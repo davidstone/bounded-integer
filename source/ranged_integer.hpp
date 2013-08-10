@@ -30,10 +30,15 @@ enum class signed_arithmetic {
 	any, force_signed, force_unsigned
 };
 
-template<intmax_t minimum, intmax_t maximum>
-using signed_underlying_t = int;
+namespace detail {
+
+template<typename T1, typename T2>
+using larger_type = typename std::conditional<sizeof(T1) >= sizeof(T2), T1, T2>::type;
 
 template<intmax_t minimum, intmax_t maximum>
+using signed_underlying_t = larger_type<typename boost::int_min_value_t<minimum>::least, typename boost::int_max_value_t<maximum>::least>;
+
+template<uintmax_t minimum, uintmax_t maximum>
 using unsigned_underlying_t = typename boost::uint_value_t<maximum>::least;
 
 template<intmax_t minimum, intmax_t maximum, bool must_be_signed>
@@ -42,6 +47,8 @@ using underlying_t = typename std::conditional<
 	signed_underlying_t<minimum, maximum>,
 	unsigned_underlying_t<minimum, maximum>
 >::type;
+
+}	// namespace detail
 
 class throw_on_overflow {
 public:
@@ -58,7 +65,7 @@ public:
 template<intmax_t minimum, intmax_t maximum, signed_arithmetic s, typename OverflowPolicy>
 class ranged_integer {
 public:
-	using underlying_type = underlying_t<minimum, maximum, s == signed_arithmetic::force_signed>;
+	using underlying_type = detail::underlying_t<minimum, maximum, s == signed_arithmetic::force_signed>;
 	constexpr explicit ranged_integer(underlying_type value):
 		m_value(OverflowPolicy::template enforce<minimum, maximum>(value)) {
 	}
