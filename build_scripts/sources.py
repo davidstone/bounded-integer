@@ -30,4 +30,4 @@ def prepend_dir(directory, sources):
 # It is already assumed that the sources are in the 'source/' folder; it does
 # not need to be specified.
 
-base_sources = [('main', ['main.cpp'], [])]
+base_sources = [('ranged_integer', ['ranged_integer.cpp'], [])]

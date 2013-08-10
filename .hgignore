@@ -1,0 +1,11 @@
+syntax: regexp
+
+^ranged_integer$
+^ranged_integer-debug$
+
+syntax: glob
+
+*.o
+*.pyc
+
+.sconsign.dblite
