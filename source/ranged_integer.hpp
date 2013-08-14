@@ -51,6 +51,15 @@ using underlying_t = typename std::conditional<
 }	// namespace detail
 
 template<intmax_t minimum, intmax_t maximum>
+class null_policy {
+public:
+	template<typename integer>
+	constexpr integer operator()(integer const new_value) const noexcept {
+		return new_value;
+	}
+};
+
+template<intmax_t minimum, intmax_t maximum>
 class throw_on_overflow {
 public:
 	template<typename integer>
