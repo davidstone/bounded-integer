@@ -50,10 +50,11 @@ using underlying_t = typename std::conditional<
 
 }	// namespace detail
 
+template<intmax_t minimum, intmax_t maximum>
 class throw_on_overflow {
 public:
-	template<intmax_t minimum, intmax_t maximum, typename integer>
-	static constexpr integer enforce(integer const new_value) {
+	template<typename integer>
+	constexpr integer operator()(integer const new_value) const {
 		return (new_value < minimum) ?
 			throw std::underflow_error{"Value too small"} :
 			((new_value > maximum) ?
@@ -62,12 +63,13 @@ public:
 	}
 };
 
-template<intmax_t minimum, intmax_t maximum, signed_arithmetic s, typename OverflowPolicy>
+template<intmax_t minimum, intmax_t maximum, signed_arithmetic s, template<intmax_t, intmax_t> class OverflowPolicy>
 class ranged_integer {
 public:
 	using underlying_type = detail::underlying_t<minimum, maximum, s == signed_arithmetic::force_signed>;
+	using overflow_policy = OverflowPolicy<minimum, maximum>;
 	constexpr explicit ranged_integer(underlying_type value):
-		m_value(OverflowPolicy::template enforce<minimum, maximum>(value)) {
+		m_value(overflow_policy{}(value)) {
 	}
 	constexpr ranged_integer(ranged_integer const & other) noexcept = default;
 	constexpr ranged_integer(ranged_integer && other) noexcept = default;
@@ -76,7 +78,7 @@ public:
 
 	// No checks if we are constructing from a ranged_integer that fits entirely
 	// within the range of this ranged_integer.
-	template<intmax_t other_min, intmax_t other_max, signed_arithmetic other_arithmetic, typename other_overflow_policy, enable_if_t<
+	template<intmax_t other_min, intmax_t other_max, signed_arithmetic other_arithmetic, template<intmax_t, intmax_t> class other_overflow_policy, enable_if_t<
 			other_min >= minimum and other_max <= maximum
 	>...>
 	constexpr ranged_integer(ranged_integer<other_min, other_max, other_arithmetic, other_overflow_policy> const & other) noexcept:
@@ -85,7 +87,7 @@ public:
 
 	// Allow an explicit conversion from one ranged_integer type to another as
 	// long as the values at least have some overlap
-	template<intmax_t other_min, intmax_t other_max, signed_arithmetic other_arithmetic, typename other_overflow_policy, enable_if_t<
+	template<intmax_t other_min, intmax_t other_max, signed_arithmetic other_arithmetic, template<intmax_t, intmax_t> class other_overflow_policy, enable_if_t<
 		((other_min < minimum) or (other_max > maximum))
 		and (other_min <= maximum and other_max >= minimum)
 	>...>
@@ -94,14 +96,14 @@ public:
 	}
 
 	ranged_integer & operator=(underlying_type value) {
-		m_value = OverflowPolicy::template enforce<minimum, maximum>(value);
+		m_value = overflow_policy{}(value);
 		return *this;
 	}
 	constexpr operator underlying_type() const noexcept {
 		return m_value;
 	}
 private:
-	template<intmax_t other_min, intmax_t other_max, signed_arithmetic other_arithmetic, typename other_overflow_policy>
+	template<intmax_t other_min, intmax_t other_max, signed_arithmetic other_arithmetic, template<intmax_t, intmax_t> class other_overflow_policy>
 	friend class ranged_integer;
 	underlying_type m_value;
 };
