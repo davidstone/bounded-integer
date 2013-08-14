@@ -21,6 +21,7 @@
 
 #include <cstdint>
 
+// Addition
 template<
 	template<intmax_t, intmax_t> class result_overflow_policy,
 	intmax_t lhs_min, intmax_t lhs_max, template<intmax_t, intmax_t> class lhs_overflow_policy,
@@ -46,6 +47,9 @@ constexpr auto operator+(
 	return add<overflow_policy>(lhs, rhs);
 }
 
+
+
+// Subtraction
 template<
 	template<intmax_t, intmax_t> class result_overflow_policy,
 	intmax_t lhs_min, intmax_t lhs_max, template<intmax_t, intmax_t> class lhs_overflow_policy,
@@ -70,5 +74,54 @@ constexpr auto operator-(
 ) noexcept -> decltype(subtract<overflow_policy>(lhs, rhs)) {
 	return subtract<overflow_policy>(lhs, rhs);
 }
+
+
+// Multiplication
+namespace detail {
+constexpr intmax_t min(intmax_t lhs, intmax_t rhs) noexcept {
+	return (lhs < rhs) ? lhs : rhs;
+}
+constexpr intmax_t max(intmax_t lhs, intmax_t rhs) noexcept {
+	return (lhs >= rhs) ? lhs : rhs;
+}
+template<intmax_t lhs_min, intmax_t lhs_max, intmax_t rhs_min, intmax_t rhs_max>
+class product_range {
+private:
+	static constexpr auto p0 = lhs_min * rhs_min;
+	static constexpr auto p1 = lhs_min * rhs_max;
+	static constexpr auto p2 = lhs_max * rhs_min;
+	static constexpr auto p3 = lhs_max * rhs_max;
+public:
+	static constexpr auto min_product = min(p0, min(p1, min(p2, p3)));
+	static constexpr auto max_product = max(p0, max(p1, max(p2, p3)));
+};
+}	// namespace detail
+
+template<
+	template<intmax_t, intmax_t> class result_overflow_policy,
+	intmax_t lhs_min, intmax_t lhs_max, template<intmax_t, intmax_t> class lhs_overflow_policy,
+	intmax_t rhs_min, intmax_t rhs_max, template<intmax_t, intmax_t> class rhs_overflow_policy,
+	typename product_range_t = detail::product_range<lhs_min, lhs_max, rhs_min, rhs_max>,
+	typename result_type = ranged_integer<product_range_t::min_product, product_range_t::max_product, result_overflow_policy>
+>
+constexpr result_type multiply(
+	ranged_integer<lhs_min, lhs_max, lhs_overflow_policy> const lhs,
+	ranged_integer<rhs_min, rhs_max, rhs_overflow_policy> const rhs
+) noexcept {
+	return result_type(lhs.value() * rhs.value(), non_check);
+}
+
+template<
+	intmax_t lhs_min, intmax_t lhs_max,
+	intmax_t rhs_min, intmax_t rhs_max,
+	template<intmax_t, intmax_t> class overflow_policy
+>
+constexpr auto operator*(
+	ranged_integer<lhs_min, lhs_max, overflow_policy> const lhs,
+	ranged_integer<rhs_min, rhs_max, overflow_policy> const rhs
+) noexcept -> decltype(multiply<overflow_policy>(lhs, rhs)) {
+	return multiply<overflow_policy>(lhs, rhs);
+}
+
 
 #endif	// RANGED_INTEGER_OPERATORS_HPP_

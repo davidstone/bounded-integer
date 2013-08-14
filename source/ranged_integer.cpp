@@ -1,4 +1,5 @@
 #include "ranged_integer.hpp"
+#include <cassert>
 #include <limits>
 
 namespace {
@@ -24,13 +25,23 @@ int main() {
 	check_sizes();
 	constexpr checked_integer<1, 10> const x(9);
 	static_assert(sizeof(x) == 1, "checked_integer too big!");
-	constexpr checked_integer<0, 11> const y(x);
+	constexpr checked_integer<-3, 11> const y(x);
+
 	constexpr auto sum = x + y;
-	static_assert(sum.min == 1, "Minimum sum incorrect.");
+	static_assert(sum.min == -2, "Minimum sum incorrect.");
 	static_assert(sum.max == 21, "Maximum sum incorrect.");
+	assert(sum.value() == 18);
+
 	constexpr auto difference = x - y;
 	static_assert(difference.min == -10, "Minimum difference incorrect.");
-	static_assert(difference.max == 10, "Maximum difference incorrect.");
+	static_assert(difference.max == 13, "Maximum difference incorrect.");
+	assert(difference.value() == 0);
+
+	constexpr auto product = x * y;
+	static_assert(product.min == -30, "Minimum product incorrect.");
+	static_assert(product.max == 110, "Maximum product incorrect.");
+	assert(product.value() == 81);
+
 	// constexpr checked_integer<2, 8> const z(x);
 	// checked_integer<13, 63> const non_overlapping(x);
 }

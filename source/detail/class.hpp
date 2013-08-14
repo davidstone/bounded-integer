@@ -73,7 +73,10 @@ public:
 			other_min >= minimum and other_max <= maximum
 	>...>
 	constexpr ranged_integer(ranged_integer<other_min, other_max, other_overflow_policy> const & other) noexcept:
-		m_value(other.m_value) {
+		// static_cast required because we can convert an unsigned type to a
+		// signed type, and high warning levels in compilers can complain about
+		// this conversion.
+		m_value(static_cast<underlying_type>(other.m_value)) {
 	}
 
 	// Allow an explicit conversion from one ranged_integer type to another as
