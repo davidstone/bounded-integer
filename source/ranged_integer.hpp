@@ -55,6 +55,9 @@ public:
 	}
 };
 
+// Does not verify that the value is in range with the policy
+enum non_check_t { non_check };
+
 template<intmax_t minimum, intmax_t maximum>
 class throw_on_overflow {
 public:
@@ -73,9 +76,16 @@ class ranged_integer {
 public:
 	using underlying_type = detail::underlying_t<minimum, maximum>;
 	using overflow_policy = OverflowPolicy<minimum, maximum>;
-	constexpr explicit ranged_integer(underlying_type value):
-		m_value(overflow_policy{}(value)) {
+	static constexpr intmax_t min = minimum;
+	static constexpr intmax_t max = maximum;
+	constexpr explicit ranged_integer(underlying_type other):
+		m_value(overflow_policy{}(other)) {
 	}
+
+	constexpr ranged_integer(underlying_type const other, non_check_t) noexcept:
+		m_value(other) {
+	}
+
 	constexpr ranged_integer(ranged_integer const & other) noexcept = default;
 	constexpr ranged_integer(ranged_integer && other) noexcept = default;
 	ranged_integer & operator=(ranged_integer const & other) noexcept = default;
@@ -100,18 +110,48 @@ public:
 		ranged_integer(static_cast<underlying_type>(other.m_value)) {
 	}
 
-	ranged_integer & operator=(underlying_type value) {
-		m_value = overflow_policy{}(value);
+	ranged_integer & operator=(underlying_type const other) {
+		m_value = overflow_policy{}(other);
 		return *this;
 	}
-	constexpr operator underlying_type() const noexcept {
+
+	constexpr underlying_type value() const noexcept {
 		return m_value;
+	}
+	constexpr operator underlying_type() const noexcept {
+		return value();
 	}
 private:
 	template<intmax_t other_min, intmax_t other_max, template<intmax_t, intmax_t> class other_overflow_policy>
 	friend class ranged_integer;
 	underlying_type m_value;
 };
+
+template<
+	template<intmax_t, intmax_t> class result_overflow_policy,
+	intmax_t lhs_min, intmax_t lhs_max, template<intmax_t, intmax_t> class lhs_overflow_policy,
+	intmax_t rhs_min, intmax_t rhs_max, template<intmax_t, intmax_t> class rhs_overflow_policy,
+	typename result_type = ranged_integer<lhs_min + rhs_min, lhs_max + rhs_max, result_overflow_policy>
+>
+constexpr result_type add(
+	ranged_integer<lhs_min, lhs_max, lhs_overflow_policy> const lhs,
+	ranged_integer<rhs_min, rhs_max, rhs_overflow_policy> const rhs
+) noexcept {
+	return result_type(lhs.value() + rhs.value(), non_check);
+}
+
+template<
+	intmax_t lhs_min, intmax_t lhs_max,
+	intmax_t rhs_min, intmax_t rhs_max,
+	template<intmax_t, intmax_t> class overflow_policy
+>
+constexpr auto operator+(
+	ranged_integer<lhs_min, lhs_max, overflow_policy> const lhs,
+	ranged_integer<rhs_min, rhs_max, overflow_policy> const rhs
+) noexcept -> decltype(add<overflow_policy>(lhs, rhs)) {
+	return add<overflow_policy>(lhs, rhs);
+}
+
 
 template<intmax_t minimum, intmax_t maximum>
 using checked_integer = ranged_integer<minimum, maximum, throw_on_overflow>;

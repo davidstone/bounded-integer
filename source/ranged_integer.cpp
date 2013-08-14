@@ -25,6 +25,9 @@ int main() {
 	constexpr checked_integer<1, 10> const x(9);
 	static_assert(sizeof(x) == 1, "checked_integer too big!");
 	constexpr checked_integer<0, 11> const y(x);
+	constexpr auto sum = x + y;
+	static_assert(sum.min == 1, "Minimum sum incorrect.");
+	static_assert(sum.max == 21, "Maximum sum incorrect.");
 	// constexpr checked_integer<2, 8> const z(x);
 	// checked_integer<13, 63> const non_overlapping(x);
 }
