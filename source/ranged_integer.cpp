@@ -28,6 +28,9 @@ int main() {
 	constexpr auto sum = x + y;
 	static_assert(sum.min == 1, "Minimum sum incorrect.");
 	static_assert(sum.max == 21, "Maximum sum incorrect.");
+	constexpr auto difference = x - y;
+	static_assert(difference.min == -10, "Minimum difference incorrect.");
+	static_assert(difference.max == 10, "Maximum difference incorrect.");
 	// constexpr checked_integer<2, 8> const z(x);
 	// checked_integer<13, 63> const non_overlapping(x);
 }

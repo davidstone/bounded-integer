@@ -152,6 +152,31 @@ constexpr auto operator+(
 	return add<overflow_policy>(lhs, rhs);
 }
 
+template<
+	template<intmax_t, intmax_t> class result_overflow_policy,
+	intmax_t lhs_min, intmax_t lhs_max, template<intmax_t, intmax_t> class lhs_overflow_policy,
+	intmax_t rhs_min, intmax_t rhs_max, template<intmax_t, intmax_t> class rhs_overflow_policy,
+	typename result_type = ranged_integer<lhs_min - rhs_max, lhs_max - rhs_min, result_overflow_policy>
+>
+constexpr result_type subtract(
+	ranged_integer<lhs_min, lhs_max, lhs_overflow_policy> const lhs,
+	ranged_integer<rhs_min, rhs_max, rhs_overflow_policy> const rhs
+) noexcept {
+	return result_type(lhs.value() + rhs.value(), non_check);
+}
+
+template<
+	intmax_t lhs_min, intmax_t lhs_max,
+	intmax_t rhs_min, intmax_t rhs_max,
+	template<intmax_t, intmax_t> class overflow_policy
+>
+constexpr auto operator-(
+	ranged_integer<lhs_min, lhs_max, overflow_policy> const lhs,
+	ranged_integer<rhs_min, rhs_max, overflow_policy> const rhs
+) noexcept -> decltype(subtract<overflow_policy>(lhs, rhs)) {
+	return subtract<overflow_policy>(lhs, rhs);
+}
+
 
 template<intmax_t minimum, intmax_t maximum>
 using checked_integer = ranged_integer<minimum, maximum, throw_on_overflow>;
