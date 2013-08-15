@@ -1,6 +1,7 @@
 #include "ranged_integer.hpp"
 #include <cassert>
 #include <limits>
+#include <iostream>
 
 namespace {
 template<typename Integer>
@@ -26,21 +27,27 @@ int main() {
 	constexpr checked_integer<1, 10> const x(9);
 	static_assert(sizeof(x) == 1, "checked_integer too big!");
 	constexpr checked_integer<-3, 11> const y(x);
+	constexpr checked_integer<-3, 11> const z(4);
 
-	constexpr auto sum = x + y;
+	constexpr auto sum = x + z;
 	static_assert(sum.min == -2, "Minimum sum incorrect.");
 	static_assert(sum.max == 21, "Maximum sum incorrect.");
-	assert(sum.value() == 18);
+	assert(sum.value() == 13);
 
-	constexpr auto difference = x - y;
+	constexpr auto difference = x - z;
 	static_assert(difference.min == -10, "Minimum difference incorrect.");
 	static_assert(difference.max == 13, "Maximum difference incorrect.");
-	assert(difference.value() == 0);
+	assert(difference.value() == 5);
 
-	constexpr auto product = x * y;
+	constexpr auto product = x * z;
 	static_assert(product.min == -30, "Minimum product incorrect.");
 	static_assert(product.max == 110, "Maximum product incorrect.");
-	assert(product.value() == 81);
+	assert(product.value() == 36);
+
+	constexpr auto quotient = x / z;
+	static_assert(quotient.min == -3, "Minimum quotient incorrect.");
+	static_assert(quotient.max == 10, "Maximum quotient incorrect.");
+	assert(quotient.value() == 2);
 
 	// constexpr checked_integer<2, 8> const z(x);
 	// checked_integer<13, 63> const non_overlapping(x);
