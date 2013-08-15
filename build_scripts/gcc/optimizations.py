@@ -15,5 +15,5 @@
 # along with this program. If not, see <http://www.gnu.org/licenses/>.
 
 optimizations = ['-Ofast', '-march=native', '-fipa-pta', '-fnothrow-opt', '-fomit-frame-pointer', '-funsafe-loop-optimizations', '-flto=4']
-preprocessor_optimizations = ['NDEBUG']
+preprocessor_optimizations = []
 linker_optimizations = ['-fwhole-program'] + optimizations

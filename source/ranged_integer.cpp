@@ -48,6 +48,9 @@ int main() {
 	static_assert(quotient.min == -3, "Minimum quotient incorrect.");
 	static_assert(quotient.max == 10, "Maximum quotient incorrect.");
 	assert(quotient.value() == 2);
+	
+	assert(quotient < product);
+	assert(difference + 8 == sum);
 
 	// constexpr checked_integer<2, 8> const z(x);
 	// checked_integer<13, 63> const non_overlapping(x);
