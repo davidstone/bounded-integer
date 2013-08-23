@@ -32,8 +32,8 @@ using larger_type = typename std::conditional<sizeof(T1) >= sizeof(T2), T1, T2>:
 template<intmax_t minimum, intmax_t maximum>
 using signed_underlying_t = larger_type<typename boost::int_min_value_t<minimum>::least, typename boost::int_max_value_t<maximum>::least>;
 
-template<uintmax_t minimum, uintmax_t maximum>
-using unsigned_underlying_t = typename boost::uint_value_t<maximum>::least;
+template<intmax_t minimum, intmax_t maximum>
+using unsigned_underlying_t = typename boost::uint_value_t<static_cast<unsigned long long>(maximum)>::least;
 
 template<intmax_t minimum, intmax_t maximum>
 using underlying_t = typename std::conditional<
@@ -50,9 +50,11 @@ enum non_check_t { non_check };
 template<intmax_t minimum, intmax_t maximum, template<intmax_t, intmax_t> class OverflowPolicy>
 class ranged_integer {
 public:
+	static_assert(minimum <= maximum, "Maximum cannot be less than minimum");
 	using underlying_type = detail::underlying_t<minimum, maximum>;
 	using overflow_policy = OverflowPolicy<minimum, maximum>;
 
+	static_assert(minimum < 0 ? std::numeric_limits<underlying_type>::is_signed : true, "Underlying type should be signed.");
 	constexpr ranged_integer(underlying_type const other, non_check_t) noexcept:
 		m_value(other) {
 	}
@@ -83,7 +85,7 @@ public:
 		and (other_min <= maximum and other_max >= minimum)
 	>...>
 	constexpr explicit ranged_integer(integer const other):
-		m_value(overflow_policy{}(static_cast<underlying_type>(other))) {
+		ranged_integer(overflow_policy{}(static_cast<underlying_type>(other)), non_check) {
 	}
 
 	// Generate an assignment operator for any value that we have a constructor
