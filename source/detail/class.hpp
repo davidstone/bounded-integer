@@ -52,9 +52,6 @@ class ranged_integer {
 public:
 	using underlying_type = detail::underlying_t<minimum, maximum>;
 	using overflow_policy = OverflowPolicy<minimum, maximum>;
-	constexpr explicit ranged_integer(underlying_type other):
-		m_value(overflow_policy{}(other)) {
-	}
 
 	constexpr ranged_integer(underlying_type const other, non_check_t) noexcept:
 		m_value(other) {
@@ -65,30 +62,37 @@ public:
 	ranged_integer & operator=(ranged_integer const & other) noexcept = default;
 	ranged_integer & operator=(ranged_integer && other) noexcept = default;
 
-	// No checks if we are constructing from a ranged_integer that fits entirely
-	// within the range of this ranged_integer.
-	template<intmax_t other_min, intmax_t other_max, template<intmax_t, intmax_t> class other_overflow_policy, enable_if_t<
+	// No checks if we are constructing from an integer that fits entirely
+	// within the range of this ranged_integer. The default integer template
+	// arguments work around poor behavior in the gcc warning -Wtype-limits
+	template<typename integer, intmax_t other_min = std::numeric_limits<integer>::min(), intmax_t other_max = std::numeric_limits<integer>::max(), enable_if_t<
 			other_min >= minimum and other_max <= maximum
 	>...>
-	constexpr ranged_integer(ranged_integer<other_min, other_max, other_overflow_policy> const & other) noexcept:
+	constexpr ranged_integer(integer const other) noexcept:
 		// static_cast required because we can convert an unsigned type to a
 		// signed type, and high warning levels in compilers can complain about
-		// this conversion.
-		m_value(static_cast<underlying_type>(other.m_value)) {
+		// this conversion. This also allows conversion from another
+		// ranged_integer.
+		ranged_integer(static_cast<underlying_type>(other), non_check) {
 	}
 
 	// Allow an explicit conversion from one ranged_integer type to another as
 	// long as the values at least have some overlap
-	template<intmax_t other_min, intmax_t other_max, template<intmax_t, intmax_t> class other_overflow_policy, enable_if_t<
+	template<typename integer, intmax_t other_min = std::numeric_limits<integer>::min(), intmax_t other_max = std::numeric_limits<integer>::max(), enable_if_t<
 		((other_min < minimum) or (other_max > maximum))
 		and (other_min <= maximum and other_max >= minimum)
 	>...>
-	constexpr explicit ranged_integer(ranged_integer<other_min, other_max, other_overflow_policy> const & other):
-		ranged_integer(static_cast<underlying_type>(other.m_value)) {
+	constexpr explicit ranged_integer(integer const other):
+		m_value(overflow_policy{}(static_cast<underlying_type>(other))) {
 	}
 
-	ranged_integer & operator=(underlying_type const other) {
-		m_value = overflow_policy{}(other);
+	// Generate an assignment operator for any value that we have a constructor
+	// generated for. I am assuming that these fairly simple templates and
+	// copies will all be removed / inlined by the compiler, so this should be
+	// no worse than a hand-generated solution.
+	template<typename integer>
+	ranged_integer & operator=(integer other) {
+		*this = ranged_integer(std::move(other));
 		return *this;
 	}
 
