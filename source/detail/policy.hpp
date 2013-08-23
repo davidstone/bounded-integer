@@ -29,6 +29,9 @@ public:
 	constexpr integer operator()(integer const new_value) const noexcept {
 		return new_value;
 	}
+
+	// It might actually be true! This should be considered undefined
+	static constexpr bool is_modulo = false;
 };
 
 template<intmax_t minimum, intmax_t maximum>
@@ -64,6 +67,8 @@ public:
 	constexpr integer operator()(integer const new_value) const noexcept {
 		return new_value;
 	}
+	
+	static constexpr bool is_modulo = false;
 };
 
 

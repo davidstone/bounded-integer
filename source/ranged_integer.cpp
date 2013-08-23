@@ -40,6 +40,10 @@ void check_numeric_limits() {
 	RANGED_INTEGER_CHECK_CONDITION(has_denorm_loss);
 	RANGED_INTEGER_CHECK_CONDITION(is_iec559);
 	RANGED_INTEGER_CHECK_CONDITION(is_bounded);
+	// is_modulo intentionally left out because ranged_integer may differ from
+	// the behavior of built-ins. Instead, just instantiate it with a
+	// do-nothing test to verify that it compiles.
+	static_cast<void>(ranged_limits::is_modulo);
 	// RANGED_INTEGER_CHECK_CONDITION(is_modulo);
 	RANGED_INTEGER_CHECK_CONDITION(radix);
 	RANGED_INTEGER_CHECK_CONDITION(digits);
