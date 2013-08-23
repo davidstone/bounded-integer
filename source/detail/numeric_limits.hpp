@@ -70,22 +70,22 @@ public:
 		return static_cast<type>(maximum);
 	}
 	static constexpr type epsilon() noexcept {
-		return 0;
+		return static_cast<type>(0);
 	}
 	static constexpr type round_error() noexcept {
-		return 0;
+		return static_cast<type>(0);
 	}
 	static constexpr type infinity() noexcept {
-		return 0;
+		return static_cast<type>(0);
 	}
 	static constexpr type quiet_NaN() noexcept {
-		return 0;
+		return static_cast<type>(0);
 	}
 	static constexpr type signaling_NaN() noexcept {
-		return 0;
+		return static_cast<type>(0);
 	}
 	static constexpr type denorm_min() noexcept {
-		return 0;
+		return static_cast<type>(0);
 	}
 };
 

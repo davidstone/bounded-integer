@@ -18,7 +18,9 @@
 #define RANGED_INTEGER_POLICY_HPP_
 
 #include <cstdint>
+#include <limits>
 #include <stdexcept>
+#include "enable_if.hpp"
 
 template<intmax_t minimum, intmax_t maximum>
 class null_policy {
@@ -32,13 +34,35 @@ public:
 template<intmax_t minimum, intmax_t maximum>
 class throw_on_overflow {
 public:
-	template<typename integer>
+	// Even though the optimizer should be able to simplify this to any of the
+	// other three, noisy compiler warnings mean that I have to break this into
+	// four functions.
+	template<typename integer, intmax_t other_min = std::numeric_limits<integer>::min(), intmax_t other_max = std::numeric_limits<integer>::max(), enable_if_t<(other_min < minimum and other_max > maximum)>...>
 	constexpr integer operator()(integer const new_value) const {
 		return (new_value < minimum) ?
 			throw std::underflow_error{"Value too small"} :
 			((new_value > maximum) ?
 				throw std::overflow_error{"Value too large"} :
 				new_value);
+	}
+
+	template<typename integer, intmax_t other_min = std::numeric_limits<integer>::min(), intmax_t other_max = std::numeric_limits<integer>::max(), enable_if_t<(other_min >= minimum and other_max > maximum)>...>
+	constexpr integer operator()(integer const new_value) const {
+		return (new_value > maximum) ?
+			throw std::overflow_error{"Value too large"} :
+			new_value;
+	}
+
+	template<typename integer, intmax_t other_min = std::numeric_limits<integer>::min(), intmax_t other_max = std::numeric_limits<integer>::max(), enable_if_t<(other_min < minimum and other_max <= maximum)>...>
+	constexpr integer operator()(integer const new_value) const {
+		return (new_value > maximum) ?
+			throw std::underflow_error{"Value too small"} :
+			new_value;
+	}
+
+	template<typename integer, intmax_t other_min = std::numeric_limits<integer>::min(), intmax_t other_max = std::numeric_limits<integer>::max(), enable_if_t<(other_min >= minimum and other_max <= maximum)>...>
+	constexpr integer operator()(integer const new_value) const noexcept {
+		return new_value;
 	}
 };
 
