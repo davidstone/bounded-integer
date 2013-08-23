@@ -67,8 +67,8 @@ public:
 	// No checks if we are constructing from an integer that fits entirely
 	// within the range of this ranged_integer. The default integer template
 	// arguments work around poor behavior in the gcc warning -Wtype-limits
-	template<typename integer, intmax_t other_min = std::numeric_limits<integer>::min(), intmax_t other_max = std::numeric_limits<integer>::max(), enable_if_t<
-			other_min >= minimum and other_max <= maximum
+	template<typename integer, intmax_t other_min = static_cast<intmax_t>(std::numeric_limits<integer>::min()), intmax_t other_max = static_cast<intmax_t>(std::numeric_limits<integer>::max()), enable_if_t<
+			minimum <= other_min and other_max <= maximum
 	>...>
 	constexpr ranged_integer(integer const other) noexcept:
 		// static_cast required because we can convert an unsigned type to a
@@ -80,7 +80,7 @@ public:
 
 	// Allow an explicit conversion from one ranged_integer type to another as
 	// long as the values at least have some overlap
-	template<typename integer, intmax_t other_min = std::numeric_limits<integer>::min(), intmax_t other_max = std::numeric_limits<integer>::max(), enable_if_t<
+	template<typename integer, intmax_t other_min = static_cast<intmax_t>(std::numeric_limits<integer>::min()), intmax_t other_max = static_cast<intmax_t>(std::numeric_limits<integer>::max()), enable_if_t<
 		((other_min < minimum) or (other_max > maximum))
 		and (other_min <= maximum and other_max >= minimum)
 	>...>
@@ -101,8 +101,13 @@ public:
 	constexpr underlying_type value() const noexcept {
 		return m_value;
 	}
-	constexpr operator underlying_type() const noexcept {
-		return value();
+	// I do not verify that the value is in range or anything because the user
+	// has requested a conversion out of the safety of the ranged_integer type.
+	// It is subject to the all of the standard rules that conversion from one
+	// built-in integer type to another has.
+	template<typename integer, enable_if_t<std::is_integral<integer>::value>...>
+	constexpr explicit operator integer() const {
+		return static_cast<integer>(value());
 	}
 private:
 	template<intmax_t other_min, intmax_t other_max, template<intmax_t, intmax_t> class other_overflow_policy>

@@ -95,30 +95,30 @@ int main() {
 	constexpr auto sum = x + z;
 	static_assert(std::numeric_limits<decltype(sum)>::min() == -2, "Minimum sum incorrect.");
 	static_assert(std::numeric_limits<decltype(sum)>::max() == 21, "Maximum sum incorrect.");
-	assert(sum.value() == 13);
+	assert(sum == 13);
 
 	constexpr auto difference = x - z;
 	static_assert(std::numeric_limits<decltype(difference)>::min() == -10, "Minimum difference incorrect.");
 	static_assert(std::numeric_limits<decltype(difference)>::max() == 13, "Maximum difference incorrect.");
-	assert(difference.value() == 5);
+	assert(difference == 5);
 
 	constexpr auto product = x * z;
 	static_assert(std::numeric_limits<decltype(product)>::min() == -30, "Minimum product incorrect.");
 	static_assert(std::numeric_limits<decltype(product)>::max() == 110, "Maximum product incorrect.");
-	assert(product.value() == 36);
+	assert(product == 36);
 
 	constexpr auto quotient = x / z;
 	static_assert(std::numeric_limits<decltype(quotient)>::min() == -10, "Minimum quotient incorrect.");
 	static_assert(std::numeric_limits<decltype(quotient)>::max() == 10, "Maximum quotient incorrect.");
-	assert(quotient.value() == 2);
+	assert(quotient == 2);
 
 	constexpr auto nega = -x;
 	static_assert(std::numeric_limits<decltype(nega)>::min() == -10, "Minimum quotient incorrect.");
 	static_assert(std::numeric_limits<decltype(nega)>::max() == -1, "Maximum quotient incorrect.");
-	assert(nega.value() == -9);
+	assert(nega == -9);
 
 	assert(quotient < product);
-	assert(difference + 8 == sum);
+	assert(difference.value() + 8 == sum);
 
 	// constexpr checked_integer<2, 8> const z(x);
 	// checked_integer<13, 63> const non_overlapping(x);

@@ -183,6 +183,7 @@ constexpr auto operator/(
 }
 
 
+
 // Unary minus
 
 // Cannot be marked noexcept because -minimum might not exist
@@ -198,6 +199,136 @@ constexpr result_type negate(ranged_integer<minimum, maximum, overflow_policy> c
 template<intmax_t minimum, intmax_t maximum, template<intmax_t, intmax_t> class overflow_policy>
 constexpr auto operator-(ranged_integer<minimum, maximum, overflow_policy> const value) -> decltype(negate<overflow_policy>(value)) {
 	return negate<overflow_policy>(value);
+}
+
+
+
+// In my original implementation, I wrote these as comparisons between a
+// ranged_integer and its underlying type. However, this actually makes
+// relational operators much less useful than they otherwise could be. For
+// instance, if we have a ranged_integer with bounds [-100, 100], we might want
+// to compare that with an int64_t. If we have to first convert the value to the
+// underlying type (likely int8_t), then we are likely to invoke undefined
+// behavior. Instead, the comparison function should accept a much wider array
+// of types and convert up to the common type.
+
+// Equality
+template<
+	intmax_t lhs_min, intmax_t lhs_max, template<intmax_t, intmax_t> class lhs_overflow,
+	intmax_t rhs_min, intmax_t rhs_max, template<intmax_t, intmax_t> class rhs_overflow
+>
+constexpr bool operator==(ranged_integer<lhs_min, lhs_max, lhs_overflow> const lhs, ranged_integer<rhs_min, rhs_max, rhs_overflow> const rhs) noexcept {
+	// This doesn't properly handle signed / unsigned conversions
+	return lhs.value() == rhs.value();
+}
+
+template<
+	intmax_t lhs_min, intmax_t lhs_max, template<intmax_t, intmax_t> class lhs_overflow,
+	intmax_t rhs_min, intmax_t rhs_max, template<intmax_t, intmax_t> class rhs_overflow
+>
+constexpr bool operator!=(ranged_integer<lhs_min, lhs_max, lhs_overflow> const lhs, ranged_integer<rhs_min, rhs_max, rhs_overflow> const rhs) noexcept {
+	return !(lhs == rhs);
+}
+
+
+
+// Equality with built-ins
+
+template<intmax_t minimum, intmax_t maximum, template<intmax_t, intmax_t> class overflow_policy, typename integer, enable_if_t<std::is_integral<integer>::value>...>
+constexpr bool operator==(ranged_integer<minimum, maximum, overflow_policy> const lhs, integer const rhs) noexcept {
+	return lhs.value() == rhs;
+}
+template<intmax_t minimum, intmax_t maximum, template<intmax_t, intmax_t> class overflow_policy, typename integer, enable_if_t<std::is_integral<integer>::value>...>
+constexpr bool operator==(integer const lhs, ranged_integer<minimum, maximum, overflow_policy> const rhs) noexcept {
+	return lhs == rhs.value();
+}
+template<intmax_t minimum, intmax_t maximum, template<intmax_t, intmax_t> class overflow_policy, typename integer, enable_if_t<std::is_integral<integer>::value>...>
+constexpr bool operator!=(ranged_integer<minimum, maximum, overflow_policy> const lhs, integer const rhs) noexcept {
+	return !(lhs == rhs);
+}
+template<intmax_t minimum, intmax_t maximum, template<intmax_t, intmax_t> class overflow_policy, typename integer, enable_if_t<std::is_integral<integer>::value>...>
+constexpr bool operator!=(integer const lhs, ranged_integer<minimum, maximum, overflow_policy> const rhs) noexcept {
+	return !(lhs == rhs);
+}
+
+
+
+// Relational operators
+
+template<
+	intmax_t lhs_min, intmax_t lhs_max, template<intmax_t, intmax_t> class lhs_overflow,
+	intmax_t rhs_min, intmax_t rhs_max, template<intmax_t, intmax_t> class rhs_overflow
+>
+constexpr bool operator<(ranged_integer<lhs_min, lhs_max, lhs_overflow> const lhs, ranged_integer<rhs_min, rhs_max, rhs_overflow> const rhs) noexcept {
+	// This doesn't properly handle signed / unsigned conversions
+	return lhs.value() < rhs.value();
+}
+
+template<
+	intmax_t lhs_min, intmax_t lhs_max, template<intmax_t, intmax_t> class lhs_overflow,
+	intmax_t rhs_min, intmax_t rhs_max, template<intmax_t, intmax_t> class rhs_overflow
+>
+constexpr bool operator>(ranged_integer<lhs_min, lhs_max, lhs_overflow> const lhs, ranged_integer<rhs_min, rhs_max, rhs_overflow> const rhs) noexcept {
+	// This doesn't properly handle signed / unsigned conversions
+	return lhs.value() > rhs.value();
+}
+
+template<
+	intmax_t lhs_min, intmax_t lhs_max, template<intmax_t, intmax_t> class lhs_overflow,
+	intmax_t rhs_min, intmax_t rhs_max, template<intmax_t, intmax_t> class rhs_overflow
+>
+constexpr bool operator<=(ranged_integer<lhs_min, lhs_max, lhs_overflow> const lhs, ranged_integer<rhs_min, rhs_max, rhs_overflow> const rhs) noexcept {
+	// This doesn't properly handle signed / unsigned conversions
+	return lhs.value() <= rhs.value();
+}
+
+template<
+	intmax_t lhs_min, intmax_t lhs_max, template<intmax_t, intmax_t> class lhs_overflow,
+	intmax_t rhs_min, intmax_t rhs_max, template<intmax_t, intmax_t> class rhs_overflow
+>
+constexpr bool operator>=(ranged_integer<lhs_min, lhs_max, lhs_overflow> const lhs, ranged_integer<rhs_min, rhs_max, rhs_overflow> const rhs) noexcept {
+	// This doesn't properly handle signed / unsigned conversions
+	return lhs.value() >= rhs.value();
+}
+
+
+
+// Relational operators with built-ins
+
+template<intmax_t minimum, intmax_t maximum, template<intmax_t, intmax_t> class overflow_policy, typename integer, enable_if_t<std::is_integral<integer>::value>...>
+constexpr bool operator<(ranged_integer<minimum, maximum, overflow_policy> const lhs, integer const rhs) noexcept {
+	return lhs.value() < rhs;
+}
+template<intmax_t minimum, intmax_t maximum, template<intmax_t, intmax_t> class overflow_policy, typename integer, enable_if_t<std::is_integral<integer>::value>...>
+constexpr bool operator<(integer const lhs, ranged_integer<minimum, maximum, overflow_policy> const rhs) noexcept {
+	return lhs < rhs.value();
+}
+
+template<intmax_t minimum, intmax_t maximum, template<intmax_t, intmax_t> class overflow_policy, typename integer, enable_if_t<std::is_integral<integer>::value>...>
+constexpr bool operator>(ranged_integer<minimum, maximum, overflow_policy> const lhs, integer const rhs) noexcept {
+	return lhs.value() > rhs;
+}
+template<intmax_t minimum, intmax_t maximum, template<intmax_t, intmax_t> class overflow_policy, typename integer, enable_if_t<std::is_integral<integer>::value>...>
+constexpr bool operator>(integer const lhs, ranged_integer<minimum, maximum, overflow_policy> const rhs) noexcept {
+	return lhs > rhs.value();
+}
+
+template<intmax_t minimum, intmax_t maximum, template<intmax_t, intmax_t> class overflow_policy, typename integer, enable_if_t<std::is_integral<integer>::value>...>
+constexpr bool operator<=(ranged_integer<minimum, maximum, overflow_policy> const lhs, integer const rhs) noexcept {
+	return lhs.value() <= rhs;
+}
+template<intmax_t minimum, intmax_t maximum, template<intmax_t, intmax_t> class overflow_policy, typename integer, enable_if_t<std::is_integral<integer>::value>...>
+constexpr bool operator<=(integer const lhs, ranged_integer<minimum, maximum, overflow_policy> const rhs) noexcept {
+	return lhs <= rhs.value();
+}
+
+template<intmax_t minimum, intmax_t maximum, template<intmax_t, intmax_t> class overflow_policy, typename integer, enable_if_t<std::is_integral<integer>::value>...>
+constexpr bool operator>=(ranged_integer<minimum, maximum, overflow_policy> const lhs, integer const rhs) noexcept {
+	return lhs.value() >= rhs;
+}
+template<intmax_t minimum, intmax_t maximum, template<intmax_t, intmax_t> class overflow_policy, typename integer, enable_if_t<std::is_integral<integer>::value>...>
+constexpr bool operator>=(integer const lhs, ranged_integer<minimum, maximum, overflow_policy> const rhs) noexcept {
+	return lhs >= rhs.value();
 }
 
 
