@@ -18,12 +18,77 @@
 #define RANGED_INTEGER_NUMERIC_LIMITS_HPP_
 
 #include "class.hpp"
+#include <cmath>
 #include <limits>
+
+namespace std {
 
 template<intmax_t minimum, intmax_t maximum, template<intmax_t, intmax_t> class OverflowPolicy>
 class numeric_limits<ranged_integer<minimum, maximum, OverflowPolicy>> {
+private:
+	using type = ranged_integer<minimum, maximum, OverflowPolicy>;
 public:
-	static constexpr bool is_specialized = false;
+	static constexpr bool is_specialized = true;
+	static constexpr bool is_signed = minimum < 0;
+	static constexpr bool is_integer = true;
+	static constexpr bool is_exact = true;
+	static constexpr bool has_infinity = false;
+	static constexpr bool has_quiet_NaN = false;
+	static constexpr bool has_signaling_NaN = false;
+	static constexpr auto has_denorm = std::denorm_absent;
+	static constexpr bool has_denorm_loss = false;
+	static constexpr auto round_style = std::round_toward_zero;
+	static constexpr bool is_iec559 = false;
+	static constexpr bool is_bounded = true;
+	static constexpr bool is_modulo = OverflowPolicy<maximum, minimum>::is_modulo;
+	static constexpr int radix = 2;
+	// I don't know if this is actually correct. I could theoretically use a
+	// more compact representation of values that have a minimum that is far
+	// from zero. For instance, it only takes a single bit to represent the
+	// value in the range of 500 through 501, but my current implementation
+	// would actually use 9 bits of space. I don't know what this value is
+	// ultimately supposed to represent, and I may create a specialized version
+	// to compact the representation.
+	static constexpr int digits = boost::static_log2<(maximum > -minimum) ? maximum : -minimum>::value;
+	static constexpr int digits10 = digits * std::log10(radix);
+	static constexpr int max_digits10 = 0;
+	static constexpr int min_exponent = 0;
+	static constexpr int min_exponent10 = 0;
+	static constexpr int max_exponent = 0;
+	static constexpr int max_exponent10 = 0;
+	// If 0 is not in range, there is no trap value for arithmetic
+	static constexpr bool traps = minimum <= 0 and 0 <= maximum;
+	static constexpr bool tinyness_before = false;
+	
+	static constexpr type min() noexcept {
+		return static_cast<type>(minimum);
+	}
+	static constexpr type lowest() noexcept {
+		return static_cast<type>(minimum);
+	}
+	static constexpr type max() noexcept {
+		return static_cast<type>(maximum);
+	}
+	static constexpr type epsilon() noexcept {
+		return 0;
+	}
+	static constexpr type round_error() noexcept {
+		return 0;
+	}
+	static constexpr type infinity() noexcept {
+		return 0;
+	}
+	static constexpr type quiet_NaN() noexcept {
+		return 0;
+	}
+	static constexpr type signaling_NaN() noexcept {
+		return 0;
+	}
+	static constexpr type denorm_min() noexcept {
+		return 0;
+	}
 };
+
+}	// namespace std
 
 #endif	// RANGED_INTEGER_NUMERIC_LIMITS_HPP_

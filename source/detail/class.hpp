@@ -52,8 +52,6 @@ class ranged_integer {
 public:
 	using underlying_type = detail::underlying_t<minimum, maximum>;
 	using overflow_policy = OverflowPolicy<minimum, maximum>;
-	static constexpr intmax_t min = minimum;
-	static constexpr intmax_t max = maximum;
 	constexpr explicit ranged_integer(underlying_type other):
 		m_value(overflow_policy{}(other)) {
 	}
