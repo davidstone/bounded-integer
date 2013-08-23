@@ -27,6 +27,9 @@ template<intmax_t minimum, intmax_t maximum, template<intmax_t, intmax_t> class 
 class numeric_limits<ranged_integer<minimum, maximum, OverflowPolicy>> {
 private:
 	using type = ranged_integer<minimum, maximum, OverflowPolicy>;
+	static constexpr int log2abs(intmax_t value, int sum = 0) {
+		return (value == 0) ? sum : log2abs(value / 2, sum + 1);
+	}
 public:
 	static constexpr bool is_specialized = true;
 	static constexpr bool is_signed = minimum < 0;
@@ -49,7 +52,7 @@ public:
 	// would actually use 9 bits of space. I don't know what this value is
 	// ultimately supposed to represent, and I may create a specialized version
 	// to compact the representation.
-	static constexpr int digits = boost::static_log2<(maximum > -minimum) ? maximum : -minimum>::value;
+	static constexpr int digits = ((log2abs(maximum) > log2abs(minimum)) ? log2abs(maximum) : log2abs(minimum)) - static_cast<int>(is_signed);
 	static constexpr int digits10 = digits * std::log10(radix);
 	static constexpr int max_digits10 = 0;
 	static constexpr int min_exponent = 0;
