@@ -90,6 +90,7 @@ int main() {
 	static_assert(sizeof(x) == 1, "checked_integer too big!");
 	constexpr checked_integer<-3, 11> const y(x);
 	constexpr checked_integer<-3, 11> const z(4);
+	static_assert(std::numeric_limits<decltype(z)>::is_signed, "ranged_integer with negative value in range should be signed.");
 
 	constexpr auto sum = x + z;
 	static_assert(std::numeric_limits<decltype(sum)>::min() == -2, "Minimum sum incorrect.");
@@ -110,7 +111,12 @@ int main() {
 	static_assert(std::numeric_limits<decltype(quotient)>::min() == -10, "Minimum quotient incorrect.");
 	static_assert(std::numeric_limits<decltype(quotient)>::max() == 10, "Maximum quotient incorrect.");
 	assert(quotient.value() == 2);
-	
+
+	constexpr auto nega = -x;
+	static_assert(std::numeric_limits<decltype(nega)>::min() == -10, "Minimum quotient incorrect.");
+	static_assert(std::numeric_limits<decltype(nega)>::max() == -1, "Maximum quotient incorrect.");
+	assert(nega.value() == -9);
+
 	assert(quotient < product);
 	assert(difference + 8 == sum);
 

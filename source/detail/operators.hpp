@@ -183,4 +183,22 @@ constexpr auto operator/(
 }
 
 
+// Unary minus
+
+// Cannot be marked noexcept because -minimum might not exist
+template<
+	template<intmax_t, intmax_t> class result_overflow_policy,
+	intmax_t minimum, intmax_t maximum, template<intmax_t, intmax_t> class overflow_policy,
+	typename result_type = ranged_integer<-maximum, -minimum, result_overflow_policy>
+>
+constexpr result_type negate(ranged_integer<minimum, maximum, overflow_policy> const value) {
+	return result_type(-static_cast<typename result_type::underlying_type>(value), non_check);
+}
+
+template<intmax_t minimum, intmax_t maximum, template<intmax_t, intmax_t> class overflow_policy>
+constexpr auto operator-(ranged_integer<minimum, maximum, overflow_policy> const value) -> decltype(negate<overflow_policy>(value)) {
+	return negate<overflow_policy>(value);
+}
+
+
 #endif	// RANGED_INTEGER_OPERATORS_HPP_
