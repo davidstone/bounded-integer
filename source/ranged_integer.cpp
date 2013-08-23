@@ -45,7 +45,7 @@ int main() {
 	assert(product.value() == 36);
 
 	constexpr auto quotient = x / z;
-	static_assert(std::numeric_limits<decltype(quotient)>::min() == -3, "Minimum quotient incorrect.");
+	static_assert(std::numeric_limits<decltype(quotient)>::min() == -10, "Minimum quotient incorrect.");
 	static_assert(std::numeric_limits<decltype(quotient)>::max() == 10, "Maximum quotient incorrect.");
 	assert(quotient.value() == 2);
 	

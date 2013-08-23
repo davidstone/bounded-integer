@@ -150,7 +150,7 @@ private:
 	static constexpr auto l2 = lhs_max / rhs_min;
 	static constexpr auto l3 = lhs_max / rhs_max;
 public:
-	static constexpr auto min_quotient = min(l0, min(l1, min(l2, l3)));
+	static constexpr auto min_quotient = min(min(l0, min(l1, min(l2, l3))), min(g0, min(g1, min(g2, g3))));
 	static constexpr auto max_quotient = max(g0, max(g1, max(g2, g3)));
 };
 
