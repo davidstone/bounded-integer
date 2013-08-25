@@ -18,6 +18,7 @@
 #define RANGED_INTEGER_HPP_
 
 #include "detail/class.hpp"
+#include "detail/literal.hpp"
 #include "detail/numeric_limits.hpp"
 #include "detail/operators.hpp"
 #include "detail/policy.hpp"

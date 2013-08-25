@@ -21,6 +21,7 @@
 #include <limits>
 #include <stdexcept>
 #include "enable_if.hpp"
+#include "numeric_limits.hpp"
 
 template<intmax_t minimum, intmax_t maximum>
 class null_policy {

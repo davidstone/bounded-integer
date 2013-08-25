@@ -21,6 +21,9 @@
 
 #include <cstdint>
 
+// I'll have to revisit this. It currently invokes implementation-defined
+// behavior by casting an unsigned value to a signed value.
+
 
 // Addition
 template<
@@ -33,7 +36,7 @@ constexpr result_type add(
 	ranged_integer<lhs_min, lhs_max, lhs_overflow_policy> const lhs,
 	ranged_integer<rhs_min, rhs_max, rhs_overflow_policy> const rhs
 ) noexcept {
-	return result_type(lhs.value() + rhs.value(), non_check);
+	return result_type(static_cast<typename result_type::underlying_type>(lhs.value()) + static_cast<typename result_type::underlying_type>(rhs.value()), non_check);
 }
 
 template<
@@ -110,7 +113,7 @@ constexpr result_type multiply(
 	ranged_integer<lhs_min, lhs_max, lhs_overflow_policy> const lhs,
 	ranged_integer<rhs_min, rhs_max, rhs_overflow_policy> const rhs
 ) noexcept {
-	return result_type(lhs.value() * rhs.value(), non_check);
+	return result_type(static_cast<typename result_type::underlying_type>(lhs.value()) * static_cast<typename result_type::underlying_type>(rhs.value()), non_check);
 }
 
 template<

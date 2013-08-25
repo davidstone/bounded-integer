@@ -15,7 +15,6 @@
 // along with this program. If not, see <http://www.gnu.org/licenses/>.
 
 #include "ranged_integer.hpp"
-#include <cassert>
 #include <limits>
 #include <iostream>
 
@@ -82,9 +81,35 @@ void check_numeric_limits_all() {
 	// check_numeric_limits<uint64_t>();
 }
 
+void check_literals() {
+	// I have to use the preprocessor here to create an integer literal
+	#define RANGED_INTEGER_CHECK_LITERAL(x) \
+		do { \
+			constexpr auto value = x ## _ranged_integer; \
+			using value_type = decltype(value); \
+			\
+			static_assert(std::numeric_limits<value_type>::min() == std::numeric_limits<value_type>::max(), "Literal does not have a min possible value equal to a max possible value."); \
+			static_assert(std::numeric_limits<value_type>::min() == value, "Literal does not have a value equal to the range."); \
+			\
+			static_assert(value == static_cast<value_type::underlying_type>(x), "Inaccurate value of " #x " (cast x)"); \
+			static_assert(static_cast<decltype(x)>(value) == x, "Inaccurate value of " #x " (cast value)"); \
+		} while(false)
+	RANGED_INTEGER_CHECK_LITERAL(0);
+	RANGED_INTEGER_CHECK_LITERAL(1);
+	RANGED_INTEGER_CHECK_LITERAL(10);
+	RANGED_INTEGER_CHECK_LITERAL(1000);
+	RANGED_INTEGER_CHECK_LITERAL(4294967295);
+	RANGED_INTEGER_CHECK_LITERAL(4294967296);
+	RANGED_INTEGER_CHECK_LITERAL(9223372036854775807);
+	RANGED_INTEGER_CHECK_LITERAL(-1);
+	RANGED_INTEGER_CHECK_LITERAL(-0);
+	#undef RANGED_INTEGER_CHECK_LITERAL
+}
+
 }	// namespace
 
 int main() {
+	check_literals();
 	check_numeric_limits_all();
 	constexpr checked_integer<1, 10> const x(9);
 	static_assert(sizeof(x) == 1, "checked_integer too big!");
@@ -95,30 +120,30 @@ int main() {
 	constexpr auto sum = x + z;
 	static_assert(std::numeric_limits<decltype(sum)>::min() == -2, "Minimum sum incorrect.");
 	static_assert(std::numeric_limits<decltype(sum)>::max() == 21, "Maximum sum incorrect.");
-	assert(sum == 13);
+	static_assert(sum == 13, "Calculated sum incorrect.");
 
 	constexpr auto difference = x - z;
 	static_assert(std::numeric_limits<decltype(difference)>::min() == -10, "Minimum difference incorrect.");
 	static_assert(std::numeric_limits<decltype(difference)>::max() == 13, "Maximum difference incorrect.");
-	assert(difference == 5);
+	static_assert(difference == 5, "Calculated difference incorrect.");
 
 	constexpr auto product = x * z;
 	static_assert(std::numeric_limits<decltype(product)>::min() == -30, "Minimum product incorrect.");
 	static_assert(std::numeric_limits<decltype(product)>::max() == 110, "Maximum product incorrect.");
-	assert(product == 36);
+	static_assert(product == 36, "Calculated product incorrect.");
 
 	constexpr auto quotient = x / z;
 	static_assert(std::numeric_limits<decltype(quotient)>::min() == -10, "Minimum quotient incorrect.");
 	static_assert(std::numeric_limits<decltype(quotient)>::max() == 10, "Maximum quotient incorrect.");
-	assert(quotient == 2);
+	static_assert(quotient == 2, "Calculated quotient incorrect.");
 
-	constexpr auto nega = -x;
-	static_assert(std::numeric_limits<decltype(nega)>::min() == -10, "Minimum quotient incorrect.");
-	static_assert(std::numeric_limits<decltype(nega)>::max() == -1, "Maximum quotient incorrect.");
-	assert(nega == -9);
+	constexpr auto negation = -x;
+	static_assert(std::numeric_limits<decltype(negation)>::min() == -10, "Minimum quotient incorrect.");
+	static_assert(std::numeric_limits<decltype(negation)>::max() == -1, "Maximum quotient incorrect.");
+	static_assert(negation == -9, "Calculated negation incorrect.");
 
-	assert(quotient < product);
-	assert(difference.value() + 8 == sum);
+	static_assert(quotient < product, "quotient should be less than product.");
+	static_assert(difference.value() + 8 == sum, "difference + 8 should equal sum.");
 
 	// constexpr checked_integer<2, 8> const z(x);
 	// checked_integer<13, 63> const non_overlapping(x);
