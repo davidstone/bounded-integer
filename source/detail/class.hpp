@@ -115,4 +115,61 @@ private:
 	underlying_type m_value;
 };
 
+
+template<intmax_t only_value, template<intmax_t, intmax_t> class OverflowPolicy>
+class ranged_integer<only_value, only_value, OverflowPolicy> {
+public:
+	using underlying_type = detail::underlying_t<only_value, only_value>;
+	using overflow_policy = OverflowPolicy<only_value, only_value>;
+
+	static_assert(only_value < 0 ? std::numeric_limits<underlying_type>::is_signed : true, "Underlying type should be signed.");
+	// All constructors do nothing but check constraints. We already know this
+	// value is in range, but we still want to alert the user if they are trying
+	// to assign an illegal value.
+	//
+	// This specialization also adds a default constructor, as we have valid
+	// default behavior (still do nothing)
+	constexpr ranged_integer() noexcept = default;
+
+	constexpr ranged_integer(underlying_type const other, non_check_t) noexcept { }
+
+	constexpr ranged_integer(ranged_integer const & other) noexcept = default;
+	constexpr ranged_integer(ranged_integer && other) noexcept = default;
+	ranged_integer & operator=(ranged_integer const & other) noexcept = default;
+	ranged_integer & operator=(ranged_integer && other) noexcept = default;
+
+	// Allow an explicit conversion from one ranged_integer type to another as
+	// long as the values at least have some overlap. I have to delegate to
+	// another constructor so I can check constraints while still keeping the
+	// constexpr constructor body empty.
+	template<typename integer, intmax_t other_min = static_cast<intmax_t>(std::numeric_limits<integer>::min()), intmax_t other_max = static_cast<intmax_t>(std::numeric_limits<integer>::max()), enable_if_t<
+		(other_min <= only_value) and (only_value <= other_max)
+	>...>
+	constexpr explicit ranged_integer(integer const other):
+		ranged_integer(overflow_policy{}(static_cast<underlying_type>(other)), non_check) {
+	}
+
+	// Generate an assignment operator for any value that we have a constructor
+	// generated for. I am assuming that these fairly simple templates and
+	// copies will all be removed / inlined by the compiler, so this should be
+	// no worse than a hand-generated solution.
+	template<typename integer>
+	ranged_integer & operator=(integer other) {
+		*this = ranged_integer(std::move(other));
+		return *this;
+	}
+
+	constexpr underlying_type value() const noexcept {
+		return static_cast<underlying_type>(only_value);
+	}
+	// I do not verify that the value is in range or anything because the user
+	// has requested a conversion out of the safety of the ranged_integer type.
+	// It is subject to the all of the standard rules that conversion from one
+	// built-in integer type to another has.
+	template<typename integer, enable_if_t<std::is_integral<integer>::value>...>
+	constexpr explicit operator integer() const {
+		return static_cast<integer>(value());
+	}
+};
+
 #endif	// RANGED_INTEGER_CLASS_HPP_
