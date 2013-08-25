@@ -106,11 +106,7 @@ void check_literals() {
 	#undef RANGED_INTEGER_CHECK_LITERAL
 }
 
-}	// namespace
-
-int main() {
-	check_literals();
-	check_numeric_limits_all();
+void check_arithmetic() {
 	constexpr checked_integer<1, 10> const x(9);
 	static_assert(sizeof(x) == 1, "checked_integer too big!");
 	constexpr checked_integer<-3, 11> const y(x);
@@ -147,4 +143,11 @@ int main() {
 
 	// constexpr checked_integer<2, 8> const z(x);
 	// checked_integer<13, 63> const non_overlapping(x);
+}
+
+}	// namespace
+
+int main() {
+	check_literals();
+	check_numeric_limits_all();
 }

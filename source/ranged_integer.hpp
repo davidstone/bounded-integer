@@ -19,6 +19,7 @@
 
 #include "detail/class.hpp"
 #include "detail/literal.hpp"
+#include "detail/make_ranged.hpp"
 #include "detail/numeric_limits.hpp"
 #include "detail/operators.hpp"
 #include "detail/policy.hpp"

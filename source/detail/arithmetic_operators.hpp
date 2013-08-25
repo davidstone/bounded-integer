@@ -19,6 +19,7 @@
 
 #include "class.hpp"
 #include "enable_if.hpp"
+#include "make_ranged.hpp"
 
 #include <cstdint>
 
@@ -73,7 +74,7 @@ template<
 >
 constexpr auto operator+(
 	integer const lhs,
-	ranged_integer<lhs_min, lhs_max, overflow_policy> const rhs,
+	ranged_integer<rhs_min, rhs_max, overflow_policy> const rhs
 ) noexcept -> decltype(add<overflow_policy>(make_ranged(lhs), rhs)) {
 	return add<overflow_policy>(make_ranged(lhs), rhs);
 }
@@ -127,7 +128,7 @@ template<
 >
 constexpr auto operator-(
 	integer const lhs,
-	ranged_integer<lhs_min, lhs_max, overflow_policy> const rhs,
+	ranged_integer<rhs_min, rhs_max, overflow_policy> const rhs
 ) noexcept -> decltype(subtract<overflow_policy>(make_ranged(lhs), rhs)) {
 	return subtract<overflow_policy>(make_ranged(lhs), rhs);
 }
@@ -202,7 +203,7 @@ template<
 >
 constexpr auto operator*(
 	integer const lhs,
-	ranged_integer<lhs_min, lhs_max, overflow_policy> const rhs,
+	ranged_integer<rhs_min, rhs_max, overflow_policy> const rhs
 ) noexcept -> decltype(multiply<overflow_policy>(make_ranged(lhs), rhs)) {
 	return multiply<overflow_policy>(make_ranged(lhs), rhs);
 }
@@ -285,7 +286,7 @@ template<
 >
 constexpr auto operator/(
 	integer const lhs,
-	ranged_integer<lhs_min, lhs_max, overflow_policy> const rhs,
+	ranged_integer<rhs_min, rhs_max, overflow_policy> const rhs
 ) noexcept -> decltype(divide<overflow_policy>(make_ranged(lhs), rhs)) {
 	return divide<overflow_policy>(make_ranged(lhs), rhs);
 }
