@@ -26,14 +26,8 @@ namespace detail {
 template<intmax_t minimum, intmax_t maximum>
 using literal_policy = null_policy<minimum, maximum>;
 
-template<intmax_t n>
-class ranged_constant {
-public:
-	using type = ranged_integer<n, n, literal_policy>;
-	static constexpr type value = type(static_cast<typename type::underlying_type>(n), non_check);
-};
 template<intmax_t value>
-using ranged_constant_t = typename ranged_constant<value>::type;
+using ranged_constant = ranged_integer<value, value, literal_policy>;
 
 constexpr intmax_t power(intmax_t const radix, intmax_t const exponent) {
 	return (exponent == 0) ? 1 : radix * power(radix, exponent - 1);
@@ -44,7 +38,7 @@ class literal_ranged_integer {
 private:
 	static constexpr intmax_t radix = 10;
 	static constexpr intmax_t integer_scale = power(radix, sizeof...(digits));
-	static constexpr ranged_constant_t<integer_scale> scale = ranged_constant<integer_scale>::value;
+	static constexpr ranged_constant<integer_scale> scale{};
 public:
 	static constexpr decltype(literal_ranged_integer<digit>::value() * scale + literal_ranged_integer<digits...>::value()) value() {
 		return literal_ranged_integer<digit>::value() * scale + literal_ranged_integer<digits...>::value();
@@ -53,9 +47,11 @@ public:
 
 template<char digit>
 class literal_ranged_integer<digit> {
+private:
+	using result_type = ranged_constant<digit - '0'>;
 public:
-	static constexpr ranged_constant_t<digit - '0'> value() {
-		return ranged_constant<digit - '0'>::value;
+	static constexpr result_type value() {
+		return result_type{};
 	}
 };
 
