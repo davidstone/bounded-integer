@@ -172,4 +172,9 @@ public:
 	}
 };
 
+template<typename integer, enable_if_t<std::is_integral<integer>::value>...>
+constexpr ranged_integer<std::numeric_limits<integer>::min(), std::numeric_limits<integer>::max(), null_policy> make_ranged(integer const value) noexcept {
+	return ranged_integer<std::numeric_limits<integer>::min(), std::numeric_limits<integer>::max(), null_policy>(value, non_check);
+}
+
 #endif	// RANGED_INTEGER_CLASS_HPP_

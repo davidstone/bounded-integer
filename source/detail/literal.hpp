@@ -23,11 +23,8 @@
 
 namespace detail {
 
-template<intmax_t minimum, intmax_t maximum>
-using literal_policy = null_policy<minimum, maximum>;
-
 template<intmax_t value>
-using ranged_constant = ranged_integer<value, value, literal_policy>;
+using ranged_constant = ranged_integer<value, value, null_policy>;
 
 constexpr intmax_t power(intmax_t const radix, intmax_t const exponent) {
 	return (exponent == 0) ? 1 : radix * power(radix, exponent - 1);
