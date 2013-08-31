@@ -19,13 +19,13 @@
 
 namespace detail {
 
-template<typename Predicate, typename Integer>
-constexpr Integer minmax(Predicate const & predicate, Integer && integer) {
+template<typename Function, typename Integer>
+constexpr Integer minmax(Function const & function, Integer && integer) {
 	return integer;
 }
-template<typename Predicate, typename Integer, typename... Integers>
-constexpr auto minmax(Predicate const & predicate, Integer && integer, Integers && ... integers) -> decltype(predicate(integer, minmax(predicate, std::forward<Integers>(integers)...))) {
-	return predicate(integer, minmax(predicate, std::forward<Integers>(integers)...));
+template<typename Function, typename Integer, typename... Integers>
+constexpr auto minmax(Function const & function, Integer && integer, Integers && ... integers) -> decltype(function(integer, minmax(function, std::forward<Integers>(integers)...))) {
+	return function(integer, minmax(function, std::forward<Integers>(integers)...));
 }
 
 class less {

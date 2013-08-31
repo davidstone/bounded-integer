@@ -15,7 +15,8 @@
 // along with this program. If not, see <http://www.gnu.org/licenses/>.
 
 #include "ranged_integer.hpp"
-#include <limits>
+#include "detail/common_type.hpp"
+#include "detail/numeric_limits.hpp"
 #include <iostream>
 
 namespace {
@@ -145,9 +146,18 @@ void check_arithmetic() {
 	// checked_integer<13, 63> const non_overlapping(x);
 }
 
+void check_common_type() {
+	using expected_type = ranged_integer<1, 10, null_policy>;
+	using type1 = ranged_integer<1, 5, null_policy>;
+	using type2 = ranged_integer<3, 10, null_policy>;
+	using common_type = std::common_type<type1, type2>::type;
+	static_assert(std::is_same<expected_type, common_type>::value, "common_type wrong.");
+}
+
 }	// namespace
 
 int main() {
 	check_literals();
 	check_numeric_limits_all();
+	check_common_type();
 }
