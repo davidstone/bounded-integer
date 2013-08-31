@@ -20,6 +20,7 @@
 #include "class.hpp"
 #include "enable_if.hpp"
 #include "make_ranged.hpp"
+#include "minmax.hpp"
 
 #include <cstdint>
 
@@ -137,12 +138,6 @@ constexpr auto operator-(
 
 // Multiplication
 namespace detail {
-constexpr intmax_t min(intmax_t lhs, intmax_t rhs) noexcept {
-	return (lhs < rhs) ? lhs : rhs;
-}
-constexpr intmax_t max(intmax_t lhs, intmax_t rhs) noexcept {
-	return (lhs >= rhs) ? lhs : rhs;
-}
 template<intmax_t lhs_min, intmax_t lhs_max, intmax_t rhs_min, intmax_t rhs_max>
 class product_range {
 private:
@@ -151,8 +146,8 @@ private:
 	static constexpr auto p2 = lhs_max * rhs_min;
 	static constexpr auto p3 = lhs_max * rhs_max;
 public:
-	static constexpr auto min_product = min(p0, min(p1, min(p2, p3)));
-	static constexpr auto max_product = max(p0, max(p1, max(p2, p3)));
+	static constexpr auto min_product = min(p0, p1, p2, p3);
+	static constexpr auto max_product = max(p0, p1, p2, p3);
 };
 }	// namespace detail
 
@@ -233,8 +228,8 @@ private:
 	static constexpr auto l2 = lhs_max / rhs_min;
 	static constexpr auto l3 = lhs_max / rhs_max;
 public:
-	static constexpr auto min_quotient = min(min(l0, min(l1, min(l2, l3))), min(g0, min(g1, min(g2, g3))));
-	static constexpr auto max_quotient = max(g0, max(g1, max(g2, g3)));
+	static constexpr auto min_quotient = min(l0, l1, l2, l3, g0, g1, g2, g3);
+	static constexpr auto max_quotient = max(g0, g1, g2, g3);
 };
 
 }	// namespace detail
