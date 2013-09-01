@@ -310,4 +310,13 @@ constexpr auto operator-(ranged_integer<minimum, maximum, overflow_policy> const
 	return negate<overflow_policy>(value);
 }
 
+
+
+// Unary plus
+
+template<intmax_t minimum, intmax_t maximum, template<intmax_t, intmax_t> class OverflowPolicy>
+constexpr ranged_integer<minimum, maximum, OverflowPolicy> operator+(ranged_integer<minimum, maximum, OverflowPolicy> const & value) noexcept {
+	return value;
+}
+
 #endif	// RANGED_INTEGER_ARITHMETIC_OPERATORS_HPP_

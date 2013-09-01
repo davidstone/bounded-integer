@@ -142,6 +142,9 @@ void check_arithmetic() {
 
 	static_assert(quotient < product, "quotient should be less than product.");
 	static_assert(difference.value() + 8 == sum, "difference + 8 should equal sum.");
+	
+	constexpr auto positive = +x;
+	static_assert(positive == x, "Unary plus not a no-op.");
 
 	// constexpr checked_integer<2, 8> const z(x);
 	// checked_integer<13, 63> const non_overlapping(x);
