@@ -27,4 +27,9 @@ constexpr ranged_integer<std::numeric_limits<integer>::min(), std::numeric_limit
 	return ranged_integer<std::numeric_limits<integer>::min(), std::numeric_limits<integer>::max(), null_policy>(value, non_check);
 }
 
+template<intmax_t integer>
+constexpr ranged_integer<integer, integer, null_policy> make_ranged() noexcept {
+	return ranged_integer<integer, integer, null_policy>{};
+}
+
 #endif	// RANGED_INTEGER_MAKE_RANGED_HPP_

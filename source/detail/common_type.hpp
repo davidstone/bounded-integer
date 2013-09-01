@@ -56,4 +56,7 @@ public:
 };
 }	// namespace std
 
+template<typename... Ts>
+using common_type_t = typename std::common_type<Ts...>::type;
+
 #endif	// RANGED_INTEGER_COMMON_TYPE_HPP_

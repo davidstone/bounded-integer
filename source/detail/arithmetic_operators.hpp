@@ -18,6 +18,7 @@
 #define RANGED_INTEGER_ARITHMETIC_OPERATORS_HPP_
 
 #include "class.hpp"
+#include "common_type.hpp"
 #include "enable_if.hpp"
 #include "make_ranged.hpp"
 #include "minmax.hpp"
@@ -39,7 +40,8 @@ constexpr result_type add(
 	ranged_integer<lhs_min, lhs_max, lhs_overflow_policy> const lhs,
 	ranged_integer<rhs_min, rhs_max, rhs_overflow_policy> const rhs
 ) noexcept {
-	return result_type(static_cast<typename result_type::underlying_type>(lhs.value()) + static_cast<typename result_type::underlying_type>(rhs.value()), non_check);
+	using common = common_type_t<result_type, ranged_integer<lhs_min, lhs_max, lhs_overflow_policy>, ranged_integer<rhs_min, rhs_max, rhs_overflow_policy>>;
+	return result_type(static_cast<common>(lhs).value() + static_cast<common>(rhs).value(), non_check);
 }
 
 template<
@@ -93,7 +95,8 @@ constexpr result_type subtract(
 	ranged_integer<lhs_min, lhs_max, lhs_overflow_policy> const lhs,
 	ranged_integer<rhs_min, rhs_max, rhs_overflow_policy> const rhs
 ) noexcept {
-	return result_type(lhs.value() - rhs.value(), non_check);
+	using common = common_type_t<result_type, ranged_integer<lhs_min, lhs_max, lhs_overflow_policy>, ranged_integer<rhs_min, rhs_max, rhs_overflow_policy>>;
+	return result_type(static_cast<common>(lhs).value() - static_cast<common>(rhs).value(), non_check);
 }
 
 template<
@@ -162,7 +165,8 @@ constexpr result_type multiply(
 	ranged_integer<lhs_min, lhs_max, lhs_overflow_policy> const lhs,
 	ranged_integer<rhs_min, rhs_max, rhs_overflow_policy> const rhs
 ) noexcept {
-	return result_type(static_cast<typename result_type::underlying_type>(lhs.value()) * static_cast<typename result_type::underlying_type>(rhs.value()), non_check);
+	using common = common_type_t<result_type, ranged_integer<lhs_min, lhs_max, lhs_overflow_policy>, ranged_integer<rhs_min, rhs_max, rhs_overflow_policy>>;
+	return result_type(static_cast<common>(lhs).value() * static_cast<common>(rhs).value(), non_check);
 }
 
 template<
@@ -214,7 +218,7 @@ private:
 	// other options are a range that are entirely positive, in which case I
 	// want to return the least value, or the range is entirely negative or
 	// zero, in which case I pick the greatest absolute value (which is the
-	// minimum) to that the 'positive' divisor is not selected in a later step.
+	// minimum) so that the 'positive' divisor is not selected in a later step.
 	// We can use similar logic for greatest_negative_divisor.
 	static constexpr auto least_positive_divisor = (rhs_min <= 1 and 1 <= rhs_max) ? 1 : rhs_min;
 	static constexpr auto greatest_negative_divisor = (rhs_min <= -1 and -1 <= rhs_max) ? -1 : rhs_max;
@@ -245,7 +249,8 @@ constexpr result_type divide(
 	ranged_integer<lhs_min, lhs_max, lhs_overflow_policy> const lhs,
 	ranged_integer<rhs_min, rhs_max, rhs_overflow_policy> const rhs
 ) noexcept {
-	return result_type(lhs.value() / rhs.value(), non_check);
+	using common = common_type_t<result_type, ranged_integer<lhs_min, lhs_max, lhs_overflow_policy>, ranged_integer<rhs_min, rhs_max, rhs_overflow_policy>>;
+	return result_type(static_cast<common>(lhs).value() / static_cast<common>(rhs).value(), non_check);
 }
 
 template<

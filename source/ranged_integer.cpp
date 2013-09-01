@@ -17,6 +17,7 @@
 #include "ranged_integer.hpp"
 #include "detail/common_type.hpp"
 #include "detail/numeric_limits.hpp"
+#include <cassert>
 #include <iostream>
 
 namespace {
@@ -157,6 +158,7 @@ void check_common_type() {
 }	// namespace
 
 int main() {
+	check_arithmetic();
 	check_literals();
 	check_numeric_limits_all();
 	check_common_type();
