@@ -18,7 +18,6 @@
 #define RANGED_INTEGER_TERNARY_CONDITIONAL_HPP_
 
 #include "common_type.hpp"
-#include "minmax.hpp"
 
 namespace detail {
 
@@ -29,23 +28,36 @@ constexpr result_type ternary_conditional(LHS && lhs, RHS && rhs, Compare && com
 		static_cast<result_type>(std::forward<RHS>(rhs));
 }
 
-class ranged_less {
+
+class less {
 public:
 	template<typename LHS, typename RHS>
 	constexpr typename std::common_type<LHS, RHS>::type operator()(LHS && lhs, RHS && rhs) {
-		return ternary_conditional(lhs, rhs, [](LHS const & lhs_, RHS const & rhs_) {
-			return lhs_ < rhs_;
-		});
+		return ternary_conditional(lhs, rhs, compare{});
 	}
+private:
+	class compare {
+	public:
+		template<typename LHS, typename RHS>
+		constexpr bool operator()(LHS const & lhs, RHS const & rhs) {
+			return lhs < rhs;
+		}
+	};
 };
-class ranged_greater {
+class greater {
 public:
 	template<typename LHS, typename RHS>
 	constexpr typename std::common_type<LHS, RHS>::type operator()(LHS && lhs, RHS && rhs) {
-		return ternary_conditional(lhs, rhs, [](LHS const & lhs_, RHS const & rhs_) {
-			return lhs_ > rhs_;
-		});
+		return ternary_conditional(lhs, rhs, compare{});
 	}
+private:
+	class compare {
+	public:
+		template<typename LHS, typename RHS>
+		constexpr bool operator()(LHS const & lhs, RHS const & rhs) {
+			return lhs > rhs;
+		}
+	};
 };
 }	// namespace detail
 

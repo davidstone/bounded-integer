@@ -18,9 +18,6 @@
 #define RANGED_INTEGER_COMMON_TYPE_HPP_
 
 #include "class.hpp"
-#include "enable_if.hpp"
-#include "minmax.hpp"
-#include "numeric_limits.hpp"
 #include <type_traits>
 
 namespace std {
@@ -35,8 +32,8 @@ template<
 >
 class common_type<ranged_integer<lhs_min, lhs_max, OverflowPolicy>, ranged_integer<rhs_min, rhs_max, OverflowPolicy>> {
 private:
-	static constexpr auto minimum = ::min(lhs_min, rhs_min);
-	static constexpr auto maximum = ::max(lhs_max, rhs_max);
+	static constexpr auto minimum = (lhs_min < rhs_min) ? lhs_min : rhs_min;
+	static constexpr auto maximum = (lhs_max > rhs_max) ? lhs_max : rhs_max;
 public:
 	using type = ranged_integer<minimum, maximum, OverflowPolicy>;
 };

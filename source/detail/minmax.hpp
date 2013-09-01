@@ -17,6 +17,9 @@
 #ifndef RANGED_INTEGER_MINMAX_HPP_
 #define RANGED_INTEGER_MINMAX_HPP_
 
+#include "common_type.hpp"
+#include "ternary_conditional.hpp"
+
 namespace detail {
 
 template<typename Function, typename Integer>
@@ -24,33 +27,19 @@ constexpr Integer minmax(Function const & function, Integer && integer) {
 	return integer;
 }
 template<typename Function, typename Integer, typename... Integers>
-constexpr auto minmax(Function const & function, Integer && integer, Integers && ... integers) -> decltype(function(integer, minmax(function, std::forward<Integers>(integers)...))) {
-	return function(integer, minmax(function, std::forward<Integers>(integers)...));
+constexpr typename std::common_type<Integer, Integers...>::type minmax(Function const & function, Integer && integer, Integers && ... integers) {
+	return function(std::forward<Integer>(integer), minmax(function, std::forward<Integers>(integers)...));
 }
 
-class less {
-public:
-	template<typename T1, typename T2>
-	constexpr auto operator()(T1 && t1, T2 && t2) -> decltype((t1 < t2) ? t1 : t2) {
-		return (t1 < t2) ? t1 : t2;
-	}
-};
-class greater {
-public:
-	template<typename T1, typename T2>
-	constexpr auto operator()(T1 && t1, T2 && t2) -> decltype((t1 < t2) ? t1 : t2) {
-		return (t1 > t2) ? t1 : t2;
-	}
-};
 }	// namespace detail
 
 template<typename... Integers>
-constexpr auto min(Integers && ... integers) -> decltype(detail::minmax(detail::less{}, std::forward<Integers>(integers)...)) {
+constexpr typename std::common_type<Integers...>::type min(Integers && ... integers) {
 	return detail::minmax(detail::less{}, std::forward<Integers>(integers)...);
 }
 
 template<typename... Integers>
-constexpr auto max(Integers && ... integers) -> decltype(detail::minmax(detail::greater{}, std::forward<Integers>(integers)...)) {
+constexpr typename std::common_type<Integers...>::type max(Integers && ... integers) {
 	return detail::minmax(detail::greater{}, std::forward<Integers>(integers)...);
 }
 
