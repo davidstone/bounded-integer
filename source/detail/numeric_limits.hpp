@@ -17,8 +17,9 @@
 #ifndef RANGED_INTEGER_NUMERIC_LIMITS_HPP_
 #define RANGED_INTEGER_NUMERIC_LIMITS_HPP_
 
-#include "class.hpp"
+#include "forward_declaration.hpp"
 #include <cmath>
+#include <cstdint>
 #include <limits>
 
 namespace std {

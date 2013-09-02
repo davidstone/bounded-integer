@@ -16,6 +16,7 @@
 
 #include "ranged_integer.hpp"
 #include "detail/common_type.hpp"
+#include "detail/math.hpp"
 #include "detail/numeric_limits.hpp"
 #include <cassert>
 #include <iostream>
@@ -150,6 +151,14 @@ void check_arithmetic() {
 	// checked_integer<13, 63> const non_overlapping(x);
 }
 
+void check_math() {
+	constexpr checked_integer<-10, 4> value(-5);
+	constexpr auto absolute = abs(value);
+	constexpr checked_integer<0, 10> expected_absolute(5);
+	static_assert(std::is_same<decltype(expected_absolute), decltype(absolute)>::value, "Absolute value returns the wrong type.");
+	static_assert(absolute == expected_absolute, "Absolute value returns the wrong value.");
+}
+
 void check_common_type() {
 	using expected_type = ranged_integer<1, 10, null_policy>;
 	using type1 = ranged_integer<1, 5, null_policy>;
@@ -163,6 +172,7 @@ void check_common_type() {
 int main() {
 	check_arithmetic();
 	check_literals();
+	check_math();
 	check_numeric_limits_all();
 	check_common_type();
 }

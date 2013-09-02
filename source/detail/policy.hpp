@@ -17,11 +17,12 @@
 #ifndef RANGED_INTEGER_POLICY_HPP_
 #define RANGED_INTEGER_POLICY_HPP_
 
-#include <cstdint>
-#include <limits>
-#include <stdexcept>
 #include "enable_if.hpp"
 #include "numeric_limits.hpp"
+#include "overlapping_range.hpp"
+
+#include <cstdint>
+#include <stdexcept>
 
 template<intmax_t minimum, intmax_t maximum>
 class null_policy {
@@ -41,7 +42,9 @@ public:
 	// Even though the optimizer should be able to simplify this to any of the
 	// other three, noisy compiler warnings mean that I have to break this into
 	// four functions.
-	template<typename integer, intmax_t other_min = std::numeric_limits<integer>::min(), intmax_t other_max = std::numeric_limits<integer>::max(), enable_if_t<(other_min < minimum and other_max > maximum)>...>
+	template<typename integer, enable_if_t<
+		detail::type_can_underflow<integer>(minimum) and detail::type_can_overflow<integer>(maximum)
+	>...>
 	constexpr integer operator()(integer const new_value) const {
 		return (new_value < minimum) ?
 			throw std::underflow_error{"Value too small"} :
@@ -50,21 +53,27 @@ public:
 				new_value);
 	}
 
-	template<typename integer, intmax_t other_min = std::numeric_limits<integer>::min(), intmax_t other_max = std::numeric_limits<integer>::max(), enable_if_t<(other_min >= minimum and other_max > maximum)>...>
+	template<typename integer, enable_if_t<
+		!detail::type_can_underflow<integer>(minimum) and detail::type_can_overflow<integer>(maximum)
+	>...>
 	constexpr integer operator()(integer const new_value) const {
 		return (new_value > maximum) ?
 			throw std::overflow_error{"Value too large"} :
 			new_value;
 	}
 
-	template<typename integer, intmax_t other_min = std::numeric_limits<integer>::min(), intmax_t other_max = std::numeric_limits<integer>::max(), enable_if_t<(other_min < minimum and other_max <= maximum)>...>
+	template<typename integer, enable_if_t<
+		detail::type_can_underflow<integer>(minimum) and !detail::type_can_overflow<integer>(maximum)
+	>...>
 	constexpr integer operator()(integer const new_value) const {
-		return (new_value > maximum) ?
+		return (new_value < minimum) ?
 			throw std::underflow_error{"Value too small"} :
 			new_value;
 	}
 
-	template<typename integer, intmax_t other_min = std::numeric_limits<integer>::min(), intmax_t other_max = std::numeric_limits<integer>::max(), enable_if_t<(other_min >= minimum and other_max <= maximum)>...>
+	template<typename integer, enable_if_t<
+		detail::type_in_range<integer>(minimum, maximum)
+	>...>
 	constexpr integer operator()(integer const new_value) const noexcept {
 		return new_value;
 	}

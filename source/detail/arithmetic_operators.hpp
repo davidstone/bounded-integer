@@ -25,10 +25,6 @@
 
 #include <cstdint>
 
-// I'll have to revisit this. It currently invokes implementation-defined
-// behavior by casting an unsigned value to a signed value.
-
-
 // Addition
 template<
 	template<intmax_t, intmax_t> class result_overflow_policy,
