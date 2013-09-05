@@ -18,8 +18,8 @@
 #define RANGED_INTEGER_MATH_HPP_
 
 #include "arithmetic_operators.hpp"
-#include "class.hpp"
 #include "common_type.hpp"
+#include "forward_declaration.hpp"
 #include "minmax.hpp"
 
 template<intmax_t minimum, intmax_t maximum, template<intmax_t, intmax_t> class OverflowPolicy, typename result_type = ranged_integer<max(0, minimum), max(maximum, -minimum), OverflowPolicy>>

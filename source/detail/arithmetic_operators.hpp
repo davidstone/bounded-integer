@@ -17,9 +17,9 @@
 #ifndef RANGED_INTEGER_ARITHMETIC_OPERATORS_HPP_
 #define RANGED_INTEGER_ARITHMETIC_OPERATORS_HPP_
 
-#include "class.hpp"
 #include "common_type.hpp"
 #include "enable_if.hpp"
+#include "forward_declaration.hpp"
 #include "make_ranged.hpp"
 #include "minmax.hpp"
 

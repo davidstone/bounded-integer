@@ -18,6 +18,7 @@
 #define RANGED_INTEGER_TERNARY_CONDITIONAL_HPP_
 
 #include "common_type.hpp"
+#include <utility>
 
 namespace detail {
 

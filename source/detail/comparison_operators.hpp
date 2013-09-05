@@ -17,8 +17,8 @@
 #ifndef RANGED_INTEGER_COMPARISON_OPERATORS_HPP_
 #define RANGED_INTEGER_COMPARISON_OPERATORS_HPP_
 
-#include "class.hpp"
 #include "enable_if.hpp"
+#include "forward_declaration.hpp"
 
 #include <cstdint>
 

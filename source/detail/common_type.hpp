@@ -17,7 +17,7 @@
 #ifndef RANGED_INTEGER_COMMON_TYPE_HPP_
 #define RANGED_INTEGER_COMMON_TYPE_HPP_
 
-#include "class.hpp"
+#include "forward_declaration.hpp"
 #include <type_traits>
 
 namespace std {
