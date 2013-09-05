@@ -102,6 +102,15 @@ public:
 		*this = ranged_integer(std::move(other));
 		return *this;
 	}
+	
+	ranged_integer & operator++() {
+		++m_value;
+		return *this;
+	}
+	ranged_integer & operator--() {
+		--m_value;
+		return *this;
+	}
 
 	constexpr underlying_type value() const noexcept {
 		return m_value;
