@@ -22,7 +22,7 @@
 namespace detail {
 
 template<typename LHS, typename RHS, typename Compare, typename result_type = typename std::common_type<LHS, RHS>::type>
-constexpr result_type ternary_conditional(LHS && lhs, RHS && rhs, Compare && compare) {
+constexpr result_type ternary_conditional(Compare && compare, LHS && lhs, RHS && rhs) {
 	return std::forward<Compare>(compare)(lhs, rhs) ?
 		static_cast<result_type>(std::forward<LHS>(lhs)) :
 		static_cast<result_type>(std::forward<RHS>(rhs));
@@ -33,7 +33,7 @@ class less {
 public:
 	template<typename LHS, typename RHS>
 	constexpr typename std::common_type<LHS, RHS>::type operator()(LHS && lhs, RHS && rhs) {
-		return ternary_conditional(lhs, rhs, compare{});
+		return ternary_conditional(compare{}, lhs, rhs);
 	}
 private:
 	class compare {
@@ -48,7 +48,7 @@ class greater {
 public:
 	template<typename LHS, typename RHS>
 	constexpr typename std::common_type<LHS, RHS>::type operator()(LHS && lhs, RHS && rhs) {
-		return ternary_conditional(lhs, rhs, compare{});
+		return ternary_conditional(compare{}, lhs, rhs);
 	}
 private:
 	class compare {
