@@ -30,4 +30,4 @@ def prepend_dir(directory, sources):
 # It is already assumed that the sources are in the 'source/' folder; it does
 # not need to be specified.
 
-base_sources = [('ranged_integer', ['ranged_integer.cpp'], [])]
+base_sources = [('ranged_integer', ['ranged_integer.cpp'] + prepend_dir('detail', ['arithmetic_operators.cpp', 'class.cpp', 'common_type.cpp', 'comparison_operators.cpp', 'enable_if.cpp', 'forward_declaration.cpp', 'literal.cpp', 'make_ranged.cpp', 'math.cpp', 'minmax.cpp', 'numeric_limits.cpp', 'operators.cpp', 'overlapping_range.cpp', 'policy.cpp', 'ternary_conditional.cpp']), [])]
