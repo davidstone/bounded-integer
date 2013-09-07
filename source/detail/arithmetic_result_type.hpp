@@ -17,199 +17,98 @@
 #ifndef RANGED_INTEGER_ARITHMETIC_RESULT_TYPE_HPP_
 #define RANGED_INTEGER_ARITHMETIC_RESULT_TYPE_HPP_
 
-#include "common_type.hpp"
-#include "enable_if.hpp"
 #include "forward_declaration.hpp"
-#include "make_ranged.hpp"
 #include "minmax.hpp"
+#include "numeric_limits.hpp"
 
 #include <cstdint>
+#include <utility>
 
-// Addition
-template<
-	template<intmax_t, intmax_t> class result_overflow_policy,
-	intmax_t lhs_min, intmax_t lhs_max, template<intmax_t, intmax_t> class lhs_overflow_policy,
-	intmax_t rhs_min, intmax_t rhs_max, template<intmax_t, intmax_t> class rhs_overflow_policy,
-	typename result_type = ranged_integer<lhs_min + rhs_min, lhs_max + rhs_max, result_overflow_policy>
->
-constexpr result_type add(
-	ranged_integer<lhs_min, lhs_max, lhs_overflow_policy> const lhs,
-	ranged_integer<rhs_min, rhs_max, rhs_overflow_policy> const rhs
-) noexcept {
-	using common = common_type_t<result_type, ranged_integer<lhs_min, lhs_max, lhs_overflow_policy>, ranged_integer<rhs_min, rhs_max, rhs_overflow_policy>>;
-	return result_type(static_cast<common>(lhs).value() + static_cast<common>(rhs).value(), non_check);
-}
-
-template<
-	intmax_t lhs_min, intmax_t lhs_max,
-	intmax_t rhs_min, intmax_t rhs_max,
-	template<intmax_t, intmax_t> class overflow_policy
->
-constexpr auto operator+(
-	ranged_integer<lhs_min, lhs_max, overflow_policy> const lhs,
-	ranged_integer<rhs_min, rhs_max, overflow_policy> const rhs
-) noexcept -> decltype(add<overflow_policy>(lhs, rhs)) {
-	return add<overflow_policy>(lhs, rhs);
-}
-
-// Addition with built-ins
-template<
-	intmax_t lhs_min, intmax_t lhs_max,
-	typename integer,
-	template<intmax_t, intmax_t> class overflow_policy,
-	enable_if_t<std::is_integral<integer>::value>...
->
-constexpr auto operator+(
-	ranged_integer<lhs_min, lhs_max, overflow_policy> const lhs,
-	integer const rhs
-) noexcept -> decltype(add<overflow_policy>(lhs, make_ranged(rhs))) {
-	return add<overflow_policy>(lhs, make_ranged(rhs));
-}
-template<
-	typename integer,
-	intmax_t rhs_min, intmax_t rhs_max,
-	template<intmax_t, intmax_t> class overflow_policy,
-	enable_if_t<std::is_integral<integer>::value>...
->
-constexpr auto operator+(
-	integer const lhs,
-	ranged_integer<rhs_min, rhs_max, overflow_policy> const rhs
-) noexcept -> decltype(add<overflow_policy>(make_ranged(lhs), rhs)) {
-	return add<overflow_policy>(make_ranged(lhs), rhs);
-}
-
-
-
-// Subtraction
-template<
-	template<intmax_t, intmax_t> class result_overflow_policy,
-	intmax_t lhs_min, intmax_t lhs_max, template<intmax_t, intmax_t> class lhs_overflow_policy,
-	intmax_t rhs_min, intmax_t rhs_max, template<intmax_t, intmax_t> class rhs_overflow_policy,
-	typename result_type = ranged_integer<lhs_min - rhs_max, lhs_max - rhs_min, result_overflow_policy>
->
-constexpr result_type subtract(
-	ranged_integer<lhs_min, lhs_max, lhs_overflow_policy> const lhs,
-	ranged_integer<rhs_min, rhs_max, rhs_overflow_policy> const rhs
-) noexcept {
-	using common = common_type_t<result_type, ranged_integer<lhs_min, lhs_max, lhs_overflow_policy>, ranged_integer<rhs_min, rhs_max, rhs_overflow_policy>>;
-	return result_type(static_cast<common>(lhs).value() - static_cast<common>(rhs).value(), non_check);
-}
-
-template<
-	intmax_t lhs_min, intmax_t lhs_max,
-	intmax_t rhs_min, intmax_t rhs_max,
-	template<intmax_t, intmax_t> class overflow_policy
->
-constexpr auto operator-(
-	ranged_integer<lhs_min, lhs_max, overflow_policy> const lhs,
-	ranged_integer<rhs_min, rhs_max, overflow_policy> const rhs
-) noexcept -> decltype(subtract<overflow_policy>(lhs, rhs)) {
-	return subtract<overflow_policy>(lhs, rhs);
-}
-
-// Subtraction with built-ins
-template<
-	intmax_t lhs_min, intmax_t lhs_max,
-	typename integer,
-	template<intmax_t, intmax_t> class overflow_policy,
-	enable_if_t<std::is_integral<integer>::value>...
->
-constexpr auto operator-(
-	ranged_integer<lhs_min, lhs_max, overflow_policy> const lhs,
-	integer const rhs
-) noexcept -> decltype(subtract<overflow_policy>(lhs, make_ranged(rhs))) {
-	return subtract<overflow_policy>(lhs, make_ranged(rhs));
-}
-template<
-	typename integer,
-	intmax_t rhs_min, intmax_t rhs_max,
-	template<intmax_t, intmax_t> class overflow_policy,
-	enable_if_t<std::is_integral<integer>::value>...
->
-constexpr auto operator-(
-	integer const lhs,
-	ranged_integer<rhs_min, rhs_max, overflow_policy> const rhs
-) noexcept -> decltype(subtract<overflow_policy>(make_ranged(lhs), rhs)) {
-	return subtract<overflow_policy>(make_ranged(lhs), rhs);
-}
-
-
-
-// Multiplication
 namespace detail {
-template<intmax_t lhs_min, intmax_t lhs_max, intmax_t rhs_min, intmax_t rhs_max>
-class product_range {
+
+// We have to define our own function objects rather than using the classes from
+// <functional> because we need constexpr
+
+class plus {
+public:
+	template<typename LHS, typename RHS>
+	constexpr auto operator()(LHS && lhs, RHS && rhs) const noexcept -> decltype(std::forward<LHS>(lhs) + std::forward<RHS>(rhs)) {
+		return std::forward<LHS>(lhs) + std::forward<RHS>(rhs);
+	}
+};
+class minus {
+public:
+	template<typename LHS, typename RHS>
+	constexpr auto operator()(LHS && lhs, RHS && rhs) const noexcept -> decltype(std::forward<LHS>(lhs) - std::forward<RHS>(rhs)) {
+		return std::forward<LHS>(lhs) - std::forward<RHS>(rhs);
+	}
+};
+class multiplies {
+public:
+	template<typename LHS, typename RHS>
+	constexpr auto operator()(LHS && lhs, RHS && rhs) const noexcept -> decltype(std::forward<LHS>(lhs) * std::forward<RHS>(rhs)) {
+		return std::forward<LHS>(lhs) * std::forward<RHS>(rhs);
+	}
+};
+class divides {
+public:
+	template<typename LHS, typename RHS>
+	constexpr auto operator()(LHS && lhs, RHS && rhs) const -> decltype(std::forward<LHS>(lhs) / std::forward<RHS>(rhs)) {
+		return std::forward<LHS>(lhs) / std::forward<RHS>(rhs);
+	}
+};
+
+template<typename LHS, typename RHS, typename Operator>
+class operator_range {
+};
+
+template<typename LHS, typename RHS>
+class operator_range<LHS, RHS, plus> {
 private:
+	static constexpr auto lhs_min = static_cast<intmax_t>(std::numeric_limits<LHS>::min());
+	static constexpr auto lhs_max = static_cast<intmax_t>(std::numeric_limits<LHS>::max());
+	static constexpr auto rhs_min = static_cast<intmax_t>(std::numeric_limits<RHS>::min());
+	static constexpr auto rhs_max = static_cast<intmax_t>(std::numeric_limits<RHS>::max());
+public:
+	static constexpr auto minimum = lhs_min + rhs_min;
+	static constexpr auto maximum = lhs_max + rhs_max;
+};
+
+template<typename LHS, typename RHS>
+class operator_range<LHS, RHS, minus> {
+private:
+	static constexpr auto lhs_min = static_cast<intmax_t>(std::numeric_limits<LHS>::min());
+	static constexpr auto lhs_max = static_cast<intmax_t>(std::numeric_limits<LHS>::max());
+	static constexpr auto rhs_min = static_cast<intmax_t>(std::numeric_limits<RHS>::min());
+	static constexpr auto rhs_max = static_cast<intmax_t>(std::numeric_limits<RHS>::max());
+public:
+	static constexpr auto minimum = lhs_min - rhs_max;
+	static constexpr auto maximum = lhs_max - rhs_min;
+};
+
+template<typename LHS, typename RHS>
+class operator_range<LHS, RHS, multiplies> {
+private:
+	static constexpr auto lhs_min = static_cast<intmax_t>(std::numeric_limits<LHS>::min());
+	static constexpr auto lhs_max = static_cast<intmax_t>(std::numeric_limits<LHS>::max());
+	static constexpr auto rhs_min = static_cast<intmax_t>(std::numeric_limits<RHS>::min());
+	static constexpr auto rhs_max = static_cast<intmax_t>(std::numeric_limits<RHS>::max());
 	static constexpr auto p0 = lhs_min * rhs_min;
 	static constexpr auto p1 = lhs_min * rhs_max;
 	static constexpr auto p2 = lhs_max * rhs_min;
 	static constexpr auto p3 = lhs_max * rhs_max;
 public:
-	static constexpr auto min_product = min(p0, p1, p2, p3);
-	static constexpr auto max_product = max(p0, p1, p2, p3);
+	static constexpr auto minimum = min(p0, p1, p2, p3);
+	static constexpr auto maximum = max(p0, p1, p2, p3);
 };
-}	// namespace detail
 
-template<
-	template<intmax_t, intmax_t> class result_overflow_policy,
-	intmax_t lhs_min, intmax_t lhs_max, template<intmax_t, intmax_t> class lhs_overflow_policy,
-	intmax_t rhs_min, intmax_t rhs_max, template<intmax_t, intmax_t> class rhs_overflow_policy,
-	typename product_range_t = detail::product_range<lhs_min, lhs_max, rhs_min, rhs_max>,
-	typename result_type = ranged_integer<product_range_t::min_product, product_range_t::max_product, result_overflow_policy>
->
-constexpr result_type multiply(
-	ranged_integer<lhs_min, lhs_max, lhs_overflow_policy> const lhs,
-	ranged_integer<rhs_min, rhs_max, rhs_overflow_policy> const rhs
-) noexcept {
-	using common = common_type_t<result_type, ranged_integer<lhs_min, lhs_max, lhs_overflow_policy>, ranged_integer<rhs_min, rhs_max, rhs_overflow_policy>>;
-	return result_type(static_cast<common>(lhs).value() * static_cast<common>(rhs).value(), non_check);
-}
-
-template<
-	intmax_t lhs_min, intmax_t lhs_max,
-	intmax_t rhs_min, intmax_t rhs_max,
-	template<intmax_t, intmax_t> class overflow_policy
->
-constexpr auto operator*(
-	ranged_integer<lhs_min, lhs_max, overflow_policy> const lhs,
-	ranged_integer<rhs_min, rhs_max, overflow_policy> const rhs
-) noexcept -> decltype(multiply<overflow_policy>(lhs, rhs)) {
-	return multiply<overflow_policy>(lhs, rhs);
-}
-
-// Multiplication with built-ins
-template<
-	intmax_t lhs_min, intmax_t lhs_max,
-	typename integer,
-	template<intmax_t, intmax_t> class overflow_policy,
-	enable_if_t<std::is_integral<integer>::value>...
->
-constexpr auto operator*(
-	ranged_integer<lhs_min, lhs_max, overflow_policy> const lhs,
-	integer const rhs
-) noexcept -> decltype(multiply<overflow_policy>(lhs, make_ranged(rhs))) {
-	return multiply<overflow_policy>(lhs, make_ranged(rhs));
-}
-template<
-	typename integer,
-	intmax_t rhs_min, intmax_t rhs_max,
-	template<intmax_t, intmax_t> class overflow_policy,
-	enable_if_t<std::is_integral<integer>::value>...
->
-constexpr auto operator*(
-	integer const lhs,
-	ranged_integer<rhs_min, rhs_max, overflow_policy> const rhs
-) noexcept -> decltype(multiply<overflow_policy>(make_ranged(lhs), rhs)) {
-	return multiply<overflow_policy>(make_ranged(lhs), rhs);
-}
-
-
-
-// Division
-namespace detail {
-template<intmax_t lhs_min, intmax_t lhs_max, intmax_t rhs_min, intmax_t rhs_max>
-class quotient_range {
+template<typename LHS, typename RHS>
+class operator_range<LHS, RHS, divides> {
 private:
+	static constexpr auto lhs_min = static_cast<intmax_t>(std::numeric_limits<LHS>::min());
+	static constexpr auto lhs_max = static_cast<intmax_t>(std::numeric_limits<LHS>::max());
+	static constexpr auto rhs_min = static_cast<intmax_t>(std::numeric_limits<RHS>::min());
+	static constexpr auto rhs_max = static_cast<intmax_t>(std::numeric_limits<RHS>::max());
 	// If 1 falls within the range, that is the least positive divisor. The
 	// other options are a range that are entirely positive, in which case I
 	// want to return the least value, or the range is entirely negative or
@@ -228,91 +127,22 @@ private:
 	static constexpr auto l2 = lhs_max / rhs_min;
 	static constexpr auto l3 = lhs_max / rhs_max;
 public:
-	static constexpr auto min_quotient = min(l0, l1, l2, l3, g0, g1, g2, g3);
-	static constexpr auto max_quotient = max(g0, g1, g2, g3);
+	static constexpr auto minimum = min(l0, l1, l2, l3, g0, g1, g2, g3);
+	static constexpr auto maximum = max(g0, g1, g2, g3);
 };
 
 }	// namespace detail
 
-template<
-	template<intmax_t, intmax_t> class result_overflow_policy,
-	intmax_t lhs_min, intmax_t lhs_max, template<intmax_t, intmax_t> class lhs_overflow_policy,
-	intmax_t rhs_min, intmax_t rhs_max, template<intmax_t, intmax_t> class rhs_overflow_policy,
-	typename quotient_range_t = detail::quotient_range<lhs_min, lhs_max, rhs_min, rhs_max>,
-	typename result_type = ranged_integer<quotient_range_t::min_quotient, quotient_range_t::max_quotient, result_overflow_policy>
->
-constexpr result_type divide(
-	ranged_integer<lhs_min, lhs_max, lhs_overflow_policy> const lhs,
-	ranged_integer<rhs_min, rhs_max, rhs_overflow_policy> const rhs
-) noexcept {
-	using common = common_type_t<result_type, ranged_integer<lhs_min, lhs_max, lhs_overflow_policy>, ranged_integer<rhs_min, rhs_max, rhs_overflow_policy>>;
-	return result_type(static_cast<common>(lhs).value() / static_cast<common>(rhs).value(), non_check);
-}
-
-template<
-	intmax_t lhs_min, intmax_t lhs_max,
-	intmax_t rhs_min, intmax_t rhs_max,
-	template<intmax_t, intmax_t> class overflow_policy
->
-constexpr auto operator/(
-	ranged_integer<lhs_min, lhs_max, overflow_policy> const lhs,
-	ranged_integer<rhs_min, rhs_max, overflow_policy> const rhs
-) noexcept -> decltype(divide<overflow_policy>(lhs, rhs)) {
-	return divide<overflow_policy>(lhs, rhs);
-}
-
-// Division with built-ins
-template<
-	intmax_t lhs_min, intmax_t lhs_max,
-	typename integer,
-	template<intmax_t, intmax_t> class overflow_policy,
-	enable_if_t<std::is_integral<integer>::value>...
->
-constexpr auto operator/(
-	ranged_integer<lhs_min, lhs_max, overflow_policy> const lhs,
-	integer const rhs
-) noexcept -> decltype(divide<overflow_policy>(lhs, make_ranged(rhs))) {
-	return divide<overflow_policy>(lhs, make_ranged(rhs));
-}
-template<
-	typename integer,
-	intmax_t rhs_min, intmax_t rhs_max,
-	template<intmax_t, intmax_t> class overflow_policy,
-	enable_if_t<std::is_integral<integer>::value>...
->
-constexpr auto operator/(
-	integer const lhs,
-	ranged_integer<rhs_min, rhs_max, overflow_policy> const rhs
-) noexcept -> decltype(divide<overflow_policy>(make_ranged(lhs), rhs)) {
-	return divide<overflow_policy>(make_ranged(lhs), rhs);
-}
 
 
+template<template<intmax_t, intmax_t> class overflow_policy, typename LHS, typename RHS, typename Operator>
+using operator_result = ranged_integer<
+	detail::operator_range<LHS, RHS, Operator>::minimum,
+	detail::operator_range<LHS, RHS, Operator>::maximum,
+	overflow_policy
+>;
 
-// Unary minus
+template<template<intmax_t, intmax_t> class result_overflow_policy, typename integer>
+using unary_minus_result = ranged_integer<-static_cast<intmax_t>(std::numeric_limits<integer>::max()), -static_cast<intmax_t>(std::numeric_limits<integer>::min()), result_overflow_policy>;
 
-// Cannot be marked noexcept because -minimum might not exist
-template<
-	template<intmax_t, intmax_t> class result_overflow_policy,
-	intmax_t minimum, intmax_t maximum, template<intmax_t, intmax_t> class overflow_policy,
-	typename result_type = ranged_integer<-maximum, -minimum, result_overflow_policy>
->
-constexpr result_type negate(ranged_integer<minimum, maximum, overflow_policy> const value) {
-	return result_type(-static_cast<typename result_type::underlying_type>(value), non_check);
-}
-
-template<intmax_t minimum, intmax_t maximum, template<intmax_t, intmax_t> class overflow_policy>
-constexpr auto operator-(ranged_integer<minimum, maximum, overflow_policy> const value) -> decltype(negate<overflow_policy>(value)) {
-	return negate<overflow_policy>(value);
-}
-
-
-
-// Unary plus
-
-template<intmax_t minimum, intmax_t maximum, template<intmax_t, intmax_t> class OverflowPolicy>
-constexpr ranged_integer<minimum, maximum, OverflowPolicy> operator+(ranged_integer<minimum, maximum, OverflowPolicy> const & value) noexcept {
-	return value;
-}
-
-#endif	// RANGED_INTEGER_ARITHMETIC_OPERATORS_HPP_
+#endif	// RANGED_INTEGER_ARITHMETIC_RESULT_TYPE_HPP_
