@@ -21,15 +21,17 @@
 #include "common_type.hpp"
 #include "forward_declaration.hpp"
 #include "minmax.hpp"
+#include <type_traits>
 
-template<intmax_t minimum, intmax_t maximum, template<intmax_t, intmax_t> class OverflowPolicy, typename result_type = ranged_integer<max(0, minimum), max(maximum, -minimum), OverflowPolicy>>
+template<intmax_t minimum, intmax_t maximum, template<intmax_t, intmax_t> class OverflowPolicy, typename result_type = ranged_integer<max(0, minimum, -maximum), max(maximum, -minimum), OverflowPolicy>>
 constexpr result_type abs(ranged_integer<minimum, maximum, OverflowPolicy> const & value) noexcept {
 	// We have to cast the value to the common type of the argument and result
 	// type before we negate because -min might not be in the value, even if we
 	// were to cast to the underlying type first.
+	using common_t = common_type_t<typename std::decay<decltype(value)>::type, result_type>;
 	return (value >= 0) ?
-		result_type(value, non_check) :
-		result_type(-static_cast<common_type_t<typename std::decay<decltype(value)>::type, result_type>>(value), non_check);
+		result_type(static_cast<common_t>(value), non_check) :
+		result_type(-static_cast<common_t>(value), non_check);
 }
 
 #endif	// RANGED_INTEGER_MATH_HPP_

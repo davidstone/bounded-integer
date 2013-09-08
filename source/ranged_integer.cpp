@@ -159,12 +159,21 @@ void check_arithmetic() {
 	check_compound_arithmetic();
 }
 
-void check_math() {
-	constexpr checked_integer<-10, 4> value(-5);
+template<typename Initial, intmax_t initial_value, typename Expected, intmax_t expected_value>
+void check_absolute_value() {
+	constexpr Initial value(initial_value);
 	constexpr auto absolute = abs(value);
-	constexpr checked_integer<0, 10> expected_absolute(5);
+	constexpr Expected expected_absolute(expected_value);
 	static_assert(std::is_same<decltype(expected_absolute), decltype(absolute)>::value, "Absolute value returns the wrong type.");
 	static_assert(absolute == expected_absolute, "Absolute value returns the wrong value.");
+}
+
+void check_math() {
+	check_absolute_value<checked_integer<-10, 4>, -5, checked_integer<0, 10>, 5>();
+	check_absolute_value<checked_integer<-10, -10>, -10, checked_integer<10, 10>, 10>();
+	check_absolute_value<checked_integer<0, 0>, 0, checked_integer<0, 0>, 0>();
+	check_absolute_value<checked_integer<-7, 450>, -1, checked_integer<0, 450>, 1>();
+	check_absolute_value<checked_integer<-7, 450>, 1, checked_integer<0, 450>, 1>();
 }
 
 void check_common_type() {
