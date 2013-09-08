@@ -29,9 +29,7 @@ constexpr result_type abs(ranged_integer<minimum, maximum, OverflowPolicy> const
 	// type before we negate because -min might not be in the value, even if we
 	// were to cast to the underlying type first.
 	using common_t = common_type_t<typename std::decay<decltype(value)>::type, result_type>;
-	return (value >= 0) ?
-		result_type(static_cast<common_t>(value), non_check) :
-		result_type(-static_cast<common_t>(value), non_check);
+	return result_type((value >= 0) ? static_cast<common_t>(value) : -static_cast<common_t>(value), non_check);
 }
 
 #endif	// RANGED_INTEGER_MATH_HPP_
