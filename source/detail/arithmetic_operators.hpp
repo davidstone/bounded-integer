@@ -21,6 +21,7 @@
 #include "common_type.hpp"
 #include "enable_if.hpp"
 #include "forward_declaration.hpp"
+#include "is_ranged_integer.hpp"
 #include "make_ranged.hpp"
 #include "minmax.hpp"
 
@@ -28,28 +29,13 @@
 #include <type_traits>
 
 namespace detail {
-template<typename T>
-class is_ranged_integer_c {
-public:
-	static constexpr bool value = false;
-};
-template<intmax_t minimum, intmax_t maximum, template<intmax_t, intmax_t> class overflow_policy>
-class is_ranged_integer_c<ranged_integer<minimum, maximum, overflow_policy>> {
-public:
-	static constexpr bool value = true;
-};
-
-template<typename T>
-constexpr bool is_ranged_integer() noexcept {
-	return is_ranged_integer_c<typename std::decay<T>::type>::value;
-}
 
 template<
 	template<intmax_t, intmax_t> class overflow_policy,
 	typename LHS,
 	typename RHS,
 	typename Operator,
-	enable_if_t<detail::is_ranged_integer<LHS>() and detail::is_ranged_integer<RHS>()>...
+	enable_if_t<is_ranged_integer<LHS>() and is_ranged_integer<RHS>()>...
 >
 constexpr operator_result<overflow_policy, LHS, RHS, Operator> apply_operator(LHS const & lhs, RHS const & rhs, Operator const & op) {
 	using result_t = operator_result<overflow_policy, LHS, RHS, Operator>;
@@ -250,7 +236,7 @@ constexpr auto operator/(
 
 // Unary minus
 
-template<template<intmax_t, intmax_t> class overflow_policy, typename integer, enable_if_t<detail::is_ranged_integer<integer>()>...>
+template<template<intmax_t, intmax_t> class overflow_policy, typename integer, enable_if_t<is_ranged_integer<integer>()>...>
 constexpr unary_minus_result<overflow_policy, integer> negate(integer value) noexcept {
 	using result_type = unary_minus_result<overflow_policy, integer>;
 	using common_type = common_type_t<result_type, integer>;

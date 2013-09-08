@@ -109,6 +109,12 @@ void check_literals() {
 	#undef RANGED_INTEGER_CHECK_LITERAL
 }
 
+void check_compound_arithmetic() {
+	native_integer<0, 10> x(5);
+	x += 5;
+	assert(x == 10);
+}
+
 void check_arithmetic() {
 	constexpr checked_integer<1, 10> const x(9);
 	static_assert(sizeof(x) == 1, "checked_integer too big!");
@@ -149,6 +155,8 @@ void check_arithmetic() {
 
 	// constexpr checked_integer<2, 8> const z(x);
 	// checked_integer<13, 63> const non_overlapping(x);
+	
+	check_compound_arithmetic();
 }
 
 void check_math() {

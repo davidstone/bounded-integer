@@ -1,4 +1,4 @@
-// Ranged integer operators
+// Compound assignment operators
 // Copyright (C) 2013 David Stone
 //
 // This program is free software: you can redistribute it and / or modify
@@ -14,11 +14,18 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with this program. If not, see <http://www.gnu.org/licenses/>.
 
-#ifndef RANGED_INTEGER_OPERATORS_HPP_
-#define RANGED_INTEGER_OPERATORS_HPP_
+#ifndef RANGED_INTEGER_COMPOUND_ASSIGNMENT_OPERATORS_HPP_
+#define RANGED_INTEGER_COMPOUND_ASSIGNMENT_OPERATORS_HPP_
 
 #include "arithmetic_operators.hpp"
-#include "comparison_operators.hpp"
-#include "compound_assignment_operators.hpp"
+#include "forward_declaration.hpp"
 
-#endif	// RANGED_INTEGER_OPERATORS_HPP_
+template<intmax_t minimum, intmax_t maximum, template<intmax_t, intmax_t> class overflow_policy, typename integer>
+ranged_integer<minimum, maximum, overflow_policy> & operator+=(ranged_integer<minimum, maximum, overflow_policy> & ranged, integer const & other) {
+	ranged = static_cast<ranged_integer<minimum, maximum, overflow_policy>>(
+		add<overflow_policy>(ranged, make_ranged<overflow_policy>(other))
+	);
+	return ranged;
+}
+
+#endif	// RANGED_INTEGER_COMPOUND_ASSIGNMENT_OPERATORS_HPP_

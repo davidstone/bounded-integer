@@ -19,17 +19,18 @@
 
 #include "class.hpp"
 #include "enable_if.hpp"
+#include "is_ranged_integer.hpp"
 #include "policy.hpp"
 #include <limits>
 
-template<typename integer, enable_if_t<std::is_integral<integer>::value>...>
-constexpr ranged_integer<std::numeric_limits<integer>::min(), std::numeric_limits<integer>::max(), null_policy> make_ranged(integer const value) noexcept {
-	return ranged_integer<std::numeric_limits<integer>::min(), std::numeric_limits<integer>::max(), null_policy>(value, non_check);
+template<template<intmax_t, intmax_t> class overflow_policy = null_policy, typename integer = void, typename = enable_if_t<std::is_integral<integer>::value or is_ranged_integer<integer>()>>
+constexpr ranged_integer<static_cast<intmax_t>(std::numeric_limits<integer>::min()), static_cast<intmax_t>(std::numeric_limits<integer>::max()), overflow_policy> make_ranged(integer const value) noexcept {
+	return ranged_integer<static_cast<intmax_t>(std::numeric_limits<integer>::min()), static_cast<intmax_t>(std::numeric_limits<integer>::max()), overflow_policy>(value, non_check);
 }
 
-template<intmax_t integer>
-constexpr ranged_integer<integer, integer, null_policy> make_ranged() noexcept {
-	return ranged_integer<integer, integer, null_policy>{};
+template<intmax_t value, template<intmax_t, intmax_t> class overflow_policy = null_policy>
+constexpr ranged_integer<value, value, overflow_policy> make_ranged() noexcept {
+	return ranged_integer<value, value, overflow_policy>{};
 }
 
 #endif	// RANGED_INTEGER_MAKE_RANGED_HPP_

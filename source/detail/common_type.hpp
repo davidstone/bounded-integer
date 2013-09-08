@@ -17,8 +17,38 @@
 #ifndef RANGED_INTEGER_COMMON_TYPE_HPP_
 #define RANGED_INTEGER_COMMON_TYPE_HPP_
 
+#include "enable_if.hpp"
 #include "forward_declaration.hpp"
+#include "is_ranged_integer.hpp"
+#include "make_ranged.hpp"
+#include "policy.hpp"
 #include <type_traits>
+
+namespace detail {
+template<typename integer, typename... integers>
+class all_are_ranged_or_builtin_integer {
+public:
+	static constexpr bool value = all_are_ranged_or_builtin_integer<integer>::value and all_are_ranged_or_builtin_integer<integers...>::value;
+};
+
+template<typename T>
+class all_are_ranged_or_builtin_integer<T> {
+public:
+	static constexpr bool value = std::is_integral<T>::value or is_ranged_integer<T>();
+};
+
+template<typename T, typename... Ts>
+class all_are_integral {
+public:
+	static constexpr bool value = all_are_integral<T>::value and all_are_integral<Ts...>::value;
+};
+template<typename T>
+class all_are_integral<T> {
+public:
+	static constexpr bool value = std::is_integral<T>::value;
+};
+
+}	// namespace detail
 
 namespace std {
 
@@ -26,34 +56,181 @@ namespace std {
 // the type passed in, which will always work.
 
 template<
-	template<intmax_t, intmax_t> class OverflowPolicy,
+	template<intmax_t, intmax_t> class overflow_policy,
 	intmax_t lhs_min, intmax_t lhs_max,
 	intmax_t rhs_min, intmax_t rhs_max
 >
-class common_type<ranged_integer<lhs_min, lhs_max, OverflowPolicy>, ranged_integer<rhs_min, rhs_max, OverflowPolicy>> {
+class common_type<ranged_integer<lhs_min, lhs_max, overflow_policy>, ranged_integer<rhs_min, rhs_max, overflow_policy>> {
 private:
 	static constexpr auto minimum = (lhs_min < rhs_min) ? lhs_min : rhs_min;
 	static constexpr auto maximum = (lhs_max > rhs_max) ? lhs_max : rhs_max;
 public:
-	using type = ranged_integer<minimum, maximum, OverflowPolicy>;
+	using type = ranged_integer<minimum, maximum, overflow_policy>;
+};
+
+// The null_policy defers to other policies
+template<
+	template<intmax_t, intmax_t> class overflow_policy,
+	intmax_t lhs_min, intmax_t lhs_max,
+	intmax_t rhs_min, intmax_t rhs_max
+>
+class common_type<ranged_integer<lhs_min, lhs_max, overflow_policy>, ranged_integer<rhs_min, rhs_max, null_policy>> {
+private:
+	static constexpr auto minimum = (lhs_min < rhs_min) ? lhs_min : rhs_min;
+	static constexpr auto maximum = (lhs_max > rhs_max) ? lhs_max : rhs_max;
+public:
+	using type = ranged_integer<minimum, maximum, overflow_policy>;
+};
+template<
+	template<intmax_t, intmax_t> class overflow_policy,
+	intmax_t lhs_min, intmax_t lhs_max,
+	intmax_t rhs_min, intmax_t rhs_max
+>
+class common_type<ranged_integer<lhs_min, lhs_max, null_policy>, ranged_integer<rhs_min, rhs_max, overflow_policy>> {
+private:
+	static constexpr auto minimum = (lhs_min < rhs_min) ? lhs_min : rhs_min;
+	static constexpr auto maximum = (lhs_max > rhs_max) ? lhs_max : rhs_max;
+public:
+	using type = ranged_integer<minimum, maximum, overflow_policy>;
+};
+// We have to define the case of two null_policy to prevent ambiguity
+template<
+	intmax_t lhs_min, intmax_t lhs_max,
+	intmax_t rhs_min, intmax_t rhs_max
+>
+class common_type<ranged_integer<lhs_min, lhs_max, null_policy>, ranged_integer<rhs_min, rhs_max, null_policy>> {
+private:
+	static constexpr auto minimum = (lhs_min < rhs_min) ? lhs_min : rhs_min;
+	static constexpr auto maximum = (lhs_max > rhs_max) ? lhs_max : rhs_max;
+public:
+	using type = ranged_integer<minimum, maximum, null_policy>;
+};
+
+// Common type of a ranged_integer and a built-in
+// Cannot seem to get this to work with enable_if
+template<intmax_t minimum, intmax_t maximum, template<intmax_t, intmax_t> class overflow_policy, typename integer>
+class common_type<ranged_integer<minimum, maximum, overflow_policy>, integer> {
+private:
+	using type1 = ranged_integer<minimum, maximum, overflow_policy>;
+	using type2 = ranged_integer<static_cast<intmax_t>(std::numeric_limits<integer>::min()), static_cast<intmax_t>(std::numeric_limits<integer>::max()), overflow_policy>;
+public:
+	using type = typename common_type<type1, type2>::type;
+};
+
+// These specializations are needed to get proper behavior out of common_type.
+// If I just get the common_type of a variadic list of types as passed in by the
+// user, they could do something like
+// common_type<int, unsigned, checked_integer<0, UINT_MAX + 1>>::type
+// which would first convert int and unsigned to their common type (which is
+// unsigned), then get the common type of that and the ranged_integer. However,
+// the int type is outside of the range of the result, so the common type cannot
+// actually safely store any value in the range. The only safe way is to make
+// sure that I always get the common_type of a ranged_integer and another type,
+// regardless of the order passed in by the user. The common type of int and
+// checked_integer<0, UINT_MAX + 1> is checked_integer<INT_MIN, UINT_MAX + 1>,
+// and the common_type of that and unsigned gives
+// checked_integer<INT_MIN, UINT_MAX + 1>.
+//
+// Unfortunately, it looks like I have to specify each an arbitrary number of
+// integral arguments prior to the ranged_integer, so I have to just specialize
+// enough to make it unlikely to have a bunch of built-in integer types at the
+// start followed by a ranged_integer.
+
+template<
+	typename integer1,
+	intmax_t minimum, intmax_t maximum, template<intmax_t, intmax_t> class overflow_policy
+>
+class common_type<integer1, ranged_integer<minimum, maximum, overflow_policy>> {
+public:
+	using type = typename common_type<ranged_integer<minimum, maximum, overflow_policy>, integer1>::type;
+};
+
+// I only have to move the ranged_integer to the front once. After that, the
+// default definition works.
+template<
+	typename integer1,
+	typename integer2,
+	intmax_t minimum, intmax_t maximum, template<intmax_t, intmax_t> class overflow_policy,
+	typename... integers
+>
+class common_type<integer1, integer2, ranged_integer<minimum, maximum, overflow_policy>, integers...> {
+public:
+	using type = typename common_type<
+		typename common_type<
+			ranged_integer<minimum, maximum, overflow_policy>,
+			integer1
+		>::type,
+		integer2,
+		integers...
+	>::type;
 };
 
 template<
-	template<intmax_t, intmax_t> class OverflowPolicy,
-	intmax_t lhs_min, intmax_t lhs_max,
-	intmax_t rhs_min, intmax_t rhs_max,
-	typename... ranged_integers
+	typename integer1,
+	typename integer2,
+	typename integer3,
+	intmax_t minimum, intmax_t maximum, template<intmax_t, intmax_t> class overflow_policy,
+	typename... integers
 >
-class common_type<ranged_integer<lhs_min, lhs_max, OverflowPolicy>, ranged_integer<rhs_min, rhs_max, OverflowPolicy>, ranged_integers...> {
+class common_type<integer1, integer2, integer3, ranged_integer<minimum, maximum, overflow_policy>, integers...> {
 public:
 	using type = typename common_type<
-		ranged_integer<lhs_min, lhs_max, OverflowPolicy>,
 		typename common_type<
-			ranged_integer<rhs_min, rhs_max, OverflowPolicy>,
-			ranged_integers...
-		>::type
+			ranged_integer<minimum, maximum, overflow_policy>,
+			integer1
+		>::type,
+		integer2,
+		integer3,
+		integers...
 	>::type;
 };
+
+template<
+	typename integer1,
+	typename integer2,
+	typename integer3,
+	typename integer4,
+	intmax_t minimum, intmax_t maximum, template<intmax_t, intmax_t> class overflow_policy,
+	typename... integers
+>
+class common_type<integer1, integer2, integer3, integer4, ranged_integer<minimum, maximum, overflow_policy>, integers...> {
+public:
+	using type = typename common_type<
+		typename common_type<
+			ranged_integer<minimum, maximum, overflow_policy>,
+			integer1
+		>::type,
+		integer2,
+		integer3,
+		integer4,
+		integers...
+	>::type;
+};
+
+template<
+	typename integer1,
+	typename integer2,
+	typename integer3,
+	typename integer4,
+	typename integer5,
+	intmax_t minimum, intmax_t maximum, template<intmax_t, intmax_t> class overflow_policy,
+	typename... integers
+>
+class common_type<integer1, integer2, integer3, integer4, integer5, ranged_integer<minimum, maximum, overflow_policy>, integers...> {
+public:
+	using type = typename common_type<
+		typename common_type<
+			ranged_integer<minimum, maximum, overflow_policy>,
+			integer1
+		>::type,
+		integer2,
+		integer3,
+		integer4,
+		integer5,
+		integers...
+	>::type;
+};
+
 }	// namespace std
 
 template<typename... Ts>

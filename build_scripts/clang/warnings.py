@@ -30,9 +30,12 @@
 # later go through and update -1.0f values. It does not easily lend itself to a
 # different method of operation.
 #
-# -Wno-implicit-fallthrough must be used because it warns about an empty case
+# -Wimplicit-fallthrough must be disabled because it warns about an empty case
 # followed by another case (in other words, giving multiple cases identical
 # actions).
+#
+# -Wmismatched-tags warns about using class when you specialize a class that was
+# defined with struct
 #
 # -Wpadded is turned on occasionally to optimize the layout of classes, but it
 # is not left on because not all classes have enough elements to remove padding
@@ -47,6 +50,6 @@
 # overkill for an "all-or-nothing" setting.
 #
 
-warnings = ['-Weverything', '-Werror', '-Wno-c++98-compat', '-Wno-c++98-compat-pedantic', '-Wno-exit-time-destructors', '-Wno-float-equal', '-Wno-implicit-fallthrough', '-Wno-padded', '-Wno-switch-enum', '-Wno-unused-parameter', '-Wno-unused-private-field', '-Wno-unused-variable']
+warnings = ['-Weverything', '-Werror', '-Wno-c++98-compat', '-Wno-c++98-compat-pedantic', '-Wno-exit-time-destructors', '-Wno-float-equal', '-Wno-implicit-fallthrough', '-Wno-mismatched-tags', '-Wno-padded', '-Wno-switch-enum', '-Wno-unused-parameter', '-Wno-unused-private-field', '-Wno-unused-variable']
 warnings_debug = []
 warnings_optimized = []

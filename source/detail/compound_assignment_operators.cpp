@@ -1,4 +1,4 @@
-// Ranged integer operators
+// Verify that the header can stand on its own
 // Copyright (C) 2013 David Stone
 //
 // This program is free software: you can redistribute it and / or modify
@@ -14,11 +14,4 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with this program. If not, see <http://www.gnu.org/licenses/>.
 
-#ifndef RANGED_INTEGER_OPERATORS_HPP_
-#define RANGED_INTEGER_OPERATORS_HPP_
-
-#include "arithmetic_operators.hpp"
-#include "comparison_operators.hpp"
 #include "compound_assignment_operators.hpp"
-
-#endif	// RANGED_INTEGER_OPERATORS_HPP_
