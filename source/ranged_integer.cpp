@@ -148,7 +148,7 @@ void check_arithmetic() {
 	static_assert(negation == -9, "Calculated negation incorrect.");
 
 	static_assert(quotient < product, "quotient should be less than product.");
-	static_assert(difference.value() + 8 == sum, "difference + 8 should equal sum.");
+	static_assert(difference + 8 == sum, "difference + 8 should equal sum.");
 	
 	constexpr auto positive = +x;
 	static_assert(positive == x, "Unary plus not a no-op.");
