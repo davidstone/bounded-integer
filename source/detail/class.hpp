@@ -50,9 +50,6 @@ constexpr bool entirely_in_range(intmax_t const minimum, intmax_t const maximum)
 
 }	// namespace detail
 
-// Does not verify that the value is in range with the policy
-enum non_check_t { non_check };
-
 template<intmax_t minimum, intmax_t maximum, template<intmax_t, intmax_t> class OverflowPolicy>
 class ranged_integer {
 public:

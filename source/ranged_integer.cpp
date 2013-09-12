@@ -61,15 +61,19 @@ void check_numeric_limits() {
 
 	#define RANGED_INTEGER_CHECK_FUNCTION(function) \
 		static_assert(int_limits::function() == ranged_limits::function(), #function "() is wrong.")
+	// Some of the functions are meaningless for integers, so I do not compare
+	#define RANGED_INTEGER_CHECK_MEANINGLESS_FUNCTION(function) \
+		static_cast<void>(ranged_limits::function())
 	RANGED_INTEGER_CHECK_FUNCTION(min);
 	RANGED_INTEGER_CHECK_FUNCTION(lowest);
 	RANGED_INTEGER_CHECK_FUNCTION(max);
-	RANGED_INTEGER_CHECK_FUNCTION(epsilon);
-	RANGED_INTEGER_CHECK_FUNCTION(round_error);
-	RANGED_INTEGER_CHECK_FUNCTION(infinity);
-	RANGED_INTEGER_CHECK_FUNCTION(quiet_NaN);
-	RANGED_INTEGER_CHECK_FUNCTION(signaling_NaN);
-	RANGED_INTEGER_CHECK_FUNCTION(denorm_min);
+	RANGED_INTEGER_CHECK_MEANINGLESS_FUNCTION(epsilon);
+	RANGED_INTEGER_CHECK_MEANINGLESS_FUNCTION(round_error);
+	RANGED_INTEGER_CHECK_MEANINGLESS_FUNCTION(infinity);
+	RANGED_INTEGER_CHECK_MEANINGLESS_FUNCTION(quiet_NaN);
+	RANGED_INTEGER_CHECK_MEANINGLESS_FUNCTION(signaling_NaN);
+	RANGED_INTEGER_CHECK_MEANINGLESS_FUNCTION(denorm_min);
+	#undef RANGED_INTEGER_CHECK_MEANINGLESS_FUNCTION
 	#undef RANGED_INTEGER_CHECK_FUNCTION
 }
 void check_numeric_limits_all() {

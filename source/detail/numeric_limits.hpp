@@ -53,7 +53,7 @@ public:
 	// would actually use 9 bits of space. I don't know what this value is
 	// ultimately supposed to represent, and I may create a specialized version
 	// to compact the representation.
-	static constexpr int digits = ((log2abs(maximum) > log2abs(minimum)) ? log2abs(maximum) : log2abs(minimum)) - static_cast<int>(is_signed);
+	static constexpr int digits = ((log2abs(maximum) > log2abs(minimum)) ? log2abs(maximum) : log2abs(minimum)) - (is_signed ? 1 : 0);
 	static constexpr int digits10 = digits * std::log10(radix);
 	static constexpr int max_digits10 = 0;
 	static constexpr int min_exponent = 0;
@@ -65,31 +65,35 @@ public:
 	static constexpr bool tinyness_before = false;
 	
 	static constexpr type min() noexcept {
-		return static_cast<type>(minimum);
+		return type(minimum, non_check);
 	}
 	static constexpr type lowest() noexcept {
-		return static_cast<type>(minimum);
+		return type(minimum, non_check);
 	}
 	static constexpr type max() noexcept {
-		return static_cast<type>(maximum);
+		return type(maximum, non_check);
 	}
+	// Some of these functions return 0 for built-in integer types, but 0 may
+	// not be in the representable range. Fortunately, they are also defined as
+	// only being meaningful for floating-point types, so we can just stick any
+	// value in here.
 	static constexpr type epsilon() noexcept {
-		return static_cast<type>(0);
+		return type(minimum, non_check);
 	}
 	static constexpr type round_error() noexcept {
-		return static_cast<type>(0);
+		return type(minimum, non_check);
 	}
 	static constexpr type infinity() noexcept {
-		return static_cast<type>(0);
+		return type(minimum, non_check);
 	}
 	static constexpr type quiet_NaN() noexcept {
-		return static_cast<type>(0);
+		return type(minimum, non_check);
 	}
 	static constexpr type signaling_NaN() noexcept {
-		return static_cast<type>(0);
+		return type(minimum, non_check);
 	}
 	static constexpr type denorm_min() noexcept {
-		return static_cast<type>(0);
+		return type(minimum, non_check);
 	}
 };
 
