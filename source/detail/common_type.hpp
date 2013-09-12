@@ -17,6 +17,7 @@
 #ifndef RANGED_INTEGER_COMMON_TYPE_HPP_
 #define RANGED_INTEGER_COMMON_TYPE_HPP_
 
+#include "common_policy.hpp"
 #include "enable_if.hpp"
 #include "forward_declaration.hpp"
 #include "is_ranged_integer.hpp"
@@ -55,54 +56,15 @@ namespace std {
 // the type passed in, which will always work.
 
 template<
-	template<intmax_t, intmax_t> class overflow_policy,
-	intmax_t lhs_min, intmax_t lhs_max,
-	intmax_t rhs_min, intmax_t rhs_max
+	intmax_t lhs_min, intmax_t lhs_max, template<intmax_t, intmax_t> class lhs_policy,
+	intmax_t rhs_min, intmax_t rhs_max, template<intmax_t, intmax_t> class rhs_policy
 >
-class common_type<ranged_integer<lhs_min, lhs_max, overflow_policy>, ranged_integer<rhs_min, rhs_max, overflow_policy>> {
+class common_type<ranged_integer<lhs_min, lhs_max, lhs_policy>, ranged_integer<rhs_min, rhs_max, rhs_policy>> {
 private:
 	static constexpr auto minimum = (lhs_min < rhs_min) ? lhs_min : rhs_min;
 	static constexpr auto maximum = (lhs_max > rhs_max) ? lhs_max : rhs_max;
 public:
-	using type = ranged_integer<minimum, maximum, overflow_policy>;
-};
-
-// The null_policy defers to other policies
-template<
-	template<intmax_t, intmax_t> class overflow_policy,
-	intmax_t lhs_min, intmax_t lhs_max,
-	intmax_t rhs_min, intmax_t rhs_max
->
-class common_type<ranged_integer<lhs_min, lhs_max, overflow_policy>, ranged_integer<rhs_min, rhs_max, null_policy>> {
-private:
-	static constexpr auto minimum = (lhs_min < rhs_min) ? lhs_min : rhs_min;
-	static constexpr auto maximum = (lhs_max > rhs_max) ? lhs_max : rhs_max;
-public:
-	using type = ranged_integer<minimum, maximum, overflow_policy>;
-};
-template<
-	template<intmax_t, intmax_t> class overflow_policy,
-	intmax_t lhs_min, intmax_t lhs_max,
-	intmax_t rhs_min, intmax_t rhs_max
->
-class common_type<ranged_integer<lhs_min, lhs_max, null_policy>, ranged_integer<rhs_min, rhs_max, overflow_policy>> {
-private:
-	static constexpr auto minimum = (lhs_min < rhs_min) ? lhs_min : rhs_min;
-	static constexpr auto maximum = (lhs_max > rhs_max) ? lhs_max : rhs_max;
-public:
-	using type = ranged_integer<minimum, maximum, overflow_policy>;
-};
-// We have to define the case of two null_policy to prevent ambiguity
-template<
-	intmax_t lhs_min, intmax_t lhs_max,
-	intmax_t rhs_min, intmax_t rhs_max
->
-class common_type<ranged_integer<lhs_min, lhs_max, null_policy>, ranged_integer<rhs_min, rhs_max, null_policy>> {
-private:
-	static constexpr auto minimum = (lhs_min < rhs_min) ? lhs_min : rhs_min;
-	static constexpr auto maximum = (lhs_max > rhs_max) ? lhs_max : rhs_max;
-public:
-	using type = ranged_integer<minimum, maximum, null_policy>;
+	using type = typename common_policy<lhs_policy, rhs_policy>::template type<minimum, maximum>;
 };
 
 // Common type of a ranged_integer and a built-in
