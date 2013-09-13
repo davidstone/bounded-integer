@@ -117,6 +117,11 @@ void check_compound_arithmetic() {
 	native_integer<0, 10> x(5);
 	x += 5;
 	assert(x == 10);
+	checked_integer<-10, 10> y(-5);
+	y += 5;
+	assert(y == 0);
+	y += x;	
+	assert(y == 10);
 }
 
 void check_arithmetic() {
