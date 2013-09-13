@@ -23,6 +23,23 @@
 #include "policy.hpp"
 #include <limits>
 
+// This somewhat strange looking set of default arguments allows the following:
+//
+// 1) The first parameter is defaulted for the fairly common case of people
+// needing to convert their built-in integer type to a ranged_integer. The
+// ranged_integer analog to built-in integers is a ranged_integer with a
+// null_policy.
+//
+// 2) The second parameter ("integer") has to be defaulted because we defaulted
+// the first. We don't want "integer" to be the first parameter because that
+// would prevent type deduction from the function argument. Therefore, we
+// default it to something (it doesn't matter what), but the type will always be
+// deduced as whatever we pass as the argument type.
+//
+// 3) Finally, we use the defaulted template argument version of enable_if,
+// rather than using enable_if_t as seen elsewhere in this code because we have
+// to put a defaulted template parameter at the end of other defaulted
+// parameters.
 template<template<intmax_t, intmax_t> class overflow_policy = null_policy, typename integer = void, typename = enable_if_t<std::is_integral<integer>::value or is_ranged_integer<integer>()>>
 constexpr ranged_integer<static_cast<intmax_t>(std::numeric_limits<integer>::min()), static_cast<intmax_t>(std::numeric_limits<integer>::max()), overflow_policy> make_ranged(integer const value) noexcept {
 	return ranged_integer<static_cast<intmax_t>(std::numeric_limits<integer>::min()), static_cast<intmax_t>(std::numeric_limits<integer>::max()), overflow_policy>(value, non_check);
