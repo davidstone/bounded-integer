@@ -33,14 +33,14 @@ constexpr result_type ternary_conditional(Compare && compare, LHS && lhs, RHS &&
 class less {
 public:
 	template<typename LHS, typename RHS>
-	constexpr typename std::common_type<LHS, RHS>::type operator()(LHS && lhs, RHS && rhs) {
+	constexpr typename std::common_type<LHS, RHS>::type operator()(LHS && lhs, RHS && rhs) const {
 		return ternary_conditional(compare{}, lhs, rhs);
 	}
 private:
 	class compare {
 	public:
 		template<typename LHS, typename RHS>
-		constexpr bool operator()(LHS const & lhs, RHS const & rhs) {
+		constexpr bool operator()(LHS const & lhs, RHS const & rhs) const {
 			return lhs < rhs;
 		}
 	};
@@ -48,14 +48,14 @@ private:
 class greater {
 public:
 	template<typename LHS, typename RHS>
-	constexpr typename std::common_type<LHS, RHS>::type operator()(LHS && lhs, RHS && rhs) {
+	constexpr typename std::common_type<LHS, RHS>::type operator()(LHS && lhs, RHS && rhs) const {
 		return ternary_conditional(compare{}, lhs, rhs);
 	}
 private:
 	class compare {
 	public:
 		template<typename LHS, typename RHS>
-		constexpr bool operator()(LHS const & lhs, RHS const & rhs) {
+		constexpr bool operator()(LHS const & lhs, RHS const & rhs) const {
 			return lhs > rhs;
 		}
 	};
