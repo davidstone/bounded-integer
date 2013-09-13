@@ -28,8 +28,11 @@ template<intmax_t minimum, intmax_t maximum, template<intmax_t, intmax_t> class 
 class numeric_limits<ranged_integer<minimum, maximum, OverflowPolicy>> {
 private:
 	using type = ranged_integer<minimum, maximum, OverflowPolicy>;
-	static constexpr int log2abs(intmax_t value, int sum = 0) {
-		return (value == 0) ? sum : log2abs(value / 2, sum + 1);
+	static constexpr int log2abs_impl(intmax_t value, int sum) {
+		return (value == 0) ? sum : log2abs_impl(value / 2, sum + 1);
+	}
+	static constexpr int log2abs(intmax_t value) {
+		return log2abs_impl(value, 0);
 	}
 public:
 	static constexpr bool is_specialized = true;
