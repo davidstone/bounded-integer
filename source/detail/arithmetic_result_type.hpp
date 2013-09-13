@@ -17,6 +17,7 @@
 #ifndef RANGED_INTEGER_ARITHMETIC_RESULT_TYPE_HPP_
 #define RANGED_INTEGER_ARITHMETIC_RESULT_TYPE_HPP_
 
+#include "common_policy.hpp"
 #include "forward_declaration.hpp"
 #include "minmax.hpp"
 #include "numeric_limits.hpp"
@@ -58,41 +59,40 @@ public:
 	}
 };
 
-template<typename LHS, typename RHS, typename Operator>
+template<
+	intmax_t lhs_min, intmax_t lhs_max,
+	intmax_t rhs_min, intmax_t rhs_max,
+	typename Operator
+>
 class operator_range {
 };
 
-template<typename LHS, typename RHS>
-class operator_range<LHS, RHS, plus> {
-private:
-	static constexpr auto lhs_min = static_cast<intmax_t>(std::numeric_limits<LHS>::min());
-	static constexpr auto lhs_max = static_cast<intmax_t>(std::numeric_limits<LHS>::max());
-	static constexpr auto rhs_min = static_cast<intmax_t>(std::numeric_limits<RHS>::min());
-	static constexpr auto rhs_max = static_cast<intmax_t>(std::numeric_limits<RHS>::max());
+template<
+	intmax_t lhs_min, intmax_t lhs_max,
+	intmax_t rhs_min, intmax_t rhs_max
+>
+class operator_range<lhs_min, lhs_max, rhs_min, rhs_max, plus> {
 public:
 	static constexpr auto minimum = lhs_min + rhs_min;
 	static constexpr auto maximum = lhs_max + rhs_max;
 };
 
-template<typename LHS, typename RHS>
-class operator_range<LHS, RHS, minus> {
-private:
-	static constexpr auto lhs_min = static_cast<intmax_t>(std::numeric_limits<LHS>::min());
-	static constexpr auto lhs_max = static_cast<intmax_t>(std::numeric_limits<LHS>::max());
-	static constexpr auto rhs_min = static_cast<intmax_t>(std::numeric_limits<RHS>::min());
-	static constexpr auto rhs_max = static_cast<intmax_t>(std::numeric_limits<RHS>::max());
+template<
+	intmax_t lhs_min, intmax_t lhs_max,
+	intmax_t rhs_min, intmax_t rhs_max
+>
+class operator_range<lhs_min, lhs_max, rhs_min, rhs_max, minus> {
 public:
 	static constexpr auto minimum = lhs_min - rhs_max;
 	static constexpr auto maximum = lhs_max - rhs_min;
 };
 
-template<typename LHS, typename RHS>
-class operator_range<LHS, RHS, multiplies> {
+template<
+	intmax_t lhs_min, intmax_t lhs_max,
+	intmax_t rhs_min, intmax_t rhs_max
+>
+class operator_range<lhs_min, lhs_max, rhs_min, rhs_max, multiplies> {
 private:
-	static constexpr auto lhs_min = static_cast<intmax_t>(std::numeric_limits<LHS>::min());
-	static constexpr auto lhs_max = static_cast<intmax_t>(std::numeric_limits<LHS>::max());
-	static constexpr auto rhs_min = static_cast<intmax_t>(std::numeric_limits<RHS>::min());
-	static constexpr auto rhs_max = static_cast<intmax_t>(std::numeric_limits<RHS>::max());
 	static constexpr auto p0 = lhs_min * rhs_min;
 	static constexpr auto p1 = lhs_min * rhs_max;
 	static constexpr auto p2 = lhs_max * rhs_min;
@@ -102,13 +102,12 @@ public:
 	static constexpr auto maximum = max(p0, p1, p2, p3);
 };
 
-template<typename LHS, typename RHS>
-class operator_range<LHS, RHS, divides> {
+template<
+	intmax_t lhs_min, intmax_t lhs_max,
+	intmax_t rhs_min, intmax_t rhs_max
+>
+class operator_range<lhs_min, lhs_max, rhs_min, rhs_max, divides> {
 private:
-	static constexpr auto lhs_min = static_cast<intmax_t>(std::numeric_limits<LHS>::min());
-	static constexpr auto lhs_max = static_cast<intmax_t>(std::numeric_limits<LHS>::max());
-	static constexpr auto rhs_min = static_cast<intmax_t>(std::numeric_limits<RHS>::min());
-	static constexpr auto rhs_max = static_cast<intmax_t>(std::numeric_limits<RHS>::max());
 	// If 1 falls within the range, that is the least positive divisor. The
 	// other options are a range that are entirely positive, in which case I
 	// want to return the least value, or the range is entirely negative or
@@ -135,11 +134,14 @@ public:
 
 
 
-template<template<intmax_t, intmax_t> class overflow_policy, typename LHS, typename RHS, typename Operator>
-using operator_result = ranged_integer<
-	detail::operator_range<LHS, RHS, Operator>::minimum,
-	detail::operator_range<LHS, RHS, Operator>::maximum,
-	overflow_policy
+template<
+	intmax_t lhs_min, intmax_t lhs_max, template<intmax_t, intmax_t> class lhs_overflow,
+	intmax_t rhs_min, intmax_t rhs_max, template<intmax_t, intmax_t> class rhs_overflow,
+	typename Operator
+>
+using operator_result = typename common_policy<lhs_overflow, rhs_overflow>::template type<
+	detail::operator_range<lhs_min, lhs_max, rhs_min, rhs_max, Operator>::minimum,
+	detail::operator_range<lhs_min, lhs_max, rhs_min, rhs_max, Operator>::maximum
 >;
 
 template<template<intmax_t, intmax_t> class result_overflow_policy, typename integer>

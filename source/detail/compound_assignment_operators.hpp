@@ -22,9 +22,7 @@
 
 template<intmax_t minimum, intmax_t maximum, template<intmax_t, intmax_t> class overflow_policy, typename integer>
 ranged_integer<minimum, maximum, overflow_policy> & operator+=(ranged_integer<minimum, maximum, overflow_policy> & ranged, integer const & other) {
-	ranged = static_cast<ranged_integer<minimum, maximum, overflow_policy>>(
-		add<overflow_policy>(ranged, make_ranged<overflow_policy>(other))
-	);
+	ranged = static_cast<ranged_integer<minimum, maximum, overflow_policy>>(ranged + make_ranged<overflow_policy>(other));
 	return ranged;
 }
 
