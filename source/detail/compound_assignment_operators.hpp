@@ -18,7 +18,9 @@
 #define RANGED_INTEGER_COMPOUND_ASSIGNMENT_OPERATORS_HPP_
 
 #include "arithmetic_operators.hpp"
+#include "enable_if.hpp"
 #include "forward_declaration.hpp"
+#include <type_traits>
 
 namespace detail {
 
@@ -32,6 +34,8 @@ ranged_integer<minimum, maximum, overflow_policy> & compound_assignment(ranged_i
 }
 
 }	// namespace detail
+
+// ranged_integer being assigned to
 
 template<intmax_t minimum, intmax_t maximum, template<intmax_t, intmax_t> class overflow_policy, typename integer>
 ranged_integer<minimum, maximum, overflow_policy> & operator+=(ranged_integer<minimum, maximum, overflow_policy> & lhs, integer const & rhs) {
@@ -52,6 +56,30 @@ template<intmax_t minimum, intmax_t maximum, template<intmax_t, intmax_t> class 
 ranged_integer<minimum, maximum, overflow_policy> & operator/=(ranged_integer<minimum, maximum, overflow_policy> & lhs, integer const & rhs) {
 	return compound_assignment(lhs, rhs, detail::divides{});
 }
+
+
+// ranged_integer being assigned from
+
+template<typename integer, intmax_t minimum, intmax_t maximum, template<intmax_t, intmax_t> class overflow_policy, enable_if_t<std::is_integral<integer>::value>...>
+integer & operator+=(integer & lhs, ranged_integer<minimum, maximum, overflow_policy> const & rhs) noexcept {
+	return lhs += rhs.value();
+}
+
+template<typename integer, intmax_t minimum, intmax_t maximum, template<intmax_t, intmax_t> class overflow_policy, enable_if_t<std::is_integral<integer>::value>...>
+integer & operator-=(integer & lhs, ranged_integer<minimum, maximum, overflow_policy> const & rhs) noexcept {
+	return lhs -= rhs.value();
+}
+
+template<typename integer, intmax_t minimum, intmax_t maximum, template<intmax_t, intmax_t> class overflow_policy, enable_if_t<std::is_integral<integer>::value>...>
+integer & operator*=(integer & lhs, ranged_integer<minimum, maximum, overflow_policy> const & rhs) noexcept {
+	return lhs *= rhs.value();
+}
+
+template<typename integer, intmax_t minimum, intmax_t maximum, template<intmax_t, intmax_t> class overflow_policy, enable_if_t<std::is_integral<integer>::value>...>
+integer & operator/=(integer & lhs, ranged_integer<minimum, maximum, overflow_policy> const & rhs) noexcept {
+	return lhs /= rhs.value();
+}
+
 
 
 #endif	// RANGED_INTEGER_COMPOUND_ASSIGNMENT_OPERATORS_HPP_

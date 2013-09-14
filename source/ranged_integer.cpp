@@ -150,6 +150,18 @@ void check_compound_arithmetic() {
 	assert(z == 7);
 	z = 0;
 	assert(z == 0);
+	
+	short s = 0;
+	s += make_ranged<4>();
+	assert(s == 4);
+	int i = 9;
+	i -= make_ranged(68);
+	assert(i == -59);
+	long l = -7;
+	l *= z;
+	assert(l == 0);
+	i /= y;
+	assert(i == -5);
 }
 
 template<typename Initial, intmax_t initial_value, typename Expected, intmax_t expected_value>
