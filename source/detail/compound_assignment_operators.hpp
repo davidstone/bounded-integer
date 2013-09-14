@@ -20,10 +20,38 @@
 #include "arithmetic_operators.hpp"
 #include "forward_declaration.hpp"
 
-template<intmax_t minimum, intmax_t maximum, template<intmax_t, intmax_t> class overflow_policy, typename integer>
-ranged_integer<minimum, maximum, overflow_policy> & operator+=(ranged_integer<minimum, maximum, overflow_policy> & ranged, integer const & other) {
-	ranged = static_cast<ranged_integer<minimum, maximum, overflow_policy>>(ranged + make_ranged<overflow_policy>(other));
-	return ranged;
+namespace detail {
+
+template<intmax_t minimum, intmax_t maximum, template<intmax_t, intmax_t> class overflow_policy, typename integer, typename Operator>
+ranged_integer<minimum, maximum, overflow_policy> & compound_assignment(ranged_integer<minimum, maximum, overflow_policy> & lhs, integer const & rhs, Operator const & op) {
+	// I explicitly call make_ranged with the target's overflow policy because
+	// we need the result to be this exact overflow policy. We do not want to
+	// rely on common_policy here.
+	lhs = static_cast<ranged_integer<minimum, maximum, overflow_policy>>(op(lhs, make_ranged<overflow_policy>(rhs)));
+	return lhs;
 }
+
+}	// namespace detail
+
+template<intmax_t minimum, intmax_t maximum, template<intmax_t, intmax_t> class overflow_policy, typename integer>
+ranged_integer<minimum, maximum, overflow_policy> & operator+=(ranged_integer<minimum, maximum, overflow_policy> & lhs, integer const & rhs) {
+	return compound_assignment(lhs, rhs, detail::plus{});
+}
+
+template<intmax_t minimum, intmax_t maximum, template<intmax_t, intmax_t> class overflow_policy, typename integer>
+ranged_integer<minimum, maximum, overflow_policy> & operator-=(ranged_integer<minimum, maximum, overflow_policy> & lhs, integer const & rhs) {
+	return compound_assignment(lhs, rhs, detail::minus{});
+}
+
+template<intmax_t minimum, intmax_t maximum, template<intmax_t, intmax_t> class overflow_policy, typename integer>
+ranged_integer<minimum, maximum, overflow_policy> & operator*=(ranged_integer<minimum, maximum, overflow_policy> & lhs, integer const & rhs) {
+	return compound_assignment(lhs, rhs, detail::multiplies{});
+}
+
+template<intmax_t minimum, intmax_t maximum, template<intmax_t, intmax_t> class overflow_policy, typename integer>
+ranged_integer<minimum, maximum, overflow_policy> & operator/=(ranged_integer<minimum, maximum, overflow_policy> & lhs, integer const & rhs) {
+	return compound_assignment(lhs, rhs, detail::divides{});
+}
+
 
 #endif	// RANGED_INTEGER_COMPOUND_ASSIGNMENT_OPERATORS_HPP_

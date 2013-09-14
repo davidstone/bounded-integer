@@ -88,17 +88,6 @@ void check_numeric_limits_all() {
 	// check_numeric_limits<uint64_t>();
 }
 
-void check_compound_arithmetic() {
-	native_integer<0, 10> x(5);
-	x += 5;
-	assert(x == 10);
-	checked_integer<-10, 10> y(-5);
-	y += 5;
-	assert(y == 0);
-	y += x;	
-	assert(y == 10);
-}
-
 void check_arithmetic() {
 	constexpr checked_integer<1, 10> const x(9);
 	static_assert(sizeof(x) == 1, "checked_integer too big!");
@@ -139,8 +128,28 @@ void check_arithmetic() {
 
 	// constexpr checked_integer<2, 8> const z(x);
 	// checked_integer<13, 63> const non_overlapping(x);
-	
-	check_compound_arithmetic();
+}
+
+void check_compound_arithmetic() {
+	native_integer<0, 10> x(5);
+	x += 5;
+	assert(x == 10);
+	checked_integer<-10, 10> y(-5);
+	y += 5;
+	assert(y == 0);
+	y += x;	
+	assert(y == 10);
+	checked_integer<-1000, 1000> z(0);
+	z += y;
+	assert(z == 10);
+	z *= x - 5;
+	assert(z == 50);
+	z -= 1;
+	assert(z == 49);
+	z /= 7;
+	assert(z == 7);
+	z = 0;
+	assert(z == 0);
 }
 
 template<typename Initial, intmax_t initial_value, typename Expected, intmax_t expected_value>
@@ -197,6 +206,7 @@ void check_literals() {
 
 int main() {
 	check_arithmetic();
+	check_compound_arithmetic();
 	check_math();
 	check_numeric_limits_all();
 	check_common_type();
