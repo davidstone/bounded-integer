@@ -19,7 +19,6 @@
 
 #include "detail/class.hpp"
 #include "detail/common_type.hpp"
-#include "detail/literal.hpp"
 #include "detail/make_ranged.hpp"
 #include "detail/minmax.hpp"
 #include "detail/numeric_limits.hpp"
