@@ -88,6 +88,8 @@ void check_numeric_limits_all() {
 	// check_numeric_limits<uint64_t>();
 }
 
+void check_modulo();
+
 void check_arithmetic() {
 	constexpr checked_integer<1, 10> const x(9);
 	static_assert(sizeof(x) == 1, "checked_integer too big!");
@@ -128,6 +130,49 @@ void check_arithmetic() {
 
 	// constexpr checked_integer<2, 8> const z(x);
 	// checked_integer<13, 63> const non_overlapping(x);
+	
+	check_modulo();
+}
+
+void check_modulo() {
+	constexpr auto ten = make_ranged<10>();
+	constexpr auto eleven = make_ranged<11>();
+	constexpr auto ten_result = ten % eleven;
+	static_assert(ten_result == ten, "Incorrect modulo with divisor one greater");
+	static_assert(std::is_same<decltype(ten_result), decltype(ten)>::value, "Incorrect modulo type with divisor one greater");
+
+	constexpr auto nine = make_ranged<9>();
+	constexpr auto one = make_ranged<1>();
+	constexpr auto one_result = ten % nine;
+	static_assert(one_result == one, "Incorrect modulo with divisor one less");
+	static_assert(std::is_same<decltype(one_result), decltype(one)>::value, "Incorrect modulo type with divisor one less");
+
+	constexpr auto nine_result = nine % eleven;
+	static_assert(nine_result == nine, "Incorrect modulo with divisor two less");
+	static_assert(std::is_same<decltype(nine_result), decltype(nine)>::value, "Incorrect modulo type with divisor two less");
+
+	constexpr auto two = make_ranged<2>();
+	constexpr auto two_result = eleven % nine;
+	static_assert(two_result == two, "Incorrect modulo with divisor two greater");
+	static_assert(std::is_same<decltype(two_result), decltype(two)>::value, "Incorrect modulo type with divisor two greater");
+	
+	
+	constexpr checked_integer<17, 23> positive_range(20);
+	constexpr checked_integer<-54, -6> negative_range(-33);
+	constexpr auto positive_negative_result = positive_range % negative_range;
+	constexpr checked_integer<0, 23> positive_negative(20 % -33);
+	static_assert(positive_negative_result == positive_negative, "Incorrect modulo with mixed signs");
+	static_assert(std::is_same<decltype(positive_negative_result), decltype(positive_negative)>::value, "Incorrect modulo type with mixed signs");
+	
+	constexpr auto negative_positive_result = negative_range % positive_range;
+	constexpr checked_integer<-22, 0> negative_positive(-33 % 20);
+	static_assert(negative_positive_result == negative_positive, "Incorrect modulo with mixed signs");
+	static_assert(std::is_same<decltype(negative_positive_result), decltype(negative_positive)>::value, "Incorrect modulo type with mixed signs");
+	
+	constexpr auto result = native_integer<0, 10>(10) % 6;
+	static_assert(static_cast<intmax_t>(std::numeric_limits<decltype(result)>::min()) == 0, "uh oh");
+	static_assert(static_cast<intmax_t>(std::numeric_limits<decltype(result)>::max()) == 10, "uh oh");
+	static_assert(result == 4, "wrong answer");
 }
 
 void check_compound_arithmetic() {
@@ -150,6 +195,8 @@ void check_compound_arithmetic() {
 	assert(z == 7);
 	z = 0;
 	assert(z == 0);
+	x %= 6;
+	assert(x == 4);
 	
 	short s = 0;
 	s += make_ranged<4>();
@@ -162,6 +209,10 @@ void check_compound_arithmetic() {
 	assert(l == 0);
 	i /= y;
 	assert(i == -5);
+	i %= make_ranged(6);
+	assert(i == -5);
+	i %= make_ranged<4>();
+	assert(i == -1);
 }
 
 template<typename Initial, intmax_t initial_value, typename Expected, intmax_t expected_value>

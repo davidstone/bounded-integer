@@ -57,6 +57,11 @@ ranged_integer<minimum, maximum, overflow_policy> & operator/=(ranged_integer<mi
 	return compound_assignment(lhs, rhs, detail::divides{});
 }
 
+template<intmax_t minimum, intmax_t maximum, template<intmax_t, intmax_t> class overflow_policy, typename integer>
+ranged_integer<minimum, maximum, overflow_policy> & operator%=(ranged_integer<minimum, maximum, overflow_policy> & lhs, integer const & rhs) {
+	return compound_assignment(lhs, rhs, detail::modulus{});
+}
+
 
 // ranged_integer being assigned from
 
@@ -78,6 +83,11 @@ integer & operator*=(integer & lhs, ranged_integer<minimum, maximum, overflow_po
 template<typename integer, intmax_t minimum, intmax_t maximum, template<intmax_t, intmax_t> class overflow_policy, enable_if_t<std::is_integral<integer>::value>...>
 integer & operator/=(integer & lhs, ranged_integer<minimum, maximum, overflow_policy> const & rhs) noexcept {
 	return lhs /= rhs.value();
+}
+
+template<typename integer, intmax_t minimum, intmax_t maximum, template<intmax_t, intmax_t> class overflow_policy, enable_if_t<std::is_integral<integer>::value>...>
+integer & operator%=(integer & lhs, ranged_integer<minimum, maximum, overflow_policy> const & rhs) noexcept {
+	return lhs %= rhs.value();
 }
 
 

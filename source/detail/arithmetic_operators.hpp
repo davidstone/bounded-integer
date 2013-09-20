@@ -232,6 +232,52 @@ constexpr auto operator/(
 
 
 
+// Modulo
+template<typename LHS, typename RHS>
+constexpr auto modulo(LHS const & lhs, RHS const & rhs) noexcept -> decltype(detail::apply_operator(lhs, rhs, detail::modulus{})) {
+	return detail::apply_operator(lhs, rhs, detail::modulus{});
+}
+
+template<
+	intmax_t lhs_min, intmax_t lhs_max,
+	intmax_t rhs_min, intmax_t rhs_max,
+	template<intmax_t, intmax_t> class overflow_policy
+>
+constexpr auto operator%(
+	ranged_integer<lhs_min, lhs_max, overflow_policy> const lhs,
+	ranged_integer<rhs_min, rhs_max, overflow_policy> const rhs
+) noexcept -> decltype(modulo(lhs, rhs)) {
+	return modulo(lhs, rhs);
+}
+
+// Modulo with built-ins
+template<
+	intmax_t lhs_min, intmax_t lhs_max,
+	typename integer,
+	template<intmax_t, intmax_t> class overflow_policy,
+	enable_if_t<std::is_integral<integer>::value>...
+>
+constexpr auto operator%(
+	ranged_integer<lhs_min, lhs_max, overflow_policy> const lhs,
+	integer const rhs
+) noexcept -> decltype(modulo(lhs, make_ranged(rhs))) {
+	return modulo(lhs, make_ranged(rhs));
+}
+template<
+	typename integer,
+	intmax_t rhs_min, intmax_t rhs_max,
+	template<intmax_t, intmax_t> class overflow_policy,
+	enable_if_t<std::is_integral<integer>::value>...
+>
+constexpr auto operator%(
+	integer const lhs,
+	ranged_integer<rhs_min, rhs_max, overflow_policy> const rhs
+) noexcept -> decltype(modulo(make_ranged(lhs), rhs)) {
+	return modulo(make_ranged(lhs), rhs);
+}
+
+
+
 // Unary minus
 
 template<template<intmax_t, intmax_t> class overflow_policy, typename integer, enable_if_t<is_ranged_integer<integer>()>...>
