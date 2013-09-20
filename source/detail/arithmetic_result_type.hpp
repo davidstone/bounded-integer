@@ -118,6 +118,7 @@ template<
 >
 class operator_range<lhs_min, lhs_max, rhs_min, rhs_max, divides> {
 private:
+	static_assert(rhs_min != 0 or rhs_max != 0, "division is not defined for a divisor of zero.");
 	// If 1 falls within the range, that is the least positive divisor. The
 	// other options are a range that are entirely positive, in which case I
 	// want to return the least value, or the range is entirely negative or
@@ -178,6 +179,7 @@ template<
 >
 class operator_range<lhs_min, lhs_max, rhs_min, rhs_max, modulus> {
 private:
+	static_assert(rhs_min != 0 or rhs_max != 0, "modulo is not defined for a divisor of zero.");
 	// The sign of the result is equal to the sign of the lhs. The sign of the
 	// rhs does not matter.
 	//

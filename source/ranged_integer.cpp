@@ -173,6 +173,12 @@ void check_modulo() {
 	static_assert(static_cast<intmax_t>(std::numeric_limits<decltype(result)>::min()) == 0, "uh oh");
 	static_assert(static_cast<intmax_t>(std::numeric_limits<decltype(result)>::max()) == 10, "uh oh");
 	static_assert(result == 4, "wrong answer");
+	
+	constexpr auto zero = make_ranged<0>();
+	constexpr auto zero_result = zero % 1;
+	static_assert(zero_result == zero, "Incorrect modulo with zero for the dividend");
+	static_assert(std::is_same<decltype(zero_result), decltype(zero)>::value, "Incorrect modulo type with zero for the dividend");
+	// auto undefined = 1 % zero;
 }
 
 void check_compound_arithmetic() {
