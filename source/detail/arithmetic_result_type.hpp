@@ -158,37 +158,6 @@ public:
 	static_assert(min() <= max(), "Range is inverted.");
 };
 
-constexpr std::pair<intmax_t, intmax_t> combine(std::pair<intmax_t, intmax_t> lhs, std::pair<intmax_t, intmax_t> rhs) noexcept {
-	return std::make_pair(::max(lhs.first, rhs.first), ::min(lhs.second, rhs.second));
-}
-
-constexpr std::pair<intmax_t, intmax_t> modulo_round(intmax_t minimum_dividend, intmax_t maximum_dividend, intmax_t divisor) noexcept {
-	// When we divide both ends of our lhs range (the dividend) by a particular
-	// value in the rhs range (the divisor) there are two possibilities.
-	//
-	// If they are not equal, then that means that the periodic modulo function
-	// has reset to 0 at some point in that range. The greatest value lies
-	// immediately before this resets to 0, but we do not have to calculate
-	// where in the range it is. We already know that its magnitude will be one
-	// less than the magnitude of the divisor. The least value is obviously 0,
-	// as we are ignoring the sign of the dividend for these calculations.
-	//
-	// If they are equal, then we know that the maximum value is at the top end
-	// of the range. The function never reset, and it increases by one for each
-	// increase in the dividend until it resets to 0. Since it never reset, the
-	// maximum value must be the point at which we have had the most increases.
-	// The minimum value is the point at which we have had the fewest increases.
-	return (minimum_dividend / divisor == maximum_dividend / divisor) ?
-		std::make_pair(minimum_dividend % divisor, maximum_dividend % divisor) :
-		std::make_pair(static_cast<intmax_t>(0), divisor + 1);
-}
-
-constexpr std::pair<intmax_t, intmax_t> calculate_minmax(intmax_t minimum_dividend, intmax_t maximum_dividend, intmax_t least_divisor, intmax_t divisor, std::pair<intmax_t, intmax_t> value) noexcept {
-	return ((value.first == 0 and value.second <= divisor + 1) or divisor > least_divisor) ?
-		value :
-		calculate_minmax(minimum_dividend, maximum_dividend, least_divisor, divisor + 1, combine(value, modulo_round(minimum_dividend, maximum_dividend, divisor)));
-}
-
 template<
 	intmax_t lhs_min, intmax_t lhs_max,
 	intmax_t rhs_min, intmax_t rhs_max
@@ -205,7 +174,7 @@ private:
 	// value == std::numeric_limits<intmax_t>::min()
 	// Therefore, all temporaries should be considered to have an implicit
 	// "magnitude" and "negative" in their name.
-
+	//
 	// The divisor range cannot terminate on a 0 since that is an invalid value.
 	static constexpr auto greatest_divisor = (rhs_max < 0) ? rhs_min : ::min(rhs_min, -rhs_max, -1);
 	static constexpr auto least_divisor =
@@ -217,20 +186,51 @@ private:
 
 	template<intmax_t minimum_dividend, intmax_t maximum_dividend>
 	class sign_free_value {
-	public:
+	private:
 		static_assert(minimum_dividend <= 0, "Got a positive value where a negative was expected.");
 		static_assert(maximum_dividend <= 0, "Got a positive value where a negative was expected.");
 		static_assert(minimum_dividend >= maximum_dividend, "Range is inverted.");
-		static constexpr auto value = (greatest_divisor == -1) ?
-			std::make_pair(static_cast<intmax_t>(0), static_cast<intmax_t>(0)) :
-			calculate_minmax(
-				minimum_dividend, maximum_dividend,
-				least_divisor, greatest_divisor,
-				std::make_pair(std::numeric_limits<intmax_t>::min(), std::numeric_limits<intmax_t>::max())
-			);
-		static_assert(value.first <= 0, "Got a positive value where a negative was expected.");
-		static_assert(value.second <= 0, "Got a positive value where a negative was expected.");
-		static_assert(value.first >= value.second, "Range is inverted.");
+		
+		using result_type = std::pair<intmax_t, intmax_t>;
+		static constexpr auto initial_value = result_type(std::numeric_limits<intmax_t>::min(), std::numeric_limits<intmax_t>::max());
+
+		static constexpr result_type combine(result_type lhs, result_type rhs) noexcept {
+			return result_type(::max(lhs.first, rhs.first), ::min(lhs.second, rhs.second));
+		}
+
+		static constexpr result_type modulo_round(intmax_t divisor) noexcept {
+			// When we divide both ends of the dividend by a particular value in
+			// the range of the divisor there are two possibilities:
+			//
+			// If they are not equal, then that means that the periodic modulo
+			// function resets to 0 somewhere in that range. The greatest value
+			// is immediately before this resets, but we do not have to find
+			// where in the range it is. The magnitude will be one less than the
+			// magnitude of the divisor. The least value is obviously 0, as we
+			// are ignoring the sign of the dividend for these calculations.
+			//
+			// If they are equal, the maximum value is at the top end of the
+			// range. The function never reset, and it increases by one for each
+			// increase in the dividend until it resets. The maximum value is
+			// the point at which there were the most increases. The minimum
+			// value is the point at which there were the fewest increases.
+			return (minimum_dividend / divisor == maximum_dividend / divisor) ?
+				result_type(minimum_dividend % divisor, maximum_dividend % divisor) :
+				result_type(0, divisor + 1);
+		}
+
+		static constexpr result_type calculate_minmax(intmax_t divisor, result_type current) noexcept {
+			return ((current.first == 0 and current.second <= divisor + 1) or divisor > least_divisor) ?
+				current :
+				calculate_minmax(divisor + 1, combine(current, modulo_round(divisor)));
+		}
+	public:
+		static constexpr result_type value() noexcept {
+			return (greatest_divisor == -1) ? result_type(0, 0) : calculate_minmax(greatest_divisor, initial_value);
+		}
+		static_assert(value().first <= 0, "Got a positive value where a negative was expected.");
+		static_assert(value().second <= 0, "Got a positive value where a negative was expected.");
+		static_assert(value().first >= value().second, "Range is inverted.");
 	};
 
 	static constexpr auto maybe_most_negative_dividend = lhs_min;
@@ -249,8 +249,8 @@ private:
 	static constexpr auto most_positive_dividend = maybe_most_positive_dividend * (has_positive_values ? 1 : 0);
 	static constexpr auto least_positive_dividend = maybe_least_positive_dividend * (has_positive_values ? 1 : 0);
 	
-	static constexpr auto negative = sign_free_value<least_negative_dividend, most_negative_dividend>::value;
-	static constexpr auto positive = sign_free_value<-least_positive_dividend, -most_positive_dividend>::value;
+	static constexpr auto negative = sign_free_value<least_negative_dividend, most_negative_dividend>::value();
+	static constexpr auto positive = sign_free_value<-least_positive_dividend, -most_positive_dividend>::value();
 public:
 	static_assert(positive.first >= -std::numeric_limits<intmax_t>::max(), "Positive values out of range.");
 	static_assert(positive.second >= -std::numeric_limits<intmax_t>::max(), "Positive values out of range.");
