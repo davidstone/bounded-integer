@@ -186,12 +186,12 @@ private:
 
 	template<intmax_t minimum_dividend, intmax_t maximum_dividend>
 	class sign_free_value {
-	private:
+	public:
 		static_assert(minimum_dividend <= 0, "Got a positive value where a negative was expected.");
 		static_assert(maximum_dividend <= 0, "Got a positive value where a negative was expected.");
 		static_assert(minimum_dividend >= maximum_dividend, "Range is inverted.");
-		
 		using result_type = std::pair<intmax_t, intmax_t>;
+	private:
 		static constexpr auto initial_value = result_type(std::numeric_limits<intmax_t>::min(), std::numeric_limits<intmax_t>::max());
 
 		static constexpr result_type combine(result_type lhs, result_type rhs) noexcept {
