@@ -80,9 +80,13 @@ template<
 >
 class operator_range<lhs_min, lhs_max, rhs_min, rhs_max, plus> {
 public:
-	static constexpr auto minimum = lhs_min + rhs_min;
-	static constexpr auto maximum = lhs_max + rhs_max;
-	static_assert(minimum <= maximum, "Range is inverted.");
+	static constexpr intmax_t min() noexcept {
+		return lhs_min + rhs_min;
+	}
+	static constexpr intmax_t max() noexcept {
+		return lhs_max + rhs_max;
+	}
+	static_assert(min() <= max(), "Range is inverted.");
 };
 
 template<
@@ -91,9 +95,13 @@ template<
 >
 class operator_range<lhs_min, lhs_max, rhs_min, rhs_max, minus> {
 public:
-	static constexpr auto minimum = lhs_min - rhs_max;
-	static constexpr auto maximum = lhs_max - rhs_min;
-	static_assert(minimum <= maximum, "Range is inverted.");
+	static constexpr intmax_t min() noexcept {
+		return lhs_min - rhs_max;
+	}
+	static constexpr intmax_t max() noexcept {
+		return lhs_max - rhs_min;
+	}
+	static_assert(min() <= max(), "Range is inverted.");
 };
 
 template<
@@ -107,9 +115,13 @@ private:
 	static constexpr auto p2 = lhs_max * rhs_min;
 	static constexpr auto p3 = lhs_max * rhs_max;
 public:
-	static constexpr auto minimum = min(p0, p1, p2, p3);
-	static constexpr auto maximum = max(p0, p1, p2, p3);
-	static_assert(minimum <= maximum, "Range is inverted.");
+	static constexpr intmax_t min() noexcept {
+		return ::min(p0, p1, p2, p3);
+	}
+	static constexpr intmax_t max() noexcept {
+		return ::max(p0, p1, p2, p3);
+	}
+	static_assert(min() <= max(), "Range is inverted.");
 };
 
 template<
@@ -137,13 +149,17 @@ private:
 	static constexpr auto l2 = lhs_max / rhs_min;
 	static constexpr auto l3 = lhs_max / rhs_max;
 public:
-	static constexpr auto minimum = min(l0, l1, l2, l3, g0, g1, g2, g3);
-	static constexpr auto maximum = max(g0, g1, g2, g3);
-	static_assert(minimum <= maximum, "Range is inverted.");
+	static constexpr intmax_t min() noexcept {
+		return ::min(l0, l1, l2, l3, g0, g1, g2, g3);
+	}
+	static constexpr intmax_t max() noexcept {
+		return ::max(g0, g1, g2, g3);
+	}
+	static_assert(min() <= max(), "Range is inverted.");
 };
 
 constexpr std::pair<intmax_t, intmax_t> combine(std::pair<intmax_t, intmax_t> lhs, std::pair<intmax_t, intmax_t> rhs) noexcept {
-	return std::make_pair(max(lhs.first, rhs.first), min(lhs.second, rhs.second));
+	return std::make_pair(::max(lhs.first, rhs.first), ::min(lhs.second, rhs.second));
 }
 
 constexpr std::pair<intmax_t, intmax_t> modulo_round(intmax_t minimum_dividend, intmax_t maximum_dividend, intmax_t divisor) noexcept {
@@ -191,11 +207,11 @@ private:
 	// "magnitude" and "negative" in their name.
 
 	// The divisor range cannot terminate on a 0 since that is an invalid value.
-	static constexpr auto greatest_divisor = (rhs_max < 0) ? rhs_min : min(rhs_min, -rhs_max, -1);
+	static constexpr auto greatest_divisor = (rhs_max < 0) ? rhs_min : ::min(rhs_min, -rhs_max, -1);
 	static constexpr auto least_divisor =
 		(rhs_min > 0) ? -rhs_min :
 		(rhs_max < 0) ? rhs_max :
-		min(max(rhs_min, -rhs_max), -1);
+		::min(::max(rhs_min, -rhs_max), -1);
 	static_assert(greatest_divisor < 0, "Got a positive value where a negative was expected.");
 	static_assert(least_divisor < 0, "Got a positive value where a negative was expected.");
 
@@ -218,9 +234,9 @@ private:
 	};
 
 	static constexpr auto maybe_most_negative_dividend = lhs_min;
-	static constexpr auto maybe_least_negative_dividend = (lhs_max < 0) ? lhs_max : max(lhs_min, 0);
+	static constexpr auto maybe_least_negative_dividend = (lhs_max < 0) ? lhs_max : ::max(lhs_min, 0);
 	static constexpr auto maybe_most_positive_dividend = lhs_max;
-	static constexpr auto maybe_least_positive_dividend = (lhs_min > 0) ? lhs_min : min(lhs_max, 0);
+	static constexpr auto maybe_least_positive_dividend = (lhs_min > 0) ? lhs_min : ::min(lhs_max, 0);
 
 	static constexpr bool has_positive_values = maybe_most_positive_dividend > 0;
 	static constexpr bool has_negative_values = maybe_most_negative_dividend <= 0;
@@ -238,15 +254,19 @@ private:
 public:
 	static_assert(positive.first >= -std::numeric_limits<intmax_t>::max(), "Positive values out of range.");
 	static_assert(positive.second >= -std::numeric_limits<intmax_t>::max(), "Positive values out of range.");
-	static constexpr auto minimum =
-		!has_positive_values ? negative.second :
-		!has_negative_values ? -positive.first :
-		min(negative.second, -positive.first);
-	static constexpr auto maximum =
-		!has_positive_values ? negative.first :
-		!has_negative_values ? -positive.second :
-		max(negative.first, -positive.second);
-	static_assert(minimum <= maximum, "Range is inverted.");
+	static constexpr intmax_t min() noexcept {
+		return
+			!has_positive_values ? negative.second :
+			!has_negative_values ? -positive.first :
+			::min(negative.second, -positive.first);
+	}
+	static constexpr intmax_t max() noexcept {
+		return
+			!has_positive_values ? negative.first :
+			!has_negative_values ? -positive.second :
+			::max(negative.first, -positive.second);
+	}
+	static_assert(min() <= max(), "Range is inverted.");
 };
 
 }	// namespace detail
@@ -259,8 +279,8 @@ template<
 	typename Operator
 >
 using operator_result = typename common_policy<lhs_overflow, rhs_overflow>::template type<
-	detail::operator_range<lhs_min, lhs_max, rhs_min, rhs_max, Operator>::minimum,
-	detail::operator_range<lhs_min, lhs_max, rhs_min, rhs_max, Operator>::maximum
+	detail::operator_range<lhs_min, lhs_max, rhs_min, rhs_max, Operator>::min(),
+	detail::operator_range<lhs_min, lhs_max, rhs_min, rhs_max, Operator>::max()
 >;
 
 template<template<intmax_t, intmax_t> class result_overflow_policy, typename integer>
