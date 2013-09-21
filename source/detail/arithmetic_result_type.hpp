@@ -180,7 +180,7 @@ private:
 	static constexpr auto least_divisor =
 		(rhs_min > 0) ? -rhs_min :
 		(rhs_max < 0) ? rhs_max :
-		::min(::max(rhs_min, -rhs_max), -1);
+		-1;
 	static_assert(greatest_divisor < 0, "Got a positive value where a negative was expected.");
 	static_assert(least_divisor < 0, "Got a positive value where a negative was expected.");
 
@@ -219,14 +219,16 @@ private:
 				result_type(0, divisor + 1);
 		}
 
-		static constexpr result_type calculate_minmax(intmax_t divisor, result_type current) noexcept {
+		static constexpr result_type calculate(intmax_t divisor, result_type current) noexcept {
 			return ((current.first == 0 and current.second <= divisor + 1) or divisor > least_divisor) ?
 				current :
-				calculate_minmax(divisor + 1, combine(current, modulo_round(divisor)));
+				calculate(divisor + 1, combine(current, modulo_round(divisor)));
 		}
 	public:
 		static constexpr result_type value() noexcept {
-			return (greatest_divisor == -1) ? result_type(0, 0) : calculate_minmax(greatest_divisor, initial_value);
+			// I have the special case for -1 to avoid any possibility of
+			// integer overflow from std::numeric_limits<intmax_t>::min() / -1
+			return (greatest_divisor == -1) ? result_type(0, 0) : calculate(greatest_divisor, initial_value);
 		}
 		static_assert(value().first <= 0, "Got a positive value where a negative was expected.");
 		static_assert(value().second <= 0, "Got a positive value where a negative was expected.");
