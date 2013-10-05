@@ -48,18 +48,50 @@ constexpr bool entirely_in_range(intmax_t const minimum, intmax_t const maximum)
 	return value_in_range<integer>(minimum) and value_in_range<integer>(maximum);
 }
 
+template<intmax_t minimum, intmax_t maximum>
+class ranged_integer_base {
+public:
+	using underlying_type = detail::underlying_t<minimum, maximum>;
+	constexpr ranged_integer_base(underlying_type const & other) noexcept:
+		m_value(other) {
+	}
+	constexpr underlying_type value() noexcept {
+		return m_value;
+	}
+private:
+	underlying_type m_value;
+};
+
+template<intmax_t only_value>
+class ranged_integer_base<only_value, only_value> {
+public:
+	using underlying_type = detail::underlying_t<only_value, only_value>;
+	constexpr ranged_integer_base() noexcept = default;
+	constexpr ranged_integer_base(underlying_type const &) noexcept {
+	}
+	constexpr underlying_type value() noexcept {
+		return only_value;
+	}
+};
+
 }	// namespace detail
 
+// I use private inheritance here to take advantage of the empty base
+// optimization when minimum == maximum
 template<intmax_t minimum, intmax_t maximum, template<intmax_t, intmax_t> class OverflowPolicy>
-class ranged_integer {
+class ranged_integer : private detail::ranged_integer_base<minimum, maximum> {
+private:
+	using base = detail::ranged_integer_base<minimum, maximum>;
 public:
 	static_assert(minimum <= maximum, "Maximum cannot be less than minimum");
-	using underlying_type = detail::underlying_t<minimum, maximum>;
+	using underlying_type = typename base::underlying_type;
 	using overflow_policy = OverflowPolicy<minimum, maximum>;
 	static_assert(detail::entirely_in_range<underlying_type>(minimum, maximum), "Not all values can fit in the range of the underlying_type.");
 
 	static_assert(minimum < 0 ? std::numeric_limits<underlying_type>::is_signed : true, "Underlying type should be signed.");
 
+	// This is only defined for constant ranges. See ranged_integer_base
+	constexpr ranged_integer() noexcept = default;
 	constexpr ranged_integer(ranged_integer const & other) noexcept = default;
 	constexpr ranged_integer(ranged_integer && other) noexcept = default;
 	ranged_integer & operator=(ranged_integer const & other) noexcept = default;
@@ -71,7 +103,7 @@ public:
 		detail::has_overlap<integer>(minimum, maximum)
 	>...>
 	constexpr ranged_integer(integer const & other, non_check_t) noexcept:
-		m_value(static_cast<underlying_type>(other)) {
+		base(static_cast<underlying_type>(other)) {
 	}
 
 	// Intentionally implicit: this is safe because the value is in range
@@ -101,74 +133,7 @@ public:
 		return *this;
 	}
 	
-	constexpr underlying_type value() const noexcept {
-		return m_value;
-	}
-	// I do not verify that the value is in range or anything because the user
-	// has requested a conversion out of the safety of the ranged_integer type.
-	// It is subject to the all of the standard rules that conversion from one
-	// built-in integer type to another has.
-	template<typename integer, enable_if_t<std::is_integral<integer>::value>...>
-	constexpr explicit operator integer() const {
-		return static_cast<integer>(value());
-	}
-private:
-	underlying_type m_value;
-};
-
-
-template<intmax_t only_value, template<intmax_t, intmax_t> class OverflowPolicy>
-class ranged_integer<only_value, only_value, OverflowPolicy> {
-public:
-	using underlying_type = detail::underlying_t<only_value, only_value>;
-	using overflow_policy = OverflowPolicy<only_value, only_value>;
-	static_assert(detail::value_in_range<underlying_type>(only_value), "Not all values can fit in the range of the underlying_type.");
-
-	static_assert(only_value < 0 ? std::numeric_limits<underlying_type>::is_signed : true, "Underlying type should be signed.");
-	// All constructors do nothing but check constraints. We already know this
-	// value is in range, but we still want to alert the user if they are trying
-	// to assign an illegal value.
-	//
-	// This specialization also adds a default constructor, as we have valid
-	// default behavior (still do nothing)
-	constexpr ranged_integer() noexcept = default;
-
-	constexpr ranged_integer(ranged_integer const & other) noexcept = default;
-	constexpr ranged_integer(ranged_integer && other) noexcept = default;
-	ranged_integer & operator=(ranged_integer const & other) noexcept = default;
-	ranged_integer & operator=(ranged_integer && other) noexcept = default;
-
-	// Use this constructor if you know by means that cannot be determined by
-	// the type system that the value really does fit in the range.
-	template<typename integer, enable_if_t<
-		detail::has_overlap<integer>(only_value, only_value)
-	>...>
-	constexpr ranged_integer(integer const & other, non_check_t) noexcept {
-	}
-
-	// I have to delegate to another constructor so I can check constraints
-	// while still keeping the constexpr constructor body empty.
-	template<typename integer, enable_if_t<
-		detail::has_overlap<integer>(only_value, only_value) or
-		!overflow_policy::overflow_is_error
-	>...>
-	constexpr explicit ranged_integer(integer const other):
-		ranged_integer(overflow_policy{}(other), non_check) {
-	}
-
-	// Generate an assignment operator for any value that we have a constructor
-	// generated for. I am assuming that these fairly simple templates and
-	// copies will all be removed / inlined by the compiler, so this should be
-	// no worse than a hand-generated solution.
-	template<typename integer>
-	ranged_integer & operator=(integer other) {
-		*this = ranged_integer(std::move(other));
-		return *this;
-	}
-
-	constexpr underlying_type value() const noexcept {
-		return static_cast<underlying_type>(only_value);
-	}
+	using base::value;
 	// I do not verify that the value is in range or anything because the user
 	// has requested a conversion out of the safety of the ranged_integer type.
 	// It is subject to the all of the standard rules that conversion from one
@@ -178,5 +143,6 @@ public:
 		return static_cast<integer>(value());
 	}
 };
+
 
 #endif	// RANGED_INTEGER_CLASS_HPP_
