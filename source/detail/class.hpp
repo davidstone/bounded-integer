@@ -84,7 +84,7 @@ private:
 	using base = detail::ranged_integer_base<minimum, maximum>;
 public:
 	static_assert(minimum <= maximum, "Maximum cannot be less than minimum");
-	using underlying_type = typename base::underlying_type;
+	using typename base::underlying_type;
 	using overflow_policy = OverflowPolicy<minimum, maximum>;
 	static_assert(detail::entirely_in_range<underlying_type>(minimum, maximum), "Not all values can fit in the range of the underlying_type.");
 
