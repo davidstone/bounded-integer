@@ -219,6 +219,11 @@ void check_compound_arithmetic() {
 	assert(i == -5);
 	i %= make_ranged<4>();
 	assert(i == -1);
+
+	assert(++x == 5);
+	assert(x == 5);
+	assert(z++ == 0);
+	assert(z == 1);
 }
 
 template<typename Initial, intmax_t initial_value, typename Expected, intmax_t expected_value>

@@ -34,6 +34,7 @@ public:
 
 	// It might actually be true! This should be considered undefined
 	static constexpr bool is_modulo = false;
+	static constexpr bool overflow_is_error = true;
 };
 
 template<intmax_t minimum, intmax_t maximum>
@@ -79,6 +80,22 @@ public:
 	}
 	
 	static constexpr bool is_modulo = false;
+	static constexpr bool overflow_is_error = true;
+};
+
+template<intmax_t minimum, intmax_t maximum>
+class clamp_on_overflow {
+public:
+	template<typename integer>
+	constexpr integer operator()(integer const new_value) const noexcept {
+		return
+			(new_value <= minimum) ? minimum :
+			(new_value >= maximum) ? maximum :
+			new_value;
+	}
+
+	static constexpr bool is_modulo = false;
+	static constexpr bool overflow_is_error = false;
 };
 
 

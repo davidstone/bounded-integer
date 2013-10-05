@@ -83,8 +83,9 @@ public:
 	}
 
 	template<typename integer, enable_if_t<
-		detail::has_overlap<integer>(minimum, maximum)
-		and !detail::type_in_range<integer>(minimum, maximum)
+		!detail::type_in_range<integer>(minimum, maximum) and
+		(detail::has_overlap<integer>(minimum, maximum) or
+		!overflow_policy::overflow_is_error)
 	>...>
 	constexpr explicit ranged_integer(integer other):
 		ranged_integer(overflow_policy{}(std::move(other)), non_check) {
@@ -100,15 +101,6 @@ public:
 		return *this;
 	}
 	
-	ranged_integer & operator++() {
-		++m_value;
-		return *this;
-	}
-	ranged_integer & operator--() {
-		--m_value;
-		return *this;
-	}
-
 	constexpr underlying_type value() const noexcept {
 		return m_value;
 	}
@@ -159,7 +151,8 @@ public:
 	// I have to delegate to another constructor so I can check constraints
 	// while still keeping the constexpr constructor body empty.
 	template<typename integer, enable_if_t<
-		detail::has_overlap<integer>(only_value, only_value)
+		detail::has_overlap<integer>(only_value, only_value) or
+		!overflow_policy::overflow_is_error
 	>...>
 	constexpr explicit ranged_integer(integer const other):
 		ranged_integer(overflow_policy{}(other), non_check) {

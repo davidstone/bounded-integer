@@ -92,4 +92,35 @@ integer & operator%=(integer & lhs, ranged_integer<minimum, maximum, overflow_po
 
 
 
+// Increment / decrement
+
+template<intmax_t minimum, intmax_t maximum, template<intmax_t, intmax_t> class OverflowPolicy>
+ranged_integer<minimum, maximum, OverflowPolicy> & operator++(ranged_integer<minimum, maximum, OverflowPolicy> & value) {
+	value += make_ranged<1>();
+	return value;
+}
+
+template<intmax_t minimum, intmax_t maximum, template<intmax_t, intmax_t> class OverflowPolicy>
+ranged_integer<minimum, maximum, OverflowPolicy> operator++(ranged_integer<minimum, maximum, OverflowPolicy> & value, int) {
+	auto const previous = value;
+	++value;
+	return previous;
+}
+
+
+template<intmax_t minimum, intmax_t maximum, template<intmax_t, intmax_t> class OverflowPolicy>
+ranged_integer<minimum, maximum, OverflowPolicy> & operator--(ranged_integer<minimum, maximum, OverflowPolicy> & value) {
+	value -= make_ranged<1>();
+	return value;
+}
+
+template<intmax_t minimum, intmax_t maximum, template<intmax_t, intmax_t> class OverflowPolicy>
+ranged_integer<minimum, maximum, OverflowPolicy> operator--(ranged_integer<minimum, maximum, OverflowPolicy> & value, int) {
+	auto const previous = value;
+	--value;
+	return previous;
+}
+
+
+
 #endif	// RANGED_INTEGER_COMPOUND_ASSIGNMENT_OPERATORS_HPP_
