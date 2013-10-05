@@ -113,8 +113,6 @@ public:
 		return static_cast<integer>(value());
 	}
 private:
-	template<intmax_t other_min, intmax_t other_max, template<intmax_t, intmax_t> class other_overflow_policy>
-	friend class ranged_integer;
 	underlying_type m_value;
 };
 
