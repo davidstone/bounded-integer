@@ -54,7 +54,7 @@ def setup_environment_flags(version):
 	environment.Append(CPPDEFINES = flags['cpp'][version])
 	if version != 'default':
 		build_root = 'build/' + compiler_name + '/'
-		environment.VariantDir(build_root + version, 'source', duplicate = 0)
+		environment.VariantDir(build_root + version, 'ranged_integer', duplicate = 0)
 	return environment
 
 default = setup_environment_flags('default')
