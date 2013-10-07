@@ -183,6 +183,7 @@ private:
 		-1;
 	static_assert(greatest_divisor < 0, "Got a positive value where a negative was expected.");
 	static_assert(least_divisor < 0, "Got a positive value where a negative was expected.");
+	using result_type = std::pair<intmax_t, intmax_t>;
 
 	template<intmax_t minimum_dividend, intmax_t maximum_dividend>
 	class sign_free_value {
@@ -190,7 +191,6 @@ private:
 		static_assert(minimum_dividend <= 0, "Got a positive value where a negative was expected.");
 		static_assert(maximum_dividend <= 0, "Got a positive value where a negative was expected.");
 		static_assert(minimum_dividend >= maximum_dividend, "Range is inverted.");
-		using result_type = std::pair<intmax_t, intmax_t>;
 	private:
 		static constexpr auto initial_value = result_type(std::numeric_limits<intmax_t>::min(), std::numeric_limits<intmax_t>::max());
 
@@ -251,8 +251,8 @@ private:
 	static constexpr auto most_positive_dividend = maybe_most_positive_dividend * (has_positive_values ? 1 : 0);
 	static constexpr auto least_positive_dividend = maybe_least_positive_dividend * (has_positive_values ? 1 : 0);
 	
-	static constexpr auto negative = sign_free_value<least_negative_dividend, most_negative_dividend>::value();
-	static constexpr auto positive = sign_free_value<-least_positive_dividend, -most_positive_dividend>::value();
+	static constexpr result_type negative = sign_free_value<least_negative_dividend, most_negative_dividend>::value();
+	static constexpr result_type positive = sign_free_value<-least_positive_dividend, -most_positive_dividend>::value();
 public:
 	static_assert(positive.first >= -std::numeric_limits<intmax_t>::max(), "Positive values out of range.");
 	static_assert(positive.second >= -std::numeric_limits<intmax_t>::max(), "Positive values out of range.");

@@ -37,12 +37,12 @@ template<
 >
 constexpr operator_result<lhs_min, lhs_max, lhs_overflow, rhs_min, rhs_max, rhs_overflow, Operator> apply_operator(ranged_integer<lhs_min, lhs_max, lhs_overflow> const & lhs, ranged_integer<rhs_min, rhs_max, rhs_overflow> const & rhs, Operator const & op) {
 	using result_t = operator_result<lhs_min, lhs_max, lhs_overflow, rhs_min, rhs_max, rhs_overflow, Operator>;
-	using common_t = common_type_t<result_t, typename std::decay<decltype(lhs)>::type, typename std::decay<decltype(rhs)>::type>;
+	using common_t = typename common_type_t<result_t, typename std::decay<decltype(lhs)>::type, typename std::decay<decltype(rhs)>::type>::underlying_type;
 	// It is safe to use the non_check constructor because we have already
 	// determined that the result will fit in result_t. We have to cast to the
 	// intermediate common_t in case result_t is narrower than one of the
 	// arguments.
-	return result_t(op(static_cast<common_t>(lhs).value(), static_cast<common_t>(rhs).value()), non_check);
+	return result_t(op(static_cast<common_t>(lhs), static_cast<common_t>(rhs)), non_check);
 }
 
 }	// namespace detail
