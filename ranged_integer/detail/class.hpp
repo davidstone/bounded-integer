@@ -105,6 +105,12 @@ public:
 	constexpr ranged_integer(integer const & other, non_check_t) noexcept:
 		base(static_cast<underlying_type>(other)) {
 	}
+	
+	// This is a temporary workaround to allow default construction from integer
+	// literals. After compiler support is a little better, this will go away.
+	constexpr ranged_integer(int other):
+		ranged_integer(overflow_policy{}(std::move(other)), non_check) {
+	}
 
 	// Intentionally implicit: this is safe because the value is in range
 	template<typename integer, enable_if_t<
