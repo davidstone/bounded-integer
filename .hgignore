@@ -1,7 +1,7 @@
 syntax: regexp
 
-^ranged_integer$
-^ranged_integer-debug$
+^test$
+^test-debug$
 
 syntax: glob
 
