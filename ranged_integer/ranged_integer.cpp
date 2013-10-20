@@ -14,12 +14,13 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with this program. If not, see <http://www.gnu.org/licenses/>.
 
+#include "detail/stream.hpp"
 #include "ranged_integer.hpp"
 #include "detail/common_type.hpp"
 #include "detail/math.hpp"
 #include "detail/numeric_limits.hpp"
 #include <cassert>
-#include <iostream>
+#include <sstream>
 
 namespace {
 
@@ -291,6 +292,25 @@ void check_common_type() {
 	static_assert(std::is_same<expected_type, common_type>::value, "common_type wrong.");
 }
 
+template<typename integer>
+void streaming_test(int const initial, int const final) {
+	integer value(initial);
+	std::stringstream in;
+	in << value;
+	assert(in.str() == std::to_string(initial));
+	std::stringstream out;
+	out << final;
+	out >> value;
+	assert(value == final);
+}
+
+void check_streaming() {
+	streaming_test<checked_integer<0, 100>>(7, 0);
+	constexpr auto large_initial = std::numeric_limits<int>::max() / 3;
+	constexpr auto large_final = -49;
+	streaming_test<decltype(make_ranged(0))>(large_initial, large_final);
+}
+
 }	// namespace
 
 int main() {
@@ -300,4 +320,5 @@ int main() {
 	check_math();
 	check_numeric_limits_all();
 	check_common_type();
+	check_streaming();
 }

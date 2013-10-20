@@ -1,5 +1,5 @@
 # List of sources
-# Copyright (C) 2012 David Stone
+# Copyright (C) 2013 David Stone
 #
 # This program is free software: you can redistribute it and / or modify
 # it under the terms of the GNU Affero General Public License as
@@ -27,4 +27,4 @@ def prepend_dir(directory, sources):
 # example = ('example_program_name', example_sources, example_libraries)
 # base_sources = [example]
 
-base_sources = [('test', ['ranged_integer.cpp'] + prepend_dir('detail', ['arithmetic_operators.cpp', 'arithmetic_result_type.cpp', 'class.cpp', 'common_policy.cpp', 'common_type.cpp', 'comparison_operators.cpp', 'compound_assignment_operators.cpp', 'enable_if.cpp', 'forward_declaration.cpp', 'is_ranged_integer.cpp', 'make_ranged.cpp', 'math.cpp', 'minmax.cpp', 'numeric_limits.cpp', 'operators.cpp', 'overlapping_range.cpp', 'policy.cpp', 'ternary_conditional.cpp']), [])]
+base_sources = [('test', ['ranged_integer.cpp'] + prepend_dir('detail', ['arithmetic_operators.cpp', 'arithmetic_result_type.cpp', 'class.cpp', 'common_policy.cpp', 'common_type.cpp', 'comparison_operators.cpp', 'compound_assignment_operators.cpp', 'enable_if.cpp', 'forward_declaration.cpp', 'is_ranged_integer.cpp', 'make_ranged.cpp', 'math.cpp', 'minmax.cpp', 'numeric_limits.cpp', 'operators.cpp', 'stream.cpp', 'overlapping_range.cpp', 'policy.cpp', 'ternary_conditional.cpp']), [])]

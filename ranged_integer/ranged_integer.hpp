@@ -24,6 +24,7 @@
 #include "detail/numeric_limits.hpp"
 #include "detail/operators.hpp"
 #include "detail/policy.hpp"
+#include "detail/stream.hpp"
 
 #include <cstdint>
 
