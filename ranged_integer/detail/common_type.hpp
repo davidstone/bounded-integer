@@ -22,6 +22,8 @@
 #include "forward_declaration.hpp"
 #include "is_ranged_integer.hpp"
 #include "policy.hpp"
+
+#include <limits>
 #include <type_traits>
 
 namespace detail {

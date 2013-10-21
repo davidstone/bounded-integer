@@ -17,10 +17,6 @@
 #ifndef RANGED_INTEGER_POLICY_HPP_
 #define RANGED_INTEGER_POLICY_HPP_
 
-#include "enable_if.hpp"
-#include "numeric_limits.hpp"
-#include "overlapping_range.hpp"
-
 #include <cstdint>
 #include <stdexcept>
 
@@ -40,43 +36,14 @@ public:
 template<intmax_t minimum, intmax_t maximum>
 class throw_on_overflow {
 public:
-	// Even though the optimizer should be able to simplify this to any of the
-	// other three, noisy compiler warnings mean that I have to break this into
-	// four functions.
-	template<typename integer, enable_if_t<
-		detail::type_can_underflow<integer>(minimum) and detail::type_can_overflow<integer>(maximum)
-	>...>
+	// The optimizer should be able to simplify this to remove dead checks.
+	template<typename integer>
 	constexpr integer operator()(integer const new_value) const {
 		return (new_value < minimum) ?
 			throw std::underflow_error{"Value too small"} :
 			((new_value > maximum) ?
 				throw std::overflow_error{"Value too large"} :
 				new_value);
-	}
-
-	template<typename integer, enable_if_t<
-		!detail::type_can_underflow<integer>(minimum) and detail::type_can_overflow<integer>(maximum)
-	>...>
-	constexpr integer operator()(integer const new_value) const {
-		return (new_value > maximum) ?
-			throw std::overflow_error{"Value too large"} :
-			new_value;
-	}
-
-	template<typename integer, enable_if_t<
-		detail::type_can_underflow<integer>(minimum) and !detail::type_can_overflow<integer>(maximum)
-	>...>
-	constexpr integer operator()(integer const new_value) const {
-		return (new_value < minimum) ?
-			throw std::underflow_error{"Value too small"} :
-			new_value;
-	}
-
-	template<typename integer, enable_if_t<
-		detail::type_in_range<integer>(minimum, maximum)
-	>...>
-	constexpr integer operator()(integer const new_value) const noexcept {
-		return new_value;
 	}
 	
 	static constexpr bool is_modulo = false;
@@ -97,6 +64,5 @@ public:
 	static constexpr bool is_modulo = false;
 	static constexpr bool overflow_is_error = false;
 };
-
 
 #endif	// RANGED_INTEGER_POLICY_HPP_

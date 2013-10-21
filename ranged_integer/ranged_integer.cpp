@@ -292,6 +292,26 @@ void check_common_type() {
 	static_assert(std::is_same<expected_type, common_type>::value, "common_type wrong.");
 }
 
+void check_throw_policy() {
+	throw_on_overflow<0, 10> throw_policy;
+	try {
+		throw_policy(20);
+		assert(false);
+	}
+	catch (std::overflow_error const & e) {
+	}
+	try {
+		throw_policy(-6);
+		assert(false);
+	}
+	catch (std::underflow_error const & e) {
+	}
+}
+
+void check_policies() {
+	check_throw_policy();
+}
+
 template<typename integer>
 void streaming_test(int const initial, int const final) {
 	integer value(initial);
@@ -320,5 +340,6 @@ int main() {
 	check_math();
 	check_numeric_limits_all();
 	check_common_type();
+	check_policies();
 	check_streaming();
 }
