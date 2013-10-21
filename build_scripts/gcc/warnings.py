@@ -85,7 +85,7 @@
 #
 # -Wuseless-cast is a GCC-4.8-only warning, which I will add when I transition.
 
-warnings = ['-Wall', '-Wextra', '-pedantic', '-Wcast-align', '-Wcast-qual', '-Wctor-dtor-privacy', '-Wdouble-promotion', '-Wformat=2', '-Winit-self', '-Winvalid-pch', '-Wlogical-op', '-Wmissing-declarations', '-Wmissing-include-dirs', '-Wnoexcept', '-Wold-style-cast', '-Woverloaded-virtual', '-Wredundant-decls', '-Wshadow', '-Wsign-conversion', '-Wsign-promo', '-Wstrict-null-sentinel', '-Wtrampolines', '-Wundef', '-Werror', '-Wno-unused-parameter', '-Wno-unused-variable']
+warnings = ['-Wall', '-Wextra', '-pedantic', '-Wcast-align', '-Wcast-qual', '-Wctor-dtor-privacy', '-Wdouble-promotion', '-Wformat=2', '-Winit-self', '-Winvalid-pch', '-Wlogical-op', '-Wmissing-declarations', '-Wmissing-include-dirs', '-Wnoexcept', '-Wold-style-cast', '-Woverloaded-virtual', '-Wredundant-decls', '-Wshadow', '-Wsign-conversion', '-Wsign-promo', '-Wstrict-null-sentinel', '-Wtrampolines', '-Wundef', '-Werror', '-Wno-unused-parameter']
 # I have to set -Wstrict-overflow=5 to be a "debug" warning because it conflicts
 # with a boost library when link-time optimization is turned on.
 warnings_debug = ['-Wstrict-overflow=5']
