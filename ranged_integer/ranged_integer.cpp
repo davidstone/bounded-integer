@@ -343,7 +343,7 @@ void check_streaming() {
 	streaming_test<checked_integer<0, 100>>(7, 0);
 	constexpr auto large_initial = std::numeric_limits<int>::max() / 3;
 	constexpr auto large_final = -49;
-	streaming_test<decltype(make_ranged(0))>(large_initial, large_final);
+	streaming_test<decltype(make_ranged(int{}))>(large_initial, large_final);
 }
 
 
