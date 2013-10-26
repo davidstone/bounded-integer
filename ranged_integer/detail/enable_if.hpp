@@ -29,8 +29,12 @@ void f() {
 
 #endif
 
+namespace detail {
 enum class enabler {};
+}	// namespace detail
+
+constexpr detail::enabler clang_dummy = {};
 template<bool condition>
-using enable_if_t = typename std::enable_if<condition, enabler>::type;
+using enable_if_t = typename std::enable_if<condition, detail::enabler>::type;
 
 #endif	// ENABLE_IF_TEMPLATE_ALIAS_HPP_
