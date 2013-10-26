@@ -33,14 +33,6 @@
 # of base classes). This would be more useful as a collection of warnings (like
 # -Wall) instead of a single warning on its own.
 #
-# -Wfloat-equal warns for safe equality comparisons (in particular, comparison
-# with a non-computed value of -1). An example in my code where I use this is
-# that I have a vector of float. I go through this vector, and there are some
-# elements I cannot evaluate yet what they should be, so I set them to -1.0f
-# (since my problem only uses positive numbers, -1 is out of the domain). I
-# later go through and update -1.0f values. It does not easily lend itself to a
-# different method of operation.
-#
 # -Winline is absent because I don't use the inline keyword for optimization
 # purposes, just to define functions inline in headers. I don't care if the
 # optimizer actually inlines it. This warning also complains if it can't inline
@@ -74,15 +66,6 @@
 # changes to the enum are handled everywhere that they need to be), but it's
 # overkill for an "all-or-nothing" setting.
 #
-# -Wunsafe-loop-optimizations causes too many spurious warnings. It may be
-# useful to apply this one periodically and manually verify the results. As an
-# example, it generated this warning in my code when I looped over all elements
-# in a vector to apply a set of functions to them (using the range-based for
-# loop).  It is also warning for the constructor of a const array of const
-# std::string (where there is no loop in user code).
-#
-# -Wzero-as-null-pointer-constant triggers for a few boost libraries.
-#
 # -Wuseless-cast is a GCC-4.8-only warning, which I will add when I transition.
 
 warnings = [
@@ -93,6 +76,7 @@ warnings = [
 	'-Wcast-qual',
 	'-Wctor-dtor-privacy',
 	'-Wdouble-promotion',
+	'-Wfloat-equal',
 	'-Wformat=2',
 	'-Winit-self',
 	'-Winvalid-pch',
@@ -107,8 +91,11 @@ warnings = [
 	'-Wsign-conversion',
 	'-Wsign-promo',
 	'-Wstrict-null-sentinel',
+	'-Wstrict-overflow=2',
 	'-Wtrampolines',
 	'-Wundef',
+	'-Wunsafe-loop-optimizations',
+	'-Wzero-as-null-pointer-constant',
 	'-Werror',
 	'-Wno-unused-parameter'
 ]
