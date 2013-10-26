@@ -55,7 +55,7 @@ public:
 	constexpr ranged_integer_base(underlying_type const & other) noexcept:
 		m_value(other) {
 	}
-	constexpr underlying_type value() noexcept {
+	constexpr underlying_type value() const noexcept {
 		return m_value;
 	}
 private:
@@ -69,7 +69,7 @@ public:
 	constexpr ranged_integer_base() noexcept = default;
 	constexpr ranged_integer_base(underlying_type const &) noexcept {
 	}
-	constexpr underlying_type value() noexcept {
+	constexpr underlying_type value() const noexcept {
 		return only_value;
 	}
 };
