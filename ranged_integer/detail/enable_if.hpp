@@ -27,6 +27,11 @@ template<typename Blah, enable_if_t<1 + 1 == 2>...>
 void f() {
 }
 
+// Usage if you want to use a clang workaround:
+template<typename Blah, enable_if_t<1 + 1 == 2> = clang_dummy>
+void f() {
+}
+
 #endif
 
 namespace detail {

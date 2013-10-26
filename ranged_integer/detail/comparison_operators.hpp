@@ -54,19 +54,19 @@ constexpr bool operator!=(ranged_integer<lhs_min, lhs_max, lhs_overflow> const l
 
 // Equality with built-ins
 
-template<intmax_t minimum, intmax_t maximum, template<intmax_t, intmax_t> class overflow_policy, typename integer, enable_if_t<std::is_integral<integer>::value>...>
+template<intmax_t minimum, intmax_t maximum, template<intmax_t, intmax_t> class overflow_policy, typename integer, enable_if_t<std::is_integral<integer>::value> = clang_dummy>
 constexpr bool operator==(ranged_integer<minimum, maximum, overflow_policy> const lhs, integer const rhs) noexcept {
 	return lhs == make_ranged(rhs);
 }
-template<intmax_t minimum, intmax_t maximum, template<intmax_t, intmax_t> class overflow_policy, typename integer, enable_if_t<std::is_integral<integer>::value>...>
+template<intmax_t minimum, intmax_t maximum, template<intmax_t, intmax_t> class overflow_policy, typename integer, enable_if_t<std::is_integral<integer>::value> = clang_dummy>
 constexpr bool operator==(integer const lhs, ranged_integer<minimum, maximum, overflow_policy> const rhs) noexcept {
 	return make_ranged(lhs) == rhs;
 }
-template<intmax_t minimum, intmax_t maximum, template<intmax_t, intmax_t> class overflow_policy, typename integer, enable_if_t<std::is_integral<integer>::value>...>
+template<intmax_t minimum, intmax_t maximum, template<intmax_t, intmax_t> class overflow_policy, typename integer, enable_if_t<std::is_integral<integer>::value> = clang_dummy>
 constexpr bool operator!=(ranged_integer<minimum, maximum, overflow_policy> const lhs, integer const rhs) noexcept {
 	return !(lhs == rhs);
 }
-template<intmax_t minimum, intmax_t maximum, template<intmax_t, intmax_t> class overflow_policy, typename integer, enable_if_t<std::is_integral<integer>::value>...>
+template<intmax_t minimum, intmax_t maximum, template<intmax_t, intmax_t> class overflow_policy, typename integer, enable_if_t<std::is_integral<integer>::value> = clang_dummy>
 constexpr bool operator!=(integer const lhs, ranged_integer<minimum, maximum, overflow_policy> const rhs) noexcept {
 	return !(lhs == rhs);
 }
@@ -112,38 +112,38 @@ constexpr bool operator>=(ranged_integer<lhs_min, lhs_max, lhs_overflow> const l
 
 // Relational operators with built-ins
 
-template<intmax_t minimum, intmax_t maximum, template<intmax_t, intmax_t> class overflow_policy, typename integer, enable_if_t<std::is_integral<integer>::value>...>
+template<intmax_t minimum, intmax_t maximum, template<intmax_t, intmax_t> class overflow_policy, typename integer, enable_if_t<std::is_integral<integer>::value> = clang_dummy>
 constexpr bool operator<(ranged_integer<minimum, maximum, overflow_policy> const lhs, integer const rhs) noexcept {
 	return lhs < make_ranged(rhs);
 }
-template<intmax_t minimum, intmax_t maximum, template<intmax_t, intmax_t> class overflow_policy, typename integer, enable_if_t<std::is_integral<integer>::value>...>
+template<intmax_t minimum, intmax_t maximum, template<intmax_t, intmax_t> class overflow_policy, typename integer, enable_if_t<std::is_integral<integer>::value> = clang_dummy>
 constexpr bool operator<(integer const lhs, ranged_integer<minimum, maximum, overflow_policy> const rhs) noexcept {
 	return make_ranged(lhs) < rhs;
 }
 
-template<intmax_t minimum, intmax_t maximum, template<intmax_t, intmax_t> class overflow_policy, typename integer, enable_if_t<std::is_integral<integer>::value>...>
+template<intmax_t minimum, intmax_t maximum, template<intmax_t, intmax_t> class overflow_policy, typename integer, enable_if_t<std::is_integral<integer>::value> = clang_dummy>
 constexpr bool operator>(ranged_integer<minimum, maximum, overflow_policy> const lhs, integer const rhs) noexcept {
 	return lhs > make_ranged(rhs);
 }
-template<intmax_t minimum, intmax_t maximum, template<intmax_t, intmax_t> class overflow_policy, typename integer, enable_if_t<std::is_integral<integer>::value>...>
+template<intmax_t minimum, intmax_t maximum, template<intmax_t, intmax_t> class overflow_policy, typename integer, enable_if_t<std::is_integral<integer>::value> = clang_dummy>
 constexpr bool operator>(integer const lhs, ranged_integer<minimum, maximum, overflow_policy> const rhs) noexcept {
 	return make_ranged(lhs) > rhs;
 }
 
-template<intmax_t minimum, intmax_t maximum, template<intmax_t, intmax_t> class overflow_policy, typename integer, enable_if_t<std::is_integral<integer>::value>...>
+template<intmax_t minimum, intmax_t maximum, template<intmax_t, intmax_t> class overflow_policy, typename integer, enable_if_t<std::is_integral<integer>::value> = clang_dummy>
 constexpr bool operator<=(ranged_integer<minimum, maximum, overflow_policy> const lhs, integer const rhs) noexcept {
 	return lhs <= make_ranged(rhs);
 }
-template<intmax_t minimum, intmax_t maximum, template<intmax_t, intmax_t> class overflow_policy, typename integer, enable_if_t<std::is_integral<integer>::value>...>
+template<intmax_t minimum, intmax_t maximum, template<intmax_t, intmax_t> class overflow_policy, typename integer, enable_if_t<std::is_integral<integer>::value> = clang_dummy>
 constexpr bool operator<=(integer const lhs, ranged_integer<minimum, maximum, overflow_policy> const rhs) noexcept {
 	return make_ranged(lhs) <= rhs;
 }
 
-template<intmax_t minimum, intmax_t maximum, template<intmax_t, intmax_t> class overflow_policy, typename integer, enable_if_t<std::is_integral<integer>::value>...>
+template<intmax_t minimum, intmax_t maximum, template<intmax_t, intmax_t> class overflow_policy, typename integer, enable_if_t<std::is_integral<integer>::value> = clang_dummy>
 constexpr bool operator>=(ranged_integer<minimum, maximum, overflow_policy> const lhs, integer const rhs) noexcept {
 	return lhs >= make_ranged(rhs);
 }
-template<intmax_t minimum, intmax_t maximum, template<intmax_t, intmax_t> class overflow_policy, typename integer, enable_if_t<std::is_integral<integer>::value>...>
+template<intmax_t minimum, intmax_t maximum, template<intmax_t, intmax_t> class overflow_policy, typename integer, enable_if_t<std::is_integral<integer>::value> = clang_dummy>
 constexpr bool operator>=(integer const lhs, ranged_integer<minimum, maximum, overflow_policy> const rhs) noexcept {
 	return make_ranged(lhs) >= rhs;
 }

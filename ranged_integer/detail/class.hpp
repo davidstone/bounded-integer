@@ -101,7 +101,7 @@ public:
 	// the type system that the value really does fit in the range.
 	template<typename integer, enable_if_t<
 		detail::has_overlap<integer>(minimum, maximum)
-	>...>
+	> = clang_dummy>
 	constexpr ranged_integer(integer const & other, non_check_t) noexcept:
 		base(static_cast<underlying_type>(other)) {
 	}
@@ -109,7 +109,7 @@ public:
 	// Intentionally implicit: this is safe because the value is in range
 	template<typename integer, enable_if_t<
 		detail::type_in_range<integer>(minimum, maximum)
-	>...>
+	> = clang_dummy>
 	constexpr ranged_integer(integer other) noexcept:
 		ranged_integer(other, non_check) {
 	}
@@ -118,7 +118,7 @@ public:
 		!detail::type_in_range<integer>(minimum, maximum) and
 		(detail::has_overlap<integer>(minimum, maximum) or
 		!overflow_policy::overflow_is_error)
-	>...>
+	> = clang_dummy>
 	constexpr explicit ranged_integer(integer other):
 		ranged_integer(overflow_policy{}(std::move(other)), non_check) {
 	}
@@ -138,7 +138,7 @@ public:
 	// has requested a conversion out of the safety of the ranged_integer type.
 	// It is subject to the all of the standard rules that conversion from one
 	// built-in integer type to another has.
-	template<typename integer, enable_if_t<std::is_integral<integer>::value>...>
+	template<typename integer, enable_if_t<std::is_integral<integer>::value> = clang_dummy>
 	constexpr explicit operator integer() const {
 		return static_cast<integer>(value());
 	}

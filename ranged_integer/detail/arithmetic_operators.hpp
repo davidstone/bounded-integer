@@ -70,7 +70,7 @@ template<
 	intmax_t lhs_min, intmax_t lhs_max,
 	typename integer,
 	template<intmax_t, intmax_t> class overflow_policy,
-	enable_if_t<std::is_integral<integer>::value>...
+	enable_if_t<std::is_integral<integer>::value> = clang_dummy
 >
 constexpr auto operator+(
 	ranged_integer<lhs_min, lhs_max, overflow_policy> const lhs,
@@ -82,7 +82,7 @@ template<
 	typename integer,
 	intmax_t rhs_min, intmax_t rhs_max,
 	template<intmax_t, intmax_t> class overflow_policy,
-	enable_if_t<std::is_integral<integer>::value>...
+	enable_if_t<std::is_integral<integer>::value> = clang_dummy
 >
 constexpr auto operator+(
 	integer const lhs,
@@ -117,7 +117,7 @@ template<
 	intmax_t lhs_min, intmax_t lhs_max,
 	typename integer,
 	template<intmax_t, intmax_t> class overflow_policy,
-	enable_if_t<std::is_integral<integer>::value>...
+	enable_if_t<std::is_integral<integer>::value> = clang_dummy
 >
 constexpr auto operator-(
 	ranged_integer<lhs_min, lhs_max, overflow_policy> const lhs,
@@ -129,7 +129,7 @@ template<
 	typename integer,
 	intmax_t rhs_min, intmax_t rhs_max,
 	template<intmax_t, intmax_t> class overflow_policy,
-	enable_if_t<std::is_integral<integer>::value>...
+	enable_if_t<std::is_integral<integer>::value> = clang_dummy
 >
 constexpr auto operator-(
 	integer const lhs,
@@ -163,7 +163,7 @@ template<
 	intmax_t lhs_min, intmax_t lhs_max,
 	typename integer,
 	template<intmax_t, intmax_t> class overflow_policy,
-	enable_if_t<std::is_integral<integer>::value>...
+	enable_if_t<std::is_integral<integer>::value> = clang_dummy
 >
 constexpr auto operator*(
 	ranged_integer<lhs_min, lhs_max, overflow_policy> const lhs,
@@ -175,7 +175,7 @@ template<
 	typename integer,
 	intmax_t rhs_min, intmax_t rhs_max,
 	template<intmax_t, intmax_t> class overflow_policy,
-	enable_if_t<std::is_integral<integer>::value>...
+	enable_if_t<std::is_integral<integer>::value> = clang_dummy
 >
 constexpr auto operator*(
 	integer const lhs,
@@ -209,7 +209,7 @@ template<
 	intmax_t lhs_min, intmax_t lhs_max,
 	typename integer,
 	template<intmax_t, intmax_t> class overflow_policy,
-	enable_if_t<std::is_integral<integer>::value>...
+	enable_if_t<std::is_integral<integer>::value> = clang_dummy
 >
 constexpr auto operator/(
 	ranged_integer<lhs_min, lhs_max, overflow_policy> const lhs,
@@ -221,7 +221,7 @@ template<
 	typename integer,
 	intmax_t rhs_min, intmax_t rhs_max,
 	template<intmax_t, intmax_t> class overflow_policy,
-	enable_if_t<std::is_integral<integer>::value>...
+	enable_if_t<std::is_integral<integer>::value> = clang_dummy
 >
 constexpr auto operator/(
 	integer const lhs,
@@ -255,7 +255,7 @@ template<
 	intmax_t lhs_min, intmax_t lhs_max,
 	typename integer,
 	template<intmax_t, intmax_t> class overflow_policy,
-	enable_if_t<std::is_integral<integer>::value>...
+	enable_if_t<std::is_integral<integer>::value> = clang_dummy
 >
 constexpr auto operator%(
 	ranged_integer<lhs_min, lhs_max, overflow_policy> const lhs,
@@ -267,7 +267,7 @@ template<
 	typename integer,
 	intmax_t rhs_min, intmax_t rhs_max,
 	template<intmax_t, intmax_t> class overflow_policy,
-	enable_if_t<std::is_integral<integer>::value>...
+	enable_if_t<std::is_integral<integer>::value> = clang_dummy
 >
 constexpr auto operator%(
 	integer const lhs,
@@ -280,7 +280,7 @@ constexpr auto operator%(
 
 // Unary minus
 
-template<template<intmax_t, intmax_t> class overflow_policy, typename integer, enable_if_t<is_ranged_integer<integer>()>...>
+template<template<intmax_t, intmax_t> class overflow_policy, typename integer, enable_if_t<is_ranged_integer<integer>()> = clang_dummy>
 constexpr unary_minus_result<overflow_policy, integer> negate(integer value) noexcept {
 	using result_type = unary_minus_result<overflow_policy, integer>;
 	using common_type = common_type_t<result_type, integer>;

@@ -65,27 +65,27 @@ ranged_integer<minimum, maximum, overflow_policy> & operator%=(ranged_integer<mi
 
 // ranged_integer being assigned from
 
-template<typename integer, intmax_t minimum, intmax_t maximum, template<intmax_t, intmax_t> class overflow_policy, enable_if_t<std::is_integral<integer>::value>...>
+template<typename integer, intmax_t minimum, intmax_t maximum, template<intmax_t, intmax_t> class overflow_policy, enable_if_t<std::is_integral<integer>::value> = clang_dummy>
 integer & operator+=(integer & lhs, ranged_integer<minimum, maximum, overflow_policy> const & rhs) noexcept {
 	return lhs += rhs.value();
 }
 
-template<typename integer, intmax_t minimum, intmax_t maximum, template<intmax_t, intmax_t> class overflow_policy, enable_if_t<std::is_integral<integer>::value>...>
+template<typename integer, intmax_t minimum, intmax_t maximum, template<intmax_t, intmax_t> class overflow_policy, enable_if_t<std::is_integral<integer>::value> = clang_dummy>
 integer & operator-=(integer & lhs, ranged_integer<minimum, maximum, overflow_policy> const & rhs) noexcept {
 	return lhs -= rhs.value();
 }
 
-template<typename integer, intmax_t minimum, intmax_t maximum, template<intmax_t, intmax_t> class overflow_policy, enable_if_t<std::is_integral<integer>::value>...>
+template<typename integer, intmax_t minimum, intmax_t maximum, template<intmax_t, intmax_t> class overflow_policy, enable_if_t<std::is_integral<integer>::value> = clang_dummy>
 integer & operator*=(integer & lhs, ranged_integer<minimum, maximum, overflow_policy> const & rhs) noexcept {
 	return lhs *= rhs.value();
 }
 
-template<typename integer, intmax_t minimum, intmax_t maximum, template<intmax_t, intmax_t> class overflow_policy, enable_if_t<std::is_integral<integer>::value>...>
+template<typename integer, intmax_t minimum, intmax_t maximum, template<intmax_t, intmax_t> class overflow_policy, enable_if_t<std::is_integral<integer>::value> = clang_dummy>
 integer & operator/=(integer & lhs, ranged_integer<minimum, maximum, overflow_policy> const & rhs) noexcept {
 	return lhs /= rhs.value();
 }
 
-template<typename integer, intmax_t minimum, intmax_t maximum, template<intmax_t, intmax_t> class overflow_policy, enable_if_t<std::is_integral<integer>::value>...>
+template<typename integer, intmax_t minimum, intmax_t maximum, template<intmax_t, intmax_t> class overflow_policy, enable_if_t<std::is_integral<integer>::value> = clang_dummy>
 integer & operator%=(integer & lhs, ranged_integer<minimum, maximum, overflow_policy> const & rhs) noexcept {
 	return lhs %= rhs.value();
 }
