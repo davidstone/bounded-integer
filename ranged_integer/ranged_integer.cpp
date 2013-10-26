@@ -308,8 +308,23 @@ void check_throw_policy() {
 	}
 }
 
+void check_clamp_policy() {
+	static constexpr intmax_t minimum = 27;
+	static constexpr intmax_t maximum = 567;
+	constexpr clamp_on_overflow<minimum, maximum> clamp_policy;
+	static_assert(clamp_policy(20) == minimum, "Failure to properly clamp lesser positive values.");
+	static_assert(clamp_policy(-25) == minimum, "Failure to properly clamp negative values to a positive value.");
+	static_assert(clamp_policy(1000) == maximum, "Failure to properly clamp greater positive values.");
+	
+	using type = clamped_integer<-100, 100>;
+	constexpr auto initial = std::numeric_limits<type::underlying_type>::max() + 1;
+	constexpr type value(initial);
+	static_assert(value == std::numeric_limits<type>::max(), "Fail to clamp value when the source type is larger than the destination type.");
+}
+
 void check_policies() {
 	check_throw_policy();
+	check_clamp_policy();
 }
 
 template<typename integer>
@@ -330,6 +345,7 @@ void check_streaming() {
 	constexpr auto large_final = -49;
 	streaming_test<decltype(make_ranged(0))>(large_initial, large_final);
 }
+
 
 }	// namespace
 
