@@ -31,10 +31,10 @@ namespace detail {
 template<
 	intmax_t lhs_min, intmax_t lhs_max, template<intmax_t, intmax_t> class lhs_overflow,
 	intmax_t rhs_min, intmax_t rhs_max, template<intmax_t, intmax_t> class rhs_overflow,
-	typename Operator
+	typename Operator,
+	typename result_t = operator_result<lhs_min, lhs_max, lhs_overflow, rhs_min, rhs_max, rhs_overflow, Operator>
 >
-constexpr operator_result<lhs_min, lhs_max, lhs_overflow, rhs_min, rhs_max, rhs_overflow, Operator> apply_operator(ranged_integer<lhs_min, lhs_max, lhs_overflow> const lhs, ranged_integer<rhs_min, rhs_max, rhs_overflow> const rhs, Operator const & op) {
-	using result_t = operator_result<lhs_min, lhs_max, lhs_overflow, rhs_min, rhs_max, rhs_overflow, Operator>;
+constexpr result_t apply_operator(ranged_integer<lhs_min, lhs_max, lhs_overflow> const lhs, ranged_integer<rhs_min, rhs_max, rhs_overflow> const rhs, Operator const & op) {
 	using common_t = typename common_type_t<result_t, decltype(lhs), decltype(rhs)>::underlying_type;
 	// It is safe to use the non_check constructor because we have already
 	// determined that the result will fit in result_t. We have to cast to the
