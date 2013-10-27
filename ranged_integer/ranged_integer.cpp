@@ -127,6 +127,8 @@ void check_numeric_limits_all() {
 	check_numeric_limits<int64_t>();
 	// Currently does not support unsigned types equal to uintmax_t
 	// check_numeric_limits<uint64_t>();
+	
+	static_assert(std::numeric_limits<native_integer<1, 1000>>::digits == 0, "Meaningless digits not 0.");
 }
 
 void check_modulo();
