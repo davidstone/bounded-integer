@@ -20,9 +20,13 @@
 #include <cstdint>
 #include <stdexcept>
 
+// Default constructors are provided to work around
+// http://www.open-std.org/jtc1/sc22/wg21/docs/cwg_active.html#253
+
 template<intmax_t minimum, intmax_t maximum>
 class null_policy {
 public:
+	constexpr null_policy() noexcept {}
 	template<typename integer>
 	constexpr integer operator()(integer const new_value) const noexcept {
 		return new_value;
@@ -36,6 +40,7 @@ public:
 template<intmax_t minimum, intmax_t maximum>
 class throw_on_overflow {
 public:
+	constexpr throw_on_overflow() noexcept {}
 	// The optimizer should be able to simplify this to remove dead checks.
 	template<typename integer>
 	constexpr integer operator()(integer const new_value) const {
@@ -53,6 +58,7 @@ public:
 template<intmax_t minimum, intmax_t maximum>
 class clamp_on_overflow {
 public:
+	constexpr clamp_on_overflow() noexcept {}
 	template<typename integer>
 	constexpr integer operator()(integer const new_value) const noexcept {
 		return
