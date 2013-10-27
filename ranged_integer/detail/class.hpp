@@ -43,11 +43,6 @@ using underlying_t = typename std::conditional<
 	unsigned_underlying_t<minimum, maximum>
 >::type;
 
-template<typename integer>
-constexpr bool entirely_in_range(intmax_t const minimum, intmax_t const maximum) noexcept {
-	return value_in_range<integer>(minimum) and value_in_range<integer>(maximum);
-}
-
 template<intmax_t minimum, intmax_t maximum>
 class ranged_integer_base {
 public:
