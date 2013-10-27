@@ -18,7 +18,6 @@
 #define RANGED_INTEGER_NUMERIC_LIMITS_HPP_
 
 #include "forward_declaration.hpp"
-#include <cmath>
 #include <cstdint>
 #include <limits>
 
