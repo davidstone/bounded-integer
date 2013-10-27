@@ -23,7 +23,7 @@
 namespace detail {
 
 template<typename Function, typename Integer>
-constexpr Integer minmax(Function const & function, Integer && integer) {
+constexpr Integer minmax(Function const &, Integer && integer) {
 	return integer;
 }
 template<typename Function, typename Integer, typename... Integers>

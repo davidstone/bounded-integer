@@ -97,7 +97,6 @@ warnings = [
 	'-Wunsafe-loop-optimizations',
 	'-Wzero-as-null-pointer-constant',
 	'-Werror',
-	'-Wno-unused-parameter'
 ]
 # I have to set -Wstrict-overflow=5 to be a "debug" warning because it conflicts
 # with a boost library when link-time optimization is turned on.
