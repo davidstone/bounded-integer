@@ -33,9 +33,9 @@ template<
 	intmax_t rhs_min, intmax_t rhs_max, template<intmax_t, intmax_t> class rhs_overflow,
 	typename Operator
 >
-constexpr operator_result<lhs_min, lhs_max, lhs_overflow, rhs_min, rhs_max, rhs_overflow, Operator> apply_operator(ranged_integer<lhs_min, lhs_max, lhs_overflow> const & lhs, ranged_integer<rhs_min, rhs_max, rhs_overflow> const & rhs, Operator const & op) {
+constexpr operator_result<lhs_min, lhs_max, lhs_overflow, rhs_min, rhs_max, rhs_overflow, Operator> apply_operator(ranged_integer<lhs_min, lhs_max, lhs_overflow> const lhs, ranged_integer<rhs_min, rhs_max, rhs_overflow> const rhs, Operator const & op) {
 	using result_t = operator_result<lhs_min, lhs_max, lhs_overflow, rhs_min, rhs_max, rhs_overflow, Operator>;
-	using common_t = typename common_type_t<result_t, typename std::decay<decltype(lhs)>::type, typename std::decay<decltype(rhs)>::type>::underlying_type;
+	using common_t = typename common_type_t<result_t, decltype(lhs), decltype(rhs)>::underlying_type;
 	// It is safe to use the non_check constructor because we have already
 	// determined that the result will fit in result_t. We have to cast to the
 	// intermediate common_t in case result_t is narrower than one of the
