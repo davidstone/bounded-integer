@@ -45,204 +45,52 @@ constexpr operator_result<lhs_min, lhs_max, lhs_overflow, rhs_min, rhs_max, rhs_
 
 }	// namespace detail
 
-template<
-	intmax_t lhs_min, intmax_t lhs_max, template<intmax_t, intmax_t> class lhs_overflow_policy,
-	intmax_t rhs_min, intmax_t rhs_max, template<intmax_t, intmax_t> class rhs_overflow_policy
->
-constexpr auto operator+(
-	ranged_integer<lhs_min, lhs_max, lhs_overflow_policy> const lhs,
-	ranged_integer<rhs_min, rhs_max, rhs_overflow_policy> const rhs
-) noexcept -> decltype(detail::apply_operator(lhs, rhs, detail::plus{})) {
-	return detail::apply_operator(lhs, rhs, detail::plus{});
+
+#define RANGED_INTEGER_OPERATOR_OVERLOADS(symbol, operator_name) \
+template< \
+	intmax_t lhs_min, intmax_t lhs_max, template<intmax_t, intmax_t> class lhs_overflow_policy, \
+	intmax_t rhs_min, intmax_t rhs_max, template<intmax_t, intmax_t> class rhs_overflow_policy \
+> \
+constexpr auto operator symbol( \
+	ranged_integer<lhs_min, lhs_max, lhs_overflow_policy> const lhs, \
+	ranged_integer<rhs_min, rhs_max, rhs_overflow_policy> const rhs \
+) noexcept -> decltype(detail::apply_operator(lhs, rhs, operator_name{})) { \
+	return detail::apply_operator(lhs, rhs, operator_name{}); \
+} \
+ \
+/* Interoperability with built-ins */ \
+template< \
+	intmax_t lhs_min, intmax_t lhs_max, \
+	typename integer, \
+	template<intmax_t, intmax_t> class overflow_policy, \
+	enable_if_t<std::is_integral<integer>::value> = clang_dummy \
+> \
+constexpr auto operator symbol( \
+	ranged_integer<lhs_min, lhs_max, overflow_policy> const lhs, \
+	integer const rhs \
+) noexcept -> decltype(lhs symbol make_ranged(rhs)) { \
+	return lhs symbol make_ranged(rhs); \
+} \
+template< \
+	typename integer, \
+	intmax_t rhs_min, intmax_t rhs_max, \
+	template<intmax_t, intmax_t> class overflow_policy, \
+	enable_if_t<std::is_integral<integer>::value> = clang_dummy \
+> \
+constexpr auto operator symbol( \
+	integer const lhs, \
+	ranged_integer<rhs_min, rhs_max, overflow_policy> const rhs \
+) noexcept -> decltype(make_ranged(lhs) symbol rhs) { \
+	return make_ranged(lhs) symbol rhs; \
 }
 
-// Addition with built-ins
-template<
-	intmax_t lhs_min, intmax_t lhs_max,
-	typename integer,
-	template<intmax_t, intmax_t> class overflow_policy,
-	enable_if_t<std::is_integral<integer>::value> = clang_dummy
->
-constexpr auto operator+(
-	ranged_integer<lhs_min, lhs_max, overflow_policy> const lhs,
-	integer const rhs
-) noexcept -> decltype(lhs + make_ranged(rhs)) {
-	return lhs + make_ranged(rhs);
-}
-template<
-	typename integer,
-	intmax_t rhs_min, intmax_t rhs_max,
-	template<intmax_t, intmax_t> class overflow_policy,
-	enable_if_t<std::is_integral<integer>::value> = clang_dummy
->
-constexpr auto operator+(
-	integer const lhs,
-	ranged_integer<rhs_min, rhs_max, overflow_policy> const rhs
-) noexcept -> decltype(make_ranged(lhs) + rhs) {
-	return make_ranged(lhs) + rhs;
-}
+RANGED_INTEGER_OPERATOR_OVERLOADS(+, detail::plus)
+RANGED_INTEGER_OPERATOR_OVERLOADS(-, detail::minus)
+RANGED_INTEGER_OPERATOR_OVERLOADS(*, detail::multiplies)
+RANGED_INTEGER_OPERATOR_OVERLOADS(/, detail::divides)
+RANGED_INTEGER_OPERATOR_OVERLOADS(%, detail::modulus)
 
-
-
-// Subtraction
-
-template<
-	intmax_t lhs_min, intmax_t lhs_max, template<intmax_t, intmax_t> class lhs_overflow_policy,
-	intmax_t rhs_min, intmax_t rhs_max, template<intmax_t, intmax_t> class rhs_overflow_policy
->
-constexpr auto operator-(
-	ranged_integer<lhs_min, lhs_max, lhs_overflow_policy> const lhs,
-	ranged_integer<rhs_min, rhs_max, rhs_overflow_policy> const rhs
-) noexcept -> decltype(detail::apply_operator(lhs, rhs, detail::minus{})) {
-	return detail::apply_operator(lhs, rhs, detail::minus{});
-}
-
-// Subtraction with built-ins
-template<
-	intmax_t lhs_min, intmax_t lhs_max,
-	typename integer,
-	template<intmax_t, intmax_t> class overflow_policy,
-	enable_if_t<std::is_integral<integer>::value> = clang_dummy
->
-constexpr auto operator-(
-	ranged_integer<lhs_min, lhs_max, overflow_policy> const lhs,
-	integer const rhs
-) noexcept -> decltype(lhs - make_ranged(rhs)) {
-	return lhs - make_ranged(rhs);
-}
-template<
-	typename integer,
-	intmax_t rhs_min, intmax_t rhs_max,
-	template<intmax_t, intmax_t> class overflow_policy,
-	enable_if_t<std::is_integral<integer>::value> = clang_dummy
->
-constexpr auto operator-(
-	integer const lhs,
-	ranged_integer<rhs_min, rhs_max, overflow_policy> const rhs
-) noexcept -> decltype(make_ranged(lhs) - rhs) {
-	return make_ranged(lhs) - rhs;
-}
-
-
-
-// Multiplication
-template<
-	intmax_t lhs_min, intmax_t lhs_max, template<intmax_t, intmax_t> class lhs_overflow_policy,
-	intmax_t rhs_min, intmax_t rhs_max, template<intmax_t, intmax_t> class rhs_overflow_policy
->
-constexpr auto operator*(
-	ranged_integer<lhs_min, lhs_max, lhs_overflow_policy> const lhs,
-	ranged_integer<rhs_min, rhs_max, rhs_overflow_policy> const rhs
-) noexcept -> decltype(detail::apply_operator(lhs, rhs, detail::multiplies{})) {
-	return detail::apply_operator(lhs, rhs, detail::multiplies{});
-}
-
-// Multiplication with built-ins
-template<
-	intmax_t lhs_min, intmax_t lhs_max,
-	typename integer,
-	template<intmax_t, intmax_t> class overflow_policy,
-	enable_if_t<std::is_integral<integer>::value> = clang_dummy
->
-constexpr auto operator*(
-	ranged_integer<lhs_min, lhs_max, overflow_policy> const lhs,
-	integer const rhs
-) noexcept -> decltype(lhs * make_ranged(rhs)) {
-	return lhs * make_ranged(rhs);
-}
-template<
-	typename integer,
-	intmax_t rhs_min, intmax_t rhs_max,
-	template<intmax_t, intmax_t> class overflow_policy,
-	enable_if_t<std::is_integral<integer>::value> = clang_dummy
->
-constexpr auto operator*(
-	integer const lhs,
-	ranged_integer<rhs_min, rhs_max, overflow_policy> const rhs
-) noexcept -> decltype(make_ranged(lhs) * rhs) {
-	return make_ranged(lhs) * rhs;
-}
-
-
-
-// Division
-template<
-	intmax_t lhs_min, intmax_t lhs_max, template<intmax_t, intmax_t> class lhs_overflow_policy,
-	intmax_t rhs_min, intmax_t rhs_max, template<intmax_t, intmax_t> class rhs_overflow_policy
->
-constexpr auto operator/(
-	ranged_integer<lhs_min, lhs_max, lhs_overflow_policy> const lhs,
-	ranged_integer<rhs_min, rhs_max, rhs_overflow_policy> const rhs
-) noexcept -> decltype(detail::apply_operator(lhs, rhs, detail::divides{})) {
-	return detail::apply_operator(lhs, rhs, detail::divides{});
-}
-
-// Division with built-ins
-template<
-	intmax_t lhs_min, intmax_t lhs_max,
-	typename integer,
-	template<intmax_t, intmax_t> class overflow_policy,
-	enable_if_t<std::is_integral<integer>::value> = clang_dummy
->
-constexpr auto operator/(
-	ranged_integer<lhs_min, lhs_max, overflow_policy> const lhs,
-	integer const rhs
-) noexcept -> decltype(lhs / make_ranged(rhs)) {
-	return lhs / make_ranged(rhs);
-}
-template<
-	typename integer,
-	intmax_t rhs_min, intmax_t rhs_max,
-	template<intmax_t, intmax_t> class overflow_policy,
-	enable_if_t<std::is_integral<integer>::value> = clang_dummy
->
-constexpr auto operator/(
-	integer const lhs,
-	ranged_integer<rhs_min, rhs_max, overflow_policy> const rhs
-) noexcept -> decltype(make_ranged(lhs) / rhs) {
-	return make_ranged(lhs) / rhs;
-}
-
-
-
-// Modulo
-template<
-	intmax_t lhs_min, intmax_t lhs_max, template<intmax_t, intmax_t> class lhs_overflow_policy,
-	intmax_t rhs_min, intmax_t rhs_max, template<intmax_t, intmax_t> class rhs_overflow_policy
->
-constexpr auto operator%(
-	ranged_integer<lhs_min, lhs_max, lhs_overflow_policy> const lhs,
-	ranged_integer<rhs_min, rhs_max, rhs_overflow_policy> const rhs
-) noexcept -> decltype(detail::apply_operator(lhs, rhs, detail::modulus{})) {
-	return detail::apply_operator(lhs, rhs, detail::modulus{});
-}
-
-// Modulo with built-ins
-template<
-	intmax_t lhs_min, intmax_t lhs_max,
-	typename integer,
-	template<intmax_t, intmax_t> class overflow_policy,
-	enable_if_t<std::is_integral<integer>::value> = clang_dummy
->
-constexpr auto operator%(
-	ranged_integer<lhs_min, lhs_max, overflow_policy> const lhs,
-	integer const rhs
-) noexcept -> decltype(lhs % make_ranged(rhs)) {
-	return lhs % make_ranged(rhs);
-}
-template<
-	typename integer,
-	intmax_t rhs_min, intmax_t rhs_max,
-	template<intmax_t, intmax_t> class overflow_policy,
-	enable_if_t<std::is_integral<integer>::value> = clang_dummy
->
-constexpr auto operator%(
-	integer const lhs,
-	ranged_integer<rhs_min, rhs_max, overflow_policy> const rhs
-) noexcept -> decltype(make_ranged(lhs) % rhs) {
-	return make_ranged(lhs) % rhs;
-}
-
+#undef RANGED_INTEGER_OPERATOR_OVERLOADS
 
 
 // Unary minus
@@ -255,7 +103,6 @@ constexpr result_type operator-(ranged_integer<minimum, maximum, overflow_policy
 	using common_type = common_type_t<result_type, ranged_integer<minimum, maximum, overflow_policy>>;
 	return result_type(-static_cast<typename common_type::underlying_type>(value), non_check);
 }
-
 
 
 // Unary plus
