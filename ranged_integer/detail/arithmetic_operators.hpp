@@ -54,13 +54,12 @@ constexpr auto add(LHS const & lhs, RHS const & rhs) noexcept -> decltype(detail
 }
 
 template<
-	intmax_t lhs_min, intmax_t lhs_max,
-	intmax_t rhs_min, intmax_t rhs_max,
-	template<intmax_t, intmax_t> class overflow_policy
+	intmax_t lhs_min, intmax_t lhs_max, template<intmax_t, intmax_t> class lhs_overflow_policy,
+	intmax_t rhs_min, intmax_t rhs_max, template<intmax_t, intmax_t> class rhs_overflow_policy
 >
 constexpr auto operator+(
-	ranged_integer<lhs_min, lhs_max, overflow_policy> const lhs,
-	ranged_integer<rhs_min, rhs_max, overflow_policy> const rhs
+	ranged_integer<lhs_min, lhs_max, lhs_overflow_policy> const lhs,
+	ranged_integer<rhs_min, rhs_max, rhs_overflow_policy> const rhs
 ) noexcept -> decltype(add(lhs, rhs)) {
 	return add(lhs, rhs);
 }
@@ -101,13 +100,12 @@ constexpr auto subtract(LHS const & lhs, RHS const & rhs) noexcept -> decltype(d
 }
 
 template<
-	intmax_t lhs_min, intmax_t lhs_max,
-	intmax_t rhs_min, intmax_t rhs_max,
-	template<intmax_t, intmax_t> class overflow_policy
+	intmax_t lhs_min, intmax_t lhs_max, template<intmax_t, intmax_t> class lhs_overflow_policy,
+	intmax_t rhs_min, intmax_t rhs_max, template<intmax_t, intmax_t> class rhs_overflow_policy
 >
 constexpr auto operator-(
-	ranged_integer<lhs_min, lhs_max, overflow_policy> const lhs,
-	ranged_integer<rhs_min, rhs_max, overflow_policy> const rhs
+	ranged_integer<lhs_min, lhs_max, lhs_overflow_policy> const lhs,
+	ranged_integer<rhs_min, rhs_max, rhs_overflow_policy> const rhs
 ) noexcept -> decltype(subtract(lhs, rhs)) {
 	return subtract(lhs, rhs);
 }
@@ -147,13 +145,12 @@ constexpr auto multiply(LHS const & lhs, RHS const & rhs) noexcept -> decltype(d
 }
 
 template<
-	intmax_t lhs_min, intmax_t lhs_max,
-	intmax_t rhs_min, intmax_t rhs_max,
-	template<intmax_t, intmax_t> class overflow_policy
+	intmax_t lhs_min, intmax_t lhs_max, template<intmax_t, intmax_t> class lhs_overflow_policy,
+	intmax_t rhs_min, intmax_t rhs_max, template<intmax_t, intmax_t> class rhs_overflow_policy
 >
 constexpr auto operator*(
-	ranged_integer<lhs_min, lhs_max, overflow_policy> const lhs,
-	ranged_integer<rhs_min, rhs_max, overflow_policy> const rhs
+	ranged_integer<lhs_min, lhs_max, lhs_overflow_policy> const lhs,
+	ranged_integer<rhs_min, rhs_max, rhs_overflow_policy> const rhs
 ) noexcept -> decltype(multiply(lhs, rhs)) {
 	return multiply(lhs, rhs);
 }
@@ -193,13 +190,12 @@ constexpr auto divide(LHS const & lhs, RHS const & rhs) noexcept -> decltype(det
 }
 
 template<
-	intmax_t lhs_min, intmax_t lhs_max,
-	intmax_t rhs_min, intmax_t rhs_max,
-	template<intmax_t, intmax_t> class overflow_policy
+	intmax_t lhs_min, intmax_t lhs_max, template<intmax_t, intmax_t> class lhs_overflow_policy,
+	intmax_t rhs_min, intmax_t rhs_max, template<intmax_t, intmax_t> class rhs_overflow_policy
 >
 constexpr auto operator/(
-	ranged_integer<lhs_min, lhs_max, overflow_policy> const lhs,
-	ranged_integer<rhs_min, rhs_max, overflow_policy> const rhs
+	ranged_integer<lhs_min, lhs_max, lhs_overflow_policy> const lhs,
+	ranged_integer<rhs_min, rhs_max, rhs_overflow_policy> const rhs
 ) noexcept -> decltype(divide(lhs, rhs)) {
 	return divide(lhs, rhs);
 }
@@ -239,13 +235,12 @@ constexpr auto modulo(LHS const & lhs, RHS const & rhs) noexcept -> decltype(det
 }
 
 template<
-	intmax_t lhs_min, intmax_t lhs_max,
-	intmax_t rhs_min, intmax_t rhs_max,
-	template<intmax_t, intmax_t> class overflow_policy
+	intmax_t lhs_min, intmax_t lhs_max, template<intmax_t, intmax_t> class lhs_overflow_policy,
+	intmax_t rhs_min, intmax_t rhs_max, template<intmax_t, intmax_t> class rhs_overflow_policy
 >
 constexpr auto operator%(
-	ranged_integer<lhs_min, lhs_max, overflow_policy> const lhs,
-	ranged_integer<rhs_min, rhs_max, overflow_policy> const rhs
+	ranged_integer<lhs_min, lhs_max, lhs_overflow_policy> const lhs,
+	ranged_integer<rhs_min, rhs_max, rhs_overflow_policy> const rhs
 ) noexcept -> decltype(modulo(lhs, rhs)) {
 	return modulo(lhs, rhs);
 }
