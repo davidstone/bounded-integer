@@ -47,12 +47,6 @@ constexpr operator_result<lhs_min, lhs_max, lhs_overflow, rhs_min, rhs_max, rhs_
 
 }	// namespace detail
 
-// Addition
-template<typename LHS, typename RHS>
-constexpr auto add(LHS const & lhs, RHS const & rhs) noexcept -> decltype(detail::apply_operator(lhs, rhs, detail::plus{})) {
-	return detail::apply_operator(lhs, rhs, detail::plus{});
-}
-
 template<
 	intmax_t lhs_min, intmax_t lhs_max, template<intmax_t, intmax_t> class lhs_overflow_policy,
 	intmax_t rhs_min, intmax_t rhs_max, template<intmax_t, intmax_t> class rhs_overflow_policy
@@ -60,8 +54,8 @@ template<
 constexpr auto operator+(
 	ranged_integer<lhs_min, lhs_max, lhs_overflow_policy> const lhs,
 	ranged_integer<rhs_min, rhs_max, rhs_overflow_policy> const rhs
-) noexcept -> decltype(add(lhs, rhs)) {
-	return add(lhs, rhs);
+) noexcept -> decltype(detail::apply_operator(lhs, rhs, detail::plus{})) {
+	return detail::apply_operator(lhs, rhs, detail::plus{});
 }
 
 // Addition with built-ins
@@ -74,8 +68,8 @@ template<
 constexpr auto operator+(
 	ranged_integer<lhs_min, lhs_max, overflow_policy> const lhs,
 	integer const rhs
-) noexcept -> decltype(add(lhs, make_ranged(rhs))) {
-	return add(lhs, make_ranged(rhs));
+) noexcept -> decltype(lhs + make_ranged(rhs)) {
+	return lhs + make_ranged(rhs);
 }
 template<
 	typename integer,
@@ -86,18 +80,13 @@ template<
 constexpr auto operator+(
 	integer const lhs,
 	ranged_integer<rhs_min, rhs_max, overflow_policy> const rhs
-) noexcept -> decltype(add(make_ranged(lhs), rhs)) {
-	return add(make_ranged(lhs), rhs);
+) noexcept -> decltype(make_ranged(lhs) + rhs) {
+	return make_ranged(lhs) + rhs;
 }
 
 
 
 // Subtraction
-
-template<typename LHS, typename RHS>
-constexpr auto subtract(LHS const & lhs, RHS const & rhs) noexcept -> decltype(detail::apply_operator(lhs, rhs, detail::minus{})) {
-	return detail::apply_operator(lhs, rhs, detail::minus{});
-}
 
 template<
 	intmax_t lhs_min, intmax_t lhs_max, template<intmax_t, intmax_t> class lhs_overflow_policy,
@@ -106,8 +95,8 @@ template<
 constexpr auto operator-(
 	ranged_integer<lhs_min, lhs_max, lhs_overflow_policy> const lhs,
 	ranged_integer<rhs_min, rhs_max, rhs_overflow_policy> const rhs
-) noexcept -> decltype(subtract(lhs, rhs)) {
-	return subtract(lhs, rhs);
+) noexcept -> decltype(detail::apply_operator(lhs, rhs, detail::minus{})) {
+	return detail::apply_operator(lhs, rhs, detail::minus{});
 }
 
 // Subtraction with built-ins
@@ -120,8 +109,8 @@ template<
 constexpr auto operator-(
 	ranged_integer<lhs_min, lhs_max, overflow_policy> const lhs,
 	integer const rhs
-) noexcept -> decltype(subtract(lhs, make_ranged(rhs))) {
-	return subtract(lhs, make_ranged(rhs));
+) noexcept -> decltype(lhs - make_ranged(rhs)) {
+	return lhs - make_ranged(rhs);
 }
 template<
 	typename integer,
@@ -132,18 +121,13 @@ template<
 constexpr auto operator-(
 	integer const lhs,
 	ranged_integer<rhs_min, rhs_max, overflow_policy> const rhs
-) noexcept -> decltype(subtract(make_ranged(lhs), rhs)) {
-	return subtract(make_ranged(lhs), rhs);
+) noexcept -> decltype(make_ranged(lhs) - rhs) {
+	return make_ranged(lhs) - rhs;
 }
 
 
 
 // Multiplication
-template<typename LHS, typename RHS>
-constexpr auto multiply(LHS const & lhs, RHS const & rhs) noexcept -> decltype(detail::apply_operator(lhs, rhs, detail::multiplies{})) {
-	return detail::apply_operator(lhs, rhs, detail::multiplies{});
-}
-
 template<
 	intmax_t lhs_min, intmax_t lhs_max, template<intmax_t, intmax_t> class lhs_overflow_policy,
 	intmax_t rhs_min, intmax_t rhs_max, template<intmax_t, intmax_t> class rhs_overflow_policy
@@ -151,8 +135,8 @@ template<
 constexpr auto operator*(
 	ranged_integer<lhs_min, lhs_max, lhs_overflow_policy> const lhs,
 	ranged_integer<rhs_min, rhs_max, rhs_overflow_policy> const rhs
-) noexcept -> decltype(multiply(lhs, rhs)) {
-	return multiply(lhs, rhs);
+) noexcept -> decltype(detail::apply_operator(lhs, rhs, detail::multiplies{})) {
+	return detail::apply_operator(lhs, rhs, detail::multiplies{});
 }
 
 // Multiplication with built-ins
@@ -165,8 +149,8 @@ template<
 constexpr auto operator*(
 	ranged_integer<lhs_min, lhs_max, overflow_policy> const lhs,
 	integer const rhs
-) noexcept -> decltype(multiply(lhs, make_ranged(rhs))) {
-	return multiply(lhs, make_ranged(rhs));
+) noexcept -> decltype(lhs * make_ranged(rhs)) {
+	return lhs * make_ranged(rhs);
 }
 template<
 	typename integer,
@@ -177,18 +161,13 @@ template<
 constexpr auto operator*(
 	integer const lhs,
 	ranged_integer<rhs_min, rhs_max, overflow_policy> const rhs
-) noexcept -> decltype(multiply(make_ranged(lhs), rhs)) {
-	return multiply(make_ranged(lhs), rhs);
+) noexcept -> decltype(make_ranged(lhs) * rhs) {
+	return make_ranged(lhs) * rhs;
 }
 
 
 
 // Division
-template<typename LHS, typename RHS>
-constexpr auto divide(LHS const & lhs, RHS const & rhs) noexcept -> decltype(detail::apply_operator(lhs, rhs, detail::divides{})) {
-	return detail::apply_operator(lhs, rhs, detail::divides{});
-}
-
 template<
 	intmax_t lhs_min, intmax_t lhs_max, template<intmax_t, intmax_t> class lhs_overflow_policy,
 	intmax_t rhs_min, intmax_t rhs_max, template<intmax_t, intmax_t> class rhs_overflow_policy
@@ -196,8 +175,8 @@ template<
 constexpr auto operator/(
 	ranged_integer<lhs_min, lhs_max, lhs_overflow_policy> const lhs,
 	ranged_integer<rhs_min, rhs_max, rhs_overflow_policy> const rhs
-) noexcept -> decltype(divide(lhs, rhs)) {
-	return divide(lhs, rhs);
+) noexcept -> decltype(detail::apply_operator(lhs, rhs, detail::divides{})) {
+	return detail::apply_operator(lhs, rhs, detail::divides{});
 }
 
 // Division with built-ins
@@ -210,8 +189,8 @@ template<
 constexpr auto operator/(
 	ranged_integer<lhs_min, lhs_max, overflow_policy> const lhs,
 	integer const rhs
-) noexcept -> decltype(divide(lhs, make_ranged(rhs))) {
-	return divide(lhs, make_ranged(rhs));
+) noexcept -> decltype(lhs / make_ranged(rhs)) {
+	return lhs / make_ranged(rhs);
 }
 template<
 	typename integer,
@@ -222,18 +201,13 @@ template<
 constexpr auto operator/(
 	integer const lhs,
 	ranged_integer<rhs_min, rhs_max, overflow_policy> const rhs
-) noexcept -> decltype(divide(make_ranged(lhs), rhs)) {
-	return divide(make_ranged(lhs), rhs);
+) noexcept -> decltype(make_ranged(lhs) / rhs) {
+	return make_ranged(lhs) / rhs;
 }
 
 
 
 // Modulo
-template<typename LHS, typename RHS>
-constexpr auto modulo(LHS const & lhs, RHS const & rhs) noexcept -> decltype(detail::apply_operator(lhs, rhs, detail::modulus{})) {
-	return detail::apply_operator(lhs, rhs, detail::modulus{});
-}
-
 template<
 	intmax_t lhs_min, intmax_t lhs_max, template<intmax_t, intmax_t> class lhs_overflow_policy,
 	intmax_t rhs_min, intmax_t rhs_max, template<intmax_t, intmax_t> class rhs_overflow_policy
@@ -241,8 +215,8 @@ template<
 constexpr auto operator%(
 	ranged_integer<lhs_min, lhs_max, lhs_overflow_policy> const lhs,
 	ranged_integer<rhs_min, rhs_max, rhs_overflow_policy> const rhs
-) noexcept -> decltype(modulo(lhs, rhs)) {
-	return modulo(lhs, rhs);
+) noexcept -> decltype(detail::apply_operator(lhs, rhs, detail::modulus{})) {
+	return detail::apply_operator(lhs, rhs, detail::modulus{});
 }
 
 // Modulo with built-ins
@@ -255,8 +229,8 @@ template<
 constexpr auto operator%(
 	ranged_integer<lhs_min, lhs_max, overflow_policy> const lhs,
 	integer const rhs
-) noexcept -> decltype(modulo(lhs, make_ranged(rhs))) {
-	return modulo(lhs, make_ranged(rhs));
+) noexcept -> decltype(lhs % make_ranged(rhs)) {
+	return lhs % make_ranged(rhs);
 }
 template<
 	typename integer,
@@ -267,24 +241,21 @@ template<
 constexpr auto operator%(
 	integer const lhs,
 	ranged_integer<rhs_min, rhs_max, overflow_policy> const rhs
-) noexcept -> decltype(modulo(make_ranged(lhs), rhs)) {
-	return modulo(make_ranged(lhs), rhs);
+) noexcept -> decltype(make_ranged(lhs) % rhs) {
+	return make_ranged(lhs) % rhs;
 }
 
 
 
 // Unary minus
 
-template<template<intmax_t, intmax_t> class overflow_policy, typename integer, enable_if_t<is_ranged_integer<integer>()> = clang_dummy>
-constexpr unary_minus_result<overflow_policy, integer> negate(integer value) noexcept {
-	using result_type = unary_minus_result<overflow_policy, integer>;
-	using common_type = common_type_t<result_type, integer>;
+template<
+	intmax_t minimum, intmax_t maximum, template<intmax_t, intmax_t> class overflow_policy,
+	typename result_type = unary_minus_result<minimum, maximum, overflow_policy>
+>
+constexpr result_type operator-(ranged_integer<minimum, maximum, overflow_policy> const value) noexcept {
+	using common_type = common_type_t<result_type, ranged_integer<minimum, maximum, overflow_policy>>;
 	return result_type(-static_cast<typename common_type::underlying_type>(value), non_check);
-}
-
-template<intmax_t minimum, intmax_t maximum, template<intmax_t, intmax_t> class overflow_policy>
-constexpr auto operator-(ranged_integer<minimum, maximum, overflow_policy> const value) noexcept -> decltype(negate<overflow_policy>(value)) {
-	return negate<overflow_policy>(value);
 }
 
 

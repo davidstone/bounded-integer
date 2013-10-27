@@ -285,7 +285,7 @@ using operator_result = typename common_policy<lhs_overflow, rhs_overflow>::temp
 	detail::operator_range<lhs_min, lhs_max, rhs_min, rhs_max, Operator>::max()
 >;
 
-template<template<intmax_t, intmax_t> class result_overflow_policy, typename integer>
-using unary_minus_result = ranged_integer<-static_cast<intmax_t>(std::numeric_limits<integer>::max()), -static_cast<intmax_t>(std::numeric_limits<integer>::min()), result_overflow_policy>;
+template<intmax_t minimum, intmax_t maximum, template<intmax_t, intmax_t> class overflow_policy>
+using unary_minus_result = ranged_integer<-maximum, -minimum, overflow_policy>;
 
 #endif	// RANGED_INTEGER_ARITHMETIC_RESULT_TYPE_HPP_
