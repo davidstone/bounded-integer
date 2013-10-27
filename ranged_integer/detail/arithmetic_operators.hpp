@@ -46,15 +46,17 @@ constexpr result_t apply_operator(ranged_integer<lhs_min, lhs_max, lhs_overflow>
 }	// namespace detail
 
 
+// I have to specify the return type instead of just using decltype(body)
+// because it confuses clang
 #define RANGED_INTEGER_OPERATOR_OVERLOADS(symbol, operator_name) \
 template< \
 	intmax_t lhs_min, intmax_t lhs_max, template<intmax_t, intmax_t> class lhs_overflow_policy, \
 	intmax_t rhs_min, intmax_t rhs_max, template<intmax_t, intmax_t> class rhs_overflow_policy \
 > \
-constexpr auto operator symbol( \
+constexpr operator_result<lhs_min, lhs_max, lhs_overflow_policy, rhs_min, rhs_max, rhs_overflow_policy, operator_name> operator symbol( \
 	ranged_integer<lhs_min, lhs_max, lhs_overflow_policy> const lhs, \
 	ranged_integer<rhs_min, rhs_max, rhs_overflow_policy> const rhs \
-) noexcept(noexcept(detail::apply_operator(lhs, rhs, operator_name{}))) -> decltype(detail::apply_operator(lhs, rhs, operator_name{})) { \
+) noexcept(noexcept(detail::apply_operator(lhs, rhs, operator_name{}))) { \
 	return detail::apply_operator(lhs, rhs, operator_name{}); \
 } \
  \
