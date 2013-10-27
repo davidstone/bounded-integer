@@ -21,9 +21,7 @@
 #include "common_type.hpp"
 #include "enable_if.hpp"
 #include "forward_declaration.hpp"
-#include "is_ranged_integer.hpp"
 #include "make_ranged.hpp"
-#include "minmax.hpp"
 
 #include <cstdint>
 #include <type_traits>
