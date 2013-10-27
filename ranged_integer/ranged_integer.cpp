@@ -300,13 +300,13 @@ void check_throw_policy() {
 		throw_policy(20);
 		assert(false);
 	}
-	catch (std::overflow_error const & e) {
+	catch (std::overflow_error const &) {
 	}
 	try {
 		throw_policy(-6);
 		assert(false);
 	}
-	catch (std::underflow_error const & e) {
+	catch (std::underflow_error const &) {
 	}
 }
 
