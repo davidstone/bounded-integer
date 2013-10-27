@@ -23,17 +23,10 @@
 namespace detail {
 
 template<typename integer>
-constexpr intmax_t numeric_min() noexcept {
-	return static_cast<intmax_t>(std::numeric_limits<integer>::min());
-}
-template<typename integer>
-constexpr intmax_t numeric_max() noexcept {
-	return static_cast<intmax_t>(std::numeric_limits<integer>::max());
-}
-
-template<typename integer>
 constexpr bool value_in_range(intmax_t const value) noexcept {
-	return numeric_min<integer>() <= value and value <= numeric_max<integer>();
+	return
+		static_cast<intmax_t>(std::numeric_limits<integer>::min()) <= value and
+		value <= static_cast<intmax_t>(std::numeric_limits<integer>::max());
 }
 template<>
 constexpr bool value_in_range<uintmax_t>(intmax_t const value) noexcept {
@@ -42,7 +35,9 @@ constexpr bool value_in_range<uintmax_t>(intmax_t const value) noexcept {
 
 template<typename integer>
 constexpr bool has_overlap(intmax_t const minimum, intmax_t const maximum) noexcept {
-	return minimum <= numeric_max<integer>() and maximum >= numeric_min<integer>();
+	return
+		minimum <= static_cast<intmax_t>(std::numeric_limits<integer>::max()) and
+		maximum >= static_cast<intmax_t>(std::numeric_limits<integer>::min());
 }
 template<>
 constexpr bool has_overlap<uintmax_t>(intmax_t const minimum, intmax_t const maximum) noexcept {
@@ -51,11 +46,11 @@ constexpr bool has_overlap<uintmax_t>(intmax_t const minimum, intmax_t const max
 
 template<typename integer>
 constexpr bool type_can_underflow(intmax_t const minimum) noexcept {
-	return numeric_min<integer>() < minimum;
+	return static_cast<intmax_t>(std::numeric_limits<integer>::min()) < minimum;
 }
 template<typename integer>
 constexpr bool type_can_overflow(intmax_t const maximum) noexcept {
-	return numeric_min<integer>() > maximum;
+	return static_cast<intmax_t>(std::numeric_limits<integer>::max()) > maximum;
 }
 
 template<typename integer>
