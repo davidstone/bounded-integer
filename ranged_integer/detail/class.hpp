@@ -47,8 +47,8 @@ template<intmax_t minimum, intmax_t maximum>
 class ranged_integer_base {
 public:
 	using underlying_type = detail::underlying_t<minimum, maximum>;
-	constexpr ranged_integer_base(underlying_type const & other) noexcept:
-		m_value(other) {
+	constexpr ranged_integer_base(underlying_type const other) noexcept:
+		m_value(std::move(other)) {
 	}
 	constexpr underlying_type value() const noexcept {
 		return m_value;
@@ -62,7 +62,7 @@ class ranged_integer_base<only_value, only_value> {
 public:
 	using underlying_type = detail::underlying_t<only_value, only_value>;
 	constexpr ranged_integer_base() noexcept = default;
-	constexpr ranged_integer_base(underlying_type const &) noexcept {
+	constexpr ranged_integer_base(underlying_type) noexcept {
 	}
 	constexpr underlying_type value() const noexcept {
 		return only_value;
@@ -97,7 +97,7 @@ public:
 	template<typename integer, enable_if_t<
 		detail::has_overlap<integer>(minimum, maximum)
 	> = clang_dummy>
-	constexpr ranged_integer(integer const & other, non_check_t) noexcept:
+	constexpr ranged_integer(integer const other, non_check_t) noexcept:
 		base(static_cast<underlying_type>(other)) {
 	}
 

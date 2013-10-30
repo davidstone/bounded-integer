@@ -23,12 +23,15 @@
 namespace detail {
 
 template<typename Function, typename Integer>
-constexpr Integer minmax(Function const &, Integer && integer) {
+constexpr Integer minmax(Function &&, Integer && integer) {
 	return integer;
 }
 template<typename Function, typename Integer, typename... Integers>
-constexpr typename std::common_type<Integer, Integers...>::type minmax(Function const & function, Integer && integer, Integers && ... integers) {
-	return function(std::forward<Integer>(integer), minmax(function, std::forward<Integers>(integers)...));
+constexpr typename std::common_type<Integer, Integers...>::type minmax(Function && function, Integer && integer, Integers && ... integers) {
+	// Only possibly move from the function object for the first call, interior
+	// nested calls do not get passed an rvalue reference because we do not call
+	// std::forward on the inner function.
+	return std::forward<Function>(function)(std::forward<Integer>(integer), minmax(function, std::forward<Integers>(integers)...));
 }
 
 }	// namespace detail

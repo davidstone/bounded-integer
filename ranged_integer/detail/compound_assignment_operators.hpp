@@ -25,11 +25,11 @@
 namespace detail {
 
 template<intmax_t minimum, intmax_t maximum, template<intmax_t, intmax_t> class overflow_policy, typename integer, typename Operator>
-ranged_integer<minimum, maximum, overflow_policy> & compound_assignment(ranged_integer<minimum, maximum, overflow_policy> & lhs, integer const & rhs, Operator const & op) {
+ranged_integer<minimum, maximum, overflow_policy> & compound_assignment(ranged_integer<minimum, maximum, overflow_policy> & lhs, integer && rhs, Operator const & op) {
 	// I explicitly call make_ranged with the target's overflow policy because
 	// we need the result to be this exact overflow policy. We do not want to
 	// rely on common_policy here.
-	lhs = static_cast<ranged_integer<minimum, maximum, overflow_policy>>(op(lhs, make_ranged<overflow_policy>(rhs)));
+	lhs = static_cast<ranged_integer<minimum, maximum, overflow_policy>>(op(lhs, make_ranged<overflow_policy>(std::forward<integer>(rhs))));
 	return lhs;
 }
 
@@ -38,55 +38,55 @@ ranged_integer<minimum, maximum, overflow_policy> & compound_assignment(ranged_i
 // ranged_integer being assigned to
 
 template<intmax_t minimum, intmax_t maximum, template<intmax_t, intmax_t> class overflow_policy, typename integer>
-ranged_integer<minimum, maximum, overflow_policy> & operator+=(ranged_integer<minimum, maximum, overflow_policy> & lhs, integer const & rhs) {
-	return compound_assignment(lhs, rhs, detail::plus{});
+ranged_integer<minimum, maximum, overflow_policy> & operator+=(ranged_integer<minimum, maximum, overflow_policy> & lhs, integer && rhs) {
+	return compound_assignment(lhs, std::forward<integer>(rhs), detail::plus{});
 }
 
 template<intmax_t minimum, intmax_t maximum, template<intmax_t, intmax_t> class overflow_policy, typename integer>
-ranged_integer<minimum, maximum, overflow_policy> & operator-=(ranged_integer<minimum, maximum, overflow_policy> & lhs, integer const & rhs) {
-	return compound_assignment(lhs, rhs, detail::minus{});
+ranged_integer<minimum, maximum, overflow_policy> & operator-=(ranged_integer<minimum, maximum, overflow_policy> & lhs, integer && rhs) {
+	return compound_assignment(lhs, std::forward<integer>(rhs), detail::minus{});
 }
 
 template<intmax_t minimum, intmax_t maximum, template<intmax_t, intmax_t> class overflow_policy, typename integer>
-ranged_integer<minimum, maximum, overflow_policy> & operator*=(ranged_integer<minimum, maximum, overflow_policy> & lhs, integer const & rhs) {
-	return compound_assignment(lhs, rhs, detail::multiplies{});
+ranged_integer<minimum, maximum, overflow_policy> & operator*=(ranged_integer<minimum, maximum, overflow_policy> & lhs, integer && rhs) {
+	return compound_assignment(lhs, std::forward<integer>(rhs), detail::multiplies{});
 }
 
 template<intmax_t minimum, intmax_t maximum, template<intmax_t, intmax_t> class overflow_policy, typename integer>
-ranged_integer<minimum, maximum, overflow_policy> & operator/=(ranged_integer<minimum, maximum, overflow_policy> & lhs, integer const & rhs) {
-	return compound_assignment(lhs, rhs, detail::divides{});
+ranged_integer<minimum, maximum, overflow_policy> & operator/=(ranged_integer<minimum, maximum, overflow_policy> & lhs, integer && rhs) {
+	return compound_assignment(lhs, std::forward<integer>(rhs), detail::divides{});
 }
 
 template<intmax_t minimum, intmax_t maximum, template<intmax_t, intmax_t> class overflow_policy, typename integer>
-ranged_integer<minimum, maximum, overflow_policy> & operator%=(ranged_integer<minimum, maximum, overflow_policy> & lhs, integer const & rhs) {
-	return compound_assignment(lhs, rhs, detail::modulus{});
+ranged_integer<minimum, maximum, overflow_policy> & operator%=(ranged_integer<minimum, maximum, overflow_policy> & lhs, integer && rhs) {
+	return compound_assignment(lhs, std::forward<integer>(rhs), detail::modulus{});
 }
 
 
 // ranged_integer being assigned from
 
 template<typename integer, intmax_t minimum, intmax_t maximum, template<intmax_t, intmax_t> class overflow_policy, enable_if_t<std::is_integral<integer>::value> = clang_dummy>
-integer & operator+=(integer & lhs, ranged_integer<minimum, maximum, overflow_policy> const & rhs) noexcept {
+integer & operator+=(integer & lhs, ranged_integer<minimum, maximum, overflow_policy> const rhs) noexcept {
 	return lhs += rhs.value();
 }
 
 template<typename integer, intmax_t minimum, intmax_t maximum, template<intmax_t, intmax_t> class overflow_policy, enable_if_t<std::is_integral<integer>::value> = clang_dummy>
-integer & operator-=(integer & lhs, ranged_integer<minimum, maximum, overflow_policy> const & rhs) noexcept {
+integer & operator-=(integer & lhs, ranged_integer<minimum, maximum, overflow_policy> const rhs) noexcept {
 	return lhs -= rhs.value();
 }
 
 template<typename integer, intmax_t minimum, intmax_t maximum, template<intmax_t, intmax_t> class overflow_policy, enable_if_t<std::is_integral<integer>::value> = clang_dummy>
-integer & operator*=(integer & lhs, ranged_integer<minimum, maximum, overflow_policy> const & rhs) noexcept {
+integer & operator*=(integer & lhs, ranged_integer<minimum, maximum, overflow_policy> const rhs) noexcept {
 	return lhs *= rhs.value();
 }
 
 template<typename integer, intmax_t minimum, intmax_t maximum, template<intmax_t, intmax_t> class overflow_policy, enable_if_t<std::is_integral<integer>::value> = clang_dummy>
-integer & operator/=(integer & lhs, ranged_integer<minimum, maximum, overflow_policy> const & rhs) noexcept {
+integer & operator/=(integer & lhs, ranged_integer<minimum, maximum, overflow_policy> const rhs) noexcept {
 	return lhs /= rhs.value();
 }
 
 template<typename integer, intmax_t minimum, intmax_t maximum, template<intmax_t, intmax_t> class overflow_policy, enable_if_t<std::is_integral<integer>::value> = clang_dummy>
-integer & operator%=(integer & lhs, ranged_integer<minimum, maximum, overflow_policy> const & rhs) noexcept {
+integer & operator%=(integer & lhs, ranged_integer<minimum, maximum, overflow_policy> const rhs) noexcept {
 	return lhs %= rhs.value();
 }
 
