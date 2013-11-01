@@ -38,7 +38,7 @@ template< \
 constexpr result_t operator symbol( \
 	ranged_integer<lhs_min, lhs_max, lhs_overflow_policy> const lhs, \
 	ranged_integer<rhs_min, rhs_max, rhs_overflow_policy> const rhs \
-) noexcept(noexcept(operator_name{}(0, 0))) { \
+) noexcept { \
 	using common_t = typename common_type_t<result_t, decltype(lhs), decltype(rhs)>::underlying_type; \
 	return result_t(operator_name{}(static_cast<common_t>(lhs), static_cast<common_t>(rhs)), non_check); \
 } \

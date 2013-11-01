@@ -54,14 +54,16 @@ public:
 class divides {
 public:
 	template<typename LHS, typename RHS>
-	constexpr auto operator()(LHS && lhs, RHS && rhs) const noexcept(noexcept(std::forward<LHS>(lhs) / std::forward<RHS>(rhs))) -> decltype(std::forward<LHS>(lhs) / std::forward<RHS>(rhs)) {
+	constexpr auto operator()(LHS && lhs, RHS && rhs) const noexcept -> decltype(std::forward<LHS>(lhs) / std::forward<RHS>(rhs)) {
+		static_assert(noexcept(std::forward<LHS>(lhs) / std::forward<RHS>(rhs)), "Division can throw exceptions."); 
 		return std::forward<LHS>(lhs) / std::forward<RHS>(rhs);
 	}
 };
 class modulus {
 public:
 	template<typename LHS, typename RHS>
-	constexpr auto operator()(LHS && lhs, RHS && rhs) const noexcept(noexcept(std::forward<LHS>(lhs) % std::forward<RHS>(rhs))) -> decltype(std::forward<LHS>(lhs) % std::forward<RHS>(rhs)) {
+	constexpr auto operator()(LHS && lhs, RHS && rhs) const noexcept -> decltype(std::forward<LHS>(lhs) % std::forward<RHS>(rhs)) {
+		static_assert(noexcept(std::forward<LHS>(lhs) % std::forward<RHS>(rhs)), "Modulus can throw exceptions."); 
 		return std::forward<LHS>(lhs) % std::forward<RHS>(rhs);
 	}
 };
