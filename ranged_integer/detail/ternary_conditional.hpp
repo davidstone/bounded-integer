@@ -43,6 +43,10 @@ private:
 		constexpr bool operator()(LHS const & lhs, RHS const & rhs) const {
 			return lhs < rhs;
 		}
+		template<typename LHS, typename RHS>
+		constexpr bool operator()(LHS const volatile & lhs, RHS const volatile & rhs) const {
+			return lhs < rhs;
+		}
 	};
 };
 class greater {
@@ -56,6 +60,10 @@ private:
 	public:
 		template<typename LHS, typename RHS>
 		constexpr bool operator()(LHS const & lhs, RHS const & rhs) const {
+			return lhs > rhs;
+		}
+		template<typename LHS, typename RHS>
+		constexpr bool operator()(LHS const volatile & lhs, RHS const volatile & rhs) const {
 			return lhs > rhs;
 		}
 	};

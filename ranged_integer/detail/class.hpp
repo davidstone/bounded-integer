@@ -50,7 +50,47 @@ public:
 	constexpr ranged_integer_base(underlying_type const other) noexcept:
 		m_value(std::move(other)) {
 	}
+
+	constexpr ranged_integer_base(ranged_integer_base const &) noexcept = default;
+	constexpr ranged_integer_base(ranged_integer_base const volatile & other) noexcept:
+		m_value(other.m_value) {
+	}
+	constexpr ranged_integer_base(ranged_integer_base &&) noexcept = default;
+	constexpr ranged_integer_base(ranged_integer_base volatile && other) noexcept:
+		m_value(other.m_value) {
+	}
+
+	ranged_integer_base & operator=(ranged_integer_base const &) noexcept = default;
+	ranged_integer_base & operator=(ranged_integer_base const volatile & other) noexcept {
+		m_value = other.m_value;
+		return *this;
+	}
+	ranged_integer_base & operator=(ranged_integer_base &&) noexcept = default;
+	ranged_integer_base & operator=(ranged_integer_base volatile && other) noexcept {
+		m_value = std::move(other.m_value);
+		return *this;
+	}
+	ranged_integer_base volatile & operator=(ranged_integer_base const & other) volatile noexcept {
+		m_value = other.m_value;
+		return *this;
+	}
+	ranged_integer_base volatile & operator=(ranged_integer_base const volatile & other) volatile noexcept {
+		m_value = other.m_value;
+		return *this;
+	}
+	ranged_integer_base & operator=(ranged_integer_base && other) volatile noexcept {
+		m_value = std::move(other.m_value);
+		return *this;
+	}
+	ranged_integer_base & operator=(ranged_integer_base volatile && other) volatile noexcept {
+		m_value = std::move(other.m_value);
+		return *this;
+	}
+
 	constexpr underlying_type value() const noexcept {
+		return m_value;
+	}
+	constexpr underlying_type value() const volatile noexcept {
 		return m_value;
 	}
 private:
@@ -64,7 +104,33 @@ public:
 	constexpr ranged_integer_base() noexcept = default;
 	constexpr ranged_integer_base(underlying_type) noexcept {
 	}
+
+	constexpr ranged_integer_base(ranged_integer_base const &) noexcept = default;
+	constexpr ranged_integer_base(ranged_integer_base const volatile &) noexcept {
+	}
+	constexpr ranged_integer_base(ranged_integer_base &&) noexcept = default;
+	constexpr ranged_integer_base(ranged_integer_base volatile &&) noexcept {
+	}
+
+	ranged_integer_base & operator=(ranged_integer_base const &) noexcept = default;
+	ranged_integer_base & operator=(ranged_integer_base const volatile &) noexcept {
+	}
+	ranged_integer_base & operator=(ranged_integer_base &&) noexcept = default;
+	ranged_integer_base & operator=(ranged_integer_base volatile &&) noexcept {
+	}
+	ranged_integer_base volatile & operator=(ranged_integer_base const &) volatile noexcept {
+	}
+	ranged_integer_base volatile & operator=(ranged_integer_base const volatile &) volatile noexcept {
+	}
+	ranged_integer_base & operator=(ranged_integer_base &&) volatile noexcept {
+	}
+	ranged_integer_base & operator=(ranged_integer_base volatile &&) volatile noexcept {
+	}
+
 	constexpr underlying_type value() const noexcept {
+		return only_value;
+	}
+	constexpr underlying_type value() const volatile noexcept {
 		return only_value;
 	}
 };
@@ -87,44 +153,81 @@ public:
 
 	// This is only defined for constant ranges. See ranged_integer_base
 	constexpr ranged_integer() noexcept = default;
-	constexpr ranged_integer(ranged_integer const & other) noexcept = default;
-	constexpr ranged_integer(ranged_integer && other) noexcept = default;
-	ranged_integer & operator=(ranged_integer const & other) noexcept = default;
-	ranged_integer & operator=(ranged_integer && other) noexcept = default;
+	constexpr ranged_integer(ranged_integer const &) noexcept = default;
+	constexpr ranged_integer(ranged_integer const volatile & other) noexcept:
+		base(other) {
+	}
+	constexpr ranged_integer(ranged_integer &&) noexcept = default;
+	constexpr ranged_integer(ranged_integer volatile && other) noexcept:
+		base(std::move(other)) {
+	}
+
+	ranged_integer & operator=(ranged_integer const &) noexcept = default;
+	ranged_integer & operator=(ranged_integer const volatile & other) noexcept {
+		base::operator=(other);
+		return *this;
+	}
+	ranged_integer & operator=(ranged_integer &&) noexcept = default;
+	ranged_integer & operator=(ranged_integer volatile && other) noexcept {
+		base::operator=(std::move(other));
+		return *this;
+	}
+	ranged_integer volatile & operator=(ranged_integer const & other) volatile noexcept {
+		base::operator=(other);
+		return *this;
+	}
+	ranged_integer volatile & operator=(ranged_integer const volatile & other) volatile noexcept {
+		base::operator=(other);
+		return *this;
+	}
+	ranged_integer volatile & operator=(ranged_integer && other) volatile noexcept {
+		base::operator=(std::move(other));
+		return *this;
+	}
+	ranged_integer volatile & operator=(ranged_integer volatile && other) volatile noexcept {
+		base::operator=(std::move(other));
+		return *this;
+	}
 
 	// Use this constructor if you know by means that cannot be determined by
 	// the type system that the value really does fit in the range.
 	template<typename integer, enable_if_t<
-		detail::has_overlap<integer>(minimum, maximum)
+		detail::has_overlap<typename std::decay<integer>::type>(minimum, maximum)
 	> = clang_dummy>
-	constexpr ranged_integer(integer const other, non_check_t) noexcept:
-		base(static_cast<underlying_type>(other)) {
+	constexpr ranged_integer(integer && other, non_check_t) noexcept:
+		base(static_cast<underlying_type>(std::forward<integer>(other))) {
 	}
 
 	// Intentionally implicit: this is safe because the value is in range
 	template<typename integer, enable_if_t<
-		detail::type_in_range<integer>(minimum, maximum)
+		detail::type_in_range<typename std::decay<integer>::type>(minimum, maximum)
 	> = clang_dummy>
-	constexpr ranged_integer(integer other) noexcept:
-		ranged_integer(other, non_check) {
+	constexpr ranged_integer(integer && other) noexcept:
+		ranged_integer(std::forward<integer>(other), non_check) {
 	}
 
 	template<typename integer, enable_if_t<
-		!detail::type_in_range<integer>(minimum, maximum) and
-		(detail::has_overlap<integer>(minimum, maximum) or
+		!detail::type_in_range<typename std::decay<integer>::type>(minimum, maximum) and
+		(detail::has_overlap<typename std::decay<integer>::type>(minimum, maximum) or
 		!overflow_policy::overflow_is_error)
 	> = clang_dummy>
-	constexpr explicit ranged_integer(integer other):
-		ranged_integer(overflow_policy{}(std::move(other)), non_check) {
+	constexpr explicit ranged_integer(integer && other):
+		ranged_integer(overflow_policy{}(std::forward<integer>(other)), non_check) {
 	}
 
 	// Generate an assignment operator for any value that we have a constructor
 	// generated for. I am assuming that these fairly simple templates and
 	// copies will all be removed / inlined by the compiler, so this should be
-	// no worse than a hand-generated solution.
+	// no worse than a hand-generated solution. I may be wrong with volatile
+	// variables, though. This may also interfere with type_traits
 	template<typename integer>
-	ranged_integer & operator=(integer other) {
-		*this = ranged_integer(std::move(other));
+	ranged_integer & operator=(integer && other) {
+		*this = ranged_integer(std::forward<integer>(other));
+		return *this;
+	}
+	template<typename integer>
+	ranged_integer volatile & operator=(integer && other) volatile {
+		*this = ranged_integer(std::forward<integer>(other));
 		return *this;
 	}
 	
@@ -135,6 +238,10 @@ public:
 	// built-in integer type to another has.
 	template<typename integer, enable_if_t<std::is_integral<integer>::value> = clang_dummy>
 	constexpr explicit operator integer() const {
+		return static_cast<integer>(value());
+	}
+	template<typename integer, enable_if_t<std::is_integral<integer>::value> = clang_dummy>
+	constexpr explicit operator integer() const volatile {
 		return static_cast<integer>(value());
 	}
 };
