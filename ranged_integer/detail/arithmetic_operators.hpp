@@ -26,38 +26,21 @@
 #include <cstdint>
 #include <type_traits>
 
-namespace detail {
-
-template<
-	intmax_t lhs_min, intmax_t lhs_max, template<intmax_t, intmax_t> class lhs_overflow,
-	intmax_t rhs_min, intmax_t rhs_max, template<intmax_t, intmax_t> class rhs_overflow,
-	typename Operator,
-	typename result_t = operator_result<lhs_min, lhs_max, lhs_overflow, rhs_min, rhs_max, rhs_overflow, Operator>
->
-constexpr result_t apply_operator(ranged_integer<lhs_min, lhs_max, lhs_overflow> const lhs, ranged_integer<rhs_min, rhs_max, rhs_overflow> const rhs, Operator && op) noexcept(noexcept(op(0, 0))) {
-	using common_t = typename common_type_t<result_t, decltype(lhs), decltype(rhs)>::underlying_type;
-	// It is safe to use the non_check constructor because we have already
-	// determined that the result will fit in result_t. We have to cast to the
-	// intermediate common_t in case result_t is narrower than one of the
-	// arguments.
-	return result_t(std::forward<Operator>(op)(static_cast<common_t>(lhs), static_cast<common_t>(rhs)), non_check);
-}
-
-}	// namespace detail
-
-
-// I have to specify the return type instead of just using decltype(body)
-// because it confuses clang
+// It is safe to use the non_check constructor because we already know that the
+// result will fit in result_t. We have to cast to the intermediate common_t in
+// case result_t is narrower than one of the arguments.
 #define RANGED_INTEGER_OPERATOR_OVERLOADS(symbol, operator_name) \
 template< \
 	intmax_t lhs_min, intmax_t lhs_max, template<intmax_t, intmax_t> class lhs_overflow_policy, \
-	intmax_t rhs_min, intmax_t rhs_max, template<intmax_t, intmax_t> class rhs_overflow_policy \
+	intmax_t rhs_min, intmax_t rhs_max, template<intmax_t, intmax_t> class rhs_overflow_policy, \
+	typename result_t = operator_result<lhs_min, lhs_max, lhs_overflow_policy, rhs_min, rhs_max, rhs_overflow_policy, operator_name> \
 > \
-constexpr operator_result<lhs_min, lhs_max, lhs_overflow_policy, rhs_min, rhs_max, rhs_overflow_policy, operator_name> operator symbol( \
+constexpr result_t operator symbol( \
 	ranged_integer<lhs_min, lhs_max, lhs_overflow_policy> const lhs, \
 	ranged_integer<rhs_min, rhs_max, rhs_overflow_policy> const rhs \
-) noexcept(noexcept(detail::apply_operator(lhs, rhs, operator_name{}))) { \
-	return detail::apply_operator(lhs, rhs, operator_name{}); \
+) noexcept(noexcept(operator_name{}(0, 0))) { \
+	using common_t = typename common_type_t<result_t, decltype(lhs), decltype(rhs)>::underlying_type; \
+	return result_t(operator_name{}(static_cast<common_t>(lhs), static_cast<common_t>(rhs)), non_check); \
 } \
  \
 /* Interoperability with built-ins */ \
