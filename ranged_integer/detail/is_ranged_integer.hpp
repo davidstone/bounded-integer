@@ -21,24 +21,20 @@
 #include <cstdint>
 #include <type_traits>
 
-namespace detail {
-
+template<typename T, typename... Ts>
+class is_ranged_integer {
+public:
+	static constexpr bool value = is_ranged_integer<T>::value and is_ranged_integer<Ts...>::value;
+};
 template<typename T>
-class is_ranged_integer_c {
+class is_ranged_integer<T> {
 public:
 	static constexpr bool value = false;
 };
 template<intmax_t minimum, intmax_t maximum, template<intmax_t, intmax_t> class overflow_policy>
-class is_ranged_integer_c<ranged_integer<minimum, maximum, overflow_policy>> {
+class is_ranged_integer<ranged_integer<minimum, maximum, overflow_policy>> {
 public:
 	static constexpr bool value = true;
 };
-
-}	// namespace detail
-
-template<typename T>
-constexpr bool is_ranged_integer() noexcept {
-	return detail::is_ranged_integer_c<typename std::decay<T>::type>::value;
-}
 
 #endif	// RANGED_INTEGER_IS_RANGED_INTEGER_HPP_

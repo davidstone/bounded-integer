@@ -40,7 +40,7 @@
 // rather than using enable_if_t as seen elsewhere in this code because we have
 // to put a defaulted template parameter at the end of other defaulted
 // parameters.
-template<template<intmax_t, intmax_t> class overflow_policy = null_policy, typename integer = void, typename = enable_if_t<std::is_integral<integer>::value or is_ranged_integer<integer>()>>
+template<template<intmax_t, intmax_t> class overflow_policy = null_policy, typename integer = void, typename = enable_if_t<std::is_integral<integer>::value or is_ranged_integer<integer>::value>>
 constexpr ranged_integer<static_cast<intmax_t>(std::numeric_limits<integer>::min()), static_cast<intmax_t>(std::numeric_limits<integer>::max()), overflow_policy> make_ranged(integer const value) noexcept {
 	return ranged_integer<static_cast<intmax_t>(std::numeric_limits<integer>::min()), static_cast<intmax_t>(std::numeric_limits<integer>::max()), overflow_policy>(value, non_check);
 }

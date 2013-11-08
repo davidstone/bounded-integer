@@ -36,7 +36,7 @@ public:
 template<typename T>
 class all_are_ranged_or_builtin_integer<T> {
 public:
-	static constexpr bool value = std::is_integral<T>::value or is_ranged_integer<T>();
+	static constexpr bool value = std::is_integral<T>::value or is_ranged_integer<T>::value;
 };
 
 template<typename T, typename... Ts>
