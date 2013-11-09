@@ -21,13 +21,13 @@
 #include <cstdint>
 #include <type_traits>
 
-template<typename T, typename... Ts>
+template<typename integer, typename... integers>
 class is_ranged_integer {
 public:
-	static constexpr bool value = is_ranged_integer<T>::value and is_ranged_integer<Ts...>::value;
+	static constexpr bool value = is_ranged_integer<integer>::value and is_ranged_integer<integers...>::value;
 };
-template<typename T>
-class is_ranged_integer<T> {
+template<typename integer>
+class is_ranged_integer<integer> {
 public:
 	static constexpr bool value = false;
 };
@@ -36,5 +36,19 @@ class is_ranged_integer<ranged_integer<minimum, maximum, overflow_policy>> {
 public:
 	static constexpr bool value = true;
 };
+
+template<typename integer, typename... integers>
+class all_are_ranged_or_builtin_integer {
+public:
+	static constexpr bool value = all_are_ranged_or_builtin_integer<integer>::value and all_are_ranged_or_builtin_integer<integers...>::value;
+};
+
+template<typename integer>
+class all_are_ranged_or_builtin_integer<integer> {
+public:
+	static constexpr bool value = std::is_integral<integer>::value or is_ranged_integer<integer>::value;
+};
+
+
 
 #endif	// RANGED_INTEGER_IS_RANGED_INTEGER_HPP_

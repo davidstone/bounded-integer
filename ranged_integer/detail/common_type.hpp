@@ -27,18 +27,6 @@
 #include <type_traits>
 
 namespace detail {
-template<typename integer, typename... integers>
-class all_are_ranged_or_builtin_integer {
-public:
-	static constexpr bool value = all_are_ranged_or_builtin_integer<integer>::value and all_are_ranged_or_builtin_integer<integers...>::value;
-};
-
-template<typename T>
-class all_are_ranged_or_builtin_integer<T> {
-public:
-	static constexpr bool value = std::is_integral<T>::value or is_ranged_integer<T>::value;
-};
-
 template<typename T, typename... Ts>
 class all_are_integral {
 public:
