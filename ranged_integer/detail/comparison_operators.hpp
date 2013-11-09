@@ -20,6 +20,7 @@
 #include "common_type.hpp"
 #include "enable_if.hpp"
 #include "forward_declaration.hpp"
+#include "make_ranged.hpp"
 
 #include <cstdint>
 
