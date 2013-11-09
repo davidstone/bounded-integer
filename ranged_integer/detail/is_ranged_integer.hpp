@@ -42,13 +42,21 @@ class all_are_ranged_or_builtin_integer {
 public:
 	static constexpr bool value = all_are_ranged_or_builtin_integer<integer>::value and all_are_ranged_or_builtin_integer<integers...>::value;
 };
-
 template<typename integer>
 class all_are_ranged_or_builtin_integer<integer> {
 public:
 	static constexpr bool value = std::is_integral<integer>::value or is_ranged_integer<integer>::value;
 };
 
-
+template<typename integer, typename... integers>
+class any_are_ranged_integer {
+public:
+	static constexpr bool value = any_are_ranged_integer<integer>::value or any_are_ranged_integer<integers...>::value;
+};
+template<typename integer>
+class any_are_ranged_integer<integer> {
+public:
+	static constexpr bool value = is_ranged_integer<integer>::value;
+};
 
 #endif	// RANGED_INTEGER_IS_RANGED_INTEGER_HPP_
