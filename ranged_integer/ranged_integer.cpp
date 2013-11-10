@@ -337,6 +337,31 @@ void check_policies() {
 	check_clamp_policy();
 }
 
+void check_literals() {
+	// I have to use the preprocessor here to create an integer literal
+	#define RANGED_INTEGER_CHECK_LITERAL(x) \
+		do { \
+			constexpr auto value = x ## _ri; \
+			using value_type = decltype(value); \
+			\
+			static_assert(std::numeric_limits<value_type>::min() == std::numeric_limits<value_type>::max(), "Literal does not have a min possible value equal to a max possible value."); \
+			static_assert(std::numeric_limits<value_type>::min() == value, "Literal does not have a value equal to the range."); \
+			\
+			static_assert(value == static_cast<value_type::underlying_type>(x), "Inaccurate value of " #x " (cast x)"); \
+			static_assert(static_cast<decltype(x)>(value) == x, "Inaccurate value of " #x " (cast value)"); \
+		} while(false)
+	RANGED_INTEGER_CHECK_LITERAL(0);
+	RANGED_INTEGER_CHECK_LITERAL(1);
+	RANGED_INTEGER_CHECK_LITERAL(10);
+	RANGED_INTEGER_CHECK_LITERAL(1000);
+	RANGED_INTEGER_CHECK_LITERAL(4294967295);
+	RANGED_INTEGER_CHECK_LITERAL(4294967296);
+	RANGED_INTEGER_CHECK_LITERAL(9223372036854775807);
+	RANGED_INTEGER_CHECK_LITERAL(-1);
+	RANGED_INTEGER_CHECK_LITERAL(-0);
+	#undef RANGED_INTEGER_CHECK_LITERAL
+}
+
 void check_array() {
 	constexpr auto dynamic_int_array = make_ranged_array(0, 3, 6);
 	static_assert(dynamic_int_array.size() == 3, "Array size wrong.");
