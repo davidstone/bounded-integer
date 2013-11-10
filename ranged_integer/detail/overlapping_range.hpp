@@ -17,6 +17,7 @@
 #ifndef RANGED_INTEGER_OVERLAPPING_RANGE_HPP_
 #define RANGED_INTEGER_OVERLAPPING_RANGE_HPP_
 
+#include "enable_if.hpp"
 #include "forward_declaration.hpp"
 #include <cstdint>
 #include <limits>
@@ -45,27 +46,39 @@ public:
 	static constexpr intmax_t value = maximum;
 };
 
-template<typename integer>
+template<typename integer, enable_if_t<std::numeric_limits<integer>::is_specialized> = clang_dummy>
 constexpr bool entirely_in_range(intmax_t const minimum, intmax_t const maximum) noexcept {
 	return get_min<integer>::value <= minimum and maximum <= get_max<integer>::value;
+}
+template<typename integer, enable_if_t<!std::numeric_limits<integer>::is_specialized> = clang_dummy>
+constexpr bool entirely_in_range(intmax_t, intmax_t) noexcept {
+	return false;
 }
 template<>
 constexpr bool entirely_in_range<uintmax_t>(intmax_t const minimum, intmax_t) noexcept {
 	return minimum >= 0;
 }
 
-template<typename integer>
+template<typename integer, enable_if_t<std::numeric_limits<integer>::is_specialized> = clang_dummy>
 constexpr bool has_overlap(intmax_t const minimum, intmax_t const maximum) noexcept {
 	return minimum <= get_max<integer>::value and maximum >= get_min<integer>::value;
+}
+template<typename integer, enable_if_t<!std::numeric_limits<integer>::is_specialized> = clang_dummy>
+constexpr bool has_overlap(intmax_t, intmax_t) noexcept {
+	return false;
 }
 template<>
 constexpr bool has_overlap<uintmax_t>(intmax_t, intmax_t const maximum) noexcept {
 	return maximum >= 0;
 }
 
-template<typename integer>
+template<typename integer, enable_if_t<std::numeric_limits<integer>::is_specialized> = clang_dummy>
 constexpr bool type_in_range(intmax_t const minimum, intmax_t const maximum) noexcept {
 	return minimum <= get_min<integer>::value and get_max<integer>::value <= maximum;
+}
+template<typename integer, enable_if_t<!std::numeric_limits<integer>::is_specialized> = clang_dummy>
+constexpr bool type_in_range(intmax_t, intmax_t) noexcept {
+	return false;
 }
 template<>
 constexpr bool type_in_range<uintmax_t>(intmax_t const, intmax_t const) noexcept {
