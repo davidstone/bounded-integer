@@ -26,7 +26,7 @@ namespace detail {
 template<intmax_t value>
 using ranged_constant = ranged_integer<value, value, null_policy>;
 
-constexpr intmax_t power(intmax_t const radix, intmax_t const exponent) noexcept {
+constexpr inline intmax_t power(intmax_t const radix, intmax_t const exponent) noexcept {
 	return (exponent == 0) ? 1 : radix * power(radix, exponent - 1);
 }
 
@@ -35,10 +35,9 @@ class literal_ranged_integer {
 private:
 	static constexpr intmax_t radix = 10;
 	static constexpr intmax_t integer_scale = power(radix, sizeof...(digits));
-	static constexpr ranged_constant<integer_scale> scale{};
 public:
-	static constexpr decltype(literal_ranged_integer<digit>::value() * scale + literal_ranged_integer<digits...>::value()) value() noexcept {
-		return literal_ranged_integer<digit>::value() * scale + literal_ranged_integer<digits...>::value();
+	static constexpr decltype(literal_ranged_integer<digit>::value() * ranged_constant<integer_scale>{} + literal_ranged_integer<digits...>::value()) value() noexcept {
+		return literal_ranged_integer<digit>::value() * ranged_constant<integer_scale>{} + literal_ranged_integer<digits...>::value();
 	}
 };
 
