@@ -38,6 +38,7 @@ base_sources = [('test', ['ranged_integer.cpp'] + prepend_dir('detail', [
 	'enable_if.cpp',
 	'forward_declaration.cpp',
 	'is_ranged_integer.cpp',
+	'literal.cpp',
 	'make_ranged.cpp',
 	'make_ranged_array.cpp',
 	'math.cpp',
