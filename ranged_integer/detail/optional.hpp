@@ -14,8 +14,8 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with this program. If not, see <http://www.gnu.org/licenses/>.
 
-#ifndef RANGED_INTEGER_OPTIONAL_HPP_
-#define RANGED_INTEGER_OPTIONAL_HPP_
+#ifndef RANGED_INTEGER_DETAIL_OPTIONAL_HPP_
+#define RANGED_INTEGER_DETAIL_OPTIONAL_HPP_
 
 #include "class.hpp"
 #include "enable_if.hpp"
@@ -180,4 +180,4 @@ public:
 template<typename T>
 using optional = typename detail::optional_general<T>::type;
 
-#endif	// RANGED_INTEGER_OPTIONAL_HPP_
+#endif	// RANGED_INTEGER_DETAIL_OPTIONAL_HPP_
