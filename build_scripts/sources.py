@@ -45,8 +45,9 @@ base_sources = [('test', ['ranged_integer.cpp'] + prepend_dir('detail', [
 	'minmax.cpp',
 	'numeric_limits.cpp',
 	'operators.cpp',
-	'stream.cpp',
+	'optional.cpp',
 	'overlapping_range.cpp',
 	'policy.cpp',
+	'stream.cpp',
 	'ternary_conditional.cpp'
 ]), [])]

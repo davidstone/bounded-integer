@@ -405,6 +405,7 @@ int main() {
 	check_comparison();
 	check_arithmetic();
 	check_compound_arithmetic();
+	check_literals();
 	check_math();
 	check_numeric_limits_all();
 	check_common_type();
