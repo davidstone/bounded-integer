@@ -128,10 +128,11 @@ private:
 	}
 	using underlying_type = typename value_type::underlying_type;
 	static constexpr underlying_type uninitialized_value() {
-		return
+		return static_cast<underlying_type>(
 			(minimum > std::numeric_limits<underlying_type>::min()) ? minimum - 1 :
 			(maximum < std::numeric_limits<underlying_type>::max()) ? maximum + 1 :
-			throw std::logic_error("Attempted to use compressed_optional when the default version should have been used.");
+			throw std::logic_error("Attempted to use compressed_optional when the default version should have been used.")
+		);
 	}
 	value_type m_value;
 };
