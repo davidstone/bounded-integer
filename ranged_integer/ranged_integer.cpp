@@ -19,6 +19,7 @@
 #include "detail/common_type.hpp"
 #include "detail/math.hpp"
 #include "detail/numeric_limits.hpp"
+#include "detail/optional.hpp"
 #include <cassert>
 #include <sstream>
 
@@ -398,6 +399,39 @@ void check_streaming() {
 	streaming_test<decltype(make_ranged(int{}))>(large_initial, large_final);
 }
 
+template<typename T>
+void check_uncompressed_optional() {
+	using type = ranged_integer<std::numeric_limits<T>::min(), std::numeric_limits<T>::max(), null_policy>;
+	static_assert(sizeof(type) < sizeof(optional<type>), "Compressing an optional that should not be compressed.");
+}
+template<intmax_t minimum, intmax_t maximum>
+void check_compressed_optional() {
+	using type = ranged_integer<minimum, maximum, null_policy>;
+	using compressed_type = detail::compressed_optional<minimum, maximum, null_policy>;
+	static_assert(sizeof(type) == sizeof(compressed_type), "compressed_optional too big.");
+	static_assert(sizeof(compressed_type) == sizeof(optional<type>), "Incorrect optional selection.");
+}
+
+void check_optional() {
+	check_compressed_optional<1, 10>();
+	check_uncompressed_optional<uint8_t>();
+	check_uncompressed_optional<int>();
+	check_uncompressed_optional<unsigned>();
+	check_uncompressed_optional<intmax_t>();
+	
+	using ri_type = checked_integer<1, 10>;
+	constexpr optional<ri_type> uninitialized_optional;
+	static_assert(!uninitialized_optional, "Default constructor should leave uninitialized.");
+	constexpr optional<ri_type> constexpr_optional_integer(ri_type(5));
+	static_assert(static_cast<bool>(constexpr_optional_integer), "Value constructor should initialize optional.");
+	assert(*constexpr_optional_integer == 5);
+	optional<ri_type> optional_integer(ri_type(4));
+	optional_integer = uninitialized_optional;
+	assert(!optional_integer);
+	optional_integer = ri_type(7);
+	assert(optional_integer);
+}
+
 
 }	// namespace
 
@@ -412,4 +446,5 @@ int main() {
 	check_policies();
 	check_array();
 	check_streaming();
+	check_optional();
 }

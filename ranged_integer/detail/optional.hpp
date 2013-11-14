@@ -34,31 +34,31 @@ private:
 	using value_type = ranged_integer<minimum, maximum, policy>;
 public:
 
-	constexpr compressed_optional(boost::none_t) noexcept:
-		m_value(uninitialized, non_check) {
-	}
 	constexpr compressed_optional() noexcept:
-		compressed_optional(boost::none) {
+		m_value(uninitialized_value(), non_check) {
+	}
+	constexpr compressed_optional(boost::none_t) noexcept:
+		compressed_optional{} {
 	}
 	constexpr compressed_optional(value_type const & value) noexcept:
 		m_value(value) {
 	}
 	constexpr compressed_optional(bool condition, value_type const & value) noexcept:
-		m_value(condition ? value : value_type(uninitialized)) {
+		m_value(condition ? value : value_type(uninitialized_value())) {
 	}
 	constexpr compressed_optional(compressed_optional const &) noexcept = default;
 	template<intmax_t other_min, intmax_t other_max, template<intmax_t, intmax_t> class other_policy>
 	constexpr explicit compressed_optional(compressed_optional<other_min, other_max, other_policy> const & other):
-		m_value(other.is_initialized() ? *other : uninitialized) {
+		m_value(other.is_initialized() ? *other : uninitialized_value()) {
 	}
 	template<typename U>
 	constexpr explicit compressed_optional(boost::optional<U> const & other):
-		m_value(other.is_initialized() ? *other : uninitialized) {
+		m_value(other.is_initialized() ? *other : uninitialized_value()) {
 	}
 
 	// TODO: in_place_factory overloads?
 	
-	compressed_optional & operator=(compressed_optional const & other) noexcept = default;
+	compressed_optional & operator=(compressed_optional const &) noexcept = default;
 	compressed_optional & operator=(boost::none_t) noexcept {
 		*this = compressed_optional(boost::none);
 		return *this;
@@ -97,7 +97,7 @@ public:
 		return get();
 	}
 	
-	value_type const * get_ptr() const noexcept {
+	constexpr value_type const * get_ptr() const noexcept {
 		return is_initialized() ? &m_value : nullptr;
 	}
 	value_type * get_ptr() noexcept {
@@ -112,25 +112,27 @@ public:
 		return get_ptr();
 	}
 	
-	value_type const & get_value_or(value_type const & default_value) const noexcept {
+	constexpr value_type const & get_value_or(value_type const & default_value) const noexcept {
 		return is_initialized() ? m_value : default_value;
 	}
 	
-	explicit operator bool() const noexcept {
+	constexpr explicit operator bool() const noexcept {
 		return is_initialized();
 	}
-	bool operator!() const noexcept {
+	constexpr bool operator!() const noexcept {
 		return !is_initialized();
 	}
 private:
-	bool is_initialized() const noexcept {
-		return m_value == uninitialized;
+	constexpr bool is_initialized() const noexcept {
+		return m_value != uninitialized_value();
 	}
 	using underlying_type = typename value_type::underlying_type;
-	static constexpr underlying_type uninitialized =
-		(minimum > std::numeric_limits<underlying_type>::min()) ? minimum - 1 :
-		(maximum < std::numeric_limits<underlying_type>::max()) ? maximum + 1 :
-		throw std::logic_error("Attempted to use compressed_optional when the default version should have been used.");
+	static constexpr underlying_type uninitialized_value() {
+		return
+			(minimum > std::numeric_limits<underlying_type>::min()) ? minimum - 1 :
+			(maximum < std::numeric_limits<underlying_type>::max()) ? maximum + 1 :
+			throw std::logic_error("Attempted to use compressed_optional when the default version should have been used.");
+	}
 	value_type m_value;
 };
 
@@ -162,9 +164,20 @@ public:
 	using type = boost::optional<ranged_integer<minimum, maximum, policy>>;
 };
 
+template<typename T>
+class optional_general {
+public:
+	using type = boost::optional<T>;
+};
+template<intmax_t minimum, intmax_t maximum, template<intmax_t, intmax_t> class policy>
+class optional_general<ranged_integer<minimum, maximum, policy>> {
+public:
+	using type = typename optional_c<minimum, maximum, policy, has_extra_space<minimum, maximum>::value>::type;
+};
+
 }	// namespace detail
 
-template<intmax_t minimum, intmax_t maximum, template<intmax_t, intmax_t> class policy>
-using optional = typename detail::optional_c<minimum, maximum, policy, detail::has_extra_space<minimum, maximum>::value>::type;
+template<typename T>
+using optional = typename detail::optional_general<T>::type;
 
 #endif	// RANGED_INTEGER_OPTIONAL_HPP_

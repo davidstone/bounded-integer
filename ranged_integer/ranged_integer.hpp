@@ -28,6 +28,8 @@
 #include "detail/policy.hpp"
 #include "detail/stream.hpp"
 
+// Missing from this list: "detail/optional.hpp"
+
 #include <cstdint>
 
 template<intmax_t minimum, intmax_t maximum>
