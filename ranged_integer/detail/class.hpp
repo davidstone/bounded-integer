@@ -78,11 +78,11 @@ public:
 		m_value = other.m_value;
 		return *this;
 	}
-	ranged_integer_base & operator=(ranged_integer_base && other) volatile noexcept {
+	ranged_integer_base volatile & operator=(ranged_integer_base && other) volatile noexcept {
 		m_value = std::move(other.m_value);
 		return *this;
 	}
-	ranged_integer_base & operator=(ranged_integer_base volatile && other) volatile noexcept {
+	ranged_integer_base volatile & operator=(ranged_integer_base volatile && other) volatile noexcept {
 		m_value = std::move(other.m_value);
 		return *this;
 	}
@@ -122,9 +122,9 @@ public:
 	}
 	ranged_integer_base volatile & operator=(ranged_integer_base const volatile &) volatile noexcept {
 	}
-	ranged_integer_base & operator=(ranged_integer_base &&) volatile noexcept {
+	ranged_integer_base volatile & operator=(ranged_integer_base &&) volatile noexcept {
 	}
-	ranged_integer_base & operator=(ranged_integer_base volatile &&) volatile noexcept {
+	ranged_integer_base volatile & operator=(ranged_integer_base volatile &&) volatile noexcept {
 	}
 
 	constexpr underlying_type value() const noexcept {
