@@ -18,6 +18,7 @@
 #define RANGED_INTEGER_TERNARY_CONDITIONAL_HPP_
 
 #include "common_type.hpp"
+#include "is_ranged_integer.hpp"
 #include <utility>
 
 namespace detail {
@@ -69,5 +70,17 @@ private:
 	};
 };
 }	// namespace detail
+
+template<
+	typename LHS, typename RHS,
+	typename result_type = typename std::common_type<LHS, RHS>::type,
+	enable_if_t<any_are_ranged_integer<typename std::decay<LHS>::type, typename std::decay<RHS>::type>::value> = clang_dummy
+>
+constexpr result_type ternary_conditional(bool const condition, LHS && lhs, RHS && rhs) noexcept {
+	return condition ?
+		static_cast<result_type>(std::forward<LHS>(lhs)) :
+		static_cast<result_type>(std::forward<RHS>(rhs));
+}
+
 
 #endif	// RANGED_INTEGER_TERNARY_CONDITIONAL_HPP_
