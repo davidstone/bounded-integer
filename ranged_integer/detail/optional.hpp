@@ -338,4 +338,9 @@ public:
 template<typename T>
 using optional = typename detail::optional_general<T>::type;
 
+template<typename T>
+optional<typename std::remove_reference<T>::type> make_optional(T && value) noexcept {
+	return optional<T>(std::forward<T>(value));
+}
+
 #endif	// RANGED_INTEGER_DETAIL_OPTIONAL_HPP_
