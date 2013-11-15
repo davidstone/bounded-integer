@@ -145,6 +145,15 @@ bool operator==(compressed_optional<lhs_min, lhs_max, lhs_policy> const & lhs, c
 		*lhs == *rhs :
 		(static_cast<bool>(lhs) == static_cast<bool>(rhs));
 }
+
+template<
+	intmax_t lhs_min, intmax_t lhs_max, template<intmax_t, intmax_t> class lhs_policy,
+	intmax_t rhs_min, intmax_t rhs_max, template<intmax_t, intmax_t> class rhs_policy
+>
+bool operator!=(compressed_optional<lhs_min, lhs_max, lhs_policy> const & lhs, compressed_optional<rhs_min, rhs_max, rhs_policy> const & rhs) noexcept {
+	return !(lhs == rhs);
+}
+
 template<
 	intmax_t lhs_min, intmax_t lhs_max, template<intmax_t, intmax_t> class lhs_policy,
 	intmax_t rhs_min, intmax_t rhs_max, template<intmax_t, intmax_t> class rhs_policy
@@ -154,13 +163,7 @@ bool operator<(compressed_optional<lhs_min, lhs_max, lhs_policy> const & lhs, co
 		*lhs < *rhs :
 		(static_cast<bool>(lhs) < static_cast<bool>(rhs));
 }
-template<
-	intmax_t lhs_min, intmax_t lhs_max, template<intmax_t, intmax_t> class lhs_policy,
-	intmax_t rhs_min, intmax_t rhs_max, template<intmax_t, intmax_t> class rhs_policy
->
-bool operator!=(compressed_optional<lhs_min, lhs_max, lhs_policy> const & lhs, compressed_optional<rhs_min, rhs_max, rhs_policy> const & rhs) noexcept {
-	return !(lhs == rhs);
-}
+
 template<
 	intmax_t lhs_min, intmax_t lhs_max, template<intmax_t, intmax_t> class lhs_policy,
 	intmax_t rhs_min, intmax_t rhs_max, template<intmax_t, intmax_t> class rhs_policy
@@ -168,6 +171,7 @@ template<
 bool operator>(compressed_optional<lhs_min, lhs_max, lhs_policy> const & lhs, compressed_optional<rhs_min, rhs_max, rhs_policy> const & rhs) noexcept {
 	return rhs < lhs;
 }
+
 template<
 	intmax_t lhs_min, intmax_t lhs_max, template<intmax_t, intmax_t> class lhs_policy,
 	intmax_t rhs_min, intmax_t rhs_max, template<intmax_t, intmax_t> class rhs_policy
@@ -175,6 +179,7 @@ template<
 bool operator<=(compressed_optional<lhs_min, lhs_max, lhs_policy> const & lhs, compressed_optional<rhs_min, rhs_max, rhs_policy> const & rhs) noexcept {
 	return !(rhs < lhs);
 }
+
 template<
 	intmax_t lhs_min, intmax_t lhs_max, template<intmax_t, intmax_t> class lhs_policy,
 	intmax_t rhs_min, intmax_t rhs_max, template<intmax_t, intmax_t> class rhs_policy
@@ -182,6 +187,110 @@ template<
 bool operator>=(compressed_optional<lhs_min, lhs_max, lhs_policy> const & lhs, compressed_optional<rhs_min, rhs_max, rhs_policy> const & rhs) noexcept {
 	return !(lhs < rhs);
 }
+
+
+
+template<
+	intmax_t lhs_min, intmax_t lhs_max, template<intmax_t, intmax_t> class lhs_policy,
+	intmax_t rhs_min, intmax_t rhs_max, template<intmax_t, intmax_t> class rhs_policy
+>
+bool operator==(compressed_optional<lhs_min, lhs_max, lhs_policy> const & lhs, ranged_integer<rhs_min, rhs_max, rhs_policy> const & rhs) noexcept {
+	return static_cast<bool>(lhs) and *lhs == rhs;
+}
+
+template<
+	intmax_t lhs_min, intmax_t lhs_max, template<intmax_t, intmax_t> class lhs_policy,
+	intmax_t rhs_min, intmax_t rhs_max, template<intmax_t, intmax_t> class rhs_policy
+>
+bool operator==(ranged_integer<lhs_min, lhs_max, lhs_policy> const & lhs, compressed_optional<rhs_min, rhs_max, rhs_policy> const & rhs) noexcept {
+	return rhs == lhs;
+}
+
+
+template<
+	intmax_t lhs_min, intmax_t lhs_max, template<intmax_t, intmax_t> class lhs_policy,
+	intmax_t rhs_min, intmax_t rhs_max, template<intmax_t, intmax_t> class rhs_policy
+>
+bool operator!=(compressed_optional<lhs_min, lhs_max, lhs_policy> const & lhs, ranged_integer<rhs_min, rhs_max, rhs_policy> const & rhs) noexcept {
+	return !(lhs == rhs);
+}
+
+template<
+	intmax_t lhs_min, intmax_t lhs_max, template<intmax_t, intmax_t> class lhs_policy,
+	intmax_t rhs_min, intmax_t rhs_max, template<intmax_t, intmax_t> class rhs_policy
+>
+bool operator!=(ranged_integer<lhs_min, lhs_max, lhs_policy> const & lhs, compressed_optional<rhs_min, rhs_max, rhs_policy> const & rhs) noexcept {
+	return !(rhs == lhs);
+}
+
+
+template<
+	intmax_t lhs_min, intmax_t lhs_max, template<intmax_t, intmax_t> class lhs_policy,
+	intmax_t rhs_min, intmax_t rhs_max, template<intmax_t, intmax_t> class rhs_policy
+>
+bool operator<(compressed_optional<lhs_min, lhs_max, lhs_policy> const & lhs, ranged_integer<rhs_min, rhs_max, rhs_policy> const & rhs) noexcept {
+	return !static_cast<bool>(lhs) ? true : *lhs == rhs;
+}
+
+template<
+	intmax_t lhs_min, intmax_t lhs_max, template<intmax_t, intmax_t> class lhs_policy,
+	intmax_t rhs_min, intmax_t rhs_max, template<intmax_t, intmax_t> class rhs_policy
+>
+bool operator<(ranged_integer<lhs_min, lhs_max, lhs_policy> const & lhs, compressed_optional<rhs_min, rhs_max, rhs_policy> const & rhs) noexcept {
+	return !static_cast<bool>(rhs) ? false : lhs == *rhs;
+}
+
+
+template<
+	intmax_t lhs_min, intmax_t lhs_max, template<intmax_t, intmax_t> class lhs_policy,
+	intmax_t rhs_min, intmax_t rhs_max, template<intmax_t, intmax_t> class rhs_policy
+>
+bool operator>(compressed_optional<lhs_min, lhs_max, lhs_policy> const & lhs, ranged_integer<rhs_min, rhs_max, rhs_policy> const & rhs) noexcept {
+	return rhs < lhs;
+}
+
+template<
+	intmax_t lhs_min, intmax_t lhs_max, template<intmax_t, intmax_t> class lhs_policy,
+	intmax_t rhs_min, intmax_t rhs_max, template<intmax_t, intmax_t> class rhs_policy
+>
+bool operator>(ranged_integer<lhs_min, lhs_max, lhs_policy> const & lhs, compressed_optional<rhs_min, rhs_max, rhs_policy> const & rhs) noexcept {
+	return rhs < lhs;
+}
+
+
+template<
+	intmax_t lhs_min, intmax_t lhs_max, template<intmax_t, intmax_t> class lhs_policy,
+	intmax_t rhs_min, intmax_t rhs_max, template<intmax_t, intmax_t> class rhs_policy
+>
+bool operator<=(compressed_optional<lhs_min, lhs_max, lhs_policy> const & lhs, ranged_integer<rhs_min, rhs_max, rhs_policy> const & rhs) noexcept {
+	return !(rhs < lhs);
+}
+
+template<
+	intmax_t lhs_min, intmax_t lhs_max, template<intmax_t, intmax_t> class lhs_policy,
+	intmax_t rhs_min, intmax_t rhs_max, template<intmax_t, intmax_t> class rhs_policy
+>
+bool operator<=(ranged_integer<lhs_min, lhs_max, lhs_policy> const & lhs, compressed_optional<rhs_min, rhs_max, rhs_policy> const & rhs) noexcept {
+	return !(rhs < lhs);
+}
+
+
+template<
+	intmax_t lhs_min, intmax_t lhs_max, template<intmax_t, intmax_t> class lhs_policy,
+	intmax_t rhs_min, intmax_t rhs_max, template<intmax_t, intmax_t> class rhs_policy
+>
+bool operator>=(compressed_optional<lhs_min, lhs_max, lhs_policy> const & lhs, ranged_integer<rhs_min, rhs_max, rhs_policy> const & rhs) noexcept {
+	return !(lhs < rhs);
+}
+
+template<
+	intmax_t lhs_min, intmax_t lhs_max, template<intmax_t, intmax_t> class lhs_policy,
+	intmax_t rhs_min, intmax_t rhs_max, template<intmax_t, intmax_t> class rhs_policy
+>
+bool operator>=(ranged_integer<lhs_min, lhs_max, lhs_policy> const & lhs, compressed_optional<rhs_min, rhs_max, rhs_policy> const & rhs) noexcept {
+	return !(lhs < rhs);
+}
+
 
 
 
