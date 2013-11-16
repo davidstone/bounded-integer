@@ -62,8 +62,8 @@ public:
 	template<typename integer>
 	constexpr integer operator()(integer const new_value) const noexcept {
 		return
-			(new_value <= minimum) ? minimum :
-			(new_value >= maximum) ? maximum :
+			(new_value <= minimum) ? static_cast<integer>(minimum) :
+			(new_value >= maximum) ? static_cast<integer>(maximum) :
 			new_value;
 	}
 
