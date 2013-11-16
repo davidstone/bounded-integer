@@ -98,44 +98,6 @@ private:
 	underlying_type m_value;
 };
 
-template<intmax_t only_value>
-class ranged_integer_base<only_value, only_value> {
-public:
-	using underlying_type = detail::underlying_t<only_value, only_value>;
-	constexpr ranged_integer_base() noexcept = default;
-	constexpr ranged_integer_base(underlying_type) noexcept {
-	}
-
-	constexpr ranged_integer_base(ranged_integer_base const &) noexcept = default;
-	constexpr ranged_integer_base(ranged_integer_base const volatile &) noexcept {
-	}
-	constexpr ranged_integer_base(ranged_integer_base &&) noexcept = default;
-	constexpr ranged_integer_base(ranged_integer_base volatile &&) noexcept {
-	}
-
-	ranged_integer_base & operator=(ranged_integer_base const &) noexcept = default;
-	ranged_integer_base & operator=(ranged_integer_base const volatile &) noexcept {
-	}
-	ranged_integer_base & operator=(ranged_integer_base &&) noexcept = default;
-	ranged_integer_base & operator=(ranged_integer_base volatile &&) noexcept {
-	}
-	ranged_integer_base volatile & operator=(ranged_integer_base const &) volatile noexcept {
-	}
-	ranged_integer_base volatile & operator=(ranged_integer_base const volatile &) volatile noexcept {
-	}
-	ranged_integer_base volatile & operator=(ranged_integer_base &&) volatile noexcept {
-	}
-	ranged_integer_base volatile & operator=(ranged_integer_base volatile &&) volatile noexcept {
-	}
-
-	constexpr underlying_type value() const noexcept {
-		return only_value;
-	}
-	constexpr underlying_type value() const volatile noexcept {
-		return only_value;
-	}
-};
-
 template<intmax_t minimum, intmax_t maximum, typename U>
 constexpr bool is_implicitly_constructible_from() noexcept {
 	return type_in_range<typename std::decay<U>::type>(minimum, maximum);
@@ -148,8 +110,6 @@ constexpr bool is_explicitly_constructible_from() noexcept {
 
 }	// namespace detail
 
-// I use private inheritance here to take advantage of the empty base
-// optimization when minimum == maximum
 template<intmax_t minimum, intmax_t maximum, template<intmax_t, intmax_t> class OverflowPolicy>
 class ranged_integer : private detail::ranged_integer_base<minimum, maximum> {
 private:
@@ -162,7 +122,6 @@ public:
 
 	static_assert(minimum < 0 ? std::numeric_limits<underlying_type>::is_signed : true, "Underlying type should be signed.");
 
-	// This is only defined for constant ranges. See ranged_integer_base
 	constexpr ranged_integer() noexcept = default;
 	constexpr ranged_integer(ranged_integer const &) noexcept = default;
 	constexpr ranged_integer(ranged_integer const volatile & other) noexcept:
