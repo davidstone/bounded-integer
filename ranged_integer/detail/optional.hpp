@@ -308,13 +308,11 @@ bool operator>=(ranged_integer<lhs_min, lhs_max, lhs_policy> const & lhs, compre
 template<intmax_t minimum, intmax_t maximum>
 class has_extra_space {
 private:
-	static constexpr bool uses_space = minimum != maximum;
 	using underlying_type = underlying_t<minimum, maximum>;
 	static constexpr intmax_t underlying_min = std::numeric_limits<underlying_type>::min();
 	static constexpr intmax_t underlying_max = std::numeric_limits<underlying_type>::max();
-	static constexpr bool smaller_than_underlying_type = underlying_min < minimum or underlying_max > maximum;
 public:
-	static constexpr bool value = uses_space and smaller_than_underlying_type;
+	static constexpr bool value = underlying_min < minimum or underlying_max > maximum;
 };
 
 template<
