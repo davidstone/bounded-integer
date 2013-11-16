@@ -47,7 +47,7 @@ constexpr ranged_integer<static_cast<intmax_t>(std::numeric_limits<integer>::min
 
 template<intmax_t value, template<intmax_t, intmax_t> class overflow_policy = null_policy>
 constexpr ranged_integer<value, value, overflow_policy> make_ranged() noexcept {
-	return ranged_integer<value, value, overflow_policy>{};
+	return ranged_integer<value, value, overflow_policy>(value, non_check);
 }
 
 #endif	// RANGED_INTEGER_MAKE_RANGED_HPP_
