@@ -26,6 +26,9 @@
 #include <boost/assert.hpp>
 #include <boost/optional.hpp>
 
+enum class none_t {};
+constexpr none_t none = none_t{};
+
 namespace detail {
 
 template<intmax_t minimum, intmax_t maximum, template<intmax_t, intmax_t> class policy>
@@ -39,9 +42,20 @@ public:
 	constexpr compressed_optional(boost::none_t) noexcept:
 		compressed_optional{} {
 	}
-	constexpr compressed_optional(value_type const & value) noexcept:
-		m_value(value) {
+
+	template<typename integer, enable_if_t<
+		detail::is_implicitly_constructible_from<minimum, maximum, integer>()
+	> = clang_dummy>
+	constexpr compressed_optional(integer && other) noexcept:
+		m_value(std::forward<integer>(other)) {
 	}
+	template<typename integer, enable_if_t<
+		detail::is_explicitly_constructible_from<minimum, maximum, policy<minimum, maximum>, integer>()
+	> = clang_dummy>
+	constexpr explicit compressed_optional(integer && other):
+		m_value(std::forward<integer>(other)) {
+	}
+
 	constexpr compressed_optional(bool condition, value_type const & value) noexcept:
 		m_value(condition ? value : value_type(uninitialized_value())) {
 	}

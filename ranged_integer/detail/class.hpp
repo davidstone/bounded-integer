@@ -18,6 +18,7 @@
 #define RANGED_INTEGER_CLASS_HPP_
 
 #include "enable_if.hpp"
+#include "forward_declaration.hpp"
 #include "overlapping_range.hpp"
 
 #include <cstdint>
@@ -135,6 +136,16 @@ public:
 	}
 };
 
+template<intmax_t minimum, intmax_t maximum, typename U>
+constexpr bool is_implicitly_constructible_from() noexcept {
+	return type_in_range<typename std::decay<U>::type>(minimum, maximum);
+}
+template<intmax_t minimum, intmax_t maximum, typename policy, typename U>
+constexpr bool is_explicitly_constructible_from() noexcept {
+	return !is_implicitly_constructible_from<minimum, maximum, U>() and
+		(has_overlap<typename std::decay<U>::type>(minimum, maximum) or !policy::overflow_is_error);
+}
+
 }	// namespace detail
 
 // I use private inheritance here to take advantage of the empty base
@@ -200,16 +211,14 @@ public:
 
 	// Intentionally implicit: this is safe because the value is in range
 	template<typename integer, enable_if_t<
-		detail::type_in_range<typename std::decay<integer>::type>(minimum, maximum)
+		detail::is_implicitly_constructible_from<minimum, maximum, integer>()
 	> = clang_dummy>
 	constexpr ranged_integer(integer && other) noexcept:
 		ranged_integer(std::forward<integer>(other), non_check) {
 	}
 
 	template<typename integer, enable_if_t<
-		!detail::type_in_range<typename std::decay<integer>::type>(minimum, maximum) and
-		(detail::has_overlap<typename std::decay<integer>::type>(minimum, maximum) or
-		!overflow_policy::overflow_is_error)
+		detail::is_explicitly_constructible_from<minimum, maximum, overflow_policy, integer>()
 	> = clang_dummy>
 	constexpr explicit ranged_integer(integer && other):
 		ranged_integer(overflow_policy{}(std::forward<integer>(other)), non_check) {
