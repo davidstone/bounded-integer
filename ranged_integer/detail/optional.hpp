@@ -60,34 +60,31 @@ public:
 		m_value(condition ? value : value_type(uninitialized_value())) {
 	}
 	constexpr compressed_optional(compressed_optional const &) noexcept = default;
+	constexpr compressed_optional(compressed_optional &&) noexcept = default;
 	template<intmax_t other_min, intmax_t other_max, template<intmax_t, intmax_t> class other_policy>
 	constexpr explicit compressed_optional(compressed_optional<other_min, other_max, other_policy> const & other):
 		m_value(other.is_initialized() ? *other : uninitialized_value()) {
+	}
+	template<intmax_t other_min, intmax_t other_max, template<intmax_t, intmax_t> class other_policy>
+	constexpr explicit compressed_optional(compressed_optional<other_min, other_max, other_policy> && other):
+		m_value(other.is_initialized() ? *std::move(other) : uninitialized_value()) {
 	}
 	template<typename U>
 	constexpr explicit compressed_optional(boost::optional<U> const & other):
 		m_value(other.is_initialized() ? *other : uninitialized_value()) {
 	}
+	template<typename U>
+	constexpr explicit compressed_optional(boost::optional<U> && other):
+		m_value(other.is_initialized() ? *std::move(other) : uninitialized_value()) {
+	}
 
 	// TODO: in_place_factory overloads?
 	
 	compressed_optional & operator=(compressed_optional const &) noexcept = default;
-	compressed_optional & operator=(boost::none_t) noexcept {
-		*this = compressed_optional(boost::none);
-		return *this;
-	}
-	compressed_optional & operator=(value_type const & value) noexcept {
-		m_value = value;
-		return *this;
-	}
-	template<intmax_t other_min, intmax_t other_max, template<intmax_t, intmax_t> class other_policy>
-	compressed_optional & operator=(compressed_optional<other_min, other_max, other_policy> const & other) {
-		*this = compressed_optional(other);
-		return *this;
-	}
-	template<typename U>
-	compressed_optional & operator=(boost::optional<U> const & other) {
-		*this = compressed_optional(other);
+	compressed_optional & operator=(compressed_optional &&) noexcept = default;
+	template<typename integer>
+	compressed_optional & operator=(integer && other) {
+		*this = compressed_optional(std::forward<integer>(other));
 		return *this;
 	}
 
