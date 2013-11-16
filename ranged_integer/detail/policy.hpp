@@ -28,7 +28,7 @@ class null_policy {
 public:
 	constexpr null_policy() noexcept {}
 	template<typename integer>
-	constexpr integer operator()(integer const new_value) const noexcept {
+	constexpr integer assignment(integer const new_value) const noexcept {
 		return new_value;
 	}
 
@@ -43,7 +43,7 @@ public:
 	constexpr throw_on_overflow() noexcept {}
 	// The optimizer should be able to simplify this to remove dead checks.
 	template<typename integer>
-	constexpr integer operator()(integer const new_value) const {
+	constexpr integer assignment(integer const new_value) const {
 		return (new_value < minimum) ?
 			throw std::underflow_error{"Value too small"} :
 			((new_value > maximum) ?
@@ -60,7 +60,7 @@ class clamp_on_overflow {
 public:
 	constexpr clamp_on_overflow() noexcept {}
 	template<typename integer>
-	constexpr integer operator()(integer const new_value) const noexcept {
+	constexpr integer assignment(integer const new_value) const noexcept {
 		return
 			(new_value <= minimum) ? static_cast<integer>(minimum) :
 			(new_value >= maximum) ? static_cast<integer>(maximum) :
