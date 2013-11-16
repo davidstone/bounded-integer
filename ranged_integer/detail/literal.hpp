@@ -19,12 +19,10 @@
 
 #include "arithmetic_operators.hpp"
 #include "class.hpp"
+#include "make_ranged.hpp"
 #include "policy.hpp"
 
 namespace detail {
-
-template<intmax_t value>
-using ranged_constant = ranged_integer<value, value, null_policy>;
 
 constexpr inline intmax_t power(intmax_t const radix, intmax_t const exponent) noexcept {
 	return (exponent == 0) ? 1 : radix * power(radix, exponent - 1);
@@ -36,26 +34,20 @@ private:
 	static constexpr intmax_t radix = 10;
 	static constexpr intmax_t integer_scale = power(radix, sizeof...(digits));
 public:
-	static constexpr decltype(literal_ranged_integer<digit>::value() * ranged_constant<integer_scale>{} + literal_ranged_integer<digits...>::value()) value() noexcept {
-		return literal_ranged_integer<digit>::value() * ranged_constant<integer_scale>{} + literal_ranged_integer<digits...>::value();
-	}
+	static constexpr auto value = literal_ranged_integer<digit>::value * make_ranged<integer_scale>() + literal_ranged_integer<digits...>::value;
 };
 
 template<char digit>
 class literal_ranged_integer<digit> {
-private:
-	using result_type = ranged_constant<digit - '0'>;
 public:
-	static constexpr result_type value() noexcept {
-		return result_type{};
-	}
+	static constexpr auto value = make_ranged<digit - '0'>();
 };
 
 }	// namespace detail
 
 template<char... digits>
-constexpr decltype(detail::literal_ranged_integer<digits...>::value()) operator"" _ri() noexcept {
-	return detail::literal_ranged_integer<digits...>::value();
+constexpr decltype(detail::literal_ranged_integer<digits...>::value) operator"" _ri() noexcept {
+	return detail::literal_ranged_integer<digits...>::value;
 }
 
 #endif	// RANGED_INTEGER_LITERAL_HPP_
