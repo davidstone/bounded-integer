@@ -304,15 +304,15 @@ void check_common_type() {
 }
 
 void check_throw_policy() {
-	throw_on_overflow<0, 10> throw_policy;
+	throw_on_overflow throw_policy;
 	try {
-		throw_policy.assignment(20);
+		throw_policy.assignment(0, 10, 20);
 		assert(false);
 	}
 	catch (std::overflow_error const &) {
 	}
 	try {
-		throw_policy.assignment(-6);
+		throw_policy.assignment(0, 10, -6);
 		assert(false);
 	}
 	catch (std::underflow_error const &) {
@@ -322,10 +322,10 @@ void check_throw_policy() {
 void check_clamp_policy() {
 	static constexpr intmax_t minimum = 27;
 	static constexpr intmax_t maximum = 567;
-	constexpr clamp_on_overflow<minimum, maximum> clamp_policy;
-	static_assert(clamp_policy.assignment(20) == minimum, "Failure to properly clamp lesser positive values.");
-	static_assert(clamp_policy.assignment(-25) == minimum, "Failure to properly clamp negative values to a positive value.");
-	static_assert(clamp_policy.assignment(1000) == maximum, "Failure to properly clamp greater positive values.");
+	constexpr clamp_on_overflow clamp_policy;
+	static_assert(clamp_policy.assignment(minimum, maximum, 20) == minimum, "Failure to properly clamp lesser positive values.");
+	static_assert(clamp_policy.assignment(minimum, maximum, -25) == minimum, "Failure to properly clamp negative values to a positive value.");
+	static_assert(clamp_policy.assignment(minimum, maximum, 1000) == maximum, "Failure to properly clamp greater positive values.");
 	
 	using type = clamped_integer<-100, 100>;
 	constexpr auto initial = std::numeric_limits<type::underlying_type>::max() + 1;

@@ -31,7 +31,7 @@ class is_ranged_integer<integer> {
 public:
 	static constexpr bool value = false;
 };
-template<intmax_t minimum, intmax_t maximum, template<intmax_t, intmax_t> class overflow_policy>
+template<intmax_t minimum, intmax_t maximum, typename overflow_policy>
 class is_ranged_integer<ranged_integer<minimum, maximum, overflow_policy>> {
 public:
 	static constexpr bool value = true;

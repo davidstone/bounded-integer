@@ -31,7 +31,7 @@ constexpr none_t none = none_t{};
 
 namespace detail {
 
-template<intmax_t minimum, intmax_t maximum, template<intmax_t, intmax_t> class policy>
+template<intmax_t minimum, intmax_t maximum, typename policy>
 class compressed_optional {
 public:
 	using value_type = ranged_integer<minimum, maximum, policy>;
@@ -50,7 +50,7 @@ public:
 		m_value(std::forward<integer>(other)) {
 	}
 	template<typename integer, enable_if_t<
-		detail::is_explicitly_constructible_from<minimum, maximum, policy<minimum, maximum>, integer>()
+		detail::is_explicitly_constructible_from<minimum, maximum, policy, integer>()
 	> = clang_dummy>
 	constexpr explicit compressed_optional(integer && other):
 		m_value(std::forward<integer>(other)) {
@@ -61,11 +61,11 @@ public:
 	}
 	constexpr compressed_optional(compressed_optional const &) noexcept = default;
 	constexpr compressed_optional(compressed_optional &&) noexcept = default;
-	template<intmax_t other_min, intmax_t other_max, template<intmax_t, intmax_t> class other_policy>
+	template<intmax_t other_min, intmax_t other_max, typename other_policy>
 	constexpr explicit compressed_optional(compressed_optional<other_min, other_max, other_policy> const & other):
 		m_value(other.is_initialized() ? *other : uninitialized_value()) {
 	}
-	template<intmax_t other_min, intmax_t other_max, template<intmax_t, intmax_t> class other_policy>
+	template<intmax_t other_min, intmax_t other_max, typename other_policy>
 	constexpr explicit compressed_optional(compressed_optional<other_min, other_max, other_policy> && other):
 		m_value(other.is_initialized() ? *std::move(other) : uninitialized_value()) {
 	}
@@ -148,8 +148,8 @@ private:
 };
 
 template<
-	intmax_t lhs_min, intmax_t lhs_max, template<intmax_t, intmax_t> class lhs_policy,
-	intmax_t rhs_min, intmax_t rhs_max, template<intmax_t, intmax_t> class rhs_policy
+	intmax_t lhs_min, intmax_t lhs_max, typename lhs_policy,
+	intmax_t rhs_min, intmax_t rhs_max, typename rhs_policy
 >
 bool operator==(compressed_optional<lhs_min, lhs_max, lhs_policy> const & lhs, compressed_optional<rhs_min, rhs_max, rhs_policy> const & rhs) noexcept {
 	return (static_cast<bool>(lhs) and static_cast<bool>(rhs)) ?
@@ -158,16 +158,16 @@ bool operator==(compressed_optional<lhs_min, lhs_max, lhs_policy> const & lhs, c
 }
 
 template<
-	intmax_t lhs_min, intmax_t lhs_max, template<intmax_t, intmax_t> class lhs_policy,
-	intmax_t rhs_min, intmax_t rhs_max, template<intmax_t, intmax_t> class rhs_policy
+	intmax_t lhs_min, intmax_t lhs_max, typename lhs_policy,
+	intmax_t rhs_min, intmax_t rhs_max, typename rhs_policy
 >
 bool operator!=(compressed_optional<lhs_min, lhs_max, lhs_policy> const & lhs, compressed_optional<rhs_min, rhs_max, rhs_policy> const & rhs) noexcept {
 	return !(lhs == rhs);
 }
 
 template<
-	intmax_t lhs_min, intmax_t lhs_max, template<intmax_t, intmax_t> class lhs_policy,
-	intmax_t rhs_min, intmax_t rhs_max, template<intmax_t, intmax_t> class rhs_policy
+	intmax_t lhs_min, intmax_t lhs_max, typename lhs_policy,
+	intmax_t rhs_min, intmax_t rhs_max, typename rhs_policy
 >
 bool operator<(compressed_optional<lhs_min, lhs_max, lhs_policy> const & lhs, compressed_optional<rhs_min, rhs_max, rhs_policy> const & rhs) noexcept {
 	return (static_cast<bool>(lhs) and static_cast<bool>(rhs)) ?
@@ -176,24 +176,24 @@ bool operator<(compressed_optional<lhs_min, lhs_max, lhs_policy> const & lhs, co
 }
 
 template<
-	intmax_t lhs_min, intmax_t lhs_max, template<intmax_t, intmax_t> class lhs_policy,
-	intmax_t rhs_min, intmax_t rhs_max, template<intmax_t, intmax_t> class rhs_policy
+	intmax_t lhs_min, intmax_t lhs_max, typename lhs_policy,
+	intmax_t rhs_min, intmax_t rhs_max, typename rhs_policy
 >
 bool operator>(compressed_optional<lhs_min, lhs_max, lhs_policy> const & lhs, compressed_optional<rhs_min, rhs_max, rhs_policy> const & rhs) noexcept {
 	return rhs < lhs;
 }
 
 template<
-	intmax_t lhs_min, intmax_t lhs_max, template<intmax_t, intmax_t> class lhs_policy,
-	intmax_t rhs_min, intmax_t rhs_max, template<intmax_t, intmax_t> class rhs_policy
+	intmax_t lhs_min, intmax_t lhs_max, typename lhs_policy,
+	intmax_t rhs_min, intmax_t rhs_max, typename rhs_policy
 >
 bool operator<=(compressed_optional<lhs_min, lhs_max, lhs_policy> const & lhs, compressed_optional<rhs_min, rhs_max, rhs_policy> const & rhs) noexcept {
 	return !(rhs < lhs);
 }
 
 template<
-	intmax_t lhs_min, intmax_t lhs_max, template<intmax_t, intmax_t> class lhs_policy,
-	intmax_t rhs_min, intmax_t rhs_max, template<intmax_t, intmax_t> class rhs_policy
+	intmax_t lhs_min, intmax_t lhs_max, typename lhs_policy,
+	intmax_t rhs_min, intmax_t rhs_max, typename rhs_policy
 >
 bool operator>=(compressed_optional<lhs_min, lhs_max, lhs_policy> const & lhs, compressed_optional<rhs_min, rhs_max, rhs_policy> const & rhs) noexcept {
 	return !(lhs < rhs);
@@ -202,16 +202,16 @@ bool operator>=(compressed_optional<lhs_min, lhs_max, lhs_policy> const & lhs, c
 
 
 template<
-	intmax_t lhs_min, intmax_t lhs_max, template<intmax_t, intmax_t> class lhs_policy,
-	intmax_t rhs_min, intmax_t rhs_max, template<intmax_t, intmax_t> class rhs_policy
+	intmax_t lhs_min, intmax_t lhs_max, typename lhs_policy,
+	intmax_t rhs_min, intmax_t rhs_max, typename rhs_policy
 >
 bool operator==(compressed_optional<lhs_min, lhs_max, lhs_policy> const & lhs, ranged_integer<rhs_min, rhs_max, rhs_policy> const & rhs) noexcept {
 	return static_cast<bool>(lhs) and *lhs == rhs;
 }
 
 template<
-	intmax_t lhs_min, intmax_t lhs_max, template<intmax_t, intmax_t> class lhs_policy,
-	intmax_t rhs_min, intmax_t rhs_max, template<intmax_t, intmax_t> class rhs_policy
+	intmax_t lhs_min, intmax_t lhs_max, typename lhs_policy,
+	intmax_t rhs_min, intmax_t rhs_max, typename rhs_policy
 >
 bool operator==(ranged_integer<lhs_min, lhs_max, lhs_policy> const & lhs, compressed_optional<rhs_min, rhs_max, rhs_policy> const & rhs) noexcept {
 	return rhs == lhs;
@@ -219,16 +219,16 @@ bool operator==(ranged_integer<lhs_min, lhs_max, lhs_policy> const & lhs, compre
 
 
 template<
-	intmax_t lhs_min, intmax_t lhs_max, template<intmax_t, intmax_t> class lhs_policy,
-	intmax_t rhs_min, intmax_t rhs_max, template<intmax_t, intmax_t> class rhs_policy
+	intmax_t lhs_min, intmax_t lhs_max, typename lhs_policy,
+	intmax_t rhs_min, intmax_t rhs_max, typename rhs_policy
 >
 bool operator!=(compressed_optional<lhs_min, lhs_max, lhs_policy> const & lhs, ranged_integer<rhs_min, rhs_max, rhs_policy> const & rhs) noexcept {
 	return !(lhs == rhs);
 }
 
 template<
-	intmax_t lhs_min, intmax_t lhs_max, template<intmax_t, intmax_t> class lhs_policy,
-	intmax_t rhs_min, intmax_t rhs_max, template<intmax_t, intmax_t> class rhs_policy
+	intmax_t lhs_min, intmax_t lhs_max, typename lhs_policy,
+	intmax_t rhs_min, intmax_t rhs_max, typename rhs_policy
 >
 bool operator!=(ranged_integer<lhs_min, lhs_max, lhs_policy> const & lhs, compressed_optional<rhs_min, rhs_max, rhs_policy> const & rhs) noexcept {
 	return !(rhs == lhs);
@@ -236,16 +236,16 @@ bool operator!=(ranged_integer<lhs_min, lhs_max, lhs_policy> const & lhs, compre
 
 
 template<
-	intmax_t lhs_min, intmax_t lhs_max, template<intmax_t, intmax_t> class lhs_policy,
-	intmax_t rhs_min, intmax_t rhs_max, template<intmax_t, intmax_t> class rhs_policy
+	intmax_t lhs_min, intmax_t lhs_max, typename lhs_policy,
+	intmax_t rhs_min, intmax_t rhs_max, typename rhs_policy
 >
 bool operator<(compressed_optional<lhs_min, lhs_max, lhs_policy> const & lhs, ranged_integer<rhs_min, rhs_max, rhs_policy> const & rhs) noexcept {
 	return !static_cast<bool>(lhs) ? true : *lhs == rhs;
 }
 
 template<
-	intmax_t lhs_min, intmax_t lhs_max, template<intmax_t, intmax_t> class lhs_policy,
-	intmax_t rhs_min, intmax_t rhs_max, template<intmax_t, intmax_t> class rhs_policy
+	intmax_t lhs_min, intmax_t lhs_max, typename lhs_policy,
+	intmax_t rhs_min, intmax_t rhs_max, typename rhs_policy
 >
 bool operator<(ranged_integer<lhs_min, lhs_max, lhs_policy> const & lhs, compressed_optional<rhs_min, rhs_max, rhs_policy> const & rhs) noexcept {
 	return !static_cast<bool>(rhs) ? false : lhs == *rhs;
@@ -253,16 +253,16 @@ bool operator<(ranged_integer<lhs_min, lhs_max, lhs_policy> const & lhs, compres
 
 
 template<
-	intmax_t lhs_min, intmax_t lhs_max, template<intmax_t, intmax_t> class lhs_policy,
-	intmax_t rhs_min, intmax_t rhs_max, template<intmax_t, intmax_t> class rhs_policy
+	intmax_t lhs_min, intmax_t lhs_max, typename lhs_policy,
+	intmax_t rhs_min, intmax_t rhs_max, typename rhs_policy
 >
 bool operator>(compressed_optional<lhs_min, lhs_max, lhs_policy> const & lhs, ranged_integer<rhs_min, rhs_max, rhs_policy> const & rhs) noexcept {
 	return rhs < lhs;
 }
 
 template<
-	intmax_t lhs_min, intmax_t lhs_max, template<intmax_t, intmax_t> class lhs_policy,
-	intmax_t rhs_min, intmax_t rhs_max, template<intmax_t, intmax_t> class rhs_policy
+	intmax_t lhs_min, intmax_t lhs_max, typename lhs_policy,
+	intmax_t rhs_min, intmax_t rhs_max, typename rhs_policy
 >
 bool operator>(ranged_integer<lhs_min, lhs_max, lhs_policy> const & lhs, compressed_optional<rhs_min, rhs_max, rhs_policy> const & rhs) noexcept {
 	return rhs < lhs;
@@ -270,16 +270,16 @@ bool operator>(ranged_integer<lhs_min, lhs_max, lhs_policy> const & lhs, compres
 
 
 template<
-	intmax_t lhs_min, intmax_t lhs_max, template<intmax_t, intmax_t> class lhs_policy,
-	intmax_t rhs_min, intmax_t rhs_max, template<intmax_t, intmax_t> class rhs_policy
+	intmax_t lhs_min, intmax_t lhs_max, typename lhs_policy,
+	intmax_t rhs_min, intmax_t rhs_max, typename rhs_policy
 >
 bool operator<=(compressed_optional<lhs_min, lhs_max, lhs_policy> const & lhs, ranged_integer<rhs_min, rhs_max, rhs_policy> const & rhs) noexcept {
 	return !(rhs < lhs);
 }
 
 template<
-	intmax_t lhs_min, intmax_t lhs_max, template<intmax_t, intmax_t> class lhs_policy,
-	intmax_t rhs_min, intmax_t rhs_max, template<intmax_t, intmax_t> class rhs_policy
+	intmax_t lhs_min, intmax_t lhs_max, typename lhs_policy,
+	intmax_t rhs_min, intmax_t rhs_max, typename rhs_policy
 >
 bool operator<=(ranged_integer<lhs_min, lhs_max, lhs_policy> const & lhs, compressed_optional<rhs_min, rhs_max, rhs_policy> const & rhs) noexcept {
 	return !(rhs < lhs);
@@ -287,16 +287,16 @@ bool operator<=(ranged_integer<lhs_min, lhs_max, lhs_policy> const & lhs, compre
 
 
 template<
-	intmax_t lhs_min, intmax_t lhs_max, template<intmax_t, intmax_t> class lhs_policy,
-	intmax_t rhs_min, intmax_t rhs_max, template<intmax_t, intmax_t> class rhs_policy
+	intmax_t lhs_min, intmax_t lhs_max, typename lhs_policy,
+	intmax_t rhs_min, intmax_t rhs_max, typename rhs_policy
 >
 bool operator>=(compressed_optional<lhs_min, lhs_max, lhs_policy> const & lhs, ranged_integer<rhs_min, rhs_max, rhs_policy> const & rhs) noexcept {
 	return !(lhs < rhs);
 }
 
 template<
-	intmax_t lhs_min, intmax_t lhs_max, template<intmax_t, intmax_t> class lhs_policy,
-	intmax_t rhs_min, intmax_t rhs_max, template<intmax_t, intmax_t> class rhs_policy
+	intmax_t lhs_min, intmax_t lhs_max, typename lhs_policy,
+	intmax_t rhs_min, intmax_t rhs_max, typename rhs_policy
 >
 bool operator>=(ranged_integer<lhs_min, lhs_max, lhs_policy> const & lhs, compressed_optional<rhs_min, rhs_max, rhs_policy> const & rhs) noexcept {
 	return !(lhs < rhs);
@@ -316,16 +316,16 @@ public:
 };
 
 template<
-	intmax_t minimum, intmax_t maximum, template<intmax_t, intmax_t> class policy,
+	intmax_t minimum, intmax_t maximum, typename policy,
 	bool use_compressed_version
 >
 class optional_c;
-template<intmax_t minimum, intmax_t maximum, template<intmax_t, intmax_t> class policy>
+template<intmax_t minimum, intmax_t maximum, typename policy>
 class optional_c<minimum, maximum, policy, true> {
 public:
 	using type = compressed_optional<minimum, maximum, policy>;
 };
-template<intmax_t minimum, intmax_t maximum, template<intmax_t, intmax_t> class policy>
+template<intmax_t minimum, intmax_t maximum, typename policy>
 class optional_c<minimum, maximum, policy, false> {
 public:
 	using type = boost::optional<ranged_integer<minimum, maximum, policy>>;
@@ -336,7 +336,7 @@ class optional_general {
 public:
 	using type = boost::optional<T>;
 };
-template<intmax_t minimum, intmax_t maximum, template<intmax_t, intmax_t> class policy>
+template<intmax_t minimum, intmax_t maximum, typename policy>
 class optional_general<ranged_integer<minimum, maximum, policy>> {
 public:
 	using type = typename optional_c<minimum, maximum, policy, has_extra_space<minimum, maximum>::value>::type;

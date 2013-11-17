@@ -23,8 +23,8 @@
 #include "minmax.hpp"
 #include <type_traits>
 
-template<intmax_t minimum, intmax_t maximum, template<intmax_t, intmax_t> class OverflowPolicy, typename result_type = ranged_integer<max(0, minimum, -maximum), max(maximum, -minimum), OverflowPolicy>>
-constexpr result_type abs(ranged_integer<minimum, maximum, OverflowPolicy> const value) noexcept {
+template<intmax_t minimum, intmax_t maximum, typename overflow_policy, typename result_type = ranged_integer<max(0, minimum, -maximum), max(maximum, -minimum), overflow_policy>>
+constexpr result_type abs(ranged_integer<minimum, maximum, overflow_policy> const value) noexcept {
 	// We have to cast the value to the common type of the argument and result
 	// type before we negate because -min might not be in the value, even if we
 	// were to cast to the underlying type first.

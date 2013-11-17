@@ -56,12 +56,12 @@ constexpr bool is_explicitly_constructible_from() noexcept {
 
 }	// namespace detail
 
-template<intmax_t minimum, intmax_t maximum, template<intmax_t, intmax_t> class OverflowPolicy>
+template<intmax_t minimum, intmax_t maximum, typename OverflowPolicy>
 class ranged_integer {
 public:
 	static_assert(minimum <= maximum, "Maximum cannot be less than minimum");
 	using underlying_type = detail::underlying_t<minimum, maximum>;
-	using overflow_policy = OverflowPolicy<minimum, maximum>;
+	using overflow_policy = OverflowPolicy;
 	static_assert(detail::entirely_in_range<underlying_type>(minimum, maximum), "Not all values can fit in the range of the underlying_type.");
 
 	static_assert(minimum < 0 ? std::numeric_limits<underlying_type>::is_signed : true, "Underlying type should be signed.");
@@ -92,7 +92,7 @@ public:
 		detail::is_explicitly_constructible_from<minimum, maximum, overflow_policy, integer>()
 	> = clang_dummy>
 	constexpr explicit ranged_integer(integer && other):
-		ranged_integer(overflow_policy{}.assignment(std::forward<integer>(other)), non_check) {
+		ranged_integer(overflow_policy{}.assignment(minimum, maximum, std::forward<integer>(other)), non_check) {
 	}
 
 	ranged_integer & operator=(ranged_integer const &) noexcept = default;

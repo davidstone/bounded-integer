@@ -19,7 +19,7 @@
 
 #include <cstdint>
 
-template<intmax_t minimum, intmax_t maximum, template<intmax_t, intmax_t> class OverflowPolicy>
+template<intmax_t minimum, intmax_t maximum, typename overflow_policy>
 class ranged_integer;
 
 // Does not verify that the value is in range with the policy

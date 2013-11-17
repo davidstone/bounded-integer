@@ -35,12 +35,12 @@ class get_max {
 public:
 	static constexpr intmax_t value = std::numeric_limits<integer>::max();
 };
-template<intmax_t minimum, intmax_t maximum, template<intmax_t, intmax_t> class overflow_policy>
+template<intmax_t minimum, intmax_t maximum, typename overflow_policy>
 class get_min<ranged_integer<minimum, maximum, overflow_policy>> {
 public:
 	static constexpr intmax_t value = minimum;
 };
-template<intmax_t minimum, intmax_t maximum, template<intmax_t, intmax_t> class overflow_policy>
+template<intmax_t minimum, intmax_t maximum, typename overflow_policy>
 class get_max<ranged_integer<minimum, maximum, overflow_policy>> {
 public:
 	static constexpr intmax_t value = maximum;

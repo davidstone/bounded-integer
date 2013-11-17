@@ -46,8 +46,8 @@ namespace std {
 // the type passed in, which will always work.
 
 template<
-	intmax_t lhs_min, intmax_t lhs_max, template<intmax_t, intmax_t> class lhs_policy,
-	intmax_t rhs_min, intmax_t rhs_max, template<intmax_t, intmax_t> class rhs_policy
+	intmax_t lhs_min, intmax_t lhs_max, typename lhs_policy,
+	intmax_t rhs_min, intmax_t rhs_max, typename rhs_policy
 >
 class common_type<ranged_integer<lhs_min, lhs_max, lhs_policy>, ranged_integer<rhs_min, rhs_max, rhs_policy>> {
 private:
@@ -59,7 +59,7 @@ public:
 
 // Common type of a ranged_integer and a built-in
 // Cannot seem to get this to work with enable_if
-template<intmax_t minimum, intmax_t maximum, template<intmax_t, intmax_t> class overflow_policy, typename integer>
+template<intmax_t minimum, intmax_t maximum, typename overflow_policy, typename integer>
 class common_type<ranged_integer<minimum, maximum, overflow_policy>, integer> {
 private:
 	using type1 = ranged_integer<minimum, maximum, overflow_policy>;
@@ -87,7 +87,7 @@ public:
 
 template<
 	typename integer1,
-	intmax_t minimum, intmax_t maximum, template<intmax_t, intmax_t> class overflow_policy
+	intmax_t minimum, intmax_t maximum, typename overflow_policy
 >
 class common_type<integer1, ranged_integer<minimum, maximum, overflow_policy>> {
 public:

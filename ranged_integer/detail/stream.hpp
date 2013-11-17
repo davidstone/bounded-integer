@@ -24,7 +24,7 @@
 
 template<
 	typename CharT, typename Traits,
-	intmax_t minimum, intmax_t maximum, template<intmax_t, intmax_t> class policy
+	intmax_t minimum, intmax_t maximum, typename policy
 >
 std::basic_ostream<CharT, Traits> & operator<<(std::basic_ostream<CharT, Traits> & out, ranged_integer<minimum, maximum, policy> const & x) {
 	// The unary plus applies integer promotions to x. This ensures values are
@@ -35,7 +35,7 @@ std::basic_ostream<CharT, Traits> & operator<<(std::basic_ostream<CharT, Traits>
 }
 template<
 	typename CharT, typename Traits,
-	intmax_t minimum, intmax_t maximum, template<intmax_t, intmax_t> class policy
+	intmax_t minimum, intmax_t maximum, typename policy
 >
 std::basic_ostream<CharT, Traits> & operator<<(std::basic_ostream<CharT, Traits> & out, ranged_integer<minimum, maximum, policy> const volatile & x) {
 	return out << +x.value();
@@ -43,7 +43,7 @@ std::basic_ostream<CharT, Traits> & operator<<(std::basic_ostream<CharT, Traits>
 
 template<
 	typename CharT, typename Traits,
-	intmax_t minimum, intmax_t maximum, template<intmax_t, intmax_t> class policy
+	intmax_t minimum, intmax_t maximum, typename policy
 >
 std::basic_istream<CharT, Traits> & operator>>(std::basic_istream<CharT, Traits> & in, ranged_integer<minimum, maximum, policy> & x) {
 	// I made this intmax_t rather than underlying_type to maximize the chances
@@ -56,7 +56,7 @@ std::basic_istream<CharT, Traits> & operator>>(std::basic_istream<CharT, Traits>
 }
 template<
 	typename CharT, typename Traits,
-	intmax_t minimum, intmax_t maximum, template<intmax_t, intmax_t> class policy
+	intmax_t minimum, intmax_t maximum, typename policy
 >
 std::basic_istream<CharT, Traits> & operator>>(std::basic_istream<CharT, Traits> & in, ranged_integer<minimum, maximum, policy> volatile & x) {
 	// I made this intmax_t rather than underlying_type to maximize the chances

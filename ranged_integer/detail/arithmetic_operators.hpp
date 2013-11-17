@@ -31,8 +31,8 @@
 // case result_t is narrower than one of the arguments.
 #define RANGED_INTEGER_OPERATOR_OVERLOADS(symbol, operator_name) \
 template< \
-	intmax_t lhs_min, intmax_t lhs_max, template<intmax_t, intmax_t> class lhs_overflow_policy, \
-	intmax_t rhs_min, intmax_t rhs_max, template<intmax_t, intmax_t> class rhs_overflow_policy, \
+	intmax_t lhs_min, intmax_t lhs_max, typename lhs_overflow_policy, \
+	intmax_t rhs_min, intmax_t rhs_max, typename rhs_overflow_policy, \
 	typename result_t = operator_result<lhs_min, lhs_max, lhs_overflow_policy, rhs_min, rhs_max, rhs_overflow_policy, operator_name> \
 > \
 constexpr result_t operator symbol( \
@@ -47,7 +47,7 @@ constexpr result_t operator symbol( \
 template< \
 	intmax_t lhs_min, intmax_t lhs_max, \
 	typename integer, \
-	template<intmax_t, intmax_t> class overflow_policy, \
+	typename overflow_policy, \
 	enable_if_t<std::is_integral<integer>::value> = clang_dummy \
 > \
 constexpr auto operator symbol( \
@@ -59,7 +59,7 @@ constexpr auto operator symbol( \
 template< \
 	typename integer, \
 	intmax_t rhs_min, intmax_t rhs_max, \
-	template<intmax_t, intmax_t> class overflow_policy, \
+	typename overflow_policy, \
 	enable_if_t<std::is_integral<integer>::value> = clang_dummy \
 > \
 constexpr auto operator symbol( \
@@ -81,7 +81,7 @@ RANGED_INTEGER_OPERATOR_OVERLOADS(%, detail::modulus)
 // Unary minus
 
 template<
-	intmax_t minimum, intmax_t maximum, template<intmax_t, intmax_t> class overflow_policy,
+	intmax_t minimum, intmax_t maximum, typename overflow_policy,
 	typename result_type = unary_minus_result<minimum, maximum, overflow_policy>
 >
 constexpr result_type operator-(ranged_integer<minimum, maximum, overflow_policy> const value) noexcept {
@@ -92,8 +92,8 @@ constexpr result_type operator-(ranged_integer<minimum, maximum, overflow_policy
 
 // Unary plus
 
-template<intmax_t minimum, intmax_t maximum, template<intmax_t, intmax_t> class OverflowPolicy>
-constexpr ranged_integer<minimum, maximum, OverflowPolicy> operator+(ranged_integer<minimum, maximum, OverflowPolicy> const value) noexcept {
+template<intmax_t minimum, intmax_t maximum, typename overflow_policy>
+constexpr ranged_integer<minimum, maximum, overflow_policy> operator+(ranged_integer<minimum, maximum, overflow_policy> const value) noexcept {
 	return value;
 }
 

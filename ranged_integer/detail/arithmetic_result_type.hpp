@@ -278,8 +278,8 @@ public:
 
 
 template<
-	intmax_t lhs_min, intmax_t lhs_max, template<intmax_t, intmax_t> class lhs_overflow,
-	intmax_t rhs_min, intmax_t rhs_max, template<intmax_t, intmax_t> class rhs_overflow,
+	intmax_t lhs_min, intmax_t lhs_max, typename lhs_overflow,
+	intmax_t rhs_min, intmax_t rhs_max, typename rhs_overflow,
 	typename Operator
 >
 using operator_result = typename common_policy<lhs_overflow, rhs_overflow>::template type<
@@ -287,7 +287,7 @@ using operator_result = typename common_policy<lhs_overflow, rhs_overflow>::temp
 	detail::operator_range<lhs_min, lhs_max, rhs_min, rhs_max, Operator>::max()
 >;
 
-template<intmax_t minimum, intmax_t maximum, template<intmax_t, intmax_t> class overflow_policy>
+template<intmax_t minimum, intmax_t maximum, typename overflow_policy>
 using unary_minus_result = ranged_integer<-maximum, -minimum, overflow_policy>;
 
 #endif	// RANGED_INTEGER_ARITHMETIC_RESULT_TYPE_HPP_

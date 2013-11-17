@@ -25,12 +25,12 @@
 // We call make_ranged with the target's overflow policy because we need this
 // exact overflow policy. We do not want to rely on common_policy here.
 #define RANGED_INTEGER_COMPOUND_ASSIGNMENT_OPERATOR_TARGET(symbol) \
-template<intmax_t minimum, intmax_t maximum, template<intmax_t, intmax_t> class overflow_policy, typename integer> \
+template<intmax_t minimum, intmax_t maximum, typename overflow_policy, typename integer> \
 ranged_integer<minimum, maximum, overflow_policy> & operator symbol##=(ranged_integer<minimum, maximum, overflow_policy> & lhs, integer && rhs) { \
 	lhs = static_cast<ranged_integer<minimum, maximum, overflow_policy>>(lhs symbol make_ranged<overflow_policy>(std::forward<integer>(rhs))); \
 	return lhs; \
 } \
-template<intmax_t minimum, intmax_t maximum, template<intmax_t, intmax_t> class overflow_policy, typename integer> \
+template<intmax_t minimum, intmax_t maximum, typename overflow_policy, typename integer> \
 ranged_integer<minimum, maximum, overflow_policy> volatile & operator symbol##=(ranged_integer<minimum, maximum, overflow_policy> volatile & lhs, integer && rhs) { \
 	lhs = static_cast<ranged_integer<minimum, maximum, overflow_policy>>(lhs symbol make_ranged<overflow_policy>(std::forward<integer>(rhs))); \
 	return lhs; \
@@ -47,11 +47,11 @@ RANGED_INTEGER_COMPOUND_ASSIGNMENT_OPERATOR_TARGET(%)
 
 
 #define RANGED_INTEGER_COMPOUND_ASSIGNMENT_OPERATOR_SOURCE(symbol) \
-template<typename integer, intmax_t minimum, intmax_t maximum, template<intmax_t, intmax_t> class overflow_policy, enable_if_t<std::is_integral<integer>::value> = clang_dummy> \
+template<typename integer, intmax_t minimum, intmax_t maximum, typename overflow_policy, enable_if_t<std::is_integral<integer>::value> = clang_dummy> \
 integer & operator symbol(integer & lhs, ranged_integer<minimum, maximum, overflow_policy> const rhs) noexcept { \
 	return lhs symbol rhs.value(); \
 } \
-template<typename integer, intmax_t minimum, intmax_t maximum, template<intmax_t, intmax_t> class overflow_policy, enable_if_t<std::is_integral<integer>::value> = clang_dummy> \
+template<typename integer, intmax_t minimum, intmax_t maximum, typename overflow_policy, enable_if_t<std::is_integral<integer>::value> = clang_dummy> \
 integer volatile & operator symbol(integer volatile & lhs, ranged_integer<minimum, maximum, overflow_policy> const rhs) noexcept { \
 	return lhs symbol rhs.value(); \
 }
@@ -68,50 +68,50 @@ RANGED_INTEGER_COMPOUND_ASSIGNMENT_OPERATOR_SOURCE(%=)
 
 // Increment / decrement
 
-template<intmax_t minimum, intmax_t maximum, template<intmax_t, intmax_t> class OverflowPolicy>
-ranged_integer<minimum, maximum, OverflowPolicy> & operator++(ranged_integer<minimum, maximum, OverflowPolicy> & value) {
+template<intmax_t minimum, intmax_t maximum, typename overflow_policy>
+ranged_integer<minimum, maximum, overflow_policy> & operator++(ranged_integer<minimum, maximum, overflow_policy> & value) {
 	value += make_ranged<1>();
 	return value;
 }
-template<intmax_t minimum, intmax_t maximum, template<intmax_t, intmax_t> class OverflowPolicy>
-ranged_integer<minimum, maximum, OverflowPolicy> volatile & operator++(ranged_integer<minimum, maximum, OverflowPolicy> volatile & value) {
+template<intmax_t minimum, intmax_t maximum, typename overflow_policy>
+ranged_integer<minimum, maximum, overflow_policy> volatile & operator++(ranged_integer<minimum, maximum, overflow_policy> volatile & value) {
 	value += make_ranged<1>();
 	return value;
 }
 
-template<intmax_t minimum, intmax_t maximum, template<intmax_t, intmax_t> class OverflowPolicy>
-ranged_integer<minimum, maximum, OverflowPolicy> operator++(ranged_integer<minimum, maximum, OverflowPolicy> & value, int) {
+template<intmax_t minimum, intmax_t maximum, typename overflow_policy>
+ranged_integer<minimum, maximum, overflow_policy> operator++(ranged_integer<minimum, maximum, overflow_policy> & value, int) {
 	auto const previous = value;
 	++value;
 	return previous;
 }
-template<intmax_t minimum, intmax_t maximum, template<intmax_t, intmax_t> class OverflowPolicy>
-ranged_integer<minimum, maximum, OverflowPolicy> operator++(ranged_integer<minimum, maximum, OverflowPolicy> volatile & value, int) {
+template<intmax_t minimum, intmax_t maximum, typename overflow_policy>
+ranged_integer<minimum, maximum, overflow_policy> operator++(ranged_integer<minimum, maximum, overflow_policy> volatile & value, int) {
 	auto const previous = value;
 	++value;
 	return previous;
 }
 
 
-template<intmax_t minimum, intmax_t maximum, template<intmax_t, intmax_t> class OverflowPolicy>
-ranged_integer<minimum, maximum, OverflowPolicy> & operator--(ranged_integer<minimum, maximum, OverflowPolicy> & value) {
+template<intmax_t minimum, intmax_t maximum, typename overflow_policy>
+ranged_integer<minimum, maximum, overflow_policy> & operator--(ranged_integer<minimum, maximum, overflow_policy> & value) {
 	value -= make_ranged<1>();
 	return value;
 }
-template<intmax_t minimum, intmax_t maximum, template<intmax_t, intmax_t> class OverflowPolicy>
-ranged_integer<minimum, maximum, OverflowPolicy> volatile & operator--(ranged_integer<minimum, maximum, OverflowPolicy> volatile & value) {
+template<intmax_t minimum, intmax_t maximum, typename overflow_policy>
+ranged_integer<minimum, maximum, overflow_policy> volatile & operator--(ranged_integer<minimum, maximum, overflow_policy> volatile & value) {
 	value -= make_ranged<1>();
 	return value;
 }
 
-template<intmax_t minimum, intmax_t maximum, template<intmax_t, intmax_t> class OverflowPolicy>
-ranged_integer<minimum, maximum, OverflowPolicy> operator--(ranged_integer<minimum, maximum, OverflowPolicy> & value, int) {
+template<intmax_t minimum, intmax_t maximum, typename overflow_policy>
+ranged_integer<minimum, maximum, overflow_policy> operator--(ranged_integer<minimum, maximum, overflow_policy> & value, int) {
 	auto const previous = value;
 	--value;
 	return previous;
 }
-template<intmax_t minimum, intmax_t maximum, template<intmax_t, intmax_t> class OverflowPolicy>
-ranged_integer<minimum, maximum, OverflowPolicy> operator--(ranged_integer<minimum, maximum, OverflowPolicy> volatile & value, int) {
+template<intmax_t minimum, intmax_t maximum, typename overflow_policy>
+ranged_integer<minimum, maximum, overflow_policy> operator--(ranged_integer<minimum, maximum, overflow_policy> volatile & value, int) {
 	auto const previous = value;
 	--value;
 	return previous;

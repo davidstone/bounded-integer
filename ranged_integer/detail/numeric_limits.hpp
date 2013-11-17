@@ -153,10 +153,10 @@ public:
 
 namespace std {
 
-template<intmax_t minimum, intmax_t maximum, template<intmax_t, intmax_t> class OverflowPolicy>
-class numeric_limits<ranged_integer<minimum, maximum, OverflowPolicy>> {
+template<intmax_t minimum, intmax_t maximum, typename overflow_policy>
+class numeric_limits<ranged_integer<minimum, maximum, overflow_policy>> {
 private:
-	using type = ranged_integer<minimum, maximum, OverflowPolicy>;
+	using type = ranged_integer<minimum, maximum, overflow_policy>;
 public:
 	static constexpr bool is_specialized = true;
 	static constexpr bool is_signed = minimum < 0;
@@ -170,7 +170,7 @@ public:
 	static constexpr auto round_style = std::round_toward_zero;
 	static constexpr bool is_iec559 = false;
 	static constexpr bool is_bounded = true;
-	static constexpr bool is_modulo = OverflowPolicy<maximum, minimum>::is_modulo;
+	static constexpr bool is_modulo = overflow_policy::is_modulo;
 	static constexpr int radix = 2;
 	static constexpr int digits = detail::digits<radix>::calculate(minimum, maximum);
 	static constexpr int digits10 = detail::digits<10>::calculate(minimum, maximum);

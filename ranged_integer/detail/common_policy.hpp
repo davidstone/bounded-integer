@@ -25,24 +25,24 @@
 // for nested common_policy instantiations, so I use this instead. See
 // http://stackoverflow.com/questions/13896509/is-it-possible-to-define-an-alias-for-a-template-template-parameter
 
-template<template<intmax_t, intmax_t> class policy1, template<intmax_t, intmax_t> class policy2>
+template<typename policy1, typename policy2>
 class common_policy {
 };
 
-template<template<intmax_t, intmax_t> class policy>
+template<typename policy>
 class common_policy<policy, policy> {
 public:
 	template<intmax_t minimum, intmax_t maximum>
 	using type = ranged_integer<minimum, maximum, policy>;
 };
 
-template<template<intmax_t, intmax_t> class policy>
+template<typename policy>
 class common_policy<policy, null_policy> {
 public:
 	template<intmax_t minimum, intmax_t maximum>
 	using type = ranged_integer<minimum, maximum, policy>;
 };
-template<template<intmax_t, intmax_t> class policy>
+template<typename policy>
 class common_policy<null_policy, policy> {
 public:
 	template<intmax_t minimum, intmax_t maximum>
