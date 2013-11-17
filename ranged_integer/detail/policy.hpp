@@ -54,12 +54,12 @@ public:
 	null_policy volatile & operator=(null_policy volatile &&) volatile noexcept {
 		return *this;
 	}
-	template<typename integer>
-	constexpr integer assignment(intmax_t, intmax_t, integer const new_value) const noexcept {
+	template<intmax_t, intmax_t, typename integer>
+	constexpr integer assignment(integer const new_value) const noexcept {
 		return new_value;
 	}
-	template<typename integer>
-	constexpr integer assignment(intmax_t, intmax_t, integer const new_value) const volatile noexcept {
+	template<intmax_t, intmax_t, typename integer>
+	constexpr integer assignment(integer const new_value) const volatile noexcept {
 		return new_value;
 	}
 
@@ -100,16 +100,16 @@ public:
 		return *this;
 	}
 	// The optimizer should be able to simplify this to remove dead checks.
-	template<typename integer>
-	constexpr integer assignment(intmax_t minimum, intmax_t maximum, integer const new_value) const {
+	template<intmax_t minimum, intmax_t maximum, typename integer>
+	constexpr integer assignment(integer const new_value) const {
 		return (new_value < minimum) ?
 			throw std::underflow_error{"Value too small"} :
 			((new_value > maximum) ?
 				throw std::overflow_error{"Value too large"} :
 				new_value);
 	}
-	template<typename integer>
-	constexpr integer assignment(intmax_t minimum, intmax_t maximum, integer const new_value) const volatile {
+	template<intmax_t minimum, intmax_t maximum, typename integer>
+	constexpr integer assignment(integer const new_value) const volatile {
 		return (new_value < minimum) ?
 			throw std::underflow_error{"Value too small"} :
 			((new_value > maximum) ?
@@ -152,15 +152,15 @@ public:
 	clamp_on_overflow volatile & operator=(clamp_on_overflow volatile &&) volatile noexcept {
 		return *this;
 	}
-	template<typename integer>
-	constexpr integer assignment(intmax_t minimum, intmax_t maximum, integer const new_value) const noexcept {
+	template<intmax_t minimum, intmax_t maximum, typename integer>
+	constexpr integer assignment(integer const new_value) const noexcept {
 		return
 			(new_value <= minimum) ? static_cast<integer>(minimum) :
 			(new_value >= maximum) ? static_cast<integer>(maximum) :
 			new_value;
 	}
-	template<typename integer>
-	constexpr integer assignment(intmax_t minimum, intmax_t maximum, integer const new_value) const volatile noexcept {
+	template<intmax_t minimum, intmax_t maximum, typename integer>
+	constexpr integer assignment(integer const new_value) const volatile noexcept {
 		return
 			(new_value <= minimum) ? static_cast<integer>(minimum) :
 			(new_value >= maximum) ? static_cast<integer>(maximum) :

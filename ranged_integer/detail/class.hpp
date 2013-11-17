@@ -92,7 +92,7 @@ public:
 		detail::is_explicitly_constructible_from<minimum, maximum, overflow_policy_type, integer>()
 	> = clang_dummy>
 	constexpr explicit ranged_integer(integer && other):
-		ranged_integer(overflow_policy_type{}.assignment(minimum, maximum, std::forward<integer>(other)), non_check) {
+		ranged_integer(overflow_policy_type{}.template assignment<minimum, maximum>(std::forward<integer>(other)), non_check) {
 	}
 
 	ranged_integer & operator=(ranged_integer const &) noexcept = default;
