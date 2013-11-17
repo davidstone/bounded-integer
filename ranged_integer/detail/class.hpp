@@ -61,7 +61,7 @@ class ranged_integer {
 public:
 	static_assert(minimum <= maximum, "Maximum cannot be less than minimum");
 	using underlying_type = detail::underlying_t<minimum, maximum>;
-	using overflow_policy = OverflowPolicy;
+	using overflow_policy_type = OverflowPolicy;
 	static_assert(detail::entirely_in_range<underlying_type>(minimum, maximum), "Not all values can fit in the range of the underlying_type.");
 
 	static_assert(minimum < 0 ? std::numeric_limits<underlying_type>::is_signed : true, "Underlying type should be signed.");
@@ -89,10 +89,10 @@ public:
 	}
 
 	template<typename integer, enable_if_t<
-		detail::is_explicitly_constructible_from<minimum, maximum, overflow_policy, integer>()
+		detail::is_explicitly_constructible_from<minimum, maximum, overflow_policy_type, integer>()
 	> = clang_dummy>
 	constexpr explicit ranged_integer(integer && other):
-		ranged_integer(overflow_policy{}.assignment(minimum, maximum, std::forward<integer>(other)), non_check) {
+		ranged_integer(overflow_policy_type{}.assignment(minimum, maximum, std::forward<integer>(other)), non_check) {
 	}
 
 	ranged_integer & operator=(ranged_integer const &) noexcept = default;
