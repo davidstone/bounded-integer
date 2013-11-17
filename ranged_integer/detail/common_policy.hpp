@@ -17,42 +17,47 @@
 #ifndef RANGED_INTEGER_COMMON_POLICY_HPP_
 #define RANGED_INTEGER_COMMON_POLICY_HPP_
 
-#include "forward_declaration.hpp"
 #include "policy.hpp"
-#include <cstdint>
 
-// I wanted the type alias to just be the policy, but that ends up not working
-// for nested common_policy instantiations, so I use this instead. See
-// http://stackoverflow.com/questions/13896509/is-it-possible-to-define-an-alias-for-a-template-template-parameter
-
-template<typename policy1, typename policy2>
+template<typename... policies>
 class common_policy {
+};
+
+template<typename policy1, typename policy2, typename... policies>
+class common_policy<policy1, policy2, policies...> {
+public:
+	using type = typename common_policy<typename common_policy<policy1, policy2>::type, policies...>::type;
+};
+
+template<typename policy>
+class common_policy<policy> {
+public:
+	using type = policy;
 };
 
 template<typename policy>
 class common_policy<policy, policy> {
 public:
-	template<intmax_t minimum, intmax_t maximum>
-	using type = ranged_integer<minimum, maximum, policy>;
+	using type = policy;
 };
 
 template<typename policy>
 class common_policy<policy, null_policy> {
 public:
-	template<intmax_t minimum, intmax_t maximum>
-	using type = ranged_integer<minimum, maximum, policy>;
+	using type = policy;
 };
 template<typename policy>
 class common_policy<null_policy, policy> {
 public:
-	template<intmax_t minimum, intmax_t maximum>
-	using type = ranged_integer<minimum, maximum, policy>;
+	using type = policy;
 };
 template<>
 class common_policy<null_policy, null_policy> {
 public:
-	template<intmax_t minimum, intmax_t maximum>
-	using type = ranged_integer<minimum, maximum, null_policy>;
+	using type = null_policy;
 };
+
+template<typename... policies>
+using common_policy_t = typename common_policy<policies...>::type;
 
 #endif	// RANGED_INTEGER_COMMON_POLICY_HPP_

@@ -54,7 +54,7 @@ private:
 	static constexpr auto minimum = (lhs_min < rhs_min) ? lhs_min : rhs_min;
 	static constexpr auto maximum = (lhs_max > rhs_max) ? lhs_max : rhs_max;
 public:
-	using type = typename common_policy<lhs_policy, rhs_policy>::template type<minimum, maximum>;
+	using type = ranged_integer<minimum, maximum, common_policy_t<lhs_policy, rhs_policy>>;
 };
 
 // Common type of a ranged_integer and a built-in

@@ -16,16 +16,22 @@
 
 #include "common_policy.hpp"
 
-static_assert(std::is_same<common_policy<null_policy, null_policy>::type<0, 0>, ranged_integer<0, 0, null_policy>>::value, "common_policy gives wrong type for all null_policy");
+static_assert(
+	std::is_same<common_policy_t<null_policy, null_policy>, null_policy>::value,
+	"common_policy gives wrong type for all null_policy"
+);
 
-static_assert(std::is_same<common_policy<null_policy, throw_on_overflow>::type<0, 0>, ranged_integer<0, 0, throw_on_overflow>>::value, "common_policy gives wrong type for one null_policy (first)");
+static_assert(
+	std::is_same<common_policy_t<null_policy, throw_on_overflow>, throw_on_overflow>::value,
+	"common_policy gives wrong type for one null_policy (first)"
+);
 
-static_assert(std::is_same<common_policy<throw_on_overflow, null_policy>::type<0, 0>, ranged_integer<0, 0, throw_on_overflow>>::value, "common_policy gives wrong type for one null_policy (second)");
+static_assert(
+	std::is_same<common_policy_t<throw_on_overflow, null_policy>, throw_on_overflow>::value,
+	"common_policy gives wrong type for one null_policy (second)"
+);
 
-static_assert(std::is_same<
-	common_policy<
-		throw_on_overflow,
-		throw_on_overflow
-	>::type<0, 0>,
-	ranged_integer<0, 0, throw_on_overflow>
->::value, "common_policy gives wrong type for all throw_on_overflow");
+static_assert(
+	std::is_same<common_policy_t<throw_on_overflow, throw_on_overflow>, throw_on_overflow>::value,
+	"common_policy gives wrong type for all throw_on_overflow"
+);

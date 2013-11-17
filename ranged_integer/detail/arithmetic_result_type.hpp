@@ -282,9 +282,10 @@ template<
 	intmax_t rhs_min, intmax_t rhs_max, typename rhs_overflow,
 	typename Operator
 >
-using operator_result = typename common_policy<lhs_overflow, rhs_overflow>::template type<
+using operator_result = ranged_integer<
 	detail::operator_range<lhs_min, lhs_max, rhs_min, rhs_max, Operator>::min(),
-	detail::operator_range<lhs_min, lhs_max, rhs_min, rhs_max, Operator>::max()
+	detail::operator_range<lhs_min, lhs_max, rhs_min, rhs_max, Operator>::max(),
+	common_policy_t<lhs_overflow, rhs_overflow>
 >;
 
 template<intmax_t minimum, intmax_t maximum, typename overflow_policy>
