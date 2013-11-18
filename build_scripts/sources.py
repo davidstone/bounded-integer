@@ -49,5 +49,10 @@ base_sources = [('test', ['optional.cpp', 'ranged_integer.cpp'] + prepend_dir('d
 	'overlapping_range.cpp',
 	'policy.cpp',
 	'stream.cpp',
-	'ternary_conditional.cpp'
-]), [])]
+	'ternary_conditional.cpp',
+	]) + 	prepend_dir('detail/policy', [
+		'clamp_policy.cpp',
+		'null_policy.cpp',
+		'throw_policy.cpp',
+	])
+, [])]

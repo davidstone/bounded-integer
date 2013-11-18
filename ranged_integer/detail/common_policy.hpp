@@ -17,7 +17,7 @@
 #ifndef RANGED_INTEGER_COMMON_POLICY_HPP_
 #define RANGED_INTEGER_COMMON_POLICY_HPP_
 
-#include "policy.hpp"
+#include "policy/null_policy.hpp"
 
 template<typename... policies>
 class common_policy {

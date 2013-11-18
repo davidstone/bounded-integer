@@ -14,25 +14,4 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with this program. If not, see <http://www.gnu.org/licenses/>.
 
-#include "common_policy.hpp"
-#include "policy/throw_policy.hpp"
-
-static_assert(
-	std::is_same<common_policy_t<null_policy, null_policy>, null_policy>::value,
-	"common_policy gives wrong type for all null_policy"
-);
-
-static_assert(
-	std::is_same<common_policy_t<null_policy, throw_policy>, throw_policy>::value,
-	"common_policy gives wrong type for one null_policy (first)"
-);
-
-static_assert(
-	std::is_same<common_policy_t<throw_policy, null_policy>, throw_policy>::value,
-	"common_policy gives wrong type for one null_policy (second)"
-);
-
-static_assert(
-	std::is_same<common_policy_t<throw_policy, throw_policy>, throw_policy>::value,
-	"common_policy gives wrong type for all throw_policy"
-);
+#include "null_policy.hpp"

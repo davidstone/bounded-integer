@@ -20,7 +20,7 @@
 #include "class.hpp"
 #include "enable_if.hpp"
 #include "is_ranged_integer.hpp"
-#include "policy.hpp"
+#include "policy/null_policy.hpp"
 #include <limits>
 
 // This somewhat strange looking set of default arguments allows the following:

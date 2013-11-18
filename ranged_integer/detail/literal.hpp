@@ -18,9 +18,7 @@
 #define RANGED_INTEGER_LITERAL_HPP_
 
 #include "arithmetic_operators.hpp"
-#include "class.hpp"
 #include "make_ranged.hpp"
-#include "policy.hpp"
 
 namespace detail {
 
