@@ -28,26 +28,34 @@ constexpr inline intmax_t power(intmax_t const radix, intmax_t const exponent) n
 	return (exponent == 0) ? 1 : radix * power(radix, exponent - 1);
 }
 
+// I have to define value as a static member function due to a clang linker
+// error. It seems that it should be usable as a static member variable instead,
+// and that would simplify things a bit. It appears to be a bug in clang because
+// it triggers when unrelated parts of my code change, but I am not sure.
 template<char digit, char... digits>
 class literal_ranged_integer {
 private:
 	static constexpr intmax_t radix = 10;
 	static constexpr intmax_t integer_scale = power(radix, sizeof...(digits));
 public:
-	static constexpr auto value = literal_ranged_integer<digit>::value * make_ranged<integer_scale>() + literal_ranged_integer<digits...>::value;
+	static constexpr auto value() noexcept -> decltype(literal_ranged_integer<digit>::value() * make_ranged<integer_scale>() + literal_ranged_integer<digits...>::value()) {
+		return literal_ranged_integer<digit>::value() * make_ranged<integer_scale>() + literal_ranged_integer<digits...>::value();
+	}
 };
 
 template<char digit>
 class literal_ranged_integer<digit> {
 public:
-	static constexpr auto value = make_ranged<digit - '0'>();
+	static constexpr auto value() noexcept -> decltype(make_ranged<digit - '0'>()) {
+		return make_ranged<digit - '0'>();
+	}
 };
 
 }	// namespace detail
 
 template<char... digits>
-constexpr decltype(detail::literal_ranged_integer<digits...>::value) operator"" _ri() noexcept {
-	return detail::literal_ranged_integer<digits...>::value;
+constexpr decltype(detail::literal_ranged_integer<digits...>::value()) operator"" _ri() noexcept {
+	return detail::literal_ranged_integer<digits...>::value();
 }
 
 #endif	// RANGED_INTEGER_LITERAL_HPP_
