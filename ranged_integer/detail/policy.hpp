@@ -68,35 +68,35 @@ public:
 	static constexpr bool overflow_is_error = true;
 };
 
-class throw_on_overflow {
+class throw_policy {
 public:
-	constexpr throw_on_overflow() noexcept {}
-	constexpr throw_on_overflow(throw_on_overflow const &) noexcept {}
-	constexpr throw_on_overflow(throw_on_overflow &&) noexcept {}
-	constexpr throw_on_overflow(throw_on_overflow const volatile &) noexcept {}
-	constexpr throw_on_overflow(throw_on_overflow volatile &&) noexcept {}
-	throw_on_overflow & operator=(throw_on_overflow const &) noexcept {
+	constexpr throw_policy() noexcept {}
+	constexpr throw_policy(throw_policy const &) noexcept {}
+	constexpr throw_policy(throw_policy &&) noexcept {}
+	constexpr throw_policy(throw_policy const volatile &) noexcept {}
+	constexpr throw_policy(throw_policy volatile &&) noexcept {}
+	throw_policy & operator=(throw_policy const &) noexcept {
 		return *this;
 	}
-	throw_on_overflow & operator=(throw_on_overflow &&) noexcept {
+	throw_policy & operator=(throw_policy &&) noexcept {
 		return *this;
 	}
-	throw_on_overflow & operator=(throw_on_overflow const volatile &) noexcept {
+	throw_policy & operator=(throw_policy const volatile &) noexcept {
 		return *this;
 	}
-	throw_on_overflow & operator=(throw_on_overflow volatile &&) noexcept {
+	throw_policy & operator=(throw_policy volatile &&) noexcept {
 		return *this;
 	}
-	throw_on_overflow volatile & operator=(throw_on_overflow const &) volatile noexcept {
+	throw_policy volatile & operator=(throw_policy const &) volatile noexcept {
 		return *this;
 	}
-	throw_on_overflow volatile & operator=(throw_on_overflow &&) volatile noexcept {
+	throw_policy volatile & operator=(throw_policy &&) volatile noexcept {
 		return *this;
 	}
-	throw_on_overflow volatile & operator=(throw_on_overflow const volatile &) volatile noexcept {
+	throw_policy volatile & operator=(throw_policy const volatile &) volatile noexcept {
 		return *this;
 	}
-	throw_on_overflow volatile & operator=(throw_on_overflow volatile &&) volatile noexcept {
+	throw_policy volatile & operator=(throw_policy volatile &&) volatile noexcept {
 		return *this;
 	}
 	// The optimizer should be able to simplify this to remove dead checks.
@@ -121,35 +121,35 @@ public:
 	static constexpr bool overflow_is_error = true;
 };
 
-class clamp_on_overflow {
+class clamp_policy {
 public:
-	constexpr clamp_on_overflow() noexcept {}
-	constexpr clamp_on_overflow(clamp_on_overflow const &) noexcept {}
-	constexpr clamp_on_overflow(clamp_on_overflow &&) noexcept {}
-	constexpr clamp_on_overflow(clamp_on_overflow const volatile &) noexcept {}
-	constexpr clamp_on_overflow(clamp_on_overflow volatile &&) noexcept {}
-	clamp_on_overflow & operator=(clamp_on_overflow const &) noexcept {
+	constexpr clamp_policy() noexcept {}
+	constexpr clamp_policy(clamp_policy const &) noexcept {}
+	constexpr clamp_policy(clamp_policy &&) noexcept {}
+	constexpr clamp_policy(clamp_policy const volatile &) noexcept {}
+	constexpr clamp_policy(clamp_policy volatile &&) noexcept {}
+	clamp_policy & operator=(clamp_policy const &) noexcept {
 		return *this;
 	}
-	clamp_on_overflow & operator=(clamp_on_overflow &&) noexcept {
+	clamp_policy & operator=(clamp_policy &&) noexcept {
 		return *this;
 	}
-	clamp_on_overflow & operator=(clamp_on_overflow const volatile &) noexcept {
+	clamp_policy & operator=(clamp_policy const volatile &) noexcept {
 		return *this;
 	}
-	clamp_on_overflow & operator=(clamp_on_overflow volatile &&) noexcept {
+	clamp_policy & operator=(clamp_policy volatile &&) noexcept {
 		return *this;
 	}
-	clamp_on_overflow volatile & operator=(clamp_on_overflow const &) volatile noexcept {
+	clamp_policy volatile & operator=(clamp_policy const &) volatile noexcept {
 		return *this;
 	}
-	clamp_on_overflow volatile & operator=(clamp_on_overflow &&) volatile noexcept {
+	clamp_policy volatile & operator=(clamp_policy &&) volatile noexcept {
 		return *this;
 	}
-	clamp_on_overflow volatile & operator=(clamp_on_overflow const volatile &) volatile noexcept {
+	clamp_policy volatile & operator=(clamp_policy const volatile &) volatile noexcept {
 		return *this;
 	}
-	clamp_on_overflow volatile & operator=(clamp_on_overflow volatile &&) volatile noexcept {
+	clamp_policy volatile & operator=(clamp_policy volatile &&) volatile noexcept {
 		return *this;
 	}
 	template<intmax_t minimum, intmax_t maximum, typename integer>

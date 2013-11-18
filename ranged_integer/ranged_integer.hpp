@@ -33,12 +33,12 @@
 #include <cstdint>
 
 template<intmax_t minimum, intmax_t maximum>
-using checked_integer = ranged_integer<minimum, maximum, throw_on_overflow>;
+using checked_integer = ranged_integer<minimum, maximum, throw_policy>;
 
 template<intmax_t minimum, intmax_t maximum>
 using native_integer = ranged_integer<minimum, maximum, null_policy>;
 
 template<intmax_t minimum, intmax_t maximum>
-using clamped_integer = ranged_integer<minimum, maximum, clamp_on_overflow>;
+using clamped_integer = ranged_integer<minimum, maximum, clamp_policy>;
 
 #endif	// RANGED_INTEGER_HPP_

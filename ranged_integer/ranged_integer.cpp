@@ -306,7 +306,7 @@ void check_common_type() {
 void check_throw_policy() {
 	static constexpr intmax_t minimum = 0;
 	static constexpr intmax_t maximum = 10;
-	throw_on_overflow throw_policy;
+	throw_policy throw_policy;
 	try {
 		throw_policy.assignment<minimum, maximum>(20);
 		assert(false);
@@ -324,7 +324,7 @@ void check_throw_policy() {
 void check_clamp_policy() {
 	static constexpr intmax_t minimum = 27;
 	static constexpr intmax_t maximum = 567;
-	constexpr clamp_on_overflow clamp_policy;
+	constexpr clamp_policy clamp_policy;
 	static_assert(clamp_policy.assignment<minimum, maximum>(20) == minimum, "Failure to properly clamp lesser positive values.");
 	static_assert(clamp_policy.assignment<minimum, maximum>(-25) == minimum, "Failure to properly clamp negative values to a positive value.");
 	static_assert(clamp_policy.assignment<minimum, maximum>(1000) == maximum, "Failure to properly clamp greater positive values.");

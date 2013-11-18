@@ -22,16 +22,16 @@ static_assert(
 );
 
 static_assert(
-	std::is_same<common_policy_t<null_policy, throw_on_overflow>, throw_on_overflow>::value,
+	std::is_same<common_policy_t<null_policy, throw_policy>, throw_policy>::value,
 	"common_policy gives wrong type for one null_policy (first)"
 );
 
 static_assert(
-	std::is_same<common_policy_t<throw_on_overflow, null_policy>, throw_on_overflow>::value,
+	std::is_same<common_policy_t<throw_policy, null_policy>, throw_policy>::value,
 	"common_policy gives wrong type for one null_policy (second)"
 );
 
 static_assert(
-	std::is_same<common_policy_t<throw_on_overflow, throw_on_overflow>, throw_on_overflow>::value,
-	"common_policy gives wrong type for all throw_on_overflow"
+	std::is_same<common_policy_t<throw_policy, throw_policy>, throw_policy>::value,
+	"common_policy gives wrong type for all throw_policy"
 );
