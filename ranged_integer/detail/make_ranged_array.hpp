@@ -24,12 +24,12 @@
 #include <utility>
 
 template<
-	typename Integer, typename... Integers,
-	typename result_type = std::array<common_type_t<decltype(make_ranged(std::declval<Integer>())), Integers...>, 1 + sizeof...(Integers)>
+	typename... Integers,
+	typename result_type = std::array<common_type_t<decltype(make_ranged(std::declval<Integers>()))...>, sizeof...(Integers)>
 >
-constexpr result_type make_ranged_array(Integer && integer, Integers && ... integers) noexcept {
+constexpr result_type make_ranged_array(Integers && ... integers) noexcept {
 	static_assert(all_are_ranged_or_builtin_integer<Integers...>::value, "Can only be called with integer values");
-	return result_type{{make_ranged(std::forward<Integer>(integer)), make_ranged(std::forward<Integers>(integers))...}};
+	return result_type{{make_ranged(std::forward<Integers>(integers))...}};
 }
 
 template<
