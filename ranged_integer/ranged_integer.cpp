@@ -365,42 +365,6 @@ void check_literals() {
 	#undef RANGED_INTEGER_CHECK_LITERAL
 }
 
-void check_array() {
-	constexpr auto dynamic_int_array = make_ranged_array(0, 3, 6);
-	static_assert(dynamic_int_array.size() == 3, "Array size wrong.");
-	static_assert(dynamic_int_array[2] == 6, "Array element wrong.");
-	static_assert(std::is_same<decltype(make_ranged(0)), typename std::decay<decltype(dynamic_int_array[0])>::type>::value, "Array element type wrong for all int arguments.");
-	
-	constexpr auto dynamic_mixed_array = make_ranged_array(-6, 15u);
-	static_assert(dynamic_mixed_array.size() == 2, "Array size wrong.");
-	static_assert(dynamic_mixed_array[0] == -6, "Array element wrong.");
-	static_assert(std::is_same<common_type_t<decltype(make_ranged(-6)), decltype(make_ranged(15u))>, typename std::decay<decltype(dynamic_mixed_array[0])>::type>::value, "Array element type wrong for mixed int / unsigned arguments.");
-
-	constexpr auto exact_array = make_ranged_array<-100, 5, 378, 23, 10000>();
-	static_assert(exact_array.size() == 5, "Array size wrong.");
-	static_assert(exact_array[2] == 378, "Array element wrong.");
-	static_assert(std::is_same<ranged_integer<-100, 10000, null_policy>, typename std::decay<decltype(exact_array[0])>::type>::value, "Array element type wrong for exact template arguments.");
-}
-
-template<typename integer>
-void streaming_test(int const initial, int const final) {
-	integer value(initial);
-	std::stringstream in;
-	in << value;
-	assert(in.str() == std::to_string(initial));
-	std::stringstream out;
-	out << final;
-	out >> value;
-	assert(value == final);
-}
-
-void check_streaming() {
-	streaming_test<checked_integer<0, 100>>(7, 0);
-	constexpr auto large_initial = std::numeric_limits<int>::max() / 3;
-	constexpr auto large_final = -49;
-	streaming_test<decltype(make_ranged(int{}))>(large_initial, large_final);
-}
-
 template<typename T>
 void check_uncompressed_optional() {
 	using type = ranged_integer<std::numeric_limits<T>::min(), std::numeric_limits<T>::max(), null_policy>;
@@ -409,7 +373,7 @@ void check_uncompressed_optional() {
 template<intmax_t minimum, intmax_t maximum>
 void check_compressed_optional() {
 	using type = ranged_integer<minimum, maximum, null_policy>;
-	using compressed_type = detail::optional<minimum, maximum, null_policy>;
+	using compressed_type = optional<type>;
 	static_assert(sizeof(type) == sizeof(compressed_type), "compressed_optional too big.");
 	static_assert(sizeof(compressed_type) == sizeof(optional<type>), "Incorrect optional selection.");
 }
@@ -434,6 +398,55 @@ void check_optional() {
 	assert(optional_integer);
 }
 
+template<typename T>
+using decay_t = typename std::decay<T>::type;
+
+void check_array() {
+	constexpr auto dynamic_int_array = make_ranged_array(0, 3, 6);
+	static_assert(dynamic_int_array.size() == 3, "Array size wrong.");
+	static_assert(dynamic_int_array[2] == 6, "Array element wrong.");
+	static_assert(std::is_same<decltype(make_ranged(0)), decay_t<decltype(dynamic_int_array[0])>>::value, "Array element type wrong for all int arguments.");
+	
+	constexpr auto dynamic_mixed_array = make_ranged_array(-6, 15u);
+	static_assert(dynamic_mixed_array.size() == 2, "Array size wrong.");
+	static_assert(dynamic_mixed_array[0] == -6, "Array element wrong.");
+	static_assert(std::is_same<common_type_t<decltype(make_ranged(-6)), decltype(make_ranged(15u))>, decay_t<decltype(dynamic_mixed_array[0])>>::value, "Array element type wrong for mixed int / unsigned arguments.");
+
+	constexpr auto exact_array = make_ranged_array<-100, 5, 378, 23, 10000>();
+	static_assert(exact_array.size() == 5, "Array size wrong.");
+	static_assert(exact_array[2] == 378, "Array element wrong.");
+	static_assert(std::is_same<ranged_integer<-100, 10000, null_policy>, decay_t<decltype(exact_array[0])>>::value, "Array element type wrong for exact template arguments.");
+}
+
+void check_optional_array() {
+	constexpr auto dynamic_optional_array = make_ranged_optional_array(0, none, 3, 6);
+	static_assert(dynamic_optional_array.size() == 4, "Array size wrong.");
+	static_assert(*dynamic_optional_array[3] == 6, "valued element wrong.");
+	static_assert(dynamic_optional_array[1] == none, "none_t element wrong.");
+	static_assert(std::is_same<optional<decltype(make_ranged(0))>, decay_t<decltype(dynamic_optional_array[0])>>::value, "Array element type wrong for mixed int + none_t arguments.");
+	
+	static_assert(std::is_same<optional<decltype(make_ranged(0))>, decay_t<decltype(make_ranged_optional_array(0)[0])>>::value, "optional array type wrong with no missing values.");
+}
+
+template<typename integer>
+void streaming_test(int const initial, int const final) {
+	integer value(initial);
+	std::stringstream in;
+	in << value;
+	assert(in.str() == std::to_string(initial));
+	std::stringstream out;
+	out << final;
+	out >> value;
+	assert(value == final);
+}
+
+void check_streaming() {
+	streaming_test<checked_integer<0, 100>>(7, 0);
+	constexpr auto large_initial = std::numeric_limits<int>::max() / 3;
+	constexpr auto large_final = -49;
+	streaming_test<decltype(make_ranged(int{}))>(large_initial, large_final);
+}
+
 
 }	// namespace
 
@@ -446,7 +459,8 @@ int main() {
 	check_numeric_limits_all();
 	check_common_type();
 	check_policies();
-	check_array();
-	check_streaming();
 	check_optional();
+	check_array();
+	check_optional_array();
+	check_streaming();
 }
