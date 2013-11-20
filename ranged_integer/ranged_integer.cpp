@@ -426,7 +426,7 @@ void check_optional() {
 	static_assert(!uninitialized_optional, "Default constructor should leave uninitialized.");
 	constexpr optional<ri_type> constexpr_optional_integer(ri_type(5));
 	static_assert(static_cast<bool>(constexpr_optional_integer), "Value constructor should initialize optional.");
-	assert(*constexpr_optional_integer == 5);
+	static_assert(*constexpr_optional_integer == 5, "Value in an optional incorrect.");
 	optional<ri_type> optional_integer(ri_type(4));
 	optional_integer = uninitialized_optional;
 	assert(!optional_integer);

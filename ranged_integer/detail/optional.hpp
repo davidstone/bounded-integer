@@ -87,31 +87,27 @@ public:
 		*this = optional(std::forward<integer>(other));
 		return *this;
 	}
-
-	value_type const & get() const {
-		BOOST_ASSERT(is_initialized());
-		return m_value;
+	
+	// TODO: conform better to std::optional
+	// comma operator is used to avoid binding the reference to a temporary
+	constexpr value_type const & value() const {
+		return is_initialized() ? m_value : (throw std::logic_error("bad optional access"), m_value);
 	}
-	value_type & get() noexcept {
-		BOOST_ASSERT(is_initialized());
-		return m_value;
+	value_type & value() {
+		return is_initialized() ? m_value : (throw std::logic_error("bad optional access"), m_value);
 	}
-	value_type const & operator*() const {
-		BOOST_ASSERT(is_initialized());
-		return get();
+	constexpr value_type const & operator*() const {
+		return value();
 	}
 	value_type & operator*() {
-		BOOST_ASSERT(is_initialized());
-		return get();
+		return value();
 	}
 	
-	value_type const * operator->() const {
-		BOOST_ASSERT(is_initialized());
-		return &m_value;
+	constexpr value_type const * operator->() const {
+		return &value();
 	}
 	value_type * operator->() {
-		BOOST_ASSERT(is_initialized());
-		return &m_value;
+		return &value();
 	}
 	
 	constexpr value_type const & get_value_or(value_type const & default_value) const noexcept {
@@ -191,30 +187,25 @@ public:
 		return *this;
 	}
 
-	value_type const & get() const {
-		BOOST_ASSERT(is_initialized());
-		return m_value;
+	// comma operator is used to avoid binding the reference to a temporary
+	constexpr value_type const & value() const {
+		return is_initialized() ? m_value : (throw std::logic_error("bad optional access"), m_value);
 	}
-	value_type & get() noexcept {
-		BOOST_ASSERT(is_initialized());
-		return m_value;
+	value_type & value() {
+		return is_initialized() ? m_value : (throw std::logic_error("bad optional access"), m_value);
 	}
-	value_type const & operator*() const {
-		BOOST_ASSERT(is_initialized());
-		return get();
+	constexpr value_type const & operator*() const {
+		return value();
 	}
 	value_type & operator*() {
-		BOOST_ASSERT(is_initialized());
-		return get();
+		return value();
 	}
 	
-	value_type const * operator->() const {
-		BOOST_ASSERT(is_initialized());
-		return &m_value;
+	constexpr value_type const * operator->() const {
+		return &value();
 	}
 	value_type * operator->() {
-		BOOST_ASSERT(is_initialized());
-		return &m_value;
+		return &value();
 	}
 	
 	constexpr value_type const & get_value_or(value_type const & default_value) const noexcept {
