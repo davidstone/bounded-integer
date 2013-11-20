@@ -42,6 +42,9 @@ public:
 	constexpr compressed_optional(boost::none_t) noexcept:
 		compressed_optional{} {
 	}
+	constexpr compressed_optional(none_t) noexcept:
+		compressed_optional{} {
+	}
 
 	template<typename integer, enable_if_t<
 		detail::is_implicitly_constructible_from<minimum, maximum, integer>()
