@@ -76,6 +76,8 @@ constexpr bool operator>=(optional<lhs_min, lhs_max, lhs_policy> const & lhs, op
 
 
 
+
+
 template<
 	intmax_t lhs_min, intmax_t lhs_max, typename lhs_policy,
 	intmax_t rhs_min, intmax_t rhs_max, typename rhs_policy
@@ -174,6 +176,76 @@ template<
 	intmax_t rhs_min, intmax_t rhs_max, typename rhs_policy
 >
 constexpr bool operator>=(ranged_integer<lhs_min, lhs_max, lhs_policy> const & lhs, optional<rhs_min, rhs_max, rhs_policy> const & rhs) noexcept {
+	return !(lhs < rhs);
+}
+
+
+
+
+
+
+template<intmax_t lhs_min, intmax_t lhs_max, typename lhs_policy>
+constexpr bool operator==(optional<lhs_min, lhs_max, lhs_policy> const & lhs, none_t) noexcept {
+	return !lhs;
+}
+
+template<intmax_t rhs_min, intmax_t rhs_max, typename rhs_policy>
+constexpr bool operator==(none_t, optional<rhs_min, rhs_max, rhs_policy> const & rhs) noexcept {
+	return !rhs;
+}
+
+
+template<intmax_t lhs_min, intmax_t lhs_max, typename lhs_policy>
+constexpr bool operator!=(optional<lhs_min, lhs_max, lhs_policy> const & lhs, none_t const rhs) noexcept {
+	return !(lhs == rhs);
+}
+
+template<intmax_t rhs_min, intmax_t rhs_max, typename rhs_policy>
+constexpr bool operator!=(none_t const lhs, optional<rhs_min, rhs_max, rhs_policy> const & rhs) noexcept {
+	return !(rhs == lhs);
+}
+
+
+template<intmax_t lhs_min, intmax_t lhs_max, typename lhs_policy>
+constexpr bool operator<(optional<lhs_min, lhs_max, lhs_policy> const &, none_t) noexcept {
+	return false;
+}
+
+template<intmax_t rhs_min, intmax_t rhs_max, typename rhs_policy>
+constexpr bool operator<(none_t, optional<rhs_min, rhs_max, rhs_policy> const & rhs) noexcept {
+	return static_cast<bool>(rhs);
+}
+
+
+template<intmax_t lhs_min, intmax_t lhs_max, typename lhs_policy>
+constexpr bool operator>(optional<lhs_min, lhs_max, lhs_policy> const & lhs, none_t const rhs) noexcept {
+	return rhs < lhs;
+}
+
+template<intmax_t rhs_min, intmax_t rhs_max, typename rhs_policy>
+constexpr bool operator>(none_t const lhs, optional<rhs_min, rhs_max, rhs_policy> const & rhs) noexcept {
+	return rhs < lhs;
+}
+
+
+template<intmax_t lhs_min, intmax_t lhs_max, typename lhs_policy>
+constexpr bool operator<=(optional<lhs_min, lhs_max, lhs_policy> const & lhs, none_t const rhs) noexcept {
+	return !(rhs < lhs);
+}
+
+template<intmax_t rhs_min, intmax_t rhs_max, typename rhs_policy>
+constexpr bool operator<=(none_t const lhs, optional<rhs_min, rhs_max, rhs_policy> const & rhs) noexcept {
+	return !(rhs < lhs);
+}
+
+
+template<intmax_t lhs_min, intmax_t lhs_max, typename lhs_policy>
+constexpr bool operator>=(optional<lhs_min, lhs_max, lhs_policy> const & lhs, none_t const rhs) noexcept {
+	return !(lhs < rhs);
+}
+
+template<intmax_t rhs_min, intmax_t rhs_max, typename rhs_policy>
+constexpr bool operator>=(none_t const lhs, optional<rhs_min, rhs_max, rhs_policy> const & rhs) noexcept {
 	return !(lhs < rhs);
 }
 
