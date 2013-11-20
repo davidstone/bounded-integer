@@ -42,6 +42,6 @@
 # overkill for an "all-or-nothing" setting.
 #
 
-warnings = ['-Weverything', '-Werror', '-Wno-c++98-compat', '-Wno-c++98-compat-pedantic', '-Wno-exit-time-destructors', '-Wno-implicit-fallthrough', '-Wno-mismatched-tags', '-Wno-switch-enum']
+warnings = ['-Weverything', '-Werror', '-Wno-c++98-compat', '-Wno-c++98-compat-pedantic', '-Wno-exit-time-destructors', '-Wno-implicit-fallthrough', '-Wno-mismatched-tags', '-Wno-padded', '-Wno-switch-enum']
 warnings_debug = []
 warnings_optimized = []

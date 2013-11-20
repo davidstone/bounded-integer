@@ -14,12 +14,12 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with this program. If not, see <http://www.gnu.org/licenses/>.
 
-#include "detail/stream.hpp"
+#include "optional.hpp"
 #include "ranged_integer.hpp"
+#include "detail/stream.hpp"
 #include "detail/common_type.hpp"
 #include "detail/math.hpp"
 #include "detail/numeric_limits.hpp"
-#include "detail/optional.hpp"
 #include <cassert>
 #include <sstream>
 
@@ -409,7 +409,7 @@ void check_uncompressed_optional() {
 template<intmax_t minimum, intmax_t maximum>
 void check_compressed_optional() {
 	using type = ranged_integer<minimum, maximum, null_policy>;
-	using compressed_type = detail::compressed_optional<minimum, maximum, null_policy>;
+	using compressed_type = detail::optional<minimum, maximum, null_policy>;
 	static_assert(sizeof(type) == sizeof(compressed_type), "compressed_optional too big.");
 	static_assert(sizeof(compressed_type) == sizeof(optional<type>), "Incorrect optional selection.");
 }
