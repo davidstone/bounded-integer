@@ -40,9 +40,30 @@
 // rather than using enable_if_t as seen elsewhere in this code because we have
 // to put a defaulted template parameter at the end of other defaulted
 // parameters.
-template<typename overflow_policy = null_policy, typename integer = void, typename = enable_if_t<std::is_integral<integer>::value or is_ranged_integer<integer>::value>>
-constexpr ranged_integer<static_cast<intmax_t>(std::numeric_limits<integer>::min()), static_cast<intmax_t>(std::numeric_limits<integer>::max()), overflow_policy> make_ranged(integer const value) noexcept {
-	return ranged_integer<static_cast<intmax_t>(std::numeric_limits<integer>::min()), static_cast<intmax_t>(std::numeric_limits<integer>::max()), overflow_policy>(value, non_check);
+
+namespace detail {
+
+template<typename overflow_policy, typename integer>
+class make_ranged_result_type {
+private:
+	static constexpr auto min = static_cast<intmax_t>(std::numeric_limits<integer>::min());
+	static constexpr auto max = static_cast<intmax_t>(std::numeric_limits<integer>::max());
+public:
+	using type = ranged_integer<min, max, overflow_policy>;
+};
+template<typename overflow_policy, typename integer>
+using make_ranged_result_t = typename make_ranged_result_type<overflow_policy, integer>::type;
+
+}	// namespace detail
+
+template<
+	typename overflow_policy = null_policy,
+	typename integer = void,
+	typename result_t = detail::make_ranged_result_t<overflow_policy, integer>,
+	typename = enable_if_t<std::is_integral<integer>::value or is_ranged_integer<integer>::value>
+>
+constexpr result_t make_ranged(integer const value) noexcept {
+	return result_t(value, non_check);
 }
 
 template<intmax_t value, typename overflow_policy = null_policy>
