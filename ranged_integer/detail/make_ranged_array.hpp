@@ -33,11 +33,11 @@ constexpr result_type make_ranged_array(Integer && integer, Integers && ... inte
 }
 
 template<
-	intmax_t integer, intmax_t... integers,
-	typename result_type = std::array<common_type_t<decltype(make_ranged<integer>()), decltype(make_ranged<integers>())...>, 1 + sizeof...(integers)>
+	intmax_t... integers,
+	typename result_type = std::array<common_type_t<decltype(make_ranged<integers>())...>, sizeof...(integers)>
 >
 constexpr result_type make_ranged_array() noexcept {
-	return result_type{{make_ranged<integer>(), make_ranged<integers>()...}};
+	return result_type{{make_ranged<integers>()...}};
 }
 
 #endif	// RANGED_INTEGER_MAKE_RANGED_ARRAY_HPP_
