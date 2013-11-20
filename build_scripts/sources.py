@@ -46,6 +46,8 @@ base_sources = [('test', ['optional.cpp', 'ranged_integer.cpp'] + prepend_dir('d
 	'numeric_limits.cpp',
 	'operators.cpp',
 	'optional.cpp',
+	'optional_forward.cpp',
+	'optional_relational_operators.cpp',
 	'overlapping_range.cpp',
 	'policy.cpp',
 	'stream.cpp',
