@@ -426,6 +426,18 @@ void check_optional_array() {
 	static_assert(std::is_same<optional<decltype(make_ranged(0))>, decay_t<decltype(dynamic_optional_array[0])>>::value, "Array element type wrong for mixed int + none_t arguments.");
 	
 	static_assert(std::is_same<optional<decltype(make_ranged(0))>, decay_t<decltype(make_ranged_optional_array(0)[0])>>::value, "optional array type wrong with no missing values.");
+
+
+	constexpr auto known_optional_array = make_ranged_optional_array(0_ri, none, 3_ri, 6_ri);
+	static_assert(known_optional_array.size() == 4, "Array size wrong.");
+	static_assert(*known_optional_array[3] == 6_ri, "valued element wrong.");
+	static_assert(known_optional_array[1] == none, "none_t element wrong.");
+	static_assert(std::is_same<optional<ranged_integer<0, 6, null_policy>>, decay_t<decltype(known_optional_array[0])>>::value, "Array element type wrong for mixed ranged_integer + none_t arguments.");
+
+	constexpr auto none_first_optional_array = make_ranged_optional_array(none, 0);
+	static_assert(none_first_optional_array[0] == none, "none_t element wrong.");
+	constexpr auto none_last_optional_array = make_ranged_optional_array(0, none);
+	static_assert(none_last_optional_array[1] == none, "none_t element wrong.");
 }
 
 template<typename integer>

@@ -67,7 +67,7 @@ template<typename... Ts>
 class first_present_value;
 
 template<typename... Ts>
-using first_present_value_t = typename first_present_value<Ts...>::type;
+using first_present_value_t = typename first_present_value<typename std::decay<Ts>::type...>::type;
 
 template<typename T, typename... Ts>
 class first_present_value<T, Ts...> {
