@@ -25,6 +25,10 @@
 #include <limits>
 #include <type_traits>
 
+// decay is temporary workaround
+template<typename... Ts>
+using common_type_t = typename std::common_type<typename std::decay<Ts>::type...>::type;
+
 namespace detail {
 template<typename T, typename... Ts>
 class all_are_integral {
@@ -62,9 +66,10 @@ template<intmax_t minimum, intmax_t maximum, typename overflow_policy, typename 
 class common_type<ranged_integer<minimum, maximum, overflow_policy>, integer> {
 private:
 	using type1 = ranged_integer<minimum, maximum, overflow_policy>;
-	using type2 = ranged_integer<static_cast<intmax_t>(std::numeric_limits<integer>::min()), static_cast<intmax_t>(std::numeric_limits<integer>::max()), overflow_policy>;
+	using decayed_integer = typename std::decay<integer>::type;
+	using type2 = ranged_integer<static_cast<intmax_t>(std::numeric_limits<decayed_integer>::min()), static_cast<intmax_t>(std::numeric_limits<decayed_integer>::max()), overflow_policy>;
 public:
-	using type = typename common_type<type1, type2>::type;
+	using type = common_type_t<type1, type2>;
 };
 
 // If the user tries to do something like
@@ -90,12 +95,9 @@ template<
 >
 class common_type<integer1, ranged_integer<minimum, maximum, overflow_policy>> {
 public:
-	using type = typename common_type<ranged_integer<minimum, maximum, overflow_policy>, integer1>::type;
+	using type = common_type_t<ranged_integer<minimum, maximum, overflow_policy>, integer1>;
 };
 
 }	// namespace std
-
-template<typename... Ts>
-using common_type_t = typename std::common_type<Ts...>::type;
 
 #endif	// RANGED_INTEGER_COMMON_TYPE_HPP_
