@@ -172,10 +172,14 @@ void check_arithmetic() {
 	constexpr auto positive = +x;
 	static_assert(positive == x, "Unary plus not a no-op.");
 
-	// constexpr checked_integer<2, 8> const z(x);
-	// checked_integer<13, 63> const non_overlapping(x);
-	
 	check_modulo();
+	
+	constexpr checked_integer<0, 2> left_shift_lhs(1);
+	constexpr checked_integer<0, 61> left_shift_rhs(3);
+	constexpr auto left_shift_result = left_shift_lhs << left_shift_rhs;
+	static_assert(std::numeric_limits<decltype(left_shift_result)>::min() == 0, "Minimum left shift result incorrect.");
+	static_assert(std::numeric_limits<decltype(left_shift_result)>::max() == (2ll << 61ll), "Minimum left shift result incorrect.");
+	static_assert(left_shift_result == (1 << 3), "Incorrect left shift result.");
 }
 
 void check_modulo() {

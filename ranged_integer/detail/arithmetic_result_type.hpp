@@ -67,6 +67,22 @@ public:
 		return std::forward<LHS>(lhs) % std::forward<RHS>(rhs);
 	}
 };
+class left_shift {
+public:
+	template<typename LHS, typename RHS>
+	constexpr auto operator()(LHS && lhs, RHS && rhs) const noexcept -> decltype(std::forward<LHS>(lhs) << std::forward<RHS>(rhs)) {
+		static_assert(noexcept(std::forward<LHS>(lhs) << std::forward<RHS>(rhs)), "Left shift can throw exceptions."); 
+		return std::forward<LHS>(lhs) << std::forward<RHS>(rhs);
+	}
+};
+class right_shift {
+public:
+	template<typename LHS, typename RHS>
+	constexpr auto operator()(LHS && lhs, RHS && rhs) const noexcept -> decltype(std::forward<LHS>(lhs) >> std::forward<RHS>(rhs)) {
+		static_assert(noexcept(std::forward<LHS>(lhs) >> std::forward<RHS>(rhs)), "Right shift can throw exceptions."); 
+		return std::forward<LHS>(lhs) >> std::forward<RHS>(rhs);
+	}
+};
 
 template<
 	intmax_t lhs_min, intmax_t lhs_max,
@@ -272,6 +288,41 @@ public:
 	}
 	static_assert(min() <= max(), "Range is inverted.");
 };
+
+template<
+	intmax_t lhs_min, intmax_t lhs_max,
+	intmax_t rhs_min, intmax_t rhs_max
+>
+class operator_range<lhs_min, lhs_max, rhs_min, rhs_max, left_shift> {
+public:
+	static_assert(lhs_min >= 0 and rhs_min >= 0, "Left shift not defined for negative values.");
+	static_assert(rhs_max <= std::numeric_limits<intmax_t>::digits, "Cannot left shift >= width of intmax_t.");
+	static constexpr intmax_t min() noexcept {
+		return lhs_min << rhs_min;
+	}
+	static constexpr intmax_t max() noexcept {
+		return lhs_max << rhs_max;
+	}
+	static_assert(min() <= max(), "Range is inverted.");
+};
+
+template<
+	intmax_t lhs_min, intmax_t lhs_max,
+	intmax_t rhs_min, intmax_t rhs_max
+>
+class operator_range<lhs_min, lhs_max, rhs_min, rhs_max, right_shift> {
+public:
+	static_assert(lhs_min >= 0 and rhs_min >= 0, "Right shift not defined for negative values.");
+	static_assert(rhs_max <= std::numeric_limits<intmax_t>::digits, "Cannot right shift >= width of intmax_t.");
+	static constexpr intmax_t min() noexcept {
+		return lhs_min >> rhs_max;
+	}
+	static constexpr intmax_t max() noexcept {
+		return lhs_max >> rhs_min;
+	}
+	static_assert(min() <= max(), "Range is inverted.");
+};
+
 
 }	// namespace detail
 

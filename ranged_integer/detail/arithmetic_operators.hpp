@@ -1,4 +1,4 @@
-// Addition, subtraction, multiplication, division, unary minus
+// Addition, subtraction, multiplication, division, unary plus and minus, shifts
 // Copyright (C) 2013 David Stone
 //
 // This program is free software: you can redistribute it and / or modify
@@ -74,6 +74,9 @@ RANGED_INTEGER_OPERATOR_OVERLOADS(-, detail::minus)
 RANGED_INTEGER_OPERATOR_OVERLOADS(*, detail::multiplies)
 RANGED_INTEGER_OPERATOR_OVERLOADS(/, detail::divides)
 RANGED_INTEGER_OPERATOR_OVERLOADS(%, detail::modulus)
+
+RANGED_INTEGER_OPERATOR_OVERLOADS(<<, detail::left_shift)
+RANGED_INTEGER_OPERATOR_OVERLOADS(>>, detail::right_shift)
 
 #undef RANGED_INTEGER_OPERATOR_OVERLOADS
 
