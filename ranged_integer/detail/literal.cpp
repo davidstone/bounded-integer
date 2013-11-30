@@ -1,4 +1,4 @@
-// Verify that the header can stand on its own
+// Verify that the header can stand on its own, run tests
 // Copyright (C) 2013 David Stone
 //
 // This program is free software: you can redistribute it and / or modify
@@ -15,3 +15,27 @@
 // along with this program. If not, see <http://www.gnu.org/licenses/>.
 
 #include "literal.hpp"
+#include "comparison_operators.hpp"
+
+namespace {
+
+// I have to use the preprocessor here to create an integer literal
+#define RANGED_INTEGER_CHECK_LITERAL(x) \
+	static_assert(std::numeric_limits<decltype(x ## _ri)>::min() == std::numeric_limits<decltype(x ## _ri)>::max(), "Literal does not have a min possible value equal to a max possible value."); \
+	static_assert(std::numeric_limits<decltype(x ## _ri)>::min() == x ## _ri, "Literal does not have a value equal to the range."); \
+	\
+	static_assert(x ## _ri == static_cast<decltype(x ## _ri)::underlying_type>(x), "Inaccurate value of " #x " (cast x)"); \
+	static_assert(static_cast<decltype(x)>(x ## _ri) == x, "Inaccurate value of " #x " (cast value)");
+
+RANGED_INTEGER_CHECK_LITERAL(0)
+RANGED_INTEGER_CHECK_LITERAL(1)
+RANGED_INTEGER_CHECK_LITERAL(10)
+RANGED_INTEGER_CHECK_LITERAL(1000)
+RANGED_INTEGER_CHECK_LITERAL(4294967295)
+RANGED_INTEGER_CHECK_LITERAL(4294967296)
+RANGED_INTEGER_CHECK_LITERAL(9223372036854775807)
+RANGED_INTEGER_CHECK_LITERAL(-1)
+RANGED_INTEGER_CHECK_LITERAL(-0)
+#undef RANGED_INTEGER_CHECK_LITERAL
+
+}	// namespace

@@ -16,53 +16,10 @@
 
 #include "optional.hpp"
 #include "ranged_integer.hpp"
-#include "detail/stream.hpp"
-#include "detail/common_type.hpp"
-#include "detail/math.hpp"
-#include "detail/numeric_limits.hpp"
 #include <cassert>
 #include <sstream>
 
 namespace {
-
-void check_comparison() {
-	constexpr native_integer<1, 10> a(5);
-	static_assert(a == a, "Values do not equal themselves");
-	static_assert(a == 5, "Values do not equal their underlying value");
-	constexpr checked_integer<4, 36346> b(5);
-	static_assert(a == b, "Values do not equal equivalent other ranged_integer types");
-	
-	static_assert(make_ranged<5>() != make_ranged<6>(), "5 should not equal 6");
-
-	constexpr auto one = make_ranged<1>();
-	static_assert(!std::numeric_limits<decltype(one)>::is_signed, "Value should be unsigned for this test.");
-	constexpr auto negative_one = make_ranged<-1>();
-	static_assert(std::numeric_limits<decltype(negative_one)>::is_signed, "Value should be signed for this test.");
-	static_assert(negative_one < one, "Small negative values should be less than small positive values.");
-	constexpr intmax_t int_min = std::numeric_limits<int>::min();
-	constexpr intmax_t int_max = std::numeric_limits<int>::max();
-	static_assert(make_ranged<int_min>() < make_ranged<int_max + 1>(), "Large negative values should be less than large positive values.");
-	
-	// I have to use the preprocessor here to create a string literal
-	#define RANGED_INTEGER_SINGLE_COMPARISON(operator, a, b) \
-		static_assert((make_ranged<a>() operator make_ranged<b>()), "Incorrect result for (" #a ") " #operator " ( "#b ")")
-
-	#define RANGED_INTEGER_COMPARISON(operator, a, b, c) \
-		do { \
-			RANGED_INTEGER_SINGLE_COMPARISON(operator, a, b); \
-			RANGED_INTEGER_SINGLE_COMPARISON(operator, b, c); \
-			RANGED_INTEGER_SINGLE_COMPARISON(operator, a, c); \
-			static_assert(!(make_ranged<c>() operator make_ranged<a>()), "Incorrect result for !((" #c ") " #operator " (" #a "))"); \
-		} while (false)
-
-	RANGED_INTEGER_COMPARISON(<=, -4, -4, 16);
-	RANGED_INTEGER_COMPARISON(<, -17, 0, 17);
-	RANGED_INTEGER_COMPARISON(>=, 876, 876, 367);
-	RANGED_INTEGER_COMPARISON(>, 1LL << 50LL, 1LL << 30LL, 7);
-	
-	#undef RANGED_INTEGER_COMPARISON
-	#undef RANGED_INTEGER_SINGLE_COMPARISON
-}
 
 template<typename integer>
 void check_numeric_limits() {
@@ -128,105 +85,6 @@ void check_numeric_limits_all() {
 	check_numeric_limits<int64_t>();
 	// Currently does not support unsigned types equal to uintmax_t
 	// check_numeric_limits<uint64_t>();
-	
-	static_assert(std::numeric_limits<native_integer<1, 1000>>::digits == 0, "Meaningless digits not 0.");
-}
-
-void check_modulo();
-
-void check_arithmetic() {
-	constexpr checked_integer<1, 10> const x(9);
-	static_assert(sizeof(x) == 1, "checked_integer too big!");
-	constexpr checked_integer<-3, 11> const y(x);
-	constexpr checked_integer<-3, 11> const z(4);
-	static_assert(std::numeric_limits<decltype(z)>::is_signed, "ranged_integer with negative value in range should be signed.");
-
-	constexpr auto sum = x + z;
-	static_assert(std::numeric_limits<decltype(sum)>::min() == -2, "Minimum sum incorrect.");
-	static_assert(std::numeric_limits<decltype(sum)>::max() == 21, "Maximum sum incorrect.");
-	static_assert(sum == 13, "Calculated sum incorrect.");
-
-	constexpr auto difference = x - z;
-	static_assert(std::numeric_limits<decltype(difference)>::min() == -10, "Minimum difference incorrect.");
-	static_assert(std::numeric_limits<decltype(difference)>::max() == 13, "Maximum difference incorrect.");
-	static_assert(difference == 5, "Calculated difference incorrect.");
-
-	constexpr auto product = x * z;
-	static_assert(std::numeric_limits<decltype(product)>::min() == -30, "Minimum product incorrect.");
-	static_assert(std::numeric_limits<decltype(product)>::max() == 110, "Maximum product incorrect.");
-	static_assert(product == 36, "Calculated product incorrect.");
-
-	constexpr auto quotient = x / z;
-	static_assert(std::numeric_limits<decltype(quotient)>::min() == -10, "Minimum quotient incorrect.");
-	static_assert(std::numeric_limits<decltype(quotient)>::max() == 10, "Maximum quotient incorrect.");
-	static_assert(quotient == 2, "Calculated quotient incorrect.");
-
-	constexpr auto negation = -x;
-	static_assert(std::numeric_limits<decltype(negation)>::min() == -10, "Minimum quotient incorrect.");
-	static_assert(std::numeric_limits<decltype(negation)>::max() == -1, "Maximum quotient incorrect.");
-	static_assert(negation == -9, "Calculated negation incorrect.");
-
-	static_assert(quotient < product, "quotient should be less than product.");
-	static_assert(difference + 8 == sum, "difference + 8 should equal sum.");
-	
-	constexpr auto positive = +x;
-	static_assert(positive == x, "Unary plus not a no-op.");
-
-	check_modulo();
-	
-	constexpr checked_integer<0, 2> left_shift_lhs(1);
-	constexpr checked_integer<0, 61> left_shift_rhs(3);
-	constexpr auto left_shift_result = left_shift_lhs << left_shift_rhs;
-	static_assert(std::numeric_limits<decltype(left_shift_result)>::min() == 0, "Minimum left shift result incorrect.");
-	static_assert(std::numeric_limits<decltype(left_shift_result)>::max() == (2ll << 61ll), "Minimum left shift result incorrect.");
-	static_assert(left_shift_result == (1 << 3), "Incorrect left shift result.");
-}
-
-void check_modulo() {
-	constexpr auto ten = make_ranged<10>();
-	constexpr auto eleven = make_ranged<11>();
-	constexpr auto ten_result = ten % eleven;
-	static_assert(ten_result == ten, "Incorrect modulo with divisor one greater");
-	static_assert(std::is_same<decltype(ten_result), decltype(ten)>::value, "Incorrect modulo type with divisor one greater");
-
-	constexpr auto nine = make_ranged<9>();
-	constexpr auto one = make_ranged<1>();
-	constexpr auto one_result = ten % nine;
-	static_assert(one_result == one, "Incorrect modulo with divisor one less");
-	static_assert(std::is_same<decltype(one_result), decltype(one)>::value, "Incorrect modulo type with divisor one less");
-
-	constexpr auto nine_result = nine % eleven;
-	static_assert(nine_result == nine, "Incorrect modulo with divisor two less");
-	static_assert(std::is_same<decltype(nine_result), decltype(nine)>::value, "Incorrect modulo type with divisor two less");
-
-	constexpr auto two = make_ranged<2>();
-	constexpr auto two_result = eleven % nine;
-	static_assert(two_result == two, "Incorrect modulo with divisor two greater");
-	static_assert(std::is_same<decltype(two_result), decltype(two)>::value, "Incorrect modulo type with divisor two greater");
-	
-	
-	constexpr checked_integer<17, 23> positive_range(20);
-	constexpr checked_integer<-54, -6> negative_range(-33);
-	constexpr auto positive_negative_result = positive_range % negative_range;
-	constexpr checked_integer<0, 23> positive_negative(20 % -33);
-	static_assert(positive_negative_result == positive_negative, "Incorrect modulo with mixed signs");
-	static_assert(std::is_same<decltype(positive_negative_result), decltype(positive_negative)>::value, "Incorrect modulo type with mixed signs");
-	
-	constexpr auto negative_positive_result = negative_range % positive_range;
-	constexpr checked_integer<-22, 0> negative_positive(-33 % 20);
-	static_assert(negative_positive_result == negative_positive, "Incorrect modulo with mixed signs");
-	static_assert(std::is_same<decltype(negative_positive_result), decltype(negative_positive)>::value, "Incorrect modulo type with mixed signs");
-	
-	constexpr auto result = native_integer<0, 10>(10) % make_ranged<6>();
-//	static_assert(static_cast<intmax_t>(std::numeric_limits<decltype(result)>::min()) == 0, "uh oh");
-//	static_assert(static_cast<intmax_t>(std::numeric_limits<decltype(result)>::max()) == 10, "uh oh");
-	static_assert(result == 4, "wrong answer");
-	
-	constexpr auto zero = make_ranged<0>();
-	constexpr auto zero_result = zero % make_ranged<1>();
-	static_assert(zero_result == zero, "Incorrect modulo with zero for the dividend");
-	static_assert(std::is_same<decltype(zero_result), decltype(zero)>::value, "Incorrect modulo type with zero for the dividend");
-	// auto undefined = 1 % zero;
 }
 
 void check_compound_arithmetic() {
@@ -291,82 +149,26 @@ void check_math() {
 	check_absolute_value<checked_integer<-7, 450>, 1, checked_integer<0, 450>, 1>();
 }
 
-void check_common_type() {
-	using type1 = ranged_integer<1, 5, null_policy>;
-	using type2 = ranged_integer<3, 10, null_policy>;
-	using common_type2 = common_type_t<type1, type2>;
-	using expected_type2 = ranged_integer<1, 10, null_policy>;
-	static_assert(std::is_same<expected_type2, common_type2>::value, "common_type wrong for 2 values.");
-	using type3 = ranged_integer<-5, -5, null_policy>;
-	using common_type3 = common_type_t<type1, type2, type3>;
-	using expected_type3 = ranged_integer<-5, 10, null_policy>;
-	static_assert(std::is_same<expected_type3, common_type3>::value, "common_type wrong for 3 values.");
-	using type4 = ranged_integer<0, 0, null_policy>;
-	using common_type4 = common_type_t<type1, type2, type3, type4>;
-	using expected_type4 = ranged_integer<-5, 10, null_policy>;
-	static_assert(std::is_same<expected_type4, common_type4>::value, "common_type wrong for 4 values.");
-}
-
 void check_throw_policy() {
 	static constexpr intmax_t minimum = 0;
 	static constexpr intmax_t maximum = 10;
-	throw_policy throw_policy;
+	throw_policy policy;
 	try {
-		throw_policy.assignment<minimum, maximum>(20);
+		policy.assignment<minimum, maximum>(20);
 		assert(false);
 	}
 	catch (std::overflow_error const &) {
 	}
 	try {
-		throw_policy.assignment<minimum, maximum>(-6);
+		policy.assignment<minimum, maximum>(-6);
 		assert(false);
 	}
 	catch (std::underflow_error const &) {
 	}
 }
 
-void check_clamp_policy() {
-	static constexpr intmax_t minimum = 27;
-	static constexpr intmax_t maximum = 567;
-	constexpr clamp_policy clamp_policy;
-	static_assert(clamp_policy.assignment<minimum, maximum>(20) == minimum, "Failure to properly clamp lesser positive values.");
-	static_assert(clamp_policy.assignment<minimum, maximum>(-25) == minimum, "Failure to properly clamp negative values to a positive value.");
-	static_assert(clamp_policy.assignment<minimum, maximum>(1000) == maximum, "Failure to properly clamp greater positive values.");
-	
-	using type = clamped_integer<-100, 100>;
-	constexpr auto initial = std::numeric_limits<type::underlying_type>::max() + 1;
-	constexpr type value(initial);
-	static_assert(value == std::numeric_limits<type>::max(), "Fail to clamp value when the source type is larger than the destination type.");
-}
-
 void check_policies() {
 	check_throw_policy();
-	check_clamp_policy();
-}
-
-void check_literals() {
-	// I have to use the preprocessor here to create an integer literal
-	#define RANGED_INTEGER_CHECK_LITERAL(x) \
-		do { \
-			constexpr auto value = x ## _ri; \
-			using value_type = decltype(value); \
-			\
-			static_assert(std::numeric_limits<value_type>::min() == std::numeric_limits<value_type>::max(), "Literal does not have a min possible value equal to a max possible value."); \
-			static_assert(std::numeric_limits<value_type>::min() == value, "Literal does not have a value equal to the range."); \
-			\
-			static_assert(value == static_cast<value_type::underlying_type>(x), "Inaccurate value of " #x " (cast x)"); \
-			static_assert(static_cast<decltype(x)>(value) == x, "Inaccurate value of " #x " (cast value)"); \
-		} while(false)
-	RANGED_INTEGER_CHECK_LITERAL(0);
-	RANGED_INTEGER_CHECK_LITERAL(1);
-	RANGED_INTEGER_CHECK_LITERAL(10);
-	RANGED_INTEGER_CHECK_LITERAL(1000);
-	RANGED_INTEGER_CHECK_LITERAL(4294967295);
-	RANGED_INTEGER_CHECK_LITERAL(4294967296);
-	RANGED_INTEGER_CHECK_LITERAL(9223372036854775807);
-	RANGED_INTEGER_CHECK_LITERAL(-1);
-	RANGED_INTEGER_CHECK_LITERAL(-0);
-	#undef RANGED_INTEGER_CHECK_LITERAL
 }
 
 template<typename T>
@@ -384,6 +186,7 @@ void check_compressed_optional() {
 
 void check_optional() {
 	check_compressed_optional<1, 10>();
+	check_compressed_optional<-50, 127>();
 	check_uncompressed_optional<uint8_t>();
 	check_uncompressed_optional<int>();
 	check_uncompressed_optional<unsigned>();
@@ -400,89 +203,6 @@ void check_optional() {
 	assert(!optional_integer);
 	optional_integer = ri_type(7);
 	assert(optional_integer);
-}
-
-template<typename T>
-using decay_t = typename std::decay<T>::type;
-
-void check_array() {
-	constexpr auto dynamic_int_array = make_ranged_array(0, 3, 6);
-	static_assert(dynamic_int_array.size() == 3, "Array size wrong.");
-	static_assert(dynamic_int_array[2] == 6, "Array element wrong.");
-	static_assert(std::is_same<decltype(make_ranged(0)), decay_t<decltype(dynamic_int_array[0])>>::value, "Array element type wrong for all int arguments.");
-	
-	constexpr auto dynamic_mixed_array = make_ranged_array(-6, 15u);
-	static_assert(dynamic_mixed_array.size() == 2, "Array size wrong.");
-	static_assert(dynamic_mixed_array[0] == -6, "Array element wrong.");
-	static_assert(std::is_same<common_type_t<decltype(make_ranged(-6)), decltype(make_ranged(15u))>, decay_t<decltype(dynamic_mixed_array[0])>>::value, "Array element type wrong for mixed int / unsigned arguments.");
-
-	constexpr auto exact_array = make_ranged_array<-100, 5, 378, 23, 10000>();
-	static_assert(exact_array.size() == 5, "Array size wrong.");
-	static_assert(exact_array[2] == 378, "Array element wrong.");
-	static_assert(std::is_same<ranged_integer<-100, 10000, null_policy>, decay_t<decltype(exact_array[0])>>::value, "Array element type wrong for exact template arguments.");
-}
-
-void check_optional_array() {
-	constexpr auto dynamic_optional_array = make_ranged_optional_array(0, none, 3, 6);
-	static_assert(dynamic_optional_array.size() == 4, "Array size wrong.");
-	static_assert(*dynamic_optional_array[3] == 6, "valued element wrong.");
-	static_assert(dynamic_optional_array[1] == none, "none_t element wrong.");
-	static_assert(std::is_same<optional<decltype(make_ranged(0))>, decay_t<decltype(dynamic_optional_array[0])>>::value, "Array element type wrong for mixed int + none_t arguments.");
-	
-	static_assert(std::is_same<optional<decltype(make_ranged(0))>, decay_t<decltype(make_ranged_optional_array(0)[0])>>::value, "optional array type wrong with no missing values.");
-
-
-	constexpr auto known_optional_array = make_ranged_optional_array(0_ri, none, 3_ri, 6_ri);
-	static_assert(known_optional_array.size() == 4, "Array size wrong.");
-	static_assert(*known_optional_array[3] == 6_ri, "valued element wrong.");
-	static_assert(known_optional_array[1] == none, "none_t element wrong.");
-	static_assert(std::is_same<optional<ranged_integer<0, 6, null_policy>>, decay_t<decltype(known_optional_array[0])>>::value, "Array element type wrong for mixed ranged_integer + none_t arguments.");
-
-	constexpr auto none_first_optional_array = make_ranged_optional_array(none, 0);
-	static_assert(none_first_optional_array[0] == none, "none_t element wrong.");
-	constexpr auto none_last_optional_array = make_ranged_optional_array(0, none);
-	static_assert(none_last_optional_array[1] == none, "none_t element wrong.");
-}
-
-void check_multi_array() {
-	constexpr auto value = multi_array<5, 4>::make_explicit(
-		0_ri, 1_ri, 2_ri, 3_ri,
-		4_ri, 5_ri, 6_ri, 7_ri,
-		5_ri, 7_ri, 23_ri, 2474_ri,
-		-6_ri, 2467_ri, 29_ri, -4573_ri,
-		0_ri, 0_ri, 0_ri, 0_ri
-	);
-	static_assert(value.size() == 5, "First dimension wrong.");
-	static_assert(value[0].size() == 4, "Second dimension wrong.");
-	static_assert(value[3][1] == 2467_ri, "Value wrong.");
-	using value_type = decltype(value)::value_type::value_type;
-	static_assert(std::numeric_limits<value_type>::min() == -4573, "min wrong");
-	static_assert(std::numeric_limits<value_type>::max() == 2474, "max wrong");
-	
-	// First is deduced
-	static constexpr std::size_t second = 3;
-	static constexpr std::size_t third = 4;
-	static constexpr std::size_t fourth = 6;
-	constexpr auto four_dimensions = multi_array<second, third, fourth>::make_deduced(
-		0_ri, 1_ri, 2_ri, 3_ri, 4_ri, 5_ri,
-		0_ri, 1_ri, 2_ri, 3_ri, 4_ri, 5_ri,
-		0_ri, 1_ri, 2_ri, 3_ri, 4_ri, 5_ri,
-		0_ri, 1_ri, 2_ri, 3_ri, 4_ri, 5_ri,
-
-		0_ri, 1_ri, 2_ri, 3_ri, 4_ri, 5_ri,
-		0_ri, 1_ri, 2_ri, 3_ri, 4_ri, 5_ri,
-		0_ri, 1_ri, 2_ri, 3_ri, 4_ri, 5_ri,
-		0_ri, 1_ri, 2_ri, 3_ri, 4_ri, 5_ri,
-
-		0_ri, 1_ri, 2_ri, 3_ri, 4_ri, 5_ri,
-		0_ri, 1_ri, 2_ri, 3_ri, 4_ri, 5_ri,
-		0_ri, 1_ri, 2_ri, 3_ri, 4_ri, 5_ri,
-		0_ri, 1_ri, 2_ri, 3_ri, 4_ri, 5_ri
-	);
-	static_assert(four_dimensions.size() == 1, "First dimension wrong.");
-	static_assert(four_dimensions[0].size() == second, "Second dimension wrong.");
-	static_assert(four_dimensions[0][0].size() == third, "Third dimension wrong.");
-	static_assert(four_dimensions[0][0][0].size() == fourth, "Fourth dimension wrong.");
 }
 
 template<typename integer>
@@ -508,17 +228,10 @@ void check_streaming() {
 }	// namespace
 
 int main() {
-	check_comparison();
-	check_arithmetic();
 	check_compound_arithmetic();
-	check_literals();
 	check_math();
 	check_numeric_limits_all();
-	check_common_type();
 	check_policies();
 	check_optional();
-	check_array();
-	check_optional_array();
-	check_multi_array();
 	check_streaming();
 }
