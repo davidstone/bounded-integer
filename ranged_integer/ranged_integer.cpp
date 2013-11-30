@@ -444,6 +444,47 @@ void check_optional_array() {
 	static_assert(none_last_optional_array[1] == none, "none_t element wrong.");
 }
 
+void check_multi_array() {
+	constexpr auto value = multi_array<5, 4>::make_explicit(
+		0_ri, 1_ri, 2_ri, 3_ri,
+		4_ri, 5_ri, 6_ri, 7_ri,
+		5_ri, 7_ri, 23_ri, 2474_ri,
+		-6_ri, 2467_ri, 29_ri, -4573_ri,
+		0_ri, 0_ri, 0_ri, 0_ri
+	);
+	static_assert(value.size() == 5, "First dimension wrong.");
+	static_assert(value[0].size() == 4, "Second dimension wrong.");
+	static_assert(value[3][1] == 2467_ri, "Value wrong.");
+	using value_type = decltype(value)::value_type::value_type;
+	static_assert(std::numeric_limits<value_type>::min() == -4573, "min wrong");
+	static_assert(std::numeric_limits<value_type>::max() == 2474, "max wrong");
+	
+	// First is deduced
+	static constexpr std::size_t second = 3;
+	static constexpr std::size_t third = 4;
+	static constexpr std::size_t fourth = 6;
+	constexpr auto four_dimensions = multi_array<second, third, fourth>::make_deduced(
+		0_ri, 1_ri, 2_ri, 3_ri, 4_ri, 5_ri,
+		0_ri, 1_ri, 2_ri, 3_ri, 4_ri, 5_ri,
+		0_ri, 1_ri, 2_ri, 3_ri, 4_ri, 5_ri,
+		0_ri, 1_ri, 2_ri, 3_ri, 4_ri, 5_ri,
+
+		0_ri, 1_ri, 2_ri, 3_ri, 4_ri, 5_ri,
+		0_ri, 1_ri, 2_ri, 3_ri, 4_ri, 5_ri,
+		0_ri, 1_ri, 2_ri, 3_ri, 4_ri, 5_ri,
+		0_ri, 1_ri, 2_ri, 3_ri, 4_ri, 5_ri,
+
+		0_ri, 1_ri, 2_ri, 3_ri, 4_ri, 5_ri,
+		0_ri, 1_ri, 2_ri, 3_ri, 4_ri, 5_ri,
+		0_ri, 1_ri, 2_ri, 3_ri, 4_ri, 5_ri,
+		0_ri, 1_ri, 2_ri, 3_ri, 4_ri, 5_ri
+	);
+	static_assert(four_dimensions.size() == 1, "First dimension wrong.");
+	static_assert(four_dimensions[0].size() == second, "Second dimension wrong.");
+	static_assert(four_dimensions[0][0].size() == third, "Third dimension wrong.");
+	static_assert(four_dimensions[0][0][0].size() == fourth, "Fourth dimension wrong.");
+}
+
 template<typename integer>
 void streaming_test(int const initial, int const final) {
 	integer value(initial);
@@ -478,5 +519,6 @@ int main() {
 	check_optional();
 	check_array();
 	check_optional_array();
+	check_multi_array();
 	check_streaming();
 }
