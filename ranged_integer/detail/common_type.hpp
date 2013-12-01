@@ -25,9 +25,12 @@
 #include <limits>
 #include <type_traits>
 
+template<typename T>
+using decay_t = typename std::decay<T>::type;
+
 // decay is temporary workaround
 template<typename... Ts>
-using common_type_t = typename std::common_type<typename std::decay<Ts>::type...>::type;
+using common_type_t = typename std::common_type<decay_t<Ts>...>::type;
 
 namespace detail {
 template<typename T, typename... Ts>
@@ -66,7 +69,7 @@ template<intmax_t minimum, intmax_t maximum, typename overflow_policy, typename 
 class common_type<ranged_integer<minimum, maximum, overflow_policy>, integer> {
 private:
 	using type1 = ranged_integer<minimum, maximum, overflow_policy>;
-	using decayed_integer = typename std::decay<integer>::type;
+	using decayed_integer = decay_t<integer>;
 	using type2 = ranged_integer<static_cast<intmax_t>(std::numeric_limits<decayed_integer>::min()), static_cast<intmax_t>(std::numeric_limits<decayed_integer>::max()), overflow_policy>;
 public:
 	using type = common_type_t<type1, type2>;

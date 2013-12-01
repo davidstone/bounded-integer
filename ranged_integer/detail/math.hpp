@@ -28,7 +28,7 @@ constexpr result_type abs(ranged_integer<minimum, maximum, overflow_policy> cons
 	// We have to cast the value to the common type of the argument and result
 	// type before we negate because -min might not be in the value, even if we
 	// were to cast to the underlying type first.
-	using common_t = common_type_t<typename std::decay<decltype(value)>::type, result_type>;
+	using common_t = common_type_t<decay_t<decltype(value)>, result_type>;
 	return (value >= 0) ?
 		result_type(static_cast<common_t>(value), non_check) :
 		result_type(-static_cast<common_t>(value), non_check);

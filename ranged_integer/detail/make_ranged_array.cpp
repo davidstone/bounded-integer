@@ -20,9 +20,6 @@
 
 namespace {
 
-template<typename T>
-using decay_t = typename std::decay<T>::type;
-
 namespace check_array {
 
 constexpr auto dynamic_int_array = make_ranged_array(0, 3, 6);

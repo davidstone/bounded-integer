@@ -39,7 +39,7 @@ template<
 	intmax_t rhs_min, intmax_t rhs_max, typename rhs_overflow
 >
 constexpr bool operator==(ranged_integer<lhs_min, lhs_max, lhs_overflow> const lhs, ranged_integer<rhs_min, rhs_max, rhs_overflow> const rhs) noexcept {
-	using common_t = typename common_type_t<typename std::decay<decltype(lhs)>::type, typename std::decay<decltype(rhs)>::type>::underlying_type const;
+	using common_t = typename common_type_t<decay_t<decltype(lhs)>, decay_t<decltype(rhs)>>::underlying_type const;
 	return static_cast<common_t>(lhs) == static_cast<common_t>(rhs);
 }
 
@@ -94,7 +94,7 @@ template<
 	intmax_t rhs_min, intmax_t rhs_max, typename rhs_overflow
 >
 constexpr bool operator<(ranged_integer<lhs_min, lhs_max, lhs_overflow> const lhs, ranged_integer<rhs_min, rhs_max, rhs_overflow> const rhs) noexcept {
-	using common_t = typename common_type_t<typename std::decay<decltype(lhs)>::type, typename std::decay<decltype(rhs)>::type>::underlying_type const;
+	using common_t = typename common_type_t<decay_t<decltype(lhs)>, decay_t<decltype(rhs)>>::underlying_type const;
 	return static_cast<common_t>(lhs) < static_cast<common_t>(rhs);
 }
 

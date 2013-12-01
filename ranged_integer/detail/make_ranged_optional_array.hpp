@@ -30,7 +30,7 @@ template<typename... Ts>
 class common_optional_type;
 
 template<typename... Ts>
-using common_optional_type_t = typename common_optional_type<typename std::decay<Ts>::type...>::type;
+using common_optional_type_t = typename common_optional_type<decay_t<Ts>...>::type;
 
 // I manually stamp out a few of these templates to avoid hitting the template
 // instantiation limit of various compilers when creating large arrays.
@@ -79,7 +79,7 @@ template<typename... Ts>
 class first_present_value;
 
 template<typename... Ts>
-using first_present_value_t = typename first_present_value<typename std::decay<Ts>::type...>::type;
+using first_present_value_t = typename first_present_value<decay_t<Ts>...>::type;
 
 template<typename T, typename... Ts>
 class first_present_value<T, Ts...> {
@@ -114,7 +114,7 @@ template<
 	>
 >
 constexpr result_type make_ranged_optional_array(Integers && ... integers) noexcept {
-	static_assert(detail::all_are_ranged_or_builtin_integer_or_none<typename std::decay<Integers>::type...>::value, "All values must be integers or none");
+	static_assert(detail::all_are_ranged_or_builtin_integer_or_none<decay_t<Integers>...>::value, "All values must be integers or none");
 	return result_type{{detail::make_ranged_optional(std::forward<Integers>(integers))...}};
 }
 

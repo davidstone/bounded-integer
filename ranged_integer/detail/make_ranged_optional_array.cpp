@@ -20,9 +20,6 @@
 
 namespace {
 
-template<typename T>
-using decay_t = typename std::decay<T>::type;
-
 constexpr auto dynamic_optional_array = make_ranged_optional_array(0, none, 3, 6);
 static_assert(dynamic_optional_array.size() == 4, "Array size wrong.");
 static_assert(*dynamic_optional_array[3] == 6, "valued element wrong.");
