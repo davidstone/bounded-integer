@@ -20,8 +20,9 @@
 #include "class.hpp"
 #include "enable_if.hpp"
 #include "is_ranged_integer.hpp"
+#include "numeric_limits.hpp"
 #include "policy/null_policy.hpp"
-#include <limits>
+#include <cstdint>
 #include <type_traits>
 
 namespace detail {
