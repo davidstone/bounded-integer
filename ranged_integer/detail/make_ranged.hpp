@@ -18,7 +18,6 @@
 #define RANGED_INTEGER_MAKE_RANGED_HPP_
 
 #include "class.hpp"
-#include "enable_if.hpp"
 #include "is_ranged_integer.hpp"
 #include "numeric_limits.hpp"
 #include "policy/null_policy.hpp"
@@ -79,10 +78,10 @@ template<
 			detail::equivalent_overflow_policy<integer>,
 			overflow_policy
 		>::type
-	>,
-	typename = enable_if_t<std::is_integral<integer>::value or is_ranged_integer<integer>::value>
+	>
 >
 constexpr result_t make_ranged(integer const value) noexcept {
+	static_assert(std::numeric_limits<integer>::is_integer, "Must be an integer type.");
 	return result_t(value, non_check);
 }
 
