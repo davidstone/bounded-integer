@@ -18,11 +18,9 @@
 #define RANGED_INTEGER_COMMON_TYPE_HPP_
 
 #include "common_policy.hpp"
-#include "enable_if.hpp"
 #include "forward_declaration.hpp"
-#include "is_ranged_integer.hpp"
+#include "make_ranged.hpp"
 
-#include <limits>
 #include <type_traits>
 
 template<typename T>
@@ -64,13 +62,11 @@ public:
 };
 
 // Common type of a ranged_integer and a built-in
-// Cannot seem to get this to work with enable_if
 template<intmax_t minimum, intmax_t maximum, typename overflow_policy, typename integer>
 class common_type<ranged_integer<minimum, maximum, overflow_policy>, integer> {
 private:
 	using type1 = ranged_integer<minimum, maximum, overflow_policy>;
-	using decayed_integer = decay_t<integer>;
-	using type2 = ranged_integer<static_cast<intmax_t>(std::numeric_limits<decayed_integer>::min()), static_cast<intmax_t>(std::numeric_limits<decayed_integer>::max()), overflow_policy>;
+	using type2 = equivalent_type<decay_t<integer>>;
 public:
 	using type = common_type_t<type1, type2>;
 };
@@ -99,6 +95,25 @@ template<
 class common_type<integer1, ranged_integer<minimum, maximum, overflow_policy>> {
 public:
 	using type = common_type_t<ranged_integer<minimum, maximum, overflow_policy>, integer1>;
+};
+
+
+// We use common_type heavily in the creation of deduced arrays, so we need to add in some tricks to limit the maximum instantiation depth:
+
+template<intmax_t minimum, intmax_t maximum, typename overflow_policy, typename T1, typename T2, typename T3, typename T4, typename T5, typename... Ts>
+class common_type<ranged_integer<minimum, maximum, overflow_policy>, T1, T2, T3, T4, T5, Ts...> {
+private:
+	using type0 = ranged_integer<minimum, maximum, overflow_policy>;
+public:
+	using type = common_type_t<common_type_t<type0, T1, T2, T3, T4>, T5, Ts...>;
+};
+
+template<intmax_t minimum, intmax_t maximum, typename overflow_policy, typename T1, typename T2, typename T3, typename T4, typename T5, typename T6, typename T7, typename T8, typename T9, typename... Ts>
+class common_type<ranged_integer<minimum, maximum, overflow_policy>, T1, T2, T3, T4, T5, T6, T7, T8, T9, Ts...> {
+private:
+	using type0 = ranged_integer<minimum, maximum, overflow_policy>;
+public:
+	using type = common_type_t<common_type_t<type0, T1, T2, T3, T4, T5, T6, T7, T8>, T9, Ts...>;
 };
 
 }	// namespace std

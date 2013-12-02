@@ -18,7 +18,6 @@
 #define RANGED_INTEGER_MAKE_RANGED_ARRAY_HPP_
 
 #include "common_type.hpp"
-#include "is_ranged_integer.hpp"
 #include "make_ranged.hpp"
 #include <array>
 #include <utility>
@@ -157,7 +156,6 @@ public:
 		typename result_type = detail::multi_array<common_t, dimensions...>
 	>
 	static constexpr typename result_type::type make_explicit(Integers && ... integers) noexcept {
-		static_assert(all_are_ranged_or_builtin_integer<Integers...>::value, "Can only be called with integer values");
 		return result_type::make(std::forward<Integers>(integers)...);
 	}
 
