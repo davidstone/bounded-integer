@@ -107,11 +107,11 @@ void check_compound_arithmetic() {
 	assert(z == 7);
 	z = 0;
 	assert(z == 0);
-	x %= make_ranged<6>();
+	x %= 6_ri;
 	assert(x == 4);
 	
 	short s = 0;
-	s += make_ranged<4>();
+	s += 4_ri;
 	assert(s == 4);
 	int i = 9;
 	i -= make_ranged(68);
@@ -123,7 +123,7 @@ void check_compound_arithmetic() {
 	assert(i == -5);
 	i %= make_ranged(6);
 	assert(i == -5);
-	i %= make_ranged<4>();
+	i %= 4_ri;
 	assert(i == -1);
 
 	assert(++x == 5);
@@ -221,7 +221,7 @@ void check_streaming() {
 	streaming_test<checked_integer<0, 100>>(7, 0);
 	constexpr auto large_initial = std::numeric_limits<int>::max() / 3;
 	constexpr auto large_final = -49;
-	streaming_test<decltype(make_ranged(int{}))>(large_initial, large_final);
+	streaming_test<equivalent_type<int>>(large_initial, large_final);
 }
 
 

@@ -153,7 +153,7 @@ public:
 	// make_deduced assumes you did not specify the first dimension.
 	template<
 		typename... Integers,
-		typename common_t = common_type_t<decltype(make_ranged(std::declval<Integers>()))...>,
+		typename common_t = common_type_t<equivalent_type<Integers>...>,
 		typename result_type = detail::multi_array<common_t, dimensions...>
 	>
 	static constexpr typename result_type::type make_explicit(Integers && ... integers) noexcept {

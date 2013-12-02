@@ -25,12 +25,18 @@ namespace check_array {
 constexpr auto dynamic_int_array = make_ranged_array(0, 3, 6);
 static_assert(dynamic_int_array.size() == 3, "Array size wrong.");
 static_assert(dynamic_int_array[2] == 6, "Array element wrong.");
-static_assert(std::is_same<decltype(make_ranged(0)), decay_t<decltype(dynamic_int_array[0])>>::value, "Array element type wrong for all int arguments.");
+static_assert(std::is_same<equivalent_type<int>, decay_t<decltype(dynamic_int_array[0])>>::value, "Array element type wrong for all int arguments.");
 
 constexpr auto dynamic_mixed_array = make_ranged_array(-6, 15u);
 static_assert(dynamic_mixed_array.size() == 2, "Array size wrong.");
 static_assert(dynamic_mixed_array[0] == -6, "Array element wrong.");
-static_assert(std::is_same<common_type_t<decltype(make_ranged(-6)), decltype(make_ranged(15u))>, decay_t<decltype(dynamic_mixed_array[0])>>::value, "Array element type wrong for mixed int / unsigned arguments.");
+static_assert(
+	std::is_same<
+		common_type_t<equivalent_type<int>, equivalent_type<unsigned>>,
+		decay_t<decltype(dynamic_mixed_array[0])>
+	>::value,
+	"Array element type wrong for mixed int / unsigned arguments."
+);
 
 constexpr auto exact_array = make_ranged_array<-100, 5, 378, 23, 10000>();
 static_assert(exact_array.size() == 5, "Array size wrong.");

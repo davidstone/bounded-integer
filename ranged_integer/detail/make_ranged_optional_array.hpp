@@ -108,9 +108,8 @@ public:
 template<
 	typename... Integers,
 	typename result_type = std::array<
-		optional<detail::common_optional_type_t<
-			decltype(make_ranged(std::declval<detail::first_present_value_t<Integers...>>())), Integers...
-		>>, sizeof...(Integers)
+		optional<detail::common_optional_type_t<equivalent_type<detail::first_present_value_t<Integers...>>, Integers...>>,
+		sizeof...(Integers)
 	>
 >
 constexpr result_type make_ranged_optional_array(Integers && ... integers) noexcept {

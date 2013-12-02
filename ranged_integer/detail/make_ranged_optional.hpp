@@ -24,25 +24,21 @@
 #include <limits>
 #include <type_traits>
 
+namespace detail {
+
+template<bool condition, typename T, typename F>
+using conditional_t = typename std::conditional<condition, T, F>::type;
+
 // This is used to help make arrays of possibly optional ranged_integer. This
 // returns a value that can be used to construct an optional using the copy
 // constructor or the none_t constructor.
 
-namespace detail {
+template<typename T>
+using equivalent_optional_type = conditional_t<std::is_same<T, none_t>::value, none_t, equivalent_type<T>>;
 
-template<typename overflow_policy, typename T>
-using make_ranged_optional_result_t = typename std::conditional<
-	std::is_same<T, none_t>::value,
-	none_t,
-	make_ranged_result_t<overflow_policy, T>
->::type;
-
-
-template<
-	typename overflow_policy = null_policy,
-	typename T = void,
-	typename result_type = make_ranged_optional_result_t<overflow_policy, T>
->
+// I don't have to worry about people wanting different overflow policies here,
+// as that is never requested.
+template<typename T, typename result_type = equivalent_optional_type<T>>
 constexpr result_type make_ranged_optional(T const value) noexcept {
 	return result_type(value);
 }

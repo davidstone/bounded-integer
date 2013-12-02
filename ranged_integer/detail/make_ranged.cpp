@@ -15,3 +15,8 @@
 // along with this program. If not, see <http://www.gnu.org/licenses/>.
 
 #include "make_ranged.hpp"
+#include "policy/throw_policy.hpp"
+
+static_assert(std::is_same<detail::equivalent_overflow_policy<int>, null_policy>::value, "int should have a null_policy");
+static_assert(std::is_same<detail::equivalent_overflow_policy<ranged_integer<0, 0, throw_policy>>, throw_policy>::value, "incorrect equivalent_overflow_policy for ranged_integer.");
+

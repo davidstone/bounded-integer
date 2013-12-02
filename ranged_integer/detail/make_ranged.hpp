@@ -22,44 +22,63 @@
 #include "is_ranged_integer.hpp"
 #include "policy/null_policy.hpp"
 #include <limits>
+#include <type_traits>
+
+namespace detail {
+
+template<typename integer>
+class equivalent_overflow_policy_c {
+public:
+	using type = null_policy;
+};
+template<intmax_t minimum, intmax_t maximum, typename overflow_policy>
+class equivalent_overflow_policy_c<ranged_integer<minimum, maximum, overflow_policy>> {
+public:
+	using type = overflow_policy;
+};
+
+template<typename integer>
+using equivalent_overflow_policy = typename equivalent_overflow_policy_c<integer>::type;
+
+}	// namespace detail
+
+template<typename integer, typename overflow_policy = detail::equivalent_overflow_policy<integer>>
+using equivalent_type = ranged_integer<
+	static_cast<intmax_t>(std::numeric_limits<integer>::min()),
+	static_cast<intmax_t>(std::numeric_limits<integer>::max()),
+	overflow_policy
+>;
 
 // This somewhat strange looking set of default arguments allows the following:
 //
-// 1) The first parameter is defaulted for the fairly common case of people
-// needing to convert their built-in integer type to a ranged_integer. The
+// 1) The first parameter is defaulted to void. The common case for this
+// function is to convert a built-in integer type to a ranged_integer. The
 // ranged_integer analog to built-in integers is a ranged_integer with a
-// null_policy.
+// null_policy. However, if someone passes in something that is already a
+// ranged_integer, this shouldn't change the policy. Therefore, we default to
+// something that is not a valid policy (void) and choose correct default
+// behavior based on that. The policy must be the first parameter to work
+// properly with automatic deduction of the type of `integer`, which means that
+// the type of integer is not known when we are trying to determine the default
+// policy.
 //
 // 2) The second parameter ("integer") has to be defaulted because we defaulted
 // the first. We don't want "integer" to be the first parameter because that
 // would prevent type deduction from the function argument. Therefore, we
 // default it to something (it doesn't matter what), but the type will always be
 // deduced as whatever we pass as the argument type.
-//
-// 3) Finally, we use the defaulted template argument version of enable_if,
-// rather than using enable_if_t as seen elsewhere in this code because we have
-// to put a defaulted template parameter at the end of other defaulted
-// parameters.
-
-namespace detail {
-
-template<typename overflow_policy, typename integer>
-class make_ranged_result_type {
-private:
-	static constexpr auto min = static_cast<intmax_t>(std::numeric_limits<integer>::min());
-	static constexpr auto max = static_cast<intmax_t>(std::numeric_limits<integer>::max());
-public:
-	using type = ranged_integer<min, max, overflow_policy>;
-};
-template<typename overflow_policy, typename integer>
-using make_ranged_result_t = typename make_ranged_result_type<overflow_policy, integer>::type;
-
-}	// namespace detail
 
 template<
-	typename overflow_policy = null_policy,
+	typename overflow_policy = void,
 	typename integer = void,
-	typename result_t = detail::make_ranged_result_t<overflow_policy, integer>,
+	typename result_t = equivalent_type<
+		integer,
+		typename std::conditional<
+			std::is_void<overflow_policy>::value,
+			detail::equivalent_overflow_policy<integer>,
+			overflow_policy
+		>::type
+	>,
 	typename = enable_if_t<std::is_integral<integer>::value or is_ranged_integer<integer>::value>
 >
 constexpr result_t make_ranged(integer const value) noexcept {
