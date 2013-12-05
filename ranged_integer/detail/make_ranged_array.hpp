@@ -20,28 +20,47 @@
 #include "common_type.hpp"
 #include "make_ranged.hpp"
 #include <array>
+#include <cstddef>
 #include <utility>
 
 namespace detail {
 
-template<typename T, T... integers>
-class integer_sequence {};
+template<std::size_t... integers>
+class integer_sequence{};
 
-template<typename T, T begin, T end, T... values>
-class make_integer_sequence_helper {
+template<typename T1, typename T2>
+class concatenate;
+
+template<std::size_t... lhs, std::size_t... rhs>
+class concatenate<integer_sequence<lhs...>, integer_sequence<rhs...>> {
 public:
-	static_assert(begin < end, "Range inverted.");
-	using type = typename make_integer_sequence_helper<T, begin + 1, end, values..., begin>::type;
+	using type = integer_sequence<lhs..., rhs...>;
 };
 
-template<typename T, T value, T... values>
-class make_integer_sequence_helper<T, value, value, values...> {
+template<typename T1, typename T2>
+using concatenate_t = typename concatenate<T1, T2>::type;
+
+template<std::size_t min, std::size_t max>
+class make_integer_sequence_c;
+template<std::size_t min, std::size_t max>
+using make_integer_sequence = typename make_integer_sequence_c<min, max>::type;
+
+template<std::size_t min, std::size_t max>
+class make_integer_sequence_c {
+private:
+	// avoid overflow, although the compiler would probably run out of memory
+	// if it mattered
+	static constexpr std::size_t midpoint = min + (max - min) / 2;
 public:
-	using type = integer_sequence<T, values..., value>;
+	static_assert(min < max, "Range inverted.");
+	using type = concatenate_t<make_integer_sequence<min, midpoint>, make_integer_sequence<midpoint + 1, max>>;
 };
 
-template<typename T, T begin, T end>
-using make_integer_sequence = typename make_integer_sequence_helper<T, begin, end>::type;
+template<std::size_t value>
+class make_integer_sequence_c<value, value> {
+public:
+	using type = integer_sequence<value>;
+};
 
 
 // This gets the variadic parameter at position index
@@ -70,12 +89,12 @@ class multi_array;
 template<typename T, std::size_t dimension, std::size_t... dimensions>
 class multi_array<T, dimension, dimensions...> {
 private:
+public:
 	template<std::size_t... indexes, typename... Integers>
-	static constexpr typename multi_array<T, dimensions...>::type apply_n(integer_sequence<std::size_t, indexes...>, Integers && ... integers) noexcept {
+	static constexpr typename multi_array<T, dimensions...>::type apply_n(integer_sequence<indexes...>, Integers && ... integers) noexcept {
 		return multi_array<T, dimensions...>::make(variadic<indexes>::get(std::forward<Integers>(integers)...)...);
 	}
 
-public:
 	using type = std::array<typename multi_array<T, dimensions...>::type, dimension>;
 
 	
@@ -83,11 +102,10 @@ public:
 	// nested types with each chunk.
 	
 	template<std::size_t... indexes, typename... Integers>
-	static constexpr type make_helper(integer_sequence<std::size_t, indexes...>, Integers && ... integers) noexcept {
+	static constexpr type make_helper(integer_sequence<indexes...>, Integers && ... integers) noexcept {
 		return type{{
 			apply_n(
 				make_integer_sequence<
-					std::size_t,
 					indexes * (sizeof...(Integers) / dimension),
 					(indexes + 1) * (sizeof...(Integers) / dimension) - 1
 				>{},
@@ -98,19 +116,7 @@ public:
 	}
 	template<typename... Integers>
 	static constexpr type make(Integers && ... integers) noexcept {
-		return make_helper(make_integer_sequence<std::size_t, 0, dimension - 1>{}, std::forward<Integers>(integers)...);
-	}
-};
-
-template<typename T, std::size_t dimension>
-class multi_array<T, dimension> {
-public:
-	using type = std::array<T, dimension>;
-	template<typename... Integers>
-	static constexpr type make(Integers && ... integers) noexcept {
-		return type{{
-			std::forward<Integers>(integers)...
-		}};
+		return make_helper(make_integer_sequence<0, dimension - 1>{}, std::forward<Integers>(integers)...);
 	}
 };
 

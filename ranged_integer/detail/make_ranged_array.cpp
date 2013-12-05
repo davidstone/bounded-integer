@@ -88,4 +88,5 @@ static_assert(four_dimensions[0][0].size() == third, "Third dimension wrong.");
 static_assert(four_dimensions[0][0][0].size() == fourth, "Fourth dimension wrong.");
 
 }	// namespace check_multi_array
+
 }	// namespace
