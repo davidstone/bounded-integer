@@ -30,6 +30,7 @@ def prepend_dir(directory, sources):
 base_sources = [('test', ['optional.cpp', 'ranged_integer.cpp'] + prepend_dir('detail', [
 	'arithmetic_operators.cpp',
 	'arithmetic_result_type.cpp',
+	'array.cpp',
 	'class.cpp',
 	'common_policy.cpp',
 	'common_type.cpp',
