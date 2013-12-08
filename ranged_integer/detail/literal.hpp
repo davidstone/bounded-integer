@@ -36,7 +36,7 @@ private:
 	static constexpr intmax_t radix = 10;
 	static constexpr intmax_t integer_scale = power(radix, sizeof...(digits));
 public:
-	static constexpr auto value() noexcept -> decltype(literal_ranged_integer<digit>::value() * make_ranged<integer_scale>() + literal_ranged_integer<digits...>::value()) {
+	static constexpr decltype(literal_ranged_integer<digit>::value() * make_ranged<integer_scale>() + literal_ranged_integer<digits...>::value()) value() noexcept {
 		return literal_ranged_integer<digit>::value() * make_ranged<integer_scale>() + literal_ranged_integer<digits...>::value();
 	}
 };
@@ -44,7 +44,7 @@ public:
 template<char digit>
 class literal_ranged_integer<digit> {
 public:
-	static constexpr auto value() noexcept -> decltype(make_ranged<digit - '0'>()) {
+	static constexpr decltype(make_ranged<digit - '0'>()) value() noexcept {
 		return make_ranged<digit - '0'>();
 	}
 };
@@ -52,7 +52,7 @@ public:
 }	// namespace detail
 
 template<char... digits>
-constexpr decltype(detail::literal_ranged_integer<digits...>::value()) operator"" _ri() noexcept {
+constexpr auto operator"" _ri() noexcept {
 	return detail::literal_ranged_integer<digits...>::value();
 }
 

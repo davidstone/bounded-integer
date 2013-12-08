@@ -33,28 +33,28 @@ namespace detail {
 class plus {
 public:
 	template<typename LHS, typename RHS>
-	constexpr auto operator()(LHS && lhs, RHS && rhs) const noexcept -> decltype(std::forward<LHS>(lhs) + std::forward<RHS>(rhs)) {
+	constexpr auto operator()(LHS && lhs, RHS && rhs) const noexcept {
 		return std::forward<LHS>(lhs) + std::forward<RHS>(rhs);
 	}
 };
 class minus {
 public:
 	template<typename LHS, typename RHS>
-	constexpr auto operator()(LHS && lhs, RHS && rhs) const noexcept -> decltype(std::forward<LHS>(lhs) - std::forward<RHS>(rhs)) {
+	constexpr auto operator()(LHS && lhs, RHS && rhs) const noexcept {
 		return std::forward<LHS>(lhs) - std::forward<RHS>(rhs);
 	}
 };
 class multiplies {
 public:
 	template<typename LHS, typename RHS>
-	constexpr auto operator()(LHS && lhs, RHS && rhs) const noexcept -> decltype(std::forward<LHS>(lhs) * std::forward<RHS>(rhs)) {
+	constexpr auto operator()(LHS && lhs, RHS && rhs) const noexcept {
 		return std::forward<LHS>(lhs) * std::forward<RHS>(rhs);
 	}
 };
 class divides {
 public:
 	template<typename LHS, typename RHS>
-	constexpr auto operator()(LHS && lhs, RHS && rhs) const noexcept -> decltype(std::forward<LHS>(lhs) / std::forward<RHS>(rhs)) {
+	constexpr auto operator()(LHS && lhs, RHS && rhs) const noexcept {
 		static_assert(noexcept(std::forward<LHS>(lhs) / std::forward<RHS>(rhs)), "Division can throw exceptions."); 
 		return std::forward<LHS>(lhs) / std::forward<RHS>(rhs);
 	}
@@ -62,7 +62,7 @@ public:
 class modulus {
 public:
 	template<typename LHS, typename RHS>
-	constexpr auto operator()(LHS && lhs, RHS && rhs) const noexcept -> decltype(std::forward<LHS>(lhs) % std::forward<RHS>(rhs)) {
+	constexpr auto operator()(LHS && lhs, RHS && rhs) const noexcept {
 		static_assert(noexcept(std::forward<LHS>(lhs) % std::forward<RHS>(rhs)), "Modulus can throw exceptions."); 
 		return std::forward<LHS>(lhs) % std::forward<RHS>(rhs);
 	}
@@ -70,7 +70,7 @@ public:
 class left_shift {
 public:
 	template<typename LHS, typename RHS>
-	constexpr auto operator()(LHS && lhs, RHS && rhs) const noexcept -> decltype(std::forward<LHS>(lhs) << std::forward<RHS>(rhs)) {
+	constexpr auto operator()(LHS && lhs, RHS && rhs) const noexcept {
 		static_assert(noexcept(std::forward<LHS>(lhs) << std::forward<RHS>(rhs)), "Left shift can throw exceptions."); 
 		return std::forward<LHS>(lhs) << std::forward<RHS>(rhs);
 	}
@@ -78,7 +78,7 @@ public:
 class right_shift {
 public:
 	template<typename LHS, typename RHS>
-	constexpr auto operator()(LHS && lhs, RHS && rhs) const noexcept -> decltype(std::forward<LHS>(lhs) >> std::forward<RHS>(rhs)) {
+	constexpr auto operator()(LHS && lhs, RHS && rhs) const noexcept {
 		static_assert(noexcept(std::forward<LHS>(lhs) >> std::forward<RHS>(rhs)), "Right shift can throw exceptions."); 
 		return std::forward<LHS>(lhs) >> std::forward<RHS>(rhs);
 	}

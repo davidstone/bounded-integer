@@ -162,13 +162,13 @@ public:
 	using const_reverse_iterator = std::reverse_iterator<const_iterator>;
 	using reverse_iterator = std::reverse_iterator<iterator>;
 	
-	constexpr auto size() const noexcept -> decltype(make_ranged<size_>()) {
+	constexpr decltype(make_ranged<size_>()) size() const noexcept {
 		return make_ranged<size_>();
 	}
 	constexpr bool empty() const noexcept {
 		return size() == 0;
 	}
-	constexpr auto max_size() const noexcept -> decltype(make_ranged<std::numeric_limits<std::size_t>::max() / sizeof(value_type)>()) {
+	constexpr decltype(make_ranged<std::numeric_limits<std::size_t>::max() / sizeof(value_type)>()) max_size() const noexcept {
 		return make_ranged<std::numeric_limits<std::size_t>::max() / sizeof(value_type)>();
 	}
 	

@@ -69,29 +69,28 @@ template<std::size_t... dimensions>
 class multi_array {
 public:
 	// make_explicit assumes that all of the dimensions have been passed in.
-	template<
-		typename... Integers,
-		typename common_t = common_type_t<equivalent_type<Integers>...>,
-		typename result_type = detail::array_type<common_t, dimensions...>
-	>
-	static constexpr result_type make_explicit(Integers && ... integers) noexcept {
-		return result_type{ static_cast<common_t>(std::forward<Integers>(integers))... };
+	template<typename... Integers>
+	static constexpr auto make_explicit(Integers && ... integers) noexcept {
+		using common_t = common_type_t<equivalent_type<Integers>...>;
+		return detail::array_type<common_t, dimensions...>{
+			static_cast<common_t>(std::forward<Integers>(integers))...
+		};
 	}
 
 	// make_deduced assumes you did not specify the first dimension.
 	template<typename... Integers>
-	static constexpr auto make_deduced(Integers && ... integers) noexcept -> decltype(multi_array<detail::final_dimension<sizeof...(Integers), dimensions...>::value, dimensions...>::make_explicit(std::forward<Integers>(integers)...)) {
+	static constexpr auto make_deduced(Integers && ... integers) noexcept {
 		return multi_array<detail::final_dimension<sizeof...(Integers), dimensions...>::value, dimensions...>::make_explicit(std::forward<Integers>(integers)...);
 	}
 };
 
 template<typename... Integers>
-constexpr auto make_ranged_array(Integers && ... integers) noexcept -> decltype(multi_array<sizeof...(Integers)>::make_explicit(std::forward<Integers>(integers)...)) {
+constexpr auto make_ranged_array(Integers && ... integers) noexcept {
 	return multi_array<sizeof...(Integers)>::make_explicit(std::forward<Integers>(integers)...);
 }
 
 template<intmax_t... integers>
-constexpr auto make_ranged_array() noexcept -> decltype(make_ranged_array(make_ranged<integers>()...)) {
+constexpr auto make_ranged_array() noexcept {
 	return make_ranged_array(make_ranged<integers>()...);
 }
 
