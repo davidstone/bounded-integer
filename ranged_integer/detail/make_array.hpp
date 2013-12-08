@@ -14,8 +14,8 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with this program. If not, see <http://www.gnu.org/licenses/>.
 
-#ifndef RANGED_INTEGER_MAKE_ARRAY_HPP_
-#define RANGED_INTEGER_MAKE_ARRAY_HPP_
+#ifndef RANGED_INTEGER_DETAIL_MAKE_ARRAY_HPP_
+#define RANGED_INTEGER_DETAIL_MAKE_ARRAY_HPP_
 
 #include "array.hpp"
 #include "common_type.hpp"
@@ -82,4 +82,4 @@ constexpr auto make_array(Args && ... args) noexcept {
 	return make_explicit_array<detail::final_dimension<sizeof...(Args), dimensions...>::value, dimensions...>(std::forward<Args>(args)...);
 }
 
-#endif	// RANGED_INTEGER_MAKE_ARRAY_HPP_
+#endif	// RANGED_INTEGER_DETAIL_MAKE_ARRAY_HPP_

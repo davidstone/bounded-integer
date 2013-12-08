@@ -14,8 +14,8 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with this program. If not, see <http://www.gnu.org/licenses/>.
 
-#ifndef RANGED_INTEGER_ARRAY_HPP_
-#define RANGED_INTEGER_ARRAY_HPP_
+#ifndef RANGED_INTEGER_DETAIL_ARRAY_HPP_
+#define RANGED_INTEGER_DETAIL_ARRAY_HPP_
 
 #include "class.hpp"
 #include "make_ranged.hpp"
@@ -323,4 +323,4 @@ struct tuple_element<index, ::array<T, size>> {
 }	// namespace std
 #endif
 
-#endif	// RANGED_INTEGER_ARRAY_HPP_
+#endif	// RANGED_INTEGER_DETAIL_ARRAY_HPP_

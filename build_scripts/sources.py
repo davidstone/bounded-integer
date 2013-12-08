@@ -27,7 +27,7 @@ def prepend_dir(directory, sources):
 # example = ('example_program_name', example_sources, example_libraries)
 # base_sources = [example]
 
-base_sources = [('test', ['optional.cpp', 'ranged_integer.cpp'] + prepend_dir('detail', [
+base_sources = [('test', ['array.cpp', 'optional.cpp', 'ranged_integer.cpp'] + prepend_dir('detail', [
 	'arithmetic_operators.cpp',
 	'arithmetic_result_type.cpp',
 	'array.cpp',
