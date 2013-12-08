@@ -1,4 +1,4 @@
-// Make an array of ranged_integer with automatically deduced size and type
+// Make an array with automatically deduced size and type
 // Copyright (C) 2013 David Stone
 //
 // This program is free software: you can redistribute it and / or modify
@@ -14,8 +14,8 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with this program. If not, see <http://www.gnu.org/licenses/>.
 
-#ifndef RANGED_INTEGER_MAKE_RANGED_ARRAY_HPP_
-#define RANGED_INTEGER_MAKE_RANGED_ARRAY_HPP_
+#ifndef RANGED_INTEGER_MAKE_ARRAY_HPP_
+#define RANGED_INTEGER_MAKE_ARRAY_HPP_
 
 #include "array.hpp"
 #include "common_type.hpp"
@@ -85,13 +85,8 @@ public:
 };
 
 template<typename... Integers>
-constexpr auto make_ranged_array(Integers && ... integers) noexcept {
+constexpr auto make_array(Integers && ... integers) noexcept {
 	return multi_array<sizeof...(Integers)>::make_explicit(std::forward<Integers>(integers)...);
 }
 
-template<intmax_t... integers>
-constexpr auto make_ranged_array() noexcept {
-	return make_ranged_array(make_ranged<integers>()...);
-}
-
-#endif	// RANGED_INTEGER_MAKE_RANGED_ARRAY_HPP_
+#endif	// RANGED_INTEGER_MAKE_ARRAY_HPP_

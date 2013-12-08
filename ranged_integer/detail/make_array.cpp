@@ -14,7 +14,7 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with this program. If not, see <http://www.gnu.org/licenses/>.
 
-#include "make_ranged_array.hpp"
+#include "make_array.hpp"
 #include "comparison_operators.hpp"
 #include "literal.hpp"
 
@@ -22,12 +22,12 @@ namespace {
 
 namespace check_array {
 
-constexpr auto dynamic_int_array = make_ranged_array(0, 3, 6);
+constexpr auto dynamic_int_array = make_array(0, 3, 6);
 static_assert(dynamic_int_array.size() == 3, "Array size wrong.");
 static_assert(dynamic_int_array.at(2) == 6, "Array element wrong.");
 static_assert(std::is_same<equivalent_type<int>, decay_t<decltype(dynamic_int_array)::value_type>>::value, "Array element type wrong for all int arguments.");
 
-constexpr auto dynamic_mixed_array = make_ranged_array(-6, 15u);
+constexpr auto dynamic_mixed_array = make_array(-6, 15u);
 static_assert(dynamic_mixed_array.size() == 2, "Array size wrong.");
 static_assert(dynamic_mixed_array.front() == -6, "Array element wrong.");
 static_assert(
@@ -38,10 +38,10 @@ static_assert(
 	"Array element type wrong for mixed int / unsigned arguments."
 );
 
-constexpr auto exact_array = make_ranged_array<-100, 5, 378, 23, 10000>();
-static_assert(exact_array.size() == 5, "Array size wrong.");
-static_assert(exact_array[2_ri] == 378, "Array element wrong.");
-static_assert(std::is_same<ranged_integer<-100, 10000, null_policy>, decay_t<decltype(exact_array[0_ri])>>::value, "Array element type wrong for exact template arguments.");
+constexpr auto ranged_array = make_array(-100_ri, 5_ri, 378_ri, 23_ri, 10000_ri);
+static_assert(ranged_array.size() == 5, "Array size wrong.");
+static_assert(ranged_array[2_ri] == 378, "Array element wrong.");
+static_assert(std::is_same<ranged_integer<-100, 10000, null_policy>, decay_t<decltype(ranged_array)::value_type>>::value, "Array element type wrong for exact template arguments.");
 
 }	// namespace check_array
 

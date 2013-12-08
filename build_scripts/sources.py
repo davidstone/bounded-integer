@@ -41,7 +41,7 @@ base_sources = [('test', ['optional.cpp', 'ranged_integer.cpp'] + prepend_dir('d
 	'is_ranged_integer.cpp',
 	'literal.cpp',
 	'make_ranged.cpp',
-	'make_ranged_array.cpp',
+	'make_array.cpp',
 	'make_ranged_optional.cpp',
 	'make_ranged_optional_array.cpp',
 	'math.cpp',
