@@ -17,7 +17,10 @@
 #ifndef RANGED_INTEGER_OPTIONAL_HPP_
 #define RANGED_INTEGER_OPTIONAL_HPP_
 
-#include "detail/optional.hpp"
-#include "detail/make_ranged_optional_array.hpp"
+#include "detail/optional/forward_declaration.hpp"
+#include "detail/optional/make_optional.hpp"
+#include "detail/optional/make_optional_array.hpp"
+#include "detail/optional/optional.hpp"
+#include "detail/optional/relational_operators.hpp"
 
 #endif	// RANGED_INTEGER_OPTIONAL_HPP_

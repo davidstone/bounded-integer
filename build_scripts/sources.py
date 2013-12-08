@@ -42,22 +42,24 @@ base_sources = [('test',
 		'is_ranged_integer.cpp',
 		'literal.cpp',
 		'make_ranged.cpp',
-		'make_ranged_optional.cpp',
-		'make_ranged_optional_array.cpp',
 		'math.cpp',
 		'minmax.cpp',
 		'numeric_limits.cpp',
 		'operators.cpp',
-		'optional.cpp',
-		'optional_forward.cpp',
-		'optional_relational_operators.cpp',
 		'overlapping_range.cpp',
 		'stream.cpp',
 		'ternary_conditional.cpp',
 	]) +
 	prepend_dir('detail/array', [
 		'array.cpp',
-		'make_array.cpp'
+		'make_array.cpp',
+	]) +
+	prepend_dir('detail/optional', [
+		'forward_declaration.cpp',
+		'make_optional.cpp',
+		'make_optional_array.cpp',
+		'optional.cpp',
+		'relational_operators.cpp',
 	]) +
 	prepend_dir('detail/policy', [
 		'all.cpp',

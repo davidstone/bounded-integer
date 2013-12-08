@@ -1,4 +1,4 @@
-// Factory function that turns a built-in into a ranged_integer
+// Factory function to create an optional ranged_integer
 // Copyright (C) 2013 David Stone
 //
 // This program is free software: you can redistribute it and / or modify
@@ -14,13 +14,13 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with this program. If not, see <http://www.gnu.org/licenses/>.
 
-#ifndef RANGED_INTEGER_MAKE_RANGED_OPTIONAL_HPP_
-#define RANGED_INTEGER_MAKE_RANGED_OPTIONAL_HPP_
+#ifndef RANGED_INTEGER_DETAIL_OPTIONAL_MAKE_OPTIONAL_HPP_
+#define RANGED_INTEGER_DETAIL_OPTIONAL_MAKE_OPTIONAL_HPP_
 
-#include "class.hpp"
-#include "make_ranged.hpp"
 #include "optional.hpp"
-#include "policy/null_policy.hpp"
+#include "../class.hpp"
+#include "../make_ranged.hpp"
+#include "../policy/null_policy.hpp"
 #include <limits>
 #include <type_traits>
 
@@ -39,10 +39,10 @@ using equivalent_optional_type = conditional_t<std::is_same<T, none_t>::value, n
 // I don't have to worry about people wanting different overflow policies here,
 // as that is never requested.
 template<typename T, typename result_type = equivalent_optional_type<T>>
-constexpr result_type make_ranged_optional(T const value) noexcept {
+constexpr result_type make_optional(T const value) noexcept {
 	return result_type(value);
 }
 
 }	// namespace detail
 
-#endif	// RANGED_INTEGER_MAKE_RANGED_OPTIONAL_HPP_
+#endif	// RANGED_INTEGER_DETAIL_OPTIONAL_MAKE_OPTIONAL_HPP_

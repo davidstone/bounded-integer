@@ -1,4 +1,4 @@
-// Specialization for optional
+// Optional class
 // Copyright (C) 2013 David Stone
 //
 // This program is free software: you can redistribute it and / or modify
@@ -17,8 +17,8 @@
 #ifndef RANGED_INTEGER_DETAIL_OPTIONAL_RELATIONAL_OPERATORS_HPP_
 #define RANGED_INTEGER_DETAIL_OPTIONAL_RELATIONAL_OPERATORS_HPP_
 
-#include "class.hpp"
-#include "optional_forward.hpp"
+#include "forward_declaration.hpp"
+#include "../class.hpp"
 
 namespace detail {
 

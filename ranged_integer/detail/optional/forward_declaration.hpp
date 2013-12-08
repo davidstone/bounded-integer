@@ -14,8 +14,8 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with this program. If not, see <http://www.gnu.org/licenses/>.
 
-#ifndef RANGED_INTEGER_DETAIL_OPTIONAL_FORWARD_HPP_
-#define RANGED_INTEGER_DETAIL_OPTIONAL_FORWARD_HPP_
+#ifndef RANGED_INTEGER_DETAIL_OPTIONAL_FORWARD_DECLARATION_HPP_
+#define RANGED_INTEGER_DETAIL_OPTIONAL_FORWARD_DECLARATION_HPP_
 
 #include <cstdint>
 
@@ -29,4 +29,4 @@ class optional;
 
 }	// namespace detail
 
-#endif	// RANGED_INTEGER_DETAIL_OPTIONAL_FORWARD_HPP_
+#endif	// RANGED_INTEGER_DETAIL_OPTIONAL_FORWARD_DECLARATION_HPP_

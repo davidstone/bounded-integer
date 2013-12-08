@@ -14,14 +14,14 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with this program. If not, see <http://www.gnu.org/licenses/>.
 
-#ifndef RANGED_INTEGER_MAKE_RANGED_OPTIONAL_ARRAY_HPP_
-#define RANGED_INTEGER_MAKE_RANGED_OPTIONAL_ARRAY_HPP_
+#ifndef RANGED_INTEGER_DETAIL_OPTIONAL_MAKE_OPTIONAL_ARRAY_HPP_
+#define RANGED_INTEGER_DETAIL_OPTIONAL_MAKE_OPTIONAL_ARRAY_HPP_
 
-#include "array/array.hpp"
-#include "common_type.hpp"
-#include "is_ranged_integer.hpp"
-#include "make_ranged_optional.hpp"
+#include "make_optional.hpp"
 #include "optional.hpp"
+#include "../common_type.hpp"
+#include "../is_ranged_integer.hpp"
+#include "../array/array.hpp"
 #include <utility>
 
 namespace detail {
@@ -112,9 +112,9 @@ template<
 		sizeof...(Integers)
 	>
 >
-constexpr result_type make_ranged_optional_array(Integers && ... integers) noexcept {
+constexpr result_type make_optional_array(Integers && ... integers) noexcept {
 	static_assert(detail::all_are_ranged_or_builtin_integer_or_none<decay_t<Integers>...>::value, "All values must be integers or none");
-	return result_type{ detail::make_ranged_optional(std::forward<Integers>(integers))...};
+	return result_type{ detail::make_optional(std::forward<Integers>(integers))...};
 }
 
-#endif	// RANGED_INTEGER_MAKE_RANGED_OPTIONAL_ARRAY_HPP_
+#endif	// RANGED_INTEGER_DETAIL_OPTIONAL_MAKE_OPTIONAL_ARRAY_HPP_

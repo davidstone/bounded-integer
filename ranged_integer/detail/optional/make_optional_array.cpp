@@ -14,30 +14,30 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with this program. If not, see <http://www.gnu.org/licenses/>.
 
-#include "make_ranged_optional_array.hpp"
-#include "comparison_operators.hpp"
-#include "literal.hpp"
+#include "make_optional_array.hpp"
+#include "../comparison_operators.hpp"
+#include "../literal.hpp"
 
 namespace {
 
-constexpr auto dynamic_optional_array = make_ranged_optional_array(0, none, 3, 6);
+constexpr auto dynamic_optional_array = make_optional_array(0, none, 3, 6);
 static_assert(dynamic_optional_array.size() == 4, "Array size wrong.");
 static_assert(*dynamic_optional_array[3_ri] == 6, "valued element wrong.");
 static_assert(dynamic_optional_array[1_ri] == none, "none_t element wrong.");
 static_assert(std::is_same<optional<equivalent_type<int>>, decltype(dynamic_optional_array)::value_type>::value, "Array element type wrong for mixed int + none_t arguments.");
 
-static_assert(std::is_same<optional<equivalent_type<int>>, decltype(make_ranged_optional_array(0))::value_type>::value, "optional array type wrong with no missing values.");
+static_assert(std::is_same<optional<equivalent_type<int>>, decltype(make_optional_array(0))::value_type>::value, "optional array type wrong with no missing values.");
 
 
-constexpr auto known_optional_array = make_ranged_optional_array(0_ri, none, 3_ri, 6_ri);
+constexpr auto known_optional_array = make_optional_array(0_ri, none, 3_ri, 6_ri);
 static_assert(known_optional_array.size() == 4, "Array size wrong.");
 static_assert(*known_optional_array[3_ri] == 6_ri, "valued element wrong.");
 static_assert(known_optional_array[1_ri] == none, "none_t element wrong.");
 static_assert(std::is_same<optional<ranged_integer<0, 6, null_policy>>, decltype(known_optional_array)::value_type>::value, "Array element type wrong for mixed ranged_integer + none_t arguments.");
 
-constexpr auto none_first_optional_array = make_ranged_optional_array(none, 0);
+constexpr auto none_first_optional_array = make_optional_array(none, 0);
 static_assert(none_first_optional_array[0_ri] == none, "none_t element wrong.");
-constexpr auto none_last_optional_array = make_ranged_optional_array(0, none);
+constexpr auto none_last_optional_array = make_optional_array(0, none);
 static_assert(none_last_optional_array[1_ri] == none, "none_t element wrong.");
 
 }	// namespace
