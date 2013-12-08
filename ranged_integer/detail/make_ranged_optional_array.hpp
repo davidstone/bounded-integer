@@ -1,4 +1,4 @@
-// Make a std::array of optional<ranged_integer> with deduced size and type
+// Make an array of optional<ranged_integer> with deduced size and type
 // Copyright (C) 2013 David Stone
 //
 // This program is free software: you can redistribute it and / or modify
@@ -17,11 +17,11 @@
 #ifndef RANGED_INTEGER_MAKE_RANGED_OPTIONAL_ARRAY_HPP_
 #define RANGED_INTEGER_MAKE_RANGED_OPTIONAL_ARRAY_HPP_
 
+#include "array.hpp"
 #include "common_type.hpp"
 #include "is_ranged_integer.hpp"
 #include "make_ranged_optional.hpp"
 #include "optional.hpp"
-#include <array>
 #include <utility>
 
 namespace detail {
@@ -107,14 +107,14 @@ public:
 
 template<
 	typename... Integers,
-	typename result_type = std::array<
+	typename result_type = array<
 		optional<detail::common_optional_type_t<equivalent_type<detail::first_present_value_t<Integers...>>, Integers...>>,
 		sizeof...(Integers)
 	>
 >
 constexpr result_type make_ranged_optional_array(Integers && ... integers) noexcept {
 	static_assert(detail::all_are_ranged_or_builtin_integer_or_none<decay_t<Integers>...>::value, "All values must be integers or none");
-	return result_type{{detail::make_ranged_optional(std::forward<Integers>(integers))...}};
+	return result_type{ detail::make_ranged_optional(std::forward<Integers>(integers))...};
 }
 
 #endif	// RANGED_INTEGER_MAKE_RANGED_OPTIONAL_ARRAY_HPP_
