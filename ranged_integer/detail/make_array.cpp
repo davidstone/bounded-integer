@@ -25,23 +25,15 @@ namespace check_array {
 constexpr auto dynamic_int_array = make_array(0, 3, 6);
 static_assert(dynamic_int_array.size() == 3, "Array size wrong.");
 static_assert(dynamic_int_array.at(2) == 6, "Array element wrong.");
-static_assert(std::is_same<equivalent_type<int>, decay_t<decltype(dynamic_int_array)::value_type>>::value, "Array element type wrong for all int arguments.");
-
-constexpr auto dynamic_mixed_array = make_array(-6, 15u);
-static_assert(dynamic_mixed_array.size() == 2, "Array size wrong.");
-static_assert(dynamic_mixed_array.front() == -6, "Array element wrong.");
-static_assert(
-	std::is_same<
-		common_type_t<equivalent_type<int>, equivalent_type<unsigned>>,
-		decay_t<decltype(dynamic_mixed_array[0_ri])>
-	>::value,
-	"Array element type wrong for mixed int / unsigned arguments."
-);
+static_assert(std::is_same<int, decltype(dynamic_int_array)::value_type>::value, "Array element type wrong for all int arguments.");
 
 constexpr auto ranged_array = make_array(-100_ri, 5_ri, 378_ri, 23_ri, 10000_ri);
 static_assert(ranged_array.size() == 5, "Array size wrong.");
 static_assert(ranged_array[2_ri] == 378, "Array element wrong.");
-static_assert(std::is_same<ranged_integer<-100, 10000, null_policy>, decay_t<decltype(ranged_array)::value_type>>::value, "Array element type wrong for exact template arguments.");
+static_assert(
+	std::is_same<ranged_integer<-100, 10000, null_policy>, decltype(ranged_array)::value_type>::value,
+	"Array element type wrong for exact template arguments."
+);
 
 }	// namespace check_array
 
@@ -88,5 +80,4 @@ static_assert(four_dimensions[0_ri][0_ri].size() == third, "Third dimension wron
 static_assert(four_dimensions[0_ri][0_ri][0_ri].size() == fourth, "Fourth dimension wrong.");
 
 }	// namespace check_multi_array
-
 }	// namespace

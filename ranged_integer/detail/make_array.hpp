@@ -19,7 +19,6 @@
 
 #include "array.hpp"
 #include "common_type.hpp"
-#include "make_ranged.hpp"
 #include <cstddef>
 #include <utility>
 
@@ -54,13 +53,13 @@ public:
 	static constexpr std::size_t value = dimension;
 };
 
-template<std::size_t number_of_integers, std::size_t... dimensions>
+template<std::size_t number_of_values, std::size_t... dimensions>
 class final_dimension {
 private:
 	static constexpr std::size_t product = dimension_product<dimensions...>::value;
 public:
-	static_assert(number_of_integers % product == 0, "Not passed enough integers to deduce dimension.");
-	static constexpr std::size_t value = number_of_integers / product;
+	static_assert(number_of_values % product == 0, "Incorrect number of parameters to deduce dimension.");
+	static constexpr std::size_t value = number_of_values / product;
 };
 
 }	// namespace detail
@@ -69,24 +68,24 @@ template<std::size_t... dimensions>
 class multi_array {
 public:
 	// make_explicit assumes that all of the dimensions have been passed in.
-	template<typename... Integers>
-	static constexpr auto make_explicit(Integers && ... integers) noexcept {
-		using common_t = common_type_t<equivalent_type<Integers>...>;
+	template<typename... Args>
+	static constexpr auto make_explicit(Args && ... args) noexcept {
+		using common_t = common_type_t<Args...>;
 		return detail::array_type<common_t, dimensions...>{
-			static_cast<common_t>(std::forward<Integers>(integers))...
+			std::forward<Args>(args)...
 		};
 	}
 
 	// make_deduced assumes you did not specify the first dimension.
-	template<typename... Integers>
-	static constexpr auto make_deduced(Integers && ... integers) noexcept {
-		return multi_array<detail::final_dimension<sizeof...(Integers), dimensions...>::value, dimensions...>::make_explicit(std::forward<Integers>(integers)...);
+	template<typename... Args>
+	static constexpr auto make_deduced(Args && ... args) noexcept {
+		return multi_array<detail::final_dimension<sizeof...(Args), dimensions...>::value, dimensions...>::make_explicit(std::forward<Args>(args)...);
 	}
 };
 
-template<typename... Integers>
-constexpr auto make_array(Integers && ... integers) noexcept {
-	return multi_array<sizeof...(Integers)>::make_explicit(std::forward<Integers>(integers)...);
+template<typename... Args>
+constexpr auto make_array(Args && ... args) noexcept {
+	return multi_array<sizeof...(Args)>::make_explicit(std::forward<Args>(args)...);
 }
 
 #endif	// RANGED_INTEGER_MAKE_ARRAY_HPP_
