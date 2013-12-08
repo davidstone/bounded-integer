@@ -25,7 +25,7 @@
 #include "detail/minmax.hpp"
 #include "detail/numeric_limits.hpp"
 #include "detail/operators.hpp"
-#include "detail/policy.hpp"
+#include "detail/policy/all.hpp"
 #include "detail/stream.hpp"
 
 // Missing from this list are array and optional classes

@@ -52,10 +52,10 @@ base_sources = [('test', ['array.cpp', 'optional.cpp', 'ranged_integer.cpp'] + p
 	'optional_forward.cpp',
 	'optional_relational_operators.cpp',
 	'overlapping_range.cpp',
-	'policy.cpp',
 	'stream.cpp',
 	'ternary_conditional.cpp',
 	]) + 	prepend_dir('detail/policy', [
+		'all.cpp',
 		'clamp_policy.cpp',
 		'null_policy.cpp',
 		'throw_policy.cpp',

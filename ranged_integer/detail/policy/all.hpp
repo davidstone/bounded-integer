@@ -14,14 +14,14 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with this program. If not, see <http://www.gnu.org/licenses/>.
 
-#ifndef RANGED_INTEGER_POLICY_HPP_
-#define RANGED_INTEGER_POLICY_HPP_
+#ifndef RANGED_INTEGER_POLICY_ALL_HPP_
+#define RANGED_INTEGER_POLICY_ALL_HPP_
 
 // Default constructors must be provided to work around
 // http://www.open-std.org/jtc1/sc22/wg21/docs/cwg_active.html#253
 
-#include "policy/clamp_policy.hpp"
-#include "policy/null_policy.hpp"
-#include "policy/throw_policy.hpp"
+#include "clamp_policy.hpp"
+#include "null_policy.hpp"
+#include "throw_policy.hpp"
 
-#endif	// RANGED_INTEGER_POLICY_HPP_
+#endif	// RANGED_INTEGER_POLICY_ALL_HPP_
