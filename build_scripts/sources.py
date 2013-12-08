@@ -28,7 +28,7 @@ def prepend_dir(directory, sources):
 # base_sources = [example]
 
 base_sources = [('test',
-	['array.cpp', 'optional.cpp', 'ranged_integer.cpp'] +
+	['array.cpp', 'optional.cpp', 'bounded_integer.cpp'] +
 	prepend_dir('detail', [
 		'arithmetic_operators.cpp',
 		'arithmetic_result_type.cpp',
@@ -39,9 +39,9 @@ base_sources = [('test',
 		'compound_assignment_operators.cpp',
 		'enable_if.cpp',
 		'forward_declaration.cpp',
-		'is_ranged_integer.cpp',
+		'is_bounded_integer.cpp',
 		'literal.cpp',
-		'make_ranged.cpp',
+		'make_bounded.cpp',
 		'math.cpp',
 		'minmax.cpp',
 		'numeric_limits.cpp',
