@@ -42,15 +42,19 @@ public:
 	using type = T;
 };
 
+template<std::size_t... dimensions>
+class dimension_product;
+
 template<std::size_t dimension, std::size_t... dimensions>
-class dimension_product {
+class dimension_product<dimension, dimensions...> {
 public:
 	static constexpr std::size_t value = dimension * dimension_product<dimensions...>::value;
 };
-template<std::size_t dimension>
-class dimension_product<dimension> {
+
+template<>
+class dimension_product<> {
 public:
-	static constexpr std::size_t value = dimension;
+	static constexpr std::size_t value = 1;
 };
 
 template<std::size_t number_of_values, std::size_t... dimensions>
@@ -64,28 +68,18 @@ public:
 
 }	// namespace detail
 
-template<std::size_t... dimensions>
-class multi_array {
-public:
-	// make_explicit assumes that all of the dimensions have been passed in.
-	template<typename... Args>
-	static constexpr auto make_explicit(Args && ... args) noexcept {
-		using common_t = common_type_t<Args...>;
-		return detail::array_type<common_t, dimensions...>{
-			std::forward<Args>(args)...
-		};
-	}
+// This assumes that all of the dimensions have been passed in.
+template<std::size_t... dimensions, typename... Args>
+constexpr auto make_explicit_array(Args && ... args) noexcept {
+	using common_t = common_type_t<Args...>;
+	return detail::array_type<common_t, dimensions...>{ std::forward<Args>(args)... };
+}
 
-	// make_deduced assumes you did not specify the first dimension.
-	template<typename... Args>
-	static constexpr auto make_deduced(Args && ... args) noexcept {
-		return multi_array<detail::final_dimension<sizeof...(Args), dimensions...>::value, dimensions...>::make_explicit(std::forward<Args>(args)...);
-	}
-};
 
-template<typename... Args>
+// This assumes you did not specify the first dimension.
+template<std::size_t... dimensions, typename... Args>
 constexpr auto make_array(Args && ... args) noexcept {
-	return multi_array<sizeof...(Args)>::make_explicit(std::forward<Args>(args)...);
+	return make_explicit_array<detail::final_dimension<sizeof...(Args), dimensions...>::value, dimensions...>(std::forward<Args>(args)...);
 }
 
 #endif	// RANGED_INTEGER_MAKE_ARRAY_HPP_

@@ -35,12 +35,7 @@ static_assert(
 	"Array element type wrong for exact template arguments."
 );
 
-}	// namespace check_array
-
-
-namespace check_multi_array {
-
-constexpr auto value = multi_array<5, 4>::make_explicit(
+constexpr auto value = make_explicit_array<5, 4>(
 	0_ri, 1_ri, 2_ri, 3_ri,
 	4_ri, 5_ri, 6_ri, 7_ri,
 	5_ri, 7_ri, 23_ri, 2474_ri,
@@ -58,7 +53,7 @@ static_assert(std::numeric_limits<value_type>::max() == 2474, "max wrong");
 static constexpr std::size_t second = 3;
 static constexpr std::size_t third = 4;
 static constexpr std::size_t fourth = 6;
-constexpr auto four_dimensions = multi_array<second, third, fourth>::make_deduced(
+constexpr auto four_dimensions = make_array<second, third, fourth>(
 	0_ri, 1_ri, 2_ri, 3_ri, 4_ri, 5_ri,
 	0_ri, 1_ri, 2_ri, 3_ri, 4_ri, 5_ri,
 	0_ri, 1_ri, 2_ri, 3_ri, 4_ri, 5_ri,
