@@ -22,23 +22,23 @@ namespace {
 
 constexpr auto dynamic_optional_array = make_ranged_optional_array(0, none, 3, 6);
 static_assert(dynamic_optional_array.size() == 4, "Array size wrong.");
-static_assert(*dynamic_optional_array[3] == 6, "valued element wrong.");
-static_assert(dynamic_optional_array[1] == none, "none_t element wrong.");
-static_assert(std::is_same<optional<equivalent_type<int>>, decay_t<decltype(dynamic_optional_array[0])>>::value, "Array element type wrong for mixed int + none_t arguments.");
+static_assert(*dynamic_optional_array[3_ri] == 6, "valued element wrong.");
+static_assert(dynamic_optional_array[1_ri] == none, "none_t element wrong.");
+static_assert(std::is_same<optional<equivalent_type<int>>, decltype(dynamic_optional_array)::value_type>::value, "Array element type wrong for mixed int + none_t arguments.");
 
-static_assert(std::is_same<optional<equivalent_type<int>>, decay_t<decltype(make_ranged_optional_array(0)[0])>>::value, "optional array type wrong with no missing values.");
+static_assert(std::is_same<optional<equivalent_type<int>>, decltype(make_ranged_optional_array(0))::value_type>::value, "optional array type wrong with no missing values.");
 
 
 constexpr auto known_optional_array = make_ranged_optional_array(0_ri, none, 3_ri, 6_ri);
 static_assert(known_optional_array.size() == 4, "Array size wrong.");
-static_assert(*known_optional_array[3] == 6_ri, "valued element wrong.");
-static_assert(known_optional_array[1] == none, "none_t element wrong.");
-static_assert(std::is_same<optional<ranged_integer<0, 6, null_policy>>, decay_t<decltype(known_optional_array[0])>>::value, "Array element type wrong for mixed ranged_integer + none_t arguments.");
+static_assert(*known_optional_array[3_ri] == 6_ri, "valued element wrong.");
+static_assert(known_optional_array[1_ri] == none, "none_t element wrong.");
+static_assert(std::is_same<optional<ranged_integer<0, 6, null_policy>>, decltype(known_optional_array)::value_type>::value, "Array element type wrong for mixed ranged_integer + none_t arguments.");
 
 constexpr auto none_first_optional_array = make_ranged_optional_array(none, 0);
-static_assert(none_first_optional_array[0] == none, "none_t element wrong.");
+static_assert(none_first_optional_array[0_ri] == none, "none_t element wrong.");
 constexpr auto none_last_optional_array = make_ranged_optional_array(0, none);
-static_assert(none_last_optional_array[1] == none, "none_t element wrong.");
+static_assert(none_last_optional_array[1_ri] == none, "none_t element wrong.");
 
 }	// namespace
 
