@@ -15,8 +15,8 @@
 // along with this program. If not, see <http://www.gnu.org/licenses/>.
 
 #include "array.hpp"
-#include "comparison_operators.hpp"
-#include "literal.hpp"
+#include "../comparison_operators.hpp"
+#include "../literal.hpp"
 
 namespace {
 

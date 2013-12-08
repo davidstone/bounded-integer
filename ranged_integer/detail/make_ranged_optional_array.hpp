@@ -17,7 +17,7 @@
 #ifndef RANGED_INTEGER_MAKE_RANGED_OPTIONAL_ARRAY_HPP_
 #define RANGED_INTEGER_MAKE_RANGED_OPTIONAL_ARRAY_HPP_
 
-#include "array.hpp"
+#include "array/array.hpp"
 #include "common_type.hpp"
 #include "is_ranged_integer.hpp"
 #include "make_ranged_optional.hpp"

@@ -17,7 +17,7 @@
 #ifndef RANGED_INTEGER_ARRAY_HPP_
 #define RANGED_INTEGER_ARRAY_HPP_
 
-#include "detail/array.hpp"
-#include "detail/make_array.hpp"
+#include "detail/array/array.hpp"
+#include "detail/array/make_array.hpp"
 
 #endif	// RANGED_INTEGER_ARRAY_HPP_

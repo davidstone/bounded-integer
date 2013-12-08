@@ -18,7 +18,7 @@
 #define RANGED_INTEGER_DETAIL_MAKE_ARRAY_HPP_
 
 #include "array.hpp"
-#include "common_type.hpp"
+#include "../common_type.hpp"
 #include <cstddef>
 #include <utility>
 

@@ -17,10 +17,10 @@
 #ifndef RANGED_INTEGER_DETAIL_ARRAY_HPP_
 #define RANGED_INTEGER_DETAIL_ARRAY_HPP_
 
-#include "class.hpp"
-#include "make_ranged.hpp"
-#include "policy/null_policy.hpp"
-#include "policy/throw_policy.hpp"
+#include "../class.hpp"
+#include "../make_ranged.hpp"
+#include "../policy/null_policy.hpp"
+#include "../policy/throw_policy.hpp"
 
 #include <algorithm>
 #include <cstdint>
