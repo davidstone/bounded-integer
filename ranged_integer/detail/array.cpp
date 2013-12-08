@@ -20,7 +20,7 @@
 
 namespace {
 
-constexpr array<int, 5> a = {};
+constexpr array<int, 5> a = { 0 };
 static_assert(a.size() == 5, "Incorrect size.");
 static_assert(a[0_ri] == 0, "Incorrect value.");
 static_assert(a.at(4) == 0, "Incorrect value with at.");

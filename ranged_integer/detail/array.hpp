@@ -151,7 +151,7 @@ template<typename T, std::size_t size_>
 class array {
 public:
 	using value_type = T;
-//	using size_type = ?;
+	// using size_type = ?;
 	using difference_type = typename detail::iterator<value_type, size_>::difference_type;
 	using const_reference = value_type const &;
 	using reference = value_type &;
@@ -162,11 +162,6 @@ public:
 	using const_reverse_iterator = std::reverse_iterator<const_iterator>;
 	using reverse_iterator = std::reverse_iterator<iterator>;
 	
-	template<typename... Args>
-	constexpr array(Args && ... args):
-		m_value{ std::forward<Args>(args)... } {
-	}
-
 	constexpr auto size() const noexcept -> decltype(make_ranged<size_>()) {
 		return make_ranged<size_>();
 	}
@@ -260,9 +255,9 @@ public:
 	void swap(array & other) noexcept(detail::adl::is_nothrow_swappable<reference, reference>::value) {
 		std::swap_ranges(begin(), end(), other.begin());
 	}
-private:
-	using array_type = value_type[size_];
-	array_type m_value;
+
+	// Consider this private. It must be public to be an aggregate
+	value_type m_value[size_];
 };
 
 template<typename T, std::size_t size>
