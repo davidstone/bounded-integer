@@ -30,20 +30,6 @@ using decay_t = typename std::decay<T>::type;
 template<typename... Ts>
 using common_type_t = typename std::common_type<decay_t<Ts>...>::type;
 
-namespace detail {
-template<typename T, typename... Ts>
-class all_are_integral {
-public:
-	static constexpr bool value = all_are_integral<T>::value and all_are_integral<Ts...>::value;
-};
-template<typename T>
-class all_are_integral<T> {
-public:
-	static constexpr bool value = std::is_integral<T>::value;
-};
-
-}	// namespace detail
-
 namespace std {
 
 // I do not have to specialize the single-argument version, as it just returns
@@ -53,7 +39,7 @@ template<
 	intmax_t lhs_min, intmax_t lhs_max, typename lhs_policy,
 	intmax_t rhs_min, intmax_t rhs_max, typename rhs_policy
 >
-class common_type<ranged_integer<lhs_min, lhs_max, lhs_policy>, ranged_integer<rhs_min, rhs_max, rhs_policy>> {
+struct common_type<ranged_integer<lhs_min, lhs_max, lhs_policy>, ranged_integer<rhs_min, rhs_max, rhs_policy>> {
 private:
 	static constexpr auto minimum = (lhs_min < rhs_min) ? lhs_min : rhs_min;
 	static constexpr auto maximum = (lhs_max > rhs_max) ? lhs_max : rhs_max;
@@ -63,7 +49,7 @@ public:
 
 // Common type of a ranged_integer and a built-in
 template<intmax_t minimum, intmax_t maximum, typename overflow_policy, typename integer>
-class common_type<ranged_integer<minimum, maximum, overflow_policy>, integer> {
+struct common_type<ranged_integer<minimum, maximum, overflow_policy>, integer> {
 private:
 	using type1 = ranged_integer<minimum, maximum, overflow_policy>;
 	using type2 = equivalent_type<decay_t<integer>>;
@@ -88,20 +74,18 @@ public:
 // general solution to the problem, so I am avoiding defining extended
 // specializations for now.
 
-template<
-	typename integer1,
-	intmax_t minimum, intmax_t maximum, typename overflow_policy
->
-class common_type<integer1, ranged_integer<minimum, maximum, overflow_policy>> {
+template<typename integer1, intmax_t minimum, intmax_t maximum, typename overflow_policy>
+struct common_type<integer1, ranged_integer<minimum, maximum, overflow_policy>> {
 public:
 	using type = common_type_t<ranged_integer<minimum, maximum, overflow_policy>, integer1>;
 };
 
 
-// We use common_type heavily in the creation of deduced arrays, so we need to add in some tricks to limit the maximum instantiation depth:
+// We use common_type heavily in the creation of deduced arrays, so we need to
+// add in some tricks to limit the maximum instantiation depth:
 
 template<intmax_t minimum, intmax_t maximum, typename overflow_policy, typename T1, typename T2, typename T3, typename T4, typename T5, typename... Ts>
-class common_type<ranged_integer<minimum, maximum, overflow_policy>, T1, T2, T3, T4, T5, Ts...> {
+struct common_type<ranged_integer<minimum, maximum, overflow_policy>, T1, T2, T3, T4, T5, Ts...> {
 private:
 	using type0 = ranged_integer<minimum, maximum, overflow_policy>;
 public:
@@ -109,7 +93,7 @@ public:
 };
 
 template<intmax_t minimum, intmax_t maximum, typename overflow_policy, typename T1, typename T2, typename T3, typename T4, typename T5, typename T6, typename T7, typename T8, typename T9, typename... Ts>
-class common_type<ranged_integer<minimum, maximum, overflow_policy>, T1, T2, T3, T4, T5, T6, T7, T8, T9, Ts...> {
+struct common_type<ranged_integer<minimum, maximum, overflow_policy>, T1, T2, T3, T4, T5, T6, T7, T8, T9, Ts...> {
 private:
 	using type0 = ranged_integer<minimum, maximum, overflow_policy>;
 public:

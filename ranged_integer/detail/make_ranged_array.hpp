@@ -22,7 +22,6 @@
 #include "make_ranged.hpp"
 #include <cstddef>
 #include <utility>
-#include <array>
 
 namespace detail {
 

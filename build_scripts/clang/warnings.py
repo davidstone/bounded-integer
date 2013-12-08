@@ -26,8 +26,10 @@
 # followed by another case (in other words, giving multiple cases identical
 # actions).
 #
-# -Wmismatched-tags warns about using class when you specialize a class that was
-# defined with struct
+# -Wmismatched-tags is not disabled for two reasons:
+# 1) It is turned on by default at a low warning level, and I don't want clang
+# warning about my project for everyone else
+# 2) It could possibly cause linker problems due to name mangling issues
 #
 # -Wpadded is turned on occasionally to optimize the layout of classes, but it
 # is not left on because not all classes have enough elements to remove padding
@@ -42,6 +44,6 @@
 # overkill for an "all-or-nothing" setting.
 #
 
-warnings = ['-Weverything', '-Werror', '-Wno-c++98-compat', '-Wno-c++98-compat-pedantic', '-Wno-exit-time-destructors', '-Wno-implicit-fallthrough', '-Wno-mismatched-tags', '-Wno-padded', '-Wno-switch-enum']
+warnings = ['-Weverything', '-Werror', '-Wno-c++98-compat', '-Wno-c++98-compat-pedantic', '-Wno-exit-time-destructors', '-Wno-implicit-fallthrough', '-Wno-padded', '-Wno-switch-enum']
 warnings_debug = []
 warnings_optimized = []

@@ -308,10 +308,12 @@ void swap(array<T, size> & lhs, array<T, size> & rhs) noexcept(noexcept(lhs.swap
 	lhs.swap(rhs);
 }
 
+// I am not sure yet if it is legal to specialize these classes.
+#if 0
 namespace std {
 
 template<typename T, size_t size>
-class tuple_size<::array<T, size>> : public integral_constant<size_t, size> {};
+struct tuple_size<::array<T, size>> : public integral_constant<size_t, size> {};
 
 template<size_t index, typename T, size_t size>
 struct tuple_element<index, ::array<T, size>> {
@@ -319,5 +321,6 @@ struct tuple_element<index, ::array<T, size>> {
 };
 
 }	// namespace std
+#endif
 
 #endif	// RANGED_INTEGER_ARRAY_HPP_
