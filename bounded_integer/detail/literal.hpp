@@ -52,7 +52,7 @@ public:
 }	// namespace detail
 
 template<char... digits>
-constexpr auto operator"" _ri() noexcept {
+constexpr auto operator"" _bi() noexcept {
 	return detail::literal<digits...>::value();
 }
 

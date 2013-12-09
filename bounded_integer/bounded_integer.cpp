@@ -107,11 +107,11 @@ void check_compound_arithmetic() {
 	assert(z == 7);
 	z = 0;
 	assert(z == 0);
-	x %= 6_ri;
+	x %= 6_bi;
 	assert(x == 4);
 	
 	short s = 0;
-	s += 4_ri;
+	s += 4_bi;
 	assert(s == 4);
 	int i = 9;
 	i -= make_bounded(68);
@@ -123,7 +123,7 @@ void check_compound_arithmetic() {
 	assert(i == -5);
 	i %= make_bounded(6);
 	assert(i == -5);
-	i %= 4_ri;
+	i %= 4_bi;
 	assert(i == -1);
 
 	assert(++x == 5);
