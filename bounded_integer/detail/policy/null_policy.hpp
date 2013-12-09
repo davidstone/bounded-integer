@@ -50,18 +50,34 @@ public:
 	null_policy volatile & operator=(null_policy volatile &&) volatile noexcept {
 		return *this;
 	}
-	template<intmax_t, intmax_t, typename integer>
-	constexpr integer assignment(integer const new_value) const noexcept {
-		return new_value;
+	// The identity function is intentionally not constexpr. This provides
+	// compile-time checking if used in a constexpr context. If this is called
+	// at run-time, the optimizer should detect that all branches return the
+	// same value and eliminate all branching, creating no overhead. See
+	// http://stackoverflow.com/questions/20461121/constexpr-error-at-compile-time-but-no-overhead-at-run-time
+	template<intmax_t minimum, intmax_t maximum, typename integer>
+	constexpr integer assignment(integer new_value) const noexcept {
+		return
+			(new_value < minimum) ? error_out_of_range(new_value) :
+			(new_value > maximum) ? error_out_of_range(new_value) :
+			new_value;
 	}
-	template<intmax_t, intmax_t, typename integer>
-	constexpr integer assignment(integer const new_value) const volatile noexcept {
-		return new_value;
+	template<intmax_t minimum, intmax_t maximum, typename integer>
+	constexpr integer assignment(integer new_value) const volatile noexcept {
+		return
+			(new_value < minimum) ? error_out_of_range(new_value) :
+			(new_value > maximum) ? error_out_of_range(new_value) :
+			new_value;
 	}
 
 	// It might actually be true! This should be considered undefined
 	static constexpr bool is_modulo = false;
 	static constexpr bool overflow_is_error = true;
+private:
+	template<typename T>
+	static T error_out_of_range(T t) noexcept {
+		return t;
+	}
 };
 
 #endif	// BOUNDED_INTEGER_POLICY_NULL_POLICY_HPP_

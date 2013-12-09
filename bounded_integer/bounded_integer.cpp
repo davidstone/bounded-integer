@@ -89,7 +89,7 @@ void check_numeric_limits_all() {
 
 void check_compound_arithmetic() {
 	native_integer<0, 10> x(5);
-	x += 5;
+	x += 5_bi;
 	assert(x == 10);
 	checked_integer<-10, 10> y(-5);
 	y += 5;

@@ -15,3 +15,14 @@
 // along with this program. If not, see <http://www.gnu.org/licenses/>.
 
 #include "null_policy.hpp"
+
+namespace {
+
+constexpr null_policy policy;
+constexpr auto value1 = policy.assignment<0, 10>(5);
+// This should not compile
+// constexpr auto value2 = policy.assignment<0, 10>(15);
+// This should
+auto value3 = policy.assignment<0, 10>(15);
+
+}	// namespace
