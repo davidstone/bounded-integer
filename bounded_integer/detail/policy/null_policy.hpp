@@ -59,11 +59,11 @@ public:
 	// http://stackoverflow.com/questions/20461121/constexpr-error-at-compile-time-but-no-overhead-at-run-time
 	template<intmax_t minimum, intmax_t maximum, typename integer>
 	constexpr integer assignment(integer const value) const noexcept {
-		return (minimum < value and value < maximum) ? value : error_out_of_range(value);
+		return (minimum <= value and value <= maximum) ? value : error_out_of_range(value);
 	}
 	template<intmax_t minimum, intmax_t maximum, typename integer>
 	constexpr integer assignment(integer const value) const volatile noexcept {
-		return (minimum < value and value < maximum) ? value : error_out_of_range(value);
+		return (minimum <= value and value <= maximum) ? value : error_out_of_range(value);
 	}
 
 	// It might actually be true! This should be considered undefined
