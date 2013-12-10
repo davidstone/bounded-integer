@@ -19,6 +19,7 @@
 
 namespace bounded_integer {
 namespace {
+using namespace literal;
 
 // I have to use the preprocessor here to create an integer literal
 #define BOUNDED_INTEGER_CHECK_LITERAL(x) \

@@ -20,6 +20,7 @@
 
 namespace bounded_integer {
 namespace {
+using namespace literal;
 
 constexpr auto dynamic_int_array = make_array(0, 3, 6);
 static_assert(dynamic_int_array.size() == 3, "Array size wrong.");

@@ -22,6 +22,8 @@
 namespace bounded_integer {
 namespace {
 
+using namespace literal;
+
 template<typename integer>
 void check_numeric_limits() {
 	using int_limits = std::numeric_limits<integer>;

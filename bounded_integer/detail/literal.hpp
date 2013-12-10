@@ -52,10 +52,14 @@ public:
 
 }	// namespace detail
 
+namespace literal {
+
 template<char... digits>
 constexpr auto operator"" _bi() noexcept {
 	return detail::literal<digits...>::value();
 }
+
+}	// namespace literal
 
 }	// namespace bounded_integer
 #endif	// BOUNDED_INTEGER_LITERAL_HPP_

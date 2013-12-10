@@ -20,6 +20,7 @@
 
 namespace bounded_integer {
 namespace {
+using namespace literal;
 
 constexpr array<int, 5> a = {{}};
 static_assert(a.size() == 5, "Incorrect size.");
