@@ -55,18 +55,18 @@ public:
 	}
 	// The optimizer should be able to simplify this to remove dead checks.
 	template<intmax_t minimum, intmax_t maximum, typename integer>
-	constexpr integer assignment(integer const new_value) const {
+	constexpr integer assignment(integer const value) const {
 		return
-			(new_value < minimum) ? throw std::underflow_error{"Value too small"} :
-			(new_value > maximum) ? throw std::overflow_error{"Value too large"} :
-			new_value;
+			(value < minimum) ? throw std::underflow_error{"Value too small"} :
+			(value > maximum) ? throw std::overflow_error{"Value too large"} :
+			value;
 	}
 	template<intmax_t minimum, intmax_t maximum, typename integer>
-	constexpr integer assignment(integer const new_value) const volatile {
+	constexpr integer assignment(integer const value) const volatile {
 		return
-			(new_value < minimum) ? throw std::underflow_error{"Value too small"} :
-			(new_value > maximum) ? throw std::overflow_error{"Value too large"} :
-			new_value;
+			(value < minimum) ? throw std::underflow_error{"Value too small"} :
+			(value > maximum) ? throw std::overflow_error{"Value too large"} :
+			value;
 	}
 	
 	static constexpr bool is_modulo = false;

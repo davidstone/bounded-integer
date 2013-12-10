@@ -53,18 +53,18 @@ public:
 		return *this;
 	}
 	template<intmax_t minimum, intmax_t maximum, typename integer>
-	constexpr integer assignment(integer const new_value) const noexcept {
+	constexpr integer assignment(integer const value) const noexcept {
 		return
-			(new_value <= minimum) ? static_cast<integer>(minimum) :
-			(new_value >= maximum) ? static_cast<integer>(maximum) :
-			new_value;
+			(value <= minimum) ? static_cast<integer>(minimum) :
+			(value >= maximum) ? static_cast<integer>(maximum) :
+			value;
 	}
 	template<intmax_t minimum, intmax_t maximum, typename integer>
-	constexpr integer assignment(integer const new_value) const volatile noexcept {
+	constexpr integer assignment(integer const value) const volatile noexcept {
 		return
-			(new_value <= minimum) ? static_cast<integer>(minimum) :
-			(new_value >= maximum) ? static_cast<integer>(maximum) :
-			new_value;
+			(value <= minimum) ? static_cast<integer>(minimum) :
+			(value >= maximum) ? static_cast<integer>(maximum) :
+			value;
 	}
 
 	static constexpr bool is_modulo = false;
