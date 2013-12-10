@@ -24,6 +24,7 @@
 #include "../array/array.hpp"
 #include <utility>
 
+namespace bounded_integer {
 namespace detail {
 
 template<typename... Ts>
@@ -117,4 +118,5 @@ constexpr result_type make_optional_array(Integers && ... integers) noexcept {
 	return result_type{ detail::make_optional(std::forward<Integers>(integers))...};
 }
 
+}	// namespace bounded_integer
 #endif	// BOUNDED_INTEGER_DETAIL_OPTIONAL_MAKE_OPTIONAL_ARRAY_HPP_

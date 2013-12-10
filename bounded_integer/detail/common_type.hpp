@@ -23,12 +23,16 @@
 
 #include <type_traits>
 
+namespace bounded_integer {
+
 template<typename T>
 using decay_t = typename std::decay<T>::type;
 
 // decay is temporary workaround
 template<typename... Ts>
 using common_type_t = typename std::common_type<decay_t<Ts>...>::type;
+
+}	// namespace bounded_integer
 
 namespace std {
 
@@ -39,22 +43,25 @@ template<
 	intmax_t lhs_min, intmax_t lhs_max, typename lhs_policy,
 	intmax_t rhs_min, intmax_t rhs_max, typename rhs_policy
 >
-struct common_type<bounded_integer<lhs_min, lhs_max, lhs_policy>, bounded_integer<rhs_min, rhs_max, rhs_policy>> {
+struct common_type<
+	bounded_integer::bounded_integer<lhs_min, lhs_max, lhs_policy>,
+	bounded_integer::bounded_integer<rhs_min, rhs_max, rhs_policy>
+> {
 private:
 	static constexpr auto minimum = (lhs_min < rhs_min) ? lhs_min : rhs_min;
 	static constexpr auto maximum = (lhs_max > rhs_max) ? lhs_max : rhs_max;
 public:
-	using type = bounded_integer<minimum, maximum, common_policy_t<lhs_policy, rhs_policy>>;
+	using type = bounded_integer::bounded_integer<minimum, maximum, bounded_integer::common_policy_t<lhs_policy, rhs_policy>>;
 };
 
 // Common type of a bounded_integer and a built-in
 template<intmax_t minimum, intmax_t maximum, typename overflow_policy, typename integer>
-struct common_type<bounded_integer<minimum, maximum, overflow_policy>, integer> {
+struct common_type<bounded_integer::bounded_integer<minimum, maximum, overflow_policy>, integer> {
 private:
-	using type1 = bounded_integer<minimum, maximum, overflow_policy>;
-	using type2 = equivalent_type<decay_t<integer>>;
+	using type1 = bounded_integer::bounded_integer<minimum, maximum, overflow_policy>;
+	using type2 = bounded_integer::equivalent_type<bounded_integer::decay_t<integer>>;
 public:
-	using type = common_type_t<type1, type2>;
+	using type = bounded_integer::common_type_t<type1, type2>;
 };
 
 // If the user tries to do something like
@@ -75,9 +82,9 @@ public:
 // specializations for now.
 
 template<typename integer1, intmax_t minimum, intmax_t maximum, typename overflow_policy>
-struct common_type<integer1, bounded_integer<minimum, maximum, overflow_policy>> {
+struct common_type<integer1, bounded_integer::bounded_integer<minimum, maximum, overflow_policy>> {
 public:
-	using type = common_type_t<bounded_integer<minimum, maximum, overflow_policy>, integer1>;
+	using type = bounded_integer::common_type_t<bounded_integer::bounded_integer<minimum, maximum, overflow_policy>, integer1>;
 };
 
 
@@ -85,19 +92,19 @@ public:
 // add in some tricks to limit the maximum instantiation depth:
 
 template<intmax_t minimum, intmax_t maximum, typename overflow_policy, typename T1, typename T2, typename T3, typename T4, typename T5, typename... Ts>
-struct common_type<bounded_integer<minimum, maximum, overflow_policy>, T1, T2, T3, T4, T5, Ts...> {
+struct common_type<bounded_integer::bounded_integer<minimum, maximum, overflow_policy>, T1, T2, T3, T4, T5, Ts...> {
 private:
-	using type0 = bounded_integer<minimum, maximum, overflow_policy>;
+	using type0 = bounded_integer::bounded_integer<minimum, maximum, overflow_policy>;
 public:
-	using type = common_type_t<common_type_t<type0, T1, T2, T3, T4>, T5, Ts...>;
+	using type = bounded_integer::common_type_t<bounded_integer::common_type_t<type0, T1, T2, T3, T4>, T5, Ts...>;
 };
 
 template<intmax_t minimum, intmax_t maximum, typename overflow_policy, typename T1, typename T2, typename T3, typename T4, typename T5, typename T6, typename T7, typename T8, typename T9, typename... Ts>
-struct common_type<bounded_integer<minimum, maximum, overflow_policy>, T1, T2, T3, T4, T5, T6, T7, T8, T9, Ts...> {
+struct common_type<bounded_integer::bounded_integer<minimum, maximum, overflow_policy>, T1, T2, T3, T4, T5, T6, T7, T8, T9, Ts...> {
 private:
-	using type0 = bounded_integer<minimum, maximum, overflow_policy>;
+	using type0 = bounded_integer::bounded_integer<minimum, maximum, overflow_policy>;
 public:
-	using type = common_type_t<common_type_t<type0, T1, T2, T3, T4, T5, T6, T7, T8>, T9, Ts...>;
+	using type = bounded_integer::common_type_t<bounded_integer::common_type_t<type0, T1, T2, T3, T4, T5, T6, T7, T8>, T9, Ts...>;
 };
 
 }	// namespace std

@@ -17,9 +17,12 @@
 #include "make_bounded.hpp"
 #include "policy/throw_policy.hpp"
 
+namespace bounded_integer {
+
 static_assert(std::is_same<detail::equivalent_overflow_policy<int>, null_policy>::value, "int should have a null_policy");
 static_assert(
 	std::is_same<detail::equivalent_overflow_policy<bounded_integer<0, 0, throw_policy>>, throw_policy>::value,
 	"incorrect equivalent_overflow_policy for bounded_integer."
 );
 
+}	// namespace bounded_integer

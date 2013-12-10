@@ -25,6 +25,7 @@
 #include <cstdint>
 #include <utility>
 
+namespace bounded_integer {
 namespace detail {
 
 // We have to define our own function objects rather than using the classes from
@@ -134,10 +135,10 @@ private:
 	static constexpr auto p3 = lhs_max * rhs_max;
 public:
 	static constexpr intmax_t min() noexcept {
-		return ::min(p0, p1, p2, p3);
+		return ::bounded_integer::min(p0, p1, p2, p3);
 	}
 	static constexpr intmax_t max() noexcept {
-		return ::max(p0, p1, p2, p3);
+		return ::bounded_integer::max(p0, p1, p2, p3);
 	}
 	static_assert(min() <= max(), "Range is inverted.");
 };
@@ -168,10 +169,10 @@ private:
 	static constexpr auto l3 = lhs_max / rhs_max;
 public:
 	static constexpr intmax_t min() noexcept {
-		return ::min(l0, l1, l2, l3, g0, g1, g2, g3);
+		return ::bounded_integer::min(l0, l1, l2, l3, g0, g1, g2, g3);
 	}
 	static constexpr intmax_t max() noexcept {
-		return ::max(g0, g1, g2, g3);
+		return ::bounded_integer::max(g0, g1, g2, g3);
 	}
 	static_assert(min() <= max(), "Range is inverted.");
 };
@@ -194,7 +195,7 @@ private:
 	// "magnitude" and "negative" in their name.
 	//
 	// The divisor range cannot terminate on a 0 since that is an invalid value.
-	static constexpr auto greatest_divisor = (rhs_max < 0) ? rhs_min : ::min(rhs_min, -rhs_max, -1);
+	static constexpr auto greatest_divisor = (rhs_max < 0) ? rhs_min : ::bounded_integer::min(rhs_min, -rhs_max, -1);
 	static constexpr auto least_divisor =
 		(rhs_min > 0) ? -rhs_min :
 		(rhs_max < 0) ? rhs_max :
@@ -213,7 +214,7 @@ private:
 		static constexpr auto initial_value = result_type(std::numeric_limits<intmax_t>::min(), std::numeric_limits<intmax_t>::max());
 
 		static constexpr result_type combine(result_type lhs, result_type rhs) noexcept {
-			return result_type(::max(lhs.first, rhs.first), ::min(lhs.second, rhs.second));
+			return result_type(::bounded_integer::max(lhs.first, rhs.first), ::bounded_integer::min(lhs.second, rhs.second));
 		}
 
 		static constexpr result_type modulo_round(intmax_t divisor) noexcept {
@@ -254,9 +255,9 @@ private:
 	};
 
 	static constexpr auto maybe_most_negative_dividend = lhs_min;
-	static constexpr auto maybe_least_negative_dividend = (lhs_max < 0) ? lhs_max : ::max(lhs_min, 0);
+	static constexpr auto maybe_least_negative_dividend = (lhs_max < 0) ? lhs_max : ::bounded_integer::max(lhs_min, 0);
 	static constexpr auto maybe_most_positive_dividend = lhs_max;
-	static constexpr auto maybe_least_positive_dividend = (lhs_min > 0) ? lhs_min : ::min(lhs_max, 0);
+	static constexpr auto maybe_least_positive_dividend = (lhs_min > 0) ? lhs_min : ::bounded_integer::min(lhs_max, 0);
 
 	static constexpr bool has_positive_values = maybe_most_positive_dividend > 0;
 	static constexpr bool has_negative_values = maybe_most_negative_dividend <= 0;
@@ -278,13 +279,13 @@ public:
 		return
 			!has_positive_values ? negative.second :
 			!has_negative_values ? -positive.first :
-			::min(negative.second, -positive.first);
+			::bounded_integer::min(negative.second, -positive.first);
 	}
 	static constexpr intmax_t max() noexcept {
 		return
 			!has_positive_values ? negative.first :
 			!has_negative_values ? -positive.second :
-			::max(negative.first, -positive.second);
+			::bounded_integer::max(negative.first, -positive.second);
 	}
 	static_assert(min() <= max(), "Range is inverted.");
 };
@@ -341,5 +342,7 @@ using operator_result = bounded_integer<
 
 template<intmax_t minimum, intmax_t maximum, typename overflow_policy>
 using unary_minus_result = bounded_integer<-maximum, -minimum, overflow_policy>;
+
+}	// namespace bounded_integer
 
 #endif	// BOUNDED_INTEGER_ARITHMETIC_RESULT_TYPE_HPP_

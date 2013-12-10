@@ -20,6 +20,7 @@
 #include "common_type.hpp"
 #include "ternary_conditional.hpp"
 
+namespace bounded_integer {
 namespace detail {
 
 template<typename Function, typename Integer>
@@ -46,4 +47,5 @@ constexpr typename std::common_type<Integers...>::type max(Integers && ... integ
 	return detail::minmax(detail::greater{}, std::forward<Integers>(integers)...);
 }
 
+}	// namespace bounded_integer
 #endif	// BOUNDED_INTEGER_MINMAX_HPP_

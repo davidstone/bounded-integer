@@ -20,6 +20,7 @@
 #include "forward_declaration.hpp"
 #include "../class.hpp"
 
+namespace bounded_integer {
 namespace detail {
 
 template<
@@ -250,5 +251,5 @@ constexpr bool operator>=(none_t const lhs, optional<rhs_min, rhs_max, rhs_polic
 }
 
 }	// namespace detail
-
+}	// namespace bounded_integer
 #endif	// BOUNDED_INTEGER_DETAIL_OPTIONAL_RELATIONAL_OPERATORS_HPP_

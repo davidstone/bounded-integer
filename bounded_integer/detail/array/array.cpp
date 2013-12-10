@@ -18,6 +18,7 @@
 #include "../comparison_operators.hpp"
 #include "../literal.hpp"
 
+namespace bounded_integer {
 namespace {
 
 constexpr array<int, 5> a = {{}};
@@ -26,3 +27,4 @@ static_assert(a[0_bi] == 0, "Incorrect value.");
 static_assert(a.at(4) == 0, "Incorrect value with at.");
 
 }	// namespace
+}	// namespace bounded_integer

@@ -26,6 +26,7 @@
 #include <type_traits>
 #include <boost/integer.hpp>
 
+namespace bounded_integer {
 namespace detail {
 
 template<typename T1, typename T2>
@@ -135,5 +136,6 @@ private:
 	underlying_type m_value;
 };
 
+}	// namespace bounded_integer
 
 #endif	// BOUNDED_INTEGER_CLASS_HPP_

@@ -19,6 +19,7 @@
 #include "numeric_limits.hpp"
 #include "policy/throw_policy.hpp"
 
+namespace bounded_integer {
 namespace {
 
 constexpr bounded_integer<1, 10, throw_policy> const x(9);
@@ -115,3 +116,4 @@ static_assert(std::is_same<decltype(zero_result), decltype(zero)>::value, "Incor
 
 
 }	// namespace
+}	// namespace bounded_integer

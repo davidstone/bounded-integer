@@ -24,6 +24,7 @@
 #include <cstdint>
 #include <type_traits>
 
+namespace bounded_integer {
 namespace detail {
 
 template<typename integer>
@@ -90,4 +91,5 @@ constexpr bounded_integer<value, value, overflow_policy> make_bounded() noexcept
 	return bounded_integer<value, value, overflow_policy>(value, non_check);
 }
 
+}	// namespace bounded_integer
 #endif	// BOUNDED_INTEGER_MAKE_BOUNDED_HPP_

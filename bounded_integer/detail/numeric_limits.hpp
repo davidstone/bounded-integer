@@ -21,6 +21,7 @@
 #include <cstdint>
 #include <limits>
 
+namespace bounded_integer {
 namespace detail {
 
 // http://stackoverflow.com/questions/19609186/what-is-stdnumeric-limitstdigits-supposed-to-represent
@@ -150,13 +151,13 @@ public:
 };
 
 }	// namespace detail
-
+}	// namespace bounded_integer
 namespace std {
 
 template<intmax_t minimum, intmax_t maximum, typename overflow_policy>
-class numeric_limits<bounded_integer<minimum, maximum, overflow_policy>> {
+class numeric_limits<bounded_integer::bounded_integer<minimum, maximum, overflow_policy>> {
 private:
-	using type = bounded_integer<minimum, maximum, overflow_policy>;
+	using type = bounded_integer::bounded_integer<minimum, maximum, overflow_policy>;
 public:
 	static constexpr bool is_specialized = true;
 	static constexpr bool is_signed = minimum < 0;
@@ -172,8 +173,8 @@ public:
 	static constexpr bool is_bounded = true;
 	static constexpr bool is_modulo = overflow_policy::is_modulo;
 	static constexpr int radix = 2;
-	static constexpr int digits = detail::digits<radix>::calculate(minimum, maximum);
-	static constexpr int digits10 = detail::digits<10>::calculate(minimum, maximum);
+	static constexpr int digits = bounded_integer::detail::digits<radix>::calculate(minimum, maximum);
+	static constexpr int digits10 = bounded_integer::detail::digits<10>::calculate(minimum, maximum);
 	static constexpr int max_digits10 = 0;
 	static constexpr int min_exponent = 0;
 	static constexpr int min_exponent10 = 0;
@@ -184,13 +185,13 @@ public:
 	static constexpr bool tinyness_before = false;
 	
 	static constexpr type min() noexcept {
-		return type(minimum, non_check);
+		return type(minimum, bounded_integer::non_check);
 	}
 	static constexpr type lowest() noexcept {
-		return type(minimum, non_check);
+		return type(minimum, bounded_integer::non_check);
 	}
 	static constexpr type max() noexcept {
-		return type(maximum, non_check);
+		return type(maximum, bounded_integer::non_check);
 	}
 	// Some of these functions return 0 for built-in integer types, but 0 may
 	// not be in the representable range. Fortunately, they are also defined as
@@ -199,25 +200,24 @@ public:
 	// therefore technically invokes undefined behavior because 0 might not be
 	// in the range of representable values
 	static constexpr type epsilon() noexcept {
-		return type(minimum, non_check);
+		return type(minimum, bounded_integer::non_check);
 	}
 	static constexpr type round_error() noexcept {
-		return type(minimum, non_check);
+		return type(minimum, bounded_integer::non_check);
 	}
 	static constexpr type infinity() noexcept {
-		return type(minimum, non_check);
+		return type(minimum, bounded_integer::non_check);
 	}
 	static constexpr type quiet_NaN() noexcept {
-		return type(minimum, non_check);
+		return type(minimum, bounded_integer::non_check);
 	}
 	static constexpr type signaling_NaN() noexcept {
-		return type(minimum, non_check);
+		return type(minimum, bounded_integer::non_check);
 	}
 	static constexpr type denorm_min() noexcept {
-		return type(minimum, non_check);
+		return type(minimum, bounded_integer::non_check);
 	}
 };
 
 }	// namespace std
-
 #endif	// BOUNDED_INTEGER_NUMERIC_LIMITS_HPP_

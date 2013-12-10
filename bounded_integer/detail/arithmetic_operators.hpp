@@ -26,6 +26,8 @@
 #include <cstdint>
 #include <type_traits>
 
+namespace bounded_integer {
+
 // It is safe to use the non_check constructor because we already know that the
 // result will fit in result_t. We have to cast to the intermediate common_t in
 // case result_t is narrower than one of the arguments.
@@ -87,5 +89,7 @@ template<intmax_t minimum, intmax_t maximum, typename overflow_policy>
 constexpr auto operator+(bounded_integer<minimum, maximum, overflow_policy> const value) noexcept {
 	return value;
 }
+
+}	// namespace bounded_integer
 
 #endif	// BOUNDED_INTEGER_ARITHMETIC_OPERATORS_HPP_

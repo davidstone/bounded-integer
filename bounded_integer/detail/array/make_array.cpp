@@ -18,9 +18,8 @@
 #include "../comparison_operators.hpp"
 #include "../literal.hpp"
 
+namespace bounded_integer {
 namespace {
-
-namespace check_array {
 
 constexpr auto dynamic_int_array = make_array(0, 3, 6);
 static_assert(dynamic_int_array.size() == 3, "Array size wrong.");
@@ -74,5 +73,5 @@ static_assert(four_dimensions[0_bi].size() == second, "Second dimension wrong.")
 static_assert(four_dimensions[0_bi][0_bi].size() == third, "Third dimension wrong.");
 static_assert(four_dimensions[0_bi][0_bi][0_bi].size() == fourth, "Fourth dimension wrong.");
 
-}	// namespace check_multi_array
 }	// namespace
+}	// namespace bounded_integer

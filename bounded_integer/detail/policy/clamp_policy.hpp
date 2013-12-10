@@ -19,6 +19,8 @@
 
 #include <cstdint>
 
+namespace bounded_integer {
+
 class clamp_policy {
 public:
 	constexpr clamp_policy() noexcept {}
@@ -69,4 +71,5 @@ public:
 	static constexpr bool overflow_is_error = false;
 };
 
+}	// namespace bounded_integer
 #endif	// BOUNDED_INTEGER_POLICY_CLAMP_POLICY_HPP_

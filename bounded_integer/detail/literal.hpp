@@ -20,6 +20,7 @@
 #include "arithmetic_operators.hpp"
 #include "make_bounded.hpp"
 
+namespace bounded_integer {
 namespace detail {
 
 constexpr inline intmax_t power(intmax_t const radix, intmax_t const exponent) noexcept {
@@ -56,4 +57,5 @@ constexpr auto operator"" _bi() noexcept {
 	return detail::literal<digits...>::value();
 }
 
+}	// namespace bounded_integer
 #endif	// BOUNDED_INTEGER_LITERAL_HPP_

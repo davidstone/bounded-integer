@@ -23,6 +23,7 @@
 #include <limits>
 #include <type_traits>
 
+namespace bounded_integer {
 namespace detail {
 
 // This works around a reported circular dependency in clang
@@ -99,5 +100,5 @@ constexpr bool type_in_range<uintmax_t>(intmax_t const, intmax_t const) noexcept
 }
 
 }	// namespace detail
-
+}	// namespace bounded_integer
 #endif	// BOUNDED_INTEGER_OVERLAPPING_RANGE_HPP_

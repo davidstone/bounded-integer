@@ -18,6 +18,7 @@
 #include "numeric_limits.hpp"
 #include "policy/throw_policy.hpp"
 
+namespace bounded_integer {
 namespace {
 
 constexpr bounded_integer<1, 10, null_policy> a(5);
@@ -56,3 +57,4 @@ BOUNDED_INTEGER_COMPARISON(>, 1LL << 50LL, 1LL << 30LL, 7);
 #undef BOUNDED_INTEGER_SINGLE_COMPARISON
 
 }	// namespace
+}	// namespace bounded_integer

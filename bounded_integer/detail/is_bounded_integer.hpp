@@ -21,6 +21,8 @@
 #include <cstdint>
 #include <type_traits>
 
+namespace bounded_integer {
+
 template<typename integer, typename... integers>
 class is_bounded_integer {
 public:
@@ -59,4 +61,5 @@ public:
 	static constexpr bool value = is_bounded_integer<integer>::value;
 };
 
+}	// namespace bounded_integer
 #endif	// BOUNDED_INTEGER_IS_BOUNDED_INTEGER_HPP_

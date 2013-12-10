@@ -19,6 +19,7 @@
 #include <cassert>
 #include <sstream>
 
+namespace bounded_integer {
 namespace {
 
 template<typename integer>
@@ -226,8 +227,10 @@ void check_streaming() {
 
 
 }	// namespace
+}	// namespace bounded_integer
 
 int main() {
+	using namespace bounded_integer;
 	check_compound_arithmetic();
 	check_math();
 	check_numeric_limits_all();

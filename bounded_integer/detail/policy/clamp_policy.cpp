@@ -19,6 +19,7 @@
 #include "../comparison_operators.hpp"
 #include "../numeric_limits.hpp"
 
+namespace bounded_integer {
 namespace {
 
 static constexpr intmax_t minimum = 27;
@@ -34,3 +35,4 @@ constexpr type value(initial);
 static_assert(value == std::numeric_limits<type>::max(), "Fail to clamp value when the source type is larger than the destination type.");
 
 }	// namespace
+}	// namespace bounded_integer

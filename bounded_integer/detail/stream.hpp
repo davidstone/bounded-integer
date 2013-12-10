@@ -22,6 +22,8 @@
 #include <istream>
 #include <ostream>
 
+namespace bounded_integer {
+
 template<
 	typename CharT, typename Traits,
 	intmax_t minimum, intmax_t maximum, typename policy
@@ -68,4 +70,5 @@ std::basic_istream<CharT, Traits> & operator>>(std::basic_istream<CharT, Traits>
 	return in;
 }
 
+}	// namespace bounded_integer
 #endif	// BOUNDED_INTEGER_STREAM_HPP_

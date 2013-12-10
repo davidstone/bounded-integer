@@ -20,6 +20,8 @@
 #include <cstdint>
 #include <stdexcept>
 
+namespace bounded_integer {
+
 class throw_policy {
 public:
 	constexpr throw_policy() noexcept {}
@@ -71,4 +73,5 @@ public:
 	static constexpr bool overflow_is_error = true;
 };
 
+}	// namespace bounded_integer
 #endif	// BOUNDED_INTEGER_POLICY_THROW_POLICY_HPP_

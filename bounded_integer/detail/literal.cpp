@@ -17,6 +17,7 @@
 #include "literal.hpp"
 #include "comparison_operators.hpp"
 
+namespace bounded_integer {
 namespace {
 
 // I have to use the preprocessor here to create an integer literal
@@ -39,3 +40,4 @@ BOUNDED_INTEGER_CHECK_LITERAL(-0)
 #undef BOUNDED_INTEGER_CHECK_LITERAL
 
 }	// namespace
+}	// namespace bounded_integer

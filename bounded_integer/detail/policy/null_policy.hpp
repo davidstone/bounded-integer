@@ -19,6 +19,8 @@
 
 #include <cstdint>
 
+namespace bounded_integer {
+
 class null_policy {
 public:
 	constexpr null_policy() noexcept {}
@@ -80,4 +82,5 @@ private:
 	}
 };
 
+}	// namespace bounded_integer
 #endif	// BOUNDED_INTEGER_POLICY_NULL_POLICY_HPP_

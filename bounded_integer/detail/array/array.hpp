@@ -28,6 +28,7 @@
 #include <limits>
 #include <utility>
 
+namespace bounded_integer {
 namespace detail {
 
 template<typename T, intmax_t size>
@@ -307,6 +308,7 @@ template<typename T, std::size_t size>
 void swap(array<T, size> & lhs, array<T, size> & rhs) noexcept(noexcept(lhs.swap(rhs))) {
 	lhs.swap(rhs);
 }
+}	// namespace bounded_integer
 
 // I am not sure yet if it is legal to specialize these classes.
 #if 0

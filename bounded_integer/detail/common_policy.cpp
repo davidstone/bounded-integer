@@ -17,6 +17,8 @@
 #include "common_policy.hpp"
 #include "policy/throw_policy.hpp"
 
+namespace bounded_integer {
+
 static_assert(
 	std::is_same<common_policy_t<null_policy, null_policy>, null_policy>::value,
 	"common_policy gives wrong type for all null_policy"
@@ -36,3 +38,5 @@ static_assert(
 	std::is_same<common_policy_t<throw_policy, throw_policy>, throw_policy>::value,
 	"common_policy gives wrong type for all throw_policy"
 );
+
+} // namespace bounded_integer

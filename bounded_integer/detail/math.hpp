@@ -23,6 +23,8 @@
 #include "minmax.hpp"
 #include <type_traits>
 
+namespace bounded_integer {
+
 template<intmax_t minimum, intmax_t maximum, typename overflow_policy, typename result_type = bounded_integer<max(0, minimum, -maximum), max(maximum, -minimum), overflow_policy>>
 constexpr result_type abs(bounded_integer<minimum, maximum, overflow_policy> const value) noexcept {
 	// We have to cast the value to the common type of the argument and result
@@ -34,4 +36,5 @@ constexpr result_type abs(bounded_integer<minimum, maximum, overflow_policy> con
 		result_type(-static_cast<common_t>(value), non_check);
 }
 
+}	// namespace bounded_integer
 #endif	// BOUNDED_INTEGER_MATH_HPP_

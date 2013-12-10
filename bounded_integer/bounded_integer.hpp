@@ -32,6 +32,8 @@
 
 #include <cstdint>
 
+namespace bounded_integer {
+
 template<intmax_t minimum, intmax_t maximum>
 using checked_integer = bounded_integer<minimum, maximum, throw_policy>;
 
@@ -40,5 +42,7 @@ using native_integer = bounded_integer<minimum, maximum, null_policy>;
 
 template<intmax_t minimum, intmax_t maximum>
 using clamped_integer = bounded_integer<minimum, maximum, clamp_policy>;
+
+}	// namespace bounded_integer
 
 #endif	// BOUNDED_INTEGER_HPP_

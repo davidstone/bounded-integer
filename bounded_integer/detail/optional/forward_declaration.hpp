@@ -19,6 +19,8 @@
 
 #include <cstdint>
 
+namespace bounded_integer {
+
 enum class none_t {};
 constexpr none_t none = none_t{};
 
@@ -28,5 +30,6 @@ template<intmax_t minimum, intmax_t maximum, typename policy, typename enable = 
 class optional;
 
 }	// namespace detail
+}	// namespace bounded_integer
 
 #endif	// BOUNDED_INTEGER_DETAIL_OPTIONAL_FORWARD_DECLARATION_HPP_

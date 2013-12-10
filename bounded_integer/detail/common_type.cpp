@@ -16,6 +16,7 @@
 
 #include "common_type.hpp"
 
+namespace bounded_integer {
 namespace {
 
 using type1 = bounded_integer<1, 5, null_policy>;
@@ -33,3 +34,4 @@ using expected_type4 = bounded_integer<-5, 10, null_policy>;
 static_assert(std::is_same<expected_type4, common_type4>::value, "common_type wrong for 4 values.");
 
 }	// namespace
+}	// namespace bounded_integer

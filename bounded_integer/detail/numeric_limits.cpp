@@ -17,8 +17,10 @@
 #include "numeric_limits.hpp"
 #include "policy/null_policy.hpp"
 
+namespace bounded_integer {
 namespace {
 
 static_assert(std::numeric_limits<bounded_integer<1, 1000, null_policy>>::digits == 0, "Meaningless digits not 0.");
 
 }	// namespace
+}	// namespace bounded_integer

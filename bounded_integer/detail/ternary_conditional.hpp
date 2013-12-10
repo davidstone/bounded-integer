@@ -21,6 +21,7 @@
 #include "is_bounded_integer.hpp"
 #include <utility>
 
+namespace bounded_integer {
 namespace detail {
 
 template<typename LHS, typename RHS, typename Compare, typename result_type = typename std::common_type<LHS, RHS>::type>
@@ -82,5 +83,5 @@ constexpr result_type ternary_conditional(bool const condition, LHS && lhs, RHS 
 		static_cast<result_type>(std::forward<RHS>(rhs));
 }
 
-
+}	// namespace bounded_integer
 #endif	// BOUNDED_INTEGER_TERNARY_CONDITIONAL_HPP_

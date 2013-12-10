@@ -24,6 +24,8 @@
 
 #include <cstdint>
 
+namespace bounded_integer {
+
 // In my original implementation, I wrote these as comparisons between a
 // bounded_integer and its underlying type. However, this actually makes
 // relational operators much less useful than they otherwise could be. For
@@ -183,5 +185,5 @@ constexpr bool operator>=(integer const lhs, bounded_integer<minimum, maximum, o
 	return !(lhs < rhs);
 }
 
-
+}	// namespace bounded_integer
 #endif	// BOUNDED_INTEGER_COMPARISON_OPERATORS_HPP_

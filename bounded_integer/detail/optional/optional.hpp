@@ -27,6 +27,7 @@
 #include <limits>
 #include <stdexcept>
 
+namespace bounded_integer {
 namespace detail {
 
 template<intmax_t minimum, intmax_t maximum>
@@ -248,4 +249,5 @@ optional<typename std::remove_reference<T>::type> make_optional(T && value) noex
 	return optional<T>(std::forward<T>(value));
 }
 
+}	// namespace bounded_integer
 #endif	// BOUNDED_INTEGER_DETAIL_OPTIONAL_OPTIONAL_HPP_

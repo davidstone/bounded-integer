@@ -22,6 +22,8 @@
 #include "forward_declaration.hpp"
 #include <type_traits>
 
+namespace bounded_integer {
+
 // We call make_bounded with the target's overflow policy because we need this
 // exact overflow policy. We do not want to rely on common_policy here.
 #define BOUNDED_INTEGER_COMPOUND_ASSIGNMENT_OPERATOR_TARGET(symbol) \
@@ -117,6 +119,5 @@ bounded_integer<minimum, maximum, overflow_policy> operator--(bounded_integer<mi
 	return previous;
 }
 
-
-
+}	// namespace bounded_integer
 #endif	// BOUNDED_INTEGER_COMPOUND_ASSIGNMENT_OPERATORS_HPP_

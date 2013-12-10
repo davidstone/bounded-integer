@@ -16,6 +16,7 @@
 
 #include "null_policy.hpp"
 
+namespace bounded_integer {
 namespace {
 
 constexpr null_policy policy;
@@ -26,3 +27,4 @@ constexpr auto value1 = policy.assignment<0, 10>(5);
 auto value3 = policy.assignment<0, 10>(15);
 
 }	// namespace
+}	// namespace bounded_integer

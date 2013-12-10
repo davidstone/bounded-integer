@@ -24,6 +24,7 @@
 #include <limits>
 #include <type_traits>
 
+namespace bounded_integer {
 namespace detail {
 
 template<bool condition, typename T, typename F>
@@ -44,5 +45,5 @@ constexpr result_type make_optional(T const value) noexcept {
 }
 
 }	// namespace detail
-
+}	// namespace bounded_integer
 #endif	// BOUNDED_INTEGER_DETAIL_OPTIONAL_MAKE_OPTIONAL_HPP_

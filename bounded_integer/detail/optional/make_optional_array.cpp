@@ -18,6 +18,7 @@
 #include "../comparison_operators.hpp"
 #include "../literal.hpp"
 
+namespace bounded_integer {
 namespace {
 
 constexpr auto dynamic_optional_array = make_optional_array(0, none, 3, 6);
@@ -41,4 +42,4 @@ constexpr auto none_last_optional_array = make_optional_array(0, none);
 static_assert(none_last_optional_array[1_bi] == none, "none_t element wrong.");
 
 }	// namespace
-
+}	// namespace bounded_integer
