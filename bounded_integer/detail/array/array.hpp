@@ -169,8 +169,8 @@ public:
 	constexpr bool empty() const noexcept {
 		return size() == 0;
 	}
-	constexpr decltype(make_bounded<std::numeric_limits<std::size_t>::max() / sizeof(value_type)>()) max_size() const noexcept {
-		return make_bounded<std::numeric_limits<std::size_t>::max() / sizeof(value_type)>();
+	constexpr decltype(make_bounded<size_>()) max_size() const noexcept {
+		return make_bounded<size_>();
 	}
 	
 	
