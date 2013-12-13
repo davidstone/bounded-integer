@@ -25,6 +25,7 @@
 #include <limits>
 #include <type_traits>
 #include <boost/integer.hpp>
+#include "policy/throw_policy.hpp"
 
 namespace bounded_integer {
 namespace detail {
@@ -54,25 +55,6 @@ constexpr bool is_explicitly_constructible_from() noexcept {
 	return !is_implicitly_constructible_from<minimum, maximum, U>() and
 		(has_overlap<typename std::decay<U>::type>(minimum, maximum) or !policy::overflow_is_error);
 }
-
-// This converts an enum to its underlying type, otherwise, it does nothing
-template<typename T, typename enable = void>
-class make_integer;
-
-template<typename T>
-class make_integer<T, typename std::enable_if<!std::is_enum<T>::value>::type> {
-public:
-	using type = T;
-};
-
-template<typename T>
-class make_integer<T, typename std::enable_if<std::is_enum<T>::value>::type> {
-public:
-	using type = typename std::underlying_type<T>::type;
-};
-
-template<typename T>
-using make_integer_t = typename make_integer<T>::type;
 
 }	// namespace detail
 
@@ -112,7 +94,12 @@ public:
 		detail::is_explicitly_constructible_from<minimum, maximum, overflow_policy_type, integer>()
 	> = clang_dummy>
 	constexpr explicit bounded_integer(integer && other):
-		bounded_integer(overflow_policy_type{}.template assignment<minimum, maximum>(static_cast<detail::make_integer_t<integer>>(std::forward<integer>(other))), non_check) {
+		bounded_integer(overflow_policy_type{}.template assignment<minimum, maximum>(std::forward<integer>(other)), non_check) {
+	}
+
+	template<typename integer, enable_if_t<std::is_enum<integer>::value> = clang_dummy>
+	constexpr explicit bounded_integer(integer other):
+		bounded_integer(static_cast<typename std::underlying_type<integer>::type>(other)) {
 	}
 
 	bounded_integer & operator=(bounded_integer const &) noexcept = default;

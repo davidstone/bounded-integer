@@ -52,13 +52,9 @@ template<typename integer, enable_if_t<std::numeric_limits<integer>::is_speciali
 constexpr bool entirely_in_range(intmax_t const minimum, intmax_t const maximum) noexcept {
 	return get_min<integer>::value <= minimum and maximum <= get_max<integer>::value;
 }
-template<typename integer, enable_if_t<!std::numeric_limits<integer>::is_specialized and !std::is_enum<integer>::value> = clang_dummy>
+template<typename integer, enable_if_t<!std::numeric_limits<integer>::is_specialized> = clang_dummy>
 constexpr bool entirely_in_range(intmax_t, intmax_t) noexcept {
 	return false;
-}
-template<typename integer, enable_if_t<!std::numeric_limits<integer>::is_specialized and std::is_enum<integer>::value> = clang_dummy>
-constexpr bool entirely_in_range(intmax_t minimum, intmax_t maximum) noexcept {
-	return entirely_in_range<typename std::underlying_type<integer>::type>(minimum, maximum);
 }
 template<>
 constexpr bool entirely_in_range<uintmax_t>(intmax_t const minimum, intmax_t) noexcept {
@@ -69,13 +65,9 @@ template<typename integer, enable_if_t<std::numeric_limits<integer>::is_speciali
 constexpr bool has_overlap(intmax_t const minimum, intmax_t const maximum) noexcept {
 	return minimum <= get_max<integer>::value and maximum >= get_min<integer>::value;
 }
-template<typename integer, enable_if_t<!std::numeric_limits<integer>::is_specialized and !std::is_enum<integer>::value> = clang_dummy>
+template<typename integer, enable_if_t<!std::numeric_limits<integer>::is_specialized> = clang_dummy>
 constexpr bool has_overlap(intmax_t, intmax_t) noexcept {
 	return false;
-}
-template<typename integer, enable_if_t<!std::numeric_limits<integer>::is_specialized and std::is_enum<integer>::value> = clang_dummy>
-constexpr bool has_overlap(intmax_t minimum, intmax_t maximum) noexcept {
-	return has_overlap<typename std::underlying_type<integer>::type>(minimum, maximum);
 }
 template<>
 constexpr bool has_overlap<uintmax_t>(intmax_t, intmax_t const maximum) noexcept {
@@ -86,13 +78,9 @@ template<typename integer, enable_if_t<std::numeric_limits<integer>::is_speciali
 constexpr bool type_in_range(intmax_t const minimum, intmax_t const maximum) noexcept {
 	return minimum <= get_min<integer>::value and get_max<integer>::value <= maximum;
 }
-template<typename integer, enable_if_t<!std::numeric_limits<integer>::is_specialized and !std::is_enum<integer>::value> = clang_dummy>
+template<typename integer, enable_if_t<!std::numeric_limits<integer>::is_specialized> = clang_dummy>
 constexpr bool type_in_range(intmax_t, intmax_t) noexcept {
 	return false;
-}
-template<typename integer, enable_if_t<!std::numeric_limits<integer>::is_specialized and std::is_enum<integer>::value> = clang_dummy>
-constexpr bool type_in_range(intmax_t minimum, intmax_t maximum) noexcept {
-	return type_in_range<typename std::underlying_type<integer>::type>(minimum, maximum);
 }
 template<>
 constexpr bool type_in_range<uintmax_t>(intmax_t const, intmax_t const) noexcept {
