@@ -160,13 +160,13 @@ void check_throw_policy() {
 		policy.assignment<minimum, maximum>(20);
 		assert(false);
 	}
-	catch (std::overflow_error const &) {
+	catch (...) {
 	}
 	try {
 		policy.assignment<minimum, maximum>(-6);
 		assert(false);
 	}
-	catch (std::underflow_error const &) {
+	catch (...) {
 	}
 }
 

@@ -48,6 +48,7 @@ base_sources = [('test',
 		'operators.cpp',
 		'overlapping_range.cpp',
 		'stream.cpp',
+		'string.cpp',
 		'ternary_conditional.cpp',
 	]) +
 	prepend_dir('detail/array', [

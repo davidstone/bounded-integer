@@ -17,6 +17,7 @@
 #ifndef BOUNDED_INTEGER_POLICY_THROW_POLICY_HPP_
 #define BOUNDED_INTEGER_POLICY_THROW_POLICY_HPP_
 
+#include "../string.hpp"
 #include <cstdint>
 #include <stdexcept>
 
@@ -56,16 +57,14 @@ public:
 	// The optimizer should be able to simplify this to remove dead checks.
 	template<intmax_t minimum, intmax_t maximum, typename integer>
 	constexpr integer assignment(integer const value) const {
-		return
-			(value < minimum) ? throw std::underflow_error{"Value too small"} :
-			(value > maximum) ? throw std::overflow_error{"Value too large"} :
+		return (value < minimum or maximum < value) ?
+			throw std::range_error("Got a value of " + to_string(value) + " but expected a value in the range [" + to_string(minimum) + ", " + to_string(maximum) + "]") :
 			value;
 	}
 	template<intmax_t minimum, intmax_t maximum, typename integer>
 	constexpr integer assignment(integer const value) const volatile {
-		return
-			(value < minimum) ? throw std::underflow_error{"Value too small"} :
-			(value > maximum) ? throw std::overflow_error{"Value too large"} :
+		return (value < minimum or maximum < value) ?
+			throw std::range_error("Got a value of " + to_string(value) + " but expected a value in the range [" + to_string(minimum) + ", " + to_string(maximum) + "]") :
 			value;
 	}
 	
