@@ -20,20 +20,17 @@
 #include "arithmetic_operators.hpp"
 #include "common_type.hpp"
 #include "forward_declaration.hpp"
+#include "make_bounded.hpp"
 #include "minmax.hpp"
 #include <type_traits>
 
 namespace bounded_integer {
 
-template<intmax_t minimum, intmax_t maximum, typename overflow_policy, typename result_type = bounded_integer<max(0, minimum, -maximum), max(maximum, -minimum), overflow_policy>>
-constexpr result_type abs(bounded_integer<minimum, maximum, overflow_policy> const value) noexcept {
-	// We have to cast the value to the common type of the argument and result
-	// type before we negate because -min might not be in the value, even if we
-	// were to cast to the underlying type first.
-	using common_t = common_type_t<decay_t<decltype(value)>, result_type>;
-	return (value >= 0) ?
-		result_type(static_cast<common_t>(value), non_check) :
-		result_type(-static_cast<common_t>(value), non_check);
+template<intmax_t minimum, intmax_t maximum, typename overflow_policy>
+constexpr auto abs(bounded_integer<minimum, maximum, overflow_policy> const value) noexcept {
+	// The 0 has to be there to restrict the range of possible values. Without
+	// it, abs(bounded_integer<-7, 3>) would be [-3, 7] instead of [0, 7].
+	return max(value, -value, make_bounded<0>());
 }
 
 }	// namespace bounded_integer

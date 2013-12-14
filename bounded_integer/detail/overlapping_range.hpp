@@ -19,8 +19,8 @@
 
 #include "enable_if.hpp"
 #include "forward_declaration.hpp"
+#include "numeric_limits.hpp"
 #include <cstdint>
-#include <limits>
 #include <type_traits>
 
 namespace bounded_integer {

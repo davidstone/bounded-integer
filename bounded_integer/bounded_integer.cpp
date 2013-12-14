@@ -24,6 +24,20 @@ namespace {
 
 using namespace literal;
 
+void check_minmax() {
+	constexpr auto minimum = min(0_bi, 10_bi, 5_bi, bounded_integer<-53, 1000, null_policy>(3_bi));
+	using min_type = decltype(minimum);
+	static_assert(minimum == 0_bi, "Incorrect minimum value.");
+	static_assert(std::numeric_limits<min_type>::min() == -53, "Incorrect minimum minimum.");
+	static_assert(std::numeric_limits<min_type>::max() == 0, "Incorrect maximum minimum.");
+
+	constexpr auto maximum = max(0_bi, 10_bi, 5_bi, bounded_integer<-53, 1000, null_policy>(3_bi));
+	using max_type = decltype(maximum);
+	static_assert(maximum == 10_bi, "Incorrect maximum value.");
+	static_assert(std::numeric_limits<max_type>::min() == 10, "Incorrect minimum maximum.");
+	static_assert(std::numeric_limits<max_type>::max() == 1000, "Incorrect maximum maximum.");
+}
+
 template<typename integer>
 void check_numeric_limits() {
 	using int_limits = std::numeric_limits<integer>;

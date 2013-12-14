@@ -22,55 +22,6 @@
 #include <utility>
 
 namespace bounded_integer {
-namespace detail {
-
-template<typename LHS, typename RHS, typename Compare, typename result_type = typename std::common_type<LHS, RHS>::type>
-constexpr result_type ternary_conditional(Compare && compare, LHS && lhs, RHS && rhs) {
-	return std::forward<Compare>(compare)(lhs, rhs) ?
-		static_cast<result_type>(std::forward<LHS>(lhs)) :
-		static_cast<result_type>(std::forward<RHS>(rhs));
-}
-
-
-class less {
-public:
-	template<typename LHS, typename RHS>
-	constexpr typename std::common_type<LHS, RHS>::type operator()(LHS && lhs, RHS && rhs) const {
-		return ternary_conditional(compare{}, lhs, rhs);
-	}
-private:
-	class compare {
-	public:
-		template<typename LHS, typename RHS>
-		constexpr bool operator()(LHS const & lhs, RHS const & rhs) const {
-			return lhs < rhs;
-		}
-		template<typename LHS, typename RHS>
-		constexpr bool operator()(LHS const volatile & lhs, RHS const volatile & rhs) const {
-			return lhs < rhs;
-		}
-	};
-};
-class greater {
-public:
-	template<typename LHS, typename RHS>
-	constexpr typename std::common_type<LHS, RHS>::type operator()(LHS && lhs, RHS && rhs) const {
-		return ternary_conditional(compare{}, lhs, rhs);
-	}
-private:
-	class compare {
-	public:
-		template<typename LHS, typename RHS>
-		constexpr bool operator()(LHS const & lhs, RHS const & rhs) const {
-			return lhs > rhs;
-		}
-		template<typename LHS, typename RHS>
-		constexpr bool operator()(LHS const volatile & lhs, RHS const volatile & rhs) const {
-			return lhs > rhs;
-		}
-	};
-};
-}	// namespace detail
 
 template<
 	typename LHS, typename RHS,
