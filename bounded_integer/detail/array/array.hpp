@@ -167,7 +167,7 @@ public:
 		return make_bounded<size_>();
 	}
 	constexpr bool empty() const noexcept {
-		return size() == 0;
+		return size() == make_bounded<0>();
 	}
 	constexpr decltype(make_bounded<size_>()) max_size() const noexcept {
 		return make_bounded<size_>();
@@ -196,10 +196,10 @@ public:
 		return m_value[0];
 	}
 	constexpr const_reference back() const {
-		return m_value[size() - 1];
+		return m_value[size_ - 1];
 	}
 	reference back() {
-		return m_value[size() - 1];
+		return m_value[size_ - 1];
 	}
 
 	constexpr const_pointer data() const noexcept {
@@ -220,10 +220,10 @@ public:
 	}
 
 	constexpr const_iterator end() const noexcept {
-		return const_iterator(m_value + size());
+		return const_iterator(m_value + size_);
 	}
 	iterator end() noexcept {
-		return iterator(m_value + size());
+		return iterator(m_value + size_);
 	}
 	constexpr const_iterator cend() const noexcept {
 		return end();
