@@ -27,6 +27,7 @@
 #include "detail/operators.hpp"
 #include "detail/policy/all.hpp"
 #include "detail/stream.hpp"
+#include "detail/ternary_conditional.hpp"
 
 // Missing from this list are array and optional classes
 
