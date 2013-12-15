@@ -28,14 +28,14 @@ using std::to_string;
 
 template<intmax_t minimum, intmax_t maximum, typename overflow_policy>
 std::string to_string(bounded_integer<minimum, maximum, overflow_policy> const value) {
-	return to_string(value.value());
+	return to_string(+value.value());
 }
 
 using std::to_wstring;
 
 template<intmax_t minimum, intmax_t maximum, typename overflow_policy>
 std::wstring to_wstring(bounded_integer<minimum, maximum, overflow_policy> const value) {
-	return to_wstring(value.value());
+	return to_wstring(+value.value());
 }
 
 // TODO: template<typename T> T from_string(std::string const & str);

@@ -58,13 +58,13 @@ public:
 	template<intmax_t minimum, intmax_t maximum, typename integer>
 	constexpr integer assignment(integer const value) const {
 		return (value < minimum or maximum < value) ?
-			throw std::range_error("Got a value of " + to_string(value) + " but expected a value in the range [" + to_string(minimum) + ", " + to_string(maximum) + "]") :
+			throw std::range_error("Got a value of " + to_string(+value) + " but expected a value in the range [" + to_string(minimum) + ", " + to_string(maximum) + "]") :
 			value;
 	}
 	template<intmax_t minimum, intmax_t maximum, typename integer>
 	constexpr integer assignment(integer const value) const volatile {
 		return (value < minimum or maximum < value) ?
-			throw std::range_error("Got a value of " + to_string(value) + " but expected a value in the range [" + to_string(minimum) + ", " + to_string(maximum) + "]") :
+			throw std::range_error("Got a value of " + to_string(+value) + " but expected a value in the range [" + to_string(minimum) + ", " + to_string(maximum) + "]") :
 			value;
 	}
 	
