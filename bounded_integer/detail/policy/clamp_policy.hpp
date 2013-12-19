@@ -52,19 +52,19 @@ public:
 	clamp_policy volatile & operator=(clamp_policy volatile &&) volatile noexcept {
 		return *this;
 	}
-	template<intmax_t minimum, intmax_t maximum, typename integer>
-	constexpr integer assignment(integer const value) const noexcept {
+	template<intmax_t minimum, intmax_t maximum, typename T>
+	constexpr intmax_t assignment(T const value) const noexcept {
 		return
-			(value <= minimum) ? static_cast<integer>(minimum) :
-			(value >= maximum) ? static_cast<integer>(maximum) :
-			value;
+			(value <= minimum) ? static_cast<intmax_t>(minimum) :
+			(value >= maximum) ? static_cast<intmax_t>(maximum) :
+			static_cast<intmax_t>(value);
 	}
-	template<intmax_t minimum, intmax_t maximum, typename integer>
-	constexpr integer assignment(integer const value) const volatile noexcept {
+	template<intmax_t minimum, intmax_t maximum, typename T>
+	constexpr intmax_t assignment(T const value) const volatile noexcept {
 		return
-			(value <= minimum) ? static_cast<integer>(minimum) :
-			(value >= maximum) ? static_cast<integer>(maximum) :
-			value;
+			(value <= minimum) ? static_cast<intmax_t>(minimum) :
+			(value >= maximum) ? static_cast<intmax_t>(maximum) :
+			static_cast<intmax_t>(value);
 	}
 
 	static constexpr bool is_modulo = false;

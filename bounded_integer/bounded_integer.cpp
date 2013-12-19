@@ -104,6 +104,28 @@ void check_numeric_limits_all() {
 	// check_numeric_limits<uint64_t>();
 }
 
+void check_throw_policy() {
+	static constexpr intmax_t minimum = 0;
+	static constexpr intmax_t maximum = 10;
+	throw_policy policy;
+	try {
+		policy.assignment<minimum, maximum>(20);
+		assert(false);
+	}
+	catch (...) {
+	}
+	try {
+		policy.assignment<minimum, maximum>(-6);
+		assert(false);
+	}
+	catch (...) {
+	}
+}
+
+void check_policies() {
+	check_throw_policy();
+}
+
 void check_compound_arithmetic() {
 	native_integer<0, 10> x(5);
 	x += 5_bi;
@@ -147,6 +169,10 @@ void check_compound_arithmetic() {
 	assert(x == 5);
 	assert(z++ == 0);
 	assert(z == 1);
+	
+	clamped_integer<0, 10> clamped(5_bi);
+	clamped -= 20_bi;
+	assert(clamped == 0_bi);
 }
 
 template<typename Initial, intmax_t initial_value, typename Expected, intmax_t expected_value>
@@ -164,28 +190,6 @@ void check_math() {
 	check_absolute_value<checked_integer<0, 0>, 0, checked_integer<0, 0>, 0>();
 	check_absolute_value<checked_integer<-7, 450>, -1, checked_integer<0, 450>, 1>();
 	check_absolute_value<checked_integer<-7, 450>, 1, checked_integer<0, 450>, 1>();
-}
-
-void check_throw_policy() {
-	static constexpr intmax_t minimum = 0;
-	static constexpr intmax_t maximum = 10;
-	throw_policy policy;
-	try {
-		policy.assignment<minimum, maximum>(20);
-		assert(false);
-	}
-	catch (...) {
-	}
-	try {
-		policy.assignment<minimum, maximum>(-6);
-		assert(false);
-	}
-	catch (...) {
-	}
-}
-
-void check_policies() {
-	check_throw_policy();
 }
 
 template<typename T>
@@ -247,10 +251,10 @@ void check_streaming() {
 
 int main() {
 	using namespace bounded_integer;
-	check_compound_arithmetic();
-	check_math();
 	check_numeric_limits_all();
 	check_policies();
+	check_compound_arithmetic();
+	check_math();
 	check_optional();
 	check_streaming();
 }

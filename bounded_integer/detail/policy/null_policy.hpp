@@ -57,13 +57,17 @@ public:
 	// at run-time, the optimizer should detect that all branches return the
 	// same value and eliminate all branching, creating no overhead. See
 	// http://stackoverflow.com/questions/20461121/constexpr-error-at-compile-time-but-no-overhead-at-run-time
-	template<intmax_t minimum, intmax_t maximum, typename integer>
-	constexpr integer assignment(integer const value) const noexcept {
-		return (minimum <= value and value <= maximum) ? value : error_out_of_range(value);
+	template<intmax_t minimum, intmax_t maximum, typename T>
+	constexpr intmax_t assignment(T const value) const noexcept {
+		return (minimum <= value and value <= maximum) ?
+			static_cast<intmax_t>(value) :
+			static_cast<intmax_t>(error_out_of_range(value));
 	}
-	template<intmax_t minimum, intmax_t maximum, typename integer>
-	constexpr integer assignment(integer const value) const volatile noexcept {
-		return (minimum <= value and value <= maximum) ? value : error_out_of_range(value);
+	template<intmax_t minimum, intmax_t maximum, typename T>
+	constexpr intmax_t assignment(T const value) const volatile noexcept {
+		return (minimum <= value and value <= maximum) ?
+			static_cast<intmax_t>(value) :
+			static_cast<intmax_t>(error_out_of_range(value));
 	}
 
 	// It might actually be true! This should be considered undefined

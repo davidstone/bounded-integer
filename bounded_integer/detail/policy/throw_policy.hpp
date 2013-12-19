@@ -55,17 +55,17 @@ public:
 		return *this;
 	}
 	// The optimizer should be able to simplify this to remove dead checks.
-	template<intmax_t minimum, intmax_t maximum, typename integer>
-	constexpr integer assignment(integer const value) const {
-		return (value < minimum or maximum < value) ?
-			throw std::range_error("Got a value of " + to_string(+value) + " but expected a value in the range [" + to_string(minimum) + ", " + to_string(maximum) + "]") :
-			value;
+	template<intmax_t minimum, intmax_t maximum, typename T>
+	constexpr intmax_t assignment(T const value) const {
+		return (minimum <= value and value <= maximum) ?
+			static_cast<intmax_t>(value) :
+			throw std::range_error("Got a value of " + to_string(+value) + " but expected a value in the range [" + to_string(minimum) + ", " + to_string(maximum) + "]");
 	}
-	template<intmax_t minimum, intmax_t maximum, typename integer>
-	constexpr integer assignment(integer const value) const volatile {
-		return (value < minimum or maximum < value) ?
-			throw std::range_error("Got a value of " + to_string(+value) + " but expected a value in the range [" + to_string(minimum) + ", " + to_string(maximum) + "]") :
-			value;
+	template<intmax_t minimum, intmax_t maximum, typename T>
+	constexpr intmax_t assignment(T const value) const volatile {
+		return (minimum <= value and value <= maximum) ?
+			static_cast<intmax_t>(value) :
+			throw std::range_error("Got a value of " + to_string(+value) + " but expected a value in the range [" + to_string(minimum) + ", " + to_string(maximum) + "]");
 	}
 	
 	static constexpr bool is_modulo = false;
