@@ -34,6 +34,20 @@ namespace bounded_integer {
 // underlying type (likely int8_t), then we are likely to invoke undefined
 // behavior. Instead, the comparison function should accept a much wider array
 // of types and convert up to the common type.
+//
+// The common type uses the overflow policy of the left-hand side because the
+// policy does not matter for comparisons. This allows the user to compare
+// integers with unrelated policies.
+
+namespace detail {
+
+template<typename lhs, typename rhs, typename lhs_overflow>
+using comparison_type = typename common_type_t<
+	decay_t<lhs>,
+	equivalent_type<decay_t<rhs>, lhs_overflow>
+>::underlying_type const;
+
+}	// namespace detail
 
 // Equality
 template<
@@ -41,7 +55,7 @@ template<
 	intmax_t rhs_min, intmax_t rhs_max, typename rhs_overflow
 >
 constexpr bool operator==(bounded_integer<lhs_min, lhs_max, lhs_overflow> const lhs, bounded_integer<rhs_min, rhs_max, rhs_overflow> const rhs) noexcept {
-	using common_t = typename common_type_t<decay_t<decltype(lhs)>, decay_t<decltype(rhs)>>::underlying_type const;
+	using common_t = detail::comparison_type<decltype(lhs), decltype(rhs), lhs_overflow>;
 	return static_cast<common_t>(lhs) == static_cast<common_t>(rhs);
 }
 
@@ -96,7 +110,7 @@ template<
 	intmax_t rhs_min, intmax_t rhs_max, typename rhs_overflow
 >
 constexpr bool operator<(bounded_integer<lhs_min, lhs_max, lhs_overflow> const lhs, bounded_integer<rhs_min, rhs_max, rhs_overflow> const rhs) noexcept {
-	using common_t = typename common_type_t<decay_t<decltype(lhs)>, decay_t<decltype(rhs)>>::underlying_type const;
+	using common_t = detail::comparison_type<decltype(lhs), decltype(rhs), lhs_overflow>;
 	return static_cast<common_t>(lhs) < static_cast<common_t>(rhs);
 }
 
