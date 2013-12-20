@@ -19,6 +19,7 @@
 
 #include "detail/class.hpp"
 #include "detail/common_type.hpp"
+#include "detail/conditional.hpp"
 #include "detail/literal.hpp"
 #include "detail/make_bounded.hpp"
 #include "detail/math.hpp"
@@ -27,7 +28,6 @@
 #include "detail/operators.hpp"
 #include "detail/policy/all.hpp"
 #include "detail/stream.hpp"
-#include "detail/ternary_conditional.hpp"
 
 // Missing from this list are array and optional classes
 
