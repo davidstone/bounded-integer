@@ -15,3 +15,13 @@
 // along with this program. If not, see <http://www.gnu.org/licenses/>.
 
 #include "conditional.hpp"
+#include "literal.hpp"
+#include <type_traits>
+
+using namespace bounded_integer::literal;
+
+static_assert(BOUNDED_INTEGER_CONDITIONAL(true, 7, 9) == 7, "Wrong conditional value.");
+static_assert(std::is_same<
+	decltype(BOUNDED_INTEGER_CONDITIONAL(true, 7_bi, 9_bi)),
+	bounded_integer::bounded_integer<7, 9, bounded_integer::null_policy>
+>::value, "Wrong conditional type.");

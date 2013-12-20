@@ -21,7 +21,7 @@
 
 #define BOUNDED_INTEGER_CONDITIONAL(condition, lhs, rhs) \
 	((condition) ? \
-		static_cast<common_type_t<decltype(lhs), decltype(rhs)>>(lhs) : \
-		static_cast<common_type_t<decltype(lhs), decltype(rhs)>>(rhs))
+		static_cast<bounded_integer::common_type_t<decltype(lhs), decltype(rhs)>>(lhs) : \
+		static_cast<bounded_integer::common_type_t<decltype(lhs), decltype(rhs)>>(rhs))
 
 #endif	// BOUNDED_INTEGER_TERNARY_CONDITIONAL_HPP_
