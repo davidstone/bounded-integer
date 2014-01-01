@@ -1,5 +1,5 @@
 # Warnings if building with gcc
-# Copyright (C) 2012 David Stone
+# Copyright (C) 2013 David Stone
 #
 # This program is free software: you can redistribute it and / or modify
 # it under the terms of the GNU Affero General Public License as
@@ -21,17 +21,6 @@
 # -Waggregate-return is not something that I consider an error. For instance,
 # it triggers when using a range-based for loop on a vector of classes. Return
 # value optimization should take care of any negative effects of this.
-#
-# -Wconversion triggers on this code: `short n = 0; n += 2;` The implicit
-# conversion to int causes a warning when it's then converted back to its
-# target type.
-#
-# -Weffc++ includes a warning if all data members are not initialized in the
-# initializer list. I intentionally do not do this in many cases, so the set of
-# warnings is too cluttered to be useful. It's helpful to turn on every once in
-# a while and scan for other warnings, though (such as non-virtual destructors
-# of base classes). This would be more useful as a collection of warnings (like
-# -Wall) instead of a single warning on its own.
 #
 # -Winline is absent because I don't use the inline keyword for optimization
 # purposes, just to define functions inline in headers. I don't care if the
@@ -55,27 +44,19 @@
 # looks like level 1 and 2 give more warnings. In theory a lower level is a
 # 'stronger' warning, but it's at the cost of more false positives.
 #
-# -Wswitch-default seems pointless (I don't always want a default case if I've
-# enumerated all possibilities explicitly). I suppose some people may have need
-# of it, but I do not. I could see turning on this warning and putting
-# something like assert (false) into the default case, which I may try.
-#
-# -Wswitch-enum isn't behavior that I want. I don't want to handle every switch
-# statement explicitly. It would be useful if the language had some mechanism
-# to activate this on specified switch statements (to ensure that future
-# changes to the enum are handled everywhere that they need to be), but it's
-# overkill for an "all-or-nothing" setting.
-#
-# -Wuseless-cast is a GCC-4.8-only warning, which I will add when I transition.
+# -Wuseless-cast is incompatible with BOUNDED_INTEGER_CONDITIONAL
 
 warnings = [
 	'-Wall',
 	'-Wextra',
-	'-pedantic',
+	'-Wpedantic',
 	'-Wcast-align',
 	'-Wcast-qual',
+	'-Wconversion',
 	'-Wctor-dtor-privacy',
+	'-Wdisabled-optimization',
 	'-Wdouble-promotion',
+	'-Weffc++',
 	'-Wfloat-equal',
 	'-Wformat=2',
 	'-Winit-self',
@@ -91,14 +72,16 @@ warnings = [
 	'-Wsign-conversion',
 	'-Wsign-promo',
 	'-Wstrict-null-sentinel',
-	'-Wstrict-overflow=2',
+	'-Wstrict-overflow=5',
+	'-Wswitch-default',
+	'-Wswitch-enum',
 	'-Wtrampolines',
 	'-Wundef',
 	'-Wunsafe-loop-optimizations',
+	'-Wvector-operation-performance',
 	'-Wzero-as-null-pointer-constant',
 	'-Werror',
 ]
-# I have to set -Wstrict-overflow=5 to be a "debug" warning because it conflicts
-# with a boost library when link-time optimization is turned on.
-warnings_debug = ['-Wstrict-overflow=5']
-warnings_optimized = ['-Wdisabled-optimization', '-Wvector-operation-performance']
+
+warnings_debug = []
+warnings_optimized = []

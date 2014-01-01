@@ -149,15 +149,16 @@ void check_compound_arithmetic() {
 	x %= 6_bi;
 	assert(x == 4);
 	
-	short s = 0;
-	s += 4_bi;
-	assert(s == 4);
+	// This code doesn't work with -Wconversion, but should still compile.
+	// short s = 0;
+	// s += 4_bi;
+	// assert(s == 4);
 	int i = 9;
 	i -= make_bounded(68);
 	assert(i == -59);
 	long l = -7;
-	l *= z;
-	assert(l == 0);
+	l *= z + 1_bi;
+	assert(l == -7);
 	i /= y;
 	assert(i == -5);
 	i %= make_bounded(6);
