@@ -97,11 +97,14 @@ warnings = [
 	'-Wsign-conversion',
 	'-Wsign-promo',
 	'-Wstrict-null-sentinel',
-	'-Wstrict-overflow=5',
+	# Reduced to 1 to avoid a warning about possible pointer wrap-around
+	'-Wstrict-overflow=1',
 	'-Wtrampolines',
 	'-Wundef',
 	'-Wuseless-cast',
 	'-Wvector-operation-performance',
 	'-Wzero-as-null-pointer-constant',
 	'-Werror',
+	'-Wno-unused',
+	'-Wno-unused-parameter',
 ]

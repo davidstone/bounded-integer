@@ -1,3 +1,8 @@
+^flat_map
+^forward_list
+^moving_vector
+^performance
+
 syntax: glob
 
 build*/
