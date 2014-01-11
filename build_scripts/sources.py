@@ -18,12 +18,19 @@ def prepend_dir(directory, sources):
 	"""Remove redundant specification of a directory for multiple sources"""
 	return map(lambda source: directory + '/' + source, sources)
 
-forward_list_tests = ('forward_list', ['forward_list.cpp'], ['USE_SYSTEM_FORWARD_LIST=false'], [])
-forward_list_std_tests = ('forward_list_std', ['forward_list.cpp'], ['USE_SYSTEM_FORWARD_LIST=true'], [])
-moving_vector_tests = ('moving_vector', ['moving_vector.cpp'], [], [])
-stable_flat_map_tests = ('flat_map_stable', ['flat_map.cpp'], ['USE_STABLE_FLAT_MAP'], [])
-unstable_flat_map_tests = ('flat_map_unstable', ['flat_map.cpp'], ['USE_UNSTABLE_FLAT_MAP'], [])
-flat_map_std_tests = ('flat_map_std', ['flat_map.cpp'], ['USE_SYSTEM_MAP'], [])
+class Program:
+	def __init__(self, name, sources, defines = [], libraries = []):
+		self.name = name
+		self.sources = sources
+		self.defines = defines
+		self.libraries = libraries
+
+forward_list = Program('forward_list', ['forward_list.cpp'], ['USE_SYSTEM_FORWARD_LIST=false'])
+forward_list_std = Program('forward_list_std', ['forward_list.cpp'], ['USE_SYSTEM_FORWARD_LIST=true'])
+moving_vector = Program('moving_vector', ['moving_vector.cpp'])
+stable_flat_map = Program('flat_map_stable', ['flat_map.cpp'], ['USE_STABLE_FLAT_MAP'])
+unstable_flat_map = Program('flat_map_unstable', ['flat_map.cpp'], ['USE_UNSTABLE_FLAT_MAP'])
+flat_map_std = Program('flat_map_std', ['flat_map.cpp'], ['USE_SYSTEM_MAP'])
 
 def reserve_options(container):
 	# reserve doesn't work properly in gcc 4.7
@@ -38,10 +45,10 @@ container_types = ['deque', 'list', 'moving_vector', 'vector']
 # Don't keep compiling all of these other versions that I rarely use
 # array_sizes = ['1', '10', '40', '50', '60', '100', '200', '500', '1000']
 array_sizes = ['100']
-performance_tests = [('performance_' + container + '_' + reserve + '_' + size, performance_sources, [container.upper(), reserve, 'ARRAY_SIZE=' + size], []) for container in container_types for size in array_sizes for reserve in reserve_options(container)]
+performance_tests = [Program('performance_' + container + '_' + reserve + '_' + size, performance_sources, [container.upper(), reserve, 'ARRAY_SIZE=' + size]) for container in container_types for size in array_sizes for reserve in reserve_options(container)]
 
 source_directory = 'containers'
 
-base_sources = [forward_list_tests, forward_list_std_tests, moving_vector_tests, flat_map_std_tests, unstable_flat_map_tests, stable_flat_map_tests] + performance_tests
+programs = [forward_list, forward_list_std, moving_vector, flat_map_std, unstable_flat_map, stable_flat_map] + performance_tests
 
 include_directories = ['value_ptr']

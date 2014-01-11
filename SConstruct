@@ -17,7 +17,7 @@
 import os
 import multiprocessing
 
-from build_scripts.sources import source_directory, base_sources, include_directories
+from build_scripts.sources import source_directory, programs, include_directories
 
 SetOption('warn', 'no-duplicate-environment')
 
@@ -78,16 +78,15 @@ def generate_sources(sources, version, defines):
 		temp += [build_directory(version, defines) + source]
 	return temp
 
-def create_program(base):
+def create_program(program):
 	env = { 'debug':debug, 'optimized':optimized }
 	suffix = { 'debug':'-debug', 'optimized':'' }
-	name, sources, defines, libraries = base
 	for version in ['debug', 'optimized']:
-		targets = generate_sources(sources, version, defines)
-		executable_name = name + suffix[version]
-		real_env = env[version].Clone(LIBS = libraries, CPPDEFINES = defines)
-		real_env.VariantDir(build_directory(version, defines), source_directory, duplicate = 0)
+		targets = generate_sources(program.sources, version, program.defines)
+		executable_name = program.name + suffix[version]
+		real_env = env[version].Clone(LIBS = program.libraries, CPPDEFINES = program.defines)
+		real_env.VariantDir(build_directory(version, program.defines), source_directory, duplicate = 0)
 		real_env.Program(executable_name, targets)
 
-for sources in base_sources:
-	create_program(sources)
+for program in programs:
+	create_program(program)
