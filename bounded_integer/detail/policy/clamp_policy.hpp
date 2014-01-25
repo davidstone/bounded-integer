@@ -1,5 +1,5 @@
 // Also known as saturation
-// Copyright (C) 2013 David Stone
+// Copyright (C) 2014 David Stone
 //
 // This program is free software: you can redistribute it and / or modify
 // it under the terms of the GNU Affero General Public License as
@@ -52,18 +52,18 @@ public:
 	clamp_policy volatile & operator=(clamp_policy volatile &&) volatile noexcept {
 		return *this;
 	}
-	template<intmax_t minimum, intmax_t maximum, typename T>
-	constexpr intmax_t assignment(T const value) const noexcept {
+	template<typename T>
+	constexpr intmax_t assignment(T const value, intmax_t const minimum, intmax_t const maximum) const noexcept {
 		return
-			(value <= minimum) ? static_cast<intmax_t>(minimum) :
-			(value >= maximum) ? static_cast<intmax_t>(maximum) :
+			(value <= minimum) ? minimum :
+			(value >= maximum) ? maximum :
 			static_cast<intmax_t>(value);
 	}
-	template<intmax_t minimum, intmax_t maximum, typename T>
-	constexpr intmax_t assignment(T const value) const volatile noexcept {
+	template<typename T>
+	constexpr intmax_t assignment(T const value, intmax_t const minimum, intmax_t const maximum) const volatile noexcept {
 		return
-			(value <= minimum) ? static_cast<intmax_t>(minimum) :
-			(value >= maximum) ? static_cast<intmax_t>(maximum) :
+			(value <= minimum) ? minimum :
+			(value >= maximum) ? maximum :
 			static_cast<intmax_t>(value);
 	}
 

@@ -1,5 +1,5 @@
 // Verify that the header can stand on its own
-// Copyright (C) 2013 David Stone
+// Copyright (C) 2014 David Stone
 //
 // This program is free software: you can redistribute it and / or modify
 // it under the terms of the GNU Affero General Public License as
@@ -20,11 +20,11 @@ namespace bounded_integer {
 namespace {
 
 constexpr null_policy policy;
-constexpr auto value1 = policy.assignment<0, 10>(5);
+constexpr auto value1 = policy.assignment(5, 0, 10);
 // This should not compile
-// constexpr auto value2 = policy.assignment<0, 10>(15);
+// constexpr auto value2 = policy.assignment(15, 0, 10);
 // This should
-auto value3 = policy.assignment<0, 10>(15);
+auto value3 = policy.assignment(15, 0, 10);
 
 }	// namespace
 }	// namespace bounded_integer

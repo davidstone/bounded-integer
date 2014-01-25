@@ -1,5 +1,5 @@
 // Does nothing. Overflow is undefined behavior
-// Copyright (C) 2013 David Stone
+// Copyright (C) 2014 David Stone
 //
 // This program is free software: you can redistribute it and / or modify
 // it under the terms of the GNU Affero General Public License as
@@ -57,14 +57,14 @@ public:
 	// at run-time, the optimizer should detect that all branches return the
 	// same value and eliminate all branching, creating no overhead. See
 	// http://stackoverflow.com/questions/20461121/constexpr-error-at-compile-time-but-no-overhead-at-run-time
-	template<intmax_t minimum, intmax_t maximum, typename T>
-	constexpr intmax_t assignment(T const value) const noexcept {
+	template<typename T>
+	constexpr intmax_t assignment(T const value, intmax_t const minimum, intmax_t const maximum) const noexcept {
 		return (minimum <= value and value <= maximum) ?
 			static_cast<intmax_t>(value) :
 			static_cast<intmax_t>(error_out_of_range(value));
 	}
-	template<intmax_t minimum, intmax_t maximum, typename T>
-	constexpr intmax_t assignment(T const value) const volatile noexcept {
+	template<typename T>
+	constexpr intmax_t assignment(T const value, intmax_t const minimum, intmax_t const maximum) const volatile noexcept {
 		return (minimum <= value and value <= maximum) ?
 			static_cast<intmax_t>(value) :
 			static_cast<intmax_t>(error_out_of_range(value));

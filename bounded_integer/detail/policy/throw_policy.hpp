@@ -1,5 +1,5 @@
 // Throws an exception on overflow
-// Copyright (C) 2013 David Stone
+// Copyright (C) 2014 David Stone
 //
 // This program is free software: you can redistribute it and / or modify
 // it under the terms of the GNU Affero General Public License as
@@ -55,14 +55,14 @@ public:
 		return *this;
 	}
 	// The optimizer should be able to simplify this to remove dead checks.
-	template<intmax_t minimum, intmax_t maximum, typename T>
-	constexpr intmax_t assignment(T const value) const {
+	template<typename T>
+	constexpr intmax_t assignment(T const value, intmax_t const minimum, intmax_t const maximum) const {
 		return (minimum <= value and value <= maximum) ?
 			static_cast<intmax_t>(value) :
 			throw std::range_error("Got a value of " + to_string(+value) + " but expected a value in the range [" + to_string(minimum) + ", " + to_string(maximum) + "]");
 	}
-	template<intmax_t minimum, intmax_t maximum, typename T>
-	constexpr intmax_t assignment(T const value) const volatile {
+	template<typename T>
+	constexpr intmax_t assignment(T const value, intmax_t const minimum, intmax_t const maximum) const volatile {
 		return (minimum <= value and value <= maximum) ?
 			static_cast<intmax_t>(value) :
 			throw std::range_error("Got a value of " + to_string(+value) + " but expected a value in the range [" + to_string(minimum) + ", " + to_string(maximum) + "]");

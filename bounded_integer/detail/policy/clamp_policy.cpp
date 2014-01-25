@@ -1,5 +1,5 @@
 // Verify that the header can stand on its own, run tests
-// Copyright (C) 2013 David Stone
+// Copyright (C) 2014 David Stone
 //
 // This program is free software: you can redistribute it and / or modify
 // it under the terms of the GNU Affero General Public License as
@@ -27,10 +27,10 @@ using namespace literal;
 static constexpr intmax_t minimum = 27;
 static constexpr intmax_t maximum = 567;
 constexpr clamp_policy policy;
-static_assert(policy.assignment<minimum, maximum>(20) == minimum, "Failure to properly clamp lesser positive values.");
-static_assert(policy.assignment<minimum, maximum>(-25) == minimum, "Failure to properly clamp negative values to a positive value.");
-static_assert(policy.assignment<minimum, maximum>(1000) == maximum, "Failure to properly clamp greater positive values.");
-static_assert(policy.assignment<minimum, maximum>(2000_bi) == maximum, "Fail to clamp above range with a strictly greater type.");
+static_assert(policy.assignment(20, minimum, maximum) == minimum, "Failure to properly clamp lesser positive values.");
+static_assert(policy.assignment(-25, minimum, maximum) == minimum, "Failure to properly clamp negative values to a positive value.");
+static_assert(policy.assignment(1000, minimum, maximum) == maximum, "Failure to properly clamp greater positive values.");
+static_assert(policy.assignment(2000_bi, minimum, maximum) == maximum, "Fail to clamp above range with a strictly greater type.");
 
 using type = bounded_integer<-100, 100, clamp_policy>;
 constexpr auto initial = std::numeric_limits<type::underlying_type>::max() + 1_bi;

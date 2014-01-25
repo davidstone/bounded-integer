@@ -94,7 +94,7 @@ public:
 		detail::is_explicitly_constructible_from<minimum, maximum, overflow_policy_type, integer>()
 	> = clang_dummy>
 	constexpr explicit bounded_integer(integer && other):
-		bounded_integer(overflow_policy_type{}.template assignment<minimum, maximum>(std::forward<integer>(other)), non_check) {
+		bounded_integer(overflow_policy_type{}.assignment(std::forward<integer>(other), minimum, maximum), non_check) {
 	}
 
 	template<typename integer, enable_if_t<std::is_enum<integer>::value> = clang_dummy>

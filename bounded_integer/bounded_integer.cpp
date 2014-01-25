@@ -1,5 +1,5 @@
 // bounded_integer type tests
-// Copyright (C) 2013 David Stone
+// Copyright (C) 2014 David Stone
 //
 // This program is free software: you can redistribute it and / or modify
 // it under the terms of the GNU Affero General Public License as
@@ -109,13 +109,13 @@ void check_throw_policy() {
 	static constexpr intmax_t maximum = 10;
 	throw_policy policy;
 	try {
-		policy.assignment<minimum, maximum>(20);
+		policy.assignment(20, minimum, maximum);
 		assert(false);
 	}
 	catch (...) {
 	}
 	try {
-		policy.assignment<minimum, maximum>(-6);
+		policy.assignment(-6, minimum, maximum);
 		assert(false);
 	}
 	catch (...) {
