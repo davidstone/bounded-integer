@@ -1,5 +1,5 @@
 // bounded_integer type main implementation
-// Copyright (C) 2013 David Stone
+// Copyright (C) 2014 David Stone
 //
 // This program is free software: you can redistribute it and / or modify
 // it under the terms of the GNU Affero General Public License as
@@ -90,15 +90,21 @@ public:
 		bounded_integer(std::forward<integer>(other), non_check) {
 	}
 
+private:
+	template<typename T>
+	static constexpr auto apply_policy(T && t) noexcept(noexcept(overflow_policy_type{}.assignment(std::forward<T>(t), minimum, maximum))) {
+		return overflow_policy_type{}.assignment(std::forward<T>(t), minimum, maximum);
+	}
+public:
 	template<typename integer, enable_if_t<
 		detail::is_explicitly_constructible_from<minimum, maximum, overflow_policy_type, integer>()
 	> = clang_dummy>
-	constexpr explicit bounded_integer(integer && other):
-		bounded_integer(overflow_policy_type{}.assignment(std::forward<integer>(other), minimum, maximum), non_check) {
+	constexpr explicit bounded_integer(integer && other) noexcept(noexcept(apply_policy(std::forward<integer>(other)))):
+		bounded_integer(apply_policy(std::forward<integer>(other)), non_check) {
 	}
 
 	template<typename integer, enable_if_t<std::is_enum<integer>::value> = clang_dummy>
-	constexpr explicit bounded_integer(integer other):
+	constexpr explicit bounded_integer(integer other) noexcept(noexcept(bounded_integer(static_cast<typename std::underlying_type<integer>::type>(other)))):
 		bounded_integer(static_cast<typename std::underlying_type<integer>::type>(other)) {
 	}
 
@@ -128,16 +134,15 @@ public:
 	constexpr underlying_type const volatile & value() const volatile noexcept {
 		return m_value;
 	}
-	// I do not verify that the value is in range or anything because the user
-	// has requested a conversion out of the safety of the bounded_integer type.
-	// It is subject to the all of the standard rules that conversion from one
-	// built-in integer type to another has.
+	// Do not verify that the value is in range because the user has requested a
+	// conversion out of the safety of bounded_integer. It is subject to the all
+	// the standard rules of conversion from one integer type to another.
 	template<typename integer, enable_if_t<std::is_integral<integer>::value> = clang_dummy>
-	constexpr explicit operator integer() const {
+	constexpr explicit operator integer() const noexcept {
 		return static_cast<integer>(m_value);
 	}
 	template<typename integer, enable_if_t<std::is_integral<integer>::value> = clang_dummy>
-	constexpr explicit operator integer() const volatile {
+	constexpr explicit operator integer() const volatile noexcept {
 		return static_cast<integer>(m_value);
 	}
 private:
