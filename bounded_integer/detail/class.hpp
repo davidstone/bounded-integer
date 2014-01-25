@@ -90,17 +90,14 @@ public:
 		bounded_integer(std::forward<integer>(other), non_check) {
 	}
 
-private:
-	template<typename T>
-	static constexpr auto apply_policy(T && t) noexcept(noexcept(overflow_policy_type{}.assignment(std::forward<T>(t), minimum, maximum))) {
-		return overflow_policy_type{}.assignment(std::forward<T>(t), minimum, maximum);
-	}
-public:
 	template<typename integer, enable_if_t<
 		detail::is_explicitly_constructible_from<minimum, maximum, overflow_policy_type, integer>()
 	> = clang_dummy>
-	constexpr explicit bounded_integer(integer && other) noexcept(noexcept(apply_policy(std::forward<integer>(other)))):
-		bounded_integer(apply_policy(std::forward<integer>(other)), non_check) {
+	constexpr explicit bounded_integer(integer && other)
+		noexcept(noexcept(
+			overflow_policy_type{}.assignment(std::forward<integer>(other), minimum, maximum)
+		)):
+		bounded_integer(overflow_policy_type{}.assignment(std::forward<integer>(other), minimum, maximum), non_check) {
 	}
 
 	template<typename integer, enable_if_t<std::is_enum<integer>::value> = clang_dummy>
