@@ -110,12 +110,14 @@ public:
 	// no worse than a hand-generated solution. I may be wrong with volatile
 	// variables, though. This may also interfere with type_traits
 	template<typename integer>
-	bounded_integer & operator=(integer && other) {
+	bounded_integer & operator=(integer && other)
+		noexcept(std::is_nothrow_constructible<bounded_integer, integer &&>::value) {
 		*this = bounded_integer(std::forward<integer>(other));
 		return *this;
 	}
 	template<typename integer>
-	bounded_integer volatile & operator=(integer && other) volatile {
+	bounded_integer volatile & operator=(integer && other) volatile
+		noexcept(std::is_nothrow_constructible<bounded_integer, integer &&>::value) {
 		*this = bounded_integer(std::forward<integer>(other));
 		return *this;
 	}
