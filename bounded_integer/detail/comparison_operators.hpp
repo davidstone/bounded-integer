@@ -1,5 +1,5 @@
 // ==    !=    <    <=    >    >=
-// Copyright (C) 2013 David Stone
+// Copyright (C) 2014 David Stone
 //
 // This program is free software: you can redistribute it and / or modify
 // it under the terms of the GNU Affero General Public License as
@@ -79,6 +79,7 @@ template<
 constexpr bool operator==(bounded_integer<minimum, maximum, overflow_policy> const lhs, integer const rhs) noexcept {
 	return lhs == make_bounded(rhs);
 }
+
 template<intmax_t minimum, intmax_t maximum, typename overflow_policy>
 constexpr bool operator==(bounded_integer<minimum, maximum, overflow_policy> const lhs, uintmax_t const rhs) noexcept {
 	return (lhs < 0) ? false : static_cast<uintmax_t>(lhs) == rhs;
@@ -92,10 +93,16 @@ template<
 constexpr bool operator==(integer const lhs, bounded_integer<minimum, maximum, overflow_policy> const rhs) noexcept {
 	return rhs == lhs;
 }
-template<intmax_t minimum, intmax_t maximum, typename overflow_policy, typename integer, enable_if_t<std::is_integral<integer>::value> = clang_dummy>
+
+template<
+	intmax_t minimum, intmax_t maximum, typename overflow_policy,
+	typename integer,
+	enable_if_t<std::is_integral<integer>::value> = clang_dummy
+>
 constexpr bool operator!=(bounded_integer<minimum, maximum, overflow_policy> const lhs, integer const rhs) noexcept {
 	return !(lhs == rhs);
 }
+
 template<intmax_t minimum, intmax_t maximum, typename overflow_policy, typename integer, enable_if_t<std::is_integral<integer>::value> = clang_dummy>
 constexpr bool operator!=(integer const lhs, bounded_integer<minimum, maximum, overflow_policy> const rhs) noexcept {
 	return !(rhs == lhs);
@@ -172,29 +179,56 @@ constexpr bool operator<(uintmax_t const lhs, bounded_integer<minimum, maximum, 
 	return (rhs < 0) ? false : lhs < static_cast<uintmax_t>(rhs);
 }
 
-template<intmax_t minimum, intmax_t maximum, typename overflow_policy, typename integer, enable_if_t<std::is_integral<integer>::value> = clang_dummy>
+template<
+	intmax_t minimum, intmax_t maximum, typename overflow_policy,
+	typename integer,
+	enable_if_t<std::is_integral<integer>::value> = clang_dummy
+>
 constexpr bool operator>(bounded_integer<minimum, maximum, overflow_policy> const lhs, integer const rhs) noexcept {
 	return rhs < lhs;
 }
-template<intmax_t minimum, intmax_t maximum, typename overflow_policy, typename integer, enable_if_t<std::is_integral<integer>::value> = clang_dummy>
+
+template<
+	intmax_t minimum, intmax_t maximum, typename overflow_policy,
+	typename integer,
+	enable_if_t<std::is_integral<integer>::value> = clang_dummy
+>
 constexpr bool operator>(integer const lhs, bounded_integer<minimum, maximum, overflow_policy> const rhs) noexcept {
 	return rhs < lhs;
 }
 
-template<intmax_t minimum, intmax_t maximum, typename overflow_policy, typename integer, enable_if_t<std::is_integral<integer>::value> = clang_dummy>
+template<
+	intmax_t minimum, intmax_t maximum, typename overflow_policy,
+	typename integer,
+	enable_if_t<std::is_integral<integer>::value> = clang_dummy
+>
 constexpr bool operator<=(bounded_integer<minimum, maximum, overflow_policy> const lhs, integer const rhs) noexcept {
 	return !(rhs < lhs);
 }
-template<intmax_t minimum, intmax_t maximum, typename overflow_policy, typename integer, enable_if_t<std::is_integral<integer>::value> = clang_dummy>
+
+template<
+	intmax_t minimum, intmax_t maximum, typename overflow_policy,
+	typename integer,
+	enable_if_t<std::is_integral<integer>::value> = clang_dummy
+>
 constexpr bool operator<=(integer const lhs, bounded_integer<minimum, maximum, overflow_policy> const rhs) noexcept {
 	return !(rhs < lhs);
 }
 
-template<intmax_t minimum, intmax_t maximum, typename overflow_policy, typename integer, enable_if_t<std::is_integral<integer>::value> = clang_dummy>
+template<
+	intmax_t minimum, intmax_t maximum, typename overflow_policy,
+	typename integer,
+	enable_if_t<std::is_integral<integer>::value> = clang_dummy
+>
 constexpr bool operator>=(bounded_integer<minimum, maximum, overflow_policy> const lhs, integer const rhs) noexcept {
 	return !(lhs < rhs);
 }
-template<intmax_t minimum, intmax_t maximum, typename overflow_policy, typename integer, enable_if_t<std::is_integral<integer>::value> = clang_dummy>
+
+template<
+	intmax_t minimum, intmax_t maximum, typename overflow_policy,
+	typename integer,
+	enable_if_t<std::is_integral<integer>::value> = clang_dummy
+>
 constexpr bool operator>=(integer const lhs, bounded_integer<minimum, maximum, overflow_policy> const rhs) noexcept {
 	return !(lhs < rhs);
 }
