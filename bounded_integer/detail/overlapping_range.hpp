@@ -26,48 +26,54 @@
 namespace bounded_integer {
 namespace detail {
 
-template<typename integer, enable_if_t<std::numeric_limits<integer>::is_specialized> = clang_dummy>
-constexpr bool entirely_in_range(intmax_t const minimum, intmax_t const maximum) noexcept {
-	return
-		static_cast<intmax_t>(std::numeric_limits<integer>::min()) <= minimum and
-		maximum <= static_cast<intmax_t>(std::numeric_limits<integer>::max());
-}
-template<typename integer, enable_if_t<!std::numeric_limits<integer>::is_specialized> = clang_dummy>
-constexpr bool entirely_in_range(intmax_t, intmax_t) noexcept {
-	return false;
-}
-template<>
-constexpr bool entirely_in_range<uintmax_t>(intmax_t const minimum, intmax_t) noexcept {
-	return minimum >= 0;
+template<typename integer>
+constexpr bool value_in_range(integer const & value, intmax_t const minimum, intmax_t const maximum) noexcept {
+	static_assert(!std::is_same<typename std::decay<integer>::type, uintmax_t>::value, "Function does not work with uintmax_t.");
+	return minimum <= static_cast<intmax_t>(value) and static_cast<intmax_t>(value) <= maximum;
 }
 
 template<typename integer, enable_if_t<std::numeric_limits<integer>::is_specialized> = clang_dummy>
-constexpr bool has_overlap(intmax_t const minimum, intmax_t const maximum) noexcept {
-	return
-		minimum <= static_cast<intmax_t>(std::numeric_limits<integer>::max()) and
-		maximum >= static_cast<intmax_t>(std::numeric_limits<integer>::min());
+constexpr bool value_fits_in_type(intmax_t const value) noexcept {
+	return value_in_range(value, std::numeric_limits<integer>::min(), std::numeric_limits<integer>::max());
 }
-template<typename integer, enable_if_t<!std::numeric_limits<integer>::is_specialized> = clang_dummy>
-constexpr bool has_overlap(intmax_t, intmax_t) noexcept {
+template<typename not_integer, enable_if_t<!std::numeric_limits<not_integer>::is_specialized> = clang_dummy>
+constexpr bool value_fits_in_type(intmax_t) noexcept {
 	return false;
 }
 template<>
-constexpr bool has_overlap<uintmax_t>(intmax_t, intmax_t const maximum) noexcept {
+constexpr bool value_fits_in_type<uintmax_t>(intmax_t const value) noexcept {
+	return value >= 0;
+}
+
+constexpr bool ranges_overlap(intmax_t const first_range_min, intmax_t const first_range_max, intmax_t const second_range_min, intmax_t const second_range_max) noexcept {
+	return first_range_min < second_range_max or second_range_min < first_range_max;
+}
+
+template<typename integer, enable_if_t<std::numeric_limits<integer>::is_specialized> = clang_dummy>
+constexpr bool type_overlaps_range(intmax_t const minimum, intmax_t const maximum) noexcept {
+	return ranges_overlap(minimum, maximum, static_cast<intmax_t>(std::numeric_limits<integer>::min()), static_cast<intmax_t>(std::numeric_limits<integer>::max()));
+}
+template<typename non_integer, enable_if_t<!std::numeric_limits<non_integer>::is_specialized> = clang_dummy>
+constexpr bool type_overlaps_range(intmax_t, intmax_t) noexcept {
+	return false;
+}
+template<>
+constexpr bool type_overlaps_range<uintmax_t>(intmax_t, intmax_t const maximum) noexcept {
 	return maximum >= 0;
 }
 
 template<typename integer, enable_if_t<std::numeric_limits<integer>::is_specialized> = clang_dummy>
-constexpr bool type_in_range(intmax_t const minimum, intmax_t const maximum) noexcept {
+constexpr bool type_fits_in_range(intmax_t const minimum, intmax_t const maximum) noexcept {
 	return
 		minimum <= static_cast<intmax_t>(std::numeric_limits<integer>::min()) and
 		static_cast<intmax_t>(std::numeric_limits<integer>::max()) <= maximum;
 }
 template<typename integer, enable_if_t<!std::numeric_limits<integer>::is_specialized> = clang_dummy>
-constexpr bool type_in_range(intmax_t, intmax_t) noexcept {
+constexpr bool type_fits_in_range(intmax_t, intmax_t) noexcept {
 	return false;
 }
 template<>
-constexpr bool type_in_range<uintmax_t>(intmax_t const, intmax_t const) noexcept {
+constexpr bool type_fits_in_range<uintmax_t>(intmax_t const, intmax_t const) noexcept {
 	return false;
 }
 

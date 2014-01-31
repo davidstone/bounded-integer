@@ -46,14 +46,14 @@ using underlying_t = typename std::conditional<
 	unsigned_underlying_t<minimum, maximum>
 >::type;
 
-template<intmax_t minimum, intmax_t maximum, typename U>
-constexpr bool is_implicitly_constructible_from() noexcept {
-	return type_in_range<typename std::decay<U>::type>(minimum, maximum);
+template<typename T>
+constexpr bool is_implicitly_constructible_from(intmax_t const minimum, intmax_t const maximum) noexcept {
+	return type_fits_in_range<typename std::decay<T>::type>(minimum, maximum);
 }
-template<intmax_t minimum, intmax_t maximum, typename policy, typename U>
-constexpr bool is_explicitly_constructible_from() noexcept {
-	return !is_implicitly_constructible_from<minimum, maximum, U>() and
-		(has_overlap<typename std::decay<U>::type>(minimum, maximum) or !policy::overflow_is_error);
+template<typename policy, typename T>
+constexpr bool is_explicitly_constructible_from(intmax_t const minimum, intmax_t const maximum) noexcept {
+	return !is_implicitly_constructible_from<T>(minimum, maximum) and
+		(type_overlaps_range<typename std::decay<T>::type>(minimum, maximum) or !policy::overflow_is_error);
 }
 
 }	// namespace detail
@@ -64,9 +64,10 @@ public:
 	static_assert(minimum <= maximum, "Maximum cannot be less than minimum");
 	using underlying_type = detail::underlying_t<minimum, maximum>;
 	using overflow_policy_type = OverflowPolicy;
-	static_assert(detail::entirely_in_range<underlying_type>(minimum, maximum), "Not all values can fit in the range of the underlying_type.");
+	static_assert(detail::value_fits_in_type<underlying_type>(minimum), "minimum does not fit in underlying_type.");
+	static_assert(detail::value_fits_in_type<underlying_type>(maximum), "maximum does not fit in underlying_type.");
 
-	static_assert(minimum < 0 ? std::numeric_limits<underlying_type>::is_signed : true, "Underlying type should be signed.");
+	static_assert(minimum < 0 ? std::numeric_limits<underlying_type>::is_signed : true, "underlying_type should be signed.");
 
 	constexpr bounded_integer() noexcept = default;
 	constexpr bounded_integer(bounded_integer const &) noexcept = default;
@@ -76,7 +77,8 @@ public:
 	// Use this constructor if you know by means that cannot be determined by
 	// the type system that the value really does fit in the range.
 	template<typename integer, enable_if_t<
-		detail::has_overlap<typename std::decay<integer>::type>(minimum, maximum)
+		detail::is_implicitly_constructible_from<integer>(minimum, maximum) or
+		detail::is_explicitly_constructible_from<overflow_policy_type, integer>(minimum, maximum)
 	> = clang_dummy>
 	constexpr bounded_integer(integer && other, non_check_t) noexcept:
 		m_value(static_cast<underlying_type>(std::forward<integer>(other))) {
@@ -84,14 +86,14 @@ public:
 
 	// Intentionally implicit: this is safe because the value is in range
 	template<typename integer, enable_if_t<
-		detail::is_implicitly_constructible_from<minimum, maximum, integer>()
+		detail::is_implicitly_constructible_from<integer>(minimum, maximum)
 	> = clang_dummy>
 	constexpr bounded_integer(integer && other) noexcept:
 		bounded_integer(std::forward<integer>(other), non_check) {
 	}
 
 	template<typename integer, enable_if_t<
-		detail::is_explicitly_constructible_from<minimum, maximum, overflow_policy_type, integer>()
+		detail::is_explicitly_constructible_from<overflow_policy_type, integer>(minimum, maximum)
 	> = clang_dummy>
 	constexpr explicit bounded_integer(integer && other)
 		noexcept(noexcept(

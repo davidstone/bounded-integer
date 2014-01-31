@@ -1,5 +1,5 @@
 // Verify that the header can stand on its own
-// Copyright (C) 2013 David Stone
+// Copyright (C) 2014 David Stone
 //
 // This program is free software: you can redistribute it and / or modify
 // it under the terms of the GNU Affero General Public License as
@@ -15,3 +15,14 @@
 // along with this program. If not, see <http://www.gnu.org/licenses/>.
 
 #include "optional.hpp"
+
+#include "../make_bounded.hpp"
+#include <type_traits>
+
+namespace {
+
+using type = bounded_integer::equivalent_type<int>;
+
+static_assert(std::is_convertible<type, bounded_integer::optional<type>>::value, "Cannot construct optional of identical type.");
+
+}	// namespace

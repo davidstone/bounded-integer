@@ -1,5 +1,5 @@
 // Optional class
-// Copyright (C) 2013 David Stone
+// Copyright (C) 2014 David Stone
 //
 // This program is free software: you can redistribute it and / or modify
 // it under the terms of the GNU Affero General Public License as
@@ -53,13 +53,13 @@ public:
 	}
 
 	template<typename integer, enable_if_t<
-		detail::is_implicitly_constructible_from<minimum, maximum, integer>()
+		detail::is_implicitly_constructible_from<integer>(minimum, maximum)
 	> = clang_dummy>
 	constexpr optional(integer && other) noexcept:
 		m_value(std::forward<integer>(other)) {
 	}
 	template<typename integer, enable_if_t<
-		detail::is_explicitly_constructible_from<minimum, maximum, policy, integer>()
+		detail::is_explicitly_constructible_from<policy, integer>(minimum, maximum)
 	> = clang_dummy>
 	constexpr explicit optional(integer && other):
 		m_value(std::forward<integer>(other)) {
@@ -148,14 +148,14 @@ public:
 	}
 
 	template<typename integer, enable_if_t<
-		detail::is_implicitly_constructible_from<minimum, maximum, integer>()
+		detail::is_implicitly_constructible_from<integer>(minimum, maximum)
 	> = clang_dummy>
 	constexpr optional(integer && other) noexcept:
 		m_value(std::forward<integer>(other)),
 		m_initialized(true) {
 	}
 	template<typename integer, enable_if_t<
-		detail::is_explicitly_constructible_from<minimum, maximum, policy, integer>()
+		detail::is_explicitly_constructible_from<policy, integer>(minimum, maximum)
 	> = clang_dummy>
 	constexpr explicit optional(integer && other):
 		m_value(std::forward<integer>(other)),
