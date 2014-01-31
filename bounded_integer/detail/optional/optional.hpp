@@ -26,6 +26,7 @@
 #include <cstdint>
 #include <limits>
 #include <stdexcept>
+#include <type_traits>
 
 namespace bounded_integer {
 namespace detail {
@@ -53,13 +54,13 @@ public:
 	}
 
 	template<typename integer, enable_if_t<
-		detail::is_implicitly_constructible_from<integer>(minimum, maximum)
+		std::is_convertible<integer &&, value_type>::value
 	> = clang_dummy>
 	constexpr optional(integer && other) noexcept:
 		m_value(std::forward<integer>(other)) {
 	}
 	template<typename integer, enable_if_t<
-		detail::is_explicitly_constructible_from<policy, integer>(minimum, maximum)
+		!std::is_convertible<integer &&, value_type>::value and std::is_constructible<value_type, integer &&>::value
 	> = clang_dummy>
 	constexpr explicit optional(integer && other):
 		m_value(std::forward<integer>(other)) {
@@ -148,14 +149,14 @@ public:
 	}
 
 	template<typename integer, enable_if_t<
-		detail::is_implicitly_constructible_from<integer>(minimum, maximum)
+		std::is_convertible<integer &&, value_type>::value
 	> = clang_dummy>
 	constexpr optional(integer && other) noexcept:
 		m_value(std::forward<integer>(other)),
 		m_initialized(true) {
 	}
 	template<typename integer, enable_if_t<
-		detail::is_explicitly_constructible_from<policy, integer>(minimum, maximum)
+		!std::is_convertible<integer &&, value_type>::value and std::is_constructible<value_type, integer &&>::value
 	> = clang_dummy>
 	constexpr explicit optional(integer && other):
 		m_value(std::forward<integer>(other)),
