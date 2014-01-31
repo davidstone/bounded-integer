@@ -141,8 +141,8 @@ public:
 	using value_type = bounded_integer<minimum, maximum, policy>;
 
 	constexpr optional() noexcept:
-		m_value(uninitialized_value(), non_check),
-		m_initialized(false) {
+		m_initialized(false),
+		m_value(uninitialized_value(), non_check) {
 	}
 	constexpr optional(none_t) noexcept:
 		optional{} {
@@ -152,28 +152,28 @@ public:
 		std::is_convertible<integer &&, value_type>::value
 	> = clang_dummy>
 	constexpr optional(integer && other) noexcept:
-		m_value(std::forward<integer>(other)),
-		m_initialized(true) {
+		m_initialized(true),
+		m_value(std::forward<integer>(other)) {
 	}
 	template<typename integer, enable_if_t<
 		!std::is_convertible<integer &&, value_type>::value and std::is_constructible<value_type, integer &&>::value
 	> = clang_dummy>
 	constexpr explicit optional(integer && other):
-		m_value(std::forward<integer>(other)),
-		m_initialized(true) {
+		m_initialized(true),
+		m_value(std::forward<integer>(other)) {
 	}
 
 	constexpr optional(optional const &) noexcept = default;
 	constexpr optional(optional &&) noexcept = default;
 	template<intmax_t other_min, intmax_t other_max, typename other_policy>
 	constexpr explicit optional(optional<other_min, other_max, other_policy> const & other):
-		m_value(other.is_initialized() ? *other : uninitialized_value()),
-		m_initialized(other.is_initialized()) {
+		m_initialized(other.is_initialized()),
+		m_value(other.is_initialized() ? *other : uninitialized_value()) {
 	}
 	template<intmax_t other_min, intmax_t other_max, typename other_policy>
 	constexpr explicit optional(optional<other_min, other_max, other_policy> && other):
-		m_value(other.is_initialized() ? *other : uninitialized_value()),
-		m_initialized(other.m_initialized) {
+		m_initialized(other.is_initialized()),
+		m_value(other.is_initialized() ? std::move(*other) : uninitialized_value()) {
 	}
 
 	optional & operator=(optional const &) noexcept = default;
@@ -225,8 +225,8 @@ private:
 	static constexpr underlying_type uninitialized_value() {
 		return static_cast<underlying_type>(minimum);
 	}
-	value_type m_value;
 	bool m_initialized;
+	value_type m_value;
 };
 
 
