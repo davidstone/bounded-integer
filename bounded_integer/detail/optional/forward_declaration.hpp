@@ -1,5 +1,5 @@
 // Forward declaration for optional
-// Copyright (C) 2013 David Stone
+// Copyright (C) 2014 David Stone
 //
 // This program is free software: you can redistribute it and / or modify
 // it under the terms of the GNU Affero General Public License as
@@ -17,19 +17,14 @@
 #ifndef BOUNDED_INTEGER_DETAIL_OPTIONAL_FORWARD_DECLARATION_HPP_
 #define BOUNDED_INTEGER_DETAIL_OPTIONAL_FORWARD_DECLARATION_HPP_
 
-#include <cstdint>
-
 namespace bounded_integer {
 
 enum class none_t {};
 constexpr none_t none = none_t{};
 
-namespace detail {
-
-template<intmax_t minimum, intmax_t maximum, typename policy, typename enable = void>
+template<typename T>
 class optional;
 
-}	// namespace detail
 }	// namespace bounded_integer
 
 #endif	// BOUNDED_INTEGER_DETAIL_OPTIONAL_FORWARD_DECLARATION_HPP_

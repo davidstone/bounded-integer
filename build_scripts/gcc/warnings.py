@@ -22,6 +22,9 @@
 # it triggers when using a range-based for loop on a vector of classes. Return
 # value optimization should take care of any negative effects of this.
 #
+# -Weffc++ has a bug in the implementation as it relates to warning "X should
+# be initialized in the member initialization list" for defaulted constructors
+#
 # -Winline is absent because I don't use the inline keyword for optimization
 # purposes, just to define functions inline in headers. I don't care if the
 # optimizer actually inlines it. This warning also complains if it can't inline
@@ -56,7 +59,7 @@ warnings = [
 	'-Wctor-dtor-privacy',
 	'-Wdisabled-optimization',
 	'-Wdouble-promotion',
-	'-Weffc++',
+#	'-Weffc++',
 	'-Wfloat-equal',
 	'-Wformat=2',
 	'-Winit-self',

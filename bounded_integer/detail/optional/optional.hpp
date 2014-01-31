@@ -22,6 +22,7 @@
 
 #include "../class.hpp"
 #include "../enable_if.hpp"
+#include "../numeric_limits.hpp"
 
 #include <cstdint>
 #include <limits>
@@ -31,223 +32,211 @@
 namespace bounded_integer {
 namespace detail {
 
-template<intmax_t minimum, intmax_t maximum>
+template<typename T>
 class has_extra_space {
 private:
-	using underlying_type = underlying_t<minimum, maximum>;
+	static_assert(std::numeric_limits<T>::is_specialized, "Metafunction only works with integer types.");
+	using underlying_type = typename T::underlying_type;
 	static constexpr intmax_t underlying_min = std::numeric_limits<underlying_type>::min();
 	static constexpr intmax_t underlying_max = std::numeric_limits<underlying_type>::max();
+	static constexpr intmax_t min = static_cast<intmax_t>(std::numeric_limits<T>::min());
+	static constexpr intmax_t max = static_cast<intmax_t>(std::numeric_limits<T>::max());
 public:
-	static constexpr bool value = underlying_min < minimum or underlying_max > maximum;
+	static constexpr bool value = underlying_min < min or underlying_max > max;
 };
 
-template<intmax_t minimum, intmax_t maximum, typename policy>
-class optional<minimum, maximum, policy, typename std::enable_if<has_extra_space<minimum, maximum>::value, void>::type> {
-public:
-	using value_type = bounded_integer<minimum, maximum, policy>;
+template<typename T, bool has_extra_space>
+class optional_storage;
 
-	constexpr optional() noexcept:
+template<typename T>
+class optional_storage<T, true> {
+public:
+	constexpr optional_storage() noexcept:
 		m_value(uninitialized_value(), non_check) {
 	}
-	constexpr optional(none_t) noexcept:
-		optional{} {
+	template<typename U, enable_if_t<std::is_convertible<U &&, T>::value> = clang_dummy>
+	constexpr optional_storage(U && other) noexcept(std::is_nothrow_constructible<T, U &&>::value):
+		m_value(std::forward<U>(other)) {
+	}
+	template<typename ... Args, enable_if_t<std::is_constructible<T, Args && ...>::value> = clang_dummy>
+	constexpr explicit optional_storage(Args && ... args) noexcept(std::is_nothrow_constructible<T, Args && ...>::value):
+		m_value(std::forward<Args>(args)...) {
+	}
+	
+	template<typename U, bool extra_space, enable_if_t<std::is_constructible<T, U const &>::value> = clang_dummy>
+	constexpr explicit optional_storage(optional_storage<U, extra_space> const & other) noexcept(std::is_nothrow_constructible<T, U const &>::value):
+		m_value(other.is_initialized() ? other.value() : uninitialized_value()) {
+	}
+	template<typename U, bool extra_space, enable_if_t<std::is_constructible<T, U &&>::value> = clang_dummy>
+	constexpr explicit optional_storage(optional_storage<U, extra_space> && other) noexcept(std::is_nothrow_constructible<T, U &&>::value):
+		m_value(other.is_initialized() ? std::move(other.value()) : uninitialized_value()) {
 	}
 
-	template<typename integer, enable_if_t<
-		std::is_convertible<integer &&, value_type>::value
-	> = clang_dummy>
-	constexpr optional(integer && other) noexcept:
-		m_value(std::forward<integer>(other)) {
+	constexpr T const & value() const & noexcept {
+		return m_value;
 	}
-	template<typename integer, enable_if_t<
-		!std::is_convertible<integer &&, value_type>::value and std::is_constructible<value_type, integer &&>::value
-	> = clang_dummy>
-	constexpr explicit optional(integer && other):
-		m_value(std::forward<integer>(other)) {
+	T & value() & noexcept {
+		return m_value;
 	}
-
-	constexpr optional(optional const &) noexcept = default;
-	constexpr optional(optional &&) noexcept = default;
-	template<intmax_t other_min, intmax_t other_max, typename other_policy>
-	constexpr explicit optional(optional<other_min, other_max, other_policy> const & other):
-		m_value(other.is_initialized() ? *other : uninitialized_value()) {
+	constexpr T && value() && noexcept {
+		return std::move(m_value);
 	}
-	template<intmax_t other_min, intmax_t other_max, typename other_policy>
-	constexpr explicit optional(optional<other_min, other_max, other_policy> && other):
-		m_value(other.is_initialized() ? *std::move(other) : uninitialized_value()) {
-	}
-
-	optional & operator=(optional const &) noexcept = default;
-	optional & operator=(optional &&) noexcept = default;
-	template<typename integer>
-	optional & operator=(integer && other) {
-		*this = optional(std::forward<integer>(other));
-		return *this;
-	}
-	
-	// TODO: conform better to std::optional
-	// comma operator is used to avoid binding the reference to a temporary
-	constexpr value_type const & value() const {
-		return is_initialized() ? m_value : (throw std::logic_error("bad optional access"), m_value);
-	}
-	value_type & value() {
-		return is_initialized() ? m_value : (throw std::logic_error("bad optional access"), m_value);
-	}
-	constexpr value_type const & operator*() const {
-		return value();
-	}
-	value_type & operator*() {
-		return value();
-	}
-	
-	constexpr value_type const * operator->() const {
-		return &value();
-	}
-	value_type * operator->() {
-		return &value();
-	}
-	
-	constexpr value_type const & get_value_or(value_type const & default_value) const noexcept {
-		return is_initialized() ? m_value : default_value;
-	}
-	
-	constexpr explicit operator bool() const noexcept {
-		return is_initialized();
-	}
-	constexpr bool operator!() const noexcept {
-		return !is_initialized();
-	}
-private:
-	template<intmax_t other_min, intmax_t other_max, typename other_policy, typename other_enabler>
-	friend class optional;
 	constexpr bool is_initialized() const noexcept {
 		return m_value != uninitialized_value();
 	}
-	using underlying_type = typename value_type::underlying_type;
-	static constexpr underlying_type uninitialized_value() {
-		return static_cast<underlying_type>(
-			(minimum > std::numeric_limits<underlying_type>::min()) ? minimum - 1 :
-			(maximum < std::numeric_limits<underlying_type>::max()) ? maximum + 1 :
-			throw std::logic_error("Attempted to use compressed optional when the default version should have been used.")
-		);
+private:
+	using underlying_type = typename T::underlying_type;
+	static constexpr auto minimum = static_cast<intmax_t>(std::numeric_limits<T>::min());
+	static constexpr auto maximum = static_cast<intmax_t>(std::numeric_limits<T>::max());
+	static constexpr underlying_type uninitialized_value() noexcept {
+		return static_cast<underlying_type>(minimum > std::numeric_limits<underlying_type>::min() ? minimum - 1 : maximum + 1);
 	}
-	value_type m_value;
+	T m_value;
 };
 
-
-template<intmax_t minimum, intmax_t maximum, typename policy>
-class optional<minimum, maximum, policy, typename std::enable_if<!has_extra_space<minimum, maximum>::value, void>::type> {
+// Replaced this with a version that uses std::aligned_storage to allow it to
+// work with any type
+template<typename T>
+class optional_storage<T, false> {
 public:
-	using value_type = bounded_integer<minimum, maximum, policy>;
-
-	constexpr optional() noexcept:
+	constexpr optional_storage() noexcept:
 		m_initialized(false),
-		m_value(uninitialized_value(), non_check) {
+		m_value() {
 	}
-	constexpr optional(none_t) noexcept:
-		optional{} {
-	}
-
-	template<typename integer, enable_if_t<
-		std::is_convertible<integer &&, value_type>::value
-	> = clang_dummy>
-	constexpr optional(integer && other) noexcept:
+	template<typename U, enable_if_t<std::is_convertible<U &&, T>::value> = clang_dummy>
+	constexpr optional_storage(U && other) noexcept(std::is_nothrow_constructible<T, U &&>::value):
 		m_initialized(true),
-		m_value(std::forward<integer>(other)) {
+		m_value(std::forward<U>(other)) {
 	}
-	template<typename integer, enable_if_t<
-		!std::is_convertible<integer &&, value_type>::value and std::is_constructible<value_type, integer &&>::value
-	> = clang_dummy>
-	constexpr explicit optional(integer && other):
+	template<typename ... Args, enable_if_t<std::is_constructible<T, Args && ...>::value> = clang_dummy>
+	constexpr explicit optional_storage(Args && ... args) noexcept(std::is_nothrow_constructible<T, Args && ...>::value):
 		m_initialized(true),
-		m_value(std::forward<integer>(other)) {
+		m_value(std::forward<Args>(args)...) {
 	}
-
-	constexpr optional(optional const &) noexcept = default;
-	constexpr optional(optional &&) noexcept = default;
-	template<intmax_t other_min, intmax_t other_max, typename other_policy>
-	constexpr explicit optional(optional<other_min, other_max, other_policy> const & other):
+	
+	template<typename U, bool extra_space, enable_if_t<std::is_constructible<T, U const &>::value> = clang_dummy>
+	constexpr explicit optional_storage(optional_storage<U, extra_space> const & other) noexcept(std::is_nothrow_constructible<T, U const &>::value):
 		m_initialized(other.is_initialized()),
-		m_value(other.is_initialized() ? *other : uninitialized_value()) {
+		m_value(m_initialized ? other.value() : uninitialized_value()) {
 	}
-	template<intmax_t other_min, intmax_t other_max, typename other_policy>
-	constexpr explicit optional(optional<other_min, other_max, other_policy> && other):
+	template<typename U, bool extra_space, enable_if_t<std::is_constructible<T, U &&>::value> = clang_dummy>
+	constexpr explicit optional_storage(optional_storage<U, extra_space> && other) noexcept(std::is_nothrow_constructible<T, U &&>::value):
 		m_initialized(other.is_initialized()),
-		m_value(other.is_initialized() ? std::move(*other) : uninitialized_value()) {
+		m_value(m_initialized ? std::move(other.value()) : uninitialized_value()) {
 	}
 
-	optional & operator=(optional const &) noexcept = default;
-	optional & operator=(optional &&) noexcept = default;
-	template<typename integer>
-	optional & operator=(integer && other) {
-		*this = optional(std::forward<integer>(other));
-		return *this;
+	constexpr T const & value() const & noexcept {
+		return m_value;
 	}
-
-	// comma operator is used to avoid binding the reference to a temporary
-	constexpr value_type const & value() const {
-		return is_initialized() ? m_value : (throw std::logic_error("bad optional access"), m_value);
+	T & value() & noexcept {
+		return m_value;
 	}
-	value_type & value() {
-		return is_initialized() ? m_value : (throw std::logic_error("bad optional access"), m_value);
+	constexpr T && value() && noexcept {
+		return std::move(m_value);
 	}
-	constexpr value_type const & operator*() const {
-		return value();
-	}
-	value_type & operator*() {
-		return value();
-	}
-	
-	constexpr value_type const * operator->() const {
-		return &value();
-	}
-	value_type * operator->() {
-		return &value();
-	}
-	
-	constexpr value_type const & get_value_or(value_type const & default_value) const noexcept {
-		return is_initialized() ? m_value : default_value;
-	}
-	
-	constexpr explicit operator bool() const noexcept {
-		return is_initialized();
-	}
-	constexpr bool operator!() const noexcept {
-		return !is_initialized();
-	}
-private:
-	template<intmax_t other_min, intmax_t other_max, typename other_policy, typename other_enabler>
-	friend class optional;
 	constexpr bool is_initialized() const noexcept {
 		return m_initialized;
 	}
-	using underlying_type = typename value_type::underlying_type;
-	static constexpr underlying_type uninitialized_value() {
-		return static_cast<underlying_type>(minimum);
+private:
+	using underlying_type = typename T::underlying_type;
+	static constexpr underlying_type uninitialized_value() noexcept {
+		return static_cast<underlying_type>(std::numeric_limits<T>::min());
 	}
 	bool m_initialized;
-	value_type m_value;
-};
-
-
-
-template<typename T>
-class optional_c;
-
-template<intmax_t minimum, intmax_t maximum, typename policy>
-class optional_c<bounded_integer<minimum, maximum, policy>> {
-public:
-	using type = optional<minimum, maximum, policy>;
+	T m_value;
 };
 
 }	// namespace detail
 
 template<typename T>
-using optional = typename detail::optional_c<T>::type;
+class optional {
+public:
+	using value_type = T;
+private:
+	using storage_type = detail::optional_storage<value_type, detail::has_extra_space<value_type>::value>;
+public:
+	constexpr optional() noexcept = default;
+	constexpr optional(none_t) noexcept:
+		optional{} {
+	}
+
+	constexpr optional(optional const &) noexcept = default;
+	constexpr optional(optional &&) noexcept = default;
+
+	template<typename U>
+	constexpr explicit optional(optional<U> const & other):
+		m_storage(other.m_storage) {
+	}
+	template<typename U>
+	constexpr explicit optional(optional<U> && other):
+		m_storage(std::move(other.m_storage)) {
+	}
+
+	template<typename U, enable_if_t<std::is_convertible<U &&, value_type>::value> = clang_dummy>
+	constexpr optional(U && other) noexcept(std::is_nothrow_constructible<storage_type, U &&>::value):
+		m_storage(std::forward<U>(other)) {
+	}
+	template<typename ... Args, enable_if_t<std::is_constructible<value_type, Args && ...>::value> = clang_dummy>
+	constexpr explicit optional(Args && ... args) noexcept(std::is_nothrow_constructible<storage_type, Args && ...>::value):
+		m_storage(std::forward<Args>(args)...) {
+	}
+
+	optional & operator=(optional const &) noexcept = default;
+	optional & operator=(optional &&) noexcept = default;
+	template<typename... Args>
+	optional & operator=(Args && ... args) noexcept(noexcept(std::declval<optional &>() = optional(std::forward<Args>(args)...))) {
+		*this = optional(std::forward<Args>(args)...);
+		return *this;
+	}
+	
+	// TODO: conform better to std::optional
+	// comma operator is used to avoid binding the reference to a temporary
+	constexpr value_type const & value() const & {
+		return m_storage.is_initialized() ? m_storage.value() : (throw std::logic_error("bad optional access"), m_storage.value());
+	}
+	value_type & value() & {
+		return m_storage.is_initialized() ? m_storage.value() : (throw std::logic_error("bad optional access"), m_storage.value());
+	}
+	constexpr value_type && value() && {
+		return m_storage.is_initialized() ? m_storage.value() : (throw std::logic_error("bad optional access"), m_storage.value());
+	}
+	constexpr value_type const & operator*() const & {
+		return value();
+	}
+	value_type & operator*() & {
+		return value();
+	}
+	constexpr value_type && operator*() && {
+		return value();
+	}
+	
+	constexpr value_type const * operator->() const {
+		return &value();
+	}
+	value_type * operator->() {
+		return &value();
+	}
+	
+	constexpr value_type const & get_value_or(value_type const & default_value) const noexcept {
+		return m_storage.is_initialized() ? m_storage.value() : default_value;
+	}
+	
+	constexpr explicit operator bool() const noexcept {
+		return m_storage.is_initialized();
+	}
+	constexpr bool operator!() const noexcept {
+		return !m_storage.is_initialized();
+	}
+private:
+	template<typename U>
+	friend class optional;
+	storage_type m_storage;
+};
+
 
 template<typename T>
 optional<typename std::remove_reference<T>::type> make_optional(T && value) noexcept {
-	return optional<T>(std::forward<T>(value));
+	return { std::forward<T>(value) };
 }
 
 }	// namespace bounded_integer
