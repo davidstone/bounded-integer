@@ -1,5 +1,5 @@
 // Convert to a std::string / std::wstring
-// Copyright (C) 2013 David Stone
+// Copyright (C) 2014 David Stone
 //
 // This program is free software: you can redistribute it and / or modify
 // it under the terms of the GNU Affero General Public License as
@@ -26,16 +26,16 @@ namespace bounded_integer {
 // Import to_string for the numeric types
 using std::to_string;
 
-template<intmax_t minimum, intmax_t maximum, typename overflow_policy>
-std::string to_string(bounded_integer<minimum, maximum, overflow_policy> const value) {
-	return to_string(+value.value());
+template<intmax_t minimum, intmax_t maximum, typename overflow_policy, bounds bound>
+std::string to_string(bounded_integer<minimum, maximum, overflow_policy, bound> const integer) {
+	return to_string(+integer.value());
 }
 
 using std::to_wstring;
 
-template<intmax_t minimum, intmax_t maximum, typename overflow_policy>
-std::wstring to_wstring(bounded_integer<minimum, maximum, overflow_policy> const value) {
-	return to_wstring(+value.value());
+template<intmax_t minimum, intmax_t maximum, typename overflow_policy, bounds bound>
+std::wstring to_wstring(bounded_integer<minimum, maximum, overflow_policy, bound> const integer) {
+	return to_wstring(+integer.value());
 }
 
 // TODO: template<typename T> T from_string(std::string const & str);

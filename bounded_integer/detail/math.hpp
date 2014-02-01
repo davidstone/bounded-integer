@@ -1,5 +1,5 @@
 // Overloads for the standard library math functions.
-// Copyright (C) 2013 David Stone
+// Copyright (C) 2014 David Stone
 //
 // This program is free software: you can redistribute it and / or modify
 // it under the terms of the GNU Affero General Public License as
@@ -26,11 +26,11 @@
 
 namespace bounded_integer {
 
-template<intmax_t minimum, intmax_t maximum, typename overflow_policy>
-constexpr auto abs(bounded_integer<minimum, maximum, overflow_policy> const value) noexcept {
+template<intmax_t minimum, intmax_t maximum, typename overflow_policy, bounds bound>
+constexpr auto abs(bounded_integer<minimum, maximum, overflow_policy, bound> const value) noexcept {
 	// The 0 has to be there to restrict the range of possible values. Without
 	// it, abs(bounded_integer<-7, 3>) would be [-3, 7] instead of [0, 7].
-	return max(value, -value, make_bounded<0>());
+	return max(value, -value, make_bounded<0, overflow_policy, bound>());
 }
 
 }	// namespace bounded_integer

@@ -20,7 +20,11 @@
 
 namespace {
 
+using base_type = bounded_integer::detail::base<std::numeric_limits<int>::min(), std::numeric_limits<int>::max(), bounded_integer::null_policy>;
 using type = bounded_integer::equivalent_type<int>;
+
+static_assert(std::is_convertible<int, base_type>::value, "Cannot convert integer type to bounded_integer base_type with same range.");
 static_assert(std::is_convertible<int, type>::value, "Cannot convert integer type to bounded_integer with same range.");
+static_assert(std::is_constructible<type, type, bounded_integer::non_check_t>::value, "Cannot construct a type from itself with non_check_t.");
 
 }	// namespace

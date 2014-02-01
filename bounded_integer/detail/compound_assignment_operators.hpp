@@ -1,5 +1,5 @@
 // Compound assignment operators
-// Copyright (C) 2013 David Stone
+// Copyright (C) 2014 David Stone
 //
 // This program is free software: you can redistribute it and / or modify
 // it under the terms of the GNU Affero General Public License as
@@ -27,14 +27,14 @@ namespace bounded_integer {
 // We call make_bounded with the target's overflow policy because we need this
 // exact overflow policy. We do not want to rely on common_policy here.
 #define BOUNDED_INTEGER_COMPOUND_ASSIGNMENT_OPERATOR_TARGET(symbol) \
-template<intmax_t minimum, intmax_t maximum, typename overflow_policy, typename integer> \
-bounded_integer<minimum, maximum, overflow_policy> & operator symbol##=(bounded_integer<minimum, maximum, overflow_policy> & lhs, integer && rhs) { \
-	lhs = static_cast<bounded_integer<minimum, maximum, overflow_policy>>(lhs symbol make_bounded<overflow_policy>(std::forward<integer>(rhs))); \
+template<intmax_t minimum, intmax_t maximum, typename overflow_policy, bounds bound, typename integer> \
+bounded_integer<minimum, maximum, overflow_policy, bound> & operator symbol##=(bounded_integer<minimum, maximum, overflow_policy, bound> & lhs, integer && rhs) { \
+	lhs = static_cast<bounded_integer<minimum, maximum, overflow_policy, bound>>(lhs symbol make_bounded<overflow_policy>(std::forward<integer>(rhs))); \
 	return lhs; \
 } \
-template<intmax_t minimum, intmax_t maximum, typename overflow_policy, typename integer> \
-bounded_integer<minimum, maximum, overflow_policy> volatile & operator symbol##=(bounded_integer<minimum, maximum, overflow_policy> volatile & lhs, integer && rhs) { \
-	lhs = static_cast<bounded_integer<minimum, maximum, overflow_policy>>(lhs symbol make_bounded<overflow_policy>(std::forward<integer>(rhs))); \
+template<intmax_t minimum, intmax_t maximum, typename overflow_policy, bounds bound, typename integer> \
+bounded_integer<minimum, maximum, overflow_policy, bound> volatile & operator symbol##=(bounded_integer<minimum, maximum, overflow_policy, bound> volatile & lhs, integer && rhs) { \
+	lhs = static_cast<bounded_integer<minimum, maximum, overflow_policy, bound>>(lhs symbol make_bounded<overflow_policy>(std::forward<integer>(rhs))); \
 	return lhs; \
 }
 
@@ -49,12 +49,12 @@ BOUNDED_INTEGER_COMPOUND_ASSIGNMENT_OPERATOR_TARGET(%)
 
 
 #define BOUNDED_INTEGER_COMPOUND_ASSIGNMENT_OPERATOR_SOURCE(symbol) \
-template<typename integer, intmax_t minimum, intmax_t maximum, typename overflow_policy, enable_if_t<std::is_integral<integer>::value> = clang_dummy> \
-integer & operator symbol(integer & lhs, bounded_integer<minimum, maximum, overflow_policy> const rhs) noexcept { \
+template<typename integer, intmax_t minimum, intmax_t maximum, typename overflow_policy, bounds bound, enable_if_t<std::is_integral<integer>::value> = clang_dummy> \
+integer & operator symbol(integer & lhs, bounded_integer<minimum, maximum, overflow_policy, bound> const rhs) noexcept { \
 	return lhs symbol rhs.value(); \
 } \
-template<typename integer, intmax_t minimum, intmax_t maximum, typename overflow_policy, enable_if_t<std::is_integral<integer>::value> = clang_dummy> \
-integer volatile & operator symbol(integer volatile & lhs, bounded_integer<minimum, maximum, overflow_policy> const rhs) noexcept { \
+template<typename integer, intmax_t minimum, intmax_t maximum, typename overflow_policy, bounds bound, enable_if_t<std::is_integral<integer>::value> = clang_dummy> \
+integer volatile & operator symbol(integer volatile & lhs, bounded_integer<minimum, maximum, overflow_policy, bound> const rhs) noexcept { \
 	return lhs symbol rhs.value(); \
 }
 
@@ -70,50 +70,50 @@ BOUNDED_INTEGER_COMPOUND_ASSIGNMENT_OPERATOR_SOURCE(%=)
 
 // Increment / decrement
 
-template<intmax_t minimum, intmax_t maximum, typename overflow_policy>
-bounded_integer<minimum, maximum, overflow_policy> & operator++(bounded_integer<minimum, maximum, overflow_policy> & value) {
+template<intmax_t minimum, intmax_t maximum, typename overflow_policy, bounds bound>
+bounded_integer<minimum, maximum, overflow_policy, bound> & operator++(bounded_integer<minimum, maximum, overflow_policy, bound> & value) {
 	value += make_bounded<1>();
 	return value;
 }
-template<intmax_t minimum, intmax_t maximum, typename overflow_policy>
-bounded_integer<minimum, maximum, overflow_policy> volatile & operator++(bounded_integer<minimum, maximum, overflow_policy> volatile & value) {
+template<intmax_t minimum, intmax_t maximum, typename overflow_policy, bounds bound>
+bounded_integer<minimum, maximum, overflow_policy, bound> volatile & operator++(bounded_integer<minimum, maximum, overflow_policy, bound> volatile & value) {
 	value += make_bounded<1>();
 	return value;
 }
 
-template<intmax_t minimum, intmax_t maximum, typename overflow_policy>
-bounded_integer<minimum, maximum, overflow_policy> operator++(bounded_integer<minimum, maximum, overflow_policy> & value, int) {
+template<intmax_t minimum, intmax_t maximum, typename overflow_policy, bounds bound>
+bounded_integer<minimum, maximum, overflow_policy, bound> operator++(bounded_integer<minimum, maximum, overflow_policy, bound> & value, int) {
 	auto const previous = value;
 	++value;
 	return previous;
 }
-template<intmax_t minimum, intmax_t maximum, typename overflow_policy>
-bounded_integer<minimum, maximum, overflow_policy> operator++(bounded_integer<minimum, maximum, overflow_policy> volatile & value, int) {
+template<intmax_t minimum, intmax_t maximum, typename overflow_policy, bounds bound>
+bounded_integer<minimum, maximum, overflow_policy, bound> operator++(bounded_integer<minimum, maximum, overflow_policy, bound> volatile & value, int) {
 	auto const previous = value;
 	++value;
 	return previous;
 }
 
 
-template<intmax_t minimum, intmax_t maximum, typename overflow_policy>
-bounded_integer<minimum, maximum, overflow_policy> & operator--(bounded_integer<minimum, maximum, overflow_policy> & value) {
+template<intmax_t minimum, intmax_t maximum, typename overflow_policy, bounds bound>
+bounded_integer<minimum, maximum, overflow_policy, bound> & operator--(bounded_integer<minimum, maximum, overflow_policy, bound> & value) {
 	value -= make_bounded<1>();
 	return value;
 }
-template<intmax_t minimum, intmax_t maximum, typename overflow_policy>
-bounded_integer<minimum, maximum, overflow_policy> volatile & operator--(bounded_integer<minimum, maximum, overflow_policy> volatile & value) {
+template<intmax_t minimum, intmax_t maximum, typename overflow_policy, bounds bound>
+bounded_integer<minimum, maximum, overflow_policy, bound> volatile & operator--(bounded_integer<minimum, maximum, overflow_policy, bound> volatile & value) {
 	value -= make_bounded<1>();
 	return value;
 }
 
-template<intmax_t minimum, intmax_t maximum, typename overflow_policy>
-bounded_integer<minimum, maximum, overflow_policy> operator--(bounded_integer<minimum, maximum, overflow_policy> & value, int) {
+template<intmax_t minimum, intmax_t maximum, typename overflow_policy, bounds bound>
+bounded_integer<minimum, maximum, overflow_policy, bound> operator--(bounded_integer<minimum, maximum, overflow_policy, bound> & value, int) {
 	auto const previous = value;
 	--value;
 	return previous;
 }
-template<intmax_t minimum, intmax_t maximum, typename overflow_policy>
-bounded_integer<minimum, maximum, overflow_policy> operator--(bounded_integer<minimum, maximum, overflow_policy> volatile & value, int) {
+template<intmax_t minimum, intmax_t maximum, typename overflow_policy, bounds bound>
+bounded_integer<minimum, maximum, overflow_policy, bound> operator--(bounded_integer<minimum, maximum, overflow_policy, bound> volatile & value, int) {
 	auto const previous = value;
 	--value;
 	return previous;

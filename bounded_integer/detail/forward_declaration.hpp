@@ -1,5 +1,5 @@
 // Forward declaration of bounded_integer
-// Copyright (C) 2013 David Stone
+// Copyright (C) 2014 David Stone
 //
 // This program is free software: you can redistribute it and / or modify
 // it under the terms of the GNU Affero General Public License as
@@ -21,7 +21,12 @@
 
 namespace bounded_integer {
 
-template<intmax_t minimum, intmax_t maximum, typename overflow_policy>
+// Most end-users should not use the "detail_any" bound. It is not supported to
+// create a bounded_integer with "detail_any" as the argument, it is for default
+// template arguments only.
+enum class bounds { static_min_max, dynamic_min, dynamic_max, dynamic_min_max, detail_any };
+
+template<intmax_t minimum, intmax_t maximum, typename overflow_policy, bounds = bounds::static_min_max>
 class bounded_integer;
 
 // Does not verify that the value is in range with the policy

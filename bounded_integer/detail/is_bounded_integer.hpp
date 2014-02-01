@@ -1,5 +1,5 @@
 // Determine if a class is a type of bounded_integer
-// Copyright (C) 2013 David Stone
+// Copyright (C) 2014 David Stone
 //
 // This program is free software: you can redistribute it and / or modify
 // it under the terms of the GNU Affero General Public License as
@@ -33,8 +33,8 @@ class is_bounded_integer<integer> {
 public:
 	static constexpr bool value = false;
 };
-template<intmax_t minimum, intmax_t maximum, typename overflow_policy>
-class is_bounded_integer<bounded_integer<minimum, maximum, overflow_policy>> {
+template<intmax_t minimum, intmax_t maximum, typename overflow_policy, bounds bound>
+class is_bounded_integer<bounded_integer<minimum, maximum, overflow_policy, bound>> {
 public:
 	static constexpr bool value = true;
 };

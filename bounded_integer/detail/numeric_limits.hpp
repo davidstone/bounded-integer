@@ -1,5 +1,5 @@
 // Specialization of numeric_limits
-// Copyright (C) 2013 David Stone
+// Copyright (C) 2014 David Stone
 //
 // This program is free software: you can redistribute it and / or modify
 // it under the terms of the GNU Affero General Public License as
@@ -154,10 +154,10 @@ public:
 }	// namespace bounded_integer
 namespace std {
 
-template<intmax_t minimum, intmax_t maximum, typename overflow_policy>
-class numeric_limits<bounded_integer::bounded_integer<minimum, maximum, overflow_policy>> {
+template<intmax_t minimum, intmax_t maximum, typename overflow_policy, bounded_integer::bounds bound>
+class numeric_limits<bounded_integer::bounded_integer<minimum, maximum, overflow_policy, bound>> {
 private:
-	using type = bounded_integer::bounded_integer<minimum, maximum, overflow_policy>;
+	using type = bounded_integer::bounded_integer<minimum, maximum, overflow_policy, bound>;
 public:
 	static constexpr bool is_specialized = true;
 	static constexpr bool is_signed = minimum < 0;

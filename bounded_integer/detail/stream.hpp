@@ -1,5 +1,5 @@
 // Overload for stream insertion / extraction
-// Copyright (C) 2013 David Stone
+// Copyright (C) 2014 David Stone
 //
 // This program is free software: you can redistribute it and / or modify
 // it under the terms of the GNU Affero General Public License as
@@ -26,9 +26,9 @@ namespace bounded_integer {
 
 template<
 	typename CharT, typename Traits,
-	intmax_t minimum, intmax_t maximum, typename policy
+	intmax_t minimum, intmax_t maximum, typename policy, bounds bound
 >
-std::basic_ostream<CharT, Traits> & operator<<(std::basic_ostream<CharT, Traits> & out, bounded_integer<minimum, maximum, policy> const & x) {
+std::basic_ostream<CharT, Traits> & operator<<(std::basic_ostream<CharT, Traits> & out, bounded_integer<minimum, maximum, policy, bound> const & x) {
 	// The unary plus applies integer promotions to x. This ensures values are
 	// printed as integers. Without this, I could run into an issue where the
 	// underlying type is a typedef for signed char / unsigned char. This would
@@ -37,20 +37,20 @@ std::basic_ostream<CharT, Traits> & operator<<(std::basic_ostream<CharT, Traits>
 }
 template<
 	typename CharT, typename Traits,
-	intmax_t minimum, intmax_t maximum, typename policy
+	intmax_t minimum, intmax_t maximum, typename policy, bounds bound
 >
-std::basic_ostream<CharT, Traits> & operator<<(std::basic_ostream<CharT, Traits> & out, bounded_integer<minimum, maximum, policy> const volatile & x) {
+std::basic_ostream<CharT, Traits> & operator<<(std::basic_ostream<CharT, Traits> & out, bounded_integer<minimum, maximum, policy, bound> const volatile & x) {
 	return out << +x.value();
 }
 
 template<
 	typename CharT, typename Traits,
-	intmax_t minimum, intmax_t maximum, typename policy
+	intmax_t minimum, intmax_t maximum, typename policy, bounds bound
 >
-std::basic_istream<CharT, Traits> & operator>>(std::basic_istream<CharT, Traits> & in, bounded_integer<minimum, maximum, policy> & x) {
-	// I made this intmax_t rather than underlying_type to maximize the chances
-	// for robust error checking rather than undefined behavior, but it still
-	// fails for very large (or very small) numbers.
+std::basic_istream<CharT, Traits> & operator>>(std::basic_istream<CharT, Traits> & in, bounded_integer<minimum, maximum, policy, bound> & x) {
+	// This is intmax_t rather than underlying_type to maximize the chances for
+	// robust error checking rather than undefined behavior, but it still fails
+	// for very large and very small numbers.
 	intmax_t temp;
 	in >> temp;
 	x = temp;
@@ -58,12 +58,9 @@ std::basic_istream<CharT, Traits> & operator>>(std::basic_istream<CharT, Traits>
 }
 template<
 	typename CharT, typename Traits,
-	intmax_t minimum, intmax_t maximum, typename policy
+	intmax_t minimum, intmax_t maximum, typename policy, bounds bound
 >
-std::basic_istream<CharT, Traits> & operator>>(std::basic_istream<CharT, Traits> & in, bounded_integer<minimum, maximum, policy> volatile & x) {
-	// I made this intmax_t rather than underlying_type to maximize the chances
-	// for robust error checking rather than undefined behavior, but it still
-	// fails for very large (or very small) numbers.
+std::basic_istream<CharT, Traits> & operator>>(std::basic_istream<CharT, Traits> & in, bounded_integer<minimum, maximum, policy, bound> volatile & x) {
 	intmax_t temp;
 	in >> temp;
 	x = temp;

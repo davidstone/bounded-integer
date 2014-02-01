@@ -35,14 +35,14 @@
 
 namespace bounded_integer {
 
-template<intmax_t minimum, intmax_t maximum>
-using checked_integer = bounded_integer<minimum, maximum, throw_policy>;
+template<intmax_t minimum, intmax_t maximum, bounds bound = bounds::static_min_max>
+using checked_integer = bounded_integer<minimum, maximum, throw_policy, bound>;
 
-template<intmax_t minimum, intmax_t maximum>
-using native_integer = bounded_integer<minimum, maximum, null_policy>;
+template<intmax_t minimum, intmax_t maximum, bounds bound = bounds::static_min_max>
+using native_integer = bounded_integer<minimum, maximum, null_policy, bound>;
 
-template<intmax_t minimum, intmax_t maximum>
-using clamped_integer = bounded_integer<minimum, maximum, clamp_policy>;
+template<intmax_t minimum, intmax_t maximum, bounds bound = bounds::static_min_max>
+using clamped_integer = bounded_integer<minimum, maximum, clamp_policy, bound>;
 
 }	// namespace bounded_integer
 

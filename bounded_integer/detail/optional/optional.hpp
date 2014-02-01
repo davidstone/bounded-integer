@@ -101,7 +101,7 @@ class optional_storage<T, false> {
 public:
 	constexpr optional_storage() noexcept:
 		m_initialized(false),
-		m_value() {
+		m_value(uninitialized_value()) {
 	}
 	template<typename U, enable_if_t<std::is_convertible<U &&, T>::value> = clang_dummy>
 	constexpr optional_storage(U && other) noexcept(std::is_nothrow_constructible<T, U &&>::value):

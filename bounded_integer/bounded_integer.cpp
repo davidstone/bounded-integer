@@ -247,6 +247,34 @@ void check_streaming() {
 }
 
 
+void check_dynamic_bounds() {
+	constexpr auto value = 3_bi;
+	constexpr auto min = 1_bi;
+	constexpr auto max = 7_bi;
+	using type = checked_integer<0, 10, bounds::dynamic_min_max>;
+	constexpr type compile(value, min, max);
+	static_assert(compile == value, "Incorrect value with dynamic bounds.");
+	static_assert(compile.min() == min, "Incorrect dynamic min with dynamic bounds.");
+	static_assert(compile.max() == max, "Incorrect dynamic max with dynamic bounds.");
+	type run(value, min, max);
+	try {
+		static_assert(!noexcept(std::declval<checked_integer<0, 0> &>() = std::declval<checked_integer<1, 1> &>()), "Shouldn't be noexcept.");
+		run = min - 1_bi;
+		assert(false);
+	}
+	catch (std::range_error const &) {
+	}
+	assert(run == value);
+	try {
+		run = max + 1_bi;
+		assert(false);
+	}
+	catch (std::range_error const &) {
+	}
+	assert(run == value);
+}
+
+
 }	// namespace
 }	// namespace bounded_integer
 
@@ -258,4 +286,5 @@ int main() {
 	check_math();
 	check_optional();
 	check_streaming();
+	check_dynamic_bounds();
 }

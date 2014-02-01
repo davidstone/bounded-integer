@@ -1,5 +1,5 @@
 // Factory function that turns a built-in into a bounded_integer
-// Copyright (C) 2013 David Stone
+// Copyright (C) 2014 David Stone
 //
 // This program is free software: you can redistribute it and / or modify
 // it under the terms of the GNU Affero General Public License as
@@ -32,8 +32,8 @@ class equivalent_overflow_policy_c {
 public:
 	using type = null_policy;
 };
-template<intmax_t minimum, intmax_t maximum, typename overflow_policy>
-class equivalent_overflow_policy_c<bounded_integer<minimum, maximum, overflow_policy>> {
+template<intmax_t minimum, intmax_t maximum, typename overflow_policy, bounds bound>
+class equivalent_overflow_policy_c<bounded_integer<minimum, maximum, overflow_policy, bound>> {
 public:
 	using type = overflow_policy;
 };
@@ -41,13 +41,25 @@ public:
 template<typename integer>
 using equivalent_overflow_policy = typename equivalent_overflow_policy_c<integer>::type;
 
+template<typename integer>
+class equivalent_dynamic_bounds {
+public:
+	static constexpr bounds value = bounds::static_min_max;
+};
+template<intmax_t minimum, intmax_t maximum, typename overflow_policy, bounds bound>
+class equivalent_dynamic_bounds<bounded_integer<minimum, maximum, overflow_policy, bound>> {
+public:
+	static constexpr bounds value = bound;
+};
+
 }	// namespace detail
 
-template<typename integer, typename overflow_policy = detail::equivalent_overflow_policy<integer>>
+template<typename integer, typename overflow_policy = detail::equivalent_overflow_policy<integer>, bounds bound = detail::equivalent_dynamic_bounds<integer>::value>
 using equivalent_type = bounded_integer<
 	static_cast<intmax_t>(std::numeric_limits<integer>::min()),
 	static_cast<intmax_t>(std::numeric_limits<integer>::max()),
-	overflow_policy
+	overflow_policy,
+	bound
 >;
 
 // This somewhat strange looking set of default arguments allows the following:
@@ -63,7 +75,10 @@ using equivalent_type = bounded_integer<
 // the type of integer is not known when we are trying to determine the default
 // policy.
 //
-// 2) The second parameter ("integer") has to be defaulted because we defaulted
+// 2) The second parameter is similar to the first, but for dynamic bounds
+// checking instead of overflow policy deduction.
+//
+// 3) The third parameter ("integer") has to be defaulted because we defaulted
 // the first. We don't want "integer" to be the first parameter because that
 // would prevent type deduction from the function argument. Therefore, we
 // default it to something (it doesn't matter what), but the type will always be
@@ -71,6 +86,7 @@ using equivalent_type = bounded_integer<
 
 template<
 	typename overflow_policy = void,
+	bounds bound = bounds::detail_any,
 	typename integer = void,
 	typename result_t = equivalent_type<
 		integer,
@@ -78,7 +94,8 @@ template<
 			std::is_void<overflow_policy>::value,
 			detail::equivalent_overflow_policy<integer>,
 			overflow_policy
-		>::type
+		>::type,
+		(bound == bounds::detail_any ? detail::equivalent_dynamic_bounds<integer>::value : bound)
 	>
 >
 constexpr result_t make_bounded(integer const value) noexcept {
@@ -86,9 +103,9 @@ constexpr result_t make_bounded(integer const value) noexcept {
 	return result_t(value, non_check);
 }
 
-template<intmax_t value, typename overflow_policy = null_policy>
-constexpr bounded_integer<value, value, overflow_policy> make_bounded() noexcept {
-	return bounded_integer<value, value, overflow_policy>(value, non_check);
+template<intmax_t value, typename overflow_policy = null_policy, bounds bound = bounds::static_min_max>
+constexpr bounded_integer<value, value, overflow_policy, bound> make_bounded() noexcept {
+	return bounded_integer<value, value, overflow_policy, bound>(value, non_check);
 }
 
 }	// namespace bounded_integer
