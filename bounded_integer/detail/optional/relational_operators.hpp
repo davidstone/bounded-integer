@@ -19,6 +19,7 @@
 
 #include "forward_declaration.hpp"
 #include "../class.hpp"
+#include "../comparison_operators.hpp"
 #include <utility>
 
 namespace bounded_integer {
@@ -72,7 +73,7 @@ constexpr bool operator==(LHS const & lhs, optional<RHS> const & rhs) noexcept(n
 }
 
 template<typename LHS, typename RHS>
-constexpr bool operator!=(optional<LHS> const & lhs, RHS const & rhs) noexcept(noexcept(std::declval<LHS const &> == rhs)) {
+constexpr bool operator!=(optional<LHS> const & lhs, RHS const & rhs) noexcept(noexcept(lhs == rhs)) {
 	return !(lhs == rhs);
 }
 
