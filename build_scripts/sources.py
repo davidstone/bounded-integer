@@ -1,5 +1,5 @@
 # List of sources
-# Copyright (C) 2013 David Stone
+# Copyright (C) 2014 David Stone
 #
 # This program is free software: you can redistribute it and / or modify
 # it under the terms of the GNU Affero General Public License as
@@ -61,7 +61,7 @@ base_sources = [('test',
 		'make_optional.cpp',
 		'make_optional_array.cpp',
 		'optional.cpp',
-		'relational_operators.cpp',
+		'comparison_operators.cpp',
 	]) +
 	prepend_dir('detail/policy', [
 		'all.cpp',

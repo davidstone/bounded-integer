@@ -15,7 +15,7 @@
 // along with this program. If not, see <http://www.gnu.org/licenses/>.
 
 #include "make_optional_array.hpp"
-#include "relational_operators.hpp"
+#include "comparison_operators.hpp"
 #include "../comparison_operators.hpp"
 #include "../literal.hpp"
 

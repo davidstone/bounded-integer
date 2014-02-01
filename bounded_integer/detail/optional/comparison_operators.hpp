@@ -1,4 +1,4 @@
-// Optional relational operators
+// Optional comparison operators
 // Copyright (C) 2014 David Stone
 //
 // This program is free software: you can redistribute it and / or modify
@@ -14,8 +14,8 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with this program. If not, see <http://www.gnu.org/licenses/>.
 
-#ifndef BOUNDED_INTEGER_DETAIL_OPTIONAL_RELATIONAL_OPERATORS_HPP_
-#define BOUNDED_INTEGER_DETAIL_OPTIONAL_RELATIONAL_OPERATORS_HPP_
+#ifndef BOUNDED_INTEGER_DETAIL_OPTIONAL_COMPARISON_OPERATORS_HPP_
+#define BOUNDED_INTEGER_DETAIL_OPTIONAL_COMPARISON_OPERATORS_HPP_
 
 #include "optional.hpp"
 #include "../class.hpp"
@@ -197,4 +197,4 @@ constexpr bool operator>=(none_t const lhs, optional<T> const & rhs) noexcept {
 }
 
 }	// namespace bounded_integer
-#endif	// BOUNDED_INTEGER_DETAIL_OPTIONAL_RELATIONAL_OPERATORS_HPP_
+#endif	// BOUNDED_INTEGER_DETAIL_OPTIONAL_COMPARISON_OPERATORS_HPP_

@@ -1,5 +1,5 @@
 // optional bounded_integer type
-// Copyright (C) 2013 David Stone
+// Copyright (C) 2014 David Stone
 //
 // This program is free software: you can redistribute it and / or modify
 // it under the terms of the GNU Affero General Public License as
@@ -21,6 +21,6 @@
 #include "detail/optional/make_optional.hpp"
 #include "detail/optional/make_optional_array.hpp"
 #include "detail/optional/optional.hpp"
-#include "detail/optional/relational_operators.hpp"
+#include "detail/optional/comparison_operators.hpp"
 
 #endif	// BOUNDED_INTEGER_OPTIONAL_HPP_
