@@ -187,11 +187,6 @@ private:
 	bounded_integer & operator=(bounded_integer const &) noexcept = default; \
 	bounded_integer & operator=(bounded_integer &&) noexcept = default; \
 	\
-	template<typename T, enable_if_t<!std::is_convertible<T &&, base>::value and std::is_constructible<base, T &&>::value> = clang_dummy> \
-	explicit constexpr bounded_integer(T && other) noexcept(std::is_nothrow_constructible<base, T &&>::value): \
-		bounded_integer(overflow_policy_type{}.assignment(std::forward<T>(other), minimum, maximum), non_check) { \
-	} \
-	\
 	template<typename integer> \
 	bounded_integer & operator=(integer && other) noexcept(noexcept( \
 		m_value = base( \
@@ -255,6 +250,10 @@ public:
 	explicit constexpr bounded_integer(T && other, non_check_t) noexcept:
 		m_value(std::forward<T>(other), non_check) {
 	}
+	template<typename T, enable_if_t<!std::is_convertible<T &&, base>::value and std::is_constructible<base, T &&>::value> = clang_dummy>
+	explicit constexpr bounded_integer(T && other) noexcept(std::is_nothrow_constructible<base, T &&>::value):
+		m_value(std::forward<T>(other)) {
+	}
 	
 	
 	using min_type = bounded_integer<minimum, minimum, overflow_policy_type>;
@@ -307,6 +306,11 @@ public:
 	template<typename T, enable_if_t<std::is_constructible<base, T &&, non_check_t>::value> = clang_dummy>
 	explicit constexpr bounded_integer(T && other, non_check_t) noexcept:
 		bounded_integer(std::forward<T>(other), minimum, non_check) {
+	}
+	template<typename T, enable_if_t<!std::is_convertible<T &&, base>::value and std::is_constructible<base, T &&>::value> = clang_dummy>
+	explicit constexpr bounded_integer(T && other) noexcept(std::is_nothrow_constructible<base, T &&>::value):
+		m_min(minimum, non_check),
+		m_value(std::forward<T>(other)) {
 	}
 	
 	template<typename T, typename Min>
@@ -389,6 +393,11 @@ public:
 	template<typename T, enable_if_t<std::is_constructible<base, T &&, non_check_t>::value> = clang_dummy>
 	explicit constexpr bounded_integer(T && other, non_check_t) noexcept:
 		bounded_integer(std::forward<T>(other), maximum, non_check) {
+	}
+	template<typename T, enable_if_t<!std::is_convertible<T &&, base>::value and std::is_constructible<base, T &&>::value> = clang_dummy>
+	explicit constexpr bounded_integer(T && other) noexcept(std::is_nothrow_constructible<base, T &&>::value):
+		m_max(maximum, non_check),
+		m_value(std::forward<T>(other)) {
 	}
 	
 	
@@ -478,6 +487,12 @@ public:
 	template<typename T, enable_if_t<std::is_constructible<base, T &&, non_check_t>::value> = clang_dummy>
 	explicit constexpr bounded_integer(T && other, non_check_t) noexcept:
 		bounded_integer(std::forward<T>(other), minimum, maximum, non_check) {
+	}
+	template<typename T, enable_if_t<!std::is_convertible<T &&, base>::value and std::is_constructible<base, T &&>::value> = clang_dummy>
+	explicit constexpr bounded_integer(T && other) noexcept(std::is_nothrow_constructible<base, T &&>::value):
+		m_min(minimum, non_check),
+		m_max(maximum, non_check),
+		m_value(std::forward<T>(other)) {
 	}
 	
 	template<typename T, typename Min, typename Max>

@@ -225,6 +225,8 @@ void check_optional() {
 	assert(!optional_integer);
 	optional_integer = ri_type(7);
 	assert(optional_integer);
+	optional_integer = none;
+	assert(!optional_integer);
 }
 
 template<typename integer>
