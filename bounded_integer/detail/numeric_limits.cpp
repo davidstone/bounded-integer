@@ -1,5 +1,5 @@
 // Verify that the header can stand on its own, run tests
-// Copyright (C) 2013 David Stone
+// Copyright (C) 2014 David Stone
 //
 // This program is free software: you can redistribute it and / or modify
 // it under the terms of the GNU Affero General Public License as
@@ -15,12 +15,23 @@
 // along with this program. If not, see <http://www.gnu.org/licenses/>.
 
 #include "numeric_limits.hpp"
+
+#include "class.hpp"
+#include "comparison_operators.hpp"
 #include "policy/null_policy.hpp"
 
-namespace bounded_integer {
 namespace {
 
-static_assert(std::numeric_limits<bounded_integer<1, 1000, null_policy>>::digits == 0, "Meaningless digits not 0.");
+using policy = bounded_integer::null_policy;
+
+static_assert(std::numeric_limits<bounded_integer::bounded_integer<1, 1000, policy>>::digits == 0, "Meaningless digits not 0.");
+
+constexpr intmax_t min = 0;
+constexpr intmax_t max = 714;
+using dynamic_type = bounded_integer::bounded_integer<min, max, policy, bounded_integer::bounds::dynamic_max>;
+
+constexpr dynamic_type value(max, bounded_integer::non_check);
+static_assert(std::numeric_limits<dynamic_type>::min() == min, "Incorrect min for dynamic type.");
+static_assert(std::numeric_limits<dynamic_type>::max() == max, "Incorrect max for dynamic type.");
 
 }	// namespace
-}	// namespace bounded_integer
