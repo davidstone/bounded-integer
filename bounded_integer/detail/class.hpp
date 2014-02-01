@@ -26,7 +26,6 @@
 #include <type_traits>
 #include <utility>
 #include <boost/integer.hpp>
-#include "policy/throw_policy.hpp"
 
 namespace bounded_integer {
 namespace detail {
