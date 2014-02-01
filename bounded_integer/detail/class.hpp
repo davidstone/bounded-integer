@@ -46,14 +46,22 @@ using underlying_t = typename std::conditional<
 	unsigned_underlying_t<minimum, maximum>
 >::type;
 
-template<typename T>
+template<typename T, enable_if_t<std::numeric_limits<typename std::decay<T>::type>::is_specialized> = clang_dummy>
 constexpr bool is_implicitly_constructible_from(intmax_t const minimum, intmax_t const maximum) noexcept {
-	return std::numeric_limits<typename std::decay<T>::type>::is_specialized and type_fits_in_range<typename std::decay<T>::type>(minimum, maximum);
+	return type_fits_in_range<typename std::decay<T>::type>(minimum, maximum);
 }
-template<typename policy, typename T>
+template<typename T, enable_if_t<!std::numeric_limits<typename std::decay<T>::type>::is_specialized> = clang_dummy>
+constexpr bool is_implicitly_constructible_from(intmax_t, intmax_t) noexcept {
+	return false;
+}
+
+template<typename policy, typename T, enable_if_t<std::numeric_limits<typename std::decay<T>::type>::is_specialized> = clang_dummy>
 constexpr bool is_explicitly_constructible_from(intmax_t const minimum, intmax_t const maximum) noexcept {
-	return std::numeric_limits<typename std::decay<T>::type>::is_specialized and 
-		(type_overlaps_range<typename std::decay<T>::type>(minimum, maximum) or !policy::overflow_is_error);
+	return type_overlaps_range<typename std::decay<T>::type>(minimum, maximum) or !policy::overflow_is_error;
+}
+template<typename policy, typename T, enable_if_t<!std::numeric_limits<typename std::decay<T>::type>::is_specialized> = clang_dummy>
+constexpr bool is_explicitly_constructible_from(intmax_t, intmax_t) noexcept {
+	return false;
 }
 
 template<intmax_t minimum, intmax_t maximum, typename OverflowPolicy>
