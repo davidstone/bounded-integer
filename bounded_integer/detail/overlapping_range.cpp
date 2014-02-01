@@ -23,6 +23,7 @@ namespace {
 using type = bounded_integer::bounded_integer<0, 0, bounded_integer::null_policy>;
 static_assert(bounded_integer::detail::type_overlaps_range<type>(0, 0), "Type should overlap its own range.");
 static_assert(bounded_integer::detail::type_fits_in_range<type>(0, 0), "Type should fit in its own range.");
+static_assert(!bounded_integer::detail::type_overlaps_range<type>(1, 1), "Type should not overlap a disjoint range.");
 
 
 }	// namespace

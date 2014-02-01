@@ -46,7 +46,7 @@ constexpr bool value_fits_in_type<uintmax_t>(intmax_t const value) noexcept {
 }
 
 constexpr bool ranges_overlap(intmax_t const first_range_min, intmax_t const first_range_max, intmax_t const second_range_min, intmax_t const second_range_max) noexcept {
-	return first_range_min <= second_range_max or second_range_min <= first_range_max;
+	return first_range_min <= second_range_max and second_range_min <= first_range_max;
 }
 
 template<typename integer, enable_if_t<std::numeric_limits<integer>::is_specialized> = clang_dummy>
