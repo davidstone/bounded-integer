@@ -49,11 +49,11 @@ using underlying_t = typename std::conditional<
 
 template<typename T>
 constexpr bool is_implicitly_constructible_from(intmax_t const minimum, intmax_t const maximum) noexcept {
-	return type_fits_in_range<typename std::decay<T>::type>(minimum, maximum);
+	return std::numeric_limits<typename std::decay<T>::type>::is_specialized and type_fits_in_range<typename std::decay<T>::type>(minimum, maximum);
 }
 template<typename policy, typename T>
 constexpr bool is_explicitly_constructible_from(intmax_t const minimum, intmax_t const maximum) noexcept {
-	return 
+	return std::numeric_limits<typename std::decay<T>::type>::is_specialized and 
 		(type_overlaps_range<typename std::decay<T>::type>(minimum, maximum) or !policy::overflow_is_error);
 }
 
