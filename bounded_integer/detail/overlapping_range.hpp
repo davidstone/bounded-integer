@@ -22,33 +22,27 @@
 #include <cstdint>
 #include <type_traits>
 
+// All of these functions have a precondition that minimum <= maximum
+
 namespace bounded_integer {
 namespace detail {
 
 template<typename integer>
-constexpr bool value_in_range(integer const & value, intmax_t const minimum, intmax_t const maximum) noexcept {
-	static_assert(!std::is_same<typename std::decay<integer>::type, uintmax_t>::value, "Function does not work with uintmax_t.");
-	return minimum <= static_cast<intmax_t>(value) and static_cast<intmax_t>(value) <= maximum;
-}
-
-template<typename integer>
 constexpr bool value_fits_in_type(intmax_t const value) noexcept {
 	static_assert(std::numeric_limits<integer>::is_specialized, "Only works with integer types.");
-	return value_in_range(value, std::numeric_limits<integer>::min(), std::numeric_limits<integer>::max());
+	return std::numeric_limits<integer>::min() <= value and value <= std::numeric_limits<integer>::max();
 }
 template<>
 constexpr bool value_fits_in_type<uintmax_t>(intmax_t const value) noexcept {
 	return value >= 0;
 }
 
-constexpr bool ranges_overlap(intmax_t const first_range_min, intmax_t const first_range_max, intmax_t const second_range_min, intmax_t const second_range_max) noexcept {
-	return first_range_min <= second_range_max and second_range_min <= first_range_max;
-}
-
 template<typename integer>
 constexpr bool type_overlaps_range(intmax_t const minimum, intmax_t const maximum) noexcept {
 	static_assert(std::numeric_limits<integer>::is_specialized, "Only works with integer types.");
-	return ranges_overlap(minimum, maximum, static_cast<intmax_t>(std::numeric_limits<integer>::min()), static_cast<intmax_t>(std::numeric_limits<integer>::max()));
+	return
+		minimum <= static_cast<intmax_t>(std::numeric_limits<integer>::max()) and
+		static_cast<intmax_t>(std::numeric_limits<integer>::min()) <= maximum;
 }
 template<>
 constexpr bool type_overlaps_range<uintmax_t>(intmax_t, intmax_t const maximum) noexcept {
