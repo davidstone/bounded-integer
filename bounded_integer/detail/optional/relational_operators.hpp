@@ -17,7 +17,7 @@
 #ifndef BOUNDED_INTEGER_DETAIL_OPTIONAL_RELATIONAL_OPERATORS_HPP_
 #define BOUNDED_INTEGER_DETAIL_OPTIONAL_RELATIONAL_OPERATORS_HPP_
 
-#include "forward_declaration.hpp"
+#include "optional.hpp"
 #include "../class.hpp"
 #include "../comparison_operators.hpp"
 #include <utility>

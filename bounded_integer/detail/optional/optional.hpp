@@ -18,7 +18,6 @@
 #define BOUNDED_INTEGER_DETAIL_OPTIONAL_OPTIONAL_HPP_
 
 #include "forward_declaration.hpp"
-#include "relational_operators.hpp"
 
 #include "../class.hpp"
 #include "../enable_if.hpp"
