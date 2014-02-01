@@ -53,7 +53,7 @@ constexpr bool is_implicitly_constructible_from(intmax_t const minimum, intmax_t
 }
 template<typename policy, typename T>
 constexpr bool is_explicitly_constructible_from(intmax_t const minimum, intmax_t const maximum) noexcept {
-	return !is_implicitly_constructible_from<T>(minimum, maximum) and
+	return 
 		(type_overlaps_range<typename std::decay<T>::type>(minimum, maximum) or !policy::overflow_is_error);
 }
 
@@ -81,7 +81,6 @@ public:
 	// Use this constructor if you know by means that cannot be determined by
 	// the type system that the value really does fit in the range.
 	template<typename integer, enable_if_t<
-		is_implicitly_constructible_from<integer>(minimum, maximum) or
 		is_explicitly_constructible_from<overflow_policy_type, integer>(minimum, maximum)
 	> = clang_dummy>
 	constexpr base(integer && other, non_check_t) noexcept:
@@ -97,6 +96,7 @@ public:
 	}
 
 	template<typename integer, enable_if_t<
+		!is_implicitly_constructible_from<integer>(minimum, maximum) and
 		is_explicitly_constructible_from<overflow_policy_type, integer>(minimum, maximum)
 	> = clang_dummy>
 	constexpr explicit base(integer && other)
