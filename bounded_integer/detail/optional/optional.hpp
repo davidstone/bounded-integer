@@ -204,8 +204,8 @@ public:
 	value_type & value() & {
 		return m_storage.is_initialized() ? m_storage.value() : (throw std::logic_error("bad optional access"), m_storage.value());
 	}
-	constexpr value_type && value() && {
-		return m_storage.is_initialized() ? m_storage.value() : (throw std::logic_error("bad optional access"), m_storage.value());
+	value_type && value() && {
+		return m_storage.is_initialized() ? std::move(m_storage).value() : (throw std::logic_error("bad optional access"), std::move(m_storage).value());
 	}
 	constexpr value_type const & operator*() const & {
 		return value();
@@ -213,8 +213,8 @@ public:
 	value_type & operator*() & {
 		return value();
 	}
-	constexpr value_type && operator*() && {
-		return value();
+	value_type && operator*() && {
+		return std::move(value());
 	}
 	
 	constexpr value_type const * operator->() const {
