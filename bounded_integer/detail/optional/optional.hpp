@@ -191,9 +191,9 @@ public:
 
 	optional & operator=(optional const &) noexcept = default;
 	optional & operator=(optional &&) noexcept = default;
-	template<typename... Args>
-	optional & operator=(Args && ... args) noexcept(noexcept(std::declval<optional &>() = optional(std::forward<Args>(args)...))) {
-		*this = optional(std::forward<Args>(args)...);
+	template<typename U>
+	optional & operator=(U && other) noexcept(noexcept(std::declval<optional &>() = optional(std::forward<U>(other)))) {
+		*this = optional(std::forward<U>(other));
 		return *this;
 	}
 	
