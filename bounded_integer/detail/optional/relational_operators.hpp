@@ -63,7 +63,7 @@ constexpr bool operator>=(optional<LHS> const & lhs, optional<RHS> const & rhs) 
 
 
 template<typename LHS, typename RHS>
-constexpr bool operator==(optional<LHS> const & lhs, RHS const & rhs) noexcept(noexcept(std::declval<LHS const &> == rhs)) {
+constexpr bool operator==(optional<LHS> const & lhs, RHS const & rhs) noexcept(noexcept(std::declval<LHS const &>() == rhs)) {
 	return static_cast<bool>(lhs) and *lhs == rhs;
 }
 
