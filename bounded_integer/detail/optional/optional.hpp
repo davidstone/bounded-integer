@@ -54,6 +54,10 @@ public:
 	constexpr optional_storage() noexcept:
 		m_value(uninitialized_value(), non_check) {
 	}
+	optional_storage(optional_storage const &) = default;
+	optional_storage(optional_storage &&) = default;
+	optional_storage & operator=(optional_storage const &) = default;
+	optional_storage & operator=(optional_storage &&) = default;
 	template<typename U, enable_if_t<std::is_convertible<U &&, T>::value> = clang_dummy>
 	constexpr optional_storage(U && other) noexcept(std::is_nothrow_constructible<T, U &&>::value):
 		m_value(std::forward<U>(other)) {
@@ -103,6 +107,10 @@ public:
 		m_initialized(false),
 		m_value(uninitialized_value()) {
 	}
+	optional_storage(optional_storage const &) = default;
+	optional_storage(optional_storage &&) = default;
+	optional_storage & operator=(optional_storage const &) = default;
+	optional_storage & operator=(optional_storage &&) = default;
 	template<typename U, enable_if_t<std::is_convertible<U &&, T>::value> = clang_dummy>
 	constexpr optional_storage(U && other) noexcept(std::is_nothrow_constructible<T, U &&>::value):
 		m_initialized(true),
