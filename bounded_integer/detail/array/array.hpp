@@ -36,6 +36,7 @@ class iterator {
 public:
 	using value_type = T;
 	using difference_type = bounded_integer<-size, size, null_policy>;
+	using index_type = bounded_integer<0, size - 1, throw_policy>;
 	using pointer = value_type *;
 	using reference = value_type &;
 	using iterator_category = std::random_access_iterator_tag;
@@ -81,7 +82,7 @@ public:
 	friend constexpr difference_type operator-(iterator const & lhs, iterator const & rhs) {
 		return static_cast<difference_type>(lhs.m_it - rhs.m_it);
 	}
-	constexpr reference operator[](bounded_integer<0, size - 1, null_policy> const index) const {
+	constexpr reference operator[](index_type const index) const {
 		return m_it[static_cast<std::size_t>(index)];
 	}
 
@@ -150,16 +151,19 @@ template<typename T, std::size_t size_>
 class array {
 public:
 	using value_type = T;
-	using size_type = bounded_integer<size_, size_, null_policy>;
-	using difference_type = typename detail::iterator<value_type, size_>::difference_type;
-	using const_reference = value_type const &;
-	using reference = value_type &;
-	using const_pointer = value_type const *;
-	using pointer = value_type *;
+
 	using const_iterator = detail::iterator<value_type const, size_>;
 	using iterator = detail::iterator<value_type, size_>;
 	using const_reverse_iterator = std::reverse_iterator<const_iterator>;
 	using reverse_iterator = std::reverse_iterator<iterator>;
+
+	using size_type = bounded_integer<size_, size_, null_policy>;
+	using difference_type = typename const_iterator::difference_type;
+	using index_type = typename const_iterator::index_type;
+	using const_reference = typename const_iterator::reference;
+	using reference = typename iterator::reference;
+	using const_pointer = typename const_iterator::pointer;
+	using pointer = typename iterator::pointer;
 	
 	constexpr size_type size() const noexcept {
 		return make_bounded<size_>();
@@ -174,16 +178,16 @@ public:
 	
 	template<typename index_type>
 	constexpr const_reference at(index_type const & index) const {
-		return m_value[static_cast<std::size_t>(bounded_integer<0, size_ - 1, throw_policy>(index))];
+		return m_value[static_cast<std::size_t>(static_cast<index_type>(index))];
 	}
 	template<typename index_type>
 	reference at(index_type const & index) {
-		return m_value[static_cast<std::size_t>(bounded_integer<0, size_ - 1, throw_policy>(index))];
+		return m_value[static_cast<std::size_t>(static_cast<index_type>(index))];
 	}
-	constexpr const_reference operator[](bounded_integer<0, size_ - 1, null_policy> const & index) const noexcept {
+	constexpr const_reference operator[](index_type const & index) const noexcept {
 		return m_value[static_cast<std::size_t>(index)];
 	}
-	reference operator[](bounded_integer<0, size_ - 1, null_policy> const & index) noexcept {
+	reference operator[](index_type const & index) noexcept {
 		return m_value[static_cast<std::size_t>(index)];
 	}
 
