@@ -1,5 +1,5 @@
 // Array class with better interoperability with bounded_integer than std::array
-// Copyright (C) 2013 David Stone
+// Copyright (C) 2014 David Stone
 //
 // This program is free software: you can redistribute it and / or modify
 // it under the terms of the GNU Affero General Public License as
@@ -152,7 +152,7 @@ template<typename T, std::size_t size_>
 class array {
 public:
 	using value_type = T;
-	// using size_type = ?;
+	using size_type = bounded_integer<size_, size_, null_policy>;
 	using difference_type = typename detail::iterator<value_type, size_>::difference_type;
 	using const_reference = value_type const &;
 	using reference = value_type &;
@@ -163,13 +163,13 @@ public:
 	using const_reverse_iterator = std::reverse_iterator<const_iterator>;
 	using reverse_iterator = std::reverse_iterator<iterator>;
 	
-	constexpr decltype(make_bounded<size_>()) size() const noexcept {
+	constexpr size_type size() const noexcept {
 		return make_bounded<size_>();
 	}
 	constexpr bool empty() const noexcept {
 		return size() == make_bounded<0>();
 	}
-	constexpr decltype(make_bounded<size_>()) max_size() const noexcept {
+	constexpr size_type max_size() const noexcept {
 		return make_bounded<size_>();
 	}
 	
