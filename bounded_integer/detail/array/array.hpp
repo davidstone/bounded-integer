@@ -176,6 +176,13 @@ public:
 	}
 	
 	
+	constexpr const_pointer data() const noexcept {
+		return m_value;
+	}
+	pointer data() noexcept {
+		return m_value;
+	}
+
 	template<typename integer>
 	constexpr const_reference at(integer const & index) const {
 		return m_value[static_cast<std::size_t>(static_cast<index_type>(index))];
@@ -202,13 +209,6 @@ public:
 	}
 	reference back() {
 		return m_value[size_ - 1];
-	}
-
-	constexpr const_pointer data() const noexcept {
-		return m_value;
-	}
-	pointer data() noexcept {
-		return m_value;
 	}
 
 	constexpr const_iterator begin() const noexcept {
