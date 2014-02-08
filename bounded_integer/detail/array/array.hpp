@@ -183,6 +183,12 @@ public:
 		return m_value;
 	}
 
+	constexpr const_reference operator[](index_type const & index) const noexcept {
+		return m_value[static_cast<std::size_t>(index)];
+	}
+	reference operator[](index_type const & index) noexcept {
+		return m_value[static_cast<std::size_t>(index)];
+	}
 	template<typename integer>
 	constexpr const_reference at(integer const & index) const {
 		return m_value[static_cast<std::size_t>(static_cast<index_type>(index))];
@@ -190,12 +196,6 @@ public:
 	template<typename integer>
 	reference at(integer const & index) {
 		return m_value[static_cast<std::size_t>(static_cast<index_type>(index))];
-	}
-	constexpr const_reference operator[](index_type const & index) const noexcept {
-		return m_value[static_cast<std::size_t>(index)];
-	}
-	reference operator[](index_type const & index) noexcept {
-		return m_value[static_cast<std::size_t>(index)];
 	}
 
 	constexpr const_reference front() const {
