@@ -184,48 +184,48 @@ public:
 	}
 
 	constexpr const_reference operator[](index_type const & index) const noexcept {
-		return m_value[static_cast<std::size_t>(index)];
+		return *(data() + index);
 	}
 	reference operator[](index_type const & index) noexcept {
-		return m_value[static_cast<std::size_t>(index)];
+		return *(data() + index);
 	}
 	template<typename integer>
 	constexpr const_reference at(integer const & index) const noexcept(noexcept(static_cast<index_type>(index))) {
-		return m_value[static_cast<std::size_t>(static_cast<index_type>(index))];
+		return operator[](static_cast<index_type>(index));
 	}
 	template<typename integer>
 	reference at(integer const & index) noexcept(noexcept(static_cast<index_type>(index))) {
-		return m_value[static_cast<std::size_t>(static_cast<index_type>(index))];
+		return operator[](static_cast<index_type>(index));
 	}
 
 	constexpr const_reference front() const noexcept {
-		return m_value[0];
+		return operator[](make_bounded<0>());
 	}
 	reference front() noexcept {
-		return m_value[0];
+		return operator[](make_bounded<0>());
 	}
 	constexpr const_reference back() const noexcept {
-		return m_value[size_ - 1];
+		return operator[](size() - make_bounded<1>());
 	}
 	reference back() noexcept {
-		return m_value[size_ - 1];
+		return operator[](size() - make_bounded<1>());
 	}
 
 	constexpr const_iterator begin() const noexcept {
-		return const_iterator(m_value);
+		return const_iterator(data());
 	}
 	iterator begin() noexcept {
-		return iterator(m_value);
+		return iterator(data());
 	}
 	constexpr const_iterator cbegin() const noexcept {
 		return begin();
 	}
 
 	constexpr const_iterator end() const noexcept {
-		return const_iterator(m_value + size_);
+		return const_iterator(data() + size());
 	}
 	iterator end() noexcept {
-		return iterator(m_value + size_);
+		return iterator(data() + size());
 	}
 	constexpr const_iterator cend() const noexcept {
 		return end();
