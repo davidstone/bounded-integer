@@ -33,11 +33,9 @@ namespace detail {
 
 template<typename T, intmax_t size>
 class iterator {
-private:
-	static constexpr intmax_t size_range = (size == 0) ? 0 : (size - 1);
 public:
 	using value_type = T;
-	using difference_type = bounded_integer<-size_range, size_range, null_policy>;
+	using difference_type = bounded_integer<-size, size, null_policy>;
 	using pointer = value_type *;
 	using reference = value_type &;
 	using iterator_category = std::random_access_iterator_tag;
@@ -81,7 +79,7 @@ public:
 		return *this;
 	}
 	friend constexpr difference_type operator-(iterator const & lhs, iterator const & rhs) {
-		return lhs.m_it - rhs.m_it;
+		return static_cast<difference_type>(lhs.m_it - rhs.m_it);
 	}
 	constexpr reference operator[](bounded_integer<0, size - 1, null_policy> const index) const {
 		return m_it[static_cast<std::size_t>(index)];

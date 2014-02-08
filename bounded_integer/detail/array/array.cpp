@@ -1,5 +1,5 @@
 // Verify that the header can stand on its own, run tests
-// Copyright (C) 2013 David Stone
+// Copyright (C) 2014 David Stone
 //
 // This program is free software: you can redistribute it and / or modify
 // it under the terms of the GNU Affero General Public License as
@@ -22,10 +22,13 @@ namespace bounded_integer {
 namespace {
 using namespace literal;
 
-constexpr array<int, 5> a = {{}};
-static_assert(a.size() == 5, "Incorrect size.");
+constexpr auto size = 5;
+using array_type = array<int, size>;
+constexpr array_type a = {{}};
+static_assert(a.size() == size, "Incorrect size.");
 static_assert(a[0_bi] == 0, "Incorrect value.");
-static_assert(a.at(4) == 0, "Incorrect value with at.");
+static_assert(a.at(size - 1) == 0, "Incorrect value with at.");
+static_assert(a.end() - a.begin() == size, "Incorrect difference type.");
 
 }	// namespace
 }	// namespace bounded_integer
