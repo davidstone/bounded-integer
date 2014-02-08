@@ -190,24 +190,24 @@ public:
 		return m_value[static_cast<std::size_t>(index)];
 	}
 	template<typename integer>
-	constexpr const_reference at(integer const & index) const {
+	constexpr const_reference at(integer const & index) const noexcept(noexcept(static_cast<index_type>(index))) {
 		return m_value[static_cast<std::size_t>(static_cast<index_type>(index))];
 	}
 	template<typename integer>
-	reference at(integer const & index) {
+	reference at(integer const & index) noexcept(noexcept(static_cast<index_type>(index))) {
 		return m_value[static_cast<std::size_t>(static_cast<index_type>(index))];
 	}
 
-	constexpr const_reference front() const {
+	constexpr const_reference front() const noexcept {
 		return m_value[0];
 	}
-	reference front() {
+	reference front() noexcept {
 		return m_value[0];
 	}
-	constexpr const_reference back() const {
+	constexpr const_reference back() const noexcept {
 		return m_value[size_ - 1];
 	}
-	reference back() {
+	reference back() noexcept {
 		return m_value[size_ - 1];
 	}
 
