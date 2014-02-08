@@ -172,7 +172,7 @@ public:
 		return size() == make_bounded<0>();
 	}
 	constexpr size_type max_size() const noexcept {
-		return make_bounded<size_>();
+		return size();
 	}
 	
 	
