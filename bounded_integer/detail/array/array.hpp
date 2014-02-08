@@ -176,12 +176,12 @@ public:
 	}
 	
 	
-	template<typename index_type>
-	constexpr const_reference at(index_type const & index) const {
+	template<typename integer>
+	constexpr const_reference at(integer const & index) const {
 		return m_value[static_cast<std::size_t>(static_cast<index_type>(index))];
 	}
-	template<typename index_type>
-	reference at(index_type const & index) {
+	template<typename integer>
+	reference at(integer const & index) {
 		return m_value[static_cast<std::size_t>(static_cast<index_type>(index))];
 	}
 	constexpr const_reference operator[](index_type const & index) const noexcept {
