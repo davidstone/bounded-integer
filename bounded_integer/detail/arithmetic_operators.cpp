@@ -1,5 +1,5 @@
 // Verify that the header can stand on its own, run tests
-// Copyright (C) 2013 David Stone
+// Copyright (C) 2014 David Stone
 //
 // This program is free software: you can redistribute it and / or modify
 // it under the terms of the GNU Affero General Public License as
@@ -16,11 +16,13 @@
 
 #include "arithmetic_operators.hpp"
 #include "comparison_operators.hpp"
+#include "literal.hpp"
 #include "numeric_limits.hpp"
 #include "policy/throw_policy.hpp"
 
 namespace bounded_integer {
 namespace {
+using namespace ::bounded_integer::literal;
 
 constexpr bounded_integer<1, 10, throw_policy> const x(9);
 static_assert(sizeof(x) == 1, "bounded_integer too big!");
@@ -114,6 +116,16 @@ static_assert(zero_result == zero, "Incorrect modulo with zero for the dividend"
 static_assert(std::is_same<decltype(zero_result), decltype(zero)>::value, "Incorrect modulo type with zero for the dividend");
 // auto undefined = 1 % zero;
 
+
+
+
+using array_type = int[5];
+constexpr array_type array{ 0, 1, 2, 3, 4 };
+static_assert(*(array + 0) == 0, "Incorrect pointer arithmetic with int.");
+static_assert(array[0] == 0, "Incorrect array indexing with int.");
+static_assert(*(array + 0_bi) == 0, "Incorrect pointer arithmetic with bounded_integer.");
+// Oops, not possible!
+// static_assert(array[0_bi] == 0, "Incorrect array indexing with bounded_integer.");
 
 }	// namespace
 }	// namespace bounded_integer

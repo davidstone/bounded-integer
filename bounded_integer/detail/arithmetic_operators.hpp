@@ -93,6 +93,37 @@ constexpr auto operator+(bounded_integer<minimum, maximum, overflow_policy, boun
 	return value;
 }
 
+
+// Pointer overloads
+
+template<intmax_t minimum, intmax_t maximum, typename overflow_policy, bounds bound, typename T>
+constexpr T * operator+(bounded_integer<minimum, maximum, overflow_policy, bound> const & number, T * const pointer) noexcept {
+	return number.value() + pointer;
+}
+
+template<typename T, intmax_t minimum, intmax_t maximum, typename overflow_policy, bounds bound>
+constexpr T * operator+(T * const pointer, bounded_integer<minimum, maximum, overflow_policy, bound> const & number) noexcept {
+	return pointer + number.value();
+}
+
+template<typename T, intmax_t minimum, intmax_t maximum, typename overflow_policy, bounds bound>
+constexpr T * operator-(T * const pointer, bounded_integer<minimum, maximum, overflow_policy, bound> const & number) noexcept {
+	return pointer - number.value();
+}
+
+template<typename T, intmax_t minimum, intmax_t maximum, typename overflow_policy, bounds bound>
+T * & operator+=(T * & pointer, bounded_integer<minimum, maximum, overflow_policy, bound> const & number) noexcept {
+	return pointer += number.value();
+}
+
+template<typename T, intmax_t minimum, intmax_t maximum, typename overflow_policy, bounds bound>
+T * & operator-=(T * & pointer, bounded_integer<minimum, maximum, overflow_policy, bound> const & number) noexcept {
+	return pointer -= number.value();
+}
+
+// Not possible to overload operator[]. See
+// https://groups.google.com/a/isocpp.org/forum/#!topic/std-proposals/CmBERU_sr8Y
+
 }	// namespace bounded_integer
 
 #endif	// BOUNDED_INTEGER_ARITHMETIC_OPERATORS_HPP_
