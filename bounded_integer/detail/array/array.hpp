@@ -259,8 +259,10 @@ public:
 		std::swap_ranges(begin(), end(), other.begin());
 	}
 
-	// Consider this private. It must be public to be an aggregate
-	value_type m_value[size_];
+	// Consider this private. It must be public for the class to be an
+	// aggregate. Specialized for the 0-element case, see
+	// https://stackoverflow.com/questions/15512827/why-is-stdarray-t-0-not-empty
+	value_type m_value[size_ == 0 ? 1 : size_];
 };
 
 template<typename T, std::size_t size>
