@@ -233,20 +233,19 @@ void swap(immutable_range<T>& lhs, immutable_range<T>& rhs) {
 	lhs.swap(rhs);
 }
 
-template<typename Size>
-constexpr auto range(Size && size) noexcept {
-	using range_type = bounded_integer<0, static_cast<intmax_t>(std::numeric_limits<Size>::max()) - 1, null_policy>;
-	return immutable_range<range_type>(make_bounded<0>(), std::forward<Size>(size));
-}
-
 template<typename Begin, typename End>
 constexpr auto range(Begin && begin, End && end) noexcept {
 	using range_type = bounded_integer<
-		static_cast<intmax_t>(std::numeric_limits<Begin>::min()),
-		static_cast<intmax_t>(std::numeric_limits<End>::max()) - 1,
+		static_cast<intmax_t>(std::numeric_limits<typename std::decay<Begin>::type>::min()),
+		static_cast<intmax_t>(std::numeric_limits<typename std::decay<End>::type>::max()) - 1,
 		null_policy
 	>;
 	return immutable_range<range_type>(std::forward<Begin>(begin), std::forward<End>(end));
+}
+
+template<typename Size>
+constexpr auto range(Size && size) noexcept {
+	return range(make_bounded<0>(), std::forward<Size>(size));
 }
 
 }	// namespace bounded_integer
