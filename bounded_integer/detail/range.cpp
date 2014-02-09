@@ -28,5 +28,8 @@ static_assert(x.back() == 9_bi, "Incorrect initial value of range.");
 
 static_assert(range(5_bi, 12_bi)[2_bi] == 7_bi, "Incorrect indexed value of range that does not start with 0.");
 
+static_assert(range(0_bi, 0_bi).size() == 0_bi, "Incorrect size of empty range.");
+static_assert(range(-5_bi, -5_bi).empty(), "Incorrect size of empty range.");
+
 }	// namespace
 }	// namespace bounded_integer

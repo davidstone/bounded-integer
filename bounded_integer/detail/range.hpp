@@ -21,6 +21,7 @@
 #include "class.hpp"
 #include "comparison_operators.hpp"
 #include "make_bounded.hpp"
+#include "minmax.hpp"
 #include "numeric_limits.hpp"
 
 #include <iterator>
@@ -41,10 +42,14 @@ constexpr intmax_t range_of_type() noexcept {
 template<typename integer>
 class iterator {
 public:
-	using value_type = integer;
 	// We have to be able to index the one-past-the-end element. Not sure if
 	// this should have a throw_policy.
-	using index_type = bounded_integer<0, range_of_type<value_type>() + 1, null_policy>;
+	using index_type = bounded_integer<0, range_of_type<integer>(), null_policy>;
+	using value_type = bounded_integer<
+		static_cast<intmax_t>(std::numeric_limits<integer>::min()),
+		static_cast<intmax_t>(max(std::numeric_limits<integer>::min(), std::numeric_limits<integer>::max() - make_bounded<1>())),
+		null_policy
+	>;
 	using difference_type = bounded_integer<-range_of_type<index_type>(), range_of_type<index_type>(), null_policy>;
 	using pointer = index_type const *;
 	using iterator_category = std::random_access_iterator_tag;
@@ -76,12 +81,8 @@ public:
 		return lhs.m_index < rhs.m_index;
 	}
 private:
-	friend class immutable_range<value_type>;
-	using underlying_type = bounded_integer<
-		static_cast<intmax_t>(std::numeric_limits<value_type>::min()),
-		static_cast<intmax_t>(std::numeric_limits<value_type>::max() + make_bounded<1>()),
-		null_policy
-	>;
+	friend class immutable_range<integer>;
+	using underlying_type = integer;
 	explicit constexpr iterator(underlying_type const index) noexcept:
 		m_index(index) {
 	}
@@ -149,19 +150,18 @@ constexpr bool operator<=(iterator<integer> const & lhs, iterator<integer> const
 }	// namespace range_iterator
 }	// namespace detail
 
-template<typename Integer>
+template<typename integer>
 class immutable_range {
 public:
-	using value_type = Integer;
-	static_assert(std::numeric_limits<value_type>::is_specialized, "Must be a numeric type.");
-
-	using const_iterator = detail::range_iterator::iterator<Integer>;
+	static_assert(std::numeric_limits<integer>::is_specialized, "Must be a numeric type.");
+	using const_iterator = detail::range_iterator::iterator<integer>;
 	using const_reverse_iterator = std::reverse_iterator<const_iterator>;
-	using const_pointer = typename const_iterator::pointer;
 
-	using size_type = bounded_integer<0, detail::range_iterator::range_of_type<value_type>() + 1, null_policy>;
-	using difference_type = typename const_iterator::difference_type;
+	using value_type = typename const_iterator::value_type;
 	using index_type = typename const_iterator::index_type;
+	using difference_type = typename const_iterator::difference_type;
+	using const_pointer = typename const_iterator::pointer;
+	using size_type = bounded_integer<0, detail::range_iterator::range_of_type<value_type>(), null_policy>;
 
 	template<typename Last>
 	constexpr immutable_range(value_type const & first, Last const & last) noexcept:
@@ -203,8 +203,8 @@ public:
 	constexpr value_type operator[](index_type const & index) const {
 		return begin()[index];
 	}
-	template<typename integer>
-	constexpr value_type at(integer const & index) const {
+	template<typename Index>
+	constexpr value_type at(Index const & index) const {
 		return begin()[static_cast<index_type>(index)];
 	}
 
@@ -237,7 +237,7 @@ template<typename Begin, typename End>
 constexpr auto range(Begin && begin, End && end) noexcept {
 	using range_type = bounded_integer<
 		static_cast<intmax_t>(std::numeric_limits<typename std::decay<Begin>::type>::min()),
-		static_cast<intmax_t>(std::numeric_limits<typename std::decay<End>::type>::max()) - 1,
+		static_cast<intmax_t>(std::numeric_limits<typename std::decay<End>::type>::max()),
 		null_policy
 	>;
 	return immutable_range<range_type>(std::forward<Begin>(begin), std::forward<End>(end));
