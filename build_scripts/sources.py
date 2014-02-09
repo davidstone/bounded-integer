@@ -49,6 +49,7 @@ base_sources = [('test',
 		'numeric_limits.cpp',
 		'operators.cpp',
 		'overlapping_range.cpp',
+		'range.cpp',
 		'stream.cpp',
 		'string.cpp',
 	]) +
