@@ -162,9 +162,10 @@ public:
 	using difference_type = typename const_iterator::difference_type;
 	using const_pointer = typename const_iterator::pointer;
 	using size_type = bounded_integer<0, detail::range_iterator::range_of_type<value_type>(), null_policy>;
+	// This accounts for the one-past-the-end sentinel value.
+	using underlying_type = typename const_iterator::underlying_type;
 
-	template<typename Last>
-	constexpr immutable_range(value_type const & first, Last const & last) noexcept:
+	constexpr immutable_range(underlying_type const & first, underlying_type const & last) noexcept:
 		m_begin(first),
 		m_end(last) {
 	}
