@@ -31,5 +31,7 @@ static_assert(range(5_bi, 12_bi)[2_bi] == 7_bi, "Incorrect indexed value of rang
 static_assert(range(0_bi, 0_bi).size() == 0_bi, "Incorrect size of empty range.");
 static_assert(range(-5_bi, -5_bi).empty(), "Incorrect size of empty range.");
 
+static_assert(range(static_cast<bounded_integer<1, 2, null_policy>>(1_bi), static_cast<bounded_integer<3, 5, null_policy>>(3_bi)).size() == 2_bi, "Incorrect size of range with non-overlapping and possibly variable begin and end.");
+
 }	// namespace
 }	// namespace bounded_integer

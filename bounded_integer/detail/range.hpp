@@ -58,35 +58,35 @@ public:
 	
 	// It is undefined behavior to dereference a past-the-end iterator
 	constexpr value_type operator*() const noexcept {
-		return value_type(m_index, non_check);
+		return value_type(m_value, non_check);
 	}
 	constexpr pointer operator->() const noexcept {
-		return &m_index;
+		return &m_value;
 	}
 	constexpr value_type operator[](index_type const & index) const {
-		return static_cast<value_type>(m_index + index);
+		return static_cast<value_type>(m_value + index);
 	}
 	
 	friend constexpr difference_type operator-(iterator const & lhs, iterator const & rhs) noexcept {
-		return lhs.m_index - rhs.m_index;
+		return lhs.m_value - rhs.m_value;
 	}
 	friend constexpr iterator operator+(iterator const & lhs, difference_type const & rhs) {
-		return iterator(static_cast<index_type>(lhs.m_index + rhs));
+		return iterator(static_cast<underlying_type>(lhs.m_value + rhs));
 	}
 	
 	friend constexpr bool operator==(iterator const & lhs, iterator const & rhs) noexcept {
-		return lhs.m_index == rhs.m_index;
+		return lhs.m_value == rhs.m_value;
 	}
 	friend constexpr bool operator<(iterator const & lhs, iterator const & rhs) noexcept {
-		return lhs.m_index < rhs.m_index;
+		return lhs.m_value < rhs.m_value;
 	}
 private:
 	friend class immutable_range<integer>;
 	using underlying_type = integer;
-	explicit constexpr iterator(underlying_type const index) noexcept:
-		m_index(index) {
+	explicit constexpr iterator(underlying_type const value) noexcept:
+		m_value(value) {
 	}
-	underlying_type m_index;
+	underlying_type m_value;
 };
 
 template<typename integer>
