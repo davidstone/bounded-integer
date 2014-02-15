@@ -214,16 +214,16 @@ void check_optional() {
 	check_uncompressed_optional<unsigned>();
 	check_uncompressed_optional<intmax_t>();
 	
-	using ri_type = checked_integer<1, 10>;
-	constexpr optional<ri_type> uninitialized_optional;
+	using integer_type = checked_integer<1, 10>;
+	constexpr optional<integer_type> uninitialized_optional;
 	static_assert(!uninitialized_optional, "Default constructor should leave uninitialized.");
-	constexpr optional<ri_type> constexpr_optional_integer(ri_type(5));
+	constexpr optional<integer_type> constexpr_optional_integer(integer_type(5));
 	static_assert(static_cast<bool>(constexpr_optional_integer), "Value constructor should initialize optional.");
 	static_assert(*constexpr_optional_integer == 5, "Value in an optional incorrect.");
-	optional<ri_type> optional_integer(ri_type(4));
+	optional<integer_type> optional_integer(integer_type(4));
 	optional_integer = uninitialized_optional;
 	assert(!optional_integer);
-	optional_integer = ri_type(7);
+	optional_integer = integer_type(7);
 	assert(optional_integer);
 	optional_integer = none;
 	assert(!optional_integer);
