@@ -57,8 +57,8 @@ public:
 	// at run-time, the optimizer should detect that all branches return the
 	// same value and eliminate all branching, creating no overhead. See
 	// http://stackoverflow.com/questions/20461121/constexpr-error-at-compile-time-but-no-overhead-at-run-time
-	template<typename T>
-	static constexpr intmax_t assignment(T const value, intmax_t const minimum, intmax_t const maximum) noexcept {
+	template<typename T, typename Minimum, typename Maximum>
+	static constexpr intmax_t assignment(T && value, Minimum && minimum, Maximum && maximum) noexcept {
 		return (minimum <= value and value <= maximum) ?
 			static_cast<intmax_t>(value) :
 			static_cast<intmax_t>(error_out_of_range(value));

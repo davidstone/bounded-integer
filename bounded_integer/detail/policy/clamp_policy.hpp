@@ -52,11 +52,11 @@ public:
 	clamp_policy volatile & operator=(clamp_policy volatile &&) volatile noexcept {
 		return *this;
 	}
-	template<typename T>
-	static constexpr intmax_t assignment(T const value, intmax_t const minimum, intmax_t const maximum) noexcept {
+	template<typename T, typename Minimum, typename Maximum>
+	static constexpr intmax_t assignment(T && value, Minimum && minimum, Maximum && maximum) noexcept {
 		return
-			(value <= minimum) ? minimum :
-			(value >= maximum) ? maximum :
+			(value <= minimum) ? static_cast<intmax_t>(minimum) :
+			(value >= maximum) ? static_cast<intmax_t>(maximum) :
 			static_cast<intmax_t>(value);
 	}
 

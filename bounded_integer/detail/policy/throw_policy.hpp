@@ -55,11 +55,11 @@ public:
 		return *this;
 	}
 	// The optimizer should be able to simplify this to remove dead checks.
-	template<typename T>
-	static constexpr intmax_t assignment(T const value, intmax_t const minimum, intmax_t const maximum) {
+	template<typename T, typename Minimum, typename Maximum>
+	static constexpr intmax_t assignment(T && value, Minimum && minimum, Maximum && maximum) {
 		return (minimum <= value and value <= maximum) ?
 			static_cast<intmax_t>(value) :
-			throw std::range_error("Got a value of " + to_string(+value) + " but expected a value in the range [" + to_string(minimum) + ", " + to_string(maximum) + "]");
+			throw std::range_error("Got a value of " + to_string(+value) + " but expected a value in the range [" + to_string(+minimum) + ", " + to_string(+maximum) + "]");
 	}
 	
 	static constexpr bool is_modulo = false;
