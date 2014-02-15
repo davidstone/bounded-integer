@@ -56,13 +56,7 @@ public:
 	}
 	// The optimizer should be able to simplify this to remove dead checks.
 	template<typename T>
-	constexpr intmax_t assignment(T const value, intmax_t const minimum, intmax_t const maximum) const {
-		return (minimum <= value and value <= maximum) ?
-			static_cast<intmax_t>(value) :
-			throw std::range_error("Got a value of " + to_string(+value) + " but expected a value in the range [" + to_string(minimum) + ", " + to_string(maximum) + "]");
-	}
-	template<typename T>
-	constexpr intmax_t assignment(T const value, intmax_t const minimum, intmax_t const maximum) const volatile {
+	static constexpr intmax_t assignment(T const value, intmax_t const minimum, intmax_t const maximum) {
 		return (minimum <= value and value <= maximum) ?
 			static_cast<intmax_t>(value) :
 			throw std::range_error("Got a value of " + to_string(+value) + " but expected a value in the range [" + to_string(minimum) + ", " + to_string(maximum) + "]");

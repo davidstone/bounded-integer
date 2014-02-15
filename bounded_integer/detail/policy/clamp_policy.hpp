@@ -53,14 +53,7 @@ public:
 		return *this;
 	}
 	template<typename T>
-	constexpr intmax_t assignment(T const value, intmax_t const minimum, intmax_t const maximum) const noexcept {
-		return
-			(value <= minimum) ? minimum :
-			(value >= maximum) ? maximum :
-			static_cast<intmax_t>(value);
-	}
-	template<typename T>
-	constexpr intmax_t assignment(T const value, intmax_t const minimum, intmax_t const maximum) const volatile noexcept {
+	static constexpr intmax_t assignment(T const value, intmax_t const minimum, intmax_t const maximum) noexcept {
 		return
 			(value <= minimum) ? minimum :
 			(value >= maximum) ? maximum :
