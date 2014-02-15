@@ -282,6 +282,7 @@ void check_dynamic_bounds() {
 
 int main() {
 	using namespace bounded_integer;
+	check_minmax();
 	check_numeric_limits_all();
 	check_policies();
 	check_compound_arithmetic();
