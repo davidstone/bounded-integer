@@ -162,7 +162,7 @@ public:
 private:
 	using storage_type = detail::optional_storage<value_type, detail::has_extra_space<value_type>::value>;
 public:
-	constexpr optional() noexcept = default;
+	constexpr optional() noexcept {}
 	constexpr optional(none_t) noexcept:
 		optional{} {
 	}
