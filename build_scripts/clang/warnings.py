@@ -31,6 +31,11 @@
 # warning about my project for everyone else
 # 2) It could possibly cause linker problems due to name mangling issues
 #
+# -Wmissing-braces is incompatible with the implementation of make_array. An
+# implementation that doesn't run afoul of this warning ended up being very slow
+# and memory intensive, so it seems that disabling the warning is the better
+# option.
+#
 # -Wpadded is turned on occasionally to optimize the layout of classes, but it
 # is not left on because not all classes have enough elements to remove padding
 # at the end. In theory I could get some extra variables for 'free', but it's
@@ -44,6 +49,6 @@
 # overkill for an "all-or-nothing" setting.
 #
 
-warnings = ['-Weverything', '-Werror', '-Wno-c++98-compat', '-Wno-c++98-compat-pedantic', '-Wno-exit-time-destructors', '-Wno-implicit-fallthrough', '-Wno-padded', '-Wno-switch-enum']
+warnings = ['-Weverything', '-Werror', '-Wno-c++98-compat', '-Wno-c++98-compat-pedantic', '-Wno-exit-time-destructors', '-Wno-implicit-fallthrough', '-Wno-missing-braces', '-Wno-padded', '-Wno-switch-enum']
 warnings_debug = []
 warnings_optimized = []
