@@ -105,6 +105,7 @@ void check_minmax() {
 }
 
 void check_throw_policy() {
+	static_assert(!noexcept(std::declval<checked_integer<0, 0> &>() = std::declval<checked_integer<1, 1> &>()), "Shouldn't be noexcept.");
 	static constexpr intmax_t minimum = 0;
 	static constexpr intmax_t maximum = 10;
 	throw_policy policy;
