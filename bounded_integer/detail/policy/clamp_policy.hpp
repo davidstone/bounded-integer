@@ -17,41 +17,39 @@
 #ifndef BOUNDED_INTEGER_POLICY_CLAMP_POLICY_HPP_
 #define BOUNDED_INTEGER_POLICY_CLAMP_POLICY_HPP_
 
+#include "is_overflow_policy.hpp"
+#include "../enable_if.hpp"
 #include <cstdint>
 
 namespace bounded_integer {
 
 class clamp_policy {
 public:
+	using overflow_policy_tag = void;
 	constexpr clamp_policy() noexcept {}
-	constexpr clamp_policy(clamp_policy const &) noexcept {}
-	constexpr clamp_policy(clamp_policy &&) noexcept {}
-	constexpr clamp_policy(clamp_policy const volatile &) noexcept {}
-	constexpr clamp_policy(clamp_policy volatile &&) noexcept {}
-	clamp_policy & operator=(clamp_policy const &) noexcept {
+	constexpr clamp_policy(clamp_policy const &) noexcept = default;
+	constexpr clamp_policy(clamp_policy &&) noexcept = default;
+	template<typename T, enable_if_t<std::is_same<typename std::decay<T>::type, clamp_policy>::value> = clang_dummy>
+	constexpr clamp_policy(T &&) noexcept {
+	}
+	template<typename T, enable_if_t<
+		is_overflow_policy<T>::value and
+		!std::is_same<typename std::decay<T>::type, clamp_policy>::value
+	> = clang_dummy>
+	constexpr explicit clamp_policy(T &&) noexcept {
+	}
+
+	clamp_policy & operator=(clamp_policy const &) noexcept = default;
+	clamp_policy & operator=(clamp_policy &&) noexcept = default;
+	template<typename T, enable_if_t<is_overflow_policy<T>::value> = clang_dummy>
+	clamp_policy & operator=(T &&) noexcept {
 		return *this;
 	}
-	clamp_policy & operator=(clamp_policy &&) noexcept {
+	template<typename T, enable_if_t<is_overflow_policy<T>::value> = clang_dummy>
+	clamp_policy volatile & operator=(T &&) volatile noexcept {
 		return *this;
 	}
-	clamp_policy & operator=(clamp_policy const volatile &) noexcept {
-		return *this;
-	}
-	clamp_policy & operator=(clamp_policy volatile &&) noexcept {
-		return *this;
-	}
-	clamp_policy volatile & operator=(clamp_policy const &) volatile noexcept {
-		return *this;
-	}
-	clamp_policy volatile & operator=(clamp_policy &&) volatile noexcept {
-		return *this;
-	}
-	clamp_policy volatile & operator=(clamp_policy const volatile &) volatile noexcept {
-		return *this;
-	}
-	clamp_policy volatile & operator=(clamp_policy volatile &&) volatile noexcept {
-		return *this;
-	}
+
 	template<typename T, typename Minimum, typename Maximum>
 	static constexpr intmax_t assignment(T && value, Minimum && minimum, Maximum && maximum) noexcept {
 		return
