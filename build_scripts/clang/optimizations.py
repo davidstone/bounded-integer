@@ -16,4 +16,4 @@
 
 optimizations = ['-O3', '-march=native', '-ffast-math', '-fomit-frame-pointer']
 preprocessor_optimizations = ['NDEBUG']
-linker_optimizations = ['-fwhole-program'] + optimizations
+linker_optimizations = optimizations
