@@ -66,6 +66,7 @@ base_sources = [('test',
 	]) +
 	prepend_dir('detail/policy', [
 		'all.cpp',
+		'basic_policy.cpp',
 		'clamp_policy.cpp',
 		'is_overflow_policy.cpp',
 		'null_policy.cpp',

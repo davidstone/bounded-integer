@@ -17,40 +17,14 @@
 #ifndef BOUNDED_INTEGER_POLICY_NULL_POLICY_HPP_
 #define BOUNDED_INTEGER_POLICY_NULL_POLICY_HPP_
 
-#include "is_overflow_policy.hpp"
-#include "../enable_if.hpp"
+#include "basic_policy.hpp"
 #include <cstdint>
 
 namespace bounded_integer {
+namespace policy_detail {
 
 class null_policy {
 public:
-	using overflow_policy_tag = void;
-
-	constexpr null_policy() noexcept {}
-	constexpr null_policy(null_policy const &) noexcept = default;
-	constexpr null_policy(null_policy &&) noexcept = default;
-	template<typename T, enable_if_t<std::is_same<typename std::decay<T>::type, null_policy>::value> = clang_dummy>
-	constexpr null_policy(T &&) noexcept {
-	}
-	template<typename T, enable_if_t<
-		is_overflow_policy<T>::value and
-		!std::is_same<typename std::decay<T>::type, null_policy>::value
-	> = clang_dummy>
-	constexpr explicit null_policy(T &&) noexcept {
-	}
-
-	null_policy & operator=(null_policy const &) noexcept = default;
-	null_policy & operator=(null_policy &&) noexcept = default;
-	template<typename T, enable_if_t<is_overflow_policy<T>::value> = clang_dummy>
-	null_policy & operator=(T &&) noexcept {
-		return *this;
-	}
-	template<typename T, enable_if_t<is_overflow_policy<T>::value> = clang_dummy>
-	null_policy volatile & operator=(T &&) volatile noexcept {
-		return *this;
-	}
-
 	// The identity function is intentionally not constexpr. This provides
 	// compile-time checking if used in a constexpr context. If this is called
 	// at run-time, the optimizer should detect that all branches return the
@@ -72,6 +46,10 @@ private:
 		return value;
 	}
 };
+
+}	// namespace policy_detail
+
+using null_policy = basic_policy<policy_detail::null_policy>;
 
 }	// namespace bounded_integer
 #endif	// BOUNDED_INTEGER_POLICY_NULL_POLICY_HPP_
