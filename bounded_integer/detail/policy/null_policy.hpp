@@ -42,8 +42,8 @@ public:
 	static constexpr bool overflow_is_error = true;
 private:
 	template<typename T>
-	static T error_out_of_range(T const value) noexcept {
-		return value;
+	static T && error_out_of_range(T && value) noexcept {
+		return std::forward<T>(value);
 	}
 };
 
