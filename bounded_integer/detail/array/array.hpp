@@ -29,6 +29,10 @@
 #include <utility>
 
 namespace bounded_integer {
+
+template<typename T, std::size_t size>
+class array;
+
 namespace detail {
 
 template<typename T, intmax_t size>
@@ -95,7 +99,7 @@ public:
 
 private:
 	template<typename U, std::size_t size_>
-	friend class array;
+	friend class ::bounded_integer::array;
 	template<typename U, intmax_t size_>
 	friend class iterator;
 
