@@ -45,6 +45,9 @@ using native_integer = bounded_integer<minimum, maximum, null_policy>;
 template<intmax_t minimum, intmax_t maximum>
 using clamped_integer = bounded_integer<minimum, maximum, clamp_policy>;
 
+template<intmax_t minimum, intmax_t maximum, typename base_overflow_policy = throw_policy>
+using dynamic_integer = bounded_integer<minimum, maximum, dynamic_policy<minimum, maximum, throw_policy>>;
+
 }	// namespace bounded_integer
 
 #endif	// BOUNDED_INTEGER_HPP_
