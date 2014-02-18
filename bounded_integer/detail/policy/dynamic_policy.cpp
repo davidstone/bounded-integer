@@ -1,4 +1,4 @@
-// Forward declaration of bounded_integer
+// Verify that the header can stand on its own
 // Copyright (C) 2014 David Stone
 //
 // This program is free software: you can redistribute it and / or modify
@@ -14,18 +14,17 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with this program. If not, see <http://www.gnu.org/licenses/>.
 
-#ifndef BOUNDED_INTEGER_FORWARD_DECLARATION_HPP_
-#define BOUNDED_INTEGER_FORWARD_DECLARATION_HPP_
+#include "dynamic_policy.hpp"
+#include "clamp_policy.hpp"
+#include "throw_policy.hpp"
 
-#include <cstdint>
+using namespace bounded_integer;
 
-namespace bounded_integer {
+namespace {
 
-template<intmax_t minimum, intmax_t maximum, typename overflow_policy>
-class bounded_integer;
+using policy_type = dynamic_policy<0, 10, clamp_policy>;
+constexpr policy_type policy;
+static_assert(policy.assignment(3, 2, 5) == 3, "Incorrect dynamic policy result when the static range is entirely within range.");
+static_assert(policy.assignment(11, 0, 20) == 10, "Incorrect dynamic clamp policy result when the dynamic range is the limiting factor.");
 
-// Does not verify that the value is in range with the policy
-enum non_check_t { non_check };
-
-}	// namespace bounded_integer
-#endif	// BOUNDED_INTEGER_FORWARD_DECLARATION_HPP_
+}	// namespace

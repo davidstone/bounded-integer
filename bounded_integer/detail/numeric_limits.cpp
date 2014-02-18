@@ -26,12 +26,4 @@ using policy = bounded_integer::null_policy;
 
 static_assert(std::numeric_limits<bounded_integer::bounded_integer<1, 1000, policy>>::digits == 0, "Meaningless digits not 0.");
 
-constexpr intmax_t min = 0;
-constexpr intmax_t max = 714;
-using dynamic_type = bounded_integer::bounded_integer<min, max, policy, bounded_integer::bounds::dynamic_max>;
-
-constexpr dynamic_type value(max, bounded_integer::non_check);
-static_assert(std::numeric_limits<dynamic_type>::min() == min, "Incorrect min for dynamic type.");
-static_assert(std::numeric_limits<dynamic_type>::max() == max, "Incorrect max for dynamic type.");
-
 }	// namespace

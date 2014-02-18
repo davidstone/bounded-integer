@@ -58,16 +58,15 @@ public:
 
 template<
 	typename compare,
-	intmax_t lhs_min, intmax_t lhs_max, typename lhs_policy, bounds lhs_bound,
-	intmax_t rhs_min, intmax_t rhs_max, typename rhs_policy, bounds rhs_bound
+	intmax_t lhs_min, intmax_t lhs_max, typename lhs_policy,
+	intmax_t rhs_min, intmax_t rhs_max, typename rhs_policy
 >
-class minmax_type<compare, bounded_integer<lhs_min, lhs_max, lhs_policy, lhs_bound>, bounded_integer<rhs_min, rhs_max, rhs_policy, rhs_bound>> {
+class minmax_type<compare, bounded_integer<lhs_min, lhs_max, lhs_policy>, bounded_integer<rhs_min, rhs_max, rhs_policy>> {
 private:
 	static constexpr intmax_t minimum = compare{}(lhs_min, rhs_min) ? lhs_min : rhs_min;
 	static constexpr intmax_t maximum = compare{}(lhs_max, rhs_max) ? lhs_max : rhs_max;
 	using policy = common_policy_t<lhs_policy, rhs_policy>;
 public:
-	// TODO: common_bound ?
 	using type = bounded_integer<minimum, maximum, policy>;
 };
 

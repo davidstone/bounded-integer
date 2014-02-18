@@ -26,9 +26,9 @@ namespace bounded_integer {
 
 template<
 	typename CharT, typename Traits,
-	intmax_t minimum, intmax_t maximum, typename policy, bounds bound
+	intmax_t minimum, intmax_t maximum, typename policy
 >
-std::basic_ostream<CharT, Traits> & operator<<(std::basic_ostream<CharT, Traits> & out, bounded_integer<minimum, maximum, policy, bound> const & x) {
+std::basic_ostream<CharT, Traits> & operator<<(std::basic_ostream<CharT, Traits> & out, bounded_integer<minimum, maximum, policy> const & x) {
 	// The unary plus applies integer promotions to x. This ensures values are
 	// printed as integers. Without this, I could run into an issue where the
 	// underlying type is a typedef for signed char / unsigned char. This would
@@ -37,17 +37,17 @@ std::basic_ostream<CharT, Traits> & operator<<(std::basic_ostream<CharT, Traits>
 }
 template<
 	typename CharT, typename Traits,
-	intmax_t minimum, intmax_t maximum, typename policy, bounds bound
+	intmax_t minimum, intmax_t maximum, typename policy
 >
-std::basic_ostream<CharT, Traits> & operator<<(std::basic_ostream<CharT, Traits> & out, bounded_integer<minimum, maximum, policy, bound> const volatile & x) {
+std::basic_ostream<CharT, Traits> & operator<<(std::basic_ostream<CharT, Traits> & out, bounded_integer<minimum, maximum, policy> const volatile & x) {
 	return out << +x.value();
 }
 
 template<
 	typename CharT, typename Traits,
-	intmax_t minimum, intmax_t maximum, typename policy, bounds bound
+	intmax_t minimum, intmax_t maximum, typename policy
 >
-std::basic_istream<CharT, Traits> & operator>>(std::basic_istream<CharT, Traits> & in, bounded_integer<minimum, maximum, policy, bound> & x) {
+std::basic_istream<CharT, Traits> & operator>>(std::basic_istream<CharT, Traits> & in, bounded_integer<minimum, maximum, policy> & x) {
 	// This is intmax_t rather than underlying_type to maximize the chances for
 	// robust error checking rather than undefined behavior, but it still fails
 	// for very large and very small numbers.
@@ -58,9 +58,9 @@ std::basic_istream<CharT, Traits> & operator>>(std::basic_istream<CharT, Traits>
 }
 template<
 	typename CharT, typename Traits,
-	intmax_t minimum, intmax_t maximum, typename policy, bounds bound
+	intmax_t minimum, intmax_t maximum, typename policy
 >
-std::basic_istream<CharT, Traits> & operator>>(std::basic_istream<CharT, Traits> & in, bounded_integer<minimum, maximum, policy, bound> volatile & x) {
+std::basic_istream<CharT, Traits> & operator>>(std::basic_istream<CharT, Traits> & in, bounded_integer<minimum, maximum, policy> volatile & x) {
 	intmax_t temp;
 	in >> temp;
 	x = temp;

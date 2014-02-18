@@ -33,8 +33,8 @@ class is_bounded_integer<integer> {
 public:
 	static constexpr bool value = false;
 };
-template<intmax_t minimum, intmax_t maximum, typename overflow_policy, bounds bound>
-class is_bounded_integer<bounded_integer<minimum, maximum, overflow_policy, bound>> {
+template<intmax_t minimum, intmax_t maximum, typename overflow_policy>
+class is_bounded_integer<bounded_integer<minimum, maximum, overflow_policy>> {
 public:
 	static constexpr bool value = true;
 };

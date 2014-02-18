@@ -49,14 +49,38 @@ class optional_storage;
 
 template<typename T>
 class optional_storage<T, true> {
+private:
+	using underlying_type = typename T::underlying_type;
+	static constexpr auto minimum = static_cast<intmax_t>(std::numeric_limits<T>::min());
+	static constexpr auto maximum = static_cast<intmax_t>(std::numeric_limits<T>::max());
+	static constexpr underlying_type uninitialized_value() noexcept {
+		return static_cast<underlying_type>(minimum > std::numeric_limits<underlying_type>::min() ? minimum - 1 : maximum + 1);
+	}
+	T m_value;
 public:
 	constexpr optional_storage() noexcept:
 		m_value(uninitialized_value(), non_check) {
 	}
 	optional_storage(optional_storage const &) = default;
 	optional_storage(optional_storage &&) = default;
-	optional_storage & operator=(optional_storage const &) = default;
-	optional_storage & operator=(optional_storage &&) = default;
+	optional_storage & operator=(optional_storage const & other) noexcept(noexcept(m_value = other.m_value)) {
+		if (other.is_initialized()) {
+			m_value = other.m_value;
+		}
+		else {
+			m_value.unchecked_assignment(uninitialized_value());
+		}
+		return *this;
+	}
+	optional_storage & operator=(optional_storage && other) noexcept(noexcept(m_value = other.m_value)) {
+		if (other.is_initialized()) {
+			m_value = other.m_value;
+		}
+		else {
+			m_value.unchecked_assignment(uninitialized_value());
+		}
+		return *this;
+	}
 	template<typename U, enable_if_t<std::is_convertible<U &&, T>::value> = clang_dummy>
 	constexpr optional_storage(U && other) noexcept(std::is_nothrow_constructible<T, U &&>::value):
 		m_value(std::forward<U>(other)) {
@@ -87,14 +111,6 @@ public:
 	constexpr bool is_initialized() const noexcept {
 		return m_value != uninitialized_value();
 	}
-private:
-	using underlying_type = typename T::underlying_type;
-	static constexpr auto minimum = static_cast<intmax_t>(std::numeric_limits<T>::min());
-	static constexpr auto maximum = static_cast<intmax_t>(std::numeric_limits<T>::max());
-	static constexpr underlying_type uninitialized_value() noexcept {
-		return static_cast<underlying_type>(minimum > std::numeric_limits<underlying_type>::min() ? minimum - 1 : maximum + 1);
-	}
-	T m_value;
 };
 
 // Replaced this with a version that uses std::aligned_storage to allow it to
@@ -188,8 +204,8 @@ public:
 		m_storage(std::forward<Args>(args)...) {
 	}
 
-	optional & operator=(optional const &) noexcept = default;
-	optional & operator=(optional &&) noexcept = default;
+	optional & operator=(optional const &) = default;
+	optional & operator=(optional &&) = default;
 	template<typename U>
 	optional & operator=(U && other) noexcept(noexcept(std::declval<optional &>() = optional(std::forward<U>(other)))) {
 		*this = optional(std::forward<U>(other));

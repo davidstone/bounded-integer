@@ -26,11 +26,11 @@
 
 namespace bounded_integer {
 
-template<intmax_t minimum, intmax_t maximum, typename overflow_policy, bounds bound>
-constexpr auto abs(bounded_integer<minimum, maximum, overflow_policy, bound> const value) noexcept {
+template<intmax_t minimum, intmax_t maximum, typename overflow_policy>
+constexpr auto abs(bounded_integer<minimum, maximum, overflow_policy> const value) noexcept {
 	// The 0 has to be there to restrict the range of possible values. Without
 	// it, abs(bounded_integer<-7, 3>) would be [-3, 7] instead of [0, 7].
-	return max(value, -value, make_bounded<0, overflow_policy, bound>());
+	return max(value, -value, make_bounded<0, overflow_policy>());
 }
 
 }	// namespace bounded_integer

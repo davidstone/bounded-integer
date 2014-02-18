@@ -91,13 +91,14 @@ void check_numeric_limits_all() {
 }
 
 void check_minmax() {
-	constexpr auto minimum = min(0_bi, 10_bi, 5_bi, bounded_integer<-53, 1000, null_policy>(3_bi));
+	constexpr bounded_integer<-53, 1000, null_policy> value(3_bi);
+	constexpr auto minimum = min(0_bi, 10_bi, 5_bi, value);
 	using min_type = decltype(minimum);
 	static_assert(minimum == 0_bi, "Incorrect minimum value.");
 	static_assert(std::numeric_limits<min_type>::min() == -53, "Incorrect minimum minimum.");
 	static_assert(std::numeric_limits<min_type>::max() == 0, "Incorrect maximum minimum.");
 
-	constexpr auto maximum = max(0_bi, 10_bi, 5_bi, bounded_integer<-53, 1000, null_policy>(3_bi));
+	constexpr auto maximum = max(0_bi, 10_bi, 5_bi, value);
 	using max_type = decltype(maximum);
 	static_assert(maximum == 10_bi, "Incorrect maximum value.");
 	static_assert(std::numeric_limits<max_type>::min() == 10, "Incorrect minimum maximum.");
@@ -250,18 +251,36 @@ void check_streaming() {
 }
 
 
-void check_dynamic_bounds() {
+void check_dynamic_policy() {
 	constexpr auto value = 3_bi;
 	constexpr auto min = 1_bi;
 	constexpr auto max = 7_bi;
-	using type = checked_integer<0, 10, bounds::dynamic_min_max>;
-	constexpr type compile(value, min, max);
+	constexpr auto static_min = 0;
+	constexpr auto static_max = 10;
+	using policy_type = dynamic_policy<static_min, static_max, throw_policy>;
+	using type = bounded_integer<static_min, static_max, policy_type>;
+	constexpr policy_type policy(min, max);
+	constexpr type compile(value, policy);
 	static_assert(compile == value, "Incorrect value with dynamic bounds.");
-	static_assert(compile.min() == min, "Incorrect dynamic min with dynamic bounds.");
-	static_assert(compile.max() == max, "Incorrect dynamic max with dynamic bounds.");
-	type run(value, min, max);
+	static_assert(compile.overflow_policy().min() == min, "Incorrect dynamic min with dynamic bounds.");
+	static_assert(compile.overflow_policy().max() == max, "Incorrect dynamic max with dynamic bounds.");
+
 	try {
-		static_assert(!noexcept(std::declval<checked_integer<0, 0> &>() = std::declval<checked_integer<1, 1> &>()), "Shouldn't be noexcept.");
+		policy.assignment(min - 1_bi, static_min, static_max);
+		assert(false);
+	}
+	catch (std::range_error const &) {
+	}
+	try {
+		policy.assignment(max + 1_bi, static_min, static_max);
+		assert(false);
+	}
+	catch (std::range_error const &) {
+	}
+
+	type run(value, policy);
+	try {
+		static_assert(!std::is_nothrow_constructible<type, decltype(min - 1_bi)>::value, "Should not be noexcept.");
 		run = min - 1_bi;
 		assert(false);
 	}
@@ -269,6 +288,7 @@ void check_dynamic_bounds() {
 	}
 	assert(run == value);
 	try {
+		static_assert(!std::is_nothrow_constructible<type, decltype(max + 1_bi)>::value, "Should not be noexcept.");
 		run = max + 1_bi;
 		assert(false);
 	}
@@ -290,5 +310,5 @@ int main() {
 	check_math();
 	check_optional();
 	check_streaming();
-	check_dynamic_bounds();
+	check_dynamic_policy();
 }
