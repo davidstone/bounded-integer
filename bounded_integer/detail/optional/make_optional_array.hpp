@@ -19,7 +19,6 @@
 
 #include "optional.hpp"
 #include "../common_type.hpp"
-#include "../is_bounded_integer.hpp"
 #include "../array/array.hpp"
 #include <utility>
 
@@ -75,23 +74,11 @@ public:
 	using type = none_t;
 };
 
-template<typename integer, typename... integers>
-class all_are_bounded_or_builtin_integer_or_none {
-public:
-	static constexpr bool value = all_are_bounded_or_builtin_integer_or_none<integer>::value and all_are_bounded_or_builtin_integer_or_none<integers...>::value;
-};
-template<typename integer>
-class all_are_bounded_or_builtin_integer_or_none<integer> {
-public:
-	static constexpr bool value = std::is_integral<integer>::value or is_bounded_integer<integer>::value or std::is_same<integer, none_t>::value;
-};
-
 }	// namespace detail
 
 template<typename... Integers>
 constexpr array<optional<detail::common_optional_type_t<Integers...>>, sizeof...(Integers)>
 make_optional_array(Integers && ... integers) noexcept {
-	static_assert(detail::all_are_bounded_or_builtin_integer_or_none<decay_t<Integers>...>::value, "All values must be integers or none");
 	return { std::forward<Integers>(integers)... };
 }
 
