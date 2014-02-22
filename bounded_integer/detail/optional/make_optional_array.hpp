@@ -75,23 +75,6 @@ public:
 	using type = none_t;
 };
 
-template<typename... Ts>
-class first_present_value;
-
-template<typename... Ts>
-using first_present_value_t = typename first_present_value<decay_t<Ts>...>::type;
-
-template<typename T, typename... Ts>
-class first_present_value<T, Ts...> {
-public:
-	using type = T;
-};
-template<typename... Ts>
-class first_present_value<none_t, Ts...> {
-public:
-	using type = first_present_value_t<Ts...>;
-};
-
 template<typename integer, typename... integers>
 class all_are_bounded_or_builtin_integer_or_none {
 public:
