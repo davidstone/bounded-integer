@@ -38,23 +38,20 @@ public:
 	using overflow_policy_tag = void;
 	using underlying_type = bounded_integer<static_minimum, static_maximum, overflow_policy>;
 
-	constexpr dynamic_policy() noexcept:
-		m_min(make_bounded<static_minimum>()),
-		m_max(make_bounded<static_maximum>()) {
-	}
 	constexpr dynamic_policy(underlying_type minimum, underlying_type maximum) noexcept:
 		m_min(std::move(minimum)),
 		m_max(std::move(maximum)) {
 	}
+	constexpr dynamic_policy() noexcept:
+		dynamic_policy(make_bounded<static_minimum>(), make_bounded<static_maximum>()) {
+	}
 	constexpr dynamic_policy(dynamic_policy const &) noexcept = default;
 	constexpr dynamic_policy(dynamic_policy &&) noexcept = default;
 	constexpr dynamic_policy(dynamic_policy const volatile & other) noexcept:
-		m_min(other.m_min),
-		m_max(other.m_max) {
+		dynamic_policy(other.m_min, other.m_max) {
 	}
 	constexpr dynamic_policy(dynamic_policy volatile && other) noexcept:
-		m_min(std::move(other.m_min)),
-		m_max(std::move(other.m_max)) {
+		dynamic_policy(std::move(other.m_min), std::move(other.m_max)) {
 	}
 
 	template<typename T, enable_if_t<is_overflow_policy<T>::value> = clang_dummy>
