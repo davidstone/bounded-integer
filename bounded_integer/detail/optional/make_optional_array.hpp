@@ -1,5 +1,5 @@
-// Make an array of optional<bounded_integer> with deduced size and type
-// Copyright (C) 2013 David Stone
+// Make an array of optional<T> with deduced size and type
+// Copyright (C) 2014 David Stone
 //
 // This program is free software: you can redistribute it and / or modify
 // it under the terms of the GNU Affero General Public License as
@@ -17,7 +17,6 @@
 #ifndef BOUNDED_INTEGER_DETAIL_OPTIONAL_MAKE_OPTIONAL_ARRAY_HPP_
 #define BOUNDED_INTEGER_DETAIL_OPTIONAL_MAKE_OPTIONAL_ARRAY_HPP_
 
-#include "make_optional.hpp"
 #include "optional.hpp"
 #include "../common_type.hpp"
 #include "../is_bounded_integer.hpp"
@@ -107,15 +106,15 @@ public:
 }	// namespace detail
 
 template<
-	typename... Integers,
-	typename result_type = array<
-		optional<detail::common_optional_type_t<equivalent_type<detail::first_present_value_t<Integers...>>, Integers...>>,
-		sizeof...(Integers)
-	>
+	typename... Integers
 >
-constexpr result_type make_optional_array(Integers && ... integers) noexcept {
+constexpr array<
+	optional<detail::common_optional_type_t<Integers...>>,
+	sizeof...(Integers)
+>
+make_optional_array(Integers && ... integers) noexcept {
 	static_assert(detail::all_are_bounded_or_builtin_integer_or_none<decay_t<Integers>...>::value, "All values must be integers or none");
-	return result_type{ detail::make_optional(std::forward<Integers>(integers))...};
+	return { std::forward<Integers>(integers)... };
 }
 
 }	// namespace bounded_integer

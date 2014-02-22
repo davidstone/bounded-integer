@@ -31,11 +31,21 @@
 namespace bounded_integer {
 namespace detail {
 
+// This lets optional work with built-in types.
+template<typename T>
+struct get_underlying {
+	using type = T;
+};
+template<intmax_t minimum, intmax_t maximum, typename overflow>
+struct get_underlying<bounded_integer<minimum, maximum, overflow>> {
+	using type = typename bounded_integer<minimum, maximum, overflow>::underlying_type;
+};
+
 template<typename T>
 class has_extra_space {
 private:
 	static_assert(std::numeric_limits<T>::is_specialized, "Metafunction only works with integer types.");
-	using underlying_type = typename T::underlying_type;
+	using underlying_type = typename get_underlying<T>::type;
 	static constexpr intmax_t underlying_min = std::numeric_limits<underlying_type>::min();
 	static constexpr intmax_t underlying_max = std::numeric_limits<underlying_type>::max();
 	static constexpr intmax_t min = static_cast<intmax_t>(std::numeric_limits<T>::min());
@@ -50,7 +60,7 @@ class optional_storage;
 template<typename T>
 class optional_storage<T, true> {
 private:
-	using underlying_type = typename T::underlying_type;
+	using underlying_type = typename get_underlying<T>::type;
 	static constexpr auto minimum = static_cast<intmax_t>(std::numeric_limits<T>::min());
 	static constexpr auto maximum = static_cast<intmax_t>(std::numeric_limits<T>::max());
 	static constexpr underlying_type uninitialized_value() noexcept {
@@ -161,7 +171,7 @@ public:
 		return m_initialized;
 	}
 private:
-	using underlying_type = typename T::underlying_type;
+	using underlying_type = typename get_underlying<T>::type;
 	static constexpr underlying_type uninitialized_value() noexcept {
 		return static_cast<underlying_type>(std::numeric_limits<T>::min());
 	}

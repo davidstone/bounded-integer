@@ -27,9 +27,9 @@ constexpr auto dynamic_optional_array = make_optional_array(0, none, 3, 6);
 static_assert(dynamic_optional_array.size() == 4, "Array size wrong.");
 static_assert(*dynamic_optional_array[3_bi] == 6, "valued element wrong.");
 static_assert(dynamic_optional_array[1_bi] == none, "none_t element wrong.");
-static_assert(std::is_same<optional<equivalent_type<int>>, decltype(dynamic_optional_array)::value_type>::value, "Array element type wrong for mixed int + none_t arguments.");
+static_assert(std::is_same<optional<int>, decltype(dynamic_optional_array)::value_type>::value, "Array element type wrong for mixed int + none_t arguments.");
 
-static_assert(std::is_same<optional<equivalent_type<int>>, decltype(make_optional_array(0))::value_type>::value, "optional array type wrong with no missing values.");
+static_assert(std::is_same<optional<int>, decltype(make_optional_array(0))::value_type>::value, "optional array type wrong with no missing values.");
 
 
 constexpr auto known_optional_array = make_optional_array(0_bi, none, 3_bi, 6_bi);

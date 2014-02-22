@@ -59,7 +59,6 @@ base_sources = [('test',
 	]) +
 	prepend_dir('detail/optional', [
 		'forward_declaration.cpp',
-		'make_optional.cpp',
 		'make_optional_array.cpp',
 		'optional.cpp',
 		'comparison_operators.cpp',

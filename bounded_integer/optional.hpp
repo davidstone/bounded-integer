@@ -18,7 +18,6 @@
 #define BOUNDED_INTEGER_OPTIONAL_HPP_
 
 #include "detail/optional/forward_declaration.hpp"
-#include "detail/optional/make_optional.hpp"
 #include "detail/optional/make_optional_array.hpp"
 #include "detail/optional/optional.hpp"
 #include "detail/optional/comparison_operators.hpp"
