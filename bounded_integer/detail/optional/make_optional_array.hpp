@@ -105,13 +105,8 @@ public:
 
 }	// namespace detail
 
-template<
-	typename... Integers
->
-constexpr array<
-	optional<detail::common_optional_type_t<Integers...>>,
-	sizeof...(Integers)
->
+template<typename... Integers>
+constexpr array<optional<detail::common_optional_type_t<Integers...>>, sizeof...(Integers)>
 make_optional_array(Integers && ... integers) noexcept {
 	static_assert(detail::all_are_bounded_or_builtin_integer_or_none<decay_t<Integers>...>::value, "All values must be integers or none");
 	return { std::forward<Integers>(integers)... };
