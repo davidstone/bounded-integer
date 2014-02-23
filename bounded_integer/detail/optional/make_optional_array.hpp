@@ -20,6 +20,7 @@
 #include "optional.hpp"
 #include "../common_type.hpp"
 #include "../array/array.hpp"
+#include "../array/make_array.hpp"
 #include <utility>
 
 namespace bounded_integer {
@@ -76,10 +77,23 @@ public:
 
 }	// namespace detail
 
-template<typename... Integers>
-constexpr array<optional<detail::common_optional_type_t<Integers...>>, sizeof...(Integers)>
-make_optional_array(Integers && ... integers) noexcept {
-	return { std::forward<Integers>(integers)... };
+// This assumes that all of the dimensions have been passed in.
+template<std::size_t... dimensions, typename... Integers>
+constexpr auto make_explicit_optional_array(Integers && ... integers) noexcept {
+	return detail::array_type<
+		optional<detail::common_optional_type_t<Integers...>>,
+		dimensions...
+	>{ std::forward<Integers>(integers)... };
+}
+
+
+// This assumes you did not specify the first dimension.
+template<std::size_t... dimensions, typename... Integers>
+constexpr auto make_optional_array(Integers && ... integers) noexcept {
+	return detail::array_type<
+		optional<detail::common_optional_type_t<Integers...>>,
+		detail::final_dimension<sizeof...(Integers), dimensions...>::value, dimensions...
+	>{ std::forward<Integers>(integers)... };
 }
 
 }	// namespace bounded_integer
