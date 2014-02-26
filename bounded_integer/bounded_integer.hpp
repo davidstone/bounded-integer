@@ -17,6 +17,7 @@
 #ifndef BOUNDED_INTEGER_HPP_
 #define BOUNDED_INTEGER_HPP_
 
+#include "detail/algorithm.hpp"
 #include "detail/class.hpp"
 #include "detail/common_type.hpp"
 #include "detail/conditional.hpp"

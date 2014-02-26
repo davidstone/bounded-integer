@@ -178,6 +178,15 @@ void check_compound_arithmetic() {
 	assert(clamped == 0_bi);
 }
 
+void check_algorithm() {
+	constexpr auto array = make_array(0_bi, 3_bi, 2_bi, 3_bi, 5_bi);
+	assert(count(std::begin(array), std::end(array), 3_bi) == 2_bi);
+	assert(count(std::begin(array), std::end(array), 2_bi) == 1_bi);
+	assert(count(std::begin(array), std::end(array), 7_bi) == 0_bi);
+	assert(count_if(std::begin(array), std::end(array), [](decltype(array)::value_type){ return true; }) == array.size());
+	static_cast<void>(array);
+}
+
 template<typename Initial, intmax_t initial_value, typename Expected, intmax_t expected_value>
 void check_absolute_value() {
 	constexpr Initial value(initial_value);
@@ -307,6 +316,7 @@ int main() {
 	check_minmax();
 	check_policies();
 	check_compound_arithmetic();
+	check_algorithm();
 	check_math();
 	check_optional();
 	check_streaming();
