@@ -184,7 +184,6 @@ void check_algorithm() {
 	assert(count(std::begin(array), std::end(array), 2_bi) == 1_bi);
 	assert(count(std::begin(array), std::end(array), 7_bi) == 0_bi);
 	assert(count_if(std::begin(array), std::end(array), [](decltype(array)::value_type){ return true; }) == array.size());
-	static_cast<void>(array);
 }
 
 template<typename Initial, intmax_t initial_value, typename Expected, intmax_t expected_value>

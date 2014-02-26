@@ -15,5 +15,5 @@
 # along with this program. If not, see <http://www.gnu.org/licenses/>.
 
 optimizations = ['-O3', '-march=native', '-ffast-math', '-fomit-frame-pointer']
-preprocessor_optimizations = ['NDEBUG']
+preprocessor_optimizations = []
 linker_optimizations = optimizations
