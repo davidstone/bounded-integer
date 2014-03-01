@@ -151,6 +151,10 @@ public:
 	}
 
 	template<typename integer, enable_if_t<std::is_enum<integer>::value> = clang_dummy>
+	constexpr explicit bounded_integer(integer other, non_check_t) noexcept:
+		bounded_integer(static_cast<typename std::underlying_type<integer>::type>(other), non_check) {
+	}
+	template<typename integer, enable_if_t<std::is_enum<integer>::value> = clang_dummy>
 	constexpr explicit bounded_integer(integer other) noexcept(noexcept(bounded_integer(static_cast<typename std::underlying_type<integer>::type>(other)))):
 		bounded_integer(static_cast<typename std::underlying_type<integer>::type>(other)) {
 	}
