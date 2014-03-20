@@ -30,7 +30,7 @@ namespace {
 
 class Final {
 public:
-	constexpr Final() noexcept = default;
+	constexpr Final() noexcept {}
 	constexpr Final(int, double, char) noexcept {}
 	Final(Final const & other) = delete;
 	Final(Final && other) = delete;
