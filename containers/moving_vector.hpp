@@ -23,6 +23,10 @@
 #include <value_ptr/value_ptr.hpp>
 
 namespace containers {
+
+template<typename T, typename Allocator = std::allocator<T>>
+class moving_vector;
+
 namespace detail {
 namespace vector {
 using namespace smart_pointer;
@@ -142,7 +146,7 @@ public:
 	
 private:
 	template<typename U, typename Allocator>
-	friend class moving_vector;
+	friend class ::containers::moving_vector;
 	template<typename U, typename VT>
 	friend class iterator_base;
 
@@ -201,7 +205,7 @@ constexpr iterator_base<T, ValueType> operator-(iterator_base<T, ValueType> lhs,
 }	// namespace vector
 }	// namespace detail
 
-template<typename T, typename Allocator = std::allocator<T>>
+template<typename T, typename Allocator>
 class moving_vector {
 private:
 	using element_type = smart_pointer::value_ptr<T>;
