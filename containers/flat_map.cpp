@@ -92,8 +92,7 @@ std::vector<value_type<Key, Value>> generate_random_values(std::size_t size, std
 
 template<typename Key, typename Value>
 void test_performance(std::size_t const loop_count) {
-	std::random_device rd;
-	std::mt19937 engine(rd());
+	std::mt19937 engine(0);
 
 	auto const generator = [&](std::size_t size) { return generate_random_values<Key, Value>(size, engine); };
 	auto const source = generator(loop_count);
