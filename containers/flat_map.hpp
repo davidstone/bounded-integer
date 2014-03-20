@@ -403,7 +403,7 @@ private:
 	class make_key {
 	public:
 		template<typename... Args>
-		constexpr key_type operator()(Args && ... args) {
+		constexpr key_type operator()(Args && ... args) const {
 			return key_type(std::forward<Args>(args)...);
 		}
 	};
