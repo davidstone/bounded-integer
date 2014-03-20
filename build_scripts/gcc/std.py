@@ -1,5 +1,5 @@
 # Standard to target if building with gcc
-# Copyright (C) 2012 David Stone
+# Copyright (C) 2014 David Stone
 #
 # This program is free software: you can redistribute it and / or modify
 # it under the terms of the GNU Affero General Public License as
@@ -14,4 +14,6 @@
 # You should have received a copy of the GNU Affero General Public License
 # along with this program. If not, see <http://www.gnu.org/licenses/>.
 
-cxx_std = ['-std=c++11']
+cxx_std = [
+	'-std=c++1y'
+]

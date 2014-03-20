@@ -1,5 +1,5 @@
 # Determine the correct settings for the compiler being used.
-# Copyright (C) 2013 David Stone
+# Copyright (C) 2014 David Stone
 #
 # This program is free software: you can redistribute it and / or modify
 # it under the terms of the GNU Affero General Public License as
@@ -30,12 +30,12 @@ def extract_info(name, command):
 	installed at 'path/g++', then the user must specify both the real name of
 	the compiler and the path.
 	"""
-	if name == None and command != None:
-		name = os.path.basename(command)
-	elif command == None and name != None:
-		command = name
-	else:
-		name = DefaultEnvironment()['CXX']
+	if name == None:
+		if command == None:
+			name = DefaultEnvironment()['CXX']
+		else:
+			name = os.path.basename(command)
+	if command == None:
 		command = name
 	return (name, command)
 
@@ -50,25 +50,40 @@ def normalize_name(compiler):
 
 compiler_name, compiler_command = extract_info(compiler_name, compiler_command)
 compiler_name = normalize_name(compiler_name)
-def is_compiler(compiler):
-	return compiler_name == compiler
 
-if is_compiler('gcc'):
-	from build_scripts.gcc.debug import debug
-	from build_scripts.gcc.std import cxx_std
-	from build_scripts.gcc.warnings import warnings
-	from build_scripts.gcc.optimizations import optimizations, preprocessor_optimizations, linker_optimizations
-elif is_compiler('clang'):
-	from build_scripts.clang.debug import debug
-	from build_scripts.clang.std import cxx_std
-	from build_scripts.clang.warnings import warnings
-	from build_scripts.clang.optimizations import optimizations, preprocessor_optimizations, linker_optimizations
+if compiler_name == 'gcc':
+	from gcc.debug import debug
+	from gcc.std import cxx_std
+	from gcc.warnings import warnings
+	from gcc.optimizations import optimize
+elif compiler_name == 'clang':
+	from clang.debug import debug
+	from clang.std import cxx_std
+	from clang.warnings import warnings
+	from clang.optimizations import optimize
 
-cc_flags = { 'default': warnings + debug, 'debug': [], 'optimized': optimizations }
-cxx_flags = { 'default': cxx_std, 'debug': [], 'optimized': [] }
-link_flags = { 'default': warnings + cxx_std, 'debug': [], 'optimized': linker_optimizations }
-cpp_flags = { 'default': [], 'debug': [], 'optimized': preprocessor_optimizations }
+cc_flags = {
+	'debug': warnings + debug.compile_flags,
+	'release': warnings + debug.compile_flags_release
+}
+cxx_flags = {
+	'debug': cxx_std,
+	'release': cxx_std
+}
+link_flags = {
+	'debug': warnings + cxx_std + debug.link_flags,
+	'release': warnings + cxx_std + debug.link_flags_release + optimize.link_flags
+}
+cpp_flags = {
+	'debug': [],
+	'release': []
+}
 
-flags = { 'cc': cc_flags, 'cxx': cxx_flags, 'link': link_flags, 'cpp': cpp_flags }
+flags = {
+	'cc': cc_flags,
+	'cxx': cxx_flags,
+	'link': link_flags,
+	'cpp': cpp_flags
+}
 
 Export('flags', 'compiler_command', 'compiler_name')

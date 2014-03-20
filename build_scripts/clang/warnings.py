@@ -43,4 +43,6 @@ warnings = [
 	'-Wno-exit-time-destructors',
 	'-Wno-padded',
 	'-Wno-switch-enum',
+	'-Wno-unused-parameter',
+	'-Wno-unused-variable',
 ]

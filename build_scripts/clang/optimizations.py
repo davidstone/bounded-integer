@@ -1,5 +1,5 @@
 # Optimizations if building with clang
-# Copyright (C) 2013 David Stone
+# Copyright (C) 2014 David Stone
 #
 # This program is free software: you can redistribute it and / or modify
 # it under the terms of the GNU Affero General Public License as
@@ -14,10 +14,11 @@
 # You should have received a copy of the GNU Affero General Public License
 # along with this program. If not, see <http://www.gnu.org/licenses/>.
 
-optimizations = [
-	'-Ofast',
-	'-march=native',
-	'-fomit-frame-pointer'
-]
-preprocessor_optimizations = ['NDEBUG']
-linker_optimizations = ['-fwhole-program'] + optimizations
+class optimize:
+	compile_flags = [
+		'-Ofast',
+		'-march=native',
+		'-fomit-frame-pointer',
+	]
+
+	link_flags = compile_flags
