@@ -37,7 +37,7 @@ template<typename T, typename ValueType,
 			typename std::remove_const<T>::type,
 			typename std::remove_const<ValueType>::type
 		>::value
-	>...
+	> = enabler_dummy
 >
 ValueType const * remove_double_indirection(value_ptr<T> const * ptr) {
 	return ptr->get();
@@ -48,7 +48,7 @@ template<typename T, typename ValueType,
 			typename std::remove_const<T>::type,
 			typename std::remove_const<ValueType>::type
 		>::value
-	>...
+	> = enabler_dummy
 >
 ValueType * remove_double_indirection(value_ptr<T> * ptr) {
 	return ptr->get();
@@ -59,7 +59,7 @@ template<typename T, typename ValueType,
 			value_ptr<T>,
 			typename std::remove_const<ValueType>::type
 		>::value
-	>...
+	> = enabler_dummy
 >
 ValueType const * remove_double_indirection(value_ptr<T> const * ptr) {
 	return ptr;
@@ -70,7 +70,7 @@ template<typename T, typename ValueType,
 			value_ptr<T>,
 			typename std::remove_const<ValueType>::type
 		>::value
-	>...
+	> = enabler_dummy
 >
 ValueType * remove_double_indirection(value_ptr<T> * ptr) {
 	return ptr;
