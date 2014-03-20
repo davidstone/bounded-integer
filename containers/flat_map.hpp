@@ -121,8 +121,8 @@ public:
 	}
 	template<typename InputIterator>
 	flat_map_base(InputIterator first, InputIterator last, Compare const & compare = Compare{}, Allocator const & allocator = Allocator{}):
-		container(first, last) {
-		std::sort(moving_begin(container), moving_end(container), indirect_compare{value_comp()});
+		m_container(first, last) {
+		std::sort(moving_begin(m_container), moving_end(m_container), indirect_compare{value_comp()});
 	}
 	template<typename InputIterator>
 	flat_map_base(InputIterator first, InputIterator last, Allocator const & allocator):
@@ -146,68 +146,68 @@ public:
 	}
 	
 	const_iterator begin() const noexcept {
-		return container.begin();
+		return m_container.begin();
 	}
 	iterator begin() noexcept {
-		return container.begin();
+		return m_container.begin();
 	}
 	const_iterator cbegin() const noexcept {
 		return begin();
 	}
 	
 	const_iterator end() const noexcept {
-		return container.end();
+		return m_container.end();
 	}
 	iterator end() noexcept {
-		return container.end();
+		return m_container.end();
 	}
 	const_iterator cend() const noexcept {
 		return end();
 	}
 	
 	const_reverse_iterator rbegin() const noexcept {
-		return container.rbegin();
+		return m_container.rbegin();
 	}
 	reverse_iterator rbegin() noexcept {
-		return container.rbegin();
+		return m_container.rbegin();
 	}
 	const_reverse_iterator crbegin() const noexcept {
 		return rbegin();
 	}
 	
 	const_reverse_iterator rend() const noexcept {
-		return container.rend();
+		return m_container.rend();
 	}
 	reverse_iterator rend() noexcept {
-		return container.rend();
+		return m_container.rend();
 	}
 	const_reverse_iterator crend() const noexcept {
 		return rend();
 	}
 	
 	bool empty() const noexcept {
-		return container.empty();
+		return m_container.empty();
 	}
 	size_type size() const noexcept {
-		return container.size();
+		return m_container.size();
 	}
 	size_type max_size() const noexcept {
-		return container.max_size();
+		return m_container.max_size();
 	}
 
 	// Extra functions on top of the regular map interface
 	size_type capacity() const noexcept {
-		return container.capacity();
+		return m_container.capacity();
 	}
 	void reserve(size_type const new_capacity) noexcept {
-		return container.reserve(new_capacity);
+		return m_container.reserve(new_capacity);
 	}
 	void shink_to_fit() {
-		container.shrink_to_fit();
+		m_container.shrink_to_fit();
 	}
 	
 	void clear() noexcept {
-		container.clear();
+		m_container.clear();
 	}
 	
 	const_iterator lower_bound(key_type const & key) const {
@@ -292,10 +292,10 @@ public:
 		// simply store the iterator returned by insert (because insert returns
 		// void). Instead, I store the original size and construct a new
 		// iterator.
-		auto const offset = static_cast<typename container_type::difference_type>(container.size());
+		auto const offset = static_cast<typename container_type::difference_type>(m_container.size());
 		// I rely on the optimizer to remove this static check
 		if (allow_duplicates) {
-			container.insert(container.end(), first, last);
+			m_container.insert(m_container.end(), first, last);
 		}
 		else {
 			for (; first != last; ++first) {
@@ -304,7 +304,7 @@ public:
 				auto && value = *first;
 				auto const it = find(value.first);
 				if (it != end()) {
-					container.insert(container.end(), std::forward<decltype(value)>(value));
+					m_container.insert(m_container.end(), std::forward<decltype(value)>(value));
 				}
 			}
 			#if 0
@@ -312,14 +312,14 @@ public:
 			// issues that may just relate to the optimizer, but may be caused
 			// by changing code size. I will have to test this out some more in
 			// a later compiler version.
-			container.insert(container.end(), first, last);
-			auto const remove_position = std::unique(container.begin(), container.end());
-			container.erase(remove_position, container.end());
+			m_container.insert(m_container.end(), first, last);
+			auto const remove_position = std::unique(m_container.begin(), m_container.end());
+			m_container.erase(remove_position, m_container.end());
 			#endif
 		}
-		auto const midpoint = moving_begin(container) + offset;
-		std::sort(midpoint, moving_end(container), indirect_compare{value_comp()});
-		std::inplace_merge(moving_begin(container), midpoint, moving_end(container), indirect_compare{value_comp()});
+		auto const midpoint = moving_begin(m_container) + offset;
+		std::sort(midpoint, moving_end(m_container), indirect_compare{value_comp()});
+		std::inplace_merge(moving_begin(m_container), midpoint, moving_end(m_container), indirect_compare{value_comp()});
 	}
 	void insert(std::initializer_list<value_type> init) {
 		insert(std::begin(init), std::end(init));
@@ -328,21 +328,21 @@ public:
 	// These maintain the relative order of all elements in the container, so I
 	// don't have to worry about re-sorting
 	iterator erase(const_iterator const it) {
-		return container.erase(it);
+		return m_container.erase(it);
 	}
 	iterator erase(const_iterator const first, const_iterator const last) {
-		return container.erase(first, last);
+		return m_container.erase(first, last);
 	}
 	
 	void swap(flat_map_base & other) noexcept {
-		container.swap(other.container);
+		m_container.swap(other.m_container);
 	}
 
 	friend bool operator==(flat_map_base const & lhs, flat_map_base const & rhs) noexcept {
-		return lhs.container == rhs.container;
+		return lhs.m_container == rhs.m_container;
 	}
 	friend bool operator<(flat_map_base const & lhs, flat_map_base const & rhs) noexcept {
-		return lhs.container < rhs.container;
+		return lhs.m_container < rhs.m_container;
 	}
 
 protected:
@@ -440,7 +440,7 @@ private:
 	};
 	template<typename Search, typename... Args>
 	typename checked_emplace_key<allow_duplicates>::result_type emplace_key(Search const search, key_type const & key, Args && ... args) {
-		return checked_emplace_key<allow_duplicates>{}(container, search, key, std::forward<Args>(args)...);
+		return checked_emplace_key<allow_duplicates>{}(m_container, search, key, std::forward<Args>(args)...);
 	}
 	
 	class indirect_compare {
@@ -460,7 +460,7 @@ private:
 	};
 
 
-	container_type container;
+	container_type m_container;
 };
 
 template<typename Key, typename T, typename Compare, template<typename, typename> class Container, typename Allocator>
