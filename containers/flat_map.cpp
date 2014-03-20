@@ -17,6 +17,7 @@
 #include "flat_map.hpp"
 #include <algorithm>
 #include <cassert>
+#include <cmath>
 #include <chrono>
 #include <cstdint>
 #include <iostream>
@@ -97,7 +98,7 @@ void test_performance(std::size_t const loop_count) {
 	auto const generator = [&](std::size_t size) { return generate_random_values<Key, Value>(size, engine); };
 	auto const source = generator(loop_count);
 	auto const additional_batch = generator(loop_count);
-	auto const additional = generator(loop_count / 100);
+	auto const additional = generator(static_cast<std::size_t>(std::log2(loop_count)));
 	using std::chrono::high_resolution_clock;
 	auto const start = high_resolution_clock::now();
 	map_type<Key, Value> map(source.begin(), source.end());
@@ -112,11 +113,9 @@ void test_performance(std::size_t const loop_count) {
 	map.insert(additional_batch.begin(), additional_batch.end());
 	auto const inserted_batch = high_resolution_clock::now();
 
-	#if 0
 	for (auto const & value : additional) {
 		map.insert(value);
 	}
-	#endif
 	auto const inserted = high_resolution_clock::now();
 
 	for (auto const & value : additional) {
