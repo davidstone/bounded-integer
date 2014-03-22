@@ -234,6 +234,7 @@ public:
 	forward_list(forward_list && other) = default;
 	forward_list & operator=(forward_list const & other) {
 		assign(std::begin(other), std::end(other));
+		return *this;
 	}
 	forward_list & operator=(forward_list && other) = default;
 
