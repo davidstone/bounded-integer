@@ -16,6 +16,7 @@
 
 #include "flat_map.hpp"
 #include <algorithm>
+#include <array>
 #include <cassert>
 #include <cmath>
 #include <chrono>
@@ -109,6 +110,7 @@ void test_performance(std::size_t const loop_count) {
 		static std::mt19937 engine(0);
 		static std::uniform_int_distribution<std::uint32_t> distribution;
 		std::vector<std::pair<Key const, Value>> source;
+		source.reserve(size);
 		for (std::size_t n = 0; n != size; ++n) {
 			source.emplace_back(distribution(engine), distribution(engine));
 		}
@@ -165,6 +167,24 @@ void test_performance(std::size_t const loop_count) {
 	destructor.set();
 }
 
+template<std::size_t size>
+class Class {
+public:
+	Class(std::uint32_t v) {
+		m_value[0] = v;
+	}
+	std::uint32_t value() const {
+		return m_value[0];
+	}
+private:
+	std::array<std::uint32_t, size> m_value;
+};
+
+template<std::size_t size>
+bool operator<(Class<size> const & lhs, Class<size> const & rhs) {
+	return lhs.value() < rhs.value();
+}
+
 }	// namespace
 
 int main(int argc, char ** argv) {
@@ -176,5 +196,5 @@ int main(int argc, char ** argv) {
 
 	auto const loop_count = (argc == 1) ? 1 : std::stoull(argv[1]);
 	std::cout << "Testing performance.\n" << std::flush;
-	test_performance<std::uint32_t, std::uint32_t>(loop_count);
+	test_performance<Class<50>, Class<1000>>(loop_count);
 }
