@@ -205,9 +205,7 @@ public:
 	}
 	template<typename InputIterator>
 	forward_list(InputIterator first, InputIterator last, allocator_type const & alloc = allocator_type()) {
-		emplace_front(*first);
-		auto previous = begin();
-		++first;
+		auto previous = before_begin();
 		for ( ; first != last; ++first) {
 			previous = emplace_after(previous, *first);
 		}
