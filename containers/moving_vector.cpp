@@ -17,6 +17,7 @@
 #include "moving_vector.hpp"
 #include <algorithm>
 #include <cassert>
+#include <numeric>
 
 using namespace containers;
 using namespace smart_pointer;

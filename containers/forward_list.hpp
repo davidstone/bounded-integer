@@ -20,6 +20,7 @@
 #include <algorithm>
 #include <cassert>
 #include <iterator>
+#include <functional>
 #include <vector>
 #include <value_ptr/value_ptr.hpp>
 
@@ -486,21 +487,6 @@ public:
 		sort(std::less<value_type>{});
 	}
 	
-	friend bool operator==(forward_list const & lhs, forward_list const & rhs) {
-		auto lhs_it = lhs.begin();
-		auto rhs_it = rhs.begin();
-		while (lhs_it != lhs.end() and rhs_it != rhs.end()) {
-			if (*lhs_it != *rhs_it) {
-				return false;
-			}
-			++lhs_it;
-			++rhs_it;
-		}
-		return lhs_it == lhs.end() and rhs_it == rhs.end();
-	}
-	friend bool operator<(forward_list const & lhs, forward_list const & rhs) {
-		return std::lexicographical_compare(lhs.begin(), lhs.end(), rhs.begin(), rhs.end());
-	}
 private:
 	// This is here because it simplifies my current poor implementation of sort
 	size_type size() const noexcept {
@@ -560,9 +546,20 @@ private:
 };
 
 template<typename T, typename Allocator>
+bool operator==(forward_list<T, Allocator> const & lhs, forward_list<T, Allocator> const & rhs) {
+	return std::equal(lhs.begin(), lhs.end(), rhs.begin(), rhs.end());
+}
+
+template<typename T, typename Allocator>
 bool operator!=(forward_list<T, Allocator> const & lhs, forward_list<T, Allocator> const & rhs) {
 	return !(lhs == rhs);
 }
+
+template<typename T, typename Allocator>
+bool operator<(forward_list<T, Allocator> const & lhs, forward_list<T, Allocator> const & rhs) {
+	return std::lexicographical_compare(lhs.begin(), lhs.end(), rhs.begin(), rhs.end());
+}
+
 template<typename T, typename Allocator>
 bool operator>(forward_list<T, Allocator> const & lhs, forward_list<T, Allocator> const & rhs) {
 	return rhs < lhs;
