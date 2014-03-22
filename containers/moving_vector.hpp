@@ -276,16 +276,16 @@ public:
 	}
 	
 	constexpr const_reference at(size_type position) const {
-		return *container.at(position);
+		return *m_container.at(position);
 	}
 	reference at(size_type position) {
-		return *container.at(position);
+		return *m_container.at(position);
 	}
 	constexpr const_reference operator[](size_type position) const {
-		return *container[position];
+		return *m_container[position];
 	}
 	reference operator[](size_type position) {
-		return *container[position];
+		return *m_container[position];
 	}
 	
 	constexpr const_reference front() const {
@@ -304,16 +304,16 @@ public:
 	// data() intentionally missing
 	
 	const_iterator begin() const noexcept {
-		return const_iterator(container.begin());
+		return const_iterator(m_container.begin());
 	}
 	iterator begin() noexcept {
-		return iterator(container.begin());
+		return iterator(m_container.begin());
 	}
 	const_iterator cbegin() const noexcept {
 		return begin();
 	}
 	indirect_iterator indirect_begin() noexcept {
-		return indirect_iterator(container.begin());
+		return indirect_iterator(m_container.begin());
 	}
 	
 	const_iterator end() const noexcept {
@@ -326,7 +326,7 @@ public:
 		return end();
 	}
 	indirect_iterator indirect_end() noexcept {
-		return indirect_iterator(container.end());
+		return indirect_iterator(m_container.end());
 	}
 	
 	const_reverse_iterator rbegin() const noexcept {
@@ -356,32 +356,32 @@ public:
 	}
 	
 	bool empty() const noexcept {
-		return container.empty();
+		return m_container.empty();
 	}
 	size_type size() const noexcept {
-		return container.size();
+		return m_container.size();
 	}
 	size_type max_size() const noexcept {
-		return container.max_size();
+		return m_container.max_size();
 	}
 
 	size_type capacity() const noexcept {
-		return container.capacity();
+		return m_container.capacity();
 	}
 	void reserve(size_type const new_capacity) noexcept {
-		return container.reserve(new_capacity);
+		return m_container.reserve(new_capacity);
 	}
 	void shink_to_fit() {
-		container.shrink_to_fit();
+		m_container.shrink_to_fit();
 	}
 	
 	void clear() noexcept {
-		container.clear();
+		m_container.clear();
 	}
 	
 	template<typename... Args>
 	iterator emplace(const_iterator const position, Args && ... args) {
-		return iterator(container.emplace(make_base_iterator(position), smart_pointer::make_value<value_type>(std::forward<Args>(args)...)));
+		return iterator(m_container.emplace(make_base_iterator(position), smart_pointer::make_value<value_type>(std::forward<Args>(args)...)));
 	}
 	
 	iterator insert(const_iterator const position, value_type const & value) {
@@ -401,7 +401,7 @@ public:
 			return static_cast<iterator>(position);
 		}
 		auto const offset = position - begin();
-		container.insert(make_base_iterator(position), first, last);
+		m_container.insert(make_base_iterator(position), first, last);
 		return begin() + offset + 1;
 	}
 	iterator insert(const_iterator const position, std::initializer_list<value_type> ilist) {
@@ -410,7 +410,7 @@ public:
 
 	template<typename... Args>
 	void emplace_back(Args && ... args) {
-		container.emplace_back(smart_pointer::make_value<value_type>(std::forward<Args>(args)...));
+		m_container.emplace_back(smart_pointer::make_value<value_type>(std::forward<Args>(args)...));
 	}
 	
 	void push_back(value_type const & value) {
@@ -421,31 +421,31 @@ public:
 	}
 	
 	iterator erase(const_iterator const position) {
-		return iterator(container.erase(make_base_iterator(position)));
+		return iterator(m_container.erase(make_base_iterator(position)));
 	}
 	iterator erase(const_iterator const first, const_iterator const last) {
-		return iterator(container.erase(make_base_iterator(first), make_base_iterator(last)));
+		return iterator(m_container.erase(make_base_iterator(first), make_base_iterator(last)));
 	}
 	void pop_back() {
-		container.pop_back();
+		m_container.pop_back();
 	}
 	
 	void resize(size_type const new_size) {
 		auto old_size = size();
-		container.resize(new_size);
+		m_container.resize(new_size);
 		for ( ; old_size <= new_size; ++old_size) {
-			container[old_size] = smart_pointer::make_value<value_type>();
+			m_container[old_size] = smart_pointer::make_value<value_type>();
 		}
 	}
 	void resize(size_type const count, value_type const & value) {
-		container.resize(count, smart_pointer::make_value<value_type>(value));
+		m_container.resize(count, smart_pointer::make_value<value_type>(value));
 	}
 	void resize(size_type const count, value_type && value) {
-		container.resize(count, smart_pointer::make_value<value_type>(std::move(value)));
+		m_container.resize(count, smart_pointer::make_value<value_type>(std::move(value)));
 	}
 	
 	void swap(moving_vector & other) noexcept {
-		container.swap(other.container);
+		m_container.swap(other.m_container);
 	}
 
 	friend bool operator==(moving_vector const & lhs, moving_vector const & rhs) noexcept {
@@ -456,12 +456,12 @@ public:
 	}
 private:
 	constexpr typename container_type::const_iterator make_base_iterator(const_iterator const it) const {
-		return container.begin() + std::distance(cbegin(), it);
+		return m_container.begin() + std::distance(cbegin(), it);
 	}
 	typename container_type::iterator make_base_iterator(const_iterator const it) {
-		return container.begin() + std::distance(cbegin(), it);
+		return m_container.begin() + std::distance(cbegin(), it);
 	}
-	container_type container;
+	container_type m_container;
 };
 
 // For regular containers, the iterator you need to move elements around is just
