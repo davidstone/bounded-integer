@@ -432,9 +432,14 @@ public:
 	
 	void resize(size_type const new_size) {
 		auto old_size = size();
-		m_container.resize(new_size);
-		for ( ; old_size <= new_size; ++old_size) {
-			m_container[old_size] = smart_pointer::make_value<value_type>();
+		if (old_size < new_size) {
+			m_container.reserve(new_size);
+			for ( ; old_size != new_size; ++old_size) {
+				m_container.emplace_back();
+			}
+		}
+		else {
+			m_container.resize(new_size);
 		}
 	}
 	void resize(size_type const count, value_type const & value) {
