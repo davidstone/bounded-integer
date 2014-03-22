@@ -207,52 +207,53 @@ constexpr iterator_base<T, ValueType> operator-(iterator_base<T, ValueType> lhs,
 
 template<typename T, typename Allocator>
 class moving_vector {
-private:
-	using element_type = smart_pointer::value_ptr<T>;
-	using container_type = std::vector<element_type>;
 public:
 	using value_type = T;
+private:
+	using element_type = smart_pointer::value_ptr<value_type>;
+	using container_type = std::vector<element_type>;
+public:
 	using allocator_type = Allocator;
 	using size_type = typename container_type::size_type;
 	using difference_type = typename container_type::difference_type;
 	using const_reference = value_type const &;
 	using reference = value_type &;
-	using const_pointer = typename std::allocator_traits<Allocator>::const_pointer;
-	using pointer = typename std::allocator_traits<Allocator>::pointer;
+	using const_pointer = typename std::allocator_traits<allocator_type>::const_pointer;
+	using pointer = typename std::allocator_traits<allocator_type>::pointer;
 	
-	using const_iterator = detail::vector::iterator_base<T, T const>;
-	using iterator = detail::vector::iterator_base<T, T>;
+	using const_iterator = detail::vector::iterator_base<value_type, value_type const>;
+	using iterator = detail::vector::iterator_base<value_type, value_type>;
 	// There is no const_indirect_iterator because there is no way to enforce it
-	using indirect_iterator = detail::vector::iterator_base<T, element_type>;
+	using indirect_iterator = detail::vector::iterator_base<value_type, element_type>;
 	using const_reverse_iterator = std::reverse_iterator<const_iterator>;
 	using reverse_iterator = std::reverse_iterator<iterator>;
 	using reverse_indirect_iterator = std::reverse_iterator<indirect_iterator>;
 	
-	explicit moving_vector(Allocator const & allocator = Allocator{}) {
+	explicit moving_vector(allocator_type const & allocator = allocator_type{}) {
 	}
-	explicit moving_vector(size_type count, Allocator const & allocator = Allocator{}) {
+	explicit moving_vector(size_type count, allocator_type const & allocator = allocator_type{}) {
 		for (size_type n = 0; n != count; ++n) {
 			emplace_back();
 		}
 	}
-	moving_vector(size_type count, T const & value, Allocator const & allocator = Allocator{}) {
+	moving_vector(size_type count, value_type const & value, allocator_type const & allocator = allocator_type{}) {
 		assign(count, value);
 	}
 	template<typename InputIterator>
-	moving_vector(InputIterator first, InputIterator last, Allocator const & allocator = Allocator{}) {
+	moving_vector(InputIterator first, InputIterator last, allocator_type const & allocator = allocator_type{}) {
 		assign(first, last);
 	}
-	moving_vector(moving_vector const & other, Allocator const & allocator):
+	moving_vector(moving_vector const & other, allocator_type const & allocator):
 		moving_vector(other) {
 	}
-	moving_vector(moving_vector && other, Allocator const & allocator):
+	moving_vector(moving_vector && other, allocator_type const & allocator):
 		moving_vector(std::move(other)) {
 	}
-	moving_vector(std::initializer_list<T> init, Allocator const & allocator = Allocator{}):
+	moving_vector(std::initializer_list<value_type> init, allocator_type const & allocator = allocator_type{}):
 		moving_vector(std::begin(init), std::end(init), allocator) {
 	}
 	
-	void assign(size_type count, T const & value) {
+	void assign(size_type count, value_type const & value) {
 		reserve(count);
 		for (size_type n = 0; n != count; ++n) {
 			emplace_back(value);
@@ -264,7 +265,7 @@ public:
 			emplace_back(*first);
 		}
 	}
-	void assign(std::initializer_list<T> init) {
+	void assign(std::initializer_list<value_type> init) {
 		assign(std::begin(init), std::end(init));
 	}
 	
@@ -374,16 +375,16 @@ public:
 	
 	template<typename... Args>
 	iterator emplace(const_iterator const position, Args && ... args) {
-		return iterator(container.emplace(make_base_iterator(position), smart_pointer::make_value<T>(std::forward<Args>(args)...)));
+		return iterator(container.emplace(make_base_iterator(position), smart_pointer::make_value<value_type>(std::forward<Args>(args)...)));
 	}
 	
-	iterator insert(const_iterator const position, T const & value) {
+	iterator insert(const_iterator const position, value_type const & value) {
 		return emplace(position, value);
 	}
-	iterator insert(const_iterator const position, T && value) {
+	iterator insert(const_iterator const position, value_type && value) {
 		return emplace(position, std::move(value));
 	}
-	iterator insert(const_iterator const position, size_type const count, T const & value) {
+	iterator insert(const_iterator const position, size_type const count, value_type const & value) {
 		for (size_type n = 0; n != count; ++n) {
 			emplace(position, value);
 		}
@@ -397,19 +398,19 @@ public:
 		container.insert(make_base_iterator(position), first, last);
 		return begin() + offset + 1;
 	}
-	iterator insert(const_iterator const position, std::initializer_list<T> ilist) {
+	iterator insert(const_iterator const position, std::initializer_list<value_type> ilist) {
 		return insert(position, std::begin(ilist), std::end(ilist));
 	}
 
 	template<typename... Args>
 	void emplace_back(Args && ... args) {
-		container.emplace_back(smart_pointer::make_value<T>(std::forward<Args>(args)...));
+		container.emplace_back(smart_pointer::make_value<value_type>(std::forward<Args>(args)...));
 	}
 	
-	void push_back(T const & value) {
+	void push_back(value_type const & value) {
 		emplace_back(value);
 	}
-	void push_back(T && value) {
+	void push_back(value_type && value) {
 		emplace_back(std::move(value));
 	}
 	
@@ -427,14 +428,14 @@ public:
 		auto old_size = size();
 		container.resize(new_size);
 		for ( ; old_size <= new_size; ++old_size) {
-			container[old_size] = smart_pointer::make_value<T>();
+			container[old_size] = smart_pointer::make_value<value_type>();
 		}
 	}
-	void resize(size_type const count, T const & value) {
-		container.resize(count, smart_pointer::make_value<T>(value));
+	void resize(size_type const count, value_type const & value) {
+		container.resize(count, smart_pointer::make_value<value_type>(value));
 	}
-	void resize(size_type const count, T && value) {
-		container.resize(count, smart_pointer::make_value<T>(std::move(value)));
+	void resize(size_type const count, value_type && value) {
+		container.resize(count, smart_pointer::make_value<value_type>(std::move(value)));
 	}
 	
 	void swap(moving_vector & other) noexcept {
