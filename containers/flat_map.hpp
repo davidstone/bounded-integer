@@ -224,17 +224,11 @@ public:
 	}
 	const_iterator find(key_type const & key) const {
 		auto const it = lower_bound(key);
-		if (it == end()) {
-			return end();
-		}
-		return equals(it->first, key) ? it : end();
+		return (it == end() or key_comp()(key, it->first)) ? end() : it;
 	}
 	iterator find(key_type const & key) {
 		auto const it = lower_bound(key);
-		if (it == end()) {
-			return end();
-		}
-		return equals(it->first, key) ? it : end();
+		return (it == end() or key_comp()(key, it->first)) ? end() : it;
 	}
 	
 	// Unlike in std::map, insert / emplace can only provide a time complexity
@@ -361,10 +355,6 @@ protected:
 		key_compare const & m_compare;
 	};
 private:
-	static constexpr bool equals(key_type const & lhs, key_type const & rhs) {
-		return !key_compare{}(lhs, rhs) and !key_compare{}(rhs, lhs);
-	}
-
 	// It is safe to bind the reference to the object that is being moved in any
 	// of these calls to emplace_key because the call to std::move does not
 	// actually move anything, it just converts it to an rvalue reference. The
@@ -422,8 +412,8 @@ private:
 	public:
 		using result_type = iterator;
 		template<typename Search, typename... Args>
-		result_type operator()(container_type & container, Search const search, key_type const & key, Args && ... args) {
-			return container.emplace(search(key), std::forward<Args>(args)...);
+		result_type operator()(flat_map_base & container, Search const search, key_type const & key, Args && ... args) {
+			return container.m_container.emplace(search(key), std::forward<Args>(args)...);
 		}
 	};
 	template<typename dummy>
@@ -431,16 +421,20 @@ private:
 	public:
 		using result_type = std::pair<iterator, bool>;
 		template<typename Search, typename... Args>
-		result_type operator()(container_type & container, Search const search, key_type const & key, Args && ... args) {
-			auto const it = search(key);
-			return (it == container.begin() or !equals(key, std::prev(it)->first)) ?
-				result_type(container.emplace(it, std::forward<Args>(args)...), true) :
-				result_type(std::prev(it), false);
+		result_type operator()(flat_map_base & container, Search const upper_bound, key_type const & key, Args && ... args) {
+			auto const position = upper_bound(key);
+			// Do not decrement an iterator if it might be begin()
+			bool const there_is_element_before = position != container.begin();
+			auto const that_element_is_equal = [&](){ return !container.key_comp()(std::prev(position)->first, key); };
+			bool const already_exists = there_is_element_before and that_element_is_equal();
+			return already_exists ?
+				result_type(std::prev(position), false) :
+				result_type(container.m_container.emplace(position, std::forward<Args>(args)...), true);
 		}
 	};
 	template<typename Search, typename... Args>
 	typename checked_emplace_key<allow_duplicates>::result_type emplace_key(Search const search, key_type const & key, Args && ... args) {
-		return checked_emplace_key<allow_duplicates>{}(m_container, search, key, std::forward<Args>(args)...);
+		return checked_emplace_key<allow_duplicates>{}(*this, search, key, std::forward<Args>(args)...);
 	}
 	
 	class indirect_compare {

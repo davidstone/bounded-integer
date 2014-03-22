@@ -60,16 +60,37 @@ void test() {
 	assert(container.at(3) == 3);
 }
 
+std::size_t number_of_comparisons = 0;
+template<typename Key>
+class TrackerCompare {
+public:
+	bool operator()(Key const & lhs, Key const & rhs) const {
+		try {
+			throw 0;
+		}
+		catch (...) {
+		}
+		++number_of_comparisons;
+		return lhs < rhs;
+	}
+};
+#if 1
+template<typename Key>
+using Compare = TrackerCompare<Key>;
+#else
+template<typename Key>
+using Compare = std::less<Key>;
+#endif
 
 #if defined USE_SYSTEM_MAP
 template<typename Key, typename Value>
-using map_type = std::map<Key, Value>;
+using map_type = std::map<Key, Value, Compare<Key>>;
 #elif defined USE_UNSTABLE_FLAT_MAP
 template<typename Key, typename Value>
-using map_type = unstable_flat_map<Key, Value>;
+using map_type = unstable_flat_map<Key, Value, Compare<Key>>;
 #else
 template<typename Key, typename Value>
-using map_type = stable_flat_map<Key, Value>;
+using map_type = stable_flat_map<Key, Value, Compare<Key>>;
 #endif
 
 template<typename T>
@@ -99,6 +120,7 @@ void test_performance(std::size_t const loop_count) {
 	auto const additional_batch = generator(loop_count);
 	auto const additional = generator(static_cast<std::size_t>(std::log2(loop_count)));
 	using std::chrono::high_resolution_clock;
+	using unit = std::chrono::milliseconds;
 	auto const start = high_resolution_clock::now();
 	map_type<Key, Value> map(source.begin(), source.end());
 	auto const constructed = high_resolution_clock::now();
@@ -135,7 +157,6 @@ void test_performance(std::size_t const loop_count) {
 	}
 	auto const found_in_extras = high_resolution_clock::now();
 
-	typedef std::chrono::milliseconds unit;
 	std::cout << "Construction time: " << std::chrono::duration_cast<unit>(constructed - start).count() << '\n';
 	std::cout << "Found time: " << std::chrono::duration_cast<unit>(found - constructed).count() << '\n';
 	std::cout << "Batch insertion time: " << std::chrono::duration_cast<unit>(inserted_batch - found).count() << '\n';
@@ -144,11 +165,13 @@ void test_performance(std::size_t const loop_count) {
 	std::cout << "Copying time: " << std::chrono::duration_cast<unit>(copied - not_inserted).count() << '\n';
 	std::cout << "Iteration time: " << std::chrono::duration_cast<unit>(iterated - copied).count() << '\n';
 	std::cout << "Found time with extra elements: " << std::chrono::duration_cast<unit>(found_in_extras - iterated).count() << '\n';
+	std::cout << "Number of comparisons: " << number_of_comparisons << '\n';
 }
 
 }	// namespace
 
 int main(int argc, char ** argv) {
+	std::cout.sync_with_stdio(false);
 	std::cout << "Testing no extra copies or moves.\n" << std::flush;
 	test_no_extra_copy_or_move();
 	std::cout << "Testing many member functions.\n" << std::flush;
