@@ -106,17 +106,35 @@ std::vector<value_type<Key, Value>> generate_random_values(std::size_t size, std
 	return source;
 }
 
+using unit = std::chrono::milliseconds;
+class TimeDestructor {
+public:
+	using TimePoint = decltype(std::chrono::high_resolution_clock::now());
+	void set() {
+		m_time_point = std::chrono::high_resolution_clock::now();
+	}
+	~TimeDestructor() {
+		auto const now = std::chrono::high_resolution_clock::now();
+		std::cout << "Destroyed: " << std::chrono::duration_cast<unit>(now - m_time_point).count() << '\n';
+	}
+private:
+	TimePoint m_time_point = TimePoint{};
+};
+
 template<typename Key, typename Value>
 void test_performance(std::size_t const loop_count) {
 	std::mt19937 engine(0);
 
 	auto const generator = [&](std::size_t size) { return generate_random_values<Key, Value>(size, engine); };
+
 	auto const source = generator(loop_count);
 	auto const additional_batch = generator(loop_count);
 	auto const additional = generator(static_cast<std::size_t>(std::log2(loop_count)));
+
 	using std::chrono::high_resolution_clock;
-	using unit = std::chrono::milliseconds;
 	auto const start = high_resolution_clock::now();
+
+	TimeDestructor destructor;
 	map_type<Key, Value> map(source.begin(), source.end());
 	auto const constructed = high_resolution_clock::now();
 
@@ -141,12 +159,13 @@ void test_performance(std::size_t const loop_count) {
 		auto const volatile & thing = value;
 	}
 	auto const iterated = high_resolution_clock::now();
+
 	for (auto const & value : source) {
 		auto const volatile it = map.find(value.first);
 		static_cast<void>(it);
 	}
 	auto const found_in_extras = high_resolution_clock::now();
-
+	
 	std::cout << "Construction time: " << std::chrono::duration_cast<unit>(constructed - start).count() << '\n';
 	std::cout << "Found time: " << std::chrono::duration_cast<unit>(found - constructed).count() << '\n';
 	std::cout << "Batch insertion time: " << std::chrono::duration_cast<unit>(inserted_batch - found).count() << '\n';
@@ -155,6 +174,7 @@ void test_performance(std::size_t const loop_count) {
 	std::cout << "Iteration time: " << std::chrono::duration_cast<unit>(iterated - copied).count() << '\n';
 	std::cout << "Found time with extra elements: " << std::chrono::duration_cast<unit>(found_in_extras - iterated).count() << '\n';
 	std::cout << "Number of comparisons: " << number_of_comparisons << '\n';
+	destructor.set();
 }
 
 }	// namespace
