@@ -184,10 +184,7 @@ int main(int argc, char ** argv) {
 	std::cout << "Testing no extra copies or moves.\n" << std::flush;
 	test_no_extra_copy_or_move();
 	std::cout << "Testing many member functions.\n" << std::flush;
-	// gcc's std::map doesn't have emplace
-	// test<map_type<int, int>>();
-	test<stable_flat_map<int, int>>();
-	test<unstable_flat_map<int, int>>();
+	test<map_type<int, int>>();
 
 	auto const loop_count = (argc == 1) ? 1 : std::stoull(argv[1]);
 	std::cout << "Testing performance.\n" << std::flush;
