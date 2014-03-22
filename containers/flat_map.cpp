@@ -88,24 +88,6 @@ template<typename Key, typename Value>
 using map_type = stable_flat_map<Key, Value, Compare<Key>>;
 #endif
 
-template<typename T>
-T generate_random_value(std::mt19937 & engine) {
-	static std::uniform_int_distribution<T> distribution;
-	return distribution(engine);
-}
-
-template<typename Key, typename Value>
-using value_type = std::pair<Key const, Value>;
-
-template<typename Key, typename Value>
-std::vector<value_type<Key, Value>> generate_random_values(std::size_t size, std::mt19937 & engine) {
-	std::vector<value_type<Key, Value>> source;
-	for (std::size_t n = 0; n != size; ++n) {
-		source.emplace_back(generate_random_value<Key>(engine), generate_random_value<Value>(engine));
-	}
-	return source;
-}
-
 using unit = std::chrono::milliseconds;
 class TimeDestructor {
 public:
@@ -123,9 +105,15 @@ private:
 
 template<typename Key, typename Value>
 void test_performance(std::size_t const loop_count) {
-	std::mt19937 engine(0);
-
-	auto const generator = [&](std::size_t size) { return generate_random_values<Key, Value>(size, engine); };
+	auto const generator = [](std::size_t size) {
+		static std::mt19937 engine(0);
+		static std::uniform_int_distribution<std::uint32_t> distribution;
+		std::vector<std::pair<Key const, Value>> source;
+		for (std::size_t n = 0; n != size; ++n) {
+			source.emplace_back(distribution(engine), distribution(engine));
+		}
+		return source;
+	};
 
 	auto const source = generator(loop_count);
 	auto const additional_batch = generator(loop_count);
