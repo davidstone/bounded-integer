@@ -74,7 +74,7 @@ public:
 		return lhs < rhs;
 	}
 };
-#if 1
+#if 0
 template<typename Key>
 using Compare = TrackerCompare<Key>;
 #else
@@ -139,11 +139,6 @@ void test_performance(std::size_t const loop_count) {
 	}
 	auto const inserted = high_resolution_clock::now();
 
-	for (auto const & value : additional) {
-		map.insert(value);
-	}
-	auto const not_inserted = high_resolution_clock::now();
-
 	auto map2 = map;
 	auto const copied = high_resolution_clock::now();
 	
@@ -161,8 +156,7 @@ void test_performance(std::size_t const loop_count) {
 	std::cout << "Found time: " << std::chrono::duration_cast<unit>(found - constructed).count() << '\n';
 	std::cout << "Batch insertion time: " << std::chrono::duration_cast<unit>(inserted_batch - found).count() << '\n';
 	std::cout << "Insertion time: " << std::chrono::duration_cast<unit>(inserted - inserted_batch).count() << '\n';
-	std::cout << "Non-insertion time: " << std::chrono::duration_cast<unit>(not_inserted - inserted).count() << '\n';
-	std::cout << "Copying time: " << std::chrono::duration_cast<unit>(copied - not_inserted).count() << '\n';
+	std::cout << "Copying time: " << std::chrono::duration_cast<unit>(copied - inserted).count() << '\n';
 	std::cout << "Iteration time: " << std::chrono::duration_cast<unit>(iterated - copied).count() << '\n';
 	std::cout << "Found time with extra elements: " << std::chrono::duration_cast<unit>(found_in_extras - iterated).count() << '\n';
 	std::cout << "Number of comparisons: " << number_of_comparisons << '\n';
