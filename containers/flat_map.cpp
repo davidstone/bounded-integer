@@ -65,11 +65,6 @@ template<typename Key>
 class TrackerCompare {
 public:
 	bool operator()(Key const & lhs, Key const & rhs) const {
-		try {
-			throw 0;
-		}
-		catch (...) {
-		}
 		++number_of_comparisons;
 		return lhs < rhs;
 	}
