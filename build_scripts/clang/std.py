@@ -15,5 +15,5 @@
 # along with this program. If not, see <http://www.gnu.org/licenses/>.
 
 cxx_std = [
-	'-std=c++11'
+	'-std=c++1y'
 ]
