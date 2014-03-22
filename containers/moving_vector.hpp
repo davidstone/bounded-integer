@@ -17,6 +17,7 @@
 #ifndef CONTAINERS_MOVING_VECTOR_HPP_
 #define CONTAINERS_MOVING_VECTOR_HPP_
 
+#include <iterator>
 #include <type_traits>
 #include <vector>
 #include <value_ptr/enable_if.hpp>
@@ -254,6 +255,7 @@ public:
 	}
 	
 	void assign(size_type count, value_type const & value) {
+		clear();
 		reserve(count);
 		for (size_type n = 0; n != count; ++n) {
 			emplace_back(value);
@@ -261,6 +263,10 @@ public:
 	}
 	template<typename InputIterator>
 	void assign(InputIterator first, InputIterator last) {
+		clear();
+		if (std::is_same<typename std::iterator_traits<InputIterator>::iterator_category, std::random_access_iterator_tag>::value) {
+			reserve(static_cast<size_type>(std::distance(first, last)));
+		}
 		for (; first != last; ++first) {
 			emplace_back(*first);
 		}
