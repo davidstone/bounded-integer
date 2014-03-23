@@ -1,5 +1,5 @@
 // Make an array with automatically deduced size and type
-// Copyright (C) 2013 David Stone
+// Copyright (C) 2014 David Stone
 //
 // This program is free software: you can redistribute it and / or modify
 // it under the terms of the GNU Affero General Public License as
@@ -69,18 +69,34 @@ public:
 
 }	// namespace detail
 
-// This assumes that all of the dimensions have been passed in.
+// If element_type is not specified, the type is deduced as common_type.
+//
+// This has some code duplication (rather than all versions forwarding to the
+// explicitly typed overload of make_explicit_array) because every time you
+// forward a large number of arguments, gcc and clang both use up a lot of
+// memory. For creating an array of around 4000 elements, these functions were
+// unusable when they did not all construct detail::array_type directly.
+
+// These assume that all of the dimensions have been passed in.
+template<typename element_type, std::size_t... dimensions, typename... Args>
+constexpr auto make_explicit_array(Args && ... args) noexcept {
+	return detail::array_type<element_type, dimensions...>{ std::forward<Args>(args)... };
+}
 template<std::size_t... dimensions, typename... Args>
 constexpr auto make_explicit_array(Args && ... args) noexcept {
 	return detail::array_type<std::common_type_t<Args...>, dimensions...>{ std::forward<Args>(args)... };
 }
 
 
-// This assumes you did not specify the first dimension. I don't defer to
-// make_explicit_array because every time you forward a large number of
-// arguments, gcc and clang both use up a lot of memory. This leads to a little
-// bit of code duplication, but for creating an array of around 4000 elements,
-// this function was unusable.
+// These assume you did not specify the inner-most dimension.
+template<typename element_type, std::size_t... dimensions, typename... Args>
+constexpr auto make_array(Args && ... args) noexcept {
+	return detail::array_type<
+		element_type,
+		detail::final_dimension<sizeof...(Args), dimensions...>::value, dimensions...
+	>{ std::forward<Args>(args)... };
+}
+
 template<std::size_t... dimensions, typename... Args>
 constexpr auto make_array(Args && ... args) noexcept {
 	return detail::array_type<
@@ -88,6 +104,7 @@ constexpr auto make_array(Args && ... args) noexcept {
 		detail::final_dimension<sizeof...(Args), dimensions...>::value, dimensions...
 	>{ std::forward<Args>(args)... };
 }
+
 
 }	// namespace bounded_integer
 #endif	// BOUNDED_INTEGER_DETAIL_MAKE_ARRAY_HPP_

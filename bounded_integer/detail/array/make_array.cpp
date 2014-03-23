@@ -1,5 +1,5 @@
 // Verify that the header can stand on its own, run tests
-// Copyright (C) 2013 David Stone
+// Copyright (C) 2014 David Stone
 //
 // This program is free software: you can redistribute it and / or modify
 // it under the terms of the GNU Affero General Public License as
@@ -17,6 +17,7 @@
 #include "make_array.hpp"
 #include "../comparison_operators.hpp"
 #include "../literal.hpp"
+#include "../policy/throw_policy.hpp"
 
 namespace bounded_integer {
 namespace {
@@ -73,6 +74,12 @@ static_assert(four_dimensions.size() == 1, "First dimension wrong.");
 static_assert(four_dimensions[0_bi].size() == second, "Second dimension wrong.");
 static_assert(four_dimensions[0_bi][0_bi].size() == third, "Third dimension wrong.");
 static_assert(four_dimensions[0_bi][0_bi][0_bi].size() == fourth, "Fourth dimension wrong.");
+
+using explicit_type = bounded_integer<0, 1, throw_policy>;
+constexpr auto typed_array = make_array<explicit_type>(0_bi);
+static_assert(typed_array.size() == 1_bi, "Incorrect size with explicit type.");
+static_assert(std::is_same<decltype(typed_array)::value_type, explicit_type>::value, "Incorrect type with explicit type.");
+static_assert(typed_array.front() == 0_bi, "Incorrect value with explicit type.");
 
 }	// namespace
 }	// namespace bounded_integer
