@@ -43,8 +43,8 @@ namespace detail {
 
 template<typename lhs, typename rhs, typename lhs_overflow>
 using comparison_type = typename common_type_t<
-	decay_t<lhs>,
-	equivalent_type<decay_t<rhs>, lhs_overflow>
+	std::decay_t<lhs>,
+	equivalent_type<std::decay_t<rhs>, lhs_overflow>
 >::underlying_type const;
 
 }	// namespace detail

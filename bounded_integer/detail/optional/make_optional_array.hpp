@@ -21,6 +21,8 @@
 #include "../common_type.hpp"
 #include "../array/array.hpp"
 #include "../array/make_array.hpp"
+
+#include <type_traits>
 #include <utility>
 
 namespace bounded_integer {
@@ -30,7 +32,7 @@ template<typename... Ts>
 class common_optional_type;
 
 template<typename... Ts>
-using common_optional_type_t = typename common_optional_type<decay_t<Ts>...>::type;
+using common_optional_type_t = typename common_optional_type<std::decay_t<Ts>...>::type;
 
 // I manually stamp out a few of these templates to avoid hitting the template
 // instantiation limit of various compilers when creating large arrays.

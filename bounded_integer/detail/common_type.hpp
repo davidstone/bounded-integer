@@ -25,12 +25,9 @@
 
 namespace bounded_integer {
 
-template<typename T>
-using decay_t = typename std::decay<T>::type;
-
 // decay is temporary workaround
 template<typename... Ts>
-using common_type_t = typename std::common_type<decay_t<Ts>...>::type;
+using common_type_t = typename std::common_type<std::decay_t<Ts>...>::type;
 
 }	// namespace bounded_integer
 
@@ -59,7 +56,7 @@ template<intmax_t minimum, intmax_t maximum, typename overflow_policy, typename 
 struct common_type<bounded_integer::bounded_integer<minimum, maximum, overflow_policy>, integer> {
 private:
 	using type1 = bounded_integer::bounded_integer<minimum, maximum, overflow_policy>;
-	using type2 = bounded_integer::equivalent_type<bounded_integer::decay_t<integer>>;
+	using type2 = bounded_integer::equivalent_type<decay_t<integer>>;
 public:
 	using type = bounded_integer::common_type_t<type1, type2>;
 };
