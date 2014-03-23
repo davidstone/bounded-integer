@@ -72,7 +72,7 @@ public:
 // This assumes that all of the dimensions have been passed in.
 template<std::size_t... dimensions, typename... Args>
 constexpr auto make_explicit_array(Args && ... args) noexcept {
-	return detail::array_type<common_type_t<Args...>, dimensions...>{ std::forward<Args>(args)... };
+	return detail::array_type<std::common_type_t<Args...>, dimensions...>{ std::forward<Args>(args)... };
 }
 
 
@@ -84,7 +84,7 @@ constexpr auto make_explicit_array(Args && ... args) noexcept {
 template<std::size_t... dimensions, typename... Args>
 constexpr auto make_array(Args && ... args) noexcept {
 	return detail::array_type<
-		common_type_t<Args...>,
+		std::common_type_t<Args...>,
 		detail::final_dimension<sizeof...(Args), dimensions...>::value, dimensions...
 	>{ std::forward<Args>(args)... };
 }

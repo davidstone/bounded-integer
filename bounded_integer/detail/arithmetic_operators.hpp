@@ -43,7 +43,7 @@ constexpr auto operator symbol( \
 	bounded_integer<rhs_min, rhs_max, rhs_policy> const rhs \
 ) noexcept { \
 	using result_t = operator_result<lhs_min, lhs_max, lhs_policy, rhs_min, rhs_max, rhs_policy, operator_name>; \
-	using common_t = typename common_type_t<result_t, decltype(lhs), decltype(rhs)>::underlying_type; \
+	using common_t = typename std::common_type_t<result_t, decltype(lhs), decltype(rhs)>::underlying_type; \
 	return result_t(operator_name{}(static_cast<common_t>(lhs), static_cast<common_t>(rhs)), non_check); \
 } \
  \
@@ -80,7 +80,7 @@ BOUNDED_INTEGER_OPERATOR_OVERLOADS(>>, detail::right_shift)
 template<intmax_t minimum, intmax_t maximum, typename overflow_policy>
 constexpr auto operator-(bounded_integer<minimum, maximum, overflow_policy> const value) noexcept {
 	using result_type = unary_minus_result<minimum, maximum, overflow_policy>;
-	using common_type = common_type_t<result_type, bounded_integer<minimum, maximum, overflow_policy>>;
+	using common_type = std::common_type_t<result_type, bounded_integer<minimum, maximum, overflow_policy>>;
 	return result_type(-static_cast<typename common_type::underlying_type>(value), non_check);
 }
 

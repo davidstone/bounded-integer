@@ -23,14 +23,6 @@
 
 #include <type_traits>
 
-namespace bounded_integer {
-
-// decay is temporary workaround
-template<typename... Ts>
-using common_type_t = typename std::common_type<std::decay_t<Ts>...>::type;
-
-}	// namespace bounded_integer
-
 namespace std {
 
 // I do not have to specialize the single-argument version, as it just returns
@@ -58,7 +50,7 @@ private:
 	using type1 = bounded_integer::bounded_integer<minimum, maximum, overflow_policy>;
 	using type2 = bounded_integer::equivalent_type<decay_t<integer>>;
 public:
-	using type = bounded_integer::common_type_t<type1, type2>;
+	using type = common_type_t<type1, type2>;
 };
 
 // If the user tries to do something like
@@ -81,7 +73,7 @@ public:
 template<typename integer1, intmax_t minimum, intmax_t maximum, typename overflow_policy>
 struct common_type<integer1, bounded_integer::bounded_integer<minimum, maximum, overflow_policy>> {
 public:
-	using type = bounded_integer::common_type_t<bounded_integer::bounded_integer<minimum, maximum, overflow_policy>, integer1>;
+	using type = common_type_t<bounded_integer::bounded_integer<minimum, maximum, overflow_policy>, integer1>;
 };
 
 
@@ -114,8 +106,8 @@ struct common_type<
 private:
 	using type0 = bounded_integer::bounded_integer<minimum, maximum, overflow_policy>;
 public:
-	using type = bounded_integer::common_type_t<
-		bounded_integer::common_type_t<
+	using type = common_type_t<
+		common_type_t<
 			type0, T1, T2, T3, T4, T5, T6, T7, T8, T9,
 			T10, T11, T12, T13, T14, T15, T16, T17, T18, T19,
 			T20, T21, T22, T23, T24, T25, T26, T27, T28, T29,

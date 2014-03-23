@@ -42,7 +42,7 @@ namespace bounded_integer {
 namespace detail {
 
 template<typename lhs, typename rhs, typename lhs_overflow>
-using comparison_type = typename common_type_t<
+using comparison_type = typename std::common_type_t<
 	std::decay_t<lhs>,
 	equivalent_type<std::decay_t<rhs>, lhs_overflow>
 >::underlying_type const;

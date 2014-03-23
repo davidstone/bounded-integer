@@ -54,7 +54,7 @@ public:
 template<typename T1, typename T2>
 class common_optional_type<T1, T2> {
 public:
-	using type = common_type_t<T1, T2>;
+	using type = std::common_type_t<T1, T2>;
 };
 template<typename T>
 class common_optional_type<T> {
