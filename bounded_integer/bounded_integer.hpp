@@ -21,6 +21,7 @@
 #include "detail/class.hpp"
 #include "detail/common_type.hpp"
 #include "detail/conditional.hpp"
+#include "detail/iterator.hpp"
 #include "detail/literal.hpp"
 #include "detail/make_bounded.hpp"
 #include "detail/math.hpp"

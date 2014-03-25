@@ -305,6 +305,12 @@ void check_dynamic_policy() {
 	assert(run == value);
 }
 
+void check_iterator() {
+	constexpr array<char, 1> a = { {} };
+	assert(next(a.begin()) == a.end());
+	assert(prev(a.end()) == a.begin());
+}
+
 
 }	// namespace
 }	// namespace bounded_integer
@@ -320,4 +326,5 @@ int main() {
 	check_optional();
 	check_streaming();
 	check_dynamic_policy();
+	check_iterator();
 }
