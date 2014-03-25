@@ -19,15 +19,14 @@
 #include <cassert>
 #include <sstream>
 
-namespace bounded_integer {
 namespace {
 
-using namespace literal;
+using namespace bounded_integer::literal;
 
 template<typename integer>
 void check_numeric_limits() {
 	using int_limits = std::numeric_limits<integer>;
-	using bounded_t = checked_integer<int_limits::min(), int_limits::max()>;
+	using bounded_t = bounded_integer::checked_integer<int_limits::min(), int_limits::max()>;
 	using bounded_limits = std::numeric_limits<bounded_t>;
 	static_assert(sizeof(bounded_t) == sizeof(integer), "checked_integer wrong size.");
 
@@ -91,14 +90,14 @@ void check_numeric_limits_all() {
 }
 
 void check_minmax() {
-	constexpr bounded_integer<-53, 1000, null_policy> value(3_bi);
-	constexpr auto minimum = min(0_bi, 10_bi, 5_bi, value);
+	constexpr bounded_integer::native_integer<-53, 1000> value(3_bi);
+	constexpr auto minimum = bounded_integer::min(0_bi, 10_bi, 5_bi, value);
 	using min_type = decltype(minimum);
 	static_assert(minimum == 0_bi, "Incorrect minimum value.");
 	static_assert(std::numeric_limits<min_type>::min() == -53, "Incorrect minimum minimum.");
 	static_assert(std::numeric_limits<min_type>::max() == 0, "Incorrect maximum minimum.");
 
-	constexpr auto maximum = max(0_bi, 10_bi, 5_bi, value);
+	constexpr auto maximum = bounded_integer::max(0_bi, 10_bi, 5_bi, value);
 	using max_type = decltype(maximum);
 	static_assert(maximum == 10_bi, "Incorrect maximum value.");
 	static_assert(std::numeric_limits<max_type>::min() == 10, "Incorrect minimum maximum.");
@@ -106,10 +105,14 @@ void check_minmax() {
 }
 
 void check_throw_policy() {
-	static_assert(!noexcept(std::declval<checked_integer<0, 0> &>() = std::declval<checked_integer<1, 1> &>()), "Shouldn't be noexcept.");
+	using bounded_integer::checked_integer;
+	static_assert(
+		!noexcept(std::declval<checked_integer<0, 0> &>() = std::declval<checked_integer<1, 1> &>()),
+		"Shouldn't be noexcept."
+	);
 	static constexpr intmax_t minimum = 0;
 	static constexpr intmax_t maximum = 10;
-	throw_policy policy;
+	bounded_integer::throw_policy policy;
 	try {
 		policy.assignment(20, minimum, maximum);
 		assert(false);
@@ -129,15 +132,15 @@ void check_policies() {
 }
 
 void check_compound_arithmetic() {
-	native_integer<0, 10> x(5);
+	bounded_integer::native_integer<0, 10> x(5);
 	x += 5_bi;
 	assert(x == 10);
-	checked_integer<-10, 10> y(-5);
+	bounded_integer::checked_integer<-10, 10> y(-5);
 	y += 5;
 	assert(y == 0);
 	y += x;	
 	assert(y == 10);
-	checked_integer<-1000, 1000> z(0);
+	bounded_integer::checked_integer<-1000, 1000> z(0);
 	z += y;
 	assert(z == 10);
 	z *= x - 5;
@@ -156,14 +159,14 @@ void check_compound_arithmetic() {
 	// s += 4_bi;
 	// assert(s == 4);
 	int i = 9;
-	i -= make_bounded(68);
+	i -= bounded_integer::make_bounded(68);
 	assert(i == -59);
 	long l = -7;
 	l *= z + 1_bi;
 	assert(l == -7);
 	i /= y;
 	assert(i == -5);
-	i %= make_bounded(6);
+	i %= bounded_integer::make_bounded(6);
 	assert(i == -5);
 	i %= 4_bi;
 	assert(i == -1);
@@ -173,29 +176,36 @@ void check_compound_arithmetic() {
 	assert(z++ == 0);
 	assert(z == 1);
 	
-	clamped_integer<0, 10> clamped(5_bi);
+	bounded_integer::clamped_integer<0, 10> clamped(5_bi);
 	clamped -= 20_bi;
 	assert(clamped == 0_bi);
 }
 
 void check_algorithm() {
-	constexpr auto array = make_array(0_bi, 3_bi, 2_bi, 3_bi, 5_bi);
-	assert(count(std::begin(array), std::end(array), 3_bi) == 2_bi);
-	assert(count(std::begin(array), std::end(array), 2_bi) == 1_bi);
-	assert(count(std::begin(array), std::end(array), 7_bi) == 0_bi);
-	assert(count_if(std::begin(array), std::end(array), [](decltype(array)::value_type){ return true; }) == array.size());
+	constexpr auto array = bounded_integer::make_array(0_bi, 3_bi, 2_bi, 3_bi, 5_bi);
+	assert(bounded_integer::count(std::begin(array), std::end(array), 3_bi) == 2_bi);
+	assert(bounded_integer::count(std::begin(array), std::end(array), 2_bi) == 1_bi);
+	assert(bounded_integer::count(std::begin(array), std::end(array), 7_bi) == 0_bi);
+	assert(bounded_integer::count_if(std::begin(array), std::end(array), [](auto){ return true; }) == array.size());
 }
 
 template<typename Initial, intmax_t initial_value, typename Expected, intmax_t expected_value>
 void check_absolute_value() {
 	constexpr Initial value(initial_value);
-	constexpr auto absolute = abs(value);
+	constexpr auto absolute = bounded_integer::abs(value);
 	constexpr Expected expected_absolute(expected_value);
-	static_assert(std::is_same<decltype(expected_absolute), decltype(absolute)>::value, "Absolute value returns the wrong type.");
-	static_assert(absolute == expected_absolute, "Absolute value returns the wrong value.");
+	static_assert(
+		std::is_same<decltype(expected_absolute), decltype(absolute)>::value,
+		"Absolute value returns the wrong type."
+	);
+	static_assert(
+		absolute == expected_absolute,
+		"Absolute value returns the wrong value."
+	);
 }
 
 void check_math() {
+	using bounded_integer::checked_integer;
 	check_absolute_value<checked_integer<-10, 4>, -5, checked_integer<0, 10>, 5>();
 	check_absolute_value<checked_integer<-10, -10>, -10, checked_integer<10, 10>, 10>();
 	check_absolute_value<checked_integer<0, 0>, 0, checked_integer<0, 0>, 0>();
@@ -205,15 +215,24 @@ void check_math() {
 
 template<typename T>
 void check_uncompressed_optional() {
-	using type = bounded_integer<std::numeric_limits<T>::min(), std::numeric_limits<T>::max(), null_policy>;
-	static_assert(sizeof(type) < sizeof(optional<type>), "Compressing an optional that should not be compressed.");
+	using type = bounded_integer::native_integer<std::numeric_limits<T>::min(), std::numeric_limits<T>::max()>;
+	static_assert(
+		sizeof(type) < sizeof(bounded_integer::optional<type>),
+		"Compressing an optional that should not be compressed."
+	);
 }
 template<intmax_t minimum, intmax_t maximum>
 void check_compressed_optional() {
-	using type = bounded_integer<minimum, maximum, null_policy>;
-	using compressed_type = optional<type>;
-	static_assert(sizeof(type) == sizeof(compressed_type), "compressed_optional too big.");
-	static_assert(sizeof(compressed_type) == sizeof(optional<type>), "Incorrect optional selection.");
+	using type = bounded_integer::native_integer<minimum, maximum>;
+	using compressed_type = bounded_integer::optional<type>;
+	static_assert(
+		sizeof(type) == sizeof(compressed_type),
+		"compressed_optional too big."
+	);
+	static_assert(
+		sizeof(compressed_type) == sizeof(bounded_integer::optional<type>),
+		"Incorrect optional selection."
+	);
 }
 
 void check_optional() {
@@ -224,18 +243,18 @@ void check_optional() {
 	check_uncompressed_optional<unsigned>();
 	check_uncompressed_optional<intmax_t>();
 	
-	using integer_type = checked_integer<1, 10>;
-	constexpr optional<integer_type> uninitialized_optional;
+	using integer_type = bounded_integer::checked_integer<1, 10>;
+	constexpr bounded_integer::optional<integer_type> uninitialized_optional;
 	static_assert(!uninitialized_optional, "Default constructor should leave uninitialized.");
-	constexpr optional<integer_type> constexpr_optional_integer(integer_type(5));
+	constexpr bounded_integer::optional<integer_type> constexpr_optional_integer(integer_type(5));
 	static_assert(static_cast<bool>(constexpr_optional_integer), "Value constructor should initialize optional.");
 	static_assert(*constexpr_optional_integer == 5, "Value in an optional incorrect.");
-	optional<integer_type> optional_integer(integer_type(4));
+	bounded_integer::optional<integer_type> optional_integer(integer_type(4));
 	optional_integer = uninitialized_optional;
 	assert(!optional_integer);
 	optional_integer = integer_type(7);
 	assert(optional_integer);
-	optional_integer = none;
+	optional_integer = bounded_integer::none;
 	assert(!optional_integer);
 }
 
@@ -252,10 +271,10 @@ void streaming_test(int const initial, int const final) {
 }
 
 void check_streaming() {
-	streaming_test<checked_integer<0, 100>>(7, 0);
+	streaming_test<bounded_integer::checked_integer<0, 100>>(7, 0);
 	constexpr auto large_initial = std::numeric_limits<int>::max() / 3;
 	constexpr auto large_final = -49;
-	streaming_test<equivalent_type<int>>(large_initial, large_final);
+	streaming_test<bounded_integer::equivalent_type<int>>(large_initial, large_final);
 }
 
 
@@ -265,8 +284,8 @@ void check_dynamic_policy() {
 	constexpr auto max = 7_bi;
 	constexpr auto static_min = 0;
 	constexpr auto static_max = 10;
-	using policy_type = dynamic_policy<static_min, static_max, throw_policy>;
-	using type = bounded_integer<static_min, static_max, policy_type>;
+	using policy_type = bounded_integer::dynamic_policy<static_min, static_max, bounded_integer::throw_policy>;
+	using type = bounded_integer::bounded_integer<static_min, static_max, policy_type>;
 	constexpr policy_type policy(min, max);
 	constexpr type compile(value, policy);
 	static_assert(compile == value, "Incorrect value with dynamic bounds.");
@@ -306,17 +325,15 @@ void check_dynamic_policy() {
 }
 
 void check_iterator() {
-	constexpr array<char, 1> a = { {} };
-	assert(next(a.begin()) == a.end());
-	assert(prev(a.end()) == a.begin());
+	constexpr bounded_integer::array<char, 1> a = { {} };
+	assert(bounded_integer::next(a.begin()) == a.end());
+	assert(bounded_integer::prev(a.end()) == a.begin());
 }
 
 
 }	// namespace
-}	// namespace bounded_integer
 
 int main() {
-	using namespace bounded_integer;
 	check_numeric_limits_all();
 	check_minmax();
 	check_policies();
