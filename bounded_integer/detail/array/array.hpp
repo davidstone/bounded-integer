@@ -17,6 +17,7 @@
 #ifndef BOUNDED_INTEGER_DETAIL_ARRAY_HPP_
 #define BOUNDED_INTEGER_DETAIL_ARRAY_HPP_
 
+#include "../arithmetic_operators.hpp"
 #include "../class.hpp"
 #include "../make_bounded.hpp"
 #include "../policy/null_policy.hpp"
