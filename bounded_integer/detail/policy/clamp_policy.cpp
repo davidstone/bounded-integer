@@ -20,27 +20,24 @@
 #include "../literal.hpp"
 #include "../numeric_limits.hpp"
 
-namespace bounded_integer {
 namespace {
-using namespace literal;
+using namespace bounded_integer::literal;
 
 static constexpr intmax_t minimum = 27;
 static constexpr intmax_t maximum = 567;
-constexpr clamp_policy policy;
+constexpr bounded_integer::clamp_policy policy;
 static_assert(policy.assignment(20, minimum, maximum) == minimum, "Failure to properly clamp lesser positive values.");
 static_assert(policy.assignment(-25, minimum, maximum) == minimum, "Failure to properly clamp negative values to a positive value.");
 static_assert(policy.assignment(1000, minimum, maximum) == maximum, "Failure to properly clamp greater positive values.");
 static_assert(policy.assignment(2000_bi, minimum, maximum) == maximum, "Fail to clamp above range with a strictly greater type.");
 
-using type = bounded_integer<-100, 100, clamp_policy>;
+using type = bounded_integer::bounded_integer<-100, 100, bounded_integer::clamp_policy>;
 constexpr auto initial = std::numeric_limits<type::underlying_type>::max() + 1_bi;
 constexpr type value(initial);
 static_assert(value == std::numeric_limits<type>::max(), "Fail to clamp value when the source type is larger than the destination type.");
 
 
-constexpr bounded_integer<minimum, maximum, clamp_policy> integer(1000_bi);
+constexpr bounded_integer::bounded_integer<minimum, maximum, bounded_integer::clamp_policy> integer(1000_bi);
 static_assert(integer == maximum, "Fail to clamp when using a bounded_integer.");
 
-
 }	// namespace
-}	// namespace bounded_integer
