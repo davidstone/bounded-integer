@@ -202,6 +202,14 @@ public:
 	reference at(integer const & index) noexcept(noexcept(static_cast<index_type>(index))) {
 		return operator[](static_cast<index_type>(index));
 	}
+	template<typename integer>
+	constexpr const_reference at(integer const & index, non_check_t) const noexcept {
+		return operator[](index_type(index, non_check));
+	}
+	template<typename integer>
+	reference at(integer const & index, non_check_t) noexcept {
+		return operator[](index_type(index, non_check));
+	}
 
 	constexpr const_reference front() const noexcept {
 		return operator[](make_bounded<0>());
