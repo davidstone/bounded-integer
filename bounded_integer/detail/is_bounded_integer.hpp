@@ -23,13 +23,13 @@
 
 namespace bounded_integer {
 
-template<typename integer, typename... integers>
+template<typename T, typename... Ts>
 class is_bounded_integer {
 public:
-	static constexpr bool value = is_bounded_integer<integer>::value and is_bounded_integer<integers...>::value;
+	static constexpr bool value = is_bounded_integer<T>::value and is_bounded_integer<Ts...>::value;
 };
-template<typename integer>
-class is_bounded_integer<integer> {
+template<typename T>
+class is_bounded_integer<T> {
 public:
 	static constexpr bool value = false;
 };
@@ -39,26 +39,26 @@ public:
 	static constexpr bool value = true;
 };
 
-template<typename integer, typename... integers>
+template<typename T, typename... Ts>
 class all_are_bounded_or_builtin_integer {
 public:
-	static constexpr bool value = all_are_bounded_or_builtin_integer<integer>::value and all_are_bounded_or_builtin_integer<integers...>::value;
+	static constexpr bool value = all_are_bounded_or_builtin_integer<T>::value and all_are_bounded_or_builtin_integer<Ts...>::value;
 };
-template<typename integer>
-class all_are_bounded_or_builtin_integer<integer> {
+template<typename T>
+class all_are_bounded_or_builtin_integer<T> {
 public:
-	static constexpr bool value = std::is_integral<integer>::value or is_bounded_integer<integer>::value;
+	static constexpr bool value = std::is_integral<T>::value or is_bounded_integer<T>::value;
 };
 
-template<typename integer, typename... integers>
+template<typename T, typename... Ts>
 class any_are_bounded_integer {
 public:
-	static constexpr bool value = any_are_bounded_integer<integer>::value or any_are_bounded_integer<integers...>::value;
+	static constexpr bool value = any_are_bounded_integer<T>::value or any_are_bounded_integer<Ts...>::value;
 };
-template<typename integer>
-class any_are_bounded_integer<integer> {
+template<typename T>
+class any_are_bounded_integer<T> {
 public:
-	static constexpr bool value = is_bounded_integer<integer>::value;
+	static constexpr bool value = is_bounded_integer<T>::value;
 };
 
 }	// namespace bounded_integer

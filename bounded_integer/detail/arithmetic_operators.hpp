@@ -49,17 +49,17 @@ constexpr auto operator symbol( \
  \
 /* Interoperability with built-ins */ \
 template< \
-	intmax_t lhs_min, intmax_t lhs_max, typename overflow, typename integer, \
-	enable_if_t<std::is_integral<integer>::value> = clang_dummy \
+	intmax_t lhs_min, intmax_t lhs_max, typename overflow, typename T, \
+	enable_if_t<std::is_integral<T>::value> = clang_dummy \
 > \
-constexpr auto operator symbol(bounded_integer<lhs_min, lhs_max, overflow> const lhs, integer const rhs) noexcept { \
+constexpr auto operator symbol(bounded_integer<lhs_min, lhs_max, overflow> const lhs, T const rhs) noexcept { \
 	return lhs symbol make_bounded(rhs); \
 } \
 template< \
-	typename integer, intmax_t rhs_min, intmax_t rhs_max, typename overflow, \
-	enable_if_t<std::is_integral<integer>::value> = clang_dummy \
+	typename T, intmax_t rhs_min, intmax_t rhs_max, typename overflow, \
+	enable_if_t<std::is_integral<T>::value> = clang_dummy \
 > \
-constexpr auto operator symbol(integer const lhs, bounded_integer<rhs_min, rhs_max, overflow> const rhs) noexcept { \
+constexpr auto operator symbol(T const lhs, bounded_integer<rhs_min, rhs_max, overflow> const rhs) noexcept { \
 	return make_bounded(lhs) symbol rhs; \
 }
 

@@ -27,7 +27,7 @@
 namespace bounded_integer {
 namespace detail {
 
-template<typename integer>
+template<typename T>
 class equivalent_overflow_policy_c {
 public:
 	using type = null_policy;
@@ -38,15 +38,15 @@ public:
 	using type = overflow_policy;
 };
 
-template<typename integer>
-using equivalent_overflow_policy = typename equivalent_overflow_policy_c<integer>::type;
+template<typename T>
+using equivalent_overflow_policy = typename equivalent_overflow_policy_c<T>::type;
 
 }	// namespace detail
 
-template<typename integer, typename overflow_policy = detail::equivalent_overflow_policy<integer>>
+template<typename T, typename overflow_policy = detail::equivalent_overflow_policy<T>>
 using equivalent_type = bounded_integer<
-	static_cast<intmax_t>(std::numeric_limits<integer>::min()),
-	static_cast<intmax_t>(std::numeric_limits<integer>::max()),
+	static_cast<intmax_t>(std::numeric_limits<T>::min()),
+	static_cast<intmax_t>(std::numeric_limits<T>::max()),
 	overflow_policy
 >;
 
@@ -71,18 +71,18 @@ using equivalent_type = bounded_integer<
 
 template<
 	typename overflow_policy = void,
-	typename integer = void,
+	typename T = void,
 	typename result_t = equivalent_type<
-		integer,
+		T,
 		typename std::conditional<
 			std::is_void<overflow_policy>::value,
-			detail::equivalent_overflow_policy<integer>,
+			detail::equivalent_overflow_policy<T>,
 			overflow_policy
 		>::type
 	>
 >
-constexpr result_t make_bounded(integer const value) noexcept {
-	static_assert(std::numeric_limits<integer>::is_integer, "Must be an integer type.");
+constexpr result_t make_bounded(T const value) noexcept {
+	static_assert(std::numeric_limits<T>::is_integer, "Must be an integer type.");
 	return result_t(value, non_check);
 }
 

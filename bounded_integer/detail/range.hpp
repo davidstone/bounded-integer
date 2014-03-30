@@ -28,26 +28,26 @@
 
 namespace bounded_integer {
 
-template<typename Integer>
+template<typename T>
 class immutable_range;
 
 namespace detail {
 namespace range_iterator {
 
-template<typename integer>
+template<typename T>
 constexpr intmax_t range_of_type() noexcept {
-	return static_cast<intmax_t>(std::numeric_limits<integer>::max() - std::numeric_limits<integer>::min());
+	return static_cast<intmax_t>(std::numeric_limits<T>::max() - std::numeric_limits<T>::min());
 }
 
-template<typename integer>
+template<typename T>
 class iterator {
 public:
 	// We have to be able to index the one-past-the-end element. Not sure if
 	// this should have a throw_policy.
-	using index_type = bounded_integer<0, range_of_type<integer>(), null_policy>;
+	using index_type = bounded_integer<0, range_of_type<T>(), null_policy>;
 	using value_type = bounded_integer<
-		static_cast<intmax_t>(std::numeric_limits<integer>::min()),
-		static_cast<intmax_t>(max(std::numeric_limits<integer>::min(), std::numeric_limits<integer>::max() - make_bounded<1>())),
+		static_cast<intmax_t>(std::numeric_limits<T>::min()),
+		static_cast<intmax_t>(max(std::numeric_limits<T>::min(), std::numeric_limits<T>::max() - make_bounded<1>())),
 		null_policy
 	>;
 	using difference_type = bounded_integer<-range_of_type<index_type>(), range_of_type<index_type>(), null_policy>;
@@ -81,80 +81,80 @@ public:
 		return lhs.m_value < rhs.m_value;
 	}
 private:
-	friend class immutable_range<integer>;
-	using underlying_type = integer;
+	friend class immutable_range<T>;
+	using underlying_type = T;
 	explicit constexpr iterator(underlying_type const value) noexcept:
 		m_value(value) {
 	}
 	underlying_type m_value;
 };
 
-template<typename integer>
-constexpr iterator<integer> operator+(typename iterator<integer>::difference_type const & lhs, iterator<integer> const & rhs) {
+template<typename T>
+constexpr iterator<T> operator+(typename iterator<T>::difference_type const & lhs, iterator<T> const & rhs) {
 	return rhs + lhs;
 }
-template<typename integer>
-iterator<integer> & operator+=(iterator<integer> & lhs, typename iterator<integer>::difference_type const & rhs) {
+template<typename T>
+iterator<T> & operator+=(iterator<T> & lhs, typename iterator<T>::difference_type const & rhs) {
 	return lhs = lhs + rhs;
 }
-template<typename integer>
-constexpr iterator<integer> operator-(iterator<integer> const & lhs, typename iterator<integer>::difference_type const & rhs) {
+template<typename T>
+constexpr iterator<T> operator-(iterator<T> const & lhs, typename iterator<T>::difference_type const & rhs) {
 	return lhs + (-rhs);
 }
-template<typename integer>
-iterator<integer> & operator-=(iterator<integer> & lhs, typename iterator<integer>::difference_type const & rhs) {
+template<typename T>
+iterator<T> & operator-=(iterator<T> & lhs, typename iterator<T>::difference_type const & rhs) {
 	return lhs = lhs - rhs;
 }
 
-template<typename integer>
-iterator<integer> & operator++(iterator<integer> & it) {
+template<typename T>
+iterator<T> & operator++(iterator<T> & it) {
 	return it += make_bounded<1>();
 }
-template<typename integer>
-iterator<integer> operator++(iterator<integer> & it, int) {
+template<typename T>
+iterator<T> operator++(iterator<T> & it, int) {
 	auto self = it;
 	++it;
 	return self;
 }
 
-template<typename integer>
-iterator<integer> & operator--(iterator<integer> & it) {
+template<typename T>
+iterator<T> & operator--(iterator<T> & it) {
 	return it -= make_bounded<1>();
 }
-template<typename integer>
-iterator<integer> operator--(iterator<integer> & it, int) {
+template<typename T>
+iterator<T> operator--(iterator<T> & it, int) {
 	auto self = it;
 	--it;
 	return self;
 }
 
 
-template<typename integer>
-constexpr bool operator!=(iterator<integer> const & lhs, iterator<integer> const & rhs) noexcept {
+template<typename T>
+constexpr bool operator!=(iterator<T> const & lhs, iterator<T> const & rhs) noexcept {
 	return !(lhs == rhs);
 }
 
-template<typename integer>
-constexpr bool operator>(iterator<integer> const & lhs, iterator<integer> const & rhs) noexcept {
+template<typename T>
+constexpr bool operator>(iterator<T> const & lhs, iterator<T> const & rhs) noexcept {
 	return rhs < lhs;
 }
-template<typename integer>
-constexpr bool operator>=(iterator<integer> const & lhs, iterator<integer> const & rhs) noexcept {
+template<typename T>
+constexpr bool operator>=(iterator<T> const & lhs, iterator<T> const & rhs) noexcept {
 	return !(lhs < rhs);
 }
-template<typename integer>
-constexpr bool operator<=(iterator<integer> const & lhs, iterator<integer> const & rhs) noexcept {
+template<typename T>
+constexpr bool operator<=(iterator<T> const & lhs, iterator<T> const & rhs) noexcept {
 	return !(rhs < lhs);
 }
 
 }	// namespace range_iterator
 }	// namespace detail
 
-template<typename integer>
+template<typename T>
 class immutable_range {
 public:
-	static_assert(std::numeric_limits<integer>::is_specialized, "Must be a numeric type.");
-	using const_iterator = detail::range_iterator::iterator<integer>;
+	static_assert(std::numeric_limits<T>::is_specialized, "Must be a numeric type.");
+	using const_iterator = detail::range_iterator::iterator<T>;
 	using const_reverse_iterator = std::reverse_iterator<const_iterator>;
 
 	using value_type = typename const_iterator::value_type;

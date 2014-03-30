@@ -27,15 +27,15 @@ namespace bounded_integer {
 using std::to_string;
 
 template<intmax_t minimum, intmax_t maximum, typename overflow_policy>
-std::string to_string(bounded_integer<minimum, maximum, overflow_policy> const integer) {
-	return to_string(+integer.value());
+std::string to_string(bounded_integer<minimum, maximum, overflow_policy> const x) {
+	return to_string(+x.value());
 }
 
 using std::to_wstring;
 
 template<intmax_t minimum, intmax_t maximum, typename overflow_policy>
-std::wstring to_wstring(bounded_integer<minimum, maximum, overflow_policy> const integer) {
-	return to_wstring(+integer.value());
+std::wstring to_wstring(bounded_integer<minimum, maximum, overflow_policy> const x) {
+	return to_wstring(+x.value());
 }
 
 // TODO: template<typename T> T from_string(std::string const & str);

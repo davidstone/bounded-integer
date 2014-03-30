@@ -27,16 +27,16 @@
 namespace bounded_integer {
 namespace detail {
 
-template<typename integer>
+template<typename T>
 class basic_numeric_limits {
 public:
 	static constexpr intmax_t min() noexcept {
-		return std::numeric_limits<integer>::min();
+		return std::numeric_limits<T>::min();
 	}
 	static constexpr intmax_t max() noexcept {
-		return std::numeric_limits<integer>::max();
+		return std::numeric_limits<T>::max();
 	}
-	static constexpr bool is_specialized = std::numeric_limits<integer>::is_specialized;
+	static constexpr bool is_specialized = std::numeric_limits<T>::is_specialized;
 };
 template<intmax_t minimum, intmax_t maximum, typename overflow_policy>
 class basic_numeric_limits<bounded_integer<minimum, maximum, overflow_policy>> {
@@ -50,34 +50,34 @@ public:
 	static constexpr bool is_specialized = true;
 };
 
-template<typename integer>
+template<typename T>
 constexpr bool value_fits_in_type(intmax_t const value) noexcept {
-	static_assert(basic_numeric_limits<integer>::is_specialized, "Only works with integer types.");
-	return basic_numeric_limits<integer>::min() <= value and value <= basic_numeric_limits<integer>::max();
+	static_assert(basic_numeric_limits<T>::is_specialized, "Only works with integer types.");
+	return basic_numeric_limits<T>::min() <= value and value <= basic_numeric_limits<T>::max();
 }
 template<>
 constexpr bool value_fits_in_type<uintmax_t>(intmax_t const value) noexcept {
 	return value >= 0;
 }
 
-template<typename integer>
+template<typename T>
 constexpr bool type_overlaps_range(intmax_t const minimum, intmax_t const maximum) noexcept {
-	static_assert(basic_numeric_limits<integer>::is_specialized, "Only works with integer types.");
+	static_assert(basic_numeric_limits<T>::is_specialized, "Only works with integer types.");
 	return
-		minimum <= basic_numeric_limits<integer>::max() and
-		basic_numeric_limits<integer>::min() <= maximum;
+		minimum <= basic_numeric_limits<T>::max() and
+		basic_numeric_limits<T>::min() <= maximum;
 }
 template<>
 constexpr bool type_overlaps_range<uintmax_t>(intmax_t, intmax_t const maximum) noexcept {
 	return maximum >= 0;
 }
 
-template<typename integer>
+template<typename T>
 constexpr bool type_fits_in_range(intmax_t const minimum, intmax_t const maximum) noexcept {
-	static_assert(basic_numeric_limits<integer>::is_specialized, "Only works with integer types.");
+	static_assert(basic_numeric_limits<T>::is_specialized, "Only works with integer types.");
 	return
-		minimum <= basic_numeric_limits<integer>::min() and
-		basic_numeric_limits<integer>::max() <= maximum;
+		minimum <= basic_numeric_limits<T>::min() and
+		basic_numeric_limits<T>::max() <= maximum;
 }
 template<>
 constexpr bool type_fits_in_range<uintmax_t>(intmax_t const, intmax_t const) noexcept {

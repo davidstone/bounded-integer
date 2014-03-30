@@ -194,20 +194,20 @@ public:
 	reference operator[](index_type const & index) noexcept {
 		return *(data() + index);
 	}
-	template<typename integer>
-	constexpr const_reference at(integer const & index) const noexcept(noexcept(static_cast<index_type>(index))) {
+	template<typename Index>
+	constexpr const_reference at(Index const & index) const noexcept(noexcept(static_cast<index_type>(index))) {
 		return operator[](static_cast<index_type>(index));
 	}
-	template<typename integer>
-	reference at(integer const & index) noexcept(noexcept(static_cast<index_type>(index))) {
+	template<typename Index>
+	reference at(Index const & index) noexcept(noexcept(static_cast<index_type>(index))) {
 		return operator[](static_cast<index_type>(index));
 	}
-	template<typename integer>
-	constexpr const_reference at(integer const & index, non_check_t) const noexcept {
+	template<typename Index>
+	constexpr const_reference at(Index const & index, non_check_t) const noexcept {
 		return operator[](index_type(index, non_check));
 	}
-	template<typename integer>
-	reference at(integer const & index, non_check_t) noexcept {
+	template<typename Index>
+	reference at(Index const & index, non_check_t) noexcept {
 		return operator[](index_type(index, non_check));
 	}
 

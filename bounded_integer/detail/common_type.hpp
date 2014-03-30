@@ -44,11 +44,11 @@ public:
 };
 
 // Common type of a bounded_integer and a built-in
-template<intmax_t minimum, intmax_t maximum, typename overflow_policy, typename integer>
-struct common_type<bounded_integer::bounded_integer<minimum, maximum, overflow_policy>, integer> {
+template<intmax_t minimum, intmax_t maximum, typename overflow_policy, typename T>
+struct common_type<bounded_integer::bounded_integer<minimum, maximum, overflow_policy>, T> {
 private:
 	using type1 = bounded_integer::bounded_integer<minimum, maximum, overflow_policy>;
-	using type2 = bounded_integer::equivalent_type<decay_t<integer>>;
+	using type2 = bounded_integer::equivalent_type<decay_t<T>>;
 public:
 	using type = common_type_t<type1, type2>;
 };
