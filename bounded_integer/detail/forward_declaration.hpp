@@ -17,11 +17,13 @@
 #ifndef BOUNDED_INTEGER_FORWARD_DECLARATION_HPP_
 #define BOUNDED_INTEGER_FORWARD_DECLARATION_HPP_
 
+#include "policy/null_policy.hpp"
+
 #include <cstdint>
 
 namespace bounded_integer {
 
-template<intmax_t minimum, intmax_t maximum, typename overflow_policy>
+template<intmax_t minimum, intmax_t maximum, typename overflow_policy = null_policy>
 class integer;
 
 // Does not verify that the value is in range with the policy

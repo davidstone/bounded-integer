@@ -28,9 +28,6 @@ template<intmax_t minimum, intmax_t maximum>
 using checked_integer = integer<minimum, maximum, throw_policy>;
 
 template<intmax_t minimum, intmax_t maximum>
-using native_integer = integer<minimum, maximum, null_policy>;
-
-template<intmax_t minimum, intmax_t maximum>
 using clamped_integer = integer<minimum, maximum, clamp_policy>;
 
 template<intmax_t minimum, intmax_t maximum, typename base_overflow_policy = throw_policy>

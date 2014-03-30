@@ -90,7 +90,7 @@ void check_numeric_limits_all() {
 }
 
 void check_minmax() {
-	constexpr bounded_integer::native_integer<-53, 1000> value(3_bi);
+	constexpr bounded_integer::integer<-53, 1000> value(3_bi);
 	constexpr auto minimum = bounded_integer::min(0_bi, 10_bi, 5_bi, value);
 	using min_type = decltype(minimum);
 	static_assert(minimum == 0_bi, "Incorrect minimum value.");
@@ -132,7 +132,7 @@ void check_policies() {
 }
 
 void check_compound_arithmetic() {
-	bounded_integer::native_integer<0, 10> x(5);
+	bounded_integer::integer<0, 10> x(5);
 	x += 5_bi;
 	assert(x == 10);
 	bounded_integer::checked_integer<-10, 10> y(-5);
@@ -215,7 +215,7 @@ void check_math() {
 
 template<typename T>
 void check_uncompressed_optional() {
-	using type = bounded_integer::native_integer<std::numeric_limits<T>::min(), std::numeric_limits<T>::max()>;
+	using type = bounded_integer::integer<std::numeric_limits<T>::min(), std::numeric_limits<T>::max()>;
 	static_assert(
 		sizeof(type) < sizeof(bounded_integer::optional<type>),
 		"Compressing an optional that should not be compressed."
@@ -223,7 +223,7 @@ void check_uncompressed_optional() {
 }
 template<intmax_t minimum, intmax_t maximum>
 void check_compressed_optional() {
-	using type = bounded_integer::native_integer<minimum, maximum>;
+	using type = bounded_integer::integer<minimum, maximum>;
 	using compressed_type = bounded_integer::optional<type>;
 	static_assert(
 		sizeof(type) == sizeof(compressed_type),

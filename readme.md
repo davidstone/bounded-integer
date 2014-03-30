@@ -16,12 +16,12 @@ The `bounded_integer` philosophy is the same as the C++ philosophy: you don't pa
 
 `bounded_integer` requires all integers to have more explicit bounds. These bounds, however, can be calculated for the user by the compiler. The following code snippet shows this principle:
 
-	bounded_integer::native_integer<1, 100> const x = f();
-	bounded_integer::native_integer<-3, 7> const y = g();
+	bounded_integer::integer<1, 100> const x = f();
+	bounded_integer::integer<-3, 7> const y = g();
 	auto const z = x + y;
-	static_assert(std::is_same<decltype(z), bounded_integer::native_integer<-2, 107>>::value, "Type of z incorrect.");
+	static_assert(std::is_same<decltype(z), bounded_integer::integer<-2, 107>>::value, "Type of z incorrect.");
 
-The type of `z` is calculated as the smallest type that can hold all possible values of the calculation `x + y`. The `native_integer` type says that when modifying or constructing a value, the compiler should not do any run time checks. Other possibilities, such as throwing an exception on overflow or clamping the value to the minimum or maximum are also possible by use of template policies (and those particular use cases are already built in to the library).
+The type of `z` is calculated as the smallest type that can hold all possible values of the calculation `x + y`. The `integer` type by defaults says that when modifying or constructing a value, the compiler should not do any run time checks. Other possibilities, such as throwing an exception on overflow or clamping the value to the minimum or maximum are also possible by use of template policies (and those particular use cases are already built in to the library).
 
 `bounded_integer` has the following goals:
 1. Never perform a run-time check when a static check would work instead
