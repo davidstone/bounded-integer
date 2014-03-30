@@ -17,7 +17,7 @@
 #ifndef BOUNDED_INTEGER_TYPEDEFS_HPP_
 #define BOUNDED_INTEGER_TYPEDEFS_HPP_
 
-#include "class.hpp"
+#include "forward_declaration.hpp"
 #include "policy/all.hpp"
 
 #include <cstdint>
