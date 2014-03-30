@@ -21,7 +21,7 @@
 #include "common_type.hpp"
 #include "enable_if.hpp"
 #include "forward_declaration.hpp"
-#include "make_bounded.hpp"
+#include "make.hpp"
 
 #include <cstdint>
 #include <type_traits>
@@ -53,14 +53,14 @@ template< \
 	enable_if_t<std::is_integral<T>::value> = clang_dummy \
 > \
 constexpr auto operator symbol(integer<lhs_min, lhs_max, overflow> const lhs, T const rhs) noexcept { \
-	return lhs symbol make_bounded(rhs); \
+	return lhs symbol make(rhs); \
 } \
 template< \
 	typename T, intmax_t rhs_min, intmax_t rhs_max, typename overflow, \
 	enable_if_t<std::is_integral<T>::value> = clang_dummy \
 > \
 constexpr auto operator symbol(T const lhs, integer<rhs_min, rhs_max, overflow> const rhs) noexcept { \
-	return make_bounded(lhs) symbol rhs; \
+	return make(lhs) symbol rhs; \
 }
 
 BOUNDED_INTEGER_OPERATOR_OVERLOADS(+, detail::plus)

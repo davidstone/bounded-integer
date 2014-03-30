@@ -16,7 +16,7 @@
 
 #include "optional.hpp"
 
-#include "../make_bounded.hpp"
+#include "../make.hpp"
 #include <type_traits>
 
 namespace {

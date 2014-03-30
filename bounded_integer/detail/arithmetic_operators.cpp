@@ -17,6 +17,7 @@
 #include "arithmetic_operators.hpp"
 #include "comparison_operators.hpp"
 #include "literal.hpp"
+#include "make.hpp"
 #include "numeric_limits.hpp"
 #include "policy/throw_policy.hpp"
 
@@ -139,8 +140,8 @@ static_assert(
 
 // modulo
 
-constexpr auto ten = bounded_integer::make_bounded<10>();
-constexpr auto eleven = bounded_integer::make_bounded<11>();
+constexpr auto ten = bounded_integer::make<10>();
+constexpr auto eleven = bounded_integer::make<11>();
 constexpr auto ten_result = ten % eleven;
 static_assert(
 	ten_result == ten,
@@ -151,8 +152,8 @@ static_assert(
 	"Incorrect modulo type with divisor one greater"
 );
 
-constexpr auto nine = bounded_integer::make_bounded<9>();
-constexpr auto one = bounded_integer::make_bounded<1>();
+constexpr auto nine = bounded_integer::make<9>();
+constexpr auto one = bounded_integer::make<1>();
 constexpr auto one_result = ten % nine;
 static_assert(
 	one_result == one,
@@ -173,7 +174,7 @@ static_assert(
 	"Incorrect modulo type with divisor two less"
 );
 
-constexpr auto two = bounded_integer::make_bounded<2>();
+constexpr auto two = bounded_integer::make<2>();
 constexpr auto two_result = eleven % nine;
 static_assert(
 	two_result == two,
@@ -209,7 +210,7 @@ static_assert(
 	"Incorrect modulo type with mixed signs"
 );
 
-constexpr auto result = bounded_integer::integer<0, 10, bounded_integer::null_policy>(10) % bounded_integer::make_bounded<6>();
+constexpr auto result = bounded_integer::integer<0, 10, bounded_integer::null_policy>(10) % bounded_integer::make<6>();
 #if 0
 static_assert(
 	static_cast<intmax_t>(std::numeric_limits<decltype(result)>::min()) == 0,
@@ -225,8 +226,8 @@ static_assert(
 	"wrong answer"
 );
 
-constexpr auto zero = bounded_integer::make_bounded<0>();
-constexpr auto zero_result = zero % bounded_integer::make_bounded<1>();
+constexpr auto zero = bounded_integer::make<0>();
+constexpr auto zero_result = zero % bounded_integer::make<1>();
 static_assert(
 	zero_result == zero,
 	"Incorrect modulo with zero for the dividend"

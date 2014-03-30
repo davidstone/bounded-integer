@@ -23,7 +23,7 @@
 #include "../class.hpp"
 #include "../comparison_operators.hpp"
 #include "../enable_if.hpp"
-#include "../make_bounded.hpp"
+#include "../make.hpp"
 #include "../minmax.hpp"
 
 #include <cstdint>
@@ -41,7 +41,7 @@ public:
 		m_max(std::move(maximum)) {
 	}
 	constexpr dynamic_policy() noexcept:
-		dynamic_policy(make_bounded<static_minimum>(), make_bounded<static_maximum>()) {
+		dynamic_policy(make<static_minimum>(), make<static_maximum>()) {
 	}
 	constexpr dynamic_policy(dynamic_policy const &) noexcept = default;
 	constexpr dynamic_policy(dynamic_policy &&) noexcept = default;
@@ -137,7 +137,7 @@ public:
 		m_max(std::move(maximum)) {
 	}
 	constexpr dynamic_max_policy() noexcept:
-		dynamic_max_policy(make_bounded<static_maximum>()) {
+		dynamic_max_policy(make<static_maximum>()) {
 	}
 	constexpr dynamic_max_policy(dynamic_max_policy const &) noexcept = default;
 	constexpr dynamic_max_policy(dynamic_max_policy &&) noexcept = default;
@@ -200,7 +200,7 @@ public:
 	}
 	
 	static constexpr underlying_type min() noexcept {
-		return make_bounded<static_minimum>();
+		return make<static_minimum>();
 	}
 	constexpr underlying_type const & max() const noexcept {
 		return m_max;
@@ -227,7 +227,7 @@ public:
 		m_min(std::move(minimum)) {
 	}
 	constexpr dynamic_min_policy() noexcept:
-		dynamic_min_policy(make_bounded<static_minimum>()) {
+		dynamic_min_policy(make<static_minimum>()) {
 	}
 	constexpr dynamic_min_policy(dynamic_min_policy const &) noexcept = default;
 	constexpr dynamic_min_policy(dynamic_min_policy &&) noexcept = default;
@@ -296,7 +296,7 @@ public:
 		return m_min;
 	}
 	static constexpr underlying_type max() noexcept {
-		return make_bounded<static_maximum>();
+		return make<static_maximum>();
 	}
 	
 	static constexpr bool is_modulo = overflow_policy::is_modulo;

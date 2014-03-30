@@ -18,7 +18,7 @@
 #define BOUNDED_INTEGER_LITERAL_HPP_
 
 #include "arithmetic_operators.hpp"
-#include "make_bounded.hpp"
+#include "make.hpp"
 
 namespace bounded_integer {
 namespace detail {
@@ -37,16 +37,16 @@ private:
 	static constexpr intmax_t radix = 10;
 	static constexpr intmax_t integer_scale = power(radix, sizeof...(digits));
 public:
-	static constexpr decltype(literal<digit>::value() * make_bounded<integer_scale>() + literal<digits...>::value()) value() noexcept {
-		return literal<digit>::value() * make_bounded<integer_scale>() + literal<digits...>::value();
+	static constexpr decltype(literal<digit>::value() * make<integer_scale>() + literal<digits...>::value()) value() noexcept {
+		return literal<digit>::value() * make<integer_scale>() + literal<digits...>::value();
 	}
 };
 
 template<char digit>
 class literal<digit> {
 public:
-	static constexpr decltype(make_bounded<digit - '0'>()) value() noexcept {
-		return make_bounded<digit - '0'>();
+	static constexpr decltype(make<digit - '0'>()) value() noexcept {
+		return make<digit - '0'>();
 	}
 };
 

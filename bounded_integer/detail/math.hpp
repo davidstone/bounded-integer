@@ -20,7 +20,7 @@
 #include "arithmetic_operators.hpp"
 #include "common_type.hpp"
 #include "forward_declaration.hpp"
-#include "make_bounded.hpp"
+#include "make.hpp"
 #include "minmax.hpp"
 #include <type_traits>
 
@@ -30,7 +30,7 @@ template<intmax_t minimum, intmax_t maximum, typename overflow_policy>
 constexpr auto abs(integer<minimum, maximum, overflow_policy> const value) noexcept {
 	// The 0 has to be there to restrict the range of possible values. Without
 	// it, abs(integer<-7, 3>) would be [-3, 7] instead of [0, 7].
-	return max(value, -value, make_bounded<0, overflow_policy>());
+	return max(value, -value, make<0, overflow_policy>());
 }
 
 }	// namespace bounded_integer

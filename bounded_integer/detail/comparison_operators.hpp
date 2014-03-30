@@ -20,7 +20,7 @@
 #include "common_type.hpp"
 #include "enable_if.hpp"
 #include "forward_declaration.hpp"
-#include "make_bounded.hpp"
+#include "make.hpp"
 
 #include <cstdint>
 
@@ -77,7 +77,7 @@ template<
 	enable_if_t<std::is_integral<T>::value> = clang_dummy
 >
 constexpr bool operator==(integer<minimum, maximum, overflow_policy> const lhs, T const rhs) noexcept {
-	return lhs == make_bounded(rhs);
+	return lhs == make(rhs);
 }
 
 template<intmax_t minimum, intmax_t maximum, typename overflow_policy>
@@ -159,7 +159,7 @@ template<
 	enable_if_t<std::is_integral<T>::value> = clang_dummy
 >
 constexpr bool operator<(integer<minimum, maximum, overflow_policy> const lhs, T const rhs) noexcept {
-	return lhs < make_bounded(rhs);
+	return lhs < make(rhs);
 }
 template<intmax_t minimum, intmax_t maximum, typename overflow_policy>
 constexpr bool operator<(integer<minimum, maximum, overflow_policy> const lhs, uintmax_t const rhs) noexcept {
@@ -172,7 +172,7 @@ template<
 	enable_if_t<std::is_integral<T>::value> = clang_dummy
 >
 constexpr bool operator<(T const lhs, integer<minimum, maximum, overflow_policy> const rhs) noexcept {
-	return make_bounded(lhs) < rhs;
+	return make(lhs) < rhs;
 }
 template<intmax_t minimum, intmax_t maximum, typename overflow_policy>
 constexpr bool operator<(uintmax_t const lhs, integer<minimum, maximum, overflow_policy> const rhs) noexcept {

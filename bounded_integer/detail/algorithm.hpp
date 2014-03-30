@@ -20,7 +20,7 @@
 #include "arithmetic_operators.hpp"
 #include "class.hpp"
 #include "comparison_operators.hpp"
-#include "make_bounded.hpp"
+#include "make.hpp"
 #include "numeric_limits.hpp"
 #include "policy/null_policy.hpp"
 
@@ -29,7 +29,7 @@ namespace bounded_integer {
 template<typename InputIterator, typename Predicate>
 auto count_if(InputIterator first, InputIterator const last, Predicate predicate) {
 	constexpr auto maximum = std::numeric_limits<typename InputIterator::difference_type>::max();
-	integer<0, static_cast<intmax_t>(maximum), null_policy> sum = make_bounded<0>();
+	integer<0, static_cast<intmax_t>(maximum), null_policy> sum = make<0>();
 	for (; first != last; ++first) {
 		if (predicate(*first)) {
 			++sum;

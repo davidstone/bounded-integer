@@ -20,7 +20,7 @@
 #include "arithmetic_operators.hpp"
 #include "class.hpp"
 #include "comparison_operators.hpp"
-#include "make_bounded.hpp"
+#include "make.hpp"
 #include "minmax.hpp"
 #include "numeric_limits.hpp"
 
@@ -47,7 +47,7 @@ public:
 	using index_type = integer<0, range_of_type<T>(), null_policy>;
 	using value_type = integer<
 		static_cast<intmax_t>(std::numeric_limits<T>::min()),
-		static_cast<intmax_t>(max(std::numeric_limits<T>::min(), std::numeric_limits<T>::max() - make_bounded<1>())),
+		static_cast<intmax_t>(max(std::numeric_limits<T>::min(), std::numeric_limits<T>::max() - make<1>())),
 		null_policy
 	>;
 	using difference_type = integer<-range_of_type<index_type>(), range_of_type<index_type>(), null_policy>;
@@ -108,7 +108,7 @@ iterator<T> & operator-=(iterator<T> & lhs, typename iterator<T>::difference_typ
 
 template<typename T>
 iterator<T> & operator++(iterator<T> & it) {
-	return it += make_bounded<1>();
+	return it += make<1>();
 }
 template<typename T>
 iterator<T> operator++(iterator<T> & it, int) {
@@ -119,7 +119,7 @@ iterator<T> operator++(iterator<T> & it, int) {
 
 template<typename T>
 iterator<T> & operator--(iterator<T> & it) {
-	return it -= make_bounded<1>();
+	return it -= make<1>();
 }
 template<typename T>
 iterator<T> operator--(iterator<T> & it, int) {
@@ -199,7 +199,7 @@ public:
 		return *begin();
 	}
 	constexpr value_type back() const {
-		return *(end() - make_bounded<1>());
+		return *(end() - make<1>());
 	}
 	constexpr value_type operator[](index_type const & index) const {
 		return begin()[index];
@@ -218,10 +218,10 @@ public:
 		return size_type(end() - begin(), non_check);
 	}
 	constexpr size_type max_size() const {
-		return make_bounded<detail::range_iterator::range_of_type<value_type>()>();
+		return make<detail::range_iterator::range_of_type<value_type>()>();
 	}
 	constexpr bool empty() const {
-		return size() == make_bounded<0>();
+		return size() == make<0>();
 	}
 
 private:
@@ -246,7 +246,7 @@ constexpr auto range(Begin && begin, End && end) noexcept {
 
 template<typename Size>
 constexpr auto range(Size && size) noexcept {
-	return range(make_bounded<0>(), std::forward<Size>(size));
+	return range(make<0>(), std::forward<Size>(size));
 }
 
 }	// namespace bounded_integer

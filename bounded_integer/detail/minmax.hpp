@@ -19,7 +19,7 @@
 
 #include "common_policy.hpp"
 #include "forward_declaration.hpp"
-#include "make_bounded.hpp"
+#include "make.hpp"
 #include "numeric_limits.hpp"
 #include "overlapping_range.hpp"
 
@@ -136,12 +136,12 @@ constexpr minmax_t<greater, LHS, RHS, Others...> max(LHS && lhs, RHS && rhs, Oth
 
 template<typename... Integers>
 constexpr auto min(Integers && ... integers) noexcept {
-	return detail::minmax::min(make_bounded(std::forward<Integers>(integers))...);
+	return detail::minmax::min(make(std::forward<Integers>(integers))...);
 }
 
 template<typename... Integers>
 constexpr auto max(Integers && ... integers) noexcept {
-	return detail::minmax::max(make_bounded(std::forward<Integers>(integers))...);
+	return detail::minmax::max(make(std::forward<Integers>(integers))...);
 }
 
 }	// namespace bounded_integer

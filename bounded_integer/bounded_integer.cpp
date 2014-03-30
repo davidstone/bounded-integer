@@ -159,14 +159,14 @@ void check_compound_arithmetic() {
 	// s += 4_bi;
 	// assert(s == 4);
 	int i = 9;
-	i -= bounded_integer::make_bounded(68);
+	i -= bounded_integer::make(68);
 	assert(i == -59);
 	long l = -7;
 	l *= z + 1_bi;
 	assert(l == -7);
 	i /= y;
 	assert(i == -5);
-	i %= bounded_integer::make_bounded(6);
+	i %= bounded_integer::make(6);
 	assert(i == -5);
 	i %= 4_bi;
 	assert(i == -1);

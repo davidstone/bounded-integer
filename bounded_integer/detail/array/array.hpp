@@ -19,7 +19,7 @@
 
 #include "../arithmetic_operators.hpp"
 #include "../class.hpp"
-#include "../make_bounded.hpp"
+#include "../make.hpp"
 #include "../policy/null_policy.hpp"
 #include "../policy/throw_policy.hpp"
 
@@ -171,10 +171,10 @@ public:
 	using pointer = typename iterator::pointer;
 	
 	constexpr size_type size() const noexcept {
-		return make_bounded<size_>();
+		return make<size_>();
 	}
 	constexpr bool empty() const noexcept {
-		return size() == make_bounded<0>();
+		return size() == make<0>();
 	}
 	constexpr size_type max_size() const noexcept {
 		return size();
@@ -212,16 +212,16 @@ public:
 	}
 
 	constexpr const_reference front() const noexcept {
-		return operator[](make_bounded<0>());
+		return operator[](make<0>());
 	}
 	reference front() noexcept {
-		return operator[](make_bounded<0>());
+		return operator[](make<0>());
 	}
 	constexpr const_reference back() const noexcept {
-		return operator[](size() - make_bounded<1>());
+		return operator[](size() - make<1>());
 	}
 	reference back() noexcept {
-		return operator[](size() - make_bounded<1>());
+		return operator[](size() - make<1>());
 	}
 
 	constexpr const_iterator begin() const noexcept {
@@ -310,15 +310,15 @@ constexpr bool operator>=(array<T, size> const & lhs, array<T, size> const & rhs
 
 template<std::size_t index, typename T, std::size_t size>
 constexpr T const & get(array<T, size> const & a) noexcept {
-	return a[make_bounded<index>()];
+	return a[make<index>()];
 }
 template<std::size_t index, typename T, std::size_t size>
 constexpr T & get(array<T, size> & a) noexcept {
-	return a[make_bounded<index>()];
+	return a[make<index>()];
 }
 template<std::size_t index, typename T, std::size_t size>
 constexpr T && get(array<T, size> && a) noexcept {
-	return std::move(a[make_bounded<index>()]);
+	return std::move(a[make<index>()]);
 }
 
 template<typename T, std::size_t size>

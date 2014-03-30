@@ -20,21 +20,22 @@
 #include "arithmetic_operators.hpp"
 #include "enable_if.hpp"
 #include "forward_declaration.hpp"
+#include "make.hpp"
 #include <type_traits>
 
 namespace bounded_integer {
 
-// We call make_bounded with the target's overflow policy because we need this
-// exact overflow policy. We do not want to rely on common_policy here.
+// We call make with the target's overflow policy because we need this exact
+// overflow policy. We do not want to rely on common_policy here.
 #define BOUNDED_INTEGER_COMPOUND_ASSIGNMENT_OPERATOR_TARGET(symbol) \
 template<intmax_t minimum, intmax_t maximum, typename overflow_policy, typename T> \
 integer<minimum, maximum, overflow_policy> & operator symbol##=(integer<minimum, maximum, overflow_policy> & lhs, T && rhs) { \
-	lhs = static_cast<integer<minimum, maximum, overflow_policy>>(lhs symbol make_bounded<overflow_policy>(std::forward<T>(rhs))); \
+	lhs = static_cast<integer<minimum, maximum, overflow_policy>>(lhs symbol make<overflow_policy>(std::forward<T>(rhs))); \
 	return lhs; \
 } \
 template<intmax_t minimum, intmax_t maximum, typename overflow_policy, typename T> \
 integer<minimum, maximum, overflow_policy> volatile & operator symbol##=(integer<minimum, maximum, overflow_policy> volatile & lhs, T && rhs) { \
-	lhs = static_cast<integer<minimum, maximum, overflow_policy>>(lhs symbol make_bounded<overflow_policy>(std::forward<T>(rhs))); \
+	lhs = static_cast<integer<minimum, maximum, overflow_policy>>(lhs symbol make<overflow_policy>(std::forward<T>(rhs))); \
 	return lhs; \
 }
 
@@ -72,12 +73,12 @@ BOUNDED_INTEGER_COMPOUND_ASSIGNMENT_OPERATOR_SOURCE(%=)
 
 template<intmax_t minimum, intmax_t maximum, typename overflow_policy>
 integer<minimum, maximum, overflow_policy> & operator++(integer<minimum, maximum, overflow_policy> & value) {
-	value += make_bounded<1>();
+	value += make<1>();
 	return value;
 }
 template<intmax_t minimum, intmax_t maximum, typename overflow_policy>
 integer<minimum, maximum, overflow_policy> volatile & operator++(integer<minimum, maximum, overflow_policy> volatile & value) {
-	value += make_bounded<1>();
+	value += make<1>();
 	return value;
 }
 
@@ -97,12 +98,12 @@ integer<minimum, maximum, overflow_policy> operator++(integer<minimum, maximum, 
 
 template<intmax_t minimum, intmax_t maximum, typename overflow_policy>
 integer<minimum, maximum, overflow_policy> & operator--(integer<minimum, maximum, overflow_policy> & value) {
-	value -= make_bounded<1>();
+	value -= make<1>();
 	return value;
 }
 template<intmax_t minimum, intmax_t maximum, typename overflow_policy>
 integer<minimum, maximum, overflow_policy> volatile & operator--(integer<minimum, maximum, overflow_policy> volatile & value) {
-	value -= make_bounded<1>();
+	value -= make<1>();
 	return value;
 }
 

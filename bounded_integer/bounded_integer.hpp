@@ -23,7 +23,7 @@
 #include "detail/conditional.hpp"
 #include "detail/iterator.hpp"
 #include "detail/literal.hpp"
-#include "detail/make_bounded.hpp"
+#include "detail/make.hpp"
 #include "detail/math.hpp"
 #include "detail/minmax.hpp"
 #include "detail/numeric_limits.hpp"

@@ -19,7 +19,7 @@
 
 #include "arithmetic_operators.hpp"
 #include "class.hpp"
-#include "make_bounded.hpp"
+#include "make.hpp"
 
 #include <iterator>
 
@@ -31,14 +31,14 @@ namespace bounded_integer {
 // ever happen.
 
 // TODO: constexpr when gcc supports it
-template<typename Iterator, typename Offset = decltype(make_bounded<1>())>
-auto next(Iterator it, Offset const offset = make_bounded<1>()) {
+template<typename Iterator, typename Offset = decltype(make<1>())>
+auto next(Iterator it, Offset const offset = make<1>()) {
 	std::advance(it, offset);
 	return it;
 }
 
-template<typename Iterator, typename Offset = decltype(make_bounded<1>())>
-auto prev(Iterator it, Offset const offset = make_bounded<1>()) {
+template<typename Iterator, typename Offset = decltype(make<1>())>
+auto prev(Iterator it, Offset const offset = make<1>()) {
 	std::advance(it, -offset);
 	return it;
 }

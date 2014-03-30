@@ -73,13 +73,13 @@ template<typename overflow_policy = void, typename T = void>
 constexpr equivalent_type<T, typename std::conditional<std::is_void<overflow_policy>::value,
 	detail::equivalent_overflow_policy<T>,
 	overflow_policy
->::type> make_bounded(T const value) noexcept {
+>::type> make(T const value) noexcept {
 	static_assert(std::numeric_limits<T>::is_integer, "Must be an integer type.");
 	return {value, non_check};
 }
 
 template<intmax_t value, typename overflow_policy = null_policy>
-constexpr integer<value, value, overflow_policy> make_bounded() noexcept {
+constexpr integer<value, value, overflow_policy> make() noexcept {
 	return {value, non_check};
 }
 

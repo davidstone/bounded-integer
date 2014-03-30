@@ -14,7 +14,7 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with this program. If not, see <http://www.gnu.org/licenses/>.
 
-#include "make_bounded.hpp"
+#include "make.hpp"
 #include "policy/throw_policy.hpp"
 
 namespace {

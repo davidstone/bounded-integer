@@ -15,7 +15,7 @@
 // along with this program. If not, see <http://www.gnu.org/licenses/>.
 
 #include "class.hpp"
-#include "make_bounded.hpp"
+#include "make.hpp"
 #include <type_traits>
 
 namespace {
