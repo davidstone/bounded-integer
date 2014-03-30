@@ -1,5 +1,5 @@
 // array class that uses bounded_integer for things like indexing
-// Copyright (C) 2013 David Stone
+// Copyright (C) 2014 David Stone
 //
 // This program is free software: you can redistribute it and / or modify
 // it under the terms of the GNU Affero General Public License as
@@ -19,5 +19,6 @@
 
 #include "detail/array/array.hpp"
 #include "detail/array/make_array.hpp"
+#include "bounded_integer.hpp"
 
 #endif	// BOUNDED_INTEGER_ARRAY_HPP_

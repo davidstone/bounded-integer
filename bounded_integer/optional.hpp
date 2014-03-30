@@ -21,5 +21,6 @@
 #include "detail/optional/make_optional_array.hpp"
 #include "detail/optional/optional.hpp"
 #include "detail/optional/comparison_operators.hpp"
+#include "bounded_integer.hpp"
 
 #endif	// BOUNDED_INTEGER_OPTIONAL_HPP_
