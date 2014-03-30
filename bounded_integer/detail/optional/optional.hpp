@@ -37,8 +37,8 @@ struct get_underlying {
 	using type = T;
 };
 template<intmax_t minimum, intmax_t maximum, typename overflow>
-struct get_underlying<bounded_integer<minimum, maximum, overflow>> {
-	using type = typename bounded_integer<minimum, maximum, overflow>::underlying_type;
+struct get_underlying<integer<minimum, maximum, overflow>> {
+	using type = typename integer<minimum, maximum, overflow>::underlying_type;
 };
 
 template<typename T>

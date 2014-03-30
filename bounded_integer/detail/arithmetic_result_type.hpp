@@ -1,5 +1,5 @@
 // result_type of arithmetic operations
-// Copyright (C) 2013 David Stone
+// Copyright (C) 2014 David Stone
 //
 // This program is free software: you can redistribute it and / or modify
 // it under the terms of the GNU Affero General Public License as
@@ -351,14 +351,14 @@ template<
 	intmax_t rhs_min, intmax_t rhs_max, typename rhs_overflow,
 	typename Operator
 >
-using operator_result = bounded_integer<
+using operator_result = integer<
 	detail::operator_range<lhs_min, lhs_max, rhs_min, rhs_max, Operator>::min(),
 	detail::operator_range<lhs_min, lhs_max, rhs_min, rhs_max, Operator>::max(),
 	common_policy_t<lhs_overflow, rhs_overflow>
 >;
 
 template<intmax_t minimum, intmax_t maximum, typename overflow_policy>
-using unary_minus_result = bounded_integer<-maximum, -minimum, overflow_policy>;
+using unary_minus_result = integer<-maximum, -minimum, overflow_policy>;
 
 }	// namespace bounded_integer
 

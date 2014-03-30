@@ -33,7 +33,7 @@ public:
 	using type = null_policy;
 };
 template<intmax_t minimum, intmax_t maximum, typename overflow_policy>
-class equivalent_overflow_policy_c<bounded_integer<minimum, maximum, overflow_policy>> {
+class equivalent_overflow_policy_c<integer<minimum, maximum, overflow_policy>> {
 public:
 	using type = overflow_policy;
 };
@@ -44,7 +44,7 @@ using equivalent_overflow_policy = typename equivalent_overflow_policy_c<T>::typ
 }	// namespace detail
 
 template<typename T, typename overflow_policy = detail::equivalent_overflow_policy<T>>
-using equivalent_type = bounded_integer<
+using equivalent_type = integer<
 	static_cast<intmax_t>(std::numeric_limits<T>::min()),
 	static_cast<intmax_t>(std::numeric_limits<T>::max()),
 	overflow_policy
@@ -69,26 +69,18 @@ using equivalent_type = bounded_integer<
 // default it to something (it doesn't matter what), but the type will always be
 // deduced as whatever we pass as the argument type.
 
-template<
-	typename overflow_policy = void,
-	typename T = void,
-	typename result_t = equivalent_type<
-		T,
-		typename std::conditional<
-			std::is_void<overflow_policy>::value,
-			detail::equivalent_overflow_policy<T>,
-			overflow_policy
-		>::type
-	>
->
-constexpr result_t make_bounded(T const value) noexcept {
+template<typename overflow_policy = void, typename T = void>
+constexpr equivalent_type<T, typename std::conditional<std::is_void<overflow_policy>::value,
+	detail::equivalent_overflow_policy<T>,
+	overflow_policy
+>::type> make_bounded(T const value) noexcept {
 	static_assert(std::numeric_limits<T>::is_integer, "Must be an integer type.");
-	return result_t(value, non_check);
+	return {value, non_check};
 }
 
 template<intmax_t value, typename overflow_policy = null_policy>
-constexpr bounded_integer<value, value, overflow_policy> make_bounded() noexcept {
-	return bounded_integer<value, value, overflow_policy>(value, non_check);
+constexpr integer<value, value, overflow_policy> make_bounded() noexcept {
+	return {value, non_check};
 }
 
 }	// namespace bounded_integer

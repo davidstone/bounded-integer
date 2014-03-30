@@ -23,13 +23,13 @@
 namespace {
 using namespace ::bounded_integer::literal;
 
-constexpr bounded_integer::bounded_integer<1, 10, bounded_integer::throw_policy> const x(9);
+constexpr bounded_integer::integer<1, 10, bounded_integer::throw_policy> const x(9);
 static_assert(
 	sizeof(x) == 1,
 	"bounded_integer too big!"
 );
-constexpr bounded_integer::bounded_integer<-3, 11, bounded_integer::throw_policy> const y(x);
-constexpr bounded_integer::bounded_integer<-3, 11, bounded_integer::throw_policy> const z(4);
+constexpr bounded_integer::integer<-3, 11, bounded_integer::throw_policy> const y(x);
+constexpr bounded_integer::integer<-3, 11, bounded_integer::throw_policy> const z(4);
 static_assert(
 	std::numeric_limits<decltype(z)>::is_signed,
 	"bounded_integer with negative value in range should be signed."
@@ -120,8 +120,8 @@ static_assert(
 	"Unary plus not a no-op."
 );
 
-constexpr bounded_integer::bounded_integer<0, 2, bounded_integer::throw_policy> left_shift_lhs(1);
-constexpr bounded_integer::bounded_integer<0, 60, bounded_integer::throw_policy> left_shift_rhs(3);
+constexpr bounded_integer::integer<0, 2, bounded_integer::throw_policy> left_shift_lhs(1);
+constexpr bounded_integer::integer<0, 60, bounded_integer::throw_policy> left_shift_rhs(3);
 constexpr auto left_shift_result = left_shift_lhs << left_shift_rhs;
 static_assert(
 	std::numeric_limits<decltype(left_shift_result)>::min() == 0,
@@ -185,10 +185,10 @@ static_assert(
 );
 
 
-constexpr bounded_integer::bounded_integer<17, 23, bounded_integer::throw_policy> positive_range(20);
-constexpr bounded_integer::bounded_integer<-54, -6, bounded_integer::throw_policy> negative_range(-33);
+constexpr bounded_integer::integer<17, 23, bounded_integer::throw_policy> positive_range(20);
+constexpr bounded_integer::integer<-54, -6, bounded_integer::throw_policy> negative_range(-33);
 constexpr auto positive_negative_result = positive_range % negative_range;
-constexpr bounded_integer::bounded_integer<0, 23, bounded_integer::throw_policy> positive_negative(20 % -33);
+constexpr bounded_integer::integer<0, 23, bounded_integer::throw_policy> positive_negative(20 % -33);
 static_assert(
 	positive_negative_result == positive_negative,
 	"Incorrect modulo with mixed signs"
@@ -199,7 +199,7 @@ static_assert(
 );
 
 constexpr auto negative_positive_result = negative_range % positive_range;
-constexpr bounded_integer::bounded_integer<-22, 0, bounded_integer::throw_policy> negative_positive(-33 % 20);
+constexpr bounded_integer::integer<-22, 0, bounded_integer::throw_policy> negative_positive(-33 % 20);
 static_assert(
 	negative_positive_result == negative_positive,
 	"Incorrect modulo with mixed signs"
@@ -209,7 +209,7 @@ static_assert(
 	"Incorrect modulo type with mixed signs"
 );
 
-constexpr auto result = bounded_integer::bounded_integer<0, 10, bounded_integer::null_policy>(10) % bounded_integer::make_bounded<6>();
+constexpr auto result = bounded_integer::integer<0, 10, bounded_integer::null_policy>(10) % bounded_integer::make_bounded<6>();
 #if 0
 static_assert(
 	static_cast<intmax_t>(std::numeric_limits<decltype(result)>::min()) == 0,

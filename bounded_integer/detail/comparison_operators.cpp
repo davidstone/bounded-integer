@@ -20,10 +20,10 @@
 
 namespace {
 
-constexpr bounded_integer::bounded_integer<1, 10, bounded_integer::null_policy> a(5);
+constexpr bounded_integer::integer<1, 10, bounded_integer::null_policy> a(5);
 static_assert(a == a, "Values do not equal themselves");
 static_assert(a == 5, "Values do not equal their underlying value");
-constexpr bounded_integer::bounded_integer<4, 36346, bounded_integer::throw_policy> b(5);
+constexpr bounded_integer::integer<4, 36346, bounded_integer::throw_policy> b(5);
 static_assert(a == b, "Values do not equal equivalent other bounded_integer types");
 
 static_assert(bounded_integer::make_bounded<5>() != bounded_integer::make_bounded<6>(), "5 should not equal 6");

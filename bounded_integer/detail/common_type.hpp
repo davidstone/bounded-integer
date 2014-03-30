@@ -33,21 +33,21 @@ template<
 	intmax_t rhs_min, intmax_t rhs_max, typename rhs_policy
 >
 struct common_type<
-	bounded_integer::bounded_integer<lhs_min, lhs_max, lhs_policy>,
-	bounded_integer::bounded_integer<rhs_min, rhs_max, rhs_policy>
+	bounded_integer::integer<lhs_min, lhs_max, lhs_policy>,
+	bounded_integer::integer<rhs_min, rhs_max, rhs_policy>
 > {
 private:
 	static constexpr auto minimum = (lhs_min < rhs_min) ? lhs_min : rhs_min;
 	static constexpr auto maximum = (lhs_max > rhs_max) ? lhs_max : rhs_max;
 public:
-	using type = bounded_integer::bounded_integer<minimum, maximum, bounded_integer::common_policy_t<lhs_policy, rhs_policy>>;
+	using type = bounded_integer::integer<minimum, maximum, bounded_integer::common_policy_t<lhs_policy, rhs_policy>>;
 };
 
 // Common type of a bounded_integer and a built-in
 template<intmax_t minimum, intmax_t maximum, typename overflow_policy, typename T>
-struct common_type<bounded_integer::bounded_integer<minimum, maximum, overflow_policy>, T> {
+struct common_type<bounded_integer::integer<minimum, maximum, overflow_policy>, T> {
 private:
-	using type1 = bounded_integer::bounded_integer<minimum, maximum, overflow_policy>;
+	using type1 = bounded_integer::integer<minimum, maximum, overflow_policy>;
 	using type2 = bounded_integer::equivalent_type<decay_t<T>>;
 public:
 	using type = common_type_t<type1, type2>;
@@ -71,9 +71,9 @@ public:
 // specializations for now.
 
 template<typename integer1, intmax_t minimum, intmax_t maximum, typename overflow_policy>
-struct common_type<integer1, bounded_integer::bounded_integer<minimum, maximum, overflow_policy>> {
+struct common_type<integer1, bounded_integer::integer<minimum, maximum, overflow_policy>> {
 public:
-	using type = common_type_t<bounded_integer::bounded_integer<minimum, maximum, overflow_policy>, integer1>;
+	using type = common_type_t<bounded_integer::integer<minimum, maximum, overflow_policy>, integer1>;
 };
 
 
@@ -95,7 +95,7 @@ template<
 	typename... Ts
 >
 struct common_type<
-	bounded_integer::bounded_integer<minimum, maximum, overflow_policy>,
+	bounded_integer::integer<minimum, maximum, overflow_policy>,
 	T1, T2, T3, T4, T5, T6, T7, T8, T9, T10,
 	T11, T12, T13, T14, T15, T16, T17, T18, T19, T20,
 	T21, T22, T23, T24, T25, T26, T27, T28, T29, T30,
@@ -104,7 +104,7 @@ struct common_type<
 	Ts...
 > {
 private:
-	using type0 = bounded_integer::bounded_integer<minimum, maximum, overflow_policy>;
+	using type0 = bounded_integer::integer<minimum, maximum, overflow_policy>;
 public:
 	using type = common_type_t<
 		common_type_t<

@@ -60,7 +60,7 @@ static_assert(
 	"none_t element wrong."
 );
 static_assert(
-	std::is_same<bounded_integer::optional<bounded_integer::bounded_integer<0, 6, bounded_integer::null_policy>>, decltype(known_optional_array)::value_type>::value,
+	std::is_same<bounded_integer::optional<bounded_integer::integer<0, 6, bounded_integer::null_policy>>, decltype(known_optional_array)::value_type>::value,
 	"Array element type wrong for mixed bounded_integer + none_t arguments."
 );
 

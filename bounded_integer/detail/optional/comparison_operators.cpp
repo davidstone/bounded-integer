@@ -21,7 +21,7 @@
 namespace {
 using namespace bounded_integer::literal;
 
-using integer = bounded_integer::bounded_integer<0, 10, bounded_integer::null_policy>;
+using integer = bounded_integer::integer<0, 10, bounded_integer::null_policy>;
 
 constexpr bounded_integer::optional<integer> uninitialized;
 

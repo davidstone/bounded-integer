@@ -32,7 +32,7 @@ The type of `z` is calculated as the smallest type that can hold all possible va
 
 ## Using policies
 
-The general form of the class is `bounded_integer::bounded_integer<minimum, maximum, policy>`. `policy` can do pretty much anything, including being stateful to handle bounds that are only known at run-time.
+The general form of the class is `bounded_integer::integer<minimum, maximum, policy>`. `policy` can do pretty much anything, including being stateful to handle bounds that are only known at run-time.
 
 # bounded_integer installation instructions
 

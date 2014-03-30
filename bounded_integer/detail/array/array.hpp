@@ -40,8 +40,8 @@ template<typename T, intmax_t size>
 class iterator {
 public:
 	using value_type = T;
-	using difference_type = bounded_integer<-size, size, null_policy>;
-	using index_type = bounded_integer<0, size - 1, throw_policy>;
+	using difference_type = integer<-size, size, null_policy>;
+	using index_type = integer<0, size - 1, throw_policy>;
 	using pointer = value_type *;
 	using reference = value_type &;
 	using iterator_category = std::random_access_iterator_tag;
@@ -162,7 +162,7 @@ public:
 	using const_reverse_iterator = std::reverse_iterator<const_iterator>;
 	using reverse_iterator = std::reverse_iterator<iterator>;
 
-	using size_type = bounded_integer<size_, size_, null_policy>;
+	using size_type = integer<size_, size_, null_policy>;
 	using difference_type = typename const_iterator::difference_type;
 	using index_type = typename const_iterator::index_type;
 	using const_reference = typename const_iterator::reference;

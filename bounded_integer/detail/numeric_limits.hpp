@@ -155,9 +155,9 @@ public:
 namespace std {
 
 template<intmax_t minimum, intmax_t maximum, typename overflow_policy>
-class numeric_limits<bounded_integer::bounded_integer<minimum, maximum, overflow_policy>> {
+class numeric_limits<bounded_integer::integer<minimum, maximum, overflow_policy>> {
 private:
-	using type = bounded_integer::bounded_integer<minimum, maximum, overflow_policy>;
+	using type = bounded_integer::integer<minimum, maximum, overflow_policy>;
 public:
 	static constexpr bool is_specialized = true;
 	static constexpr bool is_signed = minimum < 0;

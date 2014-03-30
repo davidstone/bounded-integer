@@ -20,7 +20,7 @@
 
 namespace {
 
-using bounded_type = bounded_integer::bounded_integer<std::numeric_limits<int>::min(), std::numeric_limits<int>::max(), bounded_integer::null_policy>;
+using bounded_type = bounded_integer::integer<std::numeric_limits<int>::min(), std::numeric_limits<int>::max(), bounded_integer::null_policy>;
 using type = bounded_integer::equivalent_type<int>;
 
 static_assert(std::is_convertible<int, bounded_type>::value, "Cannot convert integer type to bounded_integer with same range.");

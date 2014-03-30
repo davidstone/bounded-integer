@@ -285,7 +285,7 @@ void check_dynamic_policy() {
 	constexpr auto static_min = 0;
 	constexpr auto static_max = 10;
 	using policy_type = bounded_integer::dynamic_policy<static_min, static_max, bounded_integer::throw_policy>;
-	using type = bounded_integer::bounded_integer<static_min, static_max, policy_type>;
+	using type = bounded_integer::integer<static_min, static_max, policy_type>;
 	constexpr policy_type policy(min, max);
 	constexpr type compile(value, policy);
 	static_assert(compile == value, "Incorrect value with dynamic bounds.");

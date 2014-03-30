@@ -80,7 +80,7 @@ constexpr auto get_overflow_policy(T const & value) noexcept {
 }
 
 template<intmax_t minimum, intmax_t maximum, typename OverflowPolicy>
-class bounded_integer : private OverflowPolicy {
+class integer : private OverflowPolicy {
 public:
 	static_assert(minimum <= maximum, "Maximum cannot be less than minimum");
 	using underlying_type = detail::underlying_t<minimum, maximum>;
@@ -94,35 +94,35 @@ public:
 	static_assert(std::is_nothrow_default_constructible<overflow_policy_type>::value, "overflow_policy must be nothrow default constructible.");
 	static_assert(std::is_nothrow_move_constructible<overflow_policy_type>::value, "overflow_policy must be nothrow move constructible.");
 
-	constexpr bounded_integer() noexcept = default;
-	constexpr bounded_integer(bounded_integer const &) noexcept = default;
-	constexpr bounded_integer(bounded_integer &&) noexcept = default;
+	constexpr integer() noexcept = default;
+	constexpr integer(integer const &) noexcept = default;
+	constexpr integer(integer &&) noexcept = default;
 
 	// Use these constructors if you know by means that cannot be determined by
 	// the type system that the value really does fit in the range.
 	template<typename T, enable_if_t<
 		detail::is_explicitly_constructible_from<overflow_policy_type, T>(minimum, maximum)
 	> = clang_dummy>
-	constexpr bounded_integer(T && other, overflow_policy_type policy, non_check_t) noexcept:
+	constexpr integer(T && other, overflow_policy_type policy, non_check_t) noexcept:
 		overflow_policy_type(std::move(policy)),
 		m_value(static_cast<underlying_type>(std::forward<T>(other))) {
 	}
 	template<typename T, enable_if_t<
 		detail::is_explicitly_constructible_from<overflow_policy_type, T>(minimum, maximum)
 	> = clang_dummy>
-	constexpr bounded_integer(T && other, non_check_t) noexcept:
-		bounded_integer(std::forward<T>(other), static_cast<overflow_policy_type>(get_overflow_policy(std::forward<T>(other))), non_check) {
+	constexpr integer(T && other, non_check_t) noexcept:
+		integer(std::forward<T>(other), static_cast<overflow_policy_type>(get_overflow_policy(std::forward<T>(other))), non_check) {
 	}
 
 
 	template<typename T, enable_if_t<
 		detail::is_explicitly_constructible_from<overflow_policy_type, T>(minimum, maximum)
 	> = clang_dummy>
-	constexpr bounded_integer(T && other, overflow_policy_type policy)
+	constexpr integer(T && other, overflow_policy_type policy)
 		noexcept(noexcept(
 			policy.assignment(static_cast<intmax_t>(std::forward<T>(other)), minimum, maximum)
 		)):
-		bounded_integer(policy.assignment(static_cast<intmax_t>(std::forward<T>(other)), minimum, maximum), policy, non_check) {
+		integer(policy.assignment(static_cast<intmax_t>(std::forward<T>(other)), minimum, maximum), policy, non_check) {
 	}
 
 
@@ -130,33 +130,33 @@ public:
 	template<typename T, enable_if_t<
 		detail::is_implicitly_constructible_from<T>(minimum, maximum)
 	> = clang_dummy>
-	constexpr bounded_integer(T && other)
+	constexpr integer(T && other)
 		noexcept(noexcept(
-			bounded_integer(
+			integer(
 				std::forward<T>(other), static_cast<overflow_policy_type>(get_overflow_policy(std::forward<T>(other))))
 		)):
-		bounded_integer(std::forward<T>(other), static_cast<overflow_policy_type>(get_overflow_policy(std::forward<T>(other)))) {
+		integer(std::forward<T>(other), static_cast<overflow_policy_type>(get_overflow_policy(std::forward<T>(other)))) {
 	}
 
 	template<typename T, enable_if_t<
 		!detail::is_implicitly_constructible_from<T>(minimum, maximum) and
 		detail::is_explicitly_constructible_from<overflow_policy_type, T>(minimum, maximum)
 	> = clang_dummy>
-	constexpr explicit bounded_integer(T && other)
+	constexpr explicit integer(T && other)
 		noexcept(noexcept(
-			bounded_integer(
+			integer(
 				std::forward<T>(other), static_cast<overflow_policy_type>(get_overflow_policy(std::forward<T>(other))))
 		)):
-		bounded_integer(std::forward<T>(other), static_cast<overflow_policy_type>(get_overflow_policy(std::forward<T>(other)))) {
+		integer(std::forward<T>(other), static_cast<overflow_policy_type>(get_overflow_policy(std::forward<T>(other)))) {
 	}
 
 	template<typename T, enable_if_t<std::is_enum<T>::value> = clang_dummy>
-	constexpr explicit bounded_integer(T other, non_check_t) noexcept:
-		bounded_integer(static_cast<typename std::underlying_type<T>::type>(other), non_check) {
+	constexpr explicit integer(T other, non_check_t) noexcept:
+		integer(static_cast<typename std::underlying_type<T>::type>(other), non_check) {
 	}
 	template<typename T, enable_if_t<std::is_enum<T>::value> = clang_dummy>
-	constexpr explicit bounded_integer(T other) noexcept(noexcept(bounded_integer(static_cast<typename std::underlying_type<T>::type>(other)))):
-		bounded_integer(static_cast<typename std::underlying_type<T>::type>(other)) {
+	constexpr explicit integer(T other) noexcept(noexcept(integer(static_cast<typename std::underlying_type<T>::type>(other)))):
+		integer(static_cast<typename std::underlying_type<T>::type>(other)) {
 	}
 
 	template<typename T>
@@ -168,21 +168,21 @@ public:
 		m_value = static_cast<underlying_type>(std::forward<T>(other));
 	}
 	
-	bounded_integer & operator=(bounded_integer const & other) noexcept(noexcept(overflow_policy_type{}.assignment(static_cast<intmax_t>(other), minimum, maximum))) {
+	integer & operator=(integer const & other) noexcept(noexcept(overflow_policy_type{}.assignment(static_cast<intmax_t>(other), minimum, maximum))) {
 		unchecked_assignment(overflow_policy().assignment(static_cast<intmax_t>(other), minimum, maximum));
 		return *this;
 	}
-	bounded_integer & operator=(bounded_integer && other) noexcept(noexcept(overflow_policy_type{}.assignment(static_cast<intmax_t>(std::move(other)), minimum, maximum))) {
+	integer & operator=(integer && other) noexcept(noexcept(overflow_policy_type{}.assignment(static_cast<intmax_t>(std::move(other)), minimum, maximum))) {
 		unchecked_assignment(overflow_policy().assignment(static_cast<intmax_t>(std::move(other)), minimum, maximum));
 		return *this;
 	}
 	template<typename T>
-	bounded_integer & operator=(T && other) noexcept(noexcept(overflow_policy_type{}.assignment(static_cast<intmax_t>(std::forward<T>(other)), minimum, maximum))) {
+	integer & operator=(T && other) noexcept(noexcept(overflow_policy_type{}.assignment(static_cast<intmax_t>(std::forward<T>(other)), minimum, maximum))) {
 		unchecked_assignment(overflow_policy().assignment(static_cast<intmax_t>(std::forward<T>(other)), minimum, maximum));
 		return *this;
 	}
 	template<typename T>
-	bounded_integer volatile & operator=(T && other) volatile noexcept(noexcept(overflow_policy_type{}.assignment(static_cast<intmax_t>(std::forward<T>(other)), minimum, maximum))) {
+	integer volatile & operator=(T && other) volatile noexcept(noexcept(overflow_policy_type{}.assignment(static_cast<intmax_t>(std::forward<T>(other)), minimum, maximum))) {
 		unchecked_assignment(overflow_policy().assignment(static_cast<intmax_t>(std::forward<T>(other)), minimum, maximum));
 		return *this;
 	}

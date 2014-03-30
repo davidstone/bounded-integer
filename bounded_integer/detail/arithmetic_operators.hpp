@@ -39,8 +39,8 @@ template< \
 	intmax_t rhs_min, intmax_t rhs_max, typename rhs_policy \
 > \
 constexpr auto operator symbol( \
-	bounded_integer<lhs_min, lhs_max, lhs_policy> const lhs, \
-	bounded_integer<rhs_min, rhs_max, rhs_policy> const rhs \
+	integer<lhs_min, lhs_max, lhs_policy> const lhs, \
+	integer<rhs_min, rhs_max, rhs_policy> const rhs \
 ) noexcept { \
 	using result_t = operator_result<lhs_min, lhs_max, lhs_policy, rhs_min, rhs_max, rhs_policy, operator_name>; \
 	using common_t = typename std::common_type_t<result_t, decltype(lhs), decltype(rhs)>::underlying_type; \
@@ -52,14 +52,14 @@ template< \
 	intmax_t lhs_min, intmax_t lhs_max, typename overflow, typename T, \
 	enable_if_t<std::is_integral<T>::value> = clang_dummy \
 > \
-constexpr auto operator symbol(bounded_integer<lhs_min, lhs_max, overflow> const lhs, T const rhs) noexcept { \
+constexpr auto operator symbol(integer<lhs_min, lhs_max, overflow> const lhs, T const rhs) noexcept { \
 	return lhs symbol make_bounded(rhs); \
 } \
 template< \
 	typename T, intmax_t rhs_min, intmax_t rhs_max, typename overflow, \
 	enable_if_t<std::is_integral<T>::value> = clang_dummy \
 > \
-constexpr auto operator symbol(T const lhs, bounded_integer<rhs_min, rhs_max, overflow> const rhs) noexcept { \
+constexpr auto operator symbol(T const lhs, integer<rhs_min, rhs_max, overflow> const rhs) noexcept { \
 	return make_bounded(lhs) symbol rhs; \
 }
 
@@ -78,9 +78,9 @@ BOUNDED_INTEGER_OPERATOR_OVERLOADS(>>, detail::right_shift)
 // Unary minus
 
 template<intmax_t minimum, intmax_t maximum, typename overflow_policy>
-constexpr auto operator-(bounded_integer<minimum, maximum, overflow_policy> const value) noexcept {
+constexpr auto operator-(integer<minimum, maximum, overflow_policy> const value) noexcept {
 	using result_type = unary_minus_result<minimum, maximum, overflow_policy>;
-	using common_type = std::common_type_t<result_type, bounded_integer<minimum, maximum, overflow_policy>>;
+	using common_type = std::common_type_t<result_type, integer<minimum, maximum, overflow_policy>>;
 	return result_type(-static_cast<typename common_type::underlying_type>(value), non_check);
 }
 
@@ -88,7 +88,7 @@ constexpr auto operator-(bounded_integer<minimum, maximum, overflow_policy> cons
 // Unary plus
 
 template<intmax_t minimum, intmax_t maximum, typename overflow_policy>
-constexpr auto operator+(bounded_integer<minimum, maximum, overflow_policy> const value) noexcept {
+constexpr auto operator+(integer<minimum, maximum, overflow_policy> const value) noexcept {
 	return value;
 }
 
@@ -96,27 +96,27 @@ constexpr auto operator+(bounded_integer<minimum, maximum, overflow_policy> cons
 // Pointer overloads
 
 template<intmax_t minimum, intmax_t maximum, typename overflow_policy, typename T>
-constexpr T * operator+(bounded_integer<minimum, maximum, overflow_policy> const & number, T * const pointer) noexcept {
+constexpr T * operator+(integer<minimum, maximum, overflow_policy> const & number, T * const pointer) noexcept {
 	return number.value() + pointer;
 }
 
 template<typename T, intmax_t minimum, intmax_t maximum, typename overflow_policy>
-constexpr T * operator+(T * const pointer, bounded_integer<minimum, maximum, overflow_policy> const & number) noexcept {
+constexpr T * operator+(T * const pointer, integer<minimum, maximum, overflow_policy> const & number) noexcept {
 	return pointer + number.value();
 }
 
 template<typename T, intmax_t minimum, intmax_t maximum, typename overflow_policy>
-constexpr T * operator-(T * const pointer, bounded_integer<minimum, maximum, overflow_policy> const & number) noexcept {
+constexpr T * operator-(T * const pointer, integer<minimum, maximum, overflow_policy> const & number) noexcept {
 	return pointer - number.value();
 }
 
 template<typename T, intmax_t minimum, intmax_t maximum, typename overflow_policy>
-T * & operator+=(T * & pointer, bounded_integer<minimum, maximum, overflow_policy> const & number) noexcept {
+T * & operator+=(T * & pointer, integer<minimum, maximum, overflow_policy> const & number) noexcept {
 	return pointer += number.value();
 }
 
 template<typename T, intmax_t minimum, intmax_t maximum, typename overflow_policy>
-T * & operator-=(T * & pointer, bounded_integer<minimum, maximum, overflow_policy> const & number) noexcept {
+T * & operator-=(T * & pointer, integer<minimum, maximum, overflow_policy> const & number) noexcept {
 	return pointer -= number.value();
 }
 

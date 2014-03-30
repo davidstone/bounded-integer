@@ -28,7 +28,7 @@ static_assert(
 );
 static_assert(
 	std::is_same<
-		bounded_integer::detail::equivalent_overflow_policy<bounded_integer::bounded_integer<0, 0, bounded_integer::throw_policy>>,
+		bounded_integer::detail::equivalent_overflow_policy<bounded_integer::integer<0, 0, bounded_integer::throw_policy>>,
 		bounded_integer::throw_policy
 	>::value,
 	"incorrect equivalent_overflow_policy for bounded_integer."

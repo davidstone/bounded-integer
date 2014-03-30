@@ -1,5 +1,5 @@
 // Verify that the header can stand on its own
-// Copyright (C) 2013 David Stone
+// Copyright (C) 2014 David Stone
 //
 // This program is free software: you can redistribute it and / or modify
 // it under the terms of the GNU Affero General Public License as
@@ -23,5 +23,5 @@ using namespace bounded_integer::literal;
 static_assert(BOUNDED_INTEGER_CONDITIONAL(true, 7, 9) == 7, "Wrong conditional value.");
 static_assert(std::is_same<
 	decltype(BOUNDED_INTEGER_CONDITIONAL(true, 7_bi, 9_bi)),
-	bounded_integer::bounded_integer<7, 9, bounded_integer::null_policy>
+	bounded_integer::integer<7, 9, bounded_integer::null_policy>
 >::value, "Wrong conditional type.");

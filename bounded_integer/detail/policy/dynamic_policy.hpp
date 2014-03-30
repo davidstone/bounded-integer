@@ -34,7 +34,7 @@ template<intmax_t static_minimum, intmax_t static_maximum, typename overflow_pol
 class dynamic_policy {
 public:
 	using overflow_policy_tag = void;
-	using underlying_type = bounded_integer<static_minimum, static_maximum, overflow_policy>;
+	using underlying_type = integer<static_minimum, static_maximum, overflow_policy>;
 
 	constexpr dynamic_policy(underlying_type minimum, underlying_type maximum) noexcept:
 		m_min(std::move(minimum)),
@@ -131,7 +131,7 @@ template<intmax_t static_minimum, intmax_t static_maximum, typename overflow_pol
 class dynamic_max_policy {
 public:
 	using overflow_policy_tag = void;
-	using underlying_type = bounded_integer<static_minimum, static_maximum, overflow_policy>;
+	using underlying_type = integer<static_minimum, static_maximum, overflow_policy>;
 
 	constexpr dynamic_max_policy(underlying_type maximum) noexcept:
 		m_max(std::move(maximum)) {
@@ -221,7 +221,7 @@ template<intmax_t static_minimum, intmax_t static_maximum, typename overflow_pol
 class dynamic_min_policy {
 public:
 	using overflow_policy_tag = void;
-	using underlying_type = bounded_integer<static_minimum, static_maximum, overflow_policy>;
+	using underlying_type = integer<static_minimum, static_maximum, overflow_policy>;
 
 	constexpr dynamic_min_policy(underlying_type minimum) noexcept:
 		m_min(std::move(minimum)) {
