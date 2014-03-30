@@ -16,13 +16,11 @@
 
 #include "null_policy.hpp"
 
-namespace bounded_integer {
 namespace {
 
-constexpr null_policy policy;
+constexpr bounded_integer::null_policy policy;
 constexpr auto value1 = policy.assignment(5, 0, 10);
 // This should not compile
 // constexpr auto value2 = policy.assignment(15, 0, 10);
 
 }	// namespace
-}	// namespace bounded_integer

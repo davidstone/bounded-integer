@@ -1,5 +1,5 @@
 // Verify that the header can stand on its own
-// Copyright (C) 2013 David Stone
+// Copyright (C) 2014 David Stone
 //
 // This program is free software: you can redistribute it and / or modify
 // it under the terms of the GNU Affero General Public License as
@@ -17,12 +17,21 @@
 #include "make_bounded.hpp"
 #include "policy/throw_policy.hpp"
 
-namespace bounded_integer {
+namespace {
 
-static_assert(std::is_same<detail::equivalent_overflow_policy<int>, null_policy>::value, "int should have a null_policy");
 static_assert(
-	std::is_same<detail::equivalent_overflow_policy<bounded_integer<0, 0, throw_policy>>, throw_policy>::value,
+	std::is_same<
+		bounded_integer::detail::equivalent_overflow_policy<int>,
+		bounded_integer::null_policy
+	>::value,
+	"int should have a null_policy"
+);
+static_assert(
+	std::is_same<
+		bounded_integer::detail::equivalent_overflow_policy<bounded_integer::bounded_integer<0, 0, bounded_integer::throw_policy>>,
+		bounded_integer::throw_policy
+	>::value,
 	"incorrect equivalent_overflow_policy for bounded_integer."
 );
 
-}	// namespace bounded_integer
+}	// namespace

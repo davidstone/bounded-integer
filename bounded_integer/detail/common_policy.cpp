@@ -1,5 +1,5 @@
 // Verify that the header can stand on its own
-// Copyright (C) 2013 David Stone
+// Copyright (C) 2014 David Stone
 //
 // This program is free software: you can redistribute it and / or modify
 // it under the terms of the GNU Affero General Public License as
@@ -17,26 +17,28 @@
 #include "common_policy.hpp"
 #include "policy/throw_policy.hpp"
 
-namespace bounded_integer {
+namespace {
+using bounded_integer::null_policy;
+using bounded_integer::throw_policy;
 
 static_assert(
-	std::is_same<common_policy_t<null_policy, null_policy>, null_policy>::value,
+	std::is_same<bounded_integer::common_policy_t<null_policy, null_policy>, null_policy>::value,
 	"common_policy gives wrong type for all null_policy"
 );
 
 static_assert(
-	std::is_same<common_policy_t<null_policy, throw_policy>, throw_policy>::value,
+	std::is_same<bounded_integer::common_policy_t<null_policy, throw_policy>, throw_policy>::value,
 	"common_policy gives wrong type for one null_policy (first)"
 );
 
 static_assert(
-	std::is_same<common_policy_t<throw_policy, null_policy>, throw_policy>::value,
+	std::is_same<bounded_integer::common_policy_t<throw_policy, null_policy>, throw_policy>::value,
 	"common_policy gives wrong type for one null_policy (second)"
 );
 
 static_assert(
-	std::is_same<common_policy_t<throw_policy, throw_policy>, throw_policy>::value,
+	std::is_same<bounded_integer::common_policy_t<throw_policy, throw_policy>, throw_policy>::value,
 	"common_policy gives wrong type for all throw_policy"
 );
 
-} // namespace bounded_integer
+} // namespace

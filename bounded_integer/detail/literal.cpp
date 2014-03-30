@@ -1,5 +1,5 @@
 // Verify that the header can stand on its own, run tests
-// Copyright (C) 2013 David Stone
+// Copyright (C) 2014 David Stone
 //
 // This program is free software: you can redistribute it and / or modify
 // it under the terms of the GNU Affero General Public License as
@@ -17,17 +17,28 @@
 #include "literal.hpp"
 #include "comparison_operators.hpp"
 
-namespace bounded_integer {
 namespace {
-using namespace literal;
+using namespace bounded_integer::literal;
 
 // I have to use the preprocessor here to create an integer literal
 #define BOUNDED_INTEGER_CHECK_LITERAL(x) \
-	static_assert(std::numeric_limits<decltype(x ## _bi)>::min() == std::numeric_limits<decltype(x ## _bi)>::max(), "Literal does not have a min possible value equal to a max possible value."); \
-	static_assert(std::numeric_limits<decltype(x ## _bi)>::min() == x ## _bi, "Literal does not have a value equal to the range."); \
+	static_assert( \
+		std::numeric_limits<decltype(x ## _bi)>::min() == std::numeric_limits<decltype(x ## _bi)>::max(), \
+		"Literal does not have a min possible value equal to a max possible value." \
+	); \
+	static_assert( \
+		std::numeric_limits<decltype(x ## _bi)>::min() == x ## _bi, \
+		"Literal does not have a value equal to the range." \
+	); \
 	\
-	static_assert(x ## _bi == static_cast<decltype(x ## _bi)::underlying_type>(x), "Inaccurate value of " #x " (cast x)"); \
-	static_assert(static_cast<decltype(x)>(x ## _bi) == x, "Inaccurate value of " #x " (cast value)");
+	static_assert( \
+		x ## _bi == static_cast<decltype(x ## _bi)::underlying_type>(x), \
+		"Inaccurate value of " #x " (cast x)" \
+	); \
+	static_assert( \
+		static_cast<decltype(x)>(x ## _bi) == x, \
+		"Inaccurate value of " #x " (cast value)" \
+	);
 
 BOUNDED_INTEGER_CHECK_LITERAL(0)
 BOUNDED_INTEGER_CHECK_LITERAL(1)
@@ -41,4 +52,3 @@ BOUNDED_INTEGER_CHECK_LITERAL(-0)
 #undef BOUNDED_INTEGER_CHECK_LITERAL
 
 }	// namespace
-}	// namespace bounded_integer

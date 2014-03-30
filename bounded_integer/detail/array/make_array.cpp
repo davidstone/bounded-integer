@@ -19,24 +19,29 @@
 #include "../literal.hpp"
 #include "../policy/throw_policy.hpp"
 
-namespace bounded_integer {
 namespace {
-using namespace literal;
+using namespace bounded_integer::literal;
 
-constexpr auto dynamic_int_array = make_array(0, 3, 6);
+constexpr auto dynamic_int_array = bounded_integer::make_array(0, 3, 6);
 static_assert(dynamic_int_array.size() == 3, "Array size wrong.");
 static_assert(dynamic_int_array.at(2) == 6, "Array element wrong.");
-static_assert(std::is_same<int, decltype(dynamic_int_array)::value_type>::value, "Array element type wrong for all int arguments.");
+static_assert(
+	std::is_same<int, decltype(dynamic_int_array)::value_type>::value,
+	"Array element type wrong for all int arguments."
+);
 
-constexpr auto bounded_array = make_array(-100_bi, 5_bi, 378_bi, 23_bi, 10000_bi);
+constexpr auto bounded_array = bounded_integer::make_array(-100_bi, 5_bi, 378_bi, 23_bi, 10000_bi);
 static_assert(bounded_array.size() == 5, "Array size wrong.");
 static_assert(bounded_array[2_bi] == 378, "Array element wrong.");
 static_assert(
-	std::is_same<bounded_integer<-100, 10000, null_policy>, decltype(bounded_array)::value_type>::value,
+	std::is_same<
+		bounded_integer::bounded_integer<-100, 10000, bounded_integer::null_policy>,
+		decltype(bounded_array)::value_type
+	>::value,
 	"Array element type wrong for exact template arguments."
 );
 
-constexpr auto value = make_explicit_array<5, 4>(
+constexpr auto value = bounded_integer::make_explicit_array<5, 4>(
 	0_bi, 1_bi, 2_bi, 3_bi,
 	4_bi, 5_bi, 6_bi, 7_bi,
 	5_bi, 7_bi, 23_bi, 2474_bi,
@@ -54,7 +59,7 @@ static_assert(std::numeric_limits<value_type>::max() == 2474, "max wrong");
 static constexpr std::size_t second = 3;
 static constexpr std::size_t third = 4;
 static constexpr std::size_t fourth = 6;
-constexpr auto four_dimensions = make_array<second, third, fourth>(
+constexpr auto four_dimensions = bounded_integer::make_array<second, third, fourth>(
 	0_bi, 1_bi, 2_bi, 3_bi, 4_bi, 5_bi,
 	0_bi, 1_bi, 2_bi, 3_bi, 4_bi, 5_bi,
 	0_bi, 1_bi, 2_bi, 3_bi, 4_bi, 5_bi,
@@ -75,11 +80,10 @@ static_assert(four_dimensions[0_bi].size() == second, "Second dimension wrong.")
 static_assert(four_dimensions[0_bi][0_bi].size() == third, "Third dimension wrong.");
 static_assert(four_dimensions[0_bi][0_bi][0_bi].size() == fourth, "Fourth dimension wrong.");
 
-using explicit_type = bounded_integer<0, 1, throw_policy>;
-constexpr auto typed_array = make_array<explicit_type>(0_bi);
+using explicit_type = bounded_integer::bounded_integer<0, 1, bounded_integer::throw_policy>;
+constexpr auto typed_array = bounded_integer::make_array<explicit_type>(0_bi);
 static_assert(typed_array.size() == 1_bi, "Incorrect size with explicit type.");
 static_assert(std::is_same<decltype(typed_array)::value_type, explicit_type>::value, "Incorrect type with explicit type.");
 static_assert(typed_array.front() == 0_bi, "Incorrect value with explicit type.");
 
 }	// namespace
-}	// namespace bounded_integer

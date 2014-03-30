@@ -18,11 +18,9 @@
 #include "clamp_policy.hpp"
 #include "throw_policy.hpp"
 
-using namespace bounded_integer;
-
 namespace {
 
-using policy_type = dynamic_policy<0, 10, clamp_policy>;
+using policy_type = bounded_integer::dynamic_policy<0, 10, bounded_integer::clamp_policy>;
 constexpr policy_type policy;
 static_assert(policy.assignment(3, 2, 5) == 3, "Incorrect dynamic policy result when the static range is entirely within range.");
 static_assert(policy.assignment(11, 0, 20) == 10, "Incorrect dynamic clamp policy result when the dynamic range is the limiting factor.");

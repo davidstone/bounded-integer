@@ -17,21 +17,43 @@
 #include "range.hpp"
 #include "literal.hpp"
 
-namespace bounded_integer {
 namespace {
 using namespace ::bounded_integer::literal;
 
-constexpr auto x = range(10_bi);
-static_assert(*x.begin() == 0_bi, "Incorrect initial value of range.");
-static_assert(x.front() == 0_bi, "Incorrect initial value of range.");
-static_assert(x.back() == 9_bi, "Incorrect initial value of range.");
+constexpr auto x = bounded_integer::range(10_bi);
+static_assert(
+	*x.begin() == 0_bi,
+	"Incorrect initial value of range."
+);
+static_assert(
+	x.front() == 0_bi,
+	"Incorrect initial value of range."
+);
+static_assert(
+	x.back() == 9_bi,
+	"Incorrect initial value of range."
+);
 
-static_assert(range(5_bi, 12_bi)[2_bi] == 7_bi, "Incorrect indexed value of range that does not start with 0.");
+static_assert(
+	bounded_integer::range(5_bi, 12_bi)[2_bi] == 7_bi,
+	"Incorrect indexed value of range that does not start with 0."
+);
 
-static_assert(range(0_bi, 0_bi).size() == 0_bi, "Incorrect size of empty range.");
-static_assert(range(-5_bi, -5_bi).empty(), "Incorrect size of empty range.");
+static_assert(
+	bounded_integer::range(0_bi, 0_bi).size() == 0_bi,
+	"Incorrect size of empty range."
+);
+static_assert(
+	bounded_integer::range(-5_bi, -5_bi).empty(),
+	"Incorrect size of empty range."
+);
 
-static_assert(range(static_cast<bounded_integer<1, 2, null_policy>>(1_bi), static_cast<bounded_integer<3, 5, null_policy>>(3_bi)).size() == 2_bi, "Incorrect size of range with non-overlapping and possibly variable begin and end.");
+static_assert(
+	bounded_integer::range(
+		static_cast<bounded_integer::bounded_integer<1, 2, bounded_integer::null_policy>>(1_bi),
+		static_cast<bounded_integer::bounded_integer<3, 5, bounded_integer::null_policy>>(3_bi)
+	).size() == 2_bi,
+	"Incorrect size of range with non-overlapping and possibly variable begin and end."
+);
 
 }	// namespace
-}	// namespace bounded_integer

@@ -18,13 +18,28 @@
 #include "all.hpp"
 #include <type_traits>
 
-namespace bounded_integer {
+namespace {
 
-static_assert(is_overflow_policy<null_policy>::value, "null_policy not recognized as an overflow policy.");
-static_assert(is_overflow_policy<throw_policy>::value, "throw_policy not recognized as an overflow policy.");
-static_assert(is_overflow_policy<clamp_policy>::value, "clamp_policy not recognized as an overflow policy.");
-static_assert(!is_overflow_policy<int>::value, "int recognized as an overflow policy.");
+static_assert(
+	bounded_integer::is_overflow_policy<bounded_integer::null_policy>::value,
+	"null_policy not recognized as an overflow policy."
+);
+static_assert(
+	bounded_integer::is_overflow_policy<bounded_integer::throw_policy>::value,
+	"throw_policy not recognized as an overflow policy."
+);
+static_assert(
+	bounded_integer::is_overflow_policy<bounded_integer::clamp_policy>::value,
+	"clamp_policy not recognized as an overflow policy."
+);
+static_assert(
+	!bounded_integer::is_overflow_policy<int>::value,
+	"int recognized as an overflow policy."
+);
 
-static_assert(std::is_constructible<null_policy, clamp_policy>::value, "Cannot construct one policy from another.");
+static_assert(
+	std::is_constructible<bounded_integer::null_policy, bounded_integer::clamp_policy>::value,
+	"Cannot construct one policy from another."
+);
 
-}	// namespace bounded_integer
+}	// namespace
