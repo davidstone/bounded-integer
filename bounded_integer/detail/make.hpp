@@ -18,7 +18,6 @@
 #define BOUNDED_INTEGER_MAKE_BOUNDED_HPP_
 
 #include "class.hpp"
-#include "is_bounded_integer.hpp"
 #include "numeric_limits.hpp"
 #include "policy/null_policy.hpp"
 #include <cstdint>

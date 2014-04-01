@@ -23,13 +23,8 @@
 
 namespace bounded_integer {
 
-template<typename T, typename... Ts>
-class is_bounded_integer {
-public:
-	static constexpr bool value = is_bounded_integer<T>::value and is_bounded_integer<Ts...>::value;
-};
 template<typename T>
-class is_bounded_integer<T> {
+class is_bounded_integer {
 public:
 	static constexpr bool value = false;
 };
