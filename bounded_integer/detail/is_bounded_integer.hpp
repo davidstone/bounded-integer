@@ -39,27 +39,5 @@ public:
 	static constexpr bool value = true;
 };
 
-template<typename T, typename... Ts>
-class all_are_bounded_or_builtin_integer {
-public:
-	static constexpr bool value = all_are_bounded_or_builtin_integer<T>::value and all_are_bounded_or_builtin_integer<Ts...>::value;
-};
-template<typename T>
-class all_are_bounded_or_builtin_integer<T> {
-public:
-	static constexpr bool value = std::is_integral<T>::value or is_bounded_integer<T>::value;
-};
-
-template<typename T, typename... Ts>
-class any_are_bounded_integer {
-public:
-	static constexpr bool value = any_are_bounded_integer<T>::value or any_are_bounded_integer<Ts...>::value;
-};
-template<typename T>
-class any_are_bounded_integer<T> {
-public:
-	static constexpr bool value = is_bounded_integer<T>::value;
-};
-
 }	// namespace bounded_integer
 #endif	// BOUNDED_INTEGER_IS_BOUNDED_INTEGER_HPP_
