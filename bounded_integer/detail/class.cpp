@@ -15,16 +15,31 @@
 // along with this program. If not, see <http://www.gnu.org/licenses/>.
 
 #include "class.hpp"
-#include "make.hpp"
 #include <type_traits>
 
 namespace {
 
-using bounded_type = bounded_integer::integer<std::numeric_limits<int>::min(), std::numeric_limits<int>::max(), bounded_integer::null_policy>;
-using type = bounded_integer::equivalent_type<int>;
+constexpr auto min = std::numeric_limits<int>::min();
+constexpr auto max = std::numeric_limits<int>::max();
+using type = bounded_integer::integer<min, max>;
 
-static_assert(std::is_convertible<int, bounded_type>::value, "Cannot convert integer type to bounded_integer with same range.");
-static_assert(std::is_convertible<int, type>::value, "Cannot convert integer type to bounded_integer with same range.");
-static_assert(std::is_constructible<type, type, bounded_integer::non_check_t>::value, "Cannot construct a type from itself with non_check_t.");
+static_assert(
+	bounded_integer::detail::type_overlaps_range<std::decay_t<type>>(min, max),
+	"Bounds of type do not overlap its own range."
+);
+
+static_assert(
+	bounded_integer::detail::is_explicitly_constructible_from<bounded_integer::null_policy, type>(min, max),
+	"Type is not explicitly constructible from itself."
+);
+
+static_assert(
+	std::is_convertible<int, type>::value,
+	"Cannot convert integer type to bounded_integer with same range."
+);
+static_assert(
+	std::is_constructible<type, type, bounded_integer::non_check_t>::value,
+	"Cannot construct a type from itself with non_check_t."
+);
 
 }	// namespace
