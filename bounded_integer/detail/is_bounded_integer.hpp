@@ -19,7 +19,6 @@
 
 #include "forward_declaration.hpp"
 #include <cstdint>
-#include <type_traits>
 
 namespace bounded_integer {
 
