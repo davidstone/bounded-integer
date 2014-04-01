@@ -22,7 +22,7 @@
 #include <istream>
 #include <ostream>
 
-namespace bounded_integer {
+namespace bounded {
 
 template<
 	typename CharT, typename Traits,
@@ -67,5 +67,5 @@ std::basic_istream<CharT, Traits> & operator>>(std::basic_istream<CharT, Traits>
 	return in;
 }
 
-}	// namespace bounded_integer
+}	// namespace bounded
 #endif	// BOUNDED_INTEGER_STREAM_HPP_

@@ -19,7 +19,7 @@
 
 #include "policy/null_policy.hpp"
 
-namespace bounded_integer {
+namespace bounded {
 
 template<typename... policies>
 class common_policy {
@@ -62,6 +62,6 @@ public:
 template<typename... policies>
 using common_policy_t = typename common_policy<policies...>::type;
 
-}	// namespace bounded_integer
+}	// namespace bounded
 
 #endif	// BOUNDED_INTEGER_COMMON_POLICY_HPP_

@@ -17,7 +17,7 @@
 #ifndef BOUNDED_INTEGER_DETAIL_OPTIONAL_FORWARD_DECLARATION_HPP_
 #define BOUNDED_INTEGER_DETAIL_OPTIONAL_FORWARD_DECLARATION_HPP_
 
-namespace bounded_integer {
+namespace bounded {
 
 enum class none_t {};
 constexpr none_t none = none_t{};
@@ -25,6 +25,6 @@ constexpr none_t none = none_t{};
 template<typename T>
 class optional;
 
-}	// namespace bounded_integer
+}	// namespace bounded
 
 #endif	// BOUNDED_INTEGER_DETAIL_OPTIONAL_FORWARD_DECLARATION_HPP_

@@ -20,7 +20,7 @@
 #include "basic_policy.hpp"
 #include <cstdint>
 
-namespace bounded_integer {
+namespace bounded {
 namespace policy_detail {
 
 class clamp_policy {
@@ -41,5 +41,5 @@ public:
 
 using clamp_policy = basic_policy<policy_detail::clamp_policy>;
 
-}	// namespace bounded_integer
+}	// namespace bounded
 #endif	// BOUNDED_INTEGER_POLICY_CLAMP_POLICY_HPP_

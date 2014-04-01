@@ -21,8 +21,8 @@
 
 namespace {
 
-using type = bounded_integer::equivalent_type<int>;
+using type = bounded::equivalent_type<int>;
 
-static_assert(std::is_convertible<type, bounded_integer::optional<type>>::value, "Cannot construct optional of identical type.");
+static_assert(std::is_convertible<type, bounded::optional<type>>::value, "Cannot construct optional of identical type.");
 
 }	// namespace

@@ -1,4 +1,4 @@
-// Determine if a class is a type of bounded_integer
+// Determine if a class is a type of bounded::integer
 // Copyright (C) 2014 David Stone
 //
 // This program is free software: you can redistribute it and / or modify
@@ -20,7 +20,7 @@
 #include "forward_declaration.hpp"
 #include <cstdint>
 
-namespace bounded_integer {
+namespace bounded {
 
 template<typename T>
 class is_bounded_integer {
@@ -33,5 +33,5 @@ public:
 	static constexpr bool value = true;
 };
 
-}	// namespace bounded_integer
+}	// namespace bounded
 #endif	// BOUNDED_INTEGER_IS_BOUNDED_INTEGER_HPP_

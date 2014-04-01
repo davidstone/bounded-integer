@@ -18,7 +18,7 @@
 #include "comparison_operators.hpp"
 #include "literal.hpp"
 
-using namespace bounded_integer::literal;
+using namespace bounded::literal;
 
-static_assert(bounded_integer::div(26_bi, 5_bi).quot == 5_bi, "Incorrect quotient.");
-static_assert(bounded_integer::div(102_bi, 5_bi).rem == 2_bi, "Incorrect remainder.");
+static_assert(bounded::div(26_bi, 5_bi).quot == 5_bi, "Incorrect quotient.");
+static_assert(bounded::div(102_bi, 5_bi).rem == 2_bi, "Incorrect remainder.");

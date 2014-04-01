@@ -28,7 +28,7 @@
 
 #include <cstdint>
 
-namespace bounded_integer {
+namespace bounded {
 
 template<intmax_t static_minimum, intmax_t static_maximum, typename overflow_policy>
 class dynamic_policy {
@@ -82,26 +82,26 @@ public:
 	constexpr intmax_t assignment(T && value, Minimum && minimum, Maximum && maximum) const
 		noexcept(noexcept(overflow_policy{}.assignment(
 			std::forward<T>(value),
-			::bounded_integer::max(std::forward<Minimum>(minimum), std::declval<underlying_type &>()),
-			::bounded_integer::min(std::forward<Maximum>(maximum), std::declval<underlying_type &>())
+			::bounded::max(std::forward<Minimum>(minimum), std::declval<underlying_type &>()),
+			::bounded::min(std::forward<Maximum>(maximum), std::declval<underlying_type &>())
 		))) {
 		return overflow_policy{}.assignment(
 			std::forward<T>(value),
-			::bounded_integer::max(std::forward<Minimum>(minimum), m_min),
-			::bounded_integer::min(std::forward<Maximum>(maximum), m_max)
+			::bounded::max(std::forward<Minimum>(minimum), m_min),
+			::bounded::min(std::forward<Maximum>(maximum), m_max)
 		);
 	}
 	template<typename T, typename Minimum, typename Maximum>
 	constexpr intmax_t assignment(T && value, Minimum && minimum, Maximum && maximum) const volatile
 		noexcept(noexcept(overflow_policy{}.assignment(
 			std::forward<T>(value),
-			::bounded_integer::max(std::forward<Minimum>(minimum), std::declval<underlying_type &>()),
-			::bounded_integer::min(std::forward<Maximum>(maximum), std::declval<underlying_type &>())
+			::bounded::max(std::forward<Minimum>(minimum), std::declval<underlying_type &>()),
+			::bounded::min(std::forward<Maximum>(maximum), std::declval<underlying_type &>())
 		))) {
 		return overflow_policy{}.assignment(
 			std::forward<T>(value),
-			::bounded_integer::max(std::forward<Minimum>(minimum), m_min),
-			::bounded_integer::min(std::forward<Maximum>(maximum), m_max)
+			::bounded::max(std::forward<Minimum>(minimum), m_min),
+			::bounded::min(std::forward<Maximum>(maximum), m_max)
 		);
 	}
 	
@@ -177,12 +177,12 @@ public:
 		noexcept(noexcept(overflow_policy{}.assignment(
 			std::forward<T>(value),
 			std::forward<Minimum>(minimum),
-			::bounded_integer::min(std::forward<Maximum>(maximum), std::declval<underlying_type &>())
+			::bounded::min(std::forward<Maximum>(maximum), std::declval<underlying_type &>())
 		))) {
 		return overflow_policy{}.assignment(
 			std::forward<T>(value),
 			std::forward<Minimum>(minimum),
-			::bounded_integer::min(std::forward<Maximum>(maximum), m_max)
+			::bounded::min(std::forward<Maximum>(maximum), m_max)
 		);
 	}
 	template<typename T, typename Minimum, typename Maximum>
@@ -190,12 +190,12 @@ public:
 		noexcept(noexcept(overflow_policy{}.assignment(
 			std::forward<T>(value),
 			std::forward<Minimum>(minimum),
-			::bounded_integer::min(std::forward<Maximum>(maximum), std::declval<underlying_type &>())
+			::bounded::min(std::forward<Maximum>(maximum), std::declval<underlying_type &>())
 		))) {
 		return overflow_policy{}.assignment(
 			std::forward<T>(value),
 			std::forward<Minimum>(minimum),
-			::bounded_integer::min(std::forward<Maximum>(maximum), m_max)
+			::bounded::min(std::forward<Maximum>(maximum), m_max)
 		);
 	}
 	
@@ -266,12 +266,12 @@ public:
 	constexpr intmax_t assignment(T && value, Minimum && minimum, Maximum && maximum) const
 		noexcept(noexcept(overflow_policy{}.assignment(
 			std::forward<T>(value),
-			::bounded_integer::max(std::forward<Minimum>(minimum), std::declval<underlying_type &>()),
+			::bounded::max(std::forward<Minimum>(minimum), std::declval<underlying_type &>()),
 			std::forward<Maximum>(maximum)
 		))) {
 		return overflow_policy{}.assignment(
 			std::forward<T>(value),
-			::bounded_integer::max(std::forward<Minimum>(minimum), m_min),
+			::bounded::max(std::forward<Minimum>(minimum), m_min),
 			std::forward<Maximum>(maximum)
 		);
 	}
@@ -279,12 +279,12 @@ public:
 	constexpr intmax_t assignment(T && value, Minimum && minimum, Maximum && maximum) const volatile
 		noexcept(noexcept(overflow_policy{}.assignment(
 			std::forward<T>(value),
-			::bounded_integer::max(std::forward<Minimum>(minimum), std::declval<underlying_type &>()),
+			::bounded::max(std::forward<Minimum>(minimum), std::declval<underlying_type &>()),
 			std::forward<Maximum>(maximum)
 		))) {
 		return overflow_policy{}.assignment(
 			std::forward<T>(value),
-			::bounded_integer::max(std::forward<Minimum>(minimum), m_min),
+			::bounded::max(std::forward<Minimum>(minimum), m_min),
 			std::forward<Maximum>(maximum)
 		);
 	}
@@ -305,5 +305,5 @@ private:
 	underlying_type m_min;
 };
 
-}	// namespace bounded_integer
+}	// namespace bounded
 #endif	// BOUNDED_INTEGER_POLICY_DYNAMIC_POLICY_HPP_

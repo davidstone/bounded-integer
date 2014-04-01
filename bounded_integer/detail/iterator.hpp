@@ -1,4 +1,4 @@
-// bounded_integer-aware versions of the standard library iterator functions
+// bounded::integer-aware versions of the standard library iterator functions
 // Copyright (C) 2014 David Stone
 //
 // This program is free software: you can redistribute it and / or modify
@@ -23,10 +23,10 @@
 
 #include <iterator>
 
-namespace bounded_integer {
+namespace bounded {
 
 // These are not considered to be more specialized than std::next and std::prev.
-// I could write a more specific case for bounded_integer::array to ensure it is
+// I could write a more specific case for bounded::array to ensure it is
 // picked up by unqualified calls to std::next, but such calls are unlikely to
 // ever happen.
 
@@ -43,5 +43,5 @@ auto prev(Iterator it, Offset const offset = make<1>()) {
 	return it;
 }
 
-}	// namespace bounded_integer
+}	// namespace bounded
 #endif	// BOUNDED_INTEGER_ITERATOR_HPP_

@@ -23,7 +23,7 @@
 #include "make.hpp"
 #include <type_traits>
 
-namespace bounded_integer {
+namespace bounded {
 
 // We call make with the target's overflow policy because we need this exact
 // overflow policy. We do not want to rely on common_policy here.
@@ -39,7 +39,7 @@ integer<minimum, maximum, overflow_policy> volatile & operator symbol##=(integer
 	return lhs; \
 }
 
-// bounded_integer being assigned to
+// bounded::integer being assigned to
 BOUNDED_INTEGER_COMPOUND_ASSIGNMENT_OPERATOR_TARGET(+)
 BOUNDED_INTEGER_COMPOUND_ASSIGNMENT_OPERATOR_TARGET(-)
 BOUNDED_INTEGER_COMPOUND_ASSIGNMENT_OPERATOR_TARGET(*)
@@ -59,7 +59,7 @@ T volatile & operator symbol(T volatile & lhs, integer<minimum, maximum, overflo
 	return lhs symbol rhs.value(); \
 }
 
-// bounded_integer being assigned from
+// bounded::integer being assigned from
 BOUNDED_INTEGER_COMPOUND_ASSIGNMENT_OPERATOR_SOURCE(+=)
 BOUNDED_INTEGER_COMPOUND_ASSIGNMENT_OPERATOR_SOURCE(-=)
 BOUNDED_INTEGER_COMPOUND_ASSIGNMENT_OPERATOR_SOURCE(*=)
@@ -120,5 +120,5 @@ integer<minimum, maximum, overflow_policy> operator--(integer<minimum, maximum, 
 	return previous;
 }
 
-}	// namespace bounded_integer
+}	// namespace bounded
 #endif	// BOUNDED_INTEGER_COMPOUND_ASSIGNMENT_OPERATORS_HPP_

@@ -25,7 +25,7 @@
 #include <cstdint>
 #include <utility>
 
-namespace bounded_integer {
+namespace bounded {
 namespace detail {
 
 // We have to define our own function objects rather than using the classes from
@@ -360,6 +360,6 @@ using operator_result = integer<
 template<intmax_t minimum, intmax_t maximum, typename overflow_policy>
 using unary_minus_result = integer<-maximum, -minimum, overflow_policy>;
 
-}	// namespace bounded_integer
+}	// namespace bounded
 
 #endif	// BOUNDED_INTEGER_ARITHMETIC_RESULT_TYPE_HPP_

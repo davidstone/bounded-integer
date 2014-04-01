@@ -26,7 +26,7 @@
 
 #include <iterator>
 
-namespace bounded_integer {
+namespace bounded {
 
 template<typename T>
 class immutable_range;
@@ -249,6 +249,6 @@ constexpr auto range(Size && size) noexcept {
 	return range(make<0>(), std::forward<Size>(size));
 }
 
-}	// namespace bounded_integer
+}	// namespace bounded
 
 #endif	// BOUNDED_INTEGER_RANGE_HPP_

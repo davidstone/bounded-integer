@@ -21,24 +21,24 @@
 namespace {
 
 static_assert(
-	bounded_integer::is_overflow_policy<bounded_integer::null_policy>::value,
+	bounded::is_overflow_policy<bounded::null_policy>::value,
 	"null_policy not recognized as an overflow policy."
 );
 static_assert(
-	bounded_integer::is_overflow_policy<bounded_integer::throw_policy>::value,
+	bounded::is_overflow_policy<bounded::throw_policy>::value,
 	"throw_policy not recognized as an overflow policy."
 );
 static_assert(
-	bounded_integer::is_overflow_policy<bounded_integer::clamp_policy>::value,
+	bounded::is_overflow_policy<bounded::clamp_policy>::value,
 	"clamp_policy not recognized as an overflow policy."
 );
 static_assert(
-	!bounded_integer::is_overflow_policy<int>::value,
+	!bounded::is_overflow_policy<int>::value,
 	"int recognized as an overflow policy."
 );
 
 static_assert(
-	std::is_constructible<bounded_integer::null_policy, bounded_integer::clamp_policy>::value,
+	std::is_constructible<bounded::null_policy, bounded::clamp_policy>::value,
 	"Cannot construct one policy from another."
 );
 

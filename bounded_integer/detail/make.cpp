@@ -21,17 +21,17 @@ namespace {
 
 static_assert(
 	std::is_same<
-		bounded_integer::detail::equivalent_overflow_policy<int>,
-		bounded_integer::null_policy
+		bounded::detail::equivalent_overflow_policy<int>,
+		bounded::null_policy
 	>::value,
 	"int should have a null_policy"
 );
 static_assert(
 	std::is_same<
-		bounded_integer::detail::equivalent_overflow_policy<bounded_integer::integer<0, 0, bounded_integer::throw_policy>>,
-		bounded_integer::throw_policy
+		bounded::detail::equivalent_overflow_policy<bounded::integer<0, 0, bounded::throw_policy>>,
+		bounded::throw_policy
 	>::value,
-	"incorrect equivalent_overflow_policy for bounded_integer."
+	"incorrect equivalent_overflow_policy for bounded::integer."
 );
 
 }	// namespace

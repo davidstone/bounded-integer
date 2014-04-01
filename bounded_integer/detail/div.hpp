@@ -19,7 +19,7 @@
 
 #include <utility>
 
-namespace bounded_integer {
+namespace bounded {
 
 template<typename Numerator, typename Denominator>
 struct div_t {
@@ -34,5 +34,5 @@ constexpr auto div(Numerator const numerator, Denominator const denominator) noe
 	return div_t<Numerator, Denominator>{ numerator / denominator, numerator % denominator };
 }
 
-}	// namespace bounded_integer
+}	// namespace bounded
 #endif	// BOUNDED_INTEGER_DIV_HPP_

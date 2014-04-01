@@ -18,9 +18,9 @@
 #include "literal.hpp"
 
 namespace {
-using namespace ::bounded_integer::literal;
+using namespace ::bounded::literal;
 
-constexpr auto x = bounded_integer::range(10_bi);
+constexpr auto x = bounded::range(10_bi);
 static_assert(
 	*x.begin() == 0_bi,
 	"Incorrect initial value of range."
@@ -35,23 +35,23 @@ static_assert(
 );
 
 static_assert(
-	bounded_integer::range(5_bi, 12_bi)[2_bi] == 7_bi,
+	bounded::range(5_bi, 12_bi)[2_bi] == 7_bi,
 	"Incorrect indexed value of range that does not start with 0."
 );
 
 static_assert(
-	bounded_integer::range(0_bi, 0_bi).size() == 0_bi,
+	bounded::range(0_bi, 0_bi).size() == 0_bi,
 	"Incorrect size of empty range."
 );
 static_assert(
-	bounded_integer::range(-5_bi, -5_bi).empty(),
+	bounded::range(-5_bi, -5_bi).empty(),
 	"Incorrect size of empty range."
 );
 
 static_assert(
-	bounded_integer::range(
-		static_cast<bounded_integer::integer<1, 2, bounded_integer::null_policy>>(1_bi),
-		static_cast<bounded_integer::integer<3, 5, bounded_integer::null_policy>>(3_bi)
+	bounded::range(
+		static_cast<bounded::integer<1, 2, bounded::null_policy>>(1_bi),
+		static_cast<bounded::integer<3, 5, bounded::null_policy>>(3_bi)
 	).size() == 2_bi,
 	"Incorrect size of range with non-overlapping and possibly variable begin and end."
 );

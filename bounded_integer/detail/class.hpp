@@ -1,4 +1,4 @@
-// bounded_integer type main implementation
+// integer type main implementation
 // Copyright (C) 2014 David Stone
 //
 // This program is free software: you can redistribute it and / or modify
@@ -30,7 +30,7 @@
 #include <utility>
 #include <boost/integer.hpp>
 
-namespace bounded_integer {
+namespace bounded {
 namespace detail {
 
 template<typename T1, typename T2>
@@ -206,7 +206,7 @@ public:
 		return *this;
 	}
 	// Do not verify that the value is in range because the user has requested a
-	// conversion out of the safety of bounded_integer. It is subject to the all
+	// conversion out of the safety of bounded::integer. It is subject to all
 	// the standard rules of conversion from one integer type to another.
 	//
 	// This must not reference the overflow policy because it is possible that
@@ -224,6 +224,6 @@ private:
 	underlying_type m_value;
 };
 
-}	// namespace bounded_integer
+}	// namespace bounded
 
 #endif	// BOUNDED_INTEGER_CLASS_HPP_

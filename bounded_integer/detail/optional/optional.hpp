@@ -28,7 +28,7 @@
 #include <stdexcept>
 #include <type_traits>
 
-namespace bounded_integer {
+namespace bounded {
 namespace detail {
 
 // This lets optional work with built-in types.
@@ -272,5 +272,5 @@ optional<typename std::remove_reference<T>::type> make_optional(T && value) noex
 	return { std::forward<T>(value) };
 }
 
-}	// namespace bounded_integer
+}	// namespace bounded
 #endif	// BOUNDED_INTEGER_DETAIL_OPTIONAL_OPTIONAL_HPP_

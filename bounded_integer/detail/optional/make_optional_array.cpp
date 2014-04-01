@@ -20,9 +20,9 @@
 #include "../literal.hpp"
 
 namespace {
-using namespace bounded_integer::literal;
+using namespace bounded::literal;
 
-constexpr auto dynamic_optional_array = bounded_integer::make_optional_array(0, bounded_integer::none, 3, 6);
+constexpr auto dynamic_optional_array = bounded::make_optional_array(0, bounded::none, 3, 6);
 static_assert(
 	dynamic_optional_array.size() == 4,
 	"Array size wrong."
@@ -32,21 +32,21 @@ static_assert(
 	"valued element wrong."
 );
 static_assert(
-	dynamic_optional_array[1_bi] == bounded_integer::none,
+	dynamic_optional_array[1_bi] == bounded::none,
 	"none_t element wrong."
 );
 static_assert(
-	std::is_same<bounded_integer::optional<int>, decltype(dynamic_optional_array)::value_type>::value,
+	std::is_same<bounded::optional<int>, decltype(dynamic_optional_array)::value_type>::value,
 	"Array element type wrong for mixed int + none_t arguments."
 );
 
 static_assert(
-	std::is_same<bounded_integer::optional<int>, decltype(bounded_integer::make_optional_array(0))::value_type>::value,
+	std::is_same<bounded::optional<int>, decltype(bounded::make_optional_array(0))::value_type>::value,
 	"optional array type wrong with no missing values."
 );
 
 
-constexpr auto known_optional_array = bounded_integer::make_optional_array(0_bi, bounded_integer::none, 3_bi, 6_bi);
+constexpr auto known_optional_array = bounded::make_optional_array(0_bi, bounded::none, 3_bi, 6_bi);
 static_assert(
 	known_optional_array.size() == 4,
 	"Array size wrong."
@@ -56,22 +56,22 @@ static_assert(
 	"valued element wrong."
 );
 static_assert(
-	known_optional_array[1_bi] == bounded_integer::none,
+	known_optional_array[1_bi] == bounded::none,
 	"none_t element wrong."
 );
 static_assert(
-	std::is_same<bounded_integer::optional<bounded_integer::integer<0, 6, bounded_integer::null_policy>>, decltype(known_optional_array)::value_type>::value,
-	"Array element type wrong for mixed bounded_integer + none_t arguments."
+	std::is_same<bounded::optional<bounded::integer<0, 6, bounded::null_policy>>, decltype(known_optional_array)::value_type>::value,
+	"Array element type wrong for mixed bounded + none_t arguments."
 );
 
-constexpr auto none_first_optional_array = bounded_integer::make_optional_array(bounded_integer::none, 0);
+constexpr auto none_first_optional_array = bounded::make_optional_array(bounded::none, 0);
 static_assert(
-	none_first_optional_array[0_bi] == bounded_integer::none,
+	none_first_optional_array[0_bi] == bounded::none,
 	"none_t element wrong."
 );
-constexpr auto none_last_optional_array = bounded_integer::make_optional_array(0, bounded_integer::none);
+constexpr auto none_last_optional_array = bounded::make_optional_array(0, bounded::none);
 static_assert(
-	none_last_optional_array[1_bi] == bounded_integer::none,
+	none_last_optional_array[1_bi] == bounded::none,
 	"none_t element wrong."
 );
 

@@ -22,7 +22,7 @@
 #include "../comparison_operators.hpp"
 #include <utility>
 
-namespace bounded_integer {
+namespace bounded {
 
 template<typename LHS, typename RHS>
 constexpr bool operator==(optional<LHS> const & lhs, optional<RHS> const & rhs) noexcept(noexcept(std::declval<LHS const &>() == std::declval<RHS const &>())) {
@@ -196,5 +196,5 @@ constexpr bool operator>=(none_t const lhs, optional<T> const & rhs) noexcept {
 	return !(lhs < rhs);
 }
 
-}	// namespace bounded_integer
+}	// namespace bounded
 #endif	// BOUNDED_INTEGER_DETAIL_OPTIONAL_COMPARISON_OPERATORS_HPP_

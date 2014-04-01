@@ -1,4 +1,4 @@
-// bounded_integer policies that determine what to do on overflow
+// Policies that determine what to do on overflow
 // Copyright (C) 2014 David Stone
 //
 // This program is free software: you can redistribute it and / or modify

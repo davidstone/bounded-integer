@@ -1,4 +1,4 @@
-// bounded_integer type literal
+// bounded type literal
 // Copyright (C) 2013 David Stone
 //
 // This program is free software: you can redistribute it and / or modify
@@ -20,7 +20,7 @@
 #include "arithmetic_operators.hpp"
 #include "make.hpp"
 
-namespace bounded_integer {
+namespace bounded {
 namespace detail {
 
 constexpr inline intmax_t power(intmax_t const radix, intmax_t const exponent) noexcept {
@@ -61,5 +61,5 @@ constexpr auto operator"" _bi() noexcept {
 
 }	// namespace literal
 
-}	// namespace bounded_integer
+}	// namespace bounded
 #endif	// BOUNDED_INTEGER_LITERAL_HPP_

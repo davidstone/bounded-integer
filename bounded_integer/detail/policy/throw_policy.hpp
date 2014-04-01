@@ -22,7 +22,7 @@
 #include <cstdint>
 #include <stdexcept>
 
-namespace bounded_integer {
+namespace bounded {
 namespace policy_detail {
 
 class throw_policy {
@@ -42,5 +42,5 @@ public:
 }	// namespace policy_detail
 
 using throw_policy = basic_policy<policy_detail::throw_policy>;
-}	// namespace bounded_integer
+}	// namespace bounded
 #endif	// BOUNDED_INTEGER_POLICY_THROW_POLICY_HPP_

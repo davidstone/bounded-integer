@@ -22,8 +22,8 @@
 
 namespace {
 
-using policy = bounded_integer::null_policy;
+using policy = bounded::null_policy;
 
-static_assert(std::numeric_limits<bounded_integer::integer<1, 1000, policy>>::digits == 0, "Meaningless digits not 0.");
+static_assert(std::numeric_limits<bounded::integer<1, 1000, policy>>::digits == 0, "Meaningless digits not 0.");
 
 }	// namespace

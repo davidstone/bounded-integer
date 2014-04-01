@@ -1,4 +1,4 @@
-// array class that uses bounded_integer for things like indexing
+// array class that uses bounded::integer for things like indexing
 // Copyright (C) 2014 David Stone
 //
 // This program is free software: you can redistribute it and / or modify

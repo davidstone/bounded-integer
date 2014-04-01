@@ -24,16 +24,16 @@
 
 #include <cstdint>
 
-namespace bounded_integer {
+namespace bounded {
 
 // In my original implementation, I wrote these as comparisons between a
-// bounded_integer and its underlying type. However, this actually makes
+// bounded::integer and its underlying type. However, this actually makes
 // relational operators much less useful than they otherwise could be. For
-// instance, if we have a bounded_integer with bounds [-100, 100], we might want
-// to compare that with an int64_t. If we have to first convert the value to the
-// underlying type (likely int8_t), then we are likely to invoke undefined
-// behavior. Instead, the comparison function should accept a much wider array
-// of types and convert up to the common type.
+// instance, if we have bounded::integer<-100, 100>, we might want to compare
+// that with an int64_t. If we have to first convert the value to the underlying
+// type (likely int8_t), then we are likely to invoke undefined behavior.
+// Instead, the comparison function should accept a much wider array of types
+// and convert up to the common type.
 //
 // The common type uses the overflow policy of the left-hand side because the
 // policy does not matter for comparisons. This allows the user to compare
@@ -233,5 +233,5 @@ constexpr bool operator>=(T const lhs, integer<minimum, maximum, overflow_policy
 	return !(lhs < rhs);
 }
 
-}	// namespace bounded_integer
+}	// namespace bounded
 #endif	// BOUNDED_INTEGER_COMPARISON_OPERATORS_HPP_

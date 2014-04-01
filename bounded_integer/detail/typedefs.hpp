@@ -22,7 +22,7 @@
 
 #include <cstdint>
 
-namespace bounded_integer {
+namespace bounded {
 
 template<intmax_t minimum, intmax_t maximum>
 using checked_integer = integer<minimum, maximum, throw_policy>;
@@ -39,6 +39,6 @@ using dynamic_min_integer = integer<minimum, maximum, dynamic_min_policy<minimum
 template<intmax_t minimum, intmax_t maximum, typename base_overflow_policy = throw_policy>
 using dynamic_max_integer = integer<minimum, maximum, dynamic_max_policy<minimum, maximum, throw_policy>>;
 
-}	// namespace bounded_integer
+}	// namespace bounded
 
 #endif	// BOUNDED_INTEGER_TYPEDEFS_HPP_

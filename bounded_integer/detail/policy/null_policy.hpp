@@ -20,7 +20,7 @@
 #include "basic_policy.hpp"
 #include <cstdint>
 
-namespace bounded_integer {
+namespace bounded {
 namespace policy_detail {
 
 class null_policy {
@@ -51,5 +51,5 @@ private:
 
 using null_policy = basic_policy<policy_detail::null_policy>;
 
-}	// namespace bounded_integer
+}	// namespace bounded
 #endif	// BOUNDED_INTEGER_POLICY_NULL_POLICY_HPP_

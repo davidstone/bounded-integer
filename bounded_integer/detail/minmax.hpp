@@ -23,7 +23,7 @@
 #include "numeric_limits.hpp"
 #include "overlapping_range.hpp"
 
-namespace bounded_integer {
+namespace bounded {
 namespace detail {
 namespace minmax {
 
@@ -144,5 +144,5 @@ constexpr auto max(Integers && ... integers) noexcept {
 	return detail::minmax::max(make(std::forward<Integers>(integers))...);
 }
 
-}	// namespace bounded_integer
+}	// namespace bounded
 #endif	// BOUNDED_INTEGER_MINMAX_HPP_

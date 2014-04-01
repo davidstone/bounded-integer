@@ -1,4 +1,4 @@
-// bounded_integer-aware versions of the standard library algorithm functions
+// bounded::integer-aware versions of the standard library algorithm functions
 // Copyright (C) 2014 David Stone
 //
 // This program is free software: you can redistribute it and / or modify
@@ -24,7 +24,7 @@
 #include "numeric_limits.hpp"
 #include "policy/null_policy.hpp"
 
-namespace bounded_integer {
+namespace bounded {
 
 template<typename InputIterator, typename Predicate>
 auto count_if(InputIterator first, InputIterator const last, Predicate predicate) {
@@ -45,5 +45,5 @@ auto count(InputIterator first, InputIterator last, T const & value) {
 	});
 }
 
-}	// namespace bounded_integer
+}	// namespace bounded
 #endif	// BOUNDED_INTEGER_ALGORITHM_HPP_

@@ -1,4 +1,4 @@
-// optional bounded_integer type
+// optional type with specialization to minimize overhead with bounded::integer
 // Copyright (C) 2014 David Stone
 //
 // This program is free software: you can redistribute it and / or modify

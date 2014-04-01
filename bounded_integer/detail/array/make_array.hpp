@@ -22,7 +22,7 @@
 #include <cstddef>
 #include <utility>
 
-namespace bounded_integer {
+namespace bounded {
 namespace detail {
 
 template<typename T, std::size_t... dimensions>
@@ -106,5 +106,5 @@ constexpr auto make_array(Args && ... args) noexcept {
 }
 
 
-}	// namespace bounded_integer
+}	// namespace bounded
 #endif	// BOUNDED_INTEGER_DETAIL_MAKE_ARRAY_HPP_

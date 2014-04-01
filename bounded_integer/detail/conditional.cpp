@@ -18,10 +18,10 @@
 #include "literal.hpp"
 #include <type_traits>
 
-using namespace bounded_integer::literal;
+using namespace bounded::literal;
 
 static_assert(BOUNDED_INTEGER_CONDITIONAL(true, 7, 9) == 7, "Wrong conditional value.");
 static_assert(std::is_same<
 	decltype(BOUNDED_INTEGER_CONDITIONAL(true, 7_bi, 9_bi)),
-	bounded_integer::integer<7, 9, bounded_integer::null_policy>
+	bounded::integer<7, 9, bounded::null_policy>
 >::value, "Wrong conditional type.");

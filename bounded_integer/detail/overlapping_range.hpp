@@ -24,7 +24,7 @@
 
 // All of these functions have a precondition that minimum <= maximum
 
-namespace bounded_integer {
+namespace bounded {
 namespace detail {
 
 template<typename T>
@@ -85,5 +85,5 @@ constexpr bool type_fits_in_range<uintmax_t>(intmax_t const, intmax_t const) noe
 }
 
 }	// namespace detail
-}	// namespace bounded_integer
+}	// namespace bounded
 #endif	// BOUNDED_INTEGER_OVERLAPPING_RANGE_HPP_

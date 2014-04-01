@@ -10,36 +10,36 @@ There have been many attempts to fix this situation.
 
 In the abstract sense, we usually just want an "integer" that we can do math on and get the results we expect, regardless of the value. However, attempting to replace all integer types with a boundless or `BigInt` type adds overhead to every calculation, which in many domains is unacceptable. Most implementations recognize this fact, but try to resolve it by adding less overhead in the form of checked integers. They perform arithmetic as usual, but if the result would be out of bounds, the typical implementation throws an exception.
 
-## What bounded_integer does differently
+## What bounded::integer does differently
 
-The `bounded_integer` philosophy is the same as the C++ philosophy: you don't pay for what you don't use. Both of those solutions put overhead even if it isn't needed (I know my numbers are small enough and it is safe to add them). If there is any overhead at all in terms of space or time, then there is still room for an integer type below whatever "safe" integer you define. Therefore, rightly or wrongly, many will not use such a type. `bounded_integer` attempts to replace built-in integer types (and their typedefs in `cstdint`) for all use cases.
+The `bounded::integer` philosophy is the same as the C++ philosophy: you don't pay for what you don't use. Both of those solutions put overhead even if it isn't needed (I know my numbers are small enough and it is safe to add them). If there is any overhead at all in terms of space or time, then there is still room for an integer type below whatever "safe" integer you define. Therefore, rightly or wrongly, many will not use such a type. `bounded::integer` attempts to replace built-in integer types (and their typedefs in `cstdint`) for all use cases.
 
-`bounded_integer` requires all integers to have more explicit bounds. These bounds, however, can be calculated for the user by the compiler. The following code snippet shows this principle:
+`bounded::integer` requires all integers to have more explicit bounds. These bounds, however, can be calculated for the user by the compiler. The following code snippet shows this principle:
 
-	bounded_integer::integer<1, 100> const x = f();
-	bounded_integer::integer<-3, 7> const y = g();
+	bounded::integer<1, 100> const x = f();
+	bounded::integer<-3, 7> const y = g();
 	auto const z = x + y;
-	static_assert(std::is_same<decltype(z), bounded_integer::integer<-2, 107>>::value, "Type of z incorrect.");
+	static_assert(std::is_same<decltype(z), bounded::integer<-2, 107>>::value, "Type of z incorrect.");
 
 The type of `z` is calculated as the smallest type that can hold all possible values of the calculation `x + y`. The `integer` type by defaults says that when modifying or constructing a value, the compiler should not do any run time checks. Other possibilities, such as throwing an exception on overflow or clamping the value to the minimum or maximum are also possible by use of template policies (and those particular use cases are already built in to the library).
 
-`bounded_integer` has the following goals:
+`bounded::integer` has the following goals:
 1. Never perform a run-time check when a static check would work instead
 2. Never allow a conversion that is definitely wrong
 3. Allow conversions that might be wrong (assigning a value between 1 and 10 to a value between 5 and 20), but only when explicitly requested.
 4. Allow implicit conversions to larger types.
-5. Have no space or time overhead, assuming basic compiler optimizations like inlining, so that `bounded_integer` can be used on very large data sets or systems with hard real-time requirements.
+5. Have no space or time overhead, assuming basic compiler optimizations like inlining, so that `bounded::integer` can be used on very large data sets or systems with hard real-time requirements.
 
 ## Using policies
 
-The general form of the class is `bounded_integer::integer<minimum, maximum, policy>`. `policy` can do pretty much anything, including being stateful to handle bounds that are only known at run-time.
+The general form of the class is `bounded::integer<minimum, maximum, policy = bounded::null_policy>`. `policy` can do pretty much anything, including being stateful to handle bounds that are only known at run-time. The default `null_policy` has some compile-time checks, but does nothing at run time.
 
-# bounded_integer installation instructions
+# bounded::integer installation instructions
 
 ## Prerequisites
 
-* gcc version 4.9.0 or newer, with c++ support or clang 3.4.0 or newer. Note that gcc 4.9.0 is not yet released, so you will have to build from trunk. `bounded_integer` makes use of C++1y (C++14) features.
-* Boost. Listed as boost-devel in Fedora repositories. `bounded_integer` is currently tested against version 1.53.0.
+* gcc version 4.9.0 or newer, with c++ support or clang 3.4.0 or newer. Note that gcc 4.9.0 is not yet released, so you will have to build from trunk. `bounded::integer` makes use of C++1y (C++14) features.
+* Boost. Listed as boost-devel in Fedora repositories. `bounded::integer` is currently tested against version 1.53.0.
 * SCons is used for the build process for the test set up, but it is not needed to use the library.
 
 ## Building and running tests (Linux)
@@ -49,13 +49,13 @@ The general form of the class is `bounded_integer::integer<minimum, maximum, pol
 
 ## Using
 
-`bounded_integer` is a header-only library. The .cpp files only contain tests. All you have to do to use the program is `#include <bounded_integer/bounded_integer.hpp>`.
+`bounded::integer` is a header-only library. The .cpp files only contain tests. All you have to do to use the program is `#include <bounded_integer/bounded_integer.hpp>`.
 
 # Limitations
 
-`bounded_integer` can replace most uses of built-in integer types. It does have some limitations, however.
+`bounded::integer` can replace most uses of built-in integer types. It does have some limitations, however.
 
-* A `bounded_integer` cannot be used as a non-type template parameter. The C++ language rules do not permit any user-defined type to be used as a non-type template parameter, even if the user-defined type is a literal type.
-* `bounded_integer` uses `intmax_t` as the template parameter to determine its bounds. This means that it cannot store an integer larger than `std::numeric_limits<intmax_t>::max()`. The alternative is to not allow users of the library to specify the bounds as plain integer values. Instead, they would have to pass it as some sort of type that encodes a value, which increases the burden of use.
+* A `bounded::integer` cannot be used as a non-type template parameter. The C++ language rules do not permit any user-defined type to be used as a non-type template parameter, even if the user-defined type is a literal type.
+* `bounded::integer` uses `intmax_t` as the template parameter to determine its bounds. This means that it cannot store an integer larger than `std::numeric_limits<intmax_t>::max()`. The alternative is to not allow users of the library to specify the bounds as plain integer values. Instead, they would have to pass it as some sort of type that encodes a value, which increases the burden of use.
 * Doing math with `uintmax_t` (which is typically the same as `size_t` or `uint64_t`) can easily cause overflow issues. This can typically be resolved by narrowing the bounds of your values (and if you cannot do so, that usually means that your calculation could overflow).
-* `bounded_integer` is currently still under active development. It is not recommended for general use, as compiler requirements are constantly moving forward and the interfaces may change without any notice.
+* `bounded::integer` is currently still under active development. It is not recommended for general use, as compiler requirements are constantly moving forward and the interfaces may change without any notice.

@@ -22,18 +22,18 @@
 #include "policy/throw_policy.hpp"
 
 namespace {
-using namespace ::bounded_integer::literal;
+using namespace ::bounded::literal;
 
-constexpr bounded_integer::integer<1, 10, bounded_integer::throw_policy> const x(9);
+constexpr bounded::integer<1, 10, bounded::throw_policy> const x(9);
 static_assert(
 	sizeof(x) == 1,
-	"bounded_integer too big!"
+	"bounded::integer too big!"
 );
-constexpr bounded_integer::integer<-3, 11, bounded_integer::throw_policy> const y(x);
-constexpr bounded_integer::integer<-3, 11, bounded_integer::throw_policy> const z(4);
+constexpr bounded::integer<-3, 11, bounded::throw_policy> const y(x);
+constexpr bounded::integer<-3, 11, bounded::throw_policy> const z(4);
 static_assert(
 	std::numeric_limits<decltype(z)>::is_signed,
-	"bounded_integer with negative value in range should be signed."
+	"bounded::integer with negative value in range should be signed."
 );
 
 constexpr auto sum = x + z;
@@ -121,8 +121,8 @@ static_assert(
 	"Unary plus not a no-op."
 );
 
-constexpr bounded_integer::integer<0, 2, bounded_integer::throw_policy> left_shift_lhs(1);
-constexpr bounded_integer::integer<0, 60, bounded_integer::throw_policy> left_shift_rhs(3);
+constexpr bounded::integer<0, 2, bounded::throw_policy> left_shift_lhs(1);
+constexpr bounded::integer<0, 60, bounded::throw_policy> left_shift_rhs(3);
 constexpr auto left_shift_result = left_shift_lhs << left_shift_rhs;
 static_assert(
 	std::numeric_limits<decltype(left_shift_result)>::min() == 0,
@@ -140,8 +140,8 @@ static_assert(
 
 // modulo
 
-constexpr auto ten = bounded_integer::make<10>();
-constexpr auto eleven = bounded_integer::make<11>();
+constexpr auto ten = bounded::make<10>();
+constexpr auto eleven = bounded::make<11>();
 constexpr auto ten_result = ten % eleven;
 static_assert(
 	ten_result == ten,
@@ -152,8 +152,8 @@ static_assert(
 	"Incorrect modulo type with divisor one greater"
 );
 
-constexpr auto nine = bounded_integer::make<9>();
-constexpr auto one = bounded_integer::make<1>();
+constexpr auto nine = bounded::make<9>();
+constexpr auto one = bounded::make<1>();
 constexpr auto one_result = ten % nine;
 static_assert(
 	one_result == one,
@@ -174,7 +174,7 @@ static_assert(
 	"Incorrect modulo type with divisor two less"
 );
 
-constexpr auto two = bounded_integer::make<2>();
+constexpr auto two = bounded::make<2>();
 constexpr auto two_result = eleven % nine;
 static_assert(
 	two_result == two,
@@ -186,10 +186,10 @@ static_assert(
 );
 
 
-constexpr bounded_integer::integer<17, 23, bounded_integer::throw_policy> positive_range(20);
-constexpr bounded_integer::integer<-54, -6, bounded_integer::throw_policy> negative_range(-33);
+constexpr bounded::integer<17, 23, bounded::throw_policy> positive_range(20);
+constexpr bounded::integer<-54, -6, bounded::throw_policy> negative_range(-33);
 constexpr auto positive_negative_result = positive_range % negative_range;
-constexpr bounded_integer::integer<0, 23, bounded_integer::throw_policy> positive_negative(20 % -33);
+constexpr bounded::integer<0, 23, bounded::throw_policy> positive_negative(20 % -33);
 static_assert(
 	positive_negative_result == positive_negative,
 	"Incorrect modulo with mixed signs"
@@ -200,7 +200,7 @@ static_assert(
 );
 
 constexpr auto negative_positive_result = negative_range % positive_range;
-constexpr bounded_integer::integer<-22, 0, bounded_integer::throw_policy> negative_positive(-33 % 20);
+constexpr bounded::integer<-22, 0, bounded::throw_policy> negative_positive(-33 % 20);
 static_assert(
 	negative_positive_result == negative_positive,
 	"Incorrect modulo with mixed signs"
@@ -210,7 +210,7 @@ static_assert(
 	"Incorrect modulo type with mixed signs"
 );
 
-constexpr auto result = bounded_integer::integer<0, 10, bounded_integer::null_policy>(10) % bounded_integer::make<6>();
+constexpr auto result = bounded::integer<0, 10, bounded::null_policy>(10) % bounded::make<6>();
 #if 0
 static_assert(
 	static_cast<intmax_t>(std::numeric_limits<decltype(result)>::min()) == 0,
@@ -226,8 +226,8 @@ static_assert(
 	"wrong answer"
 );
 
-constexpr auto zero = bounded_integer::make<0>();
-constexpr auto zero_result = zero % bounded_integer::make<1>();
+constexpr auto zero = bounded::make<0>();
+constexpr auto zero_result = zero % bounded::make<1>();
 static_assert(
 	zero_result == zero,
 	"Incorrect modulo with zero for the dividend"
@@ -253,14 +253,14 @@ static_assert(
 );
 static_assert(
 	*(array + 0_bi) == 0,
-	"Incorrect pointer arithmetic with bounded_integer."
+	"Incorrect pointer arithmetic with bounded::integer."
 );
 
 // Oops, not possible to overload array index operator
 #if 0
 static_assert(
 	array[0_bi] == 0,
-	"Incorrect array indexing with bounded_integer."
+	"Incorrect array indexing with bounded::integer."
 );
 #endif
 

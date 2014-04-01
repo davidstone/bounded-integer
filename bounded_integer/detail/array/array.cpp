@@ -19,10 +19,10 @@
 #include "../literal.hpp"
 
 namespace {
-using namespace bounded_integer::literal;
+using namespace bounded::literal;
 
 constexpr auto size = 5;
-using array_type = bounded_integer::array<int, size>;
+using array_type = bounded::array<int, size>;
 constexpr array_type a = {{}};
 static_assert(a.size() == size, "Incorrect size.");
 static_assert(a[0_bi] == 0, "Incorrect value.");
@@ -30,7 +30,7 @@ static_assert(a.at(size - 1) == 0, "Incorrect value with at.");
 static_assert(a.end() - a.begin() == size, "Incorrect difference type.");
 
 
-constexpr bounded_integer::array<int, 0> empty_array = {{}};
+constexpr bounded::array<int, 0> empty_array = {{}};
 static_assert(empty_array.begin() == empty_array.end(), "Empty array.");
 // static_assert(empty_array[0_bi] == 0, "Should not compile.");
 

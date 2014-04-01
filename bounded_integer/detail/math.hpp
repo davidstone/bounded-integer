@@ -24,7 +24,7 @@
 #include "minmax.hpp"
 #include <type_traits>
 
-namespace bounded_integer {
+namespace bounded {
 
 template<intmax_t minimum, intmax_t maximum, typename overflow_policy>
 constexpr auto abs(integer<minimum, maximum, overflow_policy> const value) noexcept {
@@ -33,5 +33,5 @@ constexpr auto abs(integer<minimum, maximum, overflow_policy> const value) noexc
 	return max(value, -value, make<0, overflow_policy>());
 }
 
-}	// namespace bounded_integer
+}	// namespace bounded
 #endif	// BOUNDED_INTEGER_MATH_HPP_

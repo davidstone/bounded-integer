@@ -33,47 +33,47 @@ template<
 	intmax_t rhs_min, intmax_t rhs_max, typename rhs_policy
 >
 struct common_type<
-	bounded_integer::integer<lhs_min, lhs_max, lhs_policy>,
-	bounded_integer::integer<rhs_min, rhs_max, rhs_policy>
+	bounded::integer<lhs_min, lhs_max, lhs_policy>,
+	bounded::integer<rhs_min, rhs_max, rhs_policy>
 > {
 private:
 	static constexpr auto minimum = (lhs_min < rhs_min) ? lhs_min : rhs_min;
 	static constexpr auto maximum = (lhs_max > rhs_max) ? lhs_max : rhs_max;
 public:
-	using type = bounded_integer::integer<minimum, maximum, bounded_integer::common_policy_t<lhs_policy, rhs_policy>>;
+	using type = bounded::integer<minimum, maximum, bounded::common_policy_t<lhs_policy, rhs_policy>>;
 };
 
-// Common type of a bounded_integer and a built-in
+// Common type of a bounded::integer and a built-in
 template<intmax_t minimum, intmax_t maximum, typename overflow_policy, typename T>
-struct common_type<bounded_integer::integer<minimum, maximum, overflow_policy>, T> {
+struct common_type<bounded::integer<minimum, maximum, overflow_policy>, T> {
 private:
-	using type1 = bounded_integer::integer<minimum, maximum, overflow_policy>;
-	using type2 = bounded_integer::equivalent_type<decay_t<T>>;
+	using type1 = bounded::integer<minimum, maximum, overflow_policy>;
+	using type2 = bounded::equivalent_type<decay_t<T>>;
 public:
 	using type = common_type_t<type1, type2>;
 };
 
 // If the user tries to do something like
-// common_type<int, unsigned, checked_integer<0, UINT_MAX + 1>>::type
+// common_type<int, unsigned, integer<0, UINT_MAX + 1>>::type
 // this would first convert int and unsigned to their common type (which is
-// unsigned), then get the common type of that and the bounded_integer. However,
-// the int type is outside of the range of the result, so the common type cannot
-// actually safely store any value in the range. The only safe way is to make
-// sure that I always get the common_type of a bounded_integer and another type,
-// regardless of the order passed in by the user. The common type of int and
-// checked_integer<0, UINT_MAX + 1> is checked_integer<INT_MIN, UINT_MAX + 1>,
-// and the common_type of that and unsigned gives
-// checked_integer<INT_MIN, UINT_MAX + 1>.
+// unsigned), then get the common type of that and the bounded::integer.
+//
+// However, the int type is outside of the range of the result, so the common
+// type cannot actually safely store any value in the range. The only safe way
+// is to make sure that I always get the common_type of a bounded::integer and
+// another type, regardless of the order passed in by the user. The common_type
+// of int and integer<0, UINT_MAX + 1> is integer<INT_MIN, UINT_MAX + 1>, and
+// the common_type of that and unsigned gives integer<INT_MIN, UINT_MAX + 1>.
 //
 // Unfortunately, it looks like I have to specify each an arbitrary number of
-// integral arguments prior to the bounded_integer. There doesn't seem to be a
+// integral arguments prior to the bounded::integer. There doesn't seem to be a
 // general solution to the problem, so I am avoiding defining extended
 // specializations for now.
 
 template<typename integer1, intmax_t minimum, intmax_t maximum, typename overflow_policy>
-struct common_type<integer1, bounded_integer::integer<minimum, maximum, overflow_policy>> {
+struct common_type<integer1, bounded::integer<minimum, maximum, overflow_policy>> {
 public:
-	using type = common_type_t<bounded_integer::integer<minimum, maximum, overflow_policy>, integer1>;
+	using type = common_type_t<bounded::integer<minimum, maximum, overflow_policy>, integer1>;
 };
 
 
@@ -95,7 +95,7 @@ template<
 	typename... Ts
 >
 struct common_type<
-	bounded_integer::integer<minimum, maximum, overflow_policy>,
+	bounded::integer<minimum, maximum, overflow_policy>,
 	T1, T2, T3, T4, T5, T6, T7, T8, T9, T10,
 	T11, T12, T13, T14, T15, T16, T17, T18, T19, T20,
 	T21, T22, T23, T24, T25, T26, T27, T28, T29, T30,
@@ -104,7 +104,7 @@ struct common_type<
 	Ts...
 > {
 private:
-	using type0 = bounded_integer::integer<minimum, maximum, overflow_policy>;
+	using type0 = bounded::integer<minimum, maximum, overflow_policy>;
 public:
 	using type = common_type_t<
 		common_type_t<

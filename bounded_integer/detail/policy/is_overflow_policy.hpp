@@ -20,7 +20,7 @@
 #include <cstdint>
 #include <type_traits>
 
-namespace bounded_integer {
+namespace bounded {
 
 namespace detail {
 namespace is_overflow_policy {
@@ -48,5 +48,5 @@ struct is_overflow_policy : std::integral_constant<
 	sizeof(detail::is_overflow_policy::checker<overflow_policy>(nullptr)) == sizeof(detail::is_overflow_policy::yes)
 >{};
 
-}	// namespace bounded_integer
+}	// namespace bounded
 #endif	// BOUNDED_INTEGER_POLICY_IS_OVERFLOW_POLICY_HPP_

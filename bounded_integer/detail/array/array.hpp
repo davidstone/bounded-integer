@@ -1,4 +1,4 @@
-// Array class with better interoperability with bounded_integer than std::array
+// Array class with better interoperability with bounded than std::array
 // Copyright (C) 2014 David Stone
 //
 // This program is free software: you can redistribute it and / or modify
@@ -29,7 +29,7 @@
 #include <limits>
 #include <utility>
 
-namespace bounded_integer {
+namespace bounded {
 
 template<typename T, std::size_t size>
 class array;
@@ -100,7 +100,7 @@ public:
 
 private:
 	template<typename U, std::size_t size_>
-	friend class ::bounded_integer::array;
+	friend class ::bounded::array;
 	template<typename U, intmax_t size_>
 	friend class iterator;
 
@@ -325,7 +325,7 @@ template<typename T, std::size_t size>
 void swap(array<T, size> & lhs, array<T, size> & rhs) noexcept(noexcept(lhs.swap(rhs))) {
 	lhs.swap(rhs);
 }
-}	// namespace bounded_integer
+}	// namespace bounded
 
 // I am not sure yet if it is legal to specialize these classes.
 #if 0

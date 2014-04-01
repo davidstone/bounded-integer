@@ -21,7 +21,7 @@
 #include <string>
 #include <type_traits>
 
-namespace bounded_integer {
+namespace bounded {
 
 // Import to_string for the numeric types
 using std::to_string;
@@ -40,6 +40,6 @@ std::wstring to_wstring(integer<minimum, maximum, overflow_policy> const x) {
 
 // TODO: template<typename T> T from_string(std::string const & str);
 
-}	// namespace bounded_integer
+}	// namespace bounded
 
 #endif	// BOUNDED_INTEGER_STRING_HPP_

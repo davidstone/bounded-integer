@@ -22,7 +22,7 @@
 #include <cstdint>
 #include <utility>
 
-namespace bounded_integer {
+namespace bounded {
 
 template<typename policy_type>
 class basic_policy {
@@ -62,5 +62,5 @@ public:
 	static constexpr bool overflow_is_error = policy_type::overflow_is_error;
 };
 
-}	// namespace bounded_integer
+}	// namespace bounded
 #endif	// BOUNDED_INTEGER_POLICY_BASIC_POLICY_HPP_

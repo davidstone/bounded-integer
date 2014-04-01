@@ -26,7 +26,7 @@
 #include <cstdint>
 #include <type_traits>
 
-namespace bounded_integer {
+namespace bounded {
 
 // TODO: consider how dynamic bounds fit into this
 
@@ -123,6 +123,6 @@ T * & operator-=(T * & pointer, integer<minimum, maximum, overflow_policy> const
 // Not possible to overload operator[]. See
 // https://groups.google.com/a/isocpp.org/forum/#!topic/std-proposals/CmBERU_sr8Y
 
-}	// namespace bounded_integer
+}	// namespace bounded
 
 #endif	// BOUNDED_INTEGER_ARITHMETIC_OPERATORS_HPP_
