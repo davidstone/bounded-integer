@@ -15,6 +15,7 @@
 // along with this program. If not, see <http://www.gnu.org/licenses/>.
 
 #include "conditional.hpp"
+#include "comparison_operators.hpp"
 #include "literal.hpp"
 #include <type_traits>
 
@@ -25,6 +26,6 @@ using namespace bounded::literal;
 constexpr auto value = BOUNDED_INTEGER_CONDITIONAL(true, 7_bi, 9_bi);
 
 static_assert(value == 7_bi, "Wrong conditional value.");
-static_assert(std::is_same<decltype(value), bounded::integer<7, 9>>::value, "Wrong conditional type.");
+static_assert(std::is_same<decltype(value), bounded::integer<7, 9> const>::value, "Wrong conditional type.");
 
 }	// namespace
