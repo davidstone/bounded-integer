@@ -14,13 +14,13 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with this program. If not, see <http://www.gnu.org/licenses/>.
 
-#include "range.hpp"
+#include "integer_range.hpp"
 #include "literal.hpp"
 
 namespace {
 using namespace ::bounded::literal;
 
-constexpr auto x = bounded::range(10_bi);
+constexpr auto x = bounded::integer_range(10_bi);
 static_assert(
 	*x.begin() == 0_bi,
 	"Incorrect initial value of range."
@@ -35,21 +35,21 @@ static_assert(
 );
 
 static_assert(
-	bounded::range(5_bi, 12_bi)[2_bi] == 7_bi,
+	bounded::integer_range(5_bi, 12_bi)[2_bi] == 7_bi,
 	"Incorrect indexed value of range that does not start with 0."
 );
 
 static_assert(
-	bounded::range(0_bi, 0_bi).size() == 0_bi,
+	bounded::integer_range(0_bi, 0_bi).size() == 0_bi,
 	"Incorrect size of empty range."
 );
 static_assert(
-	bounded::range(-5_bi, -5_bi).empty(),
+	bounded::integer_range(-5_bi, -5_bi).empty(),
 	"Incorrect size of empty range."
 );
 
 static_assert(
-	bounded::range(
+	bounded::integer_range(
 		static_cast<bounded::integer<1, 2>>(1_bi),
 		static_cast<bounded::integer<3, 5>>(3_bi)
 	).size() == 2_bi,

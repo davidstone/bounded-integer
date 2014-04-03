@@ -29,10 +29,9 @@
 #include "detail/numeric_limits.hpp"
 #include "detail/operators.hpp"
 #include "detail/policy/all.hpp"
-#include "detail/range.hpp"
 #include "detail/stream.hpp"
 #include "detail/typedefs.hpp"
 
-// Missing from this list are array and optional classes
+// Missing from this list are array and optional classes and integer_range
 
 #endif	// BOUNDED_INTEGER_HPP_

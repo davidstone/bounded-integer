@@ -28,7 +28,6 @@ def prepend_dir(directory, sources):
 # base_sources = [example]
 
 base_sources = [('test',
-	['array.cpp', 'optional.cpp', 'bounded_integer.cpp'] +
 	prepend_dir('detail', [
 		'algorithm.cpp',
 		'arithmetic_operators.cpp',
@@ -42,6 +41,7 @@ base_sources = [('test',
 		'div.cpp',
 		'enable_if.cpp',
 		'forward_declaration.cpp',
+		'integer_range.cpp',
 		'is_bounded_integer.cpp',
 		'iterator.cpp',
 		'literal.cpp',
@@ -51,7 +51,6 @@ base_sources = [('test',
 		'numeric_limits.cpp',
 		'operators.cpp',
 		'overlapping_range.cpp',
-		'range.cpp',
 		'stream.cpp',
 		'string.cpp',
 		'typedefs.cpp',
@@ -74,5 +73,6 @@ base_sources = [('test',
 		'is_overflow_policy.cpp',
 		'null_policy.cpp',
 		'throw_policy.cpp',
-	])
+	]) +
+	['array.cpp', 'integer_range.cpp', 'optional.cpp', 'bounded_integer.cpp']
 , [])]

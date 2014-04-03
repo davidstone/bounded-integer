@@ -14,8 +14,8 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with this program. If not, see <http://www.gnu.org/licenses/>.
 
-#ifndef BOUNDED_INTEGER_RANGE_HPP_
-#define BOUNDED_INTEGER_RANGE_HPP_
+#ifndef BOUNDED_DETAIL_INTEGER_RANGE_HPP_
+#define BOUNDED_DETAIL_INTEGER_RANGE_HPP_
 
 #include "arithmetic_operators.hpp"
 #include "class.hpp"
@@ -29,10 +29,10 @@
 namespace bounded {
 
 template<typename T>
-class immutable_range;
+class integer_range_type;
 
 namespace detail {
-namespace range_iterator {
+namespace integer_range_iterator {
 
 template<typename T>
 constexpr intmax_t range_of_type() noexcept {
@@ -80,7 +80,7 @@ public:
 		return lhs.m_value < rhs.m_value;
 	}
 private:
-	friend class immutable_range<T>;
+	friend class integer_range_type<T>;
 	using underlying_type = T;
 	explicit constexpr iterator(underlying_type const value) noexcept:
 		m_value(value) {
@@ -146,25 +146,25 @@ constexpr bool operator<=(iterator<T> const & lhs, iterator<T> const & rhs) noex
 	return !(rhs < lhs);
 }
 
-}	// namespace range_iterator
+}	// namespace integer_range_iterator
 }	// namespace detail
 
 template<typename T>
-class immutable_range {
+class integer_range_type {
 public:
 	static_assert(std::numeric_limits<T>::is_specialized, "Must be a numeric type.");
-	using const_iterator = detail::range_iterator::iterator<T>;
+	using const_iterator = detail::integer_range_iterator::iterator<T>;
 	using const_reverse_iterator = std::reverse_iterator<const_iterator>;
 
 	using value_type = typename const_iterator::value_type;
 	using index_type = typename const_iterator::index_type;
 	using difference_type = typename const_iterator::difference_type;
 	using const_pointer = typename const_iterator::pointer;
-	using size_type = integer<0, detail::range_iterator::range_of_type<value_type>()>;
+	using size_type = integer<0, detail::integer_range_iterator::range_of_type<value_type>()>;
 	// This accounts for the one-past-the-end sentinel value.
 	using underlying_type = typename const_iterator::underlying_type;
 
-	constexpr immutable_range(underlying_type const & first, underlying_type const & last) noexcept:
+	constexpr integer_range_type(underlying_type const & first, underlying_type const & last) noexcept:
 		m_begin(first),
 		m_end(last) {
 	}
@@ -208,7 +208,7 @@ public:
 		return begin()[static_cast<index_type>(index)];
 	}
 
-	void swap(immutable_range & other) noexcept {
+	void swap(integer_range_type & other) noexcept {
 		using std::swap;
 		swap(m_begin, other.m_begin);
 		swap(m_end, other.m_end);
@@ -217,7 +217,7 @@ public:
 		return size_type(end() - begin(), non_check);
 	}
 	constexpr size_type max_size() const {
-		return make<detail::range_iterator::range_of_type<value_type>()>();
+		return make<detail::integer_range_iterator::range_of_type<value_type>()>();
 	}
 	constexpr bool empty() const {
 		return size() == make<0>();
@@ -229,24 +229,25 @@ private:
 };
 
 template<typename T>
-void swap(immutable_range<T>& lhs, immutable_range<T>& rhs) {
+void swap(integer_range_type<T>& lhs, integer_range_type<T>& rhs) {
 	lhs.swap(rhs);
 }
 
+// If end is less than begin, the behavior is undefined.
 template<typename Begin, typename End>
-constexpr auto range(Begin && begin, End && end) noexcept {
-	using range_type = integer<
+constexpr auto integer_range(Begin && begin, End && end) noexcept {
+	using integer_type = integer<
 		static_cast<intmax_t>(std::numeric_limits<typename std::decay<Begin>::type>::min()),
 		static_cast<intmax_t>(std::numeric_limits<typename std::decay<End>::type>::max())
 	>;
-	return immutable_range<range_type>(std::forward<Begin>(begin), std::forward<End>(end));
+	return integer_range_type<integer_type>(std::forward<Begin>(begin), std::forward<End>(end));
 }
 
 template<typename Size>
-constexpr auto range(Size && size) noexcept {
-	return range(make<0>(), std::forward<Size>(size));
+constexpr auto integer_range(Size && size) noexcept {
+	return integer_range(make<0>(), std::forward<Size>(size));
 }
 
 }	// namespace bounded
 
-#endif	// BOUNDED_INTEGER_RANGE_HPP_
+#endif	// BOUNDED_DETAIL_INTEGER_RANGE_HPP_
