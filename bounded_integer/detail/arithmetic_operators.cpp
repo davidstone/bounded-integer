@@ -210,7 +210,7 @@ static_assert(
 	"Incorrect modulo type with mixed signs"
 );
 
-constexpr auto result = bounded::integer<0, 10, bounded::null_policy>(10) % bounded::make<6>();
+constexpr auto result = bounded::integer<0, 10>(10) % bounded::make<6>();
 #if 0
 static_assert(
 	static_cast<intmax_t>(std::numeric_limits<decltype(result)>::min()) == 0,

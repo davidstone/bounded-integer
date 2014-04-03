@@ -21,7 +21,7 @@
 namespace {
 using namespace bounded::literal;
 
-using integer = bounded::integer<0, 10, bounded::null_policy>;
+using integer = bounded::integer<0, 10>;
 
 constexpr bounded::optional<integer> uninitialized;
 

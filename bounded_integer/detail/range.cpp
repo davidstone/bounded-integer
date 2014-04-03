@@ -50,8 +50,8 @@ static_assert(
 
 static_assert(
 	bounded::range(
-		static_cast<bounded::integer<1, 2, bounded::null_policy>>(1_bi),
-		static_cast<bounded::integer<3, 5, bounded::null_policy>>(3_bi)
+		static_cast<bounded::integer<1, 2>>(1_bi),
+		static_cast<bounded::integer<3, 5>>(3_bi)
 	).size() == 2_bi,
 	"Incorrect size of range with non-overlapping and possibly variable begin and end."
 );

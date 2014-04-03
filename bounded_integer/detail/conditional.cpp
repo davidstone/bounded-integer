@@ -18,10 +18,13 @@
 #include "literal.hpp"
 #include <type_traits>
 
+namespace {
+
 using namespace bounded::literal;
 
-static_assert(BOUNDED_INTEGER_CONDITIONAL(true, 7, 9) == 7, "Wrong conditional value.");
-static_assert(std::is_same<
-	decltype(BOUNDED_INTEGER_CONDITIONAL(true, 7_bi, 9_bi)),
-	bounded::integer<7, 9, bounded::null_policy>
->::value, "Wrong conditional type.");
+constexpr auto value = BOUNDED_INTEGER_CONDITIONAL(true, 7_bi, 9_bi);
+
+static_assert(value == 7_bi, "Wrong conditional value.");
+static_assert(std::is_same<decltype(value), bounded::integer<7, 9>>::value, "Wrong conditional type.");
+
+}	// namespace

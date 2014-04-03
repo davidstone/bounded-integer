@@ -16,11 +16,10 @@
 
 #include "overlapping_range.hpp"
 #include "class.hpp"
-#include "policy/null_policy.hpp"
 
 namespace {
 
-using type = bounded::integer<0, 0, bounded::null_policy>;
+using type = bounded::integer<0, 0>;
 static_assert(bounded::detail::type_overlaps_range<type>(0, 0), "Type should overlap its own range.");
 static_assert(bounded::detail::type_fits_in_range<type>(0, 0), "Type should fit in its own range.");
 static_assert(!bounded::detail::type_overlaps_range<type>(1, 1), "Type should not overlap a disjoint range.");

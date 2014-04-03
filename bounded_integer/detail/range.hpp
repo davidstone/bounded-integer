@@ -44,13 +44,12 @@ class iterator {
 public:
 	// We have to be able to index the one-past-the-end element. Not sure if
 	// this should have a throw_policy.
-	using index_type = integer<0, range_of_type<T>(), null_policy>;
+	using index_type = integer<0, range_of_type<T>()>;
 	using value_type = integer<
 		static_cast<intmax_t>(std::numeric_limits<T>::min()),
-		static_cast<intmax_t>(max(std::numeric_limits<T>::min(), std::numeric_limits<T>::max() - make<1>())),
-		null_policy
+		static_cast<intmax_t>(max(std::numeric_limits<T>::min(), std::numeric_limits<T>::max() - make<1>()))
 	>;
-	using difference_type = integer<-range_of_type<index_type>(), range_of_type<index_type>(), null_policy>;
+	using difference_type = integer<-range_of_type<index_type>(), range_of_type<index_type>()>;
 	using pointer = index_type const *;
 	using iterator_category = std::random_access_iterator_tag;
 
@@ -161,7 +160,7 @@ public:
 	using index_type = typename const_iterator::index_type;
 	using difference_type = typename const_iterator::difference_type;
 	using const_pointer = typename const_iterator::pointer;
-	using size_type = integer<0, detail::range_iterator::range_of_type<value_type>(), null_policy>;
+	using size_type = integer<0, detail::range_iterator::range_of_type<value_type>()>;
 	// This accounts for the one-past-the-end sentinel value.
 	using underlying_type = typename const_iterator::underlying_type;
 
@@ -238,8 +237,7 @@ template<typename Begin, typename End>
 constexpr auto range(Begin && begin, End && end) noexcept {
 	using range_type = integer<
 		static_cast<intmax_t>(std::numeric_limits<typename std::decay<Begin>::type>::min()),
-		static_cast<intmax_t>(std::numeric_limits<typename std::decay<End>::type>::max()),
-		null_policy
+		static_cast<intmax_t>(std::numeric_limits<typename std::decay<End>::type>::max())
 	>;
 	return immutable_range<range_type>(std::forward<Begin>(begin), std::forward<End>(end));
 }

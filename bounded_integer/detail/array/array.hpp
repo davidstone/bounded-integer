@@ -20,7 +20,6 @@
 #include "../arithmetic_operators.hpp"
 #include "../class.hpp"
 #include "../make.hpp"
-#include "../policy/null_policy.hpp"
 #include "../policy/throw_policy.hpp"
 
 #include <algorithm>
@@ -40,7 +39,7 @@ template<typename T, intmax_t size>
 class iterator {
 public:
 	using value_type = T;
-	using difference_type = integer<-size, size, null_policy>;
+	using difference_type = integer<-size, size>;
 	using index_type = integer<0, size - 1, throw_policy>;
 	using pointer = value_type *;
 	using reference = value_type &;
@@ -162,7 +161,7 @@ public:
 	using const_reverse_iterator = std::reverse_iterator<const_iterator>;
 	using reverse_iterator = std::reverse_iterator<iterator>;
 
-	using size_type = integer<size_, size_, null_policy>;
+	using size_type = integer<size_, size_>;
 	using difference_type = typename const_iterator::difference_type;
 	using index_type = typename const_iterator::index_type;
 	using const_reference = typename const_iterator::reference;

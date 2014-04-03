@@ -22,7 +22,7 @@
 
 namespace {
 
-constexpr bounded::integer<1, 10, bounded::null_policy> a(5);
+constexpr bounded::integer<1, 10> a(5);
 static_assert(
 	a == a,
 	"Values do not equal themselves"

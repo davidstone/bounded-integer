@@ -18,12 +18,9 @@
 
 #include "class.hpp"
 #include "comparison_operators.hpp"
-#include "policy/null_policy.hpp"
 
 namespace {
 
-using policy = bounded::null_policy;
-
-static_assert(std::numeric_limits<bounded::integer<1, 1000, policy>>::digits == 0, "Meaningless digits not 0.");
+static_assert(std::numeric_limits<bounded::integer<1, 1000>>::digits == 0, "Meaningless digits not 0.");
 
 }	// namespace

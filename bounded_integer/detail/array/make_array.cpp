@@ -35,7 +35,7 @@ static_assert(bounded_array.size() == 5, "Array size wrong.");
 static_assert(bounded_array[2_bi] == 378, "Array element wrong.");
 static_assert(
 	std::is_same<
-		bounded::integer<-100, 10000, bounded::null_policy>,
+		bounded::integer<-100, 10000>,
 		decltype(bounded_array)::value_type
 	>::value,
 	"Array element type wrong for exact template arguments."
