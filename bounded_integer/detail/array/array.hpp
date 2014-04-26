@@ -57,43 +57,21 @@ public:
 	constexpr auto operator->() const -> pointer {
 		return & operator*();
 	}
-	auto operator++() -> iterator & {
-		++m_it;
-		return *this;
-	}
-	auto operator++(int) -> iterator {
-		auto const self = *this;
-		operator++();
-		return self;
-	}
-	auto operator--() -> iterator & {
-		--m_it;
-		return *this;
-	}
-	auto operator--(int) -> iterator {
-		auto const self = *this;
-		operator--();
-		return self;
-	}
-	auto operator+=(difference_type const offset) -> iterator & {
-		m_it += offset;
-		return *this;
-	}
-	auto operator-=(difference_type const offset) -> iterator & {
-		m_it -= offset;
-		return *this;
-	}
-	friend constexpr auto operator-(iterator const & lhs, iterator const & rhs) -> difference_type {
-		return static_cast<difference_type>(lhs.m_it - rhs.m_it);
-	}
 	constexpr auto operator[](index_type const index) const -> reference {
 		return m_it[static_cast<std::size_t>(index)];
 	}
 
-	friend constexpr auto operator==(iterator const & lhs, iterator const & rhs) noexcept -> bool {
+	friend constexpr auto operator+(iterator const lhs, difference_type const rhs) -> iterator {
+		return iterator(lhs.m_it + rhs);
+	}
+	friend constexpr auto operator-(iterator const lhs, iterator const rhs) -> difference_type {
+		return static_cast<difference_type>(lhs.m_it - rhs.m_it);
+	}
+
+	friend constexpr auto operator==(iterator const lhs, iterator const rhs) noexcept -> bool {
 		return lhs.m_it == rhs.m_it;
 	}
-	friend constexpr auto operator<(iterator const & lhs, iterator const & rhs) noexcept -> bool {
+	friend constexpr auto operator<(iterator const lhs, iterator const rhs) noexcept -> bool {
 		return lhs.m_it < rhs.m_it;
 	}
 
@@ -111,10 +89,12 @@ private:
 	base_iterator m_it;
 };
 
+
 template<typename T, intmax_t size>
 constexpr auto operator!=(iterator<T, size> const lhs, iterator<T, size> const rhs) noexcept -> bool {
 	return !(lhs == rhs);
 }
+
 template<typename T, intmax_t size>
 constexpr auto operator>(iterator<T, size> const lhs, iterator<T, size> const rhs) noexcept -> bool {
 	return rhs < lhs;
@@ -128,17 +108,46 @@ constexpr auto operator>=(iterator<T, size> const lhs, iterator<T, size> const r
 	return !(lhs < rhs);
 }
 
+
 template<typename T, intmax_t size>
-constexpr auto operator+(iterator<T, size> lhs, typename iterator<T, size>::difference_type const rhs) -> iterator<T, size> {
-	return lhs += rhs;
+constexpr auto operator+(typename iterator<T, size>::difference_type const lhs, iterator<T, size> const rhs) -> iterator<T, size> {
+	return rhs + lhs;
 }
 template<typename T, intmax_t size>
-constexpr auto operator+(typename iterator<T, size>::difference_type const lhs, iterator<T, size> rhs) -> iterator<T, size> {
-	return rhs += lhs;
+constexpr auto operator-(iterator<T, size> const lhs, typename iterator<T, size>::difference_type const rhs) -> iterator<T, size> {
+	return lhs + -rhs;
+}
+
+
+template<typename T, intmax_t size>
+auto operator+=(iterator<T, size> & it, typename iterator<T, size>::difference_type const offset) -> iterator<T, size> & {
+	return it = it + offset;
 }
 template<typename T, intmax_t size>
-constexpr auto operator-(typename iterator<T, size>::difference_type const lhs, iterator<T, size> rhs) -> iterator<T, size> {
-	return lhs -= rhs;
+auto operator-=(iterator<T, size> & it, typename iterator<T, size>::difference_type const offset) -> iterator<T, size> & {
+	return it += -offset;
+}
+
+
+template<typename T, intmax_t size>
+auto operator++(iterator<T, size> & it) -> iterator<T, size> & {
+	return it += make<1>();
+}
+template<typename T, intmax_t size>
+auto operator++(iterator<T, size> & it, int) -> iterator<T, size> {
+	auto const original = it;
+	++it;
+	return original;
+}
+template<typename T, intmax_t size>
+auto operator--(iterator<T, size> & it) -> iterator<T, size> & {
+	return it -= make<1>();
+}
+template<typename T, intmax_t size>
+auto operator--(iterator<T, size> & it, int) -> iterator<T, size> {
+	auto const original = it;
+	--it;
+	return original;
 }
 
 namespace adl {
