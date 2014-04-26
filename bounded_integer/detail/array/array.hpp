@@ -51,49 +51,49 @@ public:
 		return iterator<T const, size>(m_it);
 	}
 
-	constexpr reference operator*() const {
+	constexpr auto operator*() const -> reference {
 		return *m_it;
 	}
-	constexpr pointer operator->() const {
+	constexpr auto operator->() const -> pointer {
 		return & operator*();
 	}
-	iterator & operator++() {
+	auto operator++() -> iterator & {
 		++m_it;
 		return *this;
 	}
-	iterator operator++(int) {
+	auto operator++(int) -> iterator {
 		auto const self = *this;
 		operator++();
 		return self;
 	}
-	iterator & operator--() {
+	auto operator--() -> iterator & {
 		--m_it;
 		return *this;
 	}
-	iterator operator--(int) {
+	auto operator--(int) -> iterator {
 		auto const self = *this;
 		operator--();
 		return self;
 	}
-	iterator & operator+=(difference_type const offset) {
+	auto operator+=(difference_type const offset) -> iterator & {
 		m_it += offset;
 		return *this;
 	}
-	iterator & operator-=(difference_type const offset) {
+	auto operator-=(difference_type const offset) -> iterator & {
 		m_it -= offset;
 		return *this;
 	}
-	friend constexpr difference_type operator-(iterator const & lhs, iterator const & rhs) {
+	friend constexpr auto operator-(iterator const & lhs, iterator const & rhs) -> difference_type {
 		return static_cast<difference_type>(lhs.m_it - rhs.m_it);
 	}
-	constexpr reference operator[](index_type const index) const {
+	constexpr auto operator[](index_type const index) const -> reference {
 		return m_it[static_cast<std::size_t>(index)];
 	}
 
-	friend constexpr bool operator==(iterator const & lhs, iterator const & rhs) noexcept {
+	friend constexpr auto operator==(iterator const & lhs, iterator const & rhs) noexcept -> bool {
 		return lhs.m_it == rhs.m_it;
 	}
-	friend constexpr bool operator<(iterator const & lhs, iterator const & rhs) noexcept {
+	friend constexpr auto operator<(iterator const & lhs, iterator const & rhs) noexcept -> bool {
 		return lhs.m_it < rhs.m_it;
 	}
 
@@ -112,32 +112,32 @@ private:
 };
 
 template<typename T, intmax_t size>
-constexpr bool operator!=(iterator<T, size> const lhs, iterator<T, size> const rhs) noexcept {
+constexpr auto operator!=(iterator<T, size> const lhs, iterator<T, size> const rhs) noexcept -> bool {
 	return !(lhs == rhs);
 }
 template<typename T, intmax_t size>
-constexpr bool operator>(iterator<T, size> const lhs, iterator<T, size> const rhs) noexcept {
+constexpr auto operator>(iterator<T, size> const lhs, iterator<T, size> const rhs) noexcept -> bool {
 	return rhs < lhs;
 }
 template<typename T, intmax_t size>
-constexpr bool operator<=(iterator<T, size> const lhs, iterator<T, size> const rhs) noexcept {
+constexpr auto operator<=(iterator<T, size> const lhs, iterator<T, size> const rhs) noexcept -> bool {
 	return !(lhs > rhs);
 }
 template<typename T, intmax_t size>
-constexpr bool operator>=(iterator<T, size> const lhs, iterator<T, size> const rhs) noexcept {
+constexpr auto operator>=(iterator<T, size> const lhs, iterator<T, size> const rhs) noexcept -> bool {
 	return !(lhs < rhs);
 }
 
 template<typename T, intmax_t size>
-constexpr iterator<T, size> operator+(iterator<T, size> lhs, typename iterator<T, size>::difference_type const rhs) {
+constexpr auto operator+(iterator<T, size> lhs, typename iterator<T, size>::difference_type const rhs) -> iterator<T, size> {
 	return lhs += rhs;
 }
 template<typename T, intmax_t size>
-constexpr iterator<T, size> operator+(typename iterator<T, size>::difference_type const lhs, iterator<T, size> rhs) {
+constexpr auto operator+(typename iterator<T, size>::difference_type const lhs, iterator<T, size> rhs) -> iterator<T, size> {
 	return rhs += lhs;
 }
 template<typename T, intmax_t size>
-constexpr iterator<T, size> operator-(typename iterator<T, size>::difference_type const lhs, iterator<T, size> rhs) {
+constexpr auto operator-(typename iterator<T, size>::difference_type const lhs, iterator<T, size> rhs) -> iterator<T, size> {
 	return lhs -= rhs;
 }
 
@@ -169,105 +169,105 @@ public:
 	using const_pointer = typename const_iterator::pointer;
 	using pointer = typename iterator::pointer;
 	
-	constexpr size_type size() const noexcept {
+	constexpr auto size() const noexcept -> size_type {
 		return make<size_>();
 	}
-	constexpr bool empty() const noexcept {
+	constexpr auto empty() const noexcept -> bool {
 		return size() == make<0>();
 	}
-	constexpr size_type max_size() const noexcept {
+	constexpr auto max_size() const noexcept -> size_type {
 		return size();
 	}
 	
 	
-	constexpr const_pointer data() const noexcept {
+	constexpr auto data() const noexcept -> const_pointer {
 		return m_value;
 	}
-	pointer data() noexcept {
+	auto data() noexcept -> pointer {
 		return m_value;
 	}
 
-	constexpr const_reference operator[](index_type const & index) const noexcept {
+	constexpr auto operator[](index_type const & index) const noexcept -> const_reference {
 		return *(data() + index);
 	}
-	reference operator[](index_type const & index) noexcept {
+	auto operator[](index_type const & index) noexcept -> reference {
 		return *(data() + index);
 	}
 	template<typename Index>
-	constexpr const_reference at(Index const & index) const noexcept(noexcept(static_cast<index_type>(index))) {
+	constexpr auto at(Index const & index) const noexcept(noexcept(static_cast<index_type>(index))) -> const_reference {
 		return operator[](static_cast<index_type>(index));
 	}
 	template<typename Index>
-	reference at(Index const & index) noexcept(noexcept(static_cast<index_type>(index))) {
+	auto at(Index const & index) noexcept(noexcept(static_cast<index_type>(index))) -> reference {
 		return operator[](static_cast<index_type>(index));
 	}
 	template<typename Index>
-	constexpr const_reference at(Index const & index, non_check_t) const noexcept {
+	constexpr auto at(Index const & index, non_check_t) const noexcept -> const_reference {
 		return operator[](index_type(index, non_check));
 	}
 	template<typename Index>
-	reference at(Index const & index, non_check_t) noexcept {
+	auto at(Index const & index, non_check_t) noexcept -> reference {
 		return operator[](index_type(index, non_check));
 	}
 
-	constexpr const_reference front() const noexcept {
+	constexpr auto front() const noexcept -> const_reference {
 		return operator[](make<0>());
 	}
-	reference front() noexcept {
+	auto front() noexcept -> reference {
 		return operator[](make<0>());
 	}
-	constexpr const_reference back() const noexcept {
+	constexpr auto back() const noexcept -> const_reference {
 		return operator[](size() - make<1>());
 	}
-	reference back() noexcept {
+	auto back() noexcept -> reference {
 		return operator[](size() - make<1>());
 	}
 
-	constexpr const_iterator begin() const noexcept {
+	constexpr auto begin() const noexcept -> const_iterator {
 		return const_iterator(data());
 	}
-	iterator begin() noexcept {
+	auto begin() noexcept -> iterator {
 		return iterator(data());
 	}
-	constexpr const_iterator cbegin() const noexcept {
+	constexpr auto cbegin() const noexcept -> const_iterator {
 		return begin();
 	}
 
-	constexpr const_iterator end() const noexcept {
+	constexpr auto end() const noexcept -> const_iterator {
 		return const_iterator(data() + size());
 	}
-	iterator end() noexcept {
+	auto end() noexcept -> iterator  {
 		return iterator(data() + size());
 	}
-	constexpr const_iterator cend() const noexcept {
+	constexpr auto cend() const noexcept -> const_iterator {
 		return end();
 	}
 
-	constexpr const_reverse_iterator rbegin() const noexcept {
+	constexpr auto rbegin() const noexcept -> const_reverse_iterator {
 		return const_reverse_iterator(end());
 	}
-	reverse_iterator rbegin() noexcept {
+	auto rbegin() noexcept -> reverse_iterator  {
 		return reverse_iterator(end());
 	}
-	constexpr const_reverse_iterator crbegin() const noexcept {
+	constexpr auto crbegin() const noexcept -> const_reverse_iterator {
 		return rbegin();
 	}
 
-	constexpr const_reverse_iterator rend() const noexcept {
+	constexpr auto rend() const noexcept -> const_reverse_iterator {
 		return const_reverse_iterator(begin());
 	}
-	reverse_iterator rend() noexcept {
+	auto rend() noexcept -> reverse_iterator {
 		return reverse_iterator(begin());
 	}
-	constexpr const_reverse_iterator crend() const noexcept {
+	constexpr auto crend() const noexcept -> const_reverse_iterator {
 		return rend();
 	}
 	
-	void fill(const_reference value) noexcept(std::is_nothrow_copy_constructible<value_type>::value) {
+	auto fill(const_reference value) noexcept(std::is_nothrow_copy_constructible<value_type>::value) -> void  {
 		std::fill(begin(), end(), value);
 	}
 	
-	void swap(array & other) noexcept(detail::adl::is_nothrow_swappable<reference, reference>::value) {
+	auto swap(array & other) noexcept(detail::adl::is_nothrow_swappable<reference, reference>::value) -> void {
 		std::swap_ranges(begin(), end(), other.begin());
 	}
 
@@ -278,50 +278,50 @@ public:
 };
 
 template<typename T, std::size_t size>
-constexpr bool operator==(array<T, size> const & lhs, array<T, size> const & rhs) noexcept(noexcept(std::declval<typename array<T, size>::value_type>() == std::declval<typename array<T, size>::value_type>())) {
+constexpr auto operator==(array<T, size> const & lhs, array<T, size> const & rhs) noexcept(noexcept(std::declval<typename array<T, size>::value_type>() == std::declval<typename array<T, size>::value_type>())) -> bool {
 	return std::equal(lhs.begin(), lhs.end(), rhs.begin());
 }
 
 template<typename T, std::size_t size>
-constexpr bool operator!=(array<T, size> const & lhs, array<T, size> const & rhs) noexcept(noexcept(!(lhs == rhs))) {
+constexpr auto operator!=(array<T, size> const & lhs, array<T, size> const & rhs) noexcept(noexcept(!(lhs == rhs))) -> bool {
 	return !(lhs == rhs);
 }
 
 template<typename T, std::size_t size>
-constexpr bool operator<(array<T, size> const & lhs, array<T, size> const & rhs) noexcept(noexcept(std::declval<typename array<T, size>::value_type>() < std::declval<typename array<T, size>::value_type>())) {
+constexpr auto operator<(array<T, size> const & lhs, array<T, size> const & rhs) noexcept(noexcept(std::declval<typename array<T, size>::value_type>() < std::declval<typename array<T, size>::value_type>())) -> bool {
 	return std::lexicographical_compare(lhs.begin(), lhs.end(), rhs.begin(), rhs.end());
 }
 
 template<typename T, std::size_t size>
-constexpr bool operator>(array<T, size> const & lhs, array<T, size> const & rhs) noexcept(noexcept(rhs < lhs)) {
+constexpr auto operator>(array<T, size> const & lhs, array<T, size> const & rhs) noexcept(noexcept(rhs < lhs)) -> bool {
 	return rhs < lhs;
 }
 
 template<typename T, std::size_t size>
-constexpr bool operator<=(array<T, size> const & lhs, array<T, size> const & rhs) noexcept(noexcept(!(rhs < lhs))) {
+constexpr auto operator<=(array<T, size> const & lhs, array<T, size> const & rhs) noexcept(noexcept(!(rhs < lhs))) -> bool {
 	return !(rhs < lhs);
 }
 
 template<typename T, std::size_t size>
-constexpr bool operator>=(array<T, size> const & lhs, array<T, size> const & rhs) noexcept(noexcept(!(lhs < rhs))) {
+constexpr auto operator>=(array<T, size> const & lhs, array<T, size> const & rhs) noexcept(noexcept(!(lhs < rhs))) -> bool {
 	return !(lhs < rhs);
 }
 
 template<std::size_t index, typename T, std::size_t size>
-constexpr T const & get(array<T, size> const & a) noexcept {
+constexpr auto get(array<T, size> const & a) noexcept -> T const & {
 	return a[make<index>()];
 }
 template<std::size_t index, typename T, std::size_t size>
-constexpr T & get(array<T, size> & a) noexcept {
+constexpr auto get(array<T, size> & a) noexcept -> T & {
 	return a[make<index>()];
 }
 template<std::size_t index, typename T, std::size_t size>
-constexpr T && get(array<T, size> && a) noexcept {
+constexpr auto get(array<T, size> && a) noexcept -> T && {
 	return std::move(a[make<index>()]);
 }
 
 template<typename T, std::size_t size>
-void swap(array<T, size> & lhs, array<T, size> & rhs) noexcept(noexcept(lhs.swap(rhs))) {
+auto swap(array<T, size> & lhs, array<T, size> & rhs) noexcept(noexcept(lhs.swap(rhs))) -> void {
 	lhs.swap(rhs);
 }
 }	// namespace bounded
