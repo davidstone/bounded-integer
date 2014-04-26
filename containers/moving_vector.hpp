@@ -89,9 +89,9 @@ public:
 	using iterator_category = std::random_access_iterator_tag;
 
 	constexpr iterator_base() noexcept = default;
-	// Convert iterator to const_iterator
-	constexpr operator iterator_base<T, value_type const>() const noexcept {
-		return iterator_base<T, value_type const>(it);
+	// Convert iterator or indirect_iterator to const_iterator
+	constexpr operator iterator_base<T, T const>() const noexcept {
+		return iterator_base<T, T const>(it);
 	}
 	// Convert iterator to indirect_iterator.
 	constexpr explicit operator iterator_base<T, indirection_type>() const noexcept {
