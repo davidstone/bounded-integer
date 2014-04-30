@@ -24,6 +24,7 @@
 #include <value_ptr/enable_if.hpp>
 #include "apply_tuple.hpp"
 #include "moving_vector.hpp"
+#include "unique_inplace_merge.hpp"
 
 namespace containers {
 namespace detail_flat_map {
@@ -287,6 +288,7 @@ public:
 		// void). Instead, I store the original size and construct a new
 		// iterator.
 		auto const offset = static_cast<typename container_type::difference_type>(m_container.size());
+#if 0
 		// I rely on the optimizer to remove this static check
 		if (allow_duplicates) {
 			m_container.insert(m_container.end(), first, last);
@@ -297,23 +299,32 @@ public:
 				// I suspect this is a win vs. having to shift the elements over.
 				auto && value = *first;
 				auto const it = find(value.first);
-				if (it != end()) {
-					m_container.insert(m_container.end(), std::forward<decltype(value)>(value));
+				if (it == end()) {
+					m_container.emplace_back(std::forward<decltype(value)>(value));
 				}
 			}
-			#if 0
-			// I considered using this code, but I'm getting strange performance
-			// issues that may just relate to the optimizer, but may be caused
-			// by changing code size. I will have to test this out some more in
-			// a later compiler version.
-			m_container.insert(m_container.end(), first, last);
-			auto const remove_position = std::unique(m_container.begin(), m_container.end());
-			m_container.erase(remove_position, m_container.end());
-			#endif
 		}
 		auto const midpoint = moving_begin(m_container) + offset;
+		indirect_compare const compare(value_comp());
+		std::sort(midpoint, moving_end(m_container), compare);
+		auto const equal = [&](auto const & lhs, auto const & rhs) {
+			return !compare(lhs, rhs) and !compare(rhs, lhs);
+		};
+		m_container.erase(std::unique(midpoint, moving_end(m_container), equal), m_container.end());
+		std::inplace_merge(moving_begin(m_container), midpoint, moving_end(m_container), compare);
+
+#else	// USE_UNIQUE
+		m_container.insert(m_container.end(), first, last);
+		auto const midpoint = moving_begin(m_container) + offset;
 		std::sort(midpoint, moving_end(m_container), indirect_compare{value_comp()});
-		std::inplace_merge(moving_begin(m_container), midpoint, moving_end(m_container), indirect_compare{value_comp()});
+		if (allow_duplicates) {
+			std::inplace_merge(moving_begin(m_container), midpoint, moving_end(m_container), indirect_compare{value_comp()});
+		}
+		else {
+			auto const position = detail::unique_inplace_merge(moving_begin(m_container), midpoint, moving_end(m_container), indirect_compare{value_comp()});
+			m_container.erase(position, m_container.end());
+		}
+#endif
 	}
 	void insert(std::initializer_list<value_type> init) {
 		insert(std::begin(init), std::end(init));

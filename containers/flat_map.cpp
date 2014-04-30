@@ -42,13 +42,46 @@ public:
 };
 
 void test_no_extra_copy_or_move() {
+	std::cout << "Testing no extra copies or moves.\n" << std::flush;
 	stable_flat_map<int, Final> final;
 	final.emplace(std::piecewise_construct, std::forward_as_tuple(5), std::forward_as_tuple());
 	final.emplace(std::piecewise_construct, std::forward_as_tuple(6), std::forward_as_tuple(5, 2.0, 'c'));
 }
 
+void test_copy_unique() {
+	std::cout << "Testing copy_unique\n" << std::flush << '\n';
+	std::vector<int> const source = { 1, 3, 5, 5, 5, 6, 10, 10 };
+	std::vector<int> destination(5);
+	auto const it = containers::detail::copy_unique(source.begin(), source.end(), destination.begin());
+	assert(it == destination.end());
+	assert(destination == std::vector<int>({ 1, 3, 5, 6, 10 }));
+}
+
+void test_unique_no_change(std::vector<int> const & v) {
+	auto copy = v;
+	auto const size = static_cast<std::vector<int>::iterator::difference_type>(copy.size());
+	auto const midpoint = std::next(copy.begin(), size / 2);
+	copy.erase(containers::detail::unique_inplace_merge(copy.begin(), midpoint, copy.end()), copy.end());
+	assert(v == copy);
+}
+
+void test_unique_inplace_merge() {
+	std::cout << "Testing unique_inplace_merge.\n" << std::flush;
+	std::vector<int> v({ 1, 3, 5, 7, 9 });
+
+	test_unique_no_change(v);
+
+	auto const midpoint = static_cast<std::vector<int>::iterator::difference_type>(v.size());
+	v.insert(v.end(), { 2, 2, 2, 3, 3, 6, 7 });
+	v.erase(containers::detail::unique_inplace_merge(v.begin(), v.begin() + midpoint, v.end()), v.end());
+	std::vector<int> const expected = { 1, 2, 3, 5, 6, 7, 9 };
+	assert(v == expected);
+}
+
 template<typename container_type>
 void test() {
+	std::cout << "Testing many member functions.\n" << std::flush;
+
 	container_type empty;
 	std::initializer_list<typename container_type::value_type> const init = { {1, 2}, {2, 5}, {3, 3} };
 	container_type container(init);
@@ -156,6 +189,7 @@ void test_performance(std::size_t const loop_count) {
 		static_cast<void>(it);
 	}
 	auto const found_in_extras = high_resolution_clock::now();
+	std::cout << "map size: " << map.size() << '\n';
 	
 	std::cout << "Construction time: " << std::chrono::duration_cast<unit>(constructed - start).count() << '\n';
 	std::cout << "Found time: " << std::chrono::duration_cast<unit>(found - constructed).count() << '\n';
@@ -190,12 +224,12 @@ bool operator<(Class<size> const & lhs, Class<size> const & rhs) {
 
 int main(int argc, char ** argv) {
 	std::cout.sync_with_stdio(false);
-	std::cout << "Testing no extra copies or moves.\n" << std::flush;
+	test_copy_unique();
+	test_unique_inplace_merge();
 	test_no_extra_copy_or_move();
-	std::cout << "Testing many member functions.\n" << std::flush;
 	test<map_type<int, int>>();
 
 	auto const loop_count = (argc == 1) ? 1 : std::stoull(argv[1]);
 	std::cout << "Testing performance.\n" << std::flush;
-	test_performance<Class<50>, Class<1000>>(loop_count);
+	test_performance<Class<1>, Class<1>>(loop_count);
 }

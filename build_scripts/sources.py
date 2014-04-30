@@ -20,6 +20,8 @@ source_directory = 'containers'
 
 include_directories = ['../value_ptr']
 
+flat_map_sources = ['flat_map.cpp', 'unique_inplace_merge.cpp']
+
 programs = [
 	Program(
 		'forward_list',
@@ -40,19 +42,19 @@ programs = [
 	),
 	Program(
 		'flat_map_stable',
-		sources = ['flat_map.cpp'],
+		sources = flat_map_sources,
 		defines = ['USE_STABLE_FLAT_MAP'],
 		include_directories = include_directories
 	),
 	Program(
 		'flat_map_unstable',
-		sources = ['flat_map.cpp'],
+		sources = flat_map_sources,
 		defines = ['USE_UNSTABLE_FLAT_MAP'],
 		include_directories = include_directories
 	),
 	Program(
 		'flat_map_std',
-		sources = ['flat_map.cpp'],
+		sources = flat_map_sources,
 		defines = ['USE_SYSTEM_MAP'],
 		include_directories = include_directories
 	),
