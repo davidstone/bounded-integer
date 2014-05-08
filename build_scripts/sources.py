@@ -54,6 +54,7 @@ base_sources = [('test',
 		'stream.cpp',
 		'string.cpp',
 		'typedefs.cpp',
+		'underlying_type.cpp',
 	]) +
 	prepend_dir('detail/array', [
 		'array.cpp',

@@ -21,6 +21,7 @@
 #include "forward_declaration.hpp"
 #include "is_bounded_integer.hpp"
 #include "overlapping_range.hpp"
+#include "underlying_type.hpp"
 
 #include "policy/null_policy.hpp"
 
@@ -28,26 +29,9 @@
 #include <limits>
 #include <type_traits>
 #include <utility>
-#include <boost/integer.hpp>
 
 namespace bounded {
 namespace detail {
-
-template<typename T1, typename T2>
-using larger_type = typename std::conditional<sizeof(T1) >= sizeof(T2), T1, T2>::type;
-
-template<intmax_t minimum, intmax_t maximum>
-using signed_underlying_t = larger_type<typename boost::int_min_value_t<minimum>::least, typename boost::int_max_value_t<maximum>::least>;
-
-template<intmax_t minimum, intmax_t maximum>
-using unsigned_underlying_t = typename boost::uint_value_t<static_cast<unsigned long long>(maximum)>::least;
-
-template<intmax_t minimum, intmax_t maximum>
-using underlying_t = typename std::conditional<
-	minimum < 0,
-	signed_underlying_t<minimum, maximum>,
-	unsigned_underlying_t<minimum, maximum>
->::type;
 
 template<typename T, enable_if_t<basic_numeric_limits<typename std::decay<T>::type>::is_specialized> = clang_dummy>
 constexpr bool is_implicitly_constructible_from(intmax_t const minimum, intmax_t const maximum) noexcept {
