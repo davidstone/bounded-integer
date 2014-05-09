@@ -237,8 +237,8 @@ void swap(integer_range_type<T>& lhs, integer_range_type<T>& rhs) {
 template<typename Begin, typename End>
 constexpr auto integer_range(Begin && begin, End && end) noexcept {
 	using integer_type = integer<
-		static_cast<intmax_t>(std::numeric_limits<typename std::decay<Begin>::type>::min()),
-		static_cast<intmax_t>(std::numeric_limits<typename std::decay<End>::type>::max())
+		static_cast<intmax_t>(std::numeric_limits<std::decay_t<Begin>>::min()),
+		static_cast<intmax_t>(std::numeric_limits< std::decay_t<End>>::max())
 	>;
 	return integer_range_type<integer_type>(std::forward<Begin>(begin), std::forward<End>(end));
 }

@@ -33,20 +33,20 @@
 namespace bounded {
 namespace detail {
 
-template<typename T, enable_if_t<basic_numeric_limits<typename std::decay<T>::type>::is_specialized> = clang_dummy>
+template<typename T, enable_if_t<basic_numeric_limits<std::decay_t<T>>::is_specialized> = clang_dummy>
 constexpr bool is_implicitly_constructible_from(intmax_t const minimum, intmax_t const maximum) noexcept {
-	return type_fits_in_range<typename std::decay<T>::type>(minimum, maximum);
+	return type_fits_in_range<std::decay_t<T>>(minimum, maximum);
 }
-template<typename T, enable_if_t<!basic_numeric_limits<typename std::decay<T>::type>::is_specialized> = clang_dummy>
+template<typename T, enable_if_t<!basic_numeric_limits<std::decay_t<T>>::is_specialized> = clang_dummy>
 constexpr bool is_implicitly_constructible_from(intmax_t, intmax_t) noexcept {
 	return false;
 }
 
-template<typename policy, typename T, enable_if_t<basic_numeric_limits<typename std::decay<T>::type>::is_specialized> = clang_dummy>
+template<typename policy, typename T, enable_if_t<basic_numeric_limits<std::decay_t<T>>::is_specialized> = clang_dummy>
 constexpr bool is_explicitly_constructible_from(intmax_t const minimum, intmax_t const maximum) noexcept {
-	return type_overlaps_range<typename std::decay<T>::type>(minimum, maximum) or !policy::overflow_is_error;
+	return type_overlaps_range<std::decay_t<T>>(minimum, maximum) or !policy::overflow_is_error;
 }
-template<typename policy, typename T, enable_if_t<!basic_numeric_limits<typename std::decay<T>::type>::is_specialized> = clang_dummy>
+template<typename policy, typename T, enable_if_t<!basic_numeric_limits<std::decay_t<T>>::is_specialized> = clang_dummy>
 constexpr bool is_explicitly_constructible_from(intmax_t, intmax_t) noexcept {
 	return false;
 }
@@ -54,11 +54,11 @@ constexpr bool is_explicitly_constructible_from(intmax_t, intmax_t) noexcept {
 }	// namespace detail
 
 
-template<typename T, enable_if_t<!is_bounded_integer<typename std::decay<T>::type>::value> = clang_dummy>
+template<typename T, enable_if_t<!is_bounded_integer<std::decay_t<T>>::value> = clang_dummy>
 constexpr auto get_overflow_policy(T &&) noexcept {
 	return null_policy{};
 }
-template<typename T, enable_if_t<is_bounded_integer<typename std::decay<T>::type>::value> = clang_dummy>
+template<typename T, enable_if_t<is_bounded_integer<std::decay_t<T>>::value> = clang_dummy>
 constexpr auto get_overflow_policy(T const & value) noexcept {
 	return value.overflow_policy();
 }
@@ -136,11 +136,11 @@ public:
 
 	template<typename T, enable_if_t<std::is_enum<T>::value> = clang_dummy>
 	constexpr explicit integer(T other, non_check_t) noexcept:
-		integer(static_cast<typename std::underlying_type<T>::type>(other), non_check) {
+		integer(static_cast<std::underlying_type_t<T>>(other), non_check) {
 	}
 	template<typename T, enable_if_t<std::is_enum<T>::value> = clang_dummy>
-	constexpr explicit integer(T other) noexcept(noexcept(integer(static_cast<typename std::underlying_type<T>::type>(other)))):
-		integer(static_cast<typename std::underlying_type<T>::type>(other)) {
+	constexpr explicit integer(T other) noexcept(noexcept(integer(static_cast<std::underlying_type_t<T>>(other)))):
+		integer(static_cast<std::underlying_type_t<T>>(other)) {
 	}
 
 	template<typename T>

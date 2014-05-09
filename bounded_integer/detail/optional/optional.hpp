@@ -268,7 +268,7 @@ private:
 
 
 template<typename T>
-optional<typename std::remove_reference<T>::type> make_optional(T && value) noexcept {
+optional<std::remove_reference_t<T>> make_optional(T && value) noexcept {
 	return { std::forward<T>(value) };
 }
 

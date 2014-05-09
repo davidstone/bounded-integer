@@ -31,12 +31,12 @@ public:
 	constexpr basic_policy() noexcept {}
 	constexpr basic_policy(basic_policy const &) noexcept = default;
 	constexpr basic_policy(basic_policy &&) noexcept = default;
-	template<typename T, enable_if_t<std::is_same<typename std::decay<T>::type, basic_policy>::value> = clang_dummy>
+	template<typename T, enable_if_t<std::is_same<std::decay_t<T>, basic_policy>::value> = clang_dummy>
 	constexpr basic_policy(T &&) noexcept {
 	}
 	template<typename T, enable_if_t<
 		is_overflow_policy<T>::value and
-		!std::is_same<typename std::decay<T>::type, basic_policy>::value
+		!std::is_same<std::decay_t<T>, basic_policy>::value
 	> = clang_dummy>
 	constexpr explicit basic_policy(T &&) noexcept {
 	}

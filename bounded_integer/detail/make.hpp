@@ -69,10 +69,10 @@ using equivalent_type = integer<
 // deduced as whatever we pass as the argument type.
 
 template<typename overflow_policy = void, typename T = void>
-constexpr equivalent_type<T, typename std::conditional<std::is_void<overflow_policy>::value,
+constexpr equivalent_type<T, std::conditional_t<std::is_void<overflow_policy>::value,
 	detail::equivalent_overflow_policy<T>,
 	overflow_policy
->::type> make(T const value) noexcept {
+>> make(T const value) noexcept {
 	static_assert(std::numeric_limits<T>::is_integer, "Must be an integer type.");
 	return {value, non_check};
 }

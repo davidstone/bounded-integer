@@ -54,7 +54,7 @@ public:
 };
 
 // If the user tries to do something like
-// common_type<int, unsigned, integer<0, UINT_MAX + 1>>::type
+// common_type_t<int, unsigned, integer<0, UINT_MAX + 1>>
 // this would first convert int and unsigned to their common type (which is
 // unsigned), then get the common type of that and the bounded::integer.
 //
