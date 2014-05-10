@@ -30,11 +30,11 @@
 
 namespace bounded {
 
-template<intmax_t static_minimum, intmax_t static_maximum, typename overflow_policy>
+template<intmax_t static_minimum, intmax_t static_maximum, typename overflow_policy, storage_type storage = storage_type::fast>
 class dynamic_policy {
 public:
 	using overflow_policy_tag = void;
-	using underlying_type = integer<static_minimum, static_maximum, overflow_policy>;
+	using underlying_type = integer<static_minimum, static_maximum, overflow_policy, storage>;
 
 	constexpr dynamic_policy(underlying_type minimum, underlying_type maximum) noexcept:
 		m_min(std::move(minimum)),
@@ -127,11 +127,11 @@ private:
 
 
 
-template<intmax_t static_minimum, intmax_t static_maximum, typename overflow_policy>
+template<intmax_t static_minimum, intmax_t static_maximum, typename overflow_policy, storage_type storage = storage_type::fast>
 class dynamic_max_policy {
 public:
 	using overflow_policy_tag = void;
-	using underlying_type = integer<static_minimum, static_maximum, overflow_policy>;
+	using underlying_type = integer<static_minimum, static_maximum, overflow_policy, storage>;
 
 	constexpr dynamic_max_policy(underlying_type maximum) noexcept:
 		m_max(std::move(maximum)) {
@@ -217,11 +217,11 @@ private:
 
 
 
-template<intmax_t static_minimum, intmax_t static_maximum, typename overflow_policy>
+template<intmax_t static_minimum, intmax_t static_maximum, typename overflow_policy, storage_type storage = storage_type::fast>
 class dynamic_min_policy {
 public:
 	using overflow_policy_tag = void;
-	using underlying_type = integer<static_minimum, static_maximum, overflow_policy>;
+	using underlying_type = integer<static_minimum, static_maximum, overflow_policy, storage>;
 
 	constexpr dynamic_min_policy(underlying_type minimum) noexcept:
 		m_min(std::move(minimum)) {

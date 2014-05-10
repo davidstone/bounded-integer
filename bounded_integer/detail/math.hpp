@@ -22,15 +22,14 @@
 #include "forward_declaration.hpp"
 #include "make.hpp"
 #include "minmax.hpp"
-#include <type_traits>
 
 namespace bounded {
 
-template<intmax_t minimum, intmax_t maximum, typename overflow_policy>
-constexpr auto abs(integer<minimum, maximum, overflow_policy> const value) noexcept {
+template<intmax_t minimum, intmax_t maximum, typename overflow_policy, storage_type storage>
+constexpr auto abs(integer<minimum, maximum, overflow_policy, storage> const value) noexcept {
 	// The 0 has to be there to restrict the range of possible values. Without
 	// it, abs(integer<-7, 3>) would be [-3, 7] instead of [0, 7].
-	return max(value, -value, make<0, overflow_policy>());
+	return max(value, -value, make<0, overflow_policy, storage>());
 }
 
 }	// namespace bounded

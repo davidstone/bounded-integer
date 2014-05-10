@@ -19,6 +19,7 @@
 
 #include "class.hpp"
 #include "numeric_limits.hpp"
+#include "underlying_type.hpp"
 #include "policy/null_policy.hpp"
 #include <cstdint>
 #include <type_traits>
@@ -31,8 +32,8 @@ class equivalent_overflow_policy_c {
 public:
 	using type = null_policy;
 };
-template<intmax_t minimum, intmax_t maximum, typename overflow_policy>
-class equivalent_overflow_policy_c<integer<minimum, maximum, overflow_policy>> {
+template<intmax_t minimum, intmax_t maximum, typename overflow_policy, storage_type storage>
+class equivalent_overflow_policy_c<integer<minimum, maximum, overflow_policy, storage>> {
 public:
 	using type = overflow_policy;
 };
@@ -42,11 +43,16 @@ using equivalent_overflow_policy = typename equivalent_overflow_policy_c<T>::typ
 
 }	// namespace detail
 
-template<typename T, typename overflow_policy = detail::equivalent_overflow_policy<T>>
+template<
+	typename T,
+	typename overflow_policy = detail::equivalent_overflow_policy<T>,
+	storage_type storage = storage_type::fast
+>
 using equivalent_type = integer<
 	static_cast<intmax_t>(std::numeric_limits<T>::min()),
 	static_cast<intmax_t>(std::numeric_limits<T>::max()),
-	overflow_policy
+	overflow_policy,
+	storage
 >;
 
 // This somewhat strange looking set of default arguments allows the following:
@@ -62,23 +68,29 @@ using equivalent_type = integer<
 // the type of integer is not known when we are trying to determine the default
 // policy.
 //
-// 2) The second parameter ("integer") has to be defaulted because we defaulted
-// the first. We don't want "integer" to be the first parameter because that
+// 2) The second is defaulted for the same reasons as the first.
+//
+// 3) The third parameter ("integer") has to be defaulted because we defaulted
+// the first two. We don't want "integer" to be the first parameter because that
 // would prevent type deduction from the function argument. Therefore, we
 // default it to something (it doesn't matter what), but the type will always be
 // deduced as whatever we pass as the argument type.
 
-template<typename overflow_policy = void, typename T = void>
-constexpr equivalent_type<T, std::conditional_t<std::is_void<overflow_policy>::value,
-	detail::equivalent_overflow_policy<T>,
-	overflow_policy
->> make(T const value) noexcept {
+template<typename overflow_policy = void, storage_type storage = storage_type::fast, typename T = void>
+constexpr equivalent_type<
+	T,
+	std::conditional_t<std::is_void<overflow_policy>::value,
+		detail::equivalent_overflow_policy<T>,
+		overflow_policy
+	>,
+	storage
+> make(T const value) noexcept {
 	static_assert(std::numeric_limits<T>::is_integer, "Must be an integer type.");
 	return {value, non_check};
 }
 
-template<intmax_t value, typename overflow_policy = null_policy>
-constexpr integer<value, value, overflow_policy> make() noexcept {
+template<intmax_t value, typename overflow_policy = null_policy, storage_type storage = storage_type::fast>
+constexpr integer<value, value, overflow_policy, storage> make() noexcept {
 	return {value, non_check};
 }
 

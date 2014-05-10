@@ -154,10 +154,10 @@ public:
 }	// namespace bounded
 namespace std {
 
-template<intmax_t minimum, intmax_t maximum, typename overflow_policy>
-class numeric_limits<bounded::integer<minimum, maximum, overflow_policy>> {
+template<intmax_t minimum, intmax_t maximum, typename overflow_policy, bounded::storage_type storage>
+class numeric_limits<bounded::integer<minimum, maximum, overflow_policy, storage>> {
 private:
-	using type = bounded::integer<minimum, maximum, overflow_policy>;
+	using type = bounded::integer<minimum, maximum, overflow_policy, storage>;
 public:
 	static constexpr bool is_specialized = true;
 	static constexpr bool is_signed = minimum < 0;

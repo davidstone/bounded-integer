@@ -342,24 +342,25 @@ public:
 };
 
 
-}	// namespace detail
-
-
 
 template<
 	intmax_t lhs_min, intmax_t lhs_max, typename lhs_overflow,
 	intmax_t rhs_min, intmax_t rhs_max, typename rhs_overflow,
+	storage_type storage,
 	typename Operator
 >
 using operator_result = integer<
 	detail::operator_range<lhs_min, lhs_max, rhs_min, rhs_max, Operator>::min(),
 	detail::operator_range<lhs_min, lhs_max, rhs_min, rhs_max, Operator>::max(),
-	common_policy_t<lhs_overflow, rhs_overflow>
+	common_policy_t<lhs_overflow, rhs_overflow>,
+	storage
 >;
 
-template<intmax_t minimum, intmax_t maximum, typename overflow_policy>
-using unary_minus_result = integer<-maximum, -minimum, overflow_policy>;
+template<intmax_t minimum, intmax_t maximum, typename overflow_policy, storage_type storage>
+using unary_minus_result = integer<-maximum, -minimum, overflow_policy, storage>;
 
+
+}	// namespace detail
 }	// namespace bounded
 
 #endif	// BOUNDED_INTEGER_ARITHMETIC_RESULT_TYPE_HPP_

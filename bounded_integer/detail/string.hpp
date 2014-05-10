@@ -26,15 +26,15 @@ namespace bounded {
 // Import to_string for the numeric types
 using std::to_string;
 
-template<intmax_t minimum, intmax_t maximum, typename overflow_policy>
-std::string to_string(integer<minimum, maximum, overflow_policy> const x) {
+template<intmax_t minimum, intmax_t maximum, typename overflow_policy, storage_type storage>
+std::string to_string(integer<minimum, maximum, overflow_policy, storage> const x) {
 	return to_string(+x.value());
 }
 
 using std::to_wstring;
 
-template<intmax_t minimum, intmax_t maximum, typename overflow_policy>
-std::wstring to_wstring(integer<minimum, maximum, overflow_policy> const x) {
+template<intmax_t minimum, intmax_t maximum, typename overflow_policy, storage_type storage>
+std::wstring to_wstring(integer<minimum, maximum, overflow_policy, storage> const x) {
 	return to_wstring(+x.value());
 }
 

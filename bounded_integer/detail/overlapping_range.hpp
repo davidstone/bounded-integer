@@ -38,8 +38,8 @@ public:
 	}
 	static constexpr bool is_specialized = std::numeric_limits<T>::is_specialized;
 };
-template<intmax_t minimum, intmax_t maximum, typename overflow_policy>
-class basic_numeric_limits<integer<minimum, maximum, overflow_policy>> {
+template<intmax_t minimum, intmax_t maximum, typename overflow_policy, storage_type storage>
+class basic_numeric_limits<integer<minimum, maximum, overflow_policy, storage>> {
 public:
 	static constexpr intmax_t min() noexcept {
 		return minimum;

@@ -63,12 +63,12 @@ constexpr auto get_overflow_policy(T const & value) noexcept {
 	return value.overflow_policy();
 }
 
-template<intmax_t minimum, intmax_t maximum, typename OverflowPolicy>
-class integer : private OverflowPolicy {
+template<intmax_t minimum, intmax_t maximum, typename overflow_policy_ = null_policy, storage_type storage = storage_type::fast>
+class integer : private overflow_policy_ {
 public:
 	static_assert(minimum <= maximum, "Maximum cannot be less than minimum");
-	using underlying_type = detail::underlying_t<minimum, maximum>;
-	using overflow_policy_type = OverflowPolicy;
+	using underlying_type = std::conditional_t<storage == storage_type::fast, detail::fast_t<minimum, maximum>, detail::least_t<minimum, maximum>>;
+	using overflow_policy_type = overflow_policy_;
 	static_assert(detail::value_fits_in_type<underlying_type>(minimum), "minimum does not fit in underlying_type.");
 	static_assert(detail::value_fits_in_type<underlying_type>(maximum), "maximum does not fit in underlying_type.");
 

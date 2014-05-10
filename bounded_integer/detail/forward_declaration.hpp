@@ -1,4 +1,4 @@
-// Forward declaration of bounded::integer with default template argument
+// Forward declaration
 // Copyright (C) 2014 David Stone
 //
 // This program is free software: you can redistribute it and / or modify
@@ -17,13 +17,13 @@
 #ifndef BOUNDED_INTEGER_FORWARD_DECLARATION_HPP_
 #define BOUNDED_INTEGER_FORWARD_DECLARATION_HPP_
 
-#include "policy/null_policy.hpp"
-
 #include <cstdint>
 
 namespace bounded {
 
-template<intmax_t minimum, intmax_t maximum, typename overflow_policy = null_policy>
+enum class storage_type { fast, least };
+
+template<intmax_t minimum, intmax_t maximum, typename overflow_policy, storage_type storage>
 class integer;
 
 // Does not verify that the value is in range with the policy

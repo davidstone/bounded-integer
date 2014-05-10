@@ -59,15 +59,20 @@ public:
 template<
 	typename compare,
 	intmax_t lhs_min, intmax_t lhs_max, typename lhs_policy,
-	intmax_t rhs_min, intmax_t rhs_max, typename rhs_policy
+	intmax_t rhs_min, intmax_t rhs_max, typename rhs_policy,
+	storage_type storage
 >
-class minmax_type<compare, integer<lhs_min, lhs_max, lhs_policy>, integer<rhs_min, rhs_max, rhs_policy>> {
+class minmax_type<
+	compare,
+	integer<lhs_min, lhs_max, lhs_policy, storage>,
+	integer<rhs_min, rhs_max, rhs_policy, storage>
+> {
 private:
 	static constexpr intmax_t minimum = compare{}(lhs_min, rhs_min) ? lhs_min : rhs_min;
 	static constexpr intmax_t maximum = compare{}(lhs_max, rhs_max) ? lhs_max : rhs_max;
 	using policy = common_policy_t<lhs_policy, rhs_policy>;
 public:
-	using type = integer<minimum, maximum, policy>;
+	using type = integer<minimum, maximum, policy, storage>;
 };
 
 

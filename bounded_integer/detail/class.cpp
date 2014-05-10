@@ -42,4 +42,6 @@ static_assert(
 	"Cannot construct a type from itself with non_check_t."
 );
 
+constexpr bounded::integer<min, max, bounded::null_policy, bounded::storage_type::least> least(0);
+
 }	// namespace
