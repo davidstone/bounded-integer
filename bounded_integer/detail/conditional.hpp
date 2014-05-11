@@ -1,5 +1,5 @@
 // This fakes a ternary conditional operator overload
-// Copyright (C) 2013 David Stone
+// Copyright (C) 2014 David Stone
 //
 // This program is free software: you can redistribute it and / or modify
 // it under the terms of the GNU Affero General Public License as
@@ -14,14 +14,14 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with this program. If not, see <http://www.gnu.org/licenses/>.
 
-#ifndef BOUNDED_INTEGER_TERNARY_CONDITIONAL_HPP_
-#define BOUNDED_INTEGER_TERNARY_CONDITIONAL_HPP_
+#ifndef BOUNDED_INTEGER_CONDITIONAL_HPP_
+#define BOUNDED_INTEGER_CONDITIONAL_HPP_
 
 #include "common_type.hpp"
 
-#define BOUNDED_INTEGER_CONDITIONAL(condition, lhs, rhs) \
+#define BOUNDED_CONDITIONAL(condition, lhs, rhs) \
 	((condition) ? \
 		static_cast<std::common_type_t<decltype(lhs), decltype(rhs)>>(lhs) : \
 		static_cast<std::common_type_t<decltype(lhs), decltype(rhs)>>(rhs))
 
-#endif	// BOUNDED_INTEGER_TERNARY_CONDITIONAL_HPP_
+#endif	// BOUNDED_INTEGER_CONDITIONAL_HPP_
