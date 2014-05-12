@@ -49,7 +49,7 @@ The general form of the class is `bounded::integer<minimum, maximum, policy = bo
 
 ## Using
 
-`bounded::integer` is a header-only library. The .cpp files only contain tests. All you have to do to use the program is `#include <bounded_integer/bounded_integer.hpp>`.
+`bounded::integer` is a header-only library. The .cpp files only contain tests. All you have to do to use the program is `#include <bounded_integer/bounded_integer.hpp>`. To get access to an array class that uses `bounded::integer`, include the header `bounded_integer/array.hpp`. `bounded_integer/integer_range.hpp` allows an integer range generating function similar to `range` in Python. Finally, `bounded_integer/optional.hpp` contains an `optional` class (that currently only works for `bounded::integer` and built-in types) with a space optimization for most `bounded::integer` types.
 
 # Limitations
 
