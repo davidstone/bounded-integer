@@ -25,6 +25,8 @@
 namespace containers {
 namespace detail {
 
+// copy_unique requires that the range passed in is already sorted.
+//
 // The binary predicate requires the "less than" semantics rather than
 // "equal to" because we know the range must be sorted, which required a strict
 // weak ordering. This allows reuse of the same predicate with no duplication of
@@ -56,16 +58,18 @@ MutableForwardIterator copy_unique(InputIterator const first, InputIterator cons
 	return copy_unique(first, last, destination, std::less<>{});
 }
 
-//#define NEW_ALGORITHM
-#define STANDARD_ALGORITHM
 
-template<typename Iterator>
-using storage_t = std::vector<std::decay_t<decltype(*std::declval<Iterator>())>>;
-
-#if defined NEW_ALGORITHM
-
+// unique_inplace_merge works on two sets of data. This function moves from one
+// of the two ranges until one of two conditions occurs:
+//
+// 1) The range is empty or
+// 2) The front of the other range compares less than the front of this range
+//
+// The third parameter is an iterator to just before the destination we will be
+// inserting into because we only insert into the destination if the value at
+// before_destination is less than the front of the source range.
 template<typename ForwardIterator, typename OutputIterator, typename Compare>
-std::tuple<ForwardIterator, OutputIterator> helper(
+std::tuple<ForwardIterator, OutputIterator> move_chunk(
 	ForwardIterator first, ForwardIterator const last,
 	OutputIterator before_destination,
 	std::remove_reference_t<decltype(*std::declval<ForwardIterator>())> const & other,
@@ -99,9 +103,12 @@ Iterator unique_inplace_merge(Iterator first, Iterator middle, Iterator last, Co
 		return compare(*middle, value);
 	});
 	
+	// This can be done better than just creating a std::vector, but it works
+	// good enough for now (famous last words).
+	using storage_type = std::vector<std::decay_t<decltype(*std::declval<Iterator>())>>;
 	// Move the rest of the elements so we can use their space without
 	// overwriting.
-	storage_t<Iterator> temp(std::make_move_iterator(destination), std::make_move_iterator(middle));
+	storage_type temp(std::make_move_iterator(destination), std::make_move_iterator(middle));
 	auto move_from = temp.begin();
 	
 	// If either range is entirely less than the other, we skip over this step,
@@ -109,11 +116,11 @@ Iterator unique_inplace_merge(Iterator first, Iterator middle, Iterator last, Co
 	if (!temp.empty() and first != destination) {
 		--destination;
 		while (true) {
-			std::tie(middle, destination) = helper(middle, last, destination, *move_from, compare);
+			std::tie(middle, destination) = move_chunk(middle, last, destination, *move_from, compare);
 			if (middle == last) {
 				break;
 			}
-			std::tie(move_from, destination) = helper(move_from, temp.end(), destination, *middle, compare);
+			std::tie(move_from, destination) = move_chunk(move_from, temp.end(), destination, *middle, compare);
 			if (move_from == temp.end()) {
 				break;
 			}
@@ -139,66 +146,9 @@ Iterator unique_inplace_merge(Iterator first, Iterator middle, Iterator last, Co
 	return destination;
 }
 
-#elif defined STANDARD_ALGORITHM
-
-template<typename Iterator, typename Compare>
-Iterator unique_inplace_merge(Iterator first, Iterator middle, Iterator last, Compare compare) {
-	std::inplace_merge(first, middle, last, compare);
-	return std::unique(first, last, [=](auto const & lhs, auto const & rhs) {
-		return !compare(lhs, rhs) and !compare(rhs, lhs);
-	});
-}
-
-#else
-
-template<typename Iterator, typename Compare>
-void add_if_unique(Iterator it, Compare compare, storage_t<Iterator> & temp) {
-	if (temp.empty() or compare(temp.back(), *it)) {
-		temp.emplace_back(std::move(*it));
-	}
-}
-
-// Returns whether to stop iterating
-template<typename Iterator, typename Compare>
-bool helper(Iterator & first, Iterator const last, Iterator & other, Iterator const other_last, Compare compare, storage_t<Iterator> & temp) {
-	for (; first != last; ++first) {
-		if (compare(*other, *first)) {
-			break;
-		}
-		add_if_unique(first, compare, temp);
-	}
-	if (first == last) {
-		for (; other != other_last; ++other) {
-			add_if_unique(other, compare, temp);
-		}
-		return true;
-	}
-	return false;
-}
-
-template<typename Iterator, typename Compare>
-Iterator unique_inplace_merge(Iterator first, Iterator middle, Iterator last, Compare compare) {
-	storage_t<Iterator> temp;
-	auto const first_end = middle;
-	auto const original = first;
-	while (true) {
-		bool stop = helper(first, first_end, middle, last, compare, temp);
-		if (stop) {
-			break;
-		}
-		stop = helper(middle, last, first, first_end, compare, temp);
-		if (stop) {
-			break;
-		}
-	}
-	return std::move(temp.begin(), temp.end(), original);
-}
-
-#endif
-
 template<typename Iterator>
 Iterator unique_inplace_merge(Iterator first, Iterator middle, Iterator last) {
-	return unique_inplace_merge(std::move(first), std::move(middle), std::move(last), std::less<>{});
+	return unique_inplace_merge(first, middle, last, std::less<>{});
 }
 
 }	// namespace detail
