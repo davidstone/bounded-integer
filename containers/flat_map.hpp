@@ -123,7 +123,13 @@ public:
 	template<typename InputIterator>
 	flat_map_base(InputIterator first, InputIterator last, Compare const & compare = Compare{}, Allocator const & allocator = Allocator{}):
 		m_container(first, last) {
-		std::sort(moving_begin(m_container), moving_end(m_container), indirect_compare{value_comp()});
+		auto const less = indirect_compare{value_comp()};
+		std::sort(moving_begin(m_container), moving_end(m_container), less);
+		// At some point this should be std::unique_sort
+		auto const equal = [&](auto const & lhs, auto const & rhs) {
+			return !less(lhs, rhs) and !less(rhs, lhs);
+		};
+		m_container.erase(std::unique(moving_begin(m_container), moving_end(m_container), equal), m_container.end());
 	}
 	template<typename InputIterator>
 	flat_map_base(InputIterator first, InputIterator last, Allocator const & allocator):
