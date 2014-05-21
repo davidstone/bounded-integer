@@ -126,24 +126,33 @@ Iterator unique_inplace_merge(Iterator first, Iterator middle, Iterator last, Co
 			}
 		}
 	}
+	auto const create_remaining_range = [=](auto const begin, auto const end) {
+		return std::make_pair(
+			std::find_if(begin, end, [=](auto const & value) { return compare(*destination, value); }),
+			end
+		);
+	};
 	if (middle != last) {
-		middle = std::find_if(middle, last, [&](auto const & value) {
-			return compare(*destination, value);
-		});
-		++destination;
-		destination = copy_unique(std::make_move_iterator(middle), std::make_move_iterator(last), destination, compare);
+		auto const remaining_range = create_remaining_range(middle, last);
+		return copy_unique(
+			std::make_move_iterator(remaining_range.first),
+			std::make_move_iterator(remaining_range.second),
+			std::next(destination),
+			compare
+		);
 	}
 	else if (move_from != temp.end()) {
-		move_from = std::find_if(move_from, temp.end(), [&](auto const & value) {
-			return compare(*destination, value);
-		});
-		++destination;
-		destination = copy_unique(std::make_move_iterator(move_from), std::make_move_iterator(temp.end()), destination, compare);
+		auto const remaining_range = create_remaining_range(move_from, temp.end());
+		return copy_unique(
+			std::make_move_iterator(remaining_range.first),
+			std::make_move_iterator(remaining_range.second),
+			std::next(destination),
+			compare
+		);
 	}
 	else {
-		++destination;
+		return last;
 	}
-	return destination;
 }
 
 template<typename Iterator>
