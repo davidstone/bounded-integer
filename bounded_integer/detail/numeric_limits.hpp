@@ -185,13 +185,13 @@ public:
 	static constexpr bool tinyness_before = false;
 	
 	static constexpr type min() noexcept {
-		return type(minimum, bounded::non_check);
+		return bounded::integer<minimum, minimum, overflow_policy, storage>(minimum, bounded::non_check);
 	}
 	static constexpr type lowest() noexcept {
-		return type(minimum, bounded::non_check);
+		return bounded::integer<minimum, minimum, overflow_policy, storage>(minimum, bounded::non_check);
 	}
 	static constexpr type max() noexcept {
-		return type(maximum, bounded::non_check);
+		return bounded::integer<maximum, maximum, overflow_policy, storage>(maximum, bounded::non_check);
 	}
 	// Some of these functions return 0 for built-in integer types, but 0 may
 	// not be in the representable range. Fortunately, they are also defined as
