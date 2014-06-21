@@ -26,9 +26,9 @@ namespace detail {
 
 // http://stackoverflow.com/questions/19609186/what-is-stdnumeric-limitstdigits-supposed-to-represent
 template<intmax_t base>
-constexpr int test_log_successor_abs(intmax_t value);
+constexpr auto test_log_successor_abs(intmax_t value) -> int;
 template<>
-constexpr int test_log_successor_abs<2>(intmax_t value) {
+constexpr auto test_log_successor_abs<2>(intmax_t value) -> int {
 	return
 		(value == 1) ? 1 :
 		(value == 2) ? 1 :
@@ -51,7 +51,7 @@ constexpr int test_log_successor_abs<2>(intmax_t value) {
 		throw 0;
 }
 template<>
-constexpr int test_log_successor_abs<10>(intmax_t value) {
+constexpr auto test_log_successor_abs<10>(intmax_t value) -> int {
 	return
 		(value == 1) ? 0 :
 		(value == 2) ? 0 :
@@ -86,19 +86,19 @@ private:
 	// to compact the representation.
 
 	static_assert(base > 1, "Base must be greater than 1.");
-	static constexpr bool successor_is_power(intmax_t value) noexcept {
+	static constexpr auto successor_is_power(intmax_t value) noexcept -> bool {
 		return
 			(value == 0) ? true :
 			(value % base != base - 1 and value % base != -base + 1) ? false :
 			successor_is_power(value / base);
 	}
-	static constexpr int log_abs(intmax_t value, int sum) noexcept {
+	static constexpr auto log_abs(intmax_t value, int sum) noexcept -> int {
 		return (-base < value and value < base) ? sum : log_abs(value / base, sum + 1);
 	}
 	// This must be one function rather than a chained call to three functions
 	// because abs can overflow for the smallest possible value of intmax_t and
 	// incrementing would overflow for either extreme.
-	static constexpr int log_successor_abs(intmax_t value) noexcept {
+	static constexpr auto log_successor_abs(intmax_t value) noexcept -> int {
 		return (value == 0) ? 0 : log_abs(value, 0) + (successor_is_power(value) ? 1 : 0);
 	}
 
@@ -140,7 +140,7 @@ private:
 
 	static_assert(log_successor_abs(0) == 0, "Incorrect abs.");
 public:
-	static constexpr int calculate(intmax_t minimum, intmax_t maximum) noexcept {
+	static constexpr auto calculate(intmax_t minimum, intmax_t maximum) noexcept -> int {
 		return
 			(0 < minimum or maximum < 0) ?
 				0 :
@@ -184,13 +184,13 @@ public:
 	static constexpr bool traps = minimum <= 0 and 0 <= maximum;
 	static constexpr bool tinyness_before = false;
 	
-	static constexpr type min() noexcept {
+	static constexpr auto min() noexcept {
 		return bounded::integer<minimum, minimum, overflow_policy, storage>(minimum, bounded::non_check);
 	}
-	static constexpr type lowest() noexcept {
+	static constexpr auto lowest() noexcept {
 		return bounded::integer<minimum, minimum, overflow_policy, storage>(minimum, bounded::non_check);
 	}
-	static constexpr type max() noexcept {
+	static constexpr auto max() noexcept {
 		return bounded::integer<maximum, maximum, overflow_policy, storage>(maximum, bounded::non_check);
 	}
 	// Some of these functions return 0 for built-in integer types, but 0 may
@@ -199,22 +199,22 @@ public:
 	// says: Any value that is not "meaningful" shall be set to 0 or false. This
 	// therefore technically invokes undefined behavior because 0 might not be
 	// in the range of representable values
-	static constexpr type epsilon() noexcept {
+	static constexpr auto epsilon() noexcept {
 		return type(minimum, bounded::non_check);
 	}
-	static constexpr type round_error() noexcept {
+	static constexpr auto round_error() noexcept {
 		return type(minimum, bounded::non_check);
 	}
-	static constexpr type infinity() noexcept {
+	static constexpr auto infinity() noexcept {
 		return type(minimum, bounded::non_check);
 	}
-	static constexpr type quiet_NaN() noexcept {
+	static constexpr auto quiet_NaN() noexcept {
 		return type(minimum, bounded::non_check);
 	}
-	static constexpr type signaling_NaN() noexcept {
+	static constexpr auto signaling_NaN() noexcept {
 		return type(minimum, bounded::non_check);
 	}
-	static constexpr type denorm_min() noexcept {
+	static constexpr auto denorm_min() noexcept {
 		return type(minimum, bounded::non_check);
 	}
 };
