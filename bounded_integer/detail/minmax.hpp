@@ -18,135 +18,163 @@
 #define BOUNDED_INTEGER_MINMAX_HPP_
 
 #include "common_policy.hpp"
+#include "common_type.hpp"
 #include "forward_declaration.hpp"
-#include "make.hpp"
 #include "numeric_limits.hpp"
 #include "overlapping_range.hpp"
+#include <utility>
 
 namespace bounded {
 namespace detail {
 namespace minmax {
 
+// These are defined because the standard versions do not have noexcept
+// specifications.
+//
+// TODO: Add total ordering for pointer types
 class less {
 public:
 	template<typename LHS, typename RHS>
-	constexpr bool operator()(LHS && lhs, RHS && rhs) const noexcept {
-		static_assert(noexcept(std::forward<LHS>(lhs) < std::forward<RHS>(rhs)), "< must be noexcept.");
+	constexpr auto operator()(LHS && lhs, RHS && rhs) const noexcept(noexcept(std::forward<LHS>(lhs) < std::forward<RHS>(rhs))) {
 		return std::forward<LHS>(lhs) < std::forward<RHS>(rhs);
 	}
 };
 class greater {
 public:
 	template<typename LHS, typename RHS>
-	constexpr bool operator()(LHS && lhs, RHS && rhs) const noexcept {
-		static_assert(noexcept(std::forward<LHS>(lhs) > std::forward<RHS>(rhs)), "> must be noexcept.");
+	constexpr auto operator()(LHS && lhs, RHS && rhs) const noexcept(noexcept(std::forward<LHS>(lhs) > std::forward<RHS>(rhs))) {
 		return std::forward<LHS>(lhs) > std::forward<RHS>(rhs);
 	}
 };
 
-template<typename compare, typename... Ts>
-class minmax_type;
+}	// namespace minmax
+}	// namespace detail
 
-template<typename compare, typename... Ts>
-using minmax_t = typename minmax_type<compare, Ts...>::type;
 
-template<typename compare, typename T0, typename T1, typename... Ts>
-class minmax_type<compare, T0, T1, Ts...> {
+// Specialize this class to give the correct type for your own extreme function
+// if the default does not work
+template<typename Compare, typename T1, typename T2>
+class extreme_type {
 public:
-	using type = minmax_t<compare, T0, minmax_t<compare, T1, Ts...>>;
+	using type = std::common_type_t<T1, T2>;
 };
 
+template<typename Compare, typename T1, typename T2>
+using extreme_t = typename extreme_type<Compare, std::decay_t<T1>, std::decay_t<T2>>::type;
+
 template<
-	typename compare,
+	typename Compare,
 	intmax_t lhs_min, intmax_t lhs_max, typename lhs_policy,
 	intmax_t rhs_min, intmax_t rhs_max, typename rhs_policy,
 	storage_type storage
 >
-class minmax_type<
-	compare,
+class extreme_type<
+	Compare,
 	integer<lhs_min, lhs_max, lhs_policy, storage>,
 	integer<rhs_min, rhs_max, rhs_policy, storage>
 > {
 private:
-	static constexpr intmax_t minimum = compare{}(lhs_min, rhs_min) ? lhs_min : rhs_min;
-	static constexpr intmax_t maximum = compare{}(lhs_max, rhs_max) ? lhs_max : rhs_max;
+	static constexpr auto minimum = Compare{}(lhs_min, rhs_min) ? lhs_min : rhs_min;
+	static constexpr auto maximum = Compare{}(lhs_max, rhs_max) ? lhs_max : rhs_max;
 	using policy = common_policy_t<lhs_policy, rhs_policy>;
 public:
 	using type = integer<minimum, maximum, policy, storage>;
 };
 
+// Unlike the standard versions of min and max, which accept a fixed number of
+// arguments, these functions accept a variadic pack. Therefore, there is no way
+// to distinguish whether the user wanted to compare all of the object with
+// `operator<` or a comparison function. The separately named function `extreme`
+// serves that purpose.
+//
+// Because the variadic pack must be at the end of the parameter list, `extreme`
+// accepts the comparison function as the first argument
 
-template<typename T>
-constexpr T min(T && value) noexcept {
-	return value;
-}
-template<typename LHS, typename RHS, enable_if_t<
-	(std::numeric_limits<LHS>::max() < std::numeric_limits<RHS>::min())
-> = clang_dummy>
-constexpr LHS min(LHS && lhs, RHS &&) noexcept {
-	return lhs;
-}
-template<typename LHS, typename RHS, enable_if_t<
-	(std::numeric_limits<RHS>::max() < std::numeric_limits<LHS>::min())
-> = clang_dummy>
-constexpr RHS min(LHS &&, RHS && rhs) noexcept {
-	return rhs;
-}
-template<typename LHS, typename RHS, enable_if_t<
-	!(std::numeric_limits<LHS>::max() < std::numeric_limits<RHS>::min()) and
-	!(std::numeric_limits<RHS>::max() < std::numeric_limits<LHS>::min())
-> = clang_dummy>
-constexpr minmax_t<less, LHS, RHS> min(LHS && lhs, RHS && rhs) noexcept {
-	using type = minmax_t<less, LHS, RHS>;
-	return (lhs < rhs) ? type(lhs, non_check) : type(rhs, non_check);
+template<typename Compare, typename T>
+constexpr auto extreme(Compare, T && t) noexcept {
+	return t;
 }
 
-template<typename LHS, typename RHS, typename... Others>
-constexpr minmax_t<less, LHS, RHS, Others...> min(LHS && lhs, RHS && rhs, Others && ... others) noexcept {
-	return min(std::forward<LHS>(lhs), min(std::forward<RHS>(rhs), std::forward<Others>(others)...));
+// If the type of the result has no overlap with the type one of the arguments,
+// then that argument cannot be the true value. Therefore, we can skip any
+// actual comparison and just return the other value. The general code would not
+// compile without this, because you cannot cast to a bounded::integer type that
+// has no overlap.
+template<typename Compare, typename T1, typename T2, enable_if_t<
+	not detail::types_overlap<extreme_t<Compare, T1, T2>, T2>()
+> = clang_dummy>
+constexpr auto extreme(Compare, T1 && t1, T2 &&) noexcept {
+	static_assert(std::is_same<std::decay_t<T1>, std::decay_t<extreme_t<Compare, T1, T2>>>::value, "Incorrect type with no overlap.");
+	return t1;
+}
+template<typename Compare, typename T1, typename T2, enable_if_t<
+	not detail::types_overlap<extreme_t<Compare, T1, T2>, T1>()
+> = clang_dummy>
+constexpr auto extreme(Compare, T1 &&, T2 && t2) noexcept {
+	static_assert(std::is_same<std::decay_t<T2>, std::decay_t<extreme_t<Compare, T1, T2>>>::value, "Incorrect type with no overlap.");
+	return t2;
+}
+
+template<typename Compare, typename T1, typename T2, enable_if_t<
+	detail::types_overlap<extreme_t<Compare, T1, T2>, T1>() and
+	detail::types_overlap<extreme_t<Compare, T1, T2>, T2>()
+> = clang_dummy>
+constexpr auto extreme(Compare compare, T1 && t1, T2 && t2) noexcept(noexcept(compare(std::forward<T1>(t1), std::forward<T2>(t2)))) {
+	return compare(t2, t1) ?
+		static_cast<extreme_t<Compare, T1, T2>>(std::forward<T2>(t2)) :
+		static_cast<extreme_t<Compare, T1, T2>>(std::forward<T1>(t1))
+	;
 }
 
 
-template<typename T>
-constexpr T max(T && value) noexcept {
-	return value;
-}
-template<typename LHS, typename RHS, enable_if_t<
-	(std::numeric_limits<LHS>::min() > std::numeric_limits<RHS>::max())
-> = clang_dummy>
-constexpr LHS max(LHS && lhs, RHS &&) noexcept {
-	return lhs;
-}
-template<typename LHS, typename RHS, enable_if_t<
-	(std::numeric_limits<RHS>::min() > std::numeric_limits<LHS>::max())
-> = clang_dummy>
-constexpr RHS max(LHS &&, RHS && rhs) noexcept {
-	return rhs;
-}
-template<typename LHS, typename RHS, enable_if_t<
-	!(std::numeric_limits<LHS>::max() < std::numeric_limits<RHS>::min()) and
-	!(std::numeric_limits<RHS>::max() < std::numeric_limits<LHS>::min())
-> = clang_dummy>
-constexpr minmax_t<greater, LHS, RHS> max(LHS && lhs, RHS && rhs) noexcept {
-	using type = minmax_t<greater, LHS, RHS>;
-	return (lhs > rhs) ? type(lhs, non_check) : type(rhs, non_check);
-}
-template<typename LHS, typename RHS, typename... Others>
-constexpr minmax_t<greater, LHS, RHS, Others...> max(LHS && lhs, RHS && rhs, Others && ... others) noexcept {
-	return max(std::forward<LHS>(lhs), max(std::forward<RHS>(rhs), std::forward<Others>(others)...));
-}
+namespace detail {
+namespace minmax {
+
+// These are needed because you cannot have a recursive noexcept specification
+// https://stackoverflow.com/questions/23772928/recursive-noexcept-specification
+
+template<typename Compare, typename... Ts>
+struct noexcept_comparable;
+
+template<typename Compare, typename T>
+struct noexcept_comparable<Compare, T> : std::integral_constant<bool, true> {
+};
+
+template<typename Compare, typename T1, typename T2>
+struct noexcept_comparable<Compare, T1, T2> : std::integral_constant<bool, noexcept(
+	std::declval<Compare>()(std::declval<T1>(), std::declval<T2>())
+)> {
+};
+
+template<typename Compare, typename T1, typename T2, typename... Ts>
+struct noexcept_comparable<Compare, T1, T2, Ts...> : std::integral_constant<bool,
+	noexcept_comparable<Compare, T1, T2>::value and
+	noexcept_comparable<Compare, extreme_t<Compare, T1, T2>, Ts...>::value
+> {
+};
 
 }	// namespace minmax
 }	// namespace detail
 
-template<typename... Integers>
-constexpr auto min(Integers && ... integers) noexcept {
-	return detail::minmax::min(make(std::forward<Integers>(integers))...);
+
+// TODO: noexcept specification needs to take possible copies / moves into
+// account if this supports non bounded::integer types.
+template<typename Compare, typename T1, typename T2, typename... Ts>
+constexpr auto extreme(Compare compare, T1 && t1, T2 && t2, Ts && ... ts) noexcept(detail::minmax::noexcept_comparable<Compare, T1, T2, Ts...>::value) {
+	return extreme(
+		compare,
+		extreme(compare, std::forward<T1>(t1), std::forward<T2>(t2)),
+		std::forward<Ts>(ts)...
+	);
 }
 
-template<typename... Integers>
-constexpr auto max(Integers && ... integers) noexcept {
-	return detail::minmax::max(make(std::forward<Integers>(integers))...);
+template<typename... Ts>
+constexpr auto min(Ts && ... ts) noexcept(detail::minmax::noexcept_comparable<detail::minmax::less, Ts...>::value) {
+	return extreme(detail::minmax::less{}, std::forward<Ts>(ts)...);
+}
+template<typename... Ts>
+constexpr auto max(Ts && ... ts) noexcept(detail::minmax::noexcept_comparable<detail::minmax::greater, Ts...>::value) {
+	return extreme(detail::minmax::greater{}, std::forward<Ts>(ts)...);
 }
 
 }	// namespace bounded

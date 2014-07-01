@@ -84,6 +84,17 @@ constexpr bool type_fits_in_range<uintmax_t>(intmax_t const, intmax_t const) noe
 	return false;
 }
 
+template<typename T1, typename T2>
+constexpr bool types_overlap() noexcept {
+	using type = std::decay_t<std::conditional_t<std::is_same<T1, uintmax_t>::value, T1, T2>>;
+	using range_type = std::decay_t<std::conditional_t<std::is_same<T1, uintmax_t>::value, T2, T1>>;
+	return type_overlaps_range<type>(basic_numeric_limits<range_type>::min(), basic_numeric_limits<range_type>::max());
+}
+template<>
+constexpr bool types_overlap<uintmax_t, uintmax_t>() noexcept {
+	return true;
+}
+
 }	// namespace detail
 }	// namespace bounded
 #endif	// BOUNDED_INTEGER_OVERLAPPING_RANGE_HPP_

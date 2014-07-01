@@ -89,7 +89,22 @@ void check_numeric_limits_all() {
 	// check_numeric_limits<uint64_t>();
 }
 
-void check_minmax() {
+void check_single_argument_minmax() {
+	constexpr auto value = 5_bi;
+	static_assert(bounded::min(value) == value, "A value does not have itself as the minimum.");
+	static_assert(bounded::max(value) == value, "A value does not have itself as the maximum.");
+}
+
+void check_double_argument_minmax() {
+	constexpr auto lower_value = 6_bi;
+	constexpr auto greater_value = 10_bi;
+	static_assert(bounded::min(lower_value, greater_value) == lower_value, "Two argument min value incorrect.");
+	static_assert(bounded::min(greater_value, lower_value) == lower_value, "Two argument min value incorrect.");
+	static_assert(bounded::max(lower_value, greater_value) == greater_value, "Two argument max value incorrect.");
+	static_assert(bounded::max(greater_value, lower_value) == greater_value, "Two argument max value incorrect.");
+}
+
+void check_many_argument_minmax() {
 	constexpr bounded::integer<-53, 1000> value(3_bi);
 	constexpr auto minimum = bounded::min(0_bi, 10_bi, 5_bi, value);
 	using min_type = decltype(minimum);
@@ -102,6 +117,12 @@ void check_minmax() {
 	static_assert(maximum == 10_bi, "Incorrect maximum value.");
 	static_assert(std::numeric_limits<max_type>::min() == 10, "Incorrect minimum maximum.");
 	static_assert(std::numeric_limits<max_type>::max() == 1000, "Incorrect maximum maximum.");
+}
+
+void check_minmax() {
+	check_single_argument_minmax();
+	check_double_argument_minmax();
+	check_many_argument_minmax();
 }
 
 void check_throw_policy() {
