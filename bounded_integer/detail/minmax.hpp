@@ -19,6 +19,7 @@
 
 #include "common_policy.hpp"
 #include "common_type.hpp"
+#include "comparison_operators.hpp"
 #include "forward_declaration.hpp"
 #include "numeric_limits.hpp"
 #include "overlapping_range.hpp"
@@ -101,14 +102,14 @@ constexpr auto extreme(Compare, T && t) noexcept {
 // compile without this, because you cannot cast to a bounded::integer type that
 // has no overlap.
 template<typename Compare, typename T1, typename T2, enable_if_t<
-	not detail::types_overlap<extreme_t<Compare, T1, T2>, T2>()
+	not detail::types_overlap<extreme_t<Compare, T1, T2>, T2>::value
 > = clang_dummy>
 constexpr auto extreme(Compare, T1 && t1, T2 &&) noexcept {
 	static_assert(std::is_same<std::decay_t<T1>, std::decay_t<extreme_t<Compare, T1, T2>>>::value, "Incorrect type with no overlap.");
 	return t1;
 }
 template<typename Compare, typename T1, typename T2, enable_if_t<
-	not detail::types_overlap<extreme_t<Compare, T1, T2>, T1>()
+	not detail::types_overlap<extreme_t<Compare, T1, T2>, T1>::value
 > = clang_dummy>
 constexpr auto extreme(Compare, T1 &&, T2 && t2) noexcept {
 	static_assert(std::is_same<std::decay_t<T2>, std::decay_t<extreme_t<Compare, T1, T2>>>::value, "Incorrect type with no overlap.");
@@ -116,8 +117,19 @@ constexpr auto extreme(Compare, T1 &&, T2 && t2) noexcept {
 }
 
 template<typename Compare, typename T1, typename T2, enable_if_t<
-	detail::types_overlap<extreme_t<Compare, T1, T2>, T1>() and
-	detail::types_overlap<extreme_t<Compare, T1, T2>, T2>()
+	detail::types_overlap<extreme_t<Compare, T1, T2>, T1>::value and
+	detail::types_overlap<extreme_t<Compare, T1, T2>, T2>::value
+> = clang_dummy>
+constexpr auto extreme(Compare compare, T1 && t1, T2 && t2) noexcept(noexcept(compare(std::forward<T1>(t1), std::forward<T2>(t2)))) {
+	return compare(t2, t1) ?
+		static_cast<extreme_t<Compare, T1, T2>>(std::forward<T2>(t2)) :
+		static_cast<extreme_t<Compare, T1, T2>>(std::forward<T1>(t1))
+	;
+}
+
+
+template<typename Compare, typename T1, typename T2, enable_if_t<
+	not detail::basic_numeric_limits<T1>::is_specialized or not detail::basic_numeric_limits<T2>::is_specialized
 > = clang_dummy>
 constexpr auto extreme(Compare compare, T1 && t1, T2 && t2) noexcept(noexcept(compare(std::forward<T1>(t1), std::forward<T2>(t2)))) {
 	return compare(t2, t1) ?

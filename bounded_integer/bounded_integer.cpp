@@ -119,10 +119,61 @@ void check_many_argument_minmax() {
 	static_assert(std::numeric_limits<max_type>::max() == 1000, "Incorrect maximum maximum.");
 }
 
+void check_non_bounded_minmax() {
+	constexpr auto integer_min = bounded::min(0, 5);
+	static_assert(std::is_same<decltype(integer_min), int const>::value, "Incorrect type of min for int arguments.");
+	static_assert(integer_min == 0, "Incorrect value of min for int arguments.");
+}
+
+constexpr auto string_less(char const * lhs, char const * rhs) noexcept -> bool {
+	return
+		*lhs < *rhs ? true :
+		*rhs < *lhs ? false :
+		*lhs == '\0' ? false :
+		string_less(lhs + 1, rhs + 1);
+}
+static_assert(string_less("0", "1"), "Incorrect string comparison function.");
+static_assert(string_less("00", "1"), "Incorrect string comparison function.");
+static_assert(string_less("0", "11"), "Incorrect string comparison function.");
+static_assert(string_less("09", "1"), "Incorrect string comparison function.");
+static_assert(string_less("09", "10"), "Incorrect string comparison function.");
+static_assert(string_less("1", "10"), "Incorrect string comparison function.");
+static_assert(!string_less("10", "1"), "Incorrect string comparison function.");
+static_assert(!string_less("1", "1"), "Incorrect string comparison function.");
+
+void check_non_integer_minmax() {
+	class string_view {
+	public:
+		explicit constexpr string_view(char const * value) noexcept:
+			m_value(value) {
+		}
+		constexpr auto operator<(string_view const other) const noexcept {
+			return string_less(m_value, other.m_value);
+		}
+		constexpr auto operator==(string_view const other) const noexcept {
+			// Don't care about efficiency here because it is just for tests
+			return !string_less(m_value, other.m_value) and !string_less(other.m_value, m_value);
+		}
+	private:
+		char const * m_value;
+	};
+	
+	static_assert(bounded::min(string_view("0"), string_view("1")) == string_view("0"), "Incorrect value of min for string arguments.");
+	static_assert(bounded::min(string_view("00"), string_view("1")) == string_view("00"), "Incorrect value of min for string arguments.");
+	static_assert(bounded::min(string_view("0"), string_view("11")) == string_view("0"), "Incorrect value of min for string arguments.");
+	static_assert(bounded::min(string_view("09"), string_view("1")) == string_view("09"), "Incorrect value of min for string arguments.");
+	static_assert(bounded::min(string_view("09"), string_view("10")) == string_view("09"), "Incorrect value of min for string arguments.");
+	static_assert(bounded::min(string_view("1"), string_view("10")) == string_view("1"), "Incorrect value of min for string arguments.");
+	static_assert(bounded::min(string_view("10"), string_view("1")) == string_view("1"), "Incorrect value of min for string arguments.");
+	static_assert(bounded::min(string_view("1"), string_view("1")) == string_view("1"), "Incorrect value of min for string arguments.");
+}
+
 void check_minmax() {
 	check_single_argument_minmax();
 	check_double_argument_minmax();
 	check_many_argument_minmax();
+	check_non_bounded_minmax();
+	check_non_integer_minmax();
 }
 
 void check_throw_policy() {
