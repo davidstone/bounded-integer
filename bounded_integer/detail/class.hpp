@@ -20,6 +20,7 @@
 #include "enable_if.hpp"
 #include "forward_declaration.hpp"
 #include "is_bounded_integer.hpp"
+#include "numeric_limits.hpp"
 #include "overlapping_range.hpp"
 #include "underlying_type.hpp"
 
@@ -33,20 +34,20 @@
 namespace bounded {
 namespace detail {
 
-template<typename T, enable_if_t<basic_numeric_limits<std::decay_t<T>>::is_specialized> = clang_dummy>
+template<typename T, enable_if_t<basic_numeric_limits<T>::is_specialized> = clang_dummy>
 constexpr bool is_implicitly_constructible_from(intmax_t const minimum, intmax_t const maximum) noexcept {
 	return type_fits_in_range<std::decay_t<T>>(minimum, maximum);
 }
-template<typename T, enable_if_t<!basic_numeric_limits<std::decay_t<T>>::is_specialized> = clang_dummy>
+template<typename T, enable_if_t<!basic_numeric_limits<T>::is_specialized> = clang_dummy>
 constexpr bool is_implicitly_constructible_from(intmax_t, intmax_t) noexcept {
 	return false;
 }
 
-template<typename policy, typename T, enable_if_t<basic_numeric_limits<std::decay_t<T>>::is_specialized> = clang_dummy>
+template<typename policy, typename T, enable_if_t<basic_numeric_limits<T>::is_specialized> = clang_dummy>
 constexpr bool is_explicitly_constructible_from(intmax_t const minimum, intmax_t const maximum) noexcept {
 	return type_overlaps_range<std::decay_t<T>>(minimum, maximum) or !policy::overflow_is_error;
 }
-template<typename policy, typename T, enable_if_t<!basic_numeric_limits<std::decay_t<T>>::is_specialized> = clang_dummy>
+template<typename policy, typename T, enable_if_t<!basic_numeric_limits<T>::is_specialized> = clang_dummy>
 constexpr bool is_explicitly_constructible_from(intmax_t, intmax_t) noexcept {
 	return false;
 }

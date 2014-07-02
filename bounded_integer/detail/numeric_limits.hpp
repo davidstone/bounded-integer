@@ -20,9 +20,39 @@
 #include "forward_declaration.hpp"
 #include <cstdint>
 #include <limits>
+#include <type_traits>
 
 namespace bounded {
 namespace detail {
+
+// This does not requiring having a definition of bounded::integer to get at the
+// minimum and maximum, so it can be used in the definition of bounded::integer.
+template<typename T>
+class basic_numeric_limits_impl {
+public:
+	static constexpr intmax_t min() noexcept {
+		return std::numeric_limits<T>::min();
+	}
+	static constexpr intmax_t max() noexcept {
+		return std::numeric_limits<T>::max();
+	}
+	static constexpr bool is_specialized = std::numeric_limits<T>::is_specialized;
+};
+template<intmax_t minimum, intmax_t maximum, typename overflow_policy, storage_type storage>
+class basic_numeric_limits_impl<integer<minimum, maximum, overflow_policy, storage>> {
+public:
+	static constexpr intmax_t min() noexcept {
+		return minimum;
+	}
+	static constexpr intmax_t max() noexcept {
+		return maximum;
+	}
+	static constexpr bool is_specialized = true;
+};
+
+template<typename T>
+using basic_numeric_limits = basic_numeric_limits_impl<std::remove_cv_t<std::remove_reference_t<T>>>;
+
 
 // http://stackoverflow.com/questions/19609186/what-is-stdnumeric-limitstdigits-supposed-to-represent
 template<intmax_t base>

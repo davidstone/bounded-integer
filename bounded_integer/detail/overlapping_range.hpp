@@ -18,37 +18,14 @@
 #define BOUNDED_INTEGER_OVERLAPPING_RANGE_HPP_
 
 #include "forward_declaration.hpp"
+#include "numeric_limits.hpp"
 #include <cstdint>
-#include <limits>
 #include <type_traits>
 
 // All of these functions have a precondition that minimum <= maximum
 
 namespace bounded {
 namespace detail {
-
-template<typename T>
-class basic_numeric_limits {
-public:
-	static constexpr intmax_t min() noexcept {
-		return std::numeric_limits<T>::min();
-	}
-	static constexpr intmax_t max() noexcept {
-		return std::numeric_limits<T>::max();
-	}
-	static constexpr bool is_specialized = std::numeric_limits<T>::is_specialized;
-};
-template<intmax_t minimum, intmax_t maximum, typename overflow_policy, storage_type storage>
-class basic_numeric_limits<integer<minimum, maximum, overflow_policy, storage>> {
-public:
-	static constexpr intmax_t min() noexcept {
-		return minimum;
-	}
-	static constexpr intmax_t max() noexcept {
-		return maximum;
-	}
-	static constexpr bool is_specialized = true;
-};
 
 template<typename T>
 constexpr bool value_fits_in_type(intmax_t const value) noexcept {
