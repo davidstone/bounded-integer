@@ -92,8 +92,57 @@ public:
 // accepts the comparison function as the first argument
 
 template<typename Compare, typename T>
-constexpr auto extreme(Compare, T && t) noexcept {
+constexpr decltype(auto) extreme(Compare, T && t) noexcept {
 	return t;
+}
+
+
+
+namespace detail {
+namespace minmax {
+
+// TODO: get rid of this class when I have relaxed constexpr functions in gcc
+
+// Because of reference collapsing rules, both of these types will be one of
+// T &, T const &, or T. The resulting type can only be a reference if both
+// types are references.
+template<typename T1, typename T2>
+class add_correct_reference {
+private:
+	static_assert(
+		std::is_same<std::decay_t<T1>, std::decay_t<T2>>::value,
+		"Can only be used for types that are the same without reference and cv qualifications."
+	);
+	using base_type = std::decay_t<T1>;
+	static constexpr bool result_is_prvalue =
+		not std::is_reference<T1>::value or
+		not std::is_reference<T2>::value;
+	static constexpr bool lvalue_reference_to_const =
+		std::is_const<std::remove_reference_t<T1>>::value or
+		std::is_const<std::remove_reference_t<T2>>::value;
+public:
+	using type =
+		std::conditional_t<result_is_prvalue, base_type,
+		std::conditional_t<lvalue_reference_to_const, base_type const &,
+		base_type &
+	>>;
+};
+
+}	// namespace minmax
+}	// namespace detail
+
+template<typename Compare, typename T1, typename T2, enable_if_t<
+	std::is_same<std::decay_t<T1>, std::decay_t<T2>>::value
+> = clang_dummy>
+constexpr decltype(auto) extreme(Compare compare, T1 && t1, T2 && t2) noexcept(noexcept(compare(std::forward<T1>(t1), std::forward<T2>(t2)))) {
+	using result_type = typename detail::minmax::add_correct_reference<T1, T2>::type;
+	// result_type might not be a reference. If this is the case, we need to
+	// call std::forward to ensure the object is move constructed. If
+	// result_type is a reference, std::forward will have no effect.
+	return compare(t2, t1) ?
+		static_cast<result_type>(std::forward<T2>(t2)) :
+		static_cast<result_type>(std::forward<T1>(t1))
+	;
 }
 
 // If the type of the result has no overlap with the type one of the arguments,
@@ -102,25 +151,28 @@ constexpr auto extreme(Compare, T && t) noexcept {
 // compile without this, because you cannot cast to a bounded::integer type that
 // has no overlap.
 template<typename Compare, typename T1, typename T2, enable_if_t<
+	not std::is_same<std::decay_t<T1>, std::decay_t<T2>>::value and
 	not detail::types_overlap<extreme_t<Compare, T1, T2>, T2>::value
 > = clang_dummy>
-constexpr auto extreme(Compare, T1 && t1, T2 &&) noexcept {
+constexpr decltype(auto) extreme(Compare, T1 && t1, T2 &&) noexcept {
 	static_assert(std::is_same<std::decay_t<T1>, std::decay_t<extreme_t<Compare, T1, T2>>>::value, "Incorrect type with no overlap.");
-	return t1;
+	return std::forward<T1>(t1);
 }
 template<typename Compare, typename T1, typename T2, enable_if_t<
+	not std::is_same<std::decay_t<T1>, std::decay_t<T2>>::value and
 	not detail::types_overlap<extreme_t<Compare, T1, T2>, T1>::value
 > = clang_dummy>
-constexpr auto extreme(Compare, T1 &&, T2 && t2) noexcept {
+constexpr decltype(auto) extreme(Compare, T1 &&, T2 && t2) noexcept {
 	static_assert(std::is_same<std::decay_t<T2>, std::decay_t<extreme_t<Compare, T1, T2>>>::value, "Incorrect type with no overlap.");
-	return t2;
+	return std::forward<T2>(t2);
 }
 
 template<typename Compare, typename T1, typename T2, enable_if_t<
+	not std::is_same<std::decay_t<T1>, std::decay_t<T2>>::value and
 	detail::types_overlap<extreme_t<Compare, T1, T2>, T1>::value and
 	detail::types_overlap<extreme_t<Compare, T1, T2>, T2>::value
 > = clang_dummy>
-constexpr auto extreme(Compare compare, T1 && t1, T2 && t2) noexcept(noexcept(compare(std::forward<T1>(t1), std::forward<T2>(t2)))) {
+constexpr decltype(auto) extreme(Compare compare, T1 && t1, T2 && t2) noexcept(noexcept(compare(std::forward<T1>(t1), std::forward<T2>(t2)))) {
 	return compare(t2, t1) ?
 		static_cast<extreme_t<Compare, T1, T2>>(std::forward<T2>(t2)) :
 		static_cast<extreme_t<Compare, T1, T2>>(std::forward<T1>(t1))
@@ -129,7 +181,8 @@ constexpr auto extreme(Compare compare, T1 && t1, T2 && t2) noexcept(noexcept(co
 
 
 template<typename Compare, typename T1, typename T2, enable_if_t<
-	not detail::basic_numeric_limits<T1>::is_specialized or not detail::basic_numeric_limits<T2>::is_specialized
+	not std::is_same<std::decay_t<T1>, std::decay_t<T2>>::value and
+	(not detail::basic_numeric_limits<T1>::is_specialized or not detail::basic_numeric_limits<T2>::is_specialized)
 > = clang_dummy>
 constexpr auto extreme(Compare compare, T1 && t1, T2 && t2) noexcept(noexcept(compare(std::forward<T1>(t1), std::forward<T2>(t2)))) {
 	return compare(t2, t1) ?
@@ -172,7 +225,7 @@ struct noexcept_comparable<Compare, T1, T2, Ts...> : std::integral_constant<bool
 // TODO: noexcept specification needs to take possible copies / moves into
 // account if this supports non bounded::integer types.
 template<typename Compare, typename T1, typename T2, typename... Ts>
-constexpr auto extreme(Compare compare, T1 && t1, T2 && t2, Ts && ... ts) noexcept(detail::minmax::noexcept_comparable<Compare, T1, T2, Ts...>::value) {
+constexpr decltype(auto) extreme(Compare compare, T1 && t1, T2 && t2, Ts && ... ts) noexcept(detail::minmax::noexcept_comparable<Compare, T1, T2, Ts...>::value) {
 	return extreme(
 		compare,
 		extreme(compare, std::forward<T1>(t1), std::forward<T2>(t2)),
@@ -181,11 +234,11 @@ constexpr auto extreme(Compare compare, T1 && t1, T2 && t2, Ts && ... ts) noexce
 }
 
 template<typename... Ts>
-constexpr auto min(Ts && ... ts) noexcept(detail::minmax::noexcept_comparable<detail::minmax::less, Ts...>::value) {
+constexpr decltype(auto) min(Ts && ... ts) noexcept(detail::minmax::noexcept_comparable<detail::minmax::less, Ts...>::value) {
 	return extreme(detail::minmax::less{}, std::forward<Ts>(ts)...);
 }
 template<typename... Ts>
-constexpr auto max(Ts && ... ts) noexcept(detail::minmax::noexcept_comparable<detail::minmax::greater, Ts...>::value) {
+constexpr decltype(auto) max(Ts && ... ts) noexcept(detail::minmax::noexcept_comparable<detail::minmax::greater, Ts...>::value) {
 	return extreme(detail::minmax::greater{}, std::forward<Ts>(ts)...);
 }
 

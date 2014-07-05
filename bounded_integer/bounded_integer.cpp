@@ -168,12 +168,69 @@ void check_non_integer_minmax() {
 	static_assert(bounded::min(string_view("1"), string_view("1")) == string_view("1"), "Incorrect value of min for string arguments.");
 }
 
+template<typename T>
+void check_specific_reference_minmax() {
+	T m1{};
+	T m2{};
+	T const c1{};
+	T const c2{};
+
+	static_assert(
+		std::is_same<decltype(bounded::min(m1, m2)), T &>::value,
+		"Incorrect result type for bounded::min with T & and T &."
+	);
+
+	static_assert(
+		std::is_same<decltype(bounded::min(c1, c2)), T const &>::value,
+		"Incorrect result type for bounded::min with T const & and T const &."
+	);
+
+	static_assert(
+		std::is_same<decltype(bounded::min(m1, c1)), T const &>::value,
+		"Incorrect result type for bounded::min with T & and T const &."
+	);
+	
+	static_assert(
+		std::is_same<decltype(bounded::min(T{}, T{})), T>::value,
+		"Incorrect result type for bounded::min with T and T."
+	);
+	static_assert(
+		std::is_same<decltype(bounded::min(m1, T{})), T>::value,
+		"Incorrect result type for bounded::min with T & and T."
+	);
+	static_assert(
+		std::is_same<decltype(bounded::min(c1, T{})), T>::value,
+		"Incorrect result type for bounded::min with T const & and T."
+	);
+}
+
+void check_reference_minmax() {
+	// Check that built-in and class types have the same behavior, unlike
+	// operator?:
+	check_specific_reference_minmax<int>();
+	class class_type {
+	public:
+		constexpr auto operator<(class_type) const noexcept -> bool {
+			return true;
+		}
+	};
+	check_specific_reference_minmax<class_type>();
+	
+	int const i{};
+	long const l{};
+	static_assert(
+		std::is_same<decltype(bounded::min(i, l)), long>::value,
+		"Incorrect result type for bounded::min with int const & and long const &."
+	);
+}
+
 void check_minmax() {
 	check_single_argument_minmax();
 	check_double_argument_minmax();
 	check_many_argument_minmax();
 	check_non_bounded_minmax();
 	check_non_integer_minmax();
+	check_reference_minmax();
 }
 
 void check_throw_policy() {
