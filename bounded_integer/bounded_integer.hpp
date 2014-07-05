@@ -30,6 +30,7 @@
 #include "detail/operators.hpp"
 #include "detail/policy/all.hpp"
 #include "detail/stream.hpp"
+#include "detail/string.hpp"
 #include "detail/typedefs.hpp"
 
 // Missing from this list are array and optional classes and integer_range

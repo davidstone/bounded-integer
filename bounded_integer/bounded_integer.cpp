@@ -387,6 +387,12 @@ void check_optional() {
 	assert(!optional_integer);
 }
 
+void check_to_string() {
+	auto const result = bounded::to_string(4_bi);
+	static_assert(std::is_same<decltype(result), std::string const>::value, "Incorrect type of to_string.");
+	assert(result == "4");
+}
+
 template<typename integer>
 void streaming_test(int const initial, int const final) {
 	integer value(initial);
@@ -470,6 +476,7 @@ int main() {
 	check_algorithm();
 	check_math();
 	check_optional();
+	check_to_string();
 	check_streaming();
 	check_dynamic_policy();
 	check_iterator();
