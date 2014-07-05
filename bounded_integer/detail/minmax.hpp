@@ -180,18 +180,6 @@ constexpr decltype(auto) extreme(Compare compare, T1 && t1, T2 && t2) noexcept(n
 }
 
 
-template<typename Compare, typename T1, typename T2, enable_if_t<
-	not std::is_same<std::decay_t<T1>, std::decay_t<T2>>::value and
-	(not detail::basic_numeric_limits<T1>::is_specialized or not detail::basic_numeric_limits<T2>::is_specialized)
-> = clang_dummy>
-constexpr auto extreme(Compare compare, T1 && t1, T2 && t2) noexcept(noexcept(compare(std::forward<T1>(t1), std::forward<T2>(t2)))) {
-	return compare(t2, t1) ?
-		static_cast<extreme_t<Compare, T1, T2>>(std::forward<T2>(t2)) :
-		static_cast<extreme_t<Compare, T1, T2>>(std::forward<T1>(t1))
-	;
-}
-
-
 namespace detail {
 namespace minmax {
 
