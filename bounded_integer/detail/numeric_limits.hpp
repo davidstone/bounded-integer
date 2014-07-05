@@ -51,7 +51,7 @@ public:
 };
 
 template<typename T>
-using basic_numeric_limits = basic_numeric_limits_impl<std::remove_cv_t<std::remove_reference_t<T>>>;
+using basic_numeric_limits = basic_numeric_limits_impl<std::decay_t<T>>;
 
 
 // http://stackoverflow.com/questions/19609186/what-is-stdnumeric-limitstdigits-supposed-to-represent
