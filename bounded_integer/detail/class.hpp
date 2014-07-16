@@ -79,7 +79,7 @@ public:
 	static_assert(std::is_nothrow_default_constructible<overflow_policy_type>::value, "overflow_policy must be nothrow default constructible.");
 	static_assert(std::is_nothrow_move_constructible<overflow_policy_type>::value, "overflow_policy must be nothrow move constructible.");
 
-	constexpr integer() noexcept = default;
+	integer() noexcept = default;
 	constexpr integer(integer const &) noexcept = default;
 	constexpr integer(integer &&) noexcept = default;
 
