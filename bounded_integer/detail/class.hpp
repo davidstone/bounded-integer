@@ -79,6 +79,8 @@ public:
 	static_assert(std::is_nothrow_default_constructible<overflow_policy_type>::value, "overflow_policy must be nothrow default constructible.");
 	static_assert(std::is_nothrow_move_constructible<overflow_policy_type>::value, "overflow_policy must be nothrow move constructible.");
 
+
+
 	integer() noexcept = default;
 	constexpr integer(integer const &) noexcept = default;
 	constexpr integer(integer &&) noexcept = default;
@@ -154,32 +156,33 @@ public:
 	}
 
 
+
 	template<typename T>
-	integer & unchecked_assignment(T && other) noexcept {
+	integer & unchecked_assignment(T && other) & noexcept {
 		m_value = static_cast<underlying_type>(std::forward<T>(other));
 		return *this;
 	}
 	template<typename T>
-	integer volatile & unchecked_assignment(T && other) volatile noexcept {
+	integer volatile & unchecked_assignment(T && other) volatile & noexcept {
 		m_value = static_cast<underlying_type>(std::forward<T>(other));
 		return *this;
 	}
 	
-	integer & operator=(integer const & other) noexcept(noexcept(overflow_policy_type{}.assignment(static_cast<intmax_t>(other), minimum, maximum))) {
+	integer & operator=(integer const & other) & noexcept(noexcept(overflow_policy_type{}.assignment(static_cast<intmax_t>(other), minimum, maximum))) {
 		unchecked_assignment(overflow_policy().assignment(static_cast<intmax_t>(other), minimum, maximum));
 		return *this;
 	}
-	integer & operator=(integer && other) noexcept(noexcept(overflow_policy_type{}.assignment(static_cast<intmax_t>(std::move(other)), minimum, maximum))) {
+	integer & operator=(integer && other) & noexcept(noexcept(overflow_policy_type{}.assignment(static_cast<intmax_t>(std::move(other)), minimum, maximum))) {
 		unchecked_assignment(overflow_policy().assignment(static_cast<intmax_t>(std::move(other)), minimum, maximum));
 		return *this;
 	}
 	template<typename T>
-	integer & operator=(T && other) noexcept(noexcept(overflow_policy_type{}.assignment(static_cast<intmax_t>(std::forward<T>(other)), minimum, maximum))) {
+	integer & operator=(T && other) & noexcept(noexcept(overflow_policy_type{}.assignment(static_cast<intmax_t>(std::forward<T>(other)), minimum, maximum))) {
 		unchecked_assignment(overflow_policy().assignment(static_cast<intmax_t>(std::forward<T>(other)), minimum, maximum));
 		return *this;
 	}
 	template<typename T>
-	integer volatile & operator=(T && other) volatile noexcept(noexcept(overflow_policy_type{}.assignment(static_cast<intmax_t>(std::forward<T>(other)), minimum, maximum))) {
+	integer volatile & operator=(T && other) volatile & noexcept(noexcept(overflow_policy_type{}.assignment(static_cast<intmax_t>(std::forward<T>(other)), minimum, maximum))) {
 		unchecked_assignment(overflow_policy().assignment(static_cast<intmax_t>(std::forward<T>(other)), minimum, maximum));
 		return *this;
 	}
