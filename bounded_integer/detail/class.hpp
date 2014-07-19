@@ -155,12 +155,14 @@ public:
 
 
 	template<typename T>
-	void unchecked_assignment(T && other) noexcept {
+	integer & unchecked_assignment(T && other) noexcept {
 		m_value = static_cast<underlying_type>(std::forward<T>(other));
+		return *this;
 	}
 	template<typename T>
-	void unchecked_assignment(T && other) volatile noexcept {
+	integer volatile & unchecked_assignment(T && other) volatile noexcept {
 		m_value = static_cast<underlying_type>(std::forward<T>(other));
+		return *this;
 	}
 	
 	integer & operator=(integer const & other) noexcept(noexcept(overflow_policy_type{}.assignment(static_cast<intmax_t>(other), minimum, maximum))) {
