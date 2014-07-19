@@ -135,14 +135,24 @@ public:
 		integer(std::forward<T>(other), static_cast<overflow_policy_type>(get_overflow_policy(std::forward<T>(other)))) {
 	}
 
-	template<typename T, enable_if_t<std::is_enum<T>::value> = clang_dummy>
-	constexpr explicit integer(T other, non_check_t) noexcept:
-		integer(static_cast<std::underlying_type_t<T>>(other), non_check) {
+
+	template<typename Enum, enable_if_t<std::is_enum<Enum>::value> = clang_dummy>
+	constexpr explicit integer(Enum other, overflow_policy_type policy, non_check_t) noexcept:
+		integer(static_cast<std::underlying_type_t<Enum>>(other), std::move(policy), non_check) {
 	}
-	template<typename T, enable_if_t<std::is_enum<T>::value> = clang_dummy>
-	constexpr explicit integer(T other) noexcept(noexcept(integer(static_cast<std::underlying_type_t<T>>(other)))):
-		integer(static_cast<std::underlying_type_t<T>>(other)) {
+	template<typename Enum, enable_if_t<std::is_enum<Enum>::value> = clang_dummy>
+	constexpr explicit integer(Enum other, non_check_t) noexcept:
+		integer(static_cast<std::underlying_type_t<Enum>>(other), non_check) {
 	}
+	template<typename Enum, enable_if_t<std::is_enum<Enum>::value> = clang_dummy>
+	constexpr explicit integer(Enum other, overflow_policy_type policy) noexcept(noexcept(integer(static_cast<std::underlying_type_t<Enum>>(other), std::move(policy)))):
+		integer(static_cast<std::underlying_type_t<Enum>>(other), std::move(policy)) {
+	}
+	template<typename Enum, enable_if_t<std::is_enum<Enum>::value> = clang_dummy>
+	constexpr explicit integer(Enum other) noexcept(noexcept(integer(static_cast<std::underlying_type_t<Enum>>(other)))):
+		integer(static_cast<std::underlying_type_t<Enum>>(other)) {
+	}
+
 
 	template<typename T>
 	void unchecked_assignment(T && other) noexcept {
