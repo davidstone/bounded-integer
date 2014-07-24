@@ -26,7 +26,7 @@ namespace policy_detail {
 class clamp_policy {
 public:
 	template<typename T, typename Minimum, typename Maximum>
-	static constexpr intmax_t assignment(T && value, Minimum && minimum, Maximum && maximum) noexcept {
+	static constexpr auto assignment(T && value, Minimum && minimum, Maximum && maximum) noexcept {
 		return
 			(value <= minimum) ? static_cast<intmax_t>(minimum) :
 			(value >= maximum) ? static_cast<intmax_t>(maximum) :

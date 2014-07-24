@@ -28,7 +28,7 @@ template<
 	typename CharT, typename Traits,
 	intmax_t minimum, intmax_t maximum, typename policy, storage_type storage
 >
-std::basic_ostream<CharT, Traits> & operator<<(std::basic_ostream<CharT, Traits> & out, integer<minimum, maximum, policy, storage> const & x) {
+decltype(auto) operator<<(std::basic_ostream<CharT, Traits> & out, integer<minimum, maximum, policy, storage> const & x) {
 	// The unary plus applies integer promotions to x. This ensures values are
 	// printed as integers. Without this, I could run into an issue where the
 	// underlying type is a typedef for signed char / unsigned char. This would
@@ -39,7 +39,7 @@ template<
 	typename CharT, typename Traits,
 	intmax_t minimum, intmax_t maximum, typename policy, storage_type storage
 >
-std::basic_ostream<CharT, Traits> & operator<<(std::basic_ostream<CharT, Traits> & out, integer<minimum, maximum, policy, storage> const volatile & x) {
+decltype(auto) operator<<(std::basic_ostream<CharT, Traits> & out, integer<minimum, maximum, policy, storage> const volatile & x) {
 	return out << +x.value();
 }
 
@@ -47,7 +47,7 @@ template<
 	typename CharT, typename Traits,
 	intmax_t minimum, intmax_t maximum, typename policy, storage_type storage
 >
-std::basic_istream<CharT, Traits> & operator>>(std::basic_istream<CharT, Traits> & in, integer<minimum, maximum, policy, storage> & x) {
+decltype(auto) operator>>(std::basic_istream<CharT, Traits> & in, integer<minimum, maximum, policy, storage> & x) {
 	// This is intmax_t rather than underlying_type to maximize the chances for
 	// robust error checking rather than undefined behavior, but it still fails
 	// for very large and very small numbers.
@@ -60,7 +60,7 @@ template<
 	typename CharT, typename Traits,
 	intmax_t minimum, intmax_t maximum, typename policy, storage_type storage
 >
-std::basic_istream<CharT, Traits> & operator>>(std::basic_istream<CharT, Traits> & in, integer<minimum, maximum, policy, storage> volatile & x) {
+decltype(auto) operator>>(std::basic_istream<CharT, Traits> & in, integer<minimum, maximum, policy, storage> volatile & x) {
 	intmax_t temp;
 	in >> temp;
 	x = temp;

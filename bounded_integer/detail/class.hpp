@@ -35,20 +35,20 @@ namespace bounded {
 namespace detail {
 
 template<typename T, enable_if_t<basic_numeric_limits<T>::is_specialized> = clang_dummy>
-constexpr bool is_implicitly_constructible_from(intmax_t const minimum, intmax_t const maximum) noexcept {
+constexpr auto is_implicitly_constructible_from(intmax_t const minimum, intmax_t const maximum) noexcept {
 	return type_fits_in_range<std::decay_t<T>>(minimum, maximum);
 }
 template<typename T, enable_if_t<!basic_numeric_limits<T>::is_specialized> = clang_dummy>
-constexpr bool is_implicitly_constructible_from(intmax_t, intmax_t) noexcept {
+constexpr auto is_implicitly_constructible_from(intmax_t, intmax_t) noexcept {
 	return false;
 }
 
 template<typename policy, typename T, enable_if_t<basic_numeric_limits<T>::is_specialized> = clang_dummy>
-constexpr bool is_explicitly_constructible_from(intmax_t const minimum, intmax_t const maximum) noexcept {
+constexpr auto is_explicitly_constructible_from(intmax_t const minimum, intmax_t const maximum) noexcept {
 	return type_overlaps_range<std::decay_t<T>>(minimum, maximum) or !policy::overflow_is_error;
 }
 template<typename policy, typename T, enable_if_t<!basic_numeric_limits<T>::is_specialized> = clang_dummy>
-constexpr bool is_explicitly_constructible_from(intmax_t, intmax_t) noexcept {
+constexpr auto is_explicitly_constructible_from(intmax_t, intmax_t) noexcept {
 	return false;
 }
 
@@ -158,51 +158,51 @@ public:
 
 
 	template<typename T>
-	integer & unchecked_assignment(T && other) & noexcept {
+	decltype(auto) unchecked_assignment(T && other) & noexcept {
 		m_value = static_cast<underlying_type>(std::forward<T>(other));
 		return *this;
 	}
 	template<typename T>
-	integer volatile & unchecked_assignment(T && other) volatile & noexcept {
+	decltype(auto) unchecked_assignment(T && other) volatile & noexcept {
 		m_value = static_cast<underlying_type>(std::forward<T>(other));
 		return *this;
 	}
 	
-	integer & operator=(integer const & other) & noexcept(noexcept(overflow_policy_type{}.assignment(static_cast<intmax_t>(other), minimum, maximum))) {
+	decltype(auto) operator=(integer const & other) & noexcept(noexcept(overflow_policy_type{}.assignment(static_cast<intmax_t>(other), minimum, maximum))) {
 		unchecked_assignment(overflow_policy().assignment(static_cast<intmax_t>(other), minimum, maximum));
 		return *this;
 	}
-	integer & operator=(integer && other) & noexcept(noexcept(overflow_policy_type{}.assignment(static_cast<intmax_t>(std::move(other)), minimum, maximum))) {
+	decltype(auto) operator=(integer && other) & noexcept(noexcept(overflow_policy_type{}.assignment(static_cast<intmax_t>(std::move(other)), minimum, maximum))) {
 		unchecked_assignment(overflow_policy().assignment(static_cast<intmax_t>(std::move(other)), minimum, maximum));
 		return *this;
 	}
 	template<typename T>
-	integer & operator=(T && other) & noexcept(noexcept(overflow_policy_type{}.assignment(static_cast<intmax_t>(std::forward<T>(other)), minimum, maximum))) {
+	decltype(auto) operator=(T && other) & noexcept(noexcept(overflow_policy_type{}.assignment(static_cast<intmax_t>(std::forward<T>(other)), minimum, maximum))) {
 		unchecked_assignment(overflow_policy().assignment(static_cast<intmax_t>(std::forward<T>(other)), minimum, maximum));
 		return *this;
 	}
 	template<typename T>
-	integer volatile & operator=(T && other) volatile & noexcept(noexcept(overflow_policy_type{}.assignment(static_cast<intmax_t>(std::forward<T>(other)), minimum, maximum))) {
+	decltype(auto) operator=(T && other) volatile & noexcept(noexcept(overflow_policy_type{}.assignment(static_cast<intmax_t>(std::forward<T>(other)), minimum, maximum))) {
 		unchecked_assignment(overflow_policy().assignment(static_cast<intmax_t>(std::forward<T>(other)), minimum, maximum));
 		return *this;
 	}
 	
-	constexpr underlying_type const & value() const noexcept {
+	constexpr decltype(auto) value() const noexcept {
 		return m_value;
 	}
-	constexpr underlying_type const volatile & value() const volatile noexcept {
+	constexpr decltype(auto) value() const volatile noexcept {
 		return m_value;
 	}
-	constexpr overflow_policy_type const & overflow_policy() const noexcept {
+	constexpr auto overflow_policy() const noexcept -> overflow_policy_type const & {
 		return *this;
 	}
-	constexpr overflow_policy_type const volatile & overflow_policy() const volatile noexcept {
+	constexpr auto overflow_policy() const volatile noexcept -> overflow_policy_type const volatile & {
 		return *this;
 	}
-	overflow_policy_type & overflow_policy() noexcept {
+	auto overflow_policy() noexcept -> overflow_policy_type & {
 		return *this;
 	}
-	overflow_policy_type volatile & overflow_policy() volatile noexcept {
+	auto overflow_policy() volatile noexcept -> overflow_policy_type volatile & {
 		return *this;
 	}
 	// Do not verify that the value is in range because the user has requested a

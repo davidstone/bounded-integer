@@ -29,7 +29,7 @@ class throw_policy {
 public:
 	// The optimizer should be able to simplify this to remove dead checks.
 	template<typename T, typename Minimum, typename Maximum>
-	static constexpr intmax_t assignment(T && value, Minimum && minimum, Maximum && maximum) {
+	static constexpr auto assignment(T && value, Minimum && minimum, Maximum && maximum) {
 		return (minimum <= value and value <= maximum) ?
 			static_cast<intmax_t>(value) :
 			throw std::range_error("Got a value of " + to_string(+value) + " but expected a value in the range [" + to_string(+minimum) + ", " + to_string(+maximum) + "]");

@@ -30,10 +30,10 @@ namespace detail {
 template<typename T>
 class basic_numeric_limits_impl {
 public:
-	static constexpr intmax_t min() noexcept {
+	static constexpr auto min() noexcept -> intmax_t {
 		return std::numeric_limits<T>::min();
 	}
-	static constexpr intmax_t max() noexcept {
+	static constexpr auto max() noexcept -> intmax_t {
 		return std::numeric_limits<T>::max();
 	}
 	static constexpr bool is_specialized = std::numeric_limits<T>::is_specialized;
@@ -41,10 +41,10 @@ public:
 template<intmax_t minimum, intmax_t maximum, typename overflow_policy, storage_type storage>
 class basic_numeric_limits_impl<integer<minimum, maximum, overflow_policy, storage>> {
 public:
-	static constexpr intmax_t min() noexcept {
+	static constexpr auto min() noexcept -> intmax_t {
 		return minimum;
 	}
-	static constexpr intmax_t max() noexcept {
+	static constexpr auto max() noexcept -> intmax_t {
 		return maximum;
 	}
 	static constexpr bool is_specialized = true;

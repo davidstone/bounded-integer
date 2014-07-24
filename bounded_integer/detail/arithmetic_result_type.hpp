@@ -85,19 +85,19 @@ public:
 	}
 };
 
-constexpr intmax_t std_min(intmax_t lhs, intmax_t rhs) noexcept {
+constexpr auto std_min(intmax_t lhs, intmax_t rhs) noexcept {
 	return (lhs < rhs) ? lhs : rhs;
 }
 template<typename... Args>
-constexpr intmax_t std_min(intmax_t lhs, intmax_t rhs, Args && ... other) noexcept {
+constexpr auto std_min(intmax_t lhs, intmax_t rhs, Args && ... other) noexcept {
 	return std_min(lhs, std_min(rhs, other...));
 }
 
-constexpr intmax_t std_max(intmax_t lhs, intmax_t rhs) noexcept {
+constexpr auto std_max(intmax_t lhs, intmax_t rhs) noexcept {
 	return (lhs > rhs) ? lhs : rhs;
 }
 template<typename... Args>
-constexpr intmax_t std_max(intmax_t lhs, intmax_t rhs, Args && ... other) noexcept {
+constexpr auto std_max(intmax_t lhs, intmax_t rhs, Args && ... other) noexcept {
 	return std_max(lhs, std_max(rhs, other...));
 }
 
@@ -116,10 +116,10 @@ template<
 >
 class operator_range<lhs_min, lhs_max, rhs_min, rhs_max, plus> {
 public:
-	static constexpr intmax_t min() noexcept {
+	static constexpr auto min() noexcept -> intmax_t {
 		return lhs_min + rhs_min;
 	}
-	static constexpr intmax_t max() noexcept {
+	static constexpr auto max() noexcept -> intmax_t {
 		return lhs_max + rhs_max;
 	}
 	static_assert(min() <= max(), "Range is inverted.");
@@ -131,10 +131,10 @@ template<
 >
 class operator_range<lhs_min, lhs_max, rhs_min, rhs_max, minus> {
 public:
-	static constexpr intmax_t min() noexcept {
+	static constexpr auto min() noexcept -> intmax_t {
 		return lhs_min - rhs_max;
 	}
-	static constexpr intmax_t max() noexcept {
+	static constexpr auto max() noexcept -> intmax_t {
 		return lhs_max - rhs_min;
 	}
 	static_assert(min() <= max(), "Range is inverted.");
@@ -151,10 +151,10 @@ private:
 	static constexpr intmax_t p2 = lhs_max * rhs_min;
 	static constexpr intmax_t p3 = lhs_max * rhs_max;
 public:
-	static constexpr intmax_t min() noexcept {
+	static constexpr auto min() noexcept -> intmax_t {
 		return std_min(p0, p1, p2, p3);
 	}
-	static constexpr intmax_t max() noexcept {
+	static constexpr auto max() noexcept -> intmax_t {
 		return std_max(p0, p1, p2, p3);
 	}
 	static_assert(min() <= max(), "Range is inverted.");
@@ -185,10 +185,10 @@ private:
 	static constexpr intmax_t l2 = lhs_max / rhs_min;
 	static constexpr intmax_t l3 = lhs_max / rhs_max;
 public:
-	static constexpr intmax_t min() noexcept {
+	static constexpr auto min() noexcept -> intmax_t {
 		return std_min(l0, l1, l2, l3, g0, g1, g2, g3);
 	}
-	static constexpr intmax_t max() noexcept {
+	static constexpr auto max() noexcept -> intmax_t {
 		return std_max(g0, g1, g2, g3);
 	}
 	static_assert(min() <= max(), "Range is inverted.");
@@ -230,11 +230,11 @@ private:
 	private:
 		static constexpr auto initial_value = result_type(std::numeric_limits<intmax_t>::min(), std::numeric_limits<intmax_t>::max());
 
-		static constexpr result_type combine(result_type lhs, result_type rhs) noexcept {
+		static constexpr auto combine(result_type lhs, result_type rhs) noexcept {
 			return result_type(std_max(lhs.first, rhs.first), std_min(lhs.second, rhs.second));
 		}
 
-		static constexpr result_type modulo_round(intmax_t divisor) noexcept {
+		static constexpr auto modulo_round(intmax_t divisor) noexcept {
 			// When we divide both ends of the dividend by a particular value in
 			// the range of the divisor there are two possibilities:
 			//
@@ -255,13 +255,13 @@ private:
 				result_type(0, divisor + 1);
 		}
 
-		static constexpr result_type calculate(intmax_t divisor, result_type current) noexcept {
+		static constexpr auto calculate(intmax_t divisor, result_type current) noexcept -> result_type {
 			return ((current.first == 0 and current.second <= divisor + 1) or divisor > least_divisor) ?
 				current :
 				calculate(divisor + 1, combine(current, modulo_round(divisor)));
 		}
 	public:
-		static constexpr result_type value() noexcept {
+		static constexpr auto value() noexcept {
 			// I have the special case for -1 to avoid any possibility of
 			// integer overflow from std::numeric_limits<intmax_t>::min() / -1
 			return (greatest_divisor == -1) ? result_type(0, 0) : calculate(greatest_divisor, initial_value);
@@ -292,13 +292,13 @@ private:
 public:
 	static_assert(positive.first >= -std::numeric_limits<intmax_t>::max(), "Positive values out of range.");
 	static_assert(positive.second >= -std::numeric_limits<intmax_t>::max(), "Positive values out of range.");
-	static constexpr intmax_t min() noexcept {
+	static constexpr auto min() noexcept -> intmax_t {
 		return
 			!has_positive_values ? negative.second :
 			!has_negative_values ? -positive.first :
 			std_min(negative.second, -positive.first);
 	}
-	static constexpr intmax_t max() noexcept {
+	static constexpr auto max() noexcept -> intmax_t {
 		return
 			!has_positive_values ? negative.first :
 			!has_negative_values ? -positive.second :
@@ -315,10 +315,10 @@ class operator_range<lhs_min, lhs_max, rhs_min, rhs_max, left_shift> {
 public:
 	static_assert(lhs_min >= 0 and rhs_min >= 0, "Left shift not defined for negative values.");
 	static_assert(rhs_max <= std::numeric_limits<intmax_t>::digits, "Cannot left shift >= width of intmax_t.");
-	static constexpr intmax_t min() noexcept {
+	static constexpr auto min() noexcept -> intmax_t {
 		return lhs_min << rhs_min;
 	}
-	static constexpr intmax_t max() noexcept {
+	static constexpr auto max() noexcept -> intmax_t {
 		return lhs_max << rhs_max;
 	}
 	static_assert(min() <= max(), "Range is inverted.");
@@ -332,10 +332,10 @@ class operator_range<lhs_min, lhs_max, rhs_min, rhs_max, right_shift> {
 public:
 	static_assert(lhs_min >= 0 and rhs_min >= 0, "Right shift not defined for negative values.");
 	static_assert(rhs_max <= std::numeric_limits<intmax_t>::digits, "Cannot right shift >= width of intmax_t.");
-	static constexpr intmax_t min() noexcept {
+	static constexpr auto min() noexcept -> intmax_t {
 		return lhs_min >> rhs_max;
 	}
-	static constexpr intmax_t max() noexcept {
+	static constexpr auto max() noexcept -> intmax_t {
 		return lhs_max >> rhs_min;
 	}
 	static_assert(min() <= max(), "Range is inverted.");

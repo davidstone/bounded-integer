@@ -25,36 +25,36 @@
 namespace bounded {
 
 template<typename LHS, typename RHS>
-constexpr bool operator==(optional<LHS> const & lhs, optional<RHS> const & rhs) noexcept(noexcept(std::declval<LHS const &>() == std::declval<RHS const &>())) {
+constexpr auto operator==(optional<LHS> const & lhs, optional<RHS> const & rhs) noexcept(noexcept(std::declval<LHS const &>() == std::declval<RHS const &>())) {
 	return (static_cast<bool>(lhs) and static_cast<bool>(rhs)) ?
 		*lhs == *rhs :
 		(static_cast<bool>(lhs) == static_cast<bool>(rhs));
 }
 
 template<typename LHS, typename RHS>
-constexpr bool operator!=(optional<LHS> const & lhs, optional<RHS> const & rhs) noexcept(noexcept(lhs == rhs)) {
+constexpr auto operator!=(optional<LHS> const & lhs, optional<RHS> const & rhs) noexcept(noexcept(lhs == rhs)) {
 	return !(lhs == rhs);
 }
 
 template<typename LHS, typename RHS>
-constexpr bool operator<(optional<LHS> const & lhs, optional<RHS> const & rhs) noexcept(noexcept(std::declval<LHS const &>() < std::declval<RHS const &>())) {
+constexpr auto operator<(optional<LHS> const & lhs, optional<RHS> const & rhs) noexcept(noexcept(std::declval<LHS const &>() < std::declval<RHS const &>())) {
 	return (static_cast<bool>(lhs) and static_cast<bool>(rhs)) ?
 		*lhs < *rhs :
 		(static_cast<bool>(lhs) < static_cast<bool>(rhs));
 }
 
 template<typename LHS, typename RHS>
-constexpr bool operator>(optional<LHS> const & lhs, optional<RHS> const & rhs) noexcept(noexcept(rhs < lhs)) {
+constexpr auto operator>(optional<LHS> const & lhs, optional<RHS> const & rhs) noexcept(noexcept(rhs < lhs)) {
 	return rhs < lhs;
 }
 
 template<typename LHS, typename RHS>
-constexpr bool operator<=(optional<LHS> const & lhs, optional<RHS> const & rhs) noexcept(noexcept(rhs < lhs)) {
+constexpr auto operator<=(optional<LHS> const & lhs, optional<RHS> const & rhs) noexcept(noexcept(rhs < lhs)) {
 	return !(rhs < lhs);
 }
 
 template<typename LHS, typename RHS>
-constexpr bool operator>=(optional<LHS> const & lhs, optional<RHS> const & rhs) noexcept(noexcept(lhs < rhs)) {
+constexpr auto operator>=(optional<LHS> const & lhs, optional<RHS> const & rhs) noexcept(noexcept(lhs < rhs)) {
 	return !(lhs < rhs);
 }
 
@@ -63,67 +63,67 @@ constexpr bool operator>=(optional<LHS> const & lhs, optional<RHS> const & rhs) 
 
 
 template<typename LHS, typename RHS>
-constexpr bool operator==(optional<LHS> const & lhs, RHS const & rhs) noexcept(noexcept(std::declval<LHS const &>() == rhs)) {
+constexpr auto operator==(optional<LHS> const & lhs, RHS const & rhs) noexcept(noexcept(std::declval<LHS const &>() == rhs)) {
 	return static_cast<bool>(lhs) and *lhs == rhs;
 }
 
 template<typename LHS, typename RHS>
-constexpr bool operator==(LHS const & lhs, optional<RHS> const & rhs) noexcept(noexcept(rhs == lhs)) {
+constexpr auto operator==(LHS const & lhs, optional<RHS> const & rhs) noexcept(noexcept(rhs == lhs)) {
 	return rhs == lhs;
 }
 
 template<typename LHS, typename RHS>
-constexpr bool operator!=(optional<LHS> const & lhs, RHS const & rhs) noexcept(noexcept(lhs == rhs)) {
+constexpr auto operator!=(optional<LHS> const & lhs, RHS const & rhs) noexcept(noexcept(lhs == rhs)) {
 	return !(lhs == rhs);
 }
 
 template<typename LHS, typename RHS>
-constexpr bool operator!=(LHS const & lhs, optional<RHS> const & rhs) noexcept(noexcept(rhs == lhs)) {
+constexpr auto operator!=(LHS const & lhs, optional<RHS> const & rhs) noexcept(noexcept(rhs == lhs)) {
 	return !(rhs == lhs);
 }
 
 
 
 template<typename LHS, typename RHS>
-constexpr bool operator<(optional<LHS> const & lhs, RHS const & rhs) noexcept(noexcept(std::declval<LHS const &>() == rhs)) {
+constexpr auto operator<(optional<LHS> const & lhs, RHS const & rhs) noexcept(noexcept(std::declval<LHS const &>() == rhs)) {
 	return !static_cast<bool>(lhs) ? true : *lhs < rhs;
 }
 
 template<typename LHS, typename RHS>
-constexpr bool operator<(LHS const & lhs, optional<RHS> const & rhs) noexcept(noexcept(lhs < std::declval<RHS const &>())) {
+constexpr auto operator<(LHS const & lhs, optional<RHS> const & rhs) noexcept(noexcept(lhs < std::declval<RHS const &>())) {
 	return !static_cast<bool>(rhs) ? false : lhs < *rhs;
 }
 
 
 template<typename LHS, typename RHS>
-constexpr bool operator>(optional<LHS> const & lhs, RHS const & rhs) noexcept(noexcept(rhs < lhs)) {
+constexpr auto operator>(optional<LHS> const & lhs, RHS const & rhs) noexcept(noexcept(rhs < lhs)) {
 	return rhs < lhs;
 }
 
 template<typename LHS, typename RHS>
-constexpr bool operator>(LHS const & lhs, optional<RHS> const & rhs) noexcept(noexcept(rhs < lhs)) {
+constexpr auto operator>(LHS const & lhs, optional<RHS> const & rhs) noexcept(noexcept(rhs < lhs)) {
 	return rhs < lhs;
 }
 
 
 template<typename LHS, typename RHS>
-constexpr bool operator<=(optional<LHS> const & lhs, RHS const & rhs) noexcept(noexcept(rhs < lhs)) {
+constexpr auto operator<=(optional<LHS> const & lhs, RHS const & rhs) noexcept(noexcept(rhs < lhs)) {
 	return !(rhs < lhs);
 }
 
 template<typename LHS, typename RHS>
-constexpr bool operator<=(LHS const & lhs, optional<RHS> const & rhs) noexcept(noexcept(rhs < lhs)) {
+constexpr auto operator<=(LHS const & lhs, optional<RHS> const & rhs) noexcept(noexcept(rhs < lhs)) {
 	return !(rhs < lhs);
 }
 
 
 template<typename LHS, typename RHS>
-constexpr bool operator>=(optional<LHS> const & lhs, RHS const & rhs) noexcept(noexcept(lhs < rhs)) {
+constexpr auto operator>=(optional<LHS> const & lhs, RHS const & rhs) noexcept(noexcept(lhs < rhs)) {
 	return !(lhs < rhs);
 }
 
 template<typename LHS, typename RHS>
-constexpr bool operator>=(LHS const & lhs, optional<RHS> const & rhs) noexcept(noexcept(lhs < rhs)) {
+constexpr auto operator>=(LHS const & lhs, optional<RHS> const & rhs) noexcept(noexcept(lhs < rhs)) {
 	return !(lhs < rhs);
 }
 
@@ -132,67 +132,67 @@ constexpr bool operator>=(LHS const & lhs, optional<RHS> const & rhs) noexcept(n
 
 
 template<typename T>
-constexpr bool operator==(optional<T> const & lhs, none_t) noexcept {
+constexpr auto operator==(optional<T> const & lhs, none_t) noexcept {
 	return !lhs;
 }
 
 template<typename T>
-constexpr bool operator==(none_t, optional<T> const & rhs) noexcept {
+constexpr auto operator==(none_t, optional<T> const & rhs) noexcept {
 	return !rhs;
 }
 
 
 template<typename T>
-constexpr bool operator!=(optional<T> const & lhs, none_t const rhs) noexcept {
+constexpr auto operator!=(optional<T> const & lhs, none_t const rhs) noexcept {
 	return !(lhs == rhs);
 }
 
 template<typename T>
-constexpr bool operator!=(none_t const lhs, optional<T> const & rhs) noexcept {
+constexpr auto operator!=(none_t const lhs, optional<T> const & rhs) noexcept {
 	return !(rhs == lhs);
 }
 
 
 template<typename T>
-constexpr bool operator<(optional<T> const &, none_t) noexcept {
+constexpr auto operator<(optional<T> const &, none_t) noexcept {
 	return false;
 }
 
 template<typename T>
-constexpr bool operator<(none_t, optional<T> const & rhs) noexcept {
+constexpr auto operator<(none_t, optional<T> const & rhs) noexcept {
 	return static_cast<bool>(rhs);
 }
 
 
 template<typename T>
-constexpr bool operator>(optional<T> const & lhs, none_t const rhs) noexcept {
+constexpr auto operator>(optional<T> const & lhs, none_t const rhs) noexcept {
 	return rhs < lhs;
 }
 
 template<typename T>
-constexpr bool operator>(none_t const lhs, optional<T> const & rhs) noexcept {
+constexpr auto operator>(none_t const lhs, optional<T> const & rhs) noexcept {
 	return rhs < lhs;
 }
 
 
 template<typename T>
-constexpr bool operator<=(optional<T> const & lhs, none_t const rhs) noexcept {
+constexpr auto operator<=(optional<T> const & lhs, none_t const rhs) noexcept {
 	return !(rhs < lhs);
 }
 
 template<typename T>
-constexpr bool operator<=(none_t const lhs, optional<T> const & rhs) noexcept {
+constexpr auto operator<=(none_t const lhs, optional<T> const & rhs) noexcept {
 	return !(rhs < lhs);
 }
 
 
 template<typename T>
-constexpr bool operator>=(optional<T> const & lhs, none_t const rhs) noexcept {
+constexpr auto operator>=(optional<T> const & lhs, none_t const rhs) noexcept {
 	return !(lhs < rhs);
 }
 
 template<typename T>
-constexpr bool operator>=(none_t const lhs, optional<T> const & rhs) noexcept {
+constexpr auto operator>=(none_t const lhs, optional<T> const & rhs) noexcept {
 	return !(lhs < rhs);
 }
 

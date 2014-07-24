@@ -77,20 +77,20 @@ using equivalent_type = integer<
 // deduced as whatever we pass as the argument type.
 
 template<typename overflow_policy = void, storage_type storage = storage_type::fast, typename T = void>
-constexpr equivalent_type<
+constexpr auto make(T const value) noexcept -> equivalent_type<
 	T,
 	std::conditional_t<std::is_void<overflow_policy>::value,
 		detail::equivalent_overflow_policy<T>,
 		overflow_policy
 	>,
 	storage
-> make(T const value) noexcept {
+> {
 	static_assert(std::numeric_limits<T>::is_integer, "Must be an integer type.");
 	return {value, non_check};
 }
 
 template<intmax_t value, typename overflow_policy = null_policy, storage_type storage = storage_type::fast>
-constexpr integer<value, value, overflow_policy, storage> make() noexcept {
+constexpr auto make() noexcept -> integer<value, value, overflow_policy, storage> {
 	return {value, non_check};
 }
 

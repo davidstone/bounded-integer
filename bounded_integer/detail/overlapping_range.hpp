@@ -28,36 +28,36 @@ namespace bounded {
 namespace detail {
 
 template<typename T>
-constexpr bool value_fits_in_type(intmax_t const value) noexcept {
+constexpr auto value_fits_in_type(intmax_t const value) noexcept -> bool {
 	static_assert(basic_numeric_limits<T>::is_specialized, "Only works with integer types.");
 	return basic_numeric_limits<T>::min() <= value and value <= basic_numeric_limits<T>::max();
 }
 template<>
-constexpr bool value_fits_in_type<uintmax_t>(intmax_t const value) noexcept {
+constexpr auto value_fits_in_type<uintmax_t>(intmax_t const value) noexcept -> bool {
 	return value >= 0;
 }
 
 template<typename T>
-constexpr bool type_overlaps_range(intmax_t const minimum, intmax_t const maximum) noexcept {
+constexpr auto type_overlaps_range(intmax_t const minimum, intmax_t const maximum) noexcept -> bool {
 	static_assert(basic_numeric_limits<T>::is_specialized, "Only works with integer types.");
 	return
 		minimum <= basic_numeric_limits<T>::max() and
 		basic_numeric_limits<T>::min() <= maximum;
 }
 template<>
-constexpr bool type_overlaps_range<uintmax_t>(intmax_t, intmax_t const maximum) noexcept {
+constexpr auto type_overlaps_range<uintmax_t>(intmax_t, intmax_t const maximum) noexcept -> bool {
 	return maximum >= 0;
 }
 
 template<typename T>
-constexpr bool type_fits_in_range(intmax_t const minimum, intmax_t const maximum) noexcept {
+constexpr auto type_fits_in_range(intmax_t const minimum, intmax_t const maximum) noexcept -> bool {
 	static_assert(basic_numeric_limits<T>::is_specialized, "Only works with integer types.");
 	return
 		minimum <= basic_numeric_limits<T>::min() and
 		basic_numeric_limits<T>::max() <= maximum;
 }
 template<>
-constexpr bool type_fits_in_range<uintmax_t>(intmax_t const, intmax_t const) noexcept {
+constexpr auto type_fits_in_range<uintmax_t>(intmax_t const, intmax_t const) noexcept -> bool {
 	return false;
 }
 

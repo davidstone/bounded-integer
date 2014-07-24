@@ -41,19 +41,19 @@ public:
 	constexpr explicit basic_policy(T &&) noexcept {
 	}
 
-	basic_policy & operator=(basic_policy const &) noexcept = default;
-	basic_policy & operator=(basic_policy &&) noexcept = default;
+	auto operator=(basic_policy const &) noexcept -> basic_policy & = default;
+	auto operator=(basic_policy &&) noexcept -> basic_policy & = default;
 	template<typename T, enable_if_t<is_overflow_policy<T>::value> = clang_dummy>
-	basic_policy & operator=(T &&) noexcept {
+	auto operator=(T &&) noexcept -> basic_policy & {
 		return *this;
 	}
 	template<typename T, enable_if_t<is_overflow_policy<T>::value> = clang_dummy>
-	basic_policy volatile & operator=(T &&) volatile noexcept {
+	auto operator=(T &&) volatile noexcept -> basic_policy volatile & {
 		return *this;
 	}
 
 	template<typename T, typename Minimum, typename Maximum>
-	static constexpr intmax_t assignment(T && value, Minimum && minimum, Maximum && maximum)
+	static constexpr auto assignment(T && value, Minimum && minimum, Maximum && maximum)
 		noexcept(noexcept(policy_type{}.assignment(std::forward<T>(value), std::forward<Minimum>(minimum), std::forward<Maximum>(maximum)))) {
 		return policy_type{}.assignment(std::forward<T>(value), std::forward<Minimum>(minimum), std::forward<Maximum>(maximum));
 	}

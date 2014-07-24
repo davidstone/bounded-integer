@@ -97,27 +97,27 @@ constexpr auto operator+(integer<minimum, maximum, overflow_policy, storage> con
 // Pointer overloads
 
 template<intmax_t minimum, intmax_t maximum, typename overflow_policy, storage_type storage, typename T>
-constexpr T * operator+(integer<minimum, maximum, overflow_policy, storage> const & number, T * const pointer) noexcept {
+constexpr auto operator+(integer<minimum, maximum, overflow_policy, storage> const & number, T * const pointer) noexcept -> T * {
 	return number.value() + pointer;
 }
 
 template<typename T, intmax_t minimum, intmax_t maximum, typename overflow_policy, storage_type storage>
-constexpr T * operator+(T * const pointer, integer<minimum, maximum, overflow_policy, storage> const & number) noexcept {
+constexpr auto operator+(T * const pointer, integer<minimum, maximum, overflow_policy, storage> const & number) noexcept -> T * {
 	return pointer + number.value();
 }
 
 template<typename T, intmax_t minimum, intmax_t maximum, typename overflow_policy, storage_type storage>
-constexpr T * operator-(T * const pointer, integer<minimum, maximum, overflow_policy, storage> const & number) noexcept {
+constexpr auto operator-(T * const pointer, integer<minimum, maximum, overflow_policy, storage> const & number) noexcept -> T * {
 	return pointer - number.value();
 }
 
 template<typename T, intmax_t minimum, intmax_t maximum, typename overflow_policy, storage_type storage>
-T * & operator+=(T * & pointer, integer<minimum, maximum, overflow_policy, storage> const & number) noexcept {
+decltype(auto) operator+=(T * & pointer, integer<minimum, maximum, overflow_policy, storage> const & number) noexcept {
 	return pointer += number.value();
 }
 
 template<typename T, intmax_t minimum, intmax_t maximum, typename overflow_policy, storage_type storage>
-T * & operator-=(T * & pointer, integer<minimum, maximum, overflow_policy, storage> const & number) noexcept {
+decltype(auto) operator-=(T * & pointer, integer<minimum, maximum, overflow_policy, storage> const & number) noexcept {
 	return pointer -= number.value();
 }
 

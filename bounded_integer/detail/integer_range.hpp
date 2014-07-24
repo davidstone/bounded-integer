@@ -35,7 +35,7 @@ namespace detail {
 namespace integer_range_iterator {
 
 template<typename T>
-constexpr intmax_t range_of_type() noexcept {
+constexpr auto range_of_type() noexcept {
 	return static_cast<intmax_t>(std::numeric_limits<T>::max() - std::numeric_limits<T>::min());
 }
 
@@ -55,28 +55,34 @@ public:
 
 	iterator() = default;
 	
-	// It is undefined behavior to dereference a past-the-end iterator
-	constexpr value_type operator*() const noexcept {
+	// It is undefined behavior to dereference a past-the-end iterator.
+	//
+	// Note that this returns a value, not a reference.
+	constexpr auto operator*() const noexcept -> value_type {
 		return value_type(m_value, non_check);
 	}
-	constexpr pointer operator->() const noexcept {
-		return &m_value;
-	}
-	constexpr value_type operator[](index_type const & index) const {
+	constexpr auto operator[](index_type const & index) const -> value_type {
 		return static_cast<value_type>(m_value + index);
 	}
+	constexpr auto operator->() const noexcept {
+		return &m_value;
+	}
 	
-	friend constexpr difference_type operator-(iterator const & lhs, iterator const & rhs) noexcept {
+	friend constexpr auto operator-(iterator const & lhs, iterator const & rhs) noexcept -> difference_type {
+		static_assert(
+			std::is_same<decltype(lhs.m_value - rhs.m_value), difference_type>::value,
+			"Incorrect difference_type."
+		);
 		return lhs.m_value - rhs.m_value;
 	}
-	friend constexpr iterator operator+(iterator const & lhs, difference_type const & rhs) {
+	friend constexpr auto operator+(iterator const & lhs, difference_type const & rhs) -> iterator {
 		return iterator(static_cast<underlying_type>(lhs.m_value + rhs));
 	}
 	
-	friend constexpr bool operator==(iterator const & lhs, iterator const & rhs) noexcept {
+	friend constexpr auto operator==(iterator const & lhs, iterator const & rhs) noexcept -> bool {
 		return lhs.m_value == rhs.m_value;
 	}
-	friend constexpr bool operator<(iterator const & lhs, iterator const & rhs) noexcept {
+	friend constexpr auto operator<(iterator const & lhs, iterator const & rhs) noexcept -> bool {
 		return lhs.m_value < rhs.m_value;
 	}
 private:
@@ -89,39 +95,39 @@ private:
 };
 
 template<typename T>
-constexpr iterator<T> operator+(typename iterator<T>::difference_type const & lhs, iterator<T> const & rhs) {
+constexpr auto operator+(typename iterator<T>::difference_type const & lhs, iterator<T> const & rhs) {
 	return rhs + lhs;
 }
 template<typename T>
-iterator<T> & operator+=(iterator<T> & lhs, typename iterator<T>::difference_type const & rhs) {
+decltype(auto) operator+=(iterator<T> & lhs, typename iterator<T>::difference_type const & rhs) {
 	return lhs = lhs + rhs;
 }
 template<typename T>
-constexpr iterator<T> operator-(iterator<T> const & lhs, typename iterator<T>::difference_type const & rhs) {
+constexpr auto operator-(iterator<T> const & lhs, typename iterator<T>::difference_type const & rhs) {
 	return lhs + (-rhs);
 }
 template<typename T>
-iterator<T> & operator-=(iterator<T> & lhs, typename iterator<T>::difference_type const & rhs) {
+decltype(auto) operator-=(iterator<T> & lhs, typename iterator<T>::difference_type const & rhs) {
 	return lhs = lhs - rhs;
 }
 
 template<typename T>
-iterator<T> & operator++(iterator<T> & it) {
+decltype(auto) operator++(iterator<T> & it) {
 	return it += make<1>();
 }
 template<typename T>
-iterator<T> operator++(iterator<T> & it, int) {
+auto operator++(iterator<T> & it, int) {
 	auto self = it;
 	++it;
 	return self;
 }
 
 template<typename T>
-iterator<T> & operator--(iterator<T> & it) {
+decltype(auto) operator--(iterator<T> & it) {
 	return it -= make<1>();
 }
 template<typename T>
-iterator<T> operator--(iterator<T> & it, int) {
+auto operator--(iterator<T> & it, int) {
 	auto self = it;
 	--it;
 	return self;
@@ -129,20 +135,20 @@ iterator<T> operator--(iterator<T> & it, int) {
 
 
 template<typename T>
-constexpr bool operator!=(iterator<T> const & lhs, iterator<T> const & rhs) noexcept {
+constexpr auto operator!=(iterator<T> const & lhs, iterator<T> const & rhs) noexcept {
 	return !(lhs == rhs);
 }
 
 template<typename T>
-constexpr bool operator>(iterator<T> const & lhs, iterator<T> const & rhs) noexcept {
+constexpr auto operator>(iterator<T> const & lhs, iterator<T> const & rhs) noexcept {
 	return rhs < lhs;
 }
 template<typename T>
-constexpr bool operator>=(iterator<T> const & lhs, iterator<T> const & rhs) noexcept {
+constexpr auto operator>=(iterator<T> const & lhs, iterator<T> const & rhs) noexcept {
 	return !(lhs < rhs);
 }
 template<typename T>
-constexpr bool operator<=(iterator<T> const & lhs, iterator<T> const & rhs) noexcept {
+constexpr auto operator<=(iterator<T> const & lhs, iterator<T> const & rhs) noexcept {
 	return !(rhs < lhs);
 }
 
@@ -169,57 +175,57 @@ public:
 		m_end(last) {
 	}
 
-	constexpr const_iterator begin() const noexcept {
+	constexpr auto begin() const noexcept {
 		return m_begin;
 	}
-	constexpr const_iterator cbegin() const noexcept {
+	constexpr auto cbegin() const noexcept {
 		return begin();
 	}
-	constexpr const_iterator end() const noexcept {
+	constexpr auto end() const noexcept {
 		return m_end;
 	}
-	constexpr const_iterator cend() const {
+	constexpr auto cend() const {
 		return end();
 	}
-	constexpr const_reverse_iterator rbegin() const noexcept {
+	constexpr auto rbegin() const noexcept {
 		return const_reverse_iterator(end());
 	}
-	constexpr const_reverse_iterator crbegin() const noexcept {
+	constexpr auto crbegin() const noexcept {
 		return rbegin();
 	}
-	constexpr const_reverse_iterator rend() const noexcept {
+	constexpr auto rend() const noexcept {
 		return const_reverse_iterator(begin());
 	}
-	constexpr const_reverse_iterator crend() const noexcept {
+	constexpr auto crend() const noexcept {
 		return rend();
 	}
 
-	constexpr value_type front() const {
+	constexpr auto front() const -> value_type {
 		return *begin();
 	}
-	constexpr value_type back() const {
+	constexpr auto back() const -> value_type {
 		return *(end() - make<1>());
 	}
-	constexpr value_type operator[](index_type const & index) const {
+	constexpr auto operator[](index_type const & index) const -> value_type {
 		return begin()[index];
 	}
 	template<typename Index>
-	constexpr value_type at(Index const & index) const {
+	constexpr auto at(Index const & index) const -> value_type {
 		return begin()[static_cast<index_type>(index)];
 	}
 
-	void swap(integer_range_type & other) noexcept {
+	auto swap(integer_range_type & other) noexcept {
 		using std::swap;
 		swap(m_begin, other.m_begin);
 		swap(m_end, other.m_end);
 	}
-	constexpr size_type size() const {
+	constexpr auto size() const {
 		return size_type(end() - begin(), non_check);
 	}
-	constexpr size_type max_size() const {
+	constexpr auto max_size() const {
 		return make<detail::integer_range_iterator::range_of_type<value_type>()>();
 	}
-	constexpr bool empty() const {
+	constexpr auto empty() const {
 		return size() == make<0>();
 	}
 
@@ -229,7 +235,7 @@ private:
 };
 
 template<typename T>
-void swap(integer_range_type<T>& lhs, integer_range_type<T>& rhs) {
+auto swap(integer_range_type<T>& lhs, integer_range_type<T>& rhs) {
 	lhs.swap(rhs);
 }
 

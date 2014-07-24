@@ -73,7 +73,7 @@ public:
 	}
 	optional_storage(optional_storage const &) = default;
 	optional_storage(optional_storage &&) = default;
-	optional_storage & operator=(optional_storage const & other) noexcept(noexcept(m_value = other.m_value)) {
+	decltype(auto) operator=(optional_storage const & other) noexcept(noexcept(m_value = other.m_value)) {
 		if (other.is_initialized()) {
 			m_value = other.m_value;
 		}
@@ -82,7 +82,7 @@ public:
 		}
 		return *this;
 	}
-	optional_storage & operator=(optional_storage && other) noexcept(noexcept(m_value = other.m_value)) {
+	decltype(auto) operator=(optional_storage && other) noexcept(noexcept(m_value = other.m_value)) {
 		if (other.is_initialized()) {
 			m_value = other.m_value;
 		}
@@ -109,16 +109,16 @@ public:
 		m_value(other.is_initialized() ? std::move(other.value()) : uninitialized_value()) {
 	}
 
-	constexpr T const & value() const & noexcept {
+	constexpr decltype(auto) value() const & noexcept {
 		return m_value;
 	}
-	T & value() & noexcept {
+	decltype(auto) value() & noexcept {
 		return m_value;
 	}
-	constexpr T && value() && noexcept {
+	constexpr decltype(auto) value() && noexcept {
 		return std::move(m_value);
 	}
-	constexpr bool is_initialized() const noexcept {
+	constexpr auto is_initialized() const noexcept {
 		return m_value != uninitialized_value();
 	}
 };
@@ -134,8 +134,8 @@ public:
 	}
 	optional_storage(optional_storage const &) = default;
 	optional_storage(optional_storage &&) = default;
-	optional_storage & operator=(optional_storage const &) = default;
-	optional_storage & operator=(optional_storage &&) = default;
+	auto operator=(optional_storage const &) -> optional_storage & = default;
+	auto operator=(optional_storage &&) -> optional_storage & = default;
 	template<typename U, enable_if_t<std::is_convertible<U &&, T>::value> = clang_dummy>
 	constexpr optional_storage(U && other) noexcept(std::is_nothrow_constructible<T, U &&>::value):
 		m_initialized(true),
@@ -158,21 +158,21 @@ public:
 		m_value(m_initialized ? std::move(other.value()) : uninitialized_value()) {
 	}
 
-	constexpr T const & value() const & noexcept {
+	constexpr decltype(auto) value() const & noexcept {
 		return m_value;
 	}
-	T & value() & noexcept {
+	decltype(auto) value() & noexcept {
 		return m_value;
 	}
-	constexpr T && value() && noexcept {
+	constexpr decltype(auto) value() && noexcept {
 		return std::move(m_value);
 	}
-	constexpr bool is_initialized() const noexcept {
+	constexpr auto is_initialized() const noexcept {
 		return m_initialized;
 	}
 private:
 	using underlying_type = typename get_underlying<T>::type;
-	static constexpr underlying_type uninitialized_value() noexcept {
+	static constexpr auto uninitialized_value() noexcept {
 		return static_cast<underlying_type>(std::numeric_limits<T>::min());
 	}
 	bool m_initialized;
@@ -214,50 +214,50 @@ public:
 		m_storage(std::forward<Args>(args)...) {
 	}
 
-	optional & operator=(optional const &) = default;
-	optional & operator=(optional &&) = default;
+	auto operator=(optional const &) -> optional & = default;
+	auto operator=(optional &&) -> optional & = default;
 	template<typename U>
-	optional & operator=(U && other) noexcept(noexcept(std::declval<optional &>() = optional(std::forward<U>(other)))) {
+	decltype(auto) operator=(U && other) noexcept(noexcept(std::declval<optional &>() = optional(std::forward<U>(other)))) {
 		*this = optional(std::forward<U>(other));
 		return *this;
 	}
 	
 	// TODO: conform better to std::optional
 	// comma operator is used to avoid binding the reference to a temporary
-	constexpr value_type const & value() const & {
+	constexpr decltype(auto) value() const & {
 		return m_storage.is_initialized() ? m_storage.value() : (throw std::logic_error("bad optional access"), m_storage.value());
 	}
-	value_type & value() & {
+	decltype(auto) value() & {
 		return m_storage.is_initialized() ? m_storage.value() : (throw std::logic_error("bad optional access"), m_storage.value());
 	}
-	value_type && value() && {
+	decltype(auto) value() && {
 		return m_storage.is_initialized() ? std::move(m_storage).value() : (throw std::logic_error("bad optional access"), std::move(m_storage).value());
 	}
-	constexpr value_type const & operator*() const & {
+	constexpr decltype(auto) operator*() const & {
 		return value();
 	}
-	value_type & operator*() & {
+	decltype(auto) operator*() & {
 		return value();
 	}
-	value_type && operator*() && {
+	decltype(auto) operator*() && {
 		return std::move(value());
 	}
 	
-	constexpr value_type const * operator->() const {
+	constexpr auto operator->() const {
 		return &value();
 	}
-	value_type * operator->() {
+	auto operator->() {
 		return &value();
 	}
 	
-	constexpr value_type const & get_value_or(value_type const & default_value) const noexcept {
+	constexpr decltype(auto) get_value_or(value_type const & default_value) const noexcept {
 		return m_storage.is_initialized() ? m_storage.value() : default_value;
 	}
 	
 	constexpr explicit operator bool() const noexcept {
 		return m_storage.is_initialized();
 	}
-	constexpr bool operator!() const noexcept {
+	constexpr auto operator!() const noexcept {
 		return !m_storage.is_initialized();
 	}
 private:
@@ -268,7 +268,7 @@ private:
 
 
 template<typename T>
-optional<std::remove_reference_t<T>> make_optional(T && value) noexcept {
+auto make_optional(T && value) noexcept -> optional<std::remove_reference_t<T>> {
 	return { std::forward<T>(value) };
 }
 

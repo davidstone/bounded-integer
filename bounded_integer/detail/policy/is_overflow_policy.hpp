@@ -31,10 +31,10 @@ using no = char[2];
 #define BOUNDED_INTEGER_HAS_NESTED_TYPE(type) \
 \
 template<typename T> \
-yes & checker(typename T::type *); \
+auto checker(typename T::type *) -> yes &; \
 \
 template<typename> \
-no & checker(...);
+auto checker(...) -> no &;
 
 BOUNDED_INTEGER_HAS_NESTED_TYPE(overflow_policy_tag)
 #undef BOUNDED_INTEGER_HAS_NESTED_TYPE

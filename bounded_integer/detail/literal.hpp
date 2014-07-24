@@ -1,5 +1,5 @@
 // bounded type literal
-// Copyright (C) 2013 David Stone
+// Copyright (C) 2014 David Stone
 //
 // This program is free software: you can redistribute it and / or modify
 // it under the terms of the GNU Affero General Public License as
@@ -23,7 +23,7 @@
 namespace bounded {
 namespace detail {
 
-constexpr inline intmax_t power(intmax_t const radix, intmax_t const exponent) noexcept {
+constexpr inline auto power(intmax_t const radix, intmax_t const exponent) noexcept -> intmax_t {
 	return (exponent == 0) ? 1 : radix * power(radix, exponent - 1);
 }
 
@@ -37,7 +37,7 @@ private:
 	static constexpr intmax_t radix = 10;
 	static constexpr intmax_t integer_scale = power(radix, sizeof...(digits));
 public:
-	static constexpr decltype(literal<digit>::value() * make<integer_scale>() + literal<digits...>::value()) value() noexcept {
+	static constexpr auto value() noexcept {
 		return literal<digit>::value() * make<integer_scale>() + literal<digits...>::value();
 	}
 };
@@ -45,7 +45,7 @@ public:
 template<char digit>
 class literal<digit> {
 public:
-	static constexpr decltype(make<digit - '0'>()) value() noexcept {
+	static constexpr auto value() noexcept {
 		return make<digit - '0'>();
 	}
 };

@@ -24,7 +24,7 @@ namespace {
 using namespace bounded::literal;
 
 template<typename integer>
-void check_numeric_limits() {
+auto check_numeric_limits() {
 	using int_limits = std::numeric_limits<integer>;
 	using bounded_t = bounded::checked_integer<int_limits::min(), int_limits::max()>;
 	using bounded_limits = std::numeric_limits<bounded_t>;
@@ -77,7 +77,7 @@ void check_numeric_limits() {
 	#undef BOUNDED_INTEGER_CHECK_MEANINGLESS_FUNCTION
 	#undef BOUNDED_INTEGER_CHECK_FUNCTION
 }
-void check_numeric_limits_all() {
+auto check_numeric_limits_all() {
 	check_numeric_limits<int8_t>();
 	check_numeric_limits<uint8_t>();
 	check_numeric_limits<int16_t>();
@@ -89,13 +89,13 @@ void check_numeric_limits_all() {
 	// check_numeric_limits<uint64_t>();
 }
 
-void check_single_argument_minmax() {
+auto check_single_argument_minmax() {
 	constexpr auto value = 5_bi;
 	static_assert(bounded::min(value) == value, "A value does not have itself as the minimum.");
 	static_assert(bounded::max(value) == value, "A value does not have itself as the maximum.");
 }
 
-void check_double_argument_minmax() {
+auto check_double_argument_minmax() {
 	constexpr auto lower_value = 6_bi;
 	constexpr auto greater_value = 10_bi;
 	static_assert(bounded::min(lower_value, greater_value) == lower_value, "Two argument min value incorrect.");
@@ -104,7 +104,7 @@ void check_double_argument_minmax() {
 	static_assert(bounded::max(greater_value, lower_value) == greater_value, "Two argument max value incorrect.");
 }
 
-void check_many_argument_minmax() {
+auto check_many_argument_minmax() {
 	constexpr bounded::integer<-53, 1000> value(3_bi);
 	constexpr auto minimum = bounded::min(0_bi, 10_bi, 5_bi, value);
 	using min_type = decltype(minimum);
@@ -119,7 +119,7 @@ void check_many_argument_minmax() {
 	static_assert(std::numeric_limits<max_type>::max() == 1000, "Incorrect maximum maximum.");
 }
 
-void check_non_bounded_minmax() {
+auto check_non_bounded_minmax() {
 	constexpr auto integer_min = bounded::min(0, 5);
 	static_assert(std::is_same<decltype(integer_min), int const>::value, "Incorrect type of min for int arguments.");
 	static_assert(integer_min == 0, "Incorrect value of min for int arguments.");
@@ -141,7 +141,7 @@ static_assert(string_less("1", "10"), "Incorrect string comparison function.");
 static_assert(!string_less("10", "1"), "Incorrect string comparison function.");
 static_assert(!string_less("1", "1"), "Incorrect string comparison function.");
 
-void check_non_integer_minmax() {
+auto check_non_integer_minmax() {
 	class string_view {
 	public:
 		explicit constexpr string_view(char const * value) noexcept:
@@ -169,7 +169,7 @@ void check_non_integer_minmax() {
 }
 
 template<typename T>
-void check_specific_reference_minmax() {
+auto check_specific_reference_minmax() {
 	T m1{};
 	T m2{};
 	T const c1{};
@@ -204,7 +204,7 @@ void check_specific_reference_minmax() {
 	);
 }
 
-void check_reference_minmax() {
+auto check_reference_minmax() {
 	// Check that built-in and class types have the same behavior, unlike
 	// operator?:
 	check_specific_reference_minmax<int>();
@@ -224,7 +224,7 @@ void check_reference_minmax() {
 	);
 }
 
-void check_minmax() {
+auto check_minmax() {
 	check_single_argument_minmax();
 	check_double_argument_minmax();
 	check_many_argument_minmax();
@@ -233,7 +233,7 @@ void check_minmax() {
 	check_reference_minmax();
 }
 
-void check_throw_policy() {
+auto check_throw_policy() {
 	using bounded::checked_integer;
 	static_assert(
 		!noexcept(std::declval<checked_integer<0, 0> &>() = std::declval<checked_integer<1, 1> &>()),
@@ -256,11 +256,11 @@ void check_throw_policy() {
 	}
 }
 
-void check_policies() {
+auto check_policies() {
 	check_throw_policy();
 }
 
-void check_compound_arithmetic() {
+auto check_compound_arithmetic() {
 	bounded::integer<0, 10> x(5);
 	x += 5_bi;
 	assert(x == 10);
@@ -310,7 +310,7 @@ void check_compound_arithmetic() {
 	assert(clamped == 0_bi);
 }
 
-void check_algorithm() {
+auto check_algorithm() {
 	constexpr auto array = bounded::make_array(0_bi, 3_bi, 2_bi, 3_bi, 5_bi);
 	assert(bounded::count(std::begin(array), std::end(array), 3_bi) == 2_bi);
 	assert(bounded::count(std::begin(array), std::end(array), 2_bi) == 1_bi);
@@ -319,7 +319,7 @@ void check_algorithm() {
 }
 
 template<typename Initial, intmax_t initial_value, typename Expected, intmax_t expected_value>
-void check_absolute_value() {
+auto check_absolute_value() {
 	constexpr Initial value(initial_value);
 	constexpr auto absolute = bounded::abs(value);
 	constexpr Expected expected_absolute(expected_value);
@@ -333,7 +333,7 @@ void check_absolute_value() {
 	);
 }
 
-void check_math() {
+auto check_math() {
 	using bounded::checked_integer;
 	check_absolute_value<checked_integer<-10, 4>, -5, checked_integer<0, 10>, 5>();
 	check_absolute_value<checked_integer<-10, -10>, -10, checked_integer<10, 10>, 10>();
@@ -343,7 +343,7 @@ void check_math() {
 }
 
 template<typename T>
-void check_uncompressed_optional() {
+auto check_uncompressed_optional() {
 	using type = bounded::integer<std::numeric_limits<T>::min(), std::numeric_limits<T>::max()>;
 	static_assert(
 		sizeof(type) < sizeof(bounded::optional<type>),
@@ -351,7 +351,7 @@ void check_uncompressed_optional() {
 	);
 }
 template<intmax_t minimum, intmax_t maximum>
-void check_compressed_optional() {
+auto check_compressed_optional() {
 	using type = bounded::integer<minimum, maximum>;
 	using compressed_type = bounded::optional<type>;
 	static_assert(
@@ -364,7 +364,7 @@ void check_compressed_optional() {
 	);
 }
 
-void check_optional() {
+auto check_optional() {
 	check_compressed_optional<1, 10>();
 	check_compressed_optional<-50, 127>();
 	check_uncompressed_optional<uint8_t>();
@@ -387,14 +387,14 @@ void check_optional() {
 	assert(!optional_integer);
 }
 
-void check_to_string() {
+auto check_to_string() {
 	auto const result = bounded::to_string(4_bi);
 	static_assert(std::is_same<decltype(result), std::string const>::value, "Incorrect type of to_string.");
 	assert(result == "4");
 }
 
 template<typename integer>
-void streaming_test(int const initial, int const final) {
+auto streaming_test(int const initial, int const final) {
 	integer value(initial);
 	std::stringstream in;
 	in << value;
@@ -405,7 +405,7 @@ void streaming_test(int const initial, int const final) {
 	assert(value == final);
 }
 
-void check_streaming() {
+auto check_streaming() {
 	streaming_test<bounded::checked_integer<0, 100>>(7, 0);
 	constexpr auto large_initial = std::numeric_limits<int>::max() / 3;
 	constexpr auto large_final = -49;
@@ -413,7 +413,7 @@ void check_streaming() {
 }
 
 
-void check_dynamic_policy() {
+auto check_dynamic_policy() {
 	constexpr auto value = 3_bi;
 	constexpr auto min = 1_bi;
 	constexpr auto max = 7_bi;
@@ -459,7 +459,7 @@ void check_dynamic_policy() {
 	assert(run == value);
 }
 
-void check_iterator() {
+auto check_iterator() {
 	constexpr bounded::array<char, 1> a = { {} };
 	assert(bounded::next(a.begin()) == a.end());
 	assert(bounded::prev(a.end()) == a.begin());
@@ -468,7 +468,7 @@ void check_iterator() {
 
 }	// namespace
 
-int main() {
+auto main() -> int {
 	check_numeric_limits_all();
 	check_minmax();
 	check_policies();
