@@ -106,17 +106,36 @@ public:
 		);
 	}
 	
-	constexpr decltype(auto) min() const noexcept {
+	constexpr decltype(auto) min() const & noexcept {
 		return m_min;
 	}
-	constexpr decltype(auto) min() const volatile noexcept {
+	constexpr decltype(auto) min() const volatile & noexcept {
 		return m_min;
 	}
-	constexpr decltype(auto) max() const noexcept {
+	decltype(auto) min() & noexcept {
+		return m_min;
+	}
+	decltype(auto) min() volatile & noexcept {
+		return m_min;
+	}
+	decltype(auto) min() && noexcept {
+		return std::move(m_min);
+	}
+
+	constexpr decltype(auto) max() const & noexcept {
 		return m_max;
 	}
-	constexpr decltype(auto) max() const volatile noexcept {
+	constexpr decltype(auto) max() const volatile & noexcept {
 		return m_max;
+	}
+	decltype(auto) max() & noexcept {
+		return m_max;
+	}
+	decltype(auto) max() volatile & noexcept {
+		return m_max;
+	}
+	decltype(auto) max() && noexcept {
+		return std::move(m_max);
 	}
 	
 	static constexpr bool is_modulo = overflow_policy::is_modulo;
@@ -203,11 +222,21 @@ public:
 	static constexpr auto min() noexcept {
 		return make<static_minimum>();
 	}
-	constexpr decltype(auto) max() const noexcept {
+
+	constexpr decltype(auto) max() const & noexcept {
 		return m_max;
 	}
-	constexpr decltype(auto) max() const volatile noexcept {
+	constexpr decltype(auto) max() const volatile & noexcept {
 		return m_max;
+	}
+	decltype(auto) max() & noexcept {
+		return m_max;
+	}
+	decltype(auto) max() volatile & noexcept {
+		return m_max;
+	}
+	decltype(auto) max() && noexcept {
+		return std::move(m_max);
 	}
 	
 	static constexpr bool is_modulo = overflow_policy::is_modulo;
@@ -290,12 +319,22 @@ public:
 		);
 	}
 	
-	constexpr decltype(auto) min() const noexcept {
+	constexpr decltype(auto) min() const & noexcept {
 		return m_min;
 	}
-	constexpr decltype(auto) min() const volatile noexcept {
+	constexpr decltype(auto) min() const volatile & noexcept {
 		return m_min;
 	}
+	decltype(auto) min() & noexcept {
+		return m_min;
+	}
+	decltype(auto) min() volatile & noexcept {
+		return m_min;
+	}
+	decltype(auto) min() && noexcept {
+		return std::move(m_min);
+	}
+
 	static constexpr auto max() noexcept {
 		return make<static_maximum>();
 	}
