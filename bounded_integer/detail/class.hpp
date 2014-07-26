@@ -168,21 +168,21 @@ public:
 		return *this;
 	}
 	
-	decltype(auto) operator=(integer const & other) & noexcept(noexcept(overflow_policy_type{}.assignment(static_cast<intmax_t>(other), minimum, maximum))) {
+	decltype(auto) operator=(integer const & other) & noexcept(noexcept(std::declval<overflow_policy_type>().assignment(static_cast<intmax_t>(other), minimum, maximum))) {
 		unchecked_assignment(overflow_policy().assignment(static_cast<intmax_t>(other), minimum, maximum));
 		return *this;
 	}
-	decltype(auto) operator=(integer && other) & noexcept(noexcept(overflow_policy_type{}.assignment(static_cast<intmax_t>(std::move(other)), minimum, maximum))) {
+	decltype(auto) operator=(integer && other) & noexcept(noexcept(std::declval<overflow_policy_type>().assignment(static_cast<intmax_t>(std::move(other)), minimum, maximum))) {
 		unchecked_assignment(overflow_policy().assignment(static_cast<intmax_t>(std::move(other)), minimum, maximum));
 		return *this;
 	}
 	template<typename T>
-	decltype(auto) operator=(T && other) & noexcept(noexcept(overflow_policy_type{}.assignment(static_cast<intmax_t>(std::forward<T>(other)), minimum, maximum))) {
+	decltype(auto) operator=(T && other) & noexcept(noexcept(std::declval<overflow_policy_type>().assignment(static_cast<intmax_t>(std::forward<T>(other)), minimum, maximum))) {
 		unchecked_assignment(overflow_policy().assignment(static_cast<intmax_t>(std::forward<T>(other)), minimum, maximum));
 		return *this;
 	}
 	template<typename T>
-	decltype(auto) operator=(T && other) volatile & noexcept(noexcept(overflow_policy_type{}.assignment(static_cast<intmax_t>(std::forward<T>(other)), minimum, maximum))) {
+	decltype(auto) operator=(T && other) volatile & noexcept(noexcept(std::declval<overflow_policy_type>().assignment(static_cast<intmax_t>(std::forward<T>(other)), minimum, maximum))) {
 		unchecked_assignment(overflow_policy().assignment(static_cast<intmax_t>(std::forward<T>(other)), minimum, maximum));
 		return *this;
 	}
