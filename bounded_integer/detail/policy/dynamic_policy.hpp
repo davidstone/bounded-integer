@@ -31,12 +31,17 @@
 namespace bounded {
 
 template<intmax_t static_minimum, intmax_t static_maximum, typename overflow_policy, storage_type storage = storage_type::fast>
-class dynamic_policy {
+class dynamic_policy : private overflow_policy {
 public:
-	static_assert(std::is_empty<overflow_policy>::value, "dynamic_policy cannot be used with a stateful policy.");
 	using overflow_policy_tag = void;
 	using underlying_type = integer<static_minimum, static_maximum, overflow_policy, storage>;
 
+	template<typename OverflowPolicy, enable_if_t<is_overflow_policy<OverflowPolicy>::value> = clang_dummy>
+	constexpr dynamic_policy(underlying_type minimum, underlying_type maximum, OverflowPolicy && policy) noexcept:
+		overflow_policy(std::forward<OverflowPolicy>(policy)),
+		m_min(std::move(minimum)),
+		m_max(std::move(maximum)) {
+	}
 	constexpr dynamic_policy(underlying_type minimum, underlying_type maximum) noexcept:
 		m_min(std::move(minimum)),
 		m_max(std::move(maximum)) {
@@ -47,15 +52,15 @@ public:
 	constexpr dynamic_policy(dynamic_policy const &) noexcept = default;
 	constexpr dynamic_policy(dynamic_policy &&) noexcept = default;
 	constexpr dynamic_policy(dynamic_policy const volatile & other) noexcept:
-		dynamic_policy(other.m_min, other.m_max) {
+		dynamic_policy(other.m_min, other.m_max, static_cast<overflow_policy const volatile &>(other)) {
 	}
 	constexpr dynamic_policy(dynamic_policy volatile && other) noexcept:
-		dynamic_policy(std::move(other.m_min), std::move(other.m_max)) {
+		dynamic_policy(std::move(other.m_min), std::move(other.m_max), static_cast<overflow_policy volatile &&>(other)) {
 	}
 
-	template<typename T, enable_if_t<is_overflow_policy<T>::value> = clang_dummy>
-	constexpr dynamic_policy(T &&) noexcept:
-		dynamic_policy() {
+	template<typename OverflowPolicy, enable_if_t<is_overflow_policy<OverflowPolicy>::value> = clang_dummy>
+	constexpr dynamic_policy(OverflowPolicy && policy) noexcept:
+		dynamic_policy(make<static_minimum>(), make<static_maximum>(), std::forward<OverflowPolicy>(policy)) {
 	}
 
 	decltype(auto) operator=(dynamic_policy const & other) noexcept {
@@ -81,12 +86,12 @@ public:
 
 	template<typename T, typename Minimum, typename Maximum>
 	constexpr auto assignment(T && value, Minimum && minimum, Maximum && maximum) const
-		noexcept(noexcept(overflow_policy{}.assignment(
+		noexcept(noexcept(std::declval<overflow_policy>().assignment(
 			std::forward<T>(value),
 			::bounded::max(std::forward<Minimum>(minimum), std::declval<underlying_type &>()),
 			::bounded::min(std::forward<Maximum>(maximum), std::declval<underlying_type &>())
 		))) {
-		return overflow_policy{}.assignment(
+		return static_cast<overflow_policy const &>(*this).assignment(
 			std::forward<T>(value),
 			::bounded::max(std::forward<Minimum>(minimum), m_min),
 			::bounded::min(std::forward<Maximum>(maximum), m_max)
@@ -94,12 +99,12 @@ public:
 	}
 	template<typename T, typename Minimum, typename Maximum>
 	constexpr auto assignment(T && value, Minimum && minimum, Maximum && maximum) const volatile
-		noexcept(noexcept(overflow_policy{}.assignment(
+		noexcept(noexcept(std::declval<overflow_policy>().assignment(
 			std::forward<T>(value),
 			::bounded::max(std::forward<Minimum>(minimum), std::declval<underlying_type &>()),
 			::bounded::min(std::forward<Maximum>(maximum), std::declval<underlying_type &>())
 		))) {
-		return overflow_policy{}.assignment(
+		return static_cast<overflow_policy volatile const &>(*this).assignment(
 			std::forward<T>(value),
 			::bounded::max(std::forward<Minimum>(minimum), m_min),
 			::bounded::min(std::forward<Maximum>(maximum), m_max)
@@ -140,6 +145,7 @@ public:
 	
 	static constexpr bool is_modulo = overflow_policy::is_modulo;
 	static constexpr bool overflow_is_error = overflow_policy::overflow_is_error;
+
 private:
 	underlying_type m_min;
 	underlying_type m_max;
@@ -148,11 +154,16 @@ private:
 
 
 template<intmax_t static_minimum, intmax_t static_maximum, typename overflow_policy, storage_type storage = storage_type::fast>
-class dynamic_max_policy {
+class dynamic_max_policy : private overflow_policy {
 public:
 	using overflow_policy_tag = void;
 	using underlying_type = integer<static_minimum, static_maximum, overflow_policy, storage>;
 
+	template<typename OverflowPolicy, enable_if_t<is_overflow_policy<OverflowPolicy>::value> = clang_dummy>
+	constexpr dynamic_max_policy(underlying_type maximum, OverflowPolicy && policy) noexcept:
+		overflow_policy(std::forward<OverflowPolicy>(policy)),
+		m_max(std::move(maximum)) {
+	}
 	constexpr dynamic_max_policy(underlying_type maximum) noexcept:
 		m_max(std::move(maximum)) {
 	}
@@ -168,9 +179,9 @@ public:
 		dynamic_max_policy(std::move(other.m_max)) {
 	}
 
-	template<typename T, enable_if_t<is_overflow_policy<T>::value> = clang_dummy>
-	constexpr dynamic_max_policy(T &&) noexcept:
-		dynamic_max_policy() {
+	template<typename OverflowPolicy, enable_if_t<is_overflow_policy<OverflowPolicy>::value> = clang_dummy>
+	constexpr dynamic_max_policy(OverflowPolicy && policy) noexcept:
+		dynamic_max_policy(make<static_maximum>(), std::forward<OverflowPolicy>(policy)) {
 	}
 
 	decltype(auto) operator=(dynamic_max_policy const & other) noexcept {
@@ -194,12 +205,12 @@ public:
 
 	template<typename T, typename Minimum, typename Maximum>
 	constexpr auto assignment(T && value, Minimum && minimum, Maximum && maximum) const
-		noexcept(noexcept(std::declval<underlying_type>().overflow_policy().assignment(
+		noexcept(noexcept(std::declval<overflow_policy>().assignment(
 			std::forward<T>(value),
 			std::forward<Minimum>(minimum),
 			::bounded::min(std::forward<Maximum>(maximum), std::declval<underlying_type &>())
 		))) {
-		return m_max.overflow_policy().assignment(
+		return static_cast<overflow_policy const &>(*this).assignment(
 			std::forward<T>(value),
 			std::forward<Minimum>(minimum),
 			::bounded::min(std::forward<Maximum>(maximum), m_max)
@@ -207,12 +218,12 @@ public:
 	}
 	template<typename T, typename Minimum, typename Maximum>
 	constexpr auto assignment(T && value, Minimum && minimum, Maximum && maximum) const volatile
-		noexcept(noexcept(std::declval<underlying_type>().overflow_policy().assignment(
+		noexcept(noexcept(std::declval<overflow_policy>().assignment(
 			std::forward<T>(value),
 			std::forward<Minimum>(minimum),
 			::bounded::min(std::forward<Maximum>(maximum), std::declval<underlying_type &>())
 		))) {
-		return m_max.overflow_policy().assignment(
+		return static_cast<overflow_policy volatile const &>(*this).assignment(
 			std::forward<T>(value),
 			std::forward<Minimum>(minimum),
 			::bounded::min(std::forward<Maximum>(maximum), m_max)
@@ -248,11 +259,16 @@ private:
 
 
 template<intmax_t static_minimum, intmax_t static_maximum, typename overflow_policy, storage_type storage = storage_type::fast>
-class dynamic_min_policy {
+class dynamic_min_policy : private overflow_policy {
 public:
 	using overflow_policy_tag = void;
 	using underlying_type = integer<static_minimum, static_maximum, overflow_policy, storage>;
 
+	template<typename OverflowPolicy, enable_if_t<is_overflow_policy<OverflowPolicy>::value> = clang_dummy>
+	constexpr dynamic_min_policy(underlying_type minimum, OverflowPolicy && policy) noexcept:
+		overflow_policy(std::forward<OverflowPolicy>(policy)),
+		m_min(std::move(minimum)) {
+	}
 	constexpr dynamic_min_policy(underlying_type minimum) noexcept:
 		m_min(std::move(minimum)) {
 	}
@@ -268,9 +284,9 @@ public:
 		dynamic_min_policy(std::move(other.m_min)) {
 	}
 
-	template<typename T, enable_if_t<is_overflow_policy<T>::value> = clang_dummy>
-	constexpr dynamic_min_policy(T &&) noexcept:
-		dynamic_min_policy() {
+	template<typename OverflowPolicy, enable_if_t<is_overflow_policy<OverflowPolicy>::value> = clang_dummy>
+	constexpr dynamic_min_policy(OverflowPolicy && policy) noexcept:
+		dynamic_min_policy(make<static_minimum>(), std::forward<OverflowPolicy>(policy)) {
 	}
 
 	decltype(auto) operator=(dynamic_min_policy const & other) noexcept {
@@ -294,12 +310,12 @@ public:
 
 	template<typename T, typename Minimum, typename Maximum>
 	constexpr auto assignment(T && value, Minimum && minimum, Maximum && maximum) const
-		noexcept(noexcept(std::declval<underlying_type>().overflow_policy().assignment(
+		noexcept(noexcept(std::declval<overflow_policy>().assignment(
 			std::forward<T>(value),
 			::bounded::max(std::forward<Minimum>(minimum), std::declval<underlying_type &>()),
 			std::forward<Maximum>(maximum)
 		))) {
-		return m_min.overflow_policy().assignment(
+		return static_cast<overflow_policy volatile const &>(*this).assignment(
 			std::forward<T>(value),
 			::bounded::max(std::forward<Minimum>(minimum), m_min),
 			std::forward<Maximum>(maximum)
@@ -307,12 +323,12 @@ public:
 	}
 	template<typename T, typename Minimum, typename Maximum>
 	constexpr auto assignment(T && value, Minimum && minimum, Maximum && maximum) const volatile
-		noexcept(noexcept(std::declval<underlying_type>().overflow_policy().assignment(
+		noexcept(noexcept(std::declval<overflow_policy>().assignment(
 			std::forward<T>(value),
 			::bounded::max(std::forward<Minimum>(minimum), std::declval<underlying_type &>()),
 			std::forward<Maximum>(maximum)
 		))) {
-		return m_min.overflow_policy().assignment(
+		return static_cast<overflow_policy volatile const &>(*this).assignment(
 			std::forward<T>(value),
 			::bounded::max(std::forward<Minimum>(minimum), m_min),
 			std::forward<Maximum>(maximum)
