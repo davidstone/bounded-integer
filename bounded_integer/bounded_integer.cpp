@@ -378,11 +378,19 @@ auto check_optional() {
 	constexpr bounded::optional<integer_type> constexpr_optional_integer(integer_type(5));
 	static_assert(static_cast<bool>(constexpr_optional_integer), "Value constructor should initialize optional.");
 	static_assert(*constexpr_optional_integer == 5, "Value in an optional incorrect.");
+
 	bounded::optional<integer_type> optional_integer(integer_type(4));
 	optional_integer = uninitialized_optional;
 	assert(!optional_integer);
+
 	optional_integer = integer_type(7);
 	assert(optional_integer);
+
+	static_assert(std::is_same<decltype(*optional_integer), integer_type &>::value, "Incorrect type of *optional.");
+	*optional_integer = integer_type(1);
+	assert(optional_integer);
+	assert(*optional_integer == 1);
+	
 	optional_integer = bounded::none;
 	assert(!optional_integer);
 }
@@ -464,7 +472,6 @@ auto check_iterator() {
 	assert(bounded::next(a.begin()) == a.end());
 	assert(bounded::prev(a.end()) == a.begin());
 }
-
 
 }	// namespace
 

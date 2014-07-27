@@ -63,23 +63,23 @@ public:
 		dynamic_policy(make<static_minimum>(), make<static_maximum>(), std::forward<OverflowPolicy>(policy)) {
 	}
 
-	decltype(auto) operator=(dynamic_policy const & other) noexcept {
+	auto && operator=(dynamic_policy const & other) noexcept {
 		m_min.unchecked_assignment(other.m_min);
 		m_max.unchecked_assignment(other.m_max);
 		return *this;
 	}
-	decltype(auto) operator=(dynamic_policy && other) noexcept {
+	auto && operator=(dynamic_policy && other) noexcept {
 		m_min.unchecked_assignment(std::move(other.m_min));
 		m_max.unchecked_assignment(std::move(other.m_max));
 		return *this;
 	}
 
 	template<typename T, enable_if_t<is_overflow_policy<T>::value> = clang_dummy>
-	decltype(auto) operator=(T && other) noexcept {
+	auto && operator=(T && other) noexcept {
 		return *this = dynamic_policy(std::forward<T>(other));
 	}
 	template<typename T, enable_if_t<is_overflow_policy<T>::value> = clang_dummy>
-	decltype(auto) operator=(T && other) volatile noexcept {
+	auto && operator=(T && other) volatile noexcept {
 		return *this = dynamic_policy(std::forward<T>(other));
 	}
 
@@ -111,35 +111,35 @@ public:
 		);
 	}
 	
-	constexpr decltype(auto) min() const & noexcept {
+	constexpr auto && min() const & noexcept {
 		return m_min;
 	}
-	constexpr decltype(auto) min() const volatile & noexcept {
+	constexpr auto && min() const volatile & noexcept {
 		return m_min;
 	}
-	decltype(auto) min() & noexcept {
+	auto && min() & noexcept {
 		return m_min;
 	}
-	decltype(auto) min() volatile & noexcept {
+	auto && min() volatile & noexcept {
 		return m_min;
 	}
-	decltype(auto) min() && noexcept {
+	auto && min() && noexcept {
 		return std::move(m_min);
 	}
 
-	constexpr decltype(auto) max() const & noexcept {
+	constexpr auto && max() const & noexcept {
 		return m_max;
 	}
-	constexpr decltype(auto) max() const volatile & noexcept {
+	constexpr auto && max() const volatile & noexcept {
 		return m_max;
 	}
-	decltype(auto) max() & noexcept {
+	auto && max() & noexcept {
 		return m_max;
 	}
-	decltype(auto) max() volatile & noexcept {
+	auto && max() volatile & noexcept {
 		return m_max;
 	}
-	decltype(auto) max() && noexcept {
+	auto && max() && noexcept {
 		return std::move(m_max);
 	}
 	
@@ -184,21 +184,21 @@ public:
 		dynamic_max_policy(make<static_maximum>(), std::forward<OverflowPolicy>(policy)) {
 	}
 
-	decltype(auto) operator=(dynamic_max_policy const & other) noexcept {
+	auto && operator=(dynamic_max_policy const & other) noexcept {
 		m_max.unchecked_assignment(other.m_max);
 		return *this;
 	}
-	decltype(auto) operator=(dynamic_max_policy && other) noexcept {
+	auto && operator=(dynamic_max_policy && other) noexcept {
 		m_max.unchecked_assignment(std::move(other.m_max));
 		return *this;
 	}
 
 	template<typename T, enable_if_t<is_overflow_policy<T>::value> = clang_dummy>
-	decltype(auto) operator=(T && other) noexcept {
+	auto && operator=(T && other) noexcept {
 		return *this = dynamic_max_policy(std::forward<T>(other));
 	}
 	template<typename T, enable_if_t<is_overflow_policy<T>::value> = clang_dummy>
-	decltype(auto) operator=(T && other) volatile noexcept {
+	auto && operator=(T && other) volatile noexcept {
 		return *this = dynamic_max_policy(std::forward<T>(other));
 	}
 
@@ -234,19 +234,19 @@ public:
 		return make<static_minimum>();
 	}
 
-	constexpr decltype(auto) max() const & noexcept {
+	constexpr auto && max() const & noexcept {
 		return m_max;
 	}
-	constexpr decltype(auto) max() const volatile & noexcept {
+	constexpr auto && max() const volatile & noexcept {
 		return m_max;
 	}
-	decltype(auto) max() & noexcept {
+	auto && max() & noexcept {
 		return m_max;
 	}
-	decltype(auto) max() volatile & noexcept {
+	auto && max() volatile & noexcept {
 		return m_max;
 	}
-	decltype(auto) max() && noexcept {
+	auto && max() && noexcept {
 		return std::move(m_max);
 	}
 	
@@ -289,21 +289,21 @@ public:
 		dynamic_min_policy(make<static_minimum>(), std::forward<OverflowPolicy>(policy)) {
 	}
 
-	decltype(auto) operator=(dynamic_min_policy const & other) noexcept {
+	auto && operator=(dynamic_min_policy const & other) noexcept {
 		m_min.unchecked_assignment(other.m_min);
 		return *this;
 	}
-	decltype(auto) operator=(dynamic_min_policy && other) noexcept {
+	auto && operator=(dynamic_min_policy && other) noexcept {
 		m_min.unchecked_assignment(std::move(other.m_min));
 		return *this;
 	}
 
 	template<typename T, enable_if_t<is_overflow_policy<T>::value> = clang_dummy>
-	decltype(auto) operator=(T && other) noexcept {
+	auto && operator=(T && other) noexcept {
 		return *this = dynamic_min_policy(std::forward<T>(other));
 	}
 	template<typename T, enable_if_t<is_overflow_policy<T>::value> = clang_dummy>
-	decltype(auto) operator=(T && other) volatile noexcept {
+	auto && operator=(T && other) volatile noexcept {
 		return *this = dynamic_min_policy(std::forward<T>(other));
 	}
 
@@ -335,19 +335,19 @@ public:
 		);
 	}
 	
-	constexpr decltype(auto) min() const & noexcept {
+	constexpr auto && min() const & noexcept {
 		return m_min;
 	}
-	constexpr decltype(auto) min() const volatile & noexcept {
+	constexpr auto && min() const volatile & noexcept {
 		return m_min;
 	}
-	decltype(auto) min() & noexcept {
+	auto && min() & noexcept {
 		return m_min;
 	}
-	decltype(auto) min() volatile & noexcept {
+	auto && min() volatile & noexcept {
 		return m_min;
 	}
-	decltype(auto) min() && noexcept {
+	auto && min() && noexcept {
 		return std::move(m_min);
 	}
 
