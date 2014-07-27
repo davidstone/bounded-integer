@@ -20,6 +20,7 @@
 #include "is_overflow_policy.hpp"
 #include "../enable_if.hpp"
 #include <cstdint>
+#include <type_traits>
 #include <utility>
 
 namespace bounded {
@@ -27,6 +28,10 @@ namespace bounded {
 template<typename policy_type>
 class basic_policy {
 public:
+	static_assert(
+		std::is_empty<policy_type>::value,
+		"basic_policy can only be used with stateless policies"
+	);
 	using overflow_policy_tag = void;
 	constexpr basic_policy() noexcept {}
 	constexpr basic_policy(basic_policy const &) noexcept = default;
