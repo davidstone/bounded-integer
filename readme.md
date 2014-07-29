@@ -59,3 +59,7 @@ The general form of the class is `bounded::integer<minimum, maximum, policy = bo
 * `bounded::integer` uses `intmax_t` as the template parameter to determine its bounds. This means that it cannot store an integer larger than `std::numeric_limits<intmax_t>::max()`. The alternative is to not allow users of the library to specify the bounds as plain integer values. Instead, they would have to pass it as some sort of type that encodes a value, which increases the burden of use.
 * Doing math with `uintmax_t` (which is typically the same as `size_t` or `uint64_t`) can easily cause overflow issues. This can typically be resolved by narrowing the bounds of your values (and if you cannot do so, that usually means that your calculation could overflow).
 * `bounded::integer` is currently still under active development, so some interfaces are still subject to change.
+
+# Reference
+
+Visit http://doublewise.net/c++/bounded/reference/
