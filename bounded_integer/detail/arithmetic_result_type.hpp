@@ -279,7 +279,7 @@ private:
 	static constexpr bool has_positive_values = maybe_most_positive_dividend > 0;
 	static constexpr bool has_negative_values = maybe_most_negative_dividend <= 0;
 
-	static_assert(has_positive_values or has_negative_values, "The range must contain at least positive or negative / 0 values");
+	static_assert(has_positive_values or has_negative_values, "The range must contain at least positive, negative, or zero values");
 
 	// Avoid instantiating a template with unexpected values
 	static constexpr intmax_t most_negative_dividend = maybe_most_negative_dividend * (has_negative_values ? 1 : 0);
