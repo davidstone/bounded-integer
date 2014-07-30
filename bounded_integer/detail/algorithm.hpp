@@ -23,11 +23,13 @@
 #include "operators/arithmetic.hpp"
 #include "operators/comparison.hpp"
 
+#include <iterator>
+
 namespace bounded {
 
 template<typename InputIterator, typename Predicate>
 auto count_if(InputIterator first, InputIterator const last, Predicate predicate) {
-	constexpr auto maximum = std::numeric_limits<typename InputIterator::difference_type>::max();
+	constexpr auto maximum = std::numeric_limits<typename std::iterator_traits<InputIterator>::difference_type>::max();
 	integer<0, static_cast<intmax_t>(maximum)> sum = make<0>();
 	for (; first != last; ++first) {
 		if (predicate(*first)) {
