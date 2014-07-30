@@ -210,8 +210,12 @@ public:
 	static constexpr int min_exponent10 = 0;
 	static constexpr int max_exponent = 0;
 	static constexpr int max_exponent10 = 0;
+
 	// If 0 is not in range, there is no trap value for arithmetic
-	static constexpr bool traps = minimum <= 0 and 0 <= maximum;
+	static constexpr bool traps =
+		minimum <= 0 and 0 <= maximum and
+		numeric_limits<typename type::underlying_type>::traps;
+
 	static constexpr bool tinyness_before = false;
 	
 	static constexpr auto min() noexcept {
