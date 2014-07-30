@@ -17,9 +17,9 @@
 #ifndef BOUNDED_INTEGER_ITERATOR_HPP_
 #define BOUNDED_INTEGER_ITERATOR_HPP_
 
-#include "arithmetic_operators.hpp"
 #include "class.hpp"
 #include "make.hpp"
+#include "operators/arithmetic.hpp"
 
 #include <iterator>
 

@@ -17,7 +17,7 @@
 #include "numeric_limits.hpp"
 
 #include "class.hpp"
-#include "comparison_operators.hpp"
+#include "operators/comparison.hpp"
 
 namespace {
 

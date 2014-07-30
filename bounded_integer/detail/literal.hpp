@@ -17,8 +17,8 @@
 #ifndef BOUNDED_INTEGER_LITERAL_HPP_
 #define BOUNDED_INTEGER_LITERAL_HPP_
 
-#include "arithmetic_operators.hpp"
 #include "make.hpp"
+#include "operators/arithmetic.hpp"
 
 namespace bounded {
 namespace detail {

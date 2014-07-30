@@ -14,12 +14,12 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with this program. If not, see <http://www.gnu.org/licenses/>.
 
-#include "arithmetic_operators.hpp"
-#include "comparison_operators.hpp"
-#include "literal.hpp"
-#include "make.hpp"
-#include "numeric_limits.hpp"
-#include "policy/throw_policy.hpp"
+#include "arithmetic.hpp"
+#include "comparison.hpp"
+#include "../literal.hpp"
+#include "../make.hpp"
+#include "../numeric_limits.hpp"
+#include "../policy/throw_policy.hpp"
 
 namespace {
 using namespace ::bounded::literal;

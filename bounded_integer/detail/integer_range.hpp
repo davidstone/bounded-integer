@@ -17,12 +17,12 @@
 #ifndef BOUNDED_DETAIL_INTEGER_RANGE_HPP_
 #define BOUNDED_DETAIL_INTEGER_RANGE_HPP_
 
-#include "arithmetic_operators.hpp"
 #include "class.hpp"
-#include "comparison_operators.hpp"
 #include "make.hpp"
 #include "minmax.hpp"
 #include "numeric_limits.hpp"
+#include "operators/arithmetic.hpp"
+#include "operators/comparison.hpp"
 
 #include <iterator>
 

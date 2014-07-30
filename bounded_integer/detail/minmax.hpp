@@ -19,10 +19,10 @@
 
 #include "common_policy.hpp"
 #include "common_type.hpp"
-#include "comparison_operators.hpp"
 #include "forward_declaration.hpp"
 #include "numeric_limits.hpp"
 #include "overlapping_range.hpp"
+#include "operators/comparison.hpp"
 #include <utility>
 
 namespace bounded {

@@ -18,10 +18,10 @@
 #define BOUNDED_INTEGER_ARITHMETIC_OPERATORS_HPP_
 
 #include "arithmetic_result_type.hpp"
-#include "common_type.hpp"
-#include "enable_if.hpp"
-#include "forward_declaration.hpp"
-#include "make.hpp"
+#include "../common_type.hpp"
+#include "../enable_if.hpp"
+#include "../forward_declaration.hpp"
+#include "../make.hpp"
 
 #include <cstdint>
 #include <type_traits>

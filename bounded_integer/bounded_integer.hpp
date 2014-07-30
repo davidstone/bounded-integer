@@ -27,11 +27,11 @@
 #include "detail/math.hpp"
 #include "detail/minmax.hpp"
 #include "detail/numeric_limits.hpp"
-#include "detail/operators.hpp"
-#include "detail/policy/all.hpp"
 #include "detail/stream.hpp"
 #include "detail/string.hpp"
 #include "detail/typedefs.hpp"
+#include "detail/operators/operators.hpp"
+#include "detail/policy/all.hpp"
 
 // Missing from this list are array and optional classes and integer_range
 

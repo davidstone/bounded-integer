@@ -17,10 +17,10 @@
 #ifndef BOUNDED_INTEGER_COMPOUND_ASSIGNMENT_OPERATORS_HPP_
 #define BOUNDED_INTEGER_COMPOUND_ASSIGNMENT_OPERATORS_HPP_
 
-#include "arithmetic_operators.hpp"
-#include "enable_if.hpp"
-#include "forward_declaration.hpp"
-#include "make.hpp"
+#include "arithmetic.hpp"
+#include "../enable_if.hpp"
+#include "../forward_declaration.hpp"
+#include "../make.hpp"
 #include <type_traits>
 
 namespace bounded {

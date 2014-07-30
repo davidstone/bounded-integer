@@ -19,12 +19,12 @@
 
 #include "is_overflow_policy.hpp"
 
-#include "../arithmetic_operators.hpp"
 #include "../class.hpp"
-#include "../comparison_operators.hpp"
 #include "../enable_if.hpp"
 #include "../make.hpp"
 #include "../minmax.hpp"
+#include "../operators/arithmetic.hpp"
+#include "../operators/comparison.hpp"
 
 #include <cstdint>
 

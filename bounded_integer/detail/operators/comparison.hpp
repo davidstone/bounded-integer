@@ -17,10 +17,10 @@
 #ifndef BOUNDED_INTEGER_COMPARISON_OPERATORS_HPP_
 #define BOUNDED_INTEGER_COMPARISON_OPERATORS_HPP_
 
-#include "common_type.hpp"
-#include "enable_if.hpp"
-#include "forward_declaration.hpp"
-#include "make.hpp"
+#include "../common_type.hpp"
+#include "../enable_if.hpp"
+#include "../forward_declaration.hpp"
+#include "../make.hpp"
 
 #include <cstdint>
 

@@ -30,13 +30,9 @@ def prepend_dir(directory, sources):
 base_sources = [('test',
 	prepend_dir('detail', [
 		'algorithm.cpp',
-		'arithmetic_operators.cpp',
-		'arithmetic_result_type.cpp',
 		'class.cpp',
 		'common_policy.cpp',
 		'common_type.cpp',
-		'comparison_operators.cpp',
-		'compound_assignment_operators.cpp',
 		'conditional.cpp',
 		'div.cpp',
 		'enable_if.cpp',
@@ -49,7 +45,6 @@ base_sources = [('test',
 		'math.cpp',
 		'minmax.cpp',
 		'numeric_limits.cpp',
-		'operators.cpp',
 		'overlapping_range.cpp',
 		'stream.cpp',
 		'string.cpp',
@@ -59,6 +54,13 @@ base_sources = [('test',
 	prepend_dir('detail/array', [
 		'array.cpp',
 		'make_array.cpp',
+	]) +
+	prepend_dir('detail/operators', [
+		'arithmetic.cpp',
+		'arithmetic_result_type.cpp',
+		'comparison.cpp',
+		'compound_assignment.cpp',
+		'operators.cpp',
 	]) +
 	prepend_dir('detail/optional', [
 		'forward_declaration.cpp',

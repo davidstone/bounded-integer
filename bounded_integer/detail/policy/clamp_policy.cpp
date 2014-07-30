@@ -16,9 +16,9 @@
 
 #include "clamp_policy.hpp"
 #include "../class.hpp"
-#include "../comparison_operators.hpp"
 #include "../literal.hpp"
 #include "../numeric_limits.hpp"
+#include "../operators/comparison.hpp"
 
 namespace {
 using namespace bounded::literal;

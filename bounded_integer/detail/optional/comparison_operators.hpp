@@ -19,7 +19,7 @@
 
 #include "optional.hpp"
 #include "../class.hpp"
-#include "../comparison_operators.hpp"
+#include "../operators/comparison.hpp"
 #include <utility>
 
 namespace bounded {

@@ -17,11 +17,11 @@
 #ifndef BOUNDED_INTEGER_ALGORITHM_HPP_
 #define BOUNDED_INTEGER_ALGORITHM_HPP_
 
-#include "arithmetic_operators.hpp"
 #include "class.hpp"
-#include "comparison_operators.hpp"
 #include "make.hpp"
 #include "numeric_limits.hpp"
+#include "operators/arithmetic.hpp"
+#include "operators/comparison.hpp"
 
 namespace bounded {
 
