@@ -88,26 +88,26 @@ public:
 	constexpr auto assignment(T && value, Minimum && minimum, Maximum && maximum) const
 		noexcept(noexcept(std::declval<overflow_policy>().assignment(
 			std::forward<T>(value),
-			::bounded::max(std::forward<Minimum>(minimum), std::declval<underlying_type &>()),
-			::bounded::min(std::forward<Maximum>(maximum), std::declval<underlying_type &>())
+			::bounded::max(bounded::make(std::forward<Minimum>(minimum)), std::declval<underlying_type &>()),
+			::bounded::min(bounded::make(std::forward<Maximum>(maximum)), std::declval<underlying_type &>())
 		))) {
 		return static_cast<overflow_policy const &>(*this).assignment(
 			std::forward<T>(value),
-			::bounded::max(std::forward<Minimum>(minimum), m_min),
-			::bounded::min(std::forward<Maximum>(maximum), m_max)
+			::bounded::max(bounded::make(std::forward<Minimum>(minimum)), m_min),
+			::bounded::min(bounded::make(std::forward<Maximum>(maximum)), m_max)
 		);
 	}
 	template<typename T, typename Minimum, typename Maximum>
 	constexpr auto assignment(T && value, Minimum && minimum, Maximum && maximum) const volatile
 		noexcept(noexcept(std::declval<overflow_policy>().assignment(
 			std::forward<T>(value),
-			::bounded::max(std::forward<Minimum>(minimum), std::declval<underlying_type &>()),
-			::bounded::min(std::forward<Maximum>(maximum), std::declval<underlying_type &>())
+			::bounded::max(bounded::make(std::forward<Minimum>(minimum)), std::declval<underlying_type &>()),
+			::bounded::min(bounded::make(std::forward<Maximum>(maximum)), std::declval<underlying_type &>())
 		))) {
 		return static_cast<overflow_policy volatile const &>(*this).assignment(
 			std::forward<T>(value),
-			::bounded::max(std::forward<Minimum>(minimum), m_min),
-			::bounded::min(std::forward<Maximum>(maximum), m_max)
+			::bounded::max(bounded::make(std::forward<Minimum>(minimum)), m_min),
+			::bounded::min(bounded::make(std::forward<Maximum>(maximum)), m_max)
 		);
 	}
 	
@@ -208,12 +208,12 @@ public:
 		noexcept(noexcept(std::declval<overflow_policy>().assignment(
 			std::forward<T>(value),
 			std::forward<Minimum>(minimum),
-			::bounded::min(std::forward<Maximum>(maximum), std::declval<underlying_type &>())
+			::bounded::min(bounded::make(std::forward<Maximum>(maximum)), std::declval<underlying_type &>())
 		))) {
 		return static_cast<overflow_policy const &>(*this).assignment(
 			std::forward<T>(value),
 			std::forward<Minimum>(minimum),
-			::bounded::min(std::forward<Maximum>(maximum), m_max)
+			::bounded::min(bounded::make(std::forward<Maximum>(maximum)), m_max)
 		);
 	}
 	template<typename T, typename Minimum, typename Maximum>
@@ -221,12 +221,12 @@ public:
 		noexcept(noexcept(std::declval<overflow_policy>().assignment(
 			std::forward<T>(value),
 			std::forward<Minimum>(minimum),
-			::bounded::min(std::forward<Maximum>(maximum), std::declval<underlying_type &>())
+			::bounded::min(bounded::make(std::forward<Maximum>(maximum)), std::declval<underlying_type &>())
 		))) {
 		return static_cast<overflow_policy volatile const &>(*this).assignment(
 			std::forward<T>(value),
 			std::forward<Minimum>(minimum),
-			::bounded::min(std::forward<Maximum>(maximum), m_max)
+			::bounded::min(bounded::make(std::forward<Maximum>(maximum)), m_max)
 		);
 	}
 	
@@ -312,12 +312,12 @@ public:
 	constexpr auto assignment(T && value, Minimum && minimum, Maximum && maximum) const
 		noexcept(noexcept(std::declval<overflow_policy>().assignment(
 			std::forward<T>(value),
-			::bounded::max(std::forward<Minimum>(minimum), std::declval<underlying_type &>()),
+			::bounded::max(bounded::make(std::forward<Minimum>(minimum)), std::declval<underlying_type &>()),
 			std::forward<Maximum>(maximum)
 		))) {
 		return static_cast<overflow_policy volatile const &>(*this).assignment(
 			std::forward<T>(value),
-			::bounded::max(std::forward<Minimum>(minimum), m_min),
+			::bounded::max(bounded::make(std::forward<Minimum>(minimum)), m_min),
 			std::forward<Maximum>(maximum)
 		);
 	}
@@ -325,12 +325,12 @@ public:
 	constexpr auto assignment(T && value, Minimum && minimum, Maximum && maximum) const volatile
 		noexcept(noexcept(std::declval<overflow_policy>().assignment(
 			std::forward<T>(value),
-			::bounded::max(std::forward<Minimum>(minimum), std::declval<underlying_type &>()),
+			::bounded::max(bounded::make(std::forward<Minimum>(minimum)), std::declval<underlying_type &>()),
 			std::forward<Maximum>(maximum)
 		))) {
 		return static_cast<overflow_policy volatile const &>(*this).assignment(
 			std::forward<T>(value),
-			::bounded::max(std::forward<Minimum>(minimum), m_min),
+			::bounded::max(bounded::make(std::forward<Minimum>(minimum)), m_min),
 			std::forward<Maximum>(maximum)
 		);
 	}

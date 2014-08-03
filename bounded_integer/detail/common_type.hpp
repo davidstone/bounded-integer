@@ -19,7 +19,6 @@
 
 #include "common_policy.hpp"
 #include "forward_declaration.hpp"
-#include "make.hpp"
 
 #include <type_traits>
 
@@ -42,39 +41,6 @@ private:
 	static constexpr auto maximum = (lhs_max > rhs_max) ? lhs_max : rhs_max;
 public:
 	using type = bounded::integer<minimum, maximum, bounded::common_policy_t<lhs_policy, rhs_policy>, storage>;
-};
-
-// Common type of a bounded::integer and a built-in
-template<intmax_t minimum, intmax_t maximum, typename overflow_policy, bounded::storage_type storage, typename T>
-struct common_type<bounded::integer<minimum, maximum, overflow_policy, storage>, T> {
-private:
-	using type1 = bounded::integer<minimum, maximum, overflow_policy, storage>;
-	using type2 = bounded::equivalent_type<decay_t<T>>;
-public:
-	using type = common_type_t<type1, type2>;
-};
-
-// If the user tries to do something like
-// common_type_t<int, unsigned, integer<0, UINT_MAX + 1>>
-// this would first convert int and unsigned to their common type (which is
-// unsigned), then get the common type of that and the bounded::integer.
-//
-// However, the int type is outside of the range of the result, so the common
-// type cannot actually safely store any value in the range. The only safe way
-// is to make sure that I always get the common_type of a bounded::integer and
-// another type, regardless of the order passed in by the user. The common_type
-// of int and integer<0, UINT_MAX + 1> is integer<INT_MIN, UINT_MAX + 1>, and
-// the common_type of that and unsigned gives integer<INT_MIN, UINT_MAX + 1>.
-//
-// Unfortunately, it looks like I have to specify each an arbitrary number of
-// integral arguments prior to the bounded::integer. There doesn't seem to be a
-// general solution to the problem, so I am avoiding defining extended
-// specializations for now.
-
-template<typename integer1, intmax_t minimum, intmax_t maximum, typename overflow_policy, bounded::storage_type storage>
-struct common_type<integer1, bounded::integer<minimum, maximum, overflow_policy, storage>> {
-public:
-	using type = common_type_t<bounded::integer<minimum, maximum, overflow_policy, storage>, integer1>;
 };
 
 

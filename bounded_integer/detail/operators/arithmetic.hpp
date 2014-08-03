@@ -44,7 +44,7 @@ constexpr auto operator symbol( \
 	integer<rhs_min, rhs_max, rhs_policy, storage> const rhs \
 ) noexcept { \
 	using result_t = detail::operator_result<lhs_min, lhs_max, lhs_policy, rhs_min, rhs_max, rhs_policy, storage, operator_name>; \
-	using common_t = typename std::common_type_t<result_t, decltype(lhs), decltype(rhs)>::underlying_type; \
+	using common_t = typename std::common_type_t<result_t, std::decay_t<decltype(lhs)>, std::decay_t<decltype(rhs)>>::underlying_type; \
 	return result_t(operator_name{}(static_cast<common_t>(lhs), static_cast<common_t>(rhs)), non_check); \
 } \
  \

@@ -15,6 +15,7 @@
 // along with this program. If not, see <http://www.gnu.org/licenses/>.
 
 #include "common_type.hpp"
+#include "class.hpp"
 
 namespace {
 
