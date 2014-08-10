@@ -85,22 +85,6 @@ public:
 	}
 };
 
-constexpr auto std_min(intmax_t lhs, intmax_t rhs) noexcept {
-	return (lhs < rhs) ? lhs : rhs;
-}
-template<typename... Args>
-constexpr auto std_min(intmax_t lhs, intmax_t rhs, Args && ... other) noexcept {
-	return std_min(lhs, std_min(rhs, other...));
-}
-
-constexpr auto std_max(intmax_t lhs, intmax_t rhs) noexcept {
-	return (lhs > rhs) ? lhs : rhs;
-}
-template<typename... Args>
-constexpr auto std_max(intmax_t lhs, intmax_t rhs, Args && ... other) noexcept {
-	return std_max(lhs, std_max(rhs, other...));
-}
-
 template<
 	intmax_t lhs_min, intmax_t lhs_max,
 	intmax_t rhs_min, intmax_t rhs_max,
@@ -152,10 +136,10 @@ private:
 	static constexpr intmax_t p3 = lhs_max * rhs_max;
 public:
 	static constexpr auto min() noexcept -> intmax_t {
-		return std_min(p0, p1, p2, p3);
+		return ::bounded::min(p0, p1, p2, p3);
 	}
 	static constexpr auto max() noexcept -> intmax_t {
-		return std_max(p0, p1, p2, p3);
+		return ::bounded::max(p0, p1, p2, p3);
 	}
 	static_assert(min() <= max(), "Range is inverted.");
 };
@@ -186,10 +170,10 @@ private:
 	static constexpr intmax_t l3 = lhs_max / rhs_max;
 public:
 	static constexpr auto min() noexcept -> intmax_t {
-		return std_min(l0, l1, l2, l3, g0, g1, g2, g3);
+		return ::bounded::min(l0, l1, l2, l3, g0, g1, g2, g3);
 	}
 	static constexpr auto max() noexcept -> intmax_t {
-		return std_max(g0, g1, g2, g3);
+		return ::bounded::max(g0, g1, g2, g3);
 	}
 	static_assert(min() <= max(), "Range is inverted.");
 };
@@ -212,7 +196,7 @@ private:
 	// "magnitude" and "negative" in their name.
 	//
 	// The divisor range cannot terminate on a 0 since that is an invalid value.
-	static constexpr intmax_t greatest_divisor = (rhs_max < 0) ? rhs_min : std_min(rhs_min, -rhs_max, -1);
+	static constexpr intmax_t greatest_divisor = (rhs_max < 0) ? rhs_min : ::bounded::min(rhs_min, -rhs_max, -1);
 	static constexpr intmax_t least_divisor =
 		(rhs_min > 0) ? -rhs_min :
 		(rhs_max < 0) ? rhs_max :
@@ -231,7 +215,7 @@ private:
 		static constexpr auto initial_value = result_type(std::numeric_limits<intmax_t>::min(), std::numeric_limits<intmax_t>::max());
 
 		static constexpr auto combine(result_type lhs, result_type rhs) noexcept {
-			return result_type(std_max(lhs.first, rhs.first), std_min(lhs.second, rhs.second));
+			return result_type(::bounded::max(lhs.first, rhs.first), ::bounded::min(lhs.second, rhs.second));
 		}
 
 		static constexpr auto modulo_round(intmax_t divisor) noexcept {
@@ -272,9 +256,9 @@ private:
 	};
 
 	static constexpr intmax_t maybe_most_negative_dividend = lhs_min;
-	static constexpr intmax_t maybe_least_negative_dividend = (lhs_max < 0) ? lhs_max : std_max(lhs_min, 0);
+	static constexpr intmax_t maybe_least_negative_dividend = (lhs_max < 0) ? lhs_max : ::bounded::max(lhs_min, 0);
 	static constexpr intmax_t maybe_most_positive_dividend = lhs_max;
-	static constexpr intmax_t maybe_least_positive_dividend = (lhs_min > 0) ? lhs_min : std_min(lhs_max, 0);
+	static constexpr intmax_t maybe_least_positive_dividend = (lhs_min > 0) ? lhs_min : ::bounded::min(lhs_max, 0);
 
 	static constexpr bool has_positive_values = maybe_most_positive_dividend > 0;
 	static constexpr bool has_negative_values = maybe_most_negative_dividend <= 0;
@@ -296,13 +280,13 @@ public:
 		return
 			!has_positive_values ? negative.second :
 			!has_negative_values ? -positive.first :
-			std_min(negative.second, -positive.first);
+			::bounded::min(negative.second, -positive.first);
 	}
 	static constexpr auto max() noexcept -> intmax_t {
 		return
 			!has_positive_values ? negative.first :
 			!has_negative_values ? -positive.second :
-			std_max(negative.first, -positive.second);
+			::bounded::max(negative.first, -positive.second);
 	}
 	static_assert(min() <= max(), "Range is inverted.");
 };
