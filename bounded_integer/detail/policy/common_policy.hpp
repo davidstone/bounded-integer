@@ -1,5 +1,5 @@
 // Specifies which policy should be used in the result type of some operations
-// Copyright (C) 2013 David Stone
+// Copyright (C) 2014 David Stone
 //
 // This program is free software: you can redistribute it and / or modify
 // it under the terms of the GNU Affero General Public License as
@@ -14,10 +14,10 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with this program. If not, see <http://www.gnu.org/licenses/>.
 
-#ifndef BOUNDED_INTEGER_COMMON_POLICY_HPP_
-#define BOUNDED_INTEGER_COMMON_POLICY_HPP_
+#ifndef BOUNDED_INTEGER_POLICY_COMMON_POLICY_HPP_
+#define BOUNDED_INTEGER_POLICY_COMMON_POLICY_HPP_
 
-#include "policy/null_policy.hpp"
+#include "null_policy.hpp"
 
 namespace bounded {
 
@@ -64,4 +64,4 @@ using common_policy_t = typename common_policy<policies...>::type;
 
 }	// namespace bounded
 
-#endif	// BOUNDED_INTEGER_COMMON_POLICY_HPP_
+#endif	// BOUNDED_INTEGER_POLICY_COMMON_POLICY_HPP_

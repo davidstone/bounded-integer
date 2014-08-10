@@ -17,10 +17,10 @@
 #ifndef BOUNDED_INTEGER_ARITHMETIC_RESULT_TYPE_HPP_
 #define BOUNDED_INTEGER_ARITHMETIC_RESULT_TYPE_HPP_
 
-#include "../common_policy.hpp"
 #include "../forward_declaration.hpp"
 #include "../minmax.hpp"
 #include "../numeric_limits.hpp"
+#include "../policy/common_policy.hpp"
 
 #include <cstdint>
 #include <utility>

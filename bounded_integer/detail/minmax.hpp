@@ -17,12 +17,12 @@
 #ifndef BOUNDED_INTEGER_MINMAX_HPP_
 #define BOUNDED_INTEGER_MINMAX_HPP_
 
-#include "common_policy.hpp"
 #include "common_type.hpp"
 #include "common_type_and_value_category.hpp"
 #include "numeric_limits.hpp"
 #include "overlapping_range.hpp"
 #include "operators/comparison.hpp"
+#include "policy/common_policy.hpp"
 #include <utility>
 
 namespace bounded {

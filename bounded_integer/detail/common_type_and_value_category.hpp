@@ -17,12 +17,12 @@
 #ifndef BOUNDED_INTEGER_COMMON_TYPE_AND_VALUE_CATEGORY_HPP_
 #define BOUNDED_INTEGER_COMMON_TYPE_AND_VALUE_CATEGORY_HPP_
 
-#include "common_policy.hpp"
 #include "common_type.hpp"
 #include "forward_declaration.hpp"
 #include "numeric_limits.hpp"
 #include "overlapping_range.hpp"
 #include "operators/comparison.hpp"
+#include "policy/common_policy.hpp"
 #include <utility>
 
 namespace bounded {

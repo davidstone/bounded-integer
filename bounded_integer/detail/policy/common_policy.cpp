@@ -15,7 +15,7 @@
 // along with this program. If not, see <http://www.gnu.org/licenses/>.
 
 #include "common_policy.hpp"
-#include "policy/throw_policy.hpp"
+#include "throw_policy.hpp"
 
 namespace {
 using bounded::null_policy;

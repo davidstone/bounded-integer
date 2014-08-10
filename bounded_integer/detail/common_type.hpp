@@ -17,8 +17,8 @@
 #ifndef BOUNDED_INTEGER_COMMON_TYPE_HPP_
 #define BOUNDED_INTEGER_COMMON_TYPE_HPP_
 
-#include "common_policy.hpp"
 #include "forward_declaration.hpp"
+#include "policy/common_policy.hpp"
 
 #include <type_traits>
 
