@@ -17,7 +17,6 @@
 #ifndef BOUNDED_INTEGER_MATH_HPP_
 #define BOUNDED_INTEGER_MATH_HPP_
 
-#include "common_type.hpp"
 #include "forward_declaration.hpp"
 #include "make.hpp"
 #include "minmax.hpp"
