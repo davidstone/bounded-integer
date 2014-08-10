@@ -18,6 +18,7 @@
 #define BOUNDED_INTEGER_POLICY_NULL_POLICY_HPP_
 
 #include "basic_policy.hpp"
+#include "common_policy.hpp"
 #include <cstdint>
 
 namespace bounded {
@@ -49,6 +50,24 @@ private:
 }	// namespace policy_detail
 
 using null_policy = basic_policy<policy_detail::null_policy>;
+
+
+
+template<typename policy>
+class common_policy<policy, null_policy> {
+public:
+	using type = policy;
+};
+template<typename policy>
+class common_policy<null_policy, policy> {
+public:
+	using type = policy;
+};
+template<>
+class common_policy<null_policy, null_policy> {
+public:
+	using type = null_policy;
+};
 
 }	// namespace bounded
 #endif	// BOUNDED_INTEGER_POLICY_NULL_POLICY_HPP_

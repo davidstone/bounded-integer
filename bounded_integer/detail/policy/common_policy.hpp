@@ -17,8 +17,6 @@
 #ifndef BOUNDED_INTEGER_POLICY_COMMON_POLICY_HPP_
 #define BOUNDED_INTEGER_POLICY_COMMON_POLICY_HPP_
 
-#include "null_policy.hpp"
-
 namespace bounded {
 
 template<typename... policies>
@@ -41,22 +39,6 @@ template<typename policy>
 class common_policy<policy, policy> {
 public:
 	using type = policy;
-};
-
-template<typename policy>
-class common_policy<policy, null_policy> {
-public:
-	using type = policy;
-};
-template<typename policy>
-class common_policy<null_policy, policy> {
-public:
-	using type = policy;
-};
-template<>
-class common_policy<null_policy, null_policy> {
-public:
-	using type = null_policy;
 };
 
 template<typename... policies>
