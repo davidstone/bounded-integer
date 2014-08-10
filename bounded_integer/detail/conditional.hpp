@@ -17,11 +17,11 @@
 #ifndef BOUNDED_INTEGER_CONDITIONAL_HPP_
 #define BOUNDED_INTEGER_CONDITIONAL_HPP_
 
-#include "common_type.hpp"
+#include "common_type_and_value_category.hpp"
 
 #define BOUNDED_CONDITIONAL(condition, lhs, rhs) \
 	((condition) ? \
-		static_cast<std::common_type_t<decltype(lhs), decltype(rhs)>>(lhs) : \
-		static_cast<std::common_type_t<decltype(lhs), decltype(rhs)>>(rhs))
+		static_cast<bounded::detail::common_type_and_value_category_t<decltype(lhs), decltype(rhs)>>(lhs) : \
+		static_cast<bounded::detail::common_type_and_value_category_t<decltype(lhs), decltype(rhs)>>(rhs))
 
 #endif	// BOUNDED_INTEGER_CONDITIONAL_HPP_
