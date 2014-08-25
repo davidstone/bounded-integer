@@ -212,11 +212,11 @@ public:
 	// This must not reference the overflow policy because it is possible that
 	// it has already been moved from if this is being called from the
 	// constructor.
-	template<typename T, enable_if_t<std::is_integral<T>::value or std::is_enum<T>::value> = clang_dummy>
+	template<typename T, enable_if_t<std::is_arithmetic<T>::value or std::is_enum<T>::value> = clang_dummy>
 	constexpr explicit operator T() const noexcept {
 		return static_cast<T>(m_value);
 	}
-	template<typename T, enable_if_t<std::is_integral<T>::value or std::is_enum<T>::value> = clang_dummy>
+	template<typename T, enable_if_t<std::is_arithmetic<T>::value or std::is_enum<T>::value> = clang_dummy>
 	constexpr explicit operator T() const volatile noexcept {
 		return static_cast<T>(m_value);
 	}
