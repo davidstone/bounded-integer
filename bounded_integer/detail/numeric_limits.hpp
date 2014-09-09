@@ -39,6 +39,7 @@ public:
 	static constexpr bool is_specialized = std::numeric_limits<T>::is_specialized;
 	static constexpr bool is_integer = std::numeric_limits<T>::is_integer;
 };
+
 template<intmax_t minimum, intmax_t maximum, typename overflow_policy, storage_type storage>
 class basic_numeric_limits_impl<integer<minimum, maximum, overflow_policy, storage>> {
 public:
@@ -50,6 +51,19 @@ public:
 	}
 	static constexpr bool is_specialized = true;
 	static constexpr bool is_integer = true;
+};
+
+template<typename T, T value>
+class basic_numeric_limits_impl<std::integral_constant<T, value>> {
+public:
+	static constexpr auto min() noexcept -> intmax_t {
+		return value;
+	}
+	static constexpr auto max() noexcept -> intmax_t {
+		return value;
+	}
+	static constexpr bool is_specialized = std::numeric_limits<T>::is_specialized;
+	static constexpr bool is_integer = std::numeric_limits<T>::is_integer;
 };
 
 template<typename T>

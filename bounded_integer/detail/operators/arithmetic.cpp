@@ -50,6 +50,20 @@ static_assert(
 	"Calculated sum incorrect."
 );
 
+constexpr auto integral_constant_sum = x + std::integral_constant<int, 5>{};
+static_assert(
+	std::numeric_limits<decltype(integral_constant_sum)>::min() == 6,
+	"Minimum sum incorrect."
+);
+static_assert(
+	std::numeric_limits<decltype(integral_constant_sum)>::max() == 15,
+	"Maximum sum incorrect."
+);
+static_assert(
+	integral_constant_sum == 14,
+	"Calculated sum incorrect."
+);
+
 constexpr auto difference = x - z;
 static_assert(
 	std::numeric_limits<decltype(difference)>::min() == -10,
