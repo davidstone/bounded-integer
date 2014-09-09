@@ -106,7 +106,7 @@ constexpr decltype(auto) extreme(Compare, T && t) noexcept {
 // compile without this, because you cannot cast to a bounded::integer type that
 // has no overlap.
 template<typename Compare, typename T1, typename T2, enable_if_t<
-	std::numeric_limits<std::decay_t<T1>>::is_specialized and std::numeric_limits<std::decay_t<T2>>::is_specialized and
+	detail::basic_numeric_limits<std::decay_t<T1>>::is_specialized and detail::basic_numeric_limits<std::decay_t<T2>>::is_specialized and
 	not detail::types_overlap<extreme_t<Compare, T1, T2>, T2>::value
 > = clang_dummy>
 constexpr decltype(auto) extreme(Compare, T1 && t1, T2 &&) noexcept {
@@ -114,7 +114,7 @@ constexpr decltype(auto) extreme(Compare, T1 && t1, T2 &&) noexcept {
 	return std::forward<T1>(t1);
 }
 template<typename Compare, typename T1, typename T2, enable_if_t<
-	std::numeric_limits<std::decay_t<T1>>::is_specialized and std::numeric_limits<std::decay_t<T2>>::is_specialized and
+	detail::basic_numeric_limits<std::decay_t<T1>>::is_specialized and detail::basic_numeric_limits<std::decay_t<T2>>::is_specialized and
 	not detail::types_overlap<extreme_t<Compare, T1, T2>, T1>::value
 > = clang_dummy>
 constexpr decltype(auto) extreme(Compare, T1 &&, T2 && t2) noexcept {
@@ -123,7 +123,7 @@ constexpr decltype(auto) extreme(Compare, T1 &&, T2 && t2) noexcept {
 }
 
 template<typename Compare, typename T1, typename T2, enable_if_t<
-	(not std::numeric_limits<std::decay_t<T1>>::is_specialized or not std::numeric_limits<std::decay_t<T2>>::is_specialized) or
+	(not detail::basic_numeric_limits<std::decay_t<T1>>::is_specialized or not detail::basic_numeric_limits<std::decay_t<T2>>::is_specialized) or
 	(detail::types_overlap<extreme_t<Compare, T1, T2>, T1>::value and
 	detail::types_overlap<extreme_t<Compare, T1, T2>, T2>::value)
 > = clang_dummy>

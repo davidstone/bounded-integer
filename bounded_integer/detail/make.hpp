@@ -49,8 +49,8 @@ template<
 	storage_type storage = storage_type::fast
 >
 using equivalent_type = integer<
-	static_cast<intmax_t>(std::numeric_limits<T>::min()),
-	static_cast<intmax_t>(std::numeric_limits<T>::max()),
+	detail::basic_numeric_limits<T>::min(),
+	detail::basic_numeric_limits<T>::max(),
 	overflow_policy,
 	storage
 >;
@@ -85,7 +85,7 @@ constexpr auto make(T const value) noexcept -> equivalent_type<
 	>,
 	storage
 > {
-	static_assert(std::numeric_limits<T>::is_integer, "Must be an integer type.");
+	static_assert(detail::basic_numeric_limits<T>::is_integer, "Must be an integer type.");
 	return {value, non_check};
 }
 

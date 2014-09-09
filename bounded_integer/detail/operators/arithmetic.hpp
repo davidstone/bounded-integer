@@ -22,6 +22,7 @@
 #include "../enable_if.hpp"
 #include "../forward_declaration.hpp"
 #include "../make.hpp"
+#include "../numeric_limits.hpp"
 
 #include <cstdint>
 #include <type_traits>
@@ -51,14 +52,14 @@ constexpr auto operator symbol( \
 /* Interoperability with built-ins */ \
 template< \
 	intmax_t lhs_min, intmax_t lhs_max, typename overflow, storage_type storage, typename T, \
-	enable_if_t<std::is_integral<T>::value> = clang_dummy \
+	enable_if_t<detail::basic_numeric_limits<T>::is_integer> = clang_dummy \
 > \
 constexpr auto operator symbol(integer<lhs_min, lhs_max, overflow, storage> const lhs, T const rhs) noexcept { \
 	return lhs symbol make(rhs); \
 } \
 template< \
 	typename T, intmax_t rhs_min, intmax_t rhs_max, typename overflow, storage_type storage, \
-	enable_if_t<std::is_integral<T>::value> = clang_dummy \
+	enable_if_t<detail::basic_numeric_limits<T>::is_integer> = clang_dummy \
 > \
 constexpr auto operator symbol(T const lhs, integer<rhs_min, rhs_max, overflow, storage> const rhs) noexcept { \
 	return make(lhs) symbol rhs; \
