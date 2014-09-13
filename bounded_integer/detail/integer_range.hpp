@@ -226,7 +226,7 @@ public:
 		return make<detail::integer_range_iterator::range_of_type<value_type>()>();
 	}
 	constexpr auto empty() const {
-		return size() == make<0>();
+		return begin() == end();
 	}
 
 private:
