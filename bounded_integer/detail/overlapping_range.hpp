@@ -63,6 +63,7 @@ constexpr auto type_fits_in_range<uintmax_t>(intmax_t const, intmax_t const) noe
 
 template<typename T1, typename T2, typename Enabler = void>
 struct types_overlap {
+	static constexpr bool value = false;
 };
 
 template<>
@@ -80,11 +81,6 @@ public:
 		basic_numeric_limits<range_type>::min(),
 		basic_numeric_limits<range_type>::max()
 	);
-};
-
-template<typename T1, typename T2>
-struct types_overlap<T1, T2, std::enable_if_t<not basic_numeric_limits<T1>::is_specialized or not basic_numeric_limits<T2>::is_specialized>> {
-	static constexpr bool value = false;
 };
 
 }	// namespace detail

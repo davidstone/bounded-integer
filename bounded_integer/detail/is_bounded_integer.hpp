@@ -19,19 +19,15 @@
 
 #include "forward_declaration.hpp"
 #include <cstdint>
+#include <type_traits>
 
 namespace bounded {
 
 template<typename T>
-class is_bounded_integer {
-public:
-	static constexpr bool value = false;
-};
+struct is_bounded_integer : std::integral_constant<bool, false> {};
+
 template<intmax_t minimum, intmax_t maximum, typename overflow_policy, storage_type storage>
-class is_bounded_integer<integer<minimum, maximum, overflow_policy, storage>> {
-public:
-	static constexpr bool value = true;
-};
+struct is_bounded_integer<integer<minimum, maximum, overflow_policy, storage>> : std::integral_constant<bool, true> {};
 
 }	// namespace bounded
 #endif	// BOUNDED_INTEGER_IS_BOUNDED_INTEGER_HPP_
