@@ -184,7 +184,7 @@ public:
 	constexpr auto end() const noexcept {
 		return m_end;
 	}
-	constexpr auto cend() const {
+	constexpr auto cend() const noexcept {
 		return end();
 	}
 	constexpr auto rbegin() const noexcept {
