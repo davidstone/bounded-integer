@@ -220,7 +220,7 @@ public:
 		swap(m_end, other.m_end);
 	}
 	constexpr auto size() const {
-		return size_type(end() - begin(), non_check);
+		return size_type(end() - begin());
 	}
 	constexpr auto max_size() const {
 		return make<detail::integer_range_iterator::range_of_type<value_type>()>();
