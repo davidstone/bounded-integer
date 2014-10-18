@@ -178,11 +178,19 @@ public:
 	}
 	template<typename T>
 	auto && operator=(T && other) & noexcept(noexcept(std::declval<overflow_policy_type>().assignment(static_cast<intmax_t>(std::forward<T>(other)), minimum, maximum))) {
+		static_assert(
+			detail::is_explicitly_constructible_from<overflow_policy_type, T>(minimum, maximum),
+			"Value not in range."
+		);
 		unchecked_assignment(overflow_policy().assignment(static_cast<intmax_t>(std::forward<T>(other)), minimum, maximum));
 		return *this;
 	}
 	template<typename T>
 	auto && operator=(T && other) volatile & noexcept(noexcept(std::declval<overflow_policy_type>().assignment(static_cast<intmax_t>(std::forward<T>(other)), minimum, maximum))) {
+		static_assert(
+			detail::is_explicitly_constructible_from<overflow_policy_type, T>(minimum, maximum),
+			"Value not in range."
+		);
 		unchecked_assignment(overflow_policy().assignment(static_cast<intmax_t>(std::forward<T>(other)), minimum, maximum));
 		return *this;
 	}
