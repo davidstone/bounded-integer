@@ -236,7 +236,7 @@ auto check_minmax() {
 auto check_throw_policy() {
 	using bounded::checked_integer;
 	static_assert(
-		!noexcept(std::declval<checked_integer<0, 0> &>() = std::declval<checked_integer<1, 1> &>()),
+		!noexcept(std::declval<checked_integer<0, 0> &>() = std::declval<checked_integer<0, 1> &>()),
 		"Shouldn't be noexcept."
 	);
 	static constexpr intmax_t minimum = 0;
@@ -258,6 +258,14 @@ auto check_throw_policy() {
 
 auto check_policies() {
 	check_throw_policy();
+}
+
+auto check_assignment() {
+	bounded::integer<0, 10> x(5);
+	// The following cannot compile due to out of range check
+	// x = 11_bi;
+	x = bounded::integer<10, 11>(10);
+	assert(x == 10_bi);
 }
 
 auto check_compound_arithmetic() {
@@ -479,6 +487,7 @@ auto main() -> int {
 	check_numeric_limits_all();
 	check_minmax();
 	check_policies();
+	check_assignment();
 	check_compound_arithmetic();
 	check_algorithm();
 	check_math();

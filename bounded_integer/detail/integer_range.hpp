@@ -214,11 +214,6 @@ public:
 		return begin()[static_cast<index_type>(index)];
 	}
 
-	auto swap(integer_range_type & other) noexcept {
-		using std::swap;
-		swap(m_begin, other.m_begin);
-		swap(m_end, other.m_end);
-	}
 	constexpr auto size() const {
 		return size_type(end() - begin());
 	}
@@ -233,11 +228,6 @@ private:
 	const_iterator m_begin;
 	const_iterator m_end;
 };
-
-template<typename T>
-auto swap(integer_range_type<T>& lhs, integer_range_type<T>& rhs) {
-	lhs.swap(rhs);
-}
 
 // If end is less than begin, the behavior is undefined.
 template<typename Begin, typename End>
