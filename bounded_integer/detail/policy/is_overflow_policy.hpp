@@ -23,7 +23,7 @@
 namespace bounded {
 
 namespace detail {
-namespace is_overflow_policy {
+namespace is_overflow_policy_detail {
 
 using yes = char[1];
 using no = char[2];
@@ -38,14 +38,14 @@ auto checker(...) -> no &;
 
 BOUNDED_INTEGER_HAS_NESTED_TYPE(overflow_policy_tag)
 #undef BOUNDED_INTEGER_HAS_NESTED_TYPE
-}	// namespace is_overflow_policy
+}	// namespace is_overflow_policy_detail
 }	// namespace detail
 
 
 template<typename overflow_policy>
 struct is_overflow_policy : std::integral_constant<
 	bool,
-	sizeof(detail::is_overflow_policy::checker<overflow_policy>(nullptr)) == sizeof(detail::is_overflow_policy::yes)
+	sizeof(detail::is_overflow_policy_detail::checker<std::decay_t<overflow_policy>>(nullptr)) == sizeof(detail::is_overflow_policy_detail::yes)
 >{};
 
 }	// namespace bounded

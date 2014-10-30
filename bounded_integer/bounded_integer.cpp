@@ -428,7 +428,6 @@ auto check_streaming() {
 	streaming_test<bounded::equivalent_type<int>>(large_initial, large_final);
 }
 
-
 auto check_dynamic_policy() {
 	constexpr auto value = 3_bi;
 	constexpr auto min = 1_bi;
@@ -437,11 +436,15 @@ auto check_dynamic_policy() {
 	constexpr auto static_max = 10;
 	using policy_type = bounded::dynamic_policy<static_min, static_max, bounded::throw_policy>;
 	using type = bounded::integer<static_min, static_max, policy_type>;
+	
 	constexpr policy_type policy(min, max);
-	constexpr type compile(value, policy);
-	static_assert(compile == value, "Incorrect value with dynamic bounds.");
-	static_assert(compile.overflow_policy().min() == min, "Incorrect dynamic min with dynamic bounds.");
-	static_assert(compile.overflow_policy().max() == max, "Incorrect dynamic max with dynamic bounds.");
+	static_assert(policy.min() == min, "Incorrect dynamic min on the policy with dynamic bounds.");
+	static_assert(policy.max() == max, "Incorrect dynamic max on the policy with dynamic bounds.");
+
+	constexpr type integer(value, policy);
+	static_assert(integer == value, "Incorrect value with dynamic bounds.");
+	static_assert(integer.overflow_policy().min() == min, "Incorrect dynamic min on the integer with dynamic bounds.");
+	static_assert(integer.overflow_policy().max() == max, "Incorrect dynamic max on the integer with dynamic bounds.");
 
 	try {
 		policy.assignment(min - 1_bi, static_min, static_max);

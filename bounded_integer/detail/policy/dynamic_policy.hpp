@@ -31,6 +31,89 @@
 namespace bounded {
 
 template<intmax_t static_minimum, intmax_t static_maximum, typename overflow_policy, storage_type storage = storage_type::fast>
+class dynamic_policy;
+
+template<intmax_t static_minimum, intmax_t static_maximum, typename overflow_policy, storage_type storage = storage_type::fast>
+class dynamic_max_policy;
+
+template<intmax_t static_minimum, intmax_t static_maximum, typename overflow_policy, storage_type storage = storage_type::fast>
+class dynamic_min_policy;
+
+namespace detail {
+
+// Copying an overflow policy should copy its dynamic min / max, if the source
+// overflow policy has one. If we do not have a dynamic min / max, then the
+// default values should be the same as the static min / max.
+
+template<typename T>
+struct has_dynamic_max : std::false_type {};
+
+template<intmax_t minimum, intmax_t maximum, typename overflow_policy, storage_type storage>
+struct has_dynamic_max<dynamic_policy<minimum, maximum, overflow_policy, storage>> : std::true_type {};
+
+template<intmax_t minimum, intmax_t maximum, typename overflow_policy, storage_type storage>
+struct has_dynamic_max<dynamic_max_policy<minimum, maximum, overflow_policy, storage>> : std::true_type {};
+
+
+template<typename T>
+struct has_dynamic_min : std::false_type {};
+
+template<intmax_t minimum, intmax_t maximum, typename overflow_policy, storage_type storage>
+struct has_dynamic_min<dynamic_policy<minimum, maximum, overflow_policy, storage>> : std::true_type {};
+
+template<intmax_t minimum, intmax_t maximum, typename overflow_policy, storage_type storage>
+struct has_dynamic_min<dynamic_min_policy<minimum, maximum, overflow_policy, storage>> : std::true_type {};
+
+
+template<
+	intmax_t minimum,
+	typename OverflowPolicy,
+	enable_if_t<!has_dynamic_min<std::decay_t<OverflowPolicy>>::value> = clang_dummy
+>
+constexpr auto get_minimum(OverflowPolicy const &) noexcept {
+	static_assert(
+		is_overflow_policy<OverflowPolicy>::value,
+		"Can only be used with an overflow_policy."
+	);
+	return make<minimum>();
+}
+
+template<
+	intmax_t,
+	typename OverflowPolicy,
+	enable_if_t<has_dynamic_min<std::decay_t<OverflowPolicy>>::value> = clang_dummy
+>
+constexpr decltype(auto) get_minimum(OverflowPolicy const & policy) noexcept {
+	return policy.min();
+}
+
+
+template<
+	intmax_t maximum,
+	typename OverflowPolicy,
+	enable_if_t<!has_dynamic_max<std::decay_t<OverflowPolicy>>::value> = clang_dummy
+>
+constexpr auto get_maximum(OverflowPolicy const &) noexcept {
+	static_assert(
+		is_overflow_policy<OverflowPolicy>::value,
+		"Can only be used with an overflow_policy."
+	);
+	return make<maximum>();
+}
+
+template<
+	intmax_t,
+	typename OverflowPolicy,
+	enable_if_t<has_dynamic_max<std::decay_t<OverflowPolicy>>::value> = clang_dummy
+>
+constexpr decltype(auto) get_maximum(OverflowPolicy const & policy) noexcept {
+	return policy.max();
+}
+
+}	// namespace detail
+
+
+template<intmax_t static_minimum, intmax_t static_maximum, typename overflow_policy, storage_type storage>
 class dynamic_policy : private overflow_policy {
 public:
 	using overflow_policy_tag = void;
@@ -51,16 +134,14 @@ public:
 	}
 	constexpr dynamic_policy(dynamic_policy const &) noexcept = default;
 	constexpr dynamic_policy(dynamic_policy &&) noexcept = default;
-	constexpr dynamic_policy(dynamic_policy const volatile & other) noexcept:
-		dynamic_policy(other.m_min, other.m_max, static_cast<overflow_policy const volatile &>(other)) {
-	}
-	constexpr dynamic_policy(dynamic_policy volatile && other) noexcept:
-		dynamic_policy(std::move(other.m_min), std::move(other.m_max), static_cast<overflow_policy volatile &&>(other)) {
-	}
 
 	template<typename OverflowPolicy, enable_if_t<is_overflow_policy<OverflowPolicy>::value> = clang_dummy>
 	constexpr dynamic_policy(OverflowPolicy && policy) noexcept:
-		dynamic_policy(make<static_minimum>(), make<static_maximum>(), std::forward<OverflowPolicy>(policy)) {
+		dynamic_policy(
+			detail::get_minimum<static_minimum>(std::forward<OverflowPolicy>(policy)),
+			detail::get_maximum<static_maximum>(std::forward<OverflowPolicy>(policy)),
+			std::forward<OverflowPolicy>(policy)
+		) {
 	}
 
 	auto && operator=(dynamic_policy const & other) noexcept {
@@ -153,7 +234,7 @@ private:
 
 
 
-template<intmax_t static_minimum, intmax_t static_maximum, typename overflow_policy, storage_type storage = storage_type::fast>
+template<intmax_t static_minimum, intmax_t static_maximum, typename overflow_policy, storage_type storage>
 class dynamic_max_policy : private overflow_policy {
 public:
 	using overflow_policy_tag = void;
@@ -170,18 +251,16 @@ public:
 	constexpr dynamic_max_policy() noexcept:
 		dynamic_max_policy(make<static_maximum>()) {
 	}
+
 	constexpr dynamic_max_policy(dynamic_max_policy const &) noexcept = default;
 	constexpr dynamic_max_policy(dynamic_max_policy &&) noexcept = default;
-	constexpr dynamic_max_policy(dynamic_max_policy const volatile & other) noexcept:
-		dynamic_max_policy(other.m_max) {
-	}
-	constexpr dynamic_max_policy(dynamic_max_policy volatile && other) noexcept:
-		dynamic_max_policy(std::move(other.m_max)) {
-	}
 
 	template<typename OverflowPolicy, enable_if_t<is_overflow_policy<OverflowPolicy>::value> = clang_dummy>
 	constexpr dynamic_max_policy(OverflowPolicy && policy) noexcept:
-		dynamic_max_policy(make<static_maximum>(), std::forward<OverflowPolicy>(policy)) {
+		dynamic_max_policy(
+			detail::get_maximum<static_maximum>(std::forward<OverflowPolicy>(policy)),
+			std::forward<OverflowPolicy>(policy)
+		) {
 	}
 
 	auto && operator=(dynamic_max_policy const & other) noexcept {
@@ -258,7 +337,7 @@ private:
 
 
 
-template<intmax_t static_minimum, intmax_t static_maximum, typename overflow_policy, storage_type storage = storage_type::fast>
+template<intmax_t static_minimum, intmax_t static_maximum, typename overflow_policy, storage_type storage>
 class dynamic_min_policy : private overflow_policy {
 public:
 	using overflow_policy_tag = void;
@@ -277,16 +356,13 @@ public:
 	}
 	constexpr dynamic_min_policy(dynamic_min_policy const &) noexcept = default;
 	constexpr dynamic_min_policy(dynamic_min_policy &&) noexcept = default;
-	constexpr dynamic_min_policy(dynamic_min_policy const volatile & other) noexcept:
-		dynamic_min_policy(other.m_min) {
-	}
-	constexpr dynamic_min_policy(dynamic_min_policy volatile && other) noexcept:
-		dynamic_min_policy(std::move(other.m_min)) {
-	}
 
 	template<typename OverflowPolicy, enable_if_t<is_overflow_policy<OverflowPolicy>::value> = clang_dummy>
 	constexpr dynamic_min_policy(OverflowPolicy && policy) noexcept:
-		dynamic_min_policy(make<static_minimum>(), std::forward<OverflowPolicy>(policy)) {
+		dynamic_min_policy(
+			detail::get_minimum<static_minimum>(std::forward<OverflowPolicy>(policy)),
+			std::forward<OverflowPolicy>(policy)
+		) {
 	}
 
 	auto && operator=(dynamic_min_policy const & other) noexcept {
@@ -360,6 +436,7 @@ public:
 private:
 	underlying_type m_min;
 };
+
 
 }	// namespace bounded
 #endif	// BOUNDED_INTEGER_POLICY_DYNAMIC_POLICY_HPP_

@@ -94,6 +94,9 @@ public:
 		overflow_policy_type(std::move(policy)),
 		m_value(static_cast<underlying_type>(std::forward<T>(other))) {
 	}
+	// std::forward is safe here because it will never actually move anything.
+	// The value itself is only moved from inside of the constructor this
+	// forwards to.
 	template<typename T, enable_if_t<
 		detail::is_explicitly_constructible_from<overflow_policy_type, T>(minimum, maximum)
 	> = clang_dummy>
