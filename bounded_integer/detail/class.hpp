@@ -20,6 +20,7 @@
 #include "enable_if.hpp"
 #include "forward_declaration.hpp"
 #include "is_bounded_integer.hpp"
+#include "noexcept.hpp"
 #include "numeric_limits.hpp"
 #include "overlapping_range.hpp"
 #include "underlying_type.hpp"
@@ -108,11 +109,9 @@ public:
 	template<typename T, enable_if_t<
 		detail::is_explicitly_constructible_from<overflow_policy_type, T>(minimum, maximum)
 	> = clang_dummy>
-	constexpr integer(T && other, overflow_policy_type policy)
-		noexcept(noexcept(
-			policy.assignment(static_cast<intmax_t>(std::forward<T>(other)), minimum, maximum)
-		)):
-		integer(policy.assignment(static_cast<intmax_t>(std::forward<T>(other)), minimum, maximum), policy, non_check) {
+	constexpr integer(T && other, overflow_policy_type policy) BOUNDED_NOEXCEPT_INITIALIZATION(
+		integer(policy.assignment(static_cast<intmax_t>(std::forward<T>(other)), minimum, maximum), policy, non_check)
+	) {
 	}
 
 
@@ -120,24 +119,18 @@ public:
 	template<typename T, enable_if_t<
 		detail::is_implicitly_constructible_from<T>(minimum, maximum)
 	> = clang_dummy>
-	constexpr integer(T && other)
-		noexcept(noexcept(
-			integer(
-				std::forward<T>(other), static_cast<overflow_policy_type>(get_overflow_policy(std::forward<T>(other))))
-		)):
-		integer(std::forward<T>(other), static_cast<overflow_policy_type>(get_overflow_policy(std::forward<T>(other)))) {
+	constexpr integer(T && other) BOUNDED_NOEXCEPT_INITIALIZATION(
+		integer(std::forward<T>(other), static_cast<overflow_policy_type>(get_overflow_policy(std::forward<T>(other))))
+	) {
 	}
 
 	template<typename T, enable_if_t<
 		!detail::is_implicitly_constructible_from<T>(minimum, maximum) and
 		detail::is_explicitly_constructible_from<overflow_policy_type, T>(minimum, maximum)
 	> = clang_dummy>
-	constexpr explicit integer(T && other)
-		noexcept(noexcept(
-			integer(
-				std::forward<T>(other), static_cast<overflow_policy_type>(get_overflow_policy(std::forward<T>(other))))
-		)):
-		integer(std::forward<T>(other), static_cast<overflow_policy_type>(get_overflow_policy(std::forward<T>(other)))) {
+	constexpr explicit integer(T && other) BOUNDED_NOEXCEPT_INITIALIZATION(
+		integer(std::forward<T>(other), static_cast<overflow_policy_type>(get_overflow_policy(std::forward<T>(other))))
+	) {
 	}
 
 
@@ -150,12 +143,14 @@ public:
 		integer(static_cast<std::underlying_type_t<Enum>>(other), non_check) {
 	}
 	template<typename Enum, enable_if_t<std::is_enum<Enum>::value> = clang_dummy>
-	constexpr explicit integer(Enum other, overflow_policy_type policy) noexcept(noexcept(integer(static_cast<std::underlying_type_t<Enum>>(other), std::move(policy)))):
-		integer(static_cast<std::underlying_type_t<Enum>>(other), std::move(policy)) {
+	constexpr explicit integer(Enum other, overflow_policy_type policy) BOUNDED_NOEXCEPT_INITIALIZATION(
+		integer(static_cast<std::underlying_type_t<Enum>>(other), std::move(policy))
+	) {
 	}
 	template<typename Enum, enable_if_t<std::is_enum<Enum>::value> = clang_dummy>
-	constexpr explicit integer(Enum other) noexcept(noexcept(integer(static_cast<std::underlying_type_t<Enum>>(other)))):
-		integer(static_cast<std::underlying_type_t<Enum>>(other)) {
+	constexpr explicit integer(Enum other) BOUNDED_NOEXCEPT_INITIALIZATION(
+		integer(static_cast<std::underlying_type_t<Enum>>(other)) 
+	) {
 	}
 
 
