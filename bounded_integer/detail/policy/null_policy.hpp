@@ -20,6 +20,7 @@
 #include "basic_policy.hpp"
 #include "common_policy.hpp"
 #include <cstdint>
+#include <utility>
 
 namespace bounded {
 namespace policy_detail {

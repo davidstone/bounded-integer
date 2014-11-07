@@ -19,9 +19,7 @@
 
 #include "is_overflow_policy.hpp"
 #include "../enable_if.hpp"
-#include <cstdint>
 #include <type_traits>
-#include <utility>
 
 namespace bounded {
 
