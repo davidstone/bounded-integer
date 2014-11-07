@@ -110,7 +110,7 @@ public:
 		detail::is_explicitly_constructible_from<overflow_policy_type, T>(minimum, maximum)
 	> = clang_dummy>
 	constexpr integer(T && other, overflow_policy_type policy) BOUNDED_NOEXCEPT_INITIALIZATION(
-		integer(policy.assignment(static_cast<intmax_t>(std::forward<T>(other)), minimum, maximum), policy, non_check)
+		integer(policy.assignment(static_cast<intmax_t>(std::forward<T>(other)), minimum, maximum), std::move(policy), non_check)
 	) {
 	}
 
