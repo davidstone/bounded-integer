@@ -26,16 +26,19 @@
 namespace bounded {
 
 template<typename policy_type>
-class basic_policy {
+class basic_policy : private policy_type {
 public:
 	static_assert(
 		std::is_empty<policy_type>::value,
 		"basic_policy can only be used with stateless policies"
 	);
 	using overflow_policy_tag = void;
+
+	// constexpr and noexcept are implied by = default
+	basic_policy(basic_policy const &) = default;
+	basic_policy(basic_policy &&) = default;
+
 	constexpr basic_policy() noexcept {}
-	constexpr basic_policy(basic_policy const &) noexcept = default;
-	constexpr basic_policy(basic_policy &&) noexcept = default;
 	template<typename T, enable_if_t<std::is_same<std::decay_t<T>, basic_policy>::value> = clang_dummy>
 	constexpr basic_policy(T &&) noexcept {
 	}
@@ -57,14 +60,10 @@ public:
 		return *this;
 	}
 
-	template<typename T, typename Minimum, typename Maximum>
-	static constexpr auto assignment(T && value, Minimum && minimum, Maximum && maximum)
-		noexcept(noexcept(policy_type{}.assignment(std::forward<T>(value), std::forward<Minimum>(minimum), std::forward<Maximum>(maximum)))) {
-		return policy_type{}.assignment(std::forward<T>(value), std::forward<Minimum>(minimum), std::forward<Maximum>(maximum));
-	}
+	using policy_type::assignment;
 	
-	static constexpr bool is_modulo = policy_type::is_modulo;
-	static constexpr bool overflow_is_error = policy_type::overflow_is_error;
+	using policy_type::is_modulo;
+	using policy_type::overflow_is_error;
 };
 
 }	// namespace bounded
