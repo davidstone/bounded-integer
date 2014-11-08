@@ -18,6 +18,7 @@
 #define BOUNDED_INTEGER_POLICY_CLAMP_POLICY_HPP_
 
 #include "basic_policy.hpp"
+#include "../operators/comparison_builtin.hpp"
 #include <cstdint>
 
 namespace bounded {

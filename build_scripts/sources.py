@@ -59,6 +59,7 @@ base_sources = [('test',
 		'arithmetic.cpp',
 		'arithmetic_result_type.cpp',
 		'comparison.cpp',
+		'comparison_builtin.cpp',
 		'compound_assignment.cpp',
 		'operators.cpp',
 	]) +

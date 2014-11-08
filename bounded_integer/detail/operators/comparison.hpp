@@ -18,10 +18,7 @@
 #define BOUNDED_INTEGER_COMPARISON_OPERATORS_HPP_
 
 #include "../common_type.hpp"
-#include "../enable_if.hpp"
 #include "../forward_declaration.hpp"
-#include "../make.hpp"
-#include "../numeric_limits.hpp"
 #include "../policy/null_policy.hpp"
 
 #include <cstdint>
@@ -29,14 +26,6 @@
 
 namespace bounded {
 
-// In my original implementation, I wrote these as comparisons between a
-// bounded::integer and its underlying type. However, this actually makes
-// relational operators much less useful than they otherwise could be. For
-// instance, if we have bounded::integer<-100, 100>, we might want to compare
-// that with an int64_t. If we have to first convert the value to the underlying
-// type (likely int8_t), then we are likely to invoke undefined behavior.
-// Instead, the comparison function should accept a much wider array of types
-// and convert up to the common type.
 
 namespace detail {
 
@@ -76,52 +65,6 @@ constexpr auto operator!=(integer<lhs_min, lhs_max, lhs_overflow, lhs_storage> c
 }
 
 
-
-// Equality with built-ins
-
-template<
-	intmax_t minimum, intmax_t maximum, typename overflow_policy, storage_type storage,
-	typename T,
-	enable_if_t<detail::basic_numeric_limits<T>::is_integer> = clang_dummy
->
-constexpr auto operator==(integer<minimum, maximum, overflow_policy, storage> const lhs, T const rhs) noexcept {
-	return lhs == make(rhs);
-}
-
-template<intmax_t minimum, intmax_t maximum, typename overflow_policy, storage_type storage>
-constexpr auto operator==(integer<minimum, maximum, overflow_policy, storage> const lhs, uintmax_t const rhs) noexcept {
-	return (lhs < 0) ? false : static_cast<uintmax_t>(lhs) == rhs;
-}
-
-template<
-	intmax_t minimum, intmax_t maximum, typename overflow_policy, storage_type storage,
-	typename T,
-	enable_if_t<detail::basic_numeric_limits<T>::is_integer> = clang_dummy
->
-constexpr auto operator==(T const lhs, integer<minimum, maximum, overflow_policy, storage> const rhs) noexcept {
-	return rhs == lhs;
-}
-
-template<
-	intmax_t minimum, intmax_t maximum, typename overflow_policy, storage_type storage,
-	typename T,
-	enable_if_t<detail::basic_numeric_limits<T>::is_integer> = clang_dummy
->
-constexpr auto operator!=(integer<minimum, maximum, overflow_policy, storage> const lhs, T const rhs) noexcept {
-	return !(lhs == rhs);
-}
-
-template<
-	intmax_t minimum, intmax_t maximum, typename overflow_policy, storage_type storage,
-	typename T,
-	enable_if_t<detail::basic_numeric_limits<T>::is_integer> = clang_dummy
->
-constexpr auto operator!=(T const lhs, integer<minimum, maximum, overflow_policy, storage> const rhs) noexcept {
-	return !(rhs == lhs);
-}
-
-
-
 // Relational operators
 
 template<
@@ -157,89 +100,6 @@ constexpr auto operator>=(integer<lhs_min, lhs_max, lhs_overflow, lhs_storage> c
 	return !(lhs < rhs);
 }
 
-
-
-// Relational operators with built-ins
-
-template<
-	intmax_t minimum, intmax_t maximum, typename overflow_policy, storage_type storage,
-	typename T,
-	enable_if_t<detail::basic_numeric_limits<T>::is_integer> = clang_dummy
->
-constexpr auto operator<(integer<minimum, maximum, overflow_policy, storage> const lhs, T const rhs) noexcept {
-	return lhs < make(rhs);
-}
-template<intmax_t minimum, intmax_t maximum, typename overflow_policy, storage_type storage>
-constexpr auto operator<(integer<minimum, maximum, overflow_policy, storage> const lhs, uintmax_t const rhs) noexcept {
-	return (lhs < 0) ? true : static_cast<uintmax_t>(lhs) < rhs;
-}
-
-template<
-	intmax_t minimum, intmax_t maximum, typename overflow_policy, storage_type storage,
-	typename T,
-	enable_if_t<detail::basic_numeric_limits<T>::is_integer> = clang_dummy
->
-constexpr auto operator<(T const lhs, integer<minimum, maximum, overflow_policy, storage> const rhs) noexcept {
-	return make(lhs) < rhs;
-}
-template<intmax_t minimum, intmax_t maximum, typename overflow_policy, storage_type storage>
-constexpr auto operator<(uintmax_t const lhs, integer<minimum, maximum, overflow_policy, storage> const rhs) noexcept {
-	return (rhs < 0) ? false : lhs < static_cast<uintmax_t>(rhs);
-}
-
-template<
-	intmax_t minimum, intmax_t maximum, typename overflow_policy, storage_type storage,
-	typename T,
-	enable_if_t<detail::basic_numeric_limits<T>::is_integer> = clang_dummy
->
-constexpr auto operator>(integer<minimum, maximum, overflow_policy, storage> const lhs, T const rhs) noexcept {
-	return rhs < lhs;
-}
-
-template<
-	intmax_t minimum, intmax_t maximum, typename overflow_policy, storage_type storage,
-	typename T,
-	enable_if_t<detail::basic_numeric_limits<T>::is_integer> = clang_dummy
->
-constexpr auto operator>(T const lhs, integer<minimum, maximum, overflow_policy, storage> const rhs) noexcept {
-	return rhs < lhs;
-}
-
-template<
-	intmax_t minimum, intmax_t maximum, typename overflow_policy, storage_type storage,
-	typename T,
-	enable_if_t<detail::basic_numeric_limits<T>::is_integer> = clang_dummy
->
-constexpr auto operator<=(integer<minimum, maximum, overflow_policy, storage> const lhs, T const rhs) noexcept {
-	return !(rhs < lhs);
-}
-
-template<
-	intmax_t minimum, intmax_t maximum, typename overflow_policy, storage_type storage,
-	typename T,
-	enable_if_t<detail::basic_numeric_limits<T>::is_integer> = clang_dummy
->
-constexpr auto operator<=(T const lhs, integer<minimum, maximum, overflow_policy, storage> const rhs) noexcept {
-	return !(rhs < lhs);
-}
-
-template<
-	intmax_t minimum, intmax_t maximum, typename overflow_policy, storage_type storage,
-	typename T,
-	enable_if_t<detail::basic_numeric_limits<T>::is_integer> = clang_dummy
->
-constexpr auto operator>=(integer<minimum, maximum, overflow_policy, storage> const lhs, T const rhs) noexcept {
-	return !(lhs < rhs);
-}
-
-template<
-	intmax_t minimum, intmax_t maximum, typename overflow_policy, storage_type storage,
-	typename T,
-	enable_if_t<detail::basic_numeric_limits<T>::is_integer> = clang_dummy
->
-constexpr auto operator>=(T const lhs, integer<minimum, maximum, overflow_policy, storage> const rhs) noexcept {
-	return !(lhs < rhs);
-}
 
 }	// namespace bounded
 #endif	// BOUNDED_INTEGER_COMPARISON_OPERATORS_HPP_

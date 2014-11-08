@@ -17,6 +17,7 @@
 #include "make_array.hpp"
 #include "../literal.hpp"
 #include "../operators/comparison.hpp"
+#include "../operators/comparison_builtin.hpp"
 #include "../policy/throw_policy.hpp"
 
 namespace {

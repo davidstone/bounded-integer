@@ -119,7 +119,7 @@ public:
 		return std::move(m_value);
 	}
 	constexpr auto is_initialized() const noexcept {
-		return m_value != uninitialized_value();
+		return m_value.value() != uninitialized_value();
 	}
 };
 

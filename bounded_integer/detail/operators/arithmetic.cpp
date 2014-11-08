@@ -16,6 +16,7 @@
 
 #include "arithmetic.hpp"
 #include "comparison.hpp"
+#include "comparison_builtin.hpp"
 #include "../literal.hpp"
 #include "../make.hpp"
 #include "../numeric_limits.hpp"
