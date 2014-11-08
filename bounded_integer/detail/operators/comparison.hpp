@@ -22,6 +22,7 @@
 #include "../forward_declaration.hpp"
 #include "../make.hpp"
 #include "../numeric_limits.hpp"
+#include "../policy/null_policy.hpp"
 
 #include <cstdint>
 #include <type_traits>
@@ -36,17 +37,22 @@ namespace bounded {
 // type (likely int8_t), then we are likely to invoke undefined behavior.
 // Instead, the comparison function should accept a much wider array of types
 // and convert up to the common type.
-//
-// The common type uses the overflow policy of the left-hand side because the
-// policy does not matter for comparisons. This allows the user to compare
-// integers with unrelated policies.
 
 namespace detail {
 
-template<typename lhs, typename rhs, typename lhs_overflow>
+// This preferentially uses storage_type::fast, but does no conversions if they
+// are the same. If new storage types are added, this will preferentially use
+// storage_type::least over whatever that new type is.
+constexpr storage_type comparison_storage_type(storage_type lhs_storage, storage_type rhs_storage) noexcept {
+	return (lhs_storage <= rhs_storage) ? lhs_storage : rhs_storage;
+}
+
+// This uses the null_policy because policies do not matter for comparisons.
+// This allows the user to compare integers with unrelated policies.
+template<intmax_t lhs_min, intmax_t lhs_max, storage_type lhs_storage, intmax_t rhs_min, intmax_t rhs_max, storage_type rhs_storage>
 using comparison_type = typename std::common_type_t<
-	std::decay_t<lhs>,
-	equivalent_type<std::decay_t<rhs>, lhs_overflow>
+	integer<lhs_min, lhs_max, null_policy, comparison_storage_type(lhs_storage, rhs_storage)>,
+	integer<rhs_min, rhs_max, null_policy, comparison_storage_type(lhs_storage, rhs_storage)>
 >::underlying_type const;
 
 }	// namespace detail
@@ -57,7 +63,7 @@ template<
 	intmax_t rhs_min, intmax_t rhs_max, typename rhs_overflow, storage_type rhs_storage
 >
 constexpr auto operator==(integer<lhs_min, lhs_max, lhs_overflow, lhs_storage> const lhs, integer<rhs_min, rhs_max, rhs_overflow, rhs_storage> const rhs) noexcept {
-	using common_t = detail::comparison_type<decltype(lhs), decltype(rhs), lhs_overflow>;
+	using common_t = detail::comparison_type<lhs_min, lhs_max, lhs_storage, rhs_min, rhs_max, rhs_storage>;
 	return static_cast<common_t>(lhs) == static_cast<common_t>(rhs);
 }
 
@@ -123,7 +129,7 @@ template<
 	intmax_t rhs_min, intmax_t rhs_max, typename rhs_overflow, storage_type rhs_storage
 >
 constexpr auto operator<(integer<lhs_min, lhs_max, lhs_overflow, lhs_storage> const lhs, integer<rhs_min, rhs_max, rhs_overflow, rhs_storage> const rhs) noexcept {
-	using common_t = detail::comparison_type<decltype(lhs), decltype(rhs), lhs_overflow>;
+	using common_t = detail::comparison_type<lhs_min, lhs_max, lhs_storage, rhs_min, rhs_max, rhs_storage>;
 	return static_cast<common_t>(lhs) < static_cast<common_t>(rhs);
 }
 
