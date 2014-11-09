@@ -1,4 +1,4 @@
-// bounded operators
+// Verify that the header can stand on its own
 // Copyright (C) 2014 David Stone
 //
 // This program is free software: you can redistribute it and / or modify
@@ -14,13 +14,4 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with this program. If not, see <http://www.gnu.org/licenses/>.
 
-#ifndef BOUNDED_INTEGER_OPERATORS_HPP_
-#define BOUNDED_INTEGER_OPERATORS_HPP_
-
-#include "arithmetic.hpp"
 #include "arithmetic_builtin.hpp"
-#include "comparison.hpp"
-#include "comparison_builtin.hpp"
-#include "compound_assignment.hpp"
-
-#endif	// BOUNDED_INTEGER_OPERATORS_HPP_

@@ -57,6 +57,7 @@ base_sources = [('test',
 	]) +
 	prepend_dir('detail/operators', [
 		'arithmetic.cpp',
+		'arithmetic_builtin.cpp',
 		'arithmetic_result_type.cpp',
 		'comparison.cpp',
 		'comparison_builtin.cpp',

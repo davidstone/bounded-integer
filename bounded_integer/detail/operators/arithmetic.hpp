@@ -14,15 +14,12 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with this program. If not, see <http://www.gnu.org/licenses/>.
 
-#ifndef BOUNDED_INTEGER_ARITHMETIC_OPERATORS_HPP_
-#define BOUNDED_INTEGER_ARITHMETIC_OPERATORS_HPP_
+#ifndef BOUNDED_INTEGER_OPERATORS_ARITHMETIC_HPP_
+#define BOUNDED_INTEGER_OPERATORS_ARITHMETIC_HPP_
 
 #include "arithmetic_result_type.hpp"
 #include "../common_type.hpp"
-#include "../enable_if.hpp"
 #include "../forward_declaration.hpp"
-#include "../make.hpp"
-#include "../numeric_limits.hpp"
 
 #include <cstdint>
 #include <type_traits>
@@ -47,22 +44,6 @@ constexpr auto operator symbol( \
 	using result_t = detail::operator_result<lhs_min, lhs_max, lhs_policy, rhs_min, rhs_max, rhs_policy, storage, operator_name>; \
 	using common_t = typename std::common_type_t<result_t, std::decay_t<decltype(lhs)>, std::decay_t<decltype(rhs)>>::underlying_type; \
 	return result_t(operator_name{}(static_cast<common_t>(lhs), static_cast<common_t>(rhs)), non_check); \
-} \
- \
-/* Interoperability with built-ins */ \
-template< \
-	intmax_t lhs_min, intmax_t lhs_max, typename overflow, storage_type storage, typename T, \
-	enable_if_t<detail::basic_numeric_limits<T>::is_integer> = clang_dummy \
-> \
-constexpr auto operator symbol(integer<lhs_min, lhs_max, overflow, storage> const lhs, T const rhs) noexcept { \
-	return lhs symbol make(rhs); \
-} \
-template< \
-	typename T, intmax_t rhs_min, intmax_t rhs_max, typename overflow, storage_type storage, \
-	enable_if_t<detail::basic_numeric_limits<T>::is_integer> = clang_dummy \
-> \
-constexpr auto operator symbol(T const lhs, integer<rhs_min, rhs_max, overflow, storage> const rhs) noexcept { \
-	return make(lhs) symbol rhs; \
 }
 
 BOUNDED_INTEGER_OPERATOR_OVERLOADS(+, detail::plus)
@@ -94,37 +75,6 @@ constexpr auto operator+(integer<minimum, maximum, overflow_policy, storage> con
 	return value;
 }
 
-
-// Pointer overloads
-
-template<intmax_t minimum, intmax_t maximum, typename overflow_policy, storage_type storage, typename T>
-constexpr auto operator+(integer<minimum, maximum, overflow_policy, storage> const & number, T * const pointer) noexcept -> T * {
-	return number.value() + pointer;
-}
-
-template<typename T, intmax_t minimum, intmax_t maximum, typename overflow_policy, storage_type storage>
-constexpr auto operator+(T * const pointer, integer<minimum, maximum, overflow_policy, storage> const & number) noexcept -> T * {
-	return pointer + number.value();
-}
-
-template<typename T, intmax_t minimum, intmax_t maximum, typename overflow_policy, storage_type storage>
-constexpr auto operator-(T * const pointer, integer<minimum, maximum, overflow_policy, storage> const & number) noexcept -> T * {
-	return pointer - number.value();
-}
-
-template<typename T, intmax_t minimum, intmax_t maximum, typename overflow_policy, storage_type storage>
-decltype(auto) operator+=(T * & pointer, integer<minimum, maximum, overflow_policy, storage> const & number) noexcept {
-	return pointer += number.value();
-}
-
-template<typename T, intmax_t minimum, intmax_t maximum, typename overflow_policy, storage_type storage>
-decltype(auto) operator-=(T * & pointer, integer<minimum, maximum, overflow_policy, storage> const & number) noexcept {
-	return pointer -= number.value();
-}
-
-// Not possible to overload operator[]. See
-// https://groups.google.com/a/isocpp.org/forum/#!topic/std-proposals/CmBERU_sr8Y
-
 }	// namespace bounded
 
-#endif	// BOUNDED_INTEGER_ARITHMETIC_OPERATORS_HPP_
+#endif	// BOUNDED_INTEGER_OPERATORS_ARITHMETIC_HPP_

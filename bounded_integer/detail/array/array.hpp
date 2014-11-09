@@ -20,6 +20,7 @@
 #include "../class.hpp"
 #include "../make.hpp"
 #include "../operators/arithmetic.hpp"
+#include "../operators/arithmetic_builtin.hpp"
 #include "../policy/throw_policy.hpp"
 
 #include <algorithm>
