@@ -15,31 +15,4 @@
 // along with this program. If not, see <http://www.gnu.org/licenses/>.
 
 #include "common_policy.hpp"
-#include "null_policy.hpp"
-#include "throw_policy.hpp"
 
-namespace {
-using bounded::null_policy;
-using bounded::throw_policy;
-
-static_assert(
-	std::is_same<bounded::common_policy_t<null_policy, null_policy>, null_policy>::value,
-	"common_policy gives wrong type for all null_policy"
-);
-
-static_assert(
-	std::is_same<bounded::common_policy_t<null_policy, throw_policy>, throw_policy>::value,
-	"common_policy gives wrong type for one null_policy (first)"
-);
-
-static_assert(
-	std::is_same<bounded::common_policy_t<throw_policy, null_policy>, throw_policy>::value,
-	"common_policy gives wrong type for one null_policy (second)"
-);
-
-static_assert(
-	std::is_same<bounded::common_policy_t<throw_policy, throw_policy>, throw_policy>::value,
-	"common_policy gives wrong type for all throw_policy"
-);
-
-} // namespace

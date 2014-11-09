@@ -1,4 +1,4 @@
-// Verify that the header can stand on its own, run tests
+// Verify that the header can stand on its own
 // Copyright (C) 2014 David Stone
 //
 // This program is free software: you can redistribute it and / or modify
@@ -15,41 +15,3 @@
 // along with this program. If not, see <http://www.gnu.org/licenses/>.
 
 #include "literal.hpp"
-#include "operators/comparison.hpp"
-#include "operators/comparison_builtin.hpp"
-
-namespace {
-using namespace bounded::literal;
-
-// I have to use the preprocessor here to create an integer literal
-#define BOUNDED_INTEGER_CHECK_LITERAL(x) \
-	static_assert( \
-		std::numeric_limits<decltype(x ## _bi)>::min() == std::numeric_limits<decltype(x ## _bi)>::max(), \
-		"Literal does not have a min possible value equal to a max possible value." \
-	); \
-	static_assert( \
-		std::numeric_limits<decltype(x ## _bi)>::min() == x ## _bi, \
-		"Literal does not have a value equal to the range." \
-	); \
-	\
-	static_assert( \
-		x ## _bi == static_cast<decltype(x ## _bi)::underlying_type>(x), \
-		"Inaccurate value of " #x " (cast x)" \
-	); \
-	static_assert( \
-		static_cast<decltype(x)>(x ## _bi) == x, \
-		"Inaccurate value of " #x " (cast value)" \
-	);
-
-BOUNDED_INTEGER_CHECK_LITERAL(0)
-BOUNDED_INTEGER_CHECK_LITERAL(1)
-BOUNDED_INTEGER_CHECK_LITERAL(10)
-BOUNDED_INTEGER_CHECK_LITERAL(1000)
-BOUNDED_INTEGER_CHECK_LITERAL(4294967295)
-BOUNDED_INTEGER_CHECK_LITERAL(4294967296)
-BOUNDED_INTEGER_CHECK_LITERAL(9223372036854775807)
-BOUNDED_INTEGER_CHECK_LITERAL(-1)
-BOUNDED_INTEGER_CHECK_LITERAL(-0)
-#undef BOUNDED_INTEGER_CHECK_LITERAL
-
-}	// namespace

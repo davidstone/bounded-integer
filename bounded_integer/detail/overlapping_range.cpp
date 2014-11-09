@@ -1,4 +1,4 @@
-// Verify that the header can stand on its own, run tests
+// Verify that the header can stand on its own
 // Copyright (C) 2014 David Stone
 //
 // This program is free software: you can redistribute it and / or modify
@@ -15,14 +15,4 @@
 // along with this program. If not, see <http://www.gnu.org/licenses/>.
 
 #include "overlapping_range.hpp"
-#include "class.hpp"
 
-namespace {
-
-using type = bounded::integer<0, 0>;
-static_assert(bounded::detail::type_overlaps_range<type>(0, 0), "Type should overlap its own range.");
-static_assert(bounded::detail::type_fits_in_range<type>(0, 0), "Type should fit in its own range.");
-static_assert(!bounded::detail::type_overlaps_range<type>(1, 1), "Type should not overlap a disjoint range.");
-
-
-}	// namespace

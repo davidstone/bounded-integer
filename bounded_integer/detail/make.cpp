@@ -15,23 +15,4 @@
 // along with this program. If not, see <http://www.gnu.org/licenses/>.
 
 #include "make.hpp"
-#include "policy/throw_policy.hpp"
 
-namespace {
-
-static_assert(
-	std::is_same<
-		bounded::detail::equivalent_overflow_policy<int>,
-		bounded::null_policy
-	>::value,
-	"int should have a null_policy"
-);
-static_assert(
-	std::is_same<
-		bounded::detail::equivalent_overflow_policy<bounded::integer<0, 0, bounded::throw_policy>>,
-		bounded::throw_policy
-	>::value,
-	"incorrect equivalent_overflow_policy for bounded::integer."
-);
-
-}	// namespace

@@ -15,12 +15,3 @@
 // along with this program. If not, see <http://www.gnu.org/licenses/>.
 
 #include "numeric_limits.hpp"
-
-#include "class.hpp"
-#include "operators/comparison.hpp"
-
-namespace {
-
-static_assert(std::numeric_limits<bounded::integer<1, 1000>>::digits == 0, "Meaningless digits not 0.");
-
-}	// namespace

@@ -15,33 +15,4 @@
 // along with this program. If not, see <http://www.gnu.org/licenses/>.
 
 #include "class.hpp"
-#include <type_traits>
 
-namespace {
-
-constexpr auto min = std::numeric_limits<int>::min();
-constexpr auto max = std::numeric_limits<int>::max();
-using type = bounded::integer<min, max>;
-
-static_assert(
-	bounded::detail::type_overlaps_range<std::decay_t<type>>(min, max),
-	"Bounds of type do not overlap its own range."
-);
-
-static_assert(
-	bounded::detail::is_explicitly_constructible_from<bounded::null_policy, type>(min, max),
-	"Type is not explicitly constructible from itself."
-);
-
-static_assert(
-	std::is_convertible<int, type>::value,
-	"Cannot convert integer type to bounded::integer with same range."
-);
-static_assert(
-	std::is_constructible<type, type, bounded::non_check_t>::value,
-	"Cannot construct a type from itself with non_check_t."
-);
-
-constexpr bounded::integer<min, max, bounded::null_policy, bounded::storage_type::least> least(0);
-
-}	// namespace
