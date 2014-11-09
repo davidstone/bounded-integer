@@ -19,6 +19,7 @@
 
 #include "common_type.hpp"
 #include "common_type_and_value_category.hpp"
+#include "is_bounded_integer.hpp"
 #include "numeric_limits.hpp"
 #include "overlapping_range.hpp"
 #include "operators/comparison.hpp"
@@ -47,6 +48,16 @@ public:
 		return std::forward<LHS>(lhs) > std::forward<RHS>(rhs);
 	}
 };
+
+
+template<typename Target, typename Source, enable_if_t<is_bounded_integer<Target>::value> = clang_dummy>
+constexpr Target construct(Source && source) noexcept {
+	return Target(std::forward<Source>(source), non_check);
+}
+template<typename Target, typename Source, enable_if_t<!is_bounded_integer<Target>::value> = clang_dummy>
+constexpr Target construct(Source && source) noexcept(noexcept(static_cast<Target>(source))) {
+	return static_cast<Target>(source);
+}
 
 }	// namespace minmax
 }	// namespace detail
@@ -130,8 +141,8 @@ template<typename Compare, typename T1, typename T2, enable_if_t<
 constexpr decltype(auto) extreme(Compare compare, T1 && t1, T2 && t2) noexcept(noexcept(compare(std::forward<T1>(t1), std::forward<T2>(t2)))) {
 	using result_type = detail::add_common_cv_reference_t<extreme_t<Compare, T1, T2>, T1, T2>;
 	return compare(t2, t1) ?
-		static_cast<result_type>(std::forward<T2>(t2)) :
-		static_cast<result_type>(std::forward<T1>(t1))
+		detail::minmax::construct<result_type>(std::forward<T2>(t2)) :
+		detail::minmax::construct<result_type>(std::forward<T1>(t1))
 	;
 }
 
