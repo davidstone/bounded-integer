@@ -20,6 +20,7 @@
 #include "class.hpp"
 #include "numeric_limits.hpp"
 #include "underlying_type.hpp"
+#include "policy/modulo_policy.hpp"
 #include "policy/null_policy.hpp"
 #include <cstdint>
 #include <type_traits>
@@ -30,7 +31,7 @@ namespace detail {
 template<typename T>
 class equivalent_overflow_policy_c {
 public:
-	using type = null_policy;
+	using type = std::conditional_t<std::is_unsigned<T>::value, modulo_policy, null_policy>;
 };
 template<intmax_t minimum, intmax_t maximum, typename overflow_policy, storage_type storage>
 class equivalent_overflow_policy_c<integer<minimum, maximum, overflow_policy, storage>> {

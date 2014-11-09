@@ -18,8 +18,8 @@
 #define BOUNDED_INTEGER_POLICY_MODULO_POLICY_HPP_
 
 #include "basic_policy.hpp"
+#include "../class.hpp"
 #include "../common_type.hpp"
-#include "../make.hpp"
 #include "../operators/arithmetic.hpp"
 #include <type_traits>
 
@@ -27,13 +27,19 @@ namespace bounded {
 namespace policy_detail {
 
 class modulo_policy {
+private:
+	template<intmax_t value>
+	static constexpr auto make() noexcept -> integer<value, value> {
+		return { value, non_check };
+	}
 public:
 	template<typename T, typename Minimum, typename Maximum>
 	static constexpr auto assignment(T && value, Minimum && minimum, Maximum && maximum) noexcept {
+		static_assert(is_bounded_integer<std::decay_t<T>>::value, "Only bounded::integer types are supported.");
 		static_assert(is_bounded_integer<std::decay_t<Minimum>>::value, "Only bounded::integer types are supported.");
 		static_assert(is_bounded_integer<std::decay_t<Maximum>>::value, "Only bounded::integer types are supported.");
 		return positive_remainder(
-			(bounded::make(value) - minimum) % (maximum - minimum + make<1>()),
+			(value - minimum) % (maximum - minimum + make<1>()),
 			maximum - minimum + make<1>()
 		) + minimum;
 	}

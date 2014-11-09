@@ -405,6 +405,13 @@ namespace check_make {
 	);
 	static_assert(
 		std::is_same<
+			bounded::detail::equivalent_overflow_policy<unsigned>,
+			bounded::modulo_policy
+		>::value,
+		"unsigned should have a modulo_policy"
+	);
+	static_assert(
+		std::is_same<
 			bounded::detail::equivalent_overflow_policy<bounded::integer<0, 0, bounded::throw_policy>>,
 			bounded::throw_policy
 		>::value,
