@@ -25,10 +25,9 @@
 
 namespace bounded {
 
-// These are not considered to be more specialized than std::next and std::prev.
-// I could write a more specific case for bounded::array to ensure it is
-// picked up by unqualified calls to std::next, but such calls are unlikely to
-// ever happen.
+// These are not more specialized than std::next and std::prev. I could write a
+// more specific case for bounded::array to ensure it is picked up by
+// unqualified calls to next, but such calls are unlikely to ever happen.
 
 // TODO: constexpr when gcc supports it
 template<typename Iterator, typename Offset = decltype(make<1>())>
