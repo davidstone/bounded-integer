@@ -1,4 +1,4 @@
-// Policies that determine what to do on overflow
+// Verify that the header can stand on its own
 // Copyright (C) 2014 David Stone
 //
 // This program is free software: you can redistribute it and / or modify
@@ -14,16 +14,4 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with this program. If not, see <http://www.gnu.org/licenses/>.
 
-#ifndef BOUNDED_INTEGER_POLICY_ALL_HPP_
-#define BOUNDED_INTEGER_POLICY_ALL_HPP_
-
-// Default constructors must be provided to work around
-// http://www.open-std.org/jtc1/sc22/wg21/docs/cwg_active.html#253
-
-#include "clamp_policy.hpp"
-#include "dynamic_policy.hpp"
 #include "modulo_policy.hpp"
-#include "null_policy.hpp"
-#include "throw_policy.hpp"
-
-#endif	// BOUNDED_INTEGER_POLICY_ALL_HPP_

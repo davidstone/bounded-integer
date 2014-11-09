@@ -630,6 +630,7 @@ auto check_minmax() {
 	check_reference_minmax();
 }
 
+
 namespace check_arithmetic {
 	constexpr bounded::integer<1, 10, bounded::throw_policy> const x(9);
 	static_assert(
@@ -956,6 +957,68 @@ auto check_throw_policy() {
 	catch (...) {
 	}
 }
+
+namespace check_modulo_policy {
+
+	constexpr bounded::modulo_policy policy;
+
+	static_assert(
+		policy.assignment(5_bi, 0_bi, 9_bi) == 5_bi,
+		"Incorrect result for a minimum of zero and value in range."
+	);
+
+	static_assert(
+		policy.assignment(5_bi, -5_bi, 9_bi) == 5_bi,
+		"Incorrect result for a negative minimum and value in range."
+	);
+	static_assert(
+		policy.assignment(-5_bi, -5_bi, 9_bi) == -5_bi,
+		"Incorrect result for a negative minimum and value equal to the minimum."
+	);
+
+	static_assert(
+		policy.assignment(17_bi, 0_bi, 9_bi) == 7_bi,
+		"Incorrect result for a minimum of zero and value too high."
+	);
+
+	static_assert(
+		policy.assignment(1_bi, 2_bi, 9_bi) == 9_bi,
+		"Incorrect result for a positive minimum and a positive value too low."
+	);
+
+	static_assert(
+		policy.assignment(-1_bi, 0_bi, 9_bi) == 9_bi,
+		"Incorrect result for a minimum of zero and value too low."
+	);
+
+	static_assert(
+		policy.assignment(12_bi, -5_bi, 9_bi) == -3_bi,
+		"Incorrect result for a negative minimum and value too high."
+	);
+
+	static_assert(
+		policy.assignment(-10_bi, -5_bi, 9_bi) == 5_bi,
+		"Incorrect result for a negative minimum and value too low."
+	);
+
+	static_assert(
+		policy.assignment(-1000_bi, 4_bi, 4_bi) == 4_bi,
+		"Incorrect result for a single-value range and value too low."
+	);
+	static_assert(
+		policy.assignment(4_bi, 4_bi, 4_bi) == 4_bi,
+		"Incorrect result for a single-value range and value in range."
+	);
+	static_assert(
+		policy.assignment(678412_bi, 4_bi, 4_bi) == 4_bi,
+		"Incorrect result for a single-value range and value too high."
+	);
+
+	static_assert(
+		policy.assignment(0_bi, 0_bi, 0_bi) == 0_bi,
+		"Incorrect result for a single-value range that can only hold 0 and a value of 0."
+	);
+}	// namespace
 
 namespace check_clamp_policy {
 	static constexpr auto minimum = 27_bi;

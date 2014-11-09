@@ -76,6 +76,7 @@ base_sources = [('test',
 		'common_policy.cpp',
 		'dynamic_policy.cpp',
 		'is_overflow_policy.cpp',
+		'modulo_policy.cpp',
 		'null_policy.cpp',
 		'throw_policy.cpp',
 	]) +
