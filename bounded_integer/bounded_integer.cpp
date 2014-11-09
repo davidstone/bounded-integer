@@ -630,59 +630,6 @@ auto check_minmax() {
 	check_reference_minmax();
 }
 
-namespace check_null_policy {
-	constexpr bounded::null_policy policy;
-	constexpr auto value1 = policy.assignment(5, bounded::make<0>(), bounded::make<10>());
-	// This should not compile
-	// constexpr auto value2 = policy.assignment(15, bounded::make<0>(), bounded::make<10>());
-}
-
-auto check_throw_policy() {
-	using bounded::checked_integer;
-	static_assert(
-		!noexcept(std::declval<checked_integer<0, 0> &>() = std::declval<checked_integer<0, 1> &>()),
-		"Shouldn't be noexcept."
-	);
-	static constexpr auto minimum = bounded::make<0>();
-	static constexpr auto maximum = bounded::make<10>();
-	bounded::throw_policy policy;
-	try {
-		policy.assignment(20, minimum, maximum);
-		assert(false);
-	}
-	catch (...) {
-	}
-	try {
-		policy.assignment(-6, minimum, maximum);
-		assert(false);
-	}
-	catch (...) {
-	}
-}
-
-namespace check_clamp_policy {
-	static constexpr auto minimum = bounded::make<27>();
-	static constexpr auto maximum = bounded::make<567>();
-	constexpr bounded::clamp_policy policy;
-	static_assert(policy.assignment(bounded::make<20>(), minimum, maximum) == minimum, "Failure to properly clamp lesser positive values.");
-	static_assert(policy.assignment(bounded::make<-25>(), minimum, maximum) == minimum, "Failure to properly clamp negative values to a positive value.");
-	static_assert(policy.assignment(bounded::make<1000>(), minimum, maximum) == maximum, "Failure to properly clamp greater positive values.");
-	static_assert(policy.assignment(bounded::make<2000>(), minimum, maximum) == maximum, "Fail to clamp above range with a strictly greater type.");
-
-	using type = bounded::integer<-100, 100, bounded::clamp_policy>;
-	constexpr auto initial = std::numeric_limits<type::underlying_type>::max() + bounded::make<1>();
-	constexpr type value(initial);
-	static_assert(value == std::numeric_limits<type>::max(), "Fail to clamp value when the source type is larger than the destination type.");
-
-
-	constexpr bounded::integer<minimum.value(), maximum.value(), bounded::clamp_policy> integer(bounded::make<1000>());
-	static_assert(integer == maximum, "Fail to clamp when using a bounded.");
-}
-
-auto check_policies() {
-	check_throw_policy();
-}
-
 namespace check_arithmetic {
 	constexpr bounded::integer<1, 10, bounded::throw_policy> const x(9);
 	static_assert(
@@ -980,6 +927,78 @@ namespace check_conditional {
 }
 
 
+namespace check_null_policy {
+	constexpr bounded::null_policy policy;
+	constexpr auto value1 = policy.assignment(5, 0_bi, 10_bi);
+	// This should not compile
+	// constexpr auto value2 = policy.assignment(15, 0_bi, 10_bi);
+}
+
+auto check_throw_policy() {
+	using bounded::checked_integer;
+	static_assert(
+		!noexcept(std::declval<checked_integer<0, 0> &>() = std::declval<checked_integer<0, 1> &>()),
+		"Shouldn't be noexcept."
+	);
+	static constexpr auto minimum = 0_bi;
+	static constexpr auto maximum = 10_bi;
+	bounded::throw_policy policy;
+	try {
+		policy.assignment(20, minimum, maximum);
+		assert(false);
+	}
+	catch (...) {
+	}
+	try {
+		policy.assignment(-6, minimum, maximum);
+		assert(false);
+	}
+	catch (...) {
+	}
+}
+
+namespace check_clamp_policy {
+	static constexpr auto minimum = 27_bi;
+	static constexpr auto maximum = 567_bi;
+	constexpr bounded::clamp_policy policy;
+	static_assert(
+		policy.assignment(20_bi, minimum, maximum) == minimum,
+		"Failure to properly clamp lesser positive values."
+	);
+	static_assert(
+		policy.assignment(-25_bi, minimum, maximum) == minimum,
+		"Failure to properly clamp negative values to a positive value."
+	);
+	static_assert(
+		policy.assignment(1000_bi, minimum, maximum) == maximum,
+		"Failure to properly clamp greater positive values."
+	);
+	static_assert(
+		policy.assignment(2000_bi, minimum, maximum) == maximum,
+		"Fail to clamp above range with a strictly greater type."
+	);
+
+	using type = bounded::integer<-100, 100, bounded::clamp_policy>;
+	constexpr auto initial = std::numeric_limits<type::underlying_type>::max() + 1_bi;
+	constexpr type value(initial);
+	static_assert(
+		value == std::numeric_limits<type>::max(),
+		"Fail to clamp value when the source type is larger than the destination type."
+	);
+
+
+	constexpr bounded::integer<minimum.value(), maximum.value(), bounded::clamp_policy> integer(1000_bi);
+	static_assert(
+		integer == maximum,
+		"Fail to clamp when using a bounded."
+	);
+}
+
+auto check_policies() {
+	check_throw_policy();
+}
+
+
 auto check_assignment() {
 	bounded::integer<0, 10> x(5);
 	// The following cannot compile due to out of range check
@@ -1150,8 +1169,8 @@ auto check_streaming() {
 
 auto check_dynamic_policy() {
 	constexpr bounded::dynamic_policy<0, 10, bounded::clamp_policy> clamp;
-	static_assert(clamp.assignment(bounded::make<3>(), bounded::make<2>(), bounded::make<5>()) == 3, "Incorrect dynamic policy result when the static range is entirely within range.");
-	static_assert(clamp.assignment(bounded::make<11>(), bounded::make<0>(), bounded::make<20>()) == 10, "Incorrect dynamic clamp policy result when the dynamic range is the limiting factor.");
+	static_assert(clamp.assignment(3_bi, 2_bi, 5_bi) == 3_bi, "Incorrect dynamic policy result when the static range is entirely within range.");
+	static_assert(clamp.assignment(11_bi, 0_bi, 20_bi) == 10_bi, "Incorrect dynamic clamp policy result when the dynamic range is the limiting factor.");
 
 	constexpr auto value = 3_bi;
 	constexpr auto min = 1_bi;
