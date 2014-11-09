@@ -361,15 +361,145 @@ auto check_numeric_limits_all() {
 	// check_numeric_limits<uint64_t>();
 }
 
+namespace check_overlapping_range {
+	using type = bounded::integer<0, 0>;
+	static_assert(bounded::detail::type_overlaps_range<type>(0, 0), "Type should overlap its own range.");
+	static_assert(bounded::detail::type_fits_in_range<type>(0, 0), "Type should fit in its own range.");
+	static_assert(!bounded::detail::type_overlaps_range<type>(1, 1), "Type should not overlap a disjoint range.");
+}
+
+namespace check_class {
+	constexpr auto min = std::numeric_limits<int>::min();
+	constexpr auto max = std::numeric_limits<int>::max();
+	using type = bounded::integer<min, max>;
+
+	static_assert(
+		bounded::detail::type_overlaps_range<std::decay_t<type>>(min, max),
+		"Bounds of type do not overlap its own range."
+	);
+
+	static_assert(
+		bounded::detail::is_explicitly_constructible_from<bounded::null_policy, type>(min, max),
+		"Type is not explicitly constructible from itself."
+	);
+
+	static_assert(
+		std::is_convertible<int, type>::value,
+		"Cannot convert integer type to bounded::integer with same range."
+	);
+	static_assert(
+		std::is_constructible<type, type, bounded::non_check_t>::value,
+		"Cannot construct a type from itself with non_check_t."
+	);
+
+	constexpr bounded::integer<min, max, bounded::null_policy, bounded::storage_type::least> least(0);
+}
+
+namespace check_make {
+	static_assert(
+		std::is_same<
+			bounded::detail::equivalent_overflow_policy<int>,
+			bounded::null_policy
+		>::value,
+		"int should have a null_policy"
+	);
+	static_assert(
+		std::is_same<
+			bounded::detail::equivalent_overflow_policy<bounded::integer<0, 0, bounded::throw_policy>>,
+			bounded::throw_policy
+		>::value,
+		"incorrect equivalent_overflow_policy for bounded::integer."
+	);
+}
+
+namespace check_comparison {
+	constexpr bounded::integer<1, 10> a(5);
+	static_assert(
+		a == a,
+		"Values do not equal themselves"
+	);
+	static_assert(
+		a == 5,
+		"Values do not equal their underlying value"
+	);
+	constexpr bounded::integer<4, 36346, bounded::throw_policy> b(5);
+	static_assert(
+		a == b,
+		"Values do not equal equivalent other bounded::integer types"
+	);
+
+	static_assert(
+		bounded::make<5>() != bounded::make<6>(),
+		"5 should not equal 6"
+	);
+
+	constexpr auto one = bounded::make<1>();
+	static_assert(
+		!std::numeric_limits<decltype(one)>::is_signed,
+		"Value should be unsigned for this test."
+	);
+	constexpr auto negative_one = bounded::make<-1>();
+	static_assert(
+		std::numeric_limits<decltype(negative_one)>::is_signed,
+		"Value should be signed for this test."
+	);
+	static_assert(
+		negative_one < one,
+		"Small negative values should be less than small positive values."
+	);
+	constexpr intmax_t int_min = std::numeric_limits<int>::min();
+	constexpr intmax_t int_max = std::numeric_limits<int>::max();
+	static_assert(
+		bounded::make<int_min>() < bounded::make<int_max + 1>(),
+		"Large negative values should be less than large positive values."
+	);
+
+	// I have to use the preprocessor here to create a string literal
+	#define BOUNDED_INTEGER_SINGLE_COMPARISON(op, a, b) \
+		static_assert( \
+			((a) op (b)), \
+			"Incorrect result for (" #a ") " #op " ( "#b ")" \
+		)
+
+	#define BOUNDED_INTEGER_MULTI_COMPARISON(op, a, b, c) \
+		BOUNDED_INTEGER_SINGLE_COMPARISON(op, a, b); \
+		BOUNDED_INTEGER_SINGLE_COMPARISON(op, b, c); \
+		BOUNDED_INTEGER_SINGLE_COMPARISON(op, a, c); \
+		static_assert( \
+			!((c) op (a)), \
+			"Incorrect result for !((" #c ") " #op " (" #a "))" \
+		)
+	
+	#define BOUNDED_INTEGER_COMPARISON(op, a, b, c) \
+		BOUNDED_INTEGER_MULTI_COMPARISON(op, a, b, c); \
+		BOUNDED_INTEGER_MULTI_COMPARISON(op, bounded::make<a>(), b, c); \
+		BOUNDED_INTEGER_MULTI_COMPARISON(op, a, bounded::make<b>(), c); \
+		BOUNDED_INTEGER_MULTI_COMPARISON(op, a, b, bounded::make<c>()); \
+		BOUNDED_INTEGER_MULTI_COMPARISON(op, bounded::make<a>(), bounded::make<b>(), c); \
+		BOUNDED_INTEGER_MULTI_COMPARISON(op, bounded::make<a>(), b, bounded::make<c>()); \
+		BOUNDED_INTEGER_MULTI_COMPARISON(op, a, bounded::make<b>(), bounded::make<c>()); \
+		BOUNDED_INTEGER_MULTI_COMPARISON(op, bounded::make<a>(), bounded::make<b>(), bounded::make<c>())
+
+	BOUNDED_INTEGER_COMPARISON(<=, -4, -4, 16);
+	BOUNDED_INTEGER_COMPARISON(<, -17, 0, 17);
+	BOUNDED_INTEGER_COMPARISON(>=, 876, 876, 367);
+	BOUNDED_INTEGER_COMPARISON(>, 1LL << 50LL, 1LL << 30LL, 7);
+
+	#undef BOUNDED_INTEGER_COMPARISON
+	#undef BOUNDED_INTEGER_MULTI_COMPARISON
+	#undef BOUNDED_INTEGER_SINGLE_COMPARISON
+
+}
+
 namespace check_single_argument_minmax {
-	constexpr auto value = 5_bi;
+	constexpr auto value = bounded::make<5>();
 	static_assert(bounded::min(value) == value, "A value does not have itself as the minimum.");
 	static_assert(bounded::max(value) == value, "A value does not have itself as the maximum.");
 }
 
 namespace check_double_argument_minmax {
-	constexpr auto lower_value = 6_bi;
-	constexpr auto greater_value = 10_bi;
+	constexpr auto lower_value = bounded::make<6>();
+	constexpr auto greater_value = bounded::make<10>();
 	static_assert(bounded::min(lower_value, greater_value) == lower_value, "Two argument min value incorrect.");
 	static_assert(bounded::min(greater_value, lower_value) == lower_value, "Two argument min value incorrect.");
 	static_assert(bounded::max(lower_value, greater_value) == greater_value, "Two argument max value incorrect.");
@@ -377,16 +507,16 @@ namespace check_double_argument_minmax {
 }
 
 namespace check_many_argument_minmax {
-	constexpr bounded::integer<-53, 1000> value(3_bi);
-	constexpr auto minimum = bounded::min(0_bi, 10_bi, 5_bi, value);
+	constexpr bounded::integer<-53, 1000> value(bounded::make<3>());
+	constexpr auto minimum = bounded::min(bounded::make<0>(), bounded::make<10>(), bounded::make<5>(), value);
 	using min_type = decltype(minimum);
-	static_assert(minimum == 0_bi, "Incorrect minimum value.");
+	static_assert(minimum == bounded::make<0>(), "Incorrect minimum value.");
 	static_assert(std::numeric_limits<min_type>::min() == -53, "Incorrect minimum minimum.");
 	static_assert(std::numeric_limits<min_type>::max() == 0, "Incorrect maximum minimum.");
 
-	constexpr auto maximum = bounded::max(0_bi, 10_bi, 5_bi, value);
+	constexpr auto maximum = bounded::max(bounded::make<0>(), bounded::make<10>(), bounded::make<5>(), value);
 	using max_type = decltype(maximum);
-	static_assert(maximum == 10_bi, "Incorrect maximum value.");
+	static_assert(maximum == bounded::make<10>(), "Incorrect maximum value.");
 	static_assert(std::numeric_limits<max_type>::min() == 10, "Incorrect minimum maximum.");
 	static_assert(std::numeric_limits<max_type>::max() == 1000, "Incorrect maximum maximum.");
 }
@@ -502,9 +632,9 @@ auto check_minmax() {
 
 namespace check_null_policy {
 	constexpr bounded::null_policy policy;
-	constexpr auto value1 = policy.assignment(5, 0, 10);
+	constexpr auto value1 = policy.assignment(5, bounded::make<0>(), bounded::make<10>());
 	// This should not compile
-	// constexpr auto value2 = policy.assignment(15, 0, 10);
+	// constexpr auto value2 = policy.assignment(15, bounded::make<0>(), bounded::make<10>());
 }
 
 auto check_throw_policy() {
@@ -513,8 +643,8 @@ auto check_throw_policy() {
 		!noexcept(std::declval<checked_integer<0, 0> &>() = std::declval<checked_integer<0, 1> &>()),
 		"Shouldn't be noexcept."
 	);
-	static constexpr intmax_t minimum = 0;
-	static constexpr intmax_t maximum = 10;
+	static constexpr auto minimum = bounded::make<0>();
+	static constexpr auto maximum = bounded::make<10>();
 	bounded::throw_policy policy;
 	try {
 		policy.assignment(20, minimum, maximum);
@@ -531,145 +661,26 @@ auto check_throw_policy() {
 }
 
 namespace check_clamp_policy {
-	static constexpr intmax_t minimum = 27;
-	static constexpr intmax_t maximum = 567;
+	static constexpr auto minimum = bounded::make<27>();
+	static constexpr auto maximum = bounded::make<567>();
 	constexpr bounded::clamp_policy policy;
-	static_assert(policy.assignment(20, minimum, maximum) == minimum, "Failure to properly clamp lesser positive values.");
-	static_assert(policy.assignment(-25, minimum, maximum) == minimum, "Failure to properly clamp negative values to a positive value.");
-	static_assert(policy.assignment(1000, minimum, maximum) == maximum, "Failure to properly clamp greater positive values.");
-	static_assert(policy.assignment(2000_bi, minimum, maximum) == maximum, "Fail to clamp above range with a strictly greater type.");
+	static_assert(policy.assignment(bounded::make<20>(), minimum, maximum) == minimum, "Failure to properly clamp lesser positive values.");
+	static_assert(policy.assignment(bounded::make<-25>(), minimum, maximum) == minimum, "Failure to properly clamp negative values to a positive value.");
+	static_assert(policy.assignment(bounded::make<1000>(), minimum, maximum) == maximum, "Failure to properly clamp greater positive values.");
+	static_assert(policy.assignment(bounded::make<2000>(), minimum, maximum) == maximum, "Fail to clamp above range with a strictly greater type.");
 
 	using type = bounded::integer<-100, 100, bounded::clamp_policy>;
-	constexpr auto initial = std::numeric_limits<type::underlying_type>::max() + 1_bi;
+	constexpr auto initial = std::numeric_limits<type::underlying_type>::max() + bounded::make<1>();
 	constexpr type value(initial);
 	static_assert(value == std::numeric_limits<type>::max(), "Fail to clamp value when the source type is larger than the destination type.");
 
 
-	constexpr bounded::integer<minimum, maximum, bounded::clamp_policy> integer(1000_bi);
+	constexpr bounded::integer<minimum.value(), maximum.value(), bounded::clamp_policy> integer(bounded::make<1000>());
 	static_assert(integer == maximum, "Fail to clamp when using a bounded.");
 }
 
 auto check_policies() {
 	check_throw_policy();
-}
-
-namespace check_overlapping_range {
-	using type = bounded::integer<0, 0>;
-	static_assert(bounded::detail::type_overlaps_range<type>(0, 0), "Type should overlap its own range.");
-	static_assert(bounded::detail::type_fits_in_range<type>(0, 0), "Type should fit in its own range.");
-	static_assert(!bounded::detail::type_overlaps_range<type>(1, 1), "Type should not overlap a disjoint range.");
-}
-
-namespace check_class {
-	constexpr auto min = std::numeric_limits<int>::min();
-	constexpr auto max = std::numeric_limits<int>::max();
-	using type = bounded::integer<min, max>;
-
-	static_assert(
-		bounded::detail::type_overlaps_range<std::decay_t<type>>(min, max),
-		"Bounds of type do not overlap its own range."
-	);
-
-	static_assert(
-		bounded::detail::is_explicitly_constructible_from<bounded::null_policy, type>(min, max),
-		"Type is not explicitly constructible from itself."
-	);
-
-	static_assert(
-		std::is_convertible<int, type>::value,
-		"Cannot convert integer type to bounded::integer with same range."
-	);
-	static_assert(
-		std::is_constructible<type, type, bounded::non_check_t>::value,
-		"Cannot construct a type from itself with non_check_t."
-	);
-
-	constexpr bounded::integer<min, max, bounded::null_policy, bounded::storage_type::least> least(0);
-}
-
-namespace check_make {
-	static_assert(
-		std::is_same<
-			bounded::detail::equivalent_overflow_policy<int>,
-			bounded::null_policy
-		>::value,
-		"int should have a null_policy"
-	);
-	static_assert(
-		std::is_same<
-			bounded::detail::equivalent_overflow_policy<bounded::integer<0, 0, bounded::throw_policy>>,
-			bounded::throw_policy
-		>::value,
-		"incorrect equivalent_overflow_policy for bounded::integer."
-	);
-}
-
-namespace check_comparison {
-	constexpr bounded::integer<1, 10> a(5);
-	static_assert(
-		a == a,
-		"Values do not equal themselves"
-	);
-	static_assert(
-		a == 5,
-		"Values do not equal their underlying value"
-	);
-	constexpr bounded::integer<4, 36346, bounded::throw_policy> b(5);
-	static_assert(
-		a == b,
-		"Values do not equal equivalent other bounded::integer types"
-	);
-
-	static_assert(
-		bounded::make<5>() != bounded::make<6>(),
-		"5 should not equal 6"
-	);
-
-	constexpr auto one = bounded::make<1>();
-	static_assert(
-		!std::numeric_limits<decltype(one)>::is_signed,
-		"Value should be unsigned for this test."
-	);
-	constexpr auto negative_one = bounded::make<-1>();
-	static_assert(
-		std::numeric_limits<decltype(negative_one)>::is_signed,
-		"Value should be signed for this test."
-	);
-	static_assert(
-		negative_one < one,
-		"Small negative values should be less than small positive values."
-	);
-	constexpr intmax_t int_min = std::numeric_limits<int>::min();
-	constexpr intmax_t int_max = std::numeric_limits<int>::max();
-	static_assert(
-		bounded::make<int_min>() < bounded::make<int_max + 1>(),
-		"Large negative values should be less than large positive values."
-	);
-
-	// I have to use the preprocessor here to create a string literal
-	#define BOUNDED_INTEGER_SINGLE_COMPARISON(op, a, b) \
-		static_assert( \
-			(bounded::make<a>() op bounded::make<b>()), \
-			"Incorrect result for (" #a ") " #op " ( "#b ")" \
-		)
-
-	#define BOUNDED_INTEGER_COMPARISON(op, a, b, c) \
-		BOUNDED_INTEGER_SINGLE_COMPARISON(op, a, b); \
-		BOUNDED_INTEGER_SINGLE_COMPARISON(op, b, c); \
-		BOUNDED_INTEGER_SINGLE_COMPARISON(op, a, c); \
-		static_assert( \
-			!(bounded::make<c>() op bounded::make<a>()), \
-			"Incorrect result for !((" #c ") " #op " (" #a "))" \
-		)
-
-	BOUNDED_INTEGER_COMPARISON(<=, -4, -4, 16);
-	BOUNDED_INTEGER_COMPARISON(<, -17, 0, 17);
-	BOUNDED_INTEGER_COMPARISON(>=, 876, 876, 367);
-	BOUNDED_INTEGER_COMPARISON(>, 1LL << 50LL, 1LL << 30LL, 7);
-
-	#undef BOUNDED_INTEGER_COMPARISON
-	#undef BOUNDED_INTEGER_SINGLE_COMPARISON
-
 }
 
 namespace check_arithmetic {
@@ -1139,8 +1150,8 @@ auto check_streaming() {
 
 auto check_dynamic_policy() {
 	constexpr bounded::dynamic_policy<0, 10, bounded::clamp_policy> clamp;
-	static_assert(clamp.assignment(3, 2, 5) == 3, "Incorrect dynamic policy result when the static range is entirely within range.");
-	static_assert(clamp.assignment(11, 0, 20) == 10, "Incorrect dynamic clamp policy result when the dynamic range is the limiting factor.");
+	static_assert(clamp.assignment(bounded::make<3>(), bounded::make<2>(), bounded::make<5>()) == 3, "Incorrect dynamic policy result when the static range is entirely within range.");
+	static_assert(clamp.assignment(bounded::make<11>(), bounded::make<0>(), bounded::make<20>()) == 10, "Incorrect dynamic clamp policy result when the dynamic range is the limiting factor.");
 
 	constexpr auto value = 3_bi;
 	constexpr auto min = 1_bi;

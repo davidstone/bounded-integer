@@ -19,7 +19,8 @@
 
 #include "basic_policy.hpp"
 #include "common_policy.hpp"
-#include <cstdint>
+#include "../is_bounded_integer.hpp"
+#include "../operators/comparison.hpp"
 #include <utility>
 
 namespace bounded {
@@ -33,17 +34,19 @@ public:
 	// same value and eliminate all branching, creating no overhead. See
 	// http://stackoverflow.com/questions/20461121/constexpr-error-at-compile-time-but-no-overhead-at-run-time
 	template<typename T, typename Minimum, typename Maximum>
-	static constexpr auto assignment(T && value, Minimum && minimum, Maximum && maximum) noexcept {
+	static constexpr auto assignment(T && value, Minimum && minimum, Maximum && maximum) noexcept -> T && {
+		static_assert(is_bounded_integer<std::decay_t<Minimum>>::value, "Only bounded::integer types are supported.");
+		static_assert(is_bounded_integer<std::decay_t<Maximum>>::value, "Only bounded::integer types are supported.");
 		return (minimum <= value and value <= maximum) ?
-			static_cast<intmax_t>(value) :
-			static_cast<intmax_t>(error_out_of_range(value));
+			std::forward<T>(value) :
+			error_out_of_range(std::forward<T>(value));
 	}
 
 	static constexpr bool is_modulo = false;
 	static constexpr bool overflow_is_error = true;
 private:
 	template<typename T>
-	static decltype(auto) error_out_of_range(T && value) noexcept {
+	static auto error_out_of_range(T && value) noexcept -> T && {
 		return std::forward<T>(value);
 	}
 };

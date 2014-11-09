@@ -19,6 +19,7 @@
 
 #include "common_type.hpp"
 #include "common_type_and_value_category.hpp"
+#include "enable_if.hpp"
 #include "is_bounded_integer.hpp"
 #include "numeric_limits.hpp"
 #include "overlapping_range.hpp"
@@ -121,7 +122,6 @@ template<typename Compare, typename T1, typename T2, enable_if_t<
 	not detail::types_overlap<extreme_t<Compare, T1, T2>, T2>::value
 > = clang_dummy>
 constexpr decltype(auto) extreme(Compare, T1 && t1, T2 &&) noexcept {
-	static_assert(std::is_same<std::decay_t<T1>, std::decay_t<extreme_t<Compare, T1, T2>>>::value, "Incorrect type with no overlap.");
 	return std::forward<T1>(t1);
 }
 template<typename Compare, typename T1, typename T2, enable_if_t<
@@ -129,7 +129,6 @@ template<typename Compare, typename T1, typename T2, enable_if_t<
 	not detail::types_overlap<extreme_t<Compare, T1, T2>, T1>::value
 > = clang_dummy>
 constexpr decltype(auto) extreme(Compare, T1 &&, T2 && t2) noexcept {
-	static_assert(std::is_same<std::decay_t<T2>, std::decay_t<extreme_t<Compare, T1, T2>>>::value, "Incorrect type with no overlap.");
 	return std::forward<T2>(t2);
 }
 

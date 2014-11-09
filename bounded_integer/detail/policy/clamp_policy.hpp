@@ -18,8 +18,9 @@
 #define BOUNDED_INTEGER_POLICY_CLAMP_POLICY_HPP_
 
 #include "basic_policy.hpp"
-#include "../operators/comparison_builtin.hpp"
-#include <cstdint>
+#include "../is_bounded_integer.hpp"
+#include "../make.hpp"
+#include "../minmax.hpp"
 
 namespace bounded {
 namespace policy_detail {
@@ -27,11 +28,11 @@ namespace policy_detail {
 class clamp_policy {
 public:
 	template<typename T, typename Minimum, typename Maximum>
-	static constexpr auto assignment(T && value, Minimum && minimum, Maximum && maximum) noexcept {
-		return
-			(value <= minimum) ? static_cast<intmax_t>(minimum) :
-			(value >= maximum) ? static_cast<intmax_t>(maximum) :
-			static_cast<intmax_t>(value);
+	static constexpr decltype(auto) assignment(T && value, Minimum && minimum, Maximum && maximum) noexcept {
+		static_assert(is_bounded_integer<std::decay_t<T>>::value, "Only bounded::integer types are supported.");
+		static_assert(is_bounded_integer<std::decay_t<Minimum>>::value, "Only bounded::integer types are supported.");
+		static_assert(is_bounded_integer<std::decay_t<Maximum>>::value, "Only bounded::integer types are supported.");
+		return min(max(value, minimum), maximum);
 	}
 
 	static constexpr bool is_modulo = false;

@@ -18,8 +18,9 @@
 #define BOUNDED_INTEGER_POLICY_THROW_POLICY_HPP_
 
 #include "basic_policy.hpp"
+#include "../is_bounded_integer.hpp"
 #include "../string.hpp"
-#include <cstdint>
+#include "../operators/comparison.hpp"
 #include <stdexcept>
 
 namespace bounded {
@@ -29,10 +30,12 @@ class throw_policy {
 public:
 	// The optimizer should be able to simplify this to remove dead checks.
 	template<typename T, typename Minimum, typename Maximum>
-	static constexpr auto assignment(T && value, Minimum && minimum, Maximum && maximum) {
+	static constexpr auto assignment(T && value, Minimum && minimum, Maximum && maximum) -> T && {
+		static_assert(is_bounded_integer<std::decay_t<Minimum>>::value, "Only bounded::integer types are supported.");
+		static_assert(is_bounded_integer<std::decay_t<Maximum>>::value, "Only bounded::integer types are supported.");
 		return (minimum <= value and value <= maximum) ?
-			static_cast<intmax_t>(value) :
-			throw std::range_error("Got a value of " + to_string(+value) + " but expected a value in the range [" + to_string(+minimum) + ", " + to_string(+maximum) + "]");
+			std::forward<T>(value) :
+			(throw std::range_error("Got a value of " + to_string(value) + " but expected a value in the range [" + to_string(minimum) + ", " + to_string(maximum) + "]"), std::forward<T>(value));
 	}
 	
 	static constexpr bool is_modulo = false;

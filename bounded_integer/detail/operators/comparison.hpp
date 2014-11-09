@@ -19,13 +19,11 @@
 
 #include "../common_type.hpp"
 #include "../forward_declaration.hpp"
-#include "../policy/null_policy.hpp"
 
 #include <cstdint>
 #include <type_traits>
 
 namespace bounded {
-
 
 namespace detail {
 
@@ -36,12 +34,12 @@ constexpr storage_type comparison_storage_type(storage_type lhs_storage, storage
 	return (lhs_storage <= rhs_storage) ? lhs_storage : rhs_storage;
 }
 
-// This uses the null_policy because policies do not matter for comparisons.
-// This allows the user to compare integers with unrelated policies.
-template<intmax_t lhs_min, intmax_t lhs_max, storage_type lhs_storage, intmax_t rhs_min, intmax_t rhs_max, storage_type rhs_storage>
+// This uses any policy because policies do not matter for comparisons. This
+// allows the user to compare integers with unrelated policies.
+template<intmax_t lhs_min, intmax_t lhs_max, storage_type lhs_storage, intmax_t rhs_min, intmax_t rhs_max, storage_type rhs_storage, typename policy>
 using comparison_type = typename std::common_type_t<
-	integer<lhs_min, lhs_max, null_policy, comparison_storage_type(lhs_storage, rhs_storage)>,
-	integer<rhs_min, rhs_max, null_policy, comparison_storage_type(lhs_storage, rhs_storage)>
+	integer<lhs_min, lhs_max, policy, comparison_storage_type(lhs_storage, rhs_storage)>,
+	integer<rhs_min, rhs_max, policy, comparison_storage_type(lhs_storage, rhs_storage)>
 >::underlying_type const;
 
 }	// namespace detail
@@ -51,8 +49,8 @@ template<
 	intmax_t lhs_min, intmax_t lhs_max, typename lhs_overflow, storage_type lhs_storage,
 	intmax_t rhs_min, intmax_t rhs_max, typename rhs_overflow, storage_type rhs_storage
 >
-constexpr auto operator==(integer<lhs_min, lhs_max, lhs_overflow, lhs_storage> const lhs, integer<rhs_min, rhs_max, rhs_overflow, rhs_storage> const rhs) noexcept {
-	using common_t = detail::comparison_type<lhs_min, lhs_max, lhs_storage, rhs_min, rhs_max, rhs_storage>;
+constexpr auto operator==(integer<lhs_min, lhs_max, lhs_overflow, lhs_storage> const & lhs, integer<rhs_min, rhs_max, rhs_overflow, rhs_storage> const & rhs) noexcept {
+	using common_t = detail::comparison_type<lhs_min, lhs_max, lhs_storage, rhs_min, rhs_max, rhs_storage, lhs_overflow>;
 	return static_cast<common_t>(lhs) == static_cast<common_t>(rhs);
 }
 
@@ -60,7 +58,7 @@ template<
 	intmax_t lhs_min, intmax_t lhs_max, typename lhs_overflow, storage_type lhs_storage,
 	intmax_t rhs_min, intmax_t rhs_max, typename rhs_overflow, storage_type rhs_storage
 >
-constexpr auto operator!=(integer<lhs_min, lhs_max, lhs_overflow, lhs_storage> const lhs, integer<rhs_min, rhs_max, rhs_overflow, rhs_storage> const rhs) noexcept {
+constexpr auto operator!=(integer<lhs_min, lhs_max, lhs_overflow, lhs_storage> const & lhs, integer<rhs_min, rhs_max, rhs_overflow, rhs_storage> const & rhs) noexcept {
 	return !(lhs == rhs);
 }
 
@@ -71,8 +69,8 @@ template<
 	intmax_t lhs_min, intmax_t lhs_max, typename lhs_overflow, storage_type lhs_storage,
 	intmax_t rhs_min, intmax_t rhs_max, typename rhs_overflow, storage_type rhs_storage
 >
-constexpr auto operator<(integer<lhs_min, lhs_max, lhs_overflow, lhs_storage> const lhs, integer<rhs_min, rhs_max, rhs_overflow, rhs_storage> const rhs) noexcept {
-	using common_t = detail::comparison_type<lhs_min, lhs_max, lhs_storage, rhs_min, rhs_max, rhs_storage>;
+constexpr auto operator<(integer<lhs_min, lhs_max, lhs_overflow, lhs_storage> const & lhs, integer<rhs_min, rhs_max, rhs_overflow, rhs_storage> const & rhs) noexcept {
+	using common_t = detail::comparison_type<lhs_min, lhs_max, lhs_storage, rhs_min, rhs_max, rhs_storage, lhs_overflow>;
 	return static_cast<common_t>(lhs) < static_cast<common_t>(rhs);
 }
 
@@ -80,7 +78,7 @@ template<
 	intmax_t lhs_min, intmax_t lhs_max, typename lhs_overflow, storage_type lhs_storage,
 	intmax_t rhs_min, intmax_t rhs_max, typename rhs_overflow, storage_type rhs_storage
 >
-constexpr auto operator>(integer<lhs_min, lhs_max, lhs_overflow, lhs_storage> const lhs, integer<rhs_min, rhs_max, rhs_overflow, rhs_storage> const rhs) noexcept {
+constexpr auto operator>(integer<lhs_min, lhs_max, lhs_overflow, lhs_storage> const & lhs, integer<rhs_min, rhs_max, rhs_overflow, rhs_storage> const & rhs) noexcept {
 	return rhs < lhs;
 }
 
@@ -88,7 +86,7 @@ template<
 	intmax_t lhs_min, intmax_t lhs_max, typename lhs_overflow, storage_type lhs_storage,
 	intmax_t rhs_min, intmax_t rhs_max, typename rhs_overflow, storage_type rhs_storage
 >
-constexpr auto operator<=(integer<lhs_min, lhs_max, lhs_overflow, lhs_storage> const lhs, integer<rhs_min, rhs_max, rhs_overflow, rhs_storage> const rhs) noexcept {
+constexpr auto operator<=(integer<lhs_min, lhs_max, lhs_overflow, lhs_storage> const & lhs, integer<rhs_min, rhs_max, rhs_overflow, rhs_storage> const & rhs) noexcept {
 	return !(rhs < lhs);
 }
 
@@ -96,7 +94,7 @@ template<
 	intmax_t lhs_min, intmax_t lhs_max, typename lhs_overflow, storage_type lhs_storage,
 	intmax_t rhs_min, intmax_t rhs_max, typename rhs_overflow, storage_type rhs_storage
 >
-constexpr auto operator>=(integer<lhs_min, lhs_max, lhs_overflow, lhs_storage> const lhs, integer<rhs_min, rhs_max, rhs_overflow, rhs_storage> const rhs) noexcept {
+constexpr auto operator>=(integer<lhs_min, lhs_max, lhs_overflow, lhs_storage> const & lhs, integer<rhs_min, rhs_max, rhs_overflow, rhs_storage> const & rhs) noexcept {
 	return !(lhs < rhs);
 }
 
