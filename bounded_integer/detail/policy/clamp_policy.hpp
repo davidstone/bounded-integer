@@ -32,7 +32,8 @@ public:
 		static_assert(is_bounded_integer<std::decay_t<T>>::value, "Only bounded::integer types are supported.");
 		static_assert(is_bounded_integer<std::decay_t<Minimum>>::value, "Only bounded::integer types are supported.");
 		static_assert(is_bounded_integer<std::decay_t<Maximum>>::value, "Only bounded::integer types are supported.");
-		return min(max(value, minimum), maximum);
+		using policy = typename std::decay_t<T>::overflow_policy_type;
+		return min(max(value, bounded::make<policy>(minimum)), bounded::make<policy>(maximum));
 	}
 
 	static constexpr bool is_modulo = false;
