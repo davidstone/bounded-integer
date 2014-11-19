@@ -35,7 +35,7 @@ decltype(auto) operator symbol##=(integer<minimum, maximum, overflow_policy, sto
 	return lhs; \
 } \
 template<intmax_t minimum, intmax_t maximum, typename overflow_policy, storage_type storage, typename T> \
-decltype(auto) operator symbol##=(integer<minimum, maximum, overflow_policy, storage> volatile & lhs, T && rhs) { \
+auto && operator symbol##=(integer<minimum, maximum, overflow_policy, storage> volatile & lhs, T && rhs) { \
 	lhs = static_cast<integer<minimum, maximum, overflow_policy, storage>>(lhs symbol make<overflow_policy>(std::forward<T>(rhs))); \
 	return lhs; \
 }
@@ -52,11 +52,11 @@ BOUNDED_INTEGER_COMPOUND_ASSIGNMENT_OPERATOR_TARGET(%)
 
 #define BOUNDED_INTEGER_COMPOUND_ASSIGNMENT_OPERATOR_SOURCE(symbol) \
 template<typename T, intmax_t minimum, intmax_t maximum, typename overflow_policy, storage_type storage, enable_if_t<detail::basic_numeric_limits<T>::is_integer and not is_bounded_integer<T>::value> = clang_dummy> \
-decltype(auto) operator symbol(T & lhs, integer<minimum, maximum, overflow_policy, storage> const rhs) noexcept { \
+auto && operator symbol(T & lhs, integer<minimum, maximum, overflow_policy, storage> const rhs) noexcept { \
 	return lhs symbol rhs.value(); \
 } \
 template<typename T, intmax_t minimum, intmax_t maximum, typename overflow_policy, storage_type storage, enable_if_t<detail::basic_numeric_limits<T>::is_integer> = clang_dummy> \
-decltype(auto) operator symbol(T volatile & lhs, integer<minimum, maximum, overflow_policy, storage> const rhs) noexcept { \
+auto && operator symbol(T volatile & lhs, integer<minimum, maximum, overflow_policy, storage> const rhs) noexcept { \
 	return lhs symbol rhs.value(); \
 }
 
@@ -73,12 +73,12 @@ BOUNDED_INTEGER_COMPOUND_ASSIGNMENT_OPERATOR_SOURCE(%=)
 // Increment / decrement
 
 template<intmax_t minimum, intmax_t maximum, typename overflow_policy, storage_type storage>
-decltype(auto) operator++(integer<minimum, maximum, overflow_policy, storage> & value) {
+auto && operator++(integer<minimum, maximum, overflow_policy, storage> & value) {
 	value += make<1>();
 	return value;
 }
 template<intmax_t minimum, intmax_t maximum, typename overflow_policy, storage_type storage>
-decltype(auto) operator++(integer<minimum, maximum, overflow_policy, storage> volatile & value) {
+auto && operator++(integer<minimum, maximum, overflow_policy, storage> volatile & value) {
 	value += make<1>();
 	return value;
 }
@@ -98,12 +98,12 @@ auto operator++(integer<minimum, maximum, overflow_policy, storage> volatile & v
 
 
 template<intmax_t minimum, intmax_t maximum, typename overflow_policy, storage_type storage>
-decltype(auto) operator--(integer<minimum, maximum, overflow_policy, storage> & value) {
+auto && operator--(integer<minimum, maximum, overflow_policy, storage> & value) {
 	value -= make<1>();
 	return value;
 }
 template<intmax_t minimum, intmax_t maximum, typename overflow_policy, storage_type storage>
-decltype(auto) operator--(integer<minimum, maximum, overflow_policy, storage> volatile & value) {
+auto && operator--(integer<minimum, maximum, overflow_policy, storage> volatile & value) {
 	value -= make<1>();
 	return value;
 }
