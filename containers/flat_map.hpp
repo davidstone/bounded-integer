@@ -107,7 +107,7 @@ public:
 		value_compare(key_compare c):
 			m_compare(c) {
 		}
-		Compare m_compare;
+		key_compare m_compare;
 	};
 	key_compare key_comp() const {
 		return key_compare{};
@@ -116,12 +116,12 @@ public:
 		return value_compare(key_comp());
 	}
 	
-	explicit flat_map_base(Compare const & compare = Compare{}, Allocator const & allocator = Allocator{}) {
+	explicit flat_map_base(key_compare const & compare = key_compare{}, Allocator const & allocator = Allocator{}) {
 	}
 	explicit flat_map_base(Allocator const & allocator) {
 	}
 	template<typename InputIterator>
-	flat_map_base(InputIterator first, InputIterator last, Compare const & compare = Compare{}, Allocator const & allocator = Allocator{}):
+	flat_map_base(InputIterator first, InputIterator last, key_compare const & compare = key_compare{}, Allocator const & allocator = Allocator{}):
 		m_container(first, last) {
 		auto const less = indirect_compare{value_comp()};
 		std::sort(moving_begin(m_container), moving_end(m_container), less);
@@ -133,7 +133,7 @@ public:
 	}
 	template<typename InputIterator>
 	flat_map_base(InputIterator first, InputIterator last, Allocator const & allocator):
-		flat_map_base(first, last, Compare{}, allocator) {
+		flat_map_base(first, last, key_compare{}, allocator) {
 	}
 	flat_map_base(flat_map_base const & other, Allocator const & allocator):
 		flat_map_base(other) {
@@ -141,11 +141,11 @@ public:
 	flat_map_base(flat_map_base && other, Allocator const & allocator):
 		flat_map_base(std::move(other)) {
 	}
-	flat_map_base(std::initializer_list<value_type> init, Compare const & compare = Compare{}, Allocator const & allocator = Allocator{}):
+	flat_map_base(std::initializer_list<value_type> init, key_compare const & compare = key_compare{}, Allocator const & allocator = Allocator{}):
 		flat_map_base(std::begin(init), std::end(init), allocator) {
 	}
 	flat_map_base(std::initializer_list<value_type> init, Allocator const & allocator):
-		flat_map_base(init, Compare{}, allocator) {
+		flat_map_base(init, key_compare{}, allocator) {
 	}
 	
 	flat_map_base & operator=(std::initializer_list<value_type> init) {

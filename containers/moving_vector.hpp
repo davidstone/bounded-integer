@@ -230,24 +230,24 @@ public:
 	using reverse_iterator = std::reverse_iterator<iterator>;
 	using reverse_indirect_iterator = std::reverse_iterator<indirect_iterator>;
 	
-	explicit moving_vector(allocator_type const & allocator = allocator_type{}) {
+	explicit moving_vector(allocator_type const & = allocator_type{}) {
 	}
-	explicit moving_vector(size_type count, allocator_type const & allocator = allocator_type{}) {
+	explicit moving_vector(size_type count, allocator_type const & = allocator_type{}) {
 		for (size_type n = 0; n != count; ++n) {
 			emplace_back();
 		}
 	}
-	moving_vector(size_type count, value_type const & value, allocator_type const & allocator = allocator_type{}) {
+	moving_vector(size_type count, value_type const & value, allocator_type const & = allocator_type{}) {
 		assign(count, value);
 	}
 	template<typename InputIterator>
-	moving_vector(InputIterator first, InputIterator last, allocator_type const & allocator = allocator_type{}) {
+	moving_vector(InputIterator first, InputIterator last, allocator_type const & = allocator_type{}) {
 		assign(first, last);
 	}
-	moving_vector(moving_vector const & other, allocator_type const & allocator):
+	moving_vector(moving_vector const & other, allocator_type const &):
 		moving_vector(other) {
 	}
-	moving_vector(moving_vector && other, allocator_type const & allocator):
+	moving_vector(moving_vector && other, allocator_type const &):
 		moving_vector(std::move(other)) {
 	}
 	moving_vector(std::initializer_list<value_type> init, allocator_type const & allocator = allocator_type{}):

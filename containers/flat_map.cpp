@@ -181,6 +181,8 @@ void test_performance(std::size_t const loop_count) {
 	
 	for (auto const & value : map) {
 		auto const volatile & thing = value;
+		auto ignore = [](auto &&){};
+		ignore(thing);
 	}
 	auto const iterated = high_resolution_clock::now();
 

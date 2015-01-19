@@ -193,28 +193,28 @@ public:
 	};
 
 
-	explicit forward_list(allocator_type const & alloc = allocator_type()) { }
-	explicit forward_list(size_type count, allocator_type const & alloc = allocator_type()) {
+	explicit forward_list(allocator_type const & = allocator_type()) { }
+	explicit forward_list(size_type count, allocator_type const & = allocator_type()) {
 		for (size_type n = 0; n != count; ++n) {
 			emplace_front();
 		}
 	}
-	forward_list(size_type count, value_type const & value, allocator_type const & alloc = allocator_type()) {
+	forward_list(size_type count, value_type const & value, allocator_type const & = allocator_type()) {
 		for (size_type n = 0; n != count; ++n) {
 			emplace_front(value);
 		}
 	}
 	template<typename InputIterator>
-	forward_list(InputIterator first, InputIterator last, allocator_type const & alloc = allocator_type()) {
+	forward_list(InputIterator first, InputIterator last, allocator_type const & = allocator_type()) {
 		auto previous = before_begin();
 		for ( ; first != last; ++first) {
 			previous = emplace_after(previous, *first);
 		}
 	}
-	forward_list(forward_list const & other, allocator_type const & alloc):
+	forward_list(forward_list const & other, allocator_type const &):
 		forward_list(other) {
 	}
-	forward_list(forward_list && other, allocator_type const & alloc):
+	forward_list(forward_list && other, allocator_type const &):
 		forward_list(std::move(other)) {
 	}
 	forward_list(std::initializer_list<value_type> init, allocator_type const & alloc = allocator_type()):
