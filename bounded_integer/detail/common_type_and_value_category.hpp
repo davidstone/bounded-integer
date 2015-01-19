@@ -48,27 +48,20 @@ private:
 	using CVTarget = common_cv_type_t<common_cv_type_t<Target, std::remove_reference_t<Source0>>, std::remove_reference_t<Source1>>;
 
 	static constexpr bool same_base_type = std::is_same<std::decay_t<Source0>, std::decay_t<Source1>>::value;
-	static constexpr bool prvalue =
-		not std::is_reference<Source0>::value or
-		not std::is_reference<Source1>::value or
-		not same_base_type;
 	static constexpr bool rvalue_reference =
 		std::is_rvalue_reference<Source0>::value and
 		std::is_rvalue_reference<Source1>::value and
 		same_base_type;
-	// T & and T && both bind to T const &
-	static constexpr bool mixed_references_causing_const =
-		same_base_type and (
-			(std::is_rvalue_reference<Source0>::value and std::is_lvalue_reference<Source1>::value) or
-			(std::is_rvalue_reference<Source1>::value and std::is_lvalue_reference<Source0>::value)
-		);
+	static constexpr bool lvalue_reference =
+		std::is_lvalue_reference<Source0>::value and
+		std::is_lvalue_reference<Source1>::value and
+		same_base_type;
 public:
 	using type =
-		std::conditional_t<prvalue, Target,
 		std::conditional_t<rvalue_reference, CVTarget &&,
-		std::conditional_t<mixed_references_causing_const, CVTarget const &,
-		CVTarget &
-	>>>;
+		std::conditional_t<lvalue_reference, CVTarget &,
+		Target
+	>>;
 };
 
 template<typename Target, typename Source0, typename Source1>

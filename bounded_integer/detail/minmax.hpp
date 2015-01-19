@@ -50,9 +50,9 @@ public:
 	}
 };
 
-
 template<typename Target, typename Source, enable_if_t<is_bounded_integer<Target>::value> = clang_dummy>
 constexpr Target construct(Source && source) noexcept {
+	static_assert(not std::is_reference<Target>::value, "Function should not be selected with a reference type.");
 	return Target(std::forward<Source>(source), non_check);
 }
 template<typename Target, typename Source, enable_if_t<!is_bounded_integer<Target>::value> = clang_dummy>
@@ -122,14 +122,14 @@ template<typename Compare, typename T1, typename T2, enable_if_t<
 	not detail::types_overlap<extreme_t<Compare, T1, T2>, T2>::value
 > = clang_dummy>
 constexpr decltype(auto) extreme(Compare, T1 && t1, T2 &&) noexcept {
-	return std::forward<T1>(t1);
+	return detail::minmax::construct<T1>(std::forward<T1>(t1));
 }
 template<typename Compare, typename T1, typename T2, enable_if_t<
 	detail::basic_numeric_limits<std::decay_t<T1>>::is_specialized and detail::basic_numeric_limits<std::decay_t<T2>>::is_specialized and
 	not detail::types_overlap<extreme_t<Compare, T1, T2>, T1>::value
 > = clang_dummy>
 constexpr decltype(auto) extreme(Compare, T1 &&, T2 && t2) noexcept {
-	return std::forward<T2>(t2);
+	return detail::minmax::construct<T2>(std::forward<T2>(t2));
 }
 
 template<typename Compare, typename T1, typename T2, enable_if_t<
