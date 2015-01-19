@@ -411,12 +411,14 @@ public:
 		splice_after(position, other);
 	}
 	void splice_after(const_iterator position, forward_list & other, const_iterator it) {
+		static_cast<void>(other);
 		insert_pointer_after(position, unlink_node_after(static_cast<iterator>(it)));
 	}
 	void splice_after(const_iterator position, forward_list && other, const_iterator it) {
 		splice_after(position, other, it);
 	}
 	void splice_after(const_iterator position, forward_list & other, const_iterator first, const_iterator last) {
+		static_cast<void>(other);
 		if (first == last) {
 			return;
 		}
