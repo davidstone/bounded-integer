@@ -18,6 +18,7 @@
 #define BOUNDED_INTEGER_POLICY_CLAMP_POLICY_HPP_
 
 #include "basic_policy.hpp"
+#include "null_policy.hpp"
 #include "../is_bounded_integer.hpp"
 #include "../make.hpp"
 #include "../minmax.hpp"
@@ -28,12 +29,9 @@ namespace policy_detail {
 class clamp_policy {
 public:
 	template<typename T, typename Minimum, typename Maximum>
-	static constexpr decltype(auto) assignment(T && value, Minimum && minimum, Maximum && maximum) noexcept {
-		static_assert(is_bounded_integer<std::decay_t<T>>::value, "Only bounded::integer types are supported.");
-		static_assert(is_bounded_integer<std::decay_t<Minimum>>::value, "Only bounded::integer types are supported.");
-		static_assert(is_bounded_integer<std::decay_t<Maximum>>::value, "Only bounded::integer types are supported.");
-		using policy = typename std::decay_t<T>::overflow_policy_type;
-		return min(max(value, bounded::make<policy>(minimum)), bounded::make<policy>(maximum));
+	static constexpr auto assignment(T && value, Minimum && minimum, Maximum && maximum) noexcept {
+		using policy = bounded::null_policy;
+		return min(max(bounded::make<policy>(std::forward<T>(value)), bounded::make<policy>(std::forward<Minimum>(minimum))), bounded::make<policy>(std::forward<Maximum>(maximum)));
 	}
 
 	static constexpr bool is_modulo = false;
