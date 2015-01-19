@@ -1137,9 +1137,9 @@ auto check_algorithm() {
 
 template<typename Initial, intmax_t initial_value, typename Expected, intmax_t expected_value>
 auto check_absolute_value() {
-	constexpr Initial value(initial_value);
+	constexpr auto value = Initial(initial_value);
 	constexpr auto absolute = bounded::abs(value);
-	constexpr Expected expected_absolute(expected_value);
+	constexpr auto expected_absolute = Expected(expected_value);
 	static_assert(
 		std::is_same<decltype(expected_absolute), decltype(absolute)>::value,
 		"Absolute value returns the wrong type."
