@@ -135,13 +135,6 @@ namespace check_common_type {
 
 
 	static_assert(
-		std::is_same<bounded::detail::common_type_and_value_category_t<int, int, int>, int>::value,
-		"Incorrect type for int, int, int."
-	);
-
-
-
-	static_assert(
 		std::is_same<bounded::detail::common_type_and_value_category_t<int, int>, int>::value,
 		"Incorrect type for int, int."
 	);
@@ -288,6 +281,13 @@ namespace check_common_type {
 	static_assert(
 		std::is_same<bounded::detail::common_type_and_value_category_t<long &&, int &&>, long>::value,
 		"Incorrect type for int &&, int &&."
+	);
+
+
+
+	static_assert(
+		std::is_same<bounded::detail::common_type_and_value_category_t<int, int, int>, int>::value,
+		"Incorrect type for int, int, int."
 	);
 }
 
