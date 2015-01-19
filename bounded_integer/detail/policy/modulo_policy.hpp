@@ -32,10 +32,13 @@ private:
 	static constexpr auto make() noexcept -> integer<value, value> {
 		return { value, non_check };
 	}
+	template<typename T>
+	static constexpr auto make(T && value) noexcept -> integer<detail::basic_numeric_limits<T>::min(), detail::basic_numeric_limits<T>::max()> {
+		return { std::forward<T>(value), non_check };
+	}
 public:
 	template<typename T, typename Minimum, typename Maximum>
 	static constexpr auto assignment(T && value, Minimum && minimum, Maximum && maximum) noexcept {
-		static_assert(is_bounded_integer<std::decay_t<T>>::value, "Only bounded::integer types are supported.");
 		static_assert(is_bounded_integer<std::decay_t<Minimum>>::value, "Only bounded::integer types are supported.");
 		static_assert(is_bounded_integer<std::decay_t<Maximum>>::value, "Only bounded::integer types are supported.");
 		return positive_remainder(
