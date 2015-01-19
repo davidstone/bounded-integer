@@ -49,7 +49,7 @@ void test_no_extra_copy_or_move() {
 }
 
 void test_copy_unique() {
-	std::cout << "Testing copy_unique\n" << std::flush << '\n';
+	std::cout << "Testing copy_unique\n" << std::flush;
 	std::vector<int> const source = { 1, 3, 5, 5, 5, 6, 10, 10 };
 	std::vector<int> destination(5);
 	auto const it = containers::detail::copy_unique(source.begin(), source.end(), destination.begin());
@@ -95,6 +95,8 @@ void test() {
 	assert(container.at(3) == 3);
 }
 
+#define TRACK_COMPARISONS
+#if defined TRACK_COMPARISONS
 std::size_t number_of_comparisons = 0;
 template<typename Key>
 class TrackerCompare {
@@ -104,9 +106,10 @@ public:
 		return lhs < rhs;
 	}
 };
-#if 0
+
 template<typename Key>
 using Compare = TrackerCompare<Key>;
+
 #else
 template<typename Key>
 using Compare = std::less<Key>;
@@ -154,27 +157,40 @@ void test_performance(std::size_t const loop_count) {
 	auto const source = generator(loop_count);
 	auto const additional_batch = generator(loop_count);
 	auto const additional = generator(static_cast<std::size_t>(std::log2(loop_count)));
-
+	
+	std::cout << '\n';
 	using std::chrono::high_resolution_clock;
 	auto const start = high_resolution_clock::now();
 
 	TimeDestructor destructor;
 	map_type<Key, Value> map(source.begin(), source.end());
 	auto const constructed = high_resolution_clock::now();
+	#if defined TRACK_COMPARISONS
+		auto const constructed_comparisons = number_of_comparisons;
+	#endif
 
 	for (auto const & value : source) {
 		auto const volatile it = map.find(value.first);
 		static_cast<void>(it);
 	}
 	auto const found = high_resolution_clock::now();
+	#if defined TRACK_COMPARISONS
+		auto const found_comparisons = number_of_comparisons;
+	#endif
 
 	map.insert(additional_batch.begin(), additional_batch.end());
 	auto const inserted_batch = high_resolution_clock::now();
+	#if defined TRACK_COMPARISONS
+		auto const inserted_batch_comparisons = number_of_comparisons;
+	#endif
 
 	for (auto const & value : additional) {
 		map.insert(value);
 	}
 	auto const inserted = high_resolution_clock::now();
+	#if defined TRACK_COMPARISONS
+		auto const inserted_comparisons = number_of_comparisons;
+	#endif
 
 	auto map2 = map;
 	auto const copied = high_resolution_clock::now();
@@ -191,8 +207,22 @@ void test_performance(std::size_t const loop_count) {
 		static_cast<void>(it);
 	}
 	auto const found_in_extras = high_resolution_clock::now();
-	std::cout << "map size: " << map.size() << '\n';
+	#if defined TRACK_COMPARISONS
+		auto const found_with_extra_comparisons = number_of_comparisons;
+	#endif
+	std::cout << "map size: " << map.size() << "\n\n";
 	
+	#if defined TRACK_COMPARISONS
+		std::cout << "Constructed comparisons: " << constructed_comparisons << '\n';
+		std::cout << "Found comparisons: " << found_comparisons - constructed_comparisons << '\n';
+		std::cout << "Batch insertion comparisons: " << inserted_batch_comparisons - found_comparisons << '\n';
+		std::cout << "Insertion comparisons: " << inserted_comparisons - inserted_batch_comparisons << '\n';
+		std::cout << "Found with extras comparisons: " << found_with_extra_comparisons - inserted_comparisons << '\n';
+		std::cout << "Number of comparisons: " << number_of_comparisons << '\n';
+		std::cout << '\n';
+	#endif
+
+
 	std::cout << "Construction time: " << std::chrono::duration_cast<unit>(constructed - start).count() << '\n';
 	std::cout << "Found time: " << std::chrono::duration_cast<unit>(found - constructed).count() << '\n';
 	std::cout << "Batch insertion time: " << std::chrono::duration_cast<unit>(inserted_batch - found).count() << '\n';
@@ -200,7 +230,6 @@ void test_performance(std::size_t const loop_count) {
 	std::cout << "Copying time: " << std::chrono::duration_cast<unit>(copied - inserted).count() << '\n';
 	std::cout << "Iteration time: " << std::chrono::duration_cast<unit>(iterated - copied).count() << '\n';
 	std::cout << "Found time with extra elements: " << std::chrono::duration_cast<unit>(found_in_extras - iterated).count() << '\n';
-	std::cout << "Number of comparisons: " << number_of_comparisons << '\n';
 	destructor.set();
 }
 
