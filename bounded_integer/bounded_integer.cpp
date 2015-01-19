@@ -176,7 +176,7 @@ namespace check_common_type {
 
 	static_assert(
 		std::is_same<bounded::detail::common_type_and_value_category_t<int &&, int &>, int const &>::value,
-		"Incorrect type for int &, int &."
+		"Incorrect type for int &&, int &."
 	);
 
 	static_assert(
@@ -228,7 +228,7 @@ namespace check_common_type {
 
 	static_assert(
 		std::is_same<bounded::detail::common_type_and_value_category_t<int &&, long &>, long>::value,
-		"Incorrect type for int &, long &."
+		"Incorrect type for int &&, long &."
 	);
 
 	static_assert(
@@ -240,47 +240,47 @@ namespace check_common_type {
 
 	static_assert(
 		std::is_same<bounded::detail::common_type_and_value_category_t<long &, int>, long>::value,
-		"Incorrect type for int &, int."
+		"Incorrect type for long &, int."
 	);
 
 	static_assert(
 		std::is_same<bounded::detail::common_type_and_value_category_t<long const &, int>, long>::value,
-		"Incorrect type for int const &, int."
+		"Incorrect type for long const &, int."
 	);
 
 	static_assert(
 		std::is_same<bounded::detail::common_type_and_value_category_t<long &&, int>, long>::value,
-		"Incorrect type for int &&, int."
+		"Incorrect type for long &&, int."
 	);
 
 	static_assert(
 		std::is_same<bounded::detail::common_type_and_value_category_t<long const &, int const &>, long>::value,
-		"Incorrect type for int const &, int const &."
+		"Incorrect type for long const &, int const &."
 	);
 
 	static_assert(
 		std::is_same<bounded::detail::common_type_and_value_category_t<long &, int const &>, long>::value,
-		"Incorrect type for int &, int const &."
+		"Incorrect type for long &, int const &."
 	);
 
 	static_assert(
 		std::is_same<bounded::detail::common_type_and_value_category_t<long &&, int const &>, long>::value,
-		"Incorrect type for int &&, int const &."
+		"Incorrect type for long &&, int const &."
 	);
 
 	static_assert(
 		std::is_same<bounded::detail::common_type_and_value_category_t<long &, int &>, long>::value,
-		"Incorrect type for int &, int &."
+		"Incorrect type for long &, int &."
 	);
 
 	static_assert(
 		std::is_same<bounded::detail::common_type_and_value_category_t<long &&, int &>, long>::value,
-		"Incorrect type for int &, int &."
+		"Incorrect type for long &&, int &."
 	);
 
 	static_assert(
 		std::is_same<bounded::detail::common_type_and_value_category_t<long &&, int &&>, long>::value,
-		"Incorrect type for int &&, int &&."
+		"Incorrect type for long &&, int &&."
 	);
 
 
