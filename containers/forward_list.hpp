@@ -475,8 +475,8 @@ public:
 		while (!empty()) {
 			temp.emplace_back(unlink_node_after(before_begin()));
 		}
-		std::sort(std::begin(temp), std::end(temp), [](ptr_type const & lhs, ptr_type const & rhs) {
-			return static_cast<node const &>(*lhs).value < static_cast<node const &>(*rhs).value;
+		std::sort(std::begin(temp), std::end(temp), [&](ptr_type const & lhs, ptr_type const & rhs) {
+			return compare(static_cast<node const &>(*lhs).value, static_cast<node const &>(*rhs).value);
 		});
 		auto it = before_begin();
 		for (auto & ptr : temp) {
