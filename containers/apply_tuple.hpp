@@ -1,5 +1,5 @@
 // Apply a function to all values in a tuple
-// Copyright (C) 2013 David Stone
+// Copyright (C) 2014 David Stone
 //
 // This program is free software: you can redistribute it and / or modify
 // it under the terms of the GNU Affero General Public License as
@@ -18,40 +18,18 @@
 #define CONTAINERS_APPLY_TUPLE_HPP_
 
 #include <type_traits>
+#include <utility>
 
 namespace containers {
 
-template<std::size_t...>
-class index_list { };
-
-// I can't seem to get enable_if_t to work with partial specializations. You 
-// also cannot specialize template aliases. I could bypass both of these
-// problems with std::conditional, but this way allows me to essentially define
-// temporary expressions / types using template arguments, and thus the
-// implementation is a little cleaner. It's also a bit harder to get at the
-// variadic std::size_t pack.
-template<std::size_t index, std::size_t size, typename Indexes = index_list<>, typename Enable = void>
-class make_index {
-public:
-	using type = Indexes;
-};
-template<std::size_t index, std::size_t size, std::size_t... lower_indexes>
-class make_index<index, size, index_list<lower_indexes...>, typename std::enable_if<index < size, void>::type> {
-public:
-	using type = typename make_index<index + 1, size, index_list<lower_indexes..., index>>::type;
-};
-
-template<typename Tuple>
-using tuple_indexes_t = typename make_index<0, std::tuple_size<Tuple>::value>::type;
-
 // I should probably add a conditional noexcept specification to these
 template<typename Function, typename Tuple, std::size_t... indexes>
-constexpr auto apply_helper(Function const & f, Tuple && tuple_args, index_list<indexes...>) ->
+constexpr auto apply_helper(Function const & f, Tuple && tuple_args, std::index_sequence<indexes...>) ->
 	decltype(f(std::get<indexes>(std::forward<Tuple>(tuple_args))...)) {
 	return f(std::get<indexes>(std::forward<Tuple>(tuple_args))...);
 }
 
-template<typename Function, typename Tuple, typename Indexes = tuple_indexes_t<Tuple>>
+template<typename Function, typename Tuple, typename Indexes = std::make_index_sequence<std::tuple_size<Tuple>::value>>
 constexpr auto apply(Function const & f, Tuple && tuple_args) ->
 	decltype(apply_helper(f, std::forward<Tuple>(tuple_args), Indexes{})) {
 	return apply_helper(f, std::forward<Tuple>(tuple_args), Indexes{});
