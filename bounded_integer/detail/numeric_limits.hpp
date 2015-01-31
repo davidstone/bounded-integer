@@ -1,5 +1,5 @@
 // Specialization of numeric_limits
-// Copyright (C) 2014 David Stone
+// Copyright (C) 2015 David Stone
 //
 // This program is free software: you can redistribute it and / or modify
 // it under the terms of the GNU Affero General Public License as
@@ -23,7 +23,6 @@
 #include <type_traits>
 
 namespace bounded {
-namespace detail {
 
 // This does not requiring having a definition of bounded::integer to get at the
 // minimum and maximum, so it can be used in the definition of bounded::integer.
@@ -71,6 +70,8 @@ public:
 	static constexpr bool is_integer = std::numeric_limits<T>::is_integer;
 };
 
+
+namespace detail {
 
 // http://stackoverflow.com/questions/19609186/what-is-stdnumeric-limitstdigits-supposed-to-represent
 template<intmax_t base>

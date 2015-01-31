@@ -29,7 +29,7 @@ namespace bounded {
 
 template<typename InputIterator, typename Predicate>
 auto count_if(InputIterator first, InputIterator const last, Predicate predicate) {
-	constexpr auto maximum = detail::basic_numeric_limits<typename std::iterator_traits<InputIterator>::difference_type>::max();
+	constexpr auto maximum = basic_numeric_limits<typename std::iterator_traits<InputIterator>::difference_type>::max();
 	integer<0, maximum> sum = make<0>();
 	for (; first != last; ++first) {
 		if (predicate(*first)) {

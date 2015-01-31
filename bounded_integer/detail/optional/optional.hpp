@@ -44,12 +44,12 @@ struct get_underlying<integer<minimum, maximum, overflow>> {
 template<typename T>
 class has_extra_space {
 private:
-	static_assert(detail::basic_numeric_limits<T>::is_specialized, "Metafunction only works with integer types.");
+	static_assert(basic_numeric_limits<T>::is_specialized, "Metafunction only works with integer types.");
 	using underlying_type = typename get_underlying<T>::type;
-	static constexpr intmax_t underlying_min = detail::basic_numeric_limits<underlying_type>::min();
-	static constexpr intmax_t underlying_max = detail::basic_numeric_limits<underlying_type>::max();
-	static constexpr intmax_t min = detail::basic_numeric_limits<T>::min();
-	static constexpr intmax_t max = detail::basic_numeric_limits<T>::max();
+	static constexpr intmax_t underlying_min = basic_numeric_limits<underlying_type>::min();
+	static constexpr intmax_t underlying_max = basic_numeric_limits<underlying_type>::max();
+	static constexpr intmax_t min = basic_numeric_limits<T>::min();
+	static constexpr intmax_t max = basic_numeric_limits<T>::max();
 public:
 	static constexpr bool value = underlying_min < min or underlying_max > max;
 };
@@ -61,10 +61,10 @@ template<typename T>
 class optional_storage<T, true> {
 private:
 	using underlying_type = typename get_underlying<T>::type;
-	static constexpr auto minimum = detail::basic_numeric_limits<T>::min();
-	static constexpr auto maximum = detail::basic_numeric_limits<T>::max();
+	static constexpr auto minimum = basic_numeric_limits<T>::min();
+	static constexpr auto maximum = basic_numeric_limits<T>::max();
 	static constexpr underlying_type uninitialized_value() noexcept {
-		return static_cast<underlying_type>(minimum > detail::basic_numeric_limits<underlying_type>::min() ? minimum - 1 : maximum + 1);
+		return static_cast<underlying_type>(minimum > basic_numeric_limits<underlying_type>::min() ? minimum - 1 : maximum + 1);
 	}
 	T m_value;
 public:
@@ -173,7 +173,7 @@ public:
 private:
 	using underlying_type = typename get_underlying<T>::type;
 	static constexpr auto uninitialized_value() noexcept {
-		return static_cast<underlying_type>(detail::basic_numeric_limits<T>::min());
+		return static_cast<underlying_type>(basic_numeric_limits<T>::min());
 	}
 	bool m_initialized;
 	T m_value;

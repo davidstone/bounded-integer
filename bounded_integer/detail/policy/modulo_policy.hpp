@@ -33,7 +33,7 @@ private:
 		return { value, non_check };
 	}
 	template<typename T>
-	static constexpr auto make(T && value) noexcept -> integer<detail::basic_numeric_limits<T>::min(), detail::basic_numeric_limits<T>::max()> {
+	static constexpr auto make(T && value) noexcept -> integer<basic_numeric_limits<T>::min(), basic_numeric_limits<T>::max()> {
 		return { std::forward<T>(value), non_check };
 	}
 public:

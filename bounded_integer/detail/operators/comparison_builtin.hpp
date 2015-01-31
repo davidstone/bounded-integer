@@ -35,7 +35,7 @@ namespace bounded {
 template<
 	intmax_t minimum, intmax_t maximum, typename overflow_policy, storage_type storage,
 	typename T,
-	enable_if_t<detail::basic_numeric_limits<T>::is_integer> = clang_dummy
+	enable_if_t<basic_numeric_limits<T>::is_integer> = clang_dummy
 >
 constexpr auto operator==(integer<minimum, maximum, overflow_policy, storage> const lhs, T const rhs) noexcept {
 	return lhs == make(rhs);
@@ -49,7 +49,7 @@ constexpr auto operator==(integer<minimum, maximum, overflow_policy, storage> co
 template<
 	intmax_t minimum, intmax_t maximum, typename overflow_policy, storage_type storage,
 	typename T,
-	enable_if_t<detail::basic_numeric_limits<T>::is_integer> = clang_dummy
+	enable_if_t<basic_numeric_limits<T>::is_integer> = clang_dummy
 >
 constexpr auto operator==(T const lhs, integer<minimum, maximum, overflow_policy, storage> const rhs) noexcept {
 	return rhs == lhs;
@@ -58,7 +58,7 @@ constexpr auto operator==(T const lhs, integer<minimum, maximum, overflow_policy
 template<
 	intmax_t minimum, intmax_t maximum, typename overflow_policy, storage_type storage,
 	typename T,
-	enable_if_t<detail::basic_numeric_limits<T>::is_integer> = clang_dummy
+	enable_if_t<basic_numeric_limits<T>::is_integer> = clang_dummy
 >
 constexpr auto operator!=(integer<minimum, maximum, overflow_policy, storage> const lhs, T const rhs) noexcept {
 	return !(lhs == rhs);
@@ -67,7 +67,7 @@ constexpr auto operator!=(integer<minimum, maximum, overflow_policy, storage> co
 template<
 	intmax_t minimum, intmax_t maximum, typename overflow_policy, storage_type storage,
 	typename T,
-	enable_if_t<detail::basic_numeric_limits<T>::is_integer> = clang_dummy
+	enable_if_t<basic_numeric_limits<T>::is_integer> = clang_dummy
 >
 constexpr auto operator!=(T const lhs, integer<minimum, maximum, overflow_policy, storage> const rhs) noexcept {
 	return !(rhs == lhs);
@@ -80,7 +80,7 @@ constexpr auto operator!=(T const lhs, integer<minimum, maximum, overflow_policy
 template<
 	intmax_t minimum, intmax_t maximum, typename overflow_policy, storage_type storage,
 	typename T,
-	enable_if_t<detail::basic_numeric_limits<T>::is_integer> = clang_dummy
+	enable_if_t<basic_numeric_limits<T>::is_integer> = clang_dummy
 >
 constexpr auto operator<(integer<minimum, maximum, overflow_policy, storage> const lhs, T const rhs) noexcept {
 	return lhs < make(rhs);
@@ -93,7 +93,7 @@ constexpr auto operator<(integer<minimum, maximum, overflow_policy, storage> con
 template<
 	intmax_t minimum, intmax_t maximum, typename overflow_policy, storage_type storage,
 	typename T,
-	enable_if_t<detail::basic_numeric_limits<T>::is_integer> = clang_dummy
+	enable_if_t<basic_numeric_limits<T>::is_integer> = clang_dummy
 >
 constexpr auto operator<(T const lhs, integer<minimum, maximum, overflow_policy, storage> const rhs) noexcept {
 	return make(lhs) < rhs;
@@ -106,7 +106,7 @@ constexpr auto operator<(uintmax_t const lhs, integer<minimum, maximum, overflow
 template<
 	intmax_t minimum, intmax_t maximum, typename overflow_policy, storage_type storage,
 	typename T,
-	enable_if_t<detail::basic_numeric_limits<T>::is_integer> = clang_dummy
+	enable_if_t<basic_numeric_limits<T>::is_integer> = clang_dummy
 >
 constexpr auto operator>(integer<minimum, maximum, overflow_policy, storage> const lhs, T const rhs) noexcept {
 	return rhs < lhs;
@@ -115,7 +115,7 @@ constexpr auto operator>(integer<minimum, maximum, overflow_policy, storage> con
 template<
 	intmax_t minimum, intmax_t maximum, typename overflow_policy, storage_type storage,
 	typename T,
-	enable_if_t<detail::basic_numeric_limits<T>::is_integer> = clang_dummy
+	enable_if_t<basic_numeric_limits<T>::is_integer> = clang_dummy
 >
 constexpr auto operator>(T const lhs, integer<minimum, maximum, overflow_policy, storage> const rhs) noexcept {
 	return rhs < lhs;
@@ -124,7 +124,7 @@ constexpr auto operator>(T const lhs, integer<minimum, maximum, overflow_policy,
 template<
 	intmax_t minimum, intmax_t maximum, typename overflow_policy, storage_type storage,
 	typename T,
-	enable_if_t<detail::basic_numeric_limits<T>::is_integer> = clang_dummy
+	enable_if_t<basic_numeric_limits<T>::is_integer> = clang_dummy
 >
 constexpr auto operator<=(integer<minimum, maximum, overflow_policy, storage> const lhs, T const rhs) noexcept {
 	return !(rhs < lhs);
@@ -133,7 +133,7 @@ constexpr auto operator<=(integer<minimum, maximum, overflow_policy, storage> co
 template<
 	intmax_t minimum, intmax_t maximum, typename overflow_policy, storage_type storage,
 	typename T,
-	enable_if_t<detail::basic_numeric_limits<T>::is_integer> = clang_dummy
+	enable_if_t<basic_numeric_limits<T>::is_integer> = clang_dummy
 >
 constexpr auto operator<=(T const lhs, integer<minimum, maximum, overflow_policy, storage> const rhs) noexcept {
 	return !(rhs < lhs);
@@ -142,7 +142,7 @@ constexpr auto operator<=(T const lhs, integer<minimum, maximum, overflow_policy
 template<
 	intmax_t minimum, intmax_t maximum, typename overflow_policy, storage_type storage,
 	typename T,
-	enable_if_t<detail::basic_numeric_limits<T>::is_integer> = clang_dummy
+	enable_if_t<basic_numeric_limits<T>::is_integer> = clang_dummy
 >
 constexpr auto operator>=(integer<minimum, maximum, overflow_policy, storage> const lhs, T const rhs) noexcept {
 	return !(lhs < rhs);
@@ -151,7 +151,7 @@ constexpr auto operator>=(integer<minimum, maximum, overflow_policy, storage> co
 template<
 	intmax_t minimum, intmax_t maximum, typename overflow_policy, storage_type storage,
 	typename T,
-	enable_if_t<detail::basic_numeric_limits<T>::is_integer> = clang_dummy
+	enable_if_t<basic_numeric_limits<T>::is_integer> = clang_dummy
 >
 constexpr auto operator>=(T const lhs, integer<minimum, maximum, overflow_policy, storage> const rhs) noexcept {
 	return !(lhs < rhs);
