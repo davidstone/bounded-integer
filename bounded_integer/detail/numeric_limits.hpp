@@ -28,20 +28,25 @@ namespace detail {
 // This does not requiring having a definition of bounded::integer to get at the
 // minimum and maximum, so it can be used in the definition of bounded::integer.
 template<typename T>
-class basic_numeric_limits_impl {
+class basic_numeric_limits {
+private:
+	using real_numeric_limits = std::conditional_t<std::is_same<T, std::decay_t<T>>::value,
+		std::numeric_limits<T>,
+		basic_numeric_limits<std::decay_t<T>>
+	>;
 public:
 	static constexpr auto min() noexcept -> intmax_t {
-		return std::numeric_limits<T>::min();
+		return real_numeric_limits::min();
 	}
 	static constexpr auto max() noexcept -> intmax_t {
-		return std::numeric_limits<T>::max();
+		return real_numeric_limits::max();
 	}
-	static constexpr bool is_specialized = std::numeric_limits<T>::is_specialized;
-	static constexpr bool is_integer = std::numeric_limits<T>::is_integer;
+	static constexpr bool is_specialized = real_numeric_limits::is_specialized;
+	static constexpr bool is_integer = real_numeric_limits::is_integer;
 };
 
 template<intmax_t minimum, intmax_t maximum, typename overflow_policy, storage_type storage>
-class basic_numeric_limits_impl<integer<minimum, maximum, overflow_policy, storage>> {
+class basic_numeric_limits<integer<minimum, maximum, overflow_policy, storage>> {
 public:
 	static constexpr auto min() noexcept -> intmax_t {
 		return minimum;
@@ -54,7 +59,7 @@ public:
 };
 
 template<typename T, T value>
-class basic_numeric_limits_impl<std::integral_constant<T, value>> {
+class basic_numeric_limits<std::integral_constant<T, value>> {
 public:
 	static constexpr auto min() noexcept -> intmax_t {
 		return value;
@@ -65,9 +70,6 @@ public:
 	static constexpr bool is_specialized = std::numeric_limits<T>::is_specialized;
 	static constexpr bool is_integer = std::numeric_limits<T>::is_integer;
 };
-
-template<typename T>
-using basic_numeric_limits = basic_numeric_limits_impl<std::decay_t<T>>;
 
 
 // http://stackoverflow.com/questions/19609186/what-is-stdnumeric-limitstdigits-supposed-to-represent
