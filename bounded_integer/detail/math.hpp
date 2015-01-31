@@ -1,5 +1,5 @@
 // Overloads for the standard library math functions.
-// Copyright (C) 2014 David Stone
+// Copyright (C) 2015 David Stone
 //
 // This program is free software: you can redistribute it and / or modify
 // it under the terms of the GNU Affero General Public License as
@@ -17,8 +17,8 @@
 #ifndef BOUNDED_INTEGER_MATH_HPP_
 #define BOUNDED_INTEGER_MATH_HPP_
 
+#include "cast.hpp"
 #include "forward_declaration.hpp"
-#include "make.hpp"
 #include "minmax.hpp"
 #include "operators/arithmetic.hpp"
 
@@ -28,7 +28,7 @@ template<intmax_t minimum, intmax_t maximum, typename overflow_policy, storage_t
 constexpr auto abs(integer<minimum, maximum, overflow_policy, storage> const value) noexcept {
 	// The 0 has to be there to restrict the range of possible values. Without
 	// it, abs(integer<-7, 3>) would be [-3, 7] instead of [0, 7].
-	return max(value, -value, make<0, overflow_policy, storage>());
+	return increase_min<0>(max(value, -value), non_check);
 }
 
 }	// namespace bounded
