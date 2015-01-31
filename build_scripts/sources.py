@@ -30,6 +30,7 @@ def prepend_dir(directory, sources):
 base_sources = [('test',
 	prepend_dir('detail', [
 		'algorithm.cpp',
+		'cast.cpp',
 		'class.cpp',
 		'common_type.cpp',
 		'common_type_and_value_category.cpp',
