@@ -1,5 +1,5 @@
 // Also known as wrapping
-// Copyright (C) 2014 David Stone
+// Copyright (C) 2015 David Stone
 //
 // This program is free software: you can redistribute it and / or modify
 // it under the terms of the GNU Affero General Public License as
@@ -32,10 +32,16 @@ private:
 	static constexpr auto make() noexcept -> integer<value, value> {
 		return { value, non_check };
 	}
-	template<typename T>
-	static constexpr auto make(T && value) noexcept -> integer<basic_numeric_limits<T>::min(), basic_numeric_limits<T>::max()> {
-		return { std::forward<T>(value), non_check };
+
+	template<typename T, typename Size>
+	static constexpr auto positive_remainder(T && value, Size && size) noexcept {
+		using result_type = std::common_type_t<std::decay_t<T>, std::decay_t<decltype(std::forward<T>(value) + std::forward<Size>(size))>>;
+		return (value < make<0>()) ?
+			result_type(std::forward<T>(value) + std::forward<Size>(size), non_check) :
+			result_type(std::forward<T>(value), non_check)
+		;
 	}
+
 public:
 	template<typename T, typename Minimum, typename Maximum>
 	static constexpr auto assignment(T && value, Minimum && minimum, Maximum && maximum) noexcept {
@@ -49,16 +55,6 @@ public:
 
 	static constexpr bool is_modulo = true;
 	static constexpr bool overflow_is_error = false;
-	
-private:
-	template<typename T, typename Size>
-	static constexpr auto positive_remainder(T && value, Size && size) noexcept {
-		using result_type = std::common_type_t<std::decay_t<T>, std::decay_t<decltype(std::forward<T>(value) + std::forward<Size>(size))>>;
-		return (value < make<0>()) ?
-			result_type(std::forward<T>(value) + std::forward<Size>(size), non_check) :
-			result_type(std::forward<T>(value), non_check)
-		;
-	}
 };
 
 }	// namespace policy_detail
