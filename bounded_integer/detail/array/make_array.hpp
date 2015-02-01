@@ -26,40 +26,36 @@ namespace bounded {
 namespace detail {
 
 template<typename T, std::size_t... dimensions>
-class array_c;
+struct array_c;
 
 template<typename T, std::size_t... dimensions>
 using array_type = typename array_c<T, dimensions...>::type;
 
 template<typename T, std::size_t dimension, std::size_t... dimensions>
-class array_c<T, dimension, dimensions...> {
-public:
+struct array_c<T, dimension, dimensions...> {
 	using type = array<array_type<T, dimensions...>, dimension>;
 };
 
 template<typename T>
-class array_c<T> {
-public:
+struct array_c<T> {
 	using type = T;
 };
 
 template<std::size_t... dimensions>
-class dimension_product;
+struct dimension_product;
 
 template<std::size_t dimension, std::size_t... dimensions>
-class dimension_product<dimension, dimensions...> {
-public:
+struct dimension_product<dimension, dimensions...> {
 	static constexpr std::size_t value = dimension * dimension_product<dimensions...>::value;
 };
 
 template<>
-class dimension_product<> {
-public:
+struct dimension_product<> {
 	static constexpr std::size_t value = 1;
 };
 
 template<std::size_t number_of_values, std::size_t... dimensions>
-class final_dimension {
+struct final_dimension {
 private:
 	static constexpr std::size_t product = dimension_product<dimensions...>::value;
 public:

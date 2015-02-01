@@ -1,5 +1,5 @@
 // Also known as saturation
-// Copyright (C) 2014 David Stone
+// Copyright (C) 2015 David Stone
 //
 // This program is free software: you can redistribute it and / or modify
 // it under the terms of the GNU Affero General Public License as
@@ -26,8 +26,7 @@
 namespace bounded {
 namespace policy_detail {
 
-class clamp_policy {
-public:
+struct clamp_policy {
 	template<typename T, typename Minimum, typename Maximum>
 	static constexpr auto assignment(T && value, Minimum && minimum, Maximum && maximum) noexcept {
 		using policy = bounded::null_policy;

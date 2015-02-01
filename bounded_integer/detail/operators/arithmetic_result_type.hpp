@@ -31,53 +31,46 @@ namespace detail {
 // We have to define our own function objects rather than using the classes from
 // <functional> because we need constexpr
 
-class plus {
-public:
+struct plus {
 	template<typename LHS, typename RHS>
 	constexpr auto operator()(LHS && lhs, RHS && rhs) const noexcept {
 		return std::forward<LHS>(lhs) + std::forward<RHS>(rhs);
 	}
 };
-class minus {
-public:
+struct minus {
 	template<typename LHS, typename RHS>
 	constexpr auto operator()(LHS && lhs, RHS && rhs) const noexcept {
 		return std::forward<LHS>(lhs) - std::forward<RHS>(rhs);
 	}
 };
-class multiplies {
-public:
+struct multiplies {
 	template<typename LHS, typename RHS>
 	constexpr auto operator()(LHS && lhs, RHS && rhs) const noexcept {
 		return std::forward<LHS>(lhs) * std::forward<RHS>(rhs);
 	}
 };
-class divides {
-public:
+struct divides {
 	template<typename LHS, typename RHS>
 	constexpr auto operator()(LHS && lhs, RHS && rhs) const noexcept {
 		static_assert(noexcept(std::forward<LHS>(lhs) / std::forward<RHS>(rhs)), "Division can throw exceptions."); 
 		return std::forward<LHS>(lhs) / std::forward<RHS>(rhs);
 	}
 };
-class modulus {
-public:
+struct modulus {
 	template<typename LHS, typename RHS>
 	constexpr auto operator()(LHS && lhs, RHS && rhs) const noexcept {
 		static_assert(noexcept(std::forward<LHS>(lhs) % std::forward<RHS>(rhs)), "Modulus can throw exceptions."); 
 		return std::forward<LHS>(lhs) % std::forward<RHS>(rhs);
 	}
 };
-class left_shift {
-public:
+struct left_shift {
 	template<typename LHS, typename RHS>
 	constexpr auto operator()(LHS && lhs, RHS && rhs) const noexcept {
 		static_assert(noexcept(std::forward<LHS>(lhs) << std::forward<RHS>(rhs)), "Left shift can throw exceptions."); 
 		return std::forward<LHS>(lhs) << std::forward<RHS>(rhs);
 	}
 };
-class right_shift {
-public:
+struct right_shift {
 	template<typename LHS, typename RHS>
 	constexpr auto operator()(LHS && lhs, RHS && rhs) const noexcept {
 		static_assert(noexcept(std::forward<LHS>(lhs) >> std::forward<RHS>(rhs)), "Right shift can throw exceptions."); 
@@ -90,7 +83,7 @@ template<
 	intmax_t rhs_min, intmax_t rhs_max,
 	typename Operator
 >
-class operator_range {
+struct operator_range {
 // TODO
 };
 
@@ -98,8 +91,7 @@ template<
 	intmax_t lhs_min, intmax_t lhs_max,
 	intmax_t rhs_min, intmax_t rhs_max
 >
-class operator_range<lhs_min, lhs_max, rhs_min, rhs_max, plus> {
-public:
+struct operator_range<lhs_min, lhs_max, rhs_min, rhs_max, plus> {
 	static constexpr auto min() noexcept -> intmax_t {
 		return lhs_min + rhs_min;
 	}
@@ -113,8 +105,7 @@ template<
 	intmax_t lhs_min, intmax_t lhs_max,
 	intmax_t rhs_min, intmax_t rhs_max
 >
-class operator_range<lhs_min, lhs_max, rhs_min, rhs_max, minus> {
-public:
+struct operator_range<lhs_min, lhs_max, rhs_min, rhs_max, minus> {
 	static constexpr auto min() noexcept -> intmax_t {
 		return lhs_min - rhs_max;
 	}
@@ -128,7 +119,7 @@ template<
 	intmax_t lhs_min, intmax_t lhs_max,
 	intmax_t rhs_min, intmax_t rhs_max
 >
-class operator_range<lhs_min, lhs_max, rhs_min, rhs_max, multiplies> {
+struct operator_range<lhs_min, lhs_max, rhs_min, rhs_max, multiplies> {
 private:
 	static constexpr intmax_t p0 = lhs_min * rhs_min;
 	static constexpr intmax_t p1 = lhs_min * rhs_max;
@@ -148,7 +139,7 @@ template<
 	intmax_t lhs_min, intmax_t lhs_max,
 	intmax_t rhs_min, intmax_t rhs_max
 >
-class operator_range<lhs_min, lhs_max, rhs_min, rhs_max, divides> {
+struct operator_range<lhs_min, lhs_max, rhs_min, rhs_max, divides> {
 private:
 	static_assert(rhs_min != 0 or rhs_max != 0, "division is not defined for a divisor of zero.");
 	// If 1 falls within the range, that is the least positive divisor. The
@@ -182,7 +173,7 @@ template<
 	intmax_t lhs_min, intmax_t lhs_max,
 	intmax_t rhs_min, intmax_t rhs_max
 >
-class operator_range<lhs_min, lhs_max, rhs_min, rhs_max, modulus> {
+struct operator_range<lhs_min, lhs_max, rhs_min, rhs_max, modulus> {
 private:
 	static_assert(rhs_min != 0 or rhs_max != 0, "modulo is not defined for a divisor of zero.");
 	// The sign of the result is equal to the sign of the lhs. The sign of the
@@ -206,8 +197,7 @@ private:
 	using result_type = std::pair<intmax_t, intmax_t>;
 
 	template<intmax_t minimum_dividend, intmax_t maximum_dividend>
-	class sign_free_value {
-	public:
+	struct sign_free_value {
 		static_assert(minimum_dividend <= 0, "Got a positive value where a negative was expected.");
 		static_assert(maximum_dividend <= 0, "Got a positive value where a negative was expected.");
 		static_assert(minimum_dividend >= maximum_dividend, "Range is inverted.");
@@ -295,8 +285,7 @@ template<
 	intmax_t lhs_min, intmax_t lhs_max,
 	intmax_t rhs_min, intmax_t rhs_max
 >
-class operator_range<lhs_min, lhs_max, rhs_min, rhs_max, left_shift> {
-public:
+struct operator_range<lhs_min, lhs_max, rhs_min, rhs_max, left_shift> {
 	static_assert(lhs_min >= 0 and rhs_min >= 0, "Left shift not defined for negative values.");
 	static_assert(rhs_max <= std::numeric_limits<intmax_t>::digits, "Cannot left shift >= width of intmax_t.");
 	static constexpr auto min() noexcept -> intmax_t {
@@ -312,8 +301,7 @@ template<
 	intmax_t lhs_min, intmax_t lhs_max,
 	intmax_t rhs_min, intmax_t rhs_max
 >
-class operator_range<lhs_min, lhs_max, rhs_min, rhs_max, right_shift> {
-public:
+struct operator_range<lhs_min, lhs_max, rhs_min, rhs_max, right_shift> {
 	static_assert(lhs_min >= 0 and rhs_min >= 0, "Right shift not defined for negative values.");
 	static_assert(rhs_max <= std::numeric_limits<intmax_t>::digits, "Cannot right shift >= width of intmax_t.");
 	static constexpr auto min() noexcept -> intmax_t {

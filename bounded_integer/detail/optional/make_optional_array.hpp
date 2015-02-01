@@ -29,7 +29,7 @@ namespace bounded {
 namespace detail {
 
 template<typename... Ts>
-class common_optional_type;
+struct common_optional_type;
 
 template<typename... Ts>
 using common_optional_type_t = typename common_optional_type<std::decay_t<Ts>...>::type;
@@ -37,43 +37,35 @@ using common_optional_type_t = typename common_optional_type<std::decay_t<Ts>...
 // I manually stamp out a few of these templates to avoid hitting the template
 // instantiation limit of various compilers when creating large arrays.
 template<typename T1, typename T2, typename T3, typename T4, typename T5, typename T6, typename T7, typename T8, typename T9, typename... Ts>
-class common_optional_type<T1, T2, T3, T4, T5, T6, T7, T8, T9, Ts...> {
-public:
+struct common_optional_type<T1, T2, T3, T4, T5, T6, T7, T8, T9, Ts...> {
 	using type = common_optional_type_t<common_optional_type_t<T1, T2, T3, T4, T5, T6, T7, T8>, T9, Ts...>;
 };
 template<typename T1, typename T2, typename T3, typename T4, typename T5, typename... Ts>
-class common_optional_type<T1, T2, T3, T4, T5, Ts...> {
-public:
+struct common_optional_type<T1, T2, T3, T4, T5, Ts...> {
 	using type = common_optional_type_t<common_optional_type_t<T1, T2, T3, T4>, T5, Ts...>;
 };
 template<typename T1, typename T2, typename... Ts>
-class common_optional_type<T1, T2, Ts...> {
-public:
+struct common_optional_type<T1, T2, Ts...> {
 	using type = common_optional_type_t<common_optional_type_t<T1, T2>, Ts...>;
 };
 template<typename T1, typename T2>
-class common_optional_type<T1, T2> {
-public:
+struct common_optional_type<T1, T2> {
 	using type = std::common_type_t<T1, T2>;
 };
 template<typename T>
-class common_optional_type<T> {
-public:
+struct common_optional_type<T> {
 	using type = T;
 };
 template<typename T1>
-class common_optional_type<T1, none_t> {
-public:
+struct common_optional_type<T1, none_t> {
 	using type = T1;
 };
 template<typename T2>
-class common_optional_type<none_t, T2> {
-public:
+struct common_optional_type<none_t, T2> {
 	using type = T2;
 };
 template<>
-class common_optional_type<none_t, none_t> {
-public:
+struct common_optional_type<none_t, none_t> {
 	using type = none_t;
 };
 

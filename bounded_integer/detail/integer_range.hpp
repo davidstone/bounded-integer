@@ -1,5 +1,5 @@
 // Iterate over a numeric range
-// Copyright (C) 2014 David Stone
+// Copyright (C) 2015 David Stone
 //
 // This program is free software: you can redistribute it and / or modify
 // it under the terms of the GNU Affero General Public License as
@@ -29,7 +29,7 @@
 namespace bounded {
 
 template<typename T>
-class integer_range_type;
+struct integer_range_type;
 
 namespace detail {
 namespace integer_range_iterator {
@@ -40,8 +40,7 @@ constexpr auto range_of_type() noexcept {
 }
 
 template<typename T>
-class iterator {
-public:
+struct iterator {
 	// We have to be able to index the one-past-the-end element. Not sure if
 	// this should have a throw_policy.
 	using index_type = integer<0, range_of_type<T>()>;
@@ -86,7 +85,7 @@ public:
 		return lhs.m_value < rhs.m_value;
 	}
 private:
-	friend class integer_range_type<T>;
+	friend struct integer_range_type<T>;
 	using underlying_type = T;
 	explicit constexpr iterator(underlying_type const value) noexcept:
 		m_value(value) {
@@ -156,8 +155,7 @@ constexpr auto operator<=(iterator<T> const & lhs, iterator<T> const & rhs) noex
 }	// namespace detail
 
 template<typename T>
-class integer_range_type {
-public:
+struct integer_range_type {
 	static_assert(std::numeric_limits<T>::is_specialized, "Must be a numeric type.");
 	using const_iterator = detail::integer_range_iterator::iterator<T>;
 	using const_reverse_iterator = std::reverse_iterator<const_iterator>;

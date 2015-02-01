@@ -1,5 +1,5 @@
 // Forward declaration
-// Copyright (C) 2014 David Stone
+// Copyright (C) 2015 David Stone
 //
 // This program is free software: you can redistribute it and / or modify
 // it under the terms of the GNU Affero General Public License as
@@ -24,7 +24,7 @@ namespace bounded {
 enum class storage_type { fast, least };
 
 template<intmax_t minimum, intmax_t maximum, typename overflow_policy, storage_type storage>
-class integer;
+struct integer;
 
 // Does not verify that the value is in range with the policy
 enum non_check_t { non_check };

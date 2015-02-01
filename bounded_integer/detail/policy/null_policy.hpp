@@ -1,5 +1,5 @@
 // Does nothing. Overflow is undefined behavior
-// Copyright (C) 2014 David Stone
+// Copyright (C) 2015 David Stone
 //
 // This program is free software: you can redistribute it and / or modify
 // it under the terms of the GNU Affero General Public License as
@@ -26,8 +26,7 @@
 namespace bounded {
 namespace policy_detail {
 
-class null_policy {
-public:
+struct null_policy {
 	// The identity function is intentionally not constexpr. This provides
 	// compile-time checking if used in a constexpr context. If this is called
 	// at run-time, the optimizer should detect that all branches return the
@@ -58,18 +57,15 @@ using null_policy = basic_policy<policy_detail::null_policy>;
 
 
 template<typename policy>
-class common_policy<policy, null_policy> {
-public:
+struct common_policy<policy, null_policy> {
 	using type = policy;
 };
 template<typename policy>
-class common_policy<null_policy, policy> {
-public:
+struct common_policy<null_policy, policy> {
 	using type = policy;
 };
 template<>
-class common_policy<null_policy, null_policy> {
-public:
+struct common_policy<null_policy, null_policy> {
 	using type = null_policy;
 };
 

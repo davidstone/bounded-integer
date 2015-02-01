@@ -1,5 +1,5 @@
 // Specifies which policy should be used in the result type of some operations
-// Copyright (C) 2014 David Stone
+// Copyright (C) 2015 David Stone
 //
 // This program is free software: you can redistribute it and / or modify
 // it under the terms of the GNU Affero General Public License as
@@ -20,24 +20,21 @@
 namespace bounded {
 
 template<typename... policies>
-class common_policy {
+struct common_policy {
 };
 
 template<typename policy1, typename policy2, typename... policies>
-class common_policy<policy1, policy2, policies...> {
-public:
+struct common_policy<policy1, policy2, policies...> {
 	using type = typename common_policy<typename common_policy<policy1, policy2>::type, policies...>::type;
 };
 
 template<typename policy>
-class common_policy<policy> {
-public:
+struct common_policy<policy> {
 	using type = policy;
 };
 
 template<typename policy>
-class common_policy<policy, policy> {
-public:
+struct common_policy<policy, policy> {
 	using type = policy;
 };
 

@@ -551,8 +551,7 @@ namespace check_non_integer_minmax {
 	static_assert(!string_less("10", "1"), "Incorrect string comparison function.");
 	static_assert(!string_less("1", "1"), "Incorrect string comparison function.");
 
-	class string_view {
-	public:
+	struct string_view {
 		explicit constexpr string_view(char const * value) noexcept:
 			m_value(value) {
 		}
@@ -617,8 +616,7 @@ auto check_reference_minmax() {
 	// Check that built-in and class types have the same behavior, unlike
 	// operator?:
 	check_specific_reference_minmax<int>();
-	class class_type {
-	public:
+	struct class_type {
 		constexpr auto operator<(class_type) const noexcept -> bool {
 			return true;
 		}

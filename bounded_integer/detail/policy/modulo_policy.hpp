@@ -26,7 +26,7 @@
 namespace bounded {
 namespace policy_detail {
 
-class modulo_policy {
+struct modulo_policy {
 private:
 	template<intmax_t value>
 	static constexpr auto make() noexcept -> integer<value, value> {

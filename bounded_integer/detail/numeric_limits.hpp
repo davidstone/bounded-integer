@@ -27,7 +27,7 @@ namespace bounded {
 // This does not requiring having a definition of bounded::integer to get at the
 // minimum and maximum, so it can be used in the definition of bounded::integer.
 template<typename T>
-class basic_numeric_limits {
+struct basic_numeric_limits {
 private:
 	using real_numeric_limits = std::conditional_t<std::is_same<T, std::decay_t<T>>::value,
 		std::numeric_limits<T>,
@@ -45,8 +45,7 @@ public:
 };
 
 template<intmax_t minimum, intmax_t maximum, typename overflow_policy, storage_type storage>
-class basic_numeric_limits<integer<minimum, maximum, overflow_policy, storage>> {
-public:
+struct basic_numeric_limits<integer<minimum, maximum, overflow_policy, storage>> {
 	static constexpr auto min() noexcept -> intmax_t {
 		return minimum;
 	}
@@ -58,8 +57,7 @@ public:
 };
 
 template<typename T, T value>
-class basic_numeric_limits<std::integral_constant<T, value>> {
-public:
+struct basic_numeric_limits<std::integral_constant<T, value>> {
 	static constexpr auto min() noexcept -> intmax_t {
 		return value;
 	}
@@ -124,7 +122,7 @@ constexpr auto test_log_successor_abs<10>(intmax_t value) -> int {
 }
 
 template<intmax_t base>
-class digits {
+struct digits {
 private:
 	// I don't know if this is actually correct. I could theoretically use a
 	// more compact representation of values that have a minimum that is far
@@ -204,7 +202,7 @@ public:
 namespace std {
 
 template<intmax_t minimum, intmax_t maximum, typename overflow_policy, bounded::storage_type storage>
-class numeric_limits<bounded::integer<minimum, maximum, overflow_policy, storage>> {
+struct numeric_limits<bounded::integer<minimum, maximum, overflow_policy, storage>> {
 private:
 	using type = bounded::integer<minimum, maximum, overflow_policy, storage>;
 public:

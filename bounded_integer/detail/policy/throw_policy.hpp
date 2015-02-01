@@ -1,5 +1,5 @@
 // Throws an exception on overflow
-// Copyright (C) 2014 David Stone
+// Copyright (C) 2015 David Stone
 //
 // This program is free software: you can redistribute it and / or modify
 // it under the terms of the GNU Affero General Public License as
@@ -26,8 +26,7 @@
 namespace bounded {
 namespace policy_detail {
 
-class throw_policy {
-public:
+struct throw_policy {
 	// The optimizer should be able to simplify this to remove dead checks.
 	template<typename T, typename Minimum, typename Maximum>
 	static constexpr auto assignment(T && value, Minimum && minimum, Maximum && maximum) -> T && {

@@ -1,5 +1,5 @@
 // Reduces boilerplate for simple policies
-// Copyright (C) 2014 David Stone
+// Copyright (C) 2015 David Stone
 //
 // This program is free software: you can redistribute it and / or modify
 // it under the terms of the GNU Affero General Public License as
@@ -24,8 +24,7 @@
 namespace bounded {
 
 template<typename policy_type>
-class basic_policy : private policy_type {
-public:
+struct basic_policy : private policy_type {
 	static_assert(
 		std::is_empty<policy_type>::value,
 		"basic_policy can only be used with stateless policies"

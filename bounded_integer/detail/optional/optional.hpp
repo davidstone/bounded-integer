@@ -42,7 +42,7 @@ struct get_underlying<integer<minimum, maximum, overflow>> {
 };
 
 template<typename T>
-class has_extra_space {
+struct has_extra_space {
 private:
 	static_assert(basic_numeric_limits<T>::is_specialized, "Metafunction only works with integer types.");
 	using underlying_type = typename get_underlying<T>::type;
@@ -55,10 +55,10 @@ public:
 };
 
 template<typename T, bool has_extra_space>
-class optional_storage;
+struct optional_storage;
 
 template<typename T>
-class optional_storage<T, true> {
+struct optional_storage<T, true> {
 private:
 	using underlying_type = typename get_underlying<T>::type;
 	static constexpr auto minimum = basic_numeric_limits<T>::min();
@@ -126,8 +126,7 @@ public:
 // Replaced this with a version that uses std::aligned_storage to allow it to
 // work with any type
 template<typename T>
-class optional_storage<T, false> {
-public:
+struct optional_storage<T, false> {
 	constexpr optional_storage() noexcept:
 		m_initialized(false),
 		m_value(uninitialized_value()) {
@@ -182,8 +181,7 @@ private:
 }	// namespace detail
 
 template<typename T>
-class optional {
-public:
+struct optional {
 	using value_type = T;
 private:
 	using storage_type = detail::optional_storage<value_type, detail::has_extra_space<value_type>::value>;
@@ -262,7 +260,7 @@ public:
 	}
 private:
 	template<typename U>
-	friend class optional;
+	friend struct optional;
 	storage_type m_storage;
 };
 

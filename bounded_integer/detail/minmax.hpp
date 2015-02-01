@@ -35,15 +35,13 @@ namespace minmax {
 // specifications.
 //
 // TODO: Add total ordering for pointer types
-class less {
-public:
+struct less {
 	template<typename LHS, typename RHS>
 	constexpr auto operator()(LHS && lhs, RHS && rhs) const noexcept(noexcept(std::forward<LHS>(lhs) < std::forward<RHS>(rhs))) {
 		return std::forward<LHS>(lhs) < std::forward<RHS>(rhs);
 	}
 };
-class greater {
-public:
+struct greater {
 	template<typename LHS, typename RHS>
 	constexpr auto operator()(LHS && lhs, RHS && rhs) const noexcept(noexcept(std::forward<LHS>(lhs) > std::forward<RHS>(rhs))) {
 		return std::forward<LHS>(lhs) > std::forward<RHS>(rhs);
@@ -67,8 +65,7 @@ constexpr Target construct(Source && source) noexcept(noexcept(static_cast<Targe
 // Specialize this class to give the correct type for your own extreme function
 // if the default does not work
 template<typename Compare, typename T1, typename T2>
-class extreme_type {
-public:
+struct extreme_type {
 	using type = std::common_type_t<T1, T2>;
 };
 
@@ -81,7 +78,7 @@ template<
 	intmax_t rhs_min, intmax_t rhs_max, typename rhs_policy,
 	storage_type storage
 >
-class extreme_type<
+struct extreme_type<
 	Compare,
 	integer<lhs_min, lhs_max, lhs_policy, storage>,
 	integer<rhs_min, rhs_max, rhs_policy, storage>

@@ -31,13 +31,13 @@
 namespace bounded {
 
 template<intmax_t static_minimum, intmax_t static_maximum, typename overflow_policy, storage_type storage = storage_type::fast>
-class dynamic_policy;
+struct dynamic_policy;
 
 template<intmax_t static_minimum, intmax_t static_maximum, typename overflow_policy, storage_type storage = storage_type::fast>
-class dynamic_max_policy;
+struct dynamic_max_policy;
 
 template<intmax_t static_minimum, intmax_t static_maximum, typename overflow_policy, storage_type storage = storage_type::fast>
-class dynamic_min_policy;
+struct dynamic_min_policy;
 
 namespace detail {
 
@@ -114,8 +114,7 @@ constexpr decltype(auto) get_maximum(OverflowPolicy const & policy) noexcept {
 
 
 template<intmax_t static_minimum, intmax_t static_maximum, typename overflow_policy, storage_type storage>
-class dynamic_policy : private overflow_policy {
-public:
+struct dynamic_policy : private overflow_policy {
 	using overflow_policy_tag = void;
 	using underlying_type = integer<static_minimum, static_maximum, overflow_policy, storage>;
 
@@ -235,8 +234,7 @@ private:
 
 
 template<intmax_t static_minimum, intmax_t static_maximum, typename overflow_policy, storage_type storage>
-class dynamic_max_policy : private overflow_policy {
-public:
+struct dynamic_max_policy : private overflow_policy {
 	using overflow_policy_tag = void;
 	using underlying_type = integer<static_minimum, static_maximum, overflow_policy, storage>;
 
@@ -338,8 +336,7 @@ private:
 
 
 template<intmax_t static_minimum, intmax_t static_maximum, typename overflow_policy, storage_type storage>
-class dynamic_min_policy : private overflow_policy {
-public:
+struct dynamic_min_policy : private overflow_policy {
 	using overflow_policy_tag = void;
 	using underlying_type = integer<static_minimum, static_maximum, overflow_policy, storage>;
 

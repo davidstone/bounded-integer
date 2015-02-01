@@ -67,8 +67,7 @@ constexpr decltype(auto) get_overflow_policy(T const & value) noexcept {
 }
 
 template<intmax_t minimum, intmax_t maximum, typename overflow_policy_ = null_policy, storage_type storage = storage_type::fast>
-class integer : private overflow_policy_ {
-public:
+struct integer : private overflow_policy_ {
 	static_assert(minimum <= maximum, "Maximum cannot be less than minimum");
 	using underlying_type = std::conditional_t<storage == storage_type::fast, detail::fast_t<minimum, maximum>, detail::least_t<minimum, maximum>>;
 	using overflow_policy_type = overflow_policy_;

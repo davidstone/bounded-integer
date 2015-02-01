@@ -1,5 +1,5 @@
 // Array class with better interoperability with bounded than std::array
-// Copyright (C) 2014 David Stone
+// Copyright (C) 2015 David Stone
 //
 // This program is free software: you can redistribute it and / or modify
 // it under the terms of the GNU Affero General Public License as
@@ -32,13 +32,12 @@
 namespace bounded {
 
 template<typename T, std::size_t size>
-class array;
+struct array;
 
 namespace detail {
 
 template<typename T, intmax_t size>
-class iterator {
-public:
+struct iterator {
 	using value_type = T;
 	using difference_type = integer<-size, size>;
 	using index_type = integer<0, size - 1, throw_policy>;
@@ -78,9 +77,9 @@ public:
 
 private:
 	template<typename U, std::size_t size_>
-	friend class ::bounded::array;
+	friend struct ::bounded::array;
 	template<typename U, intmax_t size_>
-	friend class iterator;
+	friend struct iterator;
 
 	using base_iterator = value_type *;
 	constexpr explicit iterator(base_iterator const other) noexcept:
@@ -162,8 +161,7 @@ struct is_nothrow_swappable : std::integral_constant<bool, noexcept(swap(std::de
 }	// namespace detail
 
 template<typename T, std::size_t size_>
-class array {
-public:
+struct array {
 	using value_type = T;
 
 	using const_iterator = detail::iterator<value_type const, size_>;
@@ -341,7 +339,7 @@ auto swap(array<T, size> & lhs, array<T, size> & rhs) noexcept(noexcept(lhs.swap
 namespace std {
 
 template<typename T, size_t size>
-struct tuple_size<::array<T, size>> : public integral_constant<size_t, size> {};
+struct tuple_size<::array<T, size>> : integral_constant<size_t, size> {};
 
 template<size_t index, typename T, size_t size>
 struct tuple_element<index, ::array<T, size>> {

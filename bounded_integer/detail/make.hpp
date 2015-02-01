@@ -1,5 +1,5 @@
 // Factory function that turns a built-in into a bounded
-// Copyright (C) 2014 David Stone
+// Copyright (C) 2015 David Stone
 //
 // This program is free software: you can redistribute it and / or modify
 // it under the terms of the GNU Affero General Public License as
@@ -29,13 +29,11 @@ namespace bounded {
 namespace detail {
 
 template<typename T>
-class equivalent_overflow_policy_c {
-public:
+struct equivalent_overflow_policy_c {
 	using type = std::conditional_t<std::is_unsigned<T>::value, modulo_policy, null_policy>;
 };
 template<intmax_t minimum, intmax_t maximum, typename overflow_policy, storage_type storage>
-class equivalent_overflow_policy_c<integer<minimum, maximum, overflow_policy, storage>> {
-public:
+struct equivalent_overflow_policy_c<integer<minimum, maximum, overflow_policy, storage>> {
 	using type = overflow_policy;
 };
 

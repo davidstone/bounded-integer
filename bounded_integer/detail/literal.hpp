@@ -1,5 +1,5 @@
 // bounded type literal
-// Copyright (C) 2014 David Stone
+// Copyright (C) 2015 David Stone
 //
 // This program is free software: you can redistribute it and / or modify
 // it under the terms of the GNU Affero General Public License as
@@ -32,7 +32,7 @@ constexpr inline auto power(intmax_t const radix, intmax_t const exponent) noexc
 // and that would simplify things a bit. It appears to be a bug in clang because
 // it triggers when unrelated parts of my code change, but I am not sure.
 template<char digit, char... digits>
-class literal {
+struct literal {
 private:
 	static constexpr intmax_t radix = 10;
 	static constexpr intmax_t integer_scale = power(radix, sizeof...(digits));
@@ -43,8 +43,7 @@ public:
 };
 
 template<char digit>
-class literal<digit> {
-public:
+struct literal<digit> {
 	static constexpr auto value() noexcept {
 		return make<digit - '0'>();
 	}
