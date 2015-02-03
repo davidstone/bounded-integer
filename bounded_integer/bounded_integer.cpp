@@ -1023,6 +1023,17 @@ namespace check_modulo_policy {
 		policy.assignment(0_bi, 0_bi, 0_bi) == 0_bi,
 		"Incorrect result for a single-value range that can only hold 0 and a value of 0."
 	);
+	
+	constexpr bounded::wrapping_integer<0, 9> x(15_bi);
+	constexpr bounded::wrapping_integer<0, 1> y(x);
+	static_assert(
+		x == 5_bi,
+		"Incorrect value stored with modulo policy."
+	);
+	static_assert(
+		y == 1_bi,
+		"Incorrect value stored with modulo policy."
+	);
 }	// namespace
 
 namespace check_clamp_policy {
