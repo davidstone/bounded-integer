@@ -35,11 +35,11 @@
 namespace bounded {
 namespace detail {
 
-template<typename T, enable_if_t<basic_numeric_limits<T>::is_specialized> = clang_dummy>
+template<typename T, enable_if_t<basic_numeric_limits<T>::is_integer> = clang_dummy>
 constexpr auto is_implicitly_constructible_from(intmax_t const minimum, intmax_t const maximum) noexcept {
 	return type_fits_in_range<std::decay_t<T>>(minimum, maximum);
 }
-template<typename T, enable_if_t<!basic_numeric_limits<T>::is_specialized> = clang_dummy>
+template<typename T, enable_if_t<!basic_numeric_limits<T>::is_integer> = clang_dummy>
 constexpr auto is_implicitly_constructible_from(intmax_t, intmax_t) noexcept {
 	return false;
 }
