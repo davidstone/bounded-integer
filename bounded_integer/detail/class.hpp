@@ -37,7 +37,7 @@ namespace detail {
 
 template<typename T>
 constexpr bool allow_construction_from() {
-	return basic_numeric_limits<T>::is_specialized and (basic_numeric_limits<T>::is_integer or std::is_enum<T>::value);
+	return basic_numeric_limits<T>::is_specialized and (basic_numeric_limits<T>::is_integer or std::is_enum<std::decay_t<T>>::value);
 }
 
 template<typename T, enable_if_t<allow_construction_from<T>()> = clang_dummy>
@@ -164,13 +164,13 @@ public:
 	template<typename Enum, enable_if_t<
 		std::is_enum<Enum>::value and !detail::is_explicitly_constructible_from<overflow_policy_type, Enum>(minimum, maximum)
 	> = clang_dummy>
-	constexpr explicit integer(Enum other, overflow_policy_type policy, non_check_t) noexcept:
+	constexpr integer(Enum other, overflow_policy_type policy, non_check_t) noexcept:
 		integer(static_cast<std::underlying_type_t<Enum>>(other), std::move(policy), non_check) {
 	}
 	template<typename Enum, enable_if_t<
 		std::is_enum<Enum>::value and !detail::is_explicitly_constructible_from<overflow_policy_type, Enum>(minimum, maximum)
 	> = clang_dummy>
-	constexpr explicit integer(Enum other, non_check_t) noexcept:
+	constexpr integer(Enum other, non_check_t) noexcept:
 		integer(static_cast<std::underlying_type_t<Enum>>(other), non_check) {
 	}
 	template<typename Enum, enable_if_t<

@@ -1329,11 +1329,14 @@ namespace {
 namespace check_enum_construction {
 	enum unscoped_enum {};
 	constexpr bounded::integer<0, 10> x(unscoped_enum{});
+	constexpr auto a = bounded::make(unscoped_enum{});
 	
 	enum class scoped_enum {};
 	constexpr bounded::integer<0, 10> y(scoped_enum{});
+	// constexpr auto b = bounded::make(scoped_enum{});
 	
 	constexpr bounded::integer<0, 10> z(bounded_enum{});
+	constexpr auto c = bounded::make(bounded_enum{});
 }
 
 }	// namespace

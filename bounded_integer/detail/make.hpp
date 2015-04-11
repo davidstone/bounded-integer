@@ -84,7 +84,6 @@ constexpr auto make(T const & value) noexcept -> equivalent_type<
 	>,
 	storage
 > {
-	static_assert(basic_numeric_limits<T>::is_integer, "Must be an integer type.");
 	return {value, non_check};
 }
 
