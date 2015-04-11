@@ -1306,6 +1306,36 @@ auto check_iterator() {
 	assert(bounded::prev(a.end()) == a.begin());
 }
 
+enum class bounded_enum{};
+
+}	// namespace
+namespace bounded {
+
+template<>
+struct basic_numeric_limits<bounded_enum> {
+	static constexpr auto min() noexcept -> intmax_t {
+		return 0;
+	}
+	static constexpr auto max() noexcept -> intmax_t {
+		return 0;
+	}
+	static constexpr bool is_specialized = true;
+	static constexpr bool is_integer = false;
+};
+}
+
+namespace {
+
+namespace check_enum_construction {
+	enum unscoped_enum {};
+	constexpr bounded::integer<0, 10> x(unscoped_enum{});
+	
+	enum class scoped_enum {};
+	constexpr bounded::integer<0, 10> y(scoped_enum{});
+	
+	constexpr bounded::integer<0, 10> z(bounded_enum{});
+}
+
 }	// namespace
 
 auto main() -> int {

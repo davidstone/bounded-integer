@@ -35,22 +35,41 @@
 namespace bounded {
 namespace detail {
 
-template<typename T, enable_if_t<basic_numeric_limits<T>::is_integer> = clang_dummy>
+template<typename T>
+constexpr bool allow_construction_from() {
+	return basic_numeric_limits<T>::is_specialized and (basic_numeric_limits<T>::is_integer or std::is_enum<T>::value);
+}
+
+template<typename T, enable_if_t<allow_construction_from<T>()> = clang_dummy>
 constexpr auto is_implicitly_constructible_from(intmax_t const minimum, intmax_t const maximum) noexcept {
 	return type_fits_in_range<std::decay_t<T>>(minimum, maximum);
 }
-template<typename T, enable_if_t<!basic_numeric_limits<T>::is_integer> = clang_dummy>
+template<typename T, enable_if_t<!allow_construction_from<T>()> = clang_dummy>
 constexpr auto is_implicitly_constructible_from(intmax_t, intmax_t) noexcept {
 	return false;
 }
 
-template<typename policy, typename T, enable_if_t<basic_numeric_limits<T>::is_specialized> = clang_dummy>
+template<typename policy, typename T, enable_if_t<allow_construction_from<T>()> = clang_dummy>
 constexpr auto is_explicitly_constructible_from(intmax_t const minimum, intmax_t const maximum) noexcept {
 	return type_overlaps_range<std::decay_t<T>>(minimum, maximum) or !policy::overflow_is_error;
 }
-template<typename policy, typename T, enable_if_t<!basic_numeric_limits<T>::is_specialized> = clang_dummy>
+template<typename policy, typename T, enable_if_t<!allow_construction_from<T>()> = clang_dummy>
 constexpr auto is_explicitly_constructible_from(intmax_t, intmax_t) noexcept {
 	return false;
+}
+
+// The user can specialize basic_numeric_limits for their enumeration type to
+// provide tighter bounds than the underlying_type might suggest. This forwards
+// along non-enum types without doing anything, but constructs a
+// bounded::integer with the tighter bounds from an enumeration.
+template<typename T, enable_if_t<!std::is_enum<std::decay_t<T>>::value> = clang_dummy>
+constexpr decltype(auto) as_integer(T && t) noexcept {
+	return static_cast<T &&>(t);
+}
+template<typename T, enable_if_t<std::is_enum<std::decay_t<T>>::value> = clang_dummy>
+constexpr decltype(auto) as_integer(T && t) noexcept {
+	using limits = basic_numeric_limits<T>;
+	return integer<limits::min(), limits::max(), null_policy, storage_type::fast>(static_cast<std::underlying_type_t<std::decay_t<T>>>(t));
 }
 
 }	// namespace detail
@@ -118,7 +137,7 @@ public:
 		detail::is_explicitly_constructible_from<overflow_policy_type, T>(minimum, maximum)
 	> = clang_dummy>
 	constexpr integer(T && other, overflow_policy_type policy) BOUNDED_NOEXCEPT_INITIALIZATION(
-		integer(policy.assignment(std::forward<T>(other), make<minimum>(), make<maximum>()), policy, non_check)
+		integer(policy.assignment(detail::as_integer(std::forward<T>(other)), make<minimum>(), make<maximum>()), policy, non_check)
 	) {
 	}
 
@@ -142,20 +161,28 @@ public:
 	}
 
 
-	template<typename Enum, enable_if_t<std::is_enum<Enum>::value> = clang_dummy>
+	template<typename Enum, enable_if_t<
+		std::is_enum<Enum>::value and !detail::is_explicitly_constructible_from<overflow_policy_type, Enum>(minimum, maximum)
+	> = clang_dummy>
 	constexpr explicit integer(Enum other, overflow_policy_type policy, non_check_t) noexcept:
 		integer(static_cast<std::underlying_type_t<Enum>>(other), std::move(policy), non_check) {
 	}
-	template<typename Enum, enable_if_t<std::is_enum<Enum>::value> = clang_dummy>
+	template<typename Enum, enable_if_t<
+		std::is_enum<Enum>::value and !detail::is_explicitly_constructible_from<overflow_policy_type, Enum>(minimum, maximum)
+	> = clang_dummy>
 	constexpr explicit integer(Enum other, non_check_t) noexcept:
 		integer(static_cast<std::underlying_type_t<Enum>>(other), non_check) {
 	}
-	template<typename Enum, enable_if_t<std::is_enum<Enum>::value> = clang_dummy>
+	template<typename Enum, enable_if_t<
+		std::is_enum<Enum>::value and !detail::is_explicitly_constructible_from<overflow_policy_type, Enum>(minimum, maximum)
+	> = clang_dummy>
 	constexpr explicit integer(Enum other, overflow_policy_type policy) BOUNDED_NOEXCEPT_INITIALIZATION(
 		integer(static_cast<std::underlying_type_t<Enum>>(other), std::move(policy))
 	) {
 	}
-	template<typename Enum, enable_if_t<std::is_enum<Enum>::value> = clang_dummy>
+	template<typename Enum, enable_if_t<
+		std::is_enum<Enum>::value and !detail::is_explicitly_constructible_from<overflow_policy_type, Enum>(minimum, maximum)
+	> = clang_dummy>
 	constexpr explicit integer(Enum other) BOUNDED_NOEXCEPT_INITIALIZATION(
 		integer(static_cast<std::underlying_type_t<Enum>>(other)) 
 	) {
