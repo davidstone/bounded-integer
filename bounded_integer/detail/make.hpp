@@ -60,7 +60,7 @@ using equivalent_type = integer<
 // function is to convert a built-in integer type to a bounded::integer. The
 // bounded::integer analog to built-in integers is a bounded::integer with a
 // null_policy. However, if someone passes in something that is already a
-// bounded::integer, this shouldn't change the policy. Therefore, we default to
+// bounded::integer, this should not change the policy. Therefore, we default to
 // something that is not a valid policy (void) and choose correct default
 // behavior based on that. The policy must be the first parameter to work
 // properly with automatic deduction of the type of `integer`, which means that
@@ -69,11 +69,12 @@ using equivalent_type = integer<
 //
 // 2) The second is defaulted for the same reasons as the first.
 //
-// 3) The third parameter ("integer") has to be defaulted because we defaulted
-// the first two. We don't want "integer" to be the first parameter because that
-// would prevent type deduction from the function argument. Therefore, we
-// default it to something (it doesn't matter what), but the type will always be
-// deduced as whatever we pass as the argument type.
+// 3) The third parameter, T, has to be defaulted because we defaulted the first
+// two. If T were the first template parameter, then we could not take advantage
+// of function argument type deduction if the user specified either of the other
+// two arguments. Therefore, we default it to something (it does not matter
+// what), but the type will always be deduced as whatever we pass as the
+// argument type.
 
 template<typename overflow_policy = void, storage_type storage = storage_type::fast, typename T = void>
 constexpr auto make(T const & value) noexcept -> equivalent_type<
