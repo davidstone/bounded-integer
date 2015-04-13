@@ -1,5 +1,5 @@
 // bounded::integer-aware versions of the standard library algorithm functions
-// Copyright (C) 2014 David Stone
+// Copyright (C) 2015 David Stone
 //
 // This program is free software: you can redistribute it and / or modify
 // it under the terms of the GNU Affero General Public License as
@@ -45,6 +45,28 @@ auto count(InputIterator first, InputIterator last, T const & value) {
 		return v == value;
 	});
 }
+
+
+
+
+// GCC's standard library does some silly shifting magic that we do not want
+
+template<typename InputIterator, typename Predicate>
+auto find_if(InputIterator first, InputIterator const last, Predicate predicate) {
+	for (; first != last; ++first) {
+		if (predicate(*first)) {
+			break;
+		}
+	}
+	return first;
+}
+
+template<typename InputIterator, typename T>
+auto find(InputIterator first, InputIterator last, T const & value) {
+	return find_if(std::move(first), std::move(last), [&](auto const & other) { return value == other; });
+} 
+
+
 
 }	// namespace bounded
 #endif	// BOUNDED_INTEGER_ALGORITHM_HPP_
