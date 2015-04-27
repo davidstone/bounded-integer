@@ -297,6 +297,7 @@ template<typename integer>
 auto check_numeric_limits() {
 	using int_limits = std::numeric_limits<integer>;
 	using bounded_t = bounded::checked_integer<int_limits::min(), int_limits::max()>;
+	static_assert(std::is_same<typename bounded_t::underlying_type, integer>::value, "Incorrect underlying_type.");
 	using bounded_limits = std::numeric_limits<bounded_t>;
 	static_assert(sizeof(bounded_t) == sizeof(integer), "checked_integer wrong size.");
 
@@ -331,7 +332,7 @@ auto check_numeric_limits() {
 	#undef BOUNDED_INTEGER_CHECK_CONDITION
 
 	#define BOUNDED_INTEGER_CHECK_FUNCTION(function) \
-		static_assert(int_limits::function() == bounded_limits::function(), #function "() is wrong.")
+		static_assert(int_limits::function() == bounded_limits::function().value(), #function "() is wrong.")
 	// Some of the functions are meaningless for integers, so I do not compare
 	#define BOUNDED_INTEGER_CHECK_MEANINGLESS_FUNCTION(function) \
 		static_cast<void>(bounded_limits::function())
