@@ -25,21 +25,18 @@
 namespace bounded {
 namespace detail {
 
-template<typename T, std::size_t... dimensions>
-struct array_c;
-
-template<typename T, std::size_t... dimensions>
-using array_type = typename array_c<T, dimensions...>::type;
-
 template<typename T, std::size_t dimension, std::size_t... dimensions>
-struct array_c<T, dimension, dimensions...> {
-	using type = array<array_type<T, dimensions...>, dimension>;
+struct multi_dimensional_array {
+	using type = array<typename multi_dimensional_array<T, dimensions...>::type, dimension>;
 };
 
-template<typename T>
-struct array_c<T> {
-	using type = T;
+template<typename T, std::size_t dimension>
+struct multi_dimensional_array<T, dimension> {
+	using type = array<T, dimension>;
 };
+
+template<typename T, std::size_t... dimensions>
+using multi_dimensional_array_t = typename multi_dimensional_array<T, dimensions...>::type;
 
 template<std::size_t... dimensions>
 struct dimension_product;
@@ -71,23 +68,23 @@ public:
 // explicitly typed overload of make_explicit_array) because every time you
 // forward a large number of arguments, gcc and clang both use up a lot of
 // memory. For creating an array of around 4000 elements, these functions were
-// unusable when they did not all construct detail::array_type directly.
+// unusable when they did not construct the array directly.
 
 // These assume that all of the dimensions have been passed in.
 template<typename element_type, std::size_t... dimensions, typename... Args>
 constexpr auto make_explicit_array(Args && ... args) noexcept {
-	return detail::array_type<element_type, dimensions...>{ std::forward<Args>(args)... };
+	return detail::multi_dimensional_array_t<element_type, dimensions...>{ std::forward<Args>(args)... };
 }
 template<std::size_t... dimensions, typename... Args>
 constexpr auto make_explicit_array(Args && ... args) noexcept {
-	return detail::array_type<std::common_type_t<Args...>, dimensions...>{ std::forward<Args>(args)... };
+	return detail::multi_dimensional_array_t<std::common_type_t<Args...>, dimensions...>{ std::forward<Args>(args)... };
 }
 
 
 // These assume you did not specify the inner-most dimension.
 template<typename element_type, std::size_t... dimensions, typename... Args>
 constexpr auto make_array(Args && ... args) noexcept {
-	return detail::array_type<
+	return detail::multi_dimensional_array_t<
 		element_type,
 		detail::final_dimension<sizeof...(Args), dimensions...>::value, dimensions...
 	>{ std::forward<Args>(args)... };
@@ -95,7 +92,7 @@ constexpr auto make_array(Args && ... args) noexcept {
 
 template<std::size_t... dimensions, typename... Args>
 constexpr auto make_array(Args && ... args) noexcept {
-	return detail::array_type<
+	return detail::multi_dimensional_array_t<
 		std::common_type_t<Args...>,
 		detail::final_dimension<sizeof...(Args), dimensions...>::value, dimensions...
 	>{ std::forward<Args>(args)... };

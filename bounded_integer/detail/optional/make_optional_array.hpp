@@ -74,7 +74,7 @@ struct common_optional_type<none_t, none_t> {
 // This assumes that all of the dimensions have been passed in.
 template<std::size_t... dimensions, typename... Integers>
 constexpr auto make_explicit_optional_array(Integers && ... integers) noexcept {
-	return detail::array_type<
+	return detail::multi_dimensional_array_t<
 		optional<detail::common_optional_type_t<Integers...>>,
 		dimensions...
 	>{ std::forward<Integers>(integers)... };
@@ -84,7 +84,7 @@ constexpr auto make_explicit_optional_array(Integers && ... integers) noexcept {
 // This assumes you did not specify the first dimension.
 template<std::size_t... dimensions, typename... Integers>
 constexpr auto make_optional_array(Integers && ... integers) noexcept {
-	return detail::array_type<
+	return detail::multi_dimensional_array_t<
 		optional<detail::common_optional_type_t<Integers...>>,
 		detail::final_dimension<sizeof...(Integers), dimensions...>::value, dimensions...
 	>{ std::forward<Integers>(integers)... };
