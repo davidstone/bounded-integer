@@ -1,5 +1,5 @@
 // Make an array with automatically deduced size and type
-// Copyright (C) 2014 David Stone
+// Copyright (C) 2015 David Stone
 //
 // This program is free software: you can redistribute it and / or modify
 // it under the terms of the GNU Affero General Public License as
@@ -39,16 +39,13 @@ template<typename T, std::size_t... dimensions>
 using multi_dimensional_array_t = typename multi_dimensional_array<T, dimensions...>::type;
 
 template<std::size_t... dimensions>
-struct dimension_product;
+struct dimension_product {
+	static constexpr std::size_t value = 1;
+};
 
 template<std::size_t dimension, std::size_t... dimensions>
 struct dimension_product<dimension, dimensions...> {
 	static constexpr std::size_t value = dimension * dimension_product<dimensions...>::value;
-};
-
-template<>
-struct dimension_product<> {
-	static constexpr std::size_t value = 1;
 };
 
 template<std::size_t number_of_values, std::size_t... dimensions>
