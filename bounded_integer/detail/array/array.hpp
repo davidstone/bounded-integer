@@ -31,13 +31,13 @@
 
 namespace bounded {
 
+namespace detail {
+
 template<typename T, std::size_t size>
 struct array;
 
-namespace detail {
-
 template<typename T, intmax_t size>
-struct iterator {
+struct basic_iterator {
 	using value_type = T;
 	using difference_type = integer<-size, size>;
 	using index_type = integer<0, size - 1, throw_policy>;
@@ -45,10 +45,10 @@ struct iterator {
 	using reference = value_type &;
 	using iterator_category = std::random_access_iterator_tag;
 
-	constexpr iterator() noexcept = default;
+	constexpr basic_iterator() noexcept = default;
 	// Convert iterator to const_iterator
-	constexpr operator iterator<T const, size>() const noexcept {
-		return iterator<T const, size>(m_it);
+	constexpr operator basic_iterator<T const, size>() const noexcept {
+		return basic_iterator<T const, size>(m_it);
 	}
 
 	constexpr auto operator*() const -> reference {
@@ -61,28 +61,28 @@ struct iterator {
 		return m_it[static_cast<std::size_t>(index)];
 	}
 
-	friend constexpr auto operator+(iterator const lhs, difference_type const rhs) -> iterator {
-		return iterator(lhs.m_it + rhs);
+	friend constexpr auto operator+(basic_iterator const lhs, difference_type const rhs) -> basic_iterator {
+		return basic_iterator(lhs.m_it + rhs);
 	}
-	friend constexpr auto operator-(iterator const lhs, iterator const rhs) -> difference_type {
+	friend constexpr auto operator-(basic_iterator const lhs, basic_iterator const rhs) -> difference_type {
 		return static_cast<difference_type>(lhs.m_it - rhs.m_it);
 	}
 
-	friend constexpr auto operator==(iterator const lhs, iterator const rhs) noexcept -> bool {
+	friend constexpr auto operator==(basic_iterator const lhs, basic_iterator const rhs) noexcept -> bool {
 		return lhs.m_it == rhs.m_it;
 	}
-	friend constexpr auto operator<(iterator const lhs, iterator const rhs) noexcept -> bool {
+	friend constexpr auto operator<(basic_iterator const lhs, basic_iterator const rhs) noexcept -> bool {
 		return lhs.m_it < rhs.m_it;
 	}
 
 private:
 	template<typename U, std::size_t size_>
-	friend struct ::bounded::array;
+	friend struct ::bounded::detail::array;
 	template<typename U, intmax_t size_>
-	friend struct iterator;
+	friend struct basic_iterator;
 
 	using base_iterator = value_type *;
-	constexpr explicit iterator(base_iterator const other) noexcept:
+	constexpr explicit basic_iterator(base_iterator const other) noexcept:
 		m_it(other) {
 	}
 
@@ -91,60 +91,60 @@ private:
 
 
 template<typename T, intmax_t size>
-constexpr auto operator!=(iterator<T, size> const lhs, iterator<T, size> const rhs) noexcept -> bool {
+constexpr auto operator!=(basic_iterator<T, size> const lhs, basic_iterator<T, size> const rhs) noexcept -> bool {
 	return !(lhs == rhs);
 }
 
 template<typename T, intmax_t size>
-constexpr auto operator>(iterator<T, size> const lhs, iterator<T, size> const rhs) noexcept -> bool {
+constexpr auto operator>(basic_iterator<T, size> const lhs, basic_iterator<T, size> const rhs) noexcept -> bool {
 	return rhs < lhs;
 }
 template<typename T, intmax_t size>
-constexpr auto operator<=(iterator<T, size> const lhs, iterator<T, size> const rhs) noexcept -> bool {
+constexpr auto operator<=(basic_iterator<T, size> const lhs, basic_iterator<T, size> const rhs) noexcept -> bool {
 	return !(lhs > rhs);
 }
 template<typename T, intmax_t size>
-constexpr auto operator>=(iterator<T, size> const lhs, iterator<T, size> const rhs) noexcept -> bool {
+constexpr auto operator>=(basic_iterator<T, size> const lhs, basic_iterator<T, size> const rhs) noexcept -> bool {
 	return !(lhs < rhs);
 }
 
 
 template<typename T, intmax_t size>
-constexpr auto operator+(typename iterator<T, size>::difference_type const lhs, iterator<T, size> const rhs) -> iterator<T, size> {
+constexpr auto operator+(typename basic_iterator<T, size>::difference_type const lhs, basic_iterator<T, size> const rhs) -> basic_iterator<T, size> {
 	return rhs + lhs;
 }
 template<typename T, intmax_t size>
-constexpr auto operator-(iterator<T, size> const lhs, typename iterator<T, size>::difference_type const rhs) -> iterator<T, size> {
+constexpr auto operator-(basic_iterator<T, size> const lhs, typename basic_iterator<T, size>::difference_type const rhs) -> basic_iterator<T, size> {
 	return lhs + -rhs;
 }
 
 
 template<typename T, intmax_t size>
-auto operator+=(iterator<T, size> & it, typename iterator<T, size>::difference_type const offset) -> iterator<T, size> & {
+auto operator+=(basic_iterator<T, size> & it, typename basic_iterator<T, size>::difference_type const offset) -> basic_iterator<T, size> & {
 	return it = it + offset;
 }
 template<typename T, intmax_t size>
-auto operator-=(iterator<T, size> & it, typename iterator<T, size>::difference_type const offset) -> iterator<T, size> & {
+auto operator-=(basic_iterator<T, size> & it, typename basic_iterator<T, size>::difference_type const offset) -> basic_iterator<T, size> & {
 	return it += -offset;
 }
 
 
 template<typename T, intmax_t size>
-auto operator++(iterator<T, size> & it) -> iterator<T, size> & {
+auto operator++(basic_iterator<T, size> & it) -> basic_iterator<T, size> & {
 	return it += make<1>();
 }
 template<typename T, intmax_t size>
-auto operator++(iterator<T, size> & it, int) -> iterator<T, size> {
+auto operator++(basic_iterator<T, size> & it, int) -> basic_iterator<T, size> {
 	auto const original = it;
 	++it;
 	return original;
 }
 template<typename T, intmax_t size>
-auto operator--(iterator<T, size> & it) -> iterator<T, size> & {
+auto operator--(basic_iterator<T, size> & it) -> basic_iterator<T, size> & {
 	return it -= make<1>();
 }
 template<typename T, intmax_t size>
-auto operator--(iterator<T, size> & it, int) -> iterator<T, size> {
+auto operator--(basic_iterator<T, size> & it, int) -> basic_iterator<T, size> {
 	auto const original = it;
 	--it;
 	return original;
@@ -158,14 +158,13 @@ template<typename T, typename U>
 struct is_nothrow_swappable : std::integral_constant<bool, noexcept(swap(std::declval<T &>(), std::declval<U &>()))> {};
 
 }	//	namespace adl
-}	// namespace detail
 
 template<typename T, std::size_t size_>
 struct array {
 	using value_type = T;
 
-	using const_iterator = detail::iterator<value_type const, size_>;
-	using iterator = detail::iterator<value_type, size_>;
+	using const_iterator = basic_iterator<value_type const, size_>;
+	using iterator = basic_iterator<value_type, size_>;
 	using const_reverse_iterator = std::reverse_iterator<const_iterator>;
 	using reverse_iterator = std::reverse_iterator<iterator>;
 
@@ -275,7 +274,7 @@ struct array {
 		std::fill(begin(), end(), value);
 	}
 	
-	auto swap(array & other) noexcept(detail::adl::is_nothrow_swappable<reference, reference>::value) -> void {
+	auto swap(array & other) noexcept(adl::is_nothrow_swappable<reference, reference>::value) -> void {
 		std::swap_ranges(begin(), end(), other.begin());
 	}
 
@@ -332,6 +331,22 @@ template<typename T, std::size_t size>
 auto swap(array<T, size> & lhs, array<T, size> & rhs) noexcept(noexcept(lhs.swap(rhs))) -> void {
 	lhs.swap(rhs);
 }
+
+template<typename T, std::size_t dimension, std::size_t... dimensions>
+struct multi_dimensional_array {
+	using type = array<typename multi_dimensional_array<T, dimensions...>::type, dimension>;
+};
+
+template<typename T, std::size_t dimension>
+struct multi_dimensional_array<T, dimension> {
+	using type = array<T, dimension>;
+};
+
+}	// namespace detail
+
+template<typename T, std::size_t... dimensions>
+using array = typename detail::multi_dimensional_array<T, dimensions...>::type;
+
 }	// namespace bounded
 
 // I am not sure yet if it is legal to specialize these classes.
