@@ -79,10 +79,9 @@ template<typename T, enable_if_t<!is_bounded_integer<std::decay_t<T>>::value> = 
 constexpr auto get_overflow_policy(T const &) noexcept {
 	return null_policy{};
 }
-// Must be T const & until gcc supports non-const constexpr member functions
 template<typename T, enable_if_t<is_bounded_integer<std::decay_t<T>>::value> = clang_dummy>
-constexpr decltype(auto) get_overflow_policy(T const & value) noexcept {
-	return value.overflow_policy();
+constexpr decltype(auto) get_overflow_policy(T && value) noexcept {
+	return std::forward<T>(value).overflow_policy();
 }
 
 template<intmax_t minimum, intmax_t maximum, typename overflow_policy_ = null_policy, storage_type storage = storage_type::fast>
@@ -234,17 +233,20 @@ public:
 	auto const & value() const volatile noexcept {
 		return m_value;
 	}
-	constexpr auto overflow_policy() const noexcept -> overflow_policy_type const & {
+	constexpr auto overflow_policy() const & noexcept -> overflow_policy_type const & {
 		return *this;
 	}
-	auto overflow_policy() const volatile noexcept -> overflow_policy_type const volatile & {
+	auto overflow_policy() const volatile & noexcept -> overflow_policy_type const volatile & {
 		return *this;
 	}
-	constexpr auto overflow_policy() noexcept -> overflow_policy_type & {
+	constexpr auto overflow_policy() & noexcept -> overflow_policy_type & {
 		return *this;
 	}
-	auto overflow_policy() volatile noexcept -> overflow_policy_type volatile & {
+	auto overflow_policy() volatile & noexcept -> overflow_policy_type volatile & {
 		return *this;
+	}
+	constexpr auto overflow_policy() && noexcept -> overflow_policy_type && {
+		return static_cast<overflow_policy_type &&>(*this);
 	}
 	// Do not verify that the value is in range because the user has requested a
 	// conversion out of the safety of bounded::integer. It is subject to all
