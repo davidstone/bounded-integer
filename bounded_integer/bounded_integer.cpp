@@ -1344,6 +1344,13 @@ namespace check_enum_construction {
 	constexpr auto c = bounded::make(bounded_enum{});
 }
 
+auto check_volatile() {
+	bounded::integer<0, 6> volatile x = 3_bi;
+	assert(x.value() == 3);
+	x = 2_bi;
+	assert(x.value() == 2);
+}
+
 }	// namespace
 
 auto main() -> int {
@@ -1359,4 +1366,5 @@ auto main() -> int {
 	check_streaming();
 	check_dynamic_policy();
 	check_iterator();
+	check_volatile();
 }

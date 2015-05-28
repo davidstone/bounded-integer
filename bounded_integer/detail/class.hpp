@@ -188,25 +188,25 @@ public:
 	}
 
 
-
+	// volatile qualified overloads do not return a reference to the object to
+	// avoid any confusion over what qualifies as a read of a volatile variable.
+	// gcc does not consider it a read and gives you a warning if your
+	// assignment operator returns an unused reference.
 	template<typename T>
 	constexpr auto && unchecked_assignment(T && other) & noexcept {
 		m_value = static_cast<underlying_type>(std::forward<T>(other));
 		return *this;
 	}
 	template<typename T>
-	auto && unchecked_assignment(T && other) volatile & noexcept {
+	auto unchecked_assignment(T && other) volatile & noexcept {
 		m_value = static_cast<underlying_type>(std::forward<T>(other));
-		return *this;
 	}
 	
 	constexpr auto && operator=(integer const & other) & noexcept(noexcept(std::declval<overflow_policy_type>().assignment(other, make<minimum>(), make<maximum>()))) {
-		unchecked_assignment(overflow_policy().assignment(other, make<minimum>(), make<maximum>()));
-		return *this;
+		return unchecked_assignment(overflow_policy().assignment(other, make<minimum>(), make<maximum>()));
 	}
 	constexpr auto && operator=(integer && other) & noexcept(noexcept(std::declval<overflow_policy_type>().assignment(std::move(other), make<minimum>(), make<maximum>()))) {
-		unchecked_assignment(overflow_policy().assignment(std::move(other), make<minimum>(), make<maximum>()));
-		return *this;
+		return unchecked_assignment(overflow_policy().assignment(std::move(other), make<minimum>(), make<maximum>()));
 	}
 	template<typename T>
 	constexpr auto && operator=(T && other) & noexcept(noexcept(std::declval<overflow_policy_type>().assignment(std::forward<T>(other), make<minimum>(), make<maximum>()))) {
@@ -214,17 +214,15 @@ public:
 			detail::is_explicitly_constructible_from<overflow_policy_type, T>(minimum, maximum),
 			"Value not in range."
 		);
-		unchecked_assignment(overflow_policy().assignment(std::forward<T>(other), make<minimum>(), make<maximum>()));
-		return *this;
+		return unchecked_assignment(overflow_policy().assignment(std::forward<T>(other), make<minimum>(), make<maximum>()));
 	}
 	template<typename T>
-	auto && operator=(T && other) volatile & noexcept(noexcept(std::declval<overflow_policy_type>().assignment(std::forward<T>(other), make<minimum>(), make<maximum>()))) {
+	auto operator=(T && other) volatile & noexcept(noexcept(std::declval<overflow_policy_type>().assignment(std::forward<T>(other), make<minimum>(), make<maximum>()))) {
 		static_assert(
 			detail::is_explicitly_constructible_from<overflow_policy_type, T>(minimum, maximum),
 			"Value not in range."
 		);
 		unchecked_assignment(overflow_policy().assignment(std::forward<T>(other), make<minimum>(), make<maximum>()));
-		return *this;
 	}
 	
 	constexpr auto const & value() const noexcept {
