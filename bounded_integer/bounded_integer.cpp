@@ -1081,8 +1081,7 @@ auto check_policies() {
 
 auto check_assignment() {
 	bounded::integer<0, 10> x(5);
-	// The following cannot compile due to out of range check
-	// x = 11_bi;
+	static_assert(!std::is_assignable<decltype(x), decltype(11_bi)>::value, "Should not be assignable.");
 	x = bounded::integer<10, 11>(10);
 	assert(x == 10_bi);
 }
