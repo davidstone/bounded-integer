@@ -1084,6 +1084,10 @@ auto check_assignment() {
 	static_assert(!std::is_assignable<decltype(x), decltype(11_bi)>::value, "Should not be assignable.");
 	x = bounded::integer<10, 11>(10);
 	assert(x == 10_bi);
+
+	bounded::clamped_integer<0, 10> y(5);
+	y = 11_bi;
+	assert(y == 10_bi);
 }
 
 auto check_compound_arithmetic() {
