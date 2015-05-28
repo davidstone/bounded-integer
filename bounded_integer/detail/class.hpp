@@ -191,7 +191,7 @@ public:
 
 
 	template<typename T>
-	auto && unchecked_assignment(T && other) & noexcept {
+	constexpr auto && unchecked_assignment(T && other) & noexcept {
 		m_value = static_cast<underlying_type>(std::forward<T>(other));
 		return *this;
 	}
@@ -201,16 +201,16 @@ public:
 		return *this;
 	}
 	
-	auto && operator=(integer const & other) & noexcept(noexcept(std::declval<overflow_policy_type>().assignment(other, make<minimum>(), make<maximum>()))) {
+	constexpr auto && operator=(integer const & other) & noexcept(noexcept(std::declval<overflow_policy_type>().assignment(other, make<minimum>(), make<maximum>()))) {
 		unchecked_assignment(overflow_policy().assignment(other, make<minimum>(), make<maximum>()));
 		return *this;
 	}
-	auto && operator=(integer && other) & noexcept(noexcept(std::declval<overflow_policy_type>().assignment(std::move(other), make<minimum>(), make<maximum>()))) {
+	constexpr auto && operator=(integer && other) & noexcept(noexcept(std::declval<overflow_policy_type>().assignment(std::move(other), make<minimum>(), make<maximum>()))) {
 		unchecked_assignment(overflow_policy().assignment(std::move(other), make<minimum>(), make<maximum>()));
 		return *this;
 	}
 	template<typename T>
-	auto && operator=(T && other) & noexcept(noexcept(std::declval<overflow_policy_type>().assignment(std::forward<T>(other), make<minimum>(), make<maximum>()))) {
+	constexpr auto && operator=(T && other) & noexcept(noexcept(std::declval<overflow_policy_type>().assignment(std::forward<T>(other), make<minimum>(), make<maximum>()))) {
 		static_assert(
 			detail::is_explicitly_constructible_from<overflow_policy_type, T>(minimum, maximum),
 			"Value not in range."
@@ -231,16 +231,16 @@ public:
 	constexpr auto const & value() const noexcept {
 		return m_value;
 	}
-	constexpr auto const & value() const volatile noexcept {
+	auto const & value() const volatile noexcept {
 		return m_value;
 	}
 	constexpr auto overflow_policy() const noexcept -> overflow_policy_type const & {
 		return *this;
 	}
-	constexpr auto overflow_policy() const volatile noexcept -> overflow_policy_type const volatile & {
+	auto overflow_policy() const volatile noexcept -> overflow_policy_type const volatile & {
 		return *this;
 	}
-	auto overflow_policy() noexcept -> overflow_policy_type & {
+	constexpr auto overflow_policy() noexcept -> overflow_policy_type & {
 		return *this;
 	}
 	auto overflow_policy() volatile noexcept -> overflow_policy_type volatile & {
