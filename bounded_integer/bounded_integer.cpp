@@ -839,18 +839,16 @@ namespace check_arithmetic {
 	);
 
 	constexpr auto result = bounded::integer<0, 10>(10) % bounded::make<6>();
-	#if 0
 	static_assert(
-		static_cast<intmax_t>(std::numeric_limits<decltype(result)>::min()) == 0,
+		std::numeric_limits<decltype(result)>::min() == bounded::make<0>(),
 		"uh oh"
 	);
 	static_assert(
-		static_cast<intmax_t>(std::numeric_limits<decltype(result)>::max()) == 10,
+		std::numeric_limits<decltype(result)>::max() == bounded::make<5>(),
 		"uh oh"
 	);
-	#endif
 	static_assert(
-		result == 4,
+		result == bounded::make<4>(),
 		"wrong answer"
 	);
 
