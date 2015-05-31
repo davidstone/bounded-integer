@@ -194,7 +194,11 @@ private:
 		-1;
 	static_assert(greatest_divisor < 0, "Got a positive value where a negative was expected.");
 	static_assert(least_divisor < 0, "Got a positive value where a negative was expected.");
-	using result_type = std::pair<intmax_t, intmax_t>;
+
+	struct result_type {
+		intmax_t min;
+		intmax_t max;
+	};
 
 	template<intmax_t minimum_dividend, intmax_t maximum_dividend>
 	struct sign_free_value {
@@ -202,10 +206,10 @@ private:
 		static_assert(maximum_dividend <= 0, "Got a positive value where a negative was expected.");
 		static_assert(minimum_dividend >= maximum_dividend, "Range is inverted.");
 	private:
-		static constexpr auto initial_value = result_type(std::numeric_limits<intmax_t>::min(), std::numeric_limits<intmax_t>::max());
+		static constexpr auto initial_value = result_type{std::numeric_limits<intmax_t>::min(), std::numeric_limits<intmax_t>::max()};
 
 		static constexpr auto combine(result_type lhs, result_type rhs) noexcept {
-			return result_type(::bounded::max(lhs.first, rhs.first), ::bounded::min(lhs.second, rhs.second));
+			return result_type{::bounded::max(lhs.min, rhs.min), ::bounded::min(lhs.max, rhs.max)};
 		}
 
 		static constexpr auto modulo_round(intmax_t divisor) noexcept {
@@ -225,12 +229,12 @@ private:
 			// the point at which there were the most increases. The minimum
 			// value is the point at which there were the fewest increases.
 			return (minimum_dividend / divisor == maximum_dividend / divisor) ?
-				result_type(minimum_dividend % divisor, maximum_dividend % divisor) :
-				result_type(0, divisor + 1);
+				result_type{minimum_dividend % divisor, maximum_dividend % divisor} :
+				result_type{0, divisor + 1};
 		}
 
 		static constexpr auto calculate(intmax_t divisor, result_type current) noexcept -> result_type {
-			return ((current.first == 0 and current.second <= divisor + 1) or divisor > least_divisor) ?
+			return ((current.min == 0 and current.max <= divisor + 1) or divisor > least_divisor) ?
 				current :
 				calculate(divisor + 1, combine(current, modulo_round(divisor)));
 		}
@@ -238,11 +242,11 @@ private:
 		static constexpr auto value() noexcept {
 			// I have the special case for -1 to avoid any possibility of
 			// integer overflow from std::numeric_limits<intmax_t>::min() / -1
-			return (greatest_divisor == -1) ? result_type(0, 0) : calculate(greatest_divisor, initial_value);
+			return (greatest_divisor == -1) ? result_type{0, 0} : calculate(greatest_divisor, initial_value);
 		}
-		static_assert(value().first <= 0, "Got a positive value where a negative was expected.");
-		static_assert(value().second <= 0, "Got a positive value where a negative was expected.");
-		static_assert(value().first >= value().second, "Range is inverted.");
+		static_assert(value().min <= 0, "Got a positive value where a negative was expected.");
+		static_assert(value().max <= 0, "Got a positive value where a negative was expected.");
+		static_assert(value().min >= value().max, "Range is inverted.");
 	};
 
 	static constexpr intmax_t maybe_most_negative_dividend = lhs_min;
@@ -264,19 +268,19 @@ private:
 	static constexpr result_type negative = sign_free_value<least_negative_dividend, most_negative_dividend>::value();
 	static constexpr result_type positive = sign_free_value<-least_positive_dividend, -most_positive_dividend>::value();
 public:
-	static_assert(positive.first >= -std::numeric_limits<intmax_t>::max(), "Positive values out of range.");
-	static_assert(positive.second >= -std::numeric_limits<intmax_t>::max(), "Positive values out of range.");
+	static_assert(positive.min >= -std::numeric_limits<intmax_t>::max(), "Positive values out of range.");
+	static_assert(positive.max >= -std::numeric_limits<intmax_t>::max(), "Positive values out of range.");
 	static constexpr auto min() noexcept -> intmax_t {
 		return
-			!has_positive_values ? negative.second :
-			!has_negative_values ? -positive.first :
-			::bounded::min(negative.second, -positive.first);
+			!has_positive_values ? negative.max :
+			!has_negative_values ? -positive.min :
+			::bounded::min(negative.max, -positive.min);
 	}
 	static constexpr auto max() noexcept -> intmax_t {
 		return
-			!has_positive_values ? negative.first :
-			!has_negative_values ? -positive.second :
-			::bounded::max(negative.first, -positive.second);
+			!has_positive_values ? negative.min :
+			!has_negative_values ? -positive.max :
+			::bounded::max(negative.min, -positive.max);
 	}
 	static_assert(min() <= max(), "Range is inverted.");
 };
