@@ -157,10 +157,10 @@ private:
 
 public:
 	static constexpr auto min() noexcept -> intmax_t {
-		constexpr intmax_t l0 = lhs_min / rhs_min;
-		constexpr intmax_t l1 = lhs_min / rhs_max;
-		constexpr intmax_t l2 = lhs_max / rhs_min;
-		constexpr intmax_t l3 = lhs_max / rhs_max;
+		constexpr auto l0 = lhs_min / rhs_min;
+		constexpr auto l1 = lhs_min / rhs_max;
+		constexpr auto l2 = lhs_max / rhs_min;
+		constexpr auto l3 = lhs_max / rhs_max;
 		return ::bounded::min(l0, l1, l2, l3, g0, g1, g2, g3);
 	}
 	static constexpr auto max() noexcept -> intmax_t {
