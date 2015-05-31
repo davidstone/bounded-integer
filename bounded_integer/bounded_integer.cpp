@@ -837,6 +837,17 @@ namespace check_arithmetic {
 		std::is_same<decltype(negative_positive_result), decltype(negative_positive)>::value,
 		"Incorrect modulo type with mixed signs"
 	);
+	
+	constexpr auto negative_zero_result = negative_positive % positive_negative;
+	constexpr bounded::integer<-22, 0, bounded::throw_policy> negative_zero(-13);
+	static_assert(
+		negative_zero_result == negative_zero,
+		"Incorrect modulo with mixed signs"
+	);
+	static_assert(
+		std::is_same<decltype(negative_zero_result), decltype(negative_zero)>::value,
+		"Incorrect modulo type with mixed signs"
+	);
 
 	constexpr auto result = bounded::integer<0, 10>(10) % bounded::make<6>();
 	static_assert(
