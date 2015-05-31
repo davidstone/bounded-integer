@@ -271,16 +271,10 @@ public:
 	static_assert(positive.min >= -std::numeric_limits<intmax_t>::max(), "Positive values out of range.");
 	static_assert(positive.max >= -std::numeric_limits<intmax_t>::max(), "Positive values out of range.");
 	static constexpr auto min() noexcept -> intmax_t {
-		return
-			!has_positive_values ? negative.max :
-			!has_negative_values ? -positive.min :
-			::bounded::min(negative.max, -positive.min);
+		return !has_negative_values ? -positive.min : negative.max;
 	}
 	static constexpr auto max() noexcept -> intmax_t {
-		return
-			!has_positive_values ? negative.min :
-			!has_negative_values ? -positive.max :
-			::bounded::max(negative.min, -positive.max);
+		return !has_positive_values ? negative.min : -positive.max;
 	}
 	static_assert(min() <= max(), "Range is inverted.");
 };
