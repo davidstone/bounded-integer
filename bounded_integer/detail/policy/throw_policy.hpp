@@ -14,8 +14,7 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with this program. If not, see <http://www.gnu.org/licenses/>.
 
-#ifndef BOUNDED_INTEGER_POLICY_THROW_POLICY_HPP_
-#define BOUNDED_INTEGER_POLICY_THROW_POLICY_HPP_
+#pragma once
 
 #include "basic_policy.hpp"
 #include "../is_bounded_integer.hpp"
@@ -45,4 +44,3 @@ struct throw_policy {
 
 using throw_policy = basic_policy<policy_detail::throw_policy>;
 }	// namespace bounded
-#endif	// BOUNDED_INTEGER_POLICY_THROW_POLICY_HPP_

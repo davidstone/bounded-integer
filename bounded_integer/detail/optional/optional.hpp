@@ -14,8 +14,7 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with this program. If not, see <http://www.gnu.org/licenses/>.
 
-#ifndef BOUNDED_INTEGER_DETAIL_OPTIONAL_OPTIONAL_HPP_
-#define BOUNDED_INTEGER_DETAIL_OPTIONAL_OPTIONAL_HPP_
+#pragma once
 
 #include "forward_declaration.hpp"
 
@@ -271,4 +270,3 @@ auto make_optional(T && value) noexcept -> optional<std::remove_reference_t<T>> 
 }
 
 }	// namespace bounded
-#endif	// BOUNDED_INTEGER_DETAIL_OPTIONAL_OPTIONAL_HPP_

@@ -14,8 +14,7 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with this program. If not, see <http://www.gnu.org/licenses/>.
 
-#ifndef BOUNDED_INTEGER_FORWARD_DECLARATION_HPP_
-#define BOUNDED_INTEGER_FORWARD_DECLARATION_HPP_
+#pragma once
 
 #include <cstdint>
 
@@ -30,4 +29,3 @@ struct integer;
 enum non_check_t { non_check };
 
 }	// namespace bounded
-#endif	// BOUNDED_INTEGER_FORWARD_DECLARATION_HPP_

@@ -14,8 +14,7 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with this program. If not, see <http://www.gnu.org/licenses/>.
 
-#ifndef BOUNDED_INTEGER_CLASS_HPP_
-#define BOUNDED_INTEGER_CLASS_HPP_
+#pragma once
 
 #include "enable_if.hpp"
 #include "forward_declaration.hpp"
@@ -267,4 +266,3 @@ private:
 
 }	// namespace bounded
 
-#endif	// BOUNDED_INTEGER_CLASS_HPP_

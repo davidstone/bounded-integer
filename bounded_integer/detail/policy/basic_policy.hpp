@@ -14,8 +14,7 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with this program. If not, see <http://www.gnu.org/licenses/>.
 
-#ifndef BOUNDED_INTEGER_POLICY_BASIC_POLICY_HPP_
-#define BOUNDED_INTEGER_POLICY_BASIC_POLICY_HPP_
+#pragma once
 
 #include "is_overflow_policy.hpp"
 #include "../enable_if.hpp"
@@ -64,4 +63,3 @@ struct basic_policy : private policy_type {
 };
 
 }	// namespace bounded
-#endif	// BOUNDED_INTEGER_POLICY_BASIC_POLICY_HPP_

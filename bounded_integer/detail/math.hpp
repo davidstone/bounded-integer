@@ -14,8 +14,7 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with this program. If not, see <http://www.gnu.org/licenses/>.
 
-#ifndef BOUNDED_INTEGER_MATH_HPP_
-#define BOUNDED_INTEGER_MATH_HPP_
+#pragma once
 
 #include "cast.hpp"
 #include "forward_declaration.hpp"
@@ -32,4 +31,3 @@ constexpr auto abs(integer<minimum, maximum, overflow_policy, storage> const val
 }
 
 }	// namespace bounded
-#endif	// BOUNDED_INTEGER_MATH_HPP_

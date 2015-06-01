@@ -14,8 +14,7 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with this program. If not, see <http://www.gnu.org/licenses/>.
 
-#ifndef BOUNDED_INTEGER_MINMAX_HPP_
-#define BOUNDED_INTEGER_MINMAX_HPP_
+#pragma once
 
 #include "common_type.hpp"
 #include "common_type_and_value_category.hpp"
@@ -194,4 +193,3 @@ constexpr decltype(auto) max(Ts && ... ts) noexcept(detail::minmax::noexcept_com
 }
 
 }	// namespace bounded
-#endif	// BOUNDED_INTEGER_MINMAX_HPP_

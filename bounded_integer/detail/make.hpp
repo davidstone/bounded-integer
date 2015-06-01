@@ -14,8 +14,7 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with this program. If not, see <http://www.gnu.org/licenses/>.
 
-#ifndef BOUNDED_INTEGER_MAKE_HPP_
-#define BOUNDED_INTEGER_MAKE_HPP_
+#pragma once
 
 #include "class.hpp"
 #include "numeric_limits.hpp"
@@ -94,4 +93,3 @@ constexpr auto make() noexcept -> integer<value, value, overflow_policy, storage
 }
 
 }	// namespace bounded
-#endif	// BOUNDED_INTEGER_MAKE_HPP_

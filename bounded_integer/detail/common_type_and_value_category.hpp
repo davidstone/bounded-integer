@@ -14,8 +14,7 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with this program. If not, see <http://www.gnu.org/licenses/>.
 
-#ifndef BOUNDED_INTEGER_COMMON_TYPE_AND_VALUE_CATEGORY_HPP_
-#define BOUNDED_INTEGER_COMMON_TYPE_AND_VALUE_CATEGORY_HPP_
+#pragma once
 
 #include "common_type.hpp"
 #include "forward_declaration.hpp"
@@ -96,4 +95,3 @@ struct common_type_and_value_category<T0, T1, Ts...> {
 
 }	// namespace detail
 }	// namespace bounded
-#endif	// BOUNDED_INTEGER_COMMON_TYPE_AND_VALUE_CATEGORY_HPP_

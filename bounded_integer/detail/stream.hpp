@@ -14,8 +14,7 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with this program. If not, see <http://www.gnu.org/licenses/>.
 
-#ifndef BOUNDED_INTEGER_STREAM_HPP_
-#define BOUNDED_INTEGER_STREAM_HPP_
+#pragma once
 
 #include "class.hpp"
 #include "enable_if.hpp"
@@ -68,4 +67,3 @@ decltype(auto) operator>>(std::basic_istream<CharT, Traits> & in, integer<minimu
 }
 
 }	// namespace bounded
-#endif	// BOUNDED_INTEGER_STREAM_HPP_

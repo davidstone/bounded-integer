@@ -14,8 +14,7 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with this program. If not, see <http://www.gnu.org/licenses/>.
 
-#ifndef BOUNDED_INTEGER_HPP_
-#define BOUNDED_INTEGER_HPP_
+#pragma once
 
 #include "detail/algorithm.hpp"
 #include "detail/cast.hpp"
@@ -35,5 +34,3 @@
 #include "detail/policy/all.hpp"
 
 // Missing from this list are array and optional classes and integer_range
-
-#endif	// BOUNDED_INTEGER_HPP_

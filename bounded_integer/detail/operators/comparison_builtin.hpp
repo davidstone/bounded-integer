@@ -14,8 +14,7 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with this program. If not, see <http://www.gnu.org/licenses/>.
 
-#ifndef BOUNDED_INTEGER_OPERATORS_COMPARISON_BUILTIN_HPP_
-#define BOUNDED_INTEGER_OPERATORS_COMPARISON_BUILTIN_HPP_
+#pragma once
 
 #include "comparison.hpp"
 
@@ -158,4 +157,3 @@ constexpr auto operator>=(T const lhs, integer<minimum, maximum, overflow_policy
 }
 
 }	// namespace bounded
-#endif	// BOUNDED_INTEGER_OPERATORS_COMPARISON_BUILTIN_HPP_

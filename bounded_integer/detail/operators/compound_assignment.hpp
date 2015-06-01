@@ -14,8 +14,7 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with this program. If not, see <http://www.gnu.org/licenses/>.
 
-#ifndef BOUNDED_INTEGER_COMPOUND_ASSIGNMENT_OPERATORS_HPP_
-#define BOUNDED_INTEGER_COMPOUND_ASSIGNMENT_OPERATORS_HPP_
+#pragma once
 
 #include "arithmetic.hpp"
 #include "../enable_if.hpp"
@@ -122,4 +121,3 @@ auto operator--(integer<minimum, maximum, overflow_policy, storage> volatile & v
 }
 
 }	// namespace bounded
-#endif	// BOUNDED_INTEGER_COMPOUND_ASSIGNMENT_OPERATORS_HPP_

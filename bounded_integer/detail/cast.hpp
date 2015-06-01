@@ -14,8 +14,7 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with this program. If not, see <http://www.gnu.org/licenses/>.
 
-#ifndef BOUNDED_INTEGER_CAST_HPP_
-#define BOUNDED_INTEGER_CAST_HPP_
+#pragma once
 
 #include "forward_declaration.hpp"
 #include "noexcept.hpp"
@@ -36,4 +35,3 @@ constexpr auto decrease_max(integer<minimum, maximum, overflow_policy, storage> 
 ))
 
 }	// namespace bounded
-#endif	// BOUNDED_INTEGER_CAST_HPP_

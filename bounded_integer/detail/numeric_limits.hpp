@@ -14,8 +14,7 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with this program. If not, see <http://www.gnu.org/licenses/>.
 
-#ifndef BOUNDED_INTEGER_NUMERIC_LIMITS_HPP_
-#define BOUNDED_INTEGER_NUMERIC_LIMITS_HPP_
+#pragma once
 
 #include "forward_declaration.hpp"
 #include <cstdint>
@@ -271,4 +270,3 @@ public:
 };
 
 }	// namespace std
-#endif	// BOUNDED_INTEGER_NUMERIC_LIMITS_HPP_

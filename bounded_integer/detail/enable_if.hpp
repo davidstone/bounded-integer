@@ -15,8 +15,7 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with this program. If not, see <http://www.gnu.org/licenses/>.
 
-#ifndef ENABLE_IF_TEMPLATE_ALIAS_HPP_
-#define ENABLE_IF_TEMPLATE_ALIAS_HPP_
+#pragma once
 
 #include <type_traits>
 
@@ -41,5 +40,3 @@ enum class enabler {};
 constexpr detail::enabler clang_dummy = {};
 template<bool condition>
 using enable_if_t = typename std::enable_if<condition, detail::enabler>::type;
-
-#endif	// ENABLE_IF_TEMPLATE_ALIAS_HPP_

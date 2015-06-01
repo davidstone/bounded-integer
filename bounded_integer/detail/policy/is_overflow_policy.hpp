@@ -14,8 +14,7 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with this program. If not, see <http://www.gnu.org/licenses/>.
 
-#ifndef BOUNDED_INTEGER_POLICY_IS_OVERFLOW_POLICY_HPP_
-#define BOUNDED_INTEGER_POLICY_IS_OVERFLOW_POLICY_HPP_
+#pragma once
 
 #include <cstdint>
 #include <type_traits>
@@ -49,4 +48,3 @@ struct is_overflow_policy : std::integral_constant<
 >{};
 
 }	// namespace bounded
-#endif	// BOUNDED_INTEGER_POLICY_IS_OVERFLOW_POLICY_HPP_

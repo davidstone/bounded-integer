@@ -14,8 +14,7 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with this program. If not, see <http://www.gnu.org/licenses/>.
 
-#ifndef BOUNDED_INTEGER_OPERATORS_HPP_
-#define BOUNDED_INTEGER_OPERATORS_HPP_
+#pragma once
 
 #include "arithmetic.hpp"
 #include "arithmetic_builtin.hpp"
@@ -23,4 +22,3 @@
 #include "comparison_builtin.hpp"
 #include "compound_assignment.hpp"
 
-#endif	// BOUNDED_INTEGER_OPERATORS_HPP_

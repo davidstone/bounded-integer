@@ -14,8 +14,7 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with this program. If not, see <http://www.gnu.org/licenses/>.
 
-#ifndef BOUNDED_DETAIL_INTEGER_RANGE_HPP_
-#define BOUNDED_DETAIL_INTEGER_RANGE_HPP_
+#pragma once
 
 #include "class.hpp"
 #include "make.hpp"
@@ -243,5 +242,3 @@ constexpr auto integer_range(Size && size) noexcept {
 }
 
 }	// namespace bounded
-
-#endif	// BOUNDED_DETAIL_INTEGER_RANGE_HPP_

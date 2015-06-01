@@ -14,8 +14,7 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with this program. If not, see <http://www.gnu.org/licenses/>.
 
-#ifndef BOUNDED_INTEGER_DETAIL_MAKE_ARRAY_HPP_
-#define BOUNDED_INTEGER_DETAIL_MAKE_ARRAY_HPP_
+#pragma once
 
 #include "array.hpp"
 #include "../common_type.hpp"
@@ -84,4 +83,3 @@ constexpr auto make_array(Args && ... args) noexcept {
 
 
 }	// namespace bounded
-#endif	// BOUNDED_INTEGER_DETAIL_MAKE_ARRAY_HPP_

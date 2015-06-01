@@ -14,8 +14,7 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with this program. If not, see <http://www.gnu.org/licenses/>.
 
-#ifndef BOUNDED_INTEGER_DETAIL_OPTIONAL_MAKE_OPTIONAL_ARRAY_HPP_
-#define BOUNDED_INTEGER_DETAIL_OPTIONAL_MAKE_OPTIONAL_ARRAY_HPP_
+#pragma once
 
 #include "optional.hpp"
 #include "../common_type.hpp"
@@ -91,4 +90,3 @@ constexpr auto make_optional_array(Integers && ... integers) noexcept {
 }
 
 }	// namespace bounded
-#endif	// BOUNDED_INTEGER_DETAIL_OPTIONAL_MAKE_OPTIONAL_ARRAY_HPP_

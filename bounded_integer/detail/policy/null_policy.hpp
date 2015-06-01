@@ -14,8 +14,7 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with this program. If not, see <http://www.gnu.org/licenses/>.
 
-#ifndef BOUNDED_INTEGER_POLICY_NULL_POLICY_HPP_
-#define BOUNDED_INTEGER_POLICY_NULL_POLICY_HPP_
+#pragma once
 
 #include "basic_policy.hpp"
 #include "common_policy.hpp"
@@ -70,4 +69,3 @@ struct common_policy<null_policy, null_policy> {
 };
 
 }	// namespace bounded
-#endif	// BOUNDED_INTEGER_POLICY_NULL_POLICY_HPP_

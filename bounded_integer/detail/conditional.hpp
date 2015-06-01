@@ -14,8 +14,7 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with this program. If not, see <http://www.gnu.org/licenses/>.
 
-#ifndef BOUNDED_INTEGER_CONDITIONAL_HPP_
-#define BOUNDED_INTEGER_CONDITIONAL_HPP_
+#pragma once
 
 #include "common_type_and_value_category.hpp"
 
@@ -24,4 +23,3 @@
 		static_cast<bounded::detail::common_type_and_value_category_t<decltype(lhs), decltype(rhs)>>(lhs) : \
 		static_cast<bounded::detail::common_type_and_value_category_t<decltype(lhs), decltype(rhs)>>(rhs))
 
-#endif	// BOUNDED_INTEGER_CONDITIONAL_HPP_

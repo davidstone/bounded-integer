@@ -14,8 +14,7 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with this program. If not, see <http://www.gnu.org/licenses/>.
 
-#ifndef BOUNDED_INTEGER_LITERAL_HPP_
-#define BOUNDED_INTEGER_LITERAL_HPP_
+#pragma once
 
 #include "make.hpp"
 #include "operators/arithmetic.hpp"
@@ -61,4 +60,3 @@ constexpr auto operator"" _bi() noexcept {
 }	// namespace literal
 
 }	// namespace bounded
-#endif	// BOUNDED_INTEGER_LITERAL_HPP_

@@ -14,8 +14,7 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with this program. If not, see <http://www.gnu.org/licenses/>.
 
-#ifndef BOUNDED_INTEGER_POLICY_ALL_HPP_
-#define BOUNDED_INTEGER_POLICY_ALL_HPP_
+#pragma once
 
 // Default constructors must be provided to work around
 // http://www.open-std.org/jtc1/sc22/wg21/docs/cwg_active.html#253
@@ -26,4 +25,3 @@
 #include "null_policy.hpp"
 #include "throw_policy.hpp"
 
-#endif	// BOUNDED_INTEGER_POLICY_ALL_HPP_

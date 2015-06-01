@@ -14,8 +14,7 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with this program. If not, see <http://www.gnu.org/licenses/>.
 
-#ifndef BOUNDED_INTEGER_TYPEDEFS_HPP_
-#define BOUNDED_INTEGER_TYPEDEFS_HPP_
+#pragma once
 
 #include "forward_declaration.hpp"
 #include "policy/all.hpp"
@@ -44,4 +43,3 @@ using dynamic_max_integer = integer<minimum, maximum, dynamic_max_policy<minimum
 
 }	// namespace bounded
 
-#endif	// BOUNDED_INTEGER_TYPEDEFS_HPP_

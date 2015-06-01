@@ -14,8 +14,7 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with this program. If not, see <http://www.gnu.org/licenses/>.
 
-#ifndef BOUNDED_INTEGER_UNDERLYING_TYPE_HPP_
-#define BOUNDED_INTEGER_UNDERLYING_TYPE_HPP_
+#pragma once
 
 #include <cstdint>
 #include <type_traits>
@@ -53,4 +52,3 @@ BOUNDED_INTEGER_UNDERLYING_TYPE(least)
 }	// namespace detail
 }	// namespace bounded
 
-#endif	// BOUNDED_INTEGER_UNDERLYING_TYPE_HPP_

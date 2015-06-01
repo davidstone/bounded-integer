@@ -14,8 +14,7 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with this program. If not, see <http://www.gnu.org/licenses/>.
 
-#ifndef BOUNDED_INTEGER_DETAIL_OPTIONAL_COMPARISON_OPERATORS_HPP_
-#define BOUNDED_INTEGER_DETAIL_OPTIONAL_COMPARISON_OPERATORS_HPP_
+#pragma once
 
 #include "optional.hpp"
 #include "../class.hpp"
@@ -198,4 +197,3 @@ constexpr auto operator>=(none_t const lhs, optional<T> const & rhs) noexcept {
 }
 
 }	// namespace bounded
-#endif	// BOUNDED_INTEGER_DETAIL_OPTIONAL_COMPARISON_OPERATORS_HPP_

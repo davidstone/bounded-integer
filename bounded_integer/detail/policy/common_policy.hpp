@@ -14,8 +14,7 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with this program. If not, see <http://www.gnu.org/licenses/>.
 
-#ifndef BOUNDED_INTEGER_POLICY_COMMON_POLICY_HPP_
-#define BOUNDED_INTEGER_POLICY_COMMON_POLICY_HPP_
+#pragma once
 
 namespace bounded {
 
@@ -43,4 +42,3 @@ using common_policy_t = typename common_policy<policies...>::type;
 
 }	// namespace bounded
 
-#endif	// BOUNDED_INTEGER_POLICY_COMMON_POLICY_HPP_

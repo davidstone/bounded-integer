@@ -14,8 +14,7 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with this program. If not, see <http://www.gnu.org/licenses/>.
 
-#ifndef BOUNDED_INTEGER_OPERATORS_ARITHMETIC_BUILTIN_HPP_
-#define BOUNDED_INTEGER_OPERATORS_ARITHMETIC_BUILTIN_HPP_
+#pragma once
 
 #include "arithmetic.hpp"
 #include "../enable_if.hpp"
@@ -87,4 +86,3 @@ decltype(auto) operator-=(T * & pointer, integer<minimum, maximum, overflow_poli
 
 }	// namespace bounded
 
-#endif	// BOUNDED_INTEGER_OPERATORS_ARITHMETIC_BUILTIN_HPP_

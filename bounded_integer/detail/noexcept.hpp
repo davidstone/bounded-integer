@@ -14,12 +14,10 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with this program. If not, see <http://www.gnu.org/licenses/>.
 
-#ifndef BOUNDED_INTEGER_DETAIL_NOEXCEPT_HPP_
-#define BOUNDED_INTEGER_DETAIL_NOEXCEPT_HPP_
+#pragma once
 
 #define BOUNDED_NOEXCEPT_INITIALIZATION(initializer) noexcept(noexcept(initializer)): initializer
 
 // This should probably be adjusted to include converting to the return type
 #define BOUNDED_NOEXCEPT(body) noexcept(noexcept(body)) { return body; }
 
-#endif	// BOUNDED_INTEGER_DETAIL_NOEXCEPT_HPP_

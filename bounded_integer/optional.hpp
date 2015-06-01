@@ -14,8 +14,7 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with this program. If not, see <http://www.gnu.org/licenses/>.
 
-#ifndef BOUNDED_INTEGER_OPTIONAL_HPP_
-#define BOUNDED_INTEGER_OPTIONAL_HPP_
+#pragma once
 
 #include "detail/optional/forward_declaration.hpp"
 #include "detail/optional/make_optional_array.hpp"
@@ -23,4 +22,3 @@
 #include "detail/optional/comparison_operators.hpp"
 #include "bounded_integer.hpp"
 
-#endif	// BOUNDED_INTEGER_OPTIONAL_HPP_

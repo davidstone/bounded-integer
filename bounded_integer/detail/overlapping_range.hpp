@@ -14,8 +14,7 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with this program. If not, see <http://www.gnu.org/licenses/>.
 
-#ifndef BOUNDED_INTEGER_OVERLAPPING_RANGE_HPP_
-#define BOUNDED_INTEGER_OVERLAPPING_RANGE_HPP_
+#pragma once
 
 #include "forward_declaration.hpp"
 #include "numeric_limits.hpp"
@@ -85,4 +84,3 @@ public:
 
 }	// namespace detail
 }	// namespace bounded
-#endif	// BOUNDED_INTEGER_OVERLAPPING_RANGE_HPP_

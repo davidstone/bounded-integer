@@ -14,8 +14,7 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with this program. If not, see <http://www.gnu.org/licenses/>.
 
-#ifndef BOUNDED_INTEGER_IS_BOUNDED_INTEGER_HPP_
-#define BOUNDED_INTEGER_IS_BOUNDED_INTEGER_HPP_
+#pragma once
 
 #include "forward_declaration.hpp"
 #include <cstdint>
@@ -30,4 +29,3 @@ template<intmax_t minimum, intmax_t maximum, typename overflow_policy, storage_t
 struct is_bounded_integer<integer<minimum, maximum, overflow_policy, storage>> : std::true_type {};
 
 }	// namespace bounded
-#endif	// BOUNDED_INTEGER_IS_BOUNDED_INTEGER_HPP_
