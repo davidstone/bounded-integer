@@ -55,11 +55,21 @@ sources += prepend_dir('detail/array', [
 sources += prepend_dir('detail/operators', [
 	'arithmetic.cpp',
 	'arithmetic_builtin.cpp',
-	'arithmetic_result_type.cpp',
 	'comparison.cpp',
 	'comparison_builtin.cpp',
 	'compound_assignment.cpp',
 	'operators.cpp',
+])
+sources += prepend_dir('detail/operators/arithmetic_type', [
+	'type.cpp',
+	'base.cpp',
+	'plus.cpp',
+	'minus.cpp',
+	'multiplies.cpp',
+	'divides.cpp',
+	'modulus.cpp',
+	'left_shift.cpp',
+	'right_shift.cpp',
 ])
 sources += prepend_dir('detail/optional', [
 	'forward_declaration.cpp',
