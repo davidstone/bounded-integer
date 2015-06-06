@@ -1,5 +1,5 @@
 // Convert to a std::string / std::wstring
-// Copyright (C) 2014 David Stone
+// Copyright (C) 2015 David Stone
 //
 // This program is free software: you can redistribute it and / or modify
 // it under the terms of the GNU Affero General Public License as
@@ -27,14 +27,14 @@ using std::to_string;
 
 template<intmax_t minimum, intmax_t maximum, typename overflow_policy, storage_type storage>
 auto to_string(integer<minimum, maximum, overflow_policy, storage> const & x) {
-	return to_string(+x.value());
+	return to_string(x.value());
 }
 
 using std::to_wstring;
 
 template<intmax_t minimum, intmax_t maximum, typename overflow_policy, storage_type storage>
 auto to_wstring(integer<minimum, maximum, overflow_policy, storage> const & x) {
-	return to_wstring(+x.value());
+	return to_wstring(x.value());
 }
 
 // TODO: template<typename T> T from_string(std::string const & str);
