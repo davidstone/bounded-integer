@@ -32,21 +32,12 @@ struct right_shift {
 	}
 };
 
-template<
-	intmax_t lhs_min, intmax_t lhs_max,
-	intmax_t rhs_min, intmax_t rhs_max
->
-struct operator_range<lhs_min, lhs_max, rhs_min, rhs_max, right_shift> {
-	static_assert(lhs_min >= 0 and rhs_min >= 0, "Right shift not defined for negative values.");
-	static_assert(rhs_max <= std::numeric_limits<intmax_t>::digits, "Cannot right shift >= width of intmax_t.");
-	static constexpr auto min() noexcept -> intmax_t {
-		return lhs_min >> rhs_max;
-	}
-	static constexpr auto max() noexcept -> intmax_t {
-		return lhs_max >> rhs_min;
-	}
-	static_assert(min() <= max(), "Range is inverted.");
-};
+constexpr auto operator_range(min_max lhs, min_max rhs, right_shift) noexcept {
+	return min_max(
+		lhs.min >> rhs.max,
+		lhs.max >> rhs.min
+	);
+}
 
 }	// namespace detail
 }	// namespace bounded

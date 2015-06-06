@@ -32,25 +32,16 @@ struct multiplies {
 	}
 };
 
-template<
-	intmax_t lhs_min, intmax_t lhs_max,
-	intmax_t rhs_min, intmax_t rhs_max
->
-struct operator_range<lhs_min, lhs_max, rhs_min, rhs_max, multiplies> {
-private:
-	static constexpr intmax_t p0 = lhs_min * rhs_min;
-	static constexpr intmax_t p1 = lhs_min * rhs_max;
-	static constexpr intmax_t p2 = lhs_max * rhs_min;
-	static constexpr intmax_t p3 = lhs_max * rhs_max;
-public:
-	static constexpr auto min() noexcept -> intmax_t {
-		return ::bounded::min(p0, p1, p2, p3);
-	}
-	static constexpr auto max() noexcept -> intmax_t {
-		return ::bounded::max(p0, p1, p2, p3);
-	}
-	static_assert(min() <= max(), "Range is inverted.");
-};
+constexpr auto operator_range(min_max lhs, min_max rhs, multiplies) noexcept {
+	auto const p0 = lhs.min * rhs.min;
+	auto const p1 = lhs.min * rhs.max;
+	auto const p2 = lhs.max * rhs.min;
+	auto const p3 = lhs.max * rhs.max;
+	return min_max(
+		min(p0, p1, p2, p3),
+		max(p0, p1, p2, p3)
+	);
+}
 
 }	// namespace detail
 }	// namespace bounded

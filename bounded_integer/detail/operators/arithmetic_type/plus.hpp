@@ -30,19 +30,12 @@ struct plus {
 	}
 };
 
-template<
-	intmax_t lhs_min, intmax_t lhs_max,
-	intmax_t rhs_min, intmax_t rhs_max
->
-struct operator_range<lhs_min, lhs_max, rhs_min, rhs_max, plus> {
-	static constexpr auto min() noexcept -> intmax_t {
-		return lhs_min + rhs_min;
-	}
-	static constexpr auto max() noexcept -> intmax_t {
-		return lhs_max + rhs_max;
-	}
-	static_assert(min() <= max(), "Range is inverted.");
-};
+constexpr auto operator_range(min_max lhs, min_max rhs, plus) noexcept {
+	return min_max(
+		lhs.min + rhs.min,
+		lhs.max + rhs.max
+	);
+}
 
 }	// namespace detail
 }	// namespace bounded

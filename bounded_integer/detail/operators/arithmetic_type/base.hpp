@@ -21,12 +21,14 @@
 namespace bounded {
 namespace detail {
 
-template<
-	intmax_t lhs_min, intmax_t lhs_max,
-	intmax_t rhs_min, intmax_t rhs_max,
-	typename Operator
->
-struct operator_range {};
+struct min_max {
+	constexpr min_max(intmax_t min_, intmax_t max_) noexcept:
+		min(min_),
+		max(max_) {
+	}
+	intmax_t min;
+	intmax_t max;
+};
 
 }	// namespace detail
 }	// namespace bounded

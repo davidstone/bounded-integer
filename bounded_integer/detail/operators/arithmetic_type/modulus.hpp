@@ -34,17 +34,6 @@ struct modulus {
 	}
 };
 
-namespace modulus_detail {
-
-struct min_max {
-	constexpr min_max(intmax_t min_, intmax_t max_) noexcept:
-		min(min_),
-		max(max_) {
-	}
-	intmax_t min;
-	intmax_t max;
-};
-
 constexpr auto overlap(min_max lhs, min_max rhs) noexcept {
 	return min_max(max(lhs.min, rhs.min), min(lhs.max, rhs.max));
 }
@@ -85,17 +74,7 @@ constexpr auto sign_free_value(min_max dividend, min_max divisor) noexcept {
 	return current;
 }
 
-}	// namespace modulus_detail
-
-template<
-	intmax_t lhs_min, intmax_t lhs_max,
-	intmax_t rhs_min, intmax_t rhs_max
->
-struct operator_range<lhs_min, lhs_max, rhs_min, rhs_max, modulus> {
-private:
-	static_assert(rhs_min != 0 or rhs_max != 0, "modulo is not defined for a divisor of zero.");
-	static_assert(lhs_min <= lhs_max, "Range inverted.");
-	static_assert(rhs_min <= rhs_max, "Range inverted.");
+constexpr auto operator_range(min_max lhs, min_max rhs, modulus) noexcept {
 	// The sign of the result is equal to the sign of the lhs. The sign of the
 	// rhs does not matter.
 	//
@@ -107,32 +86,26 @@ private:
 	// "magnitude" and "negative" in their name.
 	//
 	// The divisor range cannot terminate on a 0 since that is an invalid value.
-	static constexpr auto divisor = modulus_detail::min_max(
-		(rhs_min > 0) ? -rhs_min : (rhs_max < 0) ? rhs_max : -1,
-		(rhs_max < 0) ? rhs_min : bounded::min(rhs_min, -rhs_max)
+	auto const divisor = min_max(
+		(rhs.min > 0) ? -rhs.min : (rhs.max < 0) ? rhs.max : -1,
+		(rhs.max < 0) ? rhs.min : min(rhs.min, -rhs.max)
 	);
-	static_assert(divisor.max < 0, "Got a positive value where a negative was expected.");
-	static_assert(divisor.min < 0, "Got a positive value where a negative was expected.");
 
 	// Avoid instantiating a template with unexpected values
-	static constexpr auto negative_dividend = modulus_detail::min_max(bounded::min(lhs_max, 0), bounded::min(lhs_min, 0));
-	static constexpr auto positive_dividend = modulus_detail::min_max(-bounded::max(lhs_min, 0), -bounded::max(lhs_max, 0));
+	auto const negative_dividend = min_max(bounded::min(lhs.max, 0), bounded::min(lhs.min, 0));
+	auto const positive_dividend = min_max(-bounded::max(lhs.min, 0), -bounded::max(lhs.max, 0));
 	
-	static constexpr auto negative = modulus_detail::sign_free_value(negative_dividend, divisor);
-	static constexpr auto positive = modulus_detail::sign_free_value(positive_dividend, divisor);
-public:
-	static_assert(positive.min >= -std::numeric_limits<intmax_t>::max(), "Positive values out of range.");
-	static_assert(positive.max >= -std::numeric_limits<intmax_t>::max(), "Positive values out of range.");
-	static constexpr auto min() noexcept -> intmax_t {
-		constexpr bool has_negative_values = lhs_min <= 0;
-		return has_negative_values ? negative.max : -positive.min;
-	}
-	static constexpr auto max() noexcept -> intmax_t {
-		constexpr bool has_positive_values = lhs_max > 0;
-		return has_positive_values ? -positive.max : negative.min;
-	}
-	static_assert(min() <= max(), "Range is inverted.");
-};
+	auto const negative = sign_free_value(negative_dividend, divisor);
+	auto const positive = sign_free_value(positive_dividend, divisor);
+
+	auto const has_negative_values = lhs.min <= 0;
+	auto const has_positive_values = lhs.max > 0;
+
+	return min_max(
+		has_negative_values ? negative.max : -positive.min,
+		has_positive_values ? -positive.max : negative.min
+	);
+}
 
 }	// namespace detail
 }	// namespace bounded

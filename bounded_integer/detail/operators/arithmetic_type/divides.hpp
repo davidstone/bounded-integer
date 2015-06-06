@@ -33,40 +33,31 @@ struct divides {
 	}
 };
 
-template<
-	intmax_t lhs_min, intmax_t lhs_max,
-	intmax_t rhs_min, intmax_t rhs_max
->
-struct operator_range<lhs_min, lhs_max, rhs_min, rhs_max, divides> {
-private:
-	static_assert(rhs_min != 0 or rhs_max != 0, "division is not defined for a divisor of zero.");
+constexpr auto operator_range(min_max lhs, min_max rhs, divides) noexcept {
 	// If 1 falls within the range, that is the least positive divisor. The
 	// other options are a range that are entirely positive, in which case I
 	// want to return the least value, or the range is entirely negative or
 	// zero, in which case I pick the greatest absolute value (which is the
 	// minimum) so that the 'positive' divisor is not selected in a later step.
 	// We can use similar logic for greatest_negative_divisor.
-	static constexpr intmax_t least_positive_divisor = (rhs_min <= 1 and 1 <= rhs_max) ? 1 : rhs_min;
-	static constexpr intmax_t greatest_negative_divisor = (rhs_min <= -1 and -1 <= rhs_max) ? -1 : rhs_max;
-	static constexpr intmax_t g0 = lhs_min / least_positive_divisor;
-	static constexpr intmax_t g1 = lhs_min / greatest_negative_divisor;
-	static constexpr intmax_t g2 = lhs_max / least_positive_divisor;
-	static constexpr intmax_t g3 = lhs_max / greatest_negative_divisor;
+	auto const least_positive_divisor = (rhs.min <= 1 and 1 <= rhs.max) ? 1 : rhs.min;
+	auto const greatest_negative_divisor = (rhs.min <= -1 and -1 <= rhs.max) ? -1 : rhs.max;
 
-public:
-	static constexpr auto min() noexcept -> intmax_t {
-		constexpr auto l0 = lhs_min / rhs_min;
-		constexpr auto l1 = lhs_min / rhs_max;
-		constexpr auto l2 = lhs_max / rhs_min;
-		constexpr auto l3 = lhs_max / rhs_max;
-		return ::bounded::min(l0, l1, l2, l3, g0, g1, g2, g3);
-	}
-	static constexpr auto max() noexcept -> intmax_t {
-		return ::bounded::max(g0, g1, g2, g3);
-	}
-	static_assert(min() <= max(), "Range is inverted.");
-};
+	auto const g0 = lhs.min / least_positive_divisor;
+	auto const g1 = lhs.min / greatest_negative_divisor;
+	auto const g2 = lhs.max / least_positive_divisor;
+	auto const g3 = lhs.max / greatest_negative_divisor;
 
+	auto const l0 = lhs.min / rhs.min;
+	auto const l1 = lhs.min / rhs.max;
+	auto const l2 = lhs.max / rhs.min;
+	auto const l3 = lhs.max / rhs.max;
+
+	return min_max(
+		min(l0, l1, l2, l3, g0, g1, g2, g3),
+		max(g0, g1, g2, g3)
+	);
+}
 
 }	// namespace detail
 }	// namespace bounded
