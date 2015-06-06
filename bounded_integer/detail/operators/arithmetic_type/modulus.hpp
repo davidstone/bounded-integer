@@ -34,6 +34,58 @@ struct modulus {
 	}
 };
 
+namespace modulus_detail {
+
+struct min_max {
+	constexpr min_max(intmax_t min_, intmax_t max_) noexcept:
+		min(min_),
+		max(max_) {
+	}
+	intmax_t min;
+	intmax_t max;
+};
+
+constexpr auto overlap(min_max lhs, min_max rhs) noexcept {
+	return min_max(max(lhs.min, rhs.min), min(lhs.max, rhs.max));
+}
+
+constexpr auto modulo_round(min_max dividend, intmax_t divisor) noexcept {
+	// When we divide both ends of the dividend by a particular value in
+	// the range of the divisor there are two possibilities:
+	//
+	// If they are not equal, then that means that the periodic modulo
+	// function resets to 0 somewhere in that range. The greatest value
+	// is immediately before this resets, but we do not have to find
+	// where in the range it is. The magnitude will be one less than the
+	// magnitude of the divisor. The least value is obviously 0, as we
+	// are ignoring the sign of the dividend for these calculations.
+	//
+	// If they are equal, the maximum value is at the top end of the
+	// range. The function never reset, and it increases by one for each
+	// increase in the dividend until it resets. The maximum value is
+	// the point at which there were the most increases. The minimum
+	// value is the point at which there were the fewest increases.
+	return (dividend.min / divisor == dividend.max / divisor) ?
+		min_max(dividend.min % divisor, dividend.max % divisor) :
+		min_max(0, divisor + 1);
+}
+
+constexpr auto sign_free_value(min_max dividend, min_max divisor) noexcept {
+	// I have the special case for -1 to avoid any possibility of
+	// integer overflow from std::numeric_limits<intmax_t>::min() / -1
+	if (divisor.max == -1) {
+		return min_max(0, 0);
+	}
+
+	auto current = min_max(std::numeric_limits<intmax_t>::min(), std::numeric_limits<intmax_t>::max());
+	while (!(current.min == 0 and current.max <= divisor.max + 1) and divisor.max <= divisor.min) {
+		current = overlap(current, modulo_round(dividend, divisor.max));
+		++divisor.max;
+	}
+	return current;
+}
+
+}	// namespace modulus_detail
 
 template<
 	intmax_t lhs_min, intmax_t lhs_max,
@@ -42,6 +94,8 @@ template<
 struct operator_range<lhs_min, lhs_max, rhs_min, rhs_max, modulus> {
 private:
 	static_assert(rhs_min != 0 or rhs_max != 0, "modulo is not defined for a divisor of zero.");
+	static_assert(lhs_min <= lhs_max, "Range inverted.");
+	static_assert(rhs_min <= rhs_max, "Range inverted.");
 	// The sign of the result is equal to the sign of the lhs. The sign of the
 	// rhs does not matter.
 	//
@@ -53,95 +107,29 @@ private:
 	// "magnitude" and "negative" in their name.
 	//
 	// The divisor range cannot terminate on a 0 since that is an invalid value.
-	static constexpr intmax_t greatest_divisor = (rhs_max < 0) ? rhs_min : ::bounded::min(rhs_min, -rhs_max, -1);
-	static constexpr intmax_t least_divisor =
-		(rhs_min > 0) ? -rhs_min :
-		(rhs_max < 0) ? rhs_max :
-		-1;
-	static_assert(greatest_divisor < 0, "Got a positive value where a negative was expected.");
-	static_assert(least_divisor < 0, "Got a positive value where a negative was expected.");
-
-	struct result_type {
-		intmax_t min;
-		intmax_t max;
-	};
-
-
-	template<intmax_t minimum_dividend, intmax_t maximum_dividend>
-	struct sign_free_value {
-		static_assert(minimum_dividend <= 0, "Got a positive value where a negative was expected.");
-		static_assert(maximum_dividend <= 0, "Got a positive value where a negative was expected.");
-		static_assert(minimum_dividend >= maximum_dividend, "Range is inverted.");
-	private:
-		static constexpr auto initial_value = result_type{std::numeric_limits<intmax_t>::min(), std::numeric_limits<intmax_t>::max()};
-
-		static constexpr auto combine(result_type lhs, result_type rhs) noexcept {
-			return result_type{::bounded::max(lhs.min, rhs.min), ::bounded::min(lhs.max, rhs.max)};
-		}
-
-		static constexpr auto modulo_round(intmax_t divisor) noexcept {
-			// When we divide both ends of the dividend by a particular value in
-			// the range of the divisor there are two possibilities:
-			//
-			// If they are not equal, then that means that the periodic modulo
-			// function resets to 0 somewhere in that range. The greatest value
-			// is immediately before this resets, but we do not have to find
-			// where in the range it is. The magnitude will be one less than the
-			// magnitude of the divisor. The least value is obviously 0, as we
-			// are ignoring the sign of the dividend for these calculations.
-			//
-			// If they are equal, the maximum value is at the top end of the
-			// range. The function never reset, and it increases by one for each
-			// increase in the dividend until it resets. The maximum value is
-			// the point at which there were the most increases. The minimum
-			// value is the point at which there were the fewest increases.
-			return (minimum_dividend / divisor == maximum_dividend / divisor) ?
-				result_type{minimum_dividend % divisor, maximum_dividend % divisor} :
-				result_type{0, divisor + 1};
-		}
-
-		static constexpr auto calculate(intmax_t divisor, result_type current) noexcept -> result_type {
-			return ((current.min == -10 and current.max <= divisor + 1) or divisor > least_divisor) ?
-				current :
-				calculate(divisor + 1, combine(current, modulo_round(divisor)));
-		}
-	public:
-		static constexpr auto value() noexcept {
-			// I have the special case for -1 to avoid any possibility of
-			// integer overflow from std::numeric_limits<intmax_t>::min() / -1
-			return (greatest_divisor == -1) ? result_type{0, 0} : calculate(greatest_divisor, initial_value);
-		}
-		static_assert(value().min <= 0, "Got a positive value where a negative was expected.");
-		static_assert(value().max <= 0, "Got a positive value where a negative was expected.");
-		static_assert(value().min >= value().max, "Range is inverted.");
-	};
-
-	static constexpr intmax_t maybe_most_negative_dividend = lhs_min;
-	static constexpr intmax_t maybe_least_negative_dividend = (lhs_max < 0) ? lhs_max : ::bounded::max(lhs_min, 0);
-	static constexpr intmax_t maybe_most_positive_dividend = lhs_max;
-	static constexpr intmax_t maybe_least_positive_dividend = (lhs_min > 0) ? lhs_min : ::bounded::min(lhs_max, 0);
-
-	static constexpr bool has_positive_values = maybe_most_positive_dividend > 0;
-	static constexpr bool has_negative_values = maybe_most_negative_dividend <= 0;
-
-	static_assert(has_positive_values or has_negative_values, "The range must contain at least positive, negative, or zero values");
+	static constexpr auto divisor = modulus_detail::min_max(
+		(rhs_min > 0) ? -rhs_min : (rhs_max < 0) ? rhs_max : -1,
+		(rhs_max < 0) ? rhs_min : bounded::min(rhs_min, -rhs_max)
+	);
+	static_assert(divisor.max < 0, "Got a positive value where a negative was expected.");
+	static_assert(divisor.min < 0, "Got a positive value where a negative was expected.");
 
 	// Avoid instantiating a template with unexpected values
-	static constexpr intmax_t most_negative_dividend = maybe_most_negative_dividend * (has_negative_values ? 1 : 0);
-	static constexpr intmax_t least_negative_dividend = maybe_least_negative_dividend * (has_negative_values ? 1 : 0);
-	static constexpr intmax_t most_positive_dividend = maybe_most_positive_dividend * (has_positive_values ? 1 : 0);
-	static constexpr intmax_t least_positive_dividend = maybe_least_positive_dividend * (has_positive_values ? 1 : 0);
+	static constexpr auto negative_dividend = modulus_detail::min_max(bounded::min(lhs_max, 0), bounded::min(lhs_min, 0));
+	static constexpr auto positive_dividend = modulus_detail::min_max(-bounded::max(lhs_min, 0), -bounded::max(lhs_max, 0));
 	
-	static constexpr result_type negative = sign_free_value<least_negative_dividend, most_negative_dividend>::value();
-	static constexpr result_type positive = sign_free_value<-least_positive_dividend, -most_positive_dividend>::value();
+	static constexpr auto negative = modulus_detail::sign_free_value(negative_dividend, divisor);
+	static constexpr auto positive = modulus_detail::sign_free_value(positive_dividend, divisor);
 public:
 	static_assert(positive.min >= -std::numeric_limits<intmax_t>::max(), "Positive values out of range.");
 	static_assert(positive.max >= -std::numeric_limits<intmax_t>::max(), "Positive values out of range.");
 	static constexpr auto min() noexcept -> intmax_t {
-		return !has_negative_values ? -positive.min : negative.max;
+		constexpr bool has_negative_values = lhs_min <= 0;
+		return has_negative_values ? negative.max : -positive.min;
 	}
 	static constexpr auto max() noexcept -> intmax_t {
-		return !has_positive_values ? negative.min : -positive.max;
+		constexpr bool has_positive_values = lhs_max > 0;
+		return has_positive_values ? -positive.max : negative.min;
 	}
 	static_assert(min() <= max(), "Range is inverted.");
 };
