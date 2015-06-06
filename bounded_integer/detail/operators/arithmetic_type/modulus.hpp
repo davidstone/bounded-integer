@@ -20,19 +20,12 @@
 
 #include "../../minmax.hpp"
 
+#include <functional>
 #include <limits>
 #include <utility>
 
 namespace bounded {
 namespace detail {
-
-struct modulus {
-	template<typename LHS, typename RHS>
-	constexpr auto operator()(LHS && lhs, RHS && rhs) const noexcept {
-		static_assert(noexcept(std::forward<LHS>(lhs) % std::forward<RHS>(rhs)), "Modulus can throw exceptions."); 
-		return std::forward<LHS>(lhs) % std::forward<RHS>(rhs);
-	}
-};
 
 constexpr auto overlap(min_max lhs, min_max rhs) noexcept {
 	return min_max(max(lhs.min, rhs.min), min(lhs.max, rhs.max));
@@ -74,7 +67,7 @@ constexpr auto sign_free_value(min_max dividend, min_max divisor) noexcept {
 	return current;
 }
 
-constexpr auto operator_range(min_max lhs, min_max rhs, modulus) noexcept {
+constexpr auto operator_range(min_max lhs, min_max rhs, std::modulus<>) noexcept {
 	// The sign of the result is equal to the sign of the lhs. The sign of the
 	// rhs does not matter.
 	//

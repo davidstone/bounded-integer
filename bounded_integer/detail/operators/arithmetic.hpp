@@ -43,14 +43,14 @@ constexpr auto operator symbol( \
 ) noexcept { \
 	using result_t = detail::operator_result<lhs_min, lhs_max, lhs_policy, rhs_min, rhs_max, rhs_policy, storage, operator_name>; \
 	using common_t = typename std::common_type_t<result_t, std::decay_t<decltype(lhs)>, std::decay_t<decltype(rhs)>>::underlying_type; \
-	return result_t(operator_name{}(static_cast<common_t>(lhs), static_cast<common_t>(rhs)), non_check); \
+	return result_t(static_cast<common_t>(lhs) symbol static_cast<common_t>(rhs), non_check); \
 }
 
-BOUNDED_INTEGER_OPERATOR_OVERLOADS(+, detail::plus)
-BOUNDED_INTEGER_OPERATOR_OVERLOADS(-, detail::minus)
-BOUNDED_INTEGER_OPERATOR_OVERLOADS(*, detail::multiplies)
-BOUNDED_INTEGER_OPERATOR_OVERLOADS(/, detail::divides)
-BOUNDED_INTEGER_OPERATOR_OVERLOADS(%, detail::modulus)
+BOUNDED_INTEGER_OPERATOR_OVERLOADS(+, std::plus<>)
+BOUNDED_INTEGER_OPERATOR_OVERLOADS(-, std::minus<>)
+BOUNDED_INTEGER_OPERATOR_OVERLOADS(*, std::multiplies<>)
+BOUNDED_INTEGER_OPERATOR_OVERLOADS(/, std::divides<>)
+BOUNDED_INTEGER_OPERATOR_OVERLOADS(%, std::modulus<>)
 
 BOUNDED_INTEGER_OPERATOR_OVERLOADS(<<, detail::left_shift)
 BOUNDED_INTEGER_OPERATOR_OVERLOADS(>>, detail::right_shift)

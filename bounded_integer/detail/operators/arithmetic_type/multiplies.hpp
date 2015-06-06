@@ -25,14 +25,7 @@
 namespace bounded {
 namespace detail {
 
-struct multiplies {
-	template<typename LHS, typename RHS>
-	constexpr auto operator()(LHS && lhs, RHS && rhs) const noexcept {
-		return std::forward<LHS>(lhs) * std::forward<RHS>(rhs);
-	}
-};
-
-constexpr auto operator_range(min_max lhs, min_max rhs, multiplies) noexcept {
+constexpr auto operator_range(min_max lhs, min_max rhs, std::multiplies<>) noexcept {
 	auto const p0 = lhs.min * rhs.min;
 	auto const p1 = lhs.min * rhs.max;
 	auto const p2 = lhs.max * rhs.min;

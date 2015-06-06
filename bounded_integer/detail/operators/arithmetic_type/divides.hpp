@@ -20,20 +20,13 @@
 
 #include "../../minmax.hpp"
 
+#include <functional>
 #include <utility>
 
 namespace bounded {
 namespace detail {
 
-struct divides {
-	template<typename LHS, typename RHS>
-	constexpr auto operator()(LHS && lhs, RHS && rhs) const noexcept {
-		static_assert(noexcept(std::forward<LHS>(lhs) / std::forward<RHS>(rhs)), "Division can throw exceptions."); 
-		return std::forward<LHS>(lhs) / std::forward<RHS>(rhs);
-	}
-};
-
-constexpr auto operator_range(min_max lhs, min_max rhs, divides) noexcept {
+constexpr auto operator_range(min_max lhs, min_max rhs, std::divides<>) noexcept {
 	// If 1 falls within the range, that is the least positive divisor. The
 	// other options are a range that are entirely positive, in which case I
 	// want to return the least value, or the range is entirely negative or

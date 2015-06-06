@@ -18,19 +18,13 @@
 
 #include "base.hpp"
 
+#include <functional>
 #include <utility>
 
 namespace bounded {
 namespace detail {
 
-struct minus {
-	template<typename LHS, typename RHS>
-	constexpr auto operator()(LHS && lhs, RHS && rhs) const noexcept {
-		return std::forward<LHS>(lhs) - std::forward<RHS>(rhs);
-	}
-};
-
-constexpr auto operator_range(min_max lhs, min_max rhs, minus) noexcept {
+constexpr auto operator_range(min_max lhs, min_max rhs, std::minus<>) noexcept {
 	return min_max(
 		lhs.min - rhs.max,
 		lhs.max - rhs.min
