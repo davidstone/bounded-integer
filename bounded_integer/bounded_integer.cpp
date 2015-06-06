@@ -874,6 +874,19 @@ namespace check_arithmetic {
 		"Incorrect modulo type with zero for the dividend"
 	);
 	// auto undefined = 1 % zero;
+	
+	constexpr auto least = bounded::make(std::numeric_limits<intmax_t>::min());
+	constexpr auto max_range = least % least;
+	constexpr bounded::integer<std::numeric_limits<intmax_t>::min() + 1, -(std::numeric_limits<intmax_t>::min() + 1)> max_range_result(0);
+	static_assert(
+		max_range_result == max_range,
+		"Incorrect modulo for values with a very large range"
+	);
+	static_assert(
+		std::is_same<decltype(max_range_result), decltype(max_range)>::value,
+		"Incorrect modulo type for values with a very large range"
+	);
+	
 
 
 
