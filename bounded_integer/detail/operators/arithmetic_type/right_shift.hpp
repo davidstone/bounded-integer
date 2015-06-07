@@ -32,7 +32,8 @@ struct right_shift {
 	}
 };
 
-constexpr auto operator_range(min_max lhs, min_max rhs, right_shift) noexcept {
+template<typename LHS, typename RHS>
+constexpr auto operator_range(LHS const & lhs, RHS const & rhs, right_shift) noexcept {
 	return min_max(
 		lhs.min >> rhs.max,
 		lhs.max >> rhs.min

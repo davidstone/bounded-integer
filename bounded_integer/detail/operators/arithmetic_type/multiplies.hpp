@@ -20,12 +20,14 @@
 
 #include "../../minmax.hpp"
 
+#include <functional>
 #include <utility>
 
 namespace bounded {
 namespace detail {
 
-constexpr auto operator_range(min_max lhs, min_max rhs, std::multiplies<>) noexcept {
+template<typename LHS, typename RHS>
+constexpr auto operator_range(LHS const & lhs, RHS const & rhs, std::multiplies<>) noexcept {
 	auto const p0 = lhs.min * rhs.min;
 	auto const p1 = lhs.min * rhs.max;
 	auto const p2 = lhs.max * rhs.min;

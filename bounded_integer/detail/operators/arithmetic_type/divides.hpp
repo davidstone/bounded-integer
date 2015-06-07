@@ -26,7 +26,8 @@
 namespace bounded {
 namespace detail {
 
-constexpr auto operator_range(min_max lhs, min_max rhs, std::divides<>) noexcept {
+template<typename LHS, typename RHS>
+constexpr auto operator_range(LHS const & lhs, RHS const & rhs, std::divides<>) noexcept {
 	// If 1 falls within the range, that is the least positive divisor. The
 	// other options are a range that are entirely positive, in which case I
 	// want to return the least value, or the range is entirely negative or

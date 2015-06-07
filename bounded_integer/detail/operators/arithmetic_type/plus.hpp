@@ -24,7 +24,8 @@
 namespace bounded {
 namespace detail {
 
-constexpr auto operator_range(min_max lhs, min_max rhs, std::plus<>) noexcept {
+template<typename LHS, typename RHS>
+constexpr auto operator_range(LHS const & lhs, RHS const & rhs, std::plus<>) noexcept {
 	return min_max(
 		lhs.min + rhs.min,
 		lhs.max + rhs.max

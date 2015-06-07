@@ -36,8 +36,8 @@ template<
 	typename Operator
 >
 using operator_result = integer<
-	detail::operator_range({lhs_min, lhs_max}, {rhs_min, rhs_max}, Operator{}).min,
-	detail::operator_range({lhs_min, lhs_max}, {rhs_min, rhs_max}, Operator{}).max,
+	detail::operator_range(min_max(lhs_min, lhs_max), min_max(rhs_min, rhs_max), Operator{}).min,
+	detail::operator_range(min_max(lhs_min, lhs_max), min_max(rhs_min, rhs_max), Operator{}).max,
 	common_policy_t<lhs_overflow, rhs_overflow>,
 	storage
 >;

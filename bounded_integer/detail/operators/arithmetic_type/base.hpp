@@ -16,20 +16,29 @@
 
 #pragma once
 
-#include <cstdint>
-#include <functional>
+#include "../../noexcept.hpp"
+
+#include <type_traits>
+#include <utility>
 
 namespace bounded {
 namespace detail {
 
-struct min_max {
-	constexpr min_max(intmax_t min_, intmax_t max_) noexcept:
-		min(min_),
-		max(max_) {
+template<typename Min, typename Max>
+struct min_max_t {
+	template<typename Minimum, typename Maximum>
+	constexpr min_max_t(Minimum && min_, Maximum && max_) noexcept(noexcept(std::is_nothrow_constructible<Min, Minimum &&>::value and std::is_nothrow_constructible<Max, Maximum &&>::value)):
+		min(std::forward<Minimum>(min_)),
+		max(std::forward<Maximum>(max_)) {
 	}
-	intmax_t min;
-	intmax_t max;
+	Min min;
+	Max max;
 };
+
+template<typename Min, typename Max>
+constexpr auto min_max(Min && min, Max && max) BOUNDED_NOEXCEPT(
+	(min_max_t<std::remove_cv_t<std::remove_reference_t<Min>>, std::remove_cv_t<std::remove_reference_t<Max>>>(std::forward<Min>(min), std::forward<Max>(max)))
+)
 
 }	// namespace detail
 }	// namespace bounded

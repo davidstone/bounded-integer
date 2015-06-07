@@ -27,11 +27,13 @@
 namespace bounded {
 namespace detail {
 
-constexpr auto overlap(min_max lhs, min_max rhs) noexcept {
+template<typename LHS, typename RHS>
+constexpr auto overlap(LHS const & lhs, RHS const & rhs) noexcept {
 	return min_max(max(lhs.min, rhs.min), min(lhs.max, rhs.max));
 }
 
-constexpr auto modulo_round(min_max dividend, intmax_t divisor) noexcept {
+template<typename Dividend, typename Divisor>
+constexpr auto modulo_round(Dividend const & dividend, Divisor const & divisor) noexcept {
 	// When we divide both ends of the dividend by a particular value in
 	// the range of the divisor there are two possibilities:
 	//
@@ -49,14 +51,15 @@ constexpr auto modulo_round(min_max dividend, intmax_t divisor) noexcept {
 	// value is the point at which there were the fewest increases.
 	return (dividend.min / divisor == dividend.max / divisor) ?
 		min_max(dividend.min % divisor, dividend.max % divisor) :
-		min_max(0, divisor + 1);
+		min_max(static_cast<Divisor>(0), divisor + 1);
 }
 
-constexpr auto sign_free_value(min_max dividend, min_max divisor) noexcept {
+template<typename Dividend, typename Divisor>
+constexpr auto sign_free_value(Dividend const & dividend, Divisor divisor) noexcept {
 	// I have the special case for -1 to avoid any possibility of
 	// integer overflow from std::numeric_limits<intmax_t>::min() / -1
 	if (divisor.max == -1) {
-		return min_max(0, 0);
+		return min_max(static_cast<intmax_t>(0), static_cast<intmax_t>(0));
 	}
 
 	auto current = min_max(std::numeric_limits<intmax_t>::min(), std::numeric_limits<intmax_t>::max());
@@ -67,7 +70,8 @@ constexpr auto sign_free_value(min_max dividend, min_max divisor) noexcept {
 	return current;
 }
 
-constexpr auto operator_range(min_max lhs, min_max rhs, std::modulus<>) noexcept {
+template<typename LHS, typename RHS>
+constexpr auto operator_range(LHS const & lhs, RHS const & rhs, std::modulus<>) noexcept {
 	// The sign of the result is equal to the sign of the lhs. The sign of the
 	// rhs does not matter.
 	//
