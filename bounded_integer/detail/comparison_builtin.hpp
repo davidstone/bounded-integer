@@ -18,11 +18,11 @@
 
 #include "comparison.hpp"
 
-#include "../common_type.hpp"
-#include "../enable_if.hpp"
-#include "../forward_declaration.hpp"
-#include "../make.hpp"
-#include "../numeric_limits.hpp"
+#include "common_type.hpp"
+#include "enable_if.hpp"
+#include "forward_declaration.hpp"
+#include "make.hpp"
+#include "numeric_limits.hpp"
 
 #include <cstdint>
 #include <type_traits>

@@ -17,7 +17,7 @@
 #include "make_optional_array.hpp"
 #include "comparison_operators.hpp"
 #include "../literal.hpp"
-#include "../operators/comparison.hpp"
+#include "../comparison.hpp"
 
 namespace {
 using namespace bounded::literal;

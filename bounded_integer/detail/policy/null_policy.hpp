@@ -19,7 +19,7 @@
 #include "basic_policy.hpp"
 #include "common_policy.hpp"
 #include "../is_bounded_integer.hpp"
-#include "../operators/comparison.hpp"
+#include "../comparison.hpp"
 #include <utility>
 
 namespace bounded {

@@ -16,7 +16,7 @@
 
 #pragma once
 
-#include "arithmetic_type/type.hpp"
+#include "type/type.hpp"
 
 #include "../common_type.hpp"
 #include "../forward_declaration.hpp"

@@ -16,7 +16,7 @@
 
 #pragma once
 
-#include "arithmetic.hpp"
+#include "operators.hpp"
 #include "../enable_if.hpp"
 #include "../forward_declaration.hpp"
 #include "../make.hpp"

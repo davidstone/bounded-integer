@@ -16,8 +16,8 @@
 
 #pragma once
 
-#include "../common_type.hpp"
-#include "../forward_declaration.hpp"
+#include "common_type.hpp"
+#include "forward_declaration.hpp"
 
 #include <cstdint>
 #include <type_traits>

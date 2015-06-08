@@ -18,7 +18,7 @@
 
 #include "class.hpp"
 #include "make.hpp"
-#include "operators/arithmetic.hpp"
+#include "arithmetic/operators.hpp"
 
 #include <iterator>
 

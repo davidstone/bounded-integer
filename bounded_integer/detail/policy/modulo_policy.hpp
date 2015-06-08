@@ -19,7 +19,7 @@
 #include "basic_policy.hpp"
 #include "../class.hpp"
 #include "../common_type.hpp"
-#include "../operators/arithmetic.hpp"
+#include "../arithmetic/operators.hpp"
 #include <type_traits>
 
 namespace bounded {

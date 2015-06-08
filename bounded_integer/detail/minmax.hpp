@@ -18,11 +18,11 @@
 
 #include "common_type.hpp"
 #include "common_type_and_value_category.hpp"
+#include "comparison.hpp"
 #include "enable_if.hpp"
 #include "is_bounded_integer.hpp"
 #include "numeric_limits.hpp"
 #include "overlapping_range.hpp"
-#include "operators/comparison.hpp"
 #include "policy/common_policy.hpp"
 #include <utility>
 

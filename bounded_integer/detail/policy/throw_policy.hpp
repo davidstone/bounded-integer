@@ -17,9 +17,9 @@
 #pragma once
 
 #include "basic_policy.hpp"
+#include "../comparison.hpp"
 #include "../is_bounded_integer.hpp"
 #include "../string.hpp"
-#include "../operators/comparison.hpp"
 #include <stdexcept>
 
 namespace bounded {

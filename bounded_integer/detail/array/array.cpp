@@ -16,8 +16,8 @@
 
 #include "array.hpp"
 #include "../literal.hpp"
-#include "../operators/comparison.hpp"
-#include "../operators/comparison_builtin.hpp"
+#include "../comparison.hpp"
+#include "../comparison_builtin.hpp"
 
 namespace {
 using namespace bounded::literal;

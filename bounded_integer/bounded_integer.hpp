@@ -20,6 +20,8 @@
 #include "detail/cast.hpp"
 #include "detail/class.hpp"
 #include "detail/common_type.hpp"
+#include "detail/comparison.hpp"
+#include "detail/comparison_builtin.hpp"
 #include "detail/conditional.hpp"
 #include "detail/iterator.hpp"
 #include "detail/literal.hpp"
@@ -30,7 +32,9 @@
 #include "detail/stream.hpp"
 #include "detail/string.hpp"
 #include "detail/typedefs.hpp"
-#include "detail/operators/operators.hpp"
+#include "detail/arithmetic/compound_assignment.hpp"
+#include "detail/arithmetic/operators.hpp"
+#include "detail/arithmetic/operators_builtin.hpp"
 #include "detail/policy/all.hpp"
 
 // Missing from this list are array and optional classes and integer_range

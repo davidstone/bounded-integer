@@ -18,8 +18,8 @@
 
 #include "../class.hpp"
 #include "../make.hpp"
-#include "../operators/arithmetic.hpp"
-#include "../operators/arithmetic_builtin.hpp"
+#include "../arithmetic/operators.hpp"
+#include "../arithmetic/operators_builtin.hpp"
 #include "../policy/throw_policy.hpp"
 
 #include <algorithm>

@@ -17,10 +17,10 @@
 #pragma once
 
 #include "class.hpp"
+#include "comparison.hpp"
 #include "make.hpp"
 #include "numeric_limits.hpp"
-#include "operators/arithmetic.hpp"
-#include "operators/comparison.hpp"
+#include "arithmetic/operators.hpp"
 
 #include <iterator>
 

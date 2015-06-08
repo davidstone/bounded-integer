@@ -30,6 +30,8 @@ sources += prepend_dir('detail', [
 	'class.cpp',
 	'common_type.cpp',
 	'common_type_and_value_category.cpp',
+	'comparison.cpp',
+	'comparison_builtin.cpp',
 	'conditional.cpp',
 	'enable_if.cpp',
 	'forward_declaration.cpp',
@@ -52,15 +54,12 @@ sources += prepend_dir('detail/array', [
 	'array.cpp',
 	'make_array.cpp',
 ])
-sources += prepend_dir('detail/operators', [
-	'arithmetic.cpp',
-	'arithmetic_builtin.cpp',
-	'comparison.cpp',
-	'comparison_builtin.cpp',
+sources += prepend_dir('detail/arithmetic', [
 	'compound_assignment.cpp',
 	'operators.cpp',
+	'operators_builtin.cpp',
 ])
-sources += prepend_dir('detail/operators/arithmetic_type', [
+sources += prepend_dir('detail/arithmetic/type', [
 	'type.cpp',
 	'base.cpp',
 	'plus.cpp',
