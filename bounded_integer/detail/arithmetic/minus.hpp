@@ -18,14 +18,11 @@
 
 #include "base.hpp"
 
-#include <functional>
-#include <utility>
-
 namespace bounded {
 namespace detail {
 
 template<typename LHS, typename RHS>
-constexpr auto operator_range(LHS const & lhs, RHS const & rhs, std::minus<>) noexcept {
+constexpr auto minus_operator_range(LHS const & lhs, RHS const & rhs) noexcept {
 	return min_max(
 		lhs.min - rhs.max,
 		lhs.max - rhs.min
@@ -34,7 +31,7 @@ constexpr auto operator_range(LHS const & lhs, RHS const & rhs, std::minus<>) no
 
 }	// namespace detail
 
-BOUNDED_INTEGER_OPERATOR_OVERLOADS(-, std::minus<>)
+BOUNDED_INTEGER_OPERATOR_OVERLOADS(-, detail::minus_operator_range)
 
 }	// namespace bounded
 

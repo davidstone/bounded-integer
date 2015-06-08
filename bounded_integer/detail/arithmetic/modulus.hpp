@@ -20,9 +20,7 @@
 
 #include "../minmax.hpp"
 
-#include <functional>
 #include <limits>
-#include <utility>
 
 namespace bounded {
 namespace detail {
@@ -71,7 +69,7 @@ constexpr auto sign_free_value(Dividend const & dividend, Divisor divisor) noexc
 }
 
 template<typename LHS, typename RHS>
-constexpr auto operator_range(LHS const & lhs, RHS const & rhs, std::modulus<>) noexcept {
+constexpr auto modulus_operator_range(LHS const & lhs, RHS const & rhs) noexcept {
 	// The sign of the result is equal to the sign of the lhs. The sign of the
 	// rhs does not matter.
 	//
@@ -106,7 +104,7 @@ constexpr auto operator_range(LHS const & lhs, RHS const & rhs, std::modulus<>) 
 
 }	// namespace detail
 
-BOUNDED_INTEGER_OPERATOR_OVERLOADS(%, std::modulus<>)
+BOUNDED_INTEGER_OPERATOR_OVERLOADS(%, detail::modulus_operator_range)
 
 }	// namespace bounded
 

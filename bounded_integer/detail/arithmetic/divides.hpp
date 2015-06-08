@@ -20,14 +20,11 @@
 
 #include "../minmax.hpp"
 
-#include <functional>
-#include <utility>
-
 namespace bounded {
 namespace detail {
 
 template<typename LHS, typename RHS>
-constexpr auto operator_range(LHS const & lhs, RHS const & rhs, std::divides<>) noexcept {
+constexpr auto divides_operator_range(LHS const & lhs, RHS const & rhs) noexcept {
 	// If 1 falls within the range, that is the least positive divisor. The
 	// other options are a range that are entirely positive, in which case I
 	// want to return the least value, or the range is entirely negative or
@@ -55,7 +52,7 @@ constexpr auto operator_range(LHS const & lhs, RHS const & rhs, std::divides<>) 
 
 }	// namespace detail
 
-BOUNDED_INTEGER_OPERATOR_OVERLOADS(/, std::divides<>)
+BOUNDED_INTEGER_OPERATOR_OVERLOADS(/, divides_operator_range)
 
 }	// namespace bounded
 

@@ -18,22 +18,11 @@
 
 #include "base.hpp"
 
-#include <limits>
-#include <utility>
-
 namespace bounded {
 namespace detail {
 
-struct left_shift {
-	template<typename LHS, typename RHS>
-	constexpr auto operator()(LHS && lhs, RHS && rhs) const noexcept {
-		static_assert(noexcept(std::forward<LHS>(lhs) << std::forward<RHS>(rhs)), "Left shift can throw exceptions."); 
-		return std::forward<LHS>(lhs) << std::forward<RHS>(rhs);
-	}
-};
-
 template<typename LHS, typename RHS>
-constexpr auto operator_range(LHS const & lhs, RHS const & rhs, left_shift) noexcept {
+constexpr auto left_shift_operator_range(LHS const & lhs, RHS const & rhs) noexcept {
 	return min_max(
 		lhs.min << rhs.min,
 		lhs.max << rhs.max
@@ -42,7 +31,7 @@ constexpr auto operator_range(LHS const & lhs, RHS const & rhs, left_shift) noex
 
 }	// namespace detail
 
-BOUNDED_INTEGER_OPERATOR_OVERLOADS(<<, detail::left_shift)
+BOUNDED_INTEGER_OPERATOR_OVERLOADS(<<, detail::left_shift_operator_range)
 
 }	// namespace bounded
 

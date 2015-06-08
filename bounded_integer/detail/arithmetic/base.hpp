@@ -49,7 +49,7 @@ constexpr auto min_max(Min && min, Max && max) BOUNDED_NOEXCEPT(
 // It is safe to use the non_check constructor because we already know that the
 // result will fit in result_t. We have to cast to the intermediate common_t in
 // case result_t is narrower than one of the arguments.
-#define BOUNDED_INTEGER_OPERATOR_OVERLOADS(symbol, operator_name) \
+#define BOUNDED_INTEGER_OPERATOR_OVERLOADS(symbol, operator_range) \
 template< \
 	intmax_t lhs_min, intmax_t lhs_max, typename lhs_policy, \
 	intmax_t rhs_min, intmax_t rhs_max, typename rhs_policy, \
@@ -59,9 +59,10 @@ constexpr auto operator symbol( \
 	integer<lhs_min, lhs_max, lhs_policy, storage> const lhs, \
 	integer<rhs_min, rhs_max, rhs_policy, storage> const rhs \
 ) noexcept { \
+	constexpr auto range = operator_range(detail::min_max(lhs_min, lhs_max), detail::min_max(rhs_min, rhs_max)); \
 	using result_t = integer< \
-		operator_range(detail::min_max(lhs_min, lhs_max), detail::min_max(rhs_min, rhs_max), operator_name{}).min, \
-		operator_range(detail::min_max(lhs_min, lhs_max), detail::min_max(rhs_min, rhs_max), operator_name{}).max, \
+		range.min, \
+		range.max, \
 		common_policy_t<lhs_policy, rhs_policy>, \
 		storage \
 	>; \
