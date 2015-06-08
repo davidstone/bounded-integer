@@ -26,7 +26,7 @@
 
 namespace bounded {
 
-#define BOUNDED_INTEGER_OPERATOR_OVERLOADS(symbol, operator_name) \
+#define BOUNDED_INTEGER_MIXED_OPERATOR_OVERLOADS(symbol, operator_name) \
 template< \
 	intmax_t lhs_min, intmax_t lhs_max, typename overflow, storage_type storage, typename T, \
 	enable_if_t<basic_numeric_limits<T>::is_integer> = clang_dummy \
@@ -42,16 +42,16 @@ constexpr auto operator symbol(T const lhs, integer<rhs_min, rhs_max, overflow, 
 	return make(lhs) symbol rhs; \
 }
 
-BOUNDED_INTEGER_OPERATOR_OVERLOADS(+, detail::plus)
-BOUNDED_INTEGER_OPERATOR_OVERLOADS(-, detail::minus)
-BOUNDED_INTEGER_OPERATOR_OVERLOADS(*, detail::multiplies)
-BOUNDED_INTEGER_OPERATOR_OVERLOADS(/, detail::divides)
-BOUNDED_INTEGER_OPERATOR_OVERLOADS(%, detail::modulus)
+BOUNDED_INTEGER_MIXED_OPERATOR_OVERLOADS(+, detail::plus)
+BOUNDED_INTEGER_MIXED_OPERATOR_OVERLOADS(-, detail::minus)
+BOUNDED_INTEGER_MIXED_OPERATOR_OVERLOADS(*, detail::multiplies)
+BOUNDED_INTEGER_MIXED_OPERATOR_OVERLOADS(/, detail::divides)
+BOUNDED_INTEGER_MIXED_OPERATOR_OVERLOADS(%, detail::modulus)
 
-BOUNDED_INTEGER_OPERATOR_OVERLOADS(<<, detail::left_shift)
-BOUNDED_INTEGER_OPERATOR_OVERLOADS(>>, detail::right_shift)
+BOUNDED_INTEGER_MIXED_OPERATOR_OVERLOADS(<<, detail::left_shift)
+BOUNDED_INTEGER_MIXED_OPERATOR_OVERLOADS(>>, detail::right_shift)
 
-#undef BOUNDED_INTEGER_OPERATOR_OVERLOADS
+#undef BOUNDED_INTEGER_MIXED_OPERATOR_OVERLOADS
 
 
 // Pointer overloads

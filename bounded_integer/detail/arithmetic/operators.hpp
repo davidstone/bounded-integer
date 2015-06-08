@@ -1,5 +1,5 @@
-// Addition, subtraction, multiplication, division, unary plus and minus, shifts
-// Copyright (C) 2014 David Stone
+// Operator overloads when each argument is a bounded::integer
+// Copyright (C) 2015 David Stone
 //
 // This program is free software: you can redistribute it and / or modify
 // it under the terms of the GNU Affero General Public License as
@@ -16,64 +16,13 @@
 
 #pragma once
 
-#include "type/type.hpp"
-
-#include "../common_type.hpp"
-#include "../forward_declaration.hpp"
-
-#include <cstdint>
-#include <type_traits>
-
-namespace bounded {
-
-// TODO: consider how dynamic bounds fit into this
-
-// It is safe to use the non_check constructor because we already know that the
-// result will fit in result_t. We have to cast to the intermediate common_t in
-// case result_t is narrower than one of the arguments.
-#define BOUNDED_INTEGER_OPERATOR_OVERLOADS(symbol, operator_name) \
-template< \
-	intmax_t lhs_min, intmax_t lhs_max, typename lhs_policy, \
-	intmax_t rhs_min, intmax_t rhs_max, typename rhs_policy, \
-	storage_type storage \
-> \
-constexpr auto operator symbol( \
-	integer<lhs_min, lhs_max, lhs_policy, storage> const lhs, \
-	integer<rhs_min, rhs_max, rhs_policy, storage> const rhs \
-) noexcept { \
-	using result_t = detail::operator_result<lhs_min, lhs_max, lhs_policy, rhs_min, rhs_max, rhs_policy, storage, operator_name>; \
-	using common_t = typename std::common_type_t<result_t, std::decay_t<decltype(lhs)>, std::decay_t<decltype(rhs)>>::underlying_type; \
-	return result_t(static_cast<common_t>(lhs) symbol static_cast<common_t>(rhs), non_check); \
-}
-
-BOUNDED_INTEGER_OPERATOR_OVERLOADS(+, std::plus<>)
-BOUNDED_INTEGER_OPERATOR_OVERLOADS(-, std::minus<>)
-BOUNDED_INTEGER_OPERATOR_OVERLOADS(*, std::multiplies<>)
-BOUNDED_INTEGER_OPERATOR_OVERLOADS(/, std::divides<>)
-BOUNDED_INTEGER_OPERATOR_OVERLOADS(%, std::modulus<>)
-
-BOUNDED_INTEGER_OPERATOR_OVERLOADS(<<, detail::left_shift)
-BOUNDED_INTEGER_OPERATOR_OVERLOADS(>>, detail::right_shift)
-
-#undef BOUNDED_INTEGER_OPERATOR_OVERLOADS
-
-
-// Unary minus
-
-template<intmax_t minimum, intmax_t maximum, typename overflow_policy, storage_type storage>
-constexpr auto operator-(integer<minimum, maximum, overflow_policy, storage> const value) noexcept {
-	using result_type = detail::unary_minus_result<minimum, maximum, overflow_policy, storage>;
-	using common_type = std::common_type_t<result_type, integer<minimum, maximum, overflow_policy, storage>>;
-	return result_type(-static_cast<typename common_type::underlying_type>(value), non_check);
-}
-
-
-// Unary plus
-
-template<intmax_t minimum, intmax_t maximum, typename overflow_policy, storage_type storage>
-constexpr auto operator+(integer<minimum, maximum, overflow_policy, storage> const value) noexcept {
-	return value;
-}
-
-}	// namespace bounded
+#include "plus.hpp"
+#include "minus.hpp"
+#include "multiplies.hpp"
+#include "divides.hpp"
+#include "modulus.hpp"
+#include "left_shift.hpp"
+#include "right_shift.hpp"
+#include "unary_minus.hpp"
+#include "unary_plus.hpp"
 

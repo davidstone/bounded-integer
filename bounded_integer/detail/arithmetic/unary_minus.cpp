@@ -1,4 +1,4 @@
-// result_type of plus
+// Verify that the header can stand on its own
 // Copyright (C) 2015 David Stone
 //
 // This program is free software: you can redistribute it and / or modify
@@ -14,24 +14,4 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with this program. If not, see <http://www.gnu.org/licenses/>.
 
-#pragma once
-
-#include "base.hpp"
-
-#include <functional>
-#include <utility>
-
-namespace bounded {
-namespace detail {
-
-template<typename LHS, typename RHS>
-constexpr auto operator_range(LHS const & lhs, RHS const & rhs, std::plus<>) noexcept {
-	return min_max(
-		lhs.min + rhs.min,
-		lhs.max + rhs.max
-	);
-}
-
-}	// namespace detail
-}	// namespace bounded
-
+#include "unary_minus.hpp"

@@ -1,4 +1,4 @@
-// Verify that the header can stand on its own
+// Unary minus
 // Copyright (C) 2015 David Stone
 //
 // This program is free software: you can redistribute it and / or modify
@@ -14,4 +14,19 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with this program. If not, see <http://www.gnu.org/licenses/>.
 
-#include "type.hpp"
+#pragma once
+
+#include "../common_type.hpp"
+#include "../forward_declaration.hpp"
+
+namespace bounded {
+
+template<intmax_t minimum, intmax_t maximum, typename overflow_policy, storage_type storage>
+constexpr auto operator-(integer<minimum, maximum, overflow_policy, storage> const value) noexcept {
+	using result_type = integer<-maximum, -minimum, overflow_policy, storage>;
+	using common_type = std::common_type_t<result_type, integer<minimum, maximum, overflow_policy, storage>>;
+	return result_type(-static_cast<typename common_type::underlying_type>(value), non_check);
+}
+
+}	// namespace bounded
+

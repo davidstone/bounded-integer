@@ -1,4 +1,4 @@
-// result_type of minus
+// Subtraction operator overload when each argument is a bounded::integer
 // Copyright (C) 2015 David Stone
 //
 // This program is free software: you can redistribute it and / or modify
@@ -33,5 +33,8 @@ constexpr auto operator_range(LHS const & lhs, RHS const & rhs, std::minus<>) no
 }
 
 }	// namespace detail
+
+BOUNDED_INTEGER_OPERATOR_OVERLOADS(-, std::minus<>)
+
 }	// namespace bounded
 

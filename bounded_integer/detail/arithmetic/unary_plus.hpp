@@ -1,4 +1,4 @@
-// result_type of arithmetic operations
+// Unary plus
 // Copyright (C) 2015 David Stone
 //
 // This program is free software: you can redistribute it and / or modify
@@ -16,35 +16,15 @@
 
 #pragma once
 
-#include "plus.hpp"
-#include "minus.hpp"
-#include "multiplies.hpp"
-#include "divides.hpp"
-#include "modulus.hpp"
-#include "left_shift.hpp"
-#include "right_shift.hpp"
-
-#include "../../policy/common_policy.hpp"
+#include "../common_type.hpp"
+#include "../forward_declaration.hpp"
 
 namespace bounded {
-namespace detail {
-
-template<
-	intmax_t lhs_min, intmax_t lhs_max, typename lhs_overflow,
-	intmax_t rhs_min, intmax_t rhs_max, typename rhs_overflow,
-	storage_type storage,
-	typename Operator
->
-using operator_result = integer<
-	detail::operator_range(min_max(lhs_min, lhs_max), min_max(rhs_min, rhs_max), Operator{}).min,
-	detail::operator_range(min_max(lhs_min, lhs_max), min_max(rhs_min, rhs_max), Operator{}).max,
-	common_policy_t<lhs_overflow, rhs_overflow>,
-	storage
->;
 
 template<intmax_t minimum, intmax_t maximum, typename overflow_policy, storage_type storage>
-using unary_minus_result = integer<-maximum, -minimum, overflow_policy, storage>;
+constexpr auto operator+(integer<minimum, maximum, overflow_policy, storage> const value) noexcept {
+	return value;
+}
 
-}	// namespace detail
 }	// namespace bounded
 

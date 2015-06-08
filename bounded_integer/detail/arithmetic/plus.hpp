@@ -1,4 +1,4 @@
-// result_type of arithmetic operations
+// Addition operator overload when each argument is a bounded::integer
 // Copyright (C) 2015 David Stone
 //
 // This program is free software: you can redistribute it and / or modify
@@ -16,30 +16,25 @@
 
 #pragma once
 
-#include "../../noexcept.hpp"
+#include "base.hpp"
 
-#include <type_traits>
+#include <functional>
 #include <utility>
 
 namespace bounded {
 namespace detail {
 
-template<typename Min, typename Max>
-struct min_max_t {
-	template<typename Minimum, typename Maximum>
-	constexpr min_max_t(Minimum && min_, Maximum && max_) noexcept(noexcept(std::is_nothrow_constructible<Min, Minimum &&>::value and std::is_nothrow_constructible<Max, Maximum &&>::value)):
-		min(std::forward<Minimum>(min_)),
-		max(std::forward<Maximum>(max_)) {
-	}
-	Min min;
-	Max max;
-};
-
-template<typename Min, typename Max>
-constexpr auto min_max(Min && min, Max && max) BOUNDED_NOEXCEPT(
-	(min_max_t<std::remove_cv_t<std::remove_reference_t<Min>>, std::remove_cv_t<std::remove_reference_t<Max>>>(std::forward<Min>(min), std::forward<Max>(max)))
-)
+template<typename LHS, typename RHS>
+constexpr auto operator_range(LHS const & lhs, RHS const & rhs, std::plus<>) noexcept {
+	return min_max(
+		lhs.min + rhs.min,
+		lhs.max + rhs.max
+	);
+}
 
 }	// namespace detail
+
+BOUNDED_INTEGER_OPERATOR_OVERLOADS(+, std::plus<>)
+
 }	// namespace bounded
 

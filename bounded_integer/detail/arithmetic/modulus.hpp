@@ -1,4 +1,4 @@
-// result_type of modulus
+// Modulus operator overload when each argument is a bounded::integer
 // Copyright (C) 2015 David Stone
 //
 // This program is free software: you can redistribute it and / or modify
@@ -18,7 +18,7 @@
 
 #include "base.hpp"
 
-#include "../../minmax.hpp"
+#include "../minmax.hpp"
 
 #include <functional>
 #include <limits>
@@ -105,5 +105,8 @@ constexpr auto operator_range(LHS const & lhs, RHS const & rhs, std::modulus<>) 
 }
 
 }	// namespace detail
+
+BOUNDED_INTEGER_OPERATOR_OVERLOADS(%, std::modulus<>)
+
 }	// namespace bounded
 

@@ -1,4 +1,4 @@
-// result_type of left shift
+// Multiplication operator overload when each argument is a bounded::integer
 // Copyright (C) 2015 David Stone
 //
 // This program is free software: you can redistribute it and / or modify
@@ -18,28 +18,29 @@
 
 #include "base.hpp"
 
-#include <limits>
+#include "../minmax.hpp"
+
+#include <functional>
 #include <utility>
 
 namespace bounded {
 namespace detail {
 
-struct left_shift {
-	template<typename LHS, typename RHS>
-	constexpr auto operator()(LHS && lhs, RHS && rhs) const noexcept {
-		static_assert(noexcept(std::forward<LHS>(lhs) << std::forward<RHS>(rhs)), "Left shift can throw exceptions."); 
-		return std::forward<LHS>(lhs) << std::forward<RHS>(rhs);
-	}
-};
-
 template<typename LHS, typename RHS>
-constexpr auto operator_range(LHS const & lhs, RHS const & rhs, left_shift) noexcept {
+constexpr auto operator_range(LHS const & lhs, RHS const & rhs, std::multiplies<>) noexcept {
+	auto const p0 = lhs.min * rhs.min;
+	auto const p1 = lhs.min * rhs.max;
+	auto const p2 = lhs.max * rhs.min;
+	auto const p3 = lhs.max * rhs.max;
 	return min_max(
-		lhs.min << rhs.min,
-		lhs.max << rhs.max
+		min(p0, p1, p2, p3),
+		max(p0, p1, p2, p3)
 	);
 }
 
 }	// namespace detail
+
+BOUNDED_INTEGER_OPERATOR_OVERLOADS(*, std::multiplies<>)
+
 }	// namespace bounded
 

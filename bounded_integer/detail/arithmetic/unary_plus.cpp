@@ -1,4 +1,4 @@
-// result_type of multiplies
+// Verify that the header can stand on its own
 // Copyright (C) 2015 David Stone
 //
 // This program is free software: you can redistribute it and / or modify
@@ -14,30 +14,4 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with this program. If not, see <http://www.gnu.org/licenses/>.
 
-#pragma once
-
-#include "base.hpp"
-
-#include "../../minmax.hpp"
-
-#include <functional>
-#include <utility>
-
-namespace bounded {
-namespace detail {
-
-template<typename LHS, typename RHS>
-constexpr auto operator_range(LHS const & lhs, RHS const & rhs, std::multiplies<>) noexcept {
-	auto const p0 = lhs.min * rhs.min;
-	auto const p1 = lhs.min * rhs.max;
-	auto const p2 = lhs.max * rhs.min;
-	auto const p3 = lhs.max * rhs.max;
-	return min_max(
-		min(p0, p1, p2, p3),
-		max(p0, p1, p2, p3)
-	);
-}
-
-}	// namespace detail
-}	// namespace bounded
-
+#include "unary_plus.hpp"

@@ -1,4 +1,4 @@
-// result_type of right shift
+// Left shift operator overload when each argument is a bounded::integer
 // Copyright (C) 2015 David Stone
 //
 // This program is free software: you can redistribute it and / or modify
@@ -24,22 +24,25 @@
 namespace bounded {
 namespace detail {
 
-struct right_shift {
+struct left_shift {
 	template<typename LHS, typename RHS>
 	constexpr auto operator()(LHS && lhs, RHS && rhs) const noexcept {
-		static_assert(noexcept(std::forward<LHS>(lhs) >> std::forward<RHS>(rhs)), "Right shift can throw exceptions."); 
-		return std::forward<LHS>(lhs) >> std::forward<RHS>(rhs);
+		static_assert(noexcept(std::forward<LHS>(lhs) << std::forward<RHS>(rhs)), "Left shift can throw exceptions."); 
+		return std::forward<LHS>(lhs) << std::forward<RHS>(rhs);
 	}
 };
 
 template<typename LHS, typename RHS>
-constexpr auto operator_range(LHS const & lhs, RHS const & rhs, right_shift) noexcept {
+constexpr auto operator_range(LHS const & lhs, RHS const & rhs, left_shift) noexcept {
 	return min_max(
-		lhs.min >> rhs.max,
-		lhs.max >> rhs.min
+		lhs.min << rhs.min,
+		lhs.max << rhs.max
 	);
 }
 
 }	// namespace detail
+
+BOUNDED_INTEGER_OPERATOR_OVERLOADS(<<, detail::left_shift)
+
 }	// namespace bounded
 
