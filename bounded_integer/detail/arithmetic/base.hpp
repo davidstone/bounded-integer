@@ -42,22 +42,6 @@ constexpr auto min_max(Min && min, Max && max) BOUNDED_NOEXCEPT(
 	(min_max_t<std::remove_cv_t<std::remove_reference_t<Min>>, std::remove_cv_t<std::remove_reference_t<Max>>>(std::forward<Min>(min), std::forward<Max>(max)))
 )
 
-template<typename LHS, typename RHS, typename Operator>
-void operator_range(LHS, RHS, Operator);
-
-template<
-	intmax_t lhs_min, intmax_t lhs_max, typename lhs_overflow,
-	intmax_t rhs_min, intmax_t rhs_max, typename rhs_overflow,
-	storage_type storage,
-	typename Operator
->
-using operator_result = integer<
-	operator_range(min_max(lhs_min, lhs_max), min_max(rhs_min, rhs_max), Operator{}).min,
-	operator_range(min_max(lhs_min, lhs_max), min_max(rhs_min, rhs_max), Operator{}).max,
-	common_policy_t<lhs_overflow, rhs_overflow>,
-	storage
->;
-
 }	// namespace detail
 
 // TODO: consider how dynamic bounds fit into this
@@ -75,7 +59,12 @@ constexpr auto operator symbol( \
 	integer<lhs_min, lhs_max, lhs_policy, storage> const lhs, \
 	integer<rhs_min, rhs_max, rhs_policy, storage> const rhs \
 ) noexcept { \
-	using result_t = detail::operator_result<lhs_min, lhs_max, lhs_policy, rhs_min, rhs_max, rhs_policy, storage, operator_name>; \
+	using result_t = integer< \
+		operator_range(detail::min_max(lhs_min, lhs_max), detail::min_max(rhs_min, rhs_max), operator_name{}).min, \
+		operator_range(detail::min_max(lhs_min, lhs_max), detail::min_max(rhs_min, rhs_max), operator_name{}).max, \
+		common_policy_t<lhs_policy, rhs_policy>, \
+		storage \
+	>; \
 	using common_t = typename std::common_type_t<result_t, std::decay_t<decltype(lhs)>, std::decay_t<decltype(rhs)>>::underlying_type; \
 	return result_t(static_cast<common_t>(lhs) symbol static_cast<common_t>(rhs), non_check); \
 }
