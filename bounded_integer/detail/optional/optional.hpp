@@ -90,10 +90,7 @@ public:
 		}
 		return *this;
 	}
-	template<typename U, enable_if_t<std::is_convertible<U &&, T>::value> = clang_dummy>
-	constexpr optional_storage(U && other) noexcept(std::is_nothrow_constructible<T, U &&>::value):
-		m_value(std::forward<U>(other)) {
-	}
+
 	template<typename ... Args, enable_if_t<std::is_constructible<T, Args && ...>::value> = clang_dummy>
 	constexpr explicit optional_storage(Args && ... args) noexcept(std::is_nothrow_constructible<T, Args && ...>::value):
 		m_value(std::forward<Args>(args)...) {
@@ -134,11 +131,7 @@ struct optional_storage<T, false> {
 	optional_storage(optional_storage &&) = default;
 	auto operator=(optional_storage const &) -> optional_storage & = default;
 	auto operator=(optional_storage &&) -> optional_storage & = default;
-	template<typename U, enable_if_t<std::is_convertible<U &&, T>::value> = clang_dummy>
-	constexpr optional_storage(U && other) noexcept(std::is_nothrow_constructible<T, U &&>::value):
-		m_initialized(true),
-		m_value(std::forward<U>(other)) {
-	}
+
 	template<typename ... Args, enable_if_t<std::is_constructible<T, Args && ...>::value> = clang_dummy>
 	constexpr explicit optional_storage(Args && ... args) noexcept(std::is_nothrow_constructible<T, Args && ...>::value):
 		m_initialized(true),
