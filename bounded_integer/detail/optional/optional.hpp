@@ -46,10 +46,10 @@ template<typename T>
 struct has_extra_space {
 private:
 	static_assert(basic_numeric_limits<T>::is_specialized, "Metafunction only works with integer types.");
-	static constexpr intmax_t underlying_min = basic_numeric_limits<underlying<T>>::min();
-	static constexpr intmax_t underlying_max = basic_numeric_limits<underlying<T>>::max();
-	static constexpr intmax_t min = basic_numeric_limits<T>::min();
-	static constexpr intmax_t max = basic_numeric_limits<T>::max();
+	static constexpr auto underlying_min = basic_numeric_limits<underlying<T>>::min();
+	static constexpr auto underlying_max = basic_numeric_limits<underlying<T>>::max();
+	static constexpr auto min = basic_numeric_limits<T>::min();
+	static constexpr auto max = basic_numeric_limits<T>::max();
 public:
 	static constexpr bool value = underlying_min < min or underlying_max > max;
 };
@@ -72,7 +72,7 @@ public:
 	}
 	optional_storage(optional_storage const &) = default;
 	optional_storage(optional_storage &&) = default;
-	auto && operator=(optional_storage const & other) noexcept(noexcept(m_value = other.m_value)) {
+	constexpr auto && operator=(optional_storage const & other) noexcept(noexcept(m_value = other.m_value)) {
 		if (other.is_initialized()) {
 			m_value = other.m_value;
 		}
@@ -81,7 +81,7 @@ public:
 		}
 		return *this;
 	}
-	auto && operator=(optional_storage && other) noexcept(noexcept(m_value = other.m_value)) {
+	constexpr auto && operator=(optional_storage && other) noexcept(noexcept(m_value = other.m_value)) {
 		if (other.is_initialized()) {
 			m_value = other.m_value;
 		}
@@ -108,13 +108,13 @@ public:
 		m_value(other.is_initialized() ? std::move(other.value()) : uninitialized_value()) {
 	}
 
-	constexpr auto value() const & noexcept -> T const & {
+	constexpr auto && value() const & noexcept {
 		return m_value;
 	}
-	auto value() & noexcept -> T & {
+	constexpr auto && value() & noexcept {
 		return m_value;
 	}
-	constexpr auto value() && noexcept  -> T && {
+	constexpr auto && value() && noexcept {
 		return std::move(m_value);
 	}
 	constexpr auto is_initialized() const noexcept {
@@ -156,13 +156,13 @@ struct optional_storage<T, false> {
 		m_value(m_initialized ? std::move(other.value()) : uninitialized_value()) {
 	}
 
-	constexpr auto value() const & noexcept  -> T const & {
+	constexpr auto && value() const & noexcept {
 		return m_value;
 	}
-	auto value() & noexcept -> T & {
+	constexpr auto && value() & noexcept {
 		return m_value;
 	}
-	constexpr auto value() && noexcept -> T && {
+	constexpr auto && value() && noexcept {
 		return std::move(m_value);
 	}
 	constexpr auto is_initialized() const noexcept {
@@ -213,7 +213,7 @@ public:
 	auto operator=(optional const &) -> optional & = default;
 	auto operator=(optional &&) -> optional & = default;
 	template<typename U>
-	auto && operator=(U && other) noexcept(noexcept(std::declval<optional &>() = optional(std::forward<U>(other)))) {
+	constexpr auto && operator=(U && other) noexcept(noexcept(std::declval<optional &>() = optional(std::forward<U>(other)))) {
 		*this = optional(std::forward<U>(other));
 		return *this;
 	}
@@ -223,26 +223,26 @@ public:
 	constexpr auto && value() const & {
 		return m_storage.is_initialized() ? m_storage.value() : (throw std::logic_error("bad optional access"), m_storage.value());
 	}
-	auto && value() & {
+	constexpr auto && value() & {
 		return m_storage.is_initialized() ? m_storage.value() : (throw std::logic_error("bad optional access"), m_storage.value());
 	}
-	auto && value() && {
+	constexpr auto && value() && {
 		return m_storage.is_initialized() ? std::move(m_storage).value() : (throw std::logic_error("bad optional access"), std::move(m_storage).value());
 	}
 	constexpr auto && operator*() const & {
 		return value();
 	}
-	auto && operator*() & {
+	constexpr auto && operator*() & {
 		return value();
 	}
-	auto && operator*() && {
+	constexpr auto && operator*() && {
 		return value();
 	}
 	
 	constexpr auto operator->() const {
 		return &value();
 	}
-	auto operator->() {
+	constexpr auto operator->() {
 		return &value();
 	}
 	
