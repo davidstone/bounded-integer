@@ -264,7 +264,7 @@ private:
 
 
 template<typename T>
-auto make_optional(T && value) noexcept -> optional<std::remove_reference_t<T>> {
+constexpr auto make_optional(T && value) noexcept -> optional<std::remove_reference_t<T>> {
 	return { std::forward<T>(value) };
 }
 
