@@ -48,11 +48,10 @@ struct integer_optional_storage_c {
 		m_value(std::forward<Args>(args)...) {
 	}
 
-	// TODO: handle variadic arguments
 	// TODO: handle stateful policies (not set in assignment operator)
-	template<typename Args>
-	constexpr void emplace(Args && args) noexcept(std::is_nothrow_constructible<T, Args &&>::value) {
-		m_value = std::forward<Args>(args);
+	template<typename... Args>
+	constexpr void emplace(Args && ... args) noexcept(std::is_nothrow_constructible<T, Args && ...>::value) {
+		m_value = T(std::forward<Args>(args)...);
 	}
 	
 	constexpr void reset() noexcept {
