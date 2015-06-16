@@ -1217,19 +1217,12 @@ auto check_compressed_optional() {
 	);
 }
 
-auto check_optional() {
-	check_compressed_optional<1, 10>();
-	check_compressed_optional<-50, 127>();
-	check_uncompressed_optional<uint8_t>();
-	check_uncompressed_optional<int>();
-	check_uncompressed_optional<unsigned>();
-	check_uncompressed_optional<intmax_t>();
-	
-	using integer_type = bounded::checked_integer<1, 10>;
+template<typename integer_type>
+auto check_integer_optional() {
 	constexpr bounded::optional<integer_type> uninitialized_optional;
 	static_assert(!uninitialized_optional, "Default constructor should leave uninitialized.");
 	constexpr bounded::optional<integer_type> constexpr_optional_integer(integer_type(5));
-	static_assert(static_cast<bool>(constexpr_optional_integer), "Value constructor should initialize optional.");
+	static_assert(constexpr_optional_integer, "Value constructor should initialize optional.");
 	static_assert(*constexpr_optional_integer == 5, "Value in an optional incorrect.");
 
 	bounded::optional<integer_type> optional_integer(integer_type(4));
@@ -1246,6 +1239,48 @@ auto check_optional() {
 	
 	optional_integer = bounded::none;
 	assert(!optional_integer);
+}
+
+#if 0
+auto check_non_trivial_optional() {
+	using type = std::string;
+	bounded::optional<type> uninitialized_optional;
+	assert(!uninitialized_optional);
+	bounded::optional<type> optional_string("Hello");
+	assert(optional_string);
+	assert(*optional_string == "Hello");
+
+	optional_string = uninitialized_optional;
+	assert(!optional_string);
+
+	optional_string = type("Hi");
+	assert(optional_string);
+	optional_string = "Yo";
+	assert(optional_string);
+	assert(optional_string == "Yo");
+	assert(optional_string != "Sup");
+
+	static_assert(std::is_same<decltype(*optional_string), type &>::value, "Incorrect type of *optional.");
+	*optional_string = type("Hiya");
+	assert(optional_string);
+	assert(*optional_string == "Hiya");
+	
+	optional_string = bounded::none;
+	assert(!optional_string);
+}
+#endif
+
+auto check_optional() {
+	check_compressed_optional<1, 10>();
+	check_compressed_optional<-50, 127>();
+	check_uncompressed_optional<uint8_t>();
+	check_uncompressed_optional<int>();
+	check_uncompressed_optional<unsigned>();
+	check_uncompressed_optional<intmax_t>();
+	
+	check_integer_optional<int>();
+	check_integer_optional<bounded::checked_integer<1, 10>>();
+//	check_non_trivial_optional();
 }
 
 auto check_to_string() {
