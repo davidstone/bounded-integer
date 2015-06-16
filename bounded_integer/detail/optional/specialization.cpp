@@ -1,4 +1,4 @@
-// Forward declaration for optional
+// Verify that the header can stand on its own
 // Copyright (C) 2015 David Stone
 //
 // This program is free software: you can redistribute it and / or modify
@@ -14,15 +14,4 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with this program. If not, see <http://www.gnu.org/licenses/>.
 
-#pragma once
-
-namespace bounded {
-
-enum class none_t {};
-constexpr none_t none = none_t{};
-
-template<typename T>
-struct optional;
-
-}	// namespace bounded
-
+#include "specialization.hpp"

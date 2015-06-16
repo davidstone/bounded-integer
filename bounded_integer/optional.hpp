@@ -1,5 +1,5 @@
 // optional type with specialization to minimize overhead with bounded::integer
-// Copyright (C) 2014 David Stone
+// Copyright (C) 2015 David Stone
 //
 // This program is free software: you can redistribute it and / or modify
 // it under the terms of the GNU Affero General Public License as
@@ -16,9 +16,9 @@
 
 #pragma once
 
-#include "detail/optional/forward_declaration.hpp"
+#include "detail/optional/comparison_operators.hpp"
 #include "detail/optional/make_optional_array.hpp"
 #include "detail/optional/optional.hpp"
-#include "detail/optional/comparison_operators.hpp"
+#include "detail/optional/specialization.hpp"
 #include "bounded_integer.hpp"
 

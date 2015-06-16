@@ -1241,7 +1241,6 @@ auto check_integer_optional() {
 	assert(!optional_integer);
 }
 
-#if 0
 auto check_non_trivial_optional() {
 	using type = std::string;
 	bounded::optional<type> uninitialized_optional;
@@ -1268,7 +1267,6 @@ auto check_non_trivial_optional() {
 	optional_string = bounded::none;
 	assert(!optional_string);
 }
-#endif
 
 auto check_optional() {
 	check_compressed_optional<1, 10>();
@@ -1280,7 +1278,7 @@ auto check_optional() {
 	
 	check_integer_optional<int>();
 	check_integer_optional<bounded::checked_integer<1, 10>>();
-//	check_non_trivial_optional();
+	check_non_trivial_optional();
 }
 
 auto check_to_string() {

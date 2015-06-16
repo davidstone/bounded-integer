@@ -1,5 +1,5 @@
 // Verify that the header can stand on its own
-// Copyright (C) 2014 David Stone
+// Copyright (C) 2015 David Stone
 //
 // This program is free software: you can redistribute it and / or modify
 // it under the terms of the GNU Affero General Public License as
@@ -15,6 +15,7 @@
 // along with this program. If not, see <http://www.gnu.org/licenses/>.
 
 #include "optional.hpp"
+#include "specialization.hpp"
 
 #include "../make.hpp"
 #include <type_traits>
