@@ -1279,6 +1279,9 @@ auto check_optional() {
 	check_integer_optional<int>();
 	check_integer_optional<bounded::checked_integer<1, 10>>();
 	check_non_trivial_optional();
+
+	constexpr auto original = bounded::make_optional(bounded::make<0>());
+	constexpr auto copy = original;
 }
 
 auto check_to_string() {
