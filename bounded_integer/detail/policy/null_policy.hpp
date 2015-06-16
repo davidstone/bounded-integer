@@ -30,7 +30,7 @@ struct null_policy {
 	// compile-time checking if used in a constexpr context. If this is called
 	// at run-time, the optimizer should detect that all branches return the
 	// same value and eliminate all branching, creating no overhead. See
-	// http://stackoverflow.com/questions/20461121/constexpr-error-at-compile-time-but-no-overhead-at-run-time
+	// https://stackoverflow.com/questions/20461121/constexpr-error-at-compile-time-but-no-overhead-at-run-time
 	template<typename T, typename Minimum, typename Maximum>
 	static constexpr auto assignment(T && value, Minimum && minimum, Maximum && maximum) noexcept -> T && {
 		static_assert(is_bounded_integer<std::decay_t<Minimum>>::value, "Only bounded::integer types are supported.");
