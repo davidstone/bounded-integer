@@ -70,7 +70,7 @@ struct basic_numeric_limits<std::integral_constant<T, value>> {
 
 namespace detail {
 
-// http://stackoverflow.com/questions/19609186/what-is-stdnumeric-limitstdigits-supposed-to-represent
+// https://stackoverflow.com/questions/19609186/what-is-stdnumeric-limitstdigits-supposed-to-represent
 template<intmax_t base>
 constexpr auto test_log_successor_abs(intmax_t value) -> int;
 template<>
