@@ -1256,7 +1256,7 @@ auto check_non_trivial_optional() {
 	auto const default_value = std::string("knife");
 	decltype(auto) initialized_value_or = value_or(optional_string, default_value);
 	assert(initialized_value_or == "Hello");
-//	static_assert(std::is_same<decltype(initialized_value_or), std::string const &>::value, "value_or incorrect for initialized");
+	static_assert(std::is_same<decltype(initialized_value_or), std::string const &>::value, "value_or incorrect for initialized");
 	assert(*optional_string == "Hello");
 
 	optional_string = uninitialized_optional;
