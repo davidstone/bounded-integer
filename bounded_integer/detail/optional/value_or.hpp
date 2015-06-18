@@ -1,4 +1,4 @@
-// optional type with specialization to minimize overhead with bounded::integer
+// value_or gets an optional value or something else
 // Copyright (C) 2015 David Stone
 //
 // This program is free software: you can redistribute it and / or modify
@@ -16,10 +16,13 @@
 
 #pragma once
 
-#include "detail/optional/comparison_operators.hpp"
-#include "detail/optional/make_optional_array.hpp"
-#include "detail/optional/optional.hpp"
-#include "detail/optional/specialization.hpp"
-#include "detail/optional/value_or.hpp"
-#include "bounded_integer.hpp"
+#include "../conditional.hpp"
 
+namespace bounded {
+
+template<typename T, typename Default>
+constexpr decltype(auto) value_or(T && value, Default && other) {
+	return BOUNDED_CONDITIONAL(value, *std::forward<T>(value), std::forward<Default>(other));
+}
+	
+}	// namespace bounded

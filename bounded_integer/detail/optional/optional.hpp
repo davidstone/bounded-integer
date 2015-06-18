@@ -254,16 +254,6 @@ struct optional {
 		return *this ? *std::move(*this) : (throw std::logic_error("bad optional access"), *std::move(*this));
 	}
 	
-	// TODO: Make this a free function
-	template<typename U>
-	constexpr auto value_or(U && default_value) const & {
-		return *this ? **this : static_cast<value_type>(std::forward<U>(default_value));
-	}
-	template<typename U>
-	constexpr auto value_or(U && default_value) && {
-		return *this ? *std::move(*this) : static_cast<value_type>(std::forward<U>(default_value));
-	}
-	
 	constexpr explicit operator bool() const noexcept {
 		return m_storage.is_initialized();
 	}

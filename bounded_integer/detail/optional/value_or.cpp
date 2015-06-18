@@ -1,4 +1,4 @@
-// optional type with specialization to minimize overhead with bounded::integer
+// Verify that the header can stand on its own
 // Copyright (C) 2015 David Stone
 //
 // This program is free software: you can redistribute it and / or modify
@@ -14,12 +14,5 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with this program. If not, see <http://www.gnu.org/licenses/>.
 
-#pragma once
-
-#include "detail/optional/comparison_operators.hpp"
-#include "detail/optional/make_optional_array.hpp"
-#include "detail/optional/optional.hpp"
-#include "detail/optional/specialization.hpp"
-#include "detail/optional/value_or.hpp"
-#include "bounded_integer.hpp"
+#include "value_or.hpp"
 

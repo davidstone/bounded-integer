@@ -72,6 +72,7 @@ sources += prepend_dir('detail/optional', [
 	'make_optional_array.cpp',
 	'optional.cpp',
 	'specialization.cpp',
+	'value_or.cpp',
 ])
 sources += prepend_dir('detail/policy', [
 	'all.cpp',
