@@ -56,6 +56,10 @@ private:
 		std::is_lvalue_reference<Source1>::value and
 		same_base_type;
 public:
+	// This isn't perfect. A type could have a perfectly safe conversion to a
+	// reference type defined, and this will still select the fallback prvalue
+	// option. However, it should be safe in every case while still being
+	// straightforward.
 	using type =
 		std::conditional_t<rvalue_reference, CVTarget &&,
 		std::conditional_t<lvalue_reference, CVTarget &,
