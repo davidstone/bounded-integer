@@ -52,6 +52,7 @@ sources += prepend_dir('detail', [
 ])
 sources += prepend_dir('detail/array', [
 	'array.cpp',
+	'iterator.cpp',
 	'make_array.cpp',
 ])
 sources += prepend_dir('detail/arithmetic', [
