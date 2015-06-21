@@ -35,6 +35,7 @@
 #include "detail/arithmetic/compound_assignment.hpp"
 #include "detail/arithmetic/operators.hpp"
 #include "detail/arithmetic/operators_builtin.hpp"
+#include "detail/arithmetic/pointer.hpp"
 #include "detail/policy/all.hpp"
 
 // Missing from this list are array and optional classes and integer_range

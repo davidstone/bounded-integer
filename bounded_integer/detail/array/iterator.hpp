@@ -18,7 +18,7 @@
 
 #include "../class.hpp"
 #include "../make.hpp"
-#include "../arithmetic/operators_builtin.hpp"
+#include "../arithmetic/pointer.hpp"
 #include "../policy/throw_policy.hpp"
 
 #include <cstddef>

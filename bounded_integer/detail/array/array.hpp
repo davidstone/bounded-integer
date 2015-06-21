@@ -22,7 +22,7 @@
 #include "../comparison.hpp"
 #include "../make.hpp"
 #include "../arithmetic/minus.hpp"
-#include "../arithmetic/operators_builtin.hpp"
+#include "../arithmetic/pointer.hpp"
 
 #include <algorithm>
 #include <cstddef>

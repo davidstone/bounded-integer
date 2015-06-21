@@ -67,6 +67,7 @@ sources += prepend_dir('detail/arithmetic', [
 	'compound_assignment.cpp',
 	'operators.cpp',
 	'operators_builtin.cpp',
+	'pointer.cpp',
 ])
 sources += prepend_dir('detail/optional', [
 	'comparison_operators.cpp',
