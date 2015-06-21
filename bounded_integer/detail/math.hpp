@@ -19,7 +19,7 @@
 #include "cast.hpp"
 #include "forward_declaration.hpp"
 #include "minmax.hpp"
-#include "arithmetic/operators.hpp"
+#include "arithmetic/unary_minus.hpp"
 
 namespace bounded {
 

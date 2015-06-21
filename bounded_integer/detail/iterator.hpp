@@ -1,5 +1,5 @@
 // bounded::integer-aware versions of the standard library iterator functions
-// Copyright (C) 2014 David Stone
+// Copyright (C) 2015 David Stone
 //
 // This program is free software: you can redistribute it and / or modify
 // it under the terms of the GNU Affero General Public License as
@@ -18,7 +18,7 @@
 
 #include "class.hpp"
 #include "make.hpp"
-#include "arithmetic/operators.hpp"
+#include "arithmetic/unary_minus.hpp"
 
 #include <iterator>
 

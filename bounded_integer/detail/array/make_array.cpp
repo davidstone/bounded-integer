@@ -18,6 +18,7 @@
 #include "../literal.hpp"
 #include "../comparison.hpp"
 #include "../comparison_builtin.hpp"
+#include "../arithmetic/unary_minus.hpp"
 #include "../policy/throw_policy.hpp"
 
 namespace {

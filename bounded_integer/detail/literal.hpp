@@ -17,7 +17,8 @@
 #pragma once
 
 #include "make.hpp"
-#include "arithmetic/operators.hpp"
+#include "arithmetic/multiplies.hpp"
+#include "arithmetic/plus.hpp"
 
 namespace bounded {
 namespace detail {

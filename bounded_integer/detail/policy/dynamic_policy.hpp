@@ -1,5 +1,5 @@
 // Applies any other policy with dynamic bounds
-// Copyright (C) 2014 David Stone
+// Copyright (C) 2015 David Stone
 //
 // This program is free software: you can redistribute it and / or modify
 // it under the terms of the GNU Affero General Public License as
@@ -23,7 +23,6 @@
 #include "../enable_if.hpp"
 #include "../make.hpp"
 #include "../minmax.hpp"
-#include "../arithmetic/operators.hpp"
 
 #include <cstdint>
 

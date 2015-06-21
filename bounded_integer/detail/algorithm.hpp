@@ -18,18 +18,18 @@
 
 #include "class.hpp"
 #include "comparison.hpp"
-#include "make.hpp"
 #include "numeric_limits.hpp"
-#include "arithmetic/operators.hpp"
+#include "arithmetic/compound_assignment.hpp"
 
 #include <iterator>
+#include <utility>
 
 namespace bounded {
 
 template<typename InputIterator, typename Predicate>
 auto count_if(InputIterator first, InputIterator const last, Predicate predicate) {
 	constexpr auto maximum = basic_numeric_limits<typename std::iterator_traits<InputIterator>::difference_type>::max();
-	integer<0, maximum> sum = make<0>();
+	integer<0, maximum> sum(0, non_check);
 	for (; first != last; ++first) {
 		if (predicate(*first)) {
 			++sum;

@@ -18,6 +18,8 @@
 
 #include "../literal.hpp"
 
+#include "../arithmetic/unary_minus.hpp"
+
 namespace {
 using namespace bounded::literal;
 
