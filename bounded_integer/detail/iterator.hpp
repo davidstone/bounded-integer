@@ -17,7 +17,6 @@
 #pragma once
 
 #include "class.hpp"
-#include "make.hpp"
 #include "arithmetic/unary_minus.hpp"
 
 #include <iterator>
@@ -29,14 +28,14 @@ namespace bounded {
 // unqualified calls to next, but such calls are unlikely to ever happen.
 
 // TODO: constexpr when gcc supports it
-template<typename Iterator, typename Offset = decltype(make<1>())>
-auto next(Iterator it, Offset const offset = make<1>()) {
+template<typename Iterator, typename Offset = decltype(constant<1>)>
+auto next(Iterator it, Offset const offset = constant<1>) {
 	std::advance(it, offset);
 	return it;
 }
 
-template<typename Iterator, typename Offset = decltype(make<1>())>
-auto prev(Iterator it, Offset const offset = make<1>()) {
+template<typename Iterator, typename Offset = decltype(constant<1>)>
+auto prev(Iterator it, Offset const offset = constant<1>) {
 	std::advance(it, -offset);
 	return it;
 }

@@ -17,12 +17,11 @@
 #include "optional.hpp"
 #include "specialization.hpp"
 
-#include "../make.hpp"
 #include <type_traits>
 
 namespace {
 
-using type = bounded::equivalent_type<int>;
+using type = int;
 
 static_assert(std::is_convertible<type, bounded::optional<type>>::value, "Cannot construct optional of identical type.");
 

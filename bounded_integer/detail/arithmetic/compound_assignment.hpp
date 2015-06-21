@@ -73,12 +73,12 @@ BOUNDED_INTEGER_COMPOUND_ASSIGNMENT_OPERATOR_SOURCE(%=)
 
 template<intmax_t minimum, intmax_t maximum, typename overflow_policy, storage_type storage>
 constexpr auto && operator++(integer<minimum, maximum, overflow_policy, storage> & value) {
-	value += make<1>();
+	value += constant<1>;
 	return value;
 }
 template<intmax_t minimum, intmax_t maximum, typename overflow_policy, storage_type storage>
 auto && operator++(integer<minimum, maximum, overflow_policy, storage> volatile & value) {
-	value += make<1>();
+	value += constant<1>;
 	return value;
 }
 
@@ -98,12 +98,12 @@ auto operator++(integer<minimum, maximum, overflow_policy, storage> volatile & v
 
 template<intmax_t minimum, intmax_t maximum, typename overflow_policy, storage_type storage>
 constexpr auto && operator--(integer<minimum, maximum, overflow_policy, storage> & value) {
-	value -= make<1>();
+	value -= constant<1>;
 	return value;
 }
 template<intmax_t minimum, intmax_t maximum, typename overflow_policy, storage_type storage>
 auto && operator--(integer<minimum, maximum, overflow_policy, storage> volatile & value) {
-	value -= make<1>();
+	value -= constant<1>;
 	return value;
 }
 

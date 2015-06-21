@@ -20,7 +20,6 @@
 
 #include "../class.hpp"
 #include "../comparison.hpp"
-#include "../make.hpp"
 #include "../arithmetic/minus.hpp"
 #include "../arithmetic/pointer.hpp"
 
@@ -61,10 +60,10 @@ struct array {
 	using pointer = typename iterator::pointer;
 	
 	constexpr auto size() const noexcept -> size_type {
-		return make<size_>();
+		return constant<size_>;
 	}
 	constexpr auto empty() const noexcept -> bool {
-		return size() == make<0>();
+		return size() == constant<0>;
 	}
 	constexpr auto max_size() const noexcept -> size_type {
 		return size();
@@ -102,16 +101,16 @@ struct array {
 	}
 
 	constexpr auto front() const noexcept -> const_reference {
-		return operator[](make<0>());
+		return operator[](constant<0>);
 	}
 	auto front() noexcept -> reference {
-		return operator[](make<0>());
+		return operator[](constant<0>);
 	}
 	constexpr auto back() const noexcept -> const_reference {
-		return operator[](size() - make<1>());
+		return operator[](size() - constant<1>);
 	}
 	auto back() noexcept -> reference {
-		return operator[](size() - make<1>());
+		return operator[](size() - constant<1>);
 	}
 
 	constexpr auto begin() const noexcept -> const_iterator {
@@ -200,15 +199,15 @@ constexpr auto operator>=(array<T, size> const & lhs, array<T, size> const & rhs
 
 template<std::size_t index, typename T, std::size_t size>
 constexpr auto get(array<T, size> const & a) noexcept -> T const & {
-	return a[make<index>()];
+	return a[constant<index>];
 }
 template<std::size_t index, typename T, std::size_t size>
 constexpr auto get(array<T, size> & a) noexcept -> T & {
-	return a[make<index>()];
+	return a[constant<index>];
 }
 template<std::size_t index, typename T, std::size_t size>
 constexpr auto get(array<T, size> && a) noexcept -> T && {
-	return std::move(a[make<index>()]);
+	return std::move(a[constant<index>]);
 }
 
 template<typename T, std::size_t size>

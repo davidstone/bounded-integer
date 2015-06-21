@@ -87,9 +87,4 @@ constexpr auto make(T const & value) noexcept -> equivalent_type<
 	return {value, non_check};
 }
 
-template<intmax_t value, typename overflow_policy = null_policy, storage_type storage = storage_type::fast>
-constexpr auto make() noexcept -> integer<value, value, overflow_policy, storage> {
-	return {value, non_check};
-}
-
 }	// namespace bounded

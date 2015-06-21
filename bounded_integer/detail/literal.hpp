@@ -16,7 +16,7 @@
 
 #pragma once
 
-#include "make.hpp"
+#include "class.hpp"
 #include "arithmetic/multiplies.hpp"
 #include "arithmetic/plus.hpp"
 
@@ -38,14 +38,14 @@ private:
 	static constexpr intmax_t integer_scale = power(radix, sizeof...(digits));
 public:
 	static constexpr auto value() noexcept {
-		return literal<digit>::value() * make<integer_scale>() + literal<digits...>::value();
+		return literal<digit>::value() * constant<integer_scale> + literal<digits...>::value();
 	}
 };
 
 template<char digit>
 struct literal<digit> {
 	static constexpr auto value() noexcept {
-		return make<digit - '0'>();
+		return constant<digit - '0'>;
 	}
 };
 

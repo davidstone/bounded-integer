@@ -1,5 +1,5 @@
 // integer type main implementation
-// Copyright (C) 2014 David Stone
+// Copyright (C) 2015 David Stone
 //
 // This program is free software: you can redistribute it and / or modify
 // it under the terms of the GNU Affero General Public License as
@@ -83,6 +83,15 @@ constexpr decltype(auto) get_overflow_policy(T && value) noexcept {
 	return std::forward<T>(value).overflow_policy();
 }
 
+
+
+
+template<intmax_t value, typename overflow_policy = null_policy, storage_type storage = storage_type::fast>
+constexpr auto constant = integer<value, value, overflow_policy, storage>(value, non_check);
+
+
+
+
 template<intmax_t minimum, intmax_t maximum, typename overflow_policy_ = null_policy, storage_type storage = storage_type::fast>
 struct integer : private overflow_policy_ {
 	static_assert(minimum <= maximum, "Maximum cannot be less than minimum");
@@ -97,15 +106,6 @@ struct integer : private overflow_policy_ {
 	static_assert(std::is_nothrow_default_constructible<overflow_policy_type>::value, "overflow_policy must be nothrow default constructible.");
 	static_assert(std::is_nothrow_move_constructible<overflow_policy_type>::value, "overflow_policy must be nothrow move constructible.");
 	
-private:
-	// Simplified version of free-function make but avoids a cyclical dependency
-	template<intmax_t value>
-	static constexpr auto make() noexcept {
-		return integer<value, value>(value, non_check);
-	}
-
-public:
-
 
 	integer() noexcept = default;
 	constexpr integer(integer const &) noexcept = default;
@@ -135,7 +135,7 @@ public:
 		detail::is_explicitly_constructible_from<overflow_policy_type, T>(minimum, maximum)
 	> = clang_dummy>
 	constexpr integer(T && other, overflow_policy_type policy) BOUNDED_NOEXCEPT_INITIALIZATION(
-		integer(policy.assignment(detail::as_integer(std::forward<T>(other)), make<minimum>(), make<maximum>()), policy, non_check)
+		integer(policy.assignment(detail::as_integer(std::forward<T>(other)), constant<minimum>, constant<maximum>), policy, non_check)
 	) {
 	}
 
@@ -201,27 +201,27 @@ public:
 		m_value = static_cast<underlying_type>(std::forward<T>(other));
 	}
 	
-	constexpr auto && operator=(integer const & other) & noexcept(noexcept(std::declval<overflow_policy_type>().assignment(other, make<minimum>(), make<maximum>()))) {
-		return unchecked_assignment(overflow_policy().assignment(other, make<minimum>(), make<maximum>()));
+	constexpr auto && operator=(integer const & other) & noexcept(noexcept(std::declval<overflow_policy_type>().assignment(other, constant<minimum>, constant<maximum>))) {
+		return unchecked_assignment(overflow_policy().assignment(other, constant<minimum>, constant<maximum>));
 	}
-	constexpr auto && operator=(integer && other) & noexcept(noexcept(std::declval<overflow_policy_type>().assignment(std::move(other), make<minimum>(), make<maximum>()))) {
-		return unchecked_assignment(overflow_policy().assignment(std::move(other), make<minimum>(), make<maximum>()));
+	constexpr auto && operator=(integer && other) & noexcept(noexcept(std::declval<overflow_policy_type>().assignment(std::move(other), constant<minimum>, constant<maximum>))) {
+		return unchecked_assignment(overflow_policy().assignment(std::move(other), constant<minimum>, constant<maximum>));
 	}
 	template<typename T>
-	constexpr auto && operator=(T && other) & noexcept(noexcept(std::declval<overflow_policy_type>().assignment(std::forward<T>(other), make<minimum>(), make<maximum>()))) {
+	constexpr auto && operator=(T && other) & noexcept(noexcept(std::declval<overflow_policy_type>().assignment(std::forward<T>(other), constant<minimum>, constant<maximum>))) {
 		static_assert(
 			detail::is_explicitly_constructible_from<overflow_policy_type, T>(minimum, maximum),
 			"Value not in range."
 		);
-		return unchecked_assignment(overflow_policy().assignment(std::forward<T>(other), make<minimum>(), make<maximum>()));
+		return unchecked_assignment(overflow_policy().assignment(std::forward<T>(other), constant<minimum>, constant<maximum>));
 	}
 	template<typename T>
-	auto operator=(T && other) volatile & noexcept(noexcept(std::declval<overflow_policy_type>().assignment(std::forward<T>(other), make<minimum>(), make<maximum>()))) {
+	auto operator=(T && other) volatile & noexcept(noexcept(std::declval<overflow_policy_type>().assignment(std::forward<T>(other), constant<minimum>, constant<maximum>))) {
 		static_assert(
 			detail::is_explicitly_constructible_from<overflow_policy_type, T>(minimum, maximum),
 			"Value not in range."
 		);
-		unchecked_assignment(overflow_policy().assignment(std::forward<T>(other), make<minimum>(), make<maximum>()));
+		unchecked_assignment(overflow_policy().assignment(std::forward<T>(other), constant<minimum>, constant<maximum>));
 	}
 	
 	constexpr auto const & value() const noexcept {

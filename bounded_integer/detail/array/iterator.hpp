@@ -17,7 +17,6 @@
 #pragma once
 
 #include "../class.hpp"
-#include "../make.hpp"
 #include "../arithmetic/pointer.hpp"
 #include "../policy/throw_policy.hpp"
 
@@ -128,7 +127,7 @@ auto operator-=(basic_iterator<T, size> & it, typename basic_iterator<T, size>::
 
 template<typename T, intmax_t size>
 auto operator++(basic_iterator<T, size> & it) -> basic_iterator<T, size> & {
-	return it += make<1>();
+	return it += constant<1>;
 }
 template<typename T, intmax_t size>
 auto operator++(basic_iterator<T, size> & it, int) -> basic_iterator<T, size> {
@@ -138,7 +137,7 @@ auto operator++(basic_iterator<T, size> & it, int) -> basic_iterator<T, size> {
 }
 template<typename T, intmax_t size>
 auto operator--(basic_iterator<T, size> & it) -> basic_iterator<T, size> & {
-	return it -= make<1>();
+	return it -= constant<1>;
 }
 template<typename T, intmax_t size>
 auto operator--(basic_iterator<T, size> & it, int) -> basic_iterator<T, size> {

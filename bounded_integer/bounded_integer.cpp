@@ -437,16 +437,16 @@ namespace check_comparison {
 	);
 
 	static_assert(
-		bounded::make<5>() != bounded::make<6>(),
+		bounded::constant<5> != bounded::constant<6>,
 		"5 should not equal 6"
 	);
 
-	constexpr auto one = bounded::make<1>();
+	constexpr auto one = bounded::constant<1>;
 	static_assert(
 		!std::numeric_limits<decltype(one)>::is_signed,
 		"Value should be unsigned for this test."
 	);
-	constexpr auto negative_one = bounded::make<-1>();
+	constexpr auto negative_one = bounded::constant<-1>;
 	static_assert(
 		std::numeric_limits<decltype(negative_one)>::is_signed,
 		"Value should be signed for this test."
@@ -458,7 +458,7 @@ namespace check_comparison {
 	constexpr intmax_t int_min = std::numeric_limits<int>::min();
 	constexpr intmax_t int_max = std::numeric_limits<int>::max();
 	static_assert(
-		bounded::make<int_min>() < bounded::make<int_max + 1>(),
+		bounded::constant<int_min> < bounded::constant<int_max + 1>,
 		"Large negative values should be less than large positive values."
 	);
 
@@ -480,13 +480,13 @@ namespace check_comparison {
 	
 	#define BOUNDED_INTEGER_COMPARISON(op, a, b, c) \
 		BOUNDED_INTEGER_MULTI_COMPARISON(op, a, b, c); \
-		BOUNDED_INTEGER_MULTI_COMPARISON(op, bounded::make<a>(), b, c); \
-		BOUNDED_INTEGER_MULTI_COMPARISON(op, a, bounded::make<b>(), c); \
-		BOUNDED_INTEGER_MULTI_COMPARISON(op, a, b, bounded::make<c>()); \
-		BOUNDED_INTEGER_MULTI_COMPARISON(op, bounded::make<a>(), bounded::make<b>(), c); \
-		BOUNDED_INTEGER_MULTI_COMPARISON(op, bounded::make<a>(), b, bounded::make<c>()); \
-		BOUNDED_INTEGER_MULTI_COMPARISON(op, a, bounded::make<b>(), bounded::make<c>()); \
-		BOUNDED_INTEGER_MULTI_COMPARISON(op, bounded::make<a>(), bounded::make<b>(), bounded::make<c>())
+		BOUNDED_INTEGER_MULTI_COMPARISON(op, bounded::constant<a>, b, c); \
+		BOUNDED_INTEGER_MULTI_COMPARISON(op, a, bounded::constant<b>, c); \
+		BOUNDED_INTEGER_MULTI_COMPARISON(op, a, b, bounded::constant<c>); \
+		BOUNDED_INTEGER_MULTI_COMPARISON(op, bounded::constant<a>, bounded::constant<b>, c); \
+		BOUNDED_INTEGER_MULTI_COMPARISON(op, bounded::constant<a>, b, bounded::constant<c>); \
+		BOUNDED_INTEGER_MULTI_COMPARISON(op, a, bounded::constant<b>, bounded::constant<c>); \
+		BOUNDED_INTEGER_MULTI_COMPARISON(op, bounded::constant<a>, bounded::constant<b>, bounded::constant<c>)
 
 	BOUNDED_INTEGER_COMPARISON(<=, -4, -4, 16);
 	BOUNDED_INTEGER_COMPARISON(<, -17, 0, 17);
@@ -500,14 +500,14 @@ namespace check_comparison {
 }
 
 namespace check_single_argument_minmax {
-	constexpr auto value = bounded::make<5>();
+	constexpr auto value = bounded::constant<5>;
 	static_assert(bounded::min(value) == value, "A value does not have itself as the minimum.");
 	static_assert(bounded::max(value) == value, "A value does not have itself as the maximum.");
 }
 
 namespace check_double_argument_minmax {
-	constexpr auto lower_value = bounded::make<6>();
-	constexpr auto greater_value = bounded::make<10>();
+	constexpr auto lower_value = bounded::constant<6>;
+	constexpr auto greater_value = bounded::constant<10>;
 	static_assert(bounded::min(lower_value, greater_value) == lower_value, "Two argument min value incorrect.");
 	static_assert(bounded::min(greater_value, lower_value) == lower_value, "Two argument min value incorrect.");
 	static_assert(bounded::max(lower_value, greater_value) == greater_value, "Two argument max value incorrect.");
@@ -515,16 +515,16 @@ namespace check_double_argument_minmax {
 }
 
 namespace check_many_argument_minmax {
-	constexpr bounded::integer<-53, 1000> value(bounded::make<3>());
-	constexpr auto minimum = bounded::min(bounded::make<0>(), bounded::make<10>(), bounded::make<5>(), value);
+	constexpr bounded::integer<-53, 1000> value(bounded::constant<3>);
+	constexpr auto minimum = bounded::min(bounded::constant<0>, bounded::constant<10>, bounded::constant<5>, value);
 	using min_type = decltype(minimum);
-	static_assert(minimum == bounded::make<0>(), "Incorrect minimum value.");
+	static_assert(minimum == bounded::constant<0>, "Incorrect minimum value.");
 	static_assert(std::numeric_limits<min_type>::min() == -53, "Incorrect minimum minimum.");
 	static_assert(std::numeric_limits<min_type>::max() == 0, "Incorrect maximum minimum.");
 
-	constexpr auto maximum = bounded::max(bounded::make<0>(), bounded::make<10>(), bounded::make<5>(), value);
+	constexpr auto maximum = bounded::max(bounded::constant<0>, bounded::constant<10>, bounded::constant<5>, value);
 	using max_type = decltype(maximum);
-	static_assert(maximum == bounded::make<10>(), "Incorrect maximum value.");
+	static_assert(maximum == bounded::constant<10>, "Incorrect maximum value.");
 	static_assert(std::numeric_limits<max_type>::min() == 10, "Incorrect minimum maximum.");
 	static_assert(std::numeric_limits<max_type>::max() == 1000, "Incorrect maximum maximum.");
 }
@@ -768,8 +768,8 @@ namespace check_arithmetic {
 
 	// modulo
 
-	constexpr auto ten = bounded::make<10>();
-	constexpr auto eleven = bounded::make<11>();
+	constexpr auto ten = bounded::constant<10>;
+	constexpr auto eleven = bounded::constant<11>;
 	constexpr auto ten_result = ten % eleven;
 	static_assert(
 		ten_result == ten,
@@ -780,8 +780,8 @@ namespace check_arithmetic {
 		"Incorrect modulo type with divisor one greater"
 	);
 
-	constexpr auto nine = bounded::make<9>();
-	constexpr auto one = bounded::make<1>();
+	constexpr auto nine = bounded::constant<9>;
+	constexpr auto one = bounded::constant<1>;
 	constexpr auto one_result = ten % nine;
 	static_assert(
 		one_result == one,
@@ -802,7 +802,7 @@ namespace check_arithmetic {
 		"Incorrect modulo type with divisor two less"
 	);
 
-	constexpr auto two = bounded::make<2>();
+	constexpr auto two = bounded::constant<2>;
 	constexpr auto two_result = eleven % nine;
 	static_assert(
 		two_result == two,
@@ -849,22 +849,22 @@ namespace check_arithmetic {
 		"Incorrect modulo type with mixed signs"
 	);
 
-	constexpr auto result = bounded::integer<0, 10>(10) % bounded::make<6>();
+	constexpr auto result = bounded::integer<0, 10>(10) % bounded::constant<6>;
 	static_assert(
-		std::numeric_limits<decltype(result)>::min() == bounded::make<0>(),
+		std::numeric_limits<decltype(result)>::min() == bounded::constant<0>,
 		"uh oh"
 	);
 	static_assert(
-		std::numeric_limits<decltype(result)>::max() == bounded::make<5>(),
+		std::numeric_limits<decltype(result)>::max() == bounded::constant<5>,
 		"uh oh"
 	);
 	static_assert(
-		result == bounded::make<4>(),
+		result == bounded::constant<4>,
 		"wrong answer"
 	);
 
-	constexpr auto zero = bounded::make<0>();
-	constexpr auto zero_result = zero % bounded::make<1>();
+	constexpr auto zero = bounded::constant<0>;
+	constexpr auto zero_result = zero % bounded::constant<1>;
 	static_assert(
 		zero_result == zero,
 		"Incorrect modulo with zero for the dividend"
@@ -902,14 +902,14 @@ namespace check_arithmetic {
 		"Incorrect array indexing with int."
 	);
 	static_assert(
-		*(array + bounded::make<0>()) == 0,
+		*(array + bounded::constant<0>) == 0,
 		"Incorrect pointer arithmetic with bounded::integer."
 	);
 
 	// Oops, not possible to overload array index operator
 	#if 0
 	static_assert(
-		array[bounded::make<0>()] == 0,
+		array[bounded::constant<0>] == 0,
 		"Incorrect array indexing with bounded::integer."
 	);
 	#endif
@@ -1290,7 +1290,7 @@ auto check_optional() {
 	check_integer_optional<bounded::checked_integer<1, 10>>();
 	check_non_trivial_optional();
 
-	constexpr auto original = bounded::make_optional(bounded::make<0>());
+	constexpr auto original = bounded::make_optional(bounded::constant<0>);
 	constexpr auto copy = original;
 }
 

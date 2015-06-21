@@ -18,7 +18,6 @@
 
 #include "class.hpp"
 #include "comparison.hpp"
-#include "make.hpp"
 #include "minmax.hpp"
 #include "numeric_limits.hpp"
 
@@ -48,7 +47,7 @@ struct iterator {
 	using index_type = integer<0, range_of_type<T>()>;
 	using value_type = integer<
 		static_cast<intmax_t>(std::numeric_limits<T>::min()),
-		static_cast<intmax_t>(max(std::numeric_limits<T>::min(), std::numeric_limits<T>::max() - make<1>()))
+		static_cast<intmax_t>(max(std::numeric_limits<T>::min(), std::numeric_limits<T>::max() - constant<1>))
 	>;
 	using difference_type = integer<-range_of_type<index_type>(), range_of_type<index_type>()>;
 	using pointer = index_type const *;
@@ -114,7 +113,7 @@ decltype(auto) operator-=(iterator<T> & lhs, typename iterator<T>::difference_ty
 
 template<typename T>
 decltype(auto) operator++(iterator<T> & it) {
-	return it += make<1>();
+	return it += constant<1>;
 }
 template<typename T>
 auto operator++(iterator<T> & it, int) {
@@ -125,7 +124,7 @@ auto operator++(iterator<T> & it, int) {
 
 template<typename T>
 decltype(auto) operator--(iterator<T> & it) {
-	return it -= make<1>();
+	return it -= constant<1>;
 }
 template<typename T>
 auto operator--(iterator<T> & it, int) {
@@ -204,7 +203,7 @@ struct integer_range_type {
 		return *begin();
 	}
 	constexpr auto back() const -> value_type {
-		return *(end() - make<1>());
+		return *(end() - constant<1>);
 	}
 	constexpr auto operator[](index_type const & index) const -> value_type {
 		return begin()[index];
@@ -218,7 +217,7 @@ struct integer_range_type {
 		return size_type(end() - begin());
 	}
 	constexpr auto max_size() const {
-		return make<detail::integer_range_iterator::range_of_type<value_type>()>();
+		return constant<detail::integer_range_iterator::range_of_type<value_type>()>;
 	}
 	constexpr auto empty() const {
 		return begin() == end();
@@ -241,7 +240,7 @@ constexpr auto integer_range(Begin && begin, End && end) noexcept {
 
 template<typename Size>
 constexpr auto integer_range(Size && size) noexcept {
-	return integer_range(make<0>(), std::forward<Size>(size));
+	return integer_range(constant<0>, std::forward<Size>(size));
 }
 
 }	// namespace bounded

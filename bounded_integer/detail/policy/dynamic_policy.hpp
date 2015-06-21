@@ -73,7 +73,7 @@ constexpr auto get_minimum(OverflowPolicy const &) noexcept {
 		is_overflow_policy<OverflowPolicy>::value,
 		"Can only be used with an overflow_policy."
 	);
-	return make<minimum>();
+	return constant<minimum>;
 }
 
 template<
@@ -96,7 +96,7 @@ constexpr auto get_maximum(OverflowPolicy const &) noexcept {
 		is_overflow_policy<OverflowPolicy>::value,
 		"Can only be used with an overflow_policy."
 	);
-	return make<maximum>();
+	return constant<maximum>;
 }
 
 template<
@@ -127,7 +127,7 @@ struct dynamic_policy : private overflow_policy {
 		m_max(std::move(maximum)) {
 	}
 	constexpr dynamic_policy() noexcept:
-		dynamic_policy(make<static_minimum>(), make<static_maximum>()) {
+		dynamic_policy(constant<static_minimum>, constant<static_maximum>) {
 	}
 	constexpr dynamic_policy(dynamic_policy const &) noexcept = default;
 	constexpr dynamic_policy(dynamic_policy &&) noexcept = default;
@@ -245,7 +245,7 @@ struct dynamic_max_policy : private overflow_policy {
 		m_max(std::move(maximum)) {
 	}
 	constexpr dynamic_max_policy() noexcept:
-		dynamic_max_policy(make<static_maximum>()) {
+		dynamic_max_policy(constant<static_maximum>) {
 	}
 
 	constexpr dynamic_max_policy(dynamic_max_policy const &) noexcept = default;
@@ -306,7 +306,7 @@ struct dynamic_max_policy : private overflow_policy {
 	}
 	
 	static constexpr auto min() noexcept {
-		return make<static_minimum>();
+		return constant<static_minimum>;
 	}
 
 	constexpr auto && max() const & noexcept {
@@ -347,7 +347,7 @@ struct dynamic_min_policy : private overflow_policy {
 		m_min(std::move(minimum)) {
 	}
 	constexpr dynamic_min_policy() noexcept:
-		dynamic_min_policy(make<static_minimum>()) {
+		dynamic_min_policy(constant<static_minimum>) {
 	}
 	constexpr dynamic_min_policy(dynamic_min_policy const &) noexcept = default;
 	constexpr dynamic_min_policy(dynamic_min_policy &&) noexcept = default;
@@ -423,7 +423,7 @@ struct dynamic_min_policy : private overflow_policy {
 	}
 
 	static constexpr auto max() noexcept {
-		return make<static_maximum>();
+		return constant<static_maximum>;
 	}
 	
 	static constexpr bool is_modulo = overflow_policy::is_modulo;

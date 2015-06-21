@@ -30,15 +30,10 @@ namespace policy_detail {
 
 struct modulo_policy {
 private:
-	template<intmax_t value>
-	static constexpr auto make() noexcept -> integer<value, value> {
-		return { value, non_check };
-	}
-
 	template<typename T, typename Size>
 	static constexpr auto positive_remainder(T && value, Size && size) noexcept {
 		using result_type = std::common_type_t<std::decay_t<T>, std::decay_t<decltype(std::forward<T>(value) + std::forward<Size>(size))>>;
-		return (value < make<0>()) ?
+		return (value < constant<0>) ?
 			result_type(std::forward<T>(value) + std::forward<Size>(size), non_check) :
 			result_type(std::forward<T>(value), non_check)
 		;
@@ -50,8 +45,8 @@ public:
 		static_assert(is_bounded_integer<std::decay_t<Minimum>>::value, "Only bounded::integer types are supported.");
 		static_assert(is_bounded_integer<std::decay_t<Maximum>>::value, "Only bounded::integer types are supported.");
 		return positive_remainder(
-			(value - minimum) % (maximum - minimum + make<1>()),
-			maximum - minimum + make<1>()
+			(value - minimum) % (maximum - minimum + constant<1>),
+			maximum - minimum + constant<1>
 		) + minimum;
 	}
 
