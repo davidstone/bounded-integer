@@ -17,7 +17,6 @@
 #pragma once
 
 #include "class.hpp"
-#include "enable_if.hpp"
 #include <istream>
 #include <ostream>
 

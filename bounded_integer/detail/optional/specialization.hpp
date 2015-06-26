@@ -19,7 +19,6 @@
 #include "optional.hpp"
 
 #include "../class.hpp"
-#include "../enable_if.hpp"
 #include "../numeric_limits.hpp"
 
 #include <cstdint>
