@@ -33,38 +33,38 @@ private:
 		basic_numeric_limits<std::decay_t<T>>
 	>;
 public:
-	static constexpr auto min() noexcept -> intmax_t {
+	static constexpr auto min() noexcept {
 		return real_numeric_limits::min();
 	}
-	static constexpr auto max() noexcept -> intmax_t {
+	static constexpr auto max() noexcept {
 		return real_numeric_limits::max();
 	}
-	static constexpr bool is_specialized = real_numeric_limits::is_specialized;
-	static constexpr bool is_integer = real_numeric_limits::is_integer;
+	static constexpr auto is_specialized = real_numeric_limits::is_specialized;
+	static constexpr auto is_integer = real_numeric_limits::is_integer;
 };
 
 template<intmax_t minimum, intmax_t maximum, typename overflow_policy, storage_type storage>
 struct basic_numeric_limits<integer<minimum, maximum, overflow_policy, storage>> {
-	static constexpr auto min() noexcept -> intmax_t {
+	static constexpr auto min() noexcept {
 		return minimum;
 	}
-	static constexpr auto max() noexcept -> intmax_t {
+	static constexpr auto max() noexcept {
 		return maximum;
 	}
-	static constexpr bool is_specialized = true;
-	static constexpr bool is_integer = true;
+	static constexpr auto is_specialized = true;
+	static constexpr auto is_integer = true;
 };
 
 template<typename T, T value>
 struct basic_numeric_limits<std::integral_constant<T, value>> {
-	static constexpr auto min() noexcept -> intmax_t {
+	static constexpr auto min() noexcept {
 		return value;
 	}
-	static constexpr auto max() noexcept -> intmax_t {
+	static constexpr auto max() noexcept {
 		return value;
 	}
-	static constexpr bool is_specialized = std::numeric_limits<T>::is_specialized;
-	static constexpr bool is_integer = std::numeric_limits<T>::is_integer;
+	static constexpr auto is_specialized = std::numeric_limits<T>::is_specialized;
+	static constexpr auto is_integer = std::numeric_limits<T>::is_integer;
 };
 
 
