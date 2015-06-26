@@ -1,5 +1,5 @@
 // ==    !=    <    <=    >    >=
-// Copyright (C) 2014 David Stone
+// Copyright (C) 2015 David Stone
 //
 // This program is free software: you can redistribute it and / or modify
 // it under the terms of the GNU Affero General Public License as
@@ -49,6 +49,12 @@ template<
 	intmax_t rhs_min, intmax_t rhs_max, typename rhs_overflow, storage_type rhs_storage
 >
 constexpr auto operator==(integer<lhs_min, lhs_max, lhs_overflow, lhs_storage> const & lhs, integer<rhs_min, rhs_max, rhs_overflow, rhs_storage> const & rhs) noexcept {
+	if (lhs_min > rhs_max or rhs_min > lhs_max) {
+		return false;
+	}
+	if (lhs_min == lhs_max and rhs_min == rhs_max and lhs_min == rhs_min) {
+		return true;
+	}
 	using common_t = detail::comparison_type<lhs_min, lhs_max, lhs_storage, rhs_min, rhs_max, rhs_storage, lhs_overflow>;
 	return static_cast<common_t>(lhs) == static_cast<common_t>(rhs);
 }
@@ -69,6 +75,12 @@ template<
 	intmax_t rhs_min, intmax_t rhs_max, typename rhs_overflow, storage_type rhs_storage
 >
 constexpr auto operator<(integer<lhs_min, lhs_max, lhs_overflow, lhs_storage> const & lhs, integer<rhs_min, rhs_max, rhs_overflow, rhs_storage> const & rhs) noexcept {
+	if (lhs_min >= rhs_max) {
+		return false;
+	}
+	if (lhs_max < rhs_min) {
+		return true;
+	}
 	using common_t = detail::comparison_type<lhs_min, lhs_max, lhs_storage, rhs_min, rhs_max, rhs_storage, lhs_overflow>;
 	return static_cast<common_t>(lhs) < static_cast<common_t>(rhs);
 }

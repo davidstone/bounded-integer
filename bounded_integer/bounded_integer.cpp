@@ -497,6 +497,12 @@ namespace check_comparison {
 	#undef BOUNDED_INTEGER_MULTI_COMPARISON
 	#undef BOUNDED_INTEGER_SINGLE_COMPARISON
 
+	auto non_constexpr_five = bounded::constant<5>;
+	auto non_constexpr_four = bounded::constant<4>;
+	static_assert(non_constexpr_five == non_constexpr_five, "operator== not constexpr for non-constexpr arguments.");
+	static_assert(non_constexpr_five != non_constexpr_four, "operator!= not constexpr for non-constexpr arguments.");
+	static_assert(non_constexpr_four < non_constexpr_five, "operator< not constexpr for non-constexpr arguments.");
+	static_assert(non_constexpr_four <= non_constexpr_four, "operator<= not constexpr for non-constexpr arguments.");
 }
 
 namespace check_single_argument_minmax {
