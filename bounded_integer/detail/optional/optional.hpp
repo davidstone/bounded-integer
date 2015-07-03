@@ -25,8 +25,11 @@
 
 namespace bounded {
 
-struct none_t{};
-constexpr auto none = none_t{};
+// none_t cannot be default constructible or we get an ambiguity in op = {};
+struct none_t {
+	constexpr none_t(int) noexcept {}
+};
+constexpr auto none = none_t(0);
 struct in_place_t{};
 constexpr auto in_place = in_place_t{};
 
@@ -91,7 +94,7 @@ struct default_optional_storage<T, true> {
 private:
 	union underlying_storage {
 		constexpr underlying_storage() noexcept:
-			dummy{} {
+			dummy(none) {
 		}
 		template<typename... Args>
 		constexpr underlying_storage(in_place_t, Args && ... args) noexcept(std::is_nothrow_constructible<T, Args && ...>::value):
@@ -157,7 +160,7 @@ public:
 private:
 	union underlying_storage {
 		constexpr underlying_storage() noexcept:
-			dummy{} {
+			dummy(none) {
 		}
 		template<typename... Args>
 		constexpr underlying_storage(in_place_t, Args && ... args) noexcept(std::is_nothrow_constructible<T, Args && ...>::value):
@@ -191,17 +194,22 @@ template<typename T>
 struct optional {
 	using value_type = T;
 
+	constexpr optional() noexcept {}
 	constexpr optional(none_t) noexcept:
 		optional{} {
 	}
-	template<typename U, enable_if_t<std::is_convertible<U &&, value_type>::value> = clang_dummy>
-	constexpr optional(U && other) noexcept(std::is_nothrow_constructible<value_type, U &&>::value):
-		m_storage(in_place, std::forward<U>(other)) {
+
+	template<typename... Args, enable_if_t<std::is_constructible<value_type, Args && ...>::value> = clang_dummy>
+	constexpr explicit optional(in_place_t, Args && ... other) noexcept(std::is_nothrow_constructible<optional_storage<value_type>, in_place_t, Args && ...>::value):
+		m_storage(in_place, std::forward<Args>(other)...) {
 	}
-	// This handles default construction and in-place construction
-	template<typename... Args, enable_if_t<std::is_constructible<optional_storage<value_type>, Args && ...>::value> = clang_dummy>
-	constexpr explicit optional(Args && ... other) noexcept(std::is_nothrow_constructible<optional_storage<value_type>, Args && ...>::value):
-		m_storage(std::forward<Args>(other)...) {
+	template<typename U, enable_if_t<std::is_convertible<U &&, value_type>::value> = clang_dummy>
+	constexpr optional(U && other)
+		BOUNDED_NOEXCEPT_INITIALIZATION(optional(in_place, std::forward<U>(other))) {
+	}
+	template<typename U, enable_if_t<!std::is_convertible<U &&, value_type>::value and std::is_constructible<value_type, U &&>::value> = clang_dummy>
+	constexpr explicit optional(U && other)
+		BOUNDED_NOEXCEPT_INITIALIZATION(optional(in_place, std::forward<U>(other))) {
 	}
 
 
@@ -269,7 +277,7 @@ struct optional {
 		assign_from_optional(std::move(other))
 	)
 	// TODO: make this work when value_type is a reference
-	template<typename U, enable_if_t<std::is_same<std::decay_t<U>, value_type>::value>>
+	template<typename U, enable_if_t<std::is_convertible<U &&, value_type>::value> = clang_dummy>
 	constexpr auto && operator=(U && other) & noexcept(is_nothrow_optional_assignable<U &&>) {
 		return assign(std::forward<U>(other));
 	}
