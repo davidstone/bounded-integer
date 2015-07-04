@@ -1,5 +1,5 @@
 // algorithm equivalent to std::inplace_merge followed by std::unique
-// Copyright (C) 2014 David Stone
+// Copyright (C) 2015 David Stone
 //
 // This program is free software: you can redistribute it and / or modify
 // it under the terms of the GNU Affero General Public License as
@@ -34,7 +34,7 @@ namespace detail {
 //
 // Returns an iterator pointing to one-past-the-end of the last element copied
 template<typename InputIterator, typename MutableForwardIterator, typename BinaryPredicate>
-MutableForwardIterator copy_unique(InputIterator first, InputIterator const last, MutableForwardIterator destination, BinaryPredicate less) {
+constexpr auto copy_unique(InputIterator first, InputIterator const last, MutableForwardIterator destination, BinaryPredicate less) {
 	if (first == last) {
 		return destination;
 	}
@@ -54,7 +54,7 @@ MutableForwardIterator copy_unique(InputIterator first, InputIterator const last
 }
 
 template<typename InputIterator, typename MutableForwardIterator>
-MutableForwardIterator copy_unique(InputIterator const first, InputIterator const last, MutableForwardIterator const destination) {
+constexpr auto copy_unique(InputIterator const first, InputIterator const last, MutableForwardIterator const destination) {
 	return copy_unique(first, last, destination, std::less<>{});
 }
 
@@ -69,12 +69,12 @@ MutableForwardIterator copy_unique(InputIterator const first, InputIterator cons
 // inserting into because we only insert into the destination if the value at
 // before_destination is less than the front of the source range.
 template<typename ForwardIterator, typename OutputIterator, typename Compare>
-std::tuple<ForwardIterator, OutputIterator> move_chunk(
+constexpr auto move_chunk(
 	ForwardIterator first, ForwardIterator const last,
 	OutputIterator before_destination,
 	std::remove_reference_t<decltype(*std::declval<ForwardIterator>())> const & other,
 	Compare compare
-) {
+) -> std::tuple<ForwardIterator, OutputIterator> {
 	for (; first != last; ++first) {
 		// If this gets to the point where the other set of data contains
 		// something smaller, stop inserting and switch over to the other set.
@@ -90,7 +90,7 @@ std::tuple<ForwardIterator, OutputIterator> move_chunk(
 }
 
 template<typename Iterator, typename Compare>
-Iterator unique_inplace_merge(Iterator first, Iterator middle, Iterator last, Compare compare) {
+auto unique_inplace_merge(Iterator first, Iterator middle, Iterator last, Compare compare) {
 	// This works when [first, middle) or [middle, last) is empty
 	if (first == last) {
 		return std::unique(first, last, [=](auto const & lhs, auto const & rhs) {
@@ -156,7 +156,7 @@ Iterator unique_inplace_merge(Iterator first, Iterator middle, Iterator last, Co
 }
 
 template<typename Iterator>
-Iterator unique_inplace_merge(Iterator first, Iterator middle, Iterator last) {
+auto unique_inplace_merge(Iterator first, Iterator middle, Iterator last) {
 	return unique_inplace_merge(first, middle, last, std::less<>{});
 }
 
