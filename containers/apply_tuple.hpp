@@ -1,5 +1,5 @@
 // Apply a function to all values in a tuple
-// Copyright (C) 2014 David Stone
+// Copyright (C) 2015 David Stone
 //
 // This program is free software: you can redistribute it and / or modify
 // it under the terms of the GNU Affero General Public License as
@@ -24,15 +24,14 @@ namespace containers {
 
 // I should probably add a conditional noexcept specification to these
 template<typename Function, typename Tuple, std::size_t... indexes>
-constexpr auto apply_helper(Function const & f, Tuple && tuple_args, std::index_sequence<indexes...>) ->
-	decltype(f(std::get<indexes>(std::forward<Tuple>(tuple_args))...)) {
-	return f(std::get<indexes>(std::forward<Tuple>(tuple_args))...);
+constexpr decltype(auto) apply_helper(Function && f, Tuple && tuple_args, std::index_sequence<indexes...>) {
+	return std::forward<Function>(f)(std::get<indexes>(std::forward<Tuple>(tuple_args))...);
 }
 
-template<typename Function, typename Tuple, typename Indexes = std::make_index_sequence<std::tuple_size<Tuple>::value>>
-constexpr auto apply(Function const & f, Tuple && tuple_args) ->
-	decltype(apply_helper(f, std::forward<Tuple>(tuple_args), Indexes{})) {
-	return apply_helper(f, std::forward<Tuple>(tuple_args), Indexes{});
+template<typename Function, typename Tuple>
+constexpr decltype(auto) apply(Function && f, Tuple && tuple_args) {
+	using indexes = std::make_index_sequence<std::tuple_size<Tuple>::value>;
+	return apply_helper(std::forward<Function>(f), std::forward<Tuple>(tuple_args), indexes{});
 }
 
 }	// namespace containers
