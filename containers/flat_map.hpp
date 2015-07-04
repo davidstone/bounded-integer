@@ -296,32 +296,6 @@ public:
 		// void). Instead, I store the original size and construct a new
 		// iterator.
 		auto const offset = static_cast<typename container_type::difference_type>(container().size());
-#if 0
-		// I rely on the optimizer to remove this static check
-		if (allow_duplicates) {
-			container().insert(container().end(), first, last);
-		}
-		else {
-			for (; first != last; ++first) {
-				// I feel bad about finding the position just to throw it away, but
-				// I suspect this is a win vs. having to shift the elements over.
-				auto && value = *first;
-				auto const it = find(value.first);
-				if (it == end()) {
-					container().emplace_back(std::forward<decltype(value)>(value));
-				}
-			}
-		}
-		auto const midpoint = moving_begin(container()) + offset;
-		indirect_compare const compare(value_comp());
-		std::sort(midpoint, moving_end(container()), compare);
-		auto const equal = [&](auto const & lhs, auto const & rhs) {
-			return !compare(lhs, rhs) and !compare(rhs, lhs);
-		};
-		container().erase(std::unique(midpoint, moving_end(container()), equal), container().end());
-		std::inplace_merge(moving_begin(container()), midpoint, moving_end(container()), compare);
-
-#else	// USE_UNIQUE
 		container().insert(container().end(), first, last);
 		auto const midpoint = moving_begin(container()) + offset;
 		std::sort(midpoint, moving_end(container()), indirect_compare{value_comp()});
@@ -332,7 +306,6 @@ public:
 			auto const position = detail::unique_inplace_merge(moving_begin(container()), midpoint, moving_end(container()), indirect_compare{value_comp()});
 			container().erase(position, container().end());
 		}
-#endif
 	}
 	void insert(std::initializer_list<value_type> init) {
 		insert(std::begin(init), std::end(init));
