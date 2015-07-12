@@ -21,143 +21,133 @@
 #include <functional>
 #include <memory>
 #include <vector>
-
+#include <iostream>
+#include <cassert>
 namespace containers {
 namespace detail {
 
-// copy_unique requires that the range passed in is already sorted.
-//
-// The binary predicate requires the "less than" semantics rather than
-// "equal to" because we know the range must be sorted, which required a strict
-// weak ordering. This allows reuse of the same predicate with no duplication of
-// the checks. No element compares less than an earlier element.
-//
-// Returns an iterator pointing to one-past-the-end of the last element copied
-template<typename InputIterator, typename MutableForwardIterator, typename BinaryPredicate>
-constexpr auto copy_unique(InputIterator first, InputIterator const last, MutableForwardIterator destination, BinaryPredicate less) {
-	if (first == last) {
-		return destination;
-	}
-	*destination = *first;
-	++first;
-	auto before_destination = destination;
-	++destination;
-	for (; first != last; ++first) {
-		if (!less(*before_destination, *first)) {
-			continue;
-		}
-		*destination = *first;
-		++before_destination;
-		++destination;
-	}
-	return destination;
+template<typename T>
+constexpr decltype(auto) base_iterator(T it) {
+	return it;
+}
+template<typename T>
+constexpr decltype(auto) base_iterator(std::move_iterator<T> it) {
+	return it.base();
 }
 
-template<typename InputIterator, typename MutableForwardIterator>
-constexpr auto copy_unique(InputIterator const first, InputIterator const last, MutableForwardIterator const destination) {
-	return copy_unique(first, last, destination, std::less<>{});
+// If the types can be compared, use that. If they can't, they must not be
+// compatible iterator types.
+template<typename LHS, typename RHS>
+constexpr auto not_same_iterator(LHS const & lhs, RHS const & rhs) -> decltype(lhs != rhs) {
+	return lhs != rhs;
+}
+// This is worse match for any types unless there is no operator!= defined
+template<typename... Args>
+constexpr auto not_same_iterator(Args && ...) {
+	return true;
 }
 
-
-// unique_inplace_merge works on two sets of data. This function moves from one
-// of the two ranges until one of two conditions occurs:
-//
-// 1) The range is empty or
-// 2) The front of the other range compares less than the front of this range
-//
-// The third parameter is an iterator to just before the destination we will be
-// inserting into because we only insert into the destination if the value at
-// before_destination is less than the front of the source range.
-template<typename ForwardIterator, typename OutputIterator, typename Compare>
-constexpr auto move_chunk(
-	ForwardIterator first, ForwardIterator const last,
-	OutputIterator before_destination,
-	std::remove_reference_t<decltype(*std::declval<ForwardIterator>())> const & other,
-	Compare compare
-) -> std::tuple<ForwardIterator, OutputIterator> {
-	for (; first != last; ++first) {
-		// If this gets to the point where the other set of data contains
-		// something smaller, stop inserting and switch over to the other set.
-		if (compare(other, *first)) {
-			break;
-		}
-		if (compare(*before_destination, *first)) {
-			++before_destination;
-			*before_destination = std::move(*first);
+// This is written so that a special predicate built on std::less can work
+template<typename InputIterator, typename Sentinal, typename MutableForwardIterator, typename BinaryPredicate = std::equal_to<>>
+constexpr auto unique_copy(InputIterator first, Sentinal const last, MutableForwardIterator output, BinaryPredicate equal = BinaryPredicate{}) {
+	if (base_iterator(first) == base_iterator(last)) {
+		return output;
+	}
+	if (not_same_iterator(base_iterator(output), base_iterator(first))) {
+		*output = *first;
+	}
+	while (base_iterator(++first) != base_iterator(last)) {
+		if (!equal(*output, *first) and not_same_iterator(base_iterator(++output), base_iterator(first))) {
+			*output = *first;
 		}
 	}
-	return std::make_tuple(first, before_destination);
+	return ++output;
 }
 
-template<typename Iterator, typename Compare>
-auto unique_inplace_merge(Iterator first, Iterator middle, Iterator last, Compare compare) {
-	// This works when [first, middle) or [middle, last) is empty
-	if (first == last) {
-		return std::unique(first, last, [=](auto const & lhs, auto const & rhs) {
-			return !compare(lhs, rhs) and !compare(rhs, lhs);
-		});
+template<typename MutableForwardIterator, typename Sentinal, typename BinaryPredicate = std::equal_to<>>
+constexpr auto unique(MutableForwardIterator first, Sentinal const last, BinaryPredicate equal = BinaryPredicate{}) {
+	return ::containers::detail::unique_copy(std::make_move_iterator(first), last, first, equal);
+}
+
+template<typename InputIterator, typename Sentinal, typename MutableForwardIterator, typename BinaryPredicate = std::less<>>
+constexpr auto unique_copy_less(InputIterator const first, Sentinal const last, MutableForwardIterator const output, BinaryPredicate less = BinaryPredicate{}) {
+	return ::containers::detail::unique_copy(first, last, output, [=](auto const & lhs, auto const & rhs) { return !less(lhs, rhs); });
+}
+template<typename MutableForwardIterator, typename Sentinal, typename BinaryPredicate = std::less<>>
+constexpr auto unique_less(MutableForwardIterator const first, Sentinal const last, BinaryPredicate less = BinaryPredicate{}) {
+	return ::containers::detail::unique(first, last, [=](auto const & lhs, auto const & rhs) { return !less(lhs, rhs); });
+}
+
+
+template<typename InputIterator, typename Sentinal, typename T, typename BinaryPredicate>
+constexpr auto next_greater(InputIterator const first, Sentinal const last, T const & x, BinaryPredicate less) {
+	return std::find_if(first, last, [&](auto const & value) { return less(x, value); });
+}
+
+
+template<typename InputIterator1, typename Sentinal1, typename InputIterator2, typename Sentinal2, typename MutableForwardIterator, typename BinaryPredicate = std::less<>>
+constexpr auto unique_merge_copy(InputIterator1 first1, Sentinal1 const last1, InputIterator2 first2, Sentinal2 const last2, MutableForwardIterator output, BinaryPredicate less = BinaryPredicate{}) {
+	while (first1 != last1 and first2 != last2) {
+		*output = less(*first2, *first1) ? *first2++ : *first1++;
+		first1 = next_greater(first1, last1, *output, less);
+		first2 = next_greater(first2, last2, *output, less);
+		++output;
+	}
+
+	if (first1 != last1) {
+		return unique_copy_less(first1, last1, output, less);
+	} else {
+		return unique_copy_less(first2, last2, output, less);
+	}
+}
+
+// unique_inplace_merge assumes the first range is sorted and has no duplicates.
+// It assumes the second range is sorted.
+template<typename MutableForwardIterator, typename Sentinal, typename BinaryPredicate = std::less<>>
+auto unique_inplace_merge(MutableForwardIterator first, MutableForwardIterator middle, Sentinal const last, BinaryPredicate less = BinaryPredicate{}) {
+	if (first == middle or middle == last) {
+		return unique_less(first, last, less);
 	}
 
 	// Keep all the elements that will end up at the beginning where they are
-	auto destination = std::find_if(first, middle, [=](auto const & value) {
-		return compare(*middle, value);
-	});
-	
+
+	auto new_ranges = [=]() mutable {
+		auto p = [=](auto const & value) { return less(*middle, value); };
+		struct Result {
+			MutableForwardIterator destination;
+			MutableForwardIterator second_range_first;
+		};
+		if (p(*first)) {
+			return Result{ first, middle };
+		}
+		while (true) {
+			auto const it = std::next(first);
+			if (it == middle) {
+				break;
+			}
+			if (p(*it)) {
+				return Result{ it, next_greater(middle, last, *first, less) };
+			}
+			first = it;
+		}
+		return Result{ middle, next_greater(middle, last, *first, less) };
+	};
+
+	auto const iterators = new_ranges();
+
 	// This can be done better than just creating a std::vector, but it works
 	// good enough for now (famous last words).
-	using storage_type = std::vector<std::decay_t<decltype(*std::declval<Iterator>())>>;
+	using storage_type = std::vector<std::decay_t<decltype(*first)>>;
 	// Move the rest of the elements so we can use their space without
 	// overwriting.
-	storage_type temp(std::make_move_iterator(destination), std::make_move_iterator(middle));
-	auto move_from = temp.begin();
-	
-	// If either range is entirely less than the other, we skip over this step,
-	// as we do not have to clear out any of the ranges.
-	if (!temp.empty() and first != destination) {
-		--destination;
-		while (true) {
-			std::tie(middle, destination) = move_chunk(middle, last, destination, *move_from, compare);
-			if (middle == last) {
-				break;
-			}
-			std::tie(move_from, destination) = move_chunk(move_from, temp.end(), destination, *middle, compare);
-			if (move_from == temp.end()) {
-				break;
-			}
-		}
-	}
-	auto const create_remaining_range = [=](auto const begin, auto const end) {
-		return std::make_pair(
-			std::find_if(begin, end, [=](auto const & value) { return compare(*destination, value); }),
-			end
-		);
-	};
-	if (middle != last) {
-		auto const remaining_range = create_remaining_range(middle, last);
-		return copy_unique(
-			std::make_move_iterator(remaining_range.first),
-			std::make_move_iterator(remaining_range.second),
-			std::next(destination),
-			compare
-		);
-	}
-	else if (move_from != temp.end()) {
-		auto const remaining_range = create_remaining_range(move_from, temp.end());
-		return copy_unique(
-			std::make_move_iterator(remaining_range.first),
-			std::make_move_iterator(remaining_range.second),
-			std::next(destination),
-			compare
-		);
-	}
-	else {
-		return last;
-	}
-}
+	storage_type temp(std::make_move_iterator(iterators.destination), std::make_move_iterator(middle));
 
-template<typename Iterator>
-auto unique_inplace_merge(Iterator first, Iterator middle, Iterator last) {
-	return unique_inplace_merge(first, middle, last, std::less<>{});
+	return unique_merge_copy(
+		std::make_move_iterator(temp.begin()), std::make_move_iterator(temp.end()),
+		std::make_move_iterator(iterators.second_range_first), std::make_move_iterator(last),
+		iterators.destination,
+		less
+	);
 }
 
 }	// namespace detail

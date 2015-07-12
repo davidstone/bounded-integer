@@ -48,34 +48,95 @@ void test_no_extra_copy_or_move() {
 	final.emplace(std::piecewise_construct, std::forward_as_tuple(6), std::forward_as_tuple(5, 2.0, 'c'));
 }
 
-void test_copy_unique() {
-	std::cout << "Testing copy_unique\n" << std::flush;
-	std::vector<int> const source = { 1, 3, 5, 5, 5, 6, 10, 10 };
-	std::vector<int> destination(5);
-	auto const it = containers::detail::copy_unique(source.begin(), source.end(), destination.begin());
+
+class CheckedMover {
+public:
+	constexpr CheckedMover(int value):
+		m_value(value),
+		m_moved(false) {
+	}
+		
+	constexpr CheckedMover(CheckedMover const & other):
+		m_value(other.m_value),
+		m_moved(other.m_moved) {
+		assert(!other.m_moved);
+	}
+	constexpr CheckedMover(CheckedMover && other):
+		m_value(other.m_value),
+		m_moved(other.m_moved) {
+		assert(this != &other);
+		assert(!other.m_moved);
+		other.m_moved = true;
+	}
+	constexpr CheckedMover & operator=(CheckedMover const & other) {
+		assert(!other.m_moved);
+		m_value = other.m_value;
+		m_moved = other.m_moved;
+		return *this;
+	}
+	constexpr CheckedMover & operator=(CheckedMover && other) {
+		assert(this != &other);
+		assert(!other.m_moved);
+		m_value = other.m_value;
+		m_moved = other.m_moved;
+		other.m_moved = true;
+		return *this;
+	}
+	
+	constexpr friend bool operator<(CheckedMover const & lhs, CheckedMover const & rhs) {
+		assert(!lhs.m_moved);
+		assert(!rhs.m_moved);
+		return lhs.m_value < rhs.m_value;
+	}
+	constexpr friend bool operator==(CheckedMover const & lhs, CheckedMover const & rhs) {
+		assert(!lhs.m_moved);
+		assert(!rhs.m_moved);
+		return lhs.m_value == rhs.m_value;
+	}
+private:
+	int m_value;
+	bool m_moved;
+};
+
+void test_unique_copy_less() {
+	std::cout << "Testing unique_copy_less\n" << std::flush;
+	std::vector<CheckedMover> const source = { 1, 3, 5, 5, 5, 6, 10, 10 };
+	std::vector<CheckedMover> destination(5, 0);
+	auto const it = containers::detail::unique_copy_less(source.begin(), source.end(), destination.begin());
 	assert(it == destination.end());
-	assert(destination == std::vector<int>({ 1, 3, 5, 6, 10 }));
+	assert(destination == std::vector<CheckedMover>({ 1, 3, 5, 6, 10 }));
 }
 
-void test_unique_no_change(std::vector<int> const & v) {
+void test_unique_no_change(std::vector<CheckedMover> const & v) {
 	auto copy = v;
-	auto const size = static_cast<std::vector<int>::iterator::difference_type>(copy.size());
+	auto const size = static_cast<std::vector<CheckedMover>::iterator::difference_type>(copy.size());
 	auto const midpoint = std::next(copy.begin(), size / 2);
 	copy.erase(containers::detail::unique_inplace_merge(copy.begin(), midpoint, copy.end()), copy.end());
 	assert(v == copy);
 }
 
+void test_unique_inplace_merge(std::vector<CheckedMover> v, std::vector<CheckedMover> const & other, std::vector<CheckedMover> const & expected) {
+	auto const midpoint = static_cast<std::vector<CheckedMover>::iterator::difference_type>(v.size());
+	v.insert(v.end(), other.begin(), other.end());
+
+	v.erase(containers::detail::unique_inplace_merge(v.begin(), v.begin() + midpoint, v.end()), v.end());
+
+	assert(v == expected);
+}
+
 void test_unique_inplace_merge() {
 	std::cout << "Testing unique_inplace_merge.\n" << std::flush;
-	std::vector<int> v({ 1, 3, 5, 7, 9 });
-
-	test_unique_no_change(v);
-
-	auto const midpoint = static_cast<std::vector<int>::iterator::difference_type>(v.size());
-	v.insert(v.end(), { 2, 2, 2, 3, 3, 6, 7 });
-	v.erase(containers::detail::unique_inplace_merge(v.begin(), v.begin() + midpoint, v.end()), v.end());
-	std::vector<int> const expected = { 1, 2, 3, 5, 6, 7, 9 };
-	assert(v == expected);
+	test_unique_no_change({1, 2, 3, 4, 7});
+	test_unique_inplace_merge({ 1, 3, 5, 7, 9 }, { 2, 2, 2, 3, 3, 6, 7 }, { 1, 2, 3, 5, 6, 7, 9 });
+	test_unique_inplace_merge({ 2 }, { 1 }, { 1, 2 });
+	test_unique_inplace_merge({ }, { 6 }, { 6 });
+	test_unique_inplace_merge({ 4 }, { }, { 4 });
+	test_unique_inplace_merge({ }, { }, { });
+	test_unique_inplace_merge({ 8 }, { 8, 8, 8, 8, 8 }, { 8 });
+	// Ideally unique_inplace_merge would not assume the first range has no
+	// duplicates, but that is my current use-case. I do not know how to remove
+	// this limitation without making the algorithm less efficient.
+	// test_unique_inplace_merge({ 8, 8 }, { 8, 8, 8, 8, 8 }, { 8 });
 }
 
 template<typename container_type>
@@ -255,7 +316,7 @@ bool operator<(Class<size> const & lhs, Class<size> const & rhs) {
 
 int main(int argc, char ** argv) {
 	std::cout.sync_with_stdio(false);
-	test_copy_unique();
+	test_unique_copy_less();
 	test_unique_inplace_merge();
 	test_no_extra_copy_or_move();
 	test<map_type<int, int>>();
