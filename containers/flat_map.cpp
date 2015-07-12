@@ -15,6 +15,10 @@
 // along with this program. If not, see <http://www.gnu.org/licenses/>.
 
 #include "flat_map.hpp"
+
+#include <boost/random/mersenne_twister.hpp>
+#include <boost/random/uniform_int_distribution.hpp>
+
 #include <algorithm>
 #include <array>
 #include <cassert>
@@ -23,7 +27,6 @@
 #include <cstdint>
 #include <iostream>
 #include <map>
-#include <random>
 #include <vector>
 
 using namespace containers;
@@ -205,8 +208,8 @@ private:
 template<typename Key, typename Value>
 void test_performance(std::size_t const loop_count) {
 	auto const generator = [](std::size_t size) {
-		static std::mt19937 engine(0);
-		static std::uniform_int_distribution<std::uint32_t> distribution;
+		static boost::random::mt19937 engine(0);
+		static boost::random::uniform_int_distribution<std::uint32_t> distribution;
 		std::vector<std::pair<Key const, Value>> source;
 		source.reserve(size);
 		for (std::size_t n = 0; n != size; ++n) {
