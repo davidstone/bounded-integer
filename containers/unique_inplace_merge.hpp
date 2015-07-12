@@ -38,7 +38,7 @@ constexpr decltype(auto) base_iterator(std::move_iterator<T> it) {
 // If the types can be compared, use that. If they can't, they must not be
 // compatible iterator types.
 template<typename LHS, typename RHS>
-constexpr auto not_same_iterator(LHS const & lhs, RHS const & rhs) -> decltype(lhs != rhs) {
+constexpr auto not_same_iterator(LHS && lhs, RHS && rhs) -> decltype(lhs != rhs) {
 	return lhs != rhs;
 }
 // This is worse match for any types unless there is no operator!= defined
