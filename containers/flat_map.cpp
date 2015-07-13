@@ -101,28 +101,28 @@ private:
 	bool m_moved;
 };
 
-template<typename T>
+template<typename Container>
 void test_unique_copy_less() {
 	std::cout << "Testing unique_copy_less\n" << std::flush;
-	T const source = { 1, 3, 5, 5, 5, 6, 10, 10 };
-	T destination(5U, 0);
+	Container const source = { 1, 3, 5, 5, 5, 6, 10, 10 };
+	Container destination(5U, 0);
 	auto const it = containers::detail::unique_copy_less(source.begin(), source.end(), destination.begin());
 	assert(it == destination.end());
-	assert(destination == T({ 1, 3, 5, 6, 10 }));
+	assert(destination == Container({ 1, 3, 5, 6, 10 }));
 }
 
-template<typename T>
-void test_unique_no_change(T const & v) {
+template<typename Container>
+void test_unique_no_change(Container const & v) {
 	auto copy = v;
-	auto const size = static_cast<typename T::iterator::difference_type>(copy.size());
+	auto const size = static_cast<typename Container::iterator::difference_type>(copy.size());
 	auto const midpoint = std::next(copy.begin(), size / 2);
 	copy.erase(containers::detail::unique_inplace_merge(copy.begin(), midpoint, copy.end()), copy.end());
 	assert(v == copy);
 }
 
-template<typename T>
-void test_unique_inplace_merge_specific(T v, T const & other, T const & expected) {
-	auto const midpoint = static_cast<typename T::iterator::difference_type>(v.size());
+template<typename Container>
+void test_unique_inplace_merge_specific(Container v, Container const & other, Container const & expected) {
+	auto const midpoint = static_cast<typename Container::iterator::difference_type>(v.size());
 	v.insert(v.end(), other.begin(), other.end());
 
 	v.erase(containers::detail::unique_inplace_merge(v.begin(), v.begin() + midpoint, v.end()), v.end());
@@ -130,20 +130,20 @@ void test_unique_inplace_merge_specific(T v, T const & other, T const & expected
 	assert(v == expected);
 }
 
-template<typename T>
+template<typename Container>
 void test_unique_inplace_merge_specific() {
-	test_unique_copy_less<T>();
-	test_unique_no_change<T>({1, 2, 3, 4, 7});
-	test_unique_inplace_merge_specific<T>({ 1, 3, 5, 7, 9 }, { 2, 2, 2, 3, 3, 6, 7 }, { 1, 2, 3, 5, 6, 7, 9 });
-	test_unique_inplace_merge_specific<T>({ 2 }, { 1 }, { 1, 2 });
-	test_unique_inplace_merge_specific<T>({ }, { 6 }, { 6 });
-	test_unique_inplace_merge_specific<T>({ 4 }, { }, { 4 });
-	test_unique_inplace_merge_specific<T>({ }, { }, { });
-	test_unique_inplace_merge_specific<T>({ 8 }, { 8, 8, 8, 8, 8 }, { 8 });
+	test_unique_copy_less<Container>();
+	test_unique_no_change<Container>({1, 2, 3, 4, 7});
+	test_unique_inplace_merge_specific<Container>({ 1, 3, 5, 7, 9 }, { 2, 2, 2, 3, 3, 6, 7 }, { 1, 2, 3, 5, 6, 7, 9 });
+	test_unique_inplace_merge_specific<Container>({ 2 }, { 1 }, { 1, 2 });
+	test_unique_inplace_merge_specific<Container>({ }, { 6 }, { 6 });
+	test_unique_inplace_merge_specific<Container>({ 4 }, { }, { 4 });
+	test_unique_inplace_merge_specific<Container>({ }, { }, { });
+	test_unique_inplace_merge_specific<Container>({ 8 }, { 8, 8, 8, 8, 8 }, { 8 });
 	// Ideally unique_inplace_merge would not assume the first range has no
 	// duplicates, but that is my current use-case. I do not know how to remove
 	// this limitation without making the algorithm less efficient.
-	// test_unique_inplace_merge_specific<T>({ 8, 8 }, { 8, 8, 8, 8, 8 }, { 8 });
+	// test_unique_inplace_merge_specific<Container>({ 8, 8 }, { 8, 8, 8, 8, 8 }, { 8 });
 }
 
 void test_unique_inplace_merge() {
