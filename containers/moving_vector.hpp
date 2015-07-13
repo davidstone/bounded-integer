@@ -230,7 +230,9 @@ public:
 	using reverse_iterator = std::reverse_iterator<iterator>;
 	using reverse_indirect_iterator = std::reverse_iterator<indirect_iterator>;
 	
-	explicit moving_vector(allocator_type const & = allocator_type{}) {
+	moving_vector() {
+	}
+	explicit moving_vector(allocator_type const &) {
 	}
 	explicit moving_vector(size_type count, allocator_type const & = allocator_type{}) {
 		for (size_type n = 0; n != count; ++n) {
@@ -246,7 +248,7 @@ public:
 	}
 	moving_vector(moving_vector const & other, allocator_type const &):
 		moving_vector(other) {
-	}
+	}                                                                       
 	moving_vector(moving_vector && other, allocator_type const &):
 		moving_vector(std::move(other)) {
 	}
