@@ -60,13 +60,13 @@ constexpr bool is_copy_or_move_assignable() {
 	using pair_type = std::pair<Key const, T>;
 	using container_type = Container<pair_type, std::allocator<pair_type>>;
 	using value_ref = decltype(*moving_begin(container_type{}));
-	using value_type = typename std::remove_reference<value_ref>::type;
+	using value_type = std::remove_reference_t<value_ref>;
 	return is_copy_or_move_assignable_helper<value_type>{}();
 }
 
 template<typename Key, typename T, template<typename, typename> class Container>
 using value_type_t = std::pair<
-	typename std::conditional<is_copy_or_move_assignable<Key, T, Container>(), Key const, Key>::type,
+	typename std::conditional_t<is_copy_or_move_assignable<Key, T, Container>(), Key const, Key>,
 	T
 >;
 

@@ -1,5 +1,5 @@
 // A vector-like class that can take advantage of cheap moves
-// Copyright (C) 2014 David Stone
+// Copyright (C) 2015 David Stone
 //
 // This program is free software: you can redistribute it and / or modify
 // it under the terms of the GNU Affero General Public License as
@@ -34,8 +34,8 @@ using namespace smart_pointer;
 template<typename T, typename ValueType,
 	enable_if_t<
 		std::is_same<
-			typename std::remove_const<T>::type,
-			typename std::remove_const<ValueType>::type
+			std::remove_const_t<T>,
+			std::remove_const_t<ValueType>
 		>::value
 	> = enabler_dummy
 >
@@ -45,8 +45,8 @@ ValueType const * remove_double_indirection(value_ptr<T> const * ptr) {
 template<typename T, typename ValueType,
 	enable_if_t<
 		std::is_same<
-			typename std::remove_const<T>::type,
-			typename std::remove_const<ValueType>::type
+			std::remove_const_t<T>,
+			std::remove_const_t<ValueType>
 		>::value
 	> = enabler_dummy
 >
@@ -57,7 +57,7 @@ template<typename T, typename ValueType,
 	enable_if_t<
 		std::is_same<
 			value_ptr<T>,
-			typename std::remove_const<ValueType>::type
+			std::remove_const_t<ValueType>
 		>::value
 	> = enabler_dummy
 >
@@ -68,7 +68,7 @@ template<typename T, typename ValueType,
 	enable_if_t<
 		std::is_same<
 			value_ptr<T>,
-			typename std::remove_const<ValueType>::type
+			std::remove_const_t<ValueType>
 		>::value
 	> = enabler_dummy
 >
@@ -151,7 +151,7 @@ private:
 	friend class iterator_base;
 
 	static constexpr bool is_const = std::is_const<value_type>::value;
-	using base_iterator = typename std::conditional<is_const, indirection_type const, indirection_type>::type *;
+	using base_iterator = std::conditional_t<is_const, indirection_type const, indirection_type> *;
 
 	constexpr explicit iterator_base(base_iterator const other) noexcept:
 		it(other) {
@@ -165,7 +165,7 @@ private:
 
 	// Convert const_iterator to iterator
 	constexpr explicit operator iterator_base<T, T>() const noexcept {
-		using mutable_type = typename std::conditional<std::is_const<T>::value, indirection_type const, indirection_type>::type *;
+		using mutable_type = std::conditional_t<std::is_const<T>::value, indirection_type const, indirection_type> *;
 		return iterator_base<T, T>(const_cast<mutable_type>(it));
 	}
 
@@ -473,7 +473,7 @@ private:
 // For regular containers, the iterator you need to move elements around is just
 // a regular iterator
 template<typename Container>
-typename std::remove_reference<Container>::type::iterator moving_begin(Container && container) {
+typename std::remove_reference_t<Container>::iterator moving_begin(Container && container) {
 	return std::forward<Container>(container).begin();
 }
 template<typename T, typename Allocator>
@@ -485,7 +485,7 @@ typename moving_vector<T, Allocator>::indirect_iterator moving_begin(moving_vect
 	return std::move(container).begin();
 }
 template<typename Container>
-typename std::remove_reference<Container>::type::iterator moving_end(Container && container) {
+typename std::remove_reference_t<Container>::iterator moving_end(Container && container) {
 	return std::forward<Container>(container).end();
 }
 template<typename T, typename Allocator>

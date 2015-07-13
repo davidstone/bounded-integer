@@ -48,7 +48,7 @@ void test_semantics() {
 }
 
 template<typename T>
-using list_type = typename std::conditional<USE_SYSTEM_FORWARD_LIST, std::forward_list<T>, forward_list<T>>::type;
+using list_type = std::conditional_t<USE_SYSTEM_FORWARD_LIST, std::forward_list<T>, forward_list<T>>;
 
 template<typename T>
 void test_performance(std::size_t const loop_count) {
