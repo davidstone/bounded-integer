@@ -14,8 +14,7 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with this program. If not, see <http://www.gnu.org/licenses/>.
 
-#ifndef CONTAINERS_FORWARD_LIST_HPP_
-#define CONTAINERS_FORWARD_LIST_HPP_
+#pragma once
 
 #include <algorithm>
 #include <cassert>
@@ -581,4 +580,3 @@ void swap(forward_list<T, Allocator> & lhs, forward_list<T, Allocator> & rhs) no
 }
 
 }	// namespace containers
-#endif	// CONTAINERS_FORWARD_LIST_HPP_

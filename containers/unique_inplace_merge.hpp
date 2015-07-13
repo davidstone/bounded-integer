@@ -14,8 +14,7 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with this program. If not, see <http://www.gnu.org/licenses/>.
 
-#ifndef CONTAINERS_UNIQUE_INPLACE_MERGE_HPP_
-#define CONTAINERS_UNIQUE_INPLACE_MERGE_HPP_
+#pragma once
 
 #include <algorithm>
 #include <functional>
@@ -152,4 +151,3 @@ auto unique_inplace_merge(MutableForwardIterator first, MutableForwardIterator m
 
 }	// namespace detail
 }	// namespace containers
-#endif	// CONTAINERS_UNIQUE_INPLACE_MERGE_HPP_

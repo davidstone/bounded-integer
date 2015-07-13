@@ -14,8 +14,7 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with this program. If not, see <http://www.gnu.org/licenses/>.
 
-#ifndef CONTAINERS_MOVING_VECTOR_HPP_
-#define CONTAINERS_MOVING_VECTOR_HPP_
+#pragma once
 
 #include <iterator>
 #include <type_traits>
@@ -521,4 +520,3 @@ bool operator>=(moving_vector<T, Allocator> const & lhs, moving_vector<T, Alloca
 }
 
 }	// namespace containers
-#endif	// CONTAINERS_MOVING_VECTOR_HPP_

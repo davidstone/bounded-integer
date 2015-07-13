@@ -14,8 +14,7 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with this program. If not, see <http://www.gnu.org/licenses/>.
 
-#ifndef CONTAINERS_FLAT_MAP_HPP_
-#define CONTAINERS_FLAT_MAP_HPP_
+#pragma once
 
 #include <algorithm>
 #include <stdexcept>
@@ -602,4 +601,3 @@ using stable_flat_multimap = detail_flat_map::flat_multimap<Key, T, Compare, mov
 
 
 }	// namespace containers
-#endif	// CONTAINERS_FLAT_MAP_HPP_

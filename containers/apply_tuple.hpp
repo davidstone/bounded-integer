@@ -14,8 +14,7 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with this program. If not, see <http://www.gnu.org/licenses/>.
 
-#ifndef CONTAINERS_APPLY_TUPLE_HPP_
-#define CONTAINERS_APPLY_TUPLE_HPP_
+#pragma once
 
 #include <type_traits>
 #include <utility>
@@ -35,4 +34,3 @@ constexpr decltype(auto) apply(Function && f, Tuple && tuple_args) {
 }
 
 }	// namespace containers
-#endif	// CONTAINERS_APPLY_TUPLE_HPP_
