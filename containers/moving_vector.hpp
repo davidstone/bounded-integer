@@ -31,49 +31,22 @@ namespace detail {
 namespace vector {
 using namespace smart_pointer;
 
-template<typename T, typename ValueType,
-	enable_if_t<
-		std::is_same<
-			std::remove_const_t<T>,
-			std::remove_const_t<ValueType>
-		>::value
-	> = enabler_dummy
->
-ValueType const * remove_double_indirection(value_ptr<T> const * ptr) {
-	return ptr->get();
+template<typename T, typename ValueType, enable_if_t<std::is_same<T, ValueType>::value> = enabler_dummy>
+constexpr decltype(auto) remove_indirection(value_ptr<T> const * ptr) {
+	return **ptr;
 }
-template<typename T, typename ValueType,
-	enable_if_t<
-		std::is_same<
-			std::remove_const_t<T>,
-			std::remove_const_t<ValueType>
-		>::value
-	> = enabler_dummy
->
-ValueType * remove_double_indirection(value_ptr<T> * ptr) {
-	return ptr->get();
+template<typename T, typename ValueType, enable_if_t<std::is_same<T, ValueType>::value> = enabler_dummy>
+constexpr decltype(auto) remove_indirection(value_ptr<T> * ptr) {
+	return **ptr;
 }
-template<typename T, typename ValueType,
-	enable_if_t<
-		std::is_same<
-			value_ptr<T>,
-			std::remove_const_t<ValueType>
-		>::value
-	> = enabler_dummy
->
-ValueType const * remove_double_indirection(value_ptr<T> const * ptr) {
-	return ptr;
+
+template<typename T, typename ValueType, enable_if_t<std::is_same<value_ptr<T>, ValueType>::value> = enabler_dummy>
+constexpr decltype(auto) remove_indirection(value_ptr<T> const * ptr) {
+	return *ptr;
 }
-template<typename T, typename ValueType,
-	enable_if_t<
-		std::is_same<
-			value_ptr<T>,
-			std::remove_const_t<ValueType>
-		>::value
-	> = enabler_dummy
->
-ValueType * remove_double_indirection(value_ptr<T> * ptr) {
-	return ptr;
+template<typename T, typename ValueType, enable_if_t<std::is_same<value_ptr<T>, ValueType>::value> = enabler_dummy>
+constexpr decltype(auto) remove_indirection(value_ptr<T> * ptr) {
+	return *ptr;
 }
 
 template<typename T, typename ValueType>
@@ -98,7 +71,7 @@ public:
 	}
 
 	reference operator*() const {
-		return *remove_double_indirection<T, ValueType>(it);
+		return remove_indirection<std::remove_const_t<T>, std::remove_const_t<value_type>>(it);
 	}
 	pointer operator->() const {
 		return & this->operator*();
