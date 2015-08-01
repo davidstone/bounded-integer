@@ -190,8 +190,36 @@ public:
 	using base::base;
 };
 
+namespace detail {
+
+template<typename Optional, typename T>
+constexpr auto & assign(Optional & target, T && source) noexcept(std::is_nothrow_constructible<typename Optional::value_type, T>::value and std::is_nothrow_assignable<typename Optional::value_type &, T>::value) {
+	if (target) {
+		*target = std::forward<T>(source);
+	} else {
+		target.emplace(std::forward<T>(source));
+	}
+	return target;
+}
+
+template<typename Target, typename Source>
+constexpr auto & assign_from_optional(Target & target, Source && source) noexcept(noexcept(assign(target, *std::forward<Source>(source)))) {
+	if (!source) {
+		target = none;
+	} else {
+		assign(target, *std::forward<Source>(source));
+	}
+	return target;
+}
+
+
+}	// namespace detail
+
 template<typename T>
 struct optional {
+private:
+	struct common_init_tag{};
+public:
 	using value_type = T;
 
 	constexpr optional() noexcept {}
@@ -271,16 +299,16 @@ struct optional {
 		return *this;
 	}
 	constexpr auto && operator=(optional const & other) & BOUNDED_NOEXCEPT(
-		assign_from_optional(other)
+		detail::assign_from_optional(*this, other)
 	)
 	constexpr auto && operator=(optional && other) & BOUNDED_NOEXCEPT(
-		assign_from_optional(std::move(other))
+		detail::assign_from_optional(*this, std::move(other))
 	)
 	// TODO: make this work when value_type is a reference
 	template<typename U, enable_if_t<std::is_convertible<U &&, value_type>::value> = clang_dummy>
-	constexpr auto && operator=(U && other) & noexcept(is_nothrow_optional_assignable<U &&>) {
-		return assign(std::forward<U>(other));
-	}
+	constexpr auto && operator=(U && other) & BOUNDED_NOEXCEPT(
+		detail::assign(*this, std::forward<U>(other))
+	)
 	
 	// TODO: handle std::initializer_list
 	template<typename... Args>
@@ -302,36 +330,12 @@ private:
 	template<typename Optional>
 	using optional_value_type = decltype(*std::declval<Optional>());
 	
-	struct common_init_tag{};
 	template<typename Optional>
 	constexpr optional(Optional && other, common_init_tag) noexcept(std::is_nothrow_constructible<value_type, optional_value_type<Optional>>::value):
 		optional(none) {
 		if (other) {
 			m_storage.emplace(*std::forward<Optional>(other));
 		}
-	}
-	
-	template<typename U>
-	static constexpr bool is_nothrow_optional_assignable = std::is_nothrow_constructible<value_type, U>::value and std::is_nothrow_assignable<value_type &, U>::value;
-	
-	template<typename Optional>
-	constexpr auto && assign_from_optional(Optional && other) & noexcept(is_nothrow_optional_assignable<optional_value_type<Optional>>) {
-		if (!other) {
-			*this = none;
-		} else {
-			assign(*std::forward<Optional>(other));
-		}
-		return *this;
-	}
-	template<typename U>
-	constexpr auto && assign(U && other) & noexcept(is_nothrow_optional_assignable<U &&>) {
-		auto & self = *this;
-		if (self) {
-			*self = std::forward<U>(other);
-		} else {
-			emplace(std::forward<U>(other));
-		}
-		return *this;
 	}
 	
 	optional_storage<value_type> m_storage;
