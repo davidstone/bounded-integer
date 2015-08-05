@@ -222,10 +222,7 @@ private:
 public:
 	using value_type = T;
 
-	constexpr optional() noexcept {}
-	constexpr optional(none_t) noexcept:
-		optional{} {
-	}
+	constexpr optional(none_t = none) noexcept {}
 
 	template<typename... Args, enable_if_t<std::is_constructible<value_type, Args && ...>::value> = clang_dummy>
 	constexpr explicit optional(in_place_t, Args && ... other) noexcept(std::is_nothrow_constructible<optional_storage<value_type>, in_place_t, Args && ...>::value):
