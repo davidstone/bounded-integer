@@ -183,13 +183,6 @@ public:
 	using base::base;
 };
 
-struct bad_optional_access : std::logic_error {
-private:
-	using base = std::logic_error;
-public:
-	using base::base;
-};
-
 namespace detail {
 
 template<typename Optional, typename T>
@@ -274,17 +267,6 @@ public:
 	}
 	constexpr auto operator->() {
 		return &operator*();
-	}
-	
-	// comma operator is used to avoid binding the reference to a temporary
-	constexpr auto && value() const & {
-		return *this ? **this : (throw std::logic_error("bad optional access"), **this);
-	}
-	constexpr auto && value() & {
-		return *this ? **this : (throw std::logic_error("bad optional access"), **this);
-	}
-	constexpr auto && value() && {
-		return *this ? *std::move(*this) : (throw std::logic_error("bad optional access"), *std::move(*this));
 	}
 	
 	constexpr explicit operator bool() const noexcept {

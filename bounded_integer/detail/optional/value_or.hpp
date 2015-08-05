@@ -18,11 +18,27 @@
 
 #include "../conditional.hpp"
 
+#include <stdexcept>
+
 namespace bounded {
 
-template<typename T, typename Default>
-constexpr decltype(auto) value_or(T && value, Default && other) {
-	return BOUNDED_CONDITIONAL(value, *std::forward<T>(value), std::forward<Default>(other));
+template<typename Optional, typename Default>
+constexpr decltype(auto) value_or(Optional && value, Default && other) {
+	return BOUNDED_CONDITIONAL(value, *std::forward<Optional>(value), std::forward<Default>(other));
 }
-	
+
+struct bad_optional_access : std::logic_error {
+	bad_optional_access():
+		std::logic_error("bad optional access") {
+	}
+};
+
+template<typename Optional>
+constexpr decltype(auto) value(Optional && value) {
+	if (!value) {
+		throw bad_optional_access{};
+	}
+	return *std::forward<Optional>(value);
+}
+
 }	// namespace bounded
