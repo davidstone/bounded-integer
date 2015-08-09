@@ -25,12 +25,14 @@
 #include "arithmetic/plus.hpp"
 #include "arithmetic/unary_minus.hpp"
 
+#include "policy/throw_policy.hpp"
+
 #include <iterator>
 
 namespace bounded {
 
 template<typename T>
-struct integer_range_type;
+struct range_type;
 
 namespace detail {
 namespace integer_range_iterator {
@@ -42,8 +44,7 @@ constexpr auto range_of_type() noexcept {
 
 template<typename T>
 struct iterator {
-	// We have to be able to index the one-past-the-end element. Not sure if
-	// this should have a throw_policy.
+	// We have to be able to index the one-past-the-end element.
 	using index_type = integer<0, range_of_type<T>()>;
 	using value_type = integer<
 		static_cast<intmax_t>(std::numeric_limits<T>::min()),
@@ -86,7 +87,7 @@ struct iterator {
 		return lhs.m_value < rhs.m_value;
 	}
 private:
-	friend struct integer_range_type<T>;
+	friend struct range_type<iterator>;
 	using underlying_type = T;
 	explicit constexpr iterator(underlying_type const value) noexcept:
 		m_value(value) {
@@ -155,10 +156,9 @@ constexpr auto operator<=(iterator<T> const & lhs, iterator<T> const & rhs) noex
 }	// namespace integer_range_iterator
 }	// namespace detail
 
-template<typename T>
-struct integer_range_type {
-	static_assert(std::numeric_limits<T>::is_specialized, "Must be a numeric type.");
-	using const_iterator = detail::integer_range_iterator::iterator<T>;
+template<typename Iterator>
+struct range_type {
+	using const_iterator = Iterator;
 	using const_reverse_iterator = std::reverse_iterator<const_iterator>;
 
 	using value_type = typename const_iterator::value_type;
@@ -169,7 +169,7 @@ struct integer_range_type {
 	// This accounts for the one-past-the-end sentinel value.
 	using underlying_type = typename const_iterator::underlying_type;
 
-	constexpr integer_range_type(underlying_type const & first, underlying_type const & last) noexcept:
+	constexpr range_type(underlying_type const & first, underlying_type const & last) noexcept:
 		m_begin(first),
 		m_end(last) {
 	}
@@ -227,6 +227,9 @@ private:
 	const_iterator m_begin;
 	const_iterator m_end;
 };
+
+template<typename T>
+using integer_range_type = range_type<detail::integer_range_iterator::iterator<T>>;
 
 // If end is less than begin, the behavior is undefined.
 template<typename Begin, typename End>
