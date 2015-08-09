@@ -164,7 +164,6 @@ struct range_type {
 	using value_type = typename const_iterator::value_type;
 	using index_type = typename const_iterator::index_type;
 	using difference_type = typename const_iterator::difference_type;
-	using const_pointer = typename const_iterator::pointer;
 	using size_type = integer<0, detail::integer_range_iterator::range_of_type<value_type>()>;
 	// This accounts for the one-past-the-end sentinel value.
 	using underlying_type = typename const_iterator::underlying_type;
