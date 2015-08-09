@@ -17,6 +17,7 @@
 #include "bounded_integer.hpp"
 #include "optional.hpp"
 #include <cassert>
+#include <unordered_map>
 #include <sstream>
 
 namespace {
@@ -1425,6 +1426,21 @@ auto check_volatile() {
 	assert(x.value() == 2);
 }
 
+auto check_hash() {
+	std::unordered_map<bounded::integer<0, 100>, bounded::integer<0, 100>> const map = {
+		{ 1_bi, 2_bi },
+		{ 2_bi, 3_bi },
+		{ 3_bi, 5_bi },
+		{ 4_bi, 7_bi },
+		{ 5_bi, 11_bi },
+		{ 1_bi, 0_bi }
+	};
+	
+	assert(map.size() == 5);
+	assert(map.at(1_bi) == 2_bi);
+	assert(map.at(3_bi) == 5_bi);
+}
+
 }	// namespace
 
 auto main() -> int {
@@ -1441,4 +1457,5 @@ auto main() -> int {
 	check_dynamic_policy();
 	check_iterator();
 	check_volatile();
+	check_hash();
 }

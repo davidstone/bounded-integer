@@ -23,6 +23,7 @@
 #include "detail/comparison.hpp"
 #include "detail/comparison_builtin.hpp"
 #include "detail/conditional.hpp"
+#include "detail/hash.hpp"
 #include "detail/iterator.hpp"
 #include "detail/literal.hpp"
 #include "detail/make.hpp"
