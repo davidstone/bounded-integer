@@ -53,8 +53,12 @@ struct iterator {
 	using difference_type = integer<-range_of_type<index_type>(), range_of_type<index_type>()>;
 	using pointer = index_type const *;
 	using iterator_category = std::random_access_iterator_tag;
+	using underlying_type = T;
 
 	iterator() = default;
+	explicit constexpr iterator(underlying_type const value) noexcept:
+		m_value(value) {
+	}
 	
 	// It is undefined behavior to dereference a past-the-end iterator.
 	//
@@ -87,11 +91,6 @@ struct iterator {
 		return lhs.m_value < rhs.m_value;
 	}
 private:
-	friend struct range_type<iterator>;
-	using underlying_type = T;
-	explicit constexpr iterator(underlying_type const value) noexcept:
-		m_value(value) {
-	}
 	underlying_type m_value;
 };
 
@@ -165,12 +164,11 @@ struct range_type {
 	using index_type = typename const_iterator::index_type;
 	using difference_type = typename const_iterator::difference_type;
 	using size_type = integer<0, detail::integer_range_iterator::range_of_type<value_type>()>;
-	// This accounts for the one-past-the-end sentinel value.
-	using underlying_type = typename const_iterator::underlying_type;
 
-	constexpr range_type(underlying_type const & first, underlying_type const & last) noexcept:
-		m_begin(first),
-		m_end(last) {
+	template<typename First, typename Last>
+	constexpr range_type(First && first, Last && last) noexcept:
+		m_begin(std::forward<First>(first)),
+		m_end(std::forward<Last>(last)) {
 	}
 
 	constexpr auto begin() const noexcept {
@@ -235,7 +233,7 @@ template<typename Begin, typename End>
 constexpr auto integer_range(Begin && begin, End && end) noexcept {
 	using integer_type = integer<
 		static_cast<intmax_t>(std::numeric_limits<std::decay_t<Begin>>::min()),
-		static_cast<intmax_t>(std::numeric_limits< std::decay_t<End>>::max())
+		static_cast<intmax_t>(std::numeric_limits<std::decay_t<End>>::max())
 	>;
 	return integer_range_type<integer_type>(std::forward<Begin>(begin), std::forward<End>(end));
 }

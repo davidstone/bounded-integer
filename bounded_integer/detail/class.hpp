@@ -68,7 +68,7 @@ constexpr decltype(auto) as_integer(T && t) noexcept {
 template<typename T, enable_if_t<std::is_enum<std::decay_t<T>>::value> = clang_dummy>
 constexpr decltype(auto) as_integer(T && t) noexcept {
 	using limits = basic_numeric_limits<T>;
-	return integer<limits::min(), limits::max(), null_policy, storage_type::fast>(static_cast<std::underlying_type_t<std::decay_t<T>>>(t));
+	return integer<static_cast<std::intmax_t>(limits::min()), static_cast<std::intmax_t>(limits::max()), null_policy, storage_type::fast>(static_cast<std::underlying_type_t<std::decay_t<T>>>(t));
 }
 
 }	// namespace detail

@@ -47,8 +47,8 @@ template<
 	storage_type storage = storage_type::fast
 >
 using equivalent_type = integer<
-	basic_numeric_limits<T>::min(),
-	basic_numeric_limits<T>::max(),
+	static_cast<std::intmax_t>(basic_numeric_limits<T>::min()),
+	static_cast<std::intmax_t>(basic_numeric_limits<T>::max()),
 	overflow_policy,
 	storage
 >;
