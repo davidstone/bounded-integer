@@ -1,5 +1,5 @@
 # List of sources
-# Copyright (C) 2014 David Stone
+# Copyright (C) 2015 David Stone
 #
 # This program is free software: you can redistribute it and / or modify
 # it under the terms of the GNU Affero General Public License as
@@ -16,28 +16,28 @@
 
 from program import prepend_dir, Program
 
-source_directory = 'containers'
+source_directory = 'source'
 
-include_directories = ['../value_ptr']
+include_directories = ['../value_ptr', '../include']
 
-flat_map_sources = ['flat_map.cpp', 'unique_inplace_merge.cpp']
+flat_map_sources = ['flat_map/flat_map.cpp', 'algorithms/unique_inplace_merge.cpp']
 
 programs = [
 	Program(
 		'forward_list',
-		sources = ['forward_list.cpp'],
+		sources = ['forward_list/forward_list.cpp'],
 		defines = ['USE_SYSTEM_FORWARD_LIST=false'],
 		include_directories = include_directories
 	),
 	Program(
 		'forward_list_std',
-		sources = ['forward_list.cpp'],
+		sources = ['forward_list/forward_list.cpp'],
 		defines = ['USE_SYSTEM_FORWARD_LIST=true'],
 		include_directories = include_directories
 	),
 	Program(
 		'moving_vector',
-		sources = ['moving_vector.cpp'],
+		sources = ['moving_vector/moving_vector.cpp'],
 		include_directories = include_directories
 	),
 	Program(

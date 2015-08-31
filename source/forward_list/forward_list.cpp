@@ -1,5 +1,5 @@
 // A smart pointer with value semantics
-// Copyright (C) 2014 David Stone
+// Copyright (C) 2015 David Stone
 //
 // This program is free software: you can redistribute it and / or modify
 // it under the terms of the GNU Affero General Public License as
@@ -14,7 +14,8 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with this program. If not, see <http://www.gnu.org/licenses/>.
 
-#include "forward_list.hpp"
+#include <containers/forward_list/forward_list.hpp>
+
 #include <algorithm>
 #include <cassert>
 #include <chrono>

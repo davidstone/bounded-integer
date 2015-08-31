@@ -18,10 +18,10 @@
 
 #include <algorithm>
 #include <functional>
-#include <memory>
+#include <iterator>
+#include <type_traits>
 #include <vector>
-#include <iostream>
-#include <cassert>
+
 namespace containers {
 namespace detail {
 

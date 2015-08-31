@@ -1,5 +1,5 @@
 // Tests the performance of sequence containers
-// Copyright (C) 2014 David Stone
+// Copyright (C) 2015 David Stone
 //
 // This program is free software: you can redistribute it and / or modify
 // it under the terms of the GNU Affero General Public License as
@@ -14,6 +14,10 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with this program. If not, see <http://www.gnu.org/licenses/>.
 
+#include <containers/moving_vector/moving_vector.hpp>
+
+#include <boost/timer.hpp>
+
 #include <algorithm>
 #include <array>
 #include <cstdint>
@@ -23,10 +27,6 @@
 #include <list>
 #include <random>
 #include <vector>
-
-#include <boost/timer.hpp>
-
-#include "moving_vector.hpp"
 
 namespace {
 using value_type = uint8_t;

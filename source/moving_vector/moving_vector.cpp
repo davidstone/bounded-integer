@@ -14,7 +14,7 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with this program. If not, see <http://www.gnu.org/licenses/>.
 
-#include "moving_vector.hpp"
+#include <containers/moving_vector/moving_vector.hpp>
 #include <algorithm>
 #include <cassert>
 #include <numeric>

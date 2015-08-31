@@ -1,5 +1,5 @@
 // An implementation of forward_list based on value_ptr
-// Copyright (C) 2014 David Stone
+// Copyright (C) 2015 David Stone
 //
 // This program is free software: you can redistribute it and / or modify
 // it under the terms of the GNU Affero General Public License as
@@ -16,12 +16,13 @@
 
 #pragma once
 
+#include <value_ptr/value_ptr.hpp>
+
 #include <algorithm>
 #include <cassert>
 #include <iterator>
 #include <functional>
 #include <vector>
-#include <value_ptr/value_ptr.hpp>
 
 namespace containers {
 namespace detail {

@@ -1,5 +1,5 @@
 // A map-like class that has better locality of reference
-// Copyright (C) 2014 David Stone
+// Copyright (C) 2015 David Stone
 //
 // This program is free software: you can redistribute it and / or modify
 // it under the terms of the GNU Affero General Public License as
@@ -16,14 +16,16 @@
 
 #pragma once
 
+#include <containers/apply_tuple.hpp>
+#include <containers/algorithms/unique_inplace_merge.hpp>
+#include <containers/moving_vector/moving_vector.hpp>
+
+#include <value_ptr/enable_if.hpp>
+
 #include <algorithm>
 #include <stdexcept>
 #include <tuple>
 #include <vector>
-#include <value_ptr/enable_if.hpp>
-#include "apply_tuple.hpp"
-#include "moving_vector.hpp"
-#include "unique_inplace_merge.hpp"
 
 namespace containers {
 namespace detail_flat_map {
