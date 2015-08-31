@@ -81,7 +81,6 @@ sources += prepend_dir('detail/policy', [
 	'basic_policy.cpp',
 	'clamp_policy.cpp',
 	'common_policy.cpp',
-	'dynamic_policy.cpp',
 	'is_overflow_policy.cpp',
 	'modulo_policy.cpp',
 	'null_policy.cpp',

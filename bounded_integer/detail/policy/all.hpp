@@ -1,5 +1,5 @@
 // Policies that determine what to do on overflow
-// Copyright (C) 2014 David Stone
+// Copyright (C) 2015 David Stone
 //
 // This program is free software: you can redistribute it and / or modify
 // it under the terms of the GNU Affero General Public License as
@@ -20,7 +20,6 @@
 // http://www.open-std.org/jtc1/sc22/wg21/docs/cwg_active.html#253
 
 #include "clamp_policy.hpp"
-#include "dynamic_policy.hpp"
 #include "modulo_policy.hpp"
 #include "null_policy.hpp"
 #include "throw_policy.hpp"

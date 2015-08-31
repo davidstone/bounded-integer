@@ -1326,60 +1326,6 @@ auto check_streaming() {
 	streaming_test<bounded::equivalent_type<int>>(large_initial, large_final);
 }
 
-auto check_dynamic_policy() {
-	constexpr bounded::dynamic_policy<0, 10, bounded::clamp_policy> clamp;
-	static_assert(clamp.assignment(3_bi, 2_bi, 5_bi) == 3_bi, "Incorrect dynamic policy result when the static range is entirely within range.");
-	static_assert(clamp.assignment(11_bi, 0_bi, 20_bi) == 10_bi, "Incorrect dynamic clamp policy result when the dynamic range is the limiting factor.");
-
-	constexpr auto value = 3_bi;
-	constexpr auto min = 1_bi;
-	constexpr auto max = 7_bi;
-	constexpr auto static_min = 0;
-	constexpr auto static_max = 10;
-	using policy_type = bounded::dynamic_policy<static_min, static_max, bounded::throw_policy>;
-	using type = bounded::integer<static_min, static_max, policy_type>;
-	
-	constexpr policy_type policy(min, max);
-	static_assert(policy.min() == min, "Incorrect dynamic min on the policy with dynamic bounds.");
-	static_assert(policy.max() == max, "Incorrect dynamic max on the policy with dynamic bounds.");
-
-	constexpr type integer(value, policy);
-	static_assert(integer == value, "Incorrect value with dynamic bounds.");
-	static_assert(integer.overflow_policy().min() == min, "Incorrect dynamic min on the integer with dynamic bounds.");
-	static_assert(integer.overflow_policy().max() == max, "Incorrect dynamic max on the integer with dynamic bounds.");
-
-	try {
-		policy.assignment(min - 1_bi, static_min, static_max);
-		assert(false);
-	}
-	catch (std::range_error const &) {
-	}
-	try {
-		policy.assignment(max + 1_bi, static_min, static_max);
-		assert(false);
-	}
-	catch (std::range_error const &) {
-	}
-
-	type run(value, policy);
-	try {
-		static_assert(!std::is_nothrow_constructible<type, decltype(min - 1_bi)>::value, "Should not be noexcept.");
-		run = min - 1_bi;
-		assert(false);
-	}
-	catch (std::range_error const &) {
-	}
-	assert(run == value);
-	try {
-		static_assert(!std::is_nothrow_constructible<type, decltype(max + 1_bi)>::value, "Should not be noexcept.");
-		run = max + 1_bi;
-		assert(false);
-	}
-	catch (std::range_error const &) {
-	}
-	assert(run == value);
-}
-
 auto check_iterator() {
 	constexpr bounded::array<char, 1> a = { {} };
 	assert(bounded::next(a.begin()) == a.end());
@@ -1454,7 +1400,6 @@ auto main() -> int {
 	check_optional();
 	check_to_string();
 	check_streaming();
-	check_dynamic_policy();
 	check_iterator();
 	check_volatile();
 	check_hash();
