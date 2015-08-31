@@ -16,16 +16,16 @@
 
 #pragma once
 
-#include <iterator>
-#include <type_traits>
-#include <vector>
+#include <containers/moving_vector/forward_declaration.hpp>
+
 #include <value_ptr/enable_if.hpp>
 #include <value_ptr/value_ptr.hpp>
 
-namespace containers {
+#include <iterator>
+#include <type_traits>
+#include <vector>
 
-template<typename T, typename Allocator = std::allocator<T>>
-class moving_vector;
+namespace containers {
 
 namespace detail {
 namespace moving_vector {

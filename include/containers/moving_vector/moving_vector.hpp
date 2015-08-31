@@ -16,6 +16,7 @@
 
 #pragma once
 
+#include <containers/moving_vector/forward_declaration.hpp>
 #include <containers/moving_vector/iterator.hpp>
 
 #include <value_ptr/enable_if.hpp>
