@@ -273,10 +273,6 @@ public:
 		m_container.resize(count, smart_pointer::make_value<value_type>(std::move(value)));
 	}
 	
-	void swap(moving_vector & other) noexcept {
-		m_container.swap(other.m_container);
-	}
-
 	friend bool operator==(moving_vector const & lhs, moving_vector const & rhs) noexcept {
 		return lhs.size() == rhs.size() and std::equal(lhs.begin(), lhs.end(), rhs.begin());
 	}
@@ -318,11 +314,6 @@ typename moving_vector<T, Allocator>::indirect_iterator moving_end(moving_vector
 template<typename T, typename Allocator>
 typename moving_vector<T, Allocator>::indirect_iterator moving_end(moving_vector<T, Allocator> && container) {
 	return std::move(container).indirect_end();
-}
-
-template<typename T, typename Allocator>
-void swap(moving_vector<T, Allocator> & lhs, moving_vector<T, Allocator> & rhs) noexcept {
-	lhs.swap(rhs);
 }
 
 template<typename T, typename Allocator>

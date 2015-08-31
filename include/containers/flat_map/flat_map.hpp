@@ -321,10 +321,6 @@ public:
 		return container().erase(first, last);
 	}
 	
-	void swap(flat_map_base & other) noexcept {
-		container().swap(other.container());
-	}
-
 	friend bool operator==(flat_map_base const & lhs, flat_map_base const & rhs) noexcept {
 		return lhs.container() == rhs.container();
 	}
@@ -563,11 +559,6 @@ public:
 };
 
 }	// namespace detail_flat_map
-
-template<typename Key, typename T, typename Compare, template<typename, typename> class Container, typename Allocator, bool allow_duplicates>
-void swap(detail_flat_map::flat_map_base<Key, T, Compare, Container, Allocator, allow_duplicates> & lhs, detail_flat_map::flat_map_base<Key, T, Compare, Container, Allocator, allow_duplicates> & rhs) noexcept {
-	lhs.swap(rhs);
-}
 
 template<typename Key, typename T, typename Compare, template<typename, typename> class Container, typename Allocator, bool allow_duplicates>
 bool operator!=(detail_flat_map::flat_map_base<Key, T, Compare, Container, Allocator, allow_duplicates> const & lhs, detail_flat_map::flat_map_base<Key, T, Compare, Container, Allocator, allow_duplicates> const & rhs) noexcept {

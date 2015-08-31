@@ -367,11 +367,6 @@ public:
 		resize_helper(count, value);
 	}
 	
-	void swap(forward_list & other) noexcept {
-		using std::swap;
-		swap(m_before_first, other.m_before_first);
-	}
-	
 	template<typename Compare>
 	void merge(forward_list & other, Compare compare = std::less<value_type>()) {
 		auto mine = before_begin();
@@ -403,8 +398,7 @@ public:
 		auto it = static_cast<iterator>(position);
 		auto other_last = other.before_end();
 		auto next = it.next_ptr().release();
-		using std::swap;
-		swap(it.next_ptr(), other.before_begin().next_ptr());
+		std::swap(it.next_ptr(), other.before_begin().next_ptr());
 		other_last.next_ptr().reset(next);
 	}
 	void splice_after(const_iterator position, forward_list && other) {
@@ -455,7 +449,7 @@ public:
 		while (before_begin().next_ptr() != nullptr) {
 			temp.insert_pointer_after(temp.before_begin(), unlink_node_after(before_begin()));
 		}
-		swap(temp);
+		*this = std::move(temp);
 	}
 	
 	template<typename BinaryPredicate>
@@ -526,8 +520,7 @@ private:
 	}
 	static ptr_type unlink_node_after(iterator it) {
 		auto pointer = it.next_ptr().release();
-		using std::swap;
-		swap(it.next_ptr(), pointer->next);
+		std::swap(it.next_ptr(), pointer->next);
 		return ptr_type(pointer);
 	}
 	template<typename... Args>
@@ -573,11 +566,6 @@ bool operator>=(forward_list<T, Allocator> const & lhs, forward_list<T, Allocato
 template<typename T, typename Allocator>
 bool operator<=(forward_list<T, Allocator> const & lhs, forward_list<T, Allocator> const & rhs) {
 	return !(lhs > rhs);
-}
-
-template<typename T, typename Allocator>
-void swap(forward_list<T, Allocator> & lhs, forward_list<T, Allocator> & rhs) noexcept {
-	lhs.swap(rhs);
 }
 
 }	// namespace containers
