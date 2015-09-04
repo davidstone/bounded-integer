@@ -23,8 +23,8 @@
 
 namespace bounded {
 
-template<intmax_t minimum, intmax_t maximum>
-using checked_integer = integer<minimum, maximum, throw_policy>;
+template<intmax_t minimum, intmax_t maximum, typename Exception = policy_detail::default_exception>
+using checked_integer = integer<minimum, maximum, throw_policy<Exception>>;
 
 template<intmax_t minimum, intmax_t maximum>
 using clamped_integer = integer<minimum, maximum, clamp_policy>;

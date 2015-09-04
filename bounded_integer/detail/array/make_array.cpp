@@ -82,7 +82,7 @@ static_assert(four_dimensions[0_bi].size() == second, "Second dimension wrong.")
 static_assert(four_dimensions[0_bi][0_bi].size() == third, "Third dimension wrong.");
 static_assert(four_dimensions[0_bi][0_bi][0_bi].size() == fourth, "Fourth dimension wrong.");
 
-using explicit_type = bounded::integer<0, 1, bounded::throw_policy>;
+using explicit_type = bounded::integer<0, 1, bounded::throw_policy<>>;
 constexpr auto typed_array = bounded::make_array<explicit_type>(0_bi);
 static_assert(typed_array.size() == 1_bi, "Incorrect size with explicit type.");
 static_assert(std::is_same<decltype(typed_array)::value_type, explicit_type>::value, "Incorrect type with explicit type.");

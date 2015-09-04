@@ -1,5 +1,5 @@
 // bounded::integer tests
-// Copyright (C) 2014 David Stone
+// Copyright (C) 2015 David Stone
 //
 // This program is free software: you can redistribute it and / or modify
 // it under the terms of the GNU Affero General Public License as
@@ -30,7 +30,7 @@ namespace check_is_overflow_policy {
 		"null_policy not recognized as an overflow policy."
 	);
 	static_assert(
-		bounded::is_overflow_policy<bounded::throw_policy>::value,
+		bounded::is_overflow_policy<bounded::throw_policy<>>::value,
 		"throw_policy not recognized as an overflow policy."
 	);
 	static_assert(
@@ -50,7 +50,7 @@ namespace check_is_overflow_policy {
 
 namespace check_common_policy {
 	using bounded::null_policy;
-	using bounded::throw_policy;
+	using throw_policy = bounded::throw_policy<>;
 
 	static_assert(
 		std::is_same<bounded::common_policy_t<null_policy, null_policy>, null_policy>::value,
@@ -414,8 +414,8 @@ namespace check_make {
 	);
 	static_assert(
 		std::is_same<
-			bounded::detail::equivalent_overflow_policy<bounded::integer<0, 0, bounded::throw_policy>>,
-			bounded::throw_policy
+			bounded::detail::equivalent_overflow_policy<bounded::integer<0, 0, bounded::throw_policy<>>>,
+			bounded::throw_policy<>
 		>::value,
 		"incorrect equivalent_overflow_policy for bounded::integer."
 	);
@@ -431,7 +431,7 @@ namespace check_comparison {
 		a == 5,
 		"Values do not equal their underlying value"
 	);
-	constexpr bounded::integer<4, 36346, bounded::throw_policy> b(5);
+	constexpr bounded::integer<4, 36346, bounded::throw_policy<>> b(5);
 	static_assert(
 		a == b,
 		"Values do not equal equivalent other bounded::integer types"
@@ -645,13 +645,13 @@ auto check_minmax() {
 
 
 namespace check_arithmetic {
-	constexpr bounded::integer<1, 10, bounded::throw_policy> const x(9);
+	constexpr bounded::integer<1, 10, bounded::throw_policy<>> const x(9);
 	static_assert(
 		sizeof(x) == 1,
 		"bounded::integer too big!"
 	);
-	constexpr bounded::integer<-3, 11, bounded::throw_policy> const y(x);
-	constexpr bounded::integer<-3, 11, bounded::throw_policy> const z(4);
+	constexpr bounded::integer<-3, 11, bounded::throw_policy<>> const y(x);
+	constexpr bounded::integer<-3, 11, bounded::throw_policy<>> const z(4);
 	static_assert(
 		std::numeric_limits<decltype(z)>::is_signed,
 		"bounded::integer with negative value in range should be signed."
@@ -756,8 +756,8 @@ namespace check_arithmetic {
 		"Unary plus not a no-op."
 	);
 
-	constexpr bounded::integer<0, 2, bounded::throw_policy> left_shift_lhs(1);
-	constexpr bounded::integer<0, 60, bounded::throw_policy> left_shift_rhs(3);
+	constexpr bounded::integer<0, 2, bounded::throw_policy<>> left_shift_lhs(1);
+	constexpr bounded::integer<0, 60, bounded::throw_policy<>> left_shift_rhs(3);
 	constexpr auto left_shift_result = left_shift_lhs << left_shift_rhs;
 	static_assert(
 		std::numeric_limits<decltype(left_shift_result)>::min() == 0,
@@ -821,10 +821,10 @@ namespace check_arithmetic {
 	);
 
 
-	constexpr bounded::integer<17, 23, bounded::throw_policy> positive_range(20);
-	constexpr bounded::integer<-54, -6, bounded::throw_policy> negative_range(-33);
+	constexpr bounded::integer<17, 23, bounded::throw_policy<>> positive_range(20);
+	constexpr bounded::integer<-54, -6, bounded::throw_policy<>> negative_range(-33);
 	constexpr auto positive_negative_result = positive_range % negative_range;
-	constexpr bounded::integer<0, 23, bounded::throw_policy> positive_negative(20 % -33);
+	constexpr bounded::integer<0, 23, bounded::throw_policy<>> positive_negative(20 % -33);
 	static_assert(
 		positive_negative_result == positive_negative,
 		"Incorrect modulo with mixed signs"
@@ -835,7 +835,7 @@ namespace check_arithmetic {
 	);
 
 	constexpr auto negative_positive_result = negative_range % positive_range;
-	constexpr bounded::integer<-22, 0, bounded::throw_policy> negative_positive(-33 % 20);
+	constexpr bounded::integer<-22, 0, bounded::throw_policy<>> negative_positive(-33 % 20);
 	static_assert(
 		negative_positive_result == negative_positive,
 		"Incorrect modulo with mixed signs"
@@ -846,7 +846,7 @@ namespace check_arithmetic {
 	);
 	
 	constexpr auto negative_zero_result = negative_positive % positive_negative;
-	constexpr bounded::integer<-22, 0, bounded::throw_policy> negative_zero(-13);
+	constexpr bounded::integer<-22, 0, bounded::throw_policy<>> negative_zero(-13);
 	static_assert(
 		negative_zero_result == negative_zero,
 		"Incorrect modulo with mixed signs"
@@ -978,7 +978,7 @@ auto check_throw_policy() {
 	);
 	static constexpr auto minimum = 0_bi;
 	static constexpr auto maximum = 10_bi;
-	bounded::throw_policy policy;
+	bounded::throw_policy<> policy;
 	try {
 		policy.assignment(20, minimum, maximum);
 		assert(false);

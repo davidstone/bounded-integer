@@ -25,6 +25,9 @@
 namespace bounded {
 namespace policy_detail {
 
+using default_exception = std::range_error;
+
+template<typename Exception>
 struct throw_policy {
 	// The optimizer should be able to simplify this to remove dead checks.
 	template<typename T, typename Minimum, typename Maximum>
@@ -33,7 +36,7 @@ struct throw_policy {
 		static_assert(is_bounded_integer<std::decay_t<Maximum>>::value, "Only bounded::integer types are supported.");
 		return (minimum <= value and value <= maximum) ?
 			std::forward<T>(value) :
-			(throw std::range_error("Got a value of " + to_string(value) + " but expected a value in the range [" + to_string(minimum) + ", " + to_string(maximum) + "]"), std::forward<T>(value));
+			(throw Exception("Got a value of " + to_string(value) + " but expected a value in the range [" + to_string(minimum) + ", " + to_string(maximum) + "]"), std::forward<T>(value));
 	}
 	
 	static constexpr bool is_modulo = false;
@@ -42,5 +45,6 @@ struct throw_policy {
 
 }	// namespace policy_detail
 
-using throw_policy = basic_policy<policy_detail::throw_policy>;
+template<typename Exception = policy_detail::default_exception>
+using throw_policy = basic_policy<policy_detail::throw_policy<Exception>>;
 }	// namespace bounded
