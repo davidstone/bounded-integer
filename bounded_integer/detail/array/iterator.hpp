@@ -36,7 +36,7 @@ template<typename T, intmax_t size>
 struct basic_iterator {
 	using value_type = T;
 	using difference_type = integer<-size, size>;
-	using index_type = integer<0, size - 1, throw_policy<>>;
+	using index_type = integer<0, size - 1, throw_policy<std::out_of_range>>;
 	using pointer = value_type *;
 	using reference = value_type &;
 	using iterator_category = std::random_access_iterator_tag;
