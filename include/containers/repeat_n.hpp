@@ -32,7 +32,10 @@ struct repeat_n_sentinel {};
 template<typename Size, typename T>
 struct repeat_n_iterator {
 	using iterator_category = std::random_access_iterator_tag;
-	using value_type = std::remove_reference_t<T>;
+	using value_type = std::remove_reference_t<T> const;
+	using difference_type = decltype(std::declval<Size>() - std::declval<Size>());
+	using pointer = value_type *;
+	using reference = value_type &;
 	
 	constexpr auto const & operator*() const {
 		return m_value.get();
@@ -64,14 +67,14 @@ struct repeat_n_iterator {
 
 private:
 	friend struct repeat_n_t<Size, T>;
-	constexpr repeat_n_iterator(Size const remaining, value_type const & value):
+	constexpr repeat_n_iterator(Size const remaining, value_type & value):
 		m_remaining(remaining),
 		m_value(value)
 	{
 	}
 
 	Size m_remaining;
-	std::reference_wrapper<value_type const> m_value;
+	std::reference_wrapper<value_type> m_value;
 };
 
 template<typename Size, typename T>
