@@ -27,27 +27,27 @@ void test_generic(T const & t, std::initializer_list<T> init) {
 	constexpr auto capacity = bounded::constant<capacity_>;
 	using container = containers::static_vector<T, capacity_>;
 	auto const default_constructed = container{};
-	assert(default_constructed.empty());
+	assert(empty(default_constructed));
 	static_assert(default_constructed.capacity() == capacity);
 	
 	auto const count = container(capacity);
-	assert(count.size() == capacity);
+	assert(size(count) == capacity);
 	
 	for (auto const & value : count) {
 		assert(value == T{});
 	}
 	
 	auto const count_arg = container(capacity, t);
-	assert(count.size() == capacity);
+	assert(size(count) == capacity);
 	for (auto const & value : count_arg) {
 		assert(value == t);
 	}
-	assert(count_arg.front() == t);
-	assert(count_arg.back() == t);
+	assert(front(count_arg) == t);
+	assert(back(count_arg) == t);
 	assert(count_arg[0_bi] == t);
-	assert(count_arg.at(0_bi) == t);
+	assert(at(count_arg, 0_bi) == t);
 	try {
-		count_arg.at(static_cast<unsigned>(capacity + 1_bi));
+		at(count_arg, static_cast<unsigned>(capacity + 1_bi));
 		assert(false);
 	} catch (std::out_of_range const &) {
 	}
@@ -59,16 +59,16 @@ void test_generic(T const & t, std::initializer_list<T> init) {
 	assert(std::equal(copy.begin(), copy.end(), init.begin(), init.end()));
 	
 	auto move = std::move(copy);
-	copy.clear();
+	clear(copy);
 	assert(move == init_list);
 	
 	copy = move;
-	assert(copy.size() == init.size());
+	assert(size(copy) == init.size());
 	assert(copy == move);
 	
 	move = std::move(copy);
-	copy.clear();
-	assert(copy.empty());
+	clear(copy);
+	assert(empty(copy));
 	
 	assert(copy == default_constructed);
 	
@@ -77,33 +77,33 @@ void test_generic(T const & t, std::initializer_list<T> init) {
 
 	assert(copy.data() != init_list.data());
 	
-	copy.clear();
-	copy.push_back(t);
-	assert(copy.size() == 1_bi);
-	assert(copy.back() == t);
+	clear(copy);
+	push_back(copy, t);
+	assert(size(copy) == 1_bi);
+	assert(back(copy) == t);
 	copy.pop_back();
-	copy.push_back(T(t));
-	assert(copy.size() == 1_bi);
-	assert(copy.back() == t);
-	copy.clear();
-	copy.insert(copy.begin(), t);
-	assert(copy.size() == 1_bi);
-	assert(copy.back() == t);
+	push_back(copy, T(t));
+	assert(size(copy) == 1_bi);
+	assert(back(copy) == t);
+	clear(copy);
+	insert(copy, copy.begin(), t);
+	assert(size(copy) == 1_bi);
+	assert(back(copy) == t);
 	
-	copy.assign(init);
-	copy.assign(capacity, t);
+	assign(copy, init);
+	assign(copy, capacity, t);
 	
 	// TODO: insert(it, it, it) overload
-	auto const old_front = copy.front();
-	copy.resize(capacity);
-	assert(copy.front() == old_front);
-	copy.clear();
-	copy.resize(capacity);
-	assert(copy.front() == T{});
-	assert(copy.size() == capacity);
-	copy.resize(0_bi);
-	assert(copy.empty());
-	copy.resize(capacity, t);
+	auto const old_front = front(copy);
+	resize(copy, capacity);
+	assert(front(copy) == old_front);
+	clear(copy);
+	resize(copy, capacity);
+	assert(front(copy) == T{});
+	assert(size(copy) == capacity);
+	resize(copy, 0_bi);
+	assert(empty(copy));
+	resize(copy, capacity, t);
 	assert(copy == count_arg);
 }
 
