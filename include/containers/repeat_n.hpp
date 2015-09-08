@@ -143,25 +143,8 @@ struct repeat_n_t {
 		return repeat_n_sentinel{};
 	}
 
-	constexpr auto && front() const {
-		return *begin();
-	}
-	constexpr auto && back() const {
-		return *bounded::prev(end());
-	}
 	constexpr auto && operator[](index_type const & index) const {
 		return *(begin() + index);
-	}
-	template<typename Index>
-	constexpr auto && at(Index const & index) const {
-		return operator[](static_cast<index_type>(index));
-	}
-
-	constexpr auto size() const {
-		return size_type(end() - begin());
-	}
-	constexpr auto empty() const {
-		return begin() == end();
 	}
 
 private:
