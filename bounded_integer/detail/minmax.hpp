@@ -1,5 +1,5 @@
 // Compile-time min and max of an arbitrary number of values
-// Copyright (C) 2014 David Stone
+// Copyright (C) 2015 David Stone
 //
 // This program is free software: you can redistribute it and / or modify
 // it under the terms of the GNU Affero General Public License as
@@ -19,11 +19,12 @@
 #include "common_type.hpp"
 #include "common_type_and_value_category.hpp"
 #include "comparison.hpp"
-#include "enable_if.hpp"
 #include "is_bounded_integer.hpp"
 #include "numeric_limits.hpp"
 #include "overlapping_range.hpp"
+#include "requires.hpp"
 #include "policy/common_policy.hpp"
+
 #include <utility>
 
 namespace bounded {
@@ -47,12 +48,12 @@ struct greater {
 	}
 };
 
-template<typename Target, typename Source, enable_if_t<is_bounded_integer<Target>::value> = clang_dummy>
+template<typename Target, typename Source, BOUNDED_REQUIRES(is_bounded_integer<Target>::value)>
 constexpr Target construct(Source && source) noexcept {
 	static_assert(not std::is_reference<Target>::value, "Function should not be selected with a reference type.");
 	return Target(std::forward<Source>(source), non_check);
 }
-template<typename Target, typename Source, enable_if_t<!is_bounded_integer<Target>::value> = clang_dummy>
+template<typename Target, typename Source, BOUNDED_REQUIRES(!is_bounded_integer<Target>::value)>
 constexpr Target construct(Source && source) noexcept(noexcept(static_cast<Target>(source))) {
 	return static_cast<Target>(source);
 }
@@ -113,26 +114,26 @@ constexpr decltype(auto) extreme(Compare, T && t) noexcept {
 // actual comparison and just return the other value. The general code would not
 // compile without this, because you cannot cast to a bounded::integer type that
 // has no overlap.
-template<typename Compare, typename T1, typename T2, enable_if_t<
+template<typename Compare, typename T1, typename T2, BOUNDED_REQUIRES(
 	basic_numeric_limits<std::decay_t<T1>>::is_specialized and basic_numeric_limits<std::decay_t<T2>>::is_specialized and
 	not detail::types_overlap<extreme_t<Compare, T1, T2>, T2>::value
-> = clang_dummy>
+)>
 constexpr decltype(auto) extreme(Compare, T1 && t1, T2 &&) noexcept {
 	return detail::minmax::construct<T1>(std::forward<T1>(t1));
 }
-template<typename Compare, typename T1, typename T2, enable_if_t<
+template<typename Compare, typename T1, typename T2, BOUNDED_REQUIRES(
 	basic_numeric_limits<std::decay_t<T1>>::is_specialized and basic_numeric_limits<std::decay_t<T2>>::is_specialized and
 	not detail::types_overlap<extreme_t<Compare, T1, T2>, T1>::value
-> = clang_dummy>
+)>
 constexpr decltype(auto) extreme(Compare, T1 &&, T2 && t2) noexcept {
 	return detail::minmax::construct<T2>(std::forward<T2>(t2));
 }
 
-template<typename Compare, typename T1, typename T2, enable_if_t<
+template<typename Compare, typename T1, typename T2, BOUNDED_REQUIRES(
 	(not basic_numeric_limits<std::decay_t<T1>>::is_specialized or not basic_numeric_limits<std::decay_t<T2>>::is_specialized) or
 	(detail::types_overlap<extreme_t<Compare, T1, T2>, T1>::value and
 	detail::types_overlap<extreme_t<Compare, T1, T2>, T2>::value)
-> = clang_dummy>
+)>
 constexpr decltype(auto) extreme(Compare compare, T1 && t1, T2 && t2) noexcept(noexcept(compare(std::forward<T1>(t1), std::forward<T2>(t2)))) {
 	using result_type = detail::add_common_cv_reference_t<extreme_t<Compare, T1, T2>, T1, T2>;
 	return compare(t2, t1) ?

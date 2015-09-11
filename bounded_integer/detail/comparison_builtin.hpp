@@ -1,5 +1,5 @@
 // ==    !=    <    <=    >    >= with built-in types as one side
-// Copyright (C) 2014 David Stone
+// Copyright (C) 2015 David Stone
 //
 // This program is free software: you can redistribute it and / or modify
 // it under the terms of the GNU Affero General Public License as
@@ -19,10 +19,10 @@
 #include "comparison.hpp"
 
 #include "common_type.hpp"
-#include "enable_if.hpp"
 #include "forward_declaration.hpp"
 #include "make.hpp"
 #include "numeric_limits.hpp"
+#include "requires.hpp"
 
 #include <cstdint>
 #include <type_traits>
@@ -34,7 +34,7 @@ namespace bounded {
 template<
 	intmax_t minimum, intmax_t maximum, typename overflow_policy, storage_type storage,
 	typename T,
-	enable_if_t<basic_numeric_limits<T>::is_integer> = clang_dummy
+	BOUNDED_REQUIRES(basic_numeric_limits<T>::is_integer)
 >
 constexpr auto operator==(integer<minimum, maximum, overflow_policy, storage> const lhs, T const rhs) noexcept {
 	return lhs == make(rhs);
@@ -48,7 +48,7 @@ constexpr auto operator==(integer<minimum, maximum, overflow_policy, storage> co
 template<
 	intmax_t minimum, intmax_t maximum, typename overflow_policy, storage_type storage,
 	typename T,
-	enable_if_t<basic_numeric_limits<T>::is_integer> = clang_dummy
+	BOUNDED_REQUIRES(basic_numeric_limits<T>::is_integer)
 >
 constexpr auto operator==(T const lhs, integer<minimum, maximum, overflow_policy, storage> const rhs) noexcept {
 	return rhs == lhs;
@@ -57,7 +57,7 @@ constexpr auto operator==(T const lhs, integer<minimum, maximum, overflow_policy
 template<
 	intmax_t minimum, intmax_t maximum, typename overflow_policy, storage_type storage,
 	typename T,
-	enable_if_t<basic_numeric_limits<T>::is_integer> = clang_dummy
+	BOUNDED_REQUIRES(basic_numeric_limits<T>::is_integer)
 >
 constexpr auto operator!=(integer<minimum, maximum, overflow_policy, storage> const lhs, T const rhs) noexcept {
 	return !(lhs == rhs);
@@ -66,7 +66,7 @@ constexpr auto operator!=(integer<minimum, maximum, overflow_policy, storage> co
 template<
 	intmax_t minimum, intmax_t maximum, typename overflow_policy, storage_type storage,
 	typename T,
-	enable_if_t<basic_numeric_limits<T>::is_integer> = clang_dummy
+	BOUNDED_REQUIRES(basic_numeric_limits<T>::is_integer)
 >
 constexpr auto operator!=(T const lhs, integer<minimum, maximum, overflow_policy, storage> const rhs) noexcept {
 	return !(rhs == lhs);
@@ -79,7 +79,7 @@ constexpr auto operator!=(T const lhs, integer<minimum, maximum, overflow_policy
 template<
 	intmax_t minimum, intmax_t maximum, typename overflow_policy, storage_type storage,
 	typename T,
-	enable_if_t<basic_numeric_limits<T>::is_integer> = clang_dummy
+	BOUNDED_REQUIRES(basic_numeric_limits<T>::is_integer)
 >
 constexpr auto operator<(integer<minimum, maximum, overflow_policy, storage> const lhs, T const rhs) noexcept {
 	return lhs < make(rhs);
@@ -92,7 +92,7 @@ constexpr auto operator<(integer<minimum, maximum, overflow_policy, storage> con
 template<
 	intmax_t minimum, intmax_t maximum, typename overflow_policy, storage_type storage,
 	typename T,
-	enable_if_t<basic_numeric_limits<T>::is_integer> = clang_dummy
+	BOUNDED_REQUIRES(basic_numeric_limits<T>::is_integer)
 >
 constexpr auto operator<(T const lhs, integer<minimum, maximum, overflow_policy, storage> const rhs) noexcept {
 	return make(lhs) < rhs;
@@ -105,7 +105,7 @@ constexpr auto operator<(uintmax_t const lhs, integer<minimum, maximum, overflow
 template<
 	intmax_t minimum, intmax_t maximum, typename overflow_policy, storage_type storage,
 	typename T,
-	enable_if_t<basic_numeric_limits<T>::is_integer> = clang_dummy
+	BOUNDED_REQUIRES(basic_numeric_limits<T>::is_integer)
 >
 constexpr auto operator>(integer<minimum, maximum, overflow_policy, storage> const lhs, T const rhs) noexcept {
 	return rhs < lhs;
@@ -114,7 +114,7 @@ constexpr auto operator>(integer<minimum, maximum, overflow_policy, storage> con
 template<
 	intmax_t minimum, intmax_t maximum, typename overflow_policy, storage_type storage,
 	typename T,
-	enable_if_t<basic_numeric_limits<T>::is_integer> = clang_dummy
+	BOUNDED_REQUIRES(basic_numeric_limits<T>::is_integer)
 >
 constexpr auto operator>(T const lhs, integer<minimum, maximum, overflow_policy, storage> const rhs) noexcept {
 	return rhs < lhs;
@@ -123,7 +123,7 @@ constexpr auto operator>(T const lhs, integer<minimum, maximum, overflow_policy,
 template<
 	intmax_t minimum, intmax_t maximum, typename overflow_policy, storage_type storage,
 	typename T,
-	enable_if_t<basic_numeric_limits<T>::is_integer> = clang_dummy
+	BOUNDED_REQUIRES(basic_numeric_limits<T>::is_integer)
 >
 constexpr auto operator<=(integer<minimum, maximum, overflow_policy, storage> const lhs, T const rhs) noexcept {
 	return !(rhs < lhs);
@@ -132,7 +132,7 @@ constexpr auto operator<=(integer<minimum, maximum, overflow_policy, storage> co
 template<
 	intmax_t minimum, intmax_t maximum, typename overflow_policy, storage_type storage,
 	typename T,
-	enable_if_t<basic_numeric_limits<T>::is_integer> = clang_dummy
+	BOUNDED_REQUIRES(basic_numeric_limits<T>::is_integer)
 >
 constexpr auto operator<=(T const lhs, integer<minimum, maximum, overflow_policy, storage> const rhs) noexcept {
 	return !(rhs < lhs);
@@ -141,7 +141,7 @@ constexpr auto operator<=(T const lhs, integer<minimum, maximum, overflow_policy
 template<
 	intmax_t minimum, intmax_t maximum, typename overflow_policy, storage_type storage,
 	typename T,
-	enable_if_t<basic_numeric_limits<T>::is_integer> = clang_dummy
+	BOUNDED_REQUIRES(basic_numeric_limits<T>::is_integer)
 >
 constexpr auto operator>=(integer<minimum, maximum, overflow_policy, storage> const lhs, T const rhs) noexcept {
 	return !(lhs < rhs);
@@ -150,7 +150,7 @@ constexpr auto operator>=(integer<minimum, maximum, overflow_policy, storage> co
 template<
 	intmax_t minimum, intmax_t maximum, typename overflow_policy, storage_type storage,
 	typename T,
-	enable_if_t<basic_numeric_limits<T>::is_integer> = clang_dummy
+	BOUNDED_REQUIRES(basic_numeric_limits<T>::is_integer)
 >
 constexpr auto operator>=(T const lhs, integer<minimum, maximum, overflow_policy, storage> const rhs) noexcept {
 	return !(lhs < rhs);

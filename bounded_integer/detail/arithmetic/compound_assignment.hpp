@@ -17,10 +17,11 @@
 #pragma once
 
 #include "operators.hpp"
-#include "../enable_if.hpp"
 #include "../forward_declaration.hpp"
 #include "../is_bounded_integer.hpp"
 #include "../make.hpp"
+#include "../requires.hpp"
+
 #include <type_traits>
 
 namespace bounded {
@@ -50,11 +51,11 @@ BOUNDED_INTEGER_COMPOUND_ASSIGNMENT_OPERATOR_TARGET(%)
 
 
 #define BOUNDED_INTEGER_COMPOUND_ASSIGNMENT_OPERATOR_SOURCE(symbol) \
-template<typename T, intmax_t minimum, intmax_t maximum, typename overflow_policy, storage_type storage, enable_if_t<basic_numeric_limits<T>::is_integer and not is_bounded_integer<T>::value> = clang_dummy> \
+template<typename T, intmax_t minimum, intmax_t maximum, typename overflow_policy, storage_type storage, BOUNDED_REQUIRES(basic_numeric_limits<T>::is_integer and not is_bounded_integer<T>::value)> \
 constexpr auto && operator symbol(T & lhs, integer<minimum, maximum, overflow_policy, storage> const rhs) noexcept { \
 	return lhs symbol rhs.value(); \
 } \
-template<typename T, intmax_t minimum, intmax_t maximum, typename overflow_policy, storage_type storage, enable_if_t<basic_numeric_limits<T>::is_integer> = clang_dummy> \
+template<typename T, intmax_t minimum, intmax_t maximum, typename overflow_policy, storage_type storage, BOUNDED_REQUIRES(basic_numeric_limits<T>::is_integer)> \
 auto && operator symbol(T volatile & lhs, integer<minimum, maximum, overflow_policy, storage> const rhs) noexcept { \
 	return lhs symbol rhs.value(); \
 }

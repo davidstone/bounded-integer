@@ -16,8 +16,8 @@
 
 #pragma once
 
-#include "../enable_if.hpp"
 #include "../noexcept.hpp"
+#include "../requires.hpp"
 
 #include <stdexcept>
 #include <type_traits>
@@ -217,15 +217,15 @@ public:
 
 	constexpr optional(none_t = none) noexcept {}
 
-	template<typename... Args, enable_if_t<std::is_constructible<value_type, Args && ...>::value> = clang_dummy>
+	template<typename... Args, BOUNDED_REQUIRES(std::is_constructible<value_type, Args && ...>::value)>
 	constexpr explicit optional(in_place_t, Args && ... other) noexcept(std::is_nothrow_constructible<optional_storage<value_type>, in_place_t, Args && ...>::value):
 		m_storage(in_place, std::forward<Args>(other)...) {
 	}
-	template<typename U, enable_if_t<std::is_convertible<U &&, value_type>::value> = clang_dummy>
+	template<typename U, BOUNDED_REQUIRES(std::is_convertible<U &&, value_type>::value)>
 	constexpr optional(U && other)
 		BOUNDED_NOEXCEPT_INITIALIZATION(optional(in_place, std::forward<U>(other))) {
 	}
-	template<typename U, enable_if_t<!std::is_convertible<U &&, value_type>::value and std::is_constructible<value_type, U &&>::value> = clang_dummy>
+	template<typename U, BOUNDED_REQUIRES(!std::is_convertible<U &&, value_type>::value and std::is_constructible<value_type, U &&>::value)>
 	constexpr explicit optional(U && other)
 		BOUNDED_NOEXCEPT_INITIALIZATION(optional(in_place, std::forward<U>(other))) {
 	}
@@ -284,7 +284,7 @@ public:
 		detail::assign_from_optional(*this, std::move(other))
 	)
 	// TODO: make this work when value_type is a reference
-	template<typename U, enable_if_t<std::is_convertible<U &&, value_type>::value> = clang_dummy>
+	template<typename U, BOUNDED_REQUIRES(std::is_convertible<U &&, value_type>::value)>
 	constexpr auto && operator=(U && other) & BOUNDED_NOEXCEPT(
 		detail::assign(*this, std::forward<U>(other))
 	)

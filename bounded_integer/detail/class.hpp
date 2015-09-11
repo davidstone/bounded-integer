@@ -16,12 +16,12 @@
 
 #pragma once
 
-#include "enable_if.hpp"
 #include "forward_declaration.hpp"
 #include "is_bounded_integer.hpp"
 #include "noexcept.hpp"
 #include "numeric_limits.hpp"
 #include "overlapping_range.hpp"
+#include "requires.hpp"
 #include "underlying_type.hpp"
 
 #include "policy/null_policy.hpp"
@@ -39,20 +39,20 @@ constexpr bool allow_construction_from() {
 	return basic_numeric_limits<T>::is_specialized and (basic_numeric_limits<T>::is_integer or std::is_enum<std::decay_t<T>>::value);
 }
 
-template<typename T, enable_if_t<allow_construction_from<T>()> = clang_dummy>
+template<typename T, BOUNDED_REQUIRES(allow_construction_from<T>())>
 constexpr auto is_implicitly_constructible_from(intmax_t const minimum, intmax_t const maximum) noexcept {
 	return type_fits_in_range<std::decay_t<T>>(minimum, maximum);
 }
-template<typename T, enable_if_t<!allow_construction_from<T>()> = clang_dummy>
+template<typename T, BOUNDED_REQUIRES(!allow_construction_from<T>())>
 constexpr auto is_implicitly_constructible_from(intmax_t, intmax_t) noexcept {
 	return false;
 }
 
-template<typename policy, typename T, enable_if_t<allow_construction_from<T>()> = clang_dummy>
+template<typename policy, typename T, BOUNDED_REQUIRES(allow_construction_from<T>())>
 constexpr auto is_explicitly_constructible_from(intmax_t const minimum, intmax_t const maximum) noexcept {
 	return type_overlaps_range<std::decay_t<T>>(minimum, maximum) or !policy::overflow_is_error;
 }
-template<typename policy, typename T, enable_if_t<!allow_construction_from<T>()> = clang_dummy>
+template<typename policy, typename T, BOUNDED_REQUIRES(!allow_construction_from<T>())>
 constexpr auto is_explicitly_constructible_from(intmax_t, intmax_t) noexcept {
 	return false;
 }
@@ -61,11 +61,11 @@ constexpr auto is_explicitly_constructible_from(intmax_t, intmax_t) noexcept {
 // provide tighter bounds than the underlying_type might suggest. This forwards
 // along non-enum types without doing anything, but constructs a
 // bounded::integer with the tighter bounds from an enumeration.
-template<typename T, enable_if_t<!std::is_enum<std::decay_t<T>>::value> = clang_dummy>
+template<typename T, BOUNDED_REQUIRES(!std::is_enum<std::decay_t<T>>::value)>
 constexpr decltype(auto) as_integer(T && t) noexcept {
 	return static_cast<T &&>(t);
 }
-template<typename T, enable_if_t<std::is_enum<std::decay_t<T>>::value> = clang_dummy>
+template<typename T, BOUNDED_REQUIRES(std::is_enum<std::decay_t<T>>::value)>
 constexpr decltype(auto) as_integer(T && t) noexcept {
 	using limits = basic_numeric_limits<T>;
 	return integer<static_cast<std::intmax_t>(limits::min()), static_cast<std::intmax_t>(limits::max()), null_policy, storage_type::fast>(static_cast<std::underlying_type_t<std::decay_t<T>>>(t));
@@ -74,11 +74,11 @@ constexpr decltype(auto) as_integer(T && t) noexcept {
 }	// namespace detail
 
 
-template<typename T, enable_if_t<!is_bounded_integer<std::decay_t<T>>::value> = clang_dummy>
+template<typename T, BOUNDED_REQUIRES(!is_bounded_integer<std::decay_t<T>>::value)>
 constexpr auto get_overflow_policy(T const &) noexcept {
 	return null_policy{};
 }
-template<typename T, enable_if_t<is_bounded_integer<std::decay_t<T>>::value> = clang_dummy>
+template<typename T, BOUNDED_REQUIRES(is_bounded_integer<std::decay_t<T>>::value)>
 constexpr decltype(auto) get_overflow_policy(T && value) noexcept {
 	return std::forward<T>(value).overflow_policy();
 }
@@ -113,9 +113,9 @@ struct integer : private overflow_policy_ {
 
 	// Use these constructors if you know by means that cannot be determined by
 	// the type system that the value really does fit in the range.
-	template<typename T, enable_if_t<
+	template<typename T, BOUNDED_REQUIRES(
 		detail::is_explicitly_constructible_from<overflow_policy_type, T>(minimum, maximum)
-	> = clang_dummy>
+	)>
 	constexpr integer(T && other, overflow_policy_type policy, non_check_t) noexcept:
 		overflow_policy_type(std::move(policy)),
 		m_value(static_cast<underlying_type>(std::forward<T>(other))) {
@@ -123,17 +123,17 @@ struct integer : private overflow_policy_ {
 	// std::forward is safe here because it will never actually move anything.
 	// The value itself is only moved from inside of the constructor this
 	// forwards to.
-	template<typename T, enable_if_t<
+	template<typename T, BOUNDED_REQUIRES(
 		detail::is_explicitly_constructible_from<overflow_policy_type, T>(minimum, maximum)
-	> = clang_dummy>
+	)>
 	constexpr integer(T && other, non_check_t) noexcept:
 		integer(std::forward<T>(other), static_cast<overflow_policy_type>(get_overflow_policy(std::forward<T>(other))), non_check) {
 	}
 
 
-	template<typename T, enable_if_t<
+	template<typename T, BOUNDED_REQUIRES(
 		detail::is_explicitly_constructible_from<overflow_policy_type, T>(minimum, maximum)
-	> = clang_dummy>
+	)>
 	constexpr integer(T && other, overflow_policy_type policy) BOUNDED_NOEXCEPT_INITIALIZATION(
 		integer(policy.assignment(detail::as_integer(std::forward<T>(other)), constant<minimum>, constant<maximum>), policy, non_check)
 	) {
@@ -141,46 +141,46 @@ struct integer : private overflow_policy_ {
 
 
 	// Intentionally implicit: this is safe because the value is in range
-	template<typename T, enable_if_t<
+	template<typename T, BOUNDED_REQUIRES(
 		detail::is_implicitly_constructible_from<T>(minimum, maximum)
-	> = clang_dummy>
+	)>
 	constexpr integer(T && other) BOUNDED_NOEXCEPT_INITIALIZATION(
 		integer(std::forward<T>(other), static_cast<overflow_policy_type>(get_overflow_policy(std::forward<T>(other))))
 	) {
 	}
 
-	template<typename T, enable_if_t<
+	template<typename T, BOUNDED_REQUIRES(
 		!detail::is_implicitly_constructible_from<T>(minimum, maximum) and
 		detail::is_explicitly_constructible_from<overflow_policy_type, T>(minimum, maximum)
-	> = clang_dummy>
+	)>
 	constexpr explicit integer(T && other) BOUNDED_NOEXCEPT_INITIALIZATION(
 		integer(std::forward<T>(other), static_cast<overflow_policy_type>(get_overflow_policy(std::forward<T>(other))))
 	) {
 	}
 
 
-	template<typename Enum, enable_if_t<
+	template<typename Enum, BOUNDED_REQUIRES(
 		std::is_enum<Enum>::value and !detail::is_explicitly_constructible_from<overflow_policy_type, Enum>(minimum, maximum)
-	> = clang_dummy>
+	)>
 	constexpr integer(Enum other, overflow_policy_type policy, non_check_t) noexcept:
 		integer(static_cast<std::underlying_type_t<Enum>>(other), std::move(policy), non_check) {
 	}
-	template<typename Enum, enable_if_t<
+	template<typename Enum, BOUNDED_REQUIRES(
 		std::is_enum<Enum>::value and !detail::is_explicitly_constructible_from<overflow_policy_type, Enum>(minimum, maximum)
-	> = clang_dummy>
+	)>
 	constexpr integer(Enum other, non_check_t) noexcept:
 		integer(static_cast<std::underlying_type_t<Enum>>(other), non_check) {
 	}
-	template<typename Enum, enable_if_t<
+	template<typename Enum, BOUNDED_REQUIRES(
 		std::is_enum<Enum>::value and !detail::is_explicitly_constructible_from<overflow_policy_type, Enum>(minimum, maximum)
-	> = clang_dummy>
+	)>
 	constexpr explicit integer(Enum other, overflow_policy_type policy) BOUNDED_NOEXCEPT_INITIALIZATION(
 		integer(static_cast<std::underlying_type_t<Enum>>(other), std::move(policy))
 	) {
 	}
-	template<typename Enum, enable_if_t<
+	template<typename Enum, BOUNDED_REQUIRES(
 		std::is_enum<Enum>::value and !detail::is_explicitly_constructible_from<overflow_policy_type, Enum>(minimum, maximum)
-	> = clang_dummy>
+	)>
 	constexpr explicit integer(Enum other) BOUNDED_NOEXCEPT_INITIALIZATION(
 		integer(static_cast<std::underlying_type_t<Enum>>(other)) 
 	) {
@@ -252,11 +252,11 @@ struct integer : private overflow_policy_ {
 	// This must not reference the overflow policy because it is possible that
 	// it has already been moved from if this is being called from the
 	// constructor.
-	template<typename T, enable_if_t<std::is_arithmetic<T>::value or std::is_enum<T>::value> = clang_dummy>
+	template<typename T, BOUNDED_REQUIRES(std::is_arithmetic<T>::value or std::is_enum<T>::value)>
 	constexpr explicit operator T() const noexcept {
 		return static_cast<T>(m_value);
 	}
-	template<typename T, enable_if_t<std::is_arithmetic<T>::value or std::is_enum<T>::value> = clang_dummy>
+	template<typename T, BOUNDED_REQUIRES(std::is_arithmetic<T>::value or std::is_enum<T>::value)>
 	constexpr explicit operator T() const volatile noexcept {
 		return static_cast<T>(m_value);
 	}

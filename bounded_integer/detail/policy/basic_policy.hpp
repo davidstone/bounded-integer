@@ -17,7 +17,7 @@
 #pragma once
 
 #include "is_overflow_policy.hpp"
-#include "../enable_if.hpp"
+#include "../requires.hpp"
 #include <type_traits>
 
 namespace bounded {
@@ -35,23 +35,23 @@ struct basic_policy : private policy_type {
 	basic_policy(basic_policy &&) = default;
 
 	constexpr basic_policy() noexcept {}
-	template<typename T, enable_if_t<std::is_same<std::decay_t<T>, basic_policy>::value> = clang_dummy>
+	template<typename T, BOUNDED_REQUIRES(std::is_same<std::decay_t<T>, basic_policy>::value)>
 	constexpr basic_policy(T &&) noexcept {
 	}
-	template<typename T, enable_if_t<
+	template<typename T, BOUNDED_REQUIRES(
 		is_overflow_policy<T>::value and
 		!std::is_same<std::decay_t<T>, basic_policy>::value
-	> = clang_dummy>
+	)>
 	constexpr explicit basic_policy(T &&) noexcept {
 	}
 
 	auto operator=(basic_policy const &) noexcept -> basic_policy & = default;
 	auto operator=(basic_policy &&) noexcept -> basic_policy & = default;
-	template<typename T, enable_if_t<is_overflow_policy<T>::value> = clang_dummy>
+	template<typename T, BOUNDED_REQUIRES(is_overflow_policy<T>::value)>
 	auto operator=(T &&) noexcept -> basic_policy & {
 		return *this;
 	}
-	template<typename T, enable_if_t<is_overflow_policy<T>::value> = clang_dummy>
+	template<typename T, BOUNDED_REQUIRES(is_overflow_policy<T>::value)>
 	auto operator=(T &&) volatile noexcept -> basic_policy volatile & {
 		return *this;
 	}

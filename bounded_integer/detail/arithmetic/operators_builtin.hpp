@@ -17,10 +17,10 @@
 #pragma once
 
 #include "operators.hpp"
-#include "../enable_if.hpp"
 #include "../forward_declaration.hpp"
 #include "../make.hpp"
 #include "../numeric_limits.hpp"
+#include "../requires.hpp"
 
 #include <cstdint>
 
@@ -29,14 +29,14 @@ namespace bounded {
 #define BOUNDED_INTEGER_MIXED_OPERATOR_OVERLOADS(symbol, operator_name) \
 template< \
 	intmax_t lhs_min, intmax_t lhs_max, typename overflow, storage_type storage, typename T, \
-	enable_if_t<basic_numeric_limits<T>::is_integer> = clang_dummy \
+	BOUNDED_REQUIRES(basic_numeric_limits<T>::is_integer) \
 > \
 constexpr auto operator symbol(integer<lhs_min, lhs_max, overflow, storage> const lhs, T const rhs) noexcept { \
 	return lhs symbol make(rhs); \
 } \
 template< \
 	typename T, intmax_t rhs_min, intmax_t rhs_max, typename overflow, storage_type storage, \
-	enable_if_t<basic_numeric_limits<T>::is_integer> = clang_dummy \
+	BOUNDED_REQUIRES(basic_numeric_limits<T>::is_integer) \
 > \
 constexpr auto operator symbol(T const lhs, integer<rhs_min, rhs_max, overflow, storage> const rhs) noexcept { \
 	return make(lhs) symbol rhs; \
