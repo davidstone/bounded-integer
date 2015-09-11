@@ -69,6 +69,8 @@ public:
 	}
 	
 private:
+	friend struct static_vector_iterator<std::remove_const_t<T>, capacity>;
+
 	constexpr explicit static_vector_iterator(base_iterator const it):
 		m_it(it) {
 	}
