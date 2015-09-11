@@ -48,7 +48,7 @@ public:
 		return std::addressof(operator*());
 	}
 	
-	template<typename Offset>
+	template<typename Offset, BOUNDED_REQUIRES(std::numeric_limits<Offset>::is_integer)>
 	friend constexpr auto operator+(static_vector_iterator const it, Offset const offset) {
 		return static_vector_iterator(it.m_it + offset);
 	}
@@ -78,17 +78,17 @@ private:
 	base_iterator m_it;
 };
 
-template<typename T, std::size_t capacity, typename Offset>
+template<typename T, std::size_t capacity, typename Offset, BOUNDED_REQUIRES(std::numeric_limits<Offset>::is_integer)>
 constexpr auto operator-(static_vector_iterator<T, capacity> const it, Offset const offset) {
 	return it + -offset;
 }
 
-template<typename T, std::size_t capacity, typename Offset>
+template<typename T, std::size_t capacity, typename Offset, BOUNDED_REQUIRES(std::numeric_limits<Offset>::is_integer)>
 constexpr auto & operator+=(static_vector_iterator<T, capacity> & it, Offset const offset) {
 	return it = it + offset;
 }
 
-template<typename T, std::size_t capacity, typename Offset>
+template<typename T, std::size_t capacity, typename Offset, BOUNDED_REQUIRES(std::numeric_limits<Offset>::is_integer)>
 constexpr auto & operator-=(static_vector_iterator<T, capacity> & it, Offset const offset) {
 	return it = it - offset;
 }
