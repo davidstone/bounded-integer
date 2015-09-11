@@ -130,7 +130,7 @@ constexpr auto insert(Container & container, typename Container::iterator const 
 	container.insert(position, init.begin(), init.end())
 )
 // TODO: noexcept
-template<typename Container, typename Size>
+template<typename Container, typename Size, BOUNDED_REQUIRES(std::numeric_limits<Size>::is_integer)>
 constexpr auto insert(Container & container, typename Container::iterator const position, Size const count, typename Container::value_type const & value) {
 	auto const range = detail::repeat_n(count, value);
 	return container.insert(position, range.begin(), range.end());
@@ -173,7 +173,7 @@ template<typename Container>
 constexpr auto assign(Container & container, std::initializer_list<typename Container::value_type> init) BOUNDED_NOEXCEPT(
 	assign(container, init.begin(), init.end())
 )
-template<typename Container, typename Size, BOUNDED_REQUIRES(std::numeric_limits<Size>::is_specialized)>
+template<typename Container, typename Size, BOUNDED_REQUIRES(std::numeric_limits<Size>::is_integer)>
 constexpr auto assign(Container & container, Size const count, typename Container::value_type const & value) {
 	auto const range = detail::repeat_n(count, value);
 	assign(container, range.begin(), range.end());
