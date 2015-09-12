@@ -43,8 +43,6 @@ struct static_vector {
 	using size_type = bounded::integer<0, capacity_>;
 	using const_iterator = detail::static_vector_iterator<value_type const, capacity_>;
 	using iterator = detail::static_vector_iterator<value_type, capacity_>;
-	using const_reverse_iterator = std::reverse_iterator<const_iterator>;
-	using reverse_iterator = std::reverse_iterator<iterator>;
 private:
 	using container_type = bounded::array<uninitialized_storage<value_type>, capacity_>;
 public:
