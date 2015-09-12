@@ -203,6 +203,7 @@ namespace detail {
 
 template<typename Container, typename Size, typename... MaybeInitializer>
 auto resize(Container & container, Size const count, MaybeInitializer && ... args) {
+	static_assert(sizeof...(MaybeInitializer) == 0 or sizeof...(MaybeInitializer) == 1);
 	while (size(container) > count) {
 		container.pop_back();
 	}
