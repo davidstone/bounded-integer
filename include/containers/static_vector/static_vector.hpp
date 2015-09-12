@@ -126,9 +126,6 @@ public:
 	static constexpr auto capacity() noexcept {
 		return bounded::constant<capacity_>;
 	}
-	static constexpr auto max_size() noexcept {
-		return capacity();
-	}
 
 	template<typename... Args>
 	auto emplace_back(Args && ... args) {

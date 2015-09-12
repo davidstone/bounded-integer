@@ -110,7 +110,11 @@ constexpr auto empty(Container const & container) noexcept {
 	return container.begin() == container.end();
 }
 
-// TODO: max_size ?
+template<typename Container>
+constexpr auto max_size() noexcept {
+	return std::numeric_limits<typename Container::size_type>::max();
+}
+
 
 
 template<typename Container>
