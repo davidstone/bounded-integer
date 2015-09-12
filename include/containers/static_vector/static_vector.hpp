@@ -139,9 +139,9 @@ public:
 		++m_size;
 	}
 	
-	// TODO: replace iterator with const_iterator
 	template<typename... Args>
-	auto emplace(iterator const position, Args && ... args) {
+	auto emplace(const_iterator const position_, Args && ... args) {
+		auto const position = detail::make_mutable_iterator(*this, position_);
 		if (position == end()) {
 			emplace_back(std::forward<Args>(args)...);
 			return position;
@@ -154,7 +154,8 @@ public:
 		return position;
 	}
 	template<typename InputIterator, typename Sentinel>
-	auto insert(iterator const position, InputIterator first, Sentinel last) {
+	auto insert(const_iterator const position_, InputIterator first, Sentinel last) {
+		auto const position = detail::make_mutable_iterator(*this, position_);
 		if (position == end()) {
 			for (; first != last; ++first) {
 				emplace_back(*first);

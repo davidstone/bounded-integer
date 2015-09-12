@@ -27,6 +27,14 @@
 #include <utility>
 
 namespace containers {
+namespace detail {
+
+template<typename Container>
+constexpr auto make_mutable_iterator(Container & container, typename Container::const_iterator it) {
+	return container.begin() + (it - container.begin());
+}
+
+}	// namespace detail
 
 template<typename Container>
 constexpr auto begin(Container && container) BOUNDED_NOEXCEPT(
@@ -115,23 +123,22 @@ constexpr auto push_back(Container & container, typename Container::value_type &
 )
 
 
-// TODO: Work with const_iterator instead of iterator
 
 template<typename Container>
-constexpr auto insert(Container & container, typename Container::iterator const position, typename Container::value_type const & value) BOUNDED_NOEXCEPT(
+constexpr auto insert(Container & container, typename Container::const_iterator const position, typename Container::value_type const & value) BOUNDED_NOEXCEPT(
 	container.emplace(position, value)
 )
 template<typename Container>
-constexpr auto insert(Container & container, typename Container::iterator const position, typename Container::value_type && value) BOUNDED_NOEXCEPT(
+constexpr auto insert(Container & container, typename Container::const_iterator const position, typename Container::value_type && value) BOUNDED_NOEXCEPT(
 	container.emplace(position, std::move(value))
 )
 template<typename Container>
-constexpr auto insert(Container & container, typename Container::iterator const position, std::initializer_list<typename Container::value_type> init) BOUNDED_NOEXCEPT(
+constexpr auto insert(Container & container, typename Container::const_iterator const position, std::initializer_list<typename Container::value_type> init) BOUNDED_NOEXCEPT(
 	container.insert(position, init.begin(), init.end())
 )
 // TODO: noexcept
 template<typename Container, typename Size, BOUNDED_REQUIRES(std::numeric_limits<Size>::is_integer)>
-constexpr auto insert(Container & container, typename Container::iterator const position, Size const count, typename Container::value_type const & value) {
+constexpr auto insert(Container & container, typename Container::const_iterator const position, Size const count, typename Container::value_type const & value) {
 	auto const range = detail::repeat_n(count, value);
 	return container.insert(position, range.begin(), range.end());
 }
@@ -139,14 +146,16 @@ constexpr auto insert(Container & container, typename Container::iterator const 
 
 // TODO: conditional noexcept
 template<typename Container>
-constexpr auto erase(Container & container, typename Container::iterator const first, typename Container::iterator const last) noexcept {
+constexpr auto erase(Container & container, typename Container::const_iterator const first_, typename Container::const_iterator const last_) noexcept {
+	auto const first = detail::make_mutable_iterator(container, first_);
+	auto const last = detail::make_mutable_iterator(container, last_);
 	auto const to_clear = std::move(last, container.end(), first);
 	while (to_clear != container.end()) {
 		container.pop_back();
 	}
 }
 template<typename Container>
-constexpr auto erase(Container & container, typename Container::iterator const it) {
+constexpr auto erase(Container & container, typename Container::const_iterator const it) {
 	assert(it != container.end());
 	erase(container, it, bounded::next(it));
 }
