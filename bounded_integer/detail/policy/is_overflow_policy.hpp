@@ -21,7 +21,7 @@
 #define BOUNDED_INTEGER_MAKE_NESTED_TYPE_TEST(type) \
 \
 template<typename T> \
-constexpr auto has_nested_type_ ## type(typename T::type *) { return true; } \
+constexpr auto has_nested_type_ ## type(typename std::remove_reference_t<T>::type *) { return true; } \
 \
 template<typename> \
 constexpr auto has_nested_type_ ## type(...) { return false; }
@@ -37,7 +37,7 @@ BOUNDED_INTEGER_MAKE_NESTED_TYPE_TEST(overflow_policy_tag)
 template<typename overflow_policy>
 struct is_overflow_policy : std::integral_constant<
 	bool,
-	detail::has_nested_type_overflow_policy_tag<std::remove_reference_t<overflow_policy>>(nullptr)
+	detail::has_nested_type_overflow_policy_tag<overflow_policy>(nullptr)
 >{};
 
 }	// namespace bounded
