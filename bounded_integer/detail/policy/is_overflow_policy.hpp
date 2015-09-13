@@ -1,5 +1,5 @@
 // Determines if a class meets the requirements of an overflow policy.
-// Copyright (C) 2014 David Stone
+// Copyright (C) 2015 David Stone
 //
 // This program is free software: you can redistribute it and / or modify
 // it under the terms of the GNU Affero General Public License as
@@ -16,35 +16,28 @@
 
 #pragma once
 
-#include <cstdint>
 #include <type_traits>
 
-namespace bounded {
-
-namespace detail {
-namespace is_overflow_policy_detail {
-
-using yes = char[1];
-using no = char[2];
-
-#define BOUNDED_INTEGER_HAS_NESTED_TYPE(type) \
+#define BOUNDED_INTEGER_MAKE_NESTED_TYPE_TEST(type) \
 \
 template<typename T> \
-auto checker(typename T::type *) -> yes &; \
+constexpr auto has_nested_type_ ## type(typename T::type *) { return true; } \
 \
 template<typename> \
-auto checker(...) -> no &;
+constexpr auto has_nested_type_ ## type(...) { return false; }
 
-BOUNDED_INTEGER_HAS_NESTED_TYPE(overflow_policy_tag)
-#undef BOUNDED_INTEGER_HAS_NESTED_TYPE
-}	// namespace is_overflow_policy_detail
+namespace bounded {
+namespace detail {
+
+BOUNDED_INTEGER_MAKE_NESTED_TYPE_TEST(overflow_policy_tag)
+
 }	// namespace detail
 
 
 template<typename overflow_policy>
 struct is_overflow_policy : std::integral_constant<
 	bool,
-	sizeof(detail::is_overflow_policy_detail::checker<std::decay_t<overflow_policy>>(nullptr)) == sizeof(detail::is_overflow_policy_detail::yes)
+	detail::has_nested_type_overflow_policy_tag<std::remove_reference_t<overflow_policy>>(nullptr)
 >{};
 
 }	// namespace bounded
