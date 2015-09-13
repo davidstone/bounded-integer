@@ -17,6 +17,7 @@
 #pragma once
 
 #include <containers/common_functions.hpp>
+#include <containers/index_type.hpp>
 #include <containers/repeat_n.hpp>
 #include <containers/uninitialized_storage.hpp>
 
@@ -43,10 +44,6 @@ struct static_vector {
 	using size_type = bounded::integer<0, capacity_>;
 	using const_iterator = detail::static_vector_iterator<value_type const, capacity_>;
 	using iterator = detail::static_vector_iterator<value_type, capacity_>;
-private:
-	using container_type = bounded::array<uninitialized_storage<value_type>, capacity_>;
-public:
-	using index_type = typename container_type::index_type;
 	
 	static_vector() = default;
 	
@@ -109,10 +106,10 @@ public:
 	}
 
 
-	auto && operator[](index_type index) const noexcept {
+	auto && operator[](index_type<static_vector> index) const noexcept {
 		return *(begin() + index);
 	}
-	auto && operator[](index_type index) noexcept {
+	auto && operator[](index_type<static_vector> index) noexcept {
 		return *(begin() + index);
 	}
 	
@@ -179,7 +176,7 @@ private:
 		}
 	}
 	
-	container_type m_container = {{}};
+	bounded::array<uninitialized_storage<value_type>, capacity_> m_container = {{}};
 	size_type m_size = bounded::constant<0>;
 };
 

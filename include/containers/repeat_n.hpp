@@ -16,6 +16,8 @@
 
 #pragma once
 
+#include <containers/index_type.hpp>
+
 #include <bounded_integer/bounded_integer.hpp>
 
 #include <iterator>
@@ -125,7 +127,6 @@ template<typename Size, typename T>
 struct repeat_n_t {
 	using size_type = Size;
 	using value_type = T;
-	using index_type = bounded::checked_integer<0, static_cast<std::intmax_t>(std::numeric_limits<size_type>::max()) - 1>;
 
 	using const_iterator = repeat_n_iterator<size_type, value_type>;
 	
@@ -143,7 +144,7 @@ struct repeat_n_t {
 		return repeat_n_sentinel{};
 	}
 
-	constexpr auto && operator[](index_type const & index) const {
+	constexpr auto && operator[](index_type<repeat_n_t> const & index) const {
 		return *(begin() + index);
 	}
 

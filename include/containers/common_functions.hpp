@@ -16,6 +16,7 @@
 
 #pragma once
 
+#include <containers/index_type.hpp>
 #include <containers/repeat_n.hpp>
 
 #include <bounded_integer/bounded_integer.hpp>
@@ -23,7 +24,6 @@
 #include <algorithm>
 #include <initializer_list>
 #include <iterator>
-#include <type_traits>
 #include <utility>
 
 namespace containers {
@@ -85,7 +85,7 @@ constexpr auto crend(Container const & container) BOUNDED_NOEXCEPT(
 
 template<typename Container, typename Index>
 constexpr decltype(auto) at(Container && container, Index const index) BOUNDED_NOEXCEPT(
-	std::forward<Container>(container)[static_cast<typename std::remove_reference_t<Container>::index_type>(index)]
+	std::forward<Container>(container)[static_cast<index_type<Container>>(index)]
 )
 
 // These can be declared noexcept in more situations. For instance, these are
