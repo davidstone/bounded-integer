@@ -58,6 +58,11 @@ public:
 		return lhs.m_it - rhs.m_it;
 	}
 
+	template<typename Offset>
+	constexpr auto && operator[](Offset const index) {
+		return *(*this + index);
+	}
+
 	friend constexpr auto operator==(static_vector_iterator const lhs, static_vector_iterator const rhs) {
 		return lhs.m_it == rhs.m_it;
 	}
