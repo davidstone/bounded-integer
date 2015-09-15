@@ -43,10 +43,10 @@ public:
 	using const_pointer = typename std::allocator_traits<allocator_type>::const_pointer;
 	using pointer = typename std::allocator_traits<allocator_type>::pointer;
 	
-	using const_iterator = detail::moving_vector::iterator_base<value_type, value_type const>;
-	using iterator = detail::moving_vector::iterator_base<value_type, value_type>;
+	using const_iterator = detail::moving_vector_iterator<value_type, value_type const>;
+	using iterator = detail::moving_vector_iterator<value_type, value_type>;
 	// There is no const_indirect_iterator because there is no way to enforce it
-	using indirect_iterator = detail::moving_vector::iterator_base<value_type, element_type>;
+	using indirect_iterator = detail::moving_vector_iterator<value_type, element_type>;
 	using const_reverse_iterator = std::reverse_iterator<const_iterator>;
 	using reverse_iterator = std::reverse_iterator<iterator>;
 	using reverse_indirect_iterator = std::reverse_iterator<indirect_iterator>;
