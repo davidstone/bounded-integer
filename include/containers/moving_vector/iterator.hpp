@@ -63,21 +63,22 @@ public:
 	constexpr moving_vector_iterator() noexcept = default;
 	// Convert iterator or indirect_iterator to const_iterator
 	constexpr operator moving_vector_iterator<T, T const>() const noexcept {
-		return moving_vector_iterator<T, T const>(it);
+		return moving_vector_iterator<T, T const>(m_it);
 	}
 	// Convert iterator to indirect_iterator.
 	constexpr explicit operator moving_vector_iterator<T, indirection_type>() const noexcept {
-		return { it };
+		return { m_it };
 	}
 
 	auto && operator*() const {
-		return remove_indirection<std::remove_const_t<T>, std::remove_const_t<value_type>>(it);
+		return remove_indirection<std::remove_const_t<T>, std::remove_const_t<value_type>>(m_it);
 	}
 	auto operator->() const {
 		return std::addressof(operator*());
 	}
+
 	auto & operator++() {
-		++it;
+		++m_it;
 		return *this;
 	}
 	auto operator++(int) {
@@ -86,7 +87,7 @@ public:
 		return self;
 	}
 	auto & operator--() {
-		--it;
+		--m_it;
 		return *this;
 	}
 	auto operator--(int) {
@@ -94,27 +95,25 @@ public:
 		operator--();
 		return self;
 	}
-	auto & operator+=(difference_type const offset) {
-		it += offset;
-		return *this;
-	}
-	auto & operator-=(difference_type const offset) {
-		it -= offset;
-		return *this;
+
+	template<typename Offset, BOUNDED_REQUIRES(std::numeric_limits<Offset>::is_integer)>
+	friend constexpr auto operator+(moving_vector_iterator const it, Offset const offset) {
+		return moving_vector_iterator(it.m_it + offset);
 	}
 	friend constexpr auto operator-(moving_vector_iterator const lhs, moving_vector_iterator const rhs) {
-		return difference_type(lhs.it - rhs.it);
+		return difference_type(lhs.m_it - rhs.m_it);
 	}
+
 	template<typename Integer>
 	auto & operator[](Integer const index) {
-		return it[index];
+		return m_it[index];
 	}
 
 	friend constexpr auto operator==(moving_vector_iterator const lhs, moving_vector_iterator const rhs) noexcept {
-		return lhs.it == rhs.it;
+		return lhs.m_it == rhs.m_it;
 	}
 	friend constexpr auto operator<(moving_vector_iterator const lhs, moving_vector_iterator const rhs) noexcept {
-		return lhs.it < rhs.it;
+		return lhs.m_it < rhs.m_it;
 	}
 	
 private:
@@ -127,22 +126,22 @@ private:
 	using base_iterator = std::conditional_t<is_const, indirection_type const, indirection_type> *;
 
 	constexpr explicit moving_vector_iterator(base_iterator const other) noexcept:
-		it(other) {
+		m_it(other) {
 	}
 	constexpr explicit moving_vector_iterator(typename std::vector<indirection_type>::iterator const other):
-		it(std::addressof(*other)) {
+		m_it(std::addressof(*other)) {
 	}
 	constexpr explicit moving_vector_iterator(typename std::vector<indirection_type>::const_iterator const other):
-		it(std::addressof(*other)) {
+		m_it(std::addressof(*other)) {
 	}
 
 	// Convert const_iterator to iterator
 	constexpr explicit operator moving_vector_iterator<T, T>() const noexcept {
 		using mutable_type = std::conditional_t<std::is_const<T>::value, indirection_type const, indirection_type> *;
-		return moving_vector_iterator<T, T>(const_cast<mutable_type>(it));
+		return moving_vector_iterator<T, T>(const_cast<mutable_type>(m_it));
 	}
 
-	base_iterator it;
+	base_iterator m_it;
 };
 
 template<typename T, typename ValueType>
@@ -163,16 +162,20 @@ constexpr auto operator>=(moving_vector_iterator<T, ValueType> const lhs, moving
 }
 
 template<typename T, typename ValueType>
-constexpr auto operator+(moving_vector_iterator<T, ValueType> lhs, typename moving_vector_iterator<T, ValueType>::difference_type const rhs) {
-	return lhs += rhs;
+constexpr auto operator-(moving_vector_iterator<T, ValueType> const lhs, typename moving_vector_iterator<T, ValueType>::difference_type const rhs) {
+	return lhs + -rhs;
+}
+template<typename T, typename ValueType>
+constexpr auto operator+=(moving_vector_iterator<T, ValueType> & lhs, typename moving_vector_iterator<T, ValueType>::difference_type const rhs) {
+	return lhs = lhs + rhs;
+}
+template<typename T, typename ValueType>
+constexpr auto operator-=(moving_vector_iterator<T, ValueType> & lhs, typename moving_vector_iterator<T, ValueType>::difference_type const rhs) {
+	return lhs = lhs - rhs;
 }
 template<typename T, typename ValueType>
 constexpr auto operator+(typename moving_vector_iterator<T, ValueType>::difference_type const lhs, moving_vector_iterator<T, ValueType> rhs) {
 	return rhs += lhs;
-}
-template<typename T, typename ValueType>
-constexpr auto operator-(moving_vector_iterator<T, ValueType> lhs, typename moving_vector_iterator<T, ValueType>::difference_type const rhs) {
-	return lhs -= rhs;
 }
 
 }	// namespace detail
