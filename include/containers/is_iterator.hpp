@@ -1,4 +1,4 @@
-// A type suitable to index into a container / iterator
+// Determine if a type is an iterator
 // Copyright (C) 2015 David Stone
 //
 // This program is free software: you can redistribute it and / or modify
@@ -18,12 +18,17 @@
 
 #include <bounded_integer/bounded_integer.hpp>
 
-#include <limits>
+#include <iterator>
 #include <type_traits>
 
 namespace containers {
+namespace detail {
 
-template<typename T>
-using index_type = bounded::checked_integer<0, static_cast<std::intmax_t>(std::numeric_limits<typename std::remove_reference_t<T>::size_type>::max()) - 1, std::out_of_range>;
+BOUNDED_INTEGER_MAKE_NESTED_TYPE_TEST(iterator_category)
+
+}	// namespace detail
+
+template<typename Iterator>
+constexpr auto is_iterator = detail::has_nested_type_iterator_category<Iterator>(nullptr);
 
 }	// namespace containers

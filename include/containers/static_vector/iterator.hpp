@@ -16,6 +16,8 @@
 
 #pragma once
 
+#include <containers/common_iterator_functions.hpp>
+
 #include <containers/static_vector/forward_declaration.hpp>
 
 #include <bounded_integer/array.hpp>
@@ -77,53 +79,6 @@ private:
 
 	base_iterator m_it;
 };
-
-template<typename T, std::size_t capacity, typename Offset, BOUNDED_REQUIRES(std::numeric_limits<Offset>::is_integer)>
-constexpr auto operator-(static_vector_iterator<T, capacity> const it, Offset const offset) {
-	return it + -offset;
-}
-
-template<typename T, std::size_t capacity, typename Offset, BOUNDED_REQUIRES(std::numeric_limits<Offset>::is_integer)>
-constexpr auto & operator+=(static_vector_iterator<T, capacity> & it, Offset const offset) {
-	return it = it + offset;
-}
-
-template<typename T, std::size_t capacity, typename Offset, BOUNDED_REQUIRES(std::numeric_limits<Offset>::is_integer)>
-constexpr auto & operator-=(static_vector_iterator<T, capacity> & it, Offset const offset) {
-	return it = it - offset;
-}
-
-template<typename T, std::size_t capacity>
-constexpr auto & operator++(static_vector_iterator<T, capacity> & it) {
-	return it += bounded::constant<1>;
-}
-
-template<typename T, std::size_t capacity>
-constexpr auto operator++(static_vector_iterator<T, capacity> & it, int) {
-	auto temp = it;
-	++it;
-	return temp;
-}
-
-
-
-template<typename T, std::size_t capacity>
-constexpr auto operator!=(static_vector_iterator<T, capacity> const lhs, static_vector_iterator<T, capacity> const rhs) {
-	return !(lhs == rhs);
-}
-
-template<typename T, std::size_t capacity>
-constexpr auto operator>(static_vector_iterator<T, capacity> const lhs, static_vector_iterator<T, capacity> const rhs) noexcept {
-	return rhs < lhs;
-}
-template<typename T, std::size_t capacity>
-constexpr auto operator<=(static_vector_iterator<T, capacity> const lhs, static_vector_iterator<T, capacity> const rhs) noexcept {
-	return !(rhs < lhs);
-}
-template<typename T, std::size_t capacity>
-constexpr auto operator>=(static_vector_iterator<T, capacity> const lhs, static_vector_iterator<T, capacity> const rhs) noexcept {
-	return !(lhs < rhs);
-}
 
 }	// namespace detail
 }	// namespace containers

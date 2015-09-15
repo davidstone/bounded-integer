@@ -16,7 +16,7 @@
 
 #pragma once
 
-#include <containers/common_functions.hpp>
+#include <containers/common_container_functions.hpp>
 #include <containers/index_type.hpp>
 #include <containers/repeat_n.hpp>
 #include <containers/uninitialized_storage.hpp>

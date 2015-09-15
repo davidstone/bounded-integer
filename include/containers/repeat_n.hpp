@@ -16,6 +16,7 @@
 
 #pragma once
 
+#include <containers/common_iterator_functions.hpp>
 #include <containers/index_type.hpp>
 
 #include <bounded_integer/bounded_integer.hpp>
@@ -56,7 +57,7 @@ struct repeat_n_iterator {
 		return lhs.m_remaining < rhs.m_remaining;
 	}
 
-	template<typename Offset>
+	template<typename Offset, BOUNDED_REQUIRES(std::numeric_limits<Offset>::is_specialized)>
 	friend constexpr auto operator+(repeat_n_iterator const it, Offset const offset) {
 		return repeat_n_iterator(Size(it.m_remaining - offset), it.m_value);
 	}
@@ -83,18 +84,6 @@ template<typename Size, typename T>
 constexpr auto operator==(repeat_n_sentinel lhs, repeat_n_iterator<Size, T> const rhs) {
 	return rhs == lhs;
 }
-template<typename Size, typename T>
-constexpr auto operator!=(repeat_n_iterator<Size, T> const lhs, repeat_n_iterator<Size, T> const rhs) {
-	return !(lhs == rhs);
-}
-template<typename Size, typename T>
-constexpr auto operator!=(repeat_n_iterator<Size, T> const lhs, repeat_n_sentinel const rhs) {
-	return !(lhs == rhs);
-}
-template<typename Size, typename T>
-constexpr auto operator!=(repeat_n_sentinel const lhs, repeat_n_iterator<Size, T> const rhs) {
-	return !(lhs == rhs);
-}
 
 template<typename Size, typename T>
 constexpr auto operator<(repeat_n_iterator<Size, T> const lhs, repeat_n_sentinel const rhs) {
@@ -102,25 +91,10 @@ constexpr auto operator<(repeat_n_iterator<Size, T> const lhs, repeat_n_sentinel
 	// either less than it or equal to it.
 	return lhs != rhs;
 }
-
-
-template<typename Size, typename T, typename Offset>
-constexpr auto & operator+=(repeat_n_iterator<Size, T> & it, Offset const offset) {
-	it = it + offset;
-	return it;
-}
-
 template<typename Size, typename T>
-constexpr auto & operator++(repeat_n_iterator<Size, T> & it) {
-	return it += bounded::constant<1>;
+constexpr auto operator<(repeat_n_sentinel, repeat_n_iterator<Size, T>) {
+	return false;
 }
-template<typename Size, typename T>
-constexpr auto operator++(repeat_n_iterator<Size, T> & it, int) {
-	auto temp = it;
-	++it;
-	return temp;
-}
-
 
 
 template<typename Size, typename T>
