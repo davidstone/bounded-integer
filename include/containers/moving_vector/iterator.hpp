@@ -106,7 +106,7 @@ public:
 
 	template<typename Integer>
 	auto & operator[](Integer const index) {
-		return m_it[index];
+		return *(*this + index);
 	}
 
 	friend constexpr auto operator==(moving_vector_iterator const lhs, moving_vector_iterator const rhs) noexcept {
