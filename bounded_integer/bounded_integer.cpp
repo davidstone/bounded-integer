@@ -726,6 +726,7 @@ namespace check_arithmetic {
 		quotient == 2,
 		"Calculated quotient incorrect."
 	);
+	// constexpr auto fails_to_compile = bounded::constant<1> / bounded::constant<0>;
 
 	constexpr auto negation = -x;
 	static_assert(
@@ -920,6 +921,10 @@ namespace check_arithmetic {
 		"Incorrect array indexing with bounded::integer."
 	);
 	#endif
+	
+	
+	constexpr auto mixed_right_shift = bounded::constant<100> >> 1;
+	static_assert(mixed_right_shift == bounded::constant<50>);
 }
 
 namespace check_literal {
