@@ -34,7 +34,7 @@ constexpr auto make_mutable_iterator(Container & container, typename Container::
 	return container.begin() + (it - container.begin());
 }
 
-}	// namespace detail
+namespace common {
 
 template<typename Container>
 constexpr auto begin(Container && container) BOUNDED_NOEXCEPT(
@@ -138,7 +138,7 @@ constexpr auto insert(Container & container, typename Container::const_iterator 
 // TODO: noexcept
 template<typename Container, typename Size, BOUNDED_REQUIRES(std::numeric_limits<Size>::is_integer)>
 constexpr auto insert(Container & container, typename Container::const_iterator const position, Size const count, typename Container::value_type const & value) {
-	auto const range = detail::repeat_n(count, value);
+	auto const range = ::containers::detail::repeat_n(count, value);
 	return container.insert(position, range.begin(), range.end());
 }
 
@@ -146,8 +146,8 @@ constexpr auto insert(Container & container, typename Container::const_iterator 
 // TODO: conditional noexcept
 template<typename Container>
 constexpr auto erase(Container & container, typename Container::const_iterator const first_, typename Container::const_iterator const last_) noexcept {
-	auto const first = detail::make_mutable_iterator(container, first_);
-	auto const last = detail::make_mutable_iterator(container, last_);
+	auto const first = ::containers::detail::make_mutable_iterator(container, first_);
+	auto const last = ::containers::detail::make_mutable_iterator(container, last_);
 	auto const to_clear = std::move(last, container.end(), first);
 	while (to_clear != container.end()) {
 		container.pop_back();
@@ -183,7 +183,7 @@ constexpr auto assign(Container & container, std::initializer_list<typename Cont
 )
 template<typename Container, typename Size, BOUNDED_REQUIRES(std::numeric_limits<Size>::is_integer)>
 constexpr auto assign(Container & container, Size const count, typename Container::value_type const & value) {
-	auto const range = detail::repeat_n(count, value);
+	auto const range = ::containers::detail::repeat_n(count, value);
 	assign(container, range.begin(), range.end());
 }
 
@@ -228,5 +228,38 @@ template<typename Container>
 constexpr auto operator<(Container const & lhs, Container const & rhs) BOUNDED_NOEXCEPT(
 	std::lexicographical_compare(lhs.begin(), lhs.end(), rhs.begin(), rhs.end())
 )
+
+#define CONTAINERS_COMMON_USING_DECLARATIONS \
+	using ::containers::detail::common::begin; \
+	using ::containers::detail::common::end; \
+	using ::containers::detail::common::cbegin; \
+	using ::containers::detail::common::cend; \
+	using ::containers::detail::common::rbegin; \
+	using ::containers::detail::common::rend; \
+	using ::containers::detail::common::crbegin; \
+	using ::containers::detail::common::crend; \
+	using ::containers::detail::common::front; \
+	using ::containers::detail::common::back; \
+	using ::containers::detail::common::size; \
+	using ::containers::detail::common::empty; \
+	using ::containers::detail::common::max_size; \
+	using ::containers::detail::common::push_back; \
+	using ::containers::detail::common::insert; \
+	using ::containers::detail::common::erase; \
+	using ::containers::detail::common::assign; \
+	using ::containers::detail::common::clear; \
+	using ::containers::detail::common::resize; \
+	using ::containers::detail::common::operator==; \
+	using ::containers::detail::common::operator<;
+
+}	// namespace common
+
+CONTAINERS_COMMON_USING_DECLARATIONS
+
+}	// namespace detail
+
+CONTAINERS_COMMON_USING_DECLARATIONS
+
+#undef CONTAINERS_COMMON_USING_DECLARATIONS
 
 }	// namespace containers
