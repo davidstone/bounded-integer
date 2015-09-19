@@ -24,6 +24,16 @@ flat_map_sources = ['flat_map/flat_map.cpp', 'algorithms/unique_inplace_merge.cp
 
 programs = [
 	Program(
+		'array',
+		sources = [
+			'array/array.cpp',
+			'array/iterator.cpp',
+			'array/make_array.cpp',
+			'array/tuple.cpp',
+		],
+		include_directories = include_directories
+	),
+	Program(
 		'static_vector',
 		sources = ['static_vector/static_vector.cpp'],
 		include_directories = include_directories
