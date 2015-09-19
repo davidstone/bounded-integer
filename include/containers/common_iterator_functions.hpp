@@ -29,6 +29,12 @@ namespace containers {
 namespace detail {
 namespace common {
 
+template<typename Offset, typename Iterator, BOUNDED_REQUIRES(std::numeric_limits<Offset>::is_integer and is_iterator<Iterator>)>
+constexpr auto operator+(Offset const offset, Iterator const it) BOUNDED_NOEXCEPT(
+	it + offset
+)
+
+
 template<typename Iterator, typename Offset, BOUNDED_REQUIRES(is_iterator<Iterator> and std::numeric_limits<Offset>::is_integer)>
 constexpr auto operator-(Iterator const it, Offset const offset) BOUNDED_NOEXCEPT(
 	it + -offset
@@ -72,7 +78,7 @@ constexpr auto operator--(Iterator & it, int) noexcept(std::is_nothrow_copy_cons
 }
 
 #define CONTAINERS_COMMON_USING_DECLARATIONS \
-	using containers::detail::common::operator-; \
+	using containers::detail::common::operator+; \
 	using containers::detail::common::operator-; \
 	using containers::detail::common::operator+=; \
 	using containers::detail::common::operator-=; \
