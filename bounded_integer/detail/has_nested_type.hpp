@@ -1,4 +1,4 @@
-// Determines if a class meets the requirements of an overflow policy.
+// Determines if a type has a nested type
 // Copyright (C) 2015 David Stone
 //
 // This program is free software: you can redistribute it and / or modify
@@ -16,20 +16,16 @@
 
 #pragma once
 
-#include "../has_nested_type.hpp"
+#include <type_traits>
 
-namespace bounded {
-namespace detail {
+#define BOUNDED_INTEGER_MAKE_NESTED_TYPE_TEST(type) \
+\
+template<typename T> \
+constexpr auto has_nested_type_impl_ ## type(typename std::remove_reference_t<T>::type *) noexcept { return true; } \
+\
+template<typename> \
+constexpr auto has_nested_type_impl_ ## type(...) noexcept { return false; } \
+\
+template<typename T> \
+constexpr auto has_nested_type_ ## type = detail::has_nested_type_impl_ ##type<T>(nullptr);
 
-BOUNDED_INTEGER_MAKE_NESTED_TYPE_TEST(overflow_policy_tag)
-
-}	// namespace detail
-
-
-template<typename overflow_policy>
-struct is_overflow_policy : std::integral_constant<
-	bool,
-	detail::has_nested_type_overflow_policy_tag<overflow_policy>
->{};
-
-}	// namespace bounded

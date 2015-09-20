@@ -1,4 +1,4 @@
-// Determines if a class meets the requirements of an overflow policy.
+// Verify that the header can stand on its own
 // Copyright (C) 2015 David Stone
 //
 // This program is free software: you can redistribute it and / or modify
@@ -14,22 +14,4 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with this program. If not, see <http://www.gnu.org/licenses/>.
 
-#pragma once
-
-#include "../has_nested_type.hpp"
-
-namespace bounded {
-namespace detail {
-
-BOUNDED_INTEGER_MAKE_NESTED_TYPE_TEST(overflow_policy_tag)
-
-}	// namespace detail
-
-
-template<typename overflow_policy>
-struct is_overflow_policy : std::integral_constant<
-	bool,
-	detail::has_nested_type_overflow_policy_tag<overflow_policy>
->{};
-
-}	// namespace bounded
+#include "has_nested_type.hpp"
