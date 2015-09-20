@@ -35,6 +35,7 @@ sources += prepend_dir('detail', [
 	'conditional.cpp',
 	'forward_declaration.cpp',
 	'has_nested_type.cpp',
+	'hash.cpp',
 	'integer_range.cpp',
 	'is_bounded_integer.cpp',
 	'iterator.cpp',

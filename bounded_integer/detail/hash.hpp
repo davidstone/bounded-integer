@@ -18,6 +18,8 @@
 
 #include "class.hpp"
 
+#include <functional>
+
 namespace std {
 
 template<intmax_t minimum, intmax_t maximum, typename overflow_policy, bounded::storage_type storage>
