@@ -41,7 +41,7 @@ struct basic_array_iterator {
 	constexpr basic_array_iterator() noexcept = default;
 	// Convert iterator to const_iterator
 	constexpr operator basic_array_iterator<value_type const, size>() const noexcept {
-		return { m_it };
+		return basic_array_iterator<value_type const, size>(m_it);
 	}
 
 	constexpr auto & operator*() const {

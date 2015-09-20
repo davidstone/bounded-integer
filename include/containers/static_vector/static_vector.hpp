@@ -16,6 +16,7 @@
 
 #pragma once
 
+#include <containers/array/array.hpp>
 #include <containers/common_container_functions.hpp>
 #include <containers/index_type.hpp>
 #include <containers/repeat_n.hpp>
@@ -24,7 +25,6 @@
 #include <containers/static_vector/forward_declaration.hpp>
 #include <containers/static_vector/iterator.hpp>
 
-#include <bounded_integer/array.hpp>
 #include <bounded_integer/integer_range.hpp>
 
 #include <algorithm>
@@ -176,7 +176,7 @@ private:
 		}
 	}
 	
-	bounded::array<uninitialized_storage<value_type>, capacity_> m_container = {{}};
+	array<uninitialized_storage<value_type>, capacity_> m_container = {{}};
 	size_type m_size = bounded::constant<0>;
 };
 

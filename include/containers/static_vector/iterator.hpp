@@ -1,4 +1,4 @@
-// std::vector-like interface around a bounded::array
+// std::vector-like interface around an array
 // Copyright (C) 2015 David Stone
 //
 // This program is free software: you can redistribute it and / or modify
@@ -18,9 +18,9 @@
 
 #include <containers/common_iterator_functions.hpp>
 
-#include <containers/static_vector/forward_declaration.hpp>
+#include <containers/array/array.hpp>
 
-#include <bounded_integer/array.hpp>
+#include <containers/static_vector/forward_declaration.hpp>
 
 #include <cstddef>
 #include <type_traits>
@@ -33,7 +33,7 @@ struct static_vector_iterator {
 private:
 	friend struct static_vector<std::remove_const_t<T>, capacity>;
 	
-	using container = bounded::array<uninitialized_storage<std::remove_const_t<T>>, capacity>;
+	using container = array<uninitialized_storage<std::remove_const_t<T>>, capacity>;
 	using base_iterator = std::conditional_t<std::is_const<T>::value, typename container::const_iterator, typename container::iterator>;
 
 public:
