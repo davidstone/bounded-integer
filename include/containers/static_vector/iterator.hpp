@@ -50,16 +50,14 @@ public:
 		return std::addressof(operator*());
 	}
 	
-	template<typename Offset, BOUNDED_REQUIRES(std::numeric_limits<Offset>::is_integer)>
-	friend constexpr auto operator+(static_vector_iterator const it, Offset const offset) {
+	friend constexpr auto operator+(static_vector_iterator const it, difference_type const offset) {
 		return static_vector_iterator(it.m_it + offset);
 	}
 	friend constexpr auto operator-(static_vector_iterator const lhs, static_vector_iterator const rhs) {
 		return lhs.m_it - rhs.m_it;
 	}
 
-	template<typename Offset>
-	constexpr auto && operator[](Offset const index) {
+	constexpr auto && operator[](index_type<static_vector_iterator> const index) {
 		return *(*this + index);
 	}
 
