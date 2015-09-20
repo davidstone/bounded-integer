@@ -17,7 +17,7 @@
 #pragma once
 
 #include <containers/moving_vector/forward_declaration.hpp>
-#include <containers/moving_vector/iterator.hpp>
+#include <containers/moving_vector/moving_vector_iterator.hpp>
 
 #include <value_ptr/value_ptr.hpp>
 
