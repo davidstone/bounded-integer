@@ -30,12 +30,6 @@ namespace containers {
 namespace detail {
 namespace common {
 
-template<typename Indexable, typename Index>
-constexpr decltype(auto) at(Indexable && indexable, Index const index) BOUNDED_NOEXCEPT(
-	std::forward<Indexable>(indexable)[static_cast<index_type<Indexable>>(index)]
-)
-
-
 template<typename LHS, typename RHS>
 constexpr auto operator!=(LHS const & lhs, RHS const & rhs) BOUNDED_NOEXCEPT(
 	!(lhs == rhs)
@@ -55,7 +49,6 @@ constexpr auto operator>=(LHS const & lhs, RHS const & rhs) BOUNDED_NOEXCEPT(
 )
 
 #define CONTAINERS_COMMON_USING_DECLARATIONS \
-	using ::containers::detail::common::at; \
 	using ::containers::detail::common::operator!=; \
 	using ::containers::detail::common::operator>; \
 	using ::containers::detail::common::operator<=; \

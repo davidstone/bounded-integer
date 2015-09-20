@@ -17,6 +17,7 @@
 #pragma once
 
 #include <containers/common_functions.hpp>
+#include <containers/is_container.hpp>
 #include <containers/repeat_n.hpp>
 
 #include <bounded_integer/bounded_integer.hpp>
@@ -80,6 +81,12 @@ constexpr auto crbegin(Container const & container) BOUNDED_NOEXCEPT(
 template<typename Container>
 constexpr auto crend(Container const & container) BOUNDED_NOEXCEPT(
 	detail::make_reverse_iterator(container.end())
+)
+
+
+template<typename Container, typename Index, BOUNDED_REQUIRES(is_container<Container>)>
+constexpr decltype(auto) at(Container && container, Index const index) BOUNDED_NOEXCEPT(
+	std::forward<Container>(container)[static_cast<index_type<Container>>(index)]
 )
 
 
@@ -238,6 +245,7 @@ constexpr auto operator<(Container const & lhs, Container const & rhs) BOUNDED_N
 	using ::containers::detail::common::rend; \
 	using ::containers::detail::common::crbegin; \
 	using ::containers::detail::common::crend; \
+	using ::containers::detail::common::at; \
 	using ::containers::detail::common::front; \
 	using ::containers::detail::common::back; \
 	using ::containers::detail::common::size; \
