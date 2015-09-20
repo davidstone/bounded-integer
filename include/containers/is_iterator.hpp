@@ -29,6 +29,6 @@ BOUNDED_INTEGER_MAKE_NESTED_TYPE_TEST(iterator_category)
 }	// namespace detail
 
 template<typename Iterator>
-constexpr auto is_iterator = detail::has_nested_type_iterator_category<Iterator>(nullptr);
+constexpr auto is_iterator = detail::has_nested_type_iterator_category<Iterator>;
 
 }	// namespace containers
