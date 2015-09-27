@@ -112,9 +112,6 @@ private:
 
 template<typename T>
 struct default_optional_storage<T, false> {
-private:
-	using base = default_optional_storage<T, true>;
-public:
 	constexpr default_optional_storage() noexcept:
 		m_storage{},
 		m_initialized(false) {
