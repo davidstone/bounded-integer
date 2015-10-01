@@ -302,12 +302,8 @@ private:
 		return std::forward<U>(u);
 	}
 
-	// Handles value category correctly
 	template<typename Optional>
-	using optional_value_type = decltype(*std::declval<Optional>());
-	
-	template<typename Optional>
-	constexpr optional(Optional && other, common_init_tag) noexcept(std::is_nothrow_constructible<value_type, optional_value_type<Optional>>::value):
+	constexpr optional(Optional && other, common_init_tag) noexcept(std::is_nothrow_constructible<value_type, decltype(*std::declval<Optional>())>::value):
 		optional(none) {
 		if (other) {
 			m_storage.emplace(*std::forward<Optional>(other));
