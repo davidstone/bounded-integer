@@ -87,18 +87,6 @@ constexpr decltype(auto) as_integer(T && t) noexcept {
 }	// namespace detail
 
 
-template<typename T, BOUNDED_REQUIRES(!is_bounded_integer<std::decay_t<T>>::value)>
-constexpr auto get_overflow_policy(T const &) noexcept {
-	return null_policy{};
-}
-template<typename T, BOUNDED_REQUIRES(is_bounded_integer<std::decay_t<T>>::value)>
-constexpr decltype(auto) get_overflow_policy(T && value) noexcept {
-	return std::forward<T>(value).overflow_policy();
-}
-
-
-
-
 template<intmax_t value, typename overflow_policy = null_policy, storage_type storage = storage_type::fast>
 constexpr auto constant = integer<value, value, overflow_policy, storage>(value, non_check);
 
@@ -106,20 +94,23 @@ constexpr auto constant = integer<value, value, overflow_policy, storage>(value,
 
 
 template<intmax_t minimum, intmax_t maximum, typename overflow_policy_ = null_policy, storage_type storage = storage_type::fast>
-struct integer : private overflow_policy_ {
+struct integer {
 	static_assert(minimum <= maximum, "Maximum cannot be less than minimum");
 	using underlying_type = std::conditional_t<storage == storage_type::fast, detail::fast_t<minimum, maximum>, detail::least_t<minimum, maximum>>;
-	using overflow_policy_type = overflow_policy_;
+	using overflow_policy = overflow_policy_;
 	static_assert(detail::value_fits_in_type<underlying_type>(minimum), "minimum does not fit in underlying_type.");
 	static_assert(detail::value_fits_in_type<underlying_type>(maximum), "maximum does not fit in underlying_type.");
 
 	static_assert(minimum < 0 ? std::numeric_limits<underlying_type>::is_signed : true, "underlying_type should be signed.");
 	
 	// May relax these restrictions in the future
-	static_assert(std::is_nothrow_default_constructible<overflow_policy_type>::value, "overflow_policy must be nothrow default constructible.");
-	static_assert(std::is_nothrow_move_constructible<overflow_policy_type>::value, "overflow_policy must be nothrow move constructible.");
+	static_assert(std::is_nothrow_default_constructible<overflow_policy>::value, "overflow_policy must be nothrow default constructible.");
 	
-
+	template<typename T>
+	static constexpr decltype(auto) apply_overflow_policy(T && value) BOUNDED_NOEXCEPT(
+		overflow_policy{}.assignment(std::forward<T>(value), constant<minimum>, constant<maximum>)
+	)
+	
 	integer() noexcept = default;
 	constexpr integer(integer const &) noexcept = default;
 	constexpr integer(integer &&) noexcept = default;
@@ -127,29 +118,10 @@ struct integer : private overflow_policy_ {
 	// Use these constructors if you know by means that cannot be determined by
 	// the type system that the value really does fit in the range.
 	template<typename T, BOUNDED_REQUIRES(
-		detail::is_explicitly_constructible_from<overflow_policy_type, T>(minimum, maximum)
-	)>
-	constexpr integer(T && other, overflow_policy_type policy, non_check_t) noexcept:
-		overflow_policy_type(std::move(policy)),
-		m_value(static_cast<underlying_type>(std::forward<T>(other))) {
-	}
-	// std::forward is safe here because it will never actually move anything.
-	// The value itself is only moved from inside of the constructor this
-	// forwards to.
-	template<typename T, BOUNDED_REQUIRES(
-		detail::is_explicitly_constructible_from<overflow_policy_type, T>(minimum, maximum)
+		detail::is_explicitly_constructible_from<overflow_policy, T>(minimum, maximum)
 	)>
 	constexpr integer(T && other, non_check_t) noexcept:
-		integer(std::forward<T>(other), static_cast<overflow_policy_type>(get_overflow_policy(std::forward<T>(other))), non_check) {
-	}
-
-
-	template<typename T, BOUNDED_REQUIRES(
-		detail::is_explicitly_constructible_from<overflow_policy_type, T>(minimum, maximum)
-	)>
-	constexpr integer(T && other, overflow_policy_type policy) BOUNDED_NOEXCEPT_INITIALIZATION(
-		integer(policy.assignment(detail::as_integer(std::forward<T>(other)), constant<minimum>, constant<maximum>), policy, non_check)
-	) {
+		m_value(static_cast<underlying_type>(std::forward<T>(other))) {
 	}
 
 
@@ -158,41 +130,28 @@ struct integer : private overflow_policy_ {
 		detail::is_implicitly_constructible_from<T>(minimum, maximum)
 	)>
 	constexpr integer(T && other) BOUNDED_NOEXCEPT_INITIALIZATION(
-		integer(std::forward<T>(other), static_cast<overflow_policy_type>(get_overflow_policy(std::forward<T>(other))))
+		integer(std::forward<T>(other), non_check)
 	) {
 	}
 
 	template<typename T, BOUNDED_REQUIRES(
 		!detail::is_implicitly_constructible_from<T>(minimum, maximum) and
-		detail::is_explicitly_constructible_from<overflow_policy_type, T>(minimum, maximum)
+		detail::is_explicitly_constructible_from<overflow_policy, T>(minimum, maximum)
 	)>
 	constexpr explicit integer(T && other) BOUNDED_NOEXCEPT_INITIALIZATION(
-		integer(std::forward<T>(other), static_cast<overflow_policy_type>(get_overflow_policy(std::forward<T>(other))))
+		integer(apply_overflow_policy(detail::as_integer(std::forward<T>(other))), non_check)
 	) {
 	}
 
 
 	template<typename Enum, BOUNDED_REQUIRES(
-		std::is_enum<Enum>::value and !detail::is_explicitly_constructible_from<overflow_policy_type, Enum>(minimum, maximum)
-	)>
-	constexpr integer(Enum other, overflow_policy_type policy, non_check_t) noexcept:
-		integer(static_cast<std::underlying_type_t<Enum>>(other), std::move(policy), non_check) {
-	}
-	template<typename Enum, BOUNDED_REQUIRES(
-		std::is_enum<Enum>::value and !detail::is_explicitly_constructible_from<overflow_policy_type, Enum>(minimum, maximum)
+		std::is_enum<Enum>::value and !detail::is_explicitly_constructible_from<overflow_policy, Enum>(minimum, maximum)
 	)>
 	constexpr integer(Enum other, non_check_t) noexcept:
 		integer(static_cast<std::underlying_type_t<Enum>>(other), non_check) {
 	}
 	template<typename Enum, BOUNDED_REQUIRES(
-		std::is_enum<Enum>::value and !detail::is_explicitly_constructible_from<overflow_policy_type, Enum>(minimum, maximum)
-	)>
-	constexpr explicit integer(Enum other, overflow_policy_type policy) BOUNDED_NOEXCEPT_INITIALIZATION(
-		integer(static_cast<std::underlying_type_t<Enum>>(other), std::move(policy))
-	) {
-	}
-	template<typename Enum, BOUNDED_REQUIRES(
-		std::is_enum<Enum>::value and !detail::is_explicitly_constructible_from<overflow_policy_type, Enum>(minimum, maximum)
+		std::is_enum<Enum>::value and !detail::is_explicitly_constructible_from<overflow_policy, Enum>(minimum, maximum)
 	)>
 	constexpr explicit integer(Enum other) BOUNDED_NOEXCEPT_INITIALIZATION(
 		integer(static_cast<std::underlying_type_t<Enum>>(other)) 
@@ -214,27 +173,24 @@ struct integer : private overflow_policy_ {
 		m_value = static_cast<underlying_type>(std::forward<T>(other));
 	}
 	
-	constexpr auto && operator=(integer const & other) & noexcept(noexcept(std::declval<overflow_policy_type>().assignment(other, constant<minimum>, constant<maximum>))) {
-		return unchecked_assignment(overflow_policy().assignment(other, constant<minimum>, constant<maximum>));
-	}
-	constexpr auto && operator=(integer && other) & noexcept(noexcept(std::declval<overflow_policy_type>().assignment(std::move(other), constant<minimum>, constant<maximum>))) {
-		return unchecked_assignment(overflow_policy().assignment(std::move(other), constant<minimum>, constant<maximum>));
-	}
+	constexpr auto operator=(integer const & other) & noexcept -> integer & = default;
+	constexpr auto operator=(integer && other) & noexcept -> integer & = default;
+
 	template<typename T>
-	constexpr auto && operator=(T && other) & noexcept(noexcept(std::declval<overflow_policy_type>().assignment(std::forward<T>(other), constant<minimum>, constant<maximum>))) {
+	constexpr auto && operator=(T && other) & noexcept(noexcept(apply_overflow_policy(std::forward<T>(other)))) {
 		static_assert(
-			detail::is_explicitly_constructible_from<overflow_policy_type, T>(minimum, maximum),
+			detail::is_explicitly_constructible_from<overflow_policy, T>(minimum, maximum),
 			"Value not in range."
 		);
-		return unchecked_assignment(overflow_policy().assignment(std::forward<T>(other), constant<minimum>, constant<maximum>));
+		return unchecked_assignment(apply_overflow_policy(std::forward<T>(other)));
 	}
 	template<typename T>
-	auto operator=(T && other) volatile & noexcept(noexcept(std::declval<overflow_policy_type>().assignment(std::forward<T>(other), constant<minimum>, constant<maximum>))) {
+	auto operator=(T && other) volatile & noexcept(noexcept(apply_overflow_policy(std::forward<T>(other)))) {
 		static_assert(
-			detail::is_explicitly_constructible_from<overflow_policy_type, T>(minimum, maximum),
+			detail::is_explicitly_constructible_from<overflow_policy, T>(minimum, maximum),
 			"Value not in range."
 		);
-		unchecked_assignment(overflow_policy().assignment(std::forward<T>(other), constant<minimum>, constant<maximum>));
+		unchecked_assignment(apply_overflow_policy(std::forward<T>(other)));
 	}
 	
 	constexpr auto const & value() const noexcept {
@@ -243,21 +199,7 @@ struct integer : private overflow_policy_ {
 	auto const & value() const volatile noexcept {
 		return m_value;
 	}
-	constexpr auto overflow_policy() const & noexcept -> overflow_policy_type const & {
-		return *this;
-	}
-	auto overflow_policy() const volatile & noexcept -> overflow_policy_type const volatile & {
-		return *this;
-	}
-	constexpr auto overflow_policy() & noexcept -> overflow_policy_type & {
-		return *this;
-	}
-	auto overflow_policy() volatile & noexcept -> overflow_policy_type volatile & {
-		return *this;
-	}
-	constexpr auto overflow_policy() && noexcept -> overflow_policy_type && {
-		return static_cast<overflow_policy_type &&>(*this);
-	}
+
 	// Do not verify that the value is in range because the user has requested a
 	// conversion out of the safety of bounded::integer. It is subject to all
 	// the standard rules of conversion from one integer type to another.
