@@ -34,7 +34,7 @@ void test_generic(T const & t, std::initializer_list<T> init) {
 	assert(size(count) == capacity);
 
 	assert(default_constructed.begin() == default_constructed.begin());
-	assert(default_constructed.begin() != default_constructed.end());
+	assert(default_constructed.begin() == default_constructed.end());
 	
 	for (auto const & value : count) {
 		assert(value == T{});
