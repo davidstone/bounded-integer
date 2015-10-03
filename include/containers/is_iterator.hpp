@@ -16,15 +16,12 @@
 
 #pragma once
 
-#include <bounded_integer/bounded_integer.hpp>
-
-#include <iterator>
-#include <type_traits>
+#include <containers/has_nested_type.hpp>
 
 namespace containers {
 namespace detail {
 
-BOUNDED_INTEGER_MAKE_NESTED_TYPE_TEST(iterator_category)
+CONTAINERS_MAKE_NESTED_TYPE_TEST(iterator_category)
 
 }	// namespace detail
 

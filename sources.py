@@ -20,12 +20,19 @@ source_directory = 'source'
 
 include_directories = ['../bounded_integer', '../value_ptr', '../include']
 
-flat_map_sources = ['flat_map/flat_map.cpp', 'algorithms/unique_inplace_merge.cpp']
+common_sources = [
+	'has_nested_type.cpp',
+]
+
+flat_map_sources = common_sources + [
+	'flat_map/flat_map.cpp',
+	'algorithms/unique_inplace_merge.cpp',
+]
 
 programs = [
 	Program(
 		'array',
-		sources = [
+		sources = common_sources + [
 			'array/array.cpp',
 			'array/iterator.cpp',
 			'array/make_array.cpp',
@@ -35,29 +42,29 @@ programs = [
 	),
 	Program(
 		'dynamic_array',
-		sources = ['dynamic_array/dynamic_array.cpp'],
+		sources = common_sources + ['dynamic_array/dynamic_array.cpp'],
 		include_directories = include_directories
 	),
 	Program(
 		'static_vector',
-		sources = ['static_vector/static_vector.cpp'],
+		sources = common_sources + ['static_vector/static_vector.cpp'],
 		include_directories = include_directories
 	),
 	Program(
 		'forward_list',
-		sources = ['forward_list/forward_list.cpp'],
+		sources = common_sources + ['forward_list/forward_list.cpp'],
 		defines = ['USE_SYSTEM_FORWARD_LIST=false'],
 		include_directories = include_directories
 	),
 	Program(
 		'forward_list_std',
-		sources = ['forward_list/forward_list.cpp'],
+		sources = common_sources + ['forward_list/forward_list.cpp'],
 		defines = ['USE_SYSTEM_FORWARD_LIST=true'],
 		include_directories = include_directories
 	),
 	Program(
 		'moving_vector',
-		sources = ['moving_vector/moving_vector.cpp'],
+		sources = common_sources + ['moving_vector/moving_vector.cpp'],
 		include_directories = include_directories
 	),
 	Program(

@@ -1,4 +1,4 @@
-// Determine if a type is a container
+// Determines if a type has a nested type
 // Copyright (C) 2015 David Stone
 //
 // This program is free software: you can redistribute it and / or modify
@@ -16,17 +16,16 @@
 
 #pragma once
 
-#include <containers/has_nested_type.hpp>
+#include <type_traits>
 
-namespace containers {
-namespace detail {
+#define CONTAINERS_MAKE_NESTED_TYPE_TEST(type) \
+\
+template<typename T> \
+constexpr auto has_nested_type_impl_ ## type(typename std::remove_reference_t<T>::type *) noexcept { return true; } \
+\
+template<typename> \
+constexpr auto has_nested_type_impl_ ## type(...) noexcept { return false; } \
+\
+template<typename T> \
+constexpr auto has_nested_type_ ## type = detail::has_nested_type_impl_ ##type<T>(nullptr);
 
-CONTAINERS_MAKE_NESTED_TYPE_TEST(iterator)
-CONTAINERS_MAKE_NESTED_TYPE_TEST(const_iterator)
-
-}	// namespace detail
-
-template<typename Container>
-constexpr auto is_container = detail::has_nested_type_iterator<Container> or detail::has_nested_type_const_iterator<Container>;
-
-}	// namespace containers
