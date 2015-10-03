@@ -1,4 +1,4 @@
-// optional type with specialization to minimize overhead with bounded::integer
+// Optional class forward declaration
 // Copyright (C) 2015 David Stone
 //
 // This program is free software: you can redistribute it and / or modify
@@ -16,9 +16,19 @@
 
 #pragma once
 
-#include "detail/optional/comparison_operators.hpp"
-#include "detail/optional/make_optional_array.hpp"
-#include "detail/optional/optional.hpp"
-#include "detail/optional/value_or.hpp"
-#include "bounded_integer.hpp"
+namespace bounded {
 
+template<typename T>
+struct optional;
+
+struct optional_tag {
+private:
+	template<typename>
+	friend struct optional;
+	
+	optional_tag() = default;
+	optional_tag(optional_tag const &) = default;
+	optional_tag(optional_tag &&) = default;
+};
+
+}	// namespace bounded

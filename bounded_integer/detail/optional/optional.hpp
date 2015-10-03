@@ -16,14 +16,23 @@
 
 #pragma once
 
+#include "forward_declaration.hpp"
+
 #include "../noexcept.hpp"
 #include "../requires.hpp"
 
 #include <stdexcept>
 #include <type_traits>
 #include <utility>
+#include "../class.hpp"
 
 namespace bounded {
+namespace detail {
+
+template<typename T, bool is_trivially_destructible = std::is_trivially_destructible<T>::value>
+struct default_optional_storage;
+
+}	// namespace detail
 
 // none_t cannot be default constructible or we get an ambiguity in op = {};
 struct none_t {
@@ -52,43 +61,45 @@ constexpr auto in_place = in_place_t{};
 // example of this
 
 
-template<typename T, bool is_trivially_destructible = std::is_trivially_destructible<T>::value>
-struct default_optional_storage;
+namespace detail {
 
 template<typename T>
 struct default_optional_storage<T, true> {
-	constexpr default_optional_storage() noexcept:
-		m_storage{},
+	constexpr explicit default_optional_storage(optional_tag) noexcept:
+		m_storage(),
 		m_initialized(false) {
 	}
 	
 	template<typename... Args>
-	constexpr explicit default_optional_storage(in_place_t, Args && ... args) noexcept(std::is_nothrow_constructible<T, Args && ...>::value):
+	constexpr explicit default_optional_storage(Args && ... args) noexcept(std::is_nothrow_constructible<T, Args && ...>::value):
 		m_storage(in_place, std::forward<Args>(args)...),
 		m_initialized(true) {
 	}
 
 	template<typename... Args>
-	void emplace(Args && ... args) noexcept(std::is_nothrow_constructible<T, Args && ...>::value) {
+	auto initialize(optional_tag, Args && ... args) noexcept(std::is_nothrow_constructible<T, Args && ...>::value) {
 		new(&m_storage.value) T(std::forward<Args>(args)...);
 		m_initialized = true;
 	}
 	
-	constexpr void reset() noexcept {
+	constexpr auto uninitialize(optional_tag) noexcept {
+		// Trivially destructible, so we can skip the destructor call. That
+		// allows this to be constexpr
 		m_initialized = false;
 	}
 
 	
-	constexpr auto is_initialized() const noexcept {
+	constexpr auto is_initialized(optional_tag) const noexcept {
 		return m_initialized;
 	}
-	constexpr auto && value() const & noexcept {
+	
+	constexpr operator T const & () const & noexcept {
 		return m_storage.value;
 	}
-	constexpr auto && value() & noexcept {
+	constexpr operator T & () & noexcept {
 		return m_storage.value;
 	}
-	constexpr auto && value() && noexcept {
+	constexpr operator T && () && noexcept {
 		return std::move(m_storage.value);
 	}
 private:
@@ -112,49 +123,53 @@ private:
 
 template<typename T>
 struct default_optional_storage<T, false> {
-	constexpr default_optional_storage() noexcept:
-		m_storage{},
+	constexpr explicit default_optional_storage(optional_tag) noexcept:
+		m_storage(),
 		m_initialized(false) {
 	}
 	
 	template<typename... Args>
-	constexpr default_optional_storage(in_place_t, Args && ... args) noexcept(std::is_nothrow_constructible<T, Args && ...>::value):
+	constexpr default_optional_storage(Args && ... args) noexcept(std::is_nothrow_constructible<T, Args && ...>::value):
 		m_storage(in_place, std::forward<Args>(args)...),
 		m_initialized(true) {
 	}
 	
 	template<typename... Args>
-	void emplace(Args && ... args) noexcept(std::is_nothrow_constructible<T, Args && ...>::value) {
-		reset();
+	auto initialize(optional_tag, Args && ... args) noexcept(std::is_nothrow_constructible<T, Args && ...>::value) {
+		uninitialize();
 		new(&m_storage.value) T(std::forward<Args>(args)...);
 		m_initialized = true;
 	}
 	
-	void reset() noexcept {
-		if (m_initialized) {
-			value().~T();
-			m_initialized = false;
-		}
+	auto uninitialize(optional_tag) noexcept {
+		uninitialize();
 	}
 
-	constexpr auto is_initialized() const noexcept {
+	constexpr auto is_initialized(optional_tag) const noexcept {
 		return m_initialized;
 	}
-	constexpr auto && value() const & noexcept {
+
+	constexpr operator T const & () const & noexcept {
 		return m_storage.value;
 	}
-	constexpr auto && value() & noexcept {
+	constexpr operator T & () & noexcept {
 		return m_storage.value;
 	}
-	constexpr auto && value() && noexcept {
+	constexpr operator T && () && noexcept {
 		return std::move(m_storage.value);
 	}
 
 	~default_optional_storage() noexcept {
-		reset();
+		uninitialize();
 	}
 	
 private:
+	auto uninitialize() noexcept {
+		if (m_initialized) {
+			m_storage.value.~T();
+			m_initialized = false;
+		}
+	}
 	union underlying_storage {
 		constexpr underlying_storage() noexcept:
 			dummy(none) {
@@ -171,16 +186,6 @@ private:
 	underlying_storage m_storage;
 	bool m_initialized;
 };
-
-template<typename T>
-struct optional_storage : default_optional_storage<T> {
-private:
-	using base = default_optional_storage<T>;
-public:
-	using base::base;
-};
-
-namespace detail {
 
 template<typename Optional, typename T>
 constexpr auto & assign(Optional & target, T && source) noexcept(std::is_nothrow_constructible<typename Optional::value_type, T>::value and std::is_nothrow_assignable<typename Optional::value_type &, T>::value) {
@@ -209,14 +214,25 @@ template<typename T>
 struct optional {
 private:
 	struct common_init_tag{};
+	// Cannot use std::is_constructible because that does not account for
+	// friendship
+	template<typename U>
+	static constexpr auto is_specialized(decltype(U(std::declval<optional_tag>())) *) noexcept { return true; }
+	template<typename>
+	static constexpr auto is_specialized(...) noexcept { return false; }
+	using optional_storage = std::conditional_t<is_specialized<T>(nullptr), T, detail::default_optional_storage<T>>;
 public:
 	using value_type = T;
 
-	constexpr optional(none_t = none) noexcept {}
+	constexpr optional(none_t = none) noexcept:
+		m_value(optional_tag{})
+	{
+		static_assert(noexcept(optional_storage(optional_tag{})));
+	}
 
 	template<typename... Args, BOUNDED_REQUIRES(std::is_constructible<value_type, Args && ...>::value)>
-	constexpr explicit optional(in_place_t, Args && ... other) noexcept(std::is_nothrow_constructible<optional_storage<value_type>, in_place_t, Args && ...>::value):
-		m_storage(in_place, std::forward<Args>(other)...) {
+	constexpr explicit optional(in_place_t, Args && ... other) noexcept(std::is_nothrow_constructible<value_type, Args && ...>::value):
+		m_value(std::forward<Args>(other)...) {
 	}
 	template<typename U, BOUNDED_REQUIRES(std::is_convertible<U &&, value_type>::value)>
 	constexpr optional(U && other)
@@ -249,14 +265,14 @@ public:
 	#endif
 
 	
-	constexpr auto && operator*() const & {
-		return *this ? m_storage.value() : error_using_uninitialized_optional(m_storage.value());
+	constexpr auto operator*() const & -> value_type const & {
+		return *this ? m_value : error_using_uninitialized_optional(m_value);
 	}
-	constexpr auto && operator*() & {
-		return *this ? m_storage.value() : error_using_uninitialized_optional(m_storage.value());
+	constexpr auto operator*() & -> value_type & {
+		return *this ? m_value : error_using_uninitialized_optional(m_value);
 	}
-	constexpr auto && operator*() && {
-		return *this ? std::move(m_storage).value() : error_using_uninitialized_optional(std::move(m_storage).value());
+	constexpr auto operator*() && -> value_type && {
+		return *this ? std::move(m_value) : error_using_uninitialized_optional(std::move(m_value));
 	}
 
 	constexpr auto operator->() const {
@@ -267,11 +283,19 @@ public:
 	}
 	
 	constexpr explicit operator bool() const noexcept {
-		return m_storage.is_initialized();
+		static_assert(noexcept(m_value.is_initialized(optional_tag{})));
+		return m_value.is_initialized(optional_tag{});
+	}
+
+	// TODO: handle std::initializer_list
+	template<typename... Args>
+	constexpr auto emplace(Args && ... args) noexcept(std::is_nothrow_constructible<value_type, Args && ...>::value) {
+		m_value.initialize(optional_tag{}, std::forward<Args>(args)...);
 	}
 
 	constexpr auto && operator=(none_t) & noexcept {
-		m_storage.reset();
+		static_assert(noexcept(m_value.uninitialize(optional_tag{})));
+		m_value.uninitialize(optional_tag{});
 		return *this;
 	}
 	constexpr auto && operator=(optional const & other) & BOUNDED_NOEXCEPT(
@@ -286,11 +310,6 @@ public:
 		detail::assign(*this, std::forward<U>(other))
 	)
 	
-	// TODO: handle std::initializer_list
-	template<typename... Args>
-	constexpr void emplace(Args && ... args) noexcept(std::is_nothrow_constructible<value_type, Args && ...>::value) {
-		m_storage.emplace(std::forward<Args>(args)...);
-	}
 private:
 	// The identity function is intentionally not constexpr. This provides
 	// compile-time checking if used in a constexpr context. If this is called
@@ -306,11 +325,11 @@ private:
 	constexpr optional(Optional && other, common_init_tag) noexcept(std::is_nothrow_constructible<value_type, decltype(*std::declval<Optional>())>::value):
 		optional(none) {
 		if (other) {
-			m_storage.emplace(*std::forward<Optional>(other));
+			emplace(*std::forward<Optional>(other));
 		}
 	}
 	
-	optional_storage<value_type> m_storage;
+	optional_storage m_value;
 };
 
 

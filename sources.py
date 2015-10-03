@@ -73,9 +73,9 @@ sources += prepend_dir('detail/arithmetic', [
 ])
 sources += prepend_dir('detail/optional', [
 	'comparison_operators.cpp',
+	'forward_declaration.cpp',
 	'make_optional_array.cpp',
 	'optional.cpp',
-	'specialization.cpp',
 	'value_or.cpp',
 ])
 sources += prepend_dir('detail/policy', [

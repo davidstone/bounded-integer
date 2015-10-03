@@ -15,7 +15,6 @@
 // along with this program. If not, see <http://www.gnu.org/licenses/>.
 
 #include "optional.hpp"
-#include "specialization.hpp"
 
 #include <type_traits>
 

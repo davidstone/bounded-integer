@@ -24,6 +24,8 @@
 #include "requires.hpp"
 #include "underlying_type.hpp"
 
+#include "optional/forward_declaration.hpp"
+
 #include "policy/null_policy.hpp"
 
 #include <cstdint>
@@ -56,6 +58,17 @@ template<typename policy, typename T, BOUNDED_REQUIRES(!allow_construction_from<
 constexpr auto is_explicitly_constructible_from(intmax_t, intmax_t) noexcept {
 	return false;
 }
+
+
+// Necessary for optional specialization
+template<typename T>
+constexpr auto underlying_min = basic_numeric_limits<typename T::underlying_type>::min();
+template<typename T>
+constexpr auto underlying_max = basic_numeric_limits<typename T::underlying_type>::max();
+
+template<typename T>
+constexpr auto has_extra_space = underlying_min<T> < basic_numeric_limits<T>::min() or basic_numeric_limits<T>::max() < underlying_max<T>;
+
 
 // The user can specialize basic_numeric_limits for their enumeration type to
 // provide tighter bounds than the underlying_type might suggest. This forwards
@@ -260,7 +273,32 @@ struct integer : private overflow_policy_ {
 	constexpr explicit operator T() const volatile noexcept {
 		return static_cast<T>(m_value);
 	}
+	
+	
+	// Allow a compressed optional representation
+	template<typename Tag, BOUNDED_REQUIRES(std::is_same<Tag, optional_tag>::value and detail::has_extra_space<integer>)>
+	constexpr explicit integer(Tag) noexcept:
+		m_value(uninitialized_value()) {
+	}
+
+	template<typename Tag, typename... Args, BOUNDED_REQUIRES(std::is_same<Tag, optional_tag>::value and detail::has_extra_space<integer>)>
+	constexpr auto initialize(Tag, Args && ... args) noexcept(std::is_nothrow_constructible<integer, Args && ...>::value) {
+		*this = integer(std::forward<Args>(args)...);
+	}
+
+	template<typename Tag, BOUNDED_REQUIRES(std::is_same<Tag, optional_tag>::value and detail::has_extra_space<integer>)>
+	constexpr auto uninitialize(Tag) noexcept {
+		m_value = uninitialized_value();
+	}
+	template<typename Tag, BOUNDED_REQUIRES(std::is_same<Tag, optional_tag>::value and detail::has_extra_space<integer>)>
+	constexpr auto is_initialized(Tag) const noexcept {
+		return m_value != uninitialized_value();
+	}
 private:
+	static constexpr auto uninitialized_value() noexcept {
+		return static_cast<underlying_type>(minimum > std::numeric_limits<underlying_type>::min() ? minimum - 1 : maximum + 1);
+	}
+
 	underlying_type m_value;
 };
 
