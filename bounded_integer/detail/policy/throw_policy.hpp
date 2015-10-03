@@ -16,7 +16,11 @@
 
 #pragma once
 
+#include "null_policy.hpp"
 #include "../comparison.hpp"
+#include "../minmax.hpp"
+#include "../noexcept.hpp"
+#include "../numeric_limits.hpp"
 #include "../is_bounded_integer.hpp"
 #include "../string.hpp"
 #include <stdexcept>
@@ -26,20 +30,30 @@ namespace policy_detail {
 
 using default_exception = std::range_error;
 
+template<intmax_t minimum, intmax_t maximum, typename T>
+constexpr auto reduce_range(T && value) BOUNDED_NOEXCEPT(
+	integer<
+		max(minimum, basic_numeric_limits<T>::min()),
+		min(maximum, basic_numeric_limits<T>::max()),
+		null_policy,
+		storage_type::fast
+	>(std::forward<T>(value))
+)
+
 }	// namespace policy_detail
 
 template<typename Exception = policy_detail::default_exception>
 struct throw_policy {
 	constexpr throw_policy() noexcept {}
 
-	// The optimizer should be able to simplify this to remove dead checks.
 	template<typename T, typename Minimum, typename Maximum>
-	static constexpr auto assignment(T && value, Minimum && minimum, Maximum && maximum) -> T && {
+	static constexpr auto assignment(T && value, Minimum && minimum, Maximum && maximum) {
 		static_assert(is_bounded_integer<std::decay_t<Minimum>>::value, "Only bounded::integer types are supported.");
 		static_assert(is_bounded_integer<std::decay_t<Maximum>>::value, "Only bounded::integer types are supported.");
-		return (minimum <= value and value <= maximum) ?
-			std::forward<T>(value) :
-			(throw Exception("Got a value of " + to_string(value) + " but expected a value in the range [" + to_string(minimum) + ", " + to_string(maximum) + "]"), std::forward<T>(value));
+		if (minimum <= value and value <= maximum) {
+			return policy_detail::reduce_range<basic_numeric_limits<Minimum>::min(), basic_numeric_limits<Maximum>::max()>(std::forward<T>(value));
+		}
+		throw Exception("Got a value of " + to_string(value) + " but expected a value in the range [" + to_string(minimum) + ", " + to_string(maximum) + "]");
 	}
 	
 	using overflow_policy_tag = void;
