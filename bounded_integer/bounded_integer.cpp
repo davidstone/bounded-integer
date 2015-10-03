@@ -1207,6 +1207,14 @@ auto check_math() {
 	check_absolute_value<checked_integer<-7, 450>, 1, checked_integer<0, 450>, 1>();
 }
 
+template<typename Optional>
+auto check_empty_braces() {
+	Optional op = {};
+	assert(!op);
+	op = {};
+	assert(!op);
+}
+
 template<typename T>
 auto check_uncompressed_optional() {
 	using type = bounded::integer<std::numeric_limits<T>::min(), std::numeric_limits<T>::max()>;
@@ -1214,6 +1222,7 @@ auto check_uncompressed_optional() {
 		sizeof(type) < sizeof(bounded::optional<type>),
 		"Compressing an optional that should not be compressed."
 	);
+	check_empty_braces<type>();
 }
 template<intmax_t minimum, intmax_t maximum>
 auto check_compressed_optional() {
@@ -1227,6 +1236,7 @@ auto check_compressed_optional() {
 		sizeof(compressed_type) == sizeof(bounded::optional<type>),
 		"Incorrect optional selection."
 	);
+	check_empty_braces<compressed_type>();
 }
 
 template<typename integer_type>
@@ -1253,6 +1263,8 @@ auto check_integer_optional() {
 	
 	optional_integer = bounded::none;
 	assert(!optional_integer);
+
+	check_empty_braces<bounded::optional<integer_type>>();
 }
 
 auto check_non_trivial_optional() {
@@ -1288,6 +1300,8 @@ auto check_non_trivial_optional() {
 	
 	optional_string = bounded::none;
 	assert(!optional_string);
+
+	check_empty_braces<bounded::optional<type>>();
 }
 
 auto check_optional() {
