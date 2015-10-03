@@ -54,30 +54,30 @@ void test_no_extra_copy_or_move() {
 
 class CheckedMover {
 public:
-	constexpr CheckedMover(int value):
+	constexpr CheckedMover(int value) noexcept:
 		m_value(value),
 		m_moved(false) {
 	}
 		
-	constexpr CheckedMover(CheckedMover const & other):
+	constexpr CheckedMover(CheckedMover const & other) noexcept:
 		m_value(other.m_value),
 		m_moved(other.m_moved) {
 		assert(!other.m_moved);
 	}
-	constexpr CheckedMover(CheckedMover && other):
+	constexpr CheckedMover(CheckedMover && other) noexcept:
 		m_value(other.m_value),
 		m_moved(other.m_moved) {
 		assert(this != &other);
 		assert(!other.m_moved);
 		other.m_moved = true;
 	}
-	constexpr CheckedMover & operator=(CheckedMover const & other) {
+	constexpr CheckedMover & operator=(CheckedMover const & other) noexcept {
 		assert(!other.m_moved);
 		m_value = other.m_value;
 		m_moved = other.m_moved;
 		return *this;
 	}
-	constexpr CheckedMover & operator=(CheckedMover && other) {
+	constexpr CheckedMover & operator=(CheckedMover && other) noexcept {
 		assert(this != &other);
 		assert(!other.m_moved);
 		m_value = other.m_value;
@@ -86,12 +86,12 @@ public:
 		return *this;
 	}
 	
-	constexpr friend bool operator<(CheckedMover const & lhs, CheckedMover const & rhs) {
+	constexpr friend bool operator<(CheckedMover const & lhs, CheckedMover const & rhs) noexcept {
 		assert(!lhs.m_moved);
 		assert(!rhs.m_moved);
 		return lhs.m_value < rhs.m_value;
 	}
-	constexpr friend bool operator==(CheckedMover const & lhs, CheckedMover const & rhs) {
+	constexpr friend bool operator==(CheckedMover const & lhs, CheckedMover const & rhs) noexcept {
 		assert(!lhs.m_moved);
 		assert(!rhs.m_moved);
 		return lhs.m_value == rhs.m_value;
