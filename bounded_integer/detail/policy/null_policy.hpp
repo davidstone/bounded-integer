@@ -17,8 +17,8 @@
 #pragma once
 
 #include "common_policy.hpp"
-#include "../is_bounded_integer.hpp"
 #include "../comparison.hpp"
+#include "../is_bounded_integer.hpp"
 #include <utility>
 
 namespace bounded {
