@@ -16,28 +16,24 @@
 
 #pragma once
 
-#include "basic_policy.hpp"
 #include "null_policy.hpp"
-#include "../is_bounded_integer.hpp"
 #include "../make.hpp"
 #include "../minmax.hpp"
 
 namespace bounded {
-namespace policy_detail {
 
 struct clamp_policy {
+	constexpr clamp_policy() noexcept {}
+
 	template<typename T, typename Minimum, typename Maximum>
 	static constexpr auto assignment(T && value, Minimum && minimum, Maximum && maximum) noexcept {
 		using policy = bounded::null_policy;
 		return min(max(bounded::make<policy>(std::forward<T>(value)), bounded::make<policy>(std::forward<Minimum>(minimum))), bounded::make<policy>(std::forward<Maximum>(maximum)));
 	}
 
+	using overflow_policy_tag = void;
 	static constexpr bool is_modulo = false;
 	static constexpr bool overflow_is_error = false;
 };
-
-}	// namespace policy_detail
-
-using clamp_policy = basic_policy<policy_detail::clamp_policy>;
 
 }	// namespace bounded

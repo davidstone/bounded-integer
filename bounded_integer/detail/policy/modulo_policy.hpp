@@ -16,7 +16,6 @@
 
 #pragma once
 
-#include "basic_policy.hpp"
 #include "../class.hpp"
 #include "../common_type.hpp"
 #include "../comparison.hpp"
@@ -26,9 +25,10 @@
 #include <type_traits>
 
 namespace bounded {
-namespace policy_detail {
 
 struct modulo_policy {
+	constexpr modulo_policy() noexcept {}
+
 private:
 	template<typename T, typename Size>
 	static constexpr auto positive_remainder(T && value, Size && size) noexcept {
@@ -50,12 +50,9 @@ public:
 		) + minimum;
 	}
 
+	using overflow_policy_tag = void;
 	static constexpr bool is_modulo = true;
 	static constexpr bool overflow_is_error = false;
 };
-
-}	// namespace policy_detail
-
-using modulo_policy = basic_policy<policy_detail::modulo_policy>;
 
 }	// namespace bounded

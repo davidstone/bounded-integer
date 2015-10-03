@@ -16,16 +16,16 @@
 
 #pragma once
 
-#include "basic_policy.hpp"
 #include "common_policy.hpp"
 #include "../is_bounded_integer.hpp"
 #include "../comparison.hpp"
 #include <utility>
 
 namespace bounded {
-namespace policy_detail {
 
 struct null_policy {
+	constexpr null_policy() noexcept {}
+	
 	// The identity function is intentionally not constexpr. This provides
 	// compile-time checking if used in a constexpr context. If this is called
 	// at run-time, the optimizer should detect that all branches return the
@@ -40,6 +40,7 @@ struct null_policy {
 			error_out_of_range(std::forward<T>(value));
 	}
 
+	using overflow_policy_tag = void;
 	static constexpr bool is_modulo = false;
 	static constexpr bool overflow_is_error = true;
 private:
@@ -48,11 +49,6 @@ private:
 		return std::forward<T>(value);
 	}
 };
-
-}	// namespace policy_detail
-
-using null_policy = basic_policy<policy_detail::null_policy>;
-
 
 
 template<typename policy>

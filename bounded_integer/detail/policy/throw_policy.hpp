@@ -16,7 +16,6 @@
 
 #pragma once
 
-#include "basic_policy.hpp"
 #include "../comparison.hpp"
 #include "../is_bounded_integer.hpp"
 #include "../string.hpp"
@@ -27,8 +26,12 @@ namespace policy_detail {
 
 using default_exception = std::range_error;
 
-template<typename Exception>
+}	// namespace policy_detail
+
+template<typename Exception = policy_detail::default_exception>
 struct throw_policy {
+	constexpr throw_policy() noexcept {}
+
 	// The optimizer should be able to simplify this to remove dead checks.
 	template<typename T, typename Minimum, typename Maximum>
 	static constexpr auto assignment(T && value, Minimum && minimum, Maximum && maximum) -> T && {
@@ -39,12 +42,9 @@ struct throw_policy {
 			(throw Exception("Got a value of " + to_string(value) + " but expected a value in the range [" + to_string(minimum) + ", " + to_string(maximum) + "]"), std::forward<T>(value));
 	}
 	
+	using overflow_policy_tag = void;
 	static constexpr bool is_modulo = false;
 	static constexpr bool overflow_is_error = true;
 };
 
-}	// namespace policy_detail
-
-template<typename Exception = policy_detail::default_exception>
-using throw_policy = basic_policy<policy_detail::throw_policy<Exception>>;
 }	// namespace bounded
