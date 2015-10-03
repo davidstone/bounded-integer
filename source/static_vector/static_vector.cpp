@@ -1,4 +1,4 @@
-// std::vector-like interface around a bounded::array
+// std::vector-like interface around an array
 // Copyright (C) 2015 David Stone
 //
 // This program is free software: you can redistribute it and / or modify
