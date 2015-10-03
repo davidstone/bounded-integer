@@ -16,8 +16,10 @@
 
 #pragma once
 
-#define BOUNDED_NOEXCEPT_INITIALIZATION(initializer) noexcept(noexcept(initializer)): initializer
+// These must use a variadic macro in case the argument has a comma
+
+#define BOUNDED_NOEXCEPT_INITIALIZATION(...) noexcept(noexcept(__VA_ARGS__)): __VA_ARGS__
 
 // This should probably be adjusted to include converting to the return type
-#define BOUNDED_NOEXCEPT(body) noexcept(noexcept(body)) { return body; }
+#define BOUNDED_NOEXCEPT(...) noexcept(noexcept(__VA_ARGS__)) { return __VA_ARGS__; }
 
