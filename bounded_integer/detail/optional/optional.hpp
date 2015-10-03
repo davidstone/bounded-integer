@@ -24,7 +24,6 @@
 #include <stdexcept>
 #include <type_traits>
 #include <utility>
-#include "../class.hpp"
 
 namespace bounded {
 namespace detail {
@@ -53,12 +52,15 @@ constexpr auto in_place = in_place_t{};
 //
 // Any other type
 //
-// The last two cases are handled generally. Users can specialize
-// bounded::optional_storage to opt-in to the first behavior.
+// The last two cases are handled generally. For a type to opt-in to a
+// space-efficient representation, it needs the following member functions:
 //
-// default_optional_storage can then be used to fall back to the default case
-// for certain versions of class templates. See specialization.hpp for an
-// example of this
+//	* `T(optional_tag)` constructs an uninitialized value
+//	* `initialize(optional_tag, T && ...)` constructs an object when there may
+//		be one in existence already
+//	* `uninitialize(optional_tag)` destroys the contained object
+//	* `is_initialized(optional_tag)` checks whether the object is currently in
+//		an initialized state
 
 
 namespace detail {
