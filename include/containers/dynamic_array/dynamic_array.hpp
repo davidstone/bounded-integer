@@ -37,7 +37,7 @@ constexpr auto distance(InputIterator first, Sentinel const last) BOUNDED_NOEXCE
 template<typename InputIterator, typename Sentinel, typename OutputIterator>
 constexpr auto copy(InputIterator first, Sentinel const last, OutputIterator out) {
 	for (; first != last; ++first) {
-		*out = * first;
+		*out = *first;
 		++out;
 	}
 	return out;
