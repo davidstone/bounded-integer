@@ -67,7 +67,7 @@ constexpr auto make_reverse_iterator(Iterator const it) BOUNDED_NOEXCEPT(
 
 template<typename Container>
 constexpr auto rbegin(Container && container) BOUNDED_NOEXCEPT(
-	detail::make_reverse_iterator(std::forward<Container>(container).begin())
+	std::make_reverse_iterator(std::forward<Container>(container).begin())
 )
 template<typename Container>
 constexpr auto rend(Container && container) BOUNDED_NOEXCEPT(
@@ -201,7 +201,7 @@ constexpr auto assign(Container & container, Size const count, typename Containe
 
 template<typename Container>
 constexpr auto clear(Container & container) noexcept {
-	erase(container, container.begin(), container.end());
+	container = {};
 }
 
 }	// namespace common
