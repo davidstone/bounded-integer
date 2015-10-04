@@ -55,32 +55,22 @@ constexpr auto cend(Container const & container) BOUNDED_NOEXCEPT(
 	container.end()
 )
 
-namespace detail {
-// TODO: Use std::make_reverse_iterator when I have a newer system header
-
-template<typename Iterator>
-constexpr auto make_reverse_iterator(Iterator const it) BOUNDED_NOEXCEPT(
-	std::reverse_iterator<Iterator>(it)
-)
-
-}	// namespace detail
-
 template<typename Container>
 constexpr auto rbegin(Container && container) BOUNDED_NOEXCEPT(
 	std::make_reverse_iterator(std::forward<Container>(container).begin())
 )
 template<typename Container>
 constexpr auto rend(Container && container) BOUNDED_NOEXCEPT(
-	detail::make_reverse_iterator(std::forward<Container>(container).end())
+	std::make_reverse_iterator(std::forward<Container>(container).end())
 )
 
 template<typename Container>
 constexpr auto crbegin(Container const & container) BOUNDED_NOEXCEPT(
-	detail::make_reverse_iterator(container.begin())
+	std::make_reverse_iterator(container.begin())
 )
 template<typename Container>
 constexpr auto crend(Container const & container) BOUNDED_NOEXCEPT(
-	detail::make_reverse_iterator(container.end())
+	std::make_reverse_iterator(container.end())
 )
 
 
