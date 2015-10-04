@@ -204,11 +204,11 @@ constexpr auto clear(Container & container) noexcept {
 	erase(container, container.begin(), container.end());
 }
 
+}	// namespace common
 
-namespace detail {
-
+struct common_resize_tag{};
 template<typename Container, typename Size, typename... MaybeInitializer>
-auto resize(Container & container, Size const count, MaybeInitializer && ... args) {
+auto resize(common_resize_tag, Container & container, Size const count, MaybeInitializer && ... args) {
 	static_assert(sizeof...(MaybeInitializer) == 0 or sizeof...(MaybeInitializer) == 1);
 	while (size(container) > count) {
 		container.pop_back();
@@ -218,15 +218,15 @@ auto resize(Container & container, Size const count, MaybeInitializer && ... arg
 	}
 }
 
-}	// namespace detail
+namespace common {
 
 template<typename Container, typename Size>
 auto resize(Container & container, Size const count) BOUNDED_NOEXCEPT(
-	detail::resize(container, count)
+	resize(common_resize_tag{}, container, count)
 )
 template<typename Container, typename Size>
 auto resize(Container & container, Size const count, typename Container::value_type const & value) BOUNDED_NOEXCEPT(
-	detail::resize(container, count, value)
+	resize(common_resize_tag{}, container, count, value)
 )
 
 	
