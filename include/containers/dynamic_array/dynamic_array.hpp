@@ -45,17 +45,20 @@ constexpr auto copy(InputIterator first, Sentinel const last, OutputIterator out
 
 template<typename InputIterator, typename Sentinel, typename ForwardIterator>
 auto uninitialized_copy(InputIterator first, Sentinel const last, ForwardIterator out) {
-	for (; first != last; ++first) {
-		::new(static_cast<void *>(std::addressof(*out))) typename std::iterator_traits<ForwardIterator>::value_type(*first);
-		++out;
+	auto out_first = out;
+	using out_type = typename std::iterator_traits<InputIterator>::value_type;
+	try {
+		for (; first != last; ++first) {
+			::new(static_cast<void *>(std::addressof(*out))) out_type(*first);
+			++out;
+		}
+	} catch (...) {
+		for (; out_first != out; ++out_first) {
+			reinterpret_cast<out_type &>(*out_first).~out_type();
+		}
+		throw;
 	}
 	return out;
-}
-
-template<typename T, typename Size>
-auto make_uninitialized_array(Size const size) {
-	auto temp = std::make_unique<uninitialized_storage<T>[]>(static_cast<std::size_t>(size));
-	return std::unique_ptr<T[]>(reinterpret_cast<T *>(temp.release()));
 }
 
 }	// namespace detail
@@ -72,20 +75,18 @@ struct dynamic_array {
 	
 	template<typename Count, BOUNDED_REQUIRES(std::is_convertible<Count, size_type>::value)>
 	explicit dynamic_array(Count const count):
-		m_data(detail::make_uninitialized_array<value_type>(count)),
+		m_data(std::make_unique<value_type[]>(static_cast<std::size_t>(count))),
 		m_size(count)
 	{
-		for (auto & value : *this) {
-			::new(static_cast<void *>(std::addressof(value))) value_type();
-		}
 	}
 	
 	template<typename ForwardIterator, typename Sentinel>
 	dynamic_array(ForwardIterator first, Sentinel const last):
 		m_size(detail::distance(first, last))
 	{
-		m_data = detail::make_uninitialized_array<value_type>(m_size);
-		detail::uninitialized_copy(first, last, m_data.get());
+		auto temp = std::make_unique<uninitialized_storage<value_type>[]>(static_cast<std::size_t>(m_size));
+		detail::uninitialized_copy(first, last, temp.get());
+		m_data.reset(reinterpret_cast<value_type *>(temp.release()));
 	}
 	dynamic_array(std::initializer_list<value_type> init):
 		dynamic_array(init.begin(), init.end())
