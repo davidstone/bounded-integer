@@ -79,7 +79,7 @@ private:
 		m_it(other) {
 	}
 
-	pointer m_it;
+	pointer m_it = nullptr;
 };
 
 
