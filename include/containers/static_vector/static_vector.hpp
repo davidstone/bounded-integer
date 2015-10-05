@@ -159,8 +159,7 @@ struct static_vector {
 
 
 	void pop_back() {
-		assert(!empty(*this));
-		bounded::prev(end())->~value_type();
+		back(*this).~value_type();
 		--m_size;
 	}
 	
