@@ -85,16 +85,8 @@ constexpr decltype(auto) at(Container && container, Index const index) BOUNDED_N
 )
 
 
-// These can be declared noexcept in more situations. For instance, these are
-// noexcept for array if container.size() > 0
 template<typename Container>
-constexpr decltype(auto) front(Container && container) BOUNDED_NOEXCEPT(
-	*std::forward<Container>(container).begin()
-)
-template<typename Container>
-constexpr decltype(auto) back(Container && container) BOUNDED_NOEXCEPT(
-	*bounded::prev(std::forward<Container>(container).end())
-)
+constexpr auto never_empty = std::numeric_limits<typename std::remove_reference_t<Container>::size_type>::min() > bounded::constant<0>;
 
 
 template<typename Container>
@@ -104,7 +96,9 @@ constexpr auto size(Container const & container) noexcept {
 
 template<typename Container>
 constexpr auto empty(Container const & container) noexcept {
-	return container.begin() == container.end();
+	// The never_empty check is not needed for correctness, but allows this
+	// function to be constexpr in more situations.
+	return never_empty<Container> ? false : container.begin() == container.end();
 }
 
 template<typename Container>
@@ -112,6 +106,17 @@ constexpr auto max_size() noexcept {
 	return std::numeric_limits<typename Container::size_type>::max();
 }
 
+
+template<typename Container>
+constexpr decltype(auto) front(Container && container) noexcept(never_empty<Container>) {
+	assert(!empty(container));
+	return *std::forward<Container>(container).begin();
+}
+template<typename Container>
+constexpr decltype(auto) back(Container && container) noexcept(never_empty<Container>) {
+	assert(!empty(container));
+	return *bounded::prev(std::forward<Container>(container).end());
+}
 
 
 template<typename Container>
