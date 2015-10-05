@@ -23,6 +23,7 @@
 #include <bounded_integer/bounded_integer.hpp>
 
 #include <algorithm>
+#include <cassert>
 #include <initializer_list>
 #include <iterator>
 #include <utility>
