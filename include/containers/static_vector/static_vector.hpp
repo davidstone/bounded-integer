@@ -16,6 +16,7 @@
 
 #pragma once
 
+#include <containers/algorithms/copy.hpp>
 #include <containers/array/array.hpp>
 #include <containers/array/iterator.hpp>
 #include <containers/common_container_functions.hpp>
@@ -135,13 +136,13 @@ struct static_vector {
 		auto const position = detail::make_mutable_iterator(*this, position_);
 		if (position == end()) {
 			emplace_back(std::forward<Args>(args)...);
-			return position;
+		} else {
+			emplace_back(std::move(back(*this)));
+			std::move(position, bounded::prev(end()), bounded::next(position));
+			auto const pointer = std::addressof(*position);
+			pointer->~value_type();
+			::new(static_cast<void *>(pointer)) value_type(std::forward<Args>(args)...);
 		}
-		emplace_back(std::move(back(*this)));
-		std::move(position, bounded::prev(end()), bounded::next(position));
-		auto const pointer = std::addressof(*position);
-		pointer->~value_type();
-		::new(static_cast<void *>(pointer)) value_type(std::forward<Args>(args)...);
 		return position;
 	}
 	template<typename InputIterator, typename Sentinel>
@@ -151,9 +152,15 @@ struct static_vector {
 			for (; first != last; ++first) {
 				emplace_back(*first);
 			}
-			return position;
+		} else {
+			// TODO: range check
+			auto const range_size = size_type(detail::distance(first, last), bounded::non_check);
+			auto const distance_to_end = size_type(end() - position, bounded::non_check);
+			detail::uninitialized_copy_backward(std::make_move_iterator(position), std::make_move_iterator(end()), end() + range_size);
+			auto const remainder = detail::copy_n(first, bounded::min(range_size, distance_to_end), position);
+			detail::uninitialized_copy(remainder.input, last, remainder.output);
+			m_size += range_size;
 		}
-		// TODO: This will likely need std::uninitialized_copy and std::move
 		return position;
 	}
 
