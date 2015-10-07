@@ -96,7 +96,6 @@ void test_generic(T const & t, std::initializer_list<T> init) {
 	assign(copy, init);
 	assign(copy, capacity, t);
 	
-	// TODO: insert(it, it, it) overload
 	auto const old_front = front(copy);
 	resize(copy, capacity);
 	assert(front(copy) == old_front);
@@ -110,6 +109,14 @@ void test_generic(T const & t, std::initializer_list<T> init) {
 	assert(copy == count_arg);
 }
 
+struct non_copyable {
+	non_copyable() {}
+	non_copyable(non_copyable const &) = delete;
+	non_copyable(non_copyable &&) = default;
+	non_copyable & operator=(non_copyable const &) = delete;
+	non_copyable & operator=(non_copyable &&) = default;
+};
+
 }	// namespace
 
 int main() {
@@ -121,4 +128,13 @@ int main() {
 	test_generic<5>(-4, { 0, 1, 2, 3, 4 });
 
 	test_generic<3>(std::string("hi"), { std::string(""), std::string("hello"), std::string(100, '=') });
+	
+	containers::static_vector<int, 10> container = { 1, 2, 3 };
+	insert(container, container.begin() + 1_bi, 5_bi, 12);
+	auto const expected = { 1, 12, 12, 12, 12, 12, 2, 3 };
+	assert(std::equal(container.begin(), container.end(), expected.begin(), expected.end()));
+	
+	containers::static_vector<non_copyable, 10> test_no_copies;
+	test_no_copies.emplace_back();
+	insert(test_no_copies, test_no_copies.begin(), non_copyable{});
 }
