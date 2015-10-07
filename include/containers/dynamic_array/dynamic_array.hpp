@@ -16,6 +16,7 @@
 
 #pragma once
 
+#include <containers/algorithms/copy.hpp>
 #include <containers/array/iterator.hpp>
 
 #include <containers/uninitialized_storage.hpp>
@@ -26,42 +27,6 @@
 #include <memory>
 
 namespace containers {
-namespace detail {
-
-// TODO: Work with other iterator categories
-template<typename InputIterator, typename Sentinel>
-constexpr auto distance(InputIterator first, Sentinel const last) BOUNDED_NOEXCEPT(
-	last - first
-)
-
-template<typename InputIterator, typename Sentinel, typename OutputIterator>
-constexpr auto copy(InputIterator first, Sentinel const last, OutputIterator out) {
-	for (; first != last; ++first) {
-		*out = *first;
-		++out;
-	}
-	return out;
-}
-
-template<typename InputIterator, typename Sentinel, typename ForwardIterator>
-auto uninitialized_copy(InputIterator first, Sentinel const last, ForwardIterator out) {
-	auto out_first = out;
-	using out_type = typename std::iterator_traits<InputIterator>::value_type;
-	try {
-		for (; first != last; ++first) {
-			::new(static_cast<void *>(std::addressof(*out))) out_type(*first);
-			++out;
-		}
-	} catch (...) {
-		for (; out_first != out; ++out_first) {
-			reinterpret_cast<out_type &>(*out_first).~out_type();
-		}
-		throw;
-	}
-	return out;
-}
-
-}	// namespace detail
 
 template<typename T>
 struct dynamic_array {
