@@ -197,7 +197,7 @@ constexpr auto assign(Container & container, Size const count, typename Containe
 
 template<typename Container>
 constexpr auto clear(Container & container) noexcept {
-	container = {};
+	container = Container{};
 }
 
 }	// namespace common
