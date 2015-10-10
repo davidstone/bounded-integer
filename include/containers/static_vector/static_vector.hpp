@@ -128,7 +128,7 @@ struct static_vector {
 	template<typename... Args>
 	auto emplace_back(Args && ... args) {
 		assert(size(*this) != capacity());
-		::new(static_cast<void *>(m_container.data() + size(*this))) value_type(std::forward<Args>(args)...);
+		::new(static_cast<void *>(data() + size(*this))) value_type(std::forward<Args>(args)...);
 		++m_size;
 	}
 	
