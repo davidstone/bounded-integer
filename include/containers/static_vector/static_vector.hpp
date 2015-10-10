@@ -142,22 +142,20 @@ struct static_vector {
 		return detail::make_mutable_iterator(*this, position);
 	}
 	template<typename InputIterator, typename Sentinel>
-	auto insert(const_iterator const position_, InputIterator first, Sentinel last) {
-		auto const position = detail::make_mutable_iterator(*this, position_);
+	auto insert(const_iterator const position, InputIterator first, Sentinel last) {
 		if (position == end()) {
-			for (; first != last; ++first) {
-				emplace_back(*first);
-			}
+			return append(*this, first, last);
 		} else {
+			auto const mutable_position = detail::make_mutable_iterator(*this, position);
 			// TODO: range check
 			auto const range_size = size_type(detail::distance(first, last), bounded::non_check);
 			auto const distance_to_end = size_type(end() - position, bounded::non_check);
-			detail::uninitialized_move_backward(position, end(), end() + range_size);
-			auto const remainder = detail::copy_n(first, bounded::min(range_size, distance_to_end), position);
+			detail::uninitialized_move_backward(mutable_position, end(), end() + range_size);
+			auto const remainder = detail::copy_n(first, bounded::min(range_size, distance_to_end), mutable_position);
 			detail::uninitialized_copy(remainder.input, last, remainder.output);
 			m_size += range_size;
+			return mutable_position;
 		}
-		return position;
 	}
 
 

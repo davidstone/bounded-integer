@@ -131,6 +131,18 @@ constexpr auto push_back(Container & container, typename Container::value_type &
 
 
 
+// TODO: specialize for ForwardIterator to call reserve
+template<typename Container, typename InputIterator, typename Sentinel, BOUNDED_REQUIRES(is_container<Container> and is_iterator<InputIterator>)>
+auto append(Container & container, InputIterator first, Sentinel last) {
+	auto const offset = size(container);
+	for (; first != last; ++first) {
+		container.emplace_back(*first);
+	}
+	return container.begin() + offset;
+}
+
+
+
 template<typename Container, BOUNDED_REQUIRES(is_container<Container>)>
 constexpr auto insert(Container & container, typename Container::const_iterator const position, typename Container::value_type const & value) BOUNDED_NOEXCEPT(
 	container.emplace(position, value)
@@ -253,6 +265,7 @@ constexpr auto operator<(Container const & lhs, Container const & rhs) BOUNDED_N
 	using ::containers::detail::common::empty; \
 	using ::containers::detail::common::max_size; \
 	using ::containers::detail::common::push_back; \
+	using ::containers::detail::common::append; \
 	using ::containers::detail::common::insert; \
 	using ::containers::detail::common::erase; \
 	using ::containers::detail::common::assign; \
