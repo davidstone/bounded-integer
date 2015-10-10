@@ -265,6 +265,20 @@ constexpr auto operator<(Container const & lhs, Container const & rhs) BOUNDED_N
 
 CONTAINERS_COMMON_USING_DECLARATIONS
 
+// Assumes there is enough capacity -- iterators remain valid
+// TODO: exception safety
+template<typename Container, typename... Args>
+auto emplace_in_middle_no_reallocation(Container & container, typename Container::const_iterator const position_, Args && ... args) {
+	auto const position = detail::make_mutable_iterator(container, position_);
+	auto const original_end = container.end();
+	container.emplace_back(std::move(back(container)));
+	std::move_backward(position, bounded::prev(original_end), original_end);
+	auto const pointer = std::addressof(*position);
+	using value_type = typename Container::value_type;
+	pointer->~value_type();
+	::new(static_cast<void *>(pointer)) value_type(std::forward<Args>(args)...);
+}
+
 }	// namespace detail
 
 CONTAINERS_COMMON_USING_DECLARATIONS

@@ -133,18 +133,13 @@ struct static_vector {
 	}
 	
 	template<typename... Args>
-	auto emplace(const_iterator const position_, Args && ... args) {
-		auto const position = detail::make_mutable_iterator(*this, position_);
+	auto emplace(const_iterator const position, Args && ... args) {
 		if (position == end()) {
 			emplace_back(std::forward<Args>(args)...);
 		} else {
-			emplace_back(std::move(back(*this)));
-			std::move(position, bounded::prev(end()), bounded::next(position));
-			auto const pointer = std::addressof(*position);
-			pointer->~value_type();
-			::new(static_cast<void *>(pointer)) value_type(std::forward<Args>(args)...);
+			detail::emplace_in_middle_no_reallocation(*this, position, std::forward<Args>(args)...);
 		}
-		return position;
+		return detail::make_mutable_iterator(*this, position);
 	}
 	template<typename InputIterator, typename Sentinel>
 	auto insert(const_iterator const position_, InputIterator first, Sentinel last) {
