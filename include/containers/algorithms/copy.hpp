@@ -81,7 +81,7 @@ auto uninitialized_copy(InputIterator first, Sentinel const last, ForwardIterato
 
 template<typename BidirectionalInputIterator, typename BidirectionalOutputIterator>
 auto uninitialized_copy_backward(BidirectionalInputIterator const first, BidirectionalInputIterator const last, BidirectionalOutputIterator const out) {
-	return uninitialized_copy(std::make_reverse_iterator(last), std::make_reverse_iterator(first), std::make_reverse_iterator(out)).base();
+	return ::containers::detail::uninitialized_copy(std::make_reverse_iterator(last), std::make_reverse_iterator(first), std::make_reverse_iterator(out)).base();
 }
 
 }	// namespace detail
