@@ -76,8 +76,6 @@ void test_generic(T const & t, Capacity capacity, std::initializer_list<T> init)
 	copy = init;
 	assert(copy == init_list);
 
-	assert(copy.data() != init_list.data());
-	
 	assign(copy, init);
 	assign(copy, capacity, t);
 	
