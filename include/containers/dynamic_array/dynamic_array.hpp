@@ -40,17 +40,17 @@ struct dynamic_array {
 	
 	template<typename Count, BOUNDED_REQUIRES(std::is_convertible<Count, size_type>::value)>
 	explicit dynamic_array(Count const count):
-		m_size(count)
+		m_size(count),
+		m_data(make_storage(m_size))
 	{
-		m_data = make_storage(m_size);
 		detail::uninitialized_default_construct(begin(), end());
 	}
 	
 	template<typename ForwardIterator, typename Sentinel>
 	dynamic_array(ForwardIterator first, Sentinel const last):
-		m_size(detail::distance(first, last))
+		m_size(detail::distance(first, last)),
+		m_data(make_storage(m_size))
 	{
-		m_data = make_storage(m_size);
 		detail::uninitialized_copy(first, last, m_data.get());
 	}
 	dynamic_array(std::initializer_list<value_type> init):
@@ -106,10 +106,10 @@ struct dynamic_array {
 private:
 	using underlying_storage = uninitialized_storage<value_type>[];
 	static auto make_storage(size_type const size) {
-		return std::make_unique<underlying_storage>(static_cast<std::size_t>(size));
+		return (size == bounded::constant<0>) ? nullptr : std::make_unique<underlying_storage>(static_cast<std::size_t>(size));
 	}
-	std::unique_ptr<underlying_storage> m_data = nullptr;
 	size_type m_size = bounded::constant<0>;
+	std::unique_ptr<underlying_storage> m_data = nullptr;
 };
 
 
