@@ -152,7 +152,7 @@ struct static_vector {
 			// TODO: range check
 			auto const range_size = size_type(detail::distance(first, last), bounded::non_check);
 			auto const distance_to_end = size_type(end() - position, bounded::non_check);
-			detail::uninitialized_copy_backward(std::make_move_iterator(position), std::make_move_iterator(end()), end() + range_size);
+			detail::uninitialized_move_backward(position, end(), end() + range_size);
 			auto const remainder = detail::copy_n(first, bounded::min(range_size, distance_to_end), position);
 			detail::uninitialized_copy(remainder.input, last, remainder.output);
 			m_size += range_size;

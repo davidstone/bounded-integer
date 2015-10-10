@@ -79,9 +79,19 @@ auto uninitialized_copy(InputIterator first, Sentinel const last, ForwardIterato
 	return out;
 }
 
+template<typename InputIterator, typename ForwardIterator>
+auto uninitialized_move(InputIterator const first, InputIterator const last, ForwardIterator const out) {
+	return ::containers::detail::uninitialized_copy(std::make_move_iterator(first), std::make_move_iterator(last), out);
+}
+
 template<typename BidirectionalInputIterator, typename BidirectionalOutputIterator>
-auto uninitialized_copy_backward(BidirectionalInputIterator const first, BidirectionalInputIterator const last, BidirectionalOutputIterator const out) {
-	return ::containers::detail::uninitialized_copy(std::make_reverse_iterator(last), std::make_reverse_iterator(first), std::make_reverse_iterator(out)).base();
+auto uninitialized_copy_backward(BidirectionalInputIterator const first, BidirectionalInputIterator const last, BidirectionalOutputIterator const out_last) {
+	return ::containers::detail::uninitialized_copy(std::make_reverse_iterator(last), std::make_reverse_iterator(first), std::make_reverse_iterator(out_last)).base();
+}
+
+template<typename BidirectionalInputIterator, typename BidirectionalOutputIterator>
+auto uninitialized_move_backward(BidirectionalInputIterator const first, BidirectionalInputIterator const last, BidirectionalOutputIterator const out_last) {
+	return ::containers::detail::uninitialized_copy_backward(std::make_move_iterator(first), std::make_move_iterator(last), out_last);
 }
 
 template<typename ForwardIterator, typename Sentinel>
