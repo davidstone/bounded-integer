@@ -18,6 +18,7 @@
 
 #include <containers/common_functions.hpp>
 #include <containers/is_container.hpp>
+#include <containers/is_iterator.hpp>
 #include <containers/repeat_n.hpp>
 
 #include <bounded_integer/bounded_integer.hpp>
@@ -31,45 +32,45 @@
 namespace containers {
 namespace detail {
 
-template<typename Container>
+template<typename Container, BOUNDED_REQUIRES(is_container<Container>)>
 constexpr auto make_mutable_iterator(Container & container, typename Container::const_iterator it) {
 	return container.begin() + (it - container.begin());
 }
 
 namespace common {
 
-template<typename Container>
+template<typename Container, BOUNDED_REQUIRES(is_container<Container>)>
 constexpr auto begin(Container && container) BOUNDED_NOEXCEPT(
 	std::forward<Container>(container).begin()
 )
-template<typename Container>
+template<typename Container, BOUNDED_REQUIRES(is_container<Container>)>
 constexpr auto end(Container && container) BOUNDED_NOEXCEPT(
 	std::forward<Container>(container).end()
 )
 
-template<typename Container>
+template<typename Container, BOUNDED_REQUIRES(is_container<Container>)>
 constexpr auto cbegin(Container const & container) BOUNDED_NOEXCEPT(
 	container.begin()
 )
-template<typename Container>
+template<typename Container, BOUNDED_REQUIRES(is_container<Container>)>
 constexpr auto cend(Container const & container) BOUNDED_NOEXCEPT(
 	container.end()
 )
 
-template<typename Container>
+template<typename Container, BOUNDED_REQUIRES(is_container<Container>)>
 constexpr auto rbegin(Container && container) BOUNDED_NOEXCEPT(
 	std::make_reverse_iterator(std::forward<Container>(container).begin())
 )
-template<typename Container>
+template<typename Container, BOUNDED_REQUIRES(is_container<Container>)>
 constexpr auto rend(Container && container) BOUNDED_NOEXCEPT(
 	std::make_reverse_iterator(std::forward<Container>(container).end())
 )
 
-template<typename Container>
+template<typename Container, BOUNDED_REQUIRES(is_container<Container>)>
 constexpr auto crbegin(Container const & container) BOUNDED_NOEXCEPT(
 	std::make_reverse_iterator(container.begin())
 )
-template<typename Container>
+template<typename Container, BOUNDED_REQUIRES(is_container<Container>)>
 constexpr auto crend(Container const & container) BOUNDED_NOEXCEPT(
 	std::make_reverse_iterator(container.end())
 )
@@ -89,61 +90,61 @@ template<typename Container>
 constexpr auto never_empty = std::numeric_limits<typename std::remove_reference_t<Container>::size_type>::min() > bounded::constant<0>;
 
 
-template<typename Container>
+template<typename Container, BOUNDED_REQUIRES(is_container<Container>)>
 constexpr auto size(Container const & container) noexcept {
 	return typename Container::size_type(container.end() - container.begin(), bounded::non_check);
 }
 
-template<typename Container>
+template<typename Container, BOUNDED_REQUIRES(is_container<Container>)>
 constexpr auto empty(Container const & container) noexcept {
 	// The never_empty check is not needed for correctness, but allows this
 	// function to be constexpr in more situations.
 	return never_empty<Container> ? false : container.begin() == container.end();
 }
 
-template<typename Container>
+template<typename Container, BOUNDED_REQUIRES(is_container<Container>)>
 constexpr auto max_size() noexcept {
 	return std::numeric_limits<typename Container::size_type>::max();
 }
 
 
-template<typename Container>
+template<typename Container, BOUNDED_REQUIRES(is_container<Container>)>
 constexpr decltype(auto) front(Container && container) noexcept(never_empty<Container>) {
 	assert(!empty(container));
 	return *std::forward<Container>(container).begin();
 }
-template<typename Container>
+template<typename Container, BOUNDED_REQUIRES(is_container<Container>)>
 constexpr decltype(auto) back(Container && container) noexcept(never_empty<Container>) {
 	assert(!empty(container));
 	return *bounded::prev(std::forward<Container>(container).end());
 }
 
 
-template<typename Container>
+template<typename Container, BOUNDED_REQUIRES(is_container<Container>)>
 constexpr auto push_back(Container & container, typename Container::value_type const & value) BOUNDED_NOEXCEPT(
 	container.emplace_back(value)
 )
-template<typename Container>
+template<typename Container, BOUNDED_REQUIRES(is_container<Container>)>
 constexpr auto push_back(Container & container, typename Container::value_type && value) BOUNDED_NOEXCEPT(
 	container.emplace_back(std::move(value))
 )
 
 
 
-template<typename Container>
+template<typename Container, BOUNDED_REQUIRES(is_container<Container>)>
 constexpr auto insert(Container & container, typename Container::const_iterator const position, typename Container::value_type const & value) BOUNDED_NOEXCEPT(
 	container.emplace(position, value)
 )
-template<typename Container>
+template<typename Container, BOUNDED_REQUIRES(is_container<Container>)>
 constexpr auto insert(Container & container, typename Container::const_iterator const position, typename Container::value_type && value) BOUNDED_NOEXCEPT(
 	container.emplace(position, std::move(value))
 )
-template<typename Container>
+template<typename Container, BOUNDED_REQUIRES(is_container<Container>)>
 constexpr auto insert(Container & container, typename Container::const_iterator const position, std::initializer_list<typename Container::value_type> init) BOUNDED_NOEXCEPT(
 	container.insert(position, init.begin(), init.end())
 )
 // TODO: noexcept
-template<typename Container, typename Size, BOUNDED_REQUIRES(std::numeric_limits<Size>::is_integer)>
+template<typename Container, typename Size, BOUNDED_REQUIRES(is_container<Container> and std::numeric_limits<Size>::is_integer)>
 constexpr auto insert(Container & container, typename Container::const_iterator const position, Size const count, typename Container::value_type const & value) {
 	auto const range = ::containers::detail::repeat_n(count, value);
 	return container.insert(position, range.begin(), range.end());
@@ -151,7 +152,7 @@ constexpr auto insert(Container & container, typename Container::const_iterator 
 
 
 // TODO: conditional noexcept
-template<typename Container>
+template<typename Container, BOUNDED_REQUIRES(is_container<Container>)>
 constexpr auto erase(Container & container, typename Container::const_iterator const first_, typename Container::const_iterator const last_) noexcept {
 	auto const first = ::containers::detail::make_mutable_iterator(container, first_);
 	auto const last = ::containers::detail::make_mutable_iterator(container, last_);
@@ -160,7 +161,7 @@ constexpr auto erase(Container & container, typename Container::const_iterator c
 		container.pop_back();
 	}
 }
-template<typename Container>
+template<typename Container, BOUNDED_REQUIRES(is_container<Container>)>
 constexpr auto erase(Container & container, typename Container::const_iterator const it) {
 	assert(it != container.end());
 	erase(container, it, bounded::next(it));
@@ -168,7 +169,7 @@ constexpr auto erase(Container & container, typename Container::const_iterator c
 
 
 // TODO: noexcept
-template<typename Container, typename InputIterator, typename Sentinel, typename = typename std::iterator_traits<InputIterator>::iterator_category>
+template<typename Container, typename InputIterator, typename Sentinel, BOUNDED_REQUIRES(is_container<Container> and is_iterator<InputIterator>)>
 constexpr auto assign(Container & container, InputIterator first, Sentinel const last) {
 	// TODO: Do we try to reuse storage like this or just clear() + construct
 	auto it = container.begin();
@@ -184,18 +185,18 @@ constexpr auto assign(Container & container, InputIterator first, Sentinel const
 		container.emplace_back(*first);
 	}
 }
-template<typename Container>
+template<typename Container, BOUNDED_REQUIRES(is_container<Container>)>
 constexpr auto assign(Container & container, std::initializer_list<typename Container::value_type> init) BOUNDED_NOEXCEPT(
 	assign(container, init.begin(), init.end())
 )
-template<typename Container, typename Size, BOUNDED_REQUIRES(std::numeric_limits<Size>::is_integer)>
+template<typename Container, typename Size, BOUNDED_REQUIRES(is_container<Container> and std::numeric_limits<Size>::is_integer)>
 constexpr auto assign(Container & container, Size const count, typename Container::value_type const & value) {
 	auto const range = ::containers::detail::repeat_n(count, value);
 	assign(container, range.begin(), range.end());
 }
 
 
-template<typename Container>
+template<typename Container, BOUNDED_REQUIRES(is_container<Container>)>
 constexpr auto clear(Container & container) noexcept {
 	container = Container{};
 }
@@ -216,22 +217,22 @@ auto resize(common_resize_tag, Container & container, Size const count, MaybeIni
 
 namespace common {
 
-template<typename Container, typename Size>
+template<typename Container, typename Size, BOUNDED_REQUIRES(is_container<Container>)>
 auto resize(Container & container, Size const count) BOUNDED_NOEXCEPT(
 	resize(common_resize_tag{}, container, count)
 )
-template<typename Container, typename Size>
+template<typename Container, typename Size, BOUNDED_REQUIRES(is_container<Container>)>
 auto resize(Container & container, Size const count, typename Container::value_type const & value) BOUNDED_NOEXCEPT(
 	resize(common_resize_tag{}, container, count, value)
 )
 
 	
-template<typename Container>
+template<typename Container, BOUNDED_REQUIRES(is_container<Container>)>
 constexpr auto operator==(Container const & lhs, Container const & rhs) BOUNDED_NOEXCEPT(
 	std::equal(lhs.begin(), lhs.end(), rhs.begin(), rhs.end())
 )
 
-template<typename Container>
+template<typename Container, BOUNDED_REQUIRES(is_container<Container>)>
 constexpr auto operator<(Container const & lhs, Container const & rhs) BOUNDED_NOEXCEPT(
 	std::lexicographical_compare(lhs.begin(), lhs.end(), rhs.begin(), rhs.end())
 )
