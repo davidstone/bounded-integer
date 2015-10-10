@@ -16,7 +16,6 @@
 #include <containers/dynamic_array/dynamic_array.hpp>
 
 #include <cassert>
-#include <iostream>
 
 namespace {
 
