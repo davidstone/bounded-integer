@@ -88,7 +88,8 @@ struct static_vector {
 	}
 
 	~static_vector() {
-		clear(*this);
+		// clear leads to stack overflow
+		erase(*this, begin(), end());
 	}
 
 
