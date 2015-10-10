@@ -16,6 +16,7 @@
 
 #pragma once
 
+#include <containers/algorithms/copy.hpp>
 #include <containers/common_functions.hpp>
 #include <containers/is_container.hpp>
 #include <containers/is_iterator.hpp>
@@ -290,6 +291,20 @@ auto emplace_in_middle_no_reallocation(Container & container, typename Container
 	using value_type = typename Container::value_type;
 	pointer->~value_type();
 	::new(static_cast<void *>(pointer)) value_type(std::forward<Args>(args)...);
+}
+
+
+// Assumes there is enough capacity -- iterators remain valid
+// Container must update its own size
+// TODO: exception safety
+template<typename Container, typename ForwardIterator, typename Sentinel, typename Size>
+auto put_in_middle_no_reallocation(Container & container, typename Container::const_iterator const position, ForwardIterator first, Sentinel const last, Size const range_size) {
+	auto const distance_to_end = typename Container::size_type(container.end() - position, bounded::non_check);
+	auto const mutable_position = make_mutable_iterator(container, position);
+	detail::uninitialized_move_backward(mutable_position, container.end(), container.end() + range_size);
+	auto const remainder = detail::copy_n(first, bounded::min(range_size, distance_to_end), mutable_position);
+	detail::uninitialized_copy(remainder.input, last, remainder.output);
+	return mutable_position;
 }
 
 }	// namespace detail
