@@ -40,18 +40,18 @@ struct dynamic_array {
 	
 	template<typename Count, BOUNDED_REQUIRES(std::is_convertible<Count, size_type>::value)>
 	explicit dynamic_array(Count const count):
-		m_data(std::make_unique<value_type[]>(static_cast<std::size_t>(count))),
 		m_size(count)
 	{
+		m_data = make_storage(m_size);
+		detail::uninitialized_default_construct(begin(), end());
 	}
 	
 	template<typename ForwardIterator, typename Sentinel>
 	dynamic_array(ForwardIterator first, Sentinel const last):
 		m_size(detail::distance(first, last))
 	{
-		auto temp = std::make_unique<uninitialized_storage<value_type>[]>(static_cast<std::size_t>(m_size));
-		detail::uninitialized_copy(first, last, temp.get());
-		m_data.reset(reinterpret_cast<value_type *>(temp.release()));
+		m_data = make_storage(m_size);
+		detail::uninitialized_copy(first, last, m_data.get());
 	}
 	dynamic_array(std::initializer_list<value_type> init):
 		dynamic_array(init.begin(), init.end())
@@ -76,10 +76,10 @@ struct dynamic_array {
 	constexpr auto operator=(dynamic_array && other) & noexcept -> dynamic_array & = default;
 	
 	constexpr auto data() const noexcept {
-		return m_data.get();
+		return reinterpret_cast<value_type const *>(m_data.get());
 	}
 	constexpr auto data() noexcept {
-		return m_data.get();
+		return reinterpret_cast<value_type *>(m_data.get());
 	}
 	
 	constexpr auto begin() const noexcept {
@@ -104,7 +104,11 @@ struct dynamic_array {
 	}
 	
 private:
-	std::unique_ptr<value_type[]> m_data = nullptr;
+	using underlying_storage = uninitialized_storage<value_type>[];
+	static auto make_storage(size_type const size) {
+		return std::make_unique<underlying_storage>(static_cast<std::size_t>(size));
+	}
+	std::unique_ptr<underlying_storage> m_data = nullptr;
 	size_type m_size = bounded::constant<0>;
 };
 

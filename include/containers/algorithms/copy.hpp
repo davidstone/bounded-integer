@@ -84,5 +84,21 @@ auto uninitialized_copy_backward(BidirectionalInputIterator const first, Bidirec
 	return ::containers::detail::uninitialized_copy(std::make_reverse_iterator(last), std::make_reverse_iterator(first), std::make_reverse_iterator(out)).base();
 }
 
+template<typename ForwardIterator, typename Sentinel>
+auto uninitialized_default_construct(ForwardIterator const first, Sentinel const last) {
+	using value_type = typename std::iterator_traits<ForwardIterator>::value_type;
+	auto it = first;
+	try {
+		for (; it != last; ++it) {
+			::new(static_cast<void *>(std::addressof(*it))) value_type();
+		}
+	} catch (...) {
+		for (auto rollback = first; rollback != it; ++rollback) {
+			rollback->~value_type();
+		}
+		throw;
+	}
+}
+
 }	// namespace detail
 }	// namespace containers
