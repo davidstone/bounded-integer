@@ -1,6 +1,7 @@
 ^array
 ^dynamic_array
 ^static_vector
+^vector
 ^flat_map
 ^forward_list
 ^moving_vector

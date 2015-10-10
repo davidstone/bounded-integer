@@ -51,6 +51,11 @@ programs = [
 		include_directories = include_directories
 	),
 	Program(
+		'vector',
+		sources = common_sources + ['vector/vector.cpp'],
+		include_directories = include_directories
+	),
+	Program(
 		'forward_list',
 		sources = common_sources + ['forward_list/forward_list.cpp'],
 		defines = ['USE_SYSTEM_FORWARD_LIST=false'],
