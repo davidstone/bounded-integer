@@ -28,13 +28,21 @@
 
 namespace containers {
 
-template<typename T>
+// TODO: support stateful allocator
+template<typename T, typename Allocator = std::allocator<T>>
 struct dynamic_array {
 	using value_type = T;
 	using size_type = bounded::integer<0, std::numeric_limits<std::intmax_t>::max() / sizeof(T)>;
 
+	using allocator_type = typename std::allocator_traits<Allocator>::template rebind_alloc<value_type>;
+	static_assert(std::is_empty<allocator_type>::value, "Stateful allocators not yet supported.");
+
 	using const_iterator = detail::basic_array_iterator<value_type const, dynamic_array>;
 	using iterator = detail::basic_array_iterator<value_type, dynamic_array>;
+	
+	static constexpr auto get_allocator() BOUNDED_NOEXCEPT(
+		allocator_type{}
+	)
 	
 	constexpr dynamic_array() = default;
 	
@@ -43,7 +51,7 @@ struct dynamic_array {
 		m_size(count),
 		m_data(make_storage(m_size))
 	{
-		detail::uninitialized_default_construct(begin(), end());
+		detail::uninitialized_default_construct(begin(), end(), get_allocator());
 	}
 	
 	template<typename ForwardIterator, typename Sentinel>
@@ -51,7 +59,7 @@ struct dynamic_array {
 		m_size(detail::distance(first, last)),
 		m_data(make_storage(m_size))
 	{
-		detail::uninitialized_copy(first, last, m_data.get());
+		detail::uninitialized_copy(first, last, m_data.get(), get_allocator());
 	}
 	dynamic_array(std::initializer_list<value_type> init):
 		dynamic_array(init.begin(), init.end())

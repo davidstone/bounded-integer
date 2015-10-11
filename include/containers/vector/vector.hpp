@@ -33,12 +33,24 @@
 
 namespace containers {
 
-template<typename T>
+template<typename T, typename Allocator = std::allocator<T>>
 struct vector {
 	using value_type = T;
-	using size_type = typename dynamic_array<value_type>::size_type;
+	using allocator_type = typename std::allocator_traits<Allocator>::template rebind_alloc<value_type>;
+	
+private:
+	using raw_container = dynamic_array<uninitialized_storage<value_type>, allocator_type>;
+public:
+	using size_type = typename raw_container::size_type;
+
+	static_assert(std::is_empty<allocator_type>::value, "Stateful allocators not yet supported.");
+
 	using const_iterator = detail::basic_array_iterator<value_type const, vector>;
 	using iterator = detail::basic_array_iterator<value_type, vector>;
+	
+	static constexpr auto get_allocator() BOUNDED_NOEXCEPT(
+		allocator_type{}
+	)
 	
 	constexpr vector() noexcept = default;
 	
@@ -47,7 +59,7 @@ struct vector {
 		m_container(count),
 		m_size(capacity())
 	{
-		detail::uninitialized_default_construct(begin(), end());
+		detail::uninitialized_default_construct(begin(), end(), get_allocator());
 	}
 	template<typename Count, BOUNDED_REQUIRES(std::is_convertible<Count, size_type>::value)>
 	vector(Count const count, value_type const & value) {
@@ -130,13 +142,13 @@ struct vector {
 
 	template<typename... Args>
 	auto emplace_back(Args && ... args) {
+		auto && allocator = get_allocator();
 		if (size(*this) != capacity()) {
-			::new(static_cast<void *>(data() + size(*this))) value_type(std::forward<Args>(args)...);
+			detail::construct(allocator, data() + size(*this), std::forward<Args>(args)...);
 		} else {
 			raw_container temp(new_capacity());
-			auto const new_element = temp.data() + capacity();
-			::new(static_cast<void *>(new_element)) value_type(std::forward<Args>(args)...);
-			detail::uninitialized_move(begin(), end(), temp.begin());
+			detail::construct(allocator, temp.data() + capacity(), std::forward<Args>(args)...);
+			detail::uninitialized_move(begin(), end(), temp.begin(), allocator);
 			m_container = std::move(temp);
 		}
 		++m_size;
@@ -149,18 +161,19 @@ struct vector {
 		if (position == end()) {
 			emplace_back(std::forward<Args>(args)...);
 		} else if (size(*this) + bounded::constant<1> != capacity()) {
-			detail::emplace_in_middle_no_reallocation(*this, position, std::forward<Args>(args)...);
+			detail::emplace_in_middle_no_reallocation(*this, position, get_allocator(), std::forward<Args>(args)...);
 		} else {
 			// There is a reallocation required, so just put everything in the
 			// correct place to begin with
 			raw_container temp(new_capacity());
 			// First construct the new element because it may reference an old
 			// element, and we do not want to move elements it references
-			::new(static_cast<void *>(temp.data() + offset)) value_type(std::forward<Args>(args)...);
+			auto && allocator = get_allocator();
+			detail::construct(allocator, temp.data() + offset, std::forward<Args>(args)...);
 			auto const mutable_position = begin() + offset;
-			auto const pointer = detail::uninitialized_move(begin(), mutable_position, temp.data());
+			auto const pointer = detail::uninitialized_move(begin(), mutable_position, temp.data(), allocator);
 			assert(temp.data() + offset == pointer);
-			detail::uninitialized_move(mutable_position, end(), std::next(pointer));
+			detail::uninitialized_move(mutable_position, end(), std::next(pointer), allocator);
 			m_container = std::move(temp);
 			++m_size;
 		}
@@ -204,13 +217,11 @@ struct vector {
 
 
 	void pop_back() {
-		back(*this).~value_type();
+		detail::destroy(get_allocator(), std::addressof(back(*this)));
 		--m_size;
 	}
 	
 private:
-	using raw_container = dynamic_array<uninitialized_storage<value_type>>;
-	
 	constexpr auto new_capacity() const {
 		using capacity_type = bounded::equivalent_type<size_type, bounded::throw_policy<>>;
 		return bounded::max(bounded::constant<1>, capacity_type(capacity() * bounded::constant<2>));

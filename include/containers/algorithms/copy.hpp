@@ -61,50 +61,51 @@ constexpr auto copy_n(InputIterator first, Size const count, OutputIterator out)
 	return result { first, out };
 }
 
-template<typename InputIterator, typename Sentinel, typename ForwardIterator>
-auto uninitialized_copy(InputIterator first, Sentinel const last, ForwardIterator out) {
+template<typename InputIterator, typename Sentinel, typename ForwardIterator, typename Allocator_>
+auto uninitialized_copy(InputIterator first, Sentinel const last, ForwardIterator out, Allocator_ && allocator) {
+	using Allocator = std::allocator_traits<std::decay_t<Allocator_>>;
 	auto out_first = out;
-	using out_type = typename std::iterator_traits<InputIterator>::value_type;
+	using pointer = typename Allocator::value_type *;
 	try {
 		for (; first != last; ++first) {
-			::new(static_cast<void *>(std::addressof(*out))) out_type(*first);
+			Allocator::construct(allocator, reinterpret_cast<pointer>(std::addressof(*out)), *first);
 			++out;
 		}
 	} catch (...) {
 		for (; out_first != out; ++out_first) {
-			reinterpret_cast<out_type &>(*out_first).~out_type();
+			Allocator::destroy(allocator, reinterpret_cast<pointer>(std::addressof(*out_first)));
 		}
 		throw;
 	}
 	return out;
 }
 
-template<typename InputIterator, typename ForwardIterator>
-auto uninitialized_move(InputIterator const first, InputIterator const last, ForwardIterator const out) {
-	return ::containers::detail::uninitialized_copy(std::make_move_iterator(first), std::make_move_iterator(last), out);
+template<typename InputIterator, typename ForwardIterator, typename Allocator>
+auto uninitialized_move(InputIterator const first, InputIterator const last, ForwardIterator const out, Allocator && allocator) {
+	return ::containers::detail::uninitialized_copy(std::make_move_iterator(first), std::make_move_iterator(last), out, allocator);
 }
 
-template<typename BidirectionalInputIterator, typename BidirectionalOutputIterator>
-auto uninitialized_copy_backward(BidirectionalInputIterator const first, BidirectionalInputIterator const last, BidirectionalOutputIterator const out_last) {
-	return ::containers::detail::uninitialized_copy(std::make_reverse_iterator(last), std::make_reverse_iterator(first), std::make_reverse_iterator(out_last)).base();
+template<typename BidirectionalInputIterator, typename BidirectionalOutputIterator, typename Allocator>
+auto uninitialized_copy_backward(BidirectionalInputIterator const first, BidirectionalInputIterator const last, BidirectionalOutputIterator const out_last, Allocator && allocator) {
+	return ::containers::detail::uninitialized_copy(std::make_reverse_iterator(last), std::make_reverse_iterator(first), std::make_reverse_iterator(out_last), allocator).base();
 }
 
-template<typename BidirectionalInputIterator, typename BidirectionalOutputIterator>
-auto uninitialized_move_backward(BidirectionalInputIterator const first, BidirectionalInputIterator const last, BidirectionalOutputIterator const out_last) {
-	return ::containers::detail::uninitialized_copy_backward(std::make_move_iterator(first), std::make_move_iterator(last), out_last);
+template<typename BidirectionalInputIterator, typename BidirectionalOutputIterator, typename Allocator>
+auto uninitialized_move_backward(BidirectionalInputIterator const first, BidirectionalInputIterator const last, BidirectionalOutputIterator const out_last, Allocator && allocator) {
+	return ::containers::detail::uninitialized_copy_backward(std::make_move_iterator(first), std::make_move_iterator(last), out_last, allocator);
 }
 
-template<typename ForwardIterator, typename Sentinel>
-auto uninitialized_default_construct(ForwardIterator const first, Sentinel const last) {
-	using value_type = typename std::iterator_traits<ForwardIterator>::value_type;
+template<typename ForwardIterator, typename Sentinel, typename Allocator_>
+auto uninitialized_default_construct(ForwardIterator const first, Sentinel const last, Allocator_ && allocator) {
+	using Allocator = std::allocator_traits<Allocator_>;
 	auto it = first;
 	try {
 		for (; it != last; ++it) {
-			::new(static_cast<void *>(std::addressof(*it))) value_type();
+			Allocator::construct(allocator, std::addressof(*it));
 		}
 	} catch (...) {
 		for (auto rollback = first; rollback != it; ++rollback) {
-			rollback->~value_type();
+			Allocator::destroy(allocator, std::addressof(*rollback));
 		}
 		throw;
 	}

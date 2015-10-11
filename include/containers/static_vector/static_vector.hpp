@@ -128,7 +128,7 @@ struct static_vector {
 	template<typename... Args>
 	auto emplace_back(Args && ... args) {
 		assert(size(*this) != capacity());
-		::new(static_cast<void *>(data() + size(*this))) value_type(std::forward<Args>(args)...);
+		detail::construct(get_allocator(), data() + size(*this), std::forward<Args>(args)...);
 		++m_size;
 	}
 	
@@ -137,7 +137,7 @@ struct static_vector {
 		if (position == end()) {
 			emplace_back(std::forward<Args>(args)...);
 		} else {
-			detail::emplace_in_middle_no_reallocation(*this, position, std::forward<Args>(args)...);
+			detail::emplace_in_middle_no_reallocation(*this, position, get_allocator(), std::forward<Args>(args)...);
 		}
 		return detail::make_mutable_iterator(*this, position);
 	}
@@ -153,18 +153,22 @@ struct static_vector {
 			max_size<static_vector>()
 		);
 		
-		auto const mutable_position = detail::put_in_middle_no_reallocation(*this, position, first, last, range_size);
+		auto const mutable_position = detail::put_in_middle_no_reallocation(*this, position, first, last, range_size, get_allocator());
 		m_size += range_size;
 		return mutable_position;
 	}
 
 
 	void pop_back() {
-		back(*this).~value_type();
+		detail::destroy(get_allocator(), std::addressof(back(*this)));
 		--m_size;
 	}
 	
 private:
+	static constexpr auto get_allocator() noexcept {
+		return std::allocator<value_type>{};
+	}
+
 	enum class count_constructor{};
 	template<typename Count, typename... MaybeInitializer>
 	explicit static_vector(count_constructor, Count const count, MaybeInitializer && ... args) noexcept(std::is_nothrow_constructible<value_type, MaybeInitializer && ...>::value) {
