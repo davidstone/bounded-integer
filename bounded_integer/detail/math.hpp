@@ -31,3 +31,14 @@ constexpr auto abs(integer<minimum, maximum, overflow_policy, storage> const val
 }
 
 }	// namespace bounded
+
+namespace std {
+// This overload is required for std::sort to work on gcc with iterators whose
+// difference_type is a bounded::integer. It is not guaranteed to continue to be
+// supported. It returns a built-in integer that is the log2 of the number
+template<intmax_t minimum, intmax_t maximum, typename overflow_policy, bounded::storage_type storage>
+constexpr auto __lg(bounded::integer<minimum, maximum, overflow_policy, storage> const value) noexcept {
+	return __lg(value.value());
+}
+
+}	// namespace std
