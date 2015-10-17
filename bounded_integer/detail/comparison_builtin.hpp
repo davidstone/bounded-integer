@@ -54,25 +54,6 @@ constexpr auto operator==(T const lhs, integer<minimum, maximum, overflow_policy
 	return rhs == lhs;
 }
 
-template<
-	intmax_t minimum, intmax_t maximum, typename overflow_policy, storage_type storage,
-	typename T,
-	BOUNDED_REQUIRES(basic_numeric_limits<T>::is_integer)
->
-constexpr auto operator!=(integer<minimum, maximum, overflow_policy, storage> const lhs, T const rhs) noexcept {
-	return !(lhs == rhs);
-}
-
-template<
-	intmax_t minimum, intmax_t maximum, typename overflow_policy, storage_type storage,
-	typename T,
-	BOUNDED_REQUIRES(basic_numeric_limits<T>::is_integer)
->
-constexpr auto operator!=(T const lhs, integer<minimum, maximum, overflow_policy, storage> const rhs) noexcept {
-	return !(rhs == lhs);
-}
-
-
 
 // Relational operators with built-ins
 
@@ -100,60 +81,6 @@ constexpr auto operator<(T const lhs, integer<minimum, maximum, overflow_policy,
 template<intmax_t minimum, intmax_t maximum, typename overflow_policy, storage_type storage>
 constexpr auto operator<(uintmax_t const lhs, integer<minimum, maximum, overflow_policy, storage> const rhs) noexcept {
 	return (rhs < 0) ? false : lhs < static_cast<uintmax_t>(rhs);
-}
-
-template<
-	intmax_t minimum, intmax_t maximum, typename overflow_policy, storage_type storage,
-	typename T,
-	BOUNDED_REQUIRES(basic_numeric_limits<T>::is_integer)
->
-constexpr auto operator>(integer<minimum, maximum, overflow_policy, storage> const lhs, T const rhs) noexcept {
-	return rhs < lhs;
-}
-
-template<
-	intmax_t minimum, intmax_t maximum, typename overflow_policy, storage_type storage,
-	typename T,
-	BOUNDED_REQUIRES(basic_numeric_limits<T>::is_integer)
->
-constexpr auto operator>(T const lhs, integer<minimum, maximum, overflow_policy, storage> const rhs) noexcept {
-	return rhs < lhs;
-}
-
-template<
-	intmax_t minimum, intmax_t maximum, typename overflow_policy, storage_type storage,
-	typename T,
-	BOUNDED_REQUIRES(basic_numeric_limits<T>::is_integer)
->
-constexpr auto operator<=(integer<minimum, maximum, overflow_policy, storage> const lhs, T const rhs) noexcept {
-	return !(rhs < lhs);
-}
-
-template<
-	intmax_t minimum, intmax_t maximum, typename overflow_policy, storage_type storage,
-	typename T,
-	BOUNDED_REQUIRES(basic_numeric_limits<T>::is_integer)
->
-constexpr auto operator<=(T const lhs, integer<minimum, maximum, overflow_policy, storage> const rhs) noexcept {
-	return !(rhs < lhs);
-}
-
-template<
-	intmax_t minimum, intmax_t maximum, typename overflow_policy, storage_type storage,
-	typename T,
-	BOUNDED_REQUIRES(basic_numeric_limits<T>::is_integer)
->
-constexpr auto operator>=(integer<minimum, maximum, overflow_policy, storage> const lhs, T const rhs) noexcept {
-	return !(lhs < rhs);
-}
-
-template<
-	intmax_t minimum, intmax_t maximum, typename overflow_policy, storage_type storage,
-	typename T,
-	BOUNDED_REQUIRES(basic_numeric_limits<T>::is_integer)
->
-constexpr auto operator>=(T const lhs, integer<minimum, maximum, overflow_policy, storage> const rhs) noexcept {
-	return !(lhs < rhs);
 }
 
 }	// namespace bounded

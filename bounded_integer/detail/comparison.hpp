@@ -18,6 +18,7 @@
 
 #include "common_type.hpp"
 #include "forward_declaration.hpp"
+#include "noexcept.hpp"
 
 #include <cstdint>
 #include <type_traits>
@@ -43,7 +44,7 @@ using comparison_type = typename std::common_type_t<
 
 }	// namespace detail
 
-// Equality
+
 template<
 	intmax_t lhs_min, intmax_t lhs_max, typename lhs_overflow, storage_type lhs_storage,
 	intmax_t rhs_min, intmax_t rhs_max, typename rhs_overflow, storage_type rhs_storage
@@ -59,16 +60,7 @@ constexpr auto operator==(integer<lhs_min, lhs_max, lhs_overflow, lhs_storage> c
 	return static_cast<common_t>(lhs) == static_cast<common_t>(rhs);
 }
 
-template<
-	intmax_t lhs_min, intmax_t lhs_max, typename lhs_overflow, storage_type lhs_storage,
-	intmax_t rhs_min, intmax_t rhs_max, typename rhs_overflow, storage_type rhs_storage
->
-constexpr auto operator!=(integer<lhs_min, lhs_max, lhs_overflow, lhs_storage> const & lhs, integer<rhs_min, rhs_max, rhs_overflow, rhs_storage> const & rhs) noexcept {
-	return !(lhs == rhs);
-}
 
-
-// Relational operators
 
 template<
 	intmax_t lhs_min, intmax_t lhs_max, typename lhs_overflow, storage_type lhs_storage,
@@ -85,29 +77,36 @@ constexpr auto operator<(integer<lhs_min, lhs_max, lhs_overflow, lhs_storage> co
 	return static_cast<common_t>(lhs) < static_cast<common_t>(rhs);
 }
 
-template<
-	intmax_t lhs_min, intmax_t lhs_max, typename lhs_overflow, storage_type lhs_storage,
-	intmax_t rhs_min, intmax_t rhs_max, typename rhs_overflow, storage_type rhs_storage
->
-constexpr auto operator>(integer<lhs_min, lhs_max, lhs_overflow, lhs_storage> const & lhs, integer<rhs_min, rhs_max, rhs_overflow, rhs_storage> const & rhs) noexcept {
-	return rhs < lhs;
-}
 
-template<
-	intmax_t lhs_min, intmax_t lhs_max, typename lhs_overflow, storage_type lhs_storage,
-	intmax_t rhs_min, intmax_t rhs_max, typename rhs_overflow, storage_type rhs_storage
->
-constexpr auto operator<=(integer<lhs_min, lhs_max, lhs_overflow, lhs_storage> const & lhs, integer<rhs_min, rhs_max, rhs_overflow, rhs_storage> const & rhs) noexcept {
-	return !(rhs < lhs);
-}
 
-template<
-	intmax_t lhs_min, intmax_t lhs_max, typename lhs_overflow, storage_type lhs_storage,
-	intmax_t rhs_min, intmax_t rhs_max, typename rhs_overflow, storage_type rhs_storage
->
-constexpr auto operator>=(integer<lhs_min, lhs_max, lhs_overflow, lhs_storage> const & lhs, integer<rhs_min, rhs_max, rhs_overflow, rhs_storage> const & rhs) noexcept {
-	return !(lhs < rhs);
-}
+// The strange namespacing and using declarations here are to ensure these
+// functions are picked up by ADL for types defined in namespaces ::bounded or
+// ::bounded::detail
+namespace detail {
 
+template<typename LHS, typename RHS>
+constexpr auto operator!=(LHS const & lhs, RHS const & rhs) BOUNDED_NOEXCEPT(
+	!(lhs == rhs)
+)
+
+template<typename LHS, typename RHS>
+constexpr auto operator>(LHS const & lhs, RHS const & rhs) BOUNDED_NOEXCEPT(
+	rhs < lhs
+)
+template<typename LHS, typename RHS>
+constexpr auto operator<=(LHS const & lhs, RHS const & rhs) BOUNDED_NOEXCEPT(
+	!(rhs < lhs)
+)
+template<typename LHS, typename RHS>
+constexpr auto operator>=(LHS const & lhs, RHS const & rhs) BOUNDED_NOEXCEPT(
+	!(lhs < rhs)
+)
+
+}	// namespace detail
+
+using ::bounded::detail::operator!=;
+using ::bounded::detail::operator>;
+using ::bounded::detail::operator<=;
+using ::bounded::detail::operator>=;
 
 }	// namespace bounded

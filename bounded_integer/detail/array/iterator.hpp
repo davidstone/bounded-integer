@@ -17,6 +17,7 @@
 #pragma once
 
 #include "../class.hpp"
+#include "../comparison.hpp"
 #include "../arithmetic/pointer.hpp"
 #include "../policy/throw_policy.hpp"
 
@@ -84,25 +85,6 @@ private:
 
 	base_iterator m_it;
 };
-
-
-template<typename T, intmax_t size>
-constexpr auto operator!=(basic_iterator<T, size> const lhs, basic_iterator<T, size> const rhs) noexcept -> bool {
-	return !(lhs == rhs);
-}
-
-template<typename T, intmax_t size>
-constexpr auto operator>(basic_iterator<T, size> const lhs, basic_iterator<T, size> const rhs) noexcept -> bool {
-	return rhs < lhs;
-}
-template<typename T, intmax_t size>
-constexpr auto operator<=(basic_iterator<T, size> const lhs, basic_iterator<T, size> const rhs) noexcept -> bool {
-	return !(lhs > rhs);
-}
-template<typename T, intmax_t size>
-constexpr auto operator>=(basic_iterator<T, size> const lhs, basic_iterator<T, size> const rhs) noexcept -> bool {
-	return !(lhs < rhs);
-}
 
 
 template<typename T, intmax_t size>

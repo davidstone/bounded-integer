@@ -173,28 +173,8 @@ constexpr auto operator==(array<T, size> const & lhs, array<T, size> const & rhs
 }
 
 template<typename T, std::size_t size>
-constexpr auto operator!=(array<T, size> const & lhs, array<T, size> const & rhs) noexcept(noexcept(!(lhs == rhs))) -> bool {
-	return !(lhs == rhs);
-}
-
-template<typename T, std::size_t size>
 constexpr auto operator<(array<T, size> const & lhs, array<T, size> const & rhs) noexcept(noexcept(std::declval<typename array<T, size>::value_type>() < std::declval<typename array<T, size>::value_type>())) -> bool {
 	return std::lexicographical_compare(lhs.begin(), lhs.end(), rhs.begin(), rhs.end());
-}
-
-template<typename T, std::size_t size>
-constexpr auto operator>(array<T, size> const & lhs, array<T, size> const & rhs) noexcept(noexcept(rhs < lhs)) -> bool {
-	return rhs < lhs;
-}
-
-template<typename T, std::size_t size>
-constexpr auto operator<=(array<T, size> const & lhs, array<T, size> const & rhs) noexcept(noexcept(!(rhs < lhs))) -> bool {
-	return !(rhs < lhs);
-}
-
-template<typename T, std::size_t size>
-constexpr auto operator>=(array<T, size> const & lhs, array<T, size> const & rhs) noexcept(noexcept(!(lhs < rhs))) -> bool {
-	return !(lhs < rhs);
 }
 
 template<std::size_t index, typename T, std::size_t size>
