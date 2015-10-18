@@ -24,22 +24,18 @@
 #include <type_traits>
 
 namespace bounded {
-
 namespace detail {
-
-// This preferentially uses storage_type::fast, but does no conversions if they
-// are the same. If new storage types are added, this will preferentially use
-// storage_type::least over whatever that new type is.
-constexpr storage_type comparison_storage_type(storage_type lhs_storage, storage_type rhs_storage) noexcept {
-	return (lhs_storage <= rhs_storage) ? lhs_storage : rhs_storage;
-}
 
 // This uses any policy because policies do not matter for comparisons. This
 // allows the user to compare integers with unrelated policies.
-template<intmax_t lhs_min, intmax_t lhs_max, storage_type lhs_storage, intmax_t rhs_min, intmax_t rhs_max, storage_type rhs_storage, typename policy>
+template<
+	intmax_t lhs_min, intmax_t lhs_max, storage_type lhs_storage,
+	intmax_t rhs_min, intmax_t rhs_max, storage_type rhs_storage,
+	typename policy
+>
 using comparison_type = typename std::common_type_t<
-	integer<lhs_min, lhs_max, policy, comparison_storage_type(lhs_storage, rhs_storage)>,
-	integer<rhs_min, rhs_max, policy, comparison_storage_type(lhs_storage, rhs_storage)>
+	integer<lhs_min, lhs_max, policy, lhs_storage>,
+	integer<rhs_min, rhs_max, policy, rhs_storage>
 >::underlying_type const;
 
 }	// namespace detail

@@ -21,25 +21,42 @@
 
 #include <type_traits>
 
+namespace bounded {
+namespace detail {
+
+// This preferentially uses storage_type::fast, but does no conversions if they
+// are the same. If new storage types are added, this will preferentially use
+// storage_type::least over whatever that new type is.
+constexpr storage_type common_storage_type(storage_type const lhs_storage, storage_type const rhs_storage) noexcept {
+	return (lhs_storage < rhs_storage) ? lhs_storage : rhs_storage;
+}
+
+}	// namespace detail
+}	// namespace bounded
+
 namespace std {
 
 // I do not have to specialize the single-argument version, as it just returns
 // the type passed in, which will always work.
 
 template<
-	intmax_t lhs_min, intmax_t lhs_max, typename lhs_policy,
-	intmax_t rhs_min, intmax_t rhs_max, typename rhs_policy,
-	bounded::storage_type storage
+	intmax_t lhs_min, intmax_t lhs_max, typename lhs_policy, bounded::storage_type lhs_storage,
+	intmax_t rhs_min, intmax_t rhs_max, typename rhs_policy, bounded::storage_type rhs_storage
 >
 struct common_type<
-	bounded::integer<lhs_min, lhs_max, lhs_policy, storage>,
-	bounded::integer<rhs_min, rhs_max, rhs_policy, storage>
+	bounded::integer<lhs_min, lhs_max, lhs_policy, lhs_storage>,
+	bounded::integer<rhs_min, rhs_max, rhs_policy, rhs_storage>
 > {
 private:
 	static constexpr auto minimum = (lhs_min < rhs_min) ? lhs_min : rhs_min;
 	static constexpr auto maximum = (lhs_max > rhs_max) ? lhs_max : rhs_max;
 public:
-	using type = bounded::integer<minimum, maximum, bounded::common_policy_t<lhs_policy, rhs_policy>, storage>;
+	using type = bounded::integer<
+		minimum,
+		maximum,
+		bounded::common_policy_t<lhs_policy, rhs_policy>,
+		bounded::detail::common_storage_type(lhs_storage, rhs_storage)
+	>;
 };
 
 
