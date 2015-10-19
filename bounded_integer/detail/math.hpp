@@ -18,13 +18,15 @@
 
 #include "cast.hpp"
 #include "forward_declaration.hpp"
+#include "is_bounded_integer.hpp"
 #include "minmax.hpp"
+#include "requires.hpp"
 #include "arithmetic/unary_minus.hpp"
 
 namespace bounded {
 
-template<intmax_t minimum, intmax_t maximum, typename overflow_policy, storage_type storage>
-constexpr auto abs(integer<minimum, maximum, overflow_policy, storage> const value) noexcept {
+template<typename Integer, BOUNDED_REQUIRES(is_bounded_integer<Integer>)>
+constexpr auto abs(Integer const value) noexcept {
 	// The 0 has to be there to restrict the range of possible values. Without
 	// it, abs(integer<-7, 3>) would be [-3, 7] instead of [0, 7].
 	return increase_min<0>(max(value, -value), non_check);

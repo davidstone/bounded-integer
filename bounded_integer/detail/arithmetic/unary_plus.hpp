@@ -16,13 +16,12 @@
 
 #pragma once
 
-#include "../common_type.hpp"
-#include "../forward_declaration.hpp"
+#include "../requires.hpp"
 
 namespace bounded {
 
-template<intmax_t minimum, intmax_t maximum, typename overflow_policy, storage_type storage>
-constexpr auto operator+(integer<minimum, maximum, overflow_policy, storage> const value) noexcept {
+template<typename Integer, BOUNDED_REQUIRES(is_bounded_integer<Integer>)>
+constexpr auto operator+(Integer const value) noexcept {
 	return value;
 }
 

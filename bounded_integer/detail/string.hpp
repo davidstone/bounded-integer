@@ -16,7 +16,8 @@
 
 #pragma once
 
-#include "forward_declaration.hpp"
+#include "is_bounded_integer.hpp"
+#include "requires.hpp"
 #include <string>
 #include <type_traits>
 
@@ -25,15 +26,15 @@ namespace bounded {
 // Import to_string for the numeric types
 using std::to_string;
 
-template<intmax_t minimum, intmax_t maximum, typename overflow_policy, storage_type storage>
-auto to_string(integer<minimum, maximum, overflow_policy, storage> const & x) {
+template<typename Integer, BOUNDED_REQUIRES(is_bounded_integer<Integer>)>
+auto to_string(Integer const & x) {
 	return to_string(x.value());
 }
 
 using std::to_wstring;
 
-template<intmax_t minimum, intmax_t maximum, typename overflow_policy, storage_type storage>
-auto to_wstring(integer<minimum, maximum, overflow_policy, storage> const & x) {
+template<typename Integer, BOUNDED_REQUIRES(is_bounded_integer<Integer>)>
+auto to_wstring(Integer const & x) {
 	return to_wstring(x.value());
 }
 

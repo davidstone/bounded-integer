@@ -1,5 +1,5 @@
 // Overload for stream insertion / extraction
-// Copyright (C) 2014 David Stone
+// Copyright (C) 2015 David Stone
 //
 // This program is free software: you can redistribute it and / or modify
 // it under the terms of the GNU Affero General Public License as
@@ -16,36 +16,30 @@
 
 #pragma once
 
-#include "class.hpp"
+#include "is_bounded_integer.hpp"
+#include "requires.hpp"
+
+#include <cstdint>
 #include <istream>
 #include <ostream>
 
 namespace bounded {
 
-template<
-	typename CharT, typename Traits,
-	intmax_t minimum, intmax_t maximum, typename policy, storage_type storage
->
-decltype(auto) operator<<(std::basic_ostream<CharT, Traits> & out, integer<minimum, maximum, policy, storage> const & x) {
+template<typename CharT, typename Traits, typename Integer, BOUNDED_REQUIRES(is_bounded_integer<Integer>)>
+decltype(auto) operator<<(std::basic_ostream<CharT, Traits> & out, Integer const & x) {
 	// The unary plus applies integer promotions to x. This ensures values are
 	// printed as integers. Without this, I could run into an issue where the
 	// underlying type is a typedef for signed char / unsigned char. This would
 	// output the value as though it were a character.
 	return out << +x.value();
 }
-template<
-	typename CharT, typename Traits,
-	intmax_t minimum, intmax_t maximum, typename policy, storage_type storage
->
-decltype(auto) operator<<(std::basic_ostream<CharT, Traits> & out, integer<minimum, maximum, policy, storage> const volatile & x) {
+template<typename CharT, typename Traits, typename Integer, BOUNDED_REQUIRES(is_bounded_integer<Integer>)>
+decltype(auto) operator<<(std::basic_ostream<CharT, Traits> & out, Integer const volatile & x) {
 	return out << +x.value();
 }
 
-template<
-	typename CharT, typename Traits,
-	intmax_t minimum, intmax_t maximum, typename policy, storage_type storage
->
-decltype(auto) operator>>(std::basic_istream<CharT, Traits> & in, integer<minimum, maximum, policy, storage> & x) {
+template<typename CharT, typename Traits, typename Integer, BOUNDED_REQUIRES(is_bounded_integer<Integer>)>
+decltype(auto) operator>>(std::basic_istream<CharT, Traits> & in, Integer & x) {
 	// This is intmax_t rather than underlying_type to maximize the chances for
 	// robust error checking rather than undefined behavior, but it still fails
 	// for very large and very small numbers.
@@ -54,11 +48,8 @@ decltype(auto) operator>>(std::basic_istream<CharT, Traits> & in, integer<minimu
 	x = temp;
 	return in;
 }
-template<
-	typename CharT, typename Traits,
-	intmax_t minimum, intmax_t maximum, typename policy, storage_type storage
->
-decltype(auto) operator>>(std::basic_istream<CharT, Traits> & in, integer<minimum, maximum, policy, storage> volatile & x) {
+template<typename CharT, typename Traits, typename Integer, BOUNDED_REQUIRES(is_bounded_integer<Integer>)>
+decltype(auto) operator>>(std::basic_istream<CharT, Traits> & in, Integer volatile & x) {
 	intmax_t temp;
 	in >> temp;
 	x = temp;
