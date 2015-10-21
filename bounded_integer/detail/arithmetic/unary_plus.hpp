@@ -16,6 +16,7 @@
 
 #pragma once
 
+#include "../is_bounded_integer.hpp"
 #include "../requires.hpp"
 
 namespace bounded {
