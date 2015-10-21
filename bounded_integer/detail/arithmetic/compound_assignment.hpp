@@ -29,14 +29,10 @@ namespace bounded {
 // We call make with the target's overflow policy because we need this exact
 // overflow policy. We do not want to rely on common_policy here.
 #define BOUNDED_INTEGER_COMPOUND_ASSIGNMENT_OPERATOR_TARGET(symbol) \
-template<intmax_t minimum, intmax_t maximum, typename overflow_policy, storage_type storage, typename T> \
-constexpr decltype(auto) operator symbol##=(integer<minimum, maximum, overflow_policy, storage> & lhs, T && rhs) { \
-	return lhs = static_cast<integer<minimum, maximum, overflow_policy, storage>>(lhs symbol make<overflow_policy>(std::forward<T>(rhs))); \
+template<typename LHS, typename RHS, BOUNDED_REQUIRES(is_bounded_integer<LHS> and basic_numeric_limits<RHS>::is_integer)> \
+constexpr decltype(auto) operator symbol##=(LHS & lhs, RHS && rhs) { \
+	return lhs = static_cast<std::decay_t<LHS>>(lhs symbol make<typename std::remove_reference_t<LHS>::overflow_policy>(std::forward<RHS>(rhs))); \
 } \
-template<intmax_t minimum, intmax_t maximum, typename overflow_policy, storage_type storage, typename T> \
-decltype(auto) operator symbol##=(integer<minimum, maximum, overflow_policy, storage> volatile & lhs, T && rhs) { \
-	return lhs = static_cast<integer<minimum, maximum, overflow_policy, storage>>(lhs symbol make<overflow_policy>(std::forward<T>(rhs))); \
-}
 
 // bounded::integer being assigned to
 BOUNDED_INTEGER_COMPOUND_ASSIGNMENT_OPERATOR_TARGET(+)
@@ -49,12 +45,8 @@ BOUNDED_INTEGER_COMPOUND_ASSIGNMENT_OPERATOR_TARGET(%)
 
 
 #define BOUNDED_INTEGER_COMPOUND_ASSIGNMENT_OPERATOR_SOURCE(symbol) \
-template<typename T, intmax_t minimum, intmax_t maximum, typename overflow_policy, storage_type storage, BOUNDED_REQUIRES(basic_numeric_limits<T>::is_integer and not is_bounded_integer<T>)> \
-constexpr auto && operator symbol(T & lhs, integer<minimum, maximum, overflow_policy, storage> const rhs) noexcept { \
-	return lhs symbol rhs.value(); \
-} \
-template<typename T, intmax_t minimum, intmax_t maximum, typename overflow_policy, storage_type storage, BOUNDED_REQUIRES(basic_numeric_limits<T>::is_integer)> \
-auto && operator symbol(T volatile & lhs, integer<minimum, maximum, overflow_policy, storage> const rhs) noexcept { \
+template<typename LHS, intmax_t minimum, intmax_t maximum, typename overflow_policy, storage_type storage, BOUNDED_REQUIRES(basic_numeric_limits<LHS>::is_integer and not is_bounded_integer<LHS>)> \
+constexpr decltype(auto) operator symbol(LHS & lhs, integer<minimum, maximum, overflow_policy, storage> const rhs) noexcept { \
 	return lhs symbol rhs.value(); \
 }
 
@@ -70,46 +62,26 @@ BOUNDED_INTEGER_COMPOUND_ASSIGNMENT_OPERATOR_SOURCE(%=)
 
 // Increment / decrement
 
-template<intmax_t minimum, intmax_t maximum, typename overflow_policy, storage_type storage>
-constexpr decltype(auto) operator++(integer<minimum, maximum, overflow_policy, storage> & value) {
-	return value += constant<1>;
-}
-template<intmax_t minimum, intmax_t maximum, typename overflow_policy, storage_type storage>
-decltype(auto) operator++(integer<minimum, maximum, overflow_policy, storage> volatile & value) {
+template<typename Integer, BOUNDED_REQUIRES(is_bounded_integer<Integer>)>
+constexpr decltype(auto) operator++(Integer & value) {
 	return value += constant<1>;
 }
 
-template<intmax_t minimum, intmax_t maximum, typename overflow_policy, storage_type storage>
-constexpr auto operator++(integer<minimum, maximum, overflow_policy, storage> & value, int) {
-	auto previous = value;
-	++value;
-	return previous;
-}
-template<intmax_t minimum, intmax_t maximum, typename overflow_policy, storage_type storage>
-auto operator++(integer<minimum, maximum, overflow_policy, storage> volatile & value, int) {
+template<typename Integer, BOUNDED_REQUIRES(is_bounded_integer<Integer>)>
+constexpr auto operator++(Integer & value, int) {
 	auto previous = value;
 	++value;
 	return previous;
 }
 
 
-template<intmax_t minimum, intmax_t maximum, typename overflow_policy, storage_type storage>
-constexpr decltype(auto) operator--(integer<minimum, maximum, overflow_policy, storage> & value) {
-	return value -= constant<1>;
-}
-template<intmax_t minimum, intmax_t maximum, typename overflow_policy, storage_type storage>
-decltype(auto) operator--(integer<minimum, maximum, overflow_policy, storage> volatile & value) {
+template<typename Integer, BOUNDED_REQUIRES(is_bounded_integer<Integer>)>
+constexpr decltype(auto) operator--(Integer & value) {
 	return value -= constant<1>;
 }
 
-template<intmax_t minimum, intmax_t maximum, typename overflow_policy, storage_type storage>
-constexpr auto operator--(integer<minimum, maximum, overflow_policy, storage> & value, int) {
-	auto previous = value;
-	--value;
-	return previous;
-}
-template<intmax_t minimum, intmax_t maximum, typename overflow_policy, storage_type storage>
-auto operator--(integer<minimum, maximum, overflow_policy, storage> volatile & value, int) {
+template<typename Integer, BOUNDED_REQUIRES(is_bounded_integer<Integer>)>
+constexpr auto operator--(Integer & value, int) {
 	auto previous = value;
 	--value;
 	return previous;
