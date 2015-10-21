@@ -22,6 +22,11 @@
 
 namespace {
 
+template<typename LHS, typename RHS>
+constexpr auto same_bounds =
+	std::numeric_limits<LHS>::min() == std::numeric_limits<RHS>::min() and
+	std::numeric_limits<LHS>::max() == std::numeric_limits<RHS>::max();	
+
 using namespace bounded::literal;
 
 namespace check_common_policy {
@@ -867,7 +872,7 @@ namespace check_arithmetic {
 		"Incorrect modulo for values with a very large range"
 	);
 	static_assert(
-		std::is_same<decltype(max_range_result), decltype(max_range)>::value,
+		same_bounds<decltype(max_range_result), decltype(max_range)>,
 		"Incorrect modulo type for values with a very large range"
 	);
 	
@@ -1366,6 +1371,12 @@ namespace check_enum_construction {
 	
 	constexpr bounded::integer<0, 10> z(bounded_enum{});
 	constexpr auto c = bounded::make(bounded_enum{});
+}
+
+namespace check_poisoning {
+	constexpr bounded::integer<0, 10> x = 0;
+	constexpr bounded::integer<0, 100> y = x + 100;
+	constexpr bounded::integer<5, 5> z = bounded::make(5);
 }
 
 auto check_volatile() {

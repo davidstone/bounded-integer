@@ -17,6 +17,7 @@
 #pragma once
 
 #include "class.hpp"
+#include "is_bounded_integer.hpp"
 #include "numeric_limits.hpp"
 #include "underlying_type.hpp"
 #include "policy/modulo_policy.hpp"
@@ -50,7 +51,8 @@ using equivalent_type = integer<
 	static_cast<std::intmax_t>(basic_numeric_limits<T>::min()),
 	static_cast<std::intmax_t>(basic_numeric_limits<T>::max()),
 	overflow_policy,
-	storage
+	storage,
+	not is_bounded_integer<T>
 >;
 
 // This somewhat strange looking set of default arguments allows the following:

@@ -23,15 +23,15 @@
 
 namespace bounded {
 
-// Other args allow you to specify an overflow policy or declare the conversion as non_check
-template<intmax_t new_minimum, intmax_t minimum, intmax_t maximum, typename overflow_policy, storage_type storage, typename... Args>
-constexpr auto increase_min(integer<minimum, maximum, overflow_policy, storage> const & value, Args && ... args) BOUNDED_NOEXCEPT((
-	integer<(new_minimum > minimum) ? new_minimum : minimum, maximum, overflow_policy, storage>(value, std::forward<Args>(args)...)
+// Other args allow you to declare the conversion as non_check
+template<intmax_t new_minimum, intmax_t minimum, intmax_t maximum, typename overflow_policy, storage_type storage, bool poisoned, typename... Args>
+constexpr auto increase_min(integer<minimum, maximum, overflow_policy, storage, poisoned> const & value, Args && ... args) BOUNDED_NOEXCEPT((
+	integer<(new_minimum > minimum) ? new_minimum : minimum, maximum, overflow_policy, storage, poisoned>(value, std::forward<Args>(args)...)
 ))
 
-template<intmax_t new_maximum, intmax_t minimum, intmax_t maximum, typename overflow_policy, storage_type storage, typename... Args>
-constexpr auto decrease_max(integer<minimum, maximum, overflow_policy, storage> const & value, Args && ... args) BOUNDED_NOEXCEPT((
-	 integer<minimum, (new_maximum < maximum) ? new_maximum : maximum, overflow_policy, storage>(value, std::forward<Args>(args)...)
+template<intmax_t new_maximum, intmax_t minimum, intmax_t maximum, typename overflow_policy, storage_type storage, bool poisoned, typename... Args>
+constexpr auto decrease_max(integer<minimum, maximum, overflow_policy, storage, poisoned> const & value, Args && ... args) BOUNDED_NOEXCEPT((
+	 integer<minimum, (new_maximum < maximum) ? new_maximum : maximum, overflow_policy, storage, poisoned>(value, std::forward<Args>(args)...)
 ))
 
 }	// namespace bounded

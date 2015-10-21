@@ -38,8 +38,8 @@ namespace std {
 // This overload is required for std::sort to work on gcc with iterators whose
 // difference_type is a bounded::integer. It is not guaranteed to continue to be
 // supported. It returns a built-in integer that is the log2 of the number
-template<intmax_t minimum, intmax_t maximum, typename overflow_policy, bounded::storage_type storage>
-constexpr auto __lg(bounded::integer<minimum, maximum, overflow_policy, storage> const value) noexcept {
+template<intmax_t minimum, intmax_t maximum, typename overflow_policy, bounded::storage_type storage, bool poisoned>
+constexpr auto __lg(bounded::integer<minimum, maximum, overflow_policy, storage, poisoned> const value) noexcept {
 	return __lg(value.value());
 }
 

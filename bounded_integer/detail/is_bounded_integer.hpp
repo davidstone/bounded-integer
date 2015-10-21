@@ -26,8 +26,8 @@ namespace detail {
 template<typename T>
 struct is_bounded_integer_c : std::false_type {};
 
-template<intmax_t minimum, intmax_t maximum, typename overflow_policy, storage_type storage>
-struct is_bounded_integer_c<integer<minimum, maximum, overflow_policy, storage>> : std::true_type {};
+template<intmax_t minimum, intmax_t maximum, typename overflow_policy, storage_type storage, bool poisoned>
+struct is_bounded_integer_c<integer<minimum, maximum, overflow_policy, storage, poisoned>> : std::true_type {};
 
 }	// namespace detail
 

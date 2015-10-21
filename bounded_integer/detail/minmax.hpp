@@ -71,23 +71,25 @@ struct extreme_type {
 template<typename Compare, typename T1, typename T2>
 using extreme_t = typename extreme_type<Compare, std::decay_t<T1>, std::decay_t<T2>>::type;
 
+// TODO: This should only be selected for less and greater
 template<
 	typename Compare,
-	intmax_t lhs_min, intmax_t lhs_max, typename lhs_policy,
-	intmax_t rhs_min, intmax_t rhs_max, typename rhs_policy,
-	storage_type storage
+	intmax_t lhs_min, intmax_t lhs_max, typename lhs_policy, storage_type lhs_storage, bool lhs_poisoned,
+	intmax_t rhs_min, intmax_t rhs_max, typename rhs_policy, storage_type rhs_storage, bool rhs_poisoned
 >
 struct extreme_type<
 	Compare,
-	integer<lhs_min, lhs_max, lhs_policy, storage>,
-	integer<rhs_min, rhs_max, rhs_policy, storage>
+	integer<lhs_min, lhs_max, lhs_policy, lhs_storage, lhs_poisoned>,
+	integer<rhs_min, rhs_max, rhs_policy, rhs_storage, rhs_poisoned>
 > {
 private:
 	static constexpr auto minimum = Compare{}(lhs_min, rhs_min) ? lhs_min : rhs_min;
 	static constexpr auto maximum = Compare{}(lhs_max, rhs_max) ? lhs_max : rhs_max;
 	using policy = common_policy_t<lhs_policy, rhs_policy>;
+	static constexpr auto storage = detail::common_storage_type(lhs_storage, rhs_storage);
+	static constexpr auto poisoned = lhs_poisoned or rhs_poisoned;
 public:
-	using type = integer<minimum, maximum, policy, storage>;
+	using type = integer<minimum, maximum, policy, storage, poisoned>;
 };
 
 

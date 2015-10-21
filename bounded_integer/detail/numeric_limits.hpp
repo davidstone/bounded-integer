@@ -43,8 +43,8 @@ public:
 	static constexpr auto is_integer = real_numeric_limits::is_integer;
 };
 
-template<intmax_t minimum, intmax_t maximum, typename overflow_policy, storage_type storage>
-struct basic_numeric_limits<integer<minimum, maximum, overflow_policy, storage>> {
+template<intmax_t minimum, intmax_t maximum, typename overflow_policy, storage_type storage, bool poisoned>
+struct basic_numeric_limits<integer<minimum, maximum, overflow_policy, storage, poisoned>> {
 	static constexpr auto min() noexcept {
 		return minimum;
 	}
@@ -200,10 +200,10 @@ public:
 }	// namespace bounded
 namespace std {
 
-template<intmax_t minimum, intmax_t maximum, typename overflow_policy, bounded::storage_type storage>
-struct numeric_limits<bounded::integer<minimum, maximum, overflow_policy, storage>> {
+template<intmax_t minimum, intmax_t maximum, typename overflow_policy, bounded::storage_type storage, bool poisoned>
+struct numeric_limits<bounded::integer<minimum, maximum, overflow_policy, storage, poisoned>> {
 private:
-	using type = bounded::integer<minimum, maximum, overflow_policy, storage>;
+	using type = bounded::integer<minimum, maximum, overflow_policy, storage, poisoned>;
 public:
 	static constexpr bool is_specialized = true;
 	static constexpr bool is_signed = minimum < 0;
@@ -235,13 +235,13 @@ public:
 	static constexpr bool tinyness_before = false;
 	
 	static constexpr auto min() noexcept {
-		return bounded::integer<minimum, minimum, overflow_policy, storage>(minimum, bounded::non_check);
+		return bounded::integer<minimum, minimum, overflow_policy, storage, false>(minimum, bounded::non_check);
 	}
 	static constexpr auto lowest() noexcept {
-		return bounded::integer<minimum, minimum, overflow_policy, storage>(minimum, bounded::non_check);
+		return bounded::integer<minimum, minimum, overflow_policy, storage, false>(minimum, bounded::non_check);
 	}
 	static constexpr auto max() noexcept {
-		return bounded::integer<maximum, maximum, overflow_policy, storage>(maximum, bounded::non_check);
+		return bounded::integer<maximum, maximum, overflow_policy, storage, false>(maximum, bounded::non_check);
 	}
 	// Some of these functions return 0 for built-in integer types, but 0 may
 	// not be in the representable range. Fortunately, they are also defined as

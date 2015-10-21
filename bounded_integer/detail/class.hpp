@@ -18,6 +18,7 @@
 
 #include "forward_declaration.hpp"
 #include "is_bounded_integer.hpp"
+#include "is_poisoned.hpp"
 #include "noexcept.hpp"
 #include "numeric_limits.hpp"
 #include "overlapping_range.hpp"
@@ -81,26 +82,33 @@ constexpr decltype(auto) as_integer(T && t) noexcept {
 template<typename T, BOUNDED_REQUIRES(std::is_enum<std::decay_t<T>>::value)>
 constexpr decltype(auto) as_integer(T && t) noexcept {
 	using limits = basic_numeric_limits<T>;
-	return integer<static_cast<std::intmax_t>(limits::min()), static_cast<std::intmax_t>(limits::max()), null_policy, storage_type::fast>(static_cast<std::underlying_type_t<std::decay_t<T>>>(t));
+	using result_type = integer<
+		static_cast<std::intmax_t>(limits::min()),
+		static_cast<std::intmax_t>(limits::max()),
+		null_policy,
+		storage_type::fast,
+		false
+	>;
+	return result_type(static_cast<std::underlying_type_t<std::decay_t<T>>>(t));
 }
 
 }	// namespace detail
 
 
 template<intmax_t value, typename overflow_policy = null_policy, storage_type storage = storage_type::fast>
-constexpr auto constant = integer<value, value, overflow_policy, storage>(value, non_check);
+constexpr auto constant = integer<value, value, overflow_policy, storage, false>(value, non_check);
 
 
 
 
-template<intmax_t minimum, intmax_t maximum, typename overflow_policy_ = null_policy, storage_type storage = storage_type::fast>
+template<intmax_t minimum, intmax_t maximum, typename overflow_policy_ = null_policy, storage_type storage = storage_type::fast, bool poisoned_ = false>
 struct integer {
 	static_assert(minimum <= maximum, "Maximum cannot be less than minimum");
 	using underlying_type = std::conditional_t<storage == storage_type::fast, detail::fast_t<minimum, maximum>, detail::least_t<minimum, maximum>>;
 	using overflow_policy = overflow_policy_;
 	static_assert(detail::value_fits_in_type<underlying_type>(minimum), "minimum does not fit in underlying_type.");
 	static_assert(detail::value_fits_in_type<underlying_type>(maximum), "maximum does not fit in underlying_type.");
-
+	
 	static_assert(minimum < 0 ? std::numeric_limits<underlying_type>::is_signed : true, "underlying_type should be signed.");
 	
 	// May relax these restrictions in the future
@@ -136,9 +144,20 @@ struct integer {
 
 	template<typename T, BOUNDED_REQUIRES(
 		!detail::is_implicitly_constructible_from<T>(minimum, maximum) and
-		detail::is_explicitly_constructible_from<overflow_policy, T>(minimum, maximum)
+		detail::is_explicitly_constructible_from<overflow_policy, T>(minimum, maximum) and
+		!detail::is_poisoned<T>
 	)>
 	constexpr explicit integer(T && other) BOUNDED_NOEXCEPT_INITIALIZATION(
+		integer(apply_overflow_policy(detail::as_integer(std::forward<T>(other))), non_check)
+	) {
+	}
+
+	template<typename T, BOUNDED_REQUIRES(
+		!detail::is_implicitly_constructible_from<T>(minimum, maximum) and
+		detail::is_explicitly_constructible_from<overflow_policy, T>(minimum, maximum) and
+		detail::is_poisoned<T>
+	)>
+	constexpr integer(T && other) BOUNDED_NOEXCEPT_INITIALIZATION(
 		integer(apply_overflow_policy(detail::as_integer(std::forward<T>(other))), non_check)
 	) {
 	}

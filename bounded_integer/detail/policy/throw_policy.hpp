@@ -18,10 +18,11 @@
 
 #include "null_policy.hpp"
 #include "../comparison.hpp"
+#include "../is_bounded_integer.hpp"
+#include "../is_poisoned.hpp"
 #include "../minmax.hpp"
 #include "../noexcept.hpp"
 #include "../numeric_limits.hpp"
-#include "../is_bounded_integer.hpp"
 #include "../string.hpp"
 #include <stdexcept>
 
@@ -36,7 +37,8 @@ constexpr auto reduce_range(T && value) BOUNDED_NOEXCEPT(
 		max(minimum, basic_numeric_limits<T>::min()),
 		min(maximum, basic_numeric_limits<T>::max()),
 		null_policy,
-		storage_type::fast
+		storage_type::fast,
+		bounded::detail::is_poisoned<T>
 	>(std::forward<T>(value))
 )
 

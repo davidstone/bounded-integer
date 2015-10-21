@@ -1,5 +1,5 @@
 // Type that is capable of holding the value in any of a list of integer types
-// Copyright (C) 2014 David Stone
+// Copyright (C) 2015 David Stone
 //
 // This program is free software: you can redistribute it and / or modify
 // it under the terms of the GNU Affero General Public License as
@@ -40,12 +40,12 @@ namespace std {
 // the type passed in, which will always work.
 
 template<
-	intmax_t lhs_min, intmax_t lhs_max, typename lhs_policy, bounded::storage_type lhs_storage,
-	intmax_t rhs_min, intmax_t rhs_max, typename rhs_policy, bounded::storage_type rhs_storage
+	intmax_t lhs_min, intmax_t lhs_max, typename lhs_policy, bounded::storage_type lhs_storage, bool lhs_poisoned,
+	intmax_t rhs_min, intmax_t rhs_max, typename rhs_policy, bounded::storage_type rhs_storage, bool rhs_poisoned
 >
 struct common_type<
-	bounded::integer<lhs_min, lhs_max, lhs_policy, lhs_storage>,
-	bounded::integer<rhs_min, rhs_max, rhs_policy, rhs_storage>
+	bounded::integer<lhs_min, lhs_max, lhs_policy, lhs_storage, lhs_poisoned>,
+	bounded::integer<rhs_min, rhs_max, rhs_policy, rhs_storage, rhs_poisoned>
 > {
 private:
 	static constexpr auto minimum = (lhs_min < rhs_min) ? lhs_min : rhs_min;
@@ -55,7 +55,8 @@ public:
 		minimum,
 		maximum,
 		bounded::common_policy_t<lhs_policy, rhs_policy>,
-		bounded::detail::common_storage_type(lhs_storage, rhs_storage)
+		bounded::detail::common_storage_type(lhs_storage, rhs_storage),
+		lhs_poisoned or rhs_poisoned
 	>;
 };
 
@@ -64,7 +65,7 @@ public:
 // add in some tricks to limit the maximum instantiation depth:
 
 template<
-	intmax_t minimum, intmax_t maximum, typename overflow_policy, bounded::storage_type storage,
+	intmax_t minimum, intmax_t maximum, typename overflow_policy, bounded::storage_type storage, bool poisoned,
 	typename T1, typename T2, typename T3, typename T4, typename T5,
 	typename T6, typename T7, typename T8, typename T9, typename T10,
 	typename T11, typename T12, typename T13, typename T14, typename T15,
@@ -78,7 +79,7 @@ template<
 	typename... Ts
 >
 struct common_type<
-	bounded::integer<minimum, maximum, overflow_policy, storage>,
+	bounded::integer<minimum, maximum, overflow_policy, storage, poisoned>,
 	T1, T2, T3, T4, T5, T6, T7, T8, T9, T10,
 	T11, T12, T13, T14, T15, T16, T17, T18, T19, T20,
 	T21, T22, T23, T24, T25, T26, T27, T28, T29, T30,
@@ -87,7 +88,7 @@ struct common_type<
 	Ts...
 > {
 private:
-	using type0 = bounded::integer<minimum, maximum, overflow_policy, storage>;
+	using type0 = bounded::integer<minimum, maximum, overflow_policy, storage, poisoned>;
 public:
 	using type = common_type_t<
 		common_type_t<

@@ -34,18 +34,18 @@ template<
 	typename policy
 >
 using comparison_type = typename std::common_type_t<
-	integer<lhs_min, lhs_max, policy, lhs_storage>,
-	integer<rhs_min, rhs_max, policy, rhs_storage>
+	integer<lhs_min, lhs_max, policy, lhs_storage, false>,
+	integer<rhs_min, rhs_max, policy, rhs_storage, false>
 >::underlying_type const;
 
 }	// namespace detail
 
 
 template<
-	intmax_t lhs_min, intmax_t lhs_max, typename lhs_overflow, storage_type lhs_storage,
-	intmax_t rhs_min, intmax_t rhs_max, typename rhs_overflow, storage_type rhs_storage
+	intmax_t lhs_min, intmax_t lhs_max, typename lhs_overflow, storage_type lhs_storage, bool lhs_poisoned,
+	intmax_t rhs_min, intmax_t rhs_max, typename rhs_overflow, storage_type rhs_storage, bool rhs_poisoned
 >
-constexpr auto operator==(integer<lhs_min, lhs_max, lhs_overflow, lhs_storage> const & lhs, integer<rhs_min, rhs_max, rhs_overflow, rhs_storage> const & rhs) noexcept {
+constexpr auto operator==(integer<lhs_min, lhs_max, lhs_overflow, lhs_storage, lhs_poisoned> const & lhs, integer<rhs_min, rhs_max, rhs_overflow, rhs_storage, rhs_poisoned> const & rhs) noexcept {
 	if (lhs_min > rhs_max or rhs_min > lhs_max) {
 		return false;
 	}
@@ -59,10 +59,10 @@ constexpr auto operator==(integer<lhs_min, lhs_max, lhs_overflow, lhs_storage> c
 
 
 template<
-	intmax_t lhs_min, intmax_t lhs_max, typename lhs_overflow, storage_type lhs_storage,
-	intmax_t rhs_min, intmax_t rhs_max, typename rhs_overflow, storage_type rhs_storage
+	intmax_t lhs_min, intmax_t lhs_max, typename lhs_overflow, storage_type lhs_storage, bool lhs_poisoned,
+	intmax_t rhs_min, intmax_t rhs_max, typename rhs_overflow, storage_type rhs_storage, bool rhs_poisoned
 >
-constexpr auto operator<(integer<lhs_min, lhs_max, lhs_overflow, lhs_storage> const & lhs, integer<rhs_min, rhs_max, rhs_overflow, rhs_storage> const & rhs) noexcept {
+constexpr auto operator<(integer<lhs_min, lhs_max, lhs_overflow, lhs_storage, lhs_poisoned> const & lhs, integer<rhs_min, rhs_max, rhs_overflow, rhs_storage, rhs_poisoned> const & rhs) noexcept {
 	if (lhs_min >= rhs_max) {
 		return false;
 	}
