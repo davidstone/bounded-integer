@@ -16,35 +16,34 @@
 
 #pragma once
 
-#include "../forward_declaration.hpp"
-
-#include <cstdint>
+#include "../is_bounded_integer.hpp"
+#include "../requires.hpp"
 
 namespace bounded {
 
-template<typename T, intmax_t minimum, intmax_t maximum, typename overflow_policy, storage_type storage>
-constexpr auto operator+(T * const pointer, integer<minimum, maximum, overflow_policy, storage> const & number) noexcept -> T * {
+template<typename T, typename Integer, BOUNDED_REQUIRES(is_bounded_integer<Integer>)>
+constexpr auto operator+(T * const pointer, Integer const & number) noexcept {
 	return pointer + number.value();
 }
 
-template<intmax_t minimum, intmax_t maximum, typename overflow_policy, storage_type storage, typename T>
-constexpr auto operator+(integer<minimum, maximum, overflow_policy, storage> const & number, T * const pointer) noexcept -> T * {
+template<typename Integer, typename T, BOUNDED_REQUIRES(is_bounded_integer<Integer>)>
+constexpr auto operator+(Integer const & number, T * const pointer) noexcept {
 	return number.value() + pointer;
 }
 
-template<typename T, intmax_t minimum, intmax_t maximum, typename overflow_policy, storage_type storage>
-constexpr auto operator-(T * const pointer, integer<minimum, maximum, overflow_policy, storage> const & number) noexcept -> T * {
+template<typename T, typename Integer, BOUNDED_REQUIRES(is_bounded_integer<Integer>)>
+constexpr auto operator-(T * const pointer, Integer const & number) noexcept {
 	return pointer - number.value();
 }
 
 
-template<typename T, intmax_t minimum, intmax_t maximum, typename overflow_policy, storage_type storage>
-decltype(auto) operator+=(T * & pointer, integer<minimum, maximum, overflow_policy, storage> const & number) noexcept {
+template<typename T, typename Integer, BOUNDED_REQUIRES(is_bounded_integer<Integer>)>
+constexpr auto & operator+=(T * & pointer, Integer const & number) noexcept {
 	return pointer += number.value();
 }
 
-template<typename T, intmax_t minimum, intmax_t maximum, typename overflow_policy, storage_type storage>
-decltype(auto) operator-=(T * & pointer, integer<minimum, maximum, overflow_policy, storage> const & number) noexcept {
+template<typename T, typename Integer, BOUNDED_REQUIRES(is_bounded_integer<Integer>)>
+constexpr auto & operator-=(T * & pointer, Integer const & number) noexcept {
 	return pointer -= number.value();
 }
 
