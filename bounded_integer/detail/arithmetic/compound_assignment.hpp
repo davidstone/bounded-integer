@@ -46,8 +46,8 @@ BOUNDED_INTEGER_COMPOUND_ASSIGNMENT_OPERATOR_TARGET(%)
 
 
 #define BOUNDED_INTEGER_COMPOUND_ASSIGNMENT_OPERATOR_SOURCE(symbol) \
-template<typename LHS, intmax_t minimum, intmax_t maximum, typename overflow_policy, storage_type storage, BOUNDED_REQUIRES(basic_numeric_limits<LHS>::is_integer and not is_bounded_integer<LHS>)> \
-constexpr decltype(auto) operator symbol(LHS & lhs, integer<minimum, maximum, overflow_policy, storage> const rhs) BOUNDED_NOEXCEPT( \
+template<typename LHS, typename RHS, BOUNDED_REQUIRES(basic_numeric_limits<LHS>::is_integer and not is_bounded_integer<LHS> and is_bounded_integer<RHS>)> \
+constexpr decltype(auto) operator symbol(LHS & lhs, RHS const & rhs) BOUNDED_NOEXCEPT( \
 	lhs symbol rhs.value() \
 )
 
