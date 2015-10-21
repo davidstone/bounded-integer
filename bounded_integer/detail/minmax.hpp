@@ -48,12 +48,11 @@ struct greater {
 	}
 };
 
-template<typename Target, typename Source, BOUNDED_REQUIRES(is_bounded_integer<Target>)>
+template<typename Target, typename Source, BOUNDED_REQUIRES(is_bounded_integer<Target> and not std::is_reference<Target>::value)>
 constexpr Target construct(Source && source) noexcept {
-	static_assert(not std::is_reference<Target>::value, "Function should not be selected with a reference type.");
 	return Target(std::forward<Source>(source), non_check);
 }
-template<typename Target, typename Source, BOUNDED_REQUIRES(!is_bounded_integer<Target>)>
+template<typename Target, typename Source, BOUNDED_REQUIRES(!is_bounded_integer<Target> or std::is_reference<Target>::value)>
 constexpr Target construct(Source && source) noexcept(noexcept(static_cast<Target>(source))) {
 	return static_cast<Target>(source);
 }

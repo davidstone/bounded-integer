@@ -42,8 +42,8 @@ private:
 public:
 	template<typename T, typename Minimum, typename Maximum>
 	static constexpr auto assignment(T && value, Minimum && minimum, Maximum && maximum) noexcept {
-		static_assert(is_bounded_integer<std::decay_t<Minimum>>, "Only bounded::integer types are supported.");
-		static_assert(is_bounded_integer<std::decay_t<Maximum>>, "Only bounded::integer types are supported.");
+		static_assert(is_bounded_integer<Minimum>, "Only bounded::integer types are supported.");
+		static_assert(is_bounded_integer<Maximum>, "Only bounded::integer types are supported.");
 		return positive_remainder(
 			(value - minimum) % (maximum - minimum + constant<1>),
 			maximum - minimum + constant<1>

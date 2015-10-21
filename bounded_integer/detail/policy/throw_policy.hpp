@@ -48,8 +48,8 @@ struct throw_policy {
 
 	template<typename T, typename Minimum, typename Maximum>
 	static constexpr auto assignment(T && value, Minimum && minimum, Maximum && maximum) {
-		static_assert(is_bounded_integer<std::decay_t<Minimum>>, "Only bounded::integer types are supported.");
-		static_assert(is_bounded_integer<std::decay_t<Maximum>>, "Only bounded::integer types are supported.");
+		static_assert(is_bounded_integer<Minimum>, "Only bounded::integer types are supported.");
+		static_assert(is_bounded_integer<Maximum>, "Only bounded::integer types are supported.");
 		if (minimum <= value and value <= maximum) {
 			return policy_detail::reduce_range<basic_numeric_limits<Minimum>::min(), basic_numeric_limits<Maximum>::max()>(std::forward<T>(value));
 		}

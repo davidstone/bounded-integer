@@ -32,6 +32,6 @@ struct is_bounded_integer_c<integer<minimum, maximum, overflow_policy, storage>>
 }	// namespace detail
 
 template<typename T>
-constexpr auto is_bounded_integer = detail::is_bounded_integer_c<T>::value;
+constexpr auto is_bounded_integer = detail::is_bounded_integer_c<std::decay_t<T>>::value;
 
 }	// namespace bounded
