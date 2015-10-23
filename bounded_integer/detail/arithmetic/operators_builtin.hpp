@@ -30,7 +30,7 @@ namespace bounded {
 // built-in unsigned type as the right-hand side. Without special versions of
 // shift operators, you could not use any built-in type as the right-hand side.
 
-#define BOUNDED_INTEGER_MIXED_OPERATOR_OVERLOADS(symbol, operator_name, minimum, maximum) \
+#define BOUNDED_INTEGER_MIXED_OPERATOR_OVERLOADS(symbol, minimum, maximum) \
 template< \
 	intmax_t lhs_min, intmax_t lhs_max, typename overflow, storage_type storage, bool poisoned, typename T, \
 	BOUNDED_REQUIRES(basic_numeric_limits<T>::is_integer) \
@@ -47,27 +47,27 @@ constexpr auto operator symbol(T const lhs, integer<rhs_min, rhs_max, overflow, 
 }
 
 
-#define BOUNDED_INTEGER_MIXED_OPERATOR_OVERLOADS_BASIC(symbol, operator_name) \
-BOUNDED_INTEGER_MIXED_OPERATOR_OVERLOADS(symbol, operator_name, static_cast<std::intmax_t>(basic_numeric_limits<T>::min()), static_cast<std::intmax_t>(basic_numeric_limits<T>::max()))
+#define BOUNDED_INTEGER_MIXED_OPERATOR_OVERLOADS_BASIC(symbol) \
+BOUNDED_INTEGER_MIXED_OPERATOR_OVERLOADS(symbol, static_cast<std::intmax_t>(basic_numeric_limits<T>::min()), static_cast<std::intmax_t>(basic_numeric_limits<T>::max()))
 
 
-#define BOUNDED_INTEGER_MIXED_OPERATOR_OVERLOADS_DIVISION(symbol, operator_name) \
-BOUNDED_INTEGER_MIXED_OPERATOR_OVERLOADS(symbol, operator_name, 1, static_cast<std::intmax_t>(basic_numeric_limits<T>::max()))
+#define BOUNDED_INTEGER_MIXED_OPERATOR_OVERLOADS_DIVISION(symbol) \
+BOUNDED_INTEGER_MIXED_OPERATOR_OVERLOADS(symbol, 1, static_cast<std::intmax_t>(basic_numeric_limits<T>::max()))
 
 
-#define BOUNDED_INTEGER_MIXED_OPERATOR_OVERLOADS_SHIFT(symbol, operator_name) \
-BOUNDED_INTEGER_MIXED_OPERATOR_OVERLOADS(symbol, operator_name, 0, std::numeric_limits<std::intmax_t>::digits)
+#define BOUNDED_INTEGER_MIXED_OPERATOR_OVERLOADS_SHIFT(symbol) \
+BOUNDED_INTEGER_MIXED_OPERATOR_OVERLOADS(symbol, 0, std::numeric_limits<std::intmax_t>::digits)
 
 
-BOUNDED_INTEGER_MIXED_OPERATOR_OVERLOADS_BASIC(+, detail::plus)
-BOUNDED_INTEGER_MIXED_OPERATOR_OVERLOADS_BASIC(-, detail::minus)
-BOUNDED_INTEGER_MIXED_OPERATOR_OVERLOADS_BASIC(*, detail::multiplies)
+BOUNDED_INTEGER_MIXED_OPERATOR_OVERLOADS_BASIC(+)
+BOUNDED_INTEGER_MIXED_OPERATOR_OVERLOADS_BASIC(-)
+BOUNDED_INTEGER_MIXED_OPERATOR_OVERLOADS_BASIC(*)
 
-BOUNDED_INTEGER_MIXED_OPERATOR_OVERLOADS_DIVISION(/, detail::divides)
-BOUNDED_INTEGER_MIXED_OPERATOR_OVERLOADS_DIVISION(%, detail::modulus)
+BOUNDED_INTEGER_MIXED_OPERATOR_OVERLOADS_DIVISION(/)
+BOUNDED_INTEGER_MIXED_OPERATOR_OVERLOADS_DIVISION(%)
 
-BOUNDED_INTEGER_MIXED_OPERATOR_OVERLOADS_SHIFT(<<, detail::left_shift)
-BOUNDED_INTEGER_MIXED_OPERATOR_OVERLOADS_SHIFT(>>, detail::right_shift)
+BOUNDED_INTEGER_MIXED_OPERATOR_OVERLOADS_SHIFT(<<)
+BOUNDED_INTEGER_MIXED_OPERATOR_OVERLOADS_SHIFT(>>)
 
 #undef BOUNDED_INTEGER_MIXED_OPERATOR_OVERLOADS_SHIFT
 #undef BOUNDED_INTEGER_MIXED_OPERATOR_OVERLOADS_DIVISION
