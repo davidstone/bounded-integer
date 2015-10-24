@@ -16,11 +16,11 @@
 
 #pragma once
 
+#include "basic_numeric_limits.hpp"
 #include "common_type.hpp"
 #include "common_type_and_value_category.hpp"
 #include "comparison.hpp"
 #include "is_bounded_integer.hpp"
-#include "numeric_limits.hpp"
 #include "overlapping_range.hpp"
 #include "requires.hpp"
 #include "policy/common_policy.hpp"

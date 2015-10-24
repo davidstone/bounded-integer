@@ -16,11 +16,11 @@
 
 #pragma once
 
+#include "basic_numeric_limits.hpp"
 #include "forward_declaration.hpp"
 #include "is_bounded_integer.hpp"
 #include "is_poisoned.hpp"
 #include "noexcept.hpp"
-#include "numeric_limits.hpp"
 #include "overlapping_range.hpp"
 #include "requires.hpp"
 #include "underlying_type.hpp"

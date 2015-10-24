@@ -17,12 +17,12 @@
 #pragma once
 
 #include "null_policy.hpp"
+#include "../basic_numeric_limits.hpp"
 #include "../comparison.hpp"
 #include "../is_bounded_integer.hpp"
 #include "../is_poisoned.hpp"
 #include "../minmax.hpp"
 #include "../noexcept.hpp"
-#include "../numeric_limits.hpp"
 #include "../string.hpp"
 #include <stdexcept>
 

@@ -18,10 +18,10 @@
 
 #include "comparison.hpp"
 
+#include "basic_numeric_limits.hpp"
 #include "common_type.hpp"
 #include "forward_declaration.hpp"
 #include "make.hpp"
-#include "numeric_limits.hpp"
 #include "requires.hpp"
 
 #include <cstdint>

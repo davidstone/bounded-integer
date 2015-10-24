@@ -16,9 +16,9 @@
 
 #pragma once
 
+#include "basic_numeric_limits.hpp"
 #include "comparison.hpp"
 #include "forward_declaration.hpp"
-#include "numeric_limits.hpp"
 
 #include <cstdint>
 #include <type_traits>

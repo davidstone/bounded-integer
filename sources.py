@@ -26,6 +26,7 @@ sources = [
 ]
 sources += prepend_dir('detail', [
 	'algorithm.cpp',
+	'basic_numeric_limits.cpp',
 	'cast.cpp',
 	'class.cpp',
 	'common_type.cpp',

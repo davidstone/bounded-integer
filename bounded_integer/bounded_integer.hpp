@@ -1,5 +1,5 @@
 // bounded::integer type
-// Copyright (C) 2014 David Stone
+// Copyright (C) 2015 David Stone
 //
 // This program is free software: you can redistribute it and / or modify
 // it under the terms of the GNU Affero General Public License as
@@ -17,6 +17,7 @@
 #pragma once
 
 #include "detail/algorithm.hpp"
+#include "detail/basic_numeric_limits.hpp"
 #include "detail/cast.hpp"
 #include "detail/class.hpp"
 #include "detail/common_type.hpp"

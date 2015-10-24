@@ -17,6 +17,7 @@
 #pragma once
 
 #include "operators.hpp"
+#include "../basic_numeric_limits.hpp"
 #include "../forward_declaration.hpp"
 #include "../is_bounded_integer.hpp"
 #include "../make.hpp"

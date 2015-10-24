@@ -16,9 +16,9 @@
 
 #pragma once
 
+#include "basic_numeric_limits.hpp"
 #include "class.hpp"
 #include "comparison.hpp"
-#include "numeric_limits.hpp"
 #include "arithmetic/compound_assignment.hpp"
 
 #include <iterator>

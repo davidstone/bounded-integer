@@ -17,9 +17,9 @@
 #pragma once
 
 #include "operators.hpp"
+#include "../basic_numeric_limits.hpp"
 #include "../forward_declaration.hpp"
 #include "../make.hpp"
-#include "../numeric_limits.hpp"
 #include "../requires.hpp"
 
 #include <cstdint>

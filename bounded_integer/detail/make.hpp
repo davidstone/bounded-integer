@@ -16,9 +16,9 @@
 
 #pragma once
 
+#include "basic_numeric_limits.hpp"
 #include "class.hpp"
 #include "is_bounded_integer.hpp"
-#include "numeric_limits.hpp"
 #include "underlying_type.hpp"
 #include "policy/modulo_policy.hpp"
 #include "policy/null_policy.hpp"

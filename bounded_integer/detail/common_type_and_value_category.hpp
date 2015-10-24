@@ -19,7 +19,6 @@
 #include "common_type.hpp"
 #include "comparison.hpp"
 #include "forward_declaration.hpp"
-#include "numeric_limits.hpp"
 #include "overlapping_range.hpp"
 #include "policy/common_policy.hpp"
 #include <utility>

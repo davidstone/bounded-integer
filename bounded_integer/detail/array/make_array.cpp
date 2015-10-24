@@ -15,9 +15,10 @@
 // along with this program. If not, see <http://www.gnu.org/licenses/>.
 
 #include "make_array.hpp"
-#include "../literal.hpp"
 #include "../comparison.hpp"
 #include "../comparison_builtin.hpp"
+#include "../literal.hpp"
+#include "../numeric_limits.hpp"
 #include "../arithmetic/unary_minus.hpp"
 #include "../policy/throw_policy.hpp"
 
