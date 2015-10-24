@@ -24,10 +24,7 @@ namespace bounded {
 namespace detail {
 
 // https://stackoverflow.com/questions/19609186/what-is-stdnumeric-limitstdigits-supposed-to-represent
-template<intmax_t base>
-constexpr auto test_log_successor_abs(intmax_t value);
-template<>
-constexpr auto test_log_successor_abs<2>(intmax_t value) {
+constexpr auto test_log_successor_abs(intmax_t value, constant_t<2>) {
 	switch (value) {
 		case 1: return 1;
 		case 2: return 1;
@@ -50,8 +47,8 @@ constexpr auto test_log_successor_abs<2>(intmax_t value) {
 		default: throw 0;
 	}
 }
-template<>
-constexpr auto test_log_successor_abs<10>(intmax_t value) {
+
+constexpr auto test_log_successor_abs(intmax_t value, constant_t<10>) {
 	switch (value) {
 		case 1: return 0;
 		case 2: return 0;
@@ -104,7 +101,7 @@ private:
 	}
 
 	#define BOUNDED_INTEGER_DIGITS_TEST(value) \
-		static_assert(log_successor_abs(value) == test_log_successor_abs<base>(value), "Incorrect digits for " #value)
+		static_assert(log_successor_abs(value) == test_log_successor_abs(value, constant<base>), "Incorrect digits for " #value)
 	BOUNDED_INTEGER_DIGITS_TEST(1);
 	BOUNDED_INTEGER_DIGITS_TEST(2);
 	BOUNDED_INTEGER_DIGITS_TEST(3);
