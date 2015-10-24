@@ -25,52 +25,54 @@ namespace detail {
 
 // https://stackoverflow.com/questions/19609186/what-is-stdnumeric-limitstdigits-supposed-to-represent
 template<intmax_t base>
-constexpr auto test_log_successor_abs(intmax_t value) -> int;
+constexpr auto test_log_successor_abs(intmax_t value);
 template<>
-constexpr auto test_log_successor_abs<2>(intmax_t value) -> int {
-	return
-		(value == 1) ? 1 :
-		(value == 2) ? 1 :
-		(value == 3) ? 2 :
-		(value == 8) ? 3 :
-		(value == 9) ? 3 :
-		(value == 10) ? 3 :
-		(value == 11) ? 3 :
-		(value == 255) ? 8 :
-		(value == 998) ? 9 :
-		(value == 999) ? 9 :
-		(value == 1000) ? 9 :
-		(value == 1022) ? 9 :
-		(value == 1023) ? 10 :
-		(value == 1024) ? 10 :
-		(value == 1025) ? 10 :
-		(value == std::numeric_limits<int64_t>::max()) ? 64 - 1 :
-		(value == std::numeric_limits<int64_t>::min()) ? 64 - 1 :
+constexpr auto test_log_successor_abs<2>(intmax_t value) {
+	switch (value) {
+		case 1: return 1;
+		case 2: return 1;
+		case 3: return 2;
+		case 8: return 3;
+		case 9: return 3;
+		case 10: return 3;
+		case 11: return 3;
+		case 255: return 8;
+		case 998: return 9;
+		case 999: return 9;
+		case 1000: return 9;
+		case 1022: return 9;
+		case 1023: return 10;
+		case 1024: return 10;
+		case 1025: return 10;
+		case std::numeric_limits<int64_t>::max(): return 64 - 1;
+		case std::numeric_limits<int64_t>::min(): return 64 - 1;
 		// doesn't matter what we throw, compilation error
-		throw 0;
+		default: throw 0;
+	}
 }
 template<>
-constexpr auto test_log_successor_abs<10>(intmax_t value) -> int {
-	return
-		(value == 1) ? 0 :
-		(value == 2) ? 0 :
-		(value == 3) ? 0 :
-		(value == 8) ? 0 :
-		(value == 9) ? 1 :
-		(value == 10) ? 1 :
-		(value == 11) ? 1 :
-		(value == 255) ? 2 :
-		(value == 998) ? 2 :
-		(value == 999) ? 3 :
-		(value == 1000) ? 3 :
-		(value == 1022) ? 3 :
-		(value == 1023) ? 3 :
-		(value == 1024) ? 3 :
-		(value == 1025) ? 3 :
-		(value == std::numeric_limits<int64_t>::max()) ? 18 :
-		(value == std::numeric_limits<int64_t>::min()) ? 18 :
+constexpr auto test_log_successor_abs<10>(intmax_t value) {
+	switch (value) {
+		case 1: return 0;
+		case 2: return 0;
+		case 3: return 0;
+		case 8: return 0;
+		case 9: return 1;
+		case 10: return 1;
+		case 11: return 1;
+		case 255: return 2;
+		case 998: return 2;
+		case 999: return 3;
+		case 1000: return 3;
+		case 1022: return 3;
+		case 1023: return 3;
+		case 1024: return 3;
+		case 1025: return 3;
+		case std::numeric_limits<int64_t>::max(): return 18;
+		case std::numeric_limits<int64_t>::min(): return 18;
 		// doesn't matter what we throw, compilation error
-		throw 0;
+		default: throw 0;
+	}
 }
 
 template<intmax_t base>
