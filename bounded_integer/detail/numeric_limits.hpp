@@ -158,67 +158,63 @@ struct numeric_limits<bounded::integer<minimum, maximum, overflow_policy, storag
 private:
 	using type = bounded::integer<minimum, maximum, overflow_policy, storage, poisoned>;
 public:
-	static constexpr bool is_specialized = true;
-	static constexpr bool is_signed = minimum < 0;
-	static constexpr bool is_integer = true;
-	static constexpr bool is_exact = true;
-	static constexpr bool has_infinity = false;
-	static constexpr bool has_quiet_NaN = false;
-	static constexpr bool has_signaling_NaN = false;
+	static constexpr auto is_specialized = true;
+	static constexpr auto is_signed = minimum < 0;
+	static constexpr auto is_integer = true;
+	static constexpr auto is_exact = true;
+	static constexpr auto has_infinity = false;
+	static constexpr auto has_quiet_NaN = false;
+	static constexpr auto has_signaling_NaN = false;
 	static constexpr auto has_denorm = std::denorm_absent;
-	static constexpr bool has_denorm_loss = false;
+	static constexpr auto has_denorm_loss = false;
 	static constexpr auto round_style = std::round_toward_zero;
-	static constexpr bool is_iec559 = false;
-	static constexpr bool is_bounded = true;
-	static constexpr bool is_modulo = overflow_policy::is_modulo;
-	static constexpr int radix = 2;
-	static constexpr int digits = bounded::detail::digits<radix>::calculate(minimum, maximum);
-	static constexpr int digits10 = bounded::detail::digits<10>::calculate(minimum, maximum);
-	static constexpr int max_digits10 = 0;
-	static constexpr int min_exponent = 0;
-	static constexpr int min_exponent10 = 0;
-	static constexpr int max_exponent = 0;
-	static constexpr int max_exponent10 = 0;
+	static constexpr auto is_iec559 = false;
+	static constexpr auto is_bounded = true;
+	static constexpr auto is_modulo = overflow_policy::is_modulo;
+	static constexpr auto radix = 2;
+	static constexpr auto digits = bounded::detail::digits<radix>::calculate(minimum, maximum);
+	static constexpr auto digits10 = bounded::detail::digits<10>::calculate(minimum, maximum);
+	static constexpr auto max_digits10 = 0;
+	static constexpr auto min_exponent = 0;
+	static constexpr auto min_exponent10 = 0;
+	static constexpr auto max_exponent = 0;
+	static constexpr auto max_exponent10 = 0;
 
 	// If 0 is not in range, there is no trap value for arithmetic
-	static constexpr bool traps =
+	static constexpr auto traps =
 		minimum <= 0 and 0 <= maximum and
 		numeric_limits<typename type::underlying_type>::traps;
 
-	static constexpr bool tinyness_before = false;
+	static constexpr auto tinyness_before = false;
 	
 	static constexpr auto min() noexcept {
-		return bounded::integer<minimum, minimum, overflow_policy, storage, false>(minimum, bounded::non_check);
+		return bounded::constant<minimum, overflow_policy, storage>;
 	}
 	static constexpr auto lowest() noexcept {
-		return bounded::integer<minimum, minimum, overflow_policy, storage, false>(minimum, bounded::non_check);
+		return bounded::constant<minimum, overflow_policy, storage>;
 	}
 	static constexpr auto max() noexcept {
-		return bounded::integer<maximum, maximum, overflow_policy, storage, false>(maximum, bounded::non_check);
+		return bounded::constant<maximum, overflow_policy, storage>;
 	}
-	// Some of these functions return 0 for built-in integer types, but 0 may
-	// not be in the representable range. Fortunately, they are also defined as
-	// only being meaningful for floating-point types. Unfortunately, 18.3.2.7.1
-	// says: Any value that is not "meaningful" shall be set to 0 or false. This
-	// therefore technically invokes undefined behavior because 0 might not be
-	// in the range of representable values
+	// 18.3.2.7.1 says:
+	// Any value that is not "meaningful" shall be set to 0 or false.
 	static constexpr auto epsilon() noexcept {
-		return type(minimum, bounded::non_check);
+		return bounded::constant<0>;
 	}
 	static constexpr auto round_error() noexcept {
-		return type(minimum, bounded::non_check);
+		return bounded::constant<0>;
 	}
 	static constexpr auto infinity() noexcept {
-		return type(minimum, bounded::non_check);
+		return bounded::constant<0>;
 	}
 	static constexpr auto quiet_NaN() noexcept {
-		return type(minimum, bounded::non_check);
+		return bounded::constant<0>;
 	}
 	static constexpr auto signaling_NaN() noexcept {
-		return type(minimum, bounded::non_check);
+		return bounded::constant<0>;
 	}
 	static constexpr auto denorm_min() noexcept {
-		return type(minimum, bounded::non_check);
+		return bounded::constant<0>;
 	}
 };
 
