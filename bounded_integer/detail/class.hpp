@@ -95,9 +95,12 @@ constexpr decltype(auto) as_integer(T && t) noexcept {
 }	// namespace detail
 
 
-template<intmax_t value, typename overflow_policy = null_policy, storage_type storage = storage_type::fast>
-constexpr auto constant = integer<value, value, overflow_policy, storage, false>(value, non_check);
+// poisoned is useful for overloading and getting all constants
+template<intmax_t value, typename overflow_policy = null_policy, storage_type storage = storage_type::fast, bool poisoned = false>
+using constant_t = integer<value, value, overflow_policy, storage, poisoned>;
 
+template<intmax_t value, typename overflow_policy = null_policy, storage_type storage = storage_type::fast>
+constexpr auto constant = constant_t<value, overflow_policy, storage>(value, non_check);
 
 
 
