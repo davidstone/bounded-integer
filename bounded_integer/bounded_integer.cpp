@@ -331,42 +331,42 @@ auto check_numeric_limits() {
 }
 
 
-constexpr auto test_log_successor(uintmax_t value, bounded::constant_t<2>) {
+constexpr auto test_log(uintmax_t value, bounded::constant_t<2>) {
 	switch (value) {
-		case 1: return 1;
+		case 1: return 0;
 		case 2: return 1;
-		case 3: return 2;
+		case 3: return 1;
 		case 8: return 3;
 		case 9: return 3;
 		case 10: return 3;
 		case 11: return 3;
-		case 255: return 8;
+		case 255: return 7;
 		case 998: return 9;
 		case 999: return 9;
 		case 1000: return 9;
 		case 1022: return 9;
-		case 1023: return 10;
+		case 1023: return 9;
 		case 1024: return 10;
 		case 1025: return 10;
-		case static_cast<uint64_t>(std::numeric_limits<int64_t>::max()): return 64 - 1;
-		case -static_cast<uint64_t>(std::numeric_limits<int64_t>::min()): return 64 - 1;
+		case static_cast<uint64_t>(std::numeric_limits<int64_t>::max()): return 62;
+		case -static_cast<uint64_t>(std::numeric_limits<int64_t>::min()): return 63;
 		// doesn't matter what we throw, compilation error
 		default: throw 0;
 	}
 }
 
-constexpr auto test_log_successor(uintmax_t value, bounded::constant_t<10>) {
+constexpr auto test_log(uintmax_t value, bounded::constant_t<10>) {
 	switch (value) {
 		case 1: return 0;
 		case 2: return 0;
 		case 3: return 0;
 		case 8: return 0;
-		case 9: return 1;
+		case 9: return 0;
 		case 10: return 1;
 		case 11: return 1;
 		case 255: return 2;
 		case 998: return 2;
-		case 999: return 3;
+		case 999: return 2;
 		case 1000: return 3;
 		case 1022: return 3;
 		case 1023: return 3;
@@ -380,7 +380,7 @@ constexpr auto test_log_successor(uintmax_t value, bounded::constant_t<10>) {
 }
 
 #define BOUNDED_INTEGER_DIGITS_TEST_INDIVIDUAL(value, base) \
-	static_assert(bounded::detail::log_successor(value, base) == test_log_successor(value, base), "Incorrect digits for " #value)
+	static_assert(bounded::detail::log(value, base) == test_log(value, base), "Incorrect digits for " #value)
 
 #define BOUNDED_INTEGER_DIGITS_TEST(value) \
 	BOUNDED_INTEGER_DIGITS_TEST_INDIVIDUAL(value, bounded::constant<2>); \
@@ -403,8 +403,6 @@ BOUNDED_INTEGER_DIGITS_TEST(1024);
 BOUNDED_INTEGER_DIGITS_TEST(1025);
 BOUNDED_INTEGER_DIGITS_TEST(std::numeric_limits<int64_t>::max());
 BOUNDED_INTEGER_DIGITS_TEST(std::numeric_limits<int64_t>::min());
-static_assert(bounded::detail::log_successor(0, bounded::constant<2>) == 0, "Incorrect log_successor.");
-static_assert(bounded::detail::log_successor(0, bounded::constant<10>) == 0, "Incorrect log_successor.");
 
 #undef BOUNDED_INTEGER_DIGITS_TEST
 #undef BOUNDED_INTEGER_DIGITS_TEST_INDIVIDUAL

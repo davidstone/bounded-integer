@@ -28,18 +28,6 @@ namespace detail {
 // lossless string -> integer -> string conversion sequence
 
 template<typename Base>
-constexpr auto successor_is_power(uintmax_t value, Base const base) noexcept {
-	while (value != 0) {
-		if (value % base.value() != base.value() - 1) {
-			// Not evenly divisible
-			return false;
-		}
-		value /= base.value();
-	}
-	return true;
-}
-
-template<typename Base>
 constexpr auto log(uintmax_t value, Base const base) noexcept {
 	int sum = 0;
 	while (value >= base.value()) {
@@ -49,24 +37,16 @@ constexpr auto log(uintmax_t value, Base const base) noexcept {
 	return sum;
 }
 
-// This must be one function rather than a chained call to three functions
-// because abs can overflow for the smallest possible value of intmax_t and
-// incrementing would overflow for either extreme.
-template<typename Base>
-constexpr auto log_successor(uintmax_t const value, Base const base) noexcept {
-	return (value == 0) ? 0 : log(value, base) + (successor_is_power(value, base) ? 1 : 0);
-}
-
 template<typename Base>
 constexpr auto digits(intmax_t const minimum, intmax_t const maximum, Base const base) noexcept {
 	static_assert(base > constant<1>, "Base must be greater than 1.");
-	if (minimum > 0 or maximum < 0) {
+	if (minimum > 0 or maximum <= 0) {
 		return 0;
 	}
 
 	return (minimum == 0 or static_cast<uintmax_t>(maximum) < -static_cast<uintmax_t>(minimum)) ?
-		log_successor(static_cast<uintmax_t>(maximum), base) :
-		log_successor(-static_cast<uintmax_t>(minimum), base);
+		log(static_cast<uintmax_t>(maximum) + 1, base) :
+		log(-static_cast<uintmax_t>(minimum) + 1, base);
 }
 
 }	// namespace detail
