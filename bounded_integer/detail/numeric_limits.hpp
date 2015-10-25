@@ -26,115 +26,48 @@ namespace detail {
 // https://stackoverflow.com/questions/19609186/what-is-stdnumeric-limitstdigits-supposed-to-represent
 // digits and digits10 represent the maximum number of bits / digits in a
 // lossless string -> integer -> string conversion sequence
-constexpr auto test_log_successor(uintmax_t value, constant_t<2>) {
-	switch (value) {
-		case 1: return 1;
-		case 2: return 1;
-		case 3: return 2;
-		case 8: return 3;
-		case 9: return 3;
-		case 10: return 3;
-		case 11: return 3;
-		case 255: return 8;
-		case 998: return 9;
-		case 999: return 9;
-		case 1000: return 9;
-		case 1022: return 9;
-		case 1023: return 10;
-		case 1024: return 10;
-		case 1025: return 10;
-		case static_cast<uint64_t>(std::numeric_limits<int64_t>::max()): return 64 - 1;
-		case -static_cast<uint64_t>(std::numeric_limits<int64_t>::min()): return 64 - 1;
-		// doesn't matter what we throw, compilation error
-		default: throw 0;
+
+template<typename Base>
+constexpr auto successor_is_power(uintmax_t value, Base const base) noexcept {
+	while (value != 0) {
+		if (value % base.value() != base.value() - 1) {
+			// Not evenly divisible
+			return false;
+		}
+		value /= base.value();
 	}
+	return true;
 }
 
-constexpr auto test_log_successor(uintmax_t value, constant_t<10>) {
-	switch (value) {
-		case 1: return 0;
-		case 2: return 0;
-		case 3: return 0;
-		case 8: return 0;
-		case 9: return 1;
-		case 10: return 1;
-		case 11: return 1;
-		case 255: return 2;
-		case 998: return 2;
-		case 999: return 3;
-		case 1000: return 3;
-		case 1022: return 3;
-		case 1023: return 3;
-		case 1024: return 3;
-		case 1025: return 3;
-		case static_cast<uint64_t>(std::numeric_limits<int64_t>::max()): return 18;
-		case -static_cast<uint64_t>(std::numeric_limits<int64_t>::min()): return 18;
-		// doesn't matter what we throw, compilation error
-		default: throw 0;
+template<typename Base>
+constexpr auto log(uintmax_t value, Base const base) noexcept {
+	int sum = 0;
+	while (value >= base.value()) {
+		value /= base.value();
+		++sum;
 	}
+	return sum;
 }
 
-template<intmax_t base>
-struct digits {
-private:
-	static_assert(base > 1, "Base must be greater than 1.");
-	static constexpr auto successor_is_power(uintmax_t value) noexcept {
-		while (value != 0) {
-			if (value % base != base - 1) {
-				// Not evenly divisible
-				return false;
-			}
-			value /= base;
-		}
-		return true;
-	}
-	static constexpr auto log(uintmax_t value) noexcept {
-		int sum = 0;
-		while (value >= base) {
-			value /= base;
-			++sum;
-		}
-		return sum;
-	}
-	// This must be one function rather than a chained call to three functions
-	// because abs can overflow for the smallest possible value of intmax_t and
-	// incrementing would overflow for either extreme.
-	static constexpr auto log_successor(uintmax_t value) noexcept {
-		return (value == 0) ? 0 : log(value) + (successor_is_power(value) ? 1 : 0);
+// This must be one function rather than a chained call to three functions
+// because abs can overflow for the smallest possible value of intmax_t and
+// incrementing would overflow for either extreme.
+template<typename Base>
+constexpr auto log_successor(uintmax_t const value, Base const base) noexcept {
+	return (value == 0) ? 0 : log(value, base) + (successor_is_power(value, base) ? 1 : 0);
+}
+
+template<typename Base>
+constexpr auto digits(intmax_t const minimum, intmax_t const maximum, Base const base) noexcept {
+	static_assert(base > constant<1>, "Base must be greater than 1.");
+	if (minimum > 0 or maximum < 0) {
+		return 0;
 	}
 
-	#define BOUNDED_INTEGER_DIGITS_TEST(value) \
-		static_assert(log_successor(value) == test_log_successor(value, constant<base>), "Incorrect digits for " #value)
-	BOUNDED_INTEGER_DIGITS_TEST(1);
-	BOUNDED_INTEGER_DIGITS_TEST(2);
-	BOUNDED_INTEGER_DIGITS_TEST(3);
-	BOUNDED_INTEGER_DIGITS_TEST(8);
-	BOUNDED_INTEGER_DIGITS_TEST(9);
-	BOUNDED_INTEGER_DIGITS_TEST(10);
-	BOUNDED_INTEGER_DIGITS_TEST(11);
-	BOUNDED_INTEGER_DIGITS_TEST(255);
-	BOUNDED_INTEGER_DIGITS_TEST(998);
-	BOUNDED_INTEGER_DIGITS_TEST(999);
-	BOUNDED_INTEGER_DIGITS_TEST(1000);
-	BOUNDED_INTEGER_DIGITS_TEST(1022);
-	BOUNDED_INTEGER_DIGITS_TEST(1023);
-	BOUNDED_INTEGER_DIGITS_TEST(1024);
-	BOUNDED_INTEGER_DIGITS_TEST(1025);
-	BOUNDED_INTEGER_DIGITS_TEST(std::numeric_limits<int64_t>::max());
-	BOUNDED_INTEGER_DIGITS_TEST(std::numeric_limits<int64_t>::min());
-	#undef BOUNDED_INTEGER_DIGITS_TEST
-
-	static_assert(log_successor(0) == 0, "Incorrect log_successor.");
-public:
-	static constexpr auto calculate(intmax_t minimum, intmax_t maximum) noexcept {
-		if (minimum > 0 or maximum < 0) {
-			return 0;
-		}
-		return (minimum == 0 or static_cast<uintmax_t>(maximum) < -static_cast<uintmax_t>(minimum)) ?
-			log_successor(static_cast<uintmax_t>(maximum)) :
-			log_successor(-static_cast<uintmax_t>(minimum));
-	}
-};
+	return (minimum == 0 or static_cast<uintmax_t>(maximum) < -static_cast<uintmax_t>(minimum)) ?
+		log_successor(static_cast<uintmax_t>(maximum), base) :
+		log_successor(-static_cast<uintmax_t>(minimum), base);
+}
 
 }	// namespace detail
 }	// namespace bounded
@@ -159,8 +92,8 @@ public:
 	static constexpr auto is_bounded = true;
 	static constexpr auto is_modulo = overflow_policy::is_modulo;
 	static constexpr auto radix = 2;
-	static constexpr auto digits = bounded::detail::digits<radix>::calculate(minimum, maximum);
-	static constexpr auto digits10 = bounded::detail::digits<10>::calculate(minimum, maximum);
+	static constexpr auto digits = bounded::detail::digits(minimum, maximum, bounded::constant<radix>);
+	static constexpr auto digits10 = bounded::detail::digits(minimum, maximum, bounded::constant<10>);
 	static constexpr auto max_digits10 = 0;
 	static constexpr auto min_exponent = 0;
 	static constexpr auto min_exponent10 = 0;
