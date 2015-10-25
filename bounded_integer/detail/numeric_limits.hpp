@@ -24,6 +24,8 @@ namespace bounded {
 namespace detail {
 
 // https://stackoverflow.com/questions/19609186/what-is-stdnumeric-limitstdigits-supposed-to-represent
+// digits and digits10 represent the maximum number of bits / digits in a
+// lossless string -> integer -> string conversion sequence
 constexpr auto test_log_successor_abs(intmax_t value, constant_t<2>) {
 	switch (value) {
 		case 1: return 1;
@@ -75,29 +77,30 @@ constexpr auto test_log_successor_abs(intmax_t value, constant_t<10>) {
 template<intmax_t base>
 struct digits {
 private:
-	// I don't know if this is actually correct. I could theoretically use a
-	// more compact representation of values that have a minimum that is far
-	// from zero. For instance, it only takes a single bit to represent the
-	// value in the range of 500 through 501, but my current implementation
-	// would actually use 9 bits of space. I don't know what this value is
-	// ultimately supposed to represent, and I may create a specialized version
-	// to compact the representation.
-
 	static_assert(base > 1, "Base must be greater than 1.");
-	static constexpr auto successor_is_power(intmax_t value) noexcept -> bool {
-		return
-			(value == 0) ? true :
-			(value % base != base - 1 and value % base != -base + 1) ? false :
-			successor_is_power(value / base);
+	static constexpr auto successor_is_power(intmax_t value) noexcept {
+		while (value != 0) {
+			if (value % base != base - 1 and value % base != -base + 1) {
+				// Not evenly divisible
+				return false;
+			}
+			value /= base;
+		}
+		return true;
 	}
-	static constexpr auto log_abs(intmax_t value, int sum) noexcept -> int {
-		return (-base < value and value < base) ? sum : log_abs(value / base, sum + 1);
+	static constexpr auto log_abs(intmax_t value) noexcept {
+		int sum = 0;
+		while (value >= base or value <= -base) {
+			value /= base;
+			++sum;
+		}
+		return sum;
 	}
 	// This must be one function rather than a chained call to three functions
 	// because abs can overflow for the smallest possible value of intmax_t and
 	// incrementing would overflow for either extreme.
-	static constexpr auto log_successor_abs(intmax_t value) noexcept -> int {
-		return (value == 0) ? 0 : log_abs(value, 0) + (successor_is_power(value) ? 1 : 0);
+	static constexpr auto log_successor_abs(intmax_t value) noexcept {
+		return (value == 0) ? 0 : log_abs(value) + (successor_is_power(value) ? 1 : 0);
 	}
 
 	#define BOUNDED_INTEGER_DIGITS_TEST(value) \
@@ -138,13 +141,13 @@ private:
 
 	static_assert(log_successor_abs(0) == 0, "Incorrect abs.");
 public:
-	static constexpr auto calculate(intmax_t minimum, intmax_t maximum) noexcept -> int {
-		return
-			(0 < minimum or maximum < 0) ?
-				0 :
-				(minimum == 0 or log_successor_abs(maximum) < log_successor_abs(minimum)) ?
-					log_successor_abs(maximum) :
-					log_successor_abs(minimum);
+	static constexpr auto calculate(intmax_t minimum, intmax_t maximum) noexcept {
+		if (minimum > 0 or maximum < 0) {
+			return 0;
+		}
+		return (minimum == 0 or log_successor_abs(maximum) < log_successor_abs(minimum)) ?
+			log_successor_abs(maximum) :
+			log_successor_abs(minimum);
 	}
 };
 
