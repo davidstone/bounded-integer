@@ -331,8 +331,9 @@ auto check_numeric_limits() {
 }
 
 
-constexpr auto test_log(uintmax_t value, bounded::constant_t<2>) {
-	switch (value) {
+template<typename Integer>
+constexpr auto test_log(Integer const value, bounded::constant_t<2>) {
+	switch (static_cast<uintmax_t>(value)) {
 		case 1: return 0;
 		case 2: return 1;
 		case 3: return 1;
@@ -355,8 +356,9 @@ constexpr auto test_log(uintmax_t value, bounded::constant_t<2>) {
 	}
 }
 
-constexpr auto test_log(uintmax_t value, bounded::constant_t<10>) {
-	switch (value) {
+template<typename Integer>
+constexpr auto test_log(Integer const value, bounded::constant_t<10>) {
+	switch (static_cast<uintmax_t>(value)) {
 		case 1: return 0;
 		case 2: return 0;
 		case 3: return 0;
@@ -379,33 +381,32 @@ constexpr auto test_log(uintmax_t value, bounded::constant_t<10>) {
 	}
 }
 
-#define BOUNDED_INTEGER_DIGITS_TEST_INDIVIDUAL(value, base) \
-	static_assert(bounded::detail::log(value, base) == test_log(value, base), "Incorrect digits for " #value)
+#define BOUNDED_INTEGER_LOG_TEST_INDIVIDUAL(value, base) \
+	static_assert(bounded::log(value, base) == test_log(value, base), "Incorrect log for " #value)
 
-#define BOUNDED_INTEGER_DIGITS_TEST(value) \
-	BOUNDED_INTEGER_DIGITS_TEST_INDIVIDUAL(value, bounded::constant<2>); \
-	BOUNDED_INTEGER_DIGITS_TEST_INDIVIDUAL(value, bounded::constant<10>)
+#define BOUNDED_INTEGER_LOG_TEST(value) \
+	BOUNDED_INTEGER_LOG_TEST_INDIVIDUAL(bounded::constant<value>, bounded::constant<2>); \
+	BOUNDED_INTEGER_LOG_TEST_INDIVIDUAL(bounded::constant<value>, bounded::constant<10>)
 
-BOUNDED_INTEGER_DIGITS_TEST(1);
-BOUNDED_INTEGER_DIGITS_TEST(2);
-BOUNDED_INTEGER_DIGITS_TEST(3);
-BOUNDED_INTEGER_DIGITS_TEST(8);
-BOUNDED_INTEGER_DIGITS_TEST(9);
-BOUNDED_INTEGER_DIGITS_TEST(10);
-BOUNDED_INTEGER_DIGITS_TEST(11);
-BOUNDED_INTEGER_DIGITS_TEST(255);
-BOUNDED_INTEGER_DIGITS_TEST(998);
-BOUNDED_INTEGER_DIGITS_TEST(999);
-BOUNDED_INTEGER_DIGITS_TEST(1000);
-BOUNDED_INTEGER_DIGITS_TEST(1022);
-BOUNDED_INTEGER_DIGITS_TEST(1023);
-BOUNDED_INTEGER_DIGITS_TEST(1024);
-BOUNDED_INTEGER_DIGITS_TEST(1025);
-BOUNDED_INTEGER_DIGITS_TEST(std::numeric_limits<int64_t>::max());
-BOUNDED_INTEGER_DIGITS_TEST(std::numeric_limits<int64_t>::min());
+BOUNDED_INTEGER_LOG_TEST(1);
+BOUNDED_INTEGER_LOG_TEST(2);
+BOUNDED_INTEGER_LOG_TEST(3);
+BOUNDED_INTEGER_LOG_TEST(8);
+BOUNDED_INTEGER_LOG_TEST(9);
+BOUNDED_INTEGER_LOG_TEST(10);
+BOUNDED_INTEGER_LOG_TEST(11);
+BOUNDED_INTEGER_LOG_TEST(255);
+BOUNDED_INTEGER_LOG_TEST(998);
+BOUNDED_INTEGER_LOG_TEST(999);
+BOUNDED_INTEGER_LOG_TEST(1000);
+BOUNDED_INTEGER_LOG_TEST(1022);
+BOUNDED_INTEGER_LOG_TEST(1023);
+BOUNDED_INTEGER_LOG_TEST(1024);
+BOUNDED_INTEGER_LOG_TEST(1025);
+BOUNDED_INTEGER_LOG_TEST(std::numeric_limits<int64_t>::max());
 
-#undef BOUNDED_INTEGER_DIGITS_TEST
-#undef BOUNDED_INTEGER_DIGITS_TEST_INDIVIDUAL
+#undef BOUNDED_INTEGER_LOG_TEST
+#undef BOUNDED_INTEGER_LOG_TEST_INDIVIDUAL
 
 auto check_numeric_limits_all() {
 	static_assert(std::numeric_limits<bounded::integer<1, 1000>>::digits == 0, "Meaningless digits not 0.");

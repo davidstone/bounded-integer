@@ -40,6 +40,7 @@ sources += prepend_dir('detail', [
 	'is_bounded_integer.cpp',
 	'iterator.cpp',
 	'literal.cpp',
+	'log.cpp',
 	'make.cpp',
 	'math.cpp',
 	'minmax.cpp',

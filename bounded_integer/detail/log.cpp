@@ -1,4 +1,4 @@
-// Overloads for the standard library math functions.
+// Verify that the header can stand on its own
 // Copyright (C) 2015 David Stone
 //
 // This program is free software: you can redistribute it and / or modify
@@ -14,21 +14,4 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with this program. If not, see <http://www.gnu.org/licenses/>.
 
-#pragma once
-
-#include "cast.hpp"
-#include "is_bounded_integer.hpp"
-#include "minmax.hpp"
-#include "requires.hpp"
-#include "arithmetic/unary_minus.hpp"
-
-namespace bounded {
-
-template<typename Integer, BOUNDED_REQUIRES(is_bounded_integer<Integer>)>
-constexpr auto abs(Integer const value) noexcept {
-	// The 0 has to be there to restrict the range of possible values. Without
-	// it, abs(integer<-7, 3>) would be [-3, 7] instead of [0, 7].
-	return increase_min<0>(max(value, -value), non_check);
-}
-
-}	// namespace bounded
+#include "log.hpp"

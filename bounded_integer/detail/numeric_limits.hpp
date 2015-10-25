@@ -17,6 +17,7 @@
 #pragma once
 
 #include "class.hpp"
+#include "log.hpp"
 #include <cstdint>
 #include <limits>
 
@@ -28,16 +29,6 @@ namespace detail {
 // lossless string -> integer -> string conversion sequence
 
 template<typename Base>
-constexpr auto log(uintmax_t value, Base const base) noexcept {
-	int sum = 0;
-	while (value >= base.value()) {
-		value /= base.value();
-		++sum;
-	}
-	return sum;
-}
-
-template<typename Base>
 constexpr auto digits(intmax_t const minimum, intmax_t const maximum, Base const base) noexcept {
 	static_assert(base > constant<1>, "Base must be greater than 1.");
 	if (minimum > 0 or maximum <= 0) {
@@ -45,8 +36,8 @@ constexpr auto digits(intmax_t const minimum, intmax_t const maximum, Base const
 	}
 
 	return (minimum == 0 or static_cast<uintmax_t>(maximum) < -static_cast<uintmax_t>(minimum)) ?
-		log(static_cast<uintmax_t>(maximum) + 1, base) :
-		log(-static_cast<uintmax_t>(minimum) + 1, base);
+		::bounded::detail::log(static_cast<uintmax_t>(maximum) + 1, base.value()) :
+		::bounded::detail::log(-static_cast<uintmax_t>(minimum) + 1, base.value());
 }
 
 }	// namespace detail
