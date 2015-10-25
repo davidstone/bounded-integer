@@ -25,6 +25,7 @@ sources = [
 	'bounded_integer.cpp'
 ]
 sources += prepend_dir('detail', [
+	'abs.cpp',
 	'algorithm.cpp',
 	'basic_numeric_limits.cpp',
 	'cast.cpp',
@@ -42,7 +43,6 @@ sources += prepend_dir('detail', [
 	'literal.cpp',
 	'log.cpp',
 	'make.cpp',
-	'math.cpp',
 	'minmax.cpp',
 	'noexcept.cpp',
 	'numeric_limits.cpp',

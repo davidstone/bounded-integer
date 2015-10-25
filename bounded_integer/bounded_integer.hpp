@@ -16,6 +16,7 @@
 
 #pragma once
 
+#include "detail/abs.hpp"
 #include "detail/algorithm.hpp"
 #include "detail/basic_numeric_limits.hpp"
 #include "detail/cast.hpp"
@@ -29,7 +30,6 @@
 #include "detail/literal.hpp"
 #include "detail/log.hpp"
 #include "detail/make.hpp"
-#include "detail/math.hpp"
 #include "detail/minmax.hpp"
 #include "detail/numeric_limits.hpp"
 #include "detail/stream.hpp"
