@@ -26,7 +26,7 @@ namespace detail {
 // https://stackoverflow.com/questions/19609186/what-is-stdnumeric-limitstdigits-supposed-to-represent
 // digits and digits10 represent the maximum number of bits / digits in a
 // lossless string -> integer -> string conversion sequence
-constexpr auto test_log_successor_abs(intmax_t value, constant_t<2>) {
+constexpr auto test_log_successor(uintmax_t value, constant_t<2>) {
 	switch (value) {
 		case 1: return 1;
 		case 2: return 1;
@@ -43,14 +43,14 @@ constexpr auto test_log_successor_abs(intmax_t value, constant_t<2>) {
 		case 1023: return 10;
 		case 1024: return 10;
 		case 1025: return 10;
-		case std::numeric_limits<int64_t>::max(): return 64 - 1;
-		case std::numeric_limits<int64_t>::min(): return 64 - 1;
+		case static_cast<uint64_t>(std::numeric_limits<int64_t>::max()): return 64 - 1;
+		case -static_cast<uint64_t>(std::numeric_limits<int64_t>::min()): return 64 - 1;
 		// doesn't matter what we throw, compilation error
 		default: throw 0;
 	}
 }
 
-constexpr auto test_log_successor_abs(intmax_t value, constant_t<10>) {
+constexpr auto test_log_successor(uintmax_t value, constant_t<10>) {
 	switch (value) {
 		case 1: return 0;
 		case 2: return 0;
@@ -67,8 +67,8 @@ constexpr auto test_log_successor_abs(intmax_t value, constant_t<10>) {
 		case 1023: return 3;
 		case 1024: return 3;
 		case 1025: return 3;
-		case std::numeric_limits<int64_t>::max(): return 18;
-		case std::numeric_limits<int64_t>::min(): return 18;
+		case static_cast<uint64_t>(std::numeric_limits<int64_t>::max()): return 18;
+		case -static_cast<uint64_t>(std::numeric_limits<int64_t>::min()): return 18;
 		// doesn't matter what we throw, compilation error
 		default: throw 0;
 	}
@@ -78,9 +78,9 @@ template<intmax_t base>
 struct digits {
 private:
 	static_assert(base > 1, "Base must be greater than 1.");
-	static constexpr auto successor_is_power(intmax_t value) noexcept {
+	static constexpr auto successor_is_power(uintmax_t value) noexcept {
 		while (value != 0) {
-			if (value % base != base - 1 and value % base != -base + 1) {
+			if (value % base != base - 1) {
 				// Not evenly divisible
 				return false;
 			}
@@ -88,9 +88,9 @@ private:
 		}
 		return true;
 	}
-	static constexpr auto log_abs(intmax_t value) noexcept {
+	static constexpr auto log(uintmax_t value) noexcept {
 		int sum = 0;
-		while (value >= base or value <= -base) {
+		while (value >= base) {
 			value /= base;
 			++sum;
 		}
@@ -99,12 +99,12 @@ private:
 	// This must be one function rather than a chained call to three functions
 	// because abs can overflow for the smallest possible value of intmax_t and
 	// incrementing would overflow for either extreme.
-	static constexpr auto log_successor_abs(intmax_t value) noexcept {
-		return (value == 0) ? 0 : log_abs(value) + (successor_is_power(value) ? 1 : 0);
+	static constexpr auto log_successor(uintmax_t value) noexcept {
+		return (value == 0) ? 0 : log(value) + (successor_is_power(value) ? 1 : 0);
 	}
 
 	#define BOUNDED_INTEGER_DIGITS_TEST(value) \
-		static_assert(log_successor_abs(value) == test_log_successor_abs(value, constant<base>), "Incorrect digits for " #value)
+		static_assert(log_successor(value) == test_log_successor(value, constant<base>), "Incorrect digits for " #value)
 	BOUNDED_INTEGER_DIGITS_TEST(1);
 	BOUNDED_INTEGER_DIGITS_TEST(2);
 	BOUNDED_INTEGER_DIGITS_TEST(3);
@@ -124,31 +124,15 @@ private:
 	BOUNDED_INTEGER_DIGITS_TEST(std::numeric_limits<int64_t>::min());
 	#undef BOUNDED_INTEGER_DIGITS_TEST
 
-	#define BOUNDED_INTEGER_NEGATIVE_DIGITS_TEST(value) \
-		static_assert(log_successor_abs(value) == log_successor_abs(-value), "Incorrect digits for -" #value)
-	BOUNDED_INTEGER_NEGATIVE_DIGITS_TEST(1);
-	BOUNDED_INTEGER_NEGATIVE_DIGITS_TEST(2);
-	BOUNDED_INTEGER_NEGATIVE_DIGITS_TEST(3);
-	BOUNDED_INTEGER_NEGATIVE_DIGITS_TEST(8);
-	BOUNDED_INTEGER_NEGATIVE_DIGITS_TEST(9);
-	BOUNDED_INTEGER_NEGATIVE_DIGITS_TEST(10);
-	BOUNDED_INTEGER_NEGATIVE_DIGITS_TEST(11);
-	BOUNDED_INTEGER_NEGATIVE_DIGITS_TEST(1000);
-	BOUNDED_INTEGER_NEGATIVE_DIGITS_TEST(1023);
-	BOUNDED_INTEGER_NEGATIVE_DIGITS_TEST(1024);
-	BOUNDED_INTEGER_NEGATIVE_DIGITS_TEST(1025);
-	BOUNDED_INTEGER_NEGATIVE_DIGITS_TEST(std::numeric_limits<int64_t>::max());
-	#undef BOUNDED_INTEGER_NEGATIVE_DIGITS_TEST
-
-	static_assert(log_successor_abs(0) == 0, "Incorrect abs.");
+	static_assert(log_successor(0) == 0, "Incorrect log_successor.");
 public:
 	static constexpr auto calculate(intmax_t minimum, intmax_t maximum) noexcept {
 		if (minimum > 0 or maximum < 0) {
 			return 0;
 		}
-		return (minimum == 0 or log_successor_abs(maximum) < log_successor_abs(minimum)) ?
-			log_successor_abs(maximum) :
-			log_successor_abs(minimum);
+		return (minimum == 0 or static_cast<uintmax_t>(maximum) < -static_cast<uintmax_t>(minimum)) ?
+			log_successor(static_cast<uintmax_t>(maximum)) :
+			log_successor(-static_cast<uintmax_t>(minimum));
 	}
 };
 
