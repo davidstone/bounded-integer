@@ -985,6 +985,12 @@ namespace check_arithmetic {
 	
 	constexpr auto mixed_right_shift = bounded::constant<100> >> 1;
 	static_assert(mixed_right_shift == bounded::constant<50>);
+	
+	
+	constexpr auto odd_bitwise_and = bounded::constant<17> & 1;
+	static_assert(odd_bitwise_and == bounded::constant<1>);
+	constexpr auto even_bitwise_and = bounded::constant<18> & 1;
+	static_assert(even_bitwise_and == bounded::constant<0>);
 }
 
 namespace check_literal {

@@ -1,4 +1,4 @@
-// Operator overloads when each argument is a bounded::integer
+// Verify that the header can stand on its own
 // Copyright (C) 2015 David Stone
 //
 // This program is free software: you can redistribute it and / or modify
@@ -14,16 +14,4 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with this program. If not, see <http://www.gnu.org/licenses/>.
 
-#pragma once
-
-#include "plus.hpp"
-#include "minus.hpp"
-#include "multiplies.hpp"
-#include "divides.hpp"
-#include "modulus.hpp"
-#include "left_shift.hpp"
-#include "right_shift.hpp"
 #include "bitwise_and.hpp"
-#include "unary_minus.hpp"
-#include "unary_plus.hpp"
-

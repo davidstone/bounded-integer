@@ -60,6 +60,7 @@ sources += prepend_dir('detail/array', [
 ])
 sources += prepend_dir('detail/arithmetic', [
 	'base.cpp',
+	'bitwise_and.cpp',
 	'plus.cpp',
 	'minus.cpp',
 	'multiplies.cpp',
