@@ -194,7 +194,7 @@ public:
 			max_size<vector>()
 		);
 		if (range_size <= capacity()) {
-			auto const mutable_position = detail::put_in_middle_no_reallocation(*this, position, first, last, range_size);
+			auto const mutable_position = detail::put_in_middle_no_reallocation(*this, position, first, last, range_size, get_allocator());
 			m_size += range_size;
 			return mutable_position;
 		}
@@ -205,11 +205,11 @@ public:
 		auto const offset = position - begin();
 		// First construct the new element because it may reference an old
 		// element, and we do not want to move elements it references
-		detail::uninitialized_copy(first, last, temp.data() + offset);
+		detail::uninitialized_copy(first, last, temp.data() + offset, get_allocator());
 		auto const mutable_position = begin() + offset;
-		auto const pointer = detail::uninitialized_move(begin(), mutable_position, temp.data());
+		auto const pointer = detail::uninitialized_move(begin(), mutable_position, temp.data(), get_allocator());
 		assert(temp.data() + offset == pointer);
-		detail::uninitialized_move(mutable_position, end(), pointer + range_size);
+		detail::uninitialized_move(mutable_position, end(), pointer + range_size, get_allocator());
 		m_container = std::move(temp);
 		m_size += range_size;
 		return mutable_position;
@@ -229,7 +229,7 @@ private:
 
 	auto relocate(size_type const requested_capacity) {
 		raw_container temp(requested_capacity);
-		detail::uninitialized_move(begin(), end(), temp.begin());
+		detail::uninitialized_move(begin(), end(), temp.begin(), get_allocator());
 		m_container = std::move(temp);
 	}
 
