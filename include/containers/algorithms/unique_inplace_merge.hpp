@@ -16,6 +16,8 @@
 
 #pragma once
 
+#include <containers/algorithms/find.hpp>
+
 #include <algorithm>
 #include <functional>
 #include <iterator>
@@ -80,7 +82,7 @@ constexpr auto unique_less(MutableForwardIterator const first, Sentinel const la
 
 template<typename InputIterator, typename Sentinel, typename T, typename BinaryPredicate>
 constexpr auto next_greater(InputIterator const first, Sentinel const last, T const & x, BinaryPredicate less) {
-	return std::find_if(first, last, [&](auto const & value) { return less(x, value); });
+	return ::containers::find_if(first, last, [&](auto const & value) { return less(x, value); });
 }
 
 

@@ -14,6 +14,7 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with this program. If not, see <http://www.gnu.org/licenses/>.
 
+#include <containers/algorithms/find.hpp>
 #include <containers/moving_vector/moving_vector.hpp>
 
 #include <boost/timer.hpp>
@@ -56,7 +57,7 @@ class Class {
 
 template<typename Container>
 void add(Container & container, Class const & value) {
-	auto const it = std::find_if(std::begin(container), std::end(container), [&](Class const & c) {
+	auto const it = containers::find_if(std::begin(container), std::end(container), [&](Class const & c) {
 		return value <= c;
 	});
 	container.emplace(it, value);
