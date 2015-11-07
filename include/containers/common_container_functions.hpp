@@ -91,9 +91,13 @@ template<typename Container>
 constexpr auto never_empty = std::numeric_limits<typename std::remove_reference_t<Container>::size_type>::min() > bounded::constant<0>;
 
 
-template<typename Container, BOUNDED_REQUIRES(is_container<Container>)>
+template<typename Container, BOUNDED_REQUIRES(is_container<Container> and bounded::is_bounded_integer<typename Container::size_type>)>
 constexpr auto size(Container const & container) noexcept {
 	return typename Container::size_type(container.end() - container.begin(), bounded::non_check);
+}
+template<typename Container, BOUNDED_REQUIRES(is_container<Container> and !bounded::is_bounded_integer<typename Container::size_type>)>
+constexpr auto size(Container const & container) noexcept {
+	return typename Container::size_type(container.end() - container.begin());
 }
 
 template<typename Container, BOUNDED_REQUIRES(is_container<Container>)>
