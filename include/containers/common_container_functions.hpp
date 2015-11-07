@@ -33,10 +33,10 @@
 namespace containers {
 namespace detail {
 
-template<typename Container, BOUNDED_REQUIRES(is_container<Container>)>
-constexpr auto make_mutable_iterator(Container & container, typename Container::const_iterator it) {
-	return container.begin() + (it - container.begin());
-}
+template<typename Container, typename Iterator, BOUNDED_REQUIRES(is_container<Container> and is_iterator<Iterator>)>
+constexpr auto make_mutable_iterator(Container & container, Iterator const it) BOUNDED_NOEXCEPT(
+	container.begin() + (it - container.begin())
+)
 
 namespace common {
 
