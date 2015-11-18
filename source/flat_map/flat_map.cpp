@@ -102,54 +102,80 @@ private:
 };
 
 template<typename Container>
-void test_unique_copy_less() {
-	std::cout << "Testing unique_copy_less\n" << std::flush;
-	Container const source = { 1, 3, 5, 5, 5, 6, 10, 10 };
-	Container destination(5U, 0);
+void test_unique_copy_less(Container const & source, Container const & expected) {
+	Container destination(source.size(), 0);
 	auto const it = containers::detail::unique_copy_less(source.begin(), source.end(), destination.begin());
-	assert(it == destination.end());
-	assert(destination == Container({ 1, 3, 5, 6, 10 }));
+	destination.erase(it, destination.end());
+	assert(destination == expected);
 }
 
 template<typename Container>
-void test_unique_no_change(Container const & v) {
-	auto copy = v;
-	auto const size = static_cast<typename Container::iterator::difference_type>(copy.size());
-	auto const midpoint = std::next(copy.begin(), size / 2);
-	copy.erase(containers::detail::unique_inplace_merge(copy.begin(), midpoint, copy.end()), copy.end());
-	assert(v == copy);
+void test_unique_inplace_less(Container source, Container const & expected) {
+	auto const it = containers::detail::unique_copy_less(source.begin(), source.end());
+	source.erase(it, source.end());
+	assert(source == expected);
 }
 
 template<typename Container>
-void test_unique_inplace_merge_specific(Container v, Container const & other, Container const & expected) {
+void test_unique_less(Container source, Container const & expected) {
+	assert(std::is_sorted(source.begin(), source.end()));
+	assert(std::is_sorted(expected.begin(), expected.end()));
+	test_unique_copy_less(source, expected);
+	test_unique_copy_less(std::move(source), expected);
+}
+
+template<typename Container>
+void test_unique_merge_copy(Container const & lhs, Container const & rhs, Container const & expected) {
+	Container result(lhs.size() + rhs.size(), 0);
+	auto const it = containers::detail::unique_merge_copy(lhs.begin(), lhs.end(), rhs.begin(), rhs.end(), result.begin());
+	result.erase(it, result.end());
+
+	assert(result == expected);
+}
+
+template<typename Container>
+void test_unique_inplace_merge(Container v, Container const & other, Container const & expected) {
 	auto const midpoint = static_cast<typename Container::iterator::difference_type>(v.size());
 	v.insert(v.end(), other.begin(), other.end());
-
-	v.erase(containers::detail::unique_inplace_merge(v.begin(), v.begin() + midpoint, v.end()), v.end());
+	auto const it = containers::detail::unique_inplace_merge(v.begin(), v.begin() + midpoint, v.end());
+	v.erase(it, v.end());
 
 	assert(v == expected);
 }
 
 template<typename Container>
-void test_unique_inplace_merge_specific() {
-	test_unique_copy_less<Container>();
-	test_unique_no_change<Container>({1, 2, 3, 4, 7});
-	test_unique_inplace_merge_specific<Container>({ 1, 3, 5, 7, 9 }, { 2, 2, 2, 3, 3, 6, 7 }, { 1, 2, 3, 5, 6, 7, 9 });
-	test_unique_inplace_merge_specific<Container>({ 2 }, { 1 }, { 1, 2 });
-	test_unique_inplace_merge_specific<Container>({ }, { 6 }, { 6 });
-	test_unique_inplace_merge_specific<Container>({ 4 }, { }, { 4 });
-	test_unique_inplace_merge_specific<Container>({ }, { }, { });
-	test_unique_inplace_merge_specific<Container>({ 8 }, { 8, 8, 8, 8, 8 }, { 8 });
+void test_unique_merge(Container v, Container const & other, Container const & expected) {
+	assert(std::is_sorted(v.begin(), v.end()));
+	assert(std::is_sorted(other.begin(), other.end()));
+	test_unique_merge_copy(v, other, expected);
+	test_unique_inplace_merge(std::move(v), other, expected);
+}
+
+template<typename Container>
+void test_unique_specific() {
+	test_unique_less<Container>({ 1 }, { 1 });
+	test_unique_less<Container>({ 1, 2 }, { 1, 2 });
+	test_unique_less<Container>({ }, { });
+	test_unique_less<Container>({ 1, 3, 5, 5, 5, 6, 10, 10 }, { 1, 3, 5, 6, 10 });
+	test_unique_less<Container>({ 1, 1, 1, 1, 1, 1, 1, 1 }, { 1 });
+	test_unique_merge<Container>({ 1, 2, 3, 5 }, { 7, 8, 9 }, { 1, 2, 3, 5, 7, 8, 9 });
+	test_unique_merge<Container>({ 1, 3, 5, 7, 9 }, { 2, 2, 2, 3, 3, 6, 7 }, { 1, 2, 3, 5, 6, 7, 9 });
+	test_unique_merge<Container>({ 2 }, { 1 }, { 1, 2 });
+	test_unique_merge<Container>({ }, { 6 }, { 6 });
+	test_unique_merge<Container>({ 4 }, { }, { 4 });
+	test_unique_merge<Container>({ }, { }, { });
+	test_unique_merge<Container>({ 1 }, { 1 }, { 1 });
+	test_unique_merge<Container>({ 8 }, { 8, 8, 8, 8, 8 }, { 8 });
 	// Ideally unique_inplace_merge would not assume the first range has no
 	// duplicates, but that is my current use-case. I do not know how to remove
 	// this limitation without making the algorithm less efficient.
-	// test_unique_inplace_merge_specific<Container>({ 8, 8 }, { 8, 8, 8, 8, 8 }, { 8 });
+	// test_unique_merge<Container>({ 8, 8 }, { 8, 8, 8, 8, 8 }, { 8 });
 }
 
-void test_unique_inplace_merge() {
+void test_unique() {
 	std::cout << "Testing unique_inplace_merge.\n" << std::flush;
-	test_unique_inplace_merge_specific<std::vector<CheckedMover>>();
-	test_unique_inplace_merge_specific<containers::moving_vector<CheckedMover>>();
+	test_unique_specific<std::vector<CheckedMover>>();
+	test_unique_specific<containers::moving_vector<CheckedMover>>();
 }
 
 template<typename container_type>
@@ -329,7 +355,7 @@ bool operator<(Class<size> const & lhs, Class<size> const & rhs) {
 
 int main(int argc, char ** argv) {
 	std::cout.sync_with_stdio(false);
-	test_unique_inplace_merge();
+	test_unique();
 	test_no_extra_copy_or_move();
 	test<map_type<int, int>>();
 

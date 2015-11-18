@@ -33,41 +33,70 @@ constexpr decltype(auto) base_iterator(T it) {
 }
 template<typename T>
 constexpr decltype(auto) base_iterator(std::move_iterator<T> it) {
-	return it.base();
+	return base_iterator(it.base());
+}
+template<typename LHS, typename RHS>
+constexpr auto equal_iterators(LHS lhs, RHS rhs) {
+	return base_iterator(lhs) == base_iterator(rhs);
 }
 
-// If the types can be compared, use that. If they can't, they must not be
-// compatible iterator types.
-template<typename LHS, typename RHS>
-constexpr auto not_same_iterator(LHS && lhs, RHS && rhs) -> decltype(lhs != rhs) {
-	return lhs != rhs;
-}
-// This is worse match for any types unless there is no operator!= defined
-template<typename... Args>
-constexpr auto not_same_iterator(Args && ...) {
-	return true;
-}
 
 // This is written so that a special predicate built on std::less can work
+// TODO: Handle OutputIterator in addition to MutableForwardIterator
+template<typename InputIterator, typename Sentinel, typename MutableForwardIterator, typename BinaryPredicate>
+constexpr auto unique_common(InputIterator first, Sentinel const last, MutableForwardIterator output, BinaryPredicate equal) {
+	for (; base_iterator(first) != base_iterator(last); ++first) {
+		auto && output_ref = *output;
+		auto && first_ref = *first;
+		if (equal(output_ref, first_ref)) {
+			continue;
+		}
+		++output;
+		*output = std::forward<decltype(first_ref)>(first_ref);
+	}
+	return std::next(output);
+}
+
+
 template<typename InputIterator, typename Sentinel, typename MutableForwardIterator, typename BinaryPredicate = std::equal_to<>>
-constexpr auto unique_copy(InputIterator first, Sentinel const last, MutableForwardIterator output, BinaryPredicate equal = BinaryPredicate{}) {
+constexpr auto unique_copy(InputIterator const first, Sentinel const last, MutableForwardIterator const output, BinaryPredicate equal = BinaryPredicate{}) {
 	if (base_iterator(first) == base_iterator(last)) {
 		return output;
 	}
-	if (not_same_iterator(base_iterator(output), base_iterator(first))) {
-		*output = *first;
-	}
-	while (base_iterator(++first) != base_iterator(last)) {
-		if (!equal(*output, *first) and not_same_iterator(base_iterator(++output), base_iterator(first))) {
-			*output = *first;
-		}
-	}
-	return ++output;
+	*output = *first;
+	return ::containers::detail::unique_common(std::next(first), last, output, equal);
 }
 
+
+template<typename MutableForwardIterator, typename Sentinel, typename BinaryPredicate>
+constexpr auto find_first_equal(MutableForwardIterator first, Sentinel const last, BinaryPredicate equal) {
+	if (first == last) {
+		return first;
+	}
+	auto previous = first;
+	++first;
+	for (; first != last; ++first) {
+		if (equal(*previous, *first)) {
+			break;
+		}
+		previous = first;
+	}
+	return first;
+}
+
+
 template<typename MutableForwardIterator, typename Sentinel, typename BinaryPredicate = std::equal_to<>>
-constexpr auto unique(MutableForwardIterator first, Sentinel const last, BinaryPredicate equal = BinaryPredicate{}) {
-	return ::containers::detail::unique_copy(std::make_move_iterator(first), last, first, equal);
+constexpr auto unique(MutableForwardIterator const first, Sentinel const last, BinaryPredicate equal = BinaryPredicate{}) {
+	auto const equal_element = find_first_equal(first, last, equal);
+	if (equal_element == last) {
+		return equal_element;
+	}
+	auto const other = ::containers::find_if(std::next(equal_element), last, [&](auto const & value) { return !equal(*equal_element, value); });
+	if (other == last) {
+		return equal_element;
+	}
+	*equal_element = std::move(*other);
+	return ::containers::detail::unique_common(std::make_move_iterator(std::next(other)), last, equal_element, equal);
 }
 
 template<typename InputIterator, typename Sentinel, typename MutableForwardIterator, typename BinaryPredicate = std::less<>>
@@ -86,68 +115,89 @@ constexpr auto next_greater(InputIterator const first, Sentinel const last, T co
 }
 
 
-template<typename InputIterator1, typename Sentinel1, typename InputIterator2, typename Sentinel2, typename MutableForwardIterator, typename BinaryPredicate = std::less<>>
-constexpr auto unique_merge_copy(InputIterator1 first1, Sentinel1 const last1, InputIterator2 first2, Sentinel2 const last2, MutableForwardIterator output, BinaryPredicate less = BinaryPredicate{}) {
-	while (first1 != last1 and first2 != last2) {
+template<typename InputIterator1, typename Sentinel1, typename InputIterator2, typename Sentinel2, typename MutableForwardIterator, typename BinaryPredicate, typename PostFunction>
+constexpr auto unique_merge_common(InputIterator1 first1, Sentinel1 const last1, InputIterator2 first2, Sentinel2 const last2, MutableForwardIterator output, BinaryPredicate less, PostFunction postFunction) {
+	while (!equal_iterators(first1, last1) and !equal_iterators(first2, last2)) {
 		*output = less(*first2, *first1) ? *first2++ : *first1++;
 		first1 = next_greater(first1, last1, *output, less);
 		first2 = next_greater(first2, last2, *output, less);
 		++output;
 	}
 
-	if (first1 != last1) {
+	if (!equal_iterators(first1, last1)) {
 		return unique_copy_less(first1, last1, output, less);
 	} else {
-		return unique_copy_less(first2, last2, output, less);
+		return postFunction(first2, last2, output);
 	}
 }
 
-// unique_inplace_merge assumes the first range is sorted and has no duplicates.
-// It assumes the second range is sorted.
+template<typename InputIterator1, typename Sentinel1, typename InputIterator2, typename Sentinel2, typename MutableForwardIterator, typename BinaryPredicate = std::less<>>
+constexpr auto unique_merge_copy(InputIterator1 first1, Sentinel1 const last1, InputIterator2 first2, Sentinel2 const last2, MutableForwardIterator output, BinaryPredicate less = BinaryPredicate{}) {
+	auto postFunction = [=](auto const first, auto const last, auto const out) {
+		return unique_copy_less(first, last, out, less);
+	};
+	return unique_merge_common(first1, last1, first2, last2, output, less, postFunction);
+}
+
+// Both ranges must be sorted
 template<typename MutableForwardIterator, typename Sentinel, typename BinaryPredicate = std::less<>>
 auto unique_inplace_merge(MutableForwardIterator first, MutableForwardIterator middle, Sentinel const last, BinaryPredicate less = BinaryPredicate{}) {
 	if (first == middle or middle == last) {
 		return unique_less(first, last, less);
 	}
-
-	// Keep all the elements that will end up at the beginning where they are
-
-	auto new_ranges = [=]() mutable {
-		auto p = [=](auto const & value) { return less(*middle, value); };
-		struct Result {
-			MutableForwardIterator destination;
-			MutableForwardIterator second_range_first;
-		};
-		if (p(*first)) {
-			return Result{ first, middle };
-		}
-		while (true) {
-			auto const it = std::next(first);
-			if (it == middle) {
-				break;
-			}
-			if (p(*it)) {
-				return Result{ it, next_greater(middle, last, *first, less) };
-			}
-			first = it;
-		}
-		return Result{ middle, next_greater(middle, last, *first, less) };
-	};
-
-	auto const iterators = new_ranges();
-
+	
 	// This can be done better than just creating a std::vector, but it works
 	// good enough for now (famous last words).
 	using storage_type = std::vector<std::decay_t<decltype(*first)>>;
+
+	if (less(*middle, *first)) {
+		storage_type temp(std::make_move_iterator(first), std::make_move_iterator(middle));
+		return ::containers::detail::unique_merge_copy(
+			std::make_move_iterator(temp.begin()), std::make_move_iterator(temp.end()),
+			std::make_move_iterator(middle), std::make_move_iterator(last),
+			first,
+			less
+		);
+	}
+	
+	// Keep all the elements that will end up at the beginning where they are
+	auto find_first_to_move = [=]() mutable {
+		struct Result {
+			MutableForwardIterator before_target;
+			MutableForwardIterator target;
+		};
+
+		auto before = first;
+		++first;
+		for ( ; first != middle; ++first) {
+			if (less(*middle, *first)) {
+				break;
+			}
+			before = first;
+		}
+		return Result{ before, first };
+	};
+	auto const first_to_move = find_first_to_move();
+	less(*first_to_move.before_target, *first_to_move.before_target);
+	
+	if (first_to_move.target == middle) {
+		return unique_less(first_to_move.before_target, last, less);
+	}
+	
 	// Move the rest of the elements so we can use their space without
 	// overwriting.
-	storage_type temp(std::make_move_iterator(iterators.destination), std::make_move_iterator(middle));
+	storage_type temp(std::make_move_iterator(first_to_move.target), std::make_move_iterator(middle));
+	auto const new_middle = next_greater(middle, last, *first_to_move.before_target, less);
 
-	return unique_merge_copy(
+	auto postFunction = [=](auto const first_, auto const last_, auto) {
+		return unique_less(first_.base(), last_.base(), less);
+	};
+	return ::containers::detail::unique_merge_common(
 		std::make_move_iterator(temp.begin()), std::make_move_iterator(temp.end()),
-		std::make_move_iterator(iterators.second_range_first), std::make_move_iterator(last),
-		iterators.destination,
-		less
+		std::make_move_iterator(new_middle), std::make_move_iterator(last),
+		first_to_move.target,
+		less,
+		postFunction
 	);
 }
 
