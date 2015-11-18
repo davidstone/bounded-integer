@@ -17,12 +17,12 @@
 #pragma once
 
 #include <containers/algorithms/find.hpp>
+#include <containers/dynamic_array/dynamic_array.hpp>
 
 #include <algorithm>
 #include <functional>
 #include <iterator>
 #include <type_traits>
-#include <vector>
 
 namespace containers {
 namespace detail {
@@ -146,9 +146,7 @@ auto unique_inplace_merge(MutableForwardIterator first, MutableForwardIterator m
 		return unique_less(first, last, less);
 	}
 	
-	// This can be done better than just creating a std::vector, but it works
-	// good enough for now (famous last words).
-	using storage_type = std::vector<std::decay_t<decltype(*first)>>;
+	using storage_type = dynamic_array<std::decay_t<decltype(*first)>>;
 
 	if (less(*middle, *first)) {
 		storage_type temp(std::make_move_iterator(first), std::make_move_iterator(middle));
