@@ -19,7 +19,6 @@
 #include <containers/algorithms/find.hpp>
 #include <containers/dynamic_array/dynamic_array.hpp>
 
-#include <algorithm>
 #include <functional>
 #include <iterator>
 #include <type_traits>
