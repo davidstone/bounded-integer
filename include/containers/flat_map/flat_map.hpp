@@ -127,7 +127,7 @@ public:
 		m_container(container_type(first, last, allocator), compare) {
 		auto const less = indirect_compare(value_comp());
 		std::sort(moving_begin(container()), moving_end(container()), less);
-		// At some point this should be std::unique_sort
+		// At some point this should be unique_sort
 		auto const equal = [&](auto const & lhs, auto const & rhs) {
 			return !less(lhs, rhs) and !less(rhs, lhs);
 		};
