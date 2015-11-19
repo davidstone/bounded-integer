@@ -17,6 +17,7 @@
 #pragma once
 
 #include <containers/algorithms/find.hpp>
+#include <containers/algorithms/iterator.hpp>
 #include <containers/dynamic_array/dynamic_array.hpp>
 
 #include <functional>
@@ -53,7 +54,7 @@ constexpr auto unique_common(InputIterator first, Sentinel const last, MutableFo
 		++output;
 		*output = std::forward<decltype(first_ref)>(first_ref);
 	}
-	return std::next(output);
+	return ::containers::next(output);
 }
 
 
@@ -63,7 +64,7 @@ constexpr auto unique_copy(InputIterator const first, Sentinel const last, Mutab
 		return output;
 	}
 	*output = *first;
-	return ::containers::detail::unique_common(std::next(first), last, output, equal);
+	return ::containers::detail::unique_common(::containers::next(first), last, output, equal);
 }
 
 
@@ -90,12 +91,12 @@ constexpr auto unique(MutableForwardIterator const first, Sentinel const last, B
 	if (equal_element == last) {
 		return equal_element;
 	}
-	auto const other = ::containers::find_if(std::next(equal_element), last, [&](auto const & value) { return !equal(*equal_element, value); });
+	auto const other = ::containers::find_if(::containers::next(equal_element), last, [&](auto const & value) { return !equal(*equal_element, value); });
 	if (other == last) {
 		return equal_element;
 	}
 	*equal_element = std::move(*other);
-	return ::containers::detail::unique_common(std::make_move_iterator(std::next(other)), last, equal_element, equal);
+	return ::containers::detail::unique_common(std::make_move_iterator(::containers::next(other)), last, equal_element, equal);
 }
 
 template<typename InputIterator, typename Sentinel, typename MutableForwardIterator, typename BinaryPredicate = std::less<>>

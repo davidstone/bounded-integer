@@ -16,6 +16,7 @@
 
 #pragma once
 
+#include <containers/algorithms/iterator.hpp>
 #include <containers/moving_vector/forward_declaration.hpp>
 #include <containers/moving_vector/moving_vector_iterator.hpp>
 
@@ -118,10 +119,10 @@ public:
 		return *begin();
 	}
 	constexpr auto && back() const {
-		return *std::prev(end());
+		return *::containers::prev(end());
 	}
 	auto && back() {
-		return *std::prev(end());
+		return *::containers::prev(end());
 	}
 	
 	// data() intentionally missing

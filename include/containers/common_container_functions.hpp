@@ -17,6 +17,7 @@
 #pragma once
 
 #include <containers/algorithms/copy.hpp>
+#include <containers/algorithms/iterator.hpp>
 #include <containers/common_functions.hpp>
 #include <containers/is_container.hpp>
 #include <containers/is_iterator.hpp>
@@ -126,7 +127,7 @@ constexpr decltype(auto) front(Container && container) noexcept(never_empty<Cont
 template<typename Container, BOUNDED_REQUIRES(is_container<Container>)>
 constexpr decltype(auto) back(Container && container) noexcept(never_empty<Container>) {
 	assert(!empty(container));
-	return *bounded::prev(std::forward<Container>(container).end());
+	return *::containers::prev(std::forward<Container>(container).end());
 }
 
 
@@ -186,7 +187,7 @@ constexpr auto erase(Container & container, Iterator const first_, Iterator cons
 template<typename Container, BOUNDED_REQUIRES(is_container<Container>)>
 constexpr auto erase(Container & container, typename Container::const_iterator const it) {
 	assert(it != container.end());
-	erase(container, it, bounded::next(it));
+	erase(container, it, ::containers::next(it));
 }
 
 
@@ -304,7 +305,7 @@ auto emplace_in_middle_no_reallocation(Container & container, typename Container
 	auto const position = detail::make_mutable_iterator(container, position_);
 	auto const original_end = container.end();
 	container.emplace_back(std::move(back(container)));
-	std::move_backward(position, bounded::prev(original_end), original_end);
+	std::move_backward(position, ::containers::prev(original_end), original_end);
 	auto const pointer = std::addressof(*position);
 	destroy(allocator, pointer);
 	construct(allocator, pointer, std::forward<Args>(args)...);

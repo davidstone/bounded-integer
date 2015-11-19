@@ -16,6 +16,7 @@
 
 #pragma once
 
+#include <containers/algorithms/iterator.hpp>
 #include <containers/common_container_functions.hpp>
 #include <containers/dynamic_array/dynamic_array.hpp>
 #include <containers/index_type.hpp>
@@ -173,7 +174,7 @@ public:
 			auto const mutable_position = begin() + offset;
 			auto const pointer = detail::uninitialized_move(begin(), mutable_position, temp.data(), allocator);
 			assert(temp.data() + offset == pointer);
-			detail::uninitialized_move(mutable_position, end(), std::next(pointer), allocator);
+			detail::uninitialized_move(mutable_position, end(), ::containers::next(pointer), allocator);
 			m_container = std::move(temp);
 			++m_size;
 		}

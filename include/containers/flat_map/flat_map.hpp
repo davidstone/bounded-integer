@@ -17,6 +17,7 @@
 #pragma once
 
 #include <containers/apply_tuple.hpp>
+#include <containers/algorithms/iterator.hpp>
 #include <containers/algorithms/unique_inplace_merge.hpp>
 #include <containers/moving_vector/moving_vector.hpp>
 
@@ -261,7 +262,7 @@ public:
 	iterator emplace_hint(const_iterator hint, Args && ... args) {
 		auto const search_strategy = [&](key_type const & key) {
 			bool const correct_greater = this->key_comp(key, *hint);
-			bool const correct_less = this->key_comp(*std::prev(hint), key);
+			bool const correct_less = this->key_comp(*::containers::prev(hint), key);
 			bool const correct_hint = correct_greater and correct_less;
 			return correct_hint ? hint : this->upper_bound(key);
 		};
@@ -412,10 +413,10 @@ private:
 			auto const position = upper_bound(key);
 			// Do not decrement an iterator if it might be begin()
 			bool const there_is_element_before = position != container.begin();
-			auto const that_element_is_equal = [&](){ return !container.key_comp()(std::prev(position)->first, key); };
+			auto const that_element_is_equal = [&](){ return !container.key_comp()(::containers::prev(position)->first, key); };
 			bool const already_exists = there_is_element_before and that_element_is_equal();
 			return already_exists ?
-				result_type(std::prev(position), false) :
+				result_type(::containers::prev(position), false) :
 				result_type(container.container().emplace(position, std::forward<Args>(args)...), true);
 		}
 	};
@@ -490,12 +491,12 @@ public:
 	std::pair<const_iterator, const_iterator> equal_range(key_type const & key) const {
 		auto const it = find(key);
 		bool const found = it != this->end();
-		return std::make_pair(it, found ? std::next(it) : it);
+		return std::make_pair(it, found ? ::containers::next(it) : it);
 	}
 	std::pair<iterator, iterator> equal_range(key_type const & key) {
 		auto const it = find(key);
 		bool const found = it != this->end();
-		return std::make_pair(it, found ? std::next(it) : it);
+		return std::make_pair(it, found ? ::containers::next(it) : it);
 	}
 
 	size_type count(key_type const & key) const {

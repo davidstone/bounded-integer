@@ -16,6 +16,8 @@
 
 #pragma once
 
+#include <containers/algorithms/iterator.hpp>
+
 #include <value_ptr/value_ptr.hpp>
 
 #include <algorithm>
@@ -370,9 +372,9 @@ public:
 	template<typename Compare>
 	void merge(forward_list & other, Compare compare = std::less<value_type>()) {
 		auto mine = before_begin();
-		auto mine_next = std::next(mine);
+		auto mine_next = ::containers::next(mine);
 		auto theirs = other.before_begin();
-		auto theirs_next = std::next(theirs);
+		auto theirs_next = ::containers::next(theirs);
 		while (mine_next != end() and theirs_next != other.end()) {
 			if (compare(*mine_next, *theirs_next)) {
 				++mine;
@@ -380,9 +382,9 @@ public:
 			}
 			else {
 				mine = insert_pointer_after(mine, unlink_node_after(theirs));
-				mine_next = std::next(mine);
+				mine_next = ::containers::next(mine);
 				++theirs;
-				theirs_next = std::next(theirs);
+				theirs_next = ::containers::next(theirs);
 			}
 		}
 		if (mine_next == end()) {
@@ -416,11 +418,11 @@ public:
 		if (first == last) {
 			return;
 		}
-		auto it = std::next(first);
+		auto it = ::containers::next(first);
 		if (it == last) {
 			return;
 		}
-		while (std::next(it) != last) {
+		while (::containers::next(it) != last) {
 			++it;
 		}
 		splice_after(position, unlink_node_after(static_cast<iterator>(first)), it.next_ptr());
@@ -431,7 +433,7 @@ public:
 	
 	template<typename UnaryPredicate>
 	void remove_if(UnaryPredicate p) {
-		for (auto it = before_begin(); std::next(it) != end(); ++it) {
+		for (auto it = before_begin(); ::containers::next(it) != end(); ++it) {
 			if (p(*it.next_ptr())) {
 				erase_after(it);
 			}
@@ -454,8 +456,8 @@ public:
 	
 	template<typename BinaryPredicate>
 	void unique(BinaryPredicate p = std::equal_to<value_type>()) {
-		for (auto it = before_begin(); std::next(it) != end(); ++it) {
-			while (p(*it, *std::next(it))) {
+		for (auto it = before_begin(); ::containers::next(it) != end(); ++it) {
+			while (p(*it, *::containers::next(it))) {
 				erase_after(it);
 			}
 		}
@@ -505,7 +507,7 @@ private:
 	iterator insert_pointer_after(const_iterator position, ptr_type value) {
 		auto it = static_cast<iterator>(position);
 		splice_after(position, value, value);
-		return std::next(it);
+		return ::containers::next(it);
 	}
 	// last can reference the same pointer as first. Any values that last links
 	// to are destroyed. first == nullptr after this function returns. first and
