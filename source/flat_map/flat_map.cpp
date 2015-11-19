@@ -246,7 +246,7 @@ void test_performance(std::size_t const loop_count) {
 	auto const generator = [](std::size_t size) {
 		static boost::random::mt19937 engine(0);
 		static boost::random::uniform_int_distribution<std::uint32_t> distribution;
-		std::vector<std::pair<Key const, Value>> source;
+		std::vector<std::pair<Key, Value>> source;
 		source.reserve(size);
 		for (std::size_t n = 0; n != size; ++n) {
 			source.emplace_back(distribution(engine), distribution(engine));
