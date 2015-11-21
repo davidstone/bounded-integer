@@ -40,35 +40,17 @@ namespace detail {
 // The allocator should never change the value_type of a container, so we just
 // use the default to prevent infinite recursion in our flat_map template
 // parameter.
-template<typename value_type>
-class is_copy_or_move_assignable_helper {
-public:
-	constexpr bool operator()() const {
-		return std::is_move_assignable<value_type>::value or std::is_copy_assignable<value_type>::value;
-	}
-};
-template<typename First, typename Second>
-class is_copy_or_move_assignable_helper<std::pair<First, Second>> {
-public:
-	constexpr bool operator()() const {
-		using value_type = std::pair<First, Second>;
-		return (std::is_move_assignable<typename value_type::first_type>::value or std::is_copy_assignable<typename value_type::first_type>::value)
-			and (std::is_move_assignable<typename value_type::second_type>::value or std::is_copy_assignable<typename value_type::second_type>::value);
-	}
-};
-
 template<typename Key, typename T, template<typename, typename> class Container>
-constexpr bool is_copy_or_move_assignable() {
+constexpr bool supports_const_key() {
 	using pair_type = std::pair<Key const, T>;
 	using container_type = Container<pair_type, std::allocator<pair_type>>;
-	using value_ref = decltype(*moving_begin(container_type{}));
-	using value_type = std::remove_reference_t<value_ref>;
-	return is_copy_or_move_assignable_helper<value_type>{}();
+	using value_type = std::remove_reference_t<decltype(*moving_begin(std::declval<container_type>()))>;
+	return std::is_copy_assignable<typename value_type::first_type>::value;
 }
 
 template<typename Key, typename T, template<typename, typename> class Container>
 using value_type_t = std::pair<
-	typename std::conditional_t<is_copy_or_move_assignable<Key, T, Container>(), Key const, Key>,
+	typename std::conditional_t<supports_const_key<Key, T, Container>(), Key const, Key>,
 	T
 >;
 
