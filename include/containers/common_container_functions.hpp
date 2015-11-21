@@ -289,15 +289,6 @@ constexpr auto operator<(Container const & lhs, Container const & rhs) BOUNDED_N
 
 CONTAINERS_COMMON_USING_DECLARATIONS
 
-template<typename Allocator, typename T, typename... Args>
-constexpr auto construct(Allocator && allocator, T * pointer, Args && ... args) BOUNDED_NOEXCEPT(
-	std::allocator_traits<std::decay_t<Allocator>>::construct(allocator, reinterpret_cast<typename std::decay_t<Allocator>::value_type *>(pointer), std::forward<Args>(args)...)
-)
-template<typename Allocator, typename T>
-constexpr auto destroy(Allocator && allocator, T * pointer) BOUNDED_NOEXCEPT(
-	std::allocator_traits<std::decay_t<Allocator>>::destroy(allocator, reinterpret_cast<typename std::decay_t<Allocator>::value_type *>(pointer))
-)
-
 // Assumes there is enough capacity -- iterators remain valid
 // TODO: exception safety
 template<typename Container, typename Allocator, typename... Args>
@@ -307,8 +298,8 @@ auto emplace_in_middle_no_reallocation(Container & container, typename Container
 	container.emplace_back(std::move(back(container)));
 	std::move_backward(position, ::containers::prev(original_end), original_end);
 	auto const pointer = std::addressof(*position);
-	destroy(allocator, pointer);
-	construct(allocator, pointer, std::forward<Args>(args)...);
+	::containers::detail::destroy(allocator, pointer);
+	::containers::detail::construct(allocator, pointer, std::forward<Args>(args)...);
 }
 
 

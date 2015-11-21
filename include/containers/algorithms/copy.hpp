@@ -25,6 +25,16 @@
 namespace containers {
 namespace detail {
 
+template<typename Allocator, typename T, typename... Args>
+constexpr auto construct(Allocator && allocator, T * pointer, Args && ... args) BOUNDED_NOEXCEPT(
+	std::allocator_traits<std::decay_t<Allocator>>::construct(allocator, reinterpret_cast<typename std::decay_t<Allocator>::value_type *>(pointer), std::forward<Args>(args)...)
+)
+template<typename Allocator, typename T>
+constexpr auto destroy(Allocator && allocator, T * pointer) BOUNDED_NOEXCEPT(
+	std::allocator_traits<std::decay_t<Allocator>>::destroy(allocator, reinterpret_cast<typename std::decay_t<Allocator>::value_type *>(pointer))
+)
+
+
 // TODO: Work with other iterator categories
 template<typename InputIterator, typename Sentinel>
 constexpr auto distance(InputIterator first, Sentinel const last) BOUNDED_NOEXCEPT(
@@ -63,17 +73,15 @@ constexpr auto copy_n(InputIterator first, Size const count, OutputIterator out)
 
 template<typename InputIterator, typename Sentinel, typename ForwardIterator, typename Allocator_>
 auto uninitialized_copy(InputIterator first, Sentinel const last, ForwardIterator out, Allocator_ && allocator) {
-	using Allocator = std::allocator_traits<std::decay_t<Allocator_>>;
 	auto out_first = out;
-	using pointer = typename Allocator::value_type *;
 	try {
 		for (; first != last; ++first) {
-			Allocator::construct(allocator, reinterpret_cast<pointer>(std::addressof(*out)), *first);
+			::containers::detail::construct(allocator, std::addressof(*out), *first);
 			++out;
 		}
 	} catch (...) {
 		for (; out_first != out; ++out_first) {
-			Allocator::destroy(allocator, reinterpret_cast<pointer>(std::addressof(*out_first)));
+			::containers::detail::destroy(allocator, std::addressof(*out_first));
 		}
 		throw;
 	}
@@ -97,15 +105,14 @@ auto uninitialized_move_backward(BidirectionalInputIterator const first, Bidirec
 
 template<typename ForwardIterator, typename Sentinel, typename Allocator_>
 auto uninitialized_default_construct(ForwardIterator const first, Sentinel const last, Allocator_ && allocator) {
-	using Allocator = std::allocator_traits<Allocator_>;
 	auto it = first;
 	try {
 		for (; it != last; ++it) {
-			Allocator::construct(allocator, std::addressof(*it));
+			::containers::detail::construct(allocator, std::addressof(*it));
 		}
 	} catch (...) {
 		for (auto rollback = first; rollback != it; ++rollback) {
-			Allocator::destroy(allocator, std::addressof(*rollback));
+			::containers::detail::destroy(allocator, std::addressof(*rollback));
 		}
 		throw;
 	}
