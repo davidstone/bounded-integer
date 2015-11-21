@@ -49,39 +49,48 @@ public:
 	using const_iterator = detail::basic_array_iterator<value_type const, vector>;
 	using iterator = detail::basic_array_iterator<value_type, vector>;
 	
-	static constexpr auto get_allocator() BOUNDED_NOEXCEPT(
-		allocator_type{}
+	constexpr decltype(auto) get_allocator() BOUNDED_NOEXCEPT(
+		static_cast<allocator_type>(m_container.get_allocator())
 	)
 	
 	constexpr vector() noexcept = default;
 	
+	constexpr vector(allocator_type allocator):
+		m_container(std::move(allocator))
+	{
+	}
+	
 	template<typename Count, BOUNDED_REQUIRES(std::is_convertible<Count, size_type>::value)>
-	explicit vector(Count const count):
-		m_container(count),
+	explicit vector(Count const count, allocator_type allocator = allocator_type()):
+		m_container(count, std::move(allocator)),
 		m_size(capacity())
 	{
 		detail::uninitialized_default_construct(begin(), end(), get_allocator());
 	}
 	template<typename Count, BOUNDED_REQUIRES(std::is_convertible<Count, size_type>::value)>
-	vector(Count const count, value_type const & value) {
+	vector(Count const count, value_type const & value, allocator_type allocator = allocator_type()):
+		m_container(std::move(allocator))
+	{
 		auto const repeat = detail::repeat_n(count, value);
 		assign(*this, repeat.begin(), repeat.end());
 	}
 	
-	template<typename InputIterator, typename Sentinel>
-	vector(InputIterator first, Sentinel const last) {
+	template<typename ForwardIterator, typename Sentinel, BOUNDED_REQUIRES(is_iterator<ForwardIterator>)>
+	vector(ForwardIterator first, Sentinel const last, allocator_type allocator = allocator_type()):
+		m_container(std::move(allocator))
+	{
 		assign(*this, first, last);
 	}
 	
-	vector(std::initializer_list<value_type> init) BOUNDED_NOEXCEPT_INITIALIZATION(
-		vector(init.begin(), init.end())
+	vector(std::initializer_list<value_type> init, allocator_type allocator = allocator_type()) BOUNDED_NOEXCEPT_INITIALIZATION(
+		vector(init.begin(), init.end(), std::move(allocator))
 	) {}
 
-	vector(vector const & other) BOUNDED_NOEXCEPT_INITIALIZATION(
-		vector(other.begin(), other.end())
+	vector(vector const & other, allocator_type allocator = allocator_type()) BOUNDED_NOEXCEPT_INITIALIZATION(
+		vector(other.begin(), other.end(), std::move(allocator))
 	) {}
-	vector(vector && other) noexcept:
-		m_container(std::move(other.m_container)),
+	vector(vector && other, allocator_type allocator = allocator_type()) noexcept:
+		m_container(std::move(other.m_container), std::move(allocator)),
 		m_size(std::move(other.m_size))
 	{
 		other.m_size = bounded::constant<0>;
