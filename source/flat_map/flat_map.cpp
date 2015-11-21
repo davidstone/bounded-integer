@@ -15,6 +15,7 @@
 // along with this program. If not, see <http://www.gnu.org/licenses/>.
 
 #include <containers/flat_map/flat_map.hpp>
+#include <containers/vector/vector.hpp>
 
 #include <boost/random/mersenne_twister.hpp>
 #include <boost/random/uniform_int_distribution.hpp>
@@ -123,16 +124,16 @@ private:
 
 template<typename Container>
 void test_unique_copy_less(Container const & source, Container const & expected) {
-	Container destination(source.size(), 0);
+	Container destination(size(source), 0);
 	auto const it = containers::detail::unique_copy_less(source.begin(), source.end(), destination.begin());
-	destination.erase(it, destination.end());
+	erase(destination, it, destination.end());
 	assert(destination == expected);
 }
 
 template<typename Container>
 void test_unique_inplace_less(Container source, Container const & expected) {
 	auto const it = containers::detail::unique_copy_less(source.begin(), source.end());
-	source.erase(it, source.end());
+	erase(source, it, source.end());
 	assert(source == expected);
 }
 
@@ -146,19 +147,19 @@ void test_unique_less(Container source, Container const & expected) {
 
 template<typename Container>
 void test_unique_merge_copy(Container const & lhs, Container const & rhs, Container const & expected) {
-	Container result(lhs.size() + rhs.size(), 0);
+	Container result(typename Container::size_type(size(lhs) + size(rhs)), 0);
 	auto const it = containers::detail::unique_merge_copy(lhs.begin(), lhs.end(), rhs.begin(), rhs.end(), result.begin());
-	result.erase(it, result.end());
+	erase(result, it, result.end());
 
 	assert(result == expected);
 }
 
 template<typename Container>
 void test_unique_inplace_merge(Container v, Container const & other, Container const & expected) {
-	auto const midpoint = static_cast<typename Container::iterator::difference_type>(v.size());
+	auto const midpoint = static_cast<typename Container::iterator::difference_type>(size(v));
 	v.insert(v.end(), other.begin(), other.end());
 	auto const it = containers::detail::unique_inplace_merge(v.begin(), v.begin() + midpoint, v.end());
-	v.erase(it, v.end());
+	erase(v, it, v.end());
 
 	assert(v == expected);
 }
@@ -195,6 +196,7 @@ void test_unique_specific() {
 void test_unique() {
 	std::cout << "Testing unique_inplace_merge.\n" << std::flush;
 	test_unique_specific<std::vector<CheckedMover>>();
+	test_unique_specific<vector<CheckedMover>>();
 	test_unique_specific<containers::moving_vector<CheckedMover>>();
 }
 
