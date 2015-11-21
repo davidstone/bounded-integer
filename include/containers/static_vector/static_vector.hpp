@@ -128,7 +128,7 @@ struct static_vector {
 	template<typename... Args>
 	auto emplace_back(Args && ... args) {
 		assert(size(*this) != capacity());
-		detail::construct(get_allocator(), data() + size(*this), std::forward<Args>(args)...);
+		::containers::detail::construct(get_allocator(), data() + size(*this), std::forward<Args>(args)...);
 		++m_size;
 	}
 	
@@ -160,7 +160,7 @@ struct static_vector {
 
 
 	void pop_back() {
-		detail::destroy(get_allocator(), std::addressof(back(*this)));
+		::containers::detail::destroy(get_allocator(), std::addressof(back(*this)));
 		--m_size;
 	}
 	
