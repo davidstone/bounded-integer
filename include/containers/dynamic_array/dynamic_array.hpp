@@ -16,12 +16,12 @@
 
 #pragma once
 
+#include <containers/common_container_functions.hpp>
+#include <containers/is_iterator.hpp>
+#include <containers/repeat_n.hpp>
+#include <containers/uninitialized_storage.hpp>
 #include <containers/algorithms/copy.hpp>
 #include <containers/array/iterator.hpp>
-
-#include <containers/uninitialized_storage.hpp>
-#include <containers/common_container_functions.hpp>
-#include <containers/repeat_n.hpp>
 
 #include <iterator>
 #include <memory>
@@ -57,7 +57,7 @@ struct dynamic_array {
 		detail::uninitialized_default_construct(begin(), end(), get_allocator());
 	}
 	
-	template<typename ForwardIterator, typename Sentinel>
+	template<typename ForwardIterator, typename Sentinel, BOUNDED_REQUIRES(is_iterator<ForwardIterator>)>
 	constexpr dynamic_array(ForwardIterator first, Sentinel const last, allocator_type = allocator_type()):
 		m_size(detail::distance(first, last)),
 		m_data(make_storage(m_size))
