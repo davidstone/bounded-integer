@@ -29,10 +29,11 @@
 #include <map>
 #include <vector>
 
+namespace {
+
+using namespace bounded::literal;
 using namespace containers;
 using namespace smart_pointer;
-
-namespace {
 
 class Final {
 public:
@@ -178,6 +179,11 @@ void test_unique() {
 	test_unique_specific<containers::moving_vector<CheckedMover>>();
 }
 
+template<typename... Ts>
+constexpr auto size(std::map<Ts...> const & std_map) {
+	return std_map.size();
+}
+
 template<typename container_type>
 void test() {
 	std::cout << "Testing many member functions.\n" << std::flush;
@@ -189,9 +195,9 @@ void test() {
 	container.emplace(std::make_pair(4, 4));
 	container.emplace(std::piecewise_construct, std::forward_as_tuple(5), std::forward_as_tuple(3));
 	assert(container.at(5) == 3);
-	assert(container.size() == 5);
+	assert(size(container) == 5_bi);
 	container.emplace(typename container_type::value_type(3, 10));
-	assert(container.size() == 5);
+	assert(size(container) == 5_bi);
 	assert(container.at(3) == 3);
 }
 
@@ -310,7 +316,7 @@ void test_performance(std::size_t const loop_count) {
 	#if defined TRACK_COMPARISONS
 		auto const found_with_extra_comparisons = number_of_comparisons;
 	#endif
-	std::cout << "map size: " << map.size() << "\n\n";
+	std::cout << "map size: " << size(map) << "\n\n";
 	
 	#if defined TRACK_COMPARISONS
 		std::cout << "Constructed comparisons: " << constructed_comparisons << '\n';

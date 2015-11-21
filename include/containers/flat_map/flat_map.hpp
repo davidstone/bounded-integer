@@ -16,6 +16,7 @@
 
 #pragma once
 
+#include <containers/common_container_functions.hpp>
 #include <containers/apply_tuple.hpp>
 #include <containers/algorithms/iterator.hpp>
 #include <containers/algorithms/unique_inplace_merge.hpp>
@@ -159,9 +160,6 @@ public:
 	iterator begin() noexcept {
 		return container().begin();
 	}
-	const_iterator cbegin() const noexcept {
-		return begin();
-	}
 	
 	const_iterator end() const noexcept {
 		return container().end();
@@ -169,40 +167,7 @@ public:
 	iterator end() noexcept {
 		return container().end();
 	}
-	const_iterator cend() const noexcept {
-		return end();
-	}
 	
-	const_reverse_iterator rbegin() const noexcept {
-		return container().rbegin();
-	}
-	reverse_iterator rbegin() noexcept {
-		return container().rbegin();
-	}
-	const_reverse_iterator crbegin() const noexcept {
-		return rbegin();
-	}
-	
-	const_reverse_iterator rend() const noexcept {
-		return container().rend();
-	}
-	reverse_iterator rend() noexcept {
-		return container().rend();
-	}
-	const_reverse_iterator crend() const noexcept {
-		return rend();
-	}
-	
-	bool empty() const noexcept {
-		return container().empty();
-	}
-	size_type size() const noexcept {
-		return container().size();
-	}
-	size_type max_size() const noexcept {
-		return container().max_size();
-	}
-
 	// Extra functions on top of the regular map interface
 	size_type capacity() const noexcept {
 		return container().capacity();
@@ -212,10 +177,6 @@ public:
 	}
 	void shink_to_fit() {
 		container().shrink_to_fit();
-	}
-	
-	void clear() noexcept {
-		container().clear();
 	}
 	
 	const_iterator lower_bound(key_type const & key) const {
@@ -319,13 +280,6 @@ public:
 		return container().erase(first, last);
 	}
 	
-	friend bool operator==(flat_map_base const & lhs, flat_map_base const & rhs) noexcept {
-		return lhs.container() == rhs.container();
-	}
-	friend bool operator<(flat_map_base const & lhs, flat_map_base const & rhs) noexcept {
-		return lhs.container() < rhs.container();
-	}
-
 protected:
 	class key_value_compare {
 	public:
