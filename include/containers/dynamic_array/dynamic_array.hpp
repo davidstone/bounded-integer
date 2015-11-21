@@ -75,13 +75,23 @@ struct dynamic_array {
 		dynamic_array(other.begin(), other.end())
 	{
 	}
-	constexpr dynamic_array(dynamic_array && other) noexcept = default;
+	constexpr dynamic_array(dynamic_array && other) noexcept:
+		m_size(std::move(other.m_size)),
+		m_data(std::move(other.m_data))
+	{
+		other.m_size = bounded::constant<0>;
+	}
 
 	auto & operator=(dynamic_array const & other) & {
 		assign(*this, other.begin(), other.end());
 		return *this;
 	}
-	constexpr auto operator=(dynamic_array && other) & noexcept -> dynamic_array & = default;
+	constexpr auto & operator=(dynamic_array && other) & noexcept {
+		m_size = std::move(other.m_size);
+		m_data = std::move(other.m_data);
+		other.m_size = bounded::constant<0>;
+		return *this;
+	}
 	
 	constexpr auto data() const noexcept {
 		return reinterpret_cast<value_type const *>(m_data.get());
