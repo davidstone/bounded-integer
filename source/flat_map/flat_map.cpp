@@ -57,23 +57,30 @@ class CheckedMover {
 public:
 	constexpr CheckedMover(int value) noexcept:
 		m_value(value),
-		m_moved(false) {
+		m_moved(false)
+	{
 	}
 		
 	constexpr CheckedMover(CheckedMover const & other) noexcept:
 		m_value(other.m_value),
-		m_moved(other.m_moved) {
+		m_moved(other.m_moved)
+	{
 		assert(!other.m_moved);
+		assert(!other.m_destructed);
 	}
 	constexpr CheckedMover(CheckedMover && other) noexcept:
 		m_value(other.m_value),
-		m_moved(other.m_moved) {
+		m_moved(other.m_moved)
+	{
 		assert(this != &other);
 		assert(!other.m_moved);
+		assert(!other.m_destructed);
 		other.m_moved = true;
 	}
 	constexpr CheckedMover & operator=(CheckedMover const & other) noexcept {
 		assert(!other.m_moved);
+		assert(!other.m_destructed);
+		assert(!m_destructed);
 		m_value = other.m_value;
 		m_moved = other.m_moved;
 		return *this;
@@ -81,25 +88,37 @@ public:
 	constexpr CheckedMover & operator=(CheckedMover && other) noexcept {
 		assert(this != &other);
 		assert(!other.m_moved);
+		assert(!other.m_destructed);
+		assert(!m_destructed);
 		m_value = other.m_value;
 		m_moved = other.m_moved;
 		other.m_moved = true;
 		return *this;
 	}
+	~CheckedMover() {
+		assert(!m_destructed);
+		m_destructed = true;
+	}
+	
 	
 	constexpr friend bool operator<(CheckedMover const & lhs, CheckedMover const & rhs) noexcept {
 		assert(!lhs.m_moved);
 		assert(!rhs.m_moved);
+		assert(!lhs.m_destructed);
+		assert(!rhs.m_destructed);
 		return lhs.m_value < rhs.m_value;
 	}
 	constexpr friend bool operator==(CheckedMover const & lhs, CheckedMover const & rhs) noexcept {
 		assert(!lhs.m_moved);
 		assert(!rhs.m_moved);
+		assert(!lhs.m_destructed);
+		assert(!rhs.m_destructed);
 		return lhs.m_value == rhs.m_value;
 	}
 private:
 	int m_value;
 	bool m_moved;
+	bool m_destructed = false;
 };
 
 template<typename Container>
