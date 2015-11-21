@@ -50,7 +50,7 @@ struct dynamic_array {
 	}
 	
 	template<typename Count, BOUNDED_REQUIRES(std::is_convertible<Count, size_type>::value)>
-	explicit dynamic_array(Count const count, allocator_type = allocator_type()):
+	explicit constexpr dynamic_array(Count const count, allocator_type = allocator_type()):
 		m_size(count),
 		m_data(make_storage(m_size))
 	{
@@ -58,7 +58,7 @@ struct dynamic_array {
 	}
 	
 	template<typename ForwardIterator, typename Sentinel>
-	dynamic_array(ForwardIterator first, Sentinel const last, allocator_type = allocator_type()):
+	constexpr dynamic_array(ForwardIterator first, Sentinel const last, allocator_type = allocator_type()):
 		m_size(detail::distance(first, last)),
 		m_data(make_storage(m_size))
 	{
@@ -69,12 +69,12 @@ struct dynamic_array {
 	{
 	}
 	template<typename Count, BOUNDED_REQUIRES(std::is_convertible<Count, size_type>::value)>
-	dynamic_array(Count const count, value_type const & value, allocator_type = allocator_type()) {
+	constexpr dynamic_array(Count const count, value_type const & value, allocator_type = allocator_type()) {
 		auto const range = ::containers::detail::repeat_n(count, value);
 		*this = dynamic_array(range.begin(), range.end());
 	}
 	
-	dynamic_array(dynamic_array const & other, allocator_type = allocator_type()):
+	constexpr dynamic_array(dynamic_array const & other, allocator_type = allocator_type()):
 		dynamic_array(other.begin(), other.end())
 	{
 	}
@@ -85,7 +85,7 @@ struct dynamic_array {
 		other.m_size = bounded::constant<0>;
 	}
 
-	auto & operator=(dynamic_array const & other) & {
+	constexpr auto & operator=(dynamic_array const & other) & {
 		assign(*this, other.begin(), other.end());
 		return *this;
 	}
@@ -126,7 +126,7 @@ struct dynamic_array {
 	
 private:
 	using underlying_storage = uninitialized_storage<value_type>[];
-	static auto make_storage(size_type const size) {
+	static constexpr auto make_storage(size_type const size) {
 		return (size == bounded::constant<0>) ? nullptr : std::make_unique<underlying_storage>(static_cast<std::size_t>(size));
 	}
 	size_type m_size = bounded::constant<0>;
