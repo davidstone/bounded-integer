@@ -140,9 +140,11 @@ public:
 
 
 	auto && operator[](index_type<vector> const index) const noexcept {
+		assert(index < size(*this));
 		return *(begin() + index);
 	}
 	auto && operator[](index_type<vector> const index) noexcept {
+		assert(index < size(*this));
 		return *(begin() + index);
 	}
 	
@@ -164,10 +166,10 @@ public:
 	auto emplace_back(Args && ... args) {
 		auto && allocator = get_allocator();
 		if (size(*this) != capacity()) {
-			detail::construct(allocator, data() + size(*this), std::forward<Args>(args)...);
+			::containers::detail::construct(allocator, data() + size(*this), std::forward<Args>(args)...);
 		} else {
 			raw_container temp(new_capacity());
-			detail::construct(allocator, temp.data() + capacity(), std::forward<Args>(args)...);
+			::containers::detail::construct(allocator, temp.data() + capacity(), std::forward<Args>(args)...);
 			detail::uninitialized_move(begin(), end(), temp.begin(), allocator);
 			m_container = std::move(temp);
 		}
@@ -177,6 +179,7 @@ public:
 	// TODO: Remove duplication between emplace and insert
 	template<typename... Args>
 	auto emplace(const_iterator const position, Args && ... args) {
+		check_iterator_validity(position);
 		auto const offset = position - begin();
 		if (position == end()) {
 			emplace_back(std::forward<Args>(args)...);
@@ -189,7 +192,7 @@ public:
 			// First construct the new element because it may reference an old
 			// element, and we do not want to move elements it references
 			auto && allocator = get_allocator();
-			detail::construct(allocator, temp.data() + offset, std::forward<Args>(args)...);
+			::containers::detail::construct(allocator, temp.data() + offset, std::forward<Args>(args)...);
 			auto const mutable_position = begin() + offset;
 			auto const pointer = detail::uninitialized_move(begin(), mutable_position, temp.data(), allocator);
 			assert(temp.data() + offset == pointer);
@@ -204,6 +207,7 @@ public:
 	// TODO: remove duplication between this and static_vector insert
 	template<typename ForwardIterator, typename Sentinel>
 	auto insert(const_iterator const position, ForwardIterator first, Sentinel last) {
+		check_iterator_validity(position);
 		if (position == end()) {
 			return append(*this, first, last);
 		}
@@ -237,11 +241,16 @@ public:
 
 
 	void pop_back() {
-		detail::destroy(get_allocator(), std::addressof(back(*this)));
+		assert(!empty(*this));
+		::containers::detail::destroy(get_allocator(), std::addressof(back(*this)));
 		--m_size;
 	}
 	
 private:
+	constexpr auto check_iterator_validity(const_iterator it) {
+		assert(it >= begin());
+		assert(it <= end());
+	}
 	constexpr auto new_capacity() const {
 		using capacity_type = bounded::equivalent_type<size_type, bounded::throw_policy<>>;
 		return bounded::max(bounded::constant<1>, capacity_type(capacity() * bounded::constant<2>));
