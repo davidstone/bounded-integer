@@ -80,13 +80,23 @@ public:
 	vector(vector const & other) BOUNDED_NOEXCEPT_INITIALIZATION(
 		vector(other.begin(), other.end())
 	) {}
-	vector(vector && other) noexcept = default;
+	vector(vector && other) noexcept:
+		m_container(std::move(other.m_container)),
+		m_size(std::move(other.m_size))
+	{
+		other.m_size = bounded::constant<0>;
+	}
 
 	auto & operator=(vector const & other) & noexcept(std::is_nothrow_copy_assignable<value_type>::value) {
 		assign(*this, other.begin(), other.end());
 		return *this;
 	}
-	auto operator=(vector && other) & noexcept -> vector & = default;
+	auto & operator=(vector && other) & noexcept {
+		m_container = std::move(other.m_container);
+		m_size = std::move(other.m_size);
+		other.m_size = bounded::constant<0>;
+		return *this;
+	}
 
 	auto & operator=(std::initializer_list<value_type> init) & {
 		assign(*this, init.begin(), init.end());
