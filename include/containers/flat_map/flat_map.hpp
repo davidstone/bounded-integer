@@ -82,7 +82,6 @@ private:
 	using container_type = Container<value_type, allocator_type>;
 public:
 	using size_type = typename container_type::size_type;
-	using difference_type = typename container_type::difference_type;
 	using const_reference = value_type const &;
 	using reference = value_type &;
 	using const_pointer = typename std::allocator_traits<Allocator>::const_pointer;
