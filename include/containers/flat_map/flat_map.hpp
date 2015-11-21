@@ -67,8 +67,8 @@ public:
 	using size_type = typename container_type::size_type;
 	using const_reference = value_type const &;
 	using reference = value_type &;
-	using const_pointer = typename std::allocator_traits<Allocator>::const_pointer;
-	using pointer = typename std::allocator_traits<Allocator>::pointer;
+	using const_pointer = typename std::allocator_traits<allocator_type>::const_pointer;
+	using pointer = typename std::allocator_traits<allocator_type>::pointer;
 	using key_compare = Compare;
 	
 	using const_iterator = typename container_type::const_iterator;
@@ -98,15 +98,16 @@ public:
 		return value_compare(key_comp());
 	}
 	
-	explicit flat_map_base(key_compare const & compare = key_compare{}, Allocator const & allocator = Allocator{}):
-		m_container(container_type(allocator), compare) {
+	explicit flat_map_base(key_compare const & compare = key_compare{}, allocator_type allocator = allocator_type{}):
+		m_container(container_type(std::move(allocator)), compare) {
 	}
-	explicit flat_map_base(Allocator const & allocator):
-		flat_map_base(key_compare{}, allocator) {
+	explicit flat_map_base(allocator_type allocator):
+		flat_map_base(key_compare{}, std::move(allocator)) {
 	}
 	template<typename InputIterator>
-	flat_map_base(InputIterator first, InputIterator last, key_compare const & compare = key_compare{}, Allocator const & allocator = Allocator{}):
-		m_container(container_type(first, last, allocator), compare) {
+	flat_map_base(InputIterator first, InputIterator last, key_compare const & compare = key_compare{}, allocator_type allocator = allocator_type{}):
+		m_container(container_type(first, last, std::move(allocator)), compare)
+	{
 		auto const less = indirect_compare(value_comp());
 		std::sort(moving_begin(container()), moving_end(container()), less);
 		// At some point this should be unique_sort
@@ -116,20 +117,20 @@ public:
 		container().erase(std::unique(moving_begin(container()), moving_end(container()), equal), container().end());
 	}
 	template<typename InputIterator>
-	flat_map_base(InputIterator first, InputIterator last, Allocator const & allocator):
-		flat_map_base(first, last, key_compare{}, allocator) {
+	flat_map_base(InputIterator first, InputIterator last, allocator_type allocator):
+		flat_map_base(first, last, key_compare{}, std::move(allocator)) {
 	}
-	flat_map_base(flat_map_base const & other, Allocator const & allocator):
-		m_container(container_type(other, allocator), key_compare{}) {
+	flat_map_base(flat_map_base const & other, allocator_type allocator):
+		m_container(container_type(other, std::move(allocator)), key_compare{}) {
 	}
-	flat_map_base(flat_map_base && other, Allocator const & allocator):
-		m_container(container_type(std::move(other), allocator), key_compare{}) {
+	flat_map_base(flat_map_base && other, allocator_type allocator):
+		m_container(container_type(std::move(other), std::move(allocator)), key_compare{}) {
 	}
-	flat_map_base(std::initializer_list<value_type> init, key_compare const & compare = key_compare{}, Allocator const & allocator = Allocator{}):
-		flat_map_base(std::begin(init), std::end(init), compare, allocator) {
+	flat_map_base(std::initializer_list<value_type> init, key_compare const & compare = key_compare{}, allocator_type allocator = allocator_type{}):
+		flat_map_base(std::begin(init), std::end(init), compare, std::move(allocator)) {
 	}
-	flat_map_base(std::initializer_list<value_type> init, Allocator const & allocator):
-		flat_map_base(init, key_compare{}, allocator) {
+	flat_map_base(std::initializer_list<value_type> init, allocator_type allocator):
+		flat_map_base(init, key_compare{}, std::move(allocator)) {
 	}
 	
 	flat_map_base & operator=(std::initializer_list<value_type> init) {
