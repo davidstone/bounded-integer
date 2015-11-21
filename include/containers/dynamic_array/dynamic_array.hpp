@@ -28,7 +28,7 @@
 
 namespace containers {
 
-// TODO: support stateful allocator
+// TODO: Support stateful allocators in implementation
 template<typename T, typename Allocator = std::allocator<T>>
 struct dynamic_array {
 	using value_type = T;
@@ -45,9 +45,12 @@ struct dynamic_array {
 	)
 	
 	constexpr dynamic_array() = default;
+
+	constexpr dynamic_array(allocator_type) {
+	}
 	
 	template<typename Count, BOUNDED_REQUIRES(std::is_convertible<Count, size_type>::value)>
-	explicit dynamic_array(Count const count):
+	explicit dynamic_array(Count const count, allocator_type = allocator_type()):
 		m_size(count),
 		m_data(make_storage(m_size))
 	{
@@ -55,27 +58,27 @@ struct dynamic_array {
 	}
 	
 	template<typename ForwardIterator, typename Sentinel>
-	dynamic_array(ForwardIterator first, Sentinel const last):
+	dynamic_array(ForwardIterator first, Sentinel const last, allocator_type = allocator_type()):
 		m_size(detail::distance(first, last)),
 		m_data(make_storage(m_size))
 	{
 		detail::uninitialized_copy(first, last, m_data.get(), get_allocator());
 	}
-	dynamic_array(std::initializer_list<value_type> init):
+	dynamic_array(std::initializer_list<value_type> init, allocator_type = allocator_type()):
 		dynamic_array(init.begin(), init.end())
 	{
 	}
 	template<typename Count, BOUNDED_REQUIRES(std::is_convertible<Count, size_type>::value)>
-	dynamic_array(Count const count, value_type const & value) {
+	dynamic_array(Count const count, value_type const & value, allocator_type = allocator_type()) {
 		auto const range = ::containers::detail::repeat_n(count, value);
 		*this = dynamic_array(range.begin(), range.end());
 	}
 	
-	dynamic_array(dynamic_array const & other):
+	dynamic_array(dynamic_array const & other, allocator_type = allocator_type()):
 		dynamic_array(other.begin(), other.end())
 	{
 	}
-	constexpr dynamic_array(dynamic_array && other) noexcept:
+	constexpr dynamic_array(dynamic_array && other, allocator_type = allocator_type()) noexcept:
 		m_size(std::move(other.m_size)),
 		m_data(std::move(other.m_data))
 	{
