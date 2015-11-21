@@ -27,7 +27,7 @@
 #include <vector>
 
 namespace containers {
-namespace detail_flat_map {
+namespace detail {
 // The exact type of value_type should be considered implementation defined.
 // std::pair<key_type const, mapped_type> does not work if the underlying
 // container is std::vector because insertion into the middle / sorting requires
@@ -556,39 +556,39 @@ public:
 	}
 };
 
-}	// namespace detail_flat_map
+}	// namespace detail
 
 template<typename Key, typename T, typename Compare, template<typename, typename> class Container, typename Allocator, bool allow_duplicates>
-bool operator!=(detail_flat_map::flat_map_base<Key, T, Compare, Container, Allocator, allow_duplicates> const & lhs, detail_flat_map::flat_map_base<Key, T, Compare, Container, Allocator, allow_duplicates> const & rhs) noexcept {
+bool operator!=(detail::flat_map_base<Key, T, Compare, Container, Allocator, allow_duplicates> const & lhs, detail::flat_map_base<Key, T, Compare, Container, Allocator, allow_duplicates> const & rhs) noexcept {
 	return !(lhs == rhs);
 }
 template<typename Key, typename T, typename Compare, template<typename, typename> class Container, typename Allocator, bool allow_duplicates>
-bool operator>(detail_flat_map::flat_map_base<Key, T, Compare, Container, Allocator, allow_duplicates> const & lhs, detail_flat_map::flat_map_base<Key, T, Compare, Container, Allocator, allow_duplicates> const & rhs) noexcept {
+bool operator>(detail::flat_map_base<Key, T, Compare, Container, Allocator, allow_duplicates> const & lhs, detail::flat_map_base<Key, T, Compare, Container, Allocator, allow_duplicates> const & rhs) noexcept {
 	return rhs < lhs;
 }
 template<typename Key, typename T, typename Compare, template<typename, typename> class Container, typename Allocator, bool allow_duplicates>
-bool operator<=(detail_flat_map::flat_map_base<Key, T, Compare, Container, Allocator, allow_duplicates> const & lhs, detail_flat_map::flat_map_base<Key, T, Compare, Container, Allocator, allow_duplicates> const & rhs) noexcept {
+bool operator<=(detail::flat_map_base<Key, T, Compare, Container, Allocator, allow_duplicates> const & lhs, detail::flat_map_base<Key, T, Compare, Container, Allocator, allow_duplicates> const & rhs) noexcept {
 	return !(lhs > rhs);
 }
 template<typename Key, typename T, typename Compare, template<typename, typename> class Container, typename Allocator, bool allow_duplicates>
-bool operator>=(detail_flat_map::flat_map_base<Key, T, Compare, Container, Allocator, allow_duplicates> const & lhs, detail_flat_map::flat_map_base<Key, T, Compare, Container, Allocator, allow_duplicates> const & rhs) noexcept {
+bool operator>=(detail::flat_map_base<Key, T, Compare, Container, Allocator, allow_duplicates> const & lhs, detail::flat_map_base<Key, T, Compare, Container, Allocator, allow_duplicates> const & rhs) noexcept {
 	return !(lhs < rhs);
 }
 
 
 
-template<typename Key, typename T, typename Compare = std::less<Key>, typename Allocator = std::allocator<detail_flat_map::value_type_t<Key, T, std::vector>>>
-using unstable_flat_map = detail_flat_map::flat_map<Key, T, Compare, std::vector, Allocator>;
+template<typename Key, typename T, typename Compare = std::less<Key>, typename Allocator = std::allocator<detail::value_type_t<Key, T, std::vector>>>
+using unstable_flat_map = detail::flat_map<Key, T, Compare, std::vector, Allocator>;
 
-template<typename Key, typename T, typename Compare = std::less<Key>, typename Allocator = std::allocator<detail_flat_map::value_type_t<Key, T, moving_vector>>>
-using stable_flat_map = detail_flat_map::flat_map<Key, T, Compare, moving_vector, Allocator>;
+template<typename Key, typename T, typename Compare = std::less<Key>, typename Allocator = std::allocator<detail::value_type_t<Key, T, moving_vector>>>
+using stable_flat_map = detail::flat_map<Key, T, Compare, moving_vector, Allocator>;
 
 
-template<typename Key, typename T, typename Compare = std::less<Key>, typename Allocator = std::allocator<detail_flat_map::value_type_t<Key, T, std::vector>>>
-using unstable_flat_multimap = detail_flat_map::flat_multimap<Key, T, Compare, std::vector, Allocator>;
+template<typename Key, typename T, typename Compare = std::less<Key>, typename Allocator = std::allocator<detail::value_type_t<Key, T, std::vector>>>
+using unstable_flat_multimap = detail::flat_multimap<Key, T, Compare, std::vector, Allocator>;
 
-template<typename Key, typename T, typename Compare = std::less<Key>, typename Allocator = std::allocator<detail_flat_map::value_type_t<Key, T, moving_vector>>>
-using stable_flat_multimap = detail_flat_map::flat_multimap<Key, T, Compare, moving_vector, Allocator>;
+template<typename Key, typename T, typename Compare = std::less<Key>, typename Allocator = std::allocator<detail::value_type_t<Key, T, moving_vector>>>
+using stable_flat_multimap = detail::flat_multimap<Key, T, Compare, moving_vector, Allocator>;
 
 
 }	// namespace containers
