@@ -114,7 +114,10 @@ public:
 		auto const equal = [&](auto const & lhs, auto const & rhs) {
 			return !less(lhs, rhs) and !less(rhs, lhs);
 		};
-		container().erase(std::unique(moving_begin(container()), moving_end(container()), equal), container().end());
+		container().erase(
+			std::unique(moving_begin(container()), moving_end(container()), equal),
+			container().end()
+		);
 	}
 	template<typename InputIterator>
 	flat_map_base(InputIterator first, InputIterator last, allocator_type allocator):
@@ -243,10 +246,20 @@ public:
 		auto const midpoint = moving_begin(container()) + offset;
 		std::sort(midpoint, moving_end(container()), indirect_compare{value_comp()});
 		if (allow_duplicates) {
-			std::inplace_merge(moving_begin(container()), midpoint, moving_end(container()), indirect_compare{value_comp()});
+			std::inplace_merge(
+				moving_begin(container()),
+				midpoint,
+				moving_end(container()),
+				indirect_compare{value_comp()}
+			);
 		}
 		else {
-			auto const position = detail::unique_inplace_merge(moving_begin(container()), midpoint, moving_end(container()), indirect_compare{value_comp()});
+			auto const position = detail::unique_inplace_merge(
+				moving_begin(container()),
+				midpoint,
+				moving_end(container()),
+				indirect_compare{value_comp()}
+			);
 			container().erase(position, container().end());
 		}
 	}
