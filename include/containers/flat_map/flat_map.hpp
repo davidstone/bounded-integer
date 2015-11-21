@@ -512,25 +512,6 @@ public:
 
 }	// namespace detail
 
-template<typename Key, typename T, typename Compare, template<typename, typename> class Container, typename Allocator, bool allow_duplicates>
-bool operator!=(detail::flat_map_base<Key, T, Compare, Container, Allocator, allow_duplicates> const & lhs, detail::flat_map_base<Key, T, Compare, Container, Allocator, allow_duplicates> const & rhs) noexcept {
-	return !(lhs == rhs);
-}
-template<typename Key, typename T, typename Compare, template<typename, typename> class Container, typename Allocator, bool allow_duplicates>
-bool operator>(detail::flat_map_base<Key, T, Compare, Container, Allocator, allow_duplicates> const & lhs, detail::flat_map_base<Key, T, Compare, Container, Allocator, allow_duplicates> const & rhs) noexcept {
-	return rhs < lhs;
-}
-template<typename Key, typename T, typename Compare, template<typename, typename> class Container, typename Allocator, bool allow_duplicates>
-bool operator<=(detail::flat_map_base<Key, T, Compare, Container, Allocator, allow_duplicates> const & lhs, detail::flat_map_base<Key, T, Compare, Container, Allocator, allow_duplicates> const & rhs) noexcept {
-	return !(lhs > rhs);
-}
-template<typename Key, typename T, typename Compare, template<typename, typename> class Container, typename Allocator, bool allow_duplicates>
-bool operator>=(detail::flat_map_base<Key, T, Compare, Container, Allocator, allow_duplicates> const & lhs, detail::flat_map_base<Key, T, Compare, Container, Allocator, allow_duplicates> const & rhs) noexcept {
-	return !(lhs < rhs);
-}
-
-
-
 template<typename Key, typename T, typename Compare = std::less<Key>, typename Allocator = std::allocator<detail::value_type_t<Key, T, std::vector>>>
 using unstable_flat_map = detail::flat_map<Key, T, Compare, std::vector, Allocator>;
 
