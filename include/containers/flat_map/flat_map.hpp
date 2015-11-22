@@ -27,7 +27,6 @@
 #include <algorithm>
 #include <stdexcept>
 #include <tuple>
-#include <vector>
 
 namespace containers {
 namespace detail {
@@ -67,17 +66,11 @@ private:
 	using container_type = Container<value_type, allocator_type>;
 public:
 	using size_type = typename container_type::size_type;
-	using const_reference = value_type const &;
-	using reference = value_type &;
-	using const_pointer = typename std::allocator_traits<allocator_type>::const_pointer;
-	using pointer = typename std::allocator_traits<allocator_type>::pointer;
-	using key_compare = Compare;
-	
+
 	using const_iterator = typename container_type::const_iterator;
 	using iterator = typename container_type::iterator;
-	using const_reverse_iterator = std::reverse_iterator<const_iterator>;
-	using reverse_iterator = std::reverse_iterator<iterator>;
 	
+	using key_compare = Compare;
 	class value_compare {
 	public:
 		using result_type = bool;
@@ -403,11 +396,11 @@ class flat_map : public flat_map_base<Key, T, Compare, Container, Allocator, fal
 private:
 	using base = flat_map_base<Key, T, Compare, Container, Allocator, false>;
 public:
-	using mapped_type = typename base::mapped_type;
-	using key_type = typename base::key_type;
-	using size_type = typename base::size_type;
-	using const_iterator = typename base::const_iterator;
-	using iterator = typename base::iterator;
+	using typename base::mapped_type;
+	using typename base::key_type;
+	using typename base::size_type;
+	using typename base::const_iterator;
+	using typename base::iterator;
 
 	template<typename ... Args>
 	constexpr flat_map(Args && ... args):
@@ -465,12 +458,13 @@ template<typename Key, typename T, typename Compare, template<typename, typename
 class flat_multimap : public flat_map_base<Key, T, Compare, Container, Allocator, true> {
 private:
 	using base = flat_map_base<Key, T, Compare, Container, Allocator, true>;
-	using key_value_compare = typename base::key_value_compare;
+	using typename base::key_value_compare;
 public:
-	using key_type = typename base::key_type;
-	using size_type = typename base::size_type;
-	using const_iterator = typename base::const_iterator;
-	using iterator = typename base::iterator;
+	using typename base::mapped_type;
+	using typename base::key_type;
+	using typename base::size_type;
+	using typename base::const_iterator;
+	using typename base::iterator;
 
 	template<typename ... Args>
 	constexpr flat_multimap(Args && ... args):
