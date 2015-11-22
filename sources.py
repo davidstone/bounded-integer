@@ -23,6 +23,7 @@ include_directories = ['../bounded_integer', '../value_ptr', '../include']
 common_sources = [
 	'has_nested_type.cpp',
 	'legacy_iterator.cpp',
+	'algorithms/count.cpp',
 	'algorithms/iterator.cpp',
 ]
 
