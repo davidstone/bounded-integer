@@ -157,7 +157,7 @@ public:
 	void reserve(size_type const new_capacity) noexcept {
 		return container().reserve(new_capacity);
 	}
-	void shink_to_fit() {
+	void shrink_to_fit() {
 		container().shrink_to_fit();
 	}
 	
@@ -413,17 +413,42 @@ private:
 };
 
 template<typename Key, typename T, typename Compare, template<typename, typename> class Container, typename Allocator>
-class flat_map : public flat_map_base<Key, T, Compare, Container, Allocator, false> {
+class flat_map : private flat_map_base<Key, T, Compare, Container, Allocator, false> {
 private:
 	using base = flat_map_base<Key, T, Compare, Container, Allocator, false>;
 public:
-	using typename base::mapped_type;
 	using typename base::key_type;
+	using typename base::mapped_type;
+	using typename base::value_type;
 	using typename base::size_type;
 	using typename base::const_iterator;
 	using typename base::iterator;
 
+	using typename base::key_compare;
+	using typename base::value_compare;
+	
+	using base::key_comp;
+	using base::value_comp;
+
 	using base::base;
+	using base::operator=;
+	
+	using base::begin;
+	using base::end;
+	
+	using base::capacity;
+	using base::reserve;
+	using base::shrink_to_fit;
+	
+	using base::lower_bound;
+	using base::upper_bound;
+	using base::find;
+	
+	using base::emplace;
+	using base::emplace_hint;
+	using base::insert;
+	
+	using base::erase;
 
 	mapped_type const & at(key_type const & key) const {
 		auto const it = find(key);
@@ -473,18 +498,43 @@ public:
 };
 
 template<typename Key, typename T, typename Compare, template<typename, typename> class Container, typename Allocator>
-class flat_multimap : public flat_map_base<Key, T, Compare, Container, Allocator, true> {
+class flat_multimap : private flat_map_base<Key, T, Compare, Container, Allocator, true> {
 private:
 	using base = flat_map_base<Key, T, Compare, Container, Allocator, true>;
 	using typename base::key_value_compare;
 public:
-	using typename base::mapped_type;
 	using typename base::key_type;
+	using typename base::mapped_type;
+	using typename base::value_type;
 	using typename base::size_type;
 	using typename base::const_iterator;
 	using typename base::iterator;
 
+	using typename base::key_compare;
+	using typename base::value_compare;
+	
+	using base::key_comp;
+	using base::value_comp;
+
 	using base::base;
+	using base::operator=;
+	
+	using base::begin;
+	using base::end;
+	
+	using base::capacity;
+	using base::reserve;
+	using base::shrink_to_fit;
+	
+	using base::lower_bound;
+	using base::upper_bound;
+	using base::find;
+	
+	using base::emplace;
+	using base::emplace_hint;
+	using base::insert;
+	
+	using base::erase;
 
 	// These implementations work for map or multimap, but I don't expect the
 	// compiler to be able to optimize based on the fact that values in flat_map
