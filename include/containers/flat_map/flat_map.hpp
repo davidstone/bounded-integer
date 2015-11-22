@@ -55,10 +55,10 @@ using value_type_t = std::pair<
 	T
 >;
 
-template<typename Key, typename T, typename Compare, template<typename, typename> class Container, typename Allocator, bool allow_duplicates>
+template<typename Key_, typename T, typename Compare, template<typename, typename> class Container, typename Allocator, bool allow_duplicates>
 class flat_map_base {
 public:
-	using key_type = Key;
+	using key_type = Key_;
 	using mapped_type = T;
 	using value_type = value_type_t<key_type, mapped_type, Container>;
 	using allocator_type = Allocator;
@@ -193,22 +193,21 @@ public:
 	// of the value_type. In many cases, however, we will have to copy / move
 	// the key_type, because we have to construct the key to determine whether
 	// we should insert it.
+	
 	template<typename... Args>
 	std::pair<iterator, bool> emplace(Args && ... args) {
-		auto const search_strategy = [&](key_type const & key) {
-			return this->upper_bound(key);
-		};
-		return emplace_search(search_strategy, std::forward<Args>(args)...);
+		auto data = separate_key_from_mapped(std::forward<Args>(args)...);
+		auto const position = upper_bound(data.key);
+		return emplace_at(position, std::move(data).key, std::move(data).mapped_args);
 	}
 	template<typename... Args>
 	iterator emplace_hint(const_iterator hint, Args && ... args) {
-		auto const search_strategy = [&](key_type const & key) {
-			bool const correct_greater = this->key_comp(key, *hint);
-			bool const correct_less = this->key_comp(*::containers::prev(hint), key);
-			bool const correct_hint = correct_greater and correct_less;
-			return correct_hint ? hint : this->upper_bound(key);
-		};
-		return emplace_search(search_strategy, std::forward<Args>(args)...).first;
+		auto data = separate_key_from_mapped(std::forward<Args>(args)...);
+		auto const correct_greater = (hint == end()) or key_comp(data.key, *hint);
+		auto const correct_less = (hint == begin()) or key_comp(*::containers::prev(hint), data.key);
+		auto const correct_hint = correct_greater and correct_less;
+		auto const position = correct_hint ? hint : upper_bound(data.key);
+		return emplace_at(position, std::move(data).key, std::move(data).mapped_args);
 	}
 
 	decltype(auto) insert(value_type const & value) {
@@ -294,73 +293,99 @@ private:
 	// object isn't actually moved from until later on in the function.
 	//
 	// Search represents a function that finds where to insert
-	template<typename Search>
-	std::pair<iterator, bool> emplace_search(Search const search) {
-		// key_type must be default initialized in case it's something like int
-		key_type key{};
-		return emplace_key(search, key, std::piecewise_construct, std::forward_as_tuple(std::move(key)), std::forward_as_tuple());
+
+
+	template<typename...>
+	struct type_list{};
+
+	template<typename Key>
+	static constexpr auto use_reference_to_key(type_list<Key>) {
+		return std::is_same<std::decay_t<Key>, key_type>::value;
 	}
-	template<typename Search, typename ConvertToMapped>
-	std::pair<iterator, bool> emplace_search(Search const search, key_type const & key, ConvertToMapped && mapped) {
-		return emplace_key(search, key, key, std::forward<ConvertToMapped>(mapped));
-	}
-	template<typename Search, typename ConvertToMapped>
-	std::pair<iterator, bool> emplace_search(Search const search, key_type && key, ConvertToMapped && mapped) {
-		return emplace_key(search, key, std::move(key), std::forward<ConvertToMapped>(mapped));
-	}
-	template<typename Search, typename ConvertToKey, typename ConvertToMapped>
-	std::pair<iterator, bool> emplace_search(Search const search, ConvertToKey && convert_to_key, ConvertToMapped && mapped) {
-		key_type key(convert_to_key);
-		return emplace_key(search, key, std::move(key), std::forward<ConvertToMapped>(mapped));
-	}
-	// These pair constructors could possibly be better written to not construct
-	// key twice if ConvertToKey is not the same type as key_type.
-	template<typename Search, typename ConvertToKey, typename ConvertToMapped>
-	std::pair<iterator, bool> emplace_search(Search const search, std::pair<ConvertToKey, ConvertToMapped> && value) {
-		return emplace_key(search, value.first, std::move(value));
-	}
-	template<typename Search, typename ConvertToKey, typename ConvertToMapped>
-	std::pair<iterator, bool> emplace_search(Search const search, std::pair<ConvertToKey, ConvertToMapped> const & value) {
-		return emplace_key(search, value.first, value);
-	}
-	class make_key {
-	public:
-		template<typename... Args>
-		constexpr key_type operator()(Args && ... args) const {
-			return key_type(std::forward<Args>(args)...);
-		}
-	};
-	template<typename Search, typename KeyTuple, typename MappedTuple>
-	std::pair<iterator, bool> emplace_search(Search const search, std::piecewise_construct_t, KeyTuple && key_tuple, MappedTuple && mapped_tuple) {
-		key_type key(apply(make_key{}, std::forward<KeyTuple>(key_tuple)));
-		return emplace_key(search, key, std::piecewise_construct, std::forward_as_tuple(std::move(key)), std::forward<MappedTuple>(mapped_tuple));
+	template<typename... KeyArgs>
+	static constexpr auto use_reference_to_key(type_list<KeyArgs...>) {
+		return false;
 	}
 
-	// args contains everything needed to construct value_type, including the
-	// key. It is provided here as the first argument just to make things easier
+	template<typename MappedTuple, typename... KeyArgs>
+	static constexpr auto construct_result(MappedTuple && mapped_tuple, KeyArgs && ... key_args) {
+		struct result {
+			result(MappedTuple && mapped_, KeyArgs && ... key_):
+				key(std::forward<KeyArgs>(key_)...),
+				mapped_args(std::forward<MappedTuple>(mapped_)) {
+			}
+
+			std::conditional_t<
+				use_reference_to_key(type_list<KeyArgs...>{}),
+				key_type const &,
+				key_type
+			> key;
+			MappedTuple mapped_args;
+		};
+		return result(std::forward<MappedTuple>(mapped_tuple), std::forward<KeyArgs>(key_args)...);
+	}
+
+	static constexpr auto separate_key_from_mapped() {
+		return construct_result(std::tuple<>{});
+	}
+	template<typename Pair>
+	static constexpr auto separate_key_from_mapped(Pair && pair) {
+		return construct_result(
+			std::forward_as_tuple(std::forward<Pair>(pair).second),
+			std::forward<Pair>(pair).first
+		);
+	}
+	template<typename Key, typename Mapped>
+	static constexpr auto separate_key_from_mapped(Key && key, Mapped && mapped) {
+		return construct_result(
+			std::forward_as_tuple(std::forward<Mapped>(mapped)),
+			std::forward<Key>(key)
+		);
+	}
+	template<typename KeyTuple, typename MappedTuple>
+	static constexpr auto separate_key_from_mapped(std::piecewise_construct_t, KeyTuple && key, MappedTuple && mapped) {
+		auto construct = [&](auto && ... args) {
+			return construct_result(
+				std::forward<MappedTuple>(mapped),
+				std::forward<decltype(args)>(args)...
+			);
+		};
+		return apply(construct, std::forward<KeyTuple>(key));
+	}
 	
-	template<typename Search, typename... Args>
-	auto checked_emplace_key(std::true_type, Search const search, key_type const & key, Args && ... args) {
-		return container().emplace(search(key), std::forward<Args>(args)...);
+	template<typename>
+	static constexpr auto dependent_allow_duplicates = allow_duplicates;
+	
+	template<typename Key, typename Mapped, BOUNDED_REQUIRES(dependent_allow_duplicates<Key>)>
+	auto emplace_at(const_iterator position, Key && key, Mapped && mapped) {
+		return container().emplace(
+			position,
+			std::piecewise_construct,
+			std::forward_as_tuple(std::forward<Key>(key)),
+			std::forward<Mapped>(mapped)
+		);
 	}
 
-	template<typename Search, typename... Args>
-	auto checked_emplace_key(std::false_type, Search const upper_bound, key_type const & key, Args && ... args) {
-		auto const position = upper_bound(key);
+	template<typename Key, typename Mapped, BOUNDED_REQUIRES(!dependent_allow_duplicates<Key>)>
+	auto emplace_at(const_iterator position, Key && key, Mapped && mapped) {
 		// Do not decrement an iterator if it might be begin()
 		bool const there_is_element_before = position != begin();
 		auto const that_element_is_equal = [&](){ return !key_comp()(::containers::prev(position)->first, key); };
 		bool const already_exists = there_is_element_before and that_element_is_equal();
-		return already_exists ?
-			std::make_pair(::containers::prev(position), false) :
-			std::make_pair(container().emplace(position, std::forward<Args>(args)...), true);
+		if (already_exists) {
+			return std::make_pair(make_mutable_iterator(*this, ::containers::prev(position)), false);
+		}
+
+		auto const it = container().emplace(
+			position,
+			std::piecewise_construct,
+			std::forward_as_tuple(std::forward<Key>(key)),
+			std::forward<Mapped>(mapped)
+		);
+		return std::make_pair(it, true);
 	}
 
-	template<typename Search, typename... Args>
-	auto emplace_key(Search const search, key_type const & key, Args && ... args) {
-		return checked_emplace_key(std::integral_constant<bool, allow_duplicates>{}, search, key, std::forward<Args>(args)...);
-	}
-	
+
 	class indirect_compare {
 	public:
 		constexpr indirect_compare(value_compare const & compare):
