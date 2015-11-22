@@ -333,36 +333,27 @@ private:
 
 	// args contains everything needed to construct value_type, including the
 	// key. It is provided here as the first argument just to make things easier
-	template<bool duplicates_are_allowed, typename dummy = void>
-	class checked_emplace_key;
-	template<typename dummy>
-	class checked_emplace_key<true, dummy> {
-	public:
-		using result_type = iterator;
-		template<typename Search, typename... Args>
-		result_type operator()(flat_map_base & container, Search const search, key_type const & key, Args && ... args) {
-			return container.container().emplace(search(key), std::forward<Args>(args)...);
-		}
-	};
-	template<typename dummy>
-	class checked_emplace_key<false, dummy> {
-	public:
-		using result_type = std::pair<iterator, bool>;
-		template<typename Search, typename... Args>
-		result_type operator()(flat_map_base & container, Search const upper_bound, key_type const & key, Args && ... args) {
-			auto const position = upper_bound(key);
-			// Do not decrement an iterator if it might be begin()
-			bool const there_is_element_before = position != container.begin();
-			auto const that_element_is_equal = [&](){ return !container.key_comp()(::containers::prev(position)->first, key); };
-			bool const already_exists = there_is_element_before and that_element_is_equal();
-			return already_exists ?
-				result_type(::containers::prev(position), false) :
-				result_type(container.container().emplace(position, std::forward<Args>(args)...), true);
-		}
-	};
+	
 	template<typename Search, typename... Args>
-	typename checked_emplace_key<allow_duplicates>::result_type emplace_key(Search const search, key_type const & key, Args && ... args) {
-		return checked_emplace_key<allow_duplicates>{}(*this, search, key, std::forward<Args>(args)...);
+	auto checked_emplace_key(std::true_type, Search const search, key_type const & key, Args && ... args) {
+		return container().emplace(search(key), std::forward<Args>(args)...);
+	}
+
+	template<typename Search, typename... Args>
+	auto checked_emplace_key(std::false_type, Search const upper_bound, key_type const & key, Args && ... args) {
+		auto const position = upper_bound(key);
+		// Do not decrement an iterator if it might be begin()
+		bool const there_is_element_before = position != begin();
+		auto const that_element_is_equal = [&](){ return !key_comp()(::containers::prev(position)->first, key); };
+		bool const already_exists = there_is_element_before and that_element_is_equal();
+		return already_exists ?
+			std::make_pair(::containers::prev(position), false) :
+			std::make_pair(container().emplace(position, std::forward<Args>(args)...), true);
+	}
+
+	template<typename Search, typename... Args>
+	auto emplace_key(Search const search, key_type const & key, Args && ... args) {
+		return checked_emplace_key(std::integral_constant<bool, allow_duplicates>{}, search, key, std::forward<Args>(args)...);
 	}
 	
 	class indirect_compare {
