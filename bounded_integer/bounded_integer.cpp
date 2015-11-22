@@ -1241,14 +1241,6 @@ auto check_compound_arithmetic() {
 	assert(clamped == 0_bi);
 }
 
-auto check_algorithm() {
-	constexpr auto array = bounded::make_array(0_bi, 3_bi, 2_bi, 3_bi, 5_bi);
-	assert(bounded::count(std::begin(array), std::end(array), 3_bi) == 2_bi);
-	assert(bounded::count(std::begin(array), std::end(array), 2_bi) == 1_bi);
-	assert(bounded::count(std::begin(array), std::end(array), 7_bi) == 0_bi);
-	assert(bounded::count_if(std::begin(array), std::end(array), [](auto){ return true; }) == array.size());
-}
-
 template<typename Initial, intmax_t initial_value, typename Expected, intmax_t expected_value>
 auto check_absolute_value() {
 	constexpr auto value = Initial(initial_value);
@@ -1288,6 +1280,26 @@ auto check_empty_braces() {
 	op = {};
 	assert(!op);
 }
+
+namespace check_optional_common_type {
+
+	static_assert(
+		std::is_same<std::common_type_t<bounded::none_t, int>, bounded::optional<int>>::value,
+		"common_type with none_t first wrong."
+	);
+	static_assert(
+		std::is_same<std::common_type_t<int, bounded::none_t>, bounded::optional<int>>::value,
+		"common_type with none_t last wrong."
+	);
+	static_assert(
+		std::is_same<
+			std::common_type_t<decltype(1_bi), bounded::none_t, decltype(5_bi), bounded::none_t>,
+			bounded::optional<bounded::integer<1, 5>>
+		>::value,
+		"common_type with bounded::integer and none_t wrong."
+	);
+
+}	// namespace check_optional_common_type
 
 template<typename T>
 auto check_uncompressed_optional() {
@@ -1419,12 +1431,6 @@ auto check_streaming() {
 	streaming_test<bounded::equivalent_type<int>>(large_initial, large_final);
 }
 
-auto check_iterator() {
-	constexpr bounded::array<char, 1> a = { {} };
-	assert(bounded::next(a.begin()) == a.end());
-	assert(bounded::prev(a.end()) == a.begin());
-}
-
 enum class bounded_enum{};
 
 }	// namespace
@@ -1494,12 +1500,10 @@ auto main() -> int {
 	check_policies();
 	check_assignment();
 	check_compound_arithmetic();
-	check_algorithm();
 	check_math();
 	check_optional();
 	check_to_string();
 	check_streaming();
-	check_iterator();
 	check_volatile();
 	check_hash();
 }

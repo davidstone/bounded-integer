@@ -18,7 +18,6 @@
 
 #include "detail/optional/common_type.hpp"
 #include "detail/optional/comparison_operators.hpp"
-#include "detail/optional/make_optional_array.hpp"
 #include "detail/optional/optional.hpp"
 #include "detail/optional/value_or.hpp"
 #include "bounded_integer.hpp"

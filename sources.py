@@ -19,14 +19,12 @@ from program import prepend_dir, Program
 source_directory = 'bounded_integer'
 
 sources = [
-	'array.cpp',
 	'integer_range.cpp',
 	'optional.cpp',
 	'bounded_integer.cpp'
 ]
 sources += prepend_dir('detail', [
 	'abs.cpp',
-	'algorithm.cpp',
 	'basic_numeric_limits.cpp',
 	'cast.cpp',
 	'class.cpp',
@@ -39,7 +37,6 @@ sources += prepend_dir('detail', [
 	'hash.cpp',
 	'integer_range.cpp',
 	'is_bounded_integer.cpp',
-	'iterator.cpp',
 	'literal.cpp',
 	'log.cpp',
 	'make.cpp',
@@ -52,11 +49,6 @@ sources += prepend_dir('detail', [
 	'string.cpp',
 	'typedefs.cpp',
 	'underlying_type.cpp',
-])
-sources += prepend_dir('detail/array', [
-	'array.cpp',
-	'iterator.cpp',
-	'make_array.cpp',
 ])
 sources += prepend_dir('detail/arithmetic', [
 	'base.cpp',
@@ -77,7 +69,6 @@ sources += prepend_dir('detail/optional', [
 	'common_type.cpp',
 	'comparison_operators.cpp',
 	'forward_declaration.cpp',
-	'make_optional_array.cpp',
 	'optional.cpp',
 	'value_or.cpp',
 ])

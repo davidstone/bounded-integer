@@ -17,7 +17,6 @@
 #pragma once
 
 #include "detail/abs.hpp"
-#include "detail/algorithm.hpp"
 #include "detail/basic_numeric_limits.hpp"
 #include "detail/cast.hpp"
 #include "detail/class.hpp"
@@ -26,7 +25,6 @@
 #include "detail/comparison_builtin.hpp"
 #include "detail/conditional.hpp"
 #include "detail/hash.hpp"
-#include "detail/iterator.hpp"
 #include "detail/literal.hpp"
 #include "detail/log.hpp"
 #include "detail/make.hpp"
