@@ -349,11 +349,10 @@ private:
 		auto const position = upper_bound(key);
 		// Do not decrement an iterator if it might be begin()
 		bool const there_is_element_before = position != begin();
-		auto const previous = ::containers::prev(position);
-		auto const that_element_is_equal = [&](){ return !key_comp()(previous->first, key); };
+		auto const that_element_is_equal = [&](){ return !key_comp()(::containers::prev(position)->first, key); };
 		bool const already_exists = there_is_element_before and that_element_is_equal();
 		return already_exists ?
-			std::make_pair(previous, false) :
+			std::make_pair(::containers::prev(position), false) :
 			std::make_pair(container().emplace(position, std::forward<Args>(args)...), true);
 	}
 
