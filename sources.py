@@ -74,6 +74,7 @@ sources += prepend_dir('detail/arithmetic', [
 	'pointer.cpp',
 ])
 sources += prepend_dir('detail/optional', [
+	'common_type.cpp',
 	'comparison_operators.cpp',
 	'forward_declaration.cpp',
 	'make_optional_array.cpp',
