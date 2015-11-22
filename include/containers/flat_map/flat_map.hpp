@@ -262,6 +262,12 @@ public:
 	iterator erase(const_iterator const it) {
 		return container().erase(it);
 	}
+	// Need mutable iterator overload to avoid ambiguity if key_type can be
+	// constructed from iterator (for instance, an unconstrained constructor
+	// template).
+	iterator erase(iterator const it) {
+		return container().erase(it);
+	}
 	iterator erase(const_iterator const first, const_iterator const last) {
 		return container().erase(first, last);
 	}
