@@ -211,17 +211,16 @@ public:
 		return emplace_search(search_strategy, std::forward<Args>(args)...).first;
 	}
 
-	template<typename P>
-	std::pair<iterator, bool> insert(P && value) {
-		return emplace(std::forward<P>(value));
+	decltype(auto) insert(value_type const & value) {
+		return emplace(value);
 	}
-	// This differs from the signature given on cppreference due to ambiguity
-	// with the iterator range signature. I'm not sure if this workaround
-	// actually fulfills all requirements.
-	iterator insert(const_iterator const hint, value_type const & value) {
+	decltype(auto) insert(value_type && value) {
+		return emplace(std::move(value));
+	}
+	decltype(auto) insert(const_iterator const hint, value_type const & value) {
 		return emplace_hint(hint, value);
 	}
-	iterator insert(const_iterator const hint, value_type && value) {
+	decltype(auto) insert(const_iterator const hint, value_type && value) {
 		return emplace_hint(hint, std::move(value));
 	}
 	template<typename InputIterator>
