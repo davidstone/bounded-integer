@@ -60,7 +60,7 @@ class flat_map_base {
 public:
 	using key_type = Key;
 	using mapped_type = T;
-	using value_type = value_type_t<Key, T, Container>;
+	using value_type = value_type_t<key_type, mapped_type, Container>;
 	using allocator_type = Allocator;
 private:
 	using container_type = Container<value_type, allocator_type>;
