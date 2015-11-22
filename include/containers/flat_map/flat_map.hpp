@@ -402,10 +402,7 @@ public:
 	using typename base::const_iterator;
 	using typename base::iterator;
 
-	template<typename ... Args>
-	constexpr flat_map(Args && ... args):
-		base(std::forward<Args>(args)...) {
-	}
+	using base::base;
 
 	mapped_type const & at(key_type const & key) const {
 		auto const it = find(key);
@@ -466,10 +463,7 @@ public:
 	using typename base::const_iterator;
 	using typename base::iterator;
 
-	template<typename ... Args>
-	constexpr flat_multimap(Args && ... args):
-		base(std::forward<Args>(args)...) {
-	}
+	using base::base;
 
 	// These implementations work for map or multimap, but I don't expect the
 	// compiler to be able to optimize based on the fact that values in flat_map
