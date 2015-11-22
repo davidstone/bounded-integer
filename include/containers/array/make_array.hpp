@@ -50,7 +50,7 @@ constexpr auto make_explicit_array(Args && ... args) noexcept {
 }
 template<std::size_t... dimensions, typename... Args>
 constexpr auto make_explicit_array(Args && ... args) noexcept {
-	return array<std::common_type_t<Args...>, dimensions...>{ std::forward<Args>(args)... };
+	return array<std::common_type_t<std::decay_t<Args>...>, dimensions...>{ std::forward<Args>(args)... };
 }
 
 
@@ -66,7 +66,7 @@ constexpr auto make_array(Args && ... args) noexcept {
 template<std::size_t... dimensions, typename... Args>
 constexpr auto make_array(Args && ... args) noexcept {
 	return array<
-		std::common_type_t<Args...>,
+		std::common_type_t<std::decay_t<Args>...>,
 		detail::final_dimension<sizeof...(Args), dimensions...>::value, dimensions...
 	>{ std::forward<Args>(args)... };
 }
