@@ -31,4 +31,10 @@ private:
 	optional_tag(optional_tag &&) = default;
 };
 
+// none_t cannot be default constructible or we get an ambiguity in op = {};
+struct none_t {
+	constexpr none_t(int) noexcept {}
+};
+constexpr auto none = none_t(0);
+
 }	// namespace bounded

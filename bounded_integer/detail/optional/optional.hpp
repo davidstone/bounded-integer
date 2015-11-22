@@ -33,11 +33,6 @@ struct default_optional_storage;
 
 }	// namespace detail
 
-// none_t cannot be default constructible or we get an ambiguity in op = {};
-struct none_t {
-	constexpr none_t(int) noexcept {}
-};
-constexpr auto none = none_t(0);
 struct in_place_t{};
 constexpr auto in_place = in_place_t{};
 
