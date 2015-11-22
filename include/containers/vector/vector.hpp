@@ -44,8 +44,6 @@ private:
 public:
 	using size_type = typename raw_container::size_type;
 
-	static_assert(std::is_empty<allocator_type>::value, "Stateful allocators not yet supported.");
-
 	using const_iterator = detail::basic_array_iterator<value_type const, vector>;
 	using iterator = detail::basic_array_iterator<value_type, vector>;
 	
