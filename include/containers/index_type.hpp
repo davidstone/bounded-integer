@@ -27,14 +27,22 @@
 namespace containers {
 namespace detail {
 
-template<typename Container, BOUNDED_REQUIRES(is_container<Container>)>
-auto index_type_source_impl(Container const &) -> typename Container::size_type;
+template<typename T, bool container = is_container<T>>
+struct index_type_source_c;
 
-template<typename Iterator, BOUNDED_REQUIRES(is_iterator<Iterator>)>
-auto index_type_source_impl(Iterator const &) -> typename Iterator::difference_type;
+template<typename Container>
+struct index_type_source_c<Container, true> {
+	using type = typename Container::size_type;
+};
+
+template<typename Iterator>
+struct index_type_source_c<Iterator, false> {
+	static_assert(is_iterator<Iterator>);
+	using type = typename Iterator::difference_type;
+};
 
 template<typename T>
-using index_type_source = decltype(index_type_source_impl(std::declval<T>()));
+using index_type_source = typename index_type_source_c<std::decay_t<T>>::type;
 
 }	// namespace detail
 

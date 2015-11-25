@@ -134,6 +134,8 @@ int main() {
 		containers::index_type<decltype(container)>,
 		bounded::checked_integer<0, 9, std::out_of_range>
 	>::value);
+	static_assert(!containers::is_iterator<containers::static_vector<std::string, 6>>);
+
 	insert(container, container.begin() + 1_bi, 5_bi, 12);
 	auto const expected = { 1, 12, 12, 12, 12, 12, 2, 3 };
 	assert(std::equal(container.begin(), container.end(), expected.begin(), expected.end()));
