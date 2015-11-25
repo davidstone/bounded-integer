@@ -130,6 +130,10 @@ int main() {
 	test_generic<3>(std::string("hi"), { std::string(""), std::string("hello"), std::string(100, '=') });
 	
 	containers::static_vector<int, 10> container = { 1, 2, 3 };
+	static_assert(std::is_same<
+		containers::index_type<decltype(container)>,
+		bounded::checked_integer<0, 9, std::out_of_range>
+	>::value);
 	insert(container, container.begin() + 1_bi, 5_bi, 12);
 	auto const expected = { 1, 12, 12, 12, 12, 12, 2, 3 };
 	assert(std::equal(container.begin(), container.end(), expected.begin(), expected.end()));
