@@ -92,6 +92,11 @@ constexpr decltype(auto) at(Container && container, Index const index) BOUNDED_N
 	)]
 )
 
+template<typename Container, typename Index, BOUNDED_REQUIRES(is_container<Container>)>
+constexpr decltype(auto) at(Container && container, Index const index, bounded::non_check_t) BOUNDED_NOEXCEPT(
+	std::forward<Container>(container)[static_cast<index_type<Container>>(index)]
+)
+
 
 template<typename Container>
 constexpr auto never_empty = std::numeric_limits<typename std::remove_reference_t<Container>::size_type>::min() > bounded::constant<0>;
