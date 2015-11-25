@@ -41,6 +41,7 @@ public:
 	}
 	static constexpr auto is_specialized = real_numeric_limits::is_specialized;
 	static constexpr auto is_integer = real_numeric_limits::is_integer;
+	static constexpr auto is_bounded = real_numeric_limits::is_bounded;
 };
 
 template<intmax_t minimum, intmax_t maximum, typename overflow_policy, storage_type storage, bool poisoned>
@@ -53,6 +54,7 @@ struct basic_numeric_limits<integer<minimum, maximum, overflow_policy, storage, 
 	}
 	static constexpr auto is_specialized = true;
 	static constexpr auto is_integer = true;
+	static constexpr auto is_bounded = true;
 };
 
 template<typename T, T value>
@@ -65,6 +67,7 @@ struct basic_numeric_limits<std::integral_constant<T, value>> {
 	}
 	static constexpr auto is_specialized = std::numeric_limits<T>::is_specialized;
 	static constexpr auto is_integer = std::numeric_limits<T>::is_integer;
+	static constexpr auto is_bounded = true;
 };
 
 }	// namespace bounded

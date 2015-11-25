@@ -1446,15 +1446,20 @@ struct basic_numeric_limits<bounded_enum> {
 	}
 	static constexpr bool is_specialized = true;
 	static constexpr bool is_integer = false;
+	static constexpr bool is_bounded = true;
 };
 }
 
 namespace {
 
 namespace check_enum_construction {
-	enum unscoped_enum {};
+	enum unscoped_enum : int {};
 	constexpr bounded::integer<0, 10> x(unscoped_enum{});
 	constexpr auto a = bounded::make(unscoped_enum{});
+	static_assert(std::is_same<
+		std::remove_const_t<decltype(a)>,
+		bounded::equivalent_type<std::underlying_type_t<unscoped_enum>>
+	>::value);
 	
 	enum class scoped_enum {};
 	constexpr bounded::integer<0, 10> y(scoped_enum{});

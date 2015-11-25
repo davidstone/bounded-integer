@@ -38,7 +38,33 @@ struct equivalent_overflow_policy_c<integer<minimum, maximum, overflow_policy, s
 };
 
 template<typename T>
-using equivalent_overflow_policy = typename equivalent_overflow_policy_c<T>::type;
+using equivalent_overflow_policy = typename equivalent_overflow_policy_c<std::decay_t<T>>::type;
+
+template<typename T, typename overflow_policy, storage_type storage, bool is_specialized = basic_numeric_limits<T>::is_specialized>
+struct equivalent_type_c;
+
+template<typename T, typename overflow_policy, storage_type storage>
+struct equivalent_type_c<T, overflow_policy, storage, true> {
+	using type = integer<
+		static_cast<std::intmax_t>(basic_numeric_limits<T>::min()),
+		static_cast<std::intmax_t>(basic_numeric_limits<T>::max()),
+		overflow_policy,
+		storage,
+		std::is_integral<T>::value
+	>;
+};
+
+template<typename T, typename overflow_policy, storage_type storage>
+struct equivalent_type_c<T, overflow_policy, storage, false> {
+	static_assert(std::is_enum<T>::value);
+	using type = integer<
+		basic_numeric_limits<std::underlying_type_t<T>>::min(),
+		basic_numeric_limits<std::underlying_type_t<T>>::max(),
+		overflow_policy,
+		storage,
+		true
+	>;
+};
 
 }	// namespace detail
 
@@ -47,13 +73,7 @@ template<
 	typename overflow_policy = detail::equivalent_overflow_policy<T>,
 	storage_type storage = storage_type::fast
 >
-using equivalent_type = integer<
-	static_cast<std::intmax_t>(basic_numeric_limits<T>::min()),
-	static_cast<std::intmax_t>(basic_numeric_limits<T>::max()),
-	overflow_policy,
-	storage,
-	not is_bounded_integer<T>
->;
+using equivalent_type = typename detail::equivalent_type_c<std::decay_t<T>, overflow_policy, storage>::type;
 
 // This somewhat strange looking set of default arguments allows the following:
 //
@@ -86,6 +106,8 @@ constexpr auto make(T const & value) noexcept -> equivalent_type<
 	>,
 	storage
 > {
+	static_assert(basic_numeric_limits<T>::is_specialized or std::is_enum<T>::value, "Argument to bounded::make must specialize std::numeric_limits or be an enum.");
+	static_assert(basic_numeric_limits<T>::is_bounded or std::is_enum<T>::value, "Argument to bounded::make must be a bounded type.");
 	return {value, non_check};
 }
 
