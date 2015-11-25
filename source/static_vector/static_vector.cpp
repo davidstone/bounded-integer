@@ -135,6 +135,7 @@ int main() {
 		bounded::checked_integer<0, 9, std::out_of_range>
 	>::value);
 	static_assert(!containers::is_iterator<containers::static_vector<std::string, 6>>);
+	static_assert(containers::is_container<containers::static_vector<std::string, 6>>);
 
 	insert(container, container.begin() + 1_bi, 5_bi, 12);
 	auto const expected = { 1, 12, 12, 12, 12, 12, 2, 3 };
