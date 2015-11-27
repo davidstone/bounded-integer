@@ -86,7 +86,7 @@ constexpr auto crend(Container const & container) BOUNDED_NOEXCEPT(
 template<typename Container, typename Index, BOUNDED_REQUIRES(is_container<Container>)>
 constexpr decltype(auto) at(Container && container, Index const index) BOUNDED_NOEXCEPT(
 	std::forward<Container>(container)[typename index_type<Container>::overflow_policy{}.assignment(
-		index,
+		bounded::make(index),
 		bounded::constant<0>,
 		size(container) - bounded::constant<1>
 	)]
