@@ -74,6 +74,9 @@ public:
 	constexpr moving_vector(moving_vector && other, allocator_type const &):
 		moving_vector(std::move(other)) {
 	}
+	
+	auto operator=(moving_vector const &) & -> moving_vector & = default;
+	constexpr auto operator=(moving_vector &&) & noexcept -> moving_vector & = default;
 
 	constexpr auto begin() const noexcept {
 		return const_iterator(moving_begin());
