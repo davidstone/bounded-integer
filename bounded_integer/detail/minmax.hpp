@@ -20,6 +20,7 @@
 #include "common_type.hpp"
 #include "common_type_and_value_category.hpp"
 #include "comparison.hpp"
+#include "comparison_function_object.hpp"
 #include "is_bounded_integer.hpp"
 #include "noexcept.hpp"
 #include "overlapping_range.hpp"
@@ -31,23 +32,6 @@
 namespace bounded {
 namespace detail {
 namespace minmax {
-
-// These are defined because the standard versions do not have noexcept
-// specifications.
-//
-// TODO: Add total ordering for pointer types
-struct less {
-	template<typename LHS, typename RHS>
-	constexpr auto operator()(LHS && lhs, RHS && rhs) const BOUNDED_NOEXCEPT(
-		std::forward<LHS>(lhs) < std::forward<RHS>(rhs)
-	)
-};
-struct greater {
-	template<typename LHS, typename RHS>
-	constexpr auto operator()(LHS && lhs, RHS && rhs) const BOUNDED_NOEXCEPT(
-		std::forward<LHS>(lhs) > std::forward<RHS>(rhs)
-	)
-};
 
 template<typename Target, typename Source, BOUNDED_REQUIRES(is_bounded_integer<Target> and not std::is_reference<Target>::value)>
 constexpr Target construct(Source && source) noexcept {
@@ -188,11 +172,11 @@ constexpr decltype(auto) extreme(Compare compare, T1 && t1, T2 && t2, Ts && ... 
 
 template<typename... Ts>
 constexpr decltype(auto) min(Ts && ... ts) BOUNDED_NOEXCEPT(
-	extreme(detail::minmax::less{}, std::forward<Ts>(ts)...)
+	extreme(less{}, std::forward<Ts>(ts)...)
 )
 template<typename... Ts>
 constexpr decltype(auto) max(Ts && ... ts) BOUNDED_NOEXCEPT(
-	extreme(detail::minmax::greater{}, std::forward<Ts>(ts)...)
+	extreme(greater{}, std::forward<Ts>(ts)...)
 )
 
 }	// namespace bounded

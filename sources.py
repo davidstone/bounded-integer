@@ -32,6 +32,7 @@ sources += prepend_dir('detail', [
 	'common_type_and_value_category.cpp',
 	'comparison.cpp',
 	'comparison_builtin.cpp',
+	'comparison_function_object.cpp',
 	'conditional.cpp',
 	'forward_declaration.cpp',
 	'hash.cpp',
