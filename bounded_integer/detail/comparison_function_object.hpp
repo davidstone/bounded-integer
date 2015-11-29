@@ -24,13 +24,13 @@ namespace bounded {
 // TODO: Add total ordering for pointer types
 struct less {
 	template<typename LHS, typename RHS>
-	constexpr auto operator()(LHS && lhs, RHS && rhs) const BOUNDED_NOEXCEPT(
+	constexpr decltype(auto) operator()(LHS && lhs, RHS && rhs) const BOUNDED_NOEXCEPT(
 		std::forward<LHS>(lhs) < std::forward<RHS>(rhs)
 	)
 };
 struct greater {
 	template<typename LHS, typename RHS>
-	constexpr auto operator()(LHS && lhs, RHS && rhs) const BOUNDED_NOEXCEPT(
+	constexpr decltype(auto) operator()(LHS && lhs, RHS && rhs) const BOUNDED_NOEXCEPT(
 		std::forward<LHS>(lhs) > std::forward<RHS>(rhs)
 	)
 };
