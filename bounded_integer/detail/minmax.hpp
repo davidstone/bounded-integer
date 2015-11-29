@@ -21,6 +21,7 @@
 #include "common_type_and_value_category.hpp"
 #include "comparison.hpp"
 #include "is_bounded_integer.hpp"
+#include "noexcept.hpp"
 #include "overlapping_range.hpp"
 #include "requires.hpp"
 #include "policy/common_policy.hpp"
@@ -37,15 +38,15 @@ namespace minmax {
 // TODO: Add total ordering for pointer types
 struct less {
 	template<typename LHS, typename RHS>
-	constexpr auto operator()(LHS && lhs, RHS && rhs) const noexcept(noexcept(std::forward<LHS>(lhs) < std::forward<RHS>(rhs))) {
-		return std::forward<LHS>(lhs) < std::forward<RHS>(rhs);
-	}
+	constexpr auto operator()(LHS && lhs, RHS && rhs) const BOUNDED_NOEXCEPT(
+		std::forward<LHS>(lhs) < std::forward<RHS>(rhs)
+	)
 };
 struct greater {
 	template<typename LHS, typename RHS>
-	constexpr auto operator()(LHS && lhs, RHS && rhs) const noexcept(noexcept(std::forward<LHS>(lhs) > std::forward<RHS>(rhs))) {
-		return std::forward<LHS>(lhs) > std::forward<RHS>(rhs);
-	}
+	constexpr auto operator()(LHS && lhs, RHS && rhs) const BOUNDED_NOEXCEPT(
+		std::forward<LHS>(lhs) > std::forward<RHS>(rhs)
+	)
 };
 
 template<typename Target, typename Source, BOUNDED_REQUIRES(is_bounded_integer<Target> and not std::is_reference<Target>::value)>
@@ -135,7 +136,7 @@ template<typename Compare, typename T1, typename T2, BOUNDED_REQUIRES(
 	(detail::types_overlap<extreme_t<Compare, T1, T2>, T1>::value and
 	detail::types_overlap<extreme_t<Compare, T1, T2>, T2>::value)
 )>
-constexpr decltype(auto) extreme(Compare compare, T1 && t1, T2 && t2) noexcept(noexcept(compare(std::forward<T1>(t1), std::forward<T2>(t2)))) {
+constexpr decltype(auto) extreme(Compare compare, T1 && t1, T2 && t2) noexcept(noexcept(compare(t1, t2))) {
 	using result_type = detail::add_common_cv_reference_t<extreme_t<Compare, T1, T2>, T1, T2>;
 	return compare(t2, t1) ?
 		detail::minmax::construct<result_type>(std::forward<T2>(t2)) :
@@ -186,12 +187,12 @@ constexpr decltype(auto) extreme(Compare compare, T1 && t1, T2 && t2, Ts && ... 
 }
 
 template<typename... Ts>
-constexpr decltype(auto) min(Ts && ... ts) noexcept(detail::minmax::noexcept_comparable<detail::minmax::less, Ts...>::value) {
-	return extreme(detail::minmax::less{}, std::forward<Ts>(ts)...);
-}
+constexpr decltype(auto) min(Ts && ... ts) BOUNDED_NOEXCEPT(
+	extreme(detail::minmax::less{}, std::forward<Ts>(ts)...)
+)
 template<typename... Ts>
-constexpr decltype(auto) max(Ts && ... ts) noexcept(detail::minmax::noexcept_comparable<detail::minmax::greater, Ts...>::value) {
-	return extreme(detail::minmax::greater{}, std::forward<Ts>(ts)...);
-}
+constexpr decltype(auto) max(Ts && ... ts) BOUNDED_NOEXCEPT(
+	extreme(detail::minmax::greater{}, std::forward<Ts>(ts)...)
+)
 
 }	// namespace bounded
