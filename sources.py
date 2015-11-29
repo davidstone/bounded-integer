@@ -25,6 +25,7 @@ common_sources = [
 	'legacy_iterator.cpp',
 	'algorithms/count.cpp',
 	'algorithms/iterator.cpp',
+	'algorithms/negate.cpp',
 ]
 
 flat_map_sources = common_sources + [

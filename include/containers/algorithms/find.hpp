@@ -16,6 +16,8 @@
 
 #pragma once
 
+#include <containers/algorithms/negate.hpp>
+
 #include <bounded_integer/bounded_integer.hpp>
 
 #include <type_traits>
@@ -31,6 +33,11 @@ constexpr auto find_if(InputIterator first, Sentinel const last, UnaryPredicate 
 	}
 	return first;
 }
+
+template<typename InputIterator, typename Sentinel, typename UnaryPredicate>
+constexpr auto find_if_not(InputIterator const first, Sentinel const last, UnaryPredicate p) BOUNDED_NOEXCEPT(
+	find_if(first, last, negate(std::move(p)))
+)
 
 template<typename InputIterator, typename Sentinel, typename T>
 constexpr auto find(InputIterator first, Sentinel const last, T const & value) {
