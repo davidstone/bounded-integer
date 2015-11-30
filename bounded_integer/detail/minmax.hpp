@@ -172,11 +172,11 @@ constexpr decltype(auto) extreme(Compare compare, T1 && t1, T2 && t2, Ts && ... 
 
 template<typename... Ts>
 constexpr decltype(auto) min(Ts && ... ts) BOUNDED_NOEXCEPT(
-	extreme(less{}, std::forward<Ts>(ts)...)
+	extreme(less(), std::forward<Ts>(ts)...)
 )
 template<typename... Ts>
 constexpr decltype(auto) max(Ts && ... ts) BOUNDED_NOEXCEPT(
-	extreme(greater{}, std::forward<Ts>(ts)...)
+	extreme(greater(), std::forward<Ts>(ts)...)
 )
 
 }	// namespace bounded
