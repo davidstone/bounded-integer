@@ -36,12 +36,12 @@ constexpr auto find_if(InputIterator first, Sentinel const last, UnaryPredicate 
 
 template<typename InputIterator, typename Sentinel, typename UnaryPredicate>
 constexpr auto find_if_not(InputIterator const first, Sentinel const last, UnaryPredicate p) BOUNDED_NOEXCEPT(
-	find_if(first, last, negate(std::move(p)))
+	::containers::find_if(first, last, ::containers::negate(std::move(p)))
 )
 
 template<typename InputIterator, typename Sentinel, typename T>
 constexpr auto find(InputIterator const first, Sentinel const last, T const & value) BOUNDED_NOEXCEPT(
-	find_if(first, last, bounded::equal_to(value))
+	::containers::find_if(first, last, bounded::equal_to(value))
 )
 
 }	// namespace containers

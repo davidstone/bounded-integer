@@ -40,7 +40,7 @@ constexpr auto remove_if(ForwardIterator const first, Sentinel const last, Predi
 
 template<typename ForwardIterator, typename Sentinel, typename T>
 constexpr auto remove(ForwardIterator const first, Sentinel const last, T const & value) BOUNDED_NOEXCEPT(
-	remove_if(first, last, bounded::equal_to(value))
+	::containers::remove_if(first, last, bounded::equal_to(value))
 )
 
 
