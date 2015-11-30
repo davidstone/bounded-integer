@@ -36,10 +36,8 @@ constexpr auto count_if(InputIterator first, Sentinel const last, Predicate pred
 }
 
 template<typename InputIterator, typename Sentinel, typename T>
-constexpr auto count(InputIterator first, Sentinel last, T const & value) {
-	return count_if(std::move(first), std::move(last), [&](auto const & v) {
-		return v == value;
-	});
-}
+constexpr auto count(InputIterator first, Sentinel last, T const & value) BOUNDED_NOEXCEPT(
+	count_if(std::move(first), std::move(last), bounded::equal_to(value))
+)
 
 }	// namespace containers

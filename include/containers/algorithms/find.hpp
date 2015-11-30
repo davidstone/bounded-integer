@@ -40,8 +40,8 @@ constexpr auto find_if_not(InputIterator const first, Sentinel const last, Unary
 )
 
 template<typename InputIterator, typename Sentinel, typename T>
-constexpr auto find(InputIterator first, Sentinel const last, T const & value) {
-	return find_if(first, last, [&](auto const & other) { return other == value; });
-}
+constexpr auto find(InputIterator const first, Sentinel const last, T const & value) BOUNDED_NOEXCEPT(
+	find_if(first, last, bounded::equal_to(value))
+)
 
 }	// namespace containers

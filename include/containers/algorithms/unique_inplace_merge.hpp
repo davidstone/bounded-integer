@@ -18,6 +18,7 @@
 
 #include <containers/algorithms/find.hpp>
 #include <containers/algorithms/iterator.hpp>
+#include <containers/algorithms/negate.hpp>
 #include <containers/dynamic_array/dynamic_array.hpp>
 
 #include <functional>
@@ -101,11 +102,11 @@ constexpr auto unique(MutableForwardIterator const first, Sentinel const last, B
 
 template<typename InputIterator, typename Sentinel, typename MutableForwardIterator, typename BinaryPredicate = std::less<>>
 constexpr auto unique_copy_less(InputIterator const first, Sentinel const last, MutableForwardIterator const output, BinaryPredicate less = BinaryPredicate{}) {
-	return ::containers::detail::unique_copy(first, last, output, [=](auto const & lhs, auto const & rhs) { return !less(lhs, rhs); });
+	return ::containers::detail::unique_copy(first, last, output, negate(less));
 }
 template<typename MutableForwardIterator, typename Sentinel, typename BinaryPredicate = std::less<>>
 constexpr auto unique_less(MutableForwardIterator const first, Sentinel const last, BinaryPredicate less = BinaryPredicate{}) {
-	return ::containers::detail::unique(first, last, [=](auto const & lhs, auto const & rhs) { return !less(lhs, rhs); });
+	return ::containers::detail::unique(first, last, negate(less));
 }
 
 

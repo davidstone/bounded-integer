@@ -18,6 +18,8 @@
 
 #include <containers/algorithms/iterator.hpp>
 
+#include <bounded_integer/bounded_integer.hpp>
+
 #include <value_ptr/value_ptr.hpp>
 
 #include <algorithm>
@@ -440,9 +442,7 @@ public:
 		}
 	}
 	void remove(value_type const & value) {
-		remove_if([&](value_type const & other) {
-			return other == value;
-		});
+		remove_if(bounded::equal_to(value));
 	}
 	
 	// should this be noexcept?
