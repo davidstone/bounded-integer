@@ -18,6 +18,8 @@
 #include <containers/algorithms/find.hpp>
 #include <containers/algorithms/iterator.hpp>
 
+#include <bounded_integer/bounded_integer.hpp>
+
 #include <utility>
 
 namespace containers {
@@ -35,5 +37,11 @@ constexpr auto remove_if(ForwardIterator const first, Sentinel const last, Predi
 	}
 	return new_last;
 }
+
+template<typename ForwardIterator, typename Sentinel, typename T>
+constexpr auto remove(ForwardIterator const first, Sentinel const last, T const & value) BOUNDED_NOEXCEPT(
+	remove_if(first, last, bounded::equal_to(value))
+)
+
 
 }	// namespace containers
