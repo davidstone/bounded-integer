@@ -48,6 +48,7 @@ template<typename Exception = policy_detail::default_exception>
 struct throw_policy {
 	constexpr throw_policy() noexcept {}
 
+	// TODO: Conditional noexcept
 	template<typename T, typename Minimum, typename Maximum>
 	static constexpr auto assignment(T && value, Minimum && minimum, Maximum && maximum) {
 		static_assert(is_bounded_integer<Minimum>, "Only bounded::integer types are supported.");
