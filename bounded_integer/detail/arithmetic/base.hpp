@@ -39,7 +39,10 @@ struct min_max_t {
 
 template<typename Min, typename Max>
 constexpr auto min_max(Min && min, Max && max) BOUNDED_NOEXCEPT(
-	(min_max_t<std::remove_cv_t<std::remove_reference_t<Min>>, std::remove_cv_t<std::remove_reference_t<Max>>>(std::forward<Min>(min), std::forward<Max>(max)))
+	min_max_t<
+		std::remove_cv_t<std::remove_reference_t<Min>>,
+		std::remove_cv_t<std::remove_reference_t<Max>>
+	>(std::forward<Min>(min), std::forward<Max>(max))
 )
 
 }	// namespace detail
