@@ -248,18 +248,22 @@ public:
 		BOUNDED_NOEXCEPT_INITIALIZATION(optional(std::move(other), common_init_tag{})) {
 	}
 
-	#if 0
-	// Not sure if these two constructors should exist or whether they should
-	// have implicit versions in addition to the explicit verisons
-	template<typename U>
+	template<typename U, BOUNDED_REQUIRES(std::is_convertible<U const &, value_type>::value)>
+	constexpr optional(optional<U> const & other)
+		BOUNDED_NOEXCEPT_INITIALIZATION(optional(other, common_init_tag{})) {
+	}
+	template<typename U, BOUNDED_REQUIRES(std::is_convertible<U &&, value_type>::value)>
+	constexpr optional(optional<U> && other)
+		BOUNDED_NOEXCEPT_INITIALIZATION(optional(std::move(other), common_init_tag{})) {
+	}
+	template<typename U, BOUNDED_REQUIRES(!std::is_convertible<U const &, value_type>::value and std::is_constructible<value_type, U const &>::value)>
 	constexpr explicit optional(optional<U> const & other)
 		BOUNDED_NOEXCEPT_INITIALIZATION(optional(other, common_init_tag{})) {
 	}
-	template<typename U>
+	template<typename U, BOUNDED_REQUIRES(!std::is_convertible<U &&, value_type>::value and std::is_constructible<value_type, U &&>::value)>
 	constexpr explicit optional(optional<U> && other)
 		BOUNDED_NOEXCEPT_INITIALIZATION(optional(std::move(other), common_init_tag{})) {
 	}
-	#endif
 
 	
 	constexpr auto operator*() const & -> value_type const & {
