@@ -20,8 +20,6 @@
 
 #include <bounded_integer/bounded_integer.hpp>
 
-#include <cassert>
-
 namespace {
 using namespace bounded::literal;
 
@@ -38,16 +36,18 @@ constexpr containers::array<int, 0> empty_array = {{}};
 static_assert(empty_array.begin() == empty_array.end(), "Empty array.");
 // static_assert(empty_array[0_bi] == 0, "Should not compile.");
 
-auto check_count() {
-	constexpr auto array = containers::make_array(0_bi, 3_bi, 2_bi, 3_bi, 5_bi);
-	assert(containers::count(std::begin(array), std::end(array), 3_bi) == 2_bi);
-	assert(containers::count(std::begin(array), std::end(array), 2_bi) == 1_bi);
-	assert(containers::count(std::begin(array), std::end(array), 7_bi) == 0_bi);
-	assert(containers::count_if(std::begin(array), std::end(array), [](auto){ return true; }) == containers::size(array));
-}
+constexpr auto array = containers::make_array(0_bi, 3_bi, 2_bi, 3_bi, 5_bi);
+static_assert(containers::count(array.begin(), array.end(), 3_bi) == 2_bi);
+static_assert(containers::count(array.begin(), array.end(), 2_bi) == 1_bi);
+static_assert(containers::count(array.begin(), array.end(), 7_bi) == 0_bi);
+
+struct true_function {
+	template<typename... Args>
+	constexpr auto operator()(Args && ...) noexcept { return true; }
+};
+static_assert(containers::count_if(array.begin(), array.end(), true_function{}) == containers::size(array));
 
 }	// namespace
 
 auto main() -> int {
-	check_count();
 }
