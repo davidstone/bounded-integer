@@ -51,7 +51,8 @@ constexpr auto operator--(T & value, int) noexcept(std::is_nothrow_copy_construc
 
 #define BOUNDED_COMMON_ARITHMETIC \
 	using bounded::detail::arithmetic::operator++; \
-	using bounded::detail::arithmetic::operator--;
+	using bounded::detail::arithmetic::operator--; \
+	using bounded::detail::arithmetic::operator-;
 
 }	// namespace arithmetic
 

@@ -1,4 +1,3 @@
-// Subtraction operator overload when each argument is a bounded::integer
 // Copyright (C) 2015 David Stone
 //
 // This program is free software: you can redistribute it and / or modify
@@ -16,22 +15,28 @@
 
 #pragma once
 
-#include "base.hpp"
+#include "plus.hpp"
+#include "unary_minus.hpp"
+
+#include "../basic_numeric_limits.hpp"
+#include "../noexcept.hpp"
 
 namespace bounded {
 namespace detail {
+namespace arithmetic {
 
 template<typename LHS, typename RHS>
-constexpr auto minus_operator_range(LHS const & lhs, RHS const & rhs) noexcept {
-	return min_max(
-		lhs.min - rhs.max,
-		lhs.max - rhs.min
-	);
-}
+constexpr auto operator-(LHS && lhs, RHS && rhs) BOUNDED_NOEXCEPT_DECLTYPE(
+	std::forward<LHS>(lhs) + -std::forward<RHS>(rhs)
+)
+
+}	// namespace arithmetic
+
+using bounded::detail::arithmetic::operator-;
 
 }	// namespace detail
 
-BOUNDED_INTEGER_OPERATOR_OVERLOADS(-, detail::minus_operator_range)
+using bounded::detail::arithmetic::operator-;
 
 }	// namespace bounded
 
