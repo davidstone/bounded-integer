@@ -27,7 +27,8 @@ namespace detail {
 	using ::bounded::operator!=; \
 	using ::bounded::operator>; \
 	using ::bounded::operator<=; \
-	using ::bounded::operator>=;
+	using ::bounded::operator>=; \
+	BOUNDED_COMMON_ARITHMETIC
 
 CONTAINERS_COMMON_USING_DECLARATIONS
 

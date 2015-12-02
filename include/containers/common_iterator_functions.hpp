@@ -44,65 +44,12 @@ constexpr auto operator+(Offset const offset, Iterator const it) BOUNDED_NOEXCEP
 	it + offset
 )
 
-
-template<typename Iterator, typename Offset, BOUNDED_REQUIRES(is_iterator<Iterator> and std::numeric_limits<Offset>::is_integer)>
-constexpr auto operator-(Iterator const it, Offset const offset) BOUNDED_NOEXCEPT(
-	it + -offset
-)
-
-
-template<typename Iterator, typename Offset, BOUNDED_REQUIRES(is_iterator<Iterator> and std::numeric_limits<Offset>::is_integer)>
-constexpr decltype(auto) operator+=(Iterator & it, Offset const offset) BOUNDED_NOEXCEPT(
-	it = it + offset
-)
-
-template<typename Iterator, typename Offset, BOUNDED_REQUIRES(is_iterator<Iterator> and std::numeric_limits<Offset>::is_integer)>
-constexpr decltype(auto) operator-=(Iterator & it, Offset const offset) BOUNDED_NOEXCEPT(
-	it = it - offset
-)
-
-
-template<typename Iterator, BOUNDED_REQUIRES(is_iterator<Iterator>)>
-constexpr decltype(auto) operator++(Iterator & it) BOUNDED_NOEXCEPT(
-	it += bounded::constant<1>
-)
-
-template<typename Iterator, BOUNDED_REQUIRES(is_iterator<Iterator>)>
-constexpr auto operator++(Iterator & it, int) noexcept(std::is_nothrow_copy_constructible<Iterator>::value and noexcept(++it)) {
-	auto temp = it;
-	++it;
-	return temp;
-}
-
-
-template<typename Iterator, BOUNDED_REQUIRES(is_iterator<Iterator>)>
-constexpr decltype(auto) operator--(Iterator & it) BOUNDED_NOEXCEPT(
-	it -= bounded::constant<1>
-)
-
-template<typename Iterator, BOUNDED_REQUIRES(is_iterator<Iterator>)>
-constexpr auto operator--(Iterator & it, int) noexcept(std::is_nothrow_copy_constructible<Iterator>::value and noexcept(--it)) {
-	auto temp = it;
-	--it;
-	return temp;
-}
-
-#define CONTAINERS_COMMON_USING_DECLARATIONS \
-	using containers::detail::common::operator+; \
-	using containers::detail::common::operator-; \
-	using containers::detail::common::operator+=; \
-	using containers::detail::common::operator-=; \
-	using containers::detail::common::operator++; \
-	using containers::detail::common::operator--;
-
 }	// namespace common
 
-CONTAINERS_COMMON_USING_DECLARATIONS
+using containers::detail::common::operator+;
 
 }	// namespace detail
 
-CONTAINERS_COMMON_USING_DECLARATIONS
-
-#undef CONTAINERS_COMMON_USING_DECLARATIONS
+using containers::detail::common::operator+;
 
 }	// namespace containers
