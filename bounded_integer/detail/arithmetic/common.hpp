@@ -22,6 +22,7 @@
 
 namespace bounded {
 namespace detail {
+namespace arithmetic {
 
 template<typename T>
 constexpr auto operator++(T & value) BOUNDED_NOEXCEPT_DECLTYPE(
@@ -49,8 +50,12 @@ constexpr auto operator--(T & value, int) noexcept(std::is_nothrow_copy_construc
 }
 
 #define BOUNDED_COMMON_ARITHMETIC \
-	using bounded::detail::operator++; \
-	using bounded::detail::operator--;
+	using bounded::detail::arithmetic::operator++; \
+	using bounded::detail::arithmetic::operator--;
+
+}	// namespace arithmetic
+
+BOUNDED_COMMON_ARITHMETIC
 
 }	// namespace detail
 
