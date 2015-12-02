@@ -54,7 +54,10 @@ programs = [
 	),
 	Program(
 		'static_vector',
-		sources = common_sources + ['static_vector/static_vector.cpp'],
+		sources = common_sources + [
+			'static_vector/make_static_vector.cpp',
+			'static_vector/static_vector.cpp',
+		],
 		include_directories = include_directories
 	),
 	Program(
