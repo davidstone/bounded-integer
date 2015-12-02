@@ -43,7 +43,7 @@ template< \
 	BOUNDED_REQUIRES(basic_numeric_limits<T>::is_integer) \
 > \
 constexpr auto operator symbol(T const lhs, integer<rhs_min, rhs_max, overflow, storage, poisoned> const rhs) noexcept { \
-	return make(lhs) symbol rhs; \
+	return lhs symbol rhs.value(); \
 }
 
 

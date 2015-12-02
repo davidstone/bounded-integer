@@ -98,18 +98,6 @@ template<typename T>
 constexpr auto operator+(typename integer_range_iterator<T>::difference_type const & lhs, integer_range_iterator<T> const & rhs) {
 	return rhs + lhs;
 }
-template<typename T>
-decltype(auto) operator+=(integer_range_iterator<T> & lhs, typename integer_range_iterator<T>::difference_type const & rhs) {
-	return lhs = lhs + rhs;
-}
-template<typename T>
-constexpr auto operator-(integer_range_iterator<T> const & lhs, typename integer_range_iterator<T>::difference_type const & rhs) {
-	return lhs + (-rhs);
-}
-template<typename T>
-decltype(auto) operator-=(integer_range_iterator<T> & lhs, typename integer_range_iterator<T>::difference_type const & rhs) {
-	return lhs = lhs - rhs;
-}
 
 }	// namespace detail
 

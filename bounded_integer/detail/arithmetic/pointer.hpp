@@ -16,7 +16,7 @@
 
 #pragma once
 
-#include "minus.hpp"
+#include "common.hpp"
 
 #include "../is_bounded_integer.hpp"
 #include "../requires.hpp"
@@ -31,16 +31,6 @@ constexpr auto operator+(T * const pointer, Integer const & number) noexcept {
 template<typename Integer, typename T, BOUNDED_REQUIRES(is_bounded_integer<Integer>)>
 constexpr auto operator+(Integer const & number, T * const pointer) noexcept {
 	return number.value() + pointer;
-}
-
-template<typename T, typename Integer, BOUNDED_REQUIRES(is_bounded_integer<Integer>)>
-constexpr auto & operator+=(T * & pointer, Integer const & number) noexcept {
-	return pointer += number.value();
-}
-
-template<typename T, typename Integer, BOUNDED_REQUIRES(is_bounded_integer<Integer>)>
-constexpr auto & operator-=(T * & pointer, Integer const & number) noexcept {
-	return pointer -= number.value();
 }
 
 // Not possible to overload operator[]. See

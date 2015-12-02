@@ -1219,7 +1219,7 @@ auto check_compound_arithmetic() {
 	// s += 4_bi;
 	// assert(s == 4);
 	int i = 9;
-	i -= bounded::make(68);
+	i -= 68_bi;
 	assert(i == -59);
 	long l = -7;
 	l *= z + 1_bi;
