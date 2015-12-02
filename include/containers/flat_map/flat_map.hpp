@@ -18,6 +18,7 @@
 
 #include <containers/common_container_functions.hpp>
 #include <containers/apply_tuple.hpp>
+#include <containers/algorithms/negate.hpp>
 #include <containers/algorithms/iterator.hpp>
 #include <containers/algorithms/unique_inplace_merge.hpp>
 #include <containers/legacy_iterator.hpp>
@@ -106,9 +107,7 @@ public:
 		auto const less = indirect_compare(value_comp());
 		std::sort(moving_begin(container()), moving_end(container()), less);
 		// At some point this should be unique_sort
-		auto const equal = [&](auto const & lhs, auto const & rhs) {
-			return !less(lhs, rhs) and !less(rhs, lhs);
-		};
+		auto const equal = ::containers::negate(less);
 		::containers::erase(
 			container(),
 			moving_to_standard_iterator(::containers::detail::unique(moving_begin(container()), moving_end(container()), equal)),
