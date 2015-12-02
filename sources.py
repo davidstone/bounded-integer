@@ -55,6 +55,7 @@ programs = [
 	Program(
 		'static_vector',
 		sources = common_sources + [
+			'static_vector/forward_declaration.cpp',
 			'static_vector/make_static_vector.cpp',
 			'static_vector/static_vector.cpp',
 		],
