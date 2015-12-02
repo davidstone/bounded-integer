@@ -115,6 +115,7 @@ constexpr decltype(auto) extreme(Compare, T1 &&, T2 && t2) noexcept {
 	return detail::minmax::construct<T2>(std::forward<T2>(t2));
 }
 
+// TODO: Fix noexcept specification
 template<typename Compare, typename T1, typename T2, BOUNDED_REQUIRES(
 	(not basic_numeric_limits<T1>::is_specialized or not basic_numeric_limits<T2>::is_specialized) or
 	(detail::types_overlap<extreme_t<Compare, T1, T2>, T1>::value and
@@ -171,11 +172,11 @@ constexpr decltype(auto) extreme(Compare compare, T1 && t1, T2 && t2, Ts && ... 
 }
 
 template<typename... Ts>
-constexpr decltype(auto) min(Ts && ... ts) BOUNDED_NOEXCEPT(
+constexpr auto min(Ts && ... ts) BOUNDED_NOEXCEPT_DECLTYPE(
 	extreme(less(), std::forward<Ts>(ts)...)
 )
 template<typename... Ts>
-constexpr decltype(auto) max(Ts && ... ts) BOUNDED_NOEXCEPT(
+constexpr auto max(Ts && ... ts) BOUNDED_NOEXCEPT_DECLTYPE(
 	extreme(greater(), std::forward<Ts>(ts)...)
 )
 

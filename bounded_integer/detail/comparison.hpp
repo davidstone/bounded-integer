@@ -81,20 +81,20 @@ constexpr auto operator<(integer<lhs_min, lhs_max, lhs_overflow, lhs_storage, lh
 namespace detail {
 
 template<typename LHS, typename RHS>
-constexpr auto operator!=(LHS const & lhs, RHS const & rhs) BOUNDED_NOEXCEPT(
+constexpr auto operator!=(LHS const & lhs, RHS const & rhs) BOUNDED_NOEXCEPT_DECLTYPE(
 	!(lhs == rhs)
 )
 
 template<typename LHS, typename RHS>
-constexpr auto operator>(LHS const & lhs, RHS const & rhs) BOUNDED_NOEXCEPT(
+constexpr auto operator>(LHS const & lhs, RHS const & rhs) BOUNDED_NOEXCEPT_DECLTYPE(
 	rhs < lhs
 )
 template<typename LHS, typename RHS>
-constexpr auto operator<=(LHS const & lhs, RHS const & rhs) BOUNDED_NOEXCEPT(
+constexpr auto operator<=(LHS const & lhs, RHS const & rhs) BOUNDED_NOEXCEPT_DECLTYPE(
 	!(rhs < lhs)
 )
 template<typename LHS, typename RHS>
-constexpr auto operator>=(LHS const & lhs, RHS const & rhs) BOUNDED_NOEXCEPT(
+constexpr auto operator>=(LHS const & lhs, RHS const & rhs) BOUNDED_NOEXCEPT_DECLTYPE(
 	!(lhs < rhs)
 )
 

@@ -25,13 +25,13 @@ namespace bounded {
 
 // Other args allow you to declare the conversion as non_check
 template<intmax_t new_minimum, intmax_t minimum, intmax_t maximum, typename overflow_policy, storage_type storage, bool poisoned, typename... Args>
-constexpr auto increase_min(integer<minimum, maximum, overflow_policy, storage, poisoned> const & value, Args && ... args) BOUNDED_NOEXCEPT((
+constexpr auto increase_min(integer<minimum, maximum, overflow_policy, storage, poisoned> const & value, Args && ... args) BOUNDED_NOEXCEPT_VALUE(
 	integer<(new_minimum > minimum) ? new_minimum : minimum, maximum, overflow_policy, storage, poisoned>(value, std::forward<Args>(args)...)
-))
+)
 
 template<intmax_t new_maximum, intmax_t minimum, intmax_t maximum, typename overflow_policy, storage_type storage, bool poisoned, typename... Args>
-constexpr auto decrease_max(integer<minimum, maximum, overflow_policy, storage, poisoned> const & value, Args && ... args) BOUNDED_NOEXCEPT((
+constexpr auto decrease_max(integer<minimum, maximum, overflow_policy, storage, poisoned> const & value, Args && ... args) BOUNDED_NOEXCEPT_VALUE(
 	 integer<minimum, (new_maximum < maximum) ? new_maximum : maximum, overflow_policy, storage, poisoned>(value, std::forward<Args>(args)...)
-))
+)
 
 }	// namespace bounded

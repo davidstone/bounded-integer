@@ -46,7 +46,7 @@ namespace bounded {
 
 #define BOUNDED_INTEGER_COMPOUND_ASSIGNMENT_OPERATOR_TARGET(symbol) \
 template<typename LHS, typename RHS, BOUNDED_REQUIRES(is_bounded_integer<LHS> and basic_numeric_limits<RHS>::is_integer)> \
-constexpr decltype(auto) operator symbol##=(LHS & lhs, RHS && rhs) BOUNDED_NOEXCEPT( \
+constexpr auto operator symbol##=(LHS & lhs, RHS && rhs) BOUNDED_NOEXCEPT_DECLTYPE( \
 	lhs = static_cast<std::decay_t<LHS>>(lhs symbol make<typename std::remove_reference_t<LHS>::overflow_policy>(std::forward<RHS>(rhs))) \
 ) \
 
@@ -62,7 +62,7 @@ BOUNDED_INTEGER_COMPOUND_ASSIGNMENT_OPERATOR_TARGET(%)
 
 #define BOUNDED_INTEGER_COMPOUND_ASSIGNMENT_OPERATOR_SOURCE(symbol) \
 template<typename LHS, typename RHS, BOUNDED_REQUIRES(basic_numeric_limits<LHS>::is_integer and not is_bounded_integer<LHS> and is_bounded_integer<RHS>)> \
-constexpr decltype(auto) operator symbol(LHS & lhs, RHS const & rhs) BOUNDED_NOEXCEPT( \
+constexpr auto operator symbol(LHS & lhs, RHS const & rhs) BOUNDED_NOEXCEPT_DECLTYPE( \
 	lhs symbol rhs.value() \
 )
 

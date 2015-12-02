@@ -24,7 +24,7 @@ namespace bounded {
 namespace detail {
 
 template<typename T>
-constexpr decltype(auto) operator++(T & value) BOUNDED_NOEXCEPT(
+constexpr auto operator++(T & value) BOUNDED_NOEXCEPT_DECLTYPE(
 	value += constant<1>
 )
 
@@ -37,7 +37,7 @@ constexpr auto operator++(T & value, int) noexcept(std::is_nothrow_copy_construc
 
 
 template<typename T>
-constexpr decltype(auto) operator--(T & value) BOUNDED_NOEXCEPT(
+constexpr auto operator--(T & value) BOUNDED_NOEXCEPT_DECLTYPE(
 	value -= constant<1>
 )
 
