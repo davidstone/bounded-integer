@@ -33,6 +33,7 @@
 #include "detail/stream.hpp"
 #include "detail/string.hpp"
 #include "detail/typedefs.hpp"
+#include "detail/arithmetic/common.hpp"
 #include "detail/arithmetic/compound_assignment.hpp"
 #include "detail/arithmetic/operators.hpp"
 #include "detail/arithmetic/operators_builtin.hpp"

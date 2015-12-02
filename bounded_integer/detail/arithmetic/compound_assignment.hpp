@@ -1,4 +1,3 @@
-// Compound assignment operators
 // Copyright (C) 2015 David Stone
 //
 // This program is free software: you can redistribute it and / or modify
@@ -28,8 +27,23 @@
 
 namespace bounded {
 
-// We call make with the target's overflow policy because we need this exact
-// overflow policy. We do not want to rely on common_policy here.
+// It seems as though it would be possible to write a common implementation of
+// operator+= that can be used for any type that defines operator+ and
+// operator=. The problem is with type compatibility. With a bounded::integer,
+// the type returned by operator+ is not the same as the type of the left-hand
+// side, which is what is assumed with the typical approach of implementing
+// operator+ in terms of operator+=. The reverse is also problematic, however.
+// It is also possible for two types to be valid arguments to operator+= without
+// being valid arguments to operator+. This happens with bounded::integer with
+// two different overflow policies and no defined relation -- for instance
+// clamp_policy and modulo_policy. There is no 'best' type for operator+ to
+// return when confronted with conflicting policies. However, for operator+=, we
+// already know the result type is the type of the left-hand side, so we do not
+// care about the policy of the right-hand side.
+//
+// An alternative is to change the definition of operator+ to always return
+// null_policy, which would allow for a generic operator+= definition
+
 #define BOUNDED_INTEGER_COMPOUND_ASSIGNMENT_OPERATOR_TARGET(symbol) \
 template<typename LHS, typename RHS, BOUNDED_REQUIRES(is_bounded_integer<LHS> and basic_numeric_limits<RHS>::is_integer)> \
 constexpr decltype(auto) operator symbol##=(LHS & lhs, RHS && rhs) BOUNDED_NOEXCEPT( \
@@ -60,33 +74,5 @@ BOUNDED_INTEGER_COMPOUND_ASSIGNMENT_OPERATOR_SOURCE(/=)
 BOUNDED_INTEGER_COMPOUND_ASSIGNMENT_OPERATOR_SOURCE(%=)
 
 #undef BOUNDED_INTEGER_COMPOUND_ASSIGNMENT_OPERATOR_SOURCE
-
-
-// Increment / decrement
-
-template<typename Integer, BOUNDED_REQUIRES(is_bounded_integer<Integer>)>
-constexpr decltype(auto) operator++(Integer & value) BOUNDED_NOEXCEPT(
-	value += constant<1>
-)
-
-template<typename Integer, BOUNDED_REQUIRES(is_bounded_integer<Integer>)>
-constexpr auto operator++(Integer & value, int) noexcept(std::is_nothrow_copy_constructible<Integer>::value and noexcept(++value)) {
-	auto previous = value;
-	++value;
-	return previous;
-}
-
-
-template<typename Integer, BOUNDED_REQUIRES(is_bounded_integer<Integer>)>
-constexpr decltype(auto) operator--(Integer & value) BOUNDED_NOEXCEPT(
-	value -= constant<1>
-)
-
-template<typename Integer, BOUNDED_REQUIRES(is_bounded_integer<Integer>)>
-constexpr auto operator--(Integer & value, int) noexcept(std::is_nothrow_copy_constructible<Integer>::value and noexcept(--value)) {
-	auto previous = value;
-	--value;
-	return previous;
-}
 
 }	// namespace bounded

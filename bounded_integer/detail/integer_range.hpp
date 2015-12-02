@@ -21,6 +21,7 @@
 #include "minmax.hpp"
 #include "numeric_limits.hpp"
 
+#include "arithmetic/common.hpp"
 #include "arithmetic/minus.hpp"
 #include "arithmetic/plus.hpp"
 #include "arithmetic/unary_minus.hpp"
@@ -108,28 +109,6 @@ constexpr auto operator-(integer_range_iterator<T> const & lhs, typename integer
 template<typename T>
 decltype(auto) operator-=(integer_range_iterator<T> & lhs, typename integer_range_iterator<T>::difference_type const & rhs) {
 	return lhs = lhs - rhs;
-}
-
-template<typename T>
-decltype(auto) operator++(integer_range_iterator<T> & it) {
-	return it += constant<1>;
-}
-template<typename T>
-auto operator++(integer_range_iterator<T> & it, int) {
-	auto self = it;
-	++it;
-	return self;
-}
-
-template<typename T>
-decltype(auto) operator--(integer_range_iterator<T> & it) {
-	return it -= constant<1>;
-}
-template<typename T>
-auto operator--(integer_range_iterator<T> & it, int) {
-	auto self = it;
-	--it;
-	return self;
 }
 
 }	// namespace detail
