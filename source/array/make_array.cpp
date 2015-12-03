@@ -85,4 +85,24 @@ static_assert(size(typed_array) == 1_bi, "Incorrect size with explicit type.");
 static_assert(std::is_same<decltype(typed_array)::value_type, explicit_type>::value, "Incorrect type with explicit type.");
 static_assert(front(typed_array) == 0_bi, "Incorrect value with explicit type.");
 
+
+constexpr auto array_n = containers::make_array_n(6_bi, 5);
+static_assert(std::is_same<std::decay_t<decltype(array_n)>::value_type, int>::value, "Incorrect type from make_array_n.");
+static_assert(size(array_n) == 6_bi, "Incorrect size from make_array_n.");
+static_assert(array_n[3_bi] == 5, "Incorrect values from make_array_n.");
+
+struct non_copyable {
+	constexpr non_copyable(non_copyable const &) = delete;
+	constexpr non_copyable(non_copyable &&) = default;
+};
+
+constexpr auto array_non_copyable = containers::make_array_n(1_bi, non_copyable{});
+static_assert(size(array_non_copyable) == 1_bi, "Incorrect array size of 1 for move-only types.");
+
+constexpr auto array_empty = containers::make_array_n(0_bi, 2);
+static_assert(empty(array_empty), "Incorrect array size for empty array.");
+
+constexpr auto array_non_copyable_empty = containers::make_array_n(0_bi, non_copyable{});
+static_assert(empty(array_non_copyable_empty), "Incorrect array size for empty array of move-only.");
+
 }	// namespace

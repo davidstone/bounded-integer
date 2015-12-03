@@ -72,4 +72,26 @@ constexpr auto make_array(Args && ... args) noexcept {
 }
 
 
+namespace detail {
+
+// Use the comma operator to expand the variadic pack
+// Move the last element in if possible. Order of evaluation is well-defined for
+// aggregate initialization, so there is no risk of copy-after-move
+template<std::intmax_t size, typename T, std::size_t... indexes>
+constexpr auto make_array_n_impl(T && value, std::index_sequence<indexes...>) BOUNDED_NOEXCEPT_VALUE(
+	array<std::decay_t<T>, size>{ (static_cast<void>(indexes), value)..., std::forward<T>(value) }
+)
+
+}	// namespace detail
+
+template<typename T, typename overflow_policy, bounded::storage_type storage, bool poisoned>
+constexpr auto make_array_n(bounded::constant_t<0, overflow_policy, storage, poisoned>, T &&) noexcept {
+	return array<std::decay_t<T>, 0>{};
+}
+
+template<typename T, std::intmax_t size, typename overflow_policy, bounded::storage_type storage, bool poisoned>
+constexpr auto make_array_n(bounded::constant_t<size, overflow_policy, storage, poisoned>, T && value) noexcept(std::is_nothrow_move_constructible<std::decay_t<T>>::value and std::is_nothrow_constructible<std::decay_t<T>, T &&>::value and (size == 1 or std::is_nothrow_copy_constructible<std::decay_t<T>>::value)) {
+	return detail::make_array_n_impl<size>(std::forward<T>(value), std::make_index_sequence<size - 1>{});
+}
+
 }	// namespace containers
