@@ -17,6 +17,7 @@
 #include <containers/moving_vector/moving_vector.hpp>
 
 #include <containers/algorithms/accumulate.hpp>
+#include <containers/algorithms/unique.hpp>
 
 #include <algorithm>
 #include <cassert>
@@ -43,7 +44,7 @@ int main() {
 	assert((containers::accumulate<bounded::checked_integer<0, 100>>(v.begin(), v.end())) == 2_bi + 5_bi + 6_bi + 2_bi - 3_bi);
 	std::sort(v.begin(), v.end());
 	assert(v == moving_vector<int>({-3, 2, 2, 5, 6}));
-	auto const last = std::unique(v.begin(), v.end());
+	auto const last = containers::unique(v.begin(), v.end());
 	erase(v, last, v.end());
 	assert(v == container_after_unique());
 	moving_vector<moving_vector<int>> inception(5_bi);
