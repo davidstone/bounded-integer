@@ -34,7 +34,7 @@ struct iterator_adapter_t : private std::tuple<Iterator, Function> {
 private:
 	using base = std::tuple<Iterator, Function>;
 public:
-	using value_type = typename Iterator::value_type;
+	using value_type = decltype(std::declval<Function>()(*std::declval<Iterator>()));
 	using difference_type = typename Iterator::difference_type;
 	using pointer = typename Iterator::pointer;
 	using reference = typename Iterator::reference;
