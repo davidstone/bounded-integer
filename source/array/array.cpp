@@ -16,6 +16,7 @@
 
 #include <containers/array/array.hpp>
 #include <containers/array/make_array.hpp>
+#include <containers/algorithms/accumulate.hpp>
 #include <containers/algorithms/count.hpp>
 
 #include <bounded_integer/bounded_integer.hpp>
@@ -46,6 +47,10 @@ struct true_function {
 	constexpr auto operator()(Args && ...) noexcept { return true; }
 };
 static_assert(containers::count_if(array.begin(), array.end(), true_function{}) == containers::size(array));
+
+
+static_assert(containers::accumulate(array.begin(), array.end()) == (0_bi + 3_bi + 2_bi + 3_bi + 5_bi));
+static_assert(containers::accumulate(array.begin(), array.end(), 10_bi) == (10_bi + 0_bi + 3_bi + 2_bi + 3_bi + 5_bi));
 
 }	// namespace
 

@@ -15,6 +15,9 @@
 // along with this program. If not, see <http://www.gnu.org/licenses/>.
 
 #include <containers/moving_vector/moving_vector.hpp>
+
+#include <containers/algorithms/accumulate.hpp>
+
 #include <algorithm>
 #include <cassert>
 #include <numeric>
@@ -37,7 +40,7 @@ moving_vector<int> container_after_unique() {
 int main() {
 	assert(moving_vector<int>({1, 2, 2, 3}) == moving_vector<int>({1, 2, 2, 3}));
 	moving_vector<int> v({2, 5, 6, 2, -3});
-	assert(std::accumulate(v.begin(), v.end(), 0) == 2 + 5 + 6 + 2 - 3);
+	assert((containers::accumulate<bounded::checked_integer<0, 100>>(v.begin(), v.end())) == 2_bi + 5_bi + 6_bi + 2_bi - 3_bi);
 	std::sort(v.begin(), v.end());
 	assert(v == moving_vector<int>({-3, 2, 2, 5, 6}));
 	auto const last = std::unique(v.begin(), v.end());
