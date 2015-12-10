@@ -52,6 +52,11 @@ static_assert(containers::count_if(array.begin(), array.end(), true_function{}) 
 static_assert(containers::accumulate(array.begin(), array.end()) == (0_bi + 3_bi + 2_bi + 3_bi + 5_bi));
 static_assert(containers::accumulate(array.begin(), array.end(), 10_bi) == (10_bi + 0_bi + 3_bi + 2_bi + 3_bi + 5_bi));
 
+constexpr auto double_array = containers::make_array(0.0, 1.0, 2.0);
+template<typename>
+struct print;
+static_assert(containers::accumulate(double_array.begin(), double_array.end()) == (0.0 + 1.0 + 2.0));
+
 }	// namespace
 
 auto main() -> int {

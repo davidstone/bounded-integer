@@ -24,24 +24,27 @@
 namespace containers {
 namespace detail {
 
+template<typename InputIterator, typename Initial, typename BinaryFunction, bool is_bounded = bounded::is_bounded_integer<Initial>>
+struct accumulate_c {
+	using type = Initial;
+};
+
 template<typename InputIterator, typename Initial>
-using integer_accumulate_t = decltype(
-	std::declval<Initial>() +
-	(
-		*std::declval<InputIterator>() *
-		std::declval<bounded::integer<
-			0,
-			static_cast<intmax_t>(std::numeric_limits<typename std::iterator_traits<InputIterator>::difference_type>::max())
-		>>()
-	)
-);
+struct accumulate_c<InputIterator, Initial, std::plus<>, true> {
+	using type = decltype(
+		std::declval<Initial>() +
+		(
+			*std::declval<InputIterator>() *
+			std::declval<bounded::integer<
+				0,
+				static_cast<intmax_t>(std::numeric_limits<typename std::iterator_traits<InputIterator>::difference_type>::max())
+			>>()
+		)
+	);
+};
 
 template<typename InputIterator, typename Initial, typename BinaryFunction>
-using accumulate_t = std::conditional_t<
-	bounded::is_bounded_integer<Initial> and std::is_same<BinaryFunction, std::plus<>>::value,
-	integer_accumulate_t<InputIterator, Initial>,
-	std::decay_t<Initial>
->;
+using accumulate_t = typename accumulate_c<InputIterator, std::decay_t<Initial>, BinaryFunction>::type;
 
 }	// namespace detail
 
@@ -79,14 +82,43 @@ constexpr auto accumulate(InputIterator first, Sentinel const last, Initial && i
 )
 
 
-template<typename Result, typename InputIterator, typename Sentinel>
+template<
+	typename Result,
+	typename InputIterator,
+	typename Sentinel,
+	BOUNDED_REQUIRES(bounded::is_bounded_integer<typename InputIterator::value_type>)
+>
 constexpr auto accumulate(InputIterator first, Sentinel const last) BOUNDED_NOEXCEPT(
 	::containers::accumulate<Result>(first, last, bounded::constant<0>, std::plus<>{})
 )
 
-template<typename InputIterator, typename Sentinel>
+template<
+	typename InputIterator,
+	typename Sentinel,
+	BOUNDED_REQUIRES(bounded::is_bounded_integer<typename InputIterator::value_type>)
+>
 constexpr auto accumulate(InputIterator first, Sentinel const last) BOUNDED_NOEXCEPT(
 	::containers::accumulate(first, last, bounded::constant<0>, std::plus<>{})
+)
+
+
+template<
+	typename Result,
+	typename InputIterator,
+	typename Sentinel,
+	BOUNDED_REQUIRES(!bounded::is_bounded_integer<typename InputIterator::value_type>)
+>
+constexpr auto accumulate(InputIterator first, Sentinel const last) BOUNDED_NOEXCEPT(
+	::containers::accumulate<Result>(first, last, typename InputIterator::value_type{}, std::plus<>{})
+)
+
+template<
+	typename InputIterator,
+	typename Sentinel,
+	BOUNDED_REQUIRES(!bounded::is_bounded_integer<typename InputIterator::value_type>)
+>
+constexpr auto accumulate(InputIterator first, Sentinel const last) BOUNDED_NOEXCEPT(
+	::containers::accumulate(first, last, typename InputIterator::value_type{}, std::plus<>{})
 )
 
 }	// namespace containers
