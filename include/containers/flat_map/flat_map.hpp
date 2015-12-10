@@ -110,7 +110,7 @@ public:
 		auto const equal = ::containers::negate(less);
 		::containers::erase(
 			container(),
-			moving_to_standard_iterator(::containers::detail::unique(moving_begin(container()), moving_end(container()), equal)),
+			moving_to_standard_iterator(::containers::unique(moving_begin(container()), moving_end(container()), equal)),
 			container().end()
 		);
 	}
@@ -241,7 +241,7 @@ public:
 			);
 		}
 		else {
-			auto const position = detail::unique_inplace_merge(
+			auto const position = ::containers::unique_inplace_merge(
 				moving_begin(container()),
 				midpoint,
 				moving_end(container()),

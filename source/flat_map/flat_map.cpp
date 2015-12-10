@@ -125,14 +125,14 @@ private:
 template<typename Container>
 void test_unique_copy_less(Container const & source, Container const & expected) {
 	Container destination(size(source), 0);
-	auto const it = containers::detail::unique_copy_less(source.begin(), source.end(), destination.begin());
+	auto const it = containers::unique_copy_less(source.begin(), source.end(), destination.begin());
 	erase(destination, it, destination.end());
 	assert(destination == expected);
 }
 
 template<typename Container>
 void test_unique_inplace_less(Container source, Container const & expected) {
-	auto const it = containers::detail::unique_copy_less(source.begin(), source.end());
+	auto const it = containers::unique_copy_less(source.begin(), source.end());
 	erase(source, it, source.end());
 	assert(source == expected);
 }
@@ -148,7 +148,7 @@ void test_unique_less(Container source, Container const & expected) {
 template<typename Container>
 void test_unique_merge_copy(Container const & lhs, Container const & rhs, Container const & expected) {
 	Container result(typename Container::size_type(size(lhs) + size(rhs)), 0);
-	auto const it = containers::detail::unique_merge_copy(lhs.begin(), lhs.end(), rhs.begin(), rhs.end(), result.begin());
+	auto const it = containers::unique_merge_copy(lhs.begin(), lhs.end(), rhs.begin(), rhs.end(), result.begin());
 	erase(result, it, result.end());
 
 	assert(result == expected);
@@ -158,7 +158,7 @@ template<typename Container>
 void test_unique_inplace_merge(Container v, Container const & other, Container const & expected) {
 	auto const midpoint = static_cast<typename Container::iterator::difference_type>(size(v));
 	v.insert(v.end(), other.begin(), other.end());
-	auto const it = containers::detail::unique_inplace_merge(v.begin(), v.begin() + midpoint, v.end());
+	auto const it = containers::unique_inplace_merge(v.begin(), v.begin() + midpoint, v.end());
 	erase(v, it, v.end());
 
 	assert(v == expected);
