@@ -35,7 +35,7 @@ common_sources = [
 flat_map_sources = common_sources + [
 	'flat_map/flat_map.cpp',
 	'algorithms/find.cpp',
-	'algorithms/unique_inplace_merge.cpp',
+	'algorithms/unique.cpp',
 ]
 
 programs = [

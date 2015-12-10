@@ -20,7 +20,7 @@
 #include <containers/apply_tuple.hpp>
 #include <containers/algorithms/negate.hpp>
 #include <containers/algorithms/iterator.hpp>
-#include <containers/algorithms/unique_inplace_merge.hpp>
+#include <containers/algorithms/unique.hpp>
 #include <containers/legacy_iterator.hpp>
 #include <containers/moving_vector/moving_vector.hpp>
 #include <containers/vector/vector.hpp>
