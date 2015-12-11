@@ -22,7 +22,6 @@
 #include <containers/common_container_functions.hpp>
 #include <containers/index_type.hpp>
 #include <containers/repeat_n.hpp>
-#include <containers/static_vector/forward_declaration.hpp>
 #include <containers/uninitialized_storage.hpp>
 
 #include <bounded_integer/integer_range.hpp>
