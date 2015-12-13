@@ -18,7 +18,7 @@ namespace arithmetic {
 #define BOUNDED_INTEGER_COMPOUND_ASSIGNMENT_OPERATOR(symbol) \
 template<typename LHS, typename RHS, BOUNDED_REQUIRES(!is_bounded_integer<LHS>)> \
 constexpr auto operator symbol##=(LHS & lhs, RHS && rhs) BOUNDED_NOEXCEPT_DECLTYPE( \
-	lhs = std::move(lhs) symbol std::forward<RHS>(rhs) \
+	lhs = static_cast<std::decay_t<LHS>>(std::move(lhs) symbol std::forward<RHS>(rhs)) \
 ) \
 
 BOUNDED_INTEGER_COMPOUND_ASSIGNMENT_OPERATOR(+)
