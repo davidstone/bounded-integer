@@ -41,14 +41,14 @@ constexpr auto operator symbol(std::integral_constant<T, lhs>, RHS const rhs) no
 #define BOUNDED_INTEGER_MIXED_OPERATOR_OVERLOADS(symbol, minimum, maximum) \
 template< \
 	intmax_t lhs_min, intmax_t lhs_max, typename overflow, storage_type storage, bool poisoned, typename T, \
-	BOUNDED_REQUIRES(std::is_integer<T>::value) \
+	BOUNDED_REQUIRES(std::is_integral<T>::value) \
 > \
 constexpr auto operator symbol(integer<lhs_min, lhs_max, overflow, storage, poisoned> const lhs, T const rhs) noexcept { \
 	return lhs symbol integer<minimum, maximum, overflow, storage, true>(rhs); \
 } \
 template< \
 	typename T, intmax_t rhs_min, intmax_t rhs_max, typename overflow, storage_type storage, bool poisoned, \
-	BOUNDED_REQUIRES(std::is_integer<T>::value) \
+	BOUNDED_REQUIRES(std::is_integral<T>::value) \
 > \
 constexpr auto operator symbol(T const lhs, integer<rhs_min, rhs_max, overflow, storage, poisoned> const rhs) noexcept { \
 	return integer<minimum, maximum, overflow, storage, true>(lhs) symbol rhs; \

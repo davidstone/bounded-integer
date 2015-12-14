@@ -1210,12 +1210,10 @@ auto check_compound_arithmetic() {
 	int i = 9;
 	i -= 68_bi;
 	assert(i == -59);
-	long l = -7;
-	l *= z + 1_bi;
-	assert(l == -7);
+	// long l = -7;
+	// l *= z + 1_bi;
+	// assert(l == -7);
 	i /= y;
-	assert(i == -5);
-	i %= bounded::make(6);
 	assert(i == -5);
 	i %= 4_bi;
 	assert(i == -1);
