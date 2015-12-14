@@ -16,6 +16,8 @@
 
 #pragma once
 
+#include <containers/addressof.hpp>
+
 #include <bounded_integer/bounded_integer.hpp>
 #include <bounded_integer/integer_range.hpp>
 
@@ -76,12 +78,12 @@ auto uninitialized_copy(InputIterator first, Sentinel const last, ForwardIterato
 	auto out_first = out;
 	try {
 		for (; first != last; ++first) {
-			::containers::detail::construct(allocator, std::addressof(*out), *first);
+			::containers::detail::construct(allocator, ::containers::addressof(*out), *first);
 			++out;
 		}
 	} catch (...) {
 		for (; out_first != out; ++out_first) {
-			::containers::detail::destroy(allocator, std::addressof(*out_first));
+			::containers::detail::destroy(allocator, ::containers::addressof(*out_first));
 		}
 		throw;
 	}
@@ -108,11 +110,11 @@ auto uninitialized_default_construct(ForwardIterator const first, Sentinel const
 	auto it = first;
 	try {
 		for (; it != last; ++it) {
-			::containers::detail::construct(allocator, std::addressof(*it));
+			::containers::detail::construct(allocator, ::containers::addressof(*it));
 		}
 	} catch (...) {
 		for (auto rollback = first; rollback != it; ++rollback) {
-			::containers::detail::destroy(allocator, std::addressof(*rollback));
+			::containers::detail::destroy(allocator, ::containers::addressof(*rollback));
 		}
 		throw;
 	}

@@ -16,6 +16,7 @@
 
 #pragma once
 
+#include <containers/addressof.hpp>
 #include <containers/algorithms/copy.hpp>
 #include <containers/array/array.hpp>
 #include <containers/array/iterator.hpp>
@@ -159,7 +160,7 @@ struct static_vector {
 
 
 	void pop_back() {
-		::containers::detail::destroy(get_allocator(), std::addressof(back(*this)));
+		::containers::detail::destroy(get_allocator(), ::containers::addressof(back(*this)));
 		--m_size;
 	}
 	

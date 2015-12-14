@@ -16,6 +16,7 @@
 
 #pragma once
 
+#include <containers/addressof.hpp>
 #include <containers/algorithms/iterator.hpp>
 #include <containers/common_container_functions.hpp>
 #include <containers/dynamic_array/dynamic_array.hpp>
@@ -240,7 +241,7 @@ public:
 
 	void pop_back() {
 		assert(!empty(*this));
-		::containers::detail::destroy(get_allocator(), std::addressof(back(*this)));
+		::containers::detail::destroy(get_allocator(), ::containers::addressof(back(*this)));
 		--m_size;
 	}
 	

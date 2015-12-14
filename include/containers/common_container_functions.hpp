@@ -16,6 +16,7 @@
 
 #pragma once
 
+#include <containers/addressof.hpp>
 #include <containers/algorithms/copy.hpp>
 #include <containers/algorithms/iterator.hpp>
 #include <containers/algorithms/remove.hpp>
@@ -310,7 +311,7 @@ auto emplace_in_middle_no_reallocation(Container & container, typename Container
 	auto const original_end = container.end();
 	container.emplace_back(std::move(back(container)));
 	std::move_backward(position, ::containers::prev(original_end), original_end);
-	auto const pointer = std::addressof(*position);
+	auto const pointer = ::containers::addressof(*position);
 	::containers::detail::destroy(allocator, pointer);
 	::containers::detail::construct(allocator, pointer, std::forward<Args>(args)...);
 }

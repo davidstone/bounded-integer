@@ -21,6 +21,7 @@ source_directory = 'source'
 include_directories = ['../bounded_integer', '../value_ptr', '../include']
 
 common_sources = [
+	'addressof.cpp',
 	'has_nested_type.cpp',
 	'is_container.cpp',
 	'is_iterator.cpp',

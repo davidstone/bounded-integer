@@ -16,6 +16,7 @@
 
 #pragma once
 
+#include <containers/addressof.hpp>
 #include <containers/common_iterator_functions.hpp>
 #include <containers/index_type.hpp>
 
@@ -44,7 +45,7 @@ struct repeat_n_iterator {
 		return m_value.get();
 	}
 	constexpr auto operator->() const {
-		return std::addressof(operator*());
+		return ::containers::addressof(operator*());
 	}
 
 	friend constexpr auto operator==(repeat_n_iterator const lhs, repeat_n_iterator const rhs) {

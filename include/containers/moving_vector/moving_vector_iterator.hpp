@@ -16,6 +16,7 @@
 
 #pragma once
 
+#include <containers/addressof.hpp>
 #include <containers/common_iterator_functions.hpp>
 #include <containers/moving_vector/forward_declaration.hpp>
 #include <containers/vector/vector.hpp>
@@ -62,7 +63,7 @@ public:
 		return **m_it;
 	}
 	constexpr auto operator->() const {
-		return std::addressof(operator*());
+		return ::containers::addressof(operator*());
 	}
 
 	template<typename Offset, BOUNDED_REQUIRES(std::numeric_limits<Offset>::is_integer)>
