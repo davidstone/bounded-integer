@@ -24,6 +24,7 @@ common_sources = [
 	'has_nested_type.cpp',
 	'is_container.cpp',
 	'is_iterator.cpp',
+	'is_iterator_sentinel.cpp',
 	'iterator_adapter.cpp',
 	'legacy_iterator.cpp',
 	'type_list.cpp',
