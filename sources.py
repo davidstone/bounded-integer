@@ -26,6 +26,7 @@ common_sources = [
 	'is_iterator.cpp',
 	'iterator_adapter.cpp',
 	'legacy_iterator.cpp',
+	'type_list.cpp',
 	'algorithms/accumulate.cpp',
 	'algorithms/all_any_none.cpp',
 	'algorithms/count.cpp',
