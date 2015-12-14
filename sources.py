@@ -20,6 +20,9 @@ source_directory = 'source'
 
 include_directories = ['../bounded_integer', '../value_ptr', '../include']
 
+# The sources are just needed to make sure the include files are self-contained.
+# To minimize compile times, only compile these files with the array program,
+# otherwise they keep getting compiled for various macros that have no meaning.
 common_sources = [
 	'addressof.cpp',
 	'allocator.cpp',
@@ -38,7 +41,7 @@ common_sources = [
 	'algorithms/remove.cpp',
 ]
 
-flat_map_sources = common_sources + [
+flat_map_sources = [
 	'flat_map/flat_map.cpp',
 	'algorithms/find.cpp',
 	'algorithms/unique.cpp',
@@ -57,12 +60,12 @@ programs = [
 	),
 	Program(
 		'dynamic_array',
-		sources = common_sources + ['dynamic_array/dynamic_array.cpp'],
+		sources = ['dynamic_array/dynamic_array.cpp'],
 		include_directories = include_directories
 	),
 	Program(
 		'static_vector',
-		sources = common_sources + [
+		sources = [
 			'static_vector/make_static_vector.cpp',
 			'static_vector/static_vector.cpp',
 		],
@@ -70,24 +73,24 @@ programs = [
 	),
 	Program(
 		'vector',
-		sources = common_sources + ['vector/vector.cpp'],
+		sources = ['vector/vector.cpp'],
 		include_directories = include_directories
 	),
 	Program(
 		'forward_list',
-		sources = common_sources + ['forward_list/forward_list.cpp'],
+		sources = ['forward_list/forward_list.cpp'],
 		defines = ['USE_SYSTEM_FORWARD_LIST=false'],
 		include_directories = include_directories
 	),
 	Program(
 		'forward_list_std',
-		sources = common_sources + ['forward_list/forward_list.cpp'],
+		sources = ['forward_list/forward_list.cpp'],
 		defines = ['USE_SYSTEM_FORWARD_LIST=true'],
 		include_directories = include_directories
 	),
 	Program(
 		'moving_vector',
-		sources = common_sources + ['moving_vector/moving_vector.cpp'],
+		sources = ['moving_vector/moving_vector.cpp'],
 		include_directories = include_directories
 	),
 	Program(
