@@ -17,6 +17,7 @@
 #pragma once
 
 #include <containers/addressof.hpp>
+#include <containers/allocator.hpp>
 
 #include <bounded_integer/bounded_integer.hpp>
 #include <bounded_integer/integer_range.hpp>
@@ -29,11 +30,11 @@ namespace detail {
 
 template<typename Allocator, typename T, typename... Args>
 constexpr auto construct(Allocator && allocator, T * pointer, Args && ... args) BOUNDED_NOEXCEPT(
-	std::allocator_traits<std::decay_t<Allocator>>::construct(allocator, reinterpret_cast<typename std::decay_t<Allocator>::value_type *>(pointer), std::forward<Args>(args)...)
+	allocator_traits<std::decay_t<Allocator>>::construct(allocator, reinterpret_cast<typename std::decay_t<Allocator>::value_type *>(pointer), std::forward<Args>(args)...)
 )
 template<typename Allocator, typename T>
 constexpr auto destroy(Allocator && allocator, T * pointer) BOUNDED_NOEXCEPT(
-	std::allocator_traits<std::decay_t<Allocator>>::destroy(allocator, reinterpret_cast<typename std::decay_t<Allocator>::value_type *>(pointer))
+	allocator_traits<std::decay_t<Allocator>>::destroy(allocator, reinterpret_cast<typename std::decay_t<Allocator>::value_type *>(pointer))
 )
 
 

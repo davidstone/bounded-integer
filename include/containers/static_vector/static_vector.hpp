@@ -17,6 +17,7 @@
 #pragma once
 
 #include <containers/addressof.hpp>
+#include <containers/allocator.hpp>
 #include <containers/algorithms/copy.hpp>
 #include <containers/array/array.hpp>
 #include <containers/array/iterator.hpp>
@@ -166,7 +167,7 @@ struct static_vector {
 	
 private:
 	static constexpr auto get_allocator() noexcept {
-		return std::allocator<value_type>{};
+		return detail::allocator<value_type>{};
 	}
 
 	enum class count_constructor{};
