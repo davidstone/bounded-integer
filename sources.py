@@ -35,6 +35,7 @@ common_sources = [
 	'type_list.cpp',
 	'algorithms/accumulate.cpp',
 	'algorithms/all_any_none.cpp',
+	'algorithms/copy.cpp',
 	'algorithms/count.cpp',
 	'algorithms/equal.cpp',
 	'algorithms/find.cpp',
