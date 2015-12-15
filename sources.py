@@ -36,15 +36,15 @@ common_sources = [
 	'algorithms/accumulate.cpp',
 	'algorithms/all_any_none.cpp',
 	'algorithms/count.cpp',
+	'algorithms/find.cpp',
 	'algorithms/iterator.cpp',
 	'algorithms/negate.cpp',
 	'algorithms/remove.cpp',
+	'algorithms/unique.cpp',
 ]
 
 flat_map_sources = [
 	'flat_map/flat_map.cpp',
-	'algorithms/find.cpp',
-	'algorithms/unique.cpp',
 ]
 
 programs = [
