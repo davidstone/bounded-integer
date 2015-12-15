@@ -71,7 +71,7 @@ struct dynamic_array {
 	
 	template<typename ForwardIterator, typename Sentinel, BOUNDED_REQUIRES(is_iterator<ForwardIterator>)>
 	constexpr dynamic_array(ForwardIterator first, Sentinel const last, allocator_type = allocator_type()):
-		m_size(detail::distance(first, last)),
+		m_size(::containers::distance(first, last)),
 		m_data(make_storage(m_size))
 	{
 		detail::uninitialized_copy(first, last, m_data.get(), get_allocator());
@@ -148,7 +148,7 @@ private:
 
 template<typename T, typename ForwardIterator, typename Sentinel, typename = typename std::iterator_traits<ForwardIterator>::iterator_category>
 auto assign(dynamic_array<T> & container, ForwardIterator first, Sentinel const last) {
-	auto const difference = detail::distance(first, last);
+	auto const difference = ::containers::distance(first, last);
 	if (difference == size(container)) {
 		detail::copy(first, last, container.begin());
 	} else {

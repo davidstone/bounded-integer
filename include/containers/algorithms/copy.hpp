@@ -19,6 +19,7 @@
 #include <containers/addressof.hpp>
 #include <containers/allocator.hpp>
 #include <containers/type_list.hpp>
+#include <containers/algorithms/iterator.hpp>
 
 #include <bounded_integer/bounded_integer.hpp>
 #include <bounded_integer/integer_range.hpp>
@@ -70,12 +71,6 @@ constexpr auto destroy(Allocator && allocator, T * pointer) BOUNDED_NOEXCEPT(
 	)
 )
 
-
-// TODO: Work with other iterator categories
-template<typename InputIterator, typename Sentinel>
-constexpr auto distance(InputIterator first, Sentinel const last) BOUNDED_NOEXCEPT(
-	last - first
-)
 
 template<typename InputIterator, typename Sentinel, typename OutputIterator>
 constexpr auto copy(InputIterator first, Sentinel const last, OutputIterator out) {

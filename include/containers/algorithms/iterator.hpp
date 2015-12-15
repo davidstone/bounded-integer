@@ -23,6 +23,12 @@
 #include <iterator>
 
 namespace containers {
+
+template<typename InputIterator, typename Sentinel>
+constexpr auto distance(InputIterator first, Sentinel const last) BOUNDED_NOEXCEPT(
+	last - first
+)
+
 namespace detail {
 
 template<typename Iterator, typename Offset>

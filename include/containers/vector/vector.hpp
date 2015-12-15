@@ -212,7 +212,7 @@ public:
 		}
 
 		auto const range_size = bounded::throw_policy<std::out_of_range>{}.assignment(
-			detail::distance(first, last),
+			::containers::distance(first, last),
 			bounded::constant<0>,
 			max_size<vector>()
 		);

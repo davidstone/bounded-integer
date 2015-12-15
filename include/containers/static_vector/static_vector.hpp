@@ -19,6 +19,7 @@
 #include <containers/addressof.hpp>
 #include <containers/allocator.hpp>
 #include <containers/algorithms/copy.hpp>
+#include <containers/algorithms/iterator.hpp>
 #include <containers/array/array.hpp>
 #include <containers/array/iterator.hpp>
 #include <containers/common_container_functions.hpp>
@@ -149,7 +150,7 @@ struct static_vector {
 		}
 
 		auto const range_size = bounded::throw_policy<std::out_of_range>{}.assignment(
-			detail::distance(first, last),
+			::containers::distance(first, last),
 			bounded::constant<0>,
 			max_size<static_vector>()
 		);
