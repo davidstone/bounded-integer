@@ -64,7 +64,7 @@ public:
 		m_container(count, std::move(allocator)),
 		m_size(capacity())
 	{
-		detail::uninitialized_default_construct(begin(), end(), get_allocator());
+		::containers::uninitialized_default_construct(begin(), end(), get_allocator());
 	}
 	template<typename Count, BOUNDED_REQUIRES(std::is_convertible<Count, size_type>::value)>
 	vector(Count const count, value_type const & value, allocator_type allocator = allocator_type()):
@@ -169,7 +169,7 @@ public:
 		} else {
 			raw_container temp(new_capacity());
 			::containers::detail::construct(allocator, temp.data() + capacity(), std::forward<Args>(args)...);
-			detail::uninitialized_move(begin(), end(), temp.begin(), allocator);
+			::containers::uninitialized_move(begin(), end(), temp.begin(), allocator);
 			m_container = std::move(temp);
 		}
 		++m_size;
@@ -193,9 +193,9 @@ public:
 			auto && allocator = get_allocator();
 			::containers::detail::construct(allocator, temp.data() + offset, std::forward<Args>(args)...);
 			auto const mutable_position = begin() + offset;
-			auto const pointer = detail::uninitialized_move(begin(), mutable_position, temp.data(), allocator);
+			auto const pointer = ::containers::uninitialized_move(begin(), mutable_position, temp.data(), allocator);
 			assert(temp.data() + offset == pointer);
-			detail::uninitialized_move(mutable_position, end(), ::containers::next(pointer), allocator);
+			::containers::uninitialized_move(mutable_position, end(), ::containers::next(pointer), allocator);
 			m_container = std::move(temp);
 			++m_size;
 		}
@@ -228,11 +228,11 @@ public:
 		auto const offset = position - begin();
 		// First construct the new element because it may reference an old
 		// element, and we do not want to move elements it references
-		detail::uninitialized_copy(first, last, temp.data() + offset, get_allocator());
+		::containers::uninitialized_copy(first, last, temp.data() + offset, get_allocator());
 		auto const mutable_position = begin() + offset;
-		auto const pointer = detail::uninitialized_move(begin(), mutable_position, temp.data(), get_allocator());
+		auto const pointer = ::containers::uninitialized_move(begin(), mutable_position, temp.data(), get_allocator());
 		assert(temp.data() + offset == pointer);
-		detail::uninitialized_move(mutable_position, end(), pointer + range_size, get_allocator());
+		::containers::uninitialized_move(mutable_position, end(), pointer + range_size, get_allocator());
 		m_container = std::move(temp);
 		m_size += range_size;
 		return mutable_position;
@@ -257,7 +257,7 @@ private:
 
 	auto relocate(size_type const requested_capacity) {
 		raw_container temp(requested_capacity);
-		detail::uninitialized_move(begin(), end(), temp.begin(), get_allocator());
+		::containers::uninitialized_move(begin(), end(), temp.begin(), get_allocator());
 		m_container = std::move(temp);
 	}
 

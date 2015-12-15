@@ -22,6 +22,7 @@
 #include <containers/algorithms/iterator.hpp>
 #include <containers/algorithms/lexicographical_compare.hpp>
 #include <containers/algorithms/remove.hpp>
+#include <containers/algorithms/uninitialized.hpp>
 #include <containers/common_functions.hpp>
 #include <containers/is_container.hpp>
 #include <containers/is_iterator.hpp>
@@ -326,9 +327,9 @@ template<typename Container, typename ForwardIterator, typename Sentinel, typena
 constexpr auto put_in_middle_no_reallocation(Container & container, typename Container::const_iterator const position, ForwardIterator first, Sentinel const last, Size const range_size, Allocator && allocator) {
 	auto const distance_to_end = typename Container::size_type(container.end() - position, bounded::non_check);
 	auto const mutable_position = make_mutable_iterator(container, position);
-	detail::uninitialized_move_backward(mutable_position, container.end(), container.end() + range_size, allocator);
-	auto const remainder = detail::copy_n(first, bounded::min(range_size, distance_to_end), mutable_position);
-	detail::uninitialized_copy(remainder.input, last, remainder.output, allocator);
+	::containers::uninitialized_move_backward(mutable_position, container.end(), container.end() + range_size, allocator);
+	auto const remainder = ::containers::copy_n(first, bounded::min(range_size, distance_to_end), mutable_position);
+	::containers::uninitialized_copy(remainder.input, last, remainder.output, allocator);
 	return mutable_position;
 }
 
