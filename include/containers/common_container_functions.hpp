@@ -18,7 +18,9 @@
 
 #include <containers/addressof.hpp>
 #include <containers/algorithms/copy.hpp>
+#include <containers/algorithms/equal.hpp>
 #include <containers/algorithms/iterator.hpp>
+#include <containers/algorithms/lexicographical_compare.hpp>
 #include <containers/algorithms/remove.hpp>
 #include <containers/common_functions.hpp>
 #include <containers/is_container.hpp>
@@ -151,7 +153,7 @@ constexpr auto push_back(Container & container, typename Container::value_type &
 
 // TODO: specialize for ForwardIterator to call reserve
 template<typename Container, typename InputIterator, typename Sentinel, BOUNDED_REQUIRES(is_container<Container> and is_iterator<InputIterator>)>
-auto append(Container & container, InputIterator first, Sentinel last) {
+constexpr auto append(Container & container, InputIterator first, Sentinel last) {
 	auto const offset = size(container);
 	for (; first != last; ++first) {
 		container.emplace_back(*first);
@@ -240,7 +242,7 @@ constexpr auto clear(Container & container) noexcept {
 
 struct common_resize_tag{};
 template<typename Container, typename Size, typename... MaybeInitializer>
-auto resize(common_resize_tag, Container & container, Size const count, MaybeInitializer && ... args) {
+constexpr auto resize(common_resize_tag, Container & container, Size const count, MaybeInitializer && ... args) {
 	static_assert(sizeof...(MaybeInitializer) == 0 or sizeof...(MaybeInitializer) == 1);
 	while (size(container) > count) {
 		container.pop_back();
@@ -253,23 +255,23 @@ auto resize(common_resize_tag, Container & container, Size const count, MaybeIni
 namespace common {
 
 template<typename Container, typename Size, BOUNDED_REQUIRES(is_container<Container>)>
-auto resize(Container & container, Size const count) BOUNDED_NOEXCEPT(
+constexpr auto resize(Container & container, Size const count) BOUNDED_NOEXCEPT(
 	resize(common_resize_tag{}, container, count)
 )
 template<typename Container, typename Size, BOUNDED_REQUIRES(is_container<Container>)>
-auto resize(Container & container, Size const count, typename Container::value_type const & value) BOUNDED_NOEXCEPT(
+constexpr auto resize(Container & container, Size const count, typename Container::value_type const & value) BOUNDED_NOEXCEPT(
 	resize(common_resize_tag{}, container, count, value)
 )
 
-	
+
 template<typename Container, BOUNDED_REQUIRES(is_container<Container>)>
 constexpr auto operator==(Container const & lhs, Container const & rhs) BOUNDED_NOEXCEPT(
-	std::equal(lhs.begin(), lhs.end(), rhs.begin(), rhs.end())
+	::containers::equal(lhs.begin(), lhs.end(), rhs.begin(), rhs.end())
 )
 
 template<typename Container, BOUNDED_REQUIRES(is_container<Container>)>
 constexpr auto operator<(Container const & lhs, Container const & rhs) BOUNDED_NOEXCEPT(
-	std::lexicographical_compare(lhs.begin(), lhs.end(), rhs.begin(), rhs.end())
+	::containers::lexicographical_compare(lhs.begin(), lhs.end(), rhs.begin(), rhs.end())
 )
 
 #define CONTAINERS_COMMON_USING_DECLARATIONS \
@@ -306,7 +308,7 @@ CONTAINERS_COMMON_USING_DECLARATIONS
 // Assumes there is enough capacity -- iterators remain valid
 // TODO: exception safety
 template<typename Container, typename Allocator, typename... Args>
-auto emplace_in_middle_no_reallocation(Container & container, typename Container::const_iterator const position_, Allocator && allocator, Args && ... args) {
+constexpr auto emplace_in_middle_no_reallocation(Container & container, typename Container::const_iterator const position_, Allocator && allocator, Args && ... args) {
 	auto const position = detail::make_mutable_iterator(container, position_);
 	auto const original_end = container.end();
 	container.emplace_back(std::move(back(container)));
@@ -321,7 +323,7 @@ auto emplace_in_middle_no_reallocation(Container & container, typename Container
 // Container must update its own size
 // TODO: exception safety
 template<typename Container, typename ForwardIterator, typename Sentinel, typename Size, typename Allocator>
-auto put_in_middle_no_reallocation(Container & container, typename Container::const_iterator const position, ForwardIterator first, Sentinel const last, Size const range_size, Allocator && allocator) {
+constexpr auto put_in_middle_no_reallocation(Container & container, typename Container::const_iterator const position, ForwardIterator first, Sentinel const last, Size const range_size, Allocator && allocator) {
 	auto const distance_to_end = typename Container::size_type(container.end() - position, bounded::non_check);
 	auto const mutable_position = make_mutable_iterator(container, position);
 	detail::uninitialized_move_backward(mutable_position, container.end(), container.end() + range_size, allocator);
