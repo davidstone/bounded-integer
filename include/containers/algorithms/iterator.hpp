@@ -18,10 +18,44 @@
 #include <containers/is_iterator.hpp>
 
 #include <bounded_integer/bounded_integer.hpp>
+#include <bounded_integer/integer_range.hpp>
 
 #include <iterator>
 
 namespace containers {
+namespace detail {
+
+template<typename Iterator, typename Offset>
+constexpr auto advance(Iterator & it, Offset const offset, std::random_access_iterator_tag) BOUNDED_NOEXCEPT(
+	static_cast<void>(it += offset)
+)
+template<typename Iterator, typename Offset>
+constexpr auto advance(Iterator & it, Offset const offset, std::bidirectional_iterator_tag) {
+	for (auto const n : bounded::integer_range(bounded::abs(offset))) {
+		static_cast<void>(n);
+		if (offset >= bounded::constant<0>) {
+			++it;
+		} else {
+			--it;
+		}
+	}
+}
+template<typename Iterator, typename Offset>
+constexpr auto advance(Iterator & it, Offset const offset, std::forward_iterator_tag) {
+	for (auto const n : bounded::integer_range(offset)) {
+		static_cast<void>(n);
+		++it;
+	}
+}
+
+
+}	// namespace detail
+
+template<typename Iterator, typename Offset>
+constexpr auto advance(Iterator & it, Offset const offset) BOUNDED_NOEXCEPT(
+	::containers::detail::advance(it, offset, typename std::iterator_traits<Iterator>::iterator_category{})
+)
+
 namespace detail {
 
 template<
@@ -48,7 +82,7 @@ template<
 	BOUNDED_REQUIRES(is_iterator<Iterator>)
 >
 constexpr auto next(Iterator it, Offset const offset = ::containers::detail::iterator_one<Iterator>()) {
-	std::advance(it, offset);
+	::containers::advance(it, offset);
 	return it;
 }
 
@@ -62,7 +96,7 @@ template<
 	)
 >
 constexpr auto prev(Iterator it, Offset const offset = ::containers::detail::iterator_one<Iterator>()) {
-	std::advance(it, -offset);
+	::containers::advance(it, -offset);
 	return it;
 }
 
