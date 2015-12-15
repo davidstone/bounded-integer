@@ -16,11 +16,8 @@
 #pragma once
 
 #include <containers/is_iterator_sentinel.hpp>
-#include <containers/algorithms/negate.hpp>
 
 #include <bounded_integer/bounded_integer.hpp>
-
-#include <type_traits>
 
 namespace containers {
 
