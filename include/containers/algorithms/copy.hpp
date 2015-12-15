@@ -24,7 +24,6 @@
 #include <bounded_integer/integer_range.hpp>
 
 #include <iterator>
-#include <memory>
 
 namespace containers {
 namespace detail {
