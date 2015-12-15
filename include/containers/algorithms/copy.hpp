@@ -18,6 +18,7 @@
 
 #include <containers/addressof.hpp>
 #include <containers/allocator.hpp>
+#include <containers/type_list.hpp>
 
 #include <bounded_integer/bounded_integer.hpp>
 #include <bounded_integer/integer_range.hpp>
@@ -28,13 +29,46 @@
 namespace containers {
 namespace detail {
 
+// reinterpret_cast or static_cast from void * are not allowed in constexpr
+
+template<typename Target, typename Source, typename Enable = void>
+struct is_static_castable_c : std::false_type {};
+
+template<typename Target, typename Source>
+struct is_static_castable_c<
+	Target,
+	Source,
+	void_t<decltype(static_cast<Target>(std::declval<Source>()))>
+> : std::true_type {};
+
+template<typename Target, typename Source>
+constexpr auto is_static_castable = is_static_castable_c<Target, Source>::value;
+
+template<typename Target, typename Source, BOUNDED_REQUIRES(is_static_castable<Target, Source>)>
+constexpr auto static_or_reinterpret_cast(Source source) noexcept {
+	return static_cast<Target>(source);
+}
+
+template<typename Target, typename Source, BOUNDED_REQUIRES(!is_static_castable<Target, Source>)>
+auto static_or_reinterpret_cast(Source source) noexcept {
+	return reinterpret_cast<Target>(source);
+}
+
 template<typename Allocator, typename T, typename... Args>
 constexpr auto construct(Allocator && allocator, T * pointer, Args && ... args) BOUNDED_NOEXCEPT(
-	allocator_traits<std::decay_t<Allocator>>::construct(allocator, reinterpret_cast<typename std::decay_t<Allocator>::value_type *>(pointer), std::forward<Args>(args)...)
+	allocator_traits<std::decay_t<Allocator>>::construct(
+		allocator,
+		::containers::detail::static_or_reinterpret_cast<typename std::decay_t<Allocator>::value_type *>(pointer),
+		std::forward<Args>(args)...
+	)
 )
+
 template<typename Allocator, typename T>
 constexpr auto destroy(Allocator && allocator, T * pointer) BOUNDED_NOEXCEPT(
-	allocator_traits<std::decay_t<Allocator>>::destroy(allocator, reinterpret_cast<typename std::decay_t<Allocator>::value_type *>(pointer))
+	allocator_traits<std::decay_t<Allocator>>::destroy(
+		allocator,
+		::containers::detail::static_or_reinterpret_cast<typename std::decay_t<Allocator>::value_type *>(pointer)
+	)
 )
 
 
