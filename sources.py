@@ -39,6 +39,7 @@ common_sources = [
 	'algorithms/equal.cpp',
 	'algorithms/find.cpp',
 	'algorithms/iterator.cpp',
+	'algorithms/lexicographical_compare.cpp',
 	'algorithms/negate.cpp',
 	'algorithms/remove.cpp',
 	'algorithms/unique.cpp',
