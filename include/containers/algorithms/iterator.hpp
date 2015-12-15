@@ -22,55 +22,46 @@
 #include <iterator>
 
 namespace containers {
+namespace detail {
 
-// TODO: constexpr when gcc supports it
 template<
 	typename Iterator,
-	typename Offset = decltype(bounded::constant<1>),
+	BOUNDED_REQUIRES(bounded::is_bounded_integer<typename std::iterator_traits<Iterator>::difference_type>)
+>
+constexpr auto iterator_one() noexcept {
+	return bounded::constant<1>;
+}
+
+template<
+	typename Iterator,
+	BOUNDED_REQUIRES(!bounded::is_bounded_integer<typename std::iterator_traits<Iterator>::difference_type>)
+>
+constexpr auto iterator_one() noexcept {
+	return 1;
+}
+
+}	// namespace detail
+
+template<
+	typename Iterator,
+	typename Offset = decltype(::containers::detail::iterator_one<Iterator>()),
+	BOUNDED_REQUIRES(is_iterator<Iterator>)
+>
+constexpr auto next(Iterator it, Offset const offset = ::containers::detail::iterator_one<Iterator>()) {
+	std::advance(it, offset);
+	return it;
+}
+
+
+template<
+	typename Iterator,
+	typename Offset = decltype(::containers::detail::iterator_one<Iterator>()),
 	BOUNDED_REQUIRES(
 		is_iterator<Iterator> and
 		bounded::is_bounded_integer<typename std::iterator_traits<Iterator>::difference_type>
 	)
 >
-auto next(Iterator it, Offset const offset = bounded::constant<1>) {
-	std::advance(it, offset);
-	return it;
-}
-template<
-	typename Iterator,
-	typename Offset = typename std::iterator_traits<Iterator>::difference_type,
-	BOUNDED_REQUIRES(
-		is_iterator<Iterator> and
-		!bounded::is_bounded_integer<typename std::iterator_traits<Iterator>::difference_type>
-	)
->
-auto next(Iterator it, Offset const offset = 1) {
-	std::advance(it, offset);
-	return it;
-}
-
-
-template<
-	typename Iterator,
-	typename Offset = decltype(bounded::constant<1>),
-	BOUNDED_REQUIRES(
-		is_iterator<Iterator> and
-		bounded::is_bounded_integer<typename std::iterator_traits<Iterator>::difference_type>
-	)
->
-auto prev(Iterator it, Offset const offset = bounded::constant<1>) {
-	std::advance(it, -offset);
-	return it;
-}
-template<
-	typename Iterator,
-	typename Offset = typename std::iterator_traits<Iterator>::difference_type,
-	BOUNDED_REQUIRES(
-		is_iterator<Iterator> and
-		!bounded::is_bounded_integer<typename std::iterator_traits<Iterator>::difference_type>
-	)
->
-auto prev(Iterator it, Offset const offset = 1) {
+constexpr auto prev(Iterator it, Offset const offset = ::containers::detail::iterator_one<Iterator>()) {
 	std::advance(it, -offset);
 	return it;
 }
