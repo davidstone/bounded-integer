@@ -108,8 +108,17 @@ constexpr auto copy_n(InputIterator first, Size const count, OutputIterator out)
 	return result { first, out };
 }
 
-template<typename InputIterator, typename Sentinel, typename ForwardIterator, typename Allocator_>
-auto uninitialized_copy(InputIterator first, Sentinel const last, ForwardIterator out, Allocator_ && allocator) {
+
+template<
+	typename InputIterator, typename Sentinel,
+	typename ForwardIterator,
+	typename Allocator,
+	BOUNDED_REQUIRES(!std::is_nothrow_constructible<
+		std::decay_t<decltype(*std::declval<ForwardIterator>())>,
+		decltype(*std::declval<InputIterator &>())
+	>::value)
+>
+auto uninitialized_copy(InputIterator first, Sentinel const last, ForwardIterator out, Allocator && allocator) {
 	auto out_first = out;
 	try {
 		for (; first != last; ++first) {
@@ -125,23 +134,49 @@ auto uninitialized_copy(InputIterator first, Sentinel const last, ForwardIterato
 	return out;
 }
 
+
+template<
+	typename InputIterator, typename Sentinel,
+	typename ForwardIterator,
+	typename Allocator,
+	BOUNDED_REQUIRES(std::is_nothrow_constructible<
+		std::decay_t<decltype(*std::declval<ForwardIterator>())>,
+		decltype(*std::declval<InputIterator &>())
+	>::value)
+>
+constexpr auto uninitialized_copy(InputIterator first, Sentinel const last, ForwardIterator out, Allocator && allocator) noexcept {
+	for (; first != last; ++first) {
+		::containers::detail::construct(allocator, ::containers::addressof(*out), *first);
+		++out;
+	}
+	return out;
+}
+
+
+
 template<typename InputIterator, typename ForwardIterator, typename Allocator>
-auto uninitialized_move(InputIterator const first, InputIterator const last, ForwardIterator const out, Allocator && allocator) {
-	return ::containers::detail::uninitialized_copy(std::make_move_iterator(first), std::make_move_iterator(last), out, allocator);
-}
+constexpr auto uninitialized_move(InputIterator const first, InputIterator const last, ForwardIterator const out, Allocator && allocator) BOUNDED_NOEXCEPT_VALUE(
+	::containers::detail::uninitialized_copy(std::make_move_iterator(first), std::make_move_iterator(last), out, allocator)
+)
 
 template<typename BidirectionalInputIterator, typename BidirectionalOutputIterator, typename Allocator>
-auto uninitialized_copy_backward(BidirectionalInputIterator const first, BidirectionalInputIterator const last, BidirectionalOutputIterator const out_last, Allocator && allocator) {
-	return ::containers::detail::uninitialized_copy(std::make_reverse_iterator(last), std::make_reverse_iterator(first), std::make_reverse_iterator(out_last), allocator).base();
-}
+constexpr auto uninitialized_copy_backward(BidirectionalInputIterator const first, BidirectionalInputIterator const last, BidirectionalOutputIterator const out_last, Allocator && allocator) BOUNDED_NOEXCEPT_VALUE(
+	::containers::detail::uninitialized_copy(std::make_reverse_iterator(last), std::make_reverse_iterator(first), std::make_reverse_iterator(out_last), allocator).base()
+)
 
 template<typename BidirectionalInputIterator, typename BidirectionalOutputIterator, typename Allocator>
-auto uninitialized_move_backward(BidirectionalInputIterator const first, BidirectionalInputIterator const last, BidirectionalOutputIterator const out_last, Allocator && allocator) {
-	return ::containers::detail::uninitialized_copy_backward(std::make_move_iterator(first), std::make_move_iterator(last), out_last, allocator);
-}
+constexpr auto uninitialized_move_backward(BidirectionalInputIterator const first, BidirectionalInputIterator const last, BidirectionalOutputIterator const out_last, Allocator && allocator) BOUNDED_NOEXCEPT_VALUE(
+	::containers::detail::uninitialized_copy_backward(std::make_move_iterator(first), std::make_move_iterator(last), out_last, allocator)
+)
 
-template<typename ForwardIterator, typename Sentinel, typename Allocator_>
-auto uninitialized_default_construct(ForwardIterator const first, Sentinel const last, Allocator_ && allocator) {
+
+template<
+	typename ForwardIterator,
+	typename Sentinel,
+	typename Allocator,
+	BOUNDED_REQUIRES(!std::is_nothrow_default_constructible<std::decay_t<decltype(*std::declval<ForwardIterator const &>())>>::value)
+>
+auto uninitialized_default_construct(ForwardIterator const first, Sentinel const last, Allocator && allocator) {
 	auto it = first;
 	try {
 		for (; it != last; ++it) {
@@ -152,6 +187,18 @@ auto uninitialized_default_construct(ForwardIterator const first, Sentinel const
 			::containers::detail::destroy(allocator, ::containers::addressof(*rollback));
 		}
 		throw;
+	}
+}
+
+template<
+	typename ForwardIterator,
+	typename Sentinel,
+	typename Allocator,
+	BOUNDED_REQUIRES(std::is_nothrow_default_constructible<std::decay_t<decltype(*std::declval<ForwardIterator const &>())>>::value)
+>
+constexpr auto uninitialized_default_construct(ForwardIterator first, Sentinel const last, Allocator && allocator) noexcept {
+	for (; first != last; ++first) {
+		::containers::detail::construct(allocator, ::containers::addressof(*first));
 	}
 }
 
