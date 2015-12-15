@@ -23,10 +23,27 @@
 #include <iterator>
 
 namespace containers {
+namespace detail {
+
+template<typename Iterator, typename Sentinel>
+constexpr auto distance(Iterator first, Sentinel const last, std::random_access_iterator_tag) BOUNDED_NOEXCEPT(
+	last - first
+)
+
+template<typename Iterator, typename Sentinel>
+constexpr auto distance(Iterator first, Sentinel const last, std::input_iterator_tag) {
+	auto difference = std::iterator_traits<Iterator>::distance_type(bounded::constant<0>);
+	for (; first != last; ++first) {
+		++difference;
+	}
+	return difference;
+}
+
+}	// namespace detail
 
 template<typename InputIterator, typename Sentinel>
 constexpr auto distance(InputIterator first, Sentinel const last) BOUNDED_NOEXCEPT(
-	last - first
+	::containers::detail::distance(first, last, typename std::iterator_traits<InputIterator>::iterator_category{})
 )
 
 namespace detail {
