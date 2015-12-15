@@ -64,7 +64,7 @@ constexpr auto advance(Iterator & it, Offset const offset, std::bidirectional_it
 	}
 }
 template<typename Iterator, typename Offset>
-constexpr auto advance(Iterator & it, Offset const offset, std::forward_iterator_tag) {
+constexpr auto advance(Iterator & it, Offset const offset, std::input_iterator_tag) {
 	for (auto const n : bounded::integer_range(offset)) {
 		static_cast<void>(n);
 		++it;
