@@ -29,7 +29,7 @@ struct negate_t {
 	{
 	}
 	template<typename... Args>
-	constexpr decltype(auto) operator()(Args && ... args) BOUNDED_NOEXCEPT(
+	constexpr decltype(auto) operator()(Args && ... args) const BOUNDED_NOEXCEPT(
 		!m_predicate(std::forward<Args>(args)...)
 	)
 private:
