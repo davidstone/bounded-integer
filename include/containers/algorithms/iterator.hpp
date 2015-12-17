@@ -15,7 +15,10 @@
 
 #pragma once
 
+#include <containers/addressof.hpp>
 #include <containers/is_iterator.hpp>
+#include <containers/iterator_adapter.hpp>
+#include <containers/type_list.hpp>
 
 #include <bounded_integer/bounded_integer.hpp>
 #include <bounded_integer/integer_range.hpp>
@@ -122,5 +125,59 @@ constexpr auto prev(Iterator it, Offset const offset = ::containers::detail::ite
 	::containers::advance(it, -offset);
 	return it;
 }
+
+
+namespace detail {
+
+template<typename Iterator>
+struct move_function_object {
+private:
+	using base_ref = decltype(*std::declval<Iterator>());
+	using result = std::conditional_t<std::is_reference<base_ref>::value, std::remove_reference_t<base_ref> &&, base_ref>;
+public:
+	template<typename T>
+	constexpr auto operator()(T && value) const BOUNDED_NOEXCEPT_DECLTYPE(
+		static_cast<result>(std::forward<T>(value))
+	)
+};
+
+}	// namespace detail
+
+template<typename Iterator>
+constexpr auto make_move_iterator(Iterator it) BOUNDED_NOEXCEPT_VALUE(
+	::containers::iterator_adapter(it, detail::move_function_object<Iterator>{})
+)
+
+template<typename Iterator>
+using move_iterator = decltype(make_move_iterator(std::declval<Iterator>()));
+
+
+
+namespace detail {
+
+struct reverse_dereference {
+	template<typename BidirectionalIterator>
+	constexpr auto operator()(BidirectionalIterator it) const BOUNDED_NOEXCEPT_DECLTYPE(
+		*::containers::prev(it)
+	)
+};
+
+// TODO: Support BidirectionalIterator
+struct reverse_add {
+	template<typename RandomAccessIterator>
+	constexpr auto operator()(RandomAccessIterator it, typename std::iterator_traits<RandomAccessIterator>::difference_type const difference) const BOUNDED_NOEXCEPT_DECLTYPE(
+		it - difference
+	)
+};
+
+}	// namespace detail
+
+template<typename BidirectionalIterator>
+constexpr auto make_reverse_iterator(BidirectionalIterator it) BOUNDED_NOEXCEPT_VALUE(
+	::containers::iterator_adapter(it, detail::reverse_dereference{}, detail::reverse_add{})
+)
+
+template<typename BidirectionalIterator>
+using reverse_iterator = decltype(make_reverse_iterator(std::declval<BidirectionalIterator>()));
 
 }	// namespace containers
