@@ -1,4 +1,3 @@
-// std::vector-like interface around an array
 // Copyright (C) 2015 David Stone
 //
 // This program is free software: you can redistribute it and / or modify
@@ -15,12 +14,46 @@
 // along with this program. If not, see <http://www.gnu.org/licenses/>.
 
 #include <containers/static_vector/static_vector.hpp>
-
-#include <iostream>
+#include <containers/static_vector/make_static_vector.hpp>
+#include <containers/array/make_array.hpp>
 
 namespace {
 
 using namespace bounded::literal;
+
+namespace constexpr_static_vector {
+	constexpr auto default_constructed = containers::static_vector<int, 9>{};
+	static_assert(empty(default_constructed));
+	
+	constexpr auto default_constructed_elements = containers::static_vector<int, 3>(2_bi);
+	static_assert(size(default_constructed_elements) == 2_bi);
+	static_assert(at(default_constructed_elements, 1_bi) == 0);
+	
+	constexpr auto copy_constructed = default_constructed_elements;
+	static_assert(copy_constructed == default_constructed_elements);
+	
+	constexpr auto n_copy = containers::static_vector<int, 4>(4_bi, 10);
+	static_assert(size(n_copy) == 4_bi);
+	static_assert(at(n_copy, 2_bi) == 10);
+	static_assert(n_copy == containers::make_static_vector(4_bi, 10));
+	
+	constexpr auto make() {
+		auto value = containers::static_vector<int, 10>{};
+		value.emplace_back(5);
+		value.emplace_back(15);
+		value.emplace_back(20);
+		value.emplace(value.begin() + 1_bi, 10);
+		value.pop_back();
+		auto copy = containers::static_vector<int, 10>{};
+		copy = value;
+		copy.insert(copy.begin() + 1_bi, value.begin(), value.end());
+		return copy;
+	}
+	constexpr auto made = make();
+	constexpr auto expected = containers::make_array(5, 5, 10, 15, 10, 15);
+	static_assert(containers::equal(made.begin(), made.end(), expected.begin(), expected.end()));
+	static_assert(made == made);
+}
 
 template<std::size_t capacity_, typename T>
 void test_generic(T const & t, std::initializer_list<T> init) {
