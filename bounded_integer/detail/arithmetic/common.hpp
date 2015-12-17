@@ -8,6 +8,7 @@
 #include "compound_assignment.hpp"
 #include "../is_bounded_integer.hpp"
 #include "../noexcept.hpp"
+#include "../requires.hpp"
 
 #include <type_traits>
 
@@ -34,10 +35,25 @@ BOUNDED_INTEGER_COMPOUND_ASSIGNMENT_OPERATOR(^)
 
 #undef BOUNDED_INTEGER_COMPOUND_ASSIGNMENT_OPERATOR
 
+template<typename...>
+using void_t = void;
+
+template<typename T, typename Enable = void>
+struct incrementable_by_bounded_c : std::false_type {};
 
 template<typename T>
+struct incrementable_by_bounded_c<T, void_t<decltype(std::declval<T &>() += bounded::constant<1>)>> : std::true_type {};
+
+template<typename T>
+constexpr auto incrementable_by_bounded = incrementable_by_bounded_c<T>::value;
+
+template<typename T, BOUNDED_REQUIRES(incrementable_by_bounded<T>)>
 constexpr auto operator++(T & value) BOUNDED_NOEXCEPT_DECLTYPE(
 	value += constant<1>
+)
+template<typename T, BOUNDED_REQUIRES(!incrementable_by_bounded<T>)>
+constexpr auto operator++(T & value) BOUNDED_NOEXCEPT_DECLTYPE(
+	value += 1
 )
 
 template<typename T>
@@ -48,9 +64,22 @@ constexpr auto operator++(T & value, int) noexcept(std::is_nothrow_copy_construc
 }
 
 
+template<typename T, typename Enable = void>
+struct decrementable_by_bounded_c : std::false_type {};
+
 template<typename T>
+struct decrementable_by_bounded_c<T, void_t<decltype(std::declval<T &>() -= bounded::constant<1>)>> : std::true_type {};
+
+template<typename T>
+constexpr auto decrementable_by_bounded = decrementable_by_bounded_c<T>::value;
+
+template<typename T, BOUNDED_REQUIRES(decrementable_by_bounded<T>)>
 constexpr auto operator--(T & value) BOUNDED_NOEXCEPT_DECLTYPE(
 	value -= constant<1>
+)
+template<typename T, BOUNDED_REQUIRES(!decrementable_by_bounded<T>)>
+constexpr auto operator--(T & value) BOUNDED_NOEXCEPT_DECLTYPE(
+	value -= 1
 )
 
 template<typename T>
