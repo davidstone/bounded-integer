@@ -71,20 +71,20 @@ constexpr auto cend(Container const & container) BOUNDED_NOEXCEPT(
 
 template<typename Container, BOUNDED_REQUIRES(is_container<Container>)>
 constexpr auto rbegin(Container && container) BOUNDED_NOEXCEPT(
-	std::make_reverse_iterator(std::forward<Container>(container).begin())
+	::containers::make_reverse_iterator(std::forward<Container>(container).begin())
 )
 template<typename Container, BOUNDED_REQUIRES(is_container<Container>)>
 constexpr auto rend(Container && container) BOUNDED_NOEXCEPT(
-	std::make_reverse_iterator(std::forward<Container>(container).end())
+	::containers::make_reverse_iterator(std::forward<Container>(container).end())
 )
 
 template<typename Container, BOUNDED_REQUIRES(is_container<Container>)>
 constexpr auto crbegin(Container const & container) BOUNDED_NOEXCEPT(
-	std::make_reverse_iterator(container.begin())
+	::containers::make_reverse_iterator(container.begin())
 )
 template<typename Container, BOUNDED_REQUIRES(is_container<Container>)>
 constexpr auto crend(Container const & container) BOUNDED_NOEXCEPT(
-	std::make_reverse_iterator(container.end())
+	::containers::make_reverse_iterator(container.end())
 )
 
 
@@ -189,7 +189,7 @@ template<typename Container, typename Iterator, BOUNDED_REQUIRES(is_container<Co
 constexpr auto erase(Container & container, Iterator const first_, Iterator const last_) noexcept {
 	auto const first = make_moving_iterator(container, first_);
 	auto const last = make_moving_iterator(container, last_);
-	auto const to_clear = std::move(last, make_moving_iterator(container, container.end()), first);
+	auto const to_clear = ::containers::move(last, make_moving_iterator(container, container.end()), first).output;
 	while (to_clear != make_moving_iterator(container, container.end())) {
 		container.pop_back();
 	}
@@ -313,7 +313,7 @@ constexpr auto emplace_in_middle_no_reallocation(Container & container, typename
 	auto const position = detail::make_mutable_iterator(container, position_);
 	auto const original_end = container.end();
 	container.emplace_back(std::move(back(container)));
-	std::move_backward(position, ::containers::prev(original_end), original_end);
+	::containers::move_backward(position, ::containers::prev(original_end), original_end);
 	auto const pointer = ::containers::addressof(*position);
 	::containers::detail::destroy(allocator, pointer);
 	::containers::detail::construct(allocator, pointer, std::forward<Args>(args)...);
