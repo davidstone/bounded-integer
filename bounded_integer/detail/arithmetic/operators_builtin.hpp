@@ -36,7 +36,7 @@ constexpr auto operator symbol(std::integral_constant<T, lhs>, RHS const rhs) no
 // a built-in integer. If this macro is defined, it is a bounded::integer with
 // the poisoned bit set to true.
 
-#if defined BOUNDED_MIXED_ARITHMETIC_RESULT_IS_BOUNDED_INTEGER
+#ifndef BOUNDED_MIXED_ARITHMETIC_RESULT_IS_BUILTIN
 
 #define BOUNDED_INTEGER_MIXED_OPERATOR_OVERLOADS(symbol, minimum, maximum) \
 template< \
