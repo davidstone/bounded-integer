@@ -6,6 +6,7 @@
 #pragma once
 
 #include <bounded/detail/abs.hpp>
+#include <bounded/detail/addressof.hpp>
 #include <bounded/detail/basic_numeric_limits.hpp>
 #include <bounded/detail/cast.hpp>
 #include <bounded/detail/class.hpp>
@@ -13,6 +14,7 @@
 #include <bounded/detail/comparison.hpp>
 #include <bounded/detail/comparison_builtin.hpp>
 #include <bounded/detail/conditional.hpp>
+#include <bounded/detail/construct_destroy.hpp>
 #include <bounded/detail/hash.hpp>
 #include <bounded/detail/literal.hpp>
 #include <bounded/detail/log.hpp>
