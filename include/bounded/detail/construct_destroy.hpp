@@ -6,6 +6,7 @@
 #pragma once
 
 #include <bounded/detail/addressof.hpp>
+#include <bounded/detail/noexcept.hpp>
 #include <bounded/detail/requires.hpp>
 
 #include <memory>
