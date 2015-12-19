@@ -15,6 +15,7 @@ sources = [
 ]
 sources += prepend_dir('detail', [
 	'abs.cpp',
+	'addressof.cpp',
 	'basic_numeric_limits.cpp',
 	'cast.cpp',
 	'class.cpp',
