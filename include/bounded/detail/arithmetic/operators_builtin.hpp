@@ -51,7 +51,7 @@ template< \
 	BOUNDED_REQUIRES(std::is_integral<T>::value) \
 > \
 constexpr auto operator symbol(T const lhs, integer<rhs_min, rhs_max, overflow, storage, poisoned> const rhs) noexcept { \
-	return integer<minimum, maximum, overflow, storage, true>(lhs) symbol rhs; \
+	return bounded::make<overflow>(lhs) symbol rhs; \
 } \
 BOUNDED_INTEGER_MIXED_OPERATOR_OVERLOADS_INTEGRAL_CONSTANT(symbol)
 
