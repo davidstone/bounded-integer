@@ -1181,52 +1181,63 @@ auto check_assignment() {
 	assert(y == 10_bi);
 }
 
+template<typename LHS, typename RHS>
+constexpr auto plus_equals(LHS lhs, RHS rhs) {
+	return lhs += rhs;
+}
+template<typename LHS, typename RHS>
+constexpr auto minus_equals(LHS lhs, RHS rhs) {
+	return lhs -= rhs;
+}
+template<typename LHS, typename RHS>
+constexpr auto times_equals(LHS lhs, RHS rhs) {
+	return lhs *= rhs;
+}
+template<typename LHS, typename RHS>
+constexpr auto divide_equals(LHS lhs, RHS rhs) {
+	return lhs /= rhs;
+}
+template<typename LHS, typename RHS>
+constexpr auto modulo_equals(LHS lhs, RHS rhs) {
+	return lhs %= rhs;
+}
+
 auto check_compound_arithmetic() {
-	bounded::integer<0, 10> x(5);
-	x += 5_bi;
-	assert(x == 10);
-	bounded::checked_integer<-10, 10> y(-5);
-	y += 5;
-	assert(y == 0);
-	y += x;	
-	assert(y == 10);
-	bounded::checked_integer<-1000, 1000> z(0);
-	z += y;
-	assert(z == 10);
-	z *= x - 5;
-	assert(z == 50);
-	z -= 1;
-	assert(z == 49);
-	z /= 7;
-	assert(z == 7);
-	z = 0;
-	assert(z == 0);
-	x %= 6_bi;
-	assert(x == 4);
+	using x_type = bounded::checked_integer<0, 10>;
+	using y_type = bounded::checked_integer<-10, 10>;
+	static_assert(plus_equals(x_type(5_bi), 5_bi) == 10_bi);
+	static_assert(plus_equals(y_type(-5_bi), 5) == 0_bi);
+	static_assert(plus_equals(y_type(0_bi), x_type(10_bi)) == 10_bi);
+	
+	using z_type = bounded::checked_integer<-1000, 1000>;
+	static_assert(plus_equals(z_type(0_bi), x_type(10_bi)) == 10_bi);
+	static_assert(times_equals(z_type(10_bi), x_type(10_bi) - 5) == 50_bi);
+	static_assert(times_equals(z_type(10_bi), x_type(10_bi) - 5) == 50_bi);
+	static_assert(minus_equals(z_type(50_bi), 1) == 49_bi);
+	static_assert(divide_equals(z_type(49_bi), 7) == 7_bi);
+	static_assert(modulo_equals(x_type(10_bi), 6_bi) == 4_bi);
 	
 	// This code doesn't work with -Wconversion, but should still compile.
 	// short s = 0;
 	// s += 4_bi;
 	// assert(s == 4);
-	int i = 9;
-	i -= 68_bi;
-	assert(i == -59);
+	static_assert(minus_equals(9, 68_bi) == -59);
 	// long l = -7;
 	// l *= z + 1_bi;
 	// assert(l == -7);
-	i /= y;
-	assert(i == -5);
-	i %= 4_bi;
-	assert(i == -1);
+	static_assert(divide_equals(-59, y_type(10_bi)) == -5);
+	static_assert(modulo_equals(-5, 4_bi) == -1);
 
-	assert(++x == 5);
-	assert(x == 5);
+	auto x = x_type(4_bi);
+	assert(++x == 5_bi);
+	assert(x == 5_bi);
+	x = 0;
+	assert(x == 0);
+	auto z = z_type(0_bi);
 	assert(z++ == 0);
 	assert(z == 1);
-	
-	bounded::clamped_integer<0, 10> clamped(5_bi);
-	clamped -= 20_bi;
-	assert(clamped == 0_bi);
+
+	static_assert(minus_equals(bounded::clamped_integer<0, 10>(5_bi), 20_bi) == 0_bi);	
 }
 
 template<typename Initial, intmax_t initial_value, typename Expected, intmax_t expected_value>
