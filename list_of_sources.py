@@ -25,6 +25,7 @@ sources += prepend_dir('detail', [
 	'comparison_builtin.cpp',
 	'comparison_function_object.cpp',
 	'conditional.cpp',
+	'construct_destroy.cpp',
 	'forward_declaration.cpp',
 	'hash.cpp',
 	'integer_range.cpp',
