@@ -5,12 +5,13 @@
 
 from program import prepend_dir, Program
 
-source_directory = 'bounded_integer'
+source_directory = 'source/bounded'
+include_directories = ['../include']
 
 sources = [
+	'integer.cpp',
 	'integer_range.cpp',
 	'optional.cpp',
-	'bounded_integer.cpp'
 ]
 sources += prepend_dir('detail', [
 	'abs.cpp',
@@ -76,6 +77,7 @@ sources += prepend_dir('detail/policy', [
 programs = [
 	Program(
 		'test',
-		sources = sources
+		sources = sources,
+		include_directories = include_directories
 	)
 ]
