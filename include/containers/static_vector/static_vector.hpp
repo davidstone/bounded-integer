@@ -32,6 +32,12 @@ template<typename T, std::size_t capacity, bool trivial = std::is_trivial<T>::va
 struct static_vector_data;
 
 template<typename T, std::size_t capacity>
+struct static_vector_data<T, capacity, true> {
+	array<T, capacity> m_container = {{}};
+	bounded::integer<0, capacity> m_size = bounded::constant<0>;
+};
+
+template<typename T, std::size_t capacity>
 struct static_vector_data<T, capacity, false> {
 	~static_vector_data() {
 		for (auto const n : bounded::integer_range(m_size)) {
@@ -43,13 +49,6 @@ struct static_vector_data<T, capacity, false> {
 	}
 
 	array<uninitialized_storage<T>, capacity> m_container = {{}};
-	bounded::integer<0, capacity> m_size = bounded::constant<0>;
-};
-
-
-template<typename T, std::size_t capacity>
-struct static_vector_data<T, capacity, true> {
-	array<T, capacity> m_container = {{}};
 	bounded::integer<0, capacity> m_size = bounded::constant<0>;
 };
 
