@@ -31,7 +31,7 @@ namespace detail {
 template<typename T>
 using static_vector_raw_storage = std::conditional_t<std::is_trivially_default_constructible<T>::value, T, uninitialized_storage<T>>;
 
-template<typename T, std::size_t capacity, bool trivial = std::is_trivial<T>::value>
+template<typename T, std::size_t capacity, bool trivial = std::is_trivially_destructible<T>::value>
 struct static_vector_data;
 
 template<typename T, std::size_t capacity>
@@ -41,18 +41,15 @@ struct static_vector_data<T, capacity, true> {
 };
 
 template<typename T, std::size_t capacity>
-struct static_vector_data<T, capacity, false> {
+struct static_vector_data<T, capacity, false> : static_vector_data<T, capacity, true> {
 	~static_vector_data() {
-		for (auto const n : bounded::integer_range(m_size)) {
+		for (auto const n : bounded::integer_range(this->m_size)) {
 			::containers::detail::destroy(
 				containers::detail::allocator<T>{},
-				reinterpret_cast<T *>(m_container.data()) + (m_size - n - bounded::constant<1>)
+				reinterpret_cast<T *>(this->m_container.data()) + (this->m_size - n - bounded::constant<1>)
 			);
 		}
 	}
-
-	array<static_vector_raw_storage<T>, capacity> m_container = {{}};
-	bounded::integer<0, capacity> m_size = bounded::constant<0>;
 };
 
 
