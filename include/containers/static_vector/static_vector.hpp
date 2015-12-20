@@ -35,15 +35,11 @@ template<typename T, std::size_t capacity>
 struct static_vector_data<T, capacity, false> {
 	~static_vector_data() {
 		for (auto const n : bounded::integer_range(m_size)) {
-			::containers::detail::destroy(containers::detail::allocator<T>{}, data() + (m_size - n - bounded::constant<1>));
+			::containers::detail::destroy(
+				containers::detail::allocator<T>{},
+				reinterpret_cast<T *>(m_container.data()) + (m_size - n - bounded::constant<1>)
+			);
 		}
-	}
-
-	auto data() const noexcept {
-		return reinterpret_cast<T const *>(m_container.data());
-	}
-	auto data() noexcept {
-		return reinterpret_cast<T *>(m_container.data());
 	}
 
 	array<uninitialized_storage<T>, capacity> m_container = {{}};
@@ -53,13 +49,6 @@ struct static_vector_data<T, capacity, false> {
 
 template<typename T, std::size_t capacity>
 struct static_vector_data<T, capacity, true> {
-	constexpr auto data() const noexcept {
-		return m_container.data();
-	}
-	constexpr auto data() noexcept {
-		return m_container.data();
-	}
-
 	array<T, capacity> m_container = {{}};
 	bounded::integer<0, capacity> m_size = bounded::constant<0>;
 };
@@ -118,7 +107,12 @@ struct static_vector : private detail::static_vector_data<T, capacity_>  {
 	}
 
 
-	using detail::static_vector_data<value_type, capacity_>::data;
+	constexpr auto data() const noexcept {
+		return ::containers::detail::static_or_reinterpret_cast<T const *>(this->m_container.data());
+	}
+	constexpr auto data() noexcept {
+		return ::containers::detail::static_or_reinterpret_cast<T *>(this->m_container.data());
+	}
 
 	constexpr auto begin() const noexcept {
 		return const_iterator(data());
