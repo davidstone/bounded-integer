@@ -13,14 +13,21 @@
 #include <type_traits>
 
 namespace bounded {
+namespace detail {
 
-template<typename T, typename... Args, BOUNDED_REQUIRES(!std::is_trivially_copyable<T>::value)>
+// A non-movable type still returns true for is_trivially_copyable and friends
+template<typename T, typename... Args>
+constexpr auto constexpr_constructible = std::is_move_assignable<T>::value and std::is_trivially_move_assignable<T>::value and std::is_trivially_destructible<T>::value;
+
+}	// namespace detail
+
+template<typename T, typename... Args, BOUNDED_REQUIRES(!detail::constexpr_constructible<T, Args...>)>
 auto construct(T & ref, Args && ... args) BOUNDED_NOEXCEPT(
-	::new(static_cast<void *>(::bounded::addressof(ref))) T(std::forward<Args>(args)...)
+	static_cast<void>(::new(static_cast<void *>(::bounded::addressof(ref))) T(std::forward<Args>(args)...))
 )
-template<typename T, typename... Args, BOUNDED_REQUIRES(std::is_trivially_copyable<T>::value)>
+template<typename T, typename... Args, BOUNDED_REQUIRES(detail::constexpr_constructible<T, Args...>)>
 constexpr auto construct(T & ref, Args && ... args) BOUNDED_NOEXCEPT(
-	ref = T(std::forward<Args>(args)...)
+	static_cast<void>(ref = T(std::forward<Args>(args)...))
 )
 
 template<typename T, BOUNDED_REQUIRES(!std::is_trivially_destructible<T>::value)>
