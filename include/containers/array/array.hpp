@@ -58,9 +58,44 @@ struct array {
 
 
 	// Consider this private. It must be public for the class to be an
-	// aggregate. Specialized for the 0-element case, see
-	// https://stackoverflow.com/questions/15512827/why-is-stdarray-t-0-not-empty
-	value_type m_value[size == 0 ? 1 : size];
+	// aggregate
+	value_type m_value[size];
+};
+
+struct aggregate_initialization {
+};
+
+template<typename T>
+struct array<T, 0> {
+	using value_type = T;
+
+	using size_type = bounded::constant_t<0>;
+	
+	using const_iterator = basic_array_iterator<value_type const, array>;
+	using iterator = basic_array_iterator<value_type, array>;
+	
+	constexpr array() noexcept = default;
+
+	// This class is technically not an aggregate because I defined this
+	// constructor, but I do not think it changes observable behavior.
+	//
+	// This extra parameter is an aggregate and thus can be constructed with {}.
+	// This constructor allows the syntax array<T, 0> = {{}}
+	constexpr array(aggregate_initialization) noexcept {}
+
+	constexpr auto data() const noexcept {
+		return nullptr;
+	}
+
+	constexpr auto begin() const noexcept {
+		return const_iterator(data());
+	}
+
+	constexpr auto end() const noexcept {
+		return begin();
+	}
+	
+	// No operator[]
 };
 
 
