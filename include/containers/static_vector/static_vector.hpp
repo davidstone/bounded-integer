@@ -9,6 +9,7 @@
 #include <containers/algorithms/iterator.hpp>
 #include <containers/common_container_functions.hpp>
 #include <containers/index_type.hpp>
+#include <containers/is_iterator_sentinel.hpp>
 #include <containers/repeat_n.hpp>
 #include <containers/uninitialized_storage.hpp>
 #include <containers/algorithms/copy.hpp>
@@ -74,7 +75,7 @@ struct static_vector : private detail::static_vector_data<T, capacity_>  {
 		static_vector(count_constructor{}, count, value)
 	) {}
 	
-	template<typename InputIterator, typename Sentinel>
+	template<typename InputIterator, typename Sentinel, BOUNDED_REQUIRES(is_iterator_sentinel<InputIterator, Sentinel>)>
 	constexpr static_vector(InputIterator first, Sentinel const last) noexcept(noexcept(first != last) and noexcept(++first) and noexcept(emplace_back(*first))) {
 		for (; first != last; ++first) {
 			emplace_back(*first);

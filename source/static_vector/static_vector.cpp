@@ -43,6 +43,9 @@ namespace constexpr_static_vector {
 	constexpr auto expected = containers::make_array(5, 5, 10, 15, 10, 15);
 	static_assert(containers::equal(made.begin(), made.end(), expected.begin(), expected.end()));
 	static_assert(made == made);
+	
+	constexpr auto bounded_integer_element = containers::static_vector<bounded::integer<0, 10>, 1>(1_bi, 2_bi);
+	static_assert(front(bounded_integer_element) == 2_bi);
 }
 
 template<std::size_t capacity_, typename T>
