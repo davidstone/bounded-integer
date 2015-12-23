@@ -29,15 +29,12 @@
 namespace containers {
 namespace detail {
 
-template<typename T>
-using static_vector_raw_storage = std::conditional_t<std::is_trivially_default_constructible<T>::value, T, uninitialized_storage<T>>;
-
 template<typename T, std::size_t capacity, bool trivial = std::is_trivially_destructible<T>::value>
 struct static_vector_data;
 
 template<typename T, std::size_t capacity>
 struct static_vector_data<T, capacity, true> {
-	array<static_vector_raw_storage<T>, capacity> m_container = {{}};
+	array<trivial_storage<T>, capacity> m_container = {{}};
 	bounded::integer<0, capacity> m_size = bounded::constant<0>;
 };
 
