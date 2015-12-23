@@ -42,7 +42,7 @@ public:
 	
 	constexpr vector() noexcept = default;
 	
-	constexpr vector(allocator_type allocator):
+	constexpr explicit vector(allocator_type allocator):
 		m_container(std::move(allocator))
 	{
 	}
