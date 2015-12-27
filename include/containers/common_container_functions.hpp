@@ -141,7 +141,7 @@ constexpr auto push_back(Container & container, typename Container::value_type &
 
 
 // TODO: specialize for ForwardIterator to call reserve
-template<typename Container, typename InputIterator, typename Sentinel, BOUNDED_REQUIRES(is_container<Container> and is_iterator<InputIterator>)>
+template<typename Container, typename InputIterator, typename Sentinel, BOUNDED_REQUIRES(is_container<Container> and is_iterator_sentinel<InputIterator, Sentinel>)>
 constexpr auto append(Container & container, InputIterator first, Sentinel last) {
 	auto const offset = size(container);
 	for (; first != last; ++first) {
@@ -195,7 +195,7 @@ constexpr auto erase_if(Container & container, Predicate predicate) {
 
 
 // TODO: noexcept
-template<typename Container, typename InputIterator, typename Sentinel, BOUNDED_REQUIRES(is_container<Container> and is_iterator<InputIterator>)>
+template<typename Container, typename InputIterator, typename Sentinel, BOUNDED_REQUIRES(is_container<Container> and is_iterator_sentinel<InputIterator, Sentinel>)>
 constexpr auto assign(Container & container, InputIterator first, Sentinel const last) {
 	// TODO: Do we try to reuse storage like this or just clear() + construct
 	auto it = container.begin();
