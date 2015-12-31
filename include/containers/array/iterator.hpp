@@ -35,10 +35,10 @@ struct basic_array_iterator {
 		return basic_array_iterator<value_type const, Container>(m_it);
 	}
 
-	constexpr auto & operator*() const {
+	constexpr auto & operator*() const noexcept {
 		return *m_it;
 	}
-	constexpr auto operator->() const {
+	constexpr auto operator->() const noexcept {
 		return ::bounded::addressof(operator*());
 	}
 
