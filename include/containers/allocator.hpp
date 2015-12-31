@@ -13,7 +13,6 @@
 #include <memory>
 
 namespace containers {
-namespace detail {
 
 template<typename T>
 struct allocator {
@@ -37,6 +36,7 @@ constexpr auto operator==(allocator<LHS>, allocator<RHS>) noexcept {
 }
 
 
+namespace detail {
 
 template<typename A, typename T, typename Args, typename Enable = void>
 struct allocator_has_construct_c : std::false_type {};
@@ -67,6 +67,7 @@ template<typename A, typename T>
 constexpr auto allocator_has_destroy = allocator_has_destroy_c<A, T>::value;
 
 
+}	// namespace detail
 
 template<typename Allocator>
 struct allocator_traits : private std::allocator_traits<Allocator> {
@@ -97,25 +98,24 @@ public:
 	using base::select_on_container_copy_construction;
 	
 
-	template<typename T, typename... Args, BOUNDED_REQUIRES(allocator_has_construct<allocator_type, T, Args...>)>
+	template<typename T, typename... Args, BOUNDED_REQUIRES(detail::allocator_has_construct<allocator_type, T, Args...>)>
 	static constexpr auto construct(allocator_type & a, T * const ptr, Args && ... args) BOUNDED_NOEXCEPT(
 		static_cast<void>(a.construct(ptr, std::forward<Args>(args)...))
 	)
-	template<typename T, typename... Args, BOUNDED_REQUIRES(!allocator_has_construct<allocator_type, T, Args...>)>
+	template<typename T, typename... Args, BOUNDED_REQUIRES(!detail::allocator_has_construct<allocator_type, T, Args...>)>
 	static constexpr auto construct(allocator_type &, T * const ptr, Args && ... args) BOUNDED_NOEXCEPT(
 		::bounded::construct(*ptr, std::forward<Args>(args)...)
 	)
 	
 
-	template<typename T, BOUNDED_REQUIRES(allocator_has_destroy<allocator_type, T>)>
+	template<typename T, BOUNDED_REQUIRES(detail::allocator_has_destroy<allocator_type, T>)>
 	static constexpr auto destroy(allocator_type & a, T * const ptr) BOUNDED_NOEXCEPT(
 		static_cast<void>(a.destroy(ptr))
 	)
-	template<typename T, BOUNDED_REQUIRES(!allocator_has_destroy<allocator_type, T>)>
+	template<typename T, BOUNDED_REQUIRES(!detail::allocator_has_destroy<allocator_type, T>)>
 	static constexpr auto destroy(allocator_type &, T * const ptr) BOUNDED_NOEXCEPT(
 		::bounded::destroy(*ptr)
 	)
 };
 
-}	// namespace detail
 }	// namespace containers

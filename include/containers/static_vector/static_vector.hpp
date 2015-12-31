@@ -43,7 +43,7 @@ struct static_vector_data<T, capacity, false> : static_vector_data<T, capacity, 
 	~static_vector_data() {
 		for (auto const n : bounded::integer_range(this->m_size)) {
 			::containers::detail::destroy(
-				containers::detail::allocator<T>{},
+				allocator<T>{},
 				reinterpret_cast<T *>(this->m_container.data()) + (this->m_size - n - bounded::constant<1>)
 			);
 		}
@@ -177,7 +177,7 @@ struct static_vector : private detail::static_vector_data<T, capacity_>  {
 
 private:
 	static constexpr auto get_allocator() noexcept {
-		return containers::detail::allocator<value_type>{};
+		return allocator<value_type>{};
 	}
 
 	enum class count_constructor{};
