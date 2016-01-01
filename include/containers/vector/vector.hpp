@@ -101,8 +101,7 @@ public:
 	}
 
 	~vector() {
-		// clear leads to stack overflow
-		erase(*this, begin(), end());
+		::containers::detail::destroy(get_allocator(), begin(), end());
 	}
 
 

@@ -85,6 +85,10 @@ struct dynamic_array {
 	{
 		other.m_size = bounded::constant<0>;
 	}
+	
+	~dynamic_array() {
+		::containers::detail::destroy(get_allocator(), begin(), end());
+	}
 
 	constexpr auto & operator=(dynamic_array const & other) & {
 		assign(*this, other.begin(), other.end());

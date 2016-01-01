@@ -41,12 +41,9 @@ struct static_vector_data<T, capacity, true> {
 template<typename T, std::size_t capacity>
 struct static_vector_data<T, capacity, false> : static_vector_data<T, capacity, true> {
 	~static_vector_data() {
-		for (auto const n : bounded::integer_range(this->m_size)) {
-			::containers::detail::destroy(
-				allocator<T>{},
-				reinterpret_cast<T *>(this->m_container.data()) + (this->m_size - n - bounded::constant<1>)
-			);
-		}
+		auto const begin = this->m_container.data();
+		auto const end = begin + this->m_size;
+		::containers::detail::destroy(allocator<T>{}, begin, end);
 	}
 };
 
