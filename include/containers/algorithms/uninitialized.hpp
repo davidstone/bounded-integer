@@ -59,6 +59,14 @@ constexpr auto destroy(Allocator && allocator, T * pointer) BOUNDED_NOEXCEPT(
 	)
 )
 
+template<typename Allocator, typename InputIterator, typename Sentinel, BOUNDED_REQUIRES(is_iterator_sentinel<InputIterator, Sentinel>)>
+constexpr auto destroy(Allocator && allocator, InputIterator first, Sentinel const last) noexcept {
+	static_assert(noexcept(::containers::detail::destroy(allocator, ::bounded::addressof(*first))));
+	for (; first != last; ++first) {
+		::containers::detail::destroy(allocator, ::bounded::addressof(*first));
+	}
+}
+
 }	// namespace detail
 
 
@@ -121,6 +129,15 @@ template<typename BidirectionalInputIterator, typename BidirectionalOutputIterat
 constexpr auto uninitialized_move_backward(BidirectionalInputIterator const first, BidirectionalInputIterator const last, BidirectionalOutputIterator const out_last, Allocator && allocator) BOUNDED_NOEXCEPT_VALUE(
 	::containers::uninitialized_copy_backward(::containers::make_move_iterator(first), ::containers::make_move_iterator(last), out_last, allocator)
 )
+
+
+template<typename InputIterator, typename ForwardIterator, typename Allocator>
+constexpr auto uninitialized_move_destroy(InputIterator const first, InputIterator const last, ForwardIterator const out, Allocator && allocator) noexcept(noexcept(::containers::uninitialized_move(first, last, out, allocator))) {
+	auto const it = ::containers::uninitialized_move(first, last, out, allocator);
+	::containers::detail::destroy(allocator, first, last);
+	return it;
+}
+
 
 
 template<
