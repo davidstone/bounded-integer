@@ -5,6 +5,7 @@
 
 #pragma once
 
+#include <containers/allocator.hpp>
 #include <containers/common_container_functions.hpp>
 #include <containers/apply_tuple.hpp>
 #include <containers/algorithms/negate.hpp>
@@ -34,7 +35,7 @@ namespace detail {
 template<typename Key, typename T, template<typename, typename> class Container>
 constexpr bool supports_const_key() {
 	using pair_type = std::pair<Key const, T>;
-	using container_type = Container<pair_type, std::allocator<pair_type>>;
+	using container_type = Container<pair_type, allocator<pair_type>>;
 	using value_type = std::remove_reference_t<decltype(*moving_begin(std::declval<container_type>()))>;
 	return std::is_copy_assignable<typename value_type::first_type>::value;
 }
@@ -553,17 +554,17 @@ public:
 
 }	// namespace detail
 
-template<typename Key, typename T, typename Compare = std::less<Key>, typename Allocator = std::allocator<detail::value_type_t<Key, T, vector>>>
+template<typename Key, typename T, typename Compare = std::less<Key>, typename Allocator = allocator<detail::value_type_t<Key, T, vector>>>
 using unstable_flat_map = detail::flat_map<Key, T, Compare, vector, Allocator>;
 
-template<typename Key, typename T, typename Compare = std::less<Key>, typename Allocator = std::allocator<detail::value_type_t<Key, T, moving_vector>>>
+template<typename Key, typename T, typename Compare = std::less<Key>, typename Allocator = allocator<detail::value_type_t<Key, T, moving_vector>>>
 using stable_flat_map = detail::flat_map<Key, T, Compare, moving_vector, Allocator>;
 
 
-template<typename Key, typename T, typename Compare = std::less<Key>, typename Allocator = std::allocator<detail::value_type_t<Key, T, vector>>>
+template<typename Key, typename T, typename Compare = std::less<Key>, typename Allocator = allocator<detail::value_type_t<Key, T, vector>>>
 using unstable_flat_multimap = detail::flat_multimap<Key, T, Compare, vector, Allocator>;
 
-template<typename Key, typename T, typename Compare = std::less<Key>, typename Allocator = std::allocator<detail::value_type_t<Key, T, moving_vector>>>
+template<typename Key, typename T, typename Compare = std::less<Key>, typename Allocator = allocator<detail::value_type_t<Key, T, moving_vector>>>
 using stable_flat_multimap = detail::flat_multimap<Key, T, Compare, moving_vector, Allocator>;
 
 

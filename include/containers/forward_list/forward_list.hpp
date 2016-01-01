@@ -5,6 +5,7 @@
 
 #pragma once
 
+#include <containers/allocator.hpp>
 #include <containers/algorithms/iterator.hpp>
 
 #include <bounded/integer.hpp>
@@ -65,7 +66,7 @@ public:
 }	// namespace fl
 }	// namespace detail
 
-template<typename T, typename Allocator = std::allocator<T>>
+template<typename T, typename Allocator = allocator<T>>
 class forward_list {
 public:
 	typedef T value_type;
@@ -79,8 +80,8 @@ public:
 	typedef std::ptrdiff_t difference_type;
 	typedef value_type & reference;
 	typedef value_type const & const_reference;
-	typedef typename std::allocator_traits<allocator_type>::pointer pointer;
-	typedef typename std::allocator_traits<allocator_type>::const_pointer const_pointer;
+	typedef typename allocator_traits<allocator_type>::pointer pointer;
+	typedef typename allocator_traits<allocator_type>::const_pointer const_pointer;
 
 	class iterator {
 	public:

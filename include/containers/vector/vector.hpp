@@ -5,6 +5,7 @@
 
 #pragma once
 
+#include <containers/allocator.hpp>
 #include <containers/algorithms/iterator.hpp>
 #include <containers/common_container_functions.hpp>
 #include <containers/dynamic_array/dynamic_array.hpp>
@@ -23,10 +24,10 @@
 
 namespace containers {
 
-template<typename T, typename Allocator = std::allocator<T>>
+template<typename T, typename Allocator = allocator<T>>
 struct vector {
 	using value_type = T;
-	using allocator_type = typename std::allocator_traits<Allocator>::template rebind_alloc<value_type>;
+	using allocator_type = typename allocator_traits<Allocator>::template rebind_alloc<value_type>;
 	
 private:
 	using raw_container = dynamic_array<uninitialized_storage<value_type>, allocator_type>;

@@ -5,6 +5,7 @@
 
 #pragma once
 
+#include <containers/allocator.hpp>
 #include <containers/common_container_functions.hpp>
 #include <containers/is_iterator.hpp>
 #include <containers/repeat_n.hpp>
@@ -13,7 +14,6 @@
 #include <containers/array/iterator.hpp>
 
 #include <iterator>
-#include <memory>
 
 namespace containers {
 namespace detail {
@@ -30,12 +30,12 @@ constexpr auto maximum_array_size = static_cast<std::intmax_t>(
 }	// namespace detail
 
 // TODO: Support stateful allocators in implementation
-template<typename T, typename Allocator = std::allocator<T>>
+template<typename T, typename Allocator = allocator<T>>
 struct dynamic_array {
 	using value_type = T;
 	using size_type = bounded::integer<0, detail::maximum_array_size<T>>;
 
-	using allocator_type = typename std::allocator_traits<Allocator>::template rebind_alloc<value_type>;
+	using allocator_type = typename allocator_traits<Allocator>::template rebind_alloc<value_type>;
 	static_assert(std::is_empty<allocator_type>::value, "Stateful allocators not yet supported.");
 
 	using const_iterator = detail::basic_array_iterator<value_type const, dynamic_array>;

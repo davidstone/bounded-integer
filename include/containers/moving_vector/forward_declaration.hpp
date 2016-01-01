@@ -5,11 +5,11 @@
 
 #pragma once
 
-#include <memory>
+#include <containers/allocator.hpp>
 
 namespace containers {
 
-template<typename T, typename Allocator = std::allocator<T>>
+template<typename T, typename Allocator = allocator<T>>
 class moving_vector;
 
 
