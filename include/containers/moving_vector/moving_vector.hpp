@@ -25,7 +25,7 @@ private:
 	using element_type = smart_pointer::value_ptr<value_type>;
 	using container_type = vector<element_type, Allocator>;
 public:
-	using allocator_type = typename allocator_traits<Allocator>::template rebind_alloc<element_type>;
+	using allocator_type = detail::rebound_allocator<element_type, Allocator>;
 	using size_type = typename container_type::size_type;
 	
 	using moving_iterator = detail::basic_array_iterator<element_type, moving_vector>;

@@ -27,7 +27,7 @@ namespace containers {
 template<typename T, typename Allocator = allocator<T>>
 struct vector {
 	using value_type = T;
-	using allocator_type = typename allocator_traits<Allocator>::template rebind_alloc<value_type>;
+	using allocator_type = detail::rebound_allocator<value_type, Allocator>;
 	
 private:
 	using raw_container = dynamic_array<uninitialized_storage<value_type>, allocator_type>;
