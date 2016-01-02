@@ -61,6 +61,20 @@ struct dynamic_array : private detail::rebound_allocator<T, Allocator> {
 	{
 	}
 	
+	template<typename ForwardIterator, typename Sentinel, BOUNDED_REQUIRES(is_iterator<ForwardIterator>)>
+	constexpr dynamic_array(ForwardIterator first, Sentinel const last, allocator_type allocator = allocator_type{}):
+		allocator_type(std::move(allocator)),
+		m_size(::containers::distance(first, last)),
+		m_data(make_storage(m_size))
+	{
+		::containers::uninitialized_copy(first, last, m_data.get(), get_allocator());
+	}
+
+	constexpr dynamic_array(std::initializer_list<value_type> init, allocator_type allocator = allocator_type{}):
+		dynamic_array(init.begin(), init.end(), std::move(allocator))
+	{
+	}
+
 	template<typename Count, BOUNDED_REQUIRES(std::is_convertible<Count, size_type>::value)>
 	explicit constexpr dynamic_array(Count const count, allocator_type allocator = allocator_type{}):
 		allocator_type(std::move(allocator)),
@@ -70,18 +84,6 @@ struct dynamic_array : private detail::rebound_allocator<T, Allocator> {
 		::containers::uninitialized_default_construct(begin(), end(), get_allocator());
 	}
 	
-	template<typename ForwardIterator, typename Sentinel, BOUNDED_REQUIRES(is_iterator<ForwardIterator>)>
-	constexpr dynamic_array(ForwardIterator first, Sentinel const last, allocator_type allocator = allocator_type{}):
-		allocator_type(std::move(allocator)),
-		m_size(::containers::distance(first, last)),
-		m_data(make_storage(m_size))
-	{
-		::containers::uninitialized_copy(first, last, m_data.get(), get_allocator());
-	}
-	dynamic_array(std::initializer_list<value_type> init, allocator_type allocator = allocator_type{}):
-		dynamic_array(init.begin(), init.end(), std::move(allocator))
-	{
-	}
 	template<typename Count, BOUNDED_REQUIRES(std::is_convertible<Count, size_type>::value)>
 	constexpr dynamic_array(Count const count, value_type const & value, allocator_type allocator = allocator_type{}):
 		allocator_type(std::move(allocator))
@@ -98,6 +100,7 @@ struct dynamic_array : private detail::rebound_allocator<T, Allocator> {
 		dynamic_array(other, other.get_allocator())
 	{
 	}
+
 	constexpr dynamic_array(dynamic_array && other, allocator_type allocator) noexcept:
 		allocator_type(std::move(allocator)),
 		m_size(std::move(other.m_size)),
