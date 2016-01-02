@@ -44,7 +44,7 @@ auto static_or_reinterpret_cast(Source source) noexcept {
 
 template<typename Allocator, typename T, typename... Args>
 constexpr auto construct(Allocator && allocator, T * pointer, Args && ... args) BOUNDED_NOEXCEPT(
-	allocator_traits<std::decay_t<Allocator>>::construct(
+	allocator_traits<Allocator>::construct(
 		allocator,
 		::containers::detail::static_or_reinterpret_cast<typename std::decay_t<Allocator>::value_type *>(pointer),
 		std::forward<Args>(args)...
@@ -53,7 +53,7 @@ constexpr auto construct(Allocator && allocator, T * pointer, Args && ... args) 
 
 template<typename Allocator, typename T>
 constexpr auto destroy(Allocator && allocator, T * pointer) BOUNDED_NOEXCEPT(
-	allocator_traits<std::decay_t<Allocator>>::destroy(
+	allocator_traits<Allocator>::destroy(
 		allocator,
 		::containers::detail::static_or_reinterpret_cast<typename std::decay_t<Allocator>::value_type *>(pointer)
 	)

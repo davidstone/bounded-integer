@@ -70,9 +70,9 @@ constexpr auto allocator_has_destroy = allocator_has_destroy_c<A, T>::value;
 }	// namespace detail
 
 template<typename Allocator>
-struct allocator_traits : private std::allocator_traits<Allocator> {
+struct allocator_traits : private std::allocator_traits<std::decay_t<Allocator>> {
 private:
-	using base = std::allocator_traits<Allocator>;
+	using base = std::allocator_traits<std::decay_t<Allocator>>;
 public:
 	using typename base::allocator_type;
 	using typename base::value_type;
