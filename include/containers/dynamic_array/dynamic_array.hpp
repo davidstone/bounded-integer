@@ -61,7 +61,7 @@ struct dynamic_array : private detail::rebound_allocator<T, Allocator> {
 	{
 	}
 	
-	template<typename ForwardIterator, typename Sentinel, BOUNDED_REQUIRES(is_iterator<ForwardIterator>)>
+	template<typename ForwardIterator, typename Sentinel, BOUNDED_REQUIRES(is_iterator_sentinel<ForwardIterator, Sentinel>)>
 	constexpr dynamic_array(ForwardIterator first, Sentinel const last, allocator_type allocator = allocator_type{}):
 		allocator_type(std::move(allocator)),
 		m_size(::containers::distance(first, last)),
@@ -166,7 +166,7 @@ private:
 };
 
 
-template<typename T, typename ForwardIterator, typename Sentinel, typename = typename std::iterator_traits<ForwardIterator>::iterator_category>
+template<typename T, typename ForwardIterator, typename Sentinel, BOUNDED_REQUIRES(is_iterator_sentinel<ForwardIterator, Sentinel>)>
 auto assign(dynamic_array<T> & container, ForwardIterator first, Sentinel const last) {
 	auto const difference = ::containers::distance(first, last);
 	if (difference == size(container)) {
