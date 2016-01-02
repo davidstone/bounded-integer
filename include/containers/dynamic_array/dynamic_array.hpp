@@ -28,6 +28,10 @@ constexpr auto maximum_array_size = static_cast<std::intmax_t>(
 );
 
 
+template<typename T, typename Allocator>
+using rebound_allocator = typename allocator_traits<Allocator>::template rebind_alloc<T>;
+
+
 // Because this does not have an allocator, it cannot free its own memory
 template<typename T>
 struct dynamic_array_without_allocator {
@@ -40,19 +44,29 @@ struct dynamic_array_without_allocator {
 	constexpr dynamic_array_without_allocator() = default;
 
 	template<typename ForwardIterator, typename Sentinel, typename Allocator, BOUNDED_REQUIRES(is_iterator_sentinel<ForwardIterator, Sentinel>)>
-	constexpr dynamic_array_without_allocator(ForwardIterator first, Sentinel const last, Allocator & allocator):
+	dynamic_array_without_allocator(ForwardIterator first, Sentinel const last, Allocator & allocator):
 		m_size(::containers::distance(first, last)),
-		m_data(make_storage(m_size))
+		m_data(make_storage(allocator, m_size))
 	{
-		::containers::uninitialized_copy(first, last, m_data.get(), allocator);
+		try {
+			::containers::uninitialized_copy(first, last, m_data, allocator);
+		} catch(...) {
+			deallocate_storage(allocator);
+			throw;
+		}
 	}
 	
 	template<typename Count, typename Allocator, BOUNDED_REQUIRES(std::is_convertible<Count, size_type>::value)>
-	constexpr dynamic_array_without_allocator(Count const count, Allocator & allocator):
+	dynamic_array_without_allocator(Count const count, Allocator & allocator):
 		m_size(count),
-		m_data(make_storage(m_size))
+		m_data(make_storage(allocator, m_size))
 	{
-		::containers::uninitialized_default_construct(begin(), end(), allocator);
+		try {
+			::containers::uninitialized_default_construct(begin(), end(), allocator);
+		} catch(...) {
+			deallocate_storage(allocator);
+			throw;
+		}
 	}
 	
 	template<typename Count, typename Allocator, BOUNDED_REQUIRES(std::is_convertible<Count, size_type>::value)>
@@ -66,6 +80,7 @@ struct dynamic_array_without_allocator {
 		m_data(std::move(other.m_data))
 	{
 		other.m_size = bounded::constant<0>;
+		other.m_data = nullptr;
 	}
 	
 
@@ -73,14 +88,15 @@ struct dynamic_array_without_allocator {
 		m_size = std::move(other.m_size);
 		m_data = std::move(other.m_data);
 		other.m_size = bounded::constant<0>;
+		other.m_data = nullptr;
 		return *this;
 	}
 	
 	constexpr auto data() const noexcept {
-		return reinterpret_cast<value_type const *>(m_data.get());
+		return reinterpret_cast<value_type const *>(m_data);
 	}
 	constexpr auto data() noexcept {
-		return reinterpret_cast<value_type *>(m_data.get());
+		return reinterpret_cast<value_type *>(m_data);
 	}
 	
 	constexpr auto begin() const noexcept {
@@ -104,19 +120,32 @@ struct dynamic_array_without_allocator {
 		return *(begin() + index);
 	}
 	
+	// No point changing the size; these are used right before destruction
 	template<typename Allocator>
 	auto cleanup(Allocator && allocator) noexcept {
 		::containers::detail::destroy(allocator, begin(), end());
-		// TODO: Replace unique_ptr
+		deallocate_storage(allocator);
 	}
 	
 private:
-	using underlying_storage = uninitialized_storage<value_type>[];
-	static constexpr auto make_storage(size_type const size) {
-		return (size == bounded::constant<0>) ? nullptr : std::make_unique<underlying_storage>(static_cast<std::size_t>(size));
+	using underlying_storage = uninitialized_storage<value_type>;
+
+	template<typename Allocator, typename Size>
+	static constexpr auto make_storage(Allocator & allocator, Size const size) {
+		using allocator_type = rebound_allocator<underlying_storage, Allocator>;
+		auto a = static_cast<allocator_type>(allocator);
+		return allocator_traits<allocator_type>::allocate(a, static_cast<std::size_t>(size));
 	}
+
+	template<typename Allocator>
+	auto deallocate_storage(Allocator && allocator) noexcept {
+		using allocator_type = rebound_allocator<underlying_storage, Allocator>;
+		auto a = static_cast<allocator_type>(allocator);
+		allocator_traits<allocator_type>::deallocate(a, m_data, static_cast<std::size_t>(m_size));
+	}
+
 	size_type m_size = bounded::constant<0>;
-	std::unique_ptr<underlying_storage> m_data = nullptr;
+	underlying_storage * m_data = nullptr;
 };
 
 template<typename T, typename ForwardIterator, typename Sentinel, typename Allocator, BOUNDED_REQUIRES(is_iterator_sentinel<ForwardIterator, Sentinel>)>
@@ -130,12 +159,9 @@ auto assign(dynamic_array_without_allocator<T> & container, ForwardIterator firs
 	}
 }
 
-template<typename T, typename Allocator>
-using rebound_allocator = typename allocator_traits<Allocator>::template rebind_alloc<T>;
-
 }	// namespace detail
 
-// TODO: Support stateful allocators in implementation
+// TODO: Handle allocator transfer in copies / moves
 template<typename T, typename Allocator = allocator<T>>
 struct dynamic_array : private detail::rebound_allocator<T, Allocator> {
 private:
