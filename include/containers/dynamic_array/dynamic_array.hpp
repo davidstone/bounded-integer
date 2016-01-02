@@ -27,31 +27,43 @@ constexpr auto maximum_array_size = static_cast<std::intmax_t>(
 	)
 );
 
+template<typename T, typename Allocator>
+using rebound_allocator = typename allocator_traits<Allocator>::template rebind_alloc<T>;
+
 }	// namespace detail
 
 // TODO: Support stateful allocators in implementation
 template<typename T, typename Allocator = allocator<T>>
-struct dynamic_array {
+struct dynamic_array : private detail::rebound_allocator<T, Allocator> {
 	using value_type = T;
 	using size_type = bounded::integer<0, detail::maximum_array_size<T>>;
 
-	using allocator_type = typename allocator_traits<Allocator>::template rebind_alloc<value_type>;
+	using allocator_type = detail::rebound_allocator<T, Allocator>;
 	static_assert(std::is_empty<allocator_type>::value, "Stateful allocators not yet supported.");
 
 	using const_iterator = detail::basic_array_iterator<value_type const, dynamic_array>;
 	using iterator = detail::basic_array_iterator<value_type, dynamic_array>;
 	
-	static constexpr auto get_allocator() BOUNDED_NOEXCEPT(
-		allocator_type{}
-	)
+	constexpr auto && get_allocator() const & noexcept {
+		return static_cast<allocator_type const &>(*this);
+	}
+	constexpr auto && get_allocator() & noexcept {
+		return static_cast<allocator_type &>(*this);
+	}
+	constexpr auto && get_allocator() && noexcept {
+		return static_cast<allocator_type &&>(*this);
+	}
 	
 	constexpr dynamic_array() = default;
 
-	constexpr dynamic_array(allocator_type) {
+	constexpr explicit dynamic_array(allocator_type allocator):
+		allocator_type(std::move(allocator))
+	{
 	}
 	
 	template<typename Count, BOUNDED_REQUIRES(std::is_convertible<Count, size_type>::value)>
-	explicit constexpr dynamic_array(Count const count, allocator_type = allocator_type()):
+	explicit constexpr dynamic_array(Count const count, allocator_type allocator = allocator_type{}):
+		allocator_type(std::move(allocator)),
 		m_size(count),
 		m_data(make_storage(m_size))
 	{
@@ -59,31 +71,43 @@ struct dynamic_array {
 	}
 	
 	template<typename ForwardIterator, typename Sentinel, BOUNDED_REQUIRES(is_iterator<ForwardIterator>)>
-	constexpr dynamic_array(ForwardIterator first, Sentinel const last, allocator_type = allocator_type()):
+	constexpr dynamic_array(ForwardIterator first, Sentinel const last, allocator_type allocator = allocator_type{}):
+		allocator_type(std::move(allocator)),
 		m_size(::containers::distance(first, last)),
 		m_data(make_storage(m_size))
 	{
 		::containers::uninitialized_copy(first, last, m_data.get(), get_allocator());
 	}
-	dynamic_array(std::initializer_list<value_type> init, allocator_type = allocator_type()):
-		dynamic_array(init.begin(), init.end())
+	dynamic_array(std::initializer_list<value_type> init, allocator_type allocator = allocator_type{}):
+		dynamic_array(init.begin(), init.end(), std::move(allocator))
 	{
 	}
 	template<typename Count, BOUNDED_REQUIRES(std::is_convertible<Count, size_type>::value)>
-	constexpr dynamic_array(Count const count, value_type const & value, allocator_type = allocator_type()) {
+	constexpr dynamic_array(Count const count, value_type const & value, allocator_type allocator = allocator_type{}):
+		allocator_type(std::move(allocator))
+	{
 		auto const range = ::containers::detail::repeat_n(count, value);
 		*this = dynamic_array(range.begin(), range.end());
 	}
 	
-	constexpr dynamic_array(dynamic_array const & other, allocator_type = allocator_type()):
-		dynamic_array(other.begin(), other.end())
+	constexpr dynamic_array(dynamic_array const & other, allocator_type allocator):
+		dynamic_array(other.begin(), other.end(), std::move(allocator))
 	{
 	}
-	constexpr dynamic_array(dynamic_array && other, allocator_type = allocator_type()) noexcept:
+	constexpr dynamic_array(dynamic_array const & other):
+		dynamic_array(other, other.get_allocator())
+	{
+	}
+	constexpr dynamic_array(dynamic_array && other, allocator_type allocator) noexcept:
+		allocator_type(std::move(allocator)),
 		m_size(std::move(other.m_size)),
 		m_data(std::move(other.m_data))
 	{
 		other.m_size = bounded::constant<0>;
+	}
+	constexpr dynamic_array(dynamic_array && other) noexcept:
+		dynamic_array(std::move(other), std::move(other).get_allocator())
+	{
 	}
 	
 	~dynamic_array() {
