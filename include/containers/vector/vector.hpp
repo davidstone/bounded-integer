@@ -89,6 +89,7 @@ public:
 		return *this;
 	}
 	auto & operator=(vector && other) & noexcept {
+		::containers::detail::destroy(get_allocator(), begin(), end());
 		m_container = std::move(other.m_container);
 		m_size = std::move(other.m_size);
 		other.m_size = bounded::constant<0>;
