@@ -72,7 +72,7 @@ struct dynamic_array_without_allocator {
 	template<typename Count, typename Allocator, BOUNDED_REQUIRES(std::is_convertible<Count, size_type>::value)>
 	constexpr dynamic_array_without_allocator(Count const count, value_type const & value, Allocator & allocator) {
 		auto const range = ::containers::detail::repeat_n(count, value);
-		*this = dynamic_array_without_allocator(range.begin(), range.end(), allocator);
+		move_assign(dynamic_array_without_allocator(range.begin(), range.end(), allocator), allocator);
 	}
 	
 	constexpr dynamic_array_without_allocator(dynamic_array_without_allocator && other) noexcept:
