@@ -83,13 +83,13 @@ struct dynamic_array_without_allocator {
 		other.m_data = nullptr;
 	}
 	
-
-	constexpr auto & operator=(dynamic_array_without_allocator && other) & noexcept {
+	template<typename Allocator>
+	constexpr auto move_assign(dynamic_array_without_allocator && other, Allocator & allocator) & noexcept {
+		deallocate_storage(allocator);
 		m_size = std::move(other.m_size);
 		m_data = std::move(other.m_data);
 		other.m_size = bounded::constant<0>;
 		other.m_data = nullptr;
-		return *this;
 	}
 	
 	constexpr auto data() const noexcept {
@@ -246,7 +246,7 @@ public:
 		return *this;
 	}
 	constexpr auto & operator=(dynamic_array && other) & noexcept {
-		m_base = std::move(other.m_base);
+		m_base.move_assign(std::move(other.m_base), get_allocator());
 		return *this;
 	}
 	
