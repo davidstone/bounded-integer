@@ -105,6 +105,21 @@ auto test_erase() {
 	assert(v == container({ 1, 3, 5, 7 }));
 }
 
+struct complex_resource {
+	complex_resource() = default;
+	template<typename Size>
+	complex_resource(Size size): data(size) {}
+
+	complex_resource(complex_resource const & other) = default;
+	complex_resource & operator=(complex_resource const & other) = default;
+
+	containers::vector<int> data;
+};
+
+auto operator==(complex_resource const & lhs, complex_resource const & rhs) {
+	return lhs.data == rhs.data;
+}
+
 }	// namespace
 
 int main() {
@@ -116,6 +131,7 @@ int main() {
 	test_generic<5>(-4, { 0, 1, 2, 3, 4 });
 
 	test_generic<3>(std::string("hi"), { std::string(""), std::string("hello"), std::string(100, '=') });
+	test_generic<6>(complex_resource(5_bi), { complex_resource(1_bi), complex_resource(0_bi), complex_resource(10_bi), complex_resource(10_bi) });
 	
 	test_erase();
 }
