@@ -49,4 +49,6 @@ constexpr auto operator"" _bi() noexcept {
 
 }	// namespace literal
 
+using namespace literal;
+
 }	// namespace bounded
