@@ -13,10 +13,12 @@
 
 namespace containers {
 
+using namespace bounded::literal;
+
 template<typename InputIterator, typename Sentinel, typename Predicate>
 constexpr auto count_if(InputIterator first, Sentinel const last, Predicate predicate) {
 	constexpr auto maximum = std::numeric_limits<typename std::iterator_traits<InputIterator>::difference_type>::max();
-	bounded::integer<0, static_cast<std::intmax_t>(maximum)> sum = bounded::constant<0>;
+	bounded::integer<0, static_cast<std::intmax_t>(maximum)> sum = 0_bi;
 	for (; first != last; ++first) {
 		if (predicate(*first)) {
 			++sum;

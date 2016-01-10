@@ -35,7 +35,7 @@ struct static_vector_data;
 template<typename T, std::size_t capacity>
 struct static_vector_data<T, capacity, true> {
 	array<trivial_storage<T>, capacity> m_container = {{}};
-	bounded::integer<0, capacity> m_size = bounded::constant<0>;
+	bounded::integer<0, capacity> m_size = 0_bi;
 };
 
 template<typename T, std::size_t capacity>
@@ -157,7 +157,7 @@ struct static_vector : private detail::static_vector_data<T, capacity_>  {
 
 		auto const range_size = bounded::throw_policy<std::out_of_range>{}.assignment(
 			::containers::distance(first, last),
-			bounded::constant<0>,
+			0_bi,
 			max_size<static_vector>()
 		);
 		

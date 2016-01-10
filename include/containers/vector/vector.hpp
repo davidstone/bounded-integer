@@ -81,7 +81,7 @@ public:
 		m_container(std::move(other.m_container), std::move(allocator)),
 		m_size(std::move(other.m_size))
 	{
-		other.m_size = bounded::constant<0>;
+		other.m_size = 0_bi;
 	}
 
 	auto & operator=(vector const & other) & noexcept(std::is_nothrow_copy_assignable<value_type>::value) {
@@ -92,7 +92,7 @@ public:
 		::containers::detail::destroy(get_allocator(), begin(), end());
 		m_container = std::move(other.m_container);
 		m_size = std::move(other.m_size);
-		other.m_size = bounded::constant<0>;
+		other.m_size = 0_bi;
 		return *this;
 	}
 
@@ -171,7 +171,7 @@ public:
 		auto const offset = position - begin();
 		if (position == end()) {
 			emplace_back(std::forward<Args>(args)...);
-		} else if (size(*this) + bounded::constant<1> != capacity()) {
+		} else if (size(*this) + 1_bi != capacity()) {
 			detail::emplace_in_middle_no_reallocation(*this, position, get_allocator(), std::forward<Args>(args)...);
 		} else {
 			// There is a reallocation required, so just put everything in the
@@ -202,7 +202,7 @@ public:
 
 		auto const range_size = bounded::throw_policy<std::out_of_range>{}.assignment(
 			::containers::distance(first, last),
-			bounded::constant<0>,
+			0_bi,
 			max_size<vector>()
 		);
 		if (range_size <= capacity()) {
@@ -241,7 +241,7 @@ private:
 	}
 	constexpr auto new_capacity() const {
 		using capacity_type = bounded::equivalent_type<size_type, bounded::throw_policy<>>;
-		return bounded::max(bounded::constant<1>, capacity_type(capacity() * bounded::constant<2>));
+		return bounded::max(1_bi, capacity_type(capacity() * 2_bi));
 	}
 
 	auto relocate(size_type const requested_capacity) {
@@ -251,7 +251,7 @@ private:
 	}
 
 	raw_container m_container = {};
-	size_type m_size = bounded::constant<0>;
+	size_type m_size = 0_bi;
 };
 
 }	// namespace containers

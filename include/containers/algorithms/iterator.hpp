@@ -15,6 +15,9 @@
 #include <iterator>
 
 namespace containers {
+
+using namespace bounded::literal;
+
 namespace detail {
 
 template<typename Iterator, typename Sentinel>
@@ -24,7 +27,7 @@ constexpr auto distance(Iterator first, Sentinel const last, std::random_access_
 
 template<typename Iterator, typename Sentinel>
 constexpr auto distance(Iterator first, Sentinel const last, std::input_iterator_tag) {
-	auto difference = std::iterator_traits<Iterator>::distance_type(bounded::constant<0>);
+	auto difference = std::iterator_traits<Iterator>::distance_type(0_bi);
 	for (; first != last; ++first) {
 		++difference;
 	}
@@ -48,7 +51,7 @@ template<typename Iterator, typename Offset>
 constexpr auto advance(Iterator & it, Offset const offset, std::bidirectional_iterator_tag) {
 	for (auto const n : bounded::integer_range(bounded::abs(offset))) {
 		static_cast<void>(n);
-		if (offset >= bounded::constant<0>) {
+		if (offset >= 0_bi) {
 			++it;
 		} else {
 			--it;
@@ -78,7 +81,7 @@ template<
 	BOUNDED_REQUIRES(bounded::is_bounded_integer<typename std::iterator_traits<Iterator>::difference_type>)
 >
 constexpr auto iterator_one() noexcept {
-	return bounded::constant<1>;
+	return 1_bi;
 }
 
 template<

@@ -16,14 +16,17 @@
 #include <iterator>
 
 namespace containers {
+
+using namespace bounded::literal;
+
 namespace detail {
 
 // TODO: support larger array sizes
 template<typename T>
 constexpr auto maximum_array_size = static_cast<std::intmax_t>(
 	bounded::min(
-		std::numeric_limits<std::ptrdiff_t>::max() / static_cast<std::ptrdiff_t>(sizeof(T)),
-		(1LL << 31LL) - 1
+		bounded::constant<std::numeric_limits<std::ptrdiff_t>::max()> / bounded::constant<sizeof(T)>,
+		(1_bi << 31_bi) - 1_bi
 	)
 );
 
@@ -79,7 +82,7 @@ struct dynamic_array_without_allocator {
 		m_size(std::move(other.m_size)),
 		m_data(std::move(other.m_data))
 	{
-		other.m_size = bounded::constant<0>;
+		other.m_size = 0_bi;
 		other.m_data = nullptr;
 	}
 	
@@ -88,7 +91,7 @@ struct dynamic_array_without_allocator {
 		deallocate_storage(allocator);
 		m_size = std::move(other.m_size);
 		m_data = std::move(other.m_data);
-		other.m_size = bounded::constant<0>;
+		other.m_size = 0_bi;
 		other.m_data = nullptr;
 	}
 	
@@ -144,7 +147,7 @@ private:
 		allocator_traits<allocator_type>::deallocate(a, m_data, static_cast<std::size_t>(m_size));
 	}
 
-	size_type m_size = bounded::constant<0>;
+	size_type m_size = 0_bi;
 	underlying_storage * m_data = nullptr;
 };
 

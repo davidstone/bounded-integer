@@ -40,7 +40,7 @@ struct repeat_n_iterator {
 		return lhs.m_remaining == rhs.m_remaining;
 	}
 	friend constexpr auto operator==(repeat_n_iterator const lhs, repeat_n_sentinel) {
-		return lhs.m_remaining == bounded::constant<0>;
+		return lhs.m_remaining == 0_bi;
 	}
 	friend constexpr auto operator<(repeat_n_iterator const lhs, repeat_n_iterator const rhs) {
 		return lhs.m_remaining < rhs.m_remaining;

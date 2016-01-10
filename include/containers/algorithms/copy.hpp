@@ -50,7 +50,7 @@ constexpr auto move_backward(BidirectionalIterator const first, BidirectionalIte
 // Ideally this would be implemented with a counted iterator
 template<typename InputIterator, typename Size, typename OutputIterator>
 constexpr auto copy_n(InputIterator first, Size const count, OutputIterator out) {
-	static_assert(count >= bounded::constant<0>, "Negative numbers not supported.");
+	static_assert(count >= 0_bi, "Negative numbers not supported.");
 	struct result {
 		InputIterator input;
 		OutputIterator output;

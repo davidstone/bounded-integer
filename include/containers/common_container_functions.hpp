@@ -80,8 +80,8 @@ template<typename Container, typename Index, BOUNDED_REQUIRES(is_container<Conta
 constexpr decltype(auto) at(Container && container, Index const index) BOUNDED_NOEXCEPT(
 	std::forward<Container>(container)[typename index_type<Container>::overflow_policy{}.assignment(
 		bounded::make(index),
-		bounded::constant<0>,
-		size(container) - bounded::constant<1>
+		0_bi,
+		size(container) - 1_bi
 	)]
 )
 
@@ -92,7 +92,7 @@ constexpr decltype(auto) at(Container && container, Index const index, bounded::
 
 
 template<typename Container>
-constexpr auto never_empty = std::numeric_limits<typename std::remove_reference_t<Container>::size_type>::min() > bounded::constant<0>;
+constexpr auto never_empty = std::numeric_limits<typename std::remove_reference_t<Container>::size_type>::min() > 0_bi;
 
 
 template<typename Container, BOUNDED_REQUIRES(is_container<Container> and bounded::is_bounded_integer<typename Container::size_type>)>

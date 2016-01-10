@@ -12,6 +12,9 @@
 #include <utility>
 
 namespace containers {
+
+using namespace bounded::literal;
+
 namespace detail {
 
 template<typename InputIterator, typename Initial, typename BinaryFunction, bool is_bounded = bounded::is_bounded_integer<Initial>>
@@ -79,7 +82,7 @@ template<
 	BOUNDED_REQUIRES(bounded::is_bounded_integer<typename InputIterator::value_type>)
 >
 constexpr auto accumulate(InputIterator first, Sentinel const last) BOUNDED_NOEXCEPT(
-	::containers::accumulate<Result>(first, last, bounded::constant<0>, std::plus<>{})
+	::containers::accumulate<Result>(first, last, 0_bi, std::plus<>{})
 )
 
 template<
@@ -88,7 +91,7 @@ template<
 	BOUNDED_REQUIRES(bounded::is_bounded_integer<typename InputIterator::value_type>)
 >
 constexpr auto accumulate(InputIterator first, Sentinel const last) BOUNDED_NOEXCEPT(
-	::containers::accumulate(first, last, bounded::constant<0>, std::plus<>{})
+	::containers::accumulate(first, last, 0_bi, std::plus<>{})
 )
 
 
