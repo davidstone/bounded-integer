@@ -20,6 +20,7 @@ common_sources = [
 	'is_iterator_sentinel.cpp',
 	'iterator_adapter.cpp',
 	'legacy_iterator.cpp',
+	'scope_guard.cpp',
 	'type_list.cpp',
 	'algorithms/accumulate.cpp',
 	'algorithms/all_any_none.cpp',
