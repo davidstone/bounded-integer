@@ -106,9 +106,16 @@ struct integer {
 	// May relax these restrictions in the future
 	static_assert(std::is_nothrow_default_constructible<overflow_policy>::value, "overflow_policy must be nothrow default constructible.");
 	
+	static constexpr auto min() noexcept {
+		return constant<minimum>;
+	}
+	static constexpr auto max() noexcept {
+		return constant<maximum>;
+	}
+	
 	template<typename T>
 	static constexpr decltype(auto) apply_overflow_policy(T && value) BOUNDED_NOEXCEPT(
-		overflow_policy{}.assignment(std::forward<T>(value), constant<minimum>, constant<maximum>)
+		overflow_policy{}.assignment(std::forward<T>(value), min(), max())
 	)
 	
 	integer() noexcept = default;

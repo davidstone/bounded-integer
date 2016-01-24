@@ -6,13 +6,13 @@
 #pragma once
 
 #include <bounded/detail/arithmetic/operators.hpp>
-#include <bounded/detail/basic_numeric_limits.hpp>
 #include <bounded/detail/forward_declaration.hpp>
 #include <bounded/detail/is_bounded_integer.hpp>
 #include <bounded/detail/make.hpp>
 #include <bounded/detail/requires.hpp>
 
 #include <cstdint>
+#include <limits>
 #include <type_traits>
 
 namespace bounded {
@@ -78,11 +78,11 @@ BOUNDED_INTEGER_MIXED_OPERATOR_OVERLOADS_INTEGRAL_CONSTANT(symbol)
 // shift operators, you could not use any built-in type as the right-hand side.
 
 #define BOUNDED_INTEGER_MIXED_OPERATOR_OVERLOADS_BASIC(symbol) \
-BOUNDED_INTEGER_MIXED_OPERATOR_OVERLOADS(symbol, static_cast<std::intmax_t>(basic_numeric_limits<T>::min()), static_cast<std::intmax_t>(basic_numeric_limits<T>::max()))
+BOUNDED_INTEGER_MIXED_OPERATOR_OVERLOADS(symbol, static_cast<std::intmax_t>(std::numeric_limits<T>::min()), static_cast<std::intmax_t>(std::numeric_limits<T>::max()))
 
 
 #define BOUNDED_INTEGER_MIXED_OPERATOR_OVERLOADS_DIVISION(symbol) \
-BOUNDED_INTEGER_MIXED_OPERATOR_OVERLOADS(symbol, 1, static_cast<std::intmax_t>(basic_numeric_limits<T>::max()))
+BOUNDED_INTEGER_MIXED_OPERATOR_OVERLOADS(symbol, 1, static_cast<std::intmax_t>(std::numeric_limits<T>::max()))
 
 
 #define BOUNDED_INTEGER_MIXED_OPERATOR_OVERLOADS_SHIFT(symbol) \

@@ -7,6 +7,7 @@
 
 #include <bounded/detail/policy/null_policy.hpp>
 #include <bounded/detail/basic_numeric_limits.hpp>
+#include <bounded/detail/class.hpp>
 #include <bounded/detail/comparison.hpp>
 #include <bounded/detail/is_bounded_integer.hpp>
 #include <bounded/detail/is_poisoned.hpp>
@@ -20,8 +21,8 @@ namespace policy_detail {
 
 using default_exception = std::range_error;
 
-template<intmax_t minimum, intmax_t maximum, typename T>
-constexpr auto reduce_range(T && value) BOUNDED_NOEXCEPT(
+template<typename T, intmax_t minimum, intmax_t maximum>
+constexpr auto reduce_range(T && value, constant_t<minimum>, constant_t<maximum>) BOUNDED_NOEXCEPT(
 	integer<
 		max(minimum, basic_numeric_limits<T>::min()),
 		min(maximum, basic_numeric_limits<T>::max()),
@@ -39,11 +40,11 @@ struct throw_policy {
 
 	// TODO: Conditional noexcept
 	template<typename T, typename Minimum, typename Maximum>
-	static constexpr auto assignment(T && value, Minimum && minimum, Maximum && maximum) {
+	static constexpr auto assignment(T && value, Minimum const & minimum, Maximum const & maximum) {
 		static_assert(is_bounded_integer<Minimum>, "Only bounded::integer types are supported.");
 		static_assert(is_bounded_integer<Maximum>, "Only bounded::integer types are supported.");
 		if (minimum <= value and value <= maximum) {
-			return policy_detail::reduce_range<basic_numeric_limits<Minimum>::min(), basic_numeric_limits<Maximum>::max()>(std::forward<T>(value));
+			return policy_detail::reduce_range(std::forward<T>(value), Minimum::min(), Maximum::max());
 		}
 		throw Exception("Got a value of " + to_string(value) + " but expected a value in the range [" + to_string(minimum) + ", " + to_string(maximum) + "]");
 	}
