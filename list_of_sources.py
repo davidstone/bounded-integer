@@ -38,6 +38,7 @@ sources += prepend_dir('detail', [
 	'numeric_limits.cpp',
 	'overlapping_range.cpp',
 	'requires.cpp',
+	'size_of.cpp',
 	'stream.cpp',
 	'string.cpp',
 	'typedefs.cpp',
