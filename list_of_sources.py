@@ -13,6 +13,7 @@ include_directories = ['../bounded_integer/include', '../value_ptr', '../include
 # To minimize compile times, only compile these files with the array program,
 # otherwise they keep getting compiled for various macros that have no meaning.
 common_sources = [
+	'add_remove_const.cpp',
 	'allocator.cpp',
 	'has_nested_type.cpp',
 	'is_container.cpp',
