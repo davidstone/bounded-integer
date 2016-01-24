@@ -6,6 +6,7 @@
 #pragma once
 
 #include <containers/allocator.hpp>
+#include <containers/scope_guard.hpp>
 #include <containers/type_list.hpp>
 #include <containers/algorithms/iterator.hpp>
 
@@ -131,8 +132,35 @@ constexpr auto uninitialized_move_backward(BidirectionalInputIterator const firs
 )
 
 
-template<typename InputIterator, typename ForwardIterator, typename Allocator>
-constexpr auto uninitialized_move_destroy(InputIterator const first, InputIterator const last, ForwardIterator const out, Allocator && allocator) noexcept(noexcept(::containers::uninitialized_move(first, last, out, allocator))) {
+template<
+	typename InputIterator,
+	typename ForwardIterator,
+	typename Allocator,
+	BOUNDED_REQUIRES(!noexcept(::containers::uninitialized_move(
+		std::declval<InputIterator const &>(),
+		std::declval<InputIterator const &>(),
+		std::declval<ForwardIterator const &>(),
+		std::declval<Allocator &>()
+	)))
+>
+auto uninitialized_move_destroy(InputIterator const first, InputIterator const last, ForwardIterator const out, Allocator && allocator) {
+	auto const guard = scope_guard([&]{ ::containers::detail::destroy(allocator, first, last); });
+	auto const it = ::containers::uninitialized_move(first, last, out, allocator);
+	return it;
+}
+
+template<
+	typename InputIterator,
+	typename ForwardIterator,
+	typename Allocator,
+	BOUNDED_REQUIRES(noexcept(::containers::uninitialized_move(
+		std::declval<InputIterator const &>(),
+		std::declval<InputIterator const &>(),
+		std::declval<ForwardIterator const &>(),
+		std::declval<Allocator &>()
+	)))
+>
+constexpr auto uninitialized_move_destroy(InputIterator const first, InputIterator const last, ForwardIterator const out, Allocator && allocator) noexcept {
 	auto const it = ::containers::uninitialized_move(first, last, out, allocator);
 	::containers::detail::destroy(allocator, first, last);
 	return it;
