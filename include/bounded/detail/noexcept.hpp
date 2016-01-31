@@ -14,6 +14,9 @@
 // No SFINAE
 #define BOUNDED_NOEXCEPT(...) noexcept(noexcept(__VA_ARGS__)) { return __VA_ARGS__; }
 
+// No SFINAE
+#define BOUNDED_NOEXCEPT_VOID(...) noexcept(noexcept(__VA_ARGS__)) { __VA_ARGS__; }
+
 // Same as returning decltype(auto), but with expression SFINAE
 #define BOUNDED_NOEXCEPT_DECLTYPE(...) \
 	noexcept( \
