@@ -21,6 +21,7 @@ common_sources = [
 	'is_iterator_sentinel.cpp',
 	'iterator_adapter.cpp',
 	'legacy_iterator.cpp',
+	'make_index_sequence.cpp',
 	'scope_guard.cpp',
 	'type_list.cpp',
 	'algorithms/accumulate.cpp',
