@@ -14,31 +14,30 @@ namespace containers {
 namespace detail {
 
 template<typename Function>
-struct scope_guard_t : private std::tuple<Function> {
+struct scope_guard_t {
 	template<typename F>
-	constexpr explicit scope_guard_t(F && function) BOUNDED_NOEXCEPT_INITIALIZATION(
-		std::tuple<Function>(std::forward<F>(function))
-	) {
+	constexpr explicit scope_guard_t(F && function) noexcept(std::is_nothrow_constructible<Function, Function &&>::value):
+		m_data(std::forward<F>(function), true)
+	{
 	}
 	
-	constexpr scope_guard_t(scope_guard_t && other) BOUNDED_NOEXCEPT_INITIALIZATION(
-		std::tuple<Function>(static_cast<std::tuple<Function> &&>(other))
-	) {
-		m_active = std::exchange(other.m_active, false);
+	constexpr scope_guard_t(scope_guard_t && other) noexcept(std::is_nothrow_move_constructible<Function>::value):
+		m_data(std::move(other.m_data))
+	{
 	}
 
 	~scope_guard_t() {
-		if (m_active) {
-			std::get<Function>(*this)();
+		if (std::get<bool>(m_data)) {
+			std::get<Function>(m_data)();
 		}
 	}
 	
 	constexpr void dismiss() noexcept {
-		m_active = false;
+		std::get<bool>(m_data) = false;
 	}
 
 private:
-	bool m_active;
+	std::tuple<Function, bool> m_data;
 };
 
 }	// namespace detail
