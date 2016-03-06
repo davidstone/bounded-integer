@@ -26,40 +26,19 @@ namespace detail {
 // container is vector because insertion into the middle / sorting requires
 // moving the value_type. key_type const does not have a copy or move assignment
 // operator. To get the code to work with a vector, we have to sacrifice some
-// compile-time checks. However, we can leave them in place in the case that we
-// are working with a moving_vector.
-//
-// The allocator should never change the value_type of a container, so we just
-// use the default to prevent infinite recursion in our flat_map template
-// parameter.
-template<typename Key, typename T, template<typename, typename> class Container>
-constexpr bool supports_const_key() {
-	using pair_type = std::pair<Key const, T>;
-	using container_type = Container<pair_type, allocator<pair_type>>;
-	using value_type = std::remove_reference_t<decltype(*moving_begin(std::declval<container_type>()))>;
-	return std::is_copy_assignable<typename value_type::first_type>::value;
-}
+// compile-time checks.
 
-template<typename Key, typename T, template<typename, typename> class Container>
-using value_type_t = std::pair<
-	typename std::conditional_t<supports_const_key<Key, T, Container>(), Key const, Key>,
-	T
->;
-
-template<typename Key_, typename T, typename Compare, template<typename, typename> class Container, typename Allocator, bool allow_duplicates>
+template<typename Container, typename Compare, bool allow_duplicates>
 class flat_map_base {
 public:
-	using key_type = Key_;
-	using mapped_type = T;
-	using value_type = value_type_t<key_type, mapped_type, Container>;
-	using allocator_type = Allocator;
-private:
-	using container_type = Container<value_type, allocator_type>;
-public:
-	using size_type = typename container_type::size_type;
+	using value_type = typename Container::value_type;
+	using key_type = typename value_type::first_type;
+	using mapped_type = typename value_type::second_type;
+	using allocator_type = typename Container::allocator_type;
+	using size_type = typename Container::size_type;
 
-	using const_iterator = typename container_type::const_iterator;
-	using iterator = typename container_type::iterator;
+	using const_iterator = typename Container::const_iterator;
+	using iterator = typename Container::iterator;
 	
 	using key_compare = Compare;
 	class value_compare {
@@ -86,14 +65,14 @@ public:
 	
 	flat_map_base() = default;
 	explicit flat_map_base(key_compare compare, allocator_type allocator = allocator_type{}):
-		m_container(container_type(std::move(allocator)), std::move(compare)) {
+		m_container(Container(std::move(allocator)), std::move(compare)) {
 	}
 	explicit flat_map_base(allocator_type allocator):
 		flat_map_base(key_compare{}, std::move(allocator)) {
 	}
 	template<typename InputIterator>
 	flat_map_base(InputIterator first, InputIterator last, key_compare compare = key_compare{}, allocator_type allocator = allocator_type{}):
-		m_container(container_type(first, last, std::move(allocator)), std::move(compare))
+		m_container(Container(first, last, std::move(allocator)), std::move(compare))
 	{
 		auto const less = indirect_compare(value_comp());
 		std::sort(moving_begin(container()), moving_end(container()), less);
@@ -110,10 +89,10 @@ public:
 		flat_map_base(first, last, key_compare{}, std::move(allocator)) {
 	}
 	flat_map_base(flat_map_base const & other, allocator_type allocator):
-		m_container(container_type(other, std::move(allocator)), key_compare{}) {
+		m_container(Container(other, std::move(allocator)), key_compare{}) {
 	}
 	flat_map_base(flat_map_base && other, allocator_type allocator):
-		m_container(container_type(std::move(other), std::move(allocator)), key_compare{}) {
+		m_container(Container(std::move(other), std::move(allocator)), key_compare{}) {
 	}
 	flat_map_base(std::initializer_list<value_type> init, key_compare compare = key_compare{}, allocator_type allocator = allocator_type{}):
 		flat_map_base(std::begin(init), std::end(init), std::move(compare), std::move(allocator)) {
@@ -392,20 +371,20 @@ private:
 		value_compare const & m_compare;
 	};
 
-	container_type const & container() const {
+	Container const & container() const {
 		return std::get<0>(m_container);
 	}
-	container_type & container() {
+	Container & container() {
 		return std::get<0>(m_container);
 	}
 	
-	std::tuple<container_type, key_compare> m_container;
+	std::tuple<Container, key_compare> m_container;
 };
 
-template<typename Key, typename T, typename Compare, template<typename, typename> class Container, typename Allocator>
-class flat_map : private flat_map_base<Key, T, Compare, Container, Allocator, false> {
+template<typename Container, typename Compare>
+class flat_map : private flat_map_base<Container, Compare, false> {
 private:
-	using base = flat_map_base<Key, T, Compare, Container, Allocator, false>;
+	using base = flat_map_base<Container, Compare, false>;
 public:
 	using typename base::key_type;
 	using typename base::mapped_type;
@@ -487,10 +466,10 @@ public:
 	}
 };
 
-template<typename Key, typename T, typename Compare, template<typename, typename> class Container, typename Allocator>
-class flat_multimap : private flat_map_base<Key, T, Compare, Container, Allocator, true> {
+template<typename Container, typename Compare>
+class flat_multimap : private flat_map_base<Container, Compare, true> {
 private:
-	using base = flat_map_base<Key, T, Compare, Container, Allocator, true>;
+	using base = flat_map_base<Container, Compare, true>;
 	using typename base::key_value_compare;
 public:
 	using typename base::key_type;
@@ -555,18 +534,18 @@ public:
 
 }	// namespace detail
 
-template<typename Key, typename T, typename Compare = std::less<Key>, typename Allocator = allocator<detail::value_type_t<Key, T, vector>>>
-using unstable_flat_map = detail::flat_map<Key, T, Compare, vector, Allocator>;
+template<typename Key, typename T, typename Compare = std::less<Key>, typename Allocator = allocator<std::pair<Key, T>>>
+using unstable_flat_map = detail::flat_map<vector<std::pair<Key, T>, Allocator>, Compare>;
 
-template<typename Key, typename T, typename Compare = std::less<Key>, typename Allocator = allocator<detail::value_type_t<Key, T, moving_vector>>>
-using stable_flat_map = detail::flat_map<Key, T, Compare, moving_vector, Allocator>;
+template<typename Key, typename T, typename Compare = std::less<Key>, typename Allocator = allocator<std::pair<Key, T>>>
+using stable_flat_map = detail::flat_map<moving_vector<std::pair<Key, T>, Allocator>, Compare>;
 
 
-template<typename Key, typename T, typename Compare = std::less<Key>, typename Allocator = allocator<detail::value_type_t<Key, T, vector>>>
-using unstable_flat_multimap = detail::flat_multimap<Key, T, Compare, vector, Allocator>;
+template<typename Key, typename T, typename Compare = std::less<Key>, typename Allocator = allocator<std::pair<Key, T>>>
+using unstable_flat_multimap = detail::flat_multimap<vector<std::pair<Key, T>, Allocator>, Compare>;
 
-template<typename Key, typename T, typename Compare = std::less<Key>, typename Allocator = allocator<detail::value_type_t<Key, T, moving_vector>>>
-using stable_flat_multimap = detail::flat_multimap<Key, T, Compare, moving_vector, Allocator>;
+template<typename Key, typename T, typename Compare = std::less<Key>, typename Allocator = allocator<std::pair<Key, T>>>
+using stable_flat_multimap = detail::flat_multimap<moving_vector<std::pair<Key, T>, Allocator>, Compare>;
 
 
 }	// namespace containers
