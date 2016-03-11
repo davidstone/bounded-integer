@@ -298,6 +298,7 @@ CONTAINERS_COMMON_USING_DECLARATIONS
 // TODO: exception safety
 template<typename Container, typename Allocator, typename... Args>
 constexpr auto emplace_in_middle_no_reallocation(Container & container, typename Container::const_iterator const position_, Allocator && allocator, Args && ... args) {
+	assert(container.capacity() > size(container));
 	auto const position = detail::make_mutable_iterator(container, position_);
 	auto const original_end = container.end();
 	container.emplace_back(std::move(back(container)));
