@@ -163,7 +163,7 @@ constexpr auto moving_begin(moving_vector<T, Allocator> const & container) {
 }
 template<typename T, typename Allocator>
 constexpr auto moving_begin(moving_vector<T, Allocator> && container) {
-	return std::move(container).begin();
+	return std::move(container).moving_begin();
 }
 template<typename Container>
 constexpr auto moving_end(Container && container) {
