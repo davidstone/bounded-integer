@@ -171,7 +171,7 @@ public:
 		auto const offset = position - begin();
 		if (position == end()) {
 			emplace_back(std::forward<Args>(args)...);
-		} else if (size(*this) + 1_bi != capacity()) {
+		} else if (size(*this) != capacity()) {
 			detail::emplace_in_middle_no_reallocation(*this, position, get_allocator(), std::forward<Args>(args)...);
 		} else {
 			// There is a reallocation required, so just put everything in the
@@ -205,7 +205,7 @@ public:
 			0_bi,
 			max_size<vector>()
 		);
-		if (range_size <= capacity()) {
+		if (range_size + m_size <= capacity()) {
 			auto const mutable_position = detail::put_in_middle_no_reallocation(*this, position, first, last, range_size, get_allocator());
 			m_size += range_size;
 			return mutable_position;
