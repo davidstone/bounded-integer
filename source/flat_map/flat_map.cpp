@@ -38,8 +38,8 @@ public:
 void test_no_extra_copy_or_move() {
 	std::cout << "Testing no extra copies or moves.\n" << std::flush;
 	stable_flat_map<int, Final> final;
-	final.emplace(std::piecewise_construct, std::forward_as_tuple(5), std::forward_as_tuple());
-	final.emplace(std::piecewise_construct, std::forward_as_tuple(6), std::forward_as_tuple(5, 2.0, 'c'));
+	final.emplace(std::piecewise_construct, containers::forward_as_tuple(5), containers::forward_as_tuple());
+	final.emplace(std::piecewise_construct, containers::forward_as_tuple(6), containers::forward_as_tuple(5, 2.0, 'c'));
 }
 
 
@@ -194,6 +194,22 @@ constexpr auto size(std::map<Ts...> const & std_map) {
 	return std_map.size();
 }
 
+
+template<typename>
+struct is_std_map : std::false_type {};
+
+template<typename Key, typename Value, typename Compare, typename Allocator>
+struct is_std_map<std::map<Key, Value, Compare, Allocator>> : std::true_type {};
+
+template<typename container_type, typename... Args, BOUNDED_REQUIRES(is_std_map<container_type>::value)>
+constexpr auto generic_forward_as_tuple(Args && ... args) BOUNDED_NOEXCEPT_VALUE(
+	std::forward_as_tuple(std::forward<Args>(args)...)
+)
+template<typename container_type, typename... Args, BOUNDED_REQUIRES(!is_std_map<container_type>::value)>
+constexpr auto generic_forward_as_tuple(Args && ... args) BOUNDED_NOEXCEPT_VALUE(
+	::containers::forward_as_tuple(std::forward<Args>(args)...)
+)
+
 template<typename container_type>
 void test() {
 	std::cout << "Testing many member functions.\n" << std::flush;
@@ -202,11 +218,11 @@ void test() {
 	std::initializer_list<typename container_type::value_type> const init = { {1, 2}, {2, 5}, {3, 3} };
 	container_type container(init);
 	assert((container == container_type{init}));
-	container.emplace(std::make_pair(4, 4));
-	container.emplace(std::piecewise_construct, std::forward_as_tuple(5), std::forward_as_tuple(3));
+	container.emplace(typename container_type::value_type(4, 4));
+	container.emplace(std::piecewise_construct, generic_forward_as_tuple<container_type>(5), generic_forward_as_tuple<container_type>(3));
 	assert(container.at(5) == 3);
 	assert(size(container) == 5_bi);
-	container.emplace(typename container_type::value_type(3, 10));
+	container.insert(typename container_type::value_type(3, 10));
 	assert(size(container) == 5_bi);
 	assert(container.at(3) == 3);
 }
@@ -231,15 +247,43 @@ template<typename Key>
 using Compare = std::less<Key>;
 #endif
 
+
 #if defined USE_SYSTEM_MAP
 template<typename Key, typename Value>
 using map_type = std::map<Key, Value, Compare<Key>>;
+
+template<typename Key, typename Value>
+using value_type = std::pair<Key, Value>;
+
+template<typename Pair>
+constexpr auto const & get_key(Pair const & pair) noexcept {
+	return pair.first;
+}
+
 #elif defined USE_UNSTABLE_FLAT_MAP
 template<typename Key, typename Value>
 using map_type = unstable_flat_map<Key, Value, Compare<Key>>;
+
+template<typename Key, typename Value>
+using value_type = containers::detail::map_value_type<Key, Value>;
+
+template<typename Pair>
+constexpr auto const & get_key(Pair const & pair) noexcept {
+	return pair.key();
+}
+
 #else
 template<typename Key, typename Value>
 using map_type = stable_flat_map<Key, Value, Compare<Key>>;
+
+template<typename Key, typename Value>
+using value_type = containers::detail::map_value_type<Key, Value>;
+
+template<typename Pair>
+constexpr auto const & get_key(Pair const & pair) noexcept {
+	return pair.key();
+}
+
 #endif
 
 using unit = std::chrono::milliseconds;
@@ -262,7 +306,7 @@ void test_performance(std::size_t const loop_count) {
 	auto const generator = [](std::size_t size) {
 		static boost::random::mt19937 engine(0);
 		static boost::random::uniform_int_distribution<std::uint32_t> distribution;
-		std::vector<std::pair<Key, Value>> source;
+		std::vector<value_type<Key, Value>> source;
 		source.reserve(size);
 		for (std::size_t n = 0; n != size; ++n) {
 			source.emplace_back(distribution(engine), distribution(engine));
@@ -285,8 +329,13 @@ void test_performance(std::size_t const loop_count) {
 		auto const constructed_comparisons = number_of_comparisons;
 	#endif
 
+	for (auto const & value : map) {
+		auto const volatile & thing = value;
+		auto ignore = [](auto &&){};
+		ignore(thing);
+	}
 	for (auto const & value : source) {
-		auto const volatile it = map.find(value.first);
+		auto const volatile it = map.find(get_key(value));
 		static_cast<void>(it);
 	}
 	auto const found = high_resolution_clock::now();
@@ -294,12 +343,22 @@ void test_performance(std::size_t const loop_count) {
 		auto const found_comparisons = number_of_comparisons;
 	#endif
 
+	for (auto const & value : map) {
+		auto const volatile & thing = value;
+		auto ignore = [](auto &&){};
+		ignore(thing);
+	}
 	map.insert(additional_batch.begin(), additional_batch.end());
 	auto const inserted_batch = high_resolution_clock::now();
 	#if defined TRACK_COMPARISONS
 		auto const inserted_batch_comparisons = number_of_comparisons;
 	#endif
 
+	for (auto const & value : map) {
+		auto const volatile & thing = value;
+		auto ignore = [](auto &&){};
+		ignore(thing);
+	}
 	for (auto const & value : additional) {
 		map.insert(value);
 	}
@@ -308,6 +367,11 @@ void test_performance(std::size_t const loop_count) {
 		auto const inserted_comparisons = number_of_comparisons;
 	#endif
 
+	for (auto const & value : map) {
+		auto const volatile & thing = value;
+		auto ignore = [](auto &&){};
+		ignore(thing);
+	}
 	auto map2 = map;
 	auto const copied = high_resolution_clock::now();
 	
@@ -319,7 +383,7 @@ void test_performance(std::size_t const loop_count) {
 	auto const iterated = high_resolution_clock::now();
 
 	for (auto const & value : source) {
-		auto const volatile it = map.find(value.first);
+		auto const volatile it = map.find(get_key(value));
 		static_cast<void>(it);
 	}
 	auto const found_in_extras = high_resolution_clock::now();

@@ -24,6 +24,7 @@ common_sources = [
 	'make_index_sequence.cpp',
 	'scope_guard.cpp',
 	'type_list.cpp',
+	'tuple.cpp',
 	'algorithms/accumulate.cpp',
 	'algorithms/all_any_none.cpp',
 	'algorithms/copy.cpp',

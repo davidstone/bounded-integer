@@ -5,39 +5,47 @@
 
 #pragma once
 
+#include <containers/tuple.hpp>
+
 #include <bounded/integer.hpp>
 
-#include <tuple>
 #include <utility>
 
 namespace containers {
 namespace detail {
+using namespace bounded::literal;
 
 template<typename Function>
 struct scope_guard_t {
 	template<typename F>
-	constexpr explicit scope_guard_t(F && function) noexcept(std::is_nothrow_constructible<Function, Function &&>::value):
-		m_data(std::forward<F>(function), true)
+	constexpr explicit scope_guard_t(F && f) noexcept(std::is_nothrow_constructible<Function, F &&>::value):
+		m_data(std::forward<F>(f), true)
 	{
 	}
 	
 	constexpr scope_guard_t(scope_guard_t && other) noexcept(std::is_nothrow_move_constructible<Function>::value):
-		m_data(std::move(other.m_data))
+		m_data(
+			std::move(other.m_data[function]),
+			std::exchange(other.m_data[is_active], false)
+		)
 	{
 	}
 
 	~scope_guard_t() {
-		if (std::get<bool>(m_data)) {
-			std::get<Function>(m_data)();
+		// TODO: linker error if I use function and is_active here
+		if (m_data[1_bi]) {
+			std::move(m_data)[0_bi]();
 		}
 	}
 	
 	constexpr void dismiss() noexcept {
-		std::get<bool>(m_data) = false;
+		m_data[is_active] = false;
 	}
 
 private:
-	std::tuple<Function, bool> m_data;
+	static constexpr auto function = 0_bi;
+	static constexpr auto is_active = 1_bi;
+	tuple<Function, bool> m_data;
 };
 
 }	// namespace detail

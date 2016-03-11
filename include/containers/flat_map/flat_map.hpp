@@ -7,12 +7,12 @@
 
 #include <containers/allocator.hpp>
 #include <containers/common_container_functions.hpp>
-#include <containers/apply_tuple.hpp>
 #include <containers/algorithms/negate.hpp>
 #include <containers/algorithms/iterator.hpp>
 #include <containers/algorithms/unique.hpp>
 #include <containers/legacy_iterator.hpp>
 #include <containers/moving_vector/moving_vector.hpp>
+#include <containers/tuple.hpp>
 #include <containers/vector/vector.hpp>
 
 #include <algorithm>
@@ -21,8 +21,49 @@
 
 namespace containers {
 namespace detail {
+
+template<typename Key, typename Mapped>
+struct map_value_type : private tuple<Key, Mapped> {
+	using key_type = Key;
+	using mapped_type = Mapped;
+	
+	using tuple<Key, Mapped>::tuple;
+	using tuple<Key, Mapped>::as_tuple;
+	
+	constexpr auto && key() const & noexcept {
+		return (*this)[0_bi];
+	}
+	constexpr auto && key() & noexcept {
+		return (*this)[0_bi];
+	}
+	constexpr auto && key() && noexcept {
+		return std::move(*this)[0_bi];
+	}
+	constexpr auto && mapped() const & noexcept {
+		return (*this)[1_bi];
+	}
+	constexpr auto && mapped() & noexcept {
+		return (*this)[1_bi];
+	}
+	constexpr auto && mapped() && noexcept {
+		return std::move(*this)[1_bi];
+	}
+};
+
+template<typename Key, typename Mapped>
+constexpr auto operator==(map_value_type<Key, Mapped> const & lhs, map_value_type<Key, Mapped> const & rhs) BOUNDED_NOEXCEPT_VALUE(
+	lhs.as_tuple() == rhs.as_tuple()
+)
+template<typename Key, typename Mapped>
+constexpr auto operator<(map_value_type<Key, Mapped> const & lhs, map_value_type<Key, Mapped> const & rhs) BOUNDED_NOEXCEPT_VALUE(
+	lhs.as_tuple() < rhs.as_tuple()
+)
+
+
+
+
 // The exact type of value_type should be considered implementation defined.
-// std::pair<key_type const, mapped_type> does not work if the underlying
+// map_value_type<key_type const, mapped_type> does not work if the underlying
 // container is vector because insertion into the middle / sorting requires
 // moving the value_type. key_type const does not have a copy or move assignment
 // operator. To get the code to work with a vector, we have to sacrifice some
@@ -32,8 +73,8 @@ template<typename Container, typename Compare, bool allow_duplicates>
 class flat_map_base {
 public:
 	using value_type = typename Container::value_type;
-	using key_type = typename value_type::first_type;
-	using mapped_type = typename value_type::second_type;
+	using key_type = typename value_type::key_type;
+	using mapped_type = typename value_type::mapped_type;
 	using allocator_type = typename Container::allocator_type;
 	using size_type = typename Container::size_type;
 
@@ -47,7 +88,7 @@ public:
 		using first_argument_type = value_type;
 		using second_argument_type = value_type;
 		constexpr bool operator()(value_type const & lhs, value_type const & rhs) const {
-			return m_compare(lhs.first, rhs.first);
+			return m_compare(lhs.key(), rhs.key());
 		}
 	protected:
 		friend class flat_map_base;
@@ -57,7 +98,7 @@ public:
 		key_compare m_compare;
 	};
 	key_compare key_comp() const {
-		return std::get<1>(m_container);
+		return m_container[1_bi];
 	}
 	value_compare value_comp() const {
 		return value_compare(key_comp());
@@ -144,11 +185,11 @@ public:
 	}
 	const_iterator find(key_type const & key) const {
 		auto const it = lower_bound(key);
-		return (it == end() or key_comp()(key, it->first)) ? end() : it;
+		return (it == end() or key_comp()(key, it->key)) ? end() : it;
 	}
 	iterator find(key_type const & key) {
 		auto const it = lower_bound(key);
-		return (it == end() or key_comp()(key, it->first)) ? end() : it;
+		return (it == end() or key_comp()(key, it->key())) ? end() : it;
 	}
 	
 	// Unlike in std::map, insert / emplace can only provide a time complexity
@@ -164,7 +205,7 @@ public:
 	// we should insert it.
 	
 	template<typename... Args>
-	std::pair<iterator, bool> emplace(Args && ... args) {
+	auto emplace(Args && ... args) {
 		auto data = separate_key_from_mapped(std::forward<Args>(args)...);
 		auto const position = upper_bound(data.key);
 		return emplace_at(position, std::move(data).key, std::move(data).mapped_args);
@@ -247,10 +288,10 @@ protected:
 			m_compare(compare) {
 		}
 		constexpr bool operator()(key_type const & key, value_type const & value) const {
-			return m_compare(key, value.first);
+			return m_compare(key, value.key());
 		}
 		constexpr bool operator()(value_type const & value, key_type const & key) const {
-			return m_compare(value.first, key);
+			return m_compare(value.key(), key);
 		}
 	private:
 		key_compare const & m_compare;
@@ -295,19 +336,19 @@ private:
 	}
 
 	static constexpr auto separate_key_from_mapped() {
-		return construct_result(std::tuple<>{});
+		return construct_result(tuple<>{});
 	}
 	template<typename Pair>
 	static constexpr auto separate_key_from_mapped(Pair && pair) {
 		return construct_result(
-			std::forward_as_tuple(std::forward<Pair>(pair).second),
-			std::forward<Pair>(pair).first
+			::containers::forward_as_tuple(std::forward<Pair>(pair).mapped()),
+			std::forward<Pair>(pair).key()
 		);
 	}
 	template<typename Key, typename Mapped>
 	static constexpr auto separate_key_from_mapped(Key && key, Mapped && mapped) {
 		return construct_result(
-			std::forward_as_tuple(std::forward<Mapped>(mapped)),
+			::containers::forward_as_tuple(std::forward<Mapped>(mapped)),
 			std::forward<Key>(key)
 		);
 	}
@@ -322,6 +363,17 @@ private:
 		return apply(construct, std::forward<KeyTuple>(key));
 	}
 	
+	struct inserted_t : private tuple<iterator, bool> {
+		using tuple<iterator, bool>::tuple;
+	
+		constexpr auto iterator() const noexcept {
+			return (*this)[0_bi];
+		}
+		constexpr auto inserted() const noexcept {
+			return (*this)[1_bi];
+		}
+	};
+
 	template<typename>
 	static constexpr auto dependent_allow_duplicates = allow_duplicates;
 	
@@ -330,7 +382,7 @@ private:
 		return container().emplace(
 			position,
 			std::piecewise_construct,
-			std::forward_as_tuple(std::forward<Key>(key)),
+			::containers::forward_as_tuple(std::forward<Key>(key)),
 			std::forward<Mapped>(mapped)
 		);
 	}
@@ -339,19 +391,19 @@ private:
 	auto emplace_at(const_iterator position, Key && key, Mapped && mapped) {
 		// Do not decrement an iterator if it might be begin()
 		bool const there_is_element_before = position != begin();
-		auto const that_element_is_equal = [&](){ return !key_comp()(::containers::prev(position)->first, key); };
+		auto const that_element_is_equal = [&](){ return !key_comp()(::containers::prev(position)->key(), key); };
 		bool const already_exists = there_is_element_before and that_element_is_equal();
 		if (already_exists) {
-			return std::make_pair(make_mutable_iterator(*this, ::containers::prev(position)), false);
+			return inserted_t(make_mutable_iterator(*this, ::containers::prev(position)), false);
 		}
 
 		auto const it = container().emplace(
 			position,
 			std::piecewise_construct,
-			std::forward_as_tuple(std::forward<Key>(key)),
+			::containers::forward_as_tuple(std::forward<Key>(key)),
 			std::forward<Mapped>(mapped)
 		);
-		return std::make_pair(it, true);
+		return inserted_t(it, true);
 	}
 
 
@@ -372,13 +424,13 @@ private:
 	};
 
 	Container const & container() const {
-		return std::get<0>(m_container);
+		return m_container[0_bi];
 	}
 	Container & container() {
-		return std::get<0>(m_container);
+		return m_container[0_bi];
 	}
 	
-	std::tuple<Container, key_compare> m_container;
+	tuple<Container, key_compare> m_container;
 };
 
 template<typename Container, typename Compare>
@@ -424,20 +476,20 @@ public:
 		if (it == this->end()) {
 			throw std::out_of_range{"Key not found"};
 		}
-		return it->second;
+		return it->mapped;
 	}
 	mapped_type & at(key_type const & key) {
 		auto const it = this->find(key);
 		if (it == this->end()) {
 			throw std::out_of_range{"Key not found"};
 		}
-		return it->second;
+		return it->mapped();
 	}
 	mapped_type & operator[](key_type const & key) {
-		return this->emplace(std::piecewise_construct, std::forward_as_tuple(key), std::forward_as_tuple()).first->second;
+		return this->emplace(std::piecewise_construct, ::containers::forward_as_tuple(key), ::containers::forward_as_tuple()).first->mapped;
 	}
 	mapped_type & operator[](key_type && key) {
-		return this->emplace(std::piecewise_construct, std::forward_as_tuple(std::move(key)), std::forward_as_tuple()).first->second;
+		return this->emplace(std::piecewise_construct, ::containers::forward_as_tuple(std::move(key)), ::containers::forward_as_tuple()).first->mapped;
 	}
 
 	std::pair<const_iterator, const_iterator> equal_range(key_type const & key) const {
@@ -534,18 +586,18 @@ public:
 
 }	// namespace detail
 
-template<typename Key, typename T, typename Compare = std::less<Key>, typename Allocator = allocator<std::pair<Key, T>>>
-using unstable_flat_map = detail::flat_map<vector<std::pair<Key, T>, Allocator>, Compare>;
+template<typename Key, typename T, typename Compare = std::less<Key>, typename Allocator = allocator<detail::map_value_type<Key, T>>>
+using unstable_flat_map = detail::flat_map<vector<detail::map_value_type<Key, T>, Allocator>, Compare>;
 
-template<typename Key, typename T, typename Compare = std::less<Key>, typename Allocator = allocator<std::pair<Key, T>>>
-using stable_flat_map = detail::flat_map<moving_vector<std::pair<Key, T>, Allocator>, Compare>;
+template<typename Key, typename T, typename Compare = std::less<Key>, typename Allocator = allocator<detail::map_value_type<Key, T>>>
+using stable_flat_map = detail::flat_map<moving_vector<detail::map_value_type<Key, T>, Allocator>, Compare>;
 
 
-template<typename Key, typename T, typename Compare = std::less<Key>, typename Allocator = allocator<std::pair<Key, T>>>
-using unstable_flat_multimap = detail::flat_multimap<vector<std::pair<Key, T>, Allocator>, Compare>;
+template<typename Key, typename T, typename Compare = std::less<Key>, typename Allocator = allocator<detail::map_value_type<Key, T>>>
+using unstable_flat_multimap = detail::flat_multimap<vector<detail::map_value_type<Key, T>, Allocator>, Compare>;
 
-template<typename Key, typename T, typename Compare = std::less<Key>, typename Allocator = allocator<std::pair<Key, T>>>
-using stable_flat_multimap = detail::flat_multimap<moving_vector<std::pair<Key, T>, Allocator>, Compare>;
+template<typename Key, typename T, typename Compare = std::less<Key>, typename Allocator = allocator<detail::map_value_type<Key, T>>>
+using stable_flat_multimap = detail::flat_multimap<moving_vector<detail::map_value_type<Key, T>, Allocator>, Compare>;
 
 
 }	// namespace containers
