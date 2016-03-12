@@ -379,13 +379,41 @@ template<typename Tuple>
 struct all_tuple_sizes<Tuple> : std::integral_constant<std::intmax_t, tuple_size<Tuple>.value()> {};
 
 
+#define CONTAINERS_FUNCTION_EXPRESSION std::declval<Function>()(std::declval<Tuples>()[bounded::constant<index>]...)
+template<std::size_t index, typename Function, typename... Tuples>
+constexpr auto is_noexcept_function_call = 
+		(
+			std::is_reference<decltype(CONTAINERS_FUNCTION_EXPRESSION)>::value or
+			std::is_nothrow_move_constructible<decltype(CONTAINERS_FUNCTION_EXPRESSION)>::value
+		) and
+		noexcept(CONTAINERS_FUNCTION_EXPRESSION);
+#undef CONTAINERS_FUNCTION_EXPRESSION
+
+template<typename Indexes, typename Function, typename... Tuples>
+struct all_noexcept_function_calls_impl;
+template<std::size_t... indexes, typename Function, typename... Tuples>
+struct all_noexcept_function_calls_impl<std::index_sequence<indexes...>, Function, Tuples...> {
+	static constexpr auto value = (is_noexcept_function_call<indexes, Function, Tuples...> and ...);
+};
+
+template<typename Function, typename... Tuples>
+constexpr auto all_noexcept_function_calls = all_noexcept_function_calls_impl<
+	make_index_sequence<all_tuple_sizes<Tuples...>::value>,
+	Function,
+	Tuples...
+>::value;
+
+
+
 template<std::intmax_t i, typename Function, typename... Tuples, BOUNDED_REQUIRES(i == all_tuple_sizes<Tuples...>::value)>
 constexpr auto transform_impl(bounded::constant_t<i>, Function &&, Tuples && ...) noexcept {
 	return tuple<>{};
 }
-// TODO: noexcept specification
+// noexcept specification is on the publicly facing transform. This is done
+// because you cannot have a recursive noexcept specification, so instead we
+// have to write special code to calculate whether the function is noexcept.
 template<std::intmax_t i, typename Function, typename... Tuples, BOUNDED_REQUIRES(i != all_tuple_sizes<Tuples...>::value)>
-constexpr auto transform_impl(bounded::constant_t<i> index, Function && function, Tuples && ... tuples) noexcept(false) {
+constexpr auto transform_impl(bounded::constant_t<i> index, Function && function, Tuples && ... tuples) {
 	return ::containers::tuple_cat(
 		tuple<decltype(function(std::forward<Tuples>(tuples)[index]...))>(function(std::forward<Tuples>(tuples)[index]...)),
 		::containers::detail::transform_impl(index + 1_bi, function, std::forward<Tuples>(tuples)...)
@@ -394,10 +422,10 @@ constexpr auto transform_impl(bounded::constant_t<i> index, Function && function
 
 }	// namespace detail
 
-template<typename Function, typename... Tuples>
-constexpr auto transform(Function && function, Tuples && ... tuples) BOUNDED_NOEXCEPT_VALUE(
-	::containers::detail::transform_impl(0_bi, std::forward<Function>(function), std::forward<Tuples>(tuples)...)
-)
+template<typename Function, typename... Tuples, BOUNDED_REQUIRES(::containers::detail::all(is_tuple<std::decay_t<Tuples>>...))>
+constexpr auto transform(Function && function, Tuples && ... tuples) noexcept(detail::all_noexcept_function_calls<Function, Tuples && ...>) {
+	return ::containers::detail::transform_impl(0_bi, function, std::forward<Tuples>(tuples)...);
+}
 
 
 // TODO: uses_allocator?
