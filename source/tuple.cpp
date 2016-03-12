@@ -75,26 +75,26 @@ constexpr auto d = containers::make_tuple(0, empty{}, 4);
 static_assert(a != d);
 static_assert(a > d);
 
-struct increment_and_swap_types {
-	constexpr auto operator()(float const x) noexcept {
+constexpr struct {
+	constexpr auto operator()(float const x) const noexcept {
 		return static_cast<int>(x + 1);
 	}
-	constexpr auto operator()(float const x, float const y) noexcept {
+	constexpr auto operator()(float const x, float const y) const noexcept {
 		return static_cast<int>(x + y);
 	}
-	constexpr auto operator()(int const x) noexcept {
+	constexpr auto operator()(int const x) const noexcept {
 		return static_cast<float>(x + 1);
 	}
-	constexpr auto operator()(int const x, int const y) noexcept {
+	constexpr auto operator()(int const x, int const y) const noexcept {
 		return static_cast<float>(x + y);
 	}
-};
+} increment_and_swap_types;
 
 constexpr auto input_tuple = containers::make_tuple(0, 1.0F, 2, 3.0F, 4);
-constexpr auto type_swapped = containers::transform(increment_and_swap_types{}, input_tuple);
+constexpr auto type_swapped = containers::transform(increment_and_swap_types, input_tuple);
 static_assert(std::is_same<decltype(type_swapped), containers::tuple<float, int, float, int, float> const>::value);
 static_assert(type_swapped == containers::make_tuple(1.0F, 2, 3.0F, 4, 5.0F));
-constexpr auto merged = containers::transform(increment_and_swap_types{}, input_tuple, input_tuple);
+constexpr auto merged = containers::transform(increment_and_swap_types, input_tuple, input_tuple);
 static_assert(std::is_same<decltype(merged), containers::tuple<float, int, float, int, float> const>::value);
 static_assert(merged == containers::make_tuple(0.0F, 2, 4.0F, 6, 8.0F));
 
