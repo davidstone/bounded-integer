@@ -80,7 +80,7 @@ struct static_vector : private detail::static_vector_data<T, capacity_>  {
 		static_vector(other.begin(), other.end())
 	) {}
 	constexpr static_vector(static_vector && other) BOUNDED_NOEXCEPT_INITIALIZATION(
-		static_vector(::containers::make_move_iterator(other.begin()), ::containers::make_move_iterator(other.end()))
+		static_vector(::containers::move_iterator(other.begin()), ::containers::move_iterator(other.end()))
 	) {}
 
 	constexpr static_vector(std::initializer_list<value_type> init) BOUNDED_NOEXCEPT_INITIALIZATION(
@@ -92,7 +92,7 @@ struct static_vector : private detail::static_vector_data<T, capacity_>  {
 		return *this;
 	}
 	constexpr auto & operator=(static_vector && other) & noexcept(std::is_nothrow_move_assignable<value_type>::value) {
-		assign(*this, ::containers::make_move_iterator(other.begin()), ::containers::make_move_iterator(other.end()));
+		assign(*this, ::containers::move_iterator(other.begin()), ::containers::move_iterator(other.end()));
 		return *this;
 	}
 	constexpr auto & operator=(std::initializer_list<value_type> init) & noexcept(noexcept(assign(std::declval<static_vector &>(), init.begin(), init.end()))) {
@@ -147,7 +147,7 @@ struct static_vector : private detail::static_vector_data<T, capacity_>  {
 		} else {
 			detail::emplace_in_middle_no_reallocation(*this, position, get_allocator(), std::forward<Args>(args)...);
 		}
-		return detail::make_mutable_iterator(*this, position);
+		return detail::mutable_iterator(*this, position);
 	}
 	template<typename ForwardIterator, typename Sentinel>
 	constexpr auto insert(const_iterator const position, ForwardIterator first, Sentinel last) {

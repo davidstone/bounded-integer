@@ -28,13 +28,13 @@ namespace containers {
 namespace detail {
 
 template<typename Container, typename Iterator, BOUNDED_REQUIRES(is_container<Container> and is_iterator<Iterator>)>
-constexpr auto make_mutable_iterator(Container & container, Iterator const it) BOUNDED_NOEXCEPT(
+constexpr auto mutable_iterator(Container & container, Iterator const it) BOUNDED_NOEXCEPT(
 	container.begin() + (it - container.begin())
 )
 
 template<typename Container, typename Iterator, BOUNDED_REQUIRES(is_container<Container> and is_iterator<Iterator>)>
-constexpr auto make_moving_iterator(Container & container, Iterator const it) BOUNDED_NOEXCEPT(
-	make_mutable_iterator(container, it)
+constexpr auto moving_iterator(Container & container, Iterator const it) BOUNDED_NOEXCEPT(
+	mutable_iterator(container, it)
 )
 
 namespace common {
@@ -59,20 +59,20 @@ constexpr auto cend(Container const & container) BOUNDED_NOEXCEPT(
 
 template<typename Container, BOUNDED_REQUIRES(is_container<Container>)>
 constexpr auto rbegin(Container && container) BOUNDED_NOEXCEPT(
-	::containers::make_reverse_iterator(std::forward<Container>(container).begin())
+	::containers::reverse_iterator(std::forward<Container>(container).begin())
 )
 template<typename Container, BOUNDED_REQUIRES(is_container<Container>)>
 constexpr auto rend(Container && container) BOUNDED_NOEXCEPT(
-	::containers::make_reverse_iterator(std::forward<Container>(container).end())
+	::containers::reverse_iterator(std::forward<Container>(container).end())
 )
 
 template<typename Container, BOUNDED_REQUIRES(is_container<Container>)>
 constexpr auto crbegin(Container const & container) BOUNDED_NOEXCEPT(
-	::containers::make_reverse_iterator(container.begin())
+	::containers::reverse_iterator(container.begin())
 )
 template<typename Container, BOUNDED_REQUIRES(is_container<Container>)>
 constexpr auto crend(Container const & container) BOUNDED_NOEXCEPT(
-	::containers::make_reverse_iterator(container.end())
+	::containers::reverse_iterator(container.end())
 )
 
 
@@ -175,10 +175,10 @@ constexpr auto insert(Container & container, typename Container::const_iterator 
 // TODO: conditional noexcept
 template<typename Container, typename Iterator, BOUNDED_REQUIRES(is_container<Container> and is_iterator<Iterator>)>
 constexpr auto erase(Container & container, Iterator const first_, Iterator const last_) noexcept {
-	auto const first = make_moving_iterator(container, first_);
-	auto const last = make_moving_iterator(container, last_);
-	auto const to_clear = ::containers::move(last, make_moving_iterator(container, container.end()), first).output;
-	while (to_clear != make_moving_iterator(container, container.end())) {
+	auto const first = moving_iterator(container, first_);
+	auto const last = moving_iterator(container, last_);
+	auto const to_clear = ::containers::move(last, moving_iterator(container, container.end()), first).output;
+	while (to_clear != moving_iterator(container, container.end())) {
 		container.pop_back();
 	}
 }
@@ -299,7 +299,7 @@ CONTAINERS_COMMON_USING_DECLARATIONS
 template<typename Container, typename Allocator, typename... Args>
 constexpr auto emplace_in_middle_no_reallocation(Container & container, typename Container::const_iterator const position_, Allocator && allocator, Args && ... args) {
 	assert(container.capacity() > size(container));
-	auto const position = detail::make_mutable_iterator(container, position_);
+	auto const position = detail::mutable_iterator(container, position_);
 	auto const original_end = container.end();
 	container.emplace_back(std::move(back(container)));
 	::containers::move_backward(position, ::containers::prev(original_end), original_end);
@@ -315,7 +315,7 @@ constexpr auto emplace_in_middle_no_reallocation(Container & container, typename
 template<typename Container, typename ForwardIterator, typename Sentinel, typename Size, typename Allocator>
 constexpr auto put_in_middle_no_reallocation(Container & container, typename Container::const_iterator const position, ForwardIterator first, Sentinel const last, Size const range_size, Allocator && allocator) {
 	auto const distance_to_end = typename Container::size_type(container.end() - position, bounded::non_check);
-	auto const mutable_position = make_mutable_iterator(container, position);
+	auto const mutable_position = mutable_iterator(container, position);
 	::containers::uninitialized_move_backward(mutable_position, container.end(), container.end() + range_size, allocator);
 	auto const remainder = ::containers::copy_n(first, bounded::min(range_size, distance_to_end), mutable_position);
 	::containers::uninitialized_copy(remainder.input, last, remainder.output, allocator);

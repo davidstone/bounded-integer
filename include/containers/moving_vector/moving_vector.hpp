@@ -113,12 +113,12 @@ public:
 	
 	template<typename... Args>
 	constexpr auto emplace(const_iterator const position, Args && ... args) {
-		return make_regular_iterator(m_container.emplace(make_base_iterator(position), smart_pointer::make_value<value_type>(std::forward<Args>(args)...)));
+		return regular_iterator(m_container.emplace(base_iterator(position), smart_pointer::make_value<value_type>(std::forward<Args>(args)...)));
 	}
 	
 	template<typename ForwardIterator, typename Sentinel>
 	constexpr auto insert(const_iterator position, ForwardIterator first, Sentinel const last) {
-		return make_regular_iterator(m_container.insert(make_base_iterator(position), first, last));
+		return regular_iterator(m_container.insert(base_iterator(position), first, last));
 	}
 
 	constexpr auto pop_back() {
@@ -137,10 +137,10 @@ private:
 		return moving_begin() + size(m_container);
 	}
 
-	constexpr auto make_base_iterator(const_iterator const it) const {
+	constexpr auto base_iterator(const_iterator const it) const {
 		return m_container.begin() + (it - begin());
 	}
-	constexpr auto make_regular_iterator(typename container_type::const_iterator const it) {
+	constexpr auto regular_iterator(typename container_type::const_iterator const it) {
 		return begin() + (it - m_container.begin());
 	}
 
@@ -197,13 +197,13 @@ template<typename T, typename Allocator, typename Iterator, BOUNDED_REQUIRES(
 	std::is_same<Iterator, typename moving_vector<T, Allocator>::const_iterator>::value or
 	std::is_same<Iterator, typename moving_vector<T, Allocator>::iterator>::value
 )>
-constexpr auto make_moving_iterator(moving_vector<T, Allocator> & container, Iterator const it) noexcept {
+constexpr auto moving_iterator(moving_vector<T, Allocator> & container, Iterator const it) noexcept {
 	return container.moving_begin() + (it - container.begin());
 }
 template<typename T, typename Allocator, typename Iterator, BOUNDED_REQUIRES(
 	std::is_same<Iterator, typename moving_vector<T, Allocator>::moving_iterator>::value
 )>
-constexpr auto make_moving_iterator(moving_vector<T, Allocator> &, Iterator const it) noexcept {
+constexpr auto moving_iterator(moving_vector<T, Allocator> &, Iterator const it) noexcept {
 	return it;
 }
 

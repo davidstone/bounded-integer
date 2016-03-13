@@ -241,7 +241,7 @@ public:
 		// merge sort on both ranges, rather than calling std::sort on the
 		// entire container.
 		auto const const_midpoint = container().insert(container().end(), first, last);
-		auto const midpoint = detail::make_moving_iterator(container(), const_midpoint);
+		auto const midpoint = detail::moving_iterator(container(), const_midpoint);
 		std::sort(midpoint, moving_end(container()), indirect_compare{value_comp()});
 		if (allow_duplicates) {
 			std::inplace_merge(
@@ -394,7 +394,7 @@ private:
 		auto const that_element_is_equal = [&](){ return !key_comp()(::containers::prev(position)->key(), key); };
 		bool const already_exists = there_is_element_before and that_element_is_equal();
 		if (already_exists) {
-			return inserted_t(make_mutable_iterator(*this, ::containers::prev(position)), false);
+			return inserted_t(mutable_iterator(*this, ::containers::prev(position)), false);
 		}
 
 		auto const it = container().emplace(

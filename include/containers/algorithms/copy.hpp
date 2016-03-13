@@ -28,7 +28,7 @@ constexpr auto copy(InputIterator first, Sentinel const last, OutputIterator out
 
 template<typename InputIterator, typename Sentinel, typename OutputIterator>
 constexpr auto move(InputIterator const first, Sentinel const last, OutputIterator const out) {
-	auto const iterators = ::containers::copy(::containers::make_move_iterator(last), ::containers::make_move_iterator(first), out);
+	auto const iterators = ::containers::copy(::containers::move_iterator(last), ::containers::move_iterator(first), out);
 	struct result {
 		InputIterator input;
 		OutputIterator output;
@@ -38,12 +38,12 @@ constexpr auto move(InputIterator const first, Sentinel const last, OutputIterat
 
 template<typename BidirectionalIterator, typename BidirectionalOutput>
 constexpr auto copy_backward(BidirectionalIterator const first, BidirectionalIterator const last, BidirectionalOutput const out_last) BOUNDED_NOEXCEPT(
-	::containers::copy(::containers::make_reverse_iterator(last), ::containers::make_reverse_iterator(first), ::containers::make_reverse_iterator(out_last)).output.base()
+	::containers::copy(::containers::reverse_iterator(last), ::containers::reverse_iterator(first), ::containers::reverse_iterator(out_last)).output.base()
 )
 
 template<typename BidirectionalIterator, typename BidirectionalOutput>
 constexpr auto move_backward(BidirectionalIterator const first, BidirectionalIterator const last, BidirectionalOutput const out_last) BOUNDED_NOEXCEPT(
-	::containers::copy_backward(::containers::make_move_iterator(first), ::containers::make_move_iterator(last), out_last)
+	::containers::copy_backward(::containers::move_iterator(first), ::containers::move_iterator(last), out_last)
 )
 
 

@@ -93,7 +93,7 @@ constexpr auto unique(MutableForwardIterator const first, Sentinel const last, B
 		return equal_element;
 	}
 	*equal_element = std::move(*other);
-	return ::containers::detail::unique_common(::containers::make_move_iterator(::containers::next(other)), last, equal_element, equal);
+	return ::containers::detail::unique_common(::containers::move_iterator(::containers::next(other)), last, equal_element, equal);
 }
 
 template<typename InputIterator, typename Sentinel, typename MutableForwardIterator, typename BinaryPredicate = std::less<>>
@@ -151,10 +151,10 @@ auto unique_inplace_merge(MutableForwardIterator first, MutableForwardIterator m
 	using storage_type = dynamic_array<std::decay_t<decltype(*first)>>;
 
 	if (less(*middle, *first)) {
-		storage_type temp(::containers::make_move_iterator(first), ::containers::make_move_iterator(middle));
+		storage_type temp(::containers::move_iterator(first), ::containers::move_iterator(middle));
 		return ::containers::unique_merge_copy(
-			::containers::make_move_iterator(temp.begin()), ::containers::make_move_iterator(temp.end()),
-			::containers::make_move_iterator(middle), ::containers::make_move_iterator(last),
+			::containers::move_iterator(temp.begin()), ::containers::move_iterator(temp.end()),
+			::containers::move_iterator(middle), ::containers::move_iterator(last),
 			first,
 			less
 		);
@@ -186,15 +186,15 @@ auto unique_inplace_merge(MutableForwardIterator first, MutableForwardIterator m
 	
 	// Move the rest of the elements so we can use their space without
 	// overwriting.
-	storage_type temp(::containers::make_move_iterator(first_to_move.target), ::containers::make_move_iterator(middle));
+	storage_type temp(::containers::move_iterator(first_to_move.target), ::containers::move_iterator(middle));
 	auto const new_middle = ::containers::detail::next_greater(middle, last, *first_to_move.before_target, less);
 
 	auto postFunction = [=](auto const first_, auto const last_, auto) {
 		return unique_less(first_.base(), last_.base(), less);
 	};
 	return ::containers::detail::unique_merge_common(
-		::containers::make_move_iterator(temp.begin()), ::containers::make_move_iterator(temp.end()),
-		::containers::make_move_iterator(new_middle), ::containers::make_move_iterator(last),
+		::containers::move_iterator(temp.begin()), ::containers::move_iterator(temp.end()),
+		::containers::move_iterator(new_middle), ::containers::move_iterator(last),
 		first_to_move.target,
 		less,
 		postFunction

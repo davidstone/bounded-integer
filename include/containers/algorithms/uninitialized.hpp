@@ -118,17 +118,17 @@ constexpr auto uninitialized_copy(InputIterator first, Sentinel const last, Forw
 
 template<typename InputIterator, typename ForwardIterator, typename Allocator>
 constexpr auto uninitialized_move(InputIterator const first, InputIterator const last, ForwardIterator const out, Allocator && allocator) BOUNDED_NOEXCEPT_VALUE(
-	::containers::uninitialized_copy(::containers::make_move_iterator(first), ::containers::make_move_iterator(last), out, allocator)
+	::containers::uninitialized_copy(::containers::move_iterator(first), ::containers::move_iterator(last), out, allocator)
 )
 
 template<typename BidirectionalInputIterator, typename BidirectionalOutputIterator, typename Allocator>
 constexpr auto uninitialized_copy_backward(BidirectionalInputIterator const first, BidirectionalInputIterator const last, BidirectionalOutputIterator const out_last, Allocator && allocator) BOUNDED_NOEXCEPT_VALUE(
-	::containers::uninitialized_copy(::containers::make_reverse_iterator(last), ::containers::make_reverse_iterator(first), ::containers::make_reverse_iterator(out_last), allocator).base()
+	::containers::uninitialized_copy(::containers::reverse_iterator(last), ::containers::reverse_iterator(first), ::containers::reverse_iterator(out_last), allocator).base()
 )
 
 template<typename BidirectionalInputIterator, typename BidirectionalOutputIterator, typename Allocator>
 constexpr auto uninitialized_move_backward(BidirectionalInputIterator const first, BidirectionalInputIterator const last, BidirectionalOutputIterator const out_last, Allocator && allocator) BOUNDED_NOEXCEPT_VALUE(
-	::containers::uninitialized_copy_backward(::containers::make_move_iterator(first), ::containers::make_move_iterator(last), out_last, allocator)
+	::containers::uninitialized_copy_backward(::containers::move_iterator(first), ::containers::move_iterator(last), out_last, allocator)
 )
 
 

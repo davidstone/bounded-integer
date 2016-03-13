@@ -139,12 +139,12 @@ public:
 }	// namespace detail
 
 template<typename Iterator>
-constexpr auto make_move_iterator(Iterator it) BOUNDED_NOEXCEPT_VALUE(
+constexpr auto move_iterator(Iterator it) BOUNDED_NOEXCEPT_VALUE(
 	::containers::iterator_adapter(it, detail::move_function_object{})
 )
 
 template<typename Iterator>
-using move_iterator = decltype(make_move_iterator(std::declval<Iterator>()));
+using move_iterator_t = decltype(move_iterator(std::declval<Iterator>()));
 
 
 
@@ -167,11 +167,11 @@ struct reverse_add {
 }	// namespace detail
 
 template<typename BidirectionalIterator>
-constexpr auto make_reverse_iterator(BidirectionalIterator it) BOUNDED_NOEXCEPT_VALUE(
+constexpr auto reverse_iterator(BidirectionalIterator it) BOUNDED_NOEXCEPT_VALUE(
 	::containers::iterator_adapter(it, detail::reverse_dereference{}, detail::reverse_add{})
 )
 
 template<typename BidirectionalIterator>
-using reverse_iterator = decltype(make_reverse_iterator(std::declval<BidirectionalIterator>()));
+using reverse_iterator_t = decltype(reverse_iterator(std::declval<BidirectionalIterator>()));
 
 }	// namespace containers
