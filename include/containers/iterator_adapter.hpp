@@ -88,35 +88,35 @@ private:
 	AddFunction m_add;
 };
 
-template<typename SimpleFunction>
-struct dereferenced_function : private SimpleFunction {
-	constexpr dereferenced_function(SimpleFunction && base) BOUNDED_NOEXCEPT_INITIALIZATION(
-		SimpleFunction(std::move(base))
-	) {
-	}
+struct default_dereference {
 	template<typename Iterator>
-	constexpr decltype(auto) operator()(Iterator const it) const {
-		return static_cast<SimpleFunction const &>(*this)(*it);
-	}
+	constexpr auto operator()(Iterator && it) const BOUNDED_NOEXCEPT_DECLTYPE(
+		*std::forward<Iterator>(it)
+	)
 };
 
-struct iterator_adapter_increment {
-	template<typename Iterator>
-	constexpr auto operator()(Iterator const it, typename std::iterator_traits<Iterator>::difference_type const difference) const BOUNDED_NOEXCEPT_DECLTYPE(
-		it + difference
+struct default_traverse {
+	template<typename Iterator, typename Offset>
+	constexpr auto operator()(Iterator && it, Offset && offset) const BOUNDED_NOEXCEPT_DECLTYPE(
+		std::forward<Iterator>(it) + std::forward<Offset>(offset)
 	)
 };
 
 }	// namespace detail
 
-template<typename Iterator, typename DereferenceFunction, typename AddFunction>
-constexpr auto iterator_adapter(Iterator it, DereferenceFunction dereference, AddFunction add) BOUNDED_NOEXCEPT(
-	detail::iterator_adapter_t<Iterator, DereferenceFunction, AddFunction>(std::move(it), std::move(dereference), std::move(add))
+// There are two functions of interest for an iterator:
+// 1) Dereferencing: *it
+// 2) Traversing: it + 5_bi
+// This allows you to customize those. Your function is passed an iterator.
+
+template<typename Iterator, typename DereferenceFunction, typename TraversalFunction>
+constexpr auto iterator_adapter(Iterator it, DereferenceFunction dereference, TraversalFunction traverse) BOUNDED_NOEXCEPT(
+	detail::iterator_adapter_t<Iterator, DereferenceFunction, TraversalFunction>(std::move(it), std::move(dereference), std::move(traverse))
 )
 
-template<typename Iterator, typename Function>
-constexpr auto iterator_adapter(Iterator it, Function function) BOUNDED_NOEXCEPT(
-	iterator_adapter(it, detail::dereferenced_function<Function>(std::move(function)), detail::iterator_adapter_increment{})
+template<typename Iterator, typename DereferenceFunction>
+constexpr auto iterator_adapter(Iterator it, DereferenceFunction dereference) BOUNDED_NOEXCEPT(
+	iterator_adapter(it, std::move(dereference), detail::default_traverse{})
 )
 
 }	// namespace containers

@@ -121,15 +121,18 @@ constexpr auto prev(Iterator it, Offset const offset = ::containers::detail::ite
 
 namespace detail {
 
-template<typename Iterator>
 struct move_function_object {
 private:
-	using base_ref = decltype(*std::declval<Iterator>());
-	using result = std::conditional_t<std::is_reference<base_ref>::value, std::remove_reference_t<base_ref> &&, base_ref>;
+	template<typename Iterator, typename base_result = decltype(*std::declval<Iterator>())>
+	using result = std::conditional_t<
+		std::is_reference<base_result>::value,
+		std::remove_reference_t<base_result> &&,
+		base_result
+	>;
 public:
-	template<typename T>
-	constexpr auto operator()(T && value) const BOUNDED_NOEXCEPT_DECLTYPE(
-		static_cast<result>(std::forward<T>(value))
+	template<typename Iterator>
+	constexpr auto operator()(Iterator && it) const BOUNDED_NOEXCEPT_DECLTYPE(
+		static_cast<result<Iterator>>(*std::forward<Iterator>(it))
 	)
 };
 
@@ -137,7 +140,7 @@ public:
 
 template<typename Iterator>
 constexpr auto make_move_iterator(Iterator it) BOUNDED_NOEXCEPT_VALUE(
-	::containers::iterator_adapter(it, detail::move_function_object<Iterator>{})
+	::containers::iterator_adapter(it, detail::move_function_object{})
 )
 
 template<typename Iterator>
@@ -154,11 +157,10 @@ struct reverse_dereference {
 	)
 };
 
-// TODO: Support BidirectionalIterator
 struct reverse_add {
-	template<typename RandomAccessIterator>
-	constexpr auto operator()(RandomAccessIterator it, typename std::iterator_traits<RandomAccessIterator>::difference_type const difference) const BOUNDED_NOEXCEPT_DECLTYPE(
-		it - difference
+	template<typename RandomAccessIterator, typename Offset>
+	constexpr auto operator()(RandomAccessIterator it, Offset const offset) const BOUNDED_NOEXCEPT_DECLTYPE(
+		it - offset
 	)
 };
 
