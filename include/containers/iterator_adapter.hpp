@@ -55,30 +55,6 @@ struct iterator_adapter_t {
 		m_dereference(*(*this + index))
 	)
 
-	friend constexpr decltype(auto) operator==(iterator_adapter_t const & lhs, iterator_adapter_t const & rhs) BOUNDED_NOEXCEPT(
-		lhs.base() == rhs.base()
-	)
-	template<typename RHS>
-	friend constexpr decltype(auto) operator==(iterator_adapter_t const & lhs, RHS const & rhs) BOUNDED_NOEXCEPT(
-		lhs.base() == rhs
-	)
-	template<typename LHS>
-	friend constexpr decltype(auto) operator==(LHS const & lhs, iterator_adapter_t const & rhs) BOUNDED_NOEXCEPT(
-		lhs == rhs.base()
-	)
-
-	friend constexpr decltype(auto) operator<(iterator_adapter_t const & lhs, iterator_adapter_t const & rhs) BOUNDED_NOEXCEPT(
-		lhs.base() < rhs.base()
-	)
-	template<typename RHS>
-	friend constexpr decltype(auto) operator<(iterator_adapter_t const & lhs, RHS const & rhs) BOUNDED_NOEXCEPT(
-		lhs.base() < rhs
-	)
-	template<typename LHS>
-	friend constexpr decltype(auto) operator<(LHS const & lhs, iterator_adapter_t const & rhs) BOUNDED_NOEXCEPT(
-		lhs < rhs.base()
-	)
-	
 	constexpr auto base() const noexcept {
 		return m_base;
 	}
@@ -87,6 +63,33 @@ private:
 	DereferenceFunction m_dereference;
 	AddFunction m_add;
 };
+
+template<typename Iterator, typename DereferenceFunction, typename AddFunction>
+constexpr auto operator==(iterator_adapter_t<Iterator, DereferenceFunction, AddFunction> const & lhs, iterator_adapter_t<Iterator, DereferenceFunction, AddFunction> const & rhs) BOUNDED_NOEXCEPT_DECLTYPE(
+	lhs.base() == rhs.base()
+)
+template<typename Iterator, typename DereferenceFunction, typename AddFunction, typename RHS>
+constexpr auto operator==(iterator_adapter_t<Iterator, DereferenceFunction, AddFunction> const & lhs, RHS const & rhs) BOUNDED_NOEXCEPT_DECLTYPE(
+	lhs.base() == rhs
+)
+template<typename LHS, typename Iterator, typename DereferenceFunction, typename AddFunction>
+constexpr auto operator==(LHS const & lhs, iterator_adapter_t<Iterator, DereferenceFunction, AddFunction> const & rhs) BOUNDED_NOEXCEPT_DECLTYPE(
+	lhs == rhs.base()
+)
+
+template<typename Iterator, typename DereferenceFunction, typename AddFunction>
+constexpr auto operator<(iterator_adapter_t<Iterator, DereferenceFunction, AddFunction> const & lhs, iterator_adapter_t<Iterator, DereferenceFunction, AddFunction> const & rhs) BOUNDED_NOEXCEPT_DECLTYPE(
+	lhs.base() < rhs.base()
+)
+template<typename Iterator, typename DereferenceFunction, typename AddFunction, typename RHS>
+constexpr auto operator<(iterator_adapter_t<Iterator, DereferenceFunction, AddFunction> const & lhs, RHS const & rhs) BOUNDED_NOEXCEPT_DECLTYPE(
+	lhs.base() < rhs
+)
+template<typename LHS, typename Iterator, typename DereferenceFunction, typename AddFunction>
+constexpr auto operator<(LHS const & lhs, iterator_adapter_t<Iterator, DereferenceFunction, AddFunction> const & rhs) BOUNDED_NOEXCEPT_DECLTYPE(
+	lhs < rhs.base()
+)
+
 
 struct default_dereference {
 	template<typename Iterator>
