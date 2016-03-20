@@ -7,6 +7,7 @@
 
 #include <containers/common_iterator_functions.hpp>
 #include <containers/index_type.hpp>
+#include <containers/tuple.hpp>
 
 #include <bounded/integer.hpp>
 
@@ -19,7 +20,6 @@
 namespace containers {
 namespace detail {
 
-// TODO: Use empty base optimization
 template<typename Iterator, typename DereferenceFunction, typename AddFunction, typename SubtractFunction, typename LessFunction>
 struct iterator_adapter_t {
 	static_assert(
@@ -41,27 +41,29 @@ struct iterator_adapter_t {
 	// Even though subtract and less must be stateless, we must still keep them
 	// around. This is because there is no guarantee that they are
 	// default-constructible: for instance, lambdas.
-	constexpr iterator_adapter_t(Iterator it, DereferenceFunction dereference, AddFunction add, SubtractFunction subtract, LessFunction less):
-		m_base(it),
-		m_dereference(std::move(dereference)),
-		m_add(std::move(add)),
-		m_subtract(std::move(subtract)),
-		m_less(std::move(less))
+	constexpr iterator_adapter_t(Iterator it, DereferenceFunction dereference, AddFunction add, SubtractFunction subtract, LessFunction less) noexcept(std::is_nothrow_constructible<decltype(m_data), Iterator, DereferenceFunction, AddFunction, SubtractFunction, LessFunction>::value):
+		m_data(std::move(it), std::move(dereference), std::move(add), std::move(subtract), std::move(less))
 	{
 	}
 	
 	constexpr decltype(auto) operator*() const BOUNDED_NOEXCEPT(
-		m_dereference(base())
+		dereference()(base())
 	)
 	// operator-> intentionally missing
 
 	// TODO: Support ForwardIterator
 	friend constexpr auto operator+(iterator_adapter_t lhs, difference_type const rhs) BOUNDED_NOEXCEPT(
 		// Use {} initialization to ensure evaluation order
-		iterator_adapter_t{lhs.m_add(lhs.base(), rhs), std::move(lhs.m_dereference), std::move(lhs.m_add), std::move(lhs.m_subtract), std::move(lhs.m_less)}
+		iterator_adapter_t{
+			lhs.add()(lhs.base(), rhs),
+			std::move(lhs).dereference(),
+			std::move(lhs).add(),
+			std::move(lhs).subtract(),
+			std::move(lhs).less()
+		}
 	)
 	friend constexpr decltype(auto) operator-(iterator_adapter_t const & lhs, iterator_adapter_t const & rhs) BOUNDED_NOEXCEPT(
-		lhs.m_subtract(lhs.base(), rhs.base())
+		lhs.subtract()(lhs.base(), rhs.base())
 	)
 
 	constexpr decltype(auto) operator[](index_type<iterator_adapter_t> const index) const BOUNDED_NOEXCEPT(
@@ -69,18 +71,38 @@ struct iterator_adapter_t {
 	)
 
 	constexpr auto base() const noexcept {
-		return m_base;
+		return m_data[0_bi];
 	}
 
 	friend constexpr decltype(auto) operator<(iterator_adapter_t const & lhs, iterator_adapter_t const & rhs) BOUNDED_NOEXCEPT(
-		lhs.m_less(lhs.base(), rhs.base())
+		lhs.less()(lhs.base(), rhs.base())
 	)
 private:
-	Iterator m_base;
-	DereferenceFunction m_dereference;
-	AddFunction m_add;
-	SubtractFunction m_subtract;
-	LessFunction m_less;
+	constexpr auto && dereference() const & noexcept {
+		return m_data[1_bi];
+	}
+	constexpr auto && dereference() && noexcept {
+		return std::move(m_data)[1_bi];
+	}
+	constexpr auto && add() const & noexcept {
+		return m_data[2_bi];
+	}
+	constexpr auto && add() && noexcept {
+		return std::move(m_data)[2_bi];
+	}
+	constexpr auto && subtract() const & noexcept {
+		return m_data[3_bi];
+	}
+	constexpr auto && subtract() && noexcept {
+		return std::move(m_data)[3_bi];
+	}
+	constexpr auto && less() const & noexcept {
+		return m_data[4_bi];
+	}
+	constexpr auto && less() && noexcept {
+		return std::move(m_data)[4_bi];
+	}
+	tuple<Iterator, DereferenceFunction, AddFunction, SubtractFunction, LessFunction> m_data;
 };
 
 template<typename Iterator, typename DereferenceFunction, typename AddFunction, typename SubtractFunction, typename LessFunction>
