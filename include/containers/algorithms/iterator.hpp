@@ -121,7 +121,7 @@ constexpr auto prev(Iterator it, Offset const offset = ::containers::detail::ite
 
 namespace detail {
 
-struct move_function_object {
+struct move_dereference {
 private:
 	template<typename Iterator, typename base_result = decltype(*std::declval<Iterator>())>
 	using result = std::conditional_t<
@@ -140,7 +140,7 @@ public:
 
 template<typename Iterator>
 constexpr auto move_iterator(Iterator it) BOUNDED_NOEXCEPT_VALUE(
-	::containers::iterator_adapter(it, detail::move_function_object{})
+	::containers::iterator_adapter(it, detail::move_dereference{})
 )
 
 template<typename Iterator>
@@ -164,11 +164,25 @@ struct reverse_add {
 	)
 };
 
+struct reverse_subtract {
+	template<typename RandomAccessIterator>
+	constexpr auto operator()(RandomAccessIterator const lhs, RandomAccessIterator const rhs) const BOUNDED_NOEXCEPT_DECLTYPE(
+		rhs - lhs
+	)
+};
+
+struct reverse_less {
+	template<typename RandomAccessIterator>
+	constexpr auto operator()(RandomAccessIterator const lhs, RandomAccessIterator const rhs) const BOUNDED_NOEXCEPT_DECLTYPE(
+		rhs < lhs
+	)
+};
+
 }	// namespace detail
 
 template<typename BidirectionalIterator>
 constexpr auto reverse_iterator(BidirectionalIterator it) BOUNDED_NOEXCEPT_VALUE(
-	::containers::iterator_adapter(it, detail::reverse_dereference{}, detail::reverse_add{})
+	::containers::iterator_adapter(it, detail::reverse_dereference{}, detail::reverse_add{}, detail::reverse_subtract{}, detail::reverse_less{})
 )
 
 template<typename BidirectionalIterator>
