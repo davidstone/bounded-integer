@@ -57,8 +57,13 @@ constexpr auto is_derivable = std::is_class<T>::value and !std::is_final<T>::val
 
 // unique ensures that a tuple with the same type repeated shows the type as
 // being different
-template<std::size_t unique, typename T, bool = is_derivable<T>>
+// Ts... ensures that tuple<T, tuple<T>> does not create an ambiguous base
+template<bool derivable, std::size_t unique, typename T, typename... Ts>
 struct tuple_value;
+
+template<std::size_t unique, typename T, typename... Ts>
+using tuple_value_t = tuple_value<is_derivable<T>, unique, T, Ts...>;
+
 
 
 
@@ -93,39 +98,39 @@ using nth_type = typename nth_type_c<index, Ts...>::type;
 
 
 template<std::size_t... indexes, typename... Types>
-struct tuple_impl<std::index_sequence<indexes...>, Types...> : tuple_value<indexes, Types>... {
+struct tuple_impl<std::index_sequence<indexes...>, Types...> : tuple_value_t<indexes, Types, Types...>... {
 
 	tuple_impl() = default;
 	
 	template<typename... Args, BOUNDED_REQUIRES(
 		::containers::detail::all(std::is_convertible<Args, Types>::value...) and
-		::containers::detail::all(std::is_constructible<tuple_value<indexes, Types>, not_piecewise_construct_t, Args>::value...)
+		::containers::detail::all(std::is_constructible<tuple_value_t<indexes, Types, Types...>, not_piecewise_construct_t, Args>::value...)
 	)>
 	constexpr tuple_impl(Args && ... args) noexcept(false):
-		tuple_value<indexes, Types>(not_piecewise_construct, std::forward<Args>(args))...
+		tuple_value_t<indexes, Types, Types...>(not_piecewise_construct, std::forward<Args>(args))...
 	{
 	}
 
 	template<typename... Args, BOUNDED_REQUIRES(
-		::containers::detail::all(std::is_constructible<tuple_value<indexes, Types>, std::piecewise_construct_t, Args>::value...)
+		::containers::detail::all(std::is_constructible<tuple_value_t<indexes, Types, Types...>, std::piecewise_construct_t, Args>::value...)
 	)>
 	constexpr tuple_impl(std::piecewise_construct_t, Args && ... args) noexcept(false):
-		tuple_value<indexes, Types>(std::piecewise_construct, std::forward<Args>(args))...
+		tuple_value_t<indexes, Types, Types...>(std::piecewise_construct, std::forward<Args>(args))...
 	{
 	}
 
 
 	template<intmax_t index, BOUNDED_REQUIRES(index < sizeof...(Types))>
 	constexpr auto && operator[](bounded::constant_t<index>) const & noexcept {
-		return static_cast<tuple_value<index, nth_type<index, Types...>> const &>(*this).value();
+		return static_cast<tuple_value_t<index, nth_type<index, Types...>, Types...> const &>(*this).value();
 	}
 	template<intmax_t index, BOUNDED_REQUIRES(index < sizeof...(Types))>
 	constexpr auto && operator[](bounded::constant_t<index>) & noexcept {
-		return static_cast<tuple_value<index, nth_type<index, Types...>> &>(*this).value();
+		return static_cast<tuple_value_t<index, nth_type<index, Types...>, Types...> &>(*this).value();
 	}
 	template<intmax_t index, BOUNDED_REQUIRES(index < sizeof...(Types))>
 	constexpr auto && operator[](bounded::constant_t<index>) && noexcept {
-		return static_cast<tuple_value<index, nth_type<index, Types...>> &&>(*this).value();
+		return static_cast<tuple_value_t<index, nth_type<index, Types...>, Types...> &&>(*this).value();
 	}
 
 protected:
@@ -142,8 +147,8 @@ protected:
 };
 
 
-template<std::size_t unique, typename T>
-struct tuple_value<unique, T, true> : private T {
+template<std::size_t unique, typename T, typename... Ts>
+struct tuple_value<true, unique, T, Ts...> : private T {
 	// We cannot just do using T::T here because that does not capture the
 	// compiler-generated copy and move constructors.
 	
@@ -179,8 +184,8 @@ private:
 	}
 };
 
-template<std::size_t unique, typename T>
-struct tuple_value<unique, T, false> {
+template<std::size_t unique, typename T, typename... Ts>
+struct tuple_value<false, unique, T, Ts...> {
 	tuple_value() = default;
 	
 	template<typename... Args, BOUNDED_REQUIRES(std::is_constructible<T, Args...>::value)>
@@ -218,8 +223,8 @@ private:
 };
 
 
-template<std::size_t unique>
-struct tuple_value<unique, void, false> {
+template<std::size_t unique, typename... Ts>
+struct tuple_value<is_derivable<void>, unique, void, Ts...> {
 	constexpr explicit tuple_value(std::piecewise_construct_t, tuple<>) noexcept {
 	}
 	constexpr explicit tuple_value(not_piecewise_construct_t) noexcept {

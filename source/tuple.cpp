@@ -30,6 +30,9 @@ static_assert(std::is_empty<containers::tuple<void, void, empty, void>>::value);
 
 static_assert(std::is_empty<containers::tuple<containers::tuple<>>>::value);
 static_assert(sizeof(containers::tuple<int>) == sizeof(int));
+// Make sure a tuple can handle multiple bases of the same type in the same position
+static_assert(std::is_empty<containers::tuple<empty, containers::tuple<empty>>>::value);
+static_assert(sizeof(containers::tuple<int, containers::tuple<int>>) == sizeof(int) * 2);
 
 static_assert(sizeof(containers::tuple<int, empty>) == sizeof(int));
 
