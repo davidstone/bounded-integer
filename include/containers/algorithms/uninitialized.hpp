@@ -116,9 +116,9 @@ constexpr auto uninitialized_copy(InputIterator first, Sentinel const last, Forw
 
 
 
-template<typename InputIterator, typename ForwardIterator, typename Allocator>
-constexpr auto uninitialized_move(InputIterator const first, InputIterator const last, ForwardIterator const out, Allocator && allocator) BOUNDED_NOEXCEPT_VALUE(
-	::containers::uninitialized_copy(::containers::move_iterator(first), ::containers::move_iterator(last), out, allocator)
+template<typename InputIterator, typename Sentinel, typename ForwardIterator, typename Allocator>
+constexpr auto uninitialized_move(InputIterator const first, Sentinel const last, ForwardIterator const out, Allocator && allocator) BOUNDED_NOEXCEPT_VALUE(
+	::containers::uninitialized_copy(::containers::move_iterator(first), last, out, allocator)
 )
 
 template<typename BidirectionalInputIterator, typename BidirectionalOutputIterator, typename Allocator>
@@ -134,6 +134,7 @@ constexpr auto uninitialized_move_backward(BidirectionalInputIterator const firs
 
 template<
 	typename InputIterator,
+	typename Sentinel,
 	typename ForwardIterator,
 	typename Allocator,
 	BOUNDED_REQUIRES(!noexcept(::containers::uninitialized_move(
@@ -143,7 +144,7 @@ template<
 		std::declval<Allocator &>()
 	)))
 >
-auto uninitialized_move_destroy(InputIterator const first, InputIterator const last, ForwardIterator const out, Allocator && allocator) {
+auto uninitialized_move_destroy(InputIterator const first, Sentinel const last, ForwardIterator const out, Allocator && allocator) {
 	auto const guard = scope_guard([&]{ ::containers::detail::destroy(allocator, first, last); });
 	auto const it = ::containers::uninitialized_move(first, last, out, allocator);
 	return it;
@@ -151,6 +152,7 @@ auto uninitialized_move_destroy(InputIterator const first, InputIterator const l
 
 template<
 	typename InputIterator,
+	typename Sentinel,
 	typename ForwardIterator,
 	typename Allocator,
 	BOUNDED_REQUIRES(noexcept(::containers::uninitialized_move(
@@ -160,7 +162,7 @@ template<
 		std::declval<Allocator &>()
 	)))
 >
-constexpr auto uninitialized_move_destroy(InputIterator const first, InputIterator const last, ForwardIterator const out, Allocator && allocator) noexcept {
+constexpr auto uninitialized_move_destroy(InputIterator const first, Sentinel const last, ForwardIterator const out, Allocator && allocator) noexcept {
 	auto const it = ::containers::uninitialized_move(first, last, out, allocator);
 	::containers::detail::destroy(allocator, first, last);
 	return it;
