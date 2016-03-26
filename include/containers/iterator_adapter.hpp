@@ -92,7 +92,8 @@ struct iterator_adapter_t {
 	)
 	// operator-> intentionally missing
 
-	constexpr decltype(auto) operator[](index_type<iterator_adapter_t> const index) const BOUNDED_NOEXCEPT(
+	template<typename Index>
+	constexpr decltype(auto) operator[](Index const index) const BOUNDED_NOEXCEPT(
 		*(*this + index)
 	)
 
