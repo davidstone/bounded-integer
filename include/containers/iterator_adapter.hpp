@@ -86,14 +86,11 @@ struct iterator_adapter_t {
 	constexpr auto && less() && noexcept {
 		return std::move(m_data)[4_bi];
 	}
-
-	constexpr decltype(auto) operator*() const BOUNDED_NOEXCEPT(
-		dereference()(base())
-	)
+	
 	// operator-> intentionally missing
 
 	template<typename Index>
-	constexpr decltype(auto) operator[](Index const index) const BOUNDED_NOEXCEPT(
+	constexpr auto operator[](Index const index) const BOUNDED_NOEXCEPT_DECLTYPE(
 		*(*this + index)
 	)
 
@@ -101,6 +98,11 @@ private:
 	tuple<Iterator, DereferenceFunction, AddFunction, SubtractFunction, LessFunction> m_data;
 };
 
+
+template<typename IteratorCategory, typename Iterator, typename DereferenceFunction, typename AddFunction, typename SubtractFunction, typename LessFunction>
+constexpr auto operator*(iterator_adapter_t<IteratorCategory, Iterator, DereferenceFunction, AddFunction, SubtractFunction, LessFunction> const & it) BOUNDED_NOEXCEPT_DECLTYPE(
+	it.dereference()(it.base())
+)
 
 template<typename IteratorCategory, typename Iterator, typename DereferenceFunction, typename AddFunction, typename SubtractFunction, typename LessFunction, typename Offset>
 constexpr auto operator+(
