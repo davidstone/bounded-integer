@@ -198,6 +198,8 @@ struct default_less {
 	)
 };
 
+struct not_a_function {};
+
 template<typename IteratorCategory, typename Iterator>
 using get_iterator_category = std::conditional_t<std::is_void<IteratorCategory>::value, typename std::iterator_traits<std::decay_t<Iterator>>::iterator_category, IteratorCategory>;
 
