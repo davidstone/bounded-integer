@@ -27,7 +27,7 @@ constexpr auto distance(Iterator first, Sentinel const last, std::random_access_
 
 template<typename Iterator, typename Sentinel>
 constexpr auto distance(Iterator first, Sentinel const last, std::input_iterator_tag) {
-	auto difference = std::iterator_traits<Iterator>::distance_type(0_bi);
+	auto difference = typename std::iterator_traits<Iterator>::difference_type(0_bi);
 	for (; first != last; ++first) {
 		++difference;
 	}
