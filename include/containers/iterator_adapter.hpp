@@ -20,7 +20,7 @@
 namespace containers {
 namespace detail {
 
-template<typename Iterator, typename DereferenceFunction, typename AddFunction, typename SubtractFunction, typename LessFunction>
+template<typename IteratorCategory, typename Iterator, typename DereferenceFunction, typename AddFunction, typename SubtractFunction, typename LessFunction>
 struct iterator_adapter_t {
 	static_assert(
 		std::is_empty<SubtractFunction>::value,
@@ -32,7 +32,7 @@ struct iterator_adapter_t {
 	);
 	using value_type = decltype(std::declval<DereferenceFunction>()(std::declval<Iterator>()));
 	using difference_type = typename std::iterator_traits<Iterator>::difference_type;
-	using iterator_category = typename std::iterator_traits<Iterator>::iterator_category;
+	using iterator_category = IteratorCategory;
 
 	// Not sure what these actually mean...
 	using pointer = typename std::iterator_traits<Iterator>::pointer;
@@ -105,24 +105,24 @@ private:
 	tuple<Iterator, DereferenceFunction, AddFunction, SubtractFunction, LessFunction> m_data;
 };
 
-template<typename Iterator, typename DereferenceFunction, typename AddFunction, typename SubtractFunction, typename LessFunction>
+template<typename IteratorCategory, typename Iterator, typename DereferenceFunction, typename AddFunction, typename SubtractFunction, typename LessFunction>
 constexpr auto operator==(
-	iterator_adapter_t<Iterator, DereferenceFunction, AddFunction, SubtractFunction, LessFunction> const & lhs,
-	iterator_adapter_t<Iterator, DereferenceFunction, AddFunction, SubtractFunction, LessFunction> const & rhs
+	iterator_adapter_t<IteratorCategory, Iterator, DereferenceFunction, AddFunction, SubtractFunction, LessFunction> const & lhs,
+	iterator_adapter_t<IteratorCategory, Iterator, DereferenceFunction, AddFunction, SubtractFunction, LessFunction> const & rhs
 ) BOUNDED_NOEXCEPT_DECLTYPE(
 	lhs.base() == rhs.base()
 )
-template<typename Iterator, typename DereferenceFunction, typename AddFunction, typename SubtractFunction, typename LessFunction, typename RHS>
+template<typename IteratorCategory, typename Iterator, typename DereferenceFunction, typename AddFunction, typename SubtractFunction, typename LessFunction, typename RHS>
 constexpr auto operator==(
-	iterator_adapter_t<Iterator, DereferenceFunction, AddFunction, SubtractFunction, LessFunction> const & lhs,
+	iterator_adapter_t<IteratorCategory, Iterator, DereferenceFunction, AddFunction, SubtractFunction, LessFunction> const & lhs,
 	RHS const & rhs
 ) BOUNDED_NOEXCEPT_DECLTYPE(
 	lhs.base() == rhs
 )
-template<typename LHS, typename Iterator, typename DereferenceFunction, typename AddFunction, typename SubtractFunction, typename LessFunction>
+template<typename LHS, typename IteratorCategory, typename Iterator, typename DereferenceFunction, typename AddFunction, typename SubtractFunction, typename LessFunction>
 constexpr auto operator==(
 	LHS const & lhs,
-	iterator_adapter_t<Iterator, DereferenceFunction, AddFunction, SubtractFunction, LessFunction> const & rhs
+	iterator_adapter_t<IteratorCategory, Iterator, DereferenceFunction, AddFunction, SubtractFunction, LessFunction> const & rhs
 ) BOUNDED_NOEXCEPT_DECLTYPE(
 	lhs == rhs.base()
 )
@@ -156,6 +156,9 @@ struct default_less {
 	)
 };
 
+template<typename IteratorCategory, typename Iterator>
+using get_iterator_category = std::conditional_t<std::is_void<IteratorCategory>::value, typename std::iterator_traits<std::decay_t<Iterator>>::iterator_category, IteratorCategory>;
+
 }	// namespace detail
 
 // There are a few functions of interest for an iterator:
@@ -169,9 +172,12 @@ struct default_less {
 // unfortunately, there does not appear to be a way to provide a function that
 // unifies these operations.
 
-template<typename Iterator, typename DereferenceFunction, typename AddFunction, typename SubtractFunction, typename LessFunction>
-constexpr auto iterator_adapter(Iterator && it, DereferenceFunction && dereference, AddFunction && add, SubtractFunction && subtract, LessFunction && less) BOUNDED_NOEXCEPT(
+// See bounded::make to understand the argument defaulting
+
+template<typename IteratorCategory = void, typename Iterator = void, typename DereferenceFunction = void, typename AddFunction = void, typename SubtractFunction = void, typename LessFunction = void>
+constexpr auto iterator_adapter(Iterator && it, DereferenceFunction && dereference, AddFunction && add, SubtractFunction && subtract, LessFunction && less) BOUNDED_NOEXCEPT_VALUE(
 	detail::iterator_adapter_t<
+		detail::get_iterator_category<IteratorCategory, Iterator>,
 		std::decay_t<Iterator>,
 		std::decay_t<DereferenceFunction>,
 		std::decay_t<AddFunction>,
@@ -186,9 +192,15 @@ constexpr auto iterator_adapter(Iterator && it, DereferenceFunction && dereferen
 	)
 )
 
-template<typename Iterator, typename DereferenceFunction>
-constexpr auto iterator_adapter(Iterator it, DereferenceFunction dereference) BOUNDED_NOEXCEPT(
-	iterator_adapter(it, std::move(dereference), detail::default_add{}, detail::default_subtract{}, detail::default_less{})
+template<typename IteratorCategory = void, typename Iterator = void, typename DereferenceFunction = void>
+constexpr auto iterator_adapter(Iterator it, DereferenceFunction && dereference) BOUNDED_NOEXCEPT_VALUE(
+	::containers::iterator_adapter<IteratorCategory>(
+		it,
+		std::forward<DereferenceFunction>(dereference),
+		detail::default_add{},
+		detail::default_subtract{},
+		detail::default_less{}
+	)
 )
 
 }	// namespace containers
