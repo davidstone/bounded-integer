@@ -205,9 +205,9 @@ using get_iterator_category = std::conditional_t<std::is_void<IteratorCategory>:
 
 // There are a few functions of interest for an iterator:
 // 1) Dereferencing: *it
-// 2) Adding: it + 5_bi
-// 3) Subtracting: it1 - it2
-// 4) Comparing: it1 < it2
+// 2) Add: it + 5_bi
+// 3) Subtract: it1 - it2
+// 4) Less than: it1 < it2
 // This allows you to customize those. Your function is passed an iterator.
 // Every other function can be built up from these four behaviors. Adding,
 // subtracting, and comparing are all linked to the same algorithm, but
