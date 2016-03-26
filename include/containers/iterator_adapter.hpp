@@ -46,39 +46,14 @@ struct iterator_adapter_t {
 	{
 	}
 	
-	constexpr decltype(auto) operator*() const BOUNDED_NOEXCEPT(
-		dereference()(base())
-	)
-	// operator-> intentionally missing
-
-	// TODO: Support ForwardIterator
-	friend constexpr auto operator+(iterator_adapter_t lhs, difference_type const rhs) BOUNDED_NOEXCEPT(
-		// Use {} initialization to ensure evaluation order
-		iterator_adapter_t{
-			lhs.add()(lhs.base(), rhs),
-			std::move(lhs).dereference(),
-			std::move(lhs).add(),
-			std::move(lhs).subtract(),
-			std::move(lhs).less()
-		}
-	)
-	friend constexpr decltype(auto) operator-(iterator_adapter_t const & lhs, iterator_adapter_t const & rhs) BOUNDED_NOEXCEPT(
-		lhs.subtract()(lhs.base(), rhs.base())
-	)
-
-	constexpr decltype(auto) operator[](index_type<iterator_adapter_t> const index) const BOUNDED_NOEXCEPT(
-		*(*this + index)
-	)
-
 	constexpr auto base() const noexcept {
 		return m_data[0_bi];
 	}
 
-	friend constexpr decltype(auto) operator<(iterator_adapter_t const & lhs, iterator_adapter_t const & rhs) BOUNDED_NOEXCEPT(
-		lhs.less()(lhs.base(), rhs.base())
-	)
-private:
 	constexpr auto && dereference() const & noexcept {
+		return m_data[1_bi];
+	}
+	constexpr auto && dereference() & noexcept {
 		return m_data[1_bi];
 	}
 	constexpr auto && dereference() && noexcept {
@@ -87,10 +62,16 @@ private:
 	constexpr auto && add() const & noexcept {
 		return m_data[2_bi];
 	}
+	constexpr auto && add() & noexcept {
+		return m_data[2_bi];
+	}
 	constexpr auto && add() && noexcept {
 		return std::move(m_data)[2_bi];
 	}
 	constexpr auto && subtract() const & noexcept {
+		return m_data[3_bi];
+	}
+	constexpr auto && subtract() & noexcept {
 		return m_data[3_bi];
 	}
 	constexpr auto && subtract() && noexcept {
@@ -99,11 +80,51 @@ private:
 	constexpr auto && less() const & noexcept {
 		return m_data[4_bi];
 	}
+	constexpr auto && less() & noexcept {
+		return m_data[4_bi];
+	}
 	constexpr auto && less() && noexcept {
 		return std::move(m_data)[4_bi];
 	}
+
+	constexpr decltype(auto) operator*() const BOUNDED_NOEXCEPT(
+		dereference()(base())
+	)
+	// operator-> intentionally missing
+
+	constexpr decltype(auto) operator[](index_type<iterator_adapter_t> const index) const BOUNDED_NOEXCEPT(
+		*(*this + index)
+	)
+
+private:
 	tuple<Iterator, DereferenceFunction, AddFunction, SubtractFunction, LessFunction> m_data;
 };
+
+
+template<typename IteratorCategory, typename Iterator, typename DereferenceFunction, typename AddFunction, typename SubtractFunction, typename LessFunction, typename Offset>
+constexpr auto operator+(
+	iterator_adapter_t<IteratorCategory, Iterator, DereferenceFunction, AddFunction, SubtractFunction, LessFunction> lhs,
+	Offset const rhs
+) BOUNDED_NOEXCEPT_VALUE(
+	// Use {} initialization to ensure evaluation order
+	iterator_adapter_t<IteratorCategory, Iterator, DereferenceFunction, AddFunction, SubtractFunction, LessFunction>{
+		lhs.add()(lhs.base(), rhs),
+		std::move(lhs).dereference(),
+		std::move(lhs).add(),
+		std::move(lhs).subtract(),
+		std::move(lhs).less()
+	}
+)
+
+
+template<typename IteratorCategory, typename Iterator, typename DereferenceFunction, typename AddFunction, typename SubtractFunction, typename LessFunction>
+constexpr auto operator-(
+	iterator_adapter_t<IteratorCategory, Iterator, DereferenceFunction, AddFunction, SubtractFunction, LessFunction> const & lhs,
+	iterator_adapter_t<IteratorCategory, Iterator, DereferenceFunction, AddFunction, SubtractFunction, LessFunction> const & rhs
+) BOUNDED_NOEXCEPT_DECLTYPE(
+	lhs.subtract()(lhs.base(), rhs.base())
+)
+
 
 template<typename IteratorCategory, typename Iterator, typename DereferenceFunction, typename AddFunction, typename SubtractFunction, typename LessFunction>
 constexpr auto operator==(
@@ -125,6 +146,14 @@ constexpr auto operator==(
 	iterator_adapter_t<IteratorCategory, Iterator, DereferenceFunction, AddFunction, SubtractFunction, LessFunction> const & rhs
 ) BOUNDED_NOEXCEPT_DECLTYPE(
 	lhs == rhs.base()
+)
+
+template<typename IteratorCategory, typename Iterator, typename DereferenceFunction, typename AddFunction, typename SubtractFunction, typename LessFunction>
+constexpr auto operator<(
+	iterator_adapter_t<IteratorCategory, Iterator, DereferenceFunction, AddFunction, SubtractFunction, LessFunction> const & lhs,
+	iterator_adapter_t<IteratorCategory, Iterator, DereferenceFunction, AddFunction, SubtractFunction, LessFunction> const & rhs
+) BOUNDED_NOEXCEPT_DECLTYPE(
+	lhs.less()(lhs.base(), rhs.base())
 )
 
 
