@@ -8,6 +8,7 @@
 #include <containers/common_iterator_functions.hpp>
 #include <containers/index_type.hpp>
 #include <containers/tuple.hpp>
+#include <containers/type_list.hpp>
 
 #include <bounded/integer.hpp>
 
@@ -20,8 +21,19 @@
 namespace containers {
 namespace detail {
 
+template<typename Iterator, typename Enable = void>
+struct operator_arrow {
+};
+
+template<typename Iterator>
+struct operator_arrow<Iterator, void_t<decltype(::bounded::addressof(*std::declval<Iterator const &>()))>> {
+	constexpr auto operator->() const BOUNDED_NOEXCEPT_VALUE(
+		::bounded::addressof(*static_cast<Iterator const &>(*this))
+	)
+};
+
 template<typename IteratorCategory, typename Iterator, typename DereferenceFunction, typename AddFunction, typename SubtractFunction, typename LessFunction>
-struct iterator_adapter_t {
+struct iterator_adapter_t : operator_arrow<iterator_adapter_t<IteratorCategory, Iterator, DereferenceFunction, AddFunction, SubtractFunction, LessFunction>> {
 	static_assert(
 		std::is_empty<SubtractFunction>::value,
 		"SubtractFunction must be a stateless comparison function. Would we use the state from the left- or right-hand side?"
@@ -87,8 +99,6 @@ struct iterator_adapter_t {
 		return std::move(m_data)[4_bi];
 	}
 	
-	// operator-> intentionally missing
-
 	template<typename Index>
 	constexpr auto operator[](Index const index) const BOUNDED_NOEXCEPT_DECLTYPE(
 		*(*this + index)
