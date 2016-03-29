@@ -98,7 +98,7 @@ public:
 		key_compare m_compare;
 	};
 	key_compare key_comp() const {
-		return m_container[1_bi];
+		return m_data.compare();
 	}
 	value_compare value_comp() const {
 		return value_compare(key_comp());
@@ -116,13 +116,13 @@ public:
 		m_container(Container(first, last, std::move(allocator)), std::move(compare))
 	{
 		auto const less = indirect_compare(value_comp());
-		std::sort(moving_begin(container()), moving_end(container()), less);
+		std::sort(moving_begin(m_data.container()), moving_end(m_data.container()), less);
 		// At some point this should be unique_sort
 		auto const equal = ::containers::negate(less);
 		::containers::erase(
-			container(),
-			moving_to_standard_iterator(::containers::unique(moving_begin(container()), moving_end(container()), equal)),
-			container().end()
+			m_data.container(),
+			moving_to_standard_iterator(::containers::unique(moving_begin(m_data.container()), moving_end(m_data.container()), equal)),
+			m_data.container().end()
 		);
 	}
 	template<typename InputIterator>
@@ -147,28 +147,28 @@ public:
 	}
 	
 	const_iterator begin() const noexcept {
-		return container().begin();
+		return m_data.container().begin();
 	}
 	iterator begin() noexcept {
-		return container().begin();
+		return m_data.container().begin();
 	}
 	
 	const_iterator end() const noexcept {
-		return container().end();
+		return m_data.container().end();
 	}
 	iterator end() noexcept {
-		return container().end();
+		return m_data.container().end();
 	}
 	
 	// Extra functions on top of the regular map interface
 	size_type capacity() const noexcept {
-		return container().capacity();
+		return m_data.container().capacity();
 	}
 	void reserve(size_type const new_capacity) noexcept {
-		return container().reserve(new_capacity);
+		return m_data.container().reserve(new_capacity);
 	}
 	void shrink_to_fit() {
-		container().shrink_to_fit();
+		m_data.container().shrink_to_fit();
 	}
 	
 	const_iterator lower_bound(key_type const & key) const {
@@ -240,26 +240,26 @@ public:
 		// sorted, it's probably better to just sort the new elements then do a
 		// merge sort on both ranges, rather than calling std::sort on the
 		// entire container.
-		auto const const_midpoint = container().insert(container().end(), first, last);
-		auto const midpoint = detail::moving_iterator(container(), const_midpoint);
-		std::sort(midpoint, moving_end(container()), indirect_compare{value_comp()});
+		auto const const_midpoint = m_data.container().insert(m_data.container().end(), first, last);
+		auto const midpoint = detail::moving_iterator(m_data.container(), const_midpoint);
+		std::sort(midpoint, moving_end(m_data.container()), indirect_compare{value_comp()});
 		if (allow_duplicates) {
 			std::inplace_merge(
-				legacy_iterator(moving_begin(container())),
+				legacy_iterator(moving_begin(m_data.container())),
 				legacy_iterator(midpoint),
-				legacy_iterator(moving_end(container())),
+				legacy_iterator(moving_end(m_data.container())),
 				indirect_compare(value_comp())
 			);
 		}
 		else {
 			auto const position = ::containers::unique_inplace_merge(
-				moving_begin(container()),
+				moving_begin(m_data.container()),
 				midpoint,
-				moving_end(container()),
+				moving_end(m_data.container()),
 				indirect_compare(value_comp())
 			);
 			using containers::erase;
-			erase(container(), position, moving_end(container()));
+			erase(m_data.container(), position, moving_end(m_data.container()));
 		}
 	}
 	void insert(std::initializer_list<value_type> init) {
@@ -269,16 +269,16 @@ public:
 	// These maintain the relative order of all elements in the container, so I
 	// don't have to worry about re-sorting
 	iterator erase(const_iterator const it) {
-		return container().erase(it);
+		return m_data.container().erase(it);
 	}
 	// Need mutable iterator overload to avoid ambiguity if key_type can be
 	// constructed from iterator (for instance, an unconstrained constructor
 	// template).
 	iterator erase(iterator const it) {
-		return container().erase(it);
+		return m_data.container().erase(it);
 	}
 	iterator erase(const_iterator const first, const_iterator const last) {
-		return container().erase(first, last);
+		return m_data.container().erase(first, last);
 	}
 	
 protected:
@@ -379,7 +379,7 @@ private:
 	
 	template<typename Key, typename Mapped, BOUNDED_REQUIRES(dependent_allow_duplicates<Key>)>
 	auto emplace_at(const_iterator position, Key && key, Mapped && mapped) {
-		return container().emplace(
+		return m_data.container().emplace(
 			position,
 			std::piecewise_construct,
 			::containers::forward_as_tuple(std::forward<Key>(key)),
@@ -397,7 +397,7 @@ private:
 			return inserted_t(mutable_iterator(*this, ::containers::prev(position)), false);
 		}
 
-		auto const it = container().emplace(
+		auto const it = m_data.container().emplace(
 			position,
 			std::piecewise_construct,
 			::containers::forward_as_tuple(std::forward<Key>(key)),
@@ -423,14 +423,29 @@ private:
 		value_compare const & m_compare;
 	};
 
-	Container const & container() const {
-		return m_container[0_bi];
-	}
-	Container & container() {
-		return m_container[0_bi];
-	}
+	struct Data : private tuple<container_type, key_compare> {
+		using tuple<container_type, key_compare>::tuple;
 	
-	tuple<Container, key_compare> m_container;
+		constexpr auto && container() const & noexcept {
+			return (*this)[0_bi];
+		}
+		constexpr auto && container() & noexcept {
+			return (*this)[0_bi];
+		}
+		constexpr auto && container() && noexcept {
+			return std::move(*this)[0_bi];
+		}
+		constexpr auto && compare() const & noexcept {
+			return (*this)[1_bi];
+		}
+		constexpr auto && compare() & noexcept {
+			return (*this)[1_bi];
+		}
+		constexpr auto && compare() && noexcept {
+			return std::move(*this)[1_bi];
+		}
+	};
+	Data m_data;
 };
 
 template<typename Container, typename Compare>
