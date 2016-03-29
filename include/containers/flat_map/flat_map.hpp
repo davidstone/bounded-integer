@@ -106,14 +106,14 @@ public:
 	
 	flat_map_base() = default;
 	explicit flat_map_base(key_compare compare, allocator_type allocator = allocator_type{}):
-		m_container(Container(std::move(allocator)), std::move(compare)) {
+		m_data(Container(std::move(allocator)), std::move(compare)) {
 	}
 	explicit flat_map_base(allocator_type allocator):
 		flat_map_base(key_compare{}, std::move(allocator)) {
 	}
 	template<typename InputIterator>
 	flat_map_base(InputIterator first, InputIterator last, key_compare compare = key_compare{}, allocator_type allocator = allocator_type{}):
-		m_container(Container(first, last, std::move(allocator)), std::move(compare))
+		m_data(Container(first, last, std::move(allocator)), std::move(compare))
 	{
 		auto const less = indirect_compare(value_comp());
 		std::sort(moving_begin(m_data.container()), moving_end(m_data.container()), less);
@@ -130,10 +130,10 @@ public:
 		flat_map_base(first, last, key_compare{}, std::move(allocator)) {
 	}
 	flat_map_base(flat_map_base const & other, allocator_type allocator):
-		m_container(Container(other, std::move(allocator)), key_compare{}) {
+		m_data(Container(other, std::move(allocator)), key_compare{}) {
 	}
 	flat_map_base(flat_map_base && other, allocator_type allocator):
-		m_container(Container(std::move(other), std::move(allocator)), key_compare{}) {
+		m_data(Container(std::move(other), std::move(allocator)), key_compare{}) {
 	}
 	flat_map_base(std::initializer_list<value_type> init, key_compare compare = key_compare{}, allocator_type allocator = allocator_type{}):
 		flat_map_base(std::begin(init), std::end(init), std::move(compare), std::move(allocator)) {
@@ -423,8 +423,8 @@ private:
 		value_compare const & m_compare;
 	};
 
-	struct Data : private tuple<container_type, key_compare> {
-		using tuple<container_type, key_compare>::tuple;
+	struct Data : private tuple<Container, key_compare> {
+		using tuple<Container, key_compare>::tuple;
 	
 		constexpr auto && container() const & noexcept {
 			return (*this)[0_bi];
