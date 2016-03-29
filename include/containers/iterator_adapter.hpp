@@ -32,6 +32,43 @@ struct operator_arrow<Iterator, void_t<decltype(::bounded::addressof(*std::declv
 	)
 };
 
+#if 0
+// Another possible implementation of operator-> is as follows, which works with
+// any iterator, even those that return by value
+
+struct temporary_operator_arrow {
+	using reference = decltype(*std::declval<iterator_adapter_t const &>()) &&;
+	constexpr explicit temporary_operator_arrow(reference value) noexcept:
+		m_value(std::forward<reference>(value))
+	{
+	}
+	constexpr auto operator->() && noexcept {
+		return ::bounded::addressof(m_value);
+	}
+
+private:
+	reference m_value;
+};
+
+constexpr auto operator->() const BOUNDED_NOEXCEPT(
+	temporary_operator_arrow(**this)
+)
+
+// However, this has the nasty effect of silently breaking lifetime extension
+// with references. In other words, if *it returns a prvalue instead of a
+// glvalue (by value instead of by reference), the following code does not work:
+
+auto && ref = it->x;
+use(x);
+
+// But the following code does:
+
+use(it->x);
+
+// This is fragile behavior, so for now, disable the operator-> overload if *it
+// is a prvalue.
+#endif
+
 template<typename IteratorCategory, typename Iterator, typename DereferenceFunction, typename AddFunction, typename SubtractFunction, typename LessFunction>
 struct iterator_adapter_t : operator_arrow<iterator_adapter_t<IteratorCategory, Iterator, DereferenceFunction, AddFunction, SubtractFunction, LessFunction>> {
 	static_assert(
