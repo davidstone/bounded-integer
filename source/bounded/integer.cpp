@@ -704,7 +704,6 @@ namespace check_arithmetic {
 		sizeof(x) == 1,
 		"bounded::integer too big!"
 	);
-	constexpr bounded::integer<-3, 11, bounded::throw_policy<>> const y(x);
 	constexpr bounded::integer<-3, 11, bounded::throw_policy<>> const z(4);
 	static_assert(
 		std::numeric_limits<decltype(z)>::is_signed,
