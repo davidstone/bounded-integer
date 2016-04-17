@@ -420,13 +420,13 @@ namespace check_overlapping_range {
 	static_assert(!bounded::detail::type_overlaps_range<type>(1, 1), "Type should not overlap a disjoint range.");
 }
 
-namespace check_class {
+template<bounded::storage_type storage_type>
+auto check_constructibility_specific() {
 	constexpr auto min = std::numeric_limits<int>::min();
 	constexpr auto max = std::numeric_limits<int>::max();
-	using type = bounded::integer<min, max>;
-
+	using type = bounded::integer<min, max, bounded::null_policy, storage_type>;
 	static_assert(
-		bounded::detail::type_overlaps_range<std::decay_t<type>>(min, max),
+		bounded::detail::type_overlaps_range<type>(min, max),
 		"Bounds of type do not overlap its own range."
 	);
 
@@ -443,9 +443,13 @@ namespace check_class {
 		std::is_constructible<type, type, bounded::non_check_t>::value,
 		"Cannot construct a type from itself with non_check_t."
 	);
-
-	constexpr bounded::integer<min, max, bounded::null_policy, bounded::storage_type::least> least(0);
 }
+
+void check_constructibility() {
+	check_constructibility_specific<bounded::storage_type::fast>();
+	check_constructibility_specific<bounded::storage_type::least>();
+}
+
 
 namespace check_make {
 	static_assert(
@@ -1500,6 +1504,7 @@ auto check_hash() {
 
 auto main() -> int {
 	check_numeric_limits_all();
+	check_constructibility();
 	check_minmax();
 	check_policies();
 	check_assignment();
