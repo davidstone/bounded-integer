@@ -1456,7 +1456,8 @@ namespace {
 
 namespace check_enum_construction {
 	enum unscoped_enum : int {};
-	constexpr bounded::integer<0, 10> x(unscoped_enum{});
+	static_assert(std::is_constructible<bounded::integer<0, 10>, unscoped_enum>::value);
+	static_assert(!std::is_convertible<unscoped_enum, bounded::integer<0, 10>>::value);
 	constexpr auto a = bounded::make(unscoped_enum{});
 	static_assert(std::is_same<
 		std::remove_const_t<decltype(a)>,
@@ -1464,18 +1465,20 @@ namespace check_enum_construction {
 	>::value);
 	
 	enum class scoped_enum {};
-	constexpr bounded::integer<0, 10> y(scoped_enum{});
+	static_assert(std::is_constructible<bounded::integer<0, 10>, scoped_enum>::value);
+	static_assert(!std::is_convertible<scoped_enum, bounded::integer<0, 10>>::value);
 	// constexpr auto b = bounded::make(scoped_enum{});
 	
-	constexpr bounded::integer<0, 10> z(bounded_enum{});
+	static_assert(std::is_constructible<bounded::integer<0, 10>, bounded_enum>::value);
+	// TODO: Should this be convertible?
+	static_assert(std::is_convertible<bounded_enum, bounded::integer<0, 10>>::value);
 	constexpr auto c = bounded::make(bounded_enum{});
 }
 
-namespace check_poisoning {
-	constexpr bounded::integer<0, 10> x = 0;
-	constexpr bounded::integer<0, 100> y = x + 100;
-	constexpr bounded::integer<5, 5> z = bounded::make(5);
-}
+// check poisoning
+static_assert(std::is_convertible<int, bounded::integer<0, 10>>::value);
+static_assert(std::is_convertible<decltype(std::declval<bounded::integer<0, 10>>() + 100), bounded::integer<0, 100>>::value);
+static_assert(std::is_convertible<decltype(bounded::make(5)), bounded::integer<5, 5>>::value);
 
 auto check_volatile() {
 	bounded::integer<0, 6> volatile x = 3_bi;
