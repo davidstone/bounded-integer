@@ -445,7 +445,7 @@ auto check_constructibility_specific() {
 	);
 }
 
-void check_constructibility() {
+auto check_constructibility() {
 	check_constructibility_specific<bounded::storage_type::fast>();
 	check_constructibility_specific<bounded::storage_type::least>();
 }
@@ -1027,9 +1027,10 @@ namespace check_conditional {
 }
 
 
-namespace check_null_policy {
+auto check_null_policy() {
 	constexpr bounded::null_policy policy;
 	constexpr auto value1 = policy.assignment(5, 0_bi, 10_bi);
+	static_cast<void>(value1);
 	// This should not compile
 	// constexpr auto value2 = policy.assignment(15, 0_bi, 10_bi);
 }
@@ -1168,6 +1169,7 @@ namespace check_clamp_policy {
 }
 
 auto check_policies() {
+	check_null_policy();
 	check_throw_policy();
 }
 
@@ -1454,7 +1456,7 @@ struct basic_numeric_limits<bounded_enum> {
 
 namespace {
 
-namespace check_enum_construction {
+auto check_enum_construction() {
 	enum unscoped_enum : int {};
 	static_assert(std::is_constructible<bounded::integer<0, 10>, unscoped_enum>::value);
 	static_assert(!std::is_convertible<unscoped_enum, bounded::integer<0, 10>>::value);
@@ -1473,6 +1475,7 @@ namespace check_enum_construction {
 	// TODO: Should this be convertible?
 	static_assert(std::is_convertible<bounded_enum, bounded::integer<0, 10>>::value);
 	constexpr auto c = bounded::make(bounded_enum{});
+	static_cast<void>(c);
 }
 
 // check poisoning
@@ -1515,6 +1518,7 @@ auto main() -> int {
 	check_optional();
 	check_to_string();
 	check_streaming();
+	check_enum_construction();
 	check_volatile();
 	check_hash();
 }
