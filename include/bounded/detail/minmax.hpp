@@ -1,4 +1,4 @@
-// Copyright David Stone 2015.
+// Copyright David Stone 2016.
 // Distributed under the Boost Software License, Version 1.0.
 // (See accompanying file LICENSE_1_0.txt or copy at
 // http://www.boost.org/LICENSE_1_0.txt)
@@ -23,13 +23,13 @@ namespace detail {
 namespace minmax {
 
 template<typename Target, typename Source, BOUNDED_REQUIRES(is_bounded_integer<Target> and not std::is_reference<Target>::value)>
-constexpr Target construct(Source && source) noexcept {
+constexpr auto construct(Source && source) noexcept {
 	return Target(std::forward<Source>(source), non_check);
 }
 template<typename Target, typename Source, BOUNDED_REQUIRES(!is_bounded_integer<Target> or std::is_reference<Target>::value)>
-constexpr Target construct(Source && source) noexcept(noexcept(static_cast<Target>(source))) {
-	return static_cast<Target>(source);
-}
+constexpr auto construct(Source && source) BOUNDED_NOEXCEPT_DECLTYPE(
+	static_cast<Target>(source)
+)
 
 }	// namespace minmax
 }	// namespace detail
@@ -104,19 +104,17 @@ constexpr decltype(auto) extreme(Compare, T1 &&, T2 && t2) noexcept {
 	return detail::minmax::construct<T2>(std::forward<T2>(t2));
 }
 
-// TODO: Fix noexcept specification
-template<typename Compare, typename T1, typename T2, BOUNDED_REQUIRES(
+
+template<typename Compare, typename T1, typename T2, typename result_type = detail::add_common_cv_reference_t<extreme_t<Compare, T1, T2>, T1, T2>, BOUNDED_REQUIRES(
 	(not basic_numeric_limits<T1>::is_specialized or not basic_numeric_limits<T2>::is_specialized) or
 	(detail::types_overlap<extreme_t<Compare, T1, T2>, T1>::value and
 	detail::types_overlap<extreme_t<Compare, T1, T2>, T2>::value)
 )>
-constexpr decltype(auto) extreme(Compare compare, T1 && t1, T2 && t2) noexcept(noexcept(compare(t1, t2))) {
-	using result_type = detail::add_common_cv_reference_t<extreme_t<Compare, T1, T2>, T1, T2>;
-	return compare(t2, t1) ?
+constexpr auto extreme(Compare compare, T1 && t1, T2 && t2) BOUNDED_NOEXCEPT_DECLTYPE(
+	compare(t2, t1) ?
 		detail::minmax::construct<result_type>(std::forward<T2>(t2)) :
 		detail::minmax::construct<result_type>(std::forward<T1>(t1))
-	;
-}
+)
 
 
 namespace detail {
@@ -149,10 +147,9 @@ struct noexcept_comparable<Compare, T1, T2, Ts...> : std::integral_constant<bool
 }	// namespace detail
 
 
-// TODO: noexcept specification needs to take possible copies / moves into
-// account if this supports non bounded::integer types.
+// TODO: noexcept
 template<typename Compare, typename T1, typename T2, typename... Ts>
-constexpr decltype(auto) extreme(Compare compare, T1 && t1, T2 && t2, Ts && ... ts) noexcept(detail::minmax::noexcept_comparable<Compare, T1, T2, Ts...>::value) {
+constexpr decltype(auto) extreme(Compare compare, T1 && t1, T2 && t2, Ts && ... ts) {
 	return extreme(
 		compare,
 		extreme(compare, std::forward<T1>(t1), std::forward<T2>(t2)),

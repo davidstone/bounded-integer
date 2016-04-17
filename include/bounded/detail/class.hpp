@@ -242,9 +242,9 @@ struct integer {
 	}
 
 	template<typename Tag, typename... Args, BOUNDED_REQUIRES(std::is_same<Tag, optional_tag>::value and detail::has_extra_space<integer>)>
-	constexpr auto initialize(Tag, Args && ... args) noexcept(std::is_nothrow_constructible<integer, Args && ...>::value) {
-		*this = integer(std::forward<Args>(args)...);
-	}
+	constexpr auto initialize(Tag, Args && ... args) BOUNDED_NOEXCEPT_VOID(
+		*this = integer(std::forward<Args>(args)...)
+	)
 
 	template<typename Tag, BOUNDED_REQUIRES(std::is_same<Tag, optional_tag>::value and detail::has_extra_space<integer>)>
 	constexpr auto uninitialize(Tag) noexcept {

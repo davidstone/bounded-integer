@@ -9,50 +9,51 @@
 #include <bounded/detail/class.hpp>
 #include <bounded/detail/comparison.hpp>
 #include <bounded/detail/comparison_builtin.hpp>
+#include <bounded/detail/noexcept.hpp>
 
 #include <utility>
 
 namespace bounded {
 
 template<typename LHS, typename RHS>
-constexpr auto operator==(optional<LHS> const & lhs, optional<RHS> const & rhs) noexcept(noexcept(std::declval<LHS const &>() == std::declval<RHS const &>())) {
-	return (static_cast<bool>(lhs) and static_cast<bool>(rhs)) ?
+constexpr auto operator==(optional<LHS> const & lhs, optional<RHS> const & rhs) BOUNDED_NOEXCEPT_VALUE(
+	(static_cast<bool>(lhs) and static_cast<bool>(rhs)) ?
 		*lhs == *rhs :
-		(static_cast<bool>(lhs) == static_cast<bool>(rhs));
-}
+		(static_cast<bool>(lhs) == static_cast<bool>(rhs))
+)
 
 
 template<typename LHS, typename RHS>
-constexpr auto operator<(optional<LHS> const & lhs, optional<RHS> const & rhs) noexcept(noexcept(std::declval<LHS const &>() < std::declval<RHS const &>())) {
-	return (static_cast<bool>(lhs) and static_cast<bool>(rhs)) ?
+constexpr auto operator<(optional<LHS> const & lhs, optional<RHS> const & rhs) BOUNDED_NOEXCEPT_VALUE(
+	(static_cast<bool>(lhs) and static_cast<bool>(rhs)) ?
 		*lhs < *rhs :
-		(static_cast<bool>(lhs) < static_cast<bool>(rhs));
-}
+		(static_cast<bool>(lhs) < static_cast<bool>(rhs))
+)
 
 
 
 
 template<typename LHS, typename RHS>
-constexpr auto operator==(optional<LHS> const & lhs, RHS const & rhs) noexcept(noexcept(std::declval<LHS const &>() == rhs)) {
-	return static_cast<bool>(lhs) and *lhs == rhs;
-}
+constexpr auto operator==(optional<LHS> const & lhs, RHS const & rhs) BOUNDED_NOEXCEPT_VALUE(
+	static_cast<bool>(lhs) and *lhs == rhs
+)
 
 template<typename LHS, typename RHS>
-constexpr auto operator==(LHS const & lhs, optional<RHS> const & rhs) noexcept(noexcept(rhs == lhs)) {
-	return rhs == lhs;
-}
+constexpr auto operator==(LHS const & lhs, optional<RHS> const & rhs) BOUNDED_NOEXCEPT_VALUE(
+	rhs == lhs
+)
 
 
 
 template<typename LHS, typename RHS>
-constexpr auto operator<(optional<LHS> const & lhs, RHS const & rhs) noexcept(noexcept(std::declval<LHS const &>() == rhs)) {
-	return !static_cast<bool>(lhs) ? true : *lhs < rhs;
-}
+constexpr auto operator<(optional<LHS> const & lhs, RHS const & rhs) BOUNDED_NOEXCEPT_VALUE(
+	!static_cast<bool>(lhs) ? true : *lhs < rhs
+)
 
 template<typename LHS, typename RHS>
-constexpr auto operator<(LHS const & lhs, optional<RHS> const & rhs) noexcept(noexcept(lhs < std::declval<RHS const &>())) {
-	return !static_cast<bool>(rhs) ? false : lhs < *rhs;
-}
+constexpr auto operator<(LHS const & lhs, optional<RHS> const & rhs) BOUNDED_NOEXCEPT_VALUE(
+	!static_cast<bool>(rhs) ? false : lhs < *rhs
+)
 
 
 
