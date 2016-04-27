@@ -40,7 +40,7 @@ constexpr auto operator==(optional<LHS> const & lhs, RHS const & rhs) BOUNDED_NO
 
 template<typename LHS, typename RHS>
 constexpr auto operator==(LHS const & lhs, optional<RHS> const & rhs) BOUNDED_NOEXCEPT_VALUE(
-	rhs == lhs
+	static_cast<bool>(rhs) and lhs == *rhs
 )
 
 
