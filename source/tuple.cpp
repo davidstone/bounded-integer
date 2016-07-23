@@ -91,7 +91,7 @@ constexpr struct {
 	constexpr auto operator()(int const x, int const y) const noexcept {
 		return static_cast<float>(x + y);
 	}
-} increment_and_swap_types;
+} increment_and_swap_types{};
 
 constexpr auto input_tuple = containers::make_tuple(0, 1.0F, 2, 3.0F, 4);
 constexpr auto type_swapped = containers::transform(increment_and_swap_types, input_tuple);
