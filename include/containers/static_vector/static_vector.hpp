@@ -1,4 +1,4 @@
-// Copyright David Stone 2015.
+// Copyright David Stone 2016.
 // Distributed under the Boost Software License, Version 1.0.
 // (See accompanying file LICENSE_1_0.txt or copy at
 // http://www.boost.org/LICENSE_1_0.txt)
@@ -28,6 +28,12 @@
 
 namespace containers {
 namespace detail {
+
+// literal types cannot have destructors. If T is trivially destructible, we
+// can skip calling their destructors, which could allow static_vector<T, n> to
+// be a literal type.
+//
+// This should also improve debug-mode performance.
 
 template<typename T, std::size_t capacity, bool trivial = std::is_trivially_destructible<T>::value>
 struct static_vector_data;
