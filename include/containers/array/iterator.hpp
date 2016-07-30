@@ -36,6 +36,7 @@ struct basic_array_iterator {
 	}
 
 	constexpr auto & operator*() const noexcept {
+		assert(m_it != nullptr);
 		return *m_it;
 	}
 	constexpr auto operator->() const noexcept {
