@@ -12,6 +12,12 @@
 
 namespace containers {
 
+// Works with explicit copy constructors
+template<typename T>
+constexpr auto copy(T && value) BOUNDED_NOEXCEPT_VALUE(
+	std::decay_t<T>(std::forward<T>(value))
+)
+
 
 template<typename InputIterator, typename Sentinel, typename OutputIterator>
 constexpr auto copy(InputIterator first, Sentinel const last, OutputIterator out) {
