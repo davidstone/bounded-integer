@@ -12,15 +12,24 @@
 
 namespace bounded {
 
-template<typename T, typename Integer, BOUNDED_REQUIRES(is_bounded_integer<Integer>)>
-constexpr auto operator+(T * const pointer, Integer const & number) noexcept {
-	return pointer + number.value();
+template<typename T, typename Integer, BOUNDED_REQUIRES(
+	is_bounded_integer<Integer> and
+	(std::is_pointer<T>::value or (std::is_array<T>::value and Integer::max() <= std::extent<T>::value))
+)>
+constexpr auto operator+(T const & array, Integer const & number) noexcept {
+	return array + number.value();
 }
 
-template<typename Integer, typename T, BOUNDED_REQUIRES(is_bounded_integer<Integer>)>
-constexpr auto operator+(Integer const & number, T * const pointer) noexcept {
-	return number.value() + pointer;
+
+template<typename Integer, typename T, BOUNDED_REQUIRES(
+	is_bounded_integer<Integer> and
+	(std::is_pointer<T>::value or (std::is_array<T>::value and Integer::max() <= std::extent<T>::value))
+)>
+constexpr auto operator+(Integer const & number, T const & array) noexcept {
+	return number.value() + array;
 }
+
+
 
 // Not possible to overload operator[]. See
 // https://groups.google.com/a/isocpp.org/forum/#!topic/std-proposals/CmBERU_sr8Y
