@@ -301,6 +301,7 @@ constexpr auto emplace_in_middle_no_reallocation(Container & container, typename
 	assert(container.capacity() > size(container));
 	auto const position = detail::mutable_iterator(container, position_);
 	auto const original_end = container.end();
+	assert(position != original_end);
 	container.emplace_back(std::move(back(container)));
 	::containers::move_backward(position, ::containers::prev(original_end), original_end);
 	auto const pointer = ::bounded::addressof(*position);
