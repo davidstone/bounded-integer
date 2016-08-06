@@ -28,7 +28,7 @@ constexpr auto equal(InputIterator1 first1, Sentinel1 const last1, InputIterator
 			return false;
 		}
 	}
-	return true;
+	return first1 == last1 and first2 == last2;
 }
 
 template<
