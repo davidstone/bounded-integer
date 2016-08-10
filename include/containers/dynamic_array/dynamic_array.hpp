@@ -224,10 +224,10 @@ struct dynamic_array : private detail::rebound_allocator<T, Allocator> {
 	}
 	
 	constexpr auto begin() const noexcept {
-		return const_iterator(data());
+		return const_iterator(data(), detail::iterator_constructor);
 	}
 	constexpr auto begin() noexcept {
-		return iterator(data());
+		return iterator(data(), detail::iterator_constructor);
 	}
 	constexpr auto end() const noexcept {
 		return begin() + m_data.size;

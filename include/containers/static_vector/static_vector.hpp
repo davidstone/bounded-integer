@@ -115,10 +115,10 @@ struct static_vector : private detail::static_vector_data<T, capacity_>  {
 	}
 
 	constexpr auto begin() const noexcept {
-		return const_iterator(data());
+		return const_iterator(data(), detail::iterator_constructor);
 	}
 	constexpr auto begin() noexcept {
-		return iterator(data());
+		return iterator(data(), detail::iterator_constructor);
 	}
 	constexpr auto end() const noexcept {
 		return begin() + this->m_size;

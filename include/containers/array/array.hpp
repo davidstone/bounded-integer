@@ -36,10 +36,10 @@ struct array {
 	}
 
 	constexpr auto begin() const noexcept {
-		return const_iterator(data());
+		return const_iterator(data(), detail::iterator_constructor);
 	}
 	constexpr auto begin() noexcept {
-		return iterator(data());
+		return iterator(data(), detail::iterator_constructor);
 	}
 
 	constexpr auto end() const noexcept {
@@ -88,7 +88,7 @@ struct array<T, 0> {
 	}
 
 	constexpr auto begin() const noexcept {
-		return const_iterator(data());
+		return const_iterator(data(), detail::iterator_constructor);
 	}
 
 	constexpr auto end() const noexcept {

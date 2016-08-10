@@ -1,4 +1,4 @@
-// Copyright David Stone 2015.
+// Copyright David Stone 2016.
 // Distributed under the Boost Software License, Version 1.0.
 // (See accompanying file LICENSE_1_0.txt or copy at
 // http://www.boost.org/LICENSE_1_0.txt)
@@ -17,6 +17,9 @@
 namespace containers {
 namespace detail {
 
+// Special tag type to make this iterator not constructible from a pointer
+constexpr struct iterator_constructor_t{} iterator_constructor{};
+
 // It looks like we do not need to pass in type T here, as it is
 // Container::value_type, but for const_iterator, it is actually
 // Container::value_type const. An alternative implementation would have two
@@ -30,9 +33,14 @@ struct basic_array_iterator {
 	using iterator_category = std::random_access_iterator_tag;
 
 	constexpr basic_array_iterator() noexcept = default;
+
+	constexpr explicit basic_array_iterator(pointer const other, iterator_constructor_t) noexcept:
+		m_it(other) {
+	}
+
 	// Convert iterator to const_iterator
 	constexpr operator basic_array_iterator<value_type const, Container>() const noexcept {
-		return basic_array_iterator<value_type const, Container>(m_it);
+		return basic_array_iterator<value_type const, Container>(m_it, iterator_constructor);
 	}
 
 	constexpr auto & operator*() const noexcept {
@@ -44,7 +52,7 @@ struct basic_array_iterator {
 	}
 
 	friend constexpr auto operator+(basic_array_iterator const lhs, difference_type const rhs) {
-		return basic_array_iterator(lhs.m_it + rhs);
+		return basic_array_iterator(lhs.m_it + rhs, iterator_constructor);
 	}
 	friend constexpr auto operator-(basic_array_iterator const lhs, basic_array_iterator const rhs) {
 		return static_cast<difference_type>(lhs.m_it - rhs.m_it);
@@ -62,13 +70,6 @@ struct basic_array_iterator {
 	}
 
 private:
-	friend Container;
-	friend basic_array_iterator<std::remove_const_t<T>, Container>;
-
-	constexpr explicit basic_array_iterator(pointer const other) noexcept:
-		m_it(other) {
-	}
-
 	pointer m_it = nullptr;
 };
 

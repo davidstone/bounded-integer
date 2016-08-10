@@ -127,10 +127,10 @@ struct dynamic_resizable_array {
 	}
 
 	auto begin() const noexcept {
-		return const_iterator(data());
+		return const_iterator(data(), detail::iterator_constructor);
 	}
 	auto begin() noexcept {
-		return iterator(data());
+		return iterator(data(), detail::iterator_constructor);
 	}
 	auto end() const noexcept {
 		return begin() + m_container.size();
