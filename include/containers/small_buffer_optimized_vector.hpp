@@ -278,42 +278,9 @@ private:
 };
 
 
-
-
 }	// namespace detail
 
 template<typename T, std::size_t requested_small_capacity, typename Allocator = allocator<T>>
-struct small_buffer_optimized_vector : private detail::dynamic_resizable_array<detail::sbo_vector_base<T, requested_small_capacity, Allocator>> {
-private:
-	using base = detail::dynamic_resizable_array<detail::sbo_vector_base<T, requested_small_capacity, Allocator>>;
-public:
-	using typename base::value_type;
-	using typename base::allocator_type;
-	using typename base::size_type;
-	using typename base::const_iterator;
-	using typename base::iterator;
-	
-	using base::get_allocator;
-
-	using base::base;
-	
-	using base::operator=;
-	
-	using base::data;
-	using base::begin;
-	using base::end;
-	using base::operator[];
-	
-	using base::capacity;
-	using base::reserve;
-	using base::shrink_to_fit;
-	
-	using base::emplace_back;
-	using base::emplace;
-	using base::insert;
-	using base::pop_back;
-};
-
-// TODO: Add in a null-terminated string class
+using small_buffer_optimized_vector = detail::dynamic_resizable_array<detail::sbo_vector_base<T, requested_small_capacity, Allocator>>;
 
 }	// namespace containers
