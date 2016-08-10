@@ -34,7 +34,7 @@ constexpr auto copy(InputIterator first, Sentinel const last, OutputIterator out
 
 template<typename InputIterator, typename Sentinel, typename OutputIterator>
 constexpr auto move(InputIterator const first, Sentinel const last, OutputIterator const out) {
-	auto const iterators = ::containers::copy(::containers::move_iterator(last), ::containers::move_iterator(first), out);
+	auto const iterators = ::containers::copy(::containers::move_iterator(first), ::containers::move_iterator(last), out);
 	struct result {
 		InputIterator input;
 		OutputIterator output;
