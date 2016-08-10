@@ -135,9 +135,7 @@ struct sbo_vector_base : private detail::rebound_allocator<T, Allocator> {
 		return result;
 	}
 	auto data() noexcept {
-		auto const result = ::containers::detail::remove_const(::containers::detail::add_const(*this).data());
-		assert(result != nullptr);
-		return result;
+		return ::containers::detail::remove_const(::containers::detail::add_const(*this).data());
 	}
 	
 	auto size() const noexcept {
