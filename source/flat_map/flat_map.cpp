@@ -23,25 +23,6 @@ namespace {
 
 using namespace bounded::literal;
 using namespace containers;
-using namespace smart_pointer;
-
-class Final {
-public:
-	constexpr Final() noexcept {}
-	constexpr Final(int, double, char) noexcept {}
-	Final(Final const & other) = delete;
-	Final(Final && other) = delete;
-	Final & operator=(Final const & other) = delete;
-	Final & operator=(Final && other) = delete;
-};
-
-void test_no_extra_copy_or_move() {
-	std::cout << "Testing no extra copies or moves.\n" << std::flush;
-	stable_flat_map<int, Final> final;
-	final.emplace(std::piecewise_construct, containers::forward_as_tuple(5), containers::forward_as_tuple());
-	final.emplace(std::piecewise_construct, containers::forward_as_tuple(6), containers::forward_as_tuple(5, 2.0, 'c'));
-}
-
 
 class CheckedMover {
 public:
@@ -186,7 +167,6 @@ void test_unique() {
 	std::cout << "Testing unique_inplace_merge.\n" << std::flush;
 	test_unique_specific<std::vector<CheckedMover>>();
 	test_unique_specific<vector<CheckedMover>>();
-	test_unique_specific<containers::moving_vector<CheckedMover>>();
 }
 
 template<typename... Ts>
@@ -249,41 +229,31 @@ using Compare = std::less<Key>;
 
 
 #if defined USE_SYSTEM_MAP
-template<typename Key, typename Value>
-using map_type = std::map<Key, Value, Compare<Key>>;
+	template<typename Key, typename Value>
+	using map_type = std::map<Key, Value, Compare<Key>>;
 
-template<typename Key, typename Value>
-using value_type = std::pair<Key, Value>;
+	template<typename Key, typename Value>
+	using value_type = std::pair<Key, Value>;
 
-template<typename Pair>
-constexpr auto const & get_key(Pair const & pair) noexcept {
-	return pair.first;
-}
+	template<typename Pair>
+	constexpr auto const & get_key(Pair const & pair) noexcept {
+		return pair.first;
+	}
 
-#elif defined USE_UNSTABLE_FLAT_MAP
-template<typename Key, typename Value>
-using map_type = unstable_flat_map<Key, Value, Compare<Key>>;
+#elif defined USE_FLAT_MAP
+	template<typename Key, typename Value>
+	using map_type = flat_map<Key, Value, Compare<Key>>;
 
-template<typename Key, typename Value>
-using value_type = containers::detail::map_value_type<Key, Value>;
+	template<typename Key, typename Value>
+	using value_type = containers::detail::map_value_type<Key, Value>;
 
-template<typename Pair>
-constexpr auto const & get_key(Pair const & pair) noexcept {
-	return pair.key();
-}
+	template<typename Pair>
+	constexpr auto const & get_key(Pair const & pair) noexcept {
+		return pair.key();
+	}
 
 #else
-template<typename Key, typename Value>
-using map_type = stable_flat_map<Key, Value, Compare<Key>>;
-
-template<typename Key, typename Value>
-using value_type = containers::detail::map_value_type<Key, Value>;
-
-template<typename Pair>
-constexpr auto const & get_key(Pair const & pair) noexcept {
-	return pair.key();
-}
-
+	#error
 #endif
 
 using unit = std::chrono::milliseconds;
@@ -436,7 +406,6 @@ bool operator<(Class<size> const & lhs, Class<size> const & rhs) {
 int main(int argc, char ** argv) {
 	std::cout.sync_with_stdio(false);
 	test_unique();
-	test_no_extra_copy_or_move();
 	test<map_type<int, int>>();
 
 	auto const loop_count = (argc == 1) ? 1 : std::stoull(argv[1]);

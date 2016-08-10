@@ -11,7 +11,6 @@
 #include <containers/algorithms/iterator.hpp>
 #include <containers/algorithms/unique.hpp>
 #include <containers/legacy_iterator.hpp>
-#include <containers/moving_vector/moving_vector.hpp>
 #include <containers/tuple.hpp>
 #include <containers/vector/vector.hpp>
 
@@ -116,12 +115,12 @@ public:
 		m_data(Container(first, last, std::move(allocator)), std::move(compare))
 	{
 		auto const less = indirect_compare(value_comp());
-		std::sort(moving_begin(m_data.container()), moving_end(m_data.container()), less);
+		std::sort(m_data.container().begin(), m_data.container().end(), less);
 		// At some point this should be unique_sort
 		auto const equal = ::containers::negate(less);
 		::containers::erase(
 			m_data.container(),
-			moving_to_standard_iterator(::containers::unique(moving_begin(m_data.container()), moving_end(m_data.container()), equal)),
+			::containers::unique(m_data.container().begin(), m_data.container().end(), equal),
 			m_data.container().end()
 		);
 	}
@@ -198,11 +197,8 @@ public:
 	//
 	// Moreover, emplace cannot in general provide the guarantee of no copying
 	// or moving. It can only provide the weaker guarantee of no copying or
-	// moving of the mapped_type. If the underlying container is a
-	// moving_vector, however, then we can perform the operation with no moving
-	// of the value_type. In many cases, however, we will have to copy / move
-	// the key_type, because we have to construct the key to determine whether
-	// we should insert it.
+	// moving of the mapped_type. We must copy or move key_type because we have
+	// to construct the key to determine whether we should insert it.
 	
 	template<typename... Args>
 	auto emplace(Args && ... args) {
@@ -240,26 +236,25 @@ public:
 		// sorted, it's probably better to just sort the new elements then do a
 		// merge sort on both ranges, rather than calling std::sort on the
 		// entire container.
-		auto const const_midpoint = m_data.container().insert(m_data.container().end(), first, last);
-		auto const midpoint = detail::moving_iterator(m_data.container(), const_midpoint);
-		std::sort(midpoint, moving_end(m_data.container()), indirect_compare{value_comp()});
+		auto const midpoint = m_data.container().insert(m_data.container().end(), first, last);
+		std::sort(midpoint, m_data.container().end(), indirect_compare{value_comp()});
 		if (allow_duplicates) {
 			std::inplace_merge(
-				legacy_iterator(moving_begin(m_data.container())),
+				legacy_iterator(m_data.container().begin()),
 				legacy_iterator(midpoint),
-				legacy_iterator(moving_end(m_data.container())),
+				legacy_iterator(m_data.container().end()),
 				indirect_compare(value_comp())
 			);
 		}
 		else {
 			auto const position = ::containers::unique_inplace_merge(
-				moving_begin(m_data.container()),
+				m_data.container().begin(),
 				midpoint,
-				moving_end(m_data.container()),
+				m_data.container().end(),
 				indirect_compare(value_comp())
 			);
 			using containers::erase;
-			erase(m_data.container(), position, moving_end(m_data.container()));
+			erase(m_data.container(), position, m_data.container().end());
 		}
 	}
 	void insert(std::initializer_list<value_type> init) {
@@ -602,17 +597,10 @@ public:
 }	// namespace detail
 
 template<typename Key, typename T, typename Compare = std::less<Key>, typename Allocator = allocator<detail::map_value_type<Key, T>>>
-using unstable_flat_map = detail::flat_map<vector<detail::map_value_type<Key, T>, Allocator>, Compare>;
-
-template<typename Key, typename T, typename Compare = std::less<Key>, typename Allocator = allocator<detail::map_value_type<Key, T>>>
-using stable_flat_map = detail::flat_map<moving_vector<detail::map_value_type<Key, T>, Allocator>, Compare>;
+using flat_map = detail::flat_map<vector<detail::map_value_type<Key, T>, Allocator>, Compare>;
 
 
 template<typename Key, typename T, typename Compare = std::less<Key>, typename Allocator = allocator<detail::map_value_type<Key, T>>>
-using unstable_flat_multimap = detail::flat_multimap<vector<detail::map_value_type<Key, T>, Allocator>, Compare>;
-
-template<typename Key, typename T, typename Compare = std::less<Key>, typename Allocator = allocator<detail::map_value_type<Key, T>>>
-using stable_flat_multimap = detail::flat_multimap<moving_vector<detail::map_value_type<Key, T>, Allocator>, Compare>;
-
+using flat_multimap = detail::flat_multimap<vector<detail::map_value_type<Key, T>, Allocator>, Compare>;
 
 }	// namespace containers

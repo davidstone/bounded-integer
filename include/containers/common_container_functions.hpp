@@ -32,11 +32,6 @@ constexpr auto mutable_iterator(Container & container, Iterator const it) BOUNDE
 	container.begin() + (it - container.begin())
 )
 
-template<typename Container, typename Iterator, BOUNDED_REQUIRES(is_container<Container> and is_iterator<Iterator>)>
-constexpr auto moving_iterator(Container & container, Iterator const it) BOUNDED_NOEXCEPT(
-	mutable_iterator(container, it)
-)
-
 namespace common {
 
 template<typename Container, BOUNDED_REQUIRES(is_container<Container>)>
@@ -175,10 +170,10 @@ constexpr auto insert(Container & container, typename Container::const_iterator 
 // TODO: conditional noexcept
 template<typename Container, typename Iterator, BOUNDED_REQUIRES(is_container<Container> and is_iterator<Iterator>)>
 constexpr auto erase(Container & container, Iterator const first_, Iterator const last_) noexcept {
-	auto const first = moving_iterator(container, first_);
-	auto const last = moving_iterator(container, last_);
-	auto const to_clear = ::containers::move(last, moving_iterator(container, container.end()), first).output;
-	while (to_clear != moving_iterator(container, container.end())) {
+	auto const first = mutable_iterator(container, first_);
+	auto const last = mutable_iterator(container, last_);
+	auto const to_clear = ::containers::move(last, container.end(), first).output;
+	while (to_clear != container.end()) {
 		container.pop_back();
 	}
 }

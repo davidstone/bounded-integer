@@ -94,20 +94,9 @@ programs = [
 		include_directories = include_directories
 	),
 	Program(
-		'moving_vector',
-		sources = ['moving_vector/moving_vector.cpp'],
-		include_directories = include_directories
-	),
-	Program(
-		'flat_map_stable',
+		'flat_map',
 		sources = flat_map_sources,
-		defines = ['USE_STABLE_FLAT_MAP'],
-		include_directories = include_directories
-	),
-	Program(
-		'flat_map_unstable',
-		sources = flat_map_sources,
-		defines = ['USE_UNSTABLE_FLAT_MAP'],
+		defines = ['USE_FLAT_MAP'],
 		include_directories = include_directories
 	),
 	Program(
@@ -127,7 +116,7 @@ def reserve_options(container):
 		return ['NO_RESERVE']
 
 performance_sources = ['performance_test_sequence.cpp']
-container_types = ['deque', 'list', 'moving_vector', 'vector']
+container_types = ['deque', 'list', 'vector']
 # Don't keep compiling all of these other versions that I rarely use
 array_sizes = [
 #	'1',

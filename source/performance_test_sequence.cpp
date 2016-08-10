@@ -4,7 +4,6 @@
 // http://www.boost.org/LICENSE_1_0.txt)
 
 #include <containers/algorithms/find.hpp>
-#include <containers/moving_vector/moving_vector.hpp>
 
 #include <boost/timer.hpp>
 
@@ -85,8 +84,6 @@ int main(int argc, char ** argv) {
 	typedef std::list<Class> Container;
 	#elif defined DEQUE
 	typedef std::deque<Class>Container;
-	#elif defined MOVING_VECTOR
-	typedef containers::moving_vector<Class> Container;
 	#endif
 	boost::timer timer;
 	f<Container>(values_to_be_copied);
