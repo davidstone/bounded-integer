@@ -31,6 +31,38 @@ namespace detail {
 // https://stackoverflow.com/a/10319672/852254
 
 
+template<typename T, typename Allocator>
+struct allocator_aware_storage {
+	allocator_aware_storage(Allocator & allocator_, dynamic_array_data_t<T> storage_) noexcept:
+		allocator(allocator_),
+		storage(std::move(storage_)),
+		active(true)
+	{
+	}
+	allocator_aware_storage(allocator_aware_storage && other) noexcept:
+		allocator(other.allocator),
+		storage(other.storage),
+		active(std::exchange(other.active, false))
+	{
+	}
+	~allocator_aware_storage() {
+		if (active) {
+			::containers::detail::deallocate_storage(allocator, storage);
+		}
+	}
+	
+	Allocator & allocator;
+	dynamic_array_data_t<T> storage;
+	bool active;
+};
+
+
+template<typename T, typename Allocator>
+constexpr auto data(allocator_aware_storage<T, Allocator> & container) noexcept {
+	return container.storage.pointer;
+}
+
+
 // If size remains below requested_small_capacity, there will be no allocations.
 // requested_small_capacity is a guaranteed minimum. The implementation may
 // reserve more space if it is less than minimum_small_capacity.
@@ -60,34 +92,6 @@ struct sbo_vector_base : private detail::rebound_allocator<T, Allocator> {
 	using const_iterator = detail::basic_array_iterator<value_type const, sbo_vector_base>;
 	using iterator = detail::basic_array_iterator<value_type, sbo_vector_base>;
 
-	struct allocator_aware_storage {
-		allocator_aware_storage(allocator_type & allocator_, dynamic_array_data_t<value_type> storage_) noexcept:
-			allocator(allocator_),
-			storage(std::move(storage_)),
-			active(true)
-		{
-		}
-		allocator_aware_storage(allocator_aware_storage && other) noexcept:
-			allocator(other.allocator),
-			storage(other.storage),
-			active(std::exchange(other.active, false))
-		{
-		}
-		~allocator_aware_storage() {
-			if (active) {
-				::containers::detail::deallocate_storage(allocator, storage);
-			}
-		}
-		
-		auto data() noexcept {
-			return storage.pointer;
-		}
-		
-		allocator_type & allocator;
-		dynamic_array_data_t<value_type> storage;
-		bool active;
-	};
-
 	constexpr auto && get_allocator() const & noexcept {
 		return static_cast<allocator_type const &>(*this);
 	}
@@ -116,9 +120,8 @@ struct sbo_vector_base : private detail::rebound_allocator<T, Allocator> {
 	auto move_assign_to_empty(sbo_vector_base && other) & noexcept {
 		deallocate_large();
 		if (other.is_small()) {
-			auto const ptr = other.data();
 			::bounded::construct(m_small);
-			::containers::uninitialized_move_destroy(ptr, ptr + other.size(), m_small.data.data(), get_allocator());
+			::containers::uninitialized_move_destroy(other.begin(), other.end(), m_small.data.begin(), get_allocator());
 			m_small.size = other.m_small.size;
 			other.m_small.size = 0;
 		} else {
@@ -129,17 +132,22 @@ struct sbo_vector_base : private detail::rebound_allocator<T, Allocator> {
 		}
 	}
 
-	auto data() const noexcept {
-		auto const result = is_small() ? reinterpret_cast<value_type const *>(m_small.data.data()) : m_large.pointer;
+	auto begin() const noexcept {
+		auto const result = is_small() ? reinterpret_cast<value_type const *>(data(m_small.data)) : m_large.pointer;
 		assert(result != nullptr);
-		return result;
+		return const_iterator(result, detail::iterator_constructor);
 	}
-	auto data() noexcept {
-		return ::containers::detail::remove_const(::containers::detail::add_const(*this).data());
+	auto begin() noexcept {
+		auto const result = is_small() ? reinterpret_cast<value_type *>(data(m_small.data)) : m_large.pointer;
+		assert(result != nullptr);
+		return iterator(result, detail::iterator_constructor);
 	}
 	
-	auto size() const noexcept {
-		return is_small() ? static_cast<size_type>(m_small.size) : m_large.size;
+	auto end() const noexcept {
+		return begin() + size();
+	}
+	auto end() noexcept {
+		return begin() + size();
 	}
 
 	auto capacity() const noexcept {
@@ -149,13 +157,13 @@ struct sbo_vector_base : private detail::rebound_allocator<T, Allocator> {
 
 	template<typename Size>
 	auto make_storage(Size const new_capacity) & {
-		return allocator_aware_storage(
+		return allocator_aware_storage<value_type, allocator_type>(
 			get_allocator(),
 			::containers::detail::make_storage<value_type>(get_allocator(), new_capacity)
 		);
 	}
 
-	auto relocate_preallocated(allocator_aware_storage new_large) noexcept {
+	auto relocate_preallocated(allocator_aware_storage<value_type, allocator_type> new_large) noexcept {
 		deallocate_large();
 		// TODO: static_assert noexcept
 		::bounded::construct(
@@ -176,7 +184,7 @@ struct sbo_vector_base : private detail::rebound_allocator<T, Allocator> {
 			relocate_to_small();
 		} else {
 			auto temp = make_storage(requested_capacity);
-			::containers::uninitialized_move_destroy(data(), data() + size(), temp.data(), get_allocator());
+			::containers::uninitialized_move_destroy(begin(), end(), data(temp), get_allocator());
 			relocate_preallocated(std::move(temp));
 		}
 	}
@@ -191,6 +199,9 @@ struct sbo_vector_base : private detail::rebound_allocator<T, Allocator> {
 	}
 
 private:
+	auto size() const noexcept {
+		return is_small() ? static_cast<size_type>(m_small.size) : m_large.size;
+	}
 	auto relocate_to_small() noexcept {
 		if (is_small()) {
 			return;

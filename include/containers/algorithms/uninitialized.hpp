@@ -6,6 +6,7 @@
 #pragma once
 
 #include <containers/allocator.hpp>
+#include <containers/is_iterator_sentinel.hpp>
 #include <containers/scope_guard.hpp>
 #include <containers/type_list.hpp>
 #include <containers/algorithms/iterator.hpp>

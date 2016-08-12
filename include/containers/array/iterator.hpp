@@ -5,6 +5,7 @@
 
 #pragma once
 
+#include <containers/algorithms/uninitialized.hpp>
 #include <containers/common_iterator_functions.hpp>
 
 #include <bounded/integer.hpp>
@@ -34,8 +35,9 @@ struct basic_array_iterator {
 
 	constexpr basic_array_iterator() noexcept = default;
 
-	constexpr explicit basic_array_iterator(pointer const other, iterator_constructor_t) noexcept:
-		m_it(other) {
+	template<typename U>
+	constexpr explicit basic_array_iterator(U * const other, iterator_constructor_t) noexcept:
+		m_it(::containers::detail::static_or_reinterpret_cast<pointer>(other)) {
 	}
 
 	// Convert iterator to const_iterator
@@ -67,6 +69,10 @@ struct basic_array_iterator {
 	}
 	friend constexpr auto operator<(basic_array_iterator const lhs, basic_array_iterator const rhs) noexcept {
 		return lhs.m_it < rhs.m_it;
+	}
+	
+	friend constexpr auto pointer_from(basic_array_iterator const it) noexcept {
+		return it.m_it;
 	}
 
 private:

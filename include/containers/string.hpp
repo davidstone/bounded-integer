@@ -46,7 +46,6 @@ public:
 	
 	using base::operator=;
 	
-	using base::data;
 	using base::begin;
 	using base::end;
 	using base::operator[];

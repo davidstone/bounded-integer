@@ -1,4 +1,4 @@
-// Copyright David Stone 2015.
+// Copyright David Stone 2016.
 // Distributed under the Boost Software License, Version 1.0.
 // (See accompanying file LICENSE_1_0.txt or copy at
 // http://www.boost.org/LICENSE_1_0.txt)
@@ -216,19 +216,13 @@ struct dynamic_array : private detail::rebound_allocator<T, Allocator> {
 		return *this;
 	}
 	
-	constexpr auto data() const noexcept {
-		return ::containers::detail::static_or_reinterpret_cast<value_type const *>(m_data.pointer);
-	}
-	constexpr auto data() noexcept {
-		return ::containers::detail::static_or_reinterpret_cast<value_type *>(m_data.pointer);
-	}
-	
 	constexpr auto begin() const noexcept {
-		return const_iterator(data(), detail::iterator_constructor);
+		return const_iterator(m_data.pointer, detail::iterator_constructor);
 	}
 	constexpr auto begin() noexcept {
-		return iterator(data(), detail::iterator_constructor);
+		return iterator(m_data.pointer, detail::iterator_constructor);
 	}
+	
 	constexpr auto end() const noexcept {
 		return begin() + m_data.size;
 	}

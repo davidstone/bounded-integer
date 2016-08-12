@@ -31,10 +31,9 @@ struct dynamic_resizable_array : private Container {
 	using typename Container::value_type;
 	using typename Container::allocator_type;
 	using typename Container::size_type;
+	using typename Container::const_iterator;
+	using typename Container::iterator;
 
-	using const_iterator = detail::basic_array_iterator<value_type const, dynamic_resizable_array>;
-	using iterator = detail::basic_array_iterator<value_type, dynamic_resizable_array>;
-	
 	using Container::get_allocator;
 	
 	constexpr dynamic_resizable_array() noexcept {}
@@ -51,7 +50,7 @@ struct dynamic_resizable_array : private Container {
 		if (count > capacity()) {
 			this->relocate(count);
 		}
-		::containers::uninitialized_default_construct(data(), data() + count, get_allocator());
+		::containers::uninitialized_default_construct(begin(), begin() + count, get_allocator());
 		this->set_size(count);
 	}
 	template<typename Count, BOUNDED_REQUIRES(std::is_convertible<Count, size_type>::value)>
@@ -110,20 +109,9 @@ struct dynamic_resizable_array : private Container {
 		::containers::detail::destroy(get_allocator(), begin(), end());
 	}
 
-	using Container::data;
 
-	auto begin() const noexcept {
-		return const_iterator(data(), detail::iterator_constructor);
-	}
-	auto begin() noexcept {
-		return iterator(data(), detail::iterator_constructor);
-	}
-	auto end() const noexcept {
-		return begin() + this->size();
-	}
-	auto end() noexcept {
-		return begin() + this->size();
-	}
+	using Container::begin;
+	using Container::end;
 
 
 	auto && operator[](index_type<dynamic_resizable_array> const index) const noexcept {
@@ -150,11 +138,11 @@ struct dynamic_resizable_array : private Container {
 	template<typename... Args>
 	auto emplace_back(Args && ... args) {
 		if (size(*this) < capacity()) {
-			::containers::detail::construct(get_allocator(), data() + size(*this), std::forward<Args>(args)...);
+			::containers::detail::construct(get_allocator(), data(*this) + size(*this), std::forward<Args>(args)...);
 		} else {
 			auto temp = this->make_storage(new_capacity());
-			::containers::detail::construct(get_allocator(), temp.data() + capacity(), std::forward<Args>(args)...);
-			::containers::uninitialized_move_destroy(begin(), end(), temp.data(), get_allocator());
+			::containers::detail::construct(get_allocator(), data(temp) + capacity(), std::forward<Args>(args)...);
+			::containers::uninitialized_move_destroy(begin(), end(), data(temp), get_allocator());
 			this->relocate_preallocated(std::move(temp));
 		}
 		add_size(1_bi);
@@ -177,10 +165,10 @@ struct dynamic_resizable_array : private Container {
 			// construct it may reference an old element. We cannot move
 			// elements it references before constructing it
 			auto && allocator = get_allocator();
-			::containers::detail::construct(allocator, temp.data() + offset, std::forward<Args>(args)...);
+			::containers::detail::construct(allocator, data(temp) + offset, std::forward<Args>(args)...);
 			auto const mutable_position = begin() + offset;
-			auto const pointer = ::containers::uninitialized_move_destroy(begin(), mutable_position, temp.data(), allocator);
-			assert(temp.data() + offset == pointer);
+			auto const pointer = ::containers::uninitialized_move_destroy(begin(), mutable_position, data(temp), allocator);
+			assert(data(temp) + offset == pointer);
 			::containers::uninitialized_move_destroy(mutable_position, end(), ::containers::next(pointer), allocator);
 			this->relocate_preallocated(std::move(temp));
 			add_size(1_bi);
@@ -215,10 +203,10 @@ struct dynamic_resizable_array : private Container {
 		auto const offset = position - begin();
 		// First construct the new element because it may reference an old
 		// element, and we do not want to move elements it references
-		::containers::uninitialized_copy(first, last, temp.data() + offset, get_allocator());
+		::containers::uninitialized_copy(first, last, data(temp) + offset, get_allocator());
 		auto const mutable_position = begin() + offset;
-		auto const pointer = ::containers::uninitialized_move_destroy(begin(), mutable_position, temp.data(), get_allocator());
-		assert(temp.data() + offset == pointer);
+		auto const pointer = ::containers::uninitialized_move_destroy(begin(), mutable_position, data(temp), get_allocator());
+		assert(data(temp) + offset == pointer);
 		::containers::uninitialized_move_destroy(mutable_position, end(), pointer + range_size, get_allocator());
 		this->relocate_preallocated(std::move(temp));
 		add_size(range_size);

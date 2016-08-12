@@ -71,6 +71,12 @@ constexpr auto crend(Container const & container) BOUNDED_NOEXCEPT(
 )
 
 
+template<typename Container, BOUNDED_REQUIRES(is_container<Container>)>
+constexpr auto data(Container && container) BOUNDED_NOEXCEPT_DECLTYPE(
+	pointer_from(container.begin())
+)
+
+
 template<typename Container, typename Index, BOUNDED_REQUIRES(is_container<Container>)>
 constexpr decltype(auto) at(Container && container, Index const index) BOUNDED_NOEXCEPT(
 	std::forward<Container>(container)[typename index_type<Container>::overflow_policy{}.assignment(
@@ -267,6 +273,7 @@ constexpr auto operator<(Container const & lhs, Container const & rhs) BOUNDED_N
 	using ::containers::detail::common::rend; \
 	using ::containers::detail::common::crbegin; \
 	using ::containers::detail::common::crend; \
+	using ::containers::detail::common::data; \
 	using ::containers::detail::common::at; \
 	using ::containers::detail::common::front; \
 	using ::containers::detail::common::back; \

@@ -104,7 +104,7 @@ void test_generic(T const & t, std::initializer_list<T> init) {
 	copy = init;
 	assert(copy == init_list);
 
-	assert(copy.data() != init_list.data());
+	assert(data(copy) != data(init_list));
 	
 	clear(copy);
 	push_back(copy, t);

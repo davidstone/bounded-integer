@@ -28,18 +28,11 @@ struct array {
 	using const_iterator = basic_array_iterator<value_type const, array>;
 	using iterator = basic_array_iterator<value_type, array>;
 
-	constexpr auto data() const noexcept {
-		return m_value;
-	}
-	constexpr auto data() noexcept {
-		return m_value;
-	}
-
 	constexpr auto begin() const noexcept {
-		return const_iterator(data(), detail::iterator_constructor);
+		return const_iterator(m_value, detail::iterator_constructor);
 	}
 	constexpr auto begin() noexcept {
-		return iterator(data(), detail::iterator_constructor);
+		return iterator(m_value, detail::iterator_constructor);
 	}
 
 	constexpr auto end() const noexcept {
@@ -83,12 +76,8 @@ struct array<T, 0> {
 	// This constructor allows the syntax array<T, 0> = {{}}
 	constexpr array(aggregate_initialization) noexcept {}
 
-	constexpr auto data() const noexcept {
-		return nullptr;
-	}
-
 	constexpr auto begin() const noexcept {
-		return const_iterator(data(), detail::iterator_constructor);
+		return const_iterator();
 	}
 
 	constexpr auto end() const noexcept {

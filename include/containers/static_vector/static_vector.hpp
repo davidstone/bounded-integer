@@ -47,7 +47,7 @@ struct static_vector_data<T, capacity, true> {
 template<typename T, std::size_t capacity>
 struct static_vector_data<T, capacity, false> : static_vector_data<T, capacity, true> {
 	~static_vector_data() {
-		auto const begin = this->m_container.data();
+		auto const begin = this->m_container.begin();
 		auto const end = begin + this->m_size;
 		::containers::detail::destroy(allocator<T>{}, begin, end);
 	}
@@ -107,18 +107,11 @@ struct static_vector : private detail::static_vector_data<T, capacity_>  {
 	}
 
 
-	constexpr auto data() const noexcept {
-		return ::containers::detail::static_or_reinterpret_cast<T const *>(this->m_container.data());
-	}
-	constexpr auto data() noexcept {
-		return ::containers::detail::static_or_reinterpret_cast<T *>(this->m_container.data());
-	}
-
 	constexpr auto begin() const noexcept {
-		return const_iterator(data(), detail::iterator_constructor);
+		return const_iterator(data(this->m_container), detail::iterator_constructor);
 	}
 	constexpr auto begin() noexcept {
-		return iterator(data(), detail::iterator_constructor);
+		return iterator(data(this->m_container), detail::iterator_constructor);
 	}
 	constexpr auto end() const noexcept {
 		return begin() + this->m_size;
@@ -142,7 +135,7 @@ struct static_vector : private detail::static_vector_data<T, capacity_>  {
 	template<typename... Args>
 	constexpr auto emplace_back(Args && ... args) {
 		assert(size(*this) != capacity());
-		::containers::detail::construct(get_allocator(), data() + size(*this), std::forward<Args>(args)...);
+		::containers::detail::construct(get_allocator(), data(*this) + size(*this), std::forward<Args>(args)...);
 		++this->m_size;
 	}
 	

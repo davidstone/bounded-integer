@@ -1,4 +1,4 @@
-// Copyright David Stone 2015.
+// Copyright David Stone 2016.
 // Distributed under the Boost Software License, Version 1.0.
 // (See accompanying file LICENSE_1_0.txt or copy at
 // http://www.boost.org/LICENSE_1_0.txt)
@@ -55,14 +55,17 @@ struct vector_base {
 		m_size = std::exchange(other.m_size, 0_bi);
 	}
 
-	auto data() const noexcept {
-		return reinterpret_cast<value_type const *>(m_container.data());
+	auto begin() const noexcept {
+		return const_iterator(data(m_container), detail::iterator_constructor);
 	}
-	auto data() noexcept {
-		return ::containers::detail::remove_const(::containers::detail::add_const(*this).data());
+	auto begin() noexcept {
+		return iterator(data(m_container), detail::iterator_constructor);
 	}
-	constexpr auto size() const noexcept {
-		return m_size;
+	auto end() const noexcept {
+		return begin() + m_size;
+	}
+	auto end() noexcept {
+		return begin() + m_size;
 	}
 
 	constexpr auto capacity() const noexcept {
@@ -81,7 +84,7 @@ struct vector_base {
 	template<typename Size>
 	auto relocate(Size const requested_capacity) {
 		auto temp = make_storage(requested_capacity);
-		::containers::uninitialized_move_destroy(data(), data() + size(), temp.data(), get_allocator());
+		::containers::uninitialized_move_destroy(begin(), end(), temp.begin(), get_allocator());
 		relocate_preallocated(std::move(temp));
 	}
 	
