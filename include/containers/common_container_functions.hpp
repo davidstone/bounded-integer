@@ -28,7 +28,7 @@ namespace containers {
 namespace detail {
 
 template<typename Container, typename Iterator, BOUNDED_REQUIRES(is_container<Container> and is_iterator<Iterator>)>
-constexpr auto mutable_iterator(Container & container, Iterator const it) BOUNDED_NOEXCEPT(
+constexpr auto mutable_iterator(Container & container, Iterator const it) BOUNDED_NOEXCEPT_VALUE(
 	container.begin() + (it - container.begin())
 )
 
