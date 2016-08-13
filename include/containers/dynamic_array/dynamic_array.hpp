@@ -8,6 +8,7 @@
 #include <containers/allocator.hpp>
 #include <containers/common_container_functions.hpp>
 #include <containers/is_iterator.hpp>
+#include <containers/operator_bracket.hpp>
 #include <containers/repeat_n.hpp>
 #include <containers/uninitialized_storage.hpp>
 #include <containers/algorithms/copy.hpp>
@@ -230,12 +231,7 @@ struct dynamic_array : private detail::rebound_allocator<T, Allocator> {
 		return begin() + m_data.size;
 	}
 
-	constexpr auto && operator[](index_type<dynamic_array> const index) const noexcept {
-		return *(begin() + index);
-	}
-	constexpr auto && operator[](index_type<dynamic_array> const index) noexcept {
-		return *(begin() + index);
-	}
+	CONTAINERS_OPERATOR_BRACKET_DEFINITIONS
 	
 private:
 	detail::dynamic_array_data_t<value_type> m_data = {};

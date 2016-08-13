@@ -6,7 +6,7 @@
 #pragma once
 
 #include <containers/common_iterator_functions.hpp>
-#include <containers/index_type.hpp>
+#include <containers/operator_bracket.hpp>
 
 #include <bounded/integer.hpp>
 
@@ -107,9 +107,7 @@ struct repeat_n_t {
 		return repeat_n_sentinel{};
 	}
 
-	constexpr auto && operator[](index_type<repeat_n_t> const & index) const {
-		return *(begin() + index);
-	}
+	CONTAINERS_OPERATOR_BRACKET_DEFINITIONS
 
 private:
 	size_type m_size;

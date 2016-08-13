@@ -10,6 +10,7 @@
 
 #include <bounded/integer.hpp>
 
+#include <cassert>
 #include <cstddef>
 #include <cstdint>
 #include <iterator>

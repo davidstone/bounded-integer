@@ -10,6 +10,7 @@
 #include <containers/common_container_functions.hpp>
 #include <containers/index_type.hpp>
 #include <containers/is_iterator_sentinel.hpp>
+#include <containers/operator_bracket.hpp>
 #include <containers/repeat_n.hpp>
 #include <containers/uninitialized_storage.hpp>
 #include <containers/algorithms/copy.hpp>
@@ -58,7 +59,7 @@ struct static_vector_data<T, capacity, false> : static_vector_data<T, capacity, 
 
 // TODO: ensure proper exception safety
 template<typename T, std::size_t capacity_>
-struct static_vector : private detail::static_vector_data<T, capacity_>  {
+struct static_vector : private detail::static_vector_data<T, capacity_> {
 	using value_type = T;
 	using size_type = bounded::integer<0, capacity_>;
 	using const_iterator = detail::basic_array_iterator<value_type const, static_vector>;
@@ -121,12 +122,7 @@ struct static_vector : private detail::static_vector_data<T, capacity_>  {
 	}
 
 
-	constexpr auto && operator[](index_type<static_vector> index) const noexcept {
-		return *(begin() + index);
-	}
-	constexpr auto && operator[](index_type<static_vector> index) noexcept {
-		return *(begin() + index);
-	}
+	CONTAINERS_OPERATOR_BRACKET_DEFINITIONS
 	
 	static constexpr auto capacity() noexcept {
 		return bounded::constant<capacity_>;

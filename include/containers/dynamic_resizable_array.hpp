@@ -113,15 +113,7 @@ struct dynamic_resizable_array : private Container {
 	using Container::begin;
 	using Container::end;
 
-
-	auto && operator[](index_type<dynamic_resizable_array> const index) const noexcept {
-		assert(index < size(*this));
-		return *(begin() + index);
-	}
-	auto && operator[](index_type<dynamic_resizable_array> const index) noexcept {
-		assert(index < size(*this));
-		return *(begin() + index);
-	}
+	CONTAINERS_OPERATOR_BRACKET_DEFINITIONS
 	
 	using Container::capacity;
 	auto reserve(size_type const requested_capacity) {

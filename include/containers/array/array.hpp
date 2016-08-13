@@ -1,12 +1,13 @@
-// Copyright David Stone 2015.
+// Copyright David Stone 2016.
 // Distributed under the Boost Software License, Version 1.0.
 // (See accompanying file LICENSE_1_0.txt or copy at
 // http://www.boost.org/LICENSE_1_0.txt)
 
 #pragma once
 
-#include <containers/common_container_functions.hpp>
 #include <containers/array/iterator.hpp>
+#include <containers/common_container_functions.hpp>
+#include <containers/operator_bracket.hpp>
 
 #include <bounded/integer.hpp>
 
@@ -41,14 +42,8 @@ struct array {
 	constexpr auto end() noexcept {
 		return begin() + bounded::constant<size>;
 	}
-
-	constexpr auto && operator[](index_type<array> const index) const noexcept {
-		return *(begin() + index);
-	}
-	constexpr auto && operator[](index_type<array> const index) noexcept {
-		return *(begin() + index);
-	}
-
+	
+	CONTAINERS_OPERATOR_BRACKET_DEFINITIONS
 
 	// Consider this private. It must be public for the class to be an
 	// aggregate
