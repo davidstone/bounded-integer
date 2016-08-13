@@ -26,12 +26,6 @@
 
 namespace containers {
 namespace detail {
-
-template<typename Container, typename Iterator, BOUNDED_REQUIRES(is_container<Container> and is_iterator<Iterator>)>
-constexpr auto mutable_iterator(Container & container, Iterator const it) BOUNDED_NOEXCEPT_VALUE(
-	container.begin() + (it - container.begin())
-)
-
 namespace common {
 
 template<typename Container, BOUNDED_REQUIRES(is_container<Container>)>
@@ -70,6 +64,17 @@ constexpr auto crend(Container const & container) BOUNDED_NOEXCEPT(
 	::containers::reverse_iterator(container.end())
 )
 
+
+}	// namespace common
+
+
+template<typename Container, typename Iterator, BOUNDED_REQUIRES(is_container<Container> and is_iterator<Iterator>)>
+constexpr auto mutable_iterator(Container & container, Iterator const it) BOUNDED_NOEXCEPT_VALUE(
+	container.begin() + (it - container.begin())
+)
+
+
+namespace common {
 
 template<typename Container, BOUNDED_REQUIRES(is_container<Container>)>
 constexpr auto data(Container && container) BOUNDED_NOEXCEPT_DECLTYPE(
