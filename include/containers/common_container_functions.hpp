@@ -29,38 +29,38 @@ namespace detail {
 namespace common {
 
 template<typename Container, BOUNDED_REQUIRES(is_container<Container>)>
-constexpr auto begin(Container && container) BOUNDED_NOEXCEPT(
+constexpr auto begin(Container && container) BOUNDED_NOEXCEPT_VALUE(
 	std::forward<Container>(container).begin()
 )
 template<typename Container, BOUNDED_REQUIRES(is_container<Container>)>
-constexpr auto end(Container && container) BOUNDED_NOEXCEPT(
+constexpr auto end(Container && container) BOUNDED_NOEXCEPT_VALUE(
 	std::forward<Container>(container).end()
 )
 
 template<typename Container, BOUNDED_REQUIRES(is_container<Container>)>
-constexpr auto cbegin(Container const & container) BOUNDED_NOEXCEPT(
+constexpr auto cbegin(Container const & container) BOUNDED_NOEXCEPT_VALUE(
 	container.begin()
 )
 template<typename Container, BOUNDED_REQUIRES(is_container<Container>)>
-constexpr auto cend(Container const & container) BOUNDED_NOEXCEPT(
+constexpr auto cend(Container const & container) BOUNDED_NOEXCEPT_VALUE(
 	container.end()
 )
 
 template<typename Container, BOUNDED_REQUIRES(is_container<Container>)>
-constexpr auto rbegin(Container && container) BOUNDED_NOEXCEPT(
+constexpr auto rbegin(Container && container) BOUNDED_NOEXCEPT_VALUE(
 	::containers::reverse_iterator(std::forward<Container>(container).begin())
 )
 template<typename Container, BOUNDED_REQUIRES(is_container<Container>)>
-constexpr auto rend(Container && container) BOUNDED_NOEXCEPT(
+constexpr auto rend(Container && container) BOUNDED_NOEXCEPT_VALUE(
 	::containers::reverse_iterator(std::forward<Container>(container).end())
 )
 
 template<typename Container, BOUNDED_REQUIRES(is_container<Container>)>
-constexpr auto crbegin(Container const & container) BOUNDED_NOEXCEPT(
+constexpr auto crbegin(Container const & container) BOUNDED_NOEXCEPT_VALUE(
 	::containers::reverse_iterator(container.begin())
 )
 template<typename Container, BOUNDED_REQUIRES(is_container<Container>)>
-constexpr auto crend(Container const & container) BOUNDED_NOEXCEPT(
+constexpr auto crend(Container const & container) BOUNDED_NOEXCEPT_VALUE(
 	::containers::reverse_iterator(container.end())
 )
 
