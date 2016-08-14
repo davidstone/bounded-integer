@@ -1,4 +1,4 @@
-// Copyright David Stone 2015.
+// Copyright David Stone 2016.
 // Distributed under the Boost Software License, Version 1.0.
 // (See accompanying file LICENSE_1_0.txt or copy at
 // http://www.boost.org/LICENSE_1_0.txt)
@@ -115,13 +115,13 @@ public:
 		m_data(Container(first, last, std::move(allocator)), std::move(compare))
 	{
 		auto const less = indirect_compare(value_comp());
-		std::sort(m_data.container().begin(), m_data.container().end(), less);
+		std::sort(begin(m_data.container()), end(m_data.container()), less);
 		// At some point this should be unique_sort
 		auto const equal = ::containers::negate(less);
 		::containers::erase(
 			m_data.container(),
-			::containers::unique(m_data.container().begin(), m_data.container().end(), equal),
-			m_data.container().end()
+			::containers::unique(begin(m_data.container()), end(m_data.container()), equal),
+			end(m_data.container())
 		);
 	}
 	template<typename InputIterator>
@@ -135,7 +135,7 @@ public:
 		m_data(Container(std::move(other), std::move(allocator)), key_compare{}) {
 	}
 	flat_map_base(std::initializer_list<value_type> init, key_compare compare = key_compare{}, allocator_type allocator = allocator_type{}):
-		flat_map_base(std::begin(init), std::end(init), std::move(compare), std::move(allocator)) {
+		flat_map_base(begin(init), end(init), std::move(compare), std::move(allocator)) {
 	}
 	flat_map_base(std::initializer_list<value_type> init, allocator_type allocator):
 		flat_map_base(init, key_compare{}, std::move(allocator)) {
@@ -145,18 +145,21 @@ public:
 		return *this = flat_map_base(init);
 	}
 	
-	const_iterator begin() const noexcept {
-		return m_data.container().begin();
+	friend constexpr auto begin(flat_map_base const & container) noexcept {
+		static_assert(noexcept(begin(container.m_data.container())), "This function assumes begin is noexcept");
+		return begin(container.m_data.container());
 	}
-	iterator begin() noexcept {
-		return m_data.container().begin();
+	friend constexpr auto begin(flat_map_base & container) noexcept {
+		static_assert(noexcept(begin(container.m_data.container())), "This function assumes begin is noexcept");
+		return begin(container.m_data.container());
 	}
-	
-	const_iterator end() const noexcept {
-		return m_data.container().end();
+	friend constexpr auto end(flat_map_base const & container) noexcept {
+		static_assert(noexcept(end(container.m_data.container())), "This function assumes end is noexcept");
+		return end(container.m_data.container());
 	}
-	iterator end() noexcept {
-		return m_data.container().end();
+	friend constexpr auto end(flat_map_base & container) noexcept {
+		static_assert(noexcept(end(container.m_data.container())), "This function assumes end is noexcept");
+		return end(container.m_data.container());
 	}
 	
 	// Extra functions on top of the regular map interface
@@ -171,24 +174,24 @@ public:
 	}
 	
 	const_iterator lower_bound(key_type const & key) const {
-		return std::lower_bound(begin(), end(), key, key_value_compare{key_comp()});
+		return std::lower_bound(begin(*this), end(*this), key, key_value_compare{key_comp()});
 	}
 	iterator lower_bound(key_type const & key) {
-		return std::lower_bound(begin(), end(), key, key_value_compare{key_comp()});
+		return std::lower_bound(begin(*this), end(*this), key, key_value_compare{key_comp()});
 	}
 	const_iterator upper_bound(key_type const & key) const {
-		return std::upper_bound(begin(), end(), key, key_value_compare{key_comp()});
+		return std::upper_bound(begin(*this), end(*this), key, key_value_compare{key_comp()});
 	}
 	iterator upper_bound(key_type const & key) {
-		return std::upper_bound(begin(), end(), key, key_value_compare{key_comp()});
+		return std::upper_bound(begin(*this), end(*this), key, key_value_compare{key_comp()});
 	}
 	const_iterator find(key_type const & key) const {
 		auto const it = lower_bound(key);
-		return (it == end() or key_comp()(key, it->key)) ? end() : it;
+		return (it == end(*this) or key_comp()(key, it->key)) ? end(*this) : it;
 	}
 	iterator find(key_type const & key) {
 		auto const it = lower_bound(key);
-		return (it == end() or key_comp()(key, it->key())) ? end() : it;
+		return (it == end(*this) or key_comp()(key, it->key())) ? end(*this) : it;
 	}
 	
 	// Unlike in std::map, insert / emplace can only provide a time complexity
@@ -209,8 +212,8 @@ public:
 	template<typename... Args>
 	iterator emplace_hint(const_iterator hint, Args && ... args) {
 		auto data = separate_key_from_mapped(std::forward<Args>(args)...);
-		auto const correct_greater = (hint == end()) or key_comp(data.key, *hint);
-		auto const correct_less = (hint == begin()) or key_comp(*::containers::prev(hint), data.key);
+		auto const correct_greater = (hint == end(*this)) or key_comp(data.key, *hint);
+		auto const correct_less = (hint == begin(*this)) or key_comp(*::containers::prev(hint), data.key);
 		auto const correct_hint = correct_greater and correct_less;
 		auto const position = correct_hint ? hint : upper_bound(data.key);
 		return emplace_at(position, std::move(data).key, std::move(data).mapped_args);
@@ -236,29 +239,29 @@ public:
 		// sorted, it's probably better to just sort the new elements then do a
 		// merge sort on both ranges, rather than calling std::sort on the
 		// entire container.
-		auto const midpoint = m_data.container().insert(m_data.container().end(), first, last);
-		std::sort(midpoint, m_data.container().end(), indirect_compare{value_comp()});
+		auto const midpoint = m_data.container().insert(end(m_data.container()), first, last);
+		std::sort(midpoint, end(m_data.container()), indirect_compare{value_comp()});
 		if (allow_duplicates) {
 			std::inplace_merge(
-				legacy_iterator(m_data.container().begin()),
+				legacy_iterator(begin(m_data.container())),
 				legacy_iterator(midpoint),
-				legacy_iterator(m_data.container().end()),
+				legacy_iterator(end(m_data.container())),
 				indirect_compare(value_comp())
 			);
 		}
 		else {
 			auto const position = ::containers::unique_inplace_merge(
-				m_data.container().begin(),
+				begin(m_data.container()),
 				midpoint,
-				m_data.container().end(),
+				end(m_data.container()),
 				indirect_compare(value_comp())
 			);
 			using containers::erase;
-			erase(m_data.container(), position, m_data.container().end());
+			erase(m_data.container(), position, end(m_data.container()));
 		}
 	}
 	void insert(std::initializer_list<value_type> init) {
-		insert(std::begin(init), std::end(init));
+		insert(begin(init), end(init));
 	}
 	
 	// These maintain the relative order of all elements in the container, so I
@@ -384,8 +387,8 @@ private:
 
 	template<typename Key, typename Mapped, BOUNDED_REQUIRES(!dependent_allow_duplicates<Key>)>
 	auto emplace_at(const_iterator position, Key && key, Mapped && mapped) {
-		// Do not decrement an iterator if it might be begin()
-		bool const there_is_element_before = position != begin();
+		// Do not decrement an iterator if it might be begin(*this)
+		bool const there_is_element_before = position != begin(*this);
 		auto const that_element_is_equal = [&](){ return !key_comp()(::containers::prev(position)->key(), key); };
 		bool const already_exists = there_is_element_before and that_element_is_equal();
 		if (already_exists) {
@@ -443,6 +446,8 @@ private:
 	Data m_data;
 };
 
+
+
 template<typename Container, typename Compare>
 class flat_map : private flat_map_base<Container, Compare, false> {
 private:
@@ -464,9 +469,23 @@ public:
 	using base::base;
 	using base::operator=;
 	
-	using base::begin;
-	using base::end;
-	
+	friend constexpr auto begin(flat_map const & container) noexcept {
+		static_assert(noexcept(begin(static_cast<base const &>(container))), "This function assumes begin is noexcept");
+		return begin(static_cast<base const &>(container));
+	}
+	friend constexpr auto begin(flat_map & container) noexcept {
+		static_assert(noexcept(begin(static_cast<base &>(container))), "This function assumes begin is noexcept");
+		return begin(static_cast<base &>(container));
+	}
+	friend constexpr auto end(flat_map const & container) noexcept {
+		static_assert(noexcept(end(static_cast<base const &>(container))), "This function assumes end is noexcept");
+		return end(static_cast<base const &>(container));
+	}
+	friend constexpr auto end(flat_map & container) noexcept {
+		static_assert(noexcept(end(static_cast<base &>(container))), "This function assumes end is noexcept");
+		return end(static_cast<base &>(container));
+	}
+
 	using base::capacity;
 	using base::reserve;
 	using base::shrink_to_fit;
@@ -483,14 +502,14 @@ public:
 
 	mapped_type const & at(key_type const & key) const {
 		auto const it = find(key);
-		if (it == this->end()) {
+		if (it == end(*this)) {
 			throw std::out_of_range{"Key not found"};
 		}
 		return it->mapped;
 	}
 	mapped_type & at(key_type const & key) {
 		auto const it = this->find(key);
-		if (it == this->end()) {
+		if (it == end(*this)) {
 			throw std::out_of_range{"Key not found"};
 		}
 		return it->mapped();
@@ -504,29 +523,30 @@ public:
 
 	std::pair<const_iterator, const_iterator> equal_range(key_type const & key) const {
 		auto const it = find(key);
-		bool const found = it != this->end();
+		bool const found = it != end(*this);
 		return std::make_pair(it, found ? ::containers::next(it) : it);
 	}
 	std::pair<iterator, iterator> equal_range(key_type const & key) {
 		auto const it = find(key);
-		bool const found = it != this->end();
+		bool const found = it != end(*this);
 		return std::make_pair(it, found ? ::containers::next(it) : it);
 	}
 
 	size_type count(key_type const & key) const {
-		bool const found = this->find(key) != this->end();
+		bool const found = this->find(key) != end(*this);
 		return found ? 1 : 0;
 	}
 
 	size_type erase(key_type const & key) {
 		auto const it = this->find(key);
-		if (it == this->end()) {
+		if (it == end(*this)) {
 			return 0;
 		}
 		this->erase(it);
 		return 1;
 	}
 };
+
 
 template<typename Container, typename Compare>
 class flat_multimap : private flat_map_base<Container, Compare, true> {
@@ -550,8 +570,22 @@ public:
 	using base::base;
 	using base::operator=;
 	
-	using base::begin;
-	using base::end;
+	friend constexpr auto begin(flat_multimap const & container) noexcept {
+		static_assert(noexcept(begin(static_cast<base const &>(container))), "This function assumes begin is noexcept");
+		return begin(static_cast<base const &>(container));
+	}
+	friend constexpr auto begin(flat_multimap & container) noexcept {
+		static_assert(noexcept(begin(static_cast<base &>(container))), "This function assumes begin is noexcept");
+		return begin(static_cast<base &>(container));
+	}
+	friend constexpr auto end(flat_multimap const & container) noexcept {
+		static_assert(noexcept(end(static_cast<base const &>(container))), "This function assumes end is noexcept");
+		return end(static_cast<base const &>(container));
+	}
+	friend constexpr auto end(flat_multimap & container) noexcept {
+		static_assert(noexcept(end(static_cast<base &>(container))), "This function assumes end is noexcept");
+		return end(static_cast<base &>(container));
+	}
 	
 	using base::capacity;
 	using base::reserve;
@@ -572,10 +606,10 @@ public:
 	// are unique, so I have slightly different versions in flat_map.
 
 	std::pair<const_iterator, const_iterator> equal_range(key_type const & key) const {
-		return std::equal_range(this->begin(), this->end(), key, key_value_compare{this->key_comp()});
+		return std::equal_range(begin(*this), end(*this), key, key_value_compare{this->key_comp()});
 	}
 	std::pair<iterator, iterator> equal_range(key_type const & key) {
-		return std::equal_range(this->begin(), this->end(), key, key_value_compare{this->key_comp()});
+		return std::equal_range(begin(*this), end(*this), key, key_value_compare{this->key_comp()});
 	}
 
 	size_type count(key_type const & key) const {
@@ -585,7 +619,7 @@ public:
 	
 	size_type erase(key_type const & key) {
 		auto const range = this->equal_range(key);
-		if (range.first == this->end()) {
+		if (range.first == end(*this)) {
 			return 0;
 		}
 		auto const distance = std::distance(range.first, range.second);
@@ -595,6 +629,7 @@ public:
 };
 
 }	// namespace detail
+
 
 template<typename Key, typename T, typename Compare = std::less<Key>, typename Allocator = allocator<detail::map_value_type<Key, T>>>
 using flat_map = detail::flat_map<vector<detail::map_value_type<Key, T>, Allocator>, Compare>;

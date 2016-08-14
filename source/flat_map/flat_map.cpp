@@ -95,22 +95,22 @@ private:
 template<typename Container>
 void test_unique_copy_less(Container const & source, Container const & expected) {
 	Container destination(size(source), 0);
-	auto const it = containers::unique_copy_less(source.begin(), source.end(), destination.begin());
-	erase(destination, it, destination.end());
+	auto const it = containers::unique_copy_less(begin(source), end(source), begin(destination));
+	erase(destination, it, end(destination));
 	assert(destination == expected);
 }
 
 template<typename Container>
 void test_unique_inplace_less(Container source, Container const & expected) {
-	auto const it = containers::unique_copy_less(source.begin(), source.end());
-	erase(source, it, source.end());
+	auto const it = containers::unique_copy_less(begin(source), end(source));
+	erase(source, it, end(source));
 	assert(source == expected);
 }
 
 template<typename Container>
 void test_unique_less(Container source, Container const & expected) {
-	assert(std::is_sorted(source.begin(), source.end()));
-	assert(std::is_sorted(expected.begin(), expected.end()));
+	assert(std::is_sorted(begin(source), end(source)));
+	assert(std::is_sorted(begin(expected), end(expected)));
 	test_unique_copy_less(source, expected);
 	test_unique_copy_less(std::move(source), expected);
 }
@@ -118,8 +118,8 @@ void test_unique_less(Container source, Container const & expected) {
 template<typename Container>
 void test_unique_merge_copy(Container const & lhs, Container const & rhs, Container const & expected) {
 	Container result(typename Container::size_type(size(lhs) + size(rhs)), 0);
-	auto const it = containers::unique_merge_copy(lhs.begin(), lhs.end(), rhs.begin(), rhs.end(), result.begin());
-	erase(result, it, result.end());
+	auto const it = containers::unique_merge_copy(begin(lhs), end(lhs), begin(rhs), end(rhs), begin(result));
+	erase(result, it, end(result));
 
 	assert(result == expected);
 }
@@ -127,17 +127,17 @@ void test_unique_merge_copy(Container const & lhs, Container const & rhs, Contai
 template<typename Container>
 void test_unique_inplace_merge(Container v, Container const & other, Container const & expected) {
 	auto const midpoint = static_cast<typename Container::iterator::difference_type>(size(v));
-	v.insert(v.end(), other.begin(), other.end());
-	auto const it = containers::unique_inplace_merge(v.begin(), v.begin() + midpoint, v.end());
-	erase(v, it, v.end());
+	v.insert(end(v), begin(other), end(other));
+	auto const it = containers::unique_inplace_merge(begin(v), begin(v) + midpoint, end(v));
+	erase(v, it, end(v));
 
 	assert(v == expected);
 }
 
 template<typename Container>
 void test_unique_merge(Container v, Container const & other, Container const & expected) {
-	assert(std::is_sorted(v.begin(), v.end()));
-	assert(std::is_sorted(other.begin(), other.end()));
+	assert(std::is_sorted(begin(v), end(v)));
+	assert(std::is_sorted(begin(other), end(other)));
 	test_unique_merge_copy(v, other, expected);
 	test_unique_inplace_merge(std::move(v), other, expected);
 }
@@ -293,7 +293,7 @@ void test_performance(std::size_t const loop_count) {
 	auto const start = high_resolution_clock::now();
 
 	TimeDestructor destructor;
-	map_type<Key, Value> map(source.begin(), source.end());
+	map_type<Key, Value> map(begin(source), end(source));
 	auto const constructed = high_resolution_clock::now();
 	#if defined TRACK_COMPARISONS
 		auto const constructed_comparisons = number_of_comparisons;
@@ -318,7 +318,7 @@ void test_performance(std::size_t const loop_count) {
 		auto ignore = [](auto &&){};
 		ignore(thing);
 	}
-	map.insert(additional_batch.begin(), additional_batch.end());
+	map.insert(begin(additional_batch), end(additional_batch));
 	auto const inserted_batch = high_resolution_clock::now();
 	#if defined TRACK_COMPARISONS
 		auto const inserted_batch_comparisons = number_of_comparisons;

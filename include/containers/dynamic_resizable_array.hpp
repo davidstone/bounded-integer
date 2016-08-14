@@ -50,7 +50,7 @@ struct dynamic_resizable_array : private Container {
 		if (count > capacity()) {
 			this->relocate(count);
 		}
-		::containers::uninitialized_default_construct(begin(), begin() + count, get_allocator());
+		::containers::uninitialized_default_construct(begin(*this), begin(*this) + count, get_allocator());
 		this->set_size(count);
 	}
 	template<typename Count, BOUNDED_REQUIRES(std::is_convertible<Count, size_type>::value)>
@@ -59,7 +59,7 @@ struct dynamic_resizable_array : private Container {
 	{
 		auto const repeat = detail::repeat_n(count, value);
 		assert(size(repeat) == count);
-		assign(*this, repeat.begin(), repeat.end());
+		assign(*this, begin(repeat), end(repeat));
 	}
 	
 	template<typename ForwardIterator, typename Sentinel, BOUNDED_REQUIRES(is_iterator_sentinel<ForwardIterator, Sentinel>)>
@@ -70,14 +70,14 @@ struct dynamic_resizable_array : private Container {
 	}
 	
 	constexpr dynamic_resizable_array(std::initializer_list<value_type> init, allocator_type allocator = allocator_type()) BOUNDED_NOEXCEPT_INITIALIZATION(
-		dynamic_resizable_array(init.begin(), init.end(), std::move(allocator))
+		dynamic_resizable_array(begin(init), end(init), std::move(allocator))
 	) {}
 
 	constexpr dynamic_resizable_array(dynamic_resizable_array const & other, allocator_type allocator) BOUNDED_NOEXCEPT_INITIALIZATION(
-		dynamic_resizable_array(other.begin(), other.end(), std::move(allocator))
+		dynamic_resizable_array(begin(other), end(other), std::move(allocator))
 	) {}
 	constexpr dynamic_resizable_array(dynamic_resizable_array const & other) BOUNDED_NOEXCEPT_INITIALIZATION(
-		dynamic_resizable_array(other.begin(), other.end(), other.get_allocator())
+		dynamic_resizable_array(begin(other), end(other), other.get_allocator())
 	) {}
 
 	constexpr dynamic_resizable_array(dynamic_resizable_array && other, allocator_type allocator) noexcept:
@@ -91,27 +91,41 @@ struct dynamic_resizable_array : private Container {
 	}
 
 	constexpr auto & operator=(dynamic_resizable_array const & other) & noexcept(std::is_nothrow_copy_assignable<value_type>::value) {
-		assign(*this, other.begin(), other.end());
+		assign(*this, begin(other), end(other));
 		return *this;
 	}
 	constexpr auto & operator=(dynamic_resizable_array && other) & noexcept {
-		::containers::detail::destroy(get_allocator(), begin(), end());
+		::containers::detail::destroy(get_allocator(), begin(*this), end(*this));
 		this->move_assign_to_empty(std::move(other));
 		return *this;
 	}
 
 	constexpr auto & operator=(std::initializer_list<value_type> init) & {
-		assign(*this, init.begin(), init.end());
+		assign(*this, begin(init), end(init));
 		return *this;
 	}
 
 	~dynamic_resizable_array() {
-		::containers::detail::destroy(get_allocator(), begin(), end());
+		::containers::detail::destroy(get_allocator(), begin(*this), end(*this));
 	}
 
 
-	using Container::begin;
-	using Container::end;
+	friend constexpr auto begin(dynamic_resizable_array const & container) noexcept {
+		static_assert(noexcept(begin(static_cast<Container const &>(container))), "This function assumes begin is noexcept");
+		return begin(static_cast<Container const &>(container));
+	}
+	friend constexpr auto begin(dynamic_resizable_array & container) noexcept {
+		static_assert(noexcept(begin(static_cast<Container &>(container))), "This function assumes begin is noexcept");
+		return begin(static_cast<Container &>(container));
+	}
+	friend constexpr auto end(dynamic_resizable_array const & container) noexcept {
+		static_assert(noexcept(end(static_cast<Container const &>(container))), "This function assumes end is noexcept");
+		return end(static_cast<Container const &>(container));
+	}
+	friend constexpr auto end(dynamic_resizable_array & container) noexcept {
+		static_assert(noexcept(end(static_cast<Container &>(container))), "This function assumes end is noexcept");
+		return end(static_cast<Container &>(container));
+	}
 
 	CONTAINERS_OPERATOR_BRACKET_DEFINITIONS
 	
@@ -134,7 +148,7 @@ struct dynamic_resizable_array : private Container {
 		} else {
 			auto temp = this->make_storage(new_capacity());
 			::containers::detail::construct(get_allocator(), data(temp) + capacity(), std::forward<Args>(args)...);
-			::containers::uninitialized_move_destroy(begin(), end(), data(temp), get_allocator());
+			::containers::uninitialized_move_destroy(begin(*this), end(*this), data(temp), get_allocator());
 			this->relocate_preallocated(std::move(temp));
 		}
 		add_size(1_bi);
@@ -144,8 +158,8 @@ struct dynamic_resizable_array : private Container {
 	template<typename... Args>
 	auto emplace(const_iterator const position, Args && ... args) {
 		check_iterator_validity(position);
-		auto const offset = position - begin();
-		if (position == end()) {
+		auto const offset = position - begin(*this);
+		if (position == end(*this)) {
 			emplace_back(std::forward<Args>(args)...);
 		} else if (size(*this) != capacity()) {
 			detail::emplace_in_middle_no_reallocation(*this, position, get_allocator(), std::forward<Args>(args)...);
@@ -158,14 +172,14 @@ struct dynamic_resizable_array : private Container {
 			// elements it references before constructing it
 			auto && allocator = get_allocator();
 			::containers::detail::construct(allocator, data(temp) + offset, std::forward<Args>(args)...);
-			auto const mutable_position = begin() + offset;
-			auto const pointer = ::containers::uninitialized_move_destroy(begin(), mutable_position, data(temp), allocator);
+			auto const mutable_position = begin(*this) + offset;
+			auto const pointer = ::containers::uninitialized_move_destroy(begin(*this), mutable_position, data(temp), allocator);
 			assert(data(temp) + offset == pointer);
-			::containers::uninitialized_move_destroy(mutable_position, end(), ::containers::next(pointer), allocator);
+			::containers::uninitialized_move_destroy(mutable_position, end(*this), ::containers::next(pointer), allocator);
 			this->relocate_preallocated(std::move(temp));
 			add_size(1_bi);
 		}
-		return begin() + offset;
+		return begin(*this) + offset;
 	}
 
 	// TODO: Check if the range lies within the container
@@ -173,7 +187,7 @@ struct dynamic_resizable_array : private Container {
 	template<typename ForwardIterator, typename Sentinel>
 	auto insert(const_iterator const position, ForwardIterator first, Sentinel last) {
 		check_iterator_validity(position);
-		if (position == end()) {
+		if (position == end(*this)) {
 			return append(*this, first, last);
 		}
 
@@ -192,14 +206,14 @@ struct dynamic_resizable_array : private Container {
 		// There is a reallocation required, so just put everything in the
 		// correct place to begin with
 		auto temp = this->make_storage(new_capacity());
-		auto const offset = position - begin();
+		auto const offset = position - begin(*this);
 		// First construct the new element because it may reference an old
 		// element, and we do not want to move elements it references
 		::containers::uninitialized_copy(first, last, data(temp) + offset, get_allocator());
-		auto const mutable_position = begin() + offset;
-		auto const pointer = ::containers::uninitialized_move_destroy(begin(), mutable_position, data(temp), get_allocator());
+		auto const mutable_position = begin(*this) + offset;
+		auto const pointer = ::containers::uninitialized_move_destroy(begin(*this), mutable_position, data(temp), get_allocator());
 		assert(data(temp) + offset == pointer);
-		::containers::uninitialized_move_destroy(mutable_position, end(), pointer + range_size, get_allocator());
+		::containers::uninitialized_move_destroy(mutable_position, end(*this), pointer + range_size, get_allocator());
 		this->relocate_preallocated(std::move(temp));
 		add_size(range_size);
 		return mutable_position;
@@ -218,14 +232,15 @@ private:
 		this->set_size(size(*this) + s)
 	)
 	constexpr auto check_iterator_validity(const_iterator it) {
-		assert(it >= begin());
-		assert(it <= end());
+		assert(it >= begin(*this));
+		assert(it <= end(*this));
 	}
 	constexpr auto new_capacity() const {
 		using capacity_type = bounded::equivalent_type<size_type, bounded::throw_policy<>>;
 		return bounded::max(1_bi, capacity_type(capacity() * 2_bi));
 	}
 };
+
 
 }	// namespace detail
 }	// namespace containers

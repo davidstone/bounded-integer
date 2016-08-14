@@ -55,17 +55,17 @@ struct vector_base {
 		m_size = std::exchange(other.m_size, 0_bi);
 	}
 
-	auto begin() const noexcept {
-		return const_iterator(data(m_container), detail::iterator_constructor);
+	friend constexpr auto begin(vector_base const & container) noexcept {
+		return typename vector_base::const_iterator(data(container.m_container), detail::iterator_constructor);
 	}
-	auto begin() noexcept {
-		return iterator(data(m_container), detail::iterator_constructor);
+	friend constexpr auto begin(vector_base & container) noexcept {
+		return typename vector_base::iterator(data(container.m_container), detail::iterator_constructor);
 	}
-	auto end() const noexcept {
-		return begin() + m_size;
+	friend constexpr auto end(vector_base const & container) noexcept {
+		return begin(container) + container.m_size;
 	}
-	auto end() noexcept {
-		return begin() + m_size;
+	friend constexpr auto end(vector_base & container) noexcept {
+		return begin(container) + container.m_size;
 	}
 
 	constexpr auto capacity() const noexcept {
@@ -84,7 +84,7 @@ struct vector_base {
 	template<typename Size>
 	auto relocate(Size const requested_capacity) {
 		auto temp = make_storage(requested_capacity);
-		::containers::uninitialized_move_destroy(begin(), end(), temp.begin(), get_allocator());
+		::containers::uninitialized_move_destroy(begin(*this), end(*this), begin(temp), get_allocator());
 		relocate_preallocated(std::move(temp));
 	}
 	

@@ -27,11 +27,11 @@ namespace detail {
 template<typename Container, BOUNDED_REQUIRES(is_container<Container>)>
 constexpr auto operator_bracket(Container && container, index_type<std::decay_t<Container>> const index) noexcept(
 	noexcept(index < size(container)) and
-	noexcept(*(std::forward<Container>(container).begin() + index)) and
-	std::is_nothrow_move_constructible<decltype(*(std::forward<Container>(container).begin() + index))>::value
-) -> decltype(*(std::forward<Container>(container).begin() + index)) {
+	noexcept(*(begin(std::forward<Container>(container)) + index)) and
+	std::is_nothrow_move_constructible<decltype(*(begin(std::forward<Container>(container)) + index))>::value
+) -> decltype(*(begin(std::forward<Container>(container)) + index)) {
 	assert(index < size(container));
-	return *(std::forward<Container>(container).begin() + index);
+	return *(begin(std::forward<Container>(container)) + index);
 }
 
 

@@ -46,8 +46,19 @@ public:
 	
 	using base::operator=;
 	
-	using base::begin;
-	using base::end;
+	friend constexpr auto begin(basic_string const & container) noexcept {
+		return begin(static_cast<base const &>(container));
+	}
+	friend constexpr auto begin(basic_string & container) noexcept {
+		return begin(static_cast<base &>(container));
+	}
+	friend constexpr auto end(basic_string const & container) noexcept {
+		return end(static_cast<base const &>(container));
+	}
+	friend constexpr auto end(basic_string & container) noexcept {
+		return end(static_cast<base &>(container));
+	}
+
 	using base::operator[];
 	
 	using base::capacity;
@@ -66,7 +77,7 @@ public:
 
 template<typename T, typename Allocator>
 constexpr auto operator==(basic_string<T, Allocator> const & lhs, T const * const rhs) BOUNDED_NOEXCEPT_VALUE(
-	::containers::equal(lhs.begin(), lhs.end(), rhs, rhs + std::strlen(rhs))
+	::containers::equal(begin(lhs), end(lhs), rhs, rhs + std::strlen(rhs))
 )
 template<typename T, typename Allocator>
 constexpr auto operator==(T const * const lhs, basic_string<T, Allocator> const & rhs) BOUNDED_NOEXCEPT_VALUE(
@@ -76,11 +87,11 @@ constexpr auto operator==(T const * const lhs, basic_string<T, Allocator> const 
 
 template<typename T, typename Allocator>
 constexpr auto operator<(basic_string<T, Allocator> const & lhs, T const * const rhs) BOUNDED_NOEXCEPT_VALUE(
-	::containers::lexicographical_compare(lhs.begin(), lhs.end(), rhs, rhs + std::strlen(rhs))
+	::containers::lexicographical_compare(begin(lhs), end(lhs), rhs, rhs + std::strlen(rhs))
 )
 template<typename T, typename Allocator>
 constexpr auto operator<(T const * const lhs, basic_string<T, Allocator> const & rhs) BOUNDED_NOEXCEPT_VALUE(
-	::containers::lexicographical_compare(lhs, lhs + std::strlen(lhs), rhs.begin(), rhs.end())
+	::containers::lexicographical_compare(lhs, lhs + std::strlen(lhs), begin(rhs), end(rhs))
 )
 
 
@@ -90,18 +101,18 @@ template<typename T, typename Allocator>
 auto operator+(basic_string<T, Allocator> const & lhs, basic_string<T, Allocator> const & rhs) {
 	basic_string<T, Allocator> result;
 	result.reserve(size(lhs) + size(rhs));
-	append(result, lhs.begin(), lhs.end());
-	append(result, rhs.begin(), rhs.end());
+	append(result, begin(lhs), end(lhs));
+	append(result, begin(rhs), end(rhs));
 	return result;
 }
 template<typename T, typename Allocator>
 auto operator+(basic_string<T, Allocator> && lhs, basic_string<T, Allocator> const & rhs) {
-	append(lhs, rhs.begin(), rhs.end());
+	append(lhs, begin(rhs), end(rhs));
 	return std::move(lhs);
 }
 template<typename T, typename Allocator>
 auto operator+(basic_string<T, Allocator> const & lhs, basic_string<T, Allocator> && rhs) {
-	rhs.insert(rhs.begin(), lhs.begin(), lhs.end());
+	rhs.insert(begin(rhs), begin(lhs), end(lhs));
 	return std::move(rhs);
 }
 template<typename T, typename Allocator>
@@ -118,7 +129,7 @@ auto operator+(basic_string<T, Allocator> const & lhs, T const * const rhs) {
 	auto const rhs_size = std::strlen(rhs);
 	basic_string<T, Allocator> result;
 	result.reserve(size(lhs) + rhs_size);
-	append(result, lhs.begin(), lhs.end());
+	append(result, begin(lhs), end(lhs));
 	append(result, rhs, rhs + rhs_size);
 	return result;
 }
@@ -133,12 +144,12 @@ auto operator+(T const * const lhs, basic_string<T, Allocator> const & rhs) {
 	basic_string<T, Allocator> result;
 	result.reserve(lhs_size + size(lhs));
 	append(result, lhs, lhs + lhs_size);
-	append(result, rhs.begin(), rhs.end());
+	append(result, begin(rhs), end(rhs));
 	return result;
 }
 template<typename T, typename Allocator>
 auto operator+(T const * const lhs, basic_string<T, Allocator> && rhs) {
-	rhs.insert(rhs.begin(), lhs, lhs + std::strlen(rhs));
+	rhs.insert(begin(rhs), lhs, lhs + std::strlen(rhs));
 	return std::move(rhs);
 }
 

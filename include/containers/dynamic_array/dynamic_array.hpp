@@ -39,16 +39,19 @@ template<typename T>
 struct dynamic_array_data_t {
 	using size_type = bounded::integer<0, maximum_array_size<T>>;
 	
-	constexpr auto begin() const noexcept {
-		return pointer;
-	}
-	constexpr auto end() const noexcept {
-		return pointer + size;
-	}
-
 	uninitialized_storage<T> * pointer = nullptr;
 	size_type size = 0_bi;
 };
+
+template<typename T>
+constexpr auto begin(dynamic_array_data_t<T> const container) noexcept {
+	return container.pointer;
+}
+template<typename T>
+constexpr auto end(dynamic_array_data_t<T> const container) noexcept {
+	return begin(container) + container.size;
+}
+
 
 template<typename T, typename Size>
 constexpr auto dynamic_array_data(T * const pointer, Size const size) noexcept {
@@ -84,7 +87,7 @@ auto deallocate_storage(Allocator & allocator, dynamic_array_data_t<T> const dat
 
 template<typename Allocator, typename T>
 constexpr auto cleanup(Allocator & allocator, dynamic_array_data_t<T> const data) noexcept {
-	::containers::detail::destroy(allocator, data.begin(), data.end());
+	::containers::detail::destroy(allocator, begin(data), end(data));
 	deallocate_storage(allocator, data);
 }
 
@@ -100,7 +103,7 @@ auto dynamic_array_initializer(ForwardIterator first, Sentinel const last, Alloc
 	using value_type = typename Allocator::value_type;
 	auto const data = make_storage<value_type>(allocator, ::containers::distance(first, last));
 	try {
-		::containers::uninitialized_copy(first, last, data.begin(), allocator);
+		::containers::uninitialized_copy(first, last, begin(data), allocator);
 	} catch(...) {
 		deallocate_storage(allocator, data);
 		throw;
@@ -118,7 +121,7 @@ auto dynamic_array_initializer(Size const size, Allocator & allocator) {
 	using value_type = typename Allocator::value_type;
 	auto const data = make_storage<value_type>(allocator, size);
 	try {
-		::containers::uninitialized_default_construct(data.begin(), data.end(), allocator);
+		::containers::uninitialized_default_construct(begin(data), end(data), allocator);
 	} catch(...) {
 		deallocate_storage(allocator, data);
 		throw;
@@ -166,7 +169,7 @@ struct dynamic_array : private detail::rebound_allocator<T, Allocator> {
 	}
 	
 	constexpr dynamic_array(std::initializer_list<value_type> init, allocator_type allocator = allocator_type{}):
-		dynamic_array(init.begin(), init.end(), std::move(allocator))
+		dynamic_array(begin(init), end(init), std::move(allocator))
 	{
 	}
 
@@ -181,11 +184,11 @@ struct dynamic_array : private detail::rebound_allocator<T, Allocator> {
 		allocator_type(std::move(allocator))
 	{
 		auto const range = ::containers::detail::repeat_n(count, value);
-		m_data = ::containers::detail::dynamic_array_initializer(range.begin(), range.end(), get_allocator());
+		m_data = ::containers::detail::dynamic_array_initializer(begin(range), end(range), get_allocator());
 	}
 	
 	constexpr dynamic_array(dynamic_array const & other, allocator_type allocator):
-		dynamic_array(other.begin(), other.end(), std::move(allocator))
+		dynamic_array(begin(other), end(other), std::move(allocator))
 	{
 	}
 	constexpr dynamic_array(dynamic_array const & other):
@@ -208,7 +211,7 @@ struct dynamic_array : private detail::rebound_allocator<T, Allocator> {
 	}
 
 	constexpr auto & operator=(dynamic_array const & other) & {
-		assign(*this, other.begin(), other.end());
+		assign(*this, begin(other), end(other));
 		return *this;
 	}
 	constexpr auto & operator=(dynamic_array && other) & noexcept {
@@ -217,18 +220,18 @@ struct dynamic_array : private detail::rebound_allocator<T, Allocator> {
 		return *this;
 	}
 	
-	constexpr auto begin() const noexcept {
-		return const_iterator(m_data.pointer, detail::iterator_constructor);
+	friend constexpr auto begin(dynamic_array const & container) noexcept {
+		return const_iterator(container.m_data.pointer, detail::iterator_constructor);
 	}
-	constexpr auto begin() noexcept {
-		return iterator(m_data.pointer, detail::iterator_constructor);
+	friend constexpr auto begin(dynamic_array & container) noexcept {
+		return iterator(container.m_data.pointer, detail::iterator_constructor);
 	}
 	
-	constexpr auto end() const noexcept {
-		return begin() + m_data.size;
+	friend constexpr auto end(dynamic_array const & container) noexcept {
+		return begin(container) + container.m_data.size;
 	}
-	constexpr auto end() noexcept {
-		return begin() + m_data.size;
+	friend constexpr auto end(dynamic_array & container) noexcept {
+		return begin(container) + container.m_data.size;
 	}
 
 	CONTAINERS_OPERATOR_BRACKET_DEFINITIONS
@@ -242,7 +245,7 @@ template<typename T, typename ForwardIterator, typename Sentinel, BOUNDED_REQUIR
 auto assign(dynamic_array<T> & container, ForwardIterator first, Sentinel const last) {
 	auto const difference = ::containers::distance(first, last);
 	if (difference == size(container)) {
-		::containers::copy(first, last, container.begin());
+		::containers::copy(first, last, begin(container));
 	} else {
 		clear(container);
 		container = dynamic_array<T>(first, last);
@@ -263,5 +266,4 @@ auto resize(common_resize_tag, dynamic_array<T> & container, Size const count, M
 }
 
 }	// namespace detail
-
 }	// namespace containers

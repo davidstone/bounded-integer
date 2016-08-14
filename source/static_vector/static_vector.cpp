@@ -32,16 +32,16 @@ namespace constexpr_static_vector {
 		value.emplace_back(5);
 		value.emplace_back(15);
 		value.emplace_back(20);
-		value.emplace(value.begin() + 1_bi, 10);
+		value.emplace(begin(value) + 1_bi, 10);
 		value.pop_back();
 		auto copy = containers::static_vector<int, 10>{};
 		copy = value;
-		copy.insert(copy.begin() + 1_bi, value.begin(), value.end());
+		copy.insert(begin(copy) + 1_bi, begin(value), end(value));
 		return copy;
 	}
 	constexpr auto made = make();
 	constexpr auto expected = containers::make_array(5, 5, 10, 15, 10, 15);
-	static_assert(containers::equal(made.begin(), made.end(), expected.begin(), expected.end()));
+	static_assert(containers::equal(begin(made), end(made), begin(expected), end(expected)));
 	static_assert(made == made);
 	
 	constexpr auto bounded_integer_element = containers::static_vector<bounded::integer<0, 10>, 1>(1_bi, 2_bi);
@@ -59,8 +59,8 @@ void test_generic(T const & t, std::initializer_list<T> init) {
 	auto const count = container(capacity);
 	assert(size(count) == capacity);
 
-	assert(default_constructed.begin() == default_constructed.begin());
-	assert(default_constructed.begin() == default_constructed.end());
+	assert(begin(default_constructed) == begin(default_constructed));
+	assert(begin(default_constructed) == end(default_constructed));
 	
 	for (auto const & value : count) {
 		assert(value == T{});
@@ -82,10 +82,10 @@ void test_generic(T const & t, std::initializer_list<T> init) {
 	}
 
 	auto const init_list = container(init);
-	assert(std::equal(init_list.begin(), init_list.end(), init.begin(), init.end()));
+	assert(std::equal(begin(init_list), end(init_list), begin(init), end(init)));
 	
 	auto copy = init_list;
-	assert(std::equal(copy.begin(), copy.end(), init.begin(), init.end()));
+	assert(std::equal(begin(copy), end(copy), begin(init), end(init)));
 	
 	auto move = std::move(copy);
 	clear(copy);
@@ -115,7 +115,7 @@ void test_generic(T const & t, std::initializer_list<T> init) {
 	assert(size(copy) == 1_bi);
 	assert(back(copy) == t);
 	clear(copy);
-	insert(copy, copy.begin(), t);
+	insert(copy, begin(copy), t);
 	assert(size(copy) == 1_bi);
 	assert(back(copy) == t);
 	
@@ -163,11 +163,11 @@ int main() {
 	static_assert(!containers::is_iterator<containers::static_vector<std::string, 6>>);
 	static_assert(containers::is_container<containers::static_vector<std::string, 6>>);
 
-	insert(container, container.begin() + 1_bi, 5_bi, 12);
+	insert(container, begin(container) + 1_bi, 5_bi, 12);
 	auto const expected = { 1, 12, 12, 12, 12, 12, 2, 3 };
-	assert(std::equal(container.begin(), container.end(), expected.begin(), expected.end()));
+	assert(std::equal(begin(container), end(container), begin(expected), end(expected)));
 	
 	containers::static_vector<non_copyable, 10> test_no_copies;
 	test_no_copies.emplace_back();
-	insert(test_no_copies, test_no_copies.begin(), non_copyable{});
+	insert(test_no_copies, begin(test_no_copies), non_copyable{});
 }

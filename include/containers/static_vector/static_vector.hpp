@@ -48,9 +48,9 @@ struct static_vector_data<T, capacity, true> {
 template<typename T, std::size_t capacity>
 struct static_vector_data<T, capacity, false> : static_vector_data<T, capacity, true> {
 	~static_vector_data() {
-		auto const begin = this->m_container.begin();
-		auto const end = begin + this->m_size;
-		::containers::detail::destroy(allocator<T>{}, begin, end);
+		auto const first = begin(this->m_container);
+		auto const last = first + this->m_size;
+		::containers::detail::destroy(allocator<T>{}, first, last);
 	}
 };
 
@@ -84,41 +84,41 @@ struct static_vector : private detail::static_vector_data<T, capacity_> {
 	}
 	
 	constexpr static_vector(static_vector const & other) BOUNDED_NOEXCEPT_INITIALIZATION(
-		static_vector(other.begin(), other.end())
+		static_vector(begin(other), end(other))
 	) {}
 	constexpr static_vector(static_vector && other) BOUNDED_NOEXCEPT_INITIALIZATION(
-		static_vector(::containers::move_iterator(other.begin()), ::containers::move_iterator(other.end()))
+		static_vector(begin(std::move(other)), end(std::move(other)))
 	) {}
 
 	constexpr static_vector(std::initializer_list<value_type> init) BOUNDED_NOEXCEPT_INITIALIZATION(
-		static_vector(init.begin(), init.end())
+		static_vector(begin(init), end(init))
 	) {}
 
 	constexpr auto & operator=(static_vector const & other) & noexcept(std::is_nothrow_copy_assignable<value_type>::value) {
-		assign(*this, other.begin(), other.end());
+		assign(*this, begin(other), end(other));
 		return *this;
 	}
 	constexpr auto & operator=(static_vector && other) & noexcept(std::is_nothrow_move_assignable<value_type>::value) {
-		assign(*this, ::containers::move_iterator(other.begin()), ::containers::move_iterator(other.end()));
+		assign(*this, begin(std::move(other)), end(std::move(other)));
 		return *this;
 	}
-	constexpr auto & operator=(std::initializer_list<value_type> init) & noexcept(noexcept(assign(std::declval<static_vector &>(), init.begin(), init.end()))) {
-		assign(*this, init.begin(), init.end());
+	constexpr auto & operator=(std::initializer_list<value_type> init) & noexcept(noexcept(assign(std::declval<static_vector &>(), containers::begin(init), containers::end(init)))) {
+		assign(*this, begin(init), end(init));
 		return *this;
 	}
 
 
-	constexpr auto begin() const noexcept {
-		return const_iterator(data(this->m_container), detail::iterator_constructor);
+	friend constexpr auto begin(static_vector const & container) noexcept {
+		return const_iterator(data(container.m_container), detail::iterator_constructor);
 	}
-	constexpr auto begin() noexcept {
-		return iterator(data(this->m_container), detail::iterator_constructor);
+	friend constexpr auto begin(static_vector & container) noexcept {
+		return iterator(data(container.m_container), detail::iterator_constructor);
 	}
-	constexpr auto end() const noexcept {
-		return begin() + this->m_size;
+	friend constexpr auto end(static_vector const & container) noexcept {
+		return begin(container) + container.m_size;
 	}
-	constexpr auto end() noexcept {
-		return begin() + this->m_size;
+	friend constexpr auto end(static_vector & container) noexcept {
+		return begin(container) + container.m_size;
 	}
 
 
@@ -137,7 +137,7 @@ struct static_vector : private detail::static_vector_data<T, capacity_> {
 	
 	template<typename... Args>
 	constexpr auto emplace(const_iterator const position, Args && ... args) {
-		if (position == end()) {
+		if (position == end(*this)) {
 			emplace_back(std::forward<Args>(args)...);
 		} else {
 			detail::emplace_in_middle_no_reallocation(*this, position, get_allocator(), std::forward<Args>(args)...);
@@ -146,7 +146,7 @@ struct static_vector : private detail::static_vector_data<T, capacity_> {
 	}
 	template<typename ForwardIterator, typename Sentinel>
 	constexpr auto insert(const_iterator const position, ForwardIterator first, Sentinel last) {
-		if (position == end()) {
+		if (position == end(*this)) {
 			return append(*this, first, last);
 		}
 
@@ -182,5 +182,6 @@ private:
 		}
 	}
 };
+
 
 }	// namespace containers

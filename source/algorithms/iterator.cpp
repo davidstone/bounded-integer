@@ -20,8 +20,8 @@ constexpr struct {
 constexpr auto check_filter() {
 	constexpr auto source = containers::make_array(1_bi, 2_bi, 3_bi, 2_bi, 4_bi, 5_bi, 6_bi, 8_bi);
 	constexpr auto expected = containers::make_array(2_bi, 2_bi, 4_bi, 6_bi, 8_bi);
-	auto first = containers::filter_iterator(source.begin(), source.end(), is_even);
-	return containers::equal(first, source.end(), expected.begin(), expected.end());
+	auto first = containers::filter_iterator(begin(source), end(source), is_even);
+	return containers::equal(first, end(source), begin(expected), end(expected));
 }
 
 static_assert(check_filter());

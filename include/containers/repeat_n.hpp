@@ -1,10 +1,11 @@
-// Copyright David Stone 2015.
+// Copyright David Stone 2016.
 // Distributed under the Boost Software License, Version 1.0.
 // (See accompanying file LICENSE_1_0.txt or copy at
 // http://www.boost.org/LICENSE_1_0.txt)
 
 #pragma once
 
+#include <containers/algorithms/iterator.hpp>
 #include <containers/common_iterator_functions.hpp>
 #include <containers/operator_bracket.hpp>
 
@@ -85,7 +86,6 @@ constexpr auto operator<(repeat_n_sentinel, repeat_n_iterator<Size, T>) {
 	return false;
 }
 
-
 template<typename Size, typename T>
 struct repeat_n_t {
 	using size_type = Size;
@@ -100,11 +100,8 @@ struct repeat_n_t {
 	{
 	}
 
-	constexpr auto begin() const noexcept {
-		return const_iterator(m_size, m_value);
-	}
-	constexpr auto end() const noexcept {
-		return repeat_n_sentinel{};
+	friend constexpr auto begin(repeat_n_t const & container) noexcept {
+		return typename repeat_n_t::const_iterator(container.m_size, container.m_value);
 	}
 
 	CONTAINERS_OPERATOR_BRACKET_DEFINITIONS
@@ -114,6 +111,10 @@ private:
 	value_type m_value;
 };
 
+template<typename Size, typename T>
+constexpr auto end(repeat_n_t<Size, T> const &) noexcept {
+	return repeat_n_sentinel{};
+}
 
 template<typename Size, typename T>
 constexpr auto repeat_n(Size const size, T && value) {

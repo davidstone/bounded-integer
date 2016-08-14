@@ -153,7 +153,7 @@ auto unique_inplace_merge(MutableForwardIterator first, MutableForwardIterator m
 	if (less(*middle, *first)) {
 		storage_type temp(::containers::move_iterator(first), ::containers::move_iterator(middle));
 		return ::containers::unique_merge_copy(
-			::containers::move_iterator(temp.begin()), ::containers::move_iterator(temp.end()),
+			::containers::move_iterator(begin(temp)), ::containers::move_iterator(end(temp)),
 			::containers::move_iterator(middle), ::containers::move_iterator(last),
 			first,
 			less
@@ -193,7 +193,7 @@ auto unique_inplace_merge(MutableForwardIterator first, MutableForwardIterator m
 		return unique_less(first_.base(), last_.base(), less);
 	};
 	return ::containers::detail::unique_merge_common(
-		::containers::move_iterator(temp.begin()), ::containers::move_iterator(temp.end()),
+		::containers::move_iterator(begin(temp)), ::containers::move_iterator(end(temp)),
 		::containers::move_iterator(new_middle), ::containers::move_iterator(last),
 		first_to_move.target,
 		less,

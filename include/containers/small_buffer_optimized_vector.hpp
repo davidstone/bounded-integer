@@ -121,7 +121,7 @@ struct sbo_vector_base : private detail::rebound_allocator<T, Allocator> {
 		deallocate_large();
 		if (other.is_small()) {
 			::bounded::construct(m_small);
-			::containers::uninitialized_move_destroy(other.begin(), other.end(), m_small.data.begin(), get_allocator());
+			::containers::uninitialized_move_destroy(begin(other), end(other), begin(m_small.data), get_allocator());
 			m_small.size = other.m_small.size;
 			other.m_small.size = 0;
 		} else {
@@ -132,22 +132,26 @@ struct sbo_vector_base : private detail::rebound_allocator<T, Allocator> {
 		}
 	}
 
-	auto begin() const noexcept {
-		auto const result = is_small() ? reinterpret_cast<value_type const *>(data(m_small.data)) : m_large.pointer;
+	friend constexpr auto begin(sbo_vector_base const & container) noexcept {
+		auto const result = container.is_small() ?
+			reinterpret_cast<value_type const *>(data(container.m_small.data)) :
+			container.m_large.pointer;
 		assert(result != nullptr);
 		return const_iterator(result, detail::iterator_constructor);
 	}
-	auto begin() noexcept {
-		auto const result = is_small() ? reinterpret_cast<value_type *>(data(m_small.data)) : m_large.pointer;
+	friend constexpr auto begin(sbo_vector_base & container) noexcept {
+		auto const result = container.is_small() ?
+			reinterpret_cast<value_type *>(data(container.m_small.data)) :
+			container.m_large.pointer;
 		assert(result != nullptr);
 		return iterator(result, detail::iterator_constructor);
 	}
 	
-	auto end() const noexcept {
-		return begin() + size();
+	friend constexpr auto end(sbo_vector_base const & container) noexcept {
+		return begin(container) + container.size();
 	}
-	auto end() noexcept {
-		return begin() + size();
+	friend constexpr auto end(sbo_vector_base & container) noexcept {
+		return begin(container) + container.size();
 	}
 
 	auto capacity() const noexcept {
@@ -184,7 +188,7 @@ struct sbo_vector_base : private detail::rebound_allocator<T, Allocator> {
 			relocate_to_small();
 		} else {
 			auto temp = make_storage(requested_capacity);
-			::containers::uninitialized_move_destroy(begin(), end(), data(temp), get_allocator());
+			::containers::uninitialized_move_destroy(begin(*this), end(*this), data(temp), get_allocator());
 			relocate_preallocated(std::move(temp));
 		}
 	}
@@ -212,7 +216,7 @@ private:
 		// It is safe to skip the destructor call of m_large
 		// because we do not rely on its side-effects
 		::bounded::construct(m_small);
-		::containers::uninitialized_move_destroy(temp.pointer, temp.pointer + temp.size, m_small.data.begin(), allocator);
+		::containers::uninitialized_move_destroy(temp.pointer, temp.pointer + temp.size, begin(m_small.data), allocator);
 		assert(is_small());
 	}
 	
