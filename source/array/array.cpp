@@ -21,7 +21,8 @@ static_assert(a[0_bi] == 0, "Incorrect value.");
 static_assert(at(a, size - 1) == 0, "Incorrect value with at.");
 static_assert(end(a) - begin(a) == size, "Incorrect difference type.");
 
-
+static_assert(std::is_pod<containers::array<int, 0>>::value);
+static_assert(std::is_empty<containers::array<int, 0>>::value);
 constexpr containers::array<int, 0> empty_array = {{}};
 static_assert(begin(empty_array) == end(empty_array), "Empty array.");
 // static_assert(empty_array[0_bi] == 0, "Should not compile.");
