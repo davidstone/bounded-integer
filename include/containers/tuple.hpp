@@ -112,7 +112,7 @@ struct tuple_impl<std::index_sequence<indexes...>, Types...> : tuple_value_t<ind
 	}
 
 	template<typename... Args, BOUNDED_REQUIRES(
-		::containers::detail::all(std::is_constructible<tuple_value_t<indexes, Types, Types...>, std::piecewise_construct_t, Args>::value...)
+		(... and std::is_constructible<tuple_value_t<indexes, Types, Types...>, std::piecewise_construct_t, Args>::value)
 	)>
 	constexpr tuple_impl(std::piecewise_construct_t, Args && ... args) noexcept(false):
 		tuple_value_t<indexes, Types, Types...>(std::piecewise_construct, std::forward<Args>(args))...
@@ -427,7 +427,7 @@ constexpr auto transform_impl(bounded::constant_t<i> index, Function && function
 
 }	// namespace detail
 
-template<typename Function, typename... Tuples, BOUNDED_REQUIRES(::containers::detail::all(is_tuple<std::decay_t<Tuples>>...))>
+template<typename Function, typename... Tuples, BOUNDED_REQUIRES((... and is_tuple<std::decay_t<Tuples>>))>
 constexpr auto transform(Function && function, Tuples && ... tuples) noexcept(detail::all_noexcept_function_calls<Function, Tuples && ...>) {
 	return ::containers::detail::transform_impl(0_bi, function, std::forward<Tuples>(tuples)...);
 }
