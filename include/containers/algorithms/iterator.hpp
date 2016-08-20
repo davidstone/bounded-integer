@@ -110,10 +110,7 @@ constexpr auto next(Iterator it, Offset const offset = ::containers::detail::ite
 template<
 	typename Iterator,
 	typename Offset = decltype(::containers::detail::iterator_one<Iterator>()),
-	BOUNDED_REQUIRES(
-		is_iterator<Iterator> and
-		bounded::is_bounded_integer<typename std::iterator_traits<Iterator>::difference_type>
-	)
+	BOUNDED_REQUIRES(is_iterator<Iterator>)
 >
 constexpr auto prev(Iterator it, Offset const offset = ::containers::detail::iterator_one<Iterator>()) {
 	::containers::advance(it, -offset);
