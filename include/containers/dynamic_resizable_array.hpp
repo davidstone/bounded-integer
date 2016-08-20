@@ -132,12 +132,12 @@ struct dynamic_resizable_array : private Container {
 	using Container::capacity;
 	auto reserve(size_type const requested_capacity) {
 		if (requested_capacity > capacity()) {
-			relocate(requested_capacity);
+			this->relocate(requested_capacity);
 		}
 	}
 	auto shrink_to_fit() {
 		if (size(*this) != capacity()) {
-			relocate(size(*this));
+			this->relocate(size(*this));
 		}
 	}
 
