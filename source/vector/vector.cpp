@@ -104,6 +104,16 @@ auto test_erase() {
 	assert(v == container({ 1, 3, 5, 7 }));
 }
 
+auto test_reserve() {
+	using container = containers::vector<int>;
+	auto v = container{};
+	assert(v.capacity() == 0_bi);
+	v.reserve(10_bi);
+	assert(v.capacity() == 10_bi);
+	v.shrink_to_fit();
+	assert(v.capacity() == 0_bi);
+}
+
 struct complex_resource {
 	complex_resource() = default;
 	template<typename Size>
@@ -133,4 +143,5 @@ int main() {
 	test_generic<6>(complex_resource(5_bi), { complex_resource(1_bi), complex_resource(0_bi), complex_resource(10_bi), complex_resource(10_bi) });
 	
 	test_erase();
+	test_reserve();
 }
