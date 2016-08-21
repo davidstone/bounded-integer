@@ -244,8 +244,8 @@ constexpr auto insert(Container & container, typename Container::const_iterator 
 // TODO: conditional noexcept
 template<typename Container, typename Iterator, BOUNDED_REQUIRES(is_container<Container> and is_iterator<Iterator>)>
 constexpr auto erase(Container & container, Iterator const first_, Iterator const last_) noexcept {
-	auto const first = mutable_iterator(container, first_);
-	auto const last = mutable_iterator(container, last_);
+	auto const first = ::containers::detail::mutable_iterator(container, first_);
+	auto const last = ::containers::detail::mutable_iterator(container, last_);
 	auto const to_clear = ::containers::move(last, end(container), first).output;
 	while (to_clear != end(container)) {
 		container.pop_back();
