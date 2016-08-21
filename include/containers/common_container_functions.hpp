@@ -179,11 +179,6 @@ constexpr auto empty(Container const & container) noexcept {
 	return never_empty<Container> ? false : begin(container) == end(container);
 }
 
-template<typename Container, BOUNDED_REQUIRES(is_container<Container>)>
-constexpr auto max_size() noexcept {
-	return std::numeric_limits<typename Container::size_type>::max();
-}
-
 
 // TODO: noexcept should take into account return value
 template<typename Container, BOUNDED_REQUIRES(is_container<Container>)>
@@ -347,7 +342,6 @@ constexpr auto operator<(Container const & lhs, Container const & rhs) BOUNDED_N
 	using ::containers::detail::common::back; \
 	using ::containers::detail::common::size; \
 	using ::containers::detail::common::empty; \
-	using ::containers::detail::common::max_size; \
 	using ::containers::detail::common::push_back; \
 	using ::containers::detail::common::append; \
 	using ::containers::detail::common::insert; \

@@ -194,7 +194,7 @@ struct dynamic_resizable_array : private Container {
 		auto const range_size = bounded::throw_policy<std::out_of_range>{}.assignment(
 			::containers::distance(first, last),
 			0_bi,
-			max_size<dynamic_resizable_array>()
+			dynamic_resizable_array::size_type::max()
 		);
 		if (range_size <= capacity()) {
 			auto const mutable_position = detail::put_in_middle_no_reallocation(*this, position, first, last, range_size, get_allocator());

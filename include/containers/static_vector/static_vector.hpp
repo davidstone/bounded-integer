@@ -153,7 +153,7 @@ struct static_vector : private detail::static_vector_data<T, capacity_> {
 		auto const range_size = bounded::throw_policy<std::out_of_range>{}.assignment(
 			::containers::distance(first, last),
 			0_bi,
-			max_size<static_vector>()
+			static_vector::size_type::max()
 		);
 		
 		auto const mutable_position = detail::put_in_middle_no_reallocation(*this, position, first, last, range_size, get_allocator());
