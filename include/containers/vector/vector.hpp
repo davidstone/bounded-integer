@@ -6,7 +6,6 @@
 #pragma once
 
 #include <containers/allocator.hpp>
-#include <containers/algorithms/iterator.hpp>
 #include <containers/common_container_functions.hpp>
 #include <containers/dynamic_array/dynamic_array.hpp>
 #include <containers/dynamic_resizable_array.hpp>

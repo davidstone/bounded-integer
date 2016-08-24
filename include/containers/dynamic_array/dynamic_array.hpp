@@ -5,13 +5,14 @@
 
 #pragma once
 
+#include <containers/algorithms/copy.hpp>
+#include <containers/algorithms/distance.hpp>
 #include <containers/allocator.hpp>
 #include <containers/common_container_functions.hpp>
 #include <containers/is_iterator.hpp>
 #include <containers/operator_bracket.hpp>
 #include <containers/repeat_n.hpp>
 #include <containers/uninitialized_storage.hpp>
-#include <containers/algorithms/copy.hpp>
 #include <containers/array/iterator.hpp>
 
 #include <iterator>

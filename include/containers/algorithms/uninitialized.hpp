@@ -5,11 +5,12 @@
 
 #pragma once
 
+#include <containers/algorithms/move_iterator.hpp>
+#include <containers/algorithms/reverse_iterator.hpp>
 #include <containers/allocator.hpp>
 #include <containers/is_iterator_sentinel.hpp>
 #include <containers/scope_guard.hpp>
 #include <containers/type_list.hpp>
-#include <containers/algorithms/iterator.hpp>
 
 #include <bounded/integer.hpp>
 

@@ -5,11 +5,10 @@
 
 #pragma once
 
+#include <containers/algorithms/negate.hpp>
+#include <containers/algorithms/unique.hpp>
 #include <containers/allocator.hpp>
 #include <containers/common_container_functions.hpp>
-#include <containers/algorithms/negate.hpp>
-#include <containers/algorithms/iterator.hpp>
-#include <containers/algorithms/unique.hpp>
 #include <containers/legacy_iterator.hpp>
 #include <containers/tuple.hpp>
 #include <containers/vector/vector.hpp>

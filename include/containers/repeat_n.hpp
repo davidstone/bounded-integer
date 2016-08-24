@@ -5,7 +5,6 @@
 
 #pragma once
 
-#include <containers/algorithms/iterator.hpp>
 #include <containers/common_iterator_functions.hpp>
 #include <containers/operator_bracket.hpp>
 

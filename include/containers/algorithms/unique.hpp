@@ -6,7 +6,6 @@
 #pragma once
 
 #include <containers/algorithms/find.hpp>
-#include <containers/algorithms/iterator.hpp>
 #include <containers/algorithms/negate.hpp>
 #include <containers/dynamic_array/dynamic_array.hpp>
 

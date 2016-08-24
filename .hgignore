@@ -1,4 +1,5 @@
 ^array
+^concatenate
 ^dynamic_array
 ^small_buffer_optimized_vector
 ^static_vector

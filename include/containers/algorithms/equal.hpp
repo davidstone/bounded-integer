@@ -1,10 +1,12 @@
-// Copyright David Stone 2015.
+// Copyright David Stone 2016.
 // Distributed under the Boost Software License, Version 1.0.
 // (See accompanying file LICENSE_1_0.txt or copy at
 // http://www.boost.org/LICENSE_1_0.txt)
 
 #pragma once
 
+#include <containers/begin_end.hpp>
+#include <containers/is_container.hpp>
 #include <containers/is_iterator_sentinel.hpp>
 
 #include <bounded/integer.hpp>
@@ -70,4 +72,15 @@ constexpr auto equal(InputIterator1 const first1, Sentinel1 const last1, InputIt
 	::containers::equal(first1, last1, first2, bounded::equal_to())
 )
 
+
+namespace detail {
+namespace common {
+
+template<typename Container, BOUNDED_REQUIRES(is_container<Container>)>
+constexpr auto operator==(Container const & lhs, Container const & rhs) BOUNDED_NOEXCEPT(
+	::containers::equal(begin(lhs), end(lhs), begin(rhs), end(rhs))
+)
+
+}	// namespace common
+}	// namespace detail
 }	// namespace containers

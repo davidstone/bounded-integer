@@ -5,14 +5,19 @@
 
 #pragma once
 
+#include <containers/is_container.hpp>
+
+#include <bounded/integer.hpp>
+
 namespace containers {
 namespace detail {
+namespace common {
 
-template<typename...>
-using void_t = void;
+template<typename Container, BOUNDED_REQUIRES(is_container<Container>)>
+constexpr auto clear(Container & container) noexcept {
+	container = Container{};
+}
 
-template<typename...>
-struct type_list;
-
+}	// namespace common
 }	// namespace detail
 }	// namespace containers
