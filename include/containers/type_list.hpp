@@ -12,7 +12,7 @@ template<typename...>
 using void_t = void;
 
 template<typename...>
-struct type_list;
+struct type_list{};
 
 }	// namespace detail
 }	// namespace containers
