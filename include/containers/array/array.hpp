@@ -83,6 +83,10 @@ template<typename T, std::size_t size>
 constexpr auto end(array<T, size> const & container) noexcept {
 	return begin(container) + bounded::constant<size>;
 }
+template<typename T, std::size_t size>
+constexpr auto end(array<T, size> & container) noexcept {
+	return begin(container) + bounded::constant<size>;
+}
 
 
 template<typename T, std::size_t dimension, std::size_t... dimensions>
