@@ -32,5 +32,13 @@ constexpr decltype(auto) back(Container && container) noexcept(never_empty<Conta
 }
 
 }	// namespace common
+
+using ::containers::detail::common::front;
+using ::containers::detail::common::back;
+
 }	// namespace detail
+
+using ::containers::detail::common::front;
+using ::containers::detail::common::back;
+
 }	// namespace containers

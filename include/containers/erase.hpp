@@ -44,5 +44,13 @@ constexpr auto erase_if(Container & container, Predicate predicate) {
 
 
 }	// namespace common
+
+using ::containers::detail::common::erase;
+using ::containers::detail::common::erase_if;
+
 }	// namespace detail
+
+using ::containers::detail::common::erase;
+using ::containers::detail::common::erase_if;
+
 }	// namespace containers

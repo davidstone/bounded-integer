@@ -25,5 +25,11 @@ constexpr auto push_back(Container & container, typename Container::value_type &
 )
 
 }	// namespace common
+
+using ::containers::detail::common::push_back;
+
 }	// namespace detail
+
+using ::containers::detail::common::push_back;
+
 }	// namespace containers

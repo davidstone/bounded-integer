@@ -38,5 +38,11 @@ constexpr auto insert(Container & container, typename Container::const_iterator 
 }
 
 }	// namespace common
+
+using ::containers::detail::common::insert;
+
 }	// namespace detail
+
+using ::containers::detail::common::insert;
+
 }	// namespace containers

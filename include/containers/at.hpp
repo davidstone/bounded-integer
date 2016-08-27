@@ -35,5 +35,11 @@ constexpr decltype(auto) at(Container && container, Index const index, bounded::
 
 
 }	// namespace common
+
+using ::containers::detail::common::at;
+
 }	// namespace detail
+
+using ::containers::detail::common::at;
+
 }	// namespace containers

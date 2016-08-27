@@ -41,14 +41,8 @@ namespace detail {
 namespace common {
 
 #define CONTAINERS_COMMON_USING_DECLARATIONS \
-	using ::containers::detail::common::begin; \
-	using ::containers::detail::common::end; \
-	using ::containers::detail::common::cbegin; \
-	using ::containers::detail::common::cend; \
-	using ::containers::detail::common::rbegin; \
-	using ::containers::detail::common::rend; \
-	using ::containers::detail::common::crbegin; \
-	using ::containers::detail::common::crend; \
+	CONTAINERS_DETAIL_COMMON_USING_DECLARATIONS \
+	CONTAINERS_COMMON_BEGIN_END_USING_DECLARATIONS \
 	using ::containers::detail::common::data; \
 	using ::containers::detail::common::at; \
 	using ::containers::detail::common::front; \
@@ -64,8 +58,7 @@ namespace common {
 	using ::containers::detail::common::clear; \
 	using ::containers::detail::common::resize; \
 	using ::containers::detail::common::operator==; \
-	using ::containers::detail::common::operator<; \
-	CONTAINERS_DETAIL_COMMON_USING_DECLARATIONS
+	using ::containers::detail::common::operator<;
 
 }	// namespace common
 

@@ -27,5 +27,11 @@ constexpr auto append(Container & container, InputIterator first, Sentinel last)
 }
 
 }	// namespace common
+
+using ::containers::detail::common::append;
+
 }	// namespace detail
+
+using ::containers::detail::common::append;
+
 }	// namespace containers

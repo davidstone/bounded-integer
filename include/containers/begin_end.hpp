@@ -115,6 +115,23 @@ constexpr auto crend(Container const & container) BOUNDED_NOEXCEPT_VALUE(
 	::containers::reverse_iterator(end(container))
 )
 
+
+#define CONTAINERS_COMMON_BEGIN_END_USING_DECLARATIONS \
+	using ::containers::detail::common::begin; \
+	using ::containers::detail::common::end; \
+	using ::containers::detail::common::cbegin; \
+	using ::containers::detail::common::cend; \
+	using ::containers::detail::common::rbegin; \
+	using ::containers::detail::common::rend; \
+	using ::containers::detail::common::crbegin; \
+	using ::containers::detail::common::crend;
+
 }	// namespace common
+
+CONTAINERS_COMMON_BEGIN_END_USING_DECLARATIONS
+
 }	// namespace detail
+
+CONTAINERS_COMMON_BEGIN_END_USING_DECLARATIONS
+
 }	// namespace containers

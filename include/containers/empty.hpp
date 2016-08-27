@@ -29,5 +29,11 @@ constexpr auto empty(Container const & container) noexcept {
 }
 
 }	// namespace common
+
+using ::containers::detail::common::empty;
+
 }	// namespace detail
+
+using ::containers::detail::common::empty;
+
 }	// namespace containers

@@ -19,5 +19,11 @@ constexpr auto clear(Container & container) noexcept {
 }
 
 }	// namespace common
+
+using ::containers::detail::common::clear;
+
 }	// namespace detail
+
+using ::containers::detail::common::clear;
+
 }	// namespace containers

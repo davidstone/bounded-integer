@@ -82,5 +82,11 @@ constexpr auto operator==(Container const & lhs, Container const & rhs) BOUNDED_
 )
 
 }	// namespace common
+
+using ::containers::detail::common::operator==;
+
 }	// namespace detail
+
+using ::containers::detail::common::operator==;
+
 }	// namespace containers

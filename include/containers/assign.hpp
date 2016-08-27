@@ -47,5 +47,11 @@ constexpr auto assign(Container & container, Size const count, typename Containe
 }
 
 }	// namespace common
+
+using ::containers::detail::common::assign;
+
 }	// namespace detail
+
+using ::containers::detail::common::assign;
+
 }	// namespace containers

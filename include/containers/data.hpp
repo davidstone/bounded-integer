@@ -20,5 +20,11 @@ constexpr auto data(Container && container) BOUNDED_NOEXCEPT_DECLTYPE(
 )
 
 }	// namespace common
+
+using ::containers::detail::common::data;
+
 }	// namespace detail
+
+using ::containers::detail::common::data;
+
 }	// namespace containers

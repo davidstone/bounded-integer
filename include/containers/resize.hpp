@@ -39,5 +39,11 @@ constexpr auto resize(Container & container, Size const count, typename Containe
 )
 
 }	// namespace common
+
+using ::containers::detail::common::resize;
+
 }	// namespace detail
+
+using ::containers::detail::common::resize;
+
 }	// namespace containers

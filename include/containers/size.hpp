@@ -24,5 +24,11 @@ constexpr auto size(Container const & container) noexcept {
 }
 
 }	// namespace common
+
+using ::containers::detail::common::size;
+
 }	// namespace detail
+
+using ::containers::detail::common::size;
+
 }	// namespace containers
