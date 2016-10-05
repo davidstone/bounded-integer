@@ -43,6 +43,7 @@ common_sources = [
 	'front_back.cpp',
 	'insert.cpp',
 	'is_container.cpp',
+	'is_iterable.cpp',
 	'is_iterator.cpp',
 	'is_iterator_sentinel.cpp',
 	'iterator_adapter.cpp',

@@ -10,6 +10,7 @@
 #include <containers/common_container_functions.hpp>
 #include <containers/dynamic_array/dynamic_array.hpp>
 #include <containers/index_type.hpp>
+#include <containers/is_container.hpp>
 #include <containers/repeat_n.hpp>
 #include <containers/uninitialized_storage.hpp>
 
@@ -242,4 +243,8 @@ private:
 
 
 }	// namespace detail
+
+template<typename Container>
+struct is_container_c<detail::dynamic_resizable_array<Container>> : std::true_type {};
+
 }	// namespace containers

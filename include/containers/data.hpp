@@ -6,7 +6,7 @@
 #pragma once
 
 #include <containers/begin_end.hpp>
-#include <containers/is_container.hpp>
+#include <containers/is_iterable.hpp>
 
 #include <bounded/integer.hpp>
 
@@ -14,9 +14,9 @@ namespace containers {
 namespace detail {
 namespace common {
 
-template<typename Container, BOUNDED_REQUIRES(is_container<Container>)>
-constexpr auto data(Container && container) BOUNDED_NOEXCEPT_DECLTYPE(
-	pointer_from(begin(container))
+template<typename Iterable, BOUNDED_REQUIRES(is_iterable<Iterable>)>
+constexpr auto data(Iterable && iterable) BOUNDED_NOEXCEPT_DECLTYPE(
+	pointer_from(begin(iterable))
 )
 
 }	// namespace common

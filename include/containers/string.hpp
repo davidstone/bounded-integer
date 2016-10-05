@@ -71,6 +71,8 @@ public:
 	using base::pop_back;
 };
 
+template<typename T, typename Allocator>
+struct is_container_c<basic_string<T, Allocator>> : std::true_type {};
 
 
 // TODO: Write a c_string end sentinel for a one-pass algorithm

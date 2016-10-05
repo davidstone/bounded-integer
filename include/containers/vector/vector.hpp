@@ -98,6 +98,9 @@ private:
 
 }	// namespace detail
 
+template<typename T, typename Allocator>
+struct is_container_c<detail::vector_base<T, Allocator>> : std::true_type {};
+
 template<typename T, typename Allocator = allocator<T>>
 using vector = detail::dynamic_resizable_array<detail::vector_base<T, Allocator>>;
 

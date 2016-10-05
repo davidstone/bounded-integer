@@ -6,7 +6,7 @@
 #pragma once
 
 #include <containers/begin_end.hpp>
-#include <containers/is_container.hpp>
+#include <containers/is_iterable.hpp>
 
 #include <bounded/integer.hpp>
 
@@ -14,13 +14,13 @@ namespace containers {
 namespace detail {
 namespace common {
 
-template<typename Container, BOUNDED_REQUIRES(is_container<Container> and bounded::is_bounded_integer<typename Container::size_type>)>
-constexpr auto size(Container const & container) noexcept {
-	return typename Container::size_type(end(container) - begin(container), bounded::non_check);
+template<typename Iterable, BOUNDED_REQUIRES(is_iterable<Iterable> and bounded::is_bounded_integer<typename Iterable::size_type>)>
+constexpr auto size(Iterable const & iterable) noexcept {
+	return typename Iterable::size_type(end(iterable) - begin(iterable), bounded::non_check);
 }
-template<typename Container, BOUNDED_REQUIRES(is_container<Container> and !bounded::is_bounded_integer<typename Container::size_type>)>
-constexpr auto size(Container const & container) noexcept {
-	return typename Container::size_type(end(container) - begin(container));
+template<typename Iterable, BOUNDED_REQUIRES(is_iterable<Iterable> and !bounded::is_bounded_integer<typename Iterable::size_type>)>
+constexpr auto size(Iterable const & iterable) noexcept {
+	return typename Iterable::size_type(end(iterable) - begin(iterable));
 }
 
 }	// namespace common

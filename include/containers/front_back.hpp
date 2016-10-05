@@ -8,7 +8,7 @@
 #include <containers/algorithms/advance.hpp>
 #include <containers/begin_end.hpp>
 #include <containers/empty.hpp>
-#include <containers/is_container.hpp>
+#include <containers/is_iterable.hpp>
 
 #include <bounded/integer.hpp>
 
@@ -20,15 +20,15 @@ namespace detail {
 namespace common {
 
 // TODO: noexcept should take into account return value
-template<typename Container, BOUNDED_REQUIRES(is_container<Container>)>
-constexpr decltype(auto) front(Container && container) noexcept(never_empty<Container>) {
-	assert(!empty(container));
-	return *begin(std::forward<Container>(container));
+template<typename Iterable, BOUNDED_REQUIRES(is_iterable<Iterable>)>
+constexpr decltype(auto) front(Iterable && iterable) noexcept(never_empty<Iterable>) {
+	assert(!empty(iterable));
+	return *begin(std::forward<Iterable>(iterable));
 }
-template<typename Container, BOUNDED_REQUIRES(is_container<Container>)>
-constexpr decltype(auto) back(Container && container) noexcept(never_empty<Container>) {
-	assert(!empty(container));
-	return *::containers::prev(end(std::forward<Container>(container)));
+template<typename Iterable, BOUNDED_REQUIRES(is_iterable<Iterable>)>
+constexpr decltype(auto) back(Iterable && iterable) noexcept(never_empty<Iterable>) {
+	assert(!empty(iterable));
+	return *::containers::prev(end(std::forward<Iterable>(iterable)));
 }
 
 }	// namespace common

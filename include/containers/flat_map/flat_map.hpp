@@ -604,7 +604,16 @@ template<typename Key, typename T, typename Compare = std::less<Key>, typename A
 using flat_map = detail::flat_map<vector<detail::map_value_type<Key, T>, Allocator>, Compare>;
 
 
+template<typename Key, typename T, typename Compare, typename Allocator>
+struct is_container_c<flat_map<Key, T, Compare, Allocator>> : std::true_type {};
+
+
+
 template<typename Key, typename T, typename Compare = std::less<Key>, typename Allocator = allocator<detail::map_value_type<Key, T>>>
 using flat_multimap = detail::flat_multimap<vector<detail::map_value_type<Key, T>, Allocator>, Compare>;
+
+
+template<typename Key, typename T, typename Compare, typename Allocator>
+struct is_container_c<flat_multimap<Key, T, Compare, Allocator>> : std::true_type {};
 
 }	// namespace containers

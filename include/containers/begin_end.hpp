@@ -32,8 +32,8 @@ namespace common {
 // iterators. It would look something like:
 //
 #if 0
-return Container::iterator(
-	const_cast<Container::value_type *>(pointer_from(add_const(container))),
+return Iterable::iterator(
+	const_cast<Iterable::value_type *>(pointer_from(add_const(container))),
 	iterator_constructor
 );
 #endif
@@ -62,13 +62,12 @@ template<typename T> \
 constexpr bool has_rvalue_ ## begin_or_end = has_rvalue_c_ ## begin_or_end<T>::value; \
 \
 \
-template<typename Container, BOUNDED_REQUIRES( \
-	is_container<Container> and \
-	std::is_rvalue_reference<Container &&>::value and \
-	has_rvalue_ ## begin_or_end<Container> \
+template<typename Iterable, BOUNDED_REQUIRES( \
+	std::is_rvalue_reference<Iterable &&>::value and \
+	has_rvalue_ ## begin_or_end<Iterable> \
 )> \
-constexpr auto begin_or_end(Container && container) BOUNDED_NOEXCEPT_VALUE( \
-	std::move(container).begin_or_end() \
+constexpr auto begin_or_end(Iterable && iterable) BOUNDED_NOEXCEPT_VALUE( \
+	std::move(iterable).begin_or_end() \
 ) \
 \
 template<typename Container, BOUNDED_REQUIRES( \
@@ -84,34 +83,34 @@ CONTAINERS_DETAIL_BEGIN_END_OVERLOADS(begin)
 CONTAINERS_DETAIL_BEGIN_END_OVERLOADS(end)
 
 
-template<typename Container, BOUNDED_REQUIRES(is_container<Container>)>
-constexpr auto cbegin(Container const & container) BOUNDED_NOEXCEPT_VALUE(
+template<typename Iterable>
+constexpr auto cbegin(Iterable const & container) BOUNDED_NOEXCEPT_VALUE(
 	begin(container)
 )
-template<typename Container, BOUNDED_REQUIRES(is_container<Container>)>
-constexpr auto cend(Container const & container) BOUNDED_NOEXCEPT_VALUE(
+template<typename Iterable>
+constexpr auto cend(Iterable const & container) BOUNDED_NOEXCEPT_VALUE(
 	end(container)
 )
 
 
 
-template<typename Container, BOUNDED_REQUIRES(is_container<Container>)>
-constexpr auto rbegin(Container && container) BOUNDED_NOEXCEPT_VALUE(
-	::containers::reverse_iterator(begin(std::forward<Container>(container)))
+template<typename Iterable>
+constexpr auto rbegin(Iterable && container) BOUNDED_NOEXCEPT_VALUE(
+	::containers::reverse_iterator(begin(std::forward<Iterable>(container)))
 )
-template<typename Container, BOUNDED_REQUIRES(is_container<Container>)>
-constexpr auto rend(Container && container) BOUNDED_NOEXCEPT_VALUE(
-	::containers::reverse_iterator(end(std::forward<Container>(container)))
+template<typename Iterable>
+constexpr auto rend(Iterable && container) BOUNDED_NOEXCEPT_VALUE(
+	::containers::reverse_iterator(end(std::forward<Iterable>(container)))
 )
 
 
 
-template<typename Container, BOUNDED_REQUIRES(is_container<Container>)>
-constexpr auto crbegin(Container const & container) BOUNDED_NOEXCEPT_VALUE(
+template<typename Iterable>
+constexpr auto crbegin(Iterable const & container) BOUNDED_NOEXCEPT_VALUE(
 	::containers::reverse_iterator(begin(container))
 )
-template<typename Container, BOUNDED_REQUIRES(is_container<Container>)>
-constexpr auto crend(Container const & container) BOUNDED_NOEXCEPT_VALUE(
+template<typename Iterable>
+constexpr auto crend(Iterable const & container) BOUNDED_NOEXCEPT_VALUE(
 	::containers::reverse_iterator(end(container))
 )
 

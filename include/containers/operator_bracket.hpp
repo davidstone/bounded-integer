@@ -5,7 +5,9 @@
 
 #pragma once
 
-#include <containers/is_container.hpp>
+#include <containers/begin_end.hpp>
+#include <containers/is_iterable.hpp>
+#include <containers/size.hpp>
 
 #include <cassert>
 #include <type_traits>
@@ -24,14 +26,14 @@ namespace detail {
 // __FILE__ and __LINE__, which may end up being a good idea if there are
 // several functions that follow this pattern.
 
-template<typename Container, BOUNDED_REQUIRES(is_container<Container>)>
-constexpr auto operator_bracket(Container && container, index_type<std::decay_t<Container>> const index) noexcept(
-	noexcept(index < size(container)) and
-	noexcept(*(begin(std::forward<Container>(container)) + index)) and
-	std::is_nothrow_move_constructible<decltype(*(begin(std::forward<Container>(container)) + index))>::value
-) -> decltype(*(begin(std::forward<Container>(container)) + index)) {
-	assert(index < size(container));
-	return *(begin(std::forward<Container>(container)) + index);
+template<typename Iterable, BOUNDED_REQUIRES(is_iterable<Iterable>)>
+constexpr auto operator_bracket(Iterable && iterable, index_type<std::decay_t<Iterable>> const index) noexcept(
+	noexcept(index < size(iterable)) and
+	noexcept(*(begin(std::forward<Iterable>(iterable)) + index)) and
+	std::is_nothrow_move_constructible<decltype(*(begin(std::forward<Iterable>(iterable)) + index))>::value
+) -> decltype(*(begin(std::forward<Iterable>(iterable)) + index)) {
+	assert(index < size(iterable));
+	return *(begin(std::forward<Iterable>(iterable)) + index);
 }
 
 

@@ -242,6 +242,10 @@ private:
 };
 
 
+template<typename T, typename Allocator>
+struct is_container_c<dynamic_array<T, Allocator>> : std::true_type {};
+
+
 template<typename T, typename ForwardIterator, typename Sentinel, BOUNDED_REQUIRES(is_iterator_sentinel<ForwardIterator, Sentinel>)>
 auto assign(dynamic_array<T> & container, ForwardIterator first, Sentinel const last) {
 	auto const difference = ::containers::distance(first, last);

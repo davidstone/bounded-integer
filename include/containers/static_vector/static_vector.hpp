@@ -184,4 +184,7 @@ private:
 };
 
 
+template<typename T, std::size_t capacity>
+struct is_container_c<static_vector<T, capacity>> : std::true_type {};
+
 }	// namespace containers

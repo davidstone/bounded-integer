@@ -7,6 +7,7 @@
 
 #include <containers/array/iterator.hpp>
 #include <containers/common_container_functions.hpp>
+#include <containers/is_container.hpp>
 #include <containers/operator_bracket.hpp>
 
 #include <bounded/integer.hpp>
@@ -103,5 +104,8 @@ struct multi_dimensional_array<T, dimension> {
 
 template<typename T, std::size_t... dimensions>
 using array = typename detail::multi_dimensional_array<T, dimensions...>::type;
+
+template<typename T, std::size_t size>
+struct is_container_c<detail::array<T, size>> : std::true_type {};
 
 }	// namespace containers

@@ -6,7 +6,7 @@
 #pragma once
 
 #include <containers/begin_end.hpp>
-#include <containers/is_container.hpp>
+#include <containers/is_iterable.hpp>
 #include <containers/is_iterator.hpp>
 
 #include <bounded/integer.hpp>
@@ -14,9 +14,9 @@
 namespace containers {
 namespace detail {
 
-template<typename Container, typename Iterator, BOUNDED_REQUIRES(is_container<Container> and is_iterator<Iterator>)>
-constexpr auto mutable_iterator(Container & container, Iterator const it) BOUNDED_NOEXCEPT_VALUE(
-	begin(container) + (it - begin(container))
+template<typename Iterable, typename Iterator, BOUNDED_REQUIRES(is_iterable<Iterable> and is_iterator<Iterator>)>
+constexpr auto mutable_iterator(Iterable & iterable, Iterator const it) BOUNDED_NOEXCEPT_VALUE(
+	begin(iterable) + (it - begin(iterable))
 )
 
 }	// namespace detail

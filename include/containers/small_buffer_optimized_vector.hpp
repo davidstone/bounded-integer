@@ -292,6 +292,9 @@ private:
 
 }	// namespace detail
 
+template<typename T, std::size_t requested_capacity, typename Allocator>
+struct is_container_c<detail::sbo_vector_base<T, requested_capacity, Allocator>> : std::true_type {};
+
 template<typename T, std::size_t requested_small_capacity, typename Allocator = allocator<T>>
 using small_buffer_optimized_vector = detail::dynamic_resizable_array<detail::sbo_vector_base<T, requested_small_capacity, Allocator>>;
 
