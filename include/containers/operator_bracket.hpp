@@ -7,6 +7,7 @@
 
 #include <containers/begin_end.hpp>
 #include <containers/is_iterable.hpp>
+#include <containers/is_iterator.hpp>
 #include <containers/size.hpp>
 
 #include <cassert>
@@ -25,6 +26,11 @@ namespace detail {
 // The alternative would be to write a new assert function that just gets
 // __FILE__ and __LINE__, which may end up being a good idea if there are
 // several functions that follow this pattern.
+
+template<typename Iterator, BOUNDED_REQUIRES(is_iterator<Iterator>)>
+constexpr auto operator_bracket(Iterator && iterator, index_type<std::decay_t<Iterator>> const index) BOUNDED_NOEXCEPT_DECLTYPE(
+	*(std::forward<Iterator>(iterator) + index)
+)
 
 template<typename Iterable, BOUNDED_REQUIRES(is_iterable<Iterable>)>
 constexpr auto operator_bracket(Iterable && iterable, index_type<std::decay_t<Iterable>> const index) noexcept(
