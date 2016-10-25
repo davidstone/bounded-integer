@@ -19,8 +19,8 @@ namespace detail {
 
 template<std::size_t number_of_values, std::size_t... dimensions>
 struct final_dimension {
-	static_assert(number_of_values % (dimensions * ...) == 0, "Incorrect number of parameters to deduce dimension.");
-	static constexpr auto value = number_of_values / (dimensions * ...);
+	static_assert(number_of_values % (1 * ... * dimensions) == 0, "Incorrect number of parameters to deduce dimension.");
+	static constexpr auto value = number_of_values / (1 * ... * dimensions);
 };
 
 }	// namespace detail
