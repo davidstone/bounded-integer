@@ -29,6 +29,9 @@ struct has_begin_end_iterator_sentinel<
 
 }	// namespace detail
 
+using std::begin;
+using std::end;
+
 template<typename Iterable>
 constexpr auto is_iterable = detail::has_begin_end_iterator_sentinel<Iterable>::value;
 
