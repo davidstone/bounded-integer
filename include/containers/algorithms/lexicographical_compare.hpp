@@ -6,7 +6,7 @@
 #pragma once
 
 #include <containers/begin_end.hpp>
-#include <containers/is_container.hpp>
+#include <containers/is_iterable.hpp>
 #include <containers/is_iterator_sentinel.hpp>
 
 #include <bounded/integer.hpp>
@@ -52,7 +52,7 @@ constexpr auto lexicographical_compare(InputIterator1 const first1, Sentinel1 co
 namespace detail {
 namespace common {
 
-template<typename Container, BOUNDED_REQUIRES(is_container<Container>)>
+template<typename Container, BOUNDED_REQUIRES(is_iterable<Container>)>
 constexpr auto operator<(Container const & lhs, Container const & rhs) BOUNDED_NOEXCEPT(
 	::containers::lexicographical_compare(begin(lhs), end(lhs), begin(rhs), end(rhs))
 )
