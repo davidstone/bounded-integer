@@ -1,4 +1,4 @@
-// Copyright David Stone 2015.
+// Copyright David Stone 2016.
 // Distributed under the Boost Software License, Version 1.0.
 // (See accompanying file LICENSE_1_0.txt or copy at
 // http://www.boost.org/LICENSE_1_0.txt)
@@ -35,14 +35,14 @@ template<
 	intmax_t rhs_min, intmax_t rhs_max, typename rhs_overflow, storage_type rhs_storage, bool rhs_poisoned
 >
 constexpr auto operator==(integer<lhs_min, lhs_max, lhs_overflow, lhs_storage, lhs_poisoned> const & lhs, integer<rhs_min, rhs_max, rhs_overflow, rhs_storage, rhs_poisoned> const & rhs) noexcept {
-	if (lhs_min > rhs_max or rhs_min > lhs_max) {
-		return false;
+	if  constexpr (lhs_min > rhs_max or rhs_min > lhs_max) {
+		return std::false_type{};
+	} else if constexpr (lhs_min == lhs_max and rhs_min == rhs_max and lhs_min == rhs_min) {
+		return std::true_type{};
+	} else {
+		using common_t = detail::comparison_type<lhs_min, lhs_max, lhs_storage, rhs_min, rhs_max, rhs_storage, lhs_overflow>;
+		return static_cast<common_t>(lhs) == static_cast<common_t>(rhs);
 	}
-	if (lhs_min == lhs_max and rhs_min == rhs_max and lhs_min == rhs_min) {
-		return true;
-	}
-	using common_t = detail::comparison_type<lhs_min, lhs_max, lhs_storage, rhs_min, rhs_max, rhs_storage, lhs_overflow>;
-	return static_cast<common_t>(lhs) == static_cast<common_t>(rhs);
 }
 
 
@@ -52,14 +52,14 @@ template<
 	intmax_t rhs_min, intmax_t rhs_max, typename rhs_overflow, storage_type rhs_storage, bool rhs_poisoned
 >
 constexpr auto operator<(integer<lhs_min, lhs_max, lhs_overflow, lhs_storage, lhs_poisoned> const & lhs, integer<rhs_min, rhs_max, rhs_overflow, rhs_storage, rhs_poisoned> const & rhs) noexcept {
-	if (lhs_min >= rhs_max) {
-		return false;
+	if constexpr (lhs_min >= rhs_max) {
+		return std::false_type{};
+	} else if constexpr (lhs_max < rhs_min) {
+		return std::true_type{};
+	} else {
+		using common_t = detail::comparison_type<lhs_min, lhs_max, lhs_storage, rhs_min, rhs_max, rhs_storage, lhs_overflow>;
+		return static_cast<common_t>(lhs) < static_cast<common_t>(rhs);
 	}
-	if (lhs_max < rhs_min) {
-		return true;
-	}
-	using common_t = detail::comparison_type<lhs_min, lhs_max, lhs_storage, rhs_min, rhs_max, rhs_storage, lhs_overflow>;
-	return static_cast<common_t>(lhs) < static_cast<common_t>(rhs);
 }
 
 

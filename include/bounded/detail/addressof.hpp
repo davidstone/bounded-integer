@@ -1,4 +1,4 @@
-// Copyright David Stone 2015.
+// Copyright David Stone 2016.
 // Distributed under the Boost Software License, Version 1.0.
 // (See accompanying file LICENSE_1_0.txt or copy at
 // http://www.boost.org/LICENSE_1_0.txt)
@@ -36,15 +36,13 @@ constexpr auto constexpr_addressof =
 
 }	// namespace detail
 
-template<typename T, BOUNDED_REQUIRES(detail::constexpr_addressof<T>)>
+template<typename T>
 constexpr auto addressof(T & t) noexcept {
-	return &t;
-}
-
-// TODO: Use compiler built-ins as a fallback
-template<typename T, BOUNDED_REQUIRES(!detail::constexpr_addressof<T>)>
-auto addressof(T & t) noexcept {
-	return std::addressof(t);
+	if constexpr (detail::constexpr_addressof<T>) {
+		return &t;
+	} else {
+		return std::addressof(t);
+	}
 }
 
 }	// namespace bounded

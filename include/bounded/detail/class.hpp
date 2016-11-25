@@ -1,4 +1,4 @@
-// Copyright David Stone 2015.
+// Copyright David Stone 2016.
 // Distributed under the Boost Software License, Version 1.0.
 // (See accompanying file LICENSE_1_0.txt or copy at
 // http://www.boost.org/LICENSE_1_0.txt)
@@ -31,22 +31,22 @@ constexpr bool allow_construction_from() {
 	return basic_numeric_limits<T>::is_specialized and (basic_numeric_limits<T>::is_integer or std::is_enum<std::decay_t<T>>::value);
 }
 
-template<typename T, BOUNDED_REQUIRES(allow_construction_from<T>())>
+template<typename T>
 constexpr auto is_implicitly_constructible_from(intmax_t const minimum, intmax_t const maximum) noexcept {
-	return type_fits_in_range<std::decay_t<T>>(minimum, maximum);
-}
-template<typename T, BOUNDED_REQUIRES(!allow_construction_from<T>())>
-constexpr auto is_implicitly_constructible_from(intmax_t, intmax_t) noexcept {
-	return false;
+	if constexpr (allow_construction_from<T>()) {
+		return type_fits_in_range<std::decay_t<T>>(minimum, maximum);
+	} else {
+		return std::false_type{};
+	}
 }
 
-template<typename policy, typename T, BOUNDED_REQUIRES(allow_construction_from<T>())>
+template<typename policy, typename T>
 constexpr auto is_explicitly_constructible_from(intmax_t const minimum, intmax_t const maximum) noexcept {
-	return type_overlaps_range<std::decay_t<T>>(minimum, maximum) or !policy::overflow_is_error;
-}
-template<typename policy, typename T, BOUNDED_REQUIRES(!allow_construction_from<T>())>
-constexpr auto is_explicitly_constructible_from(intmax_t, intmax_t) noexcept {
-	return false;
+	if constexpr (allow_construction_from<T>()) {
+		return type_overlaps_range<std::decay_t<T>>(minimum, maximum) or !policy::overflow_is_error;
+	} else {
+		return std::false_type{};
+	}
 }
 
 
@@ -64,21 +64,21 @@ constexpr auto has_extra_space = underlying_min<T> < basic_numeric_limits<T>::mi
 // provide tighter bounds than the underlying_type might suggest. This forwards
 // along non-enum types without doing anything, but constructs a
 // bounded::integer with the tighter bounds from an enumeration.
-template<typename T, BOUNDED_REQUIRES(!std::is_enum<std::decay_t<T>>::value)>
+template<typename T>
 constexpr decltype(auto) as_integer(T const & t) noexcept {
-	return t;
-}
-template<typename T, BOUNDED_REQUIRES(std::is_enum<std::decay_t<T>>::value)>
-constexpr decltype(auto) as_integer(T const & t) noexcept {
-	using limits = basic_numeric_limits<T>;
-	using result_type = integer<
-		static_cast<std::intmax_t>(limits::min()),
-		static_cast<std::intmax_t>(limits::max()),
-		null_policy,
-		storage_type::fast,
-		false
-	>;
-	return result_type(static_cast<std::underlying_type_t<std::decay_t<T>>>(t));
+	if constexpr (std::is_enum<std::decay_t<T>>::value) {
+		using limits = basic_numeric_limits<T>;
+		using result_type = integer<
+			static_cast<std::intmax_t>(limits::min()),
+			static_cast<std::intmax_t>(limits::max()),
+			null_policy,
+			storage_type::fast,
+			false
+		>;
+		return result_type(static_cast<std::underlying_type_t<std::decay_t<T>>>(t));
+	} else {
+		return t;
+	}
 }
 
 }	// namespace detail
