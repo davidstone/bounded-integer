@@ -27,13 +27,11 @@ namespace bounded {
 namespace detail {
 
 template<typename T>
-constexpr bool allow_construction_from() {
-	return basic_numeric_limits<T>::is_specialized and (basic_numeric_limits<T>::is_integer or std::is_enum<std::decay_t<T>>::value);
-}
+constexpr auto allow_construction_from = basic_numeric_limits<T>::is_specialized and (basic_numeric_limits<T>::is_integer or std::is_enum<std::decay_t<T>>::value);
 
 template<typename T>
 constexpr auto is_implicitly_constructible_from(intmax_t const minimum, intmax_t const maximum) noexcept {
-	if constexpr (allow_construction_from<T>()) {
+	if constexpr (allow_construction_from<T>) {
 		return type_fits_in_range<std::decay_t<T>>(minimum, maximum);
 	} else {
 		return std::false_type{};
@@ -42,7 +40,7 @@ constexpr auto is_implicitly_constructible_from(intmax_t const minimum, intmax_t
 
 template<typename policy, typename T>
 constexpr auto is_explicitly_constructible_from(intmax_t const minimum, intmax_t const maximum) noexcept {
-	if constexpr (allow_construction_from<T>()) {
+	if constexpr (allow_construction_from<T>) {
 		return type_overlaps_range<std::decay_t<T>>(minimum, maximum) or !policy::overflow_is_error;
 	} else {
 		return std::false_type{};

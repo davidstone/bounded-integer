@@ -27,19 +27,17 @@ struct range_type;
 namespace detail {
 
 template<typename T>
-constexpr auto range_of_type() noexcept {
-	return static_cast<intmax_t>(std::numeric_limits<T>::max() - std::numeric_limits<T>::min());
-}
+constexpr auto range_of_type = static_cast<intmax_t>(std::numeric_limits<T>::max() - std::numeric_limits<T>::min());
 
 template<typename T>
 struct integer_range_iterator {
 	// We have to be able to index the one-past-the-end element.
-	using index_type = integer<0, range_of_type<T>()>;
+	using index_type = integer<0, range_of_type<T>>;
 	using value_type = integer<
 		static_cast<intmax_t>(std::numeric_limits<T>::min()),
 		static_cast<intmax_t>(max(std::numeric_limits<T>::min(), std::numeric_limits<T>::max() - constant<1>))
 	>;
-	using difference_type = integer<-range_of_type<index_type>(), range_of_type<index_type>()>;
+	using difference_type = integer<-range_of_type<index_type>, range_of_type<index_type>>;
 	using pointer = index_type const *;
 	using iterator_category = std::random_access_iterator_tag;
 	using underlying_type = T;
@@ -98,7 +96,7 @@ struct range_type {
 	using value_type = typename const_iterator::value_type;
 	using index_type = typename const_iterator::index_type;
 	using difference_type = typename const_iterator::difference_type;
-	using size_type = integer<0, detail::range_of_type<value_type>()>;
+	using size_type = integer<0, detail::range_of_type<value_type>>;
 
 	template<typename First, typename Last>
 	constexpr range_type(First && first, Last && last) noexcept:
@@ -149,7 +147,7 @@ struct range_type {
 		return size_type(end() - begin());
 	}
 	constexpr auto max_size() const {
-		return constant<detail::range_of_type<value_type>()>;
+		return constant<detail::range_of_type<value_type>>;
 	}
 	constexpr auto empty() const {
 		return begin() == end();
