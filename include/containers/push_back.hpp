@@ -16,11 +16,11 @@ namespace detail {
 namespace common {
 
 template<typename Container, BOUNDED_REQUIRES(is_container<Container>)>
-constexpr auto push_back(Container & container, typename Container::value_type const & value) BOUNDED_NOEXCEPT(
+constexpr auto push_back(Container & container, typename Container::value_type const & value) BOUNDED_NOEXCEPT_DECLTYPE(
 	container.emplace_back(value)
 )
 template<typename Container, BOUNDED_REQUIRES(is_container<Container>)>
-constexpr auto push_back(Container & container, typename Container::value_type && value) BOUNDED_NOEXCEPT(
+constexpr auto push_back(Container & container, typename Container::value_type && value) BOUNDED_NOEXCEPT_DECLTYPE(
 	container.emplace_back(std::move(value))
 )
 

@@ -129,10 +129,11 @@ struct static_vector : private detail::static_vector_data<T, capacity_> {
 	}
 
 	template<typename... Args>
-	constexpr auto emplace_back(Args && ... args) {
+	constexpr decltype(auto) emplace_back(Args && ... args) {
 		assert(size(*this) != capacity());
 		::containers::detail::construct(get_allocator(), data(*this) + size(*this), std::forward<Args>(args)...);
 		++this->m_size;
+		return back(*this);
 	}
 	
 	template<typename... Args>

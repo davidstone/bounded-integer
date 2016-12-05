@@ -142,7 +142,7 @@ struct dynamic_resizable_array : private Container {
 	}
 
 	template<typename... Args>
-	auto emplace_back(Args && ... args) {
+	decltype(auto) emplace_back(Args && ... args) {
 		if (size(*this) < capacity()) {
 			::containers::detail::construct(get_allocator(), data(*this) + size(*this), std::forward<Args>(args)...);
 		} else {
@@ -152,6 +152,7 @@ struct dynamic_resizable_array : private Container {
 			this->relocate_preallocated(std::move(temp));
 		}
 		add_size(1_bi);
+		return back(*this);
 	}
 	
 	// TODO: Remove duplication between emplace and insert
