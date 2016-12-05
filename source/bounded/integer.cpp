@@ -443,6 +443,15 @@ auto check_constructibility_specific() {
 		std::is_constructible<type, type, bounded::non_check_t>::value,
 		"Cannot construct a type from itself with non_check_t."
 	);
+
+	static_assert(
+		!std::is_convertible<bool, type>::value,
+		"Should not be able to convert a bool to a bounded::integer."
+	);
+	static_assert(
+		std::is_constructible<type, bool>::value,
+		"Should be able to convert a bool to a bounded::integer."
+	);
 }
 
 auto check_constructibility() {

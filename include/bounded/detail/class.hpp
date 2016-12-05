@@ -31,7 +31,7 @@ constexpr auto allow_construction_from = basic_numeric_limits<T>::is_specialized
 
 template<typename T>
 constexpr auto is_implicitly_constructible_from(intmax_t const minimum, intmax_t const maximum) noexcept {
-	if constexpr (allow_construction_from<T>) {
+	if constexpr (allow_construction_from<T> and !std::is_same<std::decay_t<T>, bool>{}) {
 		return type_fits_in_range<std::decay_t<T>>(minimum, maximum);
 	} else {
 		return std::false_type{};
