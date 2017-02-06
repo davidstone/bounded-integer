@@ -1,4 +1,4 @@
-// Copyright David Stone 2016.
+// Copyright David Stone 2017.
 // Distributed under the Boost Software License, Version 1.0.
 // (See accompanying file LICENSE_1_0.txt or copy at
 // http://www.boost.org/LICENSE_1_0.txt)
@@ -40,7 +40,7 @@ template<typename T>
 struct dynamic_array_data_t {
 	using size_type = bounded::integer<0, maximum_array_size<T>>;
 	
-	uninitialized_storage<T> * pointer = nullptr;
+	T * pointer = nullptr;
 	size_type size = 0_bi;
 };
 
@@ -57,7 +57,7 @@ constexpr auto end(dynamic_array_data_t<T> const container) noexcept {
 template<typename T, typename Size>
 constexpr auto dynamic_array_data(T * const pointer, Size const size) noexcept {
 	return dynamic_array_data_t<T>{
-		static_or_reinterpret_cast<uninitialized_storage<T> *>(pointer),
+		pointer,
 		static_cast<typename dynamic_array_data_t<T>::size_type>(size)
 	};
 }
