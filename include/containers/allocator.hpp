@@ -6,7 +6,7 @@
 #pragma once
 
 #include <containers/common_functions.hpp>
-#include <containers/type_list.hpp>
+#include <containers/type.hpp>
 
 #include <bounded/integer.hpp>
 
@@ -45,12 +45,12 @@ template<typename A, typename T, typename... Args>
 struct allocator_has_construct_c<
 	A,
 	T,
-	type_list<Args...>,
+	types<Args...>,
 	void_t<decltype(std::declval<A &>().construct(std::declval<T *>(), std::declval<Args>()...))>
 > : std::true_type {};
 
 template<typename A, typename T, typename... Args>
-constexpr auto allocator_has_construct = allocator_has_construct_c<A, T, type_list<Args...>>::value;
+constexpr auto allocator_has_construct = allocator_has_construct_c<A, T, types<Args...>>::value;
 
 
 template<typename A, typename T, typename Enable = void>

@@ -54,8 +54,8 @@ common_sources = [
 	'resize.cpp',
 	'scope_guard.cpp',
 	'size.cpp',
-	'type_list.cpp',
 	'tuple.cpp',
+	'type.cpp',
 ]
 
 flat_map_sources = [

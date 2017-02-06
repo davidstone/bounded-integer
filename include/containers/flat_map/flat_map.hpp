@@ -325,11 +325,11 @@ private:
 	// Search represents a function that finds where to insert
 
 	template<typename Key>
-	static constexpr auto use_reference_to_key(type_list<Key>) noexcept {
+	static constexpr auto use_reference_to_key(types<Key>) noexcept {
 		return std::is_same<std::decay_t<Key>, key_type>::value;
 	}
 	template<typename... KeyArgs>
-	static constexpr auto use_reference_to_key(type_list<KeyArgs...>) noexcept {
+	static constexpr auto use_reference_to_key(types<KeyArgs...>) noexcept {
 		return false;
 	}
 
@@ -342,7 +342,7 @@ private:
 			}
 
 			std::conditional_t<
-				use_reference_to_key(type_list<KeyArgs...>{}),
+				use_reference_to_key(types<KeyArgs...>{}),
 				key_type const &,
 				key_type
 			> key;
