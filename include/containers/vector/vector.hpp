@@ -31,7 +31,7 @@ struct vector_base {
 
 	using const_iterator = detail::basic_array_iterator<value_type const, vector_base>;
 	using iterator = detail::basic_array_iterator<value_type, vector_base>;
-	using raw_container = dynamic_array<uninitialized_storage<value_type>, allocator_type>;
+	using raw_container = dynamic_array<trivial_storage<value_type>, allocator_type>;
 
 	constexpr auto get_allocator() const noexcept {
 		return static_cast<allocator_type>(m_container.get_allocator());
