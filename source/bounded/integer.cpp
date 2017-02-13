@@ -15,7 +15,7 @@ namespace {
 template<typename LHS, typename RHS>
 constexpr auto same_bounds =
 	std::numeric_limits<LHS>::min() == std::numeric_limits<RHS>::min() and
-	std::numeric_limits<LHS>::max() == std::numeric_limits<RHS>::max();	
+	std::numeric_limits<LHS>::max() == std::numeric_limits<RHS>::max();
 
 using namespace bounded::literal;
 
@@ -1020,7 +1020,7 @@ namespace check_literal {
 			"Inaccurate value of " #x " (cast x)" \
 		); \
 		static_assert( \
-			static_cast<decltype(x)>(x ## _bi) == x, \
+			static_cast<decltype(x)>(x ## _bi) == (x), \
 			"Inaccurate value of " #x " (cast value)" \
 		);
 
