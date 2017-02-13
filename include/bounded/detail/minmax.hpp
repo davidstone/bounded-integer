@@ -91,14 +91,14 @@ constexpr decltype(auto) extreme(Compare, T && t) noexcept {
 // has no overlap.
 template<typename Compare, typename T1, typename T2, BOUNDED_REQUIRES(
 	basic_numeric_limits<T1>::is_specialized and basic_numeric_limits<T2>::is_specialized and
-	not detail::types_overlap<extreme_t<Compare, T1, T2>, T2>::value
+	not detail::types_overlap<extreme_t<Compare, T1, T2>, T2>()
 )>
 constexpr decltype(auto) extreme(Compare, T1 && t1, T2 &&) noexcept {
 	return detail::minmax::construct<T1>(std::forward<T1>(t1));
 }
 template<typename Compare, typename T1, typename T2, BOUNDED_REQUIRES(
 	basic_numeric_limits<T1>::is_specialized and basic_numeric_limits<T2>::is_specialized and
-	not detail::types_overlap<extreme_t<Compare, T1, T2>, T1>::value
+	not detail::types_overlap<extreme_t<Compare, T1, T2>, T1>()
 )>
 constexpr decltype(auto) extreme(Compare, T1 &&, T2 && t2) noexcept {
 	return detail::minmax::construct<T2>(std::forward<T2>(t2));
@@ -107,8 +107,8 @@ constexpr decltype(auto) extreme(Compare, T1 &&, T2 && t2) noexcept {
 
 template<typename Compare, typename T1, typename T2, typename result_type = detail::add_common_cv_reference_t<extreme_t<Compare, T1, T2>, T1, T2>, BOUNDED_REQUIRES(
 	(not basic_numeric_limits<T1>::is_specialized or not basic_numeric_limits<T2>::is_specialized) or
-	(detail::types_overlap<extreme_t<Compare, T1, T2>, T1>::value and
-	detail::types_overlap<extreme_t<Compare, T1, T2>, T2>::value)
+	(detail::types_overlap<extreme_t<Compare, T1, T2>, T1>() and
+	detail::types_overlap<extreme_t<Compare, T1, T2>, T2>())
 )>
 constexpr auto extreme(Compare compare, T1 && t1, T2 && t2) BOUNDED_NOEXCEPT_DECLTYPE(
 	compare(t2, t1) ?

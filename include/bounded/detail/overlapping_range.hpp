@@ -48,27 +48,24 @@ constexpr auto type_fits_in_range(intmax_t const minimum, intmax_t const maximum
 		basic_numeric_limits<T>::max() <= maximum;
 }
 
-template<typename T1, typename T2, typename Enabler = void>
-struct types_overlap {
-	static constexpr bool value = false;
-};
 
-template<>
-struct types_overlap<uintmax_t, uintmax_t, void> {
-	static constexpr bool value = true;
-};
-
-template<typename T1, typename T2>
-struct types_overlap<T1, T2, std::enable_if_t<basic_numeric_limits<T1>::is_specialized and basic_numeric_limits<T2>::is_specialized>> {
-private:
-	using type = std::decay_t<std::conditional_t<std::is_same<T1, uintmax_t>::value, T1, T2>>;
-	using range_type = std::decay_t<std::conditional_t<std::is_same<T1, uintmax_t>::value, T2, T1>>;
-public:
-	static constexpr bool value = type_overlaps_range<type>(
-		basic_numeric_limits<range_type>::min(),
-		basic_numeric_limits<range_type>::max()
-	);
-};
+template<typename LHS, typename RHS>
+constexpr auto types_overlap() {
+	constexpr auto lhs_uintmax = std::is_same<LHS, std::uintmax_t>{};
+	constexpr auto rhs_uintmax = std::is_same<RHS, std::uintmax_t>{};
+	if constexpr (lhs_uintmax and rhs_uintmax) {
+		return std::true_type{};
+	} else if constexpr (basic_numeric_limits<LHS>::is_specialized and basic_numeric_limits<RHS>::is_specialized) {
+		using type = std::decay_t<std::conditional_t<lhs_uintmax, LHS, RHS>>;
+		using range_type = std::decay_t<std::conditional_t<lhs_uintmax, RHS, LHS>>;
+		return type_overlaps_range<type>(
+			basic_numeric_limits<range_type>::min(),
+			basic_numeric_limits<range_type>::max()
+		);
+	} else {
+		return std::false_type{};
+	}
+}
 
 }	// namespace detail
 }	// namespace bounded
