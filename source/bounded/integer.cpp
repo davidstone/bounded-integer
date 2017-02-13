@@ -1239,10 +1239,9 @@ auto check_compound_arithmetic() {
 	static_assert(divide_equals(z_type(49_bi), 7) == 7_bi);
 	static_assert(modulo_equals(x_type(10_bi), 6_bi) == 4_bi);
 	
-	// This code doesn't work with -Wconversion, but should still compile.
-	// short s = 0;
-	// s += 4_bi;
-	// assert(s == 4);
+	short s = 0;
+	s += 4_bi;
+	assert(s == 4);
 	static_assert(minus_equals(9, 68_bi) == -59);
 	// long l = -7;
 	// l *= z + 1_bi;
