@@ -1250,12 +1250,14 @@ auto check_compound_arithmetic() {
 	static_assert(modulo_equals(-5, 4_bi) == -1);
 
 	auto x = x_type(4_bi);
-	assert(++x == 5_bi);
+	auto const pre_increment = ++x;
+	assert(pre_increment == 5_bi);
 	assert(x == 5_bi);
 	x = 0;
 	assert(x == 0);
 	auto z = z_type(0_bi);
-	assert(z++ == 0);
+	auto const post_increment = z++;
+	assert(post_increment == 0);
 	assert(z == 1);
 
 	static_assert(minus_equals(bounded::clamped_integer<0, 10>(5_bi), 20_bi) == 0_bi);	
