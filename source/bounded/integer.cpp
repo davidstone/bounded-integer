@@ -1425,6 +1425,7 @@ auto check_optional() {
 
 	constexpr auto original = bounded::make_optional(bounded::constant<0>);
 	constexpr auto copy = original;
+	static_assert(original == copy);
 }
 
 auto check_to_string() {
