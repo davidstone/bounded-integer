@@ -149,9 +149,6 @@ protected:
 
 template<std::size_t unique, typename T, typename... Ts>
 struct tuple_value<true, unique, T, Ts...> : private T {
-	// We cannot just do using T::T here because that does not capture the
-	// compiler-generated copy and move constructors.
-	
 	tuple_value() = default;
 	
 	template<typename... Args, BOUNDED_REQUIRES(std::is_constructible<T, Args...>::value)>
