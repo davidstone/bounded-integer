@@ -1,4 +1,4 @@
-// Copyright David Stone 2015.
+// Copyright David Stone 2017.
 // Distributed under the Boost Software License, Version 1.0.
 // (See accompanying file LICENSE_1_0.txt or copy at
 // http://www.boost.org/LICENSE_1_0.txt)
@@ -33,12 +33,19 @@ constexpr auto operator+(Offset const offset, Iterator const it) BOUNDED_NOEXCEP
 	it + offset
 )
 
+template<typename T>
+constexpr auto pointer_from(T * pointer) noexcept {
+	return pointer;
+}
+
 }	// namespace common
 
 using containers::detail::common::operator+;
+using containers::detail::common::pointer_from;
 
 }	// namespace detail
 
 using containers::detail::common::operator+;
+using containers::detail::common::pointer_from;
 
 }	// namespace containers
