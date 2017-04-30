@@ -6,6 +6,7 @@
 #pragma once
 
 #include <containers/begin_end.hpp>
+#include <containers/common_iterator_functions.hpp>
 #include <containers/is_iterable.hpp>
 
 #include <bounded/integer.hpp>
