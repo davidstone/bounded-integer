@@ -5,6 +5,7 @@
 
 #pragma once
 
+#include <containers/add_remove_const.hpp>
 #include <containers/begin_end.hpp>
 #include <containers/is_iterable.hpp>
 #include <containers/is_iterator_sentinel.hpp>
@@ -76,9 +77,17 @@ constexpr auto equal(InputIterator1 const first1, Sentinel1 const last1, InputIt
 namespace detail {
 namespace common {
 
-template<typename Container, BOUNDED_REQUIRES(is_iterable<Container>)>
-constexpr auto operator==(Container const & lhs, Container const & rhs) BOUNDED_NOEXCEPT(
-	::containers::equal(begin(lhs), end(lhs), begin(rhs), end(rhs))
+// Rather than just accepting Iterable const &, we do this to work around
+// https://bugs.llvm.org/show_bug.cgi?id=32860
+template<typename LHS, typename RHS, BOUNDED_REQUIRES(
+	std::is_same<std::remove_cv_t<std::remove_reference_t<LHS>>, std::remove_cv_t<std::remove_reference_t<RHS>>>{} and
+	is_iterable<std::remove_cv_t<std::remove_reference_t<LHS>>>
+)>
+constexpr auto operator==(LHS && lhs, RHS && rhs) BOUNDED_NOEXCEPT(
+	::containers::equal(
+		begin(::containers::detail::add_const(lhs)), end(::containers::detail::add_const(lhs)),
+		begin(::containers::detail::add_const(rhs)), end(::containers::detail::add_const(rhs))
+	)
 )
 
 }	// namespace common
