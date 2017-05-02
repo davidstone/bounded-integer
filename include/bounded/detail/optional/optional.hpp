@@ -114,7 +114,7 @@ struct default_optional_storage {
 	template<typename... Args>
 	constexpr auto initialize(optional_tag, Args && ... args) noexcept(std::is_nothrow_constructible<T, Args && ...>::value) {
 		uninitialize();
-		::bounded::construct(m_data.storage.value, std::forward<Args>(args)...);
+		construct(m_data.storage.value, std::forward<Args>(args)...);
 		m_data.initialized = true;
 	}
 	
