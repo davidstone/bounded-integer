@@ -38,8 +38,13 @@ The general form of the class is `bounded::integer<minimum, maximum, policy = bo
 
 ## Prerequisites
 
-* gcc version 4.9.0 or newer with c++ support or clang 3.4.0 or newer. `bounded::integer` makes use of C++14 (C++1y) features.
-* Boost. Listed as boost-devel in Fedora repositories. `bounded::integer` is currently tested against version 1.53.0.
+* Compile with clang 3.9.0 or newer
+	* bounded::integer may compile with gcc 6 or newer, but has not been tested
+* Standard library from gcc 5.4.0 (libstdc++) or newer or clang 3.9.0 (libc++) or newer. 
+`bounded::integer` makes 
+use of C++17 (C++1z) features.
+* Boost. Listed as boost-devel in Fedora repositories. `bounded::integer` is currently tested 
+against version 1.64.0.
 * SCons is used for the build process for the test set up, but it is not needed to use the library.
 
 ## Building and running tests (Linux)
