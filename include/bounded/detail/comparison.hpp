@@ -69,9 +69,19 @@ constexpr auto operator<(integer<lhs_min, lhs_max, lhs_overflow, lhs_storage, lh
 // ::bounded::detail
 namespace detail {
 
+constexpr auto typed_not(bool x) noexcept {
+	return !x;
+}
+constexpr auto typed_not(std::true_type) noexcept {
+	return std::false_type{};
+}
+constexpr auto typed_not(std::false_type) noexcept {
+	return std::true_type{};
+}
+
 template<typename LHS, typename RHS>
 constexpr auto operator!=(LHS const & lhs, RHS const & rhs) BOUNDED_NOEXCEPT_DECLTYPE(
-	!(lhs == rhs)
+	::bounded::detail::typed_not(lhs == rhs)
 )
 
 template<typename LHS, typename RHS>
@@ -80,11 +90,11 @@ constexpr auto operator>(LHS const & lhs, RHS const & rhs) BOUNDED_NOEXCEPT_DECL
 )
 template<typename LHS, typename RHS>
 constexpr auto operator<=(LHS const & lhs, RHS const & rhs) BOUNDED_NOEXCEPT_DECLTYPE(
-	!(rhs < lhs)
+	::bounded::detail::typed_not(rhs < lhs)
 )
 template<typename LHS, typename RHS>
 constexpr auto operator>=(LHS const & lhs, RHS const & rhs) BOUNDED_NOEXCEPT_DECLTYPE(
-	!(lhs < rhs)
+	::bounded::detail::typed_not(lhs < rhs)
 )
 
 }	// namespace detail
