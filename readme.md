@@ -39,7 +39,7 @@ The general form of the class is `bounded::integer<minimum, maximum, policy = bo
 ## Prerequisites
 
 * Compile with clang 3.9.0 or newer
-	* bounded::integer may compile with gcc 6 or newer, but has not been tested
+	* bounded::integer may compile with gcc 7 or newer, but has not been tested
 * Standard library from gcc 5.4.0 (libstdc++) or newer or clang 3.9.0 (libc++) or newer. 
 `bounded::integer` makes 
 use of C++17 (C++1z) features.
