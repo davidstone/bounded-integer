@@ -74,13 +74,56 @@ template<typename T>
 constexpr auto minimum_small_capacity = (2_bi * bounded::size_of<typename detail::dynamic_array_data_t<T>::size_type> + bounded::size_of<T *> - bounded::size_of<unsigned char>) / bounded::size_of<T>;
 
 
+template<typename T, std::size_t requested_small_capacity>
+struct small_t {
+	static constexpr auto capacity = bounded::max(minimum_small_capacity<T>, bounded::constant<requested_small_capacity>);
+	using size_type = bounded::integer<0, capacity.value()>;
+	static_assert(sizeof(size_type) == sizeof(unsigned char));
+
+	// force_small exists just to be a bit that's always 1. This allows
+	// is_small to return the correct answer even for 0-size containers.
+	constexpr small_t() noexcept:
+		force_small(true),
+		size(0_bi)
+	{
+	}
+
+	bool force_small : 1;
+	typename size_type::underlying_type size : (bounded::size_of_bits<size_type> - 1_bi).value();
+	array<trivial_storage<T>, capacity.value()> data;
+};
+
+template<typename T, std::size_t requested_small_capacity>
+struct large_t {
+	using size_type = typename detail::dynamic_array_data_t<T>::size_type;
+	using capacity_type = bounded::integer<small_t<T, requested_small_capacity>::capacity.value() + 1, size_type::max().value()>;
+
+	constexpr large_t(size_type size_, capacity_type capacity_, T * pointer_) noexcept:
+		force_small(false),
+		size(size_),
+		capacity(capacity_),
+		pointer(pointer_)
+	{
+		assert(pointer != nullptr);
+	}
+
+	bool force_small : 1;
+	typename size_type::underlying_type size : (bounded::size_of_bits<size_type> - 1_bi).value();
+	capacity_type capacity;
+	T * pointer;
+};
+
+
+
 template<typename T, std::size_t requested_small_capacity, typename Allocator>
 struct sbo_vector_base : private detail::rebound_allocator<T, Allocator> {
 	using value_type = T;
-	using allocator_type = detail::rebound_allocator<T, Allocator>;
+	using allocator_type = detail::rebound_allocator<value_type, Allocator>;
+	using small_t = small_t<value_type, requested_small_capacity>;
+	using large_t = large_t<value_type, requested_small_capacity>;
 	static_assert(std::is_nothrow_move_constructible<value_type>::value);
 	static_assert(std::is_nothrow_move_assignable<value_type>::value);
-	using size_type = typename detail::dynamic_array_data_t<value_type>::size_type;
+	using size_type = typename large_t::size_type;
 
 	static_assert(
 		size_type::max() <= bounded::constant<(1ULL << (CHAR_BIT * sizeof(value_type *) - 1)) - 1>,
@@ -244,41 +287,6 @@ private:
 	
 	static constexpr auto small_capacity = bounded::max(minimum_small_capacity<value_type>, bounded::constant<requested_small_capacity>).value();
 
-	struct small_t {
-		using size_type = bounded::integer<0, small_capacity>;
-		static_assert(sizeof(size_type) == sizeof(unsigned char));
-
-		// force_small exists just to be a bit that's always 1. This allows
-		// is_small to return the correct answer even for 0-size containers.
-		constexpr small_t() noexcept:
-			force_small(true),
-			size(0_bi)
-		{
-		}
-
-		bool force_small : 1;
-		typename size_type::underlying_type size : (bounded::size_of_bits<size_type> - 1_bi).value();
-		array<trivial_storage<value_type>, small_capacity> data;
-	};
-
-	struct large_t {
-		using capacity_type = bounded::integer<small_capacity + 1, size_type::max().value()>;
-
-		constexpr large_t(size_type size_, capacity_type capacity_, value_type * pointer_) noexcept:
-			force_small(false),
-			size(size_),
-			capacity(capacity_),
-			pointer(pointer_)
-		{
-			assert(pointer != nullptr);
-		}
-
-		bool force_small : 1;
-		typename size_type::underlying_type size : (bounded::size_of_bits<size_type> - 1_bi).value();
-		capacity_type capacity;
-		value_type * pointer;
-	};
-	
 	static_assert(sizeof(small_t) >= sizeof(large_t), "Incorrect buffer sizes.");
 	static_assert(std::is_standard_layout<small_t>::value);
 	static_assert(std::is_standard_layout<large_t>::value);
