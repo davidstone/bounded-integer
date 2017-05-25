@@ -94,7 +94,7 @@ private:
 
 template<typename Container>
 void test_unique_copy_less(Container const & source, Container const & expected) {
-	Container destination(size(source), 0);
+	Container destination(containers::size(source), 0);
 	auto const it = containers::unique_copy_less(begin(source), end(source), begin(destination));
 	erase(destination, it, end(destination));
 	assert(destination == expected);
@@ -117,7 +117,7 @@ void test_unique_less(Container source, Container const & expected) {
 
 template<typename Container>
 void test_unique_merge_copy(Container const & lhs, Container const & rhs, Container const & expected) {
-	Container result(typename Container::size_type(size(lhs) + size(rhs)), 0);
+	Container result(typename Container::size_type(containers::size(lhs) + containers::size(rhs)), 0);
 	auto const it = containers::unique_merge_copy(begin(lhs), end(lhs), begin(rhs), end(rhs), begin(result));
 	erase(result, it, end(result));
 
@@ -126,7 +126,7 @@ void test_unique_merge_copy(Container const & lhs, Container const & rhs, Contai
 
 template<typename Container>
 void test_unique_inplace_merge(Container v, Container const & other, Container const & expected) {
-	auto const midpoint = static_cast<typename Container::iterator::difference_type>(size(v));
+	auto const midpoint = static_cast<typename Container::iterator::difference_type>(containers::size(v));
 	v.insert(end(v), begin(other), end(other));
 	auto const it = containers::unique_inplace_merge(begin(v), begin(v) + midpoint, end(v));
 	erase(v, it, end(v));
