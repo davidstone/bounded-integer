@@ -17,7 +17,7 @@ namespace detail {
 
 // A non-movable type still returns true for is_trivially_copyable and friends
 template<typename T>
-constexpr auto constexpr_constructible = std::is_move_assignable<T>::value and std::is_trivially_move_assignable<T>::value and std::is_trivially_destructible<T>::value;
+constexpr auto constexpr_constructible = std::is_move_assignable<T>{} and std::is_trivially_move_assignable<T>{} and std::is_trivially_destructible<T>{};
 
 }	// namespace detail
 
@@ -25,45 +25,46 @@ constexpr auto constexpr_constructible = std::is_move_assignable<T>::value and s
 
 constexpr struct {
 	template<typename T, typename... Args, BOUNDED_REQUIRES(
-		!detail::constexpr_constructible<T> and
-		std::is_constructible<T, Args...>::value
+		not detail::constexpr_constructible<T> and
+		std::is_constructible<T, Args...>{}
 	)>
-	constexpr auto operator()(T & ref, Args && ... args) const BOUNDED_NOEXCEPT(
-		static_cast<void>(::new(static_cast<void *>(::bounded::addressof(ref))) T(std::forward<Args>(args)...))
+	constexpr auto operator()(T & ref, Args && ... args) const BOUNDED_NOEXCEPT_REF(
+		*::new(static_cast<void *>(::bounded::addressof(ref))) T(std::forward<Args>(args)...)
+	)
+	
+	// The assignment operator must return a T & if it is trivial
+	template<typename T, typename... Args, BOUNDED_REQUIRES(
+		detail::constexpr_constructible<T> and
+		std::is_constructible<T, Args...>{}
+	)>
+	constexpr auto operator()(T & ref, Args && ... args) const BOUNDED_NOEXCEPT_REF(
+		ref = T(std::forward<Args>(args)...)
+	)
+
+	template<typename T, typename... Args, BOUNDED_REQUIRES(
+		!detail::constexpr_constructible<T> and
+		!std::is_constructible<T, Args...>{}
+	)>
+	constexpr auto operator()(T & ref, Args && ... args) const BOUNDED_NOEXCEPT_REF(
+		*::new(static_cast<void *>(::bounded::addressof(ref))) T{std::forward<Args>(args)...}
 	)
 
 	template<typename T, typename... Args, BOUNDED_REQUIRES(
 		detail::constexpr_constructible<T> and
-		std::is_constructible<T, Args...>::value
+		!std::is_constructible<T, Args...>{}
 	)>
-	constexpr auto operator()(T & ref, Args && ... args) const BOUNDED_NOEXCEPT(
-		static_cast<void>(ref = T(std::forward<Args>(args)...))
-	)
-
-	template<typename T, typename... Args, BOUNDED_REQUIRES(
-		!detail::constexpr_constructible<T> and
-		!std::is_constructible<T, Args...>::value
-	)>
-	constexpr auto operator()(T & ref, Args && ... args) const BOUNDED_NOEXCEPT(
-		static_cast<void>(::new(static_cast<void *>(::bounded::addressof(ref))) T{std::forward<Args>(args)...})
-	)
-
-	template<typename T, typename... Args, BOUNDED_REQUIRES(
-		detail::constexpr_constructible<T> and
-		!std::is_constructible<T, Args...>::value
-	)>
-	constexpr auto operator()(T & ref, Args && ... args) const BOUNDED_NOEXCEPT(
-		static_cast<void>(ref = T{std::forward<Args>(args)...})
+	constexpr auto operator()(T & ref, Args && ... args) const BOUNDED_NOEXCEPT_REF(
+		ref = T{std::forward<Args>(args)...}
 	)
 } construct;
 
 
 constexpr struct {
-	template<typename T, BOUNDED_REQUIRES(!std::is_trivially_destructible<T>::value)>
+	template<typename T, BOUNDED_REQUIRES(!std::is_trivially_destructible<T>{})>
 	constexpr auto operator()(T & ref) const BOUNDED_NOEXCEPT(
 		ref.~T()
 	)
-	template<typename T, BOUNDED_REQUIRES(std::is_trivially_destructible<T>::value)>
+	template<typename T, BOUNDED_REQUIRES(std::is_trivially_destructible<T>{})>
 	constexpr auto operator()(T &) const noexcept {
 	}
 } destroy;
