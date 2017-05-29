@@ -99,11 +99,11 @@ public:
 	
 
 	template<typename T, typename... Args, BOUNDED_REQUIRES(detail::allocator_has_construct<allocator_type, T, Args...>)>
-	static constexpr auto construct(allocator_type & a, T * const ptr, Args && ... args) BOUNDED_NOEXCEPT(
-		static_cast<void>(a.construct(ptr, std::forward<Args>(args)...))
+	static constexpr auto & construct(allocator_type & a, T * const ptr, Args && ... args) BOUNDED_NOEXCEPT(
+		*a.construct(ptr, std::forward<Args>(args)...)
 	)
 	template<typename T, typename... Args, BOUNDED_REQUIRES(!detail::allocator_has_construct<allocator_type, T, Args...>)>
-	static constexpr auto construct(allocator_type &, T * const ptr, Args && ... args) BOUNDED_NOEXCEPT(
+	static constexpr auto construct(allocator_type &, T * const ptr, Args && ... args) BOUNDED_NOEXCEPT_REF(
 		::bounded::construct(*ptr, std::forward<Args>(args)...)
 	)
 	

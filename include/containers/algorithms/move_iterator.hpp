@@ -9,7 +9,6 @@
 
 #include <bounded/integer.hpp>
 
-#include <iterator>
 #include <type_traits>
 
 namespace containers {

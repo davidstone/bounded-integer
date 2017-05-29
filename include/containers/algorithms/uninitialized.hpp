@@ -5,6 +5,7 @@
 
 #pragma once
 
+#include <containers/algorithms/move_destroy_iterator.hpp>
 #include <containers/algorithms/move_iterator.hpp>
 #include <containers/algorithms/reverse_iterator.hpp>
 #include <containers/allocator.hpp>
@@ -46,7 +47,7 @@ auto static_or_reinterpret_cast(Source source) noexcept {
 }
 
 template<typename Allocator, typename T, typename... Args>
-constexpr auto construct(Allocator && allocator, T * pointer, Args && ... args) BOUNDED_NOEXCEPT(
+constexpr auto construct(Allocator && allocator, T * pointer, Args && ... args) BOUNDED_NOEXCEPT_REF(
 	allocator_traits<Allocator>::construct(
 		allocator,
 		::containers::detail::static_or_reinterpret_cast<typename std::decay_t<Allocator>::value_type *>(pointer),
@@ -134,22 +135,38 @@ constexpr auto uninitialized_move_backward(BidirectionalInputIterator const firs
 )
 
 
+// uninitialized_move_destroy guarantees that all elements in the input range
+// have been destoyed when this function completes.
 template<
 	typename InputIterator,
 	typename Sentinel,
 	typename ForwardIterator,
 	typename Allocator,
-	BOUNDED_REQUIRES(!noexcept(::containers::uninitialized_move(
-		std::declval<InputIterator const &>(),
-		std::declval<InputIterator const &>(),
+	BOUNDED_REQUIRES(not noexcept(::containers::uninitialized_copy(
+		::containers::move_destroy_iterator(std::declval<InputIterator const &>()),
+		std::declval<Sentinel const &>(),
 		std::declval<ForwardIterator const &>(),
 		std::declval<Allocator &>()
 	)))
 >
-auto uninitialized_move_destroy(InputIterator const first, Sentinel const last, ForwardIterator const out, Allocator && allocator) {
-	auto const guard = scope_guard([&]{ ::containers::detail::destroy(allocator, first, last); });
-	auto const it = ::containers::uninitialized_move(first, last, out, allocator);
-	return it;
+auto uninitialized_move_destroy(InputIterator const first, Sentinel const last, ForwardIterator out, Allocator && allocator) {
+	auto first_adapted = ::containers::move_destroy_iterator(first);
+	auto out_first = out;
+	try {
+		for (; first_adapted != last; ++first_adapted) {
+			::containers::detail::construct(allocator, ::bounded::addressof(*out), *first_adapted);
+			++out;
+		}
+	} catch (...) {
+		for (auto first_unadapted = first_adapted.base(); first_unadapted != last; ++first_unadapted) {
+			::containers::detail::destroy(allocator, ::bounded::addressof(*first_unadapted));
+		}
+		for (; out_first != out; ++out_first) {
+			::containers::detail::destroy(allocator, ::bounded::addressof(*out_first));
+		}
+		throw;
+	}
+	return out;
 }
 
 template<
@@ -157,17 +174,15 @@ template<
 	typename Sentinel,
 	typename ForwardIterator,
 	typename Allocator,
-	BOUNDED_REQUIRES(noexcept(::containers::uninitialized_move(
-		std::declval<InputIterator const &>(),
-		std::declval<InputIterator const &>(),
+	BOUNDED_REQUIRES(noexcept(::containers::uninitialized_copy(
+		::containers::move_destroy_iterator(std::declval<InputIterator const &>()),
+		std::declval<Sentinel const &>(),
 		std::declval<ForwardIterator const &>(),
 		std::declval<Allocator &>()
 	)))
 >
 constexpr auto uninitialized_move_destroy(InputIterator const first, Sentinel const last, ForwardIterator const out, Allocator && allocator) noexcept {
-	auto const it = ::containers::uninitialized_move(first, last, out, allocator);
-	::containers::detail::destroy(allocator, first, last);
-	return it;
+	return ::containers::uninitialized_copy(::containers::move_destroy_iterator(first), last, out, allocator);
 }
 
 

@@ -23,6 +23,7 @@ common_sources = [
 	'algorithms/find.cpp',
 	'algorithms/filter_iterator.cpp',
 	'algorithms/lexicographical_compare.cpp',
+	'algorithms/move_destroy_iterator.cpp',
 	'algorithms/move_iterator.cpp',
 	'algorithms/negate.cpp',
 	'algorithms/remove.cpp',
