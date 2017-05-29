@@ -169,7 +169,7 @@ struct sbo_vector_base : private detail::rebound_allocator<T, Allocator> {
 
 	static_assert(
 		size_type::max() <= bounded::constant<(1ULL << (CHAR_BIT * sizeof(value_type *) - 1)) - 1>,
-		"Maximum possible size is too large -- will use bit reserved for small-buffer optimization."
+		"Maximum possible size is too large -- would use bit reserved for small-buffer optimization."
 	);
 	static_assert(requested_small_capacity > 0, "Must request at least one element for the minimum capacity, otherwise you should use vector.");
 
