@@ -13,12 +13,18 @@ namespace detail {
 template<typename...>
 using void_t = void;
 
-using boost::hana::basic_type;
-using boost::hana::type;
-using boost::hana::type_c;
-
 template<typename...>
 struct types{};
 
 }	// namespace detail
+
+
+template<typename T>
+using basic_type = boost::hana::basic_type<T>;
+
+template<typename T>
+using type = boost::hana::type<T>;
+
+using boost::hana::type_c;
+
 }	// namespace containers
