@@ -76,7 +76,6 @@ constexpr auto minimum_small_capacity = (bounded::size_of<std::pair<typename dyn
 
 template<typename T, std::size_t requested_small_capacity>
 struct small_t {
-
 	// force_small exists just to be a bit that's always 1. This allows
 	// is_small to return the correct answer even for 0-size containers.
 	constexpr small_t() noexcept:
@@ -269,7 +268,7 @@ struct sbo_vector_base : private detail::rebound_allocator<T, Allocator> {
 	// Assumes that requested_capacity is large enough
 	template<typename Size>
 	auto relocate(Size const requested_capacity) {
-		if (requested_capacity <= bounded::constant<small_capacity>) {
+		if (requested_capacity <= small_t::capacity()) {
 			relocate_to_small();
 		} else {
 			auto temp = make_storage(requested_capacity);
@@ -328,8 +327,6 @@ private:
 		}
 	}
 	
-	static constexpr auto small_capacity = bounded::max(minimum_small_capacity<value_type>, bounded::constant<requested_small_capacity>).value();
-
 	static_assert(sizeof(small_t) >= sizeof(large_t), "Incorrect buffer sizes.");
 	static_assert(std::is_standard_layout<small_t>{});
 	static_assert(std::is_standard_layout<large_t>{});
