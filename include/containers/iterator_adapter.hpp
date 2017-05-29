@@ -73,7 +73,7 @@ template<typename IteratorCategory, typename Iterator, typename DereferenceFunct
 struct iterator_adapter_t : operator_arrow<iterator_adapter_t<IteratorCategory, Iterator, DereferenceFunction, AddFunction, SubtractFunction, LessFunction>> {
 	static_assert(
 		std::is_empty<SubtractFunction>::value,
-		"SubtractFunction must be a stateless comparison function. Would we use the state from the left- or right-hand side?"
+		"SubtractFunction must be a stateless function. Would we use the state from the left- or right-hand side?"
 	);
 	static_assert(
 		std::is_empty<LessFunction>::value,
