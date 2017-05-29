@@ -71,7 +71,7 @@ constexpr auto data(allocator_aware_storage<T, Allocator> & container) noexcept 
 // Therefore, to request the smallest possible buffer, the user can request a
 // size of 1
 template<typename T>
-constexpr auto minimum_small_capacity = (2_bi * bounded::size_of<typename detail::dynamic_array_data_t<T>::size_type> + bounded::size_of<T *> - bounded::size_of<unsigned char>) / bounded::size_of<T>;
+constexpr auto minimum_small_capacity = (bounded::size_of<std::pair<typename dynamic_array_data_t<T>::size_type, dynamic_array_data_t<T>>> - bounded::size_of<unsigned char>) / bounded::size_of<T>;
 
 
 template<typename T, std::size_t requested_small_capacity>
@@ -123,17 +123,16 @@ struct large_t {
 	constexpr large_t(size_type size_, capacity_type capacity_, T * pointer_) noexcept:
 		m_force_small(false),
 		m_size(size_),
-		m_capacity(capacity_),
-		m_pointer(pointer_)
+		m_data{reinterpret_cast<trivial_storage<T> *>(pointer_), capacity_}
 	{
-		assert(m_pointer != nullptr);
+		assert(data() != nullptr);
 	}
 
 	constexpr auto is_small() const noexcept {
 		return m_force_small;
 	}
 	constexpr auto capacity() const noexcept {
-		return m_capacity;
+		return m_data.size;
 	}
 
 	constexpr auto size() const noexcept {
@@ -144,18 +143,17 @@ struct large_t {
 	}
 
 	constexpr auto data() const noexcept {
-		return m_pointer;
+		return reinterpret_cast<T const *>(containers::data(m_data));
 	}
 	constexpr auto data() noexcept {
-		return m_pointer;
+		return reinterpret_cast<T *>(containers::data(m_data));
 	}
 
 
 private:
 	bool m_force_small : 1;
 	typename size_type::underlying_type m_size : (bounded::size_of_bits<size_type> - 1_bi).value();
-	capacity_type m_capacity;
-	T * m_pointer;
+	dynamic_array_data_t<trivial_storage<T>> m_data;
 };
 
 
@@ -298,7 +296,7 @@ private:
 			return;
 		}
 		auto && allocator = get_allocator();
-		auto const temp =  std::move(m_large);
+		auto temp = std::move(m_large);
 		auto const guard = scope_guard([&]{ ::containers::detail::deallocate_storage(allocator, temp.data(), temp.capacity()); });
 		// It is safe to skip the destructor call of m_large
 		// because we do not rely on its side-effects
