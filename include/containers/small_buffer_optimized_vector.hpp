@@ -224,11 +224,8 @@ struct sbo_vector_base : private detail::rebound_allocator<T, Allocator> {
 		return const_iterator(result, detail::iterator_constructor);
 	}
 	friend constexpr auto begin(sbo_vector_base & container) noexcept {
-		auto const result = container.is_small() ?
-			container.m_small.data() :
-			container.m_large.data();
-		assert(result != nullptr);
-		return iterator(result, detail::iterator_constructor);
+		auto const pointer = pointer_from(begin(::containers::detail::add_const(container)));
+		return iterator(::containers::detail::remove_const(pointer), detail::iterator_constructor);
 	}
 	
 	friend constexpr auto end(sbo_vector_base const & container) noexcept {
