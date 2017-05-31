@@ -80,6 +80,11 @@ struct common_type_and_value_category<T0, T1> {
 	>;
 };
 
+template<>
+struct common_type_and_value_category<void, void> {
+	using type = void;
+};
+
 template<typename T0, typename T1, typename... Ts>
 struct common_type_and_value_category<T0, T1, Ts...> {
 	using type = common_type_and_value_category_t<common_type_and_value_category_t<T0, T1>, Ts...>;
