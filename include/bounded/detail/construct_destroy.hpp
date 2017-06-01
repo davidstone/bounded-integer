@@ -19,42 +19,50 @@ namespace detail {
 template<typename T>
 constexpr auto constexpr_constructible = std::is_move_assignable<T>{} and std::is_trivially_move_assignable<T>{} and std::is_trivially_destructible<T>{};
 
-}	// namespace detail
-
 // Try () initialization first, then {} initialization
 
+// TODO: implement bounded::construct entirely in terms of this when compilers
+// implement guaranteed move elision
+template<typename T>
+struct construct_return_t {
+	template<typename... Args, BOUNDED_REQUIRES(std::is_constructible<T, Args...>{})>
+	constexpr auto operator()(Args && ... args) const BOUNDED_NOEXCEPT_VALUE(
+		T(std::forward<Args>(args)...)
+	)
+	
+	template<typename... Args, BOUNDED_REQUIRES(not std::is_constructible<T, Args...>{})>
+	constexpr auto operator()(Args && ... args) const BOUNDED_NOEXCEPT_VALUE(
+		T{std::forward<Args>(args)...}
+	)
+};
+
+}	// namespace detail
+
+template<typename T>
+constexpr auto construct_return = detail::construct_return_t<T>{};
+
+
 constexpr struct {
+	// The assignment operator must return a T & if it is trivial
+	template<typename T, typename... Args, BOUNDED_REQUIRES(detail::constexpr_constructible<T>)>
+	constexpr auto operator()(T & ref, Args && ... args) const BOUNDED_NOEXCEPT_REF(
+		ref = construct_return<T>(std::forward<Args>(args)...)
+	)
+
 	template<typename T, typename... Args, BOUNDED_REQUIRES(
-		not detail::constexpr_constructible<T> and
-		std::is_constructible<T, Args...>{}
+		std::is_constructible<T, Args...>{} and
+		not detail::constexpr_constructible<T>
 	)>
 	constexpr auto operator()(T & ref, Args && ... args) const BOUNDED_NOEXCEPT_REF(
 		*::new(static_cast<void *>(::bounded::addressof(ref))) T(std::forward<Args>(args)...)
 	)
 	
-	// The assignment operator must return a T & if it is trivial
 	template<typename T, typename... Args, BOUNDED_REQUIRES(
-		detail::constexpr_constructible<T> and
-		std::is_constructible<T, Args...>{}
-	)>
-	constexpr auto operator()(T & ref, Args && ... args) const BOUNDED_NOEXCEPT_REF(
-		ref = T(std::forward<Args>(args)...)
-	)
-
-	template<typename T, typename... Args, BOUNDED_REQUIRES(
-		!detail::constexpr_constructible<T> and
-		!std::is_constructible<T, Args...>{}
+		not std::is_constructible<T, Args...>{} and
+		not detail::constexpr_constructible<T>
 	)>
 	constexpr auto operator()(T & ref, Args && ... args) const BOUNDED_NOEXCEPT_REF(
 		*::new(static_cast<void *>(::bounded::addressof(ref))) T{std::forward<Args>(args)...}
-	)
-
-	template<typename T, typename... Args, BOUNDED_REQUIRES(
-		detail::constexpr_constructible<T> and
-		!std::is_constructible<T, Args...>{}
-	)>
-	constexpr auto operator()(T & ref, Args && ... args) const BOUNDED_NOEXCEPT_REF(
-		ref = T{std::forward<Args>(args)...}
 	)
 } construct;
 
