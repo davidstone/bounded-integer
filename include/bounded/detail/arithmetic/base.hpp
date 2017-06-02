@@ -17,21 +17,13 @@ namespace detail {
 
 template<typename Min, typename Max>
 struct min_max_t {
-	template<typename Minimum, typename Maximum>
-	constexpr min_max_t(Minimum && min_, Maximum && max_) noexcept(noexcept(std::is_nothrow_constructible<Min, Minimum &&>::value and std::is_nothrow_constructible<Max, Maximum &&>::value)):
-		min(std::forward<Minimum>(min_)),
-		max(std::forward<Maximum>(max_)) {
-	}
 	Min min;
 	Max max;
 };
 
 template<typename Min, typename Max>
-constexpr auto min_max(Min && min, Max && max) BOUNDED_NOEXCEPT_VALUE(
-	min_max_t<
-		std::remove_cv_t<std::remove_reference_t<Min>>,
-		std::remove_cv_t<std::remove_reference_t<Max>>
-	>(std::forward<Min>(min), std::forward<Max>(max))
+constexpr auto min_max(Min min, Max max) BOUNDED_NOEXCEPT_VALUE(
+	min_max_t<Min, Max>{std::move(min), std::move(max)}
 )
 
 }	// namespace detail
