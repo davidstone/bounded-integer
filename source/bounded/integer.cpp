@@ -4,6 +4,7 @@
 // http://www.boost.org/LICENSE_1_0.txt)
 
 #include <bounded/integer.hpp>
+#include <bounded/integer_range.hpp>
 #include <bounded/optional.hpp>
 
 #include <cassert>
@@ -12,12 +13,12 @@
 
 namespace {
 
+using namespace bounded::literal;
+
 template<typename LHS, typename RHS>
 constexpr auto same_bounds =
 	std::numeric_limits<LHS>::min() == std::numeric_limits<RHS>::min() and
 	std::numeric_limits<LHS>::max() == std::numeric_limits<RHS>::max();
-
-using namespace bounded::literal;
 
 namespace check_common_policy {
 	using bounded::null_policy;
@@ -1295,6 +1296,62 @@ auto check_math() {
 	static_assert(std::__lg(8_bi) == 3);
 }
 
+
+// I would rather test the public interface of my class instead of the
+// implementation detail functions that are used to generate the bounds.
+// However, testing that way seems to require O(n^8) space in the program (and
+// thus memory at compile time) and at least that much time at compile-time,
+// followed by at least O(n^6) runtime, in addition to significantly more
+// complicated code. By going through the bounded::detail::*operator_range
+// functions, we can just do the O(n^6) runtime.
+template<typename Operation, typename Range>
+auto check_arithmetic_range(Operation const operation, Range const range) {
+	constexpr auto division_based_function = std::is_same<Operation, std::divides<>>{} or std::is_same<Operation, std::modulus<>>{};
+	constexpr auto bound = 7_bi;
+	using bounded::integer_range;
+	for (auto const rhs_min : integer_range(-bound, bound + 1_bi)) {
+		if (division_based_function and rhs_min == 0_bi) {
+			continue;
+		}
+		for (auto const rhs_max : integer_range(rhs_min, bound + 1_bi)) {
+			if (division_based_function and rhs_max == 0_bi) {
+				continue;
+			}
+			for (auto const lhs_min : integer_range(-bound, bound + 1_bi)) {
+				for (auto const lhs_max : integer_range(lhs_min, bound + 1_bi)) {
+
+					using bounded::detail::min_max;
+					auto const expected = range(min_max(lhs_min.value(), lhs_max.value()), min_max(rhs_min.value(), rhs_max.value()));
+					auto current_max = std::numeric_limits<intmax_t>::min();
+					auto current_min = std::numeric_limits<intmax_t>::max();
+
+					for (auto const rhs : integer_range(rhs_min, rhs_max + 1_bi)) {
+						if (division_based_function and rhs == 0_bi) {
+							continue;
+						}
+						for (auto const lhs : integer_range(lhs_min, lhs_max + 1_bi)) {
+							auto const result = operation(lhs.value(), rhs.value());
+							current_max = bounded::max(current_max, result);
+							current_min = bounded::min(current_min, result);
+						}
+					}
+					assert(current_min == expected.min);
+					assert(current_max == expected.max);
+				}
+			}
+		}
+	}
+}
+
+auto check_arithmetic_range() {
+	using namespace bounded::detail;
+	check_arithmetic_range(std::plus<>{}, [](auto const & lhs, auto const & rhs) { return plus_operator_range(lhs, rhs); });
+	check_arithmetic_range(std::multiplies<>{}, [](auto const & lhs, auto const & rhs) { return multiplies_operator_range(lhs, rhs); });
+	check_arithmetic_range(std::divides<>{}, [](auto const & lhs, auto const & rhs) { return divides_operator_range(lhs, rhs); });
+	check_arithmetic_range(std::modulus<>{}, [](auto const & lhs, auto const & rhs) { return modulus_operator_range(lhs, rhs); });
+}
+
+
 template<typename Optional>
 auto check_empty_braces() {
 	Optional op = {};
@@ -1534,6 +1591,7 @@ auto main() -> int {
 	check_assignment();
 	check_compound_arithmetic();
 	check_math();
+	check_arithmetic_range();
 	check_optional();
 	check_to_string();
 	check_streaming();
