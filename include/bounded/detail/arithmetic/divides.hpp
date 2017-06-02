@@ -28,13 +28,8 @@ constexpr auto divides_operator_range(LHS const & lhs, RHS const & rhs) noexcept
 	auto const g2 = lhs.max / least_positive_divisor;
 	auto const g3 = lhs.max / greatest_negative_divisor;
 
-	auto const l0 = lhs.min / rhs.min;
-	auto const l1 = lhs.min / rhs.max;
-	auto const l2 = lhs.max / rhs.min;
-	auto const l3 = lhs.max / rhs.max;
-
 	return min_max(
-		min(l0, l1, l2, l3, g0, g1, g2, g3),
+		min(g0, g1, g2, g3),
 		max(g0, g1, g2, g3)
 	);
 }
