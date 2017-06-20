@@ -187,7 +187,7 @@ constexpr auto generic_forward_as_tuple(Args && ... args) BOUNDED_NOEXCEPT_VALUE
 )
 template<typename container_type, typename... Args, BOUNDED_REQUIRES(!is_std_map<container_type>::value)>
 constexpr auto generic_forward_as_tuple(Args && ... args) BOUNDED_NOEXCEPT_VALUE(
-	::containers::forward_as_tuple(std::forward<Args>(args)...)
+	::containers::tie(std::forward<Args>(args)...)
 )
 
 template<typename container_type>

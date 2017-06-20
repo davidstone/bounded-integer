@@ -306,17 +306,10 @@ constexpr struct {
 
 constexpr struct {
 	template<typename... Types>
-	constexpr auto operator()(Types & ... args) const noexcept {
-		return tuple<Types &...>(args...);
-	}
-} tie;
-
-constexpr struct {
-	template<typename... Types>
 	constexpr auto operator()(Types && ... args) const noexcept {
 		return tuple<Types && ...>(std::forward<Types>(args)...);
 	}
-} forward_as_tuple;
+} tie;
 
 
 template<typename Tuple>
