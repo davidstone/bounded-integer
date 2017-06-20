@@ -357,14 +357,14 @@ private:
 	template<typename Pair>
 	static constexpr auto separate_key_from_mapped(Pair && pair) {
 		return construct_result(
-			::containers::forward_as_tuple(std::forward<Pair>(pair).mapped()),
+			forward_as_tuple(std::forward<Pair>(pair).mapped()),
 			std::forward<Pair>(pair).key()
 		);
 	}
 	template<typename Key, typename Mapped>
 	static constexpr auto separate_key_from_mapped(Key && key, Mapped && mapped) {
 		return construct_result(
-			::containers::forward_as_tuple(std::forward<Mapped>(mapped)),
+			forward_as_tuple(std::forward<Mapped>(mapped)),
 			std::forward<Key>(key)
 		);
 	}
@@ -398,7 +398,7 @@ private:
 		container().emplace(
 			position,
 			std::piecewise_construct,
-			::containers::forward_as_tuple(std::forward<Key>(key)),
+			forward_as_tuple(std::forward<Key>(key)),
 			std::forward<Mapped>(mapped)
 		)
 	)
@@ -416,7 +416,7 @@ private:
 		auto const it = container().emplace(
 			position,
 			std::piecewise_construct,
-			::containers::forward_as_tuple(std::forward<Key>(key)),
+			forward_as_tuple(std::forward<Key>(key)),
 			std::forward<Mapped>(mapped)
 		);
 		return inserted_t(it, true);
@@ -488,10 +488,10 @@ public:
 		return it->mapped();
 	}
 	constexpr auto & operator[](key_type const & key) {
-		return this->emplace(std::piecewise_construct, ::containers::forward_as_tuple(key), ::containers::forward_as_tuple()).first->mapped;
+		return this->emplace(std::piecewise_construct, forward_as_tuple(key), forward_as_tuple()).first->mapped;
 	}
 	constexpr auto & operator[](key_type && key) {
-		return this->emplace(std::piecewise_construct, ::containers::forward_as_tuple(std::move(key)), ::containers::forward_as_tuple()).first->mapped;
+		return this->emplace(std::piecewise_construct, forward_as_tuple(std::move(key)), forward_as_tuple()).first->mapped;
 	}
 
 	constexpr auto equal_range(key_type const & key) const {

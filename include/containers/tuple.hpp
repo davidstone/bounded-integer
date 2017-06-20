@@ -297,20 +297,26 @@ constexpr auto operator<(tuple<lhs_types...> const & lhs, tuple<rhs_types...> co
 
 // TODO: unwrap reference_wrapper?
 // TODO: Should this actually be decay?
-template<typename... Types>
-constexpr auto make_tuple(Types && ... args) BOUNDED_NOEXCEPT_VALUE(
-	tuple<std::decay_t<Types>...>(std::forward<Types>(args)...)
-)
+constexpr struct {
+	template<typename... Types>
+	constexpr auto operator()(Types && ... args) const BOUNDED_NOEXCEPT_VALUE(
+		tuple<std::decay_t<Types>...>(std::forward<Types>(args)...)
+	)
+} make_tuple;
 
-template<typename... Types>
-constexpr auto tie(Types & ... args) noexcept {
-	return tuple<Types &...>(args...);
-}
+constexpr struct {
+	template<typename... Types>
+	constexpr auto operator()(Types & ... args) const noexcept {
+		return tuple<Types &...>(args...);
+	}
+} tie;
 
-template<typename... Types>
-constexpr auto forward_as_tuple(Types && ... args) noexcept {
-	return tuple<Types && ...>(std::forward<Types>(args)...);
-}
+constexpr struct {
+	template<typename... Types>
+	constexpr auto operator()(Types && ... args) const noexcept {
+		return tuple<Types && ...>(std::forward<Types>(args)...);
+	}
+} forward_as_tuple;
 
 
 template<typename Tuple>
@@ -335,61 +341,58 @@ template<std::size_t index, typename Tuple>
 using tuple_element = typename tuple_element_c<index, Tuple>::type;
 
 
-namespace detail {
-
-template<std::size_t... first_indexes, typename First, std::size_t... second_indexes, typename Second>
-constexpr auto tuple_cat_impl(std::index_sequence<first_indexes...>, First && first, std::index_sequence<second_indexes...>, Second && second) BOUNDED_NOEXCEPT_VALUE(
-	tuple<
-		tuple_element<first_indexes, First>...,
-		tuple_element<second_indexes, Second>...
-	>(
-		std::forward<First>(first)[bounded::constant<first_indexes>]...,
-		std::forward<Second>(second)[bounded::constant<second_indexes>]...
+constexpr struct tuple_cat_t {
+private:
+	template<std::size_t... first_indexes, typename First, std::size_t... second_indexes, typename Second>
+	static constexpr auto cat_two(std::index_sequence<first_indexes...>, First && first, std::index_sequence<second_indexes...>, Second && second) BOUNDED_NOEXCEPT_VALUE(
+		tuple<
+			tuple_element<first_indexes, First>...,
+			tuple_element<second_indexes, Second>...
+		>(
+			std::forward<First>(first)[bounded::constant<first_indexes>]...,
+			std::forward<Second>(second)[bounded::constant<second_indexes>]...
+		)
 	)
-)
 
-}	// namespace detail
+public:
+	constexpr auto operator()() const noexcept {
+		return tuple<>();
+	}
 
-constexpr auto tuple_cat() noexcept {
-	return tuple<>();
-}
-
-template<typename Tuple>
-constexpr auto tuple_cat(Tuple && tuple) BOUNDED_NOEXCEPT_VALUE(
-	std::forward<Tuple>(tuple)
-)
-
-template<typename First, typename Second, typename... Tail>
-constexpr auto tuple_cat(First && first, Second && second, Tail && ... tail) BOUNDED_NOEXCEPT_VALUE(
-	tuple_cat(
-		::containers::detail::tuple_cat_impl(
-			::containers::detail::make_index_sequence(tuple_size<First>), std::forward<First>(first),
-			::containers::detail::make_index_sequence(tuple_size<Second>), std::forward<Second>(second)
-		), 
-		std::forward<Tail>(tail)...
+	template<typename Tuple>
+	constexpr auto operator()(Tuple && tuple) const BOUNDED_NOEXCEPT_VALUE(
+		std::forward<Tuple>(tuple)
 	)
-)
 
-
-
-namespace detail {
-
-template<typename Function, std::size_t... indexes, typename Tuple>
-constexpr auto apply_helper(Function && f, std::index_sequence<indexes...>, Tuple && tuple_args) BOUNDED_NOEXCEPT_DECLTYPE(
-	std::forward<Function>(f)(std::forward<Tuple>(tuple_args)[bounded::constant<indexes>]...)
-)
-
-}	// namespace detail
-
-template<typename Function, typename Tuple>
-constexpr auto apply(Function && f, Tuple && tuple_args) BOUNDED_NOEXCEPT_DECLTYPE(
-	::containers::detail::apply_helper(
-		std::forward<Function>(f),
-		detail::make_index_sequence(tuple_size<Tuple>),
-		std::forward<Tuple>(tuple_args)
+	template<typename First, typename Second, typename... Tail>
+	constexpr auto operator()(First && first, Second && second, Tail && ... tail) const BOUNDED_NOEXCEPT_VALUE(
+		operator()(
+			cat_two(
+				::containers::detail::make_index_sequence(tuple_size<First>), std::forward<First>(first),
+				::containers::detail::make_index_sequence(tuple_size<Second>), std::forward<Second>(second)
+			), 
+			std::forward<Tail>(tail)...
+		)
 	)
-)
+} tuple_cat;
 
+
+constexpr struct apply_t {
+private:
+	template<typename Function, std::size_t... indexes, typename Tuple>
+	static constexpr auto implementation(Function && f, std::index_sequence<indexes...>, Tuple && tuple_args) BOUNDED_NOEXCEPT_DECLTYPE(
+		std::forward<Function>(f)(std::forward<Tuple>(tuple_args)[bounded::constant<indexes>]...)
+	)
+public:
+	template<typename Function, typename Tuple>
+	constexpr auto operator()(Function && f, Tuple && tuple_args) const BOUNDED_NOEXCEPT_DECLTYPE(
+		implementation(
+			std::forward<Function>(f),
+			detail::make_index_sequence(tuple_size<Tuple>),
+			std::forward<Tuple>(tuple_args)
+		)
+	)
+} apply;
 
 
 namespace detail {
@@ -429,7 +432,7 @@ constexpr auto transform_impl(bounded::constant_t<i>, Function &&, Tuples && ...
 // have to write special code to calculate whether the function is noexcept.
 template<std::intmax_t i, typename Function, typename... Tuples, BOUNDED_REQUIRES(i != all_tuple_sizes<Tuples...>())>
 constexpr auto transform_impl(bounded::constant_t<i> index, Function && function, Tuples && ... tuples) {
-	return ::containers::tuple_cat(
+	return tuple_cat(
 		tuple<decltype(function(std::forward<Tuples>(tuples)[index]...))>(function(std::forward<Tuples>(tuples)[index]...)),
 		::containers::detail::transform_impl(index + 1_bi, function, std::forward<Tuples>(tuples)...)
 	);
@@ -441,9 +444,6 @@ template<typename Function, typename... Tuples, BOUNDED_REQUIRES((... and is_tup
 constexpr auto transform(Function && function, Tuples && ... tuples) noexcept(detail::all_noexcept_function_calls<Function, Tuples && ...>) {
 	return ::containers::detail::transform_impl(0_bi, function, std::forward<Tuples>(tuples)...);
 }
-
-
-// TODO: uses_allocator?
 
 
 }	// namespace containers
