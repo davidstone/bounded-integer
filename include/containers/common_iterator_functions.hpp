@@ -41,11 +41,19 @@ constexpr auto pointer_from(T * pointer) noexcept {
 }	// namespace common
 
 using containers::detail::common::operator+;
+using bounded::operator+=;
+using bounded::operator-=;
+using bounded::operator++;
+using bounded::operator--;
 using containers::detail::common::pointer_from;
 
 }	// namespace detail
 
 using containers::detail::common::operator+;
+using bounded::operator+=;
+using bounded::operator-=;
+using bounded::operator++;
+using bounded::operator--;
 using containers::detail::common::pointer_from;
 
 }	// namespace containers
