@@ -9,7 +9,6 @@
 #include <bounded/detail/comparison.hpp>
 #include <bounded/detail/forward_declaration.hpp>
 #include <bounded/detail/overlapping_range.hpp>
-#include <bounded/detail/policy/common_policy.hpp>
 #include <utility>
 
 namespace bounded {

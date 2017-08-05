@@ -44,7 +44,7 @@ constexpr auto operator symbol( \
 	using result_t = integer< \
 		range.min, \
 		range.max, \
-		common_policy_t<lhs_policy, rhs_policy>, \
+		detail::common_policy<lhs_policy, rhs_policy>, \
 		detail::common_storage_type(lhs_storage, rhs_storage), \
 		lhs_poisoned or rhs_poisoned \
 	>; \

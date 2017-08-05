@@ -20,31 +20,6 @@ constexpr auto same_bounds =
 	std::numeric_limits<LHS>::min() == std::numeric_limits<RHS>::min() and
 	std::numeric_limits<LHS>::max() == std::numeric_limits<RHS>::max();
 
-namespace check_common_policy {
-	using bounded::null_policy;
-	using throw_policy = bounded::throw_policy<>;
-
-	static_assert(
-		std::is_same<bounded::common_policy_t<null_policy, null_policy>, null_policy>::value,
-		"common_policy gives wrong type for all null_policy"
-	);
-
-	static_assert(
-		std::is_same<bounded::common_policy_t<null_policy, throw_policy>, throw_policy>::value,
-		"common_policy gives wrong type for one null_policy (first)"
-	);
-
-	static_assert(
-		std::is_same<bounded::common_policy_t<throw_policy, null_policy>, throw_policy>::value,
-		"common_policy gives wrong type for one null_policy (second)"
-	);
-
-	static_assert(
-		std::is_same<bounded::common_policy_t<throw_policy, throw_policy>, throw_policy>::value,
-		"common_policy gives wrong type for all throw_policy"
-	);
-}
-
 namespace check_common_type {
 	using type1 = bounded::integer<1, 5>;
 	using type2 = bounded::integer<3, 10>;

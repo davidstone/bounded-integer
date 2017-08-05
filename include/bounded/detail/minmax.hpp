@@ -14,7 +14,6 @@
 #include <bounded/detail/noexcept.hpp>
 #include <bounded/detail/overlapping_range.hpp>
 #include <bounded/detail/requires.hpp>
-#include <bounded/detail/policy/common_policy.hpp>
 
 #include <utility>
 
@@ -65,7 +64,7 @@ struct extreme_type<
 private:
 	static constexpr auto minimum = Compare{}(lhs_min, rhs_min) ? lhs_min : rhs_min;
 	static constexpr auto maximum = Compare{}(lhs_max, rhs_max) ? lhs_max : rhs_max;
-	using policy = common_policy_t<lhs_policy, rhs_policy>;
+	using policy = detail::common_policy<lhs_policy, rhs_policy>;
 	static constexpr auto storage = detail::common_storage_type(lhs_storage, rhs_storage);
 	static constexpr auto poisoned = lhs_poisoned or rhs_poisoned;
 public:

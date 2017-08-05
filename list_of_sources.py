@@ -70,7 +70,6 @@ sources += prepend_dir('detail/optional', [
 sources += prepend_dir('detail/policy', [
 	'all.cpp',
 	'clamp_policy.cpp',
-	'common_policy.cpp',
 	'modulo_policy.cpp',
 	'null_policy.cpp',
 	'throw_policy.cpp',

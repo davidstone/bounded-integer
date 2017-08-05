@@ -1,12 +1,10 @@
-// Copyright David Stone 2015.
+// Copyright David Stone 2017.
 // Distributed under the Boost Software License, Version 1.0.
 // (See accompanying file LICENSE_1_0.txt or copy at
 // http://www.boost.org/LICENSE_1_0.txt)
 
 #pragma once
 
-#include <bounded/detail/policy/common_policy.hpp>
-#include <bounded/detail/comparison.hpp>
 #include <bounded/detail/is_bounded_integer.hpp>
 #include <utility>
 
@@ -40,18 +38,5 @@ private:
 	}
 };
 
-
-template<typename policy>
-struct common_policy<policy, null_policy> {
-	using type = policy;
-};
-template<typename policy>
-struct common_policy<null_policy, policy> {
-	using type = policy;
-};
-template<>
-struct common_policy<null_policy, null_policy> {
-	using type = null_policy;
-};
 
 }	// namespace bounded

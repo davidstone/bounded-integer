@@ -6,7 +6,7 @@
 #pragma once
 
 #include <bounded/detail/forward_declaration.hpp>
-#include <bounded/detail/policy/common_policy.hpp>
+#include <bounded/detail/policy/null_policy.hpp>
 
 #include <type_traits>
 
@@ -19,6 +19,9 @@ namespace detail {
 constexpr storage_type common_storage_type(storage_type const lhs_storage, storage_type const rhs_storage) noexcept {
 	return (lhs_storage < rhs_storage) ? lhs_storage : rhs_storage;
 }
+
+template<typename lhs_policy, typename rhs_policy>
+using common_policy = std::conditional_t<std::is_same<lhs_policy, rhs_policy>{}, lhs_policy, bounded::null_policy>;
 
 }	// namespace detail
 }	// namespace bounded
@@ -43,7 +46,7 @@ public:
 	using type = bounded::integer<
 		minimum,
 		maximum,
-		bounded::common_policy_t<lhs_policy, rhs_policy>,
+		bounded::detail::common_policy<lhs_policy, rhs_policy>,
 		bounded::detail::common_storage_type(lhs_storage, rhs_storage),
 		lhs_poisoned or rhs_poisoned
 	>;
