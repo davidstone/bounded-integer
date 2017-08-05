@@ -54,7 +54,6 @@ sources += prepend_dir('detail/arithmetic', [
 	'modulus.cpp',
 	'left_shift.cpp',
 	'right_shift.cpp',
-	'compound_assignment.cpp',
 	'common.cpp',
 	'operators.cpp',
 	'operators_builtin.cpp',

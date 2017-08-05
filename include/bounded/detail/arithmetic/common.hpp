@@ -1,11 +1,12 @@
-// Copyright David Stone 2015.
+// Copyright David Stone 2017.
 // Distributed under the Boost Software License, Version 1.0.
 // (See accompanying file LICENSE_1_0.txt or copy at
 // http://www.boost.org/LICENSE_1_0.txt)
 
 #pragma once
 
-#include <bounded/detail/arithmetic/compound_assignment.hpp>
+#include <bounded/detail/arithmetic/operators.hpp>
+#include <bounded/detail/class.hpp>
 #include <bounded/detail/is_bounded_integer.hpp>
 #include <bounded/detail/noexcept.hpp>
 #include <bounded/detail/requires.hpp>
@@ -17,7 +18,7 @@ namespace detail {
 namespace arithmetic {
 
 #define BOUNDED_INTEGER_COMPOUND_ASSIGNMENT_OPERATOR(symbol) \
-template<typename LHS, typename RHS, BOUNDED_REQUIRES(!is_bounded_integer<LHS>)> \
+template<typename LHS, typename RHS> \
 constexpr auto operator symbol##=(LHS & lhs, RHS && rhs) BOUNDED_NOEXCEPT_DECLTYPE( \
 	lhs = static_cast<std::decay_t<LHS>>(std::move(lhs) symbol std::forward<RHS>(rhs)) \
 ) \
