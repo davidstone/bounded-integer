@@ -256,22 +256,24 @@ public:
 		m_value.initialize(optional_tag{}, std::forward<Args>(args)...);
 	}
 
+	// Cannot use BOUNDED_NOEXCEPT because of gcc bug
+	// https://gcc.gnu.org/bugzilla/show_bug.cgi?id=52869
 	constexpr auto && operator=(none_t) & noexcept {
 		static_assert(noexcept(m_value.uninitialize(optional_tag{})));
 		m_value.uninitialize(optional_tag{});
 		return *this;
 	}
-	constexpr auto && operator=(optional const & other) & BOUNDED_NOEXCEPT(
-		detail::assign_from_optional(*this, other)
-	)
-	constexpr auto && operator=(optional && other) & BOUNDED_NOEXCEPT(
-		detail::assign_from_optional(*this, std::move(other))
-	)
+	constexpr auto && operator=(optional const & other) & noexcept(noexcept(detail::assign_from_optional(std::declval<optional &>(), other))) {
+		return detail::assign_from_optional(*this, other);
+	}
+	constexpr auto && operator=(optional && other) & noexcept(noexcept(detail::assign_from_optional(std::declval<optional& >(), std::move(other)))) {
+		return detail::assign_from_optional(*this, std::move(other));
+	}
 	// TODO: make this work when value_type is a reference
 	template<typename U, BOUNDED_REQUIRES(std::is_convertible<U &&, value_type>::value)>
-	constexpr auto && operator=(U && other) & BOUNDED_NOEXCEPT(
-		detail::assign(*this, std::forward<U>(other))
-	)
+	constexpr auto && operator=(U && other) & noexcept(noexcept(detail::assign(std::declval<optional &>(), std::forward<U>(other)))) {
+		return detail::assign(*this, std::forward<U>(other));
+	}
 	
 private:
 	// The identity function is intentionally not constexpr. This provides

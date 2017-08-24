@@ -239,10 +239,12 @@ struct integer {
 		m_value(uninitialized_value()) {
 	}
 
-	template<typename Tag, typename... Args, BOUNDED_REQUIRES(std::is_same<Tag, optional_tag>::value and detail::has_extra_space<integer>)>
-	constexpr auto initialize(Tag, Args && ... args) BOUNDED_NOEXCEPT_VOID(
-		*this = integer(std::forward<Args>(args)...)
-	)
+	// Cannot use BOUNDED_NOEXCEPT_VOID because of gcc bug
+	// https://gcc.gnu.org/bugzilla/show_bug.cgi?id=52869
+	template<typename Tag, typename... Args, BOUNDED_REQUIRES(std::is_same<Tag, optional_tag>::value and detail::has_extra_space<integer> and std::is_constructible<integer, Args...>{})>
+	constexpr auto initialize(Tag, Args && ... args) noexcept(std::is_nothrow_constructible<integer, Args...>{}) {
+		return *this = integer(std::forward<Args>(args)...);
+	}
 
 	template<typename Tag, BOUNDED_REQUIRES(std::is_same<Tag, optional_tag>::value and detail::has_extra_space<integer>)>
 	constexpr auto uninitialize(Tag) noexcept {
