@@ -45,8 +45,9 @@ struct throw_policy {
 		static_assert(is_bounded_integer<Maximum>, "Only bounded::integer types are supported.");
 		if (minimum <= value and value <= maximum) {
 			return policy_detail::reduce_range(std::forward<T>(value), Minimum::min(), Maximum::max());
+		} else {
+			throw Exception("Got a value of " + to_string(value) + " but expected a value in the range [" + to_string(minimum) + ", " + to_string(maximum) + "]");
 		}
-		throw Exception("Got a value of " + to_string(value) + " but expected a value in the range [" + to_string(minimum) + ", " + to_string(maximum) + "]");
 	}
 	
 	using overflow_policy_tag = void;
