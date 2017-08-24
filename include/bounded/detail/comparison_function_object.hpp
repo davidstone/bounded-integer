@@ -20,6 +20,11 @@ struct binary_equal_to {
 };
 template<typename Bound>
 struct unary_equal_to {
+private:
+	// This has to be first to work around gcc bug
+	// https://gcc.gnu.org/bugzilla/show_bug.cgi?id=66256
+	Bound m_bound;
+public:
 	constexpr explicit unary_equal_to(Bound && bound) noexcept(std::is_nothrow_constructible<Bound, Bound &&>::value):
 		m_bound(std::forward<Bound>(bound))
 	{
@@ -28,8 +33,6 @@ struct unary_equal_to {
 	constexpr decltype(auto) operator()(Other && other) const BOUNDED_NOEXCEPT(
 		m_bound == std::forward<Other>(other)
 	)
-private:
-	Bound m_bound;
 };
 
 // TODO: Add total ordering for pointer types
