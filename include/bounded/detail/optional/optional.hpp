@@ -228,20 +228,20 @@ public:
 	}
 
 	
-	constexpr auto operator*() const & -> value_type const & {
+	constexpr auto operator*() const & noexcept -> value_type const & {
 		return *this ? m_value : error_using_uninitialized_optional(m_value);
 	}
-	constexpr auto operator*() & -> value_type & {
+	constexpr auto operator*() & noexcept -> value_type & {
 		return *this ? m_value : error_using_uninitialized_optional(m_value);
 	}
-	constexpr auto operator*() && -> value_type && {
+	constexpr auto operator*() && noexcept -> value_type && {
 		return *this ? std::move(m_value) : error_using_uninitialized_optional(std::move(m_value));
 	}
 
-	constexpr auto operator->() const {
+	constexpr auto operator->() const noexcept {
 		return &operator*();
 	}
-	constexpr auto operator->() {
+	constexpr auto operator->() noexcept {
 		return &operator*();
 	}
 	
@@ -282,7 +282,7 @@ private:
 	// same value and eliminate all branching, creating no overhead. See
 	// https://stackoverflow.com/questions/20461121/constexpr-error-at-compile-time-but-no-overhead-at-run-time
 	template<typename U>
-	static auto && error_using_uninitialized_optional(U && u) {
+	static auto && error_using_uninitialized_optional(U && u) noexcept {
 		return std::forward<U>(u);
 	}
 
