@@ -13,7 +13,7 @@
 namespace bounded {
 namespace detail {
 
-template<typename Integer, typename Base, BOUNDED_REQUIRES(std::is_integral<Integer>::value)>
+template<typename Integer, typename Base>
 constexpr auto log(Integer value, Base const base) noexcept {
 	auto sum = 0;
 	while (value >= base) {
@@ -40,7 +40,14 @@ constexpr auto log(integer<minimum, maximum, overflow_policy, storage, poisoned>
 		storage,
 		poisoned
 	>;
-	return result_type(detail::log(value.value(), base.value()), non_check);
+	using argument_type = integer<
+		0,
+		maximum,
+		overflow_policy,
+		storage,
+		poisoned
+	>;
+	return result_type(detail::log(static_cast<argument_type>(value), base), non_check);
 }
 
 }	// namespace bounded
