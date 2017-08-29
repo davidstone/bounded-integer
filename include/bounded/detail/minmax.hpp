@@ -115,12 +115,7 @@ struct noexcept_comparable<Compare, T1, T2, Ts...> : std::integral_constant<bool
 // accepts the comparison function as the first argument
 
 constexpr struct {
-	template<typename Compare, typename T>
-	constexpr decltype(auto) operator()(Compare, T && t) const noexcept {
-		return t;
-	}
-
-
+private:
 	// If the type of the result has no overlap with the type one of the
 	// arguments, then that argument cannot be the true value. Therefore, we
 	// can skip any actual comparison and just return the other value. The
@@ -130,14 +125,14 @@ constexpr struct {
 		basic_numeric_limits<T1>::is_specialized and basic_numeric_limits<T2>::is_specialized and
 		not detail::types_overlap<extreme_t<Compare, T1, T2>, T2>()
 	)>
-	constexpr decltype(auto) operator()(Compare, T1 && t1, T2 &&) const noexcept {
+	static constexpr decltype(auto) extreme_two(Compare, T1 && t1, T2 &&) noexcept {
 		return detail::minmax::construct<T1>(std::forward<T1>(t1));
 	}
 	template<typename Compare, typename T1, typename T2, BOUNDED_REQUIRES(
 		basic_numeric_limits<T1>::is_specialized and basic_numeric_limits<T2>::is_specialized and
 		not detail::types_overlap<extreme_t<Compare, T1, T2>, T1>()
 	)>
-	constexpr decltype(auto) operator()(Compare, T1 &&, T2 && t2) const noexcept {
+	static constexpr decltype(auto) extreme_two(Compare, T1 &&, T2 && t2) noexcept {
 		return detail::minmax::construct<T2>(std::forward<T2>(t2));
 	}
 
@@ -147,16 +142,43 @@ constexpr struct {
 		(detail::types_overlap<extreme_t<Compare, T1, T2>, T1>() and
 		detail::types_overlap<extreme_t<Compare, T1, T2>, T2>())
 	)>
-	constexpr auto operator()(Compare compare, T1 && t1, T2 && t2) const BOUNDED_NOEXCEPT_DECLTYPE(
+	static constexpr auto extreme_two(Compare compare, T1 && t1, T2 && t2) BOUNDED_NOEXCEPT_DECLTYPE(
 		compare(t2, t1) ?
 			detail::minmax::construct<result_type>(std::forward<T2>(t2)) :
 			detail::minmax::construct<result_type>(std::forward<T1>(t1))
 	)
 
 
-	// TODO: noexcept
+	template<typename Compare, typename... Ts>
+	struct noexcept_extreme;
+	
+	template<typename Compare, typename T1, typename T2>
+	struct noexcept_extreme<Compare, T1, T2> : std::bool_constant<
+		noexcept(extreme_two(std::declval<Compare>(), std::declval<T1>(), std::declval<T2>()))
+	> {
+	};
+	
 	template<typename Compare, typename T1, typename T2, typename... Ts>
-	constexpr decltype(auto) operator()(Compare compare, T1 && t1, T2 && t2, Ts && ... ts) const {
+	struct noexcept_extreme<Compare, T1, T2, Ts...> : std::bool_constant<
+		noexcept_extreme<Compare, T1, T2>{} and
+		noexcept_extreme<Compare, detail::add_common_cv_reference_t<extreme_t<Compare, T1, T2>, T1, T2>, Ts...>{}
+	> {
+	};
+
+public:
+	template<typename Compare, typename T>
+	constexpr decltype(auto) operator()(Compare, T && t) const noexcept {
+		return t;
+	}
+
+
+	template<typename Compare, typename T1, typename T2>
+	constexpr auto operator()(Compare compare, T1 && t1, T2 && t2) const BOUNDED_NOEXCEPT_DECLTYPE(
+		extreme_two(std::move(compare), std::forward<T1>(t1), std::forward<T2>(t2))
+	)
+
+	template<typename Compare, typename T1, typename T2, typename... Ts>
+	constexpr decltype(auto) operator()(Compare compare, T1 && t1, T2 && t2, Ts && ... ts) const noexcept(noexcept_extreme<Compare, T1, T2, Ts...>{}) {
 		return operator()(
 			compare,
 			operator()(compare, std::forward<T1>(t1), std::forward<T2>(t2)),
