@@ -547,8 +547,14 @@ namespace check_comparison {
 
 namespace check_single_argument_minmax {
 	constexpr auto value = bounded::constant<5>;
-	static_assert(bounded::min(value) == value, "A value does not have itself as the minimum.");
-	static_assert(bounded::max(value) == value, "A value does not have itself as the maximum.");
+	static_assert(
+		bounded::addressof(bounded::min(value)) == bounded::addressof(value),
+		"A value does not have itself as the minimum."
+	);
+	static_assert(
+		bounded::addressof(bounded::max(value)) == bounded::addressof(value),
+		"A value does not have itself as the maximum."
+	);
 }
 
 namespace check_double_argument_minmax {
@@ -576,7 +582,7 @@ namespace check_many_argument_minmax {
 }
 
 namespace check_non_bounded_minmax {
-	constexpr auto integer_min = bounded::min(0, 5);
+	constexpr auto integer_min = bounded::min(0, 1, 2, 3, 4, 5, 6, 7, 8, 9);
 	static_assert(std::is_same<decltype(integer_min), int const>::value, "Incorrect type of min for int arguments.");
 	static_assert(integer_min == 0, "Incorrect value of min for int arguments.");
 }

@@ -51,39 +51,6 @@ public:
 };
 
 
-
-
-namespace detail {
-namespace minmax {
-
-// These are needed because you cannot have a recursive noexcept specification
-// https://stackoverflow.com/questions/23772928/recursive-noexcept-specification
-
-template<typename Compare, typename... Ts>
-struct noexcept_comparable;
-
-template<typename Compare, typename T>
-struct noexcept_comparable<Compare, T> : std::integral_constant<bool, true> {
-};
-
-template<typename Compare, typename T1, typename T2>
-struct noexcept_comparable<Compare, T1, T2> : std::integral_constant<bool, noexcept(
-	std::declval<Compare>()(std::declval<T1>(), std::declval<T2>())
-)> {
-};
-
-template<typename Compare, typename T1, typename T2, typename... Ts>
-struct noexcept_comparable<Compare, T1, T2, Ts...> : std::integral_constant<bool,
-	noexcept_comparable<Compare, T1, T2>::value and
-	noexcept_comparable<Compare, extreme_t<Compare, T1, T2>, Ts...>::value
-> {
-};
-
-}	// namespace minmax
-}	// namespace detail
-
-
-
 // Unlike the standard versions of min and max, which accept a fixed number of
 // arguments, these functions accept a variadic pack. Therefore, there is no way
 // to distinguish whether the user wanted to compare all of the object with
@@ -95,55 +62,35 @@ struct noexcept_comparable<Compare, T1, T2, Ts...> : std::integral_constant<bool
 
 constexpr struct {
 private:
-	// If the type of the result has no overlap with the type one of the
-	// arguments, then that argument cannot be the true value. Therefore, we
-	// can skip any actual comparison and just return the other value. The
-	// general code would not compile without this, because you cannot cast to a
-	// bounded::integer type that has no overlap.
-	template<typename Compare, typename T1, typename T2, BOUNDED_REQUIRES(
-		basic_numeric_limits<T1>::is_specialized and basic_numeric_limits<T2>::is_specialized and
-		not detail::types_overlap<extreme_t<Compare, T1, T2>, T2>()
-	)>
-	static constexpr decltype(auto) extreme_two(Compare, T1 && t1, T2 &&) noexcept {
-		return std::forward<T1>(t1);
-	}
-	template<typename Compare, typename T1, typename T2, BOUNDED_REQUIRES(
-		basic_numeric_limits<T1>::is_specialized and basic_numeric_limits<T2>::is_specialized and
-		not detail::types_overlap<extreme_t<Compare, T1, T2>, T1>()
-	)>
-	static constexpr decltype(auto) extreme_two(Compare, T1 &&, T2 && t2) noexcept {
-		return std::forward<T2>(t2);
-	}
-
-
-	template<typename Compare, typename T1, typename T2, typename result_type = detail::add_common_cv_reference_t<extreme_t<Compare, T1, T2>, T1, T2>, BOUNDED_REQUIRES(
-		(not basic_numeric_limits<T1>::is_specialized or not basic_numeric_limits<T2>::is_specialized) or
-		(detail::types_overlap<extreme_t<Compare, T1, T2>, T1>() and
-		detail::types_overlap<extreme_t<Compare, T1, T2>, T2>())
-	)>
-	static constexpr auto extreme_two(Compare compare, T1 && t1, T2 && t2) BOUNDED_NOEXCEPT_DECLTYPE(
+	template<typename Compare, typename T1, typename T2, typename result_type = detail::add_common_cv_reference_t<extreme_t<Compare, T2, T1>, T1, T2>>
+	static constexpr decltype(auto) extreme_two(Compare compare, T1 && t1, T2 && t2) BOUNDED_NOEXCEPT_DECLTYPE(
 		compare(t2, t1) ?
 			static_cast<result_type>(std::forward<T2>(t2)) :
 			static_cast<result_type>(std::forward<T1>(t1))
 	)
 
+	// These are needed because you cannot have a recursive noexcept specification
+	// https://stackoverflow.com/questions/23772928/recursive-noexcept-specification
 
-	template<typename Compare, typename... Ts>
-	struct noexcept_extreme;
-	
 	template<typename Compare, typename T1, typename T2>
-	struct noexcept_extreme<Compare, T1, T2> : std::bool_constant<
-		noexcept(extreme_two(std::declval<Compare>(), std::declval<T1>(), std::declval<T2>()))
-	> {
-	};
+	static constexpr auto noexcept_extreme() noexcept {
+		using relation_t = decltype(std::declval<Compare>()(std::declval<T2>(), std::declval<T1>()));
+		if constexpr (std::is_same<relation_t, std::false_type>{} or std::is_same<relation_t, std::true_type>{}) {
+			return std::true_type{};
+		} else {
+			return std::bool_constant<noexcept(extreme_two(std::declval<Compare>(), std::declval<T1>(), std::declval<T2>()))>{};
+		}
+	}
 	
-	template<typename Compare, typename T1, typename T2, typename... Ts>
-	struct noexcept_extreme<Compare, T1, T2, Ts...> : std::bool_constant<
-		noexcept_extreme<Compare, T1, T2>{} and
-		noexcept_extreme<Compare, detail::add_common_cv_reference_t<extreme_t<Compare, T1, T2>, T1, T2>, Ts...>{}
-	> {
-	};
-
+	template<typename Compare, typename T1, typename T2, typename T3, typename... Ts>
+	static constexpr auto noexcept_extreme() noexcept {
+		using result_type = detail::add_common_cv_reference_t<extreme_t<Compare, T1, T2>, T1, T2>;
+		return std::bool_constant<
+			noexcept_extreme<Compare, T1, T2>() and
+			noexcept_extreme<Compare, result_type, T3, Ts...>()
+		>{};
+	}
+	
 public:
 	template<typename Compare, typename T>
 	constexpr decltype(auto) operator()(Compare, T && t) const noexcept {
@@ -152,12 +99,19 @@ public:
 
 
 	template<typename Compare, typename T1, typename T2>
-	constexpr auto operator()(Compare compare, T1 && t1, T2 && t2) const BOUNDED_NOEXCEPT_DECLTYPE(
-		extreme_two(std::move(compare), std::forward<T1>(t1), std::forward<T2>(t2))
-	)
+	constexpr decltype(auto) operator()(Compare compare, T1 && t1, T2 && t2) const noexcept(noexcept_extreme<Compare, T1 &&, T2 &&>()) {
+		using relation_t = decltype(compare(t2, t1));
+		if constexpr (std::is_same<relation_t, std::false_type>{}) {
+			return std::forward<T1>(t1);
+		} else if constexpr (std::is_same<relation_t, std::true_type>{}) {
+			return std::forward<T2>(t2);
+		} else {
+			return extreme_two(std::move(compare), std::forward<T1>(t1), std::forward<T2>(t2));
+		}
+	}
 
 	template<typename Compare, typename T1, typename T2, typename... Ts>
-	constexpr decltype(auto) operator()(Compare compare, T1 && t1, T2 && t2, Ts && ... ts) const noexcept(noexcept_extreme<Compare, T1, T2, Ts...>{}) {
+	constexpr decltype(auto) operator()(Compare compare, T1 && t1, T2 && t2, Ts && ... ts) const noexcept(noexcept_extreme<Compare, T1, T2, Ts...>()) {
 		return operator()(
 			compare,
 			operator()(compare, std::forward<T1>(t1), std::forward<T2>(t2)),
