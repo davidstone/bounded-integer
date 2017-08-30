@@ -18,27 +18,6 @@
 #include <utility>
 
 namespace bounded {
-namespace detail {
-namespace minmax {
-
-template<typename Target, typename Source, BOUNDED_REQUIRES(
-	is_bounded_integer<Target> and
-	not std::is_reference<Target>{}
-)>
-constexpr auto construct(Source && source) noexcept {
-	return Target(std::forward<Source>(source), non_check);
-}
-template<typename Target, typename Source, BOUNDED_REQUIRES(
-	not is_bounded_integer<Target> or
-	std::is_reference<Target>{}
-)>
-constexpr auto construct(Source && source) BOUNDED_NOEXCEPT_DECLTYPE(
-	static_cast<Target>(source)
-)
-
-}	// namespace minmax
-}	// namespace detail
-
 
 // Specialize this class to give the correct type for your own extreme function
 // if the default does not work
@@ -126,14 +105,14 @@ private:
 		not detail::types_overlap<extreme_t<Compare, T1, T2>, T2>()
 	)>
 	static constexpr decltype(auto) extreme_two(Compare, T1 && t1, T2 &&) noexcept {
-		return detail::minmax::construct<T1>(std::forward<T1>(t1));
+		return std::forward<T1>(t1);
 	}
 	template<typename Compare, typename T1, typename T2, BOUNDED_REQUIRES(
 		basic_numeric_limits<T1>::is_specialized and basic_numeric_limits<T2>::is_specialized and
 		not detail::types_overlap<extreme_t<Compare, T1, T2>, T1>()
 	)>
 	static constexpr decltype(auto) extreme_two(Compare, T1 &&, T2 && t2) noexcept {
-		return detail::minmax::construct<T2>(std::forward<T2>(t2));
+		return std::forward<T2>(t2);
 	}
 
 
@@ -144,8 +123,8 @@ private:
 	)>
 	static constexpr auto extreme_two(Compare compare, T1 && t1, T2 && t2) BOUNDED_NOEXCEPT_DECLTYPE(
 		compare(t2, t1) ?
-			detail::minmax::construct<result_type>(std::forward<T2>(t2)) :
-			detail::minmax::construct<result_type>(std::forward<T1>(t1))
+			static_cast<result_type>(std::forward<T2>(t2)) :
+			static_cast<result_type>(std::forward<T1>(t1))
 	)
 
 
@@ -168,7 +147,7 @@ private:
 public:
 	template<typename Compare, typename T>
 	constexpr decltype(auto) operator()(Compare, T && t) const noexcept {
-		return t;
+		return std::forward<T>(t);
 	}
 
 
