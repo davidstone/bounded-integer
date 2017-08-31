@@ -1267,14 +1267,6 @@ auto check_math() {
 	check_absolute_value<checked_integer<0, 0>, 0, checked_integer<0, 0>, 0>();
 	check_absolute_value<checked_integer<-7, 450>, -1, checked_integer<0, 450>, 1>();
 	check_absolute_value<checked_integer<-7, 450>, 1, checked_integer<0, 450>, 1>();
-	static_assert(std::__lg(1_bi) == 0);
-	static_assert(std::__lg(2_bi) == 1);
-	static_assert(std::__lg(3_bi) == 1);
-	static_assert(std::__lg(4_bi) == 2);
-	static_assert(std::__lg(5_bi) == 2);
-	static_assert(std::__lg(6_bi) == 2);
-	static_assert(std::__lg(7_bi) == 2);
-	static_assert(std::__lg(8_bi) == 3);
 }
 
 

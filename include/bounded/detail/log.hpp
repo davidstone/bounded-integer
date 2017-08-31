@@ -57,8 +57,8 @@ namespace std {
 // difference_type is a bounded::integer. It is not guaranteed to continue to be
 // supported. It returns a built-in integer that is the log2 of the number
 template<intmax_t minimum, intmax_t maximum, typename overflow_policy, bounded::storage_type storage, bool poisoned>
-constexpr auto __lg(bounded::integer<minimum, maximum, overflow_policy, storage, poisoned> const value) noexcept {
-	return __lg(value.value());
-}
+constexpr auto __lg(bounded::integer<minimum, maximum, overflow_policy, storage, poisoned> const value) BOUNDED_NOEXCEPT_DECLTYPE(
+	__lg(value.value())
+)
 
 }	// namespace std
