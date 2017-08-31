@@ -63,7 +63,7 @@ public:
 constexpr struct {
 private:
 	template<typename Compare, typename T1, typename T2, typename result_type = detail::add_common_cv_reference_t<extreme_t<Compare, T2, T1>, T1, T2>>
-	static constexpr decltype(auto) extreme_two(Compare compare, T1 && t1, T2 && t2) BOUNDED_NOEXCEPT_DECLTYPE(
+	static constexpr auto extreme_two(Compare compare, T1 && t1, T2 && t2) BOUNDED_NOEXCEPT_DECLTYPE(
 		compare(t2, t1) ?
 			static_cast<result_type>(std::forward<T2>(t2)) :
 			static_cast<result_type>(std::forward<T1>(t1))
