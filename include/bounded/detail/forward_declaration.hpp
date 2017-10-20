@@ -20,6 +20,6 @@ template<intmax_t minimum, intmax_t maximum, typename overflow_policy, storage_t
 struct integer;
 
 // Does not verify that the value is in range with the policy
-enum non_check_t { non_check };
+constexpr struct non_check_t{} non_check ;
 
 }	// namespace bounded
