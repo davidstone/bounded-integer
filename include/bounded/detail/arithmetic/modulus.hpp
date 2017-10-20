@@ -23,21 +23,19 @@ template<typename Dividend, typename Divisor>
 constexpr auto modulo_round(Dividend const & dividend, Divisor const & divisor) noexcept {
 	// When we divide both ends of the dividend by a particular value in
 	// the range of the divisor there are two possibilities:
-	//
-	// If they are not equal, then that means that the periodic modulo
-	// function resets to 0 somewhere in that range. The greatest value
-	// is immediately before this resets, but we do not have to find
-	// where in the range it is. The magnitude will be one less than the
-	// magnitude of the divisor. The least value is obviously 0, as we
-	// are ignoring the sign of the dividend for these calculations.
-	//
-	// If they are equal, the maximum value is at the top end of the
-	// range. The function never reset, and it increases by one for each
-	// increase in the dividend until it resets. The maximum value is
-	// the point at which there were the most increases. The minimum
-	// value is the point at which there were the fewest increases.
 	return (dividend.min / divisor == dividend.max / divisor) ?
+		// If they are equal, the maximum value is at the top end of the range.
+		// The function never reset, and it increases by one for each increase
+		// in the dividend until it resets. The maximum value is the point at
+		// which there were the most increases. The minimum value is the point
+		// at which there were the fewest increases.
 		min_max(dividend.min % divisor, dividend.max % divisor) :
+		// If the quotients are not equal, that means that the periodic modulo
+		// function reset to 0 somewhere in that range. The greatest value is
+		// immediately before this reset, but we do not have to find where in
+		// the range it is. The magnitude will be one less than the magnitude
+		// of the divisor. The least value is obviously 0, as we are ignoring
+		// the sign of the dividend for these calculations.
 		min_max(static_cast<Divisor>(0), divisor + 1);
 }
 
