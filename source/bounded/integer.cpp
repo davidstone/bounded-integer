@@ -803,6 +803,14 @@ namespace check_arithmetic {
 		bounded::constant<0> % bounded::constant<1>,
 		bounded::constant<0>
 	));
+	static_assert(homogenous_equals(
+		bounded::integer<73, 76>(73) % bounded::integer<7, 8>(7),
+		bounded::integer<1, 6>(73 % 7)
+	));
+	static_assert(homogenous_equals(
+		bounded::integer<74, 75>(74) % bounded::integer<7, 8>(7),
+		bounded::integer<2, 5>(74 % 7)
+	));
 
 	// auto undefined = 1 % zero;
 	
