@@ -453,7 +453,7 @@ namespace check_make {
 	);
 	static_assert(
 		std::is_same<
-			bounded::detail::equivalent_overflow_policy<bounded::integer<0, 0, bounded::throw_policy<>>>,
+			bounded::detail::equivalent_overflow_policy<bounded::checked_integer<0, 0>>,
 			bounded::throw_policy<>
 		>::value,
 		"incorrect equivalent_overflow_policy for bounded::integer."
@@ -470,7 +470,7 @@ namespace check_comparison {
 		a == 5,
 		"Values do not equal their underlying value"
 	);
-	constexpr bounded::integer<4, 36346, bounded::throw_policy<>> b(5);
+	constexpr bounded::checked_integer<4, 36346> b(5);
 	static_assert(
 		a == b,
 		"Values do not equal equivalent other bounded::integer types"
@@ -545,6 +545,14 @@ namespace check_comparison {
 	static_assert(non_constexpr_four <= non_constexpr_four, "operator<= not constexpr for non-constexpr arguments.");
 }
 
+
+template<typename Result, typename Expected>
+constexpr bool homogenous_equals(Result const & result, Expected const & expected) noexcept {
+	static_assert(std::is_same<Result, Expected>{}, "Mismatched types.");
+	return result == expected;
+}
+
+
 namespace check_single_argument_minmax {
 	constexpr auto value = bounded::constant<5>;
 	static_assert(
@@ -560,31 +568,40 @@ namespace check_single_argument_minmax {
 namespace check_double_argument_minmax {
 	constexpr auto lower_value = bounded::constant<6>;
 	constexpr auto greater_value = bounded::constant<10>;
-	static_assert(bounded::min(lower_value, greater_value) == lower_value, "Two argument min value incorrect.");
-	static_assert(bounded::min(greater_value, lower_value) == lower_value, "Two argument min value incorrect.");
-	static_assert(bounded::max(lower_value, greater_value) == greater_value, "Two argument max value incorrect.");
-	static_assert(bounded::max(greater_value, lower_value) == greater_value, "Two argument max value incorrect.");
+	static_assert(homogenous_equals(
+		bounded::min(lower_value, greater_value),
+		lower_value
+	));
+	static_assert(homogenous_equals(
+		bounded::min(greater_value, lower_value),
+		lower_value
+	));
+	static_assert(homogenous_equals(
+		bounded::max(lower_value, greater_value),
+		greater_value
+	));
+	static_assert(homogenous_equals(
+		bounded::max(greater_value, lower_value),
+		greater_value
+	));
 }
 
 namespace check_many_argument_minmax {
-	constexpr bounded::integer<-53, 1000> value(bounded::constant<3>);
-	constexpr auto minimum = bounded::min(bounded::constant<0>, bounded::constant<10>, bounded::constant<5>, value);
-	using min_type = decltype(minimum);
-	static_assert(minimum == bounded::constant<0>, "Incorrect minimum value.");
-	static_assert(std::numeric_limits<min_type>::min() == -53, "Incorrect minimum minimum.");
-	static_assert(std::numeric_limits<min_type>::max() == 0, "Incorrect maximum minimum.");
+	constexpr auto value = bounded::integer<-53, 1000>(bounded::constant<3>);
+	static_assert(homogenous_equals(
+		bounded::min(bounded::constant<0>, bounded::constant<10>, bounded::constant<5>, value),
+		bounded::integer<-53, 0>(0)
+	));
 
-	constexpr auto maximum = bounded::max(bounded::constant<0>, bounded::constant<10>, bounded::constant<5>, value);
-	using max_type = decltype(maximum);
-	static_assert(maximum == bounded::constant<10>, "Incorrect maximum value.");
-	static_assert(std::numeric_limits<max_type>::min() == 10, "Incorrect minimum maximum.");
-	static_assert(std::numeric_limits<max_type>::max() == 1000, "Incorrect maximum maximum.");
-}
+	static_assert(homogenous_equals(
+		bounded::max(bounded::constant<0>, bounded::constant<10>, bounded::constant<5>, value),
+		bounded::integer<10, 1000>(10)
+	));
 
-namespace check_non_bounded_minmax {
-	constexpr auto integer_min = bounded::min(0, 1, 2, 3, 4, 5, 6, 7, 8, 9);
-	static_assert(std::is_same<decltype(integer_min), int const>::value, "Incorrect type of min for int arguments.");
-	static_assert(integer_min == 0, "Incorrect value of min for int arguments.");
+	static_assert(homogenous_equals(
+		bounded::min(0, 1, 2, 3, 4, 5, 6, 7, 8, 9),
+		0
+	));
 }
 
 namespace check_non_integer_minmax {
@@ -690,259 +707,131 @@ auto check_minmax() {
 
 
 namespace check_arithmetic {
-	constexpr bounded::integer<1, 10, bounded::throw_policy<>> const x(9);
+	constexpr bounded::checked_integer<1, 10> const x(9);
 	static_assert(
 		sizeof(x) == 1,
 		"bounded::integer too big!"
 	);
-	constexpr bounded::integer<-3, 11, bounded::throw_policy<>> const z(4);
+	constexpr bounded::checked_integer<-3, 11> const z(4);
 	static_assert(
 		std::numeric_limits<decltype(z)>::is_signed,
 		"bounded::integer with negative value in range should be signed."
 	);
 
-	constexpr auto sum = x + z;
-	static_assert(
-		std::numeric_limits<decltype(sum)>::min() == -2,
-		"Minimum sum incorrect."
-	);
-	static_assert(
-		std::numeric_limits<decltype(sum)>::max() == 21,
-		"Maximum sum incorrect."
-	);
-	static_assert(
-		sum == 13,
-		"Calculated sum incorrect."
-	);
 
-	constexpr auto integral_constant_sum = x + std::integral_constant<int, 5>{};
-	static_assert(
-		std::numeric_limits<decltype(integral_constant_sum)>::min() == 6,
-		"Minimum sum incorrect."
-	);
-	static_assert(
-		std::numeric_limits<decltype(integral_constant_sum)>::max() == 15,
-		"Maximum sum incorrect."
-	);
-	static_assert(
-		integral_constant_sum == 14,
-		"Calculated sum incorrect."
-	);
+	// unary plus
+	static_assert(homogenous_equals(
+		+x,
+		x
+	));
 
-	constexpr auto difference = x - z;
-	static_assert(
-		std::numeric_limits<decltype(difference)>::min() == -10,
-		"Minimum difference incorrect."
-	);
-	static_assert(
-		std::numeric_limits<decltype(difference)>::max() == 13,
-		"Maximum difference incorrect."
-	);
-	static_assert(
-		difference == 5,
-		"Calculated difference incorrect."
-	);
+	// unary minus
+	static_assert(homogenous_equals(
+		-x,
+		bounded::checked_integer<-10, -1>(-9)
+	));
 
-	constexpr auto product = x * z;
-	static_assert(
-		std::numeric_limits<decltype(product)>::min() == -30,
-		"Minimum product incorrect."
-	);
-	static_assert(
-		std::numeric_limits<decltype(product)>::max() == 110,
-		"Maximum product incorrect."
-	);
-	static_assert(
-		product == 36,
-		"Calculated product incorrect."
-	);
+	// plus
+	static_assert(homogenous_equals(
+		x + z,
+		bounded::checked_integer<-2, 21>(13)
+	));
+	static_assert(homogenous_equals(
+		x + std::integral_constant<int, 5>{},
+		bounded::integer<6, 15>(14)
+	));
 
-	constexpr auto quotient = x / z;
-	static_assert(
-		std::numeric_limits<decltype(quotient)>::min() == -10,
-		"Minimum quotient incorrect."
-	);
-	static_assert(
-		std::numeric_limits<decltype(quotient)>::max() == 10,
-		"Maximum quotient incorrect."
-	);
-	static_assert(
-		quotient == 2,
-		"Calculated quotient incorrect."
-	);
+	// minus
+	static_assert(homogenous_equals(
+		x - z,
+		bounded::checked_integer<-10, 13>(5)
+	));
+
+	// multiplies
+	static_assert(homogenous_equals(
+		x * z,
+		bounded::checked_integer<-30, 110>(36)
+	));
+
+	// divides
+	static_assert(homogenous_equals(
+		x / z,
+		bounded::checked_integer<-10, 10>(2)
+	));
+
 	// constexpr auto fails_to_compile = bounded::constant<1> / bounded::constant<0>;
 
-	constexpr auto negation = -x;
-	static_assert(
-		std::numeric_limits<decltype(negation)>::min() == -10,
-		"Minimum quotient incorrect."
-	);
-	static_assert(
-		std::numeric_limits<decltype(negation)>::max() == -1,
-		"Maximum quotient incorrect."
-	);
-	static_assert(
-		negation == -9,
-		"Calculated negation incorrect."
-	);
 
-	static_assert(
-		quotient < product,
-		"quotient should be less than product."
-	);
-	static_assert(
-		difference + 8 == sum,
-		"difference + 8 should equal sum."
-	);
+	// modulus
+	static_assert(homogenous_equals(
+		bounded::constant<10> % bounded::constant<11>,
+		bounded::constant<10>
+	));
+	static_assert(homogenous_equals(
+		bounded::constant<10> % bounded::constant<9>,
+		bounded::constant<1>
+	));
+	static_assert(homogenous_equals(
+		bounded::constant<9> % bounded::constant<11>,
+		bounded::constant<9>
+	));
+	static_assert(homogenous_equals(
+		bounded::constant<11> % bounded::constant<9>,
+		bounded::constant<2>
+	));
+	static_assert(homogenous_equals(
+		bounded::constant<13> % bounded::constant<6>,
+		bounded::constant<1>
+	));
+	static_assert(homogenous_equals(
+		bounded::integer<17, 23>(20) % bounded::integer<-54, -6>(-33),
+		bounded::integer<0, 23>(20 % -33)
+	));
+	static_assert(homogenous_equals(
+		bounded::integer<-54, -6>(-33) % bounded::integer<17, 23>(20),
+		bounded::integer<-22, 0>(-33 % 20)
+	));
+	static_assert(homogenous_equals(
+		bounded::integer<-22, 0>(-33 % 20) % bounded::integer<0, 23>(20 % -33),
+		bounded::integer<-22, 0>(-13)
+	));
+	static_assert(homogenous_equals(
+		bounded::integer<0, 10>(10) % bounded::constant<6>,
+		bounded::integer<0, 5>(4)
+	));
+	static_assert(homogenous_equals(
+		bounded::constant<0> % bounded::constant<1>,
+		bounded::constant<0>
+	));
 
-	constexpr auto positive = +x;
-	static_assert(
-		positive == x,
-		"Unary plus not a no-op."
-	);
-
-	constexpr bounded::integer<0, 2, bounded::throw_policy<>> left_shift_lhs(1);
-	constexpr bounded::integer<0, 60, bounded::throw_policy<>> left_shift_rhs(3);
-	constexpr auto left_shift_result = left_shift_lhs << left_shift_rhs;
-	static_assert(
-		std::numeric_limits<decltype(left_shift_result)>::min() == 0,
-		"Minimum left shift result incorrect."
-	);
-	static_assert(
-		std::numeric_limits<decltype(left_shift_result)>::max() == (2LL << 60LL),
-		"Maximum left shift result incorrect."
-	);
-	static_assert(
-		left_shift_result == (1 << 3),
-		"Incorrect left shift result."
-	);
-
-
-	// modulo
-
-	constexpr auto ten = bounded::constant<10>;
-	constexpr auto eleven = bounded::constant<11>;
-	constexpr auto ten_result = ten % eleven;
-	static_assert(
-		ten_result == ten,
-		"Incorrect modulo with divisor one greater"
-	);
-	static_assert(
-		std::is_same<decltype(ten_result), decltype(ten)>::value,
-		"Incorrect modulo type with divisor one greater"
-	);
-
-	constexpr auto nine = bounded::constant<9>;
-	constexpr auto one = bounded::constant<1>;
-	constexpr auto one_result = ten % nine;
-	static_assert(
-		one_result == one,
-		"Incorrect modulo with divisor one less"
-	);
-	static_assert(
-		std::is_same<decltype(one_result), decltype(one)>::value,
-		"Incorrect modulo type with divisor one less"
-	);
-
-	constexpr auto nine_result = nine % eleven;
-	static_assert(
-		nine_result == nine,
-		"Incorrect modulo with divisor two less"
-	);
-	static_assert(
-		std::is_same<decltype(nine_result), decltype(nine)>::value,
-		"Incorrect modulo type with divisor two less"
-	);
-
-	constexpr auto two = bounded::constant<2>;
-	constexpr auto two_result = eleven % nine;
-	static_assert(
-		two_result == two,
-		"Incorrect modulo with divisor two greater"
-	);
-	static_assert(
-		std::is_same<decltype(two_result), decltype(two)>::value,
-		"Incorrect modulo type with divisor two greater"
-	);
-
-
-	constexpr bounded::integer<17, 23, bounded::throw_policy<>> positive_range(20);
-	constexpr bounded::integer<-54, -6, bounded::throw_policy<>> negative_range(-33);
-	constexpr auto positive_negative_result = positive_range % negative_range;
-	constexpr bounded::integer<0, 23, bounded::throw_policy<>> positive_negative(20 % -33);
-	static_assert(
-		positive_negative_result == positive_negative,
-		"Incorrect modulo with mixed signs"
-	);
-	static_assert(
-		std::is_same<decltype(positive_negative_result), decltype(positive_negative)>::value,
-		"Incorrect modulo type with mixed signs"
-	);
-
-	constexpr auto negative_positive_result = negative_range % positive_range;
-	constexpr bounded::integer<-22, 0, bounded::throw_policy<>> negative_positive(-33 % 20);
-	static_assert(
-		negative_positive_result == negative_positive,
-		"Incorrect modulo with mixed signs"
-	);
-	static_assert(
-		std::is_same<decltype(negative_positive_result), decltype(negative_positive)>::value,
-		"Incorrect modulo type with mixed signs"
-	);
-	
-	constexpr auto negative_zero_result = negative_positive % positive_negative;
-	constexpr bounded::integer<-22, 0, bounded::throw_policy<>> negative_zero(-13);
-	static_assert(
-		negative_zero_result == negative_zero,
-		"Incorrect modulo with mixed signs"
-	);
-	static_assert(
-		std::is_same<decltype(negative_zero_result), decltype(negative_zero)>::value,
-		"Incorrect modulo type with mixed signs"
-	);
-
-	constexpr auto result = bounded::integer<0, 10>(10) % bounded::constant<6>;
-	static_assert(
-		std::numeric_limits<decltype(result)>::min() == bounded::constant<0>,
-		"uh oh"
-	);
-	static_assert(
-		std::numeric_limits<decltype(result)>::max() == bounded::constant<5>,
-		"uh oh"
-	);
-	static_assert(
-		result == bounded::constant<4>,
-		"wrong answer"
-	);
-
-	constexpr auto zero = bounded::constant<0>;
-	constexpr auto zero_result = zero % bounded::constant<1>;
-	static_assert(
-		zero_result == zero,
-		"Incorrect modulo with zero for the dividend"
-	);
-	static_assert(
-		std::is_same<decltype(zero_result), decltype(zero)>::value,
-		"Incorrect modulo type with zero for the dividend"
-	);
 	// auto undefined = 1 % zero;
 	
-	constexpr auto least = bounded::make(std::numeric_limits<intmax_t>::min());
-	constexpr auto max_range = least % least;
-	constexpr bounded::integer<std::numeric_limits<intmax_t>::min() + 1, -(std::numeric_limits<intmax_t>::min() + 1)> max_range_result(0);
-	static_assert(
-		max_range_result == max_range,
-		"Incorrect modulo for values with a very large range"
-	);
-	static_assert(
-		same_bounds<decltype(max_range_result), decltype(max_range)>,
-		"Incorrect modulo type for values with a very large range"
-	);
+	constexpr auto bounded_intmax_t = bounded::integer<std::numeric_limits<intmax_t>::min(), std::numeric_limits<intmax_t>::max()>(std::numeric_limits<intmax_t>::min());
+	static_assert(homogenous_equals(
+		bounded_intmax_t % bounded_intmax_t,
+		bounded::integer<std::numeric_limits<intmax_t>::min() + 1, -(std::numeric_limits<intmax_t>::min() + 1)>(0)
+	));
+
+
+	// left shift
+	static_assert(homogenous_equals(
+		bounded::integer<0, 2>(1) << bounded::integer<0, 60>(3),
+		bounded::integer<0, 2LL << 60LL>(1 << 3)
+	));
+
+	// right shift
+	static_assert(homogenous_equals(
+		bounded::constant<100> >> bounded::integer<0, 50>(1),
+		bounded::integer<0, 100>(100 >> 1)
+	));
 	
 
+	// bitwise and
+	static_assert((bounded::constant<17> & 1) == bounded::constant<1>);
+	static_assert((bounded::constant<18> & 1) == bounded::constant<0>);
 
 
-
+	
 	using array_type = int[5];
 	constexpr array_type array{ 0, 1, 2, 3, 4 };
 	
@@ -973,57 +862,30 @@ namespace check_arithmetic {
 		"Incorrect array indexing with bounded::integer."
 	);
 	#endif
-	
-	
-	constexpr auto mixed_right_shift = bounded::constant<100> >> 1;
-	static_assert(mixed_right_shift == bounded::constant<50>);
-	
-	
-	constexpr auto odd_bitwise_and = bounded::constant<17> & 1;
-	static_assert(odd_bitwise_and == bounded::constant<1>);
-	constexpr auto even_bitwise_and = bounded::constant<18> & 1;
-	static_assert(even_bitwise_and == bounded::constant<0>);
-}
-
-namespace check_literal {
-	// I have to use the preprocessor here to create an integer literal
-	#define BOUNDED_INTEGER_CHECK_LITERAL(x) \
-		static_assert( \
-			std::numeric_limits<decltype(x ## _bi)>::min() == std::numeric_limits<decltype(x ## _bi)>::max(), \
-			"Literal does not have a min possible value equal to a max possible value." \
-		); \
-		static_assert( \
-			std::numeric_limits<decltype(x ## _bi)>::min() == x ## _bi, \
-			"Literal does not have a value equal to the range." \
-		); \
-		\
-		static_assert( \
-			x ## _bi == static_cast<decltype(x ## _bi)::underlying_type>(x), \
-			"Inaccurate value of " #x " (cast x)" \
-		); \
-		static_assert( \
-			static_cast<decltype(x)>(x ## _bi) == (x), \
-			"Inaccurate value of " #x " (cast value)" \
-		);
-
-	BOUNDED_INTEGER_CHECK_LITERAL(0)
-	BOUNDED_INTEGER_CHECK_LITERAL(1)
-	BOUNDED_INTEGER_CHECK_LITERAL(10)
-	BOUNDED_INTEGER_CHECK_LITERAL(1000)
-	BOUNDED_INTEGER_CHECK_LITERAL(4294967295)
-	BOUNDED_INTEGER_CHECK_LITERAL(4294967296)
-	BOUNDED_INTEGER_CHECK_LITERAL(9223372036854775807)
-	BOUNDED_INTEGER_CHECK_LITERAL(-1)
-	BOUNDED_INTEGER_CHECK_LITERAL(-0)
-	#undef BOUNDED_INTEGER_CHECK_LITERAL
 }
 
 
-namespace check_conditional {
-	constexpr auto value = BOUNDED_CONDITIONAL(true, 7_bi, 9_bi);
-	static_assert(value == 7_bi, "Wrong conditional value.");
-	static_assert(std::is_same<decltype(value), bounded::integer<7, 9> const>::value, "Wrong conditional type.");
-}
+// I have to use the preprocessor here to create an integer literal
+#define BOUNDED_INTEGER_CHECK_LITERAL(x) \
+	static_assert(homogenous_equals( \
+		x ## _bi, \
+		bounded::constant<x> \
+	))
+
+BOUNDED_INTEGER_CHECK_LITERAL(0);
+BOUNDED_INTEGER_CHECK_LITERAL(1);
+BOUNDED_INTEGER_CHECK_LITERAL(10);
+BOUNDED_INTEGER_CHECK_LITERAL(1000);
+BOUNDED_INTEGER_CHECK_LITERAL(4294967295);
+BOUNDED_INTEGER_CHECK_LITERAL(4294967296);
+BOUNDED_INTEGER_CHECK_LITERAL(9223372036854775807);
+#undef BOUNDED_INTEGER_CHECK_LITERAL
+
+
+static_assert(homogenous_equals(
+	BOUNDED_CONDITIONAL(true, 7_bi, 9_bi),
+	bounded::integer<7, 9>(7)
+));
 
 
 auto check_null_policy() {
@@ -1245,28 +1107,27 @@ auto check_compound_arithmetic() {
 	static_assert(minus_equals(bounded::clamped_integer<0, 10>(5_bi), 20_bi) == 0_bi);	
 }
 
-template<typename Initial, intmax_t initial_value, typename Expected, intmax_t expected_value>
-auto check_absolute_value() {
-	constexpr auto value = Initial(initial_value);
-	constexpr auto absolute = bounded::abs(value);
-	constexpr auto expected_absolute = Expected(expected_value);
-	static_assert(
-		std::is_same<decltype(expected_absolute), decltype(absolute)>::value,
-		"Absolute value returns the wrong type."
-	);
-	static_assert(
-		absolute == expected_absolute,
-		"Absolute value returns the wrong value."
-	);
-}
-
 auto check_math() {
-	using bounded::checked_integer;
-	check_absolute_value<checked_integer<-10, 4>, -5, checked_integer<0, 10>, 5>();
-	check_absolute_value<checked_integer<-10, -10>, -10, checked_integer<10, 10>, 10>();
-	check_absolute_value<checked_integer<0, 0>, 0, checked_integer<0, 0>, 0>();
-	check_absolute_value<checked_integer<-7, 450>, -1, checked_integer<0, 450>, 1>();
-	check_absolute_value<checked_integer<-7, 450>, 1, checked_integer<0, 450>, 1>();
+	static_assert(homogenous_equals(
+		bounded::abs(bounded::integer<-10, 4>(-5)),
+		bounded::integer<0, 10>(5)
+	));
+	static_assert(homogenous_equals(
+		bounded::abs(bounded::integer<-10, -10>(-10)),
+		bounded::integer<10, 10>(10)
+	));
+	static_assert(homogenous_equals(
+		bounded::abs(bounded::integer<0, 0>(0)),
+		bounded::integer<0, 0>(0)
+	));
+	static_assert(homogenous_equals(
+		bounded::abs(bounded::integer<-7, 450>(-1)),
+		bounded::integer<0, 450>(1)
+	));
+	static_assert(homogenous_equals(
+		bounded::abs(bounded::integer<-7, 450>(1)),
+		bounded::integer<0, 450>(1)
+	));
 }
 
 
