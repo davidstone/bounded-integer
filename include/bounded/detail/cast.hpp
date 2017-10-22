@@ -5,7 +5,7 @@
 
 #pragma once
 
-#include <bounded/detail/forward_declaration.hpp>
+#include <bounded/detail/class.hpp>
 #include <bounded/detail/noexcept.hpp>
 
 #include <utility>

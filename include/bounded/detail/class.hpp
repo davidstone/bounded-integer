@@ -24,6 +24,10 @@
 #include <utility>
 
 namespace bounded {
+
+template<intmax_t minimum, intmax_t maximum, typename policy = null_policy, storage_type storage = storage_type::fast, bool poisoned = false>
+using integer = detail::basic_integer<minimum, maximum, policy, storage, poisoned>;
+
 namespace detail {
 
 template<typename T>
@@ -66,7 +70,7 @@ template<typename T>
 constexpr decltype(auto) as_integer(T const & t) noexcept {
 	if constexpr (std::is_enum<std::decay_t<T>>::value) {
 		using limits = basic_numeric_limits<T>;
-		using result_type = integer<
+		using result_type = basic_integer<
 			static_cast<std::intmax_t>(limits::min()),
 			static_cast<std::intmax_t>(limits::max()),
 			null_policy,
@@ -84,20 +88,21 @@ constexpr decltype(auto) as_integer(T const & t) noexcept {
 
 // poisoned is useful for overloading and getting all constants
 template<intmax_t value, typename overflow_policy = null_policy, storage_type storage = storage_type::fast, bool poisoned = false>
-using constant_t = integer<value, value, overflow_policy, storage, poisoned>;
+using constant_t = detail::basic_integer<value, value, overflow_policy, storage, poisoned>;
 
 template<intmax_t value, typename overflow_policy = null_policy, storage_type storage = storage_type::fast>
 constexpr auto constant = constant_t<value, overflow_policy, storage>(value, non_check);
 
 
+namespace detail {
 
 template<intmax_t minimum, intmax_t maximum, typename overflow_policy_ = null_policy, storage_type storage = storage_type::fast, bool poisoned_ = false>
-struct integer {
+struct basic_integer {
 	static_assert(minimum <= maximum, "Maximum cannot be less than minimum");
-	using underlying_type = std::conditional_t<storage == storage_type::fast, detail::fast_t<minimum, maximum>, detail::least_t<minimum, maximum>>;
+	using underlying_type = std::conditional_t<storage == storage_type::fast, fast_t<minimum, maximum>, least_t<minimum, maximum>>;
 	using overflow_policy = overflow_policy_;
-	static_assert(detail::value_fits_in_type<underlying_type>(minimum), "minimum does not fit in underlying_type.");
-	static_assert(detail::value_fits_in_type<underlying_type>(maximum), "maximum does not fit in underlying_type.");
+	static_assert(value_fits_in_type<underlying_type>(minimum), "minimum does not fit in underlying_type.");
+	static_assert(value_fits_in_type<underlying_type>(maximum), "maximum does not fit in underlying_type.");
 	
 	static_assert(minimum < 0 ? std::numeric_limits<underlying_type>::is_signed : true, "underlying_type should be signed.");
 	
@@ -116,61 +121,61 @@ struct integer {
 		overflow_policy{}.assignment(value, min(), max())
 	)
 	
-	integer() noexcept = default;
-	constexpr integer(integer const &) noexcept = default;
-	constexpr integer(integer &&) noexcept = default;
+	basic_integer() noexcept = default;
+	constexpr basic_integer(basic_integer const &) noexcept = default;
+	constexpr basic_integer(basic_integer &&) noexcept = default;
 
 	// Use these constructors if you know by means that cannot be determined by
 	// the type system that the value really does fit in the range.
 	template<typename T, BOUNDED_REQUIRES(
-		detail::is_explicitly_constructible_from<overflow_policy, T const &>(minimum, maximum)
+		is_explicitly_constructible_from<overflow_policy, T const &>(minimum, maximum)
 	)>
-	constexpr integer(T const & other, non_check_t) noexcept:
+	constexpr basic_integer(T const & other, non_check_t) noexcept:
 		m_value(static_cast<underlying_type>(other)) {
 	}
 
 
 	// Intentionally implicit: this is safe because the value is in range
 	template<typename T, BOUNDED_REQUIRES(
-		detail::is_implicitly_constructible_from<T const &>(minimum, maximum)
+		is_implicitly_constructible_from<T const &>(minimum, maximum)
 	)>
-	constexpr integer(T const & other) BOUNDED_NOEXCEPT_INITIALIZATION(
-		integer(other, non_check)
+	constexpr basic_integer(T const & other) BOUNDED_NOEXCEPT_INITIALIZATION(
+		basic_integer(other, non_check)
 	) {
 	}
 
 	template<typename T, BOUNDED_REQUIRES(
-		!detail::is_implicitly_constructible_from<T const &>(minimum, maximum) and
-		detail::is_explicitly_constructible_from<overflow_policy, T const &>(minimum, maximum) and
-		!detail::is_poisoned<T>
+		!is_implicitly_constructible_from<T const &>(minimum, maximum) and
+		is_explicitly_constructible_from<overflow_policy, T const &>(minimum, maximum) and
+		!is_poisoned<T>
 	)>
-	constexpr explicit integer(T const & other) BOUNDED_NOEXCEPT_INITIALIZATION(
-		integer(apply_overflow_policy(detail::as_integer(other)), non_check)
+	constexpr explicit basic_integer(T const & other) BOUNDED_NOEXCEPT_INITIALIZATION(
+		basic_integer(apply_overflow_policy(detail::as_integer(other)), non_check)
 	) {
 	}
 
 	template<typename T, BOUNDED_REQUIRES(
-		!detail::is_implicitly_constructible_from<T const &>(minimum, maximum) and
-		detail::is_explicitly_constructible_from<overflow_policy, T const &>(minimum, maximum) and
-		detail::is_poisoned<T>
+		!is_implicitly_constructible_from<T const &>(minimum, maximum) and
+		is_explicitly_constructible_from<overflow_policy, T const &>(minimum, maximum) and
+		is_poisoned<T>
 	)>
-	constexpr integer(T const & other) BOUNDED_NOEXCEPT_INITIALIZATION(
-		integer(apply_overflow_policy(detail::as_integer(other)), non_check)
+	constexpr basic_integer(T const & other) BOUNDED_NOEXCEPT_INITIALIZATION(
+		basic_integer(apply_overflow_policy(detail::as_integer(other)), non_check)
 	) {
 	}
 
 
 	template<typename Enum, BOUNDED_REQUIRES(
-		std::is_enum<Enum>::value and !detail::is_explicitly_constructible_from<overflow_policy, Enum>(minimum, maximum)
+		std::is_enum<Enum>::value and !is_explicitly_constructible_from<overflow_policy, Enum>(minimum, maximum)
 	)>
-	constexpr integer(Enum other, non_check_t) noexcept:
-		integer(static_cast<std::underlying_type_t<Enum>>(other), non_check) {
+	constexpr basic_integer(Enum other, non_check_t) noexcept:
+		basic_integer(static_cast<std::underlying_type_t<Enum>>(other), non_check) {
 	}
 	template<typename Enum, BOUNDED_REQUIRES(
-		std::is_enum<Enum>::value and !detail::is_explicitly_constructible_from<overflow_policy, Enum>(minimum, maximum)
+		std::is_enum<Enum>::value and !is_explicitly_constructible_from<overflow_policy, Enum>(minimum, maximum)
 	)>
-	constexpr explicit integer(Enum other) BOUNDED_NOEXCEPT_INITIALIZATION(
-		integer(static_cast<std::underlying_type_t<Enum>>(other)) 
+	constexpr explicit basic_integer(Enum other) BOUNDED_NOEXCEPT_INITIALIZATION(
+		basic_integer(static_cast<std::underlying_type_t<Enum>>(other)) 
 	) {
 	}
 
@@ -189,13 +194,13 @@ struct integer {
 		m_value = static_cast<underlying_type>(other);
 	}
 	
-	constexpr auto operator=(integer const & other) & noexcept -> integer & = default;
-	constexpr auto operator=(integer && other) & noexcept -> integer & = default;
+	constexpr auto operator=(basic_integer const & other) & noexcept -> basic_integer & = default;
+	constexpr auto operator=(basic_integer && other) & noexcept -> basic_integer & = default;
 
 	template<typename T>
 	constexpr auto && operator=(T const & other) & noexcept(noexcept(apply_overflow_policy(other))) {
 		static_assert(
-			detail::is_explicitly_constructible_from<overflow_policy, T const &>(minimum, maximum),
+			is_explicitly_constructible_from<overflow_policy, T const &>(minimum, maximum),
 			"Value not in range."
 		);
 		return unchecked_assignment(apply_overflow_policy(other));
@@ -203,7 +208,7 @@ struct integer {
 	template<typename T>
 	auto operator=(T const & other) volatile & noexcept(noexcept(apply_overflow_policy(other))) {
 		static_assert(
-			detail::is_explicitly_constructible_from<overflow_policy, T const &>(minimum, maximum),
+			is_explicitly_constructible_from<overflow_policy, T const &>(minimum, maximum),
 			"Value not in range."
 		);
 		unchecked_assignment(apply_overflow_policy(other));
@@ -234,23 +239,23 @@ struct integer {
 	
 	
 	// Allow a compressed optional representation
-	template<typename Tag, BOUNDED_REQUIRES(std::is_same<Tag, optional_tag>::value and detail::has_extra_space<integer>)>
-	constexpr explicit integer(Tag) noexcept:
+	template<typename Tag, BOUNDED_REQUIRES(std::is_same<Tag, optional_tag>::value and has_extra_space<basic_integer>)>
+	constexpr explicit basic_integer(Tag) noexcept:
 		m_value(uninitialized_value()) {
 	}
 
 	// Cannot use BOUNDED_NOEXCEPT_VOID because of gcc bug
 	// https://gcc.gnu.org/bugzilla/show_bug.cgi?id=52869
-	template<typename Tag, typename... Args, BOUNDED_REQUIRES(std::is_same<Tag, optional_tag>::value and detail::has_extra_space<integer> and std::is_constructible<integer, Args...>{})>
-	constexpr auto initialize(Tag, Args && ... args) noexcept(std::is_nothrow_constructible<integer, Args...>{}) {
-		return *this = integer(std::forward<Args>(args)...);
+	template<typename Tag, typename... Args, BOUNDED_REQUIRES(std::is_same<Tag, optional_tag>::value and has_extra_space<basic_integer> and std::is_constructible<basic_integer, Args...>{})>
+	constexpr auto initialize(Tag, Args && ... args) noexcept(std::is_nothrow_constructible<basic_integer, Args...>{}) {
+		return *this = basic_integer(std::forward<Args>(args)...);
 	}
 
-	template<typename Tag, BOUNDED_REQUIRES(std::is_same<Tag, optional_tag>::value and detail::has_extra_space<integer>)>
+	template<typename Tag, BOUNDED_REQUIRES(std::is_same<Tag, optional_tag>::value and has_extra_space<basic_integer>)>
 	constexpr auto uninitialize(Tag) noexcept {
 		m_value = uninitialized_value();
 	}
-	template<typename Tag, BOUNDED_REQUIRES(std::is_same<Tag, optional_tag>::value and detail::has_extra_space<integer>)>
+	template<typename Tag, BOUNDED_REQUIRES(std::is_same<Tag, optional_tag>::value and has_extra_space<basic_integer>)>
 	constexpr auto is_initialized(Tag) const noexcept {
 		return m_value != uninitialized_value();
 	}
@@ -262,5 +267,5 @@ private:
 	underlying_type m_value;
 };
 
+}	// namespace detail
 }	// namespace bounded
-
