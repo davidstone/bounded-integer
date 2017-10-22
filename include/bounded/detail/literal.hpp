@@ -12,15 +12,19 @@
 namespace bounded {
 namespace detail {
 
-constexpr auto power(intmax_t const radix, intmax_t const exponent) noexcept -> intmax_t {
-	return (exponent == 0) ? 1 : radix * power(radix, exponent - 1);
+constexpr auto power(std::uintmax_t const radix, std::uintmax_t const exponent) noexcept {
+	std::uintmax_t result = 1;
+	for (std::uintmax_t n = 0; n != exponent; ++n) {
+		result *= radix;
+	}
+	return result;
 }
 
 template<char digit, char... digits>
 struct literal {
 private:
-	static constexpr intmax_t radix = 10;
-	static constexpr intmax_t integer_scale = power(radix, sizeof...(digits));
+	static constexpr auto radix = 10;
+	static constexpr auto integer_scale = power(radix, sizeof...(digits));
 public:
 	static constexpr auto value = literal<digit>::value * constant<integer_scale> + literal<digits...>::value;
 };
