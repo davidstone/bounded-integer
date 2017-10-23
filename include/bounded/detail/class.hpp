@@ -38,6 +38,8 @@ constexpr auto is_implicitly_constructible_from(intmax_t const minimum, intmax_t
 	if constexpr (allow_construction_from<T> and !std::is_same<std::decay_t<T>, bool>{}) {
 		return type_fits_in_range<std::decay_t<T>>(minimum, maximum);
 	} else {
+		static_cast<void>(minimum);
+		static_cast<void>(maximum);
 		return std::false_type{};
 	}
 }
@@ -47,6 +49,8 @@ constexpr auto is_explicitly_constructible_from(intmax_t const minimum, intmax_t
 	if constexpr (allow_construction_from<T>) {
 		return type_overlaps_range<std::decay_t<T>>(minimum, maximum) or !policy::overflow_is_error;
 	} else {
+		static_cast<void>(minimum);
+		static_cast<void>(maximum);
 		return std::false_type{};
 	}
 }

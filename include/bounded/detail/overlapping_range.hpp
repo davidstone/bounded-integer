@@ -32,6 +32,7 @@ template<typename T>
 constexpr auto type_overlaps_range(intmax_t const minimum, intmax_t const maximum) noexcept {
 	static_assert(basic_numeric_limits<T>::is_specialized, "Only works with integer types.");
 	if constexpr (std::is_same<T, uintmax_t>::value) {
+		static_cast<void>(minimum);
 		return maximum >= 0;
 	} else {
 		using limits = basic_numeric_limits<T>;
