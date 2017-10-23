@@ -12,7 +12,7 @@
 namespace bounded {
 namespace detail {
 
-constexpr auto power(std::uintmax_t const radix, std::uintmax_t const exponent) noexcept {
+constexpr auto power(std::uintmax_t const radix, std::uintmax_t const exponent) {
 	std::uintmax_t result = 1;
 	for (std::uintmax_t n = 0; n != exponent; ++n) {
 		result *= radix;
@@ -20,27 +20,23 @@ constexpr auto power(std::uintmax_t const radix, std::uintmax_t const exponent) 
 	return result;
 }
 
-template<char digit, char... digits>
-struct literal {
-private:
-	static constexpr auto radix = 10;
-	static constexpr auto integer_scale = power(radix, sizeof...(digits));
-public:
-	static constexpr auto value = literal<digit>::value * constant<integer_scale> + literal<digits...>::value;
-};
-
-template<char digit>
-struct literal<digit> {
-	static constexpr auto value = constant<digit - '0'>;
-};
+template<typename Digit>
+constexpr auto literal(Digit const digit) {
+	return digit;
+}
+template<typename Digit, typename... Digits>
+constexpr auto literal(Digit const digit, Digits... digits) {
+	constexpr auto radix = 10;
+	return digit * constant<power(radix, sizeof...(digits))> + literal(digits...);
+}
 
 }	// namespace detail
 
 namespace literal {
 
 template<char... digits>
-constexpr auto operator"" _bi() noexcept {
-	return detail::literal<digits...>::value;
+constexpr auto operator""_bi() noexcept {
+	return detail::literal(constant<digits - '0'>...);
 }
 
 }	// namespace literal
