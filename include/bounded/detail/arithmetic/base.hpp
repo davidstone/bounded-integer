@@ -5,8 +5,8 @@
 
 #pragma once
 
+#include <bounded/detail/class.hpp>
 #include <bounded/detail/common_type.hpp>
-#include <bounded/detail/forward_declaration.hpp>
 #include <bounded/detail/noexcept.hpp>
 
 #include <type_traits>
