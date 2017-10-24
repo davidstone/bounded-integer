@@ -426,7 +426,7 @@ auto check_constructibility_specific() {
 	);
 	static_assert(
 		std::is_constructible<type, bool>::value,
-		"Should be able to convert a bool to a bounded::integer."
+		"Should be able to construct a bounded::integer from a bool."
 	);
 }
 
