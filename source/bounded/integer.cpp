@@ -15,11 +15,6 @@ namespace {
 
 using namespace bounded::literal;
 
-template<typename LHS, typename RHS>
-constexpr auto same_bounds =
-	std::numeric_limits<LHS>::min() == std::numeric_limits<RHS>::min() and
-	std::numeric_limits<LHS>::max() == std::numeric_limits<RHS>::max();
-
 namespace check_common_type {
 	using type1 = bounded::integer<1, 5>;
 	using type2 = bounded::integer<3, 10>;
@@ -263,12 +258,12 @@ namespace check_comparison {
 
 	constexpr auto one = bounded::constant<1>;
 	static_assert(
-		!std::numeric_limits<decltype(one)>::is_signed,
+		!std::numeric_limits<decltype(one)::underlying_type>::is_signed,
 		"Value should be unsigned for this test."
 	);
 	constexpr auto negative_one = bounded::constant<-1>;
 	static_assert(
-		std::numeric_limits<decltype(negative_one)>::is_signed,
+		std::numeric_limits<decltype(negative_one)::underlying_type>::is_signed,
 		"Value should be signed for this test."
 	);
 	static_assert(
@@ -283,38 +278,32 @@ namespace check_comparison {
 	);
 
 	// I have to use the preprocessor here to create a string literal
-	#define BOUNDED_INTEGER_SINGLE_COMPARISON(op, a, b) \
+	#define BOUNDED_INTEGER_SINGLE_COMPARISON(lhs, op, rhs, result) \
 		static_assert( \
-			((a) op (b)), \
-			"Incorrect result for (" #a ") " #op " ( "#b ")" \
+			(((lhs) op (rhs)) == (result)), \
+			"Incorrect result for (" #lhs ") " #op " ( " #rhs ") == " #result \
 		)
 
-	#define BOUNDED_INTEGER_MULTI_COMPARISON(op, a, b, c) \
-		BOUNDED_INTEGER_SINGLE_COMPARISON(op, a, b); \
-		BOUNDED_INTEGER_SINGLE_COMPARISON(op, b, c); \
-		BOUNDED_INTEGER_SINGLE_COMPARISON(op, a, c); \
-		static_assert( \
-			!((c) op (a)), \
-			"Incorrect result for !((" #c ") " #op " (" #a "))" \
-		)
-	
-	#define BOUNDED_INTEGER_COMPARISON(op, a, b, c) \
-		BOUNDED_INTEGER_MULTI_COMPARISON(op, a, b, c); \
-		BOUNDED_INTEGER_MULTI_COMPARISON(op, bounded::constant<a>, b, c); \
-		BOUNDED_INTEGER_MULTI_COMPARISON(op, a, bounded::constant<b>, c); \
-		BOUNDED_INTEGER_MULTI_COMPARISON(op, a, b, bounded::constant<c>); \
-		BOUNDED_INTEGER_MULTI_COMPARISON(op, bounded::constant<a>, bounded::constant<b>, c); \
-		BOUNDED_INTEGER_MULTI_COMPARISON(op, bounded::constant<a>, b, bounded::constant<c>); \
-		BOUNDED_INTEGER_MULTI_COMPARISON(op, a, bounded::constant<b>, bounded::constant<c>); \
-		BOUNDED_INTEGER_MULTI_COMPARISON(op, bounded::constant<a>, bounded::constant<b>, bounded::constant<c>)
+	#define BOUNDED_INTEGER_COMPARISON(lhs, op, rhs) \
+		BOUNDED_INTEGER_SINGLE_COMPARISON(bounded::constant<lhs>, op, bounded::constant<rhs>, ((lhs) op (rhs))); \
+		BOUNDED_INTEGER_SINGLE_COMPARISON(bounded::constant<lhs>, op, rhs, ((lhs) op (rhs))); \
+		BOUNDED_INTEGER_SINGLE_COMPARISON(lhs, op, bounded::constant<rhs>, ((lhs) op (rhs))); \
+		BOUNDED_INTEGER_SINGLE_COMPARISON(bounded::constant<rhs>, op, bounded::constant<lhs>, ((rhs) op (lhs))); \
+		BOUNDED_INTEGER_SINGLE_COMPARISON(bounded::constant<rhs>, op, lhs, ((rhs) op (lhs))); \
+		BOUNDED_INTEGER_SINGLE_COMPARISON(rhs, op, bounded::constant<lhs>, ((rhs) op (lhs)))
 
-	BOUNDED_INTEGER_COMPARISON(<=, -4, -4, 16);
-	BOUNDED_INTEGER_COMPARISON(<, -17, 0, 17);
-	BOUNDED_INTEGER_COMPARISON(>=, 876, 876, 367);
-	BOUNDED_INTEGER_COMPARISON(>, 1LL << 50LL, 1LL << 30LL, 7);
+	BOUNDED_INTEGER_COMPARISON(-4, <=, -4);
+	BOUNDED_INTEGER_COMPARISON(-4, <=, 16);
+	BOUNDED_INTEGER_COMPARISON(16, <=, 400);
+	BOUNDED_INTEGER_COMPARISON(-17, <, 0);
+	BOUNDED_INTEGER_COMPARISON(-17, <, 17);
+	BOUNDED_INTEGER_COMPARISON(0, < , 17);
+	BOUNDED_INTEGER_COMPARISON(876, >=, 876);
+	BOUNDED_INTEGER_COMPARISON(876, >=, 367);
+	BOUNDED_INTEGER_COMPARISON(1LL << 50LL, >, 1LL << 30LL);
+	BOUNDED_INTEGER_COMPARISON(1LL << 50LL, >, 7);
 
 	#undef BOUNDED_INTEGER_COMPARISON
-	#undef BOUNDED_INTEGER_MULTI_COMPARISON
 	#undef BOUNDED_INTEGER_SINGLE_COMPARISON
 
 	auto non_constexpr_five = bounded::constant<5>;
