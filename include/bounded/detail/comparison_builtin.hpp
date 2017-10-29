@@ -1,4 +1,4 @@
-// Copyright David Stone 2015.
+// Copyright David Stone 2017.
 // Distributed under the Boost Software License, Version 1.0.
 // (See accompanying file LICENSE_1_0.txt or copy at
 // http://www.boost.org/LICENSE_1_0.txt)
@@ -6,70 +6,48 @@
 #pragma once
 
 #include <bounded/detail/comparison.hpp>
-
-#include <bounded/detail/basic_numeric_limits.hpp>
-#include <bounded/detail/common_type.hpp>
-#include <bounded/detail/forward_declaration.hpp>
+#include <bounded/detail/is_bounded_integer.hpp>
 #include <bounded/detail/make.hpp>
 #include <bounded/detail/requires.hpp>
 
-#include <cstdint>
 #include <type_traits>
 
 namespace bounded {
+	
+template<typename LHS, typename RHS>
+constexpr auto compare_using_member(LHS const & lhs, RHS const & rhs) BOUNDED_NOEXCEPT_DECLTYPE(
+	strong_ordering(lhs.compare(rhs))
+)
 
-// Equality with built-ins
+// C-style variadic makes this function always a worse match than the above
+template<typename LHS, typename RHS>
+constexpr auto compare_using_member(LHS const & lhs, RHS const & rhs, ...) BOUNDED_NOEXCEPT_DECLTYPE(
+	strong_ordering(-rhs.compare(lhs))
+)
 
-template<
-	intmax_t minimum, intmax_t maximum, typename overflow_policy, storage_type storage, bool poisoned,
-	typename T,
-	BOUNDED_REQUIRES(basic_numeric_limits<T>::is_integer)
->
-constexpr auto operator==(integer<minimum, maximum, overflow_policy, storage, poisoned> const lhs, T const rhs) noexcept {
-	return lhs == make(rhs);
+template<typename LHS, typename RHS>
+constexpr auto compare(LHS const & lhs, RHS const & rhs) BOUNDED_NOEXCEPT_DECLTYPE(
+	compare_using_member(lhs, rhs)
+)
+
+template<typename LHS, typename RHS, BOUNDED_REQUIRES(is_bounded_integer<LHS> and std::is_integral<RHS>{})>
+constexpr auto compare(LHS const lhs, RHS const rhs) noexcept {
+	return compare(lhs, ::bounded::make(rhs));
 }
 
-template<intmax_t minimum, intmax_t maximum, typename overflow_policy, storage_type storage, bool poisoned>
-constexpr auto operator==(integer<minimum, maximum, overflow_policy, storage, poisoned> const lhs, uintmax_t const rhs) noexcept {
-	return (lhs < 0) ? false : static_cast<uintmax_t>(lhs) == rhs;
+template<typename LHS, typename RHS, BOUNDED_REQUIRES(std::is_integral<LHS>{} and is_bounded_integer<RHS>)>
+constexpr auto compare(LHS const lhs, RHS const rhs) noexcept {
+	return compare(::bounded::make(lhs), rhs);
 }
 
-template<
-	intmax_t minimum, intmax_t maximum, typename overflow_policy, storage_type storage, bool poisoned,
-	typename T,
-	BOUNDED_REQUIRES(basic_numeric_limits<T>::is_integer)
->
-constexpr auto operator==(T const lhs, integer<minimum, maximum, overflow_policy, storage, poisoned> const rhs) noexcept {
-	return rhs == lhs;
+template<typename LHS, BOUNDED_REQUIRES(is_bounded_integer<LHS>)>
+constexpr auto compare(LHS const & lhs, std::uintmax_t const & rhs) noexcept {
+	return (lhs < constant<0>) ? strong_ordering_less : compare(static_cast<std::uintmax_t>(lhs), rhs);
 }
 
-
-// Relational operators with built-ins
-
-template<
-	intmax_t minimum, intmax_t maximum, typename overflow_policy, storage_type storage, bool poisoned,
-	typename T,
-	BOUNDED_REQUIRES(basic_numeric_limits<T>::is_integer)
->
-constexpr auto operator<(integer<minimum, maximum, overflow_policy, storage, poisoned> const lhs, T const rhs) noexcept {
-	return lhs < make(rhs);
-}
-template<intmax_t minimum, intmax_t maximum, typename overflow_policy, storage_type storage, bool poisoned>
-constexpr auto operator<(integer<minimum, maximum, overflow_policy, storage, poisoned> const lhs, uintmax_t const rhs) noexcept {
-	return (lhs < 0) ? true : static_cast<uintmax_t>(lhs) < rhs;
-}
-
-template<
-	intmax_t minimum, intmax_t maximum, typename overflow_policy, storage_type storage, bool poisoned,
-	typename T,
-	BOUNDED_REQUIRES(basic_numeric_limits<T>::is_integer)
->
-constexpr auto operator<(T const lhs, integer<minimum, maximum, overflow_policy, storage, poisoned> const rhs) noexcept {
-	return make(lhs) < rhs;
-}
-template<intmax_t minimum, intmax_t maximum, typename overflow_policy, storage_type storage, bool poisoned>
-constexpr auto operator<(uintmax_t const lhs, integer<minimum, maximum, overflow_policy, storage, poisoned> const rhs) noexcept {
-	return (rhs < 0) ? false : lhs < static_cast<uintmax_t>(rhs);
+template<typename RHS, BOUNDED_REQUIRES(is_bounded_integer<RHS>)>
+constexpr auto compare(std::uintmax_t const & lhs, RHS const & rhs) noexcept {
+	return (rhs < constant<0>) ? strong_ordering_greater : compare(lhs, static_cast<std::uintmax_t>(rhs));
 }
 
 }	// namespace bounded

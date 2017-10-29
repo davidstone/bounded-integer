@@ -71,11 +71,8 @@ struct integer_range_iterator {
 		return integer_range_iterator(static_cast<underlying_type>(lhs.m_value + rhs));
 	}
 	
-	friend constexpr auto operator==(integer_range_iterator const & lhs, integer_range_iterator const & rhs) noexcept -> bool {
-		return lhs.m_value == rhs.m_value;
-	}
-	friend constexpr auto operator<(integer_range_iterator const & lhs, integer_range_iterator const & rhs) noexcept -> bool {
-		return lhs.m_value < rhs.m_value;
+	friend constexpr auto compare(integer_range_iterator const & lhs, integer_range_iterator const & rhs) noexcept {
+		return compare(lhs.m_value, rhs.m_value);
 	}
 private:
 	underlying_type m_value;

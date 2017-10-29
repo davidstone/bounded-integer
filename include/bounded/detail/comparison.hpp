@@ -5,106 +5,189 @@
 
 #pragma once
 
-#include <bounded/detail/common_type.hpp>
-#include <bounded/detail/forward_declaration.hpp>
+#include <bounded/detail/basic_numeric_limits.hpp>
+#include <bounded/detail/is_bounded_integer.hpp>
 #include <bounded/detail/noexcept.hpp>
+#include <bounded/detail/requires.hpp>
+#include <bounded/detail/underlying_type.hpp>
 
 #include <cstdint>
 #include <type_traits>
 
 namespace bounded {
+
+// Unfortunately, (bool ? derived const & : base) is not allowed due to the
+// const qualification. Fortunately, we can fix this by returning a
+// const-qualified prvalue from all compare functions.
+
+struct strong_ordering {
+	constexpr explicit strong_ordering(int value_) noexcept:
+		value(value_)
+	{
+	}
+
+	friend constexpr auto operator==(strong_ordering const lhs, std::nullptr_t) noexcept {
+		return lhs.value == 0;
+	}
+	friend constexpr auto operator==(std::nullptr_t, strong_ordering const rhs) noexcept {
+		return 0 == rhs.value;
+	}
+
+	friend constexpr auto operator!=(strong_ordering const lhs, std::nullptr_t) noexcept {
+		return lhs.value != 0;
+	}
+	friend constexpr auto operator!=(std::nullptr_t, strong_ordering const rhs) noexcept {
+		return 0 != rhs.value;
+	}
+
+	friend constexpr auto operator<(strong_ordering const lhs, std::nullptr_t) noexcept {
+		return lhs.value < 0;
+	}
+	friend constexpr auto operator<(std::nullptr_t, strong_ordering const rhs) noexcept {
+		return 0 < rhs.value;
+	}
+
+	friend constexpr auto operator>(strong_ordering const lhs, std::nullptr_t) noexcept {
+		return lhs.value > 0;
+	}
+	friend constexpr auto operator>(std::nullptr_t, strong_ordering const rhs) noexcept {
+		return 0 > rhs.value;
+	}
+
+	friend constexpr auto operator<=(strong_ordering const lhs, std::nullptr_t) noexcept {
+		return lhs.value <= 0;
+	}
+	friend constexpr auto operator<=(std::nullptr_t, strong_ordering const rhs) noexcept {
+		return 0 <= rhs.value;
+	}
+
+	friend constexpr auto operator>=(strong_ordering const lhs, std::nullptr_t) noexcept {
+		return lhs.value >= 0;
+	}
+	friend constexpr auto operator>=(std::nullptr_t, strong_ordering const rhs) noexcept {
+		return 0 >= rhs.value;
+	}
+
+private:
+	int value;
+};
+
+constexpr auto strong_ordering_less = strong_ordering(-1);
+constexpr auto strong_ordering_equal = strong_ordering(0);
+constexpr auto strong_ordering_greater = strong_ordering(1);
+
+
 namespace detail {
 
-// This uses any policy because policies do not matter for comparisons. This
-// allows the user to compare integers with unrelated policies.
-template<
-	intmax_t lhs_min, intmax_t lhs_max, storage_type lhs_storage,
-	intmax_t rhs_min, intmax_t rhs_max, storage_type rhs_storage,
-	typename policy
->
-using comparison_type = typename std::common_type_t<
-	basic_integer<lhs_min, lhs_max, policy, lhs_storage, false>,
-	basic_integer<rhs_min, rhs_max, policy, rhs_storage, false>
->::underlying_type const;
+template<typename T>
+constexpr auto is_max_unsigned =
+	std::numeric_limits<T>::min() == std::numeric_limits<std::uintmax_t>::min() and
+	std::numeric_limits<T>::max() == std::numeric_limits<std::uintmax_t>::max();
+
+}	// namespace detail
+
+template<typename LHS, typename RHS, BOUNDED_REQUIRES(std::is_integral<LHS>{} and std::is_integral<RHS>{})>
+constexpr auto compare(LHS const lhs, RHS const rhs) noexcept -> strong_ordering const {
+	if constexpr (std::is_same<LHS, RHS>{}) {
+		return
+			(lhs < rhs) ? strong_ordering_less :
+			(lhs > rhs) ? strong_ordering_greater :
+			strong_ordering_equal;
+	} else if constexpr (not detail::is_max_unsigned<LHS> and not detail::is_max_unsigned<RHS>) {
+		return compare(static_cast<std::intmax_t>(lhs), static_cast<std::intmax_t>(rhs));
+	} else if constexpr (std::is_signed<LHS>{}) {
+		static_assert(detail::is_max_unsigned<RHS>);
+		return (lhs < static_cast<LHS>(std::numeric_limits<RHS>::min()) or std::numeric_limits<LHS>::max() < rhs) ?
+			strong_ordering_less :
+			compare(lhs, static_cast<LHS>(rhs));
+	} else {
+		static_assert(detail::is_max_unsigned<LHS>);
+		return (rhs < static_cast<RHS>(std::numeric_limits<LHS>::min()) or std::numeric_limits<RHS>::max() < lhs) ?
+			strong_ordering_greater :
+			compare(static_cast<RHS>(lhs), rhs);
+	}
+}
+
+
+namespace detail {
+
+template<typename Limited, typename UnaryFunction, typename LHS, typename RHS>
+constexpr auto safe_extreme(LHS const lhs, RHS const rhs, UnaryFunction const pick_lhs) noexcept {
+	static_assert(std::is_same<LHS, std::intmax_t>{} or std::is_same<LHS, std::uintmax_t>{});
+	static_assert(std::is_same<RHS, std::intmax_t>{} or std::is_same<RHS, std::uintmax_t>{});
+	using result_type = std::conditional_t<std::is_same<LHS, RHS>{}, LHS, Limited>;
+	return (pick_lhs(compare(lhs, rhs))) ?
+		static_cast<result_type>(lhs) :
+		static_cast<result_type>(rhs);
+}
+
+template<typename LHS, typename RHS>
+constexpr auto safe_min(LHS const lhs, RHS const rhs) noexcept {
+	return safe_extreme<std::intmax_t>(lhs, rhs, [](auto const cmp) { return cmp <= 0; });
+}
+
+template<typename LHS, typename RHS>
+constexpr auto safe_max(LHS const lhs, RHS const rhs) noexcept {
+	return safe_extreme<std::uintmax_t>(lhs, rhs, [](auto const cmp) { return cmp > 0; });
+}
 
 }	// namespace detail
 
 
-template<
-	intmax_t lhs_min, intmax_t lhs_max, typename lhs_overflow, storage_type lhs_storage, bool lhs_poisoned,
-	intmax_t rhs_min, intmax_t rhs_max, typename rhs_overflow, storage_type rhs_storage, bool rhs_poisoned
->
-constexpr auto operator==(detail::basic_integer<lhs_min, lhs_max, lhs_overflow, lhs_storage, lhs_poisoned> const & lhs, detail::basic_integer<rhs_min, rhs_max, rhs_overflow, rhs_storage, rhs_poisoned> const & rhs) noexcept {
-	if constexpr (lhs_min > rhs_max or rhs_min > lhs_max) {
-		return std::false_type{};
-	} else if constexpr (lhs_min == lhs_max and rhs_min == rhs_max and lhs_min == rhs_min) {
-		return std::true_type{};
+template<typename LHS, typename RHS, BOUNDED_REQUIRES(is_bounded_integer<LHS> and is_bounded_integer<RHS>)>
+constexpr auto compare(LHS const & lhs, RHS const & rhs) noexcept {
+	using lhs_limits = basic_numeric_limits<LHS>;
+	using rhs_limits = basic_numeric_limits<RHS>;
+	if constexpr (lhs_limits::min() > rhs_limits::max()) {
+		static_cast<void>(lhs);
+		static_cast<void>(rhs);
+		return strong_ordering_greater;
+	} else if constexpr (lhs_limits::max() < rhs_limits::min()) {
+		static_cast<void>(lhs);
+		static_cast<void>(rhs);
+		return strong_ordering_less;
+	} else if constexpr (lhs_limits::min() == lhs_limits::max() and rhs_limits::min() == rhs_limits::max() and lhs_limits::min() == rhs_limits::min()) {
+		static_cast<void>(lhs);
+		static_cast<void>(rhs);
+		return strong_ordering_equal;
 	} else {
-		using common_t = detail::comparison_type<lhs_min, lhs_max, lhs_storage, rhs_min, rhs_max, rhs_storage, lhs_overflow>;
-		return static_cast<common_t>(lhs) == static_cast<common_t>(rhs);
+		return compare(lhs.value(), rhs.value());
 	}
 }
 
-
-
-template<
-	intmax_t lhs_min, intmax_t lhs_max, typename lhs_overflow, storage_type lhs_storage, bool lhs_poisoned,
-	intmax_t rhs_min, intmax_t rhs_max, typename rhs_overflow, storage_type rhs_storage, bool rhs_poisoned
->
-constexpr auto operator<(detail::basic_integer<lhs_min, lhs_max, lhs_overflow, lhs_storage, lhs_poisoned> const & lhs, detail::basic_integer<rhs_min, rhs_max, rhs_overflow, rhs_storage, rhs_poisoned> const & rhs) noexcept {
-	if constexpr (lhs_min >= rhs_max) {
-		return std::false_type{};
-	} else if constexpr (lhs_max < rhs_min) {
-		return std::true_type{};
-	} else {
-		using common_t = detail::comparison_type<lhs_min, lhs_max, lhs_storage, rhs_min, rhs_max, rhs_storage, lhs_overflow>;
-		return static_cast<common_t>(lhs) < static_cast<common_t>(rhs);
-	}
-}
-
-
-
-// The strange namespacing and using declarations here are to ensure these
-// functions are picked up by ADL for types defined in namespaces ::bounded or
-// ::bounded::detail
-namespace detail {
-
-constexpr auto typed_not(bool x) noexcept {
-	return !x;
-}
-constexpr auto typed_not(std::true_type) noexcept {
-	return std::false_type{};
-}
-constexpr auto typed_not(std::false_type) noexcept {
-	return std::true_type{};
-}
 
 template<typename LHS, typename RHS>
+constexpr auto operator==(LHS const & lhs, RHS const & rhs) BOUNDED_NOEXCEPT_DECLTYPE(
+	compare(lhs, rhs) == 0
+)
+template<typename LHS, typename RHS>
 constexpr auto operator!=(LHS const & lhs, RHS const & rhs) BOUNDED_NOEXCEPT_DECLTYPE(
-	::bounded::detail::typed_not(lhs == rhs)
+	compare(lhs, rhs) != 0
 )
 
 template<typename LHS, typename RHS>
+constexpr auto operator<(LHS const & lhs, RHS const & rhs) BOUNDED_NOEXCEPT_DECLTYPE(
+	compare(lhs, rhs) < 0
+)
+template<typename LHS, typename RHS>
 constexpr auto operator>(LHS const & lhs, RHS const & rhs) BOUNDED_NOEXCEPT_DECLTYPE(
-	rhs < lhs
+	compare(lhs, rhs) > 0
 )
 template<typename LHS, typename RHS>
 constexpr auto operator<=(LHS const & lhs, RHS const & rhs) BOUNDED_NOEXCEPT_DECLTYPE(
-	::bounded::detail::typed_not(rhs < lhs)
+	compare(lhs, rhs) <= 0
 )
 template<typename LHS, typename RHS>
 constexpr auto operator>=(LHS const & lhs, RHS const & rhs) BOUNDED_NOEXCEPT_DECLTYPE(
-	::bounded::detail::typed_not(lhs < rhs)
+	compare(lhs, rhs) >= 0
 )
 
-}	// namespace detail
-
 #define BOUNDED_COMPARISON \
+	using ::bounded::detail::operator==; \
 	using ::bounded::detail::operator!=; \
+	using ::bounded::detail::operator<; \
 	using ::bounded::detail::operator>; \
 	using ::bounded::detail::operator<=; \
 	using ::bounded::detail::operator>=;
 	
-BOUNDED_COMPARISON
-
 }	// namespace bounded

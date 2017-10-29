@@ -21,7 +21,9 @@
 namespace bounded {
 
 // Specialize this class to give the correct type for your own extreme function
-// if the default does not work
+// if the default does not work. Types that cannot be used to construct this
+// type are assumed to never be valid results, and are thus implicitly ignored
+// as possible extreme candidates.
 template<typename Compare, typename T1, typename T2>
 struct extreme_type {
 	using type = std::common_type_t<T1, T2>;
@@ -63,11 +65,14 @@ public:
 
 constexpr struct {
 private:
-	template<typename Compare, typename T1, typename T2, typename result_type = detail::add_common_cv_reference_t<extreme_t<Compare, T2, T1>, T1, T2>>
+	template<typename Compare, typename T1, typename T2>
+	using result_type = detail::add_common_cv_reference_t<extreme_t<Compare, T2, T1>, T1, T2>;
+
+	template<typename Compare, typename T1, typename T2, typename result_t = result_type<Compare, T1, T2>>
 	static constexpr auto extreme_two(Compare compare, T1 && t1, T2 && t2) BOUNDED_NOEXCEPT_DECLTYPE(
 		compare(t2, t1) ?
-			static_cast<result_type>(std::forward<T2>(t2)) :
-			static_cast<result_type>(std::forward<T1>(t1))
+			static_cast<result_t>(std::forward<T2>(t2)) :
+			static_cast<result_t>(std::forward<T1>(t1))
 	)
 
 	// These are needed because you cannot have a recursive noexcept specification
@@ -75,20 +80,19 @@ private:
 
 	template<typename Compare, typename T1, typename T2>
 	static constexpr auto noexcept_extreme() noexcept {
-		using relation_t = decltype(std::declval<Compare>()(std::declval<T2>(), std::declval<T1>()));
-		if constexpr (std::is_same<relation_t, std::false_type>{} or std::is_same<relation_t, std::true_type>{}) {
+		using result_t = result_type<Compare, T1, T2>;
+		if constexpr (not std::is_constructible<result_t, T1>{} or not std::is_constructible<result_t, T2>{}) {
 			return std::true_type{};
 		} else {
-			return std::bool_constant<noexcept(extreme_two(std::declval<Compare>(), std::declval<T1>(), std::declval<T2>()))>{};
+			return std::bool_constant<noexcept(extreme_two(std::declval<Compare>(), std::declval<T2>(), std::declval<T1>()))>{};
 		}
 	}
 	
 	template<typename Compare, typename T1, typename T2, typename T3, typename... Ts>
 	static constexpr auto noexcept_extreme() noexcept {
-		using result_type = detail::add_common_cv_reference_t<extreme_t<Compare, T1, T2>, T1, T2>;
 		return std::bool_constant<
 			noexcept_extreme<Compare, T1, T2>() and
-			noexcept_extreme<Compare, result_type, T3, Ts...>()
+			noexcept_extreme<Compare, result_type<Compare, T1, T2>, T3, Ts...>()
 		>{};
 	}
 	
@@ -101,10 +105,12 @@ public:
 
 	template<typename Compare, typename T1, typename T2>
 	constexpr decltype(auto) operator()(Compare compare, T1 && t1, T2 && t2) const noexcept(noexcept_extreme<Compare, T1 &&, T2 &&>()) {
-		using relation_t = decltype(compare(t2, t1));
-		if constexpr (std::is_same<relation_t, std::false_type>{}) {
+		using result_t = result_type<Compare, T1, T2>;
+		if constexpr (not std::is_constructible<result_t, T2>{}) {
+			static_cast<void>(compare);
 			return std::forward<T1>(t1);
-		} else if constexpr (std::is_same<relation_t, std::true_type>{}) {
+		} else if constexpr (not std::is_constructible<result_t, T1>{}) {
+			static_cast<void>(compare);
 			return std::forward<T2>(t2);
 		} else {
 			return extreme_two(std::move(compare), std::forward<T1>(t1), std::forward<T2>(t2));
