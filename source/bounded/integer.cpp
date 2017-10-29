@@ -240,6 +240,92 @@ namespace check_common_type {
 }
 
 
+namespace check_comparison {
+	constexpr bounded::integer<1, 10> a(5);
+	static_assert(
+		a == a,
+		"Values do not equal themselves"
+	);
+	static_assert(
+		a == 5,
+		"Values do not equal their underlying value"
+	);
+	constexpr bounded::checked_integer<4, 36346> b(5);
+	static_assert(
+		a == b,
+		"Values do not equal equivalent other bounded::integer types"
+	);
+
+	static_assert(
+		bounded::constant<5> != bounded::constant<6>,
+		"5 should not equal 6"
+	);
+
+	constexpr auto one = bounded::constant<1>;
+	static_assert(
+		!std::numeric_limits<decltype(one)>::is_signed,
+		"Value should be unsigned for this test."
+	);
+	constexpr auto negative_one = bounded::constant<-1>;
+	static_assert(
+		std::numeric_limits<decltype(negative_one)>::is_signed,
+		"Value should be signed for this test."
+	);
+	static_assert(
+		negative_one < one,
+		"Small negative values should be less than small positive values."
+	);
+	constexpr intmax_t int_min = std::numeric_limits<int>::min();
+	constexpr intmax_t int_max = std::numeric_limits<int>::max();
+	static_assert(
+		bounded::constant<int_min> < bounded::constant<int_max + 1>,
+		"Large negative values should be less than large positive values."
+	);
+
+	// I have to use the preprocessor here to create a string literal
+	#define BOUNDED_INTEGER_SINGLE_COMPARISON(op, a, b) \
+		static_assert( \
+			((a) op (b)), \
+			"Incorrect result for (" #a ") " #op " ( "#b ")" \
+		)
+
+	#define BOUNDED_INTEGER_MULTI_COMPARISON(op, a, b, c) \
+		BOUNDED_INTEGER_SINGLE_COMPARISON(op, a, b); \
+		BOUNDED_INTEGER_SINGLE_COMPARISON(op, b, c); \
+		BOUNDED_INTEGER_SINGLE_COMPARISON(op, a, c); \
+		static_assert( \
+			!((c) op (a)), \
+			"Incorrect result for !((" #c ") " #op " (" #a "))" \
+		)
+	
+	#define BOUNDED_INTEGER_COMPARISON(op, a, b, c) \
+		BOUNDED_INTEGER_MULTI_COMPARISON(op, a, b, c); \
+		BOUNDED_INTEGER_MULTI_COMPARISON(op, bounded::constant<a>, b, c); \
+		BOUNDED_INTEGER_MULTI_COMPARISON(op, a, bounded::constant<b>, c); \
+		BOUNDED_INTEGER_MULTI_COMPARISON(op, a, b, bounded::constant<c>); \
+		BOUNDED_INTEGER_MULTI_COMPARISON(op, bounded::constant<a>, bounded::constant<b>, c); \
+		BOUNDED_INTEGER_MULTI_COMPARISON(op, bounded::constant<a>, b, bounded::constant<c>); \
+		BOUNDED_INTEGER_MULTI_COMPARISON(op, a, bounded::constant<b>, bounded::constant<c>); \
+		BOUNDED_INTEGER_MULTI_COMPARISON(op, bounded::constant<a>, bounded::constant<b>, bounded::constant<c>)
+
+	BOUNDED_INTEGER_COMPARISON(<=, -4, -4, 16);
+	BOUNDED_INTEGER_COMPARISON(<, -17, 0, 17);
+	BOUNDED_INTEGER_COMPARISON(>=, 876, 876, 367);
+	BOUNDED_INTEGER_COMPARISON(>, 1LL << 50LL, 1LL << 30LL, 7);
+
+	#undef BOUNDED_INTEGER_COMPARISON
+	#undef BOUNDED_INTEGER_MULTI_COMPARISON
+	#undef BOUNDED_INTEGER_SINGLE_COMPARISON
+
+	auto non_constexpr_five = bounded::constant<5>;
+	auto non_constexpr_four = bounded::constant<4>;
+	static_assert(non_constexpr_five == non_constexpr_five, "operator== not constexpr for non-constexpr arguments.");
+	static_assert(non_constexpr_five != non_constexpr_four, "operator!= not constexpr for non-constexpr arguments.");
+	static_assert(non_constexpr_four < non_constexpr_five, "operator< not constexpr for non-constexpr arguments.");
+	static_assert(non_constexpr_four <= non_constexpr_four, "operator<= not constexpr for non-constexpr arguments.");
+}
+
+
 template<typename Integer>
 constexpr auto test_log(Integer const value, bounded::constant_t<2>) {
 	switch (static_cast<uintmax_t>(value)) {
@@ -459,92 +545,6 @@ namespace check_make {
 		"incorrect equivalent_overflow_policy for bounded::integer."
 	);
 }
-
-namespace check_comparison {
-	constexpr bounded::integer<1, 10> a(5);
-	static_assert(
-		a == a,
-		"Values do not equal themselves"
-	);
-	static_assert(
-		a == 5,
-		"Values do not equal their underlying value"
-	);
-	constexpr bounded::checked_integer<4, 36346> b(5);
-	static_assert(
-		a == b,
-		"Values do not equal equivalent other bounded::integer types"
-	);
-
-	static_assert(
-		bounded::constant<5> != bounded::constant<6>,
-		"5 should not equal 6"
-	);
-
-	constexpr auto one = bounded::constant<1>;
-	static_assert(
-		!std::numeric_limits<decltype(one)>::is_signed,
-		"Value should be unsigned for this test."
-	);
-	constexpr auto negative_one = bounded::constant<-1>;
-	static_assert(
-		std::numeric_limits<decltype(negative_one)>::is_signed,
-		"Value should be signed for this test."
-	);
-	static_assert(
-		negative_one < one,
-		"Small negative values should be less than small positive values."
-	);
-	constexpr intmax_t int_min = std::numeric_limits<int>::min();
-	constexpr intmax_t int_max = std::numeric_limits<int>::max();
-	static_assert(
-		bounded::constant<int_min> < bounded::constant<int_max + 1>,
-		"Large negative values should be less than large positive values."
-	);
-
-	// I have to use the preprocessor here to create a string literal
-	#define BOUNDED_INTEGER_SINGLE_COMPARISON(op, a, b) \
-		static_assert( \
-			((a) op (b)), \
-			"Incorrect result for (" #a ") " #op " ( "#b ")" \
-		)
-
-	#define BOUNDED_INTEGER_MULTI_COMPARISON(op, a, b, c) \
-		BOUNDED_INTEGER_SINGLE_COMPARISON(op, a, b); \
-		BOUNDED_INTEGER_SINGLE_COMPARISON(op, b, c); \
-		BOUNDED_INTEGER_SINGLE_COMPARISON(op, a, c); \
-		static_assert( \
-			!((c) op (a)), \
-			"Incorrect result for !((" #c ") " #op " (" #a "))" \
-		)
-	
-	#define BOUNDED_INTEGER_COMPARISON(op, a, b, c) \
-		BOUNDED_INTEGER_MULTI_COMPARISON(op, a, b, c); \
-		BOUNDED_INTEGER_MULTI_COMPARISON(op, bounded::constant<a>, b, c); \
-		BOUNDED_INTEGER_MULTI_COMPARISON(op, a, bounded::constant<b>, c); \
-		BOUNDED_INTEGER_MULTI_COMPARISON(op, a, b, bounded::constant<c>); \
-		BOUNDED_INTEGER_MULTI_COMPARISON(op, bounded::constant<a>, bounded::constant<b>, c); \
-		BOUNDED_INTEGER_MULTI_COMPARISON(op, bounded::constant<a>, b, bounded::constant<c>); \
-		BOUNDED_INTEGER_MULTI_COMPARISON(op, a, bounded::constant<b>, bounded::constant<c>); \
-		BOUNDED_INTEGER_MULTI_COMPARISON(op, bounded::constant<a>, bounded::constant<b>, bounded::constant<c>)
-
-	BOUNDED_INTEGER_COMPARISON(<=, -4, -4, 16);
-	BOUNDED_INTEGER_COMPARISON(<, -17, 0, 17);
-	BOUNDED_INTEGER_COMPARISON(>=, 876, 876, 367);
-	BOUNDED_INTEGER_COMPARISON(>, 1LL << 50LL, 1LL << 30LL, 7);
-
-	#undef BOUNDED_INTEGER_COMPARISON
-	#undef BOUNDED_INTEGER_MULTI_COMPARISON
-	#undef BOUNDED_INTEGER_SINGLE_COMPARISON
-
-	auto non_constexpr_five = bounded::constant<5>;
-	auto non_constexpr_four = bounded::constant<4>;
-	static_assert(non_constexpr_five == non_constexpr_five, "operator== not constexpr for non-constexpr arguments.");
-	static_assert(non_constexpr_five != non_constexpr_four, "operator!= not constexpr for non-constexpr arguments.");
-	static_assert(non_constexpr_four < non_constexpr_five, "operator< not constexpr for non-constexpr arguments.");
-	static_assert(non_constexpr_four <= non_constexpr_four, "operator<= not constexpr for non-constexpr arguments.");
-}
-
 
 template<typename Result, typename Expected>
 constexpr bool homogenous_equals(Result const & result, Expected const & expected) noexcept {
