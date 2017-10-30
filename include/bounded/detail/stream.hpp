@@ -32,14 +32,14 @@ decltype(auto) operator>>(std::basic_istream<CharT, Traits> & in, Integer & x) {
 	// This is intmax_t rather than underlying_type to maximize the chances for
 	// robust error checking rather than undefined behavior, but it still fails
 	// for very large and very small numbers.
-	intmax_t temp;
+	std::intmax_t temp;
 	in >> temp;
 	x = temp;
 	return in;
 }
 template<typename CharT, typename Traits, typename Integer, BOUNDED_REQUIRES(is_bounded_integer<Integer>)>
 decltype(auto) operator>>(std::basic_istream<CharT, Traits> & in, Integer volatile & x) {
-	intmax_t temp;
+	std::intmax_t temp;
 	in >> temp;
 	x = temp;
 	return in;
