@@ -31,7 +31,7 @@ using integer = detail::basic_integer<minimum, maximum, policy, storage, poisone
 namespace detail {
 
 template<typename T>
-constexpr auto allow_construction_from = basic_numeric_limits<T>::is_specialized and (basic_numeric_limits<T>::is_integer or std::is_enum<std::decay_t<T>>::value);
+constexpr auto allow_construction_from = basic_numeric_limits<T>::is_specialized and (basic_numeric_limits<T>::is_integer or std::is_enum<std::decay_t<T>>{});
 
 template<typename T>
 constexpr auto is_implicitly_constructible_from(intmax_t const minimum, intmax_t const maximum) noexcept {
@@ -72,7 +72,7 @@ constexpr auto has_extra_space = underlying_min<T> < basic_numeric_limits<T>::mi
 // bounded::integer with the tighter bounds from an enumeration.
 template<typename T>
 constexpr decltype(auto) as_integer(T const & t) noexcept {
-	if constexpr (std::is_enum<std::decay_t<T>>::value) {
+	if constexpr (std::is_enum<std::decay_t<T>>{}) {
 		using limits = basic_numeric_limits<T>;
 		using result_type = basic_integer<
 			static_cast<std::intmax_t>(limits::min()),
@@ -111,7 +111,7 @@ struct basic_integer {
 	static_assert(minimum < 0 ? std::numeric_limits<underlying_type>::is_signed : true, "underlying_type should be signed.");
 	
 	// May relax these restrictions in the future
-	static_assert(std::is_nothrow_default_constructible<overflow_policy>::value, "overflow_policy must be nothrow default constructible.");
+	static_assert(std::is_nothrow_default_constructible<overflow_policy>{}, "overflow_policy must be nothrow default constructible.");
 	
 	static constexpr auto min() noexcept {
 		return constant<minimum>;
@@ -170,13 +170,13 @@ struct basic_integer {
 
 
 	template<typename Enum, BOUNDED_REQUIRES(
-		std::is_enum<Enum>::value and !is_explicitly_constructible_from<overflow_policy, Enum>(minimum, maximum)
+		std::is_enum<Enum>{} and !is_explicitly_constructible_from<overflow_policy, Enum>(minimum, maximum)
 	)>
 	constexpr basic_integer(Enum other, non_check_t) noexcept:
 		basic_integer(static_cast<std::underlying_type_t<Enum>>(other), non_check) {
 	}
 	template<typename Enum, BOUNDED_REQUIRES(
-		std::is_enum<Enum>::value and !is_explicitly_constructible_from<overflow_policy, Enum>(minimum, maximum)
+		std::is_enum<Enum>{} and !is_explicitly_constructible_from<overflow_policy, Enum>(minimum, maximum)
 	)>
 	constexpr explicit basic_integer(Enum other) BOUNDED_NOEXCEPT_INITIALIZATION(
 		basic_integer(static_cast<std::underlying_type_t<Enum>>(other)) 
@@ -232,34 +232,34 @@ struct basic_integer {
 	// This must not reference the overflow policy because it is possible that
 	// it has already been moved from if this is being called from the
 	// constructor.
-	template<typename T, BOUNDED_REQUIRES(std::is_arithmetic<T>::value or std::is_enum<T>::value)>
+	template<typename T, BOUNDED_REQUIRES(std::is_arithmetic<T>{} or std::is_enum<T>{})>
 	constexpr explicit operator T() const noexcept {
 		return static_cast<T>(m_value);
 	}
-	template<typename T, BOUNDED_REQUIRES(std::is_arithmetic<T>::value or std::is_enum<T>::value)>
+	template<typename T, BOUNDED_REQUIRES(std::is_arithmetic<T>{} or std::is_enum<T>{})>
 	constexpr explicit operator T() const volatile noexcept {
 		return static_cast<T>(m_value);
 	}
 	
 	
 	// Allow a compressed optional representation
-	template<typename Tag, BOUNDED_REQUIRES(std::is_same<Tag, optional_tag>::value and has_extra_space<basic_integer>)>
+	template<typename Tag, BOUNDED_REQUIRES(std::is_same<Tag, optional_tag>{} and has_extra_space<basic_integer>)>
 	constexpr explicit basic_integer(Tag) noexcept:
 		m_value(uninitialized_value()) {
 	}
 
 	// Cannot use BOUNDED_NOEXCEPT_VOID because of gcc bug
 	// https://gcc.gnu.org/bugzilla/show_bug.cgi?id=52869
-	template<typename Tag, typename... Args, BOUNDED_REQUIRES(std::is_same<Tag, optional_tag>::value and has_extra_space<basic_integer> and std::is_constructible<basic_integer, Args...>{})>
+	template<typename Tag, typename... Args, BOUNDED_REQUIRES(std::is_same<Tag, optional_tag>{} and has_extra_space<basic_integer> and std::is_constructible<basic_integer, Args...>{})>
 	constexpr auto initialize(Tag, Args && ... args) noexcept(std::is_nothrow_constructible<basic_integer, Args...>{}) {
 		return *this = basic_integer(std::forward<Args>(args)...);
 	}
 
-	template<typename Tag, BOUNDED_REQUIRES(std::is_same<Tag, optional_tag>::value and has_extra_space<basic_integer>)>
+	template<typename Tag, BOUNDED_REQUIRES(std::is_same<Tag, optional_tag>{} and has_extra_space<basic_integer>)>
 	constexpr auto uninitialize(Tag) noexcept {
 		m_value = uninitialized_value();
 	}
-	template<typename Tag, BOUNDED_REQUIRES(std::is_same<Tag, optional_tag>::value and has_extra_space<basic_integer>)>
+	template<typename Tag, BOUNDED_REQUIRES(std::is_same<Tag, optional_tag>{} and has_extra_space<basic_integer>)>
 	constexpr auto is_initialized(Tag) const noexcept {
 		return m_value != uninitialized_value();
 	}
