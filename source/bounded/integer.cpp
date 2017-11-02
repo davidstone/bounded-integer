@@ -877,7 +877,7 @@ auto check_throw_policy() {
 	);
 	static constexpr auto minimum = 0_bi;
 	static constexpr auto maximum = 10_bi;
-	bounded::throw_policy<> policy;
+	auto const policy = bounded::throw_policy{};
 	try {
 		policy.assignment(20, minimum, maximum);
 		assert(false);
@@ -1152,10 +1152,10 @@ auto check_arithmetic_range(Operation const operation, Range const range) {
 
 auto check_arithmetic_range() {
 	using namespace bounded::detail;
-	check_arithmetic_range(std::plus<>{}, [](auto const & lhs, auto const & rhs) { return plus_operator_range(lhs, rhs); });
-	check_arithmetic_range(std::multiplies<>{}, [](auto const & lhs, auto const & rhs) { return multiplies_operator_range(lhs, rhs); });
-	check_arithmetic_range(std::divides<>{}, [](auto const & lhs, auto const & rhs) { return divides_operator_range(lhs, rhs); });
-	check_arithmetic_range(std::modulus<>{}, [](auto const & lhs, auto const & rhs) { return modulus_operator_range(lhs, rhs); });
+	check_arithmetic_range(std::plus{}, [](auto const & lhs, auto const & rhs) { return plus_operator_range(lhs, rhs); });
+	check_arithmetic_range(std::multiplies{}, [](auto const & lhs, auto const & rhs) { return multiplies_operator_range(lhs, rhs); });
+	check_arithmetic_range(std::divides{}, [](auto const & lhs, auto const & rhs) { return divides_operator_range(lhs, rhs); });
+	check_arithmetic_range(std::modulus{}, [](auto const & lhs, auto const & rhs) { return modulus_operator_range(lhs, rhs); });
 }
 
 
