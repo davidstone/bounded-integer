@@ -21,7 +21,7 @@
 #define BOUNDED_NOEXCEPT_DECLTYPE(...) \
 	noexcept( \
 		noexcept(__VA_ARGS__) and \
-		std::is_nothrow_move_constructible<decltype(__VA_ARGS__)>::value \
+		std::is_nothrow_move_constructible<decltype(__VA_ARGS__)>{} \
 	) -> decltype(__VA_ARGS__) { \
 		return __VA_ARGS__; \
 	}
@@ -30,7 +30,7 @@
 #define BOUNDED_NOEXCEPT_VALUE(...) \
 	noexcept( \
 		noexcept(__VA_ARGS__) and \
-		std::is_nothrow_constructible<std::decay_t<decltype(__VA_ARGS__)>, decltype(__VA_ARGS__)>::value \
+		std::is_nothrow_constructible<std::decay_t<decltype(__VA_ARGS__)>, decltype(__VA_ARGS__)>{} \
 	) -> std::decay_t<decltype(__VA_ARGS__)> { \
 		return __VA_ARGS__; \
 	}

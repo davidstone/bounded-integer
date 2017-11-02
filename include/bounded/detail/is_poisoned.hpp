@@ -13,13 +13,13 @@ namespace bounded {
 namespace detail {
 
 template<typename T>
-struct is_poisoned_c : std::integral_constant<bool, !std::is_same<T, bool>::value> {};
+struct is_poisoned_c : std::integral_constant<bool, !std::is_same<T, bool>{}> {};
 
 template<intmax_t minimum, intmax_t maximum, typename policy, storage_type storage, bool poisoned>
 struct is_poisoned_c<basic_integer<minimum, maximum, policy, storage, poisoned>> : std::integral_constant<bool, poisoned> {};
 
 template<typename T>
-constexpr auto is_poisoned = is_poisoned_c<std::decay_t<T>>::value;
+constexpr auto is_poisoned = is_poisoned_c<std::decay_t<T>>{};
 
 }	// namespace detail
 }	// namespace bounded

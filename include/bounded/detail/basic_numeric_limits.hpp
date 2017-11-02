@@ -17,7 +17,7 @@ namespace bounded {
 template<typename T>
 struct basic_numeric_limits {
 private:
-	using real_numeric_limits = std::conditional_t<std::is_same<T, std::decay_t<T>>::value,
+	using real_numeric_limits = std::conditional_t<std::is_same<T, std::decay_t<T>>{},
 		std::numeric_limits<T>,
 		basic_numeric_limits<std::decay_t<T>>
 	>;

@@ -20,49 +20,49 @@ namespace check_common_type {
 	using type2 = bounded::integer<3, 10>;
 	using common_type2 = std::common_type_t<type1, type2>;
 	using expected_type2 = bounded::integer<1, 10>;
-	static_assert(std::is_same<expected_type2, common_type2>::value, "common_type wrong for 2 values.");
+	static_assert(std::is_same<expected_type2, common_type2>{}, "common_type wrong for 2 values.");
 	using type3 = bounded::integer<-5, -5>;
 	using common_type3 = std::common_type_t<type1, type2, type3>;
 	using expected_type3 = bounded::integer<-5, 10>;
-	static_assert(std::is_same<expected_type3, common_type3>::value, "common_type wrong for 3 values.");
+	static_assert(std::is_same<expected_type3, common_type3>{}, "common_type wrong for 3 values.");
 	using type4 = bounded::integer<0, 0>;
 	using common_type4 = std::common_type_t<type1, type2, type3, type4>;
 	using expected_type4 = bounded::integer<-5, 10>;
-	static_assert(std::is_same<expected_type4, common_type4>::value, "common_type wrong for 4 values.");
+	static_assert(std::is_same<expected_type4, common_type4>{}, "common_type wrong for 4 values.");
 
 
 	static_assert(
-		std::is_same<bounded::detail::common_cv_type_t<int, int>, int>::value,
+		std::is_same<bounded::detail::common_cv_type_t<int, int>, int>{},
 		"Incorrect type for int, int."
 	);
 
 	static_assert(
-		std::is_same<bounded::detail::common_cv_type_t<int const, int>, int const>::value,
+		std::is_same<bounded::detail::common_cv_type_t<int const, int>, int const>{},
 		"Incorrect type for int const, int."
 	);
 
 	static_assert(
-		std::is_same<bounded::detail::common_cv_type_t<int, int volatile>, int volatile>::value,
+		std::is_same<bounded::detail::common_cv_type_t<int, int volatile>, int volatile>{},
 		"Incorrect type for int, int volatile."
 	);
 
 	static_assert(
-		std::is_same<bounded::detail::common_cv_type_t<int const volatile, int>, int const volatile>::value,
+		std::is_same<bounded::detail::common_cv_type_t<int const volatile, int>, int const volatile>{},
 		"Incorrect type for int const volatile, int."
 	);
 
 	static_assert(
-		std::is_same<bounded::detail::common_cv_type_t<int volatile, int const volatile>, int const volatile>::value,
+		std::is_same<bounded::detail::common_cv_type_t<int volatile, int const volatile>, int const volatile>{},
 		"Incorrect type for int volatile, int const volatile."
 	);
 
 	static_assert(
-		std::is_same<bounded::detail::common_cv_type_t<int volatile, int const>, int const volatile>::value,
+		std::is_same<bounded::detail::common_cv_type_t<int volatile, int const>, int const volatile>{},
 		"Incorrect type for int volatile, int const."
 	);
 
 	static_assert(
-		std::is_same<bounded::detail::common_cv_type_t<int const volatile, int const volatile>, int const volatile>::value,
+		std::is_same<bounded::detail::common_cv_type_t<int const volatile, int const volatile>, int const volatile>{},
 		"Incorrect type for int const volatile, int const volatile."
 	);
 
@@ -71,165 +71,165 @@ namespace check_common_type {
 
 
 	static_assert(
-		std::is_same<bounded::detail::common_type_and_value_category_t<int>, int>::value,
+		std::is_same<bounded::detail::common_type_and_value_category_t<int>, int>{},
 		"Incorrect type for int."
 	);
 
 
 
 	static_assert(
-		std::is_same<bounded::detail::common_type_and_value_category_t<int, int>, int>::value,
+		std::is_same<bounded::detail::common_type_and_value_category_t<int, int>, int>{},
 		"Incorrect type for int, int."
 	);
 
 	static_assert(
-		std::is_same<bounded::detail::common_type_and_value_category_t<int &, int>, int>::value,
+		std::is_same<bounded::detail::common_type_and_value_category_t<int &, int>, int>{},
 		"Incorrect type for int &, int."
 	);
 
 	static_assert(
-		std::is_same<bounded::detail::common_type_and_value_category_t<int const &, int>, int>::value,
+		std::is_same<bounded::detail::common_type_and_value_category_t<int const &, int>, int>{},
 		"Incorrect type for int const &, int."
 	);
 
 	static_assert(
-		std::is_same<bounded::detail::common_type_and_value_category_t<int &&, int>, int>::value,
+		std::is_same<bounded::detail::common_type_and_value_category_t<int &&, int>, int>{},
 		"Incorrect type for int &&, int."
 	);
 
 	static_assert(
-		std::is_same<bounded::detail::common_type_and_value_category_t<int const &, int const &>, int const &>::value,
+		std::is_same<bounded::detail::common_type_and_value_category_t<int const &, int const &>, int const &>{},
 		"Incorrect type for int const &, int const &."
 	);
 
 	static_assert(
-		std::is_same<bounded::detail::common_type_and_value_category_t<int &, int const &>, int const &>::value,
+		std::is_same<bounded::detail::common_type_and_value_category_t<int &, int const &>, int const &>{},
 		"Incorrect type for int &, int const &."
 	);
 
 	static_assert(
-		std::is_same<bounded::detail::common_type_and_value_category_t<int &&, int const &>, int>::value,
+		std::is_same<bounded::detail::common_type_and_value_category_t<int &&, int const &>, int>{},
 		"Incorrect type for int &&, int const &."
 	);
 
 	static_assert(
-		std::is_same<bounded::detail::common_type_and_value_category_t<int &, int &>, int &>::value,
+		std::is_same<bounded::detail::common_type_and_value_category_t<int &, int &>, int &>{},
 		"Incorrect type for int &, int &."
 	);
 
 	static_assert(
-		std::is_same<bounded::detail::common_type_and_value_category_t<int &&, int &>, int>::value,
+		std::is_same<bounded::detail::common_type_and_value_category_t<int &&, int &>, int>{},
 		"Incorrect type for int &&, int &."
 	);
 
 	static_assert(
-		std::is_same<bounded::detail::common_type_and_value_category_t<int &&, int &&>, int &&>::value,
+		std::is_same<bounded::detail::common_type_and_value_category_t<int &&, int &&>, int &&>{},
 		"Incorrect type for int &&, int &&."
 	);
 
 
 
 	static_assert(
-		std::is_same<bounded::detail::common_type_and_value_category_t<int, long>, long>::value,
+		std::is_same<bounded::detail::common_type_and_value_category_t<int, long>, long>{},
 		"Incorrect type for int, long."
 	);
 
 	static_assert(
-		std::is_same<bounded::detail::common_type_and_value_category_t<int &, long>, long>::value,
+		std::is_same<bounded::detail::common_type_and_value_category_t<int &, long>, long>{},
 		"Incorrect type for int &, long."
 	);
 
 	static_assert(
-		std::is_same<bounded::detail::common_type_and_value_category_t<int const &, long>, long>::value,
+		std::is_same<bounded::detail::common_type_and_value_category_t<int const &, long>, long>{},
 		"Incorrect type for int const &, long."
 	);
 
 	static_assert(
-		std::is_same<bounded::detail::common_type_and_value_category_t<int &&, long>, long>::value,
+		std::is_same<bounded::detail::common_type_and_value_category_t<int &&, long>, long>{},
 		"Incorrect type for int &&, long."
 	);
 
 	static_assert(
-		std::is_same<bounded::detail::common_type_and_value_category_t<int const &, long const &>, long>::value,
+		std::is_same<bounded::detail::common_type_and_value_category_t<int const &, long const &>, long>{},
 		"Incorrect type for int const &, long const &."
 	);
 
 	static_assert(
-		std::is_same<bounded::detail::common_type_and_value_category_t<int &, long const &>, long>::value,
+		std::is_same<bounded::detail::common_type_and_value_category_t<int &, long const &>, long>{},
 		"Incorrect type for int &, long const &."
 	);
 
 	static_assert(
-		std::is_same<bounded::detail::common_type_and_value_category_t<int &&, long const &>, long>::value,
+		std::is_same<bounded::detail::common_type_and_value_category_t<int &&, long const &>, long>{},
 		"Incorrect type for int &&, long const &."
 	);
 
 	static_assert(
-		std::is_same<bounded::detail::common_type_and_value_category_t<int &, long &>, long>::value,
+		std::is_same<bounded::detail::common_type_and_value_category_t<int &, long &>, long>{},
 		"Incorrect type for int &, long &."
 	);
 
 	static_assert(
-		std::is_same<bounded::detail::common_type_and_value_category_t<int &&, long &>, long>::value,
+		std::is_same<bounded::detail::common_type_and_value_category_t<int &&, long &>, long>{},
 		"Incorrect type for int &&, long &."
 	);
 
 	static_assert(
-		std::is_same<bounded::detail::common_type_and_value_category_t<int &&, long &&>, long>::value,
+		std::is_same<bounded::detail::common_type_and_value_category_t<int &&, long &&>, long>{},
 		"Incorrect type for int &&, long &&."
 	);
 
 
 
 	static_assert(
-		std::is_same<bounded::detail::common_type_and_value_category_t<long &, int>, long>::value,
+		std::is_same<bounded::detail::common_type_and_value_category_t<long &, int>, long>{},
 		"Incorrect type for long &, int."
 	);
 
 	static_assert(
-		std::is_same<bounded::detail::common_type_and_value_category_t<long const &, int>, long>::value,
+		std::is_same<bounded::detail::common_type_and_value_category_t<long const &, int>, long>{},
 		"Incorrect type for long const &, int."
 	);
 
 	static_assert(
-		std::is_same<bounded::detail::common_type_and_value_category_t<long &&, int>, long>::value,
+		std::is_same<bounded::detail::common_type_and_value_category_t<long &&, int>, long>{},
 		"Incorrect type for long &&, int."
 	);
 
 	static_assert(
-		std::is_same<bounded::detail::common_type_and_value_category_t<long const &, int const &>, long>::value,
+		std::is_same<bounded::detail::common_type_and_value_category_t<long const &, int const &>, long>{},
 		"Incorrect type for long const &, int const &."
 	);
 
 	static_assert(
-		std::is_same<bounded::detail::common_type_and_value_category_t<long &, int const &>, long>::value,
+		std::is_same<bounded::detail::common_type_and_value_category_t<long &, int const &>, long>{},
 		"Incorrect type for long &, int const &."
 	);
 
 	static_assert(
-		std::is_same<bounded::detail::common_type_and_value_category_t<long &&, int const &>, long>::value,
+		std::is_same<bounded::detail::common_type_and_value_category_t<long &&, int const &>, long>{},
 		"Incorrect type for long &&, int const &."
 	);
 
 	static_assert(
-		std::is_same<bounded::detail::common_type_and_value_category_t<long &, int &>, long>::value,
+		std::is_same<bounded::detail::common_type_and_value_category_t<long &, int &>, long>{},
 		"Incorrect type for long &, int &."
 	);
 
 	static_assert(
-		std::is_same<bounded::detail::common_type_and_value_category_t<long &&, int &>, long>::value,
+		std::is_same<bounded::detail::common_type_and_value_category_t<long &&, int &>, long>{},
 		"Incorrect type for long &&, int &."
 	);
 
 	static_assert(
-		std::is_same<bounded::detail::common_type_and_value_category_t<long &&, int &&>, long>::value,
+		std::is_same<bounded::detail::common_type_and_value_category_t<long &&, int &&>, long>{},
 		"Incorrect type for long &&, int &&."
 	);
 
 
 
 	static_assert(
-		std::is_same<bounded::detail::common_type_and_value_category_t<int, int, int>, int>::value,
+		std::is_same<bounded::detail::common_type_and_value_category_t<int, int, int>, int>{},
 		"Incorrect type for int, int, int."
 	);
 }
@@ -397,7 +397,7 @@ template<typename integer>
 auto check_numeric_limits() {
 	using int_limits = std::numeric_limits<integer>;
 	using bounded_t = bounded::checked_integer<int_limits::min(), int_limits::max()>;
-	static_assert(std::is_same<typename bounded_t::underlying_type, integer>::value, "Incorrect underlying_type.");
+	static_assert(std::is_same<typename bounded_t::underlying_type, integer>{}, "Incorrect underlying_type.");
 	using bounded_limits = std::numeric_limits<bounded_t>;
 	static_assert(sizeof(bounded_t) == sizeof(integer), "checked_integer wrong size.");
 
@@ -487,20 +487,20 @@ auto check_constructibility_specific() {
 	);
 
 	static_assert(
-		std::is_convertible<int, type>::value,
+		std::is_convertible<int, type>{},
 		"Cannot convert integer type to bounded::integer with same range."
 	);
 	static_assert(
-		std::is_constructible<type, type, bounded::non_check_t>::value,
+		std::is_constructible<type, type, bounded::non_check_t>{},
 		"Cannot construct a type from itself with non_check_t."
 	);
 
 	static_assert(
-		!std::is_convertible<bool, type>::value,
+		!std::is_convertible<bool, type>{},
 		"Should not be able to convert a bool to a bounded::integer."
 	);
 	static_assert(
-		std::is_constructible<type, bool>::value,
+		std::is_constructible<type, bool>{},
 		"Should be able to construct a bounded::integer from a bool."
 	);
 }
@@ -619,30 +619,30 @@ auto check_specific_reference_minmax() {
 	T const c2{};
 
 	static_assert(
-		std::is_same<decltype(bounded::min(m1, m2)), T &>::value,
+		std::is_same<decltype(bounded::min(m1, m2)), T &>{},
 		"Incorrect result type for bounded::min with T & and T &."
 	);
 
 	static_assert(
-		std::is_same<decltype(bounded::min(c1, c2)), T const &>::value,
+		std::is_same<decltype(bounded::min(c1, c2)), T const &>{},
 		"Incorrect result type for bounded::min with T const & and T const &."
 	);
 
 	static_assert(
-		std::is_same<decltype(bounded::min(m1, c1)), T const &>::value,
+		std::is_same<decltype(bounded::min(m1, c1)), T const &>{},
 		"Incorrect result type for bounded::min with T & and T const &."
 	);
 	
 	static_assert(
-		std::is_same<decltype(bounded::min(T{}, T{})), T>::value,
+		std::is_same<decltype(bounded::min(T{}, T{})), T>{},
 		"Incorrect result type for bounded::min with T and T."
 	);
 	static_assert(
-		std::is_same<decltype(bounded::min(m1, T{})), T>::value,
+		std::is_same<decltype(bounded::min(m1, T{})), T>{},
 		"Incorrect result type for bounded::min with T & and T."
 	);
 	static_assert(
-		std::is_same<decltype(bounded::min(c1, T{})), T>::value,
+		std::is_same<decltype(bounded::min(c1, T{})), T>{},
 		"Incorrect result type for bounded::min with T const & and T."
 	);
 }
@@ -661,7 +661,7 @@ auto check_reference_minmax() {
 	int const i{};
 	long const l{};
 	static_assert(
-		std::is_same<decltype(bounded::min(i, l)), long>::value,
+		std::is_same<decltype(bounded::min(i, l)), long>{},
 		"Incorrect result type for bounded::min with int const & and long const &."
 	);
 }
@@ -1011,7 +1011,7 @@ auto check_policies() {
 auto check_assignment() {
 	bounded::integer<0, 10> x(5);
 	// The check for assignability fails with a hard error here currently
-	// static_assert(!std::is_assignable<decltype((x)), decltype(11_bi)>::value, "Should not be assignable.");
+	// static_assert(!std::is_assignable<decltype((x)), decltype(11_bi)>{}, "Should not be assignable.");
 	x = bounded::integer<10, 11>(10);
 	assert(x == 10_bi);
 
@@ -1170,18 +1170,18 @@ auto check_empty_braces() {
 namespace check_optional_common_type {
 
 	static_assert(
-		std::is_same<std::common_type_t<bounded::none_t, int>, bounded::optional<int>>::value,
+		std::is_same<std::common_type_t<bounded::none_t, int>, bounded::optional<int>>{},
 		"common_type with none_t first wrong."
 	);
 	static_assert(
-		std::is_same<std::common_type_t<int, bounded::none_t>, bounded::optional<int>>::value,
+		std::is_same<std::common_type_t<int, bounded::none_t>, bounded::optional<int>>{},
 		"common_type with none_t last wrong."
 	);
 	static_assert(
 		std::is_same<
 			std::common_type_t<decltype(1_bi), bounded::none_t, decltype(5_bi), bounded::none_t>,
 			bounded::optional<bounded::integer<1, 5>>
-		>::value,
+		>{},
 		"common_type with bounded::integer and none_t wrong."
 	);
 
@@ -1228,7 +1228,7 @@ auto check_integer_optional() {
 	optional_integer = integer_type(7);
 	assert(optional_integer);
 
-	static_assert(std::is_same<decltype(*optional_integer), integer_type &>::value, "Incorrect type of *optional.");
+	static_assert(std::is_same<decltype(*optional_integer), integer_type &>{}, "Incorrect type of *optional.");
 	*optional_integer = integer_type(1);
 	assert(optional_integer);
 	assert(*optional_integer == 1);
@@ -1245,14 +1245,14 @@ auto check_non_trivial_optional() {
 	assert(!uninitialized_optional);
 	decltype(auto) uninitialized_value_or = value_or(uninitialized_optional, "spork");
 	assert(uninitialized_value_or == "spork");
-	static_assert(std::is_same<decltype(uninitialized_value_or), std::string>::value, "value_or incorrect for uninitialized");
-	static_assert(std::is_same<decltype(value_or(std::move(uninitialized_optional), std::string("spoon"))), std::string &&>::value, "value_or incorrect for uninitialized");
+	static_assert(std::is_same<decltype(uninitialized_value_or), std::string>{}, "value_or incorrect for uninitialized");
+	static_assert(std::is_same<decltype(value_or(std::move(uninitialized_optional), std::string("spoon"))), std::string &&>{}, "value_or incorrect for uninitialized");
 	bounded::optional<type> optional_string("Hello");
 	assert(optional_string);
 	auto const default_value = std::string("knife");
 	decltype(auto) initialized_value_or = value_or(optional_string, default_value);
 	assert(initialized_value_or == "Hello");
-	static_assert(std::is_same<decltype(initialized_value_or), std::string const &>::value, "value_or incorrect for initialized");
+	static_assert(std::is_same<decltype(initialized_value_or), std::string const &>{}, "value_or incorrect for initialized");
 	assert(*optional_string == "Hello");
 
 	optional_string = uninitialized_optional;
@@ -1265,7 +1265,7 @@ auto check_non_trivial_optional() {
 	assert(optional_string == "Yo");
 	assert(optional_string != "Sup");
 
-	static_assert(std::is_same<decltype(*optional_string), type &>::value, "Incorrect type of *optional.");
+	static_assert(std::is_same<decltype(*optional_string), type &>{}, "Incorrect type of *optional.");
 	*optional_string = type("Hiya");
 	assert(optional_string);
 	assert(*optional_string == "Hiya");
@@ -1295,7 +1295,7 @@ auto check_optional() {
 
 auto check_to_string() {
 	auto const result = bounded::to_string(4_bi);
-	static_assert(std::is_same<decltype(result), std::string const>::value, "Incorrect type of to_string.");
+	static_assert(std::is_same<decltype(result), std::string const>{}, "Incorrect type of to_string.");
 	assert(result == "4");
 }
 
@@ -1341,29 +1341,29 @@ namespace {
 
 auto check_enum_construction() {
 	enum unscoped_enum : int {};
-	static_assert(std::is_constructible<bounded::integer<0, 10>, unscoped_enum>::value);
-	static_assert(!std::is_convertible<unscoped_enum, bounded::integer<0, 10>>::value);
+	static_assert(std::is_constructible<bounded::integer<0, 10>, unscoped_enum>{});
+	static_assert(!std::is_convertible<unscoped_enum, bounded::integer<0, 10>>{});
 	static_assert(homogenous_equals(
 		bounded::detail::basic_integer(unscoped_enum{}),
 		bounded::detail::basic_integer(static_cast<std::underlying_type_t<unscoped_enum>>(0))
 	));
 	
 	enum class scoped_enum {};
-	static_assert(std::is_constructible<bounded::integer<0, 10>, scoped_enum>::value);
-	static_assert(!std::is_convertible<scoped_enum, bounded::integer<0, 10>>::value);
+	static_assert(std::is_constructible<bounded::integer<0, 10>, scoped_enum>{});
+	static_assert(!std::is_convertible<scoped_enum, bounded::integer<0, 10>>{});
 	// constexpr auto b = bounded::detail::basic_integer(scoped_enum{});
 	
-	static_assert(std::is_constructible<bounded::integer<0, 10>, bounded_enum>::value);
+	static_assert(std::is_constructible<bounded::integer<0, 10>, bounded_enum>{});
 	// TODO: Should this be convertible?
-	static_assert(std::is_convertible<bounded_enum, bounded::integer<0, 10>>::value);
+	static_assert(std::is_convertible<bounded_enum, bounded::integer<0, 10>>{});
 	constexpr auto c = bounded::detail::basic_integer(bounded_enum{});
 	static_cast<void>(c);
 }
 
 // check poisoning
-static_assert(std::is_convertible<int, bounded::integer<0, 10>>::value);
-static_assert(std::is_convertible<decltype(std::declval<bounded::integer<0, 10>>() + 100), bounded::integer<0, 100>>::value);
-static_assert(std::is_convertible<decltype(bounded::detail::basic_integer(5)), bounded::integer<5, 5>>::value);
+static_assert(std::is_convertible<int, bounded::integer<0, 10>>{});
+static_assert(std::is_convertible<decltype(std::declval<bounded::integer<0, 10>>() + 100), bounded::integer<0, 100>>{});
+static_assert(std::is_convertible<decltype(bounded::detail::basic_integer(5)), bounded::integer<5, 5>>{});
 
 auto check_volatile() {
 	bounded::integer<0, 6> volatile x = 3_bi;

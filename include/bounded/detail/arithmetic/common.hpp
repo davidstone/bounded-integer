@@ -46,7 +46,7 @@ template<typename T>
 struct incrementable_by_bounded_c<T, void_t<decltype(std::declval<T &>() += bounded::constant<1>)>> : std::true_type {};
 
 template<typename T>
-constexpr auto incrementable_by_bounded = incrementable_by_bounded_c<T>::value;
+constexpr auto incrementable_by_bounded = incrementable_by_bounded_c<T>{};
 
 template<typename T, BOUNDED_REQUIRES(incrementable_by_bounded<T>)>
 constexpr auto operator++(T & value) BOUNDED_NOEXCEPT_DECLTYPE(
@@ -58,7 +58,7 @@ constexpr auto operator++(T & value) BOUNDED_NOEXCEPT_DECLTYPE(
 )
 
 template<typename T>
-constexpr auto operator++(T & value, int) noexcept(std::is_nothrow_copy_constructible<T>::value and std::is_nothrow_move_constructible<T>::value and noexcept(++value)) {
+constexpr auto operator++(T & value, int) noexcept(std::is_nothrow_copy_constructible<T>{} and std::is_nothrow_move_constructible<T>{} and noexcept(++value)) {
 	auto previous = value;
 	++value;
 	return previous;
@@ -72,7 +72,7 @@ template<typename T>
 struct decrementable_by_bounded_c<T, void_t<decltype(std::declval<T &>() -= bounded::constant<1>)>> : std::true_type {};
 
 template<typename T>
-constexpr auto decrementable_by_bounded = decrementable_by_bounded_c<T>::value;
+constexpr auto decrementable_by_bounded = decrementable_by_bounded_c<T>{};
 
 template<typename T, BOUNDED_REQUIRES(decrementable_by_bounded<T>)>
 constexpr auto operator--(T & value) BOUNDED_NOEXCEPT_DECLTYPE(
@@ -84,7 +84,7 @@ constexpr auto operator--(T & value) BOUNDED_NOEXCEPT_DECLTYPE(
 )
 
 template<typename T>
-constexpr auto operator--(T & value, int) noexcept(std::is_nothrow_copy_constructible<T>::value and std::is_nothrow_move_constructible<T>::value and noexcept(--value)) {
+constexpr auto operator--(T & value, int) noexcept(std::is_nothrow_copy_constructible<T>{} and std::is_nothrow_move_constructible<T>{} and noexcept(--value)) {
 	auto previous = value;
 	--value;
 	return previous;

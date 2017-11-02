@@ -11,6 +11,6 @@ namespace {
 
 using type = int;
 
-static_assert(std::is_convertible<type, bounded::optional<type>>::value, "Cannot construct optional of identical type.");
+static_assert(std::is_convertible<type, bounded::optional<type>>{}, "Cannot construct optional of identical type.");
 
 }	// namespace

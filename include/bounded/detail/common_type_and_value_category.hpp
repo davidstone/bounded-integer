@@ -17,10 +17,10 @@ namespace detail {
 template<typename T, typename U>
 struct common_cv_type {
 private:
-	using const_type = std::conditional_t<std::is_const<U>::value, std::add_const_t<T>, T>;
+	using const_type = std::conditional_t<std::is_const<U>{}, std::add_const_t<T>, T>;
 public:
-	using type = std::conditional_t<std::is_same<std::remove_cv_t<T>, std::remove_cv_t<U>>::value,
-		std::conditional_t<std::is_volatile<U>::value, std::add_volatile_t<const_type>, const_type>,
+	using type = std::conditional_t<std::is_same<std::remove_cv_t<T>, std::remove_cv_t<U>>{},
+		std::conditional_t<std::is_volatile<U>{}, std::add_volatile_t<const_type>, const_type>,
 		std::common_type_t<std::decay_t<T>, std::decay_t<U>>
 	>;
 };
@@ -33,14 +33,14 @@ struct add_common_cv_reference {
 private:
 	using CVTarget = common_cv_type_t<common_cv_type_t<Target, std::remove_reference_t<Source0>>, std::remove_reference_t<Source1>>;
 
-	static constexpr bool same_base_type = std::is_same<std::decay_t<Source0>, std::decay_t<Source1>>::value;
+	static constexpr bool same_base_type = std::is_same<std::decay_t<Source0>, std::decay_t<Source1>>{};
 	static constexpr bool rvalue_reference =
-		std::is_rvalue_reference<Source0>::value and
-		std::is_rvalue_reference<Source1>::value and
+		std::is_rvalue_reference<Source0>{} and
+		std::is_rvalue_reference<Source1>{} and
 		same_base_type;
 	static constexpr bool lvalue_reference =
-		std::is_lvalue_reference<Source0>::value and
-		std::is_lvalue_reference<Source1>::value and
+		std::is_lvalue_reference<Source0>{} and
+		std::is_lvalue_reference<Source1>{} and
 		same_base_type;
 public:
 	// This isn't perfect. A type could have a perfectly safe conversion to a

@@ -20,7 +20,7 @@ namespace detail {
 template<typename T>
 constexpr auto value_fits_in_type(intmax_t const value) noexcept {
 	static_assert(basic_numeric_limits<T>::is_specialized, "Only works with integer types.");
-	if constexpr (std::is_same<T, uintmax_t>::value) {
+	if constexpr (std::is_same<T, uintmax_t>{}) {
 		return value >= 0;
 	} else {
 		using limits = basic_numeric_limits<T>;
@@ -31,7 +31,7 @@ constexpr auto value_fits_in_type(intmax_t const value) noexcept {
 template<typename T>
 constexpr auto type_overlaps_range(intmax_t const minimum, intmax_t const maximum) noexcept {
 	static_assert(basic_numeric_limits<T>::is_specialized, "Only works with integer types.");
-	if constexpr (std::is_same<T, uintmax_t>::value) {
+	if constexpr (std::is_same<T, uintmax_t>{}) {
 		static_cast<void>(minimum);
 		return maximum >= 0;
 	} else {
@@ -43,7 +43,7 @@ constexpr auto type_overlaps_range(intmax_t const minimum, intmax_t const maximu
 template<typename T>
 constexpr auto type_fits_in_range(intmax_t const minimum, intmax_t const maximum) noexcept {
 	static_assert(basic_numeric_limits<T>::is_specialized, "Only works with integer types.");
-	if constexpr (std::is_same<T, uintmax_t>::value) {
+	if constexpr (std::is_same<T, uintmax_t>{}) {
 		return std::false_type{};
 	} else {
 		using limits = basic_numeric_limits<T>;

@@ -25,7 +25,7 @@ private:
 	// https://gcc.gnu.org/bugzilla/show_bug.cgi?id=66256
 	Bound m_bound;
 public:
-	constexpr explicit unary_equal_to(Bound && bound) noexcept(std::is_nothrow_constructible<Bound, Bound &&>::value):
+	constexpr explicit unary_equal_to(Bound && bound) noexcept(std::is_nothrow_constructible<Bound, Bound &&>{}):
 		m_bound(std::forward<Bound>(bound))
 	{
 	}
