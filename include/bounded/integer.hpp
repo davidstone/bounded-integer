@@ -18,7 +18,6 @@
 #include <bounded/detail/hash.hpp>
 #include <bounded/detail/literal.hpp>
 #include <bounded/detail/log.hpp>
-#include <bounded/detail/make.hpp>
 #include <bounded/detail/minmax.hpp>
 #include <bounded/detail/numeric_limits.hpp>
 #include <bounded/detail/size_of.hpp>

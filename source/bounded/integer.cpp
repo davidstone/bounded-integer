@@ -511,30 +511,6 @@ auto check_constructibility() {
 }
 
 
-namespace check_make {
-	static_assert(
-		std::is_same<
-			bounded::detail::equivalent_overflow_policy<int>,
-			bounded::null_policy
-		>::value,
-		"int should have a null_policy"
-	);
-	static_assert(
-		std::is_same<
-			bounded::detail::equivalent_overflow_policy<unsigned>,
-			bounded::modulo_policy
-		>::value,
-		"unsigned should have a modulo_policy"
-	);
-	static_assert(
-		std::is_same<
-			bounded::detail::equivalent_overflow_policy<bounded::checked_integer<0, 0>>,
-			bounded::throw_policy<>
-		>::value,
-		"incorrect equivalent_overflow_policy for bounded::integer."
-	);
-}
-
 template<typename Result, typename Expected>
 constexpr bool homogenous_equals(Result const & result, Expected const & expected) noexcept {
 	static_assert(std::is_same<Result, Expected>{}, "Mismatched types.");
@@ -1339,7 +1315,7 @@ auto check_streaming() {
 	streaming_test<bounded::checked_integer<0, 100>>(7, 0);
 	constexpr auto large_initial = std::numeric_limits<int>::max() / 3;
 	constexpr auto large_final = -49;
-	streaming_test<bounded::equivalent_type<int>>(large_initial, large_final);
+	streaming_test<decltype(bounded::detail::basic_integer(0))>(large_initial, large_final);
 }
 
 enum class bounded_enum{};
@@ -1367,28 +1343,27 @@ auto check_enum_construction() {
 	enum unscoped_enum : int {};
 	static_assert(std::is_constructible<bounded::integer<0, 10>, unscoped_enum>::value);
 	static_assert(!std::is_convertible<unscoped_enum, bounded::integer<0, 10>>::value);
-	constexpr auto a = bounded::make(unscoped_enum{});
-	static_assert(std::is_same<
-		std::remove_const_t<decltype(a)>,
-		bounded::equivalent_type<std::underlying_type_t<unscoped_enum>>
-	>::value);
+	static_assert(homogenous_equals(
+		bounded::detail::basic_integer(unscoped_enum{}),
+		bounded::detail::basic_integer(static_cast<std::underlying_type_t<unscoped_enum>>(0))
+	));
 	
 	enum class scoped_enum {};
 	static_assert(std::is_constructible<bounded::integer<0, 10>, scoped_enum>::value);
 	static_assert(!std::is_convertible<scoped_enum, bounded::integer<0, 10>>::value);
-	// constexpr auto b = bounded::make(scoped_enum{});
+	// constexpr auto b = bounded::detail::basic_integer(scoped_enum{});
 	
 	static_assert(std::is_constructible<bounded::integer<0, 10>, bounded_enum>::value);
 	// TODO: Should this be convertible?
 	static_assert(std::is_convertible<bounded_enum, bounded::integer<0, 10>>::value);
-	constexpr auto c = bounded::make(bounded_enum{});
+	constexpr auto c = bounded::detail::basic_integer(bounded_enum{});
 	static_cast<void>(c);
 }
 
 // check poisoning
 static_assert(std::is_convertible<int, bounded::integer<0, 10>>::value);
 static_assert(std::is_convertible<decltype(std::declval<bounded::integer<0, 10>>() + 100), bounded::integer<0, 100>>::value);
-static_assert(std::is_convertible<decltype(bounded::make(5)), bounded::integer<5, 5>>::value);
+static_assert(std::is_convertible<decltype(bounded::detail::basic_integer(5)), bounded::integer<5, 5>>::value);
 
 auto check_volatile() {
 	bounded::integer<0, 6> volatile x = 3_bi;

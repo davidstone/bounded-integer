@@ -1,4 +1,4 @@
-// Copyright David Stone 2015.
+// Copyright David Stone 2017.
 // Distributed under the Boost Software License, Version 1.0.
 // (See accompanying file LICENSE_1_0.txt or copy at
 // http://www.boost.org/LICENSE_1_0.txt)
@@ -6,7 +6,7 @@
 #pragma once
 
 #include <bounded/detail/policy/null_policy.hpp>
-#include <bounded/detail/make.hpp>
+#include <bounded/detail/class.hpp>
 #include <bounded/detail/minmax.hpp>
 
 namespace bounded {
@@ -17,7 +17,13 @@ struct clamp_policy {
 	template<typename T, typename Minimum, typename Maximum>
 	static constexpr auto assignment(T && value, Minimum && minimum, Maximum && maximum) noexcept {
 		using policy = bounded::null_policy;
-		return min(max(bounded::make<policy>(std::forward<T>(value)), bounded::make<policy>(std::forward<Minimum>(minimum))), bounded::make<policy>(std::forward<Maximum>(maximum)));
+		return min(
+			max(
+				detail::basic_integer(std::forward<T>(value), policy{}),
+				detail::basic_integer(std::forward<Minimum>(minimum), policy{})
+			),
+			detail::basic_integer(std::forward<Maximum>(maximum), policy{})
+		);
 	}
 
 	using overflow_policy_tag = void;

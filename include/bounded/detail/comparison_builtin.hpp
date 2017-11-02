@@ -5,9 +5,9 @@
 
 #pragma once
 
+#include <bounded/detail/class.hpp>
 #include <bounded/detail/comparison.hpp>
 #include <bounded/detail/is_bounded_integer.hpp>
-#include <bounded/detail/make.hpp>
 #include <bounded/detail/requires.hpp>
 
 #include <type_traits>
@@ -32,22 +32,29 @@ constexpr auto compare(LHS const & lhs, RHS const & rhs) BOUNDED_NOEXCEPT_DECLTY
 
 template<typename LHS, typename RHS, BOUNDED_REQUIRES(is_bounded_integer<LHS> and std::is_integral<RHS>{})>
 constexpr auto compare(LHS const lhs, RHS const rhs) noexcept {
-	return compare(lhs, ::bounded::make(rhs));
+	return compare(lhs, detail::basic_integer(rhs));
 }
 
 template<typename LHS, typename RHS, BOUNDED_REQUIRES(std::is_integral<LHS>{} and is_bounded_integer<RHS>)>
 constexpr auto compare(LHS const lhs, RHS const rhs) noexcept {
-	return compare(::bounded::make(lhs), rhs);
+	return compare(detail::basic_integer(lhs), rhs);
 }
 
 template<typename LHS, BOUNDED_REQUIRES(is_bounded_integer<LHS>)>
-constexpr auto compare(LHS const & lhs, std::uintmax_t const & rhs) noexcept {
+constexpr auto compare(LHS const lhs, std::uintmax_t const rhs) noexcept {
 	return (lhs < constant<0>) ? strong_ordering_less : compare(static_cast<std::uintmax_t>(lhs), rhs);
 }
 
 template<typename RHS, BOUNDED_REQUIRES(is_bounded_integer<RHS>)>
-constexpr auto compare(std::uintmax_t const & lhs, RHS const & rhs) noexcept {
+constexpr auto compare(std::uintmax_t const lhs, RHS const rhs) noexcept {
 	return (rhs < constant<0>) ? strong_ordering_greater : compare(lhs, static_cast<std::uintmax_t>(rhs));
 }
+
+
+template<typename LHS, BOUNDED_REQUIRES(is_bounded_integer<LHS>)>
+constexpr auto compare(LHS const lhs, bool const rhs) = delete;
+
+template<typename RHS, BOUNDED_REQUIRES(is_bounded_integer<RHS>)>
+constexpr auto compare(bool const lhs, RHS const rhs) = delete;
 
 }	// namespace bounded

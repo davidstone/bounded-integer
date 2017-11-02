@@ -32,7 +32,6 @@ sources += prepend_dir('detail', [
 	'is_bounded_integer.cpp',
 	'literal.cpp',
 	'log.cpp',
-	'make.cpp',
 	'minmax.cpp',
 	'noexcept.cpp',
 	'numeric_limits.cpp',

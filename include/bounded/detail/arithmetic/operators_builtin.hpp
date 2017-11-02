@@ -6,9 +6,8 @@
 #pragma once
 
 #include <bounded/detail/arithmetic/operators.hpp>
-#include <bounded/detail/forward_declaration.hpp>
+#include <bounded/detail/class.hpp>
 #include <bounded/detail/is_bounded_integer.hpp>
-#include <bounded/detail/make.hpp>
 #include <bounded/detail/requires.hpp>
 
 #include <cstdint>
@@ -51,7 +50,7 @@ template< \
 	BOUNDED_REQUIRES(std::is_integral<T>::value) \
 > \
 constexpr auto operator symbol(T const lhs, integer<rhs_min, rhs_max, overflow, storage, poisoned> const rhs) noexcept { \
-	return bounded::make<overflow>(lhs) symbol rhs; \
+	return detail::basic_integer(lhs, overflow{}) symbol rhs; \
 } \
 BOUNDED_INTEGER_MIXED_OPERATOR_OVERLOADS_INTEGRAL_CONSTANT(symbol)
 
