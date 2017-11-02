@@ -32,12 +32,12 @@ constexpr auto compare(LHS const & lhs, RHS const & rhs) BOUNDED_NOEXCEPT_DECLTY
 
 template<typename LHS, typename RHS, BOUNDED_REQUIRES(is_bounded_integer<LHS> and std::is_integral<RHS>{})>
 constexpr auto compare(LHS const lhs, RHS const rhs) noexcept {
-	return compare(lhs, detail::basic_integer(rhs));
+	return compare(lhs, integer(rhs));
 }
 
 template<typename LHS, typename RHS, BOUNDED_REQUIRES(std::is_integral<LHS>{} and is_bounded_integer<RHS>)>
 constexpr auto compare(LHS const lhs, RHS const rhs) noexcept {
-	return compare(detail::basic_integer(lhs), rhs);
+	return compare(integer(lhs), rhs);
 }
 
 template<typename LHS, BOUNDED_REQUIRES(is_bounded_integer<LHS>)>

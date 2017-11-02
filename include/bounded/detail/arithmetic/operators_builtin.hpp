@@ -50,7 +50,7 @@ template< \
 	BOUNDED_REQUIRES(std::is_integral<T>{}) \
 > \
 constexpr auto operator symbol(T const lhs, integer<rhs_min, rhs_max, overflow, storage, poisoned> const rhs) noexcept { \
-	return detail::basic_integer(lhs, overflow{}) symbol rhs; \
+	return integer(lhs, overflow{}) symbol rhs; \
 } \
 BOUNDED_INTEGER_MIXED_OPERATOR_OVERLOADS_INTEGRAL_CONSTANT(symbol)
 

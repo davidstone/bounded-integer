@@ -1315,7 +1315,7 @@ auto check_streaming() {
 	streaming_test<bounded::checked_integer<0, 100>>(7, 0);
 	constexpr auto large_initial = std::numeric_limits<int>::max() / 3;
 	constexpr auto large_final = -49;
-	streaming_test<decltype(bounded::detail::basic_integer(0))>(large_initial, large_final);
+	streaming_test<decltype(bounded::integer(0))>(large_initial, large_final);
 }
 
 enum class bounded_enum{};
@@ -1344,26 +1344,26 @@ auto check_enum_construction() {
 	static_assert(std::is_constructible<bounded::integer<0, 10>, unscoped_enum>{});
 	static_assert(!std::is_convertible<unscoped_enum, bounded::integer<0, 10>>{});
 	static_assert(homogenous_equals(
-		bounded::detail::basic_integer(unscoped_enum{}),
-		bounded::detail::basic_integer(static_cast<std::underlying_type_t<unscoped_enum>>(0))
+		bounded::integer(unscoped_enum{}),
+		bounded::integer(static_cast<std::underlying_type_t<unscoped_enum>>(0))
 	));
 	
 	enum class scoped_enum {};
 	static_assert(std::is_constructible<bounded::integer<0, 10>, scoped_enum>{});
 	static_assert(!std::is_convertible<scoped_enum, bounded::integer<0, 10>>{});
-	// constexpr auto b = bounded::detail::basic_integer(scoped_enum{});
+	// constexpr auto b = bounded::integer(scoped_enum{});
 	
 	static_assert(std::is_constructible<bounded::integer<0, 10>, bounded_enum>{});
 	// TODO: Should this be convertible?
 	static_assert(std::is_convertible<bounded_enum, bounded::integer<0, 10>>{});
-	constexpr auto c = bounded::detail::basic_integer(bounded_enum{});
+	constexpr auto c = bounded::integer(bounded_enum{});
 	static_cast<void>(c);
 }
 
 // check poisoning
 static_assert(std::is_convertible<int, bounded::integer<0, 10>>{});
 static_assert(std::is_convertible<decltype(std::declval<bounded::integer<0, 10>>() + 100), bounded::integer<0, 100>>{});
-static_assert(std::is_convertible<decltype(bounded::detail::basic_integer(5)), bounded::integer<5, 5>>{});
+static_assert(std::is_convertible<decltype(bounded::integer(5)), bounded::integer<5, 5>>{});
 
 auto check_volatile() {
 	bounded::integer<0, 6> volatile x = 3_bi;

@@ -36,14 +36,14 @@ template<
 	intmax_t rhs_min, intmax_t rhs_max, typename rhs_policy, bounded::storage_type rhs_storage, bool rhs_poisoned
 >
 struct common_type<
-	bounded::detail::basic_integer<lhs_min, lhs_max, lhs_policy, lhs_storage, lhs_poisoned>,
-	bounded::detail::basic_integer<rhs_min, rhs_max, rhs_policy, rhs_storage, rhs_poisoned>
+	bounded::integer<lhs_min, lhs_max, lhs_policy, lhs_storage, lhs_poisoned>,
+	bounded::integer<rhs_min, rhs_max, rhs_policy, rhs_storage, rhs_poisoned>
 > {
 private:
 	static constexpr auto minimum = (lhs_min < rhs_min) ? lhs_min : rhs_min;
 	static constexpr auto maximum = (lhs_max > rhs_max) ? lhs_max : rhs_max;
 public:
-	using type = bounded::detail::basic_integer<
+	using type = bounded::integer<
 		minimum,
 		maximum,
 		bounded::detail::common_policy<lhs_policy, rhs_policy>,
@@ -71,7 +71,7 @@ template<
 	typename... Ts
 >
 struct common_type<
-	bounded::detail::basic_integer<minimum, maximum, overflow_policy, storage, poisoned>,
+	bounded::integer<minimum, maximum, overflow_policy, storage, poisoned>,
 	T1, T2, T3, T4, T5, T6, T7, T8, T9, T10,
 	T11, T12, T13, T14, T15, T16, T17, T18, T19, T20,
 	T21, T22, T23, T24, T25, T26, T27, T28, T29, T30,
@@ -80,7 +80,7 @@ struct common_type<
 	Ts...
 > {
 private:
-	using type0 = bounded::detail::basic_integer<minimum, maximum, overflow_policy, storage, poisoned>;
+	using type0 = bounded::integer<minimum, maximum, overflow_policy, storage, poisoned>;
 public:
 	using type = common_type_t<
 		common_type_t<

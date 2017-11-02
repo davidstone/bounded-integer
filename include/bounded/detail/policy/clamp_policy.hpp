@@ -19,10 +19,10 @@ struct clamp_policy {
 		using policy = bounded::null_policy;
 		return min(
 			max(
-				detail::basic_integer(std::forward<T>(value), policy{}),
-				detail::basic_integer(std::forward<Minimum>(minimum), policy{})
+				integer(std::forward<T>(value), policy{}),
+				integer(std::forward<Minimum>(minimum), policy{})
 			),
-			detail::basic_integer(std::forward<Maximum>(maximum), policy{})
+			integer(std::forward<Maximum>(maximum), policy{})
 		);
 	}
 
