@@ -16,15 +16,19 @@ namespace bounded {
 namespace detail {
 
 template<typename Min, typename Max>
-struct min_max_t {
+struct min_max {
+	static_assert(std::is_nothrow_move_constructible<Min>{});
+	static_assert(std::is_nothrow_move_constructible<Max>{});
+
+	constexpr min_max(Min min_, Max max_) noexcept:
+		min(std::move(min_)),
+		max(std::move(max_))
+	{
+	}
+
 	Min min;
 	Max max;
 };
-
-template<typename Min, typename Max>
-constexpr auto min_max(Min min, Max max) BOUNDED_NOEXCEPT_VALUE(
-	min_max_t<Min, Max>{std::move(min), std::move(max)}
-)
 
 }	// namespace detail
 
