@@ -1,4 +1,4 @@
-// Copyright David Stone 2015.
+// Copyright David Stone 2017.
 // Distributed under the Boost Software License, Version 1.0.
 // (See accompanying file LICENSE_1_0.txt or copy at
 // http://www.boost.org/LICENSE_1_0.txt)
@@ -15,12 +15,12 @@ namespace bounded {
 namespace detail {
 
 template<typename LHS, typename RHS>
-constexpr auto overlap(LHS const & lhs, RHS const & rhs) noexcept {
-	return min_max(max(lhs.min, rhs.min), min(lhs.max, rhs.max));
+constexpr auto update_modulo_range(LHS const lhs, RHS const rhs) noexcept {
+	return min_max(min(lhs.min, rhs.min), max(lhs.max, rhs.max));
 }
 
-template<typename Dividend, typename Divisor>
-constexpr auto modulo_round(Dividend const & dividend, Divisor const & divisor) noexcept {
+template<typename Dividend>
+constexpr auto modulo_round(Dividend const dividend, std::uintmax_t const divisor) noexcept {
 	// When we divide both ends of the dividend by a particular value in
 	// the range of the divisor there are two possibilities:
 	return (dividend.min / divisor == dividend.max / divisor) ?
@@ -36,46 +36,53 @@ constexpr auto modulo_round(Dividend const & dividend, Divisor const & divisor) 
 		// the range it is. The magnitude will be one less than the magnitude
 		// of the divisor. The least value is obviously 0, as we are ignoring
 		// the sign of the dividend for these calculations.
-		min_max(static_cast<Divisor>(0), divisor + 1);
+		min_max(static_cast<std::uintmax_t>(0), divisor - 1);
 }
 
 template<typename Dividend, typename Divisor>
-constexpr auto sign_free_value(Dividend const & dividend, Divisor divisor) noexcept {
-	// I have the special case for -1 to avoid any possibility of
-	// integer overflow from std::numeric_limits<intmax_t>::min() / -1
-	if (divisor.max == -1) {
-		return min_max(static_cast<intmax_t>(0), static_cast<intmax_t>(0));
+constexpr auto sign_free_value(Dividend const dividend, Divisor divisor) noexcept {
+	if (divisor.min > dividend.max) {
+		return dividend;
 	}
-
-	auto current = min_max(std::numeric_limits<intmax_t>::min(), std::numeric_limits<intmax_t>::max());
-	while (!(current.min == 0 and current.max <= divisor.max + 1) and divisor.max <= divisor.min) {
-		current = overlap(current, modulo_round(dividend, divisor.max));
-		++divisor.max;
+	// Intentionally make the min the highest value and the max the smallest
+	// value. This allows us to use them as the initial value in an
+	// accumulation, as they will "lose" to any value.
+	auto current = min_max(std::numeric_limits<std::uintmax_t>::max(), std::numeric_limits<std::uintmax_t>::min());
+	while (current.min != 0 or (current.max != divisor.max - 1 and current.max != dividend.max)) {
+		current = update_modulo_range(current, modulo_round(dividend, divisor.min));
+		if (divisor.min == divisor.max) {
+			break;
+		}
+		++divisor.min;
 	}
 	return current;
+}
+
+template<typename Integer>
+constexpr auto safe_abs(Integer const value) noexcept {
+	return (value < 0) ? -static_cast<std::uintmax_t>(value) : static_cast<std::uintmax_t>(value);
 }
 
 template<typename LHS, typename RHS>
 constexpr auto modulus_operator_range(LHS const & lhs, RHS const & rhs) noexcept {
 	// The sign of the result is equal to the sign of the lhs. The sign of the
-	// rhs does not matter.
-	//
-	// We must be careful when negating due to the possibility of overflow.
-	//
-	// This operates on negatives until the end to avoid overflow when
-	// value == std::numeric_limits<intmax_t>::min()
-	// Therefore, all temporaries should be considered to have an implicit
-	// "magnitude" and "negative" in their name.
+	// rhs does not matter. Therefore, we use the absolute value of the rhs; we
+	// must be careful when negating due to the possibility of overflow.
 	//
 	// The divisor range cannot terminate on a 0 since that is an invalid value.
 	auto const divisor = min_max(
-		(rhs.min > 0) ? -rhs.min : (rhs.max < 0) ? rhs.max : -1,
-		(rhs.max < 0) ? rhs.min : min(rhs.min, -rhs.max)
+		(rhs.min > 0) ? rhs.min : (rhs.max < 0) ? -static_cast<std::uintmax_t>(rhs.max) : 1,
+		max(safe_abs(rhs.min), safe_abs(rhs.max))
 	);
 
-	// Avoid instantiating a template with unexpected values
-	auto const negative_dividend = min_max(bounded::min(lhs.max, 0), bounded::min(lhs.min, 0));
-	auto const positive_dividend = min_max(-bounded::max(lhs.min, 0), -bounded::max(lhs.max, 0));
+	auto const negative_dividend = min_max(
+		lhs.max < 0 ? safe_abs(lhs.max) : 0,
+		lhs.min < 0 ? safe_abs(lhs.min) : 0
+	);
+	auto const positive_dividend = min_max(
+		static_cast<std::uintmax_t>(max(lhs.min, 0)),
+		static_cast<std::uintmax_t>(max(lhs.max, 0))
+	);
 	
 	auto const negative = sign_free_value(negative_dividend, divisor);
 	auto const positive = sign_free_value(positive_dividend, divisor);
@@ -84,8 +91,8 @@ constexpr auto modulus_operator_range(LHS const & lhs, RHS const & rhs) noexcept
 	auto const has_positive_values = lhs.max > 0;
 
 	return min_max(
-		has_negative_values ? negative.max : -positive.min,
-		has_positive_values ? -positive.max : negative.min
+		has_negative_values ? -static_cast<std::intmax_t>(negative.max) : static_cast<std::intmax_t>(positive.min),
+		has_positive_values ? static_cast<std::intmax_t>(positive.max) : -static_cast<std::intmax_t>(negative.min)
 	);
 }
 
@@ -94,4 +101,3 @@ constexpr auto modulus_operator_range(LHS const & lhs, RHS const & rhs) noexcept
 BOUNDED_INTEGER_OPERATOR_OVERLOADS(%, detail::modulus_operator_range)
 
 }	// namespace bounded
-
