@@ -84,7 +84,7 @@ constexpr auto is_max_unsigned =
 
 template<typename LHS, typename RHS, BOUNDED_REQUIRES(std::is_integral<LHS>{} and std::is_integral<RHS>{})>
 constexpr auto compare(LHS const lhs, RHS const rhs) noexcept -> strong_ordering const {
-	if constexpr (std::is_same<LHS, RHS>{}) {
+	if constexpr (std::is_signed<LHS>{} == std::is_signed<RHS>{}) {
 		return
 			(lhs < rhs) ? strong_ordering_less :
 			(lhs > rhs) ? strong_ordering_greater :
