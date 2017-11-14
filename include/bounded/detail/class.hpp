@@ -94,7 +94,7 @@ template<intmax_t value, typename overflow_policy = null_policy, storage_type st
 constexpr auto constant = constant_t<value, overflow_policy, storage>(value, non_check);
 
 
-template<intmax_t minimum, intmax_t maximum, typename overflow_policy_ = null_policy, storage_type storage = storage_type::fast, bool poisoned_ = false>
+template<intmax_t minimum, intmax_t maximum, typename overflow_policy_ = null_policy, storage_type storage = storage_type::fast, bool poisoned = false>
 struct integer {
 	static_assert(minimum <= maximum, "Maximum cannot be less than minimum");
 	using underlying_type = std::conditional_t<storage == storage_type::fast, detail::fast_t<minimum, maximum>, detail::least_t<minimum, maximum>>;
@@ -236,16 +236,21 @@ struct integer {
 	// Do not verify that the value is in range because the user has requested a
 	// conversion out of the safety of bounded::integer. It is subject to all
 	// the standard rules of conversion from one integer type to another.
-	//
-	// This must not reference the overflow policy because it is possible that
-	// it has already been moved from if this is being called from the
-	// constructor.
-	template<typename T, BOUNDED_REQUIRES(std::is_arithmetic<T>{} or std::is_enum<T>{})>
+	template<typename T, BOUNDED_REQUIRES((not poisoned and std::is_arithmetic<T>{}) or std::is_enum<T>{})>
 	constexpr explicit operator T() const noexcept {
 		return static_cast<T>(m_value);
 	}
-	template<typename T, BOUNDED_REQUIRES(std::is_arithmetic<T>{} or std::is_enum<T>{})>
+	template<typename T, BOUNDED_REQUIRES((not poisoned and std::is_arithmetic<T>{}) or std::is_enum<T>{})>
 	constexpr explicit operator T() const volatile noexcept {
+		return static_cast<T>(m_value);
+	}
+	
+	template<typename T, BOUNDED_REQUIRES(poisoned and std::is_arithmetic<T>{})>
+	constexpr operator T() const noexcept {
+		return static_cast<T>(m_value);
+	}
+	template<typename T, BOUNDED_REQUIRES(poisoned and std::is_arithmetic<T>{})>
+	constexpr operator T() const volatile noexcept {
 		return static_cast<T>(m_value);
 	}
 	
