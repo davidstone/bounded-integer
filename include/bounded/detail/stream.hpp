@@ -18,8 +18,8 @@ template<typename CharT, typename Traits, typename Integer, BOUNDED_REQUIRES(is_
 decltype(auto) operator<<(std::basic_ostream<CharT, Traits> & out, Integer const & x) {
 	// The unary plus applies integer promotions to x. This ensures values are
 	// printed as integers. Without this, I could run into an issue where the
-	// underlying type is a typedef for signed char / unsigned char. This would
-	// output the value as though it were a character.
+	// underlying type is a typedef for char / signed char / unsigned char.
+	// This would output the value as though it were a character.
 	return out << +x.value();
 }
 template<typename CharT, typename Traits, typename Integer, BOUNDED_REQUIRES(is_bounded_integer<Integer>)>
@@ -29,17 +29,14 @@ decltype(auto) operator<<(std::basic_ostream<CharT, Traits> & out, Integer const
 
 template<typename CharT, typename Traits, typename Integer, BOUNDED_REQUIRES(is_bounded_integer<Integer>)>
 decltype(auto) operator>>(std::basic_istream<CharT, Traits> & in, Integer & x) {
-	// This is intmax_t rather than underlying_type to maximize the chances for
-	// robust error checking rather than undefined behavior, but it still fails
-	// for very large and very small numbers.
-	std::intmax_t temp;
+	typename Integer::underlying_type temp;
 	in >> temp;
 	x = temp;
 	return in;
 }
 template<typename CharT, typename Traits, typename Integer, BOUNDED_REQUIRES(is_bounded_integer<Integer>)>
 decltype(auto) operator>>(std::basic_istream<CharT, Traits> & in, Integer volatile & x) {
-	std::intmax_t temp;
+	typename Integer::underlying_type temp;
 	in >> temp;
 	x = temp;
 	return in;
