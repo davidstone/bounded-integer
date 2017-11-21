@@ -25,7 +25,8 @@ decltype(auto) operator<<(std::basic_ostream<CharT, Traits> & out, Integer const
 
 template<typename CharT, typename Traits, typename Integer, BOUNDED_REQUIRES(is_bounded_integer<Integer>)>
 decltype(auto) operator>>(std::basic_istream<CharT, Traits> & in, Integer & x) {
-	typename Integer::underlying_type temp;
+	using underlying = typename Integer::underlying_type;
+	std::conditional_t<sizeof(underlying) < sizeof(int), int, underlying> temp;
 	in >> temp;
 	x = temp;
 	return in;
