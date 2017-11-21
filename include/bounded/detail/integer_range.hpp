@@ -40,10 +40,9 @@ struct integer_range_iterator {
 	using difference_type = integer<-range_of_type<index_type>, range_of_type<index_type>>;
 	using pointer = index_type const *;
 	using iterator_category = std::random_access_iterator_tag;
-	using underlying_type = T;
 
 	integer_range_iterator() = default;
-	explicit constexpr integer_range_iterator(underlying_type const value) noexcept:
+	explicit constexpr integer_range_iterator(T const value) noexcept:
 		m_value(value) {
 	}
 	
@@ -67,15 +66,15 @@ struct integer_range_iterator {
 		);
 		return lhs.m_value - rhs.m_value;
 	}
-	friend constexpr auto operator+(integer_range_iterator const & lhs, difference_type const & rhs) -> integer_range_iterator {
-		return integer_range_iterator(static_cast<underlying_type>(lhs.m_value + rhs));
+	friend constexpr auto operator+(integer_range_iterator const & lhs, difference_type const & rhs) noexcept(noexcept(std::declval<T>() + rhs)) {
+		return integer_range_iterator(static_cast<T>(lhs.m_value + rhs));
 	}
 	
 	friend constexpr auto compare(integer_range_iterator const & lhs, integer_range_iterator const & rhs) noexcept {
 		return compare(lhs.m_value, rhs.m_value);
 	}
 private:
-	underlying_type m_value;
+	T m_value;
 };
 
 template<typename T>
