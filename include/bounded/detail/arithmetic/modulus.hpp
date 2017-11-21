@@ -71,7 +71,7 @@ constexpr auto modulus_operator_range(LHS const & lhs, RHS const & rhs) noexcept
 	//
 	// The divisor range cannot terminate on a 0 since that is an invalid value.
 	auto const divisor = min_max(
-		(rhs.min > 0) ? rhs.min : (rhs.max < 0) ? -static_cast<std::uintmax_t>(rhs.max) : 1,
+		(rhs.min > 0) ? static_cast<std::uintmax_t>(rhs.min) : (rhs.max < 0) ? -static_cast<std::uintmax_t>(rhs.max) : 1,
 		max(safe_abs(rhs.min), safe_abs(rhs.max))
 	);
 

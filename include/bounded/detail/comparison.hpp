@@ -77,8 +77,9 @@ namespace detail {
 
 template<typename T>
 constexpr auto is_max_unsigned =
-	std::numeric_limits<T>::min() == std::numeric_limits<std::uintmax_t>::min() and
-	std::numeric_limits<T>::max() == std::numeric_limits<std::uintmax_t>::max();
+	std::is_unsigned<T>{} and
+	static_cast<std::uintmax_t>(std::numeric_limits<T>::min()) == std::numeric_limits<std::uintmax_t>::min() and
+	static_cast<std::uintmax_t>(std::numeric_limits<T>::max()) == std::numeric_limits<std::uintmax_t>::max();
 
 }	// namespace detail
 
