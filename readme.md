@@ -38,13 +38,9 @@ The general form of the class is `bounded::integer<minimum, maximum, policy = bo
 
 ## Prerequisites
 
-* Compile with clang 3.9.0 or newer
-	* bounded::integer may compile with gcc 7 or newer, but has not been tested
-* Standard library from gcc 5.4.0 (libstdc++) or newer or clang 3.9.0 (libc++) or newer. 
-`bounded::integer` makes 
-use of C++17 (C++1z) features.
+* Compile with clang 5.0 or gcc 7.2.0
 * Boost. Listed as boost-devel in Fedora repositories. `bounded::integer` is currently tested 
-against version 1.64.0.
+against version 1.65.0.
 * SCons is used for the build process for the test set up, but it is not needed to use the library.
 
 ## Building and running tests (Linux)
@@ -60,8 +56,14 @@ against version 1.64.0.
 
 `bounded::integer` can replace most uses of built-in integer types. It does have some limitations, however.
 
-* A `bounded::integer` cannot be used as a non-type template parameter. The C++ language rules do not permit any user-defined type to be used as a non-type template parameter, even if the user-defined type is a literal type.
-* `bounded::integer` uses `intmax_t` as the template parameter to determine its bounds. This means that it cannot store an integer larger than `std::numeric_limits<intmax_t>::max()`. The alternative is to not allow users of the library to specify the bounds as plain integer values. Instead, they would have to pass it as some sort of type that encodes a value, which increases the burden of use.
+* A `bounded::integer` cannot be used as a non-type template parameter. The C++ 
+language rules do not permit any user-defined type to be used as a non-type template 
+parameter, even if the user-defined type is a literal type. There is a proposal going 
+through the C++ standardization committee that would remove this restriction.
+* `bounded::integer` uses `intmax_t` as the template parameter to determine its 
+bounds. This means that it cannot store an integer larger than 
+`std::numeric_limits<intmax_t>::max()`. This restriction should be removed in the near 
+future.
 * Doing math with `uintmax_t` (which is typically the same as `size_t` or `uint64_t`) can easily cause overflow issues. This can typically be resolved by narrowing the bounds of your values (and if you cannot do so, that usually means that your calculation could overflow).
 * `bounded::integer` is currently still under active development, so some interfaces are still subject to change.
 
