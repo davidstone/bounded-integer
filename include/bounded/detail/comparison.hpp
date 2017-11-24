@@ -180,11 +180,11 @@ constexpr auto operator>=(LHS const & lhs, RHS const & rhs) BOUNDED_NOEXCEPT_DEC
 )
 
 #define BOUNDED_COMPARISON \
-	using ::bounded::detail::operator==; \
-	using ::bounded::detail::operator!=; \
-	using ::bounded::detail::operator<; \
-	using ::bounded::detail::operator>; \
-	using ::bounded::detail::operator<=; \
-	using ::bounded::detail::operator>=;
+	using ::bounded::operator==; \
+	using ::bounded::operator!=; \
+	using ::bounded::operator<; \
+	using ::bounded::operator>; \
+	using ::bounded::operator<=; \
+	using ::bounded::operator>=;
 	
 }	// namespace bounded
