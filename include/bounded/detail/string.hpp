@@ -18,14 +18,14 @@ using std::to_string;
 
 template<typename Integer, BOUNDED_REQUIRES(is_bounded_integer<Integer>)>
 auto to_string(Integer const & x) {
-	return to_string(x.value());
+	return to_string(+x.value());
 }
 
 using std::to_wstring;
 
 template<typename Integer, BOUNDED_REQUIRES(is_bounded_integer<Integer>)>
 auto to_wstring(Integer const & x) {
-	return to_wstring(x.value());
+	return to_wstring(+x.value());
 }
 
 // TODO: template<typename T> T from_string(std::string const & str);
