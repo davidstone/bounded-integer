@@ -39,14 +39,13 @@ The general form of the class is `bounded::integer<minimum, maximum, policy = bo
 ## Prerequisites
 
 * Compile with clang 5.0 or gcc 7.2.0
-* Boost. Listed as boost-devel in Fedora repositories. `bounded::integer` is currently tested 
-against version 1.65.0.
-* SCons is used for the build process for the test set up, but it is not needed to use the library.
+* Boost. Listed as boost-devel in Fedora repositories. `bounded::integer` is currently tested against version 1.65.0.
+* cmake is used to build tests, but it is not needed to use the library (this library is header-only).
 
 ## Building and running tests (Linux)
 
 * `cd path/to/bounded_integer`
-* `scons && ./test && ./test-debug`. The default target (by simply typing `scons`) will build debug and release-mode versions of the tests. Most of the tests are actually done at compile time, but there are also run-time tests.
+* `mkdir build && cmake .. && ./bounded_test`. Most of the tests are actually done at compile time, but there are also run-time tests.
 
 ## Using
 
