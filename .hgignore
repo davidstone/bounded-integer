@@ -1,11 +1,3 @@
-syntax: regexp
-
-^test$
-^test-debug$
-
 syntax: glob
 
-*.o
-*.pyc
-
-.sconsign.dblite
+build*/
