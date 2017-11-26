@@ -64,7 +64,6 @@ target_sources(bounded INTERFACE
 	$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>/include/bounded/detail/arithmetic/bitwise_and.hpp
 	$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>/include/bounded/detail/arithmetic/right_shift.hpp
 	$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>/include/bounded/detail/arithmetic/plus.hpp
-	$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>/include/bounded/detail/arithmetic/compound_assignment.hpp
 	$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>/include/bounded/detail/arithmetic/minus.hpp
 	$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>/include/bounded/detail/arithmetic/operators.hpp
 	$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>/include/bounded/detail/arithmetic/modulus.hpp
@@ -146,7 +145,6 @@ add_executable(bounded_test
 	source/bounded/detail/arithmetic/plus.cpp
 	source/bounded/detail/arithmetic/unary_plus.cpp
 	source/bounded/detail/arithmetic/divides.cpp
-	source/bounded/detail/arithmetic/compound_assignment.cpp
 	source/bounded/detail/arithmetic/operators.cpp
 	source/bounded/detail/arithmetic/common.cpp
 	source/bounded/detail/arithmetic/operators_builtin.cpp

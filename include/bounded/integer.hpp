@@ -25,7 +25,6 @@
 #include <bounded/detail/string.hpp>
 #include <bounded/detail/typedefs.hpp>
 #include <bounded/detail/arithmetic/common.hpp>
-#include <bounded/detail/arithmetic/compound_assignment.hpp>
 #include <bounded/detail/arithmetic/operators.hpp>
 #include <bounded/detail/arithmetic/operators_builtin.hpp>
 #include <bounded/detail/arithmetic/pointer.hpp>
