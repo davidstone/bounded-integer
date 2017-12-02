@@ -514,7 +514,7 @@ auto check_constructibility() {
 
 
 template<typename Result, typename Expected>
-constexpr bool homogenous_equals(Result const & result, Expected const & expected) noexcept {
+constexpr bool homogeneous_equals(Result const & result, Expected const & expected) noexcept {
 	static_assert(std::is_same<Result, Expected>{}, "Mismatched types.");
 	return result == expected;
 }
@@ -535,19 +535,19 @@ namespace check_single_argument_minmax {
 namespace check_double_argument_minmax {
 	constexpr auto lower_value = bounded::constant<6>;
 	constexpr auto greater_value = bounded::constant<10>;
-	static_assert(homogenous_equals(
+	static_assert(homogeneous_equals(
 		bounded::min(lower_value, greater_value),
 		lower_value
 	));
-	static_assert(homogenous_equals(
+	static_assert(homogeneous_equals(
 		bounded::min(greater_value, lower_value),
 		lower_value
 	));
-	static_assert(homogenous_equals(
+	static_assert(homogeneous_equals(
 		bounded::max(lower_value, greater_value),
 		greater_value
 	));
-	static_assert(homogenous_equals(
+	static_assert(homogeneous_equals(
 		bounded::max(greater_value, lower_value),
 		greater_value
 	));
@@ -555,17 +555,17 @@ namespace check_double_argument_minmax {
 
 namespace check_many_argument_minmax {
 	constexpr auto value = bounded::integer<-53, 1000>(bounded::constant<3>);
-	static_assert(homogenous_equals(
+	static_assert(homogeneous_equals(
 		bounded::min(bounded::constant<0>, bounded::constant<10>, bounded::constant<5>, value),
 		bounded::integer<-53, 0>(0)
 	));
 
-	static_assert(homogenous_equals(
+	static_assert(homogeneous_equals(
 		bounded::max(bounded::constant<0>, bounded::constant<10>, bounded::constant<5>, value),
 		bounded::integer<10, 1000>(10)
 	));
 
-	static_assert(homogenous_equals(
+	static_assert(homogeneous_equals(
 		bounded::min(0, 1, 2, 3, 4, 5, 6, 7, 8, 9),
 		0
 	));
@@ -687,41 +687,41 @@ namespace check_arithmetic {
 
 
 	// unary plus
-	static_assert(homogenous_equals(
+	static_assert(homogeneous_equals(
 		+x,
 		x
 	));
 
 	// unary minus
-	static_assert(homogenous_equals(
+	static_assert(homogeneous_equals(
 		-x,
 		bounded::checked_integer<-10, -1>(-9)
 	));
 
 	// plus
-	static_assert(homogenous_equals(
+	static_assert(homogeneous_equals(
 		x + z,
 		bounded::checked_integer<-2, 21>(13)
 	));
-	static_assert(homogenous_equals(
+	static_assert(homogeneous_equals(
 		x + std::integral_constant<int, 5>{},
 		bounded::integer<6, 15>(14)
 	));
 
 	// minus
-	static_assert(homogenous_equals(
+	static_assert(homogeneous_equals(
 		x - z,
 		bounded::checked_integer<-10, 13>(5)
 	));
 
 	// multiplies
-	static_assert(homogenous_equals(
+	static_assert(homogeneous_equals(
 		x * z,
 		bounded::checked_integer<-30, 110>(36)
 	));
 
 	// divides
-	static_assert(homogenous_equals(
+	static_assert(homogeneous_equals(
 		x / z,
 		bounded::checked_integer<-10, 10>(2)
 	));
@@ -730,51 +730,51 @@ namespace check_arithmetic {
 
 
 	// modulus
-	static_assert(homogenous_equals(
+	static_assert(homogeneous_equals(
 		bounded::constant<10> % bounded::constant<11>,
 		bounded::constant<10>
 	));
-	static_assert(homogenous_equals(
+	static_assert(homogeneous_equals(
 		bounded::constant<10> % bounded::constant<9>,
 		bounded::constant<1>
 	));
-	static_assert(homogenous_equals(
+	static_assert(homogeneous_equals(
 		bounded::constant<9> % bounded::constant<11>,
 		bounded::constant<9>
 	));
-	static_assert(homogenous_equals(
+	static_assert(homogeneous_equals(
 		bounded::constant<11> % bounded::constant<9>,
 		bounded::constant<2>
 	));
-	static_assert(homogenous_equals(
+	static_assert(homogeneous_equals(
 		bounded::constant<13> % bounded::constant<6>,
 		bounded::constant<1>
 	));
-	static_assert(homogenous_equals(
+	static_assert(homogeneous_equals(
 		bounded::integer<17, 23>(20) % bounded::integer<-54, -6>(-33),
 		bounded::integer<0, 23>(20 % -33)
 	));
-	static_assert(homogenous_equals(
+	static_assert(homogeneous_equals(
 		bounded::integer<-54, -6>(-33) % bounded::integer<17, 23>(20),
 		bounded::integer<-22, 0>(-33 % 20)
 	));
-	static_assert(homogenous_equals(
+	static_assert(homogeneous_equals(
 		bounded::integer<-22, 0>(-33 % 20) % bounded::integer<0, 23>(20 % -33),
 		bounded::integer<-22, 0>(-13)
 	));
-	static_assert(homogenous_equals(
+	static_assert(homogeneous_equals(
 		bounded::integer<0, 10>(10) % bounded::constant<6>,
 		bounded::integer<0, 5>(4)
 	));
-	static_assert(homogenous_equals(
+	static_assert(homogeneous_equals(
 		bounded::constant<0> % bounded::constant<1>,
 		bounded::constant<0>
 	));
-	static_assert(homogenous_equals(
+	static_assert(homogeneous_equals(
 		bounded::integer<73, 76>(73) % bounded::integer<7, 8>(7),
 		bounded::integer<1, 6>(73 % 7)
 	));
-	static_assert(homogenous_equals(
+	static_assert(homogeneous_equals(
 		bounded::integer<74, 75>(74) % bounded::integer<7, 8>(7),
 		bounded::integer<2, 5>(74 % 7)
 	));
@@ -785,7 +785,7 @@ namespace check_arithmetic {
 	// The algorithm to compute the bounds current runs in O(n) compile time,
 	// and thus this test exceed's the constexpr evaluation limits.
 	constexpr auto bounded_intmax_t = bounded::integer<std::numeric_limits<intmax_t>::min(), std::numeric_limits<intmax_t>::max()>(std::numeric_limits<intmax_t>::min());
-	static_assert(homogenous_equals(
+	static_assert(homogeneous_equals(
 		bounded_intmax_t % bounded_intmax_t,
 		bounded::integer<std::numeric_limits<intmax_t>::min() + 1, -(std::numeric_limits<intmax_t>::min() + 1)>(0)
 	));
@@ -793,13 +793,13 @@ namespace check_arithmetic {
 
 
 	// left shift
-	static_assert(homogenous_equals(
+	static_assert(homogeneous_equals(
 		bounded::integer<0, 2>(1) << bounded::integer<0, 60>(3),
 		bounded::integer<0, 2LL << 60LL>(1 << 3)
 	));
 
 	// right shift
-	static_assert(homogenous_equals(
+	static_assert(homogeneous_equals(
 		bounded::constant<100> >> bounded::integer<0, 50>(1),
 		bounded::integer<0, 100>(100 >> 1)
 	));
@@ -846,7 +846,7 @@ namespace check_arithmetic {
 
 // I have to use the preprocessor here to create an integer literal
 #define BOUNDED_INTEGER_CHECK_LITERAL(x) \
-	static_assert(homogenous_equals( \
+	static_assert(homogeneous_equals( \
 		x ## _bi, \
 		bounded::constant<x> \
 	))
@@ -861,7 +861,7 @@ BOUNDED_INTEGER_CHECK_LITERAL(9223372036854775807);
 #undef BOUNDED_INTEGER_CHECK_LITERAL
 
 
-static_assert(homogenous_equals(
+static_assert(homogeneous_equals(
 	BOUNDED_CONDITIONAL(true, 7_bi, 9_bi),
 	bounded::integer<7, 9>(7)
 ));
@@ -1087,23 +1087,23 @@ auto check_compound_arithmetic() {
 }
 
 auto check_math() {
-	static_assert(homogenous_equals(
+	static_assert(homogeneous_equals(
 		bounded::abs(bounded::integer<-10, 4>(-5)),
 		bounded::integer<0, 10>(5)
 	));
-	static_assert(homogenous_equals(
+	static_assert(homogeneous_equals(
 		bounded::abs(bounded::integer<-10, -10>(-10)),
 		bounded::integer<10, 10>(10)
 	));
-	static_assert(homogenous_equals(
+	static_assert(homogeneous_equals(
 		bounded::abs(bounded::integer<0, 0>(0)),
 		bounded::integer<0, 0>(0)
 	));
-	static_assert(homogenous_equals(
+	static_assert(homogeneous_equals(
 		bounded::abs(bounded::integer<-7, 450>(-1)),
 		bounded::integer<0, 450>(1)
 	));
-	static_assert(homogenous_equals(
+	static_assert(homogeneous_equals(
 		bounded::abs(bounded::integer<-7, 450>(1)),
 		bounded::integer<0, 450>(1)
 	));
@@ -1349,7 +1349,7 @@ auto check_enum_construction() {
 	enum unscoped_enum : int {};
 	static_assert(std::is_constructible<bounded::integer<0, 10>, unscoped_enum>{});
 	static_assert(!std::is_convertible<unscoped_enum, bounded::integer<0, 10>>{});
-	static_assert(homogenous_equals(
+	static_assert(homogeneous_equals(
 		bounded::integer(unscoped_enum{}),
 		bounded::integer(static_cast<std::underlying_type_t<unscoped_enum>>(0))
 	));
