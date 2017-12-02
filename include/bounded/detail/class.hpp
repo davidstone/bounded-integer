@@ -102,7 +102,7 @@ struct integer {
 	static_assert(detail::value_fits_in_type<underlying_type>(minimum), "minimum does not fit in underlying_type.");
 	static_assert(detail::value_fits_in_type<underlying_type>(maximum), "maximum does not fit in underlying_type.");
 	
-	static_assert(minimum < 0 ? std::numeric_limits<underlying_type>::is_signed : true, "underlying_type should be signed.");
+	static_assert(minimum >= 0 or std::numeric_limits<underlying_type>::is_signed, "underlying_type should be signed.");
 	
 	// May relax these restrictions in the future
 	static_assert(std::is_nothrow_default_constructible<overflow_policy>{}, "overflow_policy must be nothrow default constructible.");
