@@ -226,10 +226,10 @@ struct integer {
 		unchecked_assignment(apply_overflow_policy(other));
 	}
 	
-	constexpr auto const & value() const noexcept {
+	constexpr auto value() const noexcept {
 		return m_value;
 	}
-	auto const & value() const volatile noexcept {
+	auto value() const volatile noexcept {
 		return m_value;
 	}
 
