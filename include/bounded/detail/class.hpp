@@ -83,6 +83,53 @@ constexpr decltype(auto) as_integer(T const & t) noexcept {
 	}
 }
 
+
+template<typename T>
+struct value_wrapper {
+	using underlying_type = T;
+	value_wrapper() noexcept = default;
+	constexpr explicit value_wrapper(underlying_type const value_) noexcept:
+		m_value(value_)
+	{
+	}
+	constexpr auto value() const noexcept {
+		return m_value;
+	}
+	constexpr auto value() const volatile noexcept {
+		return m_value;
+	}
+	constexpr auto assign(underlying_type other) noexcept {
+		m_value = other;
+	}
+	auto assign(underlying_type other) volatile noexcept {
+		m_value = other;
+	}
+private:
+	underlying_type m_value;
+};
+
+template<auto value_>
+struct constant_wrapper {
+	using underlying_type = decltype(value_);
+	constexpr constant_wrapper() noexcept = default;
+	constexpr explicit constant_wrapper(underlying_type) noexcept {
+	}
+	static constexpr auto value() noexcept {
+		return value_;
+	}
+	static constexpr auto assign(underlying_type) noexcept {
+	}
+};
+
+template<auto minimum, auto maximum, storage_type storage>
+using underlying_type_t = std::conditional_t<storage == storage_type::fast, fast_t<minimum, maximum>, least_t<minimum, maximum>>;
+
+template<auto minimum, auto maximum, storage_type storage>
+using base = std::conditional_t<minimum == maximum,
+	constant_wrapper<static_cast<underlying_type_t<minimum, maximum, storage>>(minimum)>,
+	value_wrapper<underlying_type_t<minimum, maximum, storage>>
+>;
+
 }	// namespace detail
 
 
@@ -95,9 +142,12 @@ constexpr auto constant = constant_t<value, overflow_policy, storage>(value, non
 
 
 template<intmax_t minimum, intmax_t maximum, typename overflow_policy_ = null_policy, storage_type storage = storage_type::fast, bool poisoned = false>
-struct integer {
+struct integer : private detail::base<minimum, maximum, storage> {
+private:
+	using base = detail::base<minimum, maximum, storage>;
+public:
 	static_assert(minimum <= maximum, "Maximum cannot be less than minimum");
-	using underlying_type = std::conditional_t<storage == storage_type::fast, detail::fast_t<minimum, maximum>, detail::least_t<minimum, maximum>>;
+	using underlying_type = typename base::underlying_type;
 	using overflow_policy = overflow_policy_;
 	static_assert(detail::value_fits_in_type<underlying_type>(minimum), "minimum does not fit in underlying_type.");
 	static_assert(detail::value_fits_in_type<underlying_type>(maximum), "maximum does not fit in underlying_type.");
@@ -119,6 +169,8 @@ struct integer {
 		overflow_policy{}.assignment(value, min(), max())
 	)
 	
+	using base::value;
+	
 	integer() noexcept = default;
 	constexpr integer(integer const &) noexcept = default;
 	constexpr integer(integer &&) noexcept = default;
@@ -133,7 +185,7 @@ struct integer {
 		detail::is_explicitly_constructible_from<overflow_policy, T const &>(minimum, maximum)
 	)>
 	constexpr integer(T const & other, non_check_t) noexcept:
-		m_value(static_cast<underlying_type>(other)) {
+		base(static_cast<underlying_type>(other)) {
 	}
 
 
@@ -198,12 +250,12 @@ struct integer {
 	// assignment operator returns an unused reference.
 	template<typename T>
 	constexpr auto && unchecked_assignment(T const & other) & noexcept {
-		m_value = static_cast<underlying_type>(other);
+		base::assign(static_cast<underlying_type>(other));
 		return *this;
 	}
 	template<typename T>
 	auto unchecked_assignment(T const & other) volatile & noexcept {
-		m_value = static_cast<underlying_type>(other);
+		base::assign(static_cast<underlying_type>(other));
 	}
 	
 	constexpr auto operator=(integer const & other) & noexcept -> integer & = default;
@@ -226,39 +278,32 @@ struct integer {
 		unchecked_assignment(apply_overflow_policy(other));
 	}
 	
-	constexpr auto value() const noexcept {
-		return m_value;
-	}
-	auto value() const volatile noexcept {
-		return m_value;
-	}
-
 	// Do not verify that the value is in range because the user has requested a
 	// conversion out of the safety of bounded::integer. It is subject to all
 	// the standard rules of conversion from one integer type to another.
 	template<typename T, BOUNDED_REQUIRES((not poisoned and std::is_arithmetic<T>{}) or std::is_enum<T>{})>
 	constexpr explicit operator T() const noexcept {
-		return static_cast<T>(m_value);
+		return static_cast<T>(value());
 	}
 	template<typename T, BOUNDED_REQUIRES((not poisoned and std::is_arithmetic<T>{}) or std::is_enum<T>{})>
 	constexpr explicit operator T() const volatile noexcept {
-		return static_cast<T>(m_value);
+		return static_cast<T>(value());
 	}
 	
 	template<typename T, BOUNDED_REQUIRES(poisoned and std::is_arithmetic<T>{})>
 	constexpr operator T() const noexcept {
-		return static_cast<T>(m_value);
+		return static_cast<T>(value());
 	}
 	template<typename T, BOUNDED_REQUIRES(poisoned and std::is_arithmetic<T>{})>
 	constexpr operator T() const volatile noexcept {
-		return static_cast<T>(m_value);
+		return static_cast<T>(value());
 	}
 	
 	
 	// Allow a compressed optional representation
 	template<typename Tag, BOUNDED_REQUIRES(std::is_same<Tag, optional_tag>{} and detail::has_extra_space<integer>)>
 	constexpr explicit integer(Tag) noexcept:
-		m_value(uninitialized_value()) {
+		base(uninitialized_value()) {
 	}
 
 	// Cannot use BOUNDED_NOEXCEPT_VOID because of gcc bug
@@ -270,18 +315,16 @@ struct integer {
 
 	template<typename Tag, BOUNDED_REQUIRES(std::is_same<Tag, optional_tag>{} and detail::has_extra_space<integer>)>
 	constexpr auto uninitialize(Tag) noexcept {
-		m_value = uninitialized_value();
+		base::assign(uninitialized_value());
 	}
 	template<typename Tag, BOUNDED_REQUIRES(std::is_same<Tag, optional_tag>{} and detail::has_extra_space<integer>)>
 	constexpr auto is_initialized(Tag) const noexcept {
-		return m_value != uninitialized_value();
+		return base::value() != uninitialized_value();
 	}
 private:
 	static constexpr auto uninitialized_value() noexcept {
 		return static_cast<underlying_type>(minimum > std::numeric_limits<underlying_type>::min() ? minimum - 1 : maximum + 1);
 	}
-
-	underlying_type m_value;
 };
 
 

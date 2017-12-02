@@ -466,6 +466,11 @@ auto check_numeric_limits_all() {
 	// check_numeric_limits<uint64_t>();
 }
 
+static_assert(std::is_empty<bounded::constant_t<0>>{});
+static_assert(std::is_empty<bounded::constant_t<1>>{});
+static_assert(std::is_empty<bounded::constant_t<-1>>{});
+static_assert(std::is_empty<bounded::constant_t<std::numeric_limits<std::intmax_t>::min()>>{});
+
 namespace check_overlapping_range {
 	using type = bounded::integer<0, 0>;
 	static_assert(bounded::detail::type_overlaps_range<type>(0, 0), "Type should overlap its own range.");
