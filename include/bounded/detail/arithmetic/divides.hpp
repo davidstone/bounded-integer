@@ -1,4 +1,4 @@
-// Copyright David Stone 2015.
+// Copyright David Stone 2017.
 // Distributed under the Boost Software License, Version 1.0.
 // (See accompanying file LICENSE_1_0.txt or copy at
 // http://www.boost.org/LICENSE_1_0.txt)
@@ -12,8 +12,7 @@
 namespace bounded {
 namespace detail {
 
-template<typename LHS, typename RHS>
-constexpr auto divides_operator_range(LHS const & lhs, RHS const & rhs) noexcept {
+constexpr auto divides_operator_range = [](auto const lhs, auto const rhs) noexcept {
 	// If 1 falls within the range, that is the least positive divisor. The
 	// other options are a range that are entirely positive, in which case I
 	// want to return the least value, or the range is entirely negative or
@@ -32,11 +31,11 @@ constexpr auto divides_operator_range(LHS const & lhs, RHS const & rhs) noexcept
 		min(g0, g1, g2, g3),
 		max(g0, g1, g2, g3)
 	);
-}
+};
 
 }	// namespace detail
 
-BOUNDED_INTEGER_OPERATOR_OVERLOADS(/, divides_operator_range)
+BOUNDED_INTEGER_OPERATOR_OVERLOADS(/, detail::divides_operator_range)
 
 }	// namespace bounded
 

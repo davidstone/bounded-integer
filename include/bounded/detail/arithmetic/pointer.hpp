@@ -16,7 +16,7 @@ template<typename T, typename Integer, BOUNDED_REQUIRES(
 	is_bounded_integer<Integer> and
 	(std::is_pointer<T>{} or (std::is_array<T>{} and Integer::max() <= std::extent<T>{}))
 )>
-constexpr auto operator+(T const & array, Integer const & number) noexcept {
+constexpr auto operator+(T const & array, Integer const number) noexcept {
 	return array + number.value();
 }
 
@@ -25,7 +25,7 @@ template<typename Integer, typename T, BOUNDED_REQUIRES(
 	is_bounded_integer<Integer> and
 	(std::is_pointer<T>{} or (std::is_array<T>{} and Integer::max() <= std::extent<T>{}))
 )>
-constexpr auto operator+(Integer const & number, T const & array) noexcept {
+constexpr auto operator+(Integer const number, T const & array) noexcept {
 	return number.value() + array;
 }
 

@@ -1,4 +1,4 @@
-// Copyright David Stone 2015.
+// Copyright David Stone 2017.
 // Distributed under the Boost Software License, Version 1.0.
 // (See accompanying file LICENSE_1_0.txt or copy at
 // http://www.boost.org/LICENSE_1_0.txt)
@@ -17,13 +17,12 @@ namespace detail {
 
 // Assume always positive integers for now
 // Not the tightest possible bounds, but probably good enough for now
-template<typename LHS, typename RHS>
-constexpr auto bitwise_and_operator_range(LHS const & lhs, RHS const & rhs) noexcept {
+constexpr auto bitwise_and_operator_range = [](auto const lhs, auto const rhs) noexcept {
 	return min_max(
 		0,
 		min(lhs.max, rhs.max)
 	);
-}
+};
 
 }	// namespace detail
 

@@ -1,4 +1,4 @@
-// Copyright David Stone 2015.
+// Copyright David Stone 2017.
 // Distributed under the Boost Software License, Version 1.0.
 // (See accompanying file LICENSE_1_0.txt or copy at
 // http://www.boost.org/LICENSE_1_0.txt)
@@ -10,13 +10,12 @@
 namespace bounded {
 namespace detail {
 
-template<typename LHS, typename RHS>
-constexpr auto plus_operator_range(LHS const & lhs, RHS const & rhs) noexcept {
+constexpr auto plus_operator_range = [](auto const lhs, auto const rhs) noexcept {
 	return min_max(
 		lhs.min + rhs.min,
 		lhs.max + rhs.max
 	);
-}
+};
 
 }	// namespace detail
 
