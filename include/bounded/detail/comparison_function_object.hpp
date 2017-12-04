@@ -1,10 +1,11 @@
-// Copyright David Stone 2015.
+// Copyright David Stone 2017.
 // Distributed under the Boost Software License, Version 1.0.
 // (See accompanying file LICENSE_1_0.txt or copy at
 // http://www.boost.org/LICENSE_1_0.txt)
 
 #pragma once
 
+#include <bounded/detail/comparison.hpp>
 #include <bounded/detail/noexcept.hpp>
 
 #include <utility>
@@ -14,8 +15,8 @@ namespace detail {
 
 struct binary_equal_to {
 	template<typename LHS, typename RHS>
-	constexpr decltype(auto) operator()(LHS && lhs, RHS && rhs) const BOUNDED_NOEXCEPT(
-		std::forward<LHS>(lhs) == std::forward<RHS>(rhs)
+	constexpr auto operator()(LHS const & lhs, RHS const & rhs) const BOUNDED_NOEXCEPT(
+		lhs == rhs
 	)
 };
 template<typename Bound>
@@ -30,22 +31,22 @@ public:
 	{
 	}
 	template<typename Other>
-	constexpr decltype(auto) operator()(Other && other) const BOUNDED_NOEXCEPT(
-		m_bound == std::forward<Other>(other)
+	constexpr auto operator()(Other const & other) const BOUNDED_NOEXCEPT(
+		m_bound == other
 	)
 };
 
 // TODO: Add total ordering for pointer types
 struct less_t {
 	template<typename LHS, typename RHS>
-	constexpr decltype(auto) operator()(LHS && lhs, RHS && rhs) const BOUNDED_NOEXCEPT(
-		std::forward<LHS>(lhs) < std::forward<RHS>(rhs)
+	constexpr auto operator()(LHS const & lhs, RHS const & rhs) const BOUNDED_NOEXCEPT(
+		lhs < rhs
 	)
 };
 struct greater_t {
 	template<typename LHS, typename RHS>
-	constexpr decltype(auto) operator()(LHS && lhs, RHS && rhs) const BOUNDED_NOEXCEPT(
-		std::forward<LHS>(lhs) > std::forward<RHS>(rhs)
+	constexpr auto operator()(LHS const & lhs, RHS const & rhs) const BOUNDED_NOEXCEPT(
+		lhs > rhs
 	)
 };
 
