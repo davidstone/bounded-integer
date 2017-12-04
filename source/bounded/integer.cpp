@@ -577,37 +577,32 @@ namespace check_many_argument_minmax {
 }
 
 namespace check_non_integer_minmax {
-	constexpr auto string_less(char const * lhs, char const * rhs) noexcept -> bool {
-		return
-			*lhs < *rhs ? true :
-			*rhs < *lhs ? false :
-			*lhs == '\0' ? false :
-			string_less(lhs + 1, rhs + 1);
-	}
-	static_assert(string_less("0", "1"), "Incorrect string comparison function.");
-	static_assert(string_less("00", "1"), "Incorrect string comparison function.");
-	static_assert(string_less("0", "11"), "Incorrect string comparison function.");
-	static_assert(string_less("09", "1"), "Incorrect string comparison function.");
-	static_assert(string_less("09", "10"), "Incorrect string comparison function.");
-	static_assert(string_less("1", "10"), "Incorrect string comparison function.");
-	static_assert(!string_less("10", "1"), "Incorrect string comparison function.");
-	static_assert(!string_less("1", "1"), "Incorrect string comparison function.");
+	BOUNDED_COMPARISON
 
 	struct string_view {
-		explicit constexpr string_view(char const * value) noexcept:
-			m_value(value) {
+		explicit constexpr string_view(char const * value_) noexcept:
+			value(value_) {
 		}
-		constexpr auto operator<(string_view const other) const noexcept {
-			return string_less(m_value, other.m_value);
-		}
-		constexpr auto operator==(string_view const other) const noexcept {
-			// Don't care about efficiency here because it is just for tests
-			return !string_less(m_value, other.m_value) and !string_less(other.m_value, m_value);
+		friend constexpr auto compare(string_view const lhs, string_view const rhs) noexcept -> bounded::strong_ordering {
+			if (auto const cmp = bounded::compare(*lhs.value, *rhs.value); cmp != 0 or *lhs.value == '\0') {
+				return cmp;
+			} else {
+				return compare(string_view(lhs.value + 1), string_view(rhs.value + 1));
+			}
 		}
 	private:
-		char const * m_value;
+		char const * value;
 	};
-	
+
+	static_assert(string_view("0") < string_view("1"), "Incorrect string comparison function.");
+	static_assert(string_view("00") < string_view("1"), "Incorrect string comparison function.");
+	static_assert(string_view("0") < string_view("11"), "Incorrect string comparison function.");
+	static_assert(string_view("09") < string_view("1"), "Incorrect string comparison function.");
+	static_assert(string_view("09") < string_view("10"), "Incorrect string comparison function.");
+	static_assert(string_view("1") < string_view("10"), "Incorrect string comparison function.");
+	static_assert(string_view("10") > string_view("1"), "Incorrect string comparison function.");
+	static_assert(string_view("1") == string_view("1"), "Incorrect string comparison function.");
+
 	static_assert(bounded::min(string_view("0"), string_view("1")) == string_view("0"), "Incorrect value of min for string arguments.");
 	static_assert(bounded::min(string_view("00"), string_view("1")) == string_view("00"), "Incorrect value of min for string arguments.");
 	static_assert(bounded::min(string_view("0"), string_view("11")) == string_view("0"), "Incorrect value of min for string arguments.");
@@ -659,8 +654,8 @@ auto check_reference_minmax() {
 	// operator?:
 	check_specific_reference_minmax<int>();
 	struct class_type {
-		constexpr auto operator<(class_type) const noexcept -> bool {
-			return true;
+		constexpr auto compare(class_type) const noexcept {
+			return bounded::strong_ordering_equal;
 		}
 	};
 	check_specific_reference_minmax<class_type>();
