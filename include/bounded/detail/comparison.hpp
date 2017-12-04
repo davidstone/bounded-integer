@@ -9,7 +9,6 @@
 #include <bounded/detail/is_bounded_integer.hpp>
 #include <bounded/detail/noexcept.hpp>
 #include <bounded/detail/requires.hpp>
-#include <bounded/detail/underlying_type.hpp>
 
 #include <cstdint>
 #include <type_traits>
@@ -110,8 +109,7 @@ namespace detail {
 
 template<typename Limited, typename UnaryFunction, typename LHS, typename RHS>
 constexpr auto safe_extreme(LHS const lhs, RHS const rhs, UnaryFunction const pick_lhs) noexcept {
-	static_assert(std::is_same<LHS, std::intmax_t>{} or std::is_same<LHS, std::uintmax_t>{});
-	static_assert(std::is_same<RHS, std::intmax_t>{} or std::is_same<RHS, std::uintmax_t>{});
+	static_assert(std::is_integral<LHS>{} and std::is_integral<RHS>{});
 	using result_type = std::conditional_t<std::is_same<LHS, RHS>{}, LHS, Limited>;
 	return (pick_lhs(compare(lhs, rhs))) ?
 		static_cast<result_type>(lhs) :
@@ -135,15 +133,15 @@ template<typename LHS, typename RHS, BOUNDED_REQUIRES(is_bounded_integer<LHS> an
 constexpr auto compare(LHS const & lhs, RHS const & rhs) noexcept {
 	using lhs_limits = basic_numeric_limits<LHS>;
 	using rhs_limits = basic_numeric_limits<RHS>;
-	if constexpr (lhs_limits::min() > rhs_limits::max()) {
+	if constexpr (compare(lhs_limits::min(), rhs_limits::max()) > 0) {
 		static_cast<void>(lhs);
 		static_cast<void>(rhs);
 		return strong_ordering_greater;
-	} else if constexpr (lhs_limits::max() < rhs_limits::min()) {
+	} else if constexpr (compare(lhs_limits::max(), rhs_limits::min()) < 0) {
 		static_cast<void>(lhs);
 		static_cast<void>(rhs);
 		return strong_ordering_less;
-	} else if constexpr (lhs_limits::min() == lhs_limits::max() and rhs_limits::min() == rhs_limits::max() and lhs_limits::min() == rhs_limits::min()) {
+	} else if constexpr (compare(lhs_limits::min(), lhs_limits::max()) == 0 and compare(rhs_limits::min(), rhs_limits::max()) == 0 and compare(lhs_limits::min(), rhs_limits::min()) == 0) {
 		static_cast<void>(lhs);
 		static_cast<void>(rhs);
 		return strong_ordering_equal;
