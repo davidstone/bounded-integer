@@ -14,22 +14,6 @@
 
 namespace bounded {
 	
-template<typename LHS, typename RHS>
-constexpr auto compare_using_member(LHS const & lhs, RHS const & rhs) BOUNDED_NOEXCEPT_DECLTYPE(
-	strong_ordering(lhs.compare(rhs))
-)
-
-// C-style variadic makes this function always a worse match than the above
-template<typename LHS, typename RHS>
-constexpr auto compare_using_member(LHS const & lhs, RHS const & rhs, ...) BOUNDED_NOEXCEPT_DECLTYPE(
-	strong_ordering(-rhs.compare(lhs))
-)
-
-template<typename LHS, typename RHS>
-constexpr auto compare(LHS const & lhs, RHS const & rhs) BOUNDED_NOEXCEPT_DECLTYPE(
-	compare_using_member(lhs, rhs)
-)
-
 template<typename LHS, typename RHS, BOUNDED_REQUIRES(is_bounded_integer<LHS> and std::is_integral<RHS>{})>
 constexpr auto compare(LHS const lhs, RHS const rhs) noexcept {
 	return compare(lhs, integer(rhs));

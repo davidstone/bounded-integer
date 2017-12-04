@@ -152,6 +152,18 @@ constexpr auto compare(LHS const & lhs, RHS const & rhs) noexcept {
 
 
 template<typename LHS, typename RHS>
+constexpr auto compare(LHS const & lhs, RHS const & rhs) BOUNDED_NOEXCEPT_DECLTYPE(
+	strong_ordering(lhs.compare(rhs))
+)
+
+// C-style variadic makes this function always a worse match than the above
+template<typename LHS, typename RHS>
+constexpr auto compare(LHS const & lhs, RHS const & rhs, ...) BOUNDED_NOEXCEPT_DECLTYPE(
+	strong_ordering(-rhs.compare(lhs))
+)
+
+
+template<typename LHS, typename RHS>
 constexpr auto operator==(LHS const & lhs, RHS const & rhs) BOUNDED_NOEXCEPT_DECLTYPE(
 	compare(lhs, rhs) == 0
 )
