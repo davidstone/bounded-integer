@@ -16,7 +16,7 @@ namespace detail {
 struct binary_equal_to {
 	template<typename LHS, typename RHS>
 	constexpr auto operator()(LHS const & lhs, RHS const & rhs) const BOUNDED_NOEXCEPT(
-		lhs == rhs
+		compare(lhs, rhs) == 0
 	)
 };
 template<typename Bound>
@@ -32,7 +32,7 @@ public:
 	}
 	template<typename Other>
 	constexpr auto operator()(Other const & other) const BOUNDED_NOEXCEPT(
-		m_bound == other
+		compare(m_bound, other) == 0
 	)
 };
 
@@ -40,13 +40,13 @@ public:
 struct less_t {
 	template<typename LHS, typename RHS>
 	constexpr auto operator()(LHS const & lhs, RHS const & rhs) const BOUNDED_NOEXCEPT(
-		lhs < rhs
+		compare(lhs, rhs) < 0
 	)
 };
 struct greater_t {
 	template<typename LHS, typename RHS>
 	constexpr auto operator()(LHS const & lhs, RHS const & rhs) const BOUNDED_NOEXCEPT(
-		lhs > rhs
+		compare(lhs, rhs) > 0
 	)
 };
 
