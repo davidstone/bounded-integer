@@ -1,4 +1,4 @@
-// Copyright David Stone 2016.
+// Copyright David Stone 2017.
 // Distributed under the Boost Software License, Version 1.0.
 // (See accompanying file LICENSE_1_0.txt or copy at
 // http://www.boost.org/LICENSE_1_0.txt)
@@ -6,6 +6,7 @@
 #pragma once
 
 #include <bounded/detail/basic_numeric_limits.hpp>
+#include <bounded/detail/comparison.hpp>
 #include <bounded/detail/forward_declaration.hpp>
 #include <bounded/detail/is_bounded_integer.hpp>
 #include <bounded/detail/is_poisoned.hpp>
@@ -29,8 +30,8 @@ namespace detail {
 template<typename T>
 constexpr auto allow_construction_from = basic_numeric_limits<T>::is_specialized and (basic_numeric_limits<T>::is_integer or std::is_enum<std::decay_t<T>>{});
 
-template<typename T>
-constexpr auto is_implicitly_constructible_from(intmax_t const minimum, intmax_t const maximum) noexcept {
+template<typename T, typename Minimum, typename Maximum>
+constexpr auto is_implicitly_constructible_from(Minimum const minimum, Maximum const maximum) noexcept {
 	if constexpr (allow_construction_from<T> and !std::is_same<std::decay_t<T>, bool>{}) {
 		return type_fits_in_range<std::decay_t<T>>(minimum, maximum);
 	} else {
@@ -40,8 +41,8 @@ constexpr auto is_implicitly_constructible_from(intmax_t const minimum, intmax_t
 	}
 }
 
-template<typename policy, typename T>
-constexpr auto is_explicitly_constructible_from(intmax_t const minimum, intmax_t const maximum) noexcept {
+template<typename policy, typename T, typename Minimum, typename Maximum>
+constexpr auto is_explicitly_constructible_from(Minimum const minimum, Maximum const maximum) noexcept {
 	if constexpr (allow_construction_from<T>) {
 		return type_overlaps_range<std::decay_t<T>>(minimum, maximum) or !policy::overflow_is_error;
 	} else {
@@ -62,6 +63,16 @@ template<typename T>
 constexpr auto has_extra_space = underlying_min<T> < basic_numeric_limits<T>::min() or basic_numeric_limits<T>::max() < underlying_max<T>;
 
 
+template<typename Integer>
+constexpr auto as_builtin_integer(Integer const x) noexcept {
+	if constexpr (std::is_integral<Integer>{}) {
+		return x;
+	} else {
+		static_assert(is_bounded_integer<Integer>);
+		return x.value();
+	}
+}
+
 // The user can specialize basic_numeric_limits for their enumeration type to
 // provide tighter bounds than the underlying_type might suggest. This forwards
 // along non-enum types without doing anything, but constructs a
@@ -71,8 +82,8 @@ constexpr decltype(auto) as_integer(T const & t) noexcept {
 	if constexpr (std::is_enum<std::decay_t<T>>{}) {
 		using limits = basic_numeric_limits<T>;
 		using result_type = integer<
-			static_cast<std::intmax_t>(limits::min()),
-			static_cast<std::intmax_t>(limits::max()),
+			as_builtin_integer(limits::min()),
+			as_builtin_integer(limits::max()),
 			null_policy,
 			storage_type::fast,
 			false
@@ -112,12 +123,12 @@ template<auto value_>
 struct constant_wrapper {
 	using underlying_type = decltype(value_);
 	constexpr constant_wrapper() noexcept = default;
-	constexpr explicit constant_wrapper(underlying_type) noexcept {
+	constexpr explicit constant_wrapper(underlying_type const &) noexcept {
 	}
 	static constexpr auto value() noexcept {
 		return value_;
 	}
-	static constexpr auto assign(underlying_type) noexcept {
+	static constexpr auto assign(underlying_type const &) noexcept {
 	}
 };
 
@@ -134,19 +145,20 @@ using base = std::conditional_t<minimum == maximum,
 
 
 // poisoned is useful for overloading and getting all constants
-template<intmax_t value, typename overflow_policy = null_policy, storage_type storage = storage_type::fast, bool poisoned = false>
+template<auto value, typename overflow_policy = null_policy, storage_type storage = storage_type::fast, bool poisoned = false>
 using constant_t = integer<value, value, overflow_policy, storage, poisoned>;
 
-template<intmax_t value, typename overflow_policy = null_policy, storage_type storage = storage_type::fast>
+template<auto value, typename overflow_policy = null_policy, storage_type storage = storage_type::fast>
 constexpr auto constant = constant_t<value, overflow_policy, storage>(value, non_check);
 
 
-template<intmax_t minimum, intmax_t maximum, typename overflow_policy_ = null_policy, storage_type storage = storage_type::fast, bool poisoned = false>
+template<auto minimum, auto maximum, typename overflow_policy_ = null_policy, storage_type storage = storage_type::fast, bool poisoned = false>
 struct integer : private detail::base<minimum, maximum, storage> {
 private:
 	using base = detail::base<minimum, maximum, storage>;
 public:
-	static_assert(minimum <= maximum, "Maximum cannot be less than minimum");
+	static_assert(compare(minimum, maximum) <= 0, "Maximum cannot be less than minimum");
+
 	using underlying_type = typename base::underlying_type;
 	using overflow_policy = overflow_policy_;
 	static_assert(detail::value_fits_in_type<underlying_type>(minimum), "minimum does not fit in underlying_type.");
@@ -334,7 +346,7 @@ template<typename T>
 struct equivalent_overflow_policy_c {
 	using type = null_policy;
 };
-template<intmax_t minimum, intmax_t maximum, typename overflow_policy, storage_type storage>
+template<auto minimum, auto maximum, typename overflow_policy, storage_type storage>
 struct equivalent_overflow_policy_c<integer<minimum, maximum, overflow_policy, storage>> {
 	using type = overflow_policy;
 };

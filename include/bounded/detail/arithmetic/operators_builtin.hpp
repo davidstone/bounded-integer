@@ -39,14 +39,14 @@ constexpr auto operator symbol(std::integral_constant<T, lhs>, RHS const rhs) no
 
 #define BOUNDED_INTEGER_MIXED_OPERATOR_OVERLOADS(symbol, minimum, maximum) \
 template< \
-	intmax_t lhs_min, intmax_t lhs_max, typename overflow, storage_type storage, bool poisoned, typename T, \
+	auto lhs_min, auto lhs_max, typename overflow, storage_type storage, bool poisoned, typename T, \
 	BOUNDED_REQUIRES(std::is_integral<T>{}) \
 > \
 constexpr auto operator symbol(integer<lhs_min, lhs_max, overflow, storage, poisoned> const lhs, T const rhs) noexcept { \
 	return lhs symbol integer<minimum, maximum, overflow, storage, true>(rhs); \
 } \
 template< \
-	typename T, intmax_t rhs_min, intmax_t rhs_max, typename overflow, storage_type storage, bool poisoned, \
+	typename T, auto rhs_min, auto rhs_max, typename overflow, storage_type storage, bool poisoned, \
 	BOUNDED_REQUIRES(std::is_integral<T>{}) \
 > \
 constexpr auto operator symbol(T const lhs, integer<rhs_min, rhs_max, overflow, storage, poisoned> const rhs) noexcept { \
@@ -77,7 +77,7 @@ BOUNDED_INTEGER_MIXED_OPERATOR_OVERLOADS_INTEGRAL_CONSTANT(symbol)
 // shift operators, you could not use any built-in type as the right-hand side.
 
 #define BOUNDED_INTEGER_MIXED_OPERATOR_OVERLOADS_BASIC(symbol) \
-BOUNDED_INTEGER_MIXED_OPERATOR_OVERLOADS(symbol, static_cast<std::intmax_t>(std::numeric_limits<T>::min()), static_cast<std::intmax_t>(std::numeric_limits<T>::max()))
+BOUNDED_INTEGER_MIXED_OPERATOR_OVERLOADS(symbol, std::numeric_limits<T>::min(), std::numeric_limits<T>::max())
 
 
 #define BOUNDED_INTEGER_MIXED_OPERATOR_OVERLOADS_DIVISION(symbol) \
@@ -85,7 +85,7 @@ BOUNDED_INTEGER_MIXED_OPERATOR_OVERLOADS(symbol, 1, static_cast<std::intmax_t>(s
 
 
 #define BOUNDED_INTEGER_MIXED_OPERATOR_OVERLOADS_SHIFT(symbol) \
-BOUNDED_INTEGER_MIXED_OPERATOR_OVERLOADS(symbol, 0, std::numeric_limits<std::intmax_t>::digits)
+BOUNDED_INTEGER_MIXED_OPERATOR_OVERLOADS(symbol, 0, std::numeric_limits<std::uintmax_t>::digits)
 
 
 BOUNDED_INTEGER_MIXED_OPERATOR_OVERLOADS_BASIC(+)

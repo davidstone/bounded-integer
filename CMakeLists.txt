@@ -71,6 +71,7 @@ target_sources(bounded INTERFACE
 	$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>/include/bounded/detail/arithmetic/pointer.hpp
 	$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>/include/bounded/detail/arithmetic/operators_builtin.hpp
 	$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>/include/bounded/detail/arithmetic/multiplies.hpp
+	$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>/include/bounded/detail/arithmetic/safe_abs.hpp
 )
 
 target_include_directories(bounded INTERFACE
@@ -151,6 +152,7 @@ add_executable(bounded_test
 	source/bounded/detail/arithmetic/multiplies.cpp
 	source/bounded/detail/arithmetic/right_shift.cpp
 	source/bounded/detail/arithmetic/modulus.cpp
+	source/bounded/detail/arithmetic/safe_abs.cpp
 )
 
 target_link_libraries(bounded_test bounded)

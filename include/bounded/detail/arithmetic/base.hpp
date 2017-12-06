@@ -1,4 +1,4 @@
-// Copyright David Stone 2015.
+// Copyright David Stone 2017.
 // Distributed under the Boost Software License, Version 1.0.
 // (See accompanying file LICENSE_1_0.txt or copy at
 // http://www.boost.org/LICENSE_1_0.txt)
@@ -37,14 +37,17 @@ struct min_max {
 // case result_t is narrower than one of the arguments.
 #define BOUNDED_INTEGER_OPERATOR_OVERLOADS(symbol, operator_range) \
 template< \
-	intmax_t lhs_min, intmax_t lhs_max, typename lhs_policy, storage_type lhs_storage, bool lhs_poisoned, \
-	intmax_t rhs_min, intmax_t rhs_max, typename rhs_policy, storage_type rhs_storage, bool rhs_poisoned \
+	auto lhs_min, auto lhs_max, typename lhs_policy, storage_type lhs_storage, bool lhs_poisoned, \
+	auto rhs_min, auto rhs_max, typename rhs_policy, storage_type rhs_storage, bool rhs_poisoned \
 > \
 constexpr auto operator symbol( \
 	integer<lhs_min, lhs_max, lhs_policy, lhs_storage, lhs_poisoned> const lhs, \
 	integer<rhs_min, rhs_max, rhs_policy, rhs_storage, rhs_poisoned> const rhs \
 ) noexcept { \
-	constexpr auto range = operator_range(detail::min_max(lhs_min, lhs_max), detail::min_max(rhs_min, rhs_max)); \
+	constexpr auto range = operator_range( \
+		detail::min_max(constant<lhs_min>, constant<lhs_max>), \
+		detail::min_max(constant<rhs_min>, constant<rhs_max>) \
+	); \
 	using result_t = integer< \
 		range.min, \
 		range.max, \

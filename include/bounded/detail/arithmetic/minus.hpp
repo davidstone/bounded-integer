@@ -8,7 +8,6 @@
 #include <bounded/detail/arithmetic/plus.hpp>
 #include <bounded/detail/arithmetic/unary_minus.hpp>
 
-#include <bounded/detail/basic_numeric_limits.hpp>
 #include <bounded/detail/noexcept.hpp>
 
 namespace bounded {

@@ -20,7 +20,7 @@ namespace detail {
 constexpr auto bitwise_and_operator_range = [](auto const lhs, auto const rhs) noexcept {
 	return min_max(
 		0,
-		min(lhs.max, rhs.max)
+		min(lhs.max, rhs.max).value()
 	);
 };
 

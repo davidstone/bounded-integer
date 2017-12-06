@@ -33,7 +33,7 @@ public:
 	static constexpr auto is_bounded = real_numeric_limits::is_bounded;
 };
 
-template<intmax_t minimum, intmax_t maximum, typename overflow_policy, storage_type storage, bool poisoned>
+template<auto minimum, auto maximum, typename overflow_policy, storage_type storage, bool poisoned>
 struct basic_numeric_limits<integer<minimum, maximum, overflow_policy, storage, poisoned>> {
 	static constexpr auto min() noexcept {
 		return minimum;

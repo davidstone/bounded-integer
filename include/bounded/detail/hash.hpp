@@ -11,7 +11,7 @@
 
 namespace std {
 
-template<intmax_t minimum, intmax_t maximum, typename overflow_policy, bounded::storage_type storage, bool poisoned>
+template<auto minimum, auto maximum, typename overflow_policy, bounded::storage_type storage, bool poisoned>
 struct hash<bounded::integer<minimum, maximum, overflow_policy, storage, poisoned>> {
 	using argument_type = bounded::integer<minimum, maximum, overflow_policy, storage, poisoned>;
 	constexpr decltype(auto) operator()(argument_type const & argument) const {

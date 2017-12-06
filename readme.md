@@ -55,15 +55,8 @@ The general form of the class is `bounded::integer<minimum, maximum, policy = bo
 
 `bounded::integer` can replace most uses of built-in integer types. It does have some limitations, however.
 
-* A `bounded::integer` cannot be used as a non-type template parameter. The C++ 
-language rules do not permit any user-defined type to be used as a non-type template 
-parameter, even if the user-defined type is a literal type. There is a proposal going 
-through the C++ standardization committee that would remove this restriction.
-* `bounded::integer` uses `intmax_t` as the template parameter to determine its 
-bounds. This means that it cannot store an integer larger than 
-`std::numeric_limits<intmax_t>::max()`. This restriction should be removed in the near 
-future.
-* Doing math with `uintmax_t` (which is typically the same as `size_t` or `uint64_t`) can easily cause overflow issues. This can typically be resolved by narrowing the bounds of your values (and if you cannot do so, that usually means that your calculation could overflow).
+* A `bounded::integer` cannot be used as a non-type template parameter. The C++ language rules do not permit any user-defined type to be used as a non-type template parameter, even if the user-defined type is a literal type. There is a proposal going through the C++ standardization committee that would remove this restriction.
+* `bounded::integer` uses `std::intmax_t` or `std::uintmax_t` as the template parameter to determine its bounds. This means that it cannot store an integer larger than `std::numeric_limits<std::uintmax_t>::max()` or smaller than `std::numeric_limits<std::intmax_t>::min()`. This restriction should be removed in the near future.
 * `bounded::integer` is currently still under active development, so some interfaces are still subject to change.
 
 # Reference

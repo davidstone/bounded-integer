@@ -1,12 +1,16 @@
-// Copyright David Stone 2015.
+// Copyright David Stone 2017.
 // Distributed under the Boost Software License, Version 1.0.
 // (See accompanying file LICENSE_1_0.txt or copy at
 // http://www.boost.org/LICENSE_1_0.txt)
 
 #pragma once
 
+#include <bounded/detail/arithmetic/plus.hpp>
+#include <bounded/detail/arithmetic/unary_minus.hpp>
 #include <bounded/detail/class.hpp>
+#include <bounded/detail/comparison.hpp>
 #include <bounded/detail/log.hpp>
+#include <bounded/detail/minmax.hpp>
 
 #include <cstdint>
 #include <limits>
@@ -18,23 +22,25 @@ namespace detail {
 // digits and digits10 represent the maximum number of bits / digits in a
 // lossless string -> integer -> string conversion sequence
 
-template<typename Base>
-constexpr auto digits(intmax_t const minimum, intmax_t const maximum, Base const base) noexcept {
+template<typename Minimum, typename Maximum, typename Base>
+constexpr auto digits(Minimum const minimum, Maximum const maximum, Base const base) noexcept {
 	static_assert(base > constant<1>, "Base must be greater than 1.");
-	if (minimum > 0 or maximum <= 0) {
-		return 0;
+	if constexpr (minimum > constant<0> or maximum <= constant<0>) {
+		return constant<0>;
+	} else if constexpr (maximum == constant<std::numeric_limits<std::uintmax_t>::max()>) {
+		return constant<std::numeric_limits<std::uintmax_t>::digits>;
+	} else if constexpr (minimum == constant<0> or maximum < -minimum) {
+		return ::bounded::log(maximum + constant<1>, base);
+	} else {
+		return ::bounded::log(-minimum + constant<1>, base);
 	}
-
-	return (minimum == 0 or static_cast<uintmax_t>(maximum) < -static_cast<uintmax_t>(minimum)) ?
-		::bounded::detail::log(static_cast<uintmax_t>(maximum) + 1, base.value()) :
-		::bounded::detail::log(-static_cast<uintmax_t>(minimum) + 1, base.value());
 }
 
 }	// namespace detail
 }	// namespace bounded
 namespace std {
 
-template<intmax_t minimum, intmax_t maximum, typename overflow_policy, bounded::storage_type storage, bool poisoned>
+template<auto minimum, auto maximum, typename overflow_policy, bounded::storage_type storage, bool poisoned>
 struct numeric_limits<bounded::integer<minimum, maximum, overflow_policy, storage, poisoned>> {
 private:
 	using type = bounded::integer<minimum, maximum, overflow_policy, storage, poisoned>;
@@ -53,8 +59,8 @@ public:
 	static constexpr auto is_bounded = true;
 	static constexpr auto is_modulo = overflow_policy::is_modulo;
 	static constexpr auto radix = 2;
-	static constexpr auto digits = bounded::detail::digits(minimum, maximum, bounded::constant<radix>);
-	static constexpr auto digits10 = bounded::detail::digits(minimum, maximum, bounded::constant<10>);
+	static constexpr auto digits = bounded::detail::digits(bounded::constant<minimum>, bounded::constant<maximum>, bounded::constant<radix>);
+	static constexpr auto digits10 = bounded::detail::digits(bounded::constant<minimum>, bounded::constant<maximum>, bounded::constant<10>);
 	static constexpr auto max_digits10 = 0;
 	static constexpr auto min_exponent = 0;
 	static constexpr auto min_exponent10 = 0;

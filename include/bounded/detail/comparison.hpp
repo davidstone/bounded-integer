@@ -109,7 +109,8 @@ namespace detail {
 
 template<typename Limited, typename UnaryFunction, typename LHS, typename RHS>
 constexpr auto safe_extreme(LHS const lhs, RHS const rhs, UnaryFunction const pick_lhs) noexcept {
-	static_assert(std::is_integral<LHS>{} and std::is_integral<RHS>{});
+	static_assert(std::is_same<LHS, std::intmax_t>{} or std::is_same<LHS, std::uintmax_t>{});
+	static_assert(std::is_same<RHS, std::intmax_t>{} or std::is_same<RHS, std::uintmax_t>{});
 	using result_type = std::conditional_t<std::is_same<LHS, RHS>{}, LHS, Limited>;
 	return (pick_lhs(compare(lhs, rhs))) ?
 		static_cast<result_type>(lhs) :
@@ -161,6 +162,19 @@ template<typename LHS, typename RHS>
 constexpr auto compare(LHS const & lhs, RHS const & rhs, ...) BOUNDED_NOEXCEPT_DECLTYPE(
 	strong_ordering(-rhs.compare(lhs))
 )
+
+
+namespace detail {
+
+template<auto value>
+constexpr auto normalize = static_cast<std::conditional_t<
+	compare(value, std::numeric_limits<std::intmax_t>::max()) <= 0,
+	std::intmax_t,
+	std::uintmax_t
+>>(value);
+
+
+}	// namespace detail
 
 
 template<typename LHS, typename RHS>

@@ -1,12 +1,9 @@
-// Copyright David Stone 2015.
+// Copyright David Stone 2017.
 // Distributed under the Boost Software License, Version 1.0.
 // (See accompanying file LICENSE_1_0.txt or copy at
 // http://www.boost.org/LICENSE_1_0.txt)
 
 #pragma once
-
-#include <cstdint>
-#include <type_traits>
 
 namespace bounded {
 
@@ -16,7 +13,7 @@ enum class storage_type { fast, least };
 // integer type -- for instance, multiplying by the literal 5. This turns off
 // some strict bounds checking. Without this, it is difficult to combine
 // bounded::integer with many standard library implementations.
-template<intmax_t minimum, intmax_t maximum, typename overflow_policy, storage_type storage, bool poisoned>
+template<auto minimum, auto maximum, typename overflow_policy, storage_type storage, bool poisoned>
 struct integer;
 
 // Does not verify that the value is in range with the policy

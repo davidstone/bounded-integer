@@ -6,7 +6,9 @@
 #pragma once
 
 #include <bounded/detail/arithmetic/base.hpp>
+#include <bounded/detail/arithmetic/safe_abs.hpp>
 
+#include <bounded/detail/comparison.hpp>
 #include <bounded/detail/minmax.hpp>
 
 #include <limits>
@@ -55,39 +57,42 @@ constexpr auto sign_free_value = [](auto const dividend, auto divisor) noexcept 
 	return current;
 };
 
-constexpr auto safe_abs = [](auto const value) noexcept {
-	return (value < 0) ? -static_cast<std::uintmax_t>(value) : static_cast<std::uintmax_t>(value);
-};
-
-constexpr auto modulus_operator_range = [](auto const lhs, auto const rhs) noexcept {
+constexpr auto modulus_operator_range = [](auto const lhs_, auto const rhs_) noexcept {
+	constexpr auto lhs = min_max(decltype(lhs_.min){}, decltype(lhs_.max){});
+	constexpr auto rhs = min_max(decltype(rhs_.min){}, decltype(rhs_.max){});
 	// The sign of the result is equal to the sign of the lhs. The sign of the
 	// rhs does not matter. Therefore, we use the absolute value of the rhs; we
 	// must be careful when negating due to the possibility of overflow.
 	//
 	// The divisor range cannot terminate on a 0 since that is an invalid value.
-	auto const divisor = min_max(
-		(rhs.min > 0) ? static_cast<std::uintmax_t>(rhs.min) : (rhs.max < 0) ? -static_cast<std::uintmax_t>(rhs.max) : 1,
-		max(safe_abs(rhs.min), safe_abs(rhs.max))
+	constexpr auto divisor = min_max(
+		(rhs.min > constant<0>) ? static_cast<std::uintmax_t>(rhs.min) : (rhs.max < constant<0>) ? -static_cast<std::uintmax_t>(rhs.max) : 1,
+		max(safe_abs(rhs.min.value()), safe_abs(rhs.max.value()))
 	);
 
-	auto const negative_dividend = min_max(
-		lhs.max < 0 ? safe_abs(lhs.max) : 0,
-		lhs.min < 0 ? safe_abs(lhs.min) : 0
+	constexpr auto negative_dividend = min_max(
+		lhs.max < constant<0> ? safe_abs(lhs.max.value()) : 0,
+		lhs.min < constant<0> ? safe_abs(lhs.min.value()) : 0
 	);
-	auto const positive_dividend = min_max(
-		static_cast<std::uintmax_t>(max(lhs.min, 0)),
-		static_cast<std::uintmax_t>(max(lhs.max, 0))
+	constexpr auto positive_dividend = min_max(
+		static_cast<std::uintmax_t>(max(lhs.min, constant<0>)),
+		static_cast<std::uintmax_t>(max(lhs.max, constant<0>))
 	);
 	
-	auto const negative = sign_free_value(negative_dividend, divisor);
-	auto const positive = sign_free_value(positive_dividend, divisor);
+	constexpr auto negative = sign_free_value(negative_dividend, divisor);
+	constexpr auto positive = sign_free_value(positive_dividend, divisor);
 
-	auto const has_negative_values = lhs.min <= 0;
-	auto const has_positive_values = lhs.max > 0;
+	constexpr auto has_negative_values = lhs.min < constant<0>;
+	constexpr auto has_positive_values = lhs.max > constant<0>;
+	
+	using signed_limits = std::numeric_limits<std::intmax_t>;
+	static_assert(not has_negative_values or negative.max <= -static_cast<std::uintmax_t>(signed_limits::min()));
 
+	using min_type = std::conditional_t<has_negative_values or positive.min <= signed_limits::max(), std::intmax_t, std::uintmax_t>;
+	using max_type = std::conditional_t<not has_positive_values or positive.max <= signed_limits::max(), std::intmax_t, std::uintmax_t>;
 	return min_max(
-		has_negative_values ? -static_cast<std::intmax_t>(negative.max) : static_cast<std::intmax_t>(positive.min),
-		has_positive_values ? static_cast<std::intmax_t>(positive.max) : -static_cast<std::intmax_t>(negative.min)
+		has_negative_values ? static_cast<min_type>(-static_cast<std::intmax_t>(negative.max)) : static_cast<min_type>(positive.min),
+		has_positive_values ? static_cast<max_type>(positive.max) : static_cast<max_type>(-static_cast<std::intmax_t>(negative.min))
 	);
 };
 

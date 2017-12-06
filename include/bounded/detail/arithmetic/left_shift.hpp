@@ -11,9 +11,10 @@ namespace bounded {
 namespace detail {
 
 constexpr auto left_shift_operator_range = [](auto const lhs, auto const rhs) noexcept {
+	// TODO: Broaden range
 	return min_max(
-		lhs.min << rhs.min,
-		lhs.max << rhs.max
+		static_cast<std::intmax_t>(lhs.min) << rhs.min.value(),
+		static_cast<std::intmax_t>(lhs.max) << rhs.max.value()
 	);
 };
 

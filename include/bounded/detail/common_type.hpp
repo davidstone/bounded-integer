@@ -5,6 +5,7 @@
 
 #pragma once
 
+#include <bounded/detail/comparison.hpp>
 #include <bounded/detail/forward_declaration.hpp>
 #include <bounded/detail/policy/null_policy.hpp>
 
@@ -16,8 +17,8 @@ namespace detail {
 // This preferentially uses storage_type::fast, but does no conversions if they
 // are the same. If new storage types are added, this will preferentially use
 // storage_type::least over whatever that new type is.
-constexpr storage_type common_storage_type(storage_type const lhs_storage, storage_type const rhs_storage) noexcept {
-	return (lhs_storage < rhs_storage) ? lhs_storage : rhs_storage;
+constexpr storage_type common_storage_type(storage_type const lhs, storage_type const rhs) noexcept {
+	return (lhs < rhs) ? lhs : rhs;
 }
 
 template<typename lhs_policy, typename rhs_policy>
@@ -32,16 +33,18 @@ namespace std {
 // the type passed in, which will always work.
 
 template<
-	intmax_t lhs_min, intmax_t lhs_max, typename lhs_policy, bounded::storage_type lhs_storage, bool lhs_poisoned,
-	intmax_t rhs_min, intmax_t rhs_max, typename rhs_policy, bounded::storage_type rhs_storage, bool rhs_poisoned
+	auto lhs_min, auto lhs_max, typename lhs_policy, bounded::storage_type lhs_storage, bool lhs_poisoned,
+	auto rhs_min, auto rhs_max, typename rhs_policy, bounded::storage_type rhs_storage, bool rhs_poisoned
 >
 struct common_type<
 	bounded::integer<lhs_min, lhs_max, lhs_policy, lhs_storage, lhs_poisoned>,
 	bounded::integer<rhs_min, rhs_max, rhs_policy, rhs_storage, rhs_poisoned>
 > {
 private:
-	static constexpr auto minimum = (lhs_min < rhs_min) ? lhs_min : rhs_min;
-	static constexpr auto maximum = (lhs_max > rhs_max) ? lhs_max : rhs_max;
+	template<auto value>
+	static constexpr auto normalize = bounded::detail::normalize<value>;
+	static constexpr auto minimum = bounded::detail::safe_min(normalize<lhs_min>, normalize<rhs_min>);
+	static constexpr auto maximum = bounded::detail::safe_max(normalize<lhs_max>, normalize<rhs_max>);
 public:
 	using type = bounded::integer<
 		minimum,
@@ -50,6 +53,7 @@ public:
 		bounded::detail::common_storage_type(lhs_storage, rhs_storage),
 		lhs_poisoned or rhs_poisoned
 	>;
+	using q = typename type::underlying_type;
 };
 
 
@@ -57,7 +61,7 @@ public:
 // add in some tricks to limit the maximum instantiation depth:
 
 template<
-	intmax_t minimum, intmax_t maximum, typename overflow_policy, bounded::storage_type storage, bool poisoned,
+	auto minimum, auto maximum, typename overflow_policy, bounded::storage_type storage, bool poisoned,
 	typename T1, typename T2, typename T3, typename T4, typename T5,
 	typename T6, typename T7, typename T8, typename T9, typename T10,
 	typename T11, typename T12, typename T13, typename T14, typename T15,

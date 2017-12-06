@@ -21,7 +21,7 @@ namespace policy_detail {
 
 using default_exception = std::range_error;
 
-template<typename T, intmax_t minimum, intmax_t maximum>
+template<typename T, auto minimum, auto maximum>
 constexpr auto reduce_range(T && value, constant_t<minimum>, constant_t<maximum>) BOUNDED_NOEXCEPT(
 	integer<
 		max(minimum, basic_numeric_limits<T>::min()),

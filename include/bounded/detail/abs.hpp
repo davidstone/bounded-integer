@@ -15,9 +15,15 @@ namespace bounded {
 
 template<typename Integer, BOUNDED_REQUIRES(is_bounded_integer<Integer>)>
 constexpr auto abs(Integer const value) noexcept {
-	// The 0 has to be there to restrict the range of possible values. Without
-	// it, abs(integer<-7, 3>) would be [-3, 7] instead of [0, 7].
-	return increase_min<0>(max(value, -value), non_check);
+	if constexpr (Integer::min() >= constant<0>) {
+		return value;
+	} else if constexpr (Integer::max() <= constant<0>) {
+		return -value;
+	} else {
+		// The 0 has to be there to restrict the range of possible values. Without
+		// it, abs(integer<-7, 3>) would be [-3, 7] instead of [0, 7].
+		return increase_min<0>(max(value, -value), non_check);
+	}
 }
 
 }	// namespace bounded

@@ -19,6 +19,15 @@
 #include <utility>
 
 namespace bounded {
+namespace detail {
+
+constexpr auto cast_to_builtin = [](auto const value) noexcept {
+	constexpr auto signed_max = constant<std::numeric_limits<std::intmax_t>::max()>;
+	using result_type = std::conditional_t<value.max() <= signed_max, std::intmax_t, std::uintmax_t>;
+	return static_cast<result_type>(value);
+};
+
+}	// namespace detail
 
 // Specialize this class to give the correct type for your own extreme function
 // if the default does not work. Types that cannot be used to construct this
@@ -32,11 +41,11 @@ struct extreme_type {
 template<typename Compare, typename T1, typename T2>
 using extreme_t = typename extreme_type<Compare, std::decay_t<T1>, std::decay_t<T2>>::type;
 
-// TODO: This should only be selected for less and greater
+// TODO: This should be selected only for less and greater
 template<
 	typename Compare,
-	intmax_t lhs_min, intmax_t lhs_max, typename lhs_policy, storage_type lhs_storage, bool lhs_poisoned,
-	intmax_t rhs_min, intmax_t rhs_max, typename rhs_policy, storage_type rhs_storage, bool rhs_poisoned
+	auto lhs_min, auto lhs_max, typename lhs_policy, storage_type lhs_storage, bool lhs_poisoned,
+	auto rhs_min, auto rhs_max, typename rhs_policy, storage_type rhs_storage, bool rhs_poisoned
 >
 struct extreme_type<
 	Compare,
@@ -44,8 +53,15 @@ struct extreme_type<
 	integer<rhs_min, rhs_max, rhs_policy, rhs_storage, rhs_poisoned>
 > {
 private:
-	static constexpr auto minimum = Compare{}(lhs_min, rhs_min) ? lhs_min : rhs_min;
-	static constexpr auto maximum = Compare{}(lhs_max, rhs_max) ? lhs_max : rhs_max;
+	static constexpr auto select = [](auto const lhs, auto const rhs) noexcept {
+		if constexpr (Compare{}(lhs, rhs)) {
+			return detail::cast_to_builtin(lhs);
+		} else {
+			return detail::cast_to_builtin(rhs);
+		}
+	};
+	static constexpr auto minimum = select(constant<lhs_min>, constant<rhs_min>);
+	static constexpr auto maximum = select(constant<lhs_max>, constant<rhs_max>);
 	using policy = detail::common_policy<lhs_policy, rhs_policy>;
 	static constexpr auto storage = detail::common_storage_type(lhs_storage, rhs_storage);
 	static constexpr auto poisoned = lhs_poisoned or rhs_poisoned;
@@ -67,7 +83,7 @@ constexpr struct {
 private:
 	template<typename Compare, typename T1, typename T2>
 	using result_type = detail::add_common_cv_reference_t<extreme_t<Compare, T2, T1>, T1, T2>;
-
+	
 	template<typename Compare, typename T1, typename T2, typename result_t = result_type<Compare, T1, T2>>
 	static constexpr auto extreme_two(Compare compare, T1 && t1, T2 && t2) BOUNDED_NOEXCEPT_DECLTYPE(
 		compare(t2, t1) ?
