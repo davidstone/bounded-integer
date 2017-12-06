@@ -1,4 +1,4 @@
-// Copyright David Stone 2015.
+// Copyright David Stone 2017.
 // Distributed under the Boost Software License, Version 1.0.
 // (See accompanying file LICENSE_1_0.txt or copy at
 // http://www.boost.org/LICENSE_1_0.txt)
@@ -8,6 +8,9 @@
 #include <bounded/integer.hpp>
 #include <bounded/integer_range.hpp>
 #include <bounded/optional.hpp>
+
+#include "homogeneous_equals.hpp"
+#include "string_view.hpp"
  
 #include <cassert>
 #include <unordered_map>
@@ -15,1173 +18,63 @@
 
 namespace {
 
-using namespace bounded::literal;
-
-template<typename LHS, typename RHS>
-struct is_same_bounded : std::is_same<LHS, RHS> {};
-
-template<auto lhs_min, auto lhs_max, auto rhs_min, auto rhs_max, typename policy, auto storage, auto poisoned>
-struct is_same_bounded<
-	bounded::integer<lhs_min, lhs_max, policy, storage, poisoned>,
-	bounded::integer<rhs_min, rhs_max, policy, storage, poisoned>
-> : std::bool_constant<
-	bounded::constant<lhs_min> == bounded::constant<rhs_min> and
-	bounded::constant<lhs_max> == bounded::constant<rhs_max>
-> {
-};
-
-namespace check_common_type {
-	using type1 = bounded::integer<1, 5>;
-	using type2 = bounded::integer<3, 10>;
-	using common_type2 = std::common_type_t<type1, type2>;
-	using expected_type2 = bounded::integer<1, 10>;
-	static_assert(is_same_bounded<expected_type2, common_type2>{}, "common_type wrong for 2 values.");
-	using type3 = bounded::integer<-5, -5>;
-	using common_type3 = std::common_type_t<type1, type2, type3>;
-	using expected_type3 = bounded::integer<-5, 10>;
-	static_assert(is_same_bounded<expected_type3, common_type3>{}, "common_type wrong for 3 values.");
-	using type4 = bounded::integer<0, 0>;
-	using common_type4 = std::common_type_t<type1, type2, type3, type4>;
-	using expected_type4 = bounded::integer<-5, 10>;
-	static_assert(is_same_bounded<expected_type4, common_type4>{}, "common_type wrong for 4 values.");
-
-
-	static_assert(
-		std::is_same<bounded::detail::common_cv_type_t<int, int>, int>{},
-		"Incorrect type for int, int."
-	);
-
-	static_assert(
-		std::is_same<bounded::detail::common_cv_type_t<int const, int>, int const>{},
-		"Incorrect type for int const, int."
-	);
-
-	static_assert(
-		std::is_same<bounded::detail::common_cv_type_t<int, int volatile>, int volatile>{},
-		"Incorrect type for int, int volatile."
-	);
-
-	static_assert(
-		std::is_same<bounded::detail::common_cv_type_t<int const volatile, int>, int const volatile>{},
-		"Incorrect type for int const volatile, int."
-	);
-
-	static_assert(
-		std::is_same<bounded::detail::common_cv_type_t<int volatile, int const volatile>, int const volatile>{},
-		"Incorrect type for int volatile, int const volatile."
-	);
-
-	static_assert(
-		std::is_same<bounded::detail::common_cv_type_t<int volatile, int const>, int const volatile>{},
-		"Incorrect type for int volatile, int const."
-	);
-
-	static_assert(
-		std::is_same<bounded::detail::common_cv_type_t<int const volatile, int const volatile>, int const volatile>{},
-		"Incorrect type for int const volatile, int const volatile."
-	);
-
-
-
-
-
-	static_assert(
-		std::is_same<bounded::detail::common_type_and_value_category_t<int>, int>{},
-		"Incorrect type for int."
-	);
-
-
-
-	static_assert(
-		std::is_same<bounded::detail::common_type_and_value_category_t<int, int>, int>{},
-		"Incorrect type for int, int."
-	);
-
-	static_assert(
-		std::is_same<bounded::detail::common_type_and_value_category_t<int &, int>, int>{},
-		"Incorrect type for int &, int."
-	);
-
-	static_assert(
-		std::is_same<bounded::detail::common_type_and_value_category_t<int const &, int>, int>{},
-		"Incorrect type for int const &, int."
-	);
-
-	static_assert(
-		std::is_same<bounded::detail::common_type_and_value_category_t<int &&, int>, int>{},
-		"Incorrect type for int &&, int."
-	);
-
-	static_assert(
-		std::is_same<bounded::detail::common_type_and_value_category_t<int const &, int const &>, int const &>{},
-		"Incorrect type for int const &, int const &."
-	);
-
-	static_assert(
-		std::is_same<bounded::detail::common_type_and_value_category_t<int &, int const &>, int const &>{},
-		"Incorrect type for int &, int const &."
-	);
-
-	static_assert(
-		std::is_same<bounded::detail::common_type_and_value_category_t<int &&, int const &>, int>{},
-		"Incorrect type for int &&, int const &."
-	);
-
-	static_assert(
-		std::is_same<bounded::detail::common_type_and_value_category_t<int &, int &>, int &>{},
-		"Incorrect type for int &, int &."
-	);
-
-	static_assert(
-		std::is_same<bounded::detail::common_type_and_value_category_t<int &&, int &>, int>{},
-		"Incorrect type for int &&, int &."
-	);
-
-	static_assert(
-		std::is_same<bounded::detail::common_type_and_value_category_t<int &&, int &&>, int &&>{},
-		"Incorrect type for int &&, int &&."
-	);
-
-
-
-	static_assert(
-		std::is_same<bounded::detail::common_type_and_value_category_t<int, long>, long>{},
-		"Incorrect type for int, long."
-	);
-
-	static_assert(
-		std::is_same<bounded::detail::common_type_and_value_category_t<int &, long>, long>{},
-		"Incorrect type for int &, long."
-	);
-
-	static_assert(
-		std::is_same<bounded::detail::common_type_and_value_category_t<int const &, long>, long>{},
-		"Incorrect type for int const &, long."
-	);
-
-	static_assert(
-		std::is_same<bounded::detail::common_type_and_value_category_t<int &&, long>, long>{},
-		"Incorrect type for int &&, long."
-	);
-
-	static_assert(
-		std::is_same<bounded::detail::common_type_and_value_category_t<int const &, long const &>, long>{},
-		"Incorrect type for int const &, long const &."
-	);
-
-	static_assert(
-		std::is_same<bounded::detail::common_type_and_value_category_t<int &, long const &>, long>{},
-		"Incorrect type for int &, long const &."
-	);
-
-	static_assert(
-		std::is_same<bounded::detail::common_type_and_value_category_t<int &&, long const &>, long>{},
-		"Incorrect type for int &&, long const &."
-	);
-
-	static_assert(
-		std::is_same<bounded::detail::common_type_and_value_category_t<int &, long &>, long>{},
-		"Incorrect type for int &, long &."
-	);
-
-	static_assert(
-		std::is_same<bounded::detail::common_type_and_value_category_t<int &&, long &>, long>{},
-		"Incorrect type for int &&, long &."
-	);
-
-	static_assert(
-		std::is_same<bounded::detail::common_type_and_value_category_t<int &&, long &&>, long>{},
-		"Incorrect type for int &&, long &&."
-	);
-
-
-
-	static_assert(
-		std::is_same<bounded::detail::common_type_and_value_category_t<long &, int>, long>{},
-		"Incorrect type for long &, int."
-	);
-
-	static_assert(
-		std::is_same<bounded::detail::common_type_and_value_category_t<long const &, int>, long>{},
-		"Incorrect type for long const &, int."
-	);
-
-	static_assert(
-		std::is_same<bounded::detail::common_type_and_value_category_t<long &&, int>, long>{},
-		"Incorrect type for long &&, int."
-	);
-
-	static_assert(
-		std::is_same<bounded::detail::common_type_and_value_category_t<long const &, int const &>, long>{},
-		"Incorrect type for long const &, int const &."
-	);
-
-	static_assert(
-		std::is_same<bounded::detail::common_type_and_value_category_t<long &, int const &>, long>{},
-		"Incorrect type for long &, int const &."
-	);
-
-	static_assert(
-		std::is_same<bounded::detail::common_type_and_value_category_t<long &&, int const &>, long>{},
-		"Incorrect type for long &&, int const &."
-	);
-
-	static_assert(
-		std::is_same<bounded::detail::common_type_and_value_category_t<long &, int &>, long>{},
-		"Incorrect type for long &, int &."
-	);
-
-	static_assert(
-		std::is_same<bounded::detail::common_type_and_value_category_t<long &&, int &>, long>{},
-		"Incorrect type for long &&, int &."
-	);
-
-	static_assert(
-		std::is_same<bounded::detail::common_type_and_value_category_t<long &&, int &&>, long>{},
-		"Incorrect type for long &&, int &&."
-	);
-
-
-
-	static_assert(
-		std::is_same<bounded::detail::common_type_and_value_category_t<int, int, int>, int>{},
-		"Incorrect type for int, int, int."
-	);
-}
-
-
-namespace check_comparison {
-	constexpr bounded::integer<1, 10> a(5);
-	static_assert(
-		a == a,
-		"Values do not equal themselves"
-	);
-	static_assert(
-		a == 5,
-		"Values do not equal their underlying value"
-	);
-	constexpr bounded::checked_integer<4, 36346> b(5);
-	static_assert(
-		a == b,
-		"Values do not equal equivalent other bounded::integer types"
-	);
-
-	static_assert(
-		bounded::constant<5> != bounded::constant<6>,
-		"5 should not equal 6"
-	);
-
-	constexpr auto one = bounded::constant<1>;
-	static_assert(
-		!std::numeric_limits<decltype(one)::underlying_type>::is_signed,
-		"Value should be unsigned for this test."
-	);
-	constexpr auto negative_one = bounded::constant<-1>;
-	static_assert(
-		std::numeric_limits<decltype(negative_one)::underlying_type>::is_signed,
-		"Value should be signed for this test."
-	);
-	static_assert(
-		negative_one < one,
-		"Small negative values should be less than small positive values."
-	);
-	constexpr intmax_t int_min = std::numeric_limits<int>::min();
-	constexpr intmax_t int_max = std::numeric_limits<int>::max();
-	static_assert(
-		bounded::constant<int_min> < bounded::constant<int_max + 1>,
-		"Large negative values should be less than large positive values."
-	);
-
-	// I have to use the preprocessor here to create a string literal
-	#define BOUNDED_INTEGER_SINGLE_COMPARISON(lhs, op, rhs, result) \
-		static_assert( \
-			(((lhs) op (rhs)) == (result)), \
-			"Incorrect result for (" #lhs ") " #op " ( " #rhs ") == " #result \
-		)
-
-	#define BOUNDED_INTEGER_COMPARISON(lhs, op, rhs) \
-		BOUNDED_INTEGER_SINGLE_COMPARISON(bounded::constant<lhs>, op, bounded::constant<rhs>, ((lhs) op (rhs))); \
-		BOUNDED_INTEGER_SINGLE_COMPARISON(bounded::constant<lhs>, op, rhs, ((lhs) op (rhs))); \
-		BOUNDED_INTEGER_SINGLE_COMPARISON(lhs, op, bounded::constant<rhs>, ((lhs) op (rhs))); \
-		BOUNDED_INTEGER_SINGLE_COMPARISON(bounded::constant<rhs>, op, bounded::constant<lhs>, ((rhs) op (lhs))); \
-		BOUNDED_INTEGER_SINGLE_COMPARISON(bounded::constant<rhs>, op, lhs, ((rhs) op (lhs))); \
-		BOUNDED_INTEGER_SINGLE_COMPARISON(rhs, op, bounded::constant<lhs>, ((rhs) op (lhs)))
-
-	BOUNDED_INTEGER_COMPARISON(-4, <=, -4);
-	BOUNDED_INTEGER_COMPARISON(-4, <=, 16);
-	BOUNDED_INTEGER_COMPARISON(16, <=, 400);
-	BOUNDED_INTEGER_COMPARISON(-17, <, 0);
-	BOUNDED_INTEGER_COMPARISON(-17, <, 17);
-	BOUNDED_INTEGER_COMPARISON(0, < , 17);
-	BOUNDED_INTEGER_COMPARISON(876, >=, 876);
-	BOUNDED_INTEGER_COMPARISON(876, >=, 367);
-	BOUNDED_INTEGER_COMPARISON(1LL << 50LL, >, 1LL << 30LL);
-	BOUNDED_INTEGER_COMPARISON(1LL << 50LL, >, 7);
-
-	#undef BOUNDED_INTEGER_COMPARISON
-	#undef BOUNDED_INTEGER_SINGLE_COMPARISON
-
-	auto non_constexpr_five = bounded::constant<5>;
-	auto non_constexpr_four = bounded::constant<4>;
-	static_assert(non_constexpr_five == non_constexpr_five, "operator== not constexpr for non-constexpr arguments.");
-	static_assert(non_constexpr_five != non_constexpr_four, "operator!= not constexpr for non-constexpr arguments.");
-	static_assert(non_constexpr_four < non_constexpr_five, "operator< not constexpr for non-constexpr arguments.");
-	static_assert(non_constexpr_four <= non_constexpr_four, "operator<= not constexpr for non-constexpr arguments.");
-}
-
-
-template<typename Integer>
-constexpr auto test_log(Integer const value, bounded::constant_t<2>) {
-	switch (static_cast<uintmax_t>(value)) {
-		case 1: return 0;
-		case 2: return 1;
-		case 3: return 1;
-		case 8: return 3;
-		case 9: return 3;
-		case 10: return 3;
-		case 11: return 3;
-		case 255: return 7;
-		case 998: return 9;
-		case 999: return 9;
-		case 1000: return 9;
-		case 1022: return 9;
-		case 1023: return 9;
-		case 1024: return 10;
-		case 1025: return 10;
-		case static_cast<uint64_t>(std::numeric_limits<int64_t>::max()): return 62;
-		case -static_cast<uint64_t>(std::numeric_limits<int64_t>::min()): return 63;
-		// doesn't matter what we throw, compilation error
-		default: throw 0;
-	}
-}
-
-template<typename Integer>
-constexpr auto test_log(Integer const value, bounded::constant_t<10>) {
-	switch (static_cast<uintmax_t>(value)) {
-		case 1: return 0;
-		case 2: return 0;
-		case 3: return 0;
-		case 8: return 0;
-		case 9: return 0;
-		case 10: return 1;
-		case 11: return 1;
-		case 255: return 2;
-		case 998: return 2;
-		case 999: return 2;
-		case 1000: return 3;
-		case 1022: return 3;
-		case 1023: return 3;
-		case 1024: return 3;
-		case 1025: return 3;
-		case static_cast<uint64_t>(std::numeric_limits<int64_t>::max()): return 18;
-		case -static_cast<uint64_t>(std::numeric_limits<int64_t>::min()): return 18;
-		// doesn't matter what we throw, compilation error
-		default: throw 0;
-	}
-}
-
-#define BOUNDED_INTEGER_LOG_TEST_INDIVIDUAL(value, base) \
-	static_assert(bounded::log(value, base) == test_log(value, base), "Incorrect log for " #value)
-
-#define BOUNDED_INTEGER_LOG_TEST(value) \
-	BOUNDED_INTEGER_LOG_TEST_INDIVIDUAL(bounded::constant<value>, bounded::constant<2>); \
-	BOUNDED_INTEGER_LOG_TEST_INDIVIDUAL(bounded::constant<value>, bounded::constant<10>)
-
-BOUNDED_INTEGER_LOG_TEST(1);
-BOUNDED_INTEGER_LOG_TEST(2);
-BOUNDED_INTEGER_LOG_TEST(3);
-BOUNDED_INTEGER_LOG_TEST(8);
-BOUNDED_INTEGER_LOG_TEST(9);
-BOUNDED_INTEGER_LOG_TEST(10);
-BOUNDED_INTEGER_LOG_TEST(11);
-BOUNDED_INTEGER_LOG_TEST(255);
-BOUNDED_INTEGER_LOG_TEST(998);
-BOUNDED_INTEGER_LOG_TEST(999);
-BOUNDED_INTEGER_LOG_TEST(1000);
-BOUNDED_INTEGER_LOG_TEST(1022);
-BOUNDED_INTEGER_LOG_TEST(1023);
-BOUNDED_INTEGER_LOG_TEST(1024);
-BOUNDED_INTEGER_LOG_TEST(1025);
-BOUNDED_INTEGER_LOG_TEST(std::numeric_limits<int64_t>::max());
-
-#undef BOUNDED_INTEGER_LOG_TEST
-#undef BOUNDED_INTEGER_LOG_TEST_INDIVIDUAL
-
-
-template<typename integer>
-auto check_numeric_limits() {
-	using int_limits = std::numeric_limits<integer>;
-	using bounded_t = bounded::checked_integer<int_limits::min(), int_limits::max()>;
-	static_assert(std::is_same<typename bounded_t::underlying_type, integer>{}, "Incorrect underlying_type.");
-	using bounded_limits = std::numeric_limits<bounded_t>;
-	static_assert(sizeof(bounded_t) == sizeof(integer), "checked_integer wrong size.");
-
-	// I have to use the preprocessor here to create a string literal
-	#define BOUNDED_INTEGER_CHECK_CONDITION(condition) \
-		static_assert(int_limits::condition == bounded_limits::condition, #condition " is wrong.")
-	BOUNDED_INTEGER_CHECK_CONDITION(is_specialized);
-	BOUNDED_INTEGER_CHECK_CONDITION(is_integer);
-	BOUNDED_INTEGER_CHECK_CONDITION(is_exact);
-	BOUNDED_INTEGER_CHECK_CONDITION(has_infinity);
-	BOUNDED_INTEGER_CHECK_CONDITION(has_quiet_NaN);
-	BOUNDED_INTEGER_CHECK_CONDITION(has_signaling_NaN);
-	BOUNDED_INTEGER_CHECK_CONDITION(has_denorm);
-	BOUNDED_INTEGER_CHECK_CONDITION(has_denorm_loss);
-	BOUNDED_INTEGER_CHECK_CONDITION(is_iec559);
-	BOUNDED_INTEGER_CHECK_CONDITION(is_bounded);
-	// is_modulo intentionally left out because bounded::integer may differ from
-	// the behavior of built-ins. Instead, just instantiate it with a
-	// do-nothing test to verify that it compiles.
-	static_cast<void>(bounded_limits::is_modulo);
-	// BOUNDED_INTEGER_CHECK_CONDITION(is_modulo);
-	BOUNDED_INTEGER_CHECK_CONDITION(radix);
-	BOUNDED_INTEGER_CHECK_CONDITION(digits);
-	BOUNDED_INTEGER_CHECK_CONDITION(digits10);
-	BOUNDED_INTEGER_CHECK_CONDITION(max_digits10);
-	BOUNDED_INTEGER_CHECK_CONDITION(min_exponent);
-	BOUNDED_INTEGER_CHECK_CONDITION(min_exponent10);
-	BOUNDED_INTEGER_CHECK_CONDITION(max_exponent);
-	BOUNDED_INTEGER_CHECK_CONDITION(max_exponent10);
-	BOUNDED_INTEGER_CHECK_CONDITION(traps);
-	BOUNDED_INTEGER_CHECK_CONDITION(tinyness_before);
-	#undef BOUNDED_INTEGER_CHECK_CONDITION
-
-	#define BOUNDED_INTEGER_CHECK_FUNCTION(function) \
-		static_assert(int_limits::function() == bounded_limits::function().value(), #function "() is wrong.")
-	// Some of the functions are meaningless for integers, so I do not compare
-	#define BOUNDED_INTEGER_CHECK_MEANINGLESS_FUNCTION(function) \
-		static_cast<void>(bounded_limits::function())
-	BOUNDED_INTEGER_CHECK_FUNCTION(min);
-	BOUNDED_INTEGER_CHECK_FUNCTION(lowest);
-	BOUNDED_INTEGER_CHECK_FUNCTION(max);
-	BOUNDED_INTEGER_CHECK_MEANINGLESS_FUNCTION(epsilon);
-	BOUNDED_INTEGER_CHECK_MEANINGLESS_FUNCTION(round_error);
-	BOUNDED_INTEGER_CHECK_MEANINGLESS_FUNCTION(infinity);
-	BOUNDED_INTEGER_CHECK_MEANINGLESS_FUNCTION(quiet_NaN);
-	BOUNDED_INTEGER_CHECK_MEANINGLESS_FUNCTION(signaling_NaN);
-	BOUNDED_INTEGER_CHECK_MEANINGLESS_FUNCTION(denorm_min);
-	#undef BOUNDED_INTEGER_CHECK_MEANINGLESS_FUNCTION
-	#undef BOUNDED_INTEGER_CHECK_FUNCTION
-}
-
-
-auto check_numeric_limits_all() {
-	static_assert(std::numeric_limits<bounded::integer<1, 1000>>::digits == 0, "Meaningless digits not 0.");
-
-	check_numeric_limits<int8_t>();
-	check_numeric_limits<uint8_t>();
-	check_numeric_limits<int16_t>();
-	check_numeric_limits<uint16_t>();
-	check_numeric_limits<int32_t>();
-	check_numeric_limits<uint32_t>();
-	check_numeric_limits<int64_t>();
-	// Currently does not support unsigned types equal to uintmax_t
-	// check_numeric_limits<uint64_t>();
-}
-
-static_assert(std::is_empty<bounded::constant_t<0>>{});
-static_assert(std::is_empty<bounded::constant_t<1>>{});
-static_assert(std::is_empty<bounded::constant_t<-1>>{});
-static_assert(std::is_empty<bounded::constant_t<std::numeric_limits<std::intmax_t>::min()>>{});
-
-namespace check_overlapping_range {
-	using type = bounded::integer<0, 0>;
-	static_assert(bounded::detail::type_overlaps_range<type>(0, 0), "Type should overlap its own range.");
-	static_assert(bounded::detail::type_fits_in_range<type>(0, 0), "Type should fit in its own range.");
-	static_assert(!bounded::detail::type_overlaps_range<type>(1, 1), "Type should not overlap a disjoint range.");
-}
-
-template<bounded::storage_type storage_type>
-auto check_constructibility_specific() {
-	constexpr auto min = std::numeric_limits<int>::min();
-	constexpr auto max = std::numeric_limits<int>::max();
-	using type = bounded::integer<min, max, bounded::null_policy, storage_type>;
-	static_assert(
-		bounded::detail::type_overlaps_range<type>(min, max),
-		"Bounds of type do not overlap its own range."
-	);
-
-	static_assert(
-		bounded::detail::is_explicitly_constructible_from<bounded::null_policy, type>(min, max),
-		"Type is not explicitly constructible from itself."
-	);
-
-	static_assert(
-		std::is_convertible<int, type>{},
-		"Cannot convert integer type to bounded::integer with same range."
-	);
-	static_assert(
-		std::is_constructible<type, type, bounded::non_check_t>{},
-		"Cannot construct a type from itself with non_check_t."
-	);
-
-	static_assert(
-		!std::is_convertible<bool, type>{},
-		"Should not be able to convert a bool to a bounded::integer."
-	);
-	static_assert(
-		std::is_constructible<type, bool>{},
-		"Should be able to construct a bounded::integer from a bool."
-	);
-}
-
-auto check_constructibility() {
-	check_constructibility_specific<bounded::storage_type::fast>();
-	check_constructibility_specific<bounded::storage_type::least>();
-}
-
-template<typename Result, typename Expected>
-constexpr bool homogeneous_equals(Result const & result, Expected const & expected) noexcept {
-	static_assert(is_same_bounded<Result, Expected>{}, "Mismatched types.");
-	return result == expected;
-}
-
-
-namespace check_single_argument_minmax {
-	constexpr auto value = bounded::constant<5>;
-	static_assert(
-		bounded::addressof(bounded::min(value)) == bounded::addressof(value),
-		"A value does not have itself as the minimum."
-	);
-	static_assert(
-		bounded::addressof(bounded::max(value)) == bounded::addressof(value),
-		"A value does not have itself as the maximum."
-	);
-}
-
-namespace check_double_argument_minmax {
-	constexpr auto lower_value = bounded::constant<6>;
-	constexpr auto greater_value = bounded::constant<10>;
-	static_assert(homogeneous_equals(
-		bounded::min(lower_value, greater_value),
-		lower_value
-	));
-	static_assert(homogeneous_equals(
-		bounded::min(greater_value, lower_value),
-		lower_value
-	));
-	static_assert(homogeneous_equals(
-		bounded::max(lower_value, greater_value),
-		greater_value
-	));
-	static_assert(homogeneous_equals(
-		bounded::max(greater_value, lower_value),
-		greater_value
-	));
-}
-
-namespace check_many_argument_minmax {
-	constexpr auto value = bounded::integer<-53, 1000>(bounded::constant<3>);
-	static_assert(homogeneous_equals(
-		bounded::min(bounded::constant<0>, bounded::constant<10>, bounded::constant<5>, value),
-		bounded::integer<-53, 0>(0)
-	));
-
-	static_assert(homogeneous_equals(
-		bounded::max(bounded::constant<0>, bounded::constant<10>, bounded::constant<5>, value),
-		bounded::integer<10, 1000>(10)
-	));
-
-	static_assert(homogeneous_equals(
-		bounded::min(0, 1, 2, 3, 4, 5, 6, 7, 8, 9),
-		0
-	));
-}
-
-namespace check_non_integer_minmax {
-	BOUNDED_COMPARISON
-
-	struct string_view {
-		explicit constexpr string_view(char const * value_) noexcept:
-			value(value_) {
-		}
-		friend constexpr auto compare(string_view const lhs, string_view const rhs) noexcept -> bounded::strong_ordering {
-			if (auto const cmp = bounded::compare(*lhs.value, *rhs.value); cmp != 0 or *lhs.value == '\0') {
-				return cmp;
-			} else {
-				return compare(string_view(lhs.value + 1), string_view(rhs.value + 1));
-			}
-		}
-	private:
-		char const * value;
-	};
-
-	static_assert(string_view("0") < string_view("1"), "Incorrect string comparison function.");
-	static_assert(string_view("00") < string_view("1"), "Incorrect string comparison function.");
-	static_assert(string_view("0") < string_view("11"), "Incorrect string comparison function.");
-	static_assert(string_view("09") < string_view("1"), "Incorrect string comparison function.");
-	static_assert(string_view("09") < string_view("10"), "Incorrect string comparison function.");
-	static_assert(string_view("1") < string_view("10"), "Incorrect string comparison function.");
-	static_assert(string_view("10") > string_view("1"), "Incorrect string comparison function.");
-	static_assert(string_view("1") == string_view("1"), "Incorrect string comparison function.");
-
-	static_assert(bounded::min(string_view("0"), string_view("1")) == string_view("0"), "Incorrect value of min for string arguments.");
-	static_assert(bounded::min(string_view("00"), string_view("1")) == string_view("00"), "Incorrect value of min for string arguments.");
-	static_assert(bounded::min(string_view("0"), string_view("11")) == string_view("0"), "Incorrect value of min for string arguments.");
-	static_assert(bounded::min(string_view("09"), string_view("1")) == string_view("09"), "Incorrect value of min for string arguments.");
-	static_assert(bounded::min(string_view("09"), string_view("10")) == string_view("09"), "Incorrect value of min for string arguments.");
-	static_assert(bounded::min(string_view("1"), string_view("10")) == string_view("1"), "Incorrect value of min for string arguments.");
-	static_assert(bounded::min(string_view("10"), string_view("1")) == string_view("1"), "Incorrect value of min for string arguments.");
-	static_assert(bounded::min(string_view("1"), string_view("1")) == string_view("1"), "Incorrect value of min for string arguments.");
-}
-
-template<typename T>
-auto check_specific_reference_minmax() {
-	T m1{};
-	T m2{};
-	T const c1{};
-	T const c2{};
-
-	static_assert(
-		std::is_same<decltype(bounded::min(m1, m2)), T &>{},
-		"Incorrect result type for bounded::min with T & and T &."
-	);
-
-	static_assert(
-		std::is_same<decltype(bounded::min(c1, c2)), T const &>{},
-		"Incorrect result type for bounded::min with T const & and T const &."
-	);
-
-	static_assert(
-		std::is_same<decltype(bounded::min(m1, c1)), T const &>{},
-		"Incorrect result type for bounded::min with T & and T const &."
-	);
-	
-	static_assert(
-		std::is_same<decltype(bounded::min(T{}, T{})), T>{},
-		"Incorrect result type for bounded::min with T and T."
-	);
-	static_assert(
-		std::is_same<decltype(bounded::min(m1, T{})), T>{},
-		"Incorrect result type for bounded::min with T & and T."
-	);
-	static_assert(
-		std::is_same<decltype(bounded::min(c1, T{})), T>{},
-		"Incorrect result type for bounded::min with T const & and T."
-	);
-}
-
-auto check_reference_minmax() {
-	// Check that built-in and class types have the same behavior, unlike
-	// operator?:
-	check_specific_reference_minmax<int>();
-	struct class_type {
-		constexpr auto compare(class_type) const noexcept {
-			return bounded::strong_ordering_equal;
-		}
-	};
-	check_specific_reference_minmax<class_type>();
-	
-	int const i{};
-	long const l{};
-	static_assert(
-		std::is_same<decltype(bounded::min(i, l)), long>{},
-		"Incorrect result type for bounded::min with int const & and long const &."
-	);
-}
-
-auto check_minmax() {
-	check_reference_minmax();
-}
-
-
-namespace check_arithmetic {
-	constexpr auto signed_max = bounded::constant<std::numeric_limits<std::intmax_t>::max()>;
-	constexpr auto signed_min = bounded::constant<std::numeric_limits<std::intmax_t>::min()>;
-	constexpr auto unsigned_max = bounded::constant<std::numeric_limits<std::uintmax_t>::max()>;
-
-	constexpr bounded::checked_integer<1, 10> const x(9);
-	static_assert(
-		sizeof(x) == 1,
-		"bounded::integer too big!"
-	);
-	constexpr bounded::checked_integer<-3, 11> const z(4);
-	static_assert(
-		std::numeric_limits<decltype(z)>::is_signed,
-		"bounded::integer with negative value in range should be signed."
-	);
-
-
-	// unary plus
-	static_assert(homogeneous_equals(
-		+bounded::constant<0>,
-		bounded::constant<0>
-	));
-	static_assert(homogeneous_equals(
-		+signed_max,
-		signed_max
-	));
-	static_assert(homogeneous_equals(
-		+signed_min,
-		signed_min
-	));
-	static_assert(homogeneous_equals(
-		+unsigned_max,
-		unsigned_max
-	));
-	static_assert(homogeneous_equals(
-		+x,
-		x
-	));
-
-	// unary minus
-	static_assert(homogeneous_equals(
-		-bounded::constant<0>,
-		bounded::constant<0>
-	));
-	static_assert(homogeneous_equals(
-		-signed_max,
-		bounded::constant<-static_cast<std::intmax_t>(signed_max)>
-	));
-	static_assert(homogeneous_equals(
-		-signed_min,
-		bounded::constant<-static_cast<std::uintmax_t>(signed_min)>
-	));
-	static_assert(homogeneous_equals(
-		-x,
-		bounded::checked_integer<-10, -1>(-9)
-	));
-
-	// plus
-	static_assert(homogeneous_equals(
-		bounded::constant<0> + bounded::constant<0>,
-		bounded::constant<0>
-	));
-	static_assert(homogeneous_equals(
-		bounded::constant<0> + bounded::constant<1>,
-		bounded::constant<1>
-	));
-	static_assert(homogeneous_equals(
-		bounded::constant<-1> + bounded::constant<1>,
-		bounded::constant<0>
-	));
-	static_assert(homogeneous_equals(
-		signed_max + bounded::constant<1>,
-		bounded::constant<static_cast<std::uintmax_t>(signed_max) + 1>
-	));
-	#if 0
-	static_assert(homogeneous_equals(
-		unsigned_max + signed_min,
-		bounded::constant<static_cast<std::uintmax_t>(unsigned_max) + static_cast<std::uintmax_t>(signed_min)>
-	));
-	#endif
-	static_assert(homogeneous_equals(
-		x + z,
-		bounded::checked_integer<-2, 21>(13)
-	));
-	static_assert(homogeneous_equals(
-		x + std::integral_constant<int, 5>{},
-		bounded::integer<6, 15>(14)
-	));
-
-	// minus
-	static_assert(homogeneous_equals(
-		bounded::constant<0> - bounded::constant<0>,
-		bounded::constant<0>
-	));
-	static_assert(homogeneous_equals(
-		bounded::constant<0> - bounded::constant<1>,
-		bounded::constant<-1>
-	));
-	#if 0
-	static_assert(homogeneous_equals(
-		unsigned_max - signed_max,
-		bounded::constant<static_cast<std::uintmax_t>(unsigned_max) - static_cast<std::uintmax_t>(signed_max)>
-	));
-	#endif
-	static_assert(homogeneous_equals(
-		x - z,
-		bounded::checked_integer<-10, 13>(5)
-	));
-
-	// multiplies
-	static_assert(homogeneous_equals(
-		bounded::constant<0> * bounded::constant<0>,
-		bounded::constant<0>
-	));
-	static_assert(homogeneous_equals(
-		bounded::constant<0> * bounded::constant<1000>,
-		bounded::constant<0>
-	));
-	static_assert(homogeneous_equals(
-		signed_max * bounded::constant<1>,
-		signed_max
-	));
-	static_assert(homogeneous_equals(
-		signed_min * bounded::constant<1>,
-		signed_min
-	));
-	static_assert(homogeneous_equals(
-		unsigned_max * bounded::constant<1>,
-		unsigned_max
-	));
-	static_assert(homogeneous_equals(
-		signed_max * bounded::constant<-1>,
-		-signed_max
-	));
-	#if 0
-	static_assert(homogeneous_equals(
-		signed_min * bounded::constant<-1>,
-		-signed_min
-	));
-	#endif
-	static_assert(homogeneous_equals(
-		signed_max * bounded::constant<2>,
-		signed_max + signed_max
-	));
-	static_assert(homogeneous_equals(
-		x * z,
-		bounded::checked_integer<-30, 110>(36)
-	));
-
-	// divides
-	static_assert(homogeneous_equals(
-		bounded::constant<0> / bounded::constant<1>,
-		bounded::constant<0>
-	));
-	static_assert(homogeneous_equals(
-		bounded::constant<1> / bounded::constant<1>,
-		bounded::constant<1>
-	));
-	static_assert(homogeneous_equals(
-		bounded::constant<1> / bounded::constant<2>,
-		bounded::constant<0>
-	));
-	static_assert(homogeneous_equals(
-		bounded::constant<0> / bounded::constant<-1>,
-		bounded::constant<0>
-	));
-	static_assert(homogeneous_equals(
-		bounded::constant<1> / bounded::constant<-1>,
-		bounded::constant<-1>
-	));
-	static_assert(homogeneous_equals(
-		bounded::constant<-1> / bounded::constant<1>,
-		bounded::constant<-1>
-	));
-	static_assert(homogeneous_equals(
-		bounded::constant<-1> / bounded::constant<-1>,
-		bounded::constant<1>
-	));
-	static_assert(homogeneous_equals(
-		signed_max / bounded::constant<1>,
-		signed_max
-	));
-	static_assert(homogeneous_equals(
-		signed_min / bounded::constant<1>,
-		signed_min
-	));
-	static_assert(homogeneous_equals(
-		unsigned_max / bounded::constant<1>,
-		unsigned_max
-	));
-	static_assert(homogeneous_equals(
-		signed_max / bounded::constant<-1>,
-		-signed_max
-	));
-	#if 0
-	static_assert(homogeneous_equals(
-		signed_min / bounded::constant<-1>,
-		-signed_min
-	));
-	#endif
-	static_assert(homogeneous_equals(
-		unsigned_max / bounded::constant<2>,
-		signed_max
-	));
-	static_assert(homogeneous_equals(
-		unsigned_max / signed_max,
-		bounded::constant<2>
-	));
-	static_assert(homogeneous_equals(
-		x / z,
-		bounded::checked_integer<-10, 10>(2)
-	));
-
-	// constexpr auto fails_to_compile = bounded::constant<1> / bounded::constant<0>;
-
-
-	// modulus
-	static_assert(homogeneous_equals(
-		bounded::constant<0> % bounded::constant<1>,
-		bounded::constant<0>
-	));
-	static_assert(homogeneous_equals(
-		bounded::constant<10> % bounded::constant<11>,
-		bounded::constant<10>
-	));
-	static_assert(homogeneous_equals(
-		bounded::constant<10> % bounded::constant<9>,
-		bounded::constant<1>
-	));
-	static_assert(homogeneous_equals(
-		bounded::constant<9> % bounded::constant<11>,
-		bounded::constant<9>
-	));
-	static_assert(homogeneous_equals(
-		bounded::constant<11> % bounded::constant<9>,
-		bounded::constant<2>
-	));
-	static_assert(homogeneous_equals(
-		bounded::constant<13> % bounded::constant<6>,
-		bounded::constant<1>
-	));
-	static_assert(homogeneous_equals(
-		signed_min % bounded::constant<1>,
-		bounded::constant<0>
-	));
-	static_assert(homogeneous_equals(
-		signed_max % bounded::constant<1>,
-		bounded::constant<0>
-	));
-	static_assert(homogeneous_equals(
-		unsigned_max % bounded::constant<1>,
-		bounded::constant<0>
-	));
-	static_assert(homogeneous_equals(
-		bounded::integer<17, 23>(20) % bounded::integer<-54, -6>(-33),
-		bounded::integer<0, 23>(20 % -33)
-	));
-	static_assert(homogeneous_equals(
-		bounded::integer<-54, -6>(-33) % bounded::integer<17, 23>(20),
-		bounded::integer<-22, 0>(-33 % 20)
-	));
-	static_assert(homogeneous_equals(
-		bounded::integer<-22, 0>(-33 % 20) % bounded::integer<0, 23>(20 % -33),
-		bounded::integer<-22, 0>(-13)
-	));
-	static_assert(homogeneous_equals(
-		bounded::integer<0, 10>(10) % bounded::constant<6>,
-		bounded::integer<0, 5>(4)
-	));
-	static_assert(homogeneous_equals(
-		bounded::constant<0> % bounded::constant<1>,
-		bounded::constant<0>
-	));
-	static_assert(homogeneous_equals(
-		bounded::integer<73, 76>(73) % bounded::integer<7, 8>(7),
-		bounded::integer<1, 6>(73 % 7)
-	));
-	static_assert(homogeneous_equals(
-		bounded::integer<74, 75>(74) % bounded::integer<7, 8>(7),
-		bounded::integer<2, 5>(74 % 7)
-	));
-
-	// auto undefined = 1 % zero;
-
-#if 0	
-	// The algorithm to compute the bounds current runs in O(n) compile time,
-	// and thus this test exceed's the constexpr evaluation limits.
-	constexpr auto bounded_intmax_t = bounded::integer<std::numeric_limits<intmax_t>::min(), std::numeric_limits<intmax_t>::max()>(std::numeric_limits<intmax_t>::min());
-	static_assert(homogeneous_equals(
-		bounded_intmax_t % bounded_intmax_t,
-		bounded::integer<std::numeric_limits<intmax_t>::min() + 1, -(std::numeric_limits<intmax_t>::min() + 1)>(0)
-	));
-#endif
-
-
-	// left shift
-	static_assert(homogeneous_equals(
-		bounded::integer<0, 2>(1) << bounded::integer<0, 60>(3),
-		bounded::integer<0, 2LL << 60LL>(1 << 3)
-	));
-
-	// right shift
-	static_assert(homogeneous_equals(
-		bounded::constant<100> >> bounded::integer<0, 50>(1),
-		bounded::integer<0, 100>(100 >> 1)
-	));
-	
-
-	// bitwise and
-	static_assert((bounded::constant<17> & 1) == bounded::constant<1>);
-	static_assert((bounded::constant<18> & 1) == bounded::constant<0>);
-
-
-	
-	using array_type = int[5];
-	constexpr array_type array{ 0, 1, 2, 3, 4 };
-	
-	static_assert(
-		*(std::begin(array) + bounded::constant<0>) == 0,
-		"Incorrect pointer arithmetic with bounded::integer."
-	);
-	static_assert(
-		*(array + bounded::constant<0>) == 0,
-		"Incorrect array arithmetic with bounded::integer."
-	);
-	static_assert(
-		array + bounded::constant<5> == std::end(array),
-		"Incorrect array arithmetic with bounded::integer."
-	);
-
-
-
-#if 0
-	// TODO: Test that this does not compile, improve error message
-	array + bounded::constant<6>
-#endif
-
-	// Oops, not possible to overload array index operator
-	#if 0
-	static_assert(
-		array[bounded::constant<0>] == 0,
-		"Incorrect array indexing with bounded::integer."
-	);
-	#endif
-}
-
-
-// I have to use the preprocessor here to create an integer literal
-#define BOUNDED_INTEGER_CHECK_LITERAL(x) \
-	static_assert(homogeneous_equals( \
-		x ## _bi, \
-		bounded::constant<x> \
-	))
-
-BOUNDED_INTEGER_CHECK_LITERAL(0);
-BOUNDED_INTEGER_CHECK_LITERAL(1);
-BOUNDED_INTEGER_CHECK_LITERAL(10);
-BOUNDED_INTEGER_CHECK_LITERAL(1000);
-BOUNDED_INTEGER_CHECK_LITERAL(4294967295);
-BOUNDED_INTEGER_CHECK_LITERAL(4294967296);
-BOUNDED_INTEGER_CHECK_LITERAL(9223372036854775807);
-#undef BOUNDED_INTEGER_CHECK_LITERAL
-
-
-static_assert(homogeneous_equals(
-	BOUNDED_CONDITIONAL(true, 7_bi, 9_bi),
-	bounded::integer<7, 9>(7)
-));
-
-
-auto check_null_policy() {
-	constexpr bounded::null_policy policy;
-	constexpr auto value1 = policy.assignment(5, 0_bi, 10_bi);
-	static_cast<void>(value1);
-	// This should not compile
-	// constexpr auto value2 = policy.assignment(15, 0_bi, 10_bi);
-}
-
 auto check_throw_policy() {
 	using bounded::checked_integer;
 	static_assert(
 		!noexcept(std::declval<checked_integer<0, 0> &>() = std::declval<checked_integer<0, 1> &>()),
 		"Shouldn't be noexcept."
 	);
-	static constexpr auto minimum = 0_bi;
-	static constexpr auto maximum = 10_bi;
+	constexpr auto minimum = bounded::constant<0>;
+	constexpr auto maximum = bounded::constant<10>;
 	auto const policy = bounded::throw_policy{};
 	try {
 		policy.assignment(20, minimum, maximum);
 		assert(false);
-	}
-	catch (...) {
+	} catch (...) {
 	}
 	try {
 		policy.assignment(-6, minimum, maximum);
 		assert(false);
-	}
-	catch (...) {
+	} catch (...) {
 	}
 }
 
 namespace check_modulo_policy {
-
-	constexpr bounded::modulo_policy policy;
-
-	static_assert(
-		policy.assignment(5_bi, 0_bi, 9_bi) == 5_bi,
-		"Incorrect result for a minimum of zero and value in range."
-	);
-
-	static_assert(
-		policy.assignment(5_bi, -5_bi, 9_bi) == 5_bi,
-		"Incorrect result for a negative minimum and value in range."
-	);
-	static_assert(
-		policy.assignment(-5_bi, -5_bi, 9_bi) == -5_bi,
-		"Incorrect result for a negative minimum and value equal to the minimum."
-	);
-
-	static_assert(
-		policy.assignment(17_bi, 0_bi, 9_bi) == 7_bi,
-		"Incorrect result for a minimum of zero and value too high."
-	);
-
-	static_assert(
-		policy.assignment(1_bi, 2_bi, 9_bi) == 9_bi,
-		"Incorrect result for a positive minimum and a positive value too low."
-	);
-
-	static_assert(
-		policy.assignment(-1_bi, 0_bi, 9_bi) == 9_bi,
-		"Incorrect result for a minimum of zero and value too low."
-	);
-
-	static_assert(
-		policy.assignment(12_bi, -5_bi, 9_bi) == -3_bi,
-		"Incorrect result for a negative minimum and value too high."
-	);
-
-	static_assert(
-		policy.assignment(-10_bi, -5_bi, 9_bi) == 5_bi,
-		"Incorrect result for a negative minimum and value too low."
-	);
-
-	static_assert(
-		policy.assignment(-1000_bi, 4_bi, 4_bi) == 4_bi,
-		"Incorrect result for a single-value range and value too low."
-	);
-	static_assert(
-		policy.assignment(4_bi, 4_bi, 4_bi) == 4_bi,
-		"Incorrect result for a single-value range and value in range."
-	);
-	static_assert(
-		policy.assignment(678412_bi, 4_bi, 4_bi) == 4_bi,
-		"Incorrect result for a single-value range and value too high."
-	);
-
-	static_assert(
-		policy.assignment(0_bi, 0_bi, 0_bi) == 0_bi,
-		"Incorrect result for a single-value range that can only hold 0 and a value of 0."
-	);
-	
-	constexpr bounded::wrapping_integer<0, 9> x(15_bi);
+	constexpr bounded::wrapping_integer<0, 9> x(bounded::constant<15>);
 	constexpr bounded::wrapping_integer<0, 1> y(x);
 	static_assert(
-		x == 5_bi,
+		x == bounded::constant<5>,
 		"Incorrect value stored with modulo policy."
 	);
 	static_assert(
-		y == 1_bi,
+		y == bounded::constant<1>,
 		"Incorrect value stored with modulo policy."
 	);
-}	// namespace
+}
 
 namespace check_clamp_policy {
-	static constexpr auto minimum = 27_bi;
-	static constexpr auto maximum = 567_bi;
+	static constexpr auto minimum = bounded::constant<27>;
+	static constexpr auto maximum = bounded::constant<567>;
 	constexpr bounded::clamp_policy policy;
 	static_assert(
-		policy.assignment(20_bi, minimum, maximum) == minimum,
+		policy.assignment(bounded::constant<20>, minimum, maximum) == minimum,
 		"Failure to properly clamp lesser positive values."
 	);
 	static_assert(
-		policy.assignment(-25_bi, minimum, maximum) == minimum,
+		policy.assignment(-bounded::constant<25>, minimum, maximum) == minimum,
 		"Failure to properly clamp negative values to a positive value."
 	);
 	static_assert(
-		policy.assignment(1000_bi, minimum, maximum) == maximum,
+		policy.assignment(bounded::constant<1000>, minimum, maximum) == maximum,
 		"Failure to properly clamp greater positive values."
 	);
 	static_assert(
-		policy.assignment(2000_bi, minimum, maximum) == maximum,
+		policy.assignment(bounded::constant<2000>, minimum, maximum) == maximum,
 		"Fail to clamp above range with a strictly greater type."
 	);
 
 	using type = bounded::integer<-100, 100, bounded::clamp_policy>;
-	constexpr auto initial = std::numeric_limits<type::underlying_type>::max() + 1_bi;
+	constexpr auto initial = std::numeric_limits<type::underlying_type>::max() + bounded::constant<1>;
 	constexpr type value(initial);
 	static_assert(
 		value == std::numeric_limits<type>::max(),
@@ -1189,7 +82,7 @@ namespace check_clamp_policy {
 	);
 
 
-	constexpr bounded::integer<minimum.value(), maximum.value(), bounded::clamp_policy> integer(1000_bi);
+	constexpr bounded::integer<minimum.value(), maximum.value(), bounded::clamp_policy> integer(bounded::constant<1000>);
 	static_assert(
 		integer == maximum,
 		"Fail to clamp when using a bounded."
@@ -1197,137 +90,20 @@ namespace check_clamp_policy {
 }
 
 auto check_policies() {
-	check_null_policy();
 	check_throw_policy();
 }
 
 
-auto check_assignment() {
-	bounded::integer<0, 10> x(5);
-	// The check for assignability fails with a hard error here currently
-	// static_assert(!std::is_assignable<decltype((x)), decltype(11_bi)>{}, "Should not be assignable.");
-	x = bounded::integer<10, 11>(10);
-	assert(x == 10_bi);
-
-	bounded::clamped_integer<0, 10> y(5);
-	y = 11_bi;
-	assert(y == 10_bi);
-}
-
-template<typename LHS, typename RHS>
-constexpr auto plus_equals(LHS lhs, RHS rhs) {
-	return lhs += rhs;
-}
-template<typename LHS, typename RHS>
-constexpr auto minus_equals(LHS lhs, RHS rhs) {
-	return lhs -= rhs;
-}
-template<typename LHS, typename RHS>
-constexpr auto times_equals(LHS lhs, RHS rhs) {
-	return lhs *= rhs;
-}
-template<typename LHS, typename RHS>
-constexpr auto divide_equals(LHS lhs, RHS rhs) {
-	return lhs /= rhs;
-}
-template<typename LHS, typename RHS>
-constexpr auto modulo_equals(LHS lhs, RHS rhs) {
-	return lhs %= rhs;
-}
-
-auto check_compound_arithmetic() {
-	using x_type = bounded::checked_integer<0, 10>;
-	using y_type = bounded::checked_integer<-10, 10>;
-	static_assert(plus_equals(x_type(5_bi), 5_bi) == 10_bi);
-	static_assert(plus_equals(y_type(-5_bi), 5) == 0_bi);
-	static_assert(plus_equals(y_type(0_bi), x_type(10_bi)) == 10_bi);
-	
-	using z_type = bounded::checked_integer<-1000, 1000>;
-	static_assert(plus_equals(z_type(0_bi), x_type(10_bi)) == 10_bi);
-	static_assert(times_equals(z_type(10_bi), x_type(10_bi) - 5) == 50_bi);
-	static_assert(times_equals(z_type(10_bi), x_type(10_bi) - 5) == 50_bi);
-	static_assert(minus_equals(z_type(50_bi), 1) == 49_bi);
-	static_assert(divide_equals(z_type(49_bi), 7) == 7_bi);
-	static_assert(modulo_equals(x_type(10_bi), 6_bi) == 4_bi);
-	
-	short s = 0;
-	s += 4_bi;
-	assert(s == 4);
-	static_assert(minus_equals(9, 68_bi) == -59);
-	// long l = -7;
-	// l *= z + 1_bi;
-	// assert(l == -7);
-	static_assert(divide_equals(-59, y_type(10_bi)) == -5);
-	static_assert(modulo_equals(-5, 4_bi) == -1);
-
-	auto x = x_type(4_bi);
-	auto const pre_increment = ++x;
-	assert(pre_increment == 5_bi);
-	assert(x == 5_bi);
-	x = 0;
-	assert(x == 0);
-	auto z = z_type(0_bi);
-	auto const post_increment = z++;
-	assert(post_increment == 0);
-	assert(z == 1);
-
-	static_assert(minus_equals(bounded::clamped_integer<0, 10>(5_bi), 20_bi) == 0_bi);	
-}
-
-auto check_math() {
-	static_assert(homogeneous_equals(
-		bounded::abs(bounded::integer<-10, 4>(-5)),
-		bounded::integer<0, 10>(5)
-	));
-	static_assert(homogeneous_equals(
-		bounded::abs(bounded::integer<-10, -10>(-10)),
-		bounded::integer<10, 10>(10)
-	));
-	static_assert(homogeneous_equals(
-		bounded::abs(bounded::integer<0, 0>(0)),
-		bounded::integer<0, 0>(0)
-	));
-	static_assert(homogeneous_equals(
-		bounded::abs(bounded::integer<-7, 450>(-1)),
-		bounded::integer<0, 450>(1)
-	));
-	static_assert(homogeneous_equals(
-		bounded::abs(bounded::integer<-7, 450>(1)),
-		bounded::integer<0, 450>(1)
-	));
-}
-
-
 template<typename Optional>
-auto check_empty_braces() {
+constexpr auto check_empty_braces() {
 	Optional op = {};
 	assert(!op);
 	op = {};
 	assert(!op);
 }
 
-namespace check_optional_common_type {
-
-	static_assert(
-		std::is_same<std::common_type_t<bounded::none_t, int>, bounded::optional<int>>{},
-		"common_type with none_t first wrong."
-	);
-	static_assert(
-		std::is_same<std::common_type_t<int, bounded::none_t>, bounded::optional<int>>{},
-		"common_type with none_t last wrong."
-	);
-	static_assert(
-		std::is_same<
-			std::common_type_t<decltype(1_bi), bounded::none_t, decltype(5_bi), bounded::none_t>,
-			bounded::optional<bounded::integer<bounded::detail::normalize<1>, bounded::detail::normalize<5>>>
-		>{},
-		"common_type with bounded::integer and none_t wrong."
-	);
-
-}	// namespace check_optional_common_type
-
 template<typename T>
-auto check_uncompressed_optional() {
+constexpr auto check_uncompressed_optional() {
 	using type = bounded::integer<std::numeric_limits<T>::min(), std::numeric_limits<T>::max()>;
 	static_assert(
 		sizeof(type) < sizeof(bounded::optional<type>),
@@ -1336,7 +112,7 @@ auto check_uncompressed_optional() {
 	check_empty_braces<type>();
 }
 template<intmax_t minimum, intmax_t maximum>
-auto check_compressed_optional() {
+constexpr auto check_compressed_optional() {
 	using type = bounded::integer<minimum, maximum>;
 	using compressed_type = bounded::optional<type>;
 	static_assert(
@@ -1351,7 +127,7 @@ auto check_compressed_optional() {
 }
 
 template<typename integer_type>
-auto check_integer_optional() {
+constexpr auto check_integer_optional() {
 	constexpr bounded::optional<integer_type> uninitialized_optional;
 	static_assert(!uninitialized_optional, "Default constructor should leave uninitialized.");
 	static_assert(value_or(uninitialized_optional, integer_type(9)) == integer_type(9), "value_or incorrect for uninitialized");
@@ -1378,20 +154,20 @@ auto check_integer_optional() {
 	check_empty_braces<bounded::optional<integer_type>>();
 }
 
-auto check_non_trivial_optional() {
-	using type = std::string;
+template<typename type>
+constexpr auto check_non_trivial_optional() {
 	bounded::optional<type> uninitialized_optional;
 	assert(!uninitialized_optional);
 	decltype(auto) uninitialized_value_or = value_or(uninitialized_optional, "spork");
 	assert(uninitialized_value_or == "spork");
-	static_assert(std::is_same<decltype(uninitialized_value_or), std::string>{}, "value_or incorrect for uninitialized");
-	static_assert(std::is_same<decltype(value_or(std::move(uninitialized_optional), std::string("spoon"))), std::string &&>{}, "value_or incorrect for uninitialized");
+	static_assert(std::is_same<decltype(uninitialized_value_or), type>{}, "value_or incorrect for uninitialized");
+	static_assert(std::is_same<decltype(value_or(std::move(uninitialized_optional), type("spoon"))), type &&>{}, "value_or incorrect for uninitialized");
 	bounded::optional<type> optional_string("Hello");
 	assert(optional_string);
-	auto const default_value = std::string("knife");
+	auto const default_value = type("knife");
 	decltype(auto) initialized_value_or = value_or(optional_string, default_value);
 	assert(initialized_value_or == "Hello");
-	static_assert(std::is_same<decltype(initialized_value_or), std::string const &>{}, "value_or incorrect for initialized");
+	static_assert(std::is_same<decltype(initialized_value_or), type const &>{}, "value_or incorrect for initialized");
 	assert(*optional_string == "Hello");
 
 	optional_string = uninitialized_optional;
@@ -1416,16 +192,20 @@ auto check_non_trivial_optional() {
 }
 
 auto check_optional() {
-	check_compressed_optional<1, 10>();
-	check_compressed_optional<-50, 127>();
-	check_uncompressed_optional<uint8_t>();
-	check_uncompressed_optional<int>();
-	check_uncompressed_optional<unsigned>();
-	check_uncompressed_optional<intmax_t>();
-	
-	check_integer_optional<int>();
-	check_integer_optional<bounded::checked_integer<1, 10>>();
-	check_non_trivial_optional();
+	static_assert((static_cast<void>([]{
+		check_compressed_optional<1, 10>();
+		check_compressed_optional<-50, 127>();
+		check_uncompressed_optional<uint8_t>();
+		check_uncompressed_optional<int>();
+		check_uncompressed_optional<unsigned>();
+		check_uncompressed_optional<intmax_t>();
+
+		check_integer_optional<int>();
+		check_integer_optional<bounded::checked_integer<1, 10>>();
+	}()), true));
+
+	check_non_trivial_optional<bounded_test::string_view>();
+	check_non_trivial_optional<std::string>();
 
 	constexpr auto original = bounded::make_optional(bounded::constant<0>);
 	constexpr auto copy = original;
@@ -1433,7 +213,7 @@ auto check_optional() {
 }
 
 auto check_to_string() {
-	auto const result = bounded::to_string(4_bi);
+	auto const result = bounded::to_string(bounded::constant<4>);
 	static_assert(std::is_same<decltype(result), std::string const>{}, "Incorrect type of to_string.");
 	assert(result == "4");
 }
@@ -1478,7 +258,7 @@ struct basic_numeric_limits<bounded_enum> {
 
 namespace {
 
-auto check_enum_construction() {
+namespace check_enum_construction {
 	enum unscoped_enum : int {};
 	static_assert(std::is_constructible<bounded::integer<0, 10>, unscoped_enum>{});
 	static_assert(!std::is_convertible<unscoped_enum, bounded::integer<0, 10>>{});
@@ -1495,8 +275,7 @@ auto check_enum_construction() {
 	static_assert(std::is_constructible<bounded::integer<0, 10>, bounded_enum>{});
 	// TODO: Should this be convertible?
 	static_assert(std::is_convertible<bounded_enum, bounded::integer<0, 10>>{});
-	constexpr auto c = bounded::integer(bounded_enum{});
-	static_cast<void>(c);
+	static_assert(bounded::integer(bounded_enum{}) == bounded::constant<0>);
 }
 
 // check poisoning
@@ -1505,41 +284,34 @@ static_assert(std::is_convertible<decltype(std::declval<bounded::integer<0, 10>>
 static_assert(std::is_convertible<decltype(bounded::integer(5)), bounded::integer<5, 5>>{});
 
 auto check_volatile() {
-	bounded::integer<0, 6> volatile x = 3_bi;
+	bounded::integer<0, 6> volatile x = bounded::constant<3>;
 	assert(x.value() == 3);
-	x = 2_bi;
+	x = bounded::constant<2>;
 	assert(x.value() == 2);
 }
 
 auto check_hash() {
 	std::unordered_map<bounded::integer<0, 100>, bounded::integer<0, 100>> const map = {
-		{ 1_bi, 2_bi },
-		{ 2_bi, 3_bi },
-		{ 3_bi, 5_bi },
-		{ 4_bi, 7_bi },
-		{ 5_bi, 11_bi },
-		{ 1_bi, 0_bi }
+		{ bounded::constant<1>, bounded::constant<2> },
+		{ bounded::constant<2>, bounded::constant<3> },
+		{ bounded::constant<3>, bounded::constant<5> },
+		{ bounded::constant<4>, bounded::constant<7> },
+		{ bounded::constant<5>, bounded::constant<11> },
+		{ bounded::constant<1>, bounded::constant<0> }
 	};
 	
 	assert(map.size() == 5);
-	assert(map.at(1_bi) == 2_bi);
-	assert(map.at(3_bi) == 5_bi);
+	assert(map.at(bounded::constant<1>) == bounded::constant<2>);
+	assert(map.at(bounded::constant<3>) == bounded::constant<5>);
 }
 
 }	// namespace
 
 auto main() -> int {
-	check_numeric_limits_all();
-	check_constructibility();
-	check_minmax();
 	check_policies();
-	check_assignment();
-	check_compound_arithmetic();
-	check_math();
 	check_optional();
 	check_to_string();
 	check_streaming();
-	check_enum_construction();
 	check_volatile();
 	check_hash();
 }

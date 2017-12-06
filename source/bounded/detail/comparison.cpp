@@ -3,10 +3,87 @@
 // (See accompanying file LICENSE_1_0.txt or copy at
 // http://www.boost.org/LICENSE_1_0.txt)
 
-#include <bounded/detail/class.hpp>
 #include <bounded/detail/comparison.hpp>
+#include <bounded/detail/class.hpp>
+#include <bounded/detail/comparison_builtin.hpp>
+#include <bounded/detail/typedefs.hpp>
 
 namespace {
+
+constexpr bounded::integer<1, 10> a(5, bounded::non_check);
+static_assert(
+	a == a,
+	"Values do not equal themselves"
+);
+static_assert(
+	a == 5,
+	"Values do not equal their underlying value"
+);
+constexpr bounded::checked_integer<4, 36346> b(5, bounded::non_check);
+static_assert(
+	a == b,
+	"Values do not equal equivalent other bounded::integer types"
+);
+
+static_assert(
+	bounded::constant<5> != bounded::constant<6>,
+	"5 should not equal 6"
+);
+
+static_assert(
+	!std::numeric_limits<bounded::constant_t<1>::underlying_type>::is_signed,
+	"Value should be unsigned for this test."
+);
+static_assert(
+	std::numeric_limits<bounded::constant_t<-1>::underlying_type>::is_signed,
+	"Value should be signed for this test."
+);
+static_assert(
+	bounded::constant<-1> < bounded::constant<1>,
+	"Small negative values should be less than small positive values."
+);
+constexpr intmax_t int_min = std::numeric_limits<int>::min();
+constexpr intmax_t int_max = std::numeric_limits<int>::max();
+static_assert(
+	bounded::constant<int_min> < bounded::constant<int_max + 1>,
+	"Large negative values should be less than large positive values."
+);
+
+// I have to use the preprocessor here to create a string literal
+#define BOUNDED_INTEGER_SINGLE_COMPARISON(lhs, op, rhs, result) \
+	static_assert( \
+		(((lhs) op (rhs)) == (result)), \
+		"Incorrect result for (" #lhs ") " #op " ( " #rhs ") == " #result \
+	)
+
+#define BOUNDED_INTEGER_COMPARISON(lhs, op, rhs) \
+	BOUNDED_INTEGER_SINGLE_COMPARISON(bounded::constant<lhs>, op, bounded::constant<rhs>, ((lhs) op (rhs))); \
+	BOUNDED_INTEGER_SINGLE_COMPARISON(bounded::constant<lhs>, op, rhs, ((lhs) op (rhs))); \
+	BOUNDED_INTEGER_SINGLE_COMPARISON(lhs, op, bounded::constant<rhs>, ((lhs) op (rhs))); \
+	BOUNDED_INTEGER_SINGLE_COMPARISON(bounded::constant<rhs>, op, bounded::constant<lhs>, ((rhs) op (lhs))); \
+	BOUNDED_INTEGER_SINGLE_COMPARISON(bounded::constant<rhs>, op, lhs, ((rhs) op (lhs))); \
+	BOUNDED_INTEGER_SINGLE_COMPARISON(rhs, op, bounded::constant<lhs>, ((rhs) op (lhs)))
+
+BOUNDED_INTEGER_COMPARISON(-4, <=, -4);
+BOUNDED_INTEGER_COMPARISON(-4, <=, 16);
+BOUNDED_INTEGER_COMPARISON(16, <=, 400);
+BOUNDED_INTEGER_COMPARISON(-17, <, 0);
+BOUNDED_INTEGER_COMPARISON(-17, <, 17);
+BOUNDED_INTEGER_COMPARISON(0, < , 17);
+BOUNDED_INTEGER_COMPARISON(876, >=, 876);
+BOUNDED_INTEGER_COMPARISON(876, >=, 367);
+BOUNDED_INTEGER_COMPARISON(1LL << 50LL, >, 1LL << 30LL);
+BOUNDED_INTEGER_COMPARISON(1LL << 50LL, >, 7);
+
+#undef BOUNDED_INTEGER_COMPARISON
+#undef BOUNDED_INTEGER_SINGLE_COMPARISON
+
+auto non_constexpr_five = bounded::constant<5>;
+auto non_constexpr_four = bounded::constant<4>;
+static_assert(non_constexpr_five == non_constexpr_five, "operator== not constexpr for non-constexpr arguments.");
+static_assert(non_constexpr_five != non_constexpr_four, "operator!= not constexpr for non-constexpr arguments.");
+static_assert(non_constexpr_four < non_constexpr_five, "operator< not constexpr for non-constexpr arguments.");
+static_assert(non_constexpr_four <= non_constexpr_four, "operator<= not constexpr for non-constexpr arguments.");
 
 // Intentionally not constexpr
 auto const zero = bounded::constant<0>;

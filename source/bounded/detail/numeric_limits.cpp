@@ -1,6 +1,87 @@
-// Copyright David Stone 2015.
+// Copyright David Stone 2017.
 // Distributed under the Boost Software License, Version 1.0.
 // (See accompanying file LICENSE_1_0.txt or copy at
 // http://www.boost.org/LICENSE_1_0.txt)
 
 #include <bounded/detail/numeric_limits.hpp>
+
+#include <bounded/detail/class.hpp>
+#include <bounded/detail/comparison_builtin.hpp>
+#include <bounded/detail/typedefs.hpp>
+
+namespace {
+
+template<typename integer>
+constexpr auto check_numeric_limits() {
+	using int_limits = std::numeric_limits<integer>;
+	using bounded_t = bounded::checked_integer<int_limits::min(), int_limits::max()>;
+	static_assert(std::is_same<typename bounded_t::underlying_type, integer>{}, "Incorrect underlying_type.");
+	using bounded_limits = std::numeric_limits<bounded_t>;
+	static_assert(sizeof(bounded_t) == sizeof(integer), "checked_integer wrong size.");
+
+	// I have to use the preprocessor here to create a string literal
+	#define BOUNDED_INTEGER_CHECK_CONDITION(condition) \
+		static_assert(int_limits::condition == bounded_limits::condition, #condition " is wrong.")
+	BOUNDED_INTEGER_CHECK_CONDITION(is_specialized);
+	BOUNDED_INTEGER_CHECK_CONDITION(is_integer);
+	BOUNDED_INTEGER_CHECK_CONDITION(is_exact);
+	BOUNDED_INTEGER_CHECK_CONDITION(has_infinity);
+	BOUNDED_INTEGER_CHECK_CONDITION(has_quiet_NaN);
+	BOUNDED_INTEGER_CHECK_CONDITION(has_signaling_NaN);
+	BOUNDED_INTEGER_CHECK_CONDITION(has_denorm);
+	BOUNDED_INTEGER_CHECK_CONDITION(has_denorm_loss);
+	BOUNDED_INTEGER_CHECK_CONDITION(is_iec559);
+	BOUNDED_INTEGER_CHECK_CONDITION(is_bounded);
+	// is_modulo intentionally left out because bounded::integer may differ from
+	// the behavior of built-ins. Instead, just instantiate it with a
+	// do-nothing test to verify that it compiles.
+	static_assert(bounded_limits::is_modulo == bounded_limits::is_modulo);
+	// BOUNDED_INTEGER_CHECK_CONDITION(is_modulo);
+	BOUNDED_INTEGER_CHECK_CONDITION(radix);
+	BOUNDED_INTEGER_CHECK_CONDITION(digits);
+	BOUNDED_INTEGER_CHECK_CONDITION(digits10);
+	BOUNDED_INTEGER_CHECK_CONDITION(max_digits10);
+	BOUNDED_INTEGER_CHECK_CONDITION(min_exponent);
+	BOUNDED_INTEGER_CHECK_CONDITION(min_exponent10);
+	BOUNDED_INTEGER_CHECK_CONDITION(max_exponent);
+	BOUNDED_INTEGER_CHECK_CONDITION(max_exponent10);
+	BOUNDED_INTEGER_CHECK_CONDITION(traps);
+	BOUNDED_INTEGER_CHECK_CONDITION(tinyness_before);
+	#undef BOUNDED_INTEGER_CHECK_CONDITION
+
+	#define BOUNDED_INTEGER_CHECK_FUNCTION(function) \
+		static_assert(int_limits::function() == bounded_limits::function().value(), #function "() is wrong.")
+	// Some of the functions are meaningless for integers, so I do not compare
+	#define BOUNDED_INTEGER_CHECK_MEANINGLESS_FUNCTION(function) \
+		static_cast<void>(bounded_limits::function())
+	BOUNDED_INTEGER_CHECK_FUNCTION(min);
+	BOUNDED_INTEGER_CHECK_FUNCTION(lowest);
+	BOUNDED_INTEGER_CHECK_FUNCTION(max);
+	BOUNDED_INTEGER_CHECK_MEANINGLESS_FUNCTION(epsilon);
+	BOUNDED_INTEGER_CHECK_MEANINGLESS_FUNCTION(round_error);
+	BOUNDED_INTEGER_CHECK_MEANINGLESS_FUNCTION(infinity);
+	BOUNDED_INTEGER_CHECK_MEANINGLESS_FUNCTION(quiet_NaN);
+	BOUNDED_INTEGER_CHECK_MEANINGLESS_FUNCTION(signaling_NaN);
+	BOUNDED_INTEGER_CHECK_MEANINGLESS_FUNCTION(denorm_min);
+	#undef BOUNDED_INTEGER_CHECK_MEANINGLESS_FUNCTION
+	#undef BOUNDED_INTEGER_CHECK_FUNCTION
+}
+
+
+constexpr auto check_numeric_limits_all() {
+	static_assert(std::numeric_limits<bounded::integer<1, 1000>>::digits == bounded::constant<0>, "Meaningless digits not 0.");
+
+	check_numeric_limits<int8_t>();
+	check_numeric_limits<uint8_t>();
+	check_numeric_limits<int16_t>();
+	check_numeric_limits<uint16_t>();
+	check_numeric_limits<int32_t>();
+	check_numeric_limits<uint32_t>();
+	check_numeric_limits<int64_t>();
+	// Currently does not support unsigned types equal to uintmax_t
+	// check_numeric_limits<uint64_t>();
+}
+
+static_assert((static_cast<void>(check_numeric_limits_all()), true));
+
+}	// namespace
