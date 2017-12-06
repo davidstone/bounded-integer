@@ -7,7 +7,6 @@
 
 #include <bounded/detail/minmax.hpp>
 
-#include <bounded/detail/addressof.hpp>
 #include <bounded/detail/class.hpp>
 #include "../homogeneous_equals.hpp"
 #include "../string_view.hpp"
@@ -17,11 +16,11 @@ namespace {
 namespace check_single_argument_minmax {
 	constexpr auto value = bounded::constant<5>;
 	static_assert(
-		bounded::addressof(bounded::min(value)) == bounded::addressof(value),
+		std::addressof(bounded::min(value)) == std::addressof(value),
 		"A value does not have itself as the minimum."
 	);
 	static_assert(
-		bounded::addressof(bounded::max(value)) == bounded::addressof(value),
+		std::addressof(bounded::max(value)) == std::addressof(value),
 		"A value does not have itself as the maximum."
 	);
 }

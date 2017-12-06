@@ -35,7 +35,6 @@ target_sources(bounded INTERFACE
 	$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>/include/bounded/detail/noexcept.hpp
 	$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>/include/bounded/detail/numeric_limits.hpp
 	$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>/include/bounded/detail/underlying_type.hpp
-	$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>/include/bounded/detail/addressof.hpp
 	$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>/include/bounded/detail/stream.hpp
 	$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>/include/bounded/detail/common_type_and_value_category.hpp
 	$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>/include/bounded/detail/common_type.hpp
@@ -122,7 +121,6 @@ add_executable(bounded_test
 	source/bounded/detail/forward_declaration.cpp
 	source/bounded/detail/requires.cpp
 	source/bounded/detail/is_bounded_integer.cpp
-	source/bounded/detail/addressof.cpp
 	source/bounded/detail/typedefs.cpp
 	source/bounded/detail/string.cpp
 	source/bounded/detail/noexcept.cpp

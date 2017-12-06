@@ -5,7 +5,6 @@
 
 #pragma once
 
-#include <bounded/detail/addressof.hpp>
 #include <bounded/detail/noexcept.hpp>
 #include <bounded/detail/requires.hpp>
 
@@ -54,7 +53,7 @@ constexpr struct {
 		not detail::constexpr_constructible<T>
 	)>
 	constexpr auto operator()(T & ref, Args && ... args) const BOUNDED_NOEXCEPT_REF(
-		*::new(static_cast<void *>(::bounded::addressof(ref))) T(std::forward<Args>(args)...)
+		*::new(static_cast<void *>(std::addressof(ref))) T(std::forward<Args>(args)...)
 	)
 	
 	template<typename T, typename... Args, BOUNDED_REQUIRES(
@@ -62,7 +61,7 @@ constexpr struct {
 		not detail::constexpr_constructible<T>
 	)>
 	constexpr auto operator()(T & ref, Args && ... args) const BOUNDED_NOEXCEPT_REF(
-		*::new(static_cast<void *>(::bounded::addressof(ref))) T{std::forward<Args>(args)...}
+		*::new(static_cast<void *>(std::addressof(ref))) T{std::forward<Args>(args)...}
 	)
 } construct;
 

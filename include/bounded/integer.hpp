@@ -6,7 +6,6 @@
 #pragma once
 
 #include <bounded/detail/abs.hpp>
-#include <bounded/detail/addressof.hpp>
 #include <bounded/detail/basic_numeric_limits.hpp>
 #include <bounded/detail/cast.hpp>
 #include <bounded/detail/class.hpp>
