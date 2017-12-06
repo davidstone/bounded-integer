@@ -273,20 +273,12 @@ public:
 	constexpr auto operator=(integer const & other) & noexcept -> integer & = default;
 	constexpr auto operator=(integer && other) & noexcept -> integer & = default;
 
-	template<typename T>
+	template<typename T, BOUNDED_REQUIRES(detail::is_explicitly_constructible_from<overflow_policy, T const &>(minimum, maximum))>
 	constexpr auto && operator=(T const & other) & noexcept(noexcept(apply_overflow_policy(other))) {
-		static_assert(
-			detail::is_explicitly_constructible_from<overflow_policy, T const &>(minimum, maximum),
-			"Value not in range."
-		);
 		return unchecked_assignment(apply_overflow_policy(other));
 	}
-	template<typename T>
+	template<typename T, BOUNDED_REQUIRES(detail::is_explicitly_constructible_from<overflow_policy, T const &>(minimum, maximum))>
 	auto operator=(T const & other) volatile & noexcept(noexcept(apply_overflow_policy(other))) {
-		static_assert(
-			detail::is_explicitly_constructible_from<overflow_policy, T const &>(minimum, maximum),
-			"Value not in range."
-		);
 		unchecked_assignment(apply_overflow_policy(other));
 	}
 	
