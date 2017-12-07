@@ -24,7 +24,7 @@ constexpr auto safer_divide(constant_t<lhs_> const lhs, constant_t<rhs_> const r
 	constexpr auto min_signed = constant<std::numeric_limits<std::intmax_t>::min()>;
 	static_assert(lhs <= -min_signed or rhs != constant<-1>);
 	if constexpr (lhs > max_signed) {
-		if constexpr (rhs > 0) {
+		if constexpr (rhs > constant<0>) {
 			return constant<static_cast<std::uintmax_t>(lhs_) / static_cast<std::uintmax_t>(rhs_)>;
 		} else {
 			return -constant<static_cast<std::uintmax_t>(lhs_) / static_cast<std::uintmax_t>(-rhs)>;
