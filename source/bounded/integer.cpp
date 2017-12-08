@@ -111,7 +111,7 @@ constexpr auto check_uncompressed_optional() {
 	);
 	check_empty_braces<type>();
 }
-template<intmax_t minimum, intmax_t maximum>
+template<auto minimum, auto maximum>
 constexpr auto check_compressed_optional() {
 	using type = bounded::integer<minimum, maximum>;
 	using compressed_type = bounded::optional<type>;
