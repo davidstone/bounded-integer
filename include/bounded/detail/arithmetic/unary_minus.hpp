@@ -28,22 +28,6 @@ constexpr auto safer_negation(constant_t<value_> const value) noexcept {
 	}
 }
 
-template<typename T, BOUNDED_REQUIRES(is_signed_builtin<T>)>
-constexpr auto from_unsigned_cast(max_unsigned_t const value) noexcept {
-	using limits = basic_numeric_limits<max_signed_t>;
-	if (value <= limits::max()) {
-		return static_cast<max_signed_t>(value);
-	} else {
-		assert(value >= static_cast<max_unsigned_t>(limits::min()));
-		return static_cast<max_signed_t>(value - static_cast<max_unsigned_t>(limits::min())) + limits::min();
-	}
-}
-
-template<typename T, BOUNDED_REQUIRES(is_unsigned_builtin<T>)>
-constexpr auto from_unsigned_cast(max_unsigned_t const value) noexcept {
-	return value;
-}
-
 template<typename T>
 struct promoted_unsigned_c {
 	using type = std::conditional_t<sizeof(T) <= sizeof(unsigned), unsigned, std::make_unsigned_t<T>>;

@@ -20,15 +20,6 @@
 #include <utility>
 
 namespace bounded {
-namespace detail {
-
-constexpr auto cast_to_builtin = [](auto const value) noexcept {
-	constexpr auto signed_max = constant<basic_numeric_limits<max_signed_t>::max()>;
-	using result_type = std::conditional_t<value.max() <= signed_max, max_signed_t, max_unsigned_t>;
-	return static_cast<result_type>(value);
-};
-
-}	// namespace detail
 
 // Specialize this class to give the correct type for your own extreme function
 // if the default does not work. Types that cannot be used to construct this
@@ -56,9 +47,9 @@ struct extreme_type<
 private:
 	static constexpr auto select = [](auto const lhs, auto const rhs) noexcept {
 		if constexpr (Compare{}(lhs, rhs)) {
-			return detail::cast_to_builtin(lhs);
+			return detail::normalize<lhs.value()>;
 		} else {
-			return detail::cast_to_builtin(rhs);
+			return detail::normalize<rhs.value()>;
 		}
 	};
 	static constexpr auto minimum = select(constant<lhs_min>, constant<rhs_min>);

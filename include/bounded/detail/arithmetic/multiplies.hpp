@@ -30,8 +30,7 @@ constexpr auto safer_multiply(constant_t<lhs> const &, constant_t<rhs> const &) 
 	} else {
 		constexpr auto result = static_cast<max_unsigned_t>(lhs) * static_cast<max_unsigned_t>(rhs);
 		static_assert((safe_abs(lhs) <= result and safe_abs(rhs) <= result) or (lhs == 0 or rhs == 0), "Integer overflow in multiplication.");
-		using result_type = std::conditional_t<result <= signed_max, max_signed_t, max_unsigned_t>;
-		return static_cast<result_type>(result);
+		return normalize<result>;
 	}
 }
 

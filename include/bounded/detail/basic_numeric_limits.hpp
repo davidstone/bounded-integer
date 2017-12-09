@@ -7,6 +7,9 @@
 
 #include <bounded/detail/forward_declaration.hpp>
 #include <bounded/detail/max_builtin.hpp>
+#include <bounded/detail/requires.hpp>
+
+#include <cassert>
 #include <limits>
 #include <type_traits>
 
@@ -46,10 +49,26 @@ namespace detail {
 
 template<auto value>
 constexpr auto normalize = static_cast<std::conditional_t<
-	value <= 0 or static_cast<max_unsigned_t>(value) <= basic_numeric_limits<max_signed_t>::max(),
+	value < 0 or static_cast<max_unsigned_t>(value) <= basic_numeric_limits<max_signed_t>::max(),
 	max_signed_t,
 	max_unsigned_t
 >>(value);
+
+template<typename T, BOUNDED_REQUIRES(is_signed_builtin<T>)>
+constexpr auto from_unsigned_cast(max_unsigned_t const value) noexcept {
+	using limits = basic_numeric_limits<max_signed_t>;
+	if (value <= limits::max()) {
+		return static_cast<max_signed_t>(value);
+	} else {
+		assert(value >= static_cast<max_unsigned_t>(limits::min()));
+		return static_cast<max_signed_t>(value - static_cast<max_unsigned_t>(limits::min())) + limits::min();
+	}
+}
+
+template<typename T, BOUNDED_REQUIRES(is_unsigned_builtin<T>)>
+constexpr auto from_unsigned_cast(max_unsigned_t const value) noexcept {
+	return value;
+}
 
 }	// namespace detail
 

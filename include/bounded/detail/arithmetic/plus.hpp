@@ -22,8 +22,7 @@ constexpr auto safer_add(constant_t<lhs_> const lhs, constant_t<rhs_> const rhs)
 			(rhs_ < 0 or modulo_equivalent_value >= lhs) and (lhs_ < 0 or modulo_equivalent_value >= rhs),
 			"Overflow in calculation of bounds."
 		);
-		using result_type = std::conditional_t<(modulo_equivalent_value > max_signed), max_unsigned_t, max_signed_t>;
-		return static_cast<result_type>(modulo_equivalent_value);
+		return normalize<modulo_equivalent_value.value()>;
 	} else {
 		// To enter this case, we know that at least one of lhs and rhs is
 		// negative. If at least one of them is positive, addition cannot
@@ -33,7 +32,7 @@ constexpr auto safer_add(constant_t<lhs_> const lhs, constant_t<rhs_> const rhs)
 			lhs_ > 0 or rhs_ > 0 or modulo_equivalent_value > max_signed,
 			"Underflow in calculation of bounds."
 		);
-		return static_cast<max_signed_t>(modulo_equivalent_value);
+		return from_unsigned_cast<max_signed_t>(modulo_equivalent_value.value());
 	}
 }
 
