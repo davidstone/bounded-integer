@@ -18,24 +18,24 @@ struct string_view {
 	constexpr string_view(char const * value_) noexcept:
 		value(value_) {
 	}
-	constexpr string_view(string_view const & other):
+	constexpr string_view(string_view const & other) noexcept:
 		value(other.value)
 	{
 		assert(not other.moved_from);
 	}
-	constexpr auto & operator=(string_view const & other) {
+	constexpr auto & operator=(string_view const & other) noexcept {
 		assert(not other.moved_from);
 		value = other.value;
 		moved_from = false;
 		return *this;
 	}
-	constexpr string_view(string_view && other):
+	constexpr string_view(string_view && other) noexcept:
 		value(other.value)
 	{
 		assert(not other.moved_from);
 		other.moved_from = true;
 	}
-	constexpr auto & operator=(string_view && other) {
+	constexpr auto & operator=(string_view && other) noexcept {
 		assert(not other.moved_from);
 		value = other.value;
 		moved_from = false;
