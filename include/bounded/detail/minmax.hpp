@@ -12,6 +12,7 @@
 #include <bounded/detail/comparison.hpp>
 #include <bounded/detail/comparison_function_object.hpp>
 #include <bounded/detail/is_bounded_integer.hpp>
+#include <bounded/detail/max_builtin.hpp>
 #include <bounded/detail/noexcept.hpp>
 #include <bounded/detail/overlapping_range.hpp>
 #include <bounded/detail/requires.hpp>
@@ -22,8 +23,8 @@ namespace bounded {
 namespace detail {
 
 constexpr auto cast_to_builtin = [](auto const value) noexcept {
-	constexpr auto signed_max = constant<std::numeric_limits<std::intmax_t>::max()>;
-	using result_type = std::conditional_t<value.max() <= signed_max, std::intmax_t, std::uintmax_t>;
+	constexpr auto signed_max = constant<basic_numeric_limits<max_signed_t>::max()>;
+	using result_type = std::conditional_t<value.max() <= signed_max, max_signed_t, max_unsigned_t>;
 	return static_cast<result_type>(value);
 };
 

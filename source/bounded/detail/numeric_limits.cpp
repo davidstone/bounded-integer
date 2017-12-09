@@ -71,15 +71,14 @@ constexpr auto check_numeric_limits() {
 constexpr auto check_numeric_limits_all() {
 	static_assert(std::numeric_limits<bounded::integer<1, 1000>>::digits == bounded::constant<0>, "Meaningless digits not 0.");
 
-	check_numeric_limits<int8_t>();
-	check_numeric_limits<uint8_t>();
-	check_numeric_limits<int16_t>();
-	check_numeric_limits<uint16_t>();
-	check_numeric_limits<int32_t>();
-	check_numeric_limits<uint32_t>();
-	check_numeric_limits<int64_t>();
-	// Currently does not support unsigned types equal to uintmax_t
-	// check_numeric_limits<uint64_t>();
+	check_numeric_limits<std::int8_t>();
+	check_numeric_limits<std::uint8_t>();
+	check_numeric_limits<std::int16_t>();
+	check_numeric_limits<std::uint16_t>();
+	check_numeric_limits<std::int32_t>();
+	check_numeric_limits<std::uint32_t>();
+	check_numeric_limits<std::int64_t>();
+	check_numeric_limits<std::uint64_t>();
 }
 
 static_assert((static_cast<void>(check_numeric_limits_all()), true));

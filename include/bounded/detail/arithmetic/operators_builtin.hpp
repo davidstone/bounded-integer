@@ -1,4 +1,4 @@
-// Copyright David Stone 2015.
+// Copyright David Stone 2017.
 // Distributed under the Boost Software License, Version 1.0.
 // (See accompanying file LICENSE_1_0.txt or copy at
 // http://www.boost.org/LICENSE_1_0.txt)
@@ -8,9 +8,10 @@
 #include <bounded/detail/arithmetic/operators.hpp>
 #include <bounded/detail/class.hpp>
 #include <bounded/detail/is_bounded_integer.hpp>
+#include <bounded/detail/max_builtin.hpp>
 #include <bounded/detail/requires.hpp>
 
-#include <cstdint>
+#include <climits>
 #include <limits>
 #include <type_traits>
 
@@ -30,24 +31,24 @@ constexpr auto operator symbol(std::integral_constant<T, lhs>, RHS const rhs) no
 
 // Many standard library components do things like mutiply by some integer (such
 // as 2, or sizeof(T)). This can quickly lead to growth in the bounds that
-// exceeds intmax_t, even though the math is perfectly safe. By default, the
-// result of mixed arithmetic between bounded::integer and built-in integers is
-// a built-in integer. If this macro is defined, it is a bounded::integer with
-// the poisoned bit set to true.
+// exceeds current limits, even though the math is perfectly safe. By default,
+// the result of mixed arithmetic between bounded::integer and built-in integers
+// is a built-in integer. If this macro is defined, it is a bounded::integer
+// with the poisoned bit set to true.
 
 #ifndef BOUNDED_MIXED_ARITHMETIC_RESULT_IS_BUILTIN
 
 #define BOUNDED_INTEGER_MIXED_OPERATOR_OVERLOADS(symbol, minimum, maximum) \
 template< \
 	auto lhs_min, auto lhs_max, typename overflow, storage_type storage, bool poisoned, typename T, \
-	BOUNDED_REQUIRES(std::is_integral<T>{}) \
+	BOUNDED_REQUIRES(detail::is_builtin_integer<T>) \
 > \
 constexpr auto operator symbol(integer<lhs_min, lhs_max, overflow, storage, poisoned> const lhs, T const rhs) noexcept { \
 	return lhs symbol integer<minimum, maximum, overflow, storage, true>(rhs); \
 } \
 template< \
 	typename T, auto rhs_min, auto rhs_max, typename overflow, storage_type storage, bool poisoned, \
-	BOUNDED_REQUIRES(std::is_integral<T>{}) \
+	BOUNDED_REQUIRES(detail::is_builtin_integer<T>) \
 > \
 constexpr auto operator symbol(T const lhs, integer<rhs_min, rhs_max, overflow, storage, poisoned> const rhs) noexcept { \
 	return integer(lhs, overflow{}) symbol rhs; \
@@ -58,11 +59,11 @@ BOUNDED_INTEGER_MIXED_OPERATOR_OVERLOADS_INTEGRAL_CONSTANT(symbol)
 #else
 
 #define BOUNDED_INTEGER_MIXED_OPERATOR_OVERLOADS(symbol, minimum, maximum) \
-template<typename LHS, typename RHS, BOUNDED_REQUIRES(is_bounded_integer<LHS> and std::is_integral<RHS>{})> \
+template<typename LHS, typename RHS, BOUNDED_REQUIRES(is_bounded_integer<LHS> and detail::is_builtin_integer<RHS>)> \
 constexpr auto operator symbol(LHS const lhs, RHS const rhs) noexcept { \
 	return lhs.value() symbol rhs; \
 } \
-template<typename LHS, typename RHS, BOUNDED_REQUIRES(std::is_integral<LHS>{} and is_bounded_integer<RHS>)> \
+template<typename LHS, typename RHS, BOUNDED_REQUIRES(detail::is_builtin_integer<LHS> and is_bounded_integer<RHS>)> \
 constexpr auto operator symbol(LHS const lhs, RHS const rhs) noexcept { \
 	return lhs symbol rhs.value(); \
 } \
@@ -77,15 +78,15 @@ BOUNDED_INTEGER_MIXED_OPERATOR_OVERLOADS_INTEGRAL_CONSTANT(symbol)
 // shift operators, you could not use any built-in type as the right-hand side.
 
 #define BOUNDED_INTEGER_MIXED_OPERATOR_OVERLOADS_BASIC(symbol) \
-BOUNDED_INTEGER_MIXED_OPERATOR_OVERLOADS(symbol, std::numeric_limits<T>::min(), std::numeric_limits<T>::max())
+BOUNDED_INTEGER_MIXED_OPERATOR_OVERLOADS(symbol, basic_numeric_limits<T>::min(), basic_numeric_limits<T>::max())
 
 
 #define BOUNDED_INTEGER_MIXED_OPERATOR_OVERLOADS_DIVISION(symbol) \
-BOUNDED_INTEGER_MIXED_OPERATOR_OVERLOADS(symbol, 1, static_cast<std::intmax_t>(std::numeric_limits<T>::max()))
+BOUNDED_INTEGER_MIXED_OPERATOR_OVERLOADS(symbol, 1, static_cast<detail::max_signed_t>(basic_numeric_limits<T>::max()))
 
 
 #define BOUNDED_INTEGER_MIXED_OPERATOR_OVERLOADS_SHIFT(symbol) \
-BOUNDED_INTEGER_MIXED_OPERATOR_OVERLOADS(symbol, 0, std::numeric_limits<std::uintmax_t>::digits)
+BOUNDED_INTEGER_MIXED_OPERATOR_OVERLOADS(symbol, 0, (sizeof(detail::max_unsigned_t) * CHAR_BIT))
 
 
 BOUNDED_INTEGER_MIXED_OPERATOR_OVERLOADS_BASIC(+)

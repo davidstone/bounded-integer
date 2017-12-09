@@ -5,42 +5,67 @@
 
 #pragma once
 
+#include <bounded/detail/comparison.hpp>
+#include <bounded/detail/max_builtin.hpp>
+#include <bounded/detail/overlapping_range.hpp>
+
 #include <type_traits>
-#include <boost/integer.hpp>
 
 namespace bounded {
 namespace detail {
 
-template<typename T1, typename T2>
-using larger_type = std::conditional_t<sizeof(T1) >= sizeof(T2), T1, T2>;
+template<typename T, typename Minimum, typename Maximum>
+constexpr auto range_fits_in_type(Minimum const minimum, Maximum const maximum) noexcept {
+	return value_fits_in_type<T>(minimum) and value_fits_in_type<T>(maximum);
+}
 
-template<template<auto, auto> typename Wrapped, auto minimum, auto maximum>
-struct lazy_wrapper {
-	using type = Wrapped<minimum, maximum>;
+template<typename T>
+struct type_c {
+	using type = T;
 };
 
-#define BOUNDED_INTEGER_UNDERLYING_TYPE(version) \
-template<auto minimum, auto maximum> \
-using signed_ ## version ## _t = larger_type< \
-	typename boost::int_min_value_t<minimum>::version, \
-	typename boost::int_max_value_t<maximum>::version \
->; \
-\
-template<auto, auto maximum> \
-using unsigned_ ## version ## _t = typename boost::uint_value_t<static_cast<unsigned long long>(maximum)>::version; \
-\
-template<auto minimum, auto maximum> \
-using version ## _t = typename std::conditional_t< \
-	minimum < 0, \
-	lazy_wrapper<signed_ ## version ## _t, minimum, maximum>, \
-	lazy_wrapper<unsigned_ ## version ## _t, minimum, maximum> \
->::type;
+template<auto...>
+constexpr auto false_ = false;
 
+template<auto minimum, auto maximum>
+constexpr auto determine_type() noexcept {
+	if constexpr (range_fits_in_type<unsigned char>(minimum, maximum)) {
+		return type_c<unsigned char>{};
+	} else if constexpr (range_fits_in_type<signed char>(minimum, maximum)) {
+		return type_c<signed char>{};
+	} else if constexpr (range_fits_in_type<unsigned short>(minimum, maximum)) {
+		return type_c<unsigned short>{};
+	} else if constexpr (range_fits_in_type<signed short>(minimum, maximum)) {
+		return type_c<signed short>{};
+	} else if constexpr (range_fits_in_type<unsigned int>(minimum, maximum)) {
+		return type_c<unsigned int>{};
+	} else if constexpr (range_fits_in_type<signed int>(minimum, maximum)) {
+		return type_c<signed int>{};
+	} else if constexpr (range_fits_in_type<unsigned long>(minimum, maximum)) {
+		return type_c<unsigned long>{};
+	} else if constexpr (range_fits_in_type<signed long>(minimum, maximum)) {
+		return type_c<signed long>{};
+	} else if constexpr (range_fits_in_type<unsigned long long>(minimum, maximum)) {
+		return type_c<unsigned long long>{};
+	} else if constexpr (range_fits_in_type<signed long long>(minimum, maximum)) {
+		return type_c<signed long long>{};
+#if defined BOUNDED_DETAIL_HAS_128_BIT
+	} else if constexpr (range_fits_in_type<uint128_t>(minimum, maximum)) {
+		return type_c<uint128_t>{};
+	} else if constexpr (range_fits_in_type<int128_t>(minimum, maximum)) {
+		return type_c<int128_t>{};
+#endif
+	} else {
+		static_assert(false_<minimum, maximum>, "Bounds cannot fit in any type.");
+	}
+}
 
-BOUNDED_INTEGER_UNDERLYING_TYPE(fast)
-BOUNDED_INTEGER_UNDERLYING_TYPE(least)
+// TODO: Maybe get rid of the concept of storage_type?
+template<auto minimum, auto maximum>
+using fast_t = typename decltype(determine_type<minimum, maximum>())::type;
 
-
+template<auto minimum, auto maximum>
+using least_t = fast_t<minimum, maximum>;
 
 }	// namespace detail
 }	// namespace bounded

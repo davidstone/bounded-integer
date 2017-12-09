@@ -9,6 +9,7 @@
 #include <bounded/detail/basic_numeric_limits.hpp>
 #include <bounded/detail/class.hpp>
 #include <bounded/detail/is_bounded_integer.hpp>
+#include <bounded/detail/max_builtin.hpp>
 #include <bounded/detail/requires.hpp>
 
 namespace bounded {
@@ -35,8 +36,8 @@ constexpr auto log(integer<minimum, maximum, overflow_policy, storage, poisoned>
 	static_assert(base > constant<1>, "Negative bases not currently supported.");
 	static_assert(value > constant<0>, "The log of a negative number or zero is undefined.");
 	using result_type = integer<
-		detail::log(static_cast<std::uintmax_t>(minimum), static_cast<std::uintmax_t>(basic_numeric_limits<Base>::max())),
-		detail::log(static_cast<std::uintmax_t>(maximum), static_cast<std::uintmax_t>(basic_numeric_limits<Base>::min())),
+		detail::log(static_cast<detail::max_unsigned_t>(minimum), static_cast<detail::max_unsigned_t>(basic_numeric_limits<Base>::max())),
+		detail::log(static_cast<detail::max_unsigned_t>(maximum), static_cast<detail::max_unsigned_t>(basic_numeric_limits<Base>::min())),
 		overflow_policy,
 		storage,
 		poisoned

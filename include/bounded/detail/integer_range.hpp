@@ -1,4 +1,4 @@
-// Copyright David Stone 2015.
+// Copyright David Stone 2017.
 // Distributed under the Boost Software License, Version 1.0.
 // (See accompanying file LICENSE_1_0.txt or copy at
 // http://www.boost.org/LICENSE_1_0.txt)
@@ -7,6 +7,7 @@
 
 #include <bounded/detail/class.hpp>
 #include <bounded/detail/comparison.hpp>
+#include <bounded/detail/max_builtin.hpp>
 #include <bounded/detail/minmax.hpp>
 #include <bounded/detail/numeric_limits.hpp>
 
@@ -27,15 +28,16 @@ struct range_type;
 namespace detail {
 
 template<typename T>
-constexpr auto range_of_type = static_cast<intmax_t>(std::numeric_limits<T>::max() - std::numeric_limits<T>::min());
+constexpr auto range_of_type = static_cast<max_signed_t>(std::numeric_limits<T>::max() - std::numeric_limits<T>::min());
 
 template<typename T>
 struct integer_range_iterator {
+	static_assert(not std::is_same<T, max_unsigned_t>{});
 	// We have to be able to index the one-past-the-end element.
 	using index_type = integer<0, range_of_type<T>>;
 	using value_type = integer<
-		static_cast<intmax_t>(std::numeric_limits<T>::min()),
-		static_cast<intmax_t>(max(std::numeric_limits<T>::min(), std::numeric_limits<T>::max() - constant<1>))
+		static_cast<max_signed_t>(std::numeric_limits<T>::min()),
+		static_cast<max_signed_t>(max(std::numeric_limits<T>::min(), std::numeric_limits<T>::max() - constant<1>))
 	>;
 	using difference_type = integer<-range_of_type<index_type>, range_of_type<index_type>>;
 	using pointer = index_type const *;
@@ -161,8 +163,8 @@ using integer_range_type = range_type<detail::integer_range_iterator<T>>;
 template<typename Begin, typename End>
 constexpr auto integer_range(Begin && begin, End && end) noexcept {
 	using integer_type = integer<
-		static_cast<intmax_t>(std::numeric_limits<std::decay_t<Begin>>::min()),
-		static_cast<intmax_t>(std::numeric_limits<std::decay_t<End>>::max())
+		static_cast<detail::max_signed_t>(std::numeric_limits<std::decay_t<Begin>>::min()),
+		static_cast<detail::max_signed_t>(std::numeric_limits<std::decay_t<End>>::max())
 	>;
 	return integer_range_type<integer_type>(std::forward<Begin>(begin), std::forward<End>(end));
 }

@@ -5,13 +5,13 @@
 
 #pragma once
 
-#include <cstdint>
+#include <bounded/detail/max_builtin.hpp>
 
 namespace bounded {
 namespace detail {
 
 constexpr auto safe_abs = [](auto const value) noexcept {
-	return (value < 0) ? -static_cast<std::uintmax_t>(value) : static_cast<std::uintmax_t>(value);
+	return (value < 0) ? -static_cast<max_unsigned_t>(value) : static_cast<max_unsigned_t>(value);
 };
 
 }	// namespace detail

@@ -39,7 +39,6 @@ The general form of the class is `bounded::integer<minimum, maximum, policy = bo
 ## Prerequisites
 
 * Compile with clang 5.0 or gcc 7.2.0
-* Boost. Listed as boost-devel in Fedora repositories. `bounded::integer` is currently tested against version 1.65.0.
 * cmake is used to build tests, but it is not needed to use the library (this library is header-only).
 
 ## Building and running tests (Linux)
@@ -56,7 +55,7 @@ The general form of the class is `bounded::integer<minimum, maximum, policy = bo
 `bounded::integer` can replace most uses of built-in integer types. It does have some limitations, however.
 
 * A `bounded::integer` cannot be used as a non-type template parameter. The C++ language rules do not permit any user-defined type to be used as a non-type template parameter, even if the user-defined type is a literal type. There is a proposal going through the C++ standardization committee that would remove this restriction.
-* `bounded::integer` uses `std::intmax_t` or `std::uintmax_t` as the template parameter to determine its bounds. This means that it cannot store an integer larger than `std::numeric_limits<std::uintmax_t>::max()` or smaller than `std::numeric_limits<std::intmax_t>::min()`. This restriction should be removed in the near future.
+* `bounded::integer` uses built-in integers as the template parameter to determine its bounds. This means that it cannot store an integer larger than an unsigned 64-bit or unsigned 128-bit integer (depending on the platform) or smaller than a signed 64-bit or signed 128-bit integer. This restriction should be removed in the near future.
 * `bounded::integer` is currently still under active development, so some interfaces are still subject to change.
 
 # Reference

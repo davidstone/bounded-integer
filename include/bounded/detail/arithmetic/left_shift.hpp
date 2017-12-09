@@ -6,6 +6,7 @@
 #pragma once
 
 #include <bounded/detail/arithmetic/base.hpp>
+#include <bounded/detail/max_builtin.hpp>
 
 namespace bounded {
 namespace detail {
@@ -13,8 +14,8 @@ namespace detail {
 constexpr auto left_shift_operator_range = [](auto const lhs, auto const rhs) noexcept {
 	// TODO: Broaden range
 	return min_max(
-		static_cast<std::intmax_t>(lhs.min) << rhs.min.value(),
-		static_cast<std::intmax_t>(lhs.max) << rhs.max.value()
+		static_cast<max_signed_t>(lhs.min) << rhs.min.value(),
+		static_cast<max_signed_t>(lhs.max) << rhs.max.value()
 	);
 };
 

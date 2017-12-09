@@ -19,7 +19,6 @@
 
 #include <bounded/detail/policy/null_policy.hpp>
 
-#include <cstdint>
 #include <limits>
 #include <type_traits>
 #include <utility>
@@ -55,17 +54,14 @@ constexpr auto is_explicitly_constructible_from(Minimum const minimum, Maximum c
 
 // Necessary for optional specialization
 template<typename T>
-constexpr auto underlying_min = basic_numeric_limits<typename T::underlying_type>::min();
-template<typename T>
-constexpr auto underlying_max = basic_numeric_limits<typename T::underlying_type>::max();
-
-template<typename T>
-constexpr auto has_extra_space = underlying_min<T> < basic_numeric_limits<T>::min() or basic_numeric_limits<T>::max() < underlying_max<T>;
+constexpr auto has_extra_space =
+	basic_numeric_limits<typename T::underlying_type>::min() < basic_numeric_limits<T>::min() or
+	basic_numeric_limits<T>::max() < basic_numeric_limits<typename T::underlying_type>::max();
 
 
 template<typename Integer>
 constexpr auto as_builtin_integer(Integer const x) noexcept {
-	if constexpr (std::is_integral<Integer>{}) {
+	if constexpr (detail::is_builtin_integer<Integer>) {
 		return x;
 	} else {
 		static_assert(is_bounded_integer<Integer>);
@@ -163,8 +159,6 @@ public:
 	using overflow_policy = overflow_policy_;
 	static_assert(detail::value_fits_in_type<underlying_type>(minimum), "minimum does not fit in underlying_type.");
 	static_assert(detail::value_fits_in_type<underlying_type>(maximum), "maximum does not fit in underlying_type.");
-	
-	static_assert(minimum >= 0 or std::numeric_limits<underlying_type>::is_signed, "underlying_type should be signed.");
 	
 	// May relax these restrictions in the future
 	static_assert(std::is_nothrow_default_constructible<overflow_policy>{}, "overflow_policy must be nothrow default constructible.");
@@ -285,20 +279,20 @@ public:
 	// Do not verify that the value is in range because the user has requested a
 	// conversion out of the safety of bounded::integer. It is subject to all
 	// the standard rules of conversion from one integer type to another.
-	template<typename T, BOUNDED_REQUIRES((not poisoned and std::is_arithmetic<T>{}) or std::is_enum<T>{})>
+	template<typename T, BOUNDED_REQUIRES((not poisoned and detail::is_builtin_arithmetic<T>) or std::is_enum<T>{})>
 	constexpr explicit operator T() const noexcept {
 		return static_cast<T>(value());
 	}
-	template<typename T, BOUNDED_REQUIRES((not poisoned and std::is_arithmetic<T>{}) or std::is_enum<T>{})>
+	template<typename T, BOUNDED_REQUIRES((not poisoned and detail::is_builtin_arithmetic<T>) or std::is_enum<T>{})>
 	constexpr explicit operator T() const volatile noexcept {
 		return static_cast<T>(value());
 	}
 	
-	template<typename T, BOUNDED_REQUIRES(poisoned and std::is_arithmetic<T>{})>
+	template<typename T, BOUNDED_REQUIRES(poisoned and detail::is_builtin_arithmetic<T>)>
 	constexpr operator T() const noexcept {
 		return static_cast<T>(value());
 	}
-	template<typename T, BOUNDED_REQUIRES(poisoned and std::is_arithmetic<T>{})>
+	template<typename T, BOUNDED_REQUIRES(poisoned and detail::is_builtin_arithmetic<T>)>
 	constexpr operator T() const volatile noexcept {
 		return static_cast<T>(value());
 	}
@@ -327,7 +321,7 @@ public:
 	}
 private:
 	static constexpr auto uninitialized_value() noexcept {
-		return static_cast<underlying_type>(minimum > std::numeric_limits<underlying_type>::min() ? minimum - 1 : maximum + 1);
+		return static_cast<underlying_type>(minimum > basic_numeric_limits<underlying_type>::min() ? minimum - 1 : maximum + 1);
 	}
 };
 
@@ -369,7 +363,7 @@ integer(T const & value, overflow_policy = overflow_policy{}) -> integer<
 	detail::deduced_max<T>(),
 	overflow_policy,
 	storage_type::fast,
-	std::is_integral<T>{} or not basic_numeric_limits<T>::is_specialized
+	detail::is_builtin_integer<T> or not basic_numeric_limits<T>::is_specialized
 >;
 
 #if 0

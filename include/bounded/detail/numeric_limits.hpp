@@ -10,9 +10,10 @@
 #include <bounded/detail/class.hpp>
 #include <bounded/detail/comparison.hpp>
 #include <bounded/detail/log.hpp>
+#include <bounded/detail/max_builtin.hpp>
 #include <bounded/detail/minmax.hpp>
 
-#include <cstdint>
+#include <climits>
 #include <limits>
 
 namespace bounded {
@@ -27,8 +28,8 @@ constexpr auto digits(Minimum const minimum, Maximum const maximum, Base const b
 	static_assert(base > constant<1>, "Base must be greater than 1.");
 	if constexpr (minimum > constant<0> or maximum <= constant<0>) {
 		return constant<0>;
-	} else if constexpr (maximum == constant<std::numeric_limits<std::uintmax_t>::max()>) {
-		return constant<std::numeric_limits<std::uintmax_t>::digits>;
+	} else if constexpr (maximum == constant<basic_numeric_limits<max_unsigned_t>::max()>) {
+		return constant<sizeof(max_unsigned_t) * CHAR_BIT>;
 	} else if constexpr (minimum == constant<0> or maximum < -minimum) {
 		return ::bounded::log(maximum + constant<1>, base);
 	} else {

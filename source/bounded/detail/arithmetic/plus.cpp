@@ -27,12 +27,12 @@ static_assert(homogeneous_equals(
 
 static_assert(homogeneous_equals(
 	signed_max + bounded::constant<1>,
-	bounded::constant<static_cast<std::uintmax_t>(signed_max) + 1>
+	bounded::constant<static_cast<bounded::detail::max_unsigned_t>(signed_max) + 1>
 ));
 #if 0
 static_assert(homogeneous_equals(
 	unsigned_max + signed_min,
-	bounded::constant<static_cast<std::uintmax_t>(unsigned_max) + static_cast<std::uintmax_t>(signed_min)>
+	bounded::constant<static_cast<bounded::detail::unsigned_max_t>(unsigned_max) + static_cast<bounded::detail::unsigned_max_t>(signed_min)>
 ));
 #endif
 

@@ -45,7 +45,11 @@ constexpr auto check_all_limits() {
 	check_limits<std::int8_t, std::uint8_t, std::int16_t>();
 	check_limits<std::int16_t, std::uint16_t, std::int32_t>();
 	check_limits<std::int32_t, std::uint32_t, std::int64_t>();
+	#if defined BOUNDED_DETAIL_HAS_128_BIT
+	check_limits<std::int64_t, std::uint64_t, bounded::detail::int128_t>();
+	#else
 	check_signed_limits<std::int64_t, std::uint64_t>();
+	#endif
 }
 static_assert((static_cast<void>(check_all_limits()), true));
 

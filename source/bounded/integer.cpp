@@ -74,7 +74,7 @@ namespace check_clamp_policy {
 	);
 
 	using type = bounded::integer<-100, 100, bounded::clamp_policy>;
-	constexpr auto initial = std::numeric_limits<type::underlying_type>::max() + bounded::constant<1>;
+	constexpr auto initial = std::numeric_limits<type>::max().value() + 1;
 	constexpr type value(initial);
 	static_assert(
 		value == std::numeric_limits<type>::max(),
@@ -82,7 +82,7 @@ namespace check_clamp_policy {
 	);
 
 
-	constexpr bounded::integer<minimum.value(), maximum.value(), bounded::clamp_policy> integer(bounded::constant<1000>);
+	constexpr auto integer = bounded::integer<minimum.value(), maximum.value(), bounded::clamp_policy>(bounded::constant<1000>);
 	static_assert(
 		integer == maximum,
 		"Fail to clamp when using a bounded."
@@ -104,7 +104,7 @@ constexpr auto check_empty_braces() {
 
 template<typename T>
 constexpr auto check_uncompressed_optional() {
-	using type = bounded::integer<std::numeric_limits<T>::min(), std::numeric_limits<T>::max()>;
+	using type = bounded::integer<bounded::basic_numeric_limits<T>::min(), bounded::basic_numeric_limits<T>::max()>;
 	static_assert(
 		sizeof(type) < sizeof(bounded::optional<type>),
 		"Compressing an optional that should not be compressed."
@@ -198,7 +198,7 @@ auto check_optional() {
 		check_uncompressed_optional<uint8_t>();
 		check_uncompressed_optional<int>();
 		check_uncompressed_optional<unsigned>();
-		check_uncompressed_optional<intmax_t>();
+		check_uncompressed_optional<bounded::detail::max_signed_t>();
 
 		check_integer_optional<int>();
 		check_integer_optional<bounded::checked_integer<1, 10>>();
@@ -244,10 +244,10 @@ namespace bounded {
 
 template<>
 struct basic_numeric_limits<bounded_enum> {
-	static constexpr auto min() noexcept -> intmax_t {
+	static constexpr auto min() noexcept -> bounded::detail::max_signed_t {
 		return 0;
 	}
-	static constexpr auto max() noexcept -> intmax_t {
+	static constexpr auto max() noexcept -> bounded::detail::max_signed_t {
 		return 0;
 	}
 	static constexpr bool is_specialized = true;

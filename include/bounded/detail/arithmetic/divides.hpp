@@ -5,14 +5,13 @@
 
 #pragma once
 
+#include <bounded/detail/abs.hpp>
 #include <bounded/detail/arithmetic/base.hpp>
 #include <bounded/detail/arithmetic/unary_minus.hpp>
+#include <bounded/detail/basic_numeric_limits.hpp>
 #include <bounded/detail/comparison.hpp>
+#include <bounded/detail/max_builtin.hpp>
 #include <bounded/detail/minmax.hpp>
-
-#include <bounded/detail/abs.hpp>
-
-#include <limits>
 
 namespace bounded {
 namespace detail {
@@ -20,19 +19,19 @@ namespace detail {
 // Ignores divide by 0, caught by constexpr
 template<auto lhs_, auto rhs_>
 constexpr auto safer_divide(constant_t<lhs_> const lhs, constant_t<rhs_> const rhs) noexcept {
-	constexpr auto max_signed = constant<std::numeric_limits<std::intmax_t>::max()>;
-	constexpr auto min_signed = constant<std::numeric_limits<std::intmax_t>::min()>;
+	constexpr auto max_signed = constant<basic_numeric_limits<max_signed_t>::max()>;
+	constexpr auto min_signed = constant<basic_numeric_limits<max_signed_t>::min()>;
 	static_assert(lhs <= -min_signed or rhs != constant<-1>);
 	if constexpr (lhs > max_signed) {
 		if constexpr (rhs > constant<0>) {
-			return constant<static_cast<std::uintmax_t>(lhs_) / static_cast<std::uintmax_t>(rhs_)>;
+			return constant<static_cast<max_unsigned_t>(lhs_) / static_cast<max_unsigned_t>(rhs_)>;
 		} else {
-			return -constant<static_cast<std::uintmax_t>(lhs_) / static_cast<std::uintmax_t>(-rhs)>;
+			return -constant<static_cast<max_unsigned_t>(lhs_) / static_cast<max_unsigned_t>(-rhs)>;
 		}
 	} else if constexpr (lhs == min_signed and min_signed != -max_signed and rhs == constant<-1>) {
 		return -min_signed;
 	} else {
-		return constant<static_cast<std::intmax_t>(lhs_) / static_cast<std::intmax_t>(rhs_)>;
+		return constant<static_cast<max_signed_t>(lhs_) / static_cast<max_signed_t>(rhs_)>;
 	}
 }
 

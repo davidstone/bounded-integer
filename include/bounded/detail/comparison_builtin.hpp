@@ -14,26 +14,15 @@
 
 namespace bounded {
 	
-template<typename LHS, typename RHS, BOUNDED_REQUIRES(is_bounded_integer<LHS> and std::is_integral<RHS>{})>
+template<typename LHS, typename RHS, BOUNDED_REQUIRES(is_bounded_integer<LHS> and detail::is_builtin_integer<RHS>)>
 constexpr auto compare(LHS const lhs, RHS const rhs) noexcept {
 	return compare(lhs, integer(rhs));
 }
 
-template<typename LHS, typename RHS, BOUNDED_REQUIRES(std::is_integral<LHS>{} and is_bounded_integer<RHS>)>
+template<typename LHS, typename RHS, BOUNDED_REQUIRES(detail::is_builtin_integer<LHS> and is_bounded_integer<RHS>)>
 constexpr auto compare(LHS const lhs, RHS const rhs) noexcept {
 	return compare(integer(lhs), rhs);
 }
-
-template<typename LHS, BOUNDED_REQUIRES(is_bounded_integer<LHS>)>
-constexpr auto compare(LHS const lhs, std::uintmax_t const rhs) noexcept {
-	return (lhs < constant<0>) ? strong_ordering_less : compare(static_cast<std::uintmax_t>(lhs), rhs);
-}
-
-template<typename RHS, BOUNDED_REQUIRES(is_bounded_integer<RHS>)>
-constexpr auto compare(std::uintmax_t const lhs, RHS const rhs) noexcept {
-	return (rhs < constant<0>) ? strong_ordering_greater : compare(lhs, static_cast<std::uintmax_t>(rhs));
-}
-
 
 template<typename LHS, BOUNDED_REQUIRES(is_bounded_integer<LHS>)>
 constexpr auto compare(LHS const lhs, bool const rhs) = delete;

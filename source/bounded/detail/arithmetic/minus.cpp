@@ -21,7 +21,7 @@ static_assert(homogeneous_equals(
 #if 0
 static_assert(homogeneous_equals(
 	unsigned_max - signed_max,
-	bounded::constant<static_cast<std::uintmax_t>(unsigned_max) - static_cast<std::uintmax_t>(signed_max)>
+	bounded::constant<static_cast<bounded::detail::unsigned_max_t>(unsigned_max) - static_cast<bounded::detail::unsigned_max_t>(signed_max)>
 ));
 #endif
 static_assert(homogeneous_equals(
