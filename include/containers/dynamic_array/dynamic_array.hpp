@@ -25,7 +25,7 @@ namespace detail {
 template<typename T>
 constexpr auto maximum_array_size = static_cast<std::intmax_t>(
 	bounded::min(
-		bounded::constant<std::numeric_limits<std::ptrdiff_t>::max()> / bounded::constant<sizeof(T)>,
+		bounded::constant<std::numeric_limits<std::ptrdiff_t>::max()> / bounded::size_of<T>,
 		(1_bi << 31_bi) - 1_bi
 	)
 );
