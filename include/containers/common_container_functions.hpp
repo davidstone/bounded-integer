@@ -295,7 +295,8 @@ constexpr auto operator<(Container const & lhs, Container const & rhs) BOUNDED_N
 	using ::containers::detail::common::clear; \
 	using ::containers::detail::common::resize; \
 	using ::containers::detail::common::operator==; \
-	using ::containers::detail::common::operator<;
+	using ::containers::detail::common::operator<; \
+	CONTAINERS_DETAIL_COMMON_USING_DECLARATIONS
 
 }	// namespace common
 
@@ -331,7 +332,5 @@ auto put_in_middle_no_reallocation(Container & container, typename Container::co
 }	// namespace detail
 
 CONTAINERS_COMMON_USING_DECLARATIONS
-
-#undef CONTAINERS_COMMON_USING_DECLARATIONS
 
 }	// namespace containers

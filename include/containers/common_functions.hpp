@@ -23,19 +23,14 @@
 namespace containers {
 namespace detail {
 
-#define CONTAINERS_COMMON_USING_DECLARATIONS \
-	using ::bounded::operator!=; \
-	using ::bounded::operator>; \
-	using ::bounded::operator<=; \
-	using ::bounded::operator>=; \
+#define CONTAINERS_DETAIL_COMMON_USING_DECLARATIONS \
+	BOUNDED_COMPARISON \
 	BOUNDED_COMMON_ARITHMETIC
 
-CONTAINERS_COMMON_USING_DECLARATIONS
+CONTAINERS_DETAIL_COMMON_USING_DECLARATIONS
 
 }	// namespace detail
 
-CONTAINERS_COMMON_USING_DECLARATIONS
-
-#undef CONTAINERS_COMMON_USING_DECLARATIONS
+CONTAINERS_DETAIL_COMMON_USING_DECLARATIONS
 
 }	// namespace containers
