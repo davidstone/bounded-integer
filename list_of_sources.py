@@ -18,13 +18,12 @@ from program import prepend_dir, Program
 
 source_directory = 'source'
 
-include_directories = ['../bounded_integer', '../value_ptr', '../include']
+include_directories = ['../bounded_integer/include', '../value_ptr', '../include']
 
 # The sources are just needed to make sure the include files are self-contained.
 # To minimize compile times, only compile these files with the array program,
 # otherwise they keep getting compiled for various macros that have no meaning.
 common_sources = [
-	'addressof.cpp',
 	'allocator.cpp',
 	'has_nested_type.cpp',
 	'is_container.cpp',

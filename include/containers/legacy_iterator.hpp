@@ -18,7 +18,7 @@
 
 #include <containers/is_iterator.hpp>
 
-#include <bounded_integer/bounded_integer.hpp>
+#include <bounded/integer.hpp>
 
 #include <iterator>
 

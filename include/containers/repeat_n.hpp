@@ -16,11 +16,10 @@
 
 #pragma once
 
-#include <containers/addressof.hpp>
 #include <containers/common_iterator_functions.hpp>
 #include <containers/index_type.hpp>
 
-#include <bounded_integer/bounded_integer.hpp>
+#include <bounded/integer.hpp>
 
 #include <iterator>
 #include <utility>
@@ -45,7 +44,7 @@ struct repeat_n_iterator {
 		return m_value.get();
 	}
 	constexpr auto operator->() const {
-		return ::containers::addressof(operator*());
+		return ::bounded::addressof(operator*());
 	}
 
 	friend constexpr auto operator==(repeat_n_iterator const lhs, repeat_n_iterator const rhs) {

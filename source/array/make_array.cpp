@@ -16,7 +16,7 @@
 
 #include <containers/array/make_array.hpp>
 
-#include <bounded_integer/bounded_integer.hpp>
+#include <bounded/integer.hpp>
 
 namespace {
 using namespace bounded::literal;

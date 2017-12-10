@@ -16,7 +16,7 @@
 
 #pragma once
 
-#include <bounded_integer/bounded_integer.hpp>
+#include <bounded/integer.hpp>
 
 #include <limits>
 #include <type_traits>

@@ -18,7 +18,7 @@
 
 #include <containers/algorithms/iterator.hpp>
 
-#include <bounded_integer/bounded_integer.hpp>
+#include <bounded/integer.hpp>
 
 #include <value_ptr/value_ptr.hpp>
 

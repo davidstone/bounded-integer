@@ -18,7 +18,7 @@
 #include <containers/common_iterator_functions.hpp>
 #include <containers/index_type.hpp>
 
-#include <bounded_integer/bounded_integer.hpp>
+#include <bounded/integer.hpp>
 
 #include <cstddef>
 #include <cstdint>

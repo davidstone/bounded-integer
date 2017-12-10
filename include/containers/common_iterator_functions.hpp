@@ -19,7 +19,7 @@
 #include <containers/common_functions.hpp>
 #include <containers/is_iterator.hpp>
 
-#include <bounded_integer/bounded_integer.hpp>
+#include <bounded/integer.hpp>
 
 // The strange namespacing and using declarations here are to ensure these
 // functions are picked up by ADL for types defined in namespaces ::container or

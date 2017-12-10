@@ -15,13 +15,12 @@
 
 #pragma once
 
-#include <containers/addressof.hpp>
 #include <containers/is_iterator.hpp>
 #include <containers/iterator_adapter.hpp>
 #include <containers/type_list.hpp>
 
-#include <bounded_integer/bounded_integer.hpp>
-#include <bounded_integer/integer_range.hpp>
+#include <bounded/integer.hpp>
+#include <bounded/integer_range.hpp>
 
 #include <iterator>
 

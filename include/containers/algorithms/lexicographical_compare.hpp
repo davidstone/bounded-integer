@@ -17,7 +17,7 @@
 
 #include <containers/is_iterator_sentinel.hpp>
 
-#include <bounded_integer/bounded_integer.hpp>
+#include <bounded/integer.hpp>
 
 namespace containers {
 

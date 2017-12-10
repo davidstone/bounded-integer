@@ -19,7 +19,7 @@
 #include <containers/common_container_functions.hpp>
 #include <containers/array/iterator.hpp>
 
-#include <bounded_integer/bounded_integer.hpp>
+#include <bounded/integer.hpp>
 
 #include <algorithm>
 #include <cstddef>

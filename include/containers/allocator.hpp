@@ -18,7 +18,7 @@
 #include <containers/common_functions.hpp>
 #include <containers/type_list.hpp>
 
-#include <bounded_integer/bounded_integer.hpp>
+#include <bounded/integer.hpp>
 
 #include <memory>
 
@@ -111,13 +111,9 @@ public:
 	static constexpr auto construct(allocator_type & a, T * const ptr, Args && ... args) BOUNDED_NOEXCEPT(
 		static_cast<void>(a.construct(ptr, std::forward<Args>(args)...))
 	)
-	template<typename T, typename... Args, BOUNDED_REQUIRES(!allocator_has_construct<allocator_type, T, Args...> and !std::is_trivial<T>::value)>
-	static auto construct(allocator_type &, T * const ptr, Args && ... args) BOUNDED_NOEXCEPT(
-		::new(static_cast<void *>(ptr)) T(std::forward<Args>(args)...)
-	)
-	template<typename T, typename... Args, BOUNDED_REQUIRES(!allocator_has_construct<allocator_type, T, Args...> and std::is_trivial<T>::value)>
+	template<typename T, typename... Args, BOUNDED_REQUIRES(!allocator_has_construct<allocator_type, T, Args...>)>
 	static constexpr auto construct(allocator_type &, T * const ptr, Args && ... args) BOUNDED_NOEXCEPT(
-		*ptr = T(std::forward<Args>(args)...)
+		::bounded::construct(*ptr, std::forward<Args>(args)...)
 	)
 	
 
@@ -125,13 +121,10 @@ public:
 	static constexpr auto destroy(allocator_type & a, T * const ptr) BOUNDED_NOEXCEPT(
 		static_cast<void>(a.destroy(ptr))
 	)
-	template<typename T, BOUNDED_REQUIRES(!allocator_has_destroy<allocator_type, T> and !std::is_trivial<T>::value)>
-	static auto destroy(allocator_type &, T * const ptr) BOUNDED_NOEXCEPT(
-		ptr->~T()
+	template<typename T, BOUNDED_REQUIRES(!allocator_has_destroy<allocator_type, T>)>
+	static constexpr auto destroy(allocator_type &, T * const ptr) BOUNDED_NOEXCEPT(
+		::bounded::destroy(*ptr)
 	)
-	template<typename T, BOUNDED_REQUIRES(!allocator_has_destroy<allocator_type, T> and std::is_trivial<T>::value)>
-	static constexpr auto destroy(allocator_type &, T *) noexcept {
-	}
 };
 
 }	// namespace detail

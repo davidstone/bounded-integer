@@ -15,12 +15,11 @@
 
 #pragma once
 
-#include <containers/addressof.hpp>
 #include <containers/allocator.hpp>
 #include <containers/type_list.hpp>
 #include <containers/algorithms/iterator.hpp>
 
-#include <bounded_integer/bounded_integer.hpp>
+#include <bounded/integer.hpp>
 
 #include <iterator>
 #include <type_traits>
@@ -86,12 +85,12 @@ auto uninitialized_copy(InputIterator first, Sentinel const last, ForwardIterato
 	auto out_first = out;
 	try {
 		for (; first != last; ++first) {
-			::containers::detail::construct(allocator, ::containers::addressof(*out), *first);
+			::containers::detail::construct(allocator, ::bounded::addressof(*out), *first);
 			++out;
 		}
 	} catch (...) {
 		for (; out_first != out; ++out_first) {
-			::containers::detail::destroy(allocator, ::containers::addressof(*out_first));
+			::containers::detail::destroy(allocator, ::bounded::addressof(*out_first));
 		}
 		throw;
 	}
@@ -110,7 +109,7 @@ template<
 >
 constexpr auto uninitialized_copy(InputIterator first, Sentinel const last, ForwardIterator out, Allocator && allocator) noexcept {
 	for (; first != last; ++first) {
-		::containers::detail::construct(allocator, ::containers::addressof(*out), *first);
+		::containers::detail::construct(allocator, ::bounded::addressof(*out), *first);
 		++out;
 	}
 	return out;
@@ -144,11 +143,11 @@ auto uninitialized_default_construct(ForwardIterator const first, Sentinel const
 	auto it = first;
 	try {
 		for (; it != last; ++it) {
-			::containers::detail::construct(allocator, ::containers::addressof(*it));
+			::containers::detail::construct(allocator, ::bounded::addressof(*it));
 		}
 	} catch (...) {
 		for (auto rollback = first; rollback != it; ++rollback) {
-			::containers::detail::destroy(allocator, ::containers::addressof(*rollback));
+			::containers::detail::destroy(allocator, ::bounded::addressof(*rollback));
 		}
 		throw;
 	}
@@ -162,7 +161,7 @@ template<
 >
 constexpr auto uninitialized_default_construct(ForwardIterator first, Sentinel const last, Allocator && allocator) noexcept {
 	for (; first != last; ++first) {
-		::containers::detail::construct(allocator, ::containers::addressof(*first));
+		::containers::detail::construct(allocator, ::bounded::addressof(*first));
 	}
 }
 

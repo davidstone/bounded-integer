@@ -16,7 +16,6 @@
 
 #pragma once
 
-#include <containers/addressof.hpp>
 #include <containers/algorithms/copy.hpp>
 #include <containers/algorithms/equal.hpp>
 #include <containers/algorithms/iterator.hpp>
@@ -28,7 +27,7 @@
 #include <containers/is_iterator.hpp>
 #include <containers/repeat_n.hpp>
 
-#include <bounded_integer/bounded_integer.hpp>
+#include <bounded/integer.hpp>
 
 #include <algorithm>
 #include <cassert>
@@ -314,7 +313,7 @@ constexpr auto emplace_in_middle_no_reallocation(Container & container, typename
 	auto const original_end = container.end();
 	container.emplace_back(std::move(back(container)));
 	::containers::move_backward(position, ::containers::prev(original_end), original_end);
-	auto const pointer = ::containers::addressof(*position);
+	auto const pointer = ::bounded::addressof(*position);
 	::containers::detail::destroy(allocator, pointer);
 	::containers::detail::construct(allocator, pointer, std::forward<Args>(args)...);
 }

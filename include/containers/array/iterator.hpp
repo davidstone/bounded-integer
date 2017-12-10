@@ -16,10 +16,9 @@
 
 #pragma once
 
-#include <containers/addressof.hpp>
 #include <containers/common_iterator_functions.hpp>
 
-#include <bounded_integer/bounded_integer.hpp>
+#include <bounded/integer.hpp>
 
 #include <cstddef>
 #include <cstdint>
@@ -51,7 +50,7 @@ struct basic_array_iterator {
 		return *m_it;
 	}
 	constexpr auto operator->() const {
-		return ::containers::addressof(operator*());
+		return ::bounded::addressof(operator*());
 	}
 
 	friend constexpr auto operator+(basic_array_iterator const lhs, difference_type const rhs) {

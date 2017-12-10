@@ -16,7 +16,6 @@
 
 #pragma once
 
-#include <containers/addressof.hpp>
 #include <containers/allocator.hpp>
 #include <containers/algorithms/iterator.hpp>
 #include <containers/common_container_functions.hpp>
@@ -27,7 +26,7 @@
 #include <containers/array/array.hpp>
 #include <containers/array/iterator.hpp>
 
-#include <bounded_integer/integer_range.hpp>
+#include <bounded/integer_range.hpp>
 
 #include <algorithm>
 #include <cassert>
@@ -191,7 +190,7 @@ struct static_vector : private detail::static_vector_data<T, capacity_>  {
 	}
 	
 	constexpr auto pop_back() {
-		::containers::detail::destroy(get_allocator(), ::containers::addressof(back(*this)));
+		::containers::detail::destroy(get_allocator(), ::bounded::addressof(back(*this)));
 		--this->m_size;
 	}
 
