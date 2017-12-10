@@ -1,4 +1,4 @@
-// A type suitable to index into a container / iterator
+// Determine if a type is a container
 // Copyright (C) 2015 David Stone
 //
 // This program is free software: you can redistribute it and / or modify
@@ -16,33 +16,17 @@
 
 #pragma once
 
-#include <containers/is_container.hpp>
-#include <containers/is_iterator.hpp>
-
 #include <bounded_integer/bounded_integer.hpp>
-
-#include <limits>
-#include <type_traits>
 
 namespace containers {
 namespace detail {
 
-template<typename Container, BOUNDED_REQUIRES(is_container<Container>)>
-auto index_type_source_impl(Container const &) -> typename Container::size_type;
-
-template<typename Iterator, BOUNDED_REQUIRES(is_iterator<Iterator>)>
-auto index_type_source_impl(Iterator const &) -> typename Iterator::difference_type;
-
-template<typename T>
-using index_type_source = decltype(index_type_source_impl(std::declval<T>()));
+BOUNDED_INTEGER_MAKE_NESTED_TYPE_TEST(iterator)
+BOUNDED_INTEGER_MAKE_NESTED_TYPE_TEST(const_iterator)
 
 }	// namespace detail
 
-template<typename T>
-using index_type = bounded::checked_integer<
-	0,
-	static_cast<std::intmax_t>(std::numeric_limits<detail::index_type_source<T>>::max()) - 1,
-	std::out_of_range
->;
+template<typename Container>
+constexpr auto is_container = detail::has_nested_type_iterator<Container> or detail::has_nested_type_const_iterator<Container>;
 
 }	// namespace containers

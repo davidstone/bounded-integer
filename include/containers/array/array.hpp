@@ -37,7 +37,7 @@ struct array {
 	using const_iterator = basic_array_iterator<value_type const, size>;
 	using iterator = basic_array_iterator<value_type, size>;
 
-	using size_type = typename const_iterator::size_type;
+	using size_type = bounded::integer<size, size>;
 	
 	constexpr auto data() const noexcept {
 		return m_value;

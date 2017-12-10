@@ -33,7 +33,6 @@ struct array;
 template<typename T, std::intmax_t size>
 struct basic_array_iterator {
 	using value_type = T;
-	using size_type = bounded::integer<size, size>;
 	using difference_type = bounded::integer<-size, size>;
 	using pointer = value_type *;
 	using reference = value_type &;
