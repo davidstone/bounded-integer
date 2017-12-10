@@ -1,6 +1,8 @@
 ^array
 ^dynamic_array
+^small_buffer_optimized_vector
 ^static_vector
+^string
 ^vector
 ^flat_map
 ^forward_list

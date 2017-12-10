@@ -72,6 +72,16 @@ programs = [
 		include_directories = include_directories
 	),
 	Program(
+		'small_buffer_optimized_vector',
+		sources = ['small_buffer_optimized_vector.cpp'],
+		include_directories = include_directories
+	),
+	Program(
+		'string',
+		sources = ['string.cpp'],
+		include_directories = include_directories
+	),
+	Program(
 		'forward_list',
 		sources = ['forward_list/forward_list.cpp'],
 		defines = ['USE_SYSTEM_FORWARD_LIST=false'],

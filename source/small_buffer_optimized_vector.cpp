@@ -1,9 +1,10 @@
-// Copyright David Stone 2015.
+// Copyright David Stone 2016.
 // Distributed under the Boost Software License, Version 1.0.
 // (See accompanying file LICENSE_1_0.txt or copy at
 // http://www.boost.org/LICENSE_1_0.txt)
 
-#include <containers/vector/vector.hpp>
+#include <containers/small_buffer_optimized_vector.hpp>
+#include <containers/string.hpp>
 
 #include <cassert>
 
@@ -11,13 +12,11 @@ namespace {
 
 using namespace bounded::literal;
 
-template<std::size_t capacity_, typename T>
-void test_generic(T const & t, std::initializer_list<T> init) {
-	constexpr auto capacity = bounded::constant<capacity_>;
-	using container = containers::vector<T>;
+template<std::intmax_t capacity_, typename T>
+void test_generic(bounded::constant_t<capacity_> const capacity, T const & t, std::initializer_list<T> init) {
+	using container = containers::small_buffer_optimized_vector<T, 1>;
 	auto const default_constructed = container{};
 	assert(empty(default_constructed));
-	assert(default_constructed.capacity() == 0_bi);
 	
 	assert(default_constructed.begin() == default_constructed.begin());
 	assert(default_constructed.begin() == default_constructed.end());
@@ -98,39 +97,32 @@ void test_generic(T const & t, std::initializer_list<T> init) {
 }
 
 auto test_erase() {
-	using container = containers::vector<int>;
+	using container = containers::small_buffer_optimized_vector<char, 1>;
 	container v = { 1, 2, 3, 4, 5, 6, 7 };
 	erase_if(v, [](auto const & value) { return value % 2 == 0; });
 	assert(v == container({ 1, 3, 5, 7 }));
 }
 
-struct complex_resource {
-	complex_resource() = default;
-	template<typename Size>
-	explicit complex_resource(Size size): data(size) {}
-
-	complex_resource(complex_resource const & other) = default;
-	complex_resource & operator=(complex_resource const & other) = default;
-
-	containers::vector<int> data;
-};
-
-auto operator==(complex_resource const & lhs, complex_resource const & rhs) {
-	return lhs.data == rhs.data;
-}
-
 }	// namespace
 
 int main() {
-	test_generic<1>(0, { });
-	test_generic<1>(0, { 5 });
+	test_generic(1_bi, '0', { });
+	test_generic(1_bi, '0', { '5' });
 
-	test_generic<5>(0, { });
-	test_generic<5>(9, { 0, 1, 4 });
-	test_generic<5>(-4, { 0, 1, 2, 3, 4 });
+	test_generic(5_bi, '0', { });
+	test_generic(5_bi, '9', { '0', '1', '4' });
+	test_generic(5_bi, '-', { '0', '1', '2', '3', '4' });
 
-	test_generic<3>(std::string("hi"), { std::string(""), std::string("hello"), std::string(100, '=') });
-	test_generic<6>(complex_resource(5_bi), { complex_resource(1_bi), complex_resource(0_bi), complex_resource(10_bi), complex_resource(10_bi) });
+	test_generic(containers::detail::minimum_small_capacity<char> + 1_bi, '-', {});
+	test_generic(containers::detail::minimum_small_capacity<char> + 1_bi, '-', { '0', '1', '2', '3', '4' });
+	static_assert(containers::detail::minimum_small_capacity<char> < 30_bi);
+	test_generic(30_bi, '-', {
+		'0', '1', '2', '3', '4', '5', '6', '7', '8', '9',
+		'0', '1', '2', '3', '4', '5', '6', '7', '8', '9',
+		'0', '1', '2', '3', '4', '5', '6', '7', '8', '9',
+	});
+
+	test_generic(3_bi, containers::string("hi"), { containers::string(""), containers::string("hello"), containers::string(100, '=') });
 	
 	test_erase();
 }
