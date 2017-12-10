@@ -18,11 +18,16 @@ from program import prepend_dir, Program
 
 source_directory = 'source'
 
-include_directories = ['../value_ptr', '../include']
+include_directories = ['../bounded_integer', '../value_ptr', '../include']
 
 flat_map_sources = ['flat_map/flat_map.cpp', 'algorithms/unique_inplace_merge.cpp']
 
 programs = [
+	Program(
+		'static_vector',
+		sources = ['static_vector/static_vector.cpp'],
+		include_directories = include_directories
+	),
 	Program(
 		'forward_list',
 		sources = ['forward_list/forward_list.cpp'],
