@@ -20,41 +20,14 @@
 
 #include <bounded_integer/bounded_integer.hpp>
 
-#include <utility>
-
-// The strange namespacing and using declarations here are to ensure these
-// functions are picked up by ADL for types defined in namespaces ::container or
-// ::container::detail
-
 namespace containers {
 namespace detail {
-namespace common {
-
-template<typename LHS, typename RHS>
-constexpr auto operator!=(LHS const & lhs, RHS const & rhs) BOUNDED_NOEXCEPT(
-	!(lhs == rhs)
-)
-
-template<typename LHS, typename RHS>
-constexpr auto operator>(LHS const & lhs, RHS const & rhs) BOUNDED_NOEXCEPT(
-	rhs < lhs
-)
-template<typename LHS, typename RHS>
-constexpr auto operator<=(LHS const & lhs, RHS const & rhs) BOUNDED_NOEXCEPT(
-	!(rhs < lhs)
-)
-template<typename LHS, typename RHS>
-constexpr auto operator>=(LHS const & lhs, RHS const & rhs) BOUNDED_NOEXCEPT(
-	!(lhs < rhs)
-)
 
 #define CONTAINERS_COMMON_USING_DECLARATIONS \
-	using ::containers::detail::common::operator!=; \
-	using ::containers::detail::common::operator>; \
-	using ::containers::detail::common::operator<=; \
-	using ::containers::detail::common::operator>=;
-
-}	// namespace common
+	using ::bounded::operator!=; \
+	using ::bounded::operator>; \
+	using ::bounded::operator<=; \
+	using ::bounded::operator>=;
 
 CONTAINERS_COMMON_USING_DECLARATIONS
 
