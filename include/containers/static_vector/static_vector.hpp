@@ -52,11 +52,11 @@ public:
 	
 	static_vector() = default;
 	
-	template<typename Count, enable_if_t<std::is_convertible<Count, size_type>::value> = clang_dummy>
+	template<typename Count, BOUNDED_REQUIRES(std::is_convertible<Count, size_type>::value)>
 	explicit static_vector(Count const count) BOUNDED_NOEXCEPT_INITIALIZATION(
 		static_vector(count_constructor{}, count)
 	) {}
-	template<typename Count, enable_if_t<std::is_convertible<Count, size_type>::value> = clang_dummy>
+	template<typename Count, BOUNDED_REQUIRES(std::is_convertible<Count, size_type>::value)>
 	static_vector(Count const count, value_type const & value) BOUNDED_NOEXCEPT_INITIALIZATION(
 		static_vector(count_constructor{}, count, value)
 	) {}

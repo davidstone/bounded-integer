@@ -20,8 +20,6 @@
 #include <containers/algorithms/unique_inplace_merge.hpp>
 #include <containers/moving_vector/moving_vector.hpp>
 
-#include <value_ptr/enable_if.hpp>
-
 #include <algorithm>
 #include <stdexcept>
 #include <tuple>

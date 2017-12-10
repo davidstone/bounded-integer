@@ -18,7 +18,8 @@
 
 #include <containers/moving_vector/forward_declaration.hpp>
 
-#include <value_ptr/enable_if.hpp>
+#include <bounded_integer/bounded_integer.hpp>
+
 #include <value_ptr/value_ptr.hpp>
 
 #include <iterator>
@@ -31,20 +32,20 @@ namespace detail {
 namespace moving_vector {
 using namespace smart_pointer;
 
-template<typename T, typename ValueType, enable_if_t<std::is_same<T, ValueType>::value> = enabler_dummy>
+template<typename T, typename ValueType, BOUNDED_REQUIRES(std::is_same<T, ValueType>::value)>
 constexpr decltype(auto) remove_indirection(value_ptr<T> const * ptr) {
 	return **ptr;
 }
-template<typename T, typename ValueType, enable_if_t<std::is_same<T, ValueType>::value> = enabler_dummy>
+template<typename T, typename ValueType, BOUNDED_REQUIRES(std::is_same<T, ValueType>::value)>
 constexpr decltype(auto) remove_indirection(value_ptr<T> * ptr) {
 	return **ptr;
 }
 
-template<typename T, typename ValueType, enable_if_t<std::is_same<value_ptr<T>, ValueType>::value> = enabler_dummy>
+template<typename T, typename ValueType, BOUNDED_REQUIRES(std::is_same<value_ptr<T>, ValueType>::value)>
 constexpr decltype(auto) remove_indirection(value_ptr<T> const * ptr) {
 	return *ptr;
 }
-template<typename T, typename ValueType, enable_if_t<std::is_same<value_ptr<T>, ValueType>::value> = enabler_dummy>
+template<typename T, typename ValueType, BOUNDED_REQUIRES(std::is_same<value_ptr<T>, ValueType>::value)>
 constexpr decltype(auto) remove_indirection(value_ptr<T> * ptr) {
 	return *ptr;
 }

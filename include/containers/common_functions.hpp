@@ -173,7 +173,7 @@ template<typename Container>
 constexpr auto assign(Container & container, std::initializer_list<typename Container::value_type> init) BOUNDED_NOEXCEPT(
 	assign(container, init.begin(), init.end())
 )
-template<typename Container, typename Size, enable_if_t<std::numeric_limits<Size>::is_specialized> = clang_dummy>
+template<typename Container, typename Size, BOUNDED_REQUIRES(std::numeric_limits<Size>::is_specialized)>
 constexpr auto assign(Container & container, Size const count, typename Container::value_type const & value) {
 	auto const range = detail::repeat_n(count, value);
 	assign(container, range.begin(), range.end());
