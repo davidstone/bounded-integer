@@ -17,13 +17,12 @@
 #pragma once
 
 #include <containers/array/array.hpp>
+#include <containers/array/iterator.hpp>
 #include <containers/common_container_functions.hpp>
 #include <containers/index_type.hpp>
 #include <containers/repeat_n.hpp>
-#include <containers/uninitialized_storage.hpp>
-
 #include <containers/static_vector/forward_declaration.hpp>
-#include <containers/static_vector/iterator.hpp>
+#include <containers/uninitialized_storage.hpp>
 
 #include <bounded_integer/integer_range.hpp>
 
@@ -42,8 +41,8 @@ template<typename T, std::size_t capacity_>
 struct static_vector {
 	using value_type = T;
 	using size_type = bounded::integer<0, capacity_>;
-	using const_iterator = detail::static_vector_iterator<value_type const, capacity_>;
-	using iterator = detail::static_vector_iterator<value_type, capacity_>;
+	using const_iterator = detail::basic_array_iterator<value_type const, static_vector>;
+	using iterator = detail::basic_array_iterator<value_type, static_vector>;
 	
 	static_vector() = default;
 	
@@ -93,10 +92,10 @@ struct static_vector {
 
 
 	auto begin() const noexcept {
-		return const_iterator(m_container.begin());
+		return const_iterator(data());
 	}
 	auto begin() noexcept {
-		return iterator(m_container.begin());
+		return iterator(data());
 	}
 	auto end() const noexcept {
 		return begin() + m_size;

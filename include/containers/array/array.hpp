@@ -34,11 +34,11 @@ template<typename T, std::size_t size>
 struct array {
 	using value_type = T;
 
-	using const_iterator = basic_array_iterator<value_type const, size>;
-	using iterator = basic_array_iterator<value_type, size>;
-
 	using size_type = bounded::integer<size, size>;
 	
+	using const_iterator = basic_array_iterator<value_type const, array>;
+	using iterator = basic_array_iterator<value_type, array>;
+
 	constexpr auto data() const noexcept {
 		return m_value;
 	}

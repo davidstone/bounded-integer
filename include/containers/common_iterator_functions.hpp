@@ -27,6 +27,16 @@
 
 namespace containers {
 namespace detail {
+
+// The value of a difference is equal to the largest possible size for
+// std::distance(begin(), end()), and it is equal to the negation of that value
+// for std::distance(end(), begin())
+template<typename Size>
+using basic_difference_type = std::common_type_t<
+	decltype(-std::declval<Size>()),
+	Size
+>;
+
 namespace common {
 
 template<typename Offset, typename Iterator, BOUNDED_REQUIRES(std::numeric_limits<Offset>::is_integer and is_iterator<Iterator>)>

@@ -23,25 +23,27 @@
 #include <cstddef>
 #include <cstdint>
 #include <iterator>
+#include <limits>
 
 namespace containers {
 namespace detail {
 
-template<typename T, std::size_t size>
-struct array;
-
-template<typename T, std::intmax_t size>
+// It looks like we do not need to pass in type T here, as it is
+// Container::value_type, but for const_iterator, it is actually
+// Container::value_type const. An alternative implementation would have two
+// template parameters: typename Container, bool is_const
+template<typename T, typename Container>
 struct basic_array_iterator {
 	using value_type = T;
-	using difference_type = bounded::integer<-size, size>;
+	using difference_type = basic_difference_type<typename Container::size_type>;
 	using pointer = value_type *;
 	using reference = value_type &;
 	using iterator_category = std::random_access_iterator_tag;
 
 	constexpr basic_array_iterator() noexcept = default;
 	// Convert iterator to const_iterator
-	constexpr operator basic_array_iterator<value_type const, size>() const noexcept {
-		return basic_array_iterator<value_type const, size>(m_it);
+	constexpr operator basic_array_iterator<value_type const, Container>() const noexcept {
+		return basic_array_iterator<value_type const, Container>(m_it);
 	}
 
 	constexpr auto & operator*() const {
@@ -50,15 +52,16 @@ struct basic_array_iterator {
 	constexpr auto operator->() const {
 		return std::addressof(operator*());
 	}
-	constexpr auto & operator[](index_type<basic_array_iterator> const index) const {
-		return m_it[static_cast<std::size_t>(index)];
-	}
 
 	friend constexpr auto operator+(basic_array_iterator const lhs, difference_type const rhs) {
 		return basic_array_iterator(lhs.m_it + rhs);
 	}
 	friend constexpr auto operator-(basic_array_iterator const lhs, basic_array_iterator const rhs) {
 		return static_cast<difference_type>(lhs.m_it - rhs.m_it);
+	}
+
+	constexpr auto & operator[](index_type<basic_array_iterator> const index) const {
+		return *(*this + index);
 	}
 
 	friend constexpr auto operator==(basic_array_iterator const lhs, basic_array_iterator const rhs) noexcept {
@@ -69,18 +72,16 @@ struct basic_array_iterator {
 	}
 
 private:
-	friend struct ::containers::detail::array<value_type, size>;
-	friend struct ::containers::detail::array<std::remove_const_t<value_type>, size>;
-	friend struct basic_array_iterator<std::remove_const_t<value_type>, size>;
+	friend Container;
+	friend basic_array_iterator<std::remove_const_t<T>, Container>;
 
-	using base_iterator = value_type *;
-	constexpr explicit basic_array_iterator(base_iterator const other) noexcept:
+	constexpr explicit basic_array_iterator(pointer const other) noexcept:
 		m_it(other) {
 	}
 
-	base_iterator m_it;
+	pointer m_it;
 };
 
 
 }	// namespace detail
-}	// namespace bounded
+}	// namespace containers

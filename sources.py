@@ -34,6 +34,11 @@ programs = [
 		include_directories = include_directories
 	),
 	Program(
+		'dynamic_array',
+		sources = ['dynamic_array/dynamic_array.cpp'],
+		include_directories = include_directories
+	),
+	Program(
 		'static_vector',
 		sources = ['static_vector/static_vector.cpp'],
 		include_directories = include_directories
