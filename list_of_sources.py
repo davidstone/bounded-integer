@@ -1,4 +1,4 @@
-# Copyright David Stone 2016.
+# Copyright David Stone 2017.
 # Distributed under the Boost Software License, Version 1.0.
 # (See accompanying file LICENSE_1_0.txt or copy at
 # http://www.boost.org/LICENSE_1_0.txt)
@@ -7,7 +7,7 @@ from program import prepend_dir, Program
 
 source_directory = 'source'
 
-include_directories = ['../bounded_integer/include', '../value_ptr', '../include']
+include_directories = ['../bounded_integer/include', '../include']
 
 # The sources are just needed to make sure the include files are self-contained.
 # To minimize compile times, only compile these files with the array program,
@@ -100,18 +100,6 @@ programs = [
 	Program(
 		'string',
 		sources = ['string.cpp'],
-		include_directories = include_directories
-	),
-	Program(
-		'forward_list',
-		sources = ['forward_list/forward_list.cpp'],
-		defines = ['USE_SYSTEM_FORWARD_LIST=false'],
-		include_directories = include_directories
-	),
-	Program(
-		'forward_list_std',
-		sources = ['forward_list/forward_list.cpp'],
-		defines = ['USE_SYSTEM_FORWARD_LIST=true'],
 		include_directories = include_directories
 	),
 	Program(

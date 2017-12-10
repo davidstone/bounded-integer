@@ -6,7 +6,6 @@
 ^string
 ^vector
 ^flat_map
-^forward_list
 ^performance
 
 syntax: glob

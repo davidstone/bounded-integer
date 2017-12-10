@@ -1,3 +1,2 @@
 bounded_integer = https://bitbucket.org/davidstone/bounded_integer
 build_scripts = https://bitbucket.org/davidstone/scons-template
-value_ptr = https://bitbucket.org/davidstone/value_ptr
