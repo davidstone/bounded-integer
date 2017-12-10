@@ -20,7 +20,9 @@
 #include <containers/apply_tuple.hpp>
 #include <containers/algorithms/iterator.hpp>
 #include <containers/algorithms/unique_inplace_merge.hpp>
+#include <containers/legacy_iterator.hpp>
 #include <containers/moving_vector/moving_vector.hpp>
+#include <containers/vector/vector.hpp>
 
 #include <algorithm>
 #include <stdexcept>
@@ -31,11 +33,11 @@ namespace containers {
 namespace detail {
 // The exact type of value_type should be considered implementation defined.
 // std::pair<key_type const, mapped_type> does not work if the underlying
-// container is std::vector because insertion into the middle / sorting requires
+// container is vector because insertion into the middle / sorting requires
 // moving the value_type. key_type const does not have a copy or move assignment
-// operator. To get the code to work with a std::vector, we have to sacrifice
-// some compile-time checks. However, we can leave them in place in the case
-// that we are working with a moving_vector.
+// operator. To get the code to work with a vector, we have to sacrifice some
+// compile-time checks. However, we can leave them in place in the case that we
+// are working with a moving_vector.
 //
 // The allocator should never change the value_type of a container, so we just
 // use the default to prevent infinite recursion in our flat_map template
@@ -114,8 +116,9 @@ public:
 		auto const equal = [&](auto const & lhs, auto const & rhs) {
 			return !less(lhs, rhs) and !less(rhs, lhs);
 		};
-		container().erase(
-			std::unique(moving_begin(container()), moving_end(container()), equal),
+		::containers::erase(
+			container(),
+			moving_to_standard_iterator(::containers::detail::unique(moving_begin(container()), moving_end(container()), equal)),
 			container().end()
 		);
 	}
@@ -236,21 +239,15 @@ public:
 		// sorted, it's probably better to just sort the new elements then do a
 		// merge sort on both ranges, rather than calling std::sort on the
 		// entire container.
-		//
-		// Due to a bug in gcc 4.7's std::vector insert implementation, I cannot
-		// simply store the iterator returned by insert (because insert returns
-		// void). Instead, I store the original size and construct a new
-		// iterator.
-		auto const offset = static_cast<typename container_type::difference_type>(container().size());
-		container().insert(container().end(), first, last);
-		auto const midpoint = moving_begin(container()) + offset;
+		auto const const_midpoint = container().insert(container().end(), first, last);
+		auto const midpoint = detail::make_moving_iterator(container(), const_midpoint);
 		std::sort(midpoint, moving_end(container()), indirect_compare{value_comp()});
 		if (allow_duplicates) {
 			std::inplace_merge(
-				moving_begin(container()),
-				midpoint,
-				moving_end(container()),
-				indirect_compare{value_comp()}
+				legacy_iterator(moving_begin(container())),
+				legacy_iterator(midpoint),
+				legacy_iterator(moving_end(container())),
+				indirect_compare(value_comp())
 			);
 		}
 		else {
@@ -258,9 +255,10 @@ public:
 				moving_begin(container()),
 				midpoint,
 				moving_end(container()),
-				indirect_compare{value_comp()}
+				indirect_compare(value_comp())
 			);
-			container().erase(position, container().end());
+			using containers::erase;
+			erase(container(), position, moving_end(container()));
 		}
 	}
 	void insert(std::initializer_list<value_type> init) {
@@ -508,15 +506,15 @@ public:
 
 }	// namespace detail
 
-template<typename Key, typename T, typename Compare = std::less<Key>, typename Allocator = std::allocator<detail::value_type_t<Key, T, std::vector>>>
-using unstable_flat_map = detail::flat_map<Key, T, Compare, std::vector, Allocator>;
+template<typename Key, typename T, typename Compare = std::less<Key>, typename Allocator = std::allocator<detail::value_type_t<Key, T, vector>>>
+using unstable_flat_map = detail::flat_map<Key, T, Compare, vector, Allocator>;
 
 template<typename Key, typename T, typename Compare = std::less<Key>, typename Allocator = std::allocator<detail::value_type_t<Key, T, moving_vector>>>
 using stable_flat_map = detail::flat_map<Key, T, Compare, moving_vector, Allocator>;
 
 
-template<typename Key, typename T, typename Compare = std::less<Key>, typename Allocator = std::allocator<detail::value_type_t<Key, T, std::vector>>>
-using unstable_flat_multimap = detail::flat_multimap<Key, T, Compare, std::vector, Allocator>;
+template<typename Key, typename T, typename Compare = std::less<Key>, typename Allocator = std::allocator<detail::value_type_t<Key, T, vector>>>
+using unstable_flat_multimap = detail::flat_multimap<Key, T, Compare, vector, Allocator>;
 
 template<typename Key, typename T, typename Compare = std::less<Key>, typename Allocator = std::allocator<detail::value_type_t<Key, T, moving_vector>>>
 using stable_flat_multimap = detail::flat_multimap<Key, T, Compare, moving_vector, Allocator>;

@@ -19,13 +19,14 @@
 #include <cassert>
 #include <numeric>
 
+namespace {
 using namespace containers;
 using namespace smart_pointer;
+using namespace bounded::literal;
 
-namespace {
 moving_vector<int> container_after_unique() {
 	moving_vector<int> v;
-	v.push_back(-3);
+	push_back(v, -3);
 	for (int const value : {2, 5, 6}) {
 		v.emplace_back(value);
 	}
@@ -40,13 +41,13 @@ int main() {
 	std::sort(v.begin(), v.end());
 	assert(v == moving_vector<int>({-3, 2, 2, 5, 6}));
 	auto const last = std::unique(v.begin(), v.end());
-	v.erase(last, v.end());
+	erase(v, last, v.end());
 	assert(v == container_after_unique());
-	moving_vector<moving_vector<int>> inception(5);
-	assert(inception.size() == 5);
-	assert(inception.front().size() == 0);
-	inception.front().assign(v.begin(), v.end());
-	assert(inception.front() == v);
+	moving_vector<moving_vector<int>> inception(5_bi);
+	assert(size(inception) == 5_bi);
+	assert(size(front(inception)) == 0_bi);
+	assign(front(inception), v.begin(), v.end());
+	assert(front(inception) == v);
 
 	v.emplace(v.begin(), 12);
 	assert(v == moving_vector<int>({12, -3, 2, 5, 6}));

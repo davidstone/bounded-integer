@@ -16,15 +16,15 @@
 
 #pragma once
 
-#include <containers/algorithms/iterator.hpp>
+#include <containers/common_container_functions.hpp>
 #include <containers/moving_vector/forward_declaration.hpp>
 #include <containers/moving_vector/moving_vector_iterator.hpp>
+#include <containers/vector/vector.hpp>
 
 #include <value_ptr/value_ptr.hpp>
 
 #include <iterator>
 #include <type_traits>
-#include <vector>
 
 namespace containers {
 
@@ -34,303 +34,186 @@ public:
 	using value_type = T;
 private:
 	using element_type = smart_pointer::value_ptr<value_type>;
-	using container_type = std::vector<element_type>;
+	using container_type = vector<element_type, Allocator>;
 public:
-	using allocator_type = Allocator;
+	using allocator_type = typename std::allocator_traits<Allocator>::template rebind_alloc<element_type>;
 	using size_type = typename container_type::size_type;
-	using difference_type = typename container_type::difference_type;
-	using const_reference = value_type const &;
-	using reference = value_type &;
-	using const_pointer = typename std::allocator_traits<allocator_type>::const_pointer;
-	using pointer = typename std::allocator_traits<allocator_type>::pointer;
 	
-	using const_iterator = detail::moving_vector_iterator<value_type, value_type const>;
-	using iterator = detail::moving_vector_iterator<value_type, value_type>;
-	// There is no const_indirect_iterator because there is no way to enforce it
-	using indirect_iterator = detail::moving_vector_iterator<value_type, element_type>;
-	using const_reverse_iterator = std::reverse_iterator<const_iterator>;
-	using reverse_iterator = std::reverse_iterator<iterator>;
-	using reverse_indirect_iterator = std::reverse_iterator<indirect_iterator>;
+	using moving_iterator = detail::basic_array_iterator<element_type, moving_vector>;
 	
-	moving_vector() {
-	}
-	explicit moving_vector(allocator_type const &) {
-	}
-	explicit moving_vector(size_type count, allocator_type const & = allocator_type{}) {
-		for (size_type n = 0; n != count; ++n) {
+	using const_iterator = detail::moving_vector_iterator<value_type const, moving_vector>;
+	using iterator = detail::moving_vector_iterator<value_type, moving_vector>;
+
+	constexpr moving_vector() = default;
+
+	constexpr explicit moving_vector(allocator_type const &) {}
+	constexpr explicit moving_vector(size_type count, allocator_type const & = allocator_type{}) {
+		for (auto const n : bounded::integer_range(count)) {
+			static_cast<void>(n);
 			emplace_back();
 		}
 	}
-	moving_vector(size_type count, value_type const & value, allocator_type const & = allocator_type{}) {
-		assign(count, value);
+	constexpr moving_vector(size_type count, value_type const & value, allocator_type const & = allocator_type{}) {
+		assign(*this, count, value);
 	}
 	template<typename InputIterator>
-	moving_vector(InputIterator first, InputIterator last, allocator_type const & = allocator_type{}) {
-		assign(first, last);
+	constexpr moving_vector(InputIterator first, InputIterator last, allocator_type const & = allocator_type{}) {
+		assign(*this, first, last);
 	}
-	moving_vector(moving_vector const & other, allocator_type const &):
-		moving_vector(other) {
-	}                                                                       
-	moving_vector(moving_vector && other, allocator_type const &):
-		moving_vector(std::move(other)) {
-	}
-	moving_vector(std::initializer_list<value_type> init, allocator_type const & allocator = allocator_type{}):
+
+	constexpr moving_vector(std::initializer_list<value_type> init, allocator_type const & allocator = allocator_type{}):
 		moving_vector(std::begin(init), std::end(init), allocator) {
 	}
 	
-	auto assign(size_type count, value_type const & value) {
-		clear();
-		reserve(count);
-		for (size_type n = 0; n != count; ++n) {
-			emplace_back(value);
-		}
-	}
-	template<typename InputIterator>
-	auto assign(InputIterator first, InputIterator last) {
-		clear();
-		if (std::is_same<typename std::iterator_traits<InputIterator>::iterator_category, std::random_access_iterator_tag>::value) {
-			reserve(static_cast<size_type>(std::distance(first, last)));
-		}
-		for (; first != last; ++first) {
-			emplace_back(*first);
-		}
-	}
-	auto assign(std::initializer_list<value_type> init) {
-		assign(std::begin(init), std::end(init));
-	}
-	
-	constexpr auto && at(size_type position) const {
-		return *m_container.at(position);
-	}
-	auto && at(size_type position) {
-		return *m_container.at(position);
-	}
-	constexpr auto && operator[](size_type position) const {
-		return *m_container[position];
-	}
-	auto && operator[](size_type position) {
-		return *m_container[position];
-	}
-	
-	constexpr auto && front() const {
-		return *begin();
-	}
-	auto && front() {
-		return *begin();
-	}
-	constexpr auto && back() const {
-		return *::containers::prev(end());
-	}
-	auto && back() {
-		return *::containers::prev(end());
-	}
-	
-	// data() intentionally missing
-	
-	auto begin() const noexcept {
-		return const_iterator(m_container.begin());
-	}
-	auto begin() noexcept {
-		return iterator(m_container.begin());
-	}
-	auto cbegin() const noexcept {
-		return begin();
-	}
-	auto indirect_begin() noexcept {
-		return indirect_iterator(m_container.begin());
-	}
-	
-	auto end() const noexcept {
-		return begin() + static_cast<difference_type>(size());
-	}
-	auto end() noexcept {
-		return begin() + static_cast<difference_type>(size());
-	}
-	auto cend() const noexcept {
-		return end();
-	}
-	auto indirect_end() noexcept {
-		return indirect_iterator(m_container.end());
-	}
-	
-	auto rbegin() const noexcept {
-		return const_reverse_iterator(end());
-	}
-	auto rbegin() noexcept {
-		return reverse_iterator(end());
-	}
-	auto crbegin() const noexcept {
-		return rbegin();
-	}
-	auto indirect_rbegin() noexcept {
-		return indirect_iterator(indirect_end());
-	}
-	
-	auto rend() const noexcept {
-		return const_reverse_iterator(begin());
-	}
-	auto rend() noexcept {
-		return reverse_iterator(begin());
-	}
-	auto crend() const noexcept {
-		return rend();
-	}
-	auto indirect_rend() noexcept {
-		return indirect_iterator(indirect_begin());
-	}
-	
-	auto empty() const noexcept {
-		return m_container.empty();
-	}
-	auto size() const noexcept {
-		return m_container.size();
-	}
-	auto max_size() const noexcept {
-		return m_container.max_size();
+	moving_vector(moving_vector const & other) = default;
+	constexpr moving_vector(moving_vector const & other, allocator_type const &):
+		moving_vector(other) {
+	}                                                                       
+
+	moving_vector(moving_vector && other) = default;
+	constexpr moving_vector(moving_vector && other, allocator_type const &):
+		moving_vector(std::move(other)) {
 	}
 
-	auto capacity() const noexcept {
+	constexpr auto begin() const noexcept {
+		return const_iterator(moving_begin());
+	}
+	constexpr auto begin() noexcept {
+		return iterator(moving_begin());
+	}
+	constexpr auto moving_begin() noexcept {
+		return moving_iterator(m_container.data());
+	}
+	
+	constexpr auto end() const noexcept {
+		return const_iterator(moving_end());
+	}
+	constexpr auto end() noexcept {
+		return iterator(moving_end());
+	}
+	constexpr auto moving_end() noexcept {
+		return moving_begin() + size(m_container);
+	}
+	
+	constexpr auto && operator[](index_type<moving_vector> const index) const noexcept {
+		return *(begin() + index);
+	}
+	constexpr auto && operator[](index_type<moving_vector> const index) noexcept {
+		return *(begin() + index);
+	}
+	
+	
+	constexpr auto capacity() const noexcept {
 		return m_container.capacity();
 	}
-	auto reserve(size_type const new_capacity) noexcept {
-		return m_container.reserve(new_capacity);
+	constexpr auto reserve(size_type const requested_capacity) {
+		return m_container.reserve(requested_capacity);
 	}
-	auto shink_to_fit() {
+	constexpr auto shink_to_fit() {
 		m_container.shrink_to_fit();
 	}
 	
-	auto clear() noexcept {
-		m_container.clear();
-	}
-	
-	template<typename... Args>
-	auto emplace(const_iterator const position, Args && ... args) {
-		return iterator(m_container.emplace(make_base_iterator(position), smart_pointer::make_value<value_type>(std::forward<Args>(args)...)));
-	}
-	
-	auto insert(const_iterator const position, value_type const & value) {
-		return emplace(position, value);
-	}
-	auto insert(const_iterator const position, value_type && value) {
-		return emplace(position, std::move(value));
-	}
-	auto insert(const_iterator const position, size_type const count, value_type const & value) {
-		for (size_type n = 0; n != count; ++n) {
-			emplace(position, value);
-		}
-	}
-	template<typename InputIterator>
-	auto insert(const_iterator position, InputIterator first, InputIterator const last) {
-		if (first == last) {
-			return static_cast<iterator>(position);
-		}
-		auto const offset = position - begin();
-		m_container.insert(make_base_iterator(position), first, last);
-		return begin() + offset + 1;
-	}
-	auto insert(const_iterator const position, std::initializer_list<value_type> ilist) {
-		return insert(position, std::begin(ilist), std::end(ilist));
-	}
 
 	template<typename... Args>
-	auto emplace_back(Args && ... args) {
+	constexpr auto emplace_back(Args && ... args) {
 		m_container.emplace_back(smart_pointer::make_value<value_type>(std::forward<Args>(args)...));
 	}
 	
-	auto push_back(value_type const & value) {
-		emplace_back(value);
-	}
-	auto push_back(value_type && value) {
-		emplace_back(std::move(value));
+	template<typename... Args>
+	constexpr auto emplace(const_iterator const position, Args && ... args) {
+		return make_regular_iterator(m_container.emplace(make_base_iterator(position), smart_pointer::make_value<value_type>(std::forward<Args>(args)...)));
 	}
 	
-	auto erase(const_iterator const position) {
-		return iterator(m_container.erase(make_base_iterator(position)));
+	template<typename ForwardIterator, typename Sentinel>
+	constexpr auto insert(const_iterator position, ForwardIterator first, Sentinel const last) {
+		return make_regular_iterator(m_container.insert(make_base_iterator(position), first, last));
 	}
-	auto erase(const_iterator const first, const_iterator const last) {
-		return iterator(m_container.erase(make_base_iterator(first), make_base_iterator(last)));
-	}
-	auto pop_back() {
+
+	constexpr auto pop_back() {
 		m_container.pop_back();
 	}
 	
-	auto resize(size_type const new_size) {
-		auto old_size = size();
-		if (old_size < new_size) {
-			m_container.reserve(new_size);
-			for ( ; old_size != new_size; ++old_size) {
-				m_container.emplace_back();
-			}
-		}
-		else {
-			m_container.resize(new_size);
-		}
-	}
-	auto resize(size_type const count, value_type const & value) {
-		m_container.resize(count, smart_pointer::make_value<value_type>(value));
-	}
-	auto resize(size_type const count, value_type && value) {
-		m_container.resize(count, smart_pointer::make_value<value_type>(std::move(value)));
-	}
-	
-	friend auto operator==(moving_vector const & lhs, moving_vector const & rhs) noexcept {
-		return lhs.size() == rhs.size() and std::equal(lhs.begin(), lhs.end(), rhs.begin());
-	}
-	friend auto operator<(moving_vector const & lhs, moving_vector const & rhs) noexcept {
-		return std::lexicographical_compare(lhs.begin(), lhs.end(), rhs.begin(), rhs.end());
-	}
+
+	using const_moving_iterator = detail::basic_array_iterator<element_type const, moving_vector>;
 private:
+	// moving_begin and moving_end are private because it would allow
+	// modifying value_type on a moving_vector const.
+	constexpr auto moving_begin() const noexcept {
+		return const_moving_iterator(m_container.data());
+	}
+	constexpr auto moving_end() const noexcept {
+		return moving_begin() + size(m_container);
+	}
+
 	constexpr auto make_base_iterator(const_iterator const it) const {
-		return m_container.begin() + std::distance(cbegin(), it);
+		return m_container.begin() + (it - begin());
 	}
-	auto make_base_iterator(const_iterator const it) {
-		return m_container.begin() + std::distance(cbegin(), it);
+	constexpr auto make_regular_iterator(typename container_type::const_iterator const it) {
+		return begin() + (it - m_container.begin());
 	}
+
 	container_type m_container;
 };
 
 // For regular containers, the iterator you need to move elements around is just
 // a regular iterator
 template<typename Container>
-auto moving_begin(Container && container) {
+constexpr auto moving_begin(Container && container) {
 	return std::forward<Container>(container).begin();
 }
 template<typename T, typename Allocator>
-auto moving_begin(moving_vector<T, Allocator> & container) {
-	return container.indirect_begin();
+constexpr auto moving_begin(moving_vector<T, Allocator> & container) {
+	return container.moving_begin();
 }
 template<typename T, typename Allocator>
-auto moving_begin(moving_vector<T, Allocator> && container) {
+constexpr auto moving_begin(moving_vector<T, Allocator> const & container) {
+	return container.moving_begin();
+}
+template<typename T, typename Allocator>
+constexpr auto moving_begin(moving_vector<T, Allocator> && container) {
 	return std::move(container).begin();
 }
 template<typename Container>
-auto moving_end(Container && container) {
+constexpr auto moving_end(Container && container) {
 	return std::forward<Container>(container).end();
 }
 template<typename T, typename Allocator>
-auto moving_end(moving_vector<T, Allocator> & container) {
-	return container.indirect_end();
+constexpr auto moving_end(moving_vector<T, Allocator> & container) {
+	return container.moving_end();
 }
 template<typename T, typename Allocator>
-auto moving_end(moving_vector<T, Allocator> && container) {
-	return std::move(container).indirect_end();
+constexpr auto moving_end(moving_vector<T, Allocator> const & container) {
+	return container.moving_end();
+}
+template<typename T, typename Allocator>
+constexpr auto moving_end(moving_vector<T, Allocator> && container) {
+	return std::move(container).moving_end();
 }
 
-template<typename T, typename Allocator>
-auto operator!=(moving_vector<T, Allocator> const & lhs, moving_vector<T, Allocator> const & rhs) noexcept {
-	return !(lhs == rhs);
+template<typename Iterator>
+constexpr auto moving_to_standard_iterator(Iterator it) {
+	return it;
 }
 template<typename T, typename Allocator>
-auto operator>(moving_vector<T, Allocator> const & lhs, moving_vector<T, Allocator> const & rhs) noexcept {
-	return rhs < lhs;
-}
-template<typename T, typename Allocator>
-auto operator<=(moving_vector<T, Allocator> const & lhs, moving_vector<T, Allocator> const & rhs) noexcept {
-	return !(lhs > rhs);
-}
-template<typename T, typename Allocator>
-auto operator>=(moving_vector<T, Allocator> const & lhs, moving_vector<T, Allocator> const & rhs) noexcept {
-	return !(lhs < rhs);
+constexpr auto moving_to_standard_iterator(detail::basic_array_iterator<smart_pointer::value_ptr<T>, moving_vector<T, Allocator>> it) {
+	return static_cast<typename moving_vector<T, Allocator>::iterator>(it);
 }
 
+namespace detail {
+
+template<typename T, typename Allocator, typename Iterator, BOUNDED_REQUIRES(
+	std::is_same<Iterator, typename moving_vector<T, Allocator>::const_iterator>::value or
+	std::is_same<Iterator, typename moving_vector<T, Allocator>::iterator>::value
+)>
+constexpr auto make_moving_iterator(moving_vector<T, Allocator> & container, Iterator const it) noexcept {
+	return container.moving_begin() + (it - container.begin());
+}
+template<typename T, typename Allocator, typename Iterator, BOUNDED_REQUIRES(
+	std::is_same<Iterator, typename moving_vector<T, Allocator>::moving_iterator>::value
+)>
+constexpr auto make_moving_iterator(moving_vector<T, Allocator> &, Iterator const it) noexcept {
+	return it;
+}
+
+}	// namespace detail
 }	// namespace containers

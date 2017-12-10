@@ -27,12 +27,24 @@
 #include <memory>
 
 namespace containers {
+namespace detail {
+
+// TODO: support larger array sizes
+template<typename T>
+constexpr auto maximum_array_size = static_cast<std::intmax_t>(
+	bounded::min(
+		std::numeric_limits<std::ptrdiff_t>::max() / static_cast<std::ptrdiff_t>(sizeof(T)),
+		(1LL << 31LL) - 1
+	)
+);
+
+}	// namespace detail
 
 // TODO: Support stateful allocators in implementation
 template<typename T, typename Allocator = std::allocator<T>>
 struct dynamic_array {
 	using value_type = T;
-	using size_type = bounded::integer<0, std::numeric_limits<std::intmax_t>::max() / sizeof(T)>;
+	using size_type = bounded::integer<0, detail::maximum_array_size<T>>;
 
 	using allocator_type = typename std::allocator_traits<Allocator>::template rebind_alloc<value_type>;
 	static_assert(std::is_empty<allocator_type>::value, "Stateful allocators not yet supported.");
