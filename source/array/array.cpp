@@ -40,10 +40,10 @@ static_assert(empty_array.begin() == empty_array.end(), "Empty array.");
 
 auto check_count() {
 	constexpr auto array = containers::make_array(0_bi, 3_bi, 2_bi, 3_bi, 5_bi);
-	assert(bounded::count(std::begin(array), std::end(array), 3_bi) == 2_bi);
-	assert(bounded::count(std::begin(array), std::end(array), 2_bi) == 1_bi);
-	assert(bounded::count(std::begin(array), std::end(array), 7_bi) == 0_bi);
-	assert(bounded::count_if(std::begin(array), std::end(array), [](auto){ return true; }) == containers::size(array));
+	assert(containers::count(std::begin(array), std::end(array), 3_bi) == 2_bi);
+	assert(containers::count(std::begin(array), std::end(array), 2_bi) == 1_bi);
+	assert(containers::count(std::begin(array), std::end(array), 7_bi) == 0_bi);
+	assert(containers::count_if(std::begin(array), std::end(array), [](auto){ return true; }) == containers::size(array));
 }
 
 }	// namespace
