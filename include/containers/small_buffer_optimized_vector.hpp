@@ -76,41 +76,86 @@ constexpr auto minimum_small_capacity = (2_bi * bounded::size_of<typename detail
 
 template<typename T, std::size_t requested_small_capacity>
 struct small_t {
-	static constexpr auto capacity = bounded::max(minimum_small_capacity<T>, bounded::constant<requested_small_capacity>);
-	using size_type = bounded::integer<0, capacity.value()>;
-	static_assert(sizeof(size_type) == sizeof(unsigned char));
 
 	// force_small exists just to be a bit that's always 1. This allows
 	// is_small to return the correct answer even for 0-size containers.
 	constexpr small_t() noexcept:
-		force_small(true),
-		size(0_bi)
+		m_force_small(true),
+		m_size(0_bi)
 	{
 	}
+	
+	constexpr auto is_small() const noexcept {
+		return m_force_small;
+	}
+	static constexpr auto capacity() noexcept {
+		return bounded::max(minimum_small_capacity<T>, bounded::constant<requested_small_capacity>);
+	}
 
-	bool force_small : 1;
-	typename size_type::underlying_type size : (bounded::size_of_bits<size_type> - 1_bi).value();
-	array<trivial_storage<T>, capacity.value()> data;
+	using size_type = bounded::integer<0, capacity().value()>;
+	static_assert(sizeof(size_type) == sizeof(unsigned char));
+
+	constexpr auto size() const noexcept {
+		return static_cast<size_type>(m_size);
+	}
+	constexpr auto set_size(size_type const size_) noexcept {
+		m_size = size_.value();
+	}
+
+	constexpr auto data() const noexcept {
+		return reinterpret_cast<T const *>(containers::data(m_data));
+	}
+	constexpr auto data() noexcept {
+		return reinterpret_cast<T *>(containers::data(m_data));
+	}
+
+private:
+	bool m_force_small : 1;
+	typename size_type::underlying_type m_size : (bounded::size_of_bits<size_type> - 1_bi).value();
+	array<trivial_storage<T>, capacity().value()> m_data;
 };
 
 template<typename T, std::size_t requested_small_capacity>
 struct large_t {
 	using size_type = typename detail::dynamic_array_data_t<T>::size_type;
-	using capacity_type = bounded::integer<small_t<T, requested_small_capacity>::capacity.value() + 1, size_type::max().value()>;
+	using capacity_type = bounded::integer<small_t<T, requested_small_capacity>::capacity().value() + 1, size_type::max().value()>;
 
 	constexpr large_t(size_type size_, capacity_type capacity_, T * pointer_) noexcept:
-		force_small(false),
-		size(size_),
-		capacity(capacity_),
-		pointer(pointer_)
+		m_force_small(false),
+		m_size(size_),
+		m_capacity(capacity_),
+		m_pointer(pointer_)
 	{
-		assert(pointer != nullptr);
+		assert(m_pointer != nullptr);
 	}
 
-	bool force_small : 1;
-	typename size_type::underlying_type size : (bounded::size_of_bits<size_type> - 1_bi).value();
-	capacity_type capacity;
-	T * pointer;
+	constexpr auto is_small() const noexcept {
+		return m_force_small;
+	}
+	constexpr auto capacity() const noexcept {
+		return m_capacity;
+	}
+
+	constexpr auto size() const noexcept {
+		return static_cast<size_type>(m_size);
+	}
+	constexpr auto set_size(size_type const size_) noexcept {
+		m_size = size_.value();
+	}
+
+	constexpr auto data() const noexcept {
+		return m_pointer;
+	}
+	constexpr auto data() noexcept {
+		return m_pointer;
+	}
+
+
+private:
+	bool m_force_small : 1;
+	typename size_type::underlying_type m_size : (bounded::size_of_bits<size_type> - 1_bi).value();
+	capacity_type m_capacity;
+	T * m_pointer;
 };
 
 
@@ -121,8 +166,8 @@ struct sbo_vector_base : private detail::rebound_allocator<T, Allocator> {
 	using allocator_type = detail::rebound_allocator<value_type, Allocator>;
 	using small_t = small_t<value_type, requested_small_capacity>;
 	using large_t = large_t<value_type, requested_small_capacity>;
-	static_assert(std::is_nothrow_move_constructible<value_type>::value);
-	static_assert(std::is_nothrow_move_assignable<value_type>::value);
+	static_assert(std::is_nothrow_move_constructible<value_type>{});
+	static_assert(std::is_nothrow_move_assignable<value_type>{});
 	using size_type = typename large_t::size_type;
 
 	static_assert(
@@ -148,7 +193,7 @@ struct sbo_vector_base : private detail::rebound_allocator<T, Allocator> {
 		m_small()
 	{
 	}
-	constexpr sbo_vector_base(allocator_type allocator) noexcept(std::is_nothrow_move_constructible<allocator_type>::value):
+	constexpr sbo_vector_base(allocator_type allocator) noexcept(std::is_nothrow_move_constructible<allocator_type>{}):
 		allocator_type(std::move(allocator)),
 		m_small()
 	{
@@ -163,9 +208,9 @@ struct sbo_vector_base : private detail::rebound_allocator<T, Allocator> {
 		deallocate_large();
 		if (other.is_small()) {
 			::bounded::construct(m_small);
-			::containers::uninitialized_move_destroy(begin(other), end(other), begin(m_small.data), get_allocator());
-			m_small.size = other.m_small.size;
-			other.m_small.size = 0;
+			::containers::uninitialized_move_destroy(begin(other), end(other), m_small.data(), get_allocator());
+			m_small.set_size(other.m_small.size());
+			other.m_small.set_size(0_bi);
 		} else {
 			::bounded::construct(m_large, other.m_large);
 			// It is safe to skip the destructor call of other.m_large because
@@ -176,15 +221,15 @@ struct sbo_vector_base : private detail::rebound_allocator<T, Allocator> {
 
 	friend constexpr auto begin(sbo_vector_base const & container) noexcept {
 		auto const result = container.is_small() ?
-			reinterpret_cast<value_type const *>(data(container.m_small.data)) :
-			container.m_large.pointer;
+			container.m_small.data() :
+			container.m_large.data();
 		assert(result != nullptr);
 		return const_iterator(result, detail::iterator_constructor);
 	}
 	friend constexpr auto begin(sbo_vector_base & container) noexcept {
 		auto const result = container.is_small() ?
-			reinterpret_cast<value_type *>(data(container.m_small.data)) :
-			container.m_large.pointer;
+			container.m_small.data() :
+			container.m_large.data();
 		assert(result != nullptr);
 		return iterator(result, detail::iterator_constructor);
 	}
@@ -197,7 +242,7 @@ struct sbo_vector_base : private detail::rebound_allocator<T, Allocator> {
 	}
 
 	auto capacity() const noexcept {
-		return is_small() ? static_cast<size_type>(bounded::constant<small_capacity>) : m_large.capacity;
+		return BOUNDED_CONDITIONAL(is_small(), m_small.capacity(), m_large.capacity());
 	}
 
 
@@ -238,15 +283,15 @@ struct sbo_vector_base : private detail::rebound_allocator<T, Allocator> {
 	template<typename Size>
 	auto set_size(Size const new_size) noexcept {
 		if (is_small()) {
-			m_small.size = static_cast<typename small_t::size_type::underlying_type>(new_size);
+			m_small.set_size(static_cast<typename small_t::size_type::underlying_type>(new_size));
 		} else {
-			m_large.size = static_cast<typename size_type::underlying_type>(new_size);
+			m_large.set_size(static_cast<typename large_t::size_type::underlying_type>(new_size));
 		}
 	}
 
 private:
 	auto size() const noexcept {
-		return is_small() ? static_cast<size_type>(m_small.size) : m_large.size;
+		return BOUNDED_CONDITIONAL(is_small(), m_small.size(), m_large.size());
 	}
 	auto relocate_to_small() noexcept {
 		if (is_small()) {
@@ -254,11 +299,11 @@ private:
 		}
 		auto && allocator = get_allocator();
 		auto const temp =  std::move(m_large);
-		auto const guard = scope_guard([&]{ ::containers::detail::deallocate_storage(allocator, temp.pointer, temp.capacity); });
+		auto const guard = scope_guard([&]{ ::containers::detail::deallocate_storage(allocator, temp.data(), temp.capacity()); });
 		// It is safe to skip the destructor call of m_large
 		// because we do not rely on its side-effects
 		::bounded::construct(m_small);
-		::containers::uninitialized_move_destroy(temp.pointer, temp.pointer + temp.size, begin(m_small.data), allocator);
+		::containers::uninitialized_move_destroy(temp.data(), temp.data() + temp.size(), m_small.data(), allocator);
 		assert(is_small());
 	}
 	
@@ -273,7 +318,7 @@ private:
 		// examine the common initial sequence of two standard-layout union
 		// members, even if those members are bit-fields.
 		// https://stackoverflow.com/a/18564719/852254
-		return m_small.force_small;
+		return m_small.is_small();
 	}
 	constexpr auto is_large() const noexcept {
 		return !is_small();
@@ -281,15 +326,15 @@ private:
 	
 	auto deallocate_large() noexcept {
 		if (is_large()) {
-			::containers::detail::deallocate_storage(get_allocator(), m_large.pointer, m_large.capacity);
+			::containers::detail::deallocate_storage(get_allocator(), m_large.data(), m_large.capacity());
 		}
 	}
 	
 	static constexpr auto small_capacity = bounded::max(minimum_small_capacity<value_type>, bounded::constant<requested_small_capacity>).value();
 
 	static_assert(sizeof(small_t) >= sizeof(large_t), "Incorrect buffer sizes.");
-	static_assert(std::is_standard_layout<small_t>::value);
-	static_assert(std::is_standard_layout<large_t>::value);
+	static_assert(std::is_standard_layout<small_t>{});
+	static_assert(std::is_standard_layout<large_t>{});
 
 	union {
 		small_t m_small;
