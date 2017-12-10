@@ -109,6 +109,13 @@ void test_generic(T const & t, std::initializer_list<T> init) {
 	assert(copy == count_arg);
 }
 
+auto test_erase() {
+	using container = containers::vector<int>;
+	container v = { 1, 2, 3, 4, 5, 6, 7 };
+	erase_if(v, [](auto const & value) { return value % 2 == 0; });
+	assert(v == container({ 1, 3, 5, 7 }));
+}
+
 }	// namespace
 
 int main() {
@@ -120,4 +127,6 @@ int main() {
 	test_generic<5>(-4, { 0, 1, 2, 3, 4 });
 
 	test_generic<3>(std::string("hi"), { std::string(""), std::string("hello"), std::string(100, '=') });
+	
+	test_erase();
 }

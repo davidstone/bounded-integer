@@ -18,6 +18,7 @@
 
 #include <containers/algorithms/copy.hpp>
 #include <containers/algorithms/iterator.hpp>
+#include <containers/algorithms/remove.hpp>
 #include <containers/common_functions.hpp>
 #include <containers/is_container.hpp>
 #include <containers/is_iterator.hpp>
@@ -195,6 +196,11 @@ constexpr auto erase(Container & container, typename Container::const_iterator c
 	erase(container, it, ::containers::next(it));
 }
 
+template<typename Container, typename Predicate, BOUNDED_REQUIRES(is_container<Container>)>
+constexpr auto erase_if(Container & container, Predicate predicate) {
+	erase(container, ::containers::remove_if(container.begin(), container.end(), std::move(predicate)), container.end());
+}
+
 
 // TODO: noexcept
 template<typename Container, typename InputIterator, typename Sentinel, BOUNDED_REQUIRES(is_container<Container> and is_iterator<InputIterator>)>
@@ -284,6 +290,7 @@ constexpr auto operator<(Container const & lhs, Container const & rhs) BOUNDED_N
 	using ::containers::detail::common::append; \
 	using ::containers::detail::common::insert; \
 	using ::containers::detail::common::erase; \
+	using ::containers::detail::common::erase_if; \
 	using ::containers::detail::common::assign; \
 	using ::containers::detail::common::clear; \
 	using ::containers::detail::common::resize; \
