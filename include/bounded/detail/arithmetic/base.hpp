@@ -17,18 +17,11 @@ namespace detail {
 
 template<typename Min, typename Max>
 struct min_max {
-	static_assert(std::is_nothrow_move_constructible<Min>{});
-	static_assert(std::is_nothrow_move_constructible<Max>{});
-
-	constexpr min_max(Min min_, Max max_) noexcept:
-		min(std::move(min_)),
-		max(std::move(max_))
-	{
-	}
-
 	Min min;
 	Max max;
 };
+template<typename Min, typename Max>
+min_max(Min min, Max max) -> min_max<Min, Max>;
 
 }	// namespace detail
 
@@ -45,8 +38,8 @@ constexpr auto operator symbol( \
 	integer<rhs_min, rhs_max, rhs_policy, rhs_storage, rhs_poisoned> const rhs \
 ) noexcept { \
 	constexpr auto range = operator_range( \
-		detail::min_max(constant<lhs_min>, constant<lhs_max>), \
-		detail::min_max(constant<rhs_min>, constant<rhs_max>) \
+		detail::min_max{constant<lhs_min>, constant<lhs_max>}, \
+		detail::min_max{constant<rhs_min>, constant<rhs_max>} \
 	); \
 	using result_t = integer< \
 		range.min, \

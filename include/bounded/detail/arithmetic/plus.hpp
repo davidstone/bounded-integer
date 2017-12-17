@@ -37,10 +37,10 @@ constexpr auto safer_add(constant_t<lhs_> const lhs, constant_t<rhs_> const rhs)
 }
 
 constexpr auto plus_operator_range = [](auto const & lhs, auto const & rhs) noexcept {
-	return min_max(
+	return min_max{
 		safer_add(lhs.min, rhs.min),
 		safer_add(lhs.max, rhs.max)
-	);
+	};
 };
 
 }	// namespace detail

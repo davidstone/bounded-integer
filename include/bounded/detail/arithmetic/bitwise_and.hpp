@@ -18,10 +18,10 @@ namespace detail {
 // Assume always positive integers for now
 // Not the tightest possible bounds, but probably good enough for now
 constexpr auto bitwise_and_operator_range = [](auto const lhs, auto const rhs) noexcept {
-	return min_max(
+	return min_max{
 		0,
 		min(lhs.max, rhs.max).value()
-	);
+	};
 };
 
 }	// namespace detail

@@ -36,8 +36,8 @@ constexpr auto safer_divide(constant_t<lhs_> const lhs, constant_t<rhs_> const r
 }
 
 constexpr auto divides_operator_range = [](auto const lhs_, auto const rhs_) noexcept {
-	constexpr auto lhs = min_max(decltype(lhs_.min){}, decltype(lhs_.max){});
-	constexpr auto rhs = min_max(decltype(rhs_.min){}, decltype(rhs_.max){});
+	constexpr auto lhs = min_max{decltype(lhs_.min){}, decltype(lhs_.max){}};
+	constexpr auto rhs = min_max{decltype(rhs_.min){}, decltype(rhs_.max){}};
 	// If 1 falls within the range, that is the least positive divisor. The
 	// other options are a range that are entirely positive, in which case I
 	// want to return the least value, or the range is entirely negative or
@@ -61,10 +61,10 @@ constexpr auto divides_operator_range = [](auto const lhs_, auto const rhs_) noe
 	constexpr auto g2 = safer_divide(lhs.max, least_positive_divisor);
 	constexpr auto g3 = safer_divide(lhs.max, greatest_negative_divisor);
 
-	return min_max(
+	return min_max{
 		normalize<min(g0, g1, g2, g3).value()>,
 		normalize<max(g0, g1, g2, g3).value()>
-	);
+	};
 };
 
 }	// namespace detail

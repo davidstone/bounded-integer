@@ -21,17 +21,17 @@ struct modulo_policy {
 
 private:
 	template<typename T, typename Size>
-	static constexpr auto positive_remainder(T && value, Size && size) noexcept {
-		using result_type = std::common_type_t<std::decay_t<T>, std::decay_t<decltype(std::forward<T>(value) + std::forward<Size>(size))>>;
+	static constexpr auto positive_remainder(T const & value, Size const & size) noexcept {
+		using result_type = std::common_type_t<T, decltype(value + size)>;
 		return (value < constant<0>) ?
-			result_type(std::forward<T>(value) + std::forward<Size>(size), non_check) :
-			result_type(std::forward<T>(value), non_check)
+			result_type(value + size, non_check) :
+			result_type(value, non_check)
 		;
 	}
 
 public:
 	template<typename T, typename Minimum, typename Maximum>
-	static constexpr auto assignment(T && value, Minimum && minimum, Maximum && maximum) noexcept {
+	static constexpr auto assignment(T const & value, Minimum const & minimum, Maximum const & maximum) noexcept {
 		static_assert(is_bounded_integer<Minimum>, "Only bounded::integer types are supported.");
 		static_assert(is_bounded_integer<Maximum>, "Only bounded::integer types are supported.");
 		return positive_remainder(

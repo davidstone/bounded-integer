@@ -15,14 +15,14 @@ struct clamp_policy {
 	constexpr clamp_policy() noexcept {}
 
 	template<typename T, typename Minimum, typename Maximum>
-	static constexpr auto assignment(T && value, Minimum && minimum, Maximum && maximum) noexcept {
+	static constexpr auto assignment(T const & value, Minimum const & minimum, Maximum const & maximum) noexcept {
 		using policy = bounded::null_policy;
 		return min(
 			max(
-				integer(std::forward<T>(value), policy{}),
-				integer(std::forward<Minimum>(minimum), policy{})
+				integer(value, policy{}),
+				integer(minimum, policy{})
 			),
-			integer(std::forward<Maximum>(maximum), policy{})
+			integer(maximum, policy{})
 		);
 	}
 

@@ -22,14 +22,14 @@ namespace policy_detail {
 using default_exception = std::range_error;
 
 template<typename T, auto minimum, auto maximum>
-constexpr auto reduce_range(T && value, constant_t<minimum>, constant_t<maximum>) BOUNDED_NOEXCEPT(
+constexpr auto reduce_range(T const & value, constant_t<minimum>, constant_t<maximum>) BOUNDED_NOEXCEPT(
 	integer<
 		max(minimum, basic_numeric_limits<T>::min()),
 		min(maximum, basic_numeric_limits<T>::max()),
 		null_policy,
 		storage_type::fast,
 		bounded::detail::is_poisoned<T>
-	>(std::forward<T>(value))
+	>(value)
 )
 
 }	// namespace policy_detail
@@ -40,11 +40,11 @@ struct throw_policy {
 
 	// TODO: Conditional noexcept
 	template<typename T, typename Minimum, typename Maximum>
-	static constexpr auto assignment(T && value, Minimum const & minimum, Maximum const & maximum) {
+	static constexpr auto assignment(T const & value, Minimum const & minimum, Maximum const & maximum) {
 		static_assert(is_bounded_integer<Minimum>, "Only bounded::integer types are supported.");
 		static_assert(is_bounded_integer<Maximum>, "Only bounded::integer types are supported.");
 		if (minimum <= value and value <= maximum) {
-			return policy_detail::reduce_range(std::forward<T>(value), Minimum::min(), Maximum::max());
+			return policy_detail::reduce_range(value, Minimum::min(), Maximum::max());
 		} else {
 			throw Exception("Got a value of " + to_string(value) + " but expected a value in the range [" + to_string(minimum) + ", " + to_string(maximum) + "]");
 		}

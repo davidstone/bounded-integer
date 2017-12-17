@@ -307,8 +307,8 @@ public:
 	// Cannot use BOUNDED_NOEXCEPT_VOID because of gcc bug
 	// https://gcc.gnu.org/bugzilla/show_bug.cgi?id=52869
 	template<typename Tag, typename... Args, BOUNDED_REQUIRES(std::is_same<Tag, optional_tag>{} and detail::has_extra_space<integer> and std::is_constructible<integer, Args...>{})>
-	constexpr auto initialize(Tag, Args && ... args) noexcept(std::is_nothrow_constructible<integer, Args...>{}) {
-		return *this = integer(std::forward<Args>(args)...);
+	constexpr auto initialize(Tag, Args... args) noexcept(std::is_nothrow_constructible<integer, Args...>{}) {
+		return *this = integer(args...);
 	}
 
 	template<typename Tag, BOUNDED_REQUIRES(std::is_same<Tag, optional_tag>{} and detail::has_extra_space<integer>)>

@@ -97,9 +97,9 @@ struct range_type {
 	using size_type = integer<0, detail::range_of_type<value_type>>;
 
 	template<typename First, typename Last>
-	constexpr range_type(First && first, Last && last) noexcept:
-		m_begin(std::forward<First>(first)),
-		m_end(std::forward<Last>(last)) {
+	constexpr range_type(First const first, Last const last) noexcept:
+		m_begin(first),
+		m_end(last) {
 	}
 
 	constexpr auto begin() const noexcept {
@@ -161,17 +161,17 @@ using integer_range_type = range_type<detail::integer_range_iterator<T>>;
 
 // If end is less than begin, the behavior is undefined.
 template<typename Begin, typename End>
-constexpr auto integer_range(Begin && begin, End && end) noexcept {
+constexpr auto integer_range(Begin const begin, End const end) noexcept {
 	using integer_type = integer<
-		static_cast<detail::max_signed_t>(std::numeric_limits<std::decay_t<Begin>>::min()),
-		static_cast<detail::max_signed_t>(std::numeric_limits<std::decay_t<End>>::max())
+		static_cast<detail::max_signed_t>(std::numeric_limits<Begin>::min()),
+		static_cast<detail::max_signed_t>(std::numeric_limits<End>::max())
 	>;
-	return integer_range_type<integer_type>(std::forward<Begin>(begin), std::forward<End>(end));
+	return integer_range_type<integer_type>(begin, end);
 }
 
 template<typename Size>
-constexpr auto integer_range(Size && size) noexcept {
-	return integer_range(constant<0>, std::forward<Size>(size));
+constexpr auto integer_range(Size const size) noexcept {
+	return integer_range(constant<0>, size);
 }
 
 }	// namespace bounded

@@ -39,10 +39,10 @@ constexpr auto multiplies_operator_range = [](auto const lhs, auto const rhs) no
 	auto p1 = safer_multiply(lhs.min, rhs.max);
 	auto p2 = safer_multiply(lhs.max, rhs.min);
 	auto p3 = safer_multiply(lhs.max, rhs.max);
-	return min_max(
+	return min_max{
 		min(p0, p1, p2, p3),
 		max(p0, p1, p2, p3)
-	);
+	};
 };
 
 }	// namespace detail
