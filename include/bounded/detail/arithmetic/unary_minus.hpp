@@ -28,23 +28,6 @@ constexpr auto safer_negation(constant_t<value_> const value) noexcept {
 	}
 }
 
-template<typename T>
-struct promoted_unsigned_c {
-	using type = std::conditional_t<sizeof(T) <= sizeof(unsigned), unsigned, std::make_unsigned_t<T>>;
-};
-
-template<>
-struct promoted_unsigned_c<max_signed_t> {
-	using type = max_unsigned_t;
-};
-template<>
-struct promoted_unsigned_c<max_unsigned_t> {
-	using type = max_unsigned_t;
-};
-
-template<typename T>
-using promoted_unsigned = typename promoted_unsigned_c<T>::type;
-
 }	// namespace detail
 
 template<auto minimum, auto maximum, typename overflow_policy, storage_type storage, bool poisoned>

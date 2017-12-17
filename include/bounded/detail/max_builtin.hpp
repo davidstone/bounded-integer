@@ -12,6 +12,18 @@
 namespace bounded {
 namespace detail {
 
+template<typename T>
+struct promoted_unsigned_c {
+	using type = std::conditional_t<sizeof(T) <= sizeof(unsigned), unsigned, std::make_unsigned_t<T>>;
+};
+
+template<typename T>
+using promoted_unsigned = typename promoted_unsigned_c<std::decay_t<T>>::type;
+
+constexpr auto as_unsigned = [](auto const value) noexcept {
+	return static_cast<promoted_unsigned<decltype(value)>>(value);
+};
+
 #if defined __GNUC__ or defined __Clang__
 	#define BOUNDED_DETAIL_HAS_128_BIT 1
 	using int128_t = __int128_t;
@@ -19,6 +31,17 @@ namespace detail {
 #endif
 
 #if defined BOUNDED_DETAIL_HAS_128_BIT
+
+template<>
+struct promoted_unsigned_c<int128_t> {
+	using type = uint128_t;
+};
+template<>
+struct promoted_unsigned_c<uint128_t> {
+	using type = uint128_t;
+};
+
+
 using max_signed_t = int128_t;
 using max_unsigned_t = uint128_t;
 
