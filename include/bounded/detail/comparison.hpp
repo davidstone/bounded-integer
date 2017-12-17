@@ -11,6 +11,7 @@
 #include <bounded/detail/noexcept.hpp>
 #include <bounded/detail/requires.hpp>
 
+#include <functional>
 #include <type_traits>
 
 namespace bounded {
@@ -70,6 +71,11 @@ private:
 constexpr auto strong_ordering_less = strong_ordering(-1);
 constexpr auto strong_ordering_equal = strong_ordering(0);
 constexpr auto strong_ordering_greater = strong_ordering(1);
+
+template<typename LHS, typename RHS>
+constexpr auto compare(LHS const * const lhs, RHS const * const rhs) noexcept {
+	return lhs == rhs ? strong_ordering_equal : std::less{}(lhs, rhs) ? strong_ordering_less : strong_ordering_greater;
+}
 
 
 template<typename LHS, typename RHS, BOUNDED_REQUIRES(detail::is_builtin_integer<LHS> and detail::is_builtin_integer<RHS>)>
