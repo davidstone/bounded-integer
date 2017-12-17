@@ -22,8 +22,8 @@ constexpr auto safer_multiply(constant_t<lhs> const &, constant_t<rhs> const &) 
 	// constexpr evaluation rules. If both are negative, I can cast them both to
 	// unsigned and the result will be positive and thus fit in unsigned. The
 	// conversion to unsigned will preserve the value under multiplication.
-	constexpr auto signed_max = basic_numeric_limits<max_signed_t>::max();
 	if constexpr ((lhs < 0) xor (rhs < 0)) {
+		constexpr auto signed_max = basic_numeric_limits<max_signed_t>::max();
 		static_assert(lhs <= signed_max or rhs == 0);
 		static_assert(rhs <= signed_max or lhs == 0);
 		return static_cast<max_signed_t>(lhs) * static_cast<max_signed_t>(rhs);
