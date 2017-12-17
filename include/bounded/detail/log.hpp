@@ -16,7 +16,7 @@ namespace bounded {
 namespace detail {
 
 template<typename Integer, typename Base>
-constexpr auto log(Integer value, Base const base) noexcept {
+constexpr auto log_impl(Integer value, Base const base) noexcept {
 	auto sum = 0;
 	while (value >= base) {
 		value /= base;
@@ -36,20 +36,13 @@ constexpr auto log(integer<minimum, maximum, overflow_policy, storage, poisoned>
 	static_assert(base > constant<1>, "Negative bases not currently supported.");
 	static_assert(value > constant<0>, "The log of a negative number or zero is undefined.");
 	using result_type = integer<
-		detail::log(static_cast<detail::max_unsigned_t>(minimum), static_cast<detail::max_unsigned_t>(basic_numeric_limits<Base>::max())),
-		detail::log(static_cast<detail::max_unsigned_t>(maximum), static_cast<detail::max_unsigned_t>(basic_numeric_limits<Base>::min())),
+		detail::log_impl(static_cast<detail::max_unsigned_t>(minimum), static_cast<detail::max_unsigned_t>(basic_numeric_limits<Base>::max())),
+		detail::log_impl(static_cast<detail::max_unsigned_t>(maximum), static_cast<detail::max_unsigned_t>(basic_numeric_limits<Base>::min())),
 		overflow_policy,
 		storage,
 		poisoned
 	>;
-	using argument_type = integer<
-		0,
-		maximum,
-		overflow_policy,
-		storage,
-		poisoned
-	>;
-	return result_type(detail::log(static_cast<argument_type>(value), base), non_check);
+	return result_type(detail::log_impl(detail::as_unsigned(value.value()), detail::as_unsigned(base.value())), non_check);
 }
 
 }	// namespace bounded
