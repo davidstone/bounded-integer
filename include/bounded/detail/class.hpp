@@ -145,7 +145,7 @@ template<auto value, typename overflow_policy = null_policy, storage_type storag
 using constant_t = integer<value, value, overflow_policy, storage, poisoned>;
 
 template<auto value, typename overflow_policy = null_policy, storage_type storage = storage_type::fast>
-constexpr auto constant = constant_t<value, overflow_policy, storage>(value, non_check);
+constexpr auto constant = constant_t<value, overflow_policy, storage>{};
 
 
 template<auto minimum, auto maximum, typename overflow_policy_ = null_policy, storage_type storage = storage_type::fast, bool poisoned = false>
