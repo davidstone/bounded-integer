@@ -29,7 +29,12 @@ constexpr auto digits(Minimum const minimum, Maximum const maximum, Base const b
 	if constexpr (minimum > constant<0> or maximum <= constant<0>) {
 		return constant<0>;
 	} else if constexpr (maximum == constant<basic_numeric_limits<max_unsigned_t>::max()>) {
-		return constant<sizeof(max_unsigned_t) * CHAR_BIT>;
+		if constexpr (base == constant<2>) {
+			return constant<sizeof(max_unsigned_t) * CHAR_BIT>;
+		} else {
+			// TODO: Not quite right, but avoids overflow
+			return ::bounded::log(maximum, base);
+		}
 	} else if constexpr (minimum == constant<0> or maximum < -minimum) {
 		return ::bounded::log(maximum + constant<1>, base);
 	} else {
