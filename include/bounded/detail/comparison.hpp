@@ -73,8 +73,14 @@ constexpr auto strong_ordering_equal = strong_ordering(0);
 constexpr auto strong_ordering_greater = strong_ordering(1);
 
 template<typename LHS, typename RHS>
-constexpr auto compare(LHS const * const lhs, RHS const * const rhs) noexcept {
+constexpr auto compare(LHS * const lhs, RHS * const rhs) noexcept {
 	return lhs == rhs ? strong_ordering_equal : std::less{}(lhs, rhs) ? strong_ordering_less : strong_ordering_greater;
+}
+
+// TODO: Implement correctly
+template<typename LHS, typename RHS, BOUNDED_REQUIRES(std::is_floating_point<LHS>{} and std::is_floating_point<RHS>{})>
+constexpr auto compare(LHS const lhs, RHS const rhs) noexcept {
+	return lhs == rhs ? strong_ordering_equal : lhs < rhs ? strong_ordering_less : strong_ordering_greater;
 }
 
 
@@ -153,9 +159,9 @@ constexpr auto compare(LHS const & lhs, RHS const & rhs) BOUNDED_NOEXCEPT_DECLTY
 	strong_ordering(lhs.compare(rhs))
 )
 
-// C-style variadic makes this function always a worse match than the above
-template<typename LHS, typename RHS>
-constexpr auto compare(LHS const & lhs, RHS const & rhs, ...) BOUNDED_NOEXCEPT_DECLTYPE(
+// Variadic makes this function always a worse match than the above
+template<typename LHS, typename RHS, typename... Ignore, BOUNDED_REQUIRES(sizeof...(Ignore) == 0)>
+constexpr auto compare(LHS const & lhs, RHS const & rhs, Ignore...) BOUNDED_NOEXCEPT_DECLTYPE(
 	strong_ordering(-rhs.compare(lhs))
 )
 
