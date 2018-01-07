@@ -65,9 +65,9 @@ constexpr auto destroy(Allocator && allocator, T * pointer) BOUNDED_NOEXCEPT(
 
 template<typename Allocator, typename InputIterator, typename Sentinel, BOUNDED_REQUIRES(is_iterator_sentinel<InputIterator, Sentinel>)>
 constexpr auto destroy(Allocator && allocator, InputIterator first, Sentinel const last) noexcept {
-	static_assert(noexcept(::containers::detail::destroy(allocator, ::bounded::addressof(*first))));
+	static_assert(noexcept(::containers::detail::destroy(allocator, std::addressof(*first))));
 	for (; first != last; ++first) {
-		::containers::detail::destroy(allocator, ::bounded::addressof(*first));
+		::containers::detail::destroy(allocator, std::addressof(*first));
 	}
 }
 
@@ -87,12 +87,12 @@ auto uninitialized_copy(InputIterator first, Sentinel const last, ForwardIterato
 	auto out_first = out;
 	try {
 		for (; first != last; ++first) {
-			::containers::detail::construct(allocator, ::bounded::addressof(*out), *first);
+			::containers::detail::construct(allocator, std::addressof(*out), *first);
 			++out;
 		}
 	} catch (...) {
 		for (; out_first != out; ++out_first) {
-			::containers::detail::destroy(allocator, ::bounded::addressof(*out_first));
+			::containers::detail::destroy(allocator, std::addressof(*out_first));
 		}
 		throw;
 	}
@@ -111,7 +111,7 @@ template<
 >
 constexpr auto uninitialized_copy(InputIterator first, Sentinel const last, ForwardIterator out, Allocator && allocator) noexcept {
 	for (; first != last; ++first) {
-		::containers::detail::construct(allocator, ::bounded::addressof(*out), *first);
+		::containers::detail::construct(allocator, std::addressof(*out), *first);
 		++out;
 	}
 	return out;
@@ -154,15 +154,15 @@ auto uninitialized_move_destroy(InputIterator const first, Sentinel const last, 
 	auto out_first = out;
 	try {
 		for (; first_adapted != last; ++first_adapted) {
-			::containers::detail::construct(allocator, ::bounded::addressof(*out), *first_adapted);
+			::containers::detail::construct(allocator, std::addressof(*out), *first_adapted);
 			++out;
 		}
 	} catch (...) {
 		for (auto first_unadapted = first_adapted.base(); first_unadapted != last; ++first_unadapted) {
-			::containers::detail::destroy(allocator, ::bounded::addressof(*first_unadapted));
+			::containers::detail::destroy(allocator, std::addressof(*first_unadapted));
 		}
 		for (; out_first != out; ++out_first) {
-			::containers::detail::destroy(allocator, ::bounded::addressof(*out_first));
+			::containers::detail::destroy(allocator, std::addressof(*out_first));
 		}
 		throw;
 	}
@@ -197,11 +197,11 @@ auto uninitialized_default_construct(ForwardIterator const first, Sentinel const
 	auto it = first;
 	try {
 		for (; it != last; ++it) {
-			::containers::detail::construct(allocator, ::bounded::addressof(*it));
+			::containers::detail::construct(allocator, std::addressof(*it));
 		}
 	} catch (...) {
 		for (auto rollback = first; rollback != it; ++rollback) {
-			::containers::detail::destroy(allocator, ::bounded::addressof(*rollback));
+			::containers::detail::destroy(allocator, std::addressof(*rollback));
 		}
 		throw;
 	}
@@ -215,7 +215,7 @@ template<
 >
 constexpr auto uninitialized_default_construct(ForwardIterator first, Sentinel const last, Allocator && allocator) noexcept {
 	for (; first != last; ++first) {
-		::containers::detail::construct(allocator, ::bounded::addressof(*first));
+		::containers::detail::construct(allocator, std::addressof(*first));
 	}
 }
 
