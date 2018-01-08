@@ -4,7 +4,6 @@
 // http://www.boost.org/LICENSE_1_0.txt)
 
 #include <containers/static_vector/static_vector.hpp>
-#include <containers/static_vector/make_static_vector.hpp>
 #include <containers/array/make_array.hpp>
 
 namespace {
@@ -25,7 +24,7 @@ namespace constexpr_static_vector {
 	constexpr auto n_copy = containers::static_vector<int, 4>(4_bi, 10);
 	static_assert(size(n_copy) == 4_bi);
 	static_assert(at(n_copy, 2_bi) == 10);
-	static_assert(n_copy == containers::make_static_vector(4_bi, 10));
+	static_assert(n_copy == containers::static_vector(4_bi, 10));
 	
 	constexpr auto make() {
 		auto value = containers::static_vector<int, 10>{};
@@ -40,7 +39,7 @@ namespace constexpr_static_vector {
 		return copy;
 	}
 	constexpr auto made = make();
-	constexpr auto expected = containers::make_array(5, 5, 10, 15, 10, 15);
+	constexpr auto expected = containers::array{5, 5, 10, 15, 10, 15};
 	static_assert(containers::equal(begin(made), end(made), begin(expected), end(expected)));
 	static_assert(made == made);
 	
@@ -64,12 +63,14 @@ void test_generic(T const & t, std::initializer_list<T> init) {
 	
 	for (auto const & value : count) {
 		assert(value == T{});
+		static_cast<void>(value);
 	}
 	
 	auto const count_arg = container(capacity, t);
 	assert(size(count) == capacity);
 	for (auto const & value : count_arg) {
 		assert(value == t);
+		static_cast<void>(value);
 	}
 	assert(front(count_arg) == t);
 	assert(back(count_arg) == t);
@@ -125,6 +126,7 @@ void test_generic(T const & t, std::initializer_list<T> init) {
 	auto const old_front = front(copy);
 	resize(copy, capacity);
 	assert(front(copy) == old_front);
+	static_cast<void>(old_front);
 	clear(copy);
 	resize(copy, capacity);
 	assert(front(copy) == T{});
@@ -156,16 +158,17 @@ int main() {
 	test_generic<3>(std::string("hi"), { std::string(""), std::string("hello"), std::string(100, '=') });
 	
 	containers::static_vector<int, 10> container = { 1, 2, 3 };
-	static_assert(std::is_same<
-		containers::index_type<decltype(container)>,
-		bounded::checked_integer<0, 9, std::out_of_range>
-	>::value);
+	using index_type = containers::index_type<decltype(container)>;
+	static_assert(index_type::min() == 0_bi);
+	static_assert(index_type::max() == 9_bi);
+	static_assert(std::is_same<index_type::overflow_policy, bounded::throw_policy<std::out_of_range>>{});
 	static_assert(!containers::is_iterator<containers::static_vector<std::string, 6>>);
 	static_assert(containers::is_container<containers::static_vector<std::string, 6>>);
 
 	insert(container, begin(container) + 1_bi, 5_bi, 12);
 	auto const expected = { 1, 12, 12, 12, 12, 12, 2, 3 };
 	assert(std::equal(begin(container), end(container), begin(expected), end(expected)));
+	static_cast<void>(expected);
 	
 	containers::static_vector<non_copyable, 10> test_no_copies;
 	test_no_copies.emplace_back();

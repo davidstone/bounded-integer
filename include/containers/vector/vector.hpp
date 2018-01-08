@@ -88,9 +88,9 @@ struct vector_base {
 	}
 	
 	template<typename Size>
-	auto set_size(Size const s) BOUNDED_NOEXCEPT_VOID(
-		m_size = s
-	)
+	auto set_size(Size const s) noexcept(std::is_nothrow_assignable<size_type, Size>{}) {
+		m_size = s;
+	}
 private:
 	raw_container m_container;
 	size_type m_size = 0_bi;

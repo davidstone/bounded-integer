@@ -1,4 +1,4 @@
-// Copyright David Stone 2016.
+// Copyright David Stone 2017.
 // Distributed under the Boost Software License, Version 1.0.
 // (See accompanying file LICENSE_1_0.txt or copy at
 // http://www.boost.org/LICENSE_1_0.txt)
@@ -106,7 +106,7 @@ struct tuple_impl<std::index_sequence<indexes...>, Types...> : tuple_value_t<ind
 		::containers::detail::all(std::is_convertible<Args, Types>::value...) and
 		::containers::detail::all(std::is_constructible<tuple_value_t<indexes, Types, Types...>, not_piecewise_construct_t, Args>::value...)
 	)>
-	constexpr tuple_impl(Args && ... args) noexcept(false):
+	constexpr tuple_impl(Args && ... args) noexcept((... and noexcept(tuple_value_t<indexes, Types, Types...>(not_piecewise_construct, std::forward<Args>(args))))):
 		tuple_value_t<indexes, Types, Types...>(not_piecewise_construct, std::forward<Args>(args))...
 	{
 	}
@@ -120,17 +120,24 @@ struct tuple_impl<std::index_sequence<indexes...>, Types...> : tuple_value_t<ind
 	}
 
 
-	template<intmax_t index, BOUNDED_REQUIRES(index < sizeof...(Types))>
-	constexpr auto && operator[](bounded::constant_t<index>) const & noexcept {
-		return static_cast<tuple_value_t<index, nth_type<index, Types...>, Types...> const &>(*this).value();
+	// Work around https://bugs.llvm.org/show_bug.cgi?id=35655
+	// This means we cannot have an auto template parameter here, so we have to
+	// accept worse error messages when the user passes in something other than
+	// a constant.
+	template<typename Index, BOUNDED_REQUIRES(bounded::is_bounded_integer<Index> and Index{} < sizeof...(Types))>
+	constexpr auto && operator[](Index const index) const & noexcept {
+		constexpr auto index_ = static_cast<std::size_t>(index);
+		return static_cast<tuple_value_t<index_, nth_type<index_, Types...>, Types...> const &>(*this).value();
 	}
-	template<intmax_t index, BOUNDED_REQUIRES(index < sizeof...(Types))>
-	constexpr auto && operator[](bounded::constant_t<index>) & noexcept {
-		return static_cast<tuple_value_t<index, nth_type<index, Types...>, Types...> &>(*this).value();
+	template<typename Index, BOUNDED_REQUIRES(bounded::is_bounded_integer<Index> and Index{} < sizeof...(Types))>
+	constexpr auto && operator[](Index const index) & noexcept {
+		constexpr auto index_ = static_cast<std::size_t>(index);
+		return static_cast<tuple_value_t<index_, nth_type<index_, Types...>, Types...> &>(*this).value();
 	}
-	template<intmax_t index, BOUNDED_REQUIRES(index < sizeof...(Types))>
-	constexpr auto && operator[](bounded::constant_t<index>) && noexcept {
-		return static_cast<tuple_value_t<index, nth_type<index, Types...>, Types...> &&>(*this).value();
+	template<typename Index, BOUNDED_REQUIRES(bounded::is_bounded_integer<Index> and Index{} < sizeof...(Types))>
+	constexpr auto && operator[](Index const index) && noexcept {
+		constexpr auto index_ = static_cast<std::size_t>(index);
+		return static_cast<tuple_value_t<index_, nth_type<index_, Types...>, Types...> &&>(*this).value();
 	}
 
 protected:
@@ -250,7 +257,7 @@ private:
 
 
 template<std::size_t unique, typename... Ts>
-struct tuple_value<is_derivable<void>, unique, void, Ts...> {
+struct tuple_value<false, unique, void, Ts...> {
 	constexpr explicit tuple_value(std::piecewise_construct_t, tuple<>) noexcept {
 	}
 	constexpr explicit tuple_value(not_piecewise_construct_t) noexcept {
@@ -258,37 +265,31 @@ struct tuple_value<is_derivable<void>, unique, void, Ts...> {
 };
 
 
-
-template<std::size_t... lhs_indexes, typename... lhs_types, std::size_t... rhs_indexes, typename... rhs_types>
-constexpr auto operator==(tuple_impl<std::index_sequence<lhs_indexes...>, lhs_types...> const & lhs, tuple_impl<std::index_sequence<rhs_indexes...>, rhs_types...> const & rhs) BOUNDED_NOEXCEPT_VALUE(
-	(... and (lhs[bounded::constant<lhs_indexes>] == rhs[bounded::constant<rhs_indexes>]))
-)
-
-
-template<
-	typename... lhs_types,
-	typename... rhs_types
->
-constexpr auto less_impl(tuple<lhs_types...> const &, tuple<rhs_types...> const &, bounded::constant_t<sizeof...(lhs_types)>) noexcept {
-	return std::false_type{};
-}
-
+// TODO: Proper noexcept
 template<
 	typename... lhs_types,
 	typename... rhs_types,
-	std::intmax_t i
+	auto i
 >
-constexpr auto less_impl(tuple<lhs_types...> const & lhs, tuple<rhs_types...> const & rhs, bounded::constant_t<i> index) BOUNDED_NOEXCEPT_VALUE(
-	lhs[index] < rhs[index] or (!(rhs[index] < lhs[index]) and less_impl(lhs, rhs, index + 1_bi))
-)
+constexpr auto compare_impl(tuple<lhs_types...> const & lhs, tuple<rhs_types...> const & rhs, bounded::constant_t<i> index) noexcept {
+	if constexpr (index == sizeof...(lhs_types)) {
+		return bounded::strong_ordering_equal;
+	} else {
+		using bounded::compare;
+		if (auto const cmp = compare(lhs[index], rhs[index]); cmp != 0) {
+			return cmp;
+		}
+		return compare_impl(lhs, rhs, index + 1_bi);
+	}
+}
 
 template<
 	typename... lhs_types,
 	typename... rhs_types,
 	BOUNDED_REQUIRES(sizeof...(lhs_types) == sizeof...(rhs_types))
 >
-constexpr auto operator<(tuple<lhs_types...> const & lhs, tuple<rhs_types...> const & rhs) BOUNDED_NOEXCEPT_VALUE(
-	less_impl(lhs, rhs, 0_bi)
+constexpr auto compare(tuple<lhs_types...> const & lhs, tuple<rhs_types...> const & rhs) BOUNDED_NOEXCEPT_VALUE(
+	compare_impl(lhs, rhs, 0_bi)
 )
 
 }	// namespace detail
@@ -316,7 +317,7 @@ template<typename Tuple>
 struct tuple_size_c;
 
 template<typename... Types>
-struct tuple_size_c<tuple<Types...>> : std::integral_constant<std::intmax_t, sizeof...(Types)> {};
+struct tuple_size_c<tuple<Types...>> : std::integral_constant<std::size_t, sizeof...(Types)> {};
 
 template<typename Tuple>
 constexpr auto tuple_size = bounded::constant<tuple_size_c<std::decay_t<Tuple>>::value>;
@@ -347,26 +348,35 @@ private:
 		)
 	)
 
+	template<typename First, typename Second, typename... Tail>
+	constexpr auto cat_many(First && first, Second && second, Tail && ... tail) const {
+		return operator()(
+			cat_two(
+				::containers::detail::make_index_sequence(tuple_size<First>), std::forward<First>(first),
+				::containers::detail::make_index_sequence(tuple_size<Second>), std::forward<Second>(second)
+			),
+			std::forward<Tail>(tail)...
+		);
+	}
+
 public:
 	constexpr auto operator()() const noexcept {
 		return tuple<>();
 	}
 
 	template<typename Tuple>
-	constexpr auto operator()(Tuple && tuple) const BOUNDED_NOEXCEPT_VALUE(
-		std::forward<Tuple>(tuple)
-	)
+	constexpr auto && operator()(Tuple && tuple) const noexcept {
+		return std::forward<Tuple>(tuple);
+	}
 
-	template<typename First, typename Second, typename... Tail>
-	constexpr auto operator()(First && first, Second && second, Tail && ... tail) const BOUNDED_NOEXCEPT_VALUE(
-		operator()(
-			cat_two(
-				::containers::detail::make_index_sequence(tuple_size<First>), std::forward<First>(first),
-				::containers::detail::make_index_sequence(tuple_size<Second>), std::forward<Second>(second)
-			), 
-			std::forward<Tail>(tail)...
-		)
-	)
+	template<typename... Tuples, BOUNDED_REQUIRES(
+		(... and std::is_constructible<std::decay_t<Tuples>, Tuples &&>{})
+	)>
+	constexpr auto operator()(Tuples && ... tuples) const noexcept(
+		(... and std::is_nothrow_constructible<std::decay_t<Tuples>, Tuples &&>{})
+	) {
+		return cat_many(std::forward<Tuples>(tuples)...);
+	}
 } tuple_cat;
 
 
@@ -409,21 +419,21 @@ constexpr auto is_noexcept_function_call =
 template<typename Function, typename... Tuples, std::size_t... indexes>
 constexpr auto all_noexcept_function_calls_impl(std::index_sequence<indexes...>) noexcept {
 	return (is_noexcept_function_call<indexes, Function, Tuples...> and ...);
-};
+}
 
 template<typename Function, typename... Tuples>
 constexpr auto all_noexcept_function_calls = all_noexcept_function_calls_impl<Function, Tuples...>(make_index_sequence(all_tuple_sizes<Tuples...>()));
 
 
 
-template<std::intmax_t i, typename Function, typename... Tuples, BOUNDED_REQUIRES(i == all_tuple_sizes<Tuples...>())>
+template<auto i, typename Function, typename... Tuples, BOUNDED_REQUIRES(i == all_tuple_sizes<Tuples...>())>
 constexpr auto transform_impl(bounded::constant_t<i>, Function &&, Tuples && ...) noexcept {
 	return tuple<>{};
 }
 // noexcept specification is on the publicly facing transform. This is done
 // because you cannot have a recursive noexcept specification, so instead we
 // have to write special code to calculate whether the function is noexcept.
-template<std::intmax_t i, typename Function, typename... Tuples, BOUNDED_REQUIRES(i != all_tuple_sizes<Tuples...>())>
+template<auto i, typename Function, typename... Tuples, BOUNDED_REQUIRES(i != all_tuple_sizes<Tuples...>())>
 constexpr auto transform_impl(bounded::constant_t<i> index, Function && function, Tuples && ... tuples) {
 	return tuple_cat(
 		tuple<decltype(function(std::forward<Tuples>(tuples)[index]...))>(function(std::forward<Tuples>(tuples)[index]...)),

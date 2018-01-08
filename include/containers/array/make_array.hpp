@@ -1,4 +1,4 @@
-// Copyright David Stone 2015.
+// Copyright David Stone 2017.
 // Distributed under the Boost Software License, Version 1.0.
 // (See accompanying file LICENSE_1_0.txt or copy at
 // http://www.boost.org/LICENSE_1_0.txt)
@@ -67,21 +67,23 @@ namespace detail {
 // Use the comma operator to expand the variadic pack
 // Move the last element in if possible. Order of evaluation is well-defined for
 // aggregate initialization, so there is no risk of copy-after-move
-template<std::intmax_t size, typename T, std::size_t... indexes>
+template<std::size_t size, typename T, std::size_t... indexes>
 constexpr auto make_array_n_impl(T && value, std::index_sequence<indexes...>) BOUNDED_NOEXCEPT_VALUE(
 	array<std::decay_t<T>, size>{ (static_cast<void>(indexes), value)..., std::forward<T>(value) }
 )
 
 }	// namespace detail
 
-template<typename T, typename overflow_policy, bounded::storage_type storage, bool poisoned>
-constexpr auto make_array_n(bounded::constant_t<0, overflow_policy, storage, poisoned>, T &&) noexcept {
-	return array<std::decay_t<T>, 0>{};
-}
-
-template<typename T, std::intmax_t size, typename overflow_policy, bounded::storage_type storage, bool poisoned>
-constexpr auto make_array_n(bounded::constant_t<size, overflow_policy, storage, poisoned> size_, T && value) noexcept(std::is_nothrow_move_constructible<std::decay_t<T>>::value and std::is_nothrow_constructible<std::decay_t<T>, T &&>::value and (size == 1 or std::is_nothrow_copy_constructible<std::decay_t<T>>::value)) {
-	return detail::make_array_n_impl<size>(std::forward<T>(value), detail::make_index_sequence(size_ - 1_bi));
+template<auto size_, typename T>
+constexpr auto make_array_n(bounded::constant_t<size_> size, T && value) noexcept(
+	bounded::constant<size_> == 0_bi or
+	(std::is_nothrow_move_constructible<std::decay_t<T>>{} and (bounded::constant<size_> == 1_bi or std::is_nothrow_copy_constructible<std::decay_t<T>>{}))
+) {
+	if constexpr (size == 0_bi) {
+		return array<std::decay_t<T>, 0>{};
+	} else {
+		return detail::make_array_n_impl<size_>(std::forward<T>(value), detail::make_index_sequence(size - 1_bi));
+	}
 }
 
 }	// namespace containers

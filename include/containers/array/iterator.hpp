@@ -51,34 +51,50 @@ struct basic_array_iterator {
 		return *m_it;
 	}
 	constexpr auto operator->() const noexcept {
-		return ::bounded::addressof(operator*());
+		return std::addressof(operator*());
 	}
 
-	friend constexpr auto operator+(basic_array_iterator const lhs, difference_type const rhs) {
-		return basic_array_iterator(lhs.m_it + rhs, iterator_constructor);
-	}
-	friend constexpr auto operator-(basic_array_iterator const lhs, basic_array_iterator const rhs) {
-		return static_cast<difference_type>(lhs.m_it - rhs.m_it);
-	}
-
-	constexpr auto & operator[](index_type<basic_array_iterator> const index) const {
+	constexpr auto & operator[](index_type<basic_array_iterator> const index) const noexcept {
 		return *(*this + index);
 	}
 
-	friend constexpr auto operator==(basic_array_iterator const lhs, basic_array_iterator const rhs) noexcept {
-		return lhs.m_it == rhs.m_it;
-	}
-	friend constexpr auto operator<(basic_array_iterator const lhs, basic_array_iterator const rhs) noexcept {
-		return lhs.m_it < rhs.m_it;
-	}
-	
 	friend constexpr auto pointer_from(basic_array_iterator const it) noexcept {
 		return it.m_it;
+	}
+
+	friend constexpr auto operator+(basic_array_iterator const lhs, difference_type const rhs) noexcept {
+		return basic_array_iterator(lhs.m_it + rhs, iterator_constructor);
 	}
 
 private:
 	pointer m_it = nullptr;
 };
+
+template<typename T, typename Container>
+constexpr auto compare(basic_array_iterator<T, Container> const lhs, basic_array_iterator<T, Container> const rhs) noexcept {
+	return bounded::compare(pointer_from(lhs), pointer_from(rhs));
+}
+template<typename T, typename Container>
+constexpr auto compare(basic_array_iterator<T const, Container> const lhs, basic_array_iterator<T, Container> const rhs) noexcept {
+	return compare(lhs, static_cast<decltype(lhs)>(rhs));
+}
+template<typename T, typename Container>
+constexpr auto compare(basic_array_iterator<T, Container> const lhs, basic_array_iterator<T const, Container> const rhs) noexcept {
+	return compare(static_cast<decltype(rhs)>(lhs), rhs);
+}
+
+template<typename T, typename Container>
+constexpr auto operator-(basic_array_iterator<T, Container> const lhs, basic_array_iterator<T, Container> const rhs) noexcept {
+	return static_cast<typename basic_array_iterator<T, Container>::difference_type>(pointer_from(lhs) - pointer_from(rhs));
+}
+template<typename T, typename Container>
+constexpr auto operator-(basic_array_iterator<T const, Container> const lhs, basic_array_iterator<T, Container> const rhs) noexcept {
+	return lhs - static_cast<decltype(lhs)>(rhs);
+}
+template<typename T, typename Container>
+constexpr auto operator-(basic_array_iterator<T, Container> const lhs, basic_array_iterator<T const, Container> const rhs) noexcept {
+	return static_cast<decltype(rhs)>(lhs) - rhs;
+}
 
 
 }	// namespace detail

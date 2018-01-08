@@ -10,16 +10,14 @@
 namespace {
 
 using namespace bounded::literal;
+BOUNDED_COMPARISON
 
 static_assert(std::is_empty<containers::tuple<>>::value);
 
 struct empty {};
 
-constexpr auto operator==(empty const &, empty const &) noexcept {
-	return std::true_type{};
-}
-constexpr auto operator<(empty const &, empty const &) noexcept {
-	return std::false_type{};
+constexpr auto compare(empty, empty) noexcept {
+	return bounded::strong_ordering_equal;
 }
 
 static_assert(std::is_empty<containers::tuple<empty>>::value);
@@ -54,11 +52,8 @@ struct non_movable {
 	non_movable(non_movable &&) = delete;
 };
 
-constexpr auto operator==(non_movable const &, non_movable const &) noexcept {
-	return std::true_type{};
-}
-constexpr auto operator<(non_movable const &, non_movable const &) noexcept {
-	return std::false_type{};
+constexpr auto compare(non_movable const &, non_movable const &) noexcept {
+	return bounded::strong_ordering_equal;
 }
 
 static_assert(std::is_constructible<containers::tuple<non_movable>>::value);

@@ -38,14 +38,14 @@ struct dynamic_resizable_array : private Container {
 	
 	constexpr dynamic_resizable_array() noexcept {}
 	
-	constexpr explicit dynamic_resizable_array(allocator_type allocator) BOUNDED_NOEXCEPT_INITIALIZATION(
-		Container(std::move(allocator))
+	constexpr explicit dynamic_resizable_array(allocator_type allocator_) BOUNDED_NOEXCEPT_INITIALIZATION(
+		Container(std::move(allocator_))
 	) {
 	}
 	
 	template<typename Count, BOUNDED_REQUIRES(std::is_convertible<Count, size_type>::value)>
-	constexpr explicit dynamic_resizable_array(Count const count, allocator_type allocator = allocator_type()):
-		Container(std::move(allocator))
+	constexpr explicit dynamic_resizable_array(Count const count, allocator_type allocator_ = allocator_type()):
+		Container(std::move(allocator_))
 	{
 		if (count > capacity()) {
 			this->relocate(count);
@@ -54,8 +54,8 @@ struct dynamic_resizable_array : private Container {
 		this->set_size(count);
 	}
 	template<typename Count, BOUNDED_REQUIRES(std::is_convertible<Count, size_type>::value)>
-	constexpr dynamic_resizable_array(Count const count, value_type const & value, allocator_type allocator = allocator_type()):
-		Container(std::move(allocator))
+	constexpr dynamic_resizable_array(Count const count, value_type const & value, allocator_type allocator_ = allocator_type()):
+		Container(std::move(allocator_))
 	{
 		auto const repeat = detail::repeat_n(count, value);
 		assert(size(repeat) == count);
@@ -63,25 +63,25 @@ struct dynamic_resizable_array : private Container {
 	}
 	
 	template<typename ForwardIterator, typename Sentinel, BOUNDED_REQUIRES(is_iterator_sentinel<ForwardIterator, Sentinel>)>
-	constexpr dynamic_resizable_array(ForwardIterator first, Sentinel const last, allocator_type allocator = allocator_type()):
-		Container(std::move(allocator))
+	constexpr dynamic_resizable_array(ForwardIterator first, Sentinel const last, allocator_type allocator_ = allocator_type()):
+		Container(std::move(allocator_))
 	{
 		assign(*this, first, last);
 	}
 	
-	constexpr dynamic_resizable_array(std::initializer_list<value_type> init, allocator_type allocator = allocator_type()) BOUNDED_NOEXCEPT_INITIALIZATION(
-		dynamic_resizable_array(begin(init), end(init), std::move(allocator))
+	constexpr dynamic_resizable_array(std::initializer_list<value_type> init, allocator_type allocator_ = allocator_type()) BOUNDED_NOEXCEPT_INITIALIZATION(
+		dynamic_resizable_array(begin(init), end(init), std::move(allocator_))
 	) {}
 
-	constexpr dynamic_resizable_array(dynamic_resizable_array const & other, allocator_type allocator) BOUNDED_NOEXCEPT_INITIALIZATION(
-		dynamic_resizable_array(begin(other), end(other), std::move(allocator))
+	constexpr dynamic_resizable_array(dynamic_resizable_array const & other, allocator_type allocator_) BOUNDED_NOEXCEPT_INITIALIZATION(
+		dynamic_resizable_array(begin(other), end(other), std::move(allocator_))
 	) {}
 	constexpr dynamic_resizable_array(dynamic_resizable_array const & other) BOUNDED_NOEXCEPT_INITIALIZATION(
 		dynamic_resizable_array(begin(other), end(other), other.get_allocator())
 	) {}
 
-	constexpr dynamic_resizable_array(dynamic_resizable_array && other, allocator_type allocator) noexcept:
-		Container(std::move(allocator))
+	constexpr dynamic_resizable_array(dynamic_resizable_array && other, allocator_type allocator_) noexcept:
+		Container(std::move(allocator_))
 	{
 		this->move_assign_to_empty(std::move(other));
 	}
@@ -127,7 +127,7 @@ struct dynamic_resizable_array : private Container {
 		return end(static_cast<Container &>(container));
 	}
 
-	CONTAINERS_OPERATOR_BRACKET_DEFINITIONS
+	CONTAINERS_OPERATOR_BRACKET_DEFINITIONS(dynamic_resizable_array)
 	
 	using Container::capacity;
 	auto reserve(size_type const requested_capacity) {
@@ -171,12 +171,12 @@ struct dynamic_resizable_array : private Container {
 			// First construct the new element because the arguments to
 			// construct it may reference an old element. We cannot move
 			// elements it references before constructing it
-			auto && allocator = get_allocator();
-			::containers::detail::construct(allocator, data(temp) + offset, std::forward<Args>(args)...);
+			auto && allocator_ = get_allocator();
+			::containers::detail::construct(allocator_, data(temp) + offset, std::forward<Args>(args)...);
 			auto const mutable_position = begin(*this) + offset;
-			auto const pointer = ::containers::uninitialized_move_destroy(begin(*this), mutable_position, data(temp), allocator);
+			auto const pointer = ::containers::uninitialized_move_destroy(begin(*this), mutable_position, data(temp), allocator_);
 			assert(data(temp) + offset == pointer);
-			::containers::uninitialized_move_destroy(mutable_position, end(*this), ::containers::next(pointer), allocator);
+			::containers::uninitialized_move_destroy(mutable_position, end(*this), ::containers::next(pointer), allocator_);
 			this->relocate_preallocated(std::move(temp));
 			add_size(1_bi);
 		}
@@ -223,22 +223,22 @@ struct dynamic_resizable_array : private Container {
 
 	void pop_back() {
 		assert(!empty(*this));
-		::containers::detail::destroy(get_allocator(), ::bounded::addressof(back(*this)));
+		::containers::detail::destroy(get_allocator(), std::addressof(back(*this)));
 		add_size(-1_bi);
 	}
 	
 private:
 	template<typename Size>
-	auto add_size(Size const s) BOUNDED_NOEXCEPT_VOID(
+	auto add_size(Size const s) BOUNDED_NOEXCEPT_GCC_BUG(
 		this->set_size(size(*this) + s)
 	)
 	constexpr auto check_iterator_validity(const_iterator it) {
 		assert(it >= begin(*this));
 		assert(it <= end(*this));
+		static_cast<void>(it);
 	}
 	constexpr auto new_capacity() const {
-		using capacity_type = bounded::equivalent_type<size_type, bounded::throw_policy<>>;
-		return bounded::max(1_bi, capacity_type(capacity() * 2_bi));
+		return static_cast<size_type>(bounded::max(1_bi, capacity() * 2_bi));
 	}
 };
 

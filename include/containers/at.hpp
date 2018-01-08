@@ -23,7 +23,7 @@ namespace common {
 template<typename Iterable, typename Index, BOUNDED_REQUIRES(is_iterable<Iterable>)>
 constexpr decltype(auto) at(Iterable && iterable, Index const index) BOUNDED_NOEXCEPT(
 	std::forward<Iterable>(iterable)[typename index_type<Iterable>::overflow_policy{}.assignment(
-		bounded::make(index),
+		bounded::integer(index),
 		0_bi,
 		size(iterable) - 1_bi
 	)]

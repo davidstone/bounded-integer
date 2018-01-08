@@ -1,12 +1,11 @@
-// Copyright David Stone 2016.
+// Copyright David Stone 2017.
 // Distributed under the Boost Software License, Version 1.0.
 // (See accompanying file LICENSE_1_0.txt or copy at
 // http://www.boost.org/LICENSE_1_0.txt)
 
 #pragma once
 
-#include <containers/algorithms/equal.hpp>
-#include <containers/algorithms/lexicographical_compare.hpp>
+#include <containers/algorithms/compare.hpp>
 #include <containers/small_buffer_optimized_vector.hpp>
 
 namespace containers {
@@ -26,8 +25,8 @@ public:
 	using base::get_allocator;
 
 	using base::base;
-	constexpr basic_string(T const * const c_string, allocator_type allocator = allocator_type()) BOUNDED_NOEXCEPT_INITIALIZATION(
-		base(c_string, c_string + std::strlen(c_string), std::move(allocator))
+	constexpr basic_string(T const * const c_string, allocator_type allocator_ = allocator_type()) BOUNDED_NOEXCEPT_INITIALIZATION(
+		base(c_string, c_string + std::strlen(c_string), std::move(allocator_))
 	) {
 	}
 	
@@ -39,8 +38,8 @@ public:
 		(std::is_same<std::decay_t<CString>, T const *>::value or std::is_same<std::decay_t<CString>, T *>::value) and
 		std::numeric_limits<Size>::is_integer
 	)>
-	constexpr basic_string(CString const & str, Size const size, allocator_type allocator = allocator_type()) BOUNDED_NOEXCEPT_INITIALIZATION(
-		base(str, str + size, std::move(allocator))
+	constexpr basic_string(CString const & str, Size const size, allocator_type allocator_ = allocator_type()) BOUNDED_NOEXCEPT_INITIALIZATION(
+		base(str, str + size, std::move(allocator_))
 	) {
 	}
 	
@@ -78,24 +77,13 @@ struct is_container_c<basic_string<T, Allocator>> : std::true_type {};
 // TODO: Write a c_string end sentinel for a one-pass algorithm
 
 template<typename T, typename Allocator>
-constexpr auto operator==(basic_string<T, Allocator> const & lhs, T const * const rhs) BOUNDED_NOEXCEPT_VALUE(
-	::containers::equal(begin(lhs), end(lhs), rhs, rhs + std::strlen(rhs))
+constexpr auto compare(basic_string<T, Allocator> const & lhs, T const * const rhs) BOUNDED_NOEXCEPT_VALUE(
+	::containers::compare(begin(lhs), end(lhs), rhs, rhs + std::strlen(rhs))
 )
 template<typename T, typename Allocator>
-constexpr auto operator==(T const * const lhs, basic_string<T, Allocator> const & rhs) BOUNDED_NOEXCEPT_VALUE(
-	rhs == lhs
+constexpr auto compare(T const * const lhs, basic_string<T, Allocator> const & rhs) BOUNDED_NOEXCEPT_VALUE(
+	::containers::compare(lhs, lhs + std::strlen(lhs), begin(rhs), end(rhs))
 )
-
-
-template<typename T, typename Allocator>
-constexpr auto operator<(basic_string<T, Allocator> const & lhs, T const * const rhs) BOUNDED_NOEXCEPT_VALUE(
-	::containers::lexicographical_compare(begin(lhs), end(lhs), rhs, rhs + std::strlen(rhs))
-)
-template<typename T, typename Allocator>
-constexpr auto operator<(T const * const lhs, basic_string<T, Allocator> const & rhs) BOUNDED_NOEXCEPT_VALUE(
-	::containers::lexicographical_compare(lhs, lhs + std::strlen(lhs), begin(rhs), end(rhs))
-)
-
 
 
 // TODO: Write a concatenate function that accepts an arbitrary number of ranges

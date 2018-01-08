@@ -63,6 +63,8 @@ constexpr auto check_compound_arithmetic() {
 	auto const post_increment = z++;
 	assert(post_increment == 0);
 	assert(z == 1);
+	static_cast<void>(pre_increment);
+	static_cast<void>(post_increment);
 
 	static_assert(minus_equals(bounded::clamped_integer<0, 10>(bounded::constant<5>), bounded::constant<20>) == bounded::constant<0>);	
 }

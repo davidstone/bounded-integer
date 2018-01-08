@@ -25,12 +25,14 @@ void test_generic(T const & t, Capacity capacity, std::initializer_list<T> init)
 	
 	for (auto const & value : count) {
 		assert(value == T{});
+		static_cast<void>(value);
 	}
 	
 	auto const count_arg = container(capacity, t);
 	assert(size(count) == capacity);
 	for (auto const & value : count_arg) {
 		assert(value == t);
+		static_cast<void>(value);
 	}
 	assert(front(count_arg) == t);
 	assert(back(count_arg) == t);

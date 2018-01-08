@@ -12,7 +12,6 @@
 #include <containers/dynamic_resizable_array.hpp>
 #include <containers/index_type.hpp>
 #include <containers/repeat_n.hpp>
-#include <containers/static_vector/static_vector.hpp>
 #include <containers/uninitialized_storage.hpp>
 
 #include <algorithm>
@@ -190,8 +189,8 @@ struct sbo_vector_base : private detail::rebound_allocator<T, Allocator> {
 		m_small()
 	{
 	}
-	constexpr sbo_vector_base(allocator_type allocator) noexcept(std::is_nothrow_move_constructible<allocator_type>{}):
-		allocator_type(std::move(allocator)),
+	constexpr sbo_vector_base(allocator_type allocator_) noexcept(std::is_nothrow_move_constructible<allocator_type>{}):
+		allocator_type(std::move(allocator_)),
 		m_small()
 	{
 	}
@@ -291,13 +290,12 @@ private:
 		if (is_small()) {
 			return;
 		}
-		auto && allocator = get_allocator();
 		auto temp = std::move(m_large);
-		auto const guard = scope_guard([&]{ ::containers::detail::deallocate_storage(allocator, temp.data(), temp.capacity()); });
+		auto const guard = scope_guard([&]{ ::containers::detail::deallocate_storage(get_allocator(), temp.data(), temp.capacity()); });
 		// It is safe to skip the destructor call of m_large
 		// because we do not rely on its side-effects
 		::bounded::construct(m_small);
-		::containers::uninitialized_move_destroy(temp.data(), temp.data() + temp.size(), m_small.data(), allocator);
+		::containers::uninitialized_move_destroy(temp.data(), temp.data() + temp.size(), m_small.data(), get_allocator());
 		assert(is_small());
 	}
 	

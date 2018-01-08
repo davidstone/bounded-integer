@@ -63,33 +63,33 @@ constexpr auto dynamic_array_data(T * const pointer, Size const size) noexcept {
 }
 
 template<typename T, typename Allocator, typename Size>
-constexpr auto make_storage(Allocator & allocator, Size const size) {
+constexpr auto make_storage(Allocator & allocator_, Size const size) {
 	return dynamic_array_data(
-		allocator_traits<Allocator>::allocate(allocator, static_cast<std::size_t>(size)),
+		allocator_traits<Allocator>::allocate(allocator_, static_cast<std::size_t>(size)),
 		size
 	);
 }
 
 template<typename Allocator, typename T, typename Size>
-auto deallocate_storage(Allocator & allocator, T * pointer, Size const size) noexcept {
+auto deallocate_storage(Allocator & allocator_, T * pointer, Size const size) noexcept {
 	allocator_traits<Allocator>::deallocate(
-		allocator,
+		allocator_,
 		reinterpret_cast<typename Allocator::value_type *>(pointer),
 		static_cast<std::size_t>(size)
 	);
 }
 
 template<typename Allocator, typename T>
-auto deallocate_storage(Allocator & allocator, dynamic_array_data_t<T> const data) noexcept {
-	return deallocate_storage(allocator, data.pointer, data.size);
+auto deallocate_storage(Allocator & allocator_, dynamic_array_data_t<T> const data) noexcept {
+	return deallocate_storage(allocator_, data.pointer, data.size);
 }
 
 
 
 template<typename Allocator, typename T>
-constexpr auto cleanup(Allocator & allocator, dynamic_array_data_t<T> const data) noexcept {
-	::containers::detail::destroy(allocator, begin(data), end(data));
-	deallocate_storage(allocator, data);
+constexpr auto cleanup(Allocator & allocator_, dynamic_array_data_t<T> const data) noexcept {
+	::containers::detail::destroy(allocator_, begin(data), end(data));
+	deallocate_storage(allocator_, data);
 }
 
 
@@ -100,13 +100,13 @@ template<
 	typename Allocator,
 	BOUNDED_REQUIRES(is_iterator_sentinel<ForwardIterator, Sentinel>)
 >
-auto dynamic_array_initializer(ForwardIterator first, Sentinel const last, Allocator & allocator) {
+auto dynamic_array_initializer(ForwardIterator first, Sentinel const last, Allocator & allocator_) {
 	using value_type = typename Allocator::value_type;
-	auto const data = make_storage<value_type>(allocator, ::containers::distance(first, last));
+	auto const data = make_storage<value_type>(allocator_, ::containers::distance(first, last));
 	try {
-		::containers::uninitialized_copy(first, last, begin(data), allocator);
+		::containers::uninitialized_copy(first, last, begin(data), allocator_);
 	} catch(...) {
-		deallocate_storage(allocator, data);
+		deallocate_storage(allocator_, data);
 		throw;
 	}
 	return data;
@@ -118,13 +118,13 @@ template<
 	typename Allocator,
 	BOUNDED_REQUIRES(std::is_convertible<Size, typename dynamic_array_data_t<typename Allocator::value_type>::size_type>::value)
 >
-auto dynamic_array_initializer(Size const size, Allocator & allocator) {
+auto dynamic_array_initializer(Size const size, Allocator & allocator_) {
 	using value_type = typename Allocator::value_type;
-	auto const data = make_storage<value_type>(allocator, size);
+	auto const data = make_storage<value_type>(allocator_, size);
 	try {
-		::containers::uninitialized_default_construct(begin(data), end(data), allocator);
+		::containers::uninitialized_default_construct(begin(data), end(data), allocator_);
 	} catch(...) {
-		deallocate_storage(allocator, data);
+		deallocate_storage(allocator_, data);
 		throw;
 	}
 	return data;
@@ -157,39 +157,39 @@ struct dynamic_array : private detail::rebound_allocator<T, Allocator> {
 	
 	constexpr dynamic_array() = default;
 
-	constexpr explicit dynamic_array(allocator_type allocator):
-		allocator_type(std::move(allocator))
+	constexpr explicit dynamic_array(allocator_type allocator_):
+		allocator_type(std::move(allocator_))
 	{
 	}
 	
 	template<typename ForwardIterator, typename Sentinel, BOUNDED_REQUIRES(is_iterator_sentinel<ForwardIterator, Sentinel>)>
-	constexpr dynamic_array(ForwardIterator first, Sentinel const last, allocator_type allocator = allocator_type{}):
-		allocator_type(std::move(allocator)),
+	constexpr dynamic_array(ForwardIterator first, Sentinel const last, allocator_type allocator_ = allocator_type{}):
+		allocator_type(std::move(allocator_)),
 		m_data(::containers::detail::dynamic_array_initializer(first, last, get_allocator()))
 	{
 	}
 	
-	constexpr dynamic_array(std::initializer_list<value_type> init, allocator_type allocator = allocator_type{}):
-		dynamic_array(begin(init), end(init), std::move(allocator))
+	constexpr dynamic_array(std::initializer_list<value_type> init, allocator_type allocator_ = allocator_type{}):
+		dynamic_array(begin(init), end(init), std::move(allocator_))
 	{
 	}
 
 	template<typename Count, BOUNDED_REQUIRES(std::is_convertible<Count, size_type>::value)>
-	explicit constexpr dynamic_array(Count const count, allocator_type allocator = allocator_type{}):
-		allocator_type(std::move(allocator)),
+	explicit constexpr dynamic_array(Count const count, allocator_type allocator_ = allocator_type{}):
+		allocator_type(std::move(allocator_)),
 		m_data(::containers::detail::dynamic_array_initializer(count, get_allocator()))
 	{
 	}
 	template<typename Count, BOUNDED_REQUIRES(std::is_convertible<Count, size_type>::value)>
-	constexpr dynamic_array(Count const count, value_type const & value, allocator_type allocator = allocator_type{}):
-		allocator_type(std::move(allocator))
+	constexpr dynamic_array(Count const count, value_type const & value, allocator_type allocator_ = allocator_type{}):
+		allocator_type(std::move(allocator_))
 	{
 		auto const range = ::containers::detail::repeat_n(count, value);
 		m_data = ::containers::detail::dynamic_array_initializer(begin(range), end(range), get_allocator());
 	}
 	
-	constexpr dynamic_array(dynamic_array const & other, allocator_type allocator):
-		dynamic_array(begin(other), end(other), std::move(allocator))
+	constexpr dynamic_array(dynamic_array const & other, allocator_type allocator_):
+		dynamic_array(begin(other), end(other), std::move(allocator_))
 	{
 	}
 	constexpr dynamic_array(dynamic_array const & other):
@@ -197,8 +197,8 @@ struct dynamic_array : private detail::rebound_allocator<T, Allocator> {
 	{
 	}
 	
-	constexpr dynamic_array(dynamic_array && other, allocator_type allocator) noexcept:
-		allocator_type(std::move(allocator)),
+	constexpr dynamic_array(dynamic_array && other, allocator_type allocator_) noexcept:
+		allocator_type(std::move(allocator_)),
 		m_data(std::exchange(other.m_data, {}))
 	{
 	}
@@ -235,7 +235,7 @@ struct dynamic_array : private detail::rebound_allocator<T, Allocator> {
 		return begin(container) + container.m_data.size;
 	}
 
-	CONTAINERS_OPERATOR_BRACKET_DEFINITIONS
+	CONTAINERS_OPERATOR_BRACKET_DEFINITIONS(dynamic_array)
 	
 private:
 	detail::dynamic_array_data_t<value_type> m_data = {};

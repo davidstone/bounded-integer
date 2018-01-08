@@ -24,6 +24,7 @@ constexpr auto index_type_source() -> typename T::difference_type {
 
 }	// namespace detail
 
+// TODO: ???
 template<typename T>
 using index_type = bounded::checked_integer<
 	0,

@@ -32,11 +32,14 @@ static_assert(containers::count(begin(array), end(array), 3_bi) == 2_bi);
 static_assert(containers::count(begin(array), end(array), 2_bi) == 1_bi);
 static_assert(containers::count(begin(array), end(array), 7_bi) == 0_bi);
 
-struct true_function {
-	template<typename... Args>
-	constexpr auto operator()(Args && ...) noexcept { return true; }
-};
-static_assert(containers::count_if(begin(array), end(array), true_function{}) == containers::size(array));
+template<auto>
+struct print;
+
+constexpr auto true_function = [](auto const &) { return true; };
+
+using namespace bounded::literal;
+
+static_assert(containers::count_if(begin(array), end(array), true_function) == containers::size(array));
 
 
 static_assert(containers::accumulate(begin(array), end(array)) == (0_bi + 3_bi + 2_bi + 3_bi + 5_bi));

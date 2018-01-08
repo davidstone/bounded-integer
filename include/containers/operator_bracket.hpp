@@ -46,17 +46,23 @@ constexpr auto operator_bracket(Iterable && iterable, index_type<std::decay_t<It
 }	// namespace detail
 }	// namespace containers
 
-#define CONTAINERS_OPERATOR_BRACKET_DEFINITIONS \
+#define CONTAINERS_OPERATOR_BRACKET_DEFINITIONS(type) \
 	template<typename Index> \
-	constexpr auto operator[](Index const index) const & BOUNDED_NOEXCEPT_DECLTYPE( \
-		::containers::detail::operator_bracket(*this, index) \
-	) \
+	constexpr auto operator[](Index const index) const & \
+		noexcept(noexcept(::containers::detail::operator_bracket(std::declval<type const &>(), index))) -> \
+		decltype(::containers::detail::operator_bracket(*this, index)) {\
+		return ::containers::detail::operator_bracket(*this, index); \
+	} \
 	template<typename Index> \
-	constexpr auto operator[](Index const index) & BOUNDED_NOEXCEPT_DECLTYPE( \
-		::containers::detail::operator_bracket(*this, index) \
-	) \
+	constexpr auto operator[](Index const index) & \
+		noexcept(noexcept(::containers::detail::operator_bracket(std::declval<type &>(), index))) -> \
+		decltype(::containers::detail::operator_bracket(*this, index)) {\
+		return ::containers::detail::operator_bracket(*this, index); \
+	} \
 	template<typename Index> \
-	constexpr auto operator[](Index const index) && BOUNDED_NOEXCEPT_DECLTYPE( \
-		::containers::detail::operator_bracket(std::move(*this), index) \
-	)
+	constexpr auto operator[](Index const index) && \
+		noexcept(noexcept(::containers::detail::operator_bracket(std::declval<type &&>(), index))) -> \
+		decltype(::containers::detail::operator_bracket(std::move(*this), index)) {\
+		return ::containers::detail::operator_bracket(std::move(*this), index); \
+	}
 

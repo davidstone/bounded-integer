@@ -30,9 +30,10 @@ struct allocator {
 	)
 };
 
+// TODO: Support only strong_equality, not strong_ordering
 template<typename LHS, typename RHS>
-constexpr auto operator==(allocator<LHS>, allocator<RHS>) noexcept {
-	return true;
+constexpr auto compare(allocator<LHS>, allocator<RHS>) noexcept {
+	return bounded::strong_ordering_equal;
 }
 
 

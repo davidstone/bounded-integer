@@ -14,11 +14,7 @@ namespace containers {
 
 template<typename T, typename Size>
 constexpr auto make_static_vector(Size const size) BOUNDED_NOEXCEPT(
-	static_vector<T, static_cast<std::intmax_t>(std::numeric_limits<Size>::max())>(size)
-)
-template<typename T, typename Size>
-constexpr auto make_static_vector(Size const size, T const & value) BOUNDED_NOEXCEPT(
-	static_vector<std::decay_t<T>, static_cast<std::intmax_t>(std::numeric_limits<Size>::max())>(size, value)
+	static_vector<T, static_cast<std::size_t>(std::numeric_limits<Size>::max())>(size)
 )
 
 }	// namespace containers

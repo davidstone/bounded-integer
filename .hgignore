@@ -1,13 +1,3 @@
-^array
-^concatenate
-^dynamic_array
-^small_buffer_optimized_vector
-^static_vector
-^string
-^vector
-^flat_map
-^performance
-
 syntax: glob
 
 build*/

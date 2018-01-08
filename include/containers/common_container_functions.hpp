@@ -5,9 +5,8 @@
 
 #pragma once
 
+#include <containers/algorithms/compare.hpp>
 #include <containers/algorithms/copy.hpp>
-#include <containers/algorithms/equal.hpp>
-#include <containers/algorithms/lexicographical_compare.hpp>
 #include <containers/algorithms/remove.hpp>
 #include <containers/algorithms/uninitialized.hpp>
 #include <containers/append.hpp>
@@ -56,9 +55,7 @@ namespace common {
 	using ::containers::detail::common::erase_if; \
 	using ::containers::detail::common::assign; \
 	using ::containers::detail::common::clear; \
-	using ::containers::detail::common::resize; \
-	using ::containers::detail::common::operator==; \
-	using ::containers::detail::common::operator<;
+	using ::containers::detail::common::resize;
 
 }	// namespace common
 
@@ -74,7 +71,7 @@ constexpr auto emplace_in_middle_no_reallocation(Container & container, typename
 	assert(position != original_end);
 	container.emplace_back(std::move(back(container)));
 	::containers::move_backward(position, ::containers::prev(original_end), original_end);
-	auto const pointer = ::bounded::addressof(*position);
+	auto const pointer = std::addressof(*position);
 	::containers::detail::destroy(allocator, pointer);
 	::containers::detail::construct(allocator, pointer, std::forward<Args>(args)...);
 }

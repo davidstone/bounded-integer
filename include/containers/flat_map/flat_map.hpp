@@ -13,6 +13,8 @@
 #include <containers/tuple.hpp>
 #include <containers/vector/vector.hpp>
 
+#include <bounded/integer.hpp>
+
 #include <algorithm>
 #include <stdexcept>
 #include <tuple>
@@ -49,33 +51,9 @@ struct map_value_type : private tuple<Key, Mapped> {
 };
 
 template<typename Key, typename Mapped>
-constexpr auto operator==(map_value_type<Key, Mapped> const & lhs, map_value_type<Key, Mapped> const & rhs) BOUNDED_NOEXCEPT_VALUE(
-	lhs.as_tuple() == rhs.as_tuple()
+constexpr auto compare(map_value_type<Key, Mapped> const & lhs, map_value_type<Key, Mapped> const & rhs) BOUNDED_NOEXCEPT_VALUE(
+	compare(lhs.as_tuple(), rhs.as_tuple())
 )
-template<typename Key, typename Mapped>
-constexpr auto operator<(map_value_type<Key, Mapped> const & lhs, map_value_type<Key, Mapped> const & rhs) BOUNDED_NOEXCEPT_VALUE(
-	lhs.as_tuple() < rhs.as_tuple()
-)
-
-
-template<typename Container, typename KeyCompare>
-struct flat_map_data : private tuple<Container, KeyCompare> {
-	using tuple<Container, KeyCompare>::tuple;
-
-	constexpr auto && container() const & noexcept {
-		return (*this)[0_bi];
-	}
-	constexpr auto && container() & noexcept {
-		return (*this)[0_bi];
-	}
-	constexpr auto && container() && noexcept {
-		return std::move(*this)[0_bi];
-	}
-	constexpr auto key_compare() const BOUNDED_NOEXCEPT_VALUE(
-		(*this)[1_bi]
-	)
-};
-
 
 // The exact type of value_type should be considered implementation defined.
 // map_value_type<key_type const, mapped_type> does not work if the underlying
@@ -85,9 +63,20 @@ struct flat_map_data : private tuple<Container, KeyCompare> {
 // compile-time checks.
 
 template<typename Container, typename Compare, bool allow_duplicates>
-class flat_map_base : private flat_map_data<Container, Compare> {
-	using base = flat_map_data<Container, Compare>;
-	using base::container;
+struct flat_map_base {
+private:
+	constexpr auto && container() const & noexcept {
+		return m_data[0_bi];
+	}
+	constexpr auto && container() & noexcept {
+		return m_data[0_bi];
+	}
+	constexpr auto && container() && noexcept {
+		return std::move(m_data)[0_bi];
+	}
+
+	using data_t = tuple<Container, Compare>;
+	data_t m_data;
 public:
 	using value_type = typename Container::value_type;
 	using key_type = typename value_type::key_type;
@@ -100,6 +89,12 @@ public:
 	
 	using key_compare_type = Compare;
 	class value_compare_type {
+	protected:
+		friend struct flat_map_base;
+		constexpr value_compare_type(key_compare_type c) noexcept(std::is_nothrow_move_constructible<key_compare_type>::value):
+			m_compare(std::move(c)) {
+		}
+		key_compare_type m_compare;
 	public:
 		using result_type = bool;
 		using first_argument_type = value_type;
@@ -107,33 +102,36 @@ public:
 		constexpr auto operator()(value_type const & lhs, value_type const & rhs) const BOUNDED_NOEXCEPT(
 			m_compare(lhs.key(), rhs.key())
 		)
-	protected:
-		friend class flat_map_base;
-		constexpr value_compare_type(key_compare_type c) noexcept(std::is_nothrow_move_constructible<key_compare_type>::value):
-			m_compare(std::move(c)) {
-		}
-		key_compare_type m_compare;
 	};
 	
-	using base::key_compare;
-	constexpr auto value_compare() const BOUNDED_NOEXCEPT(
-		value_compare_type(key_compare())
-	)
+	constexpr auto key_compare() const noexcept {
+		return m_data[1_bi];
+	}
+	constexpr auto value_compare() const noexcept{
+		return value_compare_type(key_compare());
+	}
 	
 	flat_map_base() = default;
-	constexpr explicit flat_map_base(key_compare_type compare, allocator_type allocator = allocator_type{}) BOUNDED_NOEXCEPT_INITIALIZATION(
-		base(Container(std::move(allocator)), std::move(compare))
-	) {
+	constexpr explicit flat_map_base(key_compare_type compare, allocator_type allocator = allocator_type{}) noexcept(noexcept(
+		data_t(Container(std::declval<allocator_type>()), std::declval<key_compare_type>())
+	)):
+		m_data(Container(std::move(allocator)), std::move(compare))
+	{
 	}
 	constexpr explicit flat_map_base(allocator_type allocator) BOUNDED_NOEXCEPT_INITIALIZATION(
 		flat_map_base(key_compare_type{}, std::move(allocator))
 	) {
 	}
 	template<typename InputIterator>
-	constexpr flat_map_base(InputIterator first, InputIterator last, key_compare_type compare = key_compare_type{}, allocator_type allocator = allocator_type{}) BOUNDED_NOEXCEPT_INITIALIZATION(
-		base(Container(first, last, std::move(allocator)), std::move(compare))
-	) {
-		std::sort(begin(container()), end(container()), value_compare());
+	constexpr flat_map_base(InputIterator first, InputIterator last, key_compare_type compare = key_compare_type{}, allocator_type allocator = allocator_type{}):
+		// TODO: noexcept?
+		m_data(Container(first, last, std::move(allocator)), std::move(compare))
+	{
+		std::sort(
+			legacy_iterator(begin(container())),
+			legacy_iterator(end(container())),
+			value_compare()
+		);
 		// At some point this should be unique_sort
 		auto const equal = ::containers::negate(value_compare());
 		::containers::erase(
@@ -147,13 +145,15 @@ public:
 		flat_map_base(first, last, key_compare_type{}, std::move(allocator))
 	) {
 	}
-	constexpr flat_map_base(flat_map_base const & other, allocator_type allocator) BOUNDED_NOEXCEPT_INITIALIZATION(
-		base(Container(other, std::move(allocator)), key_compare_type{})
-	) {
+	constexpr flat_map_base(flat_map_base const & other, allocator_type allocator):
+		// TODO: noexcept
+		m_data(Container(other, std::move(allocator)), key_compare_type{})
+	{
 	}
-	constexpr flat_map_base(flat_map_base && other, allocator_type allocator) BOUNDED_NOEXCEPT_INITIALIZATION(
-		base(Container(std::move(other), std::move(allocator)), key_compare_type{})
-	) {
+	constexpr flat_map_base(flat_map_base && other, allocator_type allocator):
+		// TODO: noexcept
+		m_data(Container(std::move(other), std::move(allocator)), key_compare_type{})
+	{
 	}
 	constexpr flat_map_base(std::initializer_list<value_type> init, key_compare_type compare = key_compare_type{}, allocator_type allocator = allocator_type{}) BOUNDED_NOEXCEPT_INITIALIZATION(
 		flat_map_base(begin(init), end(init), std::move(compare), std::move(allocator))
@@ -164,9 +164,9 @@ public:
 	) {
 	}
 	
-	constexpr auto & operator=(std::initializer_list<value_type> init) & BOUNDED_NOEXCEPT(
-		*this = flat_map_base(init)
-	)
+	constexpr auto & operator=(std::initializer_list<value_type> init) & noexcept(noexcept(flat_map_base(init)) and std::is_nothrow_move_assignable<flat_map_base>{}) {
+		return *this = flat_map_base(init);
+	}
 	
 	friend constexpr auto begin(flat_map_base const & c) BOUNDED_NOEXCEPT(
 		begin(c.container())
@@ -192,18 +192,38 @@ public:
 		container().shrink_to_fit()
 	)
 	
-	constexpr auto lower_bound(key_type const & key) const BOUNDED_NOEXCEPT(
-		std::lower_bound(begin(*this), end(*this), key, key_value_compare{key_compare()})
+	constexpr auto lower_bound(key_type const & key) const BOUNDED_NOEXCEPT_GCC_BUG(
+		std::lower_bound(
+			legacy_iterator(begin(*this)),
+			legacy_iterator(end(*this)),
+			key,
+			key_value_compare{key_compare()}
+		).base()
 	)
-	constexpr auto lower_bound(key_type const & key) BOUNDED_NOEXCEPT(
-		std::lower_bound(begin(*this), end(*this), key, key_value_compare{key_compare()})
+	constexpr auto lower_bound(key_type const & key) BOUNDED_NOEXCEPT_GCC_BUG(
+		std::lower_bound(
+			legacy_iterator(begin(*this)),
+			legacy_iterator(end(*this)),
+			key,
+			key_value_compare{key_compare()}
+		).base()
 	)
-	constexpr auto upper_bound(key_type const & key) const BOUNDED_NOEXCEPT(
-		std::upper_bound(begin(*this), end(*this), key, key_value_compare{key_compare()})
+	constexpr auto upper_bound(key_type const & key) const BOUNDED_NOEXCEPT_GCC_BUG(
+		std::upper_bound(
+			legacy_iterator(begin(*this)),
+			legacy_iterator(end(*this)),
+			key,
+			key_value_compare{key_compare()}
+		).base()
 	)
-	constexpr auto upper_bound(key_type const & key) {
-		return std::upper_bound(begin(*this), end(*this), key, key_value_compare{key_compare()});
-	}
+	constexpr auto upper_bound(key_type const & key) BOUNDED_NOEXCEPT_GCC_BUG(
+		std::upper_bound(
+			legacy_iterator(begin(*this)),
+			legacy_iterator(end(*this)),
+			key,
+			key_value_compare{key_compare()}
+		).base()
+	)
 	// TODO: noexcept
 	constexpr auto find(key_type const & key) const {
 		auto const it = lower_bound(key);
@@ -240,18 +260,19 @@ public:
 		return emplace_at(position, std::move(data).key, std::move(data).mapped_args);
 	}
 
-	constexpr auto insert(value_type const & value) BOUNDED_NOEXCEPT(
-		emplace(value)
-	)
-	constexpr auto insert(value_type && value) BOUNDED_NOEXCEPT(
-		emplace(std::move(value))
-	)
-	constexpr auto insert(const_iterator const hint, value_type const & value) BOUNDED_NOEXCEPT(
-		emplace_hint(hint, value)
-	)
-	constexpr auto insert(const_iterator const hint, value_type && value) BOUNDED_NOEXCEPT(
-		emplace_hint(hint, std::move(value))
-	)
+	// TODO: noexcept
+	constexpr auto insert(value_type const & value) {
+		return emplace(value);
+	}
+	constexpr auto insert(value_type && value) {
+		return emplace(std::move(value));
+	}
+	constexpr auto insert(const_iterator const hint, value_type const & value) {
+		return emplace_hint(hint, value);
+	}
+	constexpr auto insert(const_iterator const hint, value_type && value) {
+		return emplace_hint(hint, std::move(value));
+	}
 	// TODO: noexcept
 	template<typename InputIterator>
 	constexpr auto insert(InputIterator first, InputIterator const last) {
@@ -262,16 +283,17 @@ public:
 		// merge sort on both ranges, rather than calling std::sort on the
 		// entire container.
 		auto const midpoint = container().insert(end(container()), first, last);
-		std::sort(midpoint, end(container()), value_compare());
+		auto const lmidpoint = legacy_iterator(midpoint);
+		auto const lend = legacy_iterator(end(container()));
+		std::sort(lmidpoint, lend, value_compare());
 		if (allow_duplicates) {
 			std::inplace_merge(
 				legacy_iterator(begin(container())),
-				legacy_iterator(midpoint),
-				legacy_iterator(end(container())),
+				lmidpoint,
+				lend,
 				value_compare()
 			);
-		}
-		else {
+		} else {
 			auto const position = ::containers::unique_inplace_merge(
 				begin(container()),
 				midpoint,
@@ -379,15 +401,9 @@ private:
 		return apply(construct, std::forward<KeyTuple>(key));
 	}
 	
-	struct inserted_t : private tuple<iterator, bool> {
-		using tuple<iterator, bool>::tuple;
-	
-		constexpr auto iterator() const noexcept {
-			return (*this)[0_bi];
-		}
-		constexpr auto inserted() const noexcept {
-			return (*this)[1_bi];
-		}
+	struct inserted_t {
+		iterator iterator;
+		bool inserted;
 	};
 
 	template<typename>
@@ -410,7 +426,7 @@ private:
 		auto const that_element_is_equal = [&](){ return !key_compare()(::containers::prev(position)->key(), key); };
 		bool const already_exists = there_is_element_before and that_element_is_equal();
 		if (already_exists) {
-			return inserted_t(mutable_iterator(*this, ::containers::prev(position)), false);
+			return inserted_t{mutable_iterator(*this, ::containers::prev(position)), false};
 		}
 
 		auto const it = container().emplace(
@@ -419,7 +435,7 @@ private:
 			tie(std::forward<Key>(key)),
 			std::forward<Mapped>(mapped)
 		);
-		return inserted_t(it, true);
+		return inserted_t{it, true};
 	}
 };
 
@@ -574,10 +590,10 @@ public:
 	// compiler to be able to optimize based on the fact that values in flat_map
 	// are unique, so I have slightly different versions in flat_map.
 
-	constexpr auto equal_range(key_type const & key) const BOUNDED_NOEXCEPT(
+	constexpr auto equal_range(key_type const & key) const BOUNDED_NOEXCEPT_GCC_BUG(
 		std::equal_range(begin(*this), end(*this), key, key_value_compare{this->key_compare()})
 	)
-	constexpr auto equal_range(key_type const & key) BOUNDED_NOEXCEPT(
+	constexpr auto equal_range(key_type const & key) BOUNDED_NOEXCEPT_GCC_BUG(
 		std::equal_range(begin(*this), end(*this), key, key_value_compare{this->key_compare()})
 	)
 

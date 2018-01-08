@@ -60,6 +60,9 @@ struct static_vector_data<T, capacity, false> : static_vector_data<T, capacity, 
 // TODO: ensure proper exception safety
 template<typename T, std::size_t capacity_>
 struct static_vector : private detail::static_vector_data<T, capacity_> {
+private:
+	enum class count_constructor{};
+public:
 	using value_type = T;
 	using size_type = bounded::integer<0, capacity_>;
 	using const_iterator = detail::basic_array_iterator<value_type const, static_vector>;
@@ -122,12 +125,12 @@ struct static_vector : private detail::static_vector_data<T, capacity_> {
 	}
 
 
-	CONTAINERS_OPERATOR_BRACKET_DEFINITIONS
+	CONTAINERS_OPERATOR_BRACKET_DEFINITIONS(static_vector)
 	
 	static constexpr auto capacity() noexcept {
 		return bounded::constant<capacity_>;
 	}
-
+	
 	template<typename... Args>
 	constexpr decltype(auto) emplace_back(Args && ... args) {
 		assert(size(*this) != capacity());
@@ -163,7 +166,7 @@ struct static_vector : private detail::static_vector_data<T, capacity_> {
 	}
 	
 	constexpr auto pop_back() {
-		::containers::detail::destroy(get_allocator(), ::bounded::addressof(back(*this)));
+		::containers::detail::destroy(get_allocator(), std::addressof(back(*this)));
 		--this->m_size;
 	}
 
@@ -173,7 +176,6 @@ private:
 		return allocator<value_type>{};
 	}
 
-	enum class count_constructor{};
 	template<typename Count, typename... MaybeInitializer>
 	constexpr explicit static_vector(count_constructor, Count const count, MaybeInitializer && ... args) noexcept(std::is_nothrow_constructible<value_type, MaybeInitializer && ...>::value) {
 		static_assert(sizeof...(MaybeInitializer) == 0 or sizeof...(MaybeInitializer) == 1);
@@ -183,6 +185,9 @@ private:
 		}
 	}
 };
+
+template<typename Size, typename T>
+static_vector(Size const size, T const & value) -> static_vector<T, static_cast<std::size_t>(std::numeric_limits<Size>::max())>;
 
 
 template<typename T, std::size_t capacity>

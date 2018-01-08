@@ -1,4 +1,4 @@
-// Copyright David Stone 2015.
+// Copyright David Stone 2017.
 // Distributed under the Boost Software License, Version 1.0.
 // (See accompanying file LICENSE_1_0.txt or copy at
 // http://www.boost.org/LICENSE_1_0.txt)
@@ -7,6 +7,7 @@
 
 #pragma once
 
+#include <containers/common_iterator_functions.hpp>
 #include <containers/is_iterator.hpp>
 
 #include <bounded/integer.hpp>
@@ -15,15 +16,14 @@
 
 namespace containers {
 namespace detail {
-namespace bounded_integer {
 
 
 template<typename Integer>
 struct integer_compatibility {
 	integer_compatibility() = default;
 	template<typename T, BOUNDED_REQUIRES(std::is_constructible<Integer, T>::value)>
-	constexpr integer_compatibility(T && t) noexcept(std::is_nothrow_constructible<Integer, T>::value):
-		value(std::forward<T>(t))
+	constexpr integer_compatibility(T t) noexcept(std::is_nothrow_constructible<Integer, T>::value):
+		value(std::move(t))
 	{
 	}
 
@@ -44,18 +44,47 @@ private:
 	Integer value;
 };
 
+template<typename Integer>
+integer_compatibility(Integer) -> integer_compatibility<Integer>;
+
+template<typename LHS, typename RHS>
+constexpr auto compare(integer_compatibility<LHS> const lhs, integer_compatibility<RHS> const rhs) noexcept {
+	return bounded::compare(static_cast<LHS>(lhs), static_cast<RHS>(rhs));
+}
+
+template<typename LHS, typename RHS, BOUNDED_REQUIRES(bounded::is_bounded_integer<RHS>)>
+constexpr auto compare(integer_compatibility<LHS> const lhs, RHS const rhs) noexcept {
+	return bounded::compare(static_cast<LHS>(lhs), rhs);
+}
+
+template<typename LHS, typename RHS, BOUNDED_REQUIRES(bounded::is_bounded_integer<LHS>)>
+constexpr auto compare(LHS const lhs, integer_compatibility<RHS> const rhs) noexcept {
+	return bounded::compare(lhs, static_cast<RHS>(rhs));
+}
+
+
+template<typename Integer, BOUNDED_REQUIRES(bounded::is_bounded_integer<Integer>)>
+constexpr auto to_builtin(Integer x) noexcept {
+	return x.value();
+}
+template<typename Integer, BOUNDED_REQUIRES(!bounded::is_bounded_integer<Integer>)>
+constexpr auto to_builtin(Integer x) noexcept {
+	return x;
+}
+
+
 #define CONTAINERS_DETAIL_INTEGER_COMPATIBILITY_OPERATORS(op) \
 	template<typename Integer, typename RHS, BOUNDED_REQUIRES(std::numeric_limits<RHS>::is_integer)> \
 	constexpr auto operator op(integer_compatibility<Integer> const & lhs, RHS const & rhs) BOUNDED_NOEXCEPT( \
-		static_cast<integer_compatibility<Integer>>(static_cast<Integer const &>(lhs) + rhs) \
+		integer_compatibility(static_cast<Integer const &>(lhs) op to_builtin(rhs)) \
 	) \
 	template<typename LHS, typename Integer, BOUNDED_REQUIRES(std::numeric_limits<LHS>::is_integer)> \
 	constexpr auto operator op(LHS const & lhs, integer_compatibility<Integer> const & rhs) BOUNDED_NOEXCEPT( \
-		rhs + lhs \
+		integer_compatibility(to_builtin(lhs) op static_cast<Integer const &>(rhs)) \
 	) \
 	template<typename Integer> \
 	constexpr auto operator op(integer_compatibility<Integer> const & lhs, integer_compatibility<Integer> const & rhs) BOUNDED_NOEXCEPT( \
-		static_cast<Integer const &>(lhs) + rhs \
+		static_cast<Integer const &>(lhs) op static_cast<Integer const &>(rhs) \
 	)
 
 CONTAINERS_DETAIL_INTEGER_COMPATIBILITY_OPERATORS(+)
@@ -70,14 +99,13 @@ CONTAINERS_DETAIL_INTEGER_COMPATIBILITY_OPERATORS(&)
 #undef CONTAINERS_DETAIL_INTEGER_COMPATIBILITY_OPERATORS
 
 
-}	// namespace bounded_integer
 }	// namespace detail
 }	// namespace containers
 
 namespace std {
 
 template<typename Integer>
-struct numeric_limits<containers::detail::bounded_integer::integer_compatibility<Integer>> : numeric_limits<Integer> {};
+struct numeric_limits<containers::detail::integer_compatibility<Integer>> : numeric_limits<Integer> {};
 
 }	// namespace std
 
@@ -86,7 +114,7 @@ namespace containers {
 template<typename Iterator>
 struct legacy_iterator_t {
 	using value_type = typename std::iterator_traits<Iterator>::value_type;
-	using difference_type = detail::bounded_integer::integer_compatibility<std::ptrdiff_t>;
+	using difference_type = detail::integer_compatibility<std::ptrdiff_t>;
 	using pointer = typename std::iterator_traits<Iterator>::pointer;
 	using reference = typename std::iterator_traits<Iterator>::reference;
 	using iterator_category = typename std::iterator_traits<Iterator>::iterator_category;
@@ -100,15 +128,15 @@ struct legacy_iterator_t {
 		return m_it;
 	}
 
-	constexpr decltype(auto) operator*() const BOUNDED_NOEXCEPT(
+	constexpr decltype(auto) operator*() const BOUNDED_NOEXCEPT_GCC_BUG(
 		base().operator*()
 	)
-	constexpr decltype(auto) operator->() const BOUNDED_NOEXCEPT(
+	constexpr decltype(auto) operator->() const BOUNDED_NOEXCEPT_GCC_BUG(
 		base().operator->()
 	)
 	template<typename Index>
-	constexpr decltype(auto) operator[](Index const index) const BOUNDED_NOEXCEPT(
-		*(*this + index)
+	constexpr decltype(auto) operator[](Index const index) const BOUNDED_NOEXCEPT_GCC_BUG(
+		base()[index]
 	)
 
 private:
@@ -125,12 +153,8 @@ constexpr auto operator-(legacy_iterator_t<Iterator> const lhs, legacy_iterator_
 )
 
 template<typename Iterator>
-constexpr auto operator==(legacy_iterator_t<Iterator> const lhs, legacy_iterator_t<Iterator> const rhs) BOUNDED_NOEXCEPT(
-	lhs.base() == rhs.base()
-)
-template<typename Iterator>
-constexpr auto operator<(legacy_iterator_t<Iterator> const lhs, legacy_iterator_t<Iterator> const rhs) BOUNDED_NOEXCEPT(
-	lhs.base() < rhs.base()
+constexpr auto compare(legacy_iterator_t<Iterator> const lhs, legacy_iterator_t<Iterator> const rhs) BOUNDED_NOEXCEPT(
+	compare(lhs.base(), rhs.base())
 )
 
 

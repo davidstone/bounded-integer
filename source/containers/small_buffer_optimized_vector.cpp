@@ -12,7 +12,7 @@ namespace {
 
 using namespace bounded::literal;
 
-template<std::intmax_t capacity_, typename T>
+template<auto capacity_, typename T>
 void test_generic(bounded::constant_t<capacity_> const capacity, T const & t, std::initializer_list<T> init) {
 	using container = containers::small_buffer_optimized_vector<T, 1>;
 	auto const default_constructed = container{};
@@ -26,12 +26,14 @@ void test_generic(bounded::constant_t<capacity_> const capacity, T const & t, st
 
 	for (auto const & value : count) {
 		assert(value == T{});
+		static_cast<void>(value);
 	}
 	
 	auto const count_arg = container(capacity, t);
 	assert(size(count_arg) == capacity);
 	for (auto const & value : count_arg) {
 		assert(value == t);
+		static_cast<void>(value);
 	}
 	assert(front(count_arg) == t);
 	assert(back(count_arg) == t);
@@ -86,6 +88,7 @@ void test_generic(bounded::constant_t<capacity_> const capacity, T const & t, st
 	auto const old_front = front(copy);
 	resize(copy, capacity);
 	assert(front(copy) == old_front);
+	static_cast<void>(old_front);
 	clear(copy);
 	resize(copy, capacity);
 	assert(front(copy) == T{});

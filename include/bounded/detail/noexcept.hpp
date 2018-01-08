@@ -14,6 +14,12 @@
 // No SFINAE
 #define BOUNDED_NOEXCEPT(...) noexcept(noexcept(__VA_ARGS__)) { return __VA_ARGS__; }
 
+#if defined __GNUC__ && !defined __clang__
+	#define BOUNDED_NOEXCEPT_GCC_BUG(...) { return __VA_ARGS__; }
+#else
+	#define BOUNDED_NOEXCEPT_GCC_BUG(...) noexcept(noexcept(__VA_ARGS__)) { return __VA_ARGS__; }
+#endif
+
 // No SFINAE
 #define BOUNDED_NOEXCEPT_VOID(...) noexcept(noexcept(__VA_ARGS__)) { __VA_ARGS__; }
 
@@ -58,4 +64,3 @@
 	) -> decltype(__VA_ARGS__) && { \
 		return __VA_ARGS__; \
 	}
-

@@ -33,17 +33,18 @@ struct repeat_n_iterator {
 		return m_value.get();
 	}
 	constexpr auto operator->() const {
-		return ::bounded::addressof(operator*());
+		return std::addressof(operator*());
 	}
 
-	friend constexpr auto operator==(repeat_n_iterator const lhs, repeat_n_iterator const rhs) {
-		return lhs.m_remaining == rhs.m_remaining;
+	// It is undefined behavior to compare iterators into different ranges
+	friend constexpr auto compare(repeat_n_iterator const lhs, repeat_n_iterator const rhs) {
+		return compare(lhs.m_remaining, rhs.m_remaining);
 	}
-	friend constexpr auto operator==(repeat_n_iterator const lhs, repeat_n_sentinel) {
-		return lhs.m_remaining == 0_bi;
+	friend constexpr auto compare(repeat_n_iterator const lhs, repeat_n_sentinel) {
+		return compare(lhs.m_remaining, 0_bi);
 	}
-	friend constexpr auto operator<(repeat_n_iterator const lhs, repeat_n_iterator const rhs) {
-		return lhs.m_remaining < rhs.m_remaining;
+	friend constexpr auto compare(repeat_n_sentinel, repeat_n_iterator const rhs) {
+		return compare(0_bi, rhs.m_remaining);
 	}
 
 	template<typename Offset, BOUNDED_REQUIRES(std::numeric_limits<Offset>::is_specialized)>
@@ -70,22 +71,6 @@ private:
 };
 
 template<typename Size, typename T>
-constexpr auto operator==(repeat_n_sentinel lhs, repeat_n_iterator<Size, T> const rhs) {
-	return rhs == lhs;
-}
-
-template<typename Size, typename T>
-constexpr auto operator<(repeat_n_iterator<Size, T> const lhs, repeat_n_sentinel const rhs) {
-	// It is not possible to be greater than the sentinel. The iterator is
-	// either less than it or equal to it.
-	return lhs != rhs;
-}
-template<typename Size, typename T>
-constexpr auto operator<(repeat_n_sentinel, repeat_n_iterator<Size, T>) {
-	return false;
-}
-
-template<typename Size, typename T>
 struct repeat_n_t {
 	using size_type = Size;
 	using value_type = T;
@@ -99,21 +84,19 @@ struct repeat_n_t {
 	{
 	}
 
-	friend constexpr auto begin(repeat_n_t const & container) noexcept {
-		return typename repeat_n_t::const_iterator(container.m_size, container.m_value);
+	constexpr auto begin() const noexcept {
+		return const_iterator(m_size, m_value);
+	}
+	constexpr auto end() const noexcept {
+		return repeat_n_sentinel{};
 	}
 
-	CONTAINERS_OPERATOR_BRACKET_DEFINITIONS
+	CONTAINERS_OPERATOR_BRACKET_DEFINITIONS(repeat_n_t)
 
 private:
 	size_type m_size;
 	value_type m_value;
 };
-
-template<typename Size, typename T>
-constexpr auto end(repeat_n_t<Size, T> const &) noexcept {
-	return repeat_n_sentinel{};
-}
 
 template<typename Size, typename T>
 constexpr auto repeat_n(Size const size, T && value) {
