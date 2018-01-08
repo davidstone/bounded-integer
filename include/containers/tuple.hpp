@@ -297,21 +297,13 @@ constexpr auto compare(tuple<lhs_types...> const & lhs, tuple<rhs_types...> cons
 
 
 // TODO: unwrap reference_wrapper?
-// TODO: Should this actually be decay?
-constexpr struct {
-	template<typename... Types>
-	constexpr auto operator()(Types && ... args) const BOUNDED_NOEXCEPT_VALUE(
-		tuple<std::decay_t<Types>...>(std::forward<Types>(args)...)
-	)
-} make_tuple;
+constexpr auto make_tuple = [](auto && ... args) BOUNDED_NOEXCEPT_VALUE(
+	tuple<std::decay_t<decltype(args)>...>(std::forward<decltype(args)>(args)...)
+);
 
-constexpr struct {
-	template<typename... Types>
-	constexpr auto operator()(Types && ... args) const noexcept {
-		return tuple<Types && ...>(std::forward<Types>(args)...);
-	}
-} tie;
-
+constexpr auto tie = [](auto && ... args) noexcept {
+		return tuple<decltype(args)...>(std::forward<decltype(args)>(args)...);
+};
 
 template<typename Tuple>
 struct tuple_size_c;
