@@ -1,4 +1,4 @@
-// Copyright David Stone 2016.
+// Copyright David Stone 2018.
 // Distributed under the Boost Software License, Version 1.0.
 // (See accompanying file LICENSE_1_0.txt or copy at
 // http://www.boost.org/LICENSE_1_0.txt)
@@ -17,7 +17,7 @@ namespace containers {
 namespace detail {
 
 template<typename Size, typename T>
-struct repeat_n_t;
+struct repeat_n;
 
 struct repeat_n_sentinel {};
 
@@ -59,7 +59,7 @@ struct repeat_n_iterator {
 	}
 
 private:
-	friend struct repeat_n_t<Size, T>;
+	friend struct repeat_n<Size, T>;
 	constexpr repeat_n_iterator(Size const remaining, value_type & value):
 		m_remaining(remaining),
 		m_value(value)
@@ -71,14 +71,14 @@ private:
 };
 
 template<typename Size, typename T>
-struct repeat_n_t {
+struct repeat_n {
 	using size_type = Size;
 	using value_type = T;
 
 	using const_iterator = repeat_n_iterator<size_type, value_type>;
-	
-	template<typename U>
-	repeat_n_t(size_type const size, U && value):
+
+	template<typename U>	
+	repeat_n(size_type const size, U && value):
 		m_size(size),
 		m_value(std::forward<U>(value))
 	{
@@ -91,7 +91,7 @@ struct repeat_n_t {
 		return repeat_n_sentinel{};
 	}
 
-	CONTAINERS_OPERATOR_BRACKET_DEFINITIONS(repeat_n_t)
+	CONTAINERS_OPERATOR_BRACKET_DEFINITIONS(repeat_n)
 
 private:
 	size_type m_size;
@@ -99,11 +99,7 @@ private:
 };
 
 template<typename Size, typename T>
-constexpr auto repeat_n(Size const size, T && value) {
-	using size_type = bounded::integer<0, static_cast<std::intmax_t>(std::numeric_limits<Size>::max())>;
-	// T is either an lvalue reference or not a reference
-	return repeat_n_t<size_type, T>(size, std::forward<T>(value));
-}
+repeat_n(Size, T &&) -> repeat_n<bounded::integer<0, static_cast<std::intmax_t>(std::numeric_limits<Size>::max())>, T>;
 
 }	// namespace detail
 }	// namespace containers
