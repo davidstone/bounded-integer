@@ -19,13 +19,10 @@ using namespace bounded::literal;
 namespace detail {
 
 // Work around clang bug https://llvm.org/bugs/show_bug.cgi?id=26793
-// When this is fixed, use a fold expression instead
-constexpr auto all() noexcept {
-	return true;
-}
+// When this is fixed, directly use a fold expression instead
 template<typename... Args>
-constexpr auto all(bool const arg, Args... args) noexcept {
-	return arg and all(args...);
+constexpr auto all(Args... args) noexcept {
+	return (... and args);
 }
 
 
