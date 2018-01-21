@@ -60,7 +60,7 @@ struct aggregate_initialization {
 }	// namespace detail
 
 template<typename T, std::size_t... sizes>
-struct array<T, 0, sizes...> {
+struct array<T, 0, sizes...> : detail::aggregate_initialization {
 	using value_type = typename detail::array_value_type<T, sizes...>::type;
 
 	using size_type = bounded::constant_t<0>;
@@ -69,15 +69,6 @@ struct array<T, 0, sizes...> {
 	// TODO: Should this be using iterator = const_iterator?
 	using iterator = detail::basic_array_iterator<value_type, array>;
 	
-	constexpr array() noexcept = default;
-
-	// This class is technically not an aggregate because I defined this
-	// constructor, but I do not think it changes observable behavior.
-	//
-	// This extra parameter is an aggregate and thus can be constructed with {}.
-	// This constructor allows the syntax array<T, 0> = {{}}
-	constexpr array(detail::aggregate_initialization) noexcept {}
-
 	// No operator[]
 };
 
