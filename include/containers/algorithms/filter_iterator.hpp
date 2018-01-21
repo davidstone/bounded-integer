@@ -44,7 +44,7 @@ constexpr auto filter_iterator(ForwardIterator first, Sentinel last, UnaryPredic
 		detail::default_dereference{},
 		detail::filter_iterator_adapter<Sentinel, std::remove_reference_t<UnaryPredicate>>(last, std::forward<UnaryPredicate>(condition)),
 		detail::not_a_function{},
-		detail::not_a_function{}
+		detail::default_compare{}
 	)
 )
 

@@ -69,18 +69,18 @@ use(it->x);
 // is a prvalue.
 #endif
 
-template<typename IteratorCategory, typename Iterator, typename DereferenceFunction, typename AddFunction, typename SubtractFunction, typename LessFunction>
-struct iterator_adapter_t : operator_arrow<iterator_adapter_t<IteratorCategory, Iterator, DereferenceFunction, AddFunction, SubtractFunction, LessFunction>> {
+template<typename IteratorCategory, typename Iterator, typename DereferenceFunction, typename AddFunction, typename SubtractFunction, typename CompareFunction>
+struct iterator_adapter_t : operator_arrow<iterator_adapter_t<IteratorCategory, Iterator, DereferenceFunction, AddFunction, SubtractFunction, CompareFunction>> {
 private:
-	using tuple_t = tuple<Iterator, DereferenceFunction, AddFunction, SubtractFunction, LessFunction>;
+	using tuple_t = tuple<Iterator, DereferenceFunction, AddFunction, SubtractFunction, CompareFunction>;
 public:
 	static_assert(
 		std::is_empty<SubtractFunction>::value,
 		"SubtractFunction must be a stateless function. Would we use the state from the left- or right-hand side?"
 	);
 	static_assert(
-		std::is_empty<LessFunction>::value,
-		"LessFunction must be a stateless comparison function. Would we use the state from the left- or right-hand side?"
+		std::is_empty<CompareFunction>::value,
+		"CompareFunction must be a stateless comparison function. Would we use the state from the left- or right-hand side?"
 	);
 	using value_type = decltype(std::declval<DereferenceFunction>()(std::declval<Iterator>()));
 	using difference_type = typename std::iterator_traits<Iterator>::difference_type;
@@ -90,11 +90,11 @@ public:
 	using pointer = typename std::iterator_traits<Iterator>::pointer;
 	using reference = std::conditional_t<std::is_reference<value_type>::value, value_type, value_type &>;
 
-	// Even though subtract and less must be stateless, we must still keep them
-	// around. This is because there is no guarantee that they are
+	// Even though subtract and compare must be stateless, we must still keep
+	// them around. This is because there is no guarantee that they are
 	// default-constructible: for instance, lambdas.
-	constexpr iterator_adapter_t(Iterator it, DereferenceFunction dereference, AddFunction add, SubtractFunction subtract, LessFunction less) noexcept(std::is_nothrow_constructible<tuple_t, Iterator, DereferenceFunction, AddFunction, SubtractFunction, LessFunction>::value):
-		m_data(std::move(it), std::move(dereference), std::move(add), std::move(subtract), std::move(less))
+	constexpr iterator_adapter_t(Iterator it, DereferenceFunction dereference, AddFunction add, SubtractFunction subtract, CompareFunction compare) noexcept(std::is_nothrow_constructible<tuple_t, Iterator, DereferenceFunction, AddFunction, SubtractFunction, CompareFunction>::value):
+		m_data(std::move(it), std::move(dereference), std::move(add), std::move(subtract), std::move(compare))
 	{
 	}
 	
@@ -120,23 +120,11 @@ public:
 	constexpr auto && add() && noexcept {
 		return std::move(m_data)[2_bi];
 	}
-	constexpr auto && subtract() const & noexcept {
+	constexpr auto subtract() const noexcept {
 		return m_data[3_bi];
 	}
-	constexpr auto && subtract() & noexcept {
-		return m_data[3_bi];
-	}
-	constexpr auto && subtract() && noexcept {
-		return std::move(m_data)[3_bi];
-	}
-	constexpr auto && less() const & noexcept {
+	constexpr auto compare() const noexcept {
 		return m_data[4_bi];
-	}
-	constexpr auto && less() & noexcept {
-		return m_data[4_bi];
-	}
-	constexpr auto && less() && noexcept {
-		return std::move(m_data)[4_bi];
 	}
 	
 	template<typename Index>
@@ -149,56 +137,56 @@ private:
 };
 
 
-template<typename IteratorCategory, typename Iterator, typename DereferenceFunction, typename AddFunction, typename SubtractFunction, typename LessFunction>
-constexpr auto operator*(iterator_adapter_t<IteratorCategory, Iterator, DereferenceFunction, AddFunction, SubtractFunction, LessFunction> const & it) BOUNDED_NOEXCEPT_DECLTYPE(
+template<typename IteratorCategory, typename Iterator, typename DereferenceFunction, typename AddFunction, typename SubtractFunction, typename CompareFunction>
+constexpr auto operator*(iterator_adapter_t<IteratorCategory, Iterator, DereferenceFunction, AddFunction, SubtractFunction, CompareFunction> const & it) BOUNDED_NOEXCEPT_DECLTYPE(
 	it.dereference()(it.base())
 )
 
-template<typename IteratorCategory, typename Iterator, typename DereferenceFunction, typename AddFunction, typename SubtractFunction, typename LessFunction, typename Offset>
+template<typename IteratorCategory, typename Iterator, typename DereferenceFunction, typename AddFunction, typename SubtractFunction, typename CompareFunction, typename Offset>
 constexpr auto operator+(
-	iterator_adapter_t<IteratorCategory, Iterator, DereferenceFunction, AddFunction, SubtractFunction, LessFunction> lhs,
+	iterator_adapter_t<IteratorCategory, Iterator, DereferenceFunction, AddFunction, SubtractFunction, CompareFunction> lhs,
 	Offset const rhs
 ) BOUNDED_NOEXCEPT_VALUE(
 	// Use {} initialization to ensure evaluation order
-	iterator_adapter_t<IteratorCategory, Iterator, DereferenceFunction, AddFunction, SubtractFunction, LessFunction>{
+	iterator_adapter_t<IteratorCategory, Iterator, DereferenceFunction, AddFunction, SubtractFunction, CompareFunction>{
 		lhs.add()(lhs.base(), rhs),
 		std::move(lhs).dereference(),
 		std::move(lhs).add(),
-		std::move(lhs).subtract(),
-		std::move(lhs).less()
+		lhs.subtract(),
+		lhs.compare()
 	}
 )
 
 
-template<typename IteratorCategory, typename Iterator, typename DereferenceFunction, typename AddFunction, typename SubtractFunction, typename LessFunction>
+template<typename IteratorCategory, typename Iterator, typename DereferenceFunction, typename AddFunction, typename SubtractFunction, typename CompareFunction>
 constexpr auto operator-(
-	iterator_adapter_t<IteratorCategory, Iterator, DereferenceFunction, AddFunction, SubtractFunction, LessFunction> const & lhs,
-	iterator_adapter_t<IteratorCategory, Iterator, DereferenceFunction, AddFunction, SubtractFunction, LessFunction> const & rhs
+	iterator_adapter_t<IteratorCategory, Iterator, DereferenceFunction, AddFunction, SubtractFunction, CompareFunction> const & lhs,
+	iterator_adapter_t<IteratorCategory, Iterator, DereferenceFunction, AddFunction, SubtractFunction, CompareFunction> const & rhs
 ) BOUNDED_NOEXCEPT_DECLTYPE(
 	lhs.subtract()(lhs.base(), rhs.base())
 )
 
 using bounded::compare;
-template<typename IteratorCategory, typename Iterator, typename DereferenceFunction, typename AddFunction, typename SubtractFunction, typename LessFunction>
+template<typename IteratorCategory, typename Iterator, typename DereferenceFunction, typename AddFunction, typename SubtractFunction, typename CompareFunction>
 constexpr auto compare(
-	iterator_adapter_t<IteratorCategory, Iterator, DereferenceFunction, AddFunction, SubtractFunction, LessFunction> const & lhs,
-	iterator_adapter_t<IteratorCategory, Iterator, DereferenceFunction, AddFunction, SubtractFunction, LessFunction> const & rhs
+	iterator_adapter_t<IteratorCategory, Iterator, DereferenceFunction, AddFunction, SubtractFunction, CompareFunction> const & lhs,
+	iterator_adapter_t<IteratorCategory, Iterator, DereferenceFunction, AddFunction, SubtractFunction, CompareFunction> const & rhs
 ) BOUNDED_NOEXCEPT_DECLTYPE(
-	compare(lhs.base(), rhs.base())
+	lhs.compare()(lhs.base(), rhs.base())
 )
-template<typename IteratorCategory, typename Iterator, typename DereferenceFunction, typename AddFunction, typename SubtractFunction, typename LessFunction, typename RHS>
+template<typename IteratorCategory, typename Iterator, typename DereferenceFunction, typename AddFunction, typename SubtractFunction, typename CompareFunction, typename RHS>
 constexpr auto compare(
-	iterator_adapter_t<IteratorCategory, Iterator, DereferenceFunction, AddFunction, SubtractFunction, LessFunction> const & lhs,
+	iterator_adapter_t<IteratorCategory, Iterator, DereferenceFunction, AddFunction, SubtractFunction, CompareFunction> const & lhs,
 	RHS const & rhs
 ) BOUNDED_NOEXCEPT_DECLTYPE(
-	compare(lhs.base(), rhs)
+	lhs.compare()(lhs.base(), rhs)
 )
-template<typename LHS, typename IteratorCategory, typename Iterator, typename DereferenceFunction, typename AddFunction, typename SubtractFunction, typename LessFunction>
+template<typename LHS, typename IteratorCategory, typename Iterator, typename DereferenceFunction, typename AddFunction, typename SubtractFunction, typename CompareFunction>
 constexpr auto compare(
 	LHS const & lhs,
-	iterator_adapter_t<IteratorCategory, Iterator, DereferenceFunction, AddFunction, SubtractFunction, LessFunction> const & rhs
+	iterator_adapter_t<IteratorCategory, Iterator, DereferenceFunction, AddFunction, SubtractFunction, CompareFunction> const & rhs
 ) BOUNDED_NOEXCEPT_DECLTYPE(
-	compare(lhs, rhs.base())
+	rhs.compare()(lhs, rhs.base())
 )
 
 struct default_dereference {
@@ -222,17 +210,28 @@ struct default_subtract {
 	)
 };
 
-struct default_less {
-	template<typename Iterator>
-	constexpr auto operator()(Iterator const & lhs, Iterator const & rhs) const BOUNDED_NOEXCEPT_DECLTYPE(
-		lhs < rhs
+namespace compare_adl {
+
+using bounded::compare;
+
+template<typename LHS, typename RHS>
+constexpr auto indirect_compare(LHS const & lhs, RHS const & rhs) BOUNDED_NOEXCEPT_DECLTYPE(
+	compare(lhs, rhs)
+)
+
+}	// namespace compare_adl
+
+struct default_compare {
+	template<typename LHS, typename RHS>
+	constexpr auto operator()(LHS const & lhs, RHS const & rhs) const BOUNDED_NOEXCEPT_DECLTYPE(
+		compare_adl::indirect_compare(lhs, rhs)
 	)
 };
 
 struct not_a_function {};
 
 template<typename IteratorCategory, typename Iterator>
-using get_iterator_category = std::conditional_t<std::is_void<IteratorCategory>::value, typename std::iterator_traits<std::decay_t<Iterator>>::iterator_category, IteratorCategory>;
+using get_iterator_category = std::conditional_t<std::is_void<IteratorCategory>::value, typename std::iterator_traits<Iterator>::iterator_category, IteratorCategory>;
 
 }	// namespace detail
 
@@ -240,7 +239,7 @@ using get_iterator_category = std::conditional_t<std::is_void<IteratorCategory>:
 // 1) Dereferencing: *it
 // 2) Add: it + 5_bi
 // 3) Subtract: it1 - it2
-// 4) Less than: it1 < it2
+// 4) Compare: compare(it1, it2)
 // This allows you to customize those. Your function is passed an iterator.
 // Every other function can be built up from these four behaviors. Adding,
 // subtracting, and comparing are all linked to the same algorithm, but
@@ -249,32 +248,32 @@ using get_iterator_category = std::conditional_t<std::is_void<IteratorCategory>:
 
 // See bounded::make to understand the argument defaulting
 
-template<typename IteratorCategory = void, typename Iterator = void, typename DereferenceFunction = void, typename AddFunction = void, typename SubtractFunction = void, typename LessFunction = void>
-constexpr auto iterator_adapter(Iterator && it, DereferenceFunction && dereference, AddFunction && add, SubtractFunction && subtract, LessFunction && less) BOUNDED_NOEXCEPT_VALUE(
+template<typename IteratorCategory = void, typename Iterator = void, typename DereferenceFunction = void, typename AddFunction = void, typename SubtractFunction = void, typename CompareFunction = void>
+constexpr auto iterator_adapter(Iterator it, DereferenceFunction dereference, AddFunction add, SubtractFunction subtract, CompareFunction compare) BOUNDED_NOEXCEPT_VALUE(
 	detail::iterator_adapter_t<
 		detail::get_iterator_category<IteratorCategory, Iterator>,
-		std::decay_t<Iterator>,
-		std::decay_t<DereferenceFunction>,
-		std::decay_t<AddFunction>,
-		std::decay_t<SubtractFunction>,
-		std::decay_t<LessFunction>
+		Iterator,
+		DereferenceFunction,
+		AddFunction,
+		SubtractFunction,
+		CompareFunction
 	>(
-		std::forward<Iterator>(it),
-		std::forward<DereferenceFunction>(dereference),
-		std::forward<AddFunction>(add),
-		std::forward<SubtractFunction>(subtract),
-		std::forward<LessFunction>(less)
+		std::move(it),
+		std::move(dereference),
+		std::move(add),
+		std::move(subtract),
+		std::move(compare)
 	)
 )
 
 template<typename IteratorCategory = void, typename Iterator = void, typename DereferenceFunction = void>
-constexpr auto iterator_adapter(Iterator it, DereferenceFunction && dereference) BOUNDED_NOEXCEPT_VALUE(
+constexpr auto iterator_adapter(Iterator it, DereferenceFunction dereference) BOUNDED_NOEXCEPT_VALUE(
 	::containers::iterator_adapter<IteratorCategory>(
-		it,
-		std::forward<DereferenceFunction>(dereference),
+		std::move(it),
+		std::move(dereference),
 		detail::default_add{},
 		detail::default_subtract{},
-		detail::default_less{}
+		detail::default_compare{}
 	)
 )
 
