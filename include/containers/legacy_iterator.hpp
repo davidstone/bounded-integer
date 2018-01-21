@@ -1,4 +1,4 @@
-// Copyright David Stone 2017.
+// Copyright David Stone 2018.
 // Distributed under the Boost Software License, Version 1.0.
 // (See accompanying file LICENSE_1_0.txt or copy at
 // http://www.boost.org/LICENSE_1_0.txt)
@@ -112,15 +112,15 @@ struct numeric_limits<containers::detail::integer_compatibility<Integer>> : nume
 namespace containers {
 
 template<typename Iterator>
-struct legacy_iterator_t {
+struct legacy_iterator {
 	using value_type = typename std::iterator_traits<Iterator>::value_type;
 	using difference_type = detail::integer_compatibility<std::ptrdiff_t>;
 	using pointer = typename std::iterator_traits<Iterator>::pointer;
 	using reference = typename std::iterator_traits<Iterator>::reference;
 	using iterator_category = typename std::iterator_traits<Iterator>::iterator_category;
 
-	legacy_iterator_t() = default;
-	constexpr legacy_iterator_t(Iterator it) noexcept(std::is_nothrow_move_constructible<Iterator>::value):
+	legacy_iterator() = default;
+	constexpr legacy_iterator(Iterator it) noexcept(std::is_nothrow_move_constructible<Iterator>::value):
 		m_it(std::move(it)) {
 	}
 	
@@ -144,23 +144,17 @@ private:
 };
 
 template<typename Iterator, typename Offset, BOUNDED_REQUIRES(std::numeric_limits<Offset>::is_integer)>
-constexpr auto operator+(legacy_iterator_t<Iterator> const lhs, Offset const rhs) BOUNDED_NOEXCEPT(
-	legacy_iterator_t<Iterator>(lhs.base() + static_cast<typename std::iterator_traits<Iterator>::difference_type>(rhs))
+constexpr auto operator+(legacy_iterator<Iterator> const lhs, Offset const rhs) BOUNDED_NOEXCEPT(
+	legacy_iterator<Iterator>(lhs.base() + static_cast<typename std::iterator_traits<Iterator>::difference_type>(rhs))
 )
 template<typename Iterator>
-constexpr auto operator-(legacy_iterator_t<Iterator> const lhs, legacy_iterator_t<Iterator> const rhs) BOUNDED_NOEXCEPT(
-	static_cast<typename legacy_iterator_t<Iterator>::difference_type>(lhs.base() - rhs.base())
+constexpr auto operator-(legacy_iterator<Iterator> const lhs, legacy_iterator<Iterator> const rhs) BOUNDED_NOEXCEPT(
+	static_cast<typename legacy_iterator<Iterator>::difference_type>(lhs.base() - rhs.base())
 )
 
 template<typename Iterator>
-constexpr auto compare(legacy_iterator_t<Iterator> const lhs, legacy_iterator_t<Iterator> const rhs) BOUNDED_NOEXCEPT(
+constexpr auto compare(legacy_iterator<Iterator> const lhs, legacy_iterator<Iterator> const rhs) BOUNDED_NOEXCEPT(
 	compare(lhs.base(), rhs.base())
-)
-
-
-template<typename Iterator, BOUNDED_REQUIRES(is_iterator<Iterator>)>
-constexpr auto legacy_iterator(Iterator it) BOUNDED_NOEXCEPT(
-	legacy_iterator_t<Iterator>(std::move(it))
 )
 
 }	// namespace containers
