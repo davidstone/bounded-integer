@@ -69,6 +69,47 @@ use(it->x);
 // is a prvalue.
 #endif
 
+struct default_dereference {
+	template<typename Iterator>
+	constexpr auto operator()(Iterator const & it) const BOUNDED_NOEXCEPT_DECLTYPE(
+		*it
+	)
+};
+
+struct default_add {
+	template<typename Iterator, typename Offset>
+	constexpr auto operator()(Iterator const & it, Offset const & offset) const BOUNDED_NOEXCEPT_DECLTYPE(
+		it + offset
+	)
+};
+
+struct default_subtract {
+	template<typename Iterator>
+	constexpr auto operator()(Iterator const & lhs, Iterator const & rhs) const BOUNDED_NOEXCEPT_DECLTYPE(
+		lhs - rhs
+	)
+};
+
+namespace compare_adl {
+
+using bounded::compare;
+
+template<typename LHS, typename RHS>
+constexpr auto indirect_compare(LHS const & lhs, RHS const & rhs) BOUNDED_NOEXCEPT_DECLTYPE(
+	compare(lhs, rhs)
+)
+
+}	// namespace compare_adl
+
+struct default_compare {
+	template<typename LHS, typename RHS>
+	constexpr auto operator()(LHS const & lhs, RHS const & rhs) const BOUNDED_NOEXCEPT_DECLTYPE(
+		compare_adl::indirect_compare(lhs, rhs)
+	)
+};
+
+struct not_a_function {};
+
 template<typename Iterator, typename SubtractFunction,
 	typename = decltype(std::declval<SubtractFunction>()(std::declval<Iterator>(), std::declval<Iterator>()))
 >
@@ -103,8 +144,21 @@ constexpr auto is_forward_iterator(Args...) {
 	return false;
 }
 
-template<typename Iterator, typename DereferenceFunction, typename AddFunction, typename SubtractFunction, typename CompareFunction>
-struct iterator_adapter : operator_arrow<iterator_adapter<Iterator, DereferenceFunction, AddFunction, SubtractFunction, CompareFunction>> {
+}	// namespace detail
+
+// There are a few functions of interest for an iterator:
+// 1) Dereferencing: *it
+// 2) Add: it + 5_bi
+// 3) Subtract: it1 - it2
+// 4) Compare: compare(it1, it2)
+// This allows you to customize those. Your function is passed an iterator.
+// Every other function can be built up from these four behaviors. Adding,
+// subtracting, and comparing are all linked to the same algorithm, but
+// unfortunately, there does not appear to be a way to provide a function that
+// unifies these operations.
+
+template<typename Iterator, typename DereferenceFunction, typename AddFunction = detail::default_add, typename SubtractFunction = detail::default_subtract, typename CompareFunction = detail::default_compare>
+struct iterator_adapter : detail::operator_arrow<iterator_adapter<Iterator, DereferenceFunction, AddFunction, SubtractFunction, CompareFunction>> {
 private:
 	using tuple_t = tuple<Iterator, DereferenceFunction, AddFunction, SubtractFunction, CompareFunction>;
 	using base_iterator_category = typename std::iterator_traits<Iterator>::iterator_category;
@@ -122,9 +176,9 @@ public:
 	using iterator_category =
 		std::conditional_t<std::is_same<base_iterator_category, std::output_iterator_tag>{}, std::output_iterator_tag,
 		std::conditional_t<std::is_same<base_iterator_category, std::input_iterator_tag>{}, std::input_iterator_tag,
-		std::conditional_t<is_random_access_iterator<Iterator, SubtractFunction>(), std::random_access_iterator_tag,
-		std::conditional_t<is_bidirectional_iterator<Iterator, AddFunction>(), std::bidirectional_iterator_tag,
-		std::conditional_t<is_forward_iterator<Iterator, AddFunction>(), std::forward_iterator_tag,
+		std::conditional_t<detail::is_random_access_iterator<Iterator, SubtractFunction>(), std::random_access_iterator_tag,
+		std::conditional_t<detail::is_bidirectional_iterator<Iterator, AddFunction>(), std::bidirectional_iterator_tag,
+		std::conditional_t<detail::is_forward_iterator<Iterator, AddFunction>(), std::forward_iterator_tag,
 		void
 	>>>>>;
 	static_assert(not std::is_void<iterator_category>{});
@@ -139,6 +193,17 @@ public:
 	constexpr iterator_adapter(Iterator it, DereferenceFunction dereference, AddFunction add, SubtractFunction subtract, CompareFunction compare) noexcept(std::is_nothrow_constructible<tuple_t, Iterator, DereferenceFunction, AddFunction, SubtractFunction, CompareFunction>::value):
 		m_data(std::move(it), std::move(dereference), std::move(add), std::move(subtract), std::move(compare))
 	{
+	}
+	
+	constexpr iterator_adapter(Iterator it, DereferenceFunction dereference) BOUNDED_NOEXCEPT_INITIALIZATION(
+		iterator_adapter(
+			std::move(it),
+			std::move(dereference),
+			detail::default_add{},
+			detail::default_subtract{},
+			detail::default_compare{}
+		)
+	) {
 	}
 	
 	constexpr auto base() const noexcept {
@@ -230,88 +295,6 @@ constexpr auto compare(
 	iterator_adapter<Iterator, DereferenceFunction, AddFunction, SubtractFunction, CompareFunction> const & rhs
 ) BOUNDED_NOEXCEPT_DECLTYPE(
 	rhs.compare()(lhs, rhs.base())
-)
-
-struct default_dereference {
-	template<typename Iterator>
-	constexpr auto operator()(Iterator const & it) const BOUNDED_NOEXCEPT_DECLTYPE(
-		*it
-	)
-};
-
-struct default_add {
-	template<typename Iterator, typename Offset>
-	constexpr auto operator()(Iterator const & it, Offset const & offset) const BOUNDED_NOEXCEPT_DECLTYPE(
-		it + offset
-	)
-};
-
-struct default_subtract {
-	template<typename Iterator>
-	constexpr auto operator()(Iterator const & lhs, Iterator const & rhs) const BOUNDED_NOEXCEPT_DECLTYPE(
-		lhs - rhs
-	)
-};
-
-namespace compare_adl {
-
-using bounded::compare;
-
-template<typename LHS, typename RHS>
-constexpr auto indirect_compare(LHS const & lhs, RHS const & rhs) BOUNDED_NOEXCEPT_DECLTYPE(
-	compare(lhs, rhs)
-)
-
-}	// namespace compare_adl
-
-struct default_compare {
-	template<typename LHS, typename RHS>
-	constexpr auto operator()(LHS const & lhs, RHS const & rhs) const BOUNDED_NOEXCEPT_DECLTYPE(
-		compare_adl::indirect_compare(lhs, rhs)
-	)
-};
-
-struct not_a_function {};
-
-}	// namespace detail
-
-// There are a few functions of interest for an iterator:
-// 1) Dereferencing: *it
-// 2) Add: it + 5_bi
-// 3) Subtract: it1 - it2
-// 4) Compare: compare(it1, it2)
-// This allows you to customize those. Your function is passed an iterator.
-// Every other function can be built up from these four behaviors. Adding,
-// subtracting, and comparing are all linked to the same algorithm, but
-// unfortunately, there does not appear to be a way to provide a function that
-// unifies these operations.
-
-template<typename Iterator, typename DereferenceFunction, typename AddFunction, typename SubtractFunction, typename CompareFunction>
-constexpr auto iterator_adapter(Iterator it, DereferenceFunction dereference, AddFunction add, SubtractFunction subtract, CompareFunction compare) BOUNDED_NOEXCEPT_VALUE(
-	detail::iterator_adapter<
-		Iterator,
-		DereferenceFunction,
-		AddFunction,
-		SubtractFunction,
-		CompareFunction
-	>(
-		std::move(it),
-		std::move(dereference),
-		std::move(add),
-		std::move(subtract),
-		std::move(compare)
-	)
-)
-
-template<typename Iterator, typename DereferenceFunction>
-constexpr auto iterator_adapter(Iterator it, DereferenceFunction dereference) BOUNDED_NOEXCEPT_VALUE(
-	::containers::iterator_adapter(
-		std::move(it),
-		std::move(dereference),
-		detail::default_add{},
-		detail::default_subtract{},
-		detail::default_compare{}
-	)
 )
 
 }	// namespace containers
