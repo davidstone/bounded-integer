@@ -6,6 +6,7 @@
 #pragma once
 
 #include <bounded/detail/forward_declaration.hpp>
+#include <bounded/detail/is_bounded_integer.hpp>
 #include <bounded/detail/max_builtin.hpp>
 #include <bounded/detail/requires.hpp>
 
@@ -83,10 +84,20 @@ private:
 	>;
 public:
 	static constexpr auto min() noexcept {
-		return detail::normalize<real_numeric_limits::min()>;
+		constexpr auto minimum = real_numeric_limits::min();
+		if constexpr (is_bounded_integer<decltype(minimum)>) {
+			return detail::normalize<minimum.value()>;
+		} else {
+			return detail::normalize<minimum>;
+		}
 	}
 	static constexpr auto max() noexcept {
-		return detail::normalize<real_numeric_limits::max()>;
+		constexpr auto maximum = real_numeric_limits::max();
+		if constexpr (is_bounded_integer<decltype(maximum)>) {
+			return detail::normalize<maximum.value()>;
+		} else {
+			return detail::normalize<maximum>;
+		}
 	}
 	static constexpr auto is_specialized = real_numeric_limits::is_specialized;
 	static constexpr auto is_integer = real_numeric_limits::is_integer;
