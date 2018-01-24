@@ -83,7 +83,6 @@ constexpr auto compare(LHS const lhs, RHS const rhs) noexcept {
 	return lhs == rhs ? strong_ordering_equal : lhs < rhs ? strong_ordering_less : strong_ordering_greater;
 }
 
-
 template<typename LHS, typename RHS, BOUNDED_REQUIRES(detail::is_builtin_integer<LHS> and detail::is_builtin_integer<RHS>)>
 constexpr auto compare(LHS const lhs, RHS const rhs) noexcept -> strong_ordering const {
 	if constexpr (detail::is_signed_builtin<LHS> == detail::is_signed_builtin<RHS>) {
@@ -106,6 +105,11 @@ constexpr auto compare(LHS const lhs, RHS const rhs) noexcept -> strong_ordering
 	}
 }
 
+template<typename Enum, BOUNDED_REQUIRES(std::is_enum<Enum>{})>
+constexpr auto compare(Enum const lhs, Enum const rhs) noexcept {
+	using underlying = std::underlying_type_t<Enum>;
+	return bounded::compare(static_cast<underlying>(lhs), static_cast<underlying>(rhs));
+}
 
 namespace detail {
 
