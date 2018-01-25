@@ -53,9 +53,13 @@ struct default_optional_storage_base<T, true> {
 		constexpr underlying_storage() noexcept:
 			dummy(none) {
 		}
-		template<typename... Args>
+		template<typename... Args, BOUNDED_REQUIRES(std::is_constructible<T, Args && ...>{})>
 		constexpr underlying_storage(in_place_t, Args && ... args) noexcept(std::is_nothrow_constructible<T, Args && ...>{}):
 			value(std::forward<Args>(args)...) {
+		}
+		template<typename... Args, BOUNDED_REQUIRES(!std::is_constructible<T, Args && ...>{})>
+		constexpr underlying_storage(in_place_t, Args && ... args) noexcept(noexcept(underlying_storage{std::forward<Args>(args)...})):
+			value{std::forward<Args>(args)...} {
 		}
 		~underlying_storage() = default;
 
@@ -73,9 +77,13 @@ struct default_optional_storage_base<T, false> {
 		constexpr underlying_storage() noexcept:
 			dummy(none) {
 		}
-		template<typename... Args>
+		template<typename... Args, BOUNDED_REQUIRES(std::is_constructible<T, Args && ...>{})>
 		constexpr underlying_storage(in_place_t, Args && ... args) noexcept(std::is_nothrow_constructible<T, Args && ...>{}):
 			value(std::forward<Args>(args)...) {
+		}
+		template<typename... Args, BOUNDED_REQUIRES(!std::is_constructible<T, Args && ...>{})>
+		constexpr underlying_storage(in_place_t, Args && ... args) noexcept(noexcept(underlying_storage{std::forward<Args>(args)...})):
+			value{std::forward<Args>(args)...} {
 		}
 		~underlying_storage() {}
 
