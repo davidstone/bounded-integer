@@ -22,8 +22,8 @@ struct allocator {
 	template<typename U>
 	constexpr allocator(allocator<U> const &) noexcept {}
 	
-	auto allocate(typename std::allocator<T>::size_type n, typename std::allocator<void>::const_pointer hint = nullptr) {
-		return std::allocator<T>{}.allocate(n, hint);
+	auto allocate(typename std::allocator<T>::size_type n) {
+		return std::allocator<T>{}.allocate(n);
 	}
 	auto deallocate(typename std::allocator<T>::pointer p, typename std::allocator<T>::size_type n) BOUNDED_NOEXCEPT(
 		std::allocator<T>{}.deallocate(p, n)
