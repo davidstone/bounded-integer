@@ -6,9 +6,6 @@
 #include <containers/flat_map/flat_map.hpp>
 #include <containers/vector/vector.hpp>
 
-#include <boost/random/mersenne_twister.hpp>
-#include <boost/random/uniform_int_distribution.hpp>
-
 #include <algorithm>
 #include <array>
 #include <cassert>
@@ -17,6 +14,7 @@
 #include <cstdint>
 #include <iostream>
 #include <map>
+#include <random>
 #include <vector>
 
 namespace {
@@ -270,8 +268,8 @@ private:
 template<typename Key, typename Value>
 void test_performance(std::size_t const loop_count) {
 	auto const generator = [](std::size_t size) {
-		static boost::random::mt19937 engine(0);
-		static boost::random::uniform_int_distribution<std::uint32_t> distribution;
+		static std::mt19937 engine(0);
+		static std::uniform_int_distribution<std::uint32_t> distribution;
 		std::vector<value_type<Key, Value>> source;
 		source.reserve(size);
 		for (std::size_t n = 0; n != size; ++n) {
