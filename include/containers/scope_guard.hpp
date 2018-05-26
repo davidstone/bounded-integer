@@ -41,8 +41,8 @@ struct scope_guard {
 	}
 
 private:
-	static constexpr auto function = 0_bi;
-	static constexpr auto is_active = 1_bi;
+	static inline constexpr auto function = 0_bi;
+	static inline constexpr auto is_active = 1_bi;
 	tuple<Function, bool> m_data;
 };
 
