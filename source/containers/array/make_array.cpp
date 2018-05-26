@@ -76,8 +76,9 @@ static_assert(size(array_n) == 6_bi, "Incorrect size from make_array_n.");
 static_assert(array_n[3_bi] == 5, "Incorrect values from make_array_n.");
 
 struct non_copyable {
-	constexpr non_copyable(non_copyable const &) = delete;
-	constexpr non_copyable(non_copyable &&) = default;
+	non_copyable() = default;
+	non_copyable(non_copyable const &) = delete;
+	non_copyable(non_copyable &&) = default;
 };
 
 constexpr auto array_non_copyable = containers::make_array_n(1_bi, non_copyable{});
