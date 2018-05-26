@@ -5,8 +5,6 @@
 
 #pragma once
 
-#include <boost/hana/type.hpp>
-
 namespace containers {
 namespace detail {
 
@@ -17,14 +15,5 @@ template<typename...>
 struct types{};
 
 }	// namespace detail
-
-
-template<typename T>
-using basic_type = boost::hana::basic_type<T>;
-
-template<typename T>
-using type = boost::hana::type<T>;
-
-using boost::hana::type_c;
 
 }	// namespace containers
