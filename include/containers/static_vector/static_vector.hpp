@@ -80,7 +80,7 @@ public:
 	) {}
 	
 	template<typename InputIterator, typename Sentinel, BOUNDED_REQUIRES(is_iterator_sentinel<InputIterator, Sentinel>)>
-	constexpr static_vector(InputIterator first, Sentinel const last) noexcept(noexcept(first != last) and noexcept(++first) and noexcept(emplace_back(*first))) {
+	constexpr static_vector(InputIterator first, Sentinel const last) noexcept(noexcept(first != last) and noexcept(++first) and noexcept(std::declval<static_vector &>().emplace_back(*first))) {
 		for (; first != last; ++first) {
 			emplace_back(*first);
 		}
