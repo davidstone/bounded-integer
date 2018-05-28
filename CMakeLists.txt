@@ -428,6 +428,9 @@ elseif("${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU")
 		# range-based for loop).  It is also warning for the constructor of a
 		# const array of const std::string where there is no loop in user code.
 		# "-Wunsafe-loop-optimizations"
+		# -Wunused-but-set-parameter does not properly account for
+		# `if constexpr` branches.
+		"-Wno-unused-but-set-parameter"
 		# -Wuseless-cast is incompatible with BOUNDED_INTEGER_CONDITIONAL
 		# "-Wuseless-cast"
 		"-Wvector-operation-performance"
