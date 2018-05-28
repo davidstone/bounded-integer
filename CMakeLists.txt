@@ -148,7 +148,7 @@ target_include_directories(containers INTERFACE
 if("${CMAKE_CXX_COMPILER_ID}" STREQUAL "MSVC")
 	set(BOUNDED_CXX_STD "/std:c++17")
 else()
-	set(BOUNDED_CXX_STD "-std=c++17")
+	set(BOUNDED_CXX_STD "-std=c++2a")
 endif()
 
 target_compile_options(bounded INTERFACE
