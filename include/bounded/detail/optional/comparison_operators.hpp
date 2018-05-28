@@ -8,7 +8,7 @@
 #include <bounded/detail/optional/optional.hpp>
 #include <bounded/detail/class.hpp>
 #include <bounded/detail/comparison.hpp>
-#include <bounded/detail/comparison_builtin.hpp>
+#include <bounded/detail/comparison_mixed.hpp>
 #include <bounded/detail/noexcept.hpp>
 
 #include <utility>

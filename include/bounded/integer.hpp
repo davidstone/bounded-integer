@@ -11,7 +11,7 @@
 #include <bounded/detail/class.hpp>
 #include <bounded/detail/common_type.hpp>
 #include <bounded/detail/comparison.hpp>
-#include <bounded/detail/comparison_builtin.hpp>
+#include <bounded/detail/comparison_mixed.hpp>
 #include <bounded/detail/conditional.hpp>
 #include <bounded/detail/construct_destroy.hpp>
 #include <bounded/detail/hash.hpp>

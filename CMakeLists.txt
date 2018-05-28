@@ -34,9 +34,9 @@ target_sources(bounded INTERFACE
 	$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>/include/bounded/detail/class.hpp
 	$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>/include/bounded/detail/common_type_and_value_category.hpp
 	$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>/include/bounded/detail/common_type.hpp
-	$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>/include/bounded/detail/comparison_builtin.hpp
-	$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>/include/bounded/detail/comparison_function_object.hpp
 	$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>/include/bounded/detail/comparison.hpp
+	$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>/include/bounded/detail/comparison_function_object.hpp
+	$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>/include/bounded/detail/comparison_mixed.hpp
 	$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>/include/bounded/detail/conditional.hpp
 	$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>/include/bounded/detail/construct_destroy.hpp
 	$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>/include/bounded/detail/forward_declaration.hpp
@@ -184,9 +184,9 @@ add_executable(bounded_test
 	source/bounded/detail/class.cpp
 	source/bounded/detail/common_type_and_value_category.cpp
 	source/bounded/detail/common_type.cpp
-	source/bounded/detail/comparison_builtin.cpp
 	source/bounded/detail/comparison.cpp
 	source/bounded/detail/comparison_function_object.cpp
+	source/bounded/detail/comparison_mixed.cpp
 	source/bounded/detail/conditional.cpp
 	source/bounded/detail/construct_destroy.cpp
 	source/bounded/detail/forward_declaration.cpp

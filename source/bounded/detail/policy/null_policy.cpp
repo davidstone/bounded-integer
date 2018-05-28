@@ -5,7 +5,7 @@
 
 #include <bounded/detail/policy/null_policy.hpp>
 #include <bounded/detail/class.hpp>
-#include <bounded/detail/comparison_builtin.hpp>
+#include <bounded/detail/comparison_mixed.hpp>
 
 static_assert((static_cast<void>(bounded::null_policy{}.assignment(5, bounded::constant<0>, bounded::constant<10>)), true));
 // This should not compile

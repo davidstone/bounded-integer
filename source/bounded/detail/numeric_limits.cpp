@@ -6,7 +6,7 @@
 #include <bounded/detail/numeric_limits.hpp>
 
 #include <bounded/detail/class.hpp>
-#include <bounded/detail/comparison_builtin.hpp>
+#include <bounded/detail/comparison_mixed.hpp>
 #include <bounded/detail/typedefs.hpp>
 
 namespace {

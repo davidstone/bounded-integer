@@ -6,7 +6,7 @@
 #include <bounded/detail/arithmetic/common.hpp>
 #include <bounded/detail/arithmetic/operators_builtin.hpp>
 #include <bounded/detail/comparison.hpp>
-#include <bounded/detail/comparison_builtin.hpp>
+#include <bounded/detail/comparison_mixed.hpp>
 #include <bounded/detail/typedefs.hpp>
 
 namespace {

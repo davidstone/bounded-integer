@@ -5,7 +5,7 @@
 
 #include <bounded/detail/log.hpp>
 #include <bounded/detail/arithmetic/common.hpp>
-#include <bounded/detail/comparison_builtin.hpp>
+#include <bounded/detail/comparison_mixed.hpp>
 #include <bounded/detail/class.hpp>
 
 namespace {
