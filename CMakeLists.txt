@@ -6,9 +6,6 @@
 cmake_minimum_required(VERSION 3.8 FATAL_ERROR)
 project(bounded_integer LANGUAGES CXX)
 
-find_package(Boost REQUIRED)
-add_library(boost INTERFACE IMPORTED)
-set_property(TARGET boost PROPERTY INTERFACE_INCLUDE_DIRECTORIES ${Boost_INCLUDE_DIR})
 enable_testing()
 
 add_library(bounded INTERFACE)
@@ -162,7 +159,6 @@ target_compile_options(containers INTERFACE
 )
 
 target_link_libraries(containers INTERFACE
-	boost
 	bounded
 )
 
