@@ -60,12 +60,8 @@ constexpr auto determine_type() noexcept {
 	}
 }
 
-// TODO: Maybe get rid of the concept of storage_type?
 template<auto minimum, auto maximum>
-using fast_t = typename decltype(determine_type<minimum, maximum>())::type;
-
-template<auto minimum, auto maximum>
-using least_t = fast_t<minimum, maximum>;
+using underlying_type_t = typename decltype(determine_type<minimum, maximum>())::type;
 
 }	// namespace detail
 }	// namespace bounded

@@ -28,18 +28,17 @@ constexpr auto log_impl(Integer value, Base const base) noexcept {
 }	// namespace detail
 
 template<
-	auto minimum, auto maximum, typename overflow_policy, storage_type storage, bool poisoned,
+	auto minimum, auto maximum, typename overflow_policy, bool poisoned,
 	typename Base,
 	BOUNDED_REQUIRES(is_bounded_integer<Base>)
 >
-constexpr auto log(integer<minimum, maximum, overflow_policy, storage, poisoned> const value, Base const base) noexcept {
+constexpr auto log(integer<minimum, maximum, overflow_policy, poisoned> const value, Base const base) noexcept {
 	static_assert(base > constant<1>, "Negative bases not currently supported.");
 	static_assert(value > constant<0>, "The log of a negative number or zero is undefined.");
 	using result_type = integer<
 		detail::log_impl(static_cast<detail::max_unsigned_t>(minimum), static_cast<detail::max_unsigned_t>(basic_numeric_limits<Base>::max())),
 		detail::log_impl(static_cast<detail::max_unsigned_t>(maximum), static_cast<detail::max_unsigned_t>(basic_numeric_limits<Base>::min())),
 		overflow_policy,
-		storage,
 		poisoned
 	>;
 	return result_type(detail::log_impl(detail::as_unsigned(value.value()), detail::as_unsigned(base.value())), non_check);
@@ -51,8 +50,8 @@ namespace std {
 // This overload is required for std::sort to work on gcc with iterators whose
 // difference_type is a bounded::integer. It is not guaranteed to continue to be
 // supported. It returns a built-in integer that is the log2 of the number
-template<auto minimum, auto maximum, typename overflow_policy, bounded::storage_type storage, bool poisoned>
-constexpr auto __lg(bounded::integer<minimum, maximum, overflow_policy, storage, poisoned> const value) BOUNDED_NOEXCEPT_DECLTYPE(
+template<auto minimum, auto maximum, typename overflow_policy, bool poisoned>
+constexpr auto __lg(bounded::integer<minimum, maximum, overflow_policy, poisoned> const value) BOUNDED_NOEXCEPT_DECLTYPE(
 	__lg(value.value())
 )
 

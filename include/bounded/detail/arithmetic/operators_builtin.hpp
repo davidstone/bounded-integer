@@ -40,17 +40,17 @@ constexpr auto operator symbol(std::integral_constant<T, lhs>, RHS const rhs) no
 
 #define BOUNDED_INTEGER_MIXED_OPERATOR_OVERLOADS(symbol, minimum, maximum) \
 template< \
-	auto lhs_min, auto lhs_max, typename overflow, storage_type storage, bool poisoned, typename T, \
+	auto lhs_min, auto lhs_max, typename overflow, bool poisoned, typename T, \
 	BOUNDED_REQUIRES(detail::is_builtin_integer<T>) \
 > \
-constexpr auto operator symbol(integer<lhs_min, lhs_max, overflow, storage, poisoned> const lhs, T const rhs) noexcept { \
-	return lhs symbol integer<minimum, maximum, overflow, storage, true>(rhs); \
+constexpr auto operator symbol(integer<lhs_min, lhs_max, overflow, poisoned> const lhs, T const rhs) noexcept { \
+	return lhs symbol integer<minimum, maximum, overflow, true>(rhs); \
 } \
 template< \
-	typename T, auto rhs_min, auto rhs_max, typename overflow, storage_type storage, bool poisoned, \
+	typename T, auto rhs_min, auto rhs_max, typename overflow, bool poisoned, \
 	BOUNDED_REQUIRES(detail::is_builtin_integer<T>) \
 > \
-constexpr auto operator symbol(T const lhs, integer<rhs_min, rhs_max, overflow, storage, poisoned> const rhs) noexcept { \
+constexpr auto operator symbol(T const lhs, integer<rhs_min, rhs_max, overflow, poisoned> const rhs) noexcept { \
 	return integer(lhs, overflow{}) symbol rhs; \
 } \
 BOUNDED_INTEGER_MIXED_OPERATOR_OVERLOADS_INTEGRAL_CONSTANT(symbol)

@@ -15,8 +15,8 @@ namespace detail {
 template<typename T>
 struct is_poisoned_c : std::integral_constant<bool, !std::is_same<T, bool>{}> {};
 
-template<auto minimum, auto maximum, typename policy, storage_type storage, bool poisoned>
-struct is_poisoned_c<integer<minimum, maximum, policy, storage, poisoned>> : std::integral_constant<bool, poisoned> {};
+template<auto minimum, auto maximum, typename policy, bool poisoned>
+struct is_poisoned_c<integer<minimum, maximum, policy, poisoned>> : std::integral_constant<bool, poisoned> {};
 
 template<typename T>
 constexpr auto is_poisoned = is_poisoned_c<std::decay_t<T>>{};

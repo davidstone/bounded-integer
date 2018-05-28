@@ -30,8 +30,8 @@ constexpr auto safer_negation(constant_t<value_> const value) noexcept {
 
 }	// namespace detail
 
-template<auto minimum, auto maximum, typename overflow_policy, storage_type storage, bool poisoned>
-constexpr auto operator-(integer<minimum, maximum, overflow_policy, storage, poisoned> const value) noexcept {
+template<auto minimum, auto maximum, typename overflow_policy, bool poisoned>
+constexpr auto operator-(integer<minimum, maximum, overflow_policy, poisoned> const value) noexcept {
 	static_assert(
 		(constant<minimum> == constant<maximum>) ==
 		(detail::safer_negation(constant<minimum>) == detail::safer_negation(constant<maximum>))
@@ -40,7 +40,6 @@ constexpr auto operator-(integer<minimum, maximum, overflow_policy, storage, poi
 		detail::safer_negation(constant<maximum>),
 		detail::safer_negation(constant<minimum>),
 		overflow_policy,
-		storage,
 		poisoned
 	>;
 	using underlying_type = typename result_type::underlying_type;

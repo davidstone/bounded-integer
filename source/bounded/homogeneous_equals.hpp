@@ -10,10 +10,10 @@
 template<typename LHS, typename RHS>
 struct is_same_bounded : std::is_same<LHS, RHS> {};
 
-template<auto lhs_min, auto lhs_max, auto rhs_min, auto rhs_max, typename policy, auto storage, auto poisoned>
+template<auto lhs_min, auto lhs_max, auto rhs_min, auto rhs_max, typename policy, auto poisoned>
 struct is_same_bounded<
-	bounded::integer<lhs_min, lhs_max, policy, storage, poisoned>,
-	bounded::integer<rhs_min, rhs_max, policy, storage, poisoned>
+	bounded::integer<lhs_min, lhs_max, policy, poisoned>,
+	bounded::integer<rhs_min, rhs_max, policy, poisoned>
 > : std::bool_constant<
 	bounded::constant<lhs_min> == bounded::constant<rhs_min> and
 	bounded::constant<lhs_max> == bounded::constant<rhs_max>

@@ -22,11 +22,10 @@ static_assert(std::is_empty<bounded::constant_t<1>>{});
 static_assert(std::is_empty<bounded::constant_t<-1>>{});
 static_assert(std::is_empty<bounded::constant_t<std::numeric_limits<std::intmax_t>::min()>>{});
 
-template<bounded::storage_type storage_type>
-constexpr auto check_constructibility_specific() {
+constexpr auto check_constructibility() {
 	constexpr auto min = std::numeric_limits<int>::min();
 	constexpr auto max = std::numeric_limits<int>::max();
-	using type = bounded::integer<min, max, bounded::null_policy, storage_type>;
+	using type = bounded::integer<min, max, bounded::null_policy>;
 	static_assert(
 		bounded::detail::type_overlaps_range<type>(min, max),
 		"Bounds of type do not overlap its own range."
@@ -56,10 +55,6 @@ constexpr auto check_constructibility_specific() {
 	);
 }
 
-constexpr auto check_constructibility() {
-	check_constructibility_specific<bounded::storage_type::fast>();
-	check_constructibility_specific<bounded::storage_type::least>();
-}
 static_assert((static_cast<void>(check_constructibility()), true));
 
 static_assert(homogeneous_equals(

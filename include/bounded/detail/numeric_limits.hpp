@@ -46,10 +46,10 @@ constexpr auto digits(Minimum const minimum, Maximum const maximum, Base const b
 }	// namespace bounded
 namespace std {
 
-template<auto minimum, auto maximum, typename overflow_policy, bounded::storage_type storage, bool poisoned>
-struct numeric_limits<bounded::integer<minimum, maximum, overflow_policy, storage, poisoned>> {
+template<auto minimum, auto maximum, typename overflow_policy, bool poisoned>
+struct numeric_limits<bounded::integer<minimum, maximum, overflow_policy, poisoned>> {
 private:
-	using type = bounded::integer<minimum, maximum, overflow_policy, storage, poisoned>;
+	using type = bounded::integer<minimum, maximum, overflow_policy, poisoned>;
 public:
 	static constexpr auto is_specialized = true;
 	static constexpr auto is_signed = minimum < 0;
@@ -81,13 +81,13 @@ public:
 	static constexpr auto tinyness_before = false;
 	
 	static constexpr auto min() noexcept {
-		return bounded::constant<minimum, overflow_policy, storage>;
+		return bounded::constant<minimum, overflow_policy>;
 	}
 	static constexpr auto lowest() noexcept {
-		return bounded::constant<minimum, overflow_policy, storage>;
+		return bounded::constant<minimum, overflow_policy>;
 	}
 	static constexpr auto max() noexcept {
-		return bounded::constant<maximum, overflow_policy, storage>;
+		return bounded::constant<maximum, overflow_policy>;
 	}
 	// 18.3.2.7.1 says:
 	// Any value that is not "meaningful" shall be set to 0 or false.

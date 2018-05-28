@@ -1,4 +1,4 @@
-// Copyright David Stone 2017.
+// Copyright David Stone 2018.
 // Distributed under the Boost Software License, Version 1.0.
 // (See accompanying file LICENSE_1_0.txt or copy at
 // http://www.boost.org/LICENSE_1_0.txt)
@@ -81,7 +81,6 @@ constexpr decltype(auto) as_integer(T const & t) noexcept {
 			as_builtin_integer(limits::min()),
 			as_builtin_integer(limits::max()),
 			null_policy,
-			storage_type::fast,
 			false
 		>;
 		return result_type(static_cast<std::underlying_type_t<std::decay_t<T>>>(t));
@@ -128,30 +127,27 @@ struct constant_wrapper {
 	}
 };
 
-template<auto minimum, auto maximum, storage_type storage>
-using underlying_type_t = std::conditional_t<storage == storage_type::fast, fast_t<minimum, maximum>, least_t<minimum, maximum>>;
-
-template<auto minimum, auto maximum, storage_type storage>
+template<auto minimum, auto maximum>
 using base = std::conditional_t<minimum == maximum,
-	constant_wrapper<static_cast<underlying_type_t<minimum, maximum, storage>>(minimum)>,
-	value_wrapper<underlying_type_t<minimum, maximum, storage>>
+	constant_wrapper<static_cast<underlying_type_t<minimum, maximum>>(minimum)>,
+	value_wrapper<underlying_type_t<minimum, maximum>>
 >;
 
 }	// namespace detail
 
 
 // poisoned is useful for overloading and getting all constants
-template<auto value, typename overflow_policy = null_policy, storage_type storage = storage_type::fast, bool poisoned = false>
-using constant_t = integer<value, value, overflow_policy, storage, poisoned>;
+template<auto value, typename overflow_policy = null_policy, bool poisoned = false>
+using constant_t = integer<value, value, overflow_policy, poisoned>;
 
-template<auto value, typename overflow_policy = null_policy, storage_type storage = storage_type::fast>
-constexpr auto constant = constant_t<value, overflow_policy, storage>{};
+template<auto value, typename overflow_policy = null_policy>
+constexpr auto constant = constant_t<value, overflow_policy>{};
 
 
-template<auto minimum, auto maximum, typename overflow_policy_ = null_policy, storage_type storage = storage_type::fast, bool poisoned = false>
-struct integer : private detail::base<minimum, maximum, storage> {
+template<auto minimum, auto maximum, typename overflow_policy_ = null_policy, bool poisoned = false>
+struct integer : private detail::base<minimum, maximum> {
 private:
-	using base = detail::base<minimum, maximum, storage>;
+	using base = detail::base<minimum, maximum>;
 public:
 	static_assert(compare(minimum, maximum) <= 0, "Maximum cannot be less than minimum");
 
@@ -332,8 +328,8 @@ template<typename T>
 struct equivalent_overflow_policy_c {
 	using type = null_policy;
 };
-template<auto minimum, auto maximum, typename overflow_policy, storage_type storage>
-struct equivalent_overflow_policy_c<integer<minimum, maximum, overflow_policy, storage>> {
+template<auto minimum, auto maximum, typename overflow_policy>
+struct equivalent_overflow_policy_c<integer<minimum, maximum, overflow_policy>> {
 	using type = overflow_policy;
 };
 
@@ -362,7 +358,6 @@ integer(T const & value, overflow_policy = overflow_policy{}) -> integer<
 	detail::deduced_min<T>(),
 	detail::deduced_max<T>(),
 	overflow_policy,
-	storage_type::fast,
 	detail::is_builtin_integer<T> or not basic_numeric_limits<T>::is_specialized
 >;
 

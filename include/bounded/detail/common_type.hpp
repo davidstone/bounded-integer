@@ -1,4 +1,4 @@
-// Copyright David Stone 2015.
+// Copyright David Stone 2018.
 // Distributed under the Boost Software License, Version 1.0.
 // (See accompanying file LICENSE_1_0.txt or copy at
 // http://www.boost.org/LICENSE_1_0.txt)
@@ -14,13 +14,6 @@
 namespace bounded {
 namespace detail {
 
-// This preferentially uses storage_type::fast, but does no conversions if they
-// are the same. If new storage types are added, this will preferentially use
-// storage_type::least over whatever that new type is.
-constexpr storage_type common_storage_type(storage_type const lhs, storage_type const rhs) noexcept {
-	return (lhs < rhs) ? lhs : rhs;
-}
-
 template<typename lhs_policy, typename rhs_policy>
 using common_policy = std::conditional_t<std::is_same<lhs_policy, rhs_policy>{}, lhs_policy, bounded::null_policy>;
 
@@ -33,12 +26,12 @@ namespace std {
 // the type passed in, which will always work.
 
 template<
-	auto lhs_min, auto lhs_max, typename lhs_policy, bounded::storage_type lhs_storage, bool lhs_poisoned,
-	auto rhs_min, auto rhs_max, typename rhs_policy, bounded::storage_type rhs_storage, bool rhs_poisoned
+	auto lhs_min, auto lhs_max, typename lhs_policy, bool lhs_poisoned,
+	auto rhs_min, auto rhs_max, typename rhs_policy, bool rhs_poisoned
 >
 struct common_type<
-	bounded::integer<lhs_min, lhs_max, lhs_policy, lhs_storage, lhs_poisoned>,
-	bounded::integer<rhs_min, rhs_max, rhs_policy, rhs_storage, rhs_poisoned>
+	bounded::integer<lhs_min, lhs_max, lhs_policy, lhs_poisoned>,
+	bounded::integer<rhs_min, rhs_max, rhs_policy, rhs_poisoned>
 > {
 private:
 	template<auto value>
@@ -50,7 +43,6 @@ public:
 		minimum,
 		maximum,
 		bounded::detail::common_policy<lhs_policy, rhs_policy>,
-		bounded::detail::common_storage_type(lhs_storage, rhs_storage),
 		lhs_poisoned or rhs_poisoned
 	>;
 	using q = typename type::underlying_type;
@@ -61,7 +53,7 @@ public:
 // add in some tricks to limit the maximum instantiation depth:
 
 template<
-	auto minimum, auto maximum, typename overflow_policy, bounded::storage_type storage, bool poisoned,
+	auto minimum, auto maximum, typename overflow_policy, bool poisoned,
 	typename T1, typename T2, typename T3, typename T4, typename T5,
 	typename T6, typename T7, typename T8, typename T9, typename T10,
 	typename T11, typename T12, typename T13, typename T14, typename T15,
@@ -75,7 +67,7 @@ template<
 	typename... Ts
 >
 struct common_type<
-	bounded::integer<minimum, maximum, overflow_policy, storage, poisoned>,
+	bounded::integer<minimum, maximum, overflow_policy, poisoned>,
 	T1, T2, T3, T4, T5, T6, T7, T8, T9, T10,
 	T11, T12, T13, T14, T15, T16, T17, T18, T19, T20,
 	T21, T22, T23, T24, T25, T26, T27, T28, T29, T30,
@@ -84,7 +76,7 @@ struct common_type<
 	Ts...
 > {
 private:
-	using type0 = bounded::integer<minimum, maximum, overflow_policy, storage, poisoned>;
+	using type0 = bounded::integer<minimum, maximum, overflow_policy, poisoned>;
 public:
 	using type = common_type_t<
 		common_type_t<
@@ -98,4 +90,3 @@ public:
 };
 
 }	// namespace std
-

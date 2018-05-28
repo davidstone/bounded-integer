@@ -30,12 +30,12 @@ min_max(Min min, Max max) -> min_max<Min, Max>;
 // case result_t is narrower than one of the arguments.
 #define BOUNDED_INTEGER_OPERATOR_OVERLOADS(symbol, operator_range) \
 template< \
-	auto lhs_min, auto lhs_max, typename lhs_policy, storage_type lhs_storage, bool lhs_poisoned, \
-	auto rhs_min, auto rhs_max, typename rhs_policy, storage_type rhs_storage, bool rhs_poisoned \
+	auto lhs_min, auto lhs_max, typename lhs_policy, bool lhs_poisoned, \
+	auto rhs_min, auto rhs_max, typename rhs_policy, bool rhs_poisoned \
 > \
 constexpr auto operator symbol( \
-	integer<lhs_min, lhs_max, lhs_policy, lhs_storage, lhs_poisoned> const lhs, \
-	integer<rhs_min, rhs_max, rhs_policy, rhs_storage, rhs_poisoned> const rhs \
+	integer<lhs_min, lhs_max, lhs_policy, lhs_poisoned> const lhs, \
+	integer<rhs_min, rhs_max, rhs_policy, rhs_poisoned> const rhs \
 ) noexcept { \
 	constexpr auto range = operator_range( \
 		detail::min_max{constant<lhs_min>, constant<lhs_max>}, \
@@ -45,7 +45,6 @@ constexpr auto operator symbol( \
 		range.min, \
 		range.max, \
 		detail::common_policy<lhs_policy, rhs_policy>, \
-		detail::common_storage_type(lhs_storage, rhs_storage), \
 		lhs_poisoned or rhs_poisoned \
 	>; \
 	using common_t = typename std::common_type_t<result_t, std::decay_t<decltype(lhs)>, std::decay_t<decltype(rhs)>>::underlying_type; \
@@ -53,4 +52,3 @@ constexpr auto operator symbol( \
 }
 
 }	// namespace bounded
-

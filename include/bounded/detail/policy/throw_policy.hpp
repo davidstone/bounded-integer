@@ -27,7 +27,6 @@ constexpr auto reduce_range(T const & value, constant_t<minimum>, constant_t<max
 		max(minimum, basic_numeric_limits<T>::min()),
 		min(maximum, basic_numeric_limits<T>::max()),
 		null_policy,
-		storage_type::fast,
 		bounded::detail::is_poisoned<T>
 	>(value)
 )
