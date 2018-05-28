@@ -5,12 +5,13 @@
 
 #pragma once
 
-#include <containers/add_remove_const.hpp>
 #include <containers/begin_end.hpp>
 #include <containers/is_iterable.hpp>
 #include <containers/is_iterator_sentinel.hpp>
 
 #include <bounded/integer.hpp>
+
+#include <utility>
 
 namespace containers {
 namespace detail {
@@ -147,8 +148,8 @@ template<typename LHS, typename RHS, BOUNDED_REQUIRES(
 )>
 constexpr auto compare(LHS && lhs, RHS && rhs) BOUNDED_NOEXCEPT(
 	::containers::compare(
-		begin(::containers::detail::add_const(lhs)), end(::containers::detail::add_const(lhs)),
-		begin(::containers::detail::add_const(rhs)), end(::containers::detail::add_const(rhs))
+		begin(std::as_const(lhs)), end(std::as_const(lhs)),
+		begin(std::as_const(rhs)), end(std::as_const(rhs))
 	)
 )
 

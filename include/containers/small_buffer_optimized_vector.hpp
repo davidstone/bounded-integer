@@ -5,7 +5,6 @@
 
 #pragma once
 
-#include <containers/add_remove_const.hpp>
 #include <containers/array/array.hpp>
 #include <containers/common_container_functions.hpp>
 #include <containers/dynamic_array/dynamic_array.hpp>
@@ -223,8 +222,9 @@ struct sbo_vector_base : private detail::rebound_allocator<T, Allocator> {
 		return const_iterator(result, detail::iterator_constructor);
 	}
 	friend constexpr auto begin(sbo_vector_base & container) noexcept {
-		auto const pointer = pointer_from(begin(::containers::detail::add_const(container)));
-		return iterator(::containers::detail::remove_const(pointer), detail::iterator_constructor);
+		auto const pointer = pointer_from(begin(std::as_const(container)));
+		auto as_mutable = []<typename U>(U const * ptr) { return const_cast<U *>(ptr); };
+		return iterator(as_mutable(pointer), detail::iterator_constructor);
 	}
 	
 	friend constexpr auto end(sbo_vector_base const & container) noexcept {

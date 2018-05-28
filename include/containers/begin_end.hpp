@@ -33,7 +33,7 @@ namespace common {
 //
 #if 0
 return Iterable::iterator(
-	const_cast<Iterable::value_type *>(pointer_from(add_const(container))),
+	const_cast<Iterable::value_type *>(pointer_from(begin(std::as_const(container)))),
 	iterator_constructor
 );
 #endif

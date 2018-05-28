@@ -73,7 +73,6 @@ target_sources(bounded INTERFACE
 )
 
 target_sources(containers INTERFACE
-	$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>/include/containers/add_remove_const.hpp
 	$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>/include/containers/algorithms/accumulate.hpp
 	$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>/include/containers/algorithms/advance.hpp
 	$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>/include/containers/algorithms/all_any_none.hpp
@@ -226,7 +225,6 @@ add_executable(bounded_test
 target_link_libraries(bounded_test bounded)
 
 add_library(containers_test STATIC
-	source/containers/add_remove_const.cpp
 	source/containers/algorithms/accumulate.cpp
 	source/containers/algorithms/advance.cpp
 	source/containers/algorithms/all_any_none.cpp

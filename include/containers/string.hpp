@@ -108,8 +108,8 @@ auto operator+(basic_string<T, Allocator> const & lhs, basic_string<T, Allocator
 template<typename T, typename Allocator>
 auto operator+(basic_string<T, Allocator> && lhs, basic_string<T, Allocator> && rhs) {
 	return (size(lhs) + size(rhs) <= lhs.capacity()) ?
-		std::move(lhs) + detail::add_const(rhs) :
-		detail::add_const(lhs) + std::move(rhs);
+		std::move(lhs) + std::as_const(rhs) :
+		std::as_const(lhs) + std::move(rhs);
 }
 
 
