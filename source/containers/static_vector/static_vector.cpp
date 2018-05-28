@@ -10,7 +10,9 @@ namespace {
 
 using namespace bounded::literal;
 
-namespace constexpr_static_vector {
+// This must be a function to work around
+// https://gcc.gnu.org/bugzilla/show_bug.cgi?id=85944
+[[maybe_unused]] void constexpr_static_vector() {
 	constexpr auto default_constructed = containers::static_vector<int, 9>{};
 	static_assert(empty(default_constructed));
 	
@@ -26,7 +28,7 @@ namespace constexpr_static_vector {
 	static_assert(at(n_copy, 2_bi) == 10);
 	static_assert(n_copy == containers::static_vector(4_bi, 10));
 	
-	constexpr auto make() {
+	constexpr auto make = []{
 		auto value = containers::static_vector<int, 10>{};
 		value.emplace_back(5);
 		value.emplace_back(15);
@@ -37,7 +39,7 @@ namespace constexpr_static_vector {
 		copy = value;
 		copy.insert(begin(copy) + 1_bi, begin(value), end(value));
 		return copy;
-	}
+	};
 	constexpr auto made = make();
 	constexpr auto expected = containers::array{5, 5, 10, 15, 10, 15};
 	static_assert(containers::equal(begin(made), end(made), begin(expected), end(expected)));
