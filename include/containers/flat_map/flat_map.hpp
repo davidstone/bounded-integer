@@ -254,7 +254,7 @@ public:
 	constexpr auto emplace_hint(const_iterator hint, Args && ... args) {
 		auto data = separate_key_from_mapped(std::forward<Args>(args)...);
 		auto const correct_greater = (hint == end(*this)) or key_compare(data.key, *hint);
-		auto const correct_less = (hint == begin(*this)) or key_compare(*::containers::prev(hint), data.key);
+		auto const correct_less = (hint == begin(*this)) or key_compare(*std::prev(hint), data.key);
 		auto const correct_hint = correct_greater and correct_less;
 		auto const position = correct_hint ? hint : upper_bound(data.key);
 		return emplace_at(position, std::move(data).key, std::move(data).mapped_args);
@@ -423,10 +423,10 @@ private:
 	constexpr auto emplace_at(const_iterator position, Key && key, Mapped && mapped) {
 		// Do not decrement an iterator if it might be begin(*this)
 		bool const there_is_element_before = position != begin(*this);
-		auto const that_element_is_equal = [&](){ return !key_compare()(::containers::prev(position)->key(), key); };
+		auto const that_element_is_equal = [&](){ return !key_compare()(std::prev(position)->key(), key); };
 		bool const already_exists = there_is_element_before and that_element_is_equal();
 		if (already_exists) {
-			return inserted_t{mutable_iterator(*this, ::containers::prev(position)), false};
+			return inserted_t{mutable_iterator(*this, std::prev(position)), false};
 		}
 
 		auto const it = container().emplace(
@@ -513,12 +513,12 @@ public:
 	constexpr auto equal_range(key_type const & key) const {
 		auto const it = find(key);
 		bool const found = it != end(*this);
-		return std::make_pair(it, found ? ::containers::next(it) : it);
+		return std::make_pair(it, found ? std::next(it) : it);
 	}
 	constexpr auto equal_range(key_type const & key) {
 		auto const it = find(key);
 		bool const found = it != end(*this);
-		return std::make_pair(it, found ? ::containers::next(it) : it);
+		return std::make_pair(it, found ? std::next(it) : it);
 	}
 
 	constexpr size_type count(key_type const & key) const {

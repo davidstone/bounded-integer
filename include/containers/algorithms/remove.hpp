@@ -5,7 +5,6 @@
 
 #pragma once
 
-#include <containers/algorithms/advance.hpp>
 #include <containers/algorithms/find.hpp>
 
 #include <bounded/integer.hpp>
@@ -18,7 +17,7 @@ template<typename ForwardIterator, typename Sentinel, typename Predicate>
 constexpr auto remove_if(ForwardIterator const first, Sentinel const last, Predicate predicate) {
 	auto new_last = ::containers::find_if(first, last, predicate);
 	if (new_last != last) {
-		for (auto it = ::containers::next(new_last); it != last; ++it) {
+		for (auto it = std::next(new_last); it != last; ++it) {
 			if (!predicate(*it)) {
 				*new_last = std::move(*it);
 				++new_last;

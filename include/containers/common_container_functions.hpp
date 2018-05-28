@@ -70,7 +70,7 @@ constexpr auto emplace_in_middle_no_reallocation(Container & container, typename
 	auto const original_end = end(container);
 	assert(position != original_end);
 	container.emplace_back(std::move(back(container)));
-	::containers::move_backward(position, ::containers::prev(original_end), original_end);
+	::containers::move_backward(position, std::prev(original_end), original_end);
 	auto const pointer = std::addressof(*position);
 	::containers::detail::destroy(allocator, pointer);
 	::containers::detail::construct(allocator, pointer, std::forward<Args>(args)...);

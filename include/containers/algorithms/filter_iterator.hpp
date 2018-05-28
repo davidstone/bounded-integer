@@ -5,7 +5,6 @@
 
 #pragma once
 
-#include <containers/algorithms/advance.hpp>
 #include <containers/algorithms/find.hpp>
 #include <containers/iterator_adapter.hpp>
 #include <containers/tuple.hpp>
@@ -30,7 +29,7 @@ struct filter_iterator_adapter : private tuple<Sentinel, Condition> {
 	constexpr auto operator()(Iterator const it, bounded::constant_t<1>) const {
 		auto && last = (*this)[0_bi];
 		auto && condition = (*this)[1_bi];
-		return ::containers::find_if(::containers::next(it), last, condition);
+		return ::containers::find_if(std::next(it), last, condition);
 	}
 };
 

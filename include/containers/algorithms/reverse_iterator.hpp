@@ -5,7 +5,6 @@
 
 #pragma once
 
-#include <containers/algorithms/advance.hpp>
 #include <containers/is_iterator.hpp>
 #include <containers/iterator_adapter.hpp>
 
@@ -17,7 +16,7 @@ namespace detail {
 struct reverse_dereference {
 	template<typename BidirectionalIterator>
 	constexpr auto operator()(BidirectionalIterator it) const BOUNDED_NOEXCEPT_DECLTYPE(
-		*::containers::prev(it)
+		*std::prev(it)
 	)
 };
 

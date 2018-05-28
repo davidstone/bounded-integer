@@ -74,7 +74,6 @@ target_sources(bounded INTERFACE
 
 target_sources(containers INTERFACE
 	$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>/include/containers/algorithms/accumulate.hpp
-	$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>/include/containers/algorithms/advance.hpp
 	$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>/include/containers/algorithms/all_any_none.hpp
 	$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>/include/containers/algorithms/copy.hpp
 	$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>/include/containers/algorithms/count.hpp
@@ -226,7 +225,6 @@ target_link_libraries(bounded_test bounded)
 
 add_library(containers_test STATIC
 	source/containers/algorithms/accumulate.cpp
-	source/containers/algorithms/advance.cpp
 	source/containers/algorithms/all_any_none.cpp
 	source/containers/algorithms/copy.cpp
 	source/containers/algorithms/count.cpp

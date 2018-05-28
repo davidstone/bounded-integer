@@ -175,7 +175,7 @@ struct dynamic_resizable_array : private Container {
 			auto const mutable_position = begin(*this) + offset;
 			auto const pointer = ::containers::uninitialized_move_destroy(begin(*this), mutable_position, data(temp), allocator_);
 			assert(data(temp) + offset == pointer);
-			::containers::uninitialized_move_destroy(mutable_position, end(*this), ::containers::next(pointer), allocator_);
+			::containers::uninitialized_move_destroy(mutable_position, end(*this), std::next(pointer), allocator_);
 			this->relocate_preallocated(std::move(temp));
 			add_size(1_bi);
 		}
