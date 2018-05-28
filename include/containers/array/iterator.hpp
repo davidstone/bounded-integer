@@ -11,10 +11,7 @@
 #include <bounded/integer.hpp>
 
 #include <cassert>
-#include <cstddef>
-#include <cstdint>
 #include <iterator>
-#include <limits>
 
 namespace containers {
 namespace detail {
@@ -47,7 +44,7 @@ struct basic_array_iterator {
 	}
 
 	constexpr auto & operator*() const noexcept {
-		assert(m_it != nullptr);
+		assert(m_it);
 		return *m_it;
 	}
 	constexpr auto operator->() const noexcept {
