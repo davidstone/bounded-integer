@@ -13,26 +13,26 @@
 namespace bounded {
 namespace detail {
 
-template<auto lhs_, auto rhs_>
-constexpr auto safer_add(constant_t<lhs_> const lhs, constant_t<rhs_> const rhs) noexcept {
-	constexpr auto modulo_equivalent_value = constant<static_cast<max_unsigned_t>(lhs_) + static_cast<max_unsigned_t>(rhs_)>;
+template<auto lhs, auto rhs>
+constexpr auto safer_add(constant_t<lhs>, constant_t<rhs>) noexcept {
+	constexpr auto modulo_equivalent_value = static_cast<max_unsigned_t>(lhs) + static_cast<max_unsigned_t>(rhs);
 	constexpr auto max_signed = basic_numeric_limits<max_signed_t>::max();
-	if constexpr ((lhs_ >= 0 and rhs_ >= 0) or lhs_ > max_signed or rhs_ > max_signed) {
+	if constexpr ((lhs >= 0 and rhs >= 0) or lhs > max_signed or rhs > max_signed) {
 		static_assert(
-			(rhs_ < 0 or modulo_equivalent_value >= lhs) and (lhs_ < 0 or modulo_equivalent_value >= rhs),
+			(rhs < 0 or modulo_equivalent_value >= lhs) and (lhs < 0 or modulo_equivalent_value >= rhs),
 			"Overflow in calculation of bounds."
 		);
-		return normalize<modulo_equivalent_value.value()>;
+		return modulo_equivalent_value;
 	} else {
 		// To enter this case, we know that at least one of lhs and rhs is
 		// negative. If at least one of them is positive, addition cannot
 		// underflow. If both are negative, we rely on modular arithmetic to
 		// detect overflow.
 		static_assert(
-			lhs_ > 0 or rhs_ > 0 or modulo_equivalent_value.value() > max_signed,
+			lhs > 0 or rhs > 0 or modulo_equivalent_value > max_signed,
 			"Underflow in calculation of bounds."
 		);
-		return from_unsigned_cast<max_signed_t>(modulo_equivalent_value.value());
+		return from_unsigned_cast<max_signed_t>(modulo_equivalent_value);
 	}
 }
 
