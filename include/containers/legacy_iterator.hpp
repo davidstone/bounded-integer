@@ -15,106 +15,11 @@
 #include <iterator>
 
 namespace containers {
-namespace detail {
-
-
-template<typename Integer>
-struct integer_compatibility {
-	integer_compatibility() = default;
-	template<typename T, BOUNDED_REQUIRES(std::is_constructible<Integer, T>::value)>
-	constexpr integer_compatibility(T t) noexcept(std::is_nothrow_constructible<Integer, T>::value):
-		value(std::move(t))
-	{
-	}
-
-#if 0
-	template<typename T, BOUNDED_REQUIRES(std::is_constructible<T, Integer>::value)>
-	constexpr operator T() const BOUNDED_NOEXCEPT(
-		static_cast<T>(value)
-	)
-#endif
-	constexpr operator Integer const &() const noexcept(std::is_nothrow_copy_constructible<Integer>::value) {
-		return value;
-	}
-	constexpr operator Integer &() noexcept(std::is_nothrow_copy_constructible<Integer>::value) {
-		return value;
-	}
-
-private:
-	Integer value;
-};
-
-template<typename Integer>
-integer_compatibility(Integer) -> integer_compatibility<Integer>;
-
-template<typename LHS, typename RHS>
-constexpr auto compare(integer_compatibility<LHS> const lhs, integer_compatibility<RHS> const rhs) noexcept {
-	return bounded::compare(static_cast<LHS>(lhs), static_cast<RHS>(rhs));
-}
-
-template<typename LHS, typename RHS, BOUNDED_REQUIRES(bounded::is_bounded_integer<RHS>)>
-constexpr auto compare(integer_compatibility<LHS> const lhs, RHS const rhs) noexcept {
-	return bounded::compare(static_cast<LHS>(lhs), rhs);
-}
-
-template<typename LHS, typename RHS, BOUNDED_REQUIRES(bounded::is_bounded_integer<LHS>)>
-constexpr auto compare(LHS const lhs, integer_compatibility<RHS> const rhs) noexcept {
-	return bounded::compare(lhs, static_cast<RHS>(rhs));
-}
-
-
-template<typename Integer, BOUNDED_REQUIRES(bounded::is_bounded_integer<Integer>)>
-constexpr auto to_builtin(Integer x) noexcept {
-	return x.value();
-}
-template<typename Integer, BOUNDED_REQUIRES(!bounded::is_bounded_integer<Integer>)>
-constexpr auto to_builtin(Integer x) noexcept {
-	return x;
-}
-
-
-#define CONTAINERS_DETAIL_INTEGER_COMPATIBILITY_OPERATORS(op) \
-	template<typename Integer, typename RHS, BOUNDED_REQUIRES(std::numeric_limits<RHS>::is_integer)> \
-	constexpr auto operator op(integer_compatibility<Integer> const & lhs, RHS const & rhs) BOUNDED_NOEXCEPT( \
-		integer_compatibility(static_cast<Integer const &>(lhs) op to_builtin(rhs)) \
-	) \
-	template<typename LHS, typename Integer, BOUNDED_REQUIRES(std::numeric_limits<LHS>::is_integer)> \
-	constexpr auto operator op(LHS const & lhs, integer_compatibility<Integer> const & rhs) BOUNDED_NOEXCEPT( \
-		integer_compatibility(to_builtin(lhs) op static_cast<Integer const &>(rhs)) \
-	) \
-	template<typename Integer> \
-	constexpr auto operator op(integer_compatibility<Integer> const & lhs, integer_compatibility<Integer> const & rhs) BOUNDED_NOEXCEPT( \
-		static_cast<Integer const &>(lhs) op static_cast<Integer const &>(rhs) \
-	)
-
-CONTAINERS_DETAIL_INTEGER_COMPATIBILITY_OPERATORS(+)
-CONTAINERS_DETAIL_INTEGER_COMPATIBILITY_OPERATORS(-)
-CONTAINERS_DETAIL_INTEGER_COMPATIBILITY_OPERATORS(*)
-CONTAINERS_DETAIL_INTEGER_COMPATIBILITY_OPERATORS(/)
-CONTAINERS_DETAIL_INTEGER_COMPATIBILITY_OPERATORS(%)
-CONTAINERS_DETAIL_INTEGER_COMPATIBILITY_OPERATORS(<<)
-CONTAINERS_DETAIL_INTEGER_COMPATIBILITY_OPERATORS(>>)
-CONTAINERS_DETAIL_INTEGER_COMPATIBILITY_OPERATORS(&)
-
-#undef CONTAINERS_DETAIL_INTEGER_COMPATIBILITY_OPERATORS
-
-
-}	// namespace detail
-}	// namespace containers
-
-namespace std {
-
-template<typename Integer>
-struct numeric_limits<containers::detail::integer_compatibility<Integer>> : numeric_limits<Integer> {};
-
-}	// namespace std
-
-namespace containers {
 
 template<typename Iterator>
 struct legacy_iterator {
 	using value_type = typename std::iterator_traits<Iterator>::value_type;
-	using difference_type = detail::integer_compatibility<std::ptrdiff_t>;
+	using difference_type = std::ptrdiff_t;
 	using pointer = typename std::iterator_traits<Iterator>::pointer;
 	using reference = typename std::iterator_traits<Iterator>::reference;
 	using iterator_category = typename std::iterator_traits<Iterator>::iterator_category;
