@@ -128,6 +128,9 @@ protected:
 	}
 };
 
+template<typename... Ts>
+tuple(Ts && ...) -> tuple<std::decay_t<Ts>...>;
+
 
 template<typename T>
 constexpr auto is_tuple = false;
