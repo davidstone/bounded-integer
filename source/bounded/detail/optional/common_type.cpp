@@ -18,7 +18,7 @@ static_assert(
 static_assert(
 	std::is_same<
 		std::common_type_t<bounded::constant_t<1>, bounded::none_t, bounded::constant_t<5>, bounded::none_t>,
-		bounded::optional<bounded::integer<bounded::detail::normalize<1>, bounded::detail::normalize<5>>>
+		bounded::optional<bounded::integer<1, 5>>
 	>{},
 	"common_type with bounded::integer and none_t wrong."
 );

@@ -44,7 +44,7 @@ template< \
 	BOUNDED_REQUIRES(detail::is_builtin_integer<T>) \
 > \
 constexpr auto operator symbol(integer<lhs_min, lhs_max, overflow, poisoned> const lhs, T const rhs) noexcept { \
-	return lhs symbol integer<minimum, maximum, overflow, true>(rhs); \
+	return lhs symbol integer<detail::normalize<minimum>, detail::normalize<maximum>, overflow, true>(rhs); \
 } \
 template< \
 	typename T, auto rhs_min, auto rhs_max, typename overflow, bool poisoned, \

@@ -30,7 +30,7 @@ constexpr auto safer_multiply(constant_t<lhs> const &, constant_t<rhs> const &) 
 	} else {
 		constexpr auto result = static_cast<max_unsigned_t>(lhs) * static_cast<max_unsigned_t>(rhs);
 		static_assert((safe_abs(lhs) <= result and safe_abs(rhs) <= result) or (lhs == 0 or rhs == 0), "Integer overflow in multiplication.");
-		return normalize<result>;
+		return result;
 	}
 }
 
@@ -40,8 +40,8 @@ constexpr auto multiplies_operator_range = [](auto const lhs, auto const rhs) no
 	auto p2 = safer_multiply(lhs.max, rhs.min);
 	auto p3 = safer_multiply(lhs.max, rhs.max);
 	return min_max{
-		min(p0, p1, p2, p3),
-		max(p0, p1, p2, p3)
+		safe_min(p0, p1, p2, p3),
+		safe_max(p0, p1, p2, p3)
 	};
 };
 

@@ -104,7 +104,9 @@ constexpr auto check_empty_braces() {
 
 template<typename T>
 constexpr auto check_uncompressed_optional() {
-	using type = bounded::integer<bounded::basic_numeric_limits<T>::min(), bounded::basic_numeric_limits<T>::max()>;
+	using bounded::detail::normalize;
+	using limits = bounded::basic_numeric_limits<T>;
+	using type = bounded::integer<normalize<limits::min()>, normalize<limits::max()>>;
 	static_assert(
 		sizeof(type) < sizeof(bounded::optional<type>),
 		"Compressing an optional that should not be compressed."

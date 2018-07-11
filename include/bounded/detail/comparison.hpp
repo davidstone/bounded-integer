@@ -59,23 +59,36 @@ constexpr auto compare(Enum const lhs, Enum const rhs) noexcept {
 namespace detail {
 
 template<typename Limited, typename UnaryFunction, typename LHS, typename RHS>
-constexpr auto safe_extreme(LHS const lhs, RHS const rhs, UnaryFunction const pick_lhs) noexcept {
-	static_assert(std::is_same<LHS, max_signed_t>{} or std::is_same<LHS, max_unsigned_t>{});
-	static_assert(std::is_same<RHS, max_signed_t>{} or std::is_same<RHS, max_unsigned_t>{});
-	using result_type = std::conditional_t<std::is_same<LHS, RHS>{}, LHS, Limited>;
+constexpr auto safe_extreme(UnaryFunction const pick_lhs, LHS const lhs_, RHS const rhs_) noexcept {
+	auto normalized = [](auto const value) {
+		using normalized_t = std::conditional_t<
+			is_signed_builtin<std::decay_t<decltype(value)>>,
+			max_signed_t,
+			max_unsigned_t
+		>;
+		return static_cast<normalized_t>(value);
+	};
+	auto const lhs = normalized(lhs_);
+	auto const rhs = normalized(rhs_);
+	using result_type = std::conditional_t<std::is_same<decltype(lhs), decltype(rhs)>{}, decltype(lhs), Limited>;
 	return (pick_lhs(compare(lhs, rhs))) ?
 		static_cast<result_type>(lhs) :
 		static_cast<result_type>(rhs);
 }
 
-template<typename LHS, typename RHS>
-constexpr auto safe_min(LHS const lhs, RHS const rhs) noexcept {
-	return safe_extreme<max_signed_t>(lhs, rhs, [](auto const cmp) { return cmp <= 0; });
+template<typename Limited, typename UnaryFunction, typename LHS, typename RHS, typename... Rest>
+constexpr auto safe_extreme(UnaryFunction const pick_lhs, LHS const lhs, RHS const rhs, Rest const ... rest) {
+	return safe_extreme<Limited>(pick_lhs, safe_extreme<Limited>(pick_lhs, lhs, rhs), rest...);
 }
 
-template<typename LHS, typename RHS>
-constexpr auto safe_max(LHS const lhs, RHS const rhs) noexcept {
-	return safe_extreme<max_unsigned_t>(lhs, rhs, [](auto const cmp) { return cmp > 0; });
+template<typename... Ts>
+constexpr auto safe_min(Ts... values) noexcept {
+	return safe_extreme<max_signed_t>([](auto const cmp) { return cmp <= 0; }, values...);
+}
+
+template<typename... Ts>
+constexpr auto safe_max(Ts... values) noexcept {
+	return safe_extreme<max_unsigned_t>([](auto const cmp) { return cmp > 0; }, values...);
 }
 
 }	// namespace detail

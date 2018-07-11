@@ -62,8 +62,8 @@ constexpr auto divides_operator_range = [](auto const lhs_, auto const rhs_) noe
 	constexpr auto g3 = safer_divide(lhs.max, greatest_negative_divisor);
 
 	return min_max{
-		normalize<min(g0, g1, g2, g3).value()>,
-		normalize<max(g0, g1, g2, g3).value()>
+		min(g0, g1, g2, g3).value(),
+		max(g0, g1, g2, g3).value()
 	};
 };
 

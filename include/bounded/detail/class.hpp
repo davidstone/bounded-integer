@@ -141,7 +141,7 @@ template<auto value, typename overflow_policy = null_policy, bool poisoned = fal
 using constant_t = integer<value, value, overflow_policy, poisoned>;
 
 template<auto value, typename overflow_policy = null_policy>
-constexpr auto constant = constant_t<value, overflow_policy>{};
+constexpr auto constant = constant_t<detail::normalize<value>, overflow_policy>{};
 
 
 template<auto minimum, auto maximum, typename overflow_policy_ = null_policy, bool poisoned = false>
@@ -355,8 +355,8 @@ constexpr auto deduced_max() noexcept {
 
 template<typename T, typename overflow_policy = typename detail::equivalent_overflow_policy_c<std::decay_t<T>>::type>
 integer(T const & value, overflow_policy = overflow_policy{}) -> integer<
-	detail::deduced_min<T>(),
-	detail::deduced_max<T>(),
+	detail::normalize<detail::deduced_min<T>()>,
+	detail::normalize<detail::deduced_max<T>()>,
 	overflow_policy,
 	detail::is_builtin_integer<T> or not basic_numeric_limits<T>::is_specialized
 >;

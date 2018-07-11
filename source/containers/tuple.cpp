@@ -69,7 +69,7 @@ static_assert(a <= a);
 static_assert(b <= b);
 static_assert(non_movable_tuple <= non_movable_tuple);
 
-constexpr auto d = containers::make_tuple(0, empty{}, 4);
+constexpr auto d = containers::tuple(0, empty{}, 4);
 static_assert(a != d);
 static_assert(a > d);
 

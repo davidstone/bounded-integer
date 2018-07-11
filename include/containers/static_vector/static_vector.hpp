@@ -42,7 +42,7 @@ struct static_vector_data;
 template<typename T, std::size_t capacity>
 struct static_vector_data<T, capacity, true> {
 	array<trivial_storage<T>, capacity> m_container = {{}};
-	bounded::integer<0, capacity> m_size = 0_bi;
+	bounded::integer<0, bounded::detail::normalize<capacity>> m_size = 0_bi;
 };
 
 template<typename T, std::size_t capacity>
@@ -64,7 +64,7 @@ private:
 	enum class count_constructor{};
 public:
 	using value_type = T;
-	using size_type = bounded::integer<0, capacity_>;
+	using size_type = bounded::integer<0, bounded::detail::normalize<capacity_>>;
 	using const_iterator = detail::basic_array_iterator<value_type const, static_vector>;
 	using iterator = detail::basic_array_iterator<value_type, static_vector>;
 

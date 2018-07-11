@@ -171,7 +171,7 @@ public:
 		std::is_empty<CompareFunction>::value,
 		"CompareFunction must be a stateless comparison function. Would we use the state from the left- or right-hand side?"
 	);
-	using value_type = decltype(std::declval<DereferenceFunction>()(std::declval<Iterator>()));
+	using value_type = std::decay_t<decltype(std::declval<DereferenceFunction>()(std::declval<Iterator>()))>;
 	using difference_type = typename std::iterator_traits<Iterator>::difference_type;
 	using iterator_category =
 		std::conditional_t<std::is_same<base_iterator_category, std::output_iterator_tag>{}, std::output_iterator_tag,

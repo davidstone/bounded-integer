@@ -81,13 +81,13 @@ struct non_copyable {
 	non_copyable(non_copyable &&) = default;
 };
 
-constexpr auto array_non_copyable = containers::make_array_n(1_bi, non_copyable{});
+constexpr auto array_non_copyable = containers::make_array_n(1_bi, non_copyable());
 static_assert(size(array_non_copyable) == 1_bi, "Incorrect array size of 1 for move-only types.");
 
 constexpr auto array_empty = containers::make_array_n(0_bi, 2);
 static_assert(empty(array_empty), "Incorrect array size for empty array.");
 
-constexpr auto array_non_copyable_empty = containers::make_array_n(0_bi, non_copyable{});
+constexpr auto array_non_copyable_empty = containers::make_array_n(0_bi, non_copyable());
 static_assert(empty(array_non_copyable_empty), "Incorrect array size for empty array of move-only.");
 
 constexpr auto large_size = 10000_bi;

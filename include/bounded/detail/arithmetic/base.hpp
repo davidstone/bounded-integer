@@ -42,8 +42,8 @@ constexpr auto operator symbol( \
 		detail::min_max{constant<rhs_min>, constant<rhs_max>} \
 	); \
 	using result_t = integer< \
-		range.min, \
-		range.max, \
+		detail::normalize<range.min>, \
+		detail::normalize<range.max>, \
 		detail::common_policy<lhs_policy, rhs_policy>, \
 		lhs_poisoned or rhs_poisoned \
 	>; \

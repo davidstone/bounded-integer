@@ -48,12 +48,25 @@ struct basic_numeric_limits<detail::max_signed_t> {
 
 namespace detail {
 
+template<typename T>
+constexpr auto must_use_unsigned(T const value) {
+	return value > 0 and static_cast<max_unsigned_t>(value) > static_cast<max_unsigned_t>(basic_numeric_limits<max_signed_t>::max());
+}
+
+template<typename T>
+constexpr auto fits_in_int(T const value) {
+	using limits = std::numeric_limits<int>;
+	return (value < static_cast<T>(0)) ?
+		value >= static_cast<T>(limits::min()) :
+		value <= static_cast<T>(limits::max());
+}
+
 template<auto value>
-constexpr auto normalize = static_cast<std::conditional_t<
-	value < 0 or static_cast<max_unsigned_t>(value) <= basic_numeric_limits<max_signed_t>::max(),
-	max_signed_t,
-	max_unsigned_t
->>(value);
+constexpr auto normalize = static_cast<
+	std::conditional_t<fits_in_int(value), int,
+	std::conditional_t<must_use_unsigned(value), max_unsigned_t,
+	max_signed_t
+>>>(value);
 
 template<typename T, BOUNDED_REQUIRES(is_signed_builtin<T>)>
 constexpr auto from_unsigned_cast(max_unsigned_t const value) noexcept {
