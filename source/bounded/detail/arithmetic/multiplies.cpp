@@ -47,6 +47,10 @@ static_assert(homogeneous_equals(
 	signed_max + signed_max
 ));
 static_assert(homogeneous_equals(
+	bounded::integer<-3, 3>(1, bounded::non_check) * bounded::integer<0, 1>(1, bounded::non_check),
+	bounded::integer<-3, 3>(1, bounded::non_check)
+));
+static_assert(homogeneous_equals(
 	bounded::checked_integer<1, 10>(9, bounded::non_check) * bounded::checked_integer<-3, 11>(4, bounded::non_check),
 	bounded::checked_integer<-30, 110>(36, bounded::non_check)
 ));
