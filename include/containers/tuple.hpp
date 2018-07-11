@@ -3,6 +3,12 @@
 // (See accompanying file LICENSE_1_0.txt or copy at
 // http://www.boost.org/LICENSE_1_0.txt)
 
+// std::pair does not implement noexcept specifications and does not currently
+// work with std::is_constructible
+//
+// std::tuple does not implement noexcept specifications and does not support
+// std::piecewise_construct
+
 #pragma once
 
 #include <containers/common_functions.hpp>
@@ -26,27 +32,6 @@ constexpr auto all(Args... args) noexcept {
 }
 
 
-// std::pair does not implement noexcept specifications and does not currently
-// work with std::is_constructible
-//
-// std::tuple does not implement noexcept specifications and does not support
-// std::piecewise_construct
-
-template<typename Indexes, typename... Types>
-struct tuple_impl;
-
-
-}	// namespace detail
-
-
-template<typename... Types>
-using tuple = detail::tuple_impl<decltype(detail::make_index_sequence(bounded::constant<sizeof...(Types)>)), Types...>;
-
-
-
-
-namespace detail {
-
 constexpr struct not_piecewise_construct_t{} not_piecewise_construct{};
 
 template<typename T>
@@ -62,24 +47,6 @@ template<std::size_t unique, typename T, typename... Ts>
 using tuple_value_t = tuple_value<is_derivable<T>, unique, T, Ts...>;
 
 
-
-
-template<typename>
-struct is_tuple_c : std::false_type {};
-
-template<typename... Types>
-struct is_tuple_c<tuple<Types...>> : std::true_type {};
-
-}	// namespace detail
-
-template<typename T>
-constexpr auto is_tuple = detail::is_tuple_c<T>::value;
-
-
-
-namespace detail {
-
-
 template<std::size_t index, typename T, typename... Ts>
 struct nth_type_c {
 	using type = typename nth_type_c<index - 1, Ts...>::type;
@@ -88,11 +55,12 @@ template<typename T, typename... Ts>
 struct nth_type_c<0, T, Ts...> {
 	using type = T;
 };
-
 template<std::size_t index, typename... Ts>
 using nth_type = typename nth_type_c<index, Ts...>::type;
 
 
+template<typename Indexes, typename... Types>
+struct tuple_impl;
 
 template<std::size_t... indexes, typename... Types>
 struct tuple_impl<std::index_sequence<indexes...>, Types...> : tuple_value_t<indexes, Types, Types...>... {
@@ -115,7 +83,17 @@ struct tuple_impl<std::index_sequence<indexes...>, Types...> : tuple_value_t<ind
 		tuple_value_t<indexes, Types, Types...>(std::piecewise_construct, std::forward<Args>(args))...
 	{
 	}
+};
 
+template<typename... Types>
+using tuple_impl_t = detail::tuple_impl<decltype(detail::make_index_sequence(bounded::constant<sizeof...(Types)>)), Types...>;
+
+}	// namespace detail
+
+
+template<typename... Types>
+struct tuple : private detail::tuple_impl_t<Types...> {
+	using detail::tuple_impl_t<Types...>::tuple_impl_t;
 
 	// Work around https://bugs.llvm.org/show_bug.cgi?id=35655
 	// This means we cannot have an auto template parameter here, so we have to
@@ -124,17 +102,17 @@ struct tuple_impl<std::index_sequence<indexes...>, Types...> : tuple_value_t<ind
 	template<typename Index, BOUNDED_REQUIRES(bounded::is_bounded_integer<Index> and Index{} < sizeof...(Types))>
 	constexpr auto && operator[](Index const index) const & noexcept {
 		constexpr auto index_ = static_cast<std::size_t>(index);
-		return static_cast<tuple_value_t<index_, nth_type<index_, Types...>, Types...> const &>(*this).value();
+		return static_cast<detail::tuple_value_t<index_, detail::nth_type<index_, Types...>, Types...> const &>(*this).value();
 	}
 	template<typename Index, BOUNDED_REQUIRES(bounded::is_bounded_integer<Index> and Index{} < sizeof...(Types))>
 	constexpr auto && operator[](Index const index) & noexcept {
 		constexpr auto index_ = static_cast<std::size_t>(index);
-		return static_cast<tuple_value_t<index_, nth_type<index_, Types...>, Types...> &>(*this).value();
+		return static_cast<detail::tuple_value_t<index_, detail::nth_type<index_, Types...>, Types...> &>(*this).value();
 	}
 	template<typename Index, BOUNDED_REQUIRES(bounded::is_bounded_integer<Index> and Index{} < sizeof...(Types))>
 	constexpr auto && operator[](Index const index) && noexcept {
 		constexpr auto index_ = static_cast<std::size_t>(index);
-		return static_cast<tuple_value_t<index_, nth_type<index_, Types...>, Types...> &&>(*this).value();
+		return static_cast<detail::tuple_value_t<index_, detail::nth_type<index_, Types...>, Types...> &&>(*this).value();
 	}
 
 protected:
@@ -149,6 +127,17 @@ protected:
 		return std::move(*this);
 	}
 };
+
+
+template<typename T>
+constexpr auto is_tuple = false;
+
+template<typename... Types>
+constexpr auto is_tuple<tuple<Types...>> = true;
+
+
+
+namespace detail {
 
 
 template<std::size_t unique, typename T, typename... Ts>
