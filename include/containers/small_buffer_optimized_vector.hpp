@@ -223,8 +223,8 @@ struct sbo_vector_base : private detail::rebound_allocator<T, Allocator> {
 	}
 	friend constexpr auto begin(sbo_vector_base & container) noexcept {
 		auto const pointer = pointer_from(begin(std::as_const(container)));
-		auto as_mutable = []<typename U>(U const * ptr) { return const_cast<U *>(ptr); };
-		return iterator(as_mutable(pointer), detail::iterator_constructor);
+		using mutable_ptr = std::remove_const_t<std::remove_pointer_t<decltype(pointer)>> *;
+		return iterator(const_cast<mutable_ptr>(pointer), detail::iterator_constructor);
 	}
 	
 	friend constexpr auto end(sbo_vector_base const & container) noexcept {
