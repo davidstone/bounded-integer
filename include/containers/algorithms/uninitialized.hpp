@@ -33,14 +33,13 @@ constexpr auto is_static_castable<
 	void_t<decltype(static_cast<Target>(std::declval<Source>()))>
 > = true;
 
-template<typename Target, typename Source, BOUNDED_REQUIRES(is_static_castable<Target, Source>)>
+template<typename Target, typename Source>
 constexpr auto static_or_reinterpret_cast(Source source) noexcept {
-	return static_cast<Target>(source);
-}
-
-template<typename Target, typename Source, BOUNDED_REQUIRES(!is_static_castable<Target, Source>)>
-auto static_or_reinterpret_cast(Source source) noexcept {
-	return reinterpret_cast<Target>(source);
+	if constexpr (is_static_castable<Target, Source>) {
+		return static_cast<Target>(source);
+	} else {
+		return reinterpret_cast<Target>(source);
+	}
 }
 
 template<typename Allocator, typename T, typename... Args>

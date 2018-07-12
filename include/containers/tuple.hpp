@@ -407,19 +407,16 @@ constexpr auto all_noexcept_function_calls = all_noexcept_function_calls_impl<Fu
 
 
 
-template<auto i, typename Function, typename... Tuples, BOUNDED_REQUIRES(i == all_tuple_sizes<Tuples...>())>
-constexpr auto transform_impl(bounded::constant_t<i>, Function &&, Tuples && ...) noexcept {
-	return tuple<>{};
-}
-// noexcept specification is on the publicly facing transform. This is done
-// because you cannot have a recursive noexcept specification, so instead we
-// have to write special code to calculate whether the function is noexcept.
-template<auto i, typename Function, typename... Tuples, BOUNDED_REQUIRES(i != all_tuple_sizes<Tuples...>())>
+template<auto i, typename Function, typename... Tuples>
 constexpr auto transform_impl(bounded::constant_t<i> index, Function && function, Tuples && ... tuples) {
-	return tuple_cat(
-		tuple<decltype(function(std::forward<Tuples>(tuples)[index]...))>(function(std::forward<Tuples>(tuples)[index]...)),
-		::containers::detail::transform_impl(index + 1_bi, function, std::forward<Tuples>(tuples)...)
-	);
+	if constexpr (i == all_tuple_sizes<Tuples...>()) {
+		return tuple<>{};
+	} else {
+		return tuple_cat(
+			tuple<decltype(function(std::forward<Tuples>(tuples)[index]...))>(function(std::forward<Tuples>(tuples)[index]...)),
+			::containers::detail::transform_impl(index + 1_bi, function, std::forward<Tuples>(tuples)...)
+		);
+	}
 }
 
 }	// namespace detail

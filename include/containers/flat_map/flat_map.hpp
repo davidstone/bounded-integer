@@ -406,36 +406,32 @@ private:
 		bool inserted;
 	};
 
-	template<typename>
-	static constexpr auto dependent_allow_duplicates = allow_duplicates;
-	
-	template<typename Key, typename Mapped, BOUNDED_REQUIRES(dependent_allow_duplicates<Key>)>
-	constexpr auto emplace_at(const_iterator position, Key && key, Mapped && mapped) BOUNDED_NOEXCEPT_DECLTYPE(
-		container().emplace(
-			position,
-			std::piecewise_construct,
-			tie(std::forward<Key>(key)),
-			std::forward<Mapped>(mapped)
-		)
-	)
-
-	template<typename Key, typename Mapped, BOUNDED_REQUIRES(!dependent_allow_duplicates<Key>)>
+	template<typename Key, typename Mapped>
 	constexpr auto emplace_at(const_iterator position, Key && key, Mapped && mapped) {
-		// Do not decrement an iterator if it might be begin(*this)
-		bool const there_is_element_before = position != begin(*this);
-		auto const that_element_is_equal = [&](){ return !key_compare()(std::prev(position)->key(), key); };
-		bool const already_exists = there_is_element_before and that_element_is_equal();
-		if (already_exists) {
-			return inserted_t{mutable_iterator(*this, std::prev(position)), false};
-		}
+		if constexpr (allow_duplicates) {
+			return container().emplace(
+				position,
+				std::piecewise_construct,
+				tie(std::forward<Key>(key)),
+				std::forward<Mapped>(mapped)
+			);
+		} else {
+			// Do not decrement an iterator if it might be begin(*this)
+			bool const there_is_element_before = position != begin(*this);
+			auto const that_element_is_equal = [&](){ return !key_compare()(std::prev(position)->key(), key); };
+			bool const already_exists = there_is_element_before and that_element_is_equal();
+			if (already_exists) {
+				return inserted_t{mutable_iterator(*this, std::prev(position)), false};
+			}
 
-		auto const it = container().emplace(
-			position,
-			std::piecewise_construct,
-			tie(std::forward<Key>(key)),
-			std::forward<Mapped>(mapped)
-		);
-		return inserted_t{it, true};
+			auto const it = container().emplace(
+				position,
+				std::piecewise_construct,
+				tie(std::forward<Key>(key)),
+				std::forward<Mapped>(mapped)
+			);
+			return inserted_t{it, true};
+		}
 	}
 };
 

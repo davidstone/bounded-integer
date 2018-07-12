@@ -20,8 +20,6 @@ constexpr auto constexpr_constructible = std::is_move_assignable_v<T> and std::i
 
 // Try () initialization first, then {} initialization
 
-// TODO: implement bounded::construct entirely in terms of this when compilers
-// implement guaranteed move elision
 template<typename T>
 struct construct_return_t {
 	template<typename... Args, BOUNDED_REQUIRES(std::is_constructible_v<T, Args...>)>
@@ -48,32 +46,18 @@ constexpr struct {
 		ref = construct_return<T>(std::forward<Args>(args)...)
 	)
 
-	template<typename T, typename... Args, BOUNDED_REQUIRES(
-		std::is_constructible_v<T, Args...> and
-		not detail::constexpr_constructible<T>
-	)>
+	template<typename T, typename... Args, BOUNDED_REQUIRES(not detail::constexpr_constructible<T>)>
 	constexpr auto operator()(T & ref, Args && ... args) const BOUNDED_NOEXCEPT_REF(
-		*::new(static_cast<void *>(std::addressof(ref))) T(std::forward<Args>(args)...)
-	)
-	
-	template<typename T, typename... Args, BOUNDED_REQUIRES(
-		not std::is_constructible_v<T, Args...> and
-		not detail::constexpr_constructible<T>
-	)>
-	constexpr auto operator()(T & ref, Args && ... args) const BOUNDED_NOEXCEPT_REF(
-		*::new(static_cast<void *>(std::addressof(ref))) T{std::forward<Args>(args)...}
+		*::new(static_cast<void *>(std::addressof(ref))) T(construct_return<T>(std::forward<Args>(args)...))
 	)
 } construct;
 
 
-constexpr struct {
-	template<typename T, BOUNDED_REQUIRES(!std::is_trivially_destructible_v<T>)>
-	constexpr auto operator()(T & ref) const BOUNDED_NOEXCEPT(
-		ref.~T()
-	)
-	template<typename T, BOUNDED_REQUIRES(std::is_trivially_destructible_v<T>)>
-	constexpr auto operator()(T &) const noexcept {
+constexpr auto destroy = [](auto & ref) noexcept {
+	using T = std::decay_t<decltype(ref)>;
+	if constexpr (!std::is_trivially_destructible_v<T>) {
+		ref.~T();
 	}
-} destroy;
+};
 
 }	// namespace bounded
