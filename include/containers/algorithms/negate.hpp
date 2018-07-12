@@ -12,7 +12,7 @@
 namespace containers {
 
 template<typename Predicate>
-constexpr auto negate(Predicate predicate) noexcept(std::is_nothrow_move_constructible<decltype(predicate)>{}) {
+constexpr auto negate(Predicate predicate) noexcept(std::is_nothrow_move_constructible_v<decltype(predicate)>) {
 	return [predicate = std::move(predicate)](auto && ... args) BOUNDED_NOEXCEPT(
 		!predicate(std::forward<decltype(args)>(args)...)
 	);

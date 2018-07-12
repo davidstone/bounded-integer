@@ -53,17 +53,14 @@ using std::begin_or_end; \
 \
 \
 template<typename T, typename Enable = void> \
-struct has_rvalue_c_ ## begin_or_end : std::false_type {}; \
+constexpr auto has_rvalue_ ## begin_or_end = false; \
 \
 template<typename T> \
-struct has_rvalue_c_ ## begin_or_end<T, decltype(rvalue_ref_qualified(&T::begin_or_end))> : std::true_type {}; \
-\
-template<typename T> \
-constexpr bool has_rvalue_ ## begin_or_end = has_rvalue_c_ ## begin_or_end<T>::value; \
+constexpr auto has_rvalue_ ## begin_or_end<T, decltype(rvalue_ref_qualified(&T::begin_or_end))> = true; \
 \
 \
 template<typename Iterable, BOUNDED_REQUIRES( \
-	std::is_rvalue_reference<Iterable &&>::value and \
+	std::is_rvalue_reference_v<Iterable &&> and \
 	has_rvalue_ ## begin_or_end<Iterable> \
 )> \
 constexpr auto begin_or_end(Iterable && iterable) BOUNDED_NOEXCEPT_VALUE( \
@@ -72,7 +69,7 @@ constexpr auto begin_or_end(Iterable && iterable) BOUNDED_NOEXCEPT_VALUE( \
 \
 template<typename Container, BOUNDED_REQUIRES( \
 	is_container<Container> and \
-	std::is_rvalue_reference<Container &&>::value and \
+	std::is_rvalue_reference_v<Container &&> and \
 	!has_rvalue_ ## begin_or_end<std::decay_t<Container>> \
 )> \
 constexpr auto begin_or_end(Container && container) BOUNDED_NOEXCEPT_VALUE( \

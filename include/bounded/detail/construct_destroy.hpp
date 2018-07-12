@@ -16,7 +16,7 @@ namespace detail {
 
 // A non-movable type still returns true for is_trivially_copyable and friends
 template<typename T>
-constexpr auto constexpr_constructible = std::is_move_assignable<T>{} and std::is_trivially_move_assignable<T>{} and std::is_trivially_destructible<T>{};
+constexpr auto constexpr_constructible = std::is_move_assignable_v<T> and std::is_trivially_move_assignable_v<T> and std::is_trivially_destructible_v<T>;
 
 // Try () initialization first, then {} initialization
 
@@ -24,12 +24,12 @@ constexpr auto constexpr_constructible = std::is_move_assignable<T>{} and std::i
 // implement guaranteed move elision
 template<typename T>
 struct construct_return_t {
-	template<typename... Args, BOUNDED_REQUIRES(std::is_constructible<T, Args...>{})>
+	template<typename... Args, BOUNDED_REQUIRES(std::is_constructible_v<T, Args...>)>
 	constexpr auto operator()(Args && ... args) const BOUNDED_NOEXCEPT_VALUE(
 		T(std::forward<Args>(args)...)
 	)
 	
-	template<typename... Args, BOUNDED_REQUIRES(not std::is_constructible<T, Args...>{})>
+	template<typename... Args, BOUNDED_REQUIRES(not std::is_constructible_v<T, Args...>)>
 	constexpr auto operator()(Args && ... args) const BOUNDED_NOEXCEPT_VALUE(
 		T{std::forward<Args>(args)...}
 	)
@@ -49,7 +49,7 @@ constexpr struct {
 	)
 
 	template<typename T, typename... Args, BOUNDED_REQUIRES(
-		std::is_constructible<T, Args...>{} and
+		std::is_constructible_v<T, Args...> and
 		not detail::constexpr_constructible<T>
 	)>
 	constexpr auto operator()(T & ref, Args && ... args) const BOUNDED_NOEXCEPT_REF(
@@ -57,7 +57,7 @@ constexpr struct {
 	)
 	
 	template<typename T, typename... Args, BOUNDED_REQUIRES(
-		not std::is_constructible<T, Args...>{} and
+		not std::is_constructible_v<T, Args...> and
 		not detail::constexpr_constructible<T>
 	)>
 	constexpr auto operator()(T & ref, Args && ... args) const BOUNDED_NOEXCEPT_REF(
@@ -67,11 +67,11 @@ constexpr struct {
 
 
 constexpr struct {
-	template<typename T, BOUNDED_REQUIRES(!std::is_trivially_destructible<T>{})>
+	template<typename T, BOUNDED_REQUIRES(!std::is_trivially_destructible_v<T>)>
 	constexpr auto operator()(T & ref) const BOUNDED_NOEXCEPT(
 		ref.~T()
 	)
-	template<typename T, BOUNDED_REQUIRES(std::is_trivially_destructible<T>{})>
+	template<typename T, BOUNDED_REQUIRES(std::is_trivially_destructible_v<T>)>
 	constexpr auto operator()(T &) const noexcept {
 	}
 } destroy;

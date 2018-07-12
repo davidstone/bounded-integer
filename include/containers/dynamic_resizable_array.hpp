@@ -42,7 +42,7 @@ struct dynamic_resizable_array : private Container {
 	) {
 	}
 	
-	template<typename Count, BOUNDED_REQUIRES(std::is_convertible<Count, size_type>::value)>
+	template<typename Count, BOUNDED_REQUIRES(std::is_convertible_v<Count, size_type>)>
 	constexpr explicit dynamic_resizable_array(Count const count, allocator_type allocator_ = allocator_type()):
 		Container(std::move(allocator_))
 	{
@@ -52,7 +52,7 @@ struct dynamic_resizable_array : private Container {
 		::containers::uninitialized_default_construct(begin(*this), begin(*this) + count, get_allocator());
 		this->set_size(count);
 	}
-	template<typename Count, BOUNDED_REQUIRES(std::is_convertible<Count, size_type>::value)>
+	template<typename Count, BOUNDED_REQUIRES(std::is_convertible_v<Count, size_type>)>
 	constexpr dynamic_resizable_array(Count const count, value_type const & value, allocator_type allocator_ = allocator_type()):
 		Container(std::move(allocator_))
 	{
@@ -89,7 +89,7 @@ struct dynamic_resizable_array : private Container {
 	{
 	}
 
-	constexpr auto & operator=(dynamic_resizable_array const & other) & noexcept(std::is_nothrow_copy_assignable<value_type>::value) {
+	constexpr auto & operator=(dynamic_resizable_array const & other) & noexcept(std::is_nothrow_copy_assignable_v<value_type>) {
 		assign(*this, begin(other), end(other));
 		return *this;
 	}
@@ -245,6 +245,6 @@ private:
 }	// namespace detail
 
 template<typename Container>
-struct is_container_c<detail::dynamic_resizable_array<Container>> : std::true_type {};
+constexpr auto is_container<detail::dynamic_resizable_array<Container>> = true;
 
 }	// namespace containers

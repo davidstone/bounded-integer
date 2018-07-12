@@ -37,20 +37,20 @@ constexpr auto check_constructibility() {
 	);
 
 	static_assert(
-		std::is_convertible<int, type>{},
+		std::is_convertible_v<int, type>,
 		"Cannot convert integer type to bounded::integer with same range."
 	);
 	static_assert(
-		std::is_constructible<type, type, bounded::non_check_t>{},
+		std::is_constructible_v<type, type, bounded::non_check_t>,
 		"Cannot construct a type from itself with non_check_t."
 	);
 
 	static_assert(
-		!std::is_convertible<bool, type>{},
+		!std::is_convertible_v<bool, type>,
 		"Should not be able to convert a bool to a bounded::integer."
 	);
 	static_assert(
-		std::is_constructible<type, bool>{},
+		std::is_constructible_v<type, bool>,
 		"Should be able to construct a bounded::integer from a bool."
 	);
 }

@@ -63,7 +63,7 @@ struct integer_range_iterator {
 	
 	friend constexpr auto operator-(integer_range_iterator const & lhs, integer_range_iterator const & rhs) noexcept -> difference_type {
 		static_assert(
-			std::is_same<decltype(lhs.m_value - rhs.m_value), difference_type>{},
+			std::is_same_v<decltype(lhs.m_value - rhs.m_value), difference_type>,
 			"Incorrect difference_type."
 		);
 		return lhs.m_value - rhs.m_value;

@@ -17,7 +17,7 @@ using uninitialized_storage = std::aligned_storage_t<sizeof(T), alignof(T)>;
 // reinterpret_cast if T can be trivially used as storage.
 template<typename T>
 using trivial_storage = std::conditional_t<
-	std::is_trivially_default_constructible<T>::value and std::is_trivially_destructible<T>::value,
+	std::is_trivially_default_constructible_v<T> and std::is_trivially_destructible_v<T>,
 	T,
 	uninitialized_storage<T>
 >;

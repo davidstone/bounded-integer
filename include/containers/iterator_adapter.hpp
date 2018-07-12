@@ -164,33 +164,33 @@ private:
 	using base_iterator_category = typename std::iterator_traits<Iterator>::iterator_category;
 public:
 	static_assert(
-		std::is_empty<SubtractFunction>::value,
+		std::is_empty_v<SubtractFunction>,
 		"SubtractFunction must be a stateless function. Would we use the state from the left- or right-hand side?"
 	);
 	static_assert(
-		std::is_empty<CompareFunction>::value,
+		std::is_empty_v<CompareFunction>,
 		"CompareFunction must be a stateless comparison function. Would we use the state from the left- or right-hand side?"
 	);
 	using value_type = std::decay_t<decltype(std::declval<DereferenceFunction>()(std::declval<Iterator>()))>;
 	using difference_type = typename std::iterator_traits<Iterator>::difference_type;
 	using iterator_category =
-		std::conditional_t<std::is_same<base_iterator_category, std::output_iterator_tag>{}, std::output_iterator_tag,
-		std::conditional_t<std::is_same<base_iterator_category, std::input_iterator_tag>{}, std::input_iterator_tag,
+		std::conditional_t<std::is_same_v<base_iterator_category, std::output_iterator_tag>, std::output_iterator_tag,
+		std::conditional_t<std::is_same_v<base_iterator_category, std::input_iterator_tag>, std::input_iterator_tag,
 		std::conditional_t<detail::is_random_access_iterator<Iterator, SubtractFunction>(), std::random_access_iterator_tag,
 		std::conditional_t<detail::is_bidirectional_iterator<Iterator, AddFunction>(), std::bidirectional_iterator_tag,
 		std::conditional_t<detail::is_forward_iterator<Iterator, AddFunction>(), std::forward_iterator_tag,
 		void
 	>>>>>;
-	static_assert(not std::is_void<iterator_category>{});
+	static_assert(not std::is_void_v<iterator_category>);
 
 	// Not sure what these actually mean...
 	using pointer = typename std::iterator_traits<Iterator>::pointer;
-	using reference = std::conditional_t<std::is_reference<value_type>::value, value_type, value_type &>;
+	using reference = std::conditional_t<std::is_reference_v<value_type>, value_type, value_type &>;
 
 	// Even though subtract and compare must be stateless, we must still keep
 	// them around. This is because there is no guarantee that they are
 	// default-constructible: for instance, lambdas.
-	constexpr iterator_adapter(Iterator it, DereferenceFunction dereference, AddFunction add, SubtractFunction subtract, CompareFunction compare) noexcept(std::is_nothrow_constructible<tuple_t, Iterator, DereferenceFunction, AddFunction, SubtractFunction, CompareFunction>::value):
+	constexpr iterator_adapter(Iterator it, DereferenceFunction dereference, AddFunction add, SubtractFunction subtract, CompareFunction compare) noexcept(std::is_nothrow_constructible_v<tuple_t, Iterator, DereferenceFunction, AddFunction, SubtractFunction, CompareFunction>):
 		m_data(std::move(it), std::move(dereference), std::move(add), std::move(subtract), std::move(compare))
 	{
 	}

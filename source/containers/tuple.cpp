@@ -38,7 +38,7 @@ constexpr auto a = containers::tuple<int, empty, int>(0, empty{}, 5);
 
 static_assert(a[0_bi] == 0);
 
-static_assert(std::is_same<decltype(a[1_bi]), empty const &>::value);
+static_assert(std::is_same_v<decltype(a[1_bi]), empty const &>);
 
 static_assert(std::is_same<decltype(containers::tuple<int>{}[0_bi]), int &&>::value);
 static_assert(std::is_same<decltype(containers::tuple<empty>{}[0_bi]), empty &&>::value);

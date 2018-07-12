@@ -170,19 +170,19 @@ constexpr auto size(std::map<Ts...> const & std_map) {
 }
 
 template<typename>
-struct is_std_map : std::false_type {};
+constexpr auto is_std_map = false;
 
 template<typename Key, typename Value, typename Compare, typename Allocator>
-struct is_std_map<std::map<Key, Value, Compare, Allocator>> : std::true_type {};
+constexpr auto is_std_map<std::map<Key, Value, Compare, Allocator>> = true;
 
-template<typename container_type, typename... Args, BOUNDED_REQUIRES(is_std_map<container_type>::value)>
-constexpr auto generic_forward_as_tuple(Args && ... args) BOUNDED_NOEXCEPT_VALUE(
-	std::forward_as_tuple(std::forward<Args>(args)...)
-)
-template<typename container_type, typename... Args, BOUNDED_REQUIRES(!is_std_map<container_type>::value)>
-constexpr auto generic_forward_as_tuple(Args && ... args) BOUNDED_NOEXCEPT_VALUE(
-	::containers::tie(std::forward<Args>(args)...)
-)
+template<typename container_type, typename... Args>
+constexpr auto generic_forward_as_tuple(Args && ... args) noexcept {
+	if constexpr (is_std_map<container_type>) {
+		return std::forward_as_tuple(std::forward<Args>(args)...);
+	} else {
+		return ::containers::tie(std::forward<Args>(args)...);
+	}
+}
 
 template<typename container_type>
 void test() {

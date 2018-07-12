@@ -91,7 +91,7 @@ public:
 	class value_compare_type {
 	protected:
 		friend struct flat_map_base;
-		constexpr value_compare_type(key_compare_type c) noexcept(std::is_nothrow_move_constructible<key_compare_type>::value):
+		constexpr value_compare_type(key_compare_type c) noexcept(std::is_nothrow_move_constructible_v<key_compare_type>):
 			m_compare(std::move(c)) {
 		}
 		key_compare_type m_compare;
@@ -164,7 +164,7 @@ public:
 	) {
 	}
 	
-	constexpr auto & operator=(std::initializer_list<value_type> init) & noexcept(noexcept(flat_map_base(init)) and std::is_nothrow_move_assignable<flat_map_base>{}) {
+	constexpr auto & operator=(std::initializer_list<value_type> init) & noexcept(noexcept(flat_map_base(init)) and std::is_nothrow_move_assignable_v<flat_map_base>) {
 		return *this = flat_map_base(init);
 	}
 	
@@ -621,7 +621,7 @@ using flat_map = detail::flat_map<vector<detail::map_value_type<Key, T>, Allocat
 
 
 template<typename Key, typename T, typename Compare, typename Allocator>
-struct is_container_c<flat_map<Key, T, Compare, Allocator>> : std::true_type {};
+constexpr auto is_container<flat_map<Key, T, Compare, Allocator>> = true;
 
 
 
@@ -630,6 +630,6 @@ using flat_multimap = detail::flat_multimap<vector<detail::map_value_type<Key, T
 
 
 template<typename Key, typename T, typename Compare, typename Allocator>
-struct is_container_c<flat_multimap<Key, T, Compare, Allocator>> : std::true_type {};
+constexpr auto is_container<flat_multimap<Key, T, Compare, Allocator>> = true;
 
 }	// namespace containers

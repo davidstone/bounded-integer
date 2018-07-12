@@ -88,7 +88,7 @@ struct vector_base {
 	}
 	
 	template<typename Size>
-	auto set_size(Size const s) noexcept(std::is_nothrow_assignable<size_type, Size>{}) {
+	auto set_size(Size const s) noexcept(std::is_nothrow_assignable_v<size_type, Size>) {
 		m_size = s;
 	}
 private:
@@ -99,7 +99,7 @@ private:
 }	// namespace detail
 
 template<typename T, typename Allocator>
-struct is_container_c<detail::vector_base<T, Allocator>> : std::true_type {};
+constexpr auto is_container<detail::vector_base<T, Allocator>> = true;
 
 template<typename T, typename Allocator = allocator<T>>
 using vector = detail::dynamic_resizable_array<detail::vector_base<T, Allocator>>;

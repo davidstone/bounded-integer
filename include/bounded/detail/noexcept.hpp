@@ -27,7 +27,7 @@
 #define BOUNDED_NOEXCEPT_DECLTYPE(...) \
 	noexcept( \
 		noexcept(__VA_ARGS__) and \
-		std::is_nothrow_move_constructible<decltype(__VA_ARGS__)>{} \
+		std::is_nothrow_move_constructible_v<decltype(__VA_ARGS__)> \
 	) -> decltype(__VA_ARGS__) { \
 		return __VA_ARGS__; \
 	}

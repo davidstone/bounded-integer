@@ -88,10 +88,10 @@ private:
 	template<typename Compare, typename T1, typename T2>
 	static constexpr auto noexcept_extreme() noexcept {
 		using result_t = result_type<Compare, T1, T2>;
-		if constexpr (not std::is_constructible<result_t, T1>{} or not std::is_constructible<result_t, T2>{}) {
-			return std::true_type{};
+		if constexpr (not std::is_constructible_v<result_t, T1> or not std::is_constructible_v<result_t, T2>) {
+			return true;
 		} else {
-			return std::bool_constant<noexcept(extreme_two(std::declval<Compare>(), std::declval<T2>(), std::declval<T1>()))>{};
+			return noexcept(extreme_two(std::declval<Compare>(), std::declval<T2>(), std::declval<T1>()));
 		}
 	}
 	
@@ -113,10 +113,10 @@ public:
 	template<typename Compare, typename T1, typename T2>
 	constexpr decltype(auto) operator()(Compare compare, T1 && t1, T2 && t2) const noexcept(noexcept_extreme<Compare, T1 &&, T2 &&>()) {
 		using result_t = result_type<Compare, T1, T2>;
-		if constexpr (not std::is_constructible<result_t, T2>{}) {
+		if constexpr (not std::is_constructible_v<result_t, T2>) {
 			static_cast<void>(compare);
 			return std::forward<T1>(t1);
-		} else if constexpr (not std::is_constructible<result_t, T1>{}) {
+		} else if constexpr (not std::is_constructible_v<result_t, T1>) {
 			static_cast<void>(compare);
 			return std::forward<T2>(t2);
 		} else {

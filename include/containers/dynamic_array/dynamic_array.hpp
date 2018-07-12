@@ -140,7 +140,7 @@ struct dynamic_array : private detail::rebound_allocator<T, Allocator> {
 	using size_type = typename detail::dynamic_array_data_t<value_type>::size_type;
 
 	using allocator_type = detail::rebound_allocator<value_type, Allocator>;
-	static_assert(std::is_empty<allocator_type>::value, "Stateful allocators not yet supported.");
+	static_assert(std::is_empty_v<allocator_type>, "Stateful allocators not yet supported.");
 
 	using const_iterator = detail::basic_array_iterator<value_type const, dynamic_array>;
 	using iterator = detail::basic_array_iterator<value_type, dynamic_array>;
@@ -174,13 +174,13 @@ struct dynamic_array : private detail::rebound_allocator<T, Allocator> {
 	{
 	}
 
-	template<typename Count, BOUNDED_REQUIRES(std::is_convertible<Count, size_type>::value)>
+	template<typename Count, BOUNDED_REQUIRES(std::is_convertible_v<Count, size_type>)>
 	explicit constexpr dynamic_array(Count const count, allocator_type allocator_ = allocator_type{}):
 		allocator_type(std::move(allocator_)),
 		m_data(::containers::detail::dynamic_array_initializer(count, get_allocator()))
 	{
 	}
-	template<typename Count, BOUNDED_REQUIRES(std::is_convertible<Count, size_type>::value)>
+	template<typename Count, BOUNDED_REQUIRES(std::is_convertible_v<Count, size_type>)>
 	constexpr dynamic_array(Count const count, value_type const & value, allocator_type allocator_ = allocator_type{}):
 		allocator_type(std::move(allocator_))
 	{
@@ -243,7 +243,7 @@ private:
 
 
 template<typename T, typename Allocator>
-struct is_container_c<dynamic_array<T, Allocator>> : std::true_type {};
+constexpr auto is_container<dynamic_array<T, Allocator>> = true;
 
 
 template<typename T, typename ForwardIterator, typename Sentinel, BOUNDED_REQUIRES(is_iterator_sentinel<ForwardIterator, Sentinel>)>

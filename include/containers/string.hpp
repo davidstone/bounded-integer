@@ -35,7 +35,7 @@ public:
 	// other array that has not yet decayed. This prevents some cases of
 	// undefined behavior where we index past the end of the provided array.
 	template<typename CString, typename Size, BOUNDED_REQUIRES(
-		(std::is_same<std::decay_t<CString>, T const *>::value or std::is_same<std::decay_t<CString>, T *>::value) and
+		(std::is_same_v<std::decay_t<CString>, T const *> or std::is_same_v<std::decay_t<CString>, T *>) and
 		std::numeric_limits<Size>::is_integer
 	)>
 	constexpr basic_string(CString const & str, Size const size, allocator_type allocator_ = allocator_type()) BOUNDED_NOEXCEPT_INITIALIZATION(
@@ -71,7 +71,7 @@ public:
 };
 
 template<typename T, typename Allocator>
-struct is_container_c<basic_string<T, Allocator>> : std::true_type {};
+constexpr auto is_container<basic_string<T, Allocator>> = true;
 
 
 // TODO: Write a c_string end sentinel for a one-pass algorithm

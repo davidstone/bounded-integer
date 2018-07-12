@@ -17,12 +17,12 @@ using namespace bounded::literal;
 
 template<typename Function>
 struct scope_guard {
-	constexpr explicit scope_guard(Function f) noexcept(std::is_nothrow_move_constructible<Function>{}):
+	constexpr explicit scope_guard(Function f) noexcept(std::is_nothrow_move_constructible_v<Function>):
 		m_data(std::move(f), true)
 	{
 	}
 	
-	constexpr scope_guard(scope_guard && other) noexcept(std::is_nothrow_move_constructible<Function>{}):
+	constexpr scope_guard(scope_guard && other) noexcept(std::is_nothrow_move_constructible_v<Function>):
 		m_data(
 			std::move(other.m_data[function]),
 			std::exchange(other.m_data[is_active], false)

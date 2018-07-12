@@ -40,13 +40,10 @@ template<typename...>
 using void_t = void;
 
 template<typename T, typename Enable = void>
-struct incrementable_by_bounded_c : std::false_type {};
+constexpr auto incrementable_by_bounded = false;
 
 template<typename T>
-struct incrementable_by_bounded_c<T, void_t<decltype(std::declval<T &>() += bounded::constant<1>)>> : std::true_type {};
-
-template<typename T>
-constexpr auto incrementable_by_bounded = incrementable_by_bounded_c<T>{};
+constexpr auto incrementable_by_bounded<T, void_t<decltype(std::declval<T &>() += bounded::constant<1>)>> = true;
 
 template<typename T, BOUNDED_REQUIRES(incrementable_by_bounded<T>)>
 constexpr auto operator++(T & value) BOUNDED_NOEXCEPT_DECLTYPE(
@@ -58,7 +55,7 @@ constexpr auto operator++(T & value) BOUNDED_NOEXCEPT_DECLTYPE(
 )
 
 template<typename T>
-constexpr auto operator++(T & value, int) noexcept(std::is_nothrow_copy_constructible<T>{} and std::is_nothrow_move_constructible<T>{} and noexcept(++value)) {
+constexpr auto operator++(T & value, int) noexcept(std::is_nothrow_copy_constructible_v<T> and std::is_nothrow_move_constructible_v<T> and noexcept(++value)) {
 	auto previous = value;
 	++value;
 	return previous;
@@ -66,13 +63,10 @@ constexpr auto operator++(T & value, int) noexcept(std::is_nothrow_copy_construc
 
 
 template<typename T, typename Enable = void>
-struct decrementable_by_bounded_c : std::false_type {};
+constexpr auto decrementable_by_bounded = false;
 
 template<typename T>
-struct decrementable_by_bounded_c<T, void_t<decltype(std::declval<T &>() -= bounded::constant<1>)>> : std::true_type {};
-
-template<typename T>
-constexpr auto decrementable_by_bounded = decrementable_by_bounded_c<T>{};
+constexpr auto decrementable_by_bounded<T, void_t<decltype(std::declval<T &>() -= bounded::constant<1>)>> = true;
 
 template<typename T, BOUNDED_REQUIRES(decrementable_by_bounded<T>)>
 constexpr auto operator--(T & value) BOUNDED_NOEXCEPT_DECLTYPE(
@@ -84,7 +78,7 @@ constexpr auto operator--(T & value) BOUNDED_NOEXCEPT_DECLTYPE(
 )
 
 template<typename T>
-constexpr auto operator--(T & value, int) noexcept(std::is_nothrow_copy_constructible<T>{} and std::is_nothrow_move_constructible<T>{} and noexcept(--value)) {
+constexpr auto operator--(T & value, int) noexcept(std::is_nothrow_copy_constructible_v<T> and std::is_nothrow_move_constructible_v<T> and noexcept(--value)) {
 	auto previous = value;
 	--value;
 	return previous;

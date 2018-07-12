@@ -23,7 +23,7 @@ constexpr auto compare(LHS * const lhs, RHS * const rhs) noexcept {
 }
 
 // TODO: Implement correctly
-template<typename LHS, typename RHS, BOUNDED_REQUIRES(std::is_floating_point<LHS>{} and std::is_floating_point<RHS>{})>
+template<typename LHS, typename RHS, BOUNDED_REQUIRES(std::is_floating_point_v<LHS> and std::is_floating_point_v<RHS>)>
 constexpr auto compare(LHS const lhs, RHS const rhs) noexcept {
 	return lhs == rhs ? strong_ordering_equal : lhs < rhs ? strong_ordering_less : strong_ordering_greater;
 }
@@ -35,22 +35,22 @@ constexpr auto compare(LHS const lhs, RHS const rhs) noexcept -> strong_ordering
 			(lhs < rhs) ? strong_ordering_less :
 			(lhs > rhs) ? strong_ordering_greater :
 			strong_ordering_equal;
-	} else if constexpr (not std::is_same<LHS, detail::max_unsigned_t>{} and not std::is_same<RHS, detail::max_unsigned_t>{}) {
+	} else if constexpr (not std::is_same_v<LHS, detail::max_unsigned_t> and not std::is_same_v<RHS, detail::max_unsigned_t>) {
 		return compare(static_cast<detail::max_signed_t>(lhs), static_cast<detail::max_signed_t>(rhs));
 	} else if constexpr (detail::is_signed_builtin<LHS>) {
-		static_assert(std::is_same<RHS, detail::max_unsigned_t>{});
+		static_assert(std::is_same_v<RHS, detail::max_unsigned_t>);
 		return (lhs < static_cast<LHS>(basic_numeric_limits<RHS>::min()) or basic_numeric_limits<LHS>::max() < rhs) ?
 			strong_ordering_less :
 			compare(lhs, static_cast<LHS>(rhs));
 	} else {
-		static_assert(std::is_same<LHS, detail::max_unsigned_t>{});
+		static_assert(std::is_same_v<LHS, detail::max_unsigned_t>);
 		return (rhs < static_cast<RHS>(basic_numeric_limits<LHS>::min()) or basic_numeric_limits<RHS>::max() < lhs) ?
 			strong_ordering_greater :
 			compare(static_cast<RHS>(lhs), rhs);
 	}
 }
 
-template<typename Enum, BOUNDED_REQUIRES(std::is_enum<Enum>{})>
+template<typename Enum, BOUNDED_REQUIRES(std::is_enum_v<Enum>)>
 constexpr auto compare(Enum const lhs, Enum const rhs) noexcept {
 	using underlying = std::underlying_type_t<Enum>;
 	return bounded::compare(static_cast<underlying>(lhs), static_cast<underlying>(rhs));
@@ -70,7 +70,7 @@ constexpr auto safe_extreme(UnaryFunction const pick_lhs, LHS const lhs_, RHS co
 	};
 	auto const lhs = normalized(lhs_);
 	auto const rhs = normalized(rhs_);
-	using result_type = std::conditional_t<std::is_same<decltype(lhs), decltype(rhs)>{}, decltype(lhs), Limited>;
+	using result_type = std::conditional_t<std::is_same_v<decltype(lhs), decltype(rhs)>, decltype(lhs), Limited>;
 	return (pick_lhs(compare(lhs, rhs))) ?
 		static_cast<result_type>(lhs) :
 		static_cast<result_type>(rhs);

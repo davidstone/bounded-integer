@@ -14,7 +14,7 @@
 namespace containers {
 
 template<typename InputIterator, typename Sentinel, typename UnaryPredicate>
-constexpr auto find_if(InputIterator first, Sentinel const last, UnaryPredicate p) noexcept(noexcept(first != last) and noexcept(++first) and noexcept(p(*first)) and std::is_nothrow_move_constructible<InputIterator>::value) {
+constexpr auto find_if(InputIterator first, Sentinel const last, UnaryPredicate p) noexcept(noexcept(first != last) and noexcept(++first) and noexcept(p(*first)) and std::is_nothrow_move_constructible_v<InputIterator>) {
 	for (; first != last; ++first) {
 		if (p(*first)) {
 			break;

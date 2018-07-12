@@ -145,7 +145,7 @@ constexpr auto check_integer_optional() {
 	optional_integer = integer_type(7);
 	assert(optional_integer);
 
-	static_assert(std::is_same<decltype(*optional_integer), integer_type &>{}, "Incorrect type of *optional.");
+	static_assert(std::is_same_v<decltype(*optional_integer), integer_type &>, "Incorrect type of *optional.");
 	*optional_integer = integer_type(1);
 	assert(optional_integer);
 	assert(*optional_integer == 1);
@@ -162,14 +162,14 @@ constexpr auto check_non_trivial_optional() {
 	assert(!uninitialized_optional);
 	decltype(auto) uninitialized_value_or = value_or(uninitialized_optional, "spork");
 	assert(uninitialized_value_or == "spork");
-	static_assert(std::is_same<decltype(uninitialized_value_or), type>{}, "value_or incorrect for uninitialized");
-	static_assert(std::is_same<decltype(value_or(std::move(uninitialized_optional), type("spoon"))), type &&>{}, "value_or incorrect for uninitialized");
+	static_assert(std::is_same_v<decltype(uninitialized_value_or), type>, "value_or incorrect for uninitialized");
+	static_assert(std::is_same_v<decltype(value_or(std::move(uninitialized_optional), type("spoon"))), type &&>, "value_or incorrect for uninitialized");
 	bounded::optional<type> optional_string("Hello");
 	assert(optional_string);
 	auto const default_value = type("knife");
 	decltype(auto) initialized_value_or = value_or(optional_string, default_value);
 	assert(initialized_value_or == "Hello");
-	static_assert(std::is_same<decltype(initialized_value_or), type const &>{}, "value_or incorrect for initialized");
+	static_assert(std::is_same_v<decltype(initialized_value_or), type const &>, "value_or incorrect for initialized");
 	assert(*optional_string == "Hello");
 
 	optional_string = uninitialized_optional;
@@ -182,7 +182,7 @@ constexpr auto check_non_trivial_optional() {
 	assert(optional_string == "Yo");
 	assert(optional_string != "Sup");
 
-	static_assert(std::is_same<decltype(*optional_string), type &>{}, "Incorrect type of *optional.");
+	static_assert(std::is_same_v<decltype(*optional_string), type &>, "Incorrect type of *optional.");
 	*optional_string = type("Hiya");
 	assert(optional_string);
 	assert(*optional_string == "Hiya");
@@ -216,7 +216,7 @@ auto check_optional() {
 
 auto check_to_string() {
 	auto const result = bounded::to_string(bounded::constant<4>);
-	static_assert(std::is_same<decltype(result), std::string const>{}, "Incorrect type of to_string.");
+	static_assert(std::is_same_v<decltype(result), std::string const>, "Incorrect type of to_string.");
 	assert(result == "4");
 }
 

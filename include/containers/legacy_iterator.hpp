@@ -25,11 +25,11 @@ struct legacy_iterator {
 	using iterator_category = typename std::iterator_traits<Iterator>::iterator_category;
 
 	legacy_iterator() = default;
-	constexpr legacy_iterator(Iterator it) noexcept(std::is_nothrow_move_constructible<Iterator>::value):
+	constexpr legacy_iterator(Iterator it) noexcept(std::is_nothrow_move_constructible_v<Iterator>):
 		m_it(std::move(it)) {
 	}
 	
-	constexpr auto base() const noexcept(std::is_nothrow_copy_constructible<Iterator>::value) {
+	constexpr auto base() const noexcept(std::is_nothrow_copy_constructible_v<Iterator>) {
 		return m_it;
 	}
 

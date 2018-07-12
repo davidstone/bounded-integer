@@ -161,8 +161,8 @@ struct sbo_vector_base : private detail::rebound_allocator<T, Allocator> {
 	using allocator_type = detail::rebound_allocator<value_type, Allocator>;
 	using small_t = small_t<value_type, requested_small_capacity>;
 	using large_t = large_t<value_type, requested_small_capacity>;
-	static_assert(std::is_nothrow_move_constructible<value_type>{});
-	static_assert(std::is_nothrow_move_assignable<value_type>{});
+	static_assert(std::is_nothrow_move_constructible_v<value_type>);
+	static_assert(std::is_nothrow_move_assignable_v<value_type>);
 	using size_type = typename large_t::size_type;
 
 	static_assert(
@@ -188,7 +188,7 @@ struct sbo_vector_base : private detail::rebound_allocator<T, Allocator> {
 		m_small()
 	{
 	}
-	constexpr sbo_vector_base(allocator_type allocator_) noexcept(std::is_nothrow_move_constructible<allocator_type>{}):
+	constexpr sbo_vector_base(allocator_type allocator_) noexcept(std::is_nothrow_move_constructible_v<allocator_type>):
 		allocator_type(std::move(allocator_)),
 		m_small()
 	{
@@ -323,8 +323,8 @@ private:
 	}
 	
 	static_assert(sizeof(small_t) >= sizeof(large_t), "Incorrect buffer sizes.");
-	static_assert(std::is_standard_layout<small_t>{});
-	static_assert(std::is_standard_layout<large_t>{});
+	static_assert(std::is_standard_layout_v<small_t>);
+	static_assert(std::is_standard_layout_v<large_t>);
 
 	union {
 		small_t m_small;
@@ -336,7 +336,7 @@ private:
 }	// namespace detail
 
 template<typename T, std::size_t requested_capacity, typename Allocator>
-struct is_container_c<detail::sbo_vector_base<T, requested_capacity, Allocator>> : std::true_type {};
+constexpr auto is_container<detail::sbo_vector_base<T, requested_capacity, Allocator>> = true;
 
 template<typename T, std::size_t requested_small_capacity, typename Allocator = allocator<T>>
 using small_buffer_optimized_vector = detail::dynamic_resizable_array<detail::sbo_vector_base<T, requested_small_capacity, Allocator>>;

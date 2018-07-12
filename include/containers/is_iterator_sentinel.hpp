@@ -12,20 +12,17 @@ namespace containers {
 namespace detail {
 
 template<typename LHS, typename RHS, typename Enable = void>
-struct comparable_c : std::false_type {};
+constexpr auto comparable = false;
 
 template<typename LHS, typename RHS>
-struct comparable_c<
+constexpr auto comparable<
 	LHS,
 	RHS,
 	void_t<
 		decltype(std::declval<LHS const &>() == std::declval<RHS const &>()),
 		decltype(std::declval<LHS const &>() != std::declval<RHS const &>())
 	>
-> : std::true_type {};
-
-template<typename LHS, typename RHS>
-constexpr auto comparable = comparable_c<LHS, RHS>::value;
+> = true;
 
 }	// namespace detail
 

@@ -15,7 +15,7 @@ namespace bounded {
 namespace detail {
 
 template<typename lhs_policy, typename rhs_policy>
-using common_policy = std::conditional_t<std::is_same<lhs_policy, rhs_policy>{}, lhs_policy, bounded::null_policy>;
+using common_policy = std::conditional_t<std::is_same_v<lhs_policy, rhs_policy>, lhs_policy, bounded::null_policy>;
 
 }	// namespace detail
 }	// namespace bounded

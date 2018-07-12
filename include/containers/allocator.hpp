@@ -40,33 +40,26 @@ constexpr auto compare(allocator<LHS>, allocator<RHS>) noexcept {
 namespace detail {
 
 template<typename A, typename T, typename Args, typename Enable = void>
-struct allocator_has_construct_c : std::false_type {};
+constexpr auto allocator_has_construct = false;
 
 template<typename A, typename T, typename... Args>
-struct allocator_has_construct_c<
+constexpr auto allocator_has_construct<
 	A,
 	T,
 	types<Args...>,
 	void_t<decltype(std::declval<A &>().construct(std::declval<T *>(), std::declval<Args>()...))>
-> : std::true_type {};
-
-template<typename A, typename T, typename... Args>
-constexpr auto allocator_has_construct = allocator_has_construct_c<A, T, types<Args...>>::value;
+> = true;
 
 
 template<typename A, typename T, typename Enable = void>
-struct allocator_has_destroy_c : std::false_type {};
+constexpr auto allocator_has_destroy = false;
 
 template<typename A, typename T>
-struct allocator_has_destroy_c<
+constexpr auto allocator_has_destroy<
 	A,
 	T,
 	void_t<decltype(std::declval<A &>().destroy(std::declval<T *>()))>
-> : std::true_type {};
-
-template<typename A, typename T>
-constexpr auto allocator_has_destroy = allocator_has_destroy_c<A, T>::value;
-
+> = true;
 
 }	// namespace detail
 
@@ -99,24 +92,23 @@ public:
 	using base::select_on_container_copy_construction;
 	
 
-	template<typename T, typename... Args, BOUNDED_REQUIRES(detail::allocator_has_construct<allocator_type, T, Args...>)>
-	static constexpr auto & construct(allocator_type & a, T * const ptr, Args && ... args) BOUNDED_NOEXCEPT(
-		*a.construct(ptr, std::forward<Args>(args)...)
-	)
-	template<typename T, typename... Args, BOUNDED_REQUIRES(!detail::allocator_has_construct<allocator_type, T, Args...>)>
-	static constexpr auto construct(allocator_type &, T * const ptr, Args && ... args) BOUNDED_NOEXCEPT_REF(
-		::bounded::construct(*ptr, std::forward<Args>(args)...)
-	)
-	
+	template<typename T, typename... Args>
+	static constexpr auto & construct(allocator_type & a, T * const ptr, Args && ... args) noexcept(std::is_nothrow_constructible_v<T, Args...>) {
+		if constexpr (detail::allocator_has_construct<allocator_type, T, detail::types<Args...>>) {
+			return *a.construct(ptr, std::forward<Args>(args)...);
+		} else {
+			return ::bounded::construct(*ptr, std::forward<Args>(args)...);
+		}
+	}
 
-	template<typename T, BOUNDED_REQUIRES(detail::allocator_has_destroy<allocator_type, T>)>
-	static constexpr auto destroy(allocator_type & a, T * const ptr) BOUNDED_NOEXCEPT(
-		static_cast<void>(a.destroy(ptr))
-	)
-	template<typename T, BOUNDED_REQUIRES(!detail::allocator_has_destroy<allocator_type, T>)>
-	static constexpr auto destroy(allocator_type &, T * const ptr) BOUNDED_NOEXCEPT(
-		::bounded::destroy(*ptr)
-	)
+	template<typename T>
+	static constexpr auto destroy(allocator_type & a, T * const ptr) noexcept {
+		if constexpr (detail::allocator_has_destroy<allocator_type, T>) {
+			a.destroy(ptr);
+		} else {
+			::bounded::destroy(*ptr);
+		}
+	}
 };
 
 }	// namespace containers

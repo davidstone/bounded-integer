@@ -15,7 +15,7 @@ template<typename integer>
 constexpr auto check_numeric_limits() {
 	using int_limits = std::numeric_limits<integer>;
 	using bounded_t = bounded::checked_integer<int_limits::min(), int_limits::max()>;
-	static_assert(std::is_same<typename bounded_t::underlying_type, integer>{}, "Incorrect underlying_type.");
+	static_assert(std::is_same_v<typename bounded_t::underlying_type, integer>, "Incorrect underlying_type.");
 	using bounded_limits = std::numeric_limits<bounded_t>;
 	static_assert(sizeof(bounded_t) == sizeof(integer), "checked_integer wrong size.");
 

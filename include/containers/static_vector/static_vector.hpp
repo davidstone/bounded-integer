@@ -36,7 +36,7 @@ namespace detail {
 //
 // This should also improve debug-mode performance.
 
-template<typename T, std::size_t capacity, bool trivial = std::is_trivially_destructible<T>::value>
+template<typename T, std::size_t capacity, bool trivial = std::is_trivially_destructible_v<T>>
 struct static_vector_data;
 
 template<typename T, std::size_t capacity>
@@ -70,11 +70,11 @@ public:
 
 	constexpr static_vector() = default;
 	
-	template<typename Count, BOUNDED_REQUIRES(std::is_convertible<Count, size_type>::value)>
+	template<typename Count, BOUNDED_REQUIRES(std::is_convertible_v<Count, size_type>)>
 	constexpr explicit static_vector(Count const count) BOUNDED_NOEXCEPT_INITIALIZATION(
 		static_vector(count_constructor{}, count)
 	) {}
-	template<typename Count, BOUNDED_REQUIRES(std::is_convertible<Count, size_type>::value)>
+	template<typename Count, BOUNDED_REQUIRES(std::is_convertible_v<Count, size_type>)>
 	constexpr static_vector(Count const count, value_type const & value) BOUNDED_NOEXCEPT_INITIALIZATION(
 		static_vector(count_constructor{}, count, value)
 	) {}
@@ -97,11 +97,11 @@ public:
 		static_vector(begin(init), end(init))
 	) {}
 
-	constexpr auto & operator=(static_vector const & other) & noexcept(std::is_nothrow_copy_assignable<value_type>::value) {
+	constexpr auto & operator=(static_vector const & other) & noexcept(std::is_nothrow_copy_assignable_v<value_type>) {
 		assign(*this, begin(other), end(other));
 		return *this;
 	}
-	constexpr auto & operator=(static_vector && other) & noexcept(std::is_nothrow_move_assignable<value_type>::value) {
+	constexpr auto & operator=(static_vector && other) & noexcept(std::is_nothrow_move_assignable_v<value_type>) {
 		assign(*this, begin(std::move(other)), end(std::move(other)));
 		return *this;
 	}
@@ -177,7 +177,7 @@ private:
 	}
 
 	template<typename Count, typename... MaybeInitializer>
-	constexpr explicit static_vector(count_constructor, Count const count, MaybeInitializer && ... args) noexcept(std::is_nothrow_constructible<value_type, MaybeInitializer && ...>::value) {
+	constexpr explicit static_vector(count_constructor, Count const count, MaybeInitializer && ... args) noexcept(std::is_nothrow_constructible_v<value_type, MaybeInitializer && ...>) {
 		static_assert(sizeof...(MaybeInitializer) == 0 or sizeof...(MaybeInitializer) == 1);
 		for (auto const n : bounded::integer_range(count)) {
 			static_cast<void>(n);
@@ -191,6 +191,6 @@ static_vector(Size const size, T const & value) -> static_vector<T, static_cast<
 
 
 template<typename T, std::size_t capacity>
-struct is_container_c<static_vector<T, capacity>> : std::true_type {};
+constexpr auto is_container<static_vector<T, capacity>> = true;
 
 }	// namespace containers

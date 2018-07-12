@@ -14,7 +14,7 @@ constexpr auto dynamic_int_array = containers::make_array(0, 3, 6);
 static_assert(size(dynamic_int_array) == 3, "Array size wrong.");
 static_assert(at(dynamic_int_array, 2) == 6, "Array element wrong.");
 static_assert(
-	std::is_same<int, decltype(dynamic_int_array)::value_type>::value,
+	std::is_same_v<int, decltype(dynamic_int_array)::value_type>,
 	"Array element type wrong for all int arguments."
 );
 
@@ -66,7 +66,7 @@ static_assert(size(four_dimensions[0_bi][0_bi][0_bi]) == fourth, "Fourth dimensi
 using explicit_type = bounded::integer<0, 1, bounded::throw_policy<>>;
 constexpr auto typed_array = containers::make_array<explicit_type>(0_bi);
 static_assert(size(typed_array) == 1_bi, "Incorrect size with explicit type.");
-static_assert(std::is_same<decltype(typed_array)::value_type, explicit_type>::value, "Incorrect type with explicit type.");
+static_assert(std::is_same_v<decltype(typed_array)::value_type, explicit_type>, "Incorrect type with explicit type.");
 static_assert(front(typed_array) == 0_bi, "Incorrect value with explicit type.");
 
 

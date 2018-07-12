@@ -104,6 +104,6 @@ constexpr auto end(array<T, size, sizes...> & container) noexcept {
 
 
 template<typename T, std::size_t... sizes>
-struct is_container_c<array<T, sizes...>> : std::true_type {};
+constexpr auto is_container<array<T, sizes...>> = true;
 
 }	// namespace containers

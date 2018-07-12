@@ -24,17 +24,14 @@ namespace detail {
 // reinterpret_cast or static_cast from void * are not allowed in constexpr
 
 template<typename Target, typename Source, typename Enable = void>
-struct is_static_castable_c : std::false_type {};
+constexpr auto is_static_castable = false;
 
 template<typename Target, typename Source>
-struct is_static_castable_c<
+constexpr auto is_static_castable<
 	Target,
 	Source,
 	void_t<decltype(static_cast<Target>(std::declval<Source>()))>
-> : std::true_type {};
-
-template<typename Target, typename Source>
-constexpr auto is_static_castable = is_static_castable_c<Target, Source>::value;
+> = true;
 
 template<typename Target, typename Source, BOUNDED_REQUIRES(is_static_castable<Target, Source>)>
 constexpr auto static_or_reinterpret_cast(Source source) noexcept {

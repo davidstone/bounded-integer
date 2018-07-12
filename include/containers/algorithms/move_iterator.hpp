@@ -18,7 +18,7 @@ struct move_dereference {
 private:
 	template<typename Iterator, typename base_result = decltype(*std::declval<Iterator>())>
 	using result = std::conditional_t<
-		std::is_reference<base_result>::value,
+		std::is_reference_v<base_result>,
 		std::remove_reference_t<base_result> &&,
 		base_result
 	>;
