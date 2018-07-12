@@ -16,4 +16,16 @@ constexpr auto is_bounded_integer = false;
 template<auto minimum, auto maximum, typename overflow_policy, bool poisoned>
 constexpr auto is_bounded_integer<integer<minimum, maximum, overflow_policy, poisoned>> = true;
 
+template<typename T>
+constexpr auto is_bounded_integer<T const> = is_bounded_integer<T>;
+
+template<typename T>
+constexpr auto is_bounded_integer<T volatile> = is_bounded_integer<T>;
+
+template<typename T>
+constexpr auto is_bounded_integer<T &> = is_bounded_integer<T>;
+
+template<typename T>
+constexpr auto is_bounded_integer<T &&> = is_bounded_integer<T>;
+
 }	// namespace bounded
