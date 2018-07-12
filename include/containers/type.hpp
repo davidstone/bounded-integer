@@ -9,9 +9,6 @@ namespace containers {
 namespace detail {
 
 template<typename...>
-using void_t = void;
-
-template<typename...>
 struct types{};
 
 }	// namespace detail

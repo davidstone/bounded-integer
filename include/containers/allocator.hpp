@@ -47,7 +47,7 @@ constexpr auto allocator_has_construct<
 	A,
 	T,
 	types<Args...>,
-	void_t<decltype(std::declval<A &>().construct(std::declval<T *>(), std::declval<Args>()...))>
+	std::void_t<decltype(std::declval<A &>().construct(std::declval<T *>(), std::declval<Args>()...))>
 > = true;
 
 
@@ -58,7 +58,7 @@ template<typename A, typename T>
 constexpr auto allocator_has_destroy<
 	A,
 	T,
-	void_t<decltype(std::declval<A &>().destroy(std::declval<T *>()))>
+	std::void_t<decltype(std::declval<A &>().destroy(std::declval<T *>()))>
 > = true;
 
 }	// namespace detail

@@ -30,7 +30,7 @@ template<typename Target, typename Source>
 constexpr auto is_static_castable<
 	Target,
 	Source,
-	void_t<decltype(static_cast<Target>(std::declval<Source>()))>
+	std::void_t<decltype(static_cast<Target>(std::declval<Source>()))>
 > = true;
 
 template<typename Target, typename Source>

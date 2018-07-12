@@ -23,7 +23,7 @@ constexpr auto is_iterable = false;
 template<typename T>
 constexpr auto is_iterable<
 	T,
-	detail::void_t<decltype(begin(std::declval<T>())), decltype(end(std::declval<T>()))>
+	std::void_t<decltype(begin(std::declval<T>())), decltype(end(std::declval<T>()))>
 > = is_iterator_sentinel<decltype(begin(std::declval<T>())), decltype(end(std::declval<T>()))>;
 
 }	// namespace containers

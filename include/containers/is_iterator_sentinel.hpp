@@ -8,6 +8,8 @@
 #include <containers/is_iterator.hpp>
 #include <containers/type.hpp>
 
+#include <type_traits>
+
 namespace containers {
 namespace detail {
 
@@ -18,7 +20,7 @@ template<typename LHS, typename RHS>
 constexpr auto comparable<
 	LHS,
 	RHS,
-	void_t<
+	std::void_t<
 		decltype(std::declval<LHS const &>() == std::declval<RHS const &>()),
 		decltype(std::declval<LHS const &>() != std::declval<RHS const &>())
 	>

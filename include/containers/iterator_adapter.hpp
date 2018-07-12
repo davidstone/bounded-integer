@@ -16,6 +16,7 @@
 #include <cstdint>
 #include <iterator>
 #include <limits>
+#include <type_traits>
 
 // TODO: implement as range_adapter so that iterators remain cheap to copy
 namespace containers {
@@ -26,7 +27,7 @@ struct operator_arrow {
 };
 
 template<typename Iterator>
-struct operator_arrow<Iterator, void_t<decltype(std::addressof(*std::declval<Iterator const &>()))>> {
+struct operator_arrow<Iterator, std::void_t<decltype(std::addressof(*std::declval<Iterator const &>()))>> {
 	constexpr auto operator->() const noexcept(noexcept(*std::declval<Iterator const &>())) {
 		return std::addressof(*static_cast<Iterator const &>(*this));
 	}

@@ -36,14 +36,11 @@ BOUNDED_INTEGER_COMPOUND_ASSIGNMENT_OPERATOR(^)
 
 #undef BOUNDED_INTEGER_COMPOUND_ASSIGNMENT_OPERATOR
 
-template<typename...>
-using void_t = void;
-
 template<typename T, typename Enable = void>
 constexpr auto incrementable_by_bounded = false;
 
 template<typename T>
-constexpr auto incrementable_by_bounded<T, void_t<decltype(std::declval<T &>() += bounded::constant<1>)>> = true;
+constexpr auto incrementable_by_bounded<T, std::void_t<decltype(std::declval<T &>() += bounded::constant<1>)>> = true;
 
 template<typename T, BOUNDED_REQUIRES(incrementable_by_bounded<T>)>
 constexpr auto operator++(T & value) BOUNDED_NOEXCEPT_DECLTYPE(
@@ -66,7 +63,7 @@ template<typename T, typename Enable = void>
 constexpr auto decrementable_by_bounded = false;
 
 template<typename T>
-constexpr auto decrementable_by_bounded<T, void_t<decltype(std::declval<T &>() -= bounded::constant<1>)>> = true;
+constexpr auto decrementable_by_bounded<T, std::void_t<decltype(std::declval<T &>() -= bounded::constant<1>)>> = true;
 
 template<typename T, BOUNDED_REQUIRES(decrementable_by_bounded<T>)>
 constexpr auto operator--(T & value) BOUNDED_NOEXCEPT_DECLTYPE(
