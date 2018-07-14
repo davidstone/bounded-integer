@@ -73,10 +73,10 @@ constexpr auto minimum_small_capacity = (bounded::size_of<std::pair<typename dyn
 
 
 template<typename T, std::size_t requested_small_capacity>
-struct small_t {
+struct small_type {
 	// force_small exists just to be a bit that's always 1. This allows
 	// is_small to return the correct answer even for 0-size containers.
-	constexpr small_t() noexcept:
+	constexpr small_type() noexcept:
 		m_force_small(true),
 		m_size(0_bi)
 	{
@@ -113,11 +113,11 @@ private:
 };
 
 template<typename T, std::size_t requested_small_capacity>
-struct large_t {
+struct large_type {
 	using size_type = typename detail::dynamic_array_data_t<T>::size_type;
-	using capacity_type = bounded::integer<small_t<T, requested_small_capacity>::capacity().value() + 1, size_type::max().value()>;
+	using capacity_type = bounded::integer<small_type<T, requested_small_capacity>::capacity().value() + 1, size_type::max().value()>;
 
-	constexpr large_t(size_type size_, capacity_type capacity_, T * pointer_) noexcept:
+	constexpr large_type(size_type size_, capacity_type capacity_, T * pointer_) noexcept:
 		m_force_small(false),
 		m_size(size_),
 		m_data{reinterpret_cast<trivial_storage<T> *>(pointer_), capacity_}
@@ -159,8 +159,8 @@ template<typename T, std::size_t requested_small_capacity, typename Allocator>
 struct sbo_vector_base : private detail::rebound_allocator<T, Allocator> {
 	using value_type = T;
 	using allocator_type = detail::rebound_allocator<value_type, Allocator>;
-	using small_t = small_t<value_type, requested_small_capacity>;
-	using large_t = large_t<value_type, requested_small_capacity>;
+	using small_t = small_type<value_type, requested_small_capacity>;
+	using large_t = large_type<value_type, requested_small_capacity>;
 	static_assert(std::is_nothrow_move_constructible_v<value_type>);
 	static_assert(std::is_nothrow_move_assignable_v<value_type>);
 	using size_type = typename large_t::size_type;
