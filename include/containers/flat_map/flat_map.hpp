@@ -55,6 +55,15 @@ constexpr auto compare(map_value_type<Key, Mapped> const & lhs, map_value_type<K
 	compare(lhs.as_tuple(), rhs.as_tuple())
 )
 
+template<typename Iterator>
+struct inserted_t {
+	Iterator iterator;
+	bool inserted;
+};
+
+template<typename Iterator>
+inserted_t(Iterator, bool) -> inserted_t<Iterator>;
+
 // The exact type of value_type should be considered implementation defined.
 // map_value_type<key_type const, mapped_type> does not work if the underlying
 // container is vector because insertion into the middle / sorting requires
@@ -401,11 +410,6 @@ private:
 		return apply(construct, std::forward<KeyTuple>(key));
 	}
 	
-	struct inserted_t {
-		iterator iterator;
-		bool inserted;
-	};
-
 	template<typename Key, typename Mapped>
 	constexpr auto emplace_at(const_iterator position, Key && key, Mapped && mapped) {
 		if constexpr (allow_duplicates) {
