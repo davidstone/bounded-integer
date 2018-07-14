@@ -8,6 +8,7 @@
 #include <containers/array/array.hpp>
 
 namespace {
+
 using namespace bounded::literal;
 
 constexpr struct {
@@ -15,7 +16,7 @@ constexpr struct {
 	constexpr auto operator()(Integer integer) const noexcept {
 		return integer % 2_bi == 0_bi;
 	}
-} is_even{};
+} is_even;
 
 constexpr auto check_filter() {
 	constexpr auto source = containers::array{1_bi, 2_bi, 3_bi, 2_bi, 4_bi, 5_bi, 6_bi, 8_bi};
