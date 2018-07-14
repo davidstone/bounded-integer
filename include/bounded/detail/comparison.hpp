@@ -19,13 +19,19 @@ namespace bounded {
 
 template<typename LHS, typename RHS>
 constexpr auto compare(LHS * const lhs, RHS * const rhs) noexcept {
-	return lhs == rhs ? strong_ordering_equal : std::less{}(lhs, rhs) ? strong_ordering_less : strong_ordering_greater;
+	return
+		lhs == rhs ? strong_ordering_equal :
+		lhs < rhs ? strong_ordering_less :
+		strong_ordering_greater;
 }
 
 // TODO: Implement correctly
 template<typename LHS, typename RHS, BOUNDED_REQUIRES(std::is_floating_point_v<LHS> and std::is_floating_point_v<RHS>)>
 constexpr auto compare(LHS const lhs, RHS const rhs) noexcept {
-	return lhs == rhs ? strong_ordering_equal : lhs < rhs ? strong_ordering_less : strong_ordering_greater;
+	return
+		lhs == rhs ? strong_ordering_equal :
+		lhs < rhs ? strong_ordering_less :
+		strong_ordering_greater;
 }
 
 template<typename LHS, typename RHS, BOUNDED_REQUIRES(detail::is_builtin_integer<LHS> and detail::is_builtin_integer<RHS>)>
