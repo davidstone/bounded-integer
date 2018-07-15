@@ -132,6 +132,13 @@ target_sources(containers INTERFACE
 	$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>/include/containers/tuple.hpp
 	$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>/include/containers/type.hpp
 	$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>/include/containers/uninitialized_storage.hpp
+	$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>/include/containers/variant/base.hpp
+	$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>/include/containers/variant/get_index.hpp
+	$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>/include/containers/variant/is_valid_index.hpp
+	$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>/include/containers/variant/special_member_functions.hpp
+	$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>/include/containers/variant/variadic_union.hpp
+	$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>/include/containers/variant/variant.hpp
+	$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>/include/containers/variant/visit.hpp
 	$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>/include/containers/vector/vector.hpp
 )
 
@@ -271,6 +278,7 @@ add_library(containers_test STATIC
 	source/containers/static_vector/make_static_vector.cpp
 	source/containers/tuple.cpp
 	source/containers/type.cpp
+	source/containers/vector/vector.cpp
 )
 
 target_link_libraries(containers_test containers)
@@ -304,6 +312,11 @@ add_executable(dynamic_array
 	source/containers/dynamic_array/dynamic_array.cpp
 )
 target_link_libraries(dynamic_array containers_test)
+
+add_executable(variant
+	source/containers/variant/variant.cpp
+)
+target_link_libraries(variant containers_test)
 
 function(set_sanitizers target)
 	foreach(SANITIZER -fsanitize=undefined -fsanitize=address)
@@ -352,6 +365,7 @@ if("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang")
 	target_compile_options(vector PRIVATE ${COMPILE_OPTIONS})
 	target_compile_options(string PRIVATE ${COMPILE_OPTIONS})
 	target_compile_options(dynamic_array PRIVATE ${COMPILE_OPTIONS})
+	target_compile_options(variant PRIVATE ${COMPILE_OPTIONS})
 
 	set_sanitizers(bounded_test)
 	set_sanitizers(containers_test)
@@ -361,6 +375,7 @@ if("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang")
 	set_sanitizers(vector)
 	set_sanitizers(string)
 	set_sanitizers(dynamic_array)
+	set_sanitizers(variant)
 
 elseif("${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU")
 	set(COMPILE_OPTIONS
@@ -374,7 +389,9 @@ elseif("${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU")
 		"-Wcast-qual"
 		# It seems impossible to initialize bit fields with this warning on
 		#"-Wconversion"
-		"-Wctor-dtor-privacy"
+		# -Wctor-dtor-privacy has a bug in 8.1:
+		# https://gcc.gnu.org/bugzilla/show_bug.cgi?id=85792
+		"-Wno-ctor-dtor-privacy"
 		"-Wdisabled-optimization"
 		"-Wdouble-promotion"
 		# -Weffc++ includes a warning if all data members are not explicitly
@@ -445,6 +462,7 @@ elseif("${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU")
 	target_compile_options(vector PRIVATE ${COMPILE_OPTIONS})
 	target_compile_options(string PRIVATE ${COMPILE_OPTIONS})
 	target_compile_options(dynamic_array PRIVATE ${COMPILE_OPTIONS})
+	target_compile_options(variant PRIVATE ${COMPILE_OPTIONS})
 
 	set_sanitizers(bounded_test)
 	set_sanitizers(containers_test)
@@ -454,6 +472,7 @@ elseif("${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU")
 	set_sanitizers(vector)
 	set_sanitizers(string)
 	set_sanitizers(dynamic_array)
+	set_sanitizers(variant)
 endif()
 
 add_test(bounded_test bounded_test)
@@ -463,4 +482,5 @@ add_test(flat_map flat_map)
 add_test(vector vector)
 add_test(string string)
 add_test(dynamic_array dynamic_array)
+add_test(variant variant)
 

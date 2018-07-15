@@ -100,18 +100,18 @@ struct tuple : private detail::tuple_impl_t<Types...> {
 	// accept worse error messages when the user passes in something other than
 	// a constant.
 	template<typename Index, BOUNDED_REQUIRES(bounded::is_bounded_integer<Index> and Index{} < sizeof...(Types))>
-	constexpr auto && operator[](Index const index) const & noexcept {
-		constexpr auto index_ = static_cast<std::size_t>(index);
+	constexpr auto && operator[](Index const index_constant) const & noexcept {
+		constexpr auto index_ = static_cast<std::size_t>(index_constant);
 		return static_cast<detail::tuple_value_t<index_, detail::nth_type<index_, Types...>, Types...> const &>(*this).value();
 	}
 	template<typename Index, BOUNDED_REQUIRES(bounded::is_bounded_integer<Index> and Index{} < sizeof...(Types))>
-	constexpr auto && operator[](Index const index) & noexcept {
-		constexpr auto index_ = static_cast<std::size_t>(index);
+	constexpr auto && operator[](Index const index_constant) & noexcept {
+		constexpr auto index_ = static_cast<std::size_t>(index_constant);
 		return static_cast<detail::tuple_value_t<index_, detail::nth_type<index_, Types...>, Types...> &>(*this).value();
 	}
 	template<typename Index, BOUNDED_REQUIRES(bounded::is_bounded_integer<Index> and Index{} < sizeof...(Types))>
-	constexpr auto && operator[](Index const index) && noexcept {
-		constexpr auto index_ = static_cast<std::size_t>(index);
+	constexpr auto && operator[](Index const index_constant) && noexcept {
+		constexpr auto index_ = static_cast<std::size_t>(index_constant);
 		return static_cast<detail::tuple_value_t<index_, detail::nth_type<index_, Types...>, Types...> &&>(*this).value();
 	}
 
