@@ -74,16 +74,16 @@ constexpr auto minimum_small_capacity = (bounded::size_of<std::pair<typename dyn
 
 template<typename T, std::size_t requested_small_capacity>
 struct small_type {
-	// force_small exists just to be a bit that's always 1. This allows
-	// is_small to return the correct answer even for 0-size containers.
+	// m_force_large exists just to be a bit that's always 0. This allows
+	// is_large to return the correct answer even for 0-size containers.
 	constexpr small_type() noexcept:
-		m_force_small(true),
+		m_force_large(false),
 		m_size(0_bi)
 	{
 	}
 	
-	constexpr auto is_small() const noexcept {
-		return m_force_small;
+	constexpr auto is_large() const noexcept {
+		return m_force_large;
 	}
 	static constexpr auto capacity() noexcept {
 		return bounded::max(minimum_small_capacity<T>, bounded::constant<requested_small_capacity>);
@@ -107,7 +107,7 @@ struct small_type {
 	}
 
 private:
-	bool m_force_small : 1;
+	bool m_force_large : 1;
 	typename size_type::underlying_type m_size : (bounded::size_of_bits<size_type> - 1_bi).value();
 	array<trivial_storage<T>, capacity().value()> m_data;
 };
@@ -117,16 +117,17 @@ struct large_type {
 	using size_type = typename detail::dynamic_array_data_t<T>::size_type;
 	using capacity_type = bounded::integer<small_type<T, requested_small_capacity>::capacity().value() + 1, size_type::max().value()>;
 
+	// m_force_large exists just to be a bit that's always 1.
 	constexpr large_type(size_type size_, capacity_type capacity_, T * pointer_) noexcept:
-		m_force_small(false),
+		m_force_large(true),
 		m_size(size_),
 		m_data{reinterpret_cast<trivial_storage<T> *>(pointer_), capacity_}
 	{
 		assert(data() != nullptr);
 	}
 
-	constexpr auto is_small() const noexcept {
-		return m_force_small;
+	constexpr auto is_large() const noexcept {
+		return m_force_large;
 	}
 	constexpr auto capacity() const noexcept {
 		return m_data.size;
@@ -148,7 +149,7 @@ struct large_type {
 
 
 private:
-	bool m_force_small : 1;
+	bool m_force_large : 1;
 	typename size_type::underlying_type m_size : (bounded::size_of_bits<size_type> - 1_bi).value();
 	dynamic_array_data_t<trivial_storage<T>> m_data;
 };
@@ -299,7 +300,7 @@ private:
 		assert(is_small());
 	}
 	
-	constexpr auto is_small() const noexcept {
+	constexpr auto is_large() const noexcept {
 		// The original design involved casting to unsigned char const &.
 		// A reference to either member of a union is a reference to the union.
 		// https://stackoverflow.com/questions/891471/union-element-alignment
@@ -310,10 +311,10 @@ private:
 		// examine the common initial sequence of two standard-layout union
 		// members, even if those members are bit-fields.
 		// https://stackoverflow.com/a/18564719/852254
-		return m_small.is_small();
+		return m_small.is_large();
 	}
-	constexpr auto is_large() const noexcept {
-		return !is_small();
+	constexpr auto is_small() const noexcept {
+		return !is_large();
 	}
 	
 	auto deallocate_large() noexcept {
