@@ -23,7 +23,7 @@
 // No SFINAE
 #define BOUNDED_NOEXCEPT_VOID(...) noexcept(noexcept(__VA_ARGS__)) { __VA_ARGS__; }
 
-// Same as returning decltype(auto), but with expression SFINAE
+// Same as returning decltype(auto), but with noexcept + expression SFINAE
 #define BOUNDED_NOEXCEPT_DECLTYPE(...) \
 	noexcept( \
 		noexcept(__VA_ARGS__) and \
@@ -32,7 +32,7 @@
 		return __VA_ARGS__; \
 	}
 
-// Same as returning auto, but with expression SFINAE
+// Same as returning auto, but with noexcept + expression SFINAE
 #define BOUNDED_NOEXCEPT_VALUE(...) \
 	noexcept( \
 		noexcept(__VA_ARGS__) and \
@@ -41,7 +41,7 @@
 		return __VA_ARGS__; \
 	}
 
-// Same as returning auto &, but with expression SFINAE
+// Same as returning auto &, but with noexcept + expression SFINAE
 #define BOUNDED_NOEXCEPT_REF(...) \
 	noexcept( \
 		noexcept(__VA_ARGS__) \
@@ -49,7 +49,7 @@
 		return __VA_ARGS__; \
 	}
 
-// Same as returning auto const &, but with expression SFINAE
+// Same as returning auto const &, but with noexcept + expression SFINAE
 #define BOUNDED_NOEXCEPT_CONST_REF(...) \
 	noexcept( \
 		noexcept(__VA_ARGS__) \
@@ -57,10 +57,11 @@
 		return __VA_ARGS__; \
 	}
 
-// Same as returning auto &&, but with expression SFINAE
+// Same as returning auto &&, but with noexcept + expression SFINAE
 #define BOUNDED_NOEXCEPT_REF_REF(...) \
 	noexcept( \
 		noexcept(__VA_ARGS__) \
 	) -> decltype(__VA_ARGS__) && { \
 		return __VA_ARGS__; \
 	}
+
