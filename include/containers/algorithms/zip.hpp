@@ -55,10 +55,7 @@ public:
 		std::forward_iterator_tag
 	>>;
 	
-	using pointer = bounded::detail::common_type_and_value_category_t<
-		typename traits1::pointer,
-		typename traits2::pointer
-	>;
+	using pointer = value_type *;
 
 	using reference = bounded::detail::common_type_and_value_category_t<
 		typename traits1::reference,
