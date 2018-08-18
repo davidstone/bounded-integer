@@ -76,6 +76,7 @@ target_sources(bounded INTERFACE
 target_sources(containers INTERFACE
 	$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>/include/containers/algorithms/accumulate.hpp
 	$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>/include/containers/algorithms/all_any_none.hpp
+	$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>/include/containers/algorithms/concatenate.hpp
 	$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>/include/containers/algorithms/copy.hpp
 	$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>/include/containers/algorithms/count.hpp
 	$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>/include/containers/algorithms/distance.hpp
@@ -88,6 +89,7 @@ target_sources(containers INTERFACE
 	$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>/include/containers/algorithms/reverse_iterator.hpp
 	$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>/include/containers/algorithms/uninitialized.hpp
 	$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>/include/containers/algorithms/unique.hpp
+	$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>/include/containers/algorithms/zip.hpp
 	$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>/include/containers/allocator.hpp
 	$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>/include/containers/append.hpp
 	$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>/include/containers/array/array.hpp
@@ -119,8 +121,11 @@ target_sources(containers INTERFACE
 	$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>/include/containers/legacy_iterator.hpp
 	$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>/include/containers/make_index_sequence.hpp
 	$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>/include/containers/mutable_iterator.hpp
+	$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>/include/containers/null_iterator.hpp
+	$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>/include/containers/operator_arrow.hpp
 	$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>/include/containers/operator_bracket.hpp
 	$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>/include/containers/push_back.hpp
+	$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>/include/containers/range_view.hpp
 	$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>/include/containers/repeat_n.hpp
 	$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>/include/containers/resize.hpp
 	$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>/include/containers/scope_guard.hpp
@@ -247,6 +252,7 @@ add_library(containers_test STATIC
 	source/containers/algorithms/reverse_iterator.cpp
 	source/containers/algorithms/uninitialized.cpp
 	source/containers/algorithms/unique.cpp
+	source/containers/algorithms/zip.cpp
 	source/containers/allocator.cpp
 	source/containers/append.cpp
 	source/containers/array/array.cpp
@@ -271,7 +277,10 @@ add_library(containers_test STATIC
 	source/containers/legacy_iterator.cpp
 	source/containers/make_index_sequence.cpp
 	source/containers/mutable_iterator.cpp
+	source/containers/null_iterator.cpp
+	source/containers/operator_arrow.cpp
 	source/containers/push_back.cpp
+	source/containers/range_view.cpp
 	source/containers/resize.cpp
 	source/containers/scope_guard.cpp
 	source/containers/size.cpp
@@ -282,6 +291,11 @@ add_library(containers_test STATIC
 )
 
 target_link_libraries(containers_test containers)
+
+add_executable(concatenate
+	source/containers/algorithms/concatenate.cpp
+)
+target_link_libraries(concatenate containers_test)
 
 add_executable(static_vector
 	source/containers/static_vector/static_vector.cpp
@@ -359,6 +373,7 @@ if("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang")
 	)
 	target_compile_options(bounded_test PRIVATE ${COMPILE_OPTIONS})
 	target_compile_options(containers_test PRIVATE ${COMPILE_OPTIONS})
+	target_compile_options(concatenate PRIVATE ${COMPILE_OPTIONS})
 	target_compile_options(static_vector PRIVATE ${COMPILE_OPTIONS})
 	target_compile_options(small_buffer_optimized_vector PRIVATE ${COMPILE_OPTIONS})
 	target_compile_options(flat_map PRIVATE ${COMPILE_OPTIONS} "-DUSE_FLAT_MAP")
@@ -369,6 +384,7 @@ if("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang")
 
 	set_sanitizers(bounded_test)
 	set_sanitizers(containers_test)
+	set_sanitizers(concatenate)
 	set_sanitizers(static_vector)
 	set_sanitizers(small_buffer_optimized_vector)
 	set_sanitizers(flat_map)
@@ -456,6 +472,7 @@ elseif("${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU")
 	)
 	target_compile_options(bounded_test PRIVATE ${COMPILE_OPTIONS})
 	target_compile_options(containers_test PRIVATE ${COMPILE_OPTIONS})
+	target_compile_options(concatenate PRIVATE ${COMPILE_OPTIONS})
 	target_compile_options(static_vector PRIVATE ${COMPILE_OPTIONS})
 	target_compile_options(small_buffer_optimized_vector PRIVATE ${COMPILE_OPTIONS})
 	target_compile_options(flat_map PRIVATE ${COMPILE_OPTIONS} "-DUSE_FLAT_MAP")
@@ -466,6 +483,7 @@ elseif("${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU")
 
 	set_sanitizers(bounded_test)
 	set_sanitizers(containers_test)
+	set_sanitizers(concatenate)
 	set_sanitizers(static_vector)
 	set_sanitizers(small_buffer_optimized_vector)
 	set_sanitizers(flat_map)
@@ -476,6 +494,7 @@ elseif("${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU")
 endif()
 
 add_test(bounded_test bounded_test)
+add_test(concatenate concatenate)
 add_test(static_vector static_vector)
 add_test(small_buffer_optimized_vector small_buffer_optimized_vector)
 add_test(flat_map flat_map)
