@@ -14,12 +14,13 @@ namespace containers {
 namespace detail {
 namespace common {
 
-template<typename Iterable, BOUNDED_REQUIRES(is_iterable<Iterable> and bounded::is_bounded_integer<typename Iterable::size_type>)>
-constexpr auto size(Iterable const & iterable) noexcept {
+// Ignored... makes this a worse match than std::size if that compiles
+template<typename Iterable, typename... Ignored, BOUNDED_REQUIRES(is_iterable<Iterable> and bounded::is_bounded_integer<typename Iterable::size_type>)>
+constexpr auto size(Iterable const & iterable, Ignored && ...) noexcept {
 	return typename Iterable::size_type(end(iterable) - begin(iterable), bounded::non_check);
 }
-template<typename Iterable, BOUNDED_REQUIRES(is_iterable<Iterable> and !bounded::is_bounded_integer<typename Iterable::size_type>)>
-constexpr auto size(Iterable const & iterable) noexcept {
+template<typename Iterable, typename... Ignored, BOUNDED_REQUIRES(is_iterable<Iterable> and !bounded::is_bounded_integer<typename Iterable::size_type>)>
+constexpr auto size(Iterable const & iterable, Ignored && ...) noexcept {
 	return typename Iterable::size_type(end(iterable) - begin(iterable));
 }
 
