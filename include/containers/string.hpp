@@ -6,6 +6,7 @@
 #pragma once
 
 #include <containers/algorithms/compare.hpp>
+#include <containers/algorithms/concatenate.hpp>
 #include <containers/small_buffer_optimized_vector.hpp>
 
 namespace containers {
@@ -86,30 +87,21 @@ constexpr auto compare(T const * const lhs, basic_string<T, Allocator> const & r
 )
 
 
-// TODO: Write a concatenate function that accepts an arbitrary number of ranges
 template<typename T, typename Allocator>
 auto operator+(basic_string<T, Allocator> const & lhs, basic_string<T, Allocator> const & rhs) {
-	basic_string<T, Allocator> result;
-	result.reserve(size(lhs) + size(rhs));
-	append(result, begin(lhs), end(lhs));
-	append(result, begin(rhs), end(rhs));
-	return result;
+	return ::containers::concatenate<basic_string<T, Allocator>>(lhs, rhs);
 }
 template<typename T, typename Allocator>
 auto operator+(basic_string<T, Allocator> && lhs, basic_string<T, Allocator> const & rhs) {
-	append(lhs, begin(rhs), end(rhs));
-	return std::move(lhs);
+	return ::containers::concatenate<basic_string<T, Allocator>>(lhs, rhs);
 }
 template<typename T, typename Allocator>
 auto operator+(basic_string<T, Allocator> const & lhs, basic_string<T, Allocator> && rhs) {
-	rhs.insert(begin(rhs), begin(lhs), end(lhs));
-	return std::move(rhs);
+	return ::containers::concatenate<basic_string<T, Allocator>>(lhs, rhs);
 }
 template<typename T, typename Allocator>
 auto operator+(basic_string<T, Allocator> && lhs, basic_string<T, Allocator> && rhs) {
-	return (size(lhs) + size(rhs) <= lhs.capacity()) ?
-		std::move(lhs) + std::as_const(rhs) :
-		std::as_const(lhs) + std::move(rhs);
+	return ::containers::concatenate<basic_string<T, Allocator>>(lhs, rhs);
 }
 
 
