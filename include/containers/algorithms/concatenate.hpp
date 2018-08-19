@@ -49,30 +49,35 @@ constexpr auto concatenate_with_enough_spare_capacity(
 	Range && range,
 	RangesAfter && ... after
 ) {
-	if (std::addressof(range) == std::addressof(result)) {
-		result.insert(begin(result), before_first, before_last);
-		(..., append(result, begin(std::forward<RangesAfter>(after)), end(std::forward<RangesAfter>(after))));
-		return std::move(result);
-	} else {
+	if constexpr (std::is_same_v<Result, Range>) {
+		if (std::addressof(range) == std::addressof(result)) {
+			result.insert(begin(result), before_first, before_last);
+			(..., append(result, begin(std::forward<RangesAfter>(after)), end(std::forward<RangesAfter>(after))));
+			return std::move(result);
+		}
+	}
+	if constexpr (sizeof...(RangesAfter) > 0) {
 		return concatenate_with_enough_spare_capacity(
 			result,
 			zip_iterator(before_first, before_last, begin(range)),
 			zip_iterator(before_last, before_last, end(range)),
 			std::forward<RangesAfter>(after)...
 		);
+	} else {
+		assert(false);
+		return std::move(result);
 	}
 }
 
-template<typename Container, typename ZipIterator, typename Range>
-constexpr auto concatenate_with_enough_spare_capacity(
-	Container & result,
-	ZipIterator before_first,
-	ZipIterator before_last,
-	Range && range
-) {
-	assert(std::addressof(range) == std::addressof(result));
-	result.insert(begin(result), before_first, before_last);
-	return std::move(result);
+// Adding up a bunch of sizes leads to overflow in bounds
+template<typename Size, BOUNDED_REQUIRES(std::is_integral_v<Size>)>
+constexpr auto ugly_size_hack(Size const size) {
+	constexpr auto max =  std::min(std::numeric_limits<Size>::max(), std::numeric_limits<std::uintmax_t>::max() / 64);
+	return static_cast<bounded::integer<0, max>>(size);
+}
+template<typename Size, BOUNDED_REQUIRES(!std::is_integral_v<Size>)>
+constexpr auto ugly_size_hack(Size const size) {
+	return size;
 }
 
 }	// namespace detail
@@ -82,7 +87,7 @@ constexpr auto concatenate_with_enough_spare_capacity(
 template<typename Result, typename... Ranges, BOUNDED_REQUIRES(is_container<Result> and (... and is_iterable<Ranges>))>
 constexpr auto concatenate(Ranges && ... ranges) {
 	static_assert(!std::is_reference_v<Result>, "Cannot concatenate into a reference.");
-	auto const total_size = (... + size(ranges));
+	auto const total_size = (... + ::containers::detail::ugly_size_hack(size(ranges)));
 	auto const reusable = detail::reusable_container<Result>(total_size, std::forward<Ranges>(ranges)...);
 	if (reusable) {
 		return concatenate_with_enough_spare_capacity(*reusable, detail::null_iterator{}, detail::null_iterator{}, std::forward<Ranges>(ranges)...);

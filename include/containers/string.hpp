@@ -27,21 +27,9 @@ public:
 	using base::get_allocator;
 
 	using base::base;
-	constexpr basic_string(CharT const * const c_string, allocator_type allocator_ = allocator_type()) BOUNDED_NOEXCEPT_INITIALIZATION(
-		base(c_string, c_string + std::strlen(c_string), std::move(allocator_))
-	) {
-	}
 	
-	// Taking this as a template parameter allows us to grab the array size as
-	// part of the type system if we are passing in a string literal or some
-	// other array that has not yet decayed. This prevents some cases of
-	// undefined behavior where we index past the end of the provided array.
-	template<typename CString, typename Size, BOUNDED_REQUIRES(
-		(std::is_same_v<std::decay_t<CString>, CharT const *> or std::is_same_v<std::decay_t<CString>, CharT *>) and
-		std::numeric_limits<Size>::is_integer
-	)>
-	constexpr basic_string(CString const & str, Size const size, allocator_type allocator_ = allocator_type()) BOUNDED_NOEXCEPT_INITIALIZATION(
-		base(str, str + size, std::move(allocator_))
+	constexpr basic_string(std::basic_string_view<CharT> const sv, allocator_type allocator_ = allocator_type()) BOUNDED_NOEXCEPT_INITIALIZATION(
+		base(begin(sv), end(sv), std::move(allocator_))
 	) {
 	}
 	
@@ -70,6 +58,10 @@ public:
 	using base::emplace;
 	using base::insert;
 	using base::pop_back;
+	
+	constexpr operator std::basic_string_view<CharT>() const noexcept {
+		return {data(*this), size(*this)};
+	}
 };
 
 template<typename CharT, typename Allocator>
@@ -101,6 +93,15 @@ constexpr auto compare(CharT const * const lhs, basic_string<CharT, Allocator> c
 	::containers::compare(lhs, detail::c_string_sentinel<CharT>, begin(rhs), end(rhs))
 )
 
+template<typename CharT, typename Allocator>
+constexpr auto compare(basic_string<CharT, Allocator> const & lhs, std::basic_string_view<CharT> const rhs) BOUNDED_NOEXCEPT_VALUE(
+	::containers::compare(begin(lhs), end(lhs), begin(rhs), end(rhs))
+)
+template<typename CharT, typename Allocator>
+constexpr auto compare(std::basic_string_view<CharT> const lhs, basic_string<CharT, Allocator> const & rhs) BOUNDED_NOEXCEPT_VALUE(
+	::containers::compare(begin(lhs), end(lhs), begin(rhs), end(rhs))
+)
+
 
 template<typename CharT, typename Allocator>
 auto operator+(basic_string<CharT, Allocator> const & lhs, basic_string<CharT, Allocator> const & rhs) {
@@ -119,23 +120,6 @@ auto operator+(basic_string<CharT, Allocator> && lhs, basic_string<CharT, Alloca
 	return ::containers::concatenate<basic_string<CharT, Allocator>>(lhs, rhs);
 }
 
-template<typename CharT, typename Allocator>
-auto operator+(basic_string<CharT, Allocator> const & lhs, CharT const * const rhs) {
-	return ::containers::concatenate<basic_string<CharT, Allocator>>(lhs, range_view(rhs, detail::c_string_sentinel<CharT>));
-}
-template<typename CharT, typename Allocator>
-auto operator+(basic_string<CharT, Allocator> && lhs, CharT const * const rhs) {
-	return ::containers::concatenate<basic_string<CharT, Allocator>>(lhs, range_view(rhs, detail::c_string_sentinel<CharT>));
-}
-template<typename CharT, typename Allocator>
-auto operator+(CharT const * const lhs, basic_string<CharT, Allocator> const & rhs) {
-	return ::containers::concatenate<basic_string<CharT, Allocator>>(range_view(lhs, detail::c_string_sentinel<CharT>), rhs);
-}
-template<typename CharT, typename Allocator>
-auto operator+(CharT const * const lhs, basic_string<CharT, Allocator> && rhs) {
-	return ::containers::concatenate<basic_string<CharT, Allocator>>(range_view(lhs, detail::c_string_sentinel<CharT>), rhs);
-}
-
 
 template<typename CharT, typename Allocator>
 auto operator+(basic_string<CharT, Allocator> const & lhs, std::basic_string_view<CharT> const rhs) {
@@ -143,7 +127,7 @@ auto operator+(basic_string<CharT, Allocator> const & lhs, std::basic_string_vie
 }
 template<typename CharT, typename Allocator>
 auto operator+(basic_string<CharT, Allocator> && lhs, std::basic_string_view<CharT> const rhs) {
-	return ::containers::concatenate<basic_string<CharT, Allocator>>(lhs, rhs);
+	return ::containers::concatenate<basic_string<CharT, Allocator>>(std::move(lhs), rhs);
 }
 template<typename CharT, typename Allocator>
 auto operator+(std::basic_string_view<CharT> const lhs, basic_string<CharT, Allocator> const & rhs) {
@@ -151,7 +135,25 @@ auto operator+(std::basic_string_view<CharT> const lhs, basic_string<CharT, Allo
 }
 template<typename CharT, typename Allocator>
 auto operator+(std::basic_string_view<CharT> const lhs, basic_string<CharT, Allocator> && rhs) {
-	return ::containers::concatenate<basic_string<CharT, Allocator>>(lhs, rhs);
+	return ::containers::concatenate<basic_string<CharT, Allocator>>(lhs, std::move(rhs));
+}
+
+
+template<typename CharT, typename Allocator>
+auto operator+(basic_string<CharT, Allocator> const & lhs, CharT const * const rhs) {
+	return lhs + std::basic_string_view(rhs);
+}
+template<typename CharT, typename Allocator>
+auto operator+(basic_string<CharT, Allocator> && lhs, CharT const * const rhs) {
+	return std::move(lhs) + std::basic_string_view(rhs);
+}
+template<typename CharT, typename Allocator>
+auto operator+(CharT const * const lhs, basic_string<CharT, Allocator> const & rhs) {
+	return std::basic_string_view(lhs) + rhs;
+}
+template<typename CharT, typename Allocator>
+auto operator+(CharT const * const lhs, basic_string<CharT, Allocator> && rhs) {
+	return std::basic_string_view(lhs) + std::move(rhs);
 }
 
 
