@@ -119,8 +119,6 @@ auto operator+(basic_string<CharT, Allocator> && lhs, basic_string<CharT, Alloca
 	return ::containers::concatenate<basic_string<CharT, Allocator>>(lhs, rhs);
 }
 
-
-
 template<typename CharT, typename Allocator>
 auto operator+(basic_string<CharT, Allocator> const & lhs, CharT const * const rhs) {
 	return ::containers::concatenate<basic_string<CharT, Allocator>>(lhs, range_view(rhs, detail::c_string_sentinel<CharT>));
@@ -131,13 +129,30 @@ auto operator+(basic_string<CharT, Allocator> && lhs, CharT const * const rhs) {
 }
 template<typename CharT, typename Allocator>
 auto operator+(CharT const * const lhs, basic_string<CharT, Allocator> const & rhs) {
-	return ::containers::concatenate<basic_string<CharT, Allocator>>(lhs, range_view(rhs, detail::c_string_sentinel<CharT>));
+	return ::containers::concatenate<basic_string<CharT, Allocator>>(range_view(lhs, detail::c_string_sentinel<CharT>), rhs);
 }
 template<typename CharT, typename Allocator>
 auto operator+(CharT const * const lhs, basic_string<CharT, Allocator> && rhs) {
-	return ::containers::concatenate<basic_string<CharT, Allocator>>(lhs, range_view(rhs, detail::c_string_sentinel<CharT>));
+	return ::containers::concatenate<basic_string<CharT, Allocator>>(range_view(lhs, detail::c_string_sentinel<CharT>), rhs);
 }
 
+
+template<typename CharT, typename Allocator>
+auto operator+(basic_string<CharT, Allocator> const & lhs, std::basic_string_view<CharT> const rhs) {
+	return ::containers::concatenate<basic_string<CharT, Allocator>>(lhs, rhs);
+}
+template<typename CharT, typename Allocator>
+auto operator+(basic_string<CharT, Allocator> && lhs, std::basic_string_view<CharT> const rhs) {
+	return ::containers::concatenate<basic_string<CharT, Allocator>>(lhs, rhs);
+}
+template<typename CharT, typename Allocator>
+auto operator+(std::basic_string_view<CharT> const lhs, basic_string<CharT, Allocator> const & rhs) {
+	return ::containers::concatenate<basic_string<CharT, Allocator>>(lhs, rhs);
+}
+template<typename CharT, typename Allocator>
+auto operator+(std::basic_string_view<CharT> const lhs, basic_string<CharT, Allocator> && rhs) {
+	return ::containers::concatenate<basic_string<CharT, Allocator>>(lhs, rhs);
+}
 
 
 using string = basic_string<char>;
