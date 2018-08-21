@@ -8,6 +8,7 @@
 #include <containers/begin_end.hpp>
 #include <containers/is_container.hpp>
 #include <containers/is_iterator_sentinel.hpp>
+#include <containers/push_back.hpp>
 #include <containers/size.hpp>
 
 #include <bounded/integer.hpp>
@@ -21,9 +22,9 @@ template<typename Container, typename InputIterator, typename Sentinel, BOUNDED_
 constexpr auto append(Container & container, InputIterator first, Sentinel last) {
 	auto const offset = size(container);
 	for (; first != last; ++first) {
-		container.emplace_back(*first);
+		push_back(container, *first);
 	}
-	return begin(container) + offset;
+	return begin(container) + static_cast<typename Container::iterator::difference_type>(offset);
 }
 
 }	// namespace common
