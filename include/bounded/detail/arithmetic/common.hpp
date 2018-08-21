@@ -17,10 +17,11 @@ namespace bounded {
 namespace detail {
 namespace arithmetic {
 
+// We have to use static_cast here to avoid integral promotion warnings
 #define BOUNDED_INTEGER_COMPOUND_ASSIGNMENT_OPERATOR(symbol) \
 template<typename LHS, typename RHS> \
 constexpr auto operator symbol##=(LHS & lhs, RHS && rhs) BOUNDED_NOEXCEPT_DECLTYPE( \
-	lhs = std::move(lhs) symbol std::forward<RHS>(rhs) \
+	lhs = static_cast<LHS>(std::move(lhs) symbol std::forward<RHS>(rhs)) \
 )
 
 BOUNDED_INTEGER_COMPOUND_ASSIGNMENT_OPERATOR(+)
