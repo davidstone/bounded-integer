@@ -15,13 +15,31 @@ namespace containers {
 namespace detail {
 namespace common {
 
-template<typename Container, BOUNDED_REQUIRES(is_container<Container>)>
+template<typename, typename = void>
+constexpr auto has_push_back = false;
+
+template<typename Container>
+constexpr auto has_push_back<
+	Container,
+	std::void_t<decltype(std::declval<Container>().push_back(std::declval<typename Container::value_type>()))>
+> = true;
+
+template<typename Container, BOUNDED_REQUIRES(is_container<Container> and !has_push_back<Container>)>
 constexpr auto push_back(Container & container, typename Container::value_type const & value) BOUNDED_NOEXCEPT_DECLTYPE(
 	container.emplace_back(value)
 )
-template<typename Container, BOUNDED_REQUIRES(is_container<Container>)>
+template<typename Container, BOUNDED_REQUIRES(is_container<Container> and !has_push_back<Container>)>
 constexpr auto push_back(Container & container, typename Container::value_type && value) BOUNDED_NOEXCEPT_DECLTYPE(
 	container.emplace_back(std::move(value))
+)
+
+template<typename Container, BOUNDED_REQUIRES(is_container<Container> and has_push_back<Container>)>
+constexpr auto push_back(Container & container, typename Container::value_type const & value) BOUNDED_NOEXCEPT_DECLTYPE(
+	container.push_back(value)
+)
+template<typename Container, BOUNDED_REQUIRES(is_container<Container> and has_push_back<Container>)>
+constexpr auto push_back(Container & container, typename Container::value_type && value) BOUNDED_NOEXCEPT_DECLTYPE(
+	container.push_back(std::move(value))
 )
 
 }	// namespace common
