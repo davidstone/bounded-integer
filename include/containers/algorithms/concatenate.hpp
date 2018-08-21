@@ -5,6 +5,7 @@
 
 #pragma once
 
+#include <containers/append.hpp>
 #include <containers/is_container.hpp>
 #include <containers/null_iterator.hpp>
 #include <containers/size.hpp>
