@@ -10,6 +10,9 @@
 #include <containers/range_view.hpp>
 #include <containers/small_buffer_optimized_vector.hpp>
 
+#include <istream>
+#include <ostream>
+
 namespace containers {
 
 // Unlike std::basic_string, there is no null terminator.
@@ -60,7 +63,7 @@ public:
 	using base::pop_back;
 	
 	constexpr operator std::basic_string_view<CharT>() const noexcept {
-		return {data(*this), size(*this)};
+		return {data(*this), static_cast<typename std::basic_string_view<CharT>::size_type>(size(*this))};
 	}
 };
 
@@ -162,6 +165,15 @@ using wstring = basic_string<wchar_t>;
 using u16string = basic_string<char16_t>;
 using u32string = basic_string<char32_t>;
 
+template<typename CharT, typename Traits, typename Allocator>
+auto & operator<<(std::basic_ostream<CharT, Traits> & out, basic_string<CharT, Allocator> const & str) {
+	return out << static_cast<std::string_view>(str);
+}
+
+template<typename CharT, typename Traits, typename Allocator>
+auto & operator>>(std::basic_istream<CharT, Traits> & in, basic_string<CharT, Allocator> const & str) {
+	return in >> static_cast<std::string_view>(str);
+}
 
 // TODO: Add in a null-terminated string class
 
