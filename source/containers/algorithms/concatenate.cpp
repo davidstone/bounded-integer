@@ -51,6 +51,11 @@ auto main() -> int {
 	using Expected = containers::vector<int>;
 	auto const expected_result = Expected{ 2, 6, 8, 3, 5, 1, 2, 3 };
 	
+	ASSERT_EQ(::containers::concatenate<Expected>(), Expected{});
+	ASSERT_EQ(::containers::concatenate<Expected>(expected_result), expected_result);
+	ASSERT_EQ(::containers::concatenate<Expected>(expected_result, Expected{}), expected_result);
+	ASSERT_EQ(::containers::concatenate<Expected>(Expected{}, expected_result), expected_result);
+	
 	ASSERT_EQ(::containers::concatenate<Expected>(a, b, c), expected_result);
 
 	ASSERT_EQ(::containers::concatenate<Expected>(::containers::copy(a), b, c), expected_result);
@@ -76,5 +81,4 @@ auto main() -> int {
 	ASSERT_EQ(::containers::concatenate<Expected>(a, b, c, make_reusable_container()), expected_result);
 	
 	ASSERT_EQ(::containers::concatenate<Expected>(make_reusable_container(), a, make_reusable_container(), b, make_reusable_container(), c, make_reusable_container()), expected_result);
-	);
 }

@@ -121,7 +121,6 @@ target_sources(containers INTERFACE
 	$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>/include/containers/legacy_iterator.hpp
 	$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>/include/containers/make_index_sequence.hpp
 	$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>/include/containers/mutable_iterator.hpp
-	$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>/include/containers/null_iterator.hpp
 	$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>/include/containers/operator_arrow.hpp
 	$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>/include/containers/operator_bracket.hpp
 	$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>/include/containers/push_back.hpp
@@ -277,7 +276,6 @@ add_library(containers_test STATIC
 	source/containers/legacy_iterator.cpp
 	source/containers/make_index_sequence.cpp
 	source/containers/mutable_iterator.cpp
-	source/containers/null_iterator.cpp
 	source/containers/operator_arrow.cpp
 	source/containers/push_back.cpp
 	source/containers/range_view.cpp
