@@ -4,6 +4,7 @@
 // http://www.boost.org/LICENSE_1_0.txt)
 
 #include <containers/algorithms/concatenate.hpp>
+#include <containers/string.hpp>
 #include <containers/vector/vector.hpp>
 
 #include <iostream>
@@ -47,31 +48,33 @@ auto main() -> int {
 	};
 	auto d = make_reusable_container();
 	
-	auto const expected_result = containers::vector<int>{ 2, 6, 8, 3, 5, 1, 2, 3 };
+	using Expected = containers::vector<int>;
+	auto const expected_result = Expected{ 2, 6, 8, 3, 5, 1, 2, 3 };
 	
-	ASSERT_EQ(::containers::concatenate(a, b, c), expected_result);
+	ASSERT_EQ(::containers::concatenate<Expected>(a, b, c), expected_result);
 
-	ASSERT_EQ(::containers::concatenate(::containers::copy(a), b, c), expected_result);
-	ASSERT_EQ(::containers::concatenate(a, ::containers::copy(b), c), expected_result);
-	ASSERT_EQ(::containers::concatenate(a, b, ::containers::copy(c)), expected_result);
+	ASSERT_EQ(::containers::concatenate<Expected>(::containers::copy(a), b, c), expected_result);
+	ASSERT_EQ(::containers::concatenate<Expected>(a, ::containers::copy(b), c), expected_result);
+	ASSERT_EQ(::containers::concatenate<Expected>(a, b, ::containers::copy(c)), expected_result);
 
-	ASSERT_EQ(::containers::concatenate(::containers::copy(a), ::containers::copy(b), c), expected_result);
-	ASSERT_EQ(::containers::concatenate(::containers::copy(a), b, ::containers::copy(c)), expected_result);
-	ASSERT_EQ(::containers::concatenate(a, ::containers::copy(b), ::containers::copy(c)), expected_result);
+	ASSERT_EQ(::containers::concatenate<Expected>(::containers::copy(a), ::containers::copy(b), c), expected_result);
+	ASSERT_EQ(::containers::concatenate<Expected>(::containers::copy(a), b, ::containers::copy(c)), expected_result);
+	ASSERT_EQ(::containers::concatenate<Expected>(a, ::containers::copy(b), ::containers::copy(c)), expected_result);
 
-	ASSERT_EQ(::containers::concatenate(::containers::copy(a), ::containers::copy(b), ::containers::copy(c)), expected_result);
+	ASSERT_EQ(::containers::concatenate<Expected>(::containers::copy(a), ::containers::copy(b), ::containers::copy(c)), expected_result);
 
-	ASSERT_EQ(::containers::concatenate(a, b, c, d), expected_result);
+	ASSERT_EQ(::containers::concatenate<Expected>(a, b, c, d), expected_result);
 
-	ASSERT_EQ(::containers::concatenate(::containers::copy(d), a, b, c), expected_result);
-	ASSERT_EQ(::containers::concatenate(a, ::containers::copy(d), b, c), expected_result);
-	ASSERT_EQ(::containers::concatenate(a, b, ::containers::copy(d), c), expected_result);
-	ASSERT_EQ(::containers::concatenate(a, b, c, ::containers::copy(d)), expected_result);
+	ASSERT_EQ(::containers::concatenate<Expected>(::containers::copy(d), a, b, c), expected_result);
+	ASSERT_EQ(::containers::concatenate<Expected>(a, ::containers::copy(d), b, c), expected_result);
+	ASSERT_EQ(::containers::concatenate<Expected>(a, b, ::containers::copy(d), c), expected_result);
+	ASSERT_EQ(::containers::concatenate<Expected>(a, b, c, ::containers::copy(d)), expected_result);
 
-	ASSERT_EQ(::containers::concatenate(make_reusable_container(), a, b, c), expected_result);
-	ASSERT_EQ(::containers::concatenate(a, make_reusable_container(), b, c), expected_result);
-	ASSERT_EQ(::containers::concatenate(a, b, make_reusable_container(), c), expected_result);
-	ASSERT_EQ(::containers::concatenate(a, b, c, make_reusable_container()), expected_result);
+	ASSERT_EQ(::containers::concatenate<Expected>(make_reusable_container(), a, b, c), expected_result);
+	ASSERT_EQ(::containers::concatenate<Expected>(a, make_reusable_container(), b, c), expected_result);
+	ASSERT_EQ(::containers::concatenate<Expected>(a, b, make_reusable_container(), c), expected_result);
+	ASSERT_EQ(::containers::concatenate<Expected>(a, b, c, make_reusable_container()), expected_result);
 	
-	ASSERT_EQ(::containers::concatenate(make_reusable_container(), a, make_reusable_container(), b, make_reusable_container(), c, make_reusable_container()), expected_result);
+	ASSERT_EQ(::containers::concatenate<Expected>(make_reusable_container(), a, make_reusable_container(), b, make_reusable_container(), c, make_reusable_container()), expected_result);
+	);
 }
