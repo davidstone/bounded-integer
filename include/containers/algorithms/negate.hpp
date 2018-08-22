@@ -5,6 +5,7 @@
 
 #pragma once
 
+#include <bounded/detail/forward.hpp>
 #include <bounded/integer.hpp>
 
 #include <type_traits>
@@ -14,7 +15,7 @@ namespace containers {
 template<typename Predicate>
 constexpr auto negate(Predicate predicate) noexcept(std::is_nothrow_move_constructible_v<decltype(predicate)>) {
 	return [predicate = std::move(predicate)](auto && ... args) BOUNDED_NOEXCEPT(
-		!predicate(std::forward<decltype(args)>(args)...)
+		!predicate(BOUNDED_FORWARD(args)...)
 	);
 }
 

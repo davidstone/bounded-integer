@@ -15,6 +15,8 @@
 #include <containers/uninitialized_storage.hpp>
 #include <containers/array/iterator.hpp>
 
+#include <bounded/detail/forward.hpp>
+
 #include <iterator>
 
 namespace containers {
@@ -266,7 +268,7 @@ auto resize(common_resize_tag, dynamic_array<T> & container, Size const count, M
 		// Technically, the clear is unnecessary, but calling it decreases peak
 		// memory use.
 		clear(container);
-		container = dynamic_array<T>(count, std::forward<MaybeInitializer>(args)...);
+		container = dynamic_array<T>(count, BOUNDED_FORWARD(args)...);
 	}
 }
 

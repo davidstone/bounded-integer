@@ -9,6 +9,7 @@
 #include <containers/iterator_adapter.hpp>
 #include <containers/tuple.hpp>
 
+#include <bounded/detail/forward.hpp>
 #include <bounded/integer.hpp>
 
 #include <iterator>
@@ -41,7 +42,7 @@ constexpr auto filter_iterator(ForwardIterator first, Sentinel last, UnaryPredic
 	::containers::iterator_adapter(
 		::containers::find_if(first, last, condition),
 		detail::default_dereference{},
-		detail::filter_iterator_adapter<Sentinel, std::remove_reference_t<UnaryPredicate>>(last, std::forward<UnaryPredicate>(condition)),
+		detail::filter_iterator_adapter<Sentinel, std::remove_reference_t<UnaryPredicate>>(last, BOUNDED_FORWARD(condition)),
 		detail::not_a_function{},
 		detail::default_compare{}
 	)

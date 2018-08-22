@@ -9,6 +9,7 @@
 #include <containers/is_iterable.hpp>
 #include <containers/size.hpp>
 
+#include <bounded/detail/forward.hpp>
 #include <bounded/integer.hpp>
 
 #include <utility>
@@ -22,7 +23,7 @@ namespace common {
 
 template<typename Iterable, typename Index, BOUNDED_REQUIRES(is_iterable<Iterable>)>
 constexpr decltype(auto) at(Iterable && iterable, Index const index) BOUNDED_NOEXCEPT(
-	std::forward<Iterable>(iterable)[typename index_type<Iterable>::overflow_policy{}.assignment(
+	BOUNDED_FORWARD(iterable)[typename index_type<Iterable>::overflow_policy{}.assignment(
 		bounded::integer(index),
 		0_bi,
 		size(iterable) - 1_bi
@@ -31,7 +32,7 @@ constexpr decltype(auto) at(Iterable && iterable, Index const index) BOUNDED_NOE
 
 template<typename Iterable, typename Index, BOUNDED_REQUIRES(is_iterable<Iterable>)>
 constexpr decltype(auto) at(Iterable && iterable, Index const index, bounded::non_check_t) BOUNDED_NOEXCEPT(
-	std::forward<Iterable>(iterable)[static_cast<index_type<Iterable>>(index)]
+	BOUNDED_FORWARD(iterable)[static_cast<index_type<Iterable>>(index)]
 )
 
 

@@ -8,6 +8,7 @@
 #include <containers/common_functions.hpp>
 #include <containers/type.hpp>
 
+#include <bounded/detail/forward.hpp>
 #include <bounded/integer.hpp>
 
 #include <memory>
@@ -95,9 +96,9 @@ public:
 	template<typename T, typename... Args>
 	static constexpr auto & construct(allocator_type & a, T * const ptr, Args && ... args) noexcept(std::is_nothrow_constructible_v<T, Args...>) {
 		if constexpr (detail::allocator_has_construct<allocator_type, T, detail::types<Args...>>) {
-			return *a.construct(ptr, std::forward<Args>(args)...);
+			return *a.construct(ptr, BOUNDED_FORWARD(args)...);
 		} else {
-			return ::bounded::construct(*ptr, std::forward<Args>(args)...);
+			return ::bounded::construct(*ptr, BOUNDED_FORWARD(args)...);
 		}
 	}
 

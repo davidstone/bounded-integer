@@ -10,6 +10,8 @@
 #include <containers/variant/base.hpp>
 #include <containers/variant/visit.hpp>
 
+#include <bounded/detail/forward.hpp>
+
 #include <cassert>
 #include <type_traits>
 #include <utility>
@@ -54,7 +56,7 @@ struct variant_copy_move_constructor_impl<true, AddReference, Base, Ts...> : Bas
 	constexpr variant_copy_move_constructor_impl(AddReference<variant_copy_move_constructor_impl> other)
 		noexcept((... and std::is_nothrow_constructible_v<Ts, AddReference<Ts>>)):
 		Base(visit_with_index(
-			std::forward<decltype(other)>(other),
+			BOUNDED_FORWARD(other),
 			[&](auto parameter) {
 				return Base(
 					other.get_function(),
@@ -129,9 +131,9 @@ struct variant_copy_move_assignment_impl<true, AddReference, Base, Ts...> : Base
 			static_cast<reference>(other),
 			[&](auto lhs, auto rhs) {
 				if constexpr (lhs.index == rhs.index) {
-					lhs.value = std::forward<decltype(rhs.value)>(rhs.value);
+					lhs.value = BOUNDED_FORWARD(rhs.value);
 				} else {
-					this->emplace(rhs.index, std::forward<decltype(rhs.value)>(rhs.value));
+					this->emplace(rhs.index, BOUNDED_FORWARD(rhs.value));
 				}
 				this->get_function() = other.get_function();
 			}

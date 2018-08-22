@@ -8,6 +8,7 @@
 #include <containers/algorithms/move_iterator.hpp>
 #include <containers/algorithms/reverse_iterator.hpp>
 
+#include <bounded/detail/forward.hpp>
 #include <bounded/integer.hpp>
 #include <bounded/integer_range.hpp>
 
@@ -16,7 +17,7 @@ namespace containers {
 // Works with explicit copy constructors
 template<typename T>
 constexpr auto copy(T && value) BOUNDED_NOEXCEPT_VALUE(
-	std::decay_t<T>(std::forward<T>(value))
+	std::decay_t<T>(BOUNDED_FORWARD(value))
 )
 
 

@@ -5,6 +5,7 @@
 
 #pragma once
 
+#include <bounded/detail/forward.hpp>
 #include <bounded/integer.hpp>
 
 #include <type_traits>
@@ -26,12 +27,12 @@ template<typename T, typename... Ts>
 union variadic_union<true, T, Ts...> {
 	template<typename... Args>
 	explicit constexpr variadic_union(bounded::constant_t<0>, Args && ... args) noexcept(std::is_nothrow_constructible_v<T, Args && ...>):
-		head(std::forward<Args>(args)...)
+		head(BOUNDED_FORWARD(args)...)
 	{
 	}
 	template<auto n, typename... Args>
 	explicit constexpr variadic_union(bounded::constant_t<n> const index, Args && ... args) noexcept(std::is_nothrow_constructible_v<variadic_union_t<Ts...>, Args && ...>):
-		tail(index - 1_bi, std::forward<Args>(args)...)
+		tail(index - 1_bi, BOUNDED_FORWARD(args)...)
 	{
 	}
 
@@ -44,12 +45,12 @@ template<typename T, typename... Ts>
 union variadic_union<false, T, Ts...> {
 	template<typename... Args>
 	explicit constexpr variadic_union(bounded::constant_t<0>, Args && ... args) noexcept(std::is_nothrow_constructible_v<T, Args && ...>):
-		head(std::forward<Args>(args)...)
+		head(BOUNDED_FORWARD(args)...)
 	{
 	}
 	template<auto n, typename... Args>
 	explicit constexpr variadic_union(bounded::constant_t<n> const index, Args && ... args) noexcept(std::is_nothrow_constructible_v<variadic_union_t<Ts...>, Args && ...>):
-		tail(index - 1_bi, std::forward<Args>(args)...)
+		tail(index - 1_bi, BOUNDED_FORWARD(args)...)
 	{
 	}
 
@@ -68,9 +69,9 @@ union variadic_union<false, T, Ts...> {
 template<typename V, auto n, BOUNDED_REQUIRES(n >= 0_bi)>
 constexpr auto && get_union_element(V && v, bounded::constant_t<n> const index) noexcept {
 	if constexpr (index == 0_bi) {
-		return std::forward<V>(v).head;
+		return BOUNDED_FORWARD(v).head;
 	} else {
-		return get_union_element(std::forward<V>(v).tail, index - 1_bi);
+		return get_union_element(BOUNDED_FORWARD(v).tail, index - 1_bi);
 	}
 }
 

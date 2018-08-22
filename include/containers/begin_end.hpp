@@ -9,6 +9,7 @@
 #include <containers/algorithms/reverse_iterator.hpp>
 #include <containers/is_container.hpp>
 
+#include <bounded/detail/forward.hpp>
 #include <bounded/integer.hpp>
 
 #include <iterator>
@@ -93,11 +94,11 @@ constexpr auto cend(Iterable const & container) BOUNDED_NOEXCEPT_VALUE(
 
 template<typename Iterable>
 constexpr auto rbegin(Iterable && container) BOUNDED_NOEXCEPT_VALUE(
-	::containers::reverse_iterator(begin(std::forward<Iterable>(container)))
+	::containers::reverse_iterator(begin(BOUNDED_FORWARD(container)))
 )
 template<typename Iterable>
 constexpr auto rend(Iterable && container) BOUNDED_NOEXCEPT_VALUE(
-	::containers::reverse_iterator(end(std::forward<Iterable>(container)))
+	::containers::reverse_iterator(end(BOUNDED_FORWARD(container)))
 )
 
 

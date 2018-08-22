@@ -6,6 +6,7 @@
 #pragma once
 
 #include <bounded/detail/comparison.hpp>
+#include <bounded/detail/forward.hpp>
 #include <bounded/detail/noexcept.hpp>
 
 #include <utility>
@@ -27,7 +28,7 @@ private:
 	Bound m_bound;
 public:
 	constexpr explicit unary_equal_to(Bound && bound) noexcept(std::is_nothrow_constructible_v<Bound, Bound &&>):
-		m_bound(std::forward<Bound>(bound))
+		m_bound(BOUNDED_FORWARD(bound))
 	{
 	}
 	template<typename Other>
@@ -57,7 +58,7 @@ constexpr auto equal_to() noexcept {
 }
 template<typename T>
 constexpr auto equal_to(T && t) BOUNDED_NOEXCEPT(
-	detail::unary_equal_to<T>(std::forward<T>(t))
+	detail::unary_equal_to<T>(BOUNDED_FORWARD(t))
 )
 
 constexpr auto less() noexcept {

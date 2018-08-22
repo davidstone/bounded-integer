@@ -8,6 +8,7 @@
 #include <bounded/detail/optional/forward_declaration.hpp>
 
 #include <bounded/detail/construct_destroy.hpp>
+#include <bounded/detail/forward.hpp>
 #include <bounded/detail/noexcept.hpp>
 #include <bounded/detail/requires.hpp>
 
@@ -55,11 +56,11 @@ struct default_optional_storage_base<T, true> {
 		}
 		template<typename... Args, BOUNDED_REQUIRES(std::is_constructible_v<T, Args && ...>)>
 		constexpr underlying_storage(in_place_t, Args && ... args) noexcept(std::is_nothrow_constructible_v<T, Args && ...>):
-			value(std::forward<Args>(args)...) {
+			value(BOUNDED_FORWARD(args)...) {
 		}
 		template<typename... Args, BOUNDED_REQUIRES(!std::is_constructible_v<T, Args && ...>)>
-		constexpr underlying_storage(in_place_t, Args && ... args) noexcept(noexcept(underlying_storage{std::forward<Args>(args)...})):
-			value{std::forward<Args>(args)...} {
+		constexpr underlying_storage(in_place_t, Args && ... args) noexcept(noexcept(underlying_storage{BOUNDED_FORWARD(args)...})):
+			value{BOUNDED_FORWARD(args)...} {
 		}
 		~underlying_storage() = default;
 
@@ -79,11 +80,11 @@ struct default_optional_storage_base<T, false> {
 		}
 		template<typename... Args, BOUNDED_REQUIRES(std::is_constructible_v<T, Args && ...>)>
 		constexpr underlying_storage(in_place_t, Args && ... args) noexcept(std::is_nothrow_constructible_v<T, Args && ...>):
-			value(std::forward<Args>(args)...) {
+			value(BOUNDED_FORWARD(args)...) {
 		}
 		template<typename... Args, BOUNDED_REQUIRES(!std::is_constructible_v<T, Args && ...>)>
-		constexpr underlying_storage(in_place_t, Args && ... args) noexcept(noexcept(underlying_storage{std::forward<Args>(args)...})):
-			value{std::forward<Args>(args)...} {
+		constexpr underlying_storage(in_place_t, Args && ... args) noexcept(noexcept(underlying_storage{BOUNDED_FORWARD(args)...})):
+			value{BOUNDED_FORWARD(args)...} {
 		}
 		~underlying_storage() {}
 
@@ -114,7 +115,7 @@ struct default_optional_storage {
 	template<typename... Args>
 	constexpr default_optional_storage(Args && ... args) noexcept(std::is_nothrow_constructible_v<T, Args && ...>):
 		m_data{
-			{ in_place, std::forward<Args>(args)... },
+			{ in_place, BOUNDED_FORWARD(args)... },
 			true
 		} {
 	}
@@ -122,7 +123,7 @@ struct default_optional_storage {
 	template<typename... Args>
 	constexpr auto initialize(optional_tag, Args && ... args) noexcept(std::is_nothrow_constructible_v<T, Args && ...>) {
 		uninitialize();
-		construct(m_data.storage.value, std::forward<Args>(args)...);
+		construct(m_data.storage.value, BOUNDED_FORWARD(args)...);
 		m_data.initialized = true;
 	}
 	
@@ -157,19 +158,19 @@ private:
 template<typename Optional, typename T>
 constexpr auto & assign(Optional & target, T && source) noexcept(std::is_nothrow_constructible_v<typename Optional::value_type, T> and std::is_nothrow_assignable_v<typename Optional::value_type &, T>) {
 	if (target) {
-		*target = std::forward<T>(source);
+		*target = BOUNDED_FORWARD(source);
 	} else {
-		target.emplace(std::forward<T>(source));
+		target.emplace(BOUNDED_FORWARD(source));
 	}
 	return target;
 }
 
 template<typename Target, typename Source>
-constexpr auto & assign_from_optional(Target & target, Source && source) noexcept(noexcept(assign(target, *std::forward<Source>(source)))) {
+constexpr auto & assign_from_optional(Target & target, Source && source) noexcept(noexcept(assign(target, *BOUNDED_FORWARD(source)))) {
 	if (!source) {
 		target = none;
 	} else {
-		assign(target, *std::forward<Source>(source));
+		assign(target, *BOUNDED_FORWARD(source));
 	}
 	return target;
 }
@@ -199,15 +200,15 @@ public:
 
 	template<typename... Args, BOUNDED_REQUIRES(std::is_constructible_v<value_type, Args && ...>)>
 	constexpr explicit optional(in_place_t, Args && ... other) noexcept(std::is_nothrow_constructible_v<value_type, Args && ...>):
-		m_value(std::forward<Args>(other)...) {
+		m_value(BOUNDED_FORWARD(other)...) {
 	}
 	template<typename U, BOUNDED_REQUIRES(std::is_convertible_v<U &&, value_type>)>
 	constexpr optional(U && other)
-		BOUNDED_NOEXCEPT_INITIALIZATION(optional(in_place, std::forward<U>(other))) {
+		BOUNDED_NOEXCEPT_INITIALIZATION(optional(in_place, BOUNDED_FORWARD(other))) {
 	}
 	template<typename U, BOUNDED_REQUIRES(!std::is_convertible_v<U &&, value_type> and std::is_constructible_v<value_type, U &&>)>
 	constexpr explicit optional(U && other)
-		BOUNDED_NOEXCEPT_INITIALIZATION(optional(in_place, std::forward<U>(other))) {
+		BOUNDED_NOEXCEPT_INITIALIZATION(optional(in_place, BOUNDED_FORWARD(other))) {
 	}
 
 
@@ -261,7 +262,7 @@ public:
 	// TODO: handle std::initializer_list
 	template<typename... Args>
 	constexpr auto emplace(Args && ... args) noexcept(std::is_nothrow_constructible_v<value_type, Args && ...>) {
-		m_value.initialize(optional_tag{}, std::forward<Args>(args)...);
+		m_value.initialize(optional_tag{}, BOUNDED_FORWARD(args)...);
 	}
 
 	// Cannot use BOUNDED_NOEXCEPT because of gcc bug
@@ -279,8 +280,8 @@ public:
 	}
 	// TODO: make this work when value_type is a reference
 	template<typename U, BOUNDED_REQUIRES(std::is_convertible_v<U &&, value_type>)>
-	constexpr auto && operator=(U && other) & noexcept(noexcept(detail::assign(std::declval<optional &>(), std::forward<U>(other)))) {
-		return detail::assign(*this, std::forward<U>(other));
+	constexpr auto && operator=(U && other) & noexcept(noexcept(detail::assign(std::declval<optional &>(), BOUNDED_FORWARD(other)))) {
+		return detail::assign(*this, BOUNDED_FORWARD(other));
 	}
 	
 private:
@@ -291,14 +292,14 @@ private:
 	// https://stackoverflow.com/questions/20461121/constexpr-error-at-compile-time-but-no-overhead-at-run-time
 	template<typename U>
 	static auto && error_using_uninitialized_optional(U && u) noexcept {
-		return std::forward<U>(u);
+		return BOUNDED_FORWARD(u);
 	}
 
 	template<typename Optional>
 	constexpr optional(Optional && other, common_init_tag) noexcept(std::is_nothrow_constructible<value_type, decltype(*std::declval<Optional>())>{}):
 		optional(none) {
 		if (other) {
-			emplace(*std::forward<Optional>(other));
+			emplace(*BOUNDED_FORWARD(other));
 		}
 	}
 	
@@ -308,7 +309,7 @@ private:
 
 template<typename T>
 constexpr auto make_optional(T && value) noexcept -> optional<std::remove_cv_t<std::remove_reference_t<T>>> {
-	return { std::forward<T>(value) };
+	return { BOUNDED_FORWARD(value) };
 }
 
 }	// namespace bounded

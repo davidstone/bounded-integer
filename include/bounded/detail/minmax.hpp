@@ -11,6 +11,7 @@
 #include <bounded/detail/common_type_and_value_category.hpp>
 #include <bounded/detail/comparison.hpp>
 #include <bounded/detail/comparison_function_object.hpp>
+#include <bounded/detail/forward.hpp>
 #include <bounded/detail/is_bounded_integer.hpp>
 #include <bounded/detail/max_builtin.hpp>
 #include <bounded/detail/noexcept.hpp>
@@ -78,8 +79,8 @@ private:
 	template<typename Compare, typename T1, typename T2, typename result_t = result_type<Compare, T1, T2>>
 	static constexpr auto extreme_two(Compare compare, T1 && t1, T2 && t2) BOUNDED_NOEXCEPT_DECLTYPE(
 		compare(t2, t1) ?
-			static_cast<result_t>(std::forward<T2>(t2)) :
-			static_cast<result_t>(std::forward<T1>(t1))
+			static_cast<result_t>(BOUNDED_FORWARD(t2)) :
+			static_cast<result_t>(BOUNDED_FORWARD(t1))
 	)
 
 	// These are needed because you cannot have a recursive noexcept specification
@@ -106,7 +107,7 @@ private:
 public:
 	template<typename Compare, typename T>
 	constexpr decltype(auto) operator()(Compare, T && t) const noexcept {
-		return std::forward<T>(t);
+		return BOUNDED_FORWARD(t);
 	}
 
 
@@ -115,12 +116,12 @@ public:
 		using result_t = result_type<Compare, T1, T2>;
 		if constexpr (not std::is_constructible_v<result_t, T2>) {
 			static_cast<void>(compare);
-			return std::forward<T1>(t1);
+			return BOUNDED_FORWARD(t1);
 		} else if constexpr (not std::is_constructible_v<result_t, T1>) {
 			static_cast<void>(compare);
-			return std::forward<T2>(t2);
+			return BOUNDED_FORWARD(t2);
 		} else {
-			return extreme_two(std::move(compare), std::forward<T1>(t1), std::forward<T2>(t2));
+			return extreme_two(std::move(compare), BOUNDED_FORWARD(t1), BOUNDED_FORWARD(t2));
 		}
 	}
 
@@ -128,8 +129,8 @@ public:
 	constexpr decltype(auto) operator()(Compare compare, T1 && t1, T2 && t2, Ts && ... ts) const noexcept(noexcept_extreme<Compare, T1, T2, Ts...>()) {
 		return operator()(
 			compare,
-			operator()(compare, std::forward<T1>(t1), std::forward<T2>(t2)),
-			std::forward<Ts>(ts)...
+			operator()(compare, BOUNDED_FORWARD(t1), BOUNDED_FORWARD(t2)),
+			BOUNDED_FORWARD(ts)...
 		);
 	}
 
@@ -140,14 +141,14 @@ public:
 constexpr struct {
 	template<typename... Ts>
 	constexpr auto operator()(Ts && ... ts) const BOUNDED_NOEXCEPT_DECLTYPE(
-		extreme(less(), std::forward<Ts>(ts)...)
+		extreme(less(), BOUNDED_FORWARD(ts)...)
 	)
 } min;
 
 constexpr struct {
 	template<typename... Ts>
 	constexpr auto operator()(Ts && ... ts) const BOUNDED_NOEXCEPT_DECLTYPE(
-		extreme(greater(), std::forward<Ts>(ts)...)
+		extreme(greater(), BOUNDED_FORWARD(ts)...)
 	)
 } max;
 

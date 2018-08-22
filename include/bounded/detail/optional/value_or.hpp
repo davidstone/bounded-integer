@@ -6,6 +6,7 @@
 #pragma once
 
 #include <bounded/detail/conditional.hpp>
+#include <bounded/detail/forward.hpp>
 
 #include <stdexcept>
 
@@ -13,7 +14,7 @@ namespace bounded {
 
 template<typename Optional, typename Default>
 constexpr decltype(auto) value_or(Optional && value, Default && other) {
-	return BOUNDED_CONDITIONAL(value, *std::forward<Optional>(value), std::forward<Default>(other));
+	return BOUNDED_CONDITIONAL(value, *BOUNDED_FORWARD(value), BOUNDED_FORWARD(other));
 }
 
 struct bad_optional_access : std::logic_error {
@@ -27,7 +28,7 @@ constexpr decltype(auto) value(Optional && value) {
 	if (!value) {
 		throw bad_optional_access{};
 	}
-	return *std::forward<Optional>(value);
+	return *BOUNDED_FORWARD(value);
 }
 
 }	// namespace bounded

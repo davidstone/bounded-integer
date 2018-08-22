@@ -8,6 +8,7 @@
 #include <containers/is_container.hpp>
 #include <containers/size.hpp>
 
+#include <bounded/detail/forward.hpp>
 #include <bounded/integer.hpp>
 
 #include <utility>
@@ -23,7 +24,7 @@ constexpr auto resize(common_resize_tag, Container & container, Size const count
 		container.pop_back();
 	}
 	while (size(container) < count) {
-		container.emplace_back(std::forward<MaybeInitializer>(args)...);
+		container.emplace_back(BOUNDED_FORWARD(args)...);
 	}
 }
 

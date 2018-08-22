@@ -7,6 +7,7 @@
 
 #include <bounded/detail/arithmetic/operators.hpp>
 #include <bounded/detail/class.hpp>
+#include <bounded/detail/forward.hpp>
 #include <bounded/detail/is_bounded_integer.hpp>
 #include <bounded/detail/noexcept.hpp>
 #include <bounded/detail/requires.hpp>
@@ -21,7 +22,7 @@ namespace arithmetic {
 #define BOUNDED_INTEGER_COMPOUND_ASSIGNMENT_OPERATOR(symbol) \
 template<typename LHS, typename RHS> \
 constexpr auto operator symbol##=(LHS & lhs, RHS && rhs) BOUNDED_NOEXCEPT_DECLTYPE( \
-	lhs = static_cast<LHS>(std::move(lhs) symbol std::forward<RHS>(rhs)) \
+	lhs = static_cast<LHS>(std::move(lhs) symbol BOUNDED_FORWARD(rhs)) \
 )
 
 BOUNDED_INTEGER_COMPOUND_ASSIGNMENT_OPERATOR(+)

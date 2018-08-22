@@ -8,6 +8,7 @@
 #include <bounded/detail/arithmetic/plus.hpp>
 #include <bounded/detail/arithmetic/unary_minus.hpp>
 
+#include <bounded/detail/forward.hpp>
 #include <bounded/detail/noexcept.hpp>
 
 namespace bounded {
@@ -16,7 +17,7 @@ namespace arithmetic {
 
 template<typename LHS, typename RHS>
 constexpr auto operator-(LHS && lhs, RHS && rhs) BOUNDED_NOEXCEPT_DECLTYPE(
-	std::forward<LHS>(lhs) + -std::forward<RHS>(rhs)
+	BOUNDED_FORWARD(lhs) + -BOUNDED_FORWARD(rhs)
 )
 
 }	// namespace arithmetic

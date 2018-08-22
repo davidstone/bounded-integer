@@ -7,6 +7,7 @@
 
 #include <containers/iterator_adapter.hpp>
 
+#include <bounded/detail/forward.hpp>
 #include <bounded/integer.hpp>
 
 #include <type_traits>
@@ -25,7 +26,7 @@ private:
 public:
 	template<typename Iterator>
 	constexpr auto operator()(Iterator && it) const BOUNDED_NOEXCEPT_DECLTYPE(
-		static_cast<result<Iterator>>(*std::forward<Iterator>(it))
+		static_cast<result<Iterator>>(*BOUNDED_FORWARD(it))
 	)
 };
 

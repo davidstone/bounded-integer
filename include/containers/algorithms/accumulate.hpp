@@ -5,6 +5,7 @@
 
 #pragma once
 
+#include <bounded/detail/forward.hpp>
 #include <bounded/integer.hpp>
 
 #include <functional>
@@ -45,7 +46,7 @@ using accumulate_t = typename accumulate_c<InputIterator, std::decay_t<Initial>,
 
 template<typename Result, typename InputIterator, typename Sentinel, typename Initial, typename BinaryFunction>
 constexpr auto accumulate(InputIterator first, Sentinel const last, Initial && initial, BinaryFunction function) noexcept(noexcept(first != last) and noexcept(++first) and noexcept(function(std::move(std::declval<Result>()), *first)) and std::is_nothrow_move_constructible<std::decay_t<Result>>::value) {
-	auto result = static_cast<Result>(std::forward<Initial>(initial));
+	auto result = static_cast<Result>(BOUNDED_FORWARD(initial));
 	for (; first != last; ++first) {
 		result = static_cast<Result>(function(std::move(result), *first));
 	}
@@ -60,18 +61,18 @@ template<
 	typename BinaryFunction
 >
 constexpr auto accumulate(InputIterator first, Sentinel const last, Initial && initial, BinaryFunction function) BOUNDED_NOEXCEPT(
-	::containers::accumulate<detail::accumulate_t<InputIterator, Initial, BinaryFunction>>(first, last, std::forward<Initial>(initial), std::move(function))
+	::containers::accumulate<detail::accumulate_t<InputIterator, Initial, BinaryFunction>>(first, last, BOUNDED_FORWARD(initial), std::move(function))
 )
 
 
 template<typename Result, typename InputIterator, typename Sentinel, typename Initial>
 constexpr auto accumulate(InputIterator first, Sentinel const last, Initial && initial) BOUNDED_NOEXCEPT(
-	::containers::accumulate<Result>(first, last, std::forward<Initial>(initial), std::plus<>{})
+	::containers::accumulate<Result>(first, last, BOUNDED_FORWARD(initial), std::plus<>{})
 )
 
 template<typename InputIterator, typename Sentinel, typename Initial>
 constexpr auto accumulate(InputIterator first, Sentinel const last, Initial && initial) BOUNDED_NOEXCEPT(
-	::containers::accumulate(first, last, std::forward<Initial>(initial), std::plus<>{})
+	::containers::accumulate(first, last, BOUNDED_FORWARD(initial), std::plus<>{})
 )
 
 

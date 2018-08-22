@@ -8,6 +8,8 @@
 #include <containers/tuple.hpp>
 #include <containers/type.hpp>
 
+#include <bounded/detail/forward.hpp>
+
 #include <cassert>
 #include <type_traits>
 
@@ -37,7 +39,7 @@ public:
 	template<typename... Args>
 	constexpr auto operator()(Args && ... args) const BOUNDED_NOEXCEPT_DECLTYPE(
 		reorder_transform_t::implementation(
-			tie(std::forward<Args>(args)...),
+			tie(BOUNDED_FORWARD(args)...),
 			make_index_sequence(bounded::constant<sizeof...(Args)> - 2_bi)
 		)
 	)
@@ -59,7 +61,7 @@ constexpr struct visitor_with_index {
 private:
 	template<typename Function, typename... Values>
 	static constexpr decltype(auto) implementation(Function && function, bounded::constant_t<0>, tuple<Values...> values) {
-		return apply(std::forward<Function>(function), std::move(values));
+		return apply(std::move(values), BOUNDED_FORWARD(function));
 	}
 
 	template<typename Function, typename Index, typename... Values, typename Variant, typename... Variants>
@@ -67,13 +69,13 @@ private:
 	{
 		auto found = [&]() -> decltype(auto) {
 			return visitor_with_index::implementation(
-				std::forward<Function>(function),
+				BOUNDED_FORWARD(function),
 				0_bi,
 				tuple_cat(
 					std::move(values),
-					tuple(visitor_parameter{std::forward<Variant>(variant)[current_index], current_index})
+					tuple(visitor_parameter{BOUNDED_FORWARD(variant)[current_index], current_index})
 				),
-				std::forward<Variants>(variants)...
+				BOUNDED_FORWARD(variants)...
 			);
 		};
 		auto const search_index = variant.index();
@@ -83,11 +85,11 @@ private:
 			return found();
 		} else {
 			return implementation(
-				std::forward<Function>(function),
+				BOUNDED_FORWARD(function),
 				current_index + 1_bi,
 				std::move(values),
-				std::forward<Variant>(variant),
-				std::forward<Variants>(variants)...
+				BOUNDED_FORWARD(variant),
+				BOUNDED_FORWARD(variants)...
 			);
 		}
 	}
@@ -97,13 +99,13 @@ public:
 	template<typename... Args, BOUNDED_REQUIRES(sizeof...(Args) >= 1)>
 	constexpr decltype(auto) operator()(Args && ... args) const {
 		return detail::reorder_transform(
-			std::forward<Args>(args)...,
+			BOUNDED_FORWARD(args)...,
 			[](auto && function, auto && ... variants) BOUNDED_NOEXCEPT_DECLTYPE(
 				implementation(
-					std::forward<decltype(function)>(function),
+					BOUNDED_FORWARD(function),
 					0_bi,
 					tuple{},
-					std::forward<decltype(variants)>(variants)...
+					BOUNDED_FORWARD(variants)...
 				)
 			)
 		);
@@ -114,12 +116,12 @@ public:
 // arity equal to the number of variants
 constexpr auto visit = [](auto && ... args) -> decltype(auto) {
 	return detail::reorder_transform(
-		std::forward<decltype(args)>(args)...,
+		BOUNDED_FORWARD(args)...,
 		[](auto && function, auto && ... variants) {
 			return visit_with_index(
-				std::forward<decltype(variants)>(variants)...,
+				BOUNDED_FORWARD(variants)...,
 				[&](auto && ... values) {
-					return std::forward<decltype(function)>(function)(std::forward<decltype(values)>(values).value...);
+					return BOUNDED_FORWARD(function)(BOUNDED_FORWARD(values).value...);
 				}
 			);
 		}

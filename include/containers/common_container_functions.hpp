@@ -27,6 +27,7 @@
 #include <containers/resize.hpp>
 #include <containers/size.hpp>
 
+#include <bounded/detail/forward.hpp>
 #include <bounded/integer.hpp>
 
 #include <algorithm>
@@ -73,7 +74,7 @@ constexpr auto emplace_in_middle_no_reallocation(Container & container, typename
 	::containers::move_backward(position, std::prev(original_end), original_end);
 	auto const pointer = std::addressof(*position);
 	::containers::detail::destroy(allocator, pointer);
-	::containers::detail::construct(allocator, pointer, std::forward<Args>(args)...);
+	::containers::detail::construct(allocator, pointer, BOUNDED_FORWARD(args)...);
 }
 
 

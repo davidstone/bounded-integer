@@ -9,6 +9,8 @@
 #include <containers/algorithms/negate.hpp>
 #include <containers/dynamic_array/dynamic_array.hpp>
 
+#include <bounded/detail/forward.hpp>
+
 #include <functional>
 #include <iterator>
 #include <type_traits>
@@ -41,7 +43,7 @@ constexpr auto unique_common(InputIterator first, Sentinel const last, MutableFo
 			continue;
 		}
 		++output;
-		*output = std::forward<decltype(first_ref)>(first_ref);
+		*output = BOUNDED_FORWARD(first_ref);
 	}
 	return std::next(output);
 }

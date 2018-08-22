@@ -13,6 +13,7 @@
 #include <containers/repeat_n.hpp>
 #include <containers/uninitialized_storage.hpp>
 
+#include <bounded/detail/forward.hpp>
 #include <bounded/integer_range.hpp>
 
 #include <algorithm>
@@ -143,10 +144,10 @@ struct dynamic_resizable_array : private Container {
 	template<typename... Args>
 	decltype(auto) emplace_back(Args && ... args) {
 		if (size(*this) < capacity()) {
-			::containers::detail::construct(get_allocator(), data(*this) + size(*this), std::forward<Args>(args)...);
+			::containers::detail::construct(get_allocator(), data(*this) + size(*this), BOUNDED_FORWARD(args)...);
 		} else {
 			auto temp = this->make_storage(new_capacity());
-			::containers::detail::construct(get_allocator(), data(temp) + capacity(), std::forward<Args>(args)...);
+			::containers::detail::construct(get_allocator(), data(temp) + capacity(), BOUNDED_FORWARD(args)...);
 			::containers::uninitialized_move_destroy(begin(*this), end(*this), data(temp), get_allocator());
 			this->relocate_preallocated(std::move(temp));
 		}
@@ -160,9 +161,9 @@ struct dynamic_resizable_array : private Container {
 		check_iterator_validity(position);
 		auto const offset = position - begin(*this);
 		if (position == end(*this)) {
-			emplace_back(std::forward<Args>(args)...);
+			emplace_back(BOUNDED_FORWARD(args)...);
 		} else if (size(*this) != capacity()) {
-			detail::emplace_in_middle_no_reallocation(*this, position, get_allocator(), std::forward<Args>(args)...);
+			detail::emplace_in_middle_no_reallocation(*this, position, get_allocator(), BOUNDED_FORWARD(args)...);
 		} else {
 			// There is a reallocation required, so just put everything in the
 			// correct place to begin with
@@ -171,7 +172,7 @@ struct dynamic_resizable_array : private Container {
 			// construct it may reference an old element. We cannot move
 			// elements it references before constructing it
 			auto && allocator_ = get_allocator();
-			::containers::detail::construct(allocator_, data(temp) + offset, std::forward<Args>(args)...);
+			::containers::detail::construct(allocator_, data(temp) + offset, BOUNDED_FORWARD(args)...);
 			auto const mutable_position = begin(*this) + offset;
 			auto const pointer = ::containers::uninitialized_move_destroy(begin(*this), mutable_position, data(temp), allocator_);
 			assert(data(temp) + offset == pointer);

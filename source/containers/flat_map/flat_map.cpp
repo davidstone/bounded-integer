@@ -6,6 +6,8 @@
 #include <containers/flat_map/flat_map.hpp>
 #include <containers/vector/vector.hpp>
 
+#include <bounded/detail/forward.hpp>
+
 #include <algorithm>
 #include <array>
 #include <cassert>
@@ -178,9 +180,9 @@ constexpr auto is_std_map<std::map<Key, Value, Compare, Allocator>> = true;
 template<typename container_type, typename... Args>
 constexpr auto generic_forward_as_tuple(Args && ... args) noexcept {
 	if constexpr (is_std_map<container_type>) {
-		return std::forward_as_tuple(std::forward<Args>(args)...);
+		return std::forward_as_tuple(BOUNDED_FORWARD(args)...);
 	} else {
-		return ::containers::tie(std::forward<Args>(args)...);
+		return ::containers::tie(BOUNDED_FORWARD(args)...);
 	}
 }
 

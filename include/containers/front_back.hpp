@@ -9,6 +9,7 @@
 #include <containers/empty.hpp>
 #include <containers/is_iterable.hpp>
 
+#include <bounded/detail/forward.hpp>
 #include <bounded/integer.hpp>
 
 #include <cassert>
@@ -22,12 +23,12 @@ namespace common {
 template<typename Iterable, BOUNDED_REQUIRES(is_iterable<Iterable>)>
 constexpr decltype(auto) front(Iterable && iterable) noexcept(never_empty<Iterable>) {
 	assert(!empty(iterable));
-	return *begin(std::forward<Iterable>(iterable));
+	return *begin(BOUNDED_FORWARD(iterable));
 }
 template<typename Iterable, BOUNDED_REQUIRES(is_iterable<Iterable>)>
 constexpr decltype(auto) back(Iterable && iterable) noexcept(never_empty<Iterable>) {
 	assert(!empty(iterable));
-	return *std::prev(end(std::forward<Iterable>(iterable)));
+	return *std::prev(end(BOUNDED_FORWARD(iterable)));
 }
 
 }	// namespace common

@@ -17,6 +17,7 @@
 #include <containers/array/array.hpp>
 #include <containers/array/iterator.hpp>
 
+#include <bounded/detail/forward.hpp>
 #include <bounded/integer_range.hpp>
 
 #include <algorithm>
@@ -134,7 +135,7 @@ public:
 	template<typename... Args>
 	constexpr decltype(auto) emplace_back(Args && ... args) {
 		assert(size(*this) != capacity());
-		::containers::detail::construct(get_allocator(), data(*this) + size(*this), std::forward<Args>(args)...);
+		::containers::detail::construct(get_allocator(), data(*this) + size(*this), BOUNDED_FORWARD(args)...);
 		++this->m_size;
 		return back(*this);
 	}
@@ -142,9 +143,9 @@ public:
 	template<typename... Args>
 	constexpr auto emplace(const_iterator const position, Args && ... args) {
 		if (position == end(*this)) {
-			emplace_back(std::forward<Args>(args)...);
+			emplace_back(BOUNDED_FORWARD(args)...);
 		} else {
-			detail::emplace_in_middle_no_reallocation(*this, position, get_allocator(), std::forward<Args>(args)...);
+			detail::emplace_in_middle_no_reallocation(*this, position, get_allocator(), BOUNDED_FORWARD(args)...);
 		}
 		return detail::mutable_iterator(*this, position);
 	}
@@ -181,7 +182,7 @@ private:
 		static_assert(sizeof...(MaybeInitializer) == 0 or sizeof...(MaybeInitializer) == 1);
 		for (auto const n : bounded::integer_range(count)) {
 			static_cast<void>(n);
-			emplace_back(std::forward<MaybeInitializer>(args)...);
+			emplace_back(BOUNDED_FORWARD(args)...);
 		}
 	}
 };

@@ -7,6 +7,7 @@
 
 #include <containers/iterator_adapter.hpp>
 
+#include <bounded/detail/forward.hpp>
 #include <bounded/integer.hpp>
 
 #include <type_traits>
@@ -27,7 +28,7 @@ constexpr struct {
 struct move_destroy_dereference {
 	template<typename Iterator, BOUNDED_REQUIRES(std::is_reference<decltype(*std::declval<Iterator>())>{})>
 	constexpr auto operator()(Iterator && it) const BOUNDED_NOEXCEPT_VALUE(
-		move_destroy(*std::forward<Iterator>(it))
+		move_destroy(*BOUNDED_FORWARD(it))
 	)
 };
 

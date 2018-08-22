@@ -11,6 +11,7 @@
 #include <containers/size.hpp>
 #include <containers/algorithms/zip.hpp>
 
+#include <bounded/detail/forward.hpp>
 #include <bounded/integer.hpp>
 
 namespace containers {
@@ -32,12 +33,12 @@ constexpr auto individual_reusable_container(Size, Container &&) noexcept {
 
 template<typename Result, typename Size, typename... Ranges>
 constexpr auto reusable_container(Size const total_size, Ranges && ... ranges) noexcept(
-	(... and noexcept(::containers::detail::individual_reusable_container<Result>(total_size, std::forward<Ranges>(ranges))))
+	(... and noexcept(::containers::detail::individual_reusable_container<Result>(total_size, BOUNDED_FORWARD(ranges))))
 ) {
 	Result * result = nullptr;
 	(
 		...,
-		(result = result ? result : individual_reusable_container<Result>(total_size, std::forward<Ranges>(ranges)))
+		(result = result ? result : individual_reusable_container<Result>(total_size, BOUNDED_FORWARD(ranges)))
 	);
 	return result;
 }
@@ -53,7 +54,7 @@ constexpr auto concatenate_with_enough_spare_capacity(
 	if constexpr (std::is_same_v<Result, Range>) {
 		if (std::addressof(range) == std::addressof(result)) {
 			result.insert(begin(result), before_first, before_last);
-			(..., append(result, begin(std::forward<RangesAfter>(after)), end(std::forward<RangesAfter>(after))));
+			(..., append(result, begin(BOUNDED_FORWARD(after)), end(BOUNDED_FORWARD(after))));
 			return std::move(result);
 		}
 	}
@@ -62,7 +63,7 @@ constexpr auto concatenate_with_enough_spare_capacity(
 			result,
 			zip_iterator(before_first, before_last, begin(range)),
 			zip_iterator(before_last, before_last, end(range)),
-			std::forward<RangesAfter>(after)...
+			BOUNDED_FORWARD(after)...
 		);
 	} else {
 		assert(false);
@@ -89,20 +90,15 @@ template<typename Result, typename... Ranges, BOUNDED_REQUIRES(is_container<Resu
 constexpr auto concatenate(Ranges && ... ranges) {
 	static_assert(!std::is_reference_v<Result>, "Cannot concatenate into a reference.");
 	auto const total_size = (... + ::containers::detail::ugly_size_hack(size(ranges)));
-	auto const reusable = detail::reusable_container<Result>(total_size, std::forward<Ranges>(ranges)...);
+	auto const reusable = detail::reusable_container<Result>(total_size, BOUNDED_FORWARD(ranges)...);
 	if (reusable) {
-		return concatenate_with_enough_spare_capacity(*reusable, detail::null_iterator{}, detail::null_iterator{}, std::forward<Ranges>(ranges)...);
+		return concatenate_with_enough_spare_capacity(*reusable, detail::null_iterator{}, detail::null_iterator{}, BOUNDED_FORWARD(ranges)...);
 	} else {
 		Result result;
 		result.reserve(static_cast<typename Result::size_type>(total_size));
-		(..., append(result, begin(std::forward<Ranges>(ranges)), end(std::forward<Ranges>(ranges))));
+		(..., append(result, begin(BOUNDED_FORWARD(ranges)), end(BOUNDED_FORWARD(ranges))));
 		return result;
 	}
 }
-
-template<typename... Ranges>
-constexpr auto concatenate(Ranges && ... ranges) BOUNDED_NOEXCEPT_VALUE(
-	concatenate<std::common_type_t<std::decay_t<Ranges>...>>(std::forward<Ranges>(ranges)...)
-)
 
 }	// namespace containers

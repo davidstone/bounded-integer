@@ -8,6 +8,7 @@
 #include <containers/common_iterator_functions.hpp>
 #include <containers/operator_bracket.hpp>
 
+#include <bounded/detail/forward.hpp>
 #include <bounded/integer.hpp>
 
 #include <iterator>
@@ -80,7 +81,7 @@ struct repeat_n {
 	template<typename U>	
 	repeat_n(size_type const size, U && value):
 		m_size(size),
-		m_value(std::forward<U>(value))
+		m_value(BOUNDED_FORWARD(value))
 	{
 	}
 

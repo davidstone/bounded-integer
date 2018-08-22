@@ -8,6 +8,7 @@
 #include <containers/array/array.hpp>
 #include <containers/make_index_sequence.hpp>
 
+#include <bounded/detail/forward.hpp>
 #include <bounded/integer.hpp>
 
 #include <cstddef>
@@ -36,11 +37,11 @@ struct final_dimension {
 // These assume that all of the dimensions have been passed in.
 template<typename element_type, std::size_t... dimensions, typename... Args>
 constexpr auto make_explicit_array(Args && ... args) noexcept {
-	return array<element_type, dimensions...>{ std::forward<Args>(args)... };
+	return array<element_type, dimensions...>{ BOUNDED_FORWARD(args)... };
 }
 template<std::size_t... dimensions, typename... Args>
 constexpr auto make_explicit_array(Args && ... args) noexcept {
-	return array<std::common_type_t<std::decay_t<Args>...>, dimensions...>{ std::forward<Args>(args)... };
+	return array<std::common_type_t<std::decay_t<Args>...>, dimensions...>{ BOUNDED_FORWARD(args)... };
 }
 
 
@@ -50,7 +51,7 @@ constexpr auto make_array(Args && ... args) noexcept {
 	return array<
 		element_type,
 		detail::final_dimension<sizeof...(Args), dimensions...>::value, dimensions...
-	>{ std::forward<Args>(args)... };
+	>{ BOUNDED_FORWARD(args)... };
 }
 
 template<std::size_t... dimensions, typename... Args>
@@ -58,7 +59,7 @@ constexpr auto make_array(Args && ... args) noexcept {
 	return array<
 		std::common_type_t<std::decay_t<Args>...>,
 		detail::final_dimension<sizeof...(Args), dimensions...>::value, dimensions...
-	>{ std::forward<Args>(args)... };
+	>{ BOUNDED_FORWARD(args)... };
 }
 
 
@@ -69,7 +70,7 @@ namespace detail {
 // aggregate initialization, so there is no risk of copy-after-move
 template<std::size_t size, typename T, std::size_t... indexes>
 constexpr auto make_array_n_impl(T && value, std::index_sequence<indexes...>) BOUNDED_NOEXCEPT_VALUE(
-	array<std::decay_t<T>, size>{ (static_cast<void>(indexes), value)..., std::forward<T>(value) }
+	array<std::decay_t<T>, size>{ (static_cast<void>(indexes), value)..., BOUNDED_FORWARD(value) }
 )
 
 }	// namespace detail
@@ -82,7 +83,7 @@ constexpr auto make_array_n(bounded::constant_t<size_> size, T && value) noexcep
 	if constexpr (size == 0_bi) {
 		return array<std::decay_t<T>, 0>{};
 	} else {
-		return detail::make_array_n_impl<size_>(std::forward<T>(value), detail::make_index_sequence(size - 1_bi));
+		return detail::make_array_n_impl<size_>(BOUNDED_FORWARD(value), detail::make_index_sequence(size - 1_bi));
 	}
 }
 

@@ -5,6 +5,8 @@
 
 #pragma once
 
+#include <bounded/detail/forward.hpp>
+
 #include <type_traits>
 #include <utility>
 
@@ -32,7 +34,7 @@ struct operator_arrow<Iterator, std::void_t<decltype(std::addressof(*std::declva
 struct temporary_operator_arrow {
 	using reference = decltype(*std::declval<iterator_adapter const &>()) &&;
 	constexpr explicit temporary_operator_arrow(reference value) noexcept:
-		m_value(std::forward<reference>(value))
+		m_value(BOUNDED_FORWARD(value))
 	{
 	}
 	constexpr auto operator->() && noexcept {

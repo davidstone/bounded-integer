@@ -5,6 +5,7 @@
 
 #pragma once
 
+#include <bounded/detail/forward.hpp>
 #include <bounded/detail/noexcept.hpp>
 #include <bounded/detail/requires.hpp>
 
@@ -24,12 +25,12 @@ template<typename T>
 struct construct_return_t {
 	template<typename... Args, BOUNDED_REQUIRES(std::is_constructible_v<T, Args...>)>
 	constexpr auto operator()(Args && ... args) const BOUNDED_NOEXCEPT_VALUE(
-		T(std::forward<Args>(args)...)
+		T(BOUNDED_FORWARD(args)...)
 	)
 	
 	template<typename... Args, BOUNDED_REQUIRES(not std::is_constructible_v<T, Args...>)>
 	constexpr auto operator()(Args && ... args) const BOUNDED_NOEXCEPT_VALUE(
-		T{std::forward<Args>(args)...}
+		T{BOUNDED_FORWARD(args)...}
 	)
 };
 
@@ -43,12 +44,12 @@ constexpr struct {
 	// The assignment operator must return a T & if it is trivial
 	template<typename T, typename... Args, BOUNDED_REQUIRES(detail::constexpr_constructible<T>)>
 	constexpr auto operator()(T & ref, Args && ... args) const BOUNDED_NOEXCEPT_REF(
-		ref = construct_return<T>(std::forward<Args>(args)...)
+		ref = construct_return<T>(BOUNDED_FORWARD(args)...)
 	)
 
 	template<typename T, typename... Args, BOUNDED_REQUIRES(not detail::constexpr_constructible<T>)>
 	constexpr auto operator()(T & ref, Args && ... args) const BOUNDED_NOEXCEPT_REF(
-		*::new(static_cast<void *>(std::addressof(ref))) T(construct_return<T>(std::forward<Args>(args)...))
+		*::new(static_cast<void *>(std::addressof(ref))) T(construct_return<T>(BOUNDED_FORWARD(args)...))
 	)
 } construct;
 

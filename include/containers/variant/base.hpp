@@ -12,6 +12,7 @@
 #include <containers/variant/variadic_union.hpp>
 #include <containers/variant/visit.hpp>
 
+#include <bounded/detail/forward.hpp>
 #include <bounded/integer.hpp>
 
 #include <utility>
@@ -33,8 +34,8 @@ struct basic_variant_base {
 	):
 		m_data(
 			std::piecewise_construct,
-			tie(std::forward<F>(function)),
-			tie(get_index(index_, types<Ts>{}...), std::forward<Args>(args)...)
+			tie(BOUNDED_FORWARD(function)),
+			tie(get_index(index_, types<Ts>{}...), BOUNDED_FORWARD(args)...)
 		)
 	{
 		static_assert(
@@ -55,7 +56,7 @@ struct basic_variant_base {
 		basic_variant_base(
 			GetFunction(get_index(index_, types<Ts>{}...)),
 			index_,
-			std::forward<Args>(args)...
+			BOUNDED_FORWARD(args)...
 		)
 	) {
 	}
@@ -90,14 +91,14 @@ struct basic_variant_base {
 	template<typename Index, typename... Args, BOUNDED_REQUIRES(
 		std::is_constructible_v<typename decltype(get_type(Index{}, types<Ts>{}...))::type, Args...>
 	)>
-	constexpr auto & emplace(Index index, Args && ... args) & noexcept(noexcept(bounded::construct(std::declval<basic_variant_base &>()[index], std::forward<Args>(args)...))) {
+	constexpr auto & emplace(Index index, Args && ... args) & noexcept(noexcept(bounded::construct(std::declval<basic_variant_base &>()[index], BOUNDED_FORWARD(args)...))) {
 		auto & ref = operator[](index);
 		if constexpr (std::is_nothrow_constructible_v<typename decltype(get_type(index, types<Ts>{}...))::type, Args...>) {
 			::containers::visit(*this, bounded::destroy);
 			get_function() = GetFunction(get_index(index, types<Ts>{}...));
-			return bounded::construct(ref, std::forward<Args>(args)...);
+			return bounded::construct(ref, BOUNDED_FORWARD(args)...);
 		} else {
-			auto value = bounded::construct_return<std::decay_t<decltype(ref)>>(std::forward<Args>(args)...);
+			auto value = bounded::construct_return<std::decay_t<decltype(ref)>>(BOUNDED_FORWARD(args)...);
 			::containers::visit(*this, bounded::destroy);
 			get_function() = GetFunction(get_index(index));
 			return bounded::construct(ref, std::move(value));
@@ -121,7 +122,7 @@ private:
 	template<typename Variant, typename Index>
 	static constexpr auto && operator_bracket(Variant && variant, Index const index_) noexcept {
 		return ::containers::detail::get_union_element(
-			std::forward<Variant>(variant).m_data[1_bi],
+			BOUNDED_FORWARD(variant).m_data[1_bi],
 			get_index(index_, types<Ts>{}...)
 		);
 	}

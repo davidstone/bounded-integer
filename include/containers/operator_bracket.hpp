@@ -10,6 +10,8 @@
 #include <containers/is_iterator.hpp>
 #include <containers/size.hpp>
 
+#include <bounded/detail/forward.hpp>
+
 #include <cassert>
 #include <type_traits>
 
@@ -29,17 +31,17 @@ namespace detail {
 
 template<typename Iterator, BOUNDED_REQUIRES(is_iterator<Iterator>)>
 constexpr auto operator_bracket(Iterator && iterator, index_type<std::decay_t<Iterator>> const index) BOUNDED_NOEXCEPT_DECLTYPE(
-	*(std::forward<Iterator>(iterator) + index)
+	*(BOUNDED_FORWARD(iterator) + index)
 )
 
 template<typename Iterable, BOUNDED_REQUIRES(is_iterable<Iterable>)>
 constexpr auto operator_bracket(Iterable && iterable, index_type<std::decay_t<Iterable>> const index) noexcept(
 	noexcept(index < size(iterable)) and
-	noexcept(*(begin(std::forward<Iterable>(iterable)) + index)) and
-	std::is_nothrow_move_constructible<decltype(*(begin(std::forward<Iterable>(iterable)) + index))>::value
-) -> decltype(*(begin(std::forward<Iterable>(iterable)) + index)) {
+	noexcept(*(begin(BOUNDED_FORWARD(iterable)) + index)) and
+	std::is_nothrow_move_constructible<decltype(*(begin(BOUNDED_FORWARD(iterable)) + index))>::value
+) -> decltype(*(begin(BOUNDED_FORWARD(iterable)) + index)) {
 	assert(index < size(iterable));
-	return *(begin(std::forward<Iterable>(iterable)) + index);
+	return *(begin(BOUNDED_FORWARD(iterable)) + index);
 }
 
 

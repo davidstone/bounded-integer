@@ -13,6 +13,7 @@
 #include <containers/scope_guard.hpp>
 #include <containers/type.hpp>
 
+#include <bounded/detail/forward.hpp>
 #include <bounded/integer.hpp>
 
 #include <iterator>
@@ -47,7 +48,7 @@ constexpr auto construct(Allocator && allocator, T * pointer, Args && ... args) 
 	allocator_traits<Allocator>::construct(
 		allocator,
 		::containers::detail::static_or_reinterpret_cast<typename std::decay_t<Allocator>::value_type *>(pointer),
-		std::forward<Args>(args)...
+		BOUNDED_FORWARD(args)...
 	)
 )
 

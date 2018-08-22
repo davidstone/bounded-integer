@@ -13,6 +13,7 @@
 #include <containers/tuple.hpp>
 #include <containers/vector/vector.hpp>
 
+#include <bounded/detail/forward.hpp>
 #include <bounded/integer.hpp>
 
 #include <algorithm>
@@ -255,13 +256,13 @@ public:
 	// TODO: noexcept
 	template<typename... Args>
 	constexpr auto emplace(Args && ... args) {
-		auto data = separate_key_from_mapped(std::forward<Args>(args)...);
+		auto data = separate_key_from_mapped(BOUNDED_FORWARD(args)...);
 		auto const position = upper_bound(data.key);
 		return emplace_at(position, std::move(data).key, std::move(data).mapped_args);
 	}
 	template<typename... Args>
 	constexpr auto emplace_hint(const_iterator hint, Args && ... args) {
-		auto data = separate_key_from_mapped(std::forward<Args>(args)...);
+		auto data = separate_key_from_mapped(BOUNDED_FORWARD(args)...);
 		auto const correct_greater = (hint == end(*this)) or key_compare(data.key, *hint);
 		auto const correct_less = (hint == begin(*this)) or key_compare(*std::prev(hint), data.key);
 		auto const correct_hint = correct_greater and correct_less;
@@ -368,8 +369,8 @@ private:
 	static constexpr auto construct_result(MappedTuple && mapped_tuple, KeyArgs && ... key_args) {
 		struct result {
 			result(MappedTuple && mapped_, KeyArgs && ... key_):
-				key(std::forward<KeyArgs>(key_)...),
-				mapped_args(std::forward<MappedTuple>(mapped_)) {
+				key(BOUNDED_FORWARD(key_)...),
+				mapped_args(BOUNDED_FORWARD(mapped_)) {
 			}
 
 			std::conditional_t<
@@ -379,7 +380,7 @@ private:
 			> key;
 			MappedTuple mapped_args;
 		};
-		return result(std::forward<MappedTuple>(mapped_tuple), std::forward<KeyArgs>(key_args)...);
+		return result(BOUNDED_FORWARD(mapped_tuple), BOUNDED_FORWARD(key_args)...);
 	}
 
 	static constexpr auto separate_key_from_mapped() {
@@ -388,26 +389,22 @@ private:
 	template<typename Pair>
 	static constexpr auto separate_key_from_mapped(Pair && pair) {
 		return construct_result(
-			tie(std::forward<Pair>(pair).mapped()),
-			std::forward<Pair>(pair).key()
+			tie(BOUNDED_FORWARD(pair).mapped()),
+			BOUNDED_FORWARD(pair).key()
 		);
 	}
 	template<typename Key, typename Mapped>
 	static constexpr auto separate_key_from_mapped(Key && key, Mapped && mapped) {
 		return construct_result(
-			tie(std::forward<Mapped>(mapped)),
-			std::forward<Key>(key)
+			tie(BOUNDED_FORWARD(mapped)),
+			BOUNDED_FORWARD(key)
 		);
 	}
 	template<typename KeyTuple, typename MappedTuple>
 	static constexpr auto separate_key_from_mapped(std::piecewise_construct_t, KeyTuple && key, MappedTuple && mapped) {
-		auto construct = [&](auto && ... args) {
-			return construct_result(
-				std::forward<MappedTuple>(mapped),
-				std::forward<decltype(args)>(args)...
-			);
-		};
-		return apply(construct, std::forward<KeyTuple>(key));
+		return apply(BOUNDED_FORWARD(key), [&](auto && ... args) {
+			return construct_result(BOUNDED_FORWARD(mapped), BOUNDED_FORWARD(args)...);
+		});
 	}
 	
 	template<typename Key, typename Mapped>
@@ -416,8 +413,8 @@ private:
 			return container().emplace(
 				position,
 				std::piecewise_construct,
-				tie(std::forward<Key>(key)),
-				std::forward<Mapped>(mapped)
+				tie(BOUNDED_FORWARD(key)),
+				BOUNDED_FORWARD(mapped)
 			);
 		} else {
 			// Do not decrement an iterator if it might be begin(*this)
@@ -431,8 +428,8 @@ private:
 			auto const it = container().emplace(
 				position,
 				std::piecewise_construct,
-				tie(std::forward<Key>(key)),
-				std::forward<Mapped>(mapped)
+				tie(BOUNDED_FORWARD(key)),
+				BOUNDED_FORWARD(mapped)
 			);
 			return inserted_t{it, true};
 		}

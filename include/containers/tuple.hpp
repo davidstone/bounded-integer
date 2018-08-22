@@ -14,6 +14,7 @@
 #include <containers/common_functions.hpp>
 #include <containers/make_index_sequence.hpp>
 
+#include <bounded/detail/forward.hpp>
 #include <bounded/integer.hpp>
 
 #include <type_traits>
@@ -71,8 +72,8 @@ struct tuple_impl<std::index_sequence<indexes...>, Types...> : tuple_value_t<ind
 		::containers::detail::all(std::is_convertible_v<Args, Types>...) and
 		::containers::detail::all(std::is_constructible<tuple_value_t<indexes, Types, Types...>, not_piecewise_construct_t, Args>::value...)
 	)>
-	constexpr tuple_impl(Args && ... args) noexcept((... and noexcept(tuple_value_t<indexes, Types, Types...>(not_piecewise_construct, std::forward<Args>(args))))):
-		tuple_value_t<indexes, Types, Types...>(not_piecewise_construct, std::forward<Args>(args))...
+	constexpr tuple_impl(Args && ... args) noexcept((... and noexcept(tuple_value_t<indexes, Types, Types...>(not_piecewise_construct, BOUNDED_FORWARD(args))))):
+		tuple_value_t<indexes, Types, Types...>(not_piecewise_construct, BOUNDED_FORWARD(args))...
 	{
 	}
 
@@ -80,7 +81,7 @@ struct tuple_impl<std::index_sequence<indexes...>, Types...> : tuple_value_t<ind
 		(... and std::is_constructible<tuple_value_t<indexes, Types, Types...>, std::piecewise_construct_t, Args>::value)
 	)>
 	constexpr tuple_impl(std::piecewise_construct_t, Args && ... args) noexcept(false):
-		tuple_value_t<indexes, Types, Types...>(std::piecewise_construct, std::forward<Args>(args))...
+		tuple_value_t<indexes, Types, Types...>(std::piecewise_construct, BOUNDED_FORWARD(args))...
 	{
 	}
 };
@@ -155,7 +156,7 @@ struct tuple_value<true, unique, T, Ts...> : private T {
 
 	template<typename... Args, BOUNDED_REQUIRES(std::is_constructible_v<T, Args...>)>
 	constexpr explicit tuple_value(not_piecewise_construct_t, Args && ... args) BOUNDED_NOEXCEPT_INITIALIZATION(
-		T(std::forward<Args>(args)...)
+		T(BOUNDED_FORWARD(args)...)
 	) {
 	}
 	
@@ -190,7 +191,7 @@ struct tuple_value<true, unique, T const, Ts...> : private T {
 
 	template<typename... Args, BOUNDED_REQUIRES(std::is_constructible_v<T, Args...>)>
 	constexpr explicit tuple_value(not_piecewise_construct_t, Args && ... args) BOUNDED_NOEXCEPT_INITIALIZATION(
-		T(std::forward<Args>(args)...)
+		T(BOUNDED_FORWARD(args)...)
 	) {
 	}
 	
@@ -218,7 +219,7 @@ struct tuple_value<false, unique, T, Ts...> {
 
 	template<typename... Args, BOUNDED_REQUIRES(std::is_constructible_v<T, Args...>)>
 	constexpr explicit tuple_value(not_piecewise_construct_t, Args && ... args) noexcept(std::is_nothrow_constructible_v<T, Args...>):
-		m_value(std::forward<Args>(args)...)
+		m_value(BOUNDED_FORWARD(args)...)
 	{
 	}
 
@@ -287,11 +288,11 @@ constexpr auto compare(tuple<lhs_types...> const & lhs, tuple<rhs_types...> cons
 
 // TODO: unwrap reference_wrapper?
 constexpr auto make_tuple = [](auto && ... args) BOUNDED_NOEXCEPT_VALUE(
-	tuple<std::decay_t<decltype(args)>...>(std::forward<decltype(args)>(args)...)
+	tuple<std::decay_t<decltype(args)>...>(BOUNDED_FORWARD(args)...)
 );
 
 constexpr auto tie = [](auto && ... args) noexcept {
-		return tuple<decltype(args)...>(std::forward<decltype(args)>(args)...);
+		return tuple<decltype(args)...>(BOUNDED_FORWARD(args)...);
 };
 
 template<typename Tuple>
@@ -324,8 +325,8 @@ private:
 			tuple_element<first_indexes, First>...,
 			tuple_element<second_indexes, Second>...
 		>(
-			std::forward<First>(first)[bounded::constant<first_indexes>]...,
-			std::forward<Second>(second)[bounded::constant<second_indexes>]...
+			BOUNDED_FORWARD(first)[bounded::constant<first_indexes>]...,
+			BOUNDED_FORWARD(second)[bounded::constant<second_indexes>]...
 		)
 	)
 
@@ -333,10 +334,10 @@ private:
 	constexpr auto cat_many(First && first, Second && second, Tail && ... tail) const {
 		return operator()(
 			cat_two(
-				::containers::detail::make_index_sequence(tuple_size<First>), std::forward<First>(first),
-				::containers::detail::make_index_sequence(tuple_size<Second>), std::forward<Second>(second)
+				::containers::detail::make_index_sequence(tuple_size<First>), BOUNDED_FORWARD(first),
+				::containers::detail::make_index_sequence(tuple_size<Second>), BOUNDED_FORWARD(second)
 			),
-			std::forward<Tail>(tail)...
+			BOUNDED_FORWARD(tail)...
 		);
 	}
 
@@ -347,7 +348,7 @@ public:
 
 	template<typename Tuple>
 	constexpr auto && operator()(Tuple && tuple) const noexcept {
-		return std::forward<Tuple>(tuple);
+		return BOUNDED_FORWARD(tuple);
 	}
 
 	template<typename... Tuples, BOUNDED_REQUIRES(
@@ -356,24 +357,24 @@ public:
 	constexpr auto operator()(Tuples && ... tuples) const noexcept(
 		(... and std::is_nothrow_constructible<std::decay_t<Tuples>, Tuples &&>{})
 	) {
-		return cat_many(std::forward<Tuples>(tuples)...);
+		return cat_many(BOUNDED_FORWARD(tuples)...);
 	}
 } tuple_cat;
 
 
 constexpr struct apply_t {
 private:
-	template<typename Function, std::size_t... indexes, typename Tuple>
-	static constexpr auto implementation(Function && f, std::index_sequence<indexes...>, Tuple && tuple_args) BOUNDED_NOEXCEPT_DECLTYPE(
-		std::forward<Function>(f)(std::forward<Tuple>(tuple_args)[bounded::constant<indexes>]...)
+	template<typename Tuple, std::size_t... indexes, typename Function>
+	static constexpr auto implementation(Tuple && tuple_args, std::index_sequence<indexes...>, Function && f) BOUNDED_NOEXCEPT_DECLTYPE(
+		BOUNDED_FORWARD(f)(BOUNDED_FORWARD(tuple_args)[bounded::constant<indexes>]...)
 	)
 public:
-	template<typename Function, typename Tuple>
-	constexpr auto operator()(Function && f, Tuple && tuple_args) const BOUNDED_NOEXCEPT_DECLTYPE(
+	template<typename Tuple, typename Function>
+	constexpr auto operator()(Tuple && tuple_args, Function && f) const BOUNDED_NOEXCEPT_DECLTYPE(
 		implementation(
-			std::forward<Function>(f),
+			BOUNDED_FORWARD(tuple_args),
 			detail::make_index_sequence(tuple_size<Tuple>),
-			std::forward<Tuple>(tuple_args)
+			BOUNDED_FORWARD(f)
 		)
 	)
 } apply;
@@ -413,8 +414,8 @@ constexpr auto transform_impl(bounded::constant_t<i> index, Function && function
 		return tuple<>{};
 	} else {
 		return tuple_cat(
-			tuple<decltype(function(std::forward<Tuples>(tuples)[index]...))>(function(std::forward<Tuples>(tuples)[index]...)),
-			::containers::detail::transform_impl(index + 1_bi, function, std::forward<Tuples>(tuples)...)
+			tuple<decltype(function(BOUNDED_FORWARD(tuples)[index]...))>(function(BOUNDED_FORWARD(tuples)[index]...)),
+			::containers::detail::transform_impl(index + 1_bi, function, BOUNDED_FORWARD(tuples)...)
 		);
 	}
 }
@@ -423,7 +424,7 @@ constexpr auto transform_impl(bounded::constant_t<i> index, Function && function
 
 template<typename Function, typename... Tuples, BOUNDED_REQUIRES((... and is_tuple<std::decay_t<Tuples>>))>
 constexpr auto transform(Function && function, Tuples && ... tuples) noexcept(detail::all_noexcept_function_calls<Function, Tuples && ...>) {
-	return ::containers::detail::transform_impl(0_bi, function, std::forward<Tuples>(tuples)...);
+	return ::containers::detail::transform_impl(0_bi, function, BOUNDED_FORWARD(tuples)...);
 }
 
 
