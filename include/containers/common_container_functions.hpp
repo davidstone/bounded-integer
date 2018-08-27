@@ -79,7 +79,6 @@ constexpr auto emplace_in_middle_no_reallocation(Container & container, typename
 
 
 // Assumes there is enough capacity -- iterators remain valid
-// Container must update its own size
 // TODO: exception safety
 template<typename Container, typename ForwardIterator, typename Sentinel, typename Size, typename Allocator>
 constexpr auto put_in_middle_no_reallocation(Container & container, typename Container::const_iterator const position, ForwardIterator first, Sentinel const last, Size const range_size, Allocator && allocator) {
@@ -88,6 +87,7 @@ constexpr auto put_in_middle_no_reallocation(Container & container, typename Con
 	::containers::uninitialized_move_backward(mutable_position, end(container), end(container) + range_size, allocator);
 	auto const remainder = ::containers::copy_n(first, bounded::min(range_size, distance_to_end), mutable_position);
 	::containers::uninitialized_copy(remainder.input, last, remainder.output, allocator);
+	container.append_from_capacity(range_size);
 	return mutable_position;
 }
 

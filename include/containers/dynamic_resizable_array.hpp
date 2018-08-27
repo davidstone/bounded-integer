@@ -1,4 +1,4 @@
-// Copyright David Stone 2016.
+// Copyright David Stone 2018.
 // Distributed under the Boost Software License, Version 1.0.
 // (See accompanying file LICENSE_1_0.txt or copy at
 // http://www.boost.org/LICENSE_1_0.txt)
@@ -11,6 +11,7 @@
 #include <containers/index_type.hpp>
 #include <containers/is_container.hpp>
 #include <containers/repeat_n.hpp>
+#include <containers/reserve_if_reservable.hpp>
 #include <containers/uninitialized_storage.hpp>
 
 #include <bounded/detail/forward.hpp>
@@ -141,17 +142,23 @@ struct dynamic_resizable_array : private Container {
 		}
 	}
 
+	// Assumes that elements are already constructed in the spare capacity
+	template<typename Integer>
+	constexpr void append_from_capacity(Integer const count) noexcept {
+		this->set_size(size(*this) + count);
+	}
+
 	template<typename... Args>
 	decltype(auto) emplace_back(Args && ... args) {
 		if (size(*this) < capacity()) {
 			::containers::detail::construct(get_allocator(), data(*this) + size(*this), BOUNDED_FORWARD(args)...);
 		} else {
-			auto temp = this->make_storage(new_capacity());
+			auto temp = this->make_storage(::containers::detail::reallocation_size(*this, 1_bi));
 			::containers::detail::construct(get_allocator(), data(temp) + capacity(), BOUNDED_FORWARD(args)...);
 			::containers::uninitialized_move_destroy(begin(*this), end(*this), data(temp), get_allocator());
 			this->relocate_preallocated(std::move(temp));
 		}
-		add_size(1_bi);
+		append_from_capacity(1_bi);
 		return back(*this);
 	}
 	
@@ -167,7 +174,7 @@ struct dynamic_resizable_array : private Container {
 		} else {
 			// There is a reallocation required, so just put everything in the
 			// correct place to begin with
-			auto temp = this->make_storage(new_capacity());
+			auto temp = this->make_storage(::containers::detail::reallocation_size(*this, 1_bi));
 			// First construct the new element because the arguments to
 			// construct it may reference an old element. We cannot move
 			// elements it references before constructing it
@@ -178,7 +185,7 @@ struct dynamic_resizable_array : private Container {
 			assert(data(temp) + offset == pointer);
 			::containers::uninitialized_move_destroy(mutable_position, end(*this), std::next(pointer), allocator_);
 			this->relocate_preallocated(std::move(temp));
-			add_size(1_bi);
+			append_from_capacity(1_bi);
 		}
 		return begin(*this) + offset;
 	}
@@ -198,15 +205,12 @@ struct dynamic_resizable_array : private Container {
 			dynamic_resizable_array::size_type::max()
 		);
 		if (range_size <= capacity()) {
-			auto const mutable_position = detail::put_in_middle_no_reallocation(*this, position, first, last, range_size, get_allocator());
-			
-			add_size(range_size);
-			return mutable_position;
+			return detail::put_in_middle_no_reallocation(*this, position, first, last, range_size, get_allocator());
 		}
 		
 		// There is a reallocation required, so just put everything in the
 		// correct place to begin with
-		auto temp = this->make_storage(new_capacity());
+		auto temp = this->make_storage(::containers::detail::reallocation_size(*this, range_size));
 		auto const offset = position - begin(*this);
 		// First construct the new element because it may reference an old
 		// element, and we do not want to move elements it references
@@ -216,7 +220,7 @@ struct dynamic_resizable_array : private Container {
 		assert(data(temp) + offset == pointer);
 		::containers::uninitialized_move_destroy(mutable_position, end(*this), pointer + range_size, get_allocator());
 		this->relocate_preallocated(std::move(temp));
-		add_size(range_size);
+		append_from_capacity(range_size);
 		return mutable_position;
 	}
 
@@ -224,21 +228,14 @@ struct dynamic_resizable_array : private Container {
 	void pop_back() {
 		assert(!empty(*this));
 		::containers::detail::destroy(get_allocator(), std::addressof(back(*this)));
-		add_size(-1_bi);
+		append_from_capacity(-1_bi);
 	}
 	
 private:
-	template<typename Size>
-	auto add_size(Size const s) BOUNDED_NOEXCEPT_GCC_BUG(
-		this->set_size(size(*this) + s)
-	)
 	constexpr auto check_iterator_validity(const_iterator it) {
 		assert(it >= begin(*this));
 		assert(it <= end(*this));
 		static_cast<void>(it);
-	}
-	constexpr auto new_capacity() const {
-		return static_cast<size_type>(bounded::max(1_bi, capacity() * 2_bi));
 	}
 };
 

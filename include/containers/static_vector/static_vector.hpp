@@ -132,11 +132,17 @@ public:
 		return bounded::constant<capacity_>;
 	}
 	
+	// Assumes that elements are already constructed in the spare capacity
+	template<typename Integer>
+	constexpr void append_from_capacity(Integer const count) noexcept {
+		this->m_size += count;
+	}
+	
 	template<typename... Args>
 	constexpr decltype(auto) emplace_back(Args && ... args) {
 		assert(size(*this) != capacity());
 		::containers::detail::construct(get_allocator(), data(*this) + size(*this), BOUNDED_FORWARD(args)...);
-		++this->m_size;
+		append_from_capacity(1_bi);
 		return back(*this);
 	}
 	
@@ -160,13 +166,12 @@ public:
 			0_bi,
 			static_vector::size_type::max()
 		);
-		
-		auto const mutable_position = detail::put_in_middle_no_reallocation(*this, position, first, last, range_size, get_allocator());
-		this->m_size += range_size;
-		return mutable_position;
+		assert(size(*this) + range_size <= capacity());
+		return detail::put_in_middle_no_reallocation(*this, position, first, last, range_size, get_allocator());
 	}
 	
 	constexpr auto pop_back() {
+		assert(!empty(*this));
 		::containers::detail::destroy(get_allocator(), std::addressof(back(*this)));
 		--this->m_size;
 	}
