@@ -165,7 +165,7 @@ struct dynamic_resizable_array : private Container {
 	// TODO: Remove duplication between emplace and insert
 	template<typename... Args>
 	auto emplace(const_iterator const position, Args && ... args) {
-		check_iterator_validity(position);
+		assert(::containers::detail::iterator_points_into_container(*this, position));
 		auto const offset = position - begin(*this);
 		if (position == end(*this)) {
 			emplace_back(BOUNDED_FORWARD(args)...);
@@ -191,37 +191,24 @@ struct dynamic_resizable_array : private Container {
 	}
 
 	// TODO: Check if the range lies within the container
-	// TODO: remove duplication between this and static_vector insert
 	template<typename ForwardIterator, typename Sentinel>
 	auto insert(const_iterator const position, ForwardIterator first, Sentinel last) {
-		check_iterator_validity(position);
-		if (position == end(*this)) {
-			return append(*this, first, last);
-		}
-
-		auto const range_size = bounded::throw_policy<std::out_of_range>{}.assignment(
-			::containers::distance(first, last),
-			0_bi,
-			dynamic_resizable_array::size_type::max()
-		);
-		if (range_size <= capacity()) {
-			return detail::put_in_middle_no_reallocation(*this, position, first, last, range_size, get_allocator());
-		}
-		
-		// There is a reallocation required, so just put everything in the
-		// correct place to begin with
-		auto temp = this->make_storage(::containers::detail::reallocation_size(*this, range_size));
-		auto const offset = position - begin(*this);
-		// First construct the new element because it may reference an old
-		// element, and we do not want to move elements it references
-		::containers::uninitialized_copy(first, last, data(temp) + offset, get_allocator());
-		auto const mutable_position = begin(*this) + offset;
-		auto const pointer = ::containers::uninitialized_move_destroy(begin(*this), mutable_position, data(temp), get_allocator());
-		assert(data(temp) + offset == pointer);
-		::containers::uninitialized_move_destroy(mutable_position, end(*this), pointer + range_size, get_allocator());
-		this->relocate_preallocated(std::move(temp));
-		append_from_capacity(range_size);
-		return mutable_position;
+		return ::containers::detail::insert_impl(*this, get_allocator(), position, first, last, [&](auto const range_size) {
+			// There is a reallocation required, so just put everything in the
+			// correct place to begin with
+			auto temp = this->make_storage(::containers::detail::reallocation_size(*this, range_size));
+			auto const offset = position - begin(*this);
+			// First construct the new element because it may reference an old
+			// element, and we do not want to move elements it references
+			::containers::uninitialized_copy(first, last, data(temp) + offset, get_allocator());
+			auto const mutable_position = begin(*this) + offset;
+			auto const pointer = ::containers::uninitialized_move_destroy(begin(*this), mutable_position, data(temp), get_allocator());
+			assert(data(temp) + offset == pointer);
+			::containers::uninitialized_move_destroy(mutable_position, end(*this), pointer + range_size, get_allocator());
+			this->relocate_preallocated(std::move(temp));
+			append_from_capacity(range_size);
+			return mutable_position;
+		});
 	}
 
 
@@ -229,13 +216,6 @@ struct dynamic_resizable_array : private Container {
 		assert(!empty(*this));
 		::containers::detail::destroy(get_allocator(), std::addressof(back(*this)));
 		append_from_capacity(-1_bi);
-	}
-	
-private:
-	constexpr auto check_iterator_validity(const_iterator it) {
-		assert(it >= begin(*this));
-		assert(it <= end(*this));
-		static_cast<void>(it);
 	}
 };
 

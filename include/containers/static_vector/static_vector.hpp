@@ -6,7 +6,6 @@
 #pragma once
 
 #include <containers/algorithms/copy.hpp>
-#include <containers/algorithms/distance.hpp>
 #include <containers/allocator.hpp>
 #include <containers/common_container_functions.hpp>
 #include <containers/index_type.hpp>
@@ -148,6 +147,7 @@ public:
 	
 	template<typename... Args>
 	constexpr auto emplace(const_iterator const position, Args && ... args) {
+		assert(::containers::detail::iterator_points_into_container(*this, position));
 		if (position == end(*this)) {
 			emplace_back(BOUNDED_FORWARD(args)...);
 		} else {
@@ -157,17 +157,10 @@ public:
 	}
 	template<typename ForwardIterator, typename Sentinel>
 	constexpr auto insert(const_iterator const position, ForwardIterator first, Sentinel last) {
-		if (position == end(*this)) {
-			return append(*this, first, last);
-		}
-
-		auto const range_size = bounded::throw_policy<std::out_of_range>{}.assignment(
-			::containers::distance(first, last),
-			0_bi,
-			static_vector::size_type::max()
-		);
-		assert(size(*this) + range_size <= capacity());
-		return detail::put_in_middle_no_reallocation(*this, position, first, last, range_size, get_allocator());
+		return ::containers::detail::insert_impl(*this, get_allocator(), position, first, last, [](auto) {
+			assert(false);
+			return iterator{};
+		});
 	}
 	
 	constexpr auto pop_back() {
