@@ -138,7 +138,7 @@ public:
 	}
 	
 	template<typename... Args>
-	constexpr decltype(auto) emplace_back(Args && ... args) {
+	constexpr auto & emplace_back(Args && ... args) {
 		assert(size(*this) != capacity());
 		::containers::detail::construct(get_allocator(), data(*this) + size(*this), BOUNDED_FORWARD(args)...);
 		append_from_capacity(1_bi);
@@ -147,13 +147,10 @@ public:
 	
 	template<typename... Args>
 	constexpr auto emplace(const_iterator const position, Args && ... args) {
-		assert(::containers::detail::iterator_points_into_container(*this, position));
-		if (position == end(*this)) {
-			emplace_back(BOUNDED_FORWARD(args)...);
-		} else {
-			detail::emplace_in_middle_no_reallocation(*this, position, get_allocator(), BOUNDED_FORWARD(args)...);
-		}
-		return detail::mutable_iterator(*this, position);
+		auto relocating_emplace = []{
+			assert(false);
+		};
+		return ::containers::detail::emplace_impl(*this, get_allocator(), position, relocating_emplace, BOUNDED_FORWARD(args)...);
 	}
 	template<typename ForwardIterator, typename Sentinel>
 	constexpr auto insert(const_iterator const position, ForwardIterator first, Sentinel last) {

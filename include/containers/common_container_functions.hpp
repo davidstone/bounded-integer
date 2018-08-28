@@ -69,19 +69,25 @@ constexpr auto iterator_points_into_container(Container const & container, typen
 }
 
 
-// Assumes there is enough capacity -- iterators remain valid
 // TODO: exception safety
-template<typename Container, typename Allocator, typename... Args>
-constexpr auto emplace_in_middle_no_reallocation(Container & container, typename Container::const_iterator const position_, Allocator && allocator, Args && ... args) {
-	assert(container.capacity() > size(container));
-	auto const position = ::containers::detail::mutable_iterator(container, position_);
-	auto const original_end = end(container);
-	assert(position != original_end);
-	container.emplace_back(std::move(back(container)));
-	::containers::move_backward(position, std::prev(original_end), original_end);
-	auto const pointer = std::addressof(*position);
-	::containers::detail::destroy(allocator, pointer);
-	::containers::detail::construct(allocator, pointer, BOUNDED_FORWARD(args)...);
+template<typename Container, typename Allocator, typename Function, typename... Args>
+constexpr auto emplace_impl(Container & container, Allocator && allocator, typename Container::const_iterator const position, Function reallocating_emplace, Args && ... args) {
+	assert(::containers::detail::iterator_points_into_container(container, position));
+	auto const offset = position - begin(container);
+	if (position == end(container)) {
+		container.emplace_back(BOUNDED_FORWARD(args)...);
+	} else if (size(container) < container.capacity()) {
+		auto const mutable_position = detail::mutable_iterator(container, position);
+		auto const original_end = end(container);
+		container.emplace_back(std::move(back(container)));
+		::containers::move_backward(mutable_position, std::prev(original_end), original_end);
+		auto const pointer = std::addressof(*mutable_position);
+		::containers::detail::destroy(allocator, pointer);
+		::containers::detail::construct(allocator, pointer, BOUNDED_FORWARD(args)...);
+	} else {
+		reallocating_emplace();
+	}
+	return begin(container) + offset;
 }
 
 

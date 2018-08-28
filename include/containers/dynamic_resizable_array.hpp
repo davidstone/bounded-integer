@@ -149,7 +149,7 @@ struct dynamic_resizable_array : private Container {
 	}
 
 	template<typename... Args>
-	decltype(auto) emplace_back(Args && ... args) {
+	auto & emplace_back(Args && ... args) {
 		if (size(*this) < capacity()) {
 			::containers::detail::construct(get_allocator(), data(*this) + size(*this), BOUNDED_FORWARD(args)...);
 		} else {
@@ -165,13 +165,7 @@ struct dynamic_resizable_array : private Container {
 	// TODO: Remove duplication between emplace and insert
 	template<typename... Args>
 	auto emplace(const_iterator const position, Args && ... args) {
-		assert(::containers::detail::iterator_points_into_container(*this, position));
-		auto const offset = position - begin(*this);
-		if (position == end(*this)) {
-			emplace_back(BOUNDED_FORWARD(args)...);
-		} else if (size(*this) != capacity()) {
-			detail::emplace_in_middle_no_reallocation(*this, position, get_allocator(), BOUNDED_FORWARD(args)...);
-		} else {
+		auto relocating_emplace = [&]{
 			// There is a reallocation required, so just put everything in the
 			// correct place to begin with
 			auto temp = this->make_storage(::containers::detail::reallocation_size(*this, 1_bi));
@@ -179,6 +173,7 @@ struct dynamic_resizable_array : private Container {
 			// construct it may reference an old element. We cannot move
 			// elements it references before constructing it
 			auto && allocator_ = get_allocator();
+			auto const offset = position - begin(*this);
 			::containers::detail::construct(allocator_, data(temp) + offset, BOUNDED_FORWARD(args)...);
 			auto const mutable_position = begin(*this) + offset;
 			auto const pointer = ::containers::uninitialized_move_destroy(begin(*this), mutable_position, data(temp), allocator_);
@@ -186,8 +181,8 @@ struct dynamic_resizable_array : private Container {
 			::containers::uninitialized_move_destroy(mutable_position, end(*this), std::next(pointer), allocator_);
 			this->relocate_preallocated(std::move(temp));
 			append_from_capacity(1_bi);
-		}
-		return begin(*this) + offset;
+		};
+		return ::containers::detail::emplace_impl(*this, get_allocator(), position, relocating_emplace, BOUNDED_FORWARD(args)...);
 	}
 
 	// TODO: Check if the range lies within the container
