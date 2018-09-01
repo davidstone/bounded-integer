@@ -236,19 +236,5 @@ constexpr auto compare(
 ) BOUNDED_NOEXCEPT_DECLTYPE(
 	lhs.compare()(lhs.base(), rhs.base())
 )
-template<typename Iterator, typename DereferenceFunction, typename AddFunction, typename SubtractFunction, typename CompareFunction, typename RHS>
-constexpr auto compare(
-	iterator_adapter<Iterator, DereferenceFunction, AddFunction, SubtractFunction, CompareFunction> const & lhs,
-	RHS const & rhs
-) BOUNDED_NOEXCEPT_DECLTYPE(
-	lhs.compare()(lhs.base(), rhs)
-)
-template<typename LHS, typename Iterator, typename DereferenceFunction, typename AddFunction, typename SubtractFunction, typename CompareFunction>
-constexpr auto compare(
-	LHS const & lhs,
-	iterator_adapter<Iterator, DereferenceFunction, AddFunction, SubtractFunction, CompareFunction> const & rhs
-) BOUNDED_NOEXCEPT_DECLTYPE(
-	rhs.compare()(lhs, rhs.base())
-)
 
 }	// namespace containers

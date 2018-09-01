@@ -18,25 +18,11 @@
 namespace containers {
 namespace detail {
 
-template<typename T>
-constexpr decltype(auto) base_iterator(T it) {
-	return it;
-}
-template<typename T>
-constexpr decltype(auto) base_iterator(std::move_iterator<T> it) {
-	return base_iterator(it.base());
-}
-template<typename LHS, typename RHS>
-constexpr auto equal_iterators(LHS lhs, RHS rhs) {
-	return base_iterator(lhs) == base_iterator(rhs);
-}
-
-
 // This is written so that a special predicate built on std::less can work
 // TODO: Handle OutputIterator in addition to MutableForwardIterator
 template<typename InputIterator, typename Sentinel, typename MutableForwardIterator, typename BinaryPredicate>
 constexpr auto unique_common(InputIterator first, Sentinel const last, MutableForwardIterator output, BinaryPredicate equal) {
-	for (; ::containers::detail::base_iterator(first) != ::containers::detail::base_iterator(last); ++first) {
+	for (; first != last; ++first) {
 		auto && output_ref = *output;
 		auto && first_ref = *first;
 		if (equal(output_ref, first_ref)) {
@@ -53,7 +39,7 @@ constexpr auto unique_common(InputIterator first, Sentinel const last, MutableFo
 
 template<typename InputIterator, typename Sentinel, typename MutableForwardIterator, typename BinaryPredicate = std::equal_to<>>
 constexpr auto unique_copy(InputIterator const first, Sentinel const last, MutableForwardIterator const output, BinaryPredicate equal = BinaryPredicate{}) {
-	if (::containers::detail::base_iterator(first) == ::containers::detail::base_iterator(last)) {
+	if (first == last) {
 		return output;
 	}
 	*output = *first;
@@ -94,7 +80,12 @@ constexpr auto unique(MutableForwardIterator const first, Sentinel const last, B
 		return equal_element;
 	}
 	*equal_element = std::move(*other);
-	return ::containers::detail::unique_common(::containers::move_iterator(std::next(other)), last, equal_element, equal);
+	return ::containers::detail::unique_common(
+		::containers::move_iterator(std::next(other)),
+		::containers::move_iterator(last),
+		equal_element,
+		equal
+	);
 }
 
 template<typename InputIterator, typename Sentinel, typename MutableForwardIterator, typename BinaryPredicate = std::less<>>
@@ -117,14 +108,14 @@ constexpr auto next_greater(InputIterator const first, Sentinel const last, T co
 
 template<typename InputIterator1, typename Sentinel1, typename InputIterator2, typename Sentinel2, typename MutableForwardIterator, typename BinaryPredicate, typename PostFunction>
 constexpr auto unique_merge_common(InputIterator1 first1, Sentinel1 const last1, InputIterator2 first2, Sentinel2 const last2, MutableForwardIterator output, BinaryPredicate less, PostFunction postFunction) {
-	while (!equal_iterators(first1, last1) and !equal_iterators(first2, last2)) {
+	while (first1 != last1 and first2 != last2) {
 		*output = less(*first2, *first1) ? *first2++ : *first1++;
 		first1 = next_greater(first1, last1, *output, less);
 		first2 = next_greater(first2, last2, *output, less);
 		++output;
 	}
 
-	if (!equal_iterators(first1, last1)) {
+	if (first1 != last1) {
 		return unique_copy_less(first1, last1, output, less);
 	} else {
 		return postFunction(first2, last2, output);
