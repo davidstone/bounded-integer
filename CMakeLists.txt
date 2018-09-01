@@ -129,6 +129,7 @@ target_sources(containers INTERFACE
 	$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>/include/containers/reserve_if_reservable.hpp
 	$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>/include/containers/resize.hpp
 	$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>/include/containers/scope_guard.hpp
+	$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>/include/containers/single_element_range.hpp
 	$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>/include/containers/size.hpp
 	$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>/include/containers/small_buffer_optimized_vector.hpp
 	$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>/include/containers/static_vector/make_static_vector.hpp
@@ -283,6 +284,7 @@ add_library(containers_test STATIC
 	source/containers/reserve_if_reservable.cpp
 	source/containers/resize.cpp
 	source/containers/scope_guard.cpp
+	source/containers/single_element_range.cpp
 	source/containers/size.cpp
 	source/containers/static_vector/make_static_vector.cpp
 	source/containers/tuple.cpp
