@@ -228,7 +228,6 @@ constexpr auto operator-(
 	lhs.subtract()(lhs.base(), rhs.base())
 )
 
-using bounded::compare;
 template<typename Iterator, typename DereferenceFunction, typename AddFunction, typename SubtractFunction, typename CompareFunction>
 constexpr auto compare(
 	iterator_adapter<Iterator, DereferenceFunction, AddFunction, SubtractFunction, CompareFunction> const & lhs,
