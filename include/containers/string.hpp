@@ -57,6 +57,8 @@ public:
 	using base::reserve;
 	using base::shrink_to_fit;
 	
+	using base::append_from_capacity;
+	
 	using base::emplace_back;
 	using base::emplace;
 	using base::insert;
