@@ -96,7 +96,8 @@ public:
 	template<typename T, typename... Args>
 	static constexpr auto & construct(allocator_type & a, T * const ptr, Args && ... args) noexcept(std::is_nothrow_constructible_v<T, Args...>) {
 		if constexpr (detail::allocator_has_construct<allocator_type, T, detail::types<Args...>>) {
-			return *a.construct(ptr, BOUNDED_FORWARD(args)...);
+			a.construct(ptr, BOUNDED_FORWARD(args)...);
+			return *ptr;
 		} else {
 			return ::bounded::construct(*ptr, BOUNDED_FORWARD(args)...);
 		}
