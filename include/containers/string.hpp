@@ -1,4 +1,4 @@
-// Copyright David Stone 2017.
+// Copyright David Stone 2018.
 // Distributed under the Boost Software License, Version 1.0.
 // (See accompanying file LICENSE_1_0.txt or copy at
 // http://www.boost.org/LICENSE_1_0.txt)
@@ -108,59 +108,43 @@ constexpr auto compare(std::basic_string_view<CharT> const lhs, basic_string<Cha
 )
 
 
-template<typename CharT, typename Allocator>
-auto operator+(basic_string<CharT, Allocator> const & lhs, basic_string<CharT, Allocator> const & rhs) {
-	return ::containers::concatenate<basic_string<CharT, Allocator>>(lhs, rhs);
-}
-template<typename CharT, typename Allocator>
-auto operator+(basic_string<CharT, Allocator> && lhs, basic_string<CharT, Allocator> const & rhs) {
-	return ::containers::concatenate<basic_string<CharT, Allocator>>(lhs, rhs);
-}
-template<typename CharT, typename Allocator>
-auto operator+(basic_string<CharT, Allocator> const & lhs, basic_string<CharT, Allocator> && rhs) {
-	return ::containers::concatenate<basic_string<CharT, Allocator>>(lhs, rhs);
-}
-template<typename CharT, typename Allocator>
-auto operator+(basic_string<CharT, Allocator> && lhs, basic_string<CharT, Allocator> && rhs) {
-	return ::containers::concatenate<basic_string<CharT, Allocator>>(lhs, rhs);
-}
+namespace detail {
 
+template<typename T>
+constexpr auto is_string = false;
 
 template<typename CharT, typename Allocator>
-auto operator+(basic_string<CharT, Allocator> const & lhs, std::basic_string_view<CharT> const rhs) {
-	return ::containers::concatenate<basic_string<CharT, Allocator>>(lhs, rhs);
-}
-template<typename CharT, typename Allocator>
-auto operator+(basic_string<CharT, Allocator> && lhs, std::basic_string_view<CharT> const rhs) {
-	return ::containers::concatenate<basic_string<CharT, Allocator>>(std::move(lhs), rhs);
-}
-template<typename CharT, typename Allocator>
-auto operator+(std::basic_string_view<CharT> const lhs, basic_string<CharT, Allocator> const & rhs) {
-	return ::containers::concatenate<basic_string<CharT, Allocator>>(lhs, rhs);
-}
-template<typename CharT, typename Allocator>
-auto operator+(std::basic_string_view<CharT> const lhs, basic_string<CharT, Allocator> && rhs) {
-	return ::containers::concatenate<basic_string<CharT, Allocator>>(lhs, std::move(rhs));
-}
+constexpr auto is_string<basic_string<CharT, Allocator>> = true;
 
+template<typename T>
+constexpr auto string_like = false;
 
 template<typename CharT, typename Allocator>
-auto operator+(basic_string<CharT, Allocator> const & lhs, CharT const * const rhs) {
-	return lhs + std::basic_string_view(rhs);
-}
-template<typename CharT, typename Allocator>
-auto operator+(basic_string<CharT, Allocator> && lhs, CharT const * const rhs) {
-	return std::move(lhs) + std::basic_string_view(rhs);
-}
-template<typename CharT, typename Allocator>
-auto operator+(CharT const * const lhs, basic_string<CharT, Allocator> const & rhs) {
-	return std::basic_string_view(lhs) + rhs;
-}
-template<typename CharT, typename Allocator>
-auto operator+(CharT const * const lhs, basic_string<CharT, Allocator> && rhs) {
-	return std::basic_string_view(lhs) + std::move(rhs);
+constexpr auto string_like<basic_string<CharT, Allocator>> = true;
+
+template<typename CharT>
+constexpr auto string_like<std::basic_string_view<CharT>> = true;
+
+}	// namespace detail
+
+template<typename LHS, typename RHS, BOUNDED_REQUIRES(
+	(detail::string_like<std::decay_t<LHS>> and detail::string_like<std::decay_t<RHS>>) and
+	(detail::is_string<std::decay_t<LHS>> or detail::is_string<std::decay_t<RHS>>) and
+	std::is_same_v<typename std::decay_t<LHS>::value_type, typename std::decay_t<RHS>::value_type>
+)>
+auto operator+(LHS && lhs, RHS && rhs) {
+	using result_t = std::decay_t<std::conditional_t<detail::is_string<std::decay_t<LHS>>, LHS, RHS>>;
+	return ::containers::concatenate<result_t>(BOUNDED_FORWARD(lhs), BOUNDED_FORWARD(rhs));
 }
 
+template<typename String, typename CharT>
+auto operator+(String && lhs, CharT const * const rhs) BOUNDED_NOEXCEPT_VALUE(
+	BOUNDED_FORWARD(lhs) + std::basic_string_view(rhs)
+)
+template<typename CharT, typename String>
+auto operator+(CharT const * const lhs, String && rhs) BOUNDED_NOEXCEPT_VALUE(
+	std::basic_string_view(lhs) + BOUNDED_FORWARD(rhs)
+)
 
 using string = basic_string<char>;
 using wstring = basic_string<wchar_t>;
