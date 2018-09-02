@@ -8,6 +8,7 @@
 #include <containers/algorithms/compare.hpp>
 #include <containers/algorithms/concatenate.hpp>
 #include <containers/range_view.hpp>
+#include <containers/single_element_range.hpp>
 #include <containers/small_buffer_optimized_vector.hpp>
 
 #include <istream>
@@ -144,6 +145,16 @@ auto operator+(String && lhs, CharT const * const rhs) BOUNDED_NOEXCEPT_VALUE(
 template<typename CharT, typename String>
 auto operator+(CharT const * const lhs, String && rhs) BOUNDED_NOEXCEPT_VALUE(
 	std::basic_string_view(lhs) + BOUNDED_FORWARD(rhs)
+)
+
+
+template<typename String, BOUNDED_REQUIRES(detail::is_string<std::decay_t<String>>)>
+auto operator+(String && lhs, typename std::remove_reference_t<String>::value_type const rhs) BOUNDED_NOEXCEPT_VALUE(
+	containers::concatenate<std::decay_t<String>>(BOUNDED_FORWARD(lhs), ::containers::single_element_range(rhs))
+)
+template<typename String, BOUNDED_REQUIRES(detail::is_string<std::decay_t<String>>)>
+auto operator+(typename std::remove_reference_t<String>::value_type const lhs, String && rhs) BOUNDED_NOEXCEPT_VALUE(
+	containers::concatenate<std::decay_t<String>>(::containers::single_element_range(lhs), BOUNDED_FORWARD(rhs))
 )
 
 using string = basic_string<char>;
