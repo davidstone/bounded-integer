@@ -34,7 +34,7 @@ struct accumulate_c<Range, Initial, std::plus<>, true> {
 			std::declval<typename std::remove_reference_t<Range>::value_type>() *
 			std::declval<bounded::integer<
 				0,
-				static_cast<uintmax_t>(std::numeric_limits<decltype(size(std::declval<Range>()))>::max())
+				static_cast<uintmax_t>(std::numeric_limits<typename std::iterator_traits<decltype(begin(std::declval<Range>()))>::difference_type>::max())
 			>>()
 		)
 	);
