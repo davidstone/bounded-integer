@@ -5,10 +5,11 @@
 
 #pragma once
 
+#include <containers/algorithms/uninitialized.hpp>
 #include <containers/append.hpp>
 #include <containers/is_container.hpp>
+#include <containers/is_iterator.hpp>
 #include <containers/size.hpp>
-#include <containers/algorithms/zip.hpp>
 
 #include <bounded/detail/forward.hpp>
 #include <bounded/integer.hpp>
@@ -16,90 +17,43 @@
 namespace containers {
 namespace detail {
 
-template<typename Iterator, typename Sentinel>
-struct range_view_for_adl {
-
-	constexpr range_view_for_adl(Iterator first, Sentinel last):
-		m_begin(first),
-		m_end(last)
-	{
-	}
-
-	template<typename Range>
-	constexpr explicit range_view_for_adl(Range && range):
-		range_view_for_adl(begin(BOUNDED_FORWARD(range)), end(BOUNDED_FORWARD(range)))
-	{
-	}
-	
-	friend constexpr auto begin(range_view_for_adl view) {
-		return view.m_begin;
-	}
-	friend constexpr auto end(range_view_for_adl view) {
-		return view.m_end;
-	}
-	
-private:
-	Iterator m_begin;
-	Sentinel m_end;
-};
-
-template<typename Range>
-range_view_for_adl(Range &&) -> range_view_for_adl<
-	decltype(begin(BOUNDED_FORWARD(std::declval<Range>()))),
-	decltype(end(BOUNDED_FORWARD(std::declval<Range>())))
->;
-
-// Overload an operator so we can use a fold expression, otherwise compile
-// times are horrible.
-template<typename LHSIterator, typename LHSSentinel, typename RHSIterator, typename RHSSentinel>
-constexpr auto operator->*(range_view_for_adl<LHSIterator, LHSSentinel> lhs, range_view_for_adl<RHSIterator, RHSSentinel> rhs) {
-	return range_view_for_adl(
-		zip_iterator(begin(std::move(lhs)), end(lhs), begin(std::move(rhs))),
-		zip_iterator(end(lhs), end(lhs), end(rhs))
-	);
-}
-
-template<typename Result, typename Size, typename... RangesBefore>
-constexpr auto concatenate_impl(
-	Size const total_size,
-	tuple<RangesBefore...> ranges_before
-) {
-	return containers::apply(std::move(ranges_before), [=](auto && ... ranges) {
-		Result result;
-		result.reserve(static_cast<typename Result::size_type>(total_size));
-		(..., append(result, begin(BOUNDED_FORWARD(ranges)), end(BOUNDED_FORWARD(ranges))));
-		return result;
-	});
-}
-
-template<typename Result, typename Size, typename... RangesBefore, typename Range, typename... RangesAfter>
-constexpr auto concatenate_impl(
-	Size const total_size,
-	tuple<RangesBefore...> ranges_before,
-	Range && range,
-	RangesAfter && ... after
-) {
-	if constexpr (std::is_same_v<Result, Range>) {
-		static_assert(std::is_rvalue_reference_v<Range &&>);
-		if (range.capacity() >= total_size) {
-			apply(std::move(ranges_before), [&](auto && ... ranges) {
-				if constexpr (sizeof...(ranges) == 1) {
-					auto && single_range = (..., BOUNDED_FORWARD(ranges));
-					range.insert(begin(range), begin(BOUNDED_FORWARD(single_range)), end(BOUNDED_FORWARD(single_range)));
-				} else if constexpr (sizeof...(ranges) > 1) {
-					auto to_insert = (... ->* range_view_for_adl(BOUNDED_FORWARD(ranges)));
-					range.insert(begin(range), begin(BOUNDED_FORWARD(to_insert)), end(BOUNDED_FORWARD(to_insert)));
-				}
-			});
-			(..., append(range, begin(BOUNDED_FORWARD(after)), end(BOUNDED_FORWARD(after))));
-			return BOUNDED_FORWARD(range);
+// This assumes that the begining of the result is full of unused memory, and
+// all elements in result are already where they belong.
+template<typename Result, typename Range, typename... Ranges>
+constexpr auto concatenate_prepend_append(Result & result, typename Result::iterator const it, Range && range, Ranges && ... ranges) {
+	if constexpr (std::is_same_v<Result, std::remove_reference_t<Range>>) {
+		if (std::addressof(result) == std::addressof(range)) {
+			(..., append(result, begin(BOUNDED_FORWARD(ranges)), end(BOUNDED_FORWARD(ranges))));
+			return;
 		}
 	}
-	return concatenate_impl<Result>(
-		total_size,
-		tuple_cat(std::move(ranges_before), tie(BOUNDED_FORWARD(range))),
-		BOUNDED_FORWARD(after)...
-	);
+	auto const next_it = ::containers::uninitialized_copy(begin(BOUNDED_FORWARD(range)), end(BOUNDED_FORWARD(range)), it, result.get_allocator());
+	concatenate_prepend_append(result, next_it, BOUNDED_FORWARD(ranges)...);
+}
+
+template<typename Result>
+constexpr auto concatenate_prepend_append(Result &, typename Result::iterator) {
+	assert(false);
+}
+
+template<typename Result, typename Integer>
+struct reusable_concatenate_t {
+	Result * ptr;
+	Integer before_size;
+};
+
+template<typename Result, typename Integer, typename Range>
+constexpr auto reusable_concatenate_container(reusable_concatenate_t<Result, Integer> result, Integer const total_size, Range && range) {
+	if (result.ptr) {
+		return result;
+	}
+	if constexpr (std::is_same_v<Result, Range>) {
+		if (range.capacity() >= total_size) {
+			return reusable_concatenate_t<Result, Integer>{std::addressof(range), result.before_size};
+		}
+	}
+	result.before_size += size(range);
+	return result;
 }
 
 // Adding up a bunch of sizes leads to overflow in bounds
@@ -117,11 +71,26 @@ constexpr auto ugly_size_hack(Size const size) {
 
 // TODO: support non-sized input ranges, splicable output ranges, and
 // non-reservable output ranges
-template<typename Result, typename... Ranges, BOUNDED_REQUIRES(is_container<Result> and (... and is_iterable<Ranges>))>
+template<typename Result, typename... Ranges>
 constexpr auto concatenate(Ranges && ... ranges) {
-	static_assert(!std::is_reference_v<Result>, "Cannot concatenate into a reference.");
 	auto const total_size = (0_bi + ... + ::containers::detail::ugly_size_hack(size(ranges)));
-	return detail::concatenate_impl<Result>(total_size, tuple{}, BOUNDED_FORWARD(ranges)...);
+	using Integer = std::remove_const_t<decltype(total_size)>;
+
+	auto reusable = detail::reusable_concatenate_t<Result, Integer>{nullptr, 0_bi};
+	(..., (reusable = ::containers::detail::reusable_concatenate_container(reusable, total_size, BOUNDED_FORWARD(ranges))));
+	if (reusable.ptr) {
+		auto & ref = *reusable.ptr;
+		auto const new_begin = data(ref) + reusable.before_size;
+		::containers::uninitialized_move_destroy(::containers::rbegin(ref), ::containers::rend(ref), ::containers::reverse_iterator(new_begin + size(ref)), ref.get_allocator());
+		ref.append_from_capacity(reusable.before_size);
+		::containers::detail::concatenate_prepend_append(ref, begin(ref), BOUNDED_FORWARD(ranges)...);
+		return std::move(ref);
+	}
+
+	Result result;
+	result.reserve(static_cast<typename Result::size_type>(total_size));
+	(..., append(result, begin(BOUNDED_FORWARD(ranges)), end(BOUNDED_FORWARD(ranges))));
+	return result;
 }
 
 }	// namespace containers

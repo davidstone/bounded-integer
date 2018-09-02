@@ -81,4 +81,6 @@ auto main() -> int {
 	ASSERT_EQ(::containers::concatenate<Expected>(a, b, c, make_reusable_container()), expected_result);
 	
 	ASSERT_EQ(::containers::concatenate<Expected>(make_reusable_container(), a, make_reusable_container(), b, make_reusable_container(), c, make_reusable_container()), expected_result);
+	
+	ASSERT_EQ(::containers::concatenate<containers::vector<char>>(std::string_view("a"), std::string_view("b")), containers::vector<char>({'a', 'b'}));
 }
