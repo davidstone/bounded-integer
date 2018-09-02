@@ -39,7 +39,7 @@ constexpr auto erase(Container & container, typename Container::const_iterator c
 
 template<typename Container, typename Predicate, BOUNDED_REQUIRES(is_container<Container>)>
 constexpr auto erase_if(Container & container, Predicate predicate) {
-	erase(container, ::containers::remove_if(begin(container), end(container), std::move(predicate)), end(container));
+	erase(container, ::containers::remove_if(container, std::move(predicate)), end(container));
 }
 
 

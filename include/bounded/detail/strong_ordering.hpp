@@ -56,6 +56,10 @@ struct strong_ordering {
 	friend constexpr auto operator>=(std::nullptr_t, strong_ordering const rhs) noexcept {
 		return 0 >= rhs.value;
 	}
+	
+	friend constexpr auto invert(strong_ordering const ordering) noexcept {
+		return strong_ordering(-ordering.value);
+	}
 
 private:
 	int value;

@@ -1,4 +1,4 @@
-// Copyright David Stone 2015.
+// Copyright David Stone 2018.
 // Distributed under the Boost Software License, Version 1.0.
 // (See accompanying file LICENSE_1_0.txt or copy at
 // http://www.boost.org/LICENSE_1_0.txt)
@@ -88,9 +88,7 @@ auto uninitialized_copy(InputIterator first, Sentinel const last, ForwardIterato
 			++out;
 		}
 	} catch (...) {
-		for (; out_first != out; ++out_first) {
-			::containers::detail::destroy(allocator, std::addressof(*out_first));
-		}
+		::containers::detail::destroy(allocator, out_first, out);
 		throw;
 	}
 	return out;
@@ -156,12 +154,8 @@ auto uninitialized_move_destroy(InputIterator const first, Sentinel const last, 
 			++out;
 		}
 	} catch (...) {
-		for (auto first_unadapted = first_adapted.base(); first_unadapted != last; ++first_unadapted) {
-			::containers::detail::destroy(allocator, std::addressof(*first_unadapted));
-		}
-		for (; out_first != out; ++out_first) {
-			::containers::detail::destroy(allocator, std::addressof(*out_first));
-		}
+		::containers::detail::destroy(allocator, first_adapted.base(), last);
+		::containers::detail::destroy(allocator, out_first, out);
 		throw;
 	}
 	return out;
@@ -203,9 +197,7 @@ auto uninitialized_default_construct(ForwardIterator const first, Sentinel const
 			::containers::detail::construct(allocator, std::addressof(*it));
 		}
 	} catch (...) {
-		for (auto rollback = first; rollback != it; ++rollback) {
-			::containers::detail::destroy(allocator, std::addressof(*rollback));
-		}
+		::containers::detail::destroy(allocator, first, it);
 		throw;
 	}
 }
