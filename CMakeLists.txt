@@ -77,6 +77,7 @@ target_sources(containers INTERFACE
 	$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>/include/containers/algorithms/accumulate.hpp
 	$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>/include/containers/algorithms/all_any_none.hpp
 	$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>/include/containers/algorithms/concatenate.hpp
+	$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>/include/containers/algorithms/concatenate_view.hpp
 	$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>/include/containers/algorithms/copy.hpp
 	$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>/include/containers/algorithms/count.hpp
 	$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>/include/containers/algorithms/distance.hpp
@@ -89,7 +90,6 @@ target_sources(containers INTERFACE
 	$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>/include/containers/algorithms/reverse_iterator.hpp
 	$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>/include/containers/algorithms/uninitialized.hpp
 	$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>/include/containers/algorithms/unique.hpp
-	$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>/include/containers/algorithms/zip.hpp
 	$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>/include/containers/allocator.hpp
 	$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>/include/containers/append.hpp
 	$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>/include/containers/array/array.hpp
@@ -242,6 +242,7 @@ target_link_libraries(bounded_test bounded)
 add_library(containers_test STATIC
 	source/containers/algorithms/accumulate.cpp
 	source/containers/algorithms/all_any_none.cpp
+	source/containers/algorithms/concatenate_view.cpp
 	source/containers/algorithms/copy.cpp
 	source/containers/algorithms/count.cpp
 	source/containers/algorithms/distance.cpp
@@ -254,7 +255,6 @@ add_library(containers_test STATIC
 	source/containers/algorithms/reverse_iterator.cpp
 	source/containers/algorithms/uninitialized.cpp
 	source/containers/algorithms/unique.cpp
-	source/containers/algorithms/zip.cpp
 	source/containers/allocator.cpp
 	source/containers/append.cpp
 	source/containers/array/array.cpp
