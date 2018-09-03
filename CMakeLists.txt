@@ -79,6 +79,7 @@ target_sources(containers INTERFACE
 	$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>/include/containers/algorithms/concatenate.hpp
 	$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>/include/containers/algorithms/concatenate_view.hpp
 	$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>/include/containers/algorithms/copy.hpp
+	$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>/include/containers/algorithms/copy_n.hpp
 	$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>/include/containers/algorithms/count.hpp
 	$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>/include/containers/algorithms/distance.hpp
 	$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>/include/containers/algorithms/filter_iterator.hpp
@@ -245,6 +246,7 @@ add_library(containers_test STATIC
 	source/containers/algorithms/all_any_none.cpp
 	source/containers/algorithms/concatenate_view.cpp
 	source/containers/algorithms/copy.cpp
+	source/containers/algorithms/copy_n.cpp
 	source/containers/algorithms/count.cpp
 	source/containers/algorithms/distance.cpp
 	source/containers/algorithms/filter_iterator.cpp

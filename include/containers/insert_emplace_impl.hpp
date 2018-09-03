@@ -7,6 +7,7 @@
 
 #include <containers/algorithms/compare.hpp>
 #include <containers/algorithms/copy.hpp>
+#include <containers/algorithms/copy_n.hpp>
 #include <containers/algorithms/distance.hpp>
 #include <containers/algorithms/uninitialized.hpp>
 #include <containers/append.hpp>
