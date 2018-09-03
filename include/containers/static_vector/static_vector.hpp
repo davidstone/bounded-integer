@@ -9,6 +9,7 @@
 #include <containers/allocator.hpp>
 #include <containers/common_container_functions.hpp>
 #include <containers/index_type.hpp>
+#include <containers/insert_emplace_impl.hpp>
 #include <containers/is_iterator_sentinel.hpp>
 #include <containers/operator_bracket.hpp>
 #include <containers/repeat_n.hpp>
