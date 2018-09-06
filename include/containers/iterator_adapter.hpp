@@ -8,6 +8,7 @@
 #include <containers/common_iterator_functions.hpp>
 #include <containers/index_type.hpp>
 #include <containers/operator_arrow.hpp>
+#include <containers/range_view.hpp>
 #include <containers/tuple.hpp>
 #include <containers/type.hpp>
 
@@ -274,6 +275,16 @@ constexpr auto compare(
 	iterator_adapter<Iterator, DereferenceFunction, AddFunction, SubtractFunction, CompareFunction> const & rhs
 ) {
 	return invert(compare(rhs, lhs));
+}
+
+template<typename Range, typename UnaryFunction>
+constexpr auto adapt_range(Range && range, UnaryFunction && dereference) {
+	return range_view(
+		containers::iterator_adapter(begin(BOUNDED_FORWARD(range)), BOUNDED_FORWARD(dereference)),
+		iterator_adapter_sentinel([last = end(BOUNDED_FORWARD(range))](auto const & adapted) {
+			return compare(adapted.base(), last);
+		})
+	);
 }
 
 }	// namespace containers
