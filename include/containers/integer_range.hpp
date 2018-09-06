@@ -11,6 +11,7 @@
 #include <bounded/integer.hpp>
 
 #include <iterator>
+#include <type_traits>
 
 namespace containers {
 namespace detail {
@@ -19,16 +20,16 @@ template<typename Integer, typename Sentinel>
 struct integer_range_iterator {
 private:
 	using storage_type = bounded::integer<
-		Integer::min().value(),
-		Sentinel::max().value(),
+		bounded::detail::normalize<Integer::min().value()>,
+		bounded::detail::normalize<Sentinel::max().value()>,
 		typename Integer::overflow_policy
 	>;
 	storage_type m_value;
 
 public:
 	using value_type = bounded::integer<
-		storage_type::min().value(),
-		bounded::max(storage_type::min(), storage_type::max() - bounded::constant<1>).value(),
+		bounded::detail::normalize<storage_type::min().value()>,
+		bounded::detail::normalize<bounded::max(storage_type::min(), storage_type::max() - bounded::constant<1>).value()>,
 		typename Integer::overflow_policy
 	>;
 	using difference_type = decltype(std::declval<storage_type>() - std::declval<storage_type>());
@@ -71,7 +72,7 @@ constexpr auto operator+(typename integer_range_iterator<Integer, Sentinel>::dif
 
 }	// namespace detail
 
-template<typename Integer, typename Sentinel>
+template<typename Integer, typename Sentinel = Integer>
 struct integer_range {
 	static_assert(bounded::is_bounded_integer<Integer>);
 	static_assert(bounded::is_bounded_integer<Sentinel>);
@@ -81,7 +82,7 @@ struct integer_range {
 	using const_iterator = iterator;
 
 	using value_type = typename iterator::value_type;
-	using size_type = bounded::integer<0, iterator::difference_type::max().value()>;
+	using size_type = bounded::integer<0, bounded::detail::normalize<iterator::difference_type::max().value()>>;
 
 	constexpr integer_range(Integer const first, Sentinel const last) noexcept:
 		m_begin(first),
@@ -111,13 +112,25 @@ private:
 template<typename Integer, typename Sentinel>
 integer_range(Integer, Sentinel) -> integer_range<
 	bounded::integer<
-		std::numeric_limits<Integer>::min().value(),
-		std::numeric_limits<Sentinel>::max().value()
+		bounded::detail::normalize<std::numeric_limits<Integer>::min().value()>,
+		bounded::detail::normalize<std::numeric_limits<Sentinel>::max().value()>
 	>,
 	Sentinel
 >;
 
 template<typename Size>
-integer_range(Size) -> integer_range<bounded::integer<0, Size::max().value()>, Size>;
+integer_range(Size) -> integer_range<bounded::integer<0, bounded::detail::normalize<Size::max().value()>>, Size>;
+
+
+template<typename Enum, BOUNDED_REQUIRES(std::is_enum_v<Enum>)>
+constexpr auto enum_range(Enum last = static_cast<Enum>(std::numeric_limits<Enum>::max())) {
+	auto const irange = integer_range(bounded::integer(last));
+	constexpr struct {
+		constexpr auto operator()(decltype(begin(irange)) const it) const {
+			return static_cast<Enum>(*it);
+		}
+	} function;
+	return containers::adapt_range(irange, function);
+}
 
 }	// namespace containers
