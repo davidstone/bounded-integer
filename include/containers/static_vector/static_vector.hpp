@@ -10,6 +10,7 @@
 #include <containers/common_container_functions.hpp>
 #include <containers/index_type.hpp>
 #include <containers/insert_emplace_impl.hpp>
+#include <containers/integer_range.hpp>
 #include <containers/is_iterator_sentinel.hpp>
 #include <containers/operator_bracket.hpp>
 #include <containers/repeat_n.hpp>
@@ -18,7 +19,6 @@
 #include <containers/array/iterator.hpp>
 
 #include <bounded/detail/forward.hpp>
-#include <bounded/integer_range.hpp>
 
 #include <algorithm>
 #include <cassert>
@@ -176,7 +176,7 @@ private:
 	template<typename Count, typename... MaybeInitializer>
 	constexpr explicit static_vector(count_constructor, Count const count, MaybeInitializer && ... args) noexcept(std::is_nothrow_constructible_v<value_type, MaybeInitializer && ...>) {
 		static_assert(sizeof...(MaybeInitializer) == 0 or sizeof...(MaybeInitializer) == 1);
-		for (auto const n : bounded::integer_range(count)) {
+		for (auto const n : integer_range(count)) {
 			static_cast<void>(n);
 			emplace_back(BOUNDED_FORWARD(args)...);
 		}

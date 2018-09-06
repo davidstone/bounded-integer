@@ -10,7 +10,6 @@
 
 #include <bounded/integer.hpp>
 
-#include <cassert>
 #include <iterator>
 
 namespace containers {
@@ -44,7 +43,6 @@ struct basic_array_iterator {
 	}
 
 	constexpr auto & operator*() const noexcept {
-		assert(m_it);
 		return *m_it;
 	}
 	constexpr auto operator->() const noexcept {

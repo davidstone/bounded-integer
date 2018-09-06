@@ -6,7 +6,6 @@
 #undef NDEBUG
 
 #include <bounded/integer.hpp>
-#include <bounded/integer_range.hpp>
 #include <bounded/optional.hpp>
 
 #include "homogeneous_equals.hpp"

@@ -56,7 +56,7 @@ constexpr auto accumulate(Range && range, Initial && initial, BinaryFunction fun
 	std::is_nothrow_move_constructible_v<std::decay_t<Result>>
 ) {
 	auto result = static_cast<Result>(BOUNDED_FORWARD(initial));
-	for (auto && value : BOUNDED_FORWARD(range)) {
+	for (decltype(auto) value : BOUNDED_FORWARD(range)) {
 		result = static_cast<Result>(function(std::move(result), BOUNDED_FORWARD(value)));
 	}
 	return result;

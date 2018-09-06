@@ -16,7 +16,6 @@
 #include <containers/uninitialized_storage.hpp>
 
 #include <bounded/detail/forward.hpp>
-#include <bounded/integer_range.hpp>
 
 #include <algorithm>
 #include <cstddef>

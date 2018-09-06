@@ -5,8 +5,8 @@
 
 #pragma once
 
+#include <containers/integer_range.hpp>
 #include <bounded/integer.hpp>
-#include <bounded/integer_range.hpp>
 
 namespace containers {
 
@@ -18,7 +18,7 @@ constexpr auto copy_n(InputIterator first, Size const count, OutputIterator out)
 		InputIterator input;
 		OutputIterator output;
 	};
-	for (auto const n : bounded::integer_range(count)) {
+	for (auto const n : integer_range(count)) {
 		static_cast<void>(n);
 		*out = *first;
 		++out;

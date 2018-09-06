@@ -41,7 +41,6 @@ target_sources(bounded INTERFACE
 	$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>/include/bounded/detail/construct_destroy.hpp
 	$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>/include/bounded/detail/forward_declaration.hpp
 	$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>/include/bounded/detail/hash.hpp
-	$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>/include/bounded/detail/integer_range.hpp
 	$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>/include/bounded/detail/is_bounded_integer.hpp
 	$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>/include/bounded/detail/is_poisoned.hpp
 	$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>/include/bounded/detail/literal.hpp
@@ -69,7 +68,6 @@ target_sources(bounded INTERFACE
 	$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>/include/bounded/detail/typedefs.hpp
 	$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>/include/bounded/detail/underlying_type.hpp
 	$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>/include/bounded/integer.hpp
-	$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>/include/bounded/integer_range.hpp
 	$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>/include/bounded/optional.hpp
 )
 
@@ -115,6 +113,7 @@ target_sources(containers INTERFACE
 	$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>/include/containers/index_type.hpp
 	$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>/include/containers/insert.hpp
 	$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>/include/containers/insert_emplace_impl.hpp
+	$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>/include/containers/integer_range.hpp
 	$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>/include/containers/is_container.hpp
 	$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>/include/containers/is_iterable.hpp
 	$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>/include/containers/is_iterator.hpp
@@ -207,7 +206,6 @@ add_executable(bounded_test
 	source/bounded/detail/construct_destroy.cpp
 	source/bounded/detail/forward_declaration.cpp
 	source/bounded/detail/hash.cpp
-	source/bounded/detail/integer_range.cpp
 	source/bounded/detail/is_bounded_integer.cpp
 	source/bounded/detail/is_poisoned.cpp
 	source/bounded/detail/literal.cpp
@@ -235,7 +233,6 @@ add_executable(bounded_test
 	source/bounded/detail/typedefs.cpp
 	source/bounded/detail/underlying_type.cpp
 	source/bounded/integer.cpp
-	source/bounded/integer_range.cpp
 	source/bounded/optional.cpp
 )
 
@@ -276,6 +273,7 @@ add_library(containers_test STATIC
 	source/containers/has_nested_type.cpp
 	source/containers/insert.cpp
 	source/containers/insert_emplace_impl.cpp
+	source/containers/integer_range.cpp
 	source/containers/is_container.cpp
 	source/containers/is_iterable.cpp
 	source/containers/is_iterator.cpp

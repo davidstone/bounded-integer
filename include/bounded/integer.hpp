@@ -29,4 +29,4 @@
 #include <bounded/detail/arithmetic/pointer.hpp>
 #include <bounded/detail/policy/all.hpp>
 
-// Missing from this list are optional and integer_range
+// optional is not included here
