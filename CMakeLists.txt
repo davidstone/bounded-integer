@@ -127,6 +127,7 @@ target_sources(containers INTERFACE
 	$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>/include/containers/operator_bracket.hpp
 	$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>/include/containers/push_back.hpp
 	$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>/include/containers/range_view.hpp
+	$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>/include/containers/reference_wrapper.hpp
 	$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>/include/containers/repeat_n.hpp
 	$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>/include/containers/reserve_if_reservable.hpp
 	$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>/include/containers/resize.hpp
@@ -286,6 +287,7 @@ add_library(containers_test STATIC
 	source/containers/operator_arrow.cpp
 	source/containers/push_back.cpp
 	source/containers/range_view.cpp
+	source/containers/reference_wrapper.cpp
 	source/containers/reserve_if_reservable.cpp
 	source/containers/resize.cpp
 	source/containers/scope_guard.cpp
