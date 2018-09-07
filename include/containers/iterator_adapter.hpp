@@ -278,7 +278,7 @@ constexpr auto compare(
 }
 
 template<typename Range, typename UnaryFunction>
-constexpr auto adapt_range(Range && range, UnaryFunction && dereference) {
+constexpr auto transform(Range && range, UnaryFunction && dereference) {
 	return range_view(
 		containers::iterator_adapter(begin(BOUNDED_FORWARD(range)), BOUNDED_FORWARD(dereference)),
 		iterator_adapter_sentinel([last = end(BOUNDED_FORWARD(range))](auto const & adapted) {

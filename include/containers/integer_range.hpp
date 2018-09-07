@@ -130,7 +130,7 @@ constexpr auto enum_range(Enum last = static_cast<Enum>(std::numeric_limits<Enum
 			return static_cast<Enum>(*it);
 		}
 	} function;
-	return containers::adapt_range(irange, function);
+	return containers::transform(irange, function);
 }
 
 }	// namespace containers
