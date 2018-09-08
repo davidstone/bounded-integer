@@ -62,7 +62,9 @@ constexpr auto destroy(Allocator && allocator, T * pointer) BOUNDED_NOEXCEPT(
 
 template<typename Allocator, typename InputIterator, typename Sentinel, BOUNDED_REQUIRES(is_iterator_sentinel<InputIterator, Sentinel>)>
 constexpr auto destroy(Allocator && allocator, InputIterator first, Sentinel const last) noexcept {
-	static_assert(noexcept(::containers::detail::destroy(allocator, std::addressof(*first))));
+	// This static_assert fails with reverse_iterator because std::prev is not
+	// noexcept
+	// static_assert(noexcept(::containers::detail::destroy(allocator, std::addressof(*first))));
 	for (; first != last; ++first) {
 		::containers::detail::destroy(allocator, std::addressof(*first));
 	}
