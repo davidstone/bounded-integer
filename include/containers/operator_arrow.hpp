@@ -32,7 +32,7 @@ struct operator_arrow<Iterator, std::void_t<decltype(std::addressof(*std::declva
 // any iterator, even those that return by value
 
 struct temporary_operator_arrow {
-	using reference = decltype(*std::declval<iterator_adapter const &>()) &&;
+	using reference = decltype(*std::declval<Iterator const &>()) &&;
 	constexpr explicit temporary_operator_arrow(reference value) noexcept:
 		m_value(BOUNDED_FORWARD(value))
 	{
