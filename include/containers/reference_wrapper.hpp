@@ -52,4 +52,13 @@ constexpr auto cref(T const & value) noexcept {
 template<typename T>
 constexpr auto cref(T && value) = delete;
 
+template<typename T>
+constexpr auto && unwrap(reference_wrapper<T> reference) noexcept {
+	return reference.get();
+}
+template<typename T>
+constexpr auto && unwrap(T && reference) noexcept {
+	return BOUNDED_FORWARD(reference);
+}
+
 }	// namespace containers
