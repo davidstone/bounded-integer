@@ -8,43 +8,39 @@
 #include <containers/common_iterator_functions.hpp>
 #include <containers/index_type.hpp>
 #include <containers/operator_arrow.hpp>
-#include <containers/range_view.hpp>
+#include <containers/reference_wrapper.hpp>
 #include <containers/tuple.hpp>
-#include <containers/type.hpp>
 
 #include <bounded/integer.hpp>
 
-#include <cstddef>
-#include <cstdint>
 #include <iterator>
-#include <limits>
 #include <type_traits>
+#include <utility>
 
-// TODO: implement as range_adapter so that iterators remain cheap to copy
 namespace containers {
-namespace detail {
 
 struct default_dereference {
 	template<typename Iterator>
-	constexpr auto operator()(Iterator const & it) const BOUNDED_NOEXCEPT_DECLTYPE(
+	static constexpr auto dereference(Iterator const & it) BOUNDED_NOEXCEPT_DECLTYPE(
 		*it
 	)
 };
 
 struct default_add {
 	template<typename Iterator, typename Offset>
-	constexpr auto operator()(Iterator const & it, Offset const & offset) const BOUNDED_NOEXCEPT_DECLTYPE(
+	static constexpr auto add(Iterator const & it, Offset const & offset) BOUNDED_NOEXCEPT_DECLTYPE(
 		it + offset
 	)
 };
 
 struct default_subtract {
 	template<typename Iterator>
-	constexpr auto operator()(Iterator const & lhs, Iterator const & rhs) const BOUNDED_NOEXCEPT_DECLTYPE(
+	static constexpr auto subtract(Iterator const & lhs, Iterator const & rhs) BOUNDED_NOEXCEPT_DECLTYPE(
 		lhs - rhs
 	)
 };
 
+namespace detail {
 namespace compare_adl {
 
 using bounded::compare;
@@ -55,18 +51,19 @@ constexpr auto indirect_compare(LHS const & lhs, RHS const & rhs) BOUNDED_NOEXCE
 )
 
 }	// namespace compare_adl
+}	// namespace detail
 
 struct default_compare {
 	template<typename LHS, typename RHS>
-	constexpr auto operator()(LHS const & lhs, RHS const & rhs) const BOUNDED_NOEXCEPT_DECLTYPE(
-		compare_adl::indirect_compare(lhs, rhs)
+	static constexpr auto compare(LHS const & lhs, RHS const & rhs) BOUNDED_NOEXCEPT_DECLTYPE(
+		::containers::detail::compare_adl::indirect_compare(lhs, rhs)
 	)
 };
 
-struct not_a_function {};
+namespace detail {
 
-template<typename Iterator, typename SubtractFunction,
-	typename = decltype(std::declval<SubtractFunction>()(std::declval<Iterator>(), std::declval<Iterator>()))
+template<typename Iterator, typename Traits,
+	typename = decltype(std::declval<Traits>().subtract(std::declval<Iterator>(), std::declval<Iterator>()))
 >
 constexpr auto is_random_access_iterator() {
 	return true;
@@ -76,9 +73,9 @@ constexpr auto is_random_access_iterator(Args...) {
 	return false;
 }
 
-template<typename Iterator, typename AddFunction,
-	typename = decltype(std::declval<AddFunction>()(std::declval<Iterator>(), bounded::constant<1>)),
-	typename = decltype(std::declval<AddFunction>()(std::declval<Iterator>(), bounded::constant<-1>))
+template<typename Iterator, typename Traits,
+	typename = decltype(std::declval<Traits>().add(std::declval<Iterator>(), bounded::constant<1>)),
+	typename = decltype(std::declval<Traits>().add(std::declval<Iterator>(), bounded::constant<-1>))
 >
 constexpr auto is_bidirectional_iterator() {
 	return true;
@@ -88,8 +85,8 @@ constexpr auto is_bidirectional_iterator(Args...) {
 	return false;
 }
 
-template<typename Iterator, typename AddFunction,
-	typename = decltype(std::declval<AddFunction>()(std::declval<Iterator>(), 1_bi))
+template<typename Iterator, typename Traits,
+	typename = decltype(std::declval<Traits>().add(std::declval<Iterator>(), bounded::constant<1>))
 >
 constexpr auto is_forward_iterator() {
 	return true;
@@ -112,86 +109,52 @@ constexpr auto is_forward_iterator(Args...) {
 // unfortunately, there does not appear to be a way to provide a function that
 // unifies these operations.
 
-template<typename Iterator, typename DereferenceFunction, typename AddFunction = detail::default_add, typename SubtractFunction = detail::default_subtract, typename CompareFunction = detail::default_compare>
-struct iterator_adapter : detail::operator_arrow<iterator_adapter<Iterator, DereferenceFunction, AddFunction, SubtractFunction, CompareFunction>> {
+template<typename Iterator, typename Traits>
+struct adapt_iterator : detail::operator_arrow<adapt_iterator<Iterator, Traits>> {
 private:
-	using tuple_t = tuple<Iterator, DereferenceFunction, AddFunction, SubtractFunction, CompareFunction>;
+	// TODO: [[no_unique_address]]
+	using tuple_t = tuple<Iterator, Traits>;
+	static_assert(std::is_copy_assignable_v<Iterator>);
+	static_assert(std::is_copy_assignable_v<Traits>);
+
 	using base_iterator_category = typename std::iterator_traits<Iterator>::iterator_category;
+
+	using traits_t = decltype(containers::unwrap(std::declval<Traits>()));
+
 public:
-	static_assert(
-		std::is_empty_v<SubtractFunction>,
-		"SubtractFunction must be a stateless function. Would we use the state from the left- or right-hand side?"
-	);
-	static_assert(
-		std::is_empty_v<CompareFunction>,
-		"CompareFunction must be a stateless comparison function. Would we use the state from the left- or right-hand side?"
-	);
-	using value_type = std::decay_t<decltype(std::declval<DereferenceFunction>()(std::declval<Iterator>()))>;
+	using value_type = decltype(containers::unwrap(std::declval<Traits>()).dereference(std::declval<Iterator>()));
+	// TODO: technically not correct. For instance, consider an iterator adapter
+	// that visits each element twice.
 	using difference_type = typename std::iterator_traits<Iterator>::difference_type;
 	using iterator_category =
 		std::conditional_t<std::is_same_v<base_iterator_category, std::output_iterator_tag>, std::output_iterator_tag,
 		std::conditional_t<std::is_same_v<base_iterator_category, std::input_iterator_tag>, std::input_iterator_tag,
-		std::conditional_t<detail::is_random_access_iterator<Iterator, SubtractFunction>(), std::random_access_iterator_tag,
-		std::conditional_t<detail::is_bidirectional_iterator<Iterator, AddFunction>(), std::bidirectional_iterator_tag,
-		std::conditional_t<detail::is_forward_iterator<Iterator, AddFunction>(), std::forward_iterator_tag,
+		std::conditional_t<detail::is_random_access_iterator<Iterator, traits_t>(), std::random_access_iterator_tag,
+		std::conditional_t<detail::is_bidirectional_iterator<Iterator, traits_t>(), std::bidirectional_iterator_tag,
+		std::conditional_t<detail::is_forward_iterator<Iterator, traits_t>(), std::forward_iterator_tag,
 		void
 	>>>>>;
 	static_assert(not std::is_void_v<iterator_category>);
 
 	// Not sure what these actually mean...
-	using pointer = typename std::iterator_traits<Iterator>::pointer;
-	using reference = std::conditional_t<std::is_reference_v<value_type>, value_type, value_type &>;
+	using pointer = std::remove_reference_t<value_type> *;
+	using reference = value_type;
 
-	// Even though subtract and compare must be stateless, we must still keep
-	// them around. This is because there is no guarantee that they are
-	// default-constructible: for instance, lambdas.
-	constexpr iterator_adapter(Iterator it, DereferenceFunction dereference, AddFunction add, SubtractFunction subtract, CompareFunction compare) noexcept(std::is_nothrow_constructible_v<tuple_t, Iterator, DereferenceFunction, AddFunction, SubtractFunction, CompareFunction>):
-		m_data(std::move(it), std::move(dereference), std::move(add), std::move(subtract), std::move(compare))
+	constexpr adapt_iterator(Iterator it, Traits traits) noexcept(std::is_nothrow_constructible_v<tuple_t, Iterator, Traits>):
+		m_data(std::move(it), std::move(traits))
 	{
-	}
-	
-	constexpr iterator_adapter(Iterator it, DereferenceFunction dereference) BOUNDED_NOEXCEPT_INITIALIZATION(
-		iterator_adapter(
-			std::move(it),
-			std::move(dereference),
-			detail::default_add{},
-			detail::default_subtract{},
-			detail::default_compare{}
-		)
-	) {
 	}
 	
 	constexpr auto base() const noexcept {
 		return m_data[0_bi];
 	}
 
-	constexpr auto && dereference() const & noexcept {
+	constexpr auto traits() const noexcept {
 		return m_data[1_bi];
 	}
-	constexpr auto && dereference() & noexcept {
-		return m_data[1_bi];
-	}
-	constexpr auto && dereference() && noexcept {
-		return std::move(m_data)[1_bi];
-	}
-	constexpr auto && add() const & noexcept {
-		return m_data[2_bi];
-	}
-	constexpr auto && add() & noexcept {
-		return m_data[2_bi];
-	}
-	constexpr auto && add() && noexcept {
-		return std::move(m_data)[2_bi];
-	}
-	constexpr auto subtract() const noexcept {
-		return m_data[3_bi];
-	}
-	constexpr auto compare() const noexcept {
-		return m_data[4_bi];
-	}
-	
+
 	template<typename Index>
-	constexpr auto operator[](Index const index) const noexcept(noexcept(*(std::declval<iterator_adapter>() + index))) -> decltype(*(*this + index)) {
+	constexpr auto operator[](Index const index) const noexcept(noexcept(*(std::declval<adapt_iterator>() + index))) -> decltype(*(*this + index)) {
 		return *(*this + index);
 	}
 
@@ -200,41 +163,25 @@ private:
 };
 
 
-template<typename Iterator, typename DereferenceFunction, typename AddFunction, typename SubtractFunction, typename CompareFunction>
-constexpr auto operator*(iterator_adapter<Iterator, DereferenceFunction, AddFunction, SubtractFunction, CompareFunction> const & it) BOUNDED_NOEXCEPT_DECLTYPE(
-	it.dereference()(it.base())
+template<typename Iterator, typename Traits>
+constexpr auto operator*(adapt_iterator<Iterator, Traits> const it) BOUNDED_NOEXCEPT_DECLTYPE(
+	it.traits().dereference(it.base())
 )
 
-template<typename Iterator, typename DereferenceFunction, typename AddFunction, typename SubtractFunction, typename CompareFunction, typename Offset>
-constexpr auto operator+(
-	iterator_adapter<Iterator, DereferenceFunction, AddFunction, SubtractFunction, CompareFunction> lhs,
-	Offset const rhs
-) BOUNDED_NOEXCEPT_VALUE(
-	// Use {} initialization to ensure evaluation order
-	iterator_adapter<Iterator, DereferenceFunction, AddFunction, SubtractFunction, CompareFunction>{
-		lhs.add()(lhs.base(), rhs),
-		std::move(lhs).dereference(),
-		std::move(lhs).add(),
-		lhs.subtract(),
-		lhs.compare()
-	}
+template<typename Iterator, typename Traits, typename Offset>
+constexpr auto operator+(adapt_iterator<Iterator, Traits> const lhs, Offset const rhs) BOUNDED_NOEXCEPT_VALUE(
+	adapt_iterator<Iterator, Traits>(lhs.traits().add(lhs.base(), rhs), lhs.traits())
 )
 
 
-template<typename Iterator, typename DereferenceFunction, typename AddFunction, typename SubtractFunction, typename CompareFunction>
-constexpr auto operator-(
-	iterator_adapter<Iterator, DereferenceFunction, AddFunction, SubtractFunction, CompareFunction> const & lhs,
-	iterator_adapter<Iterator, DereferenceFunction, AddFunction, SubtractFunction, CompareFunction> const & rhs
-) BOUNDED_NOEXCEPT_DECLTYPE(
-	lhs.subtract()(lhs.base(), rhs.base())
+template<typename Iterator, typename Traits>
+constexpr auto operator-(adapt_iterator<Iterator, Traits> const lhs, adapt_iterator<Iterator, Traits> const rhs) BOUNDED_NOEXCEPT_DECLTYPE(
+	lhs.traits().subtract(lhs.base(), rhs.base())
 )
 
-template<typename Iterator, typename DereferenceFunction, typename AddFunction, typename SubtractFunction, typename CompareFunction>
-constexpr auto compare(
-	iterator_adapter<Iterator, DereferenceFunction, AddFunction, SubtractFunction, CompareFunction> const & lhs,
-	iterator_adapter<Iterator, DereferenceFunction, AddFunction, SubtractFunction, CompareFunction> const & rhs
-) BOUNDED_NOEXCEPT_DECLTYPE(
-	lhs.compare()(lhs.base(), rhs.base())
+template<typename Iterator, typename Traits>
+constexpr auto compare(adapt_iterator<Iterator, Traits> const lhs, adapt_iterator<Iterator, Traits> const rhs) BOUNDED_NOEXCEPT_DECLTYPE(
+	lhs.traits().compare(lhs.base(), rhs.base())
 )
 
 
@@ -245,46 +192,17 @@ public:
 		m_compare_function(std::move(compare_function))
 	{
 	}
-	template<
-		typename Iterator,
-		typename DereferenceFunction,
-		typename AddFunction,
-		typename SubtractFunction,
-		typename CompareFunction
-	>
-	friend constexpr auto compare(
-		iterator_adapter<Iterator, DereferenceFunction, AddFunction, SubtractFunction, CompareFunction> const & lhs,
-		iterator_adapter_sentinel const & rhs
-	) {
+	template<typename Iterator, typename Traits>
+	friend constexpr auto compare(adapt_iterator<Iterator, Traits> const lhs, iterator_adapter_sentinel const & rhs) {
 		return rhs.m_compare_function(lhs);
 	}
 private:
 	UnaryFunction m_compare_function;
 };
 
-template<
-	typename UnaryFunction,
-	typename Iterator,
-	typename DereferenceFunction,
-	typename AddFunction,
-	typename SubtractFunction,
-	typename CompareFunction
->
-constexpr auto compare(
-	iterator_adapter_sentinel<UnaryFunction> const & lhs,
-	iterator_adapter<Iterator, DereferenceFunction, AddFunction, SubtractFunction, CompareFunction> const & rhs
-) {
+template<typename UnaryFunction, typename Iterator, typename Traits>
+constexpr auto compare(iterator_adapter_sentinel<UnaryFunction> const & lhs, adapt_iterator<Iterator, Traits> const rhs) {
 	return invert(compare(rhs, lhs));
-}
-
-template<typename Range, typename UnaryFunction>
-constexpr auto transform(Range && range, UnaryFunction && dereference) {
-	return range_view(
-		containers::iterator_adapter(begin(BOUNDED_FORWARD(range)), BOUNDED_FORWARD(dereference)),
-		iterator_adapter_sentinel([last = end(BOUNDED_FORWARD(range))](auto const & adapted) {
-			return compare(adapted.base(), last);
-		})
-	);
 }
 
 }	// namespace containers

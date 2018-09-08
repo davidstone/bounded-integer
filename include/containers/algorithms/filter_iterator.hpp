@@ -7,7 +7,7 @@
 
 #include <containers/algorithms/find.hpp>
 #include <containers/iterator_adapter.hpp>
-#include <containers/range_view.hpp>
+#include <containers/reference_wrapper.hpp>
 #include <containers/tuple.hpp>
 
 #include <bounded/detail/forward.hpp>
@@ -24,13 +24,13 @@ namespace detail {
 
 // TODO: Switch to [[no_unique_address]] when supported
 template<typename Sentinel, typename Condition>
-struct filter_iterator_increment : private tuple<Sentinel, Condition> {
-	constexpr filter_iterator_increment(Sentinel last, Condition condition) BOUNDED_NOEXCEPT_INITIALIZATION(
+struct filter_iterator_traits : private tuple<Sentinel, Condition>, default_dereference, default_compare {
+	constexpr filter_iterator_traits(Sentinel last, Condition condition) BOUNDED_NOEXCEPT_INITIALIZATION(
 		tuple<Sentinel, Condition>(std::move(last), std::move(condition))
 	) {
 	}
 	template<typename Iterator>
-	constexpr auto operator()(Iterator const it, bounded::constant_t<1>) const {
+	constexpr auto add(Iterator const it, bounded::constant_t<1>) const {
 		auto && last = (*this)[0_bi];
 		auto && condition = (*this)[1_bi];
 		assert(it != last);
@@ -44,7 +44,7 @@ struct filter_iterator_increment : private tuple<Sentinel, Condition> {
 constexpr struct {
 	template<typename IteratorAdapter>
 	constexpr auto operator()(IteratorAdapter const & it) const {
-		return compare(it.base(), it.add().sentinel());
+		return compare(it.base(), it.traits().sentinel());
 	}
 } filter_sentinel_function;
 
@@ -52,21 +52,57 @@ constexpr struct {
 
 template<typename ForwardIterator, typename Sentinel, typename UnaryPredicate>
 constexpr auto filter_iterator(ForwardIterator first, Sentinel last, UnaryPredicate && condition) BOUNDED_NOEXCEPT_VALUE(
-	::containers::iterator_adapter(
+	::containers::adapt_iterator(
 		::containers::find_if(first, last, condition),
-		detail::default_dereference{},
-		detail::filter_iterator_increment<Sentinel, std::remove_reference_t<UnaryPredicate>>(last, BOUNDED_FORWARD(condition)),
-		detail::not_a_function{},
-		detail::default_compare{}
+		detail::filter_iterator_traits(last, BOUNDED_FORWARD(condition))
 	)
 )
 
 template<typename Range, typename UnaryPredicate>
-constexpr auto filter(Range & range, UnaryPredicate && condition) BOUNDED_NOEXCEPT_VALUE(
-	range_view(
-		containers::filter_iterator(begin(range), end(range), BOUNDED_FORWARD(condition)),
-		iterator_adapter_sentinel(detail::filter_sentinel_function)
-	)
-)
+struct filter {
+private:
+	template<typename T>
+	using wrapped = reference_wrapper<std::remove_reference_t<T>>;
+public:
+	using const_iterator = decltype(containers::filter_iterator(
+		begin(std::declval<Range const>()),
+		end(std::declval<Range const>()),
+		std::declval<wrapped<UnaryPredicate const>>()
+	));
+	using iterator = decltype(containers::filter_iterator(
+		begin(std::declval<Range>()),
+		end(std::declval<Range>()),
+		std::declval<wrapped<UnaryPredicate>>()
+	));
+
+	using value_type = typename std::remove_reference_t<Range>::value_type;
+	using size_type = bounded::integer<0, bounded::detail::normalize<iterator::difference_type::max().value()>>;
+
+	constexpr filter(Range && range, UnaryPredicate && predicate) noexcept(std::is_nothrow_move_constructible_v<Range> and std::is_nothrow_move_constructible_v<UnaryPredicate>):
+		m_range(BOUNDED_FORWARD(range)),
+		m_predicate(BOUNDED_FORWARD(predicate))
+	{
+	}
+	
+	friend constexpr auto begin(filter const & filtered) {
+		return containers::filter_iterator(begin(filtered.m_range), end(filtered.m_range), reference_wrapper(filtered.m_predicate));
+	}
+	friend constexpr auto begin(filter & filtered) {
+		return containers::filter_iterator(begin(filtered.m_range), end(filtered.m_range), reference_wrapper(filtered.m_predicate));
+	}
+	friend constexpr auto begin(filter && filtered) {
+		return containers::filter_iterator(begin(std::move(filtered).m_range), end(std::move(filtered).m_range), reference_wrapper(filtered.m_predicate));
+	}
+	friend constexpr auto end(filter const &) {
+		return iterator_adapter_sentinel(detail::filter_sentinel_function);
+	}
+	
+private:
+	Range m_range;
+	UnaryPredicate m_predicate;
+};
+
+template<typename Range, typename UnaryPredicate>
+filter(Range &&, UnaryPredicate &&) -> filter<Range, UnaryPredicate>;
 
 }	// namespace containers

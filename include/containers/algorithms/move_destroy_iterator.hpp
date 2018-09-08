@@ -1,11 +1,11 @@
-// Copyright David Stone 2017.
+// Copyright David Stone 2018.
 // Distributed under the Boost Software License, Version 1.0.
 // (See accompanying file LICENSE_1_0.txt or copy at
 // http://www.boost.org/LICENSE_1_0.txt)
 
 #pragma once
 
-#include <containers/iterator_adapter.hpp>
+#include <containers/algorithms/transform_iterator.hpp>
 
 #include <bounded/detail/forward.hpp>
 #include <bounded/integer.hpp>
@@ -15,31 +15,28 @@
 namespace containers {
 namespace detail {
 
-constexpr struct {
-	template<typename T>
-	constexpr auto operator()(T && ref) const noexcept(std::is_nothrow_move_constructible<std::decay_t<T>>{}) {
-		auto result = std::move(ref);
-		static_assert(noexcept(bounded::destroy(ref)), "Do not mark your destructor as noexcept(false)");
-		bounded::destroy(ref);
-		return result;
-	}
-} move_destroy;
-
 struct move_destroy_dereference {
-	template<typename Iterator, BOUNDED_REQUIRES(std::is_reference<decltype(*std::declval<Iterator>())>{})>
-	constexpr auto operator()(Iterator && it) const BOUNDED_NOEXCEPT_VALUE(
-		move_destroy(*BOUNDED_FORWARD(it))
-	)
+	template<typename Iterator>
+	constexpr auto operator()(Iterator it) const noexcept(
+		noexcept(*it) and std::is_nothrow_move_constructible_v<decltype(*it)>
+	) {
+		if constexpr (std::is_reference_v<decltype(*it)>) {
+			auto && ref = *it;
+			static_assert(noexcept(bounded::destroy(ref)), "Do not mark your destructor as noexcept(false)");
+			auto result = std::move(ref);
+			bounded::destroy(ref);
+			return result;
+		} else {
+			return *it;
+		}
+	}
 };
 
 }	// namespace detail
 
 template<typename Iterator>
 constexpr auto move_destroy_iterator(Iterator it) BOUNDED_NOEXCEPT_VALUE(
-	::containers::iterator_adapter(it, detail::move_destroy_dereference{})
+	::containers::transform_iterator(it, detail::move_destroy_dereference{})
 )
-
-template<typename Iterator>
-using move_destroy_iterator_t = decltype(move_destroy_iterator(std::declval<Iterator>()));
 
 }	// namespace containers

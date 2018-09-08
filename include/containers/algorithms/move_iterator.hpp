@@ -5,7 +5,7 @@
 
 #pragma once
 
-#include <containers/iterator_adapter.hpp>
+#include <containers/algorithms/transform_iterator.hpp>
 
 #include <bounded/detail/forward.hpp>
 #include <bounded/integer.hpp>
@@ -34,10 +34,7 @@ public:
 
 template<typename Iterator>
 constexpr auto move_iterator(Iterator it) BOUNDED_NOEXCEPT_VALUE(
-	::containers::iterator_adapter(it, detail::move_dereference{})
+	::containers::transform_iterator(it, detail::move_dereference{})
 )
-
-template<typename Iterator>
-using move_iterator_t = decltype(move_iterator(std::declval<Iterator>()));
 
 }	// namespace containers

@@ -1,4 +1,4 @@
-// Copyright David Stone 2016.
+// Copyright David Stone 2018.
 // Distributed under the Boost Software License, Version 1.0.
 // (See accompanying file LICENSE_1_0.txt or copy at
 // http://www.boost.org/LICENSE_1_0.txt)
@@ -13,31 +13,25 @@
 namespace containers {
 namespace detail {
 
-struct reverse_dereference {
+struct reverse_traits {
 	template<typename BidirectionalIterator>
-	constexpr auto operator()(BidirectionalIterator it) const BOUNDED_NOEXCEPT_DECLTYPE(
+	static constexpr auto dereference(BidirectionalIterator it) BOUNDED_NOEXCEPT_DECLTYPE(
 		*std::prev(it)
 	)
-};
 
-struct reverse_add {
 	template<typename RandomAccessIterator, typename Offset>
-	constexpr auto operator()(RandomAccessIterator it, Offset const offset) const BOUNDED_NOEXCEPT_DECLTYPE(
+	static constexpr auto add(RandomAccessIterator it, Offset const offset) BOUNDED_NOEXCEPT_DECLTYPE(
 		it - offset
 	)
-};
 
-struct reverse_subtract {
 	template<typename RandomAccessIterator>
-	constexpr auto operator()(RandomAccessIterator const lhs, RandomAccessIterator const rhs) const BOUNDED_NOEXCEPT_DECLTYPE(
+	static constexpr auto subtract(RandomAccessIterator const lhs, RandomAccessIterator const rhs) BOUNDED_NOEXCEPT_DECLTYPE(
 		rhs - lhs
 	)
-};
 
-struct reverse_less {
 	template<typename RandomAccessIterator>
-	constexpr auto operator()(RandomAccessIterator const lhs, RandomAccessIterator const rhs) const BOUNDED_NOEXCEPT_DECLTYPE(
-		rhs < lhs
+	static constexpr auto compare(RandomAccessIterator const lhs, RandomAccessIterator const rhs) BOUNDED_NOEXCEPT_DECLTYPE(
+		::containers::detail::compare_adl::indirect_compare(rhs, lhs)
 	)
 };
 
@@ -45,10 +39,7 @@ struct reverse_less {
 
 template<typename BidirectionalIterator>
 constexpr auto reverse_iterator(BidirectionalIterator it) BOUNDED_NOEXCEPT_VALUE(
-	::containers::iterator_adapter(it, detail::reverse_dereference{}, detail::reverse_add{}, detail::reverse_subtract{}, detail::reverse_less{})
+	adapt_iterator(it, detail::reverse_traits{})
 )
-
-template<typename BidirectionalIterator>
-using reverse_iterator_t = decltype(reverse_iterator(std::declval<BidirectionalIterator>()));
 
 }	// namespace containers
