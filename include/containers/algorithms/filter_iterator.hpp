@@ -26,7 +26,7 @@ namespace detail {
 template<typename Sentinel, typename UnaryPredicate>
 struct filter_iterator_traits : private tuple<Sentinel, UnaryPredicate>, default_dereference, default_compare {
 	constexpr filter_iterator_traits(Sentinel last, UnaryPredicate condition) BOUNDED_NOEXCEPT_INITIALIZATION(
-		tuple<Sentinel, UnaryPredicate>(std::move(last), std::move(condition))
+		tuple<Sentinel, UnaryPredicate>(std::move(last), BOUNDED_FORWARD(condition))
 	) {
 	}
 
@@ -53,48 +53,54 @@ constexpr struct {
 	}
 } filter_sentinel_function;
 
+
+template<typename ForwardIterator, typename Traits>
+constexpr auto filter_iterator_impl(ForwardIterator first, Traits traits) BOUNDED_NOEXCEPT_VALUE(
+	containers::adapt_iterator(
+		containers::find_if(first, containers::unwrap(traits).sentinel(), containers::unwrap(traits).predicate()),
+		traits
+	)
+)
+
 }	// namespace detail
 
 template<typename ForwardIterator, typename Sentinel, typename UnaryPredicate>
 constexpr auto filter_iterator(ForwardIterator first, Sentinel last, UnaryPredicate && condition) BOUNDED_NOEXCEPT_VALUE(
-	::containers::adapt_iterator(
-		::containers::find_if(first, last, condition),
-		detail::filter_iterator_traits(last, BOUNDED_FORWARD(condition))
-	)
+	detail::filter_iterator_impl(first, detail::filter_iterator_traits(last, BOUNDED_FORWARD(condition)))
 )
 
 template<typename Range, typename UnaryPredicate>
 struct filter {
 private:
+	using sentinel = decltype(end(std::declval<Range &>()));
+	using traits = detail::filter_iterator_traits<sentinel, UnaryPredicate>;
 public:
-	using const_iterator = decltype(containers::filter_iterator(
+	using const_iterator = decltype(detail::filter_iterator_impl(
 		begin(std::declval<Range const &>()),
-		end(std::declval<Range const &>()),
-		reference_wrapper(std::declval<UnaryPredicate const &>())
+		reference_wrapper(std::declval<traits const &>())
 	));
-	using iterator = decltype(containers::filter_iterator(
+	using iterator = decltype(detail::filter_iterator_impl(
 		begin(std::declval<Range &>()),
-		end(std::declval<Range &>()),
-		reference_wrapper(std::declval<UnaryPredicate &>())
+		reference_wrapper(std::declval<traits &>())
 	));
 
 	using value_type = typename std::remove_reference_t<Range>::value_type;
 	using size_type = typename std::remove_reference_t<Range>::size_type;
 
-	constexpr filter(Range && range, UnaryPredicate && predicate) noexcept(std::is_nothrow_move_constructible_v<Range> and std::is_nothrow_move_constructible_v<UnaryPredicate>):
+	constexpr filter(Range && range, UnaryPredicate && predicate) noexcept(std::is_nothrow_move_constructible_v<Range> and std::is_nothrow_constructible_v<traits, sentinel, UnaryPredicate>):
 		m_range(BOUNDED_FORWARD(range)),
-		m_predicate(BOUNDED_FORWARD(predicate))
+		m_traits(end(m_range), BOUNDED_FORWARD(predicate))
 	{
 	}
 	
 	friend constexpr auto begin(filter const & filtered) {
-		return containers::filter_iterator(begin(filtered.m_range), end(filtered.m_range), reference_wrapper(filtered.m_predicate));
+		return detail::filter_iterator_impl(begin(filtered.m_range), reference_wrapper(filtered.m_traits));
 	}
 	friend constexpr auto begin(filter & filtered) {
-		return containers::filter_iterator(begin(filtered.m_range), end(filtered.m_range), reference_wrapper(filtered.m_predicate));
+		return detail::filter_iterator_impl(begin(filtered.m_range), reference_wrapper(filtered.m_traits));
 	}
 	friend constexpr auto begin(filter && filtered) {
-		return containers::filter_iterator(begin(std::move(filtered).m_range), end(std::move(filtered).m_range), reference_wrapper(filtered.m_predicate));
+		return detail::filter_iterator_impl(begin(std::move(filtered).m_range), reference_wrapper(filtered.m_traits));
 	}
 	friend constexpr auto end(filter const &) {
 		return iterator_adapter_sentinel(detail::filter_sentinel_function);
@@ -102,7 +108,7 @@ public:
 	
 private:
 	Range m_range;
-	UnaryPredicate m_predicate;
+	traits m_traits;
 };
 
 template<typename Range, typename UnaryPredicate>
