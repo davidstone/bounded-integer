@@ -150,7 +150,7 @@ public:
 	}
 
 	constexpr auto traits() const noexcept {
-		return m_data[1_bi];
+		return containers::unwrap(m_data[1_bi]);
 	}
 
 	template<typename Index>
