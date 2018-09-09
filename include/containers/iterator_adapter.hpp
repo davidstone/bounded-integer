@@ -6,6 +6,7 @@
 #pragma once
 
 #include <containers/common_iterator_functions.hpp>
+#include <containers/compare_adl.hpp>
 #include <containers/index_type.hpp>
 #include <containers/operator_arrow.hpp>
 #include <containers/reference_wrapper.hpp>
@@ -39,19 +40,6 @@ struct default_subtract {
 		lhs - rhs
 	)
 };
-
-namespace detail {
-namespace compare_adl {
-
-using bounded::compare;
-
-template<typename LHS, typename RHS>
-constexpr auto indirect_compare(LHS const & lhs, RHS const & rhs) BOUNDED_NOEXCEPT_DECLTYPE(
-	compare(lhs, rhs)
-)
-
-}	// namespace compare_adl
-}	// namespace detail
 
 struct default_compare {
 	template<typename LHS, typename RHS>
