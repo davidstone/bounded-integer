@@ -29,15 +29,20 @@ struct filter_iterator_traits : private tuple<Sentinel, UnaryPredicate>, default
 		tuple<Sentinel, UnaryPredicate>(std::move(last), std::move(condition))
 	) {
 	}
+
+	constexpr auto sentinel() const {
+		return (*this)[0_bi];
+	}
+	constexpr auto const & predicate() const {
+		return (*this)[1_bi];
+	}
+
 	template<typename Iterator>
 	constexpr auto add(Iterator const it, bounded::constant_t<1>) const {
-		auto && last = (*this)[0_bi];
-		auto && condition = (*this)[1_bi];
+		auto const last = sentinel();
+		auto const & condition = predicate();
 		assert(it != last);
-		return ::containers::find_if(std::next(it), last, condition);
-	}
-	constexpr auto && sentinel() const {
-		return (*this)[0_bi];
+		return containers::find_if(std::next(it), last, condition);
 	}
 };
 
