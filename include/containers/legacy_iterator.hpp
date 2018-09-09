@@ -9,6 +9,7 @@
 
 #include <containers/common_iterator_functions.hpp>
 #include <containers/is_iterator.hpp>
+#include <containers/operator_arrow.hpp>
 
 #include <bounded/integer.hpp>
 
@@ -17,7 +18,7 @@
 namespace containers {
 
 template<typename Iterator>
-struct legacy_iterator {
+struct legacy_iterator : detail::operator_arrow<legacy_iterator<Iterator>> {
 	using value_type = typename std::iterator_traits<Iterator>::value_type;
 	using difference_type = std::ptrdiff_t;
 	using pointer = typename std::iterator_traits<Iterator>::pointer;
@@ -34,10 +35,7 @@ struct legacy_iterator {
 	}
 
 	constexpr decltype(auto) operator*() const BOUNDED_NOEXCEPT_GCC_BUG(
-		base().operator*()
-	)
-	constexpr decltype(auto) operator->() const BOUNDED_NOEXCEPT_GCC_BUG(
-		base().operator->()
+		*base()
 	)
 	template<typename Index>
 	constexpr decltype(auto) operator[](Index const index) const BOUNDED_NOEXCEPT_GCC_BUG(

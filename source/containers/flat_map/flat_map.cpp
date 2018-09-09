@@ -122,7 +122,8 @@ void test_unique_merge_copy(Container const & lhs, Container const & rhs, Contai
 
 template<typename Container>
 void test_unique_inplace_merge(Container v, Container const & other, Container const & expected) {
-	auto const midpoint = static_cast<typename Container::iterator::difference_type>(containers::size(v));
+	using iterator = typename Container::iterator;
+	auto const midpoint = static_cast<typename std::iterator_traits<iterator>::difference_type>(containers::size(v));
 	v.insert(end(v), begin(other), end(other));
 	auto const it = containers::unique_inplace_merge(begin(v), begin(v) + midpoint, end(v));
 	erase(v, it, end(v));

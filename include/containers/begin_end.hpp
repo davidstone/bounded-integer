@@ -30,14 +30,9 @@ namespace common {
 //
 // It would be nice if we could define mutable begin from const begin, and at
 // first it seems possible to do so at least for containers with contiguous
-// iterators. It would look something like:
+// iterators. It would look something like (assuming pointers for iterators):
 //
-#if 0
-return Iterable::iterator(
-	const_cast<Iterable::value_type *>(pointer_from(begin(std::as_const(container)))),
-	iterator_constructor
-);
-#endif
+// return const_cast<Container::value_type *>(begin(std::as_const(container)));
 //
 // However, this assumes that a mutable container implies mutable access to the
 // elements in the container. This is not necessarily the case, making this

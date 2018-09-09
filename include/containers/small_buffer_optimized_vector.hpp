@@ -11,6 +11,7 @@
 #include <containers/dynamic_resizable_array.hpp>
 #include <containers/index_type.hpp>
 #include <containers/repeat_n.hpp>
+#include <containers/scope_guard.hpp>
 #include <containers/uninitialized_storage.hpp>
 
 #include <algorithm>
@@ -166,8 +167,8 @@ struct sbo_vector_base : private detail::rebound_allocator<T, Allocator> {
 	);
 	static_assert(requested_small_capacity > 0, "Must request at least one element for the minimum capacity, otherwise you should use vector.");
 
-	using const_iterator = detail::basic_array_iterator<value_type const, sbo_vector_base>;
-	using iterator = detail::basic_array_iterator<value_type, sbo_vector_base>;
+	using const_iterator = value_type const *;
+	using iterator = value_type *;
 
 	constexpr auto && get_allocator() const & noexcept {
 		return static_cast<allocator_type const &>(*this);
@@ -198,7 +199,7 @@ struct sbo_vector_base : private detail::rebound_allocator<T, Allocator> {
 		deallocate_large();
 		if (other.is_small()) {
 			::bounded::construct(m_small);
-			::containers::uninitialized_move_destroy(begin(other), end(other), m_small.data(), get_allocator());
+			containers::uninitialized_move_destroy(begin(other), end(other), m_small.data());
 			m_small.set_size(other.m_small.size());
 			other.m_small.set_size(0_bi);
 		} else {
@@ -214,12 +215,10 @@ struct sbo_vector_base : private detail::rebound_allocator<T, Allocator> {
 			container.m_small.data() :
 			container.m_large.data();
 		assert(result != nullptr);
-		return const_iterator(result, detail::iterator_constructor);
+		return result;
 	}
 	friend constexpr auto begin(sbo_vector_base & container) noexcept {
-		auto const pointer = pointer_from(begin(std::as_const(container)));
-		using mutable_ptr = std::remove_const_t<std::remove_pointer_t<decltype(pointer)>> *;
-		return iterator(const_cast<mutable_ptr>(pointer), detail::iterator_constructor);
+		return const_cast<iterator>(begin(std::as_const(container)));
 	}
 	
 	friend constexpr auto end(sbo_vector_base const & container) noexcept {
@@ -263,7 +262,7 @@ struct sbo_vector_base : private detail::rebound_allocator<T, Allocator> {
 			relocate_to_small();
 		} else {
 			auto temp = make_storage(requested_capacity);
-			::containers::uninitialized_move_destroy(begin(*this), end(*this), data(temp), get_allocator());
+			containers::uninitialized_move_destroy(begin(*this), end(*this), data(temp));
 			relocate_preallocated(std::move(temp));
 		}
 	}
@@ -290,7 +289,7 @@ private:
 		// It is safe to skip the destructor call of m_large
 		// because we do not rely on its side-effects
 		::bounded::construct(m_small);
-		::containers::uninitialized_move_destroy(temp.data(), temp.data() + temp.size(), m_small.data(), get_allocator());
+		containers::uninitialized_move_destroy(temp.data(), temp.data() + temp.size(), m_small.data());
 		assert(is_small());
 	}
 	

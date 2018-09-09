@@ -1,4 +1,4 @@
-// Copyright David Stone 2015.
+// Copyright David Stone 2018.
 // Distributed under the Boost Software License, Version 1.0.
 // (See accompanying file LICENSE_1_0.txt or copy at
 // http://www.boost.org/LICENSE_1_0.txt)
@@ -38,32 +38,7 @@ constexpr auto compare(allocator<LHS>, allocator<RHS>) noexcept {
 }
 
 
-namespace detail {
-
-template<typename A, typename T, typename Args, typename Enable = void>
-constexpr auto allocator_has_construct = false;
-
-template<typename A, typename T, typename... Args>
-constexpr auto allocator_has_construct<
-	A,
-	T,
-	types<Args...>,
-	std::void_t<decltype(std::declval<A &>().construct(std::declval<T *>(), std::declval<Args>()...))>
-> = true;
-
-
-template<typename A, typename T, typename Enable = void>
-constexpr auto allocator_has_destroy = false;
-
-template<typename A, typename T>
-constexpr auto allocator_has_destroy<
-	A,
-	T,
-	std::void_t<decltype(std::declval<A &>().destroy(std::declval<T *>()))>
-> = true;
-
-}	// namespace detail
-
+// No construct or destroy
 template<typename Allocator>
 struct allocator_traits : private std::allocator_traits<std::decay_t<Allocator>> {
 private:
@@ -91,26 +66,6 @@ public:
 	using base::deallocate;
 	using base::max_size;
 	using base::select_on_container_copy_construction;
-	
-
-	template<typename T, typename... Args>
-	static constexpr auto & construct(allocator_type & a, T * const ptr, Args && ... args) noexcept(std::is_nothrow_constructible_v<T, Args...>) {
-		if constexpr (detail::allocator_has_construct<allocator_type, T, detail::types<Args...>>) {
-			a.construct(ptr, BOUNDED_FORWARD(args)...);
-			return *ptr;
-		} else {
-			return ::bounded::construct(*ptr, BOUNDED_FORWARD(args)...);
-		}
-	}
-
-	template<typename T>
-	static constexpr auto destroy(allocator_type & a, T * const ptr) noexcept {
-		if constexpr (detail::allocator_has_destroy<allocator_type, T>) {
-			a.destroy(ptr);
-		} else {
-			::bounded::destroy(*ptr);
-		}
-	}
 };
 
 }	// namespace containers

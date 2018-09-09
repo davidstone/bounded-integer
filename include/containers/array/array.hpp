@@ -5,7 +5,6 @@
 
 #pragma once
 
-#include <containers/array/iterator.hpp>
 #include <containers/common_container_functions.hpp>
 #include <containers/is_container.hpp>
 #include <containers/operator_bracket.hpp>
@@ -42,8 +41,8 @@ struct array {
 
 	using size_type = bounded::constant_t<size>;
 	
-	using const_iterator = detail::basic_array_iterator<value_type const, array>;
-	using iterator = detail::basic_array_iterator<value_type, array>;
+	using const_iterator = value_type const *;
+	using iterator = value_type *;
 
 	CONTAINERS_OPERATOR_BRACKET_DEFINITIONS(array)
 
@@ -65,9 +64,9 @@ struct array<T, 0, sizes...> : detail::aggregate_initialization {
 
 	using size_type = bounded::constant_t<0>;
 	
-	using const_iterator = detail::basic_array_iterator<value_type const, array>;
+	using const_iterator = value_type const *;
 	// TODO: Should this be using iterator = const_iterator?
-	using iterator = detail::basic_array_iterator<value_type, array>;
+	using iterator = value_type *;
 	
 	// No operator[]
 };
@@ -77,13 +76,16 @@ array(Args && ...) -> array<std::common_type_t<std::decay_t<Args>...>, sizeof...
 
 template<typename T, std::size_t... sizes>
 constexpr auto begin(array<T, sizes...> const & container) noexcept {
-	return typename array<T, sizes...>::const_iterator(container.m_value, detail::iterator_constructor);
+	// Array to pointer decay
+	return container.m_value;
 }
 template<typename T, std::size_t... sizes>
 constexpr auto begin(array<T, sizes...> & container) noexcept {
-	return typename array<T, sizes...>::iterator(container.m_value, detail::iterator_constructor);
+	// Array to pointer decay
+	return container.m_value;
 }
 
+// TODO: just use nullptr?
 template<typename T, std::size_t... sizes>
 constexpr auto begin(array<T, 0, sizes...> const &) noexcept {
 	return typename array<T, 0, sizes...>::const_iterator();

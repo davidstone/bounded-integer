@@ -27,7 +27,7 @@ constexpr auto concatenate_prepend_append(Result & result, typename Result::iter
 			return;
 		}
 	}
-	auto const next_it = ::containers::uninitialized_copy(begin(BOUNDED_FORWARD(range)), end(BOUNDED_FORWARD(range)), it, result.get_allocator());
+	auto const next_it = ::containers::uninitialized_copy(begin(BOUNDED_FORWARD(range)), end(BOUNDED_FORWARD(range)), it);
 	concatenate_prepend_append(result, next_it, BOUNDED_FORWARD(ranges)...);
 }
 
@@ -81,7 +81,7 @@ constexpr auto concatenate(Ranges && ... ranges) {
 	if (reusable.ptr) {
 		auto & ref = *reusable.ptr;
 		auto const new_begin = data(ref) + reusable.before_size;
-		::containers::uninitialized_move_destroy(::containers::rbegin(ref), ::containers::rend(ref), ::containers::reverse_iterator(new_begin + size(ref)), ref.get_allocator());
+		::containers::uninitialized_move_destroy(containers::rbegin(ref), containers::rend(ref), containers::reverse_iterator(new_begin + size(ref)));
 		ref.append_from_capacity(reusable.before_size);
 		::containers::detail::concatenate_prepend_append(ref, begin(ref), BOUNDED_FORWARD(ranges)...);
 		return std::move(ref);

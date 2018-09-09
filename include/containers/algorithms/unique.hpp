@@ -71,7 +71,7 @@ constexpr auto find_first_equal(MutableForwardIterator first, Sentinel const las
 
 template<typename MutableForwardIterator, typename Sentinel, typename BinaryPredicate = std::equal_to<>>
 constexpr auto unique(MutableForwardIterator const first, Sentinel const last, BinaryPredicate equal = BinaryPredicate{}) {
-	auto const equal_element = find_first_equal(first, last, equal);
+	auto const equal_element = detail::find_first_equal(first, last, equal);
 	if (equal_element == last) {
 		return equal_element;
 	}

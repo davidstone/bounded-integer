@@ -76,7 +76,7 @@ public:
 	));
 
 	using value_type = typename std::remove_reference_t<Range>::value_type;
-	using size_type = bounded::integer<0, bounded::detail::normalize<iterator::difference_type::max().value()>>;
+	using size_type = typename std::remove_reference_t<Range>::size_type;
 
 	constexpr filter(Range && range, UnaryPredicate && predicate) noexcept(std::is_nothrow_move_constructible_v<Range> and std::is_nothrow_move_constructible_v<UnaryPredicate>):
 		m_range(BOUNDED_FORWARD(range)),

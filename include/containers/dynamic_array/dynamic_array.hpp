@@ -7,13 +7,13 @@
 
 #include <containers/algorithms/copy.hpp>
 #include <containers/algorithms/distance.hpp>
+#include <containers/algorithms/uninitialized.hpp>
 #include <containers/allocator.hpp>
 #include <containers/common_container_functions.hpp>
 #include <containers/is_iterator.hpp>
 #include <containers/operator_bracket.hpp>
 #include <containers/repeat_n.hpp>
 #include <containers/uninitialized_storage.hpp>
-#include <containers/array/iterator.hpp>
 
 #include <bounded/detail/forward.hpp>
 
@@ -90,7 +90,7 @@ auto deallocate_storage(Allocator & allocator_, dynamic_array_data_t<T> const da
 
 template<typename Allocator, typename T>
 constexpr auto cleanup(Allocator & allocator_, dynamic_array_data_t<T> const data) noexcept {
-	::containers::detail::destroy(allocator_, begin(data), end(data));
+	detail::destroy_range(begin(data), end(data));
 	deallocate_storage(allocator_, data);
 }
 
@@ -106,7 +106,7 @@ auto dynamic_array_initializer(ForwardIterator first, Sentinel const last, Alloc
 	using value_type = typename Allocator::value_type;
 	auto const data = make_storage<value_type>(allocator_, ::containers::distance(first, last));
 	try {
-		::containers::uninitialized_copy(first, last, begin(data), allocator_);
+		containers::uninitialized_copy(first, last, begin(data));
 	} catch(...) {
 		deallocate_storage(allocator_, data);
 		throw;
@@ -124,7 +124,7 @@ auto dynamic_array_initializer(Size const size, Allocator & allocator_) {
 	using value_type = typename Allocator::value_type;
 	auto const data = make_storage<value_type>(allocator_, size);
 	try {
-		::containers::uninitialized_default_construct(begin(data), end(data), allocator_);
+		containers::uninitialized_default_construct(begin(data), end(data));
 	} catch(...) {
 		deallocate_storage(allocator_, data);
 		throw;
@@ -144,8 +144,8 @@ struct dynamic_array : private detail::rebound_allocator<T, Allocator> {
 	using allocator_type = detail::rebound_allocator<value_type, Allocator>;
 	static_assert(std::is_empty_v<allocator_type>, "Stateful allocators not yet supported.");
 
-	using const_iterator = detail::basic_array_iterator<value_type const, dynamic_array>;
-	using iterator = detail::basic_array_iterator<value_type, dynamic_array>;
+	using const_iterator = value_type const *;
+	using iterator = value_type *;
 	
 	constexpr auto && get_allocator() const & noexcept {
 		return static_cast<allocator_type const &>(*this);
@@ -224,10 +224,10 @@ struct dynamic_array : private detail::rebound_allocator<T, Allocator> {
 	}
 	
 	friend constexpr auto begin(dynamic_array const & container) noexcept {
-		return const_iterator(container.m_data.pointer, detail::iterator_constructor);
+		return const_cast<const_iterator>(container.m_data.pointer);
 	}
 	friend constexpr auto begin(dynamic_array & container) noexcept {
-		return iterator(container.m_data.pointer, detail::iterator_constructor);
+		return container.m_data.pointer;
 	}
 	
 	friend constexpr auto end(dynamic_array const & container) noexcept {

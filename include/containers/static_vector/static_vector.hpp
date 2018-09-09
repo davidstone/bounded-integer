@@ -16,7 +16,6 @@
 #include <containers/repeat_n.hpp>
 #include <containers/uninitialized_storage.hpp>
 #include <containers/array/array.hpp>
-#include <containers/array/iterator.hpp>
 
 #include <bounded/detail/forward.hpp>
 
@@ -51,7 +50,7 @@ struct static_vector_data<T, capacity, false> : static_vector_data<T, capacity, 
 	~static_vector_data() {
 		auto const first = begin(this->m_container);
 		auto const last = first + this->m_size;
-		::containers::detail::destroy(allocator<T>{}, first, last);
+		detail::destroy_range(first, last);
 	}
 };
 
@@ -66,8 +65,8 @@ private:
 public:
 	using value_type = T;
 	using size_type = bounded::integer<0, bounded::detail::normalize<capacity_>>;
-	using const_iterator = detail::basic_array_iterator<value_type const, static_vector>;
-	using iterator = detail::basic_array_iterator<value_type, static_vector>;
+	using const_iterator = value_type const *;
+	using iterator = value_type *;
 
 	constexpr static_vector() = default;
 	
@@ -113,10 +112,10 @@ public:
 
 
 	friend constexpr auto begin(static_vector const & container) noexcept {
-		return const_iterator(data(container.m_container), detail::iterator_constructor);
+		return detail::static_or_reinterpret_cast<const_iterator>(begin(container.m_container));
 	}
 	friend constexpr auto begin(static_vector & container) noexcept {
-		return iterator(data(container.m_container), detail::iterator_constructor);
+		return detail::static_or_reinterpret_cast<iterator>(begin(container.m_container));
 	}
 	friend constexpr auto end(static_vector const & container) noexcept {
 		return begin(container) + container.m_size;
@@ -141,7 +140,7 @@ public:
 	template<typename... Args>
 	constexpr auto & emplace_back(Args && ... args) {
 		assert(size(*this) != capacity());
-		::containers::detail::construct(get_allocator(), data(*this) + size(*this), BOUNDED_FORWARD(args)...);
+		bounded::construct(*(data(*this) + size(*this)), BOUNDED_FORWARD(args)...);
 		append_from_capacity(1_bi);
 		return back(*this);
 	}
@@ -151,11 +150,11 @@ public:
 		auto relocating_emplace = []{
 			assert(false);
 		};
-		return ::containers::detail::emplace_impl(*this, get_allocator(), position, relocating_emplace, BOUNDED_FORWARD(args)...);
+		return detail::emplace_impl(*this, position, relocating_emplace, BOUNDED_FORWARD(args)...);
 	}
 	template<typename ForwardIterator, typename Sentinel>
 	constexpr auto insert(const_iterator const position, ForwardIterator first, Sentinel last) {
-		return ::containers::detail::insert_impl(*this, get_allocator(), position, first, last, [](auto) {
+		return detail::insert_impl(*this, position, first, last, [](auto) {
 			assert(false);
 			return iterator{};
 		});
@@ -163,16 +162,12 @@ public:
 	
 	constexpr auto pop_back() {
 		assert(!empty(*this));
-		::containers::detail::destroy(get_allocator(), std::addressof(back(*this)));
+		bounded::destroy(back(*this));
 		--this->m_size;
 	}
 
 
 private:
-	static constexpr auto get_allocator() noexcept {
-		return allocator<value_type>{};
-	}
-
 	template<typename Count, typename... MaybeInitializer>
 	constexpr explicit static_vector(count_constructor, Count const count, MaybeInitializer && ... args) noexcept(std::is_nothrow_constructible_v<value_type, MaybeInitializer && ...>) {
 		static_assert(sizeof...(MaybeInitializer) == 0 or sizeof...(MaybeInitializer) == 1);

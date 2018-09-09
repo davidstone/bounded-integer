@@ -24,7 +24,8 @@ constexpr auto append(Container & container, InputIterator first, Sentinel last)
 	for (; first != last; ++first) {
 		push_back(container, *first);
 	}
-	return begin(container) + static_cast<typename Container::iterator::difference_type>(offset);
+	using traits = std::iterator_traits<typename Container::iterator>;
+	return begin(container) + static_cast<typename traits::difference_type>(offset);
 }
 
 }	// namespace common
