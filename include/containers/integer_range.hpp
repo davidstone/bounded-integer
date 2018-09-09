@@ -124,13 +124,7 @@ integer_range(Size) -> integer_range<bounded::integer<0, bounded::detail::normal
 
 template<typename Enum, BOUNDED_REQUIRES(std::is_enum_v<Enum>)>
 constexpr auto enum_range(Enum last = static_cast<Enum>(std::numeric_limits<Enum>::max())) {
-	auto const irange = integer_range(bounded::integer(last));
-	constexpr struct {
-		constexpr auto operator()(decltype(begin(irange)) const it) const {
-			return static_cast<Enum>(*it);
-		}
-	} function;
-	return containers::transform(irange, function);
+	return containers::transform(integer_range(bounded::integer(last)), [](auto it) { return static_cast<Enum>(*it); });
 }
 
 }	// namespace containers

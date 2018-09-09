@@ -11,17 +11,10 @@ namespace {
 
 using namespace bounded::literal;
 
-constexpr struct {
-	template<typename Integer>
-	constexpr auto operator()(Integer integer) const noexcept {
-		return integer % 2_bi == 0_bi;
-	}
-} is_even;
-
 constexpr auto check_filter() {
 	constexpr auto source = containers::array{1_bi, 2_bi, 3_bi, 2_bi, 4_bi, 5_bi, 6_bi, 8_bi};
 	constexpr auto expected = containers::array{2_bi, 2_bi, 4_bi, 6_bi, 8_bi};
-	auto const filtered = containers::filter(source, is_even);
+	auto const filtered = containers::filter(source, [](auto const integer) { return integer % 2_bi == 0_bi; });
 	return containers::equal(begin(filtered), end(filtered), begin(expected), end(expected));
 }
 
