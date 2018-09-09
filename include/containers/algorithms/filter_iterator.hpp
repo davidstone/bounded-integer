@@ -46,13 +46,31 @@ struct filter_iterator_traits : private tuple<Sentinel, UnaryPredicate>, default
 	}
 };
 
-constexpr struct {
-	template<typename IteratorAdapter>
-	constexpr auto operator()(IteratorAdapter const & it) const {
-		return compare(it.base(), it.traits().sentinel());
-	}
-} filter_sentinel_function;
+template<typename T>
+constexpr auto is_filter_iterator_traits = false;
 
+template<typename Sentinel, typename UnaryPredicate>
+constexpr auto is_filter_iterator_traits<filter_iterator_traits<Sentinel, UnaryPredicate>> = true;
+
+template<typename T>
+constexpr auto is_filter_iterator_traits<reference_wrapper<T>> = is_filter_iterator_traits<T>;
+
+template<typename T>
+constexpr auto is_filter_iterator_traits<T const> = is_filter_iterator_traits<T>;
+
+
+struct filter_iterator_sentinel {
+};
+
+template<typename Iterator, typename Traits, BOUNDED_REQUIRES(is_filter_iterator_traits<Traits>)>
+constexpr auto compare(adapt_iterator<Iterator, Traits> const lhs, filter_iterator_sentinel) BOUNDED_NOEXCEPT_DECLTYPE(
+	lhs.traits().compare(lhs.base(), lhs.traits().sentinel())
+)
+
+template<typename Iterator, typename Traits, BOUNDED_REQUIRES(is_filter_iterator_traits<Traits>)>
+constexpr auto compare(filter_iterator_sentinel, adapt_iterator<Iterator, Traits> const rhs) BOUNDED_NOEXCEPT_DECLTYPE(
+	rhs.traits().compare(rhs.traits().sentinel(), rhs.base())
+)
 
 template<typename ForwardIterator, typename Traits>
 constexpr auto filter_iterator_impl(ForwardIterator first, Traits traits) BOUNDED_NOEXCEPT_VALUE(
@@ -103,7 +121,7 @@ public:
 		return detail::filter_iterator_impl(begin(std::move(filtered).m_range), reference_wrapper(filtered.m_traits));
 	}
 	friend constexpr auto end(filter const &) {
-		return iterator_adapter_sentinel(detail::filter_sentinel_function);
+		return detail::filter_iterator_sentinel{};
 	}
 	
 private:

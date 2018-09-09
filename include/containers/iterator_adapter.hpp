@@ -184,25 +184,4 @@ constexpr auto compare(adapt_iterator<Iterator, Traits> const lhs, adapt_iterato
 	lhs.traits().compare(lhs.base(), rhs.base())
 )
 
-
-template<typename UnaryFunction>
-struct iterator_adapter_sentinel {
-public:
-	constexpr explicit iterator_adapter_sentinel(UnaryFunction compare_function):
-		m_compare_function(std::move(compare_function))
-	{
-	}
-	template<typename Iterator, typename Traits>
-	friend constexpr auto compare(adapt_iterator<Iterator, Traits> const lhs, iterator_adapter_sentinel const & rhs) {
-		return rhs.m_compare_function(lhs);
-	}
-private:
-	UnaryFunction m_compare_function;
-};
-
-template<typename UnaryFunction, typename Iterator, typename Traits>
-constexpr auto compare(iterator_adapter_sentinel<UnaryFunction> const & lhs, adapt_iterator<Iterator, Traits> const rhs) {
-	return invert(compare(rhs, lhs));
-}
-
 }	// namespace containers
