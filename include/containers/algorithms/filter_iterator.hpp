@@ -70,13 +70,13 @@ private:
 	using wrapped = reference_wrapper<std::remove_reference_t<T>>;
 public:
 	using const_iterator = decltype(containers::filter_iterator(
-		begin(std::declval<Range const>()),
-		end(std::declval<Range const>()),
+		begin(std::declval<Range const &>()),
+		end(std::declval<Range const &>()),
 		std::declval<wrapped<UnaryPredicate const>>()
 	));
 	using iterator = decltype(containers::filter_iterator(
-		begin(std::declval<Range>()),
-		end(std::declval<Range>()),
+		begin(std::declval<Range &>()),
+		end(std::declval<Range &>()),
 		std::declval<wrapped<UnaryPredicate>>()
 	));
 
