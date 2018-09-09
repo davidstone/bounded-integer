@@ -23,10 +23,10 @@ using namespace bounded::literal;
 namespace detail {
 
 // TODO: Switch to [[no_unique_address]] when supported
-template<typename Sentinel, typename Condition>
-struct filter_iterator_traits : private tuple<Sentinel, Condition>, default_dereference, default_compare {
-	constexpr filter_iterator_traits(Sentinel last, Condition condition) BOUNDED_NOEXCEPT_INITIALIZATION(
-		tuple<Sentinel, Condition>(std::move(last), std::move(condition))
+template<typename Sentinel, typename UnaryPredicate>
+struct filter_iterator_traits : private tuple<Sentinel, UnaryPredicate>, default_dereference, default_compare {
+	constexpr filter_iterator_traits(Sentinel last, UnaryPredicate condition) BOUNDED_NOEXCEPT_INITIALIZATION(
+		tuple<Sentinel, UnaryPredicate>(std::move(last), std::move(condition))
 	) {
 	}
 	template<typename Iterator>
