@@ -66,18 +66,16 @@ constexpr auto filter_iterator(ForwardIterator first, Sentinel last, UnaryPredic
 template<typename Range, typename UnaryPredicate>
 struct filter {
 private:
-	template<typename T>
-	using wrapped = reference_wrapper<std::remove_reference_t<T>>;
 public:
 	using const_iterator = decltype(containers::filter_iterator(
 		begin(std::declval<Range const &>()),
 		end(std::declval<Range const &>()),
-		std::declval<wrapped<UnaryPredicate const>>()
+		reference_wrapper(std::declval<UnaryPredicate const &>())
 	));
 	using iterator = decltype(containers::filter_iterator(
 		begin(std::declval<Range &>()),
 		end(std::declval<Range &>()),
-		std::declval<wrapped<UnaryPredicate>>()
+		reference_wrapper(std::declval<UnaryPredicate &>())
 	));
 
 	using value_type = typename std::remove_reference_t<Range>::value_type;
