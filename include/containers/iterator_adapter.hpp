@@ -137,7 +137,7 @@ public:
 		return m_data[0_bi];
 	}
 
-	constexpr auto const & traits() const noexcept {
+	constexpr auto && traits() const noexcept {
 		return containers::unwrap(m_data[1_bi]);
 	}
 
