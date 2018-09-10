@@ -5,6 +5,7 @@
 
 #pragma once
 
+#include <containers/algorithms/transform.hpp>
 #include <containers/common_container_functions.hpp>
 #include <containers/operator_bracket.hpp>
 
