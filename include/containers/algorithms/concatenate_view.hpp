@@ -98,6 +98,7 @@ public:
 			concatenate_view_iterator(lhs.m_first1, lhs.m_last1, std::next(lhs.m_first2))
 	)
 
+	// TODO: What if they have different m_last1?
 	template<
 		typename LHSIterator1, typename LHSSentinel1, typename LHSIterator2,
 		typename RHSIterator1, typename RHSSentinel1, typename RHSIterator2
@@ -107,6 +108,18 @@ public:
 		concatenate_view_iterator<RHSIterator1, RHSSentinel1, RHSIterator2> const rhs
 	) BOUNDED_NOEXCEPT_DECLTYPE(
 		(lhs.m_first1 - rhs.m_first1) + (lhs.m_first2 - rhs.m_first2)
+	)
+
+
+	template<
+		typename LHSSentinel,
+		typename RHSIterator1, typename RHSSentinel1, typename RHSIterator2
+	>
+	friend constexpr auto operator-(
+		concatenate_view_sentinel<LHSSentinel> const lhs,
+		concatenate_view_iterator<RHSIterator1, RHSSentinel1, RHSIterator2> const rhs
+	) BOUNDED_NOEXCEPT_DECLTYPE(
+		(rhs.m_last1 - rhs.m_first1) + (lhs.base() - rhs.m_first2)
 	)
 
 
@@ -141,6 +154,19 @@ public:
 		return *(*this + index);
 	}
 };
+
+
+template<
+	typename LHSIterator1, typename LHSSentinel1, typename LHSIterator2,
+	typename RHSSentinel
+>
+constexpr auto operator-(
+	concatenate_view_iterator<LHSIterator1, LHSSentinel1, LHSIterator2> const lhs,
+	concatenate_view_sentinel<RHSSentinel> const rhs
+) BOUNDED_NOEXCEPT_DECLTYPE(
+	-(rhs - lhs)
+)
+
 
 template<
 	typename LHSSentinel,
