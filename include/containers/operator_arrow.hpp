@@ -15,9 +15,12 @@ namespace detail {
 
 // This would not be necessary (and the solution would be better, without any of
 // the pitfalls mentioned below) if we had my paper
+// "Automatically Generate More Operators":
+// https://github.com/davidstone/isocpp/blob/master/generate-operators.md
 
 template<typename Iterator, typename Enable = void>
 struct operator_arrow {
+	auto operator->() const = delete;
 };
 
 template<typename Iterator>
