@@ -8,6 +8,7 @@
 #pragma once
 
 #include <containers/common_iterator_functions.hpp>
+#include <containers/compare_adl.hpp>
 #include <containers/is_iterator.hpp>
 #include <containers/operator_arrow.hpp>
 
@@ -37,6 +38,9 @@ struct legacy_iterator : detail::operator_arrow<legacy_iterator<Iterator>> {
 	constexpr decltype(auto) operator*() const BOUNDED_NOEXCEPT_GCC_BUG(
 		*base()
 	)
+	constexpr auto operator->() const BOUNDED_NOEXCEPT_GCC_BUG(
+		std::addressof(operator*())
+	)
 	template<typename Index>
 	constexpr decltype(auto) operator[](Index const index) const BOUNDED_NOEXCEPT_GCC_BUG(
 		base()[index]
@@ -57,7 +61,7 @@ constexpr auto operator-(legacy_iterator<Iterator> const lhs, legacy_iterator<It
 
 template<typename Iterator>
 constexpr auto compare(legacy_iterator<Iterator> const lhs, legacy_iterator<Iterator> const rhs) BOUNDED_NOEXCEPT(
-	compare(lhs.base(), rhs.base())
+	detail::compare_adl::indirect_compare(lhs.base(), rhs.base())
 )
 
 }	// namespace containers
