@@ -105,6 +105,7 @@ target_sources(containers INTERFACE
 	$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>/include/containers/common_functions.hpp
 	$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>/include/containers/common_iterator_functions.hpp
 	$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>/include/containers/compare_adl.hpp
+	$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>/include/containers/contiguous_iterator.hpp
 	$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>/include/containers/data.hpp
 	$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>/include/containers/dynamic_array/dynamic_array.hpp
 	$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>/include/containers/dynamic_resizable_array.hpp
@@ -273,6 +274,7 @@ add_library(containers_test STATIC
 	source/containers/clear.cpp
 	source/containers/common_container_functions.cpp
 	source/containers/compare_adl.cpp
+	source/containers/contiguous_iterator.cpp
 	source/containers/data.cpp
 	source/containers/empty.cpp
 	source/containers/erase.cpp

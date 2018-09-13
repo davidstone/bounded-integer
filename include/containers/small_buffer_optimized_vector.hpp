@@ -7,6 +7,7 @@
 
 #include <containers/array/array.hpp>
 #include <containers/common_container_functions.hpp>
+#include <containers/contiguous_iterator.hpp>
 #include <containers/dynamic_array/dynamic_array.hpp>
 #include <containers/dynamic_resizable_array.hpp>
 #include <containers/index_type.hpp>
@@ -167,8 +168,8 @@ struct sbo_vector_base : private detail::rebound_allocator<T, Allocator> {
 	);
 	static_assert(requested_small_capacity > 0, "Must request at least one element for the minimum capacity, otherwise you should use vector.");
 
-	using const_iterator = value_type const *;
-	using iterator = value_type *;
+	using const_iterator = contiguous_iterator<value_type const, size_type::max().value()>;
+	using iterator = contiguous_iterator<value_type, size_type::max().value()>;
 
 	constexpr auto && get_allocator() const & noexcept {
 		return static_cast<allocator_type const &>(*this);
@@ -215,10 +216,10 @@ struct sbo_vector_base : private detail::rebound_allocator<T, Allocator> {
 			container.m_small.data() :
 			container.m_large.data();
 		assert(result != nullptr);
-		return result;
+		return const_iterator(result);
 	}
 	friend constexpr auto begin(sbo_vector_base & container) noexcept {
-		return const_cast<iterator>(begin(std::as_const(container)));
+		return iterator(const_cast<value_type *>(pointer_from(begin(std::as_const(container)))));
 	}
 	
 	friend constexpr auto end(sbo_vector_base const & container) noexcept {

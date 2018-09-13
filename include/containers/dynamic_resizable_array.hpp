@@ -7,6 +7,7 @@
 
 #include <containers/allocator.hpp>
 #include <containers/common_container_functions.hpp>
+#include <containers/contiguous_iterator.hpp>
 #include <containers/dynamic_array/dynamic_array.hpp>
 #include <containers/index_type.hpp>
 #include <containers/insert_emplace_impl.hpp>
@@ -155,13 +156,13 @@ struct dynamic_resizable_array : private Container {
 		} else {
 			auto temp = this->make_storage(::containers::detail::reallocation_size(*this, 1_bi));
 			bounded::construct(
-				*(detail::static_or_reinterpret_cast<iterator>(data(temp)) + capacity()),
+				*(detail::static_or_reinterpret_cast<value_type *>(data(temp)) + capacity()),
 				BOUNDED_FORWARD(args)...
 			);
 			::containers::uninitialized_move_destroy(
 				begin(*this),
 				end(*this),
-				detail::static_or_reinterpret_cast<iterator>(data(temp))
+				detail::static_or_reinterpret_cast<value_type *>(data(temp))
 			);
 			this->relocate_preallocated(std::move(temp));
 		}
@@ -206,9 +207,9 @@ private:
 		// construct it may reference an old element. We cannot move
 		// elements it references before constructing it
 		auto const offset = position - begin(*this);
-		construct(detail::static_or_reinterpret_cast<iterator>(data(temp)) + offset);
+		construct(detail::static_or_reinterpret_cast<value_type *>(data(temp)) + offset);
 		auto const mutable_position = begin(*this) + offset;
-		auto const temp_begin = detail::static_or_reinterpret_cast<iterator>(data(temp));
+		auto const temp_begin = detail::static_or_reinterpret_cast<value_type *>(data(temp));
 		auto const pointer = containers::uninitialized_move_destroy(begin(*this), mutable_position, temp_begin);
 		assert(temp_begin + offset == pointer);
 		::containers::uninitialized_move_destroy(mutable_position, end(*this), pointer + number_of_elements);

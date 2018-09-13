@@ -8,6 +8,7 @@
 #include <containers/algorithms/copy.hpp>
 #include <containers/allocator.hpp>
 #include <containers/common_container_functions.hpp>
+#include <containers/contiguous_iterator.hpp>
 #include <containers/index_type.hpp>
 #include <containers/insert_emplace_impl.hpp>
 #include <containers/integer_range.hpp>
@@ -65,8 +66,8 @@ private:
 public:
 	using value_type = T;
 	using size_type = bounded::integer<0, bounded::detail::normalize<capacity_>>;
-	using const_iterator = value_type const *;
-	using iterator = value_type *;
+	using const_iterator = contiguous_iterator<value_type const, capacity_>;
+	using iterator = contiguous_iterator<value_type, capacity_>;
 
 	constexpr static_vector() = default;
 	
@@ -112,10 +113,10 @@ public:
 
 
 	friend constexpr auto begin(static_vector const & container) noexcept {
-		return detail::static_or_reinterpret_cast<const_iterator>(begin(container.m_container));
+		return const_iterator(detail::static_or_reinterpret_cast<value_type const *>(data(container.m_container)));
 	}
 	friend constexpr auto begin(static_vector & container) noexcept {
-		return detail::static_or_reinterpret_cast<iterator>(begin(container.m_container));
+		return iterator(detail::static_or_reinterpret_cast<value_type *>(data(container.m_container)));
 	}
 	friend constexpr auto end(static_vector const & container) noexcept {
 		return begin(container) + container.m_size;

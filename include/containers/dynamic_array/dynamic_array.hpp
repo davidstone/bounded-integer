@@ -1,4 +1,4 @@
-// Copyright David Stone 2017.
+// Copyright David Stone 2018.
 // Distributed under the Boost Software License, Version 1.0.
 // (See accompanying file LICENSE_1_0.txt or copy at
 // http://www.boost.org/LICENSE_1_0.txt)
@@ -10,6 +10,7 @@
 #include <containers/algorithms/uninitialized.hpp>
 #include <containers/allocator.hpp>
 #include <containers/common_container_functions.hpp>
+#include <containers/contiguous_iterator.hpp>
 #include <containers/is_iterator.hpp>
 #include <containers/operator_bracket.hpp>
 #include <containers/repeat_n.hpp>
@@ -144,8 +145,8 @@ struct dynamic_array : private detail::rebound_allocator<T, Allocator> {
 	using allocator_type = detail::rebound_allocator<value_type, Allocator>;
 	static_assert(std::is_empty_v<allocator_type>, "Stateful allocators not yet supported.");
 
-	using const_iterator = value_type const *;
-	using iterator = value_type *;
+	using const_iterator = contiguous_iterator<value_type const, size_type::max().value()>;
+	using iterator = contiguous_iterator<value_type, size_type::max().value()>;
 	
 	constexpr auto && get_allocator() const & noexcept {
 		return static_cast<allocator_type const &>(*this);
@@ -224,10 +225,10 @@ struct dynamic_array : private detail::rebound_allocator<T, Allocator> {
 	}
 	
 	friend constexpr auto begin(dynamic_array const & container) noexcept {
-		return const_cast<const_iterator>(container.m_data.pointer);
+		return const_iterator(container.m_data.pointer);
 	}
 	friend constexpr auto begin(dynamic_array & container) noexcept {
-		return container.m_data.pointer;
+		return iterator(container.m_data.pointer);
 	}
 	
 	friend constexpr auto end(dynamic_array const & container) noexcept {

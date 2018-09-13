@@ -7,6 +7,7 @@
 
 #include <containers/allocator.hpp>
 #include <containers/common_container_functions.hpp>
+#include <containers/contiguous_iterator.hpp>
 #include <containers/dynamic_array/dynamic_array.hpp>
 #include <containers/dynamic_resizable_array.hpp>
 #include <containers/index_type.hpp>
@@ -29,8 +30,8 @@ struct vector_base {
 	using size_type = typename detail::dynamic_array_data_t<value_type>::size_type;
 	using allocator_type = detail::rebound_allocator<value_type, Allocator>;
 
-	using const_iterator = value_type const *;
-	using iterator = value_type *;
+	using const_iterator = contiguous_iterator<value_type const, size_type::max().value()>;
+	using iterator = contiguous_iterator<value_type, size_type::max().value()>;
 	using raw_container = dynamic_array<trivial_storage<value_type>, allocator_type>;
 
 	constexpr auto get_allocator() const noexcept {
@@ -55,10 +56,10 @@ struct vector_base {
 	}
 
 	friend constexpr auto begin(vector_base const & container) noexcept {
-		return detail::static_or_reinterpret_cast<const_iterator>(begin(container.m_container));
+		return const_iterator(detail::static_or_reinterpret_cast<value_type const *>(data(container.m_container)));
 	}
 	friend constexpr auto begin(vector_base & container) noexcept {
-		return detail::static_or_reinterpret_cast<iterator>(begin(container.m_container));
+		return iterator(detail::static_or_reinterpret_cast<value_type *>(data(container.m_container)));
 	}
 	friend constexpr auto end(vector_base const & container) noexcept {
 		return begin(container) + container.m_size;
@@ -86,7 +87,7 @@ struct vector_base {
 		containers::uninitialized_move_destroy(
 			begin(*this),
 			end(*this),
-			detail::static_or_reinterpret_cast<iterator>(begin(temp))
+			detail::static_or_reinterpret_cast<value_type *>(data(temp))
 		);
 		relocate_preallocated(std::move(temp));
 	}
