@@ -19,6 +19,20 @@ namespace containers {
 
 template<typename Range, typename Traits>
 struct adapt {
+	using iterator = decltype(containers::adapt_iterator(
+		begin(std::declval<Range &>()),
+		reference_wrapper(std::declval<Traits &>())
+	));
+	using const_iterator = decltype(containers::adapt_iterator(
+		begin(std::declval<Range const &>()),
+		reference_wrapper(std::declval<Traits const &>())
+	));
+	using value_type = decltype(*std::declval<iterator>());
+	using size_type = bounded::integer<
+		0,
+		static_cast<std::uintmax_t>(std::numeric_limits<typename std::iterator_traits<iterator>::difference_type>::max())
+	>;
+	
 	constexpr adapt(Range && range, Traits && traits) noexcept(std::is_nothrow_move_constructible_v<Range> and std::is_nothrow_move_constructible_v<Traits>):
 		m_range(BOUNDED_FORWARD(range)),
 		m_traits(BOUNDED_FORWARD(traits))
