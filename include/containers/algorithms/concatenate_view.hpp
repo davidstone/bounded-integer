@@ -5,6 +5,7 @@
 
 #pragma once
 
+#include <containers/compare_adl.hpp>
 #include <containers/operator_arrow.hpp>
 #include <containers/range_view.hpp>
 #include <containers/tuple.hpp>
@@ -30,7 +31,6 @@ private:
 };
 
 
-// TODO: require that we do not try to concatenate an input + output iterator
 template<typename Iterator1, typename Sentinel1, typename Iterator2>
 struct concatenate_view_iterator : detail::operator_arrow<concatenate_view_iterator<Iterator1, Sentinel1, Iterator2>> {
 private:
@@ -42,6 +42,7 @@ private:
 			std::is_same_v<typename traits1::iterator_category, category> or
 			std::is_same_v<typename traits2::iterator_category, category>;
 	}
+	static_assert(!either_is_category<std::output_iterator_tag>() or !either_is_category<std::input_iterator_tag>());
 
 	Iterator1 m_first1;
 	Sentinel1 m_last1;
@@ -68,8 +69,10 @@ public:
 	using iterator_category =
 		std::conditional_t<either_is_category<std::output_iterator_tag>(), std::output_iterator_tag,
 		std::conditional_t<either_is_category<std::input_iterator_tag>(), std::input_iterator_tag,
-		std::forward_iterator_tag
-	>>;
+		std::conditional_t<either_is_category<std::forward_iterator_tag>(), std::forward_iterator_tag,
+		std::conditional_t<either_is_category<std::bidirectional_iterator_tag>(), std::bidirectional_iterator_tag,
+		std::random_access_iterator_tag
+	>>>>;
 	
 	using pointer = value_type *;
 
@@ -90,13 +93,34 @@ public:
 		in_first_range() ? *m_first1 : *m_first2
 	)
 
-	// TODO: In theory this can support random forward access if the underlying
-	// iterators support it
-	friend constexpr concatenate_view_iterator operator+(concatenate_view_iterator const lhs, bounded::constant_t<1>) BOUNDED_NOEXCEPT(
-		lhs.in_first_range() ?
-			concatenate_view_iterator(std::next(lhs.m_first1), lhs.m_last1, lhs.m_first2) :
-			concatenate_view_iterator(lhs.m_first1, lhs.m_last1, std::next(lhs.m_first2))
-	)
+	template<typename Offset, BOUNDED_REQUIRES(
+		std::is_convertible_v<Offset, difference_type> and
+		(
+			!bounded::is_bounded_integer<difference_type> or
+			std::is_same_v<iterator_category, std::random_access_iterator_tag> or
+			std::numeric_limits<Offset>::max() == 1_bi
+		)
+	)>
+	friend constexpr auto operator+(concatenate_view_iterator const lhs, Offset const offset) {
+		if constexpr (std::is_convertible_v<iterator_category, std::random_access_iterator_tag>) {
+			auto const first_remaining = lhs.m_last1 - lhs.m_first1;
+			return first_remaining >= offset ?
+				concatenate_view_iterator(
+					lhs.m_first1 + static_cast<typename std::iterator_traits<Iterator1>::difference_type>(offset),
+					lhs.m_last1,
+					lhs.m_first2
+				) :
+				concatenate_view_iterator(
+					lhs.m_first1 + first_remaining,
+					lhs.m_last1,
+					lhs.m_first2 + static_cast<typename std::iterator_traits<Iterator2>::difference_type>((offset - first_remaining))
+				);
+		} else {
+			return lhs.in_first_range() ?
+				concatenate_view_iterator(std::next(lhs.m_first1), lhs.m_last1, lhs.m_first2) :
+				concatenate_view_iterator(lhs.m_first1, lhs.m_last1, std::next(lhs.m_first2));
+		}
+	}
 
 	// TODO: What if they have different m_last1?
 	template<

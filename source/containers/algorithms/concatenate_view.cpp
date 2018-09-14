@@ -33,5 +33,6 @@ static_assert(equal_values_and_types(
 	containers::array{1, 1, 2, 3, 5, 1, 2, 3, 2, 3, 5, 7}
 ));
 
+static_assert(*(begin(three) + bounded::constant<7>) == 3);
 
 } // namespace
