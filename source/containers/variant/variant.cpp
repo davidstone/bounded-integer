@@ -55,7 +55,8 @@ int main() {
 	auto non_trivial_variant = non_trivial_variant_t(0_bi);
 	assert(non_trivial_variant.index() == 0_bi);
 	non_trivial_variant = non_trivial_variant_t(0_bi);
-	non_trivial_variant = non_trivial_variant;
+	// Silence self-assignment warning
+	non_trivial_variant = *&non_trivial_variant;
 	
 	
 	using non_copyable_variant_t = containers::variant<non_copyable>;
