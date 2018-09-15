@@ -1,4 +1,4 @@
-// Copyright David Stone 2016.
+// Copyright David Stone 2018.
 // Distributed under the Boost Software License, Version 1.0.
 // (See accompanying file LICENSE_1_0.txt or copy at
 // http://www.boost.org/LICENSE_1_0.txt)
@@ -153,9 +153,9 @@ public:
 		};
 		return detail::emplace_impl(*this, position, relocating_emplace, BOUNDED_FORWARD(args)...);
 	}
-	template<typename ForwardIterator, typename Sentinel>
-	constexpr auto insert(const_iterator const position, ForwardIterator first, Sentinel last) {
-		return detail::insert_impl(*this, position, first, last, [](auto) {
+	template<typename Range = std::initializer_list<value_type>>
+	constexpr auto insert(const_iterator const position, Range && range) {
+		return detail::insert_impl(*this, position, BOUNDED_FORWARD(range), [](auto) {
 			assert(false);
 			return iterator{};
 		});

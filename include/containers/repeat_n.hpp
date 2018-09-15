@@ -15,10 +15,6 @@
 #include <utility>
 
 namespace containers {
-namespace detail {
-
-template<typename Size, typename T>
-struct repeat_n;
 
 struct repeat_n_sentinel {};
 
@@ -30,6 +26,12 @@ struct repeat_n_iterator {
 	using pointer = value_type *;
 	using reference = value_type &;
 	
+	constexpr repeat_n_iterator(Size const remaining, value_type & value):
+		m_remaining(remaining),
+		m_value(value)
+	{
+	}
+
 	constexpr auto const & operator*() const {
 		return m_value.get();
 	}
@@ -60,13 +62,6 @@ struct repeat_n_iterator {
 	}
 
 private:
-	friend struct repeat_n<Size, T>;
-	constexpr repeat_n_iterator(Size const remaining, value_type & value):
-		m_remaining(remaining),
-		m_value(value)
-	{
-	}
-
 	Size m_remaining;
 	std::reference_wrapper<value_type> m_value;
 };
@@ -102,5 +97,4 @@ private:
 template<typename Size, typename T>
 repeat_n(Size, T &&) -> repeat_n<bounded::integer<0, static_cast<std::intmax_t>(std::numeric_limits<Size>::max())>, T>;
 
-}	// namespace detail
 }	// namespace containers

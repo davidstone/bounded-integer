@@ -124,7 +124,7 @@ template<typename Container>
 void test_unique_inplace_merge(Container v, Container const & other, Container const & expected) {
 	using iterator = typename Container::iterator;
 	auto const midpoint = static_cast<typename std::iterator_traits<iterator>::difference_type>(containers::size(v));
-	v.insert(end(v), begin(other), end(other));
+	append(v, other);
 	auto const it = containers::unique_inplace_merge(begin(v), begin(v) + midpoint, end(v));
 	erase(v, it, end(v));
 
@@ -315,7 +315,7 @@ void test_performance(std::size_t const loop_count) {
 		auto ignore = [](auto &&){};
 		ignore(thing);
 	}
-	map.insert(begin(additional_batch), end(additional_batch));
+	map.insert(additional_batch);
 	auto const inserted_batch = high_resolution_clock::now();
 	#if defined TRACK_COMPARISONS
 		auto const inserted_batch_comparisons = number_of_comparisons;

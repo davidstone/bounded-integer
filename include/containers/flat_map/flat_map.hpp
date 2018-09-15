@@ -284,15 +284,15 @@ public:
 		return emplace_hint(hint, std::move(value));
 	}
 	// TODO: noexcept
-	template<typename InputIterator>
-	constexpr auto insert(InputIterator first, InputIterator const last) {
+	template<typename Range = std::initializer_list<value_type>>
+	constexpr auto insert(Range && range) {
 		// Because my underlying container is expected to be contiguous storage,
 		// it's best to do a batch insert and then just sort it all. However,
 		// because I know that the first section of the final range is already
 		// sorted, it's probably better to just sort the new elements then do a
 		// merge sort on both ranges, rather than calling std::sort on the
 		// entire container.
-		auto const midpoint = container().insert(end(container()), first, last);
+		auto const midpoint = append(container(), BOUNDED_FORWARD(range));
 		auto const lmidpoint = legacy_iterator(midpoint);
 		auto const lend = legacy_iterator(end(container()));
 		std::sort(lmidpoint, lend, value_compare());
@@ -314,9 +314,6 @@ public:
 			erase(container(), position, end(container()));
 		}
 	}
-	constexpr auto insert(std::initializer_list<value_type> init) BOUNDED_NOEXCEPT_DECLTYPE(
-		insert(begin(init), end(init))
-	)
 	
 	// These maintain the relative order of all elements in the container, so I
 	// don't have to worry about re-sorting

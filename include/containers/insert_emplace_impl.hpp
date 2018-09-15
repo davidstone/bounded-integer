@@ -58,15 +58,15 @@ constexpr auto emplace_impl(Container & container, typename Container::const_ite
 
 // TODO: exception safety
 // TODO: Check if the range lies within the container
-template<typename Container, typename ForwardIterator, typename Sentinel, typename Function>
-constexpr auto insert_impl(Container & container, typename Container::const_iterator position, ForwardIterator first, Sentinel last, Function reallocating_insert) {
+template<typename Container, typename Range, typename Function>
+constexpr auto insert_impl(Container & container, typename Container::const_iterator position, Range && range, Function reallocating_insert) {
 	assert(iterator_points_into_container(container, position));
 	if (position == end(container)) {
-		return append(container, first, last);
+		return append(container, BOUNDED_FORWARD(range));
 	}
 
 	auto const range_size = bounded::throw_policy<std::out_of_range>{}.assignment(
-		::containers::distance(first, last),
+		detail::linear_size(range),
 		0_bi,
 		Container::size_type::max()
 	);
@@ -74,7 +74,10 @@ constexpr auto insert_impl(Container & container, typename Container::const_iter
 		auto const distance_to_end = typename Container::size_type(end(container) - position, bounded::non_check);
 		auto const mutable_position = ::containers::detail::mutable_iterator(container, position);
 		::containers::uninitialized_move_backward(mutable_position, end(container), end(container) + range_size);
+		auto const first = begin(BOUNDED_FORWARD(range));
+		// TODO: use a view over a counted iterator
 		auto const remainder = ::containers::copy_n(first, bounded::min(range_size, distance_to_end), mutable_position);
+		auto const last = end(BOUNDED_FORWARD(range));
 		::containers::uninitialized_copy(remainder.input, last, remainder.output);
 		container.append_from_capacity(range_size);
 		return mutable_position;

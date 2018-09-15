@@ -59,8 +59,7 @@ struct dynamic_resizable_array : private Container {
 	constexpr dynamic_resizable_array(Count const count, value_type const & value, allocator_type allocator_ = allocator_type()):
 		Container(std::move(allocator_))
 	{
-		auto const repeat = detail::repeat_n(count, value);
-		assert(size(repeat) == count);
+		auto const repeat = repeat_n(count, value);
 		assign(*this, begin(repeat), end(repeat));
 	}
 	
@@ -181,11 +180,13 @@ struct dynamic_resizable_array : private Container {
 	}
 
 	// TODO: Check if the range lies within the container
-	template<typename ForwardIterator, typename Sentinel>
-	auto insert(const_iterator const position, ForwardIterator first, Sentinel last) {
-		return ::containers::detail::insert_impl(*this, position, first, last, [&](auto const range_size) {
+	template<typename Range = std::initializer_list<value_type>>
+	auto insert(const_iterator const position, Range && range) {
+		// This looks like a double move, but when insert_impl actually moves
+		// from range, it does not call this function
+		return detail::insert_impl(*this, position, BOUNDED_FORWARD(range), [&](auto const range_size) {
 			return insert_or_emplace_with_reallocation(position, range_size, [&](auto const ptr) {
-				::containers::uninitialized_copy(first, last, ptr);
+				::containers::uninitialized_copy(BOUNDED_FORWARD(range), ptr);
 			});
 		});
 	}

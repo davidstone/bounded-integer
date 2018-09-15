@@ -6,7 +6,6 @@
 #pragma once
 
 #include <containers/begin_end.hpp>
-#include <containers/is_iterator_sentinel.hpp>
 #include <containers/push_back.hpp>
 #include <containers/size.hpp>
 
@@ -28,14 +27,14 @@ namespace common {
 
 // TODO: specialize for ForwardIterator to call reserve
 // TODO: work with non-sized containers
-template<typename Container, typename InputIterator, typename Sentinel, BOUNDED_REQUIRES(has_push_back<Container> and is_iterator_sentinel<InputIterator, Sentinel>)>
-constexpr auto append(Container & container, InputIterator first, Sentinel last) {
-	auto const offset = size(container);
-	for (; first != last; ++first) {
-		push_back(container, *first);
+template<typename Container, typename Range, BOUNDED_REQUIRES(has_push_back<Container>)>
+constexpr auto append(Container & output, Range && input) {
+	auto const offset = size(output);
+	for (decltype(auto) value : BOUNDED_FORWARD(input)) {
+		push_back(output, BOUNDED_FORWARD(value));
 	}
 	using traits = std::iterator_traits<typename Container::iterator>;
-	return begin(container) + static_cast<typename traits::difference_type>(offset);
+	return begin(output) + static_cast<typename traits::difference_type>(offset);
 }
 
 }	// namespace common

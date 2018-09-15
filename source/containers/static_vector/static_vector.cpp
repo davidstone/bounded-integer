@@ -5,6 +5,7 @@
 
 #include <containers/static_vector/static_vector.hpp>
 #include <containers/array/array.hpp>
+#include <containers/repeat_n.hpp>
 
 namespace {
 
@@ -37,7 +38,7 @@ using namespace bounded::literal;
 		value.pop_back();
 		auto copy = containers::static_vector<int, 10>{};
 		copy = value;
-		copy.insert(begin(copy) + 1_bi, begin(value), end(value));
+		copy.insert(begin(copy) + 1_bi, value);
 		return copy;
 	};
 	constexpr auto made = make();
@@ -167,7 +168,7 @@ int main() {
 	static_assert(!containers::is_iterator<containers::static_vector<std::string, 6>>);
 	static_assert(containers::is_container<containers::static_vector<std::string, 6>>);
 
-	insert(container, begin(container) + 1_bi, 5_bi, 12);
+	container.insert(begin(container) + 1_bi, containers::repeat_n(5_bi, 12));
 	auto const expected = { 1, 12, 12, 12, 12, 12, 2, 3 };
 	assert(std::equal(begin(container), end(container), begin(expected), end(expected)));
 	static_cast<void>(expected);

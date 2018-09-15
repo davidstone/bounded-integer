@@ -187,7 +187,7 @@ struct dynamic_array : private detail::rebound_allocator<T, Allocator> {
 	constexpr dynamic_array(Count const count, value_type const & value, allocator_type allocator_ = allocator_type{}):
 		allocator_type(std::move(allocator_))
 	{
-		auto const range = ::containers::detail::repeat_n(count, value);
+		auto const range = repeat_n(count, value);
 		m_data = ::containers::detail::dynamic_array_initializer(begin(range), end(range), get_allocator());
 	}
 	

@@ -42,7 +42,7 @@ constexpr auto assign(Container & container, std::initializer_list<typename Cont
 )
 template<typename Container, typename Size, BOUNDED_REQUIRES(is_container<Container> and std::numeric_limits<Size>::is_integer)>
 constexpr auto assign(Container & container, Size const count, typename Container::value_type const & value) {
-	auto const range = ::containers::detail::repeat_n(count, value);
+	auto const range = repeat_n(count, value);
 	assign(container, begin(range), end(range));
 }
 

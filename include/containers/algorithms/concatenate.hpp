@@ -23,7 +23,7 @@ template<typename Result, typename Range, typename... Ranges>
 constexpr auto concatenate_prepend_append(Result & result, typename Result::iterator const it, Range && range, Ranges && ... ranges) {
 	if constexpr (std::is_same_v<Result, std::remove_reference_t<Range>>) {
 		if (std::addressof(result) == std::addressof(range)) {
-			(..., append(result, begin(BOUNDED_FORWARD(ranges)), end(BOUNDED_FORWARD(ranges))));
+			(..., append(result, BOUNDED_FORWARD(ranges)));
 			return;
 		}
 	}
@@ -89,7 +89,7 @@ constexpr auto concatenate(Ranges && ... ranges) {
 
 	Result result;
 	result.reserve(static_cast<typename Result::size_type>(total_size));
-	(..., append(result, begin(BOUNDED_FORWARD(ranges)), end(BOUNDED_FORWARD(ranges))));
+	(..., append(result, BOUNDED_FORWARD(ranges)));
 	return result;
 }
 
