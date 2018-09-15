@@ -84,6 +84,37 @@ constexpr auto is_forward_iterator(Args...) {
 	return false;
 }
 
+// This provides the nested typedefs iterator_category and difference_type if
+// and only if Iterator is an iterator, not a sentinel
+template<typename Iterator, typename Traits, bool = is_iterator<Iterator>>
+struct iterator_typedefs_base {
+private:
+	using base_category = typename std::iterator_traits<Iterator>::iterator_category;
+public:
+	using value_type = decltype(containers::unwrap(std::declval<Traits>()).dereference(std::declval<Iterator>()));
+
+	// Not sure what these actually mean...
+	using pointer = std::remove_reference_t<value_type> *;
+	using reference = value_type;
+
+	// TODO: technically not correct. For instance, consider an iterator adapter
+	// that visits each element twice.
+	using difference_type = typename std::iterator_traits<Iterator>::difference_type;
+	using iterator_category =
+		std::conditional_t<std::is_same_v<base_category, std::output_iterator_tag>, std::output_iterator_tag,
+		std::conditional_t<std::is_same_v<base_category, std::input_iterator_tag>, std::input_iterator_tag,
+		std::conditional_t<detail::is_random_access_iterator<Iterator, Traits>(), std::random_access_iterator_tag,
+		std::conditional_t<detail::is_bidirectional_iterator<Iterator, Traits>(), std::bidirectional_iterator_tag,
+		std::conditional_t<detail::is_forward_iterator<Iterator, Traits>(), std::forward_iterator_tag,
+		void
+	>>>>>;
+	static_assert(not std::is_void_v<iterator_category>);
+};
+
+template<typename Iterator, typename Traits>
+struct iterator_typedefs_base<Iterator, Traits, false> {
+};
+
 }	// namespace detail
 
 // There are a few functions of interest for an iterator:
@@ -98,36 +129,16 @@ constexpr auto is_forward_iterator(Args...) {
 // unifies these operations.
 
 template<typename Iterator, typename Traits>
-struct adapt_iterator : detail::operator_arrow<adapt_iterator<Iterator, Traits>> {
+struct adapt_iterator :
+	detail::iterator_typedefs_base<Iterator, decltype(containers::unwrap(std::declval<Traits>()))>,
+	detail::operator_arrow<adapt_iterator<Iterator, Traits>>
+{
 private:
 	// TODO: [[no_unique_address]]
 	using tuple_t = tuple<Iterator, Traits>;
 	static_assert(std::is_copy_assignable_v<Iterator>);
 	static_assert(std::is_copy_assignable_v<Traits>);
-
-	using base_iterator_category = typename std::iterator_traits<Iterator>::iterator_category;
-
-	using traits_t = decltype(containers::unwrap(std::declval<Traits>()));
-
 public:
-	using value_type = decltype(containers::unwrap(std::declval<Traits>()).dereference(std::declval<Iterator>()));
-	// TODO: technically not correct. For instance, consider an iterator adapter
-	// that visits each element twice.
-	using difference_type = typename std::iterator_traits<Iterator>::difference_type;
-	using iterator_category =
-		std::conditional_t<std::is_same_v<base_iterator_category, std::output_iterator_tag>, std::output_iterator_tag,
-		std::conditional_t<std::is_same_v<base_iterator_category, std::input_iterator_tag>, std::input_iterator_tag,
-		std::conditional_t<detail::is_random_access_iterator<Iterator, traits_t>(), std::random_access_iterator_tag,
-		std::conditional_t<detail::is_bidirectional_iterator<Iterator, traits_t>(), std::bidirectional_iterator_tag,
-		std::conditional_t<detail::is_forward_iterator<Iterator, traits_t>(), std::forward_iterator_tag,
-		void
-	>>>>>;
-	static_assert(not std::is_void_v<iterator_category>);
-
-	// Not sure what these actually mean...
-	using pointer = std::remove_reference_t<value_type> *;
-	using reference = value_type;
-
 	constexpr adapt_iterator(Iterator it, Traits traits) noexcept(std::is_nothrow_constructible_v<tuple_t, Iterator, Traits>):
 		m_data(std::move(it), std::move(traits))
 	{
@@ -162,13 +173,13 @@ constexpr auto operator+(adapt_iterator<Iterator, Traits> const lhs, Offset cons
 )
 
 
-template<typename Iterator, typename Traits>
-constexpr auto operator-(adapt_iterator<Iterator, Traits> const lhs, adapt_iterator<Iterator, Traits> const rhs) BOUNDED_NOEXCEPT_DECLTYPE(
+template<typename LHSIterator, typename RHSIterator, typename Traits>
+constexpr auto operator-(adapt_iterator<LHSIterator, Traits> const lhs, adapt_iterator<RHSIterator, Traits> const rhs) BOUNDED_NOEXCEPT_DECLTYPE(
 	lhs.traits().subtract(lhs.base(), rhs.base())
 )
 
-template<typename Iterator, typename Traits>
-constexpr auto compare(adapt_iterator<Iterator, Traits> const lhs, adapt_iterator<Iterator, Traits> const rhs) BOUNDED_NOEXCEPT_DECLTYPE(
+template<typename LHSIterator, typename RHSIterator, typename Traits>
+constexpr auto compare(adapt_iterator<LHSIterator, Traits> const lhs, adapt_iterator<RHSIterator, Traits> const rhs) BOUNDED_NOEXCEPT_DECLTYPE(
 	lhs.traits().compare(lhs.base(), rhs.base())
 )
 
