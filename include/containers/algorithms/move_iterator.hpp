@@ -1,4 +1,4 @@
-// Copyright David Stone 2016.
+// Copyright David Stone 2018.
 // Distributed under the Boost Software License, Version 1.0.
 // (See accompanying file LICENSE_1_0.txt or copy at
 // http://www.boost.org/LICENSE_1_0.txt)
@@ -25,8 +25,8 @@ private:
 	>;
 public:
 	template<typename Iterator>
-	constexpr auto operator()(Iterator && it) const BOUNDED_NOEXCEPT_DECLTYPE(
-		static_cast<result<Iterator>>(*BOUNDED_FORWARD(it))
+	constexpr auto operator()(Iterator const it) const BOUNDED_NOEXCEPT_DECLTYPE(
+		static_cast<result<Iterator>>(*it)
 	)
 };
 
@@ -34,7 +34,7 @@ public:
 
 template<typename Iterator>
 constexpr auto move_iterator(Iterator it) BOUNDED_NOEXCEPT_VALUE(
-	::containers::transform_iterator(it, detail::move_dereference{})
+	::containers::transform_iterator_dereference(it, detail::move_dereference{})
 )
 
 }	// namespace containers

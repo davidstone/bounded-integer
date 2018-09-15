@@ -22,8 +22,8 @@ struct move_destroy_dereference {
 	) {
 		if constexpr (std::is_reference_v<decltype(*it)>) {
 			auto && ref = *it;
-			static_assert(noexcept(bounded::destroy(ref)), "Do not mark your destructor as noexcept(false)");
 			auto result = std::move(ref);
+			static_assert(noexcept(bounded::destroy(ref)), "Do not mark your destructor as noexcept(false)");
 			bounded::destroy(ref);
 			return result;
 		} else {
@@ -36,7 +36,7 @@ struct move_destroy_dereference {
 
 template<typename Iterator>
 constexpr auto move_destroy_iterator(Iterator it) BOUNDED_NOEXCEPT_VALUE(
-	::containers::transform_iterator(it, detail::move_destroy_dereference{})
+	::containers::transform_iterator_dereference(it, detail::move_destroy_dereference{})
 )
 
 }	// namespace containers

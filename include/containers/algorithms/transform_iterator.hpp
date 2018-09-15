@@ -16,13 +16,30 @@ private:
 	UnaryFunction m_dereference;
 
 public:
-	constexpr explicit transform_traits(UnaryFunction && dereference):
-		m_dereference(BOUNDED_FORWARD(dereference))
+	constexpr explicit transform_traits(UnaryFunction dereference):
+		m_dereference(std::move(dereference))
 	{
 	}
 	
 	template<typename Iterator>
-	constexpr auto dereference(Iterator const & it) const BOUNDED_NOEXCEPT_DECLTYPE(
+	constexpr auto dereference(Iterator const it) const BOUNDED_NOEXCEPT_DECLTYPE(
+		m_dereference(*it)
+	)
+};
+
+template<typename UnaryFunction>
+struct transform_traits_dereference : default_add, default_subtract, default_compare {
+private:
+	UnaryFunction m_dereference;
+
+public:
+	constexpr explicit transform_traits_dereference(UnaryFunction dereference):
+		m_dereference(std::move(dereference))
+	{
+	}
+	
+	template<typename Iterator>
+	constexpr auto dereference(Iterator const it) const BOUNDED_NOEXCEPT_DECLTYPE(
 		m_dereference(it)
 	)
 };
@@ -30,8 +47,13 @@ public:
 }	// namespace detail
 
 template<typename Iterator, typename UnaryFunction>
-constexpr auto transform_iterator(Iterator it, UnaryFunction && dereference) {
-	return adapt_iterator(std::move(it), detail::transform_traits<UnaryFunction>(BOUNDED_FORWARD(dereference)));
+constexpr auto transform_iterator(Iterator it, UnaryFunction dereference) {
+	return adapt_iterator(std::move(it), detail::transform_traits(std::move(dereference)));
+}
+
+template<typename Iterator, typename UnaryFunction>
+constexpr auto transform_iterator_dereference(Iterator it, UnaryFunction dereference) {
+	return adapt_iterator(std::move(it), detail::transform_traits_dereference(std::move(dereference)));
 }
 
 }	// namespace containers
