@@ -1,4 +1,4 @@
-// Copyright David Stone 2016.
+// Copyright David Stone 2018.
 // Distributed under the Boost Software License, Version 1.0.
 // (See accompanying file LICENSE_1_0.txt or copy at
 // http://www.boost.org/LICENSE_1_0.txt)
@@ -7,7 +7,6 @@
 
 #include <containers/algorithms/negate.hpp>
 #include <containers/algorithms/unique.hpp>
-#include <containers/allocator.hpp>
 #include <containers/common_container_functions.hpp>
 #include <containers/legacy_iterator.hpp>
 #include <containers/tuple.hpp>
@@ -91,7 +90,6 @@ public:
 	using value_type = typename Container::value_type;
 	using key_type = typename value_type::key_type;
 	using mapped_type = typename value_type::mapped_type;
-	using allocator_type = typename Container::allocator_type;
 	using size_type = typename Container::size_type;
 
 	using const_iterator = typename Container::const_iterator;
@@ -122,20 +120,16 @@ public:
 	}
 	
 	flat_map_base() = default;
-	constexpr explicit flat_map_base(key_compare_type compare, allocator_type allocator = allocator_type{}) noexcept(noexcept(
-		data_t(Container(std::declval<allocator_type>()), std::declval<key_compare_type>())
+	constexpr explicit flat_map_base(key_compare_type compare) noexcept(noexcept(
+		data_t(Container{}, std::declval<key_compare_type>())
 	)):
-		m_data(Container(std::move(allocator)), std::move(compare))
+		m_data(Container{}, std::move(compare))
 	{
 	}
-	constexpr explicit flat_map_base(allocator_type allocator) BOUNDED_NOEXCEPT_INITIALIZATION(
-		flat_map_base(key_compare_type{}, std::move(allocator))
-	) {
-	}
 	template<typename InputIterator>
-	constexpr flat_map_base(InputIterator first, InputIterator last, key_compare_type compare = key_compare_type{}, allocator_type allocator = allocator_type{}):
+	constexpr flat_map_base(InputIterator first, InputIterator last, key_compare_type compare = key_compare_type{}):
 		// TODO: noexcept?
-		m_data(Container(first, last, std::move(allocator)), std::move(compare))
+		m_data(Container(first, last), std::move(compare))
 	{
 		std::sort(
 			legacy_iterator(begin(container())),
@@ -150,27 +144,8 @@ public:
 			end(container())
 		);
 	}
-	template<typename InputIterator>
-	constexpr flat_map_base(InputIterator first, InputIterator last, allocator_type allocator) BOUNDED_NOEXCEPT_INITIALIZATION(
-		flat_map_base(first, last, key_compare_type{}, std::move(allocator))
-	) {
-	}
-	constexpr flat_map_base(flat_map_base const & other, allocator_type allocator):
-		// TODO: noexcept
-		m_data(Container(other, std::move(allocator)), key_compare_type{})
-	{
-	}
-	constexpr flat_map_base(flat_map_base && other, allocator_type allocator):
-		// TODO: noexcept
-		m_data(Container(std::move(other), std::move(allocator)), key_compare_type{})
-	{
-	}
-	constexpr flat_map_base(std::initializer_list<value_type> init, key_compare_type compare = key_compare_type{}, allocator_type allocator = allocator_type{}) BOUNDED_NOEXCEPT_INITIALIZATION(
-		flat_map_base(begin(init), end(init), std::move(compare), std::move(allocator))
-	) {
-	}
-	constexpr flat_map_base(std::initializer_list<value_type> init, allocator_type allocator) BOUNDED_NOEXCEPT_INITIALIZATION(
-		flat_map_base(init, key_compare_type{}, std::move(allocator))
+	constexpr flat_map_base(std::initializer_list<value_type> init, key_compare_type compare = key_compare_type{}) BOUNDED_NOEXCEPT_INITIALIZATION(
+		flat_map_base(begin(init), end(init), std::move(compare))
 	) {
 	}
 	
@@ -610,20 +585,20 @@ public:
 }	// namespace detail
 
 
-template<typename Key, typename T, typename Compare = std::less<Key>, typename Allocator = allocator<detail::map_value_type<Key, T>>>
-using flat_map = detail::flat_map<vector<detail::map_value_type<Key, T>, Allocator>, Compare>;
+template<typename Key, typename T, typename Compare = std::less<Key>>
+using flat_map = detail::flat_map<vector<detail::map_value_type<Key, T>>, Compare>;
 
 
-template<typename Key, typename T, typename Compare, typename Allocator>
-constexpr auto is_container<flat_map<Key, T, Compare, Allocator>> = true;
+template<typename Key, typename T, typename Compare>
+constexpr auto is_container<flat_map<Key, T, Compare>> = true;
 
 
 
-template<typename Key, typename T, typename Compare = std::less<Key>, typename Allocator = allocator<detail::map_value_type<Key, T>>>
-using flat_multimap = detail::flat_multimap<vector<detail::map_value_type<Key, T>, Allocator>, Compare>;
+template<typename Key, typename T, typename Compare = std::less<Key>>
+using flat_multimap = detail::flat_multimap<vector<detail::map_value_type<Key, T>>, Compare>;
 
 
-template<typename Key, typename T, typename Compare, typename Allocator>
-constexpr auto is_container<flat_multimap<Key, T, Compare, Allocator>> = true;
+template<typename Key, typename T, typename Compare>
+constexpr auto is_container<flat_multimap<Key, T, Compare>> = true;
 
 }	// namespace containers

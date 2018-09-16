@@ -17,23 +17,20 @@
 namespace containers {
 
 // Unlike std::basic_string, there is no null terminator.
-template<typename CharT, typename Allocator = allocator<CharT>>
-struct basic_string : private small_buffer_optimized_vector<CharT, 1, Allocator> {
+template<typename CharT>
+struct basic_string : private small_buffer_optimized_vector<CharT, 1> {
 private:
-	using base = small_buffer_optimized_vector<CharT, 1, Allocator>;
+	using base = small_buffer_optimized_vector<CharT, 1>;
 public:
 	using typename base::value_type;
-	using typename base::allocator_type;
 	using typename base::size_type;
 	using typename base::const_iterator;
 	using typename base::iterator;
 	
-	using base::get_allocator;
-
 	using base::base;
 	
-	constexpr basic_string(std::basic_string_view<CharT> const sv, allocator_type allocator_ = allocator_type()) BOUNDED_NOEXCEPT_INITIALIZATION(
-		base(begin(sv), end(sv), std::move(allocator_))
+	constexpr basic_string(std::basic_string_view<CharT> const sv) BOUNDED_NOEXCEPT_INITIALIZATION(
+		base(begin(sv), end(sv))
 	) {
 	}
 	
@@ -70,8 +67,8 @@ public:
 	}
 };
 
-template<typename CharT, typename Allocator>
-constexpr auto is_container<basic_string<CharT, Allocator>> = true;
+template<typename CharT>
+constexpr auto is_container<basic_string<CharT>> = true;
 
 
 namespace detail {
@@ -90,21 +87,21 @@ constexpr auto c_string_sentinel = c_string_sentinel_t<CharT>{};
 
 } // namespace detail
 
-template<typename CharT, typename Allocator>
-constexpr auto compare(basic_string<CharT, Allocator> const & lhs, CharT const * const rhs) BOUNDED_NOEXCEPT_VALUE(
+template<typename CharT>
+constexpr auto compare(basic_string<CharT> const & lhs, CharT const * const rhs) BOUNDED_NOEXCEPT_VALUE(
 	::containers::compare(begin(lhs), end(lhs), rhs, detail::c_string_sentinel<CharT>)
 )
-template<typename CharT, typename Allocator>
-constexpr auto compare(CharT const * const lhs, basic_string<CharT, Allocator> const & rhs) BOUNDED_NOEXCEPT_VALUE(
+template<typename CharT>
+constexpr auto compare(CharT const * const lhs, basic_string<CharT> const & rhs) BOUNDED_NOEXCEPT_VALUE(
 	::containers::compare(lhs, detail::c_string_sentinel<CharT>, begin(rhs), end(rhs))
 )
 
-template<typename CharT, typename Allocator>
-constexpr auto compare(basic_string<CharT, Allocator> const & lhs, std::basic_string_view<CharT> const rhs) BOUNDED_NOEXCEPT_VALUE(
+template<typename CharT>
+constexpr auto compare(basic_string<CharT> const & lhs, std::basic_string_view<CharT> const rhs) BOUNDED_NOEXCEPT_VALUE(
 	::containers::compare(begin(lhs), end(lhs), begin(rhs), end(rhs))
 )
-template<typename CharT, typename Allocator>
-constexpr auto compare(std::basic_string_view<CharT> const lhs, basic_string<CharT, Allocator> const & rhs) BOUNDED_NOEXCEPT_VALUE(
+template<typename CharT>
+constexpr auto compare(std::basic_string_view<CharT> const lhs, basic_string<CharT> const & rhs) BOUNDED_NOEXCEPT_VALUE(
 	::containers::compare(begin(lhs), end(lhs), begin(rhs), end(rhs))
 )
 
@@ -114,14 +111,14 @@ namespace detail {
 template<typename T>
 constexpr auto is_string = false;
 
-template<typename CharT, typename Allocator>
-constexpr auto is_string<basic_string<CharT, Allocator>> = true;
+template<typename CharT>
+constexpr auto is_string<basic_string<CharT>> = true;
 
 template<typename T>
 constexpr auto string_like = false;
 
-template<typename CharT, typename Allocator>
-constexpr auto string_like<basic_string<CharT, Allocator>> = true;
+template<typename CharT>
+constexpr auto string_like<basic_string<CharT>> = true;
 
 template<typename CharT>
 constexpr auto string_like<std::basic_string_view<CharT>> = true;
@@ -162,13 +159,13 @@ using wstring = basic_string<wchar_t>;
 using u16string = basic_string<char16_t>;
 using u32string = basic_string<char32_t>;
 
-template<typename CharT, typename Traits, typename Allocator>
-auto & operator<<(std::basic_ostream<CharT, Traits> & out, basic_string<CharT, Allocator> const & str) {
+template<typename CharT, typename Traits>
+auto & operator<<(std::basic_ostream<CharT, Traits> & out, basic_string<CharT> const & str) {
 	return out << static_cast<std::string_view>(str);
 }
 
-template<typename CharT, typename Traits, typename Allocator>
-auto & operator>>(std::basic_istream<CharT, Traits> & in, basic_string<CharT, Allocator> const & str) {
+template<typename CharT, typename Traits>
+auto & operator>>(std::basic_istream<CharT, Traits> & in, basic_string<CharT> const & str) {
 	return in >> static_cast<std::string_view>(str);
 }
 

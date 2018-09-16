@@ -5,7 +5,6 @@
 
 #pragma once
 
-#include <containers/allocator.hpp>
 #include <containers/common_container_functions.hpp>
 #include <containers/contiguous_iterator.hpp>
 #include <containers/dynamic_array/dynamic_array.hpp>
@@ -31,24 +30,14 @@ namespace detail {
 template<typename Container>
 struct dynamic_resizable_array : private Container {
 	using typename Container::value_type;
-	using typename Container::allocator_type;
 	using typename Container::size_type;
 	using typename Container::const_iterator;
 	using typename Container::iterator;
 
-	using Container::get_allocator;
-	
 	constexpr dynamic_resizable_array() noexcept {}
 	
-	constexpr explicit dynamic_resizable_array(allocator_type allocator_) BOUNDED_NOEXCEPT_INITIALIZATION(
-		Container(std::move(allocator_))
-	) {
-	}
-	
 	template<typename Count, BOUNDED_REQUIRES(std::is_convertible_v<Count, size_type>)>
-	constexpr explicit dynamic_resizable_array(Count const count, allocator_type allocator_ = allocator_type()):
-		Container(std::move(allocator_))
-	{
+	constexpr explicit dynamic_resizable_array(Count const count) {
 		if (count > capacity()) {
 			this->relocate(count);
 		}
@@ -56,39 +45,26 @@ struct dynamic_resizable_array : private Container {
 		this->set_size(count);
 	}
 	template<typename Count, BOUNDED_REQUIRES(std::is_convertible_v<Count, size_type>)>
-	constexpr dynamic_resizable_array(Count const count, value_type const & value, allocator_type allocator_ = allocator_type()):
-		Container(std::move(allocator_))
-	{
+	constexpr dynamic_resizable_array(Count const count, value_type const & value) {
 		auto const repeat = repeat_n(count, value);
 		assign(*this, begin(repeat), end(repeat));
 	}
 	
 	template<typename ForwardIterator, typename Sentinel, BOUNDED_REQUIRES(is_iterator_sentinel<ForwardIterator, Sentinel>)>
-	constexpr dynamic_resizable_array(ForwardIterator first, Sentinel const last, allocator_type allocator_ = allocator_type()):
-		Container(std::move(allocator_))
-	{
+	constexpr dynamic_resizable_array(ForwardIterator first, Sentinel const last) {
 		assign(*this, first, last);
 	}
 	
-	constexpr dynamic_resizable_array(std::initializer_list<value_type> init, allocator_type allocator_ = allocator_type()) BOUNDED_NOEXCEPT_INITIALIZATION(
-		dynamic_resizable_array(begin(init), end(init), std::move(allocator_))
+	constexpr dynamic_resizable_array(std::initializer_list<value_type> init) BOUNDED_NOEXCEPT_INITIALIZATION(
+		dynamic_resizable_array(begin(init), end(init))
 	) {}
 
-	constexpr dynamic_resizable_array(dynamic_resizable_array const & other, allocator_type allocator_) BOUNDED_NOEXCEPT_INITIALIZATION(
-		dynamic_resizable_array(begin(other), end(other), std::move(allocator_))
-	) {}
 	constexpr dynamic_resizable_array(dynamic_resizable_array const & other) BOUNDED_NOEXCEPT_INITIALIZATION(
-		dynamic_resizable_array(begin(other), end(other), other.get_allocator())
+		dynamic_resizable_array(begin(other), end(other))
 	) {}
 
-	constexpr dynamic_resizable_array(dynamic_resizable_array && other, allocator_type allocator_) noexcept:
-		Container(std::move(allocator_))
-	{
+	constexpr dynamic_resizable_array(dynamic_resizable_array && other) noexcept {
 		this->move_assign_to_empty(std::move(other));
-	}
-	constexpr dynamic_resizable_array(dynamic_resizable_array && other) noexcept:
-		dynamic_resizable_array(std::move(other), std::move(other).get_allocator())
-	{
 	}
 
 	constexpr auto & operator=(dynamic_resizable_array const & other) & noexcept(std::is_nothrow_copy_assignable_v<value_type>) {

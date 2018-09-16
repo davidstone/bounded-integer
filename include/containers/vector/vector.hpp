@@ -1,11 +1,10 @@
-// Copyright David Stone 2016.
+// Copyright David Stone 2018.
 // Distributed under the Boost Software License, Version 1.0.
 // (See accompanying file LICENSE_1_0.txt or copy at
 // http://www.boost.org/LICENSE_1_0.txt)
 
 #pragma once
 
-#include <containers/allocator.hpp>
 #include <containers/common_container_functions.hpp>
 #include <containers/contiguous_iterator.hpp>
 #include <containers/dynamic_array/dynamic_array.hpp>
@@ -24,25 +23,16 @@
 namespace containers {
 namespace detail {
 
-template<typename T, typename Allocator>
+template<typename T>
 struct vector_base {
 	using value_type = T;
-	using size_type = typename detail::dynamic_array_data_t<value_type>::size_type;
-	using allocator_type = detail::rebound_allocator<value_type, Allocator>;
+	using size_type = typename detail::dynamic_array_data<value_type>::size_type;
 
 	using const_iterator = contiguous_iterator<value_type const, size_type::max().value()>;
 	using iterator = contiguous_iterator<value_type, size_type::max().value()>;
-	using raw_container = dynamic_array<trivial_storage<value_type>, allocator_type>;
+	using raw_container = dynamic_array<trivial_storage<value_type>>;
 
-	constexpr auto get_allocator() const noexcept {
-		return static_cast<allocator_type>(m_container.get_allocator());
-	}
-	
 	constexpr vector_base() noexcept = default;
-	constexpr vector_base(allocator_type allocator):
-		m_container(std::move(allocator))
-	{
-	}
 
 	constexpr vector_base(vector_base && other) noexcept:
 		m_container(std::move(other.m_container)),
@@ -74,7 +64,7 @@ struct vector_base {
 
 	template<typename Size>
 	auto make_storage(Size const new_capacity) {
-		return raw_container(new_capacity, get_allocator());
+		return raw_container(new_capacity);
 	}
 	auto relocate_preallocated(raw_container temp) {
 		m_container = std::move(temp);
@@ -103,10 +93,10 @@ private:
 
 }	// namespace detail
 
-template<typename T, typename Allocator>
-constexpr auto is_container<detail::vector_base<T, Allocator>> = true;
+template<typename T>
+constexpr auto is_container<detail::vector_base<T>> = true;
 
-template<typename T, typename Allocator = allocator<T>>
-using vector = detail::dynamic_resizable_array<detail::vector_base<T, Allocator>>;
+template<typename T>
+using vector = detail::dynamic_resizable_array<detail::vector_base<T>>;
 
 }	// namespace containers

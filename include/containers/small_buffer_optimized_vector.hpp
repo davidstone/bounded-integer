@@ -1,4 +1,4 @@
-// Copyright David Stone 2016.
+// Copyright David Stone 2018.
 // Distributed under the Boost Software License, Version 1.0.
 // (See accompanying file LICENSE_1_0.txt or copy at
 // http://www.boost.org/LICENSE_1_0.txt)
@@ -30,34 +30,31 @@ namespace detail {
 // https://stackoverflow.com/a/10319672/852254
 
 
-template<typename T, typename Allocator>
-struct allocator_aware_storage {
-	allocator_aware_storage(Allocator & allocator_, dynamic_array_data_t<T> storage_) noexcept:
-		allocator(allocator_),
+template<typename T>
+struct owning_storage {
+	owning_storage(dynamic_array_data<T> storage_) noexcept:
 		storage(std::move(storage_)),
 		active(true)
 	{
 	}
-	allocator_aware_storage(allocator_aware_storage && other) noexcept:
-		allocator(other.allocator),
+	owning_storage(owning_storage && other) noexcept:
 		storage(other.storage),
 		active(std::exchange(other.active, false))
 	{
 	}
-	~allocator_aware_storage() {
+	~owning_storage() {
 		if (active) {
-			::containers::detail::deallocate_storage(allocator, storage);
+			::containers::detail::deallocate_storage(storage);
 		}
 	}
 	
-	Allocator & allocator;
-	dynamic_array_data_t<T> storage;
+	dynamic_array_data<T> storage;
 	bool active;
 };
 
 
-template<typename T, typename Allocator>
-constexpr auto data(allocator_aware_storage<T, Allocator> & container) noexcept {
+template<typename T>
+constexpr auto data(owning_storage<T> & container) noexcept {
 	return container.storage.pointer;
 }
 
@@ -71,13 +68,12 @@ constexpr auto data(allocator_aware_storage<T, Allocator> & container) noexcept 
 // Therefore, to request the smallest possible buffer, the user can request a
 // size of 1
 template<typename T>
-constexpr auto minimum_small_capacity = (bounded::size_of<std::pair<typename dynamic_array_data_t<T>::size_type, dynamic_array_data_t<T>>> - bounded::size_of<unsigned char>) / bounded::size_of<T>;
+constexpr auto minimum_small_capacity = (bounded::size_of<std::pair<typename dynamic_array_data<T>::size_type, dynamic_array_data<T>>> - bounded::size_of<unsigned char>) / bounded::size_of<T>;
 
 
-template<typename T, std::size_t requested_small_capacity, typename Allocator>
-struct sbo_vector_base : private detail::rebound_allocator<T, Allocator> {
+template<typename T, std::size_t requested_small_capacity>
+struct sbo_vector_base {
 	using value_type = T;
-	using allocator_type = detail::rebound_allocator<value_type, Allocator>;
 
 	struct small_t {
 		// m_force_large exists just to be a bit that's always 0. This allows
@@ -119,7 +115,7 @@ struct sbo_vector_base : private detail::rebound_allocator<T, Allocator> {
 	};
 
 	struct large_t {
-		using size_type = typename detail::dynamic_array_data_t<T>::size_type;
+		using size_type = typename detail::dynamic_array_data<T>::size_type;
 		using capacity_type = bounded::integer<small_t::capacity().value() + 1, size_type::max().value()>;
 
 		// m_force_large exists just to be a bit that's always 1.
@@ -155,7 +151,7 @@ struct sbo_vector_base : private detail::rebound_allocator<T, Allocator> {
 	private:
 		bool m_force_large : 1;
 		typename size_type::underlying_type m_size : (bounded::size_of_bits<size_type> - 1_bi).value();
-		dynamic_array_data_t<trivial_storage<T>> m_data;
+		dynamic_array_data<trivial_storage<T>> m_data;
 	};
 	
 	static_assert(std::is_nothrow_move_constructible_v<value_type>);
@@ -171,22 +167,7 @@ struct sbo_vector_base : private detail::rebound_allocator<T, Allocator> {
 	using const_iterator = contiguous_iterator<value_type const, size_type::max().value()>;
 	using iterator = contiguous_iterator<value_type, size_type::max().value()>;
 
-	constexpr auto && get_allocator() const & noexcept {
-		return static_cast<allocator_type const &>(*this);
-	}
-	constexpr auto && get_allocator() & noexcept {
-		return static_cast<allocator_type &>(*this);
-	}
-	constexpr auto && get_allocator() && noexcept {
-		return static_cast<allocator_type &&>(*this);
-	}
-	
 	constexpr sbo_vector_base() noexcept:
-		m_small()
-	{
-	}
-	constexpr sbo_vector_base(allocator_type allocator_) noexcept(std::is_nothrow_move_constructible_v<allocator_type>):
-		allocator_type(std::move(allocator_)),
 		m_small()
 	{
 	}
@@ -236,13 +217,10 @@ struct sbo_vector_base : private detail::rebound_allocator<T, Allocator> {
 
 	template<typename Size>
 	auto make_storage(Size const new_capacity) & {
-		return allocator_aware_storage<value_type, allocator_type>(
-			get_allocator(),
-			::containers::detail::make_storage<value_type>(get_allocator(), new_capacity)
-		);
+		return owning_storage<value_type>(detail::make_storage<value_type>(new_capacity));
 	}
 
-	auto relocate_preallocated(allocator_aware_storage<value_type, allocator_type> new_large) noexcept {
+	auto relocate_preallocated(owning_storage<value_type> new_large) noexcept {
 		deallocate_large();
 		// TODO: static_assert noexcept
 		::bounded::construct(
@@ -286,7 +264,9 @@ private:
 			return;
 		}
 		auto temp = std::move(m_large);
-		auto const guard = scope_guard([&]{ ::containers::detail::deallocate_storage(get_allocator(), temp.data(), temp.capacity()); });
+		auto const guard = scope_guard([&]{
+			detail::deallocate_storage(dynamic_array_data(temp.data(), temp.capacity()));
+		});
 		// It is safe to skip the destructor call of m_large
 		// because we do not rely on its side-effects
 		::bounded::construct(m_small);
@@ -313,7 +293,7 @@ private:
 	
 	auto deallocate_large() noexcept {
 		if (is_large()) {
-			::containers::detail::deallocate_storage(get_allocator(), m_large.data(), m_large.capacity());
+			detail::deallocate_storage(dynamic_array_data(m_large.data(), m_large.capacity()));
 		}
 	}
 	
@@ -330,10 +310,10 @@ private:
 
 }	// namespace detail
 
-template<typename T, std::size_t requested_capacity, typename Allocator>
-constexpr auto is_container<detail::sbo_vector_base<T, requested_capacity, Allocator>> = true;
+template<typename T, std::size_t requested_capacity>
+constexpr auto is_container<detail::sbo_vector_base<T, requested_capacity>> = true;
 
-template<typename T, std::size_t requested_small_capacity, typename Allocator = allocator<T>>
-using small_buffer_optimized_vector = detail::dynamic_resizable_array<detail::sbo_vector_base<T, requested_small_capacity, Allocator>>;
+template<typename T, std::size_t requested_small_capacity>
+using small_buffer_optimized_vector = detail::dynamic_resizable_array<detail::sbo_vector_base<T, requested_small_capacity>>;
 
 }	// namespace containers

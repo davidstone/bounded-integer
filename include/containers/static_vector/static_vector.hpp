@@ -6,7 +6,6 @@
 #pragma once
 
 #include <containers/algorithms/copy.hpp>
-#include <containers/allocator.hpp>
 #include <containers/common_container_functions.hpp>
 #include <containers/contiguous_iterator.hpp>
 #include <containers/index_type.hpp>
