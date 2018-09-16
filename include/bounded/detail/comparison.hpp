@@ -167,5 +167,16 @@ constexpr auto operator>=(LHS const & lhs, RHS const & rhs) BOUNDED_NOEXCEPT_DEC
 	using ::bounded::operator>; \
 	using ::bounded::operator<=; \
 	using ::bounded::operator>=;
-	
+
+
+// This is probably a bad idea, but it could save a lot of compile time or code.
+// This macro is just a temporary solution until we actually get operator<=>
+#define BOUNDED_COMPARE_ONE_MEMBER(member) \
+	do { \
+		using bounded::compare; \
+		if (auto const cmp = compare(lhs.member, rhs.member); cmp != 0) { \
+			return cmp; \
+		} \
+	} while(false)
+
 }	// namespace bounded
