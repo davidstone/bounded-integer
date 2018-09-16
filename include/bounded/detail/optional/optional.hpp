@@ -306,6 +306,8 @@ private:
 	optional_storage m_value;
 };
 
+template<typename T, BOUNDED_REQUIRES(!std::is_same_v<T, none_t> and !std::is_same_v<T, in_place_t>)>
+optional(T) -> optional<T>;
 
 template<typename T>
 constexpr auto make_optional(T && value) noexcept -> optional<std::remove_cv_t<std::remove_reference_t<T>>> {
