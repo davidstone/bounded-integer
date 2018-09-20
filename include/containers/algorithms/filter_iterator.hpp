@@ -5,6 +5,7 @@
 
 #pragma once
 
+#include <containers/algorithms/advance.hpp>
 #include <containers/algorithms/find.hpp>
 #include <containers/iterator_adapter.hpp>
 #include <containers/reference_wrapper.hpp>
@@ -42,7 +43,7 @@ struct filter_iterator_traits : private tuple<Sentinel, UnaryPredicate>, default
 		auto const last = sentinel();
 		auto const & condition = predicate();
 		assert(it != last);
-		return containers::find_if(std::next(it), last, condition);
+		return containers::find_if(containers::next(it), last, condition);
 	}
 };
 

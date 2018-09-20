@@ -6,7 +6,6 @@
 #pragma once
 
 #include <containers/algorithms/move_iterator.hpp>
-#include <containers/algorithms/reverse_iterator.hpp>
 #include <containers/is_container.hpp>
 
 #include <bounded/detail/forward.hpp>
@@ -87,36 +86,11 @@ constexpr auto cend(Iterable const & container) BOUNDED_NOEXCEPT_VALUE(
 
 
 
-template<typename Iterable>
-constexpr auto rbegin(Iterable && container) BOUNDED_NOEXCEPT_VALUE(
-	::containers::reverse_iterator(end(BOUNDED_FORWARD(container)))
-)
-template<typename Iterable>
-constexpr auto rend(Iterable && container) BOUNDED_NOEXCEPT_VALUE(
-	::containers::reverse_iterator(begin(BOUNDED_FORWARD(container)))
-)
-
-
-
-template<typename Iterable>
-constexpr auto crbegin(Iterable const & container) BOUNDED_NOEXCEPT_VALUE(
-	::containers::reverse_iterator(end(container))
-)
-template<typename Iterable>
-constexpr auto crend(Iterable const & container) BOUNDED_NOEXCEPT_VALUE(
-	::containers::reverse_iterator(begin(container))
-)
-
-
 #define CONTAINERS_COMMON_BEGIN_END_USING_DECLARATIONS \
 	using ::containers::detail::common::begin; \
 	using ::containers::detail::common::end; \
 	using ::containers::detail::common::cbegin; \
-	using ::containers::detail::common::cend; \
-	using ::containers::detail::common::rbegin; \
-	using ::containers::detail::common::rend; \
-	using ::containers::detail::common::crbegin; \
-	using ::containers::detail::common::crend;
+	using ::containers::detail::common::cend;
 
 }	// namespace common
 

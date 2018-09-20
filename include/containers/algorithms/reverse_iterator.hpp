@@ -5,6 +5,8 @@
 
 #pragma once
 
+#include <containers/algorithms/advance.hpp>
+#include <containers/begin_end.hpp>
 #include <containers/is_iterator.hpp>
 #include <containers/iterator_adapter.hpp>
 
@@ -16,7 +18,7 @@ namespace detail {
 struct reverse_traits {
 	template<typename BidirectionalIterator>
 	static constexpr auto dereference(BidirectionalIterator it) BOUNDED_NOEXCEPT_DECLTYPE(
-		*std::prev(it)
+		*::containers::prev(it)
 	)
 
 	template<typename RandomAccessIterator, typename Offset>
@@ -41,5 +43,27 @@ template<typename BidirectionalIterator>
 constexpr auto reverse_iterator(BidirectionalIterator it) BOUNDED_NOEXCEPT_VALUE(
 	adapt_iterator(it, detail::reverse_traits{})
 )
+
+
+template<typename Iterable>
+constexpr auto rbegin(Iterable && container) BOUNDED_NOEXCEPT_VALUE(
+	::containers::reverse_iterator(end(BOUNDED_FORWARD(container)))
+)
+template<typename Iterable>
+constexpr auto rend(Iterable && container) BOUNDED_NOEXCEPT_VALUE(
+	::containers::reverse_iterator(begin(BOUNDED_FORWARD(container)))
+)
+
+
+
+template<typename Iterable>
+constexpr auto crbegin(Iterable const & container) BOUNDED_NOEXCEPT_VALUE(
+	::containers::reverse_iterator(end(container))
+)
+template<typename Iterable>
+constexpr auto crend(Iterable const & container) BOUNDED_NOEXCEPT_VALUE(
+	::containers::reverse_iterator(begin(container))
+)
+
 
 }	// namespace containers

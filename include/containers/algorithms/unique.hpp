@@ -31,7 +31,7 @@ constexpr auto unique_common(InputIterator first, Sentinel const last, MutableFo
 		++output;
 		*output = BOUNDED_FORWARD(first_ref);
 	}
-	return std::next(output);
+	return ::containers::next(output);
 }
 
 }	// namespace detail
@@ -43,7 +43,7 @@ constexpr auto unique_copy(InputIterator const first, Sentinel const last, Mutab
 		return output;
 	}
 	*output = *first;
-	return ::containers::detail::unique_common(std::next(first), last, output, equal);
+	return ::containers::detail::unique_common(::containers::next(first), last, output, equal);
 }
 
 
@@ -75,13 +75,13 @@ constexpr auto unique(MutableForwardIterator const first, Sentinel const last, B
 	if (equal_element == last) {
 		return equal_element;
 	}
-	auto const other = ::containers::find_if(std::next(equal_element), last, [&](auto const & value) { return !equal(*equal_element, value); });
+	auto const other = ::containers::find_if(::containers::next(equal_element), last, [&](auto const & value) { return !equal(*equal_element, value); });
 	if (other == last) {
 		return equal_element;
 	}
 	*equal_element = std::move(*other);
 	return ::containers::detail::unique_common(
-		::containers::move_iterator(std::next(other)),
+		::containers::move_iterator(containers::next(other)),
 		::containers::move_iterator(last),
 		equal_element,
 		equal

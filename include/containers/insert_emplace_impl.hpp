@@ -45,7 +45,7 @@ constexpr auto emplace_impl(Container & container, typename Container::const_ite
 		auto const mutable_position = detail::mutable_iterator(container, position);
 		auto const original_end = end(container);
 		container.emplace_back(std::move(back(container)));
-		::containers::move_backward(mutable_position, std::prev(original_end), original_end);
+		::containers::move_backward(mutable_position, containers::prev(original_end), original_end);
 		auto const pointer = std::addressof(*mutable_position);
 		bounded::destroy(*pointer);
 		bounded::construct(*pointer, BOUNDED_FORWARD(args)...);

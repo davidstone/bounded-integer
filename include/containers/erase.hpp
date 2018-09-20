@@ -34,7 +34,7 @@ constexpr auto erase(Container & container, Iterator const first_, Iterator cons
 template<typename Container, BOUNDED_REQUIRES(is_container<Container>)>
 constexpr auto erase(Container & container, typename Container::const_iterator const it) {
 	assert(it != end(container));
-	erase(container, it, std::next(it));
+	erase(container, it, ::containers::next(it));
 }
 
 template<typename Container, typename Predicate, BOUNDED_REQUIRES(is_container<Container>)>

@@ -5,6 +5,7 @@
 
 #pragma once
 
+#include <containers/algorithms/advance.hpp>
 #include <containers/begin_end.hpp>
 #include <containers/empty.hpp>
 #include <containers/is_iterable.hpp>
@@ -28,7 +29,7 @@ constexpr decltype(auto) front(Iterable && iterable) noexcept(never_empty<Iterab
 template<typename Iterable, BOUNDED_REQUIRES(is_iterable<Iterable>)>
 constexpr decltype(auto) back(Iterable && iterable) noexcept(never_empty<Iterable>) {
 	assert(!empty(iterable));
-	return *std::prev(end(BOUNDED_FORWARD(iterable)));
+	return *containers::prev(end(BOUNDED_FORWARD(iterable)));
 }
 
 }	// namespace common
