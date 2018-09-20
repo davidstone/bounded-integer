@@ -44,12 +44,10 @@ constexpr auto divides_operator_range = [](auto const lhs_, auto const rhs_) noe
 	// zero, in which case I pick the greatest absolute value (which is the
 	// minimum) so that the 'positive' divisor is not selected in a later step.
 	// We can use similar logic for greatest_negative_divisor.
-	constexpr auto conditional = [](auto condition, auto if_true, auto if_false) {
+	constexpr auto conditional = [](auto condition, auto if_true [[maybe_unused]], auto if_false [[maybe_unused]]) {
 		if constexpr (condition) {
-			static_cast<void>(if_false);
 			return if_true;
 		} else {
-			static_cast<void>(if_true);
 			return if_false;
 		}
 	};

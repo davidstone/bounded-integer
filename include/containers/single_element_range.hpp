@@ -97,7 +97,7 @@ constexpr auto operator-(single_element_sentinel, single_element_iterator<T> con
 }
 
 template<typename T>
-constexpr auto operator-(single_element_iterator<T> const lhs, single_element_sentinel) noexcept {
+constexpr auto operator-(single_element_iterator<T> const lhs [[maybe_unused]], single_element_sentinel) noexcept {
 	assert(lhs.is_end());
 	return 0_bi;
 }

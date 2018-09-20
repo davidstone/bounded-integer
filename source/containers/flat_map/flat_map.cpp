@@ -3,6 +3,8 @@
 // (See accompanying file LICENSE_1_0.txt or copy at
 // http://www.boost.org/LICENSE_1_0.txt)
 
+#undef NDEBUG
+
 #include <containers/flat_map/flat_map.hpp>
 #include <containers/vector/vector.hpp>
 
@@ -91,7 +93,6 @@ void test_unique_copy_less(Container const & source, Container const & expected)
 	auto const it = containers::unique_copy_less(begin(source), end(source), begin(destination));
 	erase(destination, it, end(destination));
 	assert(destination == expected);
-	static_cast<void>(expected);
 }
 
 template<typename Container>
@@ -99,7 +100,6 @@ void test_unique_inplace_less(Container source, Container const & expected) {
 	auto const it = containers::unique_copy_less(begin(source), end(source));
 	erase(source, it, end(source));
 	assert(source == expected);
-	static_cast<void>(expected);
 }
 
 template<typename Container>
@@ -117,7 +117,6 @@ void test_unique_merge_copy(Container const & lhs, Container const & rhs, Contai
 	erase(result, it, end(result));
 
 	assert(result == expected);
-	static_cast<void>(expected);
 }
 
 template<typename Container>
@@ -129,7 +128,6 @@ void test_unique_inplace_merge(Container v, Container const & other, Container c
 	erase(v, it, end(v));
 
 	assert(v == expected);
-	static_cast<void>(expected);
 }
 
 template<typename Container>
@@ -302,8 +300,7 @@ void test_performance(std::size_t const loop_count) {
 		ignore(thing);
 	}
 	for (auto const & value : source) {
-		auto const volatile it = map.find(get_key(value));
-		static_cast<void>(it);
+		auto const volatile it [[maybe_unused]] = map.find(get_key(value));
 	}
 	auto const found = high_resolution_clock::now();
 	#if defined TRACK_COMPARISONS
@@ -350,8 +347,7 @@ void test_performance(std::size_t const loop_count) {
 	auto const iterated = high_resolution_clock::now();
 
 	for (auto const & value : source) {
-		auto const volatile it = map.find(get_key(value));
-		static_cast<void>(it);
+		auto const volatile it [[maybe_unused]] = map.find(get_key(value));
 	}
 	auto const found_in_extras = high_resolution_clock::now();
 	#if defined TRACK_COMPARISONS

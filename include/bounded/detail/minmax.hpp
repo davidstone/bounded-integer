@@ -112,13 +112,11 @@ public:
 
 
 	template<typename Compare, typename T1, typename T2>
-	constexpr decltype(auto) operator()(Compare compare, T1 && t1, T2 && t2) const noexcept(noexcept_extreme<Compare, T1 &&, T2 &&>()) {
+	constexpr decltype(auto) operator()(Compare compare [[maybe_unused]], T1 && t1, T2 && t2) const noexcept(noexcept_extreme<Compare, T1 &&, T2 &&>()) {
 		using result_t = result_type<Compare, T1, T2>;
 		if constexpr (not std::is_constructible_v<result_t, T2>) {
-			static_cast<void>(compare);
 			return BOUNDED_FORWARD(t1);
 		} else if constexpr (not std::is_constructible_v<result_t, T1>) {
-			static_cast<void>(compare);
 			return BOUNDED_FORWARD(t2);
 		} else {
 			return extreme_two(std::move(compare), BOUNDED_FORWARD(t1), BOUNDED_FORWARD(t2));

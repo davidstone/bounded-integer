@@ -53,9 +53,11 @@ constexpr auto check_constructibility() {
 		std::is_constructible_v<type, bool>,
 		"Should be able to construct a bounded::integer from a bool."
 	);
+	
+	return true;
 }
 
-static_assert((static_cast<void>(check_constructibility()), true));
+static_assert(check_constructibility());
 
 static_assert(homogeneous_equals(
 	BOUNDED_CONDITIONAL(true, bounded::constant<7>, bounded::constant<9>),
@@ -71,8 +73,9 @@ constexpr auto check_assignment() {
 	bounded::clamped_integer<0, 10> y(5, bounded::non_check);
 	y = bounded::constant<11>;
 	assert(y == bounded::constant<10>);
+	return true;
 }
 
-static_assert((static_cast<void>(check_assignment()), true));
+static_assert(check_assignment());
 
 }	// namespace

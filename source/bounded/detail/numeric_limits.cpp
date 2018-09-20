@@ -70,7 +70,6 @@ constexpr auto check_numeric_limits() {
 
 constexpr auto check_numeric_limits_all() {
 	static_assert(std::numeric_limits<bounded::integer<1, 1000>>::digits == bounded::constant<0>, "Meaningless digits not 0.");
-
 	check_numeric_limits<std::int8_t>();
 	check_numeric_limits<std::uint8_t>();
 	check_numeric_limits<std::int16_t>();
@@ -79,8 +78,9 @@ constexpr auto check_numeric_limits_all() {
 	check_numeric_limits<std::uint32_t>();
 	check_numeric_limits<std::int64_t>();
 	check_numeric_limits<std::uint64_t>();
+	return true;
 }
 
-static_assert((static_cast<void>(check_numeric_limits_all()), true));
+static_assert(check_numeric_limits_all());
 
 }	// namespace

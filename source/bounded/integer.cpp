@@ -193,7 +193,7 @@ constexpr auto check_non_trivial_optional() {
 }
 
 auto check_optional() {
-	static_assert((static_cast<void>([]{
+	static_assert([]{
 		check_compressed_optional<1, 10>();
 		check_compressed_optional<-50, 127>();
 		check_uncompressed_optional<uint8_t>();
@@ -203,7 +203,8 @@ auto check_optional() {
 
 		check_integer_optional<int>();
 		check_integer_optional<bounded::checked_integer<1, 10>>();
-	}()), true));
+		return true;
+	}());
 
 	check_non_trivial_optional<bounded_test::string_view>();
 	check_non_trivial_optional<std::string>();

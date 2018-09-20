@@ -30,23 +30,19 @@ template<typename T>
 constexpr auto allow_construction_from = basic_numeric_limits<T>::is_specialized and (basic_numeric_limits<T>::is_integer or std::is_enum<std::decay_t<T>>{});
 
 template<typename T, typename Minimum, typename Maximum>
-constexpr auto is_implicitly_constructible_from(Minimum const minimum, Maximum const maximum) noexcept {
+constexpr auto is_implicitly_constructible_from(Minimum const minimum [[maybe_unused]], Maximum const maximum [[maybe_unused]]) noexcept {
 	if constexpr (allow_construction_from<T> and !std::is_same<std::decay_t<T>, bool>{}) {
 		return type_fits_in_range<std::decay_t<T>>(minimum, maximum);
 	} else {
-		static_cast<void>(minimum);
-		static_cast<void>(maximum);
 		return false;
 	}
 }
 
 template<typename policy, typename T, typename Minimum, typename Maximum>
-constexpr auto is_explicitly_constructible_from(Minimum const minimum, Maximum const maximum) noexcept {
+constexpr auto is_explicitly_constructible_from(Minimum const minimum [[maybe_unused]], Maximum const maximum [[maybe_unused]]) noexcept {
 	if constexpr (allow_construction_from<T>) {
 		return type_overlaps_range<std::decay_t<T>>(minimum, maximum) or !policy::overflow_is_error;
 	} else {
-		static_cast<void>(minimum);
-		static_cast<void>(maximum);
 		return false;
 	}
 }

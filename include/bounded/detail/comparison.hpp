@@ -101,20 +101,14 @@ constexpr auto safe_max(Ts... values) noexcept {
 
 
 template<typename LHS, typename RHS, BOUNDED_REQUIRES(is_bounded_integer<LHS> and is_bounded_integer<RHS>)>
-constexpr auto compare(LHS const & lhs, RHS const & rhs) noexcept {
+constexpr auto compare(LHS const & lhs [[maybe_unused]], RHS const & rhs [[maybe_unused]]) noexcept {
 	using lhs_limits = basic_numeric_limits<LHS>;
 	using rhs_limits = basic_numeric_limits<RHS>;
 	if constexpr (compare(lhs_limits::min(), rhs_limits::max()) > 0) {
-		static_cast<void>(lhs);
-		static_cast<void>(rhs);
 		return strong_ordering_greater;
 	} else if constexpr (compare(lhs_limits::max(), rhs_limits::min()) < 0) {
-		static_cast<void>(lhs);
-		static_cast<void>(rhs);
 		return strong_ordering_less;
 	} else if constexpr (compare(lhs_limits::min(), lhs_limits::max()) == 0 and compare(rhs_limits::min(), rhs_limits::max()) == 0 and compare(lhs_limits::min(), rhs_limits::min()) == 0) {
-		static_cast<void>(lhs);
-		static_cast<void>(rhs);
 		return strong_ordering_equal;
 	} else {
 		return compare(lhs.value(), rhs.value());

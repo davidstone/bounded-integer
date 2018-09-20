@@ -34,8 +34,7 @@ int main() {
 	assert(c_string == from_c_string);
 
 	// Verify this works in a range-based for loop	
-	for (auto const & c : from_string_literal) {
-		static_cast<void>(c);
+	for (auto const & c [[maybe_unused]] : from_string_literal) {
 	}
 	
 	assert(from_string_literal + from_string_view == "DavidStone");

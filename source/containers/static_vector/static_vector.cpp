@@ -3,6 +3,8 @@
 // (See accompanying file LICENSE_1_0.txt or copy at
 // http://www.boost.org/LICENSE_1_0.txt)
 
+#undef NDEBUG
+
 #include <containers/static_vector/static_vector.hpp>
 #include <containers/array/array.hpp>
 #include <containers/repeat_n.hpp>
@@ -66,14 +68,12 @@ void test_generic(T const & t, std::initializer_list<T> init) {
 	
 	for (auto const & value : count) {
 		assert(value == T{});
-		static_cast<void>(value);
 	}
 	
 	auto const count_arg = container(capacity, t);
 	assert(size(count) == capacity);
 	for (auto const & value : count_arg) {
 		assert(value == t);
-		static_cast<void>(value);
 	}
 	assert(front(count_arg) == t);
 	assert(back(count_arg) == t);
@@ -129,7 +129,6 @@ void test_generic(T const & t, std::initializer_list<T> init) {
 	auto const old_front = front(copy);
 	resize(copy, capacity);
 	assert(front(copy) == old_front);
-	static_cast<void>(old_front);
 	clear(copy);
 	resize(copy, capacity);
 	assert(front(copy) == T{});
@@ -171,7 +170,6 @@ int main() {
 	container.insert(begin(container) + 1_bi, containers::repeat_n(5_bi, 12));
 	auto const expected = { 1, 12, 12, 12, 12, 12, 2, 3 };
 	assert(std::equal(begin(container), end(container), begin(expected), end(expected)));
-	static_cast<void>(expected);
 	
 	containers::static_vector<non_copyable, 10> test_no_copies;
 	test_no_copies.emplace_back();

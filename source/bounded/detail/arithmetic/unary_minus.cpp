@@ -50,8 +50,9 @@ constexpr auto check_all_limits() {
 	#else
 	check_signed_limits<std::int64_t, std::uint64_t>();
 	#endif
+	return true;
 }
-static_assert((static_cast<void>(check_all_limits()), true));
+static_assert(check_all_limits());
 
 static_assert(homogeneous_equals(
 	-bounded::checked_integer<1, 10>(9, bounded::non_check),

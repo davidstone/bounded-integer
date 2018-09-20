@@ -55,8 +55,7 @@ static_assert(containers::accumulate(range) == -6_bi);
 
 // Ensure it works with a range-based for loop
 static_assert([]{
-	for (auto const n : range) {
-		static_cast<void>(n);
+	for (auto const n [[maybe_unused]] : range) {
 	}
 	return true;
 }());

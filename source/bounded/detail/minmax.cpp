@@ -135,7 +135,8 @@ constexpr auto check_minmax() {
 		std::is_same<decltype(bounded::min(cref<int>(), cref<long>())), long>{},
 		"Incorrect result type for bounded::min with int const & and long const &."
 	);
+	return true;
 }
-static_assert((static_cast<void>(check_minmax()), true));
+static_assert(check_minmax());
 
 }	// namespace

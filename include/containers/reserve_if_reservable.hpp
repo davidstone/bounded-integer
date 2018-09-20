@@ -40,7 +40,7 @@ constexpr auto reallocation_size(Container const & container, typename Container
 )
 
 template<typename Container, BOUNDED_REQUIRES(is_container<Container> and !has_reserve<Container>)>
-constexpr void growth_reallocation(Container const & container, typename Container::size_type const count) noexcept {
+constexpr void growth_reallocation(Container const & container [[maybe_unused]], typename Container::size_type const count [[maybe_unused]]) noexcept {
 	assert(container.capacity() >= size(container) + count);
 }
 

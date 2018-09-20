@@ -1,7 +1,9 @@
-// Copyright David Stone 2017.
+// Copyright David Stone 2018.
 // Distributed under the Boost Software License, Version 1.0.
 // (See accompanying file LICENSE_1_0.txt or copy at
 // http://www.boost.org/LICENSE_1_0.txt)
+
+#undef NDEBUG
 
 #include <bounded/detail/arithmetic/common.hpp>
 #include <bounded/detail/arithmetic/operators_builtin.hpp>
@@ -63,11 +65,11 @@ constexpr auto check_compound_arithmetic() {
 	auto const post_increment = z++;
 	assert(post_increment == 0);
 	assert(z == 1);
-	static_cast<void>(pre_increment);
-	static_cast<void>(post_increment);
 
-	static_assert(minus_equals(bounded::clamped_integer<0, 10>(bounded::constant<5>), bounded::constant<20>) == bounded::constant<0>);	
+	static_assert(minus_equals(bounded::clamped_integer<0, 10>(bounded::constant<5>), bounded::constant<20>) == bounded::constant<0>);
+	
+	return true;
 }
-static_assert((static_cast<void>(check_compound_arithmetic()), true));
+static_assert(check_compound_arithmetic());
 
 }	// namespace

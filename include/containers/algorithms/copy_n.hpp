@@ -18,8 +18,7 @@ constexpr auto copy_n(InputIterator first, Size const count, OutputIterator out)
 		InputIterator input;
 		OutputIterator output;
 	};
-	for (auto const n : integer_range(count)) {
-		static_cast<void>(n);
+	for (auto const n [[maybe_unused]] : integer_range(count)) {
 		*out = *first;
 		++out;
 		++first;

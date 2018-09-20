@@ -171,8 +171,7 @@ private:
 	template<typename Count, typename... MaybeInitializer>
 	constexpr explicit static_vector(count_constructor, Count const count, MaybeInitializer && ... args) noexcept(std::is_nothrow_constructible_v<value_type, MaybeInitializer && ...>) {
 		static_assert(sizeof...(MaybeInitializer) == 0 or sizeof...(MaybeInitializer) == 1);
-		for (auto const n : integer_range(count)) {
-			static_cast<void>(n);
+		for (auto const n [[maybe_unused]] : integer_range(count)) {
 			emplace_back(BOUNDED_FORWARD(args)...);
 		}
 	}
