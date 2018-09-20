@@ -37,13 +37,13 @@ using extreme_t = typename extreme_type<Compare, std::decay_t<T1>, std::decay_t<
 // TODO: This should be selected only for less and greater
 template<
 	typename Compare,
-	auto lhs_min, auto lhs_max, typename lhs_policy, bool lhs_poisoned,
-	auto rhs_min, auto rhs_max, typename rhs_policy, bool rhs_poisoned
+	auto lhs_min, auto lhs_max, typename lhs_policy,
+	auto rhs_min, auto rhs_max, typename rhs_policy
 >
 struct extreme_type<
 	Compare,
-	integer<lhs_min, lhs_max, lhs_policy, lhs_poisoned>,
-	integer<rhs_min, rhs_max, rhs_policy, rhs_poisoned>
+	integer<lhs_min, lhs_max, lhs_policy>,
+	integer<rhs_min, rhs_max, rhs_policy>
 > {
 private:
 	static constexpr auto select = [](auto const lhs, auto const rhs) noexcept {
@@ -56,9 +56,8 @@ private:
 	static constexpr auto minimum = select(constant<lhs_min>, constant<rhs_min>);
 	static constexpr auto maximum = select(constant<lhs_max>, constant<rhs_max>);
 	using policy = detail::common_policy<lhs_policy, rhs_policy>;
-	static constexpr auto poisoned = lhs_poisoned or rhs_poisoned;
 public:
-	using type = integer<minimum, maximum, policy, poisoned>;
+	using type = integer<minimum, maximum, policy>;
 };
 
 

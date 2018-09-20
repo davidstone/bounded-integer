@@ -42,7 +42,6 @@ target_sources(bounded INTERFACE
 	$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>/include/bounded/detail/forward_declaration.hpp
 	$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>/include/bounded/detail/hash.hpp
 	$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>/include/bounded/detail/is_bounded_integer.hpp
-	$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>/include/bounded/detail/is_poisoned.hpp
 	$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>/include/bounded/detail/literal.hpp
 	$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>/include/bounded/detail/log.hpp
 	$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>/include/bounded/detail/max_builtin.hpp
@@ -212,7 +211,6 @@ add_executable(bounded_test
 	source/bounded/detail/forward_declaration.cpp
 	source/bounded/detail/hash.cpp
 	source/bounded/detail/is_bounded_integer.cpp
-	source/bounded/detail/is_poisoned.cpp
 	source/bounded/detail/literal.cpp
 	source/bounded/detail/log.cpp
 	source/bounded/detail/max_builtin.cpp

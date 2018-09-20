@@ -280,11 +280,6 @@ namespace check_enum_construction {
 	static_assert(bounded::integer(bounded_enum{}) == bounded::constant<0>);
 }
 
-// check poisoning
-static_assert(std::is_convertible<int, bounded::integer<0, 10>>{});
-static_assert(std::is_convertible<decltype(std::declval<bounded::integer<0, 10>>() + 100), bounded::integer<0, 100>>{});
-static_assert(std::is_convertible<decltype(bounded::integer(5)), bounded::integer<5, 5>>{});
-
 auto check_volatile() {
 	bounded::integer<0, 6> volatile x = bounded::constant<3>;
 	assert(x.value() == 3);

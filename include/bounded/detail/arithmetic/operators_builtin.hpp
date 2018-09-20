@@ -29,35 +29,6 @@ constexpr auto operator symbol(std::integral_constant<T, lhs>, RHS const rhs) no
 }
 
 
-// Many standard library components do things like mutiply by some integer (such
-// as 2, or sizeof(T)). This can quickly lead to growth in the bounds that
-// exceeds current limits, even though the math is perfectly safe. By default,
-// the result of mixed arithmetic between bounded::integer and built-in integers
-// is a built-in integer. If this macro is defined, it is a bounded::integer
-// with the poisoned bit set to true.
-
-#ifdef BOUNDED_MIXED_ARITHMETIC_RESULT_IS_BOUNDED
-
-#define BOUNDED_INTEGER_MIXED_OPERATOR_OVERLOADS(symbol, minimum, maximum) \
-template< \
-	auto lhs_min, auto lhs_max, typename overflow, bool poisoned, typename T, \
-	BOUNDED_REQUIRES(detail::is_builtin_integer<T>) \
-> \
-constexpr auto operator symbol(integer<lhs_min, lhs_max, overflow, poisoned> const lhs, T const rhs) noexcept { \
-	return lhs symbol integer<detail::normalize<minimum>, detail::normalize<maximum>, overflow, true>(rhs); \
-} \
-template< \
-	typename T, auto rhs_min, auto rhs_max, typename overflow, bool poisoned, \
-	BOUNDED_REQUIRES(detail::is_builtin_integer<T>) \
-> \
-constexpr auto operator symbol(T const lhs, integer<rhs_min, rhs_max, overflow, poisoned> const rhs) noexcept { \
-	return integer(lhs, overflow{}) symbol rhs; \
-} \
-BOUNDED_INTEGER_MIXED_OPERATOR_OVERLOADS_INTEGRAL_CONSTANT(symbol)
-
-
-#else
-
 #define BOUNDED_INTEGER_MIXED_OPERATOR_OVERLOADS(symbol, minimum, maximum) \
 template<typename LHS, typename RHS, BOUNDED_REQUIRES(is_bounded_integer<LHS> and detail::is_builtin_integer<RHS>)> \
 constexpr auto operator symbol(LHS const lhs, RHS const rhs) noexcept { \
@@ -68,9 +39,6 @@ constexpr auto operator symbol(LHS const lhs, RHS const rhs) noexcept { \
 	return lhs symbol rhs.value(); \
 } \
 BOUNDED_INTEGER_MIXED_OPERATOR_OVERLOADS_INTEGRAL_CONSTANT(symbol)
-
-
-#endif
 
 
 // Without the special versions for division and modulus, you could not use a

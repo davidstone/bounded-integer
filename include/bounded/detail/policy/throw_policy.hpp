@@ -10,7 +10,6 @@
 #include <bounded/detail/class.hpp>
 #include <bounded/detail/comparison.hpp>
 #include <bounded/detail/is_bounded_integer.hpp>
-#include <bounded/detail/is_poisoned.hpp>
 #include <bounded/detail/minmax.hpp>
 #include <bounded/detail/noexcept.hpp>
 #include <bounded/detail/string.hpp>
@@ -26,8 +25,7 @@ constexpr auto reduce_range(T const & value, constant_t<minimum>, constant_t<max
 	integer<
 		detail::safe_max(minimum, basic_numeric_limits<T>::min()),
 		detail::safe_min(maximum, basic_numeric_limits<T>::max()),
-		null_policy,
-		bounded::detail::is_poisoned<T>
+		null_policy
 	>(value)
 )
 

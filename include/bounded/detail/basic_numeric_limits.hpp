@@ -117,8 +117,8 @@ public:
 	static constexpr auto is_bounded = real_numeric_limits::is_bounded;
 };
 
-template<auto minimum, auto maximum, typename overflow_policy, bool poisoned>
-struct basic_numeric_limits<integer<minimum, maximum, overflow_policy, poisoned>> {
+template<auto minimum, auto maximum, typename overflow_policy>
+struct basic_numeric_limits<integer<minimum, maximum, overflow_policy>> {
 	static constexpr auto min() noexcept {
 		return detail::normalize<minimum>;
 	}

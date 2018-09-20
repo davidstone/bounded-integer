@@ -249,9 +249,13 @@ struct sbo_vector_base {
 	template<typename Size>
 	auto set_size(Size const new_size) noexcept {
 		if (is_small()) {
-			m_small.set_size(static_cast<typename small_t::size_type::underlying_type>(new_size));
+			if constexpr (std::is_constructible_v<typename small_t::size_type, Size>) {
+				m_small.set_size(static_cast<typename small_t::size_type>(new_size));
+			} else {
+				assert(false);
+			}
 		} else {
-			m_large.set_size(static_cast<typename large_t::size_type::underlying_type>(new_size));
+			m_large.set_size(static_cast<typename large_t::size_type>(new_size));
 		}
 	}
 

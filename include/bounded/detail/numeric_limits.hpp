@@ -46,10 +46,10 @@ constexpr auto digits(Minimum const minimum, Maximum const maximum, Base const b
 }	// namespace bounded
 namespace std {
 
-template<auto minimum, auto maximum, typename overflow_policy, bool poisoned>
-struct numeric_limits<bounded::integer<minimum, maximum, overflow_policy, poisoned>> {
+template<auto minimum, auto maximum, typename overflow_policy>
+struct numeric_limits<bounded::integer<minimum, maximum, overflow_policy>> {
 private:
-	using type = bounded::integer<minimum, maximum, overflow_policy, poisoned>;
+	using type = bounded::integer<minimum, maximum, overflow_policy>;
 public:
 	static constexpr auto is_specialized = true;
 	static constexpr auto is_signed = minimum < 0;

@@ -9,7 +9,6 @@
 #include <bounded/detail/comparison.hpp>
 #include <bounded/detail/forward_declaration.hpp>
 #include <bounded/detail/is_bounded_integer.hpp>
-#include <bounded/detail/is_poisoned.hpp>
 #include <bounded/detail/noexcept.hpp>
 #include <bounded/detail/overlapping_range.hpp>
 #include <bounded/detail/requires.hpp>
@@ -76,8 +75,7 @@ constexpr decltype(auto) as_integer(T const & t) noexcept {
 		using result_type = integer<
 			as_builtin_integer(limits::min()),
 			as_builtin_integer(limits::max()),
-			null_policy,
-			false
+			null_policy
 		>;
 		return result_type(static_cast<std::underlying_type_t<std::decay_t<T>>>(t));
 	} else {
@@ -132,15 +130,14 @@ using base = std::conditional_t<minimum == maximum,
 }	// namespace detail
 
 
-// poisoned is useful for overloading and getting all constants
-template<auto value, typename overflow_policy = null_policy, bool poisoned = false>
-using constant_t = integer<value, value, overflow_policy, poisoned>;
+template<auto value, typename overflow_policy = null_policy>
+using constant_t = integer<value, value, overflow_policy>;
 
 template<auto value, typename overflow_policy = null_policy>
 constexpr auto constant = constant_t<detail::normalize<value>, overflow_policy>{};
 
 
-template<auto minimum, auto maximum, typename overflow_policy_ = null_policy, bool poisoned = false>
+template<auto minimum, auto maximum, typename overflow_policy_ = null_policy>
 struct integer : private detail::base<minimum, maximum> {
 private:
 	using base = detail::base<minimum, maximum>;
@@ -199,21 +196,9 @@ public:
 	template<typename T, BOUNDED_REQUIRES(
 		!detail::is_implicitly_constructible_from<T const &>(minimum, maximum) and
 		detail::is_explicitly_constructible_from<overflow_policy, T const &>(minimum, maximum) and
-		!detail::is_poisoned<T> and
 		!std::is_same_v<T, bool>
 	)>
 	constexpr explicit integer(T const & other, overflow_policy = overflow_policy{}) BOUNDED_NOEXCEPT_INITIALIZATION(
-		integer(apply_overflow_policy(detail::as_integer(other)), non_check)
-	) {
-	}
-
-	template<typename T, BOUNDED_REQUIRES(
-		!detail::is_implicitly_constructible_from<T const &>(minimum, maximum) and
-		detail::is_explicitly_constructible_from<overflow_policy, T const &>(minimum, maximum) and
-		detail::is_poisoned<T> and
-		!std::is_same_v<T, bool>
-	)>
-	constexpr integer(T const & other, overflow_policy = overflow_policy{}) BOUNDED_NOEXCEPT_INITIALIZATION(
 		integer(apply_overflow_policy(detail::as_integer(other)), non_check)
 	) {
 	}
@@ -271,24 +256,14 @@ public:
 	// Do not verify that the value is in range because the user has requested a
 	// conversion out of the safety of bounded::integer. It is subject to all
 	// the standard rules of conversion from one integer type to another.
-	template<typename T, BOUNDED_REQUIRES((not poisoned and detail::is_builtin_arithmetic<T>) or std::is_enum_v<T>)>
+	template<typename T, BOUNDED_REQUIRES(detail::is_builtin_arithmetic<T> or std::is_enum_v<T>)>
 	constexpr explicit operator T() const noexcept {
 		return static_cast<T>(value());
 	}
-	template<typename T, BOUNDED_REQUIRES((not poisoned and detail::is_builtin_arithmetic<T>) or std::is_enum_v<T>)>
+	template<typename T, BOUNDED_REQUIRES(detail::is_builtin_arithmetic<T> or std::is_enum_v<T>)>
 	constexpr explicit operator T() const volatile noexcept {
 		return static_cast<T>(value());
 	}
-	
-	template<typename T, BOUNDED_REQUIRES(poisoned and detail::is_builtin_arithmetic<T>)>
-	constexpr operator T() const noexcept {
-		return static_cast<T>(value());
-	}
-	template<typename T, BOUNDED_REQUIRES(poisoned and detail::is_builtin_arithmetic<T>)>
-	constexpr operator T() const volatile noexcept {
-		return static_cast<T>(value());
-	}
-	
 	
 	// Allow a compressed optional representation
 	template<typename Tag, BOUNDED_REQUIRES(std::is_same_v<Tag, optional_tag> and detail::has_extra_space<integer>)>
@@ -353,8 +328,7 @@ template<typename T, typename overflow_policy = typename detail::equivalent_over
 integer(T const & value, overflow_policy = overflow_policy{}) -> integer<
 	detail::normalize<detail::deduced_min<T>()>,
 	detail::normalize<detail::deduced_max<T>()>,
-	overflow_policy,
-	detail::is_builtin_integer<T> or not basic_numeric_limits<T>::is_specialized
+	overflow_policy
 >;
 
 #if 0
