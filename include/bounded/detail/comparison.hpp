@@ -140,7 +140,7 @@ constexpr auto operator==(LHS const & lhs, RHS const & rhs) BOUNDED_NOEXCEPT_DEC
 )
 template<typename LHS, typename RHS>
 constexpr auto operator!=(LHS const & lhs, RHS const & rhs) BOUNDED_NOEXCEPT_DECLTYPE(
-	compare(lhs, rhs) != 0
+	!(lhs == rhs)
 )
 
 template<typename LHS, typename RHS>
