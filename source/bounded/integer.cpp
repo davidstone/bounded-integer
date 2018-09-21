@@ -178,8 +178,8 @@ constexpr auto check_non_trivial_optional() {
 	assert(optional_string);
 	optional_string = "Yo";
 	assert(optional_string);
-	assert(optional_string == "Yo");
-	assert(optional_string != "Sup");
+	assert(*optional_string == "Yo");
+	assert(*optional_string != "Sup");
 
 	static_assert(std::is_same_v<decltype(*optional_string), type &>, "Incorrect type of *optional.");
 	*optional_string = type("Hiya");

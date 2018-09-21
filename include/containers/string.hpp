@@ -78,8 +78,23 @@ struct c_string_sentinel_t {
 };
 
 template<typename CharT>
-constexpr auto compare(CharT const * first, c_string_sentinel_t<CharT>) noexcept {
-	return *first == '\0' ? bounded::strong_ordering_equal : bounded::strong_ordering_less;
+constexpr auto compare(CharT const * lhs, c_string_sentinel_t<CharT>) noexcept {
+	return *lhs == '\0' ? bounded::strong_ordering_equal : bounded::strong_ordering_less;
+}
+
+template<typename CharT>
+constexpr auto compare(c_string_sentinel_t<CharT> const lhs, CharT const * rhs) noexcept {
+	return invert(compare(rhs, lhs));
+}
+
+template<typename CharT>
+constexpr auto operator==(CharT const * first, c_string_sentinel_t<CharT>) noexcept {
+	return *first == '\0';
+}
+
+template<typename CharT>
+constexpr auto operator==(c_string_sentinel_t<CharT> const lhs, CharT const * rhs) noexcept {
+	return rhs == lhs;
 }
 
 template<typename CharT>
@@ -93,7 +108,16 @@ constexpr auto compare(basic_string<CharT> const & lhs, CharT const * const rhs)
 )
 template<typename CharT>
 constexpr auto compare(CharT const * const lhs, basic_string<CharT> const & rhs) BOUNDED_NOEXCEPT_VALUE(
-	::containers::compare(lhs, detail::c_string_sentinel<CharT>, begin(rhs), end(rhs))
+	invert(compare(rhs, lhs))
+)
+
+template<typename CharT>
+constexpr auto operator==(basic_string<CharT> const & lhs, CharT const * const rhs) BOUNDED_NOEXCEPT_VALUE(
+	::containers::equal(begin(lhs), end(lhs), rhs, detail::c_string_sentinel<CharT>)
+)
+template<typename CharT>
+constexpr auto operator==(CharT const * const lhs, basic_string<CharT> const & rhs) BOUNDED_NOEXCEPT_VALUE(
+	rhs == lhs
 )
 
 template<typename CharT>
@@ -102,7 +126,16 @@ constexpr auto compare(basic_string<CharT> const & lhs, std::basic_string_view<C
 )
 template<typename CharT>
 constexpr auto compare(std::basic_string_view<CharT> const lhs, basic_string<CharT> const & rhs) BOUNDED_NOEXCEPT_VALUE(
-	::containers::compare(begin(lhs), end(lhs), begin(rhs), end(rhs))
+	invert(compare(rhs, lhs))
+)
+
+template<typename CharT>
+constexpr auto operator==(basic_string<CharT> const & lhs, std::basic_string_view<CharT> const rhs) BOUNDED_NOEXCEPT_VALUE(
+	size(lhs) == rhs.size() and ::containers::equal(begin(lhs), end(lhs), begin(rhs))
+)
+template<typename CharT>
+constexpr auto operator==(std::basic_string_view<CharT> const lhs, basic_string<CharT> const & rhs) BOUNDED_NOEXCEPT_VALUE(
+	rhs == lhs
 )
 
 

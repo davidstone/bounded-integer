@@ -35,7 +35,7 @@ constexpr auto compare(LHS const lhs, RHS const rhs) noexcept {
 }
 
 template<typename LHS, typename RHS, BOUNDED_REQUIRES(detail::is_builtin_integer<LHS> and detail::is_builtin_integer<RHS>)>
-constexpr auto compare(LHS const lhs, RHS const rhs) noexcept -> strong_ordering const {
+constexpr auto compare(LHS const lhs, RHS const rhs) noexcept -> strong_ordering {
 	if constexpr (detail::is_signed_builtin<LHS> == detail::is_signed_builtin<RHS>) {
 		return
 			(lhs < rhs) ? strong_ordering_less :
@@ -45,16 +45,31 @@ constexpr auto compare(LHS const lhs, RHS const rhs) noexcept -> strong_ordering
 		return compare(static_cast<detail::max_signed_t>(lhs), static_cast<detail::max_signed_t>(rhs));
 	} else if constexpr (detail::is_signed_builtin<LHS>) {
 		static_assert(std::is_same_v<RHS, detail::max_unsigned_t>);
-		return (lhs < static_cast<LHS>(basic_numeric_limits<RHS>::min()) or basic_numeric_limits<LHS>::max() < rhs) ?
-			strong_ordering_less :
-			compare(lhs, static_cast<LHS>(rhs));
+		return lhs < 0 ? strong_ordering_less : compare(static_cast<RHS>(lhs), rhs);
 	} else {
 		static_assert(std::is_same_v<LHS, detail::max_unsigned_t>);
-		return (rhs < static_cast<RHS>(basic_numeric_limits<LHS>::min()) or basic_numeric_limits<RHS>::max() < lhs) ?
-			strong_ordering_greater :
-			compare(static_cast<RHS>(lhs), rhs);
+		return rhs < 0 ? strong_ordering_greater : compare(lhs, static_cast<LHS>(rhs));
 	}
 }
+
+namespace detail {
+template<typename LHS, typename RHS, BOUNDED_REQUIRES(detail::is_builtin_integer<LHS> and detail::is_builtin_integer<RHS>)>
+constexpr auto safe_equal(LHS const lhs, RHS const rhs) noexcept -> bool {
+	constexpr auto signed_max = basic_numeric_limits<detail::max_signed_t>::max();
+	if constexpr (detail::is_signed_builtin<LHS> == detail::is_signed_builtin<RHS>) {
+		return lhs == rhs;
+	} else if constexpr (basic_numeric_limits<LHS>::max() <= signed_max and basic_numeric_limits<RHS>::max() <= signed_max) {
+		return static_cast<detail::max_signed_t>(lhs) == static_cast<detail::max_signed_t>(rhs);
+	} else if constexpr (detail::is_signed_builtin<LHS>) {
+		static_assert(std::is_same_v<RHS, detail::max_unsigned_t>);
+		return lhs >= 0 and static_cast<RHS>(lhs) == rhs;
+	} else {
+		static_assert(std::is_same_v<LHS, detail::max_unsigned_t>);
+		return rhs >= 0 and static_cast<LHS>(rhs);
+	}
+}
+} // namespace detail
+
 
 template<typename Enum, BOUNDED_REQUIRES(std::is_enum_v<Enum>)>
 constexpr auto compare(Enum const lhs, Enum const rhs) noexcept {
@@ -116,6 +131,22 @@ constexpr auto compare(LHS const & lhs [[maybe_unused]], RHS const & rhs [[maybe
 }
 
 
+template<typename LHS, typename RHS, BOUNDED_REQUIRES(is_bounded_integer<LHS> and is_bounded_integer<RHS>)>
+constexpr auto operator==(LHS const lhs [[maybe_unused]], RHS const rhs [[maybe_unused]]) noexcept {
+	using lhs_limits = basic_numeric_limits<LHS>;
+	using rhs_limits = basic_numeric_limits<RHS>;
+	if constexpr (compare(lhs_limits::min(), rhs_limits::max()) > 0 or compare(lhs_limits::max(), rhs_limits::min()) < 0) {
+		return false;
+	} else if constexpr (compare(lhs_limits::min(), lhs_limits::max()) == 0 and compare(rhs_limits::min(), rhs_limits::max()) == 0 and compare(lhs_limits::min(), rhs_limits::min()) == 0) {
+		return true;
+	} else {
+		return detail::safe_equal(lhs.value(), rhs.value());
+	}
+}
+
+
+
+
 template<typename LHS, typename RHS>
 constexpr auto compare(LHS const & lhs, RHS const & rhs) BOUNDED_NOEXCEPT_DECLTYPE(
 	strong_ordering(lhs.compare(rhs))
@@ -128,10 +159,6 @@ constexpr auto compare(LHS const & lhs, RHS const & rhs, Ignore...) BOUNDED_NOEX
 )
 
 
-template<typename LHS, typename RHS>
-constexpr auto operator==(LHS const & lhs, RHS const & rhs) BOUNDED_NOEXCEPT_DECLTYPE(
-	compare(lhs, rhs) == 0
-)
 template<typename LHS, typename RHS>
 constexpr auto operator!=(LHS const & lhs, RHS const & rhs) BOUNDED_NOEXCEPT_DECLTYPE(
 	!(lhs == rhs)

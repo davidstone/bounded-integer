@@ -1,4 +1,4 @@
-// Copyright David Stone 2016.
+// Copyright David Stone 2018.
 // Distributed under the Boost Software License, Version 1.0.
 // (See accompanying file LICENSE_1_0.txt or copy at
 // http://www.boost.org/LICENSE_1_0.txt)
@@ -12,6 +12,8 @@
 #include <bounded/integer.hpp>
 
 #include <utility>
+
+// TODO: All of this can be optimized more
 
 namespace containers {
 namespace detail {
@@ -86,16 +88,6 @@ constexpr auto compare(InputIterator1 const first1, Sentinel1 const last1, Input
 )
 
 
-namespace detail {
-
-// TODO: Define orderings other than strong_ordering
-constexpr auto equal_to_compare = [](auto cmp) noexcept {
-	return [cmp = std::move(cmp)](auto const & lhs, auto const & rhs) BOUNDED_NOEXCEPT_DECLTYPE(
-		cmp(lhs, rhs) ? bounded::strong_ordering_equal : bounded::strong_ordering_less
-	);
-};
-
-}	// namespace detail
 
 
 template<
@@ -104,16 +96,28 @@ template<
 	typename BinaryPredicate,
 	BOUNDED_REQUIRES(is_iterator_sentinel<InputIterator1, Sentinel1> and is_iterator_sentinel<InputIterator2, Sentinel2>)
 >
-constexpr auto equal(InputIterator1 first1, Sentinel1 const last1, InputIterator2 first2, Sentinel2 const last2, BinaryPredicate eq) BOUNDED_NOEXCEPT(
-	::containers::compare(first1, last1, first2, last2, detail::equal_to_compare(eq)) == 0
-)
+constexpr auto equal(InputIterator1 first1, Sentinel1 const last1, InputIterator2 first2, Sentinel2 const last2, BinaryPredicate cmp) noexcept(
+	noexcept(first1 != last1 and first2 != last2) and
+	noexcept(++first1) and
+	noexcept(++first2) and
+	noexcept(!cmp(*first1, *first2))
+) {
+	for (; first1 != last1 and first2 != last2; ++first1, ++first2) {
+		if (!cmp(*first1, *first2)) {
+			return false;
+		}
+	}
+	return first1 == last1 and first2 == last2;
+}
+
 
 template<
 	typename InputIterator1, typename Sentinel1,
-	typename InputIterator2, typename Sentinel2
+	typename InputIterator2, typename Sentinel2,
+	BOUNDED_REQUIRES(is_iterator_sentinel<InputIterator1, Sentinel1> and is_iterator_sentinel<InputIterator2, Sentinel2>)
 >
 constexpr auto equal(InputIterator1 const first1, Sentinel1 const last1, InputIterator2 const first2, Sentinel2 const last2) BOUNDED_NOEXCEPT(
-	::containers::compare(first1, last1, first2, last2) == 0
+	::containers::equal(first1, last1, first2, last2, bounded::equal_to())
 )
 
 
@@ -123,9 +127,19 @@ template<
 	typename BinaryPredicate,
 	BOUNDED_REQUIRES(is_iterator_sentinel<InputIterator1, Sentinel1> and is_iterator<InputIterator2> and !is_iterator_sentinel<InputIterator2, BinaryPredicate>)
 >
-constexpr auto equal(InputIterator1 first1, Sentinel1 const last1, InputIterator2 first2, BinaryPredicate eq) BOUNDED_NOEXCEPT_DECLTYPE(
-	::containers::compare(first1, last1, first2, detail::equal_to_compare(eq)) == 0
-)
+constexpr auto equal(InputIterator1 first1, Sentinel1 const last1, InputIterator2 first2, BinaryPredicate cmp) noexcept(
+	noexcept(first1 != last1) and
+	noexcept(++first1) and
+	noexcept(++first2) and
+	noexcept(!cmp(*first1, *first2))
+) {
+	for (; first1 != last1; ++first1, ++first2) {
+		if (!cmp(*first1, *first2)) {
+			return false;
+		}
+	}
+	return first1 == last1;
+}
 
 template<
 	typename InputIterator1, typename Sentinel1,
@@ -133,7 +147,7 @@ template<
 	BOUNDED_REQUIRES(is_iterator_sentinel<InputIterator1, Sentinel1> and is_iterator<InputIterator2>)
 >
 constexpr auto equal(InputIterator1 const first1, Sentinel1 const last1, InputIterator2 const first2) BOUNDED_NOEXCEPT(
-	::containers::compare(first1, last1, first2) == 0
+	::containers::equal(first1, last1, first2, bounded::equal_to())
 )
 
 
@@ -153,12 +167,28 @@ constexpr auto compare(LHS && lhs, RHS && rhs) BOUNDED_NOEXCEPT(
 	)
 )
 
+template<typename LHS, typename RHS, BOUNDED_REQUIRES(
+	std::is_same_v<
+		std::remove_cv_t<std::remove_reference_t<LHS>>,
+		std::remove_cv_t<std::remove_reference_t<RHS>>
+	> and
+	is_iterable<std::remove_cv_t<std::remove_reference_t<LHS>>>
+)>
+constexpr auto operator==(LHS && lhs, RHS && rhs) BOUNDED_NOEXCEPT(
+	size(lhs) == size(rhs) and ::containers::equal(
+		begin(std::as_const(lhs)), end(std::as_const(lhs)),
+		begin(std::as_const(rhs))
+	)
+)
+
 }	// namespace common
 
 using ::containers::detail::common::compare;
+using ::containers::detail::common::operator==;
 
 }	// namespace detail
 
 using ::containers::detail::common::compare;
+using ::containers::detail::common::operator==;
 
 }	// namespace containers

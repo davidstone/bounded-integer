@@ -57,6 +57,10 @@ public:
 		return compare(lhs.m_value, rhs.m_value);
 	}
 
+	friend constexpr auto operator==(integer_range_iterator const lhs, integer_range_iterator const rhs) noexcept {
+		return lhs.m_value == rhs.m_value;
+	}
+
 	// It is undefined behavior to dereference a past-the-end iterator.
 	//
 	// Note that this returns a value, not a reference.

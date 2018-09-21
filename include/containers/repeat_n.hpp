@@ -50,6 +50,16 @@ struct repeat_n_iterator {
 		return compare(0_bi, rhs.m_remaining);
 	}
 
+	friend constexpr auto operator==(repeat_n_iterator const lhs, repeat_n_iterator const rhs) {
+		return lhs.m_remaining == rhs.m_remaining;
+	}
+	friend constexpr auto operator==(repeat_n_iterator const lhs, repeat_n_sentinel) {
+		return lhs.m_remaining == 0_bi;
+	}
+	friend constexpr auto operator==(repeat_n_sentinel, repeat_n_iterator const rhs) {
+		return 0_bi == rhs.m_remaining;
+	}
+
 	template<typename Offset, BOUNDED_REQUIRES(std::numeric_limits<Offset>::is_specialized)>
 	friend constexpr auto operator+(repeat_n_iterator const it, Offset const offset) {
 		return repeat_n_iterator(Size(it.m_remaining - offset), it.m_value);

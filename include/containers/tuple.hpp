@@ -273,16 +273,33 @@ constexpr auto compare_impl(tuple<lhs_types...> const & lhs, tuple<rhs_types...>
 	}
 }
 
+
+
+template<typename LHS, typename RHS, std::size_t... indexes>
+constexpr auto equal_impl(LHS const & lhs, RHS const & rhs, std::index_sequence<indexes...>) BOUNDED_NOEXCEPT_VALUE(
+	(... and (lhs[bounded::constant<indexes>] == rhs[bounded::constant<indexes>]))
+)
+
+}	// namespace detail
+
 template<
 	typename... lhs_types,
 	typename... rhs_types,
 	BOUNDED_REQUIRES(sizeof...(lhs_types) == sizeof...(rhs_types))
 >
 constexpr auto compare(tuple<lhs_types...> const & lhs, tuple<rhs_types...> const & rhs) BOUNDED_NOEXCEPT_VALUE(
-	compare_impl(lhs, rhs, 0_bi)
+	detail::compare_impl(lhs, rhs, 0_bi)
 )
 
-}	// namespace detail
+
+template<
+	typename... lhs_types,
+	typename... rhs_types,
+	BOUNDED_REQUIRES(sizeof...(lhs_types) == sizeof...(rhs_types))
+>
+constexpr auto operator==(tuple<lhs_types...> const & lhs, tuple<rhs_types...> const & rhs) BOUNDED_NOEXCEPT_VALUE(
+	detail::equal_impl(lhs, rhs, detail::make_index_sequence(bounded::constant<sizeof...(lhs_types)>))
+)
 
 
 

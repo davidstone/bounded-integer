@@ -55,6 +55,11 @@ constexpr auto compare(map_value_type<Key, Mapped> const & lhs, map_value_type<K
 	compare(lhs.as_tuple(), rhs.as_tuple())
 )
 
+template<typename Key, typename Mapped>
+constexpr auto operator==(map_value_type<Key, Mapped> const & lhs, map_value_type<Key, Mapped> const & rhs) BOUNDED_NOEXCEPT_VALUE(
+	lhs.as_tuple() == rhs.as_tuple()
+)
+
 template<typename Iterator>
 struct inserted_t {
 	Iterator iterator;

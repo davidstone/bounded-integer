@@ -46,6 +46,10 @@ struct default_compare {
 	static constexpr auto compare(LHS const & lhs, RHS const & rhs) BOUNDED_NOEXCEPT_DECLTYPE(
 		::containers::detail::compare_adl::indirect_compare(lhs, rhs)
 	)
+	template<typename LHS, typename RHS>
+	static constexpr auto equal(LHS const & lhs, RHS const & rhs) BOUNDED_NOEXCEPT_DECLTYPE(
+		lhs == rhs
+	)
 };
 
 namespace detail {
@@ -181,6 +185,11 @@ constexpr auto operator-(adapt_iterator<LHSIterator, Traits> const lhs, adapt_it
 template<typename LHSIterator, typename RHSIterator, typename Traits>
 constexpr auto compare(adapt_iterator<LHSIterator, Traits> const lhs, adapt_iterator<RHSIterator, Traits> const rhs) BOUNDED_NOEXCEPT_DECLTYPE(
 	lhs.traits().compare(lhs.base(), rhs.base())
+)
+
+template<typename LHSIterator, typename RHSIterator, typename Traits>
+constexpr auto operator==(adapt_iterator<LHSIterator, Traits> const lhs, adapt_iterator<RHSIterator, Traits> const rhs) BOUNDED_NOEXCEPT_DECLTYPE(
+	lhs.traits().equal(lhs.base(), rhs.base())
 )
 
 }	// namespace containers

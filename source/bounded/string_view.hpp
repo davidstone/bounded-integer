@@ -53,6 +53,19 @@ struct string_view {
 			++rhs.value;
 		}
 	}
+	friend constexpr auto operator==(string_view lhs, string_view rhs) noexcept {
+		assert(not lhs.moved_from and not rhs.moved_from);
+		while (true) {
+			if (*lhs.value != *rhs.value) {
+				return false;
+			}
+			if (*lhs.value == '\0') {
+				return true;
+			}
+			++lhs.value;
+			++rhs.value;
+		}
+	}
 private:
 	char const * value;
 	bool moved_from = false;

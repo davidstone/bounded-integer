@@ -5,6 +5,7 @@
 
 #pragma once
 
+#include <containers/algorithms/compare.hpp>
 #include <containers/algorithms/copy.hpp>
 #include <containers/algorithms/distance.hpp>
 #include <containers/algorithms/uninitialized.hpp>

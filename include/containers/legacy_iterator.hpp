@@ -64,4 +64,9 @@ constexpr auto compare(legacy_iterator<Iterator> const lhs, legacy_iterator<Iter
 	detail::compare_adl::indirect_compare(lhs.base(), rhs.base())
 )
 
+template<typename Iterator>
+constexpr auto operator==(legacy_iterator<Iterator> const lhs, legacy_iterator<Iterator> const rhs) BOUNDED_NOEXCEPT(
+	lhs.base() == rhs.base()
+)
+
 }	// namespace containers

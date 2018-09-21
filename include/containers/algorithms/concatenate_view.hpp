@@ -173,6 +173,29 @@ public:
 	)
 
 
+	template<
+		typename LHSIterator1, typename LHSSentinel1, typename LHSIterator2,
+		typename RHSIterator1, typename RHSSentinel1, typename RHSIterator2
+	>
+	friend constexpr auto operator==(
+		concatenate_view_iterator<LHSIterator1, LHSSentinel1, LHSIterator2> const lhs,
+		concatenate_view_iterator<RHSIterator1, RHSSentinel1, RHSIterator2> const rhs
+	) BOUNDED_NOEXCEPT_DECLTYPE(
+		lhs.tie() == rhs.tie()
+	)
+
+	template<
+		typename LHSIterator1, typename LHSSentinel1, typename LHSIterator2,
+		typename RHSSentinel
+	>
+	friend constexpr auto operator==(
+		concatenate_view_iterator<LHSIterator1, LHSSentinel1, LHSIterator2> const lhs,
+		concatenate_view_sentinel<RHSSentinel> const rhs
+	) BOUNDED_NOEXCEPT_DECLTYPE(
+		::containers::tie(lhs.m_first1, lhs.m_first2) == ::containers::tie(lhs.m_last1, rhs.base())
+	)
+
+
 	template<typename Index>
 	constexpr auto operator[](Index const index) const noexcept(noexcept(*(std::declval<concatenate_view_iterator>() + index))) -> decltype(*(*this + index)) {
 		return *(*this + index);
@@ -201,6 +224,18 @@ constexpr auto compare(
 	concatenate_view_iterator<RHSIterator1, RHSSentinel1, RHSIterator2> const rhs
 ) BOUNDED_NOEXCEPT_DECLTYPE(
 	invert(compare(rhs, lhs))
+)
+
+
+template<
+	typename LHSSentinel,
+	typename RHSIterator1, typename RHSSentinel1, typename RHSIterator2
+>
+constexpr auto operator==(
+	concatenate_view_sentinel<LHSSentinel> const lhs,
+	concatenate_view_iterator<RHSIterator1, RHSSentinel1, RHSIterator2> const rhs
+) BOUNDED_NOEXCEPT_DECLTYPE(
+	rhs == lhs
 )
 
 

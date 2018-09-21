@@ -127,9 +127,8 @@ struct complex_resource {
 	containers::vector<int> data;
 };
 
-constexpr auto compare(complex_resource const & lhs, complex_resource const & rhs) noexcept {
-	using bounded::compare;
-	return compare(lhs.data, rhs.data);
+constexpr auto operator==(complex_resource const & lhs, complex_resource const & rhs) noexcept {
+	return lhs.data == rhs.data;
 }
 
 BOUNDED_COMPARISON

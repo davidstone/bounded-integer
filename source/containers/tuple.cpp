@@ -20,6 +20,10 @@ constexpr auto compare(empty, empty) noexcept {
 	return bounded::strong_ordering_equal;
 }
 
+constexpr auto operator==(empty, empty) noexcept {
+	return true;
+}
+
 static_assert(std::is_empty<containers::tuple<empty>>::value);
 
 static_assert(std::is_empty<containers::tuple<void>>::value);
@@ -54,6 +58,9 @@ struct non_movable {
 
 constexpr auto compare(non_movable const &, non_movable const &) noexcept {
 	return bounded::strong_ordering_equal;
+}
+constexpr auto operator==(non_movable const &, non_movable const &) noexcept {
+	return true;
 }
 
 static_assert(std::is_constructible<containers::tuple<non_movable>>::value);

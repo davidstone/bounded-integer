@@ -81,6 +81,20 @@ constexpr auto compare(single_element_sentinel, single_element_iterator<T> const
 }
 
 template<typename T>
+constexpr auto operator==(single_element_iterator<T> const lhs, single_element_iterator<T> const rhs) noexcept {
+	return lhs.is_end() == rhs.is_end();
+}
+
+template<typename T>
+constexpr auto operator==(single_element_iterator<T> const lhs, single_element_sentinel) noexcept {
+	return lhs.is_end();
+}
+template<typename T>
+constexpr auto operator==(single_element_sentinel, single_element_iterator<T> const rhs) noexcept {
+	return rhs.is_end();
+}
+
+template<typename T>
 constexpr auto operator+(bounded::constant_t<1> const lhs, single_element_iterator<T> const rhs) noexcept {
 	return rhs + lhs;
 }
