@@ -5,19 +5,19 @@
 
 #pragma once
 
-#include <containers/tuple.hpp>
-#include <containers/type.hpp>
-#include <containers/variant/get_index.hpp>
-#include <containers/variant/is_valid_index.hpp>
-#include <containers/variant/variadic_union.hpp>
-#include <containers/variant/visit.hpp>
+#include <bounded/detail/tuple.hpp>
+#include <bounded/detail/type.hpp>
+#include <bounded/detail/variant/get_index.hpp>
+#include <bounded/detail/variant/is_valid_index.hpp>
+#include <bounded/detail/variant/variadic_union.hpp>
+#include <bounded/detail/variant/visit.hpp>
 
+#include <bounded/detail/class.hpp>
 #include <bounded/detail/forward.hpp>
-#include <bounded/integer.hpp>
 
 #include <utility>
 
-namespace containers {
+namespace bounded {
 namespace detail {
 
 template<typename GetFunction, typename... Ts>
@@ -91,17 +91,17 @@ struct basic_variant_base {
 	template<typename Index, typename... Args, BOUNDED_REQUIRES(
 		std::is_constructible_v<typename decltype(get_type(Index{}, types<Ts>{}...))::type, Args...>
 	)>
-	constexpr auto & emplace(Index index, Args && ... args) & noexcept(noexcept(bounded::construct(std::declval<basic_variant_base &>()[index], BOUNDED_FORWARD(args)...))) {
+	constexpr auto & emplace(Index index, Args && ... args) & noexcept(noexcept(construct(std::declval<basic_variant_base &>()[index], BOUNDED_FORWARD(args)...))) {
 		auto & ref = operator[](index);
 		if constexpr (std::is_nothrow_constructible_v<typename decltype(get_type(index, types<Ts>{}...))::type, Args...>) {
-			::containers::visit(*this, bounded::destroy);
+			visit(*this, destroy);
 			get_function() = GetFunction(get_index(index, types<Ts>{}...));
-			return bounded::construct(ref, BOUNDED_FORWARD(args)...);
+			return construct(ref, BOUNDED_FORWARD(args)...);
 		} else {
-			auto value = bounded::construct_return<std::decay_t<decltype(ref)>>(BOUNDED_FORWARD(args)...);
-			::containers::visit(*this, bounded::destroy);
+			auto value = construct_return<std::decay_t<decltype(ref)>>(BOUNDED_FORWARD(args)...);
+			visit(*this, destroy);
 			get_function() = GetFunction(get_index(index));
-			return bounded::construct(ref, std::move(value));
+			return construct(ref, std::move(value));
 		}
 	}
 
@@ -121,7 +121,7 @@ struct basic_variant_base {
 private:
 	template<typename Variant, typename Index>
 	static constexpr auto && operator_bracket(Variant && variant, Index const index_) noexcept {
-		return ::containers::detail::get_union_element(
+		return ::bounded::detail::get_union_element(
 			BOUNDED_FORWARD(variant).m_data[1_bi],
 			get_index(index_, types<Ts>{}...)
 		);
@@ -132,4 +132,4 @@ private:
 
 
 }	// namespace detail
-}	// namespace containers
+}	// namespace bounded

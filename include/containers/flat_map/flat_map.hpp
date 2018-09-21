@@ -9,26 +9,26 @@
 #include <containers/algorithms/unique.hpp>
 #include <containers/common_container_functions.hpp>
 #include <containers/legacy_iterator.hpp>
-#include <containers/tuple.hpp>
 #include <containers/vector/vector.hpp>
 
 #include <bounded/detail/forward.hpp>
+#include <bounded/detail/tuple.hpp>
+#include <bounded/detail/type.hpp>
 #include <bounded/integer.hpp>
 
 #include <algorithm>
 #include <stdexcept>
-#include <tuple>
 
 namespace containers {
 namespace detail {
 
 template<typename Key, typename Mapped>
-struct map_value_type : private tuple<Key, Mapped> {
+struct map_value_type : private bounded::tuple<Key, Mapped> {
 	using key_type = Key;
 	using mapped_type = Mapped;
 	
-	using tuple<Key, Mapped>::tuple;
-	using tuple<Key, Mapped>::as_tuple;
+	using bounded::tuple<Key, Mapped>::tuple;
+	using bounded::tuple<Key, Mapped>::as_tuple;
 	
 	constexpr auto && key() const & noexcept {
 		return (*this)[0_bi];
@@ -89,7 +89,7 @@ private:
 		return std::move(m_data)[0_bi];
 	}
 
-	using data_t = tuple<Container, Compare>;
+	using data_t = bounded::tuple<Container, Compare>;
 	data_t m_data;
 public:
 	using value_type = typename Container::value_type;
@@ -334,11 +334,11 @@ private:
 	// Search represents a function that finds where to insert
 
 	template<typename Key>
-	static constexpr auto use_reference_to_key(types<Key>) noexcept {
+	static constexpr auto use_reference_to_key(bounded::detail::types<Key>) noexcept {
 		return std::is_same<std::decay_t<Key>, key_type>::value;
 	}
 	template<typename... KeyArgs>
-	static constexpr auto use_reference_to_key(types<KeyArgs...>) noexcept {
+	static constexpr auto use_reference_to_key(bounded::detail::types<KeyArgs...>) noexcept {
 		return false;
 	}
 
@@ -351,7 +351,7 @@ private:
 			}
 
 			std::conditional_t<
-				use_reference_to_key(types<KeyArgs...>{}),
+				use_reference_to_key(bounded::detail::types<KeyArgs...>{}),
 				key_type const &,
 				key_type
 			> key;
@@ -361,25 +361,25 @@ private:
 	}
 
 	static constexpr auto separate_key_from_mapped() {
-		return construct_result(tuple<>{});
+		return construct_result(bounded::tuple<>{});
 	}
 	template<typename Pair>
 	static constexpr auto separate_key_from_mapped(Pair && pair) {
 		return construct_result(
-			tie(BOUNDED_FORWARD(pair).mapped()),
+			bounded::tie(BOUNDED_FORWARD(pair).mapped()),
 			BOUNDED_FORWARD(pair).key()
 		);
 	}
 	template<typename Key, typename Mapped>
 	static constexpr auto separate_key_from_mapped(Key && key, Mapped && mapped) {
 		return construct_result(
-			tie(BOUNDED_FORWARD(mapped)),
+			bounded::tie(BOUNDED_FORWARD(mapped)),
 			BOUNDED_FORWARD(key)
 		);
 	}
 	template<typename KeyTuple, typename MappedTuple>
 	static constexpr auto separate_key_from_mapped(std::piecewise_construct_t, KeyTuple && key, MappedTuple && mapped) {
-		return apply(BOUNDED_FORWARD(key), [&](auto && ... args) {
+		return bounded::apply(BOUNDED_FORWARD(key), [&](auto && ... args) {
 			return construct_result(BOUNDED_FORWARD(mapped), BOUNDED_FORWARD(args)...);
 		});
 	}
@@ -390,7 +390,7 @@ private:
 			return container().emplace(
 				position,
 				std::piecewise_construct,
-				tie(BOUNDED_FORWARD(key)),
+				bounded::tie(BOUNDED_FORWARD(key)),
 				BOUNDED_FORWARD(mapped)
 			);
 		} else {
@@ -405,7 +405,7 @@ private:
 			auto const it = container().emplace(
 				position,
 				std::piecewise_construct,
-				tie(BOUNDED_FORWARD(key)),
+				bounded::tie(BOUNDED_FORWARD(key)),
 				BOUNDED_FORWARD(mapped)
 			);
 			return inserted_t{it, true};
@@ -478,10 +478,10 @@ public:
 		return it->mapped();
 	}
 	constexpr auto & operator[](key_type const & key) {
-		return this->emplace(std::piecewise_construct, tie(key), tie()).first->mapped;
+		return this->emplace(std::piecewise_construct, bounded::tie(key), bounded::tie()).first->mapped;
 	}
 	constexpr auto & operator[](key_type && key) {
-		return this->emplace(std::piecewise_construct, tie(std::move(key)), tie()).first->mapped;
+		return this->emplace(std::piecewise_construct, bounded::tie(std::move(key)), bounded::tie()).first->mapped;
 	}
 
 	constexpr auto equal_range(key_type const & key) const {

@@ -9,7 +9,6 @@
 #include <containers/algorithms/move_iterator.hpp>
 #include <containers/algorithms/reverse_iterator.hpp>
 #include <containers/is_iterator_sentinel.hpp>
-#include <containers/type.hpp>
 
 #include <bounded/detail/forward.hpp>
 #include <bounded/integer.hpp>

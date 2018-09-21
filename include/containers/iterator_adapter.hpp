@@ -10,9 +10,9 @@
 #include <containers/index_type.hpp>
 #include <containers/operator_arrow.hpp>
 #include <containers/reference_wrapper.hpp>
-#include <containers/tuple.hpp>
 
 #include <bounded/integer.hpp>
+#include <bounded/detail/tuple.hpp>
 
 #include <iterator>
 #include <type_traits>
@@ -139,7 +139,7 @@ struct adapt_iterator :
 {
 private:
 	// TODO: [[no_unique_address]]
-	using tuple_t = tuple<Iterator, Traits>;
+	using tuple_t = bounded::tuple<Iterator, Traits>;
 	static_assert(std::is_copy_assignable_v<Iterator>);
 	static_assert(std::is_copy_assignable_v<Traits>);
 public:
@@ -149,11 +149,11 @@ public:
 	}
 	
 	constexpr auto base() const noexcept {
-		return m_data[0_bi];
+		return m_data[bounded::constant<0>];
 	}
 
 	constexpr auto && traits() const noexcept {
-		return containers::unwrap(m_data[1_bi]);
+		return containers::unwrap(m_data[bounded::constant<1>]);
 	}
 
 	template<typename Index>

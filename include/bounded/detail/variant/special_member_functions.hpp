@@ -5,10 +5,10 @@
 
 #pragma once
 
-#include <containers/tuple.hpp>
-#include <containers/type.hpp>
-#include <containers/variant/base.hpp>
-#include <containers/variant/visit.hpp>
+#include <bounded/detail/tuple.hpp>
+#include <bounded/detail/type.hpp>
+#include <bounded/detail/variant/base.hpp>
+#include <bounded/detail/variant/visit.hpp>
 
 #include <bounded/detail/forward.hpp>
 
@@ -16,7 +16,7 @@
 #include <type_traits>
 #include <utility>
 
-namespace containers {
+namespace bounded {
 namespace detail {
 
 // These types exist because the special member functions cannot be templates.
@@ -159,4 +159,4 @@ using variant_copy_assignment = variant_copy_move_assignment<
 
 
 }	// namespace detail
-}	// namespace containers
+}	// namespace bounded

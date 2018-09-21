@@ -5,15 +5,14 @@
 
 #pragma once
 
-#include <containers/tuple.hpp>
-#include <containers/type.hpp>
-
-#include <bounded/detail/forward.hpp>
+#include <bounded/detail/class.hpp>
+#include <bounded/detail/tuple.hpp>
+#include <bounded/detail/type.hpp>
 
 #include <cassert>
 #include <type_traits>
 
-namespace containers {
+namespace bounded {
 namespace detail {
 
 // Often, we want to write a function that accepts a variadic number of
@@ -30,9 +29,9 @@ constexpr struct reorder_transform_t {
 private:
 	template<typename... Args, auto... indexes>
 	static constexpr auto implementation(tuple<Args...> args, std::index_sequence<indexes...>) BOUNDED_NOEXCEPT_DECLTYPE(
-		std::move(args)[bounded::constant<sizeof...(Args)> - 1_bi](
-			std::move(args)[bounded::constant<sizeof...(Args)> - 2_bi],
-			std::move(args)[bounded::constant<indexes>]...
+		std::move(args)[constant<sizeof...(Args)> - 1_bi](
+			std::move(args)[constant<sizeof...(Args)> - 2_bi],
+			std::move(args)[constant<indexes>]...
 		)
 	)
 public:
@@ -40,7 +39,7 @@ public:
 	constexpr auto operator()(Args && ... args) const BOUNDED_NOEXCEPT_DECLTYPE(
 		reorder_transform_t::implementation(
 			tie(BOUNDED_FORWARD(args)...),
-			make_index_sequence(bounded::constant<sizeof...(Args)> - 2_bi)
+			make_index_sequence(constant<sizeof...(Args)> - 2_bi)
 		)
 	)
 } reorder_transform;
@@ -51,16 +50,16 @@ template<typename T, auto n>
 struct visitor_parameter {
 	static_assert(std::is_reference_v<T>);
 	T value;
-	bounded::constant_t<n> index;
+	constant_t<n> index;
 };
 
 template<typename T, auto n>
-visitor_parameter(T &&, bounded::constant_t<n>) -> visitor_parameter<T &&, n>;
+visitor_parameter(T &&, constant_t<n>) -> visitor_parameter<T &&, n>;
 
 constexpr struct visitor_with_index {
 private:
 	template<typename Function, typename... Values>
-	static constexpr decltype(auto) implementation(Function && function, bounded::constant_t<0>, tuple<Values...> values) {
+	static constexpr decltype(auto) implementation(Function && function, constant_t<0>, tuple<Values...> values) {
 		return apply(std::move(values), BOUNDED_FORWARD(function));
 	}
 
@@ -128,4 +127,4 @@ constexpr auto visit = [](auto && ... args) -> decltype(auto) {
 	);
 };
 
-}	// namespace containers
+}	// namespace bounded

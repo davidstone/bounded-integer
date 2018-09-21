@@ -3,7 +3,7 @@
 // (See accompanying file LICENSE_1_0.txt or copy at
 // http://www.boost.org/LICENSE_1_0.txt)
 
-#include <containers/variant/variant.hpp>
+#include <bounded/detail/variant/variant.hpp>
 
 namespace {
 
@@ -12,14 +12,14 @@ using namespace bounded::literal;
 constexpr auto index = 1_bi;
 constexpr auto value = static_cast<short>(8);
 
-using thing_t = containers::variant<int, short, long, char, int>;
+using thing_t = bounded::variant<int, short, long, char, int>;
 constexpr auto thing = thing_t(index, value);
 using thingy = decltype(thing[index]);
 
 static_assert(std::is_same_v<thingy, short const &>);
 
 static_assert(thing[index] == value);
-static_assert(containers::visit(thing, [](auto x) { return std::is_same_v<decltype(x), short>; }));
+static_assert(bounded::visit(thing, [](auto x) { return std::is_same_v<decltype(x), short>; }));
 
 constexpr auto test_assignment() {
 	thing_t thing1(index, value);
@@ -29,7 +29,7 @@ constexpr auto test_assignment() {
 
 static_assert(test_assignment()[index] == value);
 
-using empty_variant_t = containers::variant<>;
+using empty_variant_t = bounded::variant<>;
 static_assert(not std::is_default_constructible_v<empty_variant_t>);
 static_assert(not std::is_constructible_v<empty_variant_t, bounded::constant_t<0>>);
 
@@ -51,7 +51,7 @@ struct non_copyable {
 }	// namespace
 
 int main() {
-	using non_trivial_variant_t = containers::variant<non_trivial>;
+	using non_trivial_variant_t = bounded::variant<non_trivial>;
 	auto non_trivial_variant = non_trivial_variant_t(0_bi);
 	assert(non_trivial_variant.index() == 0_bi);
 	non_trivial_variant = non_trivial_variant_t(0_bi);
@@ -59,7 +59,7 @@ int main() {
 	non_trivial_variant = *&non_trivial_variant;
 	
 	
-	using non_copyable_variant_t = containers::variant<non_copyable>;
+	using non_copyable_variant_t = bounded::variant<non_copyable>;
 	auto non_copyable_variant = non_copyable_variant_t(0_bi);
 	assert(non_copyable_variant.index() == 0_bi);
 	static_assert(not std::is_copy_constructible<non_copyable_variant_t>{});

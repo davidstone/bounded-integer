@@ -5,25 +5,26 @@
 
 #pragma once
 
-#include <containers/type.hpp>
-#include <containers/variant/is_valid_index.hpp>
+#include <bounded/detail/variant/is_valid_index.hpp>
+#include <bounded/detail/arithmetic/minus.hpp>
+#include <bounded/detail/class.hpp>
+#include <bounded/detail/comparison.hpp>
+#include <bounded/detail/type.hpp>
 
-#include <bounded/integer.hpp>
-
-namespace containers {
+namespace bounded {
 namespace detail {
 
 constexpr struct get_index_t {
 	template<typename Index, typename T, typename... Ts, BOUNDED_REQUIRES(is_valid_index(types<Index>{}, T{}, Ts{}...))>
 	constexpr auto operator()(types<Index> index, T head, Ts... tail) const noexcept {
 		if constexpr (index == head) {
-			return 0_bi;
+			return constant<0>;
 		} else {
-			return 1_bi + operator()(index, tail...);
+			return constant<1> + operator()(index, tail...);
 		}
 	}
-	template<auto n, typename... Ts, BOUNDED_REQUIRES(is_valid_index(bounded::constant<n>, Ts{}...))>
-	constexpr auto operator()(bounded::constant_t<n> index, Ts...) const noexcept {
+	template<auto n, typename... Ts, BOUNDED_REQUIRES(is_valid_index(constant<n>, Ts{}...))>
+	constexpr auto operator()(constant_t<n> index, Ts...) const noexcept {
 		return index;
 	}
 } get_index;
@@ -35,16 +36,16 @@ constexpr struct get_type_t {
 		return index;
 	}
 
-	template<auto n, typename T, typename... Ts, BOUNDED_REQUIRES(is_valid_index(bounded::constant<n>, T{}, Ts{}...))>
-	constexpr auto operator()(bounded::constant_t<n> index, T head, Ts... tail) const noexcept {
-		if constexpr (index == 0_bi) {
+	template<auto n, typename T, typename... Ts, BOUNDED_REQUIRES(is_valid_index(constant<n>, T{}, Ts{}...))>
+	constexpr auto operator()(constant_t<n> index, T head, Ts... tail) const noexcept {
+		if constexpr (index == constant<0>) {
 			return head;
 		} else {
-			return operator()(index - 1_bi, tail...);
+			return operator()(index - constant<1>, tail...);
 		}
 	}
 } get_type;
 
 
 }	// namespace detail
-}	// namespace containers
+}	// namespace bounded

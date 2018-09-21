@@ -5,17 +5,18 @@
 
 #pragma once
 
-#include <bounded/integer.hpp>
+#include <bounded/detail/class.hpp>
+#include <bounded/detail/comparison.hpp>
 
 #include <type_traits>
 
-namespace containers {
+namespace bounded {
 namespace detail {
 
 constexpr struct is_valid_index_t {
 	template<auto n, typename... Ts>
-	constexpr auto operator()(bounded::constant_t<n> index, types<Ts>...) const noexcept {
-		return index < bounded::constant<sizeof...(Ts)>;
+	constexpr auto operator()(constant_t<n> index, types<Ts>...) const noexcept {
+		return index < constant<sizeof...(Ts)>;
 	}
 
 	template<typename Index, typename... Ts>
@@ -26,4 +27,4 @@ constexpr struct is_valid_index_t {
 } is_valid_index;
 
 }	// namespace detail
-}	// namespace containers
+}	// namespace bounded

@@ -8,8 +8,8 @@
 #include <containers/compare_adl.hpp>
 #include <containers/operator_arrow.hpp>
 #include <containers/range_view.hpp>
-#include <containers/tuple.hpp>
 
+#include <bounded/detail/tuple.hpp>
 #include <bounded/integer.hpp>
 
 namespace containers {
@@ -53,7 +53,7 @@ private:
 	)
 	
 	constexpr auto tie() const noexcept {
-		return ::containers::tie(m_first1, m_last1, m_first2);
+		return bounded::tie(m_first1, m_last1, m_first2);
 	}
 
 public:
@@ -98,7 +98,7 @@ public:
 		(
 			!bounded::is_bounded_integer<difference_type> or
 			std::is_same_v<iterator_category, std::random_access_iterator_tag> or
-			std::numeric_limits<Offset>::max() == 1_bi
+			std::numeric_limits<Offset>::max() == bounded::constant<1>
 		)
 	)>
 	friend constexpr auto operator+(concatenate_view_iterator const lhs, Offset const offset) {
@@ -167,8 +167,8 @@ public:
 		concatenate_view_sentinel<RHSSentinel> const rhs
 	) BOUNDED_NOEXCEPT_DECLTYPE(
 		compare(
-			::containers::tie(lhs.m_first1, lhs.m_first2),
-			::containers::tie(lhs.m_last1, rhs.base())
+			bounded::tie(lhs.m_first1, lhs.m_first2),
+			bounded::tie(lhs.m_last1, rhs.base())
 		)
 	)
 
@@ -192,7 +192,7 @@ public:
 		concatenate_view_iterator<LHSIterator1, LHSSentinel1, LHSIterator2> const lhs,
 		concatenate_view_sentinel<RHSSentinel> const rhs
 	) BOUNDED_NOEXCEPT_DECLTYPE(
-		::containers::tie(lhs.m_first1, lhs.m_first2) == ::containers::tie(lhs.m_last1, rhs.base())
+		bounded::tie(lhs.m_first1, lhs.m_first2) == bounded::tie(lhs.m_last1, rhs.base())
 	)
 
 

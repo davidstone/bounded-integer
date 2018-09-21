@@ -9,9 +9,9 @@
 #include <containers/algorithms/find.hpp>
 #include <containers/iterator_adapter.hpp>
 #include <containers/reference_wrapper.hpp>
-#include <containers/tuple.hpp>
 
 #include <bounded/detail/forward.hpp>
+#include <bounded/detail/tuple.hpp>
 #include <bounded/integer.hpp>
 
 #include <cassert>
@@ -25,9 +25,9 @@ namespace detail {
 
 // TODO: Switch to [[no_unique_address]] when supported
 template<typename Sentinel, typename UnaryPredicate>
-struct filter_iterator_traits : private tuple<Sentinel, UnaryPredicate>, default_dereference, default_compare {
+struct filter_iterator_traits : private bounded::tuple<Sentinel, UnaryPredicate>, default_dereference, default_compare {
 	constexpr filter_iterator_traits(Sentinel last, UnaryPredicate condition) BOUNDED_NOEXCEPT_INITIALIZATION(
-		tuple<Sentinel, UnaryPredicate>(std::move(last), BOUNDED_FORWARD(condition))
+		bounded::tuple<Sentinel, UnaryPredicate>(std::move(last), BOUNDED_FORWARD(condition))
 	) {
 	}
 

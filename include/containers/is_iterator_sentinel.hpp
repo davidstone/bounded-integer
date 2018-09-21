@@ -6,7 +6,6 @@
 #pragma once
 
 #include <containers/is_iterator.hpp>
-#include <containers/type.hpp>
 
 #include <type_traits>
 

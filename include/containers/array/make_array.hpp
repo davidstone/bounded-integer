@@ -1,4 +1,4 @@
-// Copyright David Stone 2017.
+// Copyright David Stone 2018.
 // Distributed under the Boost Software License, Version 1.0.
 // (See accompanying file LICENSE_1_0.txt or copy at
 // http://www.boost.org/LICENSE_1_0.txt)
@@ -6,9 +6,9 @@
 #pragma once
 
 #include <containers/array/array.hpp>
-#include <containers/make_index_sequence.hpp>
 
 #include <bounded/detail/forward.hpp>
+#include <bounded/detail/make_index_sequence.hpp>
 #include <bounded/integer.hpp>
 
 #include <cstddef>
@@ -83,7 +83,7 @@ constexpr auto make_array_n(bounded::constant_t<size_> size, T && value) noexcep
 	if constexpr (size == 0_bi) {
 		return array<std::decay_t<T>, 0>{};
 	} else {
-		return detail::make_array_n_impl<size_>(BOUNDED_FORWARD(value), detail::make_index_sequence(size - 1_bi));
+		return detail::make_array_n_impl<size_>(BOUNDED_FORWARD(value), bounded::make_index_sequence(size - 1_bi));
 	}
 }
 
