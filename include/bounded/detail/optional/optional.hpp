@@ -7,6 +7,8 @@
 
 #include <bounded/detail/optional/forward_declaration.hpp>
 
+#include <bounded/detail/variant/variant.hpp>
+
 #include <bounded/detail/construct_destroy.hpp>
 #include <bounded/detail/forward.hpp>
 #include <bounded/detail/noexcept.hpp>
@@ -45,114 +47,46 @@ constexpr auto in_place = in_place_t{};
 
 namespace detail {
 
-template<typename T, bool is_trivially_destructible = std::is_trivially_destructible_v<T>>
-struct default_optional_storage_base;
-
-template<typename T>
-struct default_optional_storage_base<T, true> {
-	union underlying_storage {
-		constexpr underlying_storage() noexcept:
-			dummy(none) {
-		}
-		template<typename... Args, BOUNDED_REQUIRES(std::is_constructible_v<T, Args && ...>)>
-		constexpr underlying_storage(in_place_t, Args && ... args) noexcept(std::is_nothrow_constructible_v<T, Args && ...>):
-			value(BOUNDED_FORWARD(args)...) {
-		}
-		template<typename... Args, BOUNDED_REQUIRES(!std::is_constructible_v<T, Args && ...>)>
-		constexpr underlying_storage(in_place_t, Args && ... args) noexcept(noexcept(underlying_storage{BOUNDED_FORWARD(args)...})):
-			value{BOUNDED_FORWARD(args)...} {
-		}
-		~underlying_storage() = default;
-
-		none_t dummy;
-		T value;
-	};
-	
-	underlying_storage storage;
-	bool initialized;
-};
-
-template<typename T>
-struct default_optional_storage_base<T, false> {
-	union underlying_storage {
-		constexpr underlying_storage() noexcept:
-			dummy(none) {
-		}
-		template<typename... Args, BOUNDED_REQUIRES(std::is_constructible_v<T, Args && ...>)>
-		constexpr underlying_storage(in_place_t, Args && ... args) noexcept(std::is_nothrow_constructible_v<T, Args && ...>):
-			value(BOUNDED_FORWARD(args)...) {
-		}
-		template<typename... Args, BOUNDED_REQUIRES(!std::is_constructible_v<T, Args && ...>)>
-		constexpr underlying_storage(in_place_t, Args && ... args) noexcept(noexcept(underlying_storage{BOUNDED_FORWARD(args)...})):
-			value{BOUNDED_FORWARD(args)...} {
-		}
-		~underlying_storage() {}
-
-		none_t dummy;
-		T value;
-	};
-	
-	~default_optional_storage_base() noexcept {
-		if (initialized) {
-			destroy(storage.value);
-		}
-	}
-	
-	underlying_storage storage;
-	bool initialized;
-};
-
-
 template<typename T>
 struct default_optional_storage {
 	constexpr explicit default_optional_storage(optional_tag) noexcept:
-		m_data{
-			{},
-			false
-		} {
+		m_data(none_index, none)
+	{
 	}
 	
 	template<typename... Args>
 	constexpr default_optional_storage(Args && ... args) noexcept(std::is_nothrow_constructible_v<T, Args && ...>):
-		m_data{
-			{ in_place, BOUNDED_FORWARD(args)... },
-			true
-		} {
+		m_data(value_index, BOUNDED_FORWARD(args)...)
+	{
 	}
 	
 	template<typename... Args>
 	constexpr auto initialize(optional_tag, Args && ... args) noexcept(std::is_nothrow_constructible_v<T, Args && ...>) {
-		uninitialize();
-		construct(m_data.storage.value, BOUNDED_FORWARD(args)...);
-		m_data.initialized = true;
+		m_data.emplace(value_index, BOUNDED_FORWARD(args)...);
 	}
 	
 	constexpr auto uninitialize(optional_tag) noexcept {
-		uninitialize();
+		m_data.emplace(none_index, none);
 	}
 
 	constexpr auto is_initialized(optional_tag) const noexcept {
-		return m_data.initialized;
+		return m_data.index() == value_index;
 	}
 
 	constexpr operator T const & () const & noexcept {
-		return m_data.storage.value;
+		return m_data[value_index];
 	}
 	constexpr operator T & () & noexcept {
-		return m_data.storage.value;
+		return m_data[value_index];
 	}
 	constexpr operator T && () && noexcept {
-		return std::move(m_data.storage.value);
+		return std::move(m_data)[value_index];
 	}
 
 private:
-	constexpr auto uninitialize() noexcept {
-		if (m_data.initialized) {
-			::bounded::destroy(m_data.storage.value);
-			m_data.initialized = false;
-		}
-	}
-	default_optional_storage_base<T> m_data;
+	static constexpr auto none_index = constant<0>;
+	static constexpr auto value_index = constant<1>;
+	variant<none_t, T> m_data;
 };
 
 template<typename Optional, typename T>
@@ -212,13 +146,6 @@ public:
 	}
 
 
-	constexpr optional(optional const & other)
-		BOUNDED_NOEXCEPT_INITIALIZATION(optional(other, common_init_tag{})) {
-	}
-	constexpr optional(optional && other)
-		BOUNDED_NOEXCEPT_INITIALIZATION(optional(std::move(other), common_init_tag{})) {
-	}
-
 	template<typename U, BOUNDED_REQUIRES(std::is_convertible_v<U const &, value_type>)>
 	constexpr optional(optional<U> const & other)
 		BOUNDED_NOEXCEPT_INITIALIZATION(optional(other, common_init_tag{})) {
@@ -271,12 +198,6 @@ public:
 		static_assert(noexcept(m_value.uninitialize(optional_tag{})));
 		m_value.uninitialize(optional_tag{});
 		return *this;
-	}
-	constexpr auto && operator=(optional const & other) & noexcept(noexcept(detail::assign_from_optional(std::declval<optional &>(), other))) {
-		return detail::assign_from_optional(*this, other);
-	}
-	constexpr auto && operator=(optional && other) & noexcept(noexcept(detail::assign_from_optional(std::declval<optional& >(), std::move(other)))) {
-		return detail::assign_from_optional(*this, std::move(other));
 	}
 	// TODO: make this work when value_type is a reference
 	template<typename U, BOUNDED_REQUIRES(std::is_convertible_v<U &&, value_type>)>
