@@ -34,9 +34,16 @@ namespace detail {
 // can skip calling their destructors, which could allow static_vector<T, n> to
 // be a literal type.
 //
-// This should also improve debug-mode performance.
+// This should also improve performance.
+//
+// TODO: Theoretically, this shouldn't group different types of triviality, but
+// without requires clauses it is too annoying to write out.
 
-template<typename T, std::size_t capacity, bool trivial = std::is_trivially_destructible_v<T>>
+template<
+	typename T,
+	std::size_t capacity,
+	bool = std::is_trivially_destructible_v<T> and std::is_trivially_copyable_v<T>
+>
 struct static_vector_data;
 
 template<typename T, std::size_t capacity>
@@ -47,10 +54,31 @@ struct static_vector_data<T, capacity, true> {
 
 template<typename T, std::size_t capacity>
 struct static_vector_data<T, capacity, false> : static_vector_data<T, capacity, true> {
+private:
+	auto first() const noexcept {
+		return reinterpret_cast<T const *>(data(this->m_container));
+	}
+	auto first() noexcept {
+		return reinterpret_cast<T *>(data(this->m_container));
+	}
+	auto last() const noexcept {
+		return first() + this->m_size;
+	}
+	auto last() noexcept {
+		return first() + this->m_size;
+	}
+public:
+	static_vector_data() = default;
+	static_vector_data(static_vector_data && other) noexcept(std::is_nothrow_move_constructible_v<T>) {
+		std::uninitialized_move(other.first(), other.last(), first());
+		this->m_size = other.m_size;
+	}
+	static_vector_data(static_vector_data const & other) noexcept(std::is_nothrow_copy_constructible_v<T>) {
+		std::uninitialized_copy(other.first(), other.last(), first());
+		this->m_size = other.m_size;
+	}
 	~static_vector_data() {
-		auto const first = begin(this->m_container);
-		auto const last = first + this->m_size;
-		detail::destroy_range(first, last);
+		detail::destroy_range(first(), last());
 	}
 };
 
@@ -86,12 +114,8 @@ public:
 		}
 	}
 	
-	constexpr static_vector(static_vector const & other) BOUNDED_NOEXCEPT_INITIALIZATION(
-		static_vector(begin(other), end(other))
-	) {}
-	constexpr static_vector(static_vector && other) BOUNDED_NOEXCEPT_INITIALIZATION(
-		static_vector(begin(std::move(other)), end(std::move(other)))
-	) {}
+	constexpr static_vector(static_vector const & other) = default;
+	constexpr static_vector(static_vector && other) = default;
 
 	constexpr static_vector(std::initializer_list<value_type> init) BOUNDED_NOEXCEPT_INITIALIZATION(
 		static_vector(begin(init), end(init))

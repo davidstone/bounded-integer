@@ -147,6 +147,10 @@ struct non_copyable {
 	non_copyable & operator=(non_copyable &&) = default;
 };
 
+static_assert(std::is_trivially_copy_constructible_v<containers::static_vector<int, 3>>);
+static_assert(std::is_trivially_move_constructible_v<containers::static_vector<int, 3>>);
+static_assert(std::is_trivially_destructible_v<containers::static_vector<int, 3>>);
+
 }	// namespace
 
 int main() {
