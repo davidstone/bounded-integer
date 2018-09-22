@@ -21,8 +21,13 @@ constexpr auto test_optional() {
 	return true;
 }
 
+struct S {
+	int member;
+};
+
 static_assert(test_optional<int>());
 static_assert(test_optional<bounded::integer<0, 10>>());
 static_assert(test_optional<decltype(bounded::integer(0))>());
+static_assert((void(bounded::optional<S>{}.emplace(0)), true));
 
 }	// namespace

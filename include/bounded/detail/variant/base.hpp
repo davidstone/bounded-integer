@@ -88,8 +88,8 @@ struct basic_variant_base {
 		return get_function()(m_data[1_bi]);
 	}
 
-	template<typename Index, typename... Args, BOUNDED_REQUIRES(
-		std::is_constructible_v<typename decltype(get_type(Index{}, types<Ts>{}...))::type, Args...>
+	template<typename Index, typename... Args, typename = decltype(
+		construct_return<typename decltype(get_type(Index{}, types<Ts>{}...))::type>(std::declval<Args>()...)
 	)>
 	constexpr auto & emplace(Index index, Args && ... args) & noexcept(noexcept(construct(std::declval<basic_variant_base &>()[index], BOUNDED_FORWARD(args)...))) {
 		using indexed = typename decltype(get_type(index, types<Ts>{}...))::type;
