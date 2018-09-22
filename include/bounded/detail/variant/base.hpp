@@ -92,16 +92,32 @@ struct basic_variant_base {
 		std::is_constructible_v<typename decltype(get_type(Index{}, types<Ts>{}...))::type, Args...>
 	)>
 	constexpr auto & emplace(Index index, Args && ... args) & noexcept(noexcept(construct(std::declval<basic_variant_base &>()[index], BOUNDED_FORWARD(args)...))) {
-		auto & ref = operator[](index);
-		if constexpr (std::is_nothrow_constructible_v<typename decltype(get_type(index, types<Ts>{}...))::type, Args...>) {
+		using indexed = typename decltype(get_type(index, types<Ts>{}...))::type;
+		constexpr auto trivial = (... and (
+			std::is_trivially_copy_constructible_v<Ts> and
+			std::is_trivially_copy_assignable_v<Ts> and
+			std::is_trivially_destructible_v<Ts>
+		));
+		if constexpr (std::is_nothrow_constructible_v<indexed, Args...>) {
 			visit(*this, destroy);
 			get_function() = GetFunction(get_index(index, types<Ts>{}...));
-			return construct(ref, BOUNDED_FORWARD(args)...);
+			if constexpr (trivial) {
+				m_data[1_bi] = variadic_union_t<Ts...>(index, BOUNDED_FORWARD(args)...);
+				return operator[](index);
+			} else {
+				return construct(operator[](index), BOUNDED_FORWARD(args)...);
+			}
 		} else {
+			auto & ref = operator[](index);
 			auto value = construct_return<std::decay_t<decltype(ref)>>(BOUNDED_FORWARD(args)...);
 			visit(*this, destroy);
-			get_function() = GetFunction(get_index(index));
-			return construct(ref, std::move(value));
+			get_function() = GetFunction(get_index(index, types<Ts>{}...));
+			if constexpr (trivial) {
+				m_data[1_bi] = variadic_union_t<Ts...>(index, std::move(value));
+				return operator[](index);
+			} else {
+				return construct(ref, std::move(value));
+			}
 		}
 	}
 
