@@ -21,7 +21,7 @@ template<typename Range, typename Traits>
 struct adapt {
 	using iterator = decltype(containers::adapt_iterator(
 		begin(std::declval<Range &>()),
-		reference_wrapper(std::declval<Traits &>())
+		reference_wrapper(std::declval<Traits const &>())
 	));
 	using const_iterator = decltype(containers::adapt_iterator(
 		begin(std::declval<Range const &>()),
@@ -43,19 +43,19 @@ struct adapt {
 		return containers::adapt_iterator(begin(adapted.m_range), reference_wrapper(adapted.m_traits));
 	}
 	friend constexpr auto begin(adapt & adapted) {
-		return containers::adapt_iterator(begin(adapted.m_range), reference_wrapper(adapted.m_traits));
+		return containers::adapt_iterator(begin(adapted.m_range), reference_wrapper(std::as_const(adapted.m_traits)));
 	}
 	friend constexpr auto begin(adapt && adapted) {
-		return containers::adapt_iterator(begin(std::move(adapted).m_range), reference_wrapper(adapted.m_traits));
+		return containers::adapt_iterator(begin(std::move(adapted).m_range), reference_wrapper(std::as_const(adapted.m_traits)));
 	}
 	friend constexpr auto end(adapt const & adapted) {
 		return containers::adapt_iterator(end(adapted.m_range), reference_wrapper(adapted.m_traits));
 	}
 	friend constexpr auto end(adapt & adapted) {
-		return containers::adapt_iterator(end(adapted.m_range), reference_wrapper(adapted.m_traits));
+		return containers::adapt_iterator(end(adapted.m_range), reference_wrapper(std::as_const(adapted.m_traits)));
 	}
 	friend constexpr auto end(adapt && adapted) {
-		return containers::adapt_iterator(end(std::move(adapted).m_range), reference_wrapper(adapted.m_traits));
+		return containers::adapt_iterator(end(std::move(adapted).m_range), reference_wrapper(std::as_const(adapted.m_traits)));
 	}
 	
 	CONTAINERS_OPERATOR_BRACKET_DEFINITIONS(adapt)
