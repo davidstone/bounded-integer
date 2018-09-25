@@ -1,4 +1,4 @@
-// Copyright David Stone 2016.
+// Copyright David Stone 2018.
 // Distributed under the Boost Software License, Version 1.0.
 // (See accompanying file LICENSE_1_0.txt or copy at
 // http://www.boost.org/LICENSE_1_0.txt)
@@ -22,6 +22,7 @@ namespace detail {
 namespace common {
 
 // TODO: conditional noexcept
+// TODO: this implementation is for contiguous ranges
 template<typename Container, typename Iterator, BOUNDED_REQUIRES(is_container<Container> and is_iterator<Iterator>)>
 constexpr auto erase(Container & container, Iterator const first_, Iterator const last_) noexcept {
 	auto const first = ::containers::detail::mutable_iterator(container, first_);
@@ -30,16 +31,17 @@ constexpr auto erase(Container & container, Iterator const first_, Iterator cons
 	while (to_clear != end(container)) {
 		container.pop_back();
 	}
+	return first;
 }
 template<typename Container, BOUNDED_REQUIRES(is_container<Container>)>
 constexpr auto erase(Container & container, typename Container::const_iterator const it) {
 	assert(it != end(container));
-	erase(container, it, ::containers::next(it));
+	return erase(container, it, ::containers::next(it));
 }
 
 template<typename Container, typename Predicate, BOUNDED_REQUIRES(is_container<Container>)>
 constexpr auto erase_if(Container & container, Predicate predicate) {
-	erase(container, ::containers::remove_if(container, std::move(predicate)), end(container));
+	return erase(container, ::containers::remove_if(container, std::move(predicate)), end(container));
 }
 
 
