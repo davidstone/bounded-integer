@@ -27,7 +27,7 @@ namespace detail {
 template<typename Sentinel, typename UnaryPredicate>
 struct filter_iterator_traits : private bounded::tuple<Sentinel, UnaryPredicate>, default_dereference, default_compare {
 	constexpr filter_iterator_traits(Sentinel last, UnaryPredicate condition) BOUNDED_NOEXCEPT_INITIALIZATION(
-		bounded::tuple<Sentinel, UnaryPredicate>(std::move(last), BOUNDED_FORWARD(condition))
+		bounded::tuple<Sentinel, UnaryPredicate>(std::move(last), std::move(condition))
 	) {
 	}
 
@@ -94,8 +94,8 @@ constexpr auto filter_iterator_impl(ForwardIterator first, Traits traits) BOUNDE
 }	// namespace detail
 
 template<typename ForwardIterator, typename Sentinel, typename UnaryPredicate>
-constexpr auto filter_iterator(ForwardIterator first, Sentinel last, UnaryPredicate && condition) BOUNDED_NOEXCEPT_VALUE(
-	detail::filter_iterator_impl(first, detail::filter_iterator_traits(last, BOUNDED_FORWARD(condition)))
+constexpr auto filter_iterator(ForwardIterator first, Sentinel last, UnaryPredicate condition) BOUNDED_NOEXCEPT_VALUE(
+	detail::filter_iterator_impl(first, detail::filter_iterator_traits(last, std::move(condition)))
 )
 
 template<typename Range, typename UnaryPredicate>
@@ -119,9 +119,9 @@ public:
 		static_cast<std::uintmax_t>(std::numeric_limits<typename std::iterator_traits<iterator>::difference_type>::max())
 	>;
 
-	constexpr filter(Range && range, UnaryPredicate && predicate) noexcept(std::is_nothrow_move_constructible_v<Range> and std::is_nothrow_constructible_v<traits, sentinel, UnaryPredicate>):
+	constexpr filter(Range && range, UnaryPredicate predicate) noexcept(std::is_nothrow_move_constructible_v<Range> and std::is_nothrow_constructible_v<traits, sentinel, UnaryPredicate>):
 		m_range(BOUNDED_FORWARD(range)),
-		m_traits(end(m_range), BOUNDED_FORWARD(predicate))
+		m_traits(end(m_range), std::move(predicate))
 	{
 	}
 	
@@ -144,6 +144,6 @@ private:
 };
 
 template<typename Range, typename UnaryPredicate>
-filter(Range &&, UnaryPredicate &&) -> filter<Range, UnaryPredicate>;
+filter(Range &&, UnaryPredicate) -> filter<Range, UnaryPredicate>;
 
 }	// namespace containers
