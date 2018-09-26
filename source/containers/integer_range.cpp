@@ -53,6 +53,8 @@ constexpr auto range = containers::integer_range(first, last);
 
 static_assert(containers::accumulate(range) == -6_bi);
 
+static_assert(containers::accumulate(containers::integer_range(4_bi, 10_bi, 2_bi)) == 18_bi);
+
 // Ensure it works with a range-based for loop
 static_assert([]{
 	for (auto const n [[maybe_unused]] : range) {
