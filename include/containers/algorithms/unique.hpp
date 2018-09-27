@@ -7,7 +7,7 @@
 
 #include <containers/algorithms/find.hpp>
 #include <containers/algorithms/negate.hpp>
-#include <containers/dynamic_array/dynamic_array.hpp>
+#include <containers/dynamic_array.hpp>
 
 #include <bounded/detail/forward.hpp>
 

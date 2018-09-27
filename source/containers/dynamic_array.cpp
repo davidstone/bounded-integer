@@ -3,7 +3,7 @@
 // (See accompanying file LICENSE_1_0.txt or copy at
 // http://www.boost.org/LICENSE_1_0.txt)
 
-#include <containers/dynamic_array/dynamic_array.hpp>
+#include <containers/dynamic_array.hpp>
 
 #include <cassert>
 

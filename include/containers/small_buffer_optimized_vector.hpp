@@ -8,7 +8,7 @@
 #include <containers/array/array.hpp>
 #include <containers/common_container_functions.hpp>
 #include <containers/contiguous_iterator.hpp>
-#include <containers/dynamic_array/dynamic_array.hpp>
+#include <containers/dynamic_array.hpp>
 #include <containers/dynamic_resizable_array.hpp>
 #include <containers/index_type.hpp>
 #include <containers/repeat_n.hpp>

@@ -117,7 +117,7 @@ target_sources(containers INTERFACE
 	$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>/include/containers/compare_adl.hpp
 	$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>/include/containers/contiguous_iterator.hpp
 	$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>/include/containers/data.hpp
-	$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>/include/containers/dynamic_array/dynamic_array.hpp
+	$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>/include/containers/dynamic_array.hpp
 	$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>/include/containers/dynamic_resizable_array.hpp
 	$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>/include/containers/empty.hpp
 	$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>/include/containers/erase.hpp
@@ -339,7 +339,7 @@ add_executable(string
 target_link_libraries(string containers_test)
 
 add_executable(dynamic_array
-	source/containers/dynamic_array/dynamic_array.cpp
+	source/containers/dynamic_array.cpp
 )
 target_link_libraries(dynamic_array containers_test)
 
