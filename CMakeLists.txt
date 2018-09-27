@@ -152,7 +152,7 @@ target_sources(containers INTERFACE
 	$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>/include/containers/static_vector/static_vector.hpp
 	$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>/include/containers/string.hpp
 	$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>/include/containers/uninitialized_storage.hpp
-	$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>/include/containers/vector/vector.hpp
+	$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>/include/containers/vector.hpp
 )
 
 target_include_directories(bounded INTERFACE
@@ -304,7 +304,6 @@ add_library(containers_test STATIC
 	source/containers/single_element_range.cpp
 	source/containers/size.cpp
 	source/containers/static_vector/make_static_vector.cpp
-	source/containers/vector/vector.cpp
 )
 
 target_link_libraries(containers_test containers)
@@ -330,7 +329,7 @@ add_executable(flat_map
 target_link_libraries(flat_map containers_test)
 
 add_executable(vector
-	source/containers/vector/vector.cpp
+	source/containers/vector.cpp
 )
 target_link_libraries(vector containers_test)
 

@@ -5,7 +5,7 @@
 
 #include <containers/algorithms/concatenate.hpp>
 #include <containers/string.hpp>
-#include <containers/vector/vector.hpp>
+#include <containers/vector.hpp>
 
 #include <iostream>
 #include <string_view>

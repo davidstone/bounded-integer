@@ -9,7 +9,7 @@
 #include <containers/algorithms/unique.hpp>
 #include <containers/common_container_functions.hpp>
 #include <containers/legacy_iterator.hpp>
-#include <containers/vector/vector.hpp>
+#include <containers/vector.hpp>
 
 #include <bounded/detail/forward.hpp>
 #include <bounded/detail/tuple.hpp>

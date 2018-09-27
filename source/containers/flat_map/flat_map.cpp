@@ -6,7 +6,7 @@
 #undef NDEBUG
 
 #include <containers/flat_map/flat_map.hpp>
-#include <containers/vector/vector.hpp>
+#include <containers/vector.hpp>
 
 #include <bounded/detail/forward.hpp>
 

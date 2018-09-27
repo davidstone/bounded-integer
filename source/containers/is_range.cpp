@@ -6,7 +6,7 @@
 #include <containers/is_range.hpp>
 #include <containers/array/array.hpp>
 #include <containers/string.hpp>
-#include <containers/vector/vector.hpp>
+#include <containers/vector.hpp>
 
 #include <array>
 #include <map>

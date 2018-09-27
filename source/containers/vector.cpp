@@ -5,7 +5,7 @@
 
 #undef NDEBUG
 
-#include <containers/vector/vector.hpp>
+#include <containers/vector.hpp>
 
 #include <cassert>
 
