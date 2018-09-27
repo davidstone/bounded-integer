@@ -5,7 +5,7 @@
 
 #pragma once
 
-#include <containers/is_iterable.hpp>
+#include <containers/is_range.hpp>
 #include <containers/noexcept_iterable.hpp>
 
 #include <bounded/detail/forward.hpp>
@@ -48,7 +48,7 @@ using accumulate_t = typename accumulate_c<Range, std::decay_t<Initial>, BinaryF
 
 
 template<typename Result, typename Range, typename Initial, typename BinaryFunction, BOUNDED_REQUIRES(
-	is_iterable<Range>
+	is_range<Range>
 )>
 constexpr auto accumulate(Range && range, Initial && initial, BinaryFunction function) noexcept(
 	detail::noexcept_iterable<Range> and
@@ -63,7 +63,7 @@ constexpr auto accumulate(Range && range, Initial && initial, BinaryFunction fun
 }
 
 
-template<typename Range, typename Initial, typename BinaryFunction, BOUNDED_REQUIRES(is_iterable<Range>)>
+template<typename Range, typename Initial, typename BinaryFunction, BOUNDED_REQUIRES(is_range<Range>)>
 constexpr auto accumulate(Range && range, Initial && initial, BinaryFunction function) BOUNDED_NOEXCEPT(
 	::containers::accumulate<detail::accumulate_t<Range, Initial, BinaryFunction>>(
 		BOUNDED_FORWARD(range),
@@ -73,12 +73,12 @@ constexpr auto accumulate(Range && range, Initial && initial, BinaryFunction fun
 )
 
 
-template<typename Result, typename Range, typename Initial, BOUNDED_REQUIRES(is_iterable<Range>)>
+template<typename Result, typename Range, typename Initial, BOUNDED_REQUIRES(is_range<Range>)>
 constexpr auto accumulate(Range && range, Initial && initial) BOUNDED_NOEXCEPT(
 	::containers::accumulate<Result>(BOUNDED_FORWARD(range), BOUNDED_FORWARD(initial), std::plus<>{})
 )
 
-template<typename Range, typename Initial, BOUNDED_REQUIRES(is_iterable<Range>)>
+template<typename Range, typename Initial, BOUNDED_REQUIRES(is_range<Range>)>
 constexpr auto accumulate(Range && range, Initial && initial) BOUNDED_NOEXCEPT(
 	::containers::accumulate(BOUNDED_FORWARD(range), BOUNDED_FORWARD(initial), std::plus<>{})
 )
@@ -98,7 +98,7 @@ constexpr auto initial_accumulate_value() BOUNDED_NOEXCEPT_VALUE(
 
 }	// namespace detail
 
-template<typename Result, typename Range, BOUNDED_REQUIRES(is_iterable<Range>)>
+template<typename Result, typename Range, BOUNDED_REQUIRES(is_range<Range>)>
 constexpr auto accumulate(Range && range) BOUNDED_NOEXCEPT(
 	::containers::accumulate<Result>(
 		BOUNDED_FORWARD(range),
@@ -107,7 +107,7 @@ constexpr auto accumulate(Range && range) BOUNDED_NOEXCEPT(
 	)
 )
 
-template<typename Range, BOUNDED_REQUIRES(is_iterable<Range>)>
+template<typename Range, BOUNDED_REQUIRES(is_range<Range>)>
 constexpr auto accumulate(Range && range) BOUNDED_NOEXCEPT(
 	::containers::accumulate(
 		BOUNDED_FORWARD(range),

@@ -6,7 +6,7 @@
 #pragma once
 
 #include <containers/begin_end.hpp>
-#include <containers/is_iterable.hpp>
+#include <containers/is_range.hpp>
 
 #include <bounded/integer.hpp>
 
@@ -19,14 +19,14 @@ using namespace bounded::literal;
 namespace detail {
 namespace common {
 
-template<typename Iterable>
-constexpr auto never_empty = std::numeric_limits<typename std::remove_reference_t<Iterable>::size_type>::min() > 0_bi;
+template<typename Range>
+constexpr auto never_empty = std::numeric_limits<typename std::remove_reference_t<Range>::size_type>::min() > 0_bi;
 
-template<typename Iterable, BOUNDED_REQUIRES(is_iterable<Iterable>)>
-constexpr auto empty(Iterable const & iterable) noexcept {
+template<typename Range, BOUNDED_REQUIRES(is_range<Range>)>
+constexpr auto empty(Range const & range) noexcept {
 	// The never_empty check is not needed for correctness, but allows this
 	// function to be constexpr in more situations.
-	return never_empty<Iterable> ? false : begin(iterable) == end(iterable);
+	return never_empty<Range> ? false : begin(range) == end(range);
 }
 
 }	// namespace common

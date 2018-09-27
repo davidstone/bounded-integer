@@ -7,7 +7,7 @@
 
 #include <containers/begin_end.hpp>
 #include <containers/common_iterator_functions.hpp>
-#include <containers/is_iterable.hpp>
+#include <containers/is_range.hpp>
 
 #include <bounded/integer.hpp>
 
@@ -15,9 +15,9 @@ namespace containers {
 namespace detail {
 namespace common {
 
-template<typename Iterable, BOUNDED_REQUIRES(is_iterable<Iterable>)>
-constexpr auto data(Iterable && iterable) BOUNDED_NOEXCEPT_DECLTYPE(
-	pointer_from(begin(iterable))
+template<typename Range, BOUNDED_REQUIRES(is_range<Range>)>
+constexpr auto data(Range && range) BOUNDED_NOEXCEPT_DECLTYPE(
+	pointer_from(begin(range))
 )
 
 }	// namespace common

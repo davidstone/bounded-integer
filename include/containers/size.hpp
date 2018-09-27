@@ -7,7 +7,7 @@
 
 #include <containers/algorithms/distance.hpp>
 #include <containers/begin_end.hpp>
-#include <containers/is_iterable.hpp>
+#include <containers/is_range.hpp>
 
 #include <bounded/integer.hpp>
 
@@ -16,11 +16,11 @@ namespace detail {
 namespace common {
 
 // Ignored... makes this a worse match than std::size if that compiles
-template<typename Range, typename... Ignored, BOUNDED_REQUIRES(is_iterable<Range> and bounded::is_bounded_integer<typename Range::size_type>)>
+template<typename Range, typename... Ignored, BOUNDED_REQUIRES(is_range<Range> and bounded::is_bounded_integer<typename Range::size_type>)>
 constexpr auto size(Range const & range, Ignored && ...) noexcept {
 	return typename Range::size_type(end(range) - begin(range), bounded::non_check);
 }
-template<typename Range, typename... Ignored, BOUNDED_REQUIRES(is_iterable<Range> and !bounded::is_bounded_integer<typename Range::size_type>)>
+template<typename Range, typename... Ignored, BOUNDED_REQUIRES(is_range<Range> and !bounded::is_bounded_integer<typename Range::size_type>)>
 constexpr auto size(Range const & range, Ignored && ...) noexcept {
 	return typename Range::size_type(end(range) - begin(range));
 }

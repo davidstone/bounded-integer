@@ -54,12 +54,12 @@ template<typename T> \
 constexpr auto has_rvalue_ ## begin_or_end<T, decltype(rvalue_ref_qualified(&T::begin_or_end))> = true; \
 \
 \
-template<typename Iterable, BOUNDED_REQUIRES( \
-	std::is_rvalue_reference_v<Iterable &&> and \
-	has_rvalue_ ## begin_or_end<Iterable> \
+template<typename Range, BOUNDED_REQUIRES( \
+	std::is_rvalue_reference_v<Range &&> and \
+	has_rvalue_ ## begin_or_end<Range> \
 )> \
-constexpr auto begin_or_end(Iterable && iterable) BOUNDED_NOEXCEPT_VALUE( \
-	std::move(iterable).begin_or_end() \
+constexpr auto begin_or_end(Range && range) BOUNDED_NOEXCEPT_VALUE( \
+	std::move(range).begin_or_end() \
 ) \
 \
 template<typename Container, BOUNDED_REQUIRES( \
@@ -75,12 +75,12 @@ CONTAINERS_DETAIL_BEGIN_END_OVERLOADS(begin)
 CONTAINERS_DETAIL_BEGIN_END_OVERLOADS(end)
 
 
-template<typename Iterable>
-constexpr auto cbegin(Iterable const & container) BOUNDED_NOEXCEPT_VALUE(
+template<typename Range>
+constexpr auto cbegin(Range const & container) BOUNDED_NOEXCEPT_VALUE(
 	begin(container)
 )
-template<typename Iterable>
-constexpr auto cend(Iterable const & container) BOUNDED_NOEXCEPT_VALUE(
+template<typename Range>
+constexpr auto cend(Range const & container) BOUNDED_NOEXCEPT_VALUE(
 	end(container)
 )
 

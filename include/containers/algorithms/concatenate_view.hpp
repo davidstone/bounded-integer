@@ -6,6 +6,7 @@
 #pragma once
 
 #include <containers/compare_adl.hpp>
+#include <containers/is_range.hpp>
 #include <containers/operator_arrow.hpp>
 #include <containers/range_view.hpp>
 
@@ -251,7 +252,7 @@ constexpr auto concatenate_view(LHS && lhs, RHS && rhs) BOUNDED_NOEXCEPT_VALUE(
 	)
 )
 
-template<typename LHS, typename RHS, typename... Remainder, BOUNDED_REQUIRES(is_iterable<LHS> and is_iterable<RHS> and (... and is_iterable<Remainder>))>
+template<typename LHS, typename RHS, typename... Remainder, BOUNDED_REQUIRES(is_range<LHS> and is_range<RHS> and (... and is_range<Remainder>))>
 constexpr auto concatenate_view(LHS && lhs, RHS && rhs, Remainder && ... remainder) {
 	return ::containers::concatenate_view(
 		::containers::concatenate_view(BOUNDED_FORWARD(lhs), BOUNDED_FORWARD(rhs)),

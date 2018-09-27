@@ -6,7 +6,7 @@
 #pragma once
 
 #include <containers/begin_end.hpp>
-#include <containers/is_iterable.hpp>
+#include <containers/is_range.hpp>
 #include <containers/is_iterator.hpp>
 #include <containers/size.hpp>
 
@@ -34,14 +34,14 @@ constexpr auto operator_bracket(Iterator && iterator, index_type<std::decay_t<It
 	*(BOUNDED_FORWARD(iterator) + index)
 )
 
-template<typename Iterable, BOUNDED_REQUIRES(is_iterable<Iterable>)>
-constexpr auto operator_bracket(Iterable && iterable, index_type<std::decay_t<Iterable>> const index) noexcept(
-	noexcept(index < size(iterable)) and
-	noexcept(*(begin(BOUNDED_FORWARD(iterable)) + index)) and
-	std::is_nothrow_move_constructible<decltype(*(begin(BOUNDED_FORWARD(iterable)) + index))>::value
-) -> decltype(*(begin(BOUNDED_FORWARD(iterable)) + index)) {
-	assert(index < size(iterable));
-	return *(begin(BOUNDED_FORWARD(iterable)) + index);
+template<typename Range, BOUNDED_REQUIRES(is_range<Range>)>
+constexpr auto operator_bracket(Range && range, index_type<std::decay_t<Range>> const index) noexcept(
+	noexcept(index < size(range)) and
+	noexcept(*(begin(BOUNDED_FORWARD(range)) + index)) and
+	std::is_nothrow_move_constructible<decltype(*(begin(BOUNDED_FORWARD(range)) + index))>::value
+) -> decltype(*(begin(BOUNDED_FORWARD(range)) + index)) {
+	assert(index < size(range));
+	return *(begin(BOUNDED_FORWARD(range)) + index);
 }
 
 

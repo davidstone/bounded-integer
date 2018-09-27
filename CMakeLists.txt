@@ -129,9 +129,9 @@ target_sources(containers INTERFACE
 	$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>/include/containers/insert_emplace_impl.hpp
 	$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>/include/containers/integer_range.hpp
 	$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>/include/containers/is_container.hpp
-	$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>/include/containers/is_iterable.hpp
 	$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>/include/containers/is_iterator.hpp
 	$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>/include/containers/is_iterator_sentinel.hpp
+	$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>/include/containers/is_range.hpp
 	$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>/include/containers/iterator_adapter.hpp
 	$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>/include/containers/legacy_iterator.hpp
 	$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>/include/containers/mutable_iterator.hpp
@@ -287,9 +287,9 @@ add_library(containers_test STATIC
 	source/containers/insert_emplace_impl.cpp
 	source/containers/integer_range.cpp
 	source/containers/is_container.cpp
-	source/containers/is_iterable.cpp
 	source/containers/is_iterator.cpp
 	source/containers/is_iterator_sentinel.cpp
+	source/containers/is_range.cpp
 	source/containers/iterator_adapter.cpp
 	source/containers/legacy_iterator.cpp
 	source/containers/mutable_iterator.cpp
