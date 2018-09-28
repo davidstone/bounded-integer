@@ -142,6 +142,12 @@ struct dynamic_array {
 	{
 	}
 	
+	template<typename Range, BOUNDED_REQUIRES(is_range<Range>)>
+	constexpr explicit dynamic_array(Range && range) BOUNDED_NOEXCEPT_INITIALIZATION(
+		dynamic_array(begin(BOUNDED_FORWARD(range)), end(BOUNDED_FORWARD(range)))
+	) {
+	}
+
 	constexpr dynamic_array(std::initializer_list<value_type> init):
 		dynamic_array(begin(init), end(init))
 	{

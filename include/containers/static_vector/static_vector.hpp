@@ -119,7 +119,14 @@ public:
 
 	constexpr static_vector(std::initializer_list<value_type> init) BOUNDED_NOEXCEPT_INITIALIZATION(
 		static_vector(begin(init), end(init))
-	) {}
+	) {
+	}
+	
+	template<typename Range, BOUNDED_REQUIRES(is_range<Range>)>
+	constexpr explicit static_vector(Range && range) BOUNDED_NOEXCEPT_INITIALIZATION(
+		static_vector(begin(BOUNDED_FORWARD(range)), end(BOUNDED_FORWARD(range)))
+	) {
+	}
 
 	constexpr auto & operator=(static_vector const & other) & noexcept(std::is_nothrow_copy_assignable_v<value_type>) {
 		assign(*this, begin(other), end(other));

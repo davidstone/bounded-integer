@@ -149,6 +149,13 @@ public:
 			end(container())
 		);
 	}
+
+	template<typename Range, BOUNDED_REQUIRES(is_range<Range>)>
+	constexpr explicit flat_map_base(Range && range) BOUNDED_NOEXCEPT_INITIALIZATION(
+		flat_map_base(begin(BOUNDED_FORWARD(range)), end(BOUNDED_FORWARD(range)))
+	) {
+	}
+
 	constexpr flat_map_base(std::initializer_list<value_type> init, key_compare_type compare = key_compare_type{}) BOUNDED_NOEXCEPT_INITIALIZATION(
 		flat_map_base(begin(init), end(init), std::move(compare))
 	) {
