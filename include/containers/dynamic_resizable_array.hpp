@@ -55,7 +55,10 @@ struct dynamic_resizable_array : private Container {
 		assign(*this, first, last);
 	}
 	
-	template<typename Range, BOUNDED_REQUIRES(is_range<Range>)>
+	template<typename Range, BOUNDED_REQUIRES(
+		is_range<Range> and
+		!std::is_array_v<std::remove_cv_t<std::remove_reference_t<Range>>>
+	)>
 	constexpr explicit dynamic_resizable_array(Range && range) BOUNDED_NOEXCEPT_INITIALIZATION(
 		dynamic_resizable_array(begin(BOUNDED_FORWARD(range)), end(BOUNDED_FORWARD(range)))
 	) {

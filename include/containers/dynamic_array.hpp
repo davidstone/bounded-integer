@@ -142,7 +142,10 @@ struct dynamic_array {
 	{
 	}
 	
-	template<typename Range, BOUNDED_REQUIRES(is_range<Range>)>
+	template<typename Range, BOUNDED_REQUIRES(
+		is_range<Range> and
+		!std::is_array_v<std::remove_cv_t<std::remove_reference_t<Range>>>
+	)>
 	constexpr explicit dynamic_array(Range && range) BOUNDED_NOEXCEPT_INITIALIZATION(
 		dynamic_array(begin(BOUNDED_FORWARD(range)), end(BOUNDED_FORWARD(range)))
 	) {
