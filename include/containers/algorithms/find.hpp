@@ -30,7 +30,7 @@ constexpr auto find_if(Range && range, UnaryPredicate p) BOUNDED_NOEXCEPT_VALUE(
 
 
 template<typename InputIterator, typename Sentinel, typename UnaryPredicate>
-constexpr auto find_if_not(InputIterator const first, Sentinel const last, UnaryPredicate p) BOUNDED_NOEXCEPT(
+constexpr auto find_if_not(InputIterator const first, Sentinel const last, UnaryPredicate p) BOUNDED_NOEXCEPT_VALUE(
 	::containers::find_if(first, last, ::containers::negate(std::move(p)))
 )
 
@@ -41,7 +41,7 @@ constexpr auto find_if_not(Range && range, UnaryPredicate p) BOUNDED_NOEXCEPT_VA
 
 
 template<typename InputIterator, typename Sentinel, typename T>
-constexpr auto find(InputIterator const first, Sentinel const last, T const & value) BOUNDED_NOEXCEPT(
+constexpr auto find(InputIterator const first, Sentinel const last, T const & value) BOUNDED_NOEXCEPT_VALUE(
 	::containers::find_if(first, last, bounded::equal_to(value))
 )
 
@@ -49,5 +49,38 @@ template<typename Range, typename T>
 constexpr auto find(Range && range, T const & value) BOUNDED_NOEXCEPT_VALUE(
 	::containers::find(begin(BOUNDED_FORWARD(range)), end(BOUNDED_FORWARD(range)), value)
 )
+
+namespace detail {
+
+template<typename InputIterator, typename Sentinel>
+constexpr auto find_pointer_if_helper(InputIterator const it, Sentinel const last) BOUNDED_NOEXCEPT_VALUE(
+	it != last ? std::addressof(*it) : nullptr
+)
+
+} // namespace detail
+
+// the find_pointer functions return a pointer to the found element if it
+// exists, otherwise it returns a nullptr.
+template<typename InputIterator, typename Sentinel, typename UnaryPredicate>
+constexpr auto find_pointer_if(InputIterator const first, Sentinel const last, UnaryPredicate p) BOUNDED_NOEXCEPT_VALUE(
+	::containers::detail::find_pointer_if_helper(::containers::find_if(first, last, std::move(p)), last)
+)
+
+template<typename Range, typename UnaryPredicate>
+constexpr auto find_pointer_if(Range && range, UnaryPredicate p) BOUNDED_NOEXCEPT_VALUE(
+	::containers::find_pointer_if(begin(BOUNDED_FORWARD(range)), end(BOUNDED_FORWARD(range)), std::move(p))
+)
+
+
+template<typename InputIterator, typename Sentinel, typename T>
+constexpr auto find_pointer(InputIterator const first, Sentinel const last, T const & value) BOUNDED_NOEXCEPT_VALUE(
+	::containers::find_pointer_if(first, last, bounded::equal_to(value))
+)
+
+template<typename Range, typename T>
+constexpr auto find_pointer(Range && range, T const & value) BOUNDED_NOEXCEPT_VALUE(
+	::containers::find_pointer(begin(BOUNDED_FORWARD(range)), end(BOUNDED_FORWARD(range)), value)
+)
+
 
 }	// namespace containers
