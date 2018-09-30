@@ -99,6 +99,7 @@ target_sources(containers INTERFACE
 	$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>/include/containers/algorithms/negate.hpp
 	$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>/include/containers/algorithms/remove.hpp
 	$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>/include/containers/algorithms/reverse_iterator.hpp
+	$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>/include/containers/algorithms/set.hpp
 	$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>/include/containers/algorithms/transform.hpp
 	$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>/include/containers/algorithms/transform_iterator.hpp
 	$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>/include/containers/algorithms/uninitialized.hpp
@@ -265,6 +266,7 @@ add_library(containers_test STATIC
 	source/containers/algorithms/negate.cpp
 	source/containers/algorithms/remove.cpp
 	source/containers/algorithms/reverse_iterator.cpp
+	source/containers/algorithms/set.cpp
 	source/containers/algorithms/transform.cpp
 	source/containers/algorithms/transform_iterator.cpp
 	source/containers/algorithms/uninitialized.cpp
