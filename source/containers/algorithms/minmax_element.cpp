@@ -6,7 +6,6 @@
 #include <containers/algorithms/minmax_element.hpp>
 
 #include <containers/array/array.hpp>
-#include <containers/range_view.hpp>
 
 namespace {
 using namespace bounded::literal;
