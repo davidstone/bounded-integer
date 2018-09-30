@@ -19,7 +19,7 @@ constexpr auto correct_min_max(Range const & range, MinIndex const min_index, Ma
 }
 
 constexpr auto zero = containers::array<int, 0>{};
-static_assert(correct_min_max(containers::range_view(data(zero), data(zero)), 0_bi, 0_bi));
+static_assert(correct_min_max(zero, 0_bi, 0_bi));
 
 
 constexpr auto one = containers::array{1};
