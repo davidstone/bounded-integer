@@ -48,6 +48,12 @@ constexpr auto lexicographical_compare_3way(InputIterator1 first1, Sentinel1 con
 		bounded::strong_ordering_equal;
 }
 
+template<typename Range1, typename Range2, typename BinaryPredicate, BOUNDED_REQUIRES(is_range<Range1> and is_range<Range2>)>
+constexpr auto lexicographical_compare_3way(Range1 const & range1, Range2 const & range2, BinaryPredicate cmp) BOUNDED_NOEXCEPT_VALUE(
+	::containers::lexicographical_compare_3way(begin(range1), end(range1), begin(range2), end(range2), std::move(cmp))
+)
+
+
 template<
 	typename InputIterator1, typename Sentinel1,
 	typename InputIterator2, typename Sentinel2,
@@ -55,6 +61,11 @@ template<
 >
 constexpr auto lexicographical_compare_3way(InputIterator1 const first1, Sentinel1 const last1, InputIterator2 const first2, Sentinel2 const last2) BOUNDED_NOEXCEPT(
 	::containers::lexicographical_compare_3way(first1, last1, first2, last2, detail::compare_to)
+)
+
+template<typename Range1, typename Range2, BOUNDED_REQUIRES(is_range<Range1> and is_range<Range2>)>
+constexpr auto lexicographical_compare_3way(Range1 const & range1, Range2 const & range2) BOUNDED_NOEXCEPT_VALUE(
+	::containers::lexicographical_compare_3way(begin(range1), end(range1), begin(range2), end(range2))
 )
 
 
@@ -110,6 +121,11 @@ constexpr auto equal(InputIterator1 first1, Sentinel1 const last1, InputIterator
 	return first1 == last1 and first2 == last2;
 }
 
+template<typename Range1, typename Range2, typename BinaryPredicate, BOUNDED_REQUIRES(is_range<Range1> and is_range<Range2>)>
+constexpr auto equal(Range1 const & range1, Range2 const & range2, BinaryPredicate cmp) BOUNDED_NOEXCEPT_VALUE(
+	::containers::equal(begin(range1), end(range1), begin(range2), end(range2), std::move(cmp))
+)
+
 
 template<
 	typename InputIterator1, typename Sentinel1,
@@ -118,6 +134,11 @@ template<
 >
 constexpr auto equal(InputIterator1 const first1, Sentinel1 const last1, InputIterator2 const first2, Sentinel2 const last2) BOUNDED_NOEXCEPT(
 	::containers::equal(first1, last1, first2, last2, bounded::equal_to())
+)
+
+template<typename Range1, typename Range2, BOUNDED_REQUIRES(is_range<Range1> and is_range<Range2>)>
+constexpr auto equal(Range1 const & range1, Range2 const & range2) BOUNDED_NOEXCEPT_VALUE(
+	::containers::equal(begin(range1), end(range1), begin(range2), end(range2))
 )
 
 
