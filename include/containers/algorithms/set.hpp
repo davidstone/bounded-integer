@@ -18,6 +18,21 @@
 namespace containers {
 namespace detail {
 
+constexpr auto less_to_compare = [](auto const & cmp) {
+	return [&](auto const & lhs, auto const & rhs) {
+		using result_t = decltype(cmp(lhs, rhs));
+		if constexpr (std::is_convertible_v<result_t, bounded::strong_ordering>) {
+			return cmp(lhs, rhs);
+		} else {
+			static_assert(std::is_constructible_v<bool, result_t>);
+			return
+				cmp(lhs, rhs) ? bounded::strong_ordering_less :
+				cmp(rhs, lhs) ? bounded::strong_ordering_greater :
+				bounded::strong_ordering_equal;
+		}
+	};
+};
+
 template<typename Range, typename ForwardIterator1, typename ForwardIterator2>
 struct set_intersection_pair_iterator {
 private:
@@ -104,7 +119,6 @@ constexpr auto operator==(
 
 // set_intersection_pair is like set_intersection, but it returns both iterators
 // TODO: find a better name for this
-// TODO: This would benefit from a real compare function instead of less than
 template<typename Range1, typename Range2, typename Compare>
 struct set_intersection_pair {
 	using iterator = detail::set_intersection_pair_iterator<
@@ -168,12 +182,13 @@ private:
 	static constexpr auto find_first_matching(Self & range, Iterator1 it1, Iterator2 it2) {
 		auto const last1 = end(range.m_range1);
 		auto const last2 = end(range.m_range2);
-		auto const & comp = range.m_compare;
+		auto const comp = detail::less_to_compare(range.m_compare);
 		
 		while (it1 != last1 and it2 != last2) {
-			if (comp(*it1, *it2)) {
+			auto const cmp = comp(*it1, *it2);
+			if (cmp < 0) {
 				++it1;
-			} else if (comp(*it2, *it1)) {
+			} else if (cmp > 0) {
 				++it2;
 			} else {
 				return detail::set_intersection_pair_iterator(range, it1, it2);
@@ -191,6 +206,6 @@ template<typename Range1, typename Range2, typename Compare>
 set_intersection_pair(Range1 &&, Range2 &&, Compare) -> set_intersection_pair<Range1, Range2, Compare>;
 
 template<typename Range1, typename Range2>
-set_intersection_pair(Range1 &&, Range2 &&) -> set_intersection_pair<Range1, Range2, bounded::detail::less_t>;
+set_intersection_pair(Range1 &&, Range2 &&) -> set_intersection_pair<Range1, Range2, bounded::detail::compare_to_t>;
 
 }	// namespace containers
