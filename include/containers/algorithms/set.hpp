@@ -60,9 +60,6 @@ public:
 	{
 	}
 
-	constexpr auto & range() const {
-		return m_range.get();
-	}
 	constexpr auto first() const {
 		return m_it1;
 	}
@@ -70,6 +67,10 @@ public:
 		return m_it2;
 	}
 	
+	constexpr auto operator+(bounded::constant_t<1>) const {
+		return Range::find_first_matching(m_range.get(), containers::next(m_it1), containers::next(m_it2));
+	}
+
 private:
 	reference_wrapper<Range> m_range;	
 	ForwardIterator1 m_it1;
@@ -79,14 +80,6 @@ private:
 template<typename Range, typename ForwardIterator1, typename ForwardIterator2>
 constexpr auto operator*(set_intersection_pair_iterator<Range, ForwardIterator1, ForwardIterator2> const it) {
 	return typename set_intersection_pair_iterator<Range, ForwardIterator1, ForwardIterator2>::value_type(*it.first(), *it.second());
-}
-
-template<typename Range, typename ForwardIterator1, typename ForwardIterator2>
-constexpr auto operator+(
-	set_intersection_pair_iterator<Range, ForwardIterator1, ForwardIterator2> const lhs,
-	bounded::constant_t<1>
-) -> set_intersection_pair_iterator<Range, ForwardIterator1, ForwardIterator2> {
-	return Range::find_first_matching(lhs.range(), containers::next(lhs.first()), containers::next(lhs.second()));
 }
 
 // These functions can compare only one pair of iterators because it is not
@@ -167,16 +160,8 @@ struct set_intersection_pair {
 	}
 
 private:
-	friend constexpr iterator detail::operator+<
-		set_intersection_pair<Range1, Range2, Compare>,
-		decltype(begin(std::declval<Range1 &>())),
-		decltype(begin(std::declval<Range2 &>()))
-	>(	iterator const lhs, bounded::constant_t<1>);
-	friend constexpr const_iterator detail::operator+<
-		set_intersection_pair<Range1, Range2, Compare> const,
-		decltype(begin(std::declval<Range1 const &>())),
-		decltype(begin(std::declval<Range2 const &>()))
-	>(const_iterator const lhs, bounded::constant_t<1>);
+	friend iterator;
+	friend const_iterator;
 
 	template<typename Self, typename Iterator1, typename Iterator2>
 	static constexpr auto find_first_matching(Self & range, Iterator1 it1, Iterator2 it2) {
