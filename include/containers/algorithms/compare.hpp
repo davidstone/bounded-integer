@@ -16,14 +16,6 @@
 // TODO: All of this can be optimized more
 
 namespace containers {
-namespace detail {
-
-using bounded::compare;
-constexpr auto compare_to = [](auto const & lhs, auto const & rhs) BOUNDED_NOEXCEPT_VALUE(
-	compare(lhs, rhs)
-);
-
-}	// namespace detail
 
 template<
 	typename InputIterator1, typename Sentinel1,
@@ -60,7 +52,7 @@ template<
 	BOUNDED_REQUIRES(is_iterator_sentinel<InputIterator1, Sentinel1> and is_iterator_sentinel<InputIterator2, Sentinel2>)
 >
 constexpr auto lexicographical_compare_3way(InputIterator1 const first1, Sentinel1 const last1, InputIterator2 const first2, Sentinel2 const last2) BOUNDED_NOEXCEPT(
-	::containers::lexicographical_compare_3way(first1, last1, first2, last2, detail::compare_to)
+	::containers::lexicographical_compare_3way(first1, last1, first2, last2, bounded::compare_3way())
 )
 
 template<typename Range1, typename Range2, BOUNDED_REQUIRES(is_range<Range1> and is_range<Range2>)>
@@ -95,7 +87,7 @@ template<
 	BOUNDED_REQUIRES(is_iterator_sentinel<InputIterator1, Sentinel1> and is_iterator<InputIterator2>)
 >
 constexpr auto lexicographical_compare_3way(InputIterator1 const first1, Sentinel1 const last1, InputIterator2 const first2) BOUNDED_NOEXCEPT(
-	::containers::lexicographical_compare_3way(first1, last1, first2, detail::compare_to)
+	::containers::lexicographical_compare_3way(first1, last1, first2, bounded::compare_3way())
 )
 
 

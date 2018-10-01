@@ -14,6 +14,13 @@
 namespace bounded {
 namespace detail {
 
+struct compare_to_t {
+	template<typename LHS, typename RHS>
+	constexpr auto operator()(LHS const & lhs, RHS const & rhs) const BOUNDED_NOEXCEPT(
+		compare(lhs, rhs)
+	)
+};
+
 struct binary_equal_to {
 	template<typename LHS, typename RHS>
 	constexpr auto operator()(LHS const & lhs, RHS const & rhs) const BOUNDED_NOEXCEPT(
@@ -52,6 +59,10 @@ struct greater_t {
 };
 
 }	// namespace detail
+
+constexpr auto compare_3way() noexcept {
+	return detail::compare_to_t{};
+}
 
 constexpr auto equal_to() noexcept {
 	return detail::binary_equal_to{};
