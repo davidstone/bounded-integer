@@ -166,19 +166,6 @@ target_include_directories(containers INTERFACE
 	$<INSTALL_INTERFACE:include>
 )
 
-if("${CMAKE_CXX_COMPILER_ID}" STREQUAL "MSVC")
-	set(BOUNDED_CXX_STD "/std:c++17")
-else()
-	set(BOUNDED_CXX_STD "-std=c++2a")
-endif()
-
-target_compile_options(bounded INTERFACE
-	${BOUNDED_CXX_STD}
-)
-target_compile_options(containers INTERFACE
-	${BOUNDED_CXX_STD}
-)
-
 target_link_libraries(containers INTERFACE
 	bounded
 )
@@ -354,20 +341,20 @@ add_executable(variant
 target_link_libraries(variant bounded)
 
 function(set_sanitizers target)
-	foreach(SANITIZER -fsanitize=undefined -fsanitize=address)
-		target_compile_options(${target} PRIVATE
-			$<$<CONFIG:Debug>:${SANITIZER}>
-		)
-		target_link_libraries(${target}
-			$<$<CONFIG:Debug>:${SANITIZER}>
-		)
-	endforeach()
+	if(USE_SANITIZERS)
+		foreach(SANITIZER -fsanitize=undefined -fsanitize=address)
+			target_compile_options(${target} PUBLIC ${SANITIZER})
+			target_link_libraries(${target} ${SANITIZER})
+		endforeach()
+	endif()
 endfunction()
+
 
 if("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang")
 	set(COMPILE_OPTIONS
-		$<$<CONFIG:Debug>:-O1;-march=native>
-		$<$<CONFIG:Release>:-march=native>
+		"-g"
+		"-std=c++2a"
+		"-march=native"
 		"-Weverything"
 		"-Werror"
 		"-Wno-c++98-compat"
@@ -416,8 +403,9 @@ if("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang")
 
 elseif("${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU")
 	set(COMPILE_OPTIONS
-		$<$<CONFIG:Debug>:-Og;-march=native>
-		$<$<CONFIG:Release>:-O3;-march=native>
+		"-g"
+		"-std=c++2a"
+		"-march=native"
 		"-Wall"
 		"-Wextra"
 		"-Wpedantic"
