@@ -48,6 +48,13 @@ struct non_copyable {
 	constexpr non_copyable & operator=(non_copyable &&) = default;
 };
 
+struct destructor_checker {
+	static inline auto destructed = 0U;
+	~destructor_checker() {
+		++destructed;
+	}
+};
+
 }	// namespace
 
 int main() {
@@ -67,4 +74,10 @@ int main() {
 	static_assert(std::is_move_constructible<non_copyable_variant_t>{});
 	static_assert(std::is_move_assignable<non_copyable_variant_t>{});
 	static_assert(std::is_same<decltype(std::move(non_copyable_variant)[0_bi]), non_copyable &&>{});
+	{
+		static_assert(!std::is_trivially_destructible_v<destructor_checker>);
+		static_assert(!std::is_trivially_destructible_v<bounded::variant<destructor_checker>>);
+		auto v = bounded::variant<destructor_checker>(0_bi);
+	}
+	assert(destructor_checker::destructed == 1U);
 }

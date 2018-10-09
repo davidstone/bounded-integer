@@ -5,12 +5,12 @@
 
 #pragma once
 
+#include <bounded/detail/construct_destroy.hpp>
+#include <bounded/detail/forward.hpp>
 #include <bounded/detail/tuple.hpp>
 #include <bounded/detail/type.hpp>
 #include <bounded/detail/variant/base.hpp>
 #include <bounded/detail/variant/visit.hpp>
-
-#include <bounded/detail/forward.hpp>
 
 #include <cassert>
 #include <type_traits>
@@ -24,6 +24,33 @@ namespace detail {
 // use the CRTP pattern to define them in these classes.
 
 
+template<bool generate_destructor, typename... Ts>
+struct variant_destructor_impl;
+
+template<typename... Ts>
+using variant_destructor = variant_destructor_impl<
+	not (... and std::is_trivially_destructible_v<Ts>),
+	Ts...
+>;
+
+template<typename... Ts>
+struct variant_destructor_impl<false, Ts...> : basic_variant_base<Ts...>
+{
+	using basic_variant_base<Ts...>::basic_variant_base;
+};
+
+
+template<typename... Ts>
+struct variant_destructor_impl<true, Ts...> : basic_variant_base<Ts...>
+{
+	using basic_variant_base<Ts...>::basic_variant_base;
+	~variant_destructor_impl() {
+		visit(*this, destroy);
+	}
+};
+
+
+
 template<bool generate_constructor, template<typename> typename AddReference, typename Base, typename... Ts>
 struct variant_copy_move_constructor_impl;
 
@@ -31,7 +58,7 @@ struct variant_copy_move_constructor_impl;
 // they get a compiler generated constructor that does the right thing
 template<template<typename> typename AddReference, typename Base, typename... Ts>
 using variant_copy_move_constructor = variant_copy_move_constructor_impl<
-	(... and std::is_constructible<Ts, AddReference<Ts>>{}) and not (... and std::is_trivially_constructible<Ts, AddReference<Ts>>{}),
+	(... and std::is_constructible_v<Ts, AddReference<Ts>>) and not (... and std::is_trivially_constructible_v<Ts, AddReference<Ts>>),
 	AddReference,
 	Base,
 	Ts...
@@ -74,7 +101,7 @@ struct variant_copy_move_constructor_impl<true, AddReference, Base, Ts...> : Bas
 template<typename GetFunction, typename... Ts>
 using variant_move_constructor = variant_copy_move_constructor<
 	std::add_rvalue_reference_t,
-	basic_variant_base<GetFunction, Ts...>,
+	variant_destructor<GetFunction, Ts...>,
 	Ts...
 >;
 
@@ -95,7 +122,7 @@ struct variant_copy_move_assignment_impl;
 
 template<template<typename> typename AddReference, typename Base, typename... Ts>
 using variant_copy_move_assignment = variant_copy_move_assignment_impl<
-	(... and std::is_assignable<Ts, AddReference<Ts>>{}) and not (... and std::is_trivially_assignable<Ts, AddReference<Ts>>{}),
+	(... and std::is_assignable_v<Ts, AddReference<Ts>>) and not (... and std::is_trivially_assignable_v<Ts, AddReference<Ts>>),
 	AddReference,
 	Base,
 	Ts...
