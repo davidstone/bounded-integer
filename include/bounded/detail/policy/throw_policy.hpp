@@ -9,6 +9,7 @@
 #include <bounded/detail/basic_numeric_limits.hpp>
 #include <bounded/detail/class.hpp>
 #include <bounded/detail/comparison.hpp>
+#include <bounded/detail/comparison_mixed.hpp>
 #include <bounded/detail/is_bounded_integer.hpp>
 #include <bounded/detail/minmax.hpp>
 #include <bounded/detail/noexcept.hpp>
