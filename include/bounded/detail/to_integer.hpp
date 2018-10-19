@@ -19,7 +19,7 @@ namespace bounded {
 namespace detail {
 
 template<auto maximum>
-constexpr auto to_integer_impl(std::string_view str) {
+constexpr auto to_integer_positive_impl(std::string_view str) {
 	using policy = throw_policy<std::invalid_argument>;
 	auto positive_result = integer<0, maximum, policy>(constant<0>);
 	for (auto const c : str) {
@@ -30,11 +30,8 @@ constexpr auto to_integer_impl(std::string_view str) {
 	return positive_result;
 }
 
-} // namespace detail
-
-// TODO: Support things other than throwing an exception?
 template<auto minimum, auto maximum>
-constexpr auto to_integer(std::string_view str) {
+constexpr auto to_integer_impl(std::string_view str) {
 	if (str.empty()) {
 		throw std::invalid_argument("Cannot convert empty string to integer");
 	}
@@ -52,11 +49,25 @@ constexpr auto to_integer(std::string_view str) {
 			}
 			negative = true;
 		}
-		auto const positive_result = bounded::detail::to_integer_impl<combined_max>(str);
+		auto const positive_result = bounded::detail::to_integer_positive_impl<combined_max>(str);
 		return integer<minimum, maximum, policy>(BOUNDED_CONDITIONAL(negative, -positive_result, positive_result));
 	} else {
-		return integer<minimum, maximum, policy>(bounded::detail::to_integer_impl<maximum>(str));
+		return integer<minimum, maximum, policy>(bounded::detail::to_integer_positive_impl<maximum>(str));
 	}
+}
+
+} // namespace detail
+
+// TODO: Support things other than throwing an exception?
+template<auto minimum, auto maximum>
+constexpr auto to_integer(std::string_view str) {
+	return integer(detail::to_integer_impl<minimum, maximum>(str), bounded::null_policy{});
+}
+
+// This overload does not currently use the overflow policy of the Integer.
+template<typename Integer>
+constexpr auto to_integer(std::string_view const str) {
+	return static_cast<Integer>(to_integer<Integer::min().value(), Integer::max().value()>(str));
 }
 
 } // namespace bounded

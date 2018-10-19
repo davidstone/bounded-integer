@@ -6,6 +6,8 @@
 #include <bounded/detail/to_integer.hpp>
 #include <bounded/detail/literal.hpp>
 
+#include "../homogeneous_equals.hpp"
+
 #include <cstdint>
 
 namespace {
@@ -30,5 +32,10 @@ static_assert(
 		static_cast<std::uint64_t>(std::numeric_limits<std::uint32_t>::max()) + 1
 	>("-2147483648") == -2147483648_bi
 );
+
+static_assert(homogeneous_equals(
+	bounded::to_integer<156, 325>("256"),
+	bounded::to_integer<bounded::integer<156, 325>>("256")
+));
 
 } // namespace
