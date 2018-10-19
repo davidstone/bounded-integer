@@ -28,7 +28,5 @@ auto to_wstring(Integer const & x) {
 	return to_wstring(+x.value());
 }
 
-// TODO: template<typename T> T from_string(std::string const & str);
-
 }	// namespace bounded
 

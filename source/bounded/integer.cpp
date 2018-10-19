@@ -1,4 +1,4 @@
-// Copyright David Stone 2017.
+// Copyright David Stone 2018.
 // Distributed under the Boost Software License, Version 1.0.
 // (See accompanying file LICENSE_1_0.txt or copy at
 // http://www.boost.org/LICENSE_1_0.txt)
@@ -7,6 +7,7 @@
 
 #include <bounded/integer.hpp>
 #include <bounded/optional.hpp>
+#include <bounded/detail/to_integer.hpp>
 
 #include "homogeneous_equals.hpp"
 #include "string_view.hpp"
@@ -302,6 +303,34 @@ auto check_hash() {
 	assert(map.at(bounded::constant<3>) == bounded::constant<5>);
 }
 
+auto check_to_integer() {
+	try {
+		bounded::to_integer<0, 0>("");
+		assert(false);
+	} catch (std::invalid_argument const &) {
+	}
+	try {
+		bounded::to_integer<-1, 1>("-");
+		assert(false);
+	} catch (std::invalid_argument const &) {
+	}
+	try {
+		bounded::to_integer<0, 0>("1");
+		assert(false);
+	} catch (std::invalid_argument const &) {
+	}
+	try {
+		bounded::to_integer<0, 100>("101");
+		assert(false);
+	} catch (std::invalid_argument const &) {
+	}
+	try {
+		bounded::to_integer<0, 100>("-90");
+		assert(false);
+	} catch (std::invalid_argument const &) {
+	}
+}
+
 }	// namespace
 
 auto main() -> int {
@@ -311,4 +340,5 @@ auto main() -> int {
 	check_streaming();
 	check_volatile();
 	check_hash();
+	check_to_integer();
 }

@@ -224,6 +224,7 @@ add_executable(bounded_test
 	source/bounded/detail/stream.cpp
 	source/bounded/detail/string.cpp
 	source/bounded/detail/strong_ordering.cpp
+	source/bounded/detail/to_integer.cpp
 	source/bounded/detail/tuple.cpp
 	source/bounded/detail/type.cpp
 	source/bounded/detail/typedefs.cpp
