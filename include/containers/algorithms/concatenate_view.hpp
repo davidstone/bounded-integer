@@ -5,10 +5,10 @@
 
 #pragma once
 
+#include <containers/algorithms/move_iterator.hpp>
 #include <containers/compare_adl.hpp>
 #include <containers/is_range.hpp>
 #include <containers/operator_arrow.hpp>
-#include <containers/range_view.hpp>
 
 #include <bounded/detail/tuple.hpp>
 #include <bounded/integer.hpp>
@@ -75,7 +75,7 @@ public:
 		std::random_access_iterator_tag
 	>>>>;
 	
-	using pointer = value_type *;
+	using pointer = std::remove_reference_t<value_type> *;
 
 	using reference = bounded::detail::common_type_and_value_category_t<
 		typename traits1::reference,
@@ -239,17 +239,68 @@ constexpr auto operator==(
 	rhs == lhs
 )
 
+namespace detail {
+
+template<typename LHS, typename RHS>
+struct concatenate_view_t {
+	using const_iterator = concatenate_view_iterator<
+		decltype(begin(std::declval<LHS const &>())),
+		decltype(end(std::declval<LHS const &>())),
+		decltype(begin(std::declval<RHS const &>()))
+	>;
+	using iterator = concatenate_view_iterator<
+		decltype(begin(std::declval<LHS &>())),
+		decltype(end(std::declval<LHS &>())),
+		decltype(begin(std::declval<RHS &>()))
+	>;
+	using value_type = typename iterator::value_type;
+	using size_type = bounded::integer<
+		0,
+		bounded::detail::normalize<std::numeric_limits<typename iterator::difference_type>::max().value()>
+	>;
+	
+	constexpr concatenate_view_t(LHS && lhs_, RHS && rhs_) noexcept(std::is_nothrow_constructible_v<LHS, LHS &&> and std::is_nothrow_constructible_v<RHS, RHS &&>):
+		lhs(BOUNDED_FORWARD(lhs_)),
+		rhs(BOUNDED_FORWARD(rhs_))
+	{
+	}
+	
+	friend constexpr auto begin(concatenate_view_t & range) {
+		return iterator(begin(range.lhs), end(range.lhs), begin(range.rhs));
+	}
+	friend constexpr auto begin(concatenate_view_t const & range) {
+		return const_iterator(begin(range.lhs), end(range.lhs), begin(range.rhs));
+	}
+	friend constexpr auto end(concatenate_view_t & range) {
+		return concatenate_view_sentinel(end(range.rhs));
+	}
+	friend constexpr auto end(concatenate_view_t const & range) {
+		return concatenate_view_sentinel(end(range.rhs));
+	}
+
+private:
+	LHS lhs;
+	RHS rhs;
+};
+
+
+#if 0
+// TODO: Figure out why this crashes clang
+template<typename LHS, typename RHS, BOUNDED_REQUIRES(
+	!std::is_reference_v<LHS> and
+	!std::is_reference_v<RHS> and
+	std::is_reference_v<decltype(*begin(std::declval<concatenate_view_t<LHS, RHS>>()))>
+)>
+constexpr auto begin(concatenate_view_t<LHS, RHS> && range) {
+	return ::containers::move_iterator(begin(range));
+}
+#endif
+
+} // namespace detail
 
 template<typename LHS, typename RHS>
 constexpr auto concatenate_view(LHS && lhs, RHS && rhs) BOUNDED_NOEXCEPT_VALUE(
-	range_view(
-		concatenate_view_iterator(
-			begin(BOUNDED_FORWARD(lhs)),
-			end(BOUNDED_FORWARD(lhs)),
-			begin(BOUNDED_FORWARD(rhs))
-		),
-		concatenate_view_sentinel(end(BOUNDED_FORWARD(rhs)))
-	)
+	detail::concatenate_view_t<LHS, RHS>(BOUNDED_FORWARD(lhs), BOUNDED_FORWARD(rhs))
 )
 
 template<typename LHS, typename RHS, typename... Remainder, BOUNDED_REQUIRES(is_range<LHS> and is_range<RHS> and (... and is_range<Remainder>))>

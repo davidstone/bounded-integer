@@ -35,4 +35,7 @@ static_assert(equal_values_and_types(
 
 static_assert(*(begin(three) + bounded::constant<7>) == 3);
 
+constexpr auto from_temp = containers::concatenate_view(containers::array{1}, containers::array{2});
+static_assert(equal_values_and_types(from_temp, containers::array{1, 2}));
+
 } // namespace
