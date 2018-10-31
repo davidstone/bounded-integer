@@ -34,16 +34,16 @@ constexpr auto all(Args... args) noexcept {
 constexpr struct not_piecewise_construct_t{} not_piecewise_construct{};
 
 template<typename T>
-constexpr auto is_derivable = std::is_class_v<T> and !std::is_final_v<T>;
+constexpr auto should_derive = std::is_class_v<T> and !std::is_final_v<T> and std::is_empty_v<T>;
 
 // unique ensures that a tuple with the same type repeated shows the type as
 // being different
 // Ts... ensures that tuple<T, tuple<T>> does not create an ambiguous base
-template<bool derivable, std::size_t unique, typename T, typename... Ts>
-struct tuple_value;
+template<bool derive, std::size_t unique, typename T, typename... Ts>
+struct tuple_value_impl;
 
 template<std::size_t unique, typename T, typename... Ts>
-using tuple_value_t = tuple_value<is_derivable<T>, unique, T, Ts...>;
+using tuple_value = tuple_value_impl<should_derive<T>, unique, T, Ts...>;
 
 
 template<std::size_t index, typename T, typename... Ts>
@@ -62,24 +62,24 @@ template<typename Indexes, typename... Types>
 struct tuple_impl;
 
 template<std::size_t... indexes, typename... Types>
-struct tuple_impl<std::index_sequence<indexes...>, Types...> : tuple_value_t<indexes, Types, Types...>... {
+struct tuple_impl<std::index_sequence<indexes...>, Types...> : tuple_value<indexes, Types, Types...>... {
 
 	tuple_impl() = default;
 	
 	template<typename... Args, BOUNDED_REQUIRES(
 		detail::all(std::is_convertible_v<Args, Types>...) and
-		detail::all(std::is_constructible_v<tuple_value_t<indexes, Types, Types...>, not_piecewise_construct_t, Args>...)
+		detail::all(std::is_constructible_v<tuple_value<indexes, Types, Types...>, not_piecewise_construct_t, Args>...)
 	)>
-	constexpr tuple_impl(Args && ... args) noexcept((... and noexcept(tuple_value_t<indexes, Types, Types...>(not_piecewise_construct, BOUNDED_FORWARD(args))))):
-		tuple_value_t<indexes, Types, Types...>(not_piecewise_construct, BOUNDED_FORWARD(args))...
+	constexpr tuple_impl(Args && ... args) noexcept((... and noexcept(tuple_value<indexes, Types, Types...>(not_piecewise_construct, BOUNDED_FORWARD(args))))):
+		tuple_value<indexes, Types, Types...>(not_piecewise_construct, BOUNDED_FORWARD(args))...
 	{
 	}
 
 	template<typename... Args, BOUNDED_REQUIRES(
-		(... and std::is_constructible<tuple_value_t<indexes, Types, Types...>, std::piecewise_construct_t, Args>::value)
+		(... and std::is_constructible<tuple_value<indexes, Types, Types...>, std::piecewise_construct_t, Args>::value)
 	)>
 	constexpr tuple_impl(std::piecewise_construct_t, Args && ... args) noexcept(false):
-		tuple_value_t<indexes, Types, Types...>(std::piecewise_construct, BOUNDED_FORWARD(args))...
+		tuple_value<indexes, Types, Types...>(std::piecewise_construct, BOUNDED_FORWARD(args))...
 	{
 	}
 };
@@ -101,17 +101,17 @@ struct tuple : private detail::tuple_impl_t<Types...> {
 	template<typename Index, BOUNDED_REQUIRES(is_bounded_integer<Index> and Index{} < constant<sizeof...(Types)>)>
 	constexpr auto && operator[](Index const index_constant) const & noexcept {
 		constexpr auto index_ = static_cast<std::size_t>(index_constant);
-		return static_cast<detail::tuple_value_t<index_, detail::nth_type<index_, Types...>, Types...> const &>(*this).value();
+		return static_cast<detail::tuple_value<index_, detail::nth_type<index_, Types...>, Types...> const &>(*this).value();
 	}
 	template<typename Index, BOUNDED_REQUIRES(is_bounded_integer<Index> and Index{} < constant<sizeof...(Types)>)>
 	constexpr auto && operator[](Index const index_constant) & noexcept {
 		constexpr auto index_ = static_cast<std::size_t>(index_constant);
-		return static_cast<detail::tuple_value_t<index_, detail::nth_type<index_, Types...>, Types...> &>(*this).value();
+		return static_cast<detail::tuple_value<index_, detail::nth_type<index_, Types...>, Types...> &>(*this).value();
 	}
 	template<typename Index, BOUNDED_REQUIRES(is_bounded_integer<Index> and Index{} < constant<sizeof...(Types)>)>
 	constexpr auto && operator[](Index const index_constant) && noexcept {
 		constexpr auto index_ = static_cast<std::size_t>(index_constant);
-		return static_cast<detail::tuple_value_t<index_, detail::nth_type<index_, Types...>, Types...> &&>(*this).value();
+		return static_cast<detail::tuple_value<index_, detail::nth_type<index_, Types...>, Types...> &&>(*this).value();
 	}
 
 protected:
@@ -143,17 +143,17 @@ namespace detail {
 
 
 template<std::size_t unique, typename T, typename... Ts>
-struct tuple_value<true, unique, T, Ts...> : private T {
-	tuple_value() = default;
+struct tuple_value_impl<true, unique, T, Ts...> : private T {
+	tuple_value_impl() = default;
 	
 	template<typename... Args, BOUNDED_REQUIRES(std::is_constructible_v<T, Args...>)>
-	constexpr explicit tuple_value(std::piecewise_construct_t, tuple<Args...> args) BOUNDED_NOEXCEPT_INITIALIZATION(
-		tuple_value(make_index_sequence(constant<sizeof...(Args)>), std::move(args))
+	constexpr explicit tuple_value_impl(std::piecewise_construct_t, tuple<Args...> args) BOUNDED_NOEXCEPT_INITIALIZATION(
+		tuple_value_impl(make_index_sequence(constant<sizeof...(Args)>), std::move(args))
 	) {
 	}
 
 	template<typename... Args, BOUNDED_REQUIRES(std::is_constructible_v<T, Args...>)>
-	constexpr explicit tuple_value(not_piecewise_construct_t, Args && ... args) BOUNDED_NOEXCEPT_INITIALIZATION(
+	constexpr explicit tuple_value_impl(not_piecewise_construct_t, Args && ... args) BOUNDED_NOEXCEPT_INITIALIZATION(
 		T(BOUNDED_FORWARD(args)...)
 	) {
 	}
@@ -170,7 +170,7 @@ struct tuple_value<true, unique, T, Ts...> : private T {
 
 private:
 	template<std::size_t... indexes, typename... Args>
-	constexpr explicit tuple_value(std::index_sequence<indexes...>, tuple<Args...> args) BOUNDED_NOEXCEPT_INITIALIZATION(
+	constexpr explicit tuple_value_impl(std::index_sequence<indexes...>, tuple<Args...> args) BOUNDED_NOEXCEPT_INITIALIZATION(
 		T(args[constant<indexes>]...)
 	) {
 	}
@@ -178,17 +178,17 @@ private:
 
 // Work around https://bugs.llvm.org/show_bug.cgi?id=32385
 template<std::size_t unique, typename T, typename... Ts>
-struct tuple_value<true, unique, T const, Ts...> : private T {
-	tuple_value() = default;
+struct tuple_value_impl<true, unique, T const, Ts...> : private T {
+	tuple_value_impl() = default;
 	
 	template<typename... Args, BOUNDED_REQUIRES(std::is_constructible_v<T, Args...>)>
-	constexpr explicit tuple_value(std::piecewise_construct_t, tuple<Args...> args) BOUNDED_NOEXCEPT_INITIALIZATION(
-		tuple_value(make_index_sequence(constant<sizeof...(Args)>), std::move(args))
+	constexpr explicit tuple_value_impl(std::piecewise_construct_t, tuple<Args...> args) BOUNDED_NOEXCEPT_INITIALIZATION(
+		tuple_value_impl(make_index_sequence(constant<sizeof...(Args)>), std::move(args))
 	) {
 	}
 
 	template<typename... Args, BOUNDED_REQUIRES(std::is_constructible_v<T, Args...>)>
-	constexpr explicit tuple_value(not_piecewise_construct_t, Args && ... args) BOUNDED_NOEXCEPT_INITIALIZATION(
+	constexpr explicit tuple_value_impl(not_piecewise_construct_t, Args && ... args) BOUNDED_NOEXCEPT_INITIALIZATION(
 		T(BOUNDED_FORWARD(args)...)
 	) {
 	}
@@ -199,24 +199,24 @@ struct tuple_value<true, unique, T const, Ts...> : private T {
 
 private:
 	template<std::size_t... indexes, typename... Args>
-	constexpr explicit tuple_value(std::index_sequence<indexes...>, tuple<Args...> args) BOUNDED_NOEXCEPT_INITIALIZATION(
+	constexpr explicit tuple_value_impl(std::index_sequence<indexes...>, tuple<Args...> args) BOUNDED_NOEXCEPT_INITIALIZATION(
 		T(args[constant<indexes>]...)
 	) {
 	}
 };
 
 template<std::size_t unique, typename T, typename... Ts>
-struct tuple_value<false, unique, T, Ts...> {
-	tuple_value() = default;
+struct tuple_value_impl<false, unique, T, Ts...> {
+	tuple_value_impl() = default;
 	
 	template<typename... Args, BOUNDED_REQUIRES(std::is_constructible_v<T, Args...>)>
-	constexpr explicit tuple_value(std::piecewise_construct_t, tuple<Args...> args) BOUNDED_NOEXCEPT_INITIALIZATION(
-		tuple_value(make_index_sequence(constant<sizeof...(Args)>), std::move(args))
+	constexpr explicit tuple_value_impl(std::piecewise_construct_t, tuple<Args...> args) BOUNDED_NOEXCEPT_INITIALIZATION(
+		tuple_value_impl(make_index_sequence(constant<sizeof...(Args)>), std::move(args))
 	) {
 	}
 
 	template<typename... Args, BOUNDED_REQUIRES(std::is_constructible_v<T, Args...>)>
-	constexpr explicit tuple_value(not_piecewise_construct_t, Args && ... args) noexcept(std::is_nothrow_constructible_v<T, Args...>):
+	constexpr explicit tuple_value_impl(not_piecewise_construct_t, Args && ... args) noexcept(std::is_nothrow_constructible_v<T, Args...>):
 		m_value(BOUNDED_FORWARD(args)...)
 	{
 	}
@@ -235,7 +235,7 @@ struct tuple_value<false, unique, T, Ts...> {
 
 private:
 	template<std::size_t... indexes, typename... Args>
-	constexpr explicit tuple_value(std::index_sequence<indexes...>, tuple<Args...> args) noexcept(std::is_nothrow_constructible_v<T, Args...>):
+	constexpr explicit tuple_value_impl(std::index_sequence<indexes...>, tuple<Args...> args) noexcept(std::is_nothrow_constructible_v<T, Args...>):
 		m_value(args[constant<indexes>]...)
 	{
 	}
@@ -245,10 +245,10 @@ private:
 
 
 template<std::size_t unique, typename... Ts>
-struct tuple_value<false, unique, void, Ts...> {
-	constexpr explicit tuple_value(std::piecewise_construct_t, tuple<>) noexcept {
+struct tuple_value_impl<false, unique, void, Ts...> {
+	constexpr explicit tuple_value_impl(std::piecewise_construct_t, tuple<>) noexcept {
 	}
-	constexpr explicit tuple_value(not_piecewise_construct_t) noexcept {
+	constexpr explicit tuple_value_impl(not_piecewise_construct_t) noexcept {
 	}
 };
 
