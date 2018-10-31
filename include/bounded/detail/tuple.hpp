@@ -176,35 +176,6 @@ private:
 	}
 };
 
-// Work around https://bugs.llvm.org/show_bug.cgi?id=32385
-template<std::size_t unique, typename T, typename... Ts>
-struct tuple_value_impl<true, unique, T const, Ts...> : private T {
-	tuple_value_impl() = default;
-	
-	template<typename... Args, BOUNDED_REQUIRES(std::is_constructible_v<T, Args...>)>
-	constexpr explicit tuple_value_impl(std::piecewise_construct_t, tuple<Args...> args) BOUNDED_NOEXCEPT_INITIALIZATION(
-		tuple_value_impl(make_index_sequence(constant<sizeof...(Args)>), std::move(args))
-	) {
-	}
-
-	template<typename... Args, BOUNDED_REQUIRES(std::is_constructible_v<T, Args...>)>
-	constexpr explicit tuple_value_impl(not_piecewise_construct_t, Args && ... args) BOUNDED_NOEXCEPT_INITIALIZATION(
-		T(BOUNDED_FORWARD(args)...)
-	) {
-	}
-	
-	constexpr auto && value() const & noexcept {
-		return static_cast<T const &>(*this);
-	}
-
-private:
-	template<std::size_t... indexes, typename... Args>
-	constexpr explicit tuple_value_impl(std::index_sequence<indexes...>, tuple<Args...> args) BOUNDED_NOEXCEPT_INITIALIZATION(
-		T(args[constant<indexes>]...)
-	) {
-	}
-};
-
 template<std::size_t unique, typename T, typename... Ts>
 struct tuple_value_impl<false, unique, T, Ts...> {
 	tuple_value_impl() = default;
