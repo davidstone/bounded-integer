@@ -93,6 +93,7 @@ target_sources(containers INTERFACE
 	$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>/include/containers/algorithms/distance.hpp
 	$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>/include/containers/algorithms/filter_iterator.hpp
 	$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>/include/containers/algorithms/find.hpp
+	$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>/include/containers/algorithms/maybe_find.hpp
 	$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>/include/containers/algorithms/minmax_element.hpp
 	$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>/include/containers/algorithms/move_destroy_iterator.hpp
 	$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>/include/containers/algorithms/move_iterator.hpp
@@ -248,6 +249,7 @@ add_library(containers_test STATIC
 	source/containers/algorithms/distance.cpp
 	source/containers/algorithms/filter_iterator.cpp
 	source/containers/algorithms/find.cpp
+	source/containers/algorithms/maybe_find.cpp
 	source/containers/algorithms/minmax_element.cpp
 	source/containers/algorithms/move_destroy_iterator.cpp
 	source/containers/algorithms/move_iterator.cpp
