@@ -56,75 +56,152 @@ struct visitor_parameter {
 template<typename T, auto n>
 visitor_parameter(T &&, constant_t<n>) -> visitor_parameter<T &&, n>;
 
-constexpr struct visitor_with_index {
-private:
-	template<typename Function, typename... Values>
-	static constexpr decltype(auto) implementation(Function && function, constant_t<0>, tuple<Values...> values) {
-		return apply(std::move(values), BOUNDED_FORWARD(function));
-	}
+namespace detail {
 
-	template<typename Function, typename Index, typename... Values, typename Variant, typename... Variants>
-	static constexpr decltype(auto) implementation(Function && function, Index const current_index, tuple<Values...> values, Variant && variant, Variants && ... variants) noexcept(false)
-	{
-		auto found = [&]() -> decltype(auto) {
-			return visitor_with_index::implementation(
+template<typename Variant, typename Indexes>
+struct variant_types_impl;
+
+template<typename Variant, std::size_t... indexes>
+struct variant_types_impl<Variant, std::index_sequence<indexes...>> {
+	using type = types<
+		visitor_parameter<
+			decltype(std::declval<Variant>()[bounded::constant<indexes>]),
+			indexes
+		>...
+	>;
+};
+
+template<typename Variant>
+using variant_types = typename variant_types_impl<
+	Variant,
+	std::make_index_sequence<static_cast<std::size_t>(
+		decltype(std::declval<Variant>().index())::max() + constant<1>
+	)>
+>::type;
+
+
+template<typename Function, typename Args, typename... Lists>
+inline constexpr auto is_cartesian_product_callable_impl = false;
+
+template<typename Function, typename... Args>
+inline constexpr auto is_cartesian_product_callable_impl<Function, types<Args...>> = std::is_invocable_v<Function, Args...>;
+
+template<typename Function, typename... Args, typename... Types, typename... Rest>
+inline constexpr auto is_cartesian_product_callable_impl<Function, types<Args...>, types<Types...>, Rest...> = (
+	... and
+	is_cartesian_product_callable_impl<Function, types<Args..., Types>, Rest...>
+);
+
+// Requires that Lists is actually a variadic pack of types
+template<typename Function, typename... Lists>
+inline constexpr auto is_cartesian_product_callable = std::is_invocable_v<Function>;
+
+template<typename Function, typename... Types, typename... Rest>
+inline constexpr auto is_cartesian_product_callable<Function, types<Types...>, Rest...> = (
+	... and
+	is_cartesian_product_callable_impl<Function, types<Types>, Rest...>
+);
+
+template<typename Function, typename... Variants>
+inline constexpr auto is_visitable = is_cartesian_product_callable<Function, variant_types<Variants>...>;
+
+
+
+
+template<typename Function, typename... Values>
+constexpr auto visit_implementation(Function && function, constant_t<0>, tuple<Values...> values) BOUNDED_NOEXCEPT_DECLTYPE(
+	apply(std::move(values), BOUNDED_FORWARD(function))
+)
+
+// TODO: noexcept?
+template<typename Function, typename Index, typename... Values, typename Variant, typename... Variants>
+constexpr decltype(auto) visit_implementation(Function && function, Index const current_index, tuple<Values...> values, Variant && variant, Variants && ... variants) {
+	auto found = [&]() BOUNDED_NOEXCEPT_DECLTYPE(
+		detail::visit_implementation(
+			BOUNDED_FORWARD(function),
+			0_bi,
+			tuple_cat(
+				std::move(values),
+				tuple(visitor_parameter{BOUNDED_FORWARD(variant)[current_index], current_index})
+			),
+			BOUNDED_FORWARD(variants)...
+		)
+	);
+	auto const search_index = variant.index();
+	if constexpr (current_index == search_index.max()) {
+		return found();
+	} else if (current_index == search_index) {
+		return found();
+	} else {
+		return detail::visit_implementation(
+			BOUNDED_FORWARD(function),
+			current_index + 1_bi,
+			std::move(values),
+			BOUNDED_FORWARD(variant),
+			BOUNDED_FORWARD(variants)...
+		);
+	}
+}
+
+} // namespace detail
+	
+constexpr struct visit_with_index_t {
+private:
+	static constexpr struct impl_t {
+		template<typename Function, typename... Variants, BOUNDED_REQUIRES(detail::is_visitable<Function, Variants...>)>
+		constexpr auto operator()(Function && function, Variants && ... variants) const BOUNDED_NOEXCEPT_DECLTYPE(
+			detail::visit_implementation(
 				BOUNDED_FORWARD(function),
 				0_bi,
-				tuple_cat(
-					std::move(values),
-					tuple(visitor_parameter{BOUNDED_FORWARD(variant)[current_index], current_index})
-				),
+				tuple{},
 				BOUNDED_FORWARD(variants)...
-			);
-		};
-		auto const search_index = variant.index();
-		if constexpr (current_index == search_index.max()) {
-			return found();
-		} else if (current_index == search_index) {
-			return found();
-		} else {
-			return implementation(
-				BOUNDED_FORWARD(function),
-				current_index + 1_bi,
-				std::move(values),
-				BOUNDED_FORWARD(variant),
-				BOUNDED_FORWARD(variants)...
-			);
-		}
-	}
-	
+			)
+		)
+	} impl;
 public:
 	// Any number of variants (including 0) followed by one function
 	template<typename... Args, BOUNDED_REQUIRES(sizeof...(Args) >= 1)>
-	constexpr decltype(auto) operator()(Args && ... args) const {
-		return detail::reorder_transform(
-			BOUNDED_FORWARD(args)...,
-			[](auto && function, auto && ... variants) BOUNDED_NOEXCEPT_DECLTYPE(
-				implementation(
-					BOUNDED_FORWARD(function),
-					0_bi,
-					tuple{},
-					BOUNDED_FORWARD(variants)...
-				)
-			)
-		);
-	}
+	constexpr auto operator()(Args && ... args) const BOUNDED_NOEXCEPT_DECLTYPE(
+		detail::reorder_transform(BOUNDED_FORWARD(args)..., impl)
+	)
 } visit_with_index;
 
+// TODO: This will be simpler to implement when clang supports explicit template
+// arguments on lambdas and / or requires clauses
 // Accepts any number of variants (including 0) followed by one function with
 // arity equal to the number of variants
-constexpr auto visit = [](auto && ... args) -> decltype(auto) {
-	return detail::reorder_transform(
-		BOUNDED_FORWARD(args)...,
-		[](auto && function, auto && ... variants) {
-			return visit_with_index(
-				BOUNDED_FORWARD(variants)...,
-				[&](auto && ... values) {
-					return BOUNDED_FORWARD(function)(BOUNDED_FORWARD(values).value...);
-				}
-			);
+constexpr struct visit_t {
+private:
+	template<typename Function>
+	struct visit_function {
+	private:
+		Function && m_function;
+	public:
+		explicit constexpr visit_function(Function && function) noexcept:
+			m_function(BOUNDED_FORWARD(function))
+		{
 		}
-	);
-};
+		template<typename... Values>
+		constexpr auto operator()(Values && ... values) && BOUNDED_NOEXCEPT_DECLTYPE(
+			BOUNDED_FORWARD(m_function)(BOUNDED_FORWARD(values).value...)
+		)
+	};
+	static constexpr struct impl_t {
+		template<typename Function, typename... Variants, BOUNDED_REQUIRES(detail::is_visitable<visit_function<Function>, Variants...>)>
+		constexpr auto operator()(Function && function, Variants && ... variants) const BOUNDED_NOEXCEPT_DECLTYPE(
+			detail::visit_implementation(
+				visit_function<Function>(BOUNDED_FORWARD(function)),
+				0_bi,
+				tuple{},
+				BOUNDED_FORWARD(variants)...
+			)
+		)
+	} impl;
+public:
+	template<typename... Args, BOUNDED_REQUIRES(sizeof...(Args) >= 1)>
+	constexpr auto operator()(Args && ... args) const BOUNDED_NOEXCEPT_DECLTYPE(
+		detail::reorder_transform(BOUNDED_FORWARD(args)..., impl)
+	)
+} visit;
 
 }	// namespace bounded
