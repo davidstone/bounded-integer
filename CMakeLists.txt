@@ -67,6 +67,7 @@ target_sources(bounded INTERFACE
 	$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>/include/bounded/detail/noexcept.hpp
 	$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>/include/bounded/detail/numeric_limits.hpp
 	$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>/include/bounded/detail/overlapping_range.hpp
+	$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>/include/bounded/detail/overload.hpp
 	$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>/include/bounded/detail/requires.hpp
 	$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>/include/bounded/detail/size_of.hpp
 	$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>/include/bounded/detail/stream.hpp
@@ -215,6 +216,7 @@ add_executable(bounded_test
 	source/bounded/detail/optional/optional.cpp
 	source/bounded/detail/optional/value_or.cpp
 	source/bounded/detail/overlapping_range.cpp
+	source/bounded/detail/overload.cpp
 	source/bounded/detail/policy/all.cpp
 	source/bounded/detail/policy/clamp_policy.cpp
 	source/bounded/detail/policy/modulo_policy.cpp
