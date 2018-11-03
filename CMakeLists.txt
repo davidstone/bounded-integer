@@ -106,11 +106,13 @@ target_sources(containers INTERFACE
 	$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>/include/containers/algorithms/transform_iterator.hpp
 	$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>/include/containers/algorithms/uninitialized.hpp
 	$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>/include/containers/algorithms/unique.hpp
-	$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>/include/containers/adapt.hpp
-	$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>/include/containers/append.hpp
 	$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>/include/containers/array/array.hpp
 	$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>/include/containers/array/make_array.hpp
 	$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>/include/containers/array/tuple.hpp
+	$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>/include/containers/static_vector/make_static_vector.hpp
+	$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>/include/containers/static_vector/static_vector.hpp
+	$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>/include/containers/adapt.hpp
+	$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>/include/containers/append.hpp
 	$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>/include/containers/assign.hpp
 	$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>/include/containers/at.hpp
 	$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>/include/containers/begin_end.hpp
@@ -152,8 +154,6 @@ target_sources(containers INTERFACE
 	$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>/include/containers/single_element_range.hpp
 	$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>/include/containers/size.hpp
 	$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>/include/containers/small_buffer_optimized_vector.hpp
-	$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>/include/containers/static_vector/make_static_vector.hpp
-	$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>/include/containers/static_vector/static_vector.hpp
 	$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>/include/containers/string.hpp
 	$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>/include/containers/uninitialized_storage.hpp
 	$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>/include/containers/vector.hpp
@@ -173,7 +173,6 @@ target_link_libraries(containers INTERFACE
 )
 
 add_executable(bounded_test
-	source/bounded/detail/abs.cpp
 	source/bounded/detail/arithmetic/base.cpp
 	source/bounded/detail/arithmetic/bitwise_and.cpp
 	source/bounded/detail/arithmetic/common.cpp
@@ -190,6 +189,17 @@ add_executable(bounded_test
 	source/bounded/detail/arithmetic/safe_abs.cpp
 	source/bounded/detail/arithmetic/unary_minus.cpp
 	source/bounded/detail/arithmetic/unary_plus.cpp
+	source/bounded/detail/optional/common_type.cpp
+	source/bounded/detail/optional/comparison_operators.cpp
+	source/bounded/detail/optional/forward_declaration.cpp
+	source/bounded/detail/optional/optional.cpp
+	source/bounded/detail/optional/value_or.cpp
+	source/bounded/detail/policy/all.cpp
+	source/bounded/detail/policy/clamp_policy.cpp
+	source/bounded/detail/policy/modulo_policy.cpp
+	source/bounded/detail/policy/null_policy.cpp
+	source/bounded/detail/policy/throw_policy.cpp
+	source/bounded/detail/abs.cpp
 	source/bounded/detail/basic_numeric_limits.cpp
 	source/bounded/detail/cast.cpp
 	source/bounded/detail/class.cpp
@@ -210,18 +220,8 @@ add_executable(bounded_test
 	source/bounded/detail/minmax.cpp
 	source/bounded/detail/noexcept.cpp
 	source/bounded/detail/numeric_limits.cpp
-	source/bounded/detail/optional/common_type.cpp
-	source/bounded/detail/optional/comparison_operators.cpp
-	source/bounded/detail/optional/forward_declaration.cpp
-	source/bounded/detail/optional/optional.cpp
-	source/bounded/detail/optional/value_or.cpp
 	source/bounded/detail/overlapping_range.cpp
 	source/bounded/detail/overload.cpp
-	source/bounded/detail/policy/all.cpp
-	source/bounded/detail/policy/clamp_policy.cpp
-	source/bounded/detail/policy/modulo_policy.cpp
-	source/bounded/detail/policy/null_policy.cpp
-	source/bounded/detail/policy/throw_policy.cpp
 	source/bounded/detail/requires.cpp
 	source/bounded/detail/size_of.cpp
 	source/bounded/detail/stream.cpp
@@ -263,11 +263,12 @@ add_library(containers_test STATIC
 	source/containers/algorithms/transform_iterator.cpp
 	source/containers/algorithms/uninitialized.cpp
 	source/containers/algorithms/unique.cpp
-	source/containers/adapt.cpp
-	source/containers/append.cpp
 	source/containers/array/array.cpp
 	source/containers/array/make_array.cpp
 	source/containers/array/tuple.cpp
+	source/containers/static_vector/make_static_vector.cpp
+	source/containers/adapt.cpp
+	source/containers/append.cpp
 	source/containers/assign.cpp
 	source/containers/at.cpp
 	source/containers/begin_end.cpp
@@ -300,7 +301,6 @@ add_library(containers_test STATIC
 	source/containers/scope_guard.cpp
 	source/containers/single_element_range.cpp
 	source/containers/size.cpp
-	source/containers/static_vector/make_static_vector.cpp
 )
 
 target_link_libraries(containers_test containers)
