@@ -199,6 +199,7 @@ add_executable(bounded_test
 	source/bounded/detail/policy/modulo_policy.cpp
 	source/bounded/detail/policy/null_policy.cpp
 	source/bounded/detail/policy/throw_policy.cpp
+	source/bounded/detail/variant/visit.cpp
 	source/bounded/detail/abs.cpp
 	source/bounded/detail/basic_numeric_limits.cpp
 	source/bounded/detail/cast.cpp

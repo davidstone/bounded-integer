@@ -4,21 +4,44 @@
 // http://www.boost.org/LICENSE_1_0.txt)
 
 #include <bounded/detail/overload.hpp>
-#include <bounded/detail/variant/variant.hpp>
 
 namespace {
 
-constexpr auto variant = bounded::variant<int, int *>(bounded::detail::types<int>{}, 5);
-
-struct int_visitor {
+struct int_function {
 	constexpr auto operator()(int) const {
 		return 3;
 	}
 };
 
-static_assert(bounded::visit(variant, bounded::overload(int_visitor{}, [](int *) { return 0; })) == 3);
-static_assert(bounded::visit(variant, bounded::overload(int_visitor{}, [](int const *) { return 0; })) == 3);
-static_assert(!std::is_invocable_v<bounded::visit_t, decltype(variant), int_visitor>);
-static_assert(!std::is_invocable_v<bounded::visit_t, decltype(variant), decltype(bounded::overload(int_visitor{}))>);
+struct pointer_function {
+	[[maybe_unused]] constexpr auto operator()(int *) const {
+		return 4;
+	}
+};
+
+struct direct {
+	constexpr auto operator()(int) const {
+		return 2;
+	}
+	template<typename T>
+	constexpr auto operator()(T) const {
+		return 1;
+	}
+};
+
+struct indirect : private int_function, private pointer_function {
+	using int_function::operator();
+	using pointer_function::operator();
+};
+
+static_assert(bounded::overload(int_function{}, [](int *) { return 0; })(10) == 3);
+static_assert(bounded::overload(int_function{}, [](int const *) { return 0; })(10) == 3);
+static_assert(bounded::overload([](auto) { return 0; })(10) == 0);
+static_assert(direct{}(10) == 2);
+static_assert(bounded::overload(direct{})(10) == 2);
+static_assert(indirect{}(10) == 3);
+static_assert(bounded::overload(indirect{})(10) == 3);
+static_assert(bounded::overload(int_function{}, [](auto) { return 0; })(10) == 3);
+static_assert(!std::is_invocable_v<decltype(bounded::overload(int_function{})), std::nullptr_t>);
 
 } // namespace

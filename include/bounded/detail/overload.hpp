@@ -5,47 +5,21 @@
 
 #pragma once
 
-#include <bounded/detail/forward.hpp>
-#include <bounded/detail/noexcept.hpp>
-#include <bounded/detail/tuple.hpp>
-
 #include <utility>
+#include <type_traits>
 
 namespace bounded {
-namespace detail {
 
-// tuple_value is used to have something consistently derivable
-template<typename Function>
-using function_wrapper = tuple_value<0, Function>;
-
-template<typename Function>
-struct overload_impl : private function_wrapper<Function> {
-	using function_wrapper<Function>::function_wrapper;
-	
-	template<typename... Args>
-	constexpr auto operator()(Args && ... args) const & BOUNDED_NOEXCEPT_DECLTYPE(
-		this->value()(BOUNDED_FORWARD(args)...)
-	)
-	template<typename... Args>
-	constexpr auto operator()(Args && ... args) & BOUNDED_NOEXCEPT_DECLTYPE(
-		this->value()(BOUNDED_FORWARD(args)...)
-	)
-	template<typename... Args>
-	constexpr auto operator()(Args && ... args) && BOUNDED_NOEXCEPT_DECLTYPE(
-		std::move(*this).value()(BOUNDED_FORWARD(args)...)
-	)
-};
-
-} // namespace detail
-
+// This needs language support to work properly. This implementation does not
+// work for function pointers or final function objects.
 template<typename... Functions>
-struct overload : detail::overload_impl<Functions>... {
-	constexpr explicit overload(Functions... functions):
-		detail::overload_impl<Functions>(detail::not_piecewise_construct, std::move(functions))...
+struct overload : Functions... {
+	constexpr explicit overload(Functions... functions) noexcept((... and std::is_nothrow_move_constructible_v<Functions>)):
+		Functions(std::move(functions))...
 	{
 	}
 		
-	using detail::overload_impl<Functions>::operator()...;
+	using Functions::operator()...;
 };
 
 } // namespace bounded
