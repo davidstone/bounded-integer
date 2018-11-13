@@ -20,9 +20,6 @@
 
 namespace bounded {
 
-struct in_place_t{};
-constexpr auto in_place = in_place_t{};
-
 // There are three general classifications of objects that can be stored in an optional:
 //
 // nullable: The object has the ability to store a null state within itself. For
@@ -133,16 +130,16 @@ public:
 	}
 
 	template<typename... Args, BOUNDED_REQUIRES(std::is_constructible_v<value_type, Args && ...>)>
-	constexpr explicit optional(in_place_t, Args && ... other) noexcept(std::is_nothrow_constructible_v<value_type, Args && ...>):
+	constexpr explicit optional(std::in_place_t, Args && ... other) noexcept(std::is_nothrow_constructible_v<value_type, Args && ...>):
 		m_value(BOUNDED_FORWARD(other)...) {
 	}
 	template<typename U, BOUNDED_REQUIRES(std::is_convertible_v<U &&, value_type>)>
 	constexpr optional(U && other)
-		BOUNDED_NOEXCEPT_INITIALIZATION(optional(in_place, BOUNDED_FORWARD(other))) {
+		BOUNDED_NOEXCEPT_INITIALIZATION(optional(std::in_place, BOUNDED_FORWARD(other))) {
 	}
 	template<typename U, BOUNDED_REQUIRES(!std::is_convertible_v<U &&, value_type> and std::is_constructible_v<value_type, U &&>)>
 	constexpr explicit optional(U && other)
-		BOUNDED_NOEXCEPT_INITIALIZATION(optional(in_place, BOUNDED_FORWARD(other))) {
+		BOUNDED_NOEXCEPT_INITIALIZATION(optional(std::in_place, BOUNDED_FORWARD(other))) {
 	}
 
 
@@ -227,7 +224,7 @@ private:
 	optional_storage m_value;
 };
 
-template<typename T, BOUNDED_REQUIRES(!std::is_same_v<T, none_t> and !std::is_same_v<T, in_place_t>)>
+template<typename T, BOUNDED_REQUIRES(!std::is_same_v<T, none_t> and !std::is_same_v<T, std::in_place_t>)>
 optional(T) -> optional<T>;
 
 template<typename T>
