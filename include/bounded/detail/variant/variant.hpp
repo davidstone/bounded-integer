@@ -9,6 +9,7 @@
 #include <bounded/detail/comparison.hpp>
 #include <bounded/detail/tuple.hpp>
 #include <bounded/detail/type.hpp>
+#include <bounded/detail/variant/get_index.hpp>
 #include <bounded/detail/variant/special_member_functions.hpp>
 #include <bounded/detail/variant/visit.hpp>
 
@@ -34,8 +35,8 @@ public:
 };
 
 template<typename GetFunction, typename... Ts, typename T>
-constexpr auto is_type_active(basic_variant<GetFunction, Ts...> const & variant, detail::types<T> type) BOUNDED_NOEXCEPT_DECLTYPE(
-	variant.index() == get_index(type, detail::types<Ts>{}...)
+constexpr auto holds_alternative(basic_variant<GetFunction, Ts...> const & variant, detail::types<T> type) BOUNDED_NOEXCEPT_DECLTYPE(
+	variant.index() == detail::get_index(type, detail::types<Ts>{}...)
 )
 
 namespace detail {

@@ -24,6 +24,17 @@ static_assert(thing_t(std::in_place, 0_bi, 0) != thing_t(std::in_place, 4_bi, 1)
 
 static_assert(thing_t(std::in_place, 1_bi, static_cast<short>(5)) == thing_t(static_cast<short>(5)));
 
+static_assert(holds_alternative(thing_t(std::in_place, 1_bi, static_cast<short>(0)), bounded::detail::types<short>{}));
+static_assert(holds_alternative(thing_t(std::in_place, 2_bi, 0), bounded::detail::types<long>{}));
+static_assert(holds_alternative(thing_t(std::in_place, 3_bi, '\0'), bounded::detail::types<char>{}));
+
+#if 0
+// std::variant has these calls ill-formed (and that naturally happens with my
+// implementation), but it seems like it should be legal.
+static_assert(holds_alternative(thing_t(std::in_place, 0_bi, 0), bounded::detail::types<int>{}));
+static_assert(holds_alternative(thing_t(std::in_place, 4_bi, 0), bounded::detail::types<int>{}));
+#endif
+
 constexpr auto index = 1_bi;
 constexpr auto value = static_cast<short>(8);
 
