@@ -6,6 +6,7 @@
 #pragma once
 
 #include <bounded/detail/class.hpp>
+#include <bounded/detail/comparison.hpp>
 #include <bounded/detail/tuple.hpp>
 #include <bounded/detail/type.hpp>
 #include <bounded/detail/variant/special_member_functions.hpp>
@@ -32,6 +33,30 @@ public:
 	using base::emplace;
 };
 
+template<typename GetFunction, typename... Ts, typename T>
+constexpr auto is_type_active(basic_variant<GetFunction, Ts...> const & variant, detail::types<T> type) BOUNDED_NOEXCEPT_DECLTYPE(
+	variant.index() == get_index(type, detail::types<Ts>{}...)
+)
+
+namespace detail {
+
+struct equality_visitor {
+	template<typename T, auto n>
+	constexpr auto operator()(visitor_parameter<T, n> const lhs, visitor_parameter<T, n> const rhs) BOUNDED_NOEXCEPT_DECLTYPE(
+		lhs.value == rhs.value
+	)
+	template<typename LHS, auto lhs_n, typename RHS, auto rhs_n>
+	constexpr auto operator()(visitor_parameter<LHS, lhs_n>, visitor_parameter<RHS, rhs_n>) noexcept {
+		return false;
+	}
+};
+
+} // namespace detail
+
+template<typename GetFunction, typename... Ts>
+constexpr auto operator==(basic_variant<GetFunction, Ts...> const & lhs, basic_variant<GetFunction, Ts...> const & rhs) BOUNDED_NOEXCEPT_DECLTYPE(
+	visit_with_index(lhs, rhs, detail::equality_visitor{})
+)
 
 
 namespace detail {

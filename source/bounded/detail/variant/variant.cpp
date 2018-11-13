@@ -9,10 +9,17 @@ namespace {
 
 using namespace bounded::literal;
 
+using thing_t = bounded::variant<int, short, long, char, int>;
+
+static_assert(thing_t(0_bi, 0) == thing_t(0_bi, 0));
+static_assert(thing_t(0_bi, 0) != thing_t(0_bi, 1));
+static_assert(thing_t(0_bi, 0) != thing_t(1_bi, static_cast<short>(0)));
+static_assert(thing_t(0_bi, 0) != thing_t(4_bi, 0));
+static_assert(thing_t(0_bi, 0) != thing_t(4_bi, 1));
+
 constexpr auto index = 1_bi;
 constexpr auto value = static_cast<short>(8);
 
-using thing_t = bounded::variant<int, short, long, char, int>;
 constexpr auto thing = thing_t(index, value);
 using thingy = decltype(thing[index]);
 

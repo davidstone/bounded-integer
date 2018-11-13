@@ -46,15 +46,12 @@ public:
 
 }	// namespace detail
 
-template<typename T, auto n>
+template<typename T, std::size_t n>
 struct visitor_parameter {
 	static_assert(std::is_reference_v<T>);
 	T value;
-	constant_t<n> index;
+	static constexpr auto index = constant<n>;
 };
-
-template<typename T, auto n>
-visitor_parameter(T &&, constant_t<n>) -> visitor_parameter<T &&, n>;
 
 namespace detail {
 
@@ -122,7 +119,12 @@ constexpr decltype(auto) visit_implementation(Function && function, Index const 
 			0_bi,
 			tuple_cat(
 				std::move(values),
-				tuple(visitor_parameter{BOUNDED_FORWARD(variant)[current_index], current_index})
+				tuple(
+					visitor_parameter<
+						decltype(BOUNDED_FORWARD(variant)[current_index]),
+						current_index.value()
+					>{BOUNDED_FORWARD(variant)[current_index]}
+				)
 			),
 			BOUNDED_FORWARD(variants)...
 		)
