@@ -21,7 +21,7 @@ constexpr struct is_valid_index_t {
 
 	template<typename Index, typename... Ts>
 	constexpr auto operator()(types<Index> index, types<Ts>... types) const noexcept {
-		constexpr auto exactly_one_type_matches = (... + (index == types)) == 1;
+		constexpr auto exactly_one_type_matches = (0 + ... + (index == types)) == 1;
 		return exactly_one_type_matches;
 	}
 } is_valid_index;
