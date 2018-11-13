@@ -11,11 +11,18 @@ using namespace bounded::literal;
 
 using thing_t = bounded::variant<int, short, long, char, int>;
 
+static_assert(!std::is_constructible_v<thing_t, int>);
+static_assert(std::is_constructible_v<thing_t, short>);
+static_assert(std::is_constructible_v<thing_t, long>);
+static_assert(std::is_constructible_v<thing_t, char>);
+
 static_assert(thing_t(std::in_place, 0_bi, 0) == thing_t(std::in_place, 0_bi, 0));
 static_assert(thing_t(std::in_place, 0_bi, 0) != thing_t(std::in_place, 0_bi, 1));
 static_assert(thing_t(std::in_place, 0_bi, 0) != thing_t(std::in_place, 1_bi, static_cast<short>(0)));
 static_assert(thing_t(std::in_place, 0_bi, 0) != thing_t(std::in_place, 4_bi, 0));
 static_assert(thing_t(std::in_place, 0_bi, 0) != thing_t(std::in_place, 4_bi, 1));
+
+static_assert(thing_t(std::in_place, 1_bi, static_cast<short>(5)) == thing_t(static_cast<short>(5)));
 
 constexpr auto index = 1_bi;
 constexpr auto value = static_cast<short>(8);

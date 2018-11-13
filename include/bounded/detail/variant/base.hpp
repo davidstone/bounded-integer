@@ -62,6 +62,16 @@ struct basic_variant_base {
 	) {
 	}
 	
+	template<typename T, BOUNDED_REQUIRES(is_valid_index(types<std::decay_t<T>>{}, types<Ts>{}...))>
+	constexpr explicit basic_variant_base(T && value) BOUNDED_NOEXCEPT_INITIALIZATION(
+		basic_variant_base(
+			std::in_place,
+			types<std::decay_t<T>>{},
+			BOUNDED_FORWARD(value)
+		)
+	) {
+	}
+	
 
 	constexpr auto && get_function() const noexcept {
 		return m_data[0_bi];
