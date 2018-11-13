@@ -8,7 +8,7 @@
 
 namespace {
 
-constexpr auto variant = bounded::variant<int, int *>(bounded::detail::types<int>{}, 5);
+constexpr auto variant = bounded::variant<int, int *>(std::in_place, bounded::detail::types<int>{}, 5);
 
 struct int_visitor {
 	constexpr auto operator()(int) const {

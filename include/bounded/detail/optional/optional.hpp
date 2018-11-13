@@ -47,13 +47,13 @@ namespace detail {
 template<typename T>
 struct default_optional_storage {
 	constexpr explicit default_optional_storage(optional_tag) noexcept:
-		m_data(none_index, none)
+		m_data(std::in_place, none_index, none)
 	{
 	}
 	
 	template<typename... Args>
 	constexpr default_optional_storage(Args && ... args) noexcept(std::is_nothrow_constructible_v<T, Args && ...>):
-		m_data(value_index, BOUNDED_FORWARD(args)...)
+		m_data(std::in_place, value_index, BOUNDED_FORWARD(args)...)
 	{
 	}
 	

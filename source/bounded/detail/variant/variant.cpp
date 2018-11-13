@@ -11,16 +11,16 @@ using namespace bounded::literal;
 
 using thing_t = bounded::variant<int, short, long, char, int>;
 
-static_assert(thing_t(0_bi, 0) == thing_t(0_bi, 0));
-static_assert(thing_t(0_bi, 0) != thing_t(0_bi, 1));
-static_assert(thing_t(0_bi, 0) != thing_t(1_bi, static_cast<short>(0)));
-static_assert(thing_t(0_bi, 0) != thing_t(4_bi, 0));
-static_assert(thing_t(0_bi, 0) != thing_t(4_bi, 1));
+static_assert(thing_t(std::in_place, 0_bi, 0) == thing_t(std::in_place, 0_bi, 0));
+static_assert(thing_t(std::in_place, 0_bi, 0) != thing_t(std::in_place, 0_bi, 1));
+static_assert(thing_t(std::in_place, 0_bi, 0) != thing_t(std::in_place, 1_bi, static_cast<short>(0)));
+static_assert(thing_t(std::in_place, 0_bi, 0) != thing_t(std::in_place, 4_bi, 0));
+static_assert(thing_t(std::in_place, 0_bi, 0) != thing_t(std::in_place, 4_bi, 1));
 
 constexpr auto index = 1_bi;
 constexpr auto value = static_cast<short>(8);
 
-constexpr auto thing = thing_t(index, value);
+constexpr auto thing = thing_t(std::in_place, index, value);
 using thingy = decltype(thing[index]);
 
 static_assert(std::is_same_v<thingy, short const &>);
@@ -29,8 +29,8 @@ static_assert(thing[index] == value);
 static_assert(bounded::visit(thing, [](auto x) { return std::is_same_v<decltype(x), short>; }));
 
 constexpr auto test_assignment() {
-	thing_t thing1(index, value);
-	thing1 = thing_t(index, value);
+	auto thing1 = thing_t(std::in_place, index, value);
+	thing1 = thing_t(std::in_place, index, value);
 	return thing1;
 }
 
@@ -66,15 +66,15 @@ struct destructor_checker {
 
 int main() {
 	using non_trivial_variant_t = bounded::variant<non_trivial>;
-	auto non_trivial_variant = non_trivial_variant_t(0_bi);
+	auto non_trivial_variant = non_trivial_variant_t(std::in_place, 0_bi);
 	assert(non_trivial_variant.index() == 0_bi);
-	non_trivial_variant = non_trivial_variant_t(0_bi);
+	non_trivial_variant = non_trivial_variant_t(std::in_place, 0_bi);
 	// Silence self-assignment warning
 	non_trivial_variant = *&non_trivial_variant;
 	
 	
 	using non_copyable_variant_t = bounded::variant<non_copyable>;
-	auto non_copyable_variant = non_copyable_variant_t(0_bi);
+	auto non_copyable_variant = non_copyable_variant_t(std::in_place, 0_bi);
 	assert(non_copyable_variant.index() == 0_bi);
 	static_assert(not std::is_copy_constructible<non_copyable_variant_t>{});
 	static_assert(not std::is_copy_assignable<non_copyable_variant_t>{});
@@ -84,7 +84,7 @@ int main() {
 	{
 		static_assert(!std::is_trivially_destructible_v<destructor_checker>);
 		static_assert(!std::is_trivially_destructible_v<bounded::variant<destructor_checker>>);
-		auto v = bounded::variant<destructor_checker>(0_bi);
+		auto v = bounded::variant<destructor_checker>(std::in_place, 0_bi);
 	}
 	assert(destructor_checker::destructed == 1U);
 }

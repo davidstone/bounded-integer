@@ -28,7 +28,7 @@ struct basic_variant_base {
 		std::is_convertible_v<F, GetFunction> and
 		std::is_constructible_v<typename decltype(get_type(Index{}, types<Ts>{}...))::type, Args...>
 	)>
-	constexpr basic_variant_base(F && function, Index index_, Args && ... args) noexcept(
+	constexpr basic_variant_base(std::in_place_t, F && function, Index index_, Args && ... args) noexcept(
 		std::is_nothrow_constructible_v<GetFunction, F> and
 		std::is_nothrow_constructible_v<typename decltype(get_type(Index{}, types<Ts>{}...))::type, Args...>
 	):
@@ -52,8 +52,9 @@ struct basic_variant_base {
 		not std::is_convertible_v<Index, GetFunction> and
 		std::is_constructible_v<typename decltype(get_type(Index{}, types<Ts>{}...))::type, Args...>
 	)>
-	constexpr basic_variant_base(Index const index_, Args && ... args) BOUNDED_NOEXCEPT_INITIALIZATION(
+	constexpr basic_variant_base(std::in_place_t, Index const index_, Args && ... args) BOUNDED_NOEXCEPT_INITIALIZATION(
 		basic_variant_base(
+			std::in_place,
 			GetFunction(get_index(index_, types<Ts>{}...)),
 			index_,
 			BOUNDED_FORWARD(args)...
@@ -61,27 +62,13 @@ struct basic_variant_base {
 	) {
 	}
 	
-	// This overload exists to mark this explicit
-	template<typename Index, BOUNDED_REQUIRES(
-		std::is_default_constructible_v<typename decltype(get_type(Index{}, types<Ts>{}...))::type>
-	)>
-	constexpr explicit basic_variant_base(Index const index_) BOUNDED_NOEXCEPT_INITIALIZATION(
-		basic_variant_base(
-			GetFunction(get_index(index_, types<Ts>{}...)),
-			index_
-		)
-	) {
-	}
 
-
-	
 	constexpr auto && get_function() const noexcept {
 		return m_data[0_bi];
 	}
 	constexpr auto && get_function() noexcept {
 		return m_data[0_bi];
 	}
-
 
 
 	constexpr auto index() const noexcept(noexcept(std::declval<GetFunction const &>()(std::declval<detail::variadic_union_t<Ts...> const &>()))) {
