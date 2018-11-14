@@ -28,6 +28,15 @@ public:
 	static_assert(std::is_trivially_copyable<GetFunction>{});
 
 	using base::base;
+
+	constexpr basic_variant(basic_variant const &) = default;
+	constexpr basic_variant(basic_variant &&) = default;
+	constexpr auto operator=(basic_variant const &) & -> basic_variant & = default;
+	constexpr auto operator=(basic_variant &&) & -> basic_variant & = default;
+	template<typename T>
+	constexpr auto operator=(T && value) & BOUNDED_NOEXCEPT_REF(
+		(this->assignment(BOUNDED_FORWARD(value)), *this)
+	)
 	
 	using base::index;
 	using base::operator[];

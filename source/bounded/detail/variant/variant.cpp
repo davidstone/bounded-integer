@@ -5,6 +5,8 @@
 
 #include <bounded/detail/variant/variant.hpp>
 
+#include <cassert>
+
 namespace {
 
 using namespace bounded::literal;
@@ -46,13 +48,21 @@ static_assert(std::is_same_v<thingy, short const &>);
 static_assert(thing[index] == value);
 static_assert(bounded::visit(thing, [](auto x) { return std::is_same_v<decltype(x), short>; }));
 
-constexpr auto test_assignment() {
+constexpr auto test_assignment_from_variant() {
 	auto thing1 = thing_t(std::in_place, index, value);
 	thing1 = thing_t(std::in_place, index, value);
-	return thing1;
+	assert(thing1[index] == value);
+	return true;
 }
+static_assert(test_assignment_from_variant());
 
-static_assert(test_assignment()[index] == value);
+constexpr auto test_assignment_from_value() {
+	auto thing1 = thing_t(std::in_place, index, value);
+	thing1 = -1L;
+	assert(thing1[bounded::detail::types<long>{}] == -1L);
+	return true;
+}
+static_assert(test_assignment_from_value());
 
 using empty_variant_t = bounded::variant<>;
 static_assert(not std::is_default_constructible_v<empty_variant_t>);
@@ -94,11 +104,11 @@ int main() {
 	using non_copyable_variant_t = bounded::variant<non_copyable>;
 	auto non_copyable_variant = non_copyable_variant_t(std::in_place, 0_bi);
 	assert(non_copyable_variant.index() == 0_bi);
-	static_assert(not std::is_copy_constructible<non_copyable_variant_t>{});
-	static_assert(not std::is_copy_assignable<non_copyable_variant_t>{});
-	static_assert(std::is_move_constructible<non_copyable_variant_t>{});
-	static_assert(std::is_move_assignable<non_copyable_variant_t>{});
-	static_assert(std::is_same<decltype(std::move(non_copyable_variant)[0_bi]), non_copyable &&>{});
+	static_assert(not std::is_copy_constructible_v<non_copyable_variant_t>);
+	static_assert(not std::is_copy_assignable_v<non_copyable_variant_t>);
+	static_assert(std::is_move_constructible_v<non_copyable_variant_t>);
+	static_assert(std::is_move_assignable_v<non_copyable_variant_t>);
+	static_assert(std::is_same_v<decltype(std::move(non_copyable_variant)[0_bi]), non_copyable &&>);
 	{
 		static_assert(!std::is_trivially_destructible_v<destructor_checker>);
 		static_assert(!std::is_trivially_destructible_v<bounded::variant<destructor_checker>>);
