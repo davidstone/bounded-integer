@@ -83,7 +83,7 @@ struct variant_selector {
 		return index;
 	}
 private:
-	integer<0, size - 1> index;
+	integer<0, normalize<size - 1U>> index;
 };
 
 template<>

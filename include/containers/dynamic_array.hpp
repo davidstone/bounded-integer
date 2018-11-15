@@ -29,12 +29,12 @@ namespace detail {
 
 // TODO: support larger array sizes
 template<typename T>
-constexpr auto maximum_array_size = static_cast<std::intmax_t>(
+constexpr auto maximum_array_size = bounded::detail::normalize<
 	bounded::min(
 		bounded::constant<std::numeric_limits<std::ptrdiff_t>::max()> / bounded::size_of<T>,
 		(1_bi << 31_bi) - 1_bi
-	)
-);
+	).value()
+>;
 
 template<typename T>
 struct dynamic_array_data {

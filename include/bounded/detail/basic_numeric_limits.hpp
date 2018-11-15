@@ -22,7 +22,7 @@ struct basic_numeric_limits;
 template<>
 struct basic_numeric_limits<detail::max_unsigned_t> {
 	static constexpr auto min() noexcept {
-		return static_cast<detail::max_unsigned_t>(0);
+		return 0;
 	}
 	static constexpr auto max() noexcept {
 		return static_cast<detail::max_unsigned_t>(-1);

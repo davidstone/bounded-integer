@@ -91,7 +91,7 @@ struct sbo_vector_base {
 			return bounded::max(minimum_small_capacity<T>, bounded::constant<requested_small_capacity>);
 		}
 
-		using size_type = bounded::integer<0, capacity().value()>;
+		using size_type = bounded::integer<0, bounded::detail::normalize<capacity().value()>>;
 		static_assert(sizeof(size_type) == sizeof(unsigned char));
 
 		constexpr auto size() const noexcept {
@@ -116,7 +116,10 @@ struct sbo_vector_base {
 
 	struct large_t {
 		using size_type = typename detail::dynamic_array_data<T>::size_type;
-		using capacity_type = bounded::integer<small_t::capacity().value() + 1, size_type::max().value()>;
+		using capacity_type = bounded::integer<
+			bounded::detail::normalize<small_t::capacity().value() + 1>,
+			bounded::detail::normalize<size_type::max().value()>
+		>;
 
 		// m_force_large exists just to be a bit that's always 1.
 		constexpr large_t(size_type size_, capacity_type capacity_, T * pointer_) noexcept:

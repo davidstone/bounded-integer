@@ -28,7 +28,9 @@ constexpr auto index_type_source() -> typename T::difference_type {
 template<typename T>
 using index_type = bounded::checked_integer<
 	0,
-	static_cast<std::intmax_t>(std::numeric_limits<decltype(detail::index_type_source<std::decay_t<T>>())>::max()) - 1,
+	bounded::detail::normalize<(
+		std::numeric_limits<decltype(detail::index_type_source<std::decay_t<T>>())>::max() - bounded::constant<1>
+	).value()>,
 	std::out_of_range
 >;
 

@@ -105,6 +105,6 @@ private:
 };
 
 template<typename Size, typename T>
-repeat_n(Size, T &&) -> repeat_n<bounded::integer<0, static_cast<std::intmax_t>(std::numeric_limits<Size>::max())>, T>;
+repeat_n(Size, T &&) -> repeat_n<bounded::integer<0, bounded::detail::normalize<Size::max().value()>>, T>;
 
 }	// namespace containers

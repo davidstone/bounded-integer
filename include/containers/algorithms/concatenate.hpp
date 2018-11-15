@@ -60,8 +60,11 @@ constexpr auto reusable_concatenate_container(reusable_concatenate_t<Result, Int
 template<typename Size>
 constexpr auto ugly_size_hack(Size const size) {
 	if constexpr (std::is_integral_v<Size>) {
-		constexpr auto max =  std::min(std::numeric_limits<Size>::max(), std::numeric_limits<std::uintmax_t>::max() / 64);
-		return static_cast<bounded::integer<0, max>>(size);
+		using result_t = bounded::integer<
+			0,
+			bounded::detail::normalize<std::min(std::numeric_limits<Size>::max(), std::numeric_limits<std::uintmax_t>::max() / 64)>
+		>;
+		return static_cast<result_t>(size);
 	} else {
 		return size;
 	}

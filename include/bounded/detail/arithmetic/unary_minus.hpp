@@ -37,8 +37,8 @@ constexpr auto operator-(integer<minimum, maximum, overflow_policy> const value)
 		(detail::safer_negation(constant<minimum>) == detail::safer_negation(constant<maximum>))
 	);
 	using result_type = integer<
-		detail::safer_negation(constant<maximum>),
-		detail::safer_negation(constant<minimum>),
+		detail::normalize<detail::safer_negation(constant<maximum>)>,
+		detail::normalize<detail::safer_negation(constant<minimum>)>,
 		overflow_policy
 	>;
 	using underlying_type = typename result_type::underlying_type;

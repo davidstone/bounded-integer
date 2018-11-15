@@ -40,7 +40,7 @@ template<typename T, std::size_t size, std::size_t... sizes>
 struct array {
 	using value_type = typename detail::array_value_type<T, sizes...>::type;
 
-	using size_type = bounded::constant_t<size>;
+	using size_type = bounded::constant_t<bounded::detail::normalize<size>>;
 	
 	using const_iterator = contiguous_iterator<value_type const, size>;
 	using iterator = contiguous_iterator<value_type, size>;

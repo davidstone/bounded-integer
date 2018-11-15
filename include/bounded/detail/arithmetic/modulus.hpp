@@ -45,7 +45,10 @@ constexpr auto sign_free_value = [](auto const dividend, auto divisor) noexcept 
 	// Intentionally make the min the highest value and the max the smallest
 	// value. This allows us to use them as the initial value in an
 	// accumulation, as they will "lose" to any value.
-	auto current = min_max{basic_numeric_limits<max_unsigned_t>::max(), basic_numeric_limits<max_unsigned_t>::min()};
+	auto current = min_max{
+		basic_numeric_limits<max_unsigned_t>::max(),
+		static_cast<max_unsigned_t>(basic_numeric_limits<max_unsigned_t>::min())
+	};
 	while (current.min != 0 or (current.max != divisor.max - 1 and current.max != dividend.max)) {
 		current = update_modulo_range(current, modulo_round(dividend, divisor.min));
 		if (divisor.min == divisor.max) {

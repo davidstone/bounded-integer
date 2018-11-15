@@ -24,8 +24,8 @@ using default_exception = std::range_error;
 template<typename T, auto minimum, auto maximum>
 constexpr auto reduce_range(T const & value, constant_t<minimum>, constant_t<maximum>) BOUNDED_NOEXCEPT(
 	integer<
-		detail::safe_max(minimum, basic_numeric_limits<T>::min()),
-		detail::safe_min(maximum, basic_numeric_limits<T>::max()),
+		detail::normalize<detail::safe_max(minimum, basic_numeric_limits<T>::min())>,
+		detail::normalize<detail::safe_min(maximum, basic_numeric_limits<T>::max())>,
 		null_policy
 	>(value)
 )

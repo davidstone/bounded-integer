@@ -22,7 +22,7 @@ constexpr auto count_if(Range && range, Predicate predicate)
 	noexcept(detail::noexcept_iterable<Range> and noexcept(predicate(*begin(BOUNDED_FORWARD(range)))))
 {
 	constexpr auto maximum = std::numeric_limits<decltype(size(range))>::max();
-	bounded::integer<0, static_cast<std::uintmax_t>(maximum)> sum = 0_bi;
+	bounded::integer<0, bounded::detail::normalize<maximum.value()>> sum = 0_bi;
 	for (auto && value : BOUNDED_FORWARD(range)) {
 		if (predicate(BOUNDED_FORWARD(value))) {
 			++sum;

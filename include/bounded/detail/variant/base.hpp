@@ -117,11 +117,12 @@ struct basic_variant_base {
 			std::is_trivially_copy_assignable_v<Ts> and
 			std::is_trivially_destructible_v<Ts>
 		));
+		constexpr auto index_value = get_index(index, types<Ts>{}...);
 		if constexpr (std::is_nothrow_constructible_v<indexed, Args...>) {
 			visit(*this, destroy);
-			get_function() = GetFunction(get_index(index, types<Ts>{}...));
+			get_function() = GetFunction(index_value);
 			if constexpr (trivial) {
-				m_data[1_bi] = variadic_union_t<Ts...>(index, BOUNDED_FORWARD(args)...);
+				m_data[1_bi] = variadic_union_t<Ts...>(index_value, BOUNDED_FORWARD(args)...);
 				return operator[](index);
 			} else {
 				return construct(operator[](index), BOUNDED_FORWARD(args)...);
@@ -130,9 +131,9 @@ struct basic_variant_base {
 			auto & ref = operator[](index);
 			auto value = construct_return<std::decay_t<decltype(ref)>>(BOUNDED_FORWARD(args)...);
 			visit(*this, destroy);
-			get_function() = GetFunction(get_index(index, types<Ts>{}...));
+			get_function() = GetFunction(index_value);
 			if constexpr (trivial) {
-				m_data[1_bi] = variadic_union_t<Ts...>(index, std::move(value));
+				m_data[1_bi] = variadic_union_t<Ts...>(index_value, std::move(value));
 				return operator[](index);
 			} else {
 				return construct(ref, std::move(value));

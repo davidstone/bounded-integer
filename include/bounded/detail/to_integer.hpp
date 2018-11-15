@@ -37,7 +37,7 @@ constexpr auto to_integer_impl(std::string_view str) {
 	}
 	using policy = throw_policy<std::invalid_argument>;
 	if constexpr(minimum < 0) {
-		constexpr auto combined_max = detail::normalize<std::max(
+		constexpr auto combined_max = normalize<std::max(
 			bounded::detail::safe_abs(minimum),
 			bounded::detail::safe_abs(maximum)
 		)>;
@@ -61,7 +61,7 @@ constexpr auto to_integer_impl(std::string_view str) {
 // TODO: Support things other than throwing an exception?
 template<auto minimum, auto maximum>
 constexpr auto to_integer(std::string_view str) {
-	return integer(detail::to_integer_impl<minimum, maximum>(str), bounded::null_policy{});
+	return integer(detail::to_integer_impl<detail::normalize<minimum>, detail::normalize<maximum>>(str), bounded::null_policy{});
 }
 
 // This overload does not currently use the overflow policy of the Integer.
