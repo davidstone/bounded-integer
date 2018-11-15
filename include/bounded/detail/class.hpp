@@ -288,7 +288,8 @@ public:
 	}
 private:
 	static constexpr auto uninitialized_value() noexcept {
-		return static_cast<underlying_type>(minimum > basic_numeric_limits<underlying_type>::min() ? minimum - 1 : maximum + 1);
+		return minimum > basic_numeric_limits<underlying_type>::min() ?
+			static_cast<underlying_type>(minimum - 1) : static_cast<underlying_type>(maximum + 1);
 	}
 };
 
