@@ -21,7 +21,6 @@ namespace bounded {
 namespace detail {
 
 // TODO: properly support references?
-// TODO: exception safety
 template<typename GetFunction, typename... Ts>
 struct basic_variant_base {
 	// TODO: assert GetFunction is noexcept
@@ -83,13 +82,12 @@ struct basic_variant_base {
 		std::is_nothrow_constructible_v<std::decay_t<T>, T &&> and
 		std::is_nothrow_move_assignable_v<std::decay_t<T>>
 	) {
-		visit(*this, [&](auto && original) {
+		visit(*this, [&](auto & original) {
 			if constexpr (std::is_same_v<std::decay_t<decltype(original)>, std::decay_t<T>>) {
 				original = BOUNDED_FORWARD(value);
 			} else {
 				destroy(original);
-				constexpr auto index = get_index(types<std::decay_t<T>>{}, types<Ts>{}...);
-				m_data[1_bi] = variadic_union_t<Ts...>(index, std::move(value));
+				replace_active_member(types<std::decay_t<T>>{}, std::move(value));
 			}
 		});
 	}
@@ -112,32 +110,14 @@ struct basic_variant_base {
 	)>
 	constexpr auto & emplace(Index index, Args && ... args) & noexcept(noexcept(construct(std::declval<basic_variant_base &>()[index], BOUNDED_FORWARD(args)...))) {
 		using indexed = typename decltype(get_type(index, types<Ts>{}...))::type;
-		constexpr auto trivial = (... and (
-			std::is_trivially_copy_constructible_v<Ts> and
-			std::is_trivially_copy_assignable_v<Ts> and
-			std::is_trivially_destructible_v<Ts>
-		));
-		constexpr auto index_value = get_index(index, types<Ts>{}...);
 		if constexpr (std::is_nothrow_constructible_v<indexed, Args...>) {
 			visit(*this, destroy);
-			get_function() = GetFunction(index_value);
-			if constexpr (trivial) {
-				m_data[1_bi] = variadic_union_t<Ts...>(index_value, BOUNDED_FORWARD(args)...);
-				return operator[](index);
-			} else {
-				return construct(operator[](index), BOUNDED_FORWARD(args)...);
-			}
+			return replace_active_member(index, BOUNDED_FORWARD(args)...);
 		} else {
 			auto & ref = operator[](index);
 			auto value = construct_return<std::decay_t<decltype(ref)>>(BOUNDED_FORWARD(args)...);
 			visit(*this, destroy);
-			get_function() = GetFunction(index_value);
-			if constexpr (trivial) {
-				m_data[1_bi] = variadic_union_t<Ts...>(index_value, std::move(value));
-				return operator[](index);
-			} else {
-				return construct(ref, std::move(value));
-			}
+			return replace_active_member(index, std::move(value));
 		}
 	}
 
@@ -155,6 +135,23 @@ struct basic_variant_base {
 	}
 
 private:
+	// Assumes the old object has already been destroyed
+	template<typename Index, typename... Args>
+	constexpr auto & replace_active_member(Index const index, Args && ... args) {
+		constexpr auto trivial = (... and (
+			std::is_trivially_copy_constructible_v<Ts> and
+			std::is_trivially_copy_assignable_v<Ts> and
+			std::is_trivially_destructible_v<Ts>
+		));
+		constexpr auto index_value = get_index(index, types<Ts>{}...);
+		get_function() = GetFunction(index_value);
+		if constexpr (trivial) {
+			m_data[1_bi] = variadic_union_t<Ts...>(index_value, BOUNDED_FORWARD(args)...);
+			return operator[](index_value);
+		} else {
+			return construct(operator[](index_value), BOUNDED_FORWARD(args)...);
+		}
+	}
 	template<typename Variant, typename Index>
 	static constexpr auto && operator_bracket(Variant && variant, Index const index_) noexcept {
 		return ::bounded::detail::get_union_element(

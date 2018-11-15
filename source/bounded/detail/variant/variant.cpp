@@ -59,6 +59,7 @@ static_assert(test_assignment_from_variant());
 constexpr auto test_assignment_from_value() {
 	auto thing1 = thing_t(std::in_place, index, value);
 	thing1 = -1L;
+	assert(holds_alternative(thing1, bounded::detail::types<long>{}));
 	assert(thing1[bounded::detail::types<long>{}] == -1L);
 	return true;
 }
