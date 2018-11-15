@@ -415,7 +415,8 @@ elseif("${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU")
 		"-Wall"
 		"-Wextra"
 		"-Wpedantic"
-		"-Wabi"
+		# Do not care about ABI differences
+		# "-Wabi"
 		"-Wcast-align"
 		"-Wcast-qual"
 		# It seems impossible to initialize bit fields with this warning on
