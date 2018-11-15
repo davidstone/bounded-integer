@@ -44,7 +44,6 @@ public:
 		maximum,
 		bounded::detail::common_policy<lhs_policy, rhs_policy>
 	>;
-	using q = typename type::underlying_type;
 };
 
 
