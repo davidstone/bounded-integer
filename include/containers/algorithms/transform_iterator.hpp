@@ -10,38 +10,38 @@
 namespace containers {
 namespace detail {
 
+// TODO: [[no_unique_address]]
 template<typename UnaryFunction>
-struct transform_traits : default_add, default_subtract, default_compare {
-private:
-	UnaryFunction m_dereference;
-
-public:
+struct transform_traits : default_add, default_subtract, default_compare, private UnaryFunction {
+	transform_traits() = default;
 	constexpr explicit transform_traits(UnaryFunction dereference):
-		m_dereference(std::move(dereference))
+		UnaryFunction(std::move(dereference))
 	{
 	}
 	
 	template<typename Iterator>
-	constexpr auto dereference(Iterator const it) const BOUNDED_NOEXCEPT_DECLTYPE(
-		m_dereference(*it)
-	)
+	constexpr auto dereference(Iterator const it) const
+		noexcept(noexcept(std::declval<UnaryFunction const &>()(*it)))
+		-> decltype(std::declval<UnaryFunction const &>()(*it))
+	{
+		return static_cast<UnaryFunction const &>(*this)(*it);
+	}
 };
 
 template<typename UnaryFunction>
-struct transform_traits_dereference : default_add, default_subtract, default_compare {
-private:
-	UnaryFunction m_dereference;
-
-public:
+struct transform_traits_dereference : default_add, default_subtract, default_compare, private UnaryFunction {
 	constexpr explicit transform_traits_dereference(UnaryFunction dereference):
-		m_dereference(std::move(dereference))
+		UnaryFunction(std::move(dereference))
 	{
 	}
 	
 	template<typename Iterator>
-	constexpr auto dereference(Iterator const it) const BOUNDED_NOEXCEPT_DECLTYPE(
-		m_dereference(it)
-	)
+	constexpr auto dereference(Iterator const it) const
+		noexcept(noexcept(std::declval<UnaryFunction const &>()(it)))
+		-> decltype(std::declval<UnaryFunction const &>()(it))
+	{
+		return static_cast<UnaryFunction const &>(*this)(it);
+	}
 };
 
 }	// namespace detail
