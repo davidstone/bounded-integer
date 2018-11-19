@@ -129,9 +129,17 @@ private:
 template<typename Size>
 integer_range(Size) -> integer_range<bounded::constant_t<0>, Size>;
 
+template<typename Integer, typename Sentinel, typename Step = bounded::constant_t<1>>
+constexpr auto inclusive_integer_range(Integer const first, Sentinel const last, Step const step = bounded::constant<1>) BOUNDED_NOEXCEPT_VALUE(
+	integer_range(first, last + step, step)
+)
+
 template<typename Enum, BOUNDED_REQUIRES(std::is_enum_v<Enum>)>
 constexpr auto enum_range(Enum last = static_cast<Enum>(std::numeric_limits<Enum>::max())) {
-	return containers::transform(integer_range(bounded::integer(last) + 1_bi), [](auto e) { return static_cast<Enum>(e); });
+	return containers::transform(
+		inclusive_integer_range(bounded::constant<0>, bounded::integer(last)),
+		[](auto e) { return static_cast<Enum>(e); }
+	);
 }
 
 }	// namespace containers
