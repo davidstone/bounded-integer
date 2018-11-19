@@ -143,6 +143,7 @@ private:
 	static_assert(std::is_copy_assignable_v<Iterator>);
 	static_assert(std::is_copy_assignable_v<Traits>);
 public:
+	adapt_iterator() = default;
 	constexpr adapt_iterator(Iterator it, Traits traits) noexcept(std::is_nothrow_constructible_v<tuple_t, Iterator, Traits>):
 		m_data(std::move(it), std::move(traits))
 	{
