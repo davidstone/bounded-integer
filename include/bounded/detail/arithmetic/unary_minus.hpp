@@ -42,8 +42,9 @@ constexpr auto operator-(integer<minimum, maximum, overflow_policy> const value)
 		overflow_policy
 	>;
 	using underlying_type = typename result_type::underlying_type;
-	using unsigned_type = detail::promoted_unsigned<underlying_type>;
-	return result_type(detail::from_unsigned_cast<typename result_type::underlying_type>(-static_cast<unsigned_type>(value)), non_check);
+	using promoted_unsigned_type = detail::promoted_unsigned<underlying_type>;
+	using unsigned_type = std::make_unsigned_t<underlying_type>;
+	return result_type(detail::from_unsigned_cast<underlying_type>(static_cast<unsigned_type>(-static_cast<promoted_unsigned_type>(value))), non_check);
 }
 
 }	// namespace bounded

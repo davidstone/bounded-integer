@@ -69,18 +69,18 @@ constexpr auto normalize = static_cast<
 >>>(value);
 
 template<typename T, BOUNDED_REQUIRES(is_signed_builtin<T>)>
-constexpr auto from_unsigned_cast(max_unsigned_t const value) noexcept {
-	using limits = basic_numeric_limits<max_signed_t>;
+constexpr auto from_unsigned_cast(std::make_unsigned_t<T> const value) noexcept {
+	using limits = basic_numeric_limits<T>;
+	static_assert(-(limits::min() + 1) == limits::max());
 	if (value <= limits::max()) {
-		return static_cast<max_signed_t>(value);
+		return static_cast<T>(value);
 	} else {
-		assert(value >= static_cast<max_unsigned_t>(limits::min()));
-		return static_cast<max_signed_t>(value - static_cast<max_unsigned_t>(limits::min())) + limits::min();
+		return static_cast<T>(static_cast<T>(value - static_cast<std::make_unsigned_t<T>>(limits::min())) + limits::min());
 	}
 }
 
 template<typename T, BOUNDED_REQUIRES(is_unsigned_builtin<T>)>
-constexpr auto from_unsigned_cast(max_unsigned_t const value) noexcept {
+constexpr auto from_unsigned_cast(std::make_unsigned_t<T> const value) noexcept {
 	return value;
 }
 
