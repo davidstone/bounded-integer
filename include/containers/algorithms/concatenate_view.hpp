@@ -6,7 +6,6 @@
 #pragma once
 
 #include <containers/algorithms/move_iterator.hpp>
-#include <containers/compare_adl.hpp>
 #include <containers/is_range.hpp>
 #include <containers/operator_arrow.hpp>
 
@@ -14,8 +13,6 @@
 #include <bounded/integer.hpp>
 
 namespace containers {
-
-using bounded::compare;
 
 template<typename Sentinel>
 struct concatenate_view_sentinel {
@@ -152,25 +149,22 @@ public:
 		typename LHSIterator1, typename LHSSentinel1, typename LHSIterator2,
 		typename RHSIterator1, typename RHSSentinel1, typename RHSIterator2
 	>
-	friend constexpr auto compare(
+	friend constexpr auto operator<=>(
 		concatenate_view_iterator<LHSIterator1, LHSSentinel1, LHSIterator2> const lhs,
 		concatenate_view_iterator<RHSIterator1, RHSSentinel1, RHSIterator2> const rhs
 	) BOUNDED_NOEXCEPT_DECLTYPE(
-		compare(lhs.tie(), rhs.tie())
+		lhs.tie() <=> rhs.tie()
 	)
 
 	template<
 		typename LHSIterator1, typename LHSSentinel1, typename LHSIterator2,
 		typename RHSSentinel
 	>
-	friend constexpr auto compare(
+	friend constexpr auto operator<=>(
 		concatenate_view_iterator<LHSIterator1, LHSSentinel1, LHSIterator2> const lhs,
 		concatenate_view_sentinel<RHSSentinel> const rhs
 	) BOUNDED_NOEXCEPT_DECLTYPE(
-		compare(
-			bounded::tie(lhs.m_first1, lhs.m_first2),
-			bounded::tie(lhs.m_last1, rhs.base())
-		)
+		bounded::tie(lhs.m_first1, lhs.m_first2) <=> bounded::tie(lhs.m_last1, rhs.base())
 	)
 
 
@@ -220,11 +214,11 @@ template<
 	typename LHSSentinel,
 	typename RHSIterator1, typename RHSSentinel1, typename RHSIterator2
 >
-constexpr auto compare(
+constexpr auto operator<=>(
 	concatenate_view_sentinel<LHSSentinel> const lhs,
 	concatenate_view_iterator<RHSIterator1, RHSSentinel1, RHSIterator2> const rhs
 ) BOUNDED_NOEXCEPT_DECLTYPE(
-	invert(compare(rhs, lhs))
+	0 <=> (rhs <=> lhs)
 )
 
 

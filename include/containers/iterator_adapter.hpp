@@ -6,7 +6,6 @@
 #pragma once
 
 #include <containers/common_iterator_functions.hpp>
-#include <containers/compare_adl.hpp>
 #include <containers/index_type.hpp>
 #include <containers/operator_arrow.hpp>
 #include <containers/reference_wrapper.hpp>
@@ -44,7 +43,7 @@ struct default_subtract {
 struct default_compare {
 	template<typename LHS, typename RHS>
 	static constexpr auto compare(LHS const & lhs, RHS const & rhs) BOUNDED_NOEXCEPT_DECLTYPE(
-		::containers::detail::compare_adl::indirect_compare(lhs, rhs)
+		lhs <=> rhs
 	)
 	template<typename LHS, typename RHS>
 	static constexpr auto equal(LHS const & lhs, RHS const & rhs) BOUNDED_NOEXCEPT_DECLTYPE(
@@ -125,12 +124,13 @@ struct iterator_typedefs_base<Iterator, Traits, false> {
 // 1) Dereferencing: *it
 // 2) Add: it + 5_bi
 // 3) Subtract: it1 - it2
-// 4) Compare: compare(it1, it2)
+// 4) Equal: it1 == it2
+// 5) Compare: it1 <=> it2
 // This allows you to customize those. Your function is passed an iterator.
-// Every other function can be built up from these four behaviors. Adding,
-// subtracting, and comparing are all linked to the same algorithm, but
-// unfortunately, there does not appear to be a way to provide a function that
-// unifies these operations.
+// Every other function can be built up from these behaviors. Adding,
+// subtracting, comparing, and equality are all linked to the same algorithm,
+// but unfortunately, there does not appear to be a way to provide a function
+// that unifies these operations.
 
 template<typename Iterator, typename Traits>
 struct adapt_iterator :
@@ -184,7 +184,7 @@ constexpr auto operator-(adapt_iterator<LHSIterator, Traits> const lhs, adapt_it
 )
 
 template<typename LHSIterator, typename RHSIterator, typename Traits>
-constexpr auto compare(adapt_iterator<LHSIterator, Traits> const lhs, adapt_iterator<RHSIterator, Traits> const rhs) BOUNDED_NOEXCEPT_DECLTYPE(
+constexpr auto operator<=>(adapt_iterator<LHSIterator, Traits> const lhs, adapt_iterator<RHSIterator, Traits> const rhs) BOUNDED_NOEXCEPT_DECLTYPE(
 	lhs.traits().compare(lhs.base(), rhs.base())
 )
 

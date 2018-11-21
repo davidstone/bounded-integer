@@ -33,7 +33,7 @@ struct reverse_traits {
 
 	template<typename RandomAccessIterator>
 	static constexpr auto compare(RandomAccessIterator const lhs, RandomAccessIterator const rhs) BOUNDED_NOEXCEPT_DECLTYPE(
-		::containers::detail::compare_adl::indirect_compare(rhs, lhs)
+		rhs <=> lhs
 	)
 	template<typename RandomAccessIterator>
 	static constexpr auto equal(RandomAccessIterator const lhs, RandomAccessIterator const rhs) BOUNDED_NOEXCEPT_DECLTYPE(

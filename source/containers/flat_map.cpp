@@ -74,12 +74,12 @@ public:
 	}
 	
 	
-	friend constexpr auto compare(CheckedMover const & lhs, CheckedMover const & rhs) noexcept {
+	friend constexpr auto operator<=>(CheckedMover const & lhs, CheckedMover const & rhs) noexcept {
 		assert(!lhs.m_moved);
 		assert(!rhs.m_moved);
 		assert(!lhs.m_destructed);
 		assert(!rhs.m_destructed);
-		return bounded::compare(lhs.m_value, rhs.m_value);
+		return lhs.m_value <=> rhs.m_value;
 	}
 	friend constexpr auto operator==(CheckedMover const & lhs, CheckedMover const & rhs) noexcept {
 		assert(!lhs.m_moved);
@@ -397,9 +397,8 @@ private:
 };
 
 template<std::size_t size>
-auto compare(Class<size> const & lhs, Class<size> const & rhs) {
-	using bounded::compare;
-	return compare(lhs.value(), rhs.value());
+auto operator<=>(Class<size> const & lhs, Class<size> const & rhs) {
+	return lhs.value() <=> rhs.value();
 }
 
 template<std::size_t size>

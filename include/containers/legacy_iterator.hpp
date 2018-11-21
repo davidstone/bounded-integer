@@ -8,7 +8,6 @@
 #pragma once
 
 #include <containers/common_iterator_functions.hpp>
-#include <containers/compare_adl.hpp>
 #include <containers/is_iterator.hpp>
 #include <containers/operator_arrow.hpp>
 
@@ -60,8 +59,8 @@ constexpr auto operator-(legacy_iterator<Iterator> const lhs, legacy_iterator<It
 )
 
 template<typename Iterator>
-constexpr auto compare(legacy_iterator<Iterator> const lhs, legacy_iterator<Iterator> const rhs) BOUNDED_NOEXCEPT(
-	detail::compare_adl::indirect_compare(lhs.base(), rhs.base())
+constexpr auto operator<=>(legacy_iterator<Iterator> const lhs, legacy_iterator<Iterator> const rhs) BOUNDED_NOEXCEPT(
+	lhs.base() <=> rhs.base()
 )
 
 template<typename Iterator>
