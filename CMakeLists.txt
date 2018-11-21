@@ -72,7 +72,6 @@ target_sources(bounded INTERFACE
 	$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>/include/bounded/detail/size_of.hpp
 	$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>/include/bounded/detail/stream.hpp
 	$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>/include/bounded/detail/string.hpp
-	$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>/include/bounded/detail/strong_ordering.hpp
 	$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>/include/bounded/detail/tuple.hpp
 	$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>/include/bounded/detail/type.hpp
 	$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>/include/bounded/detail/typedefs.hpp
@@ -227,7 +226,6 @@ add_executable(bounded_test
 	source/bounded/detail/size_of.cpp
 	source/bounded/detail/stream.cpp
 	source/bounded/detail/string.cpp
-	source/bounded/detail/strong_ordering.cpp
 	source/bounded/detail/to_integer.cpp
 	source/bounded/detail/tuple.cpp
 	source/bounded/detail/type.cpp

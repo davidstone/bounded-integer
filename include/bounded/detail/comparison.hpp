@@ -10,8 +10,8 @@
 #include <bounded/detail/max_builtin.hpp>
 #include <bounded/detail/noexcept.hpp>
 #include <bounded/detail/requires.hpp>
-#include <bounded/detail/strong_ordering.hpp>
 
+#include <compare>
 #include <functional>
 #include <type_traits>
 
@@ -19,40 +19,34 @@ namespace bounded {
 
 template<typename LHS, typename RHS>
 constexpr auto compare(LHS * const lhs, RHS * const rhs) noexcept {
-	return
-		lhs == rhs ? strong_ordering_equal :
-		lhs < rhs ? strong_ordering_less :
-		strong_ordering_greater;
+	return lhs <=> rhs;
 }
 
-// TODO: Implement correctly
 template<typename LHS, typename RHS, BOUNDED_REQUIRES(std::is_floating_point_v<LHS> and std::is_floating_point_v<RHS>)>
 constexpr auto compare(LHS const lhs, RHS const rhs) noexcept {
-	return
-		lhs == rhs ? strong_ordering_equal :
-		lhs < rhs ? strong_ordering_less :
-		strong_ordering_greater;
+	return lhs <=> rhs;
 }
 
 template<typename LHS, typename RHS, BOUNDED_REQUIRES(detail::is_builtin_integer<LHS> and detail::is_builtin_integer<RHS>)>
-constexpr auto compare(LHS const lhs, RHS const rhs) noexcept -> strong_ordering {
+constexpr auto compare(LHS const lhs, RHS const rhs) noexcept -> std::strong_ordering {
 	if constexpr (detail::is_signed_builtin<LHS> == detail::is_signed_builtin<RHS>) {
 		return
-			(lhs < rhs) ? strong_ordering_less :
-			(lhs > rhs) ? strong_ordering_greater :
-			strong_ordering_equal;
+			(lhs < rhs) ? std::strong_ordering::less :
+			(lhs > rhs) ? std::strong_ordering::greater :
+			std::strong_ordering::equal;
 	} else if constexpr (not std::is_same_v<LHS, detail::max_unsigned_t> and not std::is_same_v<RHS, detail::max_unsigned_t>) {
 		return compare(static_cast<detail::max_signed_t>(lhs), static_cast<detail::max_signed_t>(rhs));
 	} else if constexpr (detail::is_signed_builtin<LHS>) {
 		static_assert(std::is_same_v<RHS, detail::max_unsigned_t>);
-		return lhs < 0 ? strong_ordering_less : compare(static_cast<RHS>(lhs), rhs);
+		return lhs < 0 ? std::strong_ordering::less : compare(static_cast<RHS>(lhs), rhs);
 	} else {
 		static_assert(std::is_same_v<LHS, detail::max_unsigned_t>);
-		return rhs < 0 ? strong_ordering_greater : compare(lhs, static_cast<LHS>(rhs));
+		return rhs < 0 ? std::strong_ordering::greater : compare(lhs, static_cast<LHS>(rhs));
 	}
 }
 
 namespace detail {
+
 template<typename LHS, typename RHS, BOUNDED_REQUIRES(detail::is_builtin_integer<LHS> and detail::is_builtin_integer<RHS>)>
 constexpr auto safe_equal(LHS const lhs, RHS const rhs) noexcept -> bool {
 	constexpr auto signed_max = basic_numeric_limits<detail::max_signed_t>::max();
@@ -68,14 +62,14 @@ constexpr auto safe_equal(LHS const lhs, RHS const rhs) noexcept -> bool {
 		return rhs >= 0 and static_cast<LHS>(rhs);
 	}
 }
-} // namespace detail
 
+} // namespace detail
 
 template<typename Enum, BOUNDED_REQUIRES(std::is_enum_v<Enum>)>
 constexpr auto compare(Enum const lhs, Enum const rhs) noexcept {
-	using underlying = std::underlying_type_t<Enum>;
-	return bounded::compare(static_cast<underlying>(lhs), static_cast<underlying>(rhs));
+	return lhs <=> rhs;
 }
+
 
 namespace detail {
 
@@ -120,11 +114,11 @@ constexpr auto compare(LHS const & lhs [[maybe_unused]], RHS const & rhs [[maybe
 	using lhs_limits = basic_numeric_limits<LHS>;
 	using rhs_limits = basic_numeric_limits<RHS>;
 	if constexpr (compare(lhs_limits::min(), rhs_limits::max()) > 0) {
-		return strong_ordering_greater;
+		return std::strong_ordering::greater;
 	} else if constexpr (compare(lhs_limits::max(), rhs_limits::min()) < 0) {
-		return strong_ordering_less;
+		return std::strong_ordering::less;
 	} else if constexpr (compare(lhs_limits::min(), lhs_limits::max()) == 0 and compare(rhs_limits::min(), rhs_limits::max()) == 0 and compare(lhs_limits::min(), rhs_limits::min()) == 0) {
-		return strong_ordering_equal;
+		return std::strong_ordering::equal;
 	} else {
 		return compare(lhs.value(), rhs.value());
 	}
@@ -146,16 +140,15 @@ constexpr auto operator==(LHS const lhs [[maybe_unused]], RHS const rhs [[maybe_
 
 
 
-
 template<typename LHS, typename RHS>
 constexpr auto compare(LHS const & lhs, RHS const & rhs) BOUNDED_NOEXCEPT_DECLTYPE(
-	strong_ordering(lhs.compare(rhs))
+	lhs.compare(rhs) <=> 0
 )
 
 // Variadic makes this function always a worse match than the above
 template<typename LHS, typename RHS, typename... Ignore, BOUNDED_REQUIRES(sizeof...(Ignore) == 0)>
 constexpr auto compare(LHS const & lhs, RHS const & rhs, Ignore...) BOUNDED_NOEXCEPT_DECLTYPE(
-	strong_ordering(-rhs.compare(lhs))
+	0 <=> rhs.compare(lhs)
 )
 
 
@@ -182,22 +175,11 @@ constexpr auto operator>=(LHS const & lhs, RHS const & rhs) BOUNDED_NOEXCEPT_DEC
 )
 
 #define BOUNDED_COMPARISON \
-	using ::bounded::operator==; \
 	using ::bounded::operator!=; \
 	using ::bounded::operator<; \
 	using ::bounded::operator>; \
 	using ::bounded::operator<=; \
 	using ::bounded::operator>=;
 
-
-// This is probably a bad idea, but it could save a lot of compile time or code.
-// This macro is just a temporary solution until we actually get operator<=>
-#define BOUNDED_COMPARE_ONE_MEMBER(member) \
-	do { \
-		using bounded::compare; \
-		if (auto const cmp = compare(lhs.member, rhs.member); cmp != 0) { \
-			return cmp; \
-		} \
-	} while(false)
 
 }	// namespace bounded
