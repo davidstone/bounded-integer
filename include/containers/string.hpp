@@ -168,14 +168,23 @@ auto operator+(LHS && lhs, RHS && rhs) {
 	return ::containers::concatenate<result_t>(BOUNDED_FORWARD(lhs), BOUNDED_FORWARD(rhs));
 }
 
-template<typename String, typename CharT>
-auto operator+(String && lhs, CharT const * const rhs) BOUNDED_NOEXCEPT_VALUE(
-	BOUNDED_FORWARD(lhs) + std::basic_string_view(rhs)
-)
-template<typename CharT, typename String>
-auto operator+(CharT const * const lhs, String && rhs) BOUNDED_NOEXCEPT_VALUE(
-	std::basic_string_view(lhs) + BOUNDED_FORWARD(rhs)
-)
+template<typename CharT>
+auto operator+(basic_string<CharT> && lhs, CharT const * const rhs) {
+	return std::move(lhs) + std::basic_string_view(rhs);
+}
+template<typename CharT>
+auto operator+(basic_string<CharT> const & lhs, CharT const * const rhs) {
+	return lhs + std::basic_string_view(rhs);
+}
+
+template<typename CharT>
+auto operator+(CharT const * const lhs, basic_string<CharT> && rhs) {
+	return std::basic_string_view(lhs) + std::move(rhs);
+}
+template<typename CharT>
+auto operator+(CharT const * const lhs, basic_string<CharT> const & rhs) {
+	return std::basic_string_view(lhs) + rhs;
+}
 
 
 template<typename String, BOUNDED_REQUIRES(detail::is_string<std::decay_t<String>>)>
