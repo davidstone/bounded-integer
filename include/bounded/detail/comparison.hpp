@@ -18,30 +18,33 @@
 namespace bounded {
 
 template<typename LHS, typename RHS>
-constexpr auto compare(LHS * const lhs, RHS * const rhs) noexcept {
-	return lhs <=> rhs;
-}
+constexpr auto compare(LHS const & lhs, RHS const & rhs) BOUNDED_NOEXCEPT_DECLTYPE(
+	lhs.compare(rhs) <=> 0
+)
 
-template<typename LHS, typename RHS, BOUNDED_REQUIRES(std::is_floating_point_v<LHS> and std::is_floating_point_v<RHS>)>
-constexpr auto compare(LHS const lhs, RHS const rhs) noexcept {
-	return lhs <=> rhs;
-}
+// Variadic makes this function always a worse match than the above
+template<typename LHS, typename RHS, typename... Ignore, BOUNDED_REQUIRES(sizeof...(Ignore) == 0)>
+constexpr auto compare(LHS const & lhs, RHS const & rhs, Ignore...) BOUNDED_NOEXCEPT_DECLTYPE(
+	0 <=> rhs.compare(lhs)
+)
+
+template<typename LHS, typename RHS, BOUNDED_REQUIRES(not detail::is_builtin_integer<LHS> or !detail::is_builtin_integer<RHS>)>
+constexpr auto compare(LHS const & lhs, RHS const & rhs) BOUNDED_NOEXCEPT_DECLTYPE(
+	lhs <=> rhs
+)
 
 template<typename LHS, typename RHS, BOUNDED_REQUIRES(detail::is_builtin_integer<LHS> and detail::is_builtin_integer<RHS>)>
 constexpr auto compare(LHS const lhs, RHS const rhs) noexcept -> std::strong_ordering {
 	if constexpr (detail::is_signed_builtin<LHS> == detail::is_signed_builtin<RHS>) {
-		return
-			(lhs < rhs) ? std::strong_ordering::less :
-			(lhs > rhs) ? std::strong_ordering::greater :
-			std::strong_ordering::equal;
+		return lhs <=> rhs;
 	} else if constexpr (not std::is_same_v<LHS, detail::max_unsigned_t> and not std::is_same_v<RHS, detail::max_unsigned_t>) {
-		return compare(static_cast<detail::max_signed_t>(lhs), static_cast<detail::max_signed_t>(rhs));
+		return static_cast<detail::max_signed_t>(lhs) <=> static_cast<detail::max_signed_t>(rhs);
 	} else if constexpr (detail::is_signed_builtin<LHS>) {
 		static_assert(std::is_same_v<RHS, detail::max_unsigned_t>);
-		return lhs < 0 ? std::strong_ordering::less : compare(static_cast<RHS>(lhs), rhs);
+		return lhs < 0 ? std::strong_ordering::less : static_cast<RHS>(lhs) <=> rhs;
 	} else {
 		static_assert(std::is_same_v<LHS, detail::max_unsigned_t>);
-		return rhs < 0 ? std::strong_ordering::greater : compare(lhs, static_cast<LHS>(rhs));
+		return rhs < 0 ? std::strong_ordering::greater : lhs <=> static_cast<LHS>(rhs);
 	}
 }
 
@@ -62,16 +65,6 @@ constexpr auto safe_equal(LHS const lhs, RHS const rhs) noexcept -> bool {
 		return rhs >= 0 and static_cast<LHS>(rhs);
 	}
 }
-
-} // namespace detail
-
-template<typename Enum, BOUNDED_REQUIRES(std::is_enum_v<Enum>)>
-constexpr auto compare(Enum const lhs, Enum const rhs) noexcept {
-	return lhs <=> rhs;
-}
-
-
-namespace detail {
 
 template<typename Limited, typename UnaryFunction, typename LHS, typename RHS>
 constexpr auto safe_extreme(UnaryFunction const pick_lhs, LHS const lhs_, RHS const rhs_) noexcept {
@@ -138,18 +131,6 @@ constexpr auto operator==(LHS const lhs [[maybe_unused]], RHS const rhs [[maybe_
 	}
 }
 
-
-
-template<typename LHS, typename RHS>
-constexpr auto compare(LHS const & lhs, RHS const & rhs) BOUNDED_NOEXCEPT_DECLTYPE(
-	lhs.compare(rhs) <=> 0
-)
-
-// Variadic makes this function always a worse match than the above
-template<typename LHS, typename RHS, typename... Ignore, BOUNDED_REQUIRES(sizeof...(Ignore) == 0)>
-constexpr auto compare(LHS const & lhs, RHS const & rhs, Ignore...) BOUNDED_NOEXCEPT_DECLTYPE(
-	0 <=> rhs.compare(lhs)
-)
 
 
 template<typename LHS, typename RHS>
