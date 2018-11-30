@@ -1,4 +1,4 @@
-// Copyright David Stone 2017.
+// Copyright David Stone 2018.
 // Distributed under the Boost Software License, Version 1.0.
 // (See accompanying file LICENSE_1_0.txt or copy at
 // http://www.boost.org/LICENSE_1_0.txt)
@@ -100,6 +100,15 @@ constexpr auto modulus_operator_range = [](auto const lhs_, auto const rhs_) noe
 
 }	// namespace detail
 
-BOUNDED_INTEGER_OPERATOR_OVERLOADS(%, detail::modulus_operator_range)
+template<
+	auto lhs_min, auto lhs_max, typename lhs_policy,
+	auto rhs_min, auto rhs_max, typename rhs_policy
+>
+constexpr auto operator%(
+	integer<lhs_min, lhs_max, lhs_policy> const lhs,
+	integer<rhs_min, rhs_max, rhs_policy> const rhs
+) noexcept {
+	return detail::operator_overload(lhs, rhs, std::modulus{}, detail::modulus_operator_range);
+}
 
 }	// namespace bounded

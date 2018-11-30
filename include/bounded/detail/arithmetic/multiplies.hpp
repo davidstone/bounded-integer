@@ -1,4 +1,4 @@
-// Copyright David Stone 2017.
+// Copyright David Stone 2018.
 // Distributed under the Boost Software License, Version 1.0.
 // (See accompanying file LICENSE_1_0.txt or copy at
 // http://www.boost.org/LICENSE_1_0.txt)
@@ -34,20 +34,26 @@ constexpr auto safer_multiply(constant_t<lhs> const &, constant_t<rhs> const &) 
 	}
 }
 
-constexpr auto multiplies_operator_range = [](auto const lhs, auto const rhs) noexcept {
-	auto p0 = safer_multiply(lhs.min, rhs.min);
-	auto p1 = safer_multiply(lhs.min, rhs.max);
-	auto p2 = safer_multiply(lhs.max, rhs.min);
-	auto p3 = safer_multiply(lhs.max, rhs.max);
-	return min_max{
-		safe_min(p0, p1, p2, p3),
-		safe_max(p0, p1, p2, p3)
-	};
-};
-
 }	// namespace detail
 
-BOUNDED_INTEGER_OPERATOR_OVERLOADS(*, detail::multiplies_operator_range)
+template<
+	auto lhs_min, auto lhs_max, typename lhs_policy,
+	auto rhs_min, auto rhs_max, typename rhs_policy
+>
+constexpr auto operator*(
+	integer<lhs_min, lhs_max, lhs_policy> const lhs_,
+	integer<rhs_min, rhs_max, rhs_policy> const rhs_
+) noexcept {
+	return detail::operator_overload(lhs_, rhs_, std::multiplies{}, [](auto const lhs, auto const rhs) noexcept {
+		auto p0 = detail::safer_multiply(lhs.min, rhs.min);
+		auto p1 = detail::safer_multiply(lhs.min, rhs.max);
+		auto p2 = detail::safer_multiply(lhs.max, rhs.min);
+		auto p3 = detail::safer_multiply(lhs.max, rhs.max);
+		return detail::min_max{
+			detail::safe_min(p0, p1, p2, p3),
+			detail::safe_max(p0, p1, p2, p3)
+		};
+	});
+}
 
 }	// namespace bounded
-

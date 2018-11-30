@@ -1,4 +1,4 @@
-// Copyright David Stone 2017.
+// Copyright David Stone 2018.
 // Distributed under the Boost Software License, Version 1.0.
 // (See accompanying file LICENSE_1_0.txt or copy at
 // http://www.boost.org/LICENSE_1_0.txt)
@@ -36,16 +36,23 @@ constexpr auto safer_add(constant_t<lhs>, constant_t<rhs>) noexcept {
 	}
 }
 
-constexpr auto plus_operator_range = [](auto const & lhs, auto const & rhs) noexcept {
-	return min_max{
-		safer_add(lhs.min, rhs.min),
-		safer_add(lhs.max, rhs.max)
-	};
-};
-
 }	// namespace detail
 
-BOUNDED_INTEGER_OPERATOR_OVERLOADS(+, detail::plus_operator_range)
+template<
+	auto lhs_min, auto lhs_max, typename lhs_policy,
+	auto rhs_min, auto rhs_max, typename rhs_policy
+>
+constexpr auto operator+(
+	integer<lhs_min, lhs_max, lhs_policy> const lhs_,
+	integer<rhs_min, rhs_max, rhs_policy> const rhs_
+) noexcept {
+	return detail::operator_overload(lhs_, rhs_, std::plus{}, [](auto const lhs, auto const rhs) noexcept {
+		return detail::min_max{
+			safer_add(lhs.min, rhs.min),
+			safer_add(lhs.max, rhs.max)
+		};
+	});
+}
 
 }	// namespace bounded
 
