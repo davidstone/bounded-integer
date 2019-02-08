@@ -14,6 +14,7 @@
 #include <bounded/detail/noexcept.hpp>
 #include <bounded/detail/requires.hpp>
 
+#include <cassert>
 #include <stdexcept>
 #include <type_traits>
 #include <utility>
@@ -162,13 +163,16 @@ public:
 
 	
 	constexpr auto operator*() const & noexcept -> value_type const & {
-		return *this ? m_value : error_using_uninitialized_optional(m_value);
+		assert(static_cast<bool>(*this));
+		return m_value;
 	}
 	constexpr auto operator*() & noexcept -> value_type & {
-		return *this ? m_value : error_using_uninitialized_optional(m_value);
+		assert(static_cast<bool>(*this));
+		return m_value;
 	}
 	constexpr auto operator*() && noexcept -> value_type && {
-		return *this ? std::move(m_value) : error_using_uninitialized_optional(std::move(m_value));
+		assert(static_cast<bool>(*this));
+		return std::move(m_value);
 	}
 
 	constexpr auto operator->() const noexcept {
@@ -203,15 +207,6 @@ public:
 	}
 	
 private:
-	// The identity function is intentionally not constexpr. This provides
-	// compile-time checking if used in a constexpr context. If this is called
-	// at run-time, the optimizer should detect that all branches return the
-	// same value and eliminate all branching, creating no overhead. See
-	// https://stackoverflow.com/questions/20461121/constexpr-error-at-compile-time-but-no-overhead-at-run-time
-	template<typename U>
-	static auto && error_using_uninitialized_optional(U && u) noexcept {
-		return BOUNDED_FORWARD(u);
-	}
 
 	template<typename Optional>
 	constexpr optional(Optional && other, common_init_tag) noexcept(std::is_nothrow_constructible<value_type, decltype(*std::declval<Optional>())>{}):
