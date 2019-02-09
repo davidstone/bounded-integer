@@ -111,21 +111,16 @@ constexpr auto check_uncompressed_optional() {
 		sizeof(type) < sizeof(bounded::optional<type>),
 		"Compressing an optional that should not be compressed."
 	);
-	check_empty_braces<type>();
+	check_empty_braces<bounded::optional<type>>();
 }
 template<auto minimum, auto maximum>
 constexpr auto check_compressed_optional() {
 	using type = bounded::integer<minimum, maximum>;
-	using compressed_type = bounded::optional<type>;
 	static_assert(
-		sizeof(type) == sizeof(compressed_type),
+		sizeof(type) == sizeof(bounded::optional<type>),
 		"compressed_optional too big."
 	);
-	static_assert(
-		sizeof(compressed_type) == sizeof(bounded::optional<type>),
-		"Incorrect optional selection."
-	);
-	check_empty_braces<compressed_type>();
+	check_empty_braces<bounded::optional<type>>();
 }
 
 template<typename integer_type>
