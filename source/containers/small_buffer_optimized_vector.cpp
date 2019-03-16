@@ -46,10 +46,10 @@ void test_generic(bounded::constant_t<capacity_> const capacity, T const & t, st
 	}
 
 	auto const init_list = container(init);
-	assert(std::equal(begin(init_list), end(init_list), begin(init), end(init)));
+	assert(containers::equal(init_list, init));
 	
 	auto copy = init_list;
-	assert(std::equal(begin(copy), end(copy), begin(init), end(init)));
+	assert(containers::equal(copy, init));
 	
 	auto move = std::move(copy);
 	clear(copy);

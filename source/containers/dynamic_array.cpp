@@ -5,6 +5,8 @@
 
 #include <containers/dynamic_array.hpp>
 
+#include <containers/algorithms/compare.hpp>
+
 #include <cassert>
 
 namespace {
@@ -43,10 +45,10 @@ void test_generic(T const & t, Capacity capacity, std::initializer_list<T> init)
 	}
 
 	auto const init_list = container(init);
-	assert(std::equal(begin(init_list), end(init_list), begin(init), end(init)));
+	assert(containers::equal(init_list, init));
 	
 	auto copy = init_list;
-	assert(std::equal(begin(copy), end(copy), begin(init), end(init)));
+	assert(containers::equal(copy, init));
 	
 	auto move = std::move(copy);
 	clear(copy);

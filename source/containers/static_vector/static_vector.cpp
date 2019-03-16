@@ -86,10 +86,10 @@ void test_generic(T const & t, std::initializer_list<T> init) {
 	}
 
 	auto const init_list = container(init);
-	assert(std::equal(begin(init_list), end(init_list), begin(init), end(init)));
+	assert(containers::equal(init_list, init));
 	
 	auto copy = init_list;
-	assert(std::equal(begin(copy), end(copy), begin(init), end(init)));
+	assert(containers::equal(copy, init));
 	
 	auto move = std::move(copy);
 	clear(copy);
@@ -173,7 +173,7 @@ int main() {
 
 	container.insert(begin(container) + 1_bi, containers::repeat_n(5_bi, 12));
 	auto const expected = { 1, 12, 12, 12, 12, 12, 2, 3 };
-	assert(std::equal(begin(container), end(container), begin(expected), end(expected)));
+	assert(containers::equal(container, expected));
 	
 	containers::static_vector<non_copyable, 10> test_no_copies;
 	test_no_copies.emplace_back();
