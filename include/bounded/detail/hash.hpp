@@ -15,7 +15,8 @@ template<auto minimum, auto maximum, typename overflow_policy>
 struct hash<bounded::integer<minimum, maximum, overflow_policy>> {
 	using argument_type = bounded::integer<minimum, maximum, overflow_policy>;
 	constexpr decltype(auto) operator()(argument_type const & argument) const {
-		return hash<typename argument_type::underlying_type>{}(argument.value());
+		using underlying_type = typename argument_type::underlying_type;
+		return hash<underlying_type>{}(static_cast<underlying_type>(argument));
 	}
 };
 
