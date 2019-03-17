@@ -40,10 +40,23 @@ struct default_subtract {
 	)
 };
 
+namespace detail {
+namespace compare_impl_detail {
+
+using bounded::compare;
+
+template<typename LHS, typename RHS>
+constexpr auto compare_impl(LHS const & lhs, RHS const & rhs) BOUNDED_NOEXCEPT_DECLTYPE(
+	compare(lhs, rhs)
+)
+
+} // namespace compare_impl_detail
+} // namespace detail
+
 struct default_compare {
 	template<typename LHS, typename RHS>
 	static constexpr auto compare(LHS const & lhs, RHS const & rhs) BOUNDED_NOEXCEPT_DECLTYPE(
-		lhs <=> rhs
+		detail::compare_impl_detail::compare_impl(lhs, rhs)
 	)
 	template<typename LHS, typename RHS>
 	static constexpr auto equal(LHS const & lhs, RHS const & rhs) BOUNDED_NOEXCEPT_DECLTYPE(
@@ -184,7 +197,7 @@ constexpr auto operator-(adapt_iterator<LHSIterator, Traits> const lhs, adapt_it
 )
 
 template<typename LHSIterator, typename RHSIterator, typename Traits>
-constexpr auto operator<=>(adapt_iterator<LHSIterator, Traits> const lhs, adapt_iterator<RHSIterator, Traits> const rhs) BOUNDED_NOEXCEPT_DECLTYPE(
+constexpr auto compare(adapt_iterator<LHSIterator, Traits> const lhs, adapt_iterator<RHSIterator, Traits> const rhs) BOUNDED_NOEXCEPT_DECLTYPE(
 	lhs.traits().compare(lhs.base(), rhs.base())
 )
 

@@ -67,16 +67,16 @@ template<typename T>
 single_element_iterator(T &&) -> single_element_iterator<T &&>;
 
 template<typename T>
-constexpr auto operator<=>(single_element_iterator<T> const lhs, single_element_iterator<T> const rhs) noexcept {
-	return lhs.is_end() <=> rhs.is_end();
+constexpr auto compare(single_element_iterator<T> const lhs, single_element_iterator<T> const rhs) noexcept {
+	return compare(lhs.is_end(), rhs.is_end());
 }
 
 template<typename T>
-constexpr auto operator<=>(single_element_iterator<T> const lhs, single_element_sentinel) noexcept {
+constexpr auto compare(single_element_iterator<T> const lhs, single_element_sentinel) noexcept {
 	return lhs.is_end() <=> true;
 }
 template<typename T>
-constexpr auto operator<=>(single_element_sentinel, single_element_iterator<T> const rhs) noexcept {
+constexpr auto compare(single_element_sentinel, single_element_iterator<T> const rhs) noexcept {
 	return true <=> rhs.is_end();
 }
 

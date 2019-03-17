@@ -59,8 +59,8 @@ constexpr auto operator-(legacy_iterator<Iterator> const lhs, legacy_iterator<It
 )
 
 template<typename Iterator>
-constexpr auto operator<=>(legacy_iterator<Iterator> const lhs, legacy_iterator<Iterator> const rhs) BOUNDED_NOEXCEPT(
-	lhs.base() <=> rhs.base()
+constexpr auto compare(legacy_iterator<Iterator> const lhs, legacy_iterator<Iterator> const rhs) BOUNDED_NOEXCEPT(
+	compare(lhs.base(), rhs.base())
 )
 
 template<typename Iterator>

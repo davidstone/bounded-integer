@@ -103,7 +103,7 @@ constexpr auto safe_max(Ts... values) noexcept {
 
 
 template<typename LHS, typename RHS, BOUNDED_REQUIRES(is_bounded_integer<LHS> and is_bounded_integer<RHS>)>
-constexpr auto operator<=>(LHS const & lhs [[maybe_unused]], RHS const & rhs [[maybe_unused]]) noexcept {
+constexpr auto compare(LHS const & lhs [[maybe_unused]], RHS const & rhs [[maybe_unused]]) noexcept {
 	using lhs_limits = basic_numeric_limits<LHS>;
 	using rhs_limits = basic_numeric_limits<RHS>;
 	if constexpr (compare(lhs_limits::min(), rhs_limits::max()) > 0) {

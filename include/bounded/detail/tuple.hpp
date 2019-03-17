@@ -234,7 +234,7 @@ constexpr auto compare_impl(tuple<lhs_types...> const & lhs, tuple<rhs_types...>
 	if constexpr (index == constant<sizeof...(lhs_types)>) {
 		return std::strong_ordering::equal;
 	} else {
-		if (auto const cmp = lhs[index] <=> rhs[index]; cmp != 0) {
+		if (auto const cmp = compare(lhs[index], rhs[index]); cmp != 0) {
 			return cmp;
 		}
 		return compare_impl(lhs, rhs, index + constant<1>);
@@ -255,7 +255,7 @@ template<
 	typename... rhs_types,
 	BOUNDED_REQUIRES(sizeof...(lhs_types) == sizeof...(rhs_types))
 >
-constexpr auto operator<=>(tuple<lhs_types...> const & lhs, tuple<rhs_types...> const & rhs) BOUNDED_NOEXCEPT_VALUE(
+constexpr auto compare(tuple<lhs_types...> const & lhs, tuple<rhs_types...> const & rhs) BOUNDED_NOEXCEPT_VALUE(
 	detail::compare_impl(lhs, rhs, constant<0>)
 )
 

@@ -78,13 +78,13 @@ struct c_string_sentinel_t {
 };
 
 template<typename CharT>
-constexpr auto operator<=>(CharT const * lhs, c_string_sentinel_t<CharT>) noexcept {
+constexpr auto compare(CharT const * lhs, c_string_sentinel_t<CharT>) noexcept {
 	return *lhs == '\0' ? std::strong_ordering::equal : std::strong_ordering::less;
 }
 
 template<typename CharT>
-constexpr auto operator<=>(c_string_sentinel_t<CharT> const lhs, CharT const * rhs) noexcept {
-	return 0 <=> (rhs <=> lhs);
+constexpr auto compare(c_string_sentinel_t<CharT> const lhs, CharT const * rhs) noexcept {
+	return 0 <=> compare(rhs, lhs);
 }
 
 template<typename CharT>
@@ -103,12 +103,12 @@ constexpr auto c_string_sentinel = c_string_sentinel_t<CharT>{};
 } // namespace detail
 
 template<typename CharT>
-constexpr auto operator<=>(basic_string<CharT> const & lhs, CharT const * const rhs) BOUNDED_NOEXCEPT_VALUE(
+constexpr auto compare(basic_string<CharT> const & lhs, CharT const * const rhs) BOUNDED_NOEXCEPT_VALUE(
 	::containers::lexicographical_compare_3way(begin(lhs), end(lhs), rhs, detail::c_string_sentinel<CharT>)
 )
 template<typename CharT>
-constexpr auto operator<=>(CharT const * const lhs, basic_string<CharT> const & rhs) BOUNDED_NOEXCEPT_VALUE(
-	0 <=> (rhs <=> lhs)
+constexpr auto compare(CharT const * const lhs, basic_string<CharT> const & rhs) BOUNDED_NOEXCEPT_VALUE(
+	0 <=> compare(rhs, lhs)
 )
 
 template<typename CharT>
@@ -121,11 +121,11 @@ constexpr auto operator==(CharT const * const lhs, basic_string<CharT> const & r
 )
 
 template<typename CharT>
-constexpr auto operator<=>(basic_string<CharT> const & lhs, std::basic_string_view<CharT> const rhs) BOUNDED_NOEXCEPT_VALUE(
+constexpr auto compare(basic_string<CharT> const & lhs, std::basic_string_view<CharT> const rhs) BOUNDED_NOEXCEPT_VALUE(
 	::containers::lexicographical_compare_3way(lhs, rhs)
 )
 template<typename CharT>
-constexpr auto operator<=>(std::basic_string_view<CharT> const lhs, basic_string<CharT> const & rhs) BOUNDED_NOEXCEPT_VALUE(
+constexpr auto compare(std::basic_string_view<CharT> const lhs, basic_string<CharT> const & rhs) BOUNDED_NOEXCEPT_VALUE(
 	0 <=> (rhs <=> lhs)
 )
 

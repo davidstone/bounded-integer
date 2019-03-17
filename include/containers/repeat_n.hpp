@@ -40,14 +40,14 @@ struct repeat_n_iterator {
 	}
 
 	// It is undefined behavior to compare iterators into different ranges
-	friend constexpr auto operator<=>(repeat_n_iterator const lhs, repeat_n_iterator const rhs) {
-		return lhs.m_remaining <=> rhs.m_remaining;
+	friend constexpr auto compare(repeat_n_iterator const lhs, repeat_n_iterator const rhs) {
+		return compare(lhs.m_remaining, rhs.m_remaining);
 	}
-	friend constexpr auto operator<=>(repeat_n_iterator const lhs, repeat_n_sentinel) {
-		return lhs.m_remaining <=> 0_bi;
+	friend constexpr auto compare(repeat_n_iterator const lhs, repeat_n_sentinel) {
+		return compare(lhs.m_remaining, 0_bi);
 	}
-	friend constexpr auto operator<=>(repeat_n_sentinel, repeat_n_iterator const rhs) {
-		return 0_bi <=> rhs.m_remaining;
+	friend constexpr auto compare(repeat_n_sentinel, repeat_n_iterator const rhs) {
+		return compare(0_bi, rhs.m_remaining);
 	}
 
 	friend constexpr auto operator==(repeat_n_iterator const lhs, repeat_n_iterator const rhs) {

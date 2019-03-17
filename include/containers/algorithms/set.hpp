@@ -90,11 +90,11 @@ template<
 	typename RHSForwardIterator1, typename RHSForwardIterator2, typename RHSRange,
 	BOUNDED_REQUIRES(std::is_same_v<std::remove_const_t<LHSRange>, std::remove_const_t<RHSRange>>)
 >
-constexpr auto operator<=>(
+constexpr auto compare(
 	set_intersection_pair_iterator<LHSForwardIterator1, LHSForwardIterator2, LHSRange> const lhs,
 	set_intersection_pair_iterator<RHSForwardIterator1, RHSForwardIterator2, RHSRange> const rhs
 ) BOUNDED_NOEXCEPT_VALUE(
-	lhs.first() <=> rhs.first()
+	compare(lhs.first(), rhs.first())
 )
 template<
 	typename LHSForwardIterator1, typename LHSForwardIterator2, typename LHSRange,

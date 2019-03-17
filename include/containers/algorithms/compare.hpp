@@ -173,7 +173,7 @@ template<typename LHS, typename RHS, BOUNDED_REQUIRES(
 	std::is_same<std::remove_cv_t<std::remove_reference_t<LHS>>, std::remove_cv_t<std::remove_reference_t<RHS>>>{} and
 	is_range<std::remove_cv_t<std::remove_reference_t<LHS>>>
 )>
-constexpr auto operator<=>(LHS && lhs, RHS && rhs) BOUNDED_NOEXCEPT(
+constexpr auto compare(LHS && lhs, RHS && rhs) BOUNDED_NOEXCEPT(
 	::containers::lexicographical_compare_3way(
 		begin(std::as_const(lhs)), end(std::as_const(lhs)),
 		begin(std::as_const(rhs)), end(std::as_const(rhs))
@@ -196,12 +196,12 @@ constexpr auto operator==(LHS && lhs, RHS && rhs) BOUNDED_NOEXCEPT(
 
 }	// namespace common
 
-using ::containers::detail::common::operator<=>;
+using ::containers::detail::common::compare;
 using ::containers::detail::common::operator==;
 
 }	// namespace detail
 
-using ::containers::detail::common::operator<=>;
+using ::containers::detail::common::compare;
 using ::containers::detail::common::operator==;
 
 }	// namespace containers
