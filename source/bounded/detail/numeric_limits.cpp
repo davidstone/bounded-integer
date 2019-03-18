@@ -53,7 +53,7 @@ constexpr auto check_numeric_limits() {
 	#undef BOUNDED_INTEGER_CHECK_CONDITION
 
 	#define BOUNDED_INTEGER_CHECK_FUNCTION(function) \
-		static_assert(int_limits::function() == bounded_limits::function().value(), #function "() is wrong.")
+		static_assert(int_limits::function() == bounded_limits::function(), #function "() is wrong.")
 	// Some of the functions are meaningless for integers, so I do not compare
 	#define BOUNDED_INTEGER_CHECK_MEANINGLESS_FUNCTION(function) \
 		static_cast<void>(bounded_limits::function())
