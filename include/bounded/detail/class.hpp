@@ -140,6 +140,8 @@ constexpr auto constant = constant_t<detail::normalize<value>, overflow_policy>{
 template<auto minimum, auto maximum, typename overflow_policy_ = null_policy>
 struct integer : private detail::base<minimum, maximum> {
 private:
+	static_assert(std::is_same_v<std::decay_t<decltype(minimum)>, std::decay_t<decltype(detail::normalize<minimum>)>>);
+	static_assert(std::is_same_v< std::decay_t<decltype(maximum)>, std::decay_t<decltype(detail::normalize<maximum>)>>);
 	using base = detail::base<minimum, maximum>;
 public:
 	static_assert(compare(minimum, maximum) <= 0, "Maximum cannot be less than minimum");

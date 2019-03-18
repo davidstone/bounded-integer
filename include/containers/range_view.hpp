@@ -20,7 +20,7 @@ struct range_view {
 
 	using size_type = bounded::integer<
 		0,
-		static_cast<std::uintmax_t>(std::numeric_limits<typename std::iterator_traits<Iterator>::difference_type>::max())
+		bounded::detail::normalize<static_cast<std::uintmax_t>(std::numeric_limits<typename std::iterator_traits<Iterator>::difference_type>::max())>
 	>;
 	
 	using const_iterator = Iterator;

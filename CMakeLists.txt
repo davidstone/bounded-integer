@@ -1,9 +1,9 @@
-# Copyright David Stone 2017.
+# Copyright David Stone 2019.
 # Distributed under the Boost Software License, Version 1.0.
 # (See accompanying file LICENSE_1_0.txt or copy at
 # http://www.boost.org/LICENSE_1_0.txt)
 
-cmake_minimum_required(VERSION 3.8 FATAL_ERROR)
+cmake_minimum_required(VERSION 3.14 FATAL_ERROR)
 project(bounded_integer LANGUAGES CXX)
 
 enable_testing()
@@ -234,7 +234,7 @@ add_executable(bounded_test
 	source/bounded/optional.cpp
 )
 
-target_link_libraries(bounded_test bounded)
+target_link_libraries(bounded_test PUBLIC bounded)
 
 add_library(containers_test STATIC
 	source/containers/algorithms/accumulate.cpp
@@ -300,113 +300,113 @@ add_library(containers_test STATIC
 	source/containers/size.cpp
 )
 
-target_link_libraries(containers_test containers)
+target_link_libraries(containers_test PUBLIC containers)
 
 add_executable(concatenate
 	source/containers/algorithms/concatenate.cpp
 )
-target_link_libraries(concatenate containers)
+target_link_libraries(concatenate PUBLIC containers)
 
 add_executable(static_vector
 	source/containers/static_vector/static_vector.cpp
 )
-target_link_libraries(static_vector containers)
+target_link_libraries(static_vector PUBLIC containers)
 
 add_executable(small_buffer_optimized_vector
 	source/containers/small_buffer_optimized_vector.cpp
 )
-target_link_libraries(small_buffer_optimized_vector containers)
+target_link_libraries(small_buffer_optimized_vector PUBLIC containers)
 
 add_executable(flat_map
 	source/containers/flat_map.cpp
 )
-target_link_libraries(flat_map containers)
+target_link_libraries(flat_map PUBLIC containers)
 
 add_executable(vector
 	source/containers/vector.cpp
 )
-target_link_libraries(vector containers)
+target_link_libraries(vector PUBLIC containers)
 
 add_executable(string
 	source/containers/string.cpp
 )
-target_link_libraries(string containers)
+target_link_libraries(string PUBLIC containers)
 
 add_executable(dynamic_array
 	source/containers/dynamic_array.cpp
 )
-target_link_libraries(dynamic_array containers)
+target_link_libraries(dynamic_array PUBLIC containers)
 
 add_executable(variant
 	source/bounded/detail/variant/variant.cpp
 )
-target_link_libraries(variant bounded)
-
-function(set_sanitizers target)
-	if(USE_SANITIZERS)
-		foreach(SANITIZER -fsanitize=undefined -fsanitize=address)
-			target_compile_options(${target} PUBLIC ${SANITIZER})
-			target_link_libraries(${target} ${SANITIZER})
-		endforeach()
-	endif()
-endfunction()
+target_link_libraries(variant PUBLIC bounded)
 
 
-if("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang")
-	set(COMPILE_OPTIONS
-		"-g"
-		"-std=c++2a"
-		"-march=native"
-		"-Weverything"
-		"-Werror"
-		"-Wno-c++98-compat"
-		"-Wno-c++98-compat-pedantic"
-		# Floating-point comparisons are safe in these tests
-		"-Wno-float-equal"
-		# -Wmissing-braces wants two sets of braces when using constructs such
-		# as std::array
-		"-Wno-missing-braces"
-		"-Wno-newline-eof"
-		"-Wno-padded"
-		# -Wundefined-func-template has a bug that triggers on deduction guides
-		"-Wno-undefined-func-template"
-		# -Wunneeded-member-function has a bug that blocks constexpr libraries
-		# from using it: https://llvm.org/bugs/show_bug.cgi?id=25084
-		"-Wno-unneeded-member-function"
-		# Has a bug that warns even for templates that are used
-		"-Wno-unused-template"
-		# -Wweak-vtables is incompatible with header-only libraries
-		"-Wno-weak-vtables"
-		# -Wzero-as-null-pointer-constant does not work with the `operator<=>`
-		# emulation
-		"-Wno-zero-as-null-pointer-constant"
+set(COMMON_CLANG_COMPILE_OPTIONS
+	"-Weverything"
+	"-Werror"
+	"-Wno-c++98-compat"
+	"-Wno-c++98-compat-pedantic"
+	# Floating-point comparisons are safe in these tests
+	"-Wno-float-equal"
+	# -Wmissing-braces wants two sets of braces when using constructs such
+	# as std::array
+	"-Wno-missing-braces"
+	"-Wno-newline-eof"
+	"-Wno-padded"
+	# -Wundefined-func-template has a bug that triggers on deduction guides
+	"-Wno-undefined-func-template"
+	# -Wunneeded-member-function has a bug that blocks constexpr libraries
+	# from using it: https://llvm.org/bugs/show_bug.cgi?id=25084
+	"-Wno-unneeded-member-function"
+	# Has a bug that warns even for templates that are used
+	"-Wno-unused-template"
+	# -Wweak-vtables is incompatible with header-only libraries
+	"-Wno-weak-vtables"
+	# -Wzero-as-null-pointer-constant does not work with the `operator<=>`
+	# emulation
+	"-Wno-zero-as-null-pointer-constant"
+)
+
+if(MSVC)
+	target_compile_options(bounded INTERFACE
+		"/std:c++latest"
+		"/MP"
 	)
-	target_compile_options(bounded_test PRIVATE ${COMPILE_OPTIONS})
-	target_compile_options(containers_test PRIVATE ${COMPILE_OPTIONS})
-	target_compile_options(concatenate PRIVATE ${COMPILE_OPTIONS})
-	target_compile_options(static_vector PRIVATE ${COMPILE_OPTIONS})
-	target_compile_options(small_buffer_optimized_vector PRIVATE ${COMPILE_OPTIONS})
-	target_compile_options(flat_map PRIVATE ${COMPILE_OPTIONS} "-DUSE_FLAT_MAP")
-	target_compile_options(vector PRIVATE ${COMPILE_OPTIONS})
-	target_compile_options(string PRIVATE ${COMPILE_OPTIONS})
-	target_compile_options(dynamic_array PRIVATE ${COMPILE_OPTIONS})
-	target_compile_options(variant PRIVATE ${COMPILE_OPTIONS})
+	target_link_options(bounded INTERFACE
+		"/WX"
+	)
 
-	set_sanitizers(bounded_test)
-	set_sanitizers(containers_test)
-	set_sanitizers(concatenate)
-	set_sanitizers(static_vector)
-	set_sanitizers(small_buffer_optimized_vector)
-	set_sanitizers(flat_map)
-	set_sanitizers(vector)
-	set_sanitizers(string)
-	set_sanitizers(dynamic_array)
-	set_sanitizers(variant)
+	if("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang")
+		set(COMPILE_OPTIONS
+			${COMMON_CLANG_COMPILE_OPTIONS}
+		)
+		# Sanitizers currently do not work very well on Windows
+		set(USE_SANITIZERS OFF)
+	else()
+		set(COMPILE_OPTIONS
+			"/FI ciso646"
+		)
+		set(USE_SANITIZERS OFF)
+	endif()
+
+elseif("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang")
+	target_compile_options(bounded INTERFACE
+		"-std=c++2a"
+	)
+	set(COMPILE_OPTIONS
+		${COMMON_CLANG_COMPILE_OPTIONS}
+		"-g"
+		"-march=native"
+	)
 
 elseif("${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU")
+	target_compile_options(bounded INTERFACE
+		"-std=c++2a"
+	)
 	set(COMPILE_OPTIONS
 		"-g"
-		"-std=c++2a"
 		"-march=native"
 		"-Wall"
 		"-Wextra"
@@ -482,36 +482,31 @@ elseif("${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU")
 		# "-Wzero-as-null-pointer-constant"
 		"-Werror"
 	)
-	target_compile_options(bounded_test PRIVATE ${COMPILE_OPTIONS})
-	target_compile_options(containers_test PRIVATE ${COMPILE_OPTIONS})
-	target_compile_options(concatenate PRIVATE ${COMPILE_OPTIONS})
-	target_compile_options(static_vector PRIVATE ${COMPILE_OPTIONS})
-	target_compile_options(small_buffer_optimized_vector PRIVATE ${COMPILE_OPTIONS})
-	target_compile_options(flat_map PRIVATE ${COMPILE_OPTIONS} "-DUSE_FLAT_MAP")
-	target_compile_options(vector PRIVATE ${COMPILE_OPTIONS})
-	target_compile_options(string PRIVATE ${COMPILE_OPTIONS})
-	target_compile_options(dynamic_array PRIVATE ${COMPILE_OPTIONS})
-	target_compile_options(variant PRIVATE ${COMPILE_OPTIONS})
-
-	set_sanitizers(bounded_test)
-	set_sanitizers(containers_test)
-	set_sanitizers(concatenate)
-	set_sanitizers(static_vector)
-	set_sanitizers(small_buffer_optimized_vector)
-	set_sanitizers(flat_map)
-	set_sanitizers(vector)
-	set_sanitizers(string)
-	set_sanitizers(dynamic_array)
-	set_sanitizers(variant)
 endif()
 
-add_test(bounded_test bounded_test)
-add_test(concatenate concatenate)
-add_test(static_vector static_vector)
-add_test(small_buffer_optimized_vector small_buffer_optimized_vector)
-add_test(flat_map flat_map)
-add_test(vector vector)
-add_test(string string)
-add_test(dynamic_array dynamic_array)
-add_test(variant variant)
+target_compile_options(flat_map PRIVATE ${COMPILE_OPTIONS} "-DUSE_FLAT_MAP")
 
+set(test_targets bounded_test concatenate static_vector small_buffer_optimized_vector flat_map vector string dynamic_array variant)
+set(all_targets ${test_targets} containers_test)
+
+set(sanitizers "-fsanitize=undefined" "-fsanitize=address")
+foreach(target ${all_targets})
+	target_compile_options(${target} PRIVATE ${COMPILE_OPTIONS})
+	if(DEFINED USE_SANITIZERS)
+		if(${USE_SANITIZERS})
+			target_compile_options(${target} PUBLIC ${sanitizers})
+			target_link_options(${target} PUBLIC ${sanitizers})
+		endif()
+	else()
+		target_compile_options(${target} PUBLIC
+			$<$<CONFIG:Debug>:${sanitizers}>
+		)
+		target_link_options(${target} PUBLIC
+			$<$<CONFIG:Debug>:${sanitizers}>
+		)
+	endif()
+endforeach()
+
+foreach(test_target ${test_targets})
+	add_test(${test_target} ${test_target})
+endforeach()

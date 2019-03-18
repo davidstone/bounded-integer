@@ -116,7 +116,7 @@ public:
 	using value_type = typename std::remove_reference_t<Range>::value_type;
 	using size_type = bounded::integer<
 		0,
-		static_cast<std::uintmax_t>(std::numeric_limits<typename std::iterator_traits<iterator>::difference_type>::max())
+		bounded::detail::normalize<static_cast<std::uintmax_t>(std::numeric_limits<typename std::iterator_traits<iterator>::difference_type>::max())>
 	>;
 
 	constexpr filter(Range && range, UnaryPredicate predicate) noexcept(std::is_nothrow_move_constructible_v<Range> and std::is_nothrow_constructible_v<traits, sentinel, UnaryPredicate>):

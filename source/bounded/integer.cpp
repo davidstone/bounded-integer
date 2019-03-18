@@ -82,7 +82,11 @@ namespace check_clamp_policy {
 	);
 
 
-	constexpr auto integer = bounded::integer<minimum.value(), maximum.value(), bounded::clamp_policy>(bounded::constant<1000>);
+	constexpr auto integer = bounded::integer<
+		bounded::detail::normalize<minimum.value()>,
+		bounded::detail::normalize<maximum.value()>,
+		bounded::clamp_policy
+	>(bounded::constant<1000>);
 	static_assert(
 		integer == maximum,
 		"Fail to clamp when using a bounded."
