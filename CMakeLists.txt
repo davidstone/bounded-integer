@@ -305,37 +305,37 @@ target_link_libraries(containers_test containers)
 add_executable(concatenate
 	source/containers/algorithms/concatenate.cpp
 )
-target_link_libraries(concatenate containers_test)
+target_link_libraries(concatenate containers)
 
 add_executable(static_vector
 	source/containers/static_vector/static_vector.cpp
 )
-target_link_libraries(static_vector containers_test)
+target_link_libraries(static_vector containers)
 
 add_executable(small_buffer_optimized_vector
 	source/containers/small_buffer_optimized_vector.cpp
 )
-target_link_libraries(small_buffer_optimized_vector containers_test)
+target_link_libraries(small_buffer_optimized_vector containers)
 
 add_executable(flat_map
 	source/containers/flat_map.cpp
 )
-target_link_libraries(flat_map containers_test)
+target_link_libraries(flat_map containers)
 
 add_executable(vector
 	source/containers/vector.cpp
 )
-target_link_libraries(vector containers_test)
+target_link_libraries(vector containers)
 
 add_executable(string
 	source/containers/string.cpp
 )
-target_link_libraries(string containers_test)
+target_link_libraries(string containers)
 
 add_executable(dynamic_array
 	source/containers/dynamic_array.cpp
 )
-target_link_libraries(dynamic_array containers_test)
+target_link_libraries(dynamic_array containers)
 
 add_executable(variant
 	source/bounded/detail/variant/variant.cpp
