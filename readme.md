@@ -38,25 +38,27 @@ The general form of the class is `bounded::integer<minimum, maximum, policy = bo
 
 ## Prerequisites
 
-* Compile with clang 7.0+
+* Compile with clang 7.0+ and libc++ (clang's standard library)
 * cmake (3.14+) is used to build tests, but it is not needed to use the library (this library is header-only).
 
 ## Building and running tests (Linux)
 
 * `cd path/to/bounded_integer`
-* `mkdir build && cmake .. && ./bounded_test`. Most of the tests are actually done at compile time, but there are also run-time tests.
+* `mkdir build && cmake .. -DCMAKE_CXX_COMPILER=clang++ -DCMAKE_CXX_FLAGS="-stdlib=libc++" -DUSE_SANITIZERS=On && ./bounded_test`. Most of the tests are actually done at compile time, but there are also run-time tests.
 
 ## Using
 
-`bounded::integer` is a header-only library. The .cpp files only contain tests. All you have to do to use the program is `#include <bounded_integer/bounded_integer.hpp>`. To get access to an array class that uses `bounded::integer`, include the header `bounded_integer/array.hpp`. `bounded_integer/integer_range.hpp` allows an integer range generating function similar to `range` in Python. Finally, `bounded_integer/optional.hpp` contains an `optional` class (that currently only works for `bounded::integer` and built-in types) with a space optimization for most `bounded::integer` types.
+`bounded::integer` is a header-only library. The .cpp files only contain tests. All you have to do to use the program is `#include <bounded/integer.hpp>`. There is also an experimental containers / ranges library that makes use of `bounded::integer` throughout, which is located at `containers/...`. `containers/integer_range.hpp` allows an integer range generating function similar to `range` in Python. `bounded/optional.hpp` contains an `optional` class (similar to `std::optional`) with a space optimization for most `bounded::integer` types, and hooks that allows most types to opt-in to this space optimization.
 
 # Limitations
 
 `bounded::integer` can replace most uses of built-in integer types. It does have some limitations, however.
 
-* A `bounded::integer` cannot be used as a non-type template parameter. The C++ language rules do not permit any user-defined type to be used as a non-type template parameter, even if the user-defined type is a literal type. There is a proposal going through the C++ standardization committee that would remove this restriction.
-* `bounded::integer` uses built-in integers as the template parameter to determine its bounds. This means that it cannot store an integer larger than an unsigned 64-bit or unsigned 128-bit integer (depending on the platform) or smaller than a signed 64-bit or signed 128-bit integer. This restriction should be removed in the near future.
+* A `bounded::integer` cannot be used as a non-type template parameter prior to C++20. No compiler currently is able to compile `bounded::integer` and has support for class types as non-type template parameters.
+* `bounded::integer` uses built-in integers as the template parameter to determine its bounds. This means that it cannot store an integer larger than an unsigned 64-bit or unsigned 128-bit integer (depending on the platform) or smaller than a signed 64-bit or signed 128-bit integer. This restriction should be removed at some point in the future.
 * `bounded::integer` is currently still under active development, so some interfaces are still subject to change.
+* `bounded::integer` cannot be used as the argument to a `switch` statement.
+* `bounded::integer` cannot be used to express the size of a bit-field.
 
 # Reference
 
