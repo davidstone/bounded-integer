@@ -121,72 +121,54 @@ public:
 	}
 
 	// TODO: What if they have different m_last1?
-	template<
-		typename LHSIterator1, typename LHSSentinel1, typename LHSIterator2,
-		typename RHSIterator1, typename RHSSentinel1, typename RHSIterator2
-	>
+	template<typename RHSIterator1, typename RHSSentinel1, typename RHSIterator2>
 	friend constexpr auto operator-(
-		concatenate_view_iterator<LHSIterator1, LHSSentinel1, LHSIterator2> const lhs,
+		concatenate_view_iterator const lhs,
 		concatenate_view_iterator<RHSIterator1, RHSSentinel1, RHSIterator2> const rhs
-	) BOUNDED_NOEXCEPT_DECLTYPE(
+	) BOUNDED_NOEXCEPT(
 		(lhs.m_first1 - rhs.m_first1) + (lhs.m_first2 - rhs.m_first2)
 	)
 
 
-	template<
-		typename LHSSentinel,
-		typename RHSIterator1, typename RHSSentinel1, typename RHSIterator2
-	>
+	template<typename LHSSentinel>
 	friend constexpr auto operator-(
 		concatenate_view_sentinel<LHSSentinel> const lhs,
-		concatenate_view_iterator<RHSIterator1, RHSSentinel1, RHSIterator2> const rhs
-	) BOUNDED_NOEXCEPT_DECLTYPE(
+		concatenate_view_iterator const rhs
+	) BOUNDED_NOEXCEPT(
 		(rhs.m_last1 - rhs.m_first1) + (lhs.base() - rhs.m_first2)
 	)
 
 
-	template<
-		typename LHSIterator1, typename LHSSentinel1, typename LHSIterator2,
-		typename RHSIterator1, typename RHSSentinel1, typename RHSIterator2
-	>
+	template<typename RHSIterator1, typename RHSSentinel1, typename RHSIterator2>
 	friend constexpr auto compare(
-		concatenate_view_iterator<LHSIterator1, LHSSentinel1, LHSIterator2> const lhs,
+		concatenate_view_iterator const lhs,
 		concatenate_view_iterator<RHSIterator1, RHSSentinel1, RHSIterator2> const rhs
-	) BOUNDED_NOEXCEPT_DECLTYPE(
+	) BOUNDED_NOEXCEPT(
 		compare(lhs.tie(), rhs.tie())
 	)
 
-	template<
-		typename LHSIterator1, typename LHSSentinel1, typename LHSIterator2,
-		typename RHSSentinel
-	>
+	template<typename RHSSentinel>
 	friend constexpr auto compare(
-		concatenate_view_iterator<LHSIterator1, LHSSentinel1, LHSIterator2> const lhs,
+		concatenate_view_iterator const lhs,
 		concatenate_view_sentinel<RHSSentinel> const rhs
-	) BOUNDED_NOEXCEPT_DECLTYPE(
+	) BOUNDED_NOEXCEPT(
 		compare(bounded::tie(lhs.m_first1, lhs.m_first2), bounded::tie(lhs.m_last1, rhs.base()))
 	)
 
 
-	template<
-		typename LHSIterator1, typename LHSSentinel1, typename LHSIterator2,
-		typename RHSIterator1, typename RHSSentinel1, typename RHSIterator2
-	>
+	template<typename RHSIterator1, typename RHSSentinel1, typename RHSIterator2>
 	friend constexpr auto operator==(
-		concatenate_view_iterator<LHSIterator1, LHSSentinel1, LHSIterator2> const lhs,
+		concatenate_view_iterator const lhs,
 		concatenate_view_iterator<RHSIterator1, RHSSentinel1, RHSIterator2> const rhs
-	) BOUNDED_NOEXCEPT_DECLTYPE(
+	) BOUNDED_NOEXCEPT(
 		lhs.tie() == rhs.tie()
 	)
 
-	template<
-		typename LHSIterator1, typename LHSSentinel1, typename LHSIterator2,
-		typename RHSSentinel
-	>
+	template<typename RHSSentinel>
 	friend constexpr auto operator==(
-		concatenate_view_iterator<LHSIterator1, LHSSentinel1, LHSIterator2> const lhs,
+		concatenate_view_iterator const lhs,
 		concatenate_view_sentinel<RHSSentinel> const rhs
-	) BOUNDED_NOEXCEPT_DECLTYPE(
+	) BOUNDED_NOEXCEPT(
 		bounded::tie(lhs.m_first1, lhs.m_first2) == bounded::tie(lhs.m_last1, rhs.base())
 	)
 
