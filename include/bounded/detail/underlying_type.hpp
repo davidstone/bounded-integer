@@ -6,7 +6,7 @@
 #pragma once
 
 #include <bounded/detail/comparison.hpp>
-#include <bounded/detail/max_builtin.hpp>
+#include <bounded/detail/int128.hpp>
 #include <bounded/detail/overlapping_range.hpp>
 
 #include <type_traits>

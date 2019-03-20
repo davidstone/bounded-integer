@@ -5,6 +5,8 @@
 
 #pragma once
 
+#include <bounded/detail/int128.hpp>
+
 #include <cstdint>
 #include <limits>
 #include <type_traits>
@@ -23,12 +25,6 @@ using promoted_unsigned = typename promoted_unsigned_c<std::decay_t<T>>::type;
 constexpr auto as_unsigned = [](auto const value) noexcept {
 	return static_cast<promoted_unsigned<decltype(value)>>(value);
 };
-
-#if defined __GNUC__ and !defined __clang__
-	#define BOUNDED_DETAIL_HAS_128_BIT 1
-	using int128_t = __int128_t;
-	using uint128_t = __uint128_t;
-#endif
 
 #if defined BOUNDED_DETAIL_HAS_128_BIT
 
