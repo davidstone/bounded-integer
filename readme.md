@@ -38,8 +38,8 @@ The general form of the class is `bounded::integer<minimum, maximum, policy = bo
 
 ## Prerequisites
 
-* Compile with clang 5.0 or gcc 7.2.0
-* cmake is used to build tests, but it is not needed to use the library (this library is header-only).
+* Compile with clang 7.0+
+* cmake (3.14+) is used to build tests, but it is not needed to use the library (this library is header-only).
 
 ## Building and running tests (Linux)
 
