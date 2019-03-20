@@ -369,6 +369,13 @@ set(COMMON_CLANG_COMPILE_OPTIONS
 	"-Wno-zero-as-null-pointer-constant"
 )
 
+if(${CMAKE_CXX_COMPILER_VERSION} VERSION_GREATER_EQUAL 8)
+	set(COMMON_CLANG_COMPILE_OPTIONS
+		${COMMON_CLANG_COMPILE_OPTIONS}
+		"-Wno-ctad-maybe-unsupported"
+	)
+endif()
+
 if(MSVC)
 	target_compile_options(bounded INTERFACE
 		"/std:c++latest"
