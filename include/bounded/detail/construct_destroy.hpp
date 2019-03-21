@@ -37,10 +37,10 @@ struct construct_return_t {
 }	// namespace detail
 
 template<typename T>
-constexpr auto construct_return = detail::construct_return_t<T>{};
+constexpr inline auto construct_return = detail::construct_return_t<T>{};
 
 
-constexpr struct {
+constexpr inline struct construct_t {
 	// The assignment operator must return a T & if it is trivial
 	template<typename T, typename... Args, BOUNDED_REQUIRES(detail::constexpr_constructible<T>)>
 	constexpr auto operator()(T & ref, Args && ... args) const BOUNDED_NOEXCEPT_REF(
@@ -54,7 +54,7 @@ constexpr struct {
 } construct;
 
 
-constexpr auto destroy = [](auto & ref) noexcept {
+constexpr inline auto destroy = [](auto & ref) noexcept {
 	using T = std::decay_t<decltype(ref)>;
 	if constexpr (!std::is_trivially_destructible_v<T>) {
 		ref.~T();

@@ -103,13 +103,6 @@ void test_unique_copy_less(Container const & source, Container const & expected)
 }
 
 template<typename Container>
-void test_unique_inplace_less(Container source, Container const & expected) {
-	auto const it = containers::unique_copy_less(begin(source), end(source));
-	erase(source, it, end(source));
-	assert(source == expected);
-}
-
-template<typename Container>
 void test_unique_less(Container source, Container const & expected) {
 	assert(std::is_sorted(begin(source), end(source)));
 	assert(std::is_sorted(begin(expected), end(expected)));
@@ -170,11 +163,6 @@ void test_unique() {
 	std::cout << "Testing unique_inplace_merge.\n" << std::flush;
 	// test_unique_specific<std::vector<CheckedMover>>();
 	test_unique_specific<vector<CheckedMover>>();
-}
-
-template<typename... Ts>
-constexpr auto size(std::map<Ts...> const & std_map) {
-	return std_map.size();
 }
 
 template<typename>
@@ -399,11 +387,6 @@ private:
 template<std::size_t size>
 auto compare(Class<size> const & lhs, Class<size> const & rhs) {
 	return lhs.value() <=> rhs.value();
-}
-
-template<std::size_t size>
-auto operator==(Class<size> const & lhs, Class<size> const & rhs) {
-	return lhs.value() == rhs.value();
 }
 
 BOUNDED_COMPARISON

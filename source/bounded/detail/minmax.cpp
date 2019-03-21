@@ -88,40 +88,33 @@ namespace check_non_integer_minmax {
 }
 
 template<typename T>
-auto mref() -> T &;
-template<typename T>
-auto cref() -> T const &;
-template<typename T>
-auto rref() -> T &&;
-
-template<typename T>
 constexpr auto check_specific_reference_minmax() {
 	static_assert(
-		std::is_same<decltype(bounded::min(mref<T>(), mref<T>())), T &>{},
+		std::is_same<decltype(bounded::min(std::declval<T &>(), std::declval<T &>())), T &>{},
 		"Incorrect result type for bounded::min with T & and T &."
 	);
 
 	static_assert(
-		std::is_same<decltype(bounded::min(cref<T>(), cref<T>())), T const &>{},
+		std::is_same<decltype(bounded::min(std::declval<T const &>(), std::declval<T const &>())), T const &>{},
 		"Incorrect result type for bounded::min with T const & and T const &."
 	);
 
 	static_assert(
-		std::is_same<decltype(bounded::min(mref<T>(), cref<T>())), T const &>{},
+		std::is_same<decltype(bounded::min(std::declval<T &>(), std::declval<T const &>())), T const &>{},
 		"Incorrect result type for bounded::min with T & and T const &."
 	);
 	
 	static_assert(
-		std::is_same<decltype(bounded::min(rref<T>(), rref<T>())), T>{},
-		"Incorrect result type for bounded::min with T and T."
+		std::is_same<decltype(bounded::min(std::declval<T &&>(), std::declval<T &&>())), T>{},
+		"Incorrect result type for bounded::min with T && and T &&."
 	);
 	static_assert(
-		std::is_same<decltype(bounded::min(mref<T>(), rref<T>())), T>{},
-		"Incorrect result type for bounded::min with T & and T."
+		std::is_same<decltype(bounded::min(std::declval<T &>(), std::declval<T &&>())), T>{},
+		"Incorrect result type for bounded::min with T & and T &&."
 	);
 	static_assert(
-		std::is_same<decltype(bounded::min(cref<T>(), rref<T>())), T>{},
-		"Incorrect result type for bounded::min with T const & and T."
+		std::is_same<decltype(bounded::min(std::declval<T const &>(), std::declval<T &&>())), T>{},
+		"Incorrect result type for bounded::min with T const & and T &&."
 	);
 }
 
@@ -132,7 +125,7 @@ constexpr auto check_minmax() {
 	check_specific_reference_minmax<string_view>();
 	
 	static_assert(
-		std::is_same<decltype(bounded::min(cref<int>(), cref<long>())), long>{},
+		std::is_same<decltype(bounded::min(std::declval<int const &>(), std::declval<long const &>())), long>{},
 		"Incorrect result type for bounded::min with int const & and long const &."
 	);
 	return true;

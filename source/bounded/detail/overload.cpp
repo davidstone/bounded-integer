@@ -39,6 +39,7 @@ static_assert(bounded::overload(int_function{}, [](int const *) { return 0; })(1
 static_assert(bounded::overload([](auto) { return 0; })(10) == 0);
 static_assert(direct{}(10) == 2);
 static_assert(bounded::overload(direct{})(10) == 2);
+static_assert(bounded::overload(direct{})(static_cast<short>(10)) == 1);
 static_assert(indirect{}(10) == 3);
 static_assert(bounded::overload(indirect{})(10) == 3);
 static_assert(bounded::overload(int_function{}, [](auto) { return 0; })(10) == 3);

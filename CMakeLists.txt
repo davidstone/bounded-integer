@@ -356,13 +356,9 @@ set(COMMON_CLANG_COMPILE_OPTIONS
 	"-Wno-missing-braces"
 	"-Wno-newline-eof"
 	"-Wno-padded"
-	# -Wundefined-func-template has a bug that triggers on deduction guides
-	"-Wno-undefined-func-template"
 	# -Wunneeded-member-function has a bug that blocks constexpr libraries
 	# from using it: https://llvm.org/bugs/show_bug.cgi?id=25084
 	"-Wno-unneeded-member-function"
-	# Has a bug that warns even for templates that are used
-	"-Wno-unused-template"
 	# -Wweak-vtables is incompatible with header-only libraries
 	"-Wno-weak-vtables"
 	# -Wzero-as-null-pointer-constant does not work with the `operator<=>`

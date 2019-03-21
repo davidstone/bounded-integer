@@ -70,7 +70,7 @@ public:
 // Because the variadic pack must be at the end of the parameter list, `extreme`
 // accepts the comparison function as the first argument
 
-constexpr struct {
+constexpr inline struct extreme_function {
 private:
 	template<typename Compare, typename T1, typename T2>
 	using result_type = detail::add_common_cv_reference_t<extreme_t<Compare, T2, T1>, T1, T2>;
@@ -135,14 +135,14 @@ public:
 
 
 
-constexpr struct {
+constexpr inline struct min_t {
 	template<typename... Ts>
 	constexpr auto operator()(Ts && ... ts) const BOUNDED_NOEXCEPT_DECLTYPE(
 		extreme(less(), BOUNDED_FORWARD(ts)...)
 	)
 } min;
 
-constexpr struct {
+constexpr inline struct max_t {
 	template<typename... Ts>
 	constexpr auto operator()(Ts && ... ts) const BOUNDED_NOEXCEPT_DECLTYPE(
 		extreme(greater(), BOUNDED_FORWARD(ts)...)
