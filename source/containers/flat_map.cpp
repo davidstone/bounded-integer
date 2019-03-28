@@ -235,7 +235,7 @@ using Compare = std::less<Key>;
 	using map_type = flat_map<Key, Value, Compare<Key>>;
 
 	template<typename Key, typename Value>
-	using value_type = containers::detail::map_value_type<Key, Value>;
+	using value_type = containers::map_value_type<Key, Value>;
 
 	template<typename Pair>
 	constexpr auto const & get_key(Pair const & pair) noexcept {

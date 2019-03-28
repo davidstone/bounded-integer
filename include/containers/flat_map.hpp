@@ -20,7 +20,6 @@
 #include <stdexcept>
 
 namespace containers {
-namespace detail {
 
 template<typename Key, typename Mapped>
 struct map_value_type : private bounded::tuple<Key, Mapped> {
@@ -59,6 +58,8 @@ template<typename Key, typename Mapped>
 constexpr auto operator==(map_value_type<Key, Mapped> const & lhs, map_value_type<Key, Mapped> const & rhs) BOUNDED_NOEXCEPT_VALUE(
 	lhs.as_tuple() == rhs.as_tuple()
 )
+
+namespace detail {
 
 template<typename Iterator>
 struct inserted_t {
@@ -605,10 +606,10 @@ constexpr auto is_container<basic_flat_multimap<Container, Compare>> = is_contai
 
 
 template<typename Key, typename T, typename Compare = std::less<Key>>
-using flat_map = basic_flat_map<vector<detail::map_value_type<Key, T>>, Compare>;
+using flat_map = basic_flat_map<vector<map_value_type<Key, T>>, Compare>;
 
 template<typename Key, typename T, typename Compare = std::less<Key>>
-using flat_multimap = basic_flat_multimap<vector<detail::map_value_type<Key, T>>, Compare>;
+using flat_multimap = basic_flat_multimap<vector<map_value_type<Key, T>>, Compare>;
 
 
 }	// namespace containers
