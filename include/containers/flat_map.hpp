@@ -228,7 +228,7 @@ public:
 	// TODO: noexcept
 	constexpr auto find(key_type const & key) const {
 		auto const it = lower_bound(key);
-		return (it == end(*this) or key_compare()(key, it->key)) ? end(*this) : it;
+		return (it == end(*this) or key_compare()(key, it->key())) ? end(*this) : it;
 	}
 	constexpr auto find(key_type const & key) {
 		auto const it = lower_bound(key);
