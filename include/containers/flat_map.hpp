@@ -132,8 +132,8 @@ public:
 		m_data(Container{}, std::move(compare))
 	{
 	}
-	template<typename InputIterator>
-	constexpr flat_map_base(InputIterator first, InputIterator last, key_compare_type compare = key_compare_type{}):
+	template<typename InputIterator, typename Sentinel>
+	constexpr flat_map_base(InputIterator first, Sentinel last, key_compare_type compare = key_compare_type{}):
 		// TODO: noexcept?
 		m_data(Container(first, last), std::move(compare))
 	{
