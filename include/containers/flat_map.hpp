@@ -423,12 +423,13 @@ private:
 	}
 };
 
+}	// namespace detail
 
 
 template<typename Container, typename Compare>
-class flat_map : private flat_map_base<Container, Compare, false> {
+class basic_flat_map : private detail::flat_map_base<Container, Compare, false> {
 private:
-	using base = flat_map_base<Container, Compare, false>;
+	using base = detail::flat_map_base<Container, Compare, false>;
 public:
 	using typename base::key_type;
 	using typename base::mapped_type;
@@ -446,16 +447,16 @@ public:
 	using base::base;
 	using base::operator=;
 	
-	friend constexpr auto begin(flat_map const & container) BOUNDED_NOEXCEPT(
+	friend constexpr auto begin(basic_flat_map const & container) BOUNDED_NOEXCEPT(
 		begin(static_cast<base const &>(container))
 	)
-	friend constexpr auto begin(flat_map & container) BOUNDED_NOEXCEPT(
+	friend constexpr auto begin(basic_flat_map & container) BOUNDED_NOEXCEPT(
 		begin(static_cast<base &>(container))
 	)
-	friend constexpr auto end(flat_map const & container) BOUNDED_NOEXCEPT(
+	friend constexpr auto end(basic_flat_map const & container) BOUNDED_NOEXCEPT(
 		end(static_cast<base const &>(container))
 	)
-	friend constexpr auto end(flat_map & container) BOUNDED_NOEXCEPT(
+	friend constexpr auto end(basic_flat_map & container) BOUNDED_NOEXCEPT(
 		end(static_cast<base &>(container))
 	)
 
@@ -520,11 +521,13 @@ public:
 	}
 };
 
+template<typename Container, typename Compare>
+constexpr auto is_container<basic_flat_map<Container, Compare>> = is_container<Container>;
 
 template<typename Container, typename Compare>
-class flat_multimap : private flat_map_base<Container, Compare, true> {
+class basic_flat_multimap : private detail::flat_map_base<Container, Compare, true> {
 private:
-	using base = flat_map_base<Container, Compare, true>;
+	using base = detail::flat_map_base<Container, Compare, true>;
 	using typename base::key_value_compare;
 public:
 	using typename base::key_type;
@@ -543,16 +546,16 @@ public:
 	using base::base;
 	using base::operator=;
 	
-	friend constexpr auto begin(flat_multimap const & container) BOUNDED_NOEXCEPT(
+	friend constexpr auto begin(basic_flat_multimap const & container) BOUNDED_NOEXCEPT(
 		begin(static_cast<base const &>(container))
 	)
-	friend constexpr auto begin(flat_multimap & container) BOUNDED_NOEXCEPT(
+	friend constexpr auto begin(basic_flat_multimap & container) BOUNDED_NOEXCEPT(
 		begin(static_cast<base &>(container))
 	)
-	friend constexpr auto end(flat_multimap const & container) BOUNDED_NOEXCEPT(
+	friend constexpr auto end(basic_flat_multimap const & container) BOUNDED_NOEXCEPT(
 		end(static_cast<base const &>(container))
 	)
-	friend constexpr auto end(flat_multimap & container) BOUNDED_NOEXCEPT(
+	friend constexpr auto end(basic_flat_multimap & container) BOUNDED_NOEXCEPT(
 		end(static_cast<base &>(container))
 	)
 
@@ -597,23 +600,15 @@ public:
 	}
 };
 
-}	// namespace detail
+template<typename Container, typename Compare>
+constexpr auto is_container<basic_flat_multimap<Container, Compare>> = is_container<Container>;
 
 
 template<typename Key, typename T, typename Compare = std::less<Key>>
-using flat_map = detail::flat_map<vector<detail::map_value_type<Key, T>>, Compare>;
-
-
-template<typename Key, typename T, typename Compare>
-constexpr auto is_container<flat_map<Key, T, Compare>> = true;
-
-
+using flat_map = basic_flat_map<vector<detail::map_value_type<Key, T>>, Compare>;
 
 template<typename Key, typename T, typename Compare = std::less<Key>>
-using flat_multimap = detail::flat_multimap<vector<detail::map_value_type<Key, T>>, Compare>;
+using flat_multimap = basic_flat_multimap<vector<detail::map_value_type<Key, T>>, Compare>;
 
-
-template<typename Key, typename T, typename Compare>
-constexpr auto is_container<flat_multimap<Key, T, Compare>> = true;
 
 }	// namespace containers
