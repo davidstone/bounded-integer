@@ -427,7 +427,7 @@ private:
 }	// namespace detail
 
 
-template<typename Container, typename Compare>
+template<typename Container, typename Compare = std::less<>>
 class basic_flat_map : private detail::flat_map_base<Container, Compare, false> {
 private:
 	using base = detail::flat_map_base<Container, Compare, false>;
@@ -525,7 +525,7 @@ public:
 template<typename Container, typename Compare>
 constexpr auto is_container<basic_flat_map<Container, Compare>> = is_container<Container>;
 
-template<typename Container, typename Compare>
+template<typename Container, typename Compare = std::less<>>
 class basic_flat_multimap : private detail::flat_map_base<Container, Compare, true> {
 private:
 	using base = detail::flat_map_base<Container, Compare, true>;
@@ -605,11 +605,11 @@ template<typename Container, typename Compare>
 constexpr auto is_container<basic_flat_multimap<Container, Compare>> = is_container<Container>;
 
 
-template<typename Key, typename T, typename Compare = std::less<Key>>
-using flat_map = basic_flat_map<vector<map_value_type<Key, T>>, Compare>;
+template<typename Key, typename T, typename... MaybeCompare>
+using flat_map = basic_flat_map<vector<map_value_type<Key, T>>, MaybeCompare...>;
 
-template<typename Key, typename T, typename Compare = std::less<Key>>
-using flat_multimap = basic_flat_multimap<vector<map_value_type<Key, T>>, Compare>;
+template<typename Key, typename T, typename... MaybeCompare>
+using flat_multimap = basic_flat_multimap<vector<map_value_type<Key, T>>, MaybeCompare...>;
 
 
 }	// namespace containers
