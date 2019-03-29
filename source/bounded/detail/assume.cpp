@@ -8,3 +8,6 @@
 #include <type_traits>
 
 static_assert(std::is_void_v<decltype(BOUNDED_ASSUME(true))>);
+
+// Ensure BOUNDED_ASSUME is usable in a constant expression
+static_assert((void(BOUNDED_ASSUME(true)), true));
