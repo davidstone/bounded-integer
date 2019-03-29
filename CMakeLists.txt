@@ -46,6 +46,7 @@ target_sources(bounded INTERFACE
 	$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>/include/bounded/detail/variant/variant.hpp
 	$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>/include/bounded/detail/variant/visit.hpp
 	$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>/include/bounded/detail/abs.hpp
+	$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>/include/bounded/detail/assert.hpp
 	$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>/include/bounded/detail/assume.hpp
 	$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>/include/bounded/detail/basic_numeric_limits.hpp
 	$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>/include/bounded/detail/cast.hpp
@@ -200,6 +201,9 @@ add_executable(bounded_test
 	source/bounded/detail/policy/throw_policy.cpp
 	source/bounded/detail/variant/visit.cpp
 	source/bounded/detail/abs.cpp
+	source/bounded/detail/assert.cpp
+	source/bounded/detail/assert-NDEBUG.cpp
+	source/bounded/detail/assert-NDEBUG-BOUNDED_NEVER_ASSUME_ASSERTS.cpp
 	source/bounded/detail/assume.cpp
 	source/bounded/detail/basic_numeric_limits.cpp
 	source/bounded/detail/cast.cpp
