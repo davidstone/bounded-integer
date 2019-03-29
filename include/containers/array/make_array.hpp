@@ -70,7 +70,7 @@ namespace detail {
 // aggregate initialization, so there is no risk of copy-after-move
 template<std::size_t size, typename T, std::size_t... indexes>
 constexpr auto make_array_n_impl(T && value, std::index_sequence<indexes...>) BOUNDED_NOEXCEPT_VALUE(
-	array<std::decay_t<T>, size>{ (static_cast<void>(indexes), value)..., BOUNDED_FORWARD(value) }
+	array<std::decay_t<T>, size>{ (void(indexes), value)..., BOUNDED_FORWARD(value) }
 )
 
 }	// namespace detail

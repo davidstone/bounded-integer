@@ -10,5 +10,5 @@
 #elif defined _MSC_VER
 	#define BOUNDED_ASSUME __assume
 #else
-	#define BOUNDED_ASSUME(...) static_cast<void>(sizeof(__VA_ARGS__))
+	#define BOUNDED_ASSUME(...) void(sizeof(__VA_ARGS__))
 #endif

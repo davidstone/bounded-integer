@@ -21,7 +21,7 @@ namespace detail {
 
 template<typename Iterator, typename Offset>
 constexpr auto advance(Iterator & it, Offset const offset, std::random_access_iterator_tag) BOUNDED_NOEXCEPT(
-	static_cast<void>(it += offset)
+	void(it += offset)
 )
 template<typename Iterator, typename Offset>
 constexpr auto advance(Iterator & it, Offset const offset, std::bidirectional_iterator_tag) {
