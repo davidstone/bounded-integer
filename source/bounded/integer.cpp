@@ -39,10 +39,6 @@ auto check_throw_policy() {
 	}
 }
 
-auto check_policies() {
-	check_throw_policy();
-}
-
 
 template<typename Optional>
 constexpr auto check_empty_braces() {
@@ -279,7 +275,7 @@ auto check_to_integer() {
 }	// namespace
 
 auto main() -> int {
-	check_policies();
+	check_throw_policy();
 	check_optional();
 	check_to_string();
 	check_streaming();
