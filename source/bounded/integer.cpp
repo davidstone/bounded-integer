@@ -39,47 +39,6 @@ auto check_throw_policy() {
 	}
 }
 
-namespace check_clamp_policy {
-	static constexpr auto minimum = bounded::constant<27>;
-	static constexpr auto maximum = bounded::constant<567>;
-	constexpr bounded::clamp_policy policy;
-	static_assert(
-		policy.assignment(bounded::constant<20>, minimum, maximum) == minimum,
-		"Failure to properly clamp lesser positive values."
-	);
-	static_assert(
-		policy.assignment(-bounded::constant<25>, minimum, maximum) == minimum,
-		"Failure to properly clamp negative values to a positive value."
-	);
-	static_assert(
-		policy.assignment(bounded::constant<1000>, minimum, maximum) == maximum,
-		"Failure to properly clamp greater positive values."
-	);
-	static_assert(
-		policy.assignment(bounded::constant<2000>, minimum, maximum) == maximum,
-		"Fail to clamp above range with a strictly greater type."
-	);
-
-	using type = bounded::integer<-100, 100, bounded::clamp_policy>;
-	constexpr auto initial = std::numeric_limits<type>::max().value() + 1;
-	constexpr type value(initial);
-	static_assert(
-		value == std::numeric_limits<type>::max(),
-		"Fail to clamp value when the source type is larger than the destination type."
-	);
-
-
-	constexpr auto integer = bounded::integer<
-		bounded::detail::normalize<minimum.value()>,
-		bounded::detail::normalize<maximum.value()>,
-		bounded::clamp_policy
-	>(bounded::constant<1000>);
-	static_assert(
-		integer == maximum,
-		"Fail to clamp when using a bounded."
-	);
-}
-
 auto check_policies() {
 	check_throw_policy();
 }
