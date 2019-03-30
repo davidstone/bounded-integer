@@ -181,47 +181,6 @@ auto check_streaming() {
 	streaming_test<decltype(bounded::integer(0))>(large_initial, large_final);
 }
 
-enum class bounded_enum{};
-
-}	// namespace
-namespace bounded {
-
-template<>
-struct basic_numeric_limits<bounded_enum> {
-	static constexpr auto min() noexcept -> bounded::detail::max_signed_t {
-		return 0;
-	}
-	static constexpr auto max() noexcept -> bounded::detail::max_signed_t {
-		return 0;
-	}
-	static constexpr bool is_specialized = true;
-	static constexpr bool is_integer = false;
-	static constexpr bool is_bounded = true;
-};
-}
-
-namespace {
-
-namespace check_enum_construction {
-	enum unscoped_enum : int {};
-	static_assert(std::is_constructible<bounded::integer<0, 10>, unscoped_enum>{});
-	static_assert(!std::is_convertible<unscoped_enum, bounded::integer<0, 10>>{});
-	static_assert(homogeneous_equals(
-		bounded::integer(unscoped_enum{}),
-		bounded::integer(static_cast<std::underlying_type_t<unscoped_enum>>(0))
-	));
-	
-	enum class scoped_enum {};
-	static_assert(std::is_constructible<bounded::integer<0, 10>, scoped_enum>{});
-	static_assert(!std::is_convertible<scoped_enum, bounded::integer<0, 10>>{});
-	// constexpr auto b = bounded::integer(scoped_enum{});
-	
-	static_assert(std::is_constructible<bounded::integer<0, 10>, bounded_enum>{});
-	// TODO: Should this be convertible?
-	static_assert(std::is_convertible<bounded_enum, bounded::integer<0, 10>>{});
-	static_assert(bounded::integer(bounded_enum{}) == bounded::constant<0>);
-}
-
 auto check_volatile() {
 	bounded::integer<0, 6> volatile x = bounded::constant<3>;
 	assert(x.value() == 3);
