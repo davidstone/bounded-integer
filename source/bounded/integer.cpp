@@ -39,19 +39,6 @@ auto check_throw_policy() {
 	}
 }
 
-namespace check_modulo_policy {
-	constexpr bounded::wrapping_integer<0, 9> x(bounded::constant<15>);
-	constexpr bounded::wrapping_integer<0, 1> y(x);
-	static_assert(
-		x == bounded::constant<5>,
-		"Incorrect value stored with modulo policy."
-	);
-	static_assert(
-		y == bounded::constant<1>,
-		"Incorrect value stored with modulo policy."
-	);
-}
-
 namespace check_clamp_policy {
 	static constexpr auto minimum = bounded::constant<27>;
 	static constexpr auto maximum = bounded::constant<567>;
