@@ -6,6 +6,6 @@
 #define NDEBUG
 #undef BOUNDED_NEVER_ASSUME_ASSERTS
 
-#include <bounded/detail/assert.hpp>
+#include <bounded/assert.hpp>
 
 static_assert([]{ BOUNDED_ASSERT(true); return true; }());

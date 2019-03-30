@@ -3,10 +3,9 @@
 // (See accompanying file LICENSE_1_0.txt or copy at
 // http://www.boost.org/LICENSE_1_0.txt)
 
-#define NDEBUG
-#define BOUNDED_NEVER_ASSUME_ASSERTS
+#undef NDEBUG
+#undef BOUNDED_NDEBUG
 
-#include <bounded/detail/assert.hpp>
+#include <bounded/assert.hpp>
 
 static_assert([]{ BOUNDED_ASSERT(true); return true; }());
-static_assert([]{ BOUNDED_ASSERT(false); return true; }());
