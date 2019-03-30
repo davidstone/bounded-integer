@@ -9,12 +9,12 @@
 
 #include <bounded/detail/variant/variant.hpp>
 
+#include <bounded/assert.hpp>
 #include <bounded/detail/construct_destroy.hpp>
 #include <bounded/detail/forward.hpp>
 #include <bounded/detail/noexcept.hpp>
 #include <bounded/detail/requires.hpp>
 
-#include <cassert>
 #include <stdexcept>
 #include <type_traits>
 #include <utility>
@@ -163,15 +163,15 @@ public:
 
 	
 	constexpr auto operator*() const & noexcept -> value_type const & {
-		assert(static_cast<bool>(*this));
+		BOUNDED_ASSERT(*this);
 		return m_value;
 	}
 	constexpr auto operator*() & noexcept -> value_type & {
-		assert(static_cast<bool>(*this));
+		BOUNDED_ASSERT(*this);
 		return m_value;
 	}
 	constexpr auto operator*() && noexcept -> value_type && {
-		assert(static_cast<bool>(*this));
+		BOUNDED_ASSERT(*this);
 		return std::move(m_value);
 	}
 

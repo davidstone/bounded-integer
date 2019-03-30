@@ -17,10 +17,10 @@
 #include <containers/uninitialized_storage.hpp>
 #include <containers/array/array.hpp>
 
+#include <bounded/assert.hpp>
 #include <bounded/detail/forward.hpp>
 
 #include <algorithm>
-#include <cassert>
 #include <cstddef>
 #include <initializer_list>
 #include <memory>
@@ -173,7 +173,7 @@ public:
 	
 	template<typename... Args>
 	constexpr auto & emplace_back(Args && ... args) {
-		assert(size(*this) != capacity());
+		BOUNDED_ASSERT(size(*this) != capacity());
 		bounded::construct(*(data(*this) + size(*this)), BOUNDED_FORWARD(args)...);
 		append_from_capacity(1_bi);
 		return back(*this);
@@ -182,20 +182,19 @@ public:
 	template<typename... Args>
 	constexpr auto emplace(const_iterator const position, Args && ... args) {
 		auto relocating_emplace = []{
-			assert(false);
+			BOUNDED_ASSERT_OR_ASSUME(false);
 		};
 		return detail::emplace_impl(*this, position, relocating_emplace, BOUNDED_FORWARD(args)...);
 	}
 	template<typename Range = std::initializer_list<value_type>>
 	constexpr auto insert(const_iterator const position, Range && range) {
 		return detail::insert_impl(*this, position, BOUNDED_FORWARD(range), [](auto) {
-			assert(false);
+			BOUNDED_ASSERT_OR_ASSUME(false);
 			return iterator{};
 		});
 	}
 	
 	constexpr auto pop_back() {
-		assert(!empty(*this));
 		bounded::destroy(back(*this));
 		--this->m_size;
 	}

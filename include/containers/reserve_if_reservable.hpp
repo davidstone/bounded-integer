@@ -8,9 +8,9 @@
 #include <containers/is_container.hpp>
 #include <containers/size.hpp>
 
+#include <bounded/assert.hpp>
 #include <bounded/integer.hpp>
 
-#include <cassert>
 #include <utility>
 
 namespace containers {
@@ -40,8 +40,8 @@ constexpr auto reallocation_size(Container const & container, typename Container
 )
 
 template<typename Container, BOUNDED_REQUIRES(is_container<Container> and !has_reserve<Container>)>
-constexpr void growth_reallocation(Container const & container [[maybe_unused]], typename Container::size_type const count [[maybe_unused]]) noexcept {
-	assert(container.capacity() >= size(container) + count);
+constexpr void growth_reallocation(Container const & container, typename Container::size_type const count) noexcept {
+	BOUNDED_ASSERT(container.capacity() >= size(container) + count);
 }
 
 template<typename Container, BOUNDED_REQUIRES(is_container<Container> and has_reserve<Container>)>

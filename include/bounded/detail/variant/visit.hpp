@@ -9,7 +9,6 @@
 #include <bounded/detail/tuple.hpp>
 #include <bounded/detail/type.hpp>
 
-#include <cassert>
 #include <type_traits>
 
 namespace bounded {

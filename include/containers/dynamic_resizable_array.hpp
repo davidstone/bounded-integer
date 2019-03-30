@@ -16,6 +16,7 @@
 #include <containers/uninitialized_storage.hpp>
 
 #include <bounded/detail/forward.hpp>
+#include <bounded/assert.hpp>
 
 #include <algorithm>
 #include <cstddef>
@@ -178,7 +179,6 @@ struct dynamic_resizable_array : private Container {
 
 
 	void pop_back() {
-		assert(!empty(*this));
 		bounded::destroy(back(*this));
 		append_from_capacity(-1_bi);
 	}
@@ -197,7 +197,7 @@ private:
 		auto const mutable_position = begin(*this) + offset;
 		auto const temp_begin = detail::static_or_reinterpret_cast<value_type *>(data(temp));
 		auto const pointer = containers::uninitialized_move_destroy(begin(*this), mutable_position, temp_begin);
-		assert(temp_begin + offset == pointer);
+		BOUNDED_ASSERT(temp_begin + offset == pointer);
 		::containers::uninitialized_move_destroy(mutable_position, end(*this), pointer + number_of_elements);
 		this->relocate_preallocated(std::move(temp));
 		append_from_capacity(number_of_elements);

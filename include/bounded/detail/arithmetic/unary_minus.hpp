@@ -10,7 +10,6 @@
 #include <bounded/detail/common_type.hpp>
 #include <bounded/detail/max_builtin.hpp>
 
-#include <cassert>
 #include <limits>
 
 namespace bounded {

@@ -8,6 +8,7 @@
 #include <containers/common_functions.hpp>
 #include <containers/range_view.hpp>
 
+#include <bounded/assert.hpp>
 #include <bounded/integer.hpp>
 
 #include <iterator>
@@ -37,7 +38,7 @@ struct single_element_iterator {
 	}
 	
 	constexpr auto && operator*() const noexcept {
-		assert(!m_is_end);
+		BOUNDED_ASSERT_OR_ASSUME(!m_is_end);
 		return static_cast<T>(*m_value);
 	}
 	constexpr auto operator->() const  noexcept{
@@ -48,13 +49,13 @@ struct single_element_iterator {
 	}
 
 	friend constexpr auto operator+(single_element_iterator lhs, bounded::constant_t<1>) noexcept {
-		assert(!lhs.m_is_end);
+		BOUNDED_ASSERT_OR_ASSUME(!lhs.m_is_end);
 		lhs.m_is_end = true;
 		return lhs;
 	}
 
 	friend constexpr auto operator-(single_element_iterator lhs, bounded::constant_t<1>) noexcept {
-		assert(lhs.m_is_end);
+		BOUNDED_ASSERT_OR_ASSUME(lhs.m_is_end);
 		lhs.m_is_end = false;
 		return lhs;
 	}
@@ -101,7 +102,7 @@ constexpr auto operator+(bounded::constant_t<1> const lhs, single_element_iterat
 
 template<typename T>
 constexpr auto operator-(single_element_iterator<T> const lhs, single_element_iterator<T> const rhs) noexcept {
-	assert(lhs >= rhs);
+	BOUNDED_ASSERT(lhs >= rhs);
 	return BOUNDED_CONDITIONAL(lhs == rhs, 0_bi, 1_bi);
 }
 
@@ -112,7 +113,7 @@ constexpr auto operator-(single_element_sentinel, single_element_iterator<T> con
 
 template<typename T>
 constexpr auto operator-(single_element_iterator<T> const lhs [[maybe_unused]], single_element_sentinel) noexcept {
-	assert(lhs.is_end());
+	BOUNDED_ASSERT(lhs.is_end());
 	return 0_bi;
 }
 

@@ -11,8 +11,8 @@
 #include <containers/size.hpp>
 
 #include <bounded/detail/forward.hpp>
+#include <bounded/assert.hpp>
 
-#include <cassert>
 #include <type_traits>
 
 // We currently cannot have a free-function `operator[]`. However, all sequence
@@ -40,7 +40,7 @@ constexpr auto operator_bracket(Range && range, index_type<std::decay_t<Range>> 
 	noexcept(*(begin(BOUNDED_FORWARD(range)) + index)) and
 	std::is_nothrow_move_constructible<decltype(*(begin(BOUNDED_FORWARD(range)) + index))>::value
 ) -> decltype(*(begin(BOUNDED_FORWARD(range)) + index)) {
-	assert(index < size(range));
+	BOUNDED_ASSERT(index < size(range));
 	return *(begin(BOUNDED_FORWARD(range)) + index);
 }
 

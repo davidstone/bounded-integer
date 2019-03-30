@@ -12,9 +12,9 @@
 
 #include <bounded/detail/forward.hpp>
 #include <bounded/detail/tuple.hpp>
+#include <bounded/assert.hpp>
 #include <bounded/integer.hpp>
 
-#include <cassert>
 #include <iterator>
 
 namespace containers {
@@ -42,7 +42,7 @@ struct filter_iterator_traits : private bounded::tuple<Sentinel, UnaryPredicate>
 	constexpr auto add(Iterator const it, bounded::constant_t<1>) const {
 		auto const last = sentinel();
 		auto const & condition = predicate();
-		assert(it != last);
+		BOUNDED_ASSERT(it != last);
 		return containers::find_if(containers::next(it), last, condition);
 	}
 };

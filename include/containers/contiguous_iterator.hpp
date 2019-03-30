@@ -9,6 +9,8 @@
 
 #include <bounded/integer.hpp>
 
+#include <bounded/assert.hpp>
+
 #include <cstddef>
 
 namespace containers {
@@ -81,7 +83,7 @@ constexpr auto operator+(
 	contiguous_iterator<T, 0> const lhs,
 	bounded::constant_t<1>
 ) noexcept {
-	assert(false);
+	BOUNDED_ASSERT(false);
 	// Not sure what the best behavior is here. I guess a likely infinite loop
 	// (by returning the original value) is better than invalid memory access?
 	return lhs;

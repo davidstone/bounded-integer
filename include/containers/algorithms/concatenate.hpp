@@ -12,6 +12,7 @@
 #include <containers/size.hpp>
 
 #include <bounded/detail/forward.hpp>
+#include <bounded/assert.hpp>
 #include <bounded/integer.hpp>
 
 namespace containers {
@@ -33,7 +34,7 @@ constexpr auto concatenate_prepend_append(Result & result, typename Result::iter
 
 template<typename Result>
 constexpr auto concatenate_prepend_append(Result &, typename Result::iterator) {
-	assert(false);
+	BOUNDED_ASSERT_OR_ASSUME(false);
 }
 
 template<typename Result, typename Integer>

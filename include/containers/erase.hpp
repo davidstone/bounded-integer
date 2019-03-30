@@ -12,9 +12,9 @@
 #include <containers/is_iterator.hpp>
 #include <containers/mutable_iterator.hpp>
 
+#include <bounded/assert.hpp>
 #include <bounded/integer.hpp>
 
-#include <cassert>
 #include <utility>
 
 namespace containers {
@@ -35,7 +35,7 @@ constexpr auto erase(Container & container, Iterator const first_, Iterator cons
 }
 template<typename Container, BOUNDED_REQUIRES(is_container<Container>)>
 constexpr auto erase(Container & container, typename Container::const_iterator const it) {
-	assert(it != end(container));
+	BOUNDED_ASSERT(it != end(container));
 	return erase(container, it, ::containers::next(it));
 }
 

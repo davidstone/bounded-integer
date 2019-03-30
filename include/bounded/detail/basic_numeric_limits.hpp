@@ -10,7 +10,6 @@
 #include <bounded/detail/max_builtin.hpp>
 #include <bounded/detail/requires.hpp>
 
-#include <cassert>
 #include <limits>
 #include <type_traits>
 

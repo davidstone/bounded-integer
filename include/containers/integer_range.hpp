@@ -9,6 +9,7 @@
 #include <containers/common_container_functions.hpp>
 #include <containers/operator_bracket.hpp>
 
+#include <bounded/assert.hpp>
 #include <bounded/integer.hpp>
 
 #include <iterator>
@@ -47,7 +48,7 @@ public:
 	}
 	
 	friend constexpr auto operator-(integer_range_iterator const lhs, integer_range_iterator const rhs) noexcept {
-		assert(lhs.m_step == rhs.m_step);
+		BOUNDED_ASSERT(lhs.m_step == rhs.m_step);
 		return (lhs.m_value - rhs.m_value) / lhs.m_step;
 	}
 	friend constexpr auto operator+(integer_range_iterator const lhs, difference_type const rhs) noexcept(

@@ -12,7 +12,6 @@
 #include <bounded/detail/variant/base.hpp>
 #include <bounded/detail/variant/visit.hpp>
 
-#include <cassert>
 #include <type_traits>
 #include <utility>
 

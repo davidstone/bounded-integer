@@ -8,7 +8,6 @@
 #include <bounded/detail/assume.hpp>
 
 #include <cassert>
-#include <cstdlib>
 
 #if defined NDEBUG or defined BOUNDED_NDEBUG
 	#define BOUNDED_ASSERT(...) void(sizeof(__VA_ARGS__))

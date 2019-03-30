@@ -15,6 +15,8 @@
 #include <containers/scope_guard.hpp>
 #include <containers/uninitialized_storage.hpp>
 
+#include <bounded/assert.hpp>
+
 #include <algorithm>
 #include <cstddef>
 #include <initializer_list>
@@ -127,7 +129,7 @@ struct sbo_vector_base {
 			m_size(size_),
 			m_data{reinterpret_cast<trivial_storage<T> *>(pointer_), capacity_}
 		{
-			assert(data() != nullptr);
+			BOUNDED_ASSERT_OR_ASSUME(pointer_ != nullptr);
 		}
 
 		constexpr auto is_large() const noexcept {
@@ -199,7 +201,7 @@ struct sbo_vector_base {
 		auto const result = container.is_small() ?
 			container.m_small.data() :
 			container.m_large.data();
-		assert(result != nullptr);
+		BOUNDED_ASSERT_OR_ASSUME(result != nullptr);
 		return const_iterator(result);
 	}
 	friend constexpr auto begin(sbo_vector_base & container) noexcept {
@@ -232,7 +234,7 @@ struct sbo_vector_base {
 			static_cast<typename large_t::capacity_type>(new_large.storage.size),
 			reinterpret_cast<value_type *>(new_large.storage.pointer)
 		);
-		assert(is_large());
+		BOUNDED_ASSERT(is_large());
 		new_large.active = false;
 	}
 
@@ -255,7 +257,7 @@ struct sbo_vector_base {
 			if constexpr (std::is_constructible_v<typename small_t::size_type, Size>) {
 				m_small.set_size(static_cast<typename small_t::size_type>(new_size));
 			} else {
-				assert(false);
+				BOUNDED_ASSERT_OR_ASSUME(false);
 			}
 		} else {
 			m_large.set_size(static_cast<typename large_t::size_type>(new_size));
@@ -278,7 +280,7 @@ private:
 		// because we do not rely on its side-effects
 		::bounded::construct(m_small);
 		containers::uninitialized_move_destroy(temp.data(), temp.data() + temp.size(), m_small.data());
-		assert(is_small());
+		BOUNDED_ASSERT(is_small());
 	}
 	
 	constexpr auto is_large() const noexcept {

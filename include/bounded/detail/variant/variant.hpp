@@ -13,7 +13,6 @@
 #include <bounded/detail/variant/special_member_functions.hpp>
 #include <bounded/detail/variant/visit.hpp>
 
-#include <cassert>
 #include <type_traits>
 
 namespace bounded {

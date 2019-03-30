@@ -18,9 +18,9 @@
 #include <containers/size.hpp>
 
 #include <bounded/detail/forward.hpp>
+#include <bounded/assert.hpp>
 #include <bounded/integer.hpp>
 
-#include <cassert>
 #include <iterator>
 #include <stdexcept>
 #include <utility>
@@ -37,7 +37,7 @@ constexpr auto iterator_points_into_container(Container const & container, typen
 // TODO: exception safety
 template<typename Container, typename Function, typename... Args>
 constexpr auto emplace_impl(Container & container, typename Container::const_iterator const position, Function reallocating_emplace, Args && ... args) {
-	assert(::containers::detail::iterator_points_into_container(container, position));
+	BOUNDED_ASSERT(::containers::detail::iterator_points_into_container(container, position));
 	auto const offset = position - begin(container);
 	if (position == end(container)) {
 		container.emplace_back(BOUNDED_FORWARD(args)...);
@@ -60,7 +60,7 @@ constexpr auto emplace_impl(Container & container, typename Container::const_ite
 // TODO: Check if the range lies within the container
 template<typename Container, typename Range, typename Function>
 constexpr auto insert_impl(Container & container, typename Container::const_iterator position, Range && range, Function reallocating_insert) {
-	assert(iterator_points_into_container(container, position));
+	BOUNDED_ASSERT(iterator_points_into_container(container, position));
 	if (position == end(container)) {
 		return append(container, BOUNDED_FORWARD(range));
 	}
