@@ -3,16 +3,15 @@
 // (See accompanying file LICENSE_1_0.txt or copy at
 // http://www.boost.org/LICENSE_1_0.txt)
 
-#undef NDEBUG
-
 #include <containers/flat_map.hpp>
 #include <containers/vector.hpp>
 
 #include <bounded/detail/forward.hpp>
 
+#include "../test_assert.hpp"
+
 #include <algorithm>
 #include <array>
-#include <cassert>
 #include <cmath>
 #include <chrono>
 #include <cstdint>
@@ -38,54 +37,54 @@ public:
 		m_value(other.m_value),
 		m_moved(other.m_moved)
 	{
-		assert(!other.m_moved);
-		assert(!other.m_destructed);
+		BOUNDED_TEST(!other.m_moved);
+		BOUNDED_TEST(!other.m_destructed);
 	}
 	constexpr CheckedMover(CheckedMover && other) noexcept:
 		m_value(other.m_value),
 		m_moved(other.m_moved)
 	{
-		assert(this != &other);
-		assert(!other.m_moved);
-		assert(!other.m_destructed);
+		BOUNDED_TEST(this != &other);
+		BOUNDED_TEST(!other.m_moved);
+		BOUNDED_TEST(!other.m_destructed);
 		other.m_moved = true;
 	}
 	constexpr CheckedMover & operator=(CheckedMover const & other) noexcept {
-		assert(!other.m_moved);
-		assert(!other.m_destructed);
-		assert(!m_destructed);
+		BOUNDED_TEST(!other.m_moved);
+		BOUNDED_TEST(!other.m_destructed);
+		BOUNDED_TEST(!m_destructed);
 		m_value = other.m_value;
 		m_moved = other.m_moved;
 		return *this;
 	}
 	constexpr CheckedMover & operator=(CheckedMover && other) noexcept {
-		assert(this != &other);
-		assert(!other.m_moved);
-		assert(!other.m_destructed);
-		assert(!m_destructed);
+		BOUNDED_TEST(this != &other);
+		BOUNDED_TEST(!other.m_moved);
+		BOUNDED_TEST(!other.m_destructed);
+		BOUNDED_TEST(!m_destructed);
 		m_value = other.m_value;
 		m_moved = other.m_moved;
 		other.m_moved = true;
 		return *this;
 	}
 	~CheckedMover() {
-		assert(!m_destructed);
+		BOUNDED_TEST(!m_destructed);
 		m_destructed = true;
 	}
 	
 	
 	friend constexpr auto compare(CheckedMover const & lhs, CheckedMover const & rhs) noexcept {
-		assert(!lhs.m_moved);
-		assert(!rhs.m_moved);
-		assert(!lhs.m_destructed);
-		assert(!rhs.m_destructed);
+		BOUNDED_TEST(!lhs.m_moved);
+		BOUNDED_TEST(!rhs.m_moved);
+		BOUNDED_TEST(!lhs.m_destructed);
+		BOUNDED_TEST(!rhs.m_destructed);
 		return lhs.m_value <=> rhs.m_value;
 	}
 	friend constexpr auto operator==(CheckedMover const & lhs, CheckedMover const & rhs) noexcept {
-		assert(!lhs.m_moved);
-		assert(!rhs.m_moved);
-		assert(!lhs.m_destructed);
-		assert(!rhs.m_destructed);
+		BOUNDED_TEST(!lhs.m_moved);
+		BOUNDED_TEST(!rhs.m_moved);
+		BOUNDED_TEST(!lhs.m_destructed);
+		BOUNDED_TEST(!rhs.m_destructed);
 		return lhs.m_value== rhs.m_value;
 	}
 private:
@@ -99,13 +98,13 @@ void test_unique_copy_less(Container const & source, Container const & expected)
 	Container destination(containers::size(source), 0);
 	auto const it = containers::unique_copy_less(begin(source), end(source), begin(destination));
 	erase(destination, it, end(destination));
-	assert(destination == expected);
+	BOUNDED_TEST(destination == expected);
 }
 
 template<typename Container>
 void test_unique_less(Container source, Container const & expected) {
-	assert(std::is_sorted(begin(source), end(source)));
-	assert(std::is_sorted(begin(expected), end(expected)));
+	BOUNDED_TEST(std::is_sorted(begin(source), end(source)));
+	BOUNDED_TEST(std::is_sorted(begin(expected), end(expected)));
 	test_unique_copy_less(source, expected);
 	test_unique_copy_less(std::move(source), expected);
 }
@@ -116,7 +115,7 @@ void test_unique_merge_copy(Container const & lhs, Container const & rhs, Contai
 	auto const it = containers::unique_merge_copy(begin(lhs), end(lhs), begin(rhs), end(rhs), begin(result));
 	erase(result, it, end(result));
 
-	assert(result == expected);
+	BOUNDED_TEST(result == expected);
 }
 
 template<typename Container>
@@ -127,13 +126,13 @@ void test_unique_inplace_merge(Container v, Container const & other, Container c
 	auto const it = containers::unique_inplace_merge(begin(v), begin(v) + midpoint, end(v));
 	erase(v, it, end(v));
 
-	assert(v == expected);
+	BOUNDED_TEST(v == expected);
 }
 
 template<typename Container>
 void test_unique_merge(Container v, Container const & other, Container const & expected) {
-	assert(std::is_sorted(begin(v), end(v)));
-	assert(std::is_sorted(begin(other), end(other)));
+	BOUNDED_TEST(std::is_sorted(begin(v), end(v)));
+	BOUNDED_TEST(std::is_sorted(begin(other), end(other)));
 	test_unique_merge_copy(v, other, expected);
 	test_unique_inplace_merge(std::move(v), other, expected);
 }
@@ -187,14 +186,14 @@ void test() {
 	container_type empty;
 	std::initializer_list<typename container_type::value_type> const init = { {1, 2}, {2, 5}, {3, 3} };
 	container_type container(init);
-	assert((container == container_type{init}));
+	BOUNDED_TEST((container == container_type{init}));
 	container.emplace(typename container_type::value_type(4, 4));
 	container.emplace(std::piecewise_construct, generic_forward_as_tuple<container_type>(5), generic_forward_as_tuple<container_type>(3));
-	assert(container.at(5) == 3);
-	assert(size(container) == 5_bi);
+	BOUNDED_TEST(container.at(5) == 3);
+	BOUNDED_TEST(size(container) == 5_bi);
 	container.insert(typename container_type::value_type(3, 10));
-	assert(size(container) == 5_bi);
-	assert(container.at(3) == 3);
+	BOUNDED_TEST(size(container) == 5_bi);
+	BOUNDED_TEST(container.at(3) == 3);
 }
 
 #define TRACK_COMPARISONS

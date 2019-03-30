@@ -3,11 +3,11 @@
 // (See accompanying file LICENSE_1_0.txt or copy at
 // http://www.boost.org/LICENSE_1_0.txt)
 
-#undef NDEBUG
-
 #include <containers/static_vector/static_vector.hpp>
 #include <containers/array/array.hpp>
 #include <containers/repeat_n.hpp>
+
+#include "../../test_assert.hpp"
 
 namespace {
 
@@ -57,86 +57,86 @@ void test_generic(T const & t, std::initializer_list<T> init) {
 	constexpr auto capacity = bounded::constant<capacity_>;
 	using container = containers::static_vector<T, capacity_>;
 	auto const default_constructed = container{};
-	assert(empty(default_constructed));
+	BOUNDED_TEST(empty(default_constructed));
 	static_assert(default_constructed.capacity() == capacity);
 	
 	auto const count = container(capacity);
-	assert(size(count) == capacity);
+	BOUNDED_TEST(size(count) == capacity);
 
-	assert(begin(default_constructed) == begin(default_constructed));
-	assert(begin(default_constructed) == end(default_constructed));
+	BOUNDED_TEST(begin(default_constructed) == begin(default_constructed));
+	BOUNDED_TEST(begin(default_constructed) == end(default_constructed));
 	
 	for (auto const & value : count) {
-		assert(value == T{});
+		BOUNDED_TEST(value == T{});
 	}
 	
 	auto const count_arg = container(capacity, t);
-	assert(size(count) == capacity);
+	BOUNDED_TEST(size(count) == capacity);
 	for (auto const & value : count_arg) {
-		assert(value == t);
+		BOUNDED_TEST(value == t);
 	}
-	assert(front(count_arg) == t);
-	assert(back(count_arg) == t);
-	assert(count_arg[0_bi] == t);
-	assert(at(count_arg, 0_bi) == t);
+	BOUNDED_TEST(front(count_arg) == t);
+	BOUNDED_TEST(back(count_arg) == t);
+	BOUNDED_TEST(count_arg[0_bi] == t);
+	BOUNDED_TEST(at(count_arg, 0_bi) == t);
 	try {
 		at(count_arg, static_cast<unsigned>(capacity + 1_bi));
-		assert(false);
+		BOUNDED_TEST(false);
 	} catch (std::out_of_range const &) {
 	}
 
 	auto const init_list = container(init);
-	assert(containers::equal(init_list, init));
+	BOUNDED_TEST(containers::equal(init_list, init));
 	
 	auto copy = init_list;
-	assert(containers::equal(copy, init));
+	BOUNDED_TEST(containers::equal(copy, init));
 	
 	auto move = std::move(copy);
 	clear(copy);
-	assert(move == init_list);
+	BOUNDED_TEST(move == init_list);
 	
 	copy = move;
-	assert(size(copy) == init.size());
-	assert(copy == move);
+	BOUNDED_TEST(size(copy) == init.size());
+	BOUNDED_TEST(copy == move);
 	
 	move = std::move(copy);
 	clear(copy);
-	assert(empty(copy));
+	BOUNDED_TEST(empty(copy));
 	
-	assert(copy == default_constructed);
+	BOUNDED_TEST(copy == default_constructed);
 	
 	copy = init;
-	assert(copy == init_list);
+	BOUNDED_TEST(copy == init_list);
 
-	assert(data(copy) != data(init_list));
+	BOUNDED_TEST(data(copy) != data(init_list));
 	
 	clear(copy);
 	push_back(copy, t);
-	assert(size(copy) == 1_bi);
-	assert(back(copy) == t);
+	BOUNDED_TEST(size(copy) == 1_bi);
+	BOUNDED_TEST(back(copy) == t);
 	copy.pop_back();
 	push_back(copy, T(t));
-	assert(size(copy) == 1_bi);
-	assert(back(copy) == t);
+	BOUNDED_TEST(size(copy) == 1_bi);
+	BOUNDED_TEST(back(copy) == t);
 	clear(copy);
 	insert(copy, begin(copy), t);
-	assert(size(copy) == 1_bi);
-	assert(back(copy) == t);
+	BOUNDED_TEST(size(copy) == 1_bi);
+	BOUNDED_TEST(back(copy) == t);
 	
 	assign(copy, init);
 	assign(copy, capacity, t);
 	
 	auto const old_front = front(copy);
 	resize(copy, capacity);
-	assert(front(copy) == old_front);
+	BOUNDED_TEST(front(copy) == old_front);
 	clear(copy);
 	resize(copy, capacity);
-	assert(front(copy) == T{});
-	assert(size(copy) == capacity);
+	BOUNDED_TEST(front(copy) == T{});
+	BOUNDED_TEST(size(copy) == capacity);
 	resize(copy, 0_bi);
-	assert(empty(copy));
+	BOUNDED_TEST(empty(copy));
 	resize(copy, capacity, t);
-	assert(copy == count_arg);
+	BOUNDED_TEST(copy == count_arg);
 }
 
 struct non_copyable {
@@ -173,7 +173,7 @@ int main() {
 
 	container.insert(begin(container) + 1_bi, containers::repeat_n(5_bi, 12));
 	auto const expected = { 1, 12, 12, 12, 12, 12, 2, 3 };
-	assert(containers::equal(container, expected));
+	BOUNDED_TEST(containers::equal(container, expected));
 	
 	containers::static_vector<non_copyable, 10> test_no_copies;
 	test_no_copies.emplace_back();

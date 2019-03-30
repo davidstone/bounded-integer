@@ -5,7 +5,7 @@
 
 #include <bounded/detail/variant/variant.hpp>
 
-#include <cassert>
+#include "../../../test_assert.hpp"
 
 namespace {
 
@@ -51,7 +51,7 @@ static_assert(bounded::visit(thing, [](auto x) { return std::is_same_v<decltype(
 constexpr auto test_assignment_from_variant() {
 	auto thing1 = thing_t(std::in_place, index, value);
 	thing1 = thing_t(std::in_place, index, value);
-	assert(thing1[index] == value);
+	BOUNDED_TEST(thing1[index] == value);
 	return true;
 }
 static_assert(test_assignment_from_variant());
@@ -59,8 +59,8 @@ static_assert(test_assignment_from_variant());
 constexpr auto test_assignment_from_value() {
 	auto thing1 = thing_t(std::in_place, index, value);
 	thing1 = -1L;
-	assert(holds_alternative(thing1, bounded::detail::types<long>{}));
-	assert(thing1[bounded::detail::types<long>{}] == -1L);
+	BOUNDED_TEST(holds_alternative(thing1, bounded::detail::types<long>{}));
+	BOUNDED_TEST(thing1[bounded::detail::types<long>{}] == -1L);
 	return true;
 }
 static_assert(test_assignment_from_value());
@@ -96,7 +96,7 @@ struct destructor_checker {
 int main() {
 	using non_trivial_variant_t = bounded::variant<non_trivial>;
 	auto non_trivial_variant = non_trivial_variant_t(std::in_place, 0_bi);
-	assert(non_trivial_variant.index() == 0_bi);
+	BOUNDED_TEST(non_trivial_variant.index() == 0_bi);
 	non_trivial_variant = non_trivial_variant_t(std::in_place, 0_bi);
 	// Silence self-assignment warning
 	non_trivial_variant = *&non_trivial_variant;
@@ -104,7 +104,7 @@ int main() {
 	
 	using non_copyable_variant_t = bounded::variant<non_copyable>;
 	auto non_copyable_variant = non_copyable_variant_t(std::in_place, 0_bi);
-	assert(non_copyable_variant.index() == 0_bi);
+	BOUNDED_TEST(non_copyable_variant.index() == 0_bi);
 	static_assert(not std::is_copy_constructible_v<non_copyable_variant_t>);
 	static_assert(not std::is_copy_assignable_v<non_copyable_variant_t>);
 	static_assert(std::is_move_constructible_v<non_copyable_variant_t>);
@@ -115,5 +115,5 @@ int main() {
 		static_assert(!std::is_trivially_destructible_v<bounded::variant<destructor_checker>>);
 		auto v = bounded::variant<destructor_checker>(std::in_place, 0_bi);
 	}
-	assert(destructor_checker::destructed == 1U);
+	BOUNDED_TEST(destructor_checker::destructed == 1U);
 }

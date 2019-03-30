@@ -3,13 +3,13 @@
 // (See accompanying file LICENSE_1_0.txt or copy at
 // http://www.boost.org/LICENSE_1_0.txt)
 
-#undef NDEBUG
-
 #include <bounded/detail/arithmetic/common.hpp>
 #include <bounded/detail/arithmetic/operators_builtin.hpp>
 #include <bounded/detail/comparison.hpp>
 #include <bounded/detail/comparison_mixed.hpp>
 #include <bounded/detail/typedefs.hpp>
+
+#include "../../../test_assert.hpp"
 
 namespace {
 
@@ -57,14 +57,14 @@ constexpr auto check_compound_arithmetic() {
 
 	auto x = x_type(bounded::constant<4>);
 	auto const pre_increment = ++x;
-	assert(pre_increment == bounded::constant<5>);
-	assert(x == bounded::constant<5>);
+	BOUNDED_TEST(pre_increment == bounded::constant<5>);
+	BOUNDED_TEST(x == bounded::constant<5>);
 	x = 0;
-	assert(x == 0);
+	BOUNDED_TEST(x == 0);
 	auto z = z_type(bounded::constant<0>);
 	auto const post_increment = z++;
-	assert(post_increment == 0);
-	assert(z == 1);
+	BOUNDED_TEST(post_increment == 0);
+	BOUNDED_TEST(z == 1);
 
 	static_assert(minus_equals(bounded::clamped_integer<0, 10>(bounded::constant<5>), bounded::constant<20>) == bounded::constant<0>);
 	

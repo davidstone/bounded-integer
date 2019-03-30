@@ -3,8 +3,6 @@
 // (See accompanying file LICENSE_1_0.txt or copy at
 // http://www.boost.org/LICENSE_1_0.txt)
 
-#undef NDEBUG
-
 #include <bounded/detail/class.hpp>
 
 #include <bounded/detail/comparison.hpp>
@@ -12,8 +10,7 @@
 #include <bounded/detail/typedefs.hpp>
 
 #include "../homogeneous_equals.hpp"
-
-#include <cassert>
+#include "../../test_assert.hpp"
 
 namespace {
 
@@ -68,11 +65,11 @@ constexpr auto check_assignment() {
 	bounded::integer<0, 10> x(5, bounded::non_check);
 	static_assert(!std::is_assignable<decltype((x)), bounded::constant_t<11>>{}, "Should not be assignable.");
 	x = bounded::integer<10, 11>(10, bounded::non_check);
-	assert(x == bounded::constant<10>);
+	BOUNDED_TEST(x == bounded::constant<10>);
 
 	bounded::clamped_integer<0, 10> y(5, bounded::non_check);
 	y = bounded::constant<11>;
-	assert(y == bounded::constant<10>);
+	BOUNDED_TEST(y == bounded::constant<10>);
 	return true;
 }
 

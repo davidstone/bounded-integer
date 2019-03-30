@@ -3,11 +3,9 @@
 // (See accompanying file LICENSE_1_0.txt or copy at
 // http://www.boost.org/LICENSE_1_0.txt)
 
-#undef NDEBUG
-
 #include <bounded/detail/comparison.hpp>
 
-#include <cassert>
+#include "../test_assert.hpp"
 
 namespace bounded_test {
 
@@ -21,10 +19,10 @@ struct string_view {
 	constexpr string_view(string_view const & other) noexcept:
 		value(other.value)
 	{
-		assert(not other.moved_from);
+		BOUNDED_TEST(not other.moved_from);
 	}
 	constexpr auto & operator=(string_view const & other) noexcept {
-		assert(not other.moved_from);
+		BOUNDED_TEST(not other.moved_from);
 		value = other.value;
 		moved_from = false;
 		return *this;
@@ -32,11 +30,11 @@ struct string_view {
 	constexpr string_view(string_view && other) noexcept:
 		value(other.value)
 	{
-		assert(not other.moved_from);
+		BOUNDED_TEST(not other.moved_from);
 		other.moved_from = true;
 	}
 	constexpr auto & operator=(string_view && other) noexcept {
-		assert(not other.moved_from);
+		BOUNDED_TEST(not other.moved_from);
 		value = other.value;
 		moved_from = false;
 		other.moved_from = true;
@@ -44,7 +42,7 @@ struct string_view {
 	}
 	
 	friend constexpr auto compare(string_view lhs, string_view rhs) noexcept {
-		assert(not lhs.moved_from and not rhs.moved_from);
+		BOUNDED_TEST(not lhs.moved_from and not rhs.moved_from);
 		while (true) {
 			if (auto const cmp = *lhs.value <=> *rhs.value; cmp != 0 or *lhs.value == '\0') {
 				return cmp;
@@ -54,7 +52,7 @@ struct string_view {
 		}
 	}
 	friend constexpr auto operator==(string_view lhs, string_view rhs) noexcept {
-		assert(not lhs.moved_from and not rhs.moved_from);
+		BOUNDED_TEST(not lhs.moved_from and not rhs.moved_from);
 		while (true) {
 			if (*lhs.value != *rhs.value) {
 				return false;
