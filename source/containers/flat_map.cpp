@@ -393,7 +393,6 @@ BOUNDED_COMPARISON
 }	// namespace
 
 int main(int argc, char ** argv) {
-	std::cout.sync_with_stdio(false);
 	test_unique();
 	test<map_type<int, int>>();
 
