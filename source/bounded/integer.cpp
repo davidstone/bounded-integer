@@ -25,14 +25,14 @@ auto check_throw_policy() {
 	);
 	constexpr auto minimum = bounded::constant<0>;
 	constexpr auto maximum = bounded::constant<10>;
-	auto const policy = bounded::throw_policy{};
+	using policy = bounded::throw_policy<>;
 	try {
-		policy.assignment(20, minimum, maximum);
+		policy::assignment(20, minimum, maximum);
 		BOUNDED_TEST(false);
 	} catch (...) {
 	}
 	try {
-		policy.assignment(-6, minimum, maximum);
+		policy::assignment(-6, minimum, maximum);
 		BOUNDED_TEST(false);
 	} catch (...) {
 	}
