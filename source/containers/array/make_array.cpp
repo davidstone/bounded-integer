@@ -39,9 +39,9 @@ static_assert(std::numeric_limits<value_type>::min() == -4573, "min wrong");
 static_assert(std::numeric_limits<value_type>::max() == 2474, "max wrong");
 
 // First is deduced
-static constexpr std::size_t second = 3;
-static constexpr std::size_t third = 4;
-static constexpr std::size_t fourth = 6;
+constexpr std::size_t second = 3;
+constexpr std::size_t third = 4;
+constexpr std::size_t fourth = 6;
 constexpr auto four_dimensions = containers::make_array<second, third, fourth>(
 	0_bi, 1_bi, 2_bi, 3_bi, 4_bi, 5_bi,
 	0_bi, 1_bi, 2_bi, 3_bi, 4_bi, 5_bi,
