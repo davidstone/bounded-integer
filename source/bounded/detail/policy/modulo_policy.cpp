@@ -6,72 +6,72 @@
 #include <bounded/detail/policy/modulo_policy.hpp>
 
 namespace check_modulo_policy {
-constexpr bounded::modulo_policy policy;
+using policy = bounded::modulo_policy;
 
 static_assert(
-	policy.assignment(bounded::constant<5>, bounded::constant<0>, bounded::constant<9>) == bounded::constant<5>,
+	policy::assignment(bounded::constant<5>, bounded::constant<0>, bounded::constant<9>) == bounded::constant<5>,
 	"Incorrect result for a minimum of zero and value in range."
 );
 
 static_assert(
-	policy.assignment(bounded::constant<5>, -bounded::constant<5>, bounded::constant<9>) == bounded::constant<5>,
+	policy::assignment(bounded::constant<5>, -bounded::constant<5>, bounded::constant<9>) == bounded::constant<5>,
 	"Incorrect result for a negative minimum and value in range."
 );
 static_assert(
-	policy.assignment(-bounded::constant<5>, -bounded::constant<5>, bounded::constant<9>) == -bounded::constant<5>,
+	policy::assignment(-bounded::constant<5>, -bounded::constant<5>, bounded::constant<9>) == -bounded::constant<5>,
 	"Incorrect result for a negative minimum and value equal to the minimum."
 );
 
 static_assert(
-	policy.assignment(bounded::constant<17>, bounded::constant<0>, bounded::constant<9>) == bounded::constant<7>,
+	policy::assignment(bounded::constant<17>, bounded::constant<0>, bounded::constant<9>) == bounded::constant<7>,
 	"Incorrect result for a minimum of zero and value too high."
 );
 
 static_assert(
-	policy.assignment(bounded::constant<1>, bounded::constant<2>, bounded::constant<9>) == bounded::constant<9>,
+	policy::assignment(bounded::constant<1>, bounded::constant<2>, bounded::constant<9>) == bounded::constant<9>,
 	"Incorrect result for a positive minimum and a positive value too low."
 );
 
 static_assert(
-	policy.assignment(-bounded::constant<1>, bounded::constant<0>, bounded::constant<9>) == bounded::constant<9>,
+	policy::assignment(-bounded::constant<1>, bounded::constant<0>, bounded::constant<9>) == bounded::constant<9>,
 	"Incorrect result for a minimum of zero and value too low."
 );
 
 static_assert(
-	policy.assignment(bounded::constant<12>, -bounded::constant<5>, bounded::constant<9>) == -bounded::constant<3>,
+	policy::assignment(bounded::constant<12>, -bounded::constant<5>, bounded::constant<9>) == -bounded::constant<3>,
 	"Incorrect result for a negative minimum and value too high."
 );
 
 static_assert(
-	policy.assignment(-bounded::constant<10>, -bounded::constant<5>, bounded::constant<9>) == bounded::constant<5>,
+	policy::assignment(-bounded::constant<10>, -bounded::constant<5>, bounded::constant<9>) == bounded::constant<5>,
 	"Incorrect result for a negative minimum and value too low."
 );
 
 static_assert(
-	policy.assignment(-bounded::constant<1000>, bounded::constant<4>, bounded::constant<4>) == bounded::constant<4>,
+	policy::assignment(-bounded::constant<1000>, bounded::constant<4>, bounded::constant<4>) == bounded::constant<4>,
 	"Incorrect result for a single-value range and value too low."
 );
 static_assert(
-	policy.assignment(bounded::constant<4>, bounded::constant<4>, bounded::constant<4>) == bounded::constant<4>,
+	policy::assignment(bounded::constant<4>, bounded::constant<4>, bounded::constant<4>) == bounded::constant<4>,
 	"Incorrect result for a single-value range and value in range."
 );
 static_assert(
-	policy.assignment(bounded::constant<678412>, bounded::constant<4>, bounded::constant<4>) == bounded::constant<4>,
+	policy::assignment(bounded::constant<678412>, bounded::constant<4>, bounded::constant<4>) == bounded::constant<4>,
 	"Incorrect result for a single-value range and value too high."
 );
 
 static_assert(
-	policy.assignment(bounded::constant<0>, bounded::constant<0>, bounded::constant<0>) == bounded::constant<0>,
+	policy::assignment(bounded::constant<0>, bounded::constant<0>, bounded::constant<0>) == bounded::constant<0>,
 	"Incorrect result for a single-value range that can only hold 0 and a value of 0."
 );
 
 static_assert(
-	policy.assignment(bounded::constant<1>, bounded::constant<0>, bounded::constant<0>) == bounded::constant<0>,
+	policy::assignment(bounded::constant<1>, bounded::constant<0>, bounded::constant<0>) == bounded::constant<0>,
 	"Incorrect result for a single-value range that can only hold 0 and a value of 1."
 );
 
 static_assert(
-	policy.assignment(bounded::constant<9>, bounded::constant<0>, bounded::constant<1>) == bounded::constant<1>,
+	policy::assignment(bounded::constant<9>, bounded::constant<0>, bounded::constant<1>) == bounded::constant<1>,
 	"Incorrect result for integer<0, 1> target and a value of 0."
 );
 
