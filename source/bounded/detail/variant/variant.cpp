@@ -96,7 +96,7 @@ struct destructor_checker {
 int main() {
 	using non_trivial_variant_t = bounded::variant<non_trivial>;
 	auto non_trivial_variant = non_trivial_variant_t(std::in_place, 0_bi);
-	BOUNDED_TEST(non_trivial_variant.index() == 0_bi);
+	static_assert(non_trivial_variant.index() == 0_bi);
 	non_trivial_variant = non_trivial_variant_t(std::in_place, 0_bi);
 	// Silence self-assignment warning
 	non_trivial_variant = *&non_trivial_variant;
@@ -104,7 +104,7 @@ int main() {
 	
 	using non_copyable_variant_t = bounded::variant<non_copyable>;
 	auto non_copyable_variant = non_copyable_variant_t(std::in_place, 0_bi);
-	BOUNDED_TEST(non_copyable_variant.index() == 0_bi);
+	static_assert(non_copyable_variant.index() == 0_bi);
 	static_assert(not std::is_copy_constructible_v<non_copyable_variant_t>);
 	static_assert(not std::is_copy_assignable_v<non_copyable_variant_t>);
 	static_assert(std::is_move_constructible_v<non_copyable_variant_t>);
