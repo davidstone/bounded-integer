@@ -22,4 +22,11 @@ constexpr auto decrease_max(integer<minimum, maximum, overflow_policy> const & v
 	 integer<minimum, detail::normalize<detail::safe_min(new_maximum, maximum)>, overflow_policy>(value, args...)
 )
 
+template<typename Source, template<auto, auto, typename...> typename Target, typename... Extra>
+using change_policy = Target<
+	bounded::detail::normalize<Source::min().value()>,
+	bounded::detail::normalize<Source::max().value()>,
+	Extra...
+>;
+
 }	// namespace bounded
