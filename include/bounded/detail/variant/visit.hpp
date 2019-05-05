@@ -112,8 +112,8 @@ constexpr auto visit_implementation(Function && function, constant_t<0>, tuple<V
 // TODO: noexcept?
 template<typename Function, typename Index, typename... Values, typename Variant, typename... Variants>
 constexpr decltype(auto) visit_implementation(Function && function, Index const current_index, tuple<Values...> values, Variant && variant, Variants && ... variants) {
-	auto found = [&]() BOUNDED_NOEXCEPT_DECLTYPE(
-		detail::visit_implementation(
+	auto found = [&]() -> decltype(auto) {
+		return detail::visit_implementation(
 			BOUNDED_FORWARD(function),
 			0_bi,
 			tuple_cat(
@@ -126,8 +126,8 @@ constexpr decltype(auto) visit_implementation(Function && function, Index const 
 				)
 			),
 			BOUNDED_FORWARD(variants)...
-		)
-	);
+		);
+	};
 	auto const search_index = variant.index();
 	if constexpr (current_index == search_index.max()) {
 		return found();
