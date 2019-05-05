@@ -33,7 +33,11 @@ public:
 		base(begin(sv), end(sv))
 	) {
 	}
-	
+
+	basic_string(basic_string const &) = default;
+	basic_string(basic_string &&) = default;
+	basic_string & operator=(basic_string const &) & = default;
+	basic_string & operator=(basic_string &&) & = default;
 	using base::operator=;
 	
 	friend constexpr auto begin(basic_string const & container) noexcept {
