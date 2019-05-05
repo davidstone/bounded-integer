@@ -426,9 +426,7 @@ elseif("${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU")
 		"-Wcast-qual"
 		# It seems impossible to initialize bit fields with this warning on
 		#"-Wconversion"
-		# -Wctor-dtor-privacy has a bug in 8.1:
-		# https://gcc.gnu.org/bugzilla/show_bug.cgi?id=85792
-		"-Wno-ctor-dtor-privacy"
+		"-Wctor-dtor-privacy"
 		"-Wdisabled-optimization"
 		"-Wdouble-promotion"
 		# -Weffc++ includes a warning if all data members are not explicitly
