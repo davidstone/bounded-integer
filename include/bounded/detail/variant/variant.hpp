@@ -87,6 +87,7 @@ private:
 
 template<>
 struct variant_selector<0> {
+	variant_selector() = delete;
 };
 
 }	// namespace detail
