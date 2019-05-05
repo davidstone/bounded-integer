@@ -483,6 +483,9 @@ elseif("${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU")
 		# -Wunused-but-set-parameter does not properly account for
 		# `if constexpr` branches.
 		"-Wno-unused-but-set-parameter"
+		# -Wunused-but-set-variable does not properly account for
+		# `if constexpr` branches.
+		"-Wno-unused-but-set-variable"
 		# -Wuseless-cast is incompatible with BOUNDED_INTEGER_CONDITIONAL
 		# "-Wuseless-cast"
 		"-Wvector-operation-performance"
