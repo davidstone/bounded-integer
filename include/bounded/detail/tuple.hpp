@@ -277,7 +277,7 @@ constexpr auto make_tuple = [](auto && ... args) BOUNDED_NOEXCEPT_VALUE(
 );
 
 constexpr auto tie = [](auto && ... args) noexcept {
-		return tuple<decltype(args)...>(BOUNDED_FORWARD(args)...);
+	return tuple<decltype(args)...>(BOUNDED_FORWARD(args)...);
 };
 
 template<typename Tuple>
