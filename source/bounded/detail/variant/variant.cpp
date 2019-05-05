@@ -58,6 +58,18 @@ static_assert(test_assignment_from_variant());
 
 constexpr auto test_assignment_from_value() {
 	auto thing1 = thing_t(std::in_place, index, value);
+	// If this static_assert is removed, gcc fails to compile due to some bug
+	static_assert(
+		bounded::detail::all(std::is_convertible_v<
+			bounded::visitor_parameter<int&, 4>,
+			bounded::visitor_parameter<int&, 4>
+		>) and
+		bounded::detail::all(std::is_constructible_v<
+			bounded::detail::tuple_value<0, bounded::visitor_parameter<int&, 4>, bounded::visitor_parameter<int&, 4>>,
+			bounded::detail::not_piecewise_construct_t,
+			bounded::visitor_parameter<int&, 4>
+		>)
+	);
 	thing1 = -1L;
 	BOUNDED_TEST(holds_alternative(thing1, bounded::detail::types<long>{}));
 	BOUNDED_TEST(thing1[bounded::detail::types<long>{}] == -1L);
