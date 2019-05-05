@@ -91,10 +91,11 @@ struct static_vector : private detail::static_vector_data<T, capacity_> {
 private:
 	enum class count_constructor{};
 public:
+	static_assert(capacity_ <= static_cast<std::size_t>(std::numeric_limits<std::ptrdiff_t>::max()));
 	using value_type = T;
 	using size_type = bounded::integer<0, bounded::detail::normalize<capacity_>>;
-	using const_iterator = contiguous_iterator<value_type const, capacity_>;
-	using iterator = contiguous_iterator<value_type, capacity_>;
+	using const_iterator = contiguous_iterator<value_type const, static_cast<std::ptrdiff_t>(capacity_)>;
+	using iterator = contiguous_iterator<value_type, static_cast<std::ptrdiff_t>(capacity_)>;
 
 	constexpr static_vector() = default;
 	
