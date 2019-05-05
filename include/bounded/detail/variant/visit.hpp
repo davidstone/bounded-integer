@@ -148,7 +148,7 @@ constexpr decltype(auto) visit_implementation(Function && function, Index const 
 	
 constexpr struct visit_with_index_t {
 private:
-	static constexpr struct impl_t {
+	static inline constexpr struct impl_t {
 		template<typename Function, typename... Variants, BOUNDED_REQUIRES(detail::is_visitable<Function, Variants...>)>
 		constexpr auto operator()(Function && function, Variants && ... variants) const BOUNDED_NOEXCEPT_DECLTYPE(
 			detail::visit_implementation(
@@ -158,7 +158,7 @@ private:
 				BOUNDED_FORWARD(variants)...
 			)
 		)
-	} impl;
+	} impl{};
 public:
 	// Any number of variants (including 0) followed by one function
 	template<typename... Args, BOUNDED_REQUIRES(sizeof...(Args) >= 1)>
@@ -187,7 +187,7 @@ private:
 			BOUNDED_FORWARD(m_function)(BOUNDED_FORWARD(values).value...)
 		)
 	};
-	static constexpr struct impl_t {
+	static inline constexpr struct impl_t {
 		template<typename Function, typename... Variants, BOUNDED_REQUIRES(detail::is_visitable<visit_function<Function>, Variants...>)>
 		constexpr auto operator()(Function && function, Variants && ... variants) const BOUNDED_NOEXCEPT_DECLTYPE(
 			detail::visit_implementation(
@@ -197,7 +197,7 @@ private:
 				BOUNDED_FORWARD(variants)...
 			)
 		)
-	} impl;
+	} impl{};
 public:
 	template<typename... Args, BOUNDED_REQUIRES(sizeof...(Args) >= 1)>
 	constexpr auto operator()(Args && ... args) const BOUNDED_NOEXCEPT_DECLTYPE(
