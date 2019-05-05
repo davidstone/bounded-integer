@@ -44,7 +44,7 @@ struct string_view {
 	friend constexpr auto compare(string_view lhs, string_view rhs) noexcept {
 		BOUNDED_TEST(not lhs.moved_from and not rhs.moved_from);
 		while (true) {
-			if (auto const cmp = *lhs.value <=> *rhs.value; cmp != 0 or *lhs.value == '\0') {
+			if (auto const cmp = bounded::compare(*lhs.value, *rhs.value); cmp != 0 or *lhs.value == '\0') {
 				return cmp;
 			}
 			++lhs.value;

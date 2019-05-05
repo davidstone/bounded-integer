@@ -74,11 +74,11 @@ constexpr auto compare(single_element_iterator<T> const lhs, single_element_iter
 
 template<typename T>
 constexpr auto compare(single_element_iterator<T> const lhs, single_element_sentinel) noexcept {
-	return lhs.is_end() <=> true;
+	return compare(lhs.is_end(), true);
 }
 template<typename T>
 constexpr auto compare(single_element_sentinel, single_element_iterator<T> const rhs) noexcept {
-	return true <=> rhs.is_end();
+	return compare(true, rhs.is_end());
 }
 
 template<typename T>

@@ -78,7 +78,7 @@ public:
 		BOUNDED_TEST(!rhs.m_moved);
 		BOUNDED_TEST(!lhs.m_destructed);
 		BOUNDED_TEST(!rhs.m_destructed);
-		return lhs.m_value <=> rhs.m_value;
+		return bounded::compare(lhs.m_value, rhs.m_value);
 	}
 	friend constexpr auto operator==(CheckedMover const & lhs, CheckedMover const & rhs) noexcept {
 		BOUNDED_TEST(!lhs.m_moved);
@@ -385,7 +385,7 @@ private:
 
 template<std::size_t size>
 auto compare(Class<size> const & lhs, Class<size> const & rhs) {
-	return lhs.value() <=> rhs.value();
+	return bounded::compare(lhs.value(), rhs.value());
 }
 
 BOUNDED_COMPARISON

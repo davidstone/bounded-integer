@@ -232,7 +232,7 @@ template<
 >
 constexpr auto compare_impl(tuple<lhs_types...> const & lhs, tuple<rhs_types...> const & rhs, constant_t<i> index) noexcept {
 	if constexpr (index == constant<sizeof...(lhs_types)>) {
-		return std::strong_ordering::equal;
+		return strong_ordering::equal;
 	} else {
 		if (auto const cmp = compare(lhs[index], rhs[index]); cmp != 0) {
 			return cmp;

@@ -18,7 +18,7 @@ static_assert(std::is_empty<bounded::tuple<>>::value);
 struct empty {};
 
 constexpr auto compare(empty, empty) noexcept {
-	return std::strong_ordering::equal;
+	return bounded::strong_ordering::equal;
 }
 
 constexpr auto operator==(empty, empty) noexcept {
@@ -58,7 +58,7 @@ struct non_movable {
 };
 
 constexpr auto compare(non_movable const &, non_movable const &) noexcept {
-	return std::strong_ordering::equal;
+	return bounded::strong_ordering::equal;
 }
 constexpr auto operator==(non_movable const &, non_movable const &) noexcept {
 	return true;

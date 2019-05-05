@@ -35,9 +35,9 @@ constexpr auto lexicographical_compare_3way(InputIterator1 first1, Sentinel1 con
 		}
 	}
 	return
-		(first1 != last1) ? std::strong_ordering::greater :
-		(first2 != last2) ? std::strong_ordering::less :
-		std::strong_ordering::equal;
+		(first1 != last1) ? bounded::strong_ordering::greater :
+		(first2 != last2) ? bounded::strong_ordering::less :
+		bounded::strong_ordering::equal;
 }
 
 template<typename Range1, typename Range2, typename BinaryPredicate, BOUNDED_REQUIRES(is_range<Range1> and is_range<Range2>)>
@@ -78,7 +78,7 @@ constexpr auto lexicographical_compare_3way(InputIterator1 first1, Sentinel1 con
 			return result;
 		}
 	}
-	return std::strong_ordering::equal;
+	return bounded::strong_ordering::equal;
 }
 
 template<
