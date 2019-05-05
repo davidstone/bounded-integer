@@ -456,6 +456,11 @@ elseif("${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU")
 		"-Wno-padded"
 		"-Wredundant-decls"
 		"-Wshadow"
+		# -Wsign-compare warns in constexpr code for which comparison is safe.
+		# Putting in the necessary casts to silence this warning would silence
+		# the more useful warning on clang that warns if the value would
+		# actually change.
+		"-Wno-sign-compare"
 		"-Wsign-conversion"
 		# -Wsign-promo triggers on code that is guaranteed safe due to the use
 		# of the bounded::integer library. Working around the warning would lead
