@@ -103,6 +103,24 @@ struct destructor_checker {
 	}
 };
 
+struct non_comparable {
+};
+
+template<typename T, typename = void>
+struct is_equality_comparable_impl : std::false_type {};
+
+template<typename T>
+struct is_equality_comparable_impl<T, std::void_t<decltype(std::declval<T const &>() == std::declval<T const &>())>> : std::bool_constant<std::is_convertible_v<decltype(std::declval<T const &>() == std::declval<T const &>()), bool>> {};
+
+template<typename T>
+constexpr auto is_equality_comparable = is_equality_comparable_impl<T>::value;
+
+static_assert(!is_equality_comparable<non_comparable>);
+static_assert(!is_equality_comparable<bounded::variant<non_comparable>>);
+static_assert(!is_equality_comparable<bounded::variant<int, non_comparable>>);
+static_assert(!is_equality_comparable<bounded::variant<non_comparable, int>>);
+static_assert(!is_equality_comparable<bounded::variant<int, non_comparable, int>>);
+
 }	// namespace
 
 int main() {

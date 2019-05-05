@@ -51,11 +51,11 @@ namespace detail {
 
 struct equality_visitor {
 	template<typename T, auto n>
-	constexpr auto operator()(visitor_parameter<T, n> const lhs, visitor_parameter<T, n> const rhs) BOUNDED_NOEXCEPT_DECLTYPE(
+	constexpr auto operator()(visitor_parameter<T, n> const lhs, visitor_parameter<T, n> const rhs) const BOUNDED_NOEXCEPT_DECLTYPE(
 		lhs.value == rhs.value
 	)
-	template<typename LHS, auto lhs_n, typename RHS, auto rhs_n>
-	constexpr auto operator()(visitor_parameter<LHS, lhs_n>, visitor_parameter<RHS, rhs_n>) noexcept {
+	template<typename LHS, auto lhs_n, typename RHS, auto rhs_n, BOUNDED_REQUIRES(lhs_n != rhs_n)>
+	constexpr auto operator()(visitor_parameter<LHS, lhs_n>, visitor_parameter<RHS, rhs_n>) const noexcept {
 		return false;
 	}
 };
