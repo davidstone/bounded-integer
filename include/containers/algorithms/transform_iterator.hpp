@@ -72,8 +72,8 @@ struct function_wrapper<Result Type::*, false> {
 template<typename UnaryFunction>
 struct transform_traits : default_add, default_subtract, default_compare, private function_wrapper<UnaryFunction> {
 	transform_traits() = default;
-	constexpr explicit transform_traits(UnaryFunction dereference):
-		function_wrapper<UnaryFunction>{std::move(dereference)}
+	constexpr explicit transform_traits(UnaryFunction dereference_):
+		function_wrapper<UnaryFunction>{std::move(dereference_)}
 	{
 	}
 	
@@ -88,8 +88,8 @@ struct transform_traits : default_add, default_subtract, default_compare, privat
 
 template<typename UnaryFunction>
 struct transform_traits_dereference : default_add, default_subtract, default_compare, private function_wrapper<UnaryFunction> {
-	constexpr explicit transform_traits_dereference(UnaryFunction dereference):
-		function_wrapper<UnaryFunction>{std::move(dereference)}
+	constexpr explicit transform_traits_dereference(UnaryFunction dereference_):
+		function_wrapper<UnaryFunction>{std::move(dereference_)}
 	{
 	}
 	
