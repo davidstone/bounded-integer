@@ -16,7 +16,7 @@ struct S {
 
 constexpr auto operator==(S const lhs, S const rhs) {
 	return lhs.n == rhs.n;
-};
+}
 
 constexpr auto array = containers::array{S{0}, S{1}, S{2}, S{3}, S{4}};
 
