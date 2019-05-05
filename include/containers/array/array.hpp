@@ -38,12 +38,13 @@ struct array_value_type<T> {
 
 template<typename T, std::size_t size, std::size_t... sizes>
 struct array {
+	static_assert(size <= static_cast<std::size_t>(std::numeric_limits<std::ptrdiff_t>::max()));
 	using value_type = typename detail::array_value_type<T, sizes...>::type;
 
 	using size_type = bounded::constant_t<bounded::detail::normalize<size>>;
 	
-	using const_iterator = contiguous_iterator<value_type const, size>;
-	using iterator = contiguous_iterator<value_type, size>;
+	using const_iterator = contiguous_iterator<value_type const, static_cast<std::ptrdiff_t>(size)>;
+	using iterator = contiguous_iterator<value_type, static_cast<std::ptrdiff_t>(size)>;
 
 	CONTAINERS_OPERATOR_BRACKET_DEFINITIONS(array)
 
