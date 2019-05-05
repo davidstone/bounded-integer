@@ -23,26 +23,27 @@ namespace detail {
 // use the CRTP pattern to define them in these classes.
 
 
-template<bool generate_destructor, typename... Ts>
+template<bool generate_destructor, typename GetFunction, typename... Ts>
 struct variant_destructor_impl;
 
-template<typename... Ts>
+template<typename GetFunction, typename... Ts>
 using variant_destructor = variant_destructor_impl<
 	not (... and std::is_trivially_destructible_v<Ts>),
+	GetFunction,
 	Ts...
 >;
 
-template<typename... Ts>
-struct variant_destructor_impl<false, Ts...> : basic_variant_base<Ts...>
+template<typename GetFunction, typename... Ts>
+struct variant_destructor_impl<false, GetFunction, Ts...> : basic_variant_base<GetFunction, Ts...>
 {
-	using basic_variant_base<Ts...>::basic_variant_base;
+	using basic_variant_base<GetFunction, Ts...>::basic_variant_base;
 };
 
 
-template<typename... Ts>
-struct variant_destructor_impl<true, Ts...> : basic_variant_base<Ts...>
+template<typename GetFunction, typename... Ts>
+struct variant_destructor_impl<true, GetFunction, Ts...> : basic_variant_base<GetFunction, Ts...>
 {
-	using basic_variant_base<Ts...>::basic_variant_base;
+	using basic_variant_base<GetFunction, Ts...>::basic_variant_base;
 	~variant_destructor_impl() {
 		visit(*this, destroy);
 	}
