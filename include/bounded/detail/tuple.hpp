@@ -327,22 +327,19 @@ private:
 	}
 
 public:
-	constexpr auto operator()() const noexcept {
-		return tuple<>();
-	}
-
-	template<typename Tuple>
-	constexpr auto && operator()(Tuple && tuple) const noexcept {
-		return BOUNDED_FORWARD(tuple);
-	}
-
 	template<typename... Tuples, BOUNDED_REQUIRES(
-		(... and std::is_constructible<std::decay_t<Tuples>, Tuples &&>{})
+		(... and std::is_constructible_v<std::decay_t<Tuples>, Tuples &&>)
 	)>
 	constexpr auto operator()(Tuples && ... tuples) const noexcept(
-		(... and std::is_nothrow_constructible<std::decay_t<Tuples>, Tuples &&>{})
+		(... and std::is_nothrow_constructible_v<std::decay_t<Tuples>, Tuples &&>)
 	) {
-		return cat_many(BOUNDED_FORWARD(tuples)...);
+		if constexpr (sizeof...(Tuples) == 0) {
+			return tuple<>{};
+		} else if constexpr (sizeof...(Tuples) == 1) {
+			return (..., BOUNDED_FORWARD(tuples));
+		} else {
+			return cat_many(BOUNDED_FORWARD(tuples)...);
+		}
 	}
 } tuple_cat;
 
