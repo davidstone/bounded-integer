@@ -7,7 +7,6 @@
 
 #include <bounded/detail/class.hpp>
 #include <bounded/detail/comparison.hpp>
-#include <bounded/detail/tuple.hpp>
 #include <bounded/detail/type.hpp>
 #include <bounded/detail/variant/get_index.hpp>
 #include <bounded/detail/variant/special_member_functions.hpp>

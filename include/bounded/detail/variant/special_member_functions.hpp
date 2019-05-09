@@ -7,8 +7,6 @@
 
 #include <bounded/detail/construct_destroy.hpp>
 #include <bounded/detail/forward.hpp>
-#include <bounded/detail/tuple.hpp>
-#include <bounded/detail/type.hpp>
 #include <bounded/detail/variant/base.hpp>
 #include <bounded/detail/variant/visit.hpp>
 
