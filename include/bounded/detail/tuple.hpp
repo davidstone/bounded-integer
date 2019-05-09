@@ -76,7 +76,7 @@ struct tuple_impl<std::index_sequence<indexes...>, Types...> : tuple_value<index
 	}
 
 	template<typename... Args, BOUNDED_REQUIRES(
-		(... and std::is_constructible<tuple_value<indexes, Types, Types...>, std::piecewise_construct_t, Args>::value)
+		(... and std::is_constructible_v<tuple_value<indexes, Types, Types...>, std::piecewise_construct_t, Args>)
 	)>
 	constexpr tuple_impl(std::piecewise_construct_t, Args && ... args) noexcept(false):
 		tuple_value<indexes, Types, Types...>(std::piecewise_construct, BOUNDED_FORWARD(args))...

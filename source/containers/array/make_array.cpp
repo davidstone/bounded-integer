@@ -71,7 +71,7 @@ static_assert(front(typed_array) == 0_bi, "Incorrect value with explicit type.")
 
 
 constexpr auto array_n = containers::make_array_n(6_bi, 5);
-static_assert(std::is_same<std::decay_t<decltype(array_n)>::value_type, int>::value, "Incorrect type from make_array_n.");
+static_assert(std::is_same_v<std::decay_t<decltype(array_n)>::value_type, int>, "Incorrect type from make_array_n.");
 static_assert(size(array_n) == 6_bi, "Incorrect size from make_array_n.");
 static_assert(array_n[3_bi] == 5, "Incorrect values from make_array_n.");
 

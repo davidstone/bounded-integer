@@ -56,10 +56,10 @@ constexpr auto destroy_range(InputIterator first, Sentinel const last) noexcept 
 template<
 	typename InputIterator, typename Sentinel,
 	typename ForwardIterator,
-	BOUNDED_REQUIRES(!std::is_nothrow_constructible<
+	BOUNDED_REQUIRES(!std::is_nothrow_constructible_v<
 		std::decay_t<decltype(*std::declval<ForwardIterator>())>,
 		decltype(*std::declval<InputIterator &>())
-	>::value)
+	>)
 >
 auto uninitialized_copy(InputIterator first, Sentinel const last, ForwardIterator out) {
 	auto out_first = out;
@@ -79,10 +79,10 @@ auto uninitialized_copy(InputIterator first, Sentinel const last, ForwardIterato
 template<
 	typename InputIterator, typename Sentinel,
 	typename ForwardIterator,
-	BOUNDED_REQUIRES(std::is_nothrow_constructible<
+	BOUNDED_REQUIRES(std::is_nothrow_constructible_v<
 		std::decay_t<decltype(*std::declval<ForwardIterator>())>,
 		decltype(*std::declval<InputIterator &>())
-	>::value)
+	>)
 >
 constexpr auto uninitialized_copy(InputIterator first, Sentinel const last, ForwardIterator out) noexcept {
 	for (; first != last; ++first) {
@@ -170,7 +170,7 @@ constexpr auto uninitialized_move_destroy(InputIterator const first, Sentinel co
 template<
 	typename ForwardIterator,
 	typename Sentinel,
-	BOUNDED_REQUIRES(!std::is_nothrow_default_constructible<std::decay_t<decltype(*std::declval<ForwardIterator const &>())>>::value)
+	BOUNDED_REQUIRES(!std::is_nothrow_default_constructible_v<std::decay_t<decltype(*std::declval<ForwardIterator const &>())>>)
 >
 auto uninitialized_default_construct(ForwardIterator const first, Sentinel const last) {
 	auto it = first;
@@ -187,7 +187,7 @@ auto uninitialized_default_construct(ForwardIterator const first, Sentinel const
 template<
 	typename ForwardIterator,
 	typename Sentinel,
-	BOUNDED_REQUIRES(std::is_nothrow_default_constructible<std::decay_t<decltype(*std::declval<ForwardIterator const &>())>>::value)
+	BOUNDED_REQUIRES(std::is_nothrow_default_constructible_v<std::decay_t<decltype(*std::declval<ForwardIterator const &>())>>)
 >
 constexpr auto uninitialized_default_construct(ForwardIterator first, Sentinel const last) noexcept {
 	for (; first != last; ++first) {

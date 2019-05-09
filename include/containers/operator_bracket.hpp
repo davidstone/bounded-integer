@@ -38,7 +38,7 @@ template<typename Range, BOUNDED_REQUIRES(is_range<Range>)>
 constexpr auto operator_bracket(Range && range, index_type<std::decay_t<Range>> const index) noexcept(
 	noexcept(index < size(range)) and
 	noexcept(*(begin(BOUNDED_FORWARD(range)) + index)) and
-	std::is_nothrow_move_constructible<decltype(*(begin(BOUNDED_FORWARD(range)) + index))>::value
+	std::is_nothrow_move_constructible_v<decltype(*(begin(BOUNDED_FORWARD(range)) + index))>
 ) -> decltype(*(begin(BOUNDED_FORWARD(range)) + index)) {
 	BOUNDED_ASSERT(index < size(range));
 	return *(begin(BOUNDED_FORWARD(range)) + index);
