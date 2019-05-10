@@ -103,28 +103,25 @@ inline constexpr auto is_visitable = is_cartesian_product_callable<Function, var
 
 
 
+template<typename Function, std::size_t... indexes, typename... Variants, BOUNDED_REQUIRES(sizeof...(indexes) == sizeof...(Variants))>
+constexpr auto visit_implementation(Function && function, std::index_sequence<indexes...>, bounded::constant_t<0>, Variants && ... variants) {
+	return BOUNDED_FORWARD(function)(
+		visitor_parameter<
+			decltype(BOUNDED_FORWARD(variants)[bounded::constant<indexes>]),
+			indexes
+		>{BOUNDED_FORWARD(variants)[bounded::constant<indexes>]}...
+	);
+}
 
-template<typename Function, typename... Values>
-constexpr auto visit_implementation(Function && function, constant_t<0>, tuple<Values...> values) BOUNDED_NOEXCEPT_DECLTYPE(
-	apply(std::move(values), BOUNDED_FORWARD(function))
-)
-
-// TODO: noexcept?
-template<typename Function, typename Index, typename... Values, typename Variant, typename... Variants>
-constexpr decltype(auto) visit_implementation(Function && function, Index const possible_index, tuple<Values...> values, Variant && variant, Variants && ... variants) {
+// This function accepts the pack of all variants twice. It passes over them
+// once to get all the indexes, then again to pull out the values.
+template<typename Function, std::size_t... indexes, typename Index, typename Variant, typename... Variants, BOUNDED_REQUIRES(sizeof...(indexes) < sizeof...(Variants))>
+constexpr auto visit_implementation(Function && function, std::index_sequence<indexes...> initial_indexes, Index possible_index, Variant const & variant, Variants && ... variants) noexcept {
 	auto found = [&]() -> decltype(auto) {
 		return ::bounded::detail::visit_implementation(
 			BOUNDED_FORWARD(function),
+			std::index_sequence<indexes..., static_cast<std::size_t>(possible_index)>{},
 			0_bi,
-			tuple_cat(
-				std::move(values),
-				tuple(
-					visitor_parameter<
-						decltype(BOUNDED_FORWARD(variant)[possible_index]),
-						possible_index.value()
-					>{BOUNDED_FORWARD(variant)[possible_index]}
-				)
-			),
 			BOUNDED_FORWARD(variants)...
 		);
 	};
@@ -136,9 +133,9 @@ constexpr decltype(auto) visit_implementation(Function && function, Index const 
 	} else {
 		return ::bounded::detail::visit_implementation(
 			BOUNDED_FORWARD(function),
+			initial_indexes,
 			possible_index + 1_bi,
-			std::move(values),
-			BOUNDED_FORWARD(variant),
+			variant,
 			BOUNDED_FORWARD(variants)...
 		);
 	}
@@ -153,8 +150,9 @@ private:
 		constexpr auto operator()(Function && function, Variants && ... variants) const BOUNDED_NOEXCEPT_DECLTYPE(
 			::bounded::detail::visit_implementation(
 				BOUNDED_FORWARD(function),
+				std::index_sequence<>{},
 				0_bi,
-				tuple{},
+				variants...,
 				BOUNDED_FORWARD(variants)...
 			)
 		)
@@ -192,8 +190,9 @@ private:
 		constexpr auto operator()(Function && function, Variants && ... variants) const BOUNDED_NOEXCEPT_DECLTYPE(
 			::bounded::detail::visit_implementation(
 				visit_function<Function>(BOUNDED_FORWARD(function)),
+				std::index_sequence<>{},
 				0_bi,
-				tuple{},
+				variants...,
 				BOUNDED_FORWARD(variants)...
 			)
 		)
