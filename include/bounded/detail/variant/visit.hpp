@@ -113,7 +113,7 @@ constexpr auto visit_implementation(Function && function, constant_t<0>, tuple<V
 template<typename Function, typename Index, typename... Values, typename Variant, typename... Variants>
 constexpr decltype(auto) visit_implementation(Function && function, Index const current_index, tuple<Values...> values, Variant && variant, Variants && ... variants) {
 	auto found = [&]() -> decltype(auto) {
-		return detail::visit_implementation(
+		return ::bounded::detail::visit_implementation(
 			BOUNDED_FORWARD(function),
 			0_bi,
 			tuple_cat(
@@ -134,7 +134,7 @@ constexpr decltype(auto) visit_implementation(Function && function, Index const 
 	} else if (current_index == search_index) {
 		return found();
 	} else {
-		return detail::visit_implementation(
+		return ::bounded::detail::visit_implementation(
 			BOUNDED_FORWARD(function),
 			current_index + 1_bi,
 			std::move(values),
@@ -151,7 +151,7 @@ private:
 	static inline constexpr struct impl_t {
 		template<typename Function, typename... Variants, BOUNDED_REQUIRES(detail::is_visitable<Function, Variants...>)>
 		constexpr auto operator()(Function && function, Variants && ... variants) const BOUNDED_NOEXCEPT_DECLTYPE(
-			detail::visit_implementation(
+			::bounded::detail::visit_implementation(
 				BOUNDED_FORWARD(function),
 				0_bi,
 				tuple{},
@@ -190,7 +190,7 @@ private:
 	static inline constexpr struct impl_t {
 		template<typename Function, typename... Variants, BOUNDED_REQUIRES(detail::is_visitable<visit_function<Function>, Variants...>)>
 		constexpr auto operator()(Function && function, Variants && ... variants) const BOUNDED_NOEXCEPT_DECLTYPE(
-			detail::visit_implementation(
+			::bounded::detail::visit_implementation(
 				visit_function<Function>(BOUNDED_FORWARD(function)),
 				0_bi,
 				tuple{},
