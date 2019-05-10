@@ -302,27 +302,34 @@ template<std::size_t index, typename Tuple>
 using tuple_element = typename tuple_element_c<index, Tuple>::type;
 
 
+template<typename Indexes, typename Tuple>
+struct indexed_tuple;
+
+template<std::size_t... indexes, typename Tuple>
+struct indexed_tuple<std::index_sequence<indexes...>, Tuple> {
+	Tuple && tuple;
+};
+
+template<typename Tuple>
+indexed_tuple(Tuple &&) -> indexed_tuple<std::make_index_sequence<tuple_size<Tuple>.value()>, Tuple>;
+
 constexpr struct tuple_cat_t {
 private:
-	template<std::size_t... first_indexes, typename First, std::size_t... second_indexes, typename Second>
-	static constexpr auto cat_two(std::index_sequence<first_indexes...>, First && first, std::index_sequence<second_indexes...>, Second && second) BOUNDED_NOEXCEPT_VALUE(
-		tuple<
-			tuple_element<first_indexes, First>...,
-			tuple_element<second_indexes, Second>...
-		>(
-			BOUNDED_FORWARD(first)[constant<first_indexes>]...,
-			BOUNDED_FORWARD(second)[constant<second_indexes>]...
-		)
-	)
-
-	template<typename First, typename Second, typename... Tail>
-	constexpr auto cat_many(First && first, Second && second, Tail && ... tail) const {
+	template<std::size_t... first_indexes, typename First, std::size_t... second_indexes, typename Second, typename... Tail>
+	constexpr auto cat_impl(
+		indexed_tuple<std::index_sequence<first_indexes...>, First> first,
+		indexed_tuple<std::index_sequence<second_indexes...>, Second> second,
+		Tail && ... tail
+	) const {
 		return operator()(
-			cat_two(
-				bounded::make_index_sequence(tuple_size<First>), BOUNDED_FORWARD(first),
-				bounded::make_index_sequence(tuple_size<Second>), BOUNDED_FORWARD(second)
+			tuple<
+				tuple_element<first_indexes, First>...,
+				tuple_element<second_indexes, Second>...
+			>(
+				BOUNDED_FORWARD(first).tuple[constant<first_indexes>]...,
+				BOUNDED_FORWARD(second).tuple[constant<second_indexes>]...
 			),
-			BOUNDED_FORWARD(tail)...
+			BOUNDED_FORWARD(tail).tuple...
 		);
 	}
 
@@ -338,7 +345,7 @@ public:
 		} else if constexpr (sizeof...(Tuples) == 1) {
 			return (..., BOUNDED_FORWARD(tuples));
 		} else {
-			return cat_many(BOUNDED_FORWARD(tuples)...);
+			return cat_impl(indexed_tuple{BOUNDED_FORWARD(tuples)}...);
 		}
 	}
 } tuple_cat;
