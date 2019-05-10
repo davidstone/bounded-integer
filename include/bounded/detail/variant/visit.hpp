@@ -111,7 +111,7 @@ constexpr auto visit_implementation(Function && function, constant_t<0>, tuple<V
 
 // TODO: noexcept?
 template<typename Function, typename Index, typename... Values, typename Variant, typename... Variants>
-constexpr decltype(auto) visit_implementation(Function && function, Index const current_index, tuple<Values...> values, Variant && variant, Variants && ... variants) {
+constexpr decltype(auto) visit_implementation(Function && function, Index const possible_index, tuple<Values...> values, Variant && variant, Variants && ... variants) {
 	auto found = [&]() -> decltype(auto) {
 		return ::bounded::detail::visit_implementation(
 			BOUNDED_FORWARD(function),
@@ -120,23 +120,23 @@ constexpr decltype(auto) visit_implementation(Function && function, Index const 
 				std::move(values),
 				tuple(
 					visitor_parameter<
-						decltype(BOUNDED_FORWARD(variant)[current_index]),
-						current_index.value()
-					>{BOUNDED_FORWARD(variant)[current_index]}
+						decltype(BOUNDED_FORWARD(variant)[possible_index]),
+						possible_index.value()
+					>{BOUNDED_FORWARD(variant)[possible_index]}
 				)
 			),
 			BOUNDED_FORWARD(variants)...
 		);
 	};
 	auto const search_index = variant.index();
-	if constexpr (current_index == search_index.max()) {
+	if constexpr (possible_index == search_index.max()) {
 		return found();
-	} else if (current_index == search_index) {
+	} else if (possible_index == search_index) {
 		return found();
 	} else {
 		return ::bounded::detail::visit_implementation(
 			BOUNDED_FORWARD(function),
-			current_index + 1_bi,
+			possible_index + 1_bi,
 			std::move(values),
 			BOUNDED_FORWARD(variant),
 			BOUNDED_FORWARD(variants)...
