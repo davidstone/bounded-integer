@@ -85,7 +85,7 @@ struct tuple_impl<std::index_sequence<indexes...>, Types...> : tuple_value<index
 };
 
 template<typename... Types>
-using tuple_impl_t = detail::tuple_impl<decltype(bounded::make_index_sequence(constant<sizeof...(Types)>)), Types...>;
+using tuple_impl_t = detail::tuple_impl<std::make_index_sequence<sizeof...(Types)>, Types...>;
 
 }	// namespace detail
 
