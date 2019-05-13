@@ -33,17 +33,10 @@ constexpr auto all(Args... args) noexcept {
 
 constexpr struct not_piecewise_construct_t{} not_piecewise_construct{};
 
-template<typename T>
-constexpr auto should_derive = std::is_class_v<T> and !std::is_final_v<T> and std::is_empty_v<T>;
-
 // index ensures that a tuple with the same type repeated shows the type as
 // being different
-template<bool derive, std::size_t index, typename T>
-struct tuple_value_impl;
-
-template<std::size_t index, typename T>
-using tuple_value = tuple_value_impl<should_derive<T>, index, T>;
-
+template<std::size_t index, typename T, bool should_derive = std::is_class_v<T> and !std::is_final_v<T> and std::is_empty_v<T>>
+struct tuple_value;
 
 template<std::size_t index, typename T, typename... Ts>
 struct nth_type_c {
@@ -132,17 +125,17 @@ namespace detail {
 
 
 template<std::size_t index, typename T>
-struct tuple_value_impl<true, index, T> : private T {
-	tuple_value_impl() = default;
+struct tuple_value<index, T, true> : private T {
+	tuple_value() = default;
 	
 	template<typename... Args, BOUNDED_REQUIRES(std::is_constructible_v<T, Args...>)>
-	constexpr explicit tuple_value_impl(std::piecewise_construct_t, tuple<Args...> args) BOUNDED_NOEXCEPT_INITIALIZATION(
-		tuple_value_impl(make_index_sequence(constant<sizeof...(Args)>), std::move(args))
+	constexpr explicit tuple_value(std::piecewise_construct_t, tuple<Args...> args) BOUNDED_NOEXCEPT_INITIALIZATION(
+		tuple_value(make_index_sequence(constant<sizeof...(Args)>), std::move(args))
 	) {
 	}
 
 	template<typename... Args, BOUNDED_REQUIRES(std::is_constructible_v<T, Args...>)>
-	constexpr explicit tuple_value_impl(not_piecewise_construct_t, Args && ... args) BOUNDED_NOEXCEPT_INITIALIZATION(
+	constexpr explicit tuple_value(not_piecewise_construct_t, Args && ... args) BOUNDED_NOEXCEPT_INITIALIZATION(
 		T(BOUNDED_FORWARD(args)...)
 	) {
 	}
@@ -159,24 +152,24 @@ struct tuple_value_impl<true, index, T> : private T {
 
 private:
 	template<std::size_t... indexes, typename... Args>
-	constexpr explicit tuple_value_impl(std::index_sequence<indexes...>, tuple<Args...> args) BOUNDED_NOEXCEPT_INITIALIZATION(
+	constexpr explicit tuple_value(std::index_sequence<indexes...>, tuple<Args...> args) BOUNDED_NOEXCEPT_INITIALIZATION(
 		T(args[constant<indexes>]...)
 	) {
 	}
 };
 
 template<std::size_t index, typename T>
-struct tuple_value_impl<false, index, T> {
-	tuple_value_impl() = default;
+struct tuple_value<index, T, false> {
+	tuple_value() = default;
 	
 	template<typename... Args, BOUNDED_REQUIRES(std::is_constructible_v<T, Args...>)>
-	constexpr explicit tuple_value_impl(std::piecewise_construct_t, tuple<Args...> args) BOUNDED_NOEXCEPT_INITIALIZATION(
-		tuple_value_impl(make_index_sequence(constant<sizeof...(Args)>), std::move(args))
+	constexpr explicit tuple_value(std::piecewise_construct_t, tuple<Args...> args) BOUNDED_NOEXCEPT_INITIALIZATION(
+		tuple_value(make_index_sequence(constant<sizeof...(Args)>), std::move(args))
 	) {
 	}
 
 	template<typename... Args, BOUNDED_REQUIRES(std::is_constructible_v<T, Args...>)>
-	constexpr explicit tuple_value_impl(not_piecewise_construct_t, Args && ... args) noexcept(std::is_nothrow_constructible_v<T, Args...>):
+	constexpr explicit tuple_value(not_piecewise_construct_t, Args && ... args) noexcept(std::is_nothrow_constructible_v<T, Args...>):
 		m_value(BOUNDED_FORWARD(args)...)
 	{
 	}
@@ -195,7 +188,7 @@ struct tuple_value_impl<false, index, T> {
 
 private:
 	template<std::size_t... indexes, typename... Args>
-	constexpr explicit tuple_value_impl(std::index_sequence<indexes...>, tuple<Args...> args) noexcept(std::is_nothrow_constructible_v<T, Args...>):
+	constexpr explicit tuple_value(std::index_sequence<indexes...>, tuple<Args...> args) noexcept(std::is_nothrow_constructible_v<T, Args...>):
 		m_value(args[constant<indexes>]...)
 	{
 	}
@@ -205,10 +198,10 @@ private:
 
 
 template<std::size_t index>
-struct tuple_value_impl<false, index, void> {
-	constexpr explicit tuple_value_impl(std::piecewise_construct_t, tuple<>) noexcept {
+struct tuple_value<index, void, false> {
+	constexpr explicit tuple_value(std::piecewise_construct_t, tuple<>) noexcept {
 	}
-	constexpr explicit tuple_value_impl(not_piecewise_construct_t) noexcept {
+	constexpr explicit tuple_value(not_piecewise_construct_t) noexcept {
 	}
 
 	constexpr void operator[](constant_t<normalize<index>>) const noexcept {
