@@ -48,6 +48,24 @@ static_assert(std::is_same_v<decltype(a[1_bi]), empty const &>);
 static_assert(std::is_same_v<decltype(bounded::tuple<int>{}[0_bi]), int &&>);
 static_assert(std::is_same_v<decltype(bounded::tuple<empty>{}[0_bi]), empty &&>);
 
+struct different_empty {};
+static_assert(std::is_empty_v<bounded::tuple<empty, different_empty>>);
+using nested_t = bounded::tuple<bounded::tuple<empty, different_empty>>;
+constexpr auto nested = nested_t{};
+static_assert(std::is_same_v<decltype(nested[0_bi][0_bi]), empty const &>);
+static_assert(std::is_same_v<decltype(nested[0_bi][1_bi]), different_empty const &>);
+
+template<typename T, auto index, typename Enable = void>
+struct has_operator_bracket_impl : std::false_type {};
+
+template<typename T, auto index>
+struct has_operator_bracket_impl<T, index, std::void_t<decltype(std::declval<T>()[bounded::constant<index>])>> : std::true_type{};
+
+template<typename T, auto index>
+constexpr auto has_operator_bracket = has_operator_bracket_impl<T, index>::value;
+
+static_assert(!has_operator_bracket<nested_t, 1>);
+
 constexpr bounded::tuple<int, char const *> b = { 2, "Hello" };
 static_assert(b[0_bi] == b[0_bi]);
 

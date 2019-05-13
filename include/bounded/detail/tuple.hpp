@@ -36,14 +36,14 @@ constexpr struct not_piecewise_construct_t{} not_piecewise_construct{};
 template<typename T>
 constexpr auto should_derive = std::is_class_v<T> and !std::is_final_v<T> and std::is_empty_v<T>;
 
-// unique ensures that a tuple with the same type repeated shows the type as
+// index ensures that a tuple with the same type repeated shows the type as
 // being different
 // Ts... ensures that tuple<T, tuple<T>> does not create an ambiguous base
-template<bool derive, std::size_t unique, typename T, typename... Ts>
+template<bool derive, std::size_t index, typename T, typename... Ts>
 struct tuple_value_impl;
 
-template<std::size_t unique, typename T, typename... Ts>
-using tuple_value = tuple_value_impl<should_derive<T>, unique, T, Ts...>;
+template<std::size_t index, typename T, typename... Ts>
+using tuple_value = tuple_value_impl<should_derive<T>, index, T, Ts...>;
 
 
 template<std::size_t index, typename T, typename... Ts>
@@ -81,6 +81,16 @@ struct tuple_impl<std::index_sequence<indexes...>, Types...> : tuple_value<index
 		tuple_value<indexes, Types, Types...>(std::piecewise_construct, BOUNDED_FORWARD(args))...
 	{
 	}
+
+	using tuple_value<indexes, Types, Types...>::operator[]...;
+
+protected:
+	// Add in an overload that is guaranteed to exist so the using operator[]
+	// in tuple is well-formed even for empty tuples
+	struct unusable {
+		unusable() = delete;
+	};
+	void operator[](unusable) = delete;
 };
 
 template<typename... Types>
@@ -92,26 +102,7 @@ using tuple_impl_t = detail::tuple_impl<std::make_index_sequence<sizeof...(Types
 template<typename... Types>
 struct tuple : private detail::tuple_impl_t<Types...> {
 	using detail::tuple_impl_t<Types...>::tuple_impl_t;
-
-	// Work around https://bugs.llvm.org/show_bug.cgi?id=35655
-	// This means we cannot have an auto template parameter here, so we have to
-	// accept worse error messages when the user passes in something other than
-	// a constant.
-	template<typename Index, BOUNDED_REQUIRES(is_bounded_integer<Index> and Index{} < constant<sizeof...(Types)>)>
-	constexpr auto && operator[](Index const index_constant) const & noexcept {
-		constexpr auto index_ = static_cast<std::size_t>(index_constant);
-		return static_cast<detail::tuple_value<index_, detail::nth_type<index_, Types...>, Types...> const &>(*this).value();
-	}
-	template<typename Index, BOUNDED_REQUIRES(is_bounded_integer<Index> and Index{} < constant<sizeof...(Types)>)>
-	constexpr auto && operator[](Index const index_constant) & noexcept {
-		constexpr auto index_ = static_cast<std::size_t>(index_constant);
-		return static_cast<detail::tuple_value<index_, detail::nth_type<index_, Types...>, Types...> &>(*this).value();
-	}
-	template<typename Index, BOUNDED_REQUIRES(is_bounded_integer<Index> and Index{} < constant<sizeof...(Types)>)>
-	constexpr auto && operator[](Index const index_constant) && noexcept {
-		constexpr auto index_ = static_cast<std::size_t>(index_constant);
-		return static_cast<detail::tuple_value<index_, detail::nth_type<index_, Types...>, Types...> &&>(*this).value();
-	}
+	using detail::tuple_impl_t<Types...>::operator[];
 
 protected:
 	// Allow classes to explicitly expose that they are a tuple
@@ -141,8 +132,8 @@ constexpr auto is_tuple<tuple<Types...>> = true;
 namespace detail {
 
 
-template<std::size_t unique, typename T, typename... Ts>
-struct tuple_value_impl<true, unique, T, Ts...> : private T {
+template<std::size_t index, typename T, typename... Ts>
+struct tuple_value_impl<true, index, T, Ts...> : private T {
 	tuple_value_impl() = default;
 	
 	template<typename... Args, BOUNDED_REQUIRES(std::is_constructible_v<T, Args...>)>
@@ -157,13 +148,13 @@ struct tuple_value_impl<true, unique, T, Ts...> : private T {
 	) {
 	}
 	
-	constexpr auto && value() const & noexcept {
+	constexpr auto && operator[](constant_t<normalize<index>>) const & noexcept {
 		return static_cast<T const &>(*this);
 	}
-	constexpr auto && value() & noexcept {
+	constexpr auto && operator[](constant_t<normalize<index>>) & noexcept {
 		return static_cast<T &>(*this);
 	}
-	constexpr auto && value() && noexcept {
+	constexpr auto && operator[](constant_t<normalize<index>>) && noexcept {
 		return static_cast<T &&>(*this);
 	}
 
@@ -175,8 +166,8 @@ private:
 	}
 };
 
-template<std::size_t unique, typename T, typename... Ts>
-struct tuple_value_impl<false, unique, T, Ts...> {
+template<std::size_t index, typename T, typename... Ts>
+struct tuple_value_impl<false, index, T, Ts...> {
 	tuple_value_impl() = default;
 	
 	template<typename... Args, BOUNDED_REQUIRES(std::is_constructible_v<T, Args...>)>
@@ -191,13 +182,13 @@ struct tuple_value_impl<false, unique, T, Ts...> {
 	{
 	}
 
-	constexpr auto && value() const & noexcept {
+	constexpr auto && operator[](constant_t<normalize<index>>) const & noexcept {
 		return m_value;
 	}
-	constexpr auto && value() & noexcept {
+	constexpr auto && operator[](constant_t<normalize<index>>) & noexcept {
 		return m_value;
 	}
-	constexpr auto && value() && noexcept {
+	constexpr auto && operator[](constant_t<normalize<index>>) && noexcept {
 		// This should not be std::move because that would return an rvalue
 		// reference even if T is an lvalue reference type.
 		return static_cast<T &&>(m_value);
@@ -214,11 +205,14 @@ private:
 };
 
 
-template<std::size_t unique, typename... Ts>
-struct tuple_value_impl<false, unique, void, Ts...> {
+template<std::size_t index, typename... Ts>
+struct tuple_value_impl<false, index, void, Ts...> {
 	constexpr explicit tuple_value_impl(std::piecewise_construct_t, tuple<>) noexcept {
 	}
 	constexpr explicit tuple_value_impl(not_piecewise_construct_t) noexcept {
+	}
+
+	constexpr void operator[](constant_t<normalize<index>>) const noexcept {
 	}
 };
 
