@@ -356,6 +356,8 @@ set(COMMON_CLANG_COMPILE_OPTIONS
 	"-Wno-c++98-compat-pedantic"
 	# Floating-point comparisons are safe in these tests
 	"-Wno-float-equal"
+	#
+	"-Wno-inaccessible-base"
 	# -Wmissing-braces wants two sets of braces when using constructs such
 	# as std::array
 	"-Wno-missing-braces"
@@ -417,6 +419,40 @@ elseif("${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU")
 	set(COMPILE_OPTIONS
 		"-g"
 		"-march=native"
+		# We have to start by turning off all warnings just so we can disable a
+		# warning about an inaccessible base class. Then we turn on all
+		# possible warnings. This means that some on-by-default warnings are
+		# disabled with no way to re-enable. See
+		# https://gcc.gnu.org/bugzilla/show_bug.cgi?id=90449.
+		"-w"
+		"-Waggressive-loop-optimizations"
+		"-Wattribute-alias=2"
+		"-Wattributes"
+		"-Wattribute-warning"
+		"-Wbuiltin-declaration-mismatch"
+		"-Wbuiltin-macro-redefined"
+		"-Wconversion-null"
+		"-Wcoverage-mismatch"
+		"-Wcpp"
+		"-Wdeprecated"
+		"-Wdeprecated-declarations"
+		"-Wdiv-by-zero"
+		"-Wendif-labels"
+		"-Wfree-nonheap-object"
+		"-Winherited-variadic-ctor"
+		"-Wint-to-pointer-cast"
+		"-Winvalid-offsetof"
+		"-Wmultichar"
+		"-Wodr"
+		"-Woverflow"
+		"-Wpragmas"
+		"-Wprio-ctor-dtor"
+		"-Wrestrict"
+		"-Wreturn-local-addr"
+		"-Wscalar-storage-order"
+		"-Wunused-result"
+		"-Wvariadic-macros"
+		"-Wvirtual-move-assign"
 		"-Wall"
 		"-Wextra"
 		"-Wpedantic"
@@ -448,7 +484,6 @@ elseif("${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU")
 		"-Wmissing-include-dirs"
 		#"-Wnoexcept"
 		"-Wno-non-template-friend"
-		"-Wodr"
 		"-Wold-style-cast"
 		"-Woverloaded-virtual"
 		"-Wno-padded"
