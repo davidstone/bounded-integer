@@ -12,6 +12,7 @@
 #include <containers/common_container_functions.hpp>
 #include <containers/contiguous_iterator.hpp>
 #include <containers/is_iterator.hpp>
+#include <containers/maximum_array_size.hpp>
 #include <containers/operator_bracket.hpp>
 #include <containers/repeat_n.hpp>
 #include <containers/uninitialized_storage.hpp>
@@ -26,15 +27,6 @@ namespace containers {
 using namespace bounded::literal;
 
 namespace detail {
-
-// TODO: support larger array sizes
-template<typename T>
-constexpr auto maximum_array_size = bounded::detail::normalize<
-	bounded::min(
-		bounded::constant<std::numeric_limits<std::ptrdiff_t>::max()> / bounded::size_of<T>,
-		(1_bi << 31_bi) - 1_bi
-	).value()
->;
 
 template<typename T>
 struct dynamic_array_data {
