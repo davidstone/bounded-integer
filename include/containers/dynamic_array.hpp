@@ -83,7 +83,7 @@ auto deallocate_storage(dynamic_array_data<T> const data) noexcept {
 
 template<typename T>
 constexpr auto cleanup(dynamic_array_data<T> const data) noexcept {
-	detail::destroy_range(begin(data), end(data));
+	detail::destroy_range(data);
 	deallocate_storage(data);
 }
 
