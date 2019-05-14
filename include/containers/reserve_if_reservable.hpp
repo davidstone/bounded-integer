@@ -34,18 +34,18 @@ constexpr auto reserve_if_reservable(Container & container, typename Container::
 	container.reserve(size)
 )
 
-template<typename Container, BOUNDED_REQUIRES(is_container<Container>)>
-constexpr auto reallocation_size(Container const & container, typename Container::size_type const count) BOUNDED_NOEXCEPT_VALUE(
+template<typename Container, typename Integer, BOUNDED_REQUIRES(is_container<Container>)>
+constexpr auto reallocation_size(Container const & container, Integer const count) BOUNDED_NOEXCEPT_VALUE(
 	static_cast<typename Container::size_type>(bounded::max(size(container) + count, container.capacity() * 2_bi))
 )
 
-template<typename Container, BOUNDED_REQUIRES(is_container<Container> and !has_reserve<Container>)>
-constexpr void growth_reallocation(Container const & container, typename Container::size_type const count) noexcept {
+template<typename Container, typename Integer, BOUNDED_REQUIRES(is_container<Container> and !has_reserve<Container>)>
+constexpr void growth_reallocation(Container const & container, Integer const count) noexcept {
 	BOUNDED_ASSERT(container.capacity() >= size(container) + count);
 }
 
-template<typename Container, BOUNDED_REQUIRES(is_container<Container> and has_reserve<Container>)>
-constexpr auto growth_reallocation(Container & container, typename Container::size_type const count) BOUNDED_NOEXCEPT_DECLTYPE(
+template<typename Container, typename Integer, BOUNDED_REQUIRES(is_container<Container> and has_reserve<Container>)>
+constexpr auto growth_reallocation(Container & container, Integer const count) BOUNDED_NOEXCEPT_DECLTYPE(
 	container.reserve(::containers::detail::reallocation_size(container, count))
 )
 
