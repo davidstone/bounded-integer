@@ -127,6 +127,7 @@ target_sources(containers INTERFACE
 	$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>/include/containers/dynamic_resizable_array.hpp
 	$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>/include/containers/empty.hpp
 	$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>/include/containers/erase.hpp
+	$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>/include/containers/fixed_capacity_vector.hpp
 	$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>/include/containers/flat_map.hpp
 	$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>/include/containers/front_back.hpp
 	$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>/include/containers/has_nested_type.hpp
@@ -154,6 +155,7 @@ target_sources(containers INTERFACE
 	$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>/include/containers/single_element_range.hpp
 	$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>/include/containers/size.hpp
 	$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>/include/containers/small_buffer_optimized_vector.hpp
+	$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>/include/containers/stable_vector.hpp
 	$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>/include/containers/string.hpp
 	$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>/include/containers/uninitialized_storage.hpp
 	$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>/include/containers/vector.hpp
@@ -282,6 +284,7 @@ add_library(containers_test STATIC
 	source/containers/data.cpp
 	source/containers/empty.cpp
 	source/containers/erase.cpp
+	source/containers/fixed_capacity_vector.cpp
 	source/containers/front_back.cpp
 	source/containers/has_nested_type.cpp
 	source/containers/insert.cpp
@@ -312,6 +315,11 @@ add_executable(concatenate
 	source/containers/algorithms/concatenate.cpp
 )
 target_link_libraries(concatenate PUBLIC containers)
+
+add_executable(stable_vector
+	source/containers/stable_vector.cpp
+)
+target_link_libraries(stable_vector PUBLIC containers)
 
 add_executable(static_vector
 	source/containers/static_vector/static_vector.cpp
@@ -536,7 +544,7 @@ endif()
 
 target_compile_options(flat_map PRIVATE ${COMPILE_OPTIONS} "-DUSE_FLAT_MAP")
 
-set(test_targets bounded_test concatenate static_vector small_buffer_optimized_vector flat_map vector string dynamic_array variant)
+set(test_targets bounded_test concatenate stable_vector static_vector small_buffer_optimized_vector flat_map vector string dynamic_array variant)
 set(all_targets ${test_targets} containers_test)
 
 set(sanitizers "-fsanitize=undefined" "-fsanitize=address")
