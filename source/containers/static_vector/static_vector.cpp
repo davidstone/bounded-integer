@@ -29,7 +29,7 @@ using namespace bounded::literal;
 	constexpr auto n_copy = containers::static_vector<int, 4>(4_bi, 10);
 	static_assert(size(n_copy) == 4_bi);
 	static_assert(at(n_copy, 2_bi) == 10);
-	static_assert(n_copy == containers::static_vector(4_bi, 10));
+	static_assert(n_copy == containers::static_vector<int, 4>(4_bi, 10));
 	
 	constexpr auto make = []{
 		auto value = containers::static_vector<int, 10>{};
