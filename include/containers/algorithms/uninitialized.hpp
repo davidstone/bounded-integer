@@ -50,6 +50,11 @@ constexpr auto destroy_range(InputIterator first, Sentinel const last) noexcept 
 	}
 }
 
+template<typename Range>
+constexpr auto destroy_range(Range && range) BOUNDED_NOEXCEPT_DECLTYPE(
+	::containers::detail::destroy_range(begin(BOUNDED_FORWARD(range)), end(BOUNDED_FORWARD(range)))
+)
+
 }	// namespace detail
 
 
