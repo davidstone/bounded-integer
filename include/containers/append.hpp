@@ -5,6 +5,7 @@
 
 #pragma once
 
+#include <containers/algorithms/copy.hpp>
 #include <containers/begin_end.hpp>
 #include <containers/push_back.hpp>
 #include <containers/reserve_if_reservable.hpp>
@@ -25,6 +26,15 @@ constexpr auto has_push_back<
 > = true;
 
 template<typename, typename = void>
+constexpr auto has_append_from_capacity = false;
+
+template<typename Container>
+constexpr auto has_append_from_capacity<
+	Container,
+	std::void_t<decltype(std::declval<Container &>().append_from_capacity(std::declval<typename Container::size_type>()))>
+> = true;
+
+template<typename, typename = void>
 constexpr auto has_size = false;
 
 template<typename Container>
@@ -39,7 +49,7 @@ namespace common {
 template<typename Container, typename Range, BOUNDED_REQUIRES(has_push_back<Container>)>
 constexpr auto append(Container & output, Range && input) {
 	auto const offset = size(output);
-	if constexpr (has_size<Range>) {
+	if constexpr (has_size<Range> and has_reserve<Container>) {
 		auto const input_size = [&] {
 			auto const value = size(input);
 			if constexpr (bounded::is_bounded_integer<decltype(value)>) {
@@ -47,11 +57,20 @@ constexpr auto append(Container & output, Range && input) {
 			} else {
 				return typename Container::size_type(value);
 			}
-		};
-		::containers::detail::growth_reallocation(output, input_size());
+		}();
+		if (offset + input_size > output.capacity()) {
+			::containers::detail::growth_reallocation(output, input_size);
+		}
 	}
-	for (decltype(auto) value : BOUNDED_FORWARD(input)) {
-		push_back(output, BOUNDED_FORWARD(value));
+	if constexpr (has_append_from_capacity<Container>) {
+		auto const result = containers::copy(
+			begin(BOUNDED_FORWARD(input)),
+			end(BOUNDED_FORWARD(input)),
+			end(output)
+		);
+		output.append_from_capacity(result.output - end(output));
+	} else {
+		output.insert(end(output), begin(BOUNDED_FORWARD(input)), end(BOUNDED_FORWARD(input)));
 	}
 	using traits = std::iterator_traits<typename Container::iterator>;
 	return begin(output) + static_cast<typename traits::difference_type>(offset);
