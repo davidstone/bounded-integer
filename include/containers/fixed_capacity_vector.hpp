@@ -86,8 +86,15 @@ public:
 		assign(*this, begin(other), end(other));
 		return *this;
 	}
-	constexpr auto & operator=(fixed_capacity_vector && other) & noexcept(std::is_nothrow_move_assignable_v<value_type>) {
-		assign(*this, begin(std::move(other)), end(std::move(other)));
+	constexpr auto & operator=(fixed_capacity_vector && other) & noexcept(
+		std::is_swappable_v<Storage> ? std::is_nothrow_swappable_v<Storage> : std::is_nothrow_move_assignable_v<value_type>
+	) {
+		if constexpr (std::is_swappable_v<Storage>) {
+			using std::swap;
+			swap(m_storage, other.m_storage);
+		} else {
+			assign(*this, begin(std::move(other)), end(std::move(other)));
+		}
 		return *this;
 	}
 	constexpr auto & operator=(std::initializer_list<value_type> init) & noexcept(noexcept(assign(std::declval<fixed_capacity_vector &>(), containers::begin(init), containers::end(init)))) {

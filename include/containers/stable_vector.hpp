@@ -26,11 +26,14 @@ struct stable_vector_storage {
 		bounded::detail::normalize<static_cast<std::ptrdiff_t>(capacity())>
 	>;
 
+	friend auto swap(stable_vector_storage & lhs, stable_vector_storage & rhs) noexcept {
+		std::swap(lhs.storage, rhs.storage);
+		std::swap(lhs.size, rhs.size);
+	}
 	stable_vector_storage() = default;
 	// TODO: Support trivial relocatability
 	stable_vector_storage(stable_vector_storage && other) noexcept(false) {
-		std::swap(storage, other.storage);
-		std::swap(size, other.size);
+		swap(*this, other);
 	}
 	stable_vector_storage(stable_vector_storage const & other) noexcept(false) {
 		std::uninitialized_copy(begin(other), end(other), begin(*this));
