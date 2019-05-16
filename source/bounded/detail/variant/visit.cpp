@@ -26,11 +26,39 @@ struct special {
 	}
 };
 
+static_assert(
+	bounded::detail::reorder_transform(
+		[] { return 3; },
+		[](auto f) { return f(); }
+	) == 3
+);
+static_assert(
+	bounded::detail::reorder_transform(
+		7,
+		[](int x) { return x; },
+		[](auto f, int x) { return f(x); }
+	) == 7
+);
+
+static_assert(bounded::visit(bounded::variant<int>(5), int_visitor{}) == 3);
+
+static_assert(
+	bounded::detail::reorder_transform(
+		1,
+		2,
+		3,
+		[](int x, int y, int z) { return x * 100 + y * 10 + z; },
+		[](auto f, auto... values) { return f(values...); }
+	) == 123
+);
+
+
 static_assert(bounded::visit(variant, bounded::overload(int_visitor{}, [](int *) { return 0; })) == 3);
 static_assert(bounded::visit(variant, bounded::overload(int_visitor{}, [](int const *) { return 0; })) == 3);
 static_assert(bounded::visit(variant, bounded::overload([](auto) { return 0; })) == 0);
 static_assert(bounded::visit(variant, special{}) == 2);
 static_assert(bounded::visit(variant, bounded::overload(int_visitor{}, [](auto) { return 0; })) == 3);
+
 static_assert(!std::is_invocable_v<bounded::visit_t, decltype(variant), int_visitor>);
 static_assert(!std::is_invocable_v<bounded::visit_t, decltype(variant), decltype(bounded::overload(int_visitor{}))>);
 

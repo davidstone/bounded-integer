@@ -18,6 +18,12 @@ static_assert(std::is_constructible_v<thing_t, short>);
 static_assert(std::is_constructible_v<thing_t, long>);
 static_assert(std::is_constructible_v<thing_t, char>);
 
+static_assert(bounded::visit_with_index(
+	thing_t(std::in_place, 0_bi, 0),
+	thing_t(std::in_place, 0_bi, 0),
+	bounded::detail::equality_visitor{}
+));
+
 static_assert(thing_t(std::in_place, 0_bi, 0) == thing_t(std::in_place, 0_bi, 0));
 static_assert(thing_t(std::in_place, 0_bi, 0) != thing_t(std::in_place, 0_bi, 1));
 static_assert(thing_t(std::in_place, 0_bi, 0) != thing_t(std::in_place, 1_bi, static_cast<short>(0)));

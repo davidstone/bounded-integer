@@ -6,13 +6,32 @@
 #pragma once
 
 #include <bounded/detail/class.hpp>
-#include <bounded/detail/tuple.hpp>
 #include <bounded/detail/type.hpp>
 
 #include <type_traits>
 
 namespace bounded {
 namespace detail {
+
+// I would put these as private static functions of a reorder_transform_t class,
+// but I rely on argument dependent lookup to delay resolution of the function
+// in the trailing return type. I prefix the name with `bounded_` to minimize
+// the chances of accidental ADL
+struct reorder_transform_tag{};
+
+template<typename Function, typename TransformFunction, typename... Args>
+constexpr auto bounded_reorder_transform_implementation(
+	Function && function,
+	TransformFunction && transform,
+	reorder_transform_tag,
+	Args && ... args
+) BOUNDED_NOEXCEPT_DECLTYPE(
+	BOUNDED_FORWARD(transform)(BOUNDED_FORWARD(function), BOUNDED_FORWARD(args)...)
+)
+template<typename Arg0, typename Arg1, typename Arg2, typename... Args, BOUNDED_REQUIRES(!std::is_same_v<Arg2, reorder_transform_tag>)>
+constexpr auto bounded_reorder_transform_implementation(Arg0 && arg0, Arg1 && arg1, Arg2 && arg2, Args && ... args) BOUNDED_NOEXCEPT_DECLTYPE(
+	bounded_reorder_transform_implementation(BOUNDED_FORWARD(arg1), BOUNDED_FORWARD(arg2), BOUNDED_FORWARD(args)..., BOUNDED_FORWARD(arg0))
+)
 
 // Often, we want to write a function that accepts a variadic number of
 // arguments and a function. We would like to accept the function parameter
@@ -24,24 +43,12 @@ namespace detail {
 // original order after that. This allows us to write an interface that accepts
 // stuff and a function to operate on the stuff, but allows us to transform the
 // arguments in some way before calling the user function.
-constexpr struct reorder_transform_t {
-private:
-	template<typename... Args, auto... indexes>
-	static constexpr auto implementation(tuple<Args...> args, std::index_sequence<indexes...>) BOUNDED_NOEXCEPT_DECLTYPE(
-		std::move(args)[constant<sizeof...(Args)> - 1_bi](
-			std::move(args)[constant<sizeof...(Args)> - 2_bi],
-			std::move(args)[constant<indexes>]...
-		)
+auto reorder_transform = [](auto && ... args) BOUNDED_NOEXCEPT_DECLTYPE(
+	::bounded::detail::bounded_reorder_transform_implementation(
+		BOUNDED_FORWARD(args)...,
+		reorder_transform_tag{}
 	)
-public:
-	template<typename... Args>
-	constexpr auto operator()(Args && ... args) const BOUNDED_NOEXCEPT_DECLTYPE(
-		reorder_transform_t::implementation(
-			tie(BOUNDED_FORWARD(args)...),
-			make_index_sequence(constant<sizeof...(Args)> - 2_bi)
-		)
-	)
-} reorder_transform;
+);
 
 }	// namespace detail
 
@@ -115,8 +122,21 @@ constexpr auto visit_implementation(Function && function, std::index_sequence<in
 
 // This function accepts the pack of all variants twice. It passes over them
 // once to get all the indexes, then again to pull out the values.
-template<typename Function, std::size_t... indexes, typename Index, typename Variant, typename... Variants, BOUNDED_REQUIRES(sizeof...(indexes) < sizeof...(Variants))>
-constexpr auto visit_implementation(Function && function, std::index_sequence<indexes...> initial_indexes, Index possible_index, Variant const & variant, Variants && ... variants) noexcept {
+template<
+	typename Function,
+	std::size_t... indexes,
+	typename Index,
+	typename Variant,
+	typename... Variants,
+	BOUNDED_REQUIRES(sizeof...(indexes) < sizeof...(Variants))
+>
+constexpr decltype(auto) visit_implementation(
+	Function && function,
+	std::index_sequence<indexes...> initial_indexes,
+	Index possible_index,
+	Variant const & variant,
+	Variants && ... variants
+) {
 	auto found = [&]() -> decltype(auto) {
 		return ::bounded::detail::visit_implementation(
 			BOUNDED_FORWARD(function),
@@ -147,15 +167,15 @@ constexpr struct visit_with_index_t {
 private:
 	static inline constexpr struct impl_t {
 		template<typename Function, typename... Variants, BOUNDED_REQUIRES(detail::is_visitable<Function, Variants...>)>
-		constexpr auto operator()(Function && function, Variants && ... variants) const BOUNDED_NOEXCEPT_DECLTYPE(
-			::bounded::detail::visit_implementation(
+		constexpr decltype(auto) operator()(Function && function, Variants && ... variants) const {
+			return ::bounded::detail::visit_implementation(
 				BOUNDED_FORWARD(function),
 				std::index_sequence<>{},
 				0_bi,
 				variants...,
 				BOUNDED_FORWARD(variants)...
-			)
-		)
+			);
+		}
 	} impl{};
 public:
 	// Any number of variants (including 0) followed by one function
@@ -187,15 +207,15 @@ private:
 	};
 	static inline constexpr struct impl_t {
 		template<typename Function, typename... Variants, BOUNDED_REQUIRES(detail::is_visitable<visit_function<Function>, Variants...>)>
-		constexpr auto operator()(Function && function, Variants && ... variants) const BOUNDED_NOEXCEPT_DECLTYPE(
-			::bounded::detail::visit_implementation(
+		constexpr decltype(auto) operator()(Function && function, Variants && ... variants) const {
+			return ::bounded::detail::visit_implementation(
 				visit_function<Function>(BOUNDED_FORWARD(function)),
 				std::index_sequence<>{},
 				0_bi,
 				variants...,
 				BOUNDED_FORWARD(variants)...
-			)
-		)
+			);
+		}
 	} impl{};
 public:
 	template<typename... Args, BOUNDED_REQUIRES(sizeof...(Args) >= 1)>
