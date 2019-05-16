@@ -34,6 +34,20 @@ constexpr auto has_append_from_capacity<
 	std::void_t<decltype(std::declval<Container &>().append_from_capacity(std::declval<typename Container::size_type>()))>
 > = true;
 
+template<typename, typename, typename = void>
+constexpr auto has_insert = false;
+
+template<typename Container, typename Range>
+constexpr auto has_insert<
+	Container,
+	Range,
+	std::void_t<decltype(std::declval<Container &>().insert(
+		end(std::declval<Container &>()),
+		begin(std::declval<Range>()),
+		end(std::declval<Range>())
+	))>
+> = true;
+
 template<typename, typename = void>
 constexpr auto has_size = false;
 
@@ -69,8 +83,12 @@ constexpr auto append(Container & output, Range && input) {
 			end(output)
 		);
 		output.append_from_capacity(result.output - end(output));
-	} else {
+	} else if constexpr (has_insert<Container, Range>) {
 		output.insert(end(output), begin(BOUNDED_FORWARD(input)), end(BOUNDED_FORWARD(input)));
+	} else {
+		for (decltype(auto) value : BOUNDED_FORWARD(input)) {
+			push_back(output, BOUNDED_FORWARD(value));
+		}
 	}
 	using traits = std::iterator_traits<typename Container::iterator>;
 	return begin(output) + static_cast<typename traits::difference_type>(offset);
