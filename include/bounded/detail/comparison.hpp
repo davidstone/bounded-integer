@@ -131,7 +131,7 @@ namespace detail {
 
 template<typename LHS, typename RHS, BOUNDED_REQUIRES(detail::is_builtin_integer<LHS> and detail::is_builtin_integer<RHS>)>
 constexpr auto safe_equal(LHS const lhs, RHS const rhs) noexcept -> bool {
-	constexpr auto signed_max = basic_numeric_limits<detail::max_signed_t>::max();
+	constexpr auto signed_max [[maybe_unused]] = basic_numeric_limits<detail::max_signed_t>::max();
 	if constexpr (detail::is_signed_builtin<LHS> == detail::is_signed_builtin<RHS>) {
 		return lhs == rhs;
 	} else if constexpr (basic_numeric_limits<LHS>::max() <= signed_max and basic_numeric_limits<RHS>::max() <= signed_max) {
