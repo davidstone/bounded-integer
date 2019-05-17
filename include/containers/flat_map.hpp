@@ -193,44 +193,50 @@ public:
 		container().shrink_to_fit()
 	)
 	
-	constexpr auto lower_bound(key_type const & key) const BOUNDED_NOEXCEPT_GCC_BUG(
+	template<typename Key>
+	constexpr auto lower_bound(Key && key) const BOUNDED_NOEXCEPT_GCC_BUG(
 		std::lower_bound(
 			legacy_iterator(begin(*this)),
 			legacy_iterator(end(*this)),
-			key,
+			BOUNDED_FORWARD(key),
 			key_value_compare{key_compare()}
 		).base()
 	)
-	constexpr auto lower_bound(key_type const & key) BOUNDED_NOEXCEPT_GCC_BUG(
+	template<typename Key>
+	constexpr auto lower_bound(Key && key) BOUNDED_NOEXCEPT_GCC_BUG(
 		std::lower_bound(
 			legacy_iterator(begin(*this)),
 			legacy_iterator(end(*this)),
-			key,
+			BOUNDED_FORWARD(key),
 			key_value_compare{key_compare()}
 		).base()
 	)
-	constexpr auto upper_bound(key_type const & key) const BOUNDED_NOEXCEPT_GCC_BUG(
+	template<typename Key>
+	constexpr auto upper_bound(Key && key) const BOUNDED_NOEXCEPT_GCC_BUG(
 		std::upper_bound(
 			legacy_iterator(begin(*this)),
 			legacy_iterator(end(*this)),
-			key,
+			BOUNDED_FORWARD(key),
 			key_value_compare{key_compare()}
 		).base()
 	)
-	constexpr auto upper_bound(key_type const & key) BOUNDED_NOEXCEPT_GCC_BUG(
+	template<typename Key>
+	constexpr auto upper_bound(Key && key) BOUNDED_NOEXCEPT_GCC_BUG(
 		std::upper_bound(
 			legacy_iterator(begin(*this)),
 			legacy_iterator(end(*this)),
-			key,
+			BOUNDED_FORWARD(key),
 			key_value_compare{key_compare()}
 		).base()
 	)
 	// TODO: noexcept
-	constexpr auto find(key_type const & key) const {
+	template<typename Key>
+	constexpr auto find(Key const & key) const {
 		auto const it = lower_bound(key);
 		return (it == end(*this) or key_compare()(key, it->key())) ? end(*this) : it;
 	}
-	constexpr auto find(key_type const & key) {
+	template<typename Key>
+	constexpr auto find(Key const & key) {
 		auto const it = lower_bound(key);
 		return (it == end(*this) or key_compare()(key, it->key())) ? end(*this) : it;
 	}
@@ -327,11 +333,13 @@ private:
 		constexpr key_value_compare(key_compare_type const & compare):
 			m_compare(compare) {
 		}
-		constexpr bool operator()(key_type const & key, value_type const & value) const {
-			return m_compare(key, value.key());
+		template<typename Key>
+		constexpr bool operator()(Key && key, value_type const & value) const {
+			return m_compare(BOUNDED_FORWARD(key), value.key());
 		}
-		constexpr bool operator()(value_type const & value, key_type const & key) const {
-			return m_compare(value.key(), key);
+		template<typename Key>
+		constexpr bool operator()(value_type const & value, Key && key) const {
+			return m_compare(value.key(), BOUNDED_FORWARD(key));
 		}
 	private:
 		key_compare_type const & m_compare;
@@ -475,45 +483,43 @@ public:
 	
 	using base::erase;
 
-	constexpr auto const & at(key_type const & key) const {
-		auto const it = find(key);
-		if (it == end(*this)) {
-			throw std::out_of_range{"Key not found"};
-		}
-		return it->mapped;
-	}
-	constexpr auto & at(key_type const & key) {
-		auto const it = this->find(key);
+	template<typename Key>
+	constexpr auto const & at(Key && key) const {
+		auto const it = find(BOUNDED_FORWARD(key));
 		if (it == end(*this)) {
 			throw std::out_of_range{"Key not found"};
 		}
 		return it->mapped();
 	}
-	constexpr auto & operator[](key_type const & key) {
-		return this->emplace(std::piecewise_construct, bounded::tie(key), bounded::tie()).first->mapped;
+	template<typename Key>
+	constexpr auto & at(Key && key) {
+		auto const it = this->find(BOUNDED_FORWARD(key));
+		if (it == end(*this)) {
+			throw std::out_of_range{"Key not found"};
+		}
+		return it->mapped();
 	}
-	constexpr auto & operator[](key_type && key) {
-		return this->emplace(std::piecewise_construct, bounded::tie(std::move(key)), bounded::tie()).first->mapped;
+	template<typename Key>
+	constexpr auto & operator[](Key && key) {
+		return this->emplace(std::piecewise_construct, bounded::tie(BOUNDED_FORWARD(key)), bounded::tie()).first->mapped();
 	}
 
-	constexpr auto equal_range(key_type const & key) const {
-		auto const it = find(key);
+	template<typename Key>
+	constexpr auto equal_range(Key && key) const {
+		auto const it = find(BOUNDED_FORWARD(key));
 		bool const found = it != end(*this);
 		return std::make_pair(it, found ? ::containers::next(it) : it);
 	}
-	constexpr auto equal_range(key_type const & key) {
-		auto const it = find(key);
-		bool const found = it != end(*this);
-		return std::make_pair(it, found ? ::containers::next(it) : it);
-	}
 
-	constexpr size_type count(key_type const & key) const {
-		bool const found = this->find(key) != end(*this);
+	template<typename Key>
+	constexpr size_type count(Key && key) const {
+		bool const found = this->find(BOUNDED_FORWARD(key)) != end(*this);
 		return found ? 1 : 0;
 	}
 
-	constexpr size_type erase(key_type const & key) {
-		auto const it = this->find(key);
+	template<typename Key>
+	constexpr size_type erase(Key && key) {
+		auto const it = this->find(BOUNDED_FORWARD(key));
 		if (it == end(*this)) {
 			return 0;
 		}
@@ -578,20 +584,24 @@ public:
 	// compiler to be able to optimize based on the fact that values in flat_map
 	// are unique, so I have slightly different versions in flat_map.
 
-	constexpr auto equal_range(key_type const & key) const BOUNDED_NOEXCEPT_GCC_BUG(
-		std::equal_range(begin(*this), end(*this), key, key_value_compare{this->key_compare()})
+	template<typename Key>
+	constexpr auto equal_range(Key && key) const BOUNDED_NOEXCEPT_GCC_BUG(
+		std::equal_range(begin(*this), end(*this), BOUNDED_FORWARD(key), key_value_compare{this->key_compare()})
 	)
-	constexpr auto equal_range(key_type const & key) BOUNDED_NOEXCEPT_GCC_BUG(
-		std::equal_range(begin(*this), end(*this), key, key_value_compare{this->key_compare()})
+	template<typename Key>
+	constexpr auto equal_range(Key && key) BOUNDED_NOEXCEPT_GCC_BUG(
+		std::equal_range(begin(*this), end(*this), BOUNDED_FORWARD(key), key_value_compare{this->key_compare()})
 	)
 
-	constexpr auto count(key_type const & key) const {
-		auto const range = this->equal_range(key);
+	template<typename Key>
+	constexpr auto count(Key && key) const {
+		auto const range = this->equal_range(BOUNDED_FORWARD(key));
 		return static_cast<size_type>(std::distance(range.first, range.second));
 	}
 	
-	constexpr size_type erase(key_type const & key) {
-		auto const range = this->equal_range(key);
+	template<typename Key>
+	constexpr size_type erase(Key && key) {
+		auto const range = this->equal_range(BOUNDED_FORWARD(key));
 		if (range.first == end(*this)) {
 			return 0;
 		}
