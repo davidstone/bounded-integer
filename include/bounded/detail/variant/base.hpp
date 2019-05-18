@@ -5,7 +5,6 @@
 
 #pragma once
 
-#include <bounded/detail/tuple.hpp>
 #include <bounded/detail/type.hpp>
 #include <bounded/detail/variant/get_index.hpp>
 #include <bounded/detail/variant/is_valid_index.hpp>
@@ -33,11 +32,8 @@ struct basic_variant_base {
 		std::is_nothrow_constructible_v<GetFunction, F> and
 		std::is_nothrow_constructible_v<typename decltype(get_type(Index{}, types<Ts>{}...))::type, Args...>
 	):
-		m_data(
-			std::piecewise_construct,
-			tie(BOUNDED_FORWARD(function)),
-			tie(get_index(index_, types<Ts>{}...), BOUNDED_FORWARD(args)...)
-		)
+		m_function(BOUNDED_FORWARD(function)),
+		m_data(get_index(index_, types<Ts>{}...), BOUNDED_FORWARD(args)...)
 	{
 		static_assert(
 			decltype(index())::min() == 0_bi,
@@ -94,15 +90,15 @@ struct basic_variant_base {
 	
 
 	constexpr auto && get_function() const noexcept {
-		return m_data[0_bi];
+		return m_function;
 	}
 	constexpr auto && get_function() noexcept {
-		return m_data[0_bi];
+		return m_function;
 	}
 
 
 	constexpr auto index() const noexcept(noexcept(std::declval<GetFunction const &>()(std::declval<detail::variadic_union_t<Ts...> const &>()))) {
-		return get_function()(m_data[1_bi]);
+		return m_function(m_data);
 	}
 
 	template<typename Index, typename... Args, typename = decltype(
@@ -146,7 +142,7 @@ private:
 		constexpr auto index_value = get_index(index, types<Ts>{}...);
 		get_function() = GetFunction(index_value);
 		if constexpr (trivial) {
-			m_data[1_bi] = variadic_union_t<Ts...>(index_value, BOUNDED_FORWARD(args)...);
+			m_data = variadic_union_t<Ts...>(index_value, BOUNDED_FORWARD(args)...);
 			return operator[](index_value);
 		} else {
 			return construct(operator[](index_value), BOUNDED_FORWARD(args)...);
@@ -155,12 +151,13 @@ private:
 	template<typename Variant, typename Index>
 	static constexpr auto && operator_bracket(Variant && variant, Index const index_) noexcept {
 		return ::bounded::detail::get_union_element(
-			BOUNDED_FORWARD(variant).m_data[1_bi],
+			BOUNDED_FORWARD(variant).m_data,
 			get_index(index_, types<Ts>{}...)
 		);
 	}
 	
-	tuple<GetFunction, variadic_union_t<Ts...>> m_data;
+	[[no_unique_address]] GetFunction m_function;
+	[[no_unique_address]] variadic_union_t<Ts...> m_data;
 };
 
 

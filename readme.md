@@ -38,13 +38,13 @@ The general form of the class is `bounded::integer<minimum, maximum, policy = bo
 
 ## Prerequisites
 
-* Compile with clang 7.0+ and libc++ (clang's standard library)
+* Compile with gcc 9.1+
 * cmake (3.14+) is used to build tests, but it is not needed to use the library (this library is header-only).
 
 ## Building and running tests (Linux)
 
 * `cd path/to/bounded_integer`
-* `mkdir build && cmake .. -DCMAKE_CXX_COMPILER=clang++ -DCMAKE_CXX_FLAGS="-stdlib=libc++" -DUSE_SANITIZERS=On && ./bounded_test`. Most of the tests are actually done at compile time, but there are also run-time tests.
+* `mkdir build && cd build && cmake .. && ./bounded_test`. Most of the tests are actually done at compile time, but there are also run-time tests.
 
 ## Using
 

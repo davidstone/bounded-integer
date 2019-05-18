@@ -11,7 +11,6 @@
 #include <containers/reference_wrapper.hpp>
 
 #include <bounded/integer.hpp>
-#include <bounded/detail/tuple.hpp>
 
 #include <iterator>
 #include <type_traits>
@@ -150,24 +149,25 @@ struct adapt_iterator :
 	detail::iterator_typedefs_base<Iterator, decltype(containers::unwrap(std::declval<Traits>()))>,
 	detail::operator_arrow<adapt_iterator<Iterator, Traits>>
 {
-private:
-	// TODO: [[no_unique_address]]
-	using tuple_t = bounded::tuple<Iterator, Traits>;
 	static_assert(std::is_copy_assignable_v<Iterator>);
 	static_assert(std::is_copy_assignable_v<Traits>);
-public:
+
 	adapt_iterator() = default;
-	constexpr adapt_iterator(Iterator it, Traits traits) noexcept(std::is_nothrow_constructible_v<tuple_t, Iterator, Traits>):
-		m_data(std::move(it), std::move(traits))
+	constexpr adapt_iterator(Iterator it, Traits traits) noexcept(
+		std::is_nothrow_move_constructible_v<Iterator> and
+		std::is_nothrow_move_constructible_v<Traits>
+	):
+		m_base(std::move(it)),
+		m_traits(std::move(traits))
 	{
 	}
 	
 	constexpr auto base() const noexcept {
-		return m_data[bounded::constant<0>];
+		return m_base;
 	}
 
 	constexpr auto && traits() const noexcept {
-		return containers::unwrap(m_data[bounded::constant<1>]);
+		return containers::unwrap(m_traits);
 	}
 
 	template<typename Index>
@@ -176,7 +176,8 @@ public:
 	}
 
 private:
-	tuple_t m_data;
+	[[no_unique_address]] Iterator m_base;
+	[[no_unique_address]] Traits m_traits;
 };
 
 

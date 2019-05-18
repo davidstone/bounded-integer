@@ -11,7 +11,6 @@
 #include <containers/reference_wrapper.hpp>
 
 #include <bounded/detail/forward.hpp>
-#include <bounded/detail/tuple.hpp>
 #include <bounded/assert.hpp>
 #include <bounded/integer.hpp>
 
@@ -25,25 +24,31 @@ namespace detail {
 
 // TODO: Switch to [[no_unique_address]] when supported
 template<typename Sentinel, typename UnaryPredicate>
-struct filter_iterator_traits : private bounded::tuple<Sentinel, UnaryPredicate>, default_dereference, default_compare {
-	constexpr filter_iterator_traits(Sentinel last, UnaryPredicate condition) BOUNDED_NOEXCEPT_INITIALIZATION(
-		bounded::tuple<Sentinel, UnaryPredicate>(std::move(last), std::move(condition))
-	) {
+struct filter_iterator_traits : default_dereference, default_compare {
+private:
+	[[no_unique_address]] Sentinel m_sentinel;
+	[[no_unique_address]] UnaryPredicate m_predicate;
+public:
+	constexpr filter_iterator_traits(Sentinel last, UnaryPredicate condition) noexcept(
+		std::is_nothrow_move_constructible_v<Sentinel> and
+		std::is_nothrow_move_constructible_v<UnaryPredicate>
+	):
+		m_sentinel(std::move(last)),
+		m_predicate(std::move(condition))
+	{
 	}
 
 	constexpr auto sentinel() const {
-		return (*this)[0_bi];
+		return m_sentinel;
 	}
 	constexpr auto const & predicate() const {
-		return (*this)[1_bi];
+		return m_predicate;
 	}
 
 	template<typename Iterator>
 	constexpr auto add(Iterator const it, bounded::constant_t<1>) const {
-		auto const last = sentinel();
-		auto const & condition = predicate();
-		BOUNDED_ASSERT(it != last);
-		return containers::find_if(containers::next(it), last, condition);
+		BOUNDED_ASSERT(it != m_sentinel);
+		return containers::find_if(containers::next(it), m_sentinel, m_predicate);
 	}
 };
 
