@@ -28,15 +28,15 @@ struct special {
 
 static_assert(
 	bounded::detail::reorder_transform(
-		[] { return 3; },
-		[](auto f) { return f(); }
+		[](auto f) { return f(); },
+		[] { return 3; }
 	) == 3
 );
 static_assert(
 	bounded::detail::reorder_transform(
+		[](auto f, int x) { return f(x); },
 		7,
-		[](int x) { return x; },
-		[](auto f, int x) { return f(x); }
+		[](int x) { return x; }
 	) == 7
 );
 
@@ -44,11 +44,11 @@ static_assert(bounded::visit(bounded::variant<int>(5), int_visitor{}) == 3);
 
 static_assert(
 	bounded::detail::reorder_transform(
+		[](auto f, auto... values) { return f(values...); },
 		1,
 		2,
 		3,
-		[](int x, int y, int z) { return x * 100 + y * 10 + z; },
-		[](auto f, auto... values) { return f(values...); }
+		[](int x, int y, int z) { return x * 100 + y * 10 + z; }
 	) == 123
 );
 
