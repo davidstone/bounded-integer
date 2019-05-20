@@ -13,6 +13,12 @@ using namespace bounded::literal;
 
 using thing_t = bounded::variant<int, short, long, char, int>;
 
+static_assert(std::is_trivially_copy_constructible_v<thing_t>);
+static_assert(std::is_trivially_move_constructible_v<thing_t>);
+static_assert(std::is_trivially_copy_assignable_v<thing_t>);
+static_assert(std::is_trivially_move_assignable_v<thing_t>);
+static_assert(std::is_trivially_destructible_v<thing_t>);
+
 static_assert(!std::is_constructible_v<thing_t, int>);
 static_assert(std::is_constructible_v<thing_t, short>);
 static_assert(std::is_constructible_v<thing_t, long>);
