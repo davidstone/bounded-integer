@@ -31,7 +31,7 @@ public:
 	constexpr basic_variant(basic_variant &&) = default;
 	constexpr auto operator=(basic_variant const &) & -> basic_variant & = default;
 	constexpr auto operator=(basic_variant &&) & -> basic_variant & = default;
-	template<typename T>
+	template<typename T, BOUNDED_REQUIRES(!std::is_same_v<std::decay_t<T>, basic_variant>)>
 	constexpr auto operator=(T && value) & BOUNDED_NOEXCEPT_REF(
 		(this->assignment(BOUNDED_FORWARD(value)), *this)
 	)

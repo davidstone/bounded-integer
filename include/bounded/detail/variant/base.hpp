@@ -14,6 +14,7 @@
 #include <bounded/detail/class.hpp>
 #include <bounded/detail/forward.hpp>
 
+#include <type_traits>
 #include <utility>
 
 namespace bounded {
@@ -72,18 +73,18 @@ struct basic_variant_base {
 	template<typename T, BOUNDED_REQUIRES(
 		is_valid_index(types<std::decay_t<T>>{}, types<Ts>{}...) and
 		std::is_constructible_v<std::decay_t<T>, T &&> and
-		std::is_move_assignable_v<std::decay_t<T>>
+		std::is_assignable_v<std::decay_t<T> &, T &&>
 	)>
 	constexpr void assignment(T && value) & noexcept(
 		std::is_nothrow_constructible_v<std::decay_t<T>, T &&> and
-		std::is_nothrow_move_assignable_v<std::decay_t<T>>
+		std::is_nothrow_assignable_v<std::decay_t<T> &, T &&>
 	) {
 		visit(*this, [&](auto & original) {
 			if constexpr (std::is_same_v<std::decay_t<decltype(original)>, std::decay_t<T>>) {
 				original = BOUNDED_FORWARD(value);
 			} else {
 				destroy(original);
-				replace_active_member(types<std::decay_t<T>>{}, std::move(value));
+				replace_active_member(types<std::decay_t<T>>{}, BOUNDED_FORWARD(value));
 			}
 		});
 	}
