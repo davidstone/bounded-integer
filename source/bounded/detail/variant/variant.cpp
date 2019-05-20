@@ -125,6 +125,13 @@ static_assert(!is_equality_comparable<bounded::variant<int, non_comparable, int>
 
 int main() {
 	using non_trivial_variant_t = bounded::variant<non_trivial>;
+
+	static_assert(std::is_copy_constructible_v<non_trivial_variant_t>);
+	static_assert(std::is_move_constructible_v<non_trivial_variant_t>);
+	static_assert(std::is_copy_assignable_v<non_trivial_variant_t>);
+	static_assert(std::is_move_assignable_v<non_trivial_variant_t>);
+	static_assert(std::is_destructible_v<non_trivial_variant_t>);
+
 	auto non_trivial_variant = non_trivial_variant_t(std::in_place, 0_bi);
 	static_assert(non_trivial_variant.index() == 0_bi);
 	non_trivial_variant = non_trivial_variant_t(std::in_place, 0_bi);
