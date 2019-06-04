@@ -15,10 +15,17 @@
 #include <ostream>
 
 namespace containers {
+namespace detail {
+
+template<typename CharT>
+constexpr auto is_char_like = std::is_trivial_v<CharT> and std::is_standard_layout_v<CharT> and !std::is_array_v<CharT>;
+
+} // namespace detail
 
 // Unlike std::basic_string, there is no null terminator.
 template<typename CharT>
 struct basic_string : private small_buffer_optimized_vector<CharT, 1> {
+	static_assert(detail::is_char_like<CharT>);
 private:
 	using base = small_buffer_optimized_vector<CharT, 1>;
 public:
@@ -29,9 +36,9 @@ public:
 	
 	using base::base;
 	
-	constexpr basic_string(std::basic_string_view<CharT> const sv) BOUNDED_NOEXCEPT_INITIALIZATION(
+	constexpr basic_string(std::basic_string_view<CharT> const sv):
 		base(begin(sv), end(sv))
-	) {
+	{
 	}
 
 	basic_string(basic_string const &) = default;
@@ -107,40 +114,40 @@ constexpr auto c_string_sentinel = c_string_sentinel_t<CharT>{};
 } // namespace detail
 
 template<typename CharT>
-constexpr auto compare(basic_string<CharT> const & lhs, CharT const * const rhs) BOUNDED_NOEXCEPT_VALUE(
-	::containers::lexicographical_compare_3way(begin(lhs), end(lhs), rhs, detail::c_string_sentinel<CharT>)
-)
+constexpr auto compare(basic_string<CharT> const & lhs, CharT const * const rhs) noexcept {
+	return ::containers::lexicographical_compare_3way(begin(lhs), end(lhs), rhs, detail::c_string_sentinel<CharT>);
+}
 template<typename CharT>
-constexpr auto compare(CharT const * const lhs, basic_string<CharT> const & rhs) BOUNDED_NOEXCEPT_VALUE(
-	compare(0, compare(rhs, lhs))
-)
+constexpr auto compare(CharT const * const lhs, basic_string<CharT> const & rhs) noexcept {
+	return compare(0, compare(rhs, lhs));
+}
 
 template<typename CharT>
-constexpr auto operator==(basic_string<CharT> const & lhs, CharT const * const rhs) BOUNDED_NOEXCEPT_VALUE(
-	::containers::equal(begin(lhs), end(lhs), rhs, detail::c_string_sentinel<CharT>)
-)
+constexpr auto operator==(basic_string<CharT> const & lhs, CharT const * const rhs) noexcept {
+	return ::containers::equal(begin(lhs), end(lhs), rhs, detail::c_string_sentinel<CharT>);
+}
 template<typename CharT>
-constexpr auto operator==(CharT const * const lhs, basic_string<CharT> const & rhs) BOUNDED_NOEXCEPT_VALUE(
-	rhs == lhs
-)
+constexpr auto operator==(CharT const * const lhs, basic_string<CharT> const & rhs) noexcept {
+	return rhs == lhs;
+}
 
 template<typename CharT>
-constexpr auto compare(basic_string<CharT> const & lhs, std::basic_string_view<CharT> const rhs) BOUNDED_NOEXCEPT_VALUE(
-	::containers::lexicographical_compare_3way(lhs, rhs)
-)
+constexpr auto compare(basic_string<CharT> const & lhs, std::basic_string_view<CharT> const rhs) noexcept {
+	return ::containers::lexicographical_compare_3way(lhs, rhs);
+}
 template<typename CharT>
-constexpr auto compare(std::basic_string_view<CharT> const lhs, basic_string<CharT> const & rhs) BOUNDED_NOEXCEPT_VALUE(
-	compare(0, compare(rhs, lhs))
-)
+constexpr auto compare(std::basic_string_view<CharT> const lhs, basic_string<CharT> const & rhs) noexcept {
+	return compare(0, compare(rhs, lhs));
+}
 
 template<typename CharT>
-constexpr auto operator==(basic_string<CharT> const & lhs, std::basic_string_view<CharT> const rhs) BOUNDED_NOEXCEPT_VALUE(
-	size(lhs) == rhs.size() and ::containers::equal(begin(lhs), end(lhs), begin(rhs))
-)
+constexpr auto operator==(basic_string<CharT> const & lhs, std::basic_string_view<CharT> const rhs) noexcept {
+	return size(lhs) == rhs.size() and ::containers::equal(begin(lhs), end(lhs), begin(rhs));
+}
 template<typename CharT>
-constexpr auto operator==(std::basic_string_view<CharT> const lhs, basic_string<CharT> const & rhs) BOUNDED_NOEXCEPT_VALUE(
-	rhs == lhs
-)
+constexpr auto operator==(std::basic_string_view<CharT> const lhs, basic_string<CharT> const & rhs) noexcept {
+	return rhs == lhs;
+}
 
 
 namespace detail {
@@ -192,13 +199,13 @@ auto operator+(CharT const * const lhs, basic_string<CharT> const & rhs) {
 
 
 template<typename String, BOUNDED_REQUIRES(detail::is_string<std::decay_t<String>>)>
-auto operator+(String && lhs, typename std::remove_reference_t<String>::value_type const rhs) BOUNDED_NOEXCEPT_VALUE(
-	containers::concatenate<std::decay_t<String>>(BOUNDED_FORWARD(lhs), ::containers::single_element_range(rhs))
-)
+auto operator+(String && lhs, typename std::remove_reference_t<String>::value_type const rhs) {
+	return containers::concatenate<std::decay_t<String>>(BOUNDED_FORWARD(lhs), ::containers::single_element_range(rhs));
+}
 template<typename String, BOUNDED_REQUIRES(detail::is_string<std::decay_t<String>>)>
-auto operator+(typename std::remove_reference_t<String>::value_type const lhs, String && rhs) BOUNDED_NOEXCEPT_VALUE(
-	containers::concatenate<std::decay_t<String>>(::containers::single_element_range(lhs), BOUNDED_FORWARD(rhs))
-)
+auto operator+(typename std::remove_reference_t<String>::value_type const lhs, String && rhs) {
+	return containers::concatenate<std::decay_t<String>>(::containers::single_element_range(lhs), BOUNDED_FORWARD(rhs));
+}
 
 using string = basic_string<char>;
 using wstring = basic_string<wchar_t>;
