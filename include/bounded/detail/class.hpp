@@ -160,11 +160,13 @@ public:
 	static constexpr auto max() noexcept {
 		return constant<maximum>;
 	}
-	
+
+private:
 	template<typename T>
 	static constexpr decltype(auto) apply_overflow_policy(T const & value) BOUNDED_NOEXCEPT(
 		overflow_policy{}.assignment(value, min(), max())
 	)
+public:
 	
 	using base::value;
 	
