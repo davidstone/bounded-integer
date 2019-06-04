@@ -57,6 +57,7 @@ target_sources(bounded INTERFACE
 	$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>/include/bounded/detail/comparison_mixed.hpp
 	$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>/include/bounded/detail/conditional.hpp
 	$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>/include/bounded/detail/construct_destroy.hpp
+	$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>/include/bounded/detail/copy_cv_ref.hpp
 	$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>/include/bounded/detail/forward_declaration.hpp
 	$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>/include/bounded/detail/hash.hpp
 	$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>/include/bounded/detail/is_bounded_integer.hpp
@@ -215,6 +216,7 @@ add_executable(bounded_test
 	source/bounded/detail/comparison_mixed.cpp
 	source/bounded/detail/conditional.cpp
 	source/bounded/detail/construct_destroy.cpp
+	source/bounded/detail/copy_cv_ref.cpp
 	source/bounded/detail/forward_declaration.cpp
 	source/bounded/detail/hash.cpp
 	source/bounded/detail/int128.cpp
