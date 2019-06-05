@@ -199,7 +199,8 @@ private:
 
 template<std::size_t index>
 struct tuple_value<index, void, false> {
-	constexpr explicit tuple_value(std::piecewise_construct_t, tuple<>) noexcept {
+	template<typename... MaybeVoid, BOUNDED_REQUIRES(sizeof...(MaybeVoid) <= 1 and (... and std::is_void_v<MaybeVoid>))>
+	constexpr explicit tuple_value(std::piecewise_construct_t, tuple<MaybeVoid...>) noexcept {
 	}
 	constexpr explicit tuple_value(not_piecewise_construct_t) noexcept {
 	}
