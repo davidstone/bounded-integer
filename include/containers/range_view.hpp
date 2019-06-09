@@ -53,4 +53,12 @@ private:
 	Sentinel m_end;
 };
 
+template<typename Range>
+range_view(Range &) -> range_view<decltype(begin(std::declval<Range &>()), end(std::declval<Range &>()))>;
+
+template<typename Iterator, typename Sentinel>
+constexpr auto operator==(range_view<Iterator, Sentinel> const lhs, range_view<Iterator, Sentinel> const rhs) BOUNDED_NOEXCEPT_VALUE(
+	begin(lhs) == begin(rhs) and end(lhs) == end(rhs)
+)
+
 } // namespace containers
