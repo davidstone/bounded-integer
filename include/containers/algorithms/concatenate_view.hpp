@@ -6,90 +6,138 @@
 #pragma once
 
 #include <containers/algorithms/move_iterator.hpp>
+#include <containers/front_back.hpp>
 #include <containers/is_range.hpp>
 #include <containers/operator_arrow.hpp>
+#include <containers/range_view.hpp>
 
+#include <bounded/detail/make_index_sequence.hpp>
 #include <bounded/detail/tuple.hpp>
 #include <bounded/integer.hpp>
 
 namespace containers {
 
-template<typename Sentinel>
 struct concatenate_view_sentinel {
-	constexpr explicit concatenate_view_sentinel(Sentinel last):
-		m_last(std::move(last))
-	{
-	}
-	
-	constexpr auto base() const {
-		return m_last;
-	}
-private:
-	Sentinel m_last;
 };
 
+namespace detail {
 
-template<typename Iterator1, typename Sentinel1, typename Iterator2>
-struct concatenate_view_iterator : detail::operator_arrow<concatenate_view_iterator<Iterator1, Sentinel1, Iterator2>> {
+template<typename LHS, typename RHS, std::size_t... indexes>
+constexpr auto have_same_ends(LHS const & lhs, RHS const & rhs, std::index_sequence<indexes...>) {
+	return (... and (end(lhs[bounded::constant<indexes>]) == end(rhs[bounded::constant<indexes>])));
+}
+
+template<typename LHS, typename RHS>
+constexpr auto assert_same_ends(LHS const & lhs, RHS const & rhs) {
+	static_assert(bounded::tuple_size<LHS> == bounded::tuple_size<RHS>);
+	BOUNDED_ASSERT(have_same_ends(lhs, rhs, bounded::make_index_sequence(bounded::tuple_size<LHS>)));
+}
+
+} // namespace detail
+
+template<typename... RangeViews>
+struct concatenate_view_iterator : detail::operator_arrow<concatenate_view_iterator<RangeViews...>> {
 private:
-	using traits1 = std::iterator_traits<Iterator1>;
-	using traits2 = std::iterator_traits<Iterator2>;
+	template<typename RangeView>
+	using traits = std::iterator_traits<decltype(begin(std::declval<RangeView>()))>;
+
 	template<typename category>
-	static constexpr auto either_is_category() noexcept {
-		return
-			std::is_same_v<typename traits1::iterator_category, category> or
-			std::is_same_v<typename traits2::iterator_category, category>;
-	}
-	static_assert(!either_is_category<std::output_iterator_tag>() or !either_is_category<std::input_iterator_tag>());
+	static constexpr auto any_is_category =
+		(... or std::is_same_v<typename traits<RangeViews>::iterator_category, category>);
 
-	Iterator1 m_first1;
-	Sentinel1 m_last1;
-	Iterator2 m_first2;
+	static_assert(!any_is_category<std::output_iterator_tag> or !any_is_category<std::input_iterator_tag>);
 
-	constexpr auto in_first_range() const BOUNDED_NOEXCEPT_VALUE(
-		m_first1 != m_last1
-	)
-	
-	constexpr auto tie() const noexcept {
-		return bounded::tie(m_first1, m_last1, m_first2);
+	bounded::tuple<RangeViews...> m_range_views;
+
+	static constexpr auto index_sequence = std::make_index_sequence<sizeof...(RangeViews)>{};
+	static constexpr auto max_index = bounded::constant<sizeof...(RangeViews)> - bounded::constant<1>;
+
+	template<typename Index>
+	constexpr decltype(auto) operator_star(Index const index) const {
+		auto const range_view = m_range_views[index];
+		if constexpr (index == max_index) {
+			return front(range_view);
+		} else if (!empty(range_view)) {
+			return front(range_view);
+		} else {
+			return operator_star(index + bounded::constant<1>);
+		}
 	}
+
+	template<typename Index, typename Offset, std::size_t... indexes>
+	static constexpr auto operator_plus(bounded::tuple<RangeViews...> const range_views, Index const index, Offset const offset, std::index_sequence<indexes...> indexes_) {
+		if constexpr (index == sizeof...(RangeViews)) {
+			return bounded::apply(range_views, bounded::construct_return<concatenate_view_iterator>);
+		} else if constexpr (std::is_convertible_v<iterator_category, std::random_access_iterator_tag>) {
+			auto const range = range_views[index];
+			auto const added_size = bounded::min(offset, size(range));
+			auto specific_range = [=](auto const current_index) {
+				auto const current_range = range_views[current_index];
+				if constexpr (index == current_index) {
+					return range_view(begin(current_range) + added_size, end(current_range));
+				} else {
+					return current_range;
+				}
+			};
+			auto const temp = bounded::tuple(specific_range(bounded::constant<indexes>)...);
+			return operator_plus(temp, index + bounded::constant<1>, offset - added_size, indexes_);
+		} else {
+			auto const range = range_views[index];
+			auto specific_range = [=](auto const current_index) {
+				auto const current_range = range_views[current_index];
+				if constexpr (index == current_index) {
+					return range_view(std::next(begin(current_range)), end(current_range));
+				} else {
+					return current_range;
+				}
+			};
+			auto const temp = bounded::tuple(specific_range(bounded::constant<indexes>)...);
+			return empty(range) ?
+				operator_plus(temp, index + bounded::constant<1>, offset, indexes_) :
+				operator_plus(temp, index + bounded::constant<1>, bounded::constant<0>, indexes_);
+		}
+	}
+
+	constexpr auto begin_iterators() const {
+		return bounded::transform([](auto const range) { return begin(range); }, m_range_views);
+	};
+
 
 public:
 	using value_type = bounded::detail::common_type_and_value_category_t<
-		typename traits1::value_type,
-		typename traits2::value_type
+		typename traits<RangeViews>::value_type...
 	>;
-	using difference_type = decltype(
-		std::declval<typename traits1::difference_type>() +
-		std::declval<typename traits2::difference_type>()
-	);
+	using difference_type = decltype((... + std::declval<typename traits<RangeViews>::difference_type>()));
 	
 	using iterator_category =
-		std::conditional_t<either_is_category<std::output_iterator_tag>(), std::output_iterator_tag,
-		std::conditional_t<either_is_category<std::input_iterator_tag>(), std::input_iterator_tag,
-		std::conditional_t<either_is_category<std::forward_iterator_tag>(), std::forward_iterator_tag,
-		std::conditional_t<either_is_category<std::bidirectional_iterator_tag>(), std::bidirectional_iterator_tag,
+		std::conditional_t<any_is_category<std::output_iterator_tag>, std::output_iterator_tag,
+		std::conditional_t<any_is_category<std::input_iterator_tag>, std::input_iterator_tag,
+		std::conditional_t<any_is_category<std::forward_iterator_tag>, std::forward_iterator_tag,
+		std::conditional_t<any_is_category<std::bidirectional_iterator_tag>, std::bidirectional_iterator_tag,
 		std::random_access_iterator_tag
 	>>>>;
 	
 	using pointer = std::remove_reference_t<value_type> *;
 
 	using reference = bounded::detail::common_type_and_value_category_t<
-		typename traits1::reference,
-		typename traits2::reference
+		typename traits<RangeViews>::reference...
 	>;
 
-	constexpr concatenate_view_iterator(Iterator1 first1, Sentinel1 last1, Iterator2 first2):
-		m_first1(first1),
-		m_last1(last1),
-		m_first2(first2)
+	constexpr explicit concatenate_view_iterator(RangeViews... range_views):
+		m_range_views(range_views...)
+	{
+	}
+
+	constexpr explicit concatenate_view_iterator(bounded::tuple<RangeViews...> range_views):
+		m_range_views(std::move(range_views))
 	{
 	}
 
 
-	constexpr auto operator*() const BOUNDED_NOEXCEPT_DECLTYPE(
-		in_first_range() ? *m_first1 : *m_first2
-	)
+	constexpr decltype(auto) operator*() const {
+		// TODO: Implement with an expansion statement `for...`
+		return operator_star(bounded::constant<0>);
+	}
 
 	template<typename Offset, BOUNDED_REQUIRES(
 		std::is_convertible_v<Offset, difference_type> and
@@ -100,77 +148,67 @@ public:
 		)
 	)>
 	friend constexpr auto operator+(concatenate_view_iterator const lhs, Offset const offset) {
-		if constexpr (std::is_convertible_v<iterator_category, std::random_access_iterator_tag>) {
-			auto const first_remaining = lhs.m_last1 - lhs.m_first1;
-			return first_remaining >= offset ?
-				concatenate_view_iterator(
-					lhs.m_first1 + static_cast<typename std::iterator_traits<Iterator1>::difference_type>(offset),
-					lhs.m_last1,
-					lhs.m_first2
-				) :
-				concatenate_view_iterator(
-					lhs.m_first1 + first_remaining,
-					lhs.m_last1,
-					lhs.m_first2 + static_cast<typename std::iterator_traits<Iterator2>::difference_type>((offset - first_remaining))
-				);
-		} else {
-			return lhs.in_first_range() ?
-				concatenate_view_iterator(std::next(lhs.m_first1), lhs.m_last1, lhs.m_first2) :
-				concatenate_view_iterator(lhs.m_first1, lhs.m_last1, std::next(lhs.m_first2));
-		}
+		return operator_plus(
+			lhs.m_range_views,
+			bounded::constant<0>,
+			offset,
+			std::make_index_sequence<sizeof...(RangeViews)>{}
+		);
 	}
 
-	// TODO: What if they have different m_last1?
-	template<typename RHSIterator1, typename RHSSentinel1, typename RHSIterator2>
+	template<typename... RHSRanges>
 	friend constexpr auto operator-(
 		concatenate_view_iterator const lhs,
-		concatenate_view_iterator<RHSIterator1, RHSSentinel1, RHSIterator2> const rhs
-	) BOUNDED_NOEXCEPT(
-		(lhs.m_first1 - rhs.m_first1) + (lhs.m_first2 - rhs.m_first2)
-	)
+		concatenate_view_iterator<RHSRanges...> const rhs
+	) {
+		assert_same_ends(lhs.m_range_views, rhs.m_range_views);
+
+		auto transform = [](auto const lhs_range, auto const rhs_range) {
+			return begin(lhs_range) - begin(rhs_range);
+		};
+		return bounded::apply(
+			bounded::transform(transform, lhs.m_range_views, rhs.m_range_views),
+			std::plus{}
+		);
+	}
 
 
-	template<typename LHSSentinel>
 	friend constexpr auto operator-(
-		concatenate_view_sentinel<LHSSentinel> const lhs,
+		concatenate_view_sentinel,
 		concatenate_view_iterator const rhs
-	) BOUNDED_NOEXCEPT(
-		(rhs.m_last1 - rhs.m_first1) + (lhs.base() - rhs.m_first2)
-	)
+	) {
+		auto transform = [](auto const range) { return size(range); };
+		return bounded::apply(
+			bounded::transform(transform, rhs.m_range_views),
+			[](auto... integers) { return (... + integers); }
+		);
+	}
 
 
-	template<typename RHSIterator1, typename RHSSentinel1, typename RHSIterator2>
+	template<typename... RHSRanges>
 	friend constexpr auto compare(
 		concatenate_view_iterator const lhs,
-		concatenate_view_iterator<RHSIterator1, RHSSentinel1, RHSIterator2> const rhs
-	) BOUNDED_NOEXCEPT(
-		compare(lhs.tie(), rhs.tie())
-	)
+		concatenate_view_iterator<RHSRanges...> const rhs
+	) {
+		assert_same_ends(lhs.m_range_views, rhs.m_range_views);
+		return compare(lhs.begin_iterators(), rhs.begin_iterators());
+	}
 
-	template<typename RHSSentinel>
-	friend constexpr auto compare(
-		concatenate_view_iterator const lhs,
-		concatenate_view_sentinel<RHSSentinel> const rhs
-	) BOUNDED_NOEXCEPT(
-		compare(bounded::tie(lhs.m_first1, lhs.m_first2), bounded::tie(lhs.m_last1, rhs.base()))
+	friend constexpr auto compare(concatenate_view_iterator const lhs, concatenate_view_sentinel const rhs) BOUNDED_NOEXCEPT(
+		lhs == rhs ? bounded::strong_ordering::equal : bounded::strong_ordering::less
 	)
 
 
-	template<typename RHSIterator1, typename RHSSentinel1, typename RHSIterator2>
-	friend constexpr auto operator==(
-		concatenate_view_iterator const lhs,
-		concatenate_view_iterator<RHSIterator1, RHSSentinel1, RHSIterator2> const rhs
-	) BOUNDED_NOEXCEPT(
-		lhs.tie() == rhs.tie()
-	)
+	template<typename... RHSRanges>
+	friend constexpr auto operator==(concatenate_view_iterator const lhs, concatenate_view_iterator<RHSRanges...> const rhs) {
+		assert_same_ends(lhs.m_range_views, rhs.m_range_views);
+		return lhs.begin_iterators() == rhs.begin_iterators();
+	}
 
-	template<typename RHSSentinel>
-	friend constexpr auto operator==(
-		concatenate_view_iterator const lhs,
-		concatenate_view_sentinel<RHSSentinel> const rhs
-	) BOUNDED_NOEXCEPT(
-		bounded::tie(lhs.m_first1, lhs.m_first2) == bounded::tie(lhs.m_last1, rhs.base())
-	)
+	friend constexpr auto operator==(concatenate_view_iterator const lhs, concatenate_view_sentinel) {
+		auto get_end_iterators = [](auto const range) { return end(range); };
+		return lhs.begin_iterators() == bounded::transform(get_end_iterators, lhs.m_range_views);
+	}
 
 
 	template<typename Index>
@@ -180,111 +218,57 @@ public:
 };
 
 
-template<
-	typename LHSIterator1, typename LHSSentinel1, typename LHSIterator2,
-	typename RHSSentinel
->
-constexpr auto operator-(
-	concatenate_view_iterator<LHSIterator1, LHSSentinel1, LHSIterator2> const lhs,
-	concatenate_view_sentinel<RHSSentinel> const rhs
-) BOUNDED_NOEXCEPT_DECLTYPE(
+template<typename... Ranges>
+constexpr auto operator-(concatenate_view_iterator<Ranges...> const lhs, concatenate_view_sentinel const rhs) BOUNDED_NOEXCEPT_DECLTYPE(
 	-(rhs - lhs)
 )
 
 
-template<
-	typename LHSSentinel,
-	typename RHSIterator1, typename RHSSentinel1, typename RHSIterator2
->
-constexpr auto compare(
-	concatenate_view_sentinel<LHSSentinel> const lhs,
-	concatenate_view_iterator<RHSIterator1, RHSSentinel1, RHSIterator2> const rhs
-) BOUNDED_NOEXCEPT_DECLTYPE(
+template<typename... Ranges>
+constexpr auto compare(concatenate_view_sentinel const lhs, concatenate_view_iterator<Ranges...> const rhs) BOUNDED_NOEXCEPT_DECLTYPE(
 	compare(0, compare(rhs, lhs))
 )
 
 
-template<
-	typename LHSSentinel,
-	typename RHSIterator1, typename RHSSentinel1, typename RHSIterator2
->
-constexpr auto operator==(
-	concatenate_view_sentinel<LHSSentinel> const lhs,
-	concatenate_view_iterator<RHSIterator1, RHSSentinel1, RHSIterator2> const rhs
-) BOUNDED_NOEXCEPT_DECLTYPE(
+template<typename... Ranges>
+constexpr auto operator==(concatenate_view_sentinel const lhs, concatenate_view_iterator<Ranges...> const rhs) BOUNDED_NOEXCEPT_DECLTYPE(
 	rhs == lhs
 )
 
-namespace detail {
-
-template<typename LHS, typename RHS>
-struct concatenate_view_t {
-	using const_iterator = concatenate_view_iterator<
-		decltype(begin(std::declval<LHS const &>())),
-		decltype(end(std::declval<LHS const &>())),
-		decltype(begin(std::declval<RHS const &>()))
-	>;
-	using iterator = concatenate_view_iterator<
-		decltype(begin(std::declval<LHS &>())),
-		decltype(end(std::declval<LHS &>())),
-		decltype(begin(std::declval<RHS &>()))
-	>;
+template<typename... Ranges>
+struct concatenate_view {
+	using const_iterator = concatenate_view_iterator<decltype(range_view(std::declval<Ranges const &>()))...>;
+	using iterator = concatenate_view_iterator<decltype(range_view(std::declval<Ranges &>()))...>;
 	using value_type = typename iterator::value_type;
 	using size_type = bounded::integer<
 		0,
 		bounded::detail::normalize<std::numeric_limits<typename iterator::difference_type>::max().value()>
 	>;
 	
-	constexpr concatenate_view_t(LHS && lhs_, RHS && rhs_) noexcept(std::is_nothrow_constructible_v<LHS, LHS &&> and std::is_nothrow_constructible_v<RHS, RHS &&>):
-		lhs(BOUNDED_FORWARD(lhs_)),
-		rhs(BOUNDED_FORWARD(rhs_))
+	constexpr concatenate_view(Ranges && ... ranges) noexcept((... and std::is_nothrow_constructible_v<Ranges, Ranges &&>)):
+		m_ranges(BOUNDED_FORWARD(ranges)...)
 	{
 	}
 	
-	friend constexpr auto begin(concatenate_view_t & range) {
-		return iterator(begin(range.lhs), end(range.lhs), begin(range.rhs));
+	friend constexpr auto begin(concatenate_view & view) {
+		return iterator(bounded::transform([](auto && range){ return range_view(range); }, view.m_ranges));
 	}
-	friend constexpr auto begin(concatenate_view_t const & range) {
-		return const_iterator(begin(range.lhs), end(range.lhs), begin(range.rhs));
+	friend constexpr auto begin(concatenate_view const & view) {
+		return const_iterator(bounded::transform([](auto && range){ return range_view(range); }, view.m_ranges));
 	}
-	friend constexpr auto end(concatenate_view_t & range) {
-		return concatenate_view_sentinel(end(range.rhs));
+	friend constexpr auto end(concatenate_view & range) {
+		return concatenate_view_sentinel();
 	}
-	friend constexpr auto end(concatenate_view_t const & range) {
-		return concatenate_view_sentinel(end(range.rhs));
+	friend constexpr auto end(concatenate_view const & range) {
+		return concatenate_view_sentinel();
 	}
 
 private:
-	LHS lhs;
-	RHS rhs;
+	bounded::tuple<Ranges...> m_ranges;
 };
 
+template<typename... Ranges>
+concatenate_view(Ranges && ...) -> concatenate_view<Ranges...>;
 
-#if 0
-// TODO: Figure out why this crashes clang
-template<typename LHS, typename RHS, BOUNDED_REQUIRES(
-	!std::is_reference_v<LHS> and
-	!std::is_reference_v<RHS> and
-	std::is_reference_v<decltype(*begin(std::declval<concatenate_view_t<LHS, RHS>>()))>
-)>
-constexpr auto begin(concatenate_view_t<LHS, RHS> && range) {
-	return ::containers::move_iterator(begin(range));
-}
-#endif
-
-} // namespace detail
-
-template<typename LHS, typename RHS>
-constexpr auto concatenate_view(LHS && lhs, RHS && rhs) BOUNDED_NOEXCEPT_VALUE(
-	detail::concatenate_view_t<LHS, RHS>(BOUNDED_FORWARD(lhs), BOUNDED_FORWARD(rhs))
-)
-
-template<typename LHS, typename RHS, typename... Remainder, BOUNDED_REQUIRES(is_range<LHS> and is_range<RHS> and (... and is_range<Remainder>))>
-constexpr auto concatenate_view(LHS && lhs, RHS && rhs, Remainder && ... remainder) {
-	return ::containers::concatenate_view(
-		::containers::concatenate_view(BOUNDED_FORWARD(lhs), BOUNDED_FORWARD(rhs)),
-		BOUNDED_FORWARD(remainder)...
-	);
-}
 
 }	// namespace containers

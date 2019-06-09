@@ -6,8 +6,10 @@
 #include <containers/algorithms/concatenate_view.hpp>
 
 #include <containers/array/array.hpp>
+#include <containers/static_vector/static_vector.hpp>
 
 namespace {
+using namespace bounded::literal;
 
 template<typename LHS, typename RHS>
 constexpr bool equal_values_and_types(LHS const & lhs, RHS const & rhs) {
@@ -33,9 +35,14 @@ static_assert(equal_values_and_types(
 	containers::array{1, 1, 2, 3, 5, 1, 2, 3, 2, 3, 5, 7}
 ));
 
-static_assert(*(begin(three) + bounded::constant<7>) == 3);
+static_assert(*(begin(three) + 7_bi) == 3);
 
 constexpr auto from_temp = containers::concatenate_view(containers::array{1}, containers::array{2});
 static_assert(equal_values_and_types(from_temp, containers::array{1, 2}));
+
+static_assert(containers::equal(
+	containers::concatenate_view(array1, containers::static_vector<int, 4>(2_bi, 8)),
+	containers::array{1, 2, 3, 8, 8}
+));
 
 } // namespace
