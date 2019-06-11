@@ -96,11 +96,6 @@ constexpr auto operator==(single_element_sentinel, single_element_iterator<T> co
 }
 
 template<typename T>
-constexpr auto operator+(bounded::constant_t<1> const lhs, single_element_iterator<T> const rhs) noexcept {
-	return rhs + lhs;
-}
-
-template<typename T>
 constexpr auto operator-(single_element_iterator<T> const lhs, single_element_iterator<T> const rhs) noexcept {
 	BOUNDED_ASSERT(lhs >= rhs);
 	return BOUNDED_CONDITIONAL(lhs == rhs, 0_bi, 1_bi);
