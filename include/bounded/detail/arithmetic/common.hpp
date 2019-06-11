@@ -38,22 +38,18 @@ BOUNDED_INTEGER_COMPOUND_ASSIGNMENT_OPERATOR(^)
 
 #undef BOUNDED_INTEGER_COMPOUND_ASSIGNMENT_OPERATOR
 
-template<typename T, typename Enable = void>
-constexpr auto incrementable_by_bounded = false;
-
 template<typename T>
-constexpr auto incrementable_by_bounded<T, std::void_t<decltype(std::declval<T &>() += bounded::constant<1>)>> = true;
-
-template<typename T, BOUNDED_REQUIRES(incrementable_by_bounded<T>)>
 constexpr auto operator++(T & value) BOUNDED_NOEXCEPT_DECLTYPE(
 	value += constant<1>
 )
-template<typename T, BOUNDED_REQUIRES(!incrementable_by_bounded<T>)>
-constexpr auto operator++(T & value) BOUNDED_NOEXCEPT_DECLTYPE(
-	value += 1
-)
+
+template<typename T, typename Enable = void>
+constexpr auto incrementable = false;
 
 template<typename T>
+constexpr auto incrementable<T, std::void_t<decltype(++std::declval<T &>())>> = true;
+
+template<typename T, BOUNDED_REQUIRES(incrementable<T> and std::is_copy_constructible_v<T>)>
 constexpr auto operator++(T & value, int) noexcept(std::is_nothrow_copy_constructible_v<T> and std::is_nothrow_move_constructible_v<T> and noexcept(++value)) {
 	auto previous = value;
 	++value;
@@ -61,22 +57,18 @@ constexpr auto operator++(T & value, int) noexcept(std::is_nothrow_copy_construc
 }
 
 
-template<typename T, typename Enable = void>
-constexpr auto decrementable_by_bounded = false;
-
 template<typename T>
-constexpr auto decrementable_by_bounded<T, std::void_t<decltype(std::declval<T &>() -= bounded::constant<1>)>> = true;
-
-template<typename T, BOUNDED_REQUIRES(decrementable_by_bounded<T>)>
 constexpr auto operator--(T & value) BOUNDED_NOEXCEPT_DECLTYPE(
 	value -= constant<1>
 )
-template<typename T, BOUNDED_REQUIRES(!decrementable_by_bounded<T>)>
-constexpr auto operator--(T & value) BOUNDED_NOEXCEPT_DECLTYPE(
-	value -= 1
-)
+
+template<typename T, typename Enable = void>
+constexpr auto decrementable = false;
 
 template<typename T>
+constexpr auto decrementable<T, std::void_t<decltype(--std::declval<T &>())>> = true;
+
+template<typename T, BOUNDED_REQUIRES(decrementable<T>)>
 constexpr auto operator--(T & value, int) noexcept(std::is_nothrow_copy_constructible_v<T> and std::is_nothrow_move_constructible_v<T> and noexcept(--value)) {
 	auto previous = value;
 	--value;
