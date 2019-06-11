@@ -78,15 +78,14 @@ constexpr auto operator+(
 // Iterators over ranges of zero size tend to come up only in generic code, and
 // it is annoying to be unable to do things like use a range-based for loop over
 // an empty array
+// Specifying the return type triggers a gcc bug where it thinks that parameter
+// pack lengths are mismatched in the constructor of tuple.
 template<typename T>
 constexpr auto operator+(
 	contiguous_iterator<T, 0> const lhs,
 	bounded::constant_t<1>
-) noexcept {
-	BOUNDED_ASSERT(false);
-	// Not sure what the best behavior is here. I guess a likely infinite loop
-	// (by returning the original value) is better than invalid memory access?
-	return lhs;
+) noexcept -> decltype(lhs) {
+	BOUNDED_ASSERT_OR_ASSUME(false);
 }
 
 
