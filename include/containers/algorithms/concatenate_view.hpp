@@ -292,10 +292,7 @@ struct concatenate_view {
 	friend constexpr auto begin(concatenate_view const & view) {
 		return const_iterator(bounded::transform([](auto && range){ return range_view(range); }, view.m_ranges));
 	}
-	friend constexpr auto end(concatenate_view & range) {
-		return concatenate_view_sentinel();
-	}
-	friend constexpr auto end(concatenate_view const & range) {
+	friend constexpr auto end(concatenate_view) {
 		return concatenate_view_sentinel();
 	}
 
