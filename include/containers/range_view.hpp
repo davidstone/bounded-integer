@@ -61,4 +61,10 @@ constexpr auto operator==(range_view<Iterator, Sentinel> const lhs, range_view<I
 	begin(lhs) == begin(rhs) and end(lhs) == end(rhs)
 )
 
+template<typename>
+constexpr auto is_range_view = false;
+
+template<typename Iterator, typename Sentinel>
+constexpr auto is_range_view<range_view<Iterator, Sentinel>> = true;
+
 } // namespace containers
