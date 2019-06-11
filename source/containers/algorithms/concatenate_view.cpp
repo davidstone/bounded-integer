@@ -27,6 +27,8 @@ static_assert(equal_values_and_types(
 	two,
 	containers::array{1, 2, 3, 2, 3, 5, 7}
 ));
+static_assert(begin(two) + size(two) == end(two));
+static_assert(begin(two) + size(two) - begin(two) == size(two));
 
 constexpr auto three = containers::concatenate_view(array3, array1, array2);
 static_assert(size(three) == size(array3) + size(array1) + size(array2));
@@ -34,6 +36,8 @@ static_assert(equal_values_and_types(
 	three,
 	containers::array{1, 1, 2, 3, 5, 1, 2, 3, 2, 3, 5, 7}
 ));
+static_assert(begin(three) + size(three) == end(three));
+static_assert(begin(three) + size(three) - begin(three) == size(three));
 
 static_assert(*(begin(three) + 7_bi) == 3);
 

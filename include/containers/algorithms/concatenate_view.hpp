@@ -9,6 +9,7 @@
 #include <containers/front_back.hpp>
 #include <containers/is_range.hpp>
 #include <containers/operator_arrow.hpp>
+#include <containers/operator_bracket.hpp>
 #include <containers/range_view.hpp>
 
 #include <bounded/detail/make_index_sequence.hpp>
@@ -33,19 +34,45 @@ constexpr auto assert_same_ends(LHS const & lhs, RHS const & rhs) {
 	BOUNDED_ASSERT(have_same_ends(lhs, rhs, bounded::make_index_sequence(bounded::tuple_size<LHS>)));
 }
 
+template<typename Range, typename = void>
+constexpr auto is_forward_random_access = false;
+
+template<typename Range>
+constexpr auto is_forward_random_access<Range, std::void_t<decltype(
+	begin(std::declval<Range>()) + std::declval<typename Range::size_type>()
+)>> = true;
+
 } // namespace detail
 
+// This is an interesting iterator type. If the iterators of the underlying
+// ranges support it, concatenate_view_iterator can efficiently support
+// subtracting two iterators in constant time and random forward access. They
+// cannot, however, support moving an iterator backward. Doing so would require
+// either storing more state (the original begin and end and the current
+// position in that range, which is one extra iterator) or require storing an
+// iterator + reference (which would mean that more operations would require
+// dereferencing). This puts us in the strange place where
+// `it + offset - it == offset` holds, but `it + offset - offset == it` cannot
+// be computed.
 template<typename... RangeViews>
 struct concatenate_view_iterator : detail::operator_arrow<concatenate_view_iterator<RangeViews...>> {
 private:
+	static_assert((... and is_range_view<RangeViews>));
+
 	template<typename RangeView>
-	using traits = std::iterator_traits<decltype(begin(std::declval<RangeView>()))>;
+	using view_iterator = decltype(begin(std::declval<RangeView>()));
+
+	template<typename RangeView>
+	using traits = std::iterator_traits<view_iterator<RangeView>>;
 
 	template<typename category>
 	static constexpr auto any_is_category =
 		(... or std::is_same_v<typename traits<RangeViews>::iterator_category, category>);
 
-	static_assert(!any_is_category<std::output_iterator_tag> or !any_is_category<std::input_iterator_tag>);
+	static_assert(
+		!any_is_category<std::output_iterator_tag> or !any_is_category<std::input_iterator_tag>,
+		"Cannot combine input and output ranges in concatenate_view"
+	);
 
 	bounded::tuple<RangeViews...> m_range_views;
 
@@ -68,9 +95,9 @@ private:
 	static constexpr auto operator_plus(bounded::tuple<RangeViews...> const range_views, Index const index, Offset const offset, std::index_sequence<indexes...> indexes_) {
 		if constexpr (index == sizeof...(RangeViews)) {
 			return bounded::apply(range_views, bounded::construct_return<concatenate_view_iterator>);
-		} else if constexpr (std::is_convertible_v<iterator_category, std::random_access_iterator_tag>) {
+		} else if constexpr ((... and detail::is_forward_random_access<RangeViews>)) {
 			auto const range = range_views[index];
-			auto const added_size = bounded::min(offset, size(range));
+			auto const added_size = bounded::max(-size(range), bounded::min(size(range), offset));
 			auto specific_range = [=](auto const current_index) {
 				auto const current_range = range_views[current_index];
 				if constexpr (index == current_index) {
@@ -80,13 +107,18 @@ private:
 				}
 			};
 			auto const temp = bounded::tuple(specific_range(bounded::constant<indexes>)...);
-			return operator_plus(temp, index + bounded::constant<1>, offset - added_size, indexes_);
+			return operator_plus(
+				temp,
+				index + bounded::constant<1>,
+				offset - added_size,
+				indexes_
+			);
 		} else {
 			auto const range = range_views[index];
 			auto specific_range = [=](auto const current_index) {
 				auto const current_range = range_views[current_index];
 				if constexpr (index == current_index) {
-					return range_view(std::next(begin(current_range)), end(current_range));
+					return range_view(::containers::next(begin(current_range)), end(current_range));
 				} else {
 					return current_range;
 				}
@@ -112,10 +144,8 @@ public:
 	using iterator_category =
 		std::conditional_t<any_is_category<std::output_iterator_tag>, std::output_iterator_tag,
 		std::conditional_t<any_is_category<std::input_iterator_tag>, std::input_iterator_tag,
-		std::conditional_t<any_is_category<std::forward_iterator_tag>, std::forward_iterator_tag,
-		std::conditional_t<any_is_category<std::bidirectional_iterator_tag>, std::bidirectional_iterator_tag,
-		std::random_access_iterator_tag
-	>>>>;
+		std::forward_iterator_tag
+	>>;
 	
 	using pointer = std::remove_reference_t<value_type> *;
 
@@ -143,8 +173,14 @@ public:
 		std::is_convertible_v<Offset, difference_type> and
 		(
 			!bounded::is_bounded_integer<difference_type> or
-			std::is_same_v<iterator_category, std::random_access_iterator_tag> or
-			std::numeric_limits<Offset>::max() == bounded::constant<1>
+			(
+				std::numeric_limits<Offset>::min() == bounded::constant<1> and
+				std::numeric_limits<Offset>::max() == bounded::constant<1>
+			) or
+			(
+				std::numeric_limits<Offset>::min() >= bounded::constant<0> and
+				(... and detail::is_forward_random_access<RangeViews>)
+			)
 		)
 	)>
 	friend constexpr auto operator+(concatenate_view_iterator const lhs, Offset const offset) {
@@ -161,14 +197,14 @@ public:
 		concatenate_view_iterator const lhs,
 		concatenate_view_iterator<RHSRanges...> const rhs
 	) {
-		assert_same_ends(lhs.m_range_views, rhs.m_range_views);
+		::containers::detail::assert_same_ends(lhs.m_range_views, rhs.m_range_views);
 
 		auto transform = [](auto const lhs_range, auto const rhs_range) {
 			return begin(lhs_range) - begin(rhs_range);
 		};
 		return bounded::apply(
 			bounded::transform(transform, lhs.m_range_views, rhs.m_range_views),
-			std::plus{}
+			[](auto... integers) { return (... + integers); }
 		);
 	}
 
@@ -190,7 +226,7 @@ public:
 		concatenate_view_iterator const lhs,
 		concatenate_view_iterator<RHSRanges...> const rhs
 	) {
-		assert_same_ends(lhs.m_range_views, rhs.m_range_views);
+		::containers::detail::assert_same_ends(lhs.m_range_views, rhs.m_range_views);
 		return compare(lhs.begin_iterators(), rhs.begin_iterators());
 	}
 
@@ -201,7 +237,7 @@ public:
 
 	template<typename... RHSRanges>
 	friend constexpr auto operator==(concatenate_view_iterator const lhs, concatenate_view_iterator<RHSRanges...> const rhs) {
-		assert_same_ends(lhs.m_range_views, rhs.m_range_views);
+		::containers::detail::assert_same_ends(lhs.m_range_views, rhs.m_range_views);
 		return lhs.begin_iterators() == rhs.begin_iterators();
 	}
 
@@ -263,6 +299,7 @@ struct concatenate_view {
 		return concatenate_view_sentinel();
 	}
 
+	CONTAINERS_OPERATOR_BRACKET_DEFINITIONS(concatenate_view)
 private:
 	bounded::tuple<Ranges...> m_ranges;
 };
