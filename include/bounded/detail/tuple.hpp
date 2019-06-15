@@ -23,14 +23,6 @@
 namespace bounded {
 namespace detail {
 
-// Work around clang bug https://llvm.org/bugs/show_bug.cgi?id=26793
-// When this is fixed, directly use a fold expression instead
-template<typename... Args>
-constexpr auto all(Args... args) noexcept {
-	return (... and args);
-}
-
-
 constexpr struct not_piecewise_construct_t{} not_piecewise_construct{};
 
 // index ensures that a tuple with the same type repeated shows the type as
@@ -58,9 +50,7 @@ struct tuple_impl<std::index_sequence<indexes...>, Types...> : tuple_value<index
 
 	tuple_impl() = default;
 	
-	template<typename... Args, BOUNDED_REQUIRES(
-		::bounded::detail::all(std::is_convertible_v<Args, Types>...)
-	)>
+	template<typename... Args, BOUNDED_REQUIRES((... and std::is_convertible_v<Args, Types>))>
 	constexpr tuple_impl(Args && ... args) noexcept((... and noexcept(tuple_value<indexes, Types>(not_piecewise_construct, BOUNDED_FORWARD(args))))):
 		tuple_value<indexes, Types>(not_piecewise_construct, BOUNDED_FORWARD(args))...
 	{
