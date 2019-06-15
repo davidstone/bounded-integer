@@ -87,9 +87,8 @@ constexpr auto operator*(set_intersection_pair_iterator<Range, ForwardIterator1,
 // set matches, the other must.
 template<
 	typename LHSForwardIterator1, typename LHSForwardIterator2, typename LHSRange,
-	typename RHSForwardIterator1, typename RHSForwardIterator2, typename RHSRange,
-	BOUNDED_REQUIRES(std::is_same_v<std::remove_const_t<LHSRange>, std::remove_const_t<RHSRange>>)
->
+	typename RHSForwardIterator1, typename RHSForwardIterator2, typename RHSRange
+> requires (std::is_same_v<std::remove_const_t<LHSRange>, std::remove_const_t<RHSRange>>)
 constexpr auto compare(
 	set_intersection_pair_iterator<LHSForwardIterator1, LHSForwardIterator2, LHSRange> const lhs,
 	set_intersection_pair_iterator<RHSForwardIterator1, RHSForwardIterator2, RHSRange> const rhs
@@ -98,9 +97,8 @@ constexpr auto compare(
 )
 template<
 	typename LHSForwardIterator1, typename LHSForwardIterator2, typename LHSRange,
-	typename RHSForwardIterator1, typename RHSForwardIterator2, typename RHSRange,
-	BOUNDED_REQUIRES(std::is_same_v<std::remove_const_t<LHSRange>, std::remove_const_t<RHSRange>>)
->
+	typename RHSForwardIterator1, typename RHSForwardIterator2, typename RHSRange
+> requires (std::is_same_v<std::remove_const_t<LHSRange>, std::remove_const_t<RHSRange>>)
 constexpr auto operator==(
 	set_intersection_pair_iterator<LHSForwardIterator1, LHSForwardIterator2, LHSRange> const lhs,
 	set_intersection_pair_iterator<RHSForwardIterator1, RHSForwardIterator2, RHSRange> const rhs

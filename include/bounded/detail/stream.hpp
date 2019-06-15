@@ -6,14 +6,13 @@
 #pragma once
 
 #include <bounded/detail/is_bounded_integer.hpp>
-#include <bounded/detail/requires.hpp>
 
 #include <istream>
 #include <ostream>
 
 namespace bounded {
 
-template<typename CharT, typename Traits, typename Integer, BOUNDED_REQUIRES(is_bounded_integer<Integer>)>
+template<typename CharT, typename Traits, typename Integer> requires is_bounded_integer<Integer>
 decltype(auto) operator<<(std::basic_ostream<CharT, Traits> & out, Integer const & x) {
 	// The unary plus applies integer promotions to x. This ensures values are
 	// printed as integers. Without this, I could run into an issue where the
@@ -22,7 +21,7 @@ decltype(auto) operator<<(std::basic_ostream<CharT, Traits> & out, Integer const
 	return out << +x.value();
 }
 
-template<typename CharT, typename Traits, typename Integer, BOUNDED_REQUIRES(is_bounded_integer<Integer>)>
+template<typename CharT, typename Traits, typename Integer> requires is_bounded_integer<Integer>
 decltype(auto) operator>>(std::basic_istream<CharT, Traits> & in, Integer & x) {
 	using underlying = typename Integer::underlying_type;
 	std::conditional_t<sizeof(underlying) < sizeof(int), int, underlying> temp;

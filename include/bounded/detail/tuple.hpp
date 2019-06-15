@@ -16,6 +16,7 @@
 #include <bounded/detail/forward.hpp>
 #include <bounded/detail/is_bounded_integer.hpp>
 #include <bounded/detail/make_index_sequence.hpp>
+#include <bounded/detail/requires.hpp>
 
 #include <type_traits>
 #include <utility>
@@ -56,9 +57,7 @@ struct tuple_impl<std::index_sequence<indexes...>, Types...> : tuple_value<index
 	{
 	}
 
-	template<typename... Args, BOUNDED_REQUIRES(
-		(... and std::is_constructible_v<tuple_value<indexes, Types>, std::piecewise_construct_t, Args>)
-	)>
+	template<typename... Args, BOUNDED_REQUIRES((... and std::is_constructible_v<tuple_value<indexes, Types>, std::piecewise_construct_t, Args>))>
 	constexpr tuple_impl(std::piecewise_construct_t, Args && ... args) noexcept(false):
 		tuple_value<indexes, Types>(std::piecewise_construct, BOUNDED_FORWARD(args))...
 	{
@@ -118,13 +117,13 @@ template<std::size_t index, typename T>
 struct tuple_value<index, T, true> : private T {
 	tuple_value() = default;
 	
-	template<typename... Args, BOUNDED_REQUIRES(std::is_constructible_v<T, Args...>)>
+	template<typename... Args> requires std::is_constructible_v<T, Args...>
 	constexpr explicit tuple_value(std::piecewise_construct_t, tuple<Args...> args) BOUNDED_NOEXCEPT_INITIALIZATION(
 		tuple_value(make_index_sequence(constant<sizeof...(Args)>), std::move(args))
 	) {
 	}
 
-	template<typename... Args, BOUNDED_REQUIRES(std::is_constructible_v<T, Args...>)>
+	template<typename... Args> requires std::is_constructible_v<T, Args...>
 	constexpr explicit tuple_value(not_piecewise_construct_t, Args && ... args) BOUNDED_NOEXCEPT_INITIALIZATION(
 		T(BOUNDED_FORWARD(args)...)
 	) {
@@ -152,13 +151,13 @@ template<std::size_t index, typename T>
 struct tuple_value<index, T, false> {
 	tuple_value() = default;
 	
-	template<typename... Args, BOUNDED_REQUIRES(std::is_constructible_v<T, Args...>)>
+	template<typename... Args> requires std::is_constructible_v<T, Args...>
 	constexpr explicit tuple_value(std::piecewise_construct_t, tuple<Args...> args) BOUNDED_NOEXCEPT_INITIALIZATION(
 		tuple_value(make_index_sequence(constant<sizeof...(Args)>), std::move(args))
 	) {
 	}
 
-	template<typename... Args, BOUNDED_REQUIRES(std::is_constructible_v<T, Args...>)>
+	template<typename... Args> requires std::is_constructible_v<T, Args...>
 	constexpr explicit tuple_value(not_piecewise_construct_t, Args && ... args) noexcept(std::is_nothrow_constructible_v<T, Args...>):
 		m_value(BOUNDED_FORWARD(args)...)
 	{
@@ -189,7 +188,7 @@ private:
 
 template<std::size_t index>
 struct tuple_value<index, void, false> {
-	template<typename... MaybeVoid, BOUNDED_REQUIRES(sizeof...(MaybeVoid) <= 1 and (... and std::is_void_v<MaybeVoid>))>
+	template<typename... MaybeVoid> requires (sizeof...(MaybeVoid) <= 1 and (... and std::is_void_v<MaybeVoid>))
 	constexpr explicit tuple_value(std::piecewise_construct_t, tuple<MaybeVoid...>) noexcept {
 	}
 	constexpr explicit tuple_value(not_piecewise_construct_t) noexcept {
@@ -226,21 +225,17 @@ constexpr auto equal_impl(LHS const & lhs, RHS const & rhs, std::index_sequence<
 
 }	// namespace detail
 
-template<
-	typename... lhs_types,
-	typename... rhs_types,
-	BOUNDED_REQUIRES(sizeof...(lhs_types) == sizeof...(rhs_types))
->
+template<typename... lhs_types, typename... rhs_types> requires(
+	sizeof...(lhs_types) == sizeof...(rhs_types)
+)
 constexpr auto compare(tuple<lhs_types...> const & lhs, tuple<rhs_types...> const & rhs) BOUNDED_NOEXCEPT_VALUE(
 	detail::compare_impl(lhs, rhs, constant<0>)
 )
 
 
-template<
-	typename... lhs_types,
-	typename... rhs_types,
-	BOUNDED_REQUIRES(sizeof...(lhs_types) == sizeof...(rhs_types))
->
+template<typename... lhs_types, typename... rhs_types> requires(
+	sizeof...(lhs_types) == sizeof...(rhs_types)
+)
 constexpr auto operator==(tuple<lhs_types...> const & lhs, tuple<rhs_types...> const & rhs) BOUNDED_NOEXCEPT_VALUE(
 	detail::equal_impl(lhs, rhs, bounded::make_index_sequence(constant<sizeof...(lhs_types)>))
 )
@@ -310,9 +305,7 @@ private:
 	}
 
 public:
-	template<typename... Tuples, BOUNDED_REQUIRES(
-		(... and std::is_constructible_v<std::decay_t<Tuples>, Tuples &&>)
-	)>
+	template<typename... Tuples> requires(... and std::is_constructible_v<std::decay_t<Tuples>, Tuples &&>)
 	constexpr auto operator()(Tuples && ... tuples) const noexcept(
 		(... and std::is_nothrow_constructible_v<std::decay_t<Tuples>, Tuples &&>)
 	) {
@@ -347,7 +340,7 @@ public:
 
 namespace detail {
 
-template<typename Tuple, typename... Tuples, BOUNDED_REQUIRES((... and (tuple_size<Tuple> == tuple_size<Tuples>)))>
+template<typename Tuple, typename... Tuples> requires(... and (tuple_size<Tuple> == tuple_size<Tuples>))
 constexpr auto all_tuple_sizes() noexcept {
 	return tuple_size<Tuple>;
 }
@@ -387,7 +380,7 @@ constexpr auto transform_impl(constant_t<i> index, Function && function, Tuples 
 
 }	// namespace detail
 
-template<typename Function, typename... Tuples, BOUNDED_REQUIRES((... and is_tuple<std::decay_t<Tuples>>))>
+template<typename Function, typename... Tuples> requires(... and is_tuple<std::decay_t<Tuples>>)
 constexpr auto transform(Function && function, Tuples && ... tuples) noexcept(detail::all_noexcept_function_calls<Function, Tuples && ...>) {
 	return detail::transform_impl(constant<0>, function, BOUNDED_FORWARD(tuples)...);
 }

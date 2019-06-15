@@ -9,7 +9,6 @@
 #include <bounded/detail/is_bounded_integer.hpp>
 #include <bounded/detail/max_builtin.hpp>
 #include <bounded/detail/noexcept.hpp>
-#include <bounded/detail/requires.hpp>
 
 #include <functional>
 #include <type_traits>
@@ -78,13 +77,13 @@ constexpr auto compare(LHS const & lhs, RHS const & rhs) BOUNDED_NOEXCEPT_DECLTY
 )
 
 // Variadic makes this function always a worse match than the above
-template<typename LHS, typename RHS, typename... Ignore, BOUNDED_REQUIRES(sizeof...(Ignore) == 0)>
+template<typename LHS, typename RHS, typename... Ignore> requires(sizeof...(Ignore) == 0)
 constexpr auto compare(LHS const & lhs, RHS const & rhs, Ignore...) BOUNDED_NOEXCEPT_DECLTYPE(
 	compare(0, rhs.compare(lhs))
 )
 
 #if 0
-template<typename LHS, typename RHS, BOUNDED_REQUIRES(not detail::is_builtin_integer<LHS> or !detail::is_builtin_integer<RHS>)>
+template<typename LHS, typename RHS> requires(not detail::is_builtin_integer<LHS> or !detail::is_builtin_integer<RHS>)
 constexpr auto compare(LHS const & lhs, RHS const & rhs) BOUNDED_NOEXCEPT_DECLTYPE(
 	lhs <=> rhs
 )
@@ -93,12 +92,11 @@ constexpr auto compare(LHS const & lhs, RHS const & rhs) BOUNDED_NOEXCEPT_DECLTY
 namespace detail {
 
 template<typename LHS, typename RHS>
-constexpr auto builtin_compare(LHS const lhs, RHS const rhs) noexcept {
-	return
-		lhs < rhs ? strong_ordering::less :
-		lhs > rhs ? strong_ordering::greater :
-		strong_ordering::equal;
-}
+constexpr auto builtin_compare(LHS const lhs, RHS const rhs) BOUNDED_NOEXCEPT_DECLTYPE(
+	lhs < rhs ? strong_ordering::less :
+	lhs > rhs ? strong_ordering::greater :
+	strong_ordering::equal
+)
 
 } // namespace detail
 
@@ -107,12 +105,12 @@ constexpr auto compare(LHS const * const lhs, RHS const * const rhs) BOUNDED_NOE
 	detail::builtin_compare(lhs, rhs)
 )
 
-template<typename LHS, typename RHS, BOUNDED_REQUIRES(std::is_floating_point_v<LHS> and std::is_floating_point_v<RHS>)>
-constexpr auto compare(LHS const lhs, RHS const rhs) BOUNDED_NOEXCEPT_DECLTYPE(
-	detail::builtin_compare(lhs, rhs)
-)
+template<typename LHS, typename RHS> requires(std::is_floating_point_v<LHS> and std::is_floating_point_v<RHS>)
+constexpr auto compare(LHS const lhs, RHS const rhs) noexcept {
+	return detail::builtin_compare(lhs, rhs);
+}
 
-template<typename LHS, typename RHS, BOUNDED_REQUIRES(detail::is_builtin_integer<LHS> and detail::is_builtin_integer<RHS>)>
+template<typename LHS, typename RHS> requires(detail::is_builtin_integer<LHS> and detail::is_builtin_integer<RHS>)
 constexpr auto compare(LHS const lhs, RHS const rhs) noexcept -> strong_ordering {
 	if constexpr (detail::is_signed_builtin<LHS> == detail::is_signed_builtin<RHS>) {
 		return detail::builtin_compare(lhs, rhs);
@@ -129,7 +127,7 @@ constexpr auto compare(LHS const lhs, RHS const rhs) noexcept -> strong_ordering
 
 namespace detail {
 
-template<typename LHS, typename RHS, BOUNDED_REQUIRES(detail::is_builtin_integer<LHS> and detail::is_builtin_integer<RHS>)>
+template<typename LHS, typename RHS> requires(detail::is_builtin_integer<LHS> and detail::is_builtin_integer<RHS>)
 constexpr auto safe_equal(LHS const lhs, RHS const rhs) noexcept -> bool {
 	constexpr auto signed_max [[maybe_unused]] = basic_numeric_limits<detail::max_signed_t>::max();
 	if constexpr (detail::is_signed_builtin<LHS> == detail::is_signed_builtin<RHS>) {
@@ -181,7 +179,7 @@ constexpr auto safe_max(Ts... values) noexcept {
 }	// namespace detail
 
 
-template<typename LHS, typename RHS, BOUNDED_REQUIRES(is_bounded_integer<LHS> and is_bounded_integer<RHS>)>
+template<typename LHS, typename RHS> requires(is_bounded_integer<LHS> and is_bounded_integer<RHS>)
 constexpr auto compare(LHS const & lhs [[maybe_unused]], RHS const & rhs [[maybe_unused]]) noexcept {
 	using lhs_limits = basic_numeric_limits<LHS>;
 	using rhs_limits = basic_numeric_limits<RHS>;
@@ -197,7 +195,7 @@ constexpr auto compare(LHS const & lhs [[maybe_unused]], RHS const & rhs [[maybe
 }
 
 
-template<typename LHS, typename RHS, BOUNDED_REQUIRES(is_bounded_integer<LHS> and is_bounded_integer<RHS>)>
+template<typename LHS, typename RHS> requires(is_bounded_integer<LHS> and is_bounded_integer<RHS>)
 constexpr auto operator==(LHS const & lhs [[maybe_unused]], RHS const & rhs [[maybe_unused]]) noexcept {
 	using lhs_limits = basic_numeric_limits<LHS>;
 	using rhs_limits = basic_numeric_limits<RHS>;

@@ -169,11 +169,11 @@ constexpr auto string_like<std::basic_string_view<CharT>> = true;
 
 }	// namespace detail
 
-template<typename LHS, typename RHS, BOUNDED_REQUIRES(
+template<typename LHS, typename RHS> requires(
 	(detail::string_like<std::decay_t<LHS>> and detail::string_like<std::decay_t<RHS>>) and
 	(detail::is_string<std::decay_t<LHS>> or detail::is_string<std::decay_t<RHS>>) and
 	std::is_same_v<typename std::decay_t<LHS>::value_type, typename std::decay_t<RHS>::value_type>
-)>
+)
 auto operator+(LHS && lhs, RHS && rhs) {
 	using result_t = std::decay_t<std::conditional_t<detail::is_string<std::decay_t<LHS>>, LHS, RHS>>;
 	return ::containers::concatenate<result_t>(BOUNDED_FORWARD(lhs), BOUNDED_FORWARD(rhs));
@@ -198,11 +198,11 @@ auto operator+(CharT const * const lhs, basic_string<CharT> const & rhs) {
 }
 
 
-template<typename String, BOUNDED_REQUIRES(detail::is_string<std::decay_t<String>>)>
+template<typename String> requires detail::is_string<std::decay_t<String>>
 auto operator+(String && lhs, typename std::remove_reference_t<String>::value_type const rhs) {
 	return containers::concatenate<std::decay_t<String>>(BOUNDED_FORWARD(lhs), ::containers::single_element_range(rhs));
 }
-template<typename String, BOUNDED_REQUIRES(detail::is_string<std::decay_t<String>>)>
+template<typename String> requires detail::is_string<std::decay_t<String>>
 auto operator+(typename std::remove_reference_t<String>::value_type const lhs, String && rhs) {
 	return containers::concatenate<std::decay_t<String>>(::containers::single_element_range(lhs), BOUNDED_FORWARD(rhs));
 }

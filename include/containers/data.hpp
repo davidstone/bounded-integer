@@ -15,7 +15,7 @@ namespace containers {
 namespace detail {
 namespace common {
 
-template<typename Range, BOUNDED_REQUIRES(is_range<Range>)>
+template<typename Range> requires is_range<Range>
 constexpr auto data(Range && range) BOUNDED_NOEXCEPT_DECLTYPE(
 	pointer_from(begin(range))
 )

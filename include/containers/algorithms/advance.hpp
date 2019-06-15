@@ -52,40 +52,29 @@ constexpr auto advance(Iterator & it, Offset const offset) BOUNDED_NOEXCEPT_VALU
 
 namespace detail {
 
-template<
-	typename Iterator,
-	BOUNDED_REQUIRES(bounded::is_bounded_integer<typename std::iterator_traits<Iterator>::difference_type>)
->
+template<typename Iterator> requires
+	bounded::is_bounded_integer<typename std::iterator_traits<Iterator>::difference_type>
 constexpr auto iterator_one() noexcept {
 	return 1_bi;
 }
 
-template<
-	typename Iterator,
-	BOUNDED_REQUIRES(!bounded::is_bounded_integer<typename std::iterator_traits<Iterator>::difference_type>)
->
+template<typename Iterator> requires(
+	!bounded::is_bounded_integer<typename std::iterator_traits<Iterator>::difference_type>
+)
 constexpr auto iterator_one() noexcept {
 	return 1;
 }
 
 }	// namespace detail
 
-template<
-	typename Iterator,
-	typename Offset = decltype(::containers::detail::iterator_one<Iterator>()),
-	BOUNDED_REQUIRES(is_iterator<Iterator>)
->
+template<typename Iterator, typename Offset = decltype(::containers::detail::iterator_one<Iterator>())> requires is_iterator<Iterator>
 constexpr auto next(Iterator it, Offset const offset = ::containers::detail::iterator_one<Iterator>()) {
 	::containers::advance(it, offset);
 	return it;
 }
 
 
-template<
-	typename Iterator,
-	typename Offset = decltype(::containers::detail::iterator_one<Iterator>()),
-	BOUNDED_REQUIRES(is_iterator<Iterator>)
->
+template<typename Iterator, typename Offset = decltype(::containers::detail::iterator_one<Iterator>())> requires is_iterator<Iterator>
 constexpr auto prev(Iterator it, Offset const offset = ::containers::detail::iterator_one<Iterator>()) {
 	::containers::advance(it, -offset);
 	return it;

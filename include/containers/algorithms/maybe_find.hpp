@@ -16,16 +16,15 @@
 namespace containers {
 namespace detail {
 
-template<typename ForwardIterator, typename Sentinel, BOUNDED_REQUIRES(
+template<typename ForwardIterator, typename Sentinel> requires
 	std::is_lvalue_reference_v<decltype(*std::declval<ForwardIterator>())>
-)>
 constexpr auto maybe_find_if_helper(ForwardIterator const it, Sentinel const last) BOUNDED_NOEXCEPT_VALUE(
 	it != last ? std::addressof(*it) : nullptr
 )
 
-template<typename ForwardIterator, typename Sentinel, BOUNDED_REQUIRES(
+template<typename ForwardIterator, typename Sentinel> requires(
 	!std::is_lvalue_reference_v<decltype(*std::declval<ForwardIterator>())>
-)>
+)
 constexpr auto maybe_find_if_helper(ForwardIterator const it, Sentinel const last) BOUNDED_NOEXCEPT_VALUE(
 	it != last ? bounded::make_optional(*it) : bounded::none
 )

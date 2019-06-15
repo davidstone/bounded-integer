@@ -60,7 +60,7 @@ constexpr auto has_size<
 namespace common {
 
 // TODO: work with non-sized containers and non-random-access containers
-template<typename Container, typename Range, BOUNDED_REQUIRES(has_push_back<Container>)>
+template<typename Container, typename Range> requires has_push_back<Container>
 constexpr auto append(Container & output, Range && input) {
 	auto const offset = size(output);
 	if constexpr (has_size<Range> and has_reserve<Container>) {

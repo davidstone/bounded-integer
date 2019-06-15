@@ -10,7 +10,6 @@
 #include <bounded/detail/class.hpp>
 #include <bounded/detail/is_bounded_integer.hpp>
 #include <bounded/detail/max_builtin.hpp>
-#include <bounded/detail/requires.hpp>
 
 namespace bounded {
 namespace detail {
@@ -27,11 +26,7 @@ constexpr auto log_impl(Integer value, Base const base) noexcept {
 
 }	// namespace detail
 
-template<
-	auto minimum, auto maximum, typename overflow_policy,
-	typename Base,
-	BOUNDED_REQUIRES(is_bounded_integer<Base>)
->
+template<auto minimum, auto maximum, typename overflow_policy, typename Base> requires is_bounded_integer<Base>
 constexpr auto log(integer<minimum, maximum, overflow_policy> const value, Base const base) noexcept {
 	static_assert(base > constant<1>, "Negative bases not currently supported.");
 	static_assert(value > constant<0>, "The log of a negative number or zero is undefined.");

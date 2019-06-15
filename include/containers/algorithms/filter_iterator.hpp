@@ -68,22 +68,22 @@ constexpr auto is_filter_iterator_traits<T const> = is_filter_iterator_traits<T>
 struct filter_iterator_sentinel {
 };
 
-template<typename Iterator, typename Traits, BOUNDED_REQUIRES(is_filter_iterator_traits<Traits>)>
+template<typename Iterator, typename Traits> requires is_filter_iterator_traits<Traits>
 constexpr auto compare(adapt_iterator<Iterator, Traits> const lhs, filter_iterator_sentinel) BOUNDED_NOEXCEPT_DECLTYPE(
 	lhs.traits().compare(lhs.base(), lhs.traits().sentinel())
 )
 
-template<typename Iterator, typename Traits, BOUNDED_REQUIRES(is_filter_iterator_traits<Traits>)>
+template<typename Iterator, typename Traits> requires is_filter_iterator_traits<Traits>
 constexpr auto compare(filter_iterator_sentinel, adapt_iterator<Iterator, Traits> const rhs) BOUNDED_NOEXCEPT_DECLTYPE(
 	rhs.traits().compare(rhs.traits().sentinel(), rhs.base())
 )
 
-template<typename Iterator, typename Traits, BOUNDED_REQUIRES(is_filter_iterator_traits<Traits>)>
+template<typename Iterator, typename Traits> requires is_filter_iterator_traits<Traits>
 constexpr auto operator==(adapt_iterator<Iterator, Traits> const lhs, filter_iterator_sentinel) BOUNDED_NOEXCEPT_DECLTYPE(
 	lhs.traits().equal(lhs.base(), lhs.traits().sentinel())
 )
 
-template<typename Iterator, typename Traits, BOUNDED_REQUIRES(is_filter_iterator_traits<Traits>)>
+template<typename Iterator, typename Traits> requires is_filter_iterator_traits<Traits>
 constexpr auto operator==(filter_iterator_sentinel, adapt_iterator<Iterator, Traits> const rhs) BOUNDED_NOEXCEPT_DECLTYPE(
 	rhs.traits().equal(rhs.traits().sentinel(), rhs.base())
 )

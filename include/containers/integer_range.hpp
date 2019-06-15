@@ -135,7 +135,7 @@ constexpr auto inclusive_integer_range(Integer const first, Sentinel const last,
 	integer_range(first, last + step, step)
 )
 
-template<typename Enum, BOUNDED_REQUIRES(std::is_enum_v<Enum>)>
+template<typename Enum> requires std::is_enum_v<Enum>
 constexpr auto enum_range(Enum last = static_cast<Enum>(std::numeric_limits<Enum>::max())) {
 	return containers::transform(
 		inclusive_integer_range(bounded::constant<0>, bounded::integer(last)),

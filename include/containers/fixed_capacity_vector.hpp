@@ -49,16 +49,16 @@ public:
 
 	constexpr fixed_capacity_vector() = default;
 	
-	template<typename Count, BOUNDED_REQUIRES(std::is_convertible_v<Count, size_type>)>
+	template<typename Count> requires std::is_convertible_v<Count, size_type>
 	constexpr explicit fixed_capacity_vector(Count const count) BOUNDED_NOEXCEPT_INITIALIZATION(
 		fixed_capacity_vector(count_constructor{}, count)
 	) {}
-	template<typename Count, BOUNDED_REQUIRES(std::is_convertible_v<Count, size_type>)>
+	template<typename Count> requires std::is_convertible_v<Count, size_type>
 	constexpr fixed_capacity_vector(Count const count, value_type const & value) BOUNDED_NOEXCEPT_INITIALIZATION(
 		fixed_capacity_vector(count_constructor{}, count, value)
 	) {}
 	
-	template<typename InputIterator, typename Sentinel, BOUNDED_REQUIRES(is_iterator_sentinel<InputIterator, Sentinel>)>
+	template<typename InputIterator, typename Sentinel> requires is_iterator_sentinel<InputIterator, Sentinel>
 	constexpr fixed_capacity_vector(InputIterator first, Sentinel const last) noexcept(noexcept(first != last) and noexcept(++first) and noexcept(std::declval<fixed_capacity_vector &>().emplace_back(*first))) {
 		for (; first != last; ++first) {
 			emplace_back(*first);
@@ -73,10 +73,10 @@ public:
 	) {
 	}
 	
-	template<typename Range, BOUNDED_REQUIRES(
+	template<typename Range> requires(
 		is_range<Range> and
 		!std::is_array_v<std::remove_cv_t<std::remove_reference_t<Range>>>
-	)>
+	)
 	constexpr explicit fixed_capacity_vector(Range && range) BOUNDED_NOEXCEPT_INITIALIZATION(
 		fixed_capacity_vector(begin(BOUNDED_FORWARD(range)), end(BOUNDED_FORWARD(range)))
 	) {

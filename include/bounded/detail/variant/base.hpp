@@ -25,10 +25,10 @@ template<typename GetFunction, typename... Ts>
 struct basic_variant_base {
 	// TODO: assert GetFunction is noexcept
 
-	template<typename F, typename Index, typename... Args, BOUNDED_REQUIRES(
+	template<typename F, typename Index, typename... Args> requires(
 		std::is_convertible_v<F, GetFunction> and
 		std::is_constructible_v<typename decltype(get_type(Index{}, types<Ts>{}...))::type, Args...>
-	)>
+	)
 	constexpr basic_variant_base(std::in_place_t, F && function, Index index_, Args && ... args) noexcept(
 		std::is_nothrow_constructible_v<GetFunction, F> and
 		std::is_nothrow_constructible_v<typename decltype(get_type(Index{}, types<Ts>{}...))::type, Args...>
@@ -46,10 +46,10 @@ struct basic_variant_base {
 		);
 	}
 	
-	template<typename Index, typename... Args, BOUNDED_REQUIRES(
+	template<typename Index, typename... Args> requires(
 		not std::is_convertible_v<Index, GetFunction> and
 		std::is_constructible_v<typename decltype(get_type(Index{}, types<Ts>{}...))::type, Args...>
-	)>
+	)
 	constexpr basic_variant_base(std::in_place_t, Index const index_, Args && ... args) BOUNDED_NOEXCEPT_INITIALIZATION(
 		basic_variant_base(
 			std::in_place,
@@ -60,7 +60,7 @@ struct basic_variant_base {
 	) {
 	}
 	
-	template<typename T, BOUNDED_REQUIRES(is_valid_index(types<std::decay_t<T>>{}, types<Ts>{}...))>
+	template<typename T> requires is_valid_index(types<std::decay_t<T>>{}, types<Ts>{}...)
 	constexpr explicit basic_variant_base(T && value) BOUNDED_NOEXCEPT_INITIALIZATION(
 		basic_variant_base(
 			std::in_place,
@@ -70,11 +70,11 @@ struct basic_variant_base {
 	) {
 	}
 	
-	template<typename T, BOUNDED_REQUIRES(
+	template<typename T> requires(
 		is_valid_index(types<std::decay_t<T>>{}, types<Ts>{}...) and
 		std::is_constructible_v<std::decay_t<T>, T &&> and
 		std::is_assignable_v<std::decay_t<T> &, T &&>
-	)>
+	)
 	constexpr void assignment(T && value) & noexcept(
 		std::is_nothrow_constructible_v<std::decay_t<T>, T &&> and
 		std::is_nothrow_assignable_v<std::decay_t<T> &, T &&>
@@ -118,15 +118,15 @@ struct basic_variant_base {
 		}
 	}
 
-	template<typename Index, BOUNDED_REQUIRES(detail::is_valid_index(Index{}, types<Ts>{}...))>
+	template<typename Index> requires detail::is_valid_index(Index{}, types<Ts>{}...)
 	constexpr auto const & operator[](Index index_) const & noexcept {
 		return operator_bracket(*this, index_);
 	}
-	template<typename Index, BOUNDED_REQUIRES(detail::is_valid_index(Index{}, types<Ts>{}...))>
+	template<typename Index> requires detail::is_valid_index(Index{}, types<Ts>{}...)
 	constexpr auto & operator[](Index index_) & noexcept {
 		return operator_bracket(*this, index_);
 	}
-	template<typename Index, BOUNDED_REQUIRES(detail::is_valid_index(Index{}, types<Ts>{}...))>
+	template<typename Index> requires detail::is_valid_index(Index{}, types<Ts>{}...)
 	constexpr auto && operator[](Index index_) && noexcept {
 		return operator_bracket(std::move(*this), index_);
 	}

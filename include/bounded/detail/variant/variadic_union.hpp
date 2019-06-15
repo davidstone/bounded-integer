@@ -67,7 +67,7 @@ union variadic_union<false, T, Ts...> {
 
 
 
-template<typename V, auto n, BOUNDED_REQUIRES(n >= constant<0>)>
+template<typename V, auto n> requires(n >= constant<0>)
 constexpr auto && get_union_element(V && v, constant_t<n> const index) noexcept {
 	if constexpr (index == constant<0>) {
 		return BOUNDED_FORWARD(v).head;

@@ -13,7 +13,6 @@
 #include <bounded/detail/construct_destroy.hpp>
 #include <bounded/detail/forward.hpp>
 #include <bounded/detail/noexcept.hpp>
-#include <bounded/detail/requires.hpp>
 
 #include <stdexcept>
 #include <type_traits>
@@ -130,33 +129,33 @@ public:
 		static_assert(noexcept(optional_storage(optional_tag{})));
 	}
 
-	template<typename... Args, BOUNDED_REQUIRES(std::is_constructible_v<value_type, Args && ...>)>
+	template<typename... Args> requires std::is_constructible_v<value_type, Args && ...>
 	constexpr explicit optional(std::in_place_t, Args && ... other) noexcept(std::is_nothrow_constructible_v<value_type, Args && ...>):
 		m_value(BOUNDED_FORWARD(other)...) {
 	}
-	template<typename U, BOUNDED_REQUIRES(std::is_convertible_v<U &&, value_type>)>
+	template<typename U> requires std::is_convertible_v<U &&, value_type>
 	constexpr optional(U && other)
 		BOUNDED_NOEXCEPT_INITIALIZATION(optional(std::in_place, BOUNDED_FORWARD(other))) {
 	}
-	template<typename U, BOUNDED_REQUIRES(!std::is_convertible_v<U &&, value_type> and std::is_constructible_v<value_type, U &&>)>
+	template<typename U> requires (!std::is_convertible_v<U &&, value_type> and std::is_constructible_v<value_type, U &&>)
 	constexpr explicit optional(U && other)
 		BOUNDED_NOEXCEPT_INITIALIZATION(optional(std::in_place, BOUNDED_FORWARD(other))) {
 	}
 
 
-	template<typename U, BOUNDED_REQUIRES(std::is_convertible_v<U const &, value_type>)>
+	template<typename U> requires std::is_convertible_v<U const &, value_type>
 	constexpr optional(optional<U> const & other)
 		BOUNDED_NOEXCEPT_INITIALIZATION(optional(other, common_init_tag{})) {
 	}
-	template<typename U, BOUNDED_REQUIRES(std::is_convertible_v<U &&, value_type>)>
+	template<typename U> requires std::is_convertible_v<U &&, value_type>
 	constexpr optional(optional<U> && other)
 		BOUNDED_NOEXCEPT_INITIALIZATION(optional(std::move(other), common_init_tag{})) {
 	}
-	template<typename U, BOUNDED_REQUIRES(!std::is_convertible_v<U const &, value_type> and std::is_constructible_v<value_type, U const &>)>
+	template<typename U> requires (!std::is_convertible_v<U const &, value_type> and std::is_constructible_v<value_type, U const &>)
 	constexpr explicit optional(optional<U> const & other)
 		BOUNDED_NOEXCEPT_INITIALIZATION(optional(other, common_init_tag{})) {
 	}
-	template<typename U, BOUNDED_REQUIRES(!std::is_convertible_v<U &&, value_type> and std::is_constructible_v<value_type, U &&>)>
+	template<typename U> requires (!std::is_convertible_v<U &&, value_type> and std::is_constructible_v<value_type, U &&>)
 	constexpr explicit optional(optional<U> && other)
 		BOUNDED_NOEXCEPT_INITIALIZATION(optional(std::move(other), common_init_tag{})) {
 	}
@@ -201,7 +200,7 @@ public:
 		return *this;
 	}
 	// TODO: make this work when value_type is a reference
-	template<typename U, BOUNDED_REQUIRES(std::is_convertible_v<U &&, value_type>)>
+	template<typename U> requires(std::is_convertible_v<U &&, value_type>)
 	constexpr auto && operator=(U && other) & noexcept(noexcept(detail::assign(std::declval<optional &>(), BOUNDED_FORWARD(other)))) {
 		return detail::assign(*this, BOUNDED_FORWARD(other));
 	}
@@ -219,7 +218,7 @@ private:
 	optional_storage m_value;
 };
 
-template<typename T, BOUNDED_REQUIRES(!std::is_same_v<T, none_t> and !std::is_same_v<T, std::in_place_t>)>
+template<typename T> requires(!std::is_same_v<T, none_t> and !std::is_same_v<T, std::in_place_t>)
 optional(T) -> optional<T>;
 
 template<typename T>

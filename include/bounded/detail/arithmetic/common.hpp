@@ -10,7 +10,6 @@
 #include <bounded/detail/forward.hpp>
 #include <bounded/detail/is_bounded_integer.hpp>
 #include <bounded/detail/noexcept.hpp>
-#include <bounded/detail/requires.hpp>
 
 #include <type_traits>
 
@@ -49,7 +48,7 @@ constexpr auto incrementable = false;
 template<typename T>
 constexpr auto incrementable<T, std::void_t<decltype(++std::declval<T &>())>> = true;
 
-template<typename T, BOUNDED_REQUIRES(incrementable<T> and std::is_copy_constructible_v<T>)>
+template<typename T> requires(incrementable<T> and std::is_copy_constructible_v<T>)
 constexpr auto operator++(T & value, int) noexcept(std::is_nothrow_copy_constructible_v<T> and std::is_nothrow_move_constructible_v<T> and noexcept(++value)) {
 	auto previous = value;
 	++value;
@@ -68,7 +67,7 @@ constexpr auto decrementable = false;
 template<typename T>
 constexpr auto decrementable<T, std::void_t<decltype(--std::declval<T &>())>> = true;
 
-template<typename T, BOUNDED_REQUIRES(decrementable<T>)>
+template<typename T> requires(decrementable<T>)
 constexpr auto operator--(T & value, int) noexcept(std::is_nothrow_copy_constructible_v<T> and std::is_nothrow_move_constructible_v<T> and noexcept(--value)) {
 	auto previous = value;
 	--value;

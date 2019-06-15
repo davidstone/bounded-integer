@@ -7,6 +7,7 @@
 
 #include <bounded/detail/class.hpp>
 #include <bounded/detail/comparison.hpp>
+#include <bounded/detail/copy_cv_ref.hpp>
 #include <bounded/detail/type.hpp>
 #include <bounded/detail/variant/get_index.hpp>
 #include <bounded/detail/variant/special_member_functions.hpp>
@@ -29,9 +30,11 @@ public:
 
 	constexpr basic_variant(basic_variant const &) = default;
 	constexpr basic_variant(basic_variant &&) = default;
+
 	constexpr auto operator=(basic_variant const &) & -> basic_variant & = default;
 	constexpr auto operator=(basic_variant &&) & -> basic_variant & = default;
-	template<typename T, BOUNDED_REQUIRES(!std::is_same_v<std::decay_t<T>, basic_variant>)>
+
+	template<typename T, typename std::enable_if<!std::is_same_v<std::decay_t<T>, basic_variant>, int>::type = {}>
 	constexpr auto operator=(T && value) & BOUNDED_NOEXCEPT_REF(
 		(this->assignment(BOUNDED_FORWARD(value)), *this)
 	)
@@ -53,7 +56,7 @@ struct equality_visitor {
 	constexpr auto operator()(visitor_parameter<T, n> const lhs, visitor_parameter<T, n> const rhs) const BOUNDED_NOEXCEPT_DECLTYPE(
 		lhs.value == rhs.value
 	)
-	template<typename LHS, auto lhs_n, typename RHS, auto rhs_n, BOUNDED_REQUIRES(lhs_n != rhs_n)>
+	template<typename LHS, auto lhs_n, typename RHS, auto rhs_n> requires(lhs_n != rhs_n)
 	constexpr auto operator()(visitor_parameter<LHS, lhs_n>, visitor_parameter<RHS, rhs_n>) const noexcept {
 		return false;
 	}

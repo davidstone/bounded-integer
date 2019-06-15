@@ -8,12 +8,11 @@
 #include <bounded/detail/cast.hpp>
 #include <bounded/detail/is_bounded_integer.hpp>
 #include <bounded/detail/minmax.hpp>
-#include <bounded/detail/requires.hpp>
 #include <bounded/detail/arithmetic/unary_minus.hpp>
 
 namespace bounded {
 
-template<typename Integer, BOUNDED_REQUIRES(is_bounded_integer<Integer>)>
+template<typename Integer> requires is_bounded_integer<Integer>
 constexpr auto abs(Integer const value) noexcept {
 	if constexpr (Integer::min() >= constant<0>) {
 		return value;

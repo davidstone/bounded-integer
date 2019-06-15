@@ -32,7 +32,7 @@ constexpr auto has_pop_front<
 
 namespace common {
 
-template<typename Container, BOUNDED_REQUIRES(is_container<Container>)>
+template<typename Container> requires is_container<Container>
 constexpr auto clear(Container & container) noexcept {
 	if constexpr (has_pop_back<Container>) {
 		while (!empty(container)) {

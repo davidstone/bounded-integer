@@ -6,7 +6,6 @@
 #pragma once
 
 #include <bounded/detail/class.hpp>
-#include <bounded/detail/requires.hpp>
 #include <bounded/detail/type.hpp>
 
 #include <type_traits>
@@ -113,7 +112,7 @@ constexpr auto is_variants_then_visit_function<0U, TransformFunction, Function, 
 
 
 
-template<typename Function, std::size_t... indexes, typename... Variants, BOUNDED_REQUIRES(sizeof...(indexes) == sizeof...(Variants))>
+template<typename Function, std::size_t... indexes, typename... Variants> requires(sizeof...(indexes) == sizeof...(Variants))
 constexpr decltype(auto) visit_implementation(
 	Function && function,
 	std::index_sequence<indexes...>,
@@ -130,7 +129,7 @@ constexpr decltype(auto) visit_implementation(
 
 // This function accepts the pack of all variants twice. It passes over them
 // once to get all the indexes, then again to pull out the values.
-template<typename Function, std::size_t... indexes, typename Index, typename Variant, typename... Variants, BOUNDED_REQUIRES(sizeof...(indexes) < sizeof...(Variants))>
+template<typename Function, std::size_t... indexes, typename Index, typename Variant, typename... Variants> requires(sizeof...(indexes) < sizeof...(Variants))
 constexpr decltype(auto) visit_implementation(
 	Function && function,
 	std::index_sequence<indexes...> initial_indexes,
@@ -183,7 +182,7 @@ private:
 	};
 public:
 	// Any number of variants (including 0) followed by one function
-	template<typename... Args, BOUNDED_REQUIRES(detail::is_variants_then_visit_function<sizeof...(Args) - 1U, decltype(identity), Args...>)>
+	template<typename... Args> requires detail::is_variants_then_visit_function<sizeof...(Args) - 1U, decltype(identity), Args...>
 	constexpr decltype(auto) operator()(Args && ... args) const {
 		return detail::reorder_transform(detail::visit_interface(identity), BOUNDED_FORWARD(args)...);
 	}
@@ -201,7 +200,7 @@ private:
 		);
 	};
 public:
-	template<typename... Args, BOUNDED_REQUIRES(detail::is_variants_then_visit_function<sizeof...(Args) - 1U, decltype(get_value_only), Args...>)>
+	template<typename... Args> requires detail::is_variants_then_visit_function<sizeof...(Args) - 1U, decltype(get_value_only), Args...>
 	constexpr decltype(auto) operator()(Args && ... args) const {
 		return detail::reorder_transform(detail::visit_interface(get_value_only), BOUNDED_FORWARD(args)...);
 	}

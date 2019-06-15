@@ -49,7 +49,7 @@ private:
 	Iterator m_it;
 };
 
-template<typename Iterator, typename Offset, BOUNDED_REQUIRES(std::numeric_limits<Offset>::is_integer)>
+template<typename Iterator, typename Offset> requires std::numeric_limits<Offset>::is_integer
 constexpr auto operator+(legacy_iterator<Iterator> const lhs, Offset const rhs) BOUNDED_NOEXCEPT(
 	legacy_iterator<Iterator>(lhs.base() + static_cast<typename std::iterator_traits<Iterator>::difference_type>(rhs))
 )

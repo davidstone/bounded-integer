@@ -169,7 +169,7 @@ public:
 		return operator_star(bounded::constant<0>);
 	}
 
-	template<typename Offset, BOUNDED_REQUIRES(
+	template<typename Offset> requires(
 		std::is_convertible_v<Offset, difference_type> and
 		(
 			!bounded::is_bounded_integer<difference_type> or
@@ -182,7 +182,7 @@ public:
 				(... and detail::is_forward_random_access<RangeViews>)
 			)
 		)
-	)>
+	)
 	friend constexpr auto operator+(concatenate_view_iterator const lhs, Offset const offset) {
 		return operator_plus(
 			lhs.m_range_views,

@@ -431,6 +431,7 @@ elseif("${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU")
 	set(COMPILE_OPTIONS
 		"-g"
 		"-march=native"
+		"-fconcepts"
 		# We have to start by turning off all warnings just so we can disable a
 		# warning about an inaccessible base class. Then we turn on all
 		# possible warnings. This means that some on-by-default warnings are

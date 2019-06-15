@@ -22,20 +22,20 @@ constexpr auto has_member_push_back<
 	std::void_t<decltype(std::declval<Container &>().push_back(std::declval<typename Container::value_type>()))>
 > = true;
 
-template<typename Container, BOUNDED_REQUIRES(!has_member_push_back<Container>)>
+template<typename Container> requires(!has_member_push_back<Container>)
 constexpr auto push_back(Container & container, typename Container::value_type const & value) BOUNDED_NOEXCEPT_DECLTYPE(
 	container.emplace_back(value)
 )
-template<typename Container, BOUNDED_REQUIRES(!has_member_push_back<Container>)>
+template<typename Container> requires(!has_member_push_back<Container>)
 constexpr auto push_back(Container & container, typename Container::value_type && value) BOUNDED_NOEXCEPT_DECLTYPE(
 	container.emplace_back(std::move(value))
 )
 
-template<typename Container, BOUNDED_REQUIRES(has_member_push_back<Container>)>
+template<typename Container> requires has_member_push_back<Container>
 constexpr auto push_back(Container & container, typename Container::value_type const & value) BOUNDED_NOEXCEPT_DECLTYPE(
 	container.push_back(value)
 )
-template<typename Container, BOUNDED_REQUIRES(has_member_push_back<Container>)>
+template<typename Container> requires has_member_push_back<Container>
 constexpr auto push_back(Container & container, typename Container::value_type && value) BOUNDED_NOEXCEPT_DECLTYPE(
 	container.push_back(std::move(value))
 )

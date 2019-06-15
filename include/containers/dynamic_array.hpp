@@ -81,12 +81,8 @@ constexpr auto cleanup(dynamic_array_data<T> const data) noexcept {
 
 
 
-template<
-	typename T,
-	typename ForwardIterator,
-	typename Sentinel,
-	BOUNDED_REQUIRES(is_iterator_sentinel<ForwardIterator, Sentinel>)
->
+template<typename T, typename ForwardIterator, typename Sentinel> requires
+	is_iterator_sentinel<ForwardIterator, Sentinel>
 auto dynamic_array_initializer(ForwardIterator first, Sentinel const last) {
 	auto const data = make_storage<T>(::containers::distance(first, last));
 	try {
@@ -99,11 +95,8 @@ auto dynamic_array_initializer(ForwardIterator first, Sentinel const last) {
 }
 
 
-template<
-	typename T,
-	typename Size,
-	BOUNDED_REQUIRES(std::is_convertible_v<Size, typename dynamic_array_data<T>::size_type>)
->
+template<typename T, typename Size> requires
+	std::is_convertible_v<Size, typename dynamic_array_data<T>::size_type>
 auto dynamic_array_initializer(Size const size) {
 	auto const data = make_storage<T>(size);
 	try {
@@ -128,16 +121,16 @@ struct dynamic_array {
 	
 	constexpr dynamic_array() = default;
 
-	template<typename ForwardIterator, typename Sentinel, BOUNDED_REQUIRES(is_iterator_sentinel<ForwardIterator, Sentinel>)>
+	template<typename ForwardIterator, typename Sentinel> requires is_iterator_sentinel<ForwardIterator, Sentinel>
 	constexpr dynamic_array(ForwardIterator first, Sentinel const last):
 		m_data(::containers::detail::dynamic_array_initializer<value_type>(first, last))
 	{
 	}
 	
-	template<typename Range, BOUNDED_REQUIRES(
+	template<typename Range> requires(
 		is_range<Range> and
 		!std::is_array_v<std::remove_cv_t<std::remove_reference_t<Range>>>
-	)>
+	)
 	constexpr explicit dynamic_array(Range && range) BOUNDED_NOEXCEPT_INITIALIZATION(
 		dynamic_array(begin(BOUNDED_FORWARD(range)), end(BOUNDED_FORWARD(range)))
 	) {
@@ -148,12 +141,12 @@ struct dynamic_array {
 	{
 	}
 
-	template<typename Count, BOUNDED_REQUIRES(std::is_convertible_v<Count, size_type>)>
+	template<typename Count> requires std::is_convertible_v<Count, size_type>
 	explicit constexpr dynamic_array(Count const count):
 		m_data(::containers::detail::dynamic_array_initializer<value_type>(count))
 	{
 	}
-	template<typename Count, BOUNDED_REQUIRES(std::is_convertible_v<Count, size_type>)>
+	template<typename Count> requires std::is_convertible_v<Count, size_type>
 	constexpr dynamic_array(Count const count, value_type const & value) {
 		auto const range = repeat_n(count, value);
 		m_data = ::containers::detail::dynamic_array_initializer<value_type>(begin(range), end(range));
@@ -208,7 +201,8 @@ template<typename T>
 constexpr auto is_container<dynamic_array<T>> = true;
 
 
-template<typename T, typename ForwardIterator, typename Sentinel, BOUNDED_REQUIRES(is_iterator_sentinel<ForwardIterator, Sentinel>)>
+template<typename T, typename ForwardIterator, typename Sentinel> requires
+	is_iterator_sentinel<ForwardIterator, Sentinel>
 auto assign(dynamic_array<T> & container, ForwardIterator first, Sentinel const last) {
 	auto const difference = ::containers::distance(first, last);
 	if (difference == size(container)) {

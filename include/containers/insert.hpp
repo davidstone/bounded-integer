@@ -17,11 +17,11 @@ namespace containers {
 namespace detail {
 namespace common {
 
-template<typename Container, BOUNDED_REQUIRES(is_container<Container>)>
+template<typename Container> requires is_container<Container>
 constexpr auto insert(Container & container, typename Container::const_iterator const position, typename Container::value_type const & value) BOUNDED_NOEXCEPT(
 	container.emplace(position, value)
 )
-template<typename Container, BOUNDED_REQUIRES(is_container<Container>)>
+template<typename Container> requires is_container<Container>
 constexpr auto insert(Container & container, typename Container::const_iterator const position, typename Container::value_type && value) BOUNDED_NOEXCEPT(
 	container.emplace(position, std::move(value))
 )

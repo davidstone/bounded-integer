@@ -25,26 +25,26 @@ constexpr auto has_reserve<
 	std::void_t<decltype(std::declval<Container>().reserve(std::declval<typename Container::size_type>()))>
 > = true;
 
-template<typename Container, BOUNDED_REQUIRES(is_container<Container> and !has_reserve<Container>)>
+template<typename Container> requires(is_container<Container> and !has_reserve<Container>)
 constexpr void reserve_if_reservable(Container &, typename Container::size_type) noexcept {
 }
 
-template<typename Container, BOUNDED_REQUIRES(is_container<Container> and has_reserve<Container>)>
+template<typename Container> requires(is_container<Container> and has_reserve<Container>)
 constexpr auto reserve_if_reservable(Container & container, typename Container::size_type const size) BOUNDED_NOEXCEPT_DECLTYPE(
 	container.reserve(size)
 )
 
-template<typename Container, typename Integer, BOUNDED_REQUIRES(is_container<Container>)>
+template<typename Container, typename Integer> requires is_container<Container>
 constexpr auto reallocation_size(Container const & container, Integer const count) BOUNDED_NOEXCEPT_VALUE(
 	static_cast<typename Container::size_type>(bounded::max(size(container) + count, container.capacity() * 2_bi))
 )
 
-template<typename Container, typename Integer, BOUNDED_REQUIRES(is_container<Container> and !has_reserve<Container>)>
+template<typename Container, typename Integer> requires(is_container<Container> and !has_reserve<Container>)
 constexpr void growth_reallocation(Container const & container, Integer const count) noexcept {
 	BOUNDED_ASSERT(container.capacity() >= size(container) + count);
 }
 
-template<typename Container, typename Integer, BOUNDED_REQUIRES(is_container<Container> and has_reserve<Container>)>
+template<typename Container, typename Integer> requires(is_container<Container> and has_reserve<Container>)
 constexpr auto growth_reallocation(Container & container, Integer const count) BOUNDED_NOEXCEPT_DECLTYPE(
 	container.reserve(::containers::detail::reallocation_size(container, count))
 )

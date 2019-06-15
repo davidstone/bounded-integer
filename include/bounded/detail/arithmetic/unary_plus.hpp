@@ -6,11 +6,10 @@
 #pragma once
 
 #include <bounded/detail/is_bounded_integer.hpp>
-#include <bounded/detail/requires.hpp>
 
 namespace bounded {
 
-template<typename Integer, BOUNDED_REQUIRES(is_bounded_integer<Integer>)>
+template<typename Integer> requires is_bounded_integer<Integer>
 constexpr auto operator+(Integer const value) noexcept {
 	return value;
 }

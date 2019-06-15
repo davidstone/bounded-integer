@@ -20,7 +20,9 @@ namespace detail {
 namespace common {
 
 // TODO: noexcept
-template<typename Container, typename InputIterator, typename Sentinel, BOUNDED_REQUIRES(is_container<Container> and is_iterator_sentinel<InputIterator, Sentinel>)>
+template<typename Container, typename InputIterator, typename Sentinel> requires(
+	is_container<Container> and is_iterator_sentinel<InputIterator, Sentinel>
+)
 constexpr auto assign(Container & container, InputIterator first, Sentinel const last) {
 	// TODO: Do we try to reuse storage like this or just clear() + construct
 	auto it = begin(container);
@@ -36,11 +38,11 @@ constexpr auto assign(Container & container, InputIterator first, Sentinel const
 		container.emplace_back(*first);
 	}
 }
-template<typename Container, BOUNDED_REQUIRES(is_container<Container>)>
+template<typename Container> requires is_container<Container>
 constexpr auto assign(Container & container, std::initializer_list<typename Container::value_type> init) BOUNDED_NOEXCEPT(
 	assign(container, begin(init), end(init))
 )
-template<typename Container, typename Size, BOUNDED_REQUIRES(is_container<Container> and std::numeric_limits<Size>::is_integer)>
+template<typename Container, typename Size> requires(is_container<Container> and std::numeric_limits<Size>::is_integer)
 constexpr auto assign(Container & container, Size const count, typename Container::value_type const & value) {
 	auto const range = repeat_n(count, value);
 	assign(container, begin(range), end(range));

@@ -54,20 +54,20 @@ template<typename T> \
 constexpr auto has_rvalue_ ## begin_or_end<T, decltype(rvalue_ref_qualified(&T::begin_or_end))> = true; \
 \
 \
-template<typename Range, BOUNDED_REQUIRES( \
+template<typename Range> requires( \
 	std::is_rvalue_reference_v<Range &&> and \
 	has_rvalue_ ## begin_or_end<Range> \
-)> \
-constexpr auto begin_or_end(Range && range) BOUNDED_NOEXCEPT_VALUE( \
+) \
+constexpr auto begin_or_end(Range && range) BOUNDED_NOEXCEPT( \
 	std::move(range).begin_or_end() \
 ) \
 \
-template<typename Container, BOUNDED_REQUIRES( \
+template<typename Container> requires( \
 	is_container<Container> and \
 	std::is_rvalue_reference_v<Container &&> and \
 	!has_rvalue_ ## begin_or_end<std::decay_t<Container>> \
-)> \
-constexpr auto begin_or_end(Container && container) BOUNDED_NOEXCEPT_VALUE( \
+) \
+constexpr auto begin_or_end(Container && container) BOUNDED_NOEXCEPT( \
 	::containers::move_iterator(begin_or_end(container)) \
 )
 

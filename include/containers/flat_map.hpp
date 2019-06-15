@@ -151,10 +151,10 @@ public:
 		);
 	}
 
-	template<typename Range, BOUNDED_REQUIRES(
+	template<typename Range> requires(
 		is_range<Range> and
 		!std::is_array_v<std::remove_cv_t<std::remove_reference_t<Range>>>
-	)>
+	)
 	constexpr explicit flat_map_base(Range && range) BOUNDED_NOEXCEPT_INITIALIZATION(
 		flat_map_base(begin(BOUNDED_FORWARD(range)), end(BOUNDED_FORWARD(range)))
 	) {

@@ -8,23 +8,22 @@
 #include <bounded/detail/arithmetic/common.hpp>
 #include <bounded/detail/class.hpp>
 #include <bounded/detail/is_bounded_integer.hpp>
-#include <bounded/detail/requires.hpp>
 
 namespace bounded {
 
-template<typename T, typename Integer, BOUNDED_REQUIRES(
+template<typename T, typename Integer> requires(
 	is_bounded_integer<Integer> and
 	(std::is_pointer_v<T> or (std::is_array_v<T> and Integer::max() <= constant<std::extent_v<T>>))
-)>
+)
 constexpr auto operator+(T const & array, Integer const number) noexcept {
 	return array + number.value();
 }
 
 
-template<typename Integer, typename T, BOUNDED_REQUIRES(
+template<typename Integer, typename T> requires(
 	is_bounded_integer<Integer> and
 	(std::is_pointer_v<T> or (std::is_array_v<T> and Integer::max() <= constant<std::extent_v<T>>))
-)>
+)
 constexpr auto operator+(Integer const number, T const & array) noexcept {
 	return number.value() + array;
 }

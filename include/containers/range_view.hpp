@@ -35,7 +35,7 @@ struct range_view {
 		range_view(std::move(pair).first, std::move(pair).second)
 	) {
 	}
-	template<typename Range, BOUNDED_REQUIRES(is_range<Range>)>
+	template<typename Range> requires is_range<Range>
 	constexpr explicit range_view(Range & range) BOUNDED_NOEXCEPT_INITIALIZATION(
 		range_view(begin(range), end(range))
 	) {

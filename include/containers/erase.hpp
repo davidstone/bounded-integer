@@ -23,7 +23,7 @@ namespace common {
 
 // TODO: conditional noexcept
 // TODO: this implementation is for contiguous ranges
-template<typename Container, typename Iterator, BOUNDED_REQUIRES(is_container<Container> and is_iterator<Iterator>)>
+template<typename Container, typename Iterator> requires(is_container<Container> and is_iterator<Iterator>)
 constexpr auto erase(Container & container, Iterator const first_, Iterator const last_) noexcept {
 	auto const first = ::containers::detail::mutable_iterator(container, first_);
 	auto const last = ::containers::detail::mutable_iterator(container, last_);
@@ -33,13 +33,13 @@ constexpr auto erase(Container & container, Iterator const first_, Iterator cons
 	}
 	return first;
 }
-template<typename Container, BOUNDED_REQUIRES(is_container<Container>)>
+template<typename Container> requires is_container<Container>
 constexpr auto erase(Container & container, typename Container::const_iterator const it) {
 	BOUNDED_ASSERT(it != end(container));
 	return erase(container, it, ::containers::next(it));
 }
 
-template<typename Container, typename Predicate, BOUNDED_REQUIRES(is_container<Container>)>
+template<typename Container, typename Predicate> requires is_container<Container>
 constexpr auto erase_if(Container & container, Predicate predicate) {
 	return erase(container, ::containers::remove_if(container, std::move(predicate)), end(container));
 }

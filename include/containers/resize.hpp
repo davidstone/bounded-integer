@@ -30,11 +30,11 @@ constexpr auto resize(common_resize_tag, Container & container, Size const count
 
 namespace common {
 
-template<typename Container, typename Size, BOUNDED_REQUIRES(is_container<Container>)>
+template<typename Container, typename Size> requires is_container<Container>
 constexpr auto resize(Container & container, Size const count) BOUNDED_NOEXCEPT(
 	resize(common_resize_tag{}, container, count)
 )
-template<typename Container, typename Size, BOUNDED_REQUIRES(is_container<Container>)>
+template<typename Container, typename Size> requires is_container<Container>
 constexpr auto resize(Container & container, Size const count, typename Container::value_type const & value) BOUNDED_NOEXCEPT(
 	resize(common_resize_tag{}, container, count, value)
 )

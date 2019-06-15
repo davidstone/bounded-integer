@@ -37,7 +37,7 @@ struct dynamic_resizable_array : private Container {
 
 	constexpr dynamic_resizable_array() noexcept {}
 	
-	template<typename Count, BOUNDED_REQUIRES(std::is_convertible_v<Count, size_type>)>
+	template<typename Count> requires std::is_convertible_v<Count, size_type>
 	constexpr explicit dynamic_resizable_array(Count const count) {
 		if (count > capacity()) {
 			this->relocate(count);
@@ -45,21 +45,21 @@ struct dynamic_resizable_array : private Container {
 		::containers::uninitialized_default_construct(begin(*this), begin(*this) + count);
 		this->set_size(count);
 	}
-	template<typename Count, BOUNDED_REQUIRES(std::is_convertible_v<Count, size_type>)>
+	template<typename Count> requires std::is_convertible_v<Count, size_type>
 	constexpr dynamic_resizable_array(Count const count, value_type const & value) {
 		auto const repeat = repeat_n(count, value);
 		assign(*this, begin(repeat), end(repeat));
 	}
 	
-	template<typename ForwardIterator, typename Sentinel, BOUNDED_REQUIRES(is_iterator_sentinel<ForwardIterator, Sentinel>)>
+	template<typename ForwardIterator, typename Sentinel> requires is_iterator_sentinel<ForwardIterator, Sentinel>
 	constexpr dynamic_resizable_array(ForwardIterator first, Sentinel const last) {
 		assign(*this, first, last);
 	}
 	
-	template<typename Range, BOUNDED_REQUIRES(
+	template<typename Range> requires(
 		is_range<Range> and
 		!std::is_array_v<std::remove_cv_t<std::remove_reference_t<Range>>>
-	)>
+	)
 	constexpr explicit dynamic_resizable_array(Range && range) BOUNDED_NOEXCEPT_INITIALIZATION(
 		dynamic_resizable_array(begin(BOUNDED_FORWARD(range)), end(BOUNDED_FORWARD(range)))
 	) {
