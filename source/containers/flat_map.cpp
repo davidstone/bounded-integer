@@ -4,6 +4,7 @@
 // http://www.boost.org/LICENSE_1_0.txt)
 
 #include <containers/flat_map.hpp>
+#include <containers/static_vector/static_vector.hpp>
 #include <containers/vector.hpp>
 
 #include <bounded/detail/forward.hpp>
@@ -24,6 +25,18 @@ namespace {
 
 using namespace bounded::literal;
 using namespace containers;
+
+void test_constexpr_constructed() {
+	using base = containers::static_vector<containers::map_value_type<int, int>, 10>;
+	constexpr auto constexpr_constructible = containers::basic_flat_map<base>{
+		{1, 2},
+		{3, 5},
+		{0, 4}
+	};
+	BOUNDED_TEST(constexpr_constructible.find(0) != end(constexpr_constructible));
+	BOUNDED_TEST(constexpr_constructible.find(0)->key() == 0);
+	BOUNDED_TEST(constexpr_constructible.find(0)->mapped() == 4);
+}
 
 class CheckedMover {
 public:
@@ -393,6 +406,7 @@ BOUNDED_COMPARISON
 }	// namespace
 
 int main(int argc, char ** argv) {
+	test_constexpr_constructed();
 	test_unique();
 	test<map_type<int, int>>();
 

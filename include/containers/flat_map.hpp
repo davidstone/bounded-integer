@@ -6,6 +6,7 @@
 #pragma once
 
 #include <containers/algorithms/negate.hpp>
+#include <containers/algorithms/sort.hpp>
 #include <containers/algorithms/unique.hpp>
 #include <containers/common_container_functions.hpp>
 #include <containers/legacy_iterator.hpp>
@@ -137,11 +138,7 @@ public:
 		// TODO: noexcept?
 		m_data(Container(first, last), std::move(compare))
 	{
-		std::sort(
-			legacy_iterator(begin(container())),
-			legacy_iterator(end(container())),
-			value_compare()
-		);
+		sort(container(), value_compare());
 		// At some point this should be unique_sort
 		auto const equal = ::containers::negate(value_compare());
 		::containers::erase(
@@ -290,14 +287,12 @@ public:
 		// merge sort on both ranges, rather than calling std::sort on the
 		// entire container.
 		auto const midpoint = append(container(), BOUNDED_FORWARD(range));
-		auto const lmidpoint = legacy_iterator(midpoint);
-		auto const lend = legacy_iterator(end(container()));
-		std::sort(lmidpoint, lend, value_compare());
+		sort(midpoint, end(container()), value_compare());
 		if (allow_duplicates) {
 			std::inplace_merge(
 				legacy_iterator(begin(container())),
-				lmidpoint,
-				lend,
+				legacy_iterator(midpoint),
+				legacy_iterator(end(container())),
 				value_compare()
 			);
 		} else {
