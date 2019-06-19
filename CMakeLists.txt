@@ -404,13 +404,13 @@ if(MSVC)
 	)
 
 	if("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang")
-		set(COMPILE_OPTIONS
+		target_compile_options(bounded INTERFACE
 			${COMMON_CLANG_COMPILE_OPTIONS}
 		)
 		# Sanitizers currently do not work very well on Windows
 		set(USE_SANITIZERS OFF)
 	else()
-		set(COMPILE_OPTIONS
+		target_compile_options(bounded INTERFACE
 			"/FI ciso646"
 		)
 		set(USE_SANITIZERS OFF)
@@ -420,7 +420,7 @@ elseif("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang")
 	target_compile_options(bounded INTERFACE
 		"-std=c++2a"
 	)
-	set(COMPILE_OPTIONS
+	target_compile_options(bounded INTERFACE
 		${COMMON_CLANG_COMPILE_OPTIONS}
 		"-g"
 		"-march=native"
@@ -430,7 +430,7 @@ elseif("${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU")
 	target_compile_options(bounded INTERFACE
 		"-std=c++2a"
 	)
-	set(COMPILE_OPTIONS
+	target_compile_options(bounded INTERFACE
 		"-g"
 		"-march=native"
 		"-fconcepts"
@@ -549,14 +549,13 @@ elseif("${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU")
 	)
 endif()
 
-target_compile_options(flat_map PRIVATE ${COMPILE_OPTIONS} "-DUSE_FLAT_MAP")
+target_compile_definitions(flat_map PRIVATE "USE_FLAT_MAP")
 
 set(test_targets bounded_test concatenate stable_vector static_vector small_buffer_optimized_vector flat_map vector string dynamic_array variant)
 set(all_targets ${test_targets} containers_test)
 
 set(sanitizers "-fsanitize=undefined" "-fsanitize=address")
 foreach(target ${all_targets})
-	target_compile_options(${target} PRIVATE ${COMPILE_OPTIONS})
 	if(DEFINED USE_SANITIZERS)
 		if(${USE_SANITIZERS})
 			target_compile_options(${target} PUBLIC ${sanitizers})
