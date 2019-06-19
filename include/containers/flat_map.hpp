@@ -60,6 +60,9 @@ constexpr auto operator==(map_value_type<Key, Mapped> const & lhs, map_value_typ
 	lhs.as_tuple() == rhs.as_tuple()
 )
 
+constexpr inline struct assume_sorted_unique_t {} assume_sorted_unique;
+constexpr inline struct assume_unique_t {} assume_unique;
+
 namespace detail {
 
 template<typename Iterator>
@@ -121,28 +124,140 @@ public:
 		m_compare(std::move(compare))
 	{
 	}
-	template<typename InputIterator, typename Sentinel>
-	constexpr flat_map_base(InputIterator first, Sentinel last, key_compare_type compare = key_compare_type{}):
+
+	template<typename InputRange> requires is_range<InputRange>
+	constexpr explicit flat_map_base(InputRange && range):
+		m_container(BOUNDED_FORWARD(range))
+	{
+		unique_sort(m_container, value_compare());
+	}
+
+	template<typename InputRange> requires is_range<InputRange>
+	constexpr flat_map_base(InputRange && range, key_compare_type compare):
+		m_container(BOUNDED_FORWARD(range)),
+		m_compare(std::move(compare))
+	{
+		unique_sort(m_container, value_compare());
+	}
+
+	template<typename InputRange> requires is_range<InputRange>
+	constexpr flat_map_base(assume_sorted_unique_t, InputRange && range):
+		m_container(BOUNDED_FORWARD(range))
+	{
+		BOUNDED_ASSERT(is_sorted(m_container));
+	}
+
+	template<typename InputRange> requires is_range<InputRange>
+	constexpr flat_map_base(assume_sorted_unique_t, InputRange && range, key_compare_type compare):
+		m_container(BOUNDED_FORWARD(range)),
+		m_compare(std::move(compare))
+	{
+		BOUNDED_ASSERT(is_sorted(m_container));
+	}
+
+	template<typename InputRange> requires is_range<InputRange>
+	constexpr flat_map_base(assume_unique_t, InputRange && range):
+		m_container(BOUNDED_FORWARD(range))
+	{
+		sort(m_container);
+	}
+
+	template<typename InputRange> requires is_range<InputRange>
+	constexpr flat_map_base(assume_unique_t, InputRange && range, key_compare_type compare):
+		m_container(BOUNDED_FORWARD(range)),
+		m_compare(std::move(compare))
+	{
+		sort(m_container);
+	}
+
+
+
+	template<typename InputIterator, typename Sentinel> requires is_iterator_sentinel<InputIterator, Sentinel>
+	constexpr explicit flat_map_base(InputIterator const first, Sentinel const last):
+		m_container(first, last)
+	{
+		unique_sort(m_container, value_compare());
+	}
+
+	template<typename InputIterator, typename Sentinel> requires is_iterator_sentinel<InputIterator, Sentinel>
+	constexpr flat_map_base(InputIterator const first, Sentinel const last, key_compare_type compare):
 		m_container(first, last),
 		m_compare(std::move(compare))
 	{
 		unique_sort(m_container, value_compare());
 	}
 
-	template<typename Range> requires(
-		is_range<Range> and
-		!std::is_array_v<std::remove_cv_t<std::remove_reference_t<Range>>>
-	)
-	constexpr explicit flat_map_base(Range && range) BOUNDED_NOEXCEPT_INITIALIZATION(
-		flat_map_base(begin(BOUNDED_FORWARD(range)), end(BOUNDED_FORWARD(range)))
-	) {
+	template<typename InputIterator, typename Sentinel> requires is_iterator_sentinel<InputIterator, Sentinel>
+	constexpr flat_map_base(assume_sorted_unique_t, InputIterator const first, Sentinel const last):
+		m_container(first, last)
+	{
+		BOUNDED_ASSERT(is_sorted(m_container));
 	}
 
-	constexpr flat_map_base(std::initializer_list<value_type> init, key_compare_type compare = key_compare_type{}) BOUNDED_NOEXCEPT_INITIALIZATION(
-		flat_map_base(begin(init), end(init), std::move(compare))
-	) {
+	template<typename InputIterator, typename Sentinel> requires is_iterator_sentinel<InputIterator, Sentinel>
+	constexpr flat_map_base(assume_sorted_unique_t, InputIterator const first, Sentinel const last, key_compare_type compare):
+		m_container(first, last),
+		m_compare(std::move(compare))
+	{
+		BOUNDED_ASSERT(is_sorted(m_container));
 	}
-	
+
+	template<typename InputIterator, typename Sentinel> requires is_iterator_sentinel<InputIterator, Sentinel>
+	constexpr flat_map_base(assume_unique_t, InputIterator const first, Sentinel const last):
+		m_container(first, last)
+	{
+		sort(m_container);
+	}
+
+	template<typename InputIterator, typename Sentinel> requires is_iterator_sentinel<InputIterator, Sentinel>
+	constexpr flat_map_base(assume_unique_t, InputIterator const first, Sentinel const last, key_compare_type compare):
+		m_container(first, last),
+		m_compare(std::move(compare))
+	{
+		sort(m_container);
+	}
+
+
+
+	constexpr flat_map_base(std::initializer_list<value_type> range):
+		m_container(range)
+	{
+		unique_sort(m_container, value_compare());
+	}
+
+	constexpr flat_map_base(std::initializer_list<value_type> range, key_compare_type compare):
+		m_container(range),
+		m_compare(std::move(compare))
+	{
+		unique_sort(m_container, value_compare());
+	}
+
+	constexpr flat_map_base(assume_sorted_unique_t, std::initializer_list<value_type> range):
+		m_container(range)
+	{
+		BOUNDED_ASSERT(is_sorted(m_container));
+	}
+
+	constexpr flat_map_base(assume_sorted_unique_t, std::initializer_list<value_type> range, key_compare_type compare):
+		m_container(range),
+		m_compare(std::move(compare))
+	{
+		BOUNDED_ASSERT(is_sorted(m_container));
+	}
+
+	constexpr flat_map_base(assume_unique_t, std::initializer_list<value_type> range):
+		m_container(range)
+	{
+		sort(m_container);
+	}
+
+	constexpr flat_map_base(assume_unique_t, std::initializer_list<value_type> range, key_compare_type compare):
+		m_container(range),
+		m_compare(std::move(compare))
+	{
+		sort(m_container);
+	}
+
 	constexpr auto & operator=(std::initializer_list<value_type> init) & noexcept(noexcept(flat_map_base(init)) and std::is_nothrow_move_assignable_v<flat_map_base>) {
 		return *this = flat_map_base(init);
 	}
