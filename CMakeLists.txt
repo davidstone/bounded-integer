@@ -434,6 +434,7 @@ elseif("${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU")
 		"-g"
 		"-march=native"
 		"-fconcepts"
+		$<$<CONFIG:Release>:-flto=4 -flto-odr-type-merging -fuse-linker-plugin>
 		# We have to start by turning off all warnings just so we can disable a
 		# warning about an inaccessible base class. Then we turn on all
 		# possible warnings. This means that some on-by-default warnings are
