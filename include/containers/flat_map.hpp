@@ -5,6 +5,7 @@
 
 #pragma once
 
+#include <containers/algorithms/binary_search.hpp>
 #include <containers/algorithms/negate.hpp>
 #include <containers/algorithms/sort.hpp>
 #include <containers/algorithms/unique.hpp>
@@ -288,39 +289,35 @@ public:
 	
 	template<typename Key>
 	constexpr auto lower_bound(Key && key) const BOUNDED_NOEXCEPT_GCC_BUG(
-		std::lower_bound(
-			legacy_iterator(begin(*this)),
-			legacy_iterator(end(*this)),
+		containers::lower_bound(
+			*this,
 			BOUNDED_FORWARD(key),
 			key_value_compare{key_compare()}
-		).base()
+		)
 	)
 	template<typename Key>
 	constexpr auto lower_bound(Key && key) BOUNDED_NOEXCEPT_GCC_BUG(
-		std::lower_bound(
-			legacy_iterator(begin(*this)),
-			legacy_iterator(end(*this)),
+		containers::lower_bound(
+			*this,
 			BOUNDED_FORWARD(key),
 			key_value_compare{key_compare()}
-		).base()
+		)
 	)
 	template<typename Key>
 	constexpr auto upper_bound(Key && key) const BOUNDED_NOEXCEPT_GCC_BUG(
-		std::upper_bound(
-			legacy_iterator(begin(*this)),
-			legacy_iterator(end(*this)),
+		containers::upper_bound(
+			*this,
 			BOUNDED_FORWARD(key),
 			key_value_compare{key_compare()}
-		).base()
+		)
 	)
 	template<typename Key>
 	constexpr auto upper_bound(Key && key) BOUNDED_NOEXCEPT_GCC_BUG(
-		std::upper_bound(
-			legacy_iterator(begin(*this)),
-			legacy_iterator(end(*this)),
+		containers::upper_bound(
+			*this,
 			BOUNDED_FORWARD(key),
 			key_value_compare{key_compare()}
-		).base()
+		)
 	)
 	// TODO: noexcept
 	template<typename Key>

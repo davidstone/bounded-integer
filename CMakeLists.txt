@@ -252,6 +252,7 @@ add_library(containers_test STATIC
 	source/containers/algorithms/accumulate.cpp
 	source/containers/algorithms/advance.cpp
 	source/containers/algorithms/all_any_none.cpp
+	source/containers/algorithms/binary_search.cpp
 	source/containers/algorithms/compare.cpp
 	source/containers/algorithms/concatenate.cpp
 	source/containers/algorithms/concatenate_view.cpp

@@ -26,17 +26,19 @@ namespace {
 using namespace bounded::literal;
 using namespace containers;
 
-void test_constexpr_constructed() {
-	using base = containers::static_vector<containers::map_value_type<int, int>, 10>;
-	constexpr auto constexpr_constructible = containers::basic_flat_map<base>{
+using base = containers::array<containers::map_value_type<int, int>, 3>;
+constexpr auto constexpr_constructible = containers::basic_flat_map<base>(
+	containers::assume_sorted_unique,
+	base{{
+		{0, 4},
 		{1, 2},
-		{3, 5},
-		{0, 4}
-	};
-	BOUNDED_TEST(constexpr_constructible.find(0) != end(constexpr_constructible));
-	BOUNDED_TEST(constexpr_constructible.find(0)->key() == 0);
-	BOUNDED_TEST(constexpr_constructible.find(0)->mapped() == 4);
-}
+		{3, 5}
+	}}
+);
+static_assert(constexpr_constructible.at(0) == 4);
+static_assert(constexpr_constructible.at(1) == 2);
+static_assert(constexpr_constructible.at(3) == 5);
+static_assert(constexpr_constructible.find(2) == end(constexpr_constructible));
 
 class CheckedMover {
 public:
@@ -406,7 +408,6 @@ BOUNDED_COMPARISON
 }	// namespace
 
 int main(int argc, char ** argv) {
-	test_constexpr_constructed();
 	test_unique();
 	test<map_type<int, int>>();
 
