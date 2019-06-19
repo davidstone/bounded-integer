@@ -126,14 +126,7 @@ public:
 		m_container(first, last),
 		m_compare(std::move(compare))
 	{
-		sort(m_container, value_compare());
-		// At some point this should be unique_sort
-		auto const equal = ::containers::negate(value_compare());
-		::containers::erase(
-			m_container,
-			::containers::unique(begin(m_container), end(m_container), equal),
-			end(m_container)
-		);
+		unique_sort(m_container, value_compare());
 	}
 
 	template<typename Range> requires(
