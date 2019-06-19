@@ -71,17 +71,6 @@ constexpr inline strong_ordering strong_ordering::equal(0);
 constexpr inline strong_ordering strong_ordering::greater(1);
 constexpr inline strong_ordering strong_ordering::less(-1);
 
-template<typename LHS, typename RHS>
-constexpr auto compare(LHS const & lhs, RHS const & rhs) BOUNDED_NOEXCEPT_DECLTYPE(
-	compare(lhs.compare(rhs), 0)
-)
-
-// Variadic makes this function always a worse match than the above
-template<typename LHS, typename RHS, typename... Ignore> requires(sizeof...(Ignore) == 0)
-constexpr auto compare(LHS const & lhs, RHS const & rhs, Ignore...) BOUNDED_NOEXCEPT_DECLTYPE(
-	compare(0, rhs.compare(lhs))
-)
-
 #if 0
 template<typename LHS, typename RHS> requires(not detail::is_builtin_integer<LHS> or !detail::is_builtin_integer<RHS>)
 constexpr auto compare(LHS const & lhs, RHS const & rhs) BOUNDED_NOEXCEPT_DECLTYPE(
@@ -123,6 +112,12 @@ constexpr auto compare(LHS const lhs, RHS const rhs) noexcept -> strong_ordering
 		static_assert(std::is_same_v<LHS, detail::max_unsigned_t>);
 		return rhs < 0 ? strong_ordering::greater : detail::builtin_compare(lhs, static_cast<LHS>(rhs));
 	}
+}
+
+template<typename Enum> requires(std::is_enum_v<Enum>)
+constexpr auto compare(Enum const lhs, Enum const rhs) noexcept {
+	using underlying = std::underlying_type_t<Enum>;
+	return detail::builtin_compare(static_cast<underlying>(lhs), static_cast<underlying>(rhs));
 }
 
 namespace detail {
@@ -207,6 +202,18 @@ constexpr auto operator==(LHS const & lhs [[maybe_unused]], RHS const & rhs [[ma
 		return detail::safe_equal(lhs.value(), rhs.value());
 	}
 }
+
+
+template<typename LHS, typename RHS>
+constexpr auto compare(LHS const & lhs, RHS const & rhs) BOUNDED_NOEXCEPT_DECLTYPE(
+	compare(lhs.compare(rhs), 0)
+)
+
+// Variadic makes this function always a worse match than the above
+template<typename LHS, typename RHS, typename... Ignore> requires(sizeof...(Ignore) == 0)
+constexpr auto compare(LHS const & lhs, RHS const & rhs, Ignore...) BOUNDED_NOEXCEPT_DECLTYPE(
+	compare(0, rhs.compare(lhs))
+)
 
 
 
