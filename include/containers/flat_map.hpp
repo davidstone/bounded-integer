@@ -81,18 +81,8 @@ inserted_t(Iterator, bool) -> inserted_t<Iterator>;
 template<typename Container, typename Compare, bool allow_duplicates>
 struct flat_map_base {
 private:
-	constexpr auto && container() const & noexcept {
-		return m_data[0_bi];
-	}
-	constexpr auto && container() & noexcept {
-		return m_data[0_bi];
-	}
-	constexpr auto && container() && noexcept {
-		return std::move(m_data)[0_bi];
-	}
-
-	using data_t = bounded::tuple<Container, Compare>;
-	data_t m_data;
+	Container m_container;
+	[[no_unique_address]] Compare m_compare;
 public:
 	using value_type = typename Container::value_type;
 	using key_type = typename value_type::key_type;
@@ -120,31 +110,29 @@ public:
 	};
 	
 	constexpr auto key_compare() const noexcept {
-		return m_data[1_bi];
+		return m_compare;
 	}
 	constexpr auto value_compare() const noexcept{
 		return value_compare_type(key_compare());
 	}
 	
 	flat_map_base() = default;
-	constexpr explicit flat_map_base(key_compare_type compare) noexcept(noexcept(
-		data_t(Container{}, std::declval<key_compare_type>())
-	)):
-		m_data(Container{}, std::move(compare))
+	constexpr explicit flat_map_base(key_compare_type compare) noexcept(std::is_nothrow_default_constructible_v<Container> and std::is_nothrow_move_constructible_v<Compare>):
+		m_compare(std::move(compare))
 	{
 	}
 	template<typename InputIterator, typename Sentinel>
 	constexpr flat_map_base(InputIterator first, Sentinel last, key_compare_type compare = key_compare_type{}):
-		// TODO: noexcept?
-		m_data(Container(first, last), std::move(compare))
+		m_container(first, last),
+		m_compare(std::move(compare))
 	{
-		sort(container(), value_compare());
+		sort(m_container, value_compare());
 		// At some point this should be unique_sort
 		auto const equal = ::containers::negate(value_compare());
 		::containers::erase(
-			container(),
-			::containers::unique(begin(container()), end(container()), equal),
-			end(container())
+			m_container,
+			::containers::unique(begin(m_container), end(m_container), equal),
+			end(m_container)
 		);
 	}
 
@@ -167,27 +155,27 @@ public:
 	}
 	
 	friend constexpr auto begin(flat_map_base const & c) BOUNDED_NOEXCEPT(
-		begin(c.container())
+		begin(c.m_container)
 	)
 	friend constexpr auto begin(flat_map_base & c) BOUNDED_NOEXCEPT(
-		begin(c.container())
+		begin(c.m_container)
 	)
 	friend constexpr auto end(flat_map_base const & c) BOUNDED_NOEXCEPT(
-		end(c.container())
+		end(c.m_container)
 	)
 	friend constexpr auto end(flat_map_base & c) BOUNDED_NOEXCEPT(
-		end(c.container())
+		end(c.m_container)
 	)
 	
 	// Extra functions on top of the regular map interface
 	constexpr auto capacity() const BOUNDED_NOEXCEPT(
-		container().capacity()
+		m_container.capacity()
 	)
 	constexpr auto reserve(size_type const new_capacity) BOUNDED_NOEXCEPT(
-		container().reserve(new_capacity)
+		m_container.reserve(new_capacity)
 	)
 	constexpr auto shrink_to_fit() BOUNDED_NOEXCEPT(
-		container().shrink_to_fit()
+		m_container.shrink_to_fit()
 	)
 	
 	template<typename Key>
@@ -286,40 +274,40 @@ public:
 		// sorted, it's probably better to just sort the new elements then do a
 		// merge sort on both ranges, rather than calling std::sort on the
 		// entire container.
-		auto const midpoint = append(container(), BOUNDED_FORWARD(range));
-		sort(midpoint, end(container()), value_compare());
+		auto const midpoint = append(m_container, BOUNDED_FORWARD(range));
+		sort(midpoint, end(m_container), value_compare());
 		if (allow_duplicates) {
 			std::inplace_merge(
-				legacy_iterator(begin(container())),
+				legacy_iterator(begin(m_container)),
 				legacy_iterator(midpoint),
-				legacy_iterator(end(container())),
+				legacy_iterator(end(m_container)),
 				value_compare()
 			);
 		} else {
 			auto const position = ::containers::unique_inplace_merge(
-				begin(container()),
+				begin(m_container),
 				midpoint,
-				end(container()),
+				end(m_container),
 				value_compare()
 			);
 			using containers::erase;
-			erase(container(), position, end(container()));
+			erase(m_container, position, end(m_container));
 		}
 	}
 	
 	// These maintain the relative order of all elements in the container, so I
 	// don't have to worry about re-sorting
 	constexpr auto erase(const_iterator const it) BOUNDED_NOEXCEPT(
-		container().erase(it)
+		m_container.erase(it)
 	)
 	// Need mutable iterator overload to avoid ambiguity if key_type can be
 	// constructed from iterator (for instance, an unconstrained constructor
 	// template).
 	constexpr auto erase(iterator const it) BOUNDED_NOEXCEPT(
-		container().erase(it)
+		m_container.erase(it)
 	)
 	constexpr auto erase(const_iterator const first, const_iterator const last) BOUNDED_NOEXCEPT(
-		container().erase(first, last)
+		m_container.erase(first, last)
 	)
 	
 private:
@@ -401,7 +389,7 @@ private:
 	template<typename Key, typename Mapped>
 	constexpr auto emplace_at(const_iterator position, Key && key, Mapped && mapped) {
 		if constexpr (allow_duplicates) {
-			return container().emplace(
+			return m_container.emplace(
 				position,
 				std::piecewise_construct,
 				bounded::tie(BOUNDED_FORWARD(key)),
@@ -416,7 +404,7 @@ private:
 				return inserted_t{mutable_iterator(*this, containers::prev(position)), false};
 			}
 
-			auto const it = container().emplace(
+			auto const it = m_container.emplace(
 				position,
 				std::piecewise_construct,
 				bounded::tie(BOUNDED_FORWARD(key)),
