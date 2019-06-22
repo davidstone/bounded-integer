@@ -50,14 +50,14 @@ template<std::size_t... indexes, typename... Types>
 struct tuple_impl<std::index_sequence<indexes...>, Types...> : tuple_value<indexes, Types>... {
 
 	tuple_impl() = default;
-	
-	template<typename... Args>
-	constexpr tuple_impl(Args && ... args) noexcept(false):
+
+	template<typename... Args, BOUNDED_REQUIRES((... and std::is_convertible_v<Args, Types>))>
+	constexpr tuple_impl(Args && ... args) noexcept((... and noexcept(tuple_value<indexes, Types>(not_piecewise_construct, BOUNDED_FORWARD(args))))):
 		tuple_value<indexes, Types>(not_piecewise_construct, BOUNDED_FORWARD(args))...
 	{
 	}
 
-	template<typename... Args>
+	template<typename... Args, BOUNDED_REQUIRES((... and std::is_constructible_v<tuple_value<indexes, Types>, std::piecewise_construct_t, Args>))>
 	constexpr tuple_impl(std::piecewise_construct_t, Args && ... args) noexcept(false):
 		tuple_value<indexes, Types>(std::piecewise_construct, BOUNDED_FORWARD(args))...
 	{
@@ -84,18 +84,6 @@ template<typename... Types>
 struct tuple : private detail::tuple_impl_t<Types...> {
 	using detail::tuple_impl_t<Types...>::tuple_impl_t;
 	using detail::tuple_impl_t<Types...>::operator[];
-
-protected:
-	// Allow classes to explicitly expose that they are a tuple
-	constexpr auto && as_tuple() const & noexcept {
-		return *this;
-	}
-	constexpr auto && as_tuple() & noexcept {
-		return *this;
-	}
-	constexpr auto && as_tuple() && noexcept {
-		return std::move(*this);
-	}
 };
 
 template<typename... Ts>
