@@ -201,7 +201,7 @@ void test() {
 	container_type empty;
 	std::initializer_list<typename container_type::value_type> const init = { {1, 2}, {2, 5}, {3, 3} };
 	container_type container(init);
-	BOUNDED_TEST((container == container_type{init}));
+	BOUNDED_TEST((container == container_type(init)));
 	container.emplace(typename container_type::value_type(4, 4));
 	container.emplace(std::piecewise_construct, generic_forward_as_tuple<container_type>(5), generic_forward_as_tuple<container_type>(3));
 	BOUNDED_TEST(container.at(5) == 3);
