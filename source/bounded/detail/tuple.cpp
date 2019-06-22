@@ -14,6 +14,7 @@ using namespace bounded::literal;
 BOUNDED_COMPARISON
 
 static_assert(std::is_empty_v<bounded::tuple<>>);
+static_assert(bounded::tuple{} == bounded::tuple{});
 
 struct empty {};
 
@@ -26,6 +27,13 @@ constexpr auto operator==(empty, empty) noexcept {
 }
 
 static_assert(std::is_empty_v<bounded::tuple<empty>>);
+
+static_assert(std::is_trivially_default_constructible_v<bounded::tuple<empty>>);
+static_assert(std::is_trivially_copyable_v<bounded::tuple<empty>>);
+static_assert(std::is_nothrow_constructible_v<bounded::tuple<empty>, empty const &>);
+static_assert(std::is_nothrow_constructible_v<bounded::tuple<empty>, empty &&>);
+static_assert(std::is_nothrow_constructible_v<bounded::tuple<empty>, empty &>);
+static_assert(std::is_nothrow_constructible_v<bounded::tuple<empty>, empty>);
 
 static_assert(std::is_empty_v<bounded::tuple<void>>);
 
