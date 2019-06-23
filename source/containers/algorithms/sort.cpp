@@ -10,9 +10,12 @@
 namespace {
 
 template<typename Range>
-constexpr auto verify_sort(Range && range) {
-	containers::sort(range);
-	return containers::is_sorted(range);
+constexpr auto verify_sort(Range && range_) {
+	auto impl = [](auto range, auto cmp) {
+		containers::sort(range, cmp);
+		return containers::is_sorted(range, cmp);
+	};
+	return impl(range_, std::less{}) and impl(range_, std::greater{});
 }
 
 static_assert(verify_sort(containers::static_vector<int, 1>{}));
@@ -29,5 +32,13 @@ static_assert(verify_sort(containers::array{2, 1, 3}));
 static_assert(verify_sort(containers::array{2, 3, 1}));
 static_assert(verify_sort(containers::array{3, 1, 2}));
 static_assert(verify_sort(containers::array{3, 2, 1}));
+
+static_assert(verify_sort(containers::array{1, 1, 2}));
+static_assert(verify_sort(containers::array{1, 2, 1}));
+static_assert(verify_sort(containers::array{2, 1, 1}));
+static_assert(verify_sort(containers::array{1, 2, 2}));
+static_assert(verify_sort(containers::array{2, 1, 2}));
+static_assert(verify_sort(containers::array{2, 2, 1}));
+static_assert(verify_sort(containers::array{1, 1, 1}));
 
 } // namespace
