@@ -4,6 +4,7 @@
 // http://www.boost.org/LICENSE_1_0.txt)
 
 #include <containers/flat_map.hpp>
+#include <containers/algorithms/filter_iterator.hpp>
 #include <containers/static_vector/static_vector.hpp>
 #include <containers/vector.hpp>
 
@@ -39,6 +40,63 @@ static_assert(constexpr_constructible.at(0) == 4);
 static_assert(constexpr_constructible.at(1) == 2);
 static_assert(constexpr_constructible.at(3) == 5);
 static_assert(constexpr_constructible.find(2) == end(constexpr_constructible));
+
+struct lowercase_alphanumeric {
+	constexpr auto operator()(std::string_view const lhs, std::string_view const rhs) const noexcept {
+		auto transform_filter = [](std::string_view const & input) {
+			// Not portable because it does not respect character encodings.
+			// We do not want to use cctype functions because we do not want to
+			// use locales.
+			auto to_lower = [](char c) {
+				return static_cast<char>(('A' <= c and c <= 'Z') ? c + 'a' - 'A' : c);
+			};
+			static_assert(to_lower('A') == 'a');
+			static_assert(to_lower('B') == 'b');
+			static_assert(to_lower('Z') == 'z');
+			static_assert(to_lower('a') == 'a');
+			static_assert(to_lower('b') == 'b');
+			static_assert(to_lower('0') == '0');
+			auto is_valid = [](char c) {
+				return ('0' <= c and c <= '9') or ('a' <= c and c <= 'z');
+			};
+			static_assert(is_valid('0'));
+			static_assert(is_valid('1'));
+			static_assert(is_valid('9'));
+			static_assert(is_valid('a'));
+			static_assert(is_valid('b'));
+			static_assert(is_valid('z'));
+			static_assert(!is_valid('A'));
+			static_assert(!is_valid('D'));
+			static_assert(!is_valid('Z'));
+			static_assert(!is_valid('%'));
+			static_assert(!is_valid(' '));
+			return containers::filter(containers::transform(input, to_lower), is_valid);
+		};
+		using namespace std::string_view_literals;
+		static_assert(containers::equal(transform_filter("d"sv), "d"sv));
+		static_assert(containers::equal(transform_filter("De"sv), "de"sv));
+		return transform_filter(lhs) < transform_filter(rhs);
+	}
+};
+
+static_assert(lowercase_alphanumeric{}("d", "E"));
+static_assert(!lowercase_alphanumeric{}("E", "d"));
+
+using Storage = containers::array<containers::map_value_type<std::string_view, int>, 2>;
+constexpr auto converter = containers::basic_flat_map<Storage, lowercase_alphanumeric>(
+	containers::assume_unique,
+	Storage{{
+		{ "E", 1 },
+		{ "d", 2 },
+	}}
+);
+static_assert(size(converter) == 2_bi);
+
+static_assert((begin(converter) + 0_bi)->key() == "d");
+static_assert((begin(converter) + 1_bi)->key() == "E");
+static_assert(converter.lower_bound("E") != end(converter));
+static_assert(converter.find("E") != end(converter));
+static_assert(converter.at("E") == 1);
 
 class CheckedMover {
 public:

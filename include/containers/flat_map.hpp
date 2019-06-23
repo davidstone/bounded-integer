@@ -154,7 +154,7 @@ public:
 	constexpr flat_map_base(assume_sorted_unique_t, InputRange && range):
 		m_container(BOUNDED_FORWARD(range))
 	{
-		BOUNDED_ASSERT(is_sorted(m_container));
+		BOUNDED_ASSERT(is_sorted(m_container, value_compare()));
 	}
 
 	template<typename InputRange> requires is_range<InputRange>
@@ -162,14 +162,14 @@ public:
 		m_container(BOUNDED_FORWARD(range)),
 		m_compare(std::move(compare))
 	{
-		BOUNDED_ASSERT(is_sorted(m_container));
+		BOUNDED_ASSERT(is_sorted(m_container, value_compare()));
 	}
 
 	template<typename InputRange> requires is_range<InputRange>
 	constexpr flat_map_base(assume_unique_t, InputRange && range):
 		m_container(BOUNDED_FORWARD(range))
 	{
-		sort(m_container);
+		sort(m_container, value_compare());
 	}
 
 	template<typename InputRange> requires is_range<InputRange>
@@ -177,7 +177,7 @@ public:
 		m_container(BOUNDED_FORWARD(range)),
 		m_compare(std::move(compare))
 	{
-		sort(m_container);
+		sort(m_container, value_compare());
 	}
 
 
@@ -216,7 +216,7 @@ public:
 	constexpr flat_map_base(assume_unique_t, InputIterator const first, Sentinel const last):
 		m_container(first, last)
 	{
-		sort(m_container);
+		sort(m_container, value_compare());
 	}
 
 	template<typename InputIterator, typename Sentinel> requires is_iterator_sentinel<InputIterator, Sentinel>
@@ -224,7 +224,7 @@ public:
 		m_container(first, last),
 		m_compare(std::move(compare))
 	{
-		sort(m_container);
+		sort(m_container, value_compare());
 	}
 
 
@@ -258,14 +258,14 @@ public:
 	constexpr flat_map_base(assume_unique_t, std::initializer_list<value_type> range):
 		m_container(range)
 	{
-		sort(m_container);
+		sort(m_container, value_compare());
 	}
 
 	constexpr flat_map_base(assume_unique_t, std::initializer_list<value_type> range, key_compare_type compare):
 		m_container(range),
 		m_compare(std::move(compare))
 	{
-		sort(m_container);
+		sort(m_container, value_compare());
 	}
 
 	constexpr auto & operator=(std::initializer_list<value_type> init) & noexcept(noexcept(flat_map_base(init)) and std::is_nothrow_move_assignable_v<flat_map_base>) {
