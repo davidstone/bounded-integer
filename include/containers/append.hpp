@@ -5,7 +5,7 @@
 
 #pragma once
 
-#include <containers/algorithms/copy.hpp>
+#include <containers/algorithms/uninitialized.hpp>
 #include <containers/begin_end.hpp>
 #include <containers/push_back.hpp>
 #include <containers/reserve_if_reservable.hpp>
@@ -77,12 +77,12 @@ constexpr auto append(Container & output, Range && input) {
 		}
 	}
 	if constexpr (has_append_from_capacity<Container>) {
-		auto const result = containers::copy(
+		auto const result = containers::uninitialized_copy(
 			begin(BOUNDED_FORWARD(input)),
 			end(BOUNDED_FORWARD(input)),
 			end(output)
 		);
-		output.append_from_capacity(result.output - end(output));
+		output.append_from_capacity(result - end(output));
 	} else if constexpr (has_insert<Container, Range>) {
 		output.insert(end(output), begin(BOUNDED_FORWARD(input)), end(BOUNDED_FORWARD(input)));
 	} else {
