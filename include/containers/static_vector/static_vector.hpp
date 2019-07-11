@@ -69,6 +69,14 @@ struct static_vector_storage<T, capacity_, false> : static_vector_storage<T, cap
 	~static_vector_storage() {
 		detail::destroy_range(*this);
 	}
+	auto & operator=(static_vector_storage && other) & noexcept(std::is_nothrow_move_assignable_v<value_type>) {
+		assign(*this, begin(std::move(other)), end(std::move(other)));
+		return *this;
+	}
+	auto & operator=(static_vector_storage const & other) & noexcept(std::is_nothrow_copy_assignable_v<value_type>) {
+		assign(*this, begin(other), end(other));
+		return *this;
+	}
 };
 
 } // namespace detail

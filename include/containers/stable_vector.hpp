@@ -30,17 +30,34 @@ struct stable_vector_storage {
 		std::swap(lhs.storage, rhs.storage);
 		std::swap(lhs.size, rhs.size);
 	}
-	stable_vector_storage() = default;
-	// TODO: Support trivial relocatability
-	stable_vector_storage(stable_vector_storage && other) noexcept(false) {
-		swap(*this, other);
+	// Allocates the full capacity
+	stable_vector_storage():
+		storage(make_storage()),
+		size(0_bi)
+	{
 	}
-	stable_vector_storage(stable_vector_storage const & other) noexcept(false) {
+	// TODO: Support trivial relocatability
+	stable_vector_storage(stable_vector_storage && other) noexcept:
+		storage(std::move(other.storage)),
+		size(std::exchange(other.size, 0_bi))
+	{
+	}
+	stable_vector_storage(stable_vector_storage const & other):
+		stable_vector_storage()
+	{
 		std::uninitialized_copy(begin(other), end(other), begin(*this));
 		size = other.size;
 	}
 	~stable_vector_storage() {
 		detail::destroy_range(*this);
+	}
+	constexpr auto & operator=(stable_vector_storage && other) & noexcept {
+		swap(*this, other);
+		return *this;
+	}
+	auto & operator=(stable_vector_storage const & other) & noexcept(std::is_nothrow_copy_assignable_v<value_type>) {
+		assign(*this, begin(other), end(other));
+		return *this;
 	}
 
 	friend auto begin(stable_vector_storage const & container) noexcept -> T const * {
@@ -62,8 +79,13 @@ struct stable_vector_storage {
 		}
 	};
 	using raw_storage = std::unique_ptr<T, deleter>;
-	raw_storage storage{std::allocator<T>{}.allocate(static_cast<std::ptrdiff_t>(capacity()))};
-	size_type size = 0_bi;
+	raw_storage storage;
+	size_type size;
+
+private:
+	static auto make_storage() {
+		return raw_storage(std::allocator<T>{}.allocate(static_cast<std::ptrdiff_t>(capacity())));
+	}
 };
 
 } // namespace detail

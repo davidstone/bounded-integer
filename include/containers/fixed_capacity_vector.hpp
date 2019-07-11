@@ -65,8 +65,10 @@ public:
 		}
 	}
 	
-	constexpr fixed_capacity_vector(fixed_capacity_vector const & other) = default;
-	constexpr fixed_capacity_vector(fixed_capacity_vector && other) = default;
+	fixed_capacity_vector(fixed_capacity_vector const & other) = default;
+	fixed_capacity_vector(fixed_capacity_vector && other) = default;
+	fixed_capacity_vector & operator=(fixed_capacity_vector && other) = default;
+	fixed_capacity_vector & operator=(fixed_capacity_vector const & other) = default;
 
 	constexpr fixed_capacity_vector(std::initializer_list<value_type> init) BOUNDED_NOEXCEPT_INITIALIZATION(
 		fixed_capacity_vector(begin(init), end(init))
@@ -82,21 +84,6 @@ public:
 	) {
 	}
 
-	constexpr auto & operator=(fixed_capacity_vector const & other) & noexcept(std::is_nothrow_copy_assignable_v<value_type>) {
-		assign(*this, begin(other), end(other));
-		return *this;
-	}
-	constexpr auto & operator=(fixed_capacity_vector && other) & noexcept(
-		std::is_swappable_v<Storage> ? std::is_nothrow_swappable_v<Storage> : std::is_nothrow_move_assignable_v<value_type>
-	) {
-		if constexpr (std::is_swappable_v<Storage>) {
-			using std::swap;
-			swap(m_storage, other.m_storage);
-		} else {
-			assign(*this, begin(std::move(other)), end(std::move(other)));
-		}
-		return *this;
-	}
 	constexpr auto & operator=(std::initializer_list<value_type> init) & noexcept(noexcept(assign(std::declval<fixed_capacity_vector &>(), containers::begin(init), containers::end(init)))) {
 		assign(*this, begin(init), end(init));
 		return *this;
@@ -122,6 +109,7 @@ public:
 	// Assumes that elements are already constructed in the spare capacity
 	template<typename Integer>
 	constexpr void append_from_capacity(Integer const count) noexcept {
+		BOUNDED_ASSERT(count + m_storage.size > capacity());
 		m_storage.size += count;
 	}
 	
