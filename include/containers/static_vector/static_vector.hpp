@@ -84,4 +84,10 @@ struct static_vector_storage<T, capacity_, false> : static_vector_storage<T, cap
 template<typename T, std::size_t capacity>
 using static_vector = fixed_capacity_vector<detail::static_vector_storage<T, capacity>>;
 
+static_assert(std::is_trivially_copy_constructible_v<static_vector<int, 15>>);
+static_assert(std::is_trivially_move_constructible_v<static_vector<int, 15>>);
+static_assert(std::is_trivially_copy_assignable_v<static_vector<int, 15>>);
+static_assert(std::is_trivially_move_assignable_v<static_vector<int, 15>>);
+static_assert(std::is_trivially_destructible_v<static_vector<int, 15>>);
+
 }	// namespace containers
