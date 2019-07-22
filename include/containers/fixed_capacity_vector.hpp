@@ -109,7 +109,7 @@ public:
 	// Assumes that elements are already constructed in the spare capacity
 	template<typename Integer>
 	constexpr void append_from_capacity(Integer const count) noexcept {
-		BOUNDED_ASSERT(count + m_storage.size > capacity());
+		BOUNDED_ASSERT(count + m_storage.size <= capacity());
 		m_storage.size += count;
 	}
 	
