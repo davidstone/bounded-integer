@@ -355,7 +355,7 @@ void test_performance(std::size_t const loop_count) {
 	auto const start = high_resolution_clock::now();
 
 	TimeDestructor destructor;
-	map_type<Key, Value> map(begin(source), end(source));
+	auto map = map_type<Key, Value>(source);
 	auto const constructed = high_resolution_clock::now();
 	#if defined TRACK_COMPARISONS
 		auto const constructed_comparisons = number_of_comparisons;

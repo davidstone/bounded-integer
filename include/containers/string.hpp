@@ -37,7 +37,7 @@ public:
 	using base::base;
 	
 	constexpr basic_string(std::basic_string_view<CharT> const sv):
-		base(begin(sv), end(sv))
+		base(sv)
 	{
 	}
 

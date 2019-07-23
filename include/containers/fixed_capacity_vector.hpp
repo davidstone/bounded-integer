@@ -48,10 +48,19 @@ public:
 
 	constexpr fixed_capacity_vector() = default;
 	
-	template<typename InputIterator, typename Sentinel> requires is_iterator_sentinel<InputIterator, Sentinel>
-	constexpr fixed_capacity_vector(InputIterator first, Sentinel const last) noexcept(noexcept(first != last) and noexcept(++first) and noexcept(std::declval<fixed_capacity_vector &>().emplace_back(*first))) {
-		for (; first != last; ++first) {
-			emplace_back(*first);
+	template<typename Range> requires(
+		is_range<Range> and
+		!std::is_array_v<std::remove_cv_t<std::remove_reference_t<Range>>>
+	)
+	constexpr explicit fixed_capacity_vector(Range && range) {
+		for (auto && value : BOUNDED_FORWARD(range)) {
+			emplace_back(BOUNDED_FORWARD(value));
+		}
+	}
+	
+	constexpr fixed_capacity_vector(std::initializer_list<value_type> init) {
+		for (auto const & value : init) {
+			emplace_back(value);
 		}
 	}
 	
@@ -59,20 +68,6 @@ public:
 	fixed_capacity_vector(fixed_capacity_vector && other) = default;
 	fixed_capacity_vector & operator=(fixed_capacity_vector && other) = default;
 	fixed_capacity_vector & operator=(fixed_capacity_vector const & other) = default;
-
-	constexpr fixed_capacity_vector(std::initializer_list<value_type> init) BOUNDED_NOEXCEPT_INITIALIZATION(
-		fixed_capacity_vector(begin(init), end(init))
-	) {
-	}
-	
-	template<typename Range> requires(
-		is_range<Range> and
-		!std::is_array_v<std::remove_cv_t<std::remove_reference_t<Range>>>
-	)
-	constexpr explicit fixed_capacity_vector(Range && range) BOUNDED_NOEXCEPT_INITIALIZATION(
-		fixed_capacity_vector(begin(BOUNDED_FORWARD(range)), end(BOUNDED_FORWARD(range)))
-	) {
-	}
 
 	constexpr auto & operator=(std::initializer_list<value_type> init) & noexcept(noexcept(assign(std::declval<fixed_capacity_vector &>(), containers::begin(init), containers::end(init)))) {
 		assign(*this, begin(init), end(init));

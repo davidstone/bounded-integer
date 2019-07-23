@@ -182,53 +182,6 @@ public:
 
 
 
-	template<typename InputIterator, typename Sentinel> requires is_iterator_sentinel<InputIterator, Sentinel>
-	constexpr explicit flat_map_base(InputIterator const first, Sentinel const last):
-		m_container(first, last)
-	{
-		unique_sort(m_container, value_compare());
-	}
-
-	template<typename InputIterator, typename Sentinel> requires is_iterator_sentinel<InputIterator, Sentinel>
-	constexpr flat_map_base(InputIterator const first, Sentinel const last, key_compare_type compare):
-		m_container(first, last),
-		m_compare(std::move(compare))
-	{
-		unique_sort(m_container, value_compare());
-	}
-
-	template<typename InputIterator, typename Sentinel> requires is_iterator_sentinel<InputIterator, Sentinel>
-	constexpr flat_map_base(assume_sorted_unique_t, InputIterator const first, Sentinel const last):
-		m_container(first, last)
-	{
-		BOUNDED_ASSERT(is_sorted(m_container));
-	}
-
-	template<typename InputIterator, typename Sentinel> requires is_iterator_sentinel<InputIterator, Sentinel>
-	constexpr flat_map_base(assume_sorted_unique_t, InputIterator const first, Sentinel const last, key_compare_type compare):
-		m_container(first, last),
-		m_compare(std::move(compare))
-	{
-		BOUNDED_ASSERT(is_sorted(m_container));
-	}
-
-	template<typename InputIterator, typename Sentinel> requires is_iterator_sentinel<InputIterator, Sentinel>
-	constexpr flat_map_base(assume_unique_t, InputIterator const first, Sentinel const last):
-		m_container(first, last)
-	{
-		sort(m_container, value_compare());
-	}
-
-	template<typename InputIterator, typename Sentinel> requires is_iterator_sentinel<InputIterator, Sentinel>
-	constexpr flat_map_base(assume_unique_t, InputIterator const first, Sentinel const last, key_compare_type compare):
-		m_container(first, last),
-		m_compare(std::move(compare))
-	{
-		sort(m_container, value_compare());
-	}
-
-
-
 	constexpr flat_map_base(std::initializer_list<value_type> range):
 		m_container(range)
 	{

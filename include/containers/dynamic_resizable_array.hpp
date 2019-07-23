@@ -37,27 +37,21 @@ struct dynamic_resizable_array : private Container {
 
 	constexpr dynamic_resizable_array() noexcept {}
 	
-	template<typename ForwardIterator, typename Sentinel> requires is_iterator_sentinel<ForwardIterator, Sentinel>
-	constexpr dynamic_resizable_array(ForwardIterator first, Sentinel const last) {
-		assign(*this, first, last);
-	}
-	
 	template<typename Range> requires(
 		is_range<Range> and
 		!std::is_array_v<std::remove_cv_t<std::remove_reference_t<Range>>>
 	)
-	constexpr explicit dynamic_resizable_array(Range && range) BOUNDED_NOEXCEPT_INITIALIZATION(
-		dynamic_resizable_array(begin(BOUNDED_FORWARD(range)), end(BOUNDED_FORWARD(range)))
-	) {
+	constexpr explicit dynamic_resizable_array(Range && range) {
+		assign(*this, begin(BOUNDED_FORWARD(range)), end(BOUNDED_FORWARD(range)));
+	}
+	
+	constexpr dynamic_resizable_array(std::initializer_list<value_type> init) {
+		assign(*this, begin(init), end(init));
 	}
 
-	constexpr dynamic_resizable_array(std::initializer_list<value_type> init) BOUNDED_NOEXCEPT_INITIALIZATION(
-		dynamic_resizable_array(begin(init), end(init))
-	) {}
-
-	constexpr dynamic_resizable_array(dynamic_resizable_array const & other) BOUNDED_NOEXCEPT_INITIALIZATION(
-		dynamic_resizable_array(begin(other), end(other))
-	) {}
+	constexpr dynamic_resizable_array(dynamic_resizable_array const & other) {
+		assign(*this, begin(other), end(other));
+	}
 
 	constexpr dynamic_resizable_array(dynamic_resizable_array && other) noexcept {
 		this->move_assign_to_empty(std::move(other));
