@@ -26,10 +26,10 @@ using namespace bounded::literal;
 	constexpr auto copy_constructed = default_constructed_elements;
 	static_assert(copy_constructed == default_constructed_elements);
 	
-	constexpr auto n_copy = containers::static_vector<int, 4>(4_bi, 10);
+	constexpr auto n_copy = containers::static_vector<int, 4>(containers::repeat_n(4_bi, 10));
 	static_assert(size(n_copy) == 4_bi);
 	static_assert(at(n_copy, 2_bi) == 10);
-	static_assert(n_copy == containers::static_vector<int, 4>(4_bi, 10));
+	static_assert(n_copy == containers::static_vector<int, 4>(containers::repeat_n(4_bi, 10)));
 	
 	constexpr auto make = []{
 		auto value = containers::static_vector<int, 10>{};
@@ -48,7 +48,7 @@ using namespace bounded::literal;
 	static_assert(containers::equal(begin(made), end(made), begin(expected), end(expected)));
 	static_assert(made == made);
 	
-	constexpr auto bounded_integer_element = containers::static_vector<bounded::integer<0, 10>, 1>(1_bi, 2_bi);
+	constexpr auto bounded_integer_element = containers::static_vector<bounded::integer<0, 10>, 1>(containers::repeat_n(1_bi, 2_bi));
 	static_assert(front(bounded_integer_element) == 2_bi);
 }
 
@@ -70,7 +70,7 @@ void test_generic(T const & t, std::initializer_list<T> init) {
 		BOUNDED_TEST(value == T{});
 	}
 	
-	auto const count_arg = container(capacity, t);
+	auto const count_arg = container(containers::repeat_n(capacity, t));
 	BOUNDED_TEST(size(count) == capacity);
 	for (auto const & value : count_arg) {
 		BOUNDED_TEST(value == t);

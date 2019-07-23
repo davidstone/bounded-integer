@@ -168,7 +168,7 @@ private:
 
 template<typename Container>
 void test_unique_copy_less(Container const & source, Container const & expected) {
-	Container destination(containers::size(source), 0);
+	auto destination = Container(containers::repeat_n(containers::size(source), 0));
 	auto const it = containers::unique_copy_less(begin(source), end(source), begin(destination));
 	erase(destination, it, end(destination));
 	BOUNDED_TEST(destination == expected);
@@ -184,7 +184,7 @@ void test_unique_less(Container source, Container const & expected) {
 
 template<typename Container>
 void test_unique_merge_copy(Container const & lhs, Container const & rhs, Container const & expected) {
-	Container result(typename Container::size_type(containers::size(lhs) + containers::size(rhs)), 0);
+	auto result = Container(containers::repeat_n(typename Container::size_type(containers::size(lhs) + containers::size(rhs)), 0));
 	auto const it = containers::unique_merge_copy(begin(lhs), end(lhs), begin(rhs), end(rhs), begin(result));
 	erase(result, it, end(result));
 

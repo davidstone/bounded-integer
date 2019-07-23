@@ -28,7 +28,7 @@ void test_generic(bounded::constant_t<capacity_> const capacity, T const & t, st
 		BOUNDED_TEST(value == T{});
 	}
 	
-	auto const count_arg = container(capacity, t);
+	auto const count_arg = container(containers::repeat_n(capacity, t));
 	BOUNDED_TEST(size(count_arg) == capacity);
 	for (auto const & value : count_arg) {
 		BOUNDED_TEST(value == t);
@@ -122,7 +122,11 @@ int main() {
 		'0', '1', '2', '3', '4', '5', '6', '7', '8', '9',
 	});
 
-	test_generic(3_bi, containers::string("hi"), { containers::string(""), containers::string("hello"), containers::string(100_bi, '=') });
+	test_generic(
+		3_bi,
+		containers::string("hi"),
+		{ containers::string(""), containers::string("hello"), containers::string(containers::repeat_n(100_bi, '=')) }
+	);
 	
 	test_erase();
 }

@@ -37,12 +37,6 @@ struct dynamic_resizable_array : private Container {
 
 	constexpr dynamic_resizable_array() noexcept {}
 	
-	template<typename Count> requires std::is_convertible_v<Count, size_type>
-	constexpr dynamic_resizable_array(Count const count, value_type const & value) {
-		auto const repeat = repeat_n(count, value);
-		assign(*this, begin(repeat), end(repeat));
-	}
-	
 	template<typename ForwardIterator, typename Sentinel> requires is_iterator_sentinel<ForwardIterator, Sentinel>
 	constexpr dynamic_resizable_array(ForwardIterator first, Sentinel const last) {
 		assign(*this, first, last);
@@ -196,6 +190,9 @@ private:
 		return mutable_position;
 	}
 };
+
+template<typename Range>
+dynamic_resizable_array(Range &&) -> dynamic_resizable_array<std::decay_t<typename std::decay_t<Range>::value_type>>;
 
 
 }	// namespace detail

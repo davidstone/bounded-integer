@@ -36,7 +36,6 @@ template<typename Storage>
 struct fixed_capacity_vector {
 private:
 	Storage m_storage;
-	enum class count_constructor{};
 public:
 	static constexpr auto capacity() noexcept {
 		return Storage::capacity();
@@ -48,11 +47,6 @@ public:
 	using iterator = contiguous_iterator<value_type, static_cast<std::ptrdiff_t>(capacity())>;
 
 	constexpr fixed_capacity_vector() = default;
-	
-	template<typename Count> requires std::is_convertible_v<Count, size_type>
-	constexpr fixed_capacity_vector(Count const count, value_type const & value) BOUNDED_NOEXCEPT_INITIALIZATION(
-		fixed_capacity_vector(count_constructor{}, count, value)
-	) {}
 	
 	template<typename InputIterator, typename Sentinel> requires is_iterator_sentinel<InputIterator, Sentinel>
 	constexpr fixed_capacity_vector(InputIterator first, Sentinel const last) noexcept(noexcept(first != last) and noexcept(++first) and noexcept(std::declval<fixed_capacity_vector &>().emplace_back(*first))) {
@@ -135,16 +129,6 @@ public:
 	constexpr auto pop_back() {
 		bounded::destroy(back(*this));
 		--m_storage.size;
-	}
-
-
-private:
-	template<typename Count, typename... MaybeInitializer>
-	constexpr explicit fixed_capacity_vector(count_constructor, Count const count, MaybeInitializer && ... args) noexcept(std::is_nothrow_constructible_v<value_type, MaybeInitializer && ...>) {
-		static_assert(sizeof...(MaybeInitializer) == 0 or sizeof...(MaybeInitializer) == 1);
-		for (auto const n [[maybe_unused]] : integer_range(count)) {
-			emplace_back(BOUNDED_FORWARD(args)...);
-		}
 	}
 };
 

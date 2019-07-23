@@ -31,7 +31,7 @@ void test_generic(T const & t, std::initializer_list<T> init) {
 		BOUNDED_TEST(value == T{});
 	}
 	
-	auto const count_arg = container(capacity, t);
+	auto const count_arg = container(containers::repeat_n(capacity, t));
 	BOUNDED_TEST(size(count) == capacity);
 	for (auto const & value : count_arg) {
 		BOUNDED_TEST(value == t);
