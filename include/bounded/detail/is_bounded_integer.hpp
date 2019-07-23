@@ -11,21 +11,21 @@
 namespace bounded {
 
 template<typename T>
-constexpr auto is_bounded_integer = false;
+constexpr inline auto is_bounded_integer = false;
 
 template<auto minimum, auto maximum, typename overflow_policy>
-constexpr auto is_bounded_integer<integer<minimum, maximum, overflow_policy>> = true;
+constexpr inline auto is_bounded_integer<integer<minimum, maximum, overflow_policy>> = true;
 
 template<typename T>
-constexpr auto is_bounded_integer<T const> = is_bounded_integer<T>;
+constexpr inline auto is_bounded_integer<T const> = is_bounded_integer<T>;
 
 template<typename T>
-constexpr auto is_bounded_integer<T volatile> = is_bounded_integer<T>;
+constexpr inline auto is_bounded_integer<T volatile> = is_bounded_integer<T>;
 
 template<typename T>
-constexpr auto is_bounded_integer<T &> = is_bounded_integer<T>;
+constexpr inline auto is_bounded_integer<T &> = is_bounded_integer<T>;
 
 template<typename T>
-constexpr auto is_bounded_integer<T &&> = is_bounded_integer<T>;
+constexpr inline auto is_bounded_integer<T &&> = is_bounded_integer<T>;
 
 }	// namespace bounded
