@@ -50,10 +50,6 @@ public:
 	constexpr fixed_capacity_vector() = default;
 	
 	template<typename Count> requires std::is_convertible_v<Count, size_type>
-	constexpr explicit fixed_capacity_vector(Count const count) BOUNDED_NOEXCEPT_INITIALIZATION(
-		fixed_capacity_vector(count_constructor{}, count)
-	) {}
-	template<typename Count> requires std::is_convertible_v<Count, size_type>
 	constexpr fixed_capacity_vector(Count const count, value_type const & value) BOUNDED_NOEXCEPT_INITIALIZATION(
 		fixed_capacity_vector(count_constructor{}, count, value)
 	) {}

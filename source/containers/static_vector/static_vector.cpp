@@ -19,7 +19,7 @@ using namespace bounded::literal;
 	constexpr auto default_constructed = containers::static_vector<int, 9>{};
 	static_assert(empty(default_constructed));
 	
-	constexpr auto default_constructed_elements = containers::static_vector<int, 3>(2_bi);
+	constexpr auto default_constructed_elements = containers::static_vector<int, 3>(containers::repeat_default_n<int>(2_bi));
 	static_assert(size(default_constructed_elements) == 2_bi);
 	static_assert(at(default_constructed_elements, 1_bi) == 0);
 	
@@ -60,7 +60,7 @@ void test_generic(T const & t, std::initializer_list<T> init) {
 	BOUNDED_TEST(empty(default_constructed));
 	static_assert(default_constructed.capacity() == capacity);
 	
-	auto const count = container(capacity);
+	auto const count = container(containers::repeat_default_n<T>(capacity));
 	BOUNDED_TEST(size(count) == capacity);
 
 	BOUNDED_TEST(begin(default_constructed) == begin(default_constructed));

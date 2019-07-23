@@ -21,7 +21,7 @@ void test_generic(bounded::constant_t<capacity_> const capacity, T const & t, st
 	BOUNDED_TEST(begin(default_constructed) == begin(default_constructed));
 	BOUNDED_TEST(begin(default_constructed) == end(default_constructed));
 	
-	auto const count = container(capacity);
+	auto const count = container(containers::repeat_default_n<T>(capacity));
 	BOUNDED_TEST(size(count) == capacity);
 
 	for (auto const & value : count) {

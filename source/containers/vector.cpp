@@ -22,7 +22,7 @@ void test_generic(T const & t, std::initializer_list<T> init) {
 	BOUNDED_TEST(begin(default_constructed) == begin(default_constructed));
 	BOUNDED_TEST(begin(default_constructed) == end(default_constructed));
 	
-	auto const count = container(capacity);
+	auto const count = container(containers::repeat_default_n<T>(capacity));
 	BOUNDED_TEST(size(count) == capacity);
 
 	for (auto const & value : count) {
@@ -116,8 +116,8 @@ auto test_reserve() {
 
 struct complex_resource {
 	complex_resource() = default;
-	template<typename Size>
-	explicit complex_resource(Size size): data(size) {}
+	template<typename Size> requires std::numeric_limits<Size>::is_integer
+	explicit complex_resource(Size size): data(containers::repeat_default_n<int>(size)) {}
 
 	complex_resource(complex_resource const & other) = default;
 	complex_resource & operator=(complex_resource const & other) = default;

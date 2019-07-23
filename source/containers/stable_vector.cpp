@@ -21,7 +21,7 @@ void test_generic(T const & t, std::initializer_list<T> init) {
 	BOUNDED_TEST(empty(default_constructed));
 	static_assert(default_constructed.capacity() == capacity);
 	
-	auto const count = container(capacity);
+	auto const count = container(containers::repeat_n(capacity, T{}));
 	BOUNDED_TEST(size(count) == capacity);
 
 	BOUNDED_TEST(begin(default_constructed) == begin(default_constructed));

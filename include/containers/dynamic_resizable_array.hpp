@@ -38,14 +38,6 @@ struct dynamic_resizable_array : private Container {
 	constexpr dynamic_resizable_array() noexcept {}
 	
 	template<typename Count> requires std::is_convertible_v<Count, size_type>
-	constexpr explicit dynamic_resizable_array(Count const count) {
-		if (count > capacity()) {
-			this->relocate(count);
-		}
-		::containers::uninitialized_default_construct(begin(*this), begin(*this) + count);
-		this->set_size(count);
-	}
-	template<typename Count> requires std::is_convertible_v<Count, size_type>
 	constexpr dynamic_resizable_array(Count const count, value_type const & value) {
 		auto const repeat = repeat_n(count, value);
 		assign(*this, begin(repeat), end(repeat));
