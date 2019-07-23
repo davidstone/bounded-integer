@@ -89,7 +89,7 @@ constexpr inline auto value_to_function = [](auto && value) {
 	struct result {
 		containers::reference_wrapper<std::remove_reference_t<decltype(value)>> m_ref;
 		constexpr auto & operator()() const {
-			return m_ref;
+			return m_ref.get();
 		}
 	};
 	return result{value};
@@ -108,7 +108,7 @@ public:
 	using value_type = T;
 
 	template<typename U>	
-	repeat_n(size_type const size, U && value):
+	constexpr repeat_n(size_type const size, U && value):
 		m_size(size),
 		m_value(BOUNDED_FORWARD(value))
 	{
