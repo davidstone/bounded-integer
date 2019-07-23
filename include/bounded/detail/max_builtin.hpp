@@ -22,10 +22,6 @@ struct promoted_unsigned_c {
 template<typename T>
 using promoted_unsigned = typename promoted_unsigned_c<std::decay_t<T>>::type;
 
-constexpr auto as_unsigned = [](auto const value) noexcept {
-	return static_cast<promoted_unsigned<decltype(value)>>(value);
-};
-
 #if defined BOUNDED_DETAIL_HAS_128_BIT
 
 template<>

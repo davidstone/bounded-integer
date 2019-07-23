@@ -14,6 +14,10 @@
 namespace bounded {
 namespace detail {
 
+constexpr inline auto as_unsigned = [](auto const value) noexcept {
+	return static_cast<promoted_unsigned<decltype(value)>>(value);
+};
+
 template<typename Integer, typename Base>
 constexpr auto log_impl(Integer value, Base const base) noexcept {
 	auto sum = 0;
