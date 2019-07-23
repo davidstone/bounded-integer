@@ -18,22 +18,27 @@ namespace containers {
 
 struct repeat_n_sentinel {};
 
-template<typename Size, typename T>
+template<typename Size, typename Function>
 struct repeat_n_iterator {
+private:
+	Size m_remaining;
+	Function m_get_value;
+
+public:
 	using iterator_category = std::random_access_iterator_tag;
-	using value_type = std::remove_reference_t<T> const;
+	using value_type = std::remove_reference_t<decltype(std::declval<Function>()())>;
 	using difference_type = decltype(std::declval<Size>() - std::declval<Size>());
 	using pointer = value_type *;
 	using reference = value_type &;
 	
-	constexpr repeat_n_iterator(Size const remaining, value_type & value):
+	constexpr repeat_n_iterator(Size const remaining, Function get_value):
 		m_remaining(remaining),
-		m_value(value)
+		m_get_value(std::move(get_value))
 	{
 	}
 
-	constexpr auto const & operator*() const {
-		return m_value.get();
+	constexpr decltype(auto) operator*() const {
+		return m_get_value();
 	}
 	constexpr auto operator->() const {
 		return std::addressof(operator*());
@@ -60,28 +65,47 @@ struct repeat_n_iterator {
 		return 0_bi == rhs.m_remaining;
 	}
 
-	template<typename Offset> requires std::numeric_limits<Offset>::is_specialized
-	friend constexpr auto operator+(repeat_n_iterator const it, Offset const offset) {
-		return repeat_n_iterator(Size(it.m_remaining - offset), it.m_value);
-	}
+	template<typename Offset> requires(std::numeric_limits<Offset>::is_integer)
+	friend constexpr auto operator+(repeat_n_iterator it, Offset const offset) BOUNDED_NOEXCEPT_VALUE(
+		repeat_n_iterator(Size(it.m_remaining - offset), std::move(it).m_get_value)
+	)
 	friend constexpr auto operator-(repeat_n_iterator const lhs, repeat_n_iterator const rhs) {
 		return rhs.m_remaining - lhs.m_remaining;
 	}
 	friend constexpr auto operator-(repeat_n_sentinel, repeat_n_iterator const rhs) {
 		return rhs.m_remaining;
 	}
-
-private:
-	Size m_remaining;
-	std::reference_wrapper<value_type> m_value;
 };
+
+template<typename Size, typename Function> requires(Size::max() == bounded::constant<0>)
+constexpr auto & operator++(repeat_n_iterator<Size, Function> & it) {
+	BOUNDED_ASSERT_OR_ASSUME(false);
+	return it;
+}
+
+namespace detail {
+
+constexpr inline auto value_to_function = [](auto && value) {
+	struct result {
+		containers::reference_wrapper<std::remove_reference_t<decltype(value)>> m_ref;
+		constexpr auto & operator()() const {
+			return m_ref;
+		}
+	};
+	return result{value};
+};
+
+} // namespace detail
 
 template<typename Size, typename T>
 struct repeat_n {
+private:
+	Size m_size;
+	T m_value;
+
+public:
 	using size_type = Size;
 	using value_type = T;
-
-	using const_iterator = repeat_n_iterator<size_type, value_type>;
 
 	template<typename U>	
 	repeat_n(size_type const size, U && value):
@@ -91,20 +115,52 @@ struct repeat_n {
 	}
 
 	constexpr auto begin() const noexcept {
-		return const_iterator(m_size, m_value);
+		return repeat_n_iterator<size_type, decltype(detail::value_to_function(m_value))>(m_size, detail::value_to_function(m_value));
 	}
 	constexpr auto end() const noexcept {
 		return repeat_n_sentinel{};
 	}
 
-	CONTAINERS_OPERATOR_BRACKET_DEFINITIONS(repeat_n)
+	using const_iterator = decltype(std::declval<repeat_n const &>().begin());
 
-private:
-	size_type m_size;
-	value_type m_value;
+	CONTAINERS_OPERATOR_BRACKET_DEFINITIONS(repeat_n)
 };
 
 template<typename Size, typename T>
 repeat_n(Size, T &&) -> repeat_n<bounded::integer<0, bounded::detail::normalize<Size::max().value()>>, T>;
+
+template<typename Size, typename T>
+struct repeat_default_n_t {
+private:
+	Size m_size;
+
+public:
+	using size_type = Size;
+	using value_type = T;
+
+	explicit constexpr repeat_default_n_t(size_type const size):
+		m_size(size)
+	{
+	}
+
+	constexpr auto begin() const noexcept {
+		return repeat_n_iterator(m_size, bounded::construct_return<value_type>);
+	}
+	constexpr auto end() const noexcept {
+		return repeat_n_sentinel{};
+	}
+
+	using const_iterator = decltype(std::declval<repeat_default_n_t const &>().begin());
+
+	CONTAINERS_OPERATOR_BRACKET_DEFINITIONS(repeat_default_n_t)
+};
+
+template<typename T, typename Size>
+constexpr auto repeat_default_n(Size size) {
+	return repeat_default_n_t<
+		bounded::integer<0, bounded::detail::normalize<Size::max().value()>>,
+		T
+	>(size);
+}
 
 }	// namespace containers
