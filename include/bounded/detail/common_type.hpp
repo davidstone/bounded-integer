@@ -34,10 +34,8 @@ struct common_type<
 	bounded::integer<rhs_min, rhs_max, rhs_policy>
 > {
 private:
-	template<auto value>
-	static constexpr auto normalize = bounded::detail::normalize<value>;
-	static constexpr auto minimum = normalize<bounded::detail::safe_min(lhs_min, rhs_min)>;
-	static constexpr auto maximum = normalize<bounded::detail::safe_max(lhs_max, rhs_max)>;
+	static inline constexpr auto minimum = bounded::detail::normalize<bounded::detail::safe_min(lhs_min, rhs_min)>;
+	static inline constexpr auto maximum = bounded::detail::normalize<bounded::detail::safe_max(lhs_max, rhs_max)>;
 public:
 	using type = bounded::integer<
 		minimum,

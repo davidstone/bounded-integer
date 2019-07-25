@@ -25,7 +25,7 @@ namespace bounded {
 namespace detail {
 
 template<typename T>
-constexpr auto allow_construction_from = basic_numeric_limits<T>::is_specialized and (basic_numeric_limits<T>::is_integer or std::is_enum<std::decay_t<T>>{});
+inline constexpr auto allow_construction_from = basic_numeric_limits<T>::is_specialized and (basic_numeric_limits<T>::is_integer or std::is_enum<std::decay_t<T>>{});
 
 template<typename T, typename Minimum, typename Maximum>
 constexpr auto is_implicitly_constructible_from(Minimum const minimum [[maybe_unused]], Maximum const maximum [[maybe_unused]]) noexcept {
@@ -133,7 +133,7 @@ template<auto value, typename overflow_policy = null_policy>
 using constant_t = integer<value, value, overflow_policy>;
 
 template<auto value, typename overflow_policy = null_policy>
-constexpr auto constant = constant_t<detail::normalize<value>, overflow_policy>{};
+inline constexpr auto constant = constant_t<detail::normalize<value>, overflow_policy>{};
 
 
 template<auto minimum, auto maximum, typename overflow_policy_ = null_policy>

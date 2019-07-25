@@ -60,7 +60,7 @@ constexpr auto fits_in_int(T const value) {
 }
 
 template<auto value>
-constexpr auto normalize = static_cast<
+inline constexpr auto normalize = static_cast<
 	std::conditional_t<fits_in_int(+value), int,
 	std::conditional_t<must_use_unsigned(value), max_unsigned_t,
 	max_signed_t

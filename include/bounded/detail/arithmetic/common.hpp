@@ -43,10 +43,10 @@ constexpr auto operator++(T & value) BOUNDED_NOEXCEPT_DECLTYPE(
 )
 
 template<typename T, typename Enable = void>
-constexpr auto incrementable = false;
+inline constexpr auto incrementable = false;
 
 template<typename T>
-constexpr auto incrementable<T, std::void_t<decltype(++std::declval<T &>())>> = true;
+inline constexpr auto incrementable<T, std::void_t<decltype(++std::declval<T &>())>> = true;
 
 template<typename T> requires(incrementable<T> and std::is_copy_constructible_v<T>)
 constexpr auto operator++(T & value, int) noexcept(std::is_nothrow_copy_constructible_v<T> and std::is_nothrow_move_constructible_v<T> and noexcept(++value)) {
@@ -62,10 +62,10 @@ constexpr auto operator--(T & value) BOUNDED_NOEXCEPT_DECLTYPE(
 )
 
 template<typename T, typename Enable = void>
-constexpr auto decrementable = false;
+inline constexpr auto decrementable = false;
 
 template<typename T>
-constexpr auto decrementable<T, std::void_t<decltype(--std::declval<T &>())>> = true;
+inline constexpr auto decrementable<T, std::void_t<decltype(--std::declval<T &>())>> = true;
 
 template<typename T> requires(decrementable<T>)
 constexpr auto operator--(T & value, int) noexcept(std::is_nothrow_copy_constructible_v<T> and std::is_nothrow_move_constructible_v<T> and noexcept(--value)) {
