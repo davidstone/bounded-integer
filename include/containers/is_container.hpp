@@ -22,59 +22,59 @@
 namespace containers {
 
 template<typename>
-constexpr auto is_container = false;
+inline constexpr auto is_container = false;
 
 template<typename T>
-constexpr auto is_container<T[]> = true;
+inline constexpr auto is_container<T[]> = true;
 
 template<typename T, std::size_t size>
-constexpr auto is_container<T[size]> = true;
+inline constexpr auto is_container<T[size]> = true;
 
 
 template<typename T, std::size_t size>
-constexpr auto is_container<std::array<T, size>> = true;
+inline constexpr auto is_container<std::array<T, size>> = true;
 
 template<typename T, typename Allocator>
-constexpr auto is_container<std::deque<T, Allocator>> = true;
+inline constexpr auto is_container<std::deque<T, Allocator>> = true;
 
 template<typename T, typename Allocator>
-constexpr auto is_container<std::forward_list<T, Allocator>> = true;
+inline constexpr auto is_container<std::forward_list<T, Allocator>> = true;
 
 template<typename T, typename Allocator>
-constexpr auto is_container<std::list<T, Allocator>> = true;
+inline constexpr auto is_container<std::list<T, Allocator>> = true;
 
 template<typename T, typename Allocator>
-constexpr auto is_container<std::vector<T, Allocator>> = true;
+inline constexpr auto is_container<std::vector<T, Allocator>> = true;
 
 
 template<typename Key, typename T, typename Compare, typename Allocator>
-constexpr auto is_container<std::map<Key, T, Compare, Allocator>> = true;
+inline constexpr auto is_container<std::map<Key, T, Compare, Allocator>> = true;
 
 template<typename Key, typename Compare, typename Allocator>
-constexpr auto is_container<std::set<Key, Compare, Allocator>> = true;
+inline constexpr auto is_container<std::set<Key, Compare, Allocator>> = true;
 
 template<typename Key, typename T, typename Compare, typename Allocator>
-constexpr auto is_container<std::multimap<Key, T, Compare, Allocator>> = true;
+inline constexpr auto is_container<std::multimap<Key, T, Compare, Allocator>> = true;
 
 template<typename Key, typename Compare, typename Allocator>
-constexpr auto is_container<std::multiset<Key, Compare, Allocator>> = true;
+inline constexpr auto is_container<std::multiset<Key, Compare, Allocator>> = true;
 
 
 template<typename Key, typename T, typename Hash, typename KeyEqual, typename Allocator>
-constexpr auto is_container<std::unordered_map<Key, T, Hash, KeyEqual, Allocator>> = true;
+inline constexpr auto is_container<std::unordered_map<Key, T, Hash, KeyEqual, Allocator>> = true;
 
 template<typename Key, typename Hash, typename KeyEqual, typename Allocator>
-constexpr auto is_container<std::unordered_set<Key, Hash, KeyEqual, Allocator>> = true;
+inline constexpr auto is_container<std::unordered_set<Key, Hash, KeyEqual, Allocator>> = true;
 
 template<typename Key, typename T, typename Hash, typename KeyEqual, typename Allocator>
-constexpr auto is_container<std::unordered_multimap<Key, T, Hash, KeyEqual, Allocator>> = true;
+inline constexpr auto is_container<std::unordered_multimap<Key, T, Hash, KeyEqual, Allocator>> = true;
 
 template<typename Key, typename Hash, typename KeyEqual, typename Allocator>
-constexpr auto is_container<std::unordered_multiset<Key, Hash, KeyEqual, Allocator>> = true;
+inline constexpr auto is_container<std::unordered_multiset<Key, Hash, KeyEqual, Allocator>> = true;
 
 
 template<typename CharT, typename Traits, typename Allocator>
-constexpr auto is_container<std::basic_string<CharT, Traits, Allocator>> = true;
+inline constexpr auto is_container<std::basic_string<CharT, Traits, Allocator>> = true;
 
 
 }	// namespace containers

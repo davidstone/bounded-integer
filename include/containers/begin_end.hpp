@@ -48,10 +48,10 @@ using std::begin_or_end; \
 \
 \
 template<typename T, typename Enable = void> \
-constexpr auto has_rvalue_ ## begin_or_end = false; \
+inline constexpr auto has_rvalue_ ## begin_or_end = false; \
 \
 template<typename T> \
-constexpr auto has_rvalue_ ## begin_or_end<T, decltype(rvalue_ref_qualified(&T::begin_or_end))> = true; \
+inline constexpr auto has_rvalue_ ## begin_or_end<T, decltype(rvalue_ref_qualified(&T::begin_or_end))> = true; \
 \
 \
 template<typename Range> requires( \

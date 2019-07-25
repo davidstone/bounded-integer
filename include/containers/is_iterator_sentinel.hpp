@@ -13,10 +13,10 @@ namespace containers {
 namespace detail {
 
 template<typename LHS, typename RHS, typename Enable = void>
-constexpr auto comparable = false;
+inline constexpr auto comparable = false;
 
 template<typename LHS, typename RHS>
-constexpr auto comparable<
+inline constexpr auto comparable<
 	LHS,
 	RHS,
 	std::void_t<
@@ -28,6 +28,6 @@ constexpr auto comparable<
 }	// namespace detail
 
 template<typename Iterator, typename Sentinel>
-constexpr auto is_iterator_sentinel = is_iterator<Iterator> and detail::comparable<Iterator, Sentinel>;
+inline constexpr auto is_iterator_sentinel = is_iterator<Iterator> and detail::comparable<Iterator, Sentinel>;
 
 }	// namespace containers

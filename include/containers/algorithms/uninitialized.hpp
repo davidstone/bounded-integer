@@ -22,10 +22,10 @@ namespace detail {
 // reinterpret_cast or static_cast from void * are not allowed in constexpr
 
 template<typename Target, typename Source, typename Enable = void>
-constexpr auto is_static_castable = false;
+inline constexpr auto is_static_castable = false;
 
 template<typename Target, typename Source>
-constexpr auto is_static_castable<
+inline constexpr auto is_static_castable<
 	Target,
 	Source,
 	std::void_t<decltype(static_cast<Target>(std::declval<Source>()))>

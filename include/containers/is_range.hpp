@@ -15,12 +15,12 @@ using std::begin;
 using std::end;
 
 template<typename T, typename = void>
-constexpr auto is_range = false;
+inline constexpr auto is_range = false;
 
 // This has to be slightly more complicated than I would like due to
 // https://stackoverflow.com/questions/22486386/partially-specializing-a-non-type-template-parameter-of-dependent-type
 template<typename T>
-constexpr auto is_range<
+inline constexpr auto is_range<
 	T,
 	std::void_t<decltype(begin(std::declval<T>())), decltype(end(std::declval<T>()))>
 > = is_iterator_sentinel<decltype(begin(std::declval<T>())), decltype(end(std::declval<T>()))>;
