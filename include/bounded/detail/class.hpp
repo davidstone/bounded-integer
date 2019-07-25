@@ -179,16 +179,18 @@ public:
 
 	// Use non_check_t constructors if you know by means that cannot be
 	// determined by the type system that the value fits in the range.
-	template<typename T> requires
+	template<typename T> requires(
 		detail::is_explicitly_constructible_from<overflow_policy, T const &>(minimum, maximum)
+	)
 	constexpr integer(T const & other, non_check_t) noexcept:
 		base(static_cast<underlying_type>(other)) {
 	}
 
 
 	// Intentionally implicit: this is safe because the value is in range
-	template<typename T> requires
+	template<typename T> requires(
 		detail::is_implicitly_constructible_from<T const &>(minimum, maximum)
+	)
 	constexpr integer(T const & other, overflow_policy = overflow_policy{}) BOUNDED_NOEXCEPT_INITIALIZATION(
 		integer(other, non_check)
 	) {
@@ -245,11 +247,15 @@ public:
 	constexpr auto operator=(integer const & other) & noexcept -> integer & = default;
 	constexpr auto operator=(integer && other) & noexcept -> integer & = default;
 
-	template<typename T> requires detail::is_explicitly_constructible_from<overflow_policy, T const &>(minimum, maximum)
+	template<typename T> requires(
+		detail::is_explicitly_constructible_from<overflow_policy, T const &>(minimum, maximum)
+	)
 	constexpr auto && operator=(T const & other) & noexcept(noexcept(apply_overflow_policy(other))) {
 		return unchecked_assignment(apply_overflow_policy(other));
 	}
-	template<typename T> requires detail::is_explicitly_constructible_from<overflow_policy, T const &>(minimum, maximum)
+	template<typename T> requires(
+		detail::is_explicitly_constructible_from<overflow_policy, T const &>(minimum, maximum)
+	)
 	auto operator=(T const & other) volatile & noexcept(noexcept(apply_overflow_policy(other))) {
 		unchecked_assignment(apply_overflow_policy(other));
 	}
