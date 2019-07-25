@@ -17,28 +17,28 @@ namespace containers {
 namespace detail {
 
 template<typename, typename = void>
-constexpr auto has_push_back = false;
+inline constexpr auto has_push_back = false;
 
 template<typename Container>
-constexpr auto has_push_back<
+inline constexpr auto has_push_back<
 	Container,
 	std::void_t<decltype(push_back(std::declval<Container &>(), std::declval<typename Container::value_type>()))>
 > = true;
 
 template<typename, typename = void>
-constexpr auto has_append_from_capacity = false;
+inline constexpr auto has_append_from_capacity = false;
 
 template<typename Container>
-constexpr auto has_append_from_capacity<
+inline constexpr auto has_append_from_capacity<
 	Container,
 	std::void_t<decltype(std::declval<Container &>().append_from_capacity(std::declval<typename Container::size_type>()))>
 > = true;
 
 template<typename, typename, typename = void>
-constexpr auto has_insert = false;
+inline constexpr auto has_insert = false;
 
 template<typename Container, typename Range>
-constexpr auto has_insert<
+inline constexpr auto has_insert<
 	Container,
 	Range,
 	std::void_t<decltype(std::declval<Container &>().insert(
@@ -49,10 +49,10 @@ constexpr auto has_insert<
 > = true;
 
 template<typename, typename = void>
-constexpr auto has_size = false;
+inline constexpr auto has_size = false;
 
 template<typename Container>
-constexpr auto has_size<
+inline constexpr auto has_size<
 	Container,
 	std::void_t<decltype(size(std::declval<Container>()))>
 > = true;

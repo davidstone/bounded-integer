@@ -17,13 +17,13 @@ namespace detail {
 // TODO: std::invoke
 
 template<typename T>
-constexpr auto is_reference_wrapper = false;
+inline constexpr auto is_reference_wrapper = false;
 
 template<typename T>
-constexpr auto is_reference_wrapper<reference_wrapper<T>> = true;
+inline constexpr auto is_reference_wrapper<reference_wrapper<T>> = true;
 
 template<typename T>
-constexpr auto is_reference_wrapper<std::reference_wrapper<T>> = true;
+inline constexpr auto is_reference_wrapper<std::reference_wrapper<T>> = true;
 
 template<typename T, bool should_derive = std::is_class_v<T> and !std::is_final_v<T> and std::is_empty_v<T>>
 struct function_wrapper;

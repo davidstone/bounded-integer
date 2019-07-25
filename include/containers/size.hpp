@@ -36,10 +36,10 @@ constexpr auto size(Range const & range, Ignored && ...) noexcept {
 using ::containers::detail::common::size;
 
 template<typename, typename = void>
-constexpr auto is_sized = false;
+inline constexpr auto is_sized = false;
 
 template<typename Range>
-constexpr auto is_sized<
+inline constexpr auto is_sized<
 	Range,
 	std::void_t<decltype(size(std::declval<Range const &>()))>
 > = true;

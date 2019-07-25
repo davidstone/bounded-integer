@@ -17,10 +17,10 @@ namespace containers {
 namespace detail {
 
 template<typename, typename = void>
-constexpr auto has_reserve = false;
+inline constexpr auto has_reserve = false;
 
 template<typename Container>
-constexpr auto has_reserve<
+inline constexpr auto has_reserve<
 	Container,
 	std::void_t<decltype(std::declval<Container>().reserve(std::declval<typename Container::size_type>()))>
 > = true;

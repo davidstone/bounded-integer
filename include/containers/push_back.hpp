@@ -14,10 +14,10 @@ namespace detail {
 namespace common {
 
 template<typename, typename = void>
-constexpr auto has_member_push_back = false;
+inline constexpr auto has_member_push_back = false;
 
 template<typename Container>
-constexpr auto has_member_push_back<
+inline constexpr auto has_member_push_back<
 	Container,
 	std::void_t<decltype(std::declval<Container &>().push_back(std::declval<typename Container::value_type>()))>
 > = true;
