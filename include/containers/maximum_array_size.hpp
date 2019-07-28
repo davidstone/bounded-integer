@@ -17,7 +17,7 @@ using namespace bounded::literal;
 
 // TODO: support larger array sizes
 template<typename T>
-constexpr auto maximum_array_size = bounded::detail::normalize<
+inline constexpr auto maximum_array_size = bounded::detail::normalize<
 	bounded::min(
 		bounded::constant<std::numeric_limits<std::ptrdiff_t>::max()> / bounded::size_of<T>,
 		(1_bi << 31_bi) - 1_bi

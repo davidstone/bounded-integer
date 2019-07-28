@@ -70,7 +70,7 @@ constexpr auto data(owning_storage<T> & container) noexcept {
 // Therefore, to request the smallest possible buffer, the user can request a
 // size of 1
 template<typename T>
-constexpr auto minimum_small_capacity = (bounded::size_of<std::pair<typename dynamic_array_data<T>::size_type, dynamic_array_data<T>>> - bounded::size_of<unsigned char>) / bounded::size_of<T>;
+inline constexpr auto minimum_small_capacity = (bounded::size_of<std::pair<typename dynamic_array_data<T>::size_type, dynamic_array_data<T>>> - bounded::size_of<unsigned char>) / bounded::size_of<T>;
 
 
 template<typename T, std::size_t requested_small_capacity>
@@ -320,7 +320,7 @@ private:
 }	// namespace detail
 
 template<typename T, std::size_t requested_capacity>
-constexpr auto is_container<detail::sbo_vector_base<T, requested_capacity>> = true;
+inline constexpr auto is_container<detail::sbo_vector_base<T, requested_capacity>> = true;
 
 template<typename T, std::size_t requested_small_capacity>
 using small_buffer_optimized_vector = detail::dynamic_resizable_array<detail::sbo_vector_base<T, requested_small_capacity>>;

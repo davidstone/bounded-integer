@@ -13,7 +13,7 @@ namespace containers {
 namespace detail {
 
 template<typename Range>
-constexpr auto noexcept_iterable =
+inline constexpr auto noexcept_iterable =
 	noexcept(begin(std::declval<Range>()) != end(std::declval<Range>())) and
 	noexcept(++std::declval<decltype(begin(std::declval<Range>())) &>());
 

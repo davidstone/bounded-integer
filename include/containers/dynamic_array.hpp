@@ -198,7 +198,7 @@ private:
 
 
 template<typename T>
-constexpr auto is_container<dynamic_array<T>> = true;
+inline constexpr auto is_container<dynamic_array<T>> = true;
 
 
 template<typename T, typename ForwardIterator, typename Sentinel> requires

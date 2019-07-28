@@ -94,7 +94,7 @@ private:
 }	// namespace detail
 
 template<typename T>
-constexpr auto is_container<detail::vector_base<T>> = true;
+inline constexpr auto is_container<detail::vector_base<T>> = true;
 
 template<typename T>
 using vector = detail::dynamic_resizable_array<detail::vector_base<T>>;

@@ -16,7 +16,7 @@ namespace detail {
 
 // A non-movable type still returns true for is_trivially_copyable and friends
 template<typename T>
-constexpr auto constexpr_constructible = std::is_move_assignable_v<T> and std::is_trivially_move_assignable_v<T> and std::is_trivially_destructible_v<T>;
+inline constexpr auto constexpr_constructible = std::is_move_assignable_v<T> and std::is_trivially_move_assignable_v<T> and std::is_trivially_destructible_v<T>;
 
 // Try () initialization first, then {} initialization
 
@@ -36,10 +36,10 @@ struct construct_return_t {
 }	// namespace detail
 
 template<typename T>
-constexpr inline auto construct_return = detail::construct_return_t<T>{};
+inline constexpr auto construct_return = detail::construct_return_t<T>{};
 
 
-constexpr inline struct construct_t {
+inline constexpr struct construct_t {
 	// The assignment operator must return a T & if it is trivial
 	template<typename T, typename... Args> requires detail::constexpr_constructible<T>
 	constexpr auto operator()(T & ref, Args && ... args) const BOUNDED_NOEXCEPT_REF(
@@ -53,7 +53,7 @@ constexpr inline struct construct_t {
 } construct;
 
 
-constexpr inline auto destroy = [](auto & ref) noexcept {
+inline constexpr auto destroy = [](auto & ref) noexcept {
 	using T = std::decay_t<decltype(ref)>;
 	if constexpr (!std::is_trivially_destructible_v<T>) {
 		ref.~T();

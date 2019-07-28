@@ -91,10 +91,10 @@ tuple(Ts && ...) -> tuple<std::decay_t<Ts>...>;
 
 
 template<typename T>
-constexpr auto is_tuple = false;
+inline constexpr auto is_tuple = false;
 
 template<typename... Types>
-constexpr auto is_tuple<tuple<Types...>> = true;
+inline constexpr auto is_tuple<tuple<Types...>> = true;
 
 
 
@@ -246,7 +246,7 @@ template<typename... Types>
 struct tuple_size_c<tuple<Types...>> : std::integral_constant<std::size_t, sizeof...(Types)> {};
 
 template<typename Tuple>
-constexpr auto tuple_size = constant<tuple_size_c<std::decay_t<Tuple>>::value>;
+inline constexpr auto tuple_size = constant<tuple_size_c<std::decay_t<Tuple>>::value>;
 
 
 template<std::size_t index, typename Tuple>
@@ -272,7 +272,7 @@ struct indexed_tuple<std::index_sequence<indexes...>, Tuple> {
 template<typename Tuple>
 indexed_tuple(Tuple &&) -> indexed_tuple<std::make_index_sequence<tuple_size<Tuple>.value()>, Tuple>;
 
-constexpr struct tuple_cat_t {
+inline constexpr struct tuple_cat_t {
 private:
 	template<std::size_t... first_indexes, typename First, std::size_t... second_indexes, typename Second, typename... Tail>
 	constexpr auto cat_impl(
@@ -308,7 +308,7 @@ public:
 } tuple_cat;
 
 
-constexpr struct apply_t {
+inline constexpr struct apply_t {
 private:
 	template<typename Tuple, std::size_t... indexes, typename Function>
 	static constexpr auto implementation(Tuple && tuple_args, std::index_sequence<indexes...>, Function && f) BOUNDED_NOEXCEPT_DECLTYPE(
@@ -336,7 +336,7 @@ constexpr auto all_tuple_sizes() noexcept {
 
 #define BOUNDED_FUNCTION_EXPRESSION std::declval<Function>()(std::declval<Tuples>()[constant<index>]...)
 template<std::size_t index, typename Function, typename... Tuples>
-constexpr auto is_noexcept_function_call = 
+inline constexpr auto is_noexcept_function_call = 
 		(
 			std::is_reference_v<decltype(BOUNDED_FUNCTION_EXPRESSION)> or
 			std::is_nothrow_move_constructible_v<decltype(BOUNDED_FUNCTION_EXPRESSION)>
@@ -350,7 +350,7 @@ constexpr auto all_noexcept_function_calls_impl(std::index_sequence<indexes...>)
 }
 
 template<typename Function, typename... Tuples>
-constexpr auto all_noexcept_function_calls = all_noexcept_function_calls_impl<Function, Tuples...>(make_index_sequence(all_tuple_sizes<Tuples...>()));
+inline constexpr auto all_noexcept_function_calls = all_noexcept_function_calls_impl<Function, Tuples...>(make_index_sequence(all_tuple_sizes<Tuples...>()));
 
 
 

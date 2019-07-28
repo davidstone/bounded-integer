@@ -48,7 +48,7 @@ constexpr auto is_explicitly_constructible_from(Minimum const minimum [[maybe_un
 
 // Necessary for optional specialization
 template<typename T>
-constexpr auto has_extra_space =
+inline constexpr auto has_extra_space =
 	basic_numeric_limits<typename T::underlying_type>::min() < basic_numeric_limits<T>::min() or
 	basic_numeric_limits<T>::max() < basic_numeric_limits<typename T::underlying_type>::max();
 

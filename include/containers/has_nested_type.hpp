@@ -7,14 +7,14 @@
 
 #include <type_traits>
 
-#define CONTAINERS_MAKE_NESTED_TYPE_TEST(type) \
+#define CONTAINERS_MAKE_NESTED_TYPE_TEST(type_name) \
 \
 template<typename T> \
-constexpr auto has_nested_type_impl_ ## type(typename std::remove_reference_t<T>::type *) noexcept { return true; } \
+inline constexpr auto has_nested_type_impl_ ## type_name(typename std::remove_reference_t<T>::type_name *) noexcept { return true; } \
 \
 template<typename> \
-constexpr auto has_nested_type_impl_ ## type(...) noexcept { return false; } \
+inline constexpr auto has_nested_type_impl_ ## type_name(...) noexcept { return false; } \
 \
 template<typename T> \
-constexpr auto has_nested_type_ ## type = detail::has_nested_type_impl_ ##type<T>(nullptr);
+inline constexpr auto has_nested_type_ ## type_name = detail::has_nested_type_impl_ ## type_name<T>(nullptr);
 

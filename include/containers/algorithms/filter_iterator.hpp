@@ -53,16 +53,16 @@ public:
 };
 
 template<typename T>
-constexpr auto is_filter_iterator_traits = false;
+inline constexpr auto is_filter_iterator_traits = false;
 
 template<typename Sentinel, typename UnaryPredicate>
-constexpr auto is_filter_iterator_traits<filter_iterator_traits<Sentinel, UnaryPredicate>> = true;
+inline constexpr auto is_filter_iterator_traits<filter_iterator_traits<Sentinel, UnaryPredicate>> = true;
 
 template<typename T>
-constexpr auto is_filter_iterator_traits<reference_wrapper<T>> = is_filter_iterator_traits<T>;
+inline constexpr auto is_filter_iterator_traits<reference_wrapper<T>> = is_filter_iterator_traits<T>;
 
 template<typename T>
-constexpr auto is_filter_iterator_traits<T const> = is_filter_iterator_traits<T>;
+inline constexpr auto is_filter_iterator_traits<T const> = is_filter_iterator_traits<T>;
 
 
 struct filter_iterator_sentinel {

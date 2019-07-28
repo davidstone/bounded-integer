@@ -12,15 +12,15 @@
 namespace bounded {
 
 template<typename T>
-constexpr auto size_of = constant<sizeof(T)>;
+inline constexpr auto size_of = constant<sizeof(T)>;
 
 namespace {
 
-constexpr auto char_bit = constant<CHAR_BIT>;
+inline constexpr auto char_bit = constant<CHAR_BIT>;
 
 }	// namespace
 
 template<typename T>
-constexpr auto size_of_bits = size_of<T> * char_bit;
+inline constexpr auto size_of_bits = size_of<T> * char_bit;
 
 }	// namespace bounded
