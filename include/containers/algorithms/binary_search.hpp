@@ -22,18 +22,22 @@ constexpr inline struct partition_point_t {
 		using size_type = decltype(size(range));
 		auto count = bounded::integer<0, bounded::detail::normalize<std::numeric_limits<size_type>::max().value()>>(size(range));
 		auto first = begin(range);
-		while (count > bounded::constant<0>) {
-			auto it = first;
-			auto const step = count / bounded::constant<2>;
-			::containers::advance(it, step);
-			if (predicate(*it)) {
-				first = ::containers::next(it);
-				count -= step + 1;
-			} else {
-				count = step;
+		if constexpr (count.max() == bounded::constant<0>) {
+			return first;
+		} else {
+			while (count > bounded::constant<0>) {
+				auto it = first;
+				auto const step = count / bounded::constant<2>;
+				::containers::advance(it, step);
+				if (predicate(*it)) {
+					first = ::containers::next(it);
+					count -= step + bounded::constant<1>;
+				} else {
+					count = step;
+				}
 			}
+			return first;
 		}
-		return first;
 	}
 } partition_point;
 
