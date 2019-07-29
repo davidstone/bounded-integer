@@ -365,6 +365,8 @@ target_link_libraries(variant PUBLIC bounded)
 
 
 set(COMMON_CLANG_COMPILE_OPTIONS
+	"-Xclang"
+	"-fconcepts-ts"
 	"-Weverything"
 	"-Werror"
 	"-Wno-c++98-compat"
