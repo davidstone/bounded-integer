@@ -37,7 +37,7 @@ constexpr decltype(auto) reorder_transform_implementation(bounded::constant_t<in
 // original order after that. This allows us to write an interface that accepts
 // stuff and a function to operate on the stuff, but allows us to transform the
 // arguments in some way before calling the user function.
-auto reorder_transform = [](auto transform, auto && ... args) -> decltype(auto) {
+inline constexpr auto reorder_transform = [](auto transform, auto && ... args) -> decltype(auto) {
 	return ::bounded::detail::reorder_transform_implementation(
 		bounded::constant<bounded::detail::normalize<sizeof...(args) - 1U>>,
 		transform,
@@ -78,36 +78,40 @@ using variant_types = typename variant_types_impl<
 >::type;
 
 
+// The primary template is unused
 template<typename Function, typename Args, typename... Lists>
-inline constexpr auto is_cartesian_product_callable_impl = false;
+inline constexpr auto is_cartesian_product_callable = false;
 
 template<typename Function, typename... Args>
-inline constexpr auto is_cartesian_product_callable_impl<Function, types<Args...>> = std::is_invocable_v<Function, Args...>;
+inline constexpr auto is_cartesian_product_callable<Function, types<Args...>> = std::is_invocable_v<Function, Args...>;
 
 template<typename Function, typename... Args, typename... Types, typename... Rest>
-inline constexpr auto is_cartesian_product_callable_impl<Function, types<Args...>, types<Types...>, Rest...> = (
+inline constexpr auto is_cartesian_product_callable<Function, types<Args...>, types<Types...>, Rest...> = (
 	... and
-	is_cartesian_product_callable_impl<Function, types<Args..., Types>, Rest...>
+	is_cartesian_product_callable<Function, types<Args..., Types>, Rest...>
 );
 
-// Requires that Lists is actually a variadic pack of types
-template<typename Function, typename... Lists>
-inline constexpr auto is_cartesian_product_callable = std::is_invocable_v<Function>;
-
-template<typename Function, typename... Types, typename... Rest>
-inline constexpr auto is_cartesian_product_callable<Function, types<Types...>, Rest...> = (
-	... and
-	is_cartesian_product_callable_impl<Function, types<Types>, Rest...>
-);
-
-template<typename Function, typename... Variants>
-inline constexpr auto is_visitable = is_cartesian_product_callable<Function, variant_types<Variants>...>;
-
+// The primary template just rotates the parameters
 template<std::size_t index, typename TransformFunction, typename Arg, typename... Args>
-constexpr auto is_variants_then_visit_function = is_variants_then_visit_function<index - 1U, TransformFunction, Args..., Arg>;
+inline constexpr auto is_variants_then_visit_function = is_variants_then_visit_function<
+	index - 1U,
+	TransformFunction,
+	Args...,
+	Arg
+>;
 
-template<typename TransformFunction, typename Function, typename... Args>
-constexpr auto is_variants_then_visit_function<0U, TransformFunction, Function, Args...> = is_visitable<decltype(std::declval<TransformFunction>()(std::declval<Function>())), Args...>;
+// The specialization forwards to the implementation that does the real work
+template<typename TransformFunction, typename Function, typename... Variants>
+inline constexpr auto is_variants_then_visit_function<
+	0U,
+	TransformFunction,
+	Function,
+	Variants...
+> = is_cartesian_product_callable<
+	decltype(std::declval<TransformFunction>()(std::declval<Function>())),
+	types<>,
+	variant_types<Variants>...
+>;
 
 
 
@@ -174,8 +178,8 @@ inline constexpr auto visit_interface = [](auto transform) {
 };
 
 } // namespace detail
-	
-constexpr struct visit_with_index_t {
+
+inline constexpr struct visit_with_index_t {
 private:
 	static inline constexpr auto identity = [](auto && function) -> decltype(auto) {
 		return BOUNDED_FORWARD(function);
@@ -190,7 +194,7 @@ public:
 
 // Accepts any number of variants (including 0) followed by one function with
 // arity equal to the number of variants
-constexpr struct visit_t {
+inline constexpr struct visit_t {
 private:
 	// The reference is safe in the inner lambda because this function lives
 	// only for the duration of the call
