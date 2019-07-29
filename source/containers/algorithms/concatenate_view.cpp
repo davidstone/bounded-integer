@@ -7,6 +7,7 @@
 
 #include <containers/array/array.hpp>
 #include <containers/static_vector/static_vector.hpp>
+#include <containers/size.hpp>
 
 namespace {
 using namespace bounded::literal;
@@ -22,6 +23,14 @@ constexpr auto array2 = containers::array{2, 3, 5, 7};
 constexpr auto array3 = containers::array{1, 1, 2, 3, 5};
 
 constexpr auto two = containers::concatenate_view(array1, array2);
+
+using iterator = decltype(begin(two));
+using sentinel = decltype(end(two));
+
+static_assert(containers::is_iterator<iterator>);
+static_assert(containers::is_iterator_sentinel<iterator, sentinel>);
+static_assert(containers::is_range<decltype(two)>);
+
 static_assert(size(two) == size(array1) + size(array2));
 static_assert(equal_values_and_types(
 	two,
