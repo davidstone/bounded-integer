@@ -37,7 +37,7 @@ using namespace bounded::literal;
 		value.emplace_back(15);
 		value.emplace_back(20);
 		value.emplace(begin(value) + 1_bi, 10);
-		value.pop_back();
+		containers::pop_back(value);
 		auto copy = containers::static_vector<int, 10>{};
 		copy = value;
 		copy.insert(begin(copy) + 1_bi, value);
@@ -114,7 +114,7 @@ void test_generic(T const & t, std::initializer_list<T> init) {
 	push_back(copy, t);
 	BOUNDED_TEST(size(copy) == 1_bi);
 	BOUNDED_TEST(back(copy) == t);
-	copy.pop_back();
+	containers::pop_back(copy);
 	push_back(copy, T(t));
 	BOUNDED_TEST(size(copy) == 1_bi);
 	BOUNDED_TEST(back(copy) == t);

@@ -148,6 +148,7 @@ target_sources(containers INTERFACE
 	$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>/include/containers/noexcept_iterable.hpp
 	$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>/include/containers/operator_arrow.hpp
 	$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>/include/containers/operator_bracket.hpp
+	$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>/include/containers/pop_back.hpp
 	$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>/include/containers/push_back.hpp
 	$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>/include/containers/range_view.hpp
 	$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>/include/containers/reference_wrapper.hpp
@@ -306,6 +307,7 @@ add_library(containers_test STATIC
 	source/containers/mutable_iterator.cpp
 	source/containers/noexcept_iterable.cpp
 	source/containers/operator_arrow.cpp
+	source/containers/pop_back.cpp
 	source/containers/push_back.cpp
 	source/containers/range_view.cpp
 	source/containers/reference_wrapper.cpp

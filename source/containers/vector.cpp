@@ -71,7 +71,7 @@ void test_generic(T const & t, std::initializer_list<T> init) {
 	push_back(copy, t);
 	BOUNDED_TEST(size(copy) == 1_bi);
 	BOUNDED_TEST(back(copy) == t);
-	copy.pop_back();
+	containers::pop_back(copy);
 	push_back(copy, T(t));
 	BOUNDED_TEST(size(copy) == 1_bi);
 	BOUNDED_TEST(back(copy) == t);

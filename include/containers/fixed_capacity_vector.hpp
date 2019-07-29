@@ -13,6 +13,7 @@
 #include <containers/integer_range.hpp>
 #include <containers/is_iterator_sentinel.hpp>
 #include <containers/operator_bracket.hpp>
+#include <containers/pop_back.hpp>
 #include <containers/repeat_n.hpp>
 
 #include <bounded/assert.hpp>
@@ -53,7 +54,7 @@ public:
 		!std::is_array_v<std::remove_cv_t<std::remove_reference_t<Range>>>
 	)
 	constexpr explicit fixed_capacity_vector(Range && range) {
-		for (auto && value : BOUNDED_FORWARD(range)) {
+		for (decltype(auto) value : BOUNDED_FORWARD(range)) {
 			emplace_back(BOUNDED_FORWARD(value));
 		}
 	}
@@ -120,14 +121,9 @@ public:
 			return iterator{};
 		});
 	}
-	
-	constexpr auto pop_back() {
-		bounded::destroy(back(*this));
-		--m_storage.size;
-	}
 };
 
 template<typename Storage>
-constexpr auto is_container<fixed_capacity_vector<Storage>> = true;
+inline constexpr auto is_container<fixed_capacity_vector<Storage>> = true;
 
 }	// namespace containers

@@ -6,6 +6,7 @@
 #pragma once
 
 #include <containers/is_container.hpp>
+#include <containers/pop_back.hpp>
 
 #include <bounded/integer.hpp>
 
@@ -13,19 +14,10 @@ namespace containers {
 namespace detail {
 
 template<typename, typename = void>
-constexpr auto has_pop_back = false;
+inline constexpr auto has_pop_front = false;
 
 template<typename Container>
-constexpr auto has_pop_back<
-	Container,
-	std::void_t<decltype(std::declval<Container &>().pop_back())>
-> = true;
-
-template<typename, typename = void>
-constexpr auto has_pop_front = false;
-
-template<typename Container>
-constexpr auto has_pop_front<
+inline constexpr auto has_pop_front<
 	Container,
 	std::void_t<decltype(std::declval<Container &>().pop_front())>
 > = true;
@@ -34,9 +26,9 @@ namespace common {
 
 template<typename Container> requires is_container<Container>
 constexpr auto clear(Container & container) noexcept {
-	if constexpr (has_pop_back<Container>) {
+	if constexpr (pop_backable<Container>) {
 		while (!empty(container)) {
-			container.pop_back();
+			pop_back(container);
 		}
 	} else if constexpr (has_pop_front<Container>) {
 		while (!empty(container)) {

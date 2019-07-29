@@ -18,7 +18,7 @@ namespace containers {
 namespace detail {
 
 template<typename CharT>
-constexpr auto is_char_like = std::is_trivial_v<CharT> and std::is_standard_layout_v<CharT> and !std::is_array_v<CharT>;
+inline constexpr auto is_char_like = std::is_trivial_v<CharT> and std::is_standard_layout_v<CharT> and !std::is_array_v<CharT>;
 
 } // namespace detail
 
@@ -71,7 +71,6 @@ public:
 	using base::emplace_back;
 	using base::emplace;
 	using base::insert;
-	using base::pop_back;
 	
 	constexpr operator std::basic_string_view<CharT>() const noexcept {
 		return {data(*this), static_cast<typename std::basic_string_view<CharT>::size_type>(size(*this))};
@@ -79,7 +78,7 @@ public:
 };
 
 template<typename CharT>
-constexpr auto is_container<basic_string<CharT>> = true;
+inline constexpr auto is_container<basic_string<CharT>> = true;
 
 
 namespace detail {
@@ -109,7 +108,7 @@ constexpr auto operator==(c_string_sentinel_t<CharT> const lhs, CharT const * rh
 }
 
 template<typename CharT>
-constexpr auto c_string_sentinel = c_string_sentinel_t<CharT>{};
+inline constexpr auto c_string_sentinel = c_string_sentinel_t<CharT>{};
 
 } // namespace detail
 
@@ -153,19 +152,19 @@ constexpr auto operator==(std::basic_string_view<CharT> const lhs, basic_string<
 namespace detail {
 
 template<typename T>
-constexpr auto is_string = false;
+inline constexpr auto is_string = false;
 
 template<typename CharT>
-constexpr auto is_string<basic_string<CharT>> = true;
+inline constexpr auto is_string<basic_string<CharT>> = true;
 
 template<typename T>
-constexpr auto string_like = false;
+inline constexpr auto string_like = false;
 
 template<typename CharT>
-constexpr auto string_like<basic_string<CharT>> = true;
+inline constexpr auto string_like<basic_string<CharT>> = true;
 
 template<typename CharT>
-constexpr auto string_like<std::basic_string_view<CharT>> = true;
+inline constexpr auto string_like<std::basic_string_view<CharT>> = true;
 
 }	// namespace detail
 

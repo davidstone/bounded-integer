@@ -6,6 +6,7 @@
 #pragma once
 
 #include <containers/is_container.hpp>
+#include <containers/pop_back.hpp>
 #include <containers/size.hpp>
 
 #include <bounded/detail/forward.hpp>
@@ -21,7 +22,7 @@ template<typename Container, typename Size, typename... MaybeInitializer>
 constexpr auto resize(common_resize_tag, Container & container, Size const count, MaybeInitializer && ... args) {
 	static_assert(sizeof...(MaybeInitializer) == 0 or sizeof...(MaybeInitializer) == 1);
 	while (size(container) > count) {
-		container.pop_back();
+		pop_back(container);
 	}
 	while (size(container) < count) {
 		container.emplace_back(BOUNDED_FORWARD(args)...);

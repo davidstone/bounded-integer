@@ -70,7 +70,7 @@ void test_generic(bounded::constant_t<capacity_> const capacity, T const & t, st
 	push_back(copy, t);
 	BOUNDED_TEST(size(copy) == 1_bi);
 	BOUNDED_TEST(back(copy) == t);
-	copy.pop_back();
+	containers::pop_back(copy);
 	push_back(copy, T(t));
 	BOUNDED_TEST(size(copy) == 1_bi);
 	BOUNDED_TEST(back(copy) == t);

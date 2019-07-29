@@ -11,6 +11,7 @@
 #include <containers/index_type.hpp>
 #include <containers/insert_emplace_impl.hpp>
 #include <containers/is_container.hpp>
+#include <containers/pop_back.hpp>
 #include <containers/repeat_n.hpp>
 #include <containers/reserve_if_reservable.hpp>
 #include <containers/uninitialized_storage.hpp>
@@ -157,12 +158,6 @@ struct dynamic_resizable_array : private Container {
 		});
 	}
 
-
-	void pop_back() {
-		bounded::destroy(back(*this));
-		append_from_capacity(-1_bi);
-	}
-	
 private:
 	template<typename Integer, typename Function>
 	auto insert_or_emplace_with_reallocation(const_iterator position, Integer number_of_elements, Function construct) {
@@ -192,6 +187,6 @@ dynamic_resizable_array(Range &&) -> dynamic_resizable_array<std::decay_t<typena
 }	// namespace detail
 
 template<typename Container>
-constexpr auto is_container<detail::dynamic_resizable_array<Container>> = true;
+inline constexpr auto is_container<detail::dynamic_resizable_array<Container>> = true;
 
 }	// namespace containers

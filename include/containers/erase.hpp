@@ -11,6 +11,7 @@
 #include <containers/is_container.hpp>
 #include <containers/is_iterator.hpp>
 #include <containers/mutable_iterator.hpp>
+#include <containers/pop_back.hpp>
 
 #include <bounded/assert.hpp>
 #include <bounded/integer.hpp>
@@ -29,7 +30,7 @@ constexpr auto erase(Container & container, Iterator const first_, Iterator cons
 	auto const last = ::containers::detail::mutable_iterator(container, last_);
 	auto const to_clear = ::containers::move(last, end(container), first).output;
 	while (to_clear != end(container)) {
-		container.pop_back();
+		pop_back(container);
 	}
 	return first;
 }
