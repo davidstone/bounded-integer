@@ -35,12 +35,32 @@ constexpr auto assert_same_ends(LHS const & lhs, RHS const & rhs) {
 }
 
 template<typename Range, typename = void>
-constexpr auto is_forward_random_access = false;
+inline constexpr auto is_forward_random_access = false;
 
 template<typename Range>
-constexpr auto is_forward_random_access<Range, std::void_t<decltype(
+inline constexpr auto is_forward_random_access<Range, std::void_t<decltype(
 	begin(std::declval<Range>()) + std::declval<typename Range::size_type>()
 )>> = true;
+
+
+template<typename RangeView>
+using view_iterator = decltype(begin(std::declval<RangeView>()));
+
+template<typename RangeView>
+using view_iterator_traits = std::iterator_traits<view_iterator<RangeView>>;
+
+template<typename category, typename... RangeViews>
+inline constexpr bool any_is_category = (
+	... or
+	std::is_same_v<typename view_iterator_traits<RangeViews>::iterator_category, category>
+);
+
+template<typename... RangeViews>
+inline constexpr bool any_is_input_iterator = any_is_category<std::input_iterator_tag, RangeViews...>;
+
+template<typename... RangeViews>
+inline constexpr bool any_is_output_iterator = any_is_category<std::output_iterator_tag, RangeViews...>;
+
 
 } // namespace detail
 
@@ -59,18 +79,8 @@ struct concatenate_view_iterator : detail::operator_arrow<concatenate_view_itera
 private:
 	static_assert((... and is_range_view<RangeViews>));
 
-	template<typename RangeView>
-	using view_iterator = decltype(begin(std::declval<RangeView>()));
-
-	template<typename RangeView>
-	using traits = std::iterator_traits<view_iterator<RangeView>>;
-
-	template<typename category>
-	static constexpr auto any_is_category =
-		(... or std::is_same_v<typename traits<RangeViews>::iterator_category, category>);
-
 	static_assert(
-		!any_is_category<std::output_iterator_tag> or !any_is_category<std::input_iterator_tag>,
+		!detail::any_is_input_iterator<RangeViews...> or !detail::any_is_output_iterator<RangeViews...>,
 		"Cannot combine input and output ranges in concatenate_view"
 	);
 
@@ -132,25 +142,25 @@ private:
 
 	constexpr auto begin_iterators() const {
 		return bounded::transform([](auto const range) { return begin(range); }, m_range_views);
-	};
+	}
 
 
 public:
 	using value_type = bounded::detail::common_type_and_value_category_t<
-		typename traits<RangeViews>::value_type...
+		typename detail::view_iterator_traits<RangeViews>::value_type...
 	>;
-	using difference_type = decltype((... + std::declval<typename traits<RangeViews>::difference_type>()));
+	using difference_type = decltype((... + std::declval<typename detail::view_iterator_traits<RangeViews>::difference_type>()));
 	
 	using iterator_category =
-		std::conditional_t<any_is_category<std::output_iterator_tag>, std::output_iterator_tag,
-		std::conditional_t<any_is_category<std::input_iterator_tag>, std::input_iterator_tag,
+		std::conditional_t<detail::any_is_output_iterator<RangeViews...>, std::output_iterator_tag,
+		std::conditional_t<detail::any_is_input_iterator<RangeViews...>, std::input_iterator_tag,
 		std::forward_iterator_tag
 	>>;
 	
 	using pointer = std::remove_reference_t<value_type> *;
 
 	using reference = bounded::detail::common_type_and_value_category_t<
-		typename traits<RangeViews>::reference...
+		typename detail::view_iterator_traits<RangeViews>::reference...
 	>;
 
 	constexpr explicit concatenate_view_iterator(RangeViews... range_views):
