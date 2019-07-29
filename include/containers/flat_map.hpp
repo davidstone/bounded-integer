@@ -25,7 +25,8 @@ namespace containers {
 
 template<typename Key, typename Mapped>
 struct map_value_type {
-private:
+//private:
+	// Treat this as private. Public until we have C++20 `<=>` and `==`.
 	bounded::tuple<Key, Mapped> m_data;
 
 public:
@@ -57,18 +58,18 @@ public:
 		return std::move(m_data)[1_bi];
 	}
 
-	// Force this to be a template to allow SFINAE. These functions just become
-	// defaulted <=> and == in C++20.
-	template<typename RHS> requires std::is_same_v<RHS, map_value_type>
-	friend constexpr auto compare(map_value_type const & lhs, RHS const & rhs) BOUNDED_NOEXCEPT_VALUE(
-		compare(lhs.m_data, rhs.m_data)
-	)
-
-	template<typename RHS> requires std::is_same_v<RHS, map_value_type>
-	friend constexpr auto operator==(map_value_type const & lhs, RHS const & rhs) BOUNDED_NOEXCEPT_VALUE(
-		lhs.m_data == rhs.m_data
-	)
 };
+
+// These functions just become defaulted <=> and == in C++20.
+template<typename Key, typename Mapped>
+constexpr auto compare(map_value_type<Key, Mapped> const & lhs, map_value_type<Key, Mapped> const & rhs) BOUNDED_NOEXCEPT_VALUE(
+	compare(lhs.m_data, rhs.m_data)
+)
+
+template<typename Key, typename Mapped>
+constexpr auto operator==(map_value_type<Key, Mapped> const & lhs, map_value_type<Key, Mapped> const & rhs) BOUNDED_NOEXCEPT_VALUE(
+	lhs.m_data == rhs.m_data
+)
 
 constexpr inline struct assume_sorted_unique_t {} assume_sorted_unique;
 constexpr inline struct assume_unique_t {} assume_unique;
