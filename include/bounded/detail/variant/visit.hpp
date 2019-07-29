@@ -197,11 +197,19 @@ public:
 inline constexpr struct visit_t {
 private:
 	// The reference is safe in the inner lambda because this function lives
-	// only for the duration of the call
-	static inline constexpr auto get_value_only = [](auto && function) {
-		return [&](auto && ... args) BOUNDED_NOEXCEPT_DECLTYPE(
+	// only for the duration of the call. Do not use a lambda to work around
+	// https://bugs.llvm.org/show_bug.cgi?id=42749
+	template<typename Function>
+	struct unwrap_visitor_parameter {
+		Function && function;
+		template<typename... Args>
+		constexpr auto operator()(Args && ... args) && BOUNDED_NOEXCEPT_DECLTYPE(
 			BOUNDED_FORWARD(function)(BOUNDED_FORWARD(args).value...)
-		);
+		)
+	};
+
+	static inline constexpr auto get_value_only = [](auto && function) {
+		return unwrap_visitor_parameter<decltype(function)>{BOUNDED_FORWARD(function)};
 	};
 public:
 	template<typename... Args> requires detail::is_variants_then_visit_function<sizeof...(Args) - 1U, decltype(get_value_only), Args...>
