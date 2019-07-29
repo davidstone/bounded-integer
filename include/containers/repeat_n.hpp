@@ -15,6 +15,14 @@
 #include <utility>
 
 namespace containers {
+namespace detail {
+
+template<typename LHS, typename RHS>
+concept construct_subtractible = requires(LHS const lhs, RHS const rhs) {
+	LHS(lhs - rhs);
+};
+
+} // namespace detail
 
 struct repeat_n_sentinel {};
 
@@ -65,10 +73,10 @@ public:
 		return 0_bi == rhs.m_remaining;
 	}
 
-	template<typename Offset> requires(std::numeric_limits<Offset>::is_integer)
-	friend constexpr auto operator+(repeat_n_iterator it, Offset const offset) BOUNDED_NOEXCEPT_VALUE(
-		repeat_n_iterator(Size(it.m_remaining - offset), std::move(it).m_get_value)
-	)
+	template<typename Offset> requires(std::numeric_limits<Offset>::is_integer and detail::construct_subtractible<Size, Offset>)
+	friend constexpr auto operator+(repeat_n_iterator it, Offset const offset) -> repeat_n_iterator {
+		return repeat_n_iterator(Size(it.m_remaining - offset), std::move(it).m_get_value);
+	}
 	friend constexpr auto operator-(repeat_n_iterator const lhs, repeat_n_iterator const rhs) {
 		return rhs.m_remaining - lhs.m_remaining;
 	}
@@ -107,6 +115,8 @@ public:
 	using size_type = Size;
 	using value_type = T;
 
+	using const_iterator = repeat_n_iterator<size_type, decltype(detail::value_to_function(std::declval<T const &>()))>;
+
 	template<typename U>	
 	constexpr repeat_n(size_type const size, U && value):
 		m_size(size),
@@ -115,13 +125,11 @@ public:
 	}
 
 	constexpr auto begin() const noexcept {
-		return repeat_n_iterator<size_type, decltype(detail::value_to_function(m_value))>(m_size, detail::value_to_function(m_value));
+		return const_iterator(m_size, detail::value_to_function(m_value));
 	}
 	constexpr auto end() const noexcept {
 		return repeat_n_sentinel{};
 	}
-
-	using const_iterator = decltype(std::declval<repeat_n const &>().begin());
 
 	CONTAINERS_OPERATOR_BRACKET_DEFINITIONS(repeat_n)
 };
@@ -137,6 +145,7 @@ private:
 public:
 	using size_type = Size;
 	using value_type = T;
+	using const_iterator = repeat_n_iterator<size_type, std::decay_t<decltype(bounded::construct_return<value_type>)>>;
 
 	explicit constexpr repeat_default_n_t(size_type const size):
 		m_size(size)
@@ -144,13 +153,11 @@ public:
 	}
 
 	constexpr auto begin() const noexcept {
-		return repeat_n_iterator(m_size, bounded::construct_return<value_type>);
+		return const_iterator(m_size, bounded::construct_return<value_type>);
 	}
 	constexpr auto end() const noexcept {
 		return repeat_n_sentinel{};
 	}
-
-	using const_iterator = decltype(std::declval<repeat_default_n_t const &>().begin());
 
 	CONTAINERS_OPERATOR_BRACKET_DEFINITIONS(repeat_default_n_t)
 };
