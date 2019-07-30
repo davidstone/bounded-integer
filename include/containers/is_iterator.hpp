@@ -17,6 +17,6 @@ CONTAINERS_MAKE_NESTED_TYPE_TEST(iterator_category)
 }	// namespace detail
 
 template<typename Iterator>
-constexpr auto is_iterator = detail::has_nested_type_iterator_category<std::iterator_traits<Iterator>>;
+inline constexpr auto is_iterator = detail::has_nested_type_iterator_category<std::iterator_traits<Iterator>>;
 
 }	// namespace containers
