@@ -5,89 +5,123 @@
 
 #pragma once
 
+#include <containers/algorithms/copy.hpp>
 #include <containers/array/array.hpp>
-#include <containers/fixed_capacity_vector.hpp>
+#include <containers/common_container_functions.hpp>
+#include <containers/contiguous_iterator.hpp>
+#include <containers/emplace_back.hpp>
+#include <containers/index_type.hpp>
+#include <containers/integer_range.hpp>
+#include <containers/is_iterator_sentinel.hpp>
+#include <containers/operator_bracket.hpp>
+#include <containers/pop_back.hpp>
+#include <containers/repeat_n.hpp>
 #include <containers/uninitialized_storage.hpp>
 
 namespace containers {
-namespace detail {
 
-// literal types cannot have destructors. If value_type is trivially
-// destructible, we can skip calling their destructors, which could allow
-// static_vector<value_type, n> to be a literal type. This should also improve
-// performance.
-//
-// TODO: Theoretically, this shouldn't group different types of triviality, but
-// without requires clauses it is too annoying to write out.
-
-template<
-	typename T,
-	std::size_t capacity_,
-	bool = std::is_trivially_destructible_v<T> and std::is_trivially_copyable_v<T>
->
-struct static_vector_storage {
+// TODO: ensure proper exception safety
+template<typename T, std::size_t capacity_>
+struct static_vector {
 	static constexpr auto capacity() noexcept {
 		return bounded::constant<bounded::detail::normalize<capacity_>>;
 	}
+
 	using value_type = T;
 	using size_type = bounded::integer<
 		0,
-		bounded::detail::normalize<static_cast<std::ptrdiff_t>(capacity())>
+		bounded::detail::normalize<static_cast<std::ptrdiff_t>(capacity_)>
 	>;
+	using const_iterator = contiguous_iterator<value_type const, static_cast<std::ptrdiff_t>(capacity())>;
+	using iterator = contiguous_iterator<value_type, static_cast<std::ptrdiff_t>(capacity())>;
 
-	friend constexpr auto begin(static_vector_storage const & container) noexcept {
-		return detail::static_or_reinterpret_cast<value_type const *>(data(container.storage));
+	constexpr static_vector() = default;
+	
+	template<typename Range> requires(
+		is_range<Range> and
+		!std::is_array_v<std::remove_cv_t<std::remove_reference_t<Range>>>
+	)
+	constexpr explicit static_vector(Range && range) {
+		for (decltype(auto) value : BOUNDED_FORWARD(range)) {
+			::containers::emplace_back(*this, BOUNDED_FORWARD(value));
+		}
 	}
-	friend constexpr auto begin(static_vector_storage & container) noexcept {
-		return detail::static_or_reinterpret_cast<value_type *>(data(container.storage));
+	
+	constexpr static_vector(std::initializer_list<value_type> init) {
+		for (auto const & value : init) {
+			::containers::emplace_back(*this, value);
+		}
 	}
-
-	friend constexpr auto end(static_vector_storage const & container) noexcept {
-		return begin(container) + container.size;
-	}
-	friend constexpr auto end(static_vector_storage & container) noexcept {
-		return begin(container) + container.size;
-	}
-
-	array<trivial_storage<T>, capacity_> storage = {};
-	size_type size = 0_bi;
-};
-
-template<typename T, std::size_t capacity_>
-struct static_vector_storage<T, capacity_, false> : static_vector_storage<T, capacity_, true> {
-	using value_type = T;
-
-	static_vector_storage() = default;
-	static_vector_storage(static_vector_storage && other) noexcept(std::is_nothrow_move_constructible_v<value_type>) {
+	
+	static_vector(static_vector && other) requires(std::is_trivially_move_constructible_v<value_type>) = default;
+	static_vector(static_vector && other) noexcept(std::is_nothrow_move_constructible_v<T>) {
 		std::uninitialized_move(begin(other), end(other), begin(*this));
-		this->size = other.size;
+		m_size = other.m_size;
 	}
-	static_vector_storage(static_vector_storage const & other) noexcept(std::is_nothrow_copy_constructible_v<value_type>) {
+	static_vector(static_vector const & other) requires(std::is_trivially_copy_constructible_v<value_type>) = default;
+	static_vector(static_vector const & other) noexcept(std::is_nothrow_copy_constructible_v<value_type>) {
 		std::uninitialized_copy(begin(other), end(other), begin(*this));
-		this->size = other.size;
+		m_size = other.m_size;
 	}
-	~static_vector_storage() {
+
+	~static_vector() requires(std::is_trivially_destructible_v<static_vector>) = default;
+	~static_vector() {
 		detail::destroy_range(*this);
 	}
-	auto & operator=(static_vector_storage && other) & noexcept(std::is_nothrow_move_assignable_v<value_type>) {
+
+	static_vector & operator=(static_vector && other) & requires(std::is_trivially_move_assignable_v<value_type>) = default;
+	auto & operator=(static_vector && other) & noexcept(std::is_nothrow_move_assignable_v<T>) {
 		assign(*this, begin(std::move(other)), end(std::move(other)));
 		return *this;
 	}
-	auto & operator=(static_vector_storage const & other) & noexcept(std::is_nothrow_copy_assignable_v<value_type>) {
+
+	static_vector & operator=(static_vector const & other) & requires(std::is_trivially_copy_assignable_v<value_type>) = default;
+	auto & operator=(static_vector const & other) & noexcept(std::is_nothrow_copy_assignable_v<T>) {
 		assign(*this, begin(other), end(other));
 		return *this;
 	}
+
+	constexpr auto & operator=(std::initializer_list<value_type> init) & noexcept(noexcept(assign(std::declval<static_vector &>(), containers::begin(init), containers::end(init)))) {
+		assign(*this, begin(init), end(init));
+		return *this;
+	}
+
+
+	friend constexpr auto begin(static_vector const & container) noexcept {
+		return const_iterator(detail::static_or_reinterpret_cast<T const *>(data(container.m_storage)));
+	}
+	friend constexpr auto begin(static_vector & container) noexcept {
+		return iterator(detail::static_or_reinterpret_cast<T *>(data(container.m_storage)));
+	}
+
+	friend constexpr auto end(static_vector const & container) noexcept {
+		return begin(container) + container.m_size;
+	}
+	friend constexpr auto end(static_vector & container) noexcept {
+		return begin(container) + container.m_size;
+	}
+
+	CONTAINERS_OPERATOR_BRACKET_DEFINITIONS(static_vector)
+	
+	// Assumes that elements are already constructed in the spare capacity
+	template<typename Integer>
+	constexpr void append_from_capacity(Integer const count) noexcept {
+		BOUNDED_ASSERT(count + m_size <= capacity());
+		m_size += count;
+	}
+
+private:
+	array<trivial_storage<T>, capacity_> m_storage = {};
+	size_type m_size = 0_bi;
 };
-
-} // namespace detail
-
-template<typename T, std::size_t capacity>
-using static_vector = fixed_capacity_vector<detail::static_vector_storage<T, capacity>>;
 
 static_assert(std::is_trivially_copy_constructible_v<static_vector<int, 15>>);
 static_assert(std::is_trivially_move_constructible_v<static_vector<int, 15>>);
 static_assert(std::is_trivially_copy_assignable_v<static_vector<int, 15>>);
 static_assert(std::is_trivially_move_assignable_v<static_vector<int, 15>>);
 static_assert(std::is_trivially_destructible_v<static_vector<int, 15>>);
+
+template<typename T, std::size_t capacity>
+inline constexpr auto is_container<static_vector<T, capacity>> = true;
 
 }	// namespace containers
