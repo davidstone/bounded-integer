@@ -8,6 +8,7 @@
 #include <containers/common_container_functions.hpp>
 #include <containers/contiguous_iterator.hpp>
 #include <containers/dynamic_array.hpp>
+#include <containers/emplace_back.hpp>
 #include <containers/index_type.hpp>
 #include <containers/insert_emplace_impl.hpp>
 #include <containers/is_container.hpp>
@@ -115,35 +116,6 @@ struct dynamic_resizable_array : private Container {
 		this->set_size(size(*this) + count);
 	}
 
-	template<typename... Args>
-	auto & emplace_back(Args && ... args) {
-		auto const initial_size = size(*this);
-		if (initial_size < capacity()) {
-			bounded::construct(*(data(*this) + initial_size), BOUNDED_FORWARD(args)...);
-			append_from_capacity(1_bi);
-		} else {
-			auto temp = dynamic_resizable_array();
-			temp.reserve(::containers::detail::reallocation_size(*this, 1_bi));
-			auto & ref = *(detail::static_or_reinterpret_cast<value_type *>(data(temp)) + capacity());
-			bounded::construct(ref, BOUNDED_FORWARD(args)...);
-			try {
-				::containers::uninitialized_move_destroy(
-					begin(*this),
-					end(*this),
-					begin(temp)
-				);
-			} catch (...) {
-				bounded::destroy(ref);
-				append_from_capacity(-initial_size);
-				throw;
-			}
-			append_from_capacity(-initial_size);
-			temp.append_from_capacity(initial_size + 1_bi);
-			*this = std::move(temp);
-		}
-		return back(*this);
-	}
-	
 	template<typename... Args>
 	auto emplace(const_iterator const position, Args && ... args) {
 		auto relocating_emplace = [&]{

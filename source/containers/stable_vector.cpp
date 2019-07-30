@@ -133,6 +133,6 @@ int main() {
 	BOUNDED_TEST(containers::equal(container, expected));
 	
 	containers::stable_vector<non_copyable, 10> test_no_copies;
-	test_no_copies.emplace_back();
+	containers::emplace_back(test_no_copies);
 	insert(test_no_copies, begin(test_no_copies), non_copyable{});
 }

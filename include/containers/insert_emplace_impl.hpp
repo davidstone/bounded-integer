@@ -13,6 +13,7 @@
 #include <containers/append.hpp>
 #include <containers/begin_end.hpp>
 #include <containers/common_functions.hpp>
+#include <containers/emplace_back.hpp>
 #include <containers/front_back.hpp>
 #include <containers/mutable_iterator.hpp>
 #include <containers/size.hpp>
@@ -40,11 +41,11 @@ constexpr auto emplace_impl(Container & container, typename Container::const_ite
 	BOUNDED_ASSERT(::containers::detail::iterator_points_into_container(container, position));
 	auto const offset = position - begin(container);
 	if (position == end(container)) {
-		container.emplace_back(BOUNDED_FORWARD(args)...);
+		::containers::emplace_back(container, BOUNDED_FORWARD(args)...);
 	} else if (size(container) < container.capacity()) {
 		auto const mutable_position = detail::mutable_iterator(container, position);
 		auto const original_end = end(container);
-		container.emplace_back(std::move(back(container)));
+		::containers::emplace_back(container, std::move(back(container)));
 		::containers::move_backward(mutable_position, containers::prev(original_end), original_end);
 		auto const pointer = std::addressof(*mutable_position);
 		bounded::destroy(*pointer);

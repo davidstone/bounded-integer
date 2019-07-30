@@ -33,9 +33,9 @@ using namespace bounded::literal;
 	
 	constexpr auto make = []{
 		auto value = containers::static_vector<int, 10>{};
-		value.emplace_back(5);
-		value.emplace_back(15);
-		value.emplace_back(20);
+		containers::emplace_back(value, 5);
+		containers::emplace_back(value, 15);
+		containers::emplace_back(value, 20);
 		value.emplace(begin(value) + 1_bi, 10);
 		containers::pop_back(value);
 		auto copy = containers::static_vector<int, 10>{};
@@ -176,6 +176,6 @@ int main() {
 	BOUNDED_TEST(containers::equal(container, expected));
 	
 	containers::static_vector<non_copyable, 10> test_no_copies;
-	test_no_copies.emplace_back();
+	containers::emplace_back(test_no_copies);
 	insert(test_no_copies, begin(test_no_copies), non_copyable{});
 }

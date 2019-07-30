@@ -8,6 +8,7 @@
 #include <containers/algorithms/copy.hpp>
 #include <containers/common_container_functions.hpp>
 #include <containers/contiguous_iterator.hpp>
+#include <containers/emplace_back.hpp>
 #include <containers/index_type.hpp>
 #include <containers/insert_emplace_impl.hpp>
 #include <containers/integer_range.hpp>
@@ -55,13 +56,13 @@ public:
 	)
 	constexpr explicit fixed_capacity_vector(Range && range) {
 		for (decltype(auto) value : BOUNDED_FORWARD(range)) {
-			emplace_back(BOUNDED_FORWARD(value));
+			::containers::emplace_back(*this, BOUNDED_FORWARD(value));
 		}
 	}
 	
 	constexpr fixed_capacity_vector(std::initializer_list<value_type> init) {
 		for (auto const & value : init) {
-			emplace_back(value);
+			::containers::emplace_back(*this, value);
 		}
 	}
 	
@@ -97,14 +98,6 @@ public:
 	constexpr void append_from_capacity(Integer const count) noexcept {
 		BOUNDED_ASSERT(count + m_storage.size <= capacity());
 		m_storage.size += count;
-	}
-	
-	template<typename... Args>
-	constexpr auto & emplace_back(Args && ... args) {
-		BOUNDED_ASSERT(size(*this) != capacity());
-		bounded::construct(*(data(*this) + size(*this)), BOUNDED_FORWARD(args)...);
-		append_from_capacity(1_bi);
-		return back(*this);
 	}
 	
 	template<typename... Args>

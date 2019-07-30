@@ -7,6 +7,7 @@
 
 #include <containers/begin_end.hpp>
 #include <containers/erase.hpp>
+#include <containers/emplace_back.hpp>
 #include <containers/is_container.hpp>
 #include <containers/is_iterator_sentinel.hpp>
 #include <containers/repeat_n.hpp>
@@ -35,7 +36,7 @@ constexpr auto assign(Container & container, InputIterator first, Sentinel const
 	}
 	erase(container, it, end(container));
 	for (; first != last; ++first) {
-		container.emplace_back(*first);
+		::containers::emplace_back(container, *first);
 	}
 }
 template<typename Container> requires is_container<Container>

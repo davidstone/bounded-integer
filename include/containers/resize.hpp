@@ -5,6 +5,7 @@
 
 #pragma once
 
+#include <containers/emplace_back.hpp>
 #include <containers/is_container.hpp>
 #include <containers/pop_back.hpp>
 #include <containers/size.hpp>
@@ -25,7 +26,7 @@ constexpr auto resize(common_resize_tag, Container & container, Size const count
 		pop_back(container);
 	}
 	while (size(container) < count) {
-		container.emplace_back(BOUNDED_FORWARD(args)...);
+		::containers::emplace_back(container, BOUNDED_FORWARD(args)...);
 	}
 }
 

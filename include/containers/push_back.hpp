@@ -5,6 +5,8 @@
 
 #pragma once
 
+#include <containers/emplace_back.hpp>
+
 #include <bounded/integer.hpp>
 
 #include <utility>
@@ -24,11 +26,11 @@ inline constexpr auto has_member_push_back<
 
 template<typename Container> requires(!has_member_push_back<Container>)
 constexpr auto push_back(Container & container, typename Container::value_type const & value) BOUNDED_NOEXCEPT_DECLTYPE(
-	container.emplace_back(value)
+	::containers::emplace_back(container, value)
 )
 template<typename Container> requires(!has_member_push_back<Container>)
 constexpr auto push_back(Container & container, typename Container::value_type && value) BOUNDED_NOEXCEPT_DECLTYPE(
-	container.emplace_back(std::move(value))
+	::containers::emplace_back(container, std::move(value))
 )
 
 template<typename Container> requires has_member_push_back<Container>

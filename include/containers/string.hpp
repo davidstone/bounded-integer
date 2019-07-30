@@ -68,7 +68,6 @@ public:
 	
 	using base::append_from_capacity;
 	
-	using base::emplace_back;
 	using base::emplace;
 	using base::insert;
 	

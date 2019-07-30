@@ -127,6 +127,7 @@ target_sources(containers INTERFACE
 	$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>/include/containers/data.hpp
 	$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>/include/containers/dynamic_array.hpp
 	$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>/include/containers/dynamic_resizable_array.hpp
+	$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>/include/containers/emplace_back.hpp
 	$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>/include/containers/empty.hpp
 	$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>/include/containers/erase.hpp
 	$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>/include/containers/fixed_capacity_vector.hpp
@@ -288,6 +289,7 @@ add_library(containers_test STATIC
 	source/containers/common_container_functions.cpp
 	source/containers/contiguous_iterator.cpp
 	source/containers/data.cpp
+	source/containers/emplace_back.cpp
 	source/containers/empty.cpp
 	source/containers/erase.cpp
 	source/containers/fixed_capacity_vector.cpp

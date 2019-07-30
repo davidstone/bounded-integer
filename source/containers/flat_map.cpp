@@ -6,6 +6,7 @@
 #include <containers/flat_map.hpp>
 #include <containers/algorithms/filter_iterator.hpp>
 #include <containers/static_vector/static_vector.hpp>
+#include <containers/emplace_back.hpp>
 #include <containers/vector.hpp>
 
 #include <bounded/detail/forward.hpp>
@@ -341,7 +342,7 @@ void test_performance(std::size_t const loop_count) {
 		std::vector<value_type<Key, Value>> source;
 		source.reserve(size);
 		for (std::size_t n = 0; n != size; ++n) {
-			source.emplace_back(distribution(engine), distribution(engine));
+			::containers::emplace_back(source, distribution(engine), distribution(engine));
 		}
 		return source;
 	};
