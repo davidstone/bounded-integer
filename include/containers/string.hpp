@@ -69,7 +69,6 @@ public:
 	using base::append_from_capacity;
 	
 	using base::emplace;
-	using base::insert;
 	
 	constexpr operator std::basic_string_view<CharT>() const noexcept {
 		return {data(*this), static_cast<typename std::basic_string_view<CharT>::size_type>(size(*this))};

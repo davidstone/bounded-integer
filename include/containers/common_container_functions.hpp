@@ -8,18 +8,12 @@
 #include <containers/algorithms/compare.hpp>
 #include <containers/append.hpp>
 #include <containers/assign.hpp>
-#include <containers/at.hpp>
-#include <containers/begin_end.hpp>
-#include <containers/common_functions.hpp>
 #include <containers/clear.hpp>
-#include <containers/data.hpp>
-#include <containers/empty.hpp>
 #include <containers/erase.hpp>
-#include <containers/front_back.hpp>
 #include <containers/insert.hpp>
+#include <containers/non_modifying_common_container_functions.hpp>
 #include <containers/push_back.hpp>
 #include <containers/resize.hpp>
-#include <containers/size.hpp>
 
 namespace containers {
 namespace detail {
@@ -28,12 +22,7 @@ namespace common {
 #define CONTAINERS_COMMON_USING_DECLARATIONS \
 	CONTAINERS_DETAIL_COMMON_USING_DECLARATIONS \
 	CONTAINERS_COMMON_BEGIN_END_USING_DECLARATIONS \
-	using ::containers::detail::common::data; \
-	using ::containers::detail::common::at; \
-	using ::containers::detail::common::front; \
-	using ::containers::detail::common::back; \
-	using ::containers::detail::common::size; \
-	using ::containers::detail::common::empty; \
+	CONTAINERS_NON_MODIFYING_COMMON_USING_DECLARATIONS \
 	using ::containers::detail::common::push_back; \
 	using ::containers::detail::common::append; \
 	using ::containers::detail::common::insert; \

@@ -147,6 +147,7 @@ target_sources(containers INTERFACE
 	$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>/include/containers/maximum_array_size.hpp
 	$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>/include/containers/mutable_iterator.hpp
 	$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>/include/containers/noexcept_iterable.hpp
+	$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>/include/containers/non_modifying_common_container_functions.hpp
 	$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>/include/containers/operator_arrow.hpp
 	$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>/include/containers/operator_bracket.hpp
 	$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>/include/containers/push_back.hpp
@@ -307,6 +308,7 @@ add_library(containers_test STATIC
 	source/containers/maximum_array_size.cpp
 	source/containers/mutable_iterator.cpp
 	source/containers/noexcept_iterable.cpp
+	source/containers/non_modifying_common_container_functions.cpp
 	source/containers/operator_arrow.cpp
 	source/containers/push_back.cpp
 	source/containers/range_view.cpp

@@ -5,9 +5,9 @@
 
 #pragma once
 
-#include <containers/common_container_functions.hpp>
 #include <containers/contiguous_iterator.hpp>
 #include <containers/is_container.hpp>
+#include <containers/non_modifying_common_container_functions.hpp>
 #include <containers/operator_bracket.hpp>
 
 #include <bounded/integer.hpp>
