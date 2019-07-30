@@ -10,7 +10,6 @@
 #include <containers/dynamic_array.hpp>
 #include <containers/emplace_back.hpp>
 #include <containers/index_type.hpp>
-#include <containers/insert_emplace_impl.hpp>
 #include <containers/is_container.hpp>
 #include <containers/pop_back.hpp>
 #include <containers/repeat_n.hpp>
@@ -114,16 +113,6 @@ struct dynamic_resizable_array : private Container {
 	template<typename Integer>
 	constexpr void append_from_capacity(Integer const count) noexcept {
 		this->set_size(size(*this) + count);
-	}
-
-	template<typename... Args>
-	auto emplace(const_iterator const position, Args && ... args) {
-		auto relocating_emplace = [&]{
-			insert_or_emplace_with_reallocation(*this, position, 1_bi, [&](auto const ptr) {
-				bounded::construct(*ptr, BOUNDED_FORWARD(args)...);
-			});
-		};
-		return ::containers::detail::emplace_impl(*this, position, relocating_emplace, BOUNDED_FORWARD(args)...);
 	}
 };
 

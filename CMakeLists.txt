@@ -136,7 +136,6 @@ target_sources(containers INTERFACE
 	$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>/include/containers/has_nested_type.hpp
 	$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>/include/containers/index_type.hpp
 	$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>/include/containers/insert.hpp
-	$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>/include/containers/insert_emplace_impl.hpp
 	$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>/include/containers/integer_range.hpp
 	$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>/include/containers/is_container.hpp
 	$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>/include/containers/is_iterator.hpp
@@ -297,7 +296,6 @@ add_library(containers_test STATIC
 	source/containers/front_back.cpp
 	source/containers/has_nested_type.cpp
 	source/containers/insert.cpp
-	source/containers/insert_emplace_impl.cpp
 	source/containers/integer_range.cpp
 	source/containers/is_container.cpp
 	source/containers/is_iterator.cpp

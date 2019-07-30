@@ -457,7 +457,8 @@ private:
 	template<typename Key, typename Mapped>
 	constexpr auto emplace_at(const_iterator position, Key && key, Mapped && mapped) {
 		if constexpr (allow_duplicates) {
-			return m_container.emplace(
+			return ::containers::emplace(
+				m_container,
 				position,
 				std::piecewise_construct,
 				bounded::tie(BOUNDED_FORWARD(key)),
@@ -472,7 +473,8 @@ private:
 				return inserted_t{mutable_iterator(*this, containers::prev(position)), false};
 			}
 
-			auto const it = m_container.emplace(
+			auto const it = ::containers::emplace(
+				m_container,
 				position,
 				std::piecewise_construct,
 				bounded::tie(BOUNDED_FORWARD(key)),

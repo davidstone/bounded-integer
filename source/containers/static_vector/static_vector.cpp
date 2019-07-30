@@ -36,7 +36,7 @@ using namespace bounded::literal;
 		containers::emplace_back(value, 5);
 		containers::emplace_back(value, 15);
 		containers::emplace_back(value, 20);
-		value.emplace(begin(value) + 1_bi, 10);
+		::containers::emplace(value, begin(value) + 1_bi, 10);
 		containers::pop_back(value);
 		auto copy = containers::static_vector<int, 10>{};
 		copy = value;

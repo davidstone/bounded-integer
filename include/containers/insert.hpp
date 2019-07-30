@@ -5,9 +5,11 @@
 
 #pragma once
 
+#include <containers/algorithms/copy.hpp>
 #include <containers/algorithms/copy_n.hpp>
 #include <containers/algorithms/uninitialized.hpp>
 #include <containers/begin_end.hpp>
+#include <containers/emplace_back.hpp>
 #include <containers/is_container.hpp>
 #include <containers/mutable_iterator.hpp>
 #include <containers/repeat_n.hpp>
@@ -41,7 +43,38 @@ constexpr auto insert_or_emplace_with_reallocation(Container & container, typena
 	return mutable_position;
 }
 
+template<typename Container>
+constexpr auto iterator_points_into_container(Container const & container, typename Container::const_iterator it) {
+	return (begin(container) <= it) and (it <= end(container));
+}
+
+
 namespace common {
+
+// TODO: exception safety
+template<typename Container, typename... Args>
+constexpr auto emplace(Container & container, typename Container::const_iterator const position, Args && ... args) {
+	BOUNDED_ASSERT(::containers::detail::iterator_points_into_container(container, position));
+	auto const offset = position - begin(container);
+	if (position == end(container)) {
+		::containers::emplace_back(container, BOUNDED_FORWARD(args)...);
+	} else if (size(container) < container.capacity()) {
+		auto const mutable_position = detail::mutable_iterator(container, position);
+		auto const original_end = end(container);
+		::containers::emplace_back(container, std::move(back(container)));
+		::containers::move_backward(mutable_position, containers::prev(original_end), original_end);
+		auto const pointer = std::addressof(*mutable_position);
+		bounded::destroy(*pointer);
+		bounded::construct(*pointer, BOUNDED_FORWARD(args)...);
+	} else if constexpr (has_reserve<Container>) {
+		insert_or_emplace_with_reallocation(container, position, 1_bi, [&](auto const ptr) {
+			bounded::construct(*ptr, BOUNDED_FORWARD(args)...);
+		});
+	} else {
+		BOUNDED_ASSERT_OR_ASSUME(false);
+	}
+	return begin(container) + offset;
+}
 
 // TODO: exception safety
 // TODO: Check if the range lies within the container
@@ -82,19 +115,21 @@ constexpr auto insert(Container & container, typename Container::const_iterator 
 
 template<typename Container> requires is_container<Container>
 constexpr auto insert(Container & container, typename Container::const_iterator const position, typename Container::value_type const & value) BOUNDED_NOEXCEPT(
-	container.emplace(position, value)
+	::containers::detail::common::emplace(container, position, value)
 )
 template<typename Container> requires is_container<Container>
 constexpr auto insert(Container & container, typename Container::const_iterator const position, typename Container::value_type && value) BOUNDED_NOEXCEPT(
-	container.emplace(position, std::move(value))
+	::containers::detail::common::emplace(container, position, std::move(value))
 )
 
 }	// namespace common
 
+using ::containers::detail::common::emplace;
 using ::containers::detail::common::insert;
 
 }	// namespace detail
 
+using ::containers::detail::common::emplace;
 using ::containers::detail::common::insert;
 
 }	// namespace containers

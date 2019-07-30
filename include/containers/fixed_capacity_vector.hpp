@@ -10,7 +10,6 @@
 #include <containers/contiguous_iterator.hpp>
 #include <containers/emplace_back.hpp>
 #include <containers/index_type.hpp>
-#include <containers/insert_emplace_impl.hpp>
 #include <containers/integer_range.hpp>
 #include <containers/is_iterator_sentinel.hpp>
 #include <containers/operator_bracket.hpp>
@@ -98,14 +97,6 @@ public:
 	constexpr void append_from_capacity(Integer const count) noexcept {
 		BOUNDED_ASSERT(count + m_storage.size <= capacity());
 		m_storage.size += count;
-	}
-	
-	template<typename... Args>
-	constexpr auto emplace(const_iterator const position, Args && ... args) {
-		auto relocating_emplace = []{
-			BOUNDED_ASSERT_OR_ASSUME(false);
-		};
-		return detail::emplace_impl(*this, position, relocating_emplace, BOUNDED_FORWARD(args)...);
 	}
 };
 
