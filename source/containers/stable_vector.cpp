@@ -128,7 +128,7 @@ int main() {
 	static_assert(!containers::is_iterator<containers::stable_vector<std::string, 6>>);
 	static_assert(containers::is_container<containers::stable_vector<std::string, 6>>);
 
-	container.insert(begin(container) + 1_bi, containers::repeat_n(5_bi, 12));
+	containers::insert(container, begin(container) + 1_bi, containers::repeat_n(5_bi, 12));
 	auto const expected = { 1, 12, 12, 12, 12, 12, 2, 3 };
 	BOUNDED_TEST(containers::equal(container, expected));
 	

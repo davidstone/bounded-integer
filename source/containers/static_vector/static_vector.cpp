@@ -40,7 +40,7 @@ using namespace bounded::literal;
 		containers::pop_back(value);
 		auto copy = containers::static_vector<int, 10>{};
 		copy = value;
-		copy.insert(begin(copy) + 1_bi, value);
+		containers::insert(copy, begin(copy) + 1_bi, value);
 		return copy;
 	};
 	constexpr auto made = make();
@@ -171,7 +171,7 @@ int main() {
 	static_assert(!containers::is_iterator<containers::static_vector<std::string, 6>>);
 	static_assert(containers::is_container<containers::static_vector<std::string, 6>>);
 
-	container.insert(begin(container) + 1_bi, containers::repeat_n(5_bi, 12));
+	containers::insert(container, begin(container) + 1_bi, containers::repeat_n(5_bi, 12));
 	auto const expected = { 1, 12, 12, 12, 12, 12, 2, 3 };
 	BOUNDED_TEST(containers::equal(container, expected));
 	

@@ -107,13 +107,6 @@ public:
 		};
 		return detail::emplace_impl(*this, position, relocating_emplace, BOUNDED_FORWARD(args)...);
 	}
-	template<typename Range = std::initializer_list<value_type>>
-	constexpr auto insert(const_iterator const position, Range && range) {
-		return detail::insert_impl(*this, position, BOUNDED_FORWARD(range), [](auto) {
-			BOUNDED_ASSERT_OR_ASSUME(false);
-			return iterator{};
-		});
-	}
 };
 
 template<typename Storage>
