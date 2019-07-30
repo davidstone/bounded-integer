@@ -35,20 +35,14 @@ constexpr auto & emplace_back(Container & container, Args && ... args) {
 		} else if constexpr (detail::has_reserve<Container>) {
 			auto temp = Container();
 			temp.reserve(::containers::detail::reallocation_size(container, 1_bi));
-			auto & ref = *(detail::static_or_reinterpret_cast<typename Container::value_type *>(data(temp)) + container.capacity());
+			auto & ref = *(data(temp) + container.capacity());
 			bounded::construct(ref, BOUNDED_FORWARD(args)...);
 			try {
-				::containers::uninitialized_move_destroy(
-					begin(container),
-					end(container),
-					begin(temp)
-				);
+				containers::detail::transfer_all_contents(container, temp);
 			} catch (...) {
 				bounded::destroy(ref);
-				container.append_from_capacity(-initial_size);
 				throw;
 			}
-			container.append_from_capacity(-initial_size);
 			temp.append_from_capacity(initial_size + 1_bi);
 			container = std::move(temp);
 		} else {

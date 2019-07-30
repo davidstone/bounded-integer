@@ -161,6 +161,30 @@ constexpr auto uninitialized_move_destroy(InputIterator const first, Sentinel co
 }
 
 
+namespace detail {
+
+// TODO: When we have constexpr destructors, move append_from_capacity into
+// scope_guard
+template<typename Source, typename Destination>
+constexpr auto transfer_all_contents(Source && source, Destination & destination) {
+	auto set_old_size_to_zero = [&]{
+		source.append_from_capacity(-size(source));
+	};
+	try {
+		::containers::uninitialized_move_destroy(
+			begin(source),
+			end(source),
+			begin(destination)
+		);
+		set_old_size_to_zero();
+	} catch (...) {
+		set_old_size_to_zero();
+		throw;
+	}
+}
+
+} // namespace detail
+
 
 template<typename ForwardIterator, typename Sentinel> requires(
 	!std::is_nothrow_default_constructible_v<
