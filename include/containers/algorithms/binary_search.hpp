@@ -5,41 +5,14 @@
 
 #pragma once
 
-#include <containers/algorithms/advance.hpp>
+#include <containers/algorithms/partition.hpp>
 #include <containers/is_range.hpp>
 
 #include <bounded/detail/forward.hpp>
-#include <bounded/integer.hpp>
 
 #include <functional>
-#include <limits>
 
 namespace containers {
-
-constexpr inline struct partition_point_t {
-	template<typename Range, typename UnaryPredicate> requires is_range<Range>
-	constexpr auto operator()(Range && range, UnaryPredicate predicate) const {
-		using size_type = decltype(size(range));
-		auto count = bounded::integer<0, bounded::detail::normalize<std::numeric_limits<size_type>::max().value()>>(size(range));
-		auto first = begin(range);
-		if constexpr (count.max() == bounded::constant<0>) {
-			return first;
-		} else {
-			while (count > bounded::constant<0>) {
-				auto it = first;
-				auto const step = count / bounded::constant<2>;
-				::containers::advance(it, step);
-				if (predicate(*it)) {
-					first = ::containers::next(it);
-					count -= step + bounded::constant<1>;
-				} else {
-					count = step;
-				}
-			}
-			return first;
-		}
-	}
-} partition_point;
 
 constexpr inline struct lower_bound_t {
 	template<typename Range, typename T, typename Compare> requires is_range<Range>

@@ -6,6 +6,7 @@
 #pragma once
 
 #include <containers/algorithms/advance.hpp>
+#include <containers/algorithms/binary_search.hpp>
 #include <containers/algorithms/unique.hpp>
 #include <containers/erase.hpp>
 #include <containers/is_iterator_sentinel.hpp>
@@ -20,24 +21,40 @@
 
 namespace containers {
 
-template<typename LHS, typename RHS>
-constexpr void swap(LHS & lhs, RHS & rhs) {
-	auto temp = std::move(lhs);
-	lhs = std::move(rhs);
-	rhs = std::move(temp);
+template<typename ForwardIterator>
+constexpr auto rotate(ForwardIterator first, ForwardIterator middle, ForwardIterator const last) {
+	if (first == middle) {
+		return last;
+	}
+	if (middle == last) {
+		return first;
+	}
+
+	auto next_middle = first;
+
+	for (; middle != last; ++middle) {
+		if (first == next_middle) {
+			next_middle = middle;
+		}
+		::containers::swap(*first, *middle);
+		++first;
+	}
+
+	::containers::rotate(first, next_middle, last);
+	return first;
 }
 
 // TODO: Implement something like ska_sort
 // This is currently highly suboptimal at compile time, since it is an
-// implementation of O(n^2) selection sort. When the standard library has been
+// implementation of O(n^2) insertion sort. When the standard library has been
 // updated to C++20, std::sort will be constexpr.
 constexpr inline struct sort_t {
 	template<typename Iterator, typename Sentinel, typename Compare> requires is_iterator_sentinel<Iterator, Sentinel>
 	constexpr void operator()(Iterator const first, Sentinel const last, Compare cmp) const {
 		if (std::is_constant_evaluated()) {
 			for (auto it = first; it != last; ++it) {
-				auto const selection = std::min_element(it, last, cmp);
-				::containers::swap(*selection, *it);
+				auto const insertion = upper_bound(range_view(first, it), *it, cmp);
+				::containers::rotate(insertion, it, ::containers::next(it));
 			}
 		} else {
 			std::sort(containers::legacy_iterator(first), containers::legacy_iterator(last), cmp);
