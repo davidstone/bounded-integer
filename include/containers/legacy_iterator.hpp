@@ -42,7 +42,7 @@ struct legacy_iterator : detail::operator_arrow<legacy_iterator<Iterator>> {
 	)
 	template<typename Index>
 	constexpr decltype(auto) operator[](Index const index) const BOUNDED_NOEXCEPT_GCC_BUG(
-		base()[index]
+		base()[static_cast<index_type<Iterator>>(index)]
 	)
 
 private:
