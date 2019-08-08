@@ -89,6 +89,10 @@ constexpr auto builtin_compare(LHS const lhs, RHS const rhs) BOUNDED_NOEXCEPT_DE
 
 } // namespace detail
 
+constexpr auto compare(bool const lhs, bool const rhs) noexcept {
+	return detail::builtin_compare(lhs, rhs);
+}
+
 template<typename LHS, typename RHS>
 constexpr auto compare(LHS const * const lhs, RHS const * const rhs) BOUNDED_NOEXCEPT_DECLTYPE(
 	detail::builtin_compare(lhs, rhs)
