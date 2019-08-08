@@ -41,10 +41,7 @@ struct static_vector_data {
 	static_vector_data & operator=(static_vector_data &&) & = default;
 	static_vector_data & operator=(static_vector_data const &) & = default;
 
-	template<typename Range> requires(
-		is_range<Range> and
-		!std::is_array_v<std::remove_cv_t<std::remove_reference_t<Range>>>
-	)
+	template<typename Range> requires(is_range<Range>)
 	constexpr explicit static_vector_data(Range && range) {
 		for (decltype(auto) value : BOUNDED_FORWARD(range)) {
 			::containers::emplace_back(*this, BOUNDED_FORWARD(value));
