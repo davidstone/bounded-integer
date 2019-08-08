@@ -373,4 +373,27 @@ constexpr auto transform(Function && function, Tuples && ... tuples) noexcept(de
 	return detail::transform_impl(constant<0>, function, BOUNDED_FORWARD(tuples)...);
 }
 
+
+template<std::size_t index, typename... Ts>
+constexpr auto && get(tuple<Ts...> const & t) noexcept {
+	return t[constant<index>];
+}
+template<std::size_t index, typename... Ts>
+constexpr auto && get(tuple<Ts...> & t) noexcept {
+	return t[constant<index>];
+}
+template<std::size_t index, typename... Ts>
+constexpr auto && get(tuple<Ts...> && t) noexcept {
+	return std::move(t)[constant<index>];
+}
+
 }	// namespace bounded
+namespace std {
+
+template<typename... Ts>
+class tuple_size<bounded::tuple<Ts...>> : public std::integral_constant<std::size_t, sizeof...(Ts)> {};
+
+template<std::size_t index, typename... Ts>
+class tuple_element<index, bounded::tuple<Ts...>> : public bounded::tuple_element_c<index, bounded::tuple<Ts...>> {};
+
+} // namespace std
