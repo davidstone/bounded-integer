@@ -24,23 +24,22 @@ inline constexpr auto has_member_push_back<
 	std::void_t<decltype(std::declval<Container &>().push_back(std::declval<typename Container::value_type>()))>
 > = true;
 
-template<typename Container> requires(!has_member_push_back<Container>)
-constexpr auto push_back(Container & container, typename Container::value_type const & value) BOUNDED_NOEXCEPT_DECLTYPE(
-	::containers::emplace_back(container, value)
-)
-template<typename Container> requires(!has_member_push_back<Container>)
-constexpr auto push_back(Container & container, typename Container::value_type && value) BOUNDED_NOEXCEPT_DECLTYPE(
-	::containers::emplace_back(container, std::move(value))
-)
-
-template<typename Container> requires has_member_push_back<Container>
-constexpr auto push_back(Container & container, typename Container::value_type const & value) BOUNDED_NOEXCEPT_DECLTYPE(
-	container.push_back(value)
-)
-template<typename Container> requires has_member_push_back<Container>
-constexpr auto push_back(Container & container, typename Container::value_type && value) BOUNDED_NOEXCEPT_DECLTYPE(
-	container.push_back(std::move(value))
-)
+template<typename Container>
+constexpr decltype(auto) push_back(Container & container, typename Container::value_type const & value) {
+	if constexpr (has_member_push_back<Container>) {
+		container.push_back(value);
+	} else {
+		::containers::emplace_back(container, value);
+	}
+}
+template<typename Container>
+constexpr decltype(auto) push_back(Container & container, typename Container::value_type && value) {
+	if constexpr (has_member_push_back<Container>) {
+		container.push_back(std::move(value));
+	} else {
+		::containers::emplace_back(container, std::move(value));
+	}
+}
 
 }	// namespace common
 
