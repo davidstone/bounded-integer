@@ -365,6 +365,21 @@ add_executable(variant
 )
 target_link_libraries(variant PUBLIC bounded)
 
+add_subdirectory("${PROJECT_SOURCE_DIR}/source/googletest-1.8.1")
+set_target_properties(gtest PROPERTIES FOLDER extern)
+set_target_properties(gtest_main PROPERTIES FOLDER extern)
+set_target_properties(gmock PROPERTIES FOLDER extern)
+set_target_properties(gmock_main PROPERTIES FOLDER extern)
+
+set(BENCHMARK_ENABLE_TESTING OFF)
+add_subdirectory("${PROJECT_SOURCE_DIR}/source/benchmark")
+set_target_properties(benchmark PROPERTIES FOLDER extern)
+
+add_executable(ska_sort
+	source/containers/algorithms/ska_sort.cpp
+)
+target_link_libraries(ska_sort PUBLIC bounded gtest gtest_main benchmark)
+
 
 set(COMMON_CLANG_COMPILE_OPTIONS
 	"-Xclang"
@@ -412,6 +427,12 @@ if(MSVC)
 		target_compile_options(bounded INTERFACE
 			${COMMON_CLANG_COMPILE_OPTIONS}
 		)
+		target_compile_options(ska_sort PRIVATE
+			"-Wno-global-constructors"
+			"-Wno-implicit-int-conversion"
+			"-Wno-sign-conversion"
+			"-Wno-used-but-marked-unused"
+		)
 		# Sanitizers currently do not work very well on Windows
 		set(USE_SANITIZERS OFF)
 	else()
@@ -428,7 +449,26 @@ elseif("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang")
 	target_compile_options(bounded INTERFACE
 		${COMMON_CLANG_COMPILE_OPTIONS}
 		"-g"
+		"-stdlib=libc++"
 		"-march=native"
+		$<$<CONFIG:Release>:-flto=thin>
+	)
+	target_link_options(bounded INTERFACE
+		"-Wl,--fatal-warnings"
+		"-stdlib=libc++"
+		"-fuse-ld=lld"
+		# TODO: Figure out how to make this work on Visual Studio
+		"-Wl,--thinlto-cache-dir=${CMAKE_BINARY_DIR}/lto-cache"
+	)
+	target_compile_options(ska_sort PRIVATE
+		"-Wno-global-constructors"
+		"-Wno-implicit-int-conversion"
+		"-Wno-sign-conversion"
+		"-Wno-used-but-marked-unused"
+		"-Wno-unused-function"
+		"-Wno-unused-macros"
+		"-Wno-unused-template"
+		"-Wno-unused-variable"
 	)
 
 elseif("${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU")
@@ -568,8 +608,9 @@ set(test_targets
 	string
 	dynamic_array
 	variant
+	ska_sort
 )
-set(all_targets ${test_targets} containers_test)
+set(all_targets ${test_targets} containers_test gtest gtest_main benchmark)
 
 set(sanitizers "-fsanitize=undefined" "-fsanitize=address")
 foreach(target ${all_targets})
