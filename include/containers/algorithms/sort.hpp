@@ -44,6 +44,17 @@ constexpr auto rotate(ForwardIterator first, ForwardIterator middle, ForwardIter
 	return first;
 }
 
+namespace detail {
+
+constexpr auto insertion_sort = [](auto const first, auto const last, auto cmp) {
+	for (auto it = first; it != last; ++it) {
+		auto const insertion = upper_bound(range_view(first, it), *it, cmp);
+		::containers::rotate(insertion, it, ::containers::next(it));
+	}
+};
+
+} // namespace detail
+
 // TODO: Implement something like ska_sort
 // This is currently highly suboptimal at compile time, since it is an
 // implementation of O(n^2) insertion sort. When the standard library has been
@@ -51,11 +62,9 @@ constexpr auto rotate(ForwardIterator first, ForwardIterator middle, ForwardIter
 constexpr inline struct sort_t {
 	template<typename Iterator, typename Sentinel, typename Compare> requires is_iterator_sentinel<Iterator, Sentinel>
 	constexpr void operator()(Iterator const first, Sentinel const last, Compare cmp) const {
+		// Temporary, until std::sort is constexpr
 		if (std::is_constant_evaluated()) {
-			for (auto it = first; it != last; ++it) {
-				auto const insertion = upper_bound(range_view(first, it), *it, cmp);
-				::containers::rotate(insertion, it, ::containers::next(it));
-			}
+			detail::insertion_sort(first, last, cmp);
 		} else {
 			std::sort(containers::legacy_iterator(first), containers::legacy_iterator(last), cmp);
 		}
