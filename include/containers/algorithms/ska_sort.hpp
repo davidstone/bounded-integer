@@ -212,9 +212,18 @@ struct SubKey<T> {
 	using next = SubKey<void>;
 };
 
+constexpr auto extract_key_to_compare = [](auto extract_key) {
+	return [extract_key = std::move(extract_key)](auto const & lhs, auto const & rhs) {
+		return extract_key(lhs) < extract_key(rhs);
+	};
+};
+
+template<typename ExtractKey>
+using extract_key_to_compare_t = decltype(extract_key_to_compare(std::declval<ExtractKey>()));
+
 template<typename It, typename ExtractKey>
-constexpr void StdSortFallback(It begin, It end, ExtractKey & extract_key) {
-	std::sort(begin, end, [&](auto const & lhs, auto const & rhs ){ return extract_key(lhs) < extract_key(rhs); });
+constexpr void StdSortFallback(It begin, It end, ExtractKey extract_key) {
+	std::sort(begin, end, extract_key_to_compare(std::move(extract_key)));
 }
 
 struct PartitionCounts {
@@ -490,6 +499,7 @@ constexpr void inplace_radix_sort(It begin, It end, ExtractKey & extract_key) {
 inline constexpr auto identity = [](auto && value) -> auto && {
 	return BOUNDED_FORWARD(value);
 };
+using identity_t = std::decay_t<decltype(identity)>;
 
 namespace extract {
 
