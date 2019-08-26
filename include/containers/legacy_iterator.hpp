@@ -68,4 +68,12 @@ constexpr auto operator==(legacy_iterator<Iterator> const lhs, legacy_iterator<I
 	lhs.base() == rhs.base()
 )
 
+constexpr auto make_legacy_iterator = [](auto it) {
+	if constexpr (bounded::is_bounded_integer<decltype(it - it)>) {
+		return containers::legacy_iterator(it);
+	} else {
+		return it;
+	}
+};
+
 }	// namespace containers
