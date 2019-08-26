@@ -311,6 +311,7 @@ add_library(containers_test STATIC
 	source/containers/push_back.cpp
 	source/containers/range_view.cpp
 	source/containers/reference_wrapper.cpp
+	source/containers/repeat_n.cpp
 	source/containers/reserve_if_reservable.cpp
 	source/containers/resize.cpp
 	source/containers/scope_guard.cpp
