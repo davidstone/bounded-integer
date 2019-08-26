@@ -8,6 +8,7 @@
 #include <containers/begin_end.hpp>
 #include <containers/is_range.hpp>
 #include <containers/is_iterator_sentinel.hpp>
+#include <containers/size.hpp>
 
 #include <bounded/integer.hpp>
 
