@@ -12,6 +12,9 @@
 #include <containers/algorithms/negate.hpp>
 #include <containers/algorithms/partition.hpp>
 #include <containers/algorithms/sort.hpp>
+#include <containers/algorithms/unique.hpp>
+#include <containers/erase.hpp>
+#include <containers/legacy_iterator.hpp>
 #include <containers/is_range.hpp>
 #include <containers/is_iterator_sentinel.hpp>
 
@@ -64,6 +67,12 @@ constexpr auto to_radix_sort_key(T const value) {
 		return static_cast<unsigned_t>(static_cast<unsigned_t>(value) + static_cast<unsigned_t>(std::numeric_limits<T>::min()));
 	}
 }
+
+template<typename T> requires std::is_enum_v<T>
+auto to_radix_sort_key(T const value) {
+	return to_radix_sort_key(static_cast<std::underlying_type_t<T>>(value));
+}
+
 template<typename T>
 auto to_radix_sort_key(T * ptr) {
 	return reinterpret_cast<std::uintptr_t>(ptr);
@@ -223,7 +232,7 @@ using extract_key_to_compare_t = decltype(extract_key_to_compare(std::declval<Ex
 
 template<typename It, typename ExtractKey>
 constexpr void StdSortFallback(It begin, It end, ExtractKey extract_key) {
-	std::sort(begin, end, extract_key_to_compare(std::move(extract_key)));
+	sort(begin, end, extract_key_to_compare(std::move(extract_key)));
 }
 
 struct PartitionCounts {
@@ -491,7 +500,9 @@ constexpr void sort_starter(It begin, It end, ExtractKey & extract_key, BaseList
 }
 
 template<std::ptrdiff_t AmericanFlagSortThreshold, typename It, typename ExtractKey>
-constexpr void inplace_radix_sort(It begin, It end, ExtractKey & extract_key) {
+constexpr void inplace_radix_sort(It begin_, It end_, ExtractKey & extract_key) {
+	auto begin = make_legacy_iterator(begin_);
+	auto end = make_legacy_iterator(end_);
 	using SubKey = SubKey<decltype(extract_key(*begin))>;
 	sort_starter<AmericanFlagSortThreshold, SubKey>(begin, end, extract_key, nullptr);
 }
@@ -545,7 +556,11 @@ struct ska_sort_t {
 
 struct ska_sort_copy_t {
 	template<typename SourceIterator, typename Sentinel, typename BufferIterator, typename ExtractKey> requires containers::is_iterator_sentinel<SourceIterator, Sentinel> and containers::is_iterator<BufferIterator>
-	constexpr bool operator()(SourceIterator begin, Sentinel end, BufferIterator buffer_begin, ExtractKey && extract_key) const {
+	constexpr bool operator()(SourceIterator begin_, Sentinel end_, BufferIterator buffer_begin_, ExtractKey && extract_key) const {
+		auto begin = make_legacy_iterator(begin_);
+		auto end = make_legacy_iterator(end_);
+		auto buffer_begin = make_legacy_iterator(buffer_begin_);
+
 		using key_t = detail::key_type<SourceIterator, ExtractKey>;
 		if constexpr (std::is_same_v<key_t, bool>) {
 			auto false_position = buffer_begin;
@@ -678,5 +693,24 @@ private:
 		}
 	}
 } inline constexpr ska_sort_copy;
+
+constexpr inline struct unique_ska_sort_t {
+	template<typename Range, typename ExtractKey> requires is_range<Range>
+	constexpr auto operator()(Range & range, ExtractKey extract_key) const {
+		ska_sort(range, extract_key);
+		auto const equal = [&](auto const & lhs, auto const & rhs) {
+			return extract_key(lhs) == extract_key(rhs);
+		};
+		return ::containers::erase(
+			range,
+			::containers::unique(begin(range), end(range), equal),
+			end(range)
+		);
+	}
+	template<typename Range> requires is_range<Range>
+	constexpr auto operator()(Range && range) const {
+		return operator()(range, detail::identity);
+	}
+} unique_ska_sort;
 
 } // namespace containers

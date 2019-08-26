@@ -46,14 +46,6 @@ static constexpr void inplace_radix_sort(It begin, It end) {
 	inplace_radix_sort(begin, end, detail::identity);
 }
 
-constexpr auto maybe_wrap = [](auto it) {
-	if constexpr (bounded::is_bounded_integer<decltype(it - it)>) {
-		return containers::legacy_iterator(it);
-	} else {
-		return it;
-	}
-};
-
 template<typename Container, typename Function>
 constexpr bool test_sort_copy(Container source, Container const & expected, Function function) {
 	BOUNDED_TEST(containers::is_sorted(expected));
@@ -61,12 +53,7 @@ constexpr bool test_sort_copy(Container source, Container const & expected, Func
 	if constexpr (requires(Container c) { c.resize(size(c)); }) {
 		other.resize(size(source));
 	}
-	bool const data_in_other = ska_sort_copy(
-		maybe_wrap(begin(source)),
-		maybe_wrap(end(source)),
-		maybe_wrap(begin(other)),
-		std::move(function)
-	);
+	bool const data_in_other = ska_sort_copy(source, other, std::move(function));
 	auto const & sorted = data_in_other ? other : source;
 	BOUNDED_TEST(sorted == expected);
 	return true;
@@ -75,11 +62,7 @@ constexpr bool test_sort_copy(Container source, Container const & expected, Func
 template<typename Container, typename Function>
 constexpr bool test_sort_inplace(Container source, Container const & expected, Function function) {
 	BOUNDED_TEST(containers::is_sorted(expected));
-	inplace_radix_sort(
-		maybe_wrap(begin(source)),
-		maybe_wrap(end(source)),
-		std::move(function)
-	);
+	inplace_radix_sort(begin(source), end(source), std::move(function));
 	BOUNDED_TEST(source == expected);
 	return true;
 }

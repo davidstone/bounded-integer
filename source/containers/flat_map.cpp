@@ -42,63 +42,6 @@ static_assert(constexpr_constructible.at(1) == 2);
 static_assert(constexpr_constructible.at(3) == 5);
 static_assert(constexpr_constructible.find(2) == end(constexpr_constructible));
 
-struct lowercase_alphanumeric {
-	constexpr auto operator()(std::string_view const lhs, std::string_view const rhs) const noexcept {
-		auto transform_filter = [](std::string_view const & input) {
-			// Not portable because it does not respect character encodings.
-			// We do not want to use cctype functions because we do not want to
-			// use locales.
-			auto to_lower = [](char c) {
-				return static_cast<char>(('A' <= c and c <= 'Z') ? c + 'a' - 'A' : c);
-			};
-			static_assert(to_lower('A') == 'a');
-			static_assert(to_lower('B') == 'b');
-			static_assert(to_lower('Z') == 'z');
-			static_assert(to_lower('a') == 'a');
-			static_assert(to_lower('b') == 'b');
-			static_assert(to_lower('0') == '0');
-			auto is_valid = [](char c) {
-				return ('0' <= c and c <= '9') or ('a' <= c and c <= 'z');
-			};
-			static_assert(is_valid('0'));
-			static_assert(is_valid('1'));
-			static_assert(is_valid('9'));
-			static_assert(is_valid('a'));
-			static_assert(is_valid('b'));
-			static_assert(is_valid('z'));
-			static_assert(!is_valid('A'));
-			static_assert(!is_valid('D'));
-			static_assert(!is_valid('Z'));
-			static_assert(!is_valid('%'));
-			static_assert(!is_valid(' '));
-			return containers::filter(containers::transform(input, to_lower), is_valid);
-		};
-		using namespace std::string_view_literals;
-		static_assert(containers::equal(transform_filter("d"sv), "d"sv));
-		static_assert(containers::equal(transform_filter("De"sv), "de"sv));
-		return transform_filter(lhs) < transform_filter(rhs);
-	}
-};
-
-static_assert(lowercase_alphanumeric{}("d", "E"));
-static_assert(!lowercase_alphanumeric{}("E", "d"));
-
-using Storage = containers::array<containers::map_value_type<std::string_view, int>, 2>;
-constexpr auto converter = containers::basic_flat_map<Storage, lowercase_alphanumeric>(
-	containers::assume_unique,
-	Storage{{
-		{ "E", 1 },
-		{ "d", 2 },
-	}}
-);
-static_assert(size(converter) == 2_bi);
-
-static_assert((begin(converter) + 0_bi)->key() == "d");
-static_assert((begin(converter) + 1_bi)->key() == "E");
-static_assert(converter.lower_bound("E") != end(converter));
-static_assert(converter.find("E") != end(converter));
-static_assert(converter.at("E") == 1);
-
 class CheckedMover {
 public:
 	constexpr CheckedMover(int value) noexcept:
@@ -166,6 +109,8 @@ private:
 	bool m_moved;
 	bool m_destructed = false;
 };
+
+BOUNDED_COMPARISON;
 
 template<typename Container>
 void test_unique_copy_less(Container const & source, Container const & expected) {
@@ -257,9 +202,9 @@ template<typename container_type>
 void test() {
 	std::cout << "Testing many member functions.\n" << std::flush;
 
-	container_type empty;
-	std::initializer_list<typename container_type::value_type> const init = { {1, 2}, {2, 5}, {3, 3} };
-	container_type container(init);
+	auto empty = container_type();
+	auto const init = std::initializer_list<typename container_type::value_type>{{1, 2}, {2, 5}, {3, 3}};
+	auto container = container_type(init);
 	BOUNDED_TEST((container == container_type(init)));
 	container.emplace(typename container_type::value_type(4, 4));
 	container.emplace(std::piecewise_construct, generic_forward_as_tuple<container_type>(5), generic_forward_as_tuple<container_type>(3));
@@ -270,30 +215,30 @@ void test() {
 	BOUNDED_TEST(container.at(3) == 3);
 }
 
-#define TRACK_COMPARISONS
-#if defined TRACK_COMPARISONS
-std::size_t number_of_comparisons = 0;
-template<typename Key>
-class TrackerCompare {
-public:
-	bool operator()(Key const & lhs, Key const & rhs) const {
-		++number_of_comparisons;
-		return lhs < rhs;
+#define TRACK_EXTRACTIONS
+#if defined TRACK_EXTRACTIONS
+std::size_t number_of_extractions = 0;
+template<typename Extract>
+struct extract_tracker {
+	template<typename Key>
+	decltype(auto) operator()(Key const & key) const {
+		++number_of_extractions;
+		return Extract()(key);
 	}
 };
 
-template<typename Key>
-using Compare = TrackerCompare<Key>;
+template<typename Extract>
+using extract_key_t = extract_tracker<Extract>;
 
 #else
-template<typename Key>
-using Compare = std::less<Key>;
+template<typename Extract>
+using extract_key_t = Extract;
 #endif
 
 
 #if defined USE_SYSTEM_MAP
-	template<typename Key, typename Value>
-	using map_type = std::map<Key, Value, Compare<Key>>;
+	template<typename Key, typename Value, typename Extract>
+	using map_type = std::map<Key, Value, extract_key_to_compare_t<extract_key_t<Extract>>>;
 
 	template<typename Key, typename Value>
 	using value_type = std::pair<Key, Value>;
@@ -304,8 +249,8 @@ using Compare = std::less<Key>;
 	}
 
 #elif defined USE_FLAT_MAP
-	template<typename Key, typename Value>
-	using map_type = flat_map<Key, Value, Compare<Key>>;
+	template<typename Key, typename Value, typename Extract>
+	using map_type = flat_map<Key, Value, extract_key_t<Extract>>;
 
 	template<typename Key, typename Value>
 	using value_type = containers::map_value_type<Key, Value>;
@@ -334,12 +279,31 @@ private:
 	TimePoint m_time_point = TimePoint{};
 };
 
-template<typename Key, typename Value>
+template<std::size_t size>
+struct Thing {
+public:
+	Thing(std::uint32_t v) {
+		m_value[0] = v;
+	}
+
+	friend struct Extract;
+private:
+	std::array<std::uint32_t, size> m_value;
+};
+
+struct Extract {
+	template<std::size_t size>
+	auto operator()(Thing<size> const thing) const -> std::uint32_t {
+		return thing.m_value[0];
+	}
+};
+
+template<std::size_t key_size, std::size_t value_size>
 void test_performance(std::size_t const loop_count) {
 	auto const generator = [](std::size_t size) {
 		static std::mt19937 engine(0);
 		static std::uniform_int_distribution<std::uint32_t> distribution;
-		std::vector<value_type<Key, Value>> source;
+		std::vector<value_type<Thing<key_size>, Thing<value_size>>> source;
 		source.reserve(size);
 		for (std::size_t n = 0; n != size; ++n) {
 			::containers::emplace_back(source, distribution(engine), distribution(engine));
@@ -356,10 +320,10 @@ void test_performance(std::size_t const loop_count) {
 	auto const start = high_resolution_clock::now();
 
 	TimeDestructor destructor;
-	auto map = map_type<Key, Value>(source);
+	auto map = map_type<Thing<key_size>, Thing<value_size>, Extract>(source);
 	auto const constructed = high_resolution_clock::now();
-	#if defined TRACK_COMPARISONS
-		auto const constructed_comparisons = number_of_comparisons;
+	#if defined TRACK_EXTRACTIONS
+		auto const constructed_extractions = number_of_extractions;
 	#endif
 
 	for (auto const & value : map) {
@@ -371,8 +335,8 @@ void test_performance(std::size_t const loop_count) {
 		auto const volatile it [[maybe_unused]] = map.find(get_key(value));
 	}
 	auto const found = high_resolution_clock::now();
-	#if defined TRACK_COMPARISONS
-		auto const found_comparisons = number_of_comparisons;
+	#if defined TRACK_EXTRACTIONS
+		auto const found_extractions = number_of_extractions;
 	#endif
 
 	for (auto const & value : map) {
@@ -382,8 +346,8 @@ void test_performance(std::size_t const loop_count) {
 	}
 	map.insert(additional_batch);
 	auto const inserted_batch = high_resolution_clock::now();
-	#if defined TRACK_COMPARISONS
-		auto const inserted_batch_comparisons = number_of_comparisons;
+	#if defined TRACK_EXTRACTIONS
+		auto const inserted_batch_extractions = number_of_extractions;
 	#endif
 
 	for (auto const & value : map) {
@@ -395,8 +359,8 @@ void test_performance(std::size_t const loop_count) {
 		map.insert(value);
 	}
 	auto const inserted = high_resolution_clock::now();
-	#if defined TRACK_COMPARISONS
-		auto const inserted_comparisons = number_of_comparisons;
+	#if defined TRACK_EXTRACTIONS
+		auto const inserted_extractions = number_of_extractions;
 	#endif
 
 	for (auto const & value : map) {
@@ -418,18 +382,18 @@ void test_performance(std::size_t const loop_count) {
 		auto const volatile it [[maybe_unused]] = map.find(get_key(value));
 	}
 	auto const found_in_extras = high_resolution_clock::now();
-	#if defined TRACK_COMPARISONS
-		auto const found_with_extra_comparisons = number_of_comparisons;
+	#if defined TRACK_EXTRACTIONS
+		auto const found_with_extra_extractions = number_of_extractions;
 	#endif
 	std::cout << "map size: " << size(map) << "\n\n";
 	
-	#if defined TRACK_COMPARISONS
-		std::cout << "Constructed comparisons: " << constructed_comparisons << '\n';
-		std::cout << "Found comparisons: " << found_comparisons - constructed_comparisons << '\n';
-		std::cout << "Batch insertion comparisons: " << inserted_batch_comparisons - found_comparisons << '\n';
-		std::cout << "Insertion comparisons: " << inserted_comparisons - inserted_batch_comparisons << '\n';
-		std::cout << "Found with extras comparisons: " << found_with_extra_comparisons - inserted_comparisons << '\n';
-		std::cout << "Number of comparisons: " << number_of_comparisons << '\n';
+	#if defined TRACK_EXTRACTIONS
+		std::cout << "Constructed extractions: " << constructed_extractions << '\n';
+		std::cout << "Found extractions: " << found_extractions - constructed_extractions << '\n';
+		std::cout << "Batch insertion extractions: " << inserted_batch_extractions - found_extractions << '\n';
+		std::cout << "Insertion extractions: " << inserted_extractions - inserted_batch_extractions << '\n';
+		std::cout << "Found with extras extractions: " << found_with_extra_extractions - inserted_extractions << '\n';
+		std::cout << "Number of extractions: " << number_of_extractions << '\n';
 		std::cout << '\n';
 	#endif
 
@@ -444,33 +408,18 @@ void test_performance(std::size_t const loop_count) {
 	destructor.set();
 }
 
-template<std::size_t size>
-class Class {
-public:
-	Class(std::uint32_t v) {
-		m_value[0] = v;
-	}
-	std::uint32_t value() const {
-		return m_value[0];
-	}
-private:
-	std::array<std::uint32_t, size> m_value;
-};
-
-template<std::size_t size>
-auto compare(Class<size> const & lhs, Class<size> const & rhs) {
-	return bounded::compare(lhs.value(), rhs.value());
-}
-
-BOUNDED_COMPARISON
-
 }	// namespace
 
 int main(int argc, char ** argv) {
-	test_unique();
-	test<map_type<int, int>>();
-
 	auto const loop_count = (argc == 1) ? 1 : std::stoull(argv[1]);
+	if (loop_count == 0) {
+		std::cerr << "Must pass a positive number\n";
+		return 1;
+	}
+
+	test_unique();
+	test<map_type<int, int, containers::detail::identity_t>>();
+
 	std::cout << "Testing performance.\n" << std::flush;
-	test_performance<Class<1>, Class<1>>(loop_count);
+	test_performance<1, 1>(loop_count);
 }

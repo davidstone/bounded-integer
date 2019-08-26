@@ -7,8 +7,6 @@
 
 #include <containers/algorithms/advance.hpp>
 #include <containers/algorithms/binary_search.hpp>
-#include <containers/algorithms/unique.hpp>
-#include <containers/erase.hpp>
 #include <containers/is_iterator_sentinel.hpp>
 #include <containers/is_range.hpp>
 #include <containers/legacy_iterator.hpp>
@@ -66,7 +64,7 @@ constexpr inline struct sort_t {
 		if (std::is_constant_evaluated()) {
 			detail::insertion_sort(first, last, cmp);
 		} else {
-			std::sort(containers::legacy_iterator(first), containers::legacy_iterator(last), cmp);
+			std::sort(make_legacy_iterator(first), make_legacy_iterator(last), cmp);
 		}
 	}
 	template<typename Range, typename Compare> requires is_range<Range>
@@ -100,22 +98,5 @@ constexpr inline struct is_sorted_t {
 	}
 } is_sorted;
 
-
-constexpr inline struct unique_sort_t {
-	template<typename Range, typename Compare> requires is_range<Range>
-	constexpr auto operator()(Range & range, Compare cmp) const {
-		sort(range, cmp);
-		auto const equal = ::containers::negate(cmp);
-		return ::containers::erase(
-			range,
-			::containers::unique(begin(range), end(range), equal),
-			end(range)
-		);
-	}
-	template<typename Range> requires is_range<Range>
-	constexpr auto operator()(Range && range) const {
-		return operator()(range, std::less{});
-	}
-} unique_sort;
 
 }	// namespace containers

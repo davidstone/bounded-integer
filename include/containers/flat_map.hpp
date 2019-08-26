@@ -7,7 +7,7 @@
 
 #include <containers/algorithms/binary_search.hpp>
 #include <containers/algorithms/negate.hpp>
-#include <containers/algorithms/sort.hpp>
+#include <containers/algorithms/ska_sort.hpp>
 #include <containers/algorithms/unique.hpp>
 #include <containers/common_container_functions.hpp>
 #include <containers/legacy_iterator.hpp>
@@ -85,6 +85,28 @@ struct inserted_t {
 template<typename Iterator>
 inserted_t(Iterator, bool) -> inserted_t<Iterator>;
 
+template<typename T, typename ExtractKey>
+struct extract_map_key {
+	constexpr explicit extract_map_key(ExtractKey extract_key):
+		m_extract(extract_key)
+	{
+	}
+	constexpr decltype(auto) operator()(T const & value) const {
+		return m_extract(value.key());
+	}
+	constexpr decltype(auto) operator()(typename T::key_type const & key) const {
+		return m_extract(key);
+	}
+private:
+	ExtractKey m_extract;
+};
+
+template<typename ExtractKey, typename T>
+concept extract_key_function = requires(ExtractKey const & extract_key, T const & value) {
+	extract_key(value);
+};
+
+
 // The exact type of value_type should be considered implementation defined.
 // map_value_type<key_type const, mapped_type> does not work if the underlying
 // container is vector because insertion into the middle / sorting requires
@@ -92,11 +114,11 @@ inserted_t(Iterator, bool) -> inserted_t<Iterator>;
 // operator. To get the code to work with a vector, we have to sacrifice some
 // compile-time checks.
 
-template<typename Container, typename Compare, bool allow_duplicates>
+template<typename Container, typename ExtractKey, bool allow_duplicates> requires extract_key_function<ExtractKey, typename Container::value_type::key_type>
 struct flat_map_base {
 private:
 	Container m_container;
-	[[no_unique_address]] Compare m_compare;
+	[[no_unique_address]] ExtractKey m_extract_key;
 public:
 	using value_type = typename Container::value_type;
 	using key_type = typename value_type::key_type;
@@ -106,33 +128,16 @@ public:
 	using const_iterator = typename Container::const_iterator;
 	using iterator = typename Container::iterator;
 	
-	using key_compare_type = Compare;
-	class value_compare_type {
-	protected:
-		friend struct flat_map_base;
-		constexpr value_compare_type(key_compare_type c) noexcept(std::is_nothrow_move_constructible_v<key_compare_type>):
-			m_compare(std::move(c)) {
-		}
-		key_compare_type m_compare;
-	public:
-		using result_type = bool;
-		using first_argument_type = value_type;
-		using second_argument_type = value_type;
-		constexpr auto operator()(value_type const & lhs, value_type const & rhs) const BOUNDED_NOEXCEPT(
-			m_compare(lhs.key(), rhs.key())
-		)
-	};
-	
-	constexpr auto key_compare() const noexcept {
-		return m_compare;
+	constexpr auto extract_key() const {
+		return extract_map_key<value_type, ExtractKey>(m_extract_key);
 	}
-	constexpr auto value_compare() const noexcept{
-		return value_compare_type(key_compare());
+	constexpr auto compare() const {
+		return detail::extract_key_to_compare(extract_key());
 	}
 	
 	flat_map_base() = default;
-	constexpr explicit flat_map_base(key_compare_type compare) noexcept(std::is_nothrow_default_constructible_v<Container> and std::is_nothrow_move_constructible_v<Compare>):
-		m_compare(std::move(compare))
+	constexpr explicit flat_map_base(ExtractKey extract_key) noexcept(std::is_nothrow_default_constructible_v<Container> and std::is_nothrow_move_constructible_v<ExtractKey>):
+		m_extract_key(std::move(extract_key))
 	{
 	}
 
@@ -140,45 +145,45 @@ public:
 	constexpr explicit flat_map_base(InputRange && range):
 		m_container(BOUNDED_FORWARD(range))
 	{
-		unique_sort(m_container, value_compare());
+		unique_ska_sort(m_container, extract_key());
 	}
 
 	template<typename InputRange> requires is_range<InputRange>
-	constexpr flat_map_base(InputRange && range, key_compare_type compare):
+	constexpr flat_map_base(InputRange && range, ExtractKey extract_key):
 		m_container(BOUNDED_FORWARD(range)),
-		m_compare(std::move(compare))
+		m_extract_key(std::move(extract_key))
 	{
-		unique_sort(m_container, value_compare());
+		unique_ska_sort(m_container, extract_key());
 	}
 
 	template<typename InputRange> requires is_range<InputRange>
 	constexpr flat_map_base(assume_sorted_unique_t, InputRange && range):
 		m_container(BOUNDED_FORWARD(range))
 	{
-		BOUNDED_ASSERT(is_sorted(m_container, value_compare()));
+		BOUNDED_ASSERT(is_sorted(m_container, compare()));
 	}
 
 	template<typename InputRange> requires is_range<InputRange>
-	constexpr flat_map_base(assume_sorted_unique_t, InputRange && range, key_compare_type compare):
+	constexpr flat_map_base(assume_sorted_unique_t, InputRange && range, ExtractKey extract_key):
 		m_container(BOUNDED_FORWARD(range)),
-		m_compare(std::move(compare))
+		m_extract_key(std::move(extract_key))
 	{
-		BOUNDED_ASSERT(is_sorted(m_container, value_compare()));
+		BOUNDED_ASSERT(is_sorted(m_container, compare()));
 	}
 
 	template<typename InputRange> requires is_range<InputRange>
 	constexpr flat_map_base(assume_unique_t, InputRange && range):
 		m_container(BOUNDED_FORWARD(range))
 	{
-		sort(m_container, value_compare());
+		ska_sort(m_container, extract_key());
 	}
 
 	template<typename InputRange> requires is_range<InputRange>
-	constexpr flat_map_base(assume_unique_t, InputRange && range, key_compare_type compare):
+	constexpr flat_map_base(assume_unique_t, InputRange && range, ExtractKey extract_key):
 		m_container(BOUNDED_FORWARD(range)),
-		m_compare(std::move(compare))
+		m_extract_key(std::move(extract_key))
 	{
-		sort(m_container, value_compare());
+		ska_sort(m_container, extract_key());
 	}
 
 
@@ -186,40 +191,40 @@ public:
 	constexpr flat_map_base(std::initializer_list<value_type> range):
 		m_container(range)
 	{
-		unique_sort(m_container, value_compare());
+		unique_ska_sort(m_container, extract_key());
 	}
 
-	constexpr flat_map_base(std::initializer_list<value_type> range, key_compare_type compare):
+	constexpr flat_map_base(std::initializer_list<value_type> range, ExtractKey extract_key):
 		m_container(range),
-		m_compare(std::move(compare))
+		m_extract_key(std::move(extract_key))
 	{
-		unique_sort(m_container, value_compare());
+		unique_ska_sort(m_container, extract_key());
 	}
 
 	constexpr flat_map_base(assume_sorted_unique_t, std::initializer_list<value_type> range):
 		m_container(range)
 	{
-		BOUNDED_ASSERT(is_sorted(m_container));
+		BOUNDED_ASSERT(is_sorted(m_container, compare()));
 	}
 
-	constexpr flat_map_base(assume_sorted_unique_t, std::initializer_list<value_type> range, key_compare_type compare):
+	constexpr flat_map_base(assume_sorted_unique_t, std::initializer_list<value_type> range, ExtractKey extract_key):
 		m_container(range),
-		m_compare(std::move(compare))
+		m_extract_key(std::move(extract_key))
 	{
-		BOUNDED_ASSERT(is_sorted(m_container));
+		BOUNDED_ASSERT(is_sorted(m_container, compare()));
 	}
 
 	constexpr flat_map_base(assume_unique_t, std::initializer_list<value_type> range):
 		m_container(range)
 	{
-		sort(m_container, value_compare());
+		ska_sort(m_container, extract_key());
 	}
 
-	constexpr flat_map_base(assume_unique_t, std::initializer_list<value_type> range, key_compare_type compare):
+	constexpr flat_map_base(assume_unique_t, std::initializer_list<value_type> range, ExtractKey extract_key):
 		m_container(range),
-		m_compare(std::move(compare))
+		m_extract_key(std::move(extract_key))
 	{
-		sort(m_container, value_compare());
+		ska_sort(m_container, extract_key());
 	}
 
 	constexpr auto & operator=(std::initializer_list<value_type> init) & noexcept(noexcept(flat_map_base(init)) and std::is_nothrow_move_assignable_v<flat_map_base>) {
@@ -255,7 +260,7 @@ public:
 		containers::lower_bound(
 			*this,
 			BOUNDED_FORWARD(key),
-			key_value_compare{key_compare()}
+			compare()
 		)
 	)
 	template<typename Key>
@@ -263,7 +268,7 @@ public:
 		containers::lower_bound(
 			*this,
 			BOUNDED_FORWARD(key),
-			key_value_compare{key_compare()}
+			compare()
 		)
 	)
 	template<typename Key>
@@ -271,7 +276,7 @@ public:
 		containers::upper_bound(
 			*this,
 			BOUNDED_FORWARD(key),
-			key_value_compare{key_compare()}
+			compare()
 		)
 	)
 	template<typename Key>
@@ -279,19 +284,19 @@ public:
 		containers::upper_bound(
 			*this,
 			BOUNDED_FORWARD(key),
-			key_value_compare{key_compare()}
+			compare()
 		)
 	)
 	// TODO: noexcept
 	template<typename Key>
 	constexpr auto find(Key const & key) const {
 		auto const it = lower_bound(key);
-		return (it == end(*this) or key_compare()(key, it->key())) ? end(*this) : it;
+		return (it == end(*this) or compare()(key, it->key())) ? end(*this) : it;
 	}
 	template<typename Key>
 	constexpr auto find(Key const & key) {
 		auto const it = lower_bound(key);
-		return (it == end(*this) or key_compare()(key, it->key())) ? end(*this) : it;
+		return (it == end(*this) or compare()(key, it->key())) ? end(*this) : it;
 	}
 	
 	// Unlike in std::map, insert / emplace can only provide a time complexity
@@ -313,8 +318,8 @@ public:
 	template<typename... Args>
 	constexpr auto emplace_hint(const_iterator hint, Args && ... args) {
 		auto data = separate_key_from_mapped(BOUNDED_FORWARD(args)...);
-		auto const correct_greater = (hint == end(*this)) or key_compare(data.key, *hint);
-		auto const correct_less = (hint == begin(*this)) or key_compare(*::containers::prev(hint), data.key);
+		auto const correct_greater = (hint == end(*this)) or compare()(data.key, *hint);
+		auto const correct_less = (hint == begin(*this)) or compare()(*::containers::prev(hint), data.key);
 		auto const correct_hint = correct_greater and correct_less;
 		auto const position = correct_hint ? hint : upper_bound(data.key);
 		return emplace_at(position, std::move(data).key, std::move(data).mapped_args);
@@ -343,20 +348,20 @@ public:
 		// merge sort on both ranges, rather than calling std::sort on the
 		// entire container.
 		auto const midpoint = append(m_container, BOUNDED_FORWARD(range));
-		sort(midpoint, end(m_container), value_compare());
+		ska_sort(midpoint, end(m_container), extract_key());
 		if (allow_duplicates) {
 			std::inplace_merge(
-				legacy_iterator(begin(m_container)),
-				legacy_iterator(midpoint),
-				legacy_iterator(end(m_container)),
-				value_compare()
+				make_legacy_iterator(begin(m_container)),
+				make_legacy_iterator(midpoint),
+				make_legacy_iterator(end(m_container)),
+				compare()
 			);
 		} else {
 			auto const position = ::containers::unique_inplace_merge(
 				begin(m_container),
 				midpoint,
 				end(m_container),
-				value_compare()
+				compare()
 			);
 			using containers::erase;
 			erase(m_container, position, end(m_container));
@@ -379,23 +384,6 @@ public:
 	)
 	
 private:
-	class key_value_compare {
-	public:
-		constexpr key_value_compare(key_compare_type const & compare):
-			m_compare(compare) {
-		}
-		template<typename Key>
-		constexpr bool operator()(Key && key, value_type const & value) const {
-			return m_compare(BOUNDED_FORWARD(key), value.key());
-		}
-		template<typename Key>
-		constexpr bool operator()(value_type const & value, Key && key) const {
-			return m_compare(value.key(), BOUNDED_FORWARD(key));
-		}
-	private:
-		key_compare_type const & m_compare;
-	};
-
 	// It is safe to bind the reference to the object that is being moved in any
 	// of these calls to emplace_key because the call to std::move does not
 	// actually move anything, it just converts it to an rvalue reference. The
@@ -467,7 +455,7 @@ private:
 		} else {
 			// Do not decrement an iterator if it might be begin(*this)
 			bool const there_is_element_before = position != begin(*this);
-			auto const that_element_is_equal = [&](){ return !key_compare()(containers::prev(position)->key(), key); };
+			auto const that_element_is_equal = [&](){ return !compare()(containers::prev(position)->key(), key); };
 			bool const already_exists = there_is_element_before and that_element_is_equal();
 			if (already_exists) {
 				return inserted_t{mutable_iterator(*this, containers::prev(position)), false};
@@ -488,10 +476,10 @@ private:
 }	// namespace detail
 
 
-template<typename Container, typename Compare = std::less<>>
-class basic_flat_map : private detail::flat_map_base<Container, Compare, false> {
+template<typename Container, typename ExtractKey = detail::identity_t>
+class basic_flat_map : private detail::flat_map_base<Container, ExtractKey, false> {
 private:
-	using base = detail::flat_map_base<Container, Compare, false>;
+	using base = detail::flat_map_base<Container, ExtractKey, false>;
 public:
 	using typename base::key_type;
 	using typename base::mapped_type;
@@ -500,11 +488,7 @@ public:
 	using typename base::const_iterator;
 	using typename base::iterator;
 
-	using typename base::key_compare_type;
-	using typename base::value_compare_type;
-	
-	using base::key_compare;
-	using base::value_compare;
+	using base::compare;
 
 	using base::base;
 	using base::operator=;
@@ -581,14 +565,13 @@ public:
 	}
 };
 
-template<typename Container, typename Compare>
-inline constexpr auto is_container<basic_flat_map<Container, Compare>> = is_container<Container>;
+template<typename Container, typename ExtractKey>
+inline constexpr auto is_container<basic_flat_map<Container, ExtractKey>> = is_container<Container>;
 
-template<typename Container, typename Compare = std::less<>>
-class basic_flat_multimap : private detail::flat_map_base<Container, Compare, true> {
+template<typename Container, typename ExtractKey = detail::identity_t>
+class basic_flat_multimap : private detail::flat_map_base<Container, ExtractKey, true> {
 private:
-	using base = detail::flat_map_base<Container, Compare, true>;
-	using typename base::key_value_compare;
+	using base = detail::flat_map_base<Container, ExtractKey, true>;
 public:
 	using typename base::key_type;
 	using typename base::mapped_type;
@@ -597,11 +580,7 @@ public:
 	using typename base::const_iterator;
 	using typename base::iterator;
 
-	using typename base::key_compare_type;
-	using typename base::value_compare_type;
-	
-	using base::key_compare;
-	using base::value_compare;
+	using base::compare;
 
 	using base::base;
 	using base::operator=;
@@ -639,11 +618,11 @@ public:
 
 	template<typename Key>
 	constexpr auto equal_range(Key && key) const BOUNDED_NOEXCEPT_GCC_BUG(
-		std::equal_range(begin(*this), end(*this), BOUNDED_FORWARD(key), key_value_compare{this->key_compare()})
+		std::equal_range(begin(*this), end(*this), BOUNDED_FORWARD(key), compare())
 	)
 	template<typename Key>
 	constexpr auto equal_range(Key && key) BOUNDED_NOEXCEPT_GCC_BUG(
-		std::equal_range(begin(*this), end(*this), BOUNDED_FORWARD(key), key_value_compare{this->key_compare()})
+		std::equal_range(begin(*this), end(*this), BOUNDED_FORWARD(key), compare)
 	)
 
 	template<typename Key>
@@ -664,15 +643,15 @@ public:
 	}
 };
 
-template<typename Container, typename Compare>
-inline constexpr auto is_container<basic_flat_multimap<Container, Compare>> = is_container<Container>;
+template<typename Container, typename ExtractKey>
+inline constexpr auto is_container<basic_flat_multimap<Container, ExtractKey>> = is_container<Container>;
 
 
-template<typename Key, typename T, typename... MaybeCompare>
-using flat_map = basic_flat_map<vector<map_value_type<Key, T>>, MaybeCompare...>;
+template<typename Key, typename T, typename... MaybeExtractKey>
+using flat_map = basic_flat_map<vector<map_value_type<Key, T>>, MaybeExtractKey...>;
 
-template<typename Key, typename T, typename... MaybeCompare>
-using flat_multimap = basic_flat_multimap<vector<map_value_type<Key, T>>, MaybeCompare...>;
+template<typename Key, typename T, typename... MaybeExtractKey>
+using flat_multimap = basic_flat_multimap<vector<map_value_type<Key, T>>, MaybeExtractKey...>;
 
 
 }	// namespace containers
