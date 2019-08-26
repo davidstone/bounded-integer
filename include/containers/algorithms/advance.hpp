@@ -20,9 +20,14 @@ using namespace bounded::literal;
 namespace detail {
 
 template<typename Iterator, typename Offset>
-constexpr auto advance(Iterator & it, Offset const offset, std::random_access_iterator_tag) BOUNDED_NOEXCEPT(
-	void(it += offset)
+constexpr auto advance(Iterator & it, Offset const offset, std::random_access_iterator_tag) BOUNDED_NOEXCEPT_VALUE(
+	void(it += offset.value())
 )
+template<typename Iterator, typename Offset>
+constexpr auto advance(Iterator & it, Offset const offset, std::random_access_iterator_tag) requires requires { it += offset; } {
+	it += offset;
+}
+
 template<typename Iterator, typename Offset>
 constexpr auto advance(Iterator & it, Offset const offset, std::bidirectional_iterator_tag) {
 	using counter = std::common_type_t<decltype(bounded::abs(offset)), bounded::constant_t<0>>;
