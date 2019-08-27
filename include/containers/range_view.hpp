@@ -6,6 +6,7 @@
 #pragma once
 
 #include <containers/is_range.hpp>
+#include <containers/operator_bracket.hpp>
 
 #include <bounded/integer.hpp>
 
@@ -47,6 +48,8 @@ struct range_view {
 	friend constexpr Sentinel end(range_view view) {
 		return view.m_end;
 	}
+
+	CONTAINERS_OPERATOR_BRACKET_DEFINITIONS(range_view)
 	
 private:
 	Iterator m_begin;
