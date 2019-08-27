@@ -161,6 +161,7 @@ target_sources(containers INTERFACE
 	$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>/include/containers/small_buffer_optimized_vector.hpp
 	$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>/include/containers/stable_vector.hpp
 	$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>/include/containers/string.hpp
+	$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>/include/containers/take.hpp
 	$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>/include/containers/uninitialized_storage.hpp
 	$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>/include/containers/vector.hpp
 )
@@ -317,6 +318,7 @@ add_library(containers_test STATIC
 	source/containers/scope_guard.cpp
 	source/containers/single_element_range.cpp
 	source/containers/size.cpp
+	source/containers/take.cpp
 )
 
 target_link_libraries(containers_test PUBLIC containers)
