@@ -21,7 +21,6 @@
 #include <bounded/detail/numeric_limits.hpp>
 #include <bounded/detail/size_of.hpp>
 #include <bounded/detail/stream.hpp>
-#include <bounded/detail/string.hpp>
 #include <bounded/detail/to_integer.hpp>
 #include <bounded/detail/typedefs.hpp>
 #include <bounded/detail/arithmetic/common.hpp>

@@ -8,7 +8,6 @@
 #include <bounded/detail/is_bounded_integer.hpp>
 
 #include <string>
-#include <type_traits>
 
 namespace bounded {
 

@@ -13,7 +13,7 @@
 #include <bounded/detail/is_bounded_integer.hpp>
 #include <bounded/detail/minmax.hpp>
 #include <bounded/detail/noexcept.hpp>
-#include <bounded/detail/string.hpp>
+#include <bounded/string.hpp>
 #include <stdexcept>
 
 namespace bounded {

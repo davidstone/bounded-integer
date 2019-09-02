@@ -73,7 +73,6 @@ target_sources(bounded INTERFACE
 	$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>/include/bounded/detail/requires.hpp
 	$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>/include/bounded/detail/size_of.hpp
 	$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>/include/bounded/detail/stream.hpp
-	$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>/include/bounded/detail/string.hpp
 	$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>/include/bounded/detail/tuple.hpp
 	$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>/include/bounded/detail/type.hpp
 	$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>/include/bounded/detail/typedefs.hpp
@@ -81,6 +80,7 @@ target_sources(bounded INTERFACE
 	$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>/include/bounded/assert.hpp
 	$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>/include/bounded/integer.hpp
 	$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>/include/bounded/optional.hpp
+	$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>/include/bounded/string.hpp
 )
 
 target_sources(containers INTERFACE
@@ -236,7 +236,6 @@ add_executable(bounded_test
 	source/bounded/detail/requires.cpp
 	source/bounded/detail/size_of.cpp
 	source/bounded/detail/stream.cpp
-	source/bounded/detail/string.cpp
 	source/bounded/detail/to_integer.cpp
 	source/bounded/detail/tuple.cpp
 	source/bounded/detail/type.cpp
@@ -246,6 +245,7 @@ add_executable(bounded_test
 	source/bounded/assert-NDEBUG.cpp
 	source/bounded/integer.cpp
 	source/bounded/optional.cpp
+	source/bounded/string.cpp
 )
 
 target_link_libraries(bounded_test PUBLIC bounded)
