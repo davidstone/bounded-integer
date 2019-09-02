@@ -7,8 +7,7 @@
 
 #include <bounded/detail/is_bounded_integer.hpp>
 
-#include <istream>
-#include <ostream>
+#include <iosfwd>
 
 namespace bounded {
 
