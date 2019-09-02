@@ -10,7 +10,7 @@
 #include <bounded/detail/max_builtin.hpp>
 #include <bounded/detail/noexcept.hpp>
 
-#include <functional>
+#include <cstddef>
 #include <type_traits>
 
 namespace bounded {
