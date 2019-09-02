@@ -11,8 +11,7 @@
 #include <containers/single_element_range.hpp>
 #include <containers/small_buffer_optimized_vector.hpp>
 
-#include <istream>
-#include <ostream>
+#include <iosfwd>
 
 namespace containers {
 namespace detail {
