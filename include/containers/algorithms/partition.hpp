@@ -14,7 +14,6 @@
 #include <bounded/detail/forward.hpp>
 #include <bounded/integer.hpp>
 
-#include <functional>
 #include <limits>
 
 namespace containers {

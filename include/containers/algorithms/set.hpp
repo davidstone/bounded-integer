@@ -10,7 +10,6 @@
 
 #include <bounded/detail/forward.hpp>
 
-#include <functional>
 #include <iterator>
 #include <type_traits>
 #include <utility>
