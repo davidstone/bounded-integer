@@ -158,12 +158,6 @@ public:
 	using base::append_from_capacity;
 };
 
-static_assert(std::is_trivially_copy_constructible_v<static_vector<int, 15>>);
-static_assert(std::is_trivially_move_constructible_v<static_vector<int, 15>>);
-static_assert(std::is_trivially_copy_assignable_v<static_vector<int, 15>>);
-static_assert(std::is_trivially_move_assignable_v<static_vector<int, 15>>);
-static_assert(std::is_trivially_destructible_v<static_vector<int, 15>>);
-
 template<typename T, std::size_t capacity, bool is_trivial>
 inline constexpr auto is_container<detail::static_vector_data<T, capacity, is_trivial>> = true;
 
