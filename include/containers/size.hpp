@@ -13,22 +13,26 @@
 
 namespace containers {
 namespace detail {
+
+template<typename Range>
+concept has_member_size = requires(Range const & range) { range.size(); };
+
+template<typename Range>
+concept random_access_range = requires(Range const & range) {
+	static_cast<typename Range::size_type>(end(range) - begin(range));
+};
+
 namespace common {
 
-// Ignored... makes this a worse match than std::size if that compiles
-template<typename Range, typename... Ignored> requires(
-	is_range<Range> and
-	bounded::is_bounded_integer<typename Range::size_type>
-)
-constexpr auto size(Range const & range, Ignored && ...) noexcept {
-	return typename Range::size_type(end(range) - begin(range), bounded::non_check);
-}
-template<typename Range, typename... Ignored> requires(
-	is_range<Range> and
-	!bounded::is_bounded_integer<typename Range::size_type>
-)
-constexpr auto size(Range const & range, Ignored && ...) noexcept {
-	return typename Range::size_type(end(range) - begin(range));
+template<typename Range> requires has_member_size<Range> or random_access_range<Range>
+constexpr auto size(Range const & range) noexcept {
+	if constexpr (has_member_size<Range>) {
+		return range.size();
+	} else if constexpr (bounded::is_bounded_integer<typename Range::size_type>) {
+		return typename Range::size_type(end(range) - begin(range), bounded::non_check);
+	} else {
+		return typename Range::size_type(end(range) - begin(range));
+	}
 }
 
 }	// namespace common
