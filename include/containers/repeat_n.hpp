@@ -8,6 +8,7 @@
 #include <containers/common_iterator_functions.hpp>
 #include <containers/operator_bracket.hpp>
 
+#include <bounded/detail/construct_destroy.hpp>
 #include <bounded/detail/forward.hpp>
 #include <bounded/integer.hpp>
 

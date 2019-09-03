@@ -12,6 +12,7 @@
 #include <containers/operator_bracket.hpp>
 #include <containers/range_view.hpp>
 
+#include <bounded/detail/construct_destroy.hpp>
 #include <bounded/detail/make_index_sequence.hpp>
 #include <bounded/detail/tuple.hpp>
 #include <bounded/integer.hpp>
