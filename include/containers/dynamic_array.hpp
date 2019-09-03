@@ -213,8 +213,7 @@ inline constexpr bool is_initializer_list<std::initializer_list<T>> = true;
 
 template<typename T, typename Range> requires(is_range<Range> and !detail::is_initializer_list<std::decay_t<Range>>)
 auto assign(dynamic_array<T> & container, Range && range) {
-	// TODO: Allow O(n) size
-	auto const difference = size(range);
+	auto const difference = detail::linear_size(range);
 	if (difference == size(container)) {
 		::containers::copy(begin(BOUNDED_FORWARD(range)), end(BOUNDED_FORWARD(range)), begin(container));
 	} else {

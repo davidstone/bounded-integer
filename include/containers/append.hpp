@@ -48,22 +48,13 @@ inline constexpr auto has_insert<
 	))>
 > = true;
 
-template<typename, typename = void>
-inline constexpr auto has_size = false;
-
-template<typename Container>
-inline constexpr auto has_size<
-	Container,
-	std::void_t<decltype(size(std::declval<Container>()))>
-> = true;
-
 namespace common {
 
 // TODO: work with non-sized containers and non-random-access containers
 template<typename Container, typename Range> requires has_push_back<Container>
 constexpr auto append(Container & output, Range && input) {
-	auto const offset = size(output);
-	if constexpr (has_size<Range> and has_reserve<Container>) {
+	auto const offset = linear_size(output);
+	if constexpr (is_sized<Range> and has_reserve<Container>) {
 		auto const input_size = [&] {
 			auto const value = size(input);
 			if constexpr (bounded::is_bounded_integer<decltype(value)>) {
