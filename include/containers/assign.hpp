@@ -5,12 +5,12 @@
 
 #pragma once
 
+#include <containers/append.hpp>
 #include <containers/begin_end.hpp>
 #include <containers/erase.hpp>
-#include <containers/emplace_back.hpp>
 #include <containers/is_container.hpp>
-#include <containers/is_iterator_sentinel.hpp>
-#include <containers/repeat_n.hpp>
+#include <containers/is_range.hpp>
+#include <containers/range_view.hpp>
 
 #include <bounded/integer.hpp>
 
@@ -21,12 +21,13 @@ namespace detail {
 namespace common {
 
 // TODO: noexcept
-template<typename Container, typename InputIterator, typename Sentinel> requires(
-	is_container<Container> and is_iterator_sentinel<InputIterator, Sentinel>
+template<typename Container, typename Range> requires(
+	is_container<Container> and is_range<Range>
 )
-constexpr auto assign(Container & container, InputIterator first, Sentinel const last) {
-	// TODO: Do we try to reuse storage like this or just clear() + construct
+constexpr auto assign(Container & container, Range && range) {
 	auto it = begin(container);
+	auto first = begin(BOUNDED_FORWARD(range));
+	auto last = end(BOUNDED_FORWARD(range));
 	for (; first != last; ++first) {
 		if (it == end(container)) {
 			break;
@@ -35,19 +36,12 @@ constexpr auto assign(Container & container, InputIterator first, Sentinel const
 		++it;
 	}
 	erase(container, it, end(container));
-	for (; first != last; ++first) {
-		::containers::emplace_back(container, *first);
-	}
+	append(container, range_view(first, last));
 }
 template<typename Container> requires is_container<Container>
 constexpr auto assign(Container & container, std::initializer_list<typename Container::value_type> init) BOUNDED_NOEXCEPT(
-	assign(container, begin(init), end(init))
+	assign(container, range_view(init))
 )
-template<typename Container, typename Size> requires(is_container<Container> and std::numeric_limits<Size>::is_integer)
-constexpr auto assign(Container & container, Size const count, typename Container::value_type const & value) {
-	auto const range = repeat_n(count, value);
-	assign(container, begin(range), end(range));
-}
 
 }	// namespace common
 

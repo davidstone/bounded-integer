@@ -89,12 +89,12 @@ struct stable_vector {
 		if (!m_storage) {
 			*this = stable_vector();
 		}
-		assign(*this, begin(other), end(other));
+		assign(*this, other);
 		return *this;
 	}
 
-	auto & operator=(std::initializer_list<value_type> init) & noexcept(noexcept(assign(std::declval<stable_vector &>(), containers::begin(init), containers::end(init)))) {
-		assign(*this, begin(init), end(init));
+	auto & operator=(std::initializer_list<value_type> init) & noexcept(noexcept(assign(std::declval<stable_vector &>(), init))) {
+		assign(*this, init);
 		return *this;
 	}
 

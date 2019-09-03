@@ -81,7 +81,7 @@ void test_generic(T const & t, std::initializer_list<T> init) {
 	BOUNDED_TEST(back(copy) == t);
 	
 	assign(copy, init);
-	assign(copy, capacity, t);
+	assign(copy, containers::repeat_n(capacity, t));
 	
 	// TODO: insert(it, it, it) overload
 	auto const old_front = front(copy);

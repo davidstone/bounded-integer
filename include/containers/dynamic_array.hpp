@@ -167,7 +167,7 @@ struct dynamic_array {
 	}
 
 	constexpr auto & operator=(dynamic_array const & other) & {
-		assign(*this, begin(other), end(other));
+		assign(*this, other);
 		return *this;
 	}
 	constexpr auto & operator=(dynamic_array && other) & noexcept {
@@ -200,16 +200,26 @@ private:
 template<typename T>
 inline constexpr auto is_container<dynamic_array<T>> = true;
 
+namespace detail {
 
-template<typename T, typename ForwardIterator, typename Sentinel> requires
-	is_iterator_sentinel<ForwardIterator, Sentinel>
-auto assign(dynamic_array<T> & container, ForwardIterator first, Sentinel const last) {
-	auto const difference = ::containers::distance(first, last);
+template<typename>
+inline constexpr bool is_initializer_list = false;
+
+template<typename T>
+inline constexpr bool is_initializer_list<std::initializer_list<T>> = true;
+
+} // namespace detail
+
+
+template<typename T, typename Range> requires(is_range<Range> and !detail::is_initializer_list<std::decay_t<Range>>)
+auto assign(dynamic_array<T> & container, Range && range) {
+	// TODO: Allow O(n) size
+	auto const difference = size(range);
 	if (difference == size(container)) {
-		::containers::copy(first, last, begin(container));
+		::containers::copy(begin(BOUNDED_FORWARD(range)), end(BOUNDED_FORWARD(range)), begin(container));
 	} else {
 		clear(container);
-		container = dynamic_array<T>(first, last);
+		container = dynamic_array<T>(BOUNDED_FORWARD(range));
 	}
 }
 

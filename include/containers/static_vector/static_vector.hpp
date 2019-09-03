@@ -68,8 +68,8 @@ struct static_vector_data {
 		return begin(container) + container.m_size;
 	}
 
-	constexpr auto & operator=(std::initializer_list<value_type> init) & noexcept(noexcept(assign(std::declval<static_vector_data &>(), init.begin(), init.end()))) {
-		assign(*this, begin(init), end(init));
+	constexpr auto & operator=(std::initializer_list<value_type> init) & noexcept(noexcept(assign(std::declval<static_vector_data &>(), init))) {
+		assign(*this, init);
 		return *this;
 	}
 
@@ -109,12 +109,12 @@ public:
 	}
 
 	auto & operator=(static_vector_data && other) & noexcept(std::is_nothrow_move_assignable_v<T>) {
-		assign(*this, begin(std::move(other)), end(std::move(other)));
+		assign(*this, std::move(other));
 		return *this;
 	}
 
 	auto & operator=(static_vector_data const & other) & noexcept(std::is_nothrow_copy_assignable_v<T>) {
-		assign(*this, begin(other), end(other));
+		assign(*this, other);
 		return *this;
 	}
 

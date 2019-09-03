@@ -43,15 +43,15 @@ struct dynamic_resizable_array : private Container {
 		!std::is_array_v<std::remove_cv_t<std::remove_reference_t<Range>>>
 	)
 	constexpr explicit dynamic_resizable_array(Range && range) {
-		assign(*this, begin(BOUNDED_FORWARD(range)), end(BOUNDED_FORWARD(range)));
+		append(*this, BOUNDED_FORWARD(range));
 	}
 	
 	constexpr dynamic_resizable_array(std::initializer_list<value_type> init) {
-		assign(*this, begin(init), end(init));
+		append(*this, init);
 	}
 
 	constexpr dynamic_resizable_array(dynamic_resizable_array const & other) {
-		assign(*this, begin(other), end(other));
+		append(*this, other);
 	}
 
 	constexpr dynamic_resizable_array(dynamic_resizable_array && other) noexcept {
@@ -59,7 +59,7 @@ struct dynamic_resizable_array : private Container {
 	}
 
 	constexpr auto & operator=(dynamic_resizable_array const & other) & noexcept(std::is_nothrow_copy_assignable_v<value_type>) {
-		assign(*this, begin(other), end(other));
+		assign(*this, other);
 		return *this;
 	}
 	constexpr auto & operator=(dynamic_resizable_array && other) & noexcept {
@@ -69,7 +69,7 @@ struct dynamic_resizable_array : private Container {
 	}
 
 	constexpr auto & operator=(std::initializer_list<value_type> init) & {
-		assign(*this, begin(init), end(init));
+		assign(*this, init);
 		return *this;
 	}
 

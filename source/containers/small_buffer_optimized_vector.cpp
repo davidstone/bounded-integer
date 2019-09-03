@@ -80,7 +80,7 @@ void test_generic(bounded::constant_t<capacity_> const capacity, T const & t, st
 	BOUNDED_TEST(back(copy) == t);
 	
 	assign(copy, init);
-	assign(copy, capacity, t);
+	assign(copy, containers::repeat_n(capacity, t));
 	
 	// TODO: insert(it, it, it) overload
 	auto const old_front = front(copy);

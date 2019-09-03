@@ -68,7 +68,7 @@ void test_generic(T const & t, Capacity capacity, std::initializer_list<T> init)
 	BOUNDED_TEST(copy == init_list);
 
 	assign(copy, init);
-	assign(copy, capacity, t);
+	assign(copy, containers::repeat_n(capacity, t));
 	
 	clear(copy);
 	resize(copy, capacity);
