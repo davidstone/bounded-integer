@@ -50,11 +50,15 @@ inline constexpr auto has_insert<
 
 namespace common {
 
-// TODO: work with non-sized containers and non-random-access containers
+// I would like to return an iterator to the start of the appended range, but
+// that does not seem possible to do efficiently in general due to potential
+// iterator instability.
 template<typename Container, typename Range> requires has_push_back<Container>
-constexpr auto append(Container & output, Range && input) {
-	auto const offset = linear_size(output);
-	if constexpr (is_sized<Range> and has_reserve<Container>) {
+constexpr auto append(Container & output, Range && input) -> void {
+	// TODO: Define InputRange and ForwardRange concepts
+	using iterator_category = typename std::iterator_traits<decltype(begin(input))>::iterator_category;
+	constexpr auto reserve_space = std::is_convertible_v<iterator_category, std::forward_iterator_tag> and has_reserve<Container>;
+	if constexpr (reserve_space) {
 		auto const input_size = [&] {
 			auto const value = size(input);
 			if constexpr (bounded::is_bounded_integer<decltype(value)>) {
@@ -63,26 +67,25 @@ constexpr auto append(Container & output, Range && input) {
 				return typename Container::size_type(value);
 			}
 		}();
+		auto const offset = linear_size(output);
 		if (offset + input_size > output.capacity()) {
 			::containers::detail::growth_reallocation(output, input_size);
 		}
 	}
-	if constexpr (has_append_from_capacity<Container>) {
-		auto const result = containers::uninitialized_copy(
+	if constexpr (reserve_space and has_append_from_capacity<Container>) {
+		auto const new_end = containers::uninitialized_copy(
 			begin(BOUNDED_FORWARD(input)),
 			end(BOUNDED_FORWARD(input)),
 			end(output)
 		);
-		output.append_from_capacity(result - end(output));
-	} else if constexpr (has_insert<Container, Range>) {
+		output.append_from_capacity(new_end - end(output));
+	} else if constexpr (has_insert<Container, Range> and std::is_move_constructible_v<typename Container::value_type> and std::is_move_assignable_v<typename Container::value_type>) {
 		output.insert(end(output), begin(BOUNDED_FORWARD(input)), end(BOUNDED_FORWARD(input)));
 	} else {
 		for (decltype(auto) value : BOUNDED_FORWARD(input)) {
 			push_back(output, BOUNDED_FORWARD(value));
 		}
 	}
-	using traits = std::iterator_traits<typename Container::iterator>;
-	return begin(output) + static_cast<typename traits::difference_type>(offset);
 }
 
 }	// namespace common

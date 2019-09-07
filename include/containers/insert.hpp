@@ -78,11 +78,13 @@ constexpr auto emplace(Container & container, typename Container::const_iterator
 
 // TODO: exception safety
 // TODO: Check if the range lies within the container
+// TODO: Return an iterator to the first element inserted
 template<typename Container, typename Range = std::initializer_list<typename Container::value_type>>
 constexpr auto insert(Container & container, typename Container::const_iterator position, Range && range) {
 	BOUNDED_ASSERT(iterator_points_into_container(container, position));
 	if (position == end(container)) {
-		return append(container, BOUNDED_FORWARD(range));
+		append(container, BOUNDED_FORWARD(range));
+		return;
 	}
 
 	auto const range_size = bounded::throw_policy<std::out_of_range>{}.assignment(
@@ -100,16 +102,13 @@ constexpr auto insert(Container & container, typename Container::const_iterator 
 		auto const last = end(BOUNDED_FORWARD(range));
 		::containers::uninitialized_copy(remainder.input, last, remainder.output);
 		container.append_from_capacity(range_size);
-		return mutable_position;
-	}
-	
-	if constexpr (has_reserve<Container>) {
-		return insert_or_emplace_with_reallocation(position, range_size, [&](auto const ptr) {
+		// return mutable_position;
+	} else if constexpr (has_reserve<Container>) {
+		insert_or_emplace_with_reallocation(position, range_size, [&](auto const ptr) {
 			::containers::uninitialized_copy(BOUNDED_FORWARD(range), ptr);
 		});
 	} else {
 		BOUNDED_ASSERT_OR_ASSUME(false);
-		return typename Container::iterator();
 	}
 }
 

@@ -347,7 +347,10 @@ public:
 		// sorted, it's probably better to just sort the new elements then do a
 		// merge sort on both ranges, rather than calling std::sort on the
 		// entire container.
-		auto const midpoint = append(m_container, BOUNDED_FORWARD(range));
+		auto const original_size = size(m_container);
+		append(m_container, BOUNDED_FORWARD(range));
+		auto const midpoint = begin(m_container) + original_size;
+
 		ska_sort(midpoint, end(m_container), extract_key());
 		if (allow_duplicates) {
 			std::inplace_merge(
