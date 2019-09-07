@@ -463,6 +463,18 @@ elseif("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang")
 		# TODO: Figure out how to make this work on Visual Studio
 		"-Wl,--thinlto-cache-dir=${CMAKE_BINARY_DIR}/lto-cache"
 	)
+	target_compile_options(gtest PUBLIC
+		"-std=c++2a"
+		"-stdlib=libc++"
+	)
+	target_compile_options(gtest_main PUBLIC
+		"-std=c++2a"
+		"-stdlib=libc++"
+	)
+	target_compile_options(benchmark PUBLIC
+		"-std=c++2a"
+		"-stdlib=libc++"
+	)
 	target_compile_options(ska_sort PRIVATE
 		"-Wno-global-constructors"
 		"-Wno-implicit-int-conversion"
