@@ -1,6 +1,0 @@
-syntax: glob
-
-build*/
-.vscode
-source/googletest-*
-source/benchmark
