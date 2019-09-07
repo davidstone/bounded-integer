@@ -7,7 +7,6 @@
 
 #include <containers/algorithms/uninitialized.hpp>
 #include <containers/append.hpp>
-#include <containers/is_container.hpp>
 #include <containers/is_iterator.hpp>
 #include <containers/size.hpp>
 
