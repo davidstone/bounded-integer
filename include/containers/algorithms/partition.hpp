@@ -36,7 +36,7 @@ constexpr inline struct is_partitioned_t {
 } is_partitioned;
 
 constexpr inline struct partition_point_t {
-	template<typename Range, typename UnaryPredicate> requires is_range<Range>
+	template<typename Range, typename UnaryPredicate> requires range<Range>
 	constexpr auto operator()(Range && range, UnaryPredicate predicate) const {
 		using size_type = decltype(size(range));
 		auto count = bounded::integer<0, bounded::detail::normalize<std::numeric_limits<size_type>::max().value()>>(size(range));
@@ -72,7 +72,7 @@ concept reversible_iterator = requires(Iterator it) {
 
 // TODO: Support bidirectional iterators
 constexpr inline struct partition_t {
-	template<typename ForwardIterator, typename Sentinel, typename UnaryPredicate> requires is_iterator_sentinel<ForwardIterator, Sentinel>
+	template<typename ForwardIterator, typename Sentinel, typename UnaryPredicate> requires iterator_sentinel<ForwardIterator, Sentinel>
 	constexpr auto operator()(ForwardIterator first, Sentinel last, UnaryPredicate predicate) const {
 		auto advance_first = [&]{
 			first = containers::find_if_not(first, last, predicate);
@@ -111,7 +111,7 @@ constexpr inline struct partition_t {
 		}
 		return first;
 	}
-	template<typename Range, typename UnaryPredicate> requires is_range<Range>
+	template<typename Range, typename UnaryPredicate> requires range<Range>
 	constexpr auto operator()(Range && range, UnaryPredicate predicate) const {
 		return operator()(begin(range), end(range), predicate);
 	}

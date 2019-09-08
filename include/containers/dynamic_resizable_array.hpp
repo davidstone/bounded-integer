@@ -39,7 +39,7 @@ struct dynamic_resizable_array : private Container {
 	constexpr dynamic_resizable_array() noexcept {}
 	
 	template<typename Range> requires(
-		is_range<Range> and
+		range<Range> and
 		!std::is_array_v<std::remove_cv_t<std::remove_reference_t<Range>>>
 	)
 	constexpr explicit dynamic_resizable_array(Range && range) {
@@ -63,7 +63,7 @@ struct dynamic_resizable_array : private Container {
 		return *this;
 	}
 	constexpr auto & operator=(dynamic_resizable_array && other) & noexcept {
-		detail::destroy_range(*this);
+		::containers::detail::destroy_range(*this);
 		this->move_assign_to_empty(std::move(other));
 		return *this;
 	}
@@ -74,7 +74,7 @@ struct dynamic_resizable_array : private Container {
 	}
 
 	~dynamic_resizable_array() {
-		detail::destroy_range(*this);
+		::containers::detail::destroy_range(*this);
 	}
 
 

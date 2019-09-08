@@ -75,14 +75,14 @@ auto deallocate_storage(dynamic_array_data<T> const data) noexcept {
 
 template<typename T>
 constexpr auto cleanup(dynamic_array_data<T> const data) noexcept {
-	detail::destroy_range(data);
+	::containers::detail::destroy_range(data);
 	deallocate_storage(data);
 }
 
 
 
 template<typename T, typename ForwardIterator, typename Sentinel> requires
-	is_iterator_sentinel<ForwardIterator, Sentinel>
+	iterator_sentinel<ForwardIterator, Sentinel>
 auto dynamic_array_initializer(ForwardIterator first, Sentinel const last) {
 	auto const data = make_storage<T>(::containers::distance(first, last));
 	try {
@@ -121,14 +121,14 @@ struct dynamic_array {
 	
 	constexpr dynamic_array() = default;
 
-	template<typename ForwardIterator, typename Sentinel> requires is_iterator_sentinel<ForwardIterator, Sentinel>
+	template<typename ForwardIterator, typename Sentinel> requires iterator_sentinel<ForwardIterator, Sentinel>
 	constexpr dynamic_array(ForwardIterator first, Sentinel const last):
 		m_data(::containers::detail::dynamic_array_initializer<value_type>(first, last))
 	{
 	}
 	
 	template<typename Range> requires(
-		is_range<Range> and
+		range<Range> and
 		!std::is_array_v<std::remove_cv_t<std::remove_reference_t<Range>>>
 	)
 	constexpr explicit dynamic_array(Range && range) BOUNDED_NOEXCEPT_INITIALIZATION(
@@ -211,7 +211,7 @@ inline constexpr bool is_initializer_list<std::initializer_list<T>> = true;
 } // namespace detail
 
 
-template<typename T, typename Range> requires(is_range<Range> and !detail::is_initializer_list<std::decay_t<Range>>)
+template<typename T, typename Range> requires(range<Range> and !detail::is_initializer_list<std::decay_t<Range>>)
 auto assign(dynamic_array<T> & container, Range && range) {
 	auto const difference = detail::linear_size(range);
 	if (difference == size(container)) {

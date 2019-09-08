@@ -20,8 +20,8 @@ struct null_policy {
 	// https://stackoverflow.com/questions/20461121/constexpr-error-at-compile-time-but-no-overhead-at-run-time
 	template<typename T, typename Minimum, typename Maximum>
 	static constexpr auto assignment(T const & value, Minimum const & minimum, Maximum const & maximum) noexcept -> T const & {
-		static_assert(is_bounded_integer<Minimum>, "Only bounded::integer types are supported.");
-		static_assert(is_bounded_integer<Maximum>, "Only bounded::integer types are supported.");
+		static_assert(bounded_integer<Minimum>, "Only bounded::integer types are supported.");
+		static_assert(bounded_integer<Maximum>, "Only bounded::integer types are supported.");
 		return (minimum <= value and value <= maximum) ?
 			value :
 			error_out_of_range(value);

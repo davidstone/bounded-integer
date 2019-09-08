@@ -22,7 +22,7 @@ template<
 	typename InputIterator1, typename Sentinel1,
 	typename InputIterator2, typename Sentinel2,
 	typename BinaryPredicate
-> requires (is_iterator_sentinel<InputIterator1, Sentinel1> and is_iterator_sentinel<InputIterator2, Sentinel2>)
+> requires (iterator_sentinel<InputIterator1, Sentinel1> and iterator_sentinel<InputIterator2, Sentinel2>)
 constexpr auto lexicographical_compare_3way(InputIterator1 first1, Sentinel1 const last1, InputIterator2 first2, Sentinel2 const last2, BinaryPredicate cmp) noexcept(
 	noexcept(first1 != last1 and first2 != last2) and
 	noexcept(++first1) and
@@ -40,7 +40,7 @@ constexpr auto lexicographical_compare_3way(InputIterator1 first1, Sentinel1 con
 		bounded::strong_ordering::equal;
 }
 
-template<typename Range1, typename Range2, typename BinaryPredicate> requires(is_range<Range1> and is_range<Range2>)
+template<typename Range1, typename Range2, typename BinaryPredicate> requires(range<Range1> and range<Range2>)
 constexpr auto lexicographical_compare_3way(Range1 const & range1, Range2 const & range2, BinaryPredicate cmp) BOUNDED_NOEXCEPT_VALUE(
 	::containers::lexicographical_compare_3way(begin(range1), end(range1), begin(range2), end(range2), std::move(cmp))
 )
@@ -49,12 +49,12 @@ constexpr auto lexicographical_compare_3way(Range1 const & range1, Range2 const 
 template<
 	typename InputIterator1, typename Sentinel1,
 	typename InputIterator2, typename Sentinel2
-> requires (is_iterator_sentinel<InputIterator1, Sentinel1> and is_iterator_sentinel<InputIterator2, Sentinel2>)
+> requires (iterator_sentinel<InputIterator1, Sentinel1> and iterator_sentinel<InputIterator2, Sentinel2>)
 constexpr auto lexicographical_compare_3way(InputIterator1 const first1, Sentinel1 const last1, InputIterator2 const first2, Sentinel2 const last2) BOUNDED_NOEXCEPT(
 	::containers::lexicographical_compare_3way(first1, last1, first2, last2, bounded::compare_3way())
 )
 
-template<typename Range1, typename Range2> requires (is_range<Range1> and is_range<Range2>)
+template<typename Range1, typename Range2> requires (range<Range1> and range<Range2>)
 constexpr auto lexicographical_compare_3way(Range1 const & range1, Range2 const & range2) BOUNDED_NOEXCEPT_VALUE(
 	::containers::lexicographical_compare_3way(begin(range1), end(range1), begin(range2), end(range2))
 )
@@ -64,7 +64,7 @@ template<
 	typename InputIterator1, typename Sentinel1,
 	typename InputIterator2,
 	typename BinaryPredicate
-> requires(is_iterator_sentinel<InputIterator1, Sentinel1> and is_iterator<InputIterator2> and !is_iterator_sentinel<InputIterator2, BinaryPredicate>)
+> requires(iterator_sentinel<InputIterator1, Sentinel1> and iterator<InputIterator2> and !iterator_sentinel<InputIterator2, BinaryPredicate>)
 constexpr auto lexicographical_compare_3way(InputIterator1 first1, Sentinel1 const last1, InputIterator2 first2, BinaryPredicate cmp) noexcept(
 	noexcept(first1 != last1) and
 	noexcept(++first1) and
@@ -80,7 +80,7 @@ constexpr auto lexicographical_compare_3way(InputIterator1 first1, Sentinel1 con
 }
 
 template<typename InputIterator1, typename Sentinel1, typename InputIterator2> requires(
-	is_iterator_sentinel<InputIterator1, Sentinel1> and is_iterator<InputIterator2>
+	iterator_sentinel<InputIterator1, Sentinel1> and iterator<InputIterator2>
 )
 constexpr auto lexicographical_compare_3way(InputIterator1 const first1, Sentinel1 const last1, InputIterator2 const first2) BOUNDED_NOEXCEPT(
 	::containers::lexicographical_compare_3way(first1, last1, first2, bounded::compare_3way())
@@ -93,7 +93,7 @@ template<
 	typename InputIterator1, typename Sentinel1,
 	typename InputIterator2, typename Sentinel2,
 	typename BinaryPredicate
-> requires (is_iterator_sentinel<InputIterator1, Sentinel1> and is_iterator_sentinel<InputIterator2, Sentinel2>)
+> requires (iterator_sentinel<InputIterator1, Sentinel1> and iterator_sentinel<InputIterator2, Sentinel2>)
 constexpr auto equal(InputIterator1 first1, Sentinel1 const last1, InputIterator2 first2, Sentinel2 const last2, BinaryPredicate cmp) noexcept(
 	noexcept(first1 != last1 and first2 != last2) and
 	noexcept(++first1) and
@@ -108,7 +108,7 @@ constexpr auto equal(InputIterator1 first1, Sentinel1 const last1, InputIterator
 	return first1 == last1 and first2 == last2;
 }
 
-template<typename Range1, typename Range2, typename BinaryPredicate> requires(is_range<Range1> and is_range<Range2>)
+template<typename Range1, typename Range2, typename BinaryPredicate> requires(range<Range1> and range<Range2>)
 constexpr auto equal(Range1 const & range1, Range2 const & range2, BinaryPredicate cmp) BOUNDED_NOEXCEPT_VALUE(
 	::containers::equal(begin(range1), end(range1), begin(range2), end(range2), std::move(cmp))
 )
@@ -117,12 +117,12 @@ constexpr auto equal(Range1 const & range1, Range2 const & range2, BinaryPredica
 template<
 	typename InputIterator1, typename Sentinel1,
 	typename InputIterator2, typename Sentinel2
-> requires (is_iterator_sentinel<InputIterator1, Sentinel1> and is_iterator_sentinel<InputIterator2, Sentinel2>)
+> requires (iterator_sentinel<InputIterator1, Sentinel1> and iterator_sentinel<InputIterator2, Sentinel2>)
 constexpr auto equal(InputIterator1 const first1, Sentinel1 const last1, InputIterator2 const first2, Sentinel2 const last2) BOUNDED_NOEXCEPT(
 	::containers::equal(first1, last1, first2, last2, bounded::equal_to())
 )
 
-template<typename Range1, typename Range2> requires(is_range<Range1> and is_range<Range2>)
+template<typename Range1, typename Range2> requires(range<Range1> and range<Range2>)
 constexpr auto equal(Range1 const & range1, Range2 const & range2) BOUNDED_NOEXCEPT_VALUE(
 	::containers::equal(begin(range1), end(range1), begin(range2), end(range2))
 )
@@ -132,7 +132,7 @@ template<
 	typename InputIterator1, typename Sentinel1,
 	typename InputIterator2,
 	typename BinaryPredicate
-> requires(is_iterator_sentinel<InputIterator1, Sentinel1> and is_iterator<InputIterator2> and !is_iterator_sentinel<InputIterator2, BinaryPredicate>)
+> requires(iterator_sentinel<InputIterator1, Sentinel1> and iterator<InputIterator2> and !iterator_sentinel<InputIterator2, BinaryPredicate>)
 constexpr auto equal(InputIterator1 first1, Sentinel1 const last1, InputIterator2 first2, BinaryPredicate cmp) noexcept(
 	noexcept(first1 != last1) and
 	noexcept(++first1) and
@@ -150,7 +150,7 @@ constexpr auto equal(InputIterator1 first1, Sentinel1 const last1, InputIterator
 template<
 	typename InputIterator1, typename Sentinel1,
 	typename InputIterator2
-> requires(is_iterator_sentinel<InputIterator1, Sentinel1> and is_iterator<InputIterator2>)
+> requires(iterator_sentinel<InputIterator1, Sentinel1> and iterator<InputIterator2>)
 constexpr auto equal(InputIterator1 const first1, Sentinel1 const last1, InputIterator2 const first2) BOUNDED_NOEXCEPT(
 	::containers::equal(first1, last1, first2, bounded::equal_to())
 )
@@ -166,7 +166,7 @@ template<typename LHS, typename RHS> requires(
 		std::remove_cv_t<std::remove_reference_t<LHS>>,
 		std::remove_cv_t<std::remove_reference_t<RHS>>
 	> and
-	is_range<std::remove_cv_t<std::remove_reference_t<LHS>>>
+	range<std::remove_cv_t<std::remove_reference_t<LHS>>>
 )
 constexpr auto compare(LHS && lhs, RHS && rhs) BOUNDED_NOEXCEPT(
 	::containers::lexicographical_compare_3way(
@@ -180,7 +180,7 @@ template<typename LHS, typename RHS> requires(
 		std::remove_cv_t<std::remove_reference_t<LHS>>,
 		std::remove_cv_t<std::remove_reference_t<RHS>>
 	> and
-	is_range<std::remove_cv_t<std::remove_reference_t<LHS>>>
+	range<std::remove_cv_t<std::remove_reference_t<LHS>>>
 )
 constexpr auto operator==(LHS && lhs, RHS && rhs) BOUNDED_NOEXCEPT(
 	size(lhs) == size(rhs) and ::containers::equal(

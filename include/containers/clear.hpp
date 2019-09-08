@@ -13,24 +13,19 @@
 namespace containers {
 namespace detail {
 
-template<typename, typename = void>
-inline constexpr auto has_pop_front = false;
-
 template<typename Container>
-inline constexpr auto has_pop_front<
-	Container,
-	std::void_t<decltype(std::declval<Container &>().pop_front())>
-> = true;
+concept member_pop_frontable = requires(Container & container) { container.pop_front(); };
 
 namespace common {
 
+// TODO: Should probably get rid of the fallback to default construction
 template<typename Container> requires is_container<Container>
 constexpr auto clear(Container & container) noexcept {
 	if constexpr (pop_backable<Container>) {
 		while (!empty(container)) {
 			pop_back(container);
 		}
-	} else if constexpr (has_pop_front<Container>) {
+	} else if constexpr (member_pop_frontable<Container>) {
 		while (!empty(container)) {
 			container.pop_front();
 		}

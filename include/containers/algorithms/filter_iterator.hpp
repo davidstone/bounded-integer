@@ -52,6 +52,8 @@ public:
 	}
 };
 
+namespace detail {
+
 template<typename T>
 inline constexpr auto is_filter_iterator_traits = false;
 
@@ -64,6 +66,10 @@ inline constexpr auto is_filter_iterator_traits<reference_wrapper<T>> = is_filte
 template<typename T>
 inline constexpr auto is_filter_iterator_traits<T const> = is_filter_iterator_traits<T>;
 
+} // namespace detail
+
+template<typename T>
+concept is_filter_iterator_traits = detail::is_filter_iterator_traits<T>;
 
 struct filter_iterator_sentinel {
 };

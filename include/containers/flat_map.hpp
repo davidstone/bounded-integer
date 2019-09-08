@@ -132,7 +132,7 @@ public:
 		return extract_map_key<value_type, ExtractKey>(m_extract_key);
 	}
 	constexpr auto compare() const {
-		return detail::extract_key_to_compare(extract_key());
+		return ::containers::detail::extract_key_to_compare(extract_key());
 	}
 	
 	flat_map_base() = default;
@@ -141,14 +141,14 @@ public:
 	{
 	}
 
-	template<typename InputRange> requires is_range<InputRange>
+	template<typename InputRange> requires range<InputRange>
 	constexpr explicit flat_map_base(InputRange && range):
 		m_container(BOUNDED_FORWARD(range))
 	{
 		unique_ska_sort(m_container, extract_key());
 	}
 
-	template<typename InputRange> requires is_range<InputRange>
+	template<typename InputRange> requires range<InputRange>
 	constexpr flat_map_base(InputRange && range, ExtractKey extract_key):
 		m_container(BOUNDED_FORWARD(range)),
 		m_extract_key(std::move(extract_key))
@@ -156,14 +156,14 @@ public:
 		unique_ska_sort(m_container, extract_key());
 	}
 
-	template<typename InputRange> requires is_range<InputRange>
+	template<typename InputRange> requires range<InputRange>
 	constexpr flat_map_base(assume_sorted_unique_t, InputRange && range):
 		m_container(BOUNDED_FORWARD(range))
 	{
 		BOUNDED_ASSERT(is_sorted(m_container, compare()));
 	}
 
-	template<typename InputRange> requires is_range<InputRange>
+	template<typename InputRange> requires range<InputRange>
 	constexpr flat_map_base(assume_sorted_unique_t, InputRange && range, ExtractKey extract_key):
 		m_container(BOUNDED_FORWARD(range)),
 		m_extract_key(std::move(extract_key))
@@ -171,14 +171,14 @@ public:
 		BOUNDED_ASSERT(is_sorted(m_container, compare()));
 	}
 
-	template<typename InputRange> requires is_range<InputRange>
+	template<typename InputRange> requires range<InputRange>
 	constexpr flat_map_base(assume_unique_t, InputRange && range):
 		m_container(BOUNDED_FORWARD(range))
 	{
 		ska_sort(m_container, extract_key());
 	}
 
-	template<typename InputRange> requires is_range<InputRange>
+	template<typename InputRange> requires range<InputRange>
 	constexpr flat_map_base(assume_unique_t, InputRange && range, ExtractKey extract_key):
 		m_container(BOUNDED_FORWARD(range)),
 		m_extract_key(std::move(extract_key))

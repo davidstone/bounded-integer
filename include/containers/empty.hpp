@@ -20,13 +20,13 @@ namespace detail {
 namespace common {
 
 template<typename Range>
-inline constexpr auto never_empty = std::numeric_limits<typename std::remove_reference_t<Range>::size_type>::min() > 0_bi;
+concept never_empty_range = std::numeric_limits<typename std::remove_reference_t<Range>::size_type>::min() > 0_bi;
 
-template<typename Range> requires is_range<Range>
+template<typename Range> requires range<Range>
 constexpr auto empty(Range const & range) noexcept {
 	// The never_empty check is not needed for correctness, but allows this
 	// function to be constexpr in more situations.
-	return never_empty<Range> ? false : begin(range) == end(range);
+	return never_empty_range<Range> ? false : begin(range) == end(range);
 }
 
 }	// namespace common

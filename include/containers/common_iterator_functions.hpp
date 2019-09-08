@@ -28,7 +28,7 @@ using basic_difference_type = std::common_type_t<
 namespace detail {
 namespace common {
 
-template<typename Offset, typename Iterator> requires(std::numeric_limits<Offset>::is_integer and is_iterator<Iterator>)
+template<typename Offset, typename Iterator> requires(std::numeric_limits<Offset>::is_integer and iterator<Iterator>)
 constexpr auto operator+(Offset const offset, Iterator const it) BOUNDED_NOEXCEPT(
 	it + offset
 )

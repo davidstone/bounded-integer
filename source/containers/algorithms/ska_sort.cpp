@@ -991,7 +991,7 @@ static_assert(test_sort<bounded::tuple<bool, bounded::tuple<int, bounded::tuple<
 	}
 ));
 
-static_assert(containers::detail::is_range_concept<std::string>);
+static_assert(containers::range<std::string>);
 
 static_assert(test_sort_inplace(
 	containers::array<std::string_view, 8>{

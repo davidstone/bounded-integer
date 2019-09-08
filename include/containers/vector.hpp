@@ -26,7 +26,7 @@ namespace detail {
 template<typename T>
 struct vector_base {
 	using value_type = T;
-	using size_type = typename detail::dynamic_array_data<value_type>::size_type;
+	using size_type = typename dynamic_array_data<value_type>::size_type;
 
 	using const_iterator = contiguous_iterator<value_type const, size_type::max().value()>;
 	using iterator = contiguous_iterator<value_type, size_type::max().value()>;
@@ -46,10 +46,10 @@ struct vector_base {
 	}
 
 	friend constexpr auto begin(vector_base const & container) noexcept {
-		return const_iterator(detail::static_or_reinterpret_cast<value_type const *>(data(container.m_container)));
+		return const_iterator(::containers::detail::static_or_reinterpret_cast<value_type const *>(data(container.m_container)));
 	}
 	friend constexpr auto begin(vector_base & container) noexcept {
-		return iterator(detail::static_or_reinterpret_cast<value_type *>(data(container.m_container)));
+		return iterator(::containers::detail::static_or_reinterpret_cast<value_type *>(data(container.m_container)));
 	}
 	friend constexpr auto end(vector_base const & container) noexcept {
 		return begin(container) + container.m_size;
@@ -77,7 +77,7 @@ struct vector_base {
 		containers::uninitialized_move_destroy(
 			begin(*this),
 			end(*this),
-			detail::static_or_reinterpret_cast<value_type *>(data(temp))
+			::containers::detail::static_or_reinterpret_cast<value_type *>(data(temp))
 		);
 		relocate_preallocated(std::move(temp));
 	}

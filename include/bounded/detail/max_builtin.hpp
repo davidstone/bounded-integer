@@ -46,15 +46,15 @@ using max_unsigned_t = std::uintmax_t;
 #endif
 
 template<typename T>
-inline constexpr auto is_builtin_integer = (std::is_integral_v<T> and !std::is_same_v<T, bool>) or std::is_same_v<T, max_signed_t> or std::is_same_v<T, max_unsigned_t>;
+concept builtin_integer = (std::is_integral_v<T> and !std::is_same_v<T, bool>) or std::is_same_v<T, max_signed_t> or std::is_same_v<T, max_unsigned_t>;
 
 template<typename T>
-inline constexpr auto is_builtin_arithmetic = (std::is_arithmetic_v<T> and !std::is_same_v<T, bool>) or std::is_same_v<T, max_signed_t> or std::is_same_v<T, max_unsigned_t>;
+concept builtin_arithmetic = (std::is_arithmetic_v<T> and !std::is_same_v<T, bool>) or std::is_same_v<T, max_signed_t> or std::is_same_v<T, max_unsigned_t>;
 
 template<typename T>
-inline constexpr auto is_signed_builtin = std::is_signed_v<T> or std::is_same_v<T, max_signed_t>;
+concept signed_builtin = std::is_signed_v<T> or std::is_same_v<T, max_signed_t>;
 template<typename T>
-inline constexpr auto is_unsigned_builtin = std::is_unsigned_v<T> or std::is_same_v<T, max_unsigned_t>;
+concept unsigned_builtin = std::is_unsigned_v<T> or std::is_same_v<T, max_unsigned_t>;
 
 }	// namespace detail
 }	// namespace bounded

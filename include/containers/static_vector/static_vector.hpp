@@ -41,7 +41,7 @@ struct static_vector_data {
 	static_vector_data & operator=(static_vector_data &&) & = default;
 	static_vector_data & operator=(static_vector_data const &) & = default;
 
-	template<typename Range> requires(is_range<Range>)
+	template<typename Range> requires(range<Range>)
 	constexpr explicit static_vector_data(Range && range) {
 		for (decltype(auto) value : BOUNDED_FORWARD(range)) {
 			::containers::emplace_back(*this, BOUNDED_FORWARD(value));
@@ -55,10 +55,10 @@ struct static_vector_data {
 	}
 	
 	friend constexpr auto begin(static_vector_data const & container) noexcept {
-		return const_iterator(detail::static_or_reinterpret_cast<T const *>(data(container.m_storage)));
+		return const_iterator(::containers::detail::static_or_reinterpret_cast<T const *>(data(container.m_storage)));
 	}
 	friend constexpr auto begin(static_vector_data & container) noexcept {
-		return iterator(detail::static_or_reinterpret_cast<T *>(data(container.m_storage)));
+		return iterator(::containers::detail::static_or_reinterpret_cast<T *>(data(container.m_storage)));
 	}
 
 	friend constexpr auto end(static_vector_data const & container) noexcept {
@@ -105,7 +105,7 @@ public:
 	}
 
 	~static_vector_data() {
-		detail::destroy_range(*this);
+		::containers::detail::destroy_range(*this);
 	}
 
 	auto & operator=(static_vector_data && other) & noexcept(std::is_nothrow_move_assignable_v<T>) {

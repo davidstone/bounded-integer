@@ -8,8 +8,6 @@
 #include <bounded/detail/class.hpp>
 #include <bounded/detail/comparison.hpp>
 
-#include <type_traits>
-
 namespace bounded {
 namespace detail {
 

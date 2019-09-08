@@ -21,7 +21,7 @@ using namespace bounded::literal;
 namespace detail {
 namespace common {
 
-template<typename Range, typename Index> requires is_range<Range>
+template<typename Range, typename Index> requires range<Range>
 constexpr decltype(auto) at(Range && range, Index const index) BOUNDED_NOEXCEPT(
 	BOUNDED_FORWARD(range)[typename index_type<Range>::overflow_policy{}.assignment(
 		bounded::integer(index),
@@ -30,7 +30,7 @@ constexpr decltype(auto) at(Range && range, Index const index) BOUNDED_NOEXCEPT(
 	)]
 )
 
-template<typename Range, typename Index> requires is_range<Range>
+template<typename Range, typename Index> requires range<Range>
 constexpr decltype(auto) at(Range && range, Index const index, bounded::non_check_t) BOUNDED_NOEXCEPT(
 	BOUNDED_FORWARD(range)[static_cast<index_type<Range>>(index)]
 )

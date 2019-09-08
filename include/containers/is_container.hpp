@@ -5,8 +5,6 @@
 
 #pragma once
 
-#include <type_traits>
-
 #include <array>
 #include <deque>
 #include <forward_list>

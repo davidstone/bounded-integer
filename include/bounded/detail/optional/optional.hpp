@@ -113,7 +113,7 @@ template<typename T>
 struct optional {
 private:
 	struct common_init_tag{};
-	// Cannot use std::is_constructible because that does not account for
+	// Cannot use concepts or std::is_constructible because this could require
 	// friendship
 	template<typename U>
 	static constexpr auto is_specialized(decltype(U(std::declval<optional_tag>())) *) noexcept { return true; }

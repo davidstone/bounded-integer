@@ -13,20 +13,15 @@
 
 namespace containers {
 namespace detail {
-namespace common {
-
-template<typename, typename = void>
-inline constexpr auto has_member_push_back = false;
 
 template<typename Container>
-inline constexpr auto has_member_push_back<
-	Container,
-	std::void_t<decltype(std::declval<Container &>().push_back(std::declval<typename Container::value_type>()))>
-> = true;
+concept member_push_backable = requires(Container & container, typename Container::value_type value) { container.push_back(std::move(value)); };
+
+namespace common {
 
 template<typename Container>
 constexpr decltype(auto) push_back(Container & container, typename Container::value_type const & value) {
-	if constexpr (has_member_push_back<Container>) {
+	if constexpr (member_push_backable<Container>) {
 		container.push_back(value);
 	} else {
 		::containers::emplace_back(container, value);
@@ -34,7 +29,7 @@ constexpr decltype(auto) push_back(Container & container, typename Container::va
 }
 template<typename Container>
 constexpr decltype(auto) push_back(Container & container, typename Container::value_type && value) {
-	if constexpr (has_member_push_back<Container>) {
+	if constexpr (member_push_backable<Container>) {
 		container.push_back(std::move(value));
 	} else {
 		::containers::emplace_back(container, std::move(value));

@@ -83,8 +83,8 @@ constexpr auto operator+(typename integer_range_iterator<Integer, Sentinel, Step
 
 template<typename Integer, typename Sentinel = Integer, typename Step = bounded::constant_t<1>>
 struct integer_range {
-	static_assert(bounded::is_bounded_integer<Integer>);
-	static_assert(bounded::is_bounded_integer<Sentinel>);
+	static_assert(bounded::bounded_integer<Integer>);
+	static_assert(bounded::bounded_integer<Sentinel>);
 	static_assert(Sentinel::max() >= Integer::min(), "Cannot construct inverted integer ranges.");
 
 	using iterator = detail::integer_range_iterator<Integer, Sentinel, Step>;

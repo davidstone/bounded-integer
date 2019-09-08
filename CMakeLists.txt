@@ -133,7 +133,6 @@ target_sources(containers INTERFACE
 	$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>/include/containers/erase.hpp
 	$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>/include/containers/flat_map.hpp
 	$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>/include/containers/front_back.hpp
-	$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>/include/containers/has_nested_type.hpp
 	$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>/include/containers/index_type.hpp
 	$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>/include/containers/insert.hpp
 	$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>/include/containers/integer_range.hpp
@@ -295,7 +294,6 @@ add_library(containers_test STATIC
 	source/containers/empty.cpp
 	source/containers/erase.cpp
 	source/containers/front_back.cpp
-	source/containers/has_nested_type.cpp
 	source/containers/insert.cpp
 	source/containers/integer_range.cpp
 	source/containers/is_container.cpp

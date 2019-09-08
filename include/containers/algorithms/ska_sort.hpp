@@ -80,13 +80,9 @@ auto to_radix_sort_key(T * ptr) {
 
 namespace detail {
 
-// TODO: Turn the variable template into a concept
-template<typename T>
-concept is_range_concept = containers::is_range<T>;
-
 // TODO: Also validate get and tuple_element
 template<typename T>
-concept is_tuple_like = requires{
+concept tuple_like = requires{
 	std::tuple_size<T>::value;
 };
 
@@ -96,11 +92,10 @@ concept is_boolean = std::is_arithmetic_v<T> and std::is_same_v<T, bool>;
 template<typename It, typename ExtractKey>
 using key_type = std::decay_t<decltype(std::declval<ExtractKey>()(*std::declval<It>()))>;
 
-template<typename T, typename Enable = void>
-inline constexpr bool has_subscript_operator = false;
-
 template<typename T>
-inline constexpr bool has_subscript_operator<T, std::void_t<decltype(std::declval<T>()[0])>> = true;
+concept indexable =
+	requires(T && value) { BOUNDED_FORWARD(value)[0]; } or
+	requires(T && value) { BOUNDED_FORWARD(value)[bounded::constant<0>]; };
 
 struct PartitionInfo {
 	constexpr PartitionInfo()
@@ -201,14 +196,14 @@ struct TupleSubKeyWrapper<Tuple, std::index_sequence<indexes...>> :
 {
 };
 
-template<typename Tuple> requires(is_tuple_like<Tuple> and !is_range_concept<Tuple>)
+template<typename Tuple> requires(tuple_like<Tuple> and !range<Tuple>)
 struct SubKey<Tuple> : TupleSubKeyWrapper<
 	Tuple,
 	std::make_index_sequence<std::tuple_size_v<Tuple>>
 > {
 };
 
-template<typename T> requires (!std::is_pointer_v<T> and has_subscript_operator<T>)
+template<typename T> requires (!std::is_pointer_v<T> and indexable<T> and range<T>)
 struct SubKey<T> {
 	static constexpr const T & sub_key(T const & value, BaseListSortData *) {
 		return value;
@@ -534,28 +529,28 @@ using extract_return_type = typename extract::return_type_impl<index, ExtractKey
 } // namespace detail
 
 struct ska_sort_t {
-	template<typename Iterator, typename Sentinel, typename ExtractKey> requires containers::is_iterator_sentinel<Iterator, Sentinel>
+	template<typename Iterator, typename Sentinel, typename ExtractKey> requires containers::iterator_sentinel<Iterator, Sentinel>
 	constexpr void operator()(Iterator begin, Sentinel end, ExtractKey && extract_key) const {
 		detail::inplace_radix_sort<1024>(begin, end, extract_key);
 	}
 
-	template<typename Iterator, typename Sentinel> requires containers::is_iterator_sentinel<Iterator, Sentinel>
+	template<typename Iterator, typename Sentinel> requires containers::iterator_sentinel<Iterator, Sentinel>
 	constexpr void operator()(Iterator begin, Sentinel end) const {
 		operator()(begin, end, detail::identity);
 	}
 
-	template<typename Range, typename ExtractKey> requires containers::is_range<Range>
+	template<typename Range, typename ExtractKey> requires containers::range<Range>
 	constexpr void operator()(Range && range, ExtractKey && extract_key) const {
 		operator()(begin(range), end(range), BOUNDED_FORWARD(extract_key));
 	}
-	template<typename Range> requires containers::is_range<Range>
+	template<typename Range> requires containers::range<Range>
 	constexpr void operator()(Range && range) const {
 		operator()(BOUNDED_FORWARD(range), detail::identity);
 	}
 } inline constexpr ska_sort;
 
 struct ska_sort_copy_t {
-	template<typename SourceIterator, typename Sentinel, typename BufferIterator, typename ExtractKey> requires containers::is_iterator_sentinel<SourceIterator, Sentinel> and containers::is_iterator<BufferIterator>
+	template<typename SourceIterator, typename Sentinel, typename BufferIterator, typename ExtractKey> requires containers::iterator_sentinel<SourceIterator, Sentinel> and containers::iterator<BufferIterator>
 	constexpr bool operator()(SourceIterator begin_, Sentinel end_, BufferIterator buffer_begin_, ExtractKey && extract_key) const {
 		auto begin = make_legacy_iterator(begin_);
 		auto end = make_legacy_iterator(end_);
@@ -576,7 +571,7 @@ struct ska_sort_copy_t {
 			return true;
 		} else if constexpr (std::is_arithmetic_v<key_t>) {
 			return numeric_sort_impl(begin, end, buffer_begin, extract_key);
-		} else if constexpr (containers::is_range<key_t>) {
+		} else if constexpr (containers::range<key_t>) {
 			if (begin == end) {
 				return false;
 			}
@@ -611,7 +606,7 @@ struct ska_sort_copy_t {
 				}
 			}
 			return which;
-		} else if constexpr (detail::is_tuple_like<key_t>) {
+		} else if constexpr (detail::tuple_like<key_t>) {
 			return tuple_sort_impl<0U>(begin, end, buffer_begin, extract_key);
 		} else {
 			return operator()(begin, end, buffer_begin, [&](auto && a) -> decltype(auto) {
@@ -620,16 +615,16 @@ struct ska_sort_copy_t {
 		}
 	}
 
-	template<typename SourceIterator, typename Sentinel, typename BufferIterator> requires containers::is_iterator_sentinel<SourceIterator, Sentinel> and containers::is_iterator<BufferIterator>
+	template<typename SourceIterator, typename Sentinel, typename BufferIterator> requires containers::iterator_sentinel<SourceIterator, Sentinel> and containers::iterator<BufferIterator>
 	constexpr auto operator()(SourceIterator source_begin, Sentinel source_end, BufferIterator buffer_begin) const -> bool {
 		return operator()(source_begin, source_end, buffer_begin, detail::identity);
 	}
 
-	template<typename SourceRange, typename BufferRange, typename ExtractKey> requires containers::is_range<SourceRange> and containers::is_range<BufferRange>
+	template<typename SourceRange, typename BufferRange, typename ExtractKey> requires containers::range<SourceRange> and containers::range<BufferRange>
 	constexpr auto operator()(SourceRange && source_range, BufferRange && buffer_range, ExtractKey && extract_key) const -> bool {
 		return operator()(begin(source_range), end(source_range), begin(buffer_range), BOUNDED_FORWARD(extract_key));
 	}
-	template<typename SourceRange, typename BufferRange> requires containers::is_range<SourceRange> and containers::is_range<BufferRange>
+	template<typename SourceRange, typename BufferRange> requires containers::range<SourceRange> and containers::range<BufferRange>
 	constexpr auto operator()(SourceRange && source_range, BufferRange && buffer_range) const -> bool {
 		return operator()(source_range, buffer_range, detail::identity);
 	}
@@ -695,7 +690,7 @@ private:
 } inline constexpr ska_sort_copy;
 
 constexpr inline struct unique_ska_sort_t {
-	template<typename Range, typename ExtractKey> requires is_range<Range>
+	template<typename Range, typename ExtractKey> requires range<Range>
 	constexpr auto operator()(Range & range, ExtractKey extract_key) const {
 		ska_sort(range, extract_key);
 		auto const equal = [&](auto const & lhs, auto const & rhs) {
@@ -707,7 +702,7 @@ constexpr inline struct unique_ska_sort_t {
 			end(range)
 		);
 	}
-	template<typename Range> requires is_range<Range>
+	template<typename Range> requires range<Range>
 	constexpr auto operator()(Range && range) const {
 		return operator()(range, detail::identity);
 	}

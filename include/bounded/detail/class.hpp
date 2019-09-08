@@ -25,11 +25,11 @@ namespace bounded {
 namespace detail {
 
 template<typename T>
-inline constexpr auto allow_construction_from = basic_numeric_limits<T>::is_specialized and (basic_numeric_limits<T>::is_integer or std::is_enum<std::decay_t<T>>{});
+concept integer_constructible_from = basic_numeric_limits<T>::is_specialized and (basic_numeric_limits<T>::is_integer or std::is_enum_v<std::decay_t<T>>);
 
 template<typename T, typename Minimum, typename Maximum>
 constexpr auto is_implicitly_constructible_from(Minimum const minimum [[maybe_unused]], Maximum const maximum [[maybe_unused]]) noexcept {
-	if constexpr (allow_construction_from<T> and !std::is_same<std::decay_t<T>, bool>{}) {
+	if constexpr (integer_constructible_from<T> and !std::is_same<std::decay_t<T>, bool>{}) {
 		return type_fits_in_range<std::decay_t<T>>(minimum, maximum);
 	} else {
 		return false;
@@ -38,7 +38,7 @@ constexpr auto is_implicitly_constructible_from(Minimum const minimum [[maybe_un
 
 template<typename policy, typename T, typename Minimum, typename Maximum>
 constexpr auto is_explicitly_constructible_from(Minimum const minimum [[maybe_unused]], Maximum const maximum [[maybe_unused]]) noexcept {
-	if constexpr (allow_construction_from<T>) {
+	if constexpr (integer_constructible_from<T>) {
 		return type_overlaps_range<std::decay_t<T>>(minimum, maximum) or !policy::overflow_is_error;
 	} else {
 		return false;
@@ -48,17 +48,17 @@ constexpr auto is_explicitly_constructible_from(Minimum const minimum [[maybe_un
 
 // Necessary for optional specialization
 template<typename T>
-inline constexpr auto has_extra_space =
+concept has_extra_space =
 	basic_numeric_limits<typename T::underlying_type>::min() < basic_numeric_limits<T>::min() or
 	basic_numeric_limits<T>::max() < basic_numeric_limits<typename T::underlying_type>::max();
 
 
 template<typename Integer>
 constexpr auto as_builtin_integer(Integer const x) noexcept {
-	if constexpr (detail::is_builtin_integer<Integer>) {
+	if constexpr (detail::builtin_integer<Integer>) {
 		return x;
 	} else {
-		static_assert(is_bounded_integer<Integer>);
+		static_assert(bounded_integer<Integer>);
 		return x.value();
 	}
 }
@@ -263,11 +263,11 @@ public:
 	// Do not verify that the value is in range because the user has requested a
 	// conversion out of the safety of bounded::integer. It is subject to all
 	// the standard rules of conversion from one integer type to another.
-	template<typename T> requires (detail::is_builtin_arithmetic<T> or std::is_enum_v<T>)
+	template<typename T> requires (detail::builtin_arithmetic<T> or std::is_enum_v<T>)
 	constexpr explicit operator T() const noexcept {
 		return static_cast<T>(value());
 	}
-	template<typename T> requires (detail::is_builtin_arithmetic<T> or std::is_enum_v<T>)
+	template<typename T> requires (detail::builtin_arithmetic<T> or std::is_enum_v<T>)
 	constexpr explicit operator T() const volatile noexcept {
 		return static_cast<T>(value());
 	}

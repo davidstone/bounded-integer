@@ -17,14 +17,14 @@ namespace containers {
 namespace detail {
 
 template<typename CharT>
-inline constexpr auto is_char_like = std::is_trivial_v<CharT> and std::is_standard_layout_v<CharT> and !std::is_array_v<CharT>;
+concept char_like = std::is_trivial_v<CharT> and std::is_standard_layout_v<CharT> and !std::is_array_v<CharT>;
 
 } // namespace detail
 
 // Unlike std::basic_string, there is no null terminator.
 template<typename CharT>
 struct basic_string : private small_buffer_optimized_vector<CharT, 1> {
-	static_assert(detail::is_char_like<CharT>);
+	static_assert(detail::char_like<CharT>);
 private:
 	using base = small_buffer_optimized_vector<CharT, 1>;
 public:

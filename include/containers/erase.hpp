@@ -24,7 +24,7 @@ namespace common {
 
 // TODO: conditional noexcept
 // TODO: this implementation is for contiguous ranges
-template<typename Container, typename Iterator> requires(is_container<Container> and is_iterator<Iterator>)
+template<typename Container, typename Iterator> requires(is_container<Container> and iterator<Iterator>)
 constexpr auto erase(Container & container, Iterator const first_, Iterator const last_) noexcept {
 	auto const first = ::containers::detail::mutable_iterator(container, first_);
 	auto const last = ::containers::detail::mutable_iterator(container, last_);

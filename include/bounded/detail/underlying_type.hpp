@@ -9,8 +9,6 @@
 #include <bounded/detail/int128.hpp>
 #include <bounded/detail/overlapping_range.hpp>
 
-#include <type_traits>
-
 namespace bounded {
 namespace detail {
 

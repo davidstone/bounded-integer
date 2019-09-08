@@ -28,7 +28,7 @@ template<typename Range> requires has_member_size<Range> or random_access_range<
 constexpr auto size(Range const & range) noexcept {
 	if constexpr (has_member_size<Range>) {
 		return range.size();
-	} else if constexpr (bounded::is_bounded_integer<typename Range::size_type>) {
+	} else if constexpr (bounded::bounded_integer<typename Range::size_type>) {
 		return typename Range::size_type(end(range) - begin(range), bounded::non_check);
 	} else {
 		return typename Range::size_type(end(range) - begin(range));
@@ -39,19 +39,9 @@ constexpr auto size(Range const & range) noexcept {
 
 using ::containers::detail::common::size;
 
-template<typename, typename = void>
-inline constexpr auto is_sized = false;
-
-template<typename Range>
-inline constexpr auto is_sized<
-	Range,
-	std::void_t<decltype(size(std::declval<Range const &>()))>
-> = true;
-
-
 template<typename Range>
 constexpr auto linear_size(Range const & range) {
-	if constexpr (is_sized<Range>) {
+	if constexpr (requires { size(range); }) {
 		return size(range);
 	} else {
 		return containers::distance(begin(range), end(range));

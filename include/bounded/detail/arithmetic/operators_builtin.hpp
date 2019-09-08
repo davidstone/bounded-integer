@@ -18,22 +18,22 @@ namespace bounded {
 
 
 #define BOUNDED_INTEGER_MIXED_OPERATOR_OVERLOADS_INTEGRAL_CONSTANT(symbol) \
-template<typename LHS, typename T, T rhs> requires is_bounded_integer<LHS> \
+template<typename LHS, typename T, T rhs> requires bounded_integer<LHS> \
 constexpr auto operator symbol(LHS const lhs, std::integral_constant<T, rhs>) noexcept { \
 	return lhs symbol constant<rhs>; \
 } \
-template<typename T, T lhs, typename RHS> requires is_bounded_integer<RHS> \
+template<typename T, T lhs, typename RHS> requires bounded_integer<RHS> \
 constexpr auto operator symbol(std::integral_constant<T, lhs>, RHS const rhs) noexcept { \
 	return constant<lhs> symbol rhs; \
 }
 
 
 #define BOUNDED_INTEGER_MIXED_OPERATOR_OVERLOADS(symbol, minimum, maximum) \
-template<typename LHS, typename RHS> requires (is_bounded_integer<LHS> and detail::is_builtin_integer<RHS>) \
+template<typename LHS, typename RHS> requires (bounded_integer<LHS> and detail::builtin_integer<RHS>) \
 constexpr auto operator symbol(LHS const lhs, RHS const rhs) noexcept { \
 	return lhs.value() symbol rhs; \
 } \
-template<typename LHS, typename RHS> requires (detail::is_builtin_integer<LHS> and is_bounded_integer<RHS>) \
+template<typename LHS, typename RHS> requires (detail::builtin_integer<LHS> and bounded_integer<RHS>) \
 constexpr auto operator symbol(LHS const lhs, RHS const rhs) noexcept { \
 	return lhs symbol rhs.value(); \
 } \

@@ -20,27 +20,19 @@ namespace containers {
 namespace detail {
 
 // reinterpret_cast or static_cast from void * are not allowed in constexpr
-
-template<typename Target, typename Source, typename Enable = void>
-inline constexpr auto is_static_castable = false;
-
 template<typename Target, typename Source>
-inline constexpr auto is_static_castable<
-	Target,
-	Source,
-	std::void_t<decltype(static_cast<Target>(std::declval<Source>()))>
-> = true;
+concept static_castable = requires(Source source) { static_cast<Target>(source); };
 
 template<typename Target, typename Source>
 constexpr auto static_or_reinterpret_cast(Source source) noexcept {
-	if constexpr (is_static_castable<Target, Source>) {
+	if constexpr (static_castable<Target, Source>) {
 		return static_cast<Target>(source);
 	} else {
 		return reinterpret_cast<Target>(source);
 	}
 }
 
-template<typename InputIterator, typename Sentinel> requires is_iterator_sentinel<InputIterator, Sentinel>
+template<typename InputIterator, typename Sentinel> requires iterator_sentinel<InputIterator, Sentinel>
 constexpr auto destroy_range(InputIterator first, Sentinel const last) noexcept {
 	// This static_assert fails with reverse_iterator because std::prev is not
 	// noexcept

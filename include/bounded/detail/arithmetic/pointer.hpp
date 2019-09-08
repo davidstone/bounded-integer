@@ -12,7 +12,7 @@
 namespace bounded {
 
 template<typename T, typename Integer> requires(
-	is_bounded_integer<Integer> and
+	bounded_integer<Integer> and
 	(std::is_pointer_v<T> or (std::is_array_v<T> and Integer::max() <= constant<std::extent_v<T>>))
 )
 constexpr auto operator+(T const & array, Integer const number) noexcept {
@@ -21,7 +21,7 @@ constexpr auto operator+(T const & array, Integer const number) noexcept {
 
 
 template<typename Integer, typename T> requires(
-	is_bounded_integer<Integer> and
+	bounded_integer<Integer> and
 	(std::is_pointer_v<T> or (std::is_array_v<T> and Integer::max() <= constant<std::extent_v<T>>))
 )
 constexpr auto operator+(Integer const number, T const & array) noexcept {

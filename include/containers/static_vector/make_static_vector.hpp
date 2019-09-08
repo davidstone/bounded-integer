@@ -8,7 +8,6 @@
 #include <containers/static_vector/static_vector.hpp>
 
 #include <limits>
-#include <type_traits>
 
 namespace containers {
 

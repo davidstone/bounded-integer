@@ -101,7 +101,7 @@ constexpr auto is_forward_iterator(Args...) {
 
 // This provides the nested typedefs iterator_category and difference_type if
 // and only if Iterator is an iterator, not a sentinel
-template<typename Iterator, typename Traits, bool = is_iterator<Iterator>>
+template<typename Iterator, typename Traits, bool = iterator<Iterator>>
 struct iterator_typedefs_base {
 private:
 	using base_category = typename std::iterator_traits<Iterator>::iterator_category;

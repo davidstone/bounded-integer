@@ -45,7 +45,7 @@ struct stable_vector {
 	}
 
 	template<typename Range> requires(
-		is_range<Range> and
+		range<Range> and
 		!std::is_array_v<std::remove_cv_t<std::remove_reference_t<Range>>>
 	)
 	explicit stable_vector(Range && range):

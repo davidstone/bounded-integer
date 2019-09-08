@@ -16,52 +16,35 @@
 namespace containers {
 namespace detail {
 
-template<typename, typename = void>
-inline constexpr auto has_push_back = false;
+template<typename Container>
+concept push_backable = requires(Container & container, typename Container::value_type value_type) { push_back(container, std::move(value_type)); };
 
 template<typename Container>
-inline constexpr auto has_push_back<
-	Container,
-	std::void_t<decltype(push_back(std::declval<Container &>(), std::declval<typename Container::value_type>()))>
-> = true;
-
-template<typename, typename = void>
-inline constexpr auto has_append_from_capacity = false;
-
-template<typename Container>
-inline constexpr auto has_append_from_capacity<
-	Container,
-	std::void_t<decltype(std::declval<Container &>().append_from_capacity(std::declval<typename Container::size_type>()))>
-> = true;
-
-template<typename, typename, typename = void>
-inline constexpr auto has_insert = false;
+concept appendable_from_capacity = requires(Container & container, typename Container::size_type count) { container.append_from_capacity(count); };
 
 template<typename Container, typename Range>
-inline constexpr auto has_insert<
-	Container,
-	Range,
-	std::void_t<decltype(std::declval<Container &>().insert(
-		end(std::declval<Container &>()),
-		begin(std::declval<Range>()),
-		end(std::declval<Range>())
-	))>
-> = true;
+concept member_insertable = requires(Container & container, Range && range) {
+	container.insert(
+		end(container),
+		begin(BOUNDED_FORWARD(range)),
+		end(BOUNDED_FORWARD(range))
+	);
+};
 
 namespace common {
 
 // I would like to return an iterator to the start of the appended range, but
 // that does not seem possible to do efficiently in general due to potential
 // iterator instability.
-template<typename Container, typename Range> requires has_push_back<Container>
+template<typename Container, typename Range> requires push_backable<Container>
 constexpr auto append(Container & output, Range && input) -> void {
 	// TODO: Define InputRange and ForwardRange concepts
 	using iterator_category = typename std::iterator_traits<decltype(begin(input))>::iterator_category;
-	constexpr auto reserve_space = std::is_convertible_v<iterator_category, std::forward_iterator_tag> and has_reserve<Container>;
+	constexpr auto reserve_space = std::is_convertible_v<iterator_category, std::forward_iterator_tag> and reservable<Container>;
 	if constexpr (reserve_space) {
 		auto const input_size = [&] {
 			auto const value = size(input);
-			if constexpr (bounded::is_bounded_integer<decltype(value)>) {
+			if constexpr (bounded::bounded_integer<decltype(value)>) {
 				return value;
 			} else {
 				return typename Container::size_type(value);
@@ -72,14 +55,14 @@ constexpr auto append(Container & output, Range && input) -> void {
 			::containers::detail::growth_reallocation(output, input_size);
 		}
 	}
-	if constexpr (reserve_space and has_append_from_capacity<Container>) {
+	if constexpr (reserve_space and appendable_from_capacity<Container>) {
 		auto const new_end = containers::uninitialized_copy(
 			begin(BOUNDED_FORWARD(input)),
 			end(BOUNDED_FORWARD(input)),
 			end(output)
 		);
 		output.append_from_capacity(new_end - end(output));
-	} else if constexpr (has_insert<Container, Range> and std::is_move_constructible_v<typename Container::value_type> and std::is_move_assignable_v<typename Container::value_type>) {
+	} else if constexpr (member_insertable<Container, Range> and std::is_move_constructible_v<typename Container::value_type> and std::is_move_assignable_v<typename Container::value_type>) {
 		output.insert(end(output), begin(BOUNDED_FORWARD(input)), end(BOUNDED_FORWARD(input)));
 	} else {
 		for (decltype(auto) value : BOUNDED_FORWARD(input)) {

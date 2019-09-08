@@ -16,7 +16,7 @@ namespace detail {
 
 // A non-movable type still returns true for is_trivially_copyable and friends
 template<typename T>
-inline constexpr auto constexpr_constructible = std::is_move_assignable_v<T> and std::is_trivially_move_assignable_v<T> and std::is_trivially_destructible_v<T>;
+concept constexpr_constructible = std::is_move_assignable_v<T> and std::is_trivially_move_assignable_v<T> and std::is_trivially_destructible_v<T>;
 
 // Try () initialization first, then {} initialization
 

@@ -125,7 +125,7 @@ int main() {
 	static_assert(index_type::min() == 0_bi);
 	static_assert(index_type::max() == 9_bi);
 	static_assert(std::is_same<index_type::overflow_policy, bounded::throw_policy<std::out_of_range>>{});
-	static_assert(!containers::is_iterator<containers::stable_vector<std::string, 6>>);
+	static_assert(!containers::iterator<containers::stable_vector<std::string, 6>>);
 	static_assert(containers::is_container<containers::stable_vector<std::string, 6>>);
 
 	containers::insert(container, begin(container) + 1_bi, containers::repeat_n(5_bi, 12));

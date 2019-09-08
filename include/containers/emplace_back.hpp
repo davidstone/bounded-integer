@@ -32,7 +32,7 @@ constexpr auto & emplace_back(Container & container, Args && ... args) {
 		if (initial_size < container.capacity()) {
 			bounded::construct(*(data(container) + initial_size), BOUNDED_FORWARD(args)...);
 			container.append_from_capacity(1_bi);
-		} else if constexpr (detail::has_reserve<Container>) {
+		} else if constexpr (detail::reservable<Container>) {
 			auto temp = Container();
 			temp.reserve(::containers::detail::reallocation_size(container, 1_bi));
 			auto & ref = *(data(temp) + container.capacity());

@@ -9,7 +9,7 @@
 
 namespace bounded {
 
-template<typename Integer> requires is_bounded_integer<Integer>
+template<typename Integer> requires bounded_integer<Integer>
 constexpr auto operator+(Integer const value) noexcept {
 	return value;
 }

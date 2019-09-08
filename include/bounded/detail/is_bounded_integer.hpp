@@ -6,26 +6,31 @@
 #pragma once
 
 #include <bounded/detail/forward_declaration.hpp>
-#include <type_traits>
 
 namespace bounded {
+namespace detail {
 
 template<typename T>
-constexpr inline auto is_bounded_integer = false;
+inline constexpr auto is_bounded_integer = false;
 
 template<auto minimum, auto maximum, typename overflow_policy>
-constexpr inline auto is_bounded_integer<integer<minimum, maximum, overflow_policy>> = true;
+inline constexpr auto is_bounded_integer<integer<minimum, maximum, overflow_policy>> = true;
 
 template<typename T>
-constexpr inline auto is_bounded_integer<T const> = is_bounded_integer<T>;
+inline constexpr auto is_bounded_integer<T const> = is_bounded_integer<T>;
 
 template<typename T>
-constexpr inline auto is_bounded_integer<T volatile> = is_bounded_integer<T>;
+inline constexpr auto is_bounded_integer<T volatile> = is_bounded_integer<T>;
 
 template<typename T>
-constexpr inline auto is_bounded_integer<T &> = is_bounded_integer<T>;
+inline constexpr auto is_bounded_integer<T &> = is_bounded_integer<T>;
 
 template<typename T>
-constexpr inline auto is_bounded_integer<T &&> = is_bounded_integer<T>;
+inline constexpr auto is_bounded_integer<T &&> = is_bounded_integer<T>;
 
-}	// namespace bounded
+} // namespace detail
+
+template<typename T>
+concept bounded_integer = detail::is_bounded_integer<T>;
+
+} // namespace bounded

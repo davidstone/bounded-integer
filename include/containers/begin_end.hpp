@@ -47,11 +47,8 @@ void rvalue_ref_qualified(Return (T::*)() &&);
 using std::begin_or_end; \
 \
 \
-template<typename T, typename Enable = void> \
-inline constexpr auto has_rvalue_ ## begin_or_end = false; \
-\
 template<typename T> \
-inline constexpr auto has_rvalue_ ## begin_or_end<T, decltype(rvalue_ref_qualified(&T::begin_or_end))> = true; \
+concept has_rvalue_ ## begin_or_end = requires { rvalue_ref_qualified(&T::begin_or_end); }; \
 \
 \
 template<typename Range> requires( \

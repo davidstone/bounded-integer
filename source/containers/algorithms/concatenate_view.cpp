@@ -27,9 +27,9 @@ constexpr auto two = containers::concatenate_view(array1, array2);
 using iterator = decltype(begin(two));
 using sentinel = decltype(end(two));
 
-static_assert(containers::is_iterator<iterator>);
-static_assert(containers::is_iterator_sentinel<iterator, sentinel>);
-static_assert(containers::is_range<decltype(two)>);
+static_assert(containers::iterator<iterator>);
+static_assert(containers::iterator_sentinel<iterator, sentinel>);
+static_assert(containers::range<decltype(two)>);
 
 static_assert(size(two) == size(array1) + size(array2));
 static_assert(equal_values_and_types(

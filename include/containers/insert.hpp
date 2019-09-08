@@ -59,14 +59,14 @@ constexpr auto emplace(Container & container, typename Container::const_iterator
 	if (position == end(container)) {
 		::containers::emplace_back(container, BOUNDED_FORWARD(args)...);
 	} else if (size(container) < container.capacity()) {
-		auto const mutable_position = detail::mutable_iterator(container, position);
+		auto const mutable_position = ::containers::detail::mutable_iterator(container, position);
 		auto const original_end = end(container);
 		::containers::emplace_back(container, std::move(back(container)));
 		::containers::move_backward(mutable_position, containers::prev(original_end), original_end);
 		auto const pointer = std::addressof(*mutable_position);
 		bounded::destroy(*pointer);
 		bounded::construct(*pointer, BOUNDED_FORWARD(args)...);
-	} else if constexpr (has_reserve<Container>) {
+	} else if constexpr (reservable<Container>) {
 		insert_or_emplace_with_reallocation(container, position, 1_bi, [&](auto const ptr) {
 			bounded::construct(*ptr, BOUNDED_FORWARD(args)...);
 		});
@@ -88,7 +88,7 @@ constexpr auto insert(Container & container, typename Container::const_iterator 
 	}
 
 	auto const range_size = bounded::throw_policy<std::out_of_range>{}.assignment(
-		detail::linear_size(range),
+		::containers::detail::linear_size(range),
 		0_bi,
 		Container::size_type::max()
 	);
@@ -103,7 +103,7 @@ constexpr auto insert(Container & container, typename Container::const_iterator 
 		::containers::uninitialized_copy(remainder.input, last, remainder.output);
 		container.append_from_capacity(range_size);
 		// return mutable_position;
-	} else if constexpr (has_reserve<Container>) {
+	} else if constexpr (reservable<Container>) {
 		insert_or_emplace_with_reallocation(position, range_size, [&](auto const ptr) {
 			::containers::uninitialized_copy(BOUNDED_FORWARD(range), ptr);
 		});

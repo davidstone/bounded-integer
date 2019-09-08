@@ -18,13 +18,16 @@ namespace detail {
 // "Automatically Generate More Operators":
 // https://github.com/davidstone/isocpp/blob/master/generate-operators.md
 
-template<typename Iterator, typename Enable = void>
+template<typename Iterator>
 struct operator_arrow {
 	auto operator->() const = delete;
 };
 
 template<typename Iterator>
-struct operator_arrow<Iterator, std::void_t<decltype(std::addressof(*std::declval<Iterator const &>()))>> {
+concept lvalue_from_dereference = requires(Iterator it) { std::addressof(*it); };
+
+template<typename Iterator> requires lvalue_from_dereference<Iterator>
+struct operator_arrow<Iterator> {
 	constexpr auto operator->() const noexcept(noexcept(*std::declval<Iterator const &>())) {
 		return std::addressof(*static_cast<Iterator const &>(*this));
 	}

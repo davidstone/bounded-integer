@@ -22,7 +22,7 @@ namespace common {
 
 // TODO: noexcept
 template<typename Container, typename Range> requires(
-	is_container<Container> and is_range<Range>
+	is_container<Container> and range<Range>
 )
 constexpr auto assign(Container & container, Range && range) {
 	auto it = begin(container);

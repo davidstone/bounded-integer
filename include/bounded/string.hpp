@@ -14,14 +14,14 @@ namespace bounded {
 // Import to_string for the numeric types
 using std::to_string;
 
-template<typename Integer> requires is_bounded_integer<Integer>
+template<typename Integer> requires bounded_integer<Integer>
 auto to_string(Integer const & x) {
 	return to_string(+x.value());
 }
 
 using std::to_wstring;
 
-template<typename Integer> requires is_bounded_integer<Integer>
+template<typename Integer> requires bounded_integer<Integer>
 auto to_wstring(Integer const & x) {
 	return to_wstring(+x.value());
 }

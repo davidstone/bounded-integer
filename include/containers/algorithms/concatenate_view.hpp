@@ -35,13 +35,10 @@ constexpr auto assert_same_ends(LHS const & lhs, RHS const & rhs) {
 	BOUNDED_ASSERT(have_same_ends(lhs, rhs, bounded::make_index_sequence(bounded::tuple_size<LHS>)));
 }
 
-template<typename Range, typename = void>
-inline constexpr auto is_forward_random_access = false;
-
 template<typename Range>
-inline constexpr auto is_forward_random_access<Range, std::void_t<decltype(
-	begin(std::declval<Range>()) + std::declval<typename Range::size_type>()
-)>> = true;
+concept forward_random_access_range = requires(Range && range, typename Range::size_type offset) {
+	begin(BOUNDED_FORWARD(range)) + offset;
+};
 
 
 template<typename RangeView>
@@ -106,7 +103,7 @@ private:
 	static constexpr auto operator_plus(bounded::tuple<RangeViews...> const range_views, Index const index, Offset const offset, std::index_sequence<indexes...> indexes_) {
 		if constexpr (index == sizeof...(RangeViews)) {
 			return bounded::apply(range_views, bounded::construct_return<concatenate_view_iterator>);
-		} else if constexpr ((... and detail::is_forward_random_access<RangeViews>)) {
+		} else if constexpr ((... and detail::forward_random_access_range<RangeViews>)) {
 			auto const range = range_views[index];
 			auto const added_size = bounded::max(-size(range), bounded::min(size(range), offset));
 			auto specific_range = [=](auto const current_index) {
@@ -183,14 +180,14 @@ public:
 	template<typename Offset> requires(
 		std::is_convertible_v<Offset, difference_type> and
 		(
-			!bounded::is_bounded_integer<difference_type> or
+			!bounded::bounded_integer<difference_type> or
 			(
 				std::numeric_limits<Offset>::min() == bounded::constant<1> and
 				std::numeric_limits<Offset>::max() == bounded::constant<1>
 			) or
 			(
 				std::numeric_limits<Offset>::min() >= bounded::constant<0> and
-				(... and detail::is_forward_random_access<RangeViews>)
+				(... and detail::forward_random_access_range<RangeViews>)
 			)
 		)
 	)

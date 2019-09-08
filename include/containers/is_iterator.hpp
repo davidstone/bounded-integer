@@ -5,18 +5,11 @@
 
 #pragma once
 
-#include <containers/has_nested_type.hpp>
-
 #include <iterator>
 
 namespace containers {
-namespace detail {
-
-CONTAINERS_MAKE_NESTED_TYPE_TEST(iterator_category)
-
-}	// namespace detail
 
 template<typename Iterator>
-inline constexpr auto is_iterator = detail::has_nested_type_iterator_category<std::iterator_traits<Iterator>>;
+concept iterator = requires { typename std::iterator_traits<Iterator>::iterator_category; };
 
 }	// namespace containers

@@ -15,7 +15,7 @@ namespace containers {
 namespace detail {
 namespace common {
 
-template<typename Range> requires is_range<Range>
+template<typename Range> requires range<Range>
 constexpr auto data(Range && range) noexcept {
 	if constexpr (requires { range.data(); }) {
 		static_assert(noexcept(range.data()));

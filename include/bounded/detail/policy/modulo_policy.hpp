@@ -32,8 +32,8 @@ private:
 public:
 	template<typename T, typename Minimum, typename Maximum>
 	static constexpr auto assignment(T const & value, Minimum const & minimum, Maximum const & maximum) noexcept {
-		static_assert(is_bounded_integer<Minimum>, "Only bounded::integer types are supported.");
-		static_assert(is_bounded_integer<Maximum>, "Only bounded::integer types are supported.");
+		static_assert(bounded_integer<Minimum>, "Only bounded::integer types are supported.");
+		static_assert(bounded_integer<Maximum>, "Only bounded::integer types are supported.");
 		return positive_remainder(
 			(value - minimum) % (maximum - minimum + constant<1>),
 			maximum - minimum + constant<1>

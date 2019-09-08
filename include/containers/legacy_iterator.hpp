@@ -69,7 +69,7 @@ constexpr auto operator==(legacy_iterator<Iterator> const lhs, legacy_iterator<I
 )
 
 constexpr auto make_legacy_iterator = [](auto it) {
-	if constexpr (bounded::is_bounded_integer<decltype(it - it)>) {
+	if constexpr (bounded::bounded_integer<decltype(it - it)>) {
 		return containers::legacy_iterator(it);
 	} else {
 		return it;
