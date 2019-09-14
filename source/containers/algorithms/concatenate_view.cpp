@@ -28,7 +28,7 @@ using iterator = decltype(begin(two));
 using sentinel = decltype(end(two));
 
 static_assert(containers::iterator<iterator>);
-static_assert(containers::iterator_sentinel<iterator, sentinel>);
+static_assert(containers::sentinel_for<sentinel, iterator>);
 static_assert(containers::range<decltype(two)>);
 
 static_assert(size(two) == size(array1) + size(array2));

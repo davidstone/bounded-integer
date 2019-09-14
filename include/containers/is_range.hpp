@@ -16,6 +16,6 @@ using std::begin;
 using std::end;
 
 template<typename T>
-concept range = iterator_sentinel<decltype(begin(std::declval<T>())), decltype(end(std::declval<T>()))>;
+concept range = sentinel_for<decltype(end(std::declval<T>())), decltype(begin(std::declval<T>()))>;
 
 }	// namespace containers

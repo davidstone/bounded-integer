@@ -26,7 +26,7 @@ struct operator_arrow {
 template<typename Iterator>
 concept lvalue_from_dereference = requires(Iterator it) { std::addressof(*it); };
 
-template<typename Iterator> requires lvalue_from_dereference<Iterator>
+template<lvalue_from_dereference Iterator>
 struct operator_arrow<Iterator> {
 	constexpr auto operator->() const noexcept(noexcept(*std::declval<Iterator const &>())) {
 		return std::addressof(*static_cast<Iterator const &>(*this));

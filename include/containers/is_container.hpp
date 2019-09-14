@@ -24,4 +24,7 @@ inline constexpr auto is_container<T> = true;
 template<typename T, std::size_t size>
 inline constexpr auto is_container<std::array<T, size>> = true;
 
+template<typename T>
+concept container = is_container<T>;
+
 }	// namespace containers

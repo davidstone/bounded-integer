@@ -59,8 +59,7 @@ constexpr auto begin_or_end(Range && range) BOUNDED_NOEXCEPT( \
 	std::move(range).begin_or_end() \
 ) \
 \
-template<typename Container> requires( \
-	is_container<Container> and \
+template<container Container> requires( \
 	std::is_rvalue_reference_v<Container &&> and \
 	!has_rvalue_ ## begin_or_end<std::decay_t<Container>> \
 ) \

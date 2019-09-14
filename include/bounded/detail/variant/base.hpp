@@ -60,18 +60,17 @@ struct basic_variant_base {
 	) {
 	}
 	
-	template<typename T> requires(is_valid_index(types<std::decay_t<T>>{}, types<Ts>{}...))
-	constexpr explicit basic_variant_base(T && value) BOUNDED_NOEXCEPT_INITIALIZATION(
+	template<matches_exactly_one_type<types<Ts>...> T>
+	constexpr explicit basic_variant_base(T && value) noexcept(std::is_nothrow_constructible_v<std::decay_t<T>, T &&>):
 		basic_variant_base(
 			std::in_place,
 			types<std::decay_t<T>>{},
 			BOUNDED_FORWARD(value)
 		)
-	) {
+	{
 	}
 	
-	template<typename T> requires(
-		is_valid_index(types<std::decay_t<T>>{}, types<Ts>{}...) and
+	template<matches_exactly_one_type<types<Ts>...> T> requires(
 		std::is_constructible_v<std::decay_t<T>, T &&> and
 		std::is_assignable_v<std::decay_t<T> &, T &&>
 	)
@@ -118,15 +117,15 @@ struct basic_variant_base {
 		}
 	}
 
-	template<typename Index> requires(detail::is_valid_index(Index{}, types<Ts>{}...))
+	template<unique_type_identifier<types<Ts>...> Index>
 	constexpr auto const & operator[](Index index_) const & noexcept {
 		return operator_bracket(*this, index_);
 	}
-	template<typename Index> requires(detail::is_valid_index(Index{}, types<Ts>{}...))
+	template<unique_type_identifier<types<Ts>...> Index>
 	constexpr auto & operator[](Index index_) & noexcept {
 		return operator_bracket(*this, index_);
 	}
-	template<typename Index> requires(detail::is_valid_index(Index{}, types<Ts>{}...))
+	template<unique_type_identifier<types<Ts>...> Index>
 	constexpr auto && operator[](Index index_) && noexcept {
 		return operator_bracket(std::move(*this), index_);
 	}

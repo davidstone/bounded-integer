@@ -27,7 +27,7 @@ struct construct_return_t {
 		T(BOUNDED_FORWARD(args)...)
 	)
 	
-	template<typename... Args> requires (not std::is_constructible_v<T, Args...>)
+	template<typename... Args>
 	constexpr auto operator()(Args && ... args) const BOUNDED_NOEXCEPT_VALUE(
 		T{BOUNDED_FORWARD(args)...}
 	)
@@ -41,12 +41,12 @@ inline constexpr auto construct_return = detail::construct_return_t<T>{};
 
 inline constexpr struct construct_t {
 	// The assignment operator must return a T & if it is trivial
-	template<typename T, typename... Args> requires detail::constexpr_constructible<T>
+	template<detail::constexpr_constructible T, typename... Args>
 	constexpr auto operator()(T & ref, Args && ... args) const BOUNDED_NOEXCEPT_REF(
 		ref = construct_return<T>(BOUNDED_FORWARD(args)...)
 	)
 
-	template<typename T, typename... Args> requires (not detail::constexpr_constructible<T>)
+	template<typename T, typename... Args>
 	constexpr auto operator()(T & ref, Args && ... args) const BOUNDED_NOEXCEPT_REF(
 		*::new(static_cast<void *>(std::addressof(ref))) T(construct_return<T>(BOUNDED_FORWARD(args)...))
 	)

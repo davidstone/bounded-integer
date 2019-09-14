@@ -7,22 +7,28 @@
 
 #include <bounded/detail/class.hpp>
 #include <bounded/detail/comparison.hpp>
+#include <bounded/detail/type.hpp>
 
 namespace bounded {
 namespace detail {
 
-constexpr struct is_valid_index_t {
-	template<auto n, typename... Ts>
-	constexpr auto operator()(constant_t<n> index, types<Ts>...) const noexcept {
-		return index < constant<sizeof...(Ts)>;
-	}
+template<typename LHS, typename RHS>
+constexpr auto types_equal(types<LHS> lhs, types<RHS> rhs) noexcept {
+	return bounded::integer(lhs == rhs);
+}
 
-	template<typename Index, typename... Ts>
-	constexpr auto operator()(types<Index> index, types<Ts>... types) const noexcept {
-		constexpr auto exactly_one_type_matches = (0 + ... + (index == types)) == 1;
-		return exactly_one_type_matches;
-	}
-} is_valid_index;
+template<typename Index, typename... Ts>
+concept matches_exactly_one_type_impl = (constant<0> + ... + ::bounded::detail::types_equal(Index(), Ts())) == constant<1>;
 
 }	// namespace detail
+
+template<typename Index, typename... Ts>
+concept matches_exactly_one_type = detail::matches_exactly_one_type_impl<detail::types<std::decay_t<Index>>, Ts...>;
+
+template<typename Index, typename... Ts>
+concept variant_integer_index = bounded_integer<Index> and Index::value() < sizeof...(Ts);
+
+template<typename Index, typename... Ts>
+concept unique_type_identifier = detail::matches_exactly_one_type_impl<Index, Ts...> or variant_integer_index<Index, Ts...>;
+
 }	// namespace bounded

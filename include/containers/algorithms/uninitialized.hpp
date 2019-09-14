@@ -9,6 +9,7 @@
 #include <containers/algorithms/move_iterator.hpp>
 #include <containers/algorithms/reverse_iterator.hpp>
 #include <containers/is_iterator_sentinel.hpp>
+#include <containers/is_range.hpp>
 
 #include <bounded/detail/forward.hpp>
 #include <bounded/integer.hpp>
@@ -32,8 +33,8 @@ constexpr auto static_or_reinterpret_cast(Source source) noexcept {
 	}
 }
 
-template<typename InputIterator, typename Sentinel> requires iterator_sentinel<InputIterator, Sentinel>
-constexpr auto destroy_range(InputIterator first, Sentinel const last) noexcept {
+template<iterator InputIterator>
+constexpr auto destroy_range(InputIterator first, sentinel_for<InputIterator> auto const last) noexcept {
 	// This static_assert fails with reverse_iterator because std::prev is not
 	// noexcept
 	// static_assert(noexcept(bounded::destroy(*first)));
@@ -42,7 +43,7 @@ constexpr auto destroy_range(InputIterator first, Sentinel const last) noexcept 
 	}
 }
 
-template<typename Range>
+template<range Range>
 constexpr auto destroy_range(Range && range) BOUNDED_NOEXCEPT_DECLTYPE(
 	::containers::detail::destroy_range(begin(BOUNDED_FORWARD(range)), end(BOUNDED_FORWARD(range)))
 )
@@ -50,13 +51,8 @@ constexpr auto destroy_range(Range && range) BOUNDED_NOEXCEPT_DECLTYPE(
 }	// namespace detail
 
 
-template<typename InputIterator, typename Sentinel, typename ForwardIterator> requires(
-	!std::is_nothrow_constructible_v<
-		std::decay_t<decltype(*std::declval<ForwardIterator>())>,
-		decltype(*std::declval<InputIterator &>())
-	>
-)
-auto uninitialized_copy(InputIterator first, Sentinel const last, ForwardIterator out) {
+template<iterator InputIterator, iterator ForwardIterator>
+constexpr auto uninitialized_copy(InputIterator first, sentinel_for<InputIterator> auto const last, ForwardIterator out) {
 	auto out_first = out;
 	try {
 		for (; first != last; ++first) {
@@ -71,24 +67,8 @@ auto uninitialized_copy(InputIterator first, Sentinel const last, ForwardIterato
 }
 
 
-template<typename InputIterator, typename Sentinel, typename ForwardIterator> requires(
-	std::is_nothrow_constructible_v<
-		std::decay_t<decltype(*std::declval<ForwardIterator>())>,
-		decltype(*std::declval<InputIterator &>())
-	>
-)
-constexpr auto uninitialized_copy(InputIterator first, Sentinel const last, ForwardIterator out) noexcept {
-	for (; first != last; ++first) {
-		bounded::construct(*out, *first);
-		++out;
-	}
-	return out;
-}
-
-
-
-template<typename InputIterator, typename Sentinel, typename ForwardIterator>
-constexpr auto uninitialized_move(InputIterator const first, Sentinel const last, ForwardIterator const out) BOUNDED_NOEXCEPT_VALUE(
+template<iterator InputIterator, iterator ForwardIterator>
+constexpr auto uninitialized_move(InputIterator const first, sentinel_for<InputIterator> auto const last, ForwardIterator const out) BOUNDED_NOEXCEPT_VALUE(
 	::containers::uninitialized_copy(::containers::move_iterator(first), ::containers::move_iterator(last), out)
 )
 
@@ -113,43 +93,36 @@ constexpr auto uninitialized_move_backward(BidirectionalInputIterator const firs
 
 // uninitialized_move_destroy guarantees that all elements in the input range
 // have been destoyed when this function completes.
-template<typename InputIterator, typename Sentinel, typename ForwardIterator> requires(
-	not noexcept(::containers::uninitialized_copy(
-		::containers::move_destroy_iterator(std::declval<InputIterator const &>()),
-		::containers::move_destroy_iterator(std::declval<Sentinel const &>()),
-		std::declval<ForwardIterator const &>()
-	))
-)
-auto uninitialized_move_destroy(InputIterator const first, Sentinel const last, ForwardIterator out) {
-	auto first_adapted = ::containers::move_destroy_iterator(first);
-	auto const last_adapted = containers::move_destroy_iterator(last);
-	auto out_first = out;
-	try {
-		for (; first_adapted != last_adapted; ++first_adapted) {
-			bounded::construct(*out, *first_adapted);
-			++out;
-		}
-	} catch (...) {
-		detail::destroy_range(first_adapted.base(), last);
-		detail::destroy_range(out_first, out);
-		throw;
-	}
-	return out;
-}
-
-template<typename InputIterator, typename Sentinel, typename ForwardIterator> requires(
-	noexcept(::containers::uninitialized_copy(
-		::containers::move_destroy_iterator(std::declval<InputIterator const &>()),
-		::containers::move_destroy_iterator(std::declval<Sentinel const &>()),
-		std::declval<ForwardIterator const &>()
-	))
-)
-constexpr auto uninitialized_move_destroy(InputIterator const first, Sentinel const last, ForwardIterator const out) noexcept {
-	return ::containers::uninitialized_copy(
+// This should probably just require noexcept
+template<iterator InputIterator, iterator ForwardIterator>
+constexpr auto uninitialized_move_destroy(InputIterator const first, sentinel_for<InputIterator> auto const last, ForwardIterator out) {
+	constexpr auto is_noexcept = noexcept(::containers::uninitialized_copy(
 		::containers::move_destroy_iterator(first),
 		::containers::move_destroy_iterator(last),
 		out
-	);
+	));
+	if constexpr (is_noexcept) {
+		return ::containers::uninitialized_copy(
+			::containers::move_destroy_iterator(first),
+			::containers::move_destroy_iterator(last),
+			out
+		);
+	} else {
+		auto first_adapted = ::containers::move_destroy_iterator(first);
+		auto const last_adapted = containers::move_destroy_iterator(last);
+		auto out_first = out;
+		try {
+			for (; first_adapted != last_adapted; ++first_adapted) {
+				bounded::construct(*out, *first_adapted);
+				++out;
+			}
+		} catch (...) {
+			detail::destroy_range(first_adapted.base(), last);
+			detail::destroy_range(out_first, out);
+			throw;
+		}
+		return out;
+	}
 }
 
 
@@ -178,12 +151,8 @@ constexpr auto transfer_all_contents(Source && source, Destination & destination
 } // namespace detail
 
 
-template<typename ForwardIterator, typename Sentinel> requires(
-	!std::is_nothrow_default_constructible_v<
-		std::decay_t<decltype(*std::declval<ForwardIterator const &>())>
-	>
-)
-auto uninitialized_default_construct(ForwardIterator const first, Sentinel const last) {
+template<iterator ForwardIterator>
+constexpr auto uninitialized_default_construct(ForwardIterator const first, sentinel_for<ForwardIterator> auto const last) {
 	auto it = first;
 	try {
 		for (; it != last; ++it) {
@@ -192,17 +161,6 @@ auto uninitialized_default_construct(ForwardIterator const first, Sentinel const
 	} catch (...) {
 		detail::destroy_range(first, it);
 		throw;
-	}
-}
-
-template<typename ForwardIterator, typename Sentinel> requires(
-	std::is_nothrow_default_constructible_v<
-		std::decay_t<decltype(*std::declval<ForwardIterator const &>())>
-	>
-)
-constexpr auto uninitialized_default_construct(ForwardIterator first, Sentinel const last) noexcept {
-	for (; first != last; ++first) {
-		bounded::construct(*first);
 	}
 }
 

@@ -529,29 +529,29 @@ using extract_return_type = typename extract::return_type_impl<index, ExtractKey
 } // namespace detail
 
 struct ska_sort_t {
-	template<typename Iterator, typename Sentinel, typename ExtractKey> requires containers::iterator_sentinel<Iterator, Sentinel>
-	constexpr void operator()(Iterator begin, Sentinel end, ExtractKey && extract_key) const {
+	template<iterator Iterator, typename ExtractKey>
+	constexpr void operator()(Iterator begin, sentinel_for<Iterator> auto end, ExtractKey && extract_key) const {
 		detail::inplace_radix_sort<1024>(begin, end, extract_key);
 	}
 
-	template<typename Iterator, typename Sentinel> requires containers::iterator_sentinel<Iterator, Sentinel>
-	constexpr void operator()(Iterator begin, Sentinel end) const {
+	template<iterator Iterator>
+	constexpr void operator()(Iterator begin, sentinel_for<Iterator> auto end) const {
 		operator()(begin, end, detail::identity);
 	}
 
-	template<typename Range, typename ExtractKey> requires containers::range<Range>
-	constexpr void operator()(Range && range, ExtractKey && extract_key) const {
+	template<typename ExtractKey>
+	constexpr void operator()(range auto && range, ExtractKey && extract_key) const {
 		operator()(begin(range), end(range), BOUNDED_FORWARD(extract_key));
 	}
-	template<typename Range> requires containers::range<Range>
+	template<range Range>
 	constexpr void operator()(Range && range) const {
 		operator()(BOUNDED_FORWARD(range), detail::identity);
 	}
 } inline constexpr ska_sort;
 
 struct ska_sort_copy_t {
-	template<typename SourceIterator, typename Sentinel, typename BufferIterator, typename ExtractKey> requires containers::iterator_sentinel<SourceIterator, Sentinel> and containers::iterator<BufferIterator>
-	constexpr bool operator()(SourceIterator begin_, Sentinel end_, BufferIterator buffer_begin_, ExtractKey && extract_key) const {
+	template<iterator SourceIterator, iterator BufferIterator, typename ExtractKey>
+	constexpr bool operator()(SourceIterator begin_, sentinel_for<SourceIterator> auto end_, BufferIterator buffer_begin_, ExtractKey && extract_key) const {
 		auto begin = make_legacy_iterator(begin_);
 		auto end = make_legacy_iterator(end_);
 		auto buffer_begin = make_legacy_iterator(buffer_begin_);
@@ -615,16 +615,16 @@ struct ska_sort_copy_t {
 		}
 	}
 
-	template<typename SourceIterator, typename Sentinel, typename BufferIterator> requires containers::iterator_sentinel<SourceIterator, Sentinel> and containers::iterator<BufferIterator>
-	constexpr auto operator()(SourceIterator source_begin, Sentinel source_end, BufferIterator buffer_begin) const -> bool {
+	template<iterator SourceIterator, iterator BufferIterator>
+	constexpr auto operator()(SourceIterator source_begin, sentinel_for<SourceIterator> auto source_end, BufferIterator buffer_begin) const -> bool {
 		return operator()(source_begin, source_end, buffer_begin, detail::identity);
 	}
 
-	template<typename SourceRange, typename BufferRange, typename ExtractKey> requires containers::range<SourceRange> and containers::range<BufferRange>
+	template<range SourceRange, range BufferRange, typename ExtractKey>
 	constexpr auto operator()(SourceRange && source_range, BufferRange && buffer_range, ExtractKey && extract_key) const -> bool {
 		return operator()(begin(source_range), end(source_range), begin(buffer_range), BOUNDED_FORWARD(extract_key));
 	}
-	template<typename SourceRange, typename BufferRange> requires containers::range<SourceRange> and containers::range<BufferRange>
+	template<range SourceRange, range BufferRange>
 	constexpr auto operator()(SourceRange && source_range, BufferRange && buffer_range) const -> bool {
 		return operator()(source_range, buffer_range, detail::identity);
 	}
@@ -690,7 +690,7 @@ private:
 } inline constexpr ska_sort_copy;
 
 constexpr inline struct unique_ska_sort_t {
-	template<typename Range, typename ExtractKey> requires range<Range>
+	template<range Range, typename ExtractKey>
 	constexpr auto operator()(Range & range, ExtractKey extract_key) const {
 		ska_sort(range, extract_key);
 		auto const equal = [&](auto const & lhs, auto const & rhs) {
@@ -702,7 +702,7 @@ constexpr inline struct unique_ska_sort_t {
 			end(range)
 		);
 	}
-	template<typename Range> requires range<Range>
+	template<range Range>
 	constexpr auto operator()(Range && range) const {
 		return operator()(range, detail::identity);
 	}

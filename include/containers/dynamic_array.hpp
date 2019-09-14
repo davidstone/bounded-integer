@@ -81,9 +81,8 @@ constexpr auto cleanup(dynamic_array_data<T> const data) noexcept {
 
 
 
-template<typename T, typename ForwardIterator, typename Sentinel> requires
-	iterator_sentinel<ForwardIterator, Sentinel>
-auto dynamic_array_initializer(ForwardIterator first, Sentinel const last) {
+template<typename T, iterator ForwardIterator>
+auto dynamic_array_initializer(ForwardIterator first, sentinel_for<ForwardIterator> auto const last) {
 	auto const data = make_storage<T>(::containers::distance(first, last));
 	try {
 		containers::uninitialized_copy(first, last, begin(data));
@@ -95,8 +94,7 @@ auto dynamic_array_initializer(ForwardIterator first, Sentinel const last) {
 }
 
 
-template<typename T, typename Size> requires
-	std::is_convertible_v<Size, typename dynamic_array_data<T>::size_type>
+template<typename T, typename Size> requires std::is_convertible_v<Size, typename dynamic_array_data<T>::size_type>
 auto dynamic_array_initializer(Size const size) {
 	auto const data = make_storage<T>(size);
 	try {
@@ -121,16 +119,13 @@ struct dynamic_array {
 	
 	constexpr dynamic_array() = default;
 
-	template<typename ForwardIterator, typename Sentinel> requires iterator_sentinel<ForwardIterator, Sentinel>
+	template<typename ForwardIterator, sentinel_for<ForwardIterator> Sentinel>
 	constexpr dynamic_array(ForwardIterator first, Sentinel const last):
 		m_data(::containers::detail::dynamic_array_initializer<value_type>(first, last))
 	{
 	}
 	
-	template<typename Range> requires(
-		range<Range> and
-		!std::is_array_v<std::remove_cv_t<std::remove_reference_t<Range>>>
-	)
+	template<range Range> requires(!std::is_array_v<std::remove_cv_t<std::remove_reference_t<Range>>>)
 	constexpr explicit dynamic_array(Range && range) BOUNDED_NOEXCEPT_INITIALIZATION(
 		dynamic_array(begin(BOUNDED_FORWARD(range)), end(BOUNDED_FORWARD(range)))
 	) {
@@ -211,7 +206,7 @@ inline constexpr bool is_initializer_list<std::initializer_list<T>> = true;
 } // namespace detail
 
 
-template<typename T, typename Range> requires(range<Range> and !detail::is_initializer_list<std::decay_t<Range>>)
+template<typename T, range Range> requires(!detail::is_initializer_list<std::decay_t<Range>>)
 auto assign(dynamic_array<T> & container, Range && range) {
 	auto const difference = detail::linear_size(range);
 	if (difference == size(container)) {

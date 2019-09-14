@@ -14,7 +14,7 @@
 namespace containers {
 namespace detail {
 
-template<typename Range, typename Iterator> requires(range<Range> and iterator<Iterator>)
+template<range Range, iterator Iterator>
 constexpr auto mutable_iterator(Range & range, Iterator const it) BOUNDED_NOEXCEPT_VALUE(
 	begin(range) + (it - begin(range))
 )

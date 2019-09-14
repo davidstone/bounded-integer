@@ -21,9 +21,7 @@ namespace detail {
 namespace common {
 
 // TODO: noexcept
-template<typename Container, typename Range> requires(
-	is_container<Container> and range<Range>
-)
+template<container Container, range Range>
 constexpr auto assign(Container & container, Range && range) {
 	auto it = begin(container);
 	auto first = begin(BOUNDED_FORWARD(range));
@@ -38,7 +36,7 @@ constexpr auto assign(Container & container, Range && range) {
 	erase(container, it, end(container));
 	append(container, range_view(first, last));
 }
-template<typename Container> requires is_container<Container>
+template<container Container>
 constexpr auto assign(Container & container, std::initializer_list<typename Container::value_type> init) BOUNDED_NOEXCEPT(
 	assign(container, range_view(init))
 )

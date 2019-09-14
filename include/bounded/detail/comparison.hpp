@@ -71,13 +71,6 @@ constexpr inline strong_ordering strong_ordering::equal(0);
 constexpr inline strong_ordering strong_ordering::greater(1);
 constexpr inline strong_ordering strong_ordering::less(-1);
 
-#if 0
-template<typename LHS, typename RHS> requires(not detail::builtin_integer<LHS> or !detail::builtin_integer<RHS>)
-constexpr auto compare(LHS const & lhs, RHS const & rhs) BOUNDED_NOEXCEPT_DECLTYPE(
-	lhs <=> rhs
-)
-#endif
-
 namespace detail {
 
 template<typename LHS, typename RHS>
@@ -103,13 +96,13 @@ constexpr auto compare(LHS const lhs, RHS const rhs) noexcept {
 	return detail::builtin_compare(lhs, rhs);
 }
 
-template<typename LHS, typename RHS> requires(detail::builtin_integer<LHS> and detail::builtin_integer<RHS>)
+template<detail_builtin_integer LHS, detail_builtin_integer RHS>
 constexpr auto compare(LHS const lhs, RHS const rhs) noexcept -> strong_ordering {
-	if constexpr (detail::signed_builtin<LHS> == detail::signed_builtin<RHS>) {
+	if constexpr (detail_signed_builtin<LHS> == detail_signed_builtin<RHS>) {
 		return detail::builtin_compare(lhs, rhs);
 	} else if constexpr (not std::is_same_v<LHS, detail::max_unsigned_t> and not std::is_same_v<RHS, detail::max_unsigned_t>) {
 		return detail::builtin_compare(static_cast<detail::max_signed_t>(lhs), static_cast<detail::max_signed_t>(rhs));
-	} else if constexpr (detail::signed_builtin<LHS>) {
+	} else if constexpr (detail_signed_builtin<LHS>) {
 		static_assert(std::is_same_v<RHS, detail::max_unsigned_t>);
 		return lhs < 0 ? strong_ordering::less : detail::builtin_compare(static_cast<RHS>(lhs), rhs);
 	} else {
@@ -126,14 +119,14 @@ constexpr auto compare(Enum const lhs, Enum const rhs) noexcept {
 
 namespace detail {
 
-template<typename LHS, typename RHS> requires(detail::builtin_integer<LHS> and detail::builtin_integer<RHS>)
+template<detail_builtin_integer LHS, detail_builtin_integer RHS>
 constexpr auto safe_equal(LHS const lhs, RHS const rhs) noexcept -> bool {
-	constexpr auto signed_max [[maybe_unused]] = basic_numeric_limits<detail::max_signed_t>::max();
-	if constexpr (detail::signed_builtin<LHS> == detail::signed_builtin<RHS>) {
+	constexpr auto signed_max = basic_numeric_limits<detail::max_signed_t>::max();
+	if constexpr (detail_signed_builtin<LHS> == detail_signed_builtin<RHS>) {
 		return lhs == rhs;
 	} else if constexpr (basic_numeric_limits<LHS>::max() <= signed_max and basic_numeric_limits<RHS>::max() <= signed_max) {
 		return static_cast<detail::max_signed_t>(lhs) == static_cast<detail::max_signed_t>(rhs);
-	} else if constexpr (detail::signed_builtin<LHS>) {
+	} else if constexpr (detail_signed_builtin<LHS>) {
 		static_assert(std::is_same_v<RHS, detail::max_unsigned_t>);
 		return lhs >= 0 and static_cast<RHS>(lhs) == rhs;
 	} else {
@@ -146,7 +139,7 @@ template<typename Limited, typename UnaryFunction, typename LHS, typename RHS>
 constexpr auto safe_extreme(UnaryFunction const pick_lhs, LHS const lhs_, RHS const rhs_) noexcept {
 	auto normalized = [](auto const value) {
 		using normalized_t = std::conditional_t<
-			signed_builtin<std::decay_t<decltype(value)>>,
+			detail_signed_builtin<std::decay_t<decltype(value)>>,
 			max_signed_t,
 			max_unsigned_t
 		>;
@@ -178,8 +171,8 @@ constexpr auto safe_max(Ts... values) noexcept {
 }	// namespace detail
 
 
-template<typename LHS, typename RHS> requires(bounded_integer<LHS> and bounded_integer<RHS>)
-constexpr auto compare(LHS const & lhs [[maybe_unused]], RHS const & rhs [[maybe_unused]]) noexcept {
+template<bounded_integer LHS, bounded_integer RHS>
+constexpr auto compare(LHS const & lhs, RHS const & rhs) noexcept {
 	using lhs_limits = basic_numeric_limits<LHS>;
 	using rhs_limits = basic_numeric_limits<RHS>;
 	if constexpr (compare(lhs_limits::min(), rhs_limits::max()) > 0) {
@@ -194,8 +187,8 @@ constexpr auto compare(LHS const & lhs [[maybe_unused]], RHS const & rhs [[maybe
 }
 
 
-template<typename LHS, typename RHS> requires(bounded_integer<LHS> and bounded_integer<RHS>)
-constexpr auto operator==(LHS const & lhs [[maybe_unused]], RHS const & rhs [[maybe_unused]]) noexcept {
+template<bounded_integer LHS, bounded_integer RHS>
+constexpr auto operator==(LHS const & lhs, RHS const & rhs) noexcept {
 	using lhs_limits = basic_numeric_limits<LHS>;
 	using rhs_limits = basic_numeric_limits<RHS>;
 	if constexpr (compare(lhs_limits::min(), rhs_limits::max()) > 0 or compare(lhs_limits::max(), rhs_limits::min()) < 0) {
@@ -208,14 +201,14 @@ constexpr auto operator==(LHS const & lhs [[maybe_unused]], RHS const & rhs [[ma
 }
 
 
-template<typename LHS, typename RHS>
+// Requires true makes this a better match than the reverse option
+template<typename LHS, typename RHS> requires true
 constexpr auto compare(LHS const & lhs, RHS const & rhs) BOUNDED_NOEXCEPT_DECLTYPE(
 	compare(lhs.compare(rhs), 0)
 )
 
-// Variadic makes this function always a worse match than the above
-template<typename LHS, typename RHS, typename... Ignore> requires(sizeof...(Ignore) == 0)
-constexpr auto compare(LHS const & lhs, RHS const & rhs, Ignore...) BOUNDED_NOEXCEPT_DECLTYPE(
+template<typename LHS, typename RHS>
+constexpr auto compare(LHS const & lhs, RHS const & rhs) BOUNDED_NOEXCEPT_DECLTYPE(
 	compare(0, rhs.compare(lhs))
 )
 

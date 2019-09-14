@@ -45,7 +45,7 @@ constexpr auto operator++(T & value) BOUNDED_NOEXCEPT_DECLTYPE(
 template<typename T>
 concept incrementable = requires(T value) { ++value; };
 
-template<typename T> requires(incrementable<T> and std::is_copy_constructible_v<T>)
+template<incrementable T> requires std::is_copy_constructible_v<T>
 constexpr auto operator++(T & value, int) noexcept(std::is_nothrow_copy_constructible_v<T> and std::is_nothrow_move_constructible_v<T> and noexcept(++value)) {
 	auto previous = value;
 	++value;
@@ -61,7 +61,7 @@ constexpr auto operator--(T & value) BOUNDED_NOEXCEPT_DECLTYPE(
 template<typename T>
 concept decrementable = requires(T value) { --value; };
 
-template<typename T> requires(decrementable<T>)
+template<decrementable T> requires std::is_copy_constructible_v<T>
 constexpr auto operator--(T & value, int) noexcept(std::is_nothrow_copy_constructible_v<T> and std::is_nothrow_move_constructible_v<T> and noexcept(--value)) {
 	auto previous = value;
 	--value;

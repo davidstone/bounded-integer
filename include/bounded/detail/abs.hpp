@@ -12,7 +12,7 @@
 
 namespace bounded {
 
-template<typename Integer> requires bounded_integer<Integer>
+template<bounded_integer Integer>
 constexpr auto abs(Integer const value) noexcept {
 	if constexpr (Integer::min() >= constant<0>) {
 		return value;

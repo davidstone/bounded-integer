@@ -114,7 +114,7 @@ concept extract_key_function = requires(ExtractKey const & extract_key, T const 
 // operator. To get the code to work with a vector, we have to sacrifice some
 // compile-time checks.
 
-template<typename Container, typename ExtractKey, bool allow_duplicates> requires extract_key_function<ExtractKey, typename Container::value_type::key_type>
+template<typename Container, extract_key_function<typename Container::value_type::key_type> ExtractKey, bool allow_duplicates>
 struct flat_map_base {
 private:
 	Container m_container;
@@ -141,14 +141,14 @@ public:
 	{
 	}
 
-	template<typename InputRange> requires range<InputRange>
+	template<range InputRange>
 	constexpr explicit flat_map_base(InputRange && range):
 		m_container(BOUNDED_FORWARD(range))
 	{
 		unique_ska_sort(m_container, extract_key());
 	}
 
-	template<typename InputRange> requires range<InputRange>
+	template<range InputRange>
 	constexpr flat_map_base(InputRange && range, ExtractKey extract_key):
 		m_container(BOUNDED_FORWARD(range)),
 		m_extract_key(std::move(extract_key))
@@ -156,14 +156,14 @@ public:
 		unique_ska_sort(m_container, extract_key());
 	}
 
-	template<typename InputRange> requires range<InputRange>
+	template<range InputRange>
 	constexpr flat_map_base(assume_sorted_unique_t, InputRange && range):
 		m_container(BOUNDED_FORWARD(range))
 	{
 		BOUNDED_ASSERT(is_sorted(m_container, compare()));
 	}
 
-	template<typename InputRange> requires range<InputRange>
+	template<range InputRange>
 	constexpr flat_map_base(assume_sorted_unique_t, InputRange && range, ExtractKey extract_key):
 		m_container(BOUNDED_FORWARD(range)),
 		m_extract_key(std::move(extract_key))
@@ -171,14 +171,14 @@ public:
 		BOUNDED_ASSERT(is_sorted(m_container, compare()));
 	}
 
-	template<typename InputRange> requires range<InputRange>
+	template<range InputRange>
 	constexpr flat_map_base(assume_unique_t, InputRange && range):
 		m_container(BOUNDED_FORWARD(range))
 	{
 		ska_sort(m_container, extract_key());
 	}
 
-	template<typename InputRange> requires range<InputRange>
+	template<range InputRange>
 	constexpr flat_map_base(assume_unique_t, InputRange && range, ExtractKey extract_key):
 		m_container(BOUNDED_FORWARD(range)),
 		m_extract_key(std::move(extract_key))

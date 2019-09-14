@@ -11,36 +11,24 @@
 
 namespace bounded {
 	
-template<typename LHS, typename RHS> requires(bounded_integer<LHS> and detail::builtin_integer<RHS>)
-constexpr auto compare(LHS const lhs, RHS const rhs) noexcept {
+constexpr auto compare(bounded_integer auto const lhs, detail_builtin_integer auto const rhs) noexcept {
 	return compare(lhs, integer(rhs));
 }
-
-template<typename LHS, typename RHS> requires(detail::builtin_integer<LHS> and bounded_integer<RHS>)
-constexpr auto compare(LHS const lhs, RHS const rhs) noexcept {
+constexpr auto compare(detail_builtin_integer auto const lhs, bounded_integer auto const rhs) noexcept {
 	return compare(integer(lhs), rhs);
 }
 
-template<typename LHS, typename RHS> requires(bounded_integer<LHS> and detail::builtin_integer<RHS>)
-constexpr auto operator==(LHS const lhs, RHS const rhs) noexcept {
+constexpr auto operator==(bounded_integer auto const lhs, detail_builtin_integer auto const rhs) noexcept {
 	return lhs == integer(rhs);
 }
-
-template<typename LHS, typename RHS> requires(detail::builtin_integer<LHS> and bounded_integer<RHS>)
-constexpr auto operator==(LHS const lhs, RHS const rhs) noexcept {
+constexpr auto operator==(detail_builtin_integer auto const lhs, bounded_integer auto const rhs) noexcept {
 	return integer(lhs) == rhs;
 }
 
-template<typename LHS> requires bounded_integer<LHS>
-constexpr auto compare(LHS const lhs, bool const rhs) = delete;
+constexpr auto compare(bounded_integer auto const lhs, bool const rhs) = delete;
+constexpr auto compare(bool const lhs, bounded_integer auto const rhs) = delete;
 
-template<typename RHS> requires bounded_integer<RHS>
-constexpr auto compare(bool const lhs, RHS const rhs) = delete;
-
-template<typename LHS> requires bounded_integer<LHS>
-constexpr auto operator==(LHS const lhs, bool const rhs) = delete;
-
-template<typename RHS> requires bounded_integer<RHS>
-constexpr auto operator==(bool const lhs, RHS const rhs) = delete;
+constexpr auto operator==(bounded_integer auto const lhs, bool const rhs) = delete;
+constexpr auto operator==(bool const lhs, bounded_integer auto const rhs) = delete;
 
 }	// namespace bounded

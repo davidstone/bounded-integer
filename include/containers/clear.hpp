@@ -19,7 +19,7 @@ concept member_pop_frontable = requires(Container & container) { container.pop_f
 namespace common {
 
 // TODO: Should probably get rid of the fallback to default construction
-template<typename Container> requires is_container<Container>
+template<container Container>
 constexpr auto clear(Container & container) noexcept {
 	if constexpr (pop_backable<Container>) {
 		while (!empty(container)) {

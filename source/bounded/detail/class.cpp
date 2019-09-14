@@ -14,23 +14,28 @@
 
 namespace {
 
+static_assert(bounded::detail::overlapping_integer<bounded::integer<0, 0>, 0, 0, bounded::null_policy>, "Type should overlap its own range.");
+static_assert(!bounded::detail::overlapping_integer<bounded::integer<0, 0>, 1, 1, bounded::null_policy>, "Type should not overlap a disjoint range.");
+
+static_assert(bounded::detail::bounded_by_range<bounded::integer<0, 0>, -1, 1, bounded::null_policy>);
+static_assert(!bounded::detail::bounded_by_range<bounded::integer<0, 1>, 0, 0, bounded::null_policy>);
+
 static_assert(std::is_empty<bounded::constant_t<0>>{});
 static_assert(std::is_empty<bounded::constant_t<1>>{});
 static_assert(std::is_empty<bounded::constant_t<-1>>{});
 static_assert(std::is_empty<bounded::constant_t<std::numeric_limits<std::intmax_t>::min()>>{});
 
-constexpr auto check_constructibility() {
+static_assert(!std::is_convertible_v<bool, bounded::integer<0, 1>>);
+static_assert(std::is_constructible_v<bounded::integer<0, 1>, bool>);
+static_assert(!std::is_constructible_v<bounded::clamped_integer<0, 0>, bool>);
+
+namespace check_constructibility {
 	constexpr auto min = std::numeric_limits<int>::min();
 	constexpr auto max = std::numeric_limits<int>::max();
 	using type = bounded::integer<min, max, bounded::null_policy>;
 	static_assert(
-		bounded::detail::type_overlaps_range<type>(min, max),
+		bounded::detail::overlapping_integer<type, min, max, bounded::null_policy>,
 		"Bounds of type do not overlap its own range."
-	);
-
-	static_assert(
-		bounded::detail::is_explicitly_constructible_from<bounded::null_policy, type>(min, max),
-		"Type is not explicitly constructible from itself."
 	);
 
 	static_assert(
@@ -50,11 +55,7 @@ constexpr auto check_constructibility() {
 		std::is_constructible_v<type, bool>,
 		"Should be able to construct a bounded::integer from a bool."
 	);
-	
-	return true;
 }
-
-static_assert(check_constructibility());
 
 static_assert(homogeneous_equals(
 	BOUNDED_CONDITIONAL(true, bounded::constant<7>, bounded::constant<9>),
@@ -91,7 +92,6 @@ struct basic_numeric_limits<bounded_enum> {
 	}
 	static constexpr bool is_specialized = true;
 	static constexpr bool is_integer = false;
-	static constexpr bool is_bounded = true;
 };
 
 } // namespace bounded

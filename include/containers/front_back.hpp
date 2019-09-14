@@ -21,12 +21,12 @@ namespace detail {
 namespace common {
 
 // TODO: noexcept should take into account return value
-template<typename Range> requires range<Range>
+template<range Range>
 constexpr decltype(auto) front(Range && range) noexcept(never_empty_range<Range>) {
 	BOUNDED_ASSERT(!empty(range));
 	return *begin(BOUNDED_FORWARD(range));
 }
-template<typename Range> requires range<Range>
+template<range Range>
 constexpr decltype(auto) back(Range && range) noexcept(never_empty_range<Range>) {
 	BOUNDED_ASSERT(!empty(range));
 	return *containers::prev(end(BOUNDED_FORWARD(range)));

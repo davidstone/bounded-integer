@@ -29,12 +29,12 @@ namespace detail {
 // __FILE__ and __LINE__, which may end up being a good idea if there are
 // several functions that follow this pattern.
 
-template<typename Iterator> requires iterator<Iterator>
+template<iterator Iterator>
 constexpr auto operator_bracket(Iterator && iterator, index_type<std::decay_t<Iterator>> const index) BOUNDED_NOEXCEPT_DECLTYPE(
 	*(BOUNDED_FORWARD(iterator) + index)
 )
 
-template<typename Range> requires range<Range>
+template<range Range>
 constexpr auto operator_bracket(Range && range, index_type<std::decay_t<Range>> const index) noexcept(
 	noexcept(index < size(range)) and
 	noexcept(*(begin(BOUNDED_FORWARD(range)) + index)) and

@@ -25,25 +25,13 @@ namespace bounded {
 namespace detail {
 
 template<typename T>
-concept integer_constructible_from = basic_numeric_limits<T>::is_specialized and (basic_numeric_limits<T>::is_integer or std::is_enum_v<std::decay_t<T>>);
+concept generic_integer = basic_numeric_limits<T>::is_specialized and !std::is_same_v<T, bool> and (basic_numeric_limits<T>::is_integer or std::is_enum_v<T>);
 
-template<typename T, typename Minimum, typename Maximum>
-constexpr auto is_implicitly_constructible_from(Minimum const minimum [[maybe_unused]], Maximum const maximum [[maybe_unused]]) noexcept {
-	if constexpr (integer_constructible_from<T> and !std::is_same<std::decay_t<T>, bool>{}) {
-		return type_fits_in_range<std::decay_t<T>>(minimum, maximum);
-	} else {
-		return false;
-	}
-}
+template<typename T, auto minimum, auto maximum, typename policy>
+concept overlapping_integer = generic_integer<T> and (!policy::overflow_is_error or (compare(basic_numeric_limits<T>::min(), maximum) <= 0 and compare(minimum, basic_numeric_limits<T>::max()) <= 0));
 
-template<typename policy, typename T, typename Minimum, typename Maximum>
-constexpr auto is_explicitly_constructible_from(Minimum const minimum [[maybe_unused]], Maximum const maximum [[maybe_unused]]) noexcept {
-	if constexpr (integer_constructible_from<T>) {
-		return type_overlaps_range<std::decay_t<T>>(minimum, maximum) or !policy::overflow_is_error;
-	} else {
-		return false;
-	}
-}
+template<typename T, auto minimum, auto maximum, typename policy>
+concept bounded_by_range = overlapping_integer<T, minimum, maximum, policy> and compare(minimum, basic_numeric_limits<T>::min()) <= 0 and compare(basic_numeric_limits<T>::max(), maximum) <= 0;
 
 
 // Necessary for optional specialization
@@ -55,7 +43,7 @@ concept has_extra_space =
 
 template<typename Integer>
 constexpr auto as_builtin_integer(Integer const x) noexcept {
-	if constexpr (detail::builtin_integer<Integer>) {
+	if constexpr (detail_builtin_integer<Integer>) {
 		return x;
 	} else {
 		static_assert(bounded_integer<Integer>);
@@ -136,9 +124,14 @@ template<auto value, typename overflow_policy = null_policy>
 inline constexpr auto constant = constant_t<detail::normalize<value>, overflow_policy>{};
 
 
+// TODO: Use terse concepts syntax on most of these functions after fix for
+// https://github.com/saarraz/clang-concepts-monorepo/issues/20 and
+// https://github.com/saarraz/clang-concepts-monorepo/issues/21
+
 template<auto minimum, auto maximum, typename overflow_policy_ = null_policy>
 struct integer : private detail::base<minimum, maximum> {
 private:
+	// TODO: Remove these decays
 	static_assert(std::is_same_v<std::decay_t<decltype(minimum)>, std::decay_t<decltype(detail::normalize<minimum>)>>);
 	static_assert(std::is_same_v< std::decay_t<decltype(maximum)>, std::decay_t<decltype(detail::normalize<maximum>)>>);
 	using base = detail::base<minimum, maximum>;
@@ -179,50 +172,37 @@ public:
 
 	// Use non_check_t constructors if you know by means that cannot be
 	// determined by the type system that the value fits in the range.
-	template<typename T> requires(
-		detail::is_explicitly_constructible_from<overflow_policy, T const &>(minimum, maximum)
-	)
+
+	template<typename T> requires(detail::overlapping_integer<T, minimum, maximum, overflow_policy> or std::is_same_v<T, bool>)
 	constexpr integer(T const & other, non_check_t) noexcept:
 		base(static_cast<underlying_type>(other)) {
 	}
 
-
-	// Intentionally implicit: this is safe because the value is in range
-	template<typename T> requires(
-		detail::is_implicitly_constructible_from<T const &>(minimum, maximum)
-	)
-	constexpr integer(T const & other, overflow_policy = overflow_policy{}) BOUNDED_NOEXCEPT_INITIALIZATION(
+	template<typename T> requires detail::bounded_by_range<T, minimum, maximum, overflow_policy>
+	constexpr integer(T const other, overflow_policy = overflow_policy{}) BOUNDED_NOEXCEPT_INITIALIZATION(
 		integer(other, non_check)
 	) {
 	}
 
-	template<typename T> requires(
-		!detail::is_implicitly_constructible_from<T const &>(minimum, maximum) and
-		detail::is_explicitly_constructible_from<overflow_policy, T const &>(minimum, maximum) and
-		!std::is_same_v<T, bool>
-	)
+	template<typename T> requires detail::overlapping_integer<T, minimum, maximum, overflow_policy>
 	constexpr explicit integer(T const & other, overflow_policy = overflow_policy{}) BOUNDED_NOEXCEPT_INITIALIZATION(
 		integer(apply_overflow_policy(detail::as_integer(other)), non_check)
 	) {
 	}
 
-	template<typename T> requires(
-		detail::is_explicitly_constructible_from<overflow_policy, T const &>(minimum, maximum) and
-		std::is_same_v<T, bool>
-	)
-	constexpr explicit integer(T const & other, overflow_policy = overflow_policy{}) BOUNDED_NOEXCEPT_INITIALIZATION(
-		integer(apply_overflow_policy(integer<0, 1>(other, non_check)), non_check)
-	) {
+	constexpr explicit integer(bool const other, overflow_policy = overflow_policy{}) noexcept requires(minimum <= 0 and 1 <= maximum):
+		integer(other, non_check)
+	{
 	}
 
 	template<typename Enum> requires(
-		std::is_enum_v<Enum> and !detail::is_explicitly_constructible_from<overflow_policy, Enum>(minimum, maximum)
+		std::is_enum_v<Enum> and !detail::overlapping_integer<Enum, minimum, maximum, overflow_policy>
 	)
 	constexpr integer(Enum other, non_check_t) noexcept:
 		integer(static_cast<std::underlying_type_t<Enum>>(other), non_check) {
 	}
 	template<typename Enum> requires(
-		std::is_enum_v<Enum> and !detail::is_explicitly_constructible_from<overflow_policy, Enum>(minimum, maximum)
+		std::is_enum_v<Enum> and !detail::overlapping_integer<Enum, minimum, maximum, overflow_policy>
 	)
 	constexpr explicit integer(Enum other, overflow_policy = overflow_policy{}) BOUNDED_NOEXCEPT_INITIALIZATION(
 		integer(static_cast<std::underlying_type_t<Enum>>(other)) 
@@ -230,10 +210,6 @@ public:
 	}
 
 
-	// volatile qualified overloads do not return a reference to the object to
-	// avoid any confusion over what qualifies as a read of a volatile variable.
-	// gcc does not consider it a read and gives you a warning if your
-	// assignment operator returns an unused reference.
 	template<typename T>
 	constexpr auto && unchecked_assignment(T const & other) & noexcept {
 		base::assign(static_cast<underlying_type>(other));
@@ -247,15 +223,11 @@ public:
 	constexpr auto operator=(integer const & other) & noexcept -> integer & = default;
 	constexpr auto operator=(integer && other) & noexcept -> integer & = default;
 
-	template<typename T> requires(
-		detail::is_explicitly_constructible_from<overflow_policy, T const &>(minimum, maximum)
-	)
+	template<typename T> requires detail::overlapping_integer<T, minimum, maximum, overflow_policy>
 	constexpr auto && operator=(T const & other) & noexcept(noexcept(apply_overflow_policy(other))) {
 		return unchecked_assignment(apply_overflow_policy(other));
 	}
-	template<typename T> requires(
-		detail::is_explicitly_constructible_from<overflow_policy, T const &>(minimum, maximum)
-	)
+	template<typename T> requires detail::overlapping_integer<T, minimum, maximum, overflow_policy>
 	auto operator=(T const & other) volatile & noexcept(noexcept(apply_overflow_policy(other))) {
 		unchecked_assignment(apply_overflow_policy(other));
 	}
@@ -263,11 +235,11 @@ public:
 	// Do not verify that the value is in range because the user has requested a
 	// conversion out of the safety of bounded::integer. It is subject to all
 	// the standard rules of conversion from one integer type to another.
-	template<typename T> requires (detail::builtin_arithmetic<T> or std::is_enum_v<T>)
+	template<typename T> requires (detail_builtin_arithmetic<T> or std::is_enum_v<T>)
 	constexpr explicit operator T() const noexcept {
 		return static_cast<T>(value());
 	}
-	template<typename T> requires (detail::builtin_arithmetic<T> or std::is_enum_v<T>)
+	template<typename T> requires (detail_builtin_arithmetic<T> or std::is_enum_v<T>)
 	constexpr explicit operator T() const volatile noexcept {
 		return static_cast<T>(value());
 	}
@@ -280,12 +252,11 @@ public:
 
 	// Cannot use BOUNDED_NOEXCEPT_VOID because of gcc bug
 	// https://gcc.gnu.org/bugzilla/show_bug.cgi?id=52869
-	template<typename Tag, typename... Args> requires(
-		std::is_same_v<Tag, optional_tag> and
+	template<typename... Args> requires(
 		detail::has_extra_space<integer> and
 		std::is_constructible_v<integer, Args...>
 	)
-	constexpr auto initialize(Tag, Args... args) noexcept(std::is_nothrow_constructible_v<integer, Args...>) {
+	constexpr auto initialize(optional_tag, Args... args) noexcept(std::is_nothrow_constructible_v<integer, Args...>) {
 		return *this = integer(args...);
 	}
 

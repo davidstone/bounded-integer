@@ -6,6 +6,8 @@
 #pragma once
 
 #include <containers/algorithms/find.hpp>
+#include <containers/is_iterator_sentinel.hpp>
+#include <containers/is_range.hpp>
 
 #include <bounded/integer.hpp>
 #include <bounded/optional.hpp>
@@ -14,42 +16,31 @@
 #include <utility>
 
 namespace containers {
-namespace detail {
-
-template<typename ForwardIterator, typename Sentinel> requires
-	std::is_lvalue_reference_v<decltype(*std::declval<ForwardIterator>())>
-constexpr auto maybe_find_if_helper(ForwardIterator const it, Sentinel const last) BOUNDED_NOEXCEPT_VALUE(
-	it != last ? std::addressof(*it) : nullptr
-)
-
-template<typename ForwardIterator, typename Sentinel> requires(
-	!std::is_lvalue_reference_v<decltype(*std::declval<ForwardIterator>())>
-)
-constexpr auto maybe_find_if_helper(ForwardIterator const it, Sentinel const last) BOUNDED_NOEXCEPT_VALUE(
-	it != last ? bounded::make_optional(*it) : bounded::none
-)
-
-} // namespace detail
 
 // the maybe_find functions return a value contextually convertible to bool. If
 // the range contains the element, it can be dereferenced as an optional
-template<typename ForwardIterator, typename Sentinel, typename UnaryPredicate>
-constexpr auto maybe_find_if(ForwardIterator const first, Sentinel const last, UnaryPredicate p) BOUNDED_NOEXCEPT_VALUE(
-	::containers::detail::maybe_find_if_helper(::containers::find_if(first, last, std::move(p)), last)
-)
+template<iterator ForwardIterator, typename UnaryPredicate>
+constexpr auto maybe_find_if(ForwardIterator const first, sentinel_for<ForwardIterator> auto const last, UnaryPredicate p) {
+	auto const it = ::containers::find_if(first, last, std::move(p));
+	if constexpr (std::is_lvalue_reference_v<decltype(*it)>) {
+		return it != last ? std::addressof(*it) : nullptr;
+	} else {
+		return it != last ? bounded::make_optional(*it) : bounded::none;
+	}
+}
 
-template<typename Range, typename UnaryPredicate>
+template<range Range, typename UnaryPredicate>
 constexpr auto maybe_find_if(Range && range, UnaryPredicate p) BOUNDED_NOEXCEPT_VALUE(
 	::containers::maybe_find_if(begin(BOUNDED_FORWARD(range)), end(BOUNDED_FORWARD(range)), std::move(p))
 )
 
 
-template<typename ForwardIterator, typename Sentinel, typename T>
-constexpr auto maybe_find(ForwardIterator const first, Sentinel const last, T const & value) BOUNDED_NOEXCEPT_VALUE(
+template<iterator ForwardIterator, typename T>
+constexpr auto maybe_find(ForwardIterator const first, sentinel_for<ForwardIterator> auto const last, T const & value) BOUNDED_NOEXCEPT_VALUE(
 	::containers::maybe_find_if(first, last, bounded::equal_to(value))
 )
 
-template<typename Range, typename T>
+template<range Range, typename T>
 constexpr auto maybe_find(Range && range, T const & value) BOUNDED_NOEXCEPT_VALUE(
 	::containers::maybe_find(begin(BOUNDED_FORWARD(range)), end(BOUNDED_FORWARD(range)), value)
 )

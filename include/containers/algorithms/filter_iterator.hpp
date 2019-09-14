@@ -22,7 +22,6 @@ using namespace bounded::literal;
 
 namespace detail {
 
-// TODO: Switch to [[no_unique_address]] when supported
 template<typename Sentinel, typename UnaryPredicate>
 struct filter_iterator_traits : default_dereference, default_compare {
 private:
@@ -68,33 +67,34 @@ inline constexpr auto is_filter_iterator_traits<T const> = is_filter_iterator_tr
 
 } // namespace detail
 
+// TODO: Change name to something without "is"
 template<typename T>
 concept is_filter_iterator_traits = detail::is_filter_iterator_traits<T>;
 
 struct filter_iterator_sentinel {
 };
 
-template<typename Iterator, typename Traits> requires is_filter_iterator_traits<Traits>
+template<typename Iterator, is_filter_iterator_traits Traits>
 constexpr auto compare(adapt_iterator<Iterator, Traits> const lhs, filter_iterator_sentinel) BOUNDED_NOEXCEPT_DECLTYPE(
 	lhs.traits().compare(lhs.base(), lhs.traits().sentinel())
 )
 
-template<typename Iterator, typename Traits> requires is_filter_iterator_traits<Traits>
+template<typename Iterator, is_filter_iterator_traits Traits>
 constexpr auto compare(filter_iterator_sentinel, adapt_iterator<Iterator, Traits> const rhs) BOUNDED_NOEXCEPT_DECLTYPE(
 	rhs.traits().compare(rhs.traits().sentinel(), rhs.base())
 )
 
-template<typename Iterator, typename Traits> requires is_filter_iterator_traits<Traits>
+template<typename Iterator, is_filter_iterator_traits Traits>
 constexpr auto operator==(adapt_iterator<Iterator, Traits> const lhs, filter_iterator_sentinel) BOUNDED_NOEXCEPT_DECLTYPE(
 	lhs.traits().equal(lhs.base(), lhs.traits().sentinel())
 )
 
-template<typename Iterator, typename Traits> requires is_filter_iterator_traits<Traits>
+template<typename Iterator, is_filter_iterator_traits Traits>
 constexpr auto operator==(filter_iterator_sentinel, adapt_iterator<Iterator, Traits> const rhs) BOUNDED_NOEXCEPT_DECLTYPE(
 	rhs.traits().equal(rhs.traits().sentinel(), rhs.base())
 )
 
-template<typename ForwardIterator, typename Traits>
+template<typename ForwardIterator, is_filter_iterator_traits Traits>
 constexpr auto filter_iterator_impl(ForwardIterator first, Traits traits) BOUNDED_NOEXCEPT_VALUE(
 	containers::adapt_iterator(
 		containers::find_if(first, containers::unwrap(traits).sentinel(), containers::unwrap(traits).predicate()),

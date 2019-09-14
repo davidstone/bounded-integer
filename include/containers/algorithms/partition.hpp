@@ -26,21 +26,21 @@ constexpr void swap(LHS & lhs, RHS & rhs) {
 }
 
 constexpr inline struct is_partitioned_t {
-	template<typename Range, typename UnaryPredicate>
-	constexpr auto operator()(Range && range, UnaryPredicate predicate) const -> bool {
-		auto first = begin(range);
-		auto last = end(range);
+	template<typename UnaryPredicate>
+	constexpr auto operator()(range auto && input, UnaryPredicate predicate) const -> bool {
+		auto first = begin(input);
+		auto last = end(input);
 		auto it = containers::find_if_not(first, last, predicate);
 		return containers::find_if(it, last, predicate) == last;
 	}
 } is_partitioned;
 
 constexpr inline struct partition_point_t {
-	template<typename Range, typename UnaryPredicate> requires range<Range>
-	constexpr auto operator()(Range && range, UnaryPredicate predicate) const {
-		using size_type = decltype(size(range));
-		auto count = bounded::integer<0, bounded::detail::normalize<std::numeric_limits<size_type>::max().value()>>(size(range));
-		auto first = begin(range);
+	template<typename UnaryPredicate>
+	constexpr auto operator()(range auto && input, UnaryPredicate predicate) const {
+		using size_type = decltype(size(input));
+		auto count = bounded::integer<0, bounded::detail::normalize<std::numeric_limits<size_type>::max().value()>>(size(input));
+		auto first = begin(input);
 		if constexpr (count.max() == bounded::constant<0>) {
 			return first;
 		} else {
@@ -61,25 +61,16 @@ constexpr inline struct partition_point_t {
 } partition_point;
 
 
-namespace detail {
-
-template<typename Iterator>
-concept reversible_iterator = requires(Iterator it) {
-	--it;
-};
-
-} // namespace detail
-
 // TODO: Support bidirectional iterators
 constexpr inline struct partition_t {
-	template<typename ForwardIterator, typename Sentinel, typename UnaryPredicate> requires iterator_sentinel<ForwardIterator, Sentinel>
-	constexpr auto operator()(ForwardIterator first, Sentinel last, UnaryPredicate predicate) const {
+	template<iterator ForwardIterator, typename UnaryPredicate>
+	constexpr auto operator()(ForwardIterator first, sentinel_for<ForwardIterator> auto last, UnaryPredicate predicate) const {
 		auto advance_first = [&]{
 			first = containers::find_if_not(first, last, predicate);
 		};
 		advance_first();
 
-		if constexpr (detail::reversible_iterator<Sentinel>) {
+		if constexpr (bounded::detail::arithmetic::decrementable<decltype(last)>) {
 			auto advance_last = [&]{
 				while (first != last) {
 					--last;
@@ -111,9 +102,9 @@ constexpr inline struct partition_t {
 		}
 		return first;
 	}
-	template<typename Range, typename UnaryPredicate> requires range<Range>
-	constexpr auto operator()(Range && range, UnaryPredicate predicate) const {
-		return operator()(begin(range), end(range), predicate);
+	template<typename UnaryPredicate>
+	constexpr auto operator()(range auto && input, UnaryPredicate predicate) const {
+		return operator()(begin(input), end(input), predicate);
 	}
 } partition;
 

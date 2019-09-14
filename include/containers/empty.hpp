@@ -22,7 +22,7 @@ namespace common {
 template<typename Range>
 concept never_empty_range = std::numeric_limits<typename std::remove_reference_t<Range>::size_type>::min() > 0_bi;
 
-template<typename Range> requires range<Range>
+template<range Range>
 constexpr auto empty(Range const & range) noexcept {
 	// The never_empty check is not needed for correctness, but allows this
 	// function to be constexpr in more situations.

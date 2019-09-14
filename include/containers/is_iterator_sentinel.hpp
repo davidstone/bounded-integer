@@ -11,7 +11,7 @@
 
 namespace containers {
 
-template<typename Iterator, typename Sentinel>
-concept iterator_sentinel = iterator<Iterator> and bounded::equality_comparable<Iterator, Sentinel>;
+template<typename Sentinel, typename Iterator>
+concept sentinel_for = iterator<Iterator> and bounded::equality_comparable<Iterator, Sentinel>;
 
 }	// namespace containers

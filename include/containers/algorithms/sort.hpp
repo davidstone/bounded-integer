@@ -19,8 +19,8 @@
 
 namespace containers {
 
-template<typename ForwardIterator>
-constexpr auto rotate(ForwardIterator first, ForwardIterator middle, ForwardIterator const last) {
+template<iterator ForwardIterator>
+constexpr auto rotate(ForwardIterator first, ForwardIterator middle, sentinel_for<ForwardIterator> auto const last) {
 	if (first == middle) {
 		return last;
 	}
@@ -58,8 +58,8 @@ constexpr auto insertion_sort = [](auto const first, auto const last, auto cmp) 
 // implementation of O(n^2) insertion sort. When the standard library has been
 // updated to C++20, std::sort will be constexpr.
 constexpr inline struct sort_t {
-	template<typename Iterator, typename Sentinel, typename Compare> requires iterator_sentinel<Iterator, Sentinel>
-	constexpr void operator()(Iterator const first, Sentinel const last, Compare cmp) const {
+	template<iterator Iterator, typename Compare>
+	constexpr void operator()(Iterator const first, sentinel_for<Iterator> auto const last, Compare cmp) const {
 		// Temporary, until std::sort is constexpr
 		if (std::is_constant_evaluated()) {
 			detail::insertion_sort(first, last, cmp);
@@ -67,18 +67,18 @@ constexpr inline struct sort_t {
 			std::sort(make_legacy_iterator(first), make_legacy_iterator(last), cmp);
 		}
 	}
-	template<typename Range, typename Compare> requires range<Range>
+	template<range Range, typename Compare>
 	constexpr void operator()(Range & range, Compare cmp) const {
 		operator()(begin(range), end(range), cmp);
 	}
-	template<typename Range> requires range<Range>
+	template<range Range>
 	constexpr void operator()(Range & range) const {
 		operator()(range, std::less{});
 	}
 } sort;
 
 constexpr inline struct is_sorted_t {
-	template<typename Range, typename Compare> requires range<Range>
+	template<range Range, typename Compare>
 	constexpr bool operator()(Range && range, Compare cmp) const {
 		auto first = begin(range);
 		auto const last = end(range);
@@ -92,7 +92,7 @@ constexpr inline struct is_sorted_t {
 		}
 		return true;
 	}
-	template<typename Range> requires range<Range>
+	template<range Range>
 	constexpr bool operator()(Range && range) const {
 		return operator()(range, std::less{});
 	}

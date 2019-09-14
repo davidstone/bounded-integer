@@ -153,19 +153,24 @@ template<typename CharT>
 inline constexpr auto is_string<basic_string<CharT>> = true;
 
 template<typename T>
-inline constexpr auto string_like = false;
+concept string_specialization = is_string<std::decay_t<T>>;
+
+template<typename T>
+inline constexpr auto is_string_like = false;
 
 template<typename CharT>
-inline constexpr auto string_like<basic_string<CharT>> = true;
+inline constexpr auto is_string_like<basic_string<CharT>> = true;
 
 template<typename CharT>
-inline constexpr auto string_like<std::basic_string_view<CharT>> = true;
+inline constexpr auto is_string_like<std::basic_string_view<CharT>> = true;
+
+template<typename T>
+concept string_like = is_string_like<std::decay_t<T>>;
 
 }	// namespace detail
 
-template<typename LHS, typename RHS> requires(
-	(detail::string_like<std::decay_t<LHS>> and detail::string_like<std::decay_t<RHS>>) and
-	(detail::is_string<std::decay_t<LHS>> or detail::is_string<std::decay_t<RHS>>) and
+template<detail::string_like LHS, detail::string_like RHS> requires(
+	(detail::string_specialization<LHS> or detail::string_specialization<RHS>) and
 	std::is_same_v<typename std::decay_t<LHS>::value_type, typename std::decay_t<RHS>::value_type>
 )
 auto operator+(LHS && lhs, RHS && rhs) {
@@ -192,11 +197,11 @@ auto operator+(CharT const * const lhs, basic_string<CharT> const & rhs) {
 }
 
 
-template<typename String> requires detail::is_string<std::decay_t<String>>
+template<detail::string_specialization String>
 auto operator+(String && lhs, typename std::remove_reference_t<String>::value_type const rhs) {
 	return containers::concatenate<std::decay_t<String>>(BOUNDED_FORWARD(lhs), ::containers::single_element_range(rhs));
 }
-template<typename String> requires detail::is_string<std::decay_t<String>>
+template<detail::string_specialization String>
 auto operator+(typename std::remove_reference_t<String>::value_type const lhs, String && rhs) {
 	return containers::concatenate<std::decay_t<String>>(::containers::single_element_range(lhs), BOUNDED_FORWARD(rhs));
 }

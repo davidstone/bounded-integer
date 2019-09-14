@@ -112,11 +112,11 @@ constexpr auto insert(Container & container, typename Container::const_iterator 
 	}
 }
 
-template<typename Container> requires is_container<Container>
+template<container Container>
 constexpr auto insert(Container & container, typename Container::const_iterator const position, typename Container::value_type const & value) BOUNDED_NOEXCEPT(
 	::containers::detail::common::emplace(container, position, value)
 )
-template<typename Container> requires is_container<Container>
+template<container Container>
 constexpr auto insert(Container & container, typename Container::const_iterator const position, typename Container::value_type && value) BOUNDED_NOEXCEPT(
 	::containers::detail::common::emplace(container, position, std::move(value))
 )

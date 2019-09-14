@@ -9,8 +9,7 @@
 
 namespace bounded {
 
-template<typename Integer> requires bounded_integer<Integer>
-constexpr auto operator+(Integer const value) noexcept {
+constexpr auto operator+(bounded_integer auto const value) noexcept {
 	return value;
 }
 

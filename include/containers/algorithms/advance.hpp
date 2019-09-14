@@ -19,16 +19,16 @@ using namespace bounded::literal;
 
 namespace detail {
 
-template<typename Iterator, typename Offset>
+template<iterator Iterator, typename Offset>
 constexpr auto advance(Iterator & it, Offset const offset, std::random_access_iterator_tag) BOUNDED_NOEXCEPT_VALUE(
 	void(it += offset.value())
 )
-template<typename Iterator, typename Offset>
+template<iterator Iterator, typename Offset>
 constexpr auto advance(Iterator & it, Offset const offset, std::random_access_iterator_tag) requires requires { it += offset; } {
 	it += offset;
 }
 
-template<typename Iterator, typename Offset>
+template<iterator Iterator, typename Offset>
 constexpr auto advance(Iterator & it, Offset const offset, std::bidirectional_iterator_tag) {
 	using counter = std::common_type_t<decltype(bounded::abs(offset)), bounded::constant_t<0>>;
 	for (auto n = counter(0_bi); n != bounded::abs(offset); ++n) {
@@ -39,7 +39,7 @@ constexpr auto advance(Iterator & it, Offset const offset, std::bidirectional_it
 		}
 	}
 }
-template<typename Iterator, typename Offset>
+template<iterator Iterator, typename Offset>
 constexpr auto advance(Iterator & it, Offset const offset, std::input_iterator_tag) {
 	using counter = std::common_type_t<Offset, bounded::constant_t<0>>;
 	for (auto n = counter(0_bi); n != offset; ++n) {
@@ -50,36 +50,33 @@ constexpr auto advance(Iterator & it, Offset const offset, std::input_iterator_t
 
 }	// namespace detail
 
-template<typename Iterator, typename Offset>
+template<iterator Iterator, typename Offset>
 constexpr auto advance(Iterator & it, Offset const offset) BOUNDED_NOEXCEPT_VALUE(
 	::containers::detail::advance(it, offset, typename std::iterator_traits<Iterator>::iterator_category{})
 )
 
 namespace detail {
 
-template<typename Iterator> requires
-	bounded::bounded_integer<typename std::iterator_traits<Iterator>::difference_type>
+template<iterator Iterator> requires bounded::bounded_integer<typename std::iterator_traits<Iterator>::difference_type>
 constexpr auto iterator_one() noexcept {
 	return 1_bi;
 }
 
-template<typename Iterator> requires(
-	!bounded::bounded_integer<typename std::iterator_traits<Iterator>::difference_type>
-)
+template<iterator Iterator>
 constexpr auto iterator_one() noexcept {
 	return 1;
 }
 
 }	// namespace detail
 
-template<typename Iterator, typename Offset = decltype(::containers::detail::iterator_one<Iterator>())> requires iterator<Iterator>
+template<iterator Iterator, typename Offset = decltype(::containers::detail::iterator_one<Iterator>())>
 constexpr auto next(Iterator it, Offset const offset = ::containers::detail::iterator_one<Iterator>()) {
 	::containers::advance(it, offset);
 	return it;
 }
 
 
-template<typename Iterator, typename Offset = decltype(::containers::detail::iterator_one<Iterator>())> requires iterator<Iterator>
+template<iterator Iterator, typename Offset = decltype(::containers::detail::iterator_one<Iterator>())>
 constexpr auto prev(Iterator it, Offset const offset = ::containers::detail::iterator_one<Iterator>()) {
 	::containers::advance(it, -offset);
 	return it;

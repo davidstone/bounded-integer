@@ -36,7 +36,7 @@ namespace common {
 // I would like to return an iterator to the start of the appended range, but
 // that does not seem possible to do efficiently in general due to potential
 // iterator instability.
-template<typename Container, typename Range> requires push_backable<Container>
+template<push_backable Container, typename Range>
 constexpr auto append(Container & output, Range && input) -> void {
 	// TODO: Define InputRange and ForwardRange concepts
 	using iterator_category = typename std::iterator_traits<decltype(begin(input))>::iterator_category;

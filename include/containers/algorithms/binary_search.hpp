@@ -15,37 +15,37 @@
 namespace containers {
 
 constexpr inline struct lower_bound_t {
-	template<typename Range, typename T, typename Compare> requires range<Range>
-	constexpr auto operator()(Range && range, T const & value, Compare cmp) const {
-		return partition_point(BOUNDED_FORWARD(range), [&](auto const & element) { return cmp(element, value); });
+	template<typename T, typename Compare>
+	constexpr auto operator()(range auto && sorted, T const & value, Compare cmp) const {
+		return partition_point(BOUNDED_FORWARD(sorted), [&](auto const & element) { return cmp(element, value); });
 	}
-	template<typename Range, typename T> requires range<Range>
-	constexpr auto operator()(Range && range, T const & value) const {
-		return operator()(BOUNDED_FORWARD(range), value, std::less{});
+	template<typename T>
+	constexpr auto operator()(range auto && sorted, T const & value) const {
+		return operator()(BOUNDED_FORWARD(sorted), value, std::less{});
 	}
 } lower_bound;
 
 constexpr inline struct upper_bound_t {
-	template<typename Range, typename T, typename Compare> requires range<Range>
-	constexpr auto operator()(Range && range, T const & value, Compare cmp) const {
-		return partition_point(BOUNDED_FORWARD(range), [&](auto const & element) { return !cmp(value, element); });
+	template<typename T, typename Compare>
+	constexpr auto operator()(range auto && sorted, T const & value, Compare cmp) const {
+		return partition_point(BOUNDED_FORWARD(sorted), [&](auto const & element) { return !cmp(value, element); });
 	}
-	template<typename Range, typename T> requires range<Range>
-	constexpr auto operator()(Range && range, T const & value) const {
-		return operator()(BOUNDED_FORWARD(range), value, std::less{});
+	template<typename T>
+	constexpr auto operator()(range auto && sorted, T const & value) const {
+		return operator()(BOUNDED_FORWARD(sorted), value, std::less{});
 	}
 } upper_bound;
 
 
 // TODO: This is sub-optimal. Unsure how to make it optimal without copy + paste
 constexpr inline struct binary_search_t {
-	template<typename Range, typename T, typename Compare> requires range<Range>
-	constexpr bool operator()(Range && range, T const & value, Compare cmp) const {
-		return lower_bound(BOUNDED_FORWARD(range), value, cmp);
+	template<typename T, typename Compare>
+	constexpr bool operator()(range auto && sorted, T const & value, Compare cmp) const {
+		return lower_bound(BOUNDED_FORWARD(sorted), value, cmp) == end(sorted);
 	}
-	template<typename Range, typename T> requires range<Range>
-	constexpr bool operator()(Range && range, T const & value) const {
-		return operator()(range, value, std::less{});
+	template<typename T>
+	constexpr bool operator()(range auto && sorted, T const & value) const {
+		return operator()(sorted, value, std::less{});
 	}
 } binary_search;
 

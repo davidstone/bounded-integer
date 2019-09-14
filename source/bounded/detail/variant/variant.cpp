@@ -19,6 +19,64 @@ static_assert(std::is_trivially_copy_assignable_v<thing_t>);
 static_assert(std::is_trivially_move_assignable_v<thing_t>);
 static_assert(std::is_trivially_destructible_v<thing_t>);
 
+template<bool expected, typename Index, typename... Ts>
+constexpr bool assert_type_index_concepts() {
+	static_assert(
+		bounded::matches_exactly_one_type<
+			Index,
+			bounded::detail::types<Ts>...
+		> == expected
+	);
+	static_assert(
+		!bounded::variant_integer_index<
+			bounded::detail::types<Index>,
+			bounded::detail::types<Ts>...
+		>
+	);
+	static_assert(
+		bounded::unique_type_identifier<
+			bounded::detail::types<Index>,
+			bounded::detail::types<Ts>...
+		> == expected
+	);
+	return true;
+}
+
+template<bool expected, auto index, typename... Ts>
+constexpr bool assert_integer_index_concepts() {
+	static_assert(
+		!bounded::matches_exactly_one_type<
+			bounded::constant_t<index>,
+			bounded::detail::types<Ts>...
+		>
+	);
+	static_assert(
+		bounded::variant_integer_index<
+			bounded::constant_t<index>,
+			bounded::detail::types<Ts>...
+		> == expected
+	);
+	static_assert(
+		bounded::unique_type_identifier<
+			bounded::constant_t<index>,
+			bounded::detail::types<Ts>...
+		> == expected
+	);
+	return true;
+}
+
+static_assert(assert_type_index_concepts<true, int, int>());
+static_assert(assert_type_index_concepts<true, int, int, short>());
+static_assert(assert_type_index_concepts<false, int, int, int>());
+static_assert(assert_type_index_concepts<false, int, short>());
+static_assert(assert_type_index_concepts<false, int>());
+
+static_assert(assert_integer_index_concepts<true, 0, int>());
+static_assert(assert_integer_index_concepts<true, 0, int, short>());
+static_assert(assert_integer_index_concepts<true, 1, int, int>());
+static_assert(assert_integer_index_concepts<false, 1, int>());
+static_assert(assert_integer_index_concepts<false, 0>());
+
 static_assert(!std::is_constructible_v<thing_t, int>);
 static_assert(std::is_constructible_v<thing_t, short>);
 static_assert(std::is_constructible_v<thing_t, long>);
@@ -45,8 +103,8 @@ static_assert(holds_alternative(thing_t(std::in_place, 3_bi, '\0'), bounded::det
 #if 0
 // std::variant has these calls ill-formed (and that naturally happens with my
 // implementation), but it seems like it should be legal.
-static_assert(holds_alternative(thing_t(std::in_place, 0_bi, 0), bounded::detail::types<int>{}));
-static_assert(holds_alternative(thing_t(std::in_place, 4_bi, 0), bounded::detail::types<int>{}));
+static_assert(holds_alternative(thing_t(std::in_place, 0_bi, 0), bounded::detail::bounded::detail::types<int>{}));
+static_assert(holds_alternative(thing_t(std::in_place, 4_bi, 0), bounded::detail::bounded::detail::types<int>{}));
 #endif
 
 constexpr auto index = 1_bi;

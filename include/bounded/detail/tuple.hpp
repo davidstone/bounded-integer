@@ -90,13 +90,19 @@ template<typename... Ts>
 tuple(Ts && ...) -> tuple<std::decay_t<Ts>...>;
 
 
-// TODO: define tuple-like concept
+namespace detail {
+
 template<typename T>
 inline constexpr auto is_tuple = false;
 
 template<typename... Types>
 inline constexpr auto is_tuple<tuple<Types...>> = true;
 
+} // namespace detail
+
+// TODO: tuple_like to be based on requirements, not exact match
+template<typename T>
+concept tuple_like = detail::is_tuple<std::decay_t<T>>;
 
 
 namespace detail {
@@ -214,17 +220,13 @@ constexpr auto equal_impl(LHS const & lhs, RHS const & rhs, std::index_sequence<
 
 }	// namespace detail
 
-template<typename... lhs_types, typename... rhs_types> requires(
-	sizeof...(lhs_types) == sizeof...(rhs_types)
-)
+template<typename... lhs_types, typename... rhs_types> requires(sizeof...(lhs_types) == sizeof...(rhs_types))
 constexpr auto compare(tuple<lhs_types...> const & lhs, tuple<rhs_types...> const & rhs) BOUNDED_NOEXCEPT_VALUE(
 	detail::compare_impl(lhs, rhs, constant<0>)
 )
 
 
-template<typename... lhs_types, typename... rhs_types> requires(
-	sizeof...(lhs_types) == sizeof...(rhs_types)
-)
+template<typename... lhs_types, typename... rhs_types> requires(sizeof...(lhs_types) == sizeof...(rhs_types))
 constexpr auto operator==(tuple<lhs_types...> const & lhs, tuple<rhs_types...> const & rhs) BOUNDED_NOEXCEPT_VALUE(
 	detail::equal_impl(lhs, rhs, bounded::make_index_sequence(constant<sizeof...(lhs_types)>))
 )
@@ -369,7 +371,7 @@ constexpr auto transform_impl(constant_t<i> index, Function && function, Tuples 
 
 }	// namespace detail
 
-template<typename Function, typename... Tuples> requires(... and is_tuple<std::decay_t<Tuples>>)
+template<typename Function, tuple_like... Tuples>
 constexpr auto transform(Function && function, Tuples && ... tuples) noexcept(detail::all_noexcept_function_calls<Function, Tuples && ...>) {
 	return detail::transform_impl(constant<0>, function, BOUNDED_FORWARD(tuples)...);
 }

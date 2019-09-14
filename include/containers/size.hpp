@@ -24,7 +24,7 @@ concept random_access_range = requires(Range const & range) {
 
 namespace common {
 
-template<typename Range> requires has_member_size<Range> or random_access_range<Range>
+template<range Range> requires has_member_size<Range> or random_access_range<Range>
 constexpr auto size(Range const & range) noexcept {
 	if constexpr (has_member_size<Range>) {
 		return range.size();

@@ -66,7 +66,7 @@ inline constexpr auto normalize = static_cast<
 	max_signed_t
 >>>(value);
 
-template<typename T> requires signed_builtin<T>
+template<detail_signed_builtin T>
 constexpr auto from_unsigned_cast(std::make_unsigned_t<T> const value) noexcept {
 	using limits = basic_numeric_limits<T>;
 	static_assert(-(limits::min() + 1) == limits::max());
@@ -77,7 +77,7 @@ constexpr auto from_unsigned_cast(std::make_unsigned_t<T> const value) noexcept 
 	}
 }
 
-template<typename T> requires unsigned_builtin<T>
+template<detail_unsigned_builtin T>
 constexpr auto from_unsigned_cast(std::make_unsigned_t<T> const value) noexcept {
 	return value;
 }
