@@ -82,7 +82,10 @@ struct counted_iterator : detail::operator_arrow<counted_iterator<Iterator, Coun
 	}
 
 	// TODO: Properly constrain this function
-	template<typename Offset> requires(std::numeric_limits<Offset>::is_integer)
+	template<typename Offset> requires(
+		std::numeric_limits<Offset>::is_integer and
+		decltype(std::declval<Count>() - std::declval<Offset>())::max() >= bounded::constant<0>
+	)
 	friend constexpr auto operator+(counted_iterator it, Offset const offset) {
 		auto const count = bounded::increase_min<0>(it.m_count - offset);
 		return counted_iterator(std::move(it).m_it + offset, count);

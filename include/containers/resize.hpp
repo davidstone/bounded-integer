@@ -8,7 +8,9 @@
 #include <containers/emplace_back.hpp>
 #include <containers/is_container.hpp>
 #include <containers/pop_back.hpp>
+#include <containers/repeat_n.hpp>
 #include <containers/size.hpp>
+#include <containers/take.hpp>
 
 #include <bounded/detail/forward.hpp>
 #include <bounded/integer.hpp>
@@ -18,28 +20,25 @@
 namespace containers {
 namespace detail {
 
-struct common_resize_tag{};
-template<typename Container, typename Size, typename... MaybeInitializer>
-constexpr auto resize(common_resize_tag, Container & container, Size const count, MaybeInitializer && ... args) {
-	static_assert(sizeof...(MaybeInitializer) == 0 or sizeof...(MaybeInitializer) == 1);
-	while (size(container) > count) {
+template<typename Container, typename InitializerRange>
+constexpr auto resize_impl(Container & container, InitializerRange const values) {
+	while (size(container) > size(values)) {
 		pop_back(container);
 	}
-	while (size(container) < count) {
-		::containers::emplace_back(container, BOUNDED_FORWARD(args)...);
-	}
+	auto const remaining = size(values) - size(container);
+	append(container, containers::take(values, remaining));
 }
 
 namespace common {
 
 template<container Container, typename Size>
-constexpr auto resize(Container & container, Size const count) BOUNDED_NOEXCEPT(
-	resize(common_resize_tag{}, container, count)
-)
+constexpr auto resize(Container & container, Size const count) {
+	resize_impl(container, repeat_default_n<typename Container::value_type>(count));
+}
 template<container Container, typename Size>
-constexpr auto resize(Container & container, Size const count, typename Container::value_type const & value) BOUNDED_NOEXCEPT(
-	resize(common_resize_tag{}, container, count, value)
-)
+constexpr auto resize(Container & container, Size const count, typename Container::value_type const & value) {
+	resize_impl(container, repeat_n(count, value));
+}
 
 }	// namespace common
 
