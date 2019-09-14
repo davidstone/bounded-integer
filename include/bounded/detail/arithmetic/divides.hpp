@@ -16,6 +16,16 @@
 namespace bounded {
 namespace detail {
 
+template<bool condition>
+constexpr auto conditional_function(auto if_true, auto if_false) {
+	if constexpr (condition) {
+		return if_true;
+	} else {
+		return if_false;
+	}
+};
+
+
 // Ignores divide by 0, caught by constexpr
 template<auto lhs_, auto rhs_>
 constexpr auto safer_divide(constant_t<lhs_> const lhs, constant_t<rhs_> const rhs) noexcept {
@@ -44,15 +54,8 @@ constexpr auto divides_operator_range = [](auto const lhs_, auto const rhs_) noe
 	// zero, in which case I pick the greatest absolute value (which is the
 	// minimum) so that the 'positive' divisor is not selected in a later step.
 	// We can use similar logic for greatest_negative_divisor.
-	constexpr auto conditional = [](auto condition, auto if_true [[maybe_unused]], auto if_false [[maybe_unused]]) {
-		if constexpr (condition) {
-			return if_true;
-		} else {
-			return if_false;
-		}
-	};
-	constexpr auto least_positive_divisor = conditional(std::bool_constant<rhs.min <= constant<1> and constant<1> <= rhs.max>{}, constant<1>, rhs.min);
-	constexpr auto greatest_negative_divisor = conditional(std::bool_constant<rhs.min <= constant<-1> and constant<-1> <= rhs.max>{}, constant<-1>, rhs.max);
+	constexpr auto least_positive_divisor = ::bounded::detail::conditional_function<rhs.min <= constant<1> and constant<1> <= rhs.max>(constant<1>, rhs.min);
+	constexpr auto greatest_negative_divisor = ::bounded::detail::conditional_function<rhs.min <= constant<-1> and constant<-1> <= rhs.max>(constant<-1>, rhs.max);
 
 	constexpr auto g0 = safer_divide(lhs.min, least_positive_divisor);
 	constexpr auto g1 = safer_divide(lhs.min, greatest_negative_divisor);
