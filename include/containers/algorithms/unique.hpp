@@ -143,7 +143,10 @@ auto unique_inplace_merge(MutableForwardIterator first, MutableForwardIterator m
 	using storage_type = dynamic_array<std::decay_t<decltype(*first)>>;
 
 	if (less(*middle, *first)) {
-		storage_type temp(::containers::move_iterator(first), ::containers::move_iterator(middle));
+		auto temp = storage_type(range_view(
+			::containers::move_iterator(first),
+			::containers::move_iterator(middle)
+		));
 		return ::containers::unique_merge_copy(
 			::containers::move_iterator(begin(temp)), ::containers::move_iterator(end(temp)),
 			::containers::move_iterator(middle), ::containers::move_iterator(last),
@@ -178,7 +181,10 @@ auto unique_inplace_merge(MutableForwardIterator first, MutableForwardIterator m
 	
 	// Move the rest of the elements so we can use their space without
 	// overwriting.
-	storage_type temp(::containers::move_iterator(first_to_move.target), ::containers::move_iterator(middle));
+	auto temp = storage_type(range_view(
+		::containers::move_iterator(first_to_move.target),
+		::containers::move_iterator(middle)
+	));
 	auto const new_middle = ::containers::detail::next_greater(middle, last, *first_to_move.before_target, less);
 
 	auto postFunction = [=](auto const first_, auto const last_, auto) {

@@ -7,6 +7,8 @@
 
 #include <containers/algorithms/compare.hpp>
 
+#include <containers/repeat_n.hpp>
+
 #include "../test_assert.hpp"
 
 namespace {
@@ -19,7 +21,7 @@ void test_generic(T const & t, Capacity capacity, std::initializer_list<T> init)
 	auto const default_constructed = container{};
 	BOUNDED_TEST(empty(default_constructed));
 	
-	auto const count = container(capacity);
+	auto const count = container(containers::repeat_default_n<T>(capacity));
 	BOUNDED_TEST(size(count) == capacity);
 
 	BOUNDED_TEST(begin(default_constructed) == begin(default_constructed));
@@ -29,7 +31,7 @@ void test_generic(T const & t, Capacity capacity, std::initializer_list<T> init)
 		BOUNDED_TEST(value == T{});
 	}
 	
-	auto const count_arg = container(capacity, t);
+	auto const count_arg = container(containers::repeat_n(capacity, t));
 	BOUNDED_TEST(size(count) == capacity);
 	for (auto const & value : count_arg) {
 		BOUNDED_TEST(value == t);
@@ -69,15 +71,6 @@ void test_generic(T const & t, Capacity capacity, std::initializer_list<T> init)
 
 	assign(copy, init);
 	assign(copy, containers::repeat_n(capacity, t));
-	
-	clear(copy);
-	resize(copy, capacity);
-	BOUNDED_TEST(front(copy) == T{});
-	BOUNDED_TEST(size(copy) == capacity);
-	resize(copy, 0_bi);
-	BOUNDED_TEST(empty(copy));
-	resize(copy, capacity, t);
-	BOUNDED_TEST(copy == count_arg);
 }
 
 }	// namespace

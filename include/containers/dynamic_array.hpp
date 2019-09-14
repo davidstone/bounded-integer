@@ -81,11 +81,15 @@ constexpr auto cleanup(dynamic_array_data<T> const data) noexcept {
 
 
 
-template<typename T, iterator ForwardIterator>
-auto dynamic_array_initializer(ForwardIterator first, sentinel_for<ForwardIterator> auto const last) {
-	auto const data = make_storage<T>(::containers::distance(first, last));
+template<typename T, range Range>
+auto dynamic_array_initializer(Range && range) {
+	auto const data = make_storage<T>(::containers::detail::linear_size(range));
 	try {
-		containers::uninitialized_copy(first, last, begin(data));
+		containers::uninitialized_copy(
+			begin(BOUNDED_FORWARD(range)),
+			end(BOUNDED_FORWARD(range)),
+			begin(data)
+		);
 	} catch(...) {
 		deallocate_storage(data);
 		throw;
@@ -93,19 +97,6 @@ auto dynamic_array_initializer(ForwardIterator first, sentinel_for<ForwardIterat
 	return data;
 }
 
-
-template<typename T, typename Size> requires std::is_convertible_v<Size, typename dynamic_array_data<T>::size_type>
-auto dynamic_array_initializer(Size const size) {
-	auto const data = make_storage<T>(size);
-	try {
-		containers::uninitialized_default_construct(begin(data), end(data));
-	} catch(...) {
-		deallocate_storage(data);
-		throw;
-	}
-	return data;
-}
-	
 
 }	// namespace detail
 
@@ -119,36 +110,19 @@ struct dynamic_array {
 	
 	constexpr dynamic_array() = default;
 
-	template<typename ForwardIterator, sentinel_for<ForwardIterator> Sentinel>
-	constexpr dynamic_array(ForwardIterator first, Sentinel const last):
-		m_data(::containers::detail::dynamic_array_initializer<value_type>(first, last))
-	{
-	}
-	
 	template<range Range> requires(!std::is_array_v<std::remove_cv_t<std::remove_reference_t<Range>>>)
-	constexpr explicit dynamic_array(Range && range) BOUNDED_NOEXCEPT_INITIALIZATION(
-		dynamic_array(begin(BOUNDED_FORWARD(range)), end(BOUNDED_FORWARD(range)))
-	) {
+	constexpr explicit dynamic_array(Range && range):
+		m_data(::containers::detail::dynamic_array_initializer<value_type>(BOUNDED_FORWARD(range)))
+	{
 	}
 
 	constexpr dynamic_array(std::initializer_list<value_type> init):
-		dynamic_array(begin(init), end(init))
+		dynamic_array(range_view(init))
 	{
 	}
 
-	template<typename Count> requires std::is_convertible_v<Count, size_type>
-	explicit constexpr dynamic_array(Count const count):
-		m_data(::containers::detail::dynamic_array_initializer<value_type>(count))
-	{
-	}
-	template<typename Count> requires std::is_convertible_v<Count, size_type>
-	constexpr dynamic_array(Count const count, value_type const & value) {
-		auto const range = repeat_n(count, value);
-		m_data = ::containers::detail::dynamic_array_initializer<value_type>(begin(range), end(range));
-	}
-	
 	constexpr dynamic_array(dynamic_array const & other):
-		dynamic_array(begin(other), end(other))
+		dynamic_array(range_view(other))
 	{
 	}
 	
@@ -217,18 +191,4 @@ auto assign(dynamic_array<T> & container, Range && range) {
 	}
 }
 
-namespace detail {
-
-template<typename T, typename Size, typename... MaybeInitializer>
-auto resize(common_resize_tag, dynamic_array<T> & container, Size const count, MaybeInitializer && ... args) {
-	static_assert(sizeof...(MaybeInitializer) == 0 or sizeof...(MaybeInitializer) == 1);
-	if (size(container) != count) {
-		// Technically, the clear is unnecessary, but calling it decreases peak
-		// memory use.
-		clear(container);
-		container = dynamic_array<T>(count, BOUNDED_FORWARD(args)...);
-	}
-}
-
-}	// namespace detail
-}	// namespace containers
+} // namespace containers

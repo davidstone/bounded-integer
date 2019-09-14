@@ -64,7 +64,7 @@ struct vector_base {
 
 	template<typename Size>
 	auto make_storage(Size const new_capacity) {
-		return raw_container(new_capacity);
+		return raw_container(repeat_default_n<typename raw_container::value_type>(new_capacity));
 	}
 	auto relocate_preallocated(raw_container temp) {
 		m_container = std::move(temp);
