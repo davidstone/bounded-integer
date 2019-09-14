@@ -25,13 +25,13 @@ namespace bounded {
 namespace detail {
 
 template<typename T>
-concept generic_integer = basic_numeric_limits<T>::is_specialized and !std::is_same_v<T, bool> and (basic_numeric_limits<T>::is_integer or std::is_enum_v<T>);
+concept generic_integer = basic_numeric_limits<T>::is_specialized and (basic_numeric_limits<T>::is_integer or std::is_enum_v<T>);
 
 template<typename T, auto minimum, auto maximum, typename policy>
 concept overlapping_integer = generic_integer<T> and (!policy::overflow_is_error or (compare(basic_numeric_limits<T>::min(), maximum) <= 0 and compare(minimum, basic_numeric_limits<T>::max()) <= 0));
 
 template<typename T, auto minimum, auto maximum, typename policy>
-concept bounded_by_range = overlapping_integer<T, minimum, maximum, policy> and compare(minimum, basic_numeric_limits<T>::min()) <= 0 and compare(basic_numeric_limits<T>::max(), maximum) <= 0;
+concept bounded_by_range = overlapping_integer<T, minimum, maximum, policy> and !std::is_same_v<T, bool> and compare(minimum, basic_numeric_limits<T>::min()) <= 0 and compare(basic_numeric_limits<T>::max(), maximum) <= 0;
 
 
 // Necessary for optional specialization
@@ -56,17 +56,19 @@ constexpr auto as_builtin_integer(Integer const x) noexcept {
 // along non-enum types without doing anything, but constructs a
 // bounded::integer with the tighter bounds from an enumeration.
 template<typename T>
-constexpr decltype(auto) as_integer(T const & t) noexcept {
-	if constexpr (std::is_enum<std::decay_t<T>>{}) {
+constexpr decltype(auto) as_integer(T const & value) noexcept {
+	if constexpr (std::is_enum_v<T>) {
 		using limits = basic_numeric_limits<T>;
 		using result_type = integer<
 			as_builtin_integer(limits::min()),
 			as_builtin_integer(limits::max()),
 			null_policy
 		>;
-		return result_type(static_cast<std::underlying_type_t<std::decay_t<T>>>(t));
+		return result_type(static_cast<std::underlying_type_t<T>>(value));
+	} else if constexpr (std::is_same_v<T, bool>) {
+		return integer<0, 1, null_policy>(value, non_check);
 	} else {
-		return t;
+		return value;
 	}
 }
 
@@ -172,7 +174,7 @@ public:
 	// Use non_check_t constructors if you know by means that cannot be
 	// determined by the type system that the value fits in the range.
 
-	template<typename T> requires(detail::overlapping_integer<T, minimum, maximum, overflow_policy> or std::is_same_v<T, bool>)
+	template<typename T> requires detail::overlapping_integer<T, minimum, maximum, overflow_policy>
 	constexpr integer(T const & other, non_check_t) noexcept:
 		base(static_cast<underlying_type>(other)) {
 	}
@@ -187,11 +189,6 @@ public:
 	constexpr explicit integer(T const & other, overflow_policy = overflow_policy{}) BOUNDED_NOEXCEPT_INITIALIZATION(
 		integer(apply_overflow_policy(detail::as_integer(other)), non_check)
 	) {
-	}
-
-	constexpr explicit integer(bool const other, overflow_policy = overflow_policy{}) noexcept requires(minimum <= 0 and 1 <= maximum):
-		integer(other, non_check)
-	{
 	}
 
 	template<typename Enum> requires(

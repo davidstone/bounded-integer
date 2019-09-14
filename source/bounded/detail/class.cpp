@@ -27,7 +27,7 @@ static_assert(std::is_empty<bounded::constant_t<std::numeric_limits<std::intmax_
 
 static_assert(!std::is_convertible_v<bool, bounded::integer<0, 1>>);
 static_assert(std::is_constructible_v<bounded::integer<0, 1>, bool>);
-static_assert(!std::is_constructible_v<bounded::clamped_integer<0, 0>, bool>);
+static_assert(std::is_constructible_v<bounded::integer<0, 0>, bool>);
 
 namespace check_constructibility {
 	constexpr auto min = std::numeric_limits<int>::min();
