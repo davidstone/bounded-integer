@@ -14,6 +14,17 @@
 #include <type_traits>
 
 namespace containers {
+
+// TODO: Integrate this with "relocate"
+template<typename T>
+constexpr auto move_destroy(T && ref) noexcept {
+	static_assert(std::is_nothrow_move_constructible_v<T>, "Please provide a noexcept move_destroy overload for your type.");
+	static_assert(std::is_nothrow_destructible_v<T>, "Do not mark your destructor as noexcept(false)");
+	auto result = std::move(ref);
+	bounded::destroy(ref);
+	return result;
+}
+
 namespace detail {
 
 struct move_destroy_dereference {
@@ -22,11 +33,7 @@ struct move_destroy_dereference {
 		noexcept(*it) and std::is_nothrow_move_constructible_v<decltype(*it)>
 	) {
 		if constexpr (std::is_reference_v<decltype(*it)>) {
-			auto && ref = *it;
-			auto result = std::move(ref);
-			static_assert(noexcept(bounded::destroy(ref)), "Do not mark your destructor as noexcept(false)");
-			bounded::destroy(ref);
-			return result;
+			return move_destroy(*it);
 		} else {
 			return *it;
 		}

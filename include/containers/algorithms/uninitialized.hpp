@@ -91,61 +91,26 @@ constexpr auto uninitialized_move_backward(BidirectionalInputIterator const firs
 )
 
 
-// uninitialized_move_destroy guarantees that all elements in the input range
-// have been destoyed when this function completes.
-// This should probably just require noexcept
 template<iterator InputIterator, iterator ForwardIterator>
-constexpr auto uninitialized_move_destroy(InputIterator const first, sentinel_for<InputIterator> auto const last, ForwardIterator out) {
-	constexpr auto is_noexcept = noexcept(::containers::uninitialized_copy(
+constexpr auto uninitialized_move_destroy(InputIterator const first, sentinel_for<InputIterator> auto const last, ForwardIterator out) noexcept {
+	return ::containers::uninitialized_copy(
 		::containers::move_destroy_iterator(first),
 		::containers::move_destroy_iterator(last),
 		out
-	));
-	if constexpr (is_noexcept) {
-		return ::containers::uninitialized_copy(
-			::containers::move_destroy_iterator(first),
-			::containers::move_destroy_iterator(last),
-			out
-		);
-	} else {
-		auto first_adapted = ::containers::move_destroy_iterator(first);
-		auto const last_adapted = containers::move_destroy_iterator(last);
-		auto out_first = out;
-		try {
-			for (; first_adapted != last_adapted; ++first_adapted) {
-				bounded::construct(*out, *first_adapted);
-				++out;
-			}
-		} catch (...) {
-			detail::destroy_range(first_adapted.base(), last);
-			detail::destroy_range(out_first, out);
-			throw;
-		}
-		return out;
-	}
+	);
 }
 
 
 namespace detail {
 
-// TODO: When we have constexpr destructors, move append_from_capacity into
-// scope_guard
 template<typename Source, typename Destination>
-constexpr auto transfer_all_contents(Source && source, Destination & destination) {
-	auto set_old_size_to_zero = [&]{
-		source.append_from_capacity(-size(source));
-	};
-	try {
-		::containers::uninitialized_move_destroy(
-			begin(source),
-			end(source),
-			begin(destination)
-		);
-		set_old_size_to_zero();
-	} catch (...) {
-		set_old_size_to_zero();
-		throw;
-	}
+constexpr auto transfer_all_contents(Source && source, Destination & destination) noexcept {
+	::containers::uninitialized_move_destroy(
+		begin(source),
+		end(source),
+		begin(destination)
+	);
+	source.append_from_capacity(-size(source));
 }
 
 } // namespace detail

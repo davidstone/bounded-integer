@@ -37,12 +37,7 @@ constexpr auto & emplace_back(Container & container, Args && ... args) {
 			temp.reserve(::containers::detail::reallocation_size(container, 1_bi));
 			auto & ref = *(data(temp) + container.capacity());
 			bounded::construct(ref, BOUNDED_FORWARD(args)...);
-			try {
-				containers::detail::transfer_all_contents(container, temp);
-			} catch (...) {
-				bounded::destroy(ref);
-				throw;
-			}
+			containers::detail::transfer_all_contents(container, temp);
 			temp.append_from_capacity(initial_size + 1_bi);
 			container = std::move(temp);
 		} else {
