@@ -35,9 +35,10 @@ public:
 	constexpr auto operator=(basic_variant &&) & -> basic_variant & = default;
 
 	template<typename T, typename std::enable_if<!std::is_same_v<std::decay_t<T>, basic_variant>, int>::type = 0>
-	constexpr auto operator=(T && value) & BOUNDED_NOEXCEPT_REF(
-		(this->assignment(BOUNDED_FORWARD(value)), *this)
-	)
+	constexpr auto & operator=(T && value) & {
+		this->assignment(BOUNDED_FORWARD(value));
+		return *this;
+	}
 	
 	using base::index;
 	using base::operator[];
@@ -45,29 +46,29 @@ public:
 };
 
 template<typename GetFunction, typename... Ts, typename T>
-constexpr auto holds_alternative(basic_variant<GetFunction, Ts...> const & variant, detail::types<T> type) BOUNDED_NOEXCEPT_DECLTYPE(
-	variant.index() == detail::get_index(type, detail::types<Ts>{}...)
-)
+constexpr auto holds_alternative(basic_variant<GetFunction, Ts...> const & variant, detail::types<T> type) {
+	return variant.index() == detail::get_index(type, detail::types<Ts>{}...);
+}
 
 namespace detail {
 
 struct equality_visitor {
 	template<typename T, auto n>
-	constexpr auto operator()(visitor_parameter<T, n> const lhs, visitor_parameter<T, n> const rhs) const BOUNDED_NOEXCEPT_DECLTYPE(
-		lhs.value == rhs.value
-	)
+	constexpr auto operator()(visitor_parameter<T, n> const lhs, visitor_parameter<T, n> const rhs) const {
+		return lhs.value == rhs.value;
+	}
 	template<typename LHS, auto lhs_n, typename RHS, auto rhs_n> requires(lhs_n != rhs_n)
-	constexpr auto operator()(visitor_parameter<LHS, lhs_n>, visitor_parameter<RHS, rhs_n>) const noexcept {
+	constexpr auto operator()(visitor_parameter<LHS, lhs_n>, visitor_parameter<RHS, rhs_n>) const {
 		return false;
 	}
 };
 
 } // namespace detail
 
-template<typename GetFunction, typename... Ts>
-constexpr auto operator==(basic_variant<GetFunction, Ts...> const & lhs, basic_variant<GetFunction, Ts...> const & rhs) BOUNDED_NOEXCEPT_DECLTYPE(
-	visit_with_index(lhs, rhs, detail::equality_visitor{})
-)
+template<typename GetFunction, equality_comparable... Ts>
+constexpr auto operator==(basic_variant<GetFunction, Ts...> const & lhs, basic_variant<GetFunction, Ts...> const & rhs) {
+	return visit_with_index(lhs, rhs, detail::equality_visitor{});
+}
 
 
 namespace detail {
@@ -75,12 +76,12 @@ namespace detail {
 template<std::size_t size>
 struct variant_selector {
 	template<auto n>
-	constexpr explicit variant_selector(constant_t<n> index_) noexcept:
+	constexpr explicit variant_selector(constant_t<n> index_):
 		index(index_)
 	{
 	}
 	template<typename Union>
-	constexpr auto operator()(Union const &) const noexcept {
+	constexpr auto operator()(Union const &) const {
 		return index;
 	}
 private:

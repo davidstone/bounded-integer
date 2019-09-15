@@ -12,7 +12,7 @@
 namespace bounded {
 
 template<auto n>
-constexpr auto make_index_sequence(constant_t<n>) noexcept {
+constexpr auto make_index_sequence(constant_t<n>) {
 	return std::make_index_sequence<n>{};
 }
 

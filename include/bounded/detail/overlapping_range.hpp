@@ -14,7 +14,7 @@ namespace bounded {
 namespace detail {
 
 template<typename T, typename Value>
-constexpr auto value_fits_in_type(Value const value) noexcept {
+constexpr auto value_fits_in_type(Value const value) {
 	static_assert(basic_numeric_limits<T>::is_specialized, "Only works with integer types.");
 	using limits = basic_numeric_limits<T>;
 	return compare(limits::min(), value) <= 0 and compare(value, limits::max()) <= 0;

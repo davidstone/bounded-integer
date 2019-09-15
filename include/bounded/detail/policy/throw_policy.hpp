@@ -12,7 +12,6 @@
 #include <bounded/detail/comparison_mixed.hpp>
 #include <bounded/detail/is_bounded_integer.hpp>
 #include <bounded/detail/minmax.hpp>
-#include <bounded/detail/noexcept.hpp>
 #include <bounded/string.hpp>
 #include <stdexcept>
 
@@ -22,21 +21,20 @@ namespace policy_detail {
 using default_exception = std::range_error;
 
 template<typename T, auto minimum, auto maximum>
-constexpr auto reduce_range(T const & value, constant_t<minimum>, constant_t<maximum>) BOUNDED_NOEXCEPT(
-	integer<
+constexpr auto reduce_range(T const & value, constant_t<minimum>, constant_t<maximum>) {
+	return integer<
 		detail::normalize<detail::safe_max(minimum, basic_numeric_limits<T>::min())>,
 		detail::normalize<detail::safe_min(maximum, basic_numeric_limits<T>::max())>,
 		null_policy
-	>(value)
-)
+	>(value);
+}
 
 }	// namespace policy_detail
 
 template<typename Exception = policy_detail::default_exception>
 struct throw_policy {
-	constexpr throw_policy() noexcept {}
+	constexpr throw_policy() {}
 
-	// TODO: Conditional noexcept
 	template<typename T, typename Minimum, typename Maximum>
 	static constexpr auto assignment(T const & value, Minimum const & minimum, Maximum const & maximum) {
 		static_assert(bounded_integer<Minimum>, "Only bounded::integer types are supported.");

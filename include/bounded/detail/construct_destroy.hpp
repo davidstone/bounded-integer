@@ -6,7 +6,6 @@
 #pragma once
 
 #include <bounded/detail/forward.hpp>
-#include <bounded/detail/noexcept.hpp>
 
 #include <memory>
 #include <type_traits>
@@ -23,14 +22,14 @@ concept constexpr_constructible = std::is_move_assignable_v<T> and std::is_trivi
 template<typename T>
 struct construct_return_t {
 	template<typename... Args> requires std::is_constructible_v<T, Args...>
-	constexpr auto operator()(Args && ... args) const BOUNDED_NOEXCEPT_VALUE(
-		T(BOUNDED_FORWARD(args)...)
-	)
+	constexpr auto operator()(Args && ... args) const {
+		return T(BOUNDED_FORWARD(args)...);
+	}
 	
-	template<typename... Args>
-	constexpr auto operator()(Args && ... args) const BOUNDED_NOEXCEPT_VALUE(
-		T{BOUNDED_FORWARD(args)...}
-	)
+	template<typename... Args> requires(!std::is_constructible_v<T, Args...> and requires (Args && ... args) { T{BOUNDED_FORWARD(args)...}; })
+	constexpr auto operator()(Args && ... args) const {
+		return T{BOUNDED_FORWARD(args)...};
+	}
 };
 
 }	// namespace detail
@@ -42,18 +41,18 @@ inline constexpr auto construct_return = detail::construct_return_t<T>{};
 inline constexpr struct construct_t {
 	// The assignment operator must return a T & if it is trivial
 	template<detail::constexpr_constructible T, typename... Args>
-	constexpr auto operator()(T & ref, Args && ... args) const BOUNDED_NOEXCEPT_REF(
-		ref = construct_return<T>(BOUNDED_FORWARD(args)...)
-	)
+	constexpr auto & operator()(T & ref, Args && ... args) const {
+		return ref = construct_return<T>(BOUNDED_FORWARD(args)...);
+	}
 
-	template<typename T, typename... Args>
-	constexpr auto operator()(T & ref, Args && ... args) const BOUNDED_NOEXCEPT_REF(
-		*::new(static_cast<void *>(std::addressof(ref))) T(construct_return<T>(BOUNDED_FORWARD(args)...))
-	)
+	template<typename T, typename... Args> requires(!detail::constexpr_constructible<T> and requires (Args && ... args) { construct_return<T>(BOUNDED_FORWARD(args)...); })
+	constexpr auto & operator()(T & ref, Args && ... args) const {
+		return *::new(static_cast<void *>(std::addressof(ref))) T(construct_return<T>(BOUNDED_FORWARD(args)...));
+	}
 } construct;
 
 
-inline constexpr auto destroy = [](auto & ref) noexcept {
+inline constexpr auto destroy = [](auto & ref) {
 	using T = std::decay_t<decltype(ref)>;
 	if constexpr (!std::is_trivially_destructible_v<T>) {
 		ref.~T();

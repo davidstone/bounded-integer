@@ -36,18 +36,18 @@ struct final_dimension {
 
 // These assume that all of the dimensions have been passed in.
 template<typename element_type, std::size_t... dimensions, typename... Args>
-constexpr auto make_explicit_array(Args && ... args) noexcept {
+constexpr auto make_explicit_array(Args && ... args) {
 	return array<element_type, dimensions...>{ BOUNDED_FORWARD(args)... };
 }
 template<std::size_t... dimensions, typename... Args>
-constexpr auto make_explicit_array(Args && ... args) noexcept {
+constexpr auto make_explicit_array(Args && ... args) {
 	return array<std::common_type_t<std::decay_t<Args>...>, dimensions...>{ BOUNDED_FORWARD(args)... };
 }
 
 
 // These assume you did not specify the inner-most dimension.
 template<typename element_type, std::size_t... dimensions, typename... Args>
-constexpr auto make_array(Args && ... args) noexcept {
+constexpr auto make_array(Args && ... args) {
 	return array<
 		element_type,
 		detail::final_dimension<sizeof...(Args), dimensions...>::value, dimensions...
@@ -55,7 +55,7 @@ constexpr auto make_array(Args && ... args) noexcept {
 }
 
 template<std::size_t... dimensions, typename... Args>
-constexpr auto make_array(Args && ... args) noexcept {
+constexpr auto make_array(Args && ... args) {
 	return array<
 		std::common_type_t<std::decay_t<Args>...>,
 		detail::final_dimension<sizeof...(Args), dimensions...>::value, dimensions...
@@ -69,17 +69,14 @@ namespace detail {
 // Move the last element in if possible. Order of evaluation is well-defined for
 // aggregate initialization, so there is no risk of copy-after-move
 template<std::size_t size, typename T, std::size_t... indexes>
-constexpr auto make_array_n_impl(T && value, std::index_sequence<indexes...>) BOUNDED_NOEXCEPT_VALUE(
-	array<std::decay_t<T>, size>{ (void(indexes), value)..., BOUNDED_FORWARD(value) }
-)
+constexpr auto make_array_n_impl(T && value, std::index_sequence<indexes...>) {
+	return array<std::decay_t<T>, size>{(void(indexes), value)..., BOUNDED_FORWARD(value)};
+}
 
 }	// namespace detail
 
 template<auto size_, typename T>
-constexpr auto make_array_n(bounded::constant_t<size_> size, T && value) noexcept(
-	bounded::constant<size_> == 0_bi or
-	(std::is_nothrow_move_constructible<std::decay_t<T>>{} and (bounded::constant<size_> == 1_bi or std::is_nothrow_copy_constructible<std::decay_t<T>>{}))
-) {
+constexpr auto make_array_n(bounded::constant_t<size_> size, T && value) {
 	if constexpr (size == 0_bi) {
 		return array<std::decay_t<T>, 0>{};
 	} else {

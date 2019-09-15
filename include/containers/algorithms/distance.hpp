@@ -5,6 +5,8 @@
 
 #pragma once
 
+#include <containers/is_iterator_sentinel.hpp>
+
 #include <bounded/integer.hpp>
 
 #include <iterator>
@@ -13,29 +15,18 @@ namespace containers {
 
 using namespace bounded::literal;
 
-namespace detail {
-
-template<typename Iterator, typename Sentinel>
-constexpr auto distance(Iterator const first, Sentinel const last, std::random_access_iterator_tag) BOUNDED_NOEXCEPT_VALUE(
-	last - first
-)
-
-// TODO: noexcept
-template<typename Iterator, typename Sentinel>
-constexpr auto distance(Iterator first, Sentinel const last, std::input_iterator_tag) {
-	auto difference = typename std::iterator_traits<Iterator>::difference_type(0_bi);
-	for (; first != last; ++first) {
-		++difference;
+template<iterator InputIterator>
+constexpr auto distance(InputIterator first, sentinel_for<InputIterator> auto const last) {
+	if constexpr (std::is_same_v<typename std::iterator_traits<InputIterator>::iterator_category, std::random_access_iterator_tag>) {
+		return last - first;
+	} else {
+		auto difference = typename std::iterator_traits<InputIterator>::difference_type(0_bi);
+		for (; first != last; ++first) {
+			++difference;
+		}
+		return difference;
 	}
-	return difference;
 }
-
-}	// namespace detail
-
-template<typename InputIterator, typename Sentinel>
-constexpr auto distance(InputIterator first, Sentinel const last) BOUNDED_NOEXCEPT_VALUE(
-	::containers::detail::distance(first, last, typename std::iterator_traits<InputIterator>::iterator_category{})
-)
 
 
 }	// namespace containers

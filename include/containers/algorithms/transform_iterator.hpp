@@ -8,6 +8,8 @@
 #include <containers/iterator_adapter.hpp>
 #include <containers/reference_wrapper.hpp>
 
+#include <bounded/detail/returns.hpp>
+
 #include <functional>
 
 namespace containers {
@@ -38,7 +40,7 @@ struct function_wrapper<F, false> {
 	F function;
 
 	template<typename... Args>
-	constexpr auto operator()(Args && ... args) const BOUNDED_NOEXCEPT_DECLTYPE(
+	constexpr auto operator()(Args && ... args) const BOUNDED_RETURNS(
 		  function(BOUNDED_FORWARD(args)...)
 	)
 };
@@ -48,7 +50,7 @@ struct function_wrapper<Result Type::*, false> {
 	Result Type::* function;
 
 	template<typename T1, typename... Args>
-	constexpr auto operator()(T1 && t1, Args && ... args) const noexcept(std::is_nothrow_invocable_v<decltype(function), T1, Args...>) -> std::invoke_result_t<decltype(function), T1, Args...> {
+	constexpr auto operator()(T1 && t1, Args && ... args) const {
 		if constexpr (is_reference_wrapper<std::decay_t<T1>>) {
 			return operator()(function, t1.get(), BOUNDED_FORWARD(args)...);
 		} else if constexpr (std::is_member_function_pointer_v<decltype(function)>) {
@@ -78,9 +80,7 @@ struct transform_traits : default_add, default_subtract, default_compare, privat
 	}
 	
 	template<typename Iterator>
-	constexpr auto dereference(Iterator const it) const
-		noexcept(noexcept(std::declval<function_wrapper<UnaryFunction> const &>()(*it)))
-		-> decltype(std::declval<function_wrapper<UnaryFunction> const &>()(*it))
+	constexpr auto dereference(Iterator const it) const -> decltype(std::declval<function_wrapper<UnaryFunction> const &>()(*it))
 	{
 		return static_cast<function_wrapper<UnaryFunction> const &>(*this)(*it);
 	}
@@ -94,9 +94,7 @@ struct transform_traits_dereference : default_add, default_subtract, default_com
 	}
 	
 	template<typename Iterator>
-	constexpr auto dereference(Iterator const it) const
-		noexcept(noexcept(std::declval<function_wrapper<UnaryFunction> const &>()(it)))
-		-> decltype(std::declval<function_wrapper<UnaryFunction> const &>()(it))
+	constexpr auto dereference(Iterator const it) const -> decltype(std::declval<function_wrapper<UnaryFunction> const &>()(it))
 	{
 		return static_cast<function_wrapper<UnaryFunction> const &>(*this)(it);
 	}

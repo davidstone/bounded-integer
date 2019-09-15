@@ -22,10 +22,9 @@ namespace containers {
 namespace detail {
 namespace common {
 
-// TODO: conditional noexcept
 // TODO: this implementation is for contiguous ranges
 template<container Container, iterator Iterator>
-constexpr auto erase(Container & container, Iterator const first_, Iterator const last_) noexcept {
+constexpr auto erase(Container & container, Iterator const first_, Iterator const last_) {
 	auto const first = ::containers::detail::mutable_iterator(container, first_);
 	auto const last = ::containers::detail::mutable_iterator(container, last_);
 	auto const to_clear = ::containers::move(last, end(container), first).output;

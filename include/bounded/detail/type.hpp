@@ -17,17 +17,17 @@ struct types<T> {
 };
 
 template<typename... LHS, typename... RHS>
-constexpr bool operator==(types<LHS...>, types<RHS...>) noexcept {
+constexpr bool operator==(types<LHS...>, types<RHS...>) {
 	return false;
 }
 
 template<typename... Ts>
-constexpr bool operator==(types<Ts...>, types<Ts...>) noexcept {
+constexpr bool operator==(types<Ts...>, types<Ts...>) {
 	return true;
 }
 
 template<typename... LHS, typename... RHS>
-constexpr bool operator!=(types<LHS...> lhs, types<RHS...> rhs) noexcept {
+constexpr bool operator!=(types<LHS...> lhs, types<RHS...> rhs) {
 	return !(lhs == rhs);
 }
 

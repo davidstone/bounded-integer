@@ -13,10 +13,10 @@
 namespace containers {
 
 template<typename Predicate>
-constexpr auto negate(Predicate predicate) noexcept(std::is_nothrow_move_constructible_v<Predicate>) {
-	return [predicate = std::move(predicate)](auto && ... args) BOUNDED_NOEXCEPT(
-		!predicate(BOUNDED_FORWARD(args)...)
-	);
+constexpr auto negate(Predicate predicate) {
+	return [predicate = std::move(predicate)](auto && ... args) {
+		return !predicate(BOUNDED_FORWARD(args)...);
+	};
 }
 
 }	// namespace containers

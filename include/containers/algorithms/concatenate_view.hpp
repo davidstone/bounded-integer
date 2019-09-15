@@ -14,6 +14,7 @@
 
 #include <bounded/detail/construct_destroy.hpp>
 #include <bounded/detail/make_index_sequence.hpp>
+#include <bounded/detail/returns.hpp>
 #include <bounded/detail/tuple.hpp>
 #include <bounded/integer.hpp>
 
@@ -34,12 +35,6 @@ constexpr auto assert_same_ends(LHS const & lhs, RHS const & rhs) {
 	static_assert(bounded::tuple_size<LHS> == bounded::tuple_size<RHS>);
 	BOUNDED_ASSERT(have_same_ends(lhs, rhs, bounded::make_index_sequence(bounded::tuple_size<LHS>)));
 }
-
-template<typename Range>
-concept forward_random_access_range = requires(Range && range, typename Range::size_type offset) {
-	begin(BOUNDED_FORWARD(range)) + offset;
-};
-
 
 template<typename RangeView>
 using view_iterator = decltype(begin(std::declval<RangeView>()));
@@ -238,9 +233,9 @@ public:
 		return compare(lhs.begin_iterators(), rhs.begin_iterators());
 	}
 
-	friend constexpr auto compare(concatenate_view_iterator const lhs, concatenate_view_sentinel const rhs) BOUNDED_NOEXCEPT(
-		lhs == rhs ? bounded::strong_ordering::equal : bounded::strong_ordering::less
-	)
+	friend constexpr auto compare(concatenate_view_iterator const lhs, concatenate_view_sentinel const rhs) {
+		return lhs == rhs ? bounded::strong_ordering::equal : bounded::strong_ordering::less;
+	}
 
 
 	template<typename... RHSRanges>
@@ -256,28 +251,28 @@ public:
 
 
 	template<typename Index>
-	constexpr auto operator[](Index const index) const noexcept(noexcept(*(std::declval<concatenate_view_iterator>() + index))) -> decltype(*(*this + index)) {
+	constexpr decltype(auto) operator[](Index const index) const {
 		return *(*this + index);
 	}
 };
 
 
 template<typename... Ranges>
-constexpr auto operator-(concatenate_view_iterator<Ranges...> const lhs, concatenate_view_sentinel const rhs) BOUNDED_NOEXCEPT_DECLTYPE(
+constexpr auto operator-(concatenate_view_iterator<Ranges...> const lhs, concatenate_view_sentinel const rhs) BOUNDED_RETURNS(
 	-(rhs - lhs)
 )
 
 
-template<typename... Ranges>
-constexpr auto compare(concatenate_view_sentinel const lhs, concatenate_view_iterator<Ranges...> const rhs) BOUNDED_NOEXCEPT_DECLTYPE(
-	compare(0, compare(rhs, lhs))
-)
+template<typename... Ranges> requires bounded::ordered<concatenate_view_iterator<Ranges...>, concatenate_view_sentinel>
+constexpr auto compare(concatenate_view_sentinel const lhs, concatenate_view_iterator<Ranges...> const rhs) {
+	return compare(0, compare(rhs, lhs));
+}
 
 
 template<typename... Ranges>
-constexpr auto operator==(concatenate_view_sentinel const lhs, concatenate_view_iterator<Ranges...> const rhs) BOUNDED_NOEXCEPT_DECLTYPE(
-	rhs == lhs
-)
+constexpr auto operator==(concatenate_view_sentinel const lhs, concatenate_view_iterator<Ranges...> const rhs) {
+	return rhs == lhs;
+}
 
 template<typename... Ranges>
 struct concatenate_view {
@@ -289,7 +284,7 @@ struct concatenate_view {
 		bounded::detail::normalize<std::numeric_limits<typename iterator::difference_type>::max().value()>
 	>;
 	
-	constexpr concatenate_view(Ranges && ... ranges) noexcept((... and std::is_nothrow_constructible_v<Ranges, Ranges &&>)):
+	constexpr concatenate_view(Ranges && ... ranges):
 		m_ranges(BOUNDED_FORWARD(ranges)...)
 	{
 	}

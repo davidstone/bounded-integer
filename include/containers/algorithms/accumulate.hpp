@@ -6,7 +6,6 @@
 #pragma once
 
 #include <containers/is_range.hpp>
-#include <containers/noexcept_iterable.hpp>
 
 #include <bounded/detail/forward.hpp>
 #include <bounded/integer.hpp>
@@ -52,11 +51,7 @@ using accumulate_t = typename accumulate_c<Range, std::decay_t<Initial>, BinaryF
 
 
 template<typename Result, range Range, typename Initial, typename BinaryFunction>
-constexpr auto accumulate(Range && source, Initial && initial, BinaryFunction function) noexcept(
-	detail::noexcept_iterable<Range> and
-	noexcept(function(std::move(std::declval<Result>()), *begin(BOUNDED_FORWARD(source)))) and
-	std::is_nothrow_move_constructible_v<std::decay_t<Result>>
-) {
+constexpr auto accumulate(Range && source, Initial && initial, BinaryFunction function) {
 	auto result = static_cast<Result>(BOUNDED_FORWARD(initial));
 	for (decltype(auto) value : BOUNDED_FORWARD(source)) {
 		result = static_cast<Result>(function(std::move(result), BOUNDED_FORWARD(value)));
@@ -66,56 +61,55 @@ constexpr auto accumulate(Range && source, Initial && initial, BinaryFunction fu
 
 
 template<range Range, typename Initial, typename BinaryFunction>
-constexpr auto accumulate(Range && source, Initial && initial, BinaryFunction function) BOUNDED_NOEXCEPT(
-	::containers::accumulate<detail::accumulate_t<Range, Initial, BinaryFunction>>(
+constexpr auto accumulate(Range && source, Initial && initial, BinaryFunction function) {
+	return ::containers::accumulate<detail::accumulate_t<Range, Initial, BinaryFunction>>(
 		BOUNDED_FORWARD(source),
 		BOUNDED_FORWARD(initial),
 		std::move(function)
-	)
-)
+	);
+}
 
 
 template<typename Result>
-constexpr auto accumulate(range auto && source, auto && initial) BOUNDED_NOEXCEPT(
-	::containers::accumulate<Result>(BOUNDED_FORWARD(source), BOUNDED_FORWARD(initial), std::plus<>{})
-)
+constexpr auto accumulate(range auto && source, auto && initial) {
+	return ::containers::accumulate<Result>(BOUNDED_FORWARD(source), BOUNDED_FORWARD(initial), std::plus<>{});
+}
 
 template<typename Initial>
-constexpr auto accumulate(range auto && source, Initial && initial) BOUNDED_NOEXCEPT(
-	::containers::accumulate(BOUNDED_FORWARD(source), BOUNDED_FORWARD(initial), std::plus<>{})
-)
+constexpr auto accumulate(range auto && source, Initial && initial) {
+	return ::containers::accumulate(BOUNDED_FORWARD(source), BOUNDED_FORWARD(initial), std::plus<>{});
+}
 
 
 namespace detail {
 
-template<bounded::bounded_integer T>
-constexpr auto initial_accumulate_value() noexcept{
-	return 0_bi;
+template<typename T> requires std::is_default_constructible_v<T>
+constexpr auto initial_accumulate_value() {
+	if constexpr (bounded::bounded_integer<T>) {
+		return 0_bi;
+	} else {
+		return T{};
+	}
 }
-
-template<typename T>
-constexpr auto initial_accumulate_value() BOUNDED_NOEXCEPT_VALUE(
-	T{}
-)
 
 }	// namespace detail
 
 template<typename Result, range Range>
-constexpr auto accumulate(Range && source) BOUNDED_NOEXCEPT(
-	::containers::accumulate<Result>(
+constexpr auto accumulate(Range && source) {
+	return ::containers::accumulate<Result>(
 		BOUNDED_FORWARD(source),
 		detail::initial_accumulate_value<typename std::remove_reference_t<Range>::value_type>(),
 		std::plus<>{}
-	)
-)
+	);
+}
 
 template<range Range>
-constexpr auto accumulate(Range && source) BOUNDED_NOEXCEPT(
-	::containers::accumulate(
+constexpr auto accumulate(Range && source) {
+	return ::containers::accumulate(
 		BOUNDED_FORWARD(source),
 		detail::initial_accumulate_value<typename std::remove_reference_t<Range>::value_type>(),
 		std::plus<>{}
-	)
-)
+	);
+}
 
 }	// namespace containers

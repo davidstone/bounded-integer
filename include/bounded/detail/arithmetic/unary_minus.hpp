@@ -16,7 +16,7 @@ namespace bounded {
 namespace detail {
 
 template<auto value_>
-constexpr auto safer_negation(constant_t<value_> const value) noexcept {
+constexpr auto safer_negation(constant_t<value_> const value) {
 	constexpr auto max_signed = basic_numeric_limits<max_signed_t>::max();
 	if constexpr (value < constant<-max_signed>) {
 		static_assert(value == constant<basic_numeric_limits<max_signed_t>::min()>);
@@ -30,7 +30,7 @@ constexpr auto safer_negation(constant_t<value_> const value) noexcept {
 }	// namespace detail
 
 template<auto minimum, auto maximum, typename overflow_policy>
-constexpr auto operator-(integer<minimum, maximum, overflow_policy> const value) noexcept {
+constexpr auto operator-(integer<minimum, maximum, overflow_policy> const value) {
 	static_assert(
 		(constant<minimum> == constant<maximum>) ==
 		(detail::safer_negation(constant<minimum>) == detail::safer_negation(constant<maximum>))

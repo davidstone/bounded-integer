@@ -13,7 +13,7 @@
 namespace bounded {
 
 template<bounded_integer Integer>
-constexpr auto abs(Integer const value) noexcept {
+constexpr auto abs(Integer const value) {
 	if constexpr (Integer::min() >= constant<0>) {
 		return value;
 	} else if constexpr (Integer::max() <= constant<0>) {

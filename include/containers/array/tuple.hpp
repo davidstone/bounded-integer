@@ -16,7 +16,7 @@
 namespace containers {
 
 template<std::size_t index, typename T, std::size_t size>
-constexpr auto && get(array<T, size> const & a) noexcept {
+constexpr auto && get(array<T, size> const & a) {
 	return a[bounded::constant<index>];
 }
 template<std::size_t index, typename T, std::size_t size>
@@ -24,7 +24,7 @@ constexpr auto && get(array<T, size> & a) {
 	return a[bounded::constant<index>];
 }
 template<std::size_t index, typename T, std::size_t size>
-constexpr auto && get(array<T, size> && a) noexcept {
+constexpr auto && get(array<T, size> && a) {
 	return std::move(a[bounded::constant<index>]);
 }
 

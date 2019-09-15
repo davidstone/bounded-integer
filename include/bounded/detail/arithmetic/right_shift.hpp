@@ -17,11 +17,11 @@ template<
 constexpr auto operator>>(
 	integer<lhs_min, lhs_max, lhs_policy> const lhs_,
 	integer<rhs_min, rhs_max, rhs_policy> const rhs_
-) noexcept {
-	constexpr auto right_shift = [](auto const lhs, auto const rhs) noexcept {
+) {
+	constexpr auto right_shift = [](auto const lhs, auto const rhs) {
 		return lhs >> rhs;
 	};
-	return detail::operator_overload(lhs_, rhs_, right_shift, [](auto const lhs, auto const rhs) noexcept {
+	return detail::operator_overload(lhs_, rhs_, right_shift, [](auto const lhs, auto const rhs) {
 		// TODO: Broaden range
 		return detail::min_max{
 			static_cast<detail::max_signed_t>(lhs.min) >> rhs.max.value(),

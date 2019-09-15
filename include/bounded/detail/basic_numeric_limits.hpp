@@ -19,10 +19,10 @@ struct basic_numeric_limits;
 
 template<>
 struct basic_numeric_limits<detail::max_unsigned_t> {
-	static constexpr auto min() noexcept {
+	static constexpr auto min() {
 		return 0;
 	}
-	static constexpr auto max() noexcept {
+	static constexpr auto max() {
 		return static_cast<detail::max_unsigned_t>(-1);
 	}
 	static constexpr auto is_specialized = true;
@@ -32,11 +32,11 @@ struct basic_numeric_limits<detail::max_unsigned_t> {
 
 template<>
 struct basic_numeric_limits<detail::max_signed_t> {
-	static constexpr auto max() noexcept {
+	static constexpr auto max() {
 		return static_cast<detail::max_signed_t>(basic_numeric_limits<detail::max_unsigned_t>::max() / 2);
 	}
 	// TODO: Implement this properly
-	static constexpr auto min() noexcept {
+	static constexpr auto min() {
 		return -max() - 1;
 	}
 	static constexpr auto is_specialized = true;
@@ -67,7 +67,7 @@ inline constexpr auto normalize = static_cast<
 >>>(value);
 
 template<detail_signed_builtin T>
-constexpr auto from_unsigned_cast(std::make_unsigned_t<T> const value) noexcept {
+constexpr auto from_unsigned_cast(std::make_unsigned_t<T> const value) {
 	using limits = basic_numeric_limits<T>;
 	static_assert(-(limits::min() + 1) == limits::max());
 	if (value <= limits::max()) {
@@ -78,7 +78,7 @@ constexpr auto from_unsigned_cast(std::make_unsigned_t<T> const value) noexcept 
 }
 
 template<detail_unsigned_builtin T>
-constexpr auto from_unsigned_cast(std::make_unsigned_t<T> const value) noexcept {
+constexpr auto from_unsigned_cast(std::make_unsigned_t<T> const value) {
 	return value;
 }
 
@@ -94,7 +94,7 @@ private:
 		basic_numeric_limits<std::decay_t<T>>
 	>;
 public:
-	static constexpr auto min() noexcept {
+	static constexpr auto min() {
 		constexpr auto minimum = real_numeric_limits::min();
 		if constexpr (bounded_integer<decltype(minimum)>) {
 			return detail::normalize<minimum.value()>;
@@ -102,7 +102,7 @@ public:
 			return detail::normalize<minimum>;
 		}
 	}
-	static constexpr auto max() noexcept {
+	static constexpr auto max() {
 		constexpr auto maximum = real_numeric_limits::max();
 		if constexpr (bounded_integer<decltype(maximum)>) {
 			return detail::normalize<maximum.value()>;
@@ -117,10 +117,10 @@ public:
 
 template<auto minimum, auto maximum, typename overflow_policy>
 struct basic_numeric_limits<integer<minimum, maximum, overflow_policy>> {
-	static constexpr auto min() noexcept {
+	static constexpr auto min() {
 		return detail::normalize<minimum>;
 	}
-	static constexpr auto max() noexcept {
+	static constexpr auto max() {
 		return detail::normalize<maximum>;
 	}
 	static constexpr auto is_specialized = true;
@@ -130,10 +130,10 @@ struct basic_numeric_limits<integer<minimum, maximum, overflow_policy>> {
 
 template<typename T, T value>
 struct basic_numeric_limits<std::integral_constant<T, value>> {
-	static constexpr auto min() noexcept {
+	static constexpr auto min() {
 		return detail::normalize<value>;
 	}
-	static constexpr auto max() noexcept {
+	static constexpr auto max() {
 		return detail::normalize<value>;
 	}
 	static constexpr auto is_specialized = std::numeric_limits<T>::is_specialized;

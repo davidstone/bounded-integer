@@ -36,7 +36,7 @@ struct dynamic_resizable_array : private Container {
 	using typename Container::const_iterator;
 	using typename Container::iterator;
 
-	constexpr dynamic_resizable_array() noexcept {}
+	constexpr dynamic_resizable_array() {}
 	
 	template<typename Range> requires(
 		range<Range> and
@@ -58,7 +58,7 @@ struct dynamic_resizable_array : private Container {
 		this->move_assign_to_empty(std::move(other));
 	}
 
-	constexpr auto & operator=(dynamic_resizable_array const & other) & noexcept(std::is_nothrow_copy_assignable_v<value_type>) {
+	constexpr auto & operator=(dynamic_resizable_array const & other) & {
 		assign(*this, other);
 		return *this;
 	}
@@ -78,20 +78,16 @@ struct dynamic_resizable_array : private Container {
 	}
 
 
-	friend constexpr auto begin(dynamic_resizable_array const & container) noexcept {
-		static_assert(noexcept(begin(static_cast<Container const &>(container))), "This function assumes begin is noexcept");
+	friend constexpr auto begin(dynamic_resizable_array const & container) {
 		return begin(static_cast<Container const &>(container));
 	}
-	friend constexpr auto begin(dynamic_resizable_array & container) noexcept {
-		static_assert(noexcept(begin(static_cast<Container &>(container))), "This function assumes begin is noexcept");
+	friend constexpr auto begin(dynamic_resizable_array & container) {
 		return begin(static_cast<Container &>(container));
 	}
-	friend constexpr auto end(dynamic_resizable_array const & container) noexcept {
-		static_assert(noexcept(end(static_cast<Container const &>(container))), "This function assumes end is noexcept");
+	friend constexpr auto end(dynamic_resizable_array const & container) {
 		return end(static_cast<Container const &>(container));
 	}
-	friend constexpr auto end(dynamic_resizable_array & container) noexcept {
-		static_assert(noexcept(end(static_cast<Container &>(container))), "This function assumes end is noexcept");
+	friend constexpr auto end(dynamic_resizable_array & container) {
 		return end(static_cast<Container &>(container));
 	}
 
@@ -111,7 +107,7 @@ struct dynamic_resizable_array : private Container {
 
 	// Assumes that elements are already constructed in the spare capacity
 	template<typename Integer>
-	constexpr void append_from_capacity(Integer const count) noexcept {
+	constexpr void append_from_capacity(Integer const count) {
 		this->set_size(size(*this) + count);
 	}
 };

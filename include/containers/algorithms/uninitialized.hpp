@@ -25,7 +25,7 @@ template<typename Target, typename Source>
 concept static_castable = requires(Source source) { static_cast<Target>(source); };
 
 template<typename Target, typename Source>
-constexpr auto static_or_reinterpret_cast(Source source) noexcept {
+constexpr auto static_or_reinterpret_cast(Source source) {
 	if constexpr (static_castable<Target, Source>) {
 		return static_cast<Target>(source);
 	} else {
@@ -34,19 +34,16 @@ constexpr auto static_or_reinterpret_cast(Source source) noexcept {
 }
 
 template<iterator InputIterator>
-constexpr auto destroy_range(InputIterator first, sentinel_for<InputIterator> auto const last) noexcept {
-	// This static_assert fails with reverse_iterator because std::prev is not
-	// noexcept
-	// static_assert(noexcept(bounded::destroy(*first)));
+constexpr void destroy_range(InputIterator first, sentinel_for<InputIterator> auto const last) {
 	for (; first != last; ++first) {
 		bounded::destroy(*first);
 	}
 }
 
 template<range Range>
-constexpr auto destroy_range(Range && range) BOUNDED_NOEXCEPT_DECLTYPE(
-	::containers::detail::destroy_range(begin(BOUNDED_FORWARD(range)), end(BOUNDED_FORWARD(range)))
-)
+constexpr void destroy_range(Range && range) {
+	::containers::detail::destroy_range(begin(BOUNDED_FORWARD(range)), end(BOUNDED_FORWARD(range)));
+}
 
 }	// namespace detail
 
@@ -68,31 +65,31 @@ constexpr auto uninitialized_copy(InputIterator first, sentinel_for<InputIterato
 
 
 template<iterator InputIterator, iterator ForwardIterator>
-constexpr auto uninitialized_move(InputIterator const first, sentinel_for<InputIterator> auto const last, ForwardIterator const out) BOUNDED_NOEXCEPT_VALUE(
-	::containers::uninitialized_copy(::containers::move_iterator(first), ::containers::move_iterator(last), out)
-)
+constexpr auto uninitialized_move(InputIterator const first, sentinel_for<InputIterator> auto const last, ForwardIterator const out) {
+	return ::containers::uninitialized_copy(::containers::move_iterator(first), ::containers::move_iterator(last), out);
+}
 
 template<typename BidirectionalInputIterator, typename BidirectionalOutputIterator>
-constexpr auto uninitialized_copy_backward(BidirectionalInputIterator const first, BidirectionalInputIterator const last, BidirectionalOutputIterator const out_last) BOUNDED_NOEXCEPT_VALUE(
-	containers::uninitialized_copy(
+constexpr auto uninitialized_copy_backward(BidirectionalInputIterator const first, BidirectionalInputIterator const last, BidirectionalOutputIterator const out_last) {
+	return containers::uninitialized_copy(
 		containers::reverse_iterator(last),
 		containers::reverse_iterator(first),
 		containers::reverse_iterator(out_last)
-	).base()
-)
+	).base();
+}
 
 template<typename BidirectionalInputIterator, typename BidirectionalOutputIterator>
-constexpr auto uninitialized_move_backward(BidirectionalInputIterator const first, BidirectionalInputIterator const last, BidirectionalOutputIterator const out_last) BOUNDED_NOEXCEPT_VALUE(
-	containers::uninitialized_copy_backward(
+constexpr auto uninitialized_move_backward(BidirectionalInputIterator const first, BidirectionalInputIterator const last, BidirectionalOutputIterator const out_last) {
+	return containers::uninitialized_copy_backward(
 		containers::move_iterator(first),
 		containers::move_iterator(last),
 		out_last
-	)
-)
+	);
+}
 
 
 template<iterator InputIterator, iterator ForwardIterator>
-constexpr auto uninitialized_move_destroy(InputIterator const first, sentinel_for<InputIterator> auto const last, ForwardIterator out) noexcept {
+constexpr auto uninitialized_move_destroy(InputIterator const first, sentinel_for<InputIterator> auto const last, ForwardIterator out) {
 	return ::containers::uninitialized_copy(
 		::containers::move_destroy_iterator(first),
 		::containers::move_destroy_iterator(last),
@@ -104,7 +101,7 @@ constexpr auto uninitialized_move_destroy(InputIterator const first, sentinel_fo
 namespace detail {
 
 template<typename Source, typename Destination>
-constexpr auto transfer_all_contents(Source && source, Destination & destination) noexcept {
+constexpr auto transfer_all_contents(Source && source, Destination & destination) {
 	::containers::uninitialized_move_destroy(
 		begin(source),
 		end(source),

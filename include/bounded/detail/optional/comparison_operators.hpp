@@ -9,37 +9,36 @@
 #include <bounded/detail/class.hpp>
 #include <bounded/detail/comparison.hpp>
 #include <bounded/detail/comparison_mixed.hpp>
-#include <bounded/detail/noexcept.hpp>
 
 #include <utility>
 
 namespace bounded {
 
-template<typename LHS, typename RHS>
-constexpr auto operator==(optional<LHS> const & lhs, optional<RHS> const & rhs) BOUNDED_NOEXCEPT_VALUE(
-	(lhs and rhs) ?
+template<typename LHS, typename RHS> requires equality_comparable<LHS, RHS>
+constexpr auto operator==(optional<LHS> const & lhs, optional<RHS> const & rhs) {
+	return (lhs and rhs) ?
 		*lhs == *rhs :
-		static_cast<bool>(lhs) == static_cast<bool>(rhs)
-)
+		static_cast<bool>(lhs) == static_cast<bool>(rhs);
+}
 
+
+template<equality_comparable T>
+constexpr auto operator==(optional<T> const & lhs, T const & rhs) {
+	return static_cast<bool>(lhs) and *lhs == rhs;
+}
+
+template<equality_comparable T>
+constexpr auto operator==(T const & lhs, optional<T> const & rhs) {
+	return rhs == lhs;
+}
 
 template<typename T>
-constexpr auto operator==(optional<T> const & lhs, T const & rhs) BOUNDED_NOEXCEPT_VALUE(
-	static_cast<bool>(lhs) and *lhs == rhs
-)
-
-template<typename T>
-constexpr auto operator==(T const & lhs, optional<T> const & rhs) BOUNDED_NOEXCEPT_VALUE(
-	rhs == lhs
-)
-
-template<typename T>
-constexpr auto operator==(optional<T> const & lhs, none_t) noexcept {
+constexpr auto operator==(optional<T> const & lhs, none_t) {
 	return !lhs;
 }
 
 template<typename T>
-constexpr auto operator==(none_t, optional<T> const & rhs) noexcept {
+constexpr auto operator==(none_t, optional<T> const & rhs) {
 	return !rhs;
 }
 

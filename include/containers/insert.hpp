@@ -113,13 +113,13 @@ constexpr auto insert(Container & container, typename Container::const_iterator 
 }
 
 template<container Container>
-constexpr auto insert(Container & container, typename Container::const_iterator const position, typename Container::value_type const & value) BOUNDED_NOEXCEPT(
-	::containers::detail::common::emplace(container, position, value)
-)
+constexpr auto insert(Container & container, typename Container::const_iterator const position, typename Container::value_type const & value) {
+	return ::containers::detail::common::emplace(container, position, value);
+}
 template<container Container>
-constexpr auto insert(Container & container, typename Container::const_iterator const position, typename Container::value_type && value) BOUNDED_NOEXCEPT(
-	::containers::detail::common::emplace(container, position, std::move(value))
-)
+constexpr auto insert(Container & container, typename Container::const_iterator const position, typename Container::value_type && value) {
+	return ::containers::detail::common::emplace(container, position, std::move(value));
+}
 
 }	// namespace common
 

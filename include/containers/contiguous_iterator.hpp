@@ -24,28 +24,28 @@ struct contiguous_iterator {
 	using iterator_category = std::random_access_iterator_tag;
 
 	contiguous_iterator() = default;
-	constexpr explicit contiguous_iterator(T * ptr) noexcept:
+	constexpr explicit contiguous_iterator(T * ptr):
 		m_ptr(ptr)
 	{
 	}
 
 	// Convert iterator to const_iterator
-	constexpr operator contiguous_iterator<T const, max_difference>() const noexcept {
+	constexpr operator contiguous_iterator<T const, max_difference>() const {
 		return contiguous_iterator<T const, max_difference>(m_ptr);
 	}
 
-	constexpr auto & operator*() const noexcept {
+	constexpr auto & operator*() const {
 		return *m_ptr;
 	}
-	constexpr auto operator->() const noexcept {
+	constexpr auto operator->() const {
 		return std::addressof(operator*());
 	}
 
-	constexpr auto & operator[](index_type<contiguous_iterator> const index) const noexcept {
+	constexpr auto & operator[](index_type<contiguous_iterator> const index) const {
 		return *(*this + index);
 	}
 
-	friend constexpr auto pointer_from(contiguous_iterator const it) noexcept {
+	friend constexpr auto pointer_from(contiguous_iterator const it) {
 		return it.m_ptr;
 	}
 private:
@@ -55,14 +55,14 @@ private:
 template<typename T, typename U, std::ptrdiff_t max_difference> requires(
 	std::is_same_v<std::remove_const_t<T>, std::remove_const_t<U>>
 )
-constexpr auto compare(contiguous_iterator<T, max_difference> const lhs, contiguous_iterator<U, max_difference> const rhs) noexcept {
+constexpr auto compare(contiguous_iterator<T, max_difference> const lhs, contiguous_iterator<U, max_difference> const rhs) {
 	return bounded::compare(pointer_from(lhs), pointer_from(rhs));
 }
 
 template<typename T, typename U, std::ptrdiff_t max_difference> requires(
 	std::is_same_v<std::remove_const_t<T>, std::remove_const_t<U>>
 )
-constexpr auto operator==(contiguous_iterator<T, max_difference> const lhs, contiguous_iterator<U, max_difference> const rhs) noexcept {
+constexpr auto operator==(contiguous_iterator<T, max_difference> const lhs, contiguous_iterator<U, max_difference> const rhs) {
 	return pointer_from(lhs) == pointer_from(rhs);
 }
 
@@ -71,7 +71,7 @@ template<typename T, std::ptrdiff_t max_difference>
 constexpr auto operator+(
 	contiguous_iterator<T, max_difference> const lhs,
 	typename contiguous_iterator<T, max_difference>::difference_type const rhs
-) noexcept {
+) {
 	return contiguous_iterator<T, max_difference>(pointer_from(lhs) + rhs);
 }
 
@@ -84,23 +84,23 @@ template<typename T>
 constexpr auto operator+(
 	contiguous_iterator<T, 0> const lhs,
 	bounded::constant_t<1>
-) noexcept -> decltype(lhs) {
+) -> decltype(lhs) {
 	BOUNDED_ASSERT_OR_ASSUME(false);
 }
 
 
 template<typename T, std::ptrdiff_t max_difference>
-constexpr auto operator-(contiguous_iterator<T, max_difference> const lhs, contiguous_iterator<T, max_difference> const rhs) noexcept {
+constexpr auto operator-(contiguous_iterator<T, max_difference> const lhs, contiguous_iterator<T, max_difference> const rhs) {
 	return static_cast<typename contiguous_iterator<T, max_difference>::difference_type>(pointer_from(lhs) - pointer_from(rhs));
 }
 
 template<typename T, std::ptrdiff_t max_difference>
-constexpr auto operator-(contiguous_iterator<T const, max_difference> const lhs, contiguous_iterator<T, max_difference> const rhs) noexcept {
+constexpr auto operator-(contiguous_iterator<T const, max_difference> const lhs, contiguous_iterator<T, max_difference> const rhs) {
 	return lhs - static_cast<decltype(lhs)>(rhs);
 }
 
 template<typename T, std::ptrdiff_t max_difference>
-constexpr auto operator-(contiguous_iterator<T, max_difference> const lhs, contiguous_iterator<T const, max_difference> const rhs) noexcept {
+constexpr auto operator-(contiguous_iterator<T, max_difference> const lhs, contiguous_iterator<T const, max_difference> const rhs) {
 	return static_cast<decltype(rhs)>(lhs) - rhs;
 }
 

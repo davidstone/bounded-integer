@@ -32,10 +32,10 @@ template<typename T>
 struct dynamic_array_data {
 	using size_type = bounded::integer<0, maximum_array_size<T>>;
 	
-	constexpr dynamic_array_data() noexcept = default;
+	constexpr dynamic_array_data() = default;
 
 	template<typename Size>
-	constexpr dynamic_array_data(T * const pointer_, Size const size_) noexcept:
+	constexpr dynamic_array_data(T * const pointer_, Size const size_):
 		pointer(pointer_),
 		size(static_cast<size_type>(size_))
 	{
@@ -46,11 +46,11 @@ struct dynamic_array_data {
 };
 
 template<typename T>
-constexpr auto begin(dynamic_array_data<T> const container) noexcept {
+constexpr auto begin(dynamic_array_data<T> const container) {
 	return container.pointer;
 }
 template<typename T>
-constexpr auto end(dynamic_array_data<T> const container) noexcept {
+constexpr auto end(dynamic_array_data<T> const container) {
 	return begin(container) + container.size;
 }
 
@@ -64,7 +64,7 @@ constexpr auto make_storage(Size const size) {
 }
 
 template<typename T>
-auto deallocate_storage(dynamic_array_data<T> const data) noexcept {
+auto deallocate_storage(dynamic_array_data<T> const data) {
 	std::allocator<T>{}.deallocate(
 		data.pointer,
 		static_cast<std::size_t>(data.size)
@@ -74,7 +74,7 @@ auto deallocate_storage(dynamic_array_data<T> const data) noexcept {
 
 
 template<typename T>
-constexpr auto cleanup(dynamic_array_data<T> const data) noexcept {
+constexpr auto cleanup(dynamic_array_data<T> const data) {
 	::containers::detail::destroy_range(data);
 	deallocate_storage(data);
 }
@@ -131,7 +131,7 @@ struct dynamic_array {
 	{
 	}
 	
-	~dynamic_array() noexcept {
+	~dynamic_array() {
 		detail::cleanup(m_data);
 	}
 
@@ -145,17 +145,17 @@ struct dynamic_array {
 		return *this;
 	}
 	
-	friend constexpr auto begin(dynamic_array const & container) noexcept {
+	friend constexpr auto begin(dynamic_array const & container) {
 		return const_iterator(container.m_data.pointer);
 	}
-	friend constexpr auto begin(dynamic_array & container) noexcept {
+	friend constexpr auto begin(dynamic_array & container) {
 		return iterator(container.m_data.pointer);
 	}
 	
-	friend constexpr auto end(dynamic_array const & container) noexcept {
+	friend constexpr auto end(dynamic_array const & container) {
 		return begin(container) + container.m_data.size;
 	}
-	friend constexpr auto end(dynamic_array & container) noexcept {
+	friend constexpr auto end(dynamic_array & container) {
 		return begin(container) + container.m_data.size;
 	}
 

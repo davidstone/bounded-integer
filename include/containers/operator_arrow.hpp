@@ -28,7 +28,7 @@ concept lvalue_from_dereference = requires(Iterator it) { std::addressof(*it); }
 
 template<lvalue_from_dereference Iterator>
 struct operator_arrow<Iterator> {
-	constexpr auto operator->() const noexcept(noexcept(*std::declval<Iterator const &>())) {
+	constexpr auto operator->() const {
 		return std::addressof(*static_cast<Iterator const &>(*this));
 	}
 };
@@ -39,11 +39,11 @@ struct operator_arrow<Iterator> {
 
 struct temporary_operator_arrow {
 	using reference = decltype(*std::declval<Iterator const &>()) &&;
-	constexpr explicit temporary_operator_arrow(reference value) noexcept:
+	constexpr explicit temporary_operator_arrow(reference value):
 		m_value(BOUNDED_FORWARD(value))
 	{
 	}
-	constexpr auto operator->() && noexcept {
+	constexpr auto operator->() && {
 		return std::addressof(m_value);
 	}
 
@@ -51,9 +51,9 @@ private:
 	reference m_value;
 };
 
-constexpr auto operator->() const BOUNDED_NOEXCEPT(
-	temporary_operator_arrow(**this)
-)
+constexpr auto operator->() const {
+	return temporary_operator_arrow(**this);
+}
 
 // However, this has the nasty effect of silently breaking lifetime extension
 // with references. In other words, if *it returns a prvalue instead of a

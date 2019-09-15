@@ -9,7 +9,7 @@
 #include <bounded/detail/class.hpp>
 #include <bounded/detail/forward.hpp>
 #include <bounded/detail/is_bounded_integer.hpp>
-#include <bounded/detail/noexcept.hpp>
+#include <bounded/detail/returns.hpp>
 
 #include <type_traits>
 
@@ -20,7 +20,7 @@ namespace arithmetic {
 // We have to use static_cast here to avoid integral promotion warnings
 #define BOUNDED_INTEGER_COMPOUND_ASSIGNMENT_OPERATOR(symbol) \
 template<typename LHS, typename RHS> \
-constexpr auto operator symbol##=(LHS & lhs, RHS && rhs) BOUNDED_NOEXCEPT_DECLTYPE( \
+constexpr auto operator symbol##=(LHS & lhs, RHS && rhs) BOUNDED_RETURNS( \
 	lhs = static_cast<LHS>(std::move(lhs) symbol BOUNDED_FORWARD(rhs)) \
 )
 
@@ -38,7 +38,7 @@ BOUNDED_INTEGER_COMPOUND_ASSIGNMENT_OPERATOR(^)
 #undef BOUNDED_INTEGER_COMPOUND_ASSIGNMENT_OPERATOR
 
 template<typename T>
-constexpr auto operator++(T & value) BOUNDED_NOEXCEPT_DECLTYPE(
+constexpr auto operator++(T & value) BOUNDED_RETURNS(
 	value += constant<1>
 )
 
@@ -46,7 +46,7 @@ template<typename T>
 concept incrementable = requires(T value) { ++value; };
 
 template<incrementable T> requires std::is_copy_constructible_v<T>
-constexpr auto operator++(T & value, int) noexcept(std::is_nothrow_copy_constructible_v<T> and std::is_nothrow_move_constructible_v<T> and noexcept(++value)) {
+constexpr auto operator++(T & value, int) {
 	auto previous = value;
 	++value;
 	return previous;
@@ -54,7 +54,7 @@ constexpr auto operator++(T & value, int) noexcept(std::is_nothrow_copy_construc
 
 
 template<typename T>
-constexpr auto operator--(T & value) BOUNDED_NOEXCEPT_DECLTYPE(
+constexpr auto operator--(T & value) BOUNDED_RETURNS(
 	value -= constant<1>
 )
 
@@ -62,7 +62,7 @@ template<typename T>
 concept decrementable = requires(T value) { --value; };
 
 template<decrementable T> requires std::is_copy_constructible_v<T>
-constexpr auto operator--(T & value, int) noexcept(std::is_nothrow_copy_constructible_v<T> and std::is_nothrow_move_constructible_v<T> and noexcept(--value)) {
+constexpr auto operator--(T & value, int) {
 	auto previous = value;
 	--value;
 	return previous;

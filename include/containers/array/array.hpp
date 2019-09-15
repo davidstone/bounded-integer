@@ -11,6 +11,7 @@
 #include <containers/operator_bracket.hpp>
 
 #include <bounded/integer.hpp>
+#include <bounded/detail/returns.hpp>
 
 #include <algorithm>
 #include <cstddef>
@@ -76,30 +77,30 @@ template<typename... Args>
 array(Args && ...) -> array<std::common_type_t<std::decay_t<Args>...>, sizeof...(Args)>;
 
 template<typename T, std::size_t... sizes>
-constexpr auto begin(array<T, sizes...> const & container) noexcept {
+constexpr auto begin(array<T, sizes...> const & container) {
 	return typename array<T, sizes...>::const_iterator(container.m_value);
 }
 template<typename T, std::size_t... sizes>
-constexpr auto begin(array<T, sizes...> & container) noexcept {
+constexpr auto begin(array<T, sizes...> & container) {
 	return typename array<T, sizes...>::iterator(container.m_value);
 }
 
 // TODO: just use nullptr?
 template<typename T, std::size_t... sizes>
-constexpr auto begin(array<T, 0, sizes...> const &) noexcept {
+constexpr auto begin(array<T, 0, sizes...> const &) {
 	return typename array<T, 0, sizes...>::const_iterator();
 }
 template<typename T, std::size_t... sizes>
-constexpr auto begin(array<T, 0, sizes...> &) noexcept {
+constexpr auto begin(array<T, 0, sizes...> &) {
 	return typename array<T, 0, sizes...>::iterator();
 }
 
 template<typename T, std::size_t size, std::size_t... sizes>
-constexpr auto end(array<T, size, sizes...> const & container) noexcept {
+constexpr auto end(array<T, size, sizes...> const & container) {
 	return begin(container) + bounded::constant<size>;
 }
 template<typename T, std::size_t size, std::size_t... sizes>
-constexpr auto end(array<T, size, sizes...> & container) noexcept {
+constexpr auto end(array<T, size, sizes...> & container) {
 	return begin(container) + bounded::constant<size>;
 }
 

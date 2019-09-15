@@ -26,47 +26,47 @@ struct legacy_iterator : detail::operator_arrow<legacy_iterator<Iterator>> {
 	using iterator_category = typename std::iterator_traits<Iterator>::iterator_category;
 
 	legacy_iterator() = default;
-	constexpr legacy_iterator(Iterator it) noexcept(std::is_nothrow_move_constructible_v<Iterator>):
+	constexpr legacy_iterator(Iterator it):
 		m_it(std::move(it)) {
 	}
 	
-	constexpr auto base() const noexcept(std::is_nothrow_copy_constructible_v<Iterator>) {
+	constexpr auto base() const {
 		return m_it;
 	}
 
-	constexpr decltype(auto) operator*() const BOUNDED_NOEXCEPT_GCC_BUG(
-		*base()
-	)
-	constexpr auto operator->() const BOUNDED_NOEXCEPT_GCC_BUG(
-		std::addressof(operator*())
-	)
+	constexpr decltype(auto) operator*() const {
+		return *base();
+	}
+	constexpr auto operator->() const {
+		return std::addressof(operator*());
+	}
 	template<typename Index>
-	constexpr decltype(auto) operator[](Index const index) const BOUNDED_NOEXCEPT_GCC_BUG(
-		base()[static_cast<index_type<Iterator>>(index)]
-	)
+	constexpr decltype(auto) operator[](Index const index) const {
+		return base()[static_cast<index_type<Iterator>>(index)];
+	}
 
 private:
 	Iterator m_it;
 };
 
 template<typename Iterator, typename Offset> requires std::numeric_limits<Offset>::is_integer
-constexpr auto operator+(legacy_iterator<Iterator> const lhs, Offset const rhs) BOUNDED_NOEXCEPT(
-	legacy_iterator<Iterator>(lhs.base() + static_cast<typename std::iterator_traits<Iterator>::difference_type>(rhs))
-)
+constexpr auto operator+(legacy_iterator<Iterator> const lhs, Offset const rhs) {
+	return legacy_iterator<Iterator>(lhs.base() + static_cast<typename std::iterator_traits<Iterator>::difference_type>(rhs));
+}
 template<typename Iterator>
-constexpr auto operator-(legacy_iterator<Iterator> const lhs, legacy_iterator<Iterator> const rhs) BOUNDED_NOEXCEPT(
-	static_cast<typename legacy_iterator<Iterator>::difference_type>(lhs.base() - rhs.base())
-)
+constexpr auto operator-(legacy_iterator<Iterator> const lhs, legacy_iterator<Iterator> const rhs) {
+	return static_cast<typename legacy_iterator<Iterator>::difference_type>(lhs.base() - rhs.base());
+}
 
 template<typename Iterator>
-constexpr auto compare(legacy_iterator<Iterator> const lhs, legacy_iterator<Iterator> const rhs) BOUNDED_NOEXCEPT(
-	compare(lhs.base(), rhs.base())
-)
+constexpr auto compare(legacy_iterator<Iterator> const lhs, legacy_iterator<Iterator> const rhs) {
+	return compare(lhs.base(), rhs.base());
+}
 
 template<typename Iterator>
-constexpr auto operator==(legacy_iterator<Iterator> const lhs, legacy_iterator<Iterator> const rhs) BOUNDED_NOEXCEPT(
-	lhs.base() == rhs.base()
-)
+constexpr auto operator==(legacy_iterator<Iterator> const lhs, legacy_iterator<Iterator> const rhs) {
+	return lhs.base() == rhs.base();
+}
 
 constexpr auto make_legacy_iterator = [](auto it) {
 	if constexpr (bounded::bounded_integer<decltype(it - it)>) {

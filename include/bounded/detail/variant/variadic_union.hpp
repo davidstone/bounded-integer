@@ -27,12 +27,12 @@ using variadic_union_t = variadic_union<(... and std::is_trivially_destructible_
 template<typename T, typename... Ts>
 union variadic_union<true, T, Ts...> {
 	template<typename... Args>
-	explicit constexpr variadic_union(constant_t<0>, Args && ... args) noexcept(std::is_nothrow_constructible_v<T, Args && ...>):
+	explicit constexpr variadic_union(constant_t<0>, Args && ... args):
 		head(BOUNDED_FORWARD(args)...)
 	{
 	}
 	template<auto n, typename... Args>
-	explicit constexpr variadic_union(constant_t<n> const index, Args && ... args) noexcept(std::is_nothrow_constructible_v<variadic_union_t<Ts...>, Args && ...>):
+	explicit constexpr variadic_union(constant_t<n> const index, Args && ... args):
 		tail(index - constant<1>, BOUNDED_FORWARD(args)...)
 	{
 	}
@@ -45,12 +45,12 @@ union variadic_union<true, T, Ts...> {
 template<typename T, typename... Ts>
 union variadic_union<false, T, Ts...> {
 	template<typename... Args>
-	explicit constexpr variadic_union(constant_t<0>, Args && ... args) noexcept(std::is_nothrow_constructible_v<T, Args && ...>):
+	explicit constexpr variadic_union(constant_t<0>, Args && ... args):
 		head(BOUNDED_FORWARD(args)...)
 	{
 	}
 	template<auto n, typename... Args>
-	explicit constexpr variadic_union(constant_t<n> const index, Args && ... args) noexcept(std::is_nothrow_constructible_v<variadic_union_t<Ts...>, Args && ...>):
+	explicit constexpr variadic_union(constant_t<n> const index, Args && ... args):
 		tail(index - constant<1>, BOUNDED_FORWARD(args)...)
 	{
 	}
@@ -68,7 +68,7 @@ union variadic_union<false, T, Ts...> {
 
 
 template<typename V, auto n> requires(n >= 0)
-constexpr auto && get_union_element(V && v, constant_t<n> const index) noexcept {
+constexpr auto && get_union_element(V && v, constant_t<n> const index) {
 	if constexpr (index == constant<0>) {
 		return BOUNDED_FORWARD(v).head;
 	} else {

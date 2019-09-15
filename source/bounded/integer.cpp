@@ -18,11 +18,6 @@
 namespace {
 
 auto check_throw_policy() {
-	using bounded::checked_integer;
-	static_assert(
-		!noexcept(std::declval<checked_integer<0, 0> &>() = std::declval<checked_integer<0, 1> &>()),
-		"Shouldn't be noexcept."
-	);
 	constexpr auto minimum = bounded::constant<0>;
 	constexpr auto maximum = bounded::constant<10>;
 	using policy = bounded::throw_policy<>;

@@ -9,14 +9,14 @@
 #include <bounded/detail/arithmetic/unary_minus.hpp>
 
 #include <bounded/detail/forward.hpp>
-#include <bounded/detail/noexcept.hpp>
+#include <bounded/detail/returns.hpp>
 
 namespace bounded {
 namespace detail {
 namespace arithmetic {
 
 template<typename LHS, typename RHS>
-constexpr auto operator-(LHS && lhs, RHS && rhs) BOUNDED_NOEXCEPT_DECLTYPE(
+constexpr auto operator-(LHS && lhs, RHS && rhs) BOUNDED_RETURNS(
 	BOUNDED_FORWARD(lhs) + -BOUNDED_FORWARD(rhs)
 )
 

@@ -11,6 +11,7 @@
 #include <containers/reference_wrapper.hpp>
 
 #include <bounded/integer.hpp>
+#include <bounded/detail/returns.hpp>
 
 #include <iterator>
 #include <type_traits>
@@ -20,84 +21,59 @@ namespace containers {
 
 struct default_dereference {
 	template<typename Iterator>
-	static constexpr auto dereference(Iterator const & it) BOUNDED_NOEXCEPT_DECLTYPE(
-		*it
-	)
+	static constexpr decltype(auto) dereference(Iterator const & it) {
+		return *it;
+	}
 };
 
 struct default_add {
 	template<typename Iterator, typename Offset>
-	static constexpr auto add(Iterator const & it, Offset const & offset) BOUNDED_NOEXCEPT_DECLTYPE(
+	static constexpr auto add(Iterator const & it, Offset const & offset) BOUNDED_RETURNS(
 		it + offset
 	)
 };
 
 struct default_subtract {
 	template<typename Iterator>
-	static constexpr auto subtract(Iterator const & lhs, Iterator const & rhs) BOUNDED_NOEXCEPT_DECLTYPE(
+	static constexpr auto subtract(Iterator const & lhs, Iterator const & rhs) BOUNDED_RETURNS(
 		lhs - rhs
 	)
 };
 
 namespace detail {
-namespace compare_impl_detail {
-
-using bounded::compare;
 
 template<typename LHS, typename RHS>
-constexpr auto compare_impl(LHS const & lhs, RHS const & rhs) BOUNDED_NOEXCEPT_DECLTYPE(
-	compare(lhs, rhs)
-)
+constexpr auto compare_impl(LHS const & lhs, RHS const & rhs) {
+	using bounded::compare;
+	return compare(lhs, rhs);
+}
 
-} // namespace compare_impl_detail
 } // namespace detail
 
 struct default_compare {
-	template<typename LHS, typename RHS>
-	static constexpr auto compare(LHS const & lhs, RHS const & rhs) BOUNDED_NOEXCEPT_DECLTYPE(
-		detail::compare_impl_detail::compare_impl(lhs, rhs)
-	)
-	template<typename LHS, typename RHS>
-	static constexpr auto equal(LHS const & lhs, RHS const & rhs) BOUNDED_NOEXCEPT_DECLTYPE(
-		lhs == rhs
-	)
+	template<typename LHS, typename RHS> requires bounded::ordered<LHS, RHS>
+	static constexpr auto compare(LHS const & lhs, RHS const & rhs) {
+		return detail::compare_impl(lhs, rhs);
+	}
+	template<typename LHS, typename RHS> requires bounded::equality_comparable<LHS, RHS>
+	static constexpr auto equal(LHS const & lhs, RHS const & rhs) {
+		return lhs == rhs;
+	}
 };
 
 namespace detail {
 
-template<typename Iterator, typename Traits,
-	typename = decltype(std::declval<Traits>().subtract(std::declval<Iterator>(), std::declval<Iterator>()))
->
-constexpr auto is_random_access_iterator() {
-	return true;
-}
-template<typename, typename, typename... Args>
-constexpr auto is_random_access_iterator(Args...) {
-	return false;
-}
+template<typename Iterator, typename Traits>
+concept random_access_iterator = requires(Iterator it, Traits traits) { traits.subtract(it, it); };
 
-template<typename Iterator, typename Traits,
-	typename = decltype(std::declval<Traits>().add(std::declval<Iterator>(), bounded::constant<1>)),
-	typename = decltype(std::declval<Traits>().add(std::declval<Iterator>(), bounded::constant<-1>))
->
-constexpr auto is_bidirectional_iterator() {
-	return true;
-}
-template<typename, typename, typename... Args>
-constexpr auto is_bidirectional_iterator(Args...) {
-	return false;
-}
+template<typename Iterator, typename Traits>
+concept bidirectional_iterator = requires(Iterator it, Traits traits) {
+	traits.add(it, bounded::constant<1>);
+	traits.add(it, bounded::constant<-1>);
+};
 
-template<typename Iterator, typename Traits,
-	typename = decltype(std::declval<Traits>().add(std::declval<Iterator>(), bounded::constant<1>))
->
-constexpr auto is_forward_iterator() {
-	return true;
-}
-template<typename, typename, typename... Args>
-constexpr auto is_forward_iterator(Args...) {
-	return false;
-}
+template<typename Iterator, typename Traits>
+concept forward_iterator = requires(Iterator it, Traits traits) { traits.add(it, bounded::constant<1>); };
 
 // This provides the nested typedefs iterator_category and difference_type if
 // and only if Iterator is an iterator, not a sentinel
@@ -118,9 +94,9 @@ public:
 	using iterator_category =
 		std::conditional_t<std::is_same_v<base_category, std::output_iterator_tag>, std::output_iterator_tag,
 		std::conditional_t<std::is_same_v<base_category, std::input_iterator_tag>, std::input_iterator_tag,
-		std::conditional_t<detail::is_random_access_iterator<Iterator, Traits>(), std::random_access_iterator_tag,
-		std::conditional_t<detail::is_bidirectional_iterator<Iterator, Traits>(), std::bidirectional_iterator_tag,
-		std::conditional_t<detail::is_forward_iterator<Iterator, Traits>(), std::forward_iterator_tag,
+		std::conditional_t<detail::random_access_iterator<Iterator, Traits>, std::random_access_iterator_tag,
+		std::conditional_t<detail::bidirectional_iterator<Iterator, Traits>, std::bidirectional_iterator_tag,
+		std::conditional_t<detail::forward_iterator<Iterator, Traits>, std::forward_iterator_tag,
 		void
 	>>>>>;
 	static_assert(not std::is_void_v<iterator_category>);
@@ -153,25 +129,22 @@ struct adapt_iterator :
 	static_assert(std::is_copy_assignable_v<Traits>);
 
 	adapt_iterator() = default;
-	constexpr adapt_iterator(Iterator it, Traits traits) noexcept(
-		std::is_nothrow_move_constructible_v<Iterator> and
-		std::is_nothrow_move_constructible_v<Traits>
-	):
+	constexpr adapt_iterator(Iterator it, Traits traits):
 		m_base(std::move(it)),
 		m_traits(std::move(traits))
 	{
 	}
 	
-	constexpr auto base() const noexcept {
+	constexpr auto base() const {
 		return m_base;
 	}
 
-	constexpr auto && traits() const noexcept {
+	constexpr auto && traits() const {
 		return containers::unwrap(m_traits);
 	}
 
 	template<typename Index>
-	constexpr auto operator[](Index const index) const noexcept(noexcept(*(std::declval<adapt_iterator>() + index))) -> decltype(*(*this + index)) {
+	constexpr auto operator[](Index const index) const {
 		return *(*this + index);
 	}
 
@@ -182,28 +155,28 @@ private:
 
 
 template<typename Iterator, typename Traits>
-constexpr auto operator*(adapt_iterator<Iterator, Traits> const it) BOUNDED_NOEXCEPT_DECLTYPE(
-	it.traits().dereference(it.base())
-)
+constexpr decltype(auto) operator*(adapt_iterator<Iterator, Traits> const it) {
+	return it.traits().dereference(it.base());
+}
 
 template<typename Iterator, typename Traits, typename Offset>
-constexpr auto operator+(adapt_iterator<Iterator, Traits> const lhs, Offset const rhs) BOUNDED_NOEXCEPT_VALUE(
+constexpr auto operator+(adapt_iterator<Iterator, Traits> const lhs, Offset const rhs) BOUNDED_RETURNS(
 	adapt_iterator<Iterator, Traits>(lhs.traits().add(lhs.base(), rhs), lhs.traits())
 )
 
 
 template<typename LHSIterator, typename RHSIterator, typename Traits>
-constexpr auto operator-(adapt_iterator<LHSIterator, Traits> const lhs, adapt_iterator<RHSIterator, Traits> const rhs) BOUNDED_NOEXCEPT_DECLTYPE(
+constexpr auto operator-(adapt_iterator<LHSIterator, Traits> const lhs, adapt_iterator<RHSIterator, Traits> const rhs) BOUNDED_RETURNS(
 	lhs.traits().subtract(lhs.base(), rhs.base())
 )
 
 template<typename LHSIterator, typename RHSIterator, typename Traits>
-constexpr auto compare(adapt_iterator<LHSIterator, Traits> const lhs, adapt_iterator<RHSIterator, Traits> const rhs) BOUNDED_NOEXCEPT_DECLTYPE(
+constexpr auto compare(adapt_iterator<LHSIterator, Traits> const lhs, adapt_iterator<RHSIterator, Traits> const rhs) BOUNDED_RETURNS(
 	lhs.traits().compare(lhs.base(), rhs.base())
 )
 
 template<typename LHSIterator, typename RHSIterator, typename Traits>
-constexpr auto operator==(adapt_iterator<LHSIterator, Traits> const lhs, adapt_iterator<RHSIterator, Traits> const rhs) BOUNDED_NOEXCEPT_DECLTYPE(
+constexpr auto operator==(adapt_iterator<LHSIterator, Traits> const lhs, adapt_iterator<RHSIterator, Traits> const rhs) BOUNDED_RETURNS(
 	lhs.traits().equal(lhs.base(), rhs.base())
 )
 

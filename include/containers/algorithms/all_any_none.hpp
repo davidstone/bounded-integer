@@ -13,30 +13,30 @@
 namespace containers {
 
 template<typename Range, typename UnaryPredicate>
-constexpr auto all(Range && range, UnaryPredicate p) BOUNDED_NOEXCEPT_VALUE(
-	::containers::find_if_not(BOUNDED_FORWARD(range), p) == end(BOUNDED_FORWARD(range))
-)
+constexpr auto all(Range && range, UnaryPredicate p) {
+	return ::containers::find_if_not(BOUNDED_FORWARD(range), p) == end(BOUNDED_FORWARD(range));
+}
 template<typename Range, typename T>
-constexpr auto all_equal(Range && range, T && value) BOUNDED_NOEXCEPT_VALUE(
-	::containers::all(BOUNDED_FORWARD(range), bounded::equal_to(BOUNDED_FORWARD(value)))
-)
+constexpr auto all_equal(Range && range, T && value) {
+	return ::containers::all(BOUNDED_FORWARD(range), bounded::equal_to(BOUNDED_FORWARD(value)));
+}
 
 template<typename Range, typename UnaryPredicate>
-constexpr auto any(Range && range, UnaryPredicate p) BOUNDED_NOEXCEPT_VALUE(
-	::containers::find_if(BOUNDED_FORWARD(range), p) != end(BOUNDED_FORWARD(range))
-)
+constexpr auto any(Range && range, UnaryPredicate p) {
+	return ::containers::find_if(BOUNDED_FORWARD(range), p) != end(BOUNDED_FORWARD(range));
+}
 template<typename Range, typename T>
-constexpr auto any_equal(Range && range, T && value) BOUNDED_NOEXCEPT_VALUE(
-	::containers::any(BOUNDED_FORWARD(range), bounded::equal_to(BOUNDED_FORWARD(value)))
-)
+constexpr auto any_equal(Range && range, T && value) {
+	return ::containers::any(BOUNDED_FORWARD(range), bounded::equal_to(BOUNDED_FORWARD(value)));
+}
 
 template<typename Range, typename UnaryPredicate>
-constexpr auto none(Range && range, UnaryPredicate p) BOUNDED_NOEXCEPT_VALUE(
-	::containers::find_if(BOUNDED_FORWARD(range), p) == end(BOUNDED_FORWARD(range))
-)
+constexpr auto none(Range && range, UnaryPredicate p) {
+	return ::containers::find_if(BOUNDED_FORWARD(range), p) == end(BOUNDED_FORWARD(range));
+}
 template<typename Range, typename T>
-constexpr auto none_equal(Range && range, T && value) BOUNDED_NOEXCEPT_VALUE(
-	::containers::none(BOUNDED_FORWARD(range), bounded::equal_to(BOUNDED_FORWARD(value)))
-)
+constexpr auto none_equal(Range && range, T && value) {
+	return ::containers::none(BOUNDED_FORWARD(range), bounded::equal_to(BOUNDED_FORWARD(value)));
+}
 
 }	// namespace containers

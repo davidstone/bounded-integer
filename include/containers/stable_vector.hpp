@@ -25,7 +25,7 @@ namespace containers {
 // TODO: ensure proper exception safety
 template<typename T, std::size_t capacity_>
 struct stable_vector {
-	static constexpr auto capacity() noexcept {
+	static constexpr auto capacity() {
 		return bounded::constant<bounded::detail::normalize<capacity_>>;
 	}
 
@@ -85,7 +85,7 @@ struct stable_vector {
 		swap(*this, other);
 		return *this;
 	}
-	auto & operator=(stable_vector const & other) & noexcept(std::is_nothrow_copy_assignable_v<value_type>) {
+	auto & operator=(stable_vector const & other) & {
 		if (!m_storage) {
 			*this = stable_vector();
 		}
@@ -93,7 +93,7 @@ struct stable_vector {
 		return *this;
 	}
 
-	auto & operator=(std::initializer_list<value_type> init) & noexcept(noexcept(assign(std::declval<stable_vector &>(), init))) {
+	auto & operator=(std::initializer_list<value_type> init) & {
 		assign(*this, init);
 		return *this;
 	}
@@ -103,16 +103,16 @@ struct stable_vector {
 		std::swap(lhs.m_size, rhs.m_size);
 	}
 
-	friend auto begin(stable_vector const & container) noexcept {
+	friend auto begin(stable_vector const & container) {
 		return const_iterator(container.m_storage.get());
 	}
-	friend auto begin(stable_vector & container) noexcept {
+	friend auto begin(stable_vector & container) {
 		return iterator(container.m_storage.get());
 	}
-	friend auto end(stable_vector const & container) noexcept {
+	friend auto end(stable_vector const & container) {
 		return begin(container) + container.m_size;
 	}
-	friend auto end(stable_vector & container) noexcept {
+	friend auto end(stable_vector & container) {
 		return begin(container) + container.m_size;
 	}
 
@@ -120,13 +120,13 @@ struct stable_vector {
 	
 	// Assumes that elements are already constructed in the spare capacity
 	template<typename Integer>
-	void append_from_capacity(Integer const count) noexcept {
+	void append_from_capacity(Integer const count) {
 		BOUNDED_ASSERT(count + m_size <= capacity());
 		m_size += count;
 	}
 private:
 	struct deleter {
-		auto operator()(T * ptr) const noexcept {
+		auto operator()(T * ptr) const {
 			std::allocator<T>{}.deallocate(ptr, static_cast<std::ptrdiff_t>(capacity()));
 		}
 	};

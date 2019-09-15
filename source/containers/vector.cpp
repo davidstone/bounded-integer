@@ -125,7 +125,7 @@ struct complex_resource {
 	containers::vector<int> data;
 };
 
-constexpr auto operator==(complex_resource const & lhs, complex_resource const & rhs) noexcept {
+constexpr auto operator==(complex_resource const & lhs, complex_resource const & rhs) {
 	return lhs.data == rhs.data;
 }
 

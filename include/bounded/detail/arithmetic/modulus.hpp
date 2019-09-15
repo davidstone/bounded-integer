@@ -15,11 +15,11 @@
 namespace bounded {
 namespace detail {
 
-constexpr auto update_modulo_range = [](auto const lhs, auto const rhs) noexcept {
+constexpr auto update_modulo_range = [](auto const lhs, auto const rhs) {
 	return min_max{min(lhs.min, rhs.min), max(lhs.max, rhs.max)};
 };
 
-constexpr auto modulo_round = [](auto const dividend, max_unsigned_t const divisor) noexcept {
+constexpr auto modulo_round = [](auto const dividend, max_unsigned_t const divisor) {
 	// When we divide both ends of the dividend by a particular value in
 	// the range of the divisor there are two possibilities:
 	return (dividend.min / divisor == dividend.max / divisor) ?
@@ -38,7 +38,7 @@ constexpr auto modulo_round = [](auto const dividend, max_unsigned_t const divis
 		min_max{static_cast<max_unsigned_t>(0), divisor - 1};
 };
 
-constexpr auto sign_free_value = [](auto const dividend, auto divisor) noexcept {
+constexpr auto sign_free_value = [](auto const dividend, auto divisor) {
 	if (divisor.min > dividend.max) {
 		return dividend;
 	}
@@ -59,7 +59,7 @@ constexpr auto sign_free_value = [](auto const dividend, auto divisor) noexcept 
 	return current;
 };
 
-constexpr auto modulus_operator_range = [](auto const lhs_, auto const rhs_) noexcept {
+constexpr auto modulus_operator_range = [](auto const lhs_, auto const rhs_) {
 	constexpr auto lhs = min_max{decltype(lhs_.min){}, decltype(lhs_.max){}};
 	constexpr auto rhs = min_max{decltype(rhs_.min){}, decltype(rhs_.max){}};
 	// The sign of the result is equal to the sign of the lhs. The sign of the
@@ -107,7 +107,7 @@ template<
 constexpr auto operator%(
 	integer<lhs_min, lhs_max, lhs_policy> const lhs,
 	integer<rhs_min, rhs_max, rhs_policy> const rhs
-) noexcept {
+) {
 	return detail::operator_overload(lhs, rhs, std::modulus{}, detail::modulus_operator_range);
 }
 

@@ -22,11 +22,6 @@ namespace common {
 // defined one with the rvalue qualifier, otherwise default to a definition
 // based on the lvalue begin function.
 //
-// I would like to define containers::begin and containers::end to forward to
-// member begin and end if it is defined, but then unqualified calls to begin
-// and end become ambiguous with std::begin and std::end. I would be happy with
-// std::begin and std::end except they do not have a noexcept specifier.
-//
 // It would be nice if we could define mutable begin from const begin, and at
 // first it seems possible to do so at least for containers with contiguous
 // iterators. It would look something like (assuming pointers for iterators):
@@ -55,30 +50,30 @@ template<typename Range> requires( \
 	std::is_rvalue_reference_v<Range &&> and \
 	has_rvalue_ ## begin_or_end<Range> \
 ) \
-constexpr auto begin_or_end(Range && range) BOUNDED_NOEXCEPT( \
-	std::move(range).begin_or_end() \
-) \
+constexpr auto begin_or_end(Range && range) { \
+	return std::move(range).begin_or_end(); \
+} \
 \
 template<container Container> requires( \
 	std::is_rvalue_reference_v<Container &&> and \
 	!has_rvalue_ ## begin_or_end<std::decay_t<Container>> \
 ) \
-constexpr auto begin_or_end(Container && container) BOUNDED_NOEXCEPT( \
-	::containers::move_iterator(begin_or_end(container)) \
-)
+constexpr auto begin_or_end(Container && container) { \
+	return ::containers::move_iterator(begin_or_end(container)); \
+}
 
 CONTAINERS_DETAIL_BEGIN_END_OVERLOADS(begin)
 CONTAINERS_DETAIL_BEGIN_END_OVERLOADS(end)
 
 
 template<typename Range>
-constexpr auto cbegin(Range const & container) BOUNDED_NOEXCEPT_VALUE(
-	begin(container)
-)
+constexpr auto cbegin(Range const & container) {
+	return begin(container);
+}
 template<typename Range>
-constexpr auto cend(Range const & container) BOUNDED_NOEXCEPT_VALUE(
-	end(container)
-)
+constexpr auto cend(Range const & container) {
+	return end(container);
+}
 
 
 

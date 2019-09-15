@@ -91,9 +91,9 @@ template<
 constexpr auto compare(
 	set_intersection_pair_iterator<LHSForwardIterator1, LHSForwardIterator2, LHSRange> const lhs,
 	set_intersection_pair_iterator<RHSForwardIterator1, RHSForwardIterator2, RHSRange> const rhs
-) BOUNDED_NOEXCEPT_VALUE(
-	compare(lhs.first(), rhs.first())
-)
+) {
+	return compare(lhs.first(), rhs.first());
+}
 template<
 	typename LHSForwardIterator1, typename LHSForwardIterator2, typename LHSRange,
 	typename RHSForwardIterator1, typename RHSForwardIterator2, typename RHSRange
@@ -101,9 +101,9 @@ template<
 constexpr auto operator==(
 	set_intersection_pair_iterator<LHSForwardIterator1, LHSForwardIterator2, LHSRange> const lhs,
 	set_intersection_pair_iterator<RHSForwardIterator1, RHSForwardIterator2, RHSRange> const rhs
-) BOUNDED_NOEXCEPT_VALUE(
-	lhs.first() == rhs.first()
-)
+) {
+	return lhs.first() == rhs.first();
+}
 
 } // namespace detail
 

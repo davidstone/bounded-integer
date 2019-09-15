@@ -21,25 +21,19 @@
 namespace containers {
 namespace detail {
 
-// This cannot use BOUNDED_NOEXCEPT_DECLTYPE because of the assert statement. On
-// clang, it contains the predefined identifier __ASSERT_FUNCTION, which
-// triggers an on-by-default warning: Wpredefined-identifier-outside-function.
-//
-// The alternative would be to write a new assert function that just gets
-// __FILE__ and __LINE__, which may end up being a good idea if there are
-// several functions that follow this pattern.
+template<typename Iterator>
+concept forward_random_access_iterator = iterator<Iterator> and iterator<decltype(std::declval<Iterator>() + std::declval<index_type<std::decay_t<Iterator>>>())>;
 
-template<iterator Iterator>
-constexpr auto operator_bracket(Iterator && iterator, index_type<std::decay_t<Iterator>> const index) BOUNDED_NOEXCEPT_DECLTYPE(
-	*(BOUNDED_FORWARD(iterator) + index)
-)
+template<typename Range>
+concept forward_random_access_range = range<Range> and forward_random_access_iterator<decltype(begin(std::declval<Range>()))>;
+
+template<forward_random_access_iterator Iterator>
+constexpr decltype(auto) operator_bracket(Iterator && iterator, index_type<std::decay_t<Iterator>> const index) {
+	return *(BOUNDED_FORWARD(iterator) + index);
+}
 
 template<range Range>
-constexpr auto operator_bracket(Range && range, index_type<std::decay_t<Range>> const index) noexcept(
-	noexcept(index < size(range)) and
-	noexcept(*(begin(BOUNDED_FORWARD(range)) + index)) and
-	std::is_nothrow_move_constructible_v<decltype(*(begin(BOUNDED_FORWARD(range)) + index))>
-) -> decltype(*(begin(BOUNDED_FORWARD(range)) + index)) {
+constexpr decltype(auto) operator_bracket(Range && range, index_type<std::decay_t<Range>> const index) {
 	BOUNDED_ASSERT(index < size(range));
 	return *(begin(BOUNDED_FORWARD(range)) + index);
 }
@@ -50,20 +44,17 @@ constexpr auto operator_bracket(Range && range, index_type<std::decay_t<Range>> 
 
 #define CONTAINERS_OPERATOR_BRACKET_DEFINITIONS(type) \
 	template<typename Index> \
-	constexpr auto operator[](Index const index) const & \
-		noexcept(noexcept(::containers::detail::operator_bracket(std::declval<type const &>(), index))) -> \
+	constexpr auto operator[](Index const index) const & -> \
 		decltype(::containers::detail::operator_bracket(*this, index)) {\
 		return ::containers::detail::operator_bracket(*this, index); \
 	} \
 	template<typename Index> \
-	constexpr auto operator[](Index const index) & \
-		noexcept(noexcept(::containers::detail::operator_bracket(std::declval<type &>(), index))) -> \
+	constexpr auto operator[](Index const index) & -> \
 		decltype(::containers::detail::operator_bracket(*this, index)) {\
 		return ::containers::detail::operator_bracket(*this, index); \
 	} \
 	template<typename Index> \
-	constexpr auto operator[](Index const index) && \
-		noexcept(noexcept(::containers::detail::operator_bracket(std::declval<type &&>(), index))) -> \
+	constexpr auto operator[](Index const index) && -> \
 		decltype(::containers::detail::operator_bracket(std::move(*this), index)) {\
 		return ::containers::detail::operator_bracket(std::move(*this), index); \
 	}

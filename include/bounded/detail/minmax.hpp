@@ -14,7 +14,6 @@
 #include <bounded/detail/forward.hpp>
 #include <bounded/detail/is_bounded_integer.hpp>
 #include <bounded/detail/max_builtin.hpp>
-#include <bounded/detail/noexcept.hpp>
 #include <bounded/detail/overlapping_range.hpp>
 
 #include <utility>
@@ -45,7 +44,7 @@ struct extreme_type<
 	integer<rhs_min, rhs_max, rhs_policy>
 > {
 private:
-	static constexpr auto select = [](auto const lhs, auto const rhs) noexcept {
+	static constexpr auto select = [](auto const lhs, auto const rhs) {
 		if constexpr (Compare{}(lhs, rhs)) {
 			return detail::normalize<lhs.value()>;
 		} else {
@@ -75,42 +74,21 @@ private:
 	using result_type = detail::add_common_cv_reference_t<extreme_t<Compare, T2, T1>, T1, T2>;
 	
 	template<typename Compare, typename T1, typename T2, typename result_t = result_type<Compare, T1, T2>>
-	static constexpr auto extreme_two(Compare compare, T1 && t1, T2 && t2) BOUNDED_NOEXCEPT_DECLTYPE(
-		compare(t2, t1) ?
+	static constexpr decltype(auto) extreme_two(Compare compare, T1 && t1, T2 && t2) {
+		return compare(t2, t1) ?
 			static_cast<result_t>(BOUNDED_FORWARD(t2)) :
-			static_cast<result_t>(BOUNDED_FORWARD(t1))
-	)
-
-	// These are needed because you cannot have a recursive noexcept specification
-	// https://stackoverflow.com/questions/23772928/recursive-noexcept-specification
-
-	template<typename Compare, typename T1, typename T2>
-	static constexpr auto noexcept_extreme() noexcept {
-		using result_t = result_type<Compare, T1, T2>;
-		if constexpr (not std::is_constructible_v<result_t, T1> or not std::is_constructible_v<result_t, T2>) {
-			return true;
-		} else {
-			return noexcept(extreme_two(std::declval<Compare>(), std::declval<T2>(), std::declval<T1>()));
-		}
+			static_cast<result_t>(BOUNDED_FORWARD(t1));
 	}
-	
-	template<typename Compare, typename T1, typename T2, typename T3, typename... Ts>
-	static constexpr auto noexcept_extreme() noexcept {
-		return std::bool_constant<
-			noexcept_extreme<Compare, T1, T2>() and
-			noexcept_extreme<Compare, result_type<Compare, T1, T2>, T3, Ts...>()
-		>{};
-	}
-	
+
 public:
 	template<typename Compare, typename T>
-	constexpr decltype(auto) operator()(Compare, T && t) const noexcept {
+	constexpr decltype(auto) operator()(Compare, T && t) const {
 		return BOUNDED_FORWARD(t);
 	}
 
 
 	template<typename Compare, typename T1, typename T2>
-	constexpr decltype(auto) operator()(Compare compare [[maybe_unused]], T1 && t1, T2 && t2) const noexcept(noexcept_extreme<Compare, T1 &&, T2 &&>()) {
+	constexpr decltype(auto) operator()(Compare compare [[maybe_unused]], T1 && t1, T2 && t2) const {
 		using result_t = result_type<Compare, T1, T2>;
 		if constexpr (not std::is_constructible_v<result_t, T2>) {
 			return BOUNDED_FORWARD(t1);
@@ -122,7 +100,7 @@ public:
 	}
 
 	template<typename Compare, typename T1, typename T2, typename... Ts>
-	constexpr decltype(auto) operator()(Compare compare, T1 && t1, T2 && t2, Ts && ... ts) const noexcept(noexcept_extreme<Compare, T1, T2, Ts...>()) {
+	constexpr decltype(auto) operator()(Compare compare, T1 && t1, T2 && t2, Ts && ... ts) const {
 		return operator()(
 			compare,
 			operator()(compare, BOUNDED_FORWARD(t1), BOUNDED_FORWARD(t2)),
@@ -136,16 +114,16 @@ public:
 
 constexpr inline struct min_t {
 	template<typename... Ts>
-	constexpr auto operator()(Ts && ... ts) const BOUNDED_NOEXCEPT_DECLTYPE(
-		extreme(less(), BOUNDED_FORWARD(ts)...)
-	)
+	constexpr decltype(auto) operator()(Ts && ... ts) const {
+		return extreme(less(), BOUNDED_FORWARD(ts)...);
+	}
 } min;
 
 constexpr inline struct max_t {
 	template<typename... Ts>
-	constexpr auto operator()(Ts && ... ts) const BOUNDED_NOEXCEPT_DECLTYPE(
-		extreme(greater(), BOUNDED_FORWARD(ts)...)
-	)
+	constexpr decltype(auto) operator()(Ts && ... ts) const {
+		return extreme(greater(), BOUNDED_FORWARD(ts)...);
+	}
 } max;
 
 }	// namespace bounded

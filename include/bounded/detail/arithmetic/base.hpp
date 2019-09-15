@@ -7,7 +7,6 @@
 
 #include <bounded/detail/class.hpp>
 #include <bounded/detail/common_type.hpp>
-#include <bounded/detail/noexcept.hpp>
 
 #include <functional>
 #include <type_traits>
@@ -35,7 +34,7 @@ constexpr auto operator_overload(
 	integer<rhs_min, rhs_max, rhs_policy> const rhs,
 	ArithmeticFunction const arithmetic_function,
 	OperatorRangeFunction const operator_range
-) noexcept {
+) {
 	constexpr auto range = operator_range(
 		min_max{constant<lhs_min>, constant<lhs_max>},
 		min_max{constant<rhs_min>, constant<rhs_max>}

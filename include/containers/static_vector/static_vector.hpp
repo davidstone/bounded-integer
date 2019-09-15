@@ -23,7 +23,7 @@ namespace detail {
 
 template<typename T, std::size_t capacity_, bool = std::is_trivial_v<T>>
 struct static_vector_data {
-	static constexpr auto capacity() noexcept {
+	static constexpr auto capacity() {
 		return bounded::constant<bounded::detail::normalize<capacity_>>;
 	}
 
@@ -54,21 +54,21 @@ struct static_vector_data {
 		}
 	}
 	
-	friend constexpr auto begin(static_vector_data const & container) noexcept {
+	friend constexpr auto begin(static_vector_data const & container) {
 		return const_iterator(::containers::detail::static_or_reinterpret_cast<T const *>(data(container.m_storage)));
 	}
-	friend constexpr auto begin(static_vector_data & container) noexcept {
+	friend constexpr auto begin(static_vector_data & container) {
 		return iterator(::containers::detail::static_or_reinterpret_cast<T *>(data(container.m_storage)));
 	}
 
-	friend constexpr auto end(static_vector_data const & container) noexcept {
+	friend constexpr auto end(static_vector_data const & container) {
 		return begin(container) + container.m_size;
 	}
-	friend constexpr auto end(static_vector_data & container) noexcept {
+	friend constexpr auto end(static_vector_data & container) {
 		return begin(container) + container.m_size;
 	}
 
-	constexpr auto & operator=(std::initializer_list<value_type> init) & noexcept(noexcept(assign(std::declval<static_vector_data &>(), init))) {
+	constexpr auto & operator=(std::initializer_list<value_type> init) & {
 		assign(*this, init);
 		return *this;
 	}
@@ -77,7 +77,7 @@ struct static_vector_data {
 	
 	// Assumes that elements are already constructed in the spare capacity
 	template<typename Integer>
-	constexpr void append_from_capacity(Integer const count) noexcept {
+	constexpr void append_from_capacity(Integer const count) {
 		BOUNDED_ASSERT(count + m_size <= capacity());
 		m_size += count;
 	}
@@ -99,7 +99,7 @@ public:
 		std::uninitialized_move(begin(other), end(other), begin(*this));
 		this->m_size = other.m_size;
 	}
-	static_vector_data(static_vector_data const & other) noexcept(std::is_nothrow_copy_constructible_v<T>) {
+	static_vector_data(static_vector_data const & other) {
 		std::uninitialized_copy(begin(other), end(other), begin(*this));
 		this->m_size = other.m_size;
 	}
@@ -108,12 +108,12 @@ public:
 		::containers::detail::destroy_range(*this);
 	}
 
-	auto & operator=(static_vector_data && other) & noexcept(std::is_nothrow_move_assignable_v<T>) {
+	auto & operator=(static_vector_data && other) & noexcept(std::is_nothrow_move_assignable_v<T> and std::is_nothrow_move_constructible_v<T>) {
 		assign(*this, std::move(other));
 		return *this;
 	}
 
-	auto & operator=(static_vector_data const & other) & noexcept(std::is_nothrow_copy_assignable_v<T>) {
+	auto & operator=(static_vector_data const & other) & {
 		assign(*this, other);
 		return *this;
 	}
@@ -141,17 +141,17 @@ public:
 	
 	using base::operator[];
 
-	friend constexpr auto begin(static_vector const & container) noexcept {
+	friend constexpr auto begin(static_vector const & container) {
 		return begin(static_cast<base const &>(container));
 	}
-	friend constexpr auto begin(static_vector & container) noexcept {
+	friend constexpr auto begin(static_vector & container) {
 		return begin(static_cast<base &>(container));
 	}
 
-	friend constexpr auto end(static_vector const & container) noexcept {
+	friend constexpr auto end(static_vector const & container) {
 		return end(static_cast<base const &>(container));
 	}
-	friend constexpr auto end(static_vector & container) noexcept {
+	friend constexpr auto end(static_vector & container) {
 		return end(static_cast<base &>(container));
 	}
 

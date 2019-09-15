@@ -9,7 +9,7 @@
 
 namespace bounded {
 
-constexpr auto operator+(bounded_integer auto const value) noexcept {
+constexpr auto operator+(bounded_integer auto const value) {
 	return value;
 }
 

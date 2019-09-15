@@ -46,16 +46,16 @@ public:
 	basic_string & operator=(basic_string &&) & = default;
 	using base::operator=;
 	
-	friend constexpr auto begin(basic_string const & container) noexcept {
+	friend constexpr auto begin(basic_string const & container) {
 		return begin(static_cast<base const &>(container));
 	}
-	friend constexpr auto begin(basic_string & container) noexcept {
+	friend constexpr auto begin(basic_string & container) {
 		return begin(static_cast<base &>(container));
 	}
-	friend constexpr auto end(basic_string const & container) noexcept {
+	friend constexpr auto end(basic_string const & container) {
 		return end(static_cast<base const &>(container));
 	}
-	friend constexpr auto end(basic_string & container) noexcept {
+	friend constexpr auto end(basic_string & container) {
 		return end(static_cast<base &>(container));
 	}
 
@@ -67,7 +67,7 @@ public:
 	
 	using base::append_from_capacity;
 	
-	constexpr operator std::basic_string_view<CharT>() const noexcept {
+	constexpr operator std::basic_string_view<CharT>() const {
 		return {data(*this), static_cast<typename std::basic_string_view<CharT>::size_type>(size(*this))};
 	}
 };
@@ -83,22 +83,22 @@ struct c_string_sentinel_t {
 };
 
 template<typename CharT>
-constexpr auto compare(CharT const * lhs, c_string_sentinel_t<CharT>) noexcept {
+constexpr auto compare(CharT const * lhs, c_string_sentinel_t<CharT>) {
 	return *lhs == '\0' ? bounded::strong_ordering::equal : bounded::strong_ordering::less;
 }
 
 template<typename CharT>
-constexpr auto compare(c_string_sentinel_t<CharT> const lhs, CharT const * rhs) noexcept {
+constexpr auto compare(c_string_sentinel_t<CharT> const lhs, CharT const * rhs) {
 	return compare(0, compare(rhs, lhs));
 }
 
 template<typename CharT>
-constexpr auto operator==(CharT const * first, c_string_sentinel_t<CharT>) noexcept {
+constexpr auto operator==(CharT const * first, c_string_sentinel_t<CharT>) {
 	return *first == '\0';
 }
 
 template<typename CharT>
-constexpr auto operator==(c_string_sentinel_t<CharT> const lhs, CharT const * rhs) noexcept {
+constexpr auto operator==(c_string_sentinel_t<CharT> const lhs, CharT const * rhs) {
 	return rhs == lhs;
 }
 
@@ -108,38 +108,38 @@ inline constexpr auto c_string_sentinel = c_string_sentinel_t<CharT>{};
 } // namespace detail
 
 template<typename CharT>
-constexpr auto compare(basic_string<CharT> const & lhs, CharT const * const rhs) noexcept {
+constexpr auto compare(basic_string<CharT> const & lhs, CharT const * const rhs) {
 	return ::containers::lexicographical_compare_3way(begin(lhs), end(lhs), rhs, detail::c_string_sentinel<CharT>);
 }
 template<typename CharT>
-constexpr auto compare(CharT const * const lhs, basic_string<CharT> const & rhs) noexcept {
+constexpr auto compare(CharT const * const lhs, basic_string<CharT> const & rhs) {
 	return compare(0, compare(rhs, lhs));
 }
 
 template<typename CharT>
-constexpr auto operator==(basic_string<CharT> const & lhs, CharT const * const rhs) noexcept {
+constexpr auto operator==(basic_string<CharT> const & lhs, CharT const * const rhs) {
 	return ::containers::equal(begin(lhs), end(lhs), rhs, detail::c_string_sentinel<CharT>);
 }
 template<typename CharT>
-constexpr auto operator==(CharT const * const lhs, basic_string<CharT> const & rhs) noexcept {
+constexpr auto operator==(CharT const * const lhs, basic_string<CharT> const & rhs) {
 	return rhs == lhs;
 }
 
 template<typename CharT>
-constexpr auto compare(basic_string<CharT> const & lhs, std::basic_string_view<CharT> const rhs) noexcept {
+constexpr auto compare(basic_string<CharT> const & lhs, std::basic_string_view<CharT> const rhs) {
 	return ::containers::lexicographical_compare_3way(lhs, rhs);
 }
 template<typename CharT>
-constexpr auto compare(std::basic_string_view<CharT> const lhs, basic_string<CharT> const & rhs) noexcept {
+constexpr auto compare(std::basic_string_view<CharT> const lhs, basic_string<CharT> const & rhs) {
 	return compare(0, compare(rhs, lhs));
 }
 
 template<typename CharT>
-constexpr auto operator==(basic_string<CharT> const & lhs, std::basic_string_view<CharT> const rhs) noexcept {
+constexpr auto operator==(basic_string<CharT> const & lhs, std::basic_string_view<CharT> const rhs) {
 	return size(lhs) == rhs.size() and ::containers::equal(begin(lhs), end(lhs), begin(rhs));
 }
 template<typename CharT>
-constexpr auto operator==(std::basic_string_view<CharT> const lhs, basic_string<CharT> const & rhs) noexcept {
+constexpr auto operator==(std::basic_string_view<CharT> const lhs, basic_string<CharT> const & rhs) {
 	return rhs == lhs;
 }
 

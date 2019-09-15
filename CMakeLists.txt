@@ -66,11 +66,11 @@ target_sources(bounded INTERFACE
 	$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>/include/bounded/detail/max_builtin.hpp
 	$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>/include/bounded/detail/make_index_sequence.hpp
 	$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>/include/bounded/detail/minmax.hpp
-	$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>/include/bounded/detail/noexcept.hpp
 	$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>/include/bounded/detail/numeric_limits.hpp
 	$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>/include/bounded/detail/overlapping_range.hpp
 	$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>/include/bounded/detail/overload.hpp
 	$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>/include/bounded/detail/requires.hpp
+	$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>/include/bounded/detail/returns.hpp
 	$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>/include/bounded/detail/size_of.hpp
 	$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>/include/bounded/detail/stream.hpp
 	$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>/include/bounded/detail/tuple.hpp
@@ -144,7 +144,6 @@ target_sources(containers INTERFACE
 	$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>/include/containers/legacy_iterator.hpp
 	$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>/include/containers/maximum_array_size.hpp
 	$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>/include/containers/mutable_iterator.hpp
-	$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>/include/containers/noexcept_iterable.hpp
 	$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>/include/containers/non_modifying_common_container_functions.hpp
 	$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>/include/containers/operator_arrow.hpp
 	$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>/include/containers/operator_bracket.hpp
@@ -228,11 +227,11 @@ add_executable(bounded_test
 	source/bounded/detail/make_index_sequence.cpp
 	source/bounded/detail/max_builtin.cpp
 	source/bounded/detail/minmax.cpp
-	source/bounded/detail/noexcept.cpp
 	source/bounded/detail/numeric_limits.cpp
 	source/bounded/detail/overlapping_range.cpp
 	source/bounded/detail/overload.cpp
 	source/bounded/detail/requires.cpp
+	source/bounded/detail/returns.cpp
 	source/bounded/detail/size_of.cpp
 	source/bounded/detail/stream.cpp
 	source/bounded/detail/to_integer.cpp
@@ -304,7 +303,6 @@ add_library(containers_test STATIC
 	source/containers/legacy_iterator.cpp
 	source/containers/maximum_array_size.cpp
 	source/containers/mutable_iterator.cpp
-	source/containers/noexcept_iterable.cpp
 	source/containers/non_modifying_common_container_functions.cpp
 	source/containers/operator_arrow.cpp
 	source/containers/push_back.cpp

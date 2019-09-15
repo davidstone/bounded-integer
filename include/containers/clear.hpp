@@ -20,7 +20,7 @@ namespace common {
 
 // TODO: Should probably get rid of the fallback to default construction
 template<container Container>
-constexpr auto clear(Container & container) noexcept {
+constexpr auto clear(Container & container) {
 	if constexpr (pop_backable<Container>) {
 		while (!empty(container)) {
 			pop_back(container);

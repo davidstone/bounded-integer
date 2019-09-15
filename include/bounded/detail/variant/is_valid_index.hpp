@@ -13,7 +13,7 @@ namespace bounded {
 namespace detail {
 
 template<typename LHS, typename RHS>
-constexpr auto types_equal(types<LHS> lhs, types<RHS> rhs) noexcept {
+constexpr auto types_equal(types<LHS> lhs, types<RHS> rhs) {
 	return bounded::integer(lhs == rhs);
 }
 

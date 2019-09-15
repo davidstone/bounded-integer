@@ -29,12 +29,12 @@ namespace detail {
 namespace common {
 
 template<typename Offset, iterator Iterator> requires(std::numeric_limits<Offset>::is_integer)
-constexpr auto operator+(Offset const offset, Iterator const it) BOUNDED_NOEXCEPT(
-	it + offset
-)
+constexpr auto operator+(Offset const offset, Iterator const it) {
+	return it + offset;
+}
 
 template<typename T>
-constexpr auto pointer_from(T * pointer) noexcept {
+constexpr auto pointer_from(T * pointer) {
 	return pointer;
 }
 

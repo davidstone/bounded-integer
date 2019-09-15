@@ -84,10 +84,10 @@ namespace bounded {
 
 template<>
 struct basic_numeric_limits<bounded_enum> {
-	static constexpr auto min() noexcept -> bounded::detail::max_signed_t {
+	static constexpr auto min() -> bounded::detail::max_signed_t {
 		return 0;
 	}
-	static constexpr auto max() noexcept -> bounded::detail::max_signed_t {
+	static constexpr auto max() -> bounded::detail::max_signed_t {
 		return 0;
 	}
 	static constexpr bool is_specialized = true;

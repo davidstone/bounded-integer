@@ -20,9 +20,8 @@ namespace containers {
 namespace detail {
 namespace common {
 
-// TODO: noexcept
 template<container Container, range Range>
-constexpr auto assign(Container & container, Range && range) {
+constexpr void assign(Container & container, Range && range) {
 	auto it = begin(container);
 	auto first = begin(BOUNDED_FORWARD(range));
 	auto last = end(BOUNDED_FORWARD(range));
@@ -37,9 +36,9 @@ constexpr auto assign(Container & container, Range && range) {
 	append(container, range_view(first, last));
 }
 template<container Container>
-constexpr auto assign(Container & container, std::initializer_list<typename Container::value_type> init) BOUNDED_NOEXCEPT(
-	assign(container, range_view(init))
-)
+constexpr void assign(Container & container, std::initializer_list<typename Container::value_type> init) {
+	assign(container, range_view(init));
+}
 
 }	// namespace common
 

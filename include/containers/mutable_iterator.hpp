@@ -15,9 +15,9 @@ namespace containers {
 namespace detail {
 
 template<range Range, iterator Iterator>
-constexpr auto mutable_iterator(Range & range, Iterator const it) BOUNDED_NOEXCEPT_VALUE(
-	begin(range) + (it - begin(range))
-)
+constexpr auto mutable_iterator(Range & range, Iterator const it) {
+	return begin(range) + (it - begin(range));
+}
 
 }	// namespace detail
 }	// namespace containers

@@ -9,7 +9,6 @@
 #include <bounded/detail/comparison.hpp>
 #include <bounded/detail/forward_declaration.hpp>
 #include <bounded/detail/is_bounded_integer.hpp>
-#include <bounded/detail/noexcept.hpp>
 #include <bounded/detail/overlapping_range.hpp>
 #include <bounded/detail/underlying_type.hpp>
 
@@ -42,7 +41,7 @@ concept has_extra_space =
 
 
 template<typename Integer>
-constexpr auto as_builtin_integer(Integer const x) noexcept {
+constexpr auto as_builtin_integer(Integer const x) {
 	if constexpr (detail_builtin_integer<Integer>) {
 		return x;
 	} else {
@@ -56,7 +55,7 @@ constexpr auto as_builtin_integer(Integer const x) noexcept {
 // along non-enum types without doing anything, but constructs a
 // bounded::integer with the tighter bounds from an enumeration.
 template<typename T>
-constexpr decltype(auto) as_integer(T const & value) noexcept {
+constexpr decltype(auto) as_integer(T const & value) {
 	if constexpr (std::is_enum_v<T>) {
 		using limits = basic_numeric_limits<T>;
 		using result_type = integer<
@@ -76,21 +75,21 @@ constexpr decltype(auto) as_integer(T const & value) noexcept {
 template<typename T>
 struct value_wrapper {
 	using underlying_type = T;
-	value_wrapper() noexcept = default;
-	constexpr explicit value_wrapper(underlying_type const value_) noexcept:
+	value_wrapper() = default;
+	constexpr explicit value_wrapper(underlying_type const value_):
 		m_value(value_)
 	{
 	}
-	constexpr auto value() const noexcept {
+	constexpr auto value() const {
 		return m_value;
 	}
-	constexpr auto value() const volatile noexcept {
+	constexpr auto value() const volatile {
 		return m_value;
 	}
-	constexpr auto assign(underlying_type other) noexcept {
+	constexpr auto assign(underlying_type other) {
 		m_value = other;
 	}
-	auto assign(underlying_type other) volatile noexcept {
+	auto assign(underlying_type other) volatile {
 		m_value = other;
 	}
 private:
@@ -100,13 +99,13 @@ private:
 template<auto value_>
 struct constant_wrapper {
 	using underlying_type = decltype(value_);
-	constexpr constant_wrapper() noexcept = default;
-	constexpr explicit constant_wrapper(underlying_type const &) noexcept {
+	constexpr constant_wrapper() = default;
+	constexpr explicit constant_wrapper(underlying_type const &) {
 	}
-	static constexpr auto value() noexcept {
+	static constexpr auto value() {
 		return value_;
 	}
-	static constexpr auto assign(underlying_type const &) noexcept {
+	static constexpr auto assign(underlying_type const &) {
 	}
 };
 
@@ -144,28 +143,25 @@ public:
 	static_assert(detail::value_fits_in_type<underlying_type>(minimum), "minimum does not fit in underlying_type.");
 	static_assert(detail::value_fits_in_type<underlying_type>(maximum), "maximum does not fit in underlying_type.");
 	
-	// May relax these restrictions in the future
-	static_assert(std::is_nothrow_default_constructible_v<overflow_policy>, "overflow_policy must be nothrow default constructible.");
-	
-	static constexpr auto min() noexcept {
+	static constexpr auto min() {
 		return constant<minimum>;
 	}
-	static constexpr auto max() noexcept {
+	static constexpr auto max() {
 		return constant<maximum>;
 	}
 
 private:
 	template<typename T>
-	static constexpr decltype(auto) apply_overflow_policy(T const & value) BOUNDED_NOEXCEPT(
-		overflow_policy{}.assignment(value, min(), max())
-	)
+	static constexpr decltype(auto) apply_overflow_policy(T const & value) {
+		return overflow_policy{}.assignment(value, min(), max());
+	}
 public:
 	
 	using base::value;
 	
-	integer() noexcept = default;
-	constexpr integer(integer const &) noexcept = default;
-	constexpr integer(integer &&) noexcept = default;
+	integer() = default;
+	constexpr integer(integer const &) = default;
+	constexpr integer(integer &&) = default;
 
 	// All constructors not taking a non_check_t argument accept an
 	// overflow_policy, which they default and ignore. This is solely to make
@@ -175,56 +171,56 @@ public:
 	// determined by the type system that the value fits in the range.
 
 	template<typename T> requires detail::overlapping_integer<T, minimum, maximum, overflow_policy>
-	constexpr integer(T const & other, non_check_t) noexcept:
+	constexpr integer(T const & other, non_check_t):
 		base(static_cast<underlying_type>(other)) {
 	}
 
 	template<typename T> requires detail::bounded_by_range<T, minimum, maximum, overflow_policy>
-	constexpr integer(T const other, overflow_policy = overflow_policy{}) BOUNDED_NOEXCEPT_INITIALIZATION(
+	constexpr integer(T const other, overflow_policy = overflow_policy{}):
 		integer(other, non_check)
-	) {
+	{
 	}
 
 	template<typename T> requires detail::overlapping_integer<T, minimum, maximum, overflow_policy>
-	constexpr explicit integer(T const & other, overflow_policy = overflow_policy{}) BOUNDED_NOEXCEPT_INITIALIZATION(
+	constexpr explicit integer(T const & other, overflow_policy = overflow_policy{}):
 		integer(apply_overflow_policy(detail::as_integer(other)), non_check)
-	) {
+	{
 	}
 
 	template<typename Enum> requires(
 		std::is_enum_v<Enum> and !detail::overlapping_integer<Enum, minimum, maximum, overflow_policy>
 	)
-	constexpr integer(Enum other, non_check_t) noexcept:
+	constexpr integer(Enum other, non_check_t):
 		integer(static_cast<std::underlying_type_t<Enum>>(other), non_check) {
 	}
 	template<typename Enum> requires(
 		std::is_enum_v<Enum> and !detail::overlapping_integer<Enum, minimum, maximum, overflow_policy>
 	)
-	constexpr explicit integer(Enum other, overflow_policy = overflow_policy{}) BOUNDED_NOEXCEPT_INITIALIZATION(
-		integer(static_cast<std::underlying_type_t<Enum>>(other)) 
-	) {
+	constexpr explicit integer(Enum other, overflow_policy = overflow_policy{}):
+		integer(static_cast<std::underlying_type_t<Enum>>(other))
+	{
 	}
 
 
 	template<typename T>
-	constexpr auto && unchecked_assignment(T const & other) & noexcept {
+	constexpr auto && unchecked_assignment(T const & other) & {
 		base::assign(static_cast<underlying_type>(other));
 		return *this;
 	}
 	template<typename T>
-	auto unchecked_assignment(T const & other) volatile & noexcept {
+	auto unchecked_assignment(T const & other) volatile & {
 		base::assign(static_cast<underlying_type>(other));
 	}
 	
-	constexpr auto operator=(integer const & other) & noexcept -> integer & = default;
-	constexpr auto operator=(integer && other) & noexcept -> integer & = default;
+	constexpr auto operator=(integer const & other) & -> integer & = default;
+	constexpr auto operator=(integer && other) & -> integer & = default;
 
 	template<typename T> requires detail::overlapping_integer<T, minimum, maximum, overflow_policy>
-	constexpr auto && operator=(T const & other) & noexcept(noexcept(apply_overflow_policy(other))) {
+	constexpr auto && operator=(T const & other) & {
 		return unchecked_assignment(apply_overflow_policy(other));
 	}
 	template<typename T> requires detail::overlapping_integer<T, minimum, maximum, overflow_policy>
-	auto operator=(T const & other) volatile & noexcept(noexcept(apply_overflow_policy(other))) {
+	auto operator=(T const & other) volatile & {
 		unchecked_assignment(apply_overflow_policy(other));
 	}
 	
@@ -232,27 +228,25 @@ public:
 	// conversion out of the safety of bounded::integer. It is subject to all
 	// the standard rules of conversion from one integer type to another.
 	template<typename T> requires (detail_builtin_arithmetic<T> or std::is_enum_v<T>)
-	constexpr explicit operator T() const noexcept {
+	constexpr explicit operator T() const {
 		return static_cast<T>(value());
 	}
 	template<typename T> requires (detail_builtin_arithmetic<T> or std::is_enum_v<T>)
-	constexpr explicit operator T() const volatile noexcept {
+	constexpr explicit operator T() const volatile {
 		return static_cast<T>(value());
 	}
 	
 	// Allow a compressed optional representation
 	template<typename Tag> requires (std::is_same_v<Tag, optional_tag> and detail::has_extra_space<integer>)
-	constexpr explicit integer(Tag) noexcept:
+	constexpr explicit integer(Tag):
 		base(uninitialized_value()) {
 	}
 
-	// Cannot use BOUNDED_NOEXCEPT_VOID because of gcc bug
-	// https://gcc.gnu.org/bugzilla/show_bug.cgi?id=52869
 	template<typename... Args> requires(
 		detail::has_extra_space<integer> and
 		std::is_constructible_v<integer, Args...>
 	)
-	constexpr auto initialize(optional_tag, Args... args) noexcept(std::is_nothrow_constructible_v<integer, Args...>) {
+	constexpr auto initialize(optional_tag, Args... args) {
 		return *this = integer(args...);
 	}
 
@@ -260,18 +254,18 @@ public:
 		std::is_same_v<Tag, optional_tag> and
 		detail::has_extra_space<integer>
 	)
-	constexpr auto uninitialize(Tag) noexcept {
+	constexpr auto uninitialize(Tag) {
 		base::assign(uninitialized_value());
 	}
 	template<typename Tag> requires (
 		std::is_same_v<Tag, optional_tag> and
 		detail::has_extra_space<integer>
 	)
-	constexpr auto is_initialized(Tag) const noexcept {
+	constexpr auto is_initialized(Tag) const {
 		return base::value() != uninitialized_value();
 	}
 private:
-	static constexpr auto uninitialized_value() noexcept {
+	static constexpr auto uninitialized_value() {
 		return minimum > basic_numeric_limits<underlying_type>::min() ?
 			static_cast<underlying_type>(minimum - 1) : static_cast<underlying_type>(maximum + 1);
 	}
@@ -290,20 +284,20 @@ struct equivalent_overflow_policy_c<integer<minimum, maximum, overflow_policy>> 
 };
 
 template<typename T> requires basic_numeric_limits<T>::is_specialized
-constexpr auto deduced_min() noexcept {
+constexpr auto deduced_min() {
 	return basic_numeric_limits<T>::min();
 }
 template<typename T> requires basic_numeric_limits<T>::is_specialized
-constexpr auto deduced_max() noexcept {
+constexpr auto deduced_max() {
 	return basic_numeric_limits<T>::max();
 }
 
 template<typename T> requires (not basic_numeric_limits<T>::is_specialized)
-constexpr auto deduced_min() noexcept {
+constexpr auto deduced_min() {
 	return basic_numeric_limits<std::underlying_type_t<T>>::min();
 }
 template<typename T> requires (not basic_numeric_limits<T>::is_specialized)
-constexpr auto deduced_max() noexcept {
+constexpr auto deduced_max() {
 	return basic_numeric_limits<std::underlying_type_t<T>>::max();
 }
 

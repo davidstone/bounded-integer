@@ -6,7 +6,6 @@
 #pragma once
 
 #include <utility>
-#include <type_traits>
 
 namespace bounded {
 
@@ -14,7 +13,7 @@ namespace bounded {
 // work for function pointers or final function objects.
 template<typename... Functions>
 struct overload : Functions... {
-	constexpr explicit overload(Functions... functions) noexcept((... and std::is_nothrow_move_constructible_v<Functions>)):
+	constexpr explicit overload(Functions... functions):
 		Functions(std::move(functions))...
 	{
 	}

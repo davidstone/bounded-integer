@@ -28,7 +28,7 @@ constexpr auto conditional_function(auto if_true, auto if_false) {
 
 // Ignores divide by 0, caught by constexpr
 template<auto lhs_, auto rhs_>
-constexpr auto safer_divide(constant_t<lhs_> const lhs, constant_t<rhs_> const rhs) noexcept {
+constexpr auto safer_divide(constant_t<lhs_> const lhs, constant_t<rhs_> const rhs) {
 	constexpr auto max_signed = constant<basic_numeric_limits<max_signed_t>::max()>;
 	constexpr auto min_signed = constant<basic_numeric_limits<max_signed_t>::min()>;
 	static_assert(lhs <= -min_signed or rhs != constant<-1>);
@@ -45,7 +45,7 @@ constexpr auto safer_divide(constant_t<lhs_> const lhs, constant_t<rhs_> const r
 	}
 }
 
-constexpr auto divides_operator_range = [](auto const lhs_, auto const rhs_) noexcept {
+constexpr auto divides_operator_range = [](auto const lhs_, auto const rhs_) {
 	constexpr auto lhs = min_max{decltype(lhs_.min){}, decltype(lhs_.max){}};
 	constexpr auto rhs = min_max{decltype(rhs_.min){}, decltype(rhs_.max){}};
 	// If 1 falls within the range, that is the least positive divisor. The
@@ -77,7 +77,7 @@ template<
 constexpr auto operator/(
 	integer<lhs_min, lhs_max, lhs_policy> const lhs,
 	integer<rhs_min, rhs_max, rhs_policy> const rhs
-) noexcept {
+) {
 	return detail::operator_overload(lhs, rhs, std::divides{}, detail::divides_operator_range);
 }
 

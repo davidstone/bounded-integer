@@ -10,7 +10,7 @@
 namespace bounded {
 namespace detail {
 
-constexpr auto safe_abs = [](auto const value) noexcept {
+constexpr auto safe_abs = [](auto const value) {
 	return (value < 0) ? -static_cast<max_unsigned_t>(value) : static_cast<max_unsigned_t>(value);
 };
 

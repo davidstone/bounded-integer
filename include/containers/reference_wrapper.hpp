@@ -6,7 +6,7 @@
 #pragma once
 
 #include <bounded/detail/forward.hpp>
-#include <bounded/detail/noexcept.hpp>
+#include <bounded/detail/returns.hpp>
 #include <utility>
 
 namespace containers {
@@ -16,20 +16,20 @@ template<typename T>
 struct reference_wrapper {
 	using type = T;
 
-	constexpr reference_wrapper(T & ref) noexcept:
+	constexpr reference_wrapper(T & ref):
 		m_ptr(std::addressof(ref))
 	{
 	}
 
-	constexpr operator T &() const noexcept {
+	constexpr operator T &() const {
 		return *m_ptr;
 	}
-	constexpr T & get() const noexcept {
+	constexpr T & get() const {
 		return *m_ptr;
 	}
 
 	template<typename... Args>
-	constexpr auto operator()(Args && ... args) const BOUNDED_NOEXCEPT_DECLTYPE(
+	constexpr auto operator()(Args && ... args) const BOUNDED_RETURNS(
 		get()(BOUNDED_FORWARD(args)...)
 	)
 
@@ -41,23 +41,23 @@ template<typename T>
 reference_wrapper(T &) -> reference_wrapper<T>;
 
 template<typename T>
-constexpr auto ref(T & value) noexcept {
+constexpr auto ref(T & value) {
 	return reference_wrapper<T>(value);
 }
 
 template<typename T>
-constexpr auto cref(T const & value) noexcept {
+constexpr auto cref(T const & value) {
 	return reference_wrapper<T const>(value);
 }
 template<typename T>
 constexpr auto cref(T && value) = delete;
 
 template<typename T>
-constexpr auto && unwrap(reference_wrapper<T> reference) noexcept {
+constexpr auto && unwrap(reference_wrapper<T> reference) {
 	return reference.get();
 }
 template<typename T>
-constexpr auto && unwrap(T && reference) noexcept {
+constexpr auto && unwrap(T && reference) {
 	return BOUNDED_FORWARD(reference);
 }
 

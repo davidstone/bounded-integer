@@ -14,7 +14,7 @@ namespace bounded {
 namespace detail {
 
 template<auto lhs, auto rhs>
-constexpr auto safer_add(constant_t<lhs>, constant_t<rhs>) noexcept {
+constexpr auto safer_add(constant_t<lhs>, constant_t<rhs>) {
 	constexpr auto modulo_equivalent_value = static_cast<max_unsigned_t>(lhs) + static_cast<max_unsigned_t>(rhs);
 	constexpr auto max_signed = basic_numeric_limits<max_signed_t>::max();
 	if constexpr ((lhs >= 0 and rhs >= 0) or lhs > max_signed or rhs > max_signed) {
@@ -45,8 +45,8 @@ template<
 constexpr auto operator+(
 	integer<lhs_min, lhs_max, lhs_policy> const lhs_,
 	integer<rhs_min, rhs_max, rhs_policy> const rhs_
-) noexcept {
-	return detail::operator_overload(lhs_, rhs_, std::plus{}, [](auto const lhs, auto const rhs) noexcept {
+) {
+	return detail::operator_overload(lhs_, rhs_, std::plus{}, [](auto const lhs, auto const rhs) {
 		return detail::min_max{
 			safer_add(lhs.min, rhs.min),
 			safer_add(lhs.max, rhs.max)

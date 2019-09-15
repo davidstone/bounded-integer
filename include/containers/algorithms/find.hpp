@@ -15,7 +15,7 @@
 namespace containers {
 
 template<typename InputIterator, typename Sentinel, typename UnaryPredicate>
-constexpr auto find_if(InputIterator first, Sentinel const last, UnaryPredicate p) noexcept(noexcept(first != last) and noexcept(++first) and noexcept(p(*first)) and std::is_nothrow_move_constructible_v<InputIterator>) {
+constexpr auto find_if(InputIterator first, Sentinel const last, UnaryPredicate p) {
 	for (; first != last; ++first) {
 		if (p(*first)) {
 			break;
@@ -25,30 +25,30 @@ constexpr auto find_if(InputIterator first, Sentinel const last, UnaryPredicate 
 }
 
 template<typename Range, typename UnaryPredicate>
-constexpr auto find_if(Range && range, UnaryPredicate p) BOUNDED_NOEXCEPT_VALUE(
-	::containers::find_if(begin(BOUNDED_FORWARD(range)), end(BOUNDED_FORWARD(range)), std::move(p))
-)
+constexpr auto find_if(Range && range, UnaryPredicate p) {
+	return ::containers::find_if(begin(BOUNDED_FORWARD(range)), end(BOUNDED_FORWARD(range)), std::move(p));
+}
 
 
 template<typename InputIterator, typename Sentinel, typename UnaryPredicate>
-constexpr auto find_if_not(InputIterator const first, Sentinel const last, UnaryPredicate p) BOUNDED_NOEXCEPT_VALUE(
-	::containers::find_if(first, last, ::containers::negate(std::move(p)))
-)
+constexpr auto find_if_not(InputIterator const first, Sentinel const last, UnaryPredicate p) {
+	return ::containers::find_if(first, last, ::containers::negate(std::move(p)));
+}
 
 template<typename Range, typename UnaryPredicate>
-constexpr auto find_if_not(Range && range, UnaryPredicate p) BOUNDED_NOEXCEPT_VALUE(
-	::containers::find_if_not(begin(BOUNDED_FORWARD(range)), end(BOUNDED_FORWARD(range)), std::move(p))
-)
+constexpr auto find_if_not(Range && range, UnaryPredicate p) {
+	return ::containers::find_if_not(begin(BOUNDED_FORWARD(range)), end(BOUNDED_FORWARD(range)), std::move(p));
+}
 
 
 template<typename InputIterator, typename Sentinel, typename T>
-constexpr auto find(InputIterator const first, Sentinel const last, T const & value) BOUNDED_NOEXCEPT_VALUE(
-	::containers::find_if(first, last, bounded::equal_to(value))
-)
+constexpr auto find(InputIterator const first, Sentinel const last, T const & value) {
+	return ::containers::find_if(first, last, bounded::equal_to(value));
+}
 
 template<typename Range, typename T>
-constexpr auto find(Range && range, T const & value) BOUNDED_NOEXCEPT_VALUE(
-	::containers::find(begin(BOUNDED_FORWARD(range)), end(BOUNDED_FORWARD(range)), value)
-)
+constexpr auto find(Range && range, T const & value) {
+	return ::containers::find(begin(BOUNDED_FORWARD(range)), end(BOUNDED_FORWARD(range)), value);
+}
 
 }	// namespace containers

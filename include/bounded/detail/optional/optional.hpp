@@ -12,7 +12,6 @@
 #include <bounded/assert.hpp>
 #include <bounded/detail/construct_destroy.hpp>
 #include <bounded/detail/forward.hpp>
-#include <bounded/detail/noexcept.hpp>
 
 #include <stdexcept>
 #include <type_traits>
@@ -46,37 +45,37 @@ namespace detail {
 
 template<typename T>
 struct default_optional_storage {
-	constexpr explicit default_optional_storage(optional_tag) noexcept:
+	constexpr explicit default_optional_storage(optional_tag):
 		m_data(std::in_place, none_index, none)
 	{
 	}
 	
 	template<typename... Args>
-	constexpr default_optional_storage(Args && ... args) noexcept(std::is_nothrow_constructible_v<T, Args && ...>):
+	constexpr default_optional_storage(Args && ... args):
 		m_data(std::in_place, value_index, BOUNDED_FORWARD(args)...)
 	{
 	}
 	
 	template<typename... Args>
-	constexpr auto initialize(optional_tag, Args && ... args) noexcept(std::is_nothrow_constructible_v<T, Args && ...>) {
+	constexpr auto initialize(optional_tag, Args && ... args) {
 		m_data.emplace(value_index, BOUNDED_FORWARD(args)...);
 	}
 	
-	constexpr auto uninitialize(optional_tag) noexcept {
+	constexpr auto uninitialize(optional_tag) {
 		m_data.emplace(none_index, none);
 	}
 
-	constexpr auto is_initialized(optional_tag) const noexcept {
+	constexpr auto is_initialized(optional_tag) const {
 		return m_data.index() == value_index;
 	}
 
-	constexpr operator T const & () const & noexcept {
+	constexpr operator T const & () const & {
 		return m_data[value_index];
 	}
-	constexpr operator T & () & noexcept {
+	constexpr operator T & () & {
 		return m_data[value_index];
 	}
-	constexpr operator T && () && noexcept {
+	constexpr operator T && () && {
 		return std::move(m_data)[value_index];
 	}
 
@@ -87,7 +86,7 @@ private:
 };
 
 template<typename Optional, typename T>
-constexpr auto & assign(Optional & target, T && source) noexcept(std::is_nothrow_constructible_v<typename Optional::value_type, T> and std::is_nothrow_assignable_v<typename Optional::value_type &, T>) {
+constexpr auto & assign(Optional & target, T && source) {
 	if (target) {
 		*target = BOUNDED_FORWARD(source);
 	} else {
@@ -97,7 +96,7 @@ constexpr auto & assign(Optional & target, T && source) noexcept(std::is_nothrow
 }
 
 template<typename Target, typename Source>
-constexpr auto & assign_from_optional(Target & target, Source && source) noexcept(noexcept(assign(target, *BOUNDED_FORWARD(source)))) {
+constexpr auto & assign_from_optional(Target & target, Source && source) {
 	if (!source) {
 		target = none;
 	} else {
@@ -116,99 +115,100 @@ private:
 	// Cannot use concepts or std::is_constructible because this could require
 	// friendship
 	template<typename U>
-	static constexpr auto is_specialized(decltype(U(std::declval<optional_tag>())) *) noexcept { return true; }
+	static constexpr auto is_specialized(decltype(U(std::declval<optional_tag>())) *) { return true; }
 	template<typename>
-	static constexpr auto is_specialized(...) noexcept { return false; }
+	static constexpr auto is_specialized(...) { return false; }
 	using optional_storage = std::conditional_t<is_specialized<T>(nullptr), T, detail::default_optional_storage<T>>;
 public:
 	using value_type = T;
 
-	constexpr optional(none_t = none) noexcept:
+	constexpr optional(none_t = none):
 		m_value(optional_tag{})
 	{
-		static_assert(noexcept(optional_storage(optional_tag{})));
 	}
 
 	template<typename... Args> requires std::is_constructible_v<value_type, Args && ...>
-	constexpr explicit optional(std::in_place_t, Args && ... other) noexcept(std::is_nothrow_constructible_v<value_type, Args && ...>):
+	constexpr explicit optional(std::in_place_t, Args && ... other):
 		m_value(BOUNDED_FORWARD(other)...) {
 	}
 	template<typename U> requires std::is_convertible_v<U &&, value_type>
-	constexpr optional(U && other)
-		BOUNDED_NOEXCEPT_INITIALIZATION(optional(std::in_place, BOUNDED_FORWARD(other))) {
+	constexpr optional(U && other):
+		optional(std::in_place, BOUNDED_FORWARD(other))
+	{
 	}
 	template<typename U> requires (!std::is_convertible_v<U &&, value_type> and std::is_constructible_v<value_type, U &&>)
-	constexpr explicit optional(U && other)
-		BOUNDED_NOEXCEPT_INITIALIZATION(optional(std::in_place, BOUNDED_FORWARD(other))) {
+	constexpr explicit optional(U && other):
+		optional(std::in_place, BOUNDED_FORWARD(other))
+	{
 	}
 
 
 	template<typename U> requires std::is_convertible_v<U const &, value_type>
-	constexpr optional(optional<U> const & other)
-		BOUNDED_NOEXCEPT_INITIALIZATION(optional(other, common_init_tag{})) {
+	constexpr optional(optional<U> const & other):
+		optional(other, common_init_tag{})
+	{
 	}
 	template<typename U> requires std::is_convertible_v<U &&, value_type>
-	constexpr optional(optional<U> && other)
-		BOUNDED_NOEXCEPT_INITIALIZATION(optional(std::move(other), common_init_tag{})) {
+	constexpr optional(optional<U> && other):
+		optional(std::move(other), common_init_tag{})
+	{
 	}
 	template<typename U> requires (!std::is_convertible_v<U const &, value_type> and std::is_constructible_v<value_type, U const &>)
-	constexpr explicit optional(optional<U> const & other)
-		BOUNDED_NOEXCEPT_INITIALIZATION(optional(other, common_init_tag{})) {
+	constexpr explicit optional(optional<U> const & other):
+		optional(other, common_init_tag{})
+	{
 	}
 	template<typename U> requires (!std::is_convertible_v<U &&, value_type> and std::is_constructible_v<value_type, U &&>)
-	constexpr explicit optional(optional<U> && other)
-		BOUNDED_NOEXCEPT_INITIALIZATION(optional(std::move(other), common_init_tag{})) {
+	constexpr explicit optional(optional<U> && other):
+		optional(std::move(other), common_init_tag{})
+	{
 	}
 
 	
-	constexpr auto operator*() const & noexcept -> value_type const & {
+	constexpr auto operator*() const & -> value_type const & {
 		BOUNDED_ASSERT(*this);
 		return m_value;
 	}
-	constexpr auto operator*() & noexcept -> value_type & {
+	constexpr auto operator*() & -> value_type & {
 		BOUNDED_ASSERT(*this);
 		return m_value;
 	}
-	constexpr auto operator*() && noexcept -> value_type && {
+	constexpr auto operator*() && -> value_type && {
 		BOUNDED_ASSERT(*this);
 		return std::move(m_value);
 	}
 
-	constexpr auto operator->() const noexcept {
+	constexpr auto operator->() const {
 		return &operator*();
 	}
-	constexpr auto operator->() noexcept {
+	constexpr auto operator->() {
 		return &operator*();
 	}
 	
-	constexpr explicit operator bool() const noexcept {
-		static_assert(noexcept(m_value.is_initialized(optional_tag{})));
+	constexpr explicit operator bool() const {
 		return m_value.is_initialized(optional_tag{});
 	}
 
 	// TODO: handle std::initializer_list
 	template<typename... Args>
-	constexpr auto emplace(Args && ... args) noexcept(std::is_nothrow_constructible_v<value_type, Args && ...>) {
+	constexpr auto emplace(Args && ... args) {
 		m_value.initialize(optional_tag{}, BOUNDED_FORWARD(args)...);
 	}
 
-	// Cannot use BOUNDED_NOEXCEPT because of gcc bug
-	// https://gcc.gnu.org/bugzilla/show_bug.cgi?id=52869
-	constexpr auto && operator=(none_t) & noexcept {
-		static_assert(noexcept(m_value.uninitialize(optional_tag{})));
+	constexpr auto && operator=(none_t) & {
 		m_value.uninitialize(optional_tag{});
 		return *this;
 	}
 	// TODO: make this work when value_type is a reference
 	template<typename U> requires(std::is_convertible_v<U &&, value_type>)
-	constexpr auto && operator=(U && other) & noexcept(noexcept(detail::assign(std::declval<optional &>(), BOUNDED_FORWARD(other)))) {
+	constexpr auto && operator=(U && other) & {
 		return detail::assign(*this, BOUNDED_FORWARD(other));
 	}
 	
 private:
 
 	template<typename Optional>
-	constexpr optional(Optional && other, common_init_tag) noexcept(std::is_nothrow_constructible<value_type, decltype(*std::declval<Optional>())>{}):
+	constexpr optional(Optional && other, common_init_tag):
 		optional(none) {
 		if (other) {
 			emplace(*BOUNDED_FORWARD(other));
@@ -222,7 +222,7 @@ template<typename T> requires(!std::is_same_v<T, none_t> and !std::is_same_v<T, 
 optional(T) -> optional<T>;
 
 template<typename T>
-constexpr auto make_optional(T && value) noexcept -> optional<std::remove_cv_t<std::remove_reference_t<T>>> {
+constexpr auto make_optional(T && value) -> optional<std::remove_cv_t<std::remove_reference_t<T>>> {
 	return { BOUNDED_FORWARD(value) };
 }
 

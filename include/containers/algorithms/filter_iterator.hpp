@@ -7,10 +7,12 @@
 
 #include <containers/algorithms/advance.hpp>
 #include <containers/algorithms/find.hpp>
+#include <containers/is_iterator_sentinel.hpp>
 #include <containers/iterator_adapter.hpp>
 #include <containers/reference_wrapper.hpp>
 
 #include <bounded/detail/forward.hpp>
+#include <bounded/detail/returns.hpp>
 #include <bounded/assert.hpp>
 #include <bounded/integer.hpp>
 
@@ -28,10 +30,7 @@ private:
 	[[no_unique_address]] Sentinel m_sentinel;
 	[[no_unique_address]] UnaryPredicate m_predicate;
 public:
-	constexpr filter_iterator_traits(Sentinel last, UnaryPredicate condition) noexcept(
-		std::is_nothrow_move_constructible_v<Sentinel> and
-		std::is_nothrow_move_constructible_v<UnaryPredicate>
-	):
+	constexpr filter_iterator_traits(Sentinel last, UnaryPredicate condition):
 		m_sentinel(std::move(last)),
 		m_predicate(std::move(condition))
 	{
@@ -74,40 +73,40 @@ concept is_filter_iterator_traits = detail::is_filter_iterator_traits<T>;
 struct filter_iterator_sentinel {
 };
 
-template<typename Iterator, is_filter_iterator_traits Traits>
-constexpr auto compare(adapt_iterator<Iterator, Traits> const lhs, filter_iterator_sentinel) BOUNDED_NOEXCEPT_DECLTYPE(
+template<iterator Iterator, is_filter_iterator_traits Traits>
+constexpr auto compare(adapt_iterator<Iterator, Traits> const lhs, filter_iterator_sentinel) BOUNDED_RETURNS(
 	lhs.traits().compare(lhs.base(), lhs.traits().sentinel())
 )
 
-template<typename Iterator, is_filter_iterator_traits Traits>
-constexpr auto compare(filter_iterator_sentinel, adapt_iterator<Iterator, Traits> const rhs) BOUNDED_NOEXCEPT_DECLTYPE(
+template<iterator Iterator, is_filter_iterator_traits Traits>
+constexpr auto compare(filter_iterator_sentinel, adapt_iterator<Iterator, Traits> const rhs) BOUNDED_RETURNS(
 	rhs.traits().compare(rhs.traits().sentinel(), rhs.base())
 )
 
-template<typename Iterator, is_filter_iterator_traits Traits>
-constexpr auto operator==(adapt_iterator<Iterator, Traits> const lhs, filter_iterator_sentinel) BOUNDED_NOEXCEPT_DECLTYPE(
-	lhs.traits().equal(lhs.base(), lhs.traits().sentinel())
-)
+template<iterator Iterator, is_filter_iterator_traits Traits>
+constexpr auto operator==(adapt_iterator<Iterator, Traits> const lhs, filter_iterator_sentinel) {
+	return lhs.traits().equal(lhs.base(), lhs.traits().sentinel());
+}
 
-template<typename Iterator, is_filter_iterator_traits Traits>
-constexpr auto operator==(filter_iterator_sentinel, adapt_iterator<Iterator, Traits> const rhs) BOUNDED_NOEXCEPT_DECLTYPE(
-	rhs.traits().equal(rhs.traits().sentinel(), rhs.base())
-)
+template<iterator Iterator, is_filter_iterator_traits Traits>
+constexpr auto operator==(filter_iterator_sentinel, adapt_iterator<Iterator, Traits> const rhs) {
+	return rhs.traits().equal(rhs.traits().sentinel(), rhs.base());
+}
 
-template<typename ForwardIterator, is_filter_iterator_traits Traits>
-constexpr auto filter_iterator_impl(ForwardIterator first, Traits traits) BOUNDED_NOEXCEPT_VALUE(
-	containers::adapt_iterator(
+template<iterator ForwardIterator, is_filter_iterator_traits Traits>
+constexpr auto filter_iterator_impl(ForwardIterator first, Traits traits) {
+	return containers::adapt_iterator(
 		containers::find_if(first, containers::unwrap(traits).sentinel(), containers::unwrap(traits).predicate()),
 		traits
-	)
-)
+	);
+}
 
 }	// namespace detail
 
-template<typename ForwardIterator, typename Sentinel, typename UnaryPredicate>
-constexpr auto filter_iterator(ForwardIterator first, Sentinel last, UnaryPredicate condition) BOUNDED_NOEXCEPT_VALUE(
-	detail::filter_iterator_impl(first, detail::filter_iterator_traits(last, std::move(condition)))
-)
+template<iterator ForwardIterator, typename UnaryPredicate>
+constexpr auto filter_iterator(ForwardIterator first, sentinel_for<ForwardIterator> auto last, UnaryPredicate condition) {
+	return detail::filter_iterator_impl(first, detail::filter_iterator_traits(last, std::move(condition)));
+}
 
 template<typename Range, typename UnaryPredicate>
 struct filter {
@@ -130,7 +129,7 @@ public:
 		bounded::detail::normalize<static_cast<std::uintmax_t>(std::numeric_limits<typename std::iterator_traits<iterator>::difference_type>::max())>
 	>;
 
-	constexpr filter(Range && range, UnaryPredicate predicate) noexcept(std::is_nothrow_move_constructible_v<Range> and std::is_nothrow_constructible_v<traits, sentinel, UnaryPredicate>):
+	constexpr filter(Range && range, UnaryPredicate predicate):
 		m_range(BOUNDED_FORWARD(range)),
 		m_traits(end(m_range), std::move(predicate))
 	{

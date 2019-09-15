@@ -11,17 +11,17 @@
 
 namespace bounded {
 	
-constexpr auto compare(bounded_integer auto const lhs, detail_builtin_integer auto const rhs) noexcept {
+constexpr auto compare(bounded_integer auto const lhs, detail_builtin_integer auto const rhs) {
 	return compare(lhs, integer(rhs));
 }
-constexpr auto compare(detail_builtin_integer auto const lhs, bounded_integer auto const rhs) noexcept {
+constexpr auto compare(detail_builtin_integer auto const lhs, bounded_integer auto const rhs) {
 	return compare(integer(lhs), rhs);
 }
 
-constexpr auto operator==(bounded_integer auto const lhs, detail_builtin_integer auto const rhs) noexcept {
+constexpr auto operator==(bounded_integer auto const lhs, detail_builtin_integer auto const rhs) {
 	return lhs == integer(rhs);
 }
-constexpr auto operator==(detail_builtin_integer auto const lhs, bounded_integer auto const rhs) noexcept {
+constexpr auto operator==(detail_builtin_integer auto const lhs, bounded_integer auto const rhs) {
 	return integer(lhs) == rhs;
 }
 

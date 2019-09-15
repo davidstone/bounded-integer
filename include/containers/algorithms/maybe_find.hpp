@@ -30,19 +30,19 @@ constexpr auto maybe_find_if(ForwardIterator const first, sentinel_for<ForwardIt
 }
 
 template<range Range, typename UnaryPredicate>
-constexpr auto maybe_find_if(Range && range, UnaryPredicate p) BOUNDED_NOEXCEPT_VALUE(
-	::containers::maybe_find_if(begin(BOUNDED_FORWARD(range)), end(BOUNDED_FORWARD(range)), std::move(p))
-)
+constexpr auto maybe_find_if(Range && range, UnaryPredicate p) {
+	return ::containers::maybe_find_if(begin(BOUNDED_FORWARD(range)), end(BOUNDED_FORWARD(range)), std::move(p));
+}
 
 
 template<iterator ForwardIterator, typename T>
-constexpr auto maybe_find(ForwardIterator const first, sentinel_for<ForwardIterator> auto const last, T const & value) BOUNDED_NOEXCEPT_VALUE(
-	::containers::maybe_find_if(first, last, bounded::equal_to(value))
-)
+constexpr auto maybe_find(ForwardIterator const first, sentinel_for<ForwardIterator> auto const last, T const & value) {
+	return ::containers::maybe_find_if(first, last, bounded::equal_to(value));
+}
 
 template<range Range, typename T>
-constexpr auto maybe_find(Range && range, T const & value) BOUNDED_NOEXCEPT_VALUE(
-	::containers::maybe_find(begin(BOUNDED_FORWARD(range)), end(BOUNDED_FORWARD(range)), value)
-)
+constexpr auto maybe_find(Range && range, T const & value) {
+	return ::containers::maybe_find(begin(BOUNDED_FORWARD(range)), end(BOUNDED_FORWARD(range)), value);
+}
 
 }	// namespace containers

@@ -34,7 +34,7 @@ namespace detail {
 
 template<typename T>
 struct owning_storage {
-	owning_storage(dynamic_array_data<T> storage_) noexcept:
+	owning_storage(dynamic_array_data<T> storage_):
 		storage(std::move(storage_)),
 		active(true)
 	{
@@ -56,7 +56,7 @@ struct owning_storage {
 
 
 template<typename T>
-constexpr auto data(owning_storage<T> & container) noexcept {
+constexpr auto data(owning_storage<T> & container) {
 	return container.storage.pointer;
 }
 
@@ -80,33 +80,33 @@ struct sbo_vector_base {
 	struct small_t {
 		// m_force_large exists just to be a bit that's always 0. This allows
 		// is_large to return the correct answer even for 0-size containers.
-		constexpr small_t() noexcept:
+		constexpr small_t():
 			m_force_large(false),
 			m_size(0_bi)
 		{
 		}
 		
-		constexpr auto is_large() const noexcept {
+		constexpr auto is_large() const {
 			return m_force_large;
 		}
-		static constexpr auto capacity() noexcept {
+		static constexpr auto capacity() {
 			return bounded::max(minimum_small_capacity<T>, bounded::constant<requested_small_capacity>);
 		}
 
 		using size_type = bounded::integer<0, bounded::detail::normalize<capacity().value()>>;
 		static_assert(sizeof(size_type) == sizeof(unsigned char));
 
-		constexpr auto size() const noexcept {
+		constexpr auto size() const {
 			return static_cast<size_type>(m_size);
 		}
-		constexpr auto set_size(size_type const size_) noexcept {
+		constexpr auto set_size(size_type const size_) {
 			m_size = size_.value();
 		}
 
-		constexpr auto data() const noexcept {
+		constexpr auto data() const {
 			return reinterpret_cast<T const *>(containers::data(m_data));
 		}
-		constexpr auto data() noexcept {
+		constexpr auto data() {
 			return reinterpret_cast<T *>(containers::data(m_data));
 		}
 
@@ -124,7 +124,7 @@ struct sbo_vector_base {
 		>;
 
 		// m_force_large exists just to be a bit that's always 1.
-		constexpr large_t(size_type size_, capacity_type capacity_, T * pointer_) noexcept:
+		constexpr large_t(size_type size_, capacity_type capacity_, T * pointer_):
 			m_force_large(true),
 			m_size(size_),
 			m_data{reinterpret_cast<trivial_storage<T> *>(pointer_), capacity_}
@@ -132,24 +132,24 @@ struct sbo_vector_base {
 			BOUNDED_ASSERT_OR_ASSUME(pointer_ != nullptr);
 		}
 
-		constexpr auto is_large() const noexcept {
+		constexpr auto is_large() const {
 			return m_force_large;
 		}
-		constexpr auto capacity() const noexcept {
+		constexpr auto capacity() const {
 			return m_data.size;
 		}
 
-		constexpr auto size() const noexcept {
+		constexpr auto size() const {
 			return static_cast<size_type>(m_size);
 		}
-		constexpr auto set_size(size_type const size_) noexcept {
+		constexpr auto set_size(size_type const size_) {
 			m_size = size_.value();
 		}
 
-		constexpr auto data() const noexcept {
+		constexpr auto data() const {
 			return reinterpret_cast<T const *>(containers::data(m_data));
 		}
-		constexpr auto data() noexcept {
+		constexpr auto data() {
 			return reinterpret_cast<T *>(containers::data(m_data));
 		}
 
@@ -172,7 +172,7 @@ struct sbo_vector_base {
 	using const_iterator = contiguous_iterator<value_type const, size_type::max().value()>;
 	using iterator = contiguous_iterator<value_type, size_type::max().value()>;
 
-	constexpr sbo_vector_base() noexcept:
+	constexpr sbo_vector_base():
 		m_small()
 	{
 	}
@@ -182,7 +182,7 @@ struct sbo_vector_base {
 	}
 	
 	// The elements are destroyed, but any storage may still remain
-	auto move_assign_to_empty(sbo_vector_base && other) & noexcept {
+	auto move_assign_to_empty(sbo_vector_base && other) & {
 		deallocate_large();
 		if (other.is_small()) {
 			::bounded::construct(m_small);
@@ -197,25 +197,25 @@ struct sbo_vector_base {
 		}
 	}
 
-	friend constexpr auto begin(sbo_vector_base const & container) noexcept {
+	friend constexpr auto begin(sbo_vector_base const & container) {
 		auto const result = container.is_small() ?
 			container.m_small.data() :
 			container.m_large.data();
 		BOUNDED_ASSERT_OR_ASSUME(result != nullptr);
 		return const_iterator(result);
 	}
-	friend constexpr auto begin(sbo_vector_base & container) noexcept {
+	friend constexpr auto begin(sbo_vector_base & container) {
 		return iterator(const_cast<value_type *>(pointer_from(begin(std::as_const(container)))));
 	}
 	
-	friend constexpr auto end(sbo_vector_base const & container) noexcept {
+	friend constexpr auto end(sbo_vector_base const & container) {
 		return begin(container) + container.size();
 	}
-	friend constexpr auto end(sbo_vector_base & container) noexcept {
+	friend constexpr auto end(sbo_vector_base & container) {
 		return begin(container) + container.size();
 	}
 
-	auto capacity() const noexcept {
+	auto capacity() const {
 		return BOUNDED_CONDITIONAL(is_small(), m_small.capacity(), m_large.capacity());
 	}
 
@@ -225,9 +225,8 @@ struct sbo_vector_base {
 		return owning_storage<value_type>(detail::make_storage<value_type>(new_capacity));
 	}
 
-	auto relocate_preallocated(owning_storage<value_type> new_large) noexcept {
+	auto relocate_preallocated(owning_storage<value_type> new_large) {
 		deallocate_large();
-		// TODO: static_assert noexcept
 		::bounded::construct(
 			m_large,
 			size(),
@@ -252,7 +251,7 @@ struct sbo_vector_base {
 	}
 	
 	template<typename Size>
-	auto set_size(Size const new_size) noexcept {
+	auto set_size(Size const new_size) {
 		if (is_small()) {
 			if constexpr (std::is_constructible_v<typename small_t::size_type, Size>) {
 				m_small.set_size(static_cast<typename small_t::size_type>(new_size));
@@ -265,10 +264,10 @@ struct sbo_vector_base {
 	}
 
 private:
-	auto size() const noexcept {
+	auto size() const {
 		return BOUNDED_CONDITIONAL(is_small(), m_small.size(), m_large.size());
 	}
-	auto relocate_to_small() noexcept {
+	auto relocate_to_small() {
 		if (is_small()) {
 			return;
 		}
@@ -283,7 +282,7 @@ private:
 		BOUNDED_ASSERT(is_small());
 	}
 	
-	constexpr auto is_large() const noexcept {
+	constexpr auto is_large() const {
 		// The original design involved casting to unsigned char const &.
 		// A reference to either member of a union is a reference to the union.
 		// https://stackoverflow.com/questions/891471/union-element-alignment
@@ -296,11 +295,11 @@ private:
 		// https://stackoverflow.com/a/18564719/852254
 		return m_small.is_large();
 	}
-	constexpr auto is_small() const noexcept {
+	constexpr auto is_small() const {
 		return !is_large();
 	}
 	
-	auto deallocate_large() noexcept {
+	auto deallocate_large() {
 		if (is_large()) {
 			detail::deallocate_storage(dynamic_array_data(m_large.data(), m_large.capacity()));
 		}

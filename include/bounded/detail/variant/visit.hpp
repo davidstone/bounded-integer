@@ -6,6 +6,7 @@
 #pragma once
 
 #include <bounded/detail/class.hpp>
+#include <bounded/detail/returns.hpp>
 #include <bounded/detail/type.hpp>
 
 #include <type_traits>
@@ -203,7 +204,7 @@ private:
 	struct unwrap_visitor_parameter {
 		Function && function;
 		template<typename... Args>
-		constexpr auto operator()(Args && ... args) && BOUNDED_NOEXCEPT_DECLTYPE(
+		constexpr auto operator()(Args && ... args) && BOUNDED_RETURNS(
 			BOUNDED_FORWARD(function)(BOUNDED_FORWARD(args).value...)
 		)
 	};

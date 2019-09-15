@@ -18,11 +18,11 @@ static_assert(bounded::tuple{} == bounded::tuple{});
 
 struct empty {};
 
-constexpr auto compare(empty, empty) noexcept {
+constexpr auto compare(empty, empty) {
 	return bounded::strong_ordering::equal;
 }
 
-constexpr auto operator==(empty, empty) noexcept {
+constexpr auto operator==(empty, empty) {
 	return true;
 }
 
@@ -30,10 +30,6 @@ static_assert(std::is_empty_v<bounded::tuple<empty>>);
 
 static_assert(std::is_trivially_default_constructible_v<bounded::tuple<empty>>);
 static_assert(std::is_trivially_copyable_v<bounded::tuple<empty>>);
-static_assert(std::is_nothrow_constructible_v<bounded::tuple<empty>, empty const &>);
-static_assert(std::is_nothrow_constructible_v<bounded::tuple<empty>, empty &&>);
-static_assert(std::is_nothrow_constructible_v<bounded::tuple<empty>, empty &>);
-static_assert(std::is_nothrow_constructible_v<bounded::tuple<empty>, empty>);
 
 static_assert(std::is_empty_v<bounded::tuple<void>>);
 
@@ -77,10 +73,10 @@ struct non_movable {
 	non_movable(non_movable &&) = delete;
 };
 
-constexpr auto compare(non_movable const &, non_movable const &) noexcept {
+constexpr auto compare(non_movable const &, non_movable const &) {
 	return bounded::strong_ordering::equal;
 }
-constexpr auto operator==(non_movable const &, non_movable const &) noexcept {
+constexpr auto operator==(non_movable const &, non_movable const &) {
 	return true;
 }
 
@@ -102,16 +98,16 @@ static_assert(a != d);
 static_assert(a > d);
 
 constexpr struct {
-	constexpr auto operator()(float const x) const noexcept {
+	constexpr auto operator()(float const x) const {
 		return static_cast<int>(x + 1);
 	}
-	constexpr auto operator()(float const x, float const y) const noexcept {
+	constexpr auto operator()(float const x, float const y) const {
 		return static_cast<int>(x + y);
 	}
-	constexpr auto operator()(int const x) const noexcept {
+	constexpr auto operator()(int const x) const {
 		return static_cast<float>(x + 1);
 	}
-	constexpr auto operator()(int const x, int const y) const noexcept {
+	constexpr auto operator()(int const x, int const y) const {
 		return static_cast<float>(x + y);
 	}
 } increment_and_swap_types{};

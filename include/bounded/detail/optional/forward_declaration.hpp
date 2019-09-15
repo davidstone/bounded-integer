@@ -22,7 +22,7 @@ private:
 
 // none_t cannot be default constructible or we get an ambiguity in op = {};
 struct none_t {
-	constexpr explicit none_t(int) noexcept {}
+	constexpr explicit none_t(int) {}
 };
 constexpr auto none = none_t(0);
 

@@ -11,7 +11,7 @@ namespace bounded {
 
 // Does nothing. Overflow is undefined behavior.
 struct null_policy {
-	constexpr null_policy() noexcept {}
+	constexpr null_policy() {}
 	
 	// The identity function is intentionally not constexpr. This provides
 	// compile-time checking if used in a constexpr context. If this is called
@@ -19,7 +19,7 @@ struct null_policy {
 	// same value and eliminate all branching, creating no overhead. See
 	// https://stackoverflow.com/questions/20461121/constexpr-error-at-compile-time-but-no-overhead-at-run-time
 	template<typename T, typename Minimum, typename Maximum>
-	static constexpr auto assignment(T const & value, Minimum const & minimum, Maximum const & maximum) noexcept -> T const & {
+	static constexpr auto assignment(T const & value, Minimum const & minimum, Maximum const & maximum) -> T const & {
 		static_assert(bounded_integer<Minimum>, "Only bounded::integer types are supported.");
 		static_assert(bounded_integer<Maximum>, "Only bounded::integer types are supported.");
 		return (minimum <= value and value <= maximum) ?
@@ -32,7 +32,7 @@ struct null_policy {
 	static constexpr bool overflow_is_error = true;
 private:
 	template<typename T>
-	static auto error_out_of_range(T const & value) noexcept -> T const & {
+	static auto error_out_of_range(T const & value) -> T const & {
 		return value;
 	}
 };

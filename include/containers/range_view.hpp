@@ -27,19 +27,19 @@ struct range_view {
 	using const_iterator = Iterator;
 	using iterator = Iterator;
 
-	constexpr range_view(Iterator first, Sentinel last) noexcept(std::is_nothrow_move_constructible_v<Iterator> and std::is_nothrow_move_constructible_v<Sentinel>):
+	constexpr range_view(Iterator first, Sentinel last):
 		m_begin(std::move(first)),
 		m_end(std::move(last))
 	{
 	}
-	constexpr explicit range_view(std::pair<Iterator, Sentinel> pair) BOUNDED_NOEXCEPT_INITIALIZATION(
+	constexpr explicit range_view(std::pair<Iterator, Sentinel> pair):
 		range_view(std::move(pair).first, std::move(pair).second)
-	) {
+	{
 	}
 	template<typename Range> requires range<Range>
-	constexpr explicit range_view(Range & range) BOUNDED_NOEXCEPT_INITIALIZATION(
+	constexpr explicit range_view(Range & range):
 		range_view(begin(range), end(range))
-	) {
+	{
 	}
 	
 	friend constexpr Iterator begin(range_view view) {
@@ -60,9 +60,9 @@ template<typename Range>
 range_view(Range &) -> range_view<decltype(begin(std::declval<Range &>()), end(std::declval<Range &>()))>;
 
 template<typename Iterator, typename Sentinel>
-constexpr auto operator==(range_view<Iterator, Sentinel> const lhs, range_view<Iterator, Sentinel> const rhs) BOUNDED_NOEXCEPT_VALUE(
-	begin(lhs) == begin(rhs) and end(lhs) == end(rhs)
-)
+constexpr auto operator==(range_view<Iterator, Sentinel> const lhs, range_view<Iterator, Sentinel> const rhs) {
+	return begin(lhs) == begin(rhs) and end(lhs) == end(rhs);
+}
 
 template<typename>
 inline constexpr auto is_range_view = false;

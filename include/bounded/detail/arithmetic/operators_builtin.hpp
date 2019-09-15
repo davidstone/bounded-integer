@@ -22,20 +22,20 @@ using ::bounded::detail_builtin_integer;
 
 #define BOUNDED_INTEGER_MIXED_OPERATOR_OVERLOADS_INTEGRAL_CONSTANT(symbol) \
 template<typename T, T rhs> \
-constexpr auto operator symbol(bounded_integer auto const lhs, std::integral_constant<T, rhs>) noexcept { \
+constexpr auto operator symbol(bounded_integer auto const lhs, std::integral_constant<T, rhs>) { \
 	return lhs symbol constant<rhs>; \
 } \
 template<typename T, T lhs> \
-constexpr auto operator symbol(std::integral_constant<T, lhs>, bounded_integer auto const rhs) noexcept { \
+constexpr auto operator symbol(std::integral_constant<T, lhs>, bounded_integer auto const rhs) { \
 	return constant<lhs> symbol rhs; \
 }
 
 
 #define BOUNDED_INTEGER_MIXED_OPERATOR_OVERLOADS(symbol, minimum, maximum) \
-constexpr auto operator symbol(bounded_integer auto const lhs, detail_builtin_integer auto const rhs) noexcept { \
+constexpr auto operator symbol(bounded_integer auto const lhs, detail_builtin_integer auto const rhs) { \
 	return lhs.value() symbol rhs; \
 } \
-constexpr auto operator symbol(detail_builtin_integer auto const lhs, bounded_integer auto const rhs) noexcept { \
+constexpr auto operator symbol(detail_builtin_integer auto const lhs, bounded_integer auto const rhs) { \
 	return lhs symbol rhs.value(); \
 } \
 BOUNDED_INTEGER_MIXED_OPERATOR_OVERLOADS_INTEGRAL_CONSTANT(symbol)

@@ -14,10 +14,10 @@
 namespace containers {
 
 // Works with explicit copy constructors
-template<typename T>
-constexpr auto copy(T && value) BOUNDED_NOEXCEPT_VALUE(
-	std::decay_t<T>(BOUNDED_FORWARD(value))
-)
+template<typename T> requires std::is_constructible_v<std::decay_t<T>, T &&>
+constexpr auto copy(T && value) {
+	return std::decay_t<T>(BOUNDED_FORWARD(value));
+}
 
 
 template<typename InputIterator, typename Sentinel, typename OutputIterator>
@@ -44,13 +44,13 @@ constexpr auto move(InputIterator const first, Sentinel const last, OutputIterat
 }
 
 template<typename BidirectionalIterator, typename BidirectionalOutput>
-constexpr auto copy_backward(BidirectionalIterator const first, BidirectionalIterator const last, BidirectionalOutput const out_last) BOUNDED_NOEXCEPT(
-	::containers::copy(::containers::reverse_iterator(last), ::containers::reverse_iterator(first), ::containers::reverse_iterator(out_last)).output.base()
-)
+constexpr auto copy_backward(BidirectionalIterator const first, BidirectionalIterator const last, BidirectionalOutput const out_last) {
+	return ::containers::copy(::containers::reverse_iterator(last), ::containers::reverse_iterator(first), ::containers::reverse_iterator(out_last)).output.base();
+}
 
 template<typename BidirectionalIterator, typename BidirectionalOutput>
-constexpr auto move_backward(BidirectionalIterator const first, BidirectionalIterator const last, BidirectionalOutput const out_last) BOUNDED_NOEXCEPT(
-	::containers::copy_backward(::containers::move_iterator(first), ::containers::move_iterator(last), out_last)
-)
+constexpr auto move_backward(BidirectionalIterator const first, BidirectionalIterator const last, BidirectionalOutput const out_last) {
+	return ::containers::copy_backward(::containers::move_iterator(first), ::containers::move_iterator(last), out_last);
+}
 
 }	// namespace containers

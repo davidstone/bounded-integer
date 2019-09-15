@@ -3,4 +3,7 @@
 // (See accompanying file LICENSE_1_0.txt or copy at
 // http://www.boost.org/LICENSE_1_0.txt)
 
-#include <bounded/detail/noexcept.hpp>
+#pragma once
+
+// Mostly the same as returning decltype(auto), but with expression SFINAE
+#define BOUNDED_RETURNS(...) -> decltype(__VA_ARGS__) { return __VA_ARGS__; }

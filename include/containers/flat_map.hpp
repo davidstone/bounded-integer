@@ -39,22 +39,22 @@ public:
 	{
 	}
 	
-	constexpr auto && key() const & noexcept {
+	constexpr auto && key() const & {
 		return m_data[0_bi];
 	}
-	constexpr auto && key() & noexcept {
+	constexpr auto && key() & {
 		return m_data[0_bi];
 	}
-	constexpr auto && key() && noexcept {
+	constexpr auto && key() && {
 		return std::move(m_data)[0_bi];
 	}
-	constexpr auto && mapped() const & noexcept {
+	constexpr auto && mapped() const & {
 		return m_data[1_bi];
 	}
-	constexpr auto && mapped() & noexcept {
+	constexpr auto && mapped() & {
 		return m_data[1_bi];
 	}
-	constexpr auto && mapped() && noexcept {
+	constexpr auto && mapped() && {
 		return std::move(m_data)[1_bi];
 	}
 
@@ -62,14 +62,14 @@ public:
 
 // These functions just become defaulted <=> and == in C++20.
 template<typename Key, typename Mapped>
-constexpr auto compare(map_value_type<Key, Mapped> const & lhs, map_value_type<Key, Mapped> const & rhs) BOUNDED_NOEXCEPT_VALUE(
-	compare(lhs.m_data, rhs.m_data)
-)
+constexpr auto compare(map_value_type<Key, Mapped> const & lhs, map_value_type<Key, Mapped> const & rhs) {
+	return compare(lhs.m_data, rhs.m_data);
+}
 
 template<typename Key, typename Mapped>
-constexpr auto operator==(map_value_type<Key, Mapped> const & lhs, map_value_type<Key, Mapped> const & rhs) BOUNDED_NOEXCEPT_VALUE(
-	lhs.m_data == rhs.m_data
-)
+constexpr auto operator==(map_value_type<Key, Mapped> const & lhs, map_value_type<Key, Mapped> const & rhs) {
+	return lhs.m_data == rhs.m_data;
+}
 
 constexpr inline struct assume_sorted_unique_t {} assume_sorted_unique;
 constexpr inline struct assume_unique_t {} assume_unique;
@@ -136,7 +136,7 @@ public:
 	}
 	
 	flat_map_base() = default;
-	constexpr explicit flat_map_base(ExtractKey extract_key) noexcept(std::is_nothrow_default_constructible_v<Container> and std::is_nothrow_move_constructible_v<ExtractKey>):
+	constexpr explicit flat_map_base(ExtractKey extract_key):
 		m_extract_key(std::move(extract_key))
 	{
 	}
@@ -227,67 +227,67 @@ public:
 		ska_sort(m_container, extract_key());
 	}
 
-	constexpr auto & operator=(std::initializer_list<value_type> init) & noexcept(noexcept(flat_map_base(init)) and std::is_nothrow_move_assignable_v<flat_map_base>) {
+	constexpr auto & operator=(std::initializer_list<value_type> init) & {
 		return *this = flat_map_base(init);
 	}
 	
-	friend constexpr auto begin(flat_map_base const & c) BOUNDED_NOEXCEPT(
-		begin(c.m_container)
-	)
-	friend constexpr auto begin(flat_map_base & c) BOUNDED_NOEXCEPT(
-		begin(c.m_container)
-	)
-	friend constexpr auto end(flat_map_base const & c) BOUNDED_NOEXCEPT(
-		end(c.m_container)
-	)
-	friend constexpr auto end(flat_map_base & c) BOUNDED_NOEXCEPT(
-		end(c.m_container)
-	)
+	friend constexpr auto begin(flat_map_base const & c) {
+		return begin(c.m_container);
+	}
+	friend constexpr auto begin(flat_map_base & c) {
+		return begin(c.m_container);
+	}
+	friend constexpr auto end(flat_map_base const & c) {
+		return end(c.m_container);
+	}
+	friend constexpr auto end(flat_map_base & c) {
+		return end(c.m_container);
+	}
 	
 	// Extra functions on top of the regular map interface
-	constexpr auto capacity() const BOUNDED_NOEXCEPT(
-		m_container.capacity()
-	)
-	constexpr auto reserve(size_type const new_capacity) BOUNDED_NOEXCEPT(
-		m_container.reserve(new_capacity)
-	)
-	constexpr auto shrink_to_fit() BOUNDED_NOEXCEPT(
-		m_container.shrink_to_fit()
-	)
+	constexpr auto capacity() const {
+		return m_container.capacity();
+	}
+	constexpr auto reserve(size_type const new_capacity) {
+		return m_container.reserve(new_capacity);
+	}
+	constexpr auto shrink_to_fit() {
+		return m_container.shrink_to_fit();
+	}
 	
 	template<typename Key>
-	constexpr auto lower_bound(Key && key) const BOUNDED_NOEXCEPT_GCC_BUG(
-		containers::lower_bound(
+	constexpr auto lower_bound(Key && key) const {
+		return containers::lower_bound(
 			*this,
 			BOUNDED_FORWARD(key),
 			compare()
-		)
-	)
+		);
+	}
 	template<typename Key>
-	constexpr auto lower_bound(Key && key) BOUNDED_NOEXCEPT_GCC_BUG(
-		containers::lower_bound(
+	constexpr auto lower_bound(Key && key) {
+		return containers::lower_bound(
 			*this,
 			BOUNDED_FORWARD(key),
 			compare()
-		)
-	)
+		);
+	}
 	template<typename Key>
-	constexpr auto upper_bound(Key && key) const BOUNDED_NOEXCEPT_GCC_BUG(
-		containers::upper_bound(
+	constexpr auto upper_bound(Key && key) const {
+		return containers::upper_bound(
 			*this,
 			BOUNDED_FORWARD(key),
 			compare()
-		)
-	)
+		);
+	}
 	template<typename Key>
-	constexpr auto upper_bound(Key && key) BOUNDED_NOEXCEPT_GCC_BUG(
-		containers::upper_bound(
+	constexpr auto upper_bound(Key && key) {
+		return containers::upper_bound(
 			*this,
 			BOUNDED_FORWARD(key),
 			compare()
-		)
-	)
-	// TODO: noexcept
+		);
+	}
+
 	template<typename Key>
 	constexpr auto find(Key const & key) const {
 		auto const it = lower_bound(key);
@@ -307,8 +307,6 @@ public:
 	// or moving. It can only provide the weaker guarantee of no copying or
 	// moving of the mapped_type. We must copy or move key_type because we have
 	// to construct the key to determine whether we should insert it.
-	//
-	// TODO: noexcept
 	template<typename... Args>
 	constexpr auto emplace(Args && ... args) {
 		auto data = separate_key_from_mapped(BOUNDED_FORWARD(args)...);
@@ -325,7 +323,6 @@ public:
 		return emplace_at(position, std::move(data).key, std::move(data).mapped_args);
 	}
 
-	// TODO: noexcept
 	constexpr auto insert(value_type const & value) {
 		return emplace(value);
 	}
@@ -338,7 +335,6 @@ public:
 	constexpr auto insert(const_iterator const hint, value_type && value) {
 		return emplace_hint(hint, std::move(value));
 	}
-	// TODO: noexcept
 	template<typename Range = std::initializer_list<value_type>>
 	constexpr auto insert(Range && range) {
 		// Because my underlying container is expected to be contiguous storage,
@@ -373,18 +369,18 @@ public:
 	
 	// These maintain the relative order of all elements in the container, so I
 	// don't have to worry about re-sorting
-	constexpr auto erase(const_iterator const it) BOUNDED_NOEXCEPT(
-		m_container.erase(it)
-	)
+	constexpr auto erase(const_iterator const it) {
+		return m_container.erase(it);
+	}
 	// Need mutable iterator overload to avoid ambiguity if key_type can be
 	// constructed from iterator (for instance, an unconstrained constructor
 	// template).
-	constexpr auto erase(iterator const it) BOUNDED_NOEXCEPT(
-		m_container.erase(it)
-	)
-	constexpr auto erase(const_iterator const first, const_iterator const last) BOUNDED_NOEXCEPT(
-		m_container.erase(first, last)
-	)
+	constexpr auto erase(iterator const it) {
+		return m_container.erase(it);
+	}
+	constexpr auto erase(const_iterator const first, const_iterator const last) {
+		return m_container.erase(first, last);
+	}
 	
 private:
 	// It is safe to bind the reference to the object that is being moved in any
@@ -395,11 +391,11 @@ private:
 	// Search represents a function that finds where to insert
 
 	template<typename Key>
-	static constexpr auto use_reference_to_key(bounded::detail::types<Key>) noexcept {
+	static constexpr auto use_reference_to_key(bounded::detail::types<Key>) {
 		return std::is_same<std::decay_t<Key>, key_type>::value;
 	}
 	template<typename... KeyArgs>
-	static constexpr auto use_reference_to_key(bounded::detail::types<KeyArgs...>) noexcept {
+	static constexpr auto use_reference_to_key(bounded::detail::types<KeyArgs...>) {
 		return false;
 	}
 
@@ -496,18 +492,18 @@ public:
 	using base::base;
 	using base::operator=;
 	
-	friend constexpr auto begin(basic_flat_map const & container) BOUNDED_NOEXCEPT(
-		begin(static_cast<base const &>(container))
-	)
-	friend constexpr auto begin(basic_flat_map & container) BOUNDED_NOEXCEPT(
-		begin(static_cast<base &>(container))
-	)
-	friend constexpr auto end(basic_flat_map const & container) BOUNDED_NOEXCEPT(
-		end(static_cast<base const &>(container))
-	)
-	friend constexpr auto end(basic_flat_map & container) BOUNDED_NOEXCEPT(
-		end(static_cast<base &>(container))
-	)
+	friend constexpr auto begin(basic_flat_map const & container) {
+		return begin(static_cast<base const &>(container));
+	}
+	friend constexpr auto begin(basic_flat_map & container) {
+		return begin(static_cast<base &>(container));
+	}
+	friend constexpr auto end(basic_flat_map const & container) {
+		return end(static_cast<base const &>(container));
+	}
+	friend constexpr auto end(basic_flat_map & container) {
+		return end(static_cast<base &>(container));
+	}
 
 	using base::capacity;
 	using base::reserve;
@@ -588,18 +584,18 @@ public:
 	using base::base;
 	using base::operator=;
 	
-	friend constexpr auto begin(basic_flat_multimap const & container) BOUNDED_NOEXCEPT(
-		begin(static_cast<base const &>(container))
-	)
-	friend constexpr auto begin(basic_flat_multimap & container) BOUNDED_NOEXCEPT(
-		begin(static_cast<base &>(container))
-	)
-	friend constexpr auto end(basic_flat_multimap const & container) BOUNDED_NOEXCEPT(
-		end(static_cast<base const &>(container))
-	)
-	friend constexpr auto end(basic_flat_multimap & container) BOUNDED_NOEXCEPT(
-		end(static_cast<base &>(container))
-	)
+	friend constexpr auto begin(basic_flat_multimap const & container) {
+		return begin(static_cast<base const &>(container));
+	}
+	friend constexpr auto begin(basic_flat_multimap & container) {
+		return begin(static_cast<base &>(container));
+	}
+	friend constexpr auto end(basic_flat_multimap const & container) {
+		return end(static_cast<base const &>(container));
+	}
+	friend constexpr auto end(basic_flat_multimap & container) {
+		return end(static_cast<base &>(container));
+	}
 
 	using base::capacity;
 	using base::reserve;
@@ -620,13 +616,13 @@ public:
 	// are unique, so I have slightly different versions in flat_map.
 
 	template<typename Key>
-	constexpr auto equal_range(Key && key) const BOUNDED_NOEXCEPT_GCC_BUG(
-		std::equal_range(begin(*this), end(*this), BOUNDED_FORWARD(key), compare())
-	)
+	constexpr auto equal_range(Key && key) const {
+		return std::equal_range(begin(*this), end(*this), BOUNDED_FORWARD(key), compare());
+	}
 	template<typename Key>
-	constexpr auto equal_range(Key && key) BOUNDED_NOEXCEPT_GCC_BUG(
-		std::equal_range(begin(*this), end(*this), BOUNDED_FORWARD(key), compare)
-	)
+	constexpr auto equal_range(Key && key) {
+		return std::equal_range(begin(*this), end(*this), BOUNDED_FORWARD(key), compare);
+	}
 
 	template<typename Key>
 	constexpr auto count(Key && key) const {

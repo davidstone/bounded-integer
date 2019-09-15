@@ -29,19 +29,19 @@ constexpr auto remove_if(ForwardIterator const first, Sentinel const last, Predi
 }
 
 template<typename Range, typename Predicate>
-constexpr auto remove_if(Range & range, Predicate predicate) BOUNDED_NOEXCEPT_VALUE(
-	::containers::remove_if(begin(range), end(range), BOUNDED_FORWARD(predicate))
-)
+constexpr auto remove_if(Range & range, Predicate predicate) {
+	return ::containers::remove_if(begin(range), end(range), BOUNDED_FORWARD(predicate));
+}
 
 
 template<typename ForwardIterator, typename Sentinel, typename T>
-constexpr auto remove(ForwardIterator const first, Sentinel const last, T const & value) BOUNDED_NOEXCEPT(
-	::containers::remove_if(first, last, bounded::equal_to(value))
-)
+constexpr auto remove(ForwardIterator const first, Sentinel const last, T const & value) {
+	return ::containers::remove_if(first, last, bounded::equal_to(value));
+}
 
 template<typename Range, typename T>
-constexpr auto remove(Range & range, T const & value) BOUNDED_NOEXCEPT_VALUE(
-	::containers::remove_if(begin(range), end(range), value)
-)
+constexpr auto remove(Range & range, T const & value) {
+	return ::containers::remove_if(begin(range), end(range), value);
+}
 
 }	// namespace containers

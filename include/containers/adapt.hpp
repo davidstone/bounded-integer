@@ -44,7 +44,7 @@ public:
 		bounded::detail::normalize<static_cast<std::uintmax_t>(std::numeric_limits<typename std::iterator_traits<iterator>::difference_type>::max())>
 	>;
 	
-	constexpr adapt(Range && range, Traits traits) noexcept(std::is_nothrow_move_constructible_v<Range> and std::is_nothrow_move_constructible_v<Traits>):
+	constexpr adapt(Range && range, Traits traits):
 		m_range(BOUNDED_FORWARD(range)),
 		m_traits(std::move(traits))
 	{

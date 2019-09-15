@@ -8,7 +8,6 @@
 #include <bounded/detail/basic_numeric_limits.hpp>
 #include <bounded/detail/is_bounded_integer.hpp>
 #include <bounded/detail/max_builtin.hpp>
-#include <bounded/detail/noexcept.hpp>
 
 #include <cstddef>
 #include <type_traits>
@@ -74,30 +73,31 @@ constexpr inline strong_ordering strong_ordering::less(-1);
 namespace detail {
 
 template<typename LHS, typename RHS>
-constexpr auto builtin_compare(LHS const lhs, RHS const rhs) BOUNDED_NOEXCEPT_DECLTYPE(
-	lhs < rhs ? strong_ordering::less :
-	lhs > rhs ? strong_ordering::greater :
-	strong_ordering::equal
-)
+constexpr auto builtin_compare(LHS const lhs, RHS const rhs) {
+	return
+		lhs < rhs ? strong_ordering::less :
+		lhs > rhs ? strong_ordering::greater :
+		strong_ordering::equal;
+}
 
 } // namespace detail
 
-constexpr auto compare(bool const lhs, bool const rhs) noexcept {
+constexpr auto compare(bool const lhs, bool const rhs) {
 	return detail::builtin_compare(lhs, rhs);
 }
 
 template<typename LHS, typename RHS>
-constexpr auto compare(LHS const * const lhs, RHS const * const rhs) BOUNDED_NOEXCEPT_DECLTYPE(
-	detail::builtin_compare(lhs, rhs)
-)
+constexpr auto compare(LHS const * const lhs, RHS const * const rhs) {
+	return detail::builtin_compare(lhs, rhs);
+}
 
 template<typename LHS, typename RHS> requires(std::is_floating_point_v<LHS> and std::is_floating_point_v<RHS>)
-constexpr auto compare(LHS const lhs, RHS const rhs) noexcept {
+constexpr auto compare(LHS const lhs, RHS const rhs) {
 	return detail::builtin_compare(lhs, rhs);
 }
 
 template<detail_builtin_integer LHS, detail_builtin_integer RHS>
-constexpr auto compare(LHS const lhs, RHS const rhs) noexcept -> strong_ordering {
+constexpr auto compare(LHS const lhs, RHS const rhs) -> strong_ordering {
 	if constexpr (detail_signed_builtin<LHS> == detail_signed_builtin<RHS>) {
 		return detail::builtin_compare(lhs, rhs);
 	} else if constexpr (not std::is_same_v<LHS, detail::max_unsigned_t> and not std::is_same_v<RHS, detail::max_unsigned_t>) {
@@ -112,7 +112,7 @@ constexpr auto compare(LHS const lhs, RHS const rhs) noexcept -> strong_ordering
 }
 
 template<typename Enum> requires(std::is_enum_v<Enum>)
-constexpr auto compare(Enum const lhs, Enum const rhs) noexcept {
+constexpr auto compare(Enum const lhs, Enum const rhs) {
 	using underlying = std::underlying_type_t<Enum>;
 	return detail::builtin_compare(static_cast<underlying>(lhs), static_cast<underlying>(rhs));
 }
@@ -120,7 +120,7 @@ constexpr auto compare(Enum const lhs, Enum const rhs) noexcept {
 namespace detail {
 
 template<detail_builtin_integer LHS, detail_builtin_integer RHS>
-constexpr auto safe_equal(LHS const lhs, RHS const rhs) noexcept -> bool {
+constexpr auto safe_equal(LHS const lhs, RHS const rhs) -> bool {
 	constexpr auto signed_max = basic_numeric_limits<detail::max_signed_t>::max();
 	if constexpr (detail_signed_builtin<LHS> == detail_signed_builtin<RHS>) {
 		return lhs == rhs;
@@ -136,7 +136,7 @@ constexpr auto safe_equal(LHS const lhs, RHS const rhs) noexcept -> bool {
 }
 
 template<typename Limited, typename UnaryFunction, typename LHS, typename RHS>
-constexpr auto safe_extreme(UnaryFunction const pick_lhs, LHS const lhs_, RHS const rhs_) noexcept {
+constexpr auto safe_extreme(UnaryFunction const pick_lhs, LHS const lhs_, RHS const rhs_) {
 	auto normalized = [](auto const value) {
 		using normalized_t = std::conditional_t<
 			detail_signed_builtin<std::decay_t<decltype(value)>>,
@@ -159,12 +159,12 @@ constexpr auto safe_extreme(UnaryFunction const pick_lhs, LHS const lhs, RHS con
 }
 
 template<typename... Ts>
-constexpr auto safe_min(Ts... values) noexcept {
+constexpr auto safe_min(Ts... values) {
 	return safe_extreme<max_signed_t>([](auto const cmp) { return cmp <= 0; }, values...);
 }
 
 template<typename... Ts>
-constexpr auto safe_max(Ts... values) noexcept {
+constexpr auto safe_max(Ts... values) {
 	return safe_extreme<max_unsigned_t>([](auto const cmp) { return cmp > 0; }, values...);
 }
 
@@ -172,7 +172,7 @@ constexpr auto safe_max(Ts... values) noexcept {
 
 
 template<bounded_integer LHS, bounded_integer RHS>
-constexpr auto compare(LHS const & lhs, RHS const & rhs) noexcept {
+constexpr auto compare(LHS const & lhs, RHS const & rhs) {
 	using lhs_limits = basic_numeric_limits<LHS>;
 	using rhs_limits = basic_numeric_limits<RHS>;
 	if constexpr (compare(lhs_limits::min(), rhs_limits::max()) > 0) {
@@ -188,7 +188,7 @@ constexpr auto compare(LHS const & lhs, RHS const & rhs) noexcept {
 
 
 template<bounded_integer LHS, bounded_integer RHS>
-constexpr auto operator==(LHS const & lhs, RHS const & rhs) noexcept {
+constexpr auto operator==(LHS const & lhs, RHS const & rhs) {
 	using lhs_limits = basic_numeric_limits<LHS>;
 	using rhs_limits = basic_numeric_limits<RHS>;
 	if constexpr (compare(lhs_limits::min(), rhs_limits::max()) > 0 or compare(lhs_limits::max(), rhs_limits::min()) < 0) {
@@ -200,41 +200,52 @@ constexpr auto operator==(LHS const & lhs, RHS const & rhs) noexcept {
 	}
 }
 
-
-// Requires true makes this a better match than the reverse option
-template<typename LHS, typename RHS> requires true
-constexpr auto compare(LHS const & lhs, RHS const & rhs) BOUNDED_NOEXCEPT_DECLTYPE(
-	compare(lhs.compare(rhs), 0)
-)
+namespace detail {
 
 template<typename LHS, typename RHS>
-constexpr auto compare(LHS const & lhs, RHS const & rhs) BOUNDED_NOEXCEPT_DECLTYPE(
-	compare(0, rhs.compare(lhs))
-)
+concept member_comparable = requires(LHS const & lhs, RHS const & rhs) { compare(lhs.compare(rhs), 0); };
+
+} // namespace detail
+
+template<typename LHS, typename RHS> requires detail::member_comparable<LHS, RHS>
+constexpr auto compare(LHS const & lhs, RHS const & rhs) {
+	return compare(lhs.compare(rhs), 0);
+}
+
+template<typename LHS, typename RHS> requires (detail::member_comparable<RHS, LHS> and !detail::member_comparable<LHS, RHS>)
+constexpr auto compare(LHS const & lhs, RHS const & rhs) {
+	return compare(0, rhs.compare(lhs));
+}
 
 
+template<typename LHS, typename RHS = LHS>
+concept equality_comparable = requires(LHS const & lhs, RHS const & rhs) { lhs == rhs; };
 
-template<typename LHS, typename RHS>
-constexpr auto operator!=(LHS const & lhs, RHS const & rhs) BOUNDED_NOEXCEPT_DECLTYPE(
-	!(lhs == rhs)
-)
+template<typename LHS, typename RHS = LHS>
+concept ordered = requires(LHS const & lhs, RHS const & rhs) { compare(lhs, rhs); };
 
-template<typename LHS, typename RHS>
-constexpr auto operator<(LHS const & lhs, RHS const & rhs) BOUNDED_NOEXCEPT_DECLTYPE(
-	compare(lhs, rhs) < 0
-)
-template<typename LHS, typename RHS>
-constexpr auto operator>(LHS const & lhs, RHS const & rhs) BOUNDED_NOEXCEPT_DECLTYPE(
-	compare(lhs, rhs) > 0
-)
-template<typename LHS, typename RHS>
-constexpr auto operator<=(LHS const & lhs, RHS const & rhs) BOUNDED_NOEXCEPT_DECLTYPE(
-	compare(lhs, rhs) <= 0
-)
-template<typename LHS, typename RHS>
-constexpr auto operator>=(LHS const & lhs, RHS const & rhs) BOUNDED_NOEXCEPT_DECLTYPE(
-	compare(lhs, rhs) >= 0
-)
+
+template<typename LHS, typename RHS> requires equality_comparable<LHS, RHS>
+constexpr auto operator!=(LHS const & lhs, RHS const & rhs) {
+	return !(lhs == rhs);
+}
+
+template<typename LHS, typename RHS> requires ordered<LHS, RHS>
+constexpr auto operator<(LHS const & lhs, RHS const & rhs) {
+	return compare(lhs, rhs) < 0;
+}
+template<typename LHS, typename RHS> requires ordered<LHS, RHS>
+constexpr auto operator>(LHS const & lhs, RHS const & rhs) {
+	return compare(lhs, rhs) > 0;
+}
+template<typename LHS, typename RHS> requires ordered<LHS, RHS>
+constexpr auto operator<=(LHS const & lhs, RHS const & rhs) {
+	return compare(lhs, rhs) <= 0;
+}
+template<typename LHS, typename RHS> requires ordered<LHS, RHS>
+constexpr auto operator>=(LHS const & lhs, RHS const & rhs) {
+	return compare(lhs, rhs) >= 0;
+}
 
 #define BOUNDED_COMPARISON \
 	using ::bounded::operator!=; \
@@ -242,11 +253,5 @@ constexpr auto operator>=(LHS const & lhs, RHS const & rhs) BOUNDED_NOEXCEPT_DEC
 	using ::bounded::operator>; \
 	using ::bounded::operator<=; \
 	using ::bounded::operator>=;
-
-template<typename LHS, typename RHS = LHS>
-concept equality_comparable = requires(LHS const & lhs, RHS const & rhs) {
-	lhs == rhs;
-	lhs != rhs;
-};
 
 }	// namespace bounded

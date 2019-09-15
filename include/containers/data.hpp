@@ -16,12 +16,10 @@ namespace detail {
 namespace common {
 
 template<range Range>
-constexpr auto data(Range && range) noexcept {
+constexpr auto data(Range && range) {
 	if constexpr (requires { range.data(); }) {
-		static_assert(noexcept(range.data()));
 		return range.data();
 	} else {
-		static_assert(noexcept(pointer_from(begin(range))));
 		return pointer_from(begin(range));
 	}
 }

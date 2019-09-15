@@ -19,7 +19,7 @@ inline constexpr auto is_same_bounded<
 	bounded::constant<lhs_max> == bounded::constant<rhs_max>;
 
 template<typename Result, typename Expected>
-constexpr bool homogeneous_equals(Result const & result, Expected const & expected) noexcept {
+constexpr bool homogeneous_equals(Result const & result, Expected const & expected) {
 	static_assert(is_same_bounded<Result, Expected>, "Mismatched types.");
 	return result == expected;
 }

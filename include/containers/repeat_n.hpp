@@ -125,10 +125,10 @@ public:
 	{
 	}
 
-	constexpr auto begin() const noexcept {
+	constexpr auto begin() const {
 		return const_iterator(m_size, detail::value_to_function(m_value));
 	}
-	constexpr auto end() const noexcept {
+	constexpr auto end() const {
 		return repeat_n_sentinel{};
 	}
 
@@ -153,10 +153,10 @@ public:
 	{
 	}
 
-	constexpr auto begin() const noexcept {
+	constexpr auto begin() const {
 		return const_iterator(m_size, bounded::construct_return<value_type>);
 	}
-	constexpr auto end() const noexcept {
+	constexpr auto end() const {
 		return repeat_n_sentinel{};
 	}
 

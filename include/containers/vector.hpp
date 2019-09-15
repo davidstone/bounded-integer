@@ -32,7 +32,7 @@ struct vector_base {
 	using iterator = contiguous_iterator<value_type, size_type::max().value()>;
 	using raw_container = dynamic_array<trivial_storage<value_type>>;
 
-	constexpr vector_base() noexcept = default;
+	constexpr vector_base() = default;
 
 	constexpr vector_base(vector_base && other) noexcept:
 		m_container(std::move(other.m_container)),
@@ -40,25 +40,25 @@ struct vector_base {
 	{
 	}
 
-	constexpr auto move_assign_to_empty(vector_base && other) & noexcept {
+	constexpr auto move_assign_to_empty(vector_base && other) & {
 		m_container = std::move(other.m_container);
 		m_size = std::exchange(other.m_size, 0_bi);
 	}
 
-	friend constexpr auto begin(vector_base const & container) noexcept {
+	friend constexpr auto begin(vector_base const & container) {
 		return const_iterator(::containers::detail::static_or_reinterpret_cast<value_type const *>(data(container.m_container)));
 	}
-	friend constexpr auto begin(vector_base & container) noexcept {
+	friend constexpr auto begin(vector_base & container) {
 		return iterator(::containers::detail::static_or_reinterpret_cast<value_type *>(data(container.m_container)));
 	}
-	friend constexpr auto end(vector_base const & container) noexcept {
+	friend constexpr auto end(vector_base const & container) {
 		return begin(container) + container.m_size;
 	}
-	friend constexpr auto end(vector_base & container) noexcept {
+	friend constexpr auto end(vector_base & container) {
 		return begin(container) + container.m_size;
 	}
 
-	constexpr auto capacity() const noexcept {
+	constexpr auto capacity() const {
 		return ::containers::size(m_container);
 	}
 
@@ -83,7 +83,7 @@ struct vector_base {
 	}
 	
 	template<typename Size>
-	auto set_size(Size const s) noexcept(std::is_nothrow_assignable_v<size_type, Size>) {
+	auto set_size(Size const s) {
 		m_size = s;
 	}
 private:

@@ -15,7 +15,7 @@ namespace bounded {
 namespace detail {
 
 template<auto lhs, auto rhs>
-constexpr auto safer_multiply(constant_t<lhs> const &, constant_t<rhs> const &) noexcept {
+constexpr auto safer_multiply(constant_t<lhs> const &, constant_t<rhs> const &) {
 	// If both are positive, the result is positive and I can safely use
 	// unsigned integers. If one is positive and one is negative, the result is
 	// negative and I can use signed integers. Overflow will be caught by the
@@ -43,8 +43,8 @@ template<
 constexpr auto operator*(
 	integer<lhs_min, lhs_max, lhs_policy> const lhs_,
 	integer<rhs_min, rhs_max, rhs_policy> const rhs_
-) noexcept {
-	return detail::operator_overload(lhs_, rhs_, std::multiplies{}, [](auto const lhs, auto const rhs) noexcept {
+) {
+	return detail::operator_overload(lhs_, rhs_, std::multiplies{}, [](auto const lhs, auto const rhs) {
 		auto p0 = detail::safer_multiply(lhs.min, rhs.min);
 		auto p1 = detail::safer_multiply(lhs.min, rhs.max);
 		auto p2 = detail::safer_multiply(lhs.max, rhs.min);

@@ -12,7 +12,7 @@ namespace containers {
 
 template<typename Function>
 struct scope_guard {
-	constexpr explicit scope_guard(Function f) noexcept(std::is_nothrow_move_constructible_v<Function>):
+	constexpr explicit scope_guard(Function f):
 		m_function(std::move(f)),
 		m_is_active(true)
 	{
@@ -30,7 +30,7 @@ struct scope_guard {
 		}
 	}
 	
-	constexpr void dismiss() noexcept {
+	constexpr void dismiss() {
 		m_is_active = false;
 	}
 

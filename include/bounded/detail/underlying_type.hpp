@@ -13,7 +13,7 @@ namespace bounded {
 namespace detail {
 
 template<typename T, typename Minimum, typename Maximum>
-constexpr auto range_fits_in_type(Minimum const minimum, Maximum const maximum) noexcept {
+constexpr auto range_fits_in_type(Minimum const minimum, Maximum const maximum) {
 	return value_fits_in_type<T>(minimum) and value_fits_in_type<T>(maximum);
 }
 
@@ -26,7 +26,7 @@ template<auto...>
 constexpr auto false_ = false;
 
 template<auto minimum, auto maximum>
-constexpr auto determine_type() noexcept {
+constexpr auto determine_type() {
 	if constexpr (range_fits_in_type<unsigned char>(minimum, maximum)) {
 		return type_c<unsigned char>{};
 	} else if constexpr (range_fits_in_type<signed char>(minimum, maximum)) {

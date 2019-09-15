@@ -21,10 +21,10 @@ template<
 constexpr auto operator&(
 	integer<lhs_min, lhs_max, lhs_policy> const lhs_,
 	integer<rhs_min, rhs_max, rhs_policy> const rhs_
-) noexcept {
+) {
 	// Assume always positive integers for now
 	// Not the tightest possible bounds, but probably good enough for now
-	return operator_overload(lhs_, rhs_, std::bit_and{}, [](auto const lhs, auto const rhs) noexcept {
+	return operator_overload(lhs_, rhs_, std::bit_and{}, [](auto const lhs, auto const rhs) {
 		return detail::min_max{
 			0,
 			min(lhs.max, rhs.max).value()

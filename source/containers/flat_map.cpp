@@ -44,13 +44,13 @@ static_assert(constexpr_constructible.find(2) == end(constexpr_constructible));
 
 class CheckedMover {
 public:
-	constexpr CheckedMover(int value) noexcept:
+	constexpr CheckedMover(int value):
 		m_value(value),
 		m_moved(false)
 	{
 	}
 		
-	constexpr CheckedMover(CheckedMover const & other) noexcept:
+	constexpr CheckedMover(CheckedMover const & other):
 		m_value(other.m_value),
 		m_moved(other.m_moved)
 	{
@@ -66,7 +66,7 @@ public:
 		BOUNDED_TEST(!other.m_destructed);
 		other.m_moved = true;
 	}
-	constexpr CheckedMover & operator=(CheckedMover const & other) noexcept {
+	constexpr CheckedMover & operator=(CheckedMover const & other) {
 		BOUNDED_TEST(!other.m_moved);
 		BOUNDED_TEST(!other.m_destructed);
 		BOUNDED_TEST(!m_destructed);
@@ -90,14 +90,14 @@ public:
 	}
 	
 	
-	friend constexpr auto compare(CheckedMover const & lhs, CheckedMover const & rhs) noexcept {
+	friend constexpr auto compare(CheckedMover const & lhs, CheckedMover const & rhs) {
 		BOUNDED_TEST(!lhs.m_moved);
 		BOUNDED_TEST(!rhs.m_moved);
 		BOUNDED_TEST(!lhs.m_destructed);
 		BOUNDED_TEST(!rhs.m_destructed);
 		return bounded::compare(lhs.m_value, rhs.m_value);
 	}
-	friend constexpr auto operator==(CheckedMover const & lhs, CheckedMover const & rhs) noexcept {
+	friend constexpr auto operator==(CheckedMover const & lhs, CheckedMover const & rhs) {
 		BOUNDED_TEST(!lhs.m_moved);
 		BOUNDED_TEST(!rhs.m_moved);
 		BOUNDED_TEST(!lhs.m_destructed);
@@ -190,7 +190,7 @@ template<typename Key, typename Value, typename Compare, typename Allocator>
 constexpr auto is_std_map<std::map<Key, Value, Compare, Allocator>> = true;
 
 template<typename container_type, typename... Args>
-constexpr auto generic_forward_as_tuple(Args && ... args) noexcept {
+constexpr auto generic_forward_as_tuple(Args && ... args) {
 	if constexpr (is_std_map<container_type>) {
 		return std::forward_as_tuple(BOUNDED_FORWARD(args)...);
 	} else {
@@ -244,7 +244,7 @@ using extract_key_t = Extract;
 	using value_type = std::pair<Key, Value>;
 
 	template<typename Pair>
-	constexpr auto const & get_key(Pair const & pair) noexcept {
+	constexpr auto const & get_key(Pair const & pair) {
 		return pair.first;
 	}
 
@@ -256,7 +256,7 @@ using extract_key_t = Extract;
 	using value_type = containers::map_value_type<Key, Value>;
 
 	template<typename Pair>
-	constexpr auto const & get_key(Pair const & pair) noexcept {
+	constexpr auto const & get_key(Pair const & pair) {
 		return pair.key();
 	}
 

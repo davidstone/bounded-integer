@@ -13,15 +13,15 @@ BOUNDED_COMPARISON
 
 // Add in some asserts and manually make special member functions non-trivial
 struct string_view {
-	constexpr string_view(char const * value_) noexcept:
+	constexpr string_view(char const * value_):
 		value(value_) {
 	}
-	constexpr string_view(string_view const & other) noexcept:
+	constexpr string_view(string_view const & other):
 		value(other.value)
 	{
 		BOUNDED_TEST(not other.moved_from);
 	}
-	constexpr auto & operator=(string_view const & other) noexcept {
+	constexpr auto & operator=(string_view const & other) {
 		BOUNDED_TEST(not other.moved_from);
 		value = other.value;
 		moved_from = false;
@@ -41,7 +41,7 @@ struct string_view {
 		return *this;
 	}
 	
-	friend constexpr auto compare(string_view lhs, string_view rhs) noexcept {
+	friend constexpr auto compare(string_view lhs, string_view rhs) {
 		BOUNDED_TEST(not lhs.moved_from and not rhs.moved_from);
 		while (true) {
 			if (auto const cmp = bounded::compare(*lhs.value, *rhs.value); cmp != 0 or *lhs.value == '\0') {
@@ -51,7 +51,7 @@ struct string_view {
 			++rhs.value;
 		}
 	}
-	friend constexpr auto operator==(string_view lhs, string_view rhs) noexcept {
+	friend constexpr auto operator==(string_view lhs, string_view rhs) {
 		BOUNDED_TEST(not lhs.moved_from and not rhs.moved_from);
 		while (true) {
 			if (*lhs.value != *rhs.value) {

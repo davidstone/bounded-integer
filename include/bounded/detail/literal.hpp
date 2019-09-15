@@ -36,7 +36,7 @@ constexpr auto literal(Digit const digit, Digits... digits) {
 namespace literal {
 
 template<char... digits>
-constexpr auto operator""_bi() noexcept {
+constexpr auto operator""_bi() {
 	return detail::literal(constant<digits - '0'>...);
 }
 

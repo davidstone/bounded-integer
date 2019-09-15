@@ -23,16 +23,11 @@ namespace detail {
 // TODO: properly support references?
 template<typename GetFunction, typename... Ts>
 struct basic_variant_base {
-	// TODO: assert GetFunction is noexcept
-
 	template<typename F, typename Index, typename... Args> requires(
 		std::is_convertible_v<F, GetFunction> and
 		std::is_constructible_v<typename decltype(get_type(Index{}, types<Ts>{}...))::type, Args...>
 	)
-	constexpr basic_variant_base(std::in_place_t, F && function, Index index_, Args && ... args) noexcept(
-		std::is_nothrow_constructible_v<GetFunction, F> and
-		std::is_nothrow_constructible_v<typename decltype(get_type(Index{}, types<Ts>{}...))::type, Args...>
-	):
+	constexpr basic_variant_base(std::in_place_t, F && function, Index index_, Args && ... args):
 		m_function(BOUNDED_FORWARD(function)),
 		m_data(get_index(index_, types<Ts>{}...), BOUNDED_FORWARD(args)...)
 	{
@@ -50,18 +45,18 @@ struct basic_variant_base {
 		not std::is_convertible_v<Index, GetFunction> and
 		std::is_constructible_v<typename decltype(get_type(Index{}, types<Ts>{}...))::type, Args...>
 	)
-	constexpr basic_variant_base(std::in_place_t, Index const index_, Args && ... args) BOUNDED_NOEXCEPT_INITIALIZATION(
+	constexpr basic_variant_base(std::in_place_t, Index const index_, Args && ... args):
 		basic_variant_base(
 			std::in_place,
 			GetFunction(get_index(index_, types<Ts>{}...)),
 			index_,
 			BOUNDED_FORWARD(args)...
 		)
-	) {
+	{
 	}
 	
 	template<matches_exactly_one_type<types<Ts>...> T>
-	constexpr explicit basic_variant_base(T && value) noexcept(std::is_nothrow_constructible_v<std::decay_t<T>, T &&>):
+	constexpr explicit basic_variant_base(T && value):
 		basic_variant_base(
 			std::in_place,
 			types<std::decay_t<T>>{},
@@ -74,10 +69,7 @@ struct basic_variant_base {
 		std::is_constructible_v<std::decay_t<T>, T &&> and
 		std::is_assignable_v<std::decay_t<T> &, T &&>
 	)
-	constexpr void assignment(T && value) & noexcept(
-		std::is_nothrow_constructible_v<std::decay_t<T>, T &&> and
-		std::is_nothrow_assignable_v<std::decay_t<T> &, T &&>
-	) {
+	constexpr void assignment(T && value) & {
 		visit(*this, [&](auto & original) {
 			if constexpr (std::is_same_v<std::decay_t<decltype(original)>, std::decay_t<T>>) {
 				original = BOUNDED_FORWARD(value);
@@ -89,22 +81,20 @@ struct basic_variant_base {
 	}
 	
 
-	constexpr auto && get_function() const noexcept {
+	constexpr auto && get_function() const {
 		return m_function;
 	}
-	constexpr auto && get_function() noexcept {
+	constexpr auto && get_function() {
 		return m_function;
 	}
 
 
-	constexpr auto index() const noexcept(noexcept(std::declval<GetFunction const &>()(std::declval<detail::variadic_union_t<Ts...> const &>()))) {
+	constexpr auto index() const {
 		return m_function(m_data);
 	}
 
-	template<typename Index, typename... Args, typename = decltype(
-		construct_return<typename decltype(get_type(Index{}, types<Ts>{}...))::type>(std::declval<Args>()...)
-	)>
-	constexpr auto & emplace(Index index, Args && ... args) & noexcept(noexcept(construct(std::declval<basic_variant_base &>()[index], BOUNDED_FORWARD(args)...))) {
+	template<typename Index, typename... Args>
+	constexpr auto & emplace(Index index, Args && ... args) & requires requires { construct_return<typename decltype(get_type(index, types<Ts>{}...))::type>(BOUNDED_FORWARD(args)...); } {
 		using indexed = typename decltype(get_type(index, types<Ts>{}...))::type;
 		if constexpr (std::is_nothrow_constructible_v<indexed, Args...>) {
 			visit(*this, destroy);
@@ -118,15 +108,15 @@ struct basic_variant_base {
 	}
 
 	template<unique_type_identifier<types<Ts>...> Index>
-	constexpr auto const & operator[](Index index_) const & noexcept {
+	constexpr auto const & operator[](Index index_) const & {
 		return operator_bracket(*this, index_);
 	}
 	template<unique_type_identifier<types<Ts>...> Index>
-	constexpr auto & operator[](Index index_) & noexcept {
+	constexpr auto & operator[](Index index_) & {
 		return operator_bracket(*this, index_);
 	}
 	template<unique_type_identifier<types<Ts>...> Index>
-	constexpr auto && operator[](Index index_) && noexcept {
+	constexpr auto && operator[](Index index_) && {
 		return operator_bracket(std::move(*this), index_);
 	}
 
@@ -149,7 +139,7 @@ private:
 		}
 	}
 	template<typename Variant, typename Index>
-	static constexpr auto && operator_bracket(Variant && variant, Index const index_) noexcept {
+	static constexpr auto && operator_bracket(Variant && variant, Index const index_) {
 		return ::bounded::detail::get_union_element(
 			BOUNDED_FORWARD(variant).m_data,
 			get_index(index_, types<Ts>{}...)

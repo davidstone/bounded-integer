@@ -22,18 +22,18 @@ namespace detail {
 namespace common {
 
 template<range Range, typename Index>
-constexpr decltype(auto) at(Range && range, Index const index) BOUNDED_NOEXCEPT(
-	BOUNDED_FORWARD(range)[typename index_type<Range>::overflow_policy{}.assignment(
+constexpr decltype(auto) at(Range && range, Index const index) {
+	return BOUNDED_FORWARD(range)[typename index_type<Range>::overflow_policy{}.assignment(
 		bounded::integer(index),
 		0_bi,
 		size(range) - 1_bi
-	)]
-)
+	)];
+}
 
 template<range Range, typename Index>
-constexpr decltype(auto) at(Range && range, Index const index, bounded::non_check_t) BOUNDED_NOEXCEPT(
-	BOUNDED_FORWARD(range)[static_cast<index_type<Range>>(index)]
-)
+constexpr decltype(auto) at(Range && range, Index const index, bounded::non_check_t) {
+	return BOUNDED_FORWARD(range)[static_cast<index_type<Range>>(index)];
+}
 
 
 }	// namespace common
