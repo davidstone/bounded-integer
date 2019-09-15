@@ -23,7 +23,7 @@ struct type_c {
 };
 
 template<auto...>
-constexpr auto false_ = false;
+inline constexpr auto false_ = false;
 
 template<auto minimum, auto maximum>
 constexpr auto determine_type() {
