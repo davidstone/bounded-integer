@@ -147,8 +147,8 @@ struct variant_copy_move_assignment_impl<true, AddReference, Base, Ts...> : Base
 	variant_copy_move_assignment_impl(variant_copy_move_assignment_impl const &) = default;
 
 	constexpr auto & operator=(reference other) & noexcept(
-		(... and std::is_nothrow_move_constructible_v<Ts>) and
-		(... and std::is_nothrow_move_assignable_v<Ts>)
+		(... and std::is_nothrow_constructible_v<Ts, AddReference<Ts>>) and
+		(... and std::is_nothrow_assignable_v<Ts, AddReference<Ts>>)
 	)
 	{
 		visit_with_index(
