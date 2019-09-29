@@ -13,6 +13,14 @@
 // a power of two. For instance, gcc's implementation of std::sort
 
 namespace bounded {
+namespace detail {
+
+// #include <functional> is really expensive, and we just need this one part
+auto bit_and = [](auto const lhs, auto const rhs) {
+	return lhs & rhs;
+};
+
+} // namespace detail
 
 template<
 	auto lhs_min, auto lhs_max, typename lhs_policy,
@@ -24,7 +32,7 @@ constexpr auto operator&(
 ) {
 	// Assume always positive integers for now
 	// Not the tightest possible bounds, but probably good enough for now
-	return ::bounded::detail::operator_overload(lhs_, rhs_, std::bit_and{}, [](auto const lhs, auto const rhs) {
+	return ::bounded::detail::operator_overload(lhs_, rhs_, detail::bit_and, [](auto const lhs, auto const rhs) {
 		return detail::min_max{
 			0,
 			min(lhs.max, rhs.max).value()

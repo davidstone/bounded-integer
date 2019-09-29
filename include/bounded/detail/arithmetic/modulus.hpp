@@ -98,6 +98,11 @@ constexpr auto modulus_operator_range = [](auto const lhs_, auto const rhs_) {
 	};
 };
 
+// #include <functional> is really expensive, and we just need this one part
+auto modulus = [](auto const lhs, auto const rhs) {
+	return lhs % rhs;
+};
+
 }	// namespace detail
 
 template<
@@ -108,7 +113,7 @@ constexpr auto operator%(
 	integer<lhs_min, lhs_max, lhs_policy> const lhs,
 	integer<rhs_min, rhs_max, rhs_policy> const rhs
 ) {
-	return detail::operator_overload(lhs, rhs, std::modulus{}, detail::modulus_operator_range);
+	return detail::operator_overload(lhs, rhs, detail::modulus, detail::modulus_operator_range);
 }
 
 }	// namespace bounded

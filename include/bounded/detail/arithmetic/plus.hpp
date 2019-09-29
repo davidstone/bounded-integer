@@ -37,6 +37,11 @@ constexpr auto safer_add(constant_t<lhs>, constant_t<rhs>) {
 	}
 }
 
+// #include <functional> is really expensive, and we just need this one part
+auto plus = [](auto const lhs, auto const rhs) {
+	return lhs + rhs;
+};
+
 }	// namespace detail
 
 template<
@@ -47,7 +52,7 @@ constexpr auto operator+(
 	integer<lhs_min, lhs_max, lhs_policy> const lhs_,
 	integer<rhs_min, rhs_max, rhs_policy> const rhs_
 ) {
-	return detail::operator_overload(lhs_, rhs_, std::plus{}, [](auto const lhs, auto const rhs) {
+	return detail::operator_overload(lhs_, rhs_, detail::plus, [](auto const lhs, auto const rhs) {
 		return detail::min_max{
 			::bounded::detail::safer_add(lhs.min, rhs.min),
 			::bounded::detail::safer_add(lhs.max, rhs.max)

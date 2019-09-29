@@ -8,7 +8,6 @@
 #include <bounded/detail/class.hpp>
 #include <bounded/detail/common_type.hpp>
 
-#include <functional>
 #include <type_traits>
 #include <utility>
 

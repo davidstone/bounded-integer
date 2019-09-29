@@ -34,6 +34,11 @@ constexpr auto safer_multiply(constant_t<lhs> const &, constant_t<rhs> const &) 
 	}
 }
 
+// #include <functional> is really expensive, and we just need this one part
+auto multiplies = [](auto const lhs, auto const rhs) {
+	return lhs * rhs;
+};
+
 }	// namespace detail
 
 template<
@@ -44,7 +49,7 @@ constexpr auto operator*(
 	integer<lhs_min, lhs_max, lhs_policy> const lhs_,
 	integer<rhs_min, rhs_max, rhs_policy> const rhs_
 ) {
-	return detail::operator_overload(lhs_, rhs_, std::multiplies{}, [](auto const lhs, auto const rhs) {
+	return detail::operator_overload(lhs_, rhs_, detail::multiplies, [](auto const lhs, auto const rhs) {
 		auto p0 = detail::safer_multiply(lhs.min, rhs.min);
 		auto p1 = detail::safer_multiply(lhs.min, rhs.max);
 		auto p2 = detail::safer_multiply(lhs.max, rhs.min);

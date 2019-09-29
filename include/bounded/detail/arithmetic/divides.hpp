@@ -61,6 +61,11 @@ constexpr auto divides_operator_range = [](auto const lhs_, auto const rhs_) {
 	};
 };
 
+// #include <functional> is really expensive, and we just need this one part
+auto divides = [](auto const lhs, auto const rhs) {
+	return lhs / rhs;
+};
+
 }	// namespace detail
 
 template<
@@ -71,7 +76,7 @@ constexpr auto operator/(
 	integer<lhs_min, lhs_max, lhs_policy> const lhs,
 	integer<rhs_min, rhs_max, rhs_policy> const rhs
 ) {
-	return detail::operator_overload(lhs, rhs, std::divides{}, detail::divides_operator_range);
+	return detail::operator_overload(lhs, rhs, detail::divides, detail::divides_operator_range);
 }
 
 }	// namespace bounded
