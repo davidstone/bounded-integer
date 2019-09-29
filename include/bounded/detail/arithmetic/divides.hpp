@@ -5,8 +5,8 @@
 
 #pragma once
 
-#include <bounded/detail/abs.hpp>
 #include <bounded/detail/arithmetic/base.hpp>
+#include <bounded/detail/arithmetic/safe_abs.hpp>
 #include <bounded/detail/arithmetic/unary_minus.hpp>
 #include <bounded/detail/basic_numeric_limits.hpp>
 #include <bounded/detail/comparison.hpp>
@@ -27,44 +27,37 @@ constexpr auto conditional_function(auto if_true, auto if_false) {
 
 
 // Ignores divide by 0, caught by constexpr
-template<auto lhs_, auto rhs_>
-constexpr auto safer_divide(constant_t<lhs_> const lhs, constant_t<rhs_> const rhs) {
-	constexpr auto max_signed = constant<basic_numeric_limits<max_signed_t>::max()>;
-	constexpr auto min_signed = constant<basic_numeric_limits<max_signed_t>::min()>;
-	static_assert(lhs <= -min_signed or rhs != constant<-1>);
-	if constexpr (lhs > max_signed) {
-		if constexpr (rhs > constant<0>) {
-			return constant<static_cast<max_unsigned_t>(lhs_) / static_cast<max_unsigned_t>(rhs_)>;
-		} else {
-			return -constant<static_cast<max_unsigned_t>(lhs_) / static_cast<max_unsigned_t>(-rhs)>;
-		}
-	} else if constexpr (lhs == min_signed and min_signed != -max_signed and rhs == constant<-1>) {
-		return -min_signed;
+template<auto lhs, auto rhs>
+constexpr auto safer_divide() {
+	constexpr auto is_negative = lhs < 0 xor rhs < 0;
+	constexpr auto positive_result = bounded::constant<safe_abs(lhs) / safe_abs(rhs)>;
+	if constexpr (is_negative) {
+		return (-positive_result).value();
 	} else {
-		return constant<static_cast<max_signed_t>(lhs_) / static_cast<max_signed_t>(rhs_)>;
+		return positive_result.value();
 	}
 }
 
 constexpr auto divides_operator_range = [](auto const lhs_, auto const rhs_) {
-	constexpr auto lhs = min_max{decltype(lhs_.min){}, decltype(lhs_.max){}};
-	constexpr auto rhs = min_max{decltype(rhs_.min){}, decltype(rhs_.max){}};
+	constexpr auto lhs = min_max{lhs_.min, lhs_.max};
+	constexpr auto rhs = min_max{rhs_.min, rhs_.max};
 	// If 1 falls within the range, that is the least positive divisor. The
 	// other options are a range that are entirely positive, in which case I
 	// want to return the least value, or the range is entirely negative or
 	// zero, in which case I pick the greatest absolute value (which is the
 	// minimum) so that the 'positive' divisor is not selected in a later step.
 	// We can use similar logic for greatest_negative_divisor.
-	constexpr auto least_positive_divisor = ::bounded::detail::conditional_function<rhs.min <= constant<1> and constant<1> <= rhs.max>(constant<1>, rhs.min);
-	constexpr auto greatest_negative_divisor = ::bounded::detail::conditional_function<rhs.min <= constant<-1> and constant<-1> <= rhs.max>(constant<-1>, rhs.max);
+	constexpr auto least_positive_divisor = ::bounded::detail::conditional_function<rhs.min <= constant<1> and constant<1> <= rhs.max>(1, rhs.min.value());
+	constexpr auto greatest_negative_divisor = ::bounded::detail::conditional_function<rhs.min <= constant<-1> and constant<-1> <= rhs.max>(-1, rhs.max.value());
 
-	constexpr auto g0 = safer_divide(lhs.min, least_positive_divisor);
-	constexpr auto g1 = safer_divide(lhs.min, greatest_negative_divisor);
-	constexpr auto g2 = safer_divide(lhs.max, least_positive_divisor);
-	constexpr auto g3 = safer_divide(lhs.max, greatest_negative_divisor);
+	constexpr auto g0 = safer_divide<lhs.min.value(), least_positive_divisor>();
+	constexpr auto g1 = safer_divide<lhs.min.value(), greatest_negative_divisor>();
+	constexpr auto g2 = safer_divide<lhs.max.value(), least_positive_divisor>();
+	constexpr auto g3 = safer_divide<lhs.max.value(), greatest_negative_divisor>();
 
 	return min_max{
-		min(g0, g1, g2, g3).value(),
-		max(g0, g1, g2, g3).value()
+		safe_min(g0, g1, g2, g3),
+		safe_max(g0, g1, g2, g3)
 	};
 };
 
