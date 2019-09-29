@@ -13,7 +13,6 @@
 #include <bounded/detail/comparison.hpp>
 #include <bounded/detail/comparison_mixed.hpp>
 #include <bounded/detail/conditional.hpp>
-#include <bounded/detail/hash.hpp>
 #include <bounded/detail/literal.hpp>
 #include <bounded/detail/log.hpp>
 #include <bounded/detail/minmax.hpp>

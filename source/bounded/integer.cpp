@@ -12,7 +12,6 @@
  
 #include "../test_assert.hpp"
 
-#include <unordered_map>
 #include <sstream>
 
 namespace {
@@ -175,21 +174,6 @@ auto check_streaming() {
 	streaming_test<decltype(bounded::integer(0))>(large_initial, large_final);
 }
 
-auto check_hash() {
-	std::unordered_map<bounded::integer<0, 100>, bounded::integer<0, 100>> const map = {
-		{ bounded::constant<1>, bounded::constant<2> },
-		{ bounded::constant<2>, bounded::constant<3> },
-		{ bounded::constant<3>, bounded::constant<5> },
-		{ bounded::constant<4>, bounded::constant<7> },
-		{ bounded::constant<5>, bounded::constant<11> },
-		{ bounded::constant<1>, bounded::constant<0> }
-	};
-	
-	BOUNDED_TEST(map.size() == 5);
-	BOUNDED_TEST(map.at(bounded::constant<1>) == bounded::constant<2>);
-	BOUNDED_TEST(map.at(bounded::constant<3>) == bounded::constant<5>);
-}
-
 auto check_to_integer() {
 	try {
 		bounded::to_integer<0, 0>("");
@@ -225,6 +209,5 @@ auto main() -> int {
 	check_optional();
 	check_to_string();
 	check_streaming();
-	check_hash();
 	check_to_integer();
 }

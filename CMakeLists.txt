@@ -59,7 +59,6 @@ target_sources(bounded INTERFACE
 	$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>/include/bounded/detail/construct_destroy.hpp
 	$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>/include/bounded/detail/copy_cv_ref.hpp
 	$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>/include/bounded/detail/forward_declaration.hpp
-	$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>/include/bounded/detail/hash.hpp
 	$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>/include/bounded/detail/is_bounded_integer.hpp
 	$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>/include/bounded/detail/literal.hpp
 	$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>/include/bounded/detail/log.hpp
@@ -79,6 +78,7 @@ target_sources(bounded INTERFACE
 	$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>/include/bounded/detail/typedefs.hpp
 	$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>/include/bounded/detail/underlying_type.hpp
 	$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>/include/bounded/assert.hpp
+	$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>/include/bounded/hash.hpp
 	$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>/include/bounded/integer.hpp
 	$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>/include/bounded/optional.hpp
 	$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>/include/bounded/string.hpp
@@ -220,7 +220,6 @@ add_executable(bounded_test
 	source/bounded/detail/construct_destroy.cpp
 	source/bounded/detail/copy_cv_ref.cpp
 	source/bounded/detail/forward_declaration.cpp
-	source/bounded/detail/hash.cpp
 	source/bounded/detail/int128.cpp
 	source/bounded/detail/is_bounded_integer.cpp
 	source/bounded/detail/literal.cpp
@@ -243,13 +242,14 @@ add_executable(bounded_test
 	source/bounded/detail/underlying_type.cpp
 	source/bounded/assert.cpp
 	source/bounded/assert-NDEBUG.cpp
+	source/bounded/hash.cpp
 	source/bounded/integer.cpp
 	source/bounded/optional.cpp
 	source/bounded/string.cpp
-)
-
-target_link_libraries(bounded_test PUBLIC bounded)
-
+	)
+	
+	target_link_libraries(bounded_test PUBLIC bounded)
+	
 add_library(containers_test STATIC
 	source/containers/algorithms/accumulate.cpp
 	source/containers/algorithms/advance.cpp
