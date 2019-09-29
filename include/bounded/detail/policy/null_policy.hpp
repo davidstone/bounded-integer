@@ -5,6 +5,7 @@
 
 #pragma once
 
+#include <bounded/detail/assume.hpp>
 #include <bounded/detail/is_bounded_integer.hpp>
 
 namespace bounded {
@@ -33,6 +34,8 @@ struct null_policy {
 private:
 	template<typename T>
 	static auto error_out_of_range(T const & value) -> T const & {
+		// TODO: BOUNDED_ASSERT_OR_ASSUME?
+		BOUNDED_ASSUME(false);
 		return value;
 	}
 };

@@ -5,6 +5,7 @@
 
 #pragma once
 
+#include <bounded/detail/assume.hpp>
 #include <bounded/detail/basic_numeric_limits.hpp>
 #include <bounded/detail/comparison.hpp>
 #include <bounded/detail/forward_declaration.hpp>
@@ -112,6 +113,7 @@ struct integer {
 	}
 
 	constexpr auto value() const requires(minimum != maximum) {
+		BOUNDED_ASSUME(minimum <= m_value and m_value <= maximum);
 		return m_value;
 	}
 	static constexpr auto value() requires(minimum == maximum) {
