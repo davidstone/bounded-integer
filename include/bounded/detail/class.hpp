@@ -36,8 +36,11 @@ concept bounded_by_range = overlapping_integer<T, minimum, maximum, policy> and 
 // Necessary for optional specialization
 template<typename T>
 concept has_extra_space =
+	basic_numeric_limits<T>::min() != basic_numeric_limits<T>::max() and
+	(
 	basic_numeric_limits<typename T::underlying_type>::min() < basic_numeric_limits<T>::min() or
-	basic_numeric_limits<T>::max() < basic_numeric_limits<typename T::underlying_type>::max();
+		basic_numeric_limits<T>::max() < basic_numeric_limits<typename T::underlying_type>::max()
+	);
 
 
 template<typename Integer>
