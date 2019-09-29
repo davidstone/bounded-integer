@@ -24,7 +24,7 @@ constexpr auto operator&(
 ) {
 	// Assume always positive integers for now
 	// Not the tightest possible bounds, but probably good enough for now
-	return operator_overload(lhs_, rhs_, std::bit_and{}, [](auto const lhs, auto const rhs) {
+	return ::bounded::detail::operator_overload(lhs_, rhs_, std::bit_and{}, [](auto const lhs, auto const rhs) {
 		return detail::min_max{
 			0,
 			min(lhs.max, rhs.max).value()

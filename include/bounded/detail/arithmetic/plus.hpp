@@ -49,8 +49,8 @@ constexpr auto operator+(
 ) {
 	return detail::operator_overload(lhs_, rhs_, std::plus{}, [](auto const lhs, auto const rhs) {
 		return detail::min_max{
-			safer_add(lhs.min, rhs.min),
-			safer_add(lhs.max, rhs.max)
+			::bounded::detail::safer_add(lhs.min, rhs.min),
+			::bounded::detail::safer_add(lhs.max, rhs.max)
 		};
 	});
 }
