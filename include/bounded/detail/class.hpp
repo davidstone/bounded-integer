@@ -38,7 +38,7 @@ template<typename T>
 concept has_extra_space =
 	basic_numeric_limits<T>::min() != basic_numeric_limits<T>::max() and
 	(
-	basic_numeric_limits<typename T::underlying_type>::min() < basic_numeric_limits<T>::min() or
+		basic_numeric_limits<typename T::underlying_type>::min() < basic_numeric_limits<T>::min() or
 		basic_numeric_limits<T>::max() < basic_numeric_limits<typename T::underlying_type>::max()
 	);
 
@@ -75,48 +75,11 @@ constexpr decltype(auto) as_integer(T const & value) {
 }
 
 
-template<typename T>
-struct value_wrapper {
-	using underlying_type = T;
-	value_wrapper() = default;
-	constexpr explicit value_wrapper(underlying_type const value_):
-		m_value(value_)
-	{
-	}
-	constexpr auto value() const {
-		return m_value;
-	}
-	constexpr auto value() const volatile {
-		return m_value;
-	}
-	constexpr auto assign(underlying_type other) {
-		m_value = other;
-	}
-	auto assign(underlying_type other) volatile {
-		m_value = other;
-	}
-private:
-	underlying_type m_value;
-};
-
-template<auto value_>
-struct constant_wrapper {
-	using underlying_type = decltype(value_);
-	constexpr constant_wrapper() = default;
-	constexpr explicit constant_wrapper(underlying_type const &) {
-	}
-	static constexpr auto value() {
-		return value_;
-	}
-	static constexpr auto assign(underlying_type const &) {
+struct empty {
+	constexpr empty() = default;
+	constexpr explicit empty(auto) {
 	}
 };
-
-template<auto minimum, auto maximum>
-using base = std::conditional_t<minimum == maximum,
-	constant_wrapper<static_cast<underlying_type_t<minimum, maximum>>(minimum)>,
-	value_wrapper<underlying_type_t<minimum, maximum>>
->;
 
 }	// namespace detail
 
@@ -133,15 +96,12 @@ inline constexpr auto constant = constant_t<detail::normalize<value>, overflow_p
 // https://github.com/saarraz/clang-concepts-monorepo/issues/21
 
 template<auto minimum, auto maximum, typename overflow_policy_ = null_policy>
-struct integer : private detail::base<minimum, maximum> {
-private:
+struct integer {
 	static_assert(std::is_same_v<decltype(minimum), std::remove_const_t<decltype(detail::normalize<minimum>)>>);
 	static_assert(std::is_same_v<decltype(maximum), std::remove_const_t<decltype(detail::normalize<maximum>)>>);
-	using base = detail::base<minimum, maximum>;
-public:
 	static_assert(compare(minimum, maximum) <= 0, "Maximum cannot be less than minimum");
 
-	using underlying_type = typename base::underlying_type;
+	using underlying_type = detail::underlying_type_t<minimum, maximum>;
 	using overflow_policy = overflow_policy_;
 	static_assert(detail::value_fits_in_type<underlying_type>(minimum), "minimum does not fit in underlying_type.");
 	static_assert(detail::value_fits_in_type<underlying_type>(maximum), "maximum does not fit in underlying_type.");
@@ -153,14 +113,15 @@ public:
 		return constant<maximum>;
 	}
 
-private:
-	template<typename T>
-	static constexpr decltype(auto) apply_overflow_policy(T const & value) {
-		return overflow_policy{}.assignment(value, min(), max());
+	constexpr auto value() const requires(minimum != maximum) {
+		return m_value;
 	}
-public:
-	
-	using base::value;
+	constexpr auto value() const volatile requires(minimum != maximum) {
+		return m_value;
+	}
+	static constexpr auto value() requires(minimum == maximum) {
+		return static_cast<underlying_type>(minimum);
+	}
 	
 	integer() = default;
 	constexpr integer(integer const &) = default;
@@ -175,7 +136,7 @@ public:
 
 	template<typename T> requires detail::overlapping_integer<T, minimum, maximum, overflow_policy>
 	constexpr integer(T const & other, non_check_t):
-		base(static_cast<underlying_type>(other)) {
+		m_value(static_cast<underlying_type>(other)) {
 	}
 
 	template<typename T> requires detail::bounded_by_range<T, minimum, maximum, overflow_policy>
@@ -207,12 +168,16 @@ public:
 
 	template<typename T>
 	constexpr auto && unchecked_assignment(T const & other) & {
-		base::assign(static_cast<underlying_type>(other));
+		if constexpr (minimum != maximum) {
+			m_value = static_cast<underlying_type>(other);
+		}
 		return *this;
 	}
 	template<typename T>
 	auto unchecked_assignment(T const & other) volatile & {
-		base::assign(static_cast<underlying_type>(other));
+		if constexpr (minimum != maximum) {
+			m_value = static_cast<underlying_type>(other);
+		}
 	}
 	
 	constexpr auto operator=(integer const & other) & -> integer & = default;
@@ -242,7 +207,7 @@ public:
 	// Allow a compressed optional representation
 	template<typename Tag> requires (std::is_same_v<Tag, optional_tag> and detail::has_extra_space<integer>)
 	constexpr explicit integer(Tag):
-		base(uninitialized_value()) {
+		m_value(uninitialized_value()) {
 	}
 
 	template<typename... Args> requires(
@@ -258,20 +223,28 @@ public:
 		detail::has_extra_space<integer>
 	)
 	constexpr auto uninitialize(Tag) {
-		base::assign(uninitialized_value());
+		unchecked_assignment(uninitialized_value());
 	}
 	template<typename Tag> requires (
 		std::is_same_v<Tag, optional_tag> and
 		detail::has_extra_space<integer>
 	)
 	constexpr auto is_initialized(Tag) const {
-		return base::value() != uninitialized_value();
+		return m_value != uninitialized_value();
 	}
 private:
 	static constexpr auto uninitialized_value() {
 		return minimum > basic_numeric_limits<underlying_type>::min() ?
 			static_cast<underlying_type>(minimum - 1) : static_cast<underlying_type>(maximum + 1);
 	}
+
+	template<typename T>
+	static constexpr decltype(auto) apply_overflow_policy(T const & value) {
+		return overflow_policy{}.assignment(value, min(), max());
+	}
+
+	using storage_type = std::conditional_t<minimum == maximum, detail::empty, underlying_type>;
+	[[no_unique_address]] storage_type m_value;
 };
 
 
