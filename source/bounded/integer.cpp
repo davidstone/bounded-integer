@@ -175,13 +175,6 @@ auto check_streaming() {
 	streaming_test<decltype(bounded::integer(0))>(large_initial, large_final);
 }
 
-auto check_volatile() {
-	bounded::integer<0, 6> volatile x = bounded::constant<3>;
-	BOUNDED_TEST(x.value() == 3);
-	x = bounded::constant<2>;
-	BOUNDED_TEST(x.value() == 2);
-}
-
 auto check_hash() {
 	std::unordered_map<bounded::integer<0, 100>, bounded::integer<0, 100>> const map = {
 		{ bounded::constant<1>, bounded::constant<2> },
@@ -232,7 +225,6 @@ auto main() -> int {
 	check_optional();
 	check_to_string();
 	check_streaming();
-	check_volatile();
 	check_hash();
 	check_to_integer();
 }

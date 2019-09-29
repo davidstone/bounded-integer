@@ -103,8 +103,6 @@ struct integer {
 
 	using underlying_type = detail::underlying_type_t<minimum, maximum>;
 	using overflow_policy = overflow_policy_;
-	static_assert(detail::value_fits_in_type<underlying_type>(minimum), "minimum does not fit in underlying_type.");
-	static_assert(detail::value_fits_in_type<underlying_type>(maximum), "maximum does not fit in underlying_type.");
 	
 	static constexpr auto min() {
 		return constant<minimum>;
@@ -114,9 +112,6 @@ struct integer {
 	}
 
 	constexpr auto value() const requires(minimum != maximum) {
-		return m_value;
-	}
-	constexpr auto value() const volatile requires(minimum != maximum) {
 		return m_value;
 	}
 	static constexpr auto value() requires(minimum == maximum) {
@@ -173,12 +168,6 @@ struct integer {
 		}
 		return *this;
 	}
-	template<typename T>
-	auto unchecked_assignment(T const & other) volatile & {
-		if constexpr (minimum != maximum) {
-			m_value = static_cast<underlying_type>(other);
-		}
-	}
 	
 	constexpr auto operator=(integer const & other) & -> integer & = default;
 	constexpr auto operator=(integer && other) & -> integer & = default;
@@ -187,20 +176,12 @@ struct integer {
 	constexpr auto && operator=(T const & other) & {
 		return unchecked_assignment(apply_overflow_policy(other));
 	}
-	template<typename T> requires detail::overlapping_integer<T, minimum, maximum, overflow_policy>
-	auto operator=(T const & other) volatile & {
-		unchecked_assignment(apply_overflow_policy(other));
-	}
 	
 	// Do not verify that the value is in range because the user has requested a
 	// conversion out of the safety of bounded::integer. It is subject to all
 	// the standard rules of conversion from one integer type to another.
 	template<typename T> requires (detail_builtin_arithmetic<T> or std::is_enum_v<T>)
 	constexpr explicit operator T() const {
-		return static_cast<T>(value());
-	}
-	template<typename T> requires (detail_builtin_arithmetic<T> or std::is_enum_v<T>)
-	constexpr explicit operator T() const volatile {
 		return static_cast<T>(value());
 	}
 	
