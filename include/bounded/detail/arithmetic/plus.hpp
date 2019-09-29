@@ -9,6 +9,7 @@
 #include <bounded/detail/basic_numeric_limits.hpp>
 #include <bounded/detail/comparison.hpp>
 #include <bounded/detail/max_builtin.hpp>
+#include <bounded/detail/modulo_cast.hpp>
 
 namespace bounded {
 namespace detail {
@@ -32,7 +33,7 @@ constexpr auto safer_add(constant_t<lhs>, constant_t<rhs>) {
 			lhs > 0 or rhs > 0 or modulo_equivalent_value > max_signed,
 			"Underflow in calculation of bounds."
 		);
-		return from_unsigned_cast<max_signed_t>(modulo_equivalent_value);
+		return cast_to_signed_integer(modulo_equivalent_value);
 	}
 }
 

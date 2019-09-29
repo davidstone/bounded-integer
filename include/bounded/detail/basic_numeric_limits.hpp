@@ -66,22 +66,6 @@ inline constexpr auto normalize = static_cast<
 	max_signed_t
 >>>(value);
 
-template<detail_signed_builtin T>
-constexpr auto from_unsigned_cast(std::make_unsigned_t<T> const value) {
-	using limits = basic_numeric_limits<T>;
-	static_assert(-(limits::min() + 1) == limits::max());
-	if (value <= limits::max()) {
-		return static_cast<T>(value);
-	} else {
-		return static_cast<T>(static_cast<T>(value - static_cast<std::make_unsigned_t<T>>(limits::min())) + limits::min());
-	}
-}
-
-template<detail_unsigned_builtin T>
-constexpr auto from_unsigned_cast(std::make_unsigned_t<T> const value) {
-	return value;
-}
-
 }	// namespace detail
 
 // This does not requiring having a definition of bounded::integer to get at the

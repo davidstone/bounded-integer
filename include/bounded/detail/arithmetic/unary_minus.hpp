@@ -5,25 +5,25 @@
 
 #pragma once
 
+#include <bounded/detail/basic_numeric_limits.hpp>
 #include <bounded/detail/class.hpp>
-#include <bounded/detail/comparison.hpp>
-#include <bounded/detail/common_type.hpp>
 #include <bounded/detail/max_builtin.hpp>
+#include <bounded/detail/modulo_cast.hpp>
 
 #include <limits>
 
 namespace bounded {
 namespace detail {
 
-template<auto value_>
-constexpr auto safer_negation(constant_t<value_> const value) {
-	constexpr auto max_signed = basic_numeric_limits<max_signed_t>::max();
-	if constexpr (value < constant<-max_signed>) {
-		static_assert(value == constant<basic_numeric_limits<max_signed_t>::min()>);
-		return -static_cast<max_unsigned_t>(value_);
+template<auto value>
+constexpr auto safer_negation() {
+	constexpr auto negated = -static_cast<max_unsigned_t>(value);
+	if constexpr (value <= 0) {
+		return negated;
 	} else {
-		static_assert(value <= constant<max_signed>, "Negation would overflow.");
-		return -static_cast<max_signed_t>(value_);
+		constexpr auto max_positive_input = -static_cast<max_unsigned_t>(basic_numeric_limits<max_signed_t>::min());
+		static_assert(value <= max_positive_input, "Negation would overflow.");
+		return static_cast<max_signed_t>(negated);
 	}
 }
 
@@ -31,19 +31,17 @@ constexpr auto safer_negation(constant_t<value_> const value) {
 
 template<auto minimum, auto maximum, typename overflow_policy>
 constexpr auto operator-(integer<minimum, maximum, overflow_policy> const value) {
-	static_assert(
-		(constant<minimum> == constant<maximum>) ==
-		(detail::safer_negation(constant<minimum>) == detail::safer_negation(constant<maximum>))
-	);
 	using result_type = integer<
-		detail::normalize<detail::safer_negation(constant<maximum>)>,
-		detail::normalize<detail::safer_negation(constant<minimum>)>,
+		detail::normalize<detail::safer_negation<maximum>()>,
+		detail::normalize<detail::safer_negation<minimum>()>,
 		overflow_policy
 	>;
 	using underlying_type = typename result_type::underlying_type;
 	using promoted_unsigned_type = detail::promoted_unsigned<underlying_type>;
-	using unsigned_type = std::make_unsigned_t<underlying_type>;
-	return result_type(detail::from_unsigned_cast<underlying_type>(static_cast<unsigned_type>(-static_cast<promoted_unsigned_type>(value))), non_check);
+	return result_type(
+		detail::modulo_cast<underlying_type>(-static_cast<promoted_unsigned_type>(value)),
+		non_check
+	);
 }
 
 }	// namespace bounded
