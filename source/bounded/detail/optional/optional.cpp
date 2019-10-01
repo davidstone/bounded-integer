@@ -30,4 +30,6 @@ static_assert(test_optional<bounded::integer<0, 10>>());
 static_assert(test_optional<decltype(bounded::integer(0))>());
 static_assert((void(bounded::optional<S>{}.emplace(0)), true));
 
+static_assert(*bounded::optional(5) == 5);
+
 }	// namespace
