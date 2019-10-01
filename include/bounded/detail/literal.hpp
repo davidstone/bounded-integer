@@ -5,6 +5,7 @@
 
 #pragma once
 
+#include <bounded/assert.hpp>
 #include <bounded/detail/arithmetic/multiplies.hpp>
 #include <bounded/detail/arithmetic/plus.hpp>
 #include <bounded/detail/class.hpp>
@@ -13,22 +14,21 @@
 namespace bounded {
 namespace detail {
 
-constexpr auto power(max_unsigned_t const radix, max_unsigned_t const exponent) {
-	max_unsigned_t result = 1;
-	for (max_unsigned_t n = 0; n != exponent; ++n) {
+template<char... digits>
+constexpr auto literal_impl() {
+	max_unsigned_t result = 0;
+	auto accumulate_digit = [&](char const digit) {
+		if (digit == '\'') {
+			return;
+		}
+		constexpr auto radix = 10;
 		result *= radix;
-	}
+		auto const digit_num = static_cast<max_unsigned_t>(digit - '0');
+		BOUNDED_ASSERT(digit_num <= 9);
+		result += digit_num;
+	};
+	(..., accumulate_digit(digits));
 	return result;
-}
-
-template<typename Digit>
-constexpr auto literal(Digit const digit) {
-	return digit;
-}
-template<typename Digit, typename... Digits>
-constexpr auto literal(Digit const digit, Digits... digits) {
-	constexpr auto radix = 10;
-	return digit * constant<power(radix, sizeof...(digits))> + literal(digits...);
 }
 
 }	// namespace detail
@@ -37,7 +37,7 @@ namespace literal {
 
 template<char... digits>
 constexpr auto operator""_bi() {
-	return detail::literal(constant<digits - '0'>...);
+	return constant<::bounded::detail::literal_impl<digits...>()>;
 }
 
 }	// namespace literal
