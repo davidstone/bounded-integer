@@ -13,7 +13,7 @@ namespace containers {
 
 template<typename T, typename Size>
 constexpr auto make_static_vector(Size const size) {
-	return static_vector<T, static_cast<std::size_t>(std::numeric_limits<Size>::max())>(size);
+	return static_vector<T, static_cast<std::size_t>(bounded::max_value<Size>)>(size);
 }
 
 }	// namespace containers

@@ -5,9 +5,9 @@
 
 #pragma once
 
-#include <bounded/detail/basic_numeric_limits.hpp>
 #include <bounded/detail/is_bounded_integer.hpp>
 #include <bounded/detail/max_builtin.hpp>
+#include <bounded/detail/min_max_value.hpp>
 
 #include <cstddef>
 #include <type_traits>
@@ -121,10 +121,10 @@ namespace detail {
 
 template<detail_builtin_integer LHS, detail_builtin_integer RHS>
 constexpr auto safe_equal(LHS const lhs, RHS const rhs) -> bool {
-	constexpr auto signed_max = basic_numeric_limits<detail::max_signed_t>::max();
+	constexpr auto signed_max = max_value<detail::max_signed_t>;
 	if constexpr (detail_signed_builtin<LHS> == detail_signed_builtin<RHS>) {
 		return lhs == rhs;
-	} else if constexpr (basic_numeric_limits<LHS>::max() <= signed_max and basic_numeric_limits<RHS>::max() <= signed_max) {
+	} else if constexpr (max_value<LHS> <= signed_max and max_value<RHS> <= signed_max) {
 		return static_cast<detail::max_signed_t>(lhs) == static_cast<detail::max_signed_t>(rhs);
 	} else if constexpr (detail_signed_builtin<LHS>) {
 		static_assert(std::is_same_v<RHS, detail::max_unsigned_t>);
@@ -173,13 +173,15 @@ constexpr auto safe_max(Ts... values) {
 
 template<bounded_integer LHS, bounded_integer RHS>
 constexpr auto compare(LHS const & lhs, RHS const & rhs) {
-	using lhs_limits = basic_numeric_limits<LHS>;
-	using rhs_limits = basic_numeric_limits<RHS>;
-	if constexpr (compare(lhs_limits::min(), rhs_limits::max()) > 0) {
+	constexpr auto lhs_min = min_value<LHS>.value();
+	constexpr auto lhs_max = max_value<LHS>.value();
+	constexpr auto rhs_min = min_value<RHS>.value();
+	constexpr auto rhs_max = max_value<RHS>.value();
+	if constexpr (compare(lhs_min, rhs_max) > 0) {
 		return strong_ordering::greater;
-	} else if constexpr (compare(lhs_limits::max(), rhs_limits::min()) < 0) {
+	} else if constexpr (compare(lhs_max, rhs_min) < 0) {
 		return strong_ordering::less;
-	} else if constexpr (compare(lhs_limits::min(), lhs_limits::max()) == 0 and compare(rhs_limits::min(), rhs_limits::max()) == 0 and compare(lhs_limits::min(), rhs_limits::min()) == 0) {
+	} else if constexpr (compare(lhs_min, lhs_max) == 0 and compare(rhs_min, rhs_max) == 0 and compare(lhs_min, rhs_min) == 0) {
 		return strong_ordering::equal;
 	} else {
 		return compare(lhs.value(), rhs.value());
@@ -189,11 +191,13 @@ constexpr auto compare(LHS const & lhs, RHS const & rhs) {
 
 template<bounded_integer LHS, bounded_integer RHS>
 constexpr auto operator==(LHS const & lhs, RHS const & rhs) {
-	using lhs_limits = basic_numeric_limits<LHS>;
-	using rhs_limits = basic_numeric_limits<RHS>;
-	if constexpr (compare(lhs_limits::min(), rhs_limits::max()) > 0 or compare(lhs_limits::max(), rhs_limits::min()) < 0) {
+	constexpr auto lhs_min = min_value<LHS>.value();
+	constexpr auto lhs_max = max_value<LHS>.value();
+	constexpr auto rhs_min = min_value<RHS>.value();
+	constexpr auto rhs_max = max_value<RHS>.value();
+	if constexpr (compare(lhs_min, rhs_max) > 0 or compare(lhs_max, rhs_min) < 0) {
 		return false;
-	} else if constexpr (compare(lhs_limits::min(), lhs_limits::max()) == 0 and compare(rhs_limits::min(), rhs_limits::max()) == 0 and compare(lhs_limits::min(), rhs_limits::min()) == 0) {
+	} else if constexpr (compare(lhs_min, lhs_max) == 0 and compare(rhs_min, rhs_max) == 0 and compare(lhs_min, rhs_min) == 0) {
 		return true;
 	} else {
 		return detail::safe_equal(lhs.value(), rhs.value());

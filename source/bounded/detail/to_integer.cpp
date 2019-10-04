@@ -22,14 +22,14 @@ static_assert(bounded::to_integer<-100, -4>("-60") == -60_bi);
 static_assert(bounded::to_integer<99, 100>("100") == 100_bi);
 static_assert(
 	bounded::to_integer<
-		static_cast<std::int64_t>(std::numeric_limits<std::int32_t>::min()) - 1,
-		static_cast<std::uint64_t>(std::numeric_limits<std::uint32_t>::max()) + 1
+		static_cast<std::int64_t>(bounded::min_value<std::int32_t>) - 1,
+		static_cast<std::uint64_t>(bounded::max_value<std::uint32_t>) + 1
 	>("4294967296") == 4294967296_bi
 );
 static_assert(
 	bounded::to_integer<
-		static_cast<std::int64_t>(std::numeric_limits<std::int32_t>::min()) - 1,
-		static_cast<std::uint64_t>(std::numeric_limits<std::uint32_t>::max()) + 1
+		static_cast<std::int64_t>(bounded::min_value<std::int32_t>) - 1,
+		static_cast<std::uint64_t>(bounded::max_value<std::uint32_t>) + 1
 	>("-2147483648") == -2147483648_bi
 );
 

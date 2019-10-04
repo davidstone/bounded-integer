@@ -126,7 +126,7 @@ public:
 	using value_type = typename std::remove_reference_t<Range>::value_type;
 	using size_type = bounded::integer<
 		0,
-		bounded::detail::normalize<static_cast<std::uintmax_t>(std::numeric_limits<typename std::iterator_traits<iterator>::difference_type>::max())>
+		bounded::detail::normalize<static_cast<std::uintmax_t>(bounded::max_value<typename std::iterator_traits<iterator>::difference_type>)>
 	>;
 
 	constexpr filter(Range && range, UnaryPredicate predicate):

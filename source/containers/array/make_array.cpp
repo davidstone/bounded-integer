@@ -35,8 +35,8 @@ static_assert(size(value) == 5, "First dimension wrong.");
 static_assert(size(value[0_bi]) == 4, "Second dimension wrong.");
 static_assert(value[3_bi][1_bi] == 2467_bi, "Value wrong.");
 using value_type = decltype(value)::value_type::value_type;
-static_assert(std::numeric_limits<value_type>::min() == -4573, "min wrong");
-static_assert(std::numeric_limits<value_type>::max() == 2474, "max wrong");
+static_assert(bounded::min_value<value_type> == -4573, "min wrong");
+static_assert(bounded::max_value<value_type> == 2474, "max wrong");
 
 // First is deduced
 constexpr std::size_t second = 3;

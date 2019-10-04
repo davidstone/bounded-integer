@@ -20,7 +20,7 @@ namespace detail {
 namespace common {
 
 template<typename Range>
-concept never_empty_range = std::numeric_limits<typename std::remove_reference_t<Range>::size_type>::min() > 0_bi;
+concept never_empty_range = bounded::min_value<typename std::remove_reference_t<Range>::size_type> > 0_bi;
 
 template<range Range>
 constexpr auto empty(Range const & range) {

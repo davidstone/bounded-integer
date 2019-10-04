@@ -42,8 +42,8 @@ static_assert(
 	bounded::constant<-1> < bounded::constant<1>,
 	"Small negative values should be less than small positive values."
 );
-constexpr intmax_t int_min = std::numeric_limits<int>::min();
-constexpr intmax_t int_max = std::numeric_limits<int>::max();
+constexpr intmax_t int_min = bounded::min_value<int>;
+constexpr intmax_t int_max = bounded::max_value<int>;
 static_assert(
 	bounded::constant<int_min> < bounded::constant<int_max + 1>,
 	"Large negative values should be less than large positive values."

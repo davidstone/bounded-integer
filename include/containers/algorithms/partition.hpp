@@ -39,7 +39,7 @@ constexpr inline struct partition_point_t {
 	template<typename UnaryPredicate>
 	constexpr auto operator()(range auto && input, UnaryPredicate predicate) const {
 		using size_type = decltype(size(input));
-		auto count = bounded::integer<0, bounded::detail::normalize<std::numeric_limits<size_type>::max().value()>>(size(input));
+		auto count = bounded::integer<0, bounded::detail::normalize<bounded::max_value<size_type>.value()>>(size(input));
 		auto first = begin(input);
 		if constexpr (count.max() == bounded::constant<0>) {
 			return first;

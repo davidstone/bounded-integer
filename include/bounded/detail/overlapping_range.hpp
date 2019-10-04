@@ -5,19 +5,27 @@
 
 #pragma once
 
-#include <bounded/detail/basic_numeric_limits.hpp>
 #include <bounded/detail/comparison.hpp>
-
-// All of these functions have a precondition that minimum <= maximum
+#include <bounded/detail/min_max_value.hpp>
 
 namespace bounded {
 namespace detail {
 
+template<typename T> requires(!std::is_same_v<decltype(max_value<T>), incomplete>)
+inline constexpr auto builtin_max_value = max_value<T>;
+
+template<typename T> requires(!std::is_same_v<decltype(max_value<T>), incomplete>)
+inline constexpr auto builtin_min_value = min_value<T>;
+
+template<auto minimum, auto maximum, typename policy>
+inline constexpr auto builtin_max_value<integer<minimum, maximum, policy>> = maximum;
+
+template<auto minimum, auto maximum, typename policy>
+inline constexpr auto builtin_min_value<integer<minimum, maximum, policy>> = minimum;
+
 template<typename T, typename Value>
 constexpr auto value_fits_in_type(Value const value) {
-	static_assert(basic_numeric_limits<T>::is_specialized, "Only works with integer types.");
-	using limits = basic_numeric_limits<T>;
-	return compare(limits::min(), value) <= 0 and compare(value, limits::max()) <= 0;
+	return compare(builtin_min_value<T>, value) <= 0 and compare(value, builtin_max_value<T>) <= 0;
 }
 
 }	// namespace detail

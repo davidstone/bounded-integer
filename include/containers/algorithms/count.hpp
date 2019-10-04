@@ -19,7 +19,7 @@ using namespace bounded::literal;
 
 template<typename Range, typename Predicate>
 constexpr auto count_if(Range && range, Predicate predicate) {
-	constexpr auto maximum = std::numeric_limits<decltype(size(range))>::max();
+	constexpr auto maximum = bounded::max_value<decltype(size(range))>;
 	bounded::integer<0, bounded::detail::normalize<maximum.value()>> sum = 0_bi;
 	for (decltype(auto) value : BOUNDED_FORWARD(range)) {
 		if (predicate(BOUNDED_FORWARD(value))) {

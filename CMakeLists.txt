@@ -47,7 +47,6 @@ target_sources(bounded INTERFACE
 	$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>/include/bounded/detail/variant/visit.hpp
 	$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>/include/bounded/detail/abs.hpp
 	$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>/include/bounded/detail/assume.hpp
-	$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>/include/bounded/detail/basic_numeric_limits.hpp
 	$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>/include/bounded/detail/cast.hpp
 	$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>/include/bounded/detail/class.hpp
 	$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>/include/bounded/detail/common_type_and_value_category.hpp
@@ -64,8 +63,10 @@ target_sources(bounded INTERFACE
 	$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>/include/bounded/detail/log.hpp
 	$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>/include/bounded/detail/max_builtin.hpp
 	$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>/include/bounded/detail/make_index_sequence.hpp
+	$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>/include/bounded/detail/min_max_value.hpp
 	$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>/include/bounded/detail/minmax.hpp
 	$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>/include/bounded/detail/modulo_cast.hpp
+	$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>/include/bounded/detail/normalize.hpp
 	$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>/include/bounded/detail/numeric_limits.hpp
 	$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>/include/bounded/detail/overlapping_range.hpp
 	$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>/include/bounded/detail/overload.hpp
@@ -208,7 +209,6 @@ add_executable(bounded_test
 	source/bounded/detail/variant/visit.cpp
 	source/bounded/detail/abs.cpp
 	source/bounded/detail/assume.cpp
-	source/bounded/detail/basic_numeric_limits.cpp
 	source/bounded/detail/cast.cpp
 	source/bounded/detail/class.cpp
 	source/bounded/detail/common_type_and_value_category.cpp
@@ -227,7 +227,9 @@ add_executable(bounded_test
 	source/bounded/detail/make_index_sequence.cpp
 	source/bounded/detail/max_builtin.cpp
 	source/bounded/detail/minmax.cpp
+	source/bounded/detail/min_max_value.cpp
 	source/bounded/detail/modulo_cast.cpp
+	source/bounded/detail/normalize.cpp
 	source/bounded/detail/numeric_limits.cpp
 	source/bounded/detail/overlapping_range.cpp
 	source/bounded/detail/overload.cpp

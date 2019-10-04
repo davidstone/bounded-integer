@@ -6,10 +6,10 @@
 #pragma once
 
 #include <bounded/detail/arithmetic/common.hpp>
-#include <bounded/detail/basic_numeric_limits.hpp>
 #include <bounded/detail/class.hpp>
 #include <bounded/detail/is_bounded_integer.hpp>
 #include <bounded/detail/max_builtin.hpp>
+#include <bounded/detail/min_max_value.hpp>
 
 namespace bounded {
 namespace detail {
@@ -35,8 +35,8 @@ constexpr auto log(integer<minimum, maximum, overflow_policy> const value, Base 
 	static_assert(base > constant<1>, "Negative bases not currently supported.");
 	static_assert(value > constant<0>, "The log of a negative number or zero is undefined.");
 	using result_type = integer<
-		detail::log_impl(static_cast<detail::max_unsigned_t>(minimum), static_cast<detail::max_unsigned_t>(basic_numeric_limits<Base>::max())),
-		detail::log_impl(static_cast<detail::max_unsigned_t>(maximum), static_cast<detail::max_unsigned_t>(basic_numeric_limits<Base>::min())),
+		detail::log_impl(static_cast<detail::max_unsigned_t>(minimum), static_cast<detail::max_unsigned_t>(max_value<Base>)),
+		detail::log_impl(static_cast<detail::max_unsigned_t>(maximum), static_cast<detail::max_unsigned_t>(min_value<Base>)),
 		overflow_policy
 	>;
 	return result_type(detail::log_impl(detail::as_unsigned(value.value()), detail::as_unsigned(base.value())), non_check);

@@ -39,7 +39,7 @@ struct array_value_type<T> {
 
 template<typename T, std::size_t size, std::size_t... sizes>
 struct array {
-	static_assert(size <= static_cast<std::size_t>(std::numeric_limits<std::ptrdiff_t>::max()));
+	static_assert(size <= static_cast<std::size_t>(bounded::max_value<std::ptrdiff_t>));
 	using value_type = typename detail::array_value_type<T, sizes...>::type;
 
 	using size_type = bounded::constant_t<bounded::detail::normalize<size>>;

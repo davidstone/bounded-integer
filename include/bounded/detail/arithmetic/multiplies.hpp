@@ -7,8 +7,8 @@
 
 #include <bounded/detail/arithmetic/base.hpp>
 #include <bounded/detail/arithmetic/safe_abs.hpp>
-#include <bounded/detail/basic_numeric_limits.hpp>
 #include <bounded/detail/max_builtin.hpp>
+#include <bounded/detail/min_max_value.hpp>
 #include <bounded/detail/minmax.hpp>
 
 namespace bounded {
@@ -23,7 +23,7 @@ constexpr auto safer_multiply(constant_t<lhs> const &, constant_t<rhs> const &) 
 	// unsigned and the result will be positive and thus fit in unsigned. The
 	// conversion to unsigned will preserve the value under multiplication.
 	if constexpr ((lhs < 0) xor (rhs < 0)) {
-		constexpr auto signed_max = basic_numeric_limits<max_signed_t>::max();
+		constexpr auto signed_max = max_value<max_signed_t>;
 		static_assert(lhs <= signed_max or rhs == 0);
 		static_assert(rhs <= signed_max or lhs == 0);
 		return static_cast<max_signed_t>(lhs) * static_cast<max_signed_t>(rhs);

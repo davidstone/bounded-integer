@@ -36,12 +36,12 @@ template<typename Range, typename ForwardIterator1, typename ForwardIterator2>
 struct set_intersection_pair_iterator {
 private:
 	static constexpr auto max_difference = bounded::min(
-		std::numeric_limits<typename std::iterator_traits<ForwardIterator1>::difference_type>::max(),
-		std::numeric_limits<typename std::iterator_traits<ForwardIterator2>::difference_type>::max()
+		bounded::max_value<typename std::iterator_traits<ForwardIterator1>::difference_type>,
+		bounded::max_value<typename std::iterator_traits<ForwardIterator2>::difference_type>
 	);
 public:
 	using value_type = std::pair<
-		decltype(	*std::declval<ForwardIterator1>()),
+		decltype(*std::declval<ForwardIterator1>()),
 		decltype(*std::declval<ForwardIterator2>())
 	>;
 	using difference_type = bounded::integer<

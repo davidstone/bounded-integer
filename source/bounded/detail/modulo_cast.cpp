@@ -26,27 +26,27 @@ static_assert(check_value_and_type(
     -1
 ));
 static_assert(check_value_and_type(
-    static_cast<unsigned>(std::numeric_limits<int>::max()),
-    std::numeric_limits<int>::max()
+    static_cast<unsigned>(bounded::max_value<int>),
+    bounded::max_value<int>
 ));
 static_assert(check_value_and_type(
-    std::numeric_limits<unsigned char>::max(),
+    bounded::max_value<unsigned char>,
     static_cast<signed char>(-1)
 ));
 static_assert(check_value_and_type(
-    std::numeric_limits<unsigned short>::max(),
+    bounded::max_value<unsigned short>,
     static_cast<short>(-1)
 ));
 static_assert(check_value_and_type(
-    std::numeric_limits<unsigned>::max(),
+    bounded::max_value<unsigned>,
     static_cast<int>(-1)
 ));
 static_assert(check_value_and_type(
-    std::numeric_limits<unsigned long>::max(),
+    bounded::max_value<unsigned long>,
     static_cast<long>(-1)
 ));
 static_assert(check_value_and_type(
-    std::numeric_limits<unsigned long long>::max(),
+    bounded::max_value<unsigned long long>,
     static_cast<long long>(-1)
 ));
 
@@ -54,20 +54,20 @@ using bounded::detail::max_unsigned_t;
 using bounded::detail::max_signed_t;
 
 static_assert(check_value_and_type(
-    bounded::basic_numeric_limits<max_unsigned_t>::max(),
+    bounded::max_value<max_unsigned_t>,
     static_cast<max_signed_t>(-1)
 ));
 static_assert(check_value_and_type(
-    static_cast<max_unsigned_t>(bounded::basic_numeric_limits<max_signed_t>::max()),
-    static_cast<max_signed_t>(bounded::basic_numeric_limits<max_signed_t>::max())
+    static_cast<max_unsigned_t>(bounded::max_value<max_signed_t>),
+    static_cast<max_signed_t>(bounded::max_value<max_signed_t>)
 ));
 static_assert(check_value_and_type(
-    static_cast<max_unsigned_t>(bounded::basic_numeric_limits<max_signed_t>::min()),
-    static_cast<max_signed_t>(bounded::basic_numeric_limits<max_signed_t>::min())
+    static_cast<max_unsigned_t>(bounded::min_value<max_signed_t>),
+    static_cast<max_signed_t>(bounded::min_value<max_signed_t>)
 ));
 
 static_assert(check_value_and_type(
-    std::numeric_limits<unsigned>::max() - 12,
+    bounded::max_value<unsigned> - 12,
     static_cast<int>(-13)
 ));
 

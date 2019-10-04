@@ -134,7 +134,7 @@ constexpr auto inclusive_integer_range(Integer const first, Sentinel const last,
 }
 
 template<typename Enum> requires std::is_enum_v<Enum>
-constexpr auto enum_range(Enum last = static_cast<Enum>(std::numeric_limits<Enum>::max())) {
+constexpr auto enum_range(Enum last = static_cast<Enum>(bounded::max_value<Enum>)) {
 	return containers::transform(
 		inclusive_integer_range(bounded::constant<0>, bounded::integer(last)),
 		[](auto e) { return static_cast<Enum>(e); }

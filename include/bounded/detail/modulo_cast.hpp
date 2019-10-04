@@ -5,8 +5,8 @@
 
 #pragma once
 
-#include <bounded/detail/basic_numeric_limits.hpp>
 #include <bounded/detail/max_builtin.hpp>
+#include <bounded/detail/min_max_value.hpp>
 
 #include <limits>
 #include <type_traits>
@@ -21,11 +21,10 @@ constexpr auto cast_to_signed_integer(T const value) {
 	using unsigned_t = std::conditional_t<sizeof(T) <= sizeof(unsigned), unsigned, T>;
 	using signed_t = std::make_signed_t<unsigned_t>;
 	using result_t = std::make_signed_t<T>;
-	using result_limits = basic_numeric_limits<result_t>;
-	if (value <= result_limits::max()) {
+	if (value <= max_value<result_t>) {
 		return static_cast<result_t>(value);
 	} else {
-		constexpr auto window = static_cast<signed_t>(result_limits::min());
+		constexpr auto window = static_cast<signed_t>(min_value<result_t>);
 		return static_cast<result_t>( // cast to the type we want the result in
 			static_cast<signed_t>( // cast back to signed or we end up with our original value
 				static_cast<T>( // cast to unsigned to force modular reduction

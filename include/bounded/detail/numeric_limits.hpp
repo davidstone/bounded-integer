@@ -28,7 +28,7 @@ constexpr auto digits(Minimum const minimum, Maximum const maximum, Base const b
 	static_assert(base > constant<1>, "Base must be greater than 1.");
 	if constexpr (minimum > constant<0> or maximum <= constant<0>) {
 		return constant<0>;
-	} else if constexpr (maximum == constant<basic_numeric_limits<max_unsigned_t>::max()>) {
+	} else if constexpr (maximum == constant<max_value<max_unsigned_t>>) {
 		if constexpr (base == constant<2>) {
 			return constant<sizeof(max_unsigned_t) * CHAR_BIT>;
 		} else {

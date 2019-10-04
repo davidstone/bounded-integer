@@ -8,7 +8,6 @@
 #include <bounded/detail/arithmetic/base.hpp>
 #include <bounded/detail/arithmetic/safe_abs.hpp>
 #include <bounded/detail/arithmetic/unary_minus.hpp>
-#include <bounded/detail/basic_numeric_limits.hpp>
 #include <bounded/detail/comparison.hpp>
 #include <bounded/detail/max_builtin.hpp>
 #include <bounded/detail/minmax.hpp>

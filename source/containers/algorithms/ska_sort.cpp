@@ -327,7 +327,7 @@ static_assert(test_sort<std::uint32_t>(
 		65535,
 		65534,
 		1000000,
-		std::numeric_limits<std::uint32_t>::max()
+		bounded::max_value<std::uint32_t>
 	},
 	{
 		0,
@@ -348,7 +348,7 @@ static_assert(test_sort<std::uint32_t>(
 		65535,
 		65536,
 		1000000,
-		std::numeric_limits<std::uint32_t>::max()
+		bounded::max_value<std::uint32_t>
 	}
 ));
 
@@ -378,14 +378,14 @@ static_assert(test_sort<std::int32_t>(
 		99,
 		1000000,
 		-1000001,
-		std::numeric_limits<std::int32_t>::lowest(),
-		std::numeric_limits<std::int32_t>::max(),
-		std::numeric_limits<std::int32_t>::max() - 1,
-		std::numeric_limits<std::int32_t>::lowest() + 1
+		bounded::min_value<std::int32_t>,
+		bounded::max_value<std::int32_t>,
+		bounded::max_value<std::int32_t> - 1,
+		bounded::min_value<std::int32_t> + 1
 	},
 	{
-		std::numeric_limits<std::int32_t>::lowest(),
-		std::numeric_limits<std::int32_t>::lowest() + 1,
+		bounded::min_value<std::int32_t>,
+		bounded::min_value<std::int32_t> + 1,
 		-1000001,
 		-32769,
 		-32768,
@@ -410,8 +410,8 @@ static_assert(test_sort<std::int32_t>(
 		32767,
 		32768,
 		1000000,
-		std::numeric_limits<std::int32_t>::max() - 1,
-		std::numeric_limits<std::int32_t>::max()
+		bounded::max_value<std::int32_t> - 1,
+		bounded::max_value<std::int32_t>
 	}
 ));
 
@@ -424,9 +424,9 @@ static_assert(test_sort<std::uint64_t>(
 		5,
 		7,
 		0,
-		static_cast<std::uint64_t>(std::numeric_limits<std::uint32_t>::max()) + 1,
+		static_cast<std::uint64_t>(bounded::max_value<std::uint32_t>) + 1,
 		1'000'000'000'000,
-		std::numeric_limits<std::uint64_t>::max(),
+		bounded::max_value<std::uint64_t>,
 		23,
 		6,
 		256,
@@ -438,7 +438,7 @@ static_assert(test_sort<std::uint64_t>(
 		65'535,
 		65'534,
 		1'000'000,
-		std::numeric_limits<std::uint32_t>::max(),
+		bounded::max_value<std::uint32_t>,
 	},
 	{
 		0,
@@ -459,10 +459,10 @@ static_assert(test_sort<std::uint64_t>(
 		65'535,
 		65'536,
 		1'000'000,
-		std::numeric_limits<std::uint32_t>::max(),
-		static_cast<std::uint64_t>(std::numeric_limits<std::uint32_t>::max()) + 1,
+		bounded::max_value<std::uint32_t>,
+		static_cast<std::uint64_t>(bounded::max_value<std::uint32_t>) + 1,
 		1'000'000'000'000,
-		std::numeric_limits<std::uint64_t>::max(),
+		bounded::max_value<std::uint64_t>,
 	}
 ));
 
@@ -471,12 +471,12 @@ static_assert(test_sort<std::int64_t>(
 		5,
 		6,
 		19,
-		static_cast<std::int64_t>(std::numeric_limits<std::int32_t>::lowest()) - 1,
-		std::numeric_limits<std::int64_t>::lowest(),
+		static_cast<std::int64_t>(bounded::min_value<std::int32_t>) - 1,
+		bounded::min_value<std::int64_t>,
 		-1'000'000'000'000,
 		1'000'000'000'000,
-		std::numeric_limits<std::int32_t>::max(),
-		std::numeric_limits<std::int64_t>::max(),
+		bounded::max_value<std::int32_t>,
+		bounded::max_value<std::int64_t>,
 		-4,
 		2,
 		5,
@@ -498,17 +498,17 @@ static_assert(test_sort<std::int64_t>(
 		99,
 		1'000'000,
 		-1'000'001,
-		std::numeric_limits<std::int32_t>::lowest(),
-		std::numeric_limits<std::int32_t>::max(),
-		std::numeric_limits<std::int32_t>::max() - 1,
-		std::numeric_limits<std::int32_t>::lowest() + 1,
+		bounded::min_value<std::int32_t>,
+		bounded::max_value<std::int32_t>,
+		bounded::max_value<std::int32_t> - 1,
+		bounded::min_value<std::int32_t> + 1,
 	},
 	{
-		std::numeric_limits<int64_t>::lowest(),
+		bounded::min_value<int64_t>,
 		-1'000'000'000'000,
-		static_cast<std::int64_t>(std::numeric_limits<std::int32_t>::lowest()) - 1,
-		std::numeric_limits<std::int32_t>::lowest(),
-		std::numeric_limits<std::int32_t>::lowest() + 1,
+		static_cast<std::int64_t>(bounded::min_value<std::int32_t>) - 1,
+		bounded::min_value<std::int32_t>,
+		bounded::min_value<std::int32_t> + 1,
 		-1'000'001,
 		-32'769,
 		-32'768,
@@ -533,11 +533,11 @@ static_assert(test_sort<std::int64_t>(
 		32'767,
 		32'768,
 		1'000'000,
-		std::numeric_limits<std::int32_t>::max() - 1,
-		std::numeric_limits<std::int32_t>::max(),
-		std::numeric_limits<std::int32_t>::max(),
+		bounded::max_value<std::int32_t> - 1,
+		bounded::max_value<std::int32_t>,
+		bounded::max_value<std::int32_t>,
 		1'000'000'000'000,
-		std::numeric_limits<std::int64_t>::max(),
+		bounded::max_value<std::int64_t>,
 	}
 ));
 
@@ -1404,7 +1404,7 @@ static std::vector<std::tuple<benchmark_sort_key, benchmark_sort_value>> SKA_SOR
 {
 	std::vector<std::tuple<benchmark_sort_key, benchmark_sort_value>> result;
 	result.reserve(size);
-	std::uniform_int_distribution<benchmark_sort_key> distribution(std::numeric_limits<benchmark_sort_key>::lowest(), std::numeric_limits<benchmark_sort_key>::max());
+	std::uniform_int_distribution<benchmark_sort_key> distribution(bounded::min_value<benchmark_sort_key>, bounded::max_value<benchmark_sort_key>);
 	for (int i = 0; i < size; ++i)
 	{
 		result.emplace_back(distribution(randomness), benchmark_sort_value());
@@ -1416,7 +1416,7 @@ static std::vector<std::tuple<std::pair<benchmark_sort_key, benchmark_sort_key>,
 {
 	std::vector<std::tuple<std::pair<benchmark_sort_key, benchmark_sort_key>, benchmark_sort_value>> result;
 	result.reserve(size);
-	std::uniform_int_distribution<benchmark_sort_key> distribution(std::numeric_limits<benchmark_sort_key>::lowest(), std::numeric_limits<benchmark_sort_key>::max());
+	std::uniform_int_distribution<benchmark_sort_key> distribution(bounded::min_value<benchmark_sort_key>, bounded::max_value<benchmark_sort_key>);
 	for (int i = 0; i < size; ++i)
 	{
 		result.emplace_back(std::make_pair(distribution(randomness), distribution(randomness)), benchmark_sort_value());
@@ -1428,7 +1428,7 @@ static std::vector<std::tuple<std::array<benchmark_sort_key, NUM_SORT_KEYS>, ben
 {
 	std::vector<std::tuple<std::array<benchmark_sort_key, NUM_SORT_KEYS>, benchmark_sort_value>> result;
 	result.reserve(size);
-	std::uniform_int_distribution<benchmark_sort_key> distribution(std::numeric_limits<benchmark_sort_key>::lowest(), std::numeric_limits<benchmark_sort_key>::max());
+	std::uniform_int_distribution<benchmark_sort_key> distribution(bounded::min_value<benchmark_sort_key>, bounded::max_value<benchmark_sort_key>);
 	for (int i = 0; i < size; ++i)
 	{
 		std::array<benchmark_sort_key, NUM_SORT_KEYS> key;
@@ -1490,7 +1490,7 @@ static void benchmark_std_sort(benchmark::State & state, Function create) {
 
 template<typename It, typename ExtractKey>
 static void american_flag_sort(It begin, It end, ExtractKey && extract_key) {
-	detail::inplace_radix_sort<std::numeric_limits<std::ptrdiff_t>::max()>(begin, end, extract_key);
+	detail::inplace_radix_sort<bounded::max_value<std::ptrdiff_t>>(begin, end, extract_key);
 }
 
 template<typename It>
@@ -1650,10 +1650,10 @@ auto create_range_data = [](int max_size, auto generate) {
 };
 
 template<typename T>
-constexpr auto min_value = std::numeric_limits<T>::min();
+constexpr auto min_value = bounded::min_value<T>;
 
 template<typename T>
-constexpr auto max_value = std::numeric_limits<T>::max();
+constexpr auto max_value = bounded::max_value<T>;
 
 static auto SKA_SORT_NOINLINE create_radix_sort_data_bool(std::mt19937_64 & engine, std::int64_t const size) {
 	auto int_distribution = std::uniform_int_distribution<int>(0, 1);

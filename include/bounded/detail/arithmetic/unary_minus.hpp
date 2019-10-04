@@ -5,9 +5,9 @@
 
 #pragma once
 
-#include <bounded/detail/basic_numeric_limits.hpp>
 #include <bounded/detail/class.hpp>
 #include <bounded/detail/max_builtin.hpp>
+#include <bounded/detail/min_max_value.hpp>
 #include <bounded/detail/modulo_cast.hpp>
 
 #include <limits>
@@ -21,7 +21,7 @@ constexpr auto safer_negation() {
 	if constexpr (value <= 0) {
 		return negated;
 	} else {
-		constexpr auto max_positive_input = -static_cast<max_unsigned_t>(basic_numeric_limits<max_signed_t>::min());
+		constexpr auto max_positive_input = -static_cast<max_unsigned_t>(min_value<max_signed_t>);
 		static_assert(value <= max_positive_input, "Negation would overflow.");
 		return static_cast<max_signed_t>(negated);
 	}

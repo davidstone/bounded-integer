@@ -5,7 +5,6 @@
 
 #pragma once
 
-#include <bounded/detail/basic_numeric_limits.hpp>
 #include <bounded/detail/class.hpp>
 #include <bounded/detail/common_type.hpp>
 #include <bounded/detail/common_type_and_value_category.hpp>
@@ -14,6 +13,7 @@
 #include <bounded/detail/forward.hpp>
 #include <bounded/detail/is_bounded_integer.hpp>
 #include <bounded/detail/max_builtin.hpp>
+#include <bounded/detail/normalize.hpp>
 #include <bounded/detail/overlapping_range.hpp>
 
 #include <utility>

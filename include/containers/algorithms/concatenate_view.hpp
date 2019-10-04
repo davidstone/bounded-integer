@@ -177,11 +177,11 @@ public:
 		(
 			!bounded::bounded_integer<difference_type> or
 			(
-				std::numeric_limits<Offset>::min() == bounded::constant<1> and
-				std::numeric_limits<Offset>::max() == bounded::constant<1>
+				bounded::min_value<Offset> == bounded::constant<1> and
+				bounded::max_value<Offset> == bounded::constant<1>
 			) or
 			(
-				std::numeric_limits<Offset>::min() >= bounded::constant<0> and
+				bounded::min_value<Offset> >= bounded::constant<0> and
 				(... and detail::forward_random_access_range<RangeViews>)
 			)
 		)
@@ -281,7 +281,7 @@ struct concatenate_view {
 	using value_type = typename iterator::value_type;
 	using size_type = bounded::integer<
 		0,
-		bounded::detail::normalize<std::numeric_limits<typename iterator::difference_type>::max().value()>
+		bounded::detail::normalize<bounded::max_value<typename iterator::difference_type>.value()>
 	>;
 	
 	constexpr concatenate_view(Ranges && ... ranges):

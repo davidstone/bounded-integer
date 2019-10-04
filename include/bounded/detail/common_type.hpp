@@ -7,6 +7,7 @@
 
 #include <bounded/detail/comparison.hpp>
 #include <bounded/detail/forward_declaration.hpp>
+#include <bounded/detail/normalize.hpp>
 #include <bounded/detail/policy/null_policy.hpp>
 
 #include <type_traits>

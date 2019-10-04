@@ -21,27 +21,26 @@ static_assert(homogeneous_equals(
 
 template<typename Signed, typename Unsigned>
 constexpr auto check_signed_limits() {
-	using limits = std::numeric_limits<Signed>;
 	static_assert(homogeneous_equals(
-		-bounded::constant<limits::max()>,
-		bounded::constant<-limits::max()>
+		-bounded::constant<bounded::max_value<Signed>>,
+		bounded::constant<-bounded::max_value<Signed>>
 	));
 	static_assert(homogeneous_equals(
-		-bounded::constant<limits::min()>,
+		-bounded::constant<bounded::min_value<Signed>>,
 		// The outer cast to unsigned is to counteract integer promotion
-		bounded::constant<static_cast<Unsigned>(-static_cast<Unsigned>(limits::min()))>
+		bounded::constant<static_cast<Unsigned>(-static_cast<Unsigned>(bounded::min_value<Signed>))>
 	));
 	static_assert(homogeneous_equals(
-		-(-bounded::constant<limits::min()>),
-		bounded::constant<limits::min()>
+		-(-bounded::constant<bounded::min_value<Signed>>),
+		bounded::constant<bounded::min_value<Signed>>
 	));
 }
 template<typename Signed, typename Unsigned, typename LargerSigned>
 constexpr auto check_limits() {
 	check_signed_limits<Signed, Unsigned>();
 	static_assert(homogeneous_equals(
-		-bounded::constant<std::numeric_limits<Unsigned>::max()>,
-		bounded::constant<-static_cast<LargerSigned>(std::numeric_limits<Unsigned>::max())>
+		-bounded::constant<bounded::max_value<Unsigned>>,
+		bounded::constant<-static_cast<LargerSigned>(bounded::max_value<Unsigned>)>
 	));
 }
 

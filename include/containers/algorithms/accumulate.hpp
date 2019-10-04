@@ -34,9 +34,9 @@ struct accumulate_c<Range, Initial, std::plus<>, true> {
 			std::declval<bounded::integer<
 				0,
 				bounded::detail::normalize<
-					std::numeric_limits<
+					bounded::max_value<
 						typename std::iterator_traits<decltype(begin(std::declval<Range>()))>::difference_type
-					>::max().value()
+					>.value()
 				>
 			>>()
 		)

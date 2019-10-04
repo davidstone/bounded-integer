@@ -15,11 +15,11 @@ namespace detail {
 
 template<typename T>
 constexpr auto index_type_source() -> typename T::size_type {
-	return std::numeric_limits<typename T::size_type>::min();
+	return bounded::min_value<typename T::size_type>;
 }
 template<typename T>
 constexpr auto index_type_source() -> typename T::difference_type {
-	return std::numeric_limits<typename T::difference_type>::min();
+	return bounded::min_value<typename T::difference_type>;
 }
 
 }	// namespace detail
@@ -29,7 +29,7 @@ template<typename T>
 using index_type = bounded::checked_integer<
 	0,
 	bounded::detail::normalize<(
-		std::numeric_limits<decltype(detail::index_type_source<std::decay_t<T>>())>::max() - bounded::constant<1>
+		bounded::max_value<decltype(detail::index_type_source<std::decay_t<T>>())> - bounded::constant<1>
 	).value()>,
 	std::out_of_range
 >;

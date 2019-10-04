@@ -6,10 +6,11 @@
 #pragma once
 
 #include <bounded/detail/assume.hpp>
-#include <bounded/detail/basic_numeric_limits.hpp>
 #include <bounded/detail/comparison.hpp>
 #include <bounded/detail/forward_declaration.hpp>
 #include <bounded/detail/is_bounded_integer.hpp>
+#include <bounded/detail/min_max_value.hpp>
+#include <bounded/detail/normalize.hpp>
 #include <bounded/detail/overlapping_range.hpp>
 #include <bounded/detail/underlying_type.hpp>
 
@@ -22,49 +23,44 @@
 #include <utility>
 
 namespace bounded {
-namespace detail {
 
 template<typename T>
-concept generic_integer = basic_numeric_limits<T>::is_specialized and (basic_numeric_limits<T>::is_integer or std::is_enum_v<T>);
+inline constexpr auto is_integer = detail_builtin_integer<T> or bounded_integer<T>;
+
+template<typename T, T value>
+inline constexpr auto is_integer<std::integral_constant<T, value>> = is_integer<T>;
+
+
+namespace detail {
 
 template<typename T, auto minimum, auto maximum, typename policy>
-concept overlapping_integer = generic_integer<T> and (!policy::overflow_is_error or (compare(basic_numeric_limits<T>::min(), maximum) <= 0 and compare(minimum, basic_numeric_limits<T>::max()) <= 0));
+concept overlapping_integer =
+	(is_integer<T> or std::is_enum_v<T> or std::is_same_v<T, bool>) and
+	(!policy::overflow_is_error or (compare(builtin_min_value<T>, maximum) <= 0 and compare(minimum, builtin_max_value<T>) <= 0));
 
 template<typename T, auto minimum, auto maximum, typename policy>
-concept bounded_by_range = overlapping_integer<T, minimum, maximum, policy> and !std::is_same_v<T, bool> and compare(minimum, basic_numeric_limits<T>::min()) <= 0 and compare(basic_numeric_limits<T>::max(), maximum) <= 0;
+concept bounded_by_range = overlapping_integer<T, minimum, maximum, policy> and !std::is_same_v<T, bool> and compare(minimum, builtin_min_value<T>) <= 0 and compare(builtin_max_value<T>, maximum) <= 0;
 
 
 // Necessary for optional specialization
 template<typename T>
 concept has_extra_space =
-	basic_numeric_limits<T>::min() != basic_numeric_limits<T>::max() and
+	builtin_min_value<T> != builtin_max_value<T> and
 	(
-		basic_numeric_limits<typename T::underlying_type>::min() < basic_numeric_limits<T>::min() or
-		basic_numeric_limits<T>::max() < basic_numeric_limits<typename T::underlying_type>::max()
+		min_value<typename T::underlying_type> < builtin_min_value<T> or
+		builtin_max_value<T> < max_value<typename T::underlying_type>
 	);
 
-
-template<typename Integer>
-constexpr auto as_builtin_integer(Integer const x) {
-	if constexpr (detail_builtin_integer<Integer>) {
-		return x;
-	} else {
-		static_assert(bounded_integer<Integer>);
-		return x.value();
-	}
-}
-
-// The user can specialize basic_numeric_limits for their enumeration type to
+// The user can specialize min_value and max_value for their enum type to
 // provide tighter bounds than the underlying_type might suggest. This forwards
 // along non-enum types without doing anything, but constructs a
 // bounded::integer with the tighter bounds from an enumeration.
 template<typename T>
 constexpr decltype(auto) as_integer(T const & value) {
 	if constexpr (std::is_enum_v<T>) {
-		using limits = basic_numeric_limits<T>;
 		using result_type = integer<
-			as_builtin_integer(limits::min()),
-			as_builtin_integer(limits::max()),
+			builtin_min_value<T>,
+			builtin_max_value<T>,
 			null_policy
 		>;
 		return result_type(static_cast<std::underlying_type_t<T>>(value));
@@ -217,7 +213,7 @@ struct integer {
 	}
 private:
 	static constexpr auto uninitialized_value() {
-		return minimum > basic_numeric_limits<underlying_type>::min() ?
+		return minimum > min_value<underlying_type> ?
 			static_cast<underlying_type>(minimum - 1) : static_cast<underlying_type>(maximum + 1);
 	}
 
@@ -242,22 +238,22 @@ struct equivalent_overflow_policy_c<integer<minimum, maximum, overflow_policy>> 
 	using type = overflow_policy;
 };
 
-template<typename T> requires basic_numeric_limits<T>::is_specialized
+template<typename T>
 constexpr auto deduced_min() {
-	return basic_numeric_limits<T>::min();
+	return builtin_min_value<T>;
 }
-template<typename T> requires basic_numeric_limits<T>::is_specialized
+template<typename T>
 constexpr auto deduced_max() {
-	return basic_numeric_limits<T>::max();
+	return builtin_max_value<T>;
 }
 
-template<typename T> requires (not basic_numeric_limits<T>::is_specialized)
+template<typename T> requires std::is_same_v<decltype(min_value<T>), incomplete>
 constexpr auto deduced_min() {
-	return basic_numeric_limits<std::underlying_type_t<T>>::min();
+	return min_value<std::underlying_type_t<T>>;
 }
-template<typename T> requires (not basic_numeric_limits<T>::is_specialized)
+template<typename T> requires std::is_same_v<decltype(max_value<T>), incomplete>
 constexpr auto deduced_max() {
-	return basic_numeric_limits<std::underlying_type_t<T>>::max();
+	return max_value<std::underlying_type_t<T>>;
 }
 
 }	// namespace detail

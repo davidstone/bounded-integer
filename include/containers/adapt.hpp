@@ -41,7 +41,7 @@ public:
 	using value_type = decltype(*std::declval<iterator>());
 	using size_type = bounded::integer<
 		0,
-		bounded::detail::normalize<static_cast<std::uintmax_t>(std::numeric_limits<typename std::iterator_traits<iterator>::difference_type>::max())>
+		bounded::detail::normalize<static_cast<std::uintmax_t>(bounded::max_value<typename std::iterator_traits<iterator>::difference_type>)>
 	>;
 	
 	constexpr adapt(Range && range, Traits traits):

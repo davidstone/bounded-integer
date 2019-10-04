@@ -64,7 +64,7 @@ constexpr auto to_radix_sort_key(T const value) {
 	} else {
 		static_assert(std::is_signed_v<T>);
 		using unsigned_t = std::make_unsigned_t<T>;
-		return static_cast<unsigned_t>(static_cast<unsigned_t>(value) + static_cast<unsigned_t>(std::numeric_limits<T>::min()));
+		return static_cast<unsigned_t>(static_cast<unsigned_t>(value) + static_cast<unsigned_t>(bounded::min_value<T>));
 	}
 }
 

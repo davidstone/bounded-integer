@@ -44,8 +44,7 @@ constexpr auto check_empty_braces() {
 template<typename T>
 constexpr auto check_uncompressed_optional() {
 	using bounded::detail::normalize;
-	using limits = bounded::basic_numeric_limits<T>;
-	using type = bounded::integer<normalize<limits::min()>, normalize<limits::max()>>;
+	using type = bounded::integer<normalize<bounded::min_value<T>>, normalize<bounded::max_value<T>>>;
 	static_assert(
 		sizeof(type) < sizeof(bounded::optional<type>),
 		"Compressing an optional that should not be compressed."
@@ -169,7 +168,7 @@ auto streaming_test(int const initial, int const final) {
 
 auto check_streaming() {
 	streaming_test<bounded::checked_integer<0, 100>>(7, 0);
-	constexpr auto large_initial = std::numeric_limits<int>::max() / 3;
+	constexpr auto large_initial = bounded::max_value<int> / 3;
 	constexpr auto large_final = -49;
 	streaming_test<decltype(bounded::integer(0))>(large_initial, large_final);
 }

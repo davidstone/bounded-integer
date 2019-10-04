@@ -23,15 +23,15 @@ static_assert(!bounded::detail::bounded_by_range<bounded::integer<0, 1>, 0, 0, b
 static_assert(std::is_empty<bounded::constant_t<0>>{});
 static_assert(std::is_empty<bounded::constant_t<1>>{});
 static_assert(std::is_empty<bounded::constant_t<-1>>{});
-static_assert(std::is_empty<bounded::constant_t<std::numeric_limits<std::intmax_t>::min()>>{});
+static_assert(std::is_empty<bounded::constant_t<bounded::min_value<std::intmax_t>>>{});
 
 static_assert(!std::is_convertible_v<bool, bounded::integer<0, 1>>);
 static_assert(std::is_constructible_v<bounded::integer<0, 1>, bool>);
 static_assert(std::is_constructible_v<bounded::integer<0, 0>, bool>);
 
 namespace check_constructibility {
-	constexpr auto min = std::numeric_limits<int>::min();
-	constexpr auto max = std::numeric_limits<int>::max();
+	constexpr auto min = bounded::min_value<int>;
+	constexpr auto max = bounded::max_value<int>;
 	using type = bounded::integer<min, max, bounded::null_policy>;
 	static_assert(
 		bounded::detail::overlapping_integer<type, min, max, bounded::null_policy>,
@@ -83,16 +83,10 @@ enum class bounded_enum{};
 namespace bounded {
 
 template<>
-struct basic_numeric_limits<bounded_enum> {
-	static constexpr auto min() -> bounded::detail::max_signed_t {
-		return 0;
-	}
-	static constexpr auto max() -> bounded::detail::max_signed_t {
-		return 0;
-	}
-	static constexpr bool is_specialized = true;
-	static constexpr bool is_integer = false;
-};
+constexpr auto min_value<bounded_enum> = 0;
+
+template<>
+constexpr auto max_value<bounded_enum> = 0;
 
 } // namespace bounded
 namespace {

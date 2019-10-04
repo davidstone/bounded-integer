@@ -82,10 +82,10 @@ static_assert(homogeneous_equals(
 #if 0	
 // The algorithm to compute the bounds currently runs in O(n) compile time,
 // and thus this test exceed's the constexpr evaluation limits.
-constexpr auto bounded_max_range = bounded::integer(bounded::basic_numeric_limits<bounded::detail::signed_max_t>::min());
+constexpr auto bounded_max_range = bounded::integer(bounded::min_value<bounded::detail::signed_max_t>);
 static_assert(homogeneous_equals(
 	bounded_max_range % bounded_max_range,
-	bounded::integer<bounded::basic_numeric_limits<signed_max_t>::min() + 1, -(bounded::basic_numeric_limits<signed_max_t>::min() + 1)>(0)
+	bounded::integer<bounded::min_value<signed_max_t> + 1, -(bounded::min_value<signed_max_t> + 1)>(0)
 ));
 #endif
 
