@@ -28,8 +28,7 @@ using basic_difference_type = std::common_type_t<
 namespace detail {
 namespace common {
 
-template<typename Offset, iterator Iterator> requires(std::numeric_limits<Offset>::is_integer)
-constexpr auto operator+(Offset const offset, Iterator const it) {
+constexpr auto operator+(bounded::integral auto const offset, iterator auto const it) {
 	return it + offset;
 }
 

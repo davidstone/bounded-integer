@@ -116,8 +116,10 @@ auto test_reserve() {
 
 struct complex_resource {
 	complex_resource() = default;
-	template<typename Size> requires std::numeric_limits<Size>::is_integer
-	explicit complex_resource(Size size): data(containers::repeat_default_n<int>(size)) {}
+	explicit complex_resource(bounded::integral auto const size):
+		data(containers::repeat_default_n<int>(size))
+	{
+	}
 
 	complex_resource(complex_resource const & other) = default;
 	complex_resource & operator=(complex_resource const & other) = default;

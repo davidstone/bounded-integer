@@ -49,8 +49,8 @@ private:
 	Iterator m_it;
 };
 
-template<typename Iterator, typename Offset> requires std::numeric_limits<Offset>::is_integer
-constexpr auto operator+(legacy_iterator<Iterator> const lhs, Offset const rhs) {
+template<typename Iterator>
+constexpr auto operator+(legacy_iterator<Iterator> const lhs, bounded::integral auto const rhs) {
 	return legacy_iterator<Iterator>(lhs.base() + static_cast<typename std::iterator_traits<Iterator>::difference_type>(rhs));
 }
 template<typename Iterator>

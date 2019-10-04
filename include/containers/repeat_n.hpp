@@ -74,7 +74,7 @@ public:
 		return 0_bi == rhs.m_remaining;
 	}
 
-	template<typename Offset> requires(std::numeric_limits<Offset>::is_integer and detail::construct_subtractible<Size, Offset>)
+	template<bounded::integral Offset> requires(detail::construct_subtractible<Size, Offset>)
 	friend constexpr auto operator+(repeat_n_iterator it, Offset const offset) -> repeat_n_iterator {
 		return repeat_n_iterator(Size(it.m_remaining - offset), std::move(it).m_get_value);
 	}

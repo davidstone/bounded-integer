@@ -30,6 +30,9 @@ inline constexpr auto is_integer = detail_builtin_integer<T> or bounded_integer<
 template<typename T, T value>
 inline constexpr auto is_integer<std::integral_constant<T, value>> = is_integer<T>;
 
+template<typename T>
+concept integral = is_integer<T>;
+
 
 namespace detail {
 
