@@ -107,6 +107,7 @@ static_assert(!std::is_convertible_v<scoped_enum, bounded::integer<0, 10>>);
 static_assert(std::is_constructible_v<bounded::integer<0, 10>, bounded_enum>);
 static_assert(!std::is_convertible_v<bounded_enum, bounded::integer<0, 10>>);
 static_assert(bounded::integer(bounded_enum{}) == bounded::constant<0>);
+static_assert(bounded::constant<bounded_enum{}> == bounded::constant<0>);
 
 enum class bounded_integer_enum{};
 
@@ -124,6 +125,7 @@ namespace {
 
 static_assert(!std::is_convertible_v<bounded_integer_enum, bounded::integer<0, 0>>);
 static_assert(bounded::integer(bounded_integer_enum{}) == bounded::constant<0>);
+static_assert(bounded::constant<bounded_integer_enum{}> == bounded::constant<0>);
 
 enum class enum_bounded_enum{};
 
@@ -141,5 +143,6 @@ namespace {
 
 static_assert(!std::is_convertible_v<enum_bounded_enum, bounded::integer<0, 0>>);
 static_assert(bounded::integer(enum_bounded_enum{}) == bounded::constant<0>);
+static_assert(bounded::constant<enum_bounded_enum{}> == bounded::constant<0>);
 
 } // namespace
