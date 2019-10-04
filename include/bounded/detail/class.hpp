@@ -42,7 +42,7 @@ concept overlapping_integer =
 	(!policy::overflow_is_error or (compare(builtin_min_value<T>, maximum) <= 0 and compare(minimum, builtin_max_value<T>) <= 0));
 
 template<typename T, auto minimum, auto maximum, typename policy>
-concept bounded_by_range = overlapping_integer<T, minimum, maximum, policy> and !std::is_same_v<T, bool> and compare(minimum, builtin_min_value<T>) <= 0 and compare(builtin_max_value<T>, maximum) <= 0;
+concept bounded_by_range = overlapping_integer<T, minimum, maximum, policy> and !std::is_same_v<T, bool> and !std::is_enum_v<T> and compare(minimum, builtin_min_value<T>) <= 0 and compare(builtin_max_value<T>, maximum) <= 0;
 
 
 // Necessary for optional specialization
@@ -62,8 +62,8 @@ template<typename T>
 constexpr decltype(auto) as_integer(T const & value) {
 	if constexpr (std::is_enum_v<T>) {
 		using result_type = integer<
-			builtin_min_value<T>,
-			builtin_max_value<T>,
+			normalize<builtin_min_value<T>>,
+			normalize<builtin_max_value<T>>,
 			null_policy
 		>;
 		return result_type(static_cast<std::underlying_type_t<T>>(value));
