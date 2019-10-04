@@ -31,14 +31,6 @@ static_assert(
 );
 
 static_assert(
-	!std::numeric_limits<bounded::constant_t<1>::underlying_type>::is_signed,
-	"Value should be unsigned for this test."
-);
-static_assert(
-	std::numeric_limits<bounded::constant_t<-1>::underlying_type>::is_signed,
-	"Value should be signed for this test."
-);
-static_assert(
 	bounded::constant<-1> < bounded::constant<1>,
 	"Small negative values should be less than small positive values."
 );

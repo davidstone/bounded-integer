@@ -3,7 +3,7 @@
 // (See accompanying file LICENSE_1_0.txt or copy at
 // http://www.boost.org/LICENSE_1_0.txt)
 
-#include <bounded/detail/numeric_limits.hpp>
+#include <bounded/numeric_limits.hpp>
 
 #include <bounded/detail/class.hpp>
 #include <bounded/detail/comparison_mixed.hpp>
