@@ -32,5 +32,8 @@ inline constexpr auto normalize = static_cast<
 	max_signed_t
 >>>(value);
 
+template<auto value> requires std::is_enum_v<decltype(value)>
+inline constexpr auto normalize<value> = normalize<static_cast<std::underlying_type_t<decltype(value)>>(value)>;
+
 } // namespace detail
 } // namespace bounded

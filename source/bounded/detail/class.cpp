@@ -109,4 +109,36 @@ static_assert(std::is_constructible<bounded::integer<0, 10>, bounded_enum>{});
 static_assert(std::is_convertible<bounded_enum, bounded::integer<0, 10>>{});
 static_assert(bounded::integer(bounded_enum{}) == bounded::constant<0>);
 
+enum class bounded_integer_enum{};
+
+} // namespace
+namespace bounded {
+
+template<>
+constexpr auto min_value<bounded_integer_enum> = bounded::constant<0>;
+
+template<>
+constexpr auto max_value<bounded_integer_enum> = bounded::constant<0>;
+
+} // namespace bounded
+namespace {
+
+static_assert(bounded::integer(bounded_integer_enum{}) == bounded::constant<0>);
+
+enum class enum_bounded_enum{};
+
+} // namespace
+namespace bounded {
+
+template<>
+constexpr auto min_value<enum_bounded_enum> = enum_bounded_enum();
+
+template<>
+constexpr auto max_value<enum_bounded_enum> = enum_bounded_enum();
+
+} // namespace bounded
+namespace {
+
+static_assert(bounded::integer(enum_bounded_enum{}) == bounded::constant<0>);
+
 } // namespace
