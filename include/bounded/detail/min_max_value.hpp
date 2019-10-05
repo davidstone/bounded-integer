@@ -26,6 +26,24 @@ extern detail::incomplete max_value;
 template<typename>
 extern detail::incomplete min_value;
 
+template<typename T>
+inline constexpr auto const & max_value<T const> = max_value<T>;
+
+template<typename T>
+inline constexpr auto const & max_value<T volatile> = max_value<T>;
+
+template<typename T>
+inline constexpr auto const & max_value<T const volatile> = max_value<T>;
+
+template<typename T>
+inline constexpr auto const & min_value<T const> = min_value<T>;
+
+template<typename T>
+inline constexpr auto const & min_value<T volatile> = min_value<T>;
+
+template<typename T>
+inline constexpr auto const & min_value<T const volatile> = min_value<T>;
+
 template<detail_unsigned_builtin T>
 inline constexpr auto max_value<T> = T(-1);
 
