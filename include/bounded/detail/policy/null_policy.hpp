@@ -12,8 +12,6 @@ namespace bounded {
 
 // Does nothing. Overflow is undefined behavior.
 struct null_policy {
-	constexpr null_policy() {}
-	
 	// The identity function is intentionally not constexpr. This provides
 	// compile-time checking if used in a constexpr context. If this is called
 	// at run-time, the optimizer should detect that all branches return the

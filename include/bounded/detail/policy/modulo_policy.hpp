@@ -17,8 +17,6 @@
 namespace bounded {
 
 struct modulo_policy {
-	constexpr modulo_policy() {}
-
 private:
 	template<typename T, typename Size>
 	static constexpr auto positive_remainder(T const & value, Size const & size) {

@@ -12,8 +12,6 @@
 namespace bounded {
 
 struct clamp_policy {
-	constexpr clamp_policy() {}
-
 	template<typename T, typename Minimum, typename Maximum>
 	static constexpr auto assignment(T const & value, Minimum const & minimum, Maximum const & maximum) {
 		using policy = bounded::null_policy;
