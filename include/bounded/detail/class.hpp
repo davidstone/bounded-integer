@@ -42,7 +42,7 @@ concept overlapping_integer =
 	(!policy::overflow_is_error or (compare(builtin_min_value<T>, maximum) <= 0 and compare(minimum, builtin_max_value<T>) <= 0));
 
 template<typename T, auto minimum, auto maximum, typename policy>
-concept bounded_by_range = overlapping_integer<T, minimum, maximum, policy> and !std::is_same_v<T, bool> and !std::is_enum_v<T> and compare(minimum, builtin_min_value<T>) <= 0 and compare(builtin_max_value<T>, maximum) <= 0;
+concept bounded_by_range = !std::is_same_v<T, bool> and !std::is_enum_v<T> and overlapping_integer<T, minimum, maximum, policy> and compare(minimum, builtin_min_value<T>) <= 0 and compare(builtin_max_value<T>, maximum) <= 0;
 
 
 // Necessary for optional specialization
