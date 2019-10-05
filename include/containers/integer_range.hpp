@@ -22,8 +22,8 @@ template<typename Integer, typename Sentinel, typename Step>
 struct integer_range_iterator {
 private:
 	using storage_type = bounded::integer<
-		bounded::detail::normalize<Integer::min().value()>,
-		bounded::detail::normalize<Sentinel::max().value()>,
+		bounded::detail::builtin_min_value<Integer>,
+		bounded::detail::builtin_max_value<Sentinel>,
 		typename Integer::overflow_policy
 	>;
 	storage_type m_value;
@@ -31,8 +31,8 @@ private:
 
 public:
 	using value_type = bounded::integer<
-		bounded::detail::normalize<storage_type::min().value()>,
-		bounded::detail::normalize<bounded::max(storage_type::min(), storage_type::max() - Step::min()).value()>,
+		bounded::detail::builtin_min_value<storage_type>,
+		bounded::detail::normalize<bounded::max(bounded::min_value<storage_type>, bounded::max_value<storage_type> - bounded::min_value<Step>).value()>,
 		typename Integer::overflow_policy
 	>;
 	using difference_type = decltype(std::declval<storage_type>() - std::declval<storage_type>());
@@ -83,13 +83,13 @@ template<typename Integer, typename Sentinel = Integer, typename Step = bounded:
 struct integer_range {
 	static_assert(bounded::bounded_integer<Integer>);
 	static_assert(bounded::bounded_integer<Sentinel>);
-	static_assert(Sentinel::max() >= Integer::min(), "Cannot construct inverted integer ranges.");
+	static_assert(bounded::max_value<Sentinel> >= bounded::min_value<Integer>, "Cannot construct inverted integer ranges.");
 
 	using iterator = detail::integer_range_iterator<Integer, Sentinel, Step>;
 	using const_iterator = iterator;
 
 	using value_type = typename iterator::value_type;
-	using size_type = bounded::integer<0, bounded::detail::normalize<iterator::difference_type::max().value()>>;
+	using size_type = bounded::integer<0, bounded::detail::builtin_max_value<typename iterator::difference_type>>;
 	
 	// If `last` is not reachable by adding `step` to `first` some number of
 	// times, the behavior is undefined.

@@ -28,8 +28,8 @@ struct vector_base {
 	using value_type = T;
 	using size_type = typename dynamic_array_data<value_type>::size_type;
 
-	using const_iterator = contiguous_iterator<value_type const, size_type::max().value()>;
-	using iterator = contiguous_iterator<value_type, size_type::max().value()>;
+	using const_iterator = contiguous_iterator<value_type const, bounded::detail::builtin_max_value<size_type>>;
+	using iterator = contiguous_iterator<value_type, bounded::detail::builtin_max_value<size_type>>;
 	using raw_container = dynamic_array<trivial_storage<value_type>>;
 
 	constexpr vector_base() = default;

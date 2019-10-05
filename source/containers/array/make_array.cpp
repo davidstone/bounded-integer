@@ -21,8 +21,8 @@ static_assert(
 constexpr auto bounded_array = containers::make_array(-100_bi, 5_bi, 378_bi, 23_bi, 10000_bi);
 static_assert(size(bounded_array) == 5, "Array size wrong.");
 static_assert(bounded_array[2_bi] == 378, "Array element wrong.");
-static_assert(decltype(bounded_array)::value_type::min() == -100_bi);
-static_assert(decltype(bounded_array)::value_type::max() == 10000_bi);
+static_assert(bounded::min_value<decltype(bounded_array)::value_type> == -100_bi);
+static_assert(bounded::max_value<decltype(bounded_array)::value_type> == 10000_bi);
 
 constexpr auto value = containers::make_explicit_array<5, 4>(
 	0_bi, 1_bi, 2_bi, 3_bi,

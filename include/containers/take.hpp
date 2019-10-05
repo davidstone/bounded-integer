@@ -83,7 +83,7 @@ struct counted_iterator : detail::operator_arrow<counted_iterator<Iterator, Coun
 
 	// TODO: Properly constrain this function
 	template<bounded::integral Offset> requires(
-		decltype(std::declval<Count>() - std::declval<Offset>())::max() >= bounded::constant<0>
+		bounded::max_value<decltype(std::declval<Count>() - std::declval<Offset>())> >= bounded::constant<0>
 	)
 	friend constexpr auto operator+(counted_iterator it, Offset const offset) {
 		auto const count = bounded::increase_min<0>(it.m_count - offset);
@@ -113,7 +113,7 @@ private:
 	Count m_count;
 };
 
-template<typename Iterator, typename Count> requires(Count::max() == bounded::constant<0>)
+template<typename Iterator, typename Count> requires(bounded::max_value<Count> == bounded::constant<0>)
 constexpr auto & operator++(counted_iterator<Iterator, Count> & it) {
 	BOUNDED_ASSERT_OR_ASSUME(false);
 	return it;
@@ -123,7 +123,7 @@ constexpr auto & operator++(counted_iterator<Iterator, Count> & it) {
 // TODO: Handle range having a sentinel type
 template<typename Range, typename Count>
 constexpr auto take(Range && range, Count count_) {
-	auto const count = bounded::integer<0, bounded::detail::normalize<Count::max().value()>, typename Count::overflow_policy>(count_);
+	auto const count = bounded::integer<0, bounded::detail::builtin_max_value<Count>, typename Count::overflow_policy>(count_);
 	return containers::range_view(
 		counted_iterator(begin(BOUNDED_FORWARD(range)), count),
 		counted_sentinel(end(BOUNDED_FORWARD(range)))

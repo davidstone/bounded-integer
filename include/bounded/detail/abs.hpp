@@ -14,9 +14,9 @@ namespace bounded {
 
 template<bounded_integer Integer>
 constexpr auto abs(Integer const value) {
-	if constexpr (Integer::min() >= constant<0>) {
+	if constexpr (min_value<Integer> >= constant<0>) {
 		return value;
-	} else if constexpr (Integer::max() <= constant<0>) {
+	} else if constexpr (max_value<Integer> <= constant<0>) {
 		return -value;
 	} else {
 		// The 0 has to be there to restrict the range of possible values. Without

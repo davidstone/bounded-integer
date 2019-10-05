@@ -105,8 +105,8 @@ struct dynamic_array {
 	using value_type = T;
 	using size_type = typename detail::dynamic_array_data<value_type>::size_type;
 
-	using const_iterator = contiguous_iterator<value_type const, size_type::max().value()>;
-	using iterator = contiguous_iterator<value_type, size_type::max().value()>;
+	using const_iterator = contiguous_iterator<value_type const, bounded::detail::builtin_max_value<size_type>>;
+	using iterator = contiguous_iterator<value_type, bounded::detail::builtin_max_value<size_type>>;
 	
 	constexpr dynamic_array() = default;
 

@@ -38,7 +38,7 @@ struct throw_policy {
 		static_assert(bounded_integer<Minimum>, "Only bounded::integer types are supported.");
 		static_assert(bounded_integer<Maximum>, "Only bounded::integer types are supported.");
 		if (minimum <= value and value <= maximum) {
-			return policy_detail::reduce_range(value, Minimum::min(), Maximum::max());
+			return policy_detail::reduce_range(value, min_value<Minimum>, max_value<Maximum>);
 		} else {
 			throw Exception("Got a value of " + to_string(value) + " but expected a value in the range [" + to_string(minimum) + ", " + to_string(maximum) + "]");
 		}

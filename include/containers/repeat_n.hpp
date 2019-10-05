@@ -86,7 +86,7 @@ public:
 	}
 };
 
-template<typename Size, typename Function> requires(Size::max() == bounded::constant<0>)
+template<typename Size, typename Function> requires(bounded::max_value<Size> == bounded::constant<0>)
 constexpr auto & operator++(repeat_n_iterator<Size, Function> & it) {
 	BOUNDED_ASSERT_OR_ASSUME(false);
 	return it;
@@ -136,7 +136,7 @@ public:
 };
 
 template<typename Size, typename T>
-repeat_n(Size, T &&) -> repeat_n<bounded::integer<0, bounded::detail::normalize<Size::max().value()>>, T>;
+repeat_n(Size, T &&) -> repeat_n<bounded::integer<0, bounded::detail::builtin_max_value<Size>>, T>;
 
 template<typename Size, typename T>
 struct repeat_default_n_t {
@@ -166,7 +166,7 @@ public:
 template<typename T, typename Size>
 constexpr auto repeat_default_n(Size size) {
 	return repeat_default_n_t<
-		bounded::integer<0, bounded::detail::normalize<Size::max().value()>>,
+		bounded::integer<0, bounded::detail::builtin_max_value<Size>>,
 		T
 	>(size);
 }

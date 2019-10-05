@@ -62,8 +62,8 @@ template<typename T>
 constexpr decltype(auto) as_integer(T const & value) {
 	if constexpr (std::is_enum_v<T>) {
 		using result_type = integer<
-			normalize<builtin_min_value<T>>,
-			normalize<builtin_max_value<T>>,
+			builtin_min_value<T>,
+			builtin_max_value<T>,
 			null_policy
 		>;
 		return result_type(static_cast<std::underlying_type_t<T>>(value));
@@ -104,13 +104,6 @@ struct integer {
 	using underlying_type = detail::underlying_type_t<minimum, maximum>;
 	using overflow_policy = overflow_policy_;
 	
-	static constexpr auto min() {
-		return constant<minimum>;
-	}
-	static constexpr auto max() {
-		return constant<maximum>;
-	}
-
 	constexpr auto value() const requires(minimum != maximum) {
 		BOUNDED_ASSUME(minimum <= m_value and m_value <= maximum);
 		return m_value;
@@ -222,7 +215,7 @@ private:
 
 	template<typename T>
 	static constexpr decltype(auto) apply_overflow_policy(T const & value) {
-		return overflow_policy{}.assignment(value, min(), max());
+		return overflow_policy{}.assignment(value, constant<minimum>, constant<maximum>);
 	}
 
 	using storage_type = std::conditional_t<minimum == maximum, detail::empty, underlying_type>;

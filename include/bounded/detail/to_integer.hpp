@@ -67,7 +67,7 @@ constexpr auto to_integer(std::string_view str) {
 // This overload does not currently use the overflow policy of the Integer.
 template<typename Integer>
 constexpr auto to_integer(std::string_view const str) {
-	return static_cast<Integer>(to_integer<Integer::min().value(), Integer::max().value()>(str));
+	return static_cast<Integer>(to_integer<detail::builtin_min_value<Integer>, detail::builtin_max_value<Integer>>(str));
 }
 
 } // namespace bounded

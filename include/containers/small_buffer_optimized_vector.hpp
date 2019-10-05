@@ -119,8 +119,8 @@ struct sbo_vector_base {
 	struct large_t {
 		using size_type = typename detail::dynamic_array_data<T>::size_type;
 		using capacity_type = bounded::integer<
-			bounded::detail::normalize<small_t::capacity().value() + 1>,
-			bounded::detail::normalize<size_type::max().value()>
+			bounded::detail::normalize<(small_t::capacity() + bounded::constant<1>).value()>,
+			bounded::detail::builtin_max_value<size_type>
 		>;
 
 		// m_force_large exists just to be a bit that's always 1.
@@ -164,13 +164,13 @@ struct sbo_vector_base {
 	using size_type = typename large_t::size_type;
 
 	static_assert(
-		size_type::max() <= bounded::constant<(1ULL << (CHAR_BIT * sizeof(value_type *) - 1)) - 1>,
+		bounded::max_value<size_type> <= bounded::constant<(1ULL << (CHAR_BIT * sizeof(value_type *) - 1)) - 1>,
 		"Maximum possible size is too large -- would use bit reserved for small-buffer optimization."
 	);
 	static_assert(requested_small_capacity > 0, "Must request at least one element for the minimum capacity, otherwise you should use vector.");
 
-	using const_iterator = contiguous_iterator<value_type const, size_type::max().value()>;
-	using iterator = contiguous_iterator<value_type, size_type::max().value()>;
+	using const_iterator = contiguous_iterator<value_type const, bounded::detail::builtin_max_value<size_type>>;
+	using iterator = contiguous_iterator<value_type, bounded::detail::builtin_max_value<size_type>>;
 
 	constexpr sbo_vector_base():
 		m_small()

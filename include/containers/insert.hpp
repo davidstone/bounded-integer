@@ -90,7 +90,7 @@ constexpr auto insert(Container & container, typename Container::const_iterator 
 	auto const range_size = bounded::throw_policy<std::out_of_range>{}.assignment(
 		::containers::detail::linear_size(range),
 		0_bi,
-		Container::size_type::max()
+		bounded::max_value<typename Container::size_type>
 	);
 	if (size(container) + range_size <= container.capacity()) {
 		auto const distance_to_end = typename Container::size_type(end(container) - position, bounded::non_check);

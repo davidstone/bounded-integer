@@ -23,8 +23,8 @@ constexpr auto decrease_max(integer<minimum, maximum, overflow_policy> const & v
 
 template<typename Source, template<auto, auto, typename...> typename Target, typename... Extra>
 using change_policy = Target<
-	bounded::detail::normalize<Source::min().value()>,
-	bounded::detail::normalize<Source::max().value()>,
+	detail::builtin_min_value<Source>,
+	detail::builtin_max_value<Source>,
 	Extra...
 >;
 

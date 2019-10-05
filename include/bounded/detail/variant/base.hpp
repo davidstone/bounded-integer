@@ -32,11 +32,11 @@ struct basic_variant_base {
 		m_data(get_index(index_, types<Ts>{}...), BOUNDED_FORWARD(args)...)
 	{
 		static_assert(
-			decltype(index())::min() == 0_bi,
+			min_value<decltype(index())> == 0_bi,
 			"Type returned by your function must have a minimum value of 0."
 		);
 		static_assert(
-			decltype(index())::max() == sizeof...(Ts) - 1,
+			max_value<decltype(index())> == sizeof...(Ts) - 1,
 			"Range of values of type returned by your function must equal the number of types."
 		);
 	}

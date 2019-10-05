@@ -124,7 +124,7 @@ struct set_intersection_pair {
 	using value_type = decltype(*std::declval<iterator>());
 	using size_type = bounded::integer<
 		0,
-		bounded::detail::normalize<iterator::difference_type::max().value()>
+		bounded::detail::builtin_max_value<typename iterator::difference_type>
 	>;
 
 	template<typename R1, typename R2>
