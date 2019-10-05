@@ -32,19 +32,19 @@ The type of `z` is calculated as the smallest type that can hold all possible va
 
 ## Using policies
 
-The general form of the class is `bounded::integer<minimum, maximum, policy = bounded::null_policy>`. `policy` can do pretty much anything, including being stateful to handle bounds that are only known at run-time. The default `null_policy` has some compile-time checks, but does nothing at run time.
+The general form of the class is `bounded::integer<minimum, maximum, policy = bounded::null_policy>`. `policy` is some user-provided function to handle assignment of an out-of-range value. The default `null_policy` has some compile-time checks, but does nothing at run time.
 
 # bounded::integer installation instructions
 
 ## Prerequisites
 
-* Compile with gcc 9.1+
+* Compile with the clang-concepts branch
 * cmake (3.14+) is used to build tests, but it is not needed to use the library (this library is header-only).
 
 ## Building and running tests (Linux)
 
 * `cd path/to/bounded_integer`
-* `mkdir build && cd build && cmake .. && ./bounded_test`. Most of the tests are actually done at compile time, but there are also run-time tests.
+* `mkdir build && cd build && cmake .. -GNinja && ninja && ./bounded_test`. Most of the tests are actually done at compile time, but there are also run-time tests.
 
 ## Using
 
@@ -54,10 +54,10 @@ The general form of the class is `bounded::integer<minimum, maximum, policy = bo
 
 `bounded::integer` can replace most uses of built-in integer types. It does have some limitations, however.
 
-* A `bounded::integer` cannot be used as a non-type template parameter prior to C++20. No compiler currently is able to compile `bounded::integer` and has support for class types as non-type template parameters.
-* `bounded::integer` uses built-in integers as the template parameter to determine its bounds. This means that it cannot store an integer larger than an unsigned 64-bit or unsigned 128-bit integer (depending on the platform) or smaller than a signed 64-bit or signed 128-bit integer. This restriction should be removed at some point in the future.
+* A `bounded::integer` cannot be used as a non-type template parameter prior to C++20. No compiler currently is able to compile `bounded::integer` that also has support for class types as non-type template parameters.
+* `bounded::integer` uses built-in integers as the template parameter to determine its bounds. This means that it cannot store an integer larger than an unsigned 64-bit integer or smaller than a signed 64-bit integer. This restriction should be removed at some point in the future.
 * `bounded::integer` is currently still under active development, so some interfaces are still subject to change.
-* `bounded::integer` cannot be used as the argument to a `switch` statement.
+* `bounded::integer` cannot be used as the argument to a `switch` statement. There is work in C++23 to add pattern matching, which would be a replacement for `switch` statements that does work on the library.
 * `bounded::integer` cannot be used to express the size of a bit-field.
 
 # Reference
