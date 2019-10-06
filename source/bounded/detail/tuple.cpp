@@ -26,19 +26,122 @@ constexpr auto operator==(empty, empty) {
 	return true;
 }
 
-static_assert(std::is_empty_v<bounded::tuple<empty>>);
+template<typename T, typename Index>
+concept indexable_by = requires(T t, Index index) { t[index]; };
 
-static_assert(std::is_trivially_default_constructible_v<bounded::tuple<empty>>);
-static_assert(std::is_trivially_copyable_v<bounded::tuple<empty>>);
+template<typename T, auto index>
+concept constant_indexable_by = indexable_by<T, bounded::constant_t<index>>;
+
+template<typename T, typename Index>
+concept type_indexable_by = indexable_by<T, bounded::detail::types<Index>>;
+
+
+namespace tuple_empty {
+
+using type = bounded::tuple<empty>;
+static_assert(std::is_empty_v<type>);
+static_assert(std::is_trivially_default_constructible_v<type>);
+static_assert(std::is_trivially_copyable_v<type>);
+static_assert(std::is_same_v<
+	decltype(type()[0_bi]),
+	empty &&
+>);
+static_assert(!constant_indexable_by<type, 1>);
+static_assert(std::is_same_v<
+	decltype(type()[bounded::detail::types<empty>()]),
+	empty &&
+>);
+
+} // namespace tuple_empty
+
+namespace tuple_empty_empty {
+
+using type = bounded::tuple<empty, empty>;
+static_assert(std::is_empty_v<type>);
+static_assert(std::is_trivially_default_constructible_v<type>);
+static_assert(std::is_trivially_copyable_v<type>);
+static_assert(std::is_same_v<
+	decltype(type()[0_bi]),
+	empty &&
+>);
+static_assert(std::is_same_v<
+	decltype(type()[1_bi]),
+	empty &&
+>);
+static_assert(!constant_indexable_by<type, 2>);
+static_assert(!type_indexable_by<type, empty>);
+
+} // namespace tuple_empty_empty
+
+namespace tuple_tuple {
+
+using type = bounded::tuple<bounded::tuple<>>;
+static_assert(std::is_empty_v<type>);
+static_assert(std::is_trivially_default_constructible_v<type>);
+static_assert(std::is_trivially_copyable_v<type>);
+static_assert(std::is_same_v<
+	decltype(type()[0_bi]),
+	bounded::tuple<> &&
+>);
+static_assert(!constant_indexable_by<type, 1>);
+static_assert(std::is_same_v<
+	decltype(type()[bounded::detail::types<bounded::tuple<>>()]),
+	bounded::tuple<> &&
+>);
+
+} // namespace tuple_tuple
+
+namespace tuple_empty_tuple_empty {
+
+using type = bounded::tuple<empty, bounded::tuple<empty>>;
+static_assert(std::is_empty_v<type>);
+static_assert(std::is_trivially_default_constructible_v<type>);
+static_assert(std::is_trivially_copyable_v<type>);
+static_assert(std::is_same_v<
+	decltype(type()[0_bi]),
+	empty &&
+>);
+static_assert(std::is_same_v<
+	decltype(type()[1_bi]),
+	bounded::tuple<empty> &&
+>);
+static_assert(!constant_indexable_by<type, 2>);
+static_assert(std::is_same_v<
+	decltype(type()[bounded::detail::types<empty>()]),
+	empty &&
+>);
+static_assert(std::is_same_v<
+	decltype(type()[bounded::detail::types<bounded::tuple<empty>>()]),
+	bounded::tuple<empty> &&
+>);
+
+} // namespace tuple_empty_tuple_empty
+
+namespace tuple_tuple_empty_tuple_empty {
+
+using type = bounded::tuple<bounded::tuple<empty>, bounded::tuple<empty>>;
+static_assert(std::is_empty_v<type>);
+static_assert(std::is_trivially_default_constructible_v<type>);
+static_assert(std::is_trivially_copyable_v<type>);
+static_assert(std::is_same_v<
+	decltype(type()[0_bi]),
+	bounded::tuple<empty> &&
+>);
+static_assert(std::is_same_v<
+	decltype(type()[1_bi]),
+	bounded::tuple<empty> &&
+>);
+static_assert(!constant_indexable_by<type, 2>);
+static_assert(!type_indexable_by<type, bounded::tuple<empty>>);
+static_assert(!type_indexable_by<type, empty>);
+
+} // namespace tuple_tuple_empty_tuple_empty
 
 static_assert(std::is_empty_v<bounded::tuple<void>>);
 
 static_assert(std::is_empty_v<bounded::tuple<void, void, empty, void>>);
 
-static_assert(std::is_empty_v<bounded::tuple<bounded::tuple<>>>);
 static_assert(sizeof(bounded::tuple<int>) == sizeof(int));
-// Make sure a tuple can handle multiple bases of the same type in the same position
-static_assert(std::is_empty_v<bounded::tuple<empty, bounded::tuple<empty>>>);
 static_assert(sizeof(bounded::tuple<int, bounded::tuple<int>>) == sizeof(int) * 2);
 
 static_assert(sizeof(bounded::tuple<int, empty>) == sizeof(int));
@@ -59,10 +162,7 @@ constexpr auto nested = nested_t{};
 static_assert(std::is_same_v<decltype(nested[0_bi][0_bi]), empty const &>);
 static_assert(std::is_same_v<decltype(nested[0_bi][1_bi]), different_empty const &>);
 
-template<typename T, auto index>
-concept indexable_by = requires(T value) { value[bounded::constant<index>]; };
-
-static_assert(!indexable_by<nested_t, 1>);
+static_assert(!indexable_by<nested_t, bounded::constant_t<1>>);
 
 constexpr bounded::tuple<int, char const *> b = { 2, "Hello" };
 static_assert(b[0_bi] == b[0_bi]);

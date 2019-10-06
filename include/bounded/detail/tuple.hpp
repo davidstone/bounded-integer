@@ -11,6 +11,7 @@
 #include <bounded/detail/is_bounded_integer.hpp>
 #include <bounded/detail/make_index_sequence.hpp>
 #include <bounded/detail/requires.hpp>
+#include <bounded/detail/type.hpp>
 
 #include <type_traits>
 #include <utility>
@@ -130,6 +131,18 @@ struct tuple_value {
 		return static_cast<T &&>(m_value);
 	}
 
+	constexpr auto && operator[](types<T>) const & {
+		return m_value;
+	}
+	constexpr auto && operator[](types<T>) & {
+		return m_value;
+	}
+	constexpr auto && operator[](types<T>) && {
+		// This should not be std::move because that would return an rvalue
+		// reference even if T is an lvalue reference type.
+		return static_cast<T &&>(m_value);
+	}
+
 private:
 	template<std::size_t... indexes, typename... Args>
 	constexpr explicit tuple_value(std::index_sequence<indexes...>, tuple<Args...> args):
@@ -149,6 +162,8 @@ struct tuple_value<index, void> {
 	}
 
 	constexpr void operator[](constant_t<normalize<index>>) const {
+	}
+	constexpr void operator[](types<void>) const {
 	}
 };
 
