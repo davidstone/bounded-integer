@@ -82,6 +82,7 @@ target_sources(bounded INTERFACE
 	$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>/include/bounded/numeric_limits.hpp
 	$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>/include/bounded/optional.hpp
 	$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>/include/bounded/string.hpp
+	$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>/include/bounded/to_integer.hpp
 )
 
 target_sources(containers INTERFACE
@@ -235,7 +236,6 @@ add_executable(bounded_test
 	source/bounded/detail/returns.cpp
 	source/bounded/detail/size_of.cpp
 	source/bounded/detail/stream.cpp
-	source/bounded/detail/to_integer.cpp
 	source/bounded/detail/tuple.cpp
 	source/bounded/detail/type.cpp
 	source/bounded/detail/typedefs.cpp
@@ -247,6 +247,7 @@ add_executable(bounded_test
 	source/bounded/numeric_limits.cpp
 	source/bounded/optional.cpp
 	source/bounded/string.cpp
+	source/bounded/to_integer.cpp
 	)
 
 	target_link_libraries(bounded_test PUBLIC bounded)

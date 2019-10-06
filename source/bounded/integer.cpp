@@ -5,7 +5,7 @@
 
 #include <bounded/integer.hpp>
 #include <bounded/optional.hpp>
-#include <bounded/detail/to_integer.hpp>
+#include <bounded/to_integer.hpp>
 
 #include "homogeneous_equals.hpp"
 #include "string_view.hpp"

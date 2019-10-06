@@ -3,10 +3,10 @@
 // (See accompanying file LICENSE_1_0.txt or copy at
 // http://www.boost.org/LICENSE_1_0.txt)
 
-#include <bounded/detail/to_integer.hpp>
+#include <bounded/to_integer.hpp>
 #include <bounded/detail/literal.hpp>
 
-#include "../homogeneous_equals.hpp"
+#include "homogeneous_equals.hpp"
 
 #include <cstdint>
 
