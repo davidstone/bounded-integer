@@ -22,7 +22,7 @@ constexpr struct not_piecewise_construct_t{} not_piecewise_construct{};
 
 // index ensures that a tuple with the same type repeated shows the type as
 // being different
-template<std::size_t index, typename T, bool should_derive = std::is_class_v<T> and !std::is_final_v<T> and std::is_empty_v<T>>
+template<std::size_t index, typename T>
 struct tuple_value;
 
 template<std::size_t index, typename T, typename... Ts>
@@ -103,41 +103,7 @@ namespace detail {
 
 
 template<std::size_t index, typename T>
-struct tuple_value<index, T, true> : private T {
-	tuple_value() = default;
-	
-	template<typename... Args> requires std::is_constructible_v<T, Args...>
-	constexpr explicit tuple_value(std::piecewise_construct_t, tuple<Args...> args):
-		tuple_value(make_index_sequence(constant<sizeof...(Args)>), std::move(args))
-	{
-	}
-
-	template<typename... Args> requires std::is_constructible_v<T, Args...>
-	constexpr explicit tuple_value(not_piecewise_construct_t, Args && ... args):
-		T(BOUNDED_FORWARD(args)...)
-	{
-	}
-	
-	constexpr auto && operator[](constant_t<normalize<index>>) const & {
-		return static_cast<T const &>(*this);
-	}
-	constexpr auto && operator[](constant_t<normalize<index>>) & {
-		return static_cast<T &>(*this);
-	}
-	constexpr auto && operator[](constant_t<normalize<index>>) && {
-		return static_cast<T &&>(*this);
-	}
-
-private:
-	template<std::size_t... indexes, typename... Args>
-	constexpr explicit tuple_value(std::index_sequence<indexes...>, tuple<Args...> args):
-		T(args[constant<indexes>]...)
-	{
-	}
-};
-
-template<std::size_t index, typename T>
-struct tuple_value<index, T, false> {
+struct tuple_value {
 	tuple_value() = default;
 	
 	template<typename... Args> requires std::is_constructible_v<T, Args...>
@@ -171,12 +137,11 @@ private:
 	{
 	}
 
-	T m_value;
+	[[no_unique_address]] T m_value;
 };
 
-
 template<std::size_t index>
-struct tuple_value<index, void, false> {
+struct tuple_value<index, void> {
 	template<typename... MaybeVoid> requires (sizeof...(MaybeVoid) <= 1 and (... and std::is_void_v<MaybeVoid>))
 	constexpr explicit tuple_value(std::piecewise_construct_t, tuple<MaybeVoid...>) {
 	}
