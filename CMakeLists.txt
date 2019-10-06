@@ -38,7 +38,6 @@ target_sources(bounded INTERFACE
 	$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>/include/bounded/detail/policy/modulo_policy.hpp
 	$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>/include/bounded/detail/policy/null_policy.hpp
 	$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>/include/bounded/detail/policy/throw_policy.hpp
-	$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>/include/bounded/detail/variant/base.hpp
 	$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>/include/bounded/detail/variant/get_index.hpp
 	$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>/include/bounded/detail/variant/is_valid_index.hpp
 	$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>/include/bounded/detail/variant/special_member_functions.hpp
@@ -249,9 +248,9 @@ add_executable(bounded_test
 	source/bounded/optional.cpp
 	source/bounded/string.cpp
 	)
-	
+
 	target_link_libraries(bounded_test PUBLIC bounded)
-	
+
 add_library(containers_test STATIC
 	source/containers/algorithms/accumulate.cpp
 	source/containers/algorithms/advance.cpp

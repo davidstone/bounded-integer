@@ -103,8 +103,15 @@ static_assert(holds_alternative(thing_t(std::in_place, 3_bi, '\0'), bounded::det
 #if 0
 // std::variant has these calls ill-formed (and that naturally happens with my
 // implementation), but it seems like it should be legal.
-static_assert(holds_alternative(thing_t(std::in_place, 0_bi, 0), bounded::detail::bounded::detail::types<int>{}));
-static_assert(holds_alternative(thing_t(std::in_place, 4_bi, 0), bounded::detail::bounded::detail::types<int>{}));
+static_assert(holds_alternative(
+	thing_t(std::in_place, 0_bi, 0),
+	bounded::detail::types<int>{}
+));
+
+static_assert(holds_alternative(
+	thing_t(std::in_place, 4_bi, 0),
+	bounded::detail::types<int>{}
+));
 #endif
 
 constexpr auto index = 1_bi;
@@ -173,33 +180,44 @@ static_assert(!bounded::equality_comparable<bounded::variant<int, non_comparable
 }	// namespace
 
 int main() {
-	using non_trivial_variant_t = bounded::variant<non_trivial>;
-
-	static_assert(std::is_copy_constructible_v<non_trivial_variant_t>);
-	static_assert(std::is_move_constructible_v<non_trivial_variant_t>);
-	static_assert(std::is_copy_assignable_v<non_trivial_variant_t>);
-	static_assert(std::is_move_assignable_v<non_trivial_variant_t>);
-	static_assert(std::is_destructible_v<non_trivial_variant_t>);
-
-	auto non_trivial_variant = non_trivial_variant_t(std::in_place, 0_bi);
-	static_assert(non_trivial_variant.index() == 0_bi);
-	non_trivial_variant = non_trivial_variant_t(std::in_place, 0_bi);
-	// Silence self-assignment warning
-	non_trivial_variant = *&non_trivial_variant;
-	
-	
-	using non_copyable_variant_t = bounded::variant<non_copyable>;
-	auto non_copyable_variant = non_copyable_variant_t(std::in_place, 0_bi);
-	static_assert(non_copyable_variant.index() == 0_bi);
-	static_assert(not std::is_copy_constructible_v<non_copyable_variant_t>);
-	static_assert(not std::is_copy_assignable_v<non_copyable_variant_t>);
-	static_assert(std::is_move_constructible_v<non_copyable_variant_t>);
-	static_assert(std::is_move_assignable_v<non_copyable_variant_t>);
-	static_assert(std::is_same_v<decltype(std::move(non_copyable_variant)[0_bi]), non_copyable &&>);
 	{
-		static_assert(!std::is_trivially_destructible_v<destructor_checker>);
-		static_assert(!std::is_trivially_destructible_v<bounded::variant<destructor_checker>>);
-		auto v = bounded::variant<destructor_checker>(std::in_place, 0_bi);
+		using non_trivial_variant_t = bounded::variant<non_trivial>;
+
+		static_assert(std::is_copy_constructible_v<non_trivial_variant_t>);
+		static_assert(std::is_move_constructible_v<non_trivial_variant_t>);
+		static_assert(std::is_copy_assignable_v<non_trivial_variant_t>);
+		static_assert(std::is_move_assignable_v<non_trivial_variant_t>);
+		static_assert(std::is_destructible_v<non_trivial_variant_t>);
+
+		auto non_trivial_variant = non_trivial_variant_t(std::in_place, 0_bi);
+		static_assert(non_trivial_variant.index() == 0_bi);
+		non_trivial_variant = non_trivial_variant_t(std::in_place, 0_bi);
+		// Silence self-assignment warning
+		non_trivial_variant = *&non_trivial_variant;
+
+		// TODO
+		// auto const non_trivial_copy = non_trivial_variant;
+		// assert(non_trivial_copy == non_trivial_variant);
+
+		// TODO
+		// auto const non_trivial_move = std::move(non_trivial_variant);
+		// assert(non_trivial_copy == non_trivial_move);
 	}
-	BOUNDED_TEST(destructor_checker::destructed == 1U);
+	
+	{
+		using non_copyable_variant_t = bounded::variant<non_copyable>;
+		auto non_copyable_variant = non_copyable_variant_t(std::in_place, 0_bi);
+		static_assert(non_copyable_variant.index() == 0_bi);
+		static_assert(not std::is_copy_constructible_v<non_copyable_variant_t>);
+		static_assert(not std::is_copy_assignable_v<non_copyable_variant_t>);
+		static_assert(std::is_move_constructible_v<non_copyable_variant_t>);
+		static_assert(std::is_move_assignable_v<non_copyable_variant_t>);
+		static_assert(std::is_same_v<decltype(std::move(non_copyable_variant)[0_bi]), non_copyable &&>);
+		{
+			static_assert(!std::is_trivially_destructible_v<destructor_checker>);
+			static_assert(!std::is_trivially_destructible_v<bounded::variant<destructor_checker>>);
+			auto v = bounded::variant<destructor_checker>(std::in_place, 0_bi);
+		}
+		BOUNDED_TEST(destructor_checker::destructed == 1U);
+	}
 }

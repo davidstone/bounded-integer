@@ -6,6 +6,7 @@
 #pragma once
 
 #include <bounded/detail/class.hpp>
+#include <bounded/detail/literal.hpp>
 #include <bounded/detail/returns.hpp>
 #include <bounded/detail/type.hpp>
 

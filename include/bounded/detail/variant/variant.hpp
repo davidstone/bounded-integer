@@ -8,41 +8,252 @@
 #include <bounded/detail/class.hpp>
 #include <bounded/detail/comparison.hpp>
 #include <bounded/detail/copy_cv_ref.hpp>
+#include <bounded/detail/forward.hpp>
 #include <bounded/detail/type.hpp>
 #include <bounded/detail/variant/get_index.hpp>
+#include <bounded/detail/variant/is_valid_index.hpp>
 #include <bounded/detail/variant/special_member_functions.hpp>
+#include <bounded/detail/variant/variadic_union.hpp>
 #include <bounded/detail/variant/visit.hpp>
 
 #include <type_traits>
+#include <utility>
 
 namespace bounded {
 
 template<typename GetFunction, typename... Ts>
-struct basic_variant :
-	private detail::variant_copy_assignment<GetFunction, Ts...>
-{
+struct basic_variant : private detail::variant_destructor<GetFunction, Ts...> {
 private:
-	using base = detail::variant_copy_assignment<GetFunction, Ts...>;
+	static inline constexpr bool has_trivial_copy_assignment =
+		(... and std::is_trivially_copy_assignable_v<Ts>) and
+		(... and std::is_trivially_copy_constructible_v<Ts>) and
+		(... and std::is_trivially_destructible_v<Ts>);
+
+	static inline constexpr bool has_trivial_move_assignment =
+		(... and std::is_trivially_move_assignable_v<Ts>) and
+		(... and std::is_trivially_move_constructible_v<Ts>) and
+		(... and std::is_trivially_destructible_v<Ts>);
+
 public:
-	static_assert(std::is_trivially_copyable<GetFunction>{});
+	friend detail::variant_destructor<GetFunction, Ts...>;
 
-	using base::base;
+	static_assert(std::is_trivially_copy_constructible_v<GetFunction>);
+	static_assert(std::is_trivially_move_constructible_v<GetFunction>);
+	static_assert(std::is_trivially_copy_assignable_v<GetFunction>);
+	static_assert(std::is_trivially_move_assignable_v<GetFunction>);
+	static_assert(std::is_trivially_destructible_v<GetFunction>);
 
-	constexpr basic_variant(basic_variant const &) = default;
-	constexpr basic_variant(basic_variant &&) = default;
+	template<typename F, typename Index, typename... Args> requires(
+		std::is_convertible_v<F, GetFunction> and
+		std::is_constructible_v<typename decltype(detail::get_type(Index{}, detail::types<Ts>{}...))::type, Args...>
+	)
+	constexpr basic_variant(std::in_place_t, F && function, Index index_, Args && ... args):
+		m_function(BOUNDED_FORWARD(function)),
+		m_data(detail::get_index(index_, detail::types<Ts>{}...), BOUNDED_FORWARD(args)...)
+	{
+		static_assert(
+			min_value<decltype(index())> == 0_bi,
+			"Type returned by your function must have a minimum value of 0."
+		);
+		static_assert(
+			max_value<decltype(index())> == sizeof...(Ts) - 1,
+			"Range of values of type returned by your function must equal the number of types."
+		);
+	}
 
-	constexpr auto operator=(basic_variant const &) & -> basic_variant & = default;
-	constexpr auto operator=(basic_variant &&) & -> basic_variant & = default;
-
-	template<typename T, typename std::enable_if<!std::is_same_v<std::decay_t<T>, basic_variant>, int>::type = 0>
-	constexpr auto & operator=(T && value) & {
-		this->assignment(BOUNDED_FORWARD(value));
-		return *this;
+	template<typename Index, typename... Args> requires(
+		not std::is_convertible_v<Index, GetFunction> and
+		std::is_constructible_v<typename decltype(detail::get_type(Index{}, detail::types<Ts>{}...))::type, Args...>
+	)
+	constexpr basic_variant(std::in_place_t, Index const index_, Args && ... args):
+		basic_variant(
+			std::in_place,
+			GetFunction(detail::get_index(index_, detail::types<Ts>{}...)),
+			index_,
+			BOUNDED_FORWARD(args)...
+		)
+	{
 	}
 	
-	using base::index;
-	using base::operator[];
-	using base::emplace;
+	template<matches_exactly_one_type<detail::types<Ts>...> T>
+	constexpr explicit basic_variant(T && value):
+		basic_variant(
+			std::in_place,
+			detail::types<std::decay_t<T>>{},
+			BOUNDED_FORWARD(value)
+		)
+	{
+	}
+	
+
+	constexpr basic_variant(basic_variant const &) requires(... and std::is_trivially_copy_constructible_v<Ts>) = default;
+
+	constexpr basic_variant(basic_variant const & other) noexcept(
+		(... and std::is_nothrow_copy_constructible_v<Ts>)
+	) requires(
+		(... and std::is_copy_constructible_v<Ts>) and
+		!(... and std::is_trivially_copy_constructible_v<Ts>)
+	):
+		basic_variant(other, copy_move_tag{})
+	{
+	}
+
+
+	constexpr basic_variant(basic_variant &&) requires(... and std::is_trivially_move_constructible_v<Ts>) = default;
+
+	constexpr basic_variant(basic_variant && other) noexcept(
+		(... and std::is_nothrow_move_constructible_v<Ts>)
+	) requires(
+		(... and std::is_move_constructible_v<Ts>) and
+		!(... and std::is_trivially_move_constructible_v<Ts>)
+	):
+		basic_variant(std::move(other), copy_move_tag{})
+	{
+	}
+
+
+	constexpr auto operator=(basic_variant const &) & -> basic_variant & requires has_trivial_copy_assignment = default;
+
+	constexpr auto operator=(basic_variant const & other) & noexcept(
+		(... and std::is_nothrow_copy_assignable_v<Ts>) and
+		(... and std::is_nothrow_copy_constructible_v<Ts>)
+	) -> basic_variant & requires(
+		(... and std::is_copy_assignable_v<Ts>) and
+		(... and std::is_copy_constructible_v<Ts>) and
+		!has_trivial_copy_assignment
+	) {
+		assign(other);
+		return *this;
+	}
+
+
+	constexpr auto operator=(basic_variant &&) & -> basic_variant & requires has_trivial_move_assignment = default;
+
+	constexpr auto operator=(basic_variant && other) & noexcept(
+		(... and std::is_nothrow_move_assignable_v<Ts>) and
+		(... and std::is_nothrow_move_constructible_v<Ts>)
+	) -> basic_variant & requires(
+		(... and std::is_move_assignable_v<Ts>) and
+		(... and std::is_move_constructible_v<Ts>) and
+		!has_trivial_move_assignment
+	) {
+		assign(std::move(other));
+		return *this;
+	}
+
+	template<typename T> requires(
+		!std::is_same_v<std::decay_t<T>, basic_variant> and
+		std::is_constructible_v<std::decay_t<T>, T &&> and
+		std::is_assignable_v<std::decay_t<T> &, T &&>
+	)
+	constexpr auto & operator=(T && value) & {
+		visit(*this, [&](auto & original) {
+			if constexpr (std::is_same_v<std::decay_t<decltype(original)>, std::decay_t<T>>) {
+				original = BOUNDED_FORWARD(value);
+			} else {
+				destroy(original);
+				replace_active_member(detail::types<std::decay_t<T>>{}, BOUNDED_FORWARD(value));
+			}
+		});
+		return *this;
+	}
+
+
+	constexpr auto index() const {
+		return m_function(m_data);
+	}
+
+
+	template<unique_type_identifier<detail::types<Ts>...> Index>
+	constexpr auto const & operator[](Index index_) const & {
+		return operator_bracket(m_data, index_);
+	}
+	template<unique_type_identifier<detail::types<Ts>...> Index>
+	constexpr auto & operator[](Index index_) & {
+		return operator_bracket(m_data, index_);
+	}
+	template<unique_type_identifier<detail::types<Ts>...> Index>
+	constexpr auto && operator[](Index index_) && {
+		return operator_bracket(std::move(m_data), index_);
+	}
+
+
+	template<typename Index, typename... Args>
+	constexpr auto & emplace(Index index, Args && ... args) & requires requires { construct_return<typename decltype(detail::get_type(index, detail::types<Ts>{}...))::type>(BOUNDED_FORWARD(args)...); } {
+		using indexed = typename decltype(detail::get_type(index, detail::types<Ts>{}...))::type;
+		if constexpr (std::is_nothrow_constructible_v<indexed, Args...>) {
+			visit(*this, destroy);
+			return replace_active_member(index, BOUNDED_FORWARD(args)...);
+		} else {
+			auto & ref = operator[](index);
+			auto value = construct_return<std::decay_t<decltype(ref)>>(BOUNDED_FORWARD(args)...);
+			visit(*this, destroy);
+			return replace_active_member(index, std::move(value));
+		}
+	}
+
+private:
+	struct copy_move_tag{};
+	template<typename Other>
+	constexpr basic_variant(Other && other, copy_move_tag):
+		basic_variant(visit_with_index(
+			BOUNDED_FORWARD(other),
+			[&](auto parameter) {
+				return basic_variant(
+					std::in_place,
+					other.m_function,
+					parameter.index,
+					std::move(parameter).value
+				);
+			}
+		))
+	{
+	}
+
+	template<typename Other>
+	constexpr void assign(Other && other) {
+		visit_with_index(
+			*this,
+			BOUNDED_FORWARD(other),
+			[&](auto lhs, auto rhs) {
+				if constexpr (lhs.index == rhs.index) {
+					lhs.value = BOUNDED_FORWARD(rhs.value);
+				} else {
+					emplace(rhs.index, BOUNDED_FORWARD(rhs.value));
+				}
+				m_function = other.m_function;
+			}
+		);
+	}
+
+	// Assumes the old object has already been destroyed
+	template<typename Index, typename... Args>
+	constexpr auto & replace_active_member(Index const index, Args && ... args) {
+		constexpr auto trivial = (... and (
+			std::is_trivially_copy_constructible_v<Ts> and
+			std::is_trivially_copy_assignable_v<Ts> and
+			std::is_trivially_destructible_v<Ts>
+		));
+		constexpr auto index_value = detail::get_index(index, detail::types<Ts>{}...);
+		m_function = GetFunction(index_value);
+		if constexpr (trivial) {
+			m_data = detail::variadic_union_t<Ts...>(index_value, BOUNDED_FORWARD(args)...);
+			return operator[](index_value);
+		} else {
+			return construct(operator[](index_value), BOUNDED_FORWARD(args)...);
+		}
+	}
+
+	template<typename VariadicUnion, typename Index>
+	static constexpr auto && operator_bracket(VariadicUnion && data, Index const index_) {
+		return ::bounded::detail::get_union_element(
+			BOUNDED_FORWARD(data),
+			detail::get_index(index_, detail::types<Ts>{}...)
+		);
+	}
+
+	[[no_unique_address]] GetFunction m_function;
+	[[no_unique_address]] detail::variadic_union_t<Ts...> m_data;
 };
 
 template<typename GetFunction, typename... Ts, typename T>
