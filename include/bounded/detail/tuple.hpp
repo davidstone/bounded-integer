@@ -17,14 +17,82 @@
 #include <utility>
 
 namespace bounded {
+
+struct lazy_init_t {
+} inline constexpr lazy_init;
+
 namespace detail {
 
-constexpr struct not_piecewise_construct_t{} not_piecewise_construct{};
+// TODO: File a bug against the standard?
+template<typename T>
+T declval();
 
-// index ensures that a tuple with the same type repeated shows the type as
-// being different
+template<typename T, typename... Args>
+concept is_constructible = requires { T(declval<Args>()...); };
+
+template<typename Function, typename T>
+concept lazy_construct_function_for = (std::is_void_v<T> and std::is_void_v<decltype(std::declval<Function>()())>) or is_constructible<T, decltype(std::declval<Function>()())>;
+
+// index is the index of this value within the tuple that contains it
 template<std::size_t index, typename T>
-struct tuple_value;
+struct tuple_value {
+	tuple_value() = default;
+
+	template<lazy_construct_function_for<T> Function>
+	constexpr explicit tuple_value(lazy_init_t, Function function):
+		m_value(std::move(function)())
+	{
+	}
+
+	// TODO: convertible
+	template<typename Arg> requires detail::is_constructible<T, Arg>
+	constexpr explicit tuple_value(Arg && arg):
+		m_value(BOUNDED_FORWARD(arg))
+	{
+	}
+
+	constexpr auto && operator[](constant_t<normalize<index>>) const & {
+		return m_value;
+	}
+	constexpr auto && operator[](constant_t<normalize<index>>) & {
+		return m_value;
+	}
+	constexpr auto && operator[](constant_t<normalize<index>>) && {
+		// This should not be std::move because that would return an rvalue
+		// reference even if T is an lvalue reference type.
+		return static_cast<T &&>(m_value);
+	}
+
+	constexpr auto && operator[](types<T>) const & {
+		return m_value;
+	}
+	constexpr auto && operator[](types<T>) & {
+		return m_value;
+	}
+	constexpr auto && operator[](types<T>) && {
+		// This should not be std::move because that would return an rvalue
+		// reference even if T is an lvalue reference type.
+		return static_cast<T &&>(m_value);
+	}
+
+private:
+	[[no_unique_address]] T m_value;
+};
+
+template<std::size_t index>
+struct tuple_value<index, void> {
+	tuple_value() = default;
+
+	template<lazy_construct_function_for<void> Function>
+	constexpr explicit tuple_value(lazy_init_t, Function function) {
+		std::move(function)();
+	}
+
+	constexpr void operator[](constant_t<normalize<index>>) const {
+	}
+	constexpr void operator[](types<void>) const {
+	}
+};
 
 template<std::size_t index, typename T, typename... Ts>
 struct nth_type_c {
@@ -48,13 +116,13 @@ struct tuple_impl<std::index_sequence<indexes...>, Types...> : tuple_value<index
 
 	template<typename... Args, BOUNDED_REQUIRES((... and std::is_convertible_v<Args, Types>))>
 	constexpr tuple_impl(Args && ... args):
-		tuple_value<indexes, Types>(not_piecewise_construct, BOUNDED_FORWARD(args))...
+		tuple_value<indexes, Types>(BOUNDED_FORWARD(args))...
 	{
 	}
 
-	template<typename... Args, BOUNDED_REQUIRES((... and std::is_constructible_v<tuple_value<indexes, Types>, std::piecewise_construct_t, Args>))>
-	constexpr tuple_impl(std::piecewise_construct_t, Args && ... args):
-		tuple_value<indexes, Types>(std::piecewise_construct, BOUNDED_FORWARD(args))...
+	template<typename... Functions> requires(... and lazy_construct_function_for<Functions, Types>)
+	constexpr tuple_impl(lazy_init_t, Functions... functions):
+		tuple_value<indexes, Types>(lazy_init, std::move(functions))...
 	{
 	}
 
@@ -101,72 +169,6 @@ concept tuple_like = detail::is_tuple<std::decay_t<T>>;
 
 
 namespace detail {
-
-
-template<std::size_t index, typename T>
-struct tuple_value {
-	tuple_value() = default;
-	
-	template<typename... Args> requires std::is_constructible_v<T, Args...>
-	constexpr explicit tuple_value(std::piecewise_construct_t, tuple<Args...> args):
-		tuple_value(make_index_sequence(constant<sizeof...(Args)>), std::move(args))
-	{
-	}
-
-	template<typename... Args> requires std::is_constructible_v<T, Args...>
-	constexpr explicit tuple_value(not_piecewise_construct_t, Args && ... args):
-		m_value(BOUNDED_FORWARD(args)...)
-	{
-	}
-
-	constexpr auto && operator[](constant_t<normalize<index>>) const & {
-		return m_value;
-	}
-	constexpr auto && operator[](constant_t<normalize<index>>) & {
-		return m_value;
-	}
-	constexpr auto && operator[](constant_t<normalize<index>>) && {
-		// This should not be std::move because that would return an rvalue
-		// reference even if T is an lvalue reference type.
-		return static_cast<T &&>(m_value);
-	}
-
-	constexpr auto && operator[](types<T>) const & {
-		return m_value;
-	}
-	constexpr auto && operator[](types<T>) & {
-		return m_value;
-	}
-	constexpr auto && operator[](types<T>) && {
-		// This should not be std::move because that would return an rvalue
-		// reference even if T is an lvalue reference type.
-		return static_cast<T &&>(m_value);
-	}
-
-private:
-	template<std::size_t... indexes, typename... Args>
-	constexpr explicit tuple_value(std::index_sequence<indexes...>, tuple<Args...> args):
-		m_value(args[constant<indexes>]...)
-	{
-	}
-
-	[[no_unique_address]] T m_value;
-};
-
-template<std::size_t index>
-struct tuple_value<index, void> {
-	template<typename... MaybeVoid> requires (sizeof...(MaybeVoid) <= 1 and (... and std::is_void_v<MaybeVoid>))
-	constexpr explicit tuple_value(std::piecewise_construct_t, tuple<MaybeVoid...>) {
-	}
-	constexpr explicit tuple_value(not_piecewise_construct_t) {
-	}
-
-	constexpr void operator[](constant_t<normalize<index>>) const {
-	}
-	constexpr void operator[](types<void>) const {
-	}
-};
-
 
 template<
 	typename... lhs_types,
@@ -269,7 +271,7 @@ private:
 	}
 
 public:
-	template<typename... Tuples> requires(... and std::is_constructible_v<std::decay_t<Tuples>, Tuples &&>)
+	template<typename... Tuples> requires(... and detail::is_constructible<std::decay_t<Tuples>, Tuples &&>)
 	constexpr auto operator()(Tuples && ... tuples) const {
 		if constexpr (sizeof...(Tuples) == 0) {
 			return tuple<>{};

@@ -189,15 +189,6 @@ constexpr auto is_std_map = false;
 template<typename Key, typename Value, typename Compare, typename Allocator>
 constexpr auto is_std_map<std::map<Key, Value, Compare, Allocator>> = true;
 
-template<typename container_type, typename... Args>
-constexpr auto generic_forward_as_tuple(Args && ... args) {
-	if constexpr (is_std_map<container_type>) {
-		return std::forward_as_tuple(BOUNDED_FORWARD(args)...);
-	} else {
-		return bounded::tie(BOUNDED_FORWARD(args)...);
-	}
-}
-
 template<typename container_type>
 void test() {
 	std::cout << "Testing many member functions.\n" << std::flush;
@@ -207,7 +198,11 @@ void test() {
 	auto container = container_type(init);
 	BOUNDED_TEST((container == container_type(init)));
 	container.emplace(typename container_type::value_type(4, 4));
-	container.emplace(std::piecewise_construct, generic_forward_as_tuple<container_type>(5), generic_forward_as_tuple<container_type>(3));
+	if constexpr (is_std_map<container_type>) {
+		container.emplace(std::piecewise_construct, std::forward_as_tuple(5), std::forward_as_tuple(3));
+	} else {
+		container.emplace(bounded::lazy_init, []{ return 5; }, []{ return 3; });
+	}
 	BOUNDED_TEST(container.at(5) == 3);
 	BOUNDED_TEST(size(container) == 5_bi);
 	container.insert(typename container_type::value_type(3, 10));

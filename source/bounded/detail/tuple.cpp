@@ -181,7 +181,13 @@ constexpr auto operator==(non_movable const &, non_movable const &) {
 }
 
 static_assert(std::is_constructible_v<bounded::tuple<non_movable>>);
-static_assert(std::is_constructible_v<bounded::tuple<non_movable>, std::piecewise_construct_t, bounded::tuple<>>);
+
+
+constexpr auto non_movable_constructor = []{ return non_movable(); };
+static_assert(non_movable_constructor() == non_movable());
+static_assert(bounded::detail::is_constructible<non_movable, non_movable>);
+static_assert(bounded::detail::tuple_value<0, non_movable>(bounded::lazy_init, non_movable_constructor)[0_bi] == non_movable());
+static_assert(bounded::detail::is_constructible<bounded::tuple<non_movable>, bounded::lazy_init_t, decltype(non_movable_constructor)>);
 static_assert(std::is_same_v<bounded::tuple_element<0, bounded::tuple<non_movable>>, non_movable>);
 constexpr bounded::tuple<non_movable> non_movable_tuple = {};
 static_assert(non_movable_tuple[0_bi] == non_movable{});
