@@ -26,6 +26,7 @@ template<typename Container, typename Integer, typename Function>
 constexpr auto insert_or_emplace_with_reallocation(Container & container, typename Container::const_iterator const position, Integer const number_of_elements, Function construct) {
 	// There is a reallocation required, so just put everything in the
 	// correct place to begin with
+	auto const original_size = size(container);
 	auto temp = Container();
 	temp.reserve(::containers::detail::reallocation_size(container, number_of_elements));
 	// First construct the new element because the arguments to
@@ -39,7 +40,7 @@ constexpr auto insert_or_emplace_with_reallocation(Container & container, typena
 	BOUNDED_ASSERT(temp_begin + offset == it);
 	::containers::uninitialized_move_destroy(mutable_position, end(container), it + number_of_elements);
 	container = std::move(temp);
-	container.append_from_capacity(number_of_elements);
+	container.append_from_capacity(original_size + number_of_elements);
 	return mutable_position;
 }
 
@@ -100,7 +101,7 @@ constexpr auto insert(Container & container, typename Container::const_iterator 
 		container.append_from_capacity(range_size);
 		// return mutable_position;
 	} else if constexpr (reservable<Container>) {
-		insert_or_emplace_with_reallocation(position, range_size, [&](auto const ptr) {
+		insert_or_emplace_with_reallocation(container, position, range_size, [&](auto const ptr) {
 			::containers::uninitialized_copy(BOUNDED_FORWARD(range), ptr);
 		});
 	} else {
