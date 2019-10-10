@@ -17,13 +17,18 @@ using namespace bounded::literal;
 
 namespace detail {
 
+template<typename Iterator, typename Offset>
+concept random_access_advancable_by = requires(Iterator & it, Offset offset) {
+	it += offset;
+};
+
 template<iterator Iterator, typename Offset>
 constexpr auto advance(Iterator & it, Offset const offset, std::random_access_iterator_tag) {
-	it += offset.value();
-}
-template<iterator Iterator, typename Offset>
-constexpr auto advance(Iterator & it, Offset const offset, std::random_access_iterator_tag) requires requires { it += offset; } {
-	it += offset;
+	if constexpr (random_access_advancable_by<Iterator, Offset>) {
+		it += offset;
+	} else {
+		it += offset.value();
+	}
 }
 
 template<iterator Iterator, typename Offset>
