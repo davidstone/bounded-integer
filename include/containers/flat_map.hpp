@@ -101,75 +101,6 @@ private:
 	ExtractKey m_extract;
 };
 
-// Key could be a reference type
-template<typename Key, typename MappedFunction>
-struct emplace_helper {
-	explicit constexpr emplace_helper(Key key_, MappedFunction mapped_):
-		m_key(BOUNDED_FORWARD(key_)),
-		m_mapped(std::move(mapped_))
-	{
-	}
-
-	auto && key() const & {
-		return m_key;
-	}
-	auto && key() && {
-		return BOUNDED_FORWARD(m_key);
-	}
-	auto mapped() && {
-		return std::move(m_mapped);
-	}
-
-private:
-	Key m_key;
-	MappedFunction m_mapped;
-};
-
-template<typename Key, typename MappedFunction>
-constexpr auto make_emplace_helper_key_ref(Key && key, MappedFunction mapped) {
-	return emplace_helper<Key &&, MappedFunction>(
-		BOUNDED_FORWARD(key),
-		std::move(mapped)
-	);
-}
-
-template<typename Key, typename Mapped>
-constexpr auto make_emplace_helper() {
-	return emplace_helper(
-		Key(),
-		bounded::construct_return<Mapped>
-	);
-}
-// TODO: Think about how to handle transparent comparators better than this?
-template<typename, typename, typename Pair>
-constexpr auto make_emplace_helper(Pair && pair) {
-	return make_emplace_helper_key_ref(
-		BOUNDED_FORWARD(pair).key(),
-		[&]{ return BOUNDED_FORWARD(pair).mapped(); }
-	);
-}
-template<typename, typename, typename Key, typename Mapped>
-constexpr auto make_emplace_helper(Key && key, Mapped && mapped) {
-	return make_emplace_helper_key_ref(
-		BOUNDED_FORWARD(key),
-		[&]{ return BOUNDED_FORWARD(mapped); }
-	);
-}
-template<typename, typename, typename KeyFunction, typename MappedFunction>
-static constexpr auto make_emplace_helper(bounded::lazy_init_t, KeyFunction && key, MappedFunction && mapped) {
-	if constexpr (std::is_reference_v<decltype(BOUNDED_FORWARD(key)())>) {
-		return make_emplace_helper_key_ref(
-			BOUNDED_FORWARD(key)(),
-			BOUNDED_FORWARD(mapped)
-		);
-	} else {
-		return emplace_helper(
-			BOUNDED_FORWARD(key)(),
-			BOUNDED_FORWARD(mapped)
-		);
-	}
-}
-
 
 template<typename ExtractKey, typename T>
 concept extract_key_function = requires(ExtractKey const & extract_key, T const & value) {
@@ -369,41 +300,41 @@ public:
 		return (it == end(*this) or compare()(key, it->key())) ? end(*this) : it;
 	}
 	
-	// Unlike in std::map, insert / emplace can only provide a time complexity
-	// that matches an insert into the underlying container, which is to say,
-	// linear. An insertion implies shifting all of the elements.
-	//
-	// Moreover, emplace cannot in general provide the guarantee of no copying
-	// or moving. It can only provide the weaker guarantee of no copying or
-	// moving of the mapped_type. We must copy or move key_type because we have
-	// to construct the key to determine whether we should insert it.
-	template<typename... Args>
-	constexpr auto emplace(Args && ... args) {
-		auto data = ::containers::detail::make_emplace_helper<key_type, mapped_type>(BOUNDED_FORWARD(args)...);
-		auto const position = upper_bound(data.key());
-		return emplace_at(position, std::move(data));
+	// Unlike in std::map, insert / try_emplace can only provide a time
+	// complexity that matches an insert into the underlying container, which is
+	// to say, linear. An insertion implies shifting all of the elements.
+	template<typename Key, typename... MappedArgs>
+	constexpr auto try_emplace(Key && key, MappedArgs && ... mapped_args) {
+		auto const position = upper_bound(key);
+		return try_emplace_at(position, BOUNDED_FORWARD(key), BOUNDED_FORWARD(mapped_args)...);
 	}
-	template<typename... Args>
-	constexpr auto emplace_hint(const_iterator hint, Args && ... args) {
-		auto data = ::containers::detail::make_emplace_helper<key_type, mapped_type>(BOUNDED_FORWARD(args)...);
-		auto const correct_greater = (hint == end(*this)) or compare()(data.key(), *hint);
-		auto const correct_less = (hint == begin(*this)) or compare()(*::containers::prev(hint), data.key());
-		auto const correct_hint = correct_greater and correct_less;
-		auto const position = correct_hint ? hint : upper_bound(data.key());
-		return emplace_at(position, std::move(data));
+	template<typename Key, typename... MappedArgs>
+	constexpr auto try_emplace_hint(const_iterator hint, Key && key, MappedArgs && ... mapped_args) {
+		auto impl = [&](const_iterator position){
+			return try_emplace_at(position, BOUNDED_FORWARD(key), BOUNDED_FORWARD(mapped_args)...);
+		};
+		auto const correct_next = hint == end(*this) or compare()(key, *hint);
+		if (!correct_next) {
+			return impl(upper_bound(key));
+		}
+		auto const correct_previous = hint == begin(*this) or compare()(*::containers::prev(hint), key);
+		if (!correct_previous) {
+			return impl(upper_bound(key));
+		}
+		return impl(hint);
 	}
 
 	constexpr auto insert(value_type const & value) {
-		return emplace(value);
+		return try_emplace(value.key(), value.mapped());
 	}
 	constexpr auto insert(value_type && value) {
-		return emplace(std::move(value));
+		return try_emplace(std::move(value).key(), std::move(value).mapped());
 	}
 	constexpr auto insert(const_iterator const hint, value_type const & value) {
-		return emplace_hint(hint, value);
+		return try_emplace_hint(hint, value.key(), value.mapped());
 	}
 	constexpr auto insert(const_iterator const hint, value_type && value) {
-		return emplace_hint(hint, std::move(value));
+		return try_emplace_hint(hint, std::move(value).key(), std::move(value).mapped());
 	}
 	template<typename Range = std::initializer_list<value_type>>
 	constexpr auto insert(Range && range) {
@@ -453,28 +384,29 @@ public:
 	}
 	
 private:
-	template<typename Emplacer>
-	constexpr auto emplace_at(const_iterator position, Emplacer && emplacer) {
+	template<typename Key, typename... MappedArgs>
+	constexpr auto try_emplace_at(const_iterator position, Key && key, MappedArgs && ... mapped_args) {
 		auto add_element = [&] {
 			return ::containers::emplace(
 				m_container,
 				position,
 				bounded::lazy_init,
-				[&]{ return std::move(emplacer).key(); },
-				std::move(emplacer).mapped()
+				[&]{ return key_type(BOUNDED_FORWARD(key)); },
+				[&]{ return mapped_type(BOUNDED_FORWARD(mapped_args)...); }
 			);
 		};
 		if constexpr (allow_duplicates) {
 			return add_element();
 		} else {
-			// Do not decrement an iterator if it might be begin(*this)
 			bool const there_is_element_before = position != begin(*this);
-			auto const that_element_is_equal = [&]{ return !compare()(containers::prev(position)->key(), emplacer.key()); };
-			bool const already_exists = there_is_element_before and that_element_is_equal();
-			if (already_exists) {
-				return inserted_t{mutable_iterator(*this, containers::prev(position)), false};
+			if (!there_is_element_before) {
+				return inserted_t{add_element(), true};
 			}
-			return inserted_t{add_element(), true};
+			bool const that_element_is_equal = !compare()(containers::prev(position)->key(), key);
+			if (!that_element_is_equal) {
+				return inserted_t{add_element(), true};
+			}
+			return inserted_t{mutable_iterator(*this, containers::prev(position)), false};
 		}
 	}
 };
@@ -520,8 +452,8 @@ public:
 	using base::upper_bound;
 	using base::find;
 	
-	using base::emplace;
-	using base::emplace_hint;
+	using base::try_emplace;
+	using base::try_emplace_hint;
 	using base::insert;
 	
 	using base::erase;
@@ -544,7 +476,7 @@ public:
 	}
 	template<typename Key>
 	constexpr auto & operator[](Key && key) {
-		return this->emplace(std::piecewise_construct, bounded::tie(BOUNDED_FORWARD(key)), bounded::tie()).first->mapped();
+		return this->try_emplace(BOUNDED_FORWARD(key)).first->mapped();
 	}
 
 	template<typename Key>
@@ -612,8 +544,8 @@ public:
 	using base::upper_bound;
 	using base::find;
 	
-	using base::emplace;
-	using base::emplace_hint;
+	using base::try_emplace;
+	using base::try_emplace_hint;
 	using base::insert;
 	
 	using base::erase;

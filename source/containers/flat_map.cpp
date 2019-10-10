@@ -183,12 +183,6 @@ void test_unique() {
 	test_unique_specific<vector<CheckedMover>>();
 }
 
-template<typename>
-constexpr auto is_std_map = false;
-
-template<typename Key, typename Value, typename Compare, typename Allocator>
-constexpr auto is_std_map<std::map<Key, Value, Compare, Allocator>> = true;
-
 template<typename container_type>
 void test() {
 	std::cout << "Testing many member functions.\n" << std::flush;
@@ -197,12 +191,8 @@ void test() {
 	auto const init = std::initializer_list<typename container_type::value_type>{{1, 2}, {2, 5}, {3, 3}};
 	auto container = container_type(init);
 	BOUNDED_TEST((container == container_type(init)));
-	container.emplace(typename container_type::value_type(4, 4));
-	if constexpr (is_std_map<container_type>) {
-		container.emplace(std::piecewise_construct, std::forward_as_tuple(5), std::forward_as_tuple(3));
-	} else {
-		container.emplace(bounded::lazy_init, []{ return 5; }, []{ return 3; });
-	}
+	container.insert(typename container_type::value_type(4, 4));
+	container.try_emplace(5, 3);
 	BOUNDED_TEST(container.at(5) == 3);
 	BOUNDED_TEST(size(container) == 5_bi);
 	container.insert(typename container_type::value_type(3, 10));
@@ -233,7 +223,11 @@ using extract_key_t = Extract;
 
 #if defined USE_SYSTEM_MAP
 	template<typename Key, typename Value, typename Extract>
-	using map_type = std::map<Key, Value, extract_key_to_compare_t<extract_key_t<Extract>>>;
+	using map_type = std::map<
+		Key,
+		Value,
+		containers::detail::extract_key_to_compare<extract_key_t<Extract>>
+	>;
 
 	template<typename Key, typename Value>
 	using value_type = std::pair<Key, Value>;
