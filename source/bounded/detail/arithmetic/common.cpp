@@ -49,7 +49,7 @@ constexpr auto check_compound_arithmetic() {
 	static_assert(divide_equals(z_type(bounded::constant<49>), 7) == bounded::constant<7>);
 	static_assert(modulo_equals(x_type(bounded::constant<10>), bounded::constant<6>) == bounded::constant<4>);
 
-	static_assert(plus_equals(static_cast<short>(0), bounded::constant<4>) == 4);
+	static_assert(plus_equals(static_cast<long>(0), bounded::constant<4>) == 4);
 	static_assert(plus_equals(static_cast<unsigned>(9), bounded::constant<3>) == 12);
 	static_assert(minus_equals(9, bounded::constant<68>) == -59);
 	static_assert(divide_equals(-59, y_type(bounded::constant<10>)) == -5);

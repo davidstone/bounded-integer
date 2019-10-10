@@ -17,11 +17,9 @@ namespace bounded {
 namespace detail {
 namespace arithmetic {
 
-// We have to use static_cast here to avoid integral promotion warnings
 #define BOUNDED_INTEGER_COMPOUND_ASSIGNMENT_OPERATOR(symbol) \
-template<typename LHS, typename RHS> \
-constexpr auto operator symbol##=(LHS & lhs, RHS && rhs) BOUNDED_RETURNS( \
-	lhs = static_cast<LHS>(std::move(lhs) symbol BOUNDED_FORWARD(rhs)) \
+constexpr auto operator symbol##=(auto & lhs, auto && rhs) BOUNDED_RETURNS( \
+	lhs = std::move(lhs) symbol BOUNDED_FORWARD(rhs) \
 )
 
 BOUNDED_INTEGER_COMPOUND_ASSIGNMENT_OPERATOR(+)
