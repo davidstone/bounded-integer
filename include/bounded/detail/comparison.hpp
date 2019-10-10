@@ -5,6 +5,7 @@
 
 #pragma once
 
+#include <bounded/detail/builtin_min_max_value.hpp>
 #include <bounded/detail/is_bounded_integer.hpp>
 #include <bounded/detail/max_builtin.hpp>
 #include <bounded/detail/min_max_value.hpp>
@@ -85,10 +86,10 @@ constexpr auto safe_max(Ts... values) {
 
 template<bounded_integer LHS, bounded_integer RHS>
 constexpr auto operator<=>(LHS const & lhs, RHS const & rhs) {
-	constexpr auto lhs_min = min_value<LHS>.value();
-	constexpr auto lhs_max = max_value<LHS>.value();
-	constexpr auto rhs_min = min_value<RHS>.value();
-	constexpr auto rhs_max = max_value<RHS>.value();
+	constexpr auto lhs_min = detail::builtin_min_value<LHS>;
+	constexpr auto lhs_max = detail::builtin_max_value<LHS>;
+	constexpr auto rhs_min = detail::builtin_min_value<RHS>;
+	constexpr auto rhs_max = detail::builtin_max_value<RHS>;
 	if constexpr (detail::safe_compare(lhs_min, rhs_max) > 0) {
 		return std::strong_ordering::greater;
 	} else if constexpr (detail::safe_compare(lhs_max, rhs_min) < 0) {
@@ -102,10 +103,10 @@ constexpr auto operator<=>(LHS const & lhs, RHS const & rhs) {
 
 template<bounded_integer LHS, bounded_integer RHS>
 constexpr auto operator==(LHS const & lhs, RHS const & rhs) {
-	constexpr auto lhs_min = min_value<LHS>.value();
-	constexpr auto lhs_max = max_value<LHS>.value();
-	constexpr auto rhs_min = min_value<RHS>.value();
-	constexpr auto rhs_max = max_value<RHS>.value();
+	constexpr auto lhs_min = detail::builtin_min_value<LHS>;
+	constexpr auto lhs_max = detail::builtin_max_value<LHS>;
+	constexpr auto rhs_min = detail::builtin_min_value<RHS>;
+	constexpr auto rhs_max = detail::builtin_max_value<RHS>;
 	if constexpr (detail::safe_compare(lhs_min, rhs_max) > 0 or detail::safe_compare(lhs_max, rhs_min) < 0) {
 		return false;
 	} else if constexpr (detail::safe_equal(lhs_min, lhs_max) and detail::safe_equal(rhs_min, rhs_max) and detail::safe_equal(lhs_min, rhs_min)) {
