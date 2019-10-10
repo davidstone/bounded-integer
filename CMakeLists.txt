@@ -346,7 +346,14 @@ target_link_libraries(small_buffer_optimized_vector PUBLIC containers)
 add_executable(flat_map
 	source/containers/flat_map.cpp
 )
+target_compile_definitions(flat_map PRIVATE "USE_FLAT_MAP")
 target_link_libraries(flat_map PUBLIC containers)
+
+add_executable(std_map
+	source/containers/flat_map.cpp
+)
+target_compile_definitions(std_map PRIVATE "USE_SYSTEM_MAP")
+target_link_libraries(std_map PUBLIC containers)
 
 add_executable(vector
 	source/containers/vector.cpp
@@ -609,8 +616,6 @@ elseif("${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU")
 		"-Werror"
 	)
 endif()
-
-target_compile_definitions(flat_map PRIVATE "USE_FLAT_MAP")
 
 set(test_targets
 	bounded_test

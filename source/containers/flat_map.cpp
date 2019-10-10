@@ -232,9 +232,17 @@ using extract_key_t = Extract;
 	template<typename Key, typename Value>
 	using value_type = std::pair<Key, Value>;
 
-	template<typename Pair>
-	constexpr auto const & get_key(Pair const & pair) {
+	constexpr auto const & get_key(auto const & pair) {
 		return pair.first;
+	}
+
+	template<typename Map>
+	auto construct_from_range(auto && range) {
+		return Map(BOUNDED_FORWARD(begin(range)), BOUNDED_FORWARD(end(range)));
+	}
+
+	void insert_range(auto & map, auto && range) {
+		map.insert(BOUNDED_FORWARD(begin(range)), BOUNDED_FORWARD(end(range)));
 	}
 
 #elif defined USE_FLAT_MAP
@@ -244,9 +252,17 @@ using extract_key_t = Extract;
 	template<typename Key, typename Value>
 	using value_type = containers::map_value_type<Key, Value>;
 
-	template<typename Pair>
-	constexpr auto const & get_key(Pair const & pair) {
+	constexpr auto const & get_key(auto const & pair) {
 		return pair.key();
+	}
+
+	template<typename Map>
+	auto construct_from_range(auto && range) {
+		return Map(BOUNDED_FORWARD(range));
+	}
+
+	void insert_range(auto & map, auto && range) {
+		map.insert(BOUNDED_FORWARD(range));
 	}
 
 #else
@@ -309,7 +325,7 @@ void test_performance(std::size_t const loop_count) {
 	auto const start = high_resolution_clock::now();
 
 	TimeDestructor destructor;
-	auto map = map_type<Thing<key_size>, Thing<value_size>, Extract>(source);
+	auto map = construct_from_range<map_type<Thing<key_size>, Thing<value_size>, Extract>>(source);
 	auto const constructed = high_resolution_clock::now();
 	#if defined TRACK_EXTRACTIONS
 		auto const constructed_extractions = number_of_extractions;
@@ -333,7 +349,7 @@ void test_performance(std::size_t const loop_count) {
 		auto ignore = [](auto &&){};
 		ignore(thing);
 	}
-	map.insert(additional_batch);
+	insert_range(map, additional_batch);
 	auto const inserted_batch = high_resolution_clock::now();
 	#if defined TRACK_EXTRACTIONS
 		auto const inserted_batch_extractions = number_of_extractions;
