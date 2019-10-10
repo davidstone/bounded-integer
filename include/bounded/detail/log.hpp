@@ -36,8 +36,7 @@ constexpr auto log(integer<minimum, maximum, overflow_policy> const value, Base 
 	static_assert(value > constant<0>, "The log of a negative number or zero is undefined.");
 	using result_type = integer<
 		detail::log_impl(static_cast<detail::max_unsigned_t>(minimum), static_cast<detail::max_unsigned_t>(max_value<Base>)),
-		detail::log_impl(static_cast<detail::max_unsigned_t>(maximum), static_cast<detail::max_unsigned_t>(min_value<Base>)),
-		overflow_policy
+		detail::log_impl(static_cast<detail::max_unsigned_t>(maximum), static_cast<detail::max_unsigned_t>(min_value<Base>))
 	>;
 	return result_type(detail::log_impl(detail::as_unsigned(value.value()), detail::as_unsigned(base.value())), non_check);
 }
