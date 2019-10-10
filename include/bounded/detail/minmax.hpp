@@ -53,9 +53,8 @@ private:
 	};
 	static constexpr auto minimum = select(constant<lhs_min>, constant<rhs_min>);
 	static constexpr auto maximum = select(constant<lhs_max>, constant<rhs_max>);
-	using policy = detail::common_policy<lhs_policy, rhs_policy>;
 public:
-	using type = integer<minimum, maximum, policy>;
+	using type = integer<minimum, maximum>;
 };
 
 
