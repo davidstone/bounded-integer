@@ -23,6 +23,9 @@ template<typename T>
 inline constexpr auto is_bounded_integer<T volatile> = is_bounded_integer<T>;
 
 template<typename T>
+inline constexpr auto is_bounded_integer<T const volatile> = is_bounded_integer<T>;
+
+template<typename T>
 inline constexpr auto is_bounded_integer<T &> = is_bounded_integer<T>;
 
 template<typename T>
