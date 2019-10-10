@@ -61,15 +61,4 @@ constexpr auto rend(Iterable && container) {
 }
 
 
-
-template<typename Iterable>
-constexpr auto crbegin(Iterable const & container) {
-	return ::containers::reverse_iterator(end(container));
-}
-template<typename Iterable>
-constexpr auto crend(Iterable const & container) {
-	return ::containers::reverse_iterator(begin(container));
-}
-
-
 }	// namespace containers
