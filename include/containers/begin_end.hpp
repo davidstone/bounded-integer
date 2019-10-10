@@ -66,22 +66,10 @@ CONTAINERS_DETAIL_BEGIN_END_OVERLOADS(begin)
 CONTAINERS_DETAIL_BEGIN_END_OVERLOADS(end)
 
 
-template<typename Range>
-constexpr auto cbegin(Range const & container) {
-	return begin(container);
-}
-template<typename Range>
-constexpr auto cend(Range const & container) {
-	return end(container);
-}
-
-
 
 #define CONTAINERS_COMMON_BEGIN_END_USING_DECLARATIONS \
 	using ::containers::detail::common::begin; \
-	using ::containers::detail::common::end; \
-	using ::containers::detail::common::cbegin; \
-	using ::containers::detail::common::cend;
+	using ::containers::detail::common::end;
 
 }	// namespace common
 
