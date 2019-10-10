@@ -7,8 +7,10 @@
 
 #include <containers/algorithms/find.hpp>
 #include <containers/algorithms/negate.hpp>
+#include <containers/algorithms/sort.hpp>
 #include <containers/dynamic_array.hpp>
 
+#include <bounded/assert.hpp>
 #include <bounded/detail/forward.hpp>
 
 #include <functional>
@@ -106,36 +108,35 @@ constexpr auto next_greater(InputIterator const first, Sentinel const last, T co
 }
 
 
-template<typename InputIterator1, typename Sentinel1, typename InputIterator2, typename Sentinel2, typename MutableForwardIterator, typename BinaryPredicate, typename PostFunction>
-constexpr auto unique_merge_common(InputIterator1 first1, Sentinel1 const last1, InputIterator2 first2, Sentinel2 const last2, MutableForwardIterator output, BinaryPredicate less, PostFunction postFunction) {
-	while (first1 != last1 and first2 != last2) {
-		*output = less(*first2, *first1) ? *first2++ : *first1++;
-		first1 = next_greater(first1, last1, *output, less);
-		first2 = next_greater(first2, last2, *output, less);
-		++output;
-	}
-
-	if (first1 != last1) {
-		return unique_copy_less(first1, last1, output, less);
-	} else {
-		return postFunction(first2, last2, output);
-	}
-}
-
 }	// namespace detail
 
 
 template<typename InputIterator1, typename Sentinel1, typename InputIterator2, typename Sentinel2, typename MutableForwardIterator, typename BinaryPredicate = std::less<>>
 constexpr auto unique_merge_copy(InputIterator1 first1, Sentinel1 const last1, InputIterator2 first2, Sentinel2 const last2, MutableForwardIterator output, BinaryPredicate less = BinaryPredicate{}) {
-	auto postFunction = [=](auto const first, auto const last, auto const out) {
-		return unique_copy_less(first, last, out, less);
-	};
-	return ::containers::detail::unique_merge_common(first1, last1, first2, last2, output, less, postFunction);
+	while (first1 != last1 and first2 != last2) {
+		*output = less(*first2, *first1) ? *first2++ : *first1++;
+		first1 = ::containers::detail::next_greater(first1, last1, *output, less);
+		first2 = ::containers::detail::next_greater(first2, last2, *output, less);
+		++output;
+	}
+
+	if (first1 != last1) {
+		return ::containers::unique_copy_less(first1, last1, output, less);
+	} else {
+		return ::containers::unique_copy_less(first2, last2, output, less);
+	}
 }
 
 // Both ranges must be sorted
 template<typename MutableForwardIterator, typename Sentinel, typename BinaryPredicate = std::less<>>
 auto unique_inplace_merge(MutableForwardIterator first, MutableForwardIterator middle, Sentinel const last, BinaryPredicate less = BinaryPredicate{}) {
+	BOUNDED_ASSERT(containers::is_sorted(range_view(first, middle), less));
+	BOUNDED_ASSERT(containers::is_sorted(range_view(middle, last), less));
+	auto less_to_equal = [&](auto const & lhs, auto const & rhs) {
+		return !less(lhs, rhs) and !less(rhs, lhs);
+	};
+	BOUNDED_ASSERT(detail::find_first_equal(first, middle, less_to_equal) == middle);
+
 	if (first == middle or middle == last) {
 		return unique_less(first, last, less);
 	}
@@ -173,7 +174,6 @@ auto unique_inplace_merge(MutableForwardIterator first, MutableForwardIterator m
 		return Result{ before, first };
 	};
 	auto const first_to_move = find_first_to_move();
-	less(*first_to_move.before_target, *first_to_move.before_target);
 	
 	if (first_to_move.target == middle) {
 		return unique_less(first_to_move.before_target, last, less);
@@ -187,15 +187,11 @@ auto unique_inplace_merge(MutableForwardIterator first, MutableForwardIterator m
 	));
 	auto const new_middle = ::containers::detail::next_greater(middle, last, *first_to_move.before_target, less);
 
-	auto postFunction = [=](auto const first_, auto const last_, auto) {
-		return unique_less(first_.base(), last_.base(), less);
-	};
-	return ::containers::detail::unique_merge_common(
+	return ::containers::unique_merge_copy(
 		::containers::move_iterator(begin(temp)), ::containers::move_iterator(end(temp)),
 		::containers::move_iterator(new_middle), ::containers::move_iterator(last),
 		first_to_move.target,
-		less,
-		postFunction
+		less
 	);
 }
 
