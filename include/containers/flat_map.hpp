@@ -349,7 +349,7 @@ public:
 		auto const midpoint = begin(m_container) + original_size;
 
 		ska_sort(midpoint, end(m_container), extract_key());
-		if (allow_duplicates) {
+		if constexpr (allow_duplicates) {
 			std::inplace_merge(
 				make_legacy_iterator(begin(m_container)),
 				make_legacy_iterator(midpoint),
