@@ -8,6 +8,7 @@
 #include <bounded/detail/forward_declaration.hpp>
 #include <bounded/detail/int128.hpp>
 #include <bounded/detail/max_builtin.hpp>
+#include <bounded/detail/policy/null_policy.hpp>
 
 #include <limits>
 #include <type_traits>
@@ -67,10 +68,10 @@ inline constexpr auto min_value<detail::int128_t> = -max_value<detail::int128_t>
 #endif
 
 template<auto minimum, auto maximum, typename overflow_policy>
-inline constexpr auto max_value<integer<minimum, maximum, overflow_policy>> = integer<maximum, maximum, overflow_policy>();
+inline constexpr auto max_value<integer<minimum, maximum, overflow_policy>> = integer<maximum, maximum, null_policy>();
 
 template<auto minimum, auto maximum, typename overflow_policy>
-inline constexpr auto min_value<integer<minimum, maximum, overflow_policy>> = integer<minimum, minimum, overflow_policy>();
+inline constexpr auto min_value<integer<minimum, maximum, overflow_policy>> = integer<minimum, minimum, null_policy>();
 
 template<typename T, T value>
 inline constexpr auto max_value<std::integral_constant<T, value>> = value;
