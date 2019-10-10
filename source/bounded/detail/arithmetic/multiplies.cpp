@@ -52,7 +52,11 @@ static_assert(homogeneous_equals(
 ));
 static_assert(homogeneous_equals(
 	bounded::checked_integer<1, 10>(9, bounded::non_check) * bounded::checked_integer<-3, 11>(4, bounded::non_check),
-	bounded::checked_integer<-30, 110>(36, bounded::non_check)
+	bounded::integer<-30, 110>(36, bounded::non_check)
+));
+static_assert(homogeneous_equals(
+	bounded::checked_integer<1, 10>(9, bounded::non_check) * bounded::clamped_integer<-3, 11>(4, bounded::non_check),
+	bounded::integer<-30, 110>(36, bounded::non_check)
 ));
 
 }	// namespace

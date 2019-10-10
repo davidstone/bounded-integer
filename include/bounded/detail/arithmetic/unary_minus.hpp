@@ -10,8 +10,6 @@
 #include <bounded/detail/min_max_value.hpp>
 #include <bounded/detail/modulo_cast.hpp>
 
-#include <limits>
-
 namespace bounded {
 namespace detail {
 

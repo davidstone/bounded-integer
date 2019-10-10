@@ -40,8 +40,7 @@ constexpr auto operator_overload(
 	);
 	using result_t = integer<
 		normalize<range.min>,
-		normalize<range.max>,
-		common_policy<lhs_policy, rhs_policy>
+		normalize<range.max>
 	>;
 	using common_t = typename std::common_type_t<result_t, std::decay_t<decltype(lhs)>, std::decay_t<decltype(rhs)>>::underlying_type;
 	// It is safe to use the non_check constructor because we already know that
