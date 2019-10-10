@@ -216,14 +216,21 @@ struct SubKey<T> {
 	using next = SubKey<void>;
 };
 
-constexpr auto extract_key_to_compare = [](auto extract_key) {
-	return [extract_key = std::move(extract_key)](auto const & lhs, auto const & rhs) {
-		return extract_key(lhs) < extract_key(rhs);
-	};
-};
-
 template<typename ExtractKey>
-using extract_key_to_compare_t = decltype(extract_key_to_compare(std::declval<ExtractKey>()));
+struct extract_key_to_compare {
+	extract_key_to_compare() = default;
+	explicit constexpr extract_key_to_compare(ExtractKey extract_key):
+		m_extract_key(std::move(extract_key))
+	{
+	}
+
+	constexpr auto operator()(auto const & lhs, auto const & rhs) const {
+		return m_extract_key(lhs) < m_extract_key(rhs);
+	}
+
+private:
+	[[no_unique_address]] ExtractKey m_extract_key;
+};
 
 template<typename It, typename ExtractKey>
 constexpr void StdSortFallback(It begin, It end, ExtractKey extract_key) {
