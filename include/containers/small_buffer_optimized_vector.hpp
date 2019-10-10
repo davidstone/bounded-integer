@@ -186,7 +186,7 @@ struct sbo_vector_base {
 		deallocate_large();
 		if (other.is_small()) {
 			::bounded::construct(m_small);
-			containers::uninitialized_move_destroy(begin(other), end(other), m_small.data());
+			containers::uninitialized_move_destroy(other, m_small.data());
 			m_small.set_size(other.m_small.size());
 			other.m_small.set_size(0_bi);
 		} else {
@@ -245,7 +245,7 @@ struct sbo_vector_base {
 			relocate_to_small();
 		} else {
 			auto temp = make_storage(requested_capacity);
-			containers::uninitialized_move_destroy(begin(*this), end(*this), data(temp));
+			containers::uninitialized_move_destroy(*this, data(temp));
 			relocate_preallocated(std::move(temp));
 		}
 	}

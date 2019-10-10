@@ -84,7 +84,7 @@ constexpr auto concatenate(Ranges && ... ranges) {
 	if (reusable.ptr) {
 		auto & ref = *reusable.ptr;
 		auto const new_begin = data(ref) + reusable.before_size;
-		::containers::uninitialized_move_destroy(containers::rbegin(ref), containers::rend(ref), containers::reverse_iterator(new_begin + size(ref)));
+		::containers::uninitialized_move_destroy(containers::reversed(ref), containers::reverse_iterator(new_begin + size(ref)));
 		ref.append_from_capacity(reusable.before_size);
 		::containers::detail::concatenate_prepend_append(ref, begin(ref), BOUNDED_FORWARD(ranges)...);
 		return std::move(ref);

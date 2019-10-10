@@ -97,16 +97,20 @@ constexpr auto uninitialized_move_destroy(InputIterator const first, sentinel_fo
 	);
 }
 
+constexpr auto uninitialized_move_destroy(range auto && source, iterator auto out) {
+	return ::containers::uninitialized_move_destroy(
+		begin(BOUNDED_FORWARD(source)),
+		end(BOUNDED_FORWARD(source)),
+		out
+	);
+}
+
 
 namespace detail {
 
 template<typename Source, typename Destination>
 constexpr auto transfer_all_contents(Source && source, Destination & destination) {
-	::containers::uninitialized_move_destroy(
-		begin(source),
-		end(source),
-		begin(destination)
-	);
+	::containers::uninitialized_move_destroy(BOUNDED_FORWARD(source), begin(destination));
 	source.append_from_capacity(-size(source));
 }
 

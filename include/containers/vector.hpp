@@ -75,8 +75,7 @@ struct vector_base {
 	auto relocate(Size const requested_capacity) {
 		auto temp = make_storage(requested_capacity);
 		containers::uninitialized_move_destroy(
-			begin(*this),
-			end(*this),
+			*this,
 			::containers::detail::static_or_reinterpret_cast<value_type *>(data(temp))
 		);
 		relocate_preallocated(std::move(temp));

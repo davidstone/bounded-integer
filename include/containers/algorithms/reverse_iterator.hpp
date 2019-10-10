@@ -9,6 +9,8 @@
 #include <containers/begin_end.hpp>
 #include <containers/is_iterator.hpp>
 #include <containers/iterator_adapter.hpp>
+#include <containers/adapt.hpp>
+#include <containers/is_range.hpp>
 
 #include <bounded/detail/returns.hpp>
 
@@ -50,15 +52,8 @@ constexpr auto reverse_iterator(BidirectionalIterator it) {
 	return adapt_iterator(it, detail::reverse_traits{});
 }
 
-
-template<typename Iterable>
-constexpr auto rbegin(Iterable && container) {
-	return ::containers::reverse_iterator(end(BOUNDED_FORWARD(container)));
+constexpr auto reversed(range auto && source) {
+	return adapt(source, detail::reverse_traits{});
 }
-template<typename Iterable>
-constexpr auto rend(Iterable && container) {
-	return ::containers::reverse_iterator(begin(BOUNDED_FORWARD(container)));
-}
-
 
 }	// namespace containers
