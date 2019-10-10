@@ -15,7 +15,7 @@ using namespace bounded::literal;
 
 constexpr auto size = 5;
 using array_type = containers::array<int, size>;
-constexpr array_type a = {{}};
+constexpr array_type a = {};
 static_assert(containers::size(a) == size, "Incorrect size.");
 static_assert(a[0_bi] == 0, "Incorrect value.");
 static_assert(at(a, size - 1) == 0, "Incorrect value with at.");
@@ -24,9 +24,12 @@ static_assert(end(a) - begin(a) == size, "Incorrect difference type.");
 static_assert(std::is_standard_layout_v<containers::array<int, 0>>);
 static_assert(std::is_trivial_v<containers::array<int, 0>>);
 static_assert(std::is_empty_v<containers::array<int, 0>>);
-constexpr containers::array<int, 0> empty_array = {{}};
+constexpr containers::array<int, 0> empty_array = {};
 static_assert(begin(empty_array) == end(empty_array), "Empty array.");
-// static_assert(empty_array[0_bi] == 0, "Should not compile.");
+
+template<typename Array>
+concept indexable_by_zero = requires(Array const & array) { array[0_bi]; };
+static_assert(!indexable_by_zero<containers::array<int, 0>>);
 
 constexpr auto array = containers::make_array(0_bi, 3_bi, 2_bi, 3_bi, 5_bi);
 static_assert(containers::count(array, 3_bi) == 2_bi);

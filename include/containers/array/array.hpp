@@ -54,15 +54,8 @@ struct array {
 	value_type m_value[size];
 };
 
-namespace detail {
-
-struct aggregate_initialization {
-};
-
-}	// namespace detail
-
 template<typename T, std::size_t... sizes>
-struct array<T, 0, sizes...> : detail::aggregate_initialization {
+struct array<T, 0, sizes...> {
 	using value_type = typename detail::array_value_type<T, sizes...>::type;
 
 	using size_type = bounded::constant_t<0>;
