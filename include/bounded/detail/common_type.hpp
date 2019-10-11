@@ -12,15 +12,6 @@
 
 #include <type_traits>
 
-namespace bounded {
-namespace detail {
-
-template<typename lhs_policy, typename rhs_policy>
-using common_policy = std::conditional_t<std::is_same_v<lhs_policy, rhs_policy>, lhs_policy, bounded::null_policy>;
-
-}	// namespace detail
-}	// namespace bounded
-
 namespace std {
 
 // I do not have to specialize the single-argument version, as it just returns
@@ -38,11 +29,7 @@ private:
 	static inline constexpr auto minimum = bounded::detail::normalize<bounded::detail::safe_min(lhs_min, rhs_min)>;
 	static inline constexpr auto maximum = bounded::detail::normalize<bounded::detail::safe_max(lhs_max, rhs_max)>;
 public:
-	using type = bounded::integer<
-		minimum,
-		maximum,
-		bounded::detail::common_policy<lhs_policy, rhs_policy>
-	>;
+	using type = bounded::integer<minimum, maximum, bounded::null_policy>;
 };
 
 
