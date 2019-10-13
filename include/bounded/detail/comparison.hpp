@@ -29,6 +29,11 @@ constexpr auto compare(LHS const lhs, RHS const rhs) {
 	return lhs <=> rhs;
 }
 
+template<typename Enum> requires(std::is_enum_v<Enum>)
+constexpr auto compare(Enum const lhs, Enum const rhs) {
+	return lhs <=> rhs;
+}
+
 template<detail_builtin_integer LHS, detail_builtin_integer RHS>
 constexpr auto compare(LHS const lhs, RHS const rhs) -> std::strong_ordering {
 	if constexpr (detail_signed_builtin<LHS> == detail_signed_builtin<RHS>) {
@@ -42,12 +47,6 @@ constexpr auto compare(LHS const lhs, RHS const rhs) -> std::strong_ordering {
 		static_assert(std::is_same_v<LHS, detail::max_unsigned_t>);
 		return rhs < 0 ? std::strong_ordering::greater : lhs <=> static_cast<LHS>(rhs);
 	}
-}
-
-template<typename Enum> requires(std::is_enum_v<Enum>)
-constexpr auto compare(Enum const lhs, Enum const rhs) {
-	using underlying = std::underlying_type_t<Enum>;
-	return static_cast<underlying>(lhs) <=> static_cast<underlying>(rhs);
 }
 
 namespace detail {
