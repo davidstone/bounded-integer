@@ -26,9 +26,9 @@ constexpr auto lexicographical_compare_3way(InputIterator1 first1, sentinel_for<
 		}
 	}
 	return
-		(first1 != last1) ? bounded::strong_ordering::greater :
-		(first2 != last2) ? bounded::strong_ordering::less :
-		bounded::strong_ordering::equal;
+		(first1 != last1) ? std::strong_ordering::greater :
+		(first2 != last2) ? std::strong_ordering::less :
+		std::strong_ordering::equal;
 }
 
 template<range Range1, range Range2>
@@ -55,7 +55,7 @@ constexpr auto lexicographical_compare_3way(InputIterator1 first1, sentinel_for<
 			return result;
 		}
 	}
-	return bounded::strong_ordering::equal;
+	return std::strong_ordering::equal;
 }
 
 template<iterator InputIterator1>

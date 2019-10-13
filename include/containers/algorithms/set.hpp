@@ -20,14 +20,14 @@ namespace detail {
 constexpr auto less_to_compare = [](auto const & cmp) {
 	return [&](auto const & lhs, auto const & rhs) {
 		using result_t = decltype(cmp(lhs, rhs));
-		if constexpr (std::is_convertible_v<result_t, bounded::strong_ordering>) {
+		if constexpr (std::is_convertible_v<result_t, std::strong_ordering>) {
 			return cmp(lhs, rhs);
 		} else {
 			static_assert(std::is_constructible_v<bool, result_t>);
 			return
-				cmp(lhs, rhs) ? bounded::strong_ordering::less :
-				cmp(rhs, lhs) ? bounded::strong_ordering::greater :
-				bounded::strong_ordering::equal;
+				cmp(lhs, rhs) ? std::strong_ordering::less :
+				cmp(rhs, lhs) ? std::strong_ordering::greater :
+				std::strong_ordering::equal;
 		}
 	};
 };

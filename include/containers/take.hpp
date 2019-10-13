@@ -74,11 +74,11 @@ struct counted_iterator : detail::operator_arrow<counted_iterator<Iterator, Coun
 	}
 	template<typename Sentinel>
 	friend constexpr auto compare(counted_iterator const & lhs, counted_sentinel<Sentinel> const & rhs) {
-		return lhs == rhs ? bounded::strong_ordering::equal : bounded::strong_ordering::less;
+		return lhs == rhs ? std::strong_ordering::equal : std::strong_ordering::less;
 	}
 	template<typename Sentinel>
 	friend constexpr auto compare(counted_sentinel<Sentinel> const & lhs, counted_iterator const & rhs) {
-		return lhs == rhs ? bounded::strong_ordering::equal : bounded::strong_ordering::greater;
+		return lhs == rhs ? std::strong_ordering::equal : std::strong_ordering::greater;
 	}
 
 	// TODO: Properly constrain this function

@@ -234,7 +234,7 @@ public:
 	}
 
 	friend constexpr auto compare(concatenate_view_iterator const lhs, concatenate_view_sentinel const rhs) {
-		return lhs == rhs ? bounded::strong_ordering::equal : bounded::strong_ordering::less;
+		return lhs == rhs ? std::strong_ordering::equal : std::strong_ordering::less;
 	}
 
 

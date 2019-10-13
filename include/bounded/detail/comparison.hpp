@@ -9,75 +9,19 @@
 #include <bounded/detail/max_builtin.hpp>
 #include <bounded/detail/min_max_value.hpp>
 
+#include <compare>
 #include <cstddef>
 #include <type_traits>
 
 namespace bounded {
-
-struct strong_ordering {
-	static strong_ordering const equal;
-	static strong_ordering const greater;
-	static strong_ordering const less;
-	
-	friend constexpr auto operator==(strong_ordering const lhs, std::nullptr_t) noexcept {
-		return lhs.value == 0;
-	}
-	friend constexpr auto operator!=(strong_ordering const lhs, std::nullptr_t) noexcept {
-		return lhs.value != 0;
-	}
-	friend constexpr auto operator<(strong_ordering const lhs, std::nullptr_t) noexcept {
-		return lhs.value < 0;
-	}
-	friend constexpr auto operator>(strong_ordering const lhs, std::nullptr_t) noexcept {
-		return lhs.value > 0;
-	}
-	friend constexpr auto operator<=(strong_ordering const lhs, std::nullptr_t) noexcept {
-		return lhs.value <= 0;
-	}
-	friend constexpr auto operator>=(strong_ordering const lhs, std::nullptr_t) noexcept {
-		return lhs.value >= 0;
-	}
-	
-	friend constexpr auto operator==(std::nullptr_t, strong_ordering const rhs) noexcept {
-		return 0 == rhs.value;
-	}
-	friend constexpr auto operator!=(std::nullptr_t, strong_ordering const rhs) noexcept {
-		return 0 != rhs.value;
-	}
-	friend constexpr auto operator<(std::nullptr_t, strong_ordering const rhs) noexcept {
-		return 0 < rhs.value;
-	}
-	friend constexpr auto operator>(std::nullptr_t, strong_ordering const rhs) noexcept {
-		return 0 > rhs.value;
-	}
-	friend constexpr auto operator<=(std::nullptr_t, strong_ordering const rhs) noexcept {
-		return 0 <= rhs.value;
-	}
-	friend constexpr auto operator>=(std::nullptr_t, strong_ordering const rhs) noexcept {
-		return 0 >= rhs.value;
-	}
-	
-private:
-	constexpr explicit strong_ordering(int value_):
-		value(value_)
-	{
-	}
-
-	int value;
-};
-
-constexpr inline strong_ordering strong_ordering::equal(0);
-constexpr inline strong_ordering strong_ordering::greater(1);
-constexpr inline strong_ordering strong_ordering::less(-1);
-
 namespace detail {
 
 template<typename LHS, typename RHS>
 constexpr auto builtin_compare(LHS const lhs, RHS const rhs) {
 	return
-		lhs < rhs ? strong_ordering::less :
-		lhs > rhs ? strong_ordering::greater :
-		strong_ordering::equal;
+		lhs < rhs ? std::strong_ordering::less :
+		lhs > rhs ? std::strong_ordering::greater :
+		std::strong_ordering::equal;
 }
 
 } // namespace detail
@@ -97,17 +41,17 @@ constexpr auto compare(LHS const lhs, RHS const rhs) {
 }
 
 template<detail_builtin_integer LHS, detail_builtin_integer RHS>
-constexpr auto compare(LHS const lhs, RHS const rhs) -> strong_ordering {
+constexpr auto compare(LHS const lhs, RHS const rhs) -> std::strong_ordering {
 	if constexpr (detail_signed_builtin<LHS> == detail_signed_builtin<RHS>) {
 		return detail::builtin_compare(lhs, rhs);
 	} else if constexpr (not std::is_same_v<LHS, detail::max_unsigned_t> and not std::is_same_v<RHS, detail::max_unsigned_t>) {
 		return detail::builtin_compare(static_cast<detail::max_signed_t>(lhs), static_cast<detail::max_signed_t>(rhs));
 	} else if constexpr (detail_signed_builtin<LHS>) {
 		static_assert(std::is_same_v<RHS, detail::max_unsigned_t>);
-		return lhs < 0 ? strong_ordering::less : detail::builtin_compare(static_cast<RHS>(lhs), rhs);
+		return lhs < 0 ? std::strong_ordering::less : detail::builtin_compare(static_cast<RHS>(lhs), rhs);
 	} else {
 		static_assert(std::is_same_v<LHS, detail::max_unsigned_t>);
-		return rhs < 0 ? strong_ordering::greater : detail::builtin_compare(lhs, static_cast<LHS>(rhs));
+		return rhs < 0 ? std::strong_ordering::greater : detail::builtin_compare(lhs, static_cast<LHS>(rhs));
 	}
 }
 
@@ -178,11 +122,11 @@ constexpr auto compare(LHS const & lhs, RHS const & rhs) {
 	constexpr auto rhs_min = min_value<RHS>.value();
 	constexpr auto rhs_max = max_value<RHS>.value();
 	if constexpr (compare(lhs_min, rhs_max) > 0) {
-		return strong_ordering::greater;
+		return std::strong_ordering::greater;
 	} else if constexpr (compare(lhs_max, rhs_min) < 0) {
-		return strong_ordering::less;
+		return std::strong_ordering::less;
 	} else if constexpr (compare(lhs_min, lhs_max) == 0 and compare(rhs_min, rhs_max) == 0 and compare(lhs_min, rhs_min) == 0) {
-		return strong_ordering::equal;
+		return std::strong_ordering::equal;
 	} else {
 		return compare(lhs.value(), rhs.value());
 	}

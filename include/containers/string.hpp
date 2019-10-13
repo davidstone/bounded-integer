@@ -84,7 +84,7 @@ struct c_string_sentinel_t {
 
 template<typename CharT>
 constexpr auto compare(CharT const * lhs, c_string_sentinel_t<CharT>) {
-	return *lhs == '\0' ? bounded::strong_ordering::equal : bounded::strong_ordering::less;
+	return *lhs == '\0' ? std::strong_ordering::equal : std::strong_ordering::less;
 }
 
 template<typename CharT>
