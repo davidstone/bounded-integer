@@ -14,51 +14,40 @@
 #include <type_traits>
 
 namespace bounded {
-namespace detail {
-
-template<typename LHS, typename RHS>
-constexpr auto builtin_compare(LHS const lhs, RHS const rhs) {
-	return
-		lhs < rhs ? std::strong_ordering::less :
-		lhs > rhs ? std::strong_ordering::greater :
-		std::strong_ordering::equal;
-}
-
-} // namespace detail
 
 constexpr auto compare(bool const lhs, bool const rhs) {
-	return detail::builtin_compare(lhs, rhs);
+	return lhs <=> rhs;
 }
 
 template<typename LHS, typename RHS>
 constexpr auto compare(LHS const * const lhs, RHS const * const rhs) {
-	return detail::builtin_compare(lhs, rhs);
+	return lhs <=> rhs;
 }
 
 template<typename LHS, typename RHS> requires(std::is_floating_point_v<LHS> and std::is_floating_point_v<RHS>)
 constexpr auto compare(LHS const lhs, RHS const rhs) {
-	return detail::builtin_compare(lhs, rhs);
+	return lhs <=> rhs;
 }
 
 template<detail_builtin_integer LHS, detail_builtin_integer RHS>
 constexpr auto compare(LHS const lhs, RHS const rhs) -> std::strong_ordering {
 	if constexpr (detail_signed_builtin<LHS> == detail_signed_builtin<RHS>) {
-		return detail::builtin_compare(lhs, rhs);
+		return lhs <=> rhs;
 	} else if constexpr (not std::is_same_v<LHS, detail::max_unsigned_t> and not std::is_same_v<RHS, detail::max_unsigned_t>) {
-		return detail::builtin_compare(static_cast<detail::max_signed_t>(lhs), static_cast<detail::max_signed_t>(rhs));
+		return static_cast<detail::max_signed_t>(lhs) <=> static_cast<detail::max_signed_t>(rhs);
 	} else if constexpr (detail_signed_builtin<LHS>) {
 		static_assert(std::is_same_v<RHS, detail::max_unsigned_t>);
-		return lhs < 0 ? std::strong_ordering::less : detail::builtin_compare(static_cast<RHS>(lhs), rhs);
+		return lhs < 0 ? std::strong_ordering::less : static_cast<RHS>(lhs) <=> rhs;
 	} else {
 		static_assert(std::is_same_v<LHS, detail::max_unsigned_t>);
-		return rhs < 0 ? std::strong_ordering::greater : detail::builtin_compare(lhs, static_cast<LHS>(rhs));
+		return rhs < 0 ? std::strong_ordering::greater : lhs <=> static_cast<LHS>(rhs);
 	}
 }
 
 template<typename Enum> requires(std::is_enum_v<Enum>)
 constexpr auto compare(Enum const lhs, Enum const rhs) {
 	using underlying = std::underlying_type_t<Enum>;
-	return detail::builtin_compare(static_cast<underlying>(lhs), static_cast<underlying>(rhs));
+	return static_cast<underlying>(lhs) <=> static_cast<underlying>(rhs);
 }
 
 namespace detail {
