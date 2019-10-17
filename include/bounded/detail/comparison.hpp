@@ -63,7 +63,7 @@ constexpr auto safe_equal(LHS const lhs, RHS const rhs) -> bool {
 		return lhs >= 0 and static_cast<RHS>(lhs) == rhs;
 	} else {
 		static_assert(std::is_same_v<LHS, detail::max_unsigned_t>);
-		return rhs >= 0 and static_cast<LHS>(rhs);
+		return rhs >= 0 and lhs == static_cast<LHS>(rhs);
 	}
 }
 
