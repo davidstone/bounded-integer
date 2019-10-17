@@ -90,12 +90,12 @@ public:
 	}
 	
 	
-	friend constexpr auto compare(CheckedMover const & lhs, CheckedMover const & rhs) {
+	friend constexpr auto operator<=>(CheckedMover const & lhs, CheckedMover const & rhs) {
 		BOUNDED_TEST(!lhs.m_moved);
 		BOUNDED_TEST(!rhs.m_moved);
 		BOUNDED_TEST(!lhs.m_destructed);
 		BOUNDED_TEST(!rhs.m_destructed);
-		return bounded::compare(lhs.m_value, rhs.m_value);
+		return lhs.m_value <=> rhs.m_value;
 	}
 	friend constexpr auto operator==(CheckedMover const & lhs, CheckedMover const & rhs) {
 		BOUNDED_TEST(!lhs.m_moved);

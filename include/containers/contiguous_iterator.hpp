@@ -55,8 +55,8 @@ private:
 template<typename T, typename U, std::ptrdiff_t max_difference> requires(
 	std::is_same_v<std::remove_const_t<T>, std::remove_const_t<U>>
 )
-constexpr auto compare(contiguous_iterator<T, max_difference> const lhs, contiguous_iterator<U, max_difference> const rhs) {
-	return bounded::compare(pointer_from(lhs), pointer_from(rhs));
+constexpr auto operator<=>(contiguous_iterator<T, max_difference> const lhs, contiguous_iterator<U, max_difference> const rhs) {
+	return pointer_from(lhs) <=> pointer_from(rhs);
 }
 
 template<typename T, typename U, std::ptrdiff_t max_difference> requires(

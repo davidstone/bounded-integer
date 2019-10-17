@@ -62,8 +62,8 @@ public:
 
 // These functions just become defaulted <=> and == in C++20.
 template<typename Key, typename Mapped>
-constexpr auto compare(map_value_type<Key, Mapped> const & lhs, map_value_type<Key, Mapped> const & rhs) {
-	return compare(lhs.m_data, rhs.m_data);
+constexpr auto operator<=>(map_value_type<Key, Mapped> const & lhs, map_value_type<Key, Mapped> const & rhs) {
+	return lhs.m_data <=> rhs.m_data;
 }
 
 template<typename Key, typename Mapped>

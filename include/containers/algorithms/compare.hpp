@@ -113,7 +113,7 @@ namespace detail {
 namespace common {
 
 template<range T>
-constexpr auto compare(T const & lhs, T const & rhs) {
+constexpr auto operator<=>(T const & lhs, T const & rhs) {
 	return ::containers::lexicographical_compare_3way(
 		begin(std::as_const(lhs)), end(std::as_const(lhs)),
 		begin(std::as_const(rhs)), end(std::as_const(rhs))
@@ -130,12 +130,12 @@ constexpr auto operator==(T const & lhs, T const & rhs) {
 
 }	// namespace common
 
-using ::containers::detail::common::compare;
+using ::containers::detail::common::operator<=>;
 using ::containers::detail::common::operator==;
 
 }	// namespace detail
 
-using ::containers::detail::common::compare;
+using ::containers::detail::common::operator<=>;
 using ::containers::detail::common::operator==;
 
 }	// namespace containers

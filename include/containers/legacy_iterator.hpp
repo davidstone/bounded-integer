@@ -59,8 +59,8 @@ constexpr auto operator-(legacy_iterator<Iterator> const lhs, legacy_iterator<It
 }
 
 template<typename Iterator>
-constexpr auto compare(legacy_iterator<Iterator> const lhs, legacy_iterator<Iterator> const rhs) {
-	return compare(lhs.base(), rhs.base());
+constexpr auto operator<=>(legacy_iterator<Iterator> const lhs, legacy_iterator<Iterator> const rhs) {
+	return lhs.base() <=> rhs.base();
 }
 
 template<typename Iterator>

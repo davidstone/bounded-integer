@@ -225,15 +225,15 @@ public:
 
 
 	template<typename... RHSRanges>
-	friend constexpr auto compare(
+	friend constexpr auto operator<=>(
 		concatenate_view_iterator const lhs,
 		concatenate_view_iterator<RHSRanges...> const rhs
 	) {
 		::containers::detail::assert_same_ends(lhs.m_range_views, rhs.m_range_views);
-		return compare(lhs.begin_iterators(), rhs.begin_iterators());
+		return lhs.begin_iterators() <=> rhs.begin_iterators();
 	}
 
-	friend constexpr auto compare(concatenate_view_iterator const lhs, concatenate_view_sentinel const rhs) {
+	friend constexpr auto operator<=>(concatenate_view_iterator const lhs, concatenate_view_sentinel const rhs) {
 		return lhs == rhs ? std::strong_ordering::equal : std::strong_ordering::less;
 	}
 
@@ -264,8 +264,8 @@ constexpr auto operator-(concatenate_view_iterator<Ranges...> const lhs, concate
 
 
 template<typename... Ranges> requires bounded::ordered<concatenate_view_iterator<Ranges...>, concatenate_view_sentinel>
-constexpr auto compare(concatenate_view_sentinel const lhs, concatenate_view_iterator<Ranges...> const rhs) {
-	return compare(0, compare(rhs, lhs));
+constexpr auto operator<=>(concatenate_view_sentinel const lhs, concatenate_view_iterator<Ranges...> const rhs) {
+	return 0 <=> (rhs <=> lhs);
 }
 
 

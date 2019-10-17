@@ -37,7 +37,7 @@ struct reverse_traits {
 
 	template<bounded::ordered RandomAccessIterator>
 	static constexpr auto compare(RandomAccessIterator const lhs, RandomAccessIterator const rhs) {
-		return compare(rhs, lhs);
+		return rhs <=> lhs;
 	}
 	template<typename RandomAccessIterator>
 	static constexpr auto equal(RandomAccessIterator const lhs, RandomAccessIterator const rhs) {

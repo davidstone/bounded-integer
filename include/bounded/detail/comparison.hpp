@@ -16,18 +16,6 @@
 namespace bounded {
 namespace detail {
 
-template<typename LHS, typename RHS>
-concept threeway_comparable = requires(LHS const & lhs, RHS const & rhs) { lhs <=> rhs; };
-
-} // namespace detail
-
-template<typename LHS, typename RHS> requires detail::threeway_comparable<LHS, RHS>
-constexpr auto compare(LHS const & lhs, RHS const & rhs) {
-	return lhs <=> rhs;
-}
-
-namespace detail {
-
 template<detail_builtin_integer LHS, detail_builtin_integer RHS>
 constexpr auto safe_compare(LHS const lhs, RHS const rhs) -> std::strong_ordering {
 	if constexpr (detail_signed_builtin<LHS> == detail_signed_builtin<RHS>) {
@@ -130,18 +118,18 @@ constexpr auto operator==(LHS const & lhs, RHS const & rhs) {
 namespace detail {
 
 template<typename LHS, typename RHS>
-concept member_comparable = requires(LHS const & lhs, RHS const & rhs) { compare(lhs.compare(rhs), 0); };
+concept member_comparable = requires(LHS const & lhs, RHS const & rhs) { lhs.compare(rhs) <=> 0; };
 
 } // namespace detail
 
 template<typename LHS, typename RHS> requires detail::member_comparable<LHS, RHS>
-constexpr auto compare(LHS const & lhs, RHS const & rhs) {
-	return compare(lhs.compare(rhs), 0);
+constexpr auto operator<=>(LHS const & lhs, RHS const & rhs) {
+	return lhs.compare(rhs) <=> 0;
 }
 
 template<typename LHS, typename RHS> requires (detail::member_comparable<RHS, LHS> and !detail::member_comparable<LHS, RHS>)
-constexpr auto compare(LHS const & lhs, RHS const & rhs) {
-	return compare(0, rhs.compare(lhs));
+constexpr auto operator<=>(LHS const & lhs, RHS const & rhs) {
+	return 0 <=> rhs.compare(lhs);
 }
 
 
@@ -149,7 +137,7 @@ template<typename LHS, typename RHS = LHS>
 concept equality_comparable = requires(LHS const & lhs, RHS const & rhs) { lhs == rhs; };
 
 template<typename LHS, typename RHS = LHS>
-concept ordered = requires(LHS const & lhs, RHS const & rhs) { compare(lhs, rhs); };
+concept ordered = requires(LHS const & lhs, RHS const & rhs) { lhs <=> rhs; };
 
 
 template<typename LHS, typename RHS> requires equality_comparable<LHS, RHS>
@@ -159,19 +147,19 @@ constexpr auto operator!=(LHS const & lhs, RHS const & rhs) {
 
 template<typename LHS, typename RHS> requires ordered<LHS, RHS>
 constexpr auto operator<(LHS const & lhs, RHS const & rhs) {
-	return compare(lhs, rhs) < 0;
+	return lhs <=> rhs < 0;
 }
 template<typename LHS, typename RHS> requires ordered<LHS, RHS>
 constexpr auto operator>(LHS const & lhs, RHS const & rhs) {
-	return compare(lhs, rhs) > 0;
+	return lhs <=> rhs > 0;
 }
 template<typename LHS, typename RHS> requires ordered<LHS, RHS>
 constexpr auto operator<=(LHS const & lhs, RHS const & rhs) {
-	return compare(lhs, rhs) <= 0;
+	return lhs <=> rhs <= 0;
 }
 template<typename LHS, typename RHS> requires ordered<LHS, RHS>
 constexpr auto operator>=(LHS const & lhs, RHS const & rhs) {
-	return compare(lhs, rhs) >= 0;
+	return lhs <=> rhs >= 0;
 }
 
 #define BOUNDED_COMPARISON \

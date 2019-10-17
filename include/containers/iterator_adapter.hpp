@@ -40,20 +40,11 @@ struct default_subtract {
 	)
 };
 
-namespace detail {
-
-template<typename LHS, typename RHS>
-constexpr auto compare_impl(LHS const & lhs, RHS const & rhs) {
-	using bounded::compare;
-	return compare(lhs, rhs);
-}
-
-} // namespace detail
-
 struct default_compare {
 	template<typename LHS, typename RHS> requires bounded::ordered<LHS, RHS>
 	static constexpr auto compare(LHS const & lhs, RHS const & rhs) {
-		return detail::compare_impl(lhs, rhs);
+		using bounded::operator<=>;
+		return lhs <=> rhs;
 	}
 	template<typename LHS, typename RHS> requires bounded::equality_comparable<LHS, RHS>
 	static constexpr auto equal(LHS const & lhs, RHS const & rhs) {
@@ -171,7 +162,7 @@ constexpr auto operator-(adapt_iterator<LHSIterator, Traits> const lhs, adapt_it
 )
 
 template<typename LHSIterator, typename RHSIterator, typename Traits>
-constexpr auto compare(adapt_iterator<LHSIterator, Traits> const lhs, adapt_iterator<RHSIterator, Traits> const rhs) BOUNDED_RETURNS(
+constexpr auto operator<=>(adapt_iterator<LHSIterator, Traits> const lhs, adapt_iterator<RHSIterator, Traits> const rhs) BOUNDED_RETURNS(
 	lhs.traits().compare(lhs.base(), rhs.base())
 )
 

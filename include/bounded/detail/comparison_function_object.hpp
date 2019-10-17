@@ -16,7 +16,7 @@ namespace detail {
 struct compare_to_t {
 	template<typename LHS, typename RHS>
 	constexpr auto operator()(LHS const & lhs, RHS const & rhs) const {
-		return compare(lhs, rhs);
+		return lhs <=> rhs;
 	}
 };
 

@@ -10,12 +10,12 @@
 #include <bounded/detail/is_bounded_integer.hpp>
 
 namespace bounded {
-	
-constexpr auto compare(bounded_integer auto const lhs, detail_builtin_integer auto const rhs) {
-	return compare(lhs, integer(rhs));
+
+constexpr auto operator<=>(bounded_integer auto const lhs, detail_builtin_integer auto const rhs) {
+	return lhs <=> integer(rhs);
 }
-constexpr auto compare(detail_builtin_integer auto const lhs, bounded_integer auto const rhs) {
-	return compare(integer(lhs), rhs);
+constexpr auto operator<=>(detail_builtin_integer auto const lhs, bounded_integer auto const rhs) {
+	return integer(lhs) <=> rhs;
 }
 
 constexpr auto operator==(bounded_integer auto const lhs, detail_builtin_integer auto const rhs) {
@@ -25,8 +25,8 @@ constexpr auto operator==(detail_builtin_integer auto const lhs, bounded_integer
 	return integer(lhs) == rhs;
 }
 
-constexpr auto compare(bounded_integer auto const lhs, bool const rhs) = delete;
-constexpr auto compare(bool const lhs, bounded_integer auto const rhs) = delete;
+constexpr auto operator<=>(bounded_integer auto const lhs, bool const rhs) = delete;
+constexpr auto operator<=>(bool const lhs, bounded_integer auto const rhs) = delete;
 
 constexpr auto operator==(bounded_integer auto const lhs, bool const rhs) = delete;
 constexpr auto operator==(bool const lhs, bounded_integer auto const rhs) = delete;

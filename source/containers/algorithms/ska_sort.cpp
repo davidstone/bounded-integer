@@ -898,9 +898,9 @@ struct move_only {
 		BOUNDED_TEST(!lhs.moved_from and !rhs.moved_from);
 		return lhs.value == rhs.value;
 	}
-	friend constexpr auto compare(move_only const & lhs, move_only const & rhs) {
+	friend constexpr auto operator<=>(move_only const & lhs, move_only const & rhs) {
 		BOUNDED_TEST(!lhs.moved_from and !rhs.moved_from);
-		return bounded::compare(lhs.value, rhs.value);
+		return lhs.value <=> rhs.value;
 	}
 
 	constexpr auto get() const {
@@ -1301,9 +1301,9 @@ struct move_only_with_to_sort_key {
 		BOUNDED_TEST(!lhs.moved_from and !rhs.moved_from);
 		return lhs.value == rhs.value;
 	}
-	friend constexpr auto compare(move_only_with_to_sort_key const & lhs, move_only_with_to_sort_key const & rhs) {
+	friend constexpr auto operator<=>(move_only_with_to_sort_key const & lhs, move_only_with_to_sort_key const & rhs) {
 		BOUNDED_TEST(!lhs.moved_from and !rhs.moved_from);
-		return bounded::compare(lhs.value, rhs.value);
+		return lhs.value <=> rhs.value;
 	}
 
 	friend constexpr auto to_radix_sort_key(move_only_with_to_sort_key const & arg) -> std::conditional_t<by_value, int, int const &> {
@@ -1322,9 +1322,8 @@ struct wrapper {
 	friend constexpr auto operator==(wrapper const & lhs, wrapper const & rhs) {
 		return to_radix_sort_key(lhs.value) == to_radix_sort_key(rhs.value);
 	}
-	friend constexpr auto compare(wrapper const & lhs, wrapper const & rhs) {
-		using bounded::compare;
-		return compare(to_radix_sort_key(lhs.value), to_radix_sort_key(rhs.value));
+	friend constexpr auto operator<=>(wrapper const & lhs, wrapper const & rhs) {
+		return to_radix_sort_key(lhs.value) <=> to_radix_sort_key(rhs.value);
 	}
 };
 

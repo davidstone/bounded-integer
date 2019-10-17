@@ -88,11 +88,11 @@ template<
 	typename LHSForwardIterator1, typename LHSForwardIterator2, typename LHSRange,
 	typename RHSForwardIterator1, typename RHSForwardIterator2, typename RHSRange
 > requires (std::is_same_v<std::remove_const_t<LHSRange>, std::remove_const_t<RHSRange>>)
-constexpr auto compare(
+constexpr auto operator<=>(
 	set_intersection_pair_iterator<LHSForwardIterator1, LHSForwardIterator2, LHSRange> const lhs,
 	set_intersection_pair_iterator<RHSForwardIterator1, RHSForwardIterator2, RHSRange> const rhs
 ) {
-	return compare(lhs.first(), rhs.first());
+	return lhs.first() <=> rhs.first();
 }
 template<
 	typename LHSForwardIterator1, typename LHSForwardIterator2, typename LHSRange,
