@@ -14,28 +14,22 @@
 #include <type_traits>
 
 namespace bounded {
-
-constexpr auto compare(bool const lhs, bool const rhs) {
-	return lhs <=> rhs;
-}
+namespace detail {
 
 template<typename LHS, typename RHS>
-constexpr auto compare(LHS const * const lhs, RHS const * const rhs) {
+concept threeway_comparable = requires(LHS const & lhs, RHS const & rhs) { lhs <=> rhs; };
+
+} // namespace detail
+
+template<typename LHS, typename RHS> requires detail::threeway_comparable<LHS, RHS>
+constexpr auto compare(LHS const & lhs, RHS const & rhs) {
 	return lhs <=> rhs;
 }
 
-template<typename LHS, typename RHS> requires(std::is_floating_point_v<LHS> and std::is_floating_point_v<RHS>)
-constexpr auto compare(LHS const lhs, RHS const rhs) {
-	return lhs <=> rhs;
-}
-
-template<typename Enum> requires(std::is_enum_v<Enum>)
-constexpr auto compare(Enum const lhs, Enum const rhs) {
-	return lhs <=> rhs;
-}
+namespace detail {
 
 template<detail_builtin_integer LHS, detail_builtin_integer RHS>
-constexpr auto compare(LHS const lhs, RHS const rhs) -> std::strong_ordering {
+constexpr auto safe_compare(LHS const lhs, RHS const rhs) -> std::strong_ordering {
 	if constexpr (detail_signed_builtin<LHS> == detail_signed_builtin<RHS>) {
 		return lhs <=> rhs;
 	} else if constexpr (not std::is_same_v<LHS, detail::max_unsigned_t> and not std::is_same_v<RHS, detail::max_unsigned_t>) {
@@ -48,8 +42,6 @@ constexpr auto compare(LHS const lhs, RHS const rhs) -> std::strong_ordering {
 		return rhs < 0 ? std::strong_ordering::greater : lhs <=> static_cast<LHS>(rhs);
 	}
 }
-
-namespace detail {
 
 template<detail_builtin_integer LHS, detail_builtin_integer RHS>
 constexpr auto safe_equal(LHS const lhs, RHS const rhs) -> bool {
@@ -80,7 +72,7 @@ constexpr auto safe_extreme(UnaryFunction const pick_lhs, LHS const lhs_, RHS co
 	auto const lhs = normalized(lhs_);
 	auto const rhs = normalized(rhs_);
 	using result_type = std::conditional_t<std::is_same_v<decltype(lhs), decltype(rhs)>, decltype(lhs), Limited>;
-	return (pick_lhs(compare(lhs, rhs))) ?
+	return (pick_lhs(safe_compare(lhs, rhs))) ?
 		static_cast<result_type>(lhs) :
 		static_cast<result_type>(rhs);
 }
@@ -104,22 +96,21 @@ constexpr auto safe_max(Ts... values) {
 
 
 template<bounded_integer LHS, bounded_integer RHS>
-constexpr auto compare(LHS const & lhs, RHS const & rhs) {
+constexpr auto operator<=>(LHS const & lhs, RHS const & rhs) {
 	constexpr auto lhs_min = min_value<LHS>.value();
 	constexpr auto lhs_max = max_value<LHS>.value();
 	constexpr auto rhs_min = min_value<RHS>.value();
 	constexpr auto rhs_max = max_value<RHS>.value();
-	if constexpr (compare(lhs_min, rhs_max) > 0) {
+	if constexpr (detail::safe_compare(lhs_min, rhs_max) > 0) {
 		return std::strong_ordering::greater;
-	} else if constexpr (compare(lhs_max, rhs_min) < 0) {
+	} else if constexpr (detail::safe_compare(lhs_max, rhs_min) < 0) {
 		return std::strong_ordering::less;
-	} else if constexpr (compare(lhs_min, lhs_max) == 0 and compare(rhs_min, rhs_max) == 0 and compare(lhs_min, rhs_min) == 0) {
+	} else if constexpr (detail::safe_equal(lhs_min, lhs_max) and detail::safe_equal(rhs_min, rhs_max) and detail::safe_equal(lhs_min, rhs_min)) {
 		return std::strong_ordering::equal;
 	} else {
-		return compare(lhs.value(), rhs.value());
+		return detail::safe_compare(lhs.value(), rhs.value());
 	}
 }
-
 
 template<bounded_integer LHS, bounded_integer RHS>
 constexpr auto operator==(LHS const & lhs, RHS const & rhs) {
@@ -127,9 +118,9 @@ constexpr auto operator==(LHS const & lhs, RHS const & rhs) {
 	constexpr auto lhs_max = max_value<LHS>.value();
 	constexpr auto rhs_min = min_value<RHS>.value();
 	constexpr auto rhs_max = max_value<RHS>.value();
-	if constexpr (compare(lhs_min, rhs_max) > 0 or compare(lhs_max, rhs_min) < 0) {
+	if constexpr (detail::safe_compare(lhs_min, rhs_max) > 0 or detail::safe_compare(lhs_max, rhs_min) < 0) {
 		return false;
-	} else if constexpr (compare(lhs_min, lhs_max) == 0 and compare(rhs_min, rhs_max) == 0 and compare(lhs_min, rhs_min) == 0) {
+	} else if constexpr (detail::safe_equal(lhs_min, lhs_max) and detail::safe_equal(rhs_min, rhs_max) and detail::safe_equal(lhs_min, rhs_min)) {
 		return true;
 	} else {
 		return detail::safe_equal(lhs.value(), rhs.value());

@@ -35,7 +35,7 @@ inline constexpr auto builtin_min_value<integer<minimum, maximum, policy>> = min
 
 template<typename T, typename Value>
 constexpr auto value_fits_in_type(Value const value) {
-	return compare(builtin_min_value<T>, value) <= 0 and compare(value, builtin_max_value<T>) <= 0;
+	return safe_compare(builtin_min_value<T>, value) <= 0 and safe_compare(value, builtin_max_value<T>) <= 0;
 }
 
 }	// namespace detail
