@@ -53,7 +53,7 @@ constexpr auto reverse_iterator(BidirectionalIterator it) {
 }
 
 constexpr auto reversed(range auto && source) {
-	return adapt(source, detail::reverse_traits{});
+	return adapt(BOUNDED_FORWARD(source), detail::reverse_traits{});
 }
 
 }	// namespace containers
