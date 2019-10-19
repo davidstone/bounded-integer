@@ -26,8 +26,8 @@ private:
 		decltype(reference_wrapper(std::declval<Traits const &>()))
 	>;
 
-	Range m_range;
-	Traits m_traits;
+	[[no_unique_address]] Range m_range;
+	[[no_unique_address]] Traits m_traits;
 
 public:
 	using iterator = decltype(containers::adapt_iterator(
