@@ -22,17 +22,15 @@ concept random_access_advancable_by = requires(Iterator & it, Offset offset) {
 	it += offset;
 };
 
-template<iterator Iterator, typename Offset>
-constexpr auto advance(Iterator & it, Offset const offset, std::random_access_iterator_tag) {
-	if constexpr (random_access_advancable_by<Iterator, Offset>) {
-		it += offset;
-	} else {
-		it += offset.value();
+}	// namespace detail
+
+constexpr auto advance(forward_iterator auto & it, auto const offset) {
+	using counter = std::common_type_t<decltype(offset), bounded::constant_t<0>>;
+	for (auto n = counter(0_bi); n != offset; ++n) {
+		++it;
 	}
 }
-
-template<iterator Iterator, typename Offset>
-constexpr auto advance(Iterator & it, Offset const offset, std::bidirectional_iterator_tag) {
+constexpr auto advance(bidirectional_iterator auto & it, auto const offset) {
 	using counter = std::common_type_t<decltype(bounded::abs(offset)), bounded::constant_t<0>>;
 	for (auto n = counter(0_bi); n != bounded::abs(offset); ++n) {
 		if (offset >= 0_bi) {
@@ -42,20 +40,12 @@ constexpr auto advance(Iterator & it, Offset const offset, std::bidirectional_it
 		}
 	}
 }
-template<iterator Iterator, typename Offset>
-constexpr auto advance(Iterator & it, Offset const offset, std::input_iterator_tag) {
-	using counter = std::common_type_t<Offset, bounded::constant_t<0>>;
-	for (auto n = counter(0_bi); n != offset; ++n) {
-		++it;
+constexpr auto advance(random_access_iterator auto & it, auto const offset) {
+	if constexpr (detail::random_access_advancable_by<decltype(it), decltype(offset)>) {
+		it += offset;
+	} else {
+		it += offset.value();
 	}
-}
-
-
-}	// namespace detail
-
-template<iterator Iterator, typename Offset>
-constexpr auto advance(Iterator & it, Offset const offset) {
-	return ::containers::detail::advance(it, offset, typename std::iterator_traits<Iterator>::iterator_category{});
 }
 
 namespace detail {
@@ -71,17 +61,22 @@ constexpr auto iterator_one() {
 
 }	// namespace detail
 
-template<iterator Iterator, typename Offset = decltype(::containers::detail::iterator_one<Iterator>())>
-constexpr auto next(Iterator it, Offset const offset = ::containers::detail::iterator_one<Iterator>()) {
+// TODO: propose allowing defaulted auto parameters
+constexpr auto next(iterator auto it, auto const offset) {
 	::containers::advance(it, offset);
 	return it;
 }
+constexpr auto next(iterator auto it) {
+	return ::containers::next(std::move(it), ::containers::detail::iterator_one<decltype(it)>());
+}
 
 
-template<iterator Iterator, typename Offset = decltype(::containers::detail::iterator_one<Iterator>())>
-constexpr auto prev(Iterator it, Offset const offset = ::containers::detail::iterator_one<Iterator>()) {
+constexpr auto prev(iterator auto it, auto const offset) {
 	::containers::advance(it, -offset);
 	return it;
+}
+constexpr auto prev(iterator auto it) {
+	return ::containers::prev(std::move(it), ::containers::detail::iterator_one<decltype(it)>());
 }
 
 }	// namespace containers
