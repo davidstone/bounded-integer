@@ -35,7 +35,7 @@ public:
 		bounded::detail::normalize<bounded::max(bounded::min_value<storage_type>, bounded::max_value<storage_type> - bounded::min_value<Step>).value()>,
 		typename Integer::overflow_policy
 	>;
-	using difference_type = decltype(std::declval<storage_type>() - std::declval<storage_type>());
+	using difference_type = decltype((std::declval<storage_type>() - std::declval<storage_type>()) / std::declval<Step>());
 	using pointer = value_type const *;
 	using reference = value_type;
 	using iterator_category = std::random_access_iterator_tag;
@@ -75,6 +75,12 @@ public:
 template<typename Integer, typename Sentinel, typename Step>
 constexpr auto operator+(typename integer_range_iterator<Integer, Sentinel, Step>::difference_type const lhs, integer_range_iterator<Integer, Sentinel, Step> const rhs) {
 	return rhs + lhs;
+}
+
+template<typename Integer, typename Sentinel, typename Step>
+constexpr auto operator+(integer_range_iterator<Integer, Sentinel, Step> it, bounded::constant_t<1>) requires(bounded::max_value<typename decltype(it)::difference_type> == bounded::constant<0>) {
+	BOUNDED_ASSERT_OR_ASSUME(false);
+	return it;
 }
 
 }	// namespace detail
