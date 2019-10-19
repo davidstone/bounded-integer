@@ -83,6 +83,7 @@ constexpr auto concatenate(Ranges && ... ranges) {
 	(..., (reusable = ::containers::detail::reusable_concatenate_container(reusable, total_size, BOUNDED_FORWARD(ranges))));
 	if (reusable.ptr) {
 		auto & ref = *reusable.ptr;
+		// Use data instead of begin to construct an iterator after `end()`.
 		auto const new_begin = data(ref) + reusable.before_size;
 		::containers::uninitialized_move_destroy(containers::reversed(ref), containers::reverse_iterator(new_begin + size(ref)));
 		ref.append_from_capacity(reusable.before_size);
