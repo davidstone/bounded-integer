@@ -65,16 +65,16 @@ struct default_compare {
 namespace detail {
 
 template<typename Iterator, typename Traits>
-concept random_access_iterator = requires(Iterator it, Traits traits) { traits.subtract(it, it); };
+concept adapted_random_access_iterator = requires(Iterator it, Traits traits) { traits.subtract(it, it); };
 
 template<typename Iterator, typename Traits>
-concept bidirectional_iterator = requires(Iterator it, Traits traits) {
+concept adapted_bidirectional_iterator = requires(Iterator it, Traits traits) {
 	traits.add(it, bounded::constant<1>);
 	traits.add(it, bounded::constant<-1>);
 };
 
 template<typename Iterator, typename Traits>
-concept forward_iterator = requires(Iterator it, Traits traits) { traits.add(it, bounded::constant<1>); };
+concept adapted_forward_iterator = requires(Iterator it, Traits traits) { traits.add(it, bounded::constant<1>); };
 
 // This provides the nested typedefs iterator_category and difference_type if
 // and only if Iterator is an iterator, not a sentinel
@@ -99,9 +99,9 @@ public:
 	using iterator_category =
 		std::conditional_t<std::is_same_v<base_category, std::output_iterator_tag>, std::output_iterator_tag,
 		std::conditional_t<std::is_same_v<base_category, std::input_iterator_tag>, std::input_iterator_tag,
-		std::conditional_t<detail::random_access_iterator<Iterator, Traits>, std::random_access_iterator_tag,
-		std::conditional_t<detail::bidirectional_iterator<Iterator, Traits>, std::bidirectional_iterator_tag,
-		std::conditional_t<detail::forward_iterator<Iterator, Traits>, std::forward_iterator_tag,
+		std::conditional_t<detail::adapted_random_access_iterator<Iterator, Traits>, std::random_access_iterator_tag,
+		std::conditional_t<detail::adapted_bidirectional_iterator<Iterator, Traits>, std::bidirectional_iterator_tag,
+		std::conditional_t<detail::adapted_forward_iterator<Iterator, Traits>, std::forward_iterator_tag,
 		void
 	>>>>>;
 	static_assert(not std::is_void_v<iterator_category>);
