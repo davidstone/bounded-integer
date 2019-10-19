@@ -20,6 +20,14 @@ namespace containers {
 namespace detail {
 
 struct reverse_traits {
+	static constexpr auto get_begin(auto && range) {
+		return end(BOUNDED_FORWARD(range));
+	}
+
+	static constexpr auto get_end(auto && range) {
+		return begin(BOUNDED_FORWARD(range));
+	}
+
 	template<typename BidirectionalIterator>
 	static constexpr auto dereference(BidirectionalIterator it) BOUNDED_RETURNS(
 		*::containers::prev(it)

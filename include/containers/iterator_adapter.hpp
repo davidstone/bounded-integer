@@ -19,6 +19,16 @@
 
 namespace containers {
 
+struct default_begin_end {
+	static constexpr auto get_begin(auto && range) {
+		return begin(BOUNDED_FORWARD(range));
+	}
+
+	static constexpr auto get_end(auto && range) {
+		return end(BOUNDED_FORWARD(range));
+	}
+};
+
 struct default_dereference {
 	template<typename Iterator>
 	static constexpr decltype(auto) dereference(Iterator const & it) {

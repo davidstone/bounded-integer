@@ -25,7 +25,7 @@ using namespace bounded::literal;
 namespace detail {
 
 template<typename Sentinel, typename UnaryPredicate>
-struct filter_iterator_traits : default_dereference, default_compare {
+struct filter_iterator_traits : default_begin_end, default_dereference, default_compare {
 private:
 	[[no_unique_address]] Sentinel m_sentinel;
 	[[no_unique_address]] UnaryPredicate m_predicate;

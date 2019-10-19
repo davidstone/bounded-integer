@@ -31,11 +31,11 @@ private:
 
 public:
 	using iterator = decltype(containers::adapt_iterator(
-		begin(std::declval<Range &>()),
+		containers::unwrap(std::declval<adapt_iterator_traits &>()).get_begin(std::declval<Range &>()),
 		std::declval<adapt_iterator_traits>()
 	));
 	using const_iterator = decltype(containers::adapt_iterator(
-		begin(std::declval<Range const &>()),
+		containers::unwrap(std::declval<adapt_iterator_traits &>()).get_begin(std::declval<Range const &>()),
 		std::declval<adapt_iterator_traits>()
 	));
 	using value_type = decltype(*std::declval<iterator>());
@@ -51,22 +51,40 @@ public:
 	}
 	
 	friend constexpr auto begin(adapt const & adapted) {
-		return containers::adapt_iterator(begin(adapted.m_range), adapt_iterator_traits(adapted.m_traits));
+		return containers::adapt_iterator(
+			containers::unwrap(adapted.m_traits).get_begin(adapted.m_range),
+			adapt_iterator_traits(adapted.m_traits)
+		);
 	}
 	friend constexpr auto begin(adapt & adapted) {
-		return containers::adapt_iterator(begin(adapted.m_range), adapt_iterator_traits(adapted.m_traits));
+		return containers::adapt_iterator(
+			containers::unwrap(adapted.m_traits.get_begin(adapted.m_range)),
+			adapt_iterator_traits(adapted.m_traits)
+		);
 	}
 	friend constexpr auto begin(adapt && adapted) {
-		return containers::adapt_iterator(begin(std::move(adapted).m_range), adapt_iterator_traits(adapted.m_traits));
+		return containers::adapt_iterator(
+			containers::unwrap(adapted.m_traits.get_begin(std::move(adapted).m_range)),
+			adapt_iterator_traits(adapted.m_traits)
+		);
 	}
 	friend constexpr auto end(adapt const & adapted) {
-		return containers::adapt_iterator(end(adapted.m_range), adapt_iterator_traits(adapted.m_traits));
+		return containers::adapt_iterator(
+			containers::unwrap(adapted.m_traits.get_end(adapted.m_range)),
+			adapt_iterator_traits(adapted.m_traits)
+		);
 	}
 	friend constexpr auto end(adapt & adapted) {
-		return containers::adapt_iterator(end(adapted.m_range), adapt_iterator_traits(adapted.m_traits));
+		return containers::adapt_iterator(
+			containers::unwrap(adapted.m_traits.get_end(adapted.m_range)),
+			adapt_iterator_traits(adapted.m_traits)
+		);
 	}
 	friend constexpr auto end(adapt && adapted) {
-		return containers::adapt_iterator(end(std::move(adapted).m_range), adapt_iterator_traits(adapted.m_traits));
+		return containers::adapt_iterator(
+			containers::unwrap(adapted.m_traits.get_end(std::move(adapted).m_range)),
+			adapt_iterator_traits(adapted.m_traits)
+		);
 	}
 	
 	CONTAINERS_OPERATOR_BRACKET_DEFINITIONS(adapt)
