@@ -68,8 +68,12 @@ concept forward_iterator = requires(Iterator it, Traits traits) { traits.add(it,
 
 // This provides the nested typedefs iterator_category and difference_type if
 // and only if Iterator is an iterator, not a sentinel
-template<typename Iterator, typename Traits, bool = iterator<Iterator>>
+template<typename Iterator, typename Traits>
 struct iterator_typedefs_base {
+};
+
+template<typename Iterator, typename Traits> requires iterator<Iterator>
+struct iterator_typedefs_base<Iterator, Traits> {
 private:
 	using base_category = typename std::iterator_traits<Iterator>::iterator_category;
 public:
@@ -91,10 +95,6 @@ public:
 		void
 	>>>>>;
 	static_assert(not std::is_void_v<iterator_category>);
-};
-
-template<typename Iterator, typename Traits>
-struct iterator_typedefs_base<Iterator, Traits, false> {
 };
 
 }	// namespace detail
