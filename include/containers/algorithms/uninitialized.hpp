@@ -24,9 +24,9 @@ namespace detail {
 template<typename Target, typename Source>
 concept static_castable = requires(Source source) { static_cast<Target>(source); };
 
-template<typename Target, typename Source>
-constexpr auto static_or_reinterpret_cast(Source source) {
-	if constexpr (static_castable<Target, Source>) {
+template<typename Target>
+constexpr auto static_or_reinterpret_cast(auto && source) {
+	if constexpr (static_castable<Target, decltype(source)>) {
 		return static_cast<Target>(source);
 	} else {
 		return reinterpret_cast<Target>(source);
@@ -40,16 +40,15 @@ constexpr void destroy_range(InputIterator first, sentinel_for<InputIterator> au
 	}
 }
 
-template<range Range>
-constexpr void destroy_range(Range && range) {
-	::containers::detail::destroy_range(begin(BOUNDED_FORWARD(range)), end(BOUNDED_FORWARD(range)));
+constexpr void destroy_range(range auto && r) {
+	::containers::detail::destroy_range(begin(BOUNDED_FORWARD(r)), end(BOUNDED_FORWARD(r)));
 }
 
 }	// namespace detail
 
 
-template<iterator InputIterator, iterator ForwardIterator>
-constexpr auto uninitialized_copy(InputIterator first, sentinel_for<InputIterator> auto const last, ForwardIterator out) {
+template<iterator InputIterator>
+constexpr auto uninitialized_copy(InputIterator first, sentinel_for<InputIterator> auto const last, iterator auto out) {
 	auto out_first = out;
 	try {
 		for (; first != last; ++first) {
@@ -64,13 +63,13 @@ constexpr auto uninitialized_copy(InputIterator first, sentinel_for<InputIterato
 }
 
 
-template<iterator InputIterator, iterator ForwardIterator>
-constexpr auto uninitialized_move(InputIterator const first, sentinel_for<InputIterator> auto const last, ForwardIterator const out) {
+template<iterator InputIterator>
+constexpr auto uninitialized_move(InputIterator const first, sentinel_for<InputIterator> auto const last, iterator auto const out) {
 	return ::containers::uninitialized_copy(::containers::move_iterator(first), ::containers::move_iterator(last), out);
 }
 
-template<typename BidirectionalInputIterator, typename BidirectionalOutputIterator>
-constexpr auto uninitialized_copy_backward(BidirectionalInputIterator const first, BidirectionalInputIterator const last, BidirectionalOutputIterator const out_last) {
+template<bidirectional_iterator BidirectionalInputIterator>
+constexpr auto uninitialized_copy_backward(BidirectionalInputIterator const first, BidirectionalInputIterator const last, bidirectional_iterator auto const out_last) {
 	return containers::uninitialized_copy(
 		containers::reverse_iterator(last),
 		containers::reverse_iterator(first),
@@ -78,8 +77,8 @@ constexpr auto uninitialized_copy_backward(BidirectionalInputIterator const firs
 	).base();
 }
 
-template<typename BidirectionalInputIterator, typename BidirectionalOutputIterator>
-constexpr auto uninitialized_move_backward(BidirectionalInputIterator const first, BidirectionalInputIterator const last, BidirectionalOutputIterator const out_last) {
+template<bidirectional_iterator BidirectionalInputIterator>
+constexpr auto uninitialized_move_backward(BidirectionalInputIterator const first, BidirectionalInputIterator const last, bidirectional_iterator auto const out_last) {
 	return containers::uninitialized_copy_backward(
 		containers::move_iterator(first),
 		containers::move_iterator(last),
@@ -88,8 +87,8 @@ constexpr auto uninitialized_move_backward(BidirectionalInputIterator const firs
 }
 
 
-template<iterator InputIterator, iterator ForwardIterator>
-constexpr auto uninitialized_move_destroy(InputIterator const first, sentinel_for<InputIterator> auto const last, ForwardIterator out) {
+template<iterator InputIterator>
+constexpr auto uninitialized_move_destroy(InputIterator const first, sentinel_for<InputIterator> auto const last, iterator auto out) {
 	return ::containers::uninitialized_copy(
 		::containers::move_destroy_iterator(first),
 		::containers::move_destroy_iterator(last),
@@ -108,8 +107,7 @@ constexpr auto uninitialized_move_destroy(range auto && source, iterator auto ou
 
 namespace detail {
 
-template<typename Source, typename Destination>
-constexpr auto transfer_all_contents(Source && source, Destination & destination) {
+constexpr auto transfer_all_contents(auto && source, auto & destination) {
 	::containers::uninitialized_move_destroy(BOUNDED_FORWARD(source), begin(destination));
 	source.append_from_capacity(-size(source));
 }

@@ -24,6 +24,7 @@ using namespace bounded::literal;
 
 namespace detail {
 
+// TODO: use a custom begin function
 template<typename Sentinel, typename UnaryPredicate>
 struct filter_iterator_traits : default_begin_end, default_dereference, default_compare {
 private:
@@ -43,8 +44,7 @@ public:
 		return m_predicate;
 	}
 
-	template<typename Iterator>
-	constexpr auto add(Iterator const it, bounded::constant_t<1>) const {
+	constexpr auto add(iterator auto const it, bounded::constant_t<1>) const {
 		BOUNDED_ASSERT(it != m_sentinel);
 		return containers::find_if(containers::next(it), m_sentinel, m_predicate);
 	}
@@ -93,8 +93,7 @@ constexpr auto operator==(filter_iterator_sentinel, adapt_iterator<Iterator, Tra
 	return rhs.traits().equal(rhs.traits().sentinel(), rhs.base());
 }
 
-template<iterator ForwardIterator, is_filter_iterator_traits Traits>
-constexpr auto filter_iterator_impl(ForwardIterator first, Traits traits) {
+constexpr auto filter_iterator_impl(iterator auto first, is_filter_iterator_traits auto traits) {
 	return containers::adapt_iterator(
 		containers::find_if(first, containers::unwrap(traits).sentinel(), containers::unwrap(traits).predicate()),
 		traits
@@ -103,9 +102,9 @@ constexpr auto filter_iterator_impl(ForwardIterator first, Traits traits) {
 
 }	// namespace detail
 
-template<iterator ForwardIterator, typename UnaryPredicate>
-constexpr auto filter_iterator(ForwardIterator first, sentinel_for<ForwardIterator> auto last, UnaryPredicate condition) {
-	return detail::filter_iterator_impl(first, detail::filter_iterator_traits(last, std::move(condition)));
+template<iterator ForwardIterator>
+constexpr auto filter_iterator(ForwardIterator first, sentinel_for<ForwardIterator> auto last, auto predicate) {
+	return detail::filter_iterator_impl(first, detail::filter_iterator_traits(last, std::move(predicate)));
 }
 
 template<typename Range, typename UnaryPredicate>

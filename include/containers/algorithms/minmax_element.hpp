@@ -7,6 +7,7 @@
 
 #include <containers/algorithms/advance.hpp>
 #include <containers/begin_end.hpp>
+#include <containers/is_range.hpp>
 
 #include <bounded/detail/comparison_function_object.hpp>
 #include <bounded/detail/forward.hpp>
@@ -15,10 +16,9 @@ namespace containers {
 
 // TODO: minmax_element
 
-template<typename Range, typename Compare>
-constexpr auto min_element(Range && range, Compare compare) {
-	auto smallest = begin(BOUNDED_FORWARD(range));
-	auto const last = end(BOUNDED_FORWARD(range));
+constexpr auto min_element(range auto && source, auto compare) {
+	auto smallest = begin(BOUNDED_FORWARD(source));
+	auto const last = end(BOUNDED_FORWARD(source));
 	if (smallest == last) {
 		return smallest;
 	}
@@ -30,22 +30,19 @@ constexpr auto min_element(Range && range, Compare compare) {
 	return smallest;
 }
 
-template<typename Range>
-constexpr auto min_element(Range && range) {
-	return containers::min_element(BOUNDED_FORWARD(range), bounded::less());
+constexpr auto min_element(range auto && source) {
+	return containers::min_element(BOUNDED_FORWARD(source), bounded::less());
 }
 
-template<typename Range, typename Compare>
-constexpr auto max_element(Range && range, Compare greater) {
+constexpr auto max_element(range auto && source, auto greater) {
 	auto compare = [cmp = std::move(greater)](auto const & lhs, auto const & rhs) {
 		return !(cmp(rhs, lhs));
 	};
-	return containers::min_element(BOUNDED_FORWARD(range), std::move(compare));
+	return containers::min_element(BOUNDED_FORWARD(source), std::move(compare));
 }
 
-template<typename Range>
-constexpr auto max_element(Range && range) {
-	return containers::max_element(BOUNDED_FORWARD(range), bounded::greater());
+constexpr auto max_element(range auto && source) {
+	return containers::max_element(BOUNDED_FORWARD(source), bounded::greater());
 }
 
 }	// namespace containers

@@ -27,18 +27,12 @@ inline constexpr auto is_reference_wrapper<reference_wrapper<T>> = true;
 template<typename T>
 inline constexpr auto is_reference_wrapper<std::reference_wrapper<T>> = true;
 
-template<typename T, bool should_derive = std::is_class_v<T> and !std::is_final_v<T> and std::is_empty_v<T>>
-struct function_wrapper;
+// TODO: try having a conversion operator for function pointers?
+template<typename Function>
+struct function_wrapper {
+	Function function;
 
-template<typename F>
-struct function_wrapper<F, true> : F {
-	using F::operator();
-};
-
-template<typename F>
-struct function_wrapper<F, false> {
-	F function;
-
+	// TODO: Use terse syntax when clang doesn't crash
 	template<typename... Args>
 	constexpr auto operator()(Args && ... args) const BOUNDED_RETURNS(
 		  function(BOUNDED_FORWARD(args)...)
@@ -46,29 +40,34 @@ struct function_wrapper<F, false> {
 };
 
 template<typename Result, typename Type>
-struct function_wrapper<Result Type::*, false> {
+struct function_wrapper<Result Type::*> {
 	Result Type::* function;
 
-	template<typename T1, typename... Args>
-	constexpr auto operator()(T1 && t1, Args && ... args) const {
-		if constexpr (is_reference_wrapper<std::decay_t<T1>>) {
-			return operator()(function, t1.get(), BOUNDED_FORWARD(args)...);
+	constexpr auto operator()(auto && object, auto && ... args) const {
+		using Object = std::decay_t<decltype(object)>;
+		if constexpr (is_reference_wrapper<Object>) {
+			return operator()(function, object.get(), BOUNDED_FORWARD(args)...);
 		} else if constexpr (std::is_member_function_pointer_v<decltype(function)>) {
-			if constexpr (std::is_base_of_v<Type, std::decay_t<T1>>) {
-				return (BOUNDED_FORWARD(t1).*function)(BOUNDED_FORWARD(args)...);
+			if constexpr (std::is_base_of_v<Type, Object>) {
+				return (BOUNDED_FORWARD(object).*function)(BOUNDED_FORWARD(args)...);
 			} else {
-				return ((*BOUNDED_FORWARD(t1)).*function)(BOUNDED_FORWARD(args)...);
+				return (BOUNDED_FORWARD(object)->*function)(BOUNDED_FORWARD(args)...);
 			}
 		} else {
 			static_assert(std::is_member_object_pointer_v<decltype(function)>);
 			static_assert(sizeof...(args) == 0);
-			if constexpr (std::is_base_of_v<Type, std::decay_t<T1>>) {
-				return BOUNDED_FORWARD(t1).*function;
+			if constexpr (std::is_base_of_v<Type, Object>) {
+				return BOUNDED_FORWARD(object).*function;
 			} else {
-				return (*BOUNDED_FORWARD(t1)).*function;
+				return BOUNDED_FORWARD(object)->*function;
 			}
 		}
 	}
+};
+
+template<typename Function> requires(std::is_class_v<Function> and !std::is_final_v<Function> and std::is_empty_v<Function>)
+struct function_wrapper<Function> : Function {
+	using Function::operator();
 };
 
 template<typename UnaryFunction>
@@ -79,9 +78,7 @@ struct transform_traits : default_begin_end, default_add, default_subtract, defa
 	{
 	}
 	
-	template<typename Iterator>
-	constexpr auto dereference(Iterator const it) const -> decltype(std::declval<function_wrapper<UnaryFunction> const &>()(*it))
-	{
+	constexpr auto dereference(iterator auto const it) const -> decltype(std::declval<function_wrapper<UnaryFunction> const &>()(*it)) {
 		return static_cast<function_wrapper<UnaryFunction> const &>(*this)(*it);
 	}
 };
@@ -93,22 +90,18 @@ struct transform_traits_dereference : default_add, default_subtract, default_com
 	{
 	}
 	
-	template<typename Iterator>
-	constexpr auto dereference(Iterator const it) const -> decltype(std::declval<function_wrapper<UnaryFunction> const &>()(it))
-	{
+	constexpr auto dereference(iterator auto const it) const -> decltype(std::declval<function_wrapper<UnaryFunction> const &>()(it)) {
 		return static_cast<function_wrapper<UnaryFunction> const &>(*this)(it);
 	}
 };
 
 }	// namespace detail
 
-template<typename Iterator, typename UnaryFunction>
-constexpr auto transform_iterator(Iterator it, UnaryFunction dereference) {
+constexpr auto transform_iterator(iterator auto it, auto dereference) {
 	return adapt_iterator(std::move(it), detail::transform_traits(std::move(dereference)));
 }
 
-template<typename Iterator, typename UnaryFunction>
-constexpr auto transform_iterator_dereference(Iterator it, UnaryFunction dereference) {
+constexpr auto transform_iterator_dereference(iterator auto it, auto dereference) {
 	return adapt_iterator(std::move(it), detail::transform_traits_dereference(std::move(dereference)));
 }
 

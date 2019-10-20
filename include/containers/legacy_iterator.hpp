@@ -40,8 +40,7 @@ struct legacy_iterator : detail::operator_arrow<legacy_iterator<Iterator>> {
 	constexpr auto operator->() const {
 		return std::addressof(operator*());
 	}
-	template<typename Index>
-	constexpr decltype(auto) operator[](Index const index) const {
+	constexpr decltype(auto) operator[](auto const index) const {
 		return base()[static_cast<index_type<Iterator>>(index)];
 	}
 

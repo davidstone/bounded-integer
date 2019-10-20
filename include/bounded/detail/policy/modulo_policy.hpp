@@ -18,9 +18,8 @@ namespace bounded {
 
 struct modulo_policy {
 private:
-	template<typename T, typename Size>
-	static constexpr auto positive_remainder(T const & value, Size const & size) {
-		using result_type = std::common_type_t<T, decltype(value + size)>;
+	static constexpr auto positive_remainder(auto const & value, auto const & size) {
+		using result_type = std::common_type_t<decltype(value), decltype(value + size)>;
 		return (value < constant<0>) ?
 			result_type(value + size, non_check) :
 			result_type(value, non_check)
@@ -28,10 +27,7 @@ private:
 	}
 
 public:
-	template<typename T, typename Minimum, typename Maximum>
-	static constexpr auto assignment(T const & value, Minimum const & minimum, Maximum const & maximum) {
-		static_assert(bounded_integer<Minimum>, "Only bounded::integer types are supported.");
-		static_assert(bounded_integer<Maximum>, "Only bounded::integer types are supported.");
+	static constexpr auto assignment(auto const & value, bounded_integer auto const & minimum, bounded_integer auto const & maximum) {
 		return positive_remainder(
 			(value - minimum) % (maximum - minimum + constant<1>),
 			maximum - minimum + constant<1>

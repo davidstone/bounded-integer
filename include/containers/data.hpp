@@ -15,12 +15,11 @@ namespace containers {
 namespace detail {
 namespace common {
 
-template<range Range>
-constexpr auto data(Range && range) {
-	if constexpr (requires { range.data(); }) {
-		return range.data();
+constexpr auto data(range auto && r) {
+	if constexpr (requires { r.data(); }) {
+		return r.data();
 	} else {
-		return pointer_from(begin(range));
+		return pointer_from(begin(r));
 	}
 }
 

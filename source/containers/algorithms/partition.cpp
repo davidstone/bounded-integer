@@ -31,8 +31,7 @@ static_assert(containers::is_partitioned(containers::array{true, true, false}, p
 static_assert(containers::is_partitioned(containers::array{true, true, true}, predicate));
 
 
-template<typename Range>
-constexpr bool verify_partition(Range && range) {
+constexpr bool verify_partition(auto && range) {
 	auto const it = containers::partition(range, predicate);
 	return containers::is_partitioned(range, predicate) and it == containers::partition_point(range, predicate);
 }

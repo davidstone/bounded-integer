@@ -160,11 +160,10 @@ private:
 	friend iterator;
 	friend const_iterator;
 
-	template<typename Self, typename Iterator1, typename Iterator2>
-	static constexpr auto find_first_matching(Self & range, Iterator1 it1, Iterator2 it2) {
-		auto const last1 = end(range.m_range1);
-		auto const last2 = end(range.m_range2);
-		auto const comp = detail::less_to_compare(range.m_compare);
+	static constexpr auto find_first_matching(auto & self, auto it1, auto it2) {
+		auto const last1 = end(self.m_range1);
+		auto const last2 = end(self.m_range2);
+		auto const comp = detail::less_to_compare(self.m_compare);
 		
 		while (it1 != last1 and it2 != last2) {
 			auto const cmp = comp(*it1, *it2);
@@ -173,10 +172,10 @@ private:
 			} else if (cmp > 0) {
 				++it2;
 			} else {
-				return detail::set_intersection_pair_iterator(range, it1, it2);
+				return detail::set_intersection_pair_iterator(self, it1, it2);
 			}
 		}
-		return detail::set_intersection_pair_iterator(range, last1, last2);
+		return detail::set_intersection_pair_iterator(self, last1, last2);
 	}
 
 	Range1 m_range1;

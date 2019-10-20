@@ -21,18 +21,16 @@ using namespace bounded::literal;
 namespace detail {
 namespace common {
 
-template<range Range, typename Index>
-constexpr decltype(auto) at(Range && range, Index const index) {
-	return BOUNDED_FORWARD(range)[typename index_type<Range>::overflow_policy{}.assignment(
+constexpr decltype(auto) at(range auto && r, auto const index) {
+	return BOUNDED_FORWARD(r)[typename index_type<decltype(r)>::overflow_policy{}.assignment(
 		bounded::integer(index),
 		0_bi,
-		size(range) - 1_bi
+		size(r) - 1_bi
 	)];
 }
 
-template<range Range, typename Index>
-constexpr decltype(auto) at(Range && range, Index const index, bounded::non_check_t) {
-	return BOUNDED_FORWARD(range)[static_cast<index_type<Range>>(index)];
+constexpr decltype(auto) at(range auto && r, auto const index, bounded::non_check_t) {
+	return BOUNDED_FORWARD(r)[static_cast<index_type<decltype(r)>>(index)];
 }
 
 

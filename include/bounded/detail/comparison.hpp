@@ -48,8 +48,8 @@ constexpr auto safe_equal(LHS const lhs, RHS const rhs) -> bool {
 	}
 }
 
-template<typename Limited, typename UnaryFunction, typename LHS, typename RHS>
-constexpr auto safe_extreme(UnaryFunction const pick_lhs, LHS const lhs_, RHS const rhs_) {
+template<typename Limited>
+constexpr auto safe_extreme(auto const pick_lhs, auto const lhs_, auto const rhs_) {
 	auto normalized = [](auto const value) {
 		using normalized_t = std::conditional_t<
 			detail_signed_builtin<std::decay_t<decltype(value)>>,
@@ -66,18 +66,16 @@ constexpr auto safe_extreme(UnaryFunction const pick_lhs, LHS const lhs_, RHS co
 		static_cast<result_type>(rhs);
 }
 
-template<typename Limited, typename UnaryFunction, typename LHS, typename RHS, typename... Rest>
-constexpr auto safe_extreme(UnaryFunction const pick_lhs, LHS const lhs, RHS const rhs, Rest const ... rest) {
+template<typename Limited>
+constexpr auto safe_extreme(auto const pick_lhs, auto const lhs, auto const rhs, auto const ... rest) {
 	return safe_extreme<Limited>(pick_lhs, safe_extreme<Limited>(pick_lhs, lhs, rhs), rest...);
 }
 
-template<typename... Ts>
-constexpr auto safe_min(Ts... values) {
+constexpr auto safe_min(auto... values) {
 	return safe_extreme<max_signed_t>([](auto const cmp) { return cmp <= 0; }, values...);
 }
 
-template<typename... Ts>
-constexpr auto safe_max(Ts... values) {
+constexpr auto safe_max(auto... values) {
 	return safe_extreme<max_unsigned_t>([](auto const cmp) { return cmp > 0; }, values...);
 }
 

@@ -10,14 +10,12 @@
 
 namespace containers {
 
-template<typename Range, typename UnaryFunction>
-constexpr auto transform(Range && range, UnaryFunction dereference) {
-	return adapt(BOUNDED_FORWARD(range), detail::transform_traits(std::move(dereference)));
+constexpr auto transform(range auto && source, auto dereference) {
+	return adapt(BOUNDED_FORWARD(source), detail::transform_traits(std::move(dereference)));
 }
 
-template<typename Range, typename UnaryFunction>
-constexpr auto transform_dereference(Range && range, UnaryFunction dereference) {
-	return adapt(BOUNDED_FORWARD(range), detail::transform_traits_dereference(std::move(dereference)));
+constexpr auto transform_dereference(range auto && source, auto dereference) {
+	return adapt(BOUNDED_FORWARD(source), detail::transform_traits_dereference(std::move(dereference)));
 }
 
 }	// namespace containers

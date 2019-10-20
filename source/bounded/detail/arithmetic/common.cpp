@@ -13,24 +13,19 @@
 
 namespace {
 
-template<typename LHS, typename RHS>
-constexpr auto plus_equals(LHS lhs, RHS rhs) {
+constexpr auto plus_equals(auto lhs, auto rhs) {
 	return lhs += rhs;
 }
-template<typename LHS, typename RHS>
-constexpr auto minus_equals(LHS lhs, RHS rhs) {
+constexpr auto minus_equals(auto lhs, auto rhs) {
 	return lhs -= rhs;
 }
-template<typename LHS, typename RHS>
-constexpr auto times_equals(LHS lhs, RHS rhs) {
+constexpr auto times_equals(auto lhs, auto rhs) {
 	return lhs *= rhs;
 }
-template<typename LHS, typename RHS>
-constexpr auto divide_equals(LHS lhs, RHS rhs) {
+constexpr auto divide_equals(auto lhs, auto rhs) {
 	return lhs /= rhs;
 }
-template<typename LHS, typename RHS>
-constexpr auto modulo_equals(LHS lhs, RHS rhs) {
+constexpr auto modulo_equals(auto lhs, auto rhs) {
 	return lhs %= rhs;
 }
 

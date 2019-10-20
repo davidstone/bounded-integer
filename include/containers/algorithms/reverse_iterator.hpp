@@ -28,35 +28,29 @@ struct reverse_traits {
 		return begin(BOUNDED_FORWARD(range));
 	}
 
-	template<typename BidirectionalIterator>
-	static constexpr auto dereference(BidirectionalIterator it) BOUNDED_RETURNS(
-		*::containers::prev(it)
-	)
+	static constexpr decltype(auto) dereference(bidirectional_iterator auto it) {
+		return *::containers::prev(it);
+	}
 
-	template<typename RandomAccessIterator, typename Offset>
-	static constexpr auto add(RandomAccessIterator it, Offset const offset) BOUNDED_RETURNS(
+	static constexpr auto add(random_access_iterator auto it, auto const offset) BOUNDED_RETURNS(
 		it - offset
 	)
 
-	template<typename RandomAccessIterator>
-	static constexpr auto subtract(RandomAccessIterator const lhs, RandomAccessIterator const rhs) BOUNDED_RETURNS(
-		rhs - lhs
-	)
+	static constexpr auto subtract(random_access_iterator auto const lhs, random_access_iterator auto const rhs) {
+		return rhs - lhs;
+	}
 
-	template<bounded::ordered RandomAccessIterator>
-	static constexpr auto compare(RandomAccessIterator const lhs, RandomAccessIterator const rhs) {
+	static constexpr auto compare(random_access_iterator auto const lhs, random_access_iterator auto const rhs) {
 		return rhs <=> lhs;
 	}
-	template<typename RandomAccessIterator>
-	static constexpr auto equal(RandomAccessIterator const lhs, RandomAccessIterator const rhs) {
+	static constexpr auto equal(iterator auto const lhs, iterator auto const rhs) {
 		return rhs == lhs;
 	}
 };
 
 }	// namespace detail
 
-template<typename BidirectionalIterator>
-constexpr auto reverse_iterator(BidirectionalIterator it) {
+constexpr auto reverse_iterator(bidirectional_iterator auto it) {
 	return adapt_iterator(it, detail::reverse_traits{});
 }
 

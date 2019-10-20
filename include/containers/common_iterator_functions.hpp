@@ -32,8 +32,7 @@ constexpr auto operator+(bounded::integral auto const offset, iterator auto cons
 	return it + offset;
 }
 
-template<typename T>
-constexpr auto pointer_from(T * pointer) {
+constexpr auto pointer_from(auto * pointer) {
 	return pointer;
 }
 

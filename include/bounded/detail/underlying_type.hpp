@@ -12,8 +12,8 @@
 namespace bounded {
 namespace detail {
 
-template<typename T, typename Minimum, typename Maximum>
-constexpr auto range_fits_in_type(Minimum const minimum, Maximum const maximum) {
+template<typename T>
+constexpr auto range_fits_in_type(auto const minimum, auto const maximum) {
 	return value_fits_in_type<T>(minimum) and value_fits_in_type<T>(maximum);
 }
 

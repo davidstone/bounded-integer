@@ -35,30 +35,30 @@ struct final_dimension {
 // unusable when they did not construct the array directly.
 
 // These assume that all of the dimensions have been passed in.
-template<typename element_type, std::size_t... dimensions, typename... Args>
-constexpr auto make_explicit_array(Args && ... args) {
+template<typename element_type, std::size_t... dimensions>
+constexpr auto make_explicit_array(auto && ... args) {
 	return array<element_type, dimensions...>{ BOUNDED_FORWARD(args)... };
 }
-template<std::size_t... dimensions, typename... Args>
-constexpr auto make_explicit_array(Args && ... args) {
-	return array<std::common_type_t<std::decay_t<Args>...>, dimensions...>{ BOUNDED_FORWARD(args)... };
+template<std::size_t... dimensions>
+constexpr auto make_explicit_array(auto && ... args) {
+	return array<std::common_type_t<std::decay_t<decltype(args)>...>, dimensions...>{ BOUNDED_FORWARD(args)... };
 }
 
 
 // These assume you did not specify the inner-most dimension.
-template<typename element_type, std::size_t... dimensions, typename... Args>
-constexpr auto make_array(Args && ... args) {
+template<typename element_type, std::size_t... dimensions>
+constexpr auto make_array(auto && ... args) {
 	return array<
 		element_type,
-		detail::final_dimension<sizeof...(Args), dimensions...>::value, dimensions...
+		detail::final_dimension<sizeof...(args), dimensions...>::value, dimensions...
 	>{ BOUNDED_FORWARD(args)... };
 }
 
-template<std::size_t... dimensions, typename... Args>
-constexpr auto make_array(Args && ... args) {
+template<std::size_t... dimensions>
+constexpr auto make_array(auto && ... args) {
 	return array<
-		std::common_type_t<std::decay_t<Args>...>,
-		detail::final_dimension<sizeof...(Args), dimensions...>::value, dimensions...
+		std::common_type_t<std::decay_t<decltype(args)>...>,
+		detail::final_dimension<sizeof...(args), dimensions...>::value, dimensions...
 	>{ BOUNDED_FORWARD(args)... };
 }
 
@@ -68,17 +68,17 @@ namespace detail {
 // Use the comma operator to expand the variadic pack
 // Move the last element in if possible. Order of evaluation is well-defined for
 // aggregate initialization, so there is no risk of copy-after-move
-template<std::size_t size, typename T, std::size_t... indexes>
-constexpr auto make_array_n_impl(T && value, std::index_sequence<indexes...>) {
-	return array<std::decay_t<T>, size>{(void(indexes), value)..., BOUNDED_FORWARD(value)};
+template<std::size_t size, std::size_t... indexes>
+constexpr auto make_array_n_impl(auto && value, std::index_sequence<indexes...>) {
+	return array<std::decay_t<decltype(value)>, size>{(void(indexes), value)..., BOUNDED_FORWARD(value)};
 }
 
 }	// namespace detail
 
-template<auto size_, typename T>
-constexpr auto make_array_n(bounded::constant_t<size_> size, T && value) {
+template<auto size_>
+constexpr auto make_array_n(bounded::constant_t<size_> size, auto && value) {
 	if constexpr (size == 0_bi) {
-		return array<std::decay_t<T>, 0>{};
+		return array<std::decay_t<decltype(value)>, 0>{};
 	} else {
 		return detail::make_array_n_impl<size_>(BOUNDED_FORWARD(value), bounded::make_index_sequence(size - 1_bi));
 	}

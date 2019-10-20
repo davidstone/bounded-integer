@@ -20,8 +20,7 @@ struct special {
 	constexpr auto operator()(int) const {
 		return 2;
 	}
-	template<typename T>
-	constexpr auto operator()(T) const {
+	constexpr auto operator()(auto) const {
 		return 1;
 	}
 };

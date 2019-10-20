@@ -205,8 +205,7 @@ void test() {
 std::size_t number_of_extractions = 0;
 template<typename Extract>
 struct extract_tracker {
-	template<typename Key>
-	decltype(auto) operator()(Key const & key) const {
+	decltype(auto) operator()(auto const & key) const {
 		++number_of_extractions;
 		return Extract()(key);
 	}

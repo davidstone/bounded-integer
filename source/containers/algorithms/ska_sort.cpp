@@ -36,18 +36,16 @@ constexpr auto copy_from_c_array(c_array<T, size> const & original, std::index_s
 	return containers::array<std::remove_cvref_t<T>, sizeof...(indexes)>{original[indexes]...};
 }
 
-template<typename It, typename ExtractKey>
-static constexpr void inplace_radix_sort(It begin, It end, ExtractKey && extract_key) {
+static constexpr void inplace_radix_sort(auto begin, auto end, auto && extract_key) {
 	detail::inplace_radix_sort<1>(begin, end, extract_key);
 }
 
-template<typename It>
-static constexpr void inplace_radix_sort(It begin, It end) {
+static constexpr void inplace_radix_sort(auto begin, auto end) {
 	inplace_radix_sort(begin, end, detail::identity);
 }
 
-template<typename Container, typename Function>
-constexpr bool test_sort_copy(Container source, Container const & expected, Function function) {
+template<typename Container>
+constexpr bool test_sort_copy(Container source, Container const & expected, auto function) {
 	BOUNDED_TEST(containers::is_sorted(expected));
 	auto other = Container();
 	if constexpr (requires(Container c) { c.resize(size(c)); }) {
@@ -59,31 +57,28 @@ constexpr bool test_sort_copy(Container source, Container const & expected, Func
 	return true;
 }
 
-template<typename Container, typename Function>
-constexpr bool test_sort_inplace(Container source, Container const & expected, Function function) {
+constexpr bool test_sort_inplace(auto source, auto const & expected, auto function) {
 	BOUNDED_TEST(containers::is_sorted(expected));
 	inplace_radix_sort(begin(source), end(source), std::move(function));
 	BOUNDED_TEST(source == expected);
 	return true;
 }
 
-template<typename Container, typename Function>
-constexpr bool test_sort(Container original, Container const & expected, Function function) {
+constexpr bool test_sort(auto original, auto const & expected, auto function) {
 	test_sort_copy(original, expected, function);
 	test_sort_inplace(std::move(original), expected, std::move(function));
 	return true;
 }
 
-template<typename Container>
-constexpr bool test_sort(Container original, Container const & expected) {
+constexpr bool test_sort(auto original, auto const & expected) {
 	test_sort(original, expected, containers::detail::identity);
 	test_sort(std::move(original), expected, identity_by_value);
 	return true;
 }
 
 
-template<typename T, std::size_t size, typename Function>
-constexpr bool test_sort(c_array<T, size> const & original, c_array<T, size> const & expected, Function function) {
+template<typename T, std::size_t size>
+constexpr bool test_sort(c_array<T, size> const & original, c_array<T, size> const & expected, auto function) {
 	return test_sort(
 		copy_from_c_array(original, std::make_index_sequence<size>{}),
 		copy_from_c_array(expected, std::make_index_sequence<size>{}),
@@ -1350,8 +1345,8 @@ static_assert(test_sort_copy(
 
 #define SKA_SORT_NOINLINE __attribute__((noinline))
 
-template<typename Container, typename Distribution>
-static auto create_radix_sort_data(std::mt19937_64 & engine, std::int64_t const size, Distribution distribution) {
+template<typename Container>
+static auto create_radix_sort_data(std::mt19937_64 & engine, std::int64_t const size, auto distribution) {
 	auto result = Container();
 	containers::detail::reserve_if_reservable(result, static_cast<typename Container::size_type>(size));
 	for (std::int64_t n = 0; n != size; ++n) {
@@ -1360,8 +1355,7 @@ static auto create_radix_sort_data(std::mt19937_64 & engine, std::int64_t const 
 	return result;
 }
 
-template<typename Distribution>
-static auto create_radix_sort_data(std::mt19937_64 & engine, std::int64_t const size, Distribution distribution) {
+static auto create_radix_sort_data(std::mt19937_64 & engine, std::int64_t const size, auto distribution) {
 	return create_radix_sort_data<std::vector<decltype(distribution(engine))>>(engine, size, distribution);
 }
 
@@ -1443,8 +1437,7 @@ static std::vector<std::tuple<std::array<benchmark_sort_key, NUM_SORT_KEYS>, ben
 static constexpr int profile_multiplier = 2;
 static constexpr int max_profile_range = 1 << 20;
 
-template<typename Function>
-void benchmark_ska_sort_copy(benchmark::State & state, Function create) {
+void benchmark_ska_sort_copy(benchmark::State & state, auto create) {
 	auto randomness = std::mt19937_64(77342348);
 	auto buffer = create(randomness, state.range(0));
 	for (auto _ : state) {
@@ -1470,8 +1463,7 @@ void benchmark_ska_sort_copy(benchmark::State & state, Function create) {
 	}
 }
 
-template<typename Function>
-static void benchmark_std_sort(benchmark::State & state, Function create) {
+static void benchmark_std_sort(benchmark::State & state, auto create) {
 	auto randomness = std::mt19937_64(77342348);
 	create(randomness, state.range(0));
 	for (auto _ : state) {
@@ -1487,18 +1479,15 @@ static void benchmark_std_sort(benchmark::State & state, Function create) {
 	}
 }
 
-template<typename It, typename ExtractKey>
-static void american_flag_sort(It begin, It end, ExtractKey && extract_key) {
+static void american_flag_sort(auto begin, auto end, auto && extract_key) {
 	detail::inplace_radix_sort<bounded::max_value<std::ptrdiff_t>>(begin, end, extract_key);
 }
 
-template<typename It>
-static void american_flag_sort(It begin, It end) {
+static void american_flag_sort(auto begin, auto end) {
 	american_flag_sort(begin, end, detail::identity);
 }
 
-template<typename Function>
-static void benchmark_american_flag_sort(benchmark::State & state, Function create) {
+static void benchmark_american_flag_sort(benchmark::State & state, auto create) {
 	auto randomness = std::mt19937_64(77342348);
 	create(randomness, state.range(0));
 	for (auto _ : state) {
@@ -1514,8 +1503,7 @@ static void benchmark_american_flag_sort(benchmark::State & state, Function crea
 	}
 }
 
-template<typename Function>
-static void benchmark_ska_sort(benchmark::State & state, Function create) {
+static void benchmark_ska_sort(benchmark::State & state, auto create) {
 	auto randomness = std::mt19937_64(77342348);
 	create(randomness, state.range(0));
 	for (auto _ : state) {
@@ -1531,8 +1519,7 @@ static void benchmark_ska_sort(benchmark::State & state, Function create) {
 	}
 }
 
-template<typename Function>
-static void benchmark_inplace_radix_sort(benchmark::State & state, Function create) {
+static void benchmark_inplace_radix_sort(benchmark::State & state, auto create) {
 	auto randomness = std::mt19937_64(77342348);
 	create(randomness, state.range(0));
 	for (auto _ : state) {
@@ -1548,8 +1535,7 @@ static void benchmark_inplace_radix_sort(benchmark::State & state, Function crea
 	}
 }
 
-template<typename Function>
-static void benchmark_generation(benchmark::State & state, Function create) {
+static void benchmark_generation(benchmark::State & state, auto create) {
 	auto randomness = std::mt19937_64(77342348);
 	create(randomness, state.range(0));
 	for (auto _ : state) {
@@ -1648,11 +1634,8 @@ auto create_range_data = [](int max_size, auto generate) {
 	};
 };
 
-template<typename T>
-constexpr auto min_value = bounded::min_value<T>;
-
-template<typename T>
-constexpr auto max_value = bounded::max_value<T>;
+using bounded::min_value;
+using bounded::max_value;
 
 static auto SKA_SORT_NOINLINE create_radix_sort_data_bool(std::mt19937_64 & engine, std::int64_t const size) {
 	auto int_distribution = std::uniform_int_distribution<int>(0, 1);

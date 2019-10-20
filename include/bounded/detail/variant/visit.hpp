@@ -15,17 +15,11 @@
 namespace bounded {
 namespace detail {
 
-template<typename TransformFunction, typename Function, typename... Args>
-constexpr decltype(auto) reorder_transform_implementation(
-	bounded::constant_t<0>,
-	TransformFunction transform,
-	Function && function,
-	Args && ... args
-) {
+constexpr decltype(auto) reorder_transform_implementation(bounded::constant_t<0>, auto transform, auto && function, auto && ... args) {
 	return transform(BOUNDED_FORWARD(function), BOUNDED_FORWARD(args)...);
 }
-template<auto index_, typename TransformFunction, typename Arg, typename... Args>
-constexpr decltype(auto) reorder_transform_implementation(bounded::constant_t<index_> index, TransformFunction transform, Arg && arg, Args && ... args) {
+template<auto index_>
+constexpr decltype(auto) reorder_transform_implementation(bounded::constant_t<index_> index, auto transform, auto && arg, auto && ... args) {
 	return ::bounded::detail::reorder_transform_implementation(index - 1_bi, transform, BOUNDED_FORWARD(args)..., BOUNDED_FORWARD(arg));
 }
 
@@ -39,7 +33,7 @@ constexpr decltype(auto) reorder_transform_implementation(bounded::constant_t<in
 // original order after that. This allows us to write an interface that accepts
 // stuff and a function to operate on the stuff, but allows us to transform the
 // arguments in some way before calling the user function.
-inline constexpr auto reorder_transform = [](auto transform, auto && ... args) -> decltype(auto) {
+constexpr decltype(auto) reorder_transform(auto transform, auto && ... args) {
 	return ::bounded::detail::reorder_transform_implementation(
 		bounded::constant<bounded::detail::normalize<sizeof...(args) - 1U>>,
 		transform,
@@ -118,13 +112,13 @@ inline constexpr auto is_variants_then_visit_function<
 
 
 
-template<typename Function, std::size_t... indexes, typename... Variants> requires(sizeof...(indexes) == sizeof...(Variants))
+template<std::size_t... indexes>
 constexpr decltype(auto) visit_implementation(
-	Function && function,
+	auto && function,
 	std::index_sequence<indexes...>,
 	bounded::constant_t<0>,
-	Variants && ... variants
-) {
+	auto && ... variants
+) requires(sizeof...(indexes) == sizeof...(variants)) {
 	return BOUNDED_FORWARD(function)(
 		visitor_parameter<
 			decltype(BOUNDED_FORWARD(variants)[bounded::constant<indexes>]),
@@ -135,14 +129,14 @@ constexpr decltype(auto) visit_implementation(
 
 // This function accepts the pack of all variants twice. It passes over them
 // once to get all the indexes, then again to pull out the values.
-template<typename Function, std::size_t... indexes, typename Index, typename Variant, typename... Variants> requires(sizeof...(indexes) < sizeof...(Variants))
+template<std::size_t... indexes>
 constexpr decltype(auto) visit_implementation(
-	Function && function,
+	auto && function,
 	std::index_sequence<indexes...> initial_indexes,
-	Index possible_index,
-	Variant const & variant,
-	Variants && ... variants
-) {
+	auto possible_index,
+	auto const & variant,
+	auto && ... variants
+) requires(sizeof...(indexes) < sizeof...(variants)) {
 	auto found = [&]() -> decltype(auto) {
 		return ::bounded::detail::visit_implementation(
 			BOUNDED_FORWARD(function),
@@ -204,6 +198,7 @@ private:
 	template<typename Function>
 	struct unwrap_visitor_parameter {
 		Function && function;
+		// TODO: use terse syntax when it does not crash clang
 		template<typename... Args>
 		constexpr auto operator()(Args && ... args) && BOUNDED_RETURNS(
 			BOUNDED_FORWARD(function)(BOUNDED_FORWARD(args).value...)

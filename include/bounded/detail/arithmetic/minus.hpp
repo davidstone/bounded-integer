@@ -15,8 +15,7 @@ namespace bounded {
 namespace detail {
 namespace arithmetic {
 
-template<typename LHS, typename RHS>
-constexpr auto operator-(LHS && lhs, RHS && rhs) BOUNDED_RETURNS(
+constexpr auto operator-(auto && lhs, auto && rhs) BOUNDED_RETURNS(
 	BOUNDED_FORWARD(lhs) + -BOUNDED_FORWARD(rhs)
 )
 

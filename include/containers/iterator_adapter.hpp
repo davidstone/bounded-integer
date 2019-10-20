@@ -30,22 +30,19 @@ struct default_begin_end {
 };
 
 struct default_dereference {
-	template<typename Iterator>
-	static constexpr decltype(auto) dereference(Iterator const & it) {
+	static constexpr decltype(auto) dereference(iterator auto const & it) {
 		return *it;
 	}
 };
 
 struct default_add {
-	template<typename Iterator, typename Offset>
-	static constexpr auto add(Iterator const & it, Offset const & offset) BOUNDED_RETURNS(
-		it + offset
+	static constexpr auto add(iterator auto it, auto const & offset) BOUNDED_RETURNS(
+		std::move(it) + offset
 	)
 };
 
 struct default_subtract {
-	template<typename Iterator>
-	static constexpr auto subtract(Iterator const & lhs, Iterator const & rhs) BOUNDED_RETURNS(
+	static constexpr auto subtract(iterator auto const & lhs, iterator auto const & rhs) BOUNDED_RETURNS(
 		lhs - rhs
 	)
 };
@@ -144,8 +141,7 @@ struct adapt_iterator :
 		return containers::unwrap(m_traits);
 	}
 
-	template<typename Index>
-	constexpr auto operator[](Index const index) const {
+	constexpr auto operator[](auto const index) const {
 		return *(*this + index);
 	}
 
@@ -160,8 +156,8 @@ constexpr decltype(auto) operator*(adapt_iterator<Iterator, Traits> const it) {
 	return it.traits().dereference(it.base());
 }
 
-template<typename Iterator, typename Traits, typename Offset>
-constexpr auto operator+(adapt_iterator<Iterator, Traits> const lhs, Offset const rhs) BOUNDED_RETURNS(
+template<typename Iterator, typename Traits>
+constexpr auto operator+(adapt_iterator<Iterator, Traits> const lhs, auto const rhs) BOUNDED_RETURNS(
 	adapt_iterator<Iterator, Traits>(lhs.traits().add(lhs.base(), rhs), lhs.traits())
 )
 

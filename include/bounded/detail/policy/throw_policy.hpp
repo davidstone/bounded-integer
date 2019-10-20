@@ -33,10 +33,8 @@ constexpr auto reduce_range(T const & value, constant_t<minimum>, constant_t<max
 
 template<typename Exception = policy_detail::default_exception>
 struct throw_policy {
-	template<typename T, typename Minimum, typename Maximum>
-	static constexpr auto assignment(T const & value, Minimum const & minimum, Maximum const & maximum) {
-		static_assert(bounded_integer<Minimum>, "Only bounded::integer types are supported.");
-		static_assert(bounded_integer<Maximum>, "Only bounded::integer types are supported.");
+	template<bounded_integer Minimum, bounded_integer Maximum>
+	static constexpr auto assignment(auto const & value, Minimum const & minimum, Maximum const & maximum) {
 		if (minimum <= value and value <= maximum) {
 			return policy_detail::reduce_range(value, min_value<Minimum>, max_value<Maximum>);
 		} else {

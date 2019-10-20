@@ -22,11 +22,10 @@ namespace common {
 template<typename Range>
 concept never_empty_range = bounded::min_value<typename std::remove_reference_t<Range>::size_type> > 0_bi;
 
-template<range Range>
-constexpr auto empty(Range const & range) {
+constexpr auto empty(range auto const & r) {
 	// The never_empty check is not needed for correctness, but allows this
 	// function to be constexpr in more situations.
-	return never_empty_range<Range> ? false : begin(range) == end(range);
+	return never_empty_range<decltype(r)> ? false : begin(r) == end(r);
 }
 
 }	// namespace common

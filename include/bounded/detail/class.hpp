@@ -91,9 +91,8 @@ template<auto value, typename overflow_policy = null_policy>
 inline constexpr auto constant = constant_t<detail::normalize<value>, overflow_policy>{};
 
 
-// TODO: Use terse concepts syntax on most of these functions after fix for
-// https://github.com/saarraz/clang-concepts-monorepo/issues/20 and
-// https://github.com/saarraz/clang-concepts-monorepo/issues/21
+// TODO: Use terse concepts syntax on most of these constructors after fix for
+// https://github.com/saarraz/clang-concepts-monorepo/issues/17
 
 template<auto minimum, auto maximum, typename overflow_policy_ = null_policy>
 struct integer {
@@ -155,8 +154,7 @@ struct integer {
 	}
 
 
-	template<typename T>
-	constexpr auto && unchecked_assignment(T const & other) & {
+	constexpr auto && unchecked_assignment(auto const & other) & {
 		if constexpr (minimum != maximum) {
 			m_value = static_cast<underlying_type>(other);
 		}
@@ -166,8 +164,7 @@ struct integer {
 	constexpr auto operator=(integer const & other) & -> integer & = default;
 	constexpr auto operator=(integer && other) & -> integer & = default;
 
-	template<typename T> requires detail::overlapping_integer<T, minimum, maximum, overflow_policy>
-	constexpr auto && operator=(T const & other) & {
+	constexpr auto && operator=(detail::overlapping_integer<minimum, maximum, overflow_policy> auto const & other) & {
 		return unchecked_assignment(apply_overflow_policy(other));
 	}
 	
@@ -213,8 +210,7 @@ private:
 			static_cast<underlying_type>(minimum - 1) : static_cast<underlying_type>(maximum + 1);
 	}
 
-	template<typename T>
-	static constexpr decltype(auto) apply_overflow_policy(T const & value) {
+	static constexpr decltype(auto) apply_overflow_policy(auto const & value) {
 		return overflow_policy{}.assignment(value, constant<minimum>, constant<maximum>);
 	}
 

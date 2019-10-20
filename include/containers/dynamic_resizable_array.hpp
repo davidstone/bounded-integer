@@ -42,8 +42,8 @@ struct dynamic_resizable_array : private Container {
 		range<Range> and
 		!std::is_array_v<std::remove_cv_t<std::remove_reference_t<Range>>>
 	)
-	constexpr explicit dynamic_resizable_array(Range && range) {
-		append(*this, BOUNDED_FORWARD(range));
+	constexpr explicit dynamic_resizable_array(Range && source) {
+		append(*this, BOUNDED_FORWARD(source));
 	}
 	
 	constexpr dynamic_resizable_array(std::initializer_list<value_type> init) {
@@ -106,8 +106,7 @@ struct dynamic_resizable_array : private Container {
 	}
 
 	// Assumes that elements are already constructed in the spare capacity
-	template<typename Integer>
-	constexpr void append_from_capacity(Integer const count) {
+	constexpr void append_from_capacity(auto const count) {
 		this->set_size(size(*this) + count);
 	}
 };

@@ -14,15 +14,13 @@ namespace bounded {
 namespace detail {
 
 struct compare_to_t {
-	template<typename LHS, typename RHS>
-	constexpr auto operator()(LHS const & lhs, RHS const & rhs) const {
+	constexpr auto operator()(auto const & lhs, auto const & rhs) const {
 		return lhs <=> rhs;
 	}
 };
 
 struct binary_equal_to {
-	template<typename LHS, typename RHS>
-	constexpr auto operator()(LHS const & lhs, RHS const & rhs) const {
+	constexpr auto operator()(auto const & lhs, auto const & rhs) const {
 		return lhs == rhs;
 	}
 };
@@ -37,22 +35,19 @@ public:
 		m_bound(BOUNDED_FORWARD(bound))
 	{
 	}
-	template<typename Other>
-	constexpr auto operator()(Other const & other) const {
+	constexpr auto operator()(auto const & other) const {
 		return m_bound == other;
 	}
 };
 
 // TODO: Add total ordering for pointer types
 struct less_t {
-	template<typename LHS, typename RHS>
-	constexpr auto operator()(LHS const & lhs, RHS const & rhs) const {
+	constexpr auto operator()(auto const & lhs, auto const & rhs) const {
 		return lhs < rhs;
 	}
 };
 struct greater_t {
-	template<typename LHS, typename RHS>
-	constexpr auto operator()(LHS const & lhs, RHS const & rhs) const {
+	constexpr auto operator()(auto const & lhs, auto const & rhs) const {
 		return lhs > rhs;
 	}
 };

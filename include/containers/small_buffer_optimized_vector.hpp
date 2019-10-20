@@ -220,8 +220,7 @@ struct sbo_vector_base {
 	}
 
 
-	template<typename Size>
-	auto make_storage(Size const new_capacity) & {
+	auto make_storage(auto const new_capacity) & {
 		return owning_storage<value_type>(detail::make_storage<value_type>(new_capacity));
 	}
 
@@ -239,8 +238,7 @@ struct sbo_vector_base {
 
 
 	// Assumes that requested_capacity is large enough
-	template<typename Size>
-	auto relocate(Size const requested_capacity) {
+	auto relocate(auto const requested_capacity) {
 		if (requested_capacity <= small_t::capacity()) {
 			relocate_to_small();
 		} else {
@@ -250,10 +248,9 @@ struct sbo_vector_base {
 		}
 	}
 	
-	template<typename Size>
-	auto set_size(Size const new_size) {
+	auto set_size(auto const new_size) {
 		if (is_small()) {
-			if constexpr (std::is_constructible_v<typename small_t::size_type, Size>) {
+			if constexpr (std::is_constructible_v<typename small_t::size_type, decltype(new_size)>) {
 				m_small.set_size(static_cast<typename small_t::size_type>(new_size));
 			} else {
 				BOUNDED_ASSERT_OR_ASSUME(false);

@@ -22,8 +22,8 @@
 namespace containers {
 namespace detail {
 
-template<typename Container, typename Integer, typename Function>
-constexpr auto insert_or_emplace_with_reallocation(Container & container, typename Container::const_iterator const position, Integer const number_of_elements, Function construct) {
+template<typename Container>
+constexpr auto insert_or_emplace_with_reallocation(Container & container, typename Container::const_iterator const position, auto const number_of_elements, auto construct) {
 	// There is a reallocation required, so just put everything in the
 	// correct place to begin with
 	auto const original_size = size(container);
@@ -53,8 +53,8 @@ constexpr auto iterator_points_into_container(Container const & container, typen
 namespace common {
 
 // TODO: exception safety
-template<typename Container, typename... Args>
-constexpr auto emplace(Container & container, typename Container::const_iterator const position, Args && ... args) {
+template<typename Container>
+constexpr auto emplace(Container & container, typename Container::const_iterator const position, auto && ... args) {
 	BOUNDED_ASSERT(::containers::detail::iterator_points_into_container(container, position));
 	auto const offset = position - begin(container);
 	if (position == end(container)) {

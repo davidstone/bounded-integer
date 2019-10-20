@@ -67,14 +67,7 @@ auto divides = [](auto const lhs, auto const rhs) {
 
 }	// namespace detail
 
-template<
-	auto lhs_min, auto lhs_max, typename lhs_policy,
-	auto rhs_min, auto rhs_max, typename rhs_policy
->
-constexpr auto operator/(
-	integer<lhs_min, lhs_max, lhs_policy> const lhs,
-	integer<rhs_min, rhs_max, rhs_policy> const rhs
-) {
+constexpr auto operator/(bounded_integer auto const lhs, bounded_integer auto const rhs) {
 	return detail::operator_overload(lhs, rhs, detail::divides, detail::divides_operator_range);
 }
 

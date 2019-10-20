@@ -12,8 +12,7 @@
 
 namespace bounded {
 
-template<typename Optional, typename Default>
-constexpr decltype(auto) value_or(Optional && value, Default && other) {
+constexpr decltype(auto) value_or(auto && value, auto && other) {
 	return BOUNDED_CONDITIONAL(value, *BOUNDED_FORWARD(value), BOUNDED_FORWARD(other));
 }
 
@@ -23,8 +22,7 @@ struct bad_optional_access : std::logic_error {
 	}
 };
 
-template<typename Optional>
-constexpr decltype(auto) value(Optional && value) {
+constexpr decltype(auto) value(auto && value) {
 	if (!value) {
 		throw bad_optional_access{};
 	}

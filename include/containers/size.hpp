@@ -39,12 +39,11 @@ constexpr auto size(Range const & range) {
 
 using ::containers::detail::common::size;
 
-template<typename Range>
-constexpr auto linear_size(Range const & range) {
-	if constexpr (requires { size(range); }) {
-		return size(range);
+constexpr auto linear_size(range auto const & r) {
+	if constexpr (requires { size(r); }) {
+		return size(r);
 	} else {
-		return containers::distance(begin(range), end(range));
+		return containers::distance(begin(r), end(r));
 	}
 }
 

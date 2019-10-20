@@ -15,23 +15,19 @@
 namespace containers {
 
 constexpr inline struct lower_bound_t {
-	template<typename T, typename Compare>
-	constexpr auto operator()(range auto && sorted, T const & value, Compare cmp) const {
+	constexpr auto operator()(range auto && sorted, auto const & value, auto cmp) const {
 		return partition_point(BOUNDED_FORWARD(sorted), [&](auto const & element) { return cmp(element, value); });
 	}
-	template<typename T>
-	constexpr auto operator()(range auto && sorted, T const & value) const {
+	constexpr auto operator()(range auto && sorted, auto const & value) const {
 		return operator()(BOUNDED_FORWARD(sorted), value, std::less{});
 	}
 } lower_bound;
 
 constexpr inline struct upper_bound_t {
-	template<typename T, typename Compare>
-	constexpr auto operator()(range auto && sorted, T const & value, Compare cmp) const {
+	constexpr auto operator()(range auto && sorted, auto const & value, auto cmp) const {
 		return partition_point(BOUNDED_FORWARD(sorted), [&](auto const & element) { return !cmp(value, element); });
 	}
-	template<typename T>
-	constexpr auto operator()(range auto && sorted, T const & value) const {
+	constexpr auto operator()(range auto && sorted, auto const & value) const {
 		return operator()(BOUNDED_FORWARD(sorted), value, std::less{});
 	}
 } upper_bound;
@@ -39,12 +35,10 @@ constexpr inline struct upper_bound_t {
 
 // TODO: This is sub-optimal. Unsure how to make it optimal without copy + paste
 constexpr inline struct binary_search_t {
-	template<typename T, typename Compare>
-	constexpr bool operator()(range auto && sorted, T const & value, Compare cmp) const {
+	constexpr bool operator()(range auto && sorted, auto const & value, auto cmp) const {
 		return lower_bound(BOUNDED_FORWARD(sorted), value, cmp) == end(sorted);
 	}
-	template<typename T>
-	constexpr bool operator()(range auto && sorted, T const & value) const {
+	constexpr bool operator()(range auto && sorted, auto const & value) const {
 		return operator()(sorted, value, std::less{});
 	}
 } binary_search;

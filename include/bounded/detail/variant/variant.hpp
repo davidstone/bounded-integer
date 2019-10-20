@@ -164,24 +164,20 @@ public:
 	}
 
 
-	template<unique_type_identifier<detail::types<Ts>...> Index>
-	constexpr auto const & operator[](Index index_) const & {
+	constexpr auto const & operator[](unique_type_identifier<detail::types<Ts>...> auto index_) const & {
 		return operator_bracket(m_data, index_);
 	}
-	template<unique_type_identifier<detail::types<Ts>...> Index>
-	constexpr auto & operator[](Index index_) & {
+	constexpr auto & operator[](unique_type_identifier<detail::types<Ts>...> auto index_) & {
 		return operator_bracket(m_data, index_);
 	}
-	template<unique_type_identifier<detail::types<Ts>...> Index>
-	constexpr auto && operator[](Index index_) && {
+	constexpr auto && operator[](unique_type_identifier<detail::types<Ts>...> auto index_) && {
 		return operator_bracket(std::move(m_data), index_);
 	}
 
 
-	template<typename Index, typename... Args>
-	constexpr auto & emplace(Index index, Args && ... args) & requires requires { construct_return<typename decltype(detail::get_type(index, detail::types<Ts>{}...))::type>(BOUNDED_FORWARD(args)...); } {
+	constexpr auto & emplace(auto index, auto && ... args) & requires requires { construct_return<typename decltype(detail::get_type(index, detail::types<Ts>{}...))::type>(BOUNDED_FORWARD(args)...); } {
 		using indexed = typename decltype(detail::get_type(index, detail::types<Ts>{}...))::type;
-		if constexpr (std::is_nothrow_constructible_v<indexed, Args...>) {
+		if constexpr (std::is_nothrow_constructible_v<indexed, decltype(args)...>) {
 			visit(*this, destroy);
 			return replace_active_member(index, BOUNDED_FORWARD(args)...);
 		} else {
@@ -194,8 +190,7 @@ public:
 
 private:
 	struct copy_move_tag{};
-	template<typename Other>
-	constexpr basic_variant(Other && other, copy_move_tag):
+	constexpr basic_variant(auto && other, copy_move_tag):
 		basic_variant(visit_with_index(
 			BOUNDED_FORWARD(other),
 			[&](auto parameter) {
@@ -210,8 +205,7 @@ private:
 	{
 	}
 
-	template<typename Other>
-	constexpr void assign(Other && other) {
+	constexpr void assign(auto && other) {
 		visit_with_index(
 			*this,
 			BOUNDED_FORWARD(other),
@@ -227,8 +221,7 @@ private:
 	}
 
 	// Assumes the old object has already been destroyed
-	template<typename Index, typename... Args>
-	constexpr auto & replace_active_member(Index const index, Args && ... args) {
+	constexpr auto & replace_active_member(auto const index, auto && ... args) {
 		constexpr auto trivial = (... and (
 			std::is_trivially_copy_constructible_v<Ts> and
 			std::is_trivially_copy_assignable_v<Ts> and
@@ -237,15 +230,14 @@ private:
 		constexpr auto index_value = detail::get_index(index, detail::types<Ts>{}...);
 		m_function = GetFunction(index_value);
 		if constexpr (trivial) {
-			m_data = detail::variadic_union_t<Ts...>(index_value, BOUNDED_FORWARD(args)...);
+			m_data = detail::variadic_union<Ts...>(index_value, BOUNDED_FORWARD(args)...);
 			return operator[](index_value);
 		} else {
 			return construct(operator[](index_value), BOUNDED_FORWARD(args)...);
 		}
 	}
 
-	template<typename VariadicUnion, typename Index>
-	static constexpr auto && operator_bracket(VariadicUnion && data, Index const index_) {
+	static constexpr auto && operator_bracket(auto && data, auto const index_) {
 		return ::bounded::detail::get_union_element(
 			BOUNDED_FORWARD(data),
 			detail::get_index(index_, detail::types<Ts>{}...)
@@ -253,7 +245,7 @@ private:
 	}
 
 	[[no_unique_address]] GetFunction m_function;
-	[[no_unique_address]] detail::variadic_union_t<Ts...> m_data;
+	[[no_unique_address]] detail::variadic_union<Ts...> m_data;
 };
 
 template<typename GetFunction, typename... Ts, typename T>
@@ -291,8 +283,7 @@ struct variant_selector {
 		index(index_)
 	{
 	}
-	template<typename Union>
-	constexpr auto operator()(Union const &) const {
+	constexpr auto operator()(auto const &) const {
 		return index;
 	}
 private:

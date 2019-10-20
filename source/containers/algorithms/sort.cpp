@@ -9,8 +9,7 @@
 
 namespace {
 
-template<typename Range>
-constexpr auto verify_sort(Range && range_) {
+constexpr auto verify_sort(auto && range_) {
 	auto impl = [](auto range, auto cmp) {
 		containers::sort(range, cmp);
 		return containers::is_sorted(range, cmp);

@@ -134,8 +134,8 @@ private:
 template<typename Size>
 integer_range(Size) -> integer_range<bounded::constant_t<0>, Size>;
 
-template<typename Integer, typename Sentinel, typename Step = bounded::constant_t<1>>
-constexpr auto inclusive_integer_range(Integer const first, Sentinel const last, Step const step = bounded::constant<1>) {
+template<typename Step = bounded::constant_t<1>>
+constexpr auto inclusive_integer_range(auto const first, auto const last, Step const step = bounded::constant<1>) {
 	return integer_range(first, last + step, step);
 }
 

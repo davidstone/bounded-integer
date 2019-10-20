@@ -18,16 +18,14 @@
 
 namespace containers {
 
-template<typename LHS, typename RHS>
-constexpr void swap(LHS & lhs, RHS & rhs) {
+constexpr void swap(auto & lhs, auto & rhs) {
 	auto temp = std::move(lhs);
 	lhs = std::move(rhs);
 	rhs = std::move(temp);
 }
 
 constexpr inline struct is_partitioned_t {
-	template<typename UnaryPredicate>
-	constexpr auto operator()(range auto && input, UnaryPredicate predicate) const -> bool {
+	constexpr auto operator()(range auto && input, auto predicate) const -> bool {
 		auto first = begin(input);
 		auto last = end(input);
 		auto it = containers::find_if_not(first, last, predicate);
@@ -36,8 +34,7 @@ constexpr inline struct is_partitioned_t {
 } is_partitioned;
 
 constexpr inline struct partition_point_t {
-	template<typename UnaryPredicate>
-	constexpr auto operator()(range auto && input, UnaryPredicate predicate) const {
+	constexpr auto operator()(range auto && input, auto predicate) const {
 		using size_type = decltype(size(input));
 		auto count = bounded::integer<0, bounded::detail::builtin_max_value<size_type>>(size(input));
 		auto first = begin(input);
@@ -63,8 +60,8 @@ constexpr inline struct partition_point_t {
 
 // TODO: Support bidirectional iterators
 constexpr inline struct partition_t {
-	template<iterator ForwardIterator, typename UnaryPredicate>
-	constexpr auto operator()(ForwardIterator first, sentinel_for<ForwardIterator> auto last, UnaryPredicate predicate) const {
+	template<iterator ForwardIterator>
+	constexpr auto operator()(ForwardIterator first, sentinel_for<ForwardIterator> auto last, auto predicate) const {
 		auto advance_first = [&]{
 			first = containers::find_if_not(first, last, predicate);
 		};
@@ -102,8 +99,7 @@ constexpr inline struct partition_t {
 		}
 		return first;
 	}
-	template<typename UnaryPredicate>
-	constexpr auto operator()(range auto && input, UnaryPredicate predicate) const {
+	constexpr auto operator()(range auto && input, auto predicate) const {
 		return operator()(begin(input), end(input), predicate);
 	}
 } partition;

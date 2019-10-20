@@ -14,9 +14,8 @@
 namespace containers {
 namespace detail {
 
-template<range Range, iterator Iterator>
-constexpr auto mutable_iterator(Range & range, Iterator const it) {
-	return begin(range) + (it - begin(range));
+constexpr auto mutable_iterator(range auto & r, iterator auto const it) {
+	return begin(r) + (it - begin(r));
 }
 
 }	// namespace detail

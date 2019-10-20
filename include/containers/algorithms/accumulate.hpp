@@ -20,13 +20,13 @@ using namespace bounded::literal;
 
 namespace detail {
 
-template<typename Range, typename Initial, typename BinaryFunction, bool is_bounded = bounded::bounded_integer<Initial>>
+template<typename Range, typename Initial, typename BinaryFunction>
 struct accumulate_c {
 	using type = Initial;
 };
 
-template<typename Range, typename Initial>
-struct accumulate_c<Range, Initial, std::plus<>, true> {
+template<typename Range, typename Initial> requires bounded::bounded_integer<Initial>
+struct accumulate_c<Range, Initial, std::plus<>> {
 	using type = decltype(
 		std::declval<Initial>() +
 		(
@@ -50,8 +50,8 @@ using accumulate_t = typename accumulate_c<Range, std::decay_t<Initial>, BinaryF
 
 
 
-template<typename Result, range Range, typename Initial, typename BinaryFunction>
-constexpr auto accumulate(Range && source, Initial && initial, BinaryFunction function) {
+template<typename Result>
+constexpr auto accumulate(range auto && source, auto && initial, auto function) {
 	auto result = static_cast<Result>(BOUNDED_FORWARD(initial));
 	for (decltype(auto) value : BOUNDED_FORWARD(source)) {
 		result = static_cast<Result>(function(std::move(result), BOUNDED_FORWARD(value)));
@@ -60,9 +60,8 @@ constexpr auto accumulate(Range && source, Initial && initial, BinaryFunction fu
 }
 
 
-template<range Range, typename Initial, typename BinaryFunction>
-constexpr auto accumulate(Range && source, Initial && initial, BinaryFunction function) {
-	return ::containers::accumulate<detail::accumulate_t<Range, Initial, BinaryFunction>>(
+constexpr auto accumulate(range auto && source, auto && initial, auto function) {
+	return ::containers::accumulate<detail::accumulate_t<decltype(source), decltype(initial), decltype(function)>>(
 		BOUNDED_FORWARD(source),
 		BOUNDED_FORWARD(initial),
 		std::move(function)
@@ -75,8 +74,7 @@ constexpr auto accumulate(range auto && source, auto && initial) {
 	return ::containers::accumulate<Result>(BOUNDED_FORWARD(source), BOUNDED_FORWARD(initial), std::plus<>{});
 }
 
-template<typename Initial>
-constexpr auto accumulate(range auto && source, Initial && initial) {
+constexpr auto accumulate(range auto && source, auto && initial) {
 	return ::containers::accumulate(BOUNDED_FORWARD(source), BOUNDED_FORWARD(initial), std::plus<>{});
 }
 
@@ -94,20 +92,19 @@ constexpr auto initial_accumulate_value() {
 
 }	// namespace detail
 
-template<typename Result, range Range>
-constexpr auto accumulate(Range && source) {
+template<typename Result>
+constexpr auto accumulate(range auto && source) {
 	return ::containers::accumulate<Result>(
 		BOUNDED_FORWARD(source),
-		detail::initial_accumulate_value<typename std::remove_reference_t<Range>::value_type>(),
+		detail::initial_accumulate_value<typename std::remove_reference_t<decltype(source)>::value_type>(),
 		std::plus<>{}
 	);
 }
 
-template<range Range>
-constexpr auto accumulate(Range && source) {
+constexpr auto accumulate(range auto && source) {
 	return ::containers::accumulate(
 		BOUNDED_FORWARD(source),
-		detail::initial_accumulate_value<typename std::remove_reference_t<Range>::value_type>(),
+		detail::initial_accumulate_value<typename std::remove_reference_t<decltype(source)>::value_type>(),
 		std::plus<>{}
 	);
 }

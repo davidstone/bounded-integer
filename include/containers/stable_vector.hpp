@@ -119,8 +119,7 @@ struct stable_vector {
 	CONTAINERS_OPERATOR_BRACKET_DEFINITIONS(stable_vector)
 	
 	// Assumes that elements are already constructed in the spare capacity
-	template<typename Integer>
-	void append_from_capacity(Integer const count) {
+	void append_from_capacity(auto const count) {
 		BOUNDED_ASSERT(count + m_size <= capacity());
 		m_size += count;
 	}

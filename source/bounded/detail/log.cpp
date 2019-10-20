@@ -10,8 +10,7 @@
 
 namespace {
 
-template<typename Integer>
-constexpr auto test_log(Integer const value, bounded::constant_t<2>) {
+constexpr auto test_log(auto const value, bounded::constant_t<2>) {
 	switch (static_cast<bounded::detail::max_unsigned_t>(value)) {
 		case 1: return 0;
 		case 2: return 1;
@@ -39,8 +38,7 @@ constexpr auto test_log(Integer const value, bounded::constant_t<2>) {
 	}
 }
 
-template<typename Integer>
-constexpr auto test_log(Integer const value, bounded::constant_t<10>) {
+constexpr auto test_log(auto const value, bounded::constant_t<10>) {
 	switch (static_cast<bounded::detail::max_unsigned_t>(value)) {
 		case 1: return 0;
 		case 2: return 0;

@@ -6,24 +6,24 @@
 #pragma once
 
 #include <containers/integer_range.hpp>
+#include <containers/is_iterator.hpp>
 #include <bounded/integer.hpp>
 
 namespace containers {
 
-template<typename InputIterator, typename Size, typename OutputIterator>
-constexpr auto copy_n(InputIterator first, Size const count, OutputIterator out) {
+constexpr auto copy_n(iterator auto first, auto const count, iterator auto out) {
 	using namespace bounded::literal;
 	static_assert(count > -1_bi, "Negative numbers not supported.");
 	struct result {
-		InputIterator input;
-		OutputIterator output;
+		decltype(first) input;
+		decltype(out) output;
 	};
 	for (auto const n [[maybe_unused]] : integer_range(count)) {
 		*out = *first;
 		++out;
 		++first;
 	}
-	return result { first, out };
+	return result{std::move(first), std::move(out)};
 }
 
 }	// namespace containers

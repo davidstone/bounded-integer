@@ -23,8 +23,7 @@ namespace detail {
 // digits and digits10 represent the maximum number of bits / digits in a
 // lossless string -> integer -> string conversion sequence
 
-template<typename Minimum, typename Maximum, typename Base>
-constexpr auto digits(Minimum const minimum, Maximum const maximum, Base const base) noexcept {
+constexpr auto digits(auto const minimum, auto const maximum, auto const base) noexcept {
 	static_assert(base > constant<1>, "Base must be greater than 1.");
 	if constexpr (minimum > constant<0> or maximum <= constant<0>) {
 		return constant<0>;

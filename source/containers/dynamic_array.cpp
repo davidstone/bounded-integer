@@ -15,8 +15,8 @@ namespace {
 
 using namespace bounded::literal;
 
-template<typename T, typename Capacity>
-void test_generic(T const & t, Capacity capacity, std::initializer_list<T> init) {
+template<typename T>
+void test_generic(T const & t, auto capacity, std::initializer_list<T> init) {
 	using container = containers::dynamic_array<T>;
 	auto const default_constructed = container{};
 	BOUNDED_TEST(empty(default_constructed));

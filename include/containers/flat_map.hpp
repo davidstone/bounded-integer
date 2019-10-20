@@ -256,32 +256,28 @@ public:
 		return m_container.shrink_to_fit();
 	}
 	
-	template<typename Key>
-	constexpr auto lower_bound(Key && key) const {
+	constexpr auto lower_bound(auto && key) const {
 		return containers::lower_bound(
 			*this,
 			BOUNDED_FORWARD(key),
 			compare()
 		);
 	}
-	template<typename Key>
-	constexpr auto lower_bound(Key && key) {
+	constexpr auto lower_bound(auto && key) {
 		return containers::lower_bound(
 			*this,
 			BOUNDED_FORWARD(key),
 			compare()
 		);
 	}
-	template<typename Key>
-	constexpr auto upper_bound(Key && key) const {
+	constexpr auto upper_bound(auto && key) const {
 		return containers::upper_bound(
 			*this,
 			BOUNDED_FORWARD(key),
 			compare()
 		);
 	}
-	template<typename Key>
-	constexpr auto upper_bound(Key && key) {
+	constexpr auto upper_bound(auto && key) {
 		return containers::upper_bound(
 			*this,
 			BOUNDED_FORWARD(key),
@@ -289,13 +285,11 @@ public:
 		);
 	}
 
-	template<typename Key>
-	constexpr auto find(Key const & key) const {
+	constexpr auto find(auto const & key) const {
 		auto const it = lower_bound(key);
 		return (it == end(*this) or compare()(key, it->key())) ? end(*this) : it;
 	}
-	template<typename Key>
-	constexpr auto find(Key const & key) {
+	constexpr auto find(auto const & key) {
 		auto const it = lower_bound(key);
 		return (it == end(*this) or compare()(key, it->key())) ? end(*this) : it;
 	}
@@ -303,13 +297,11 @@ public:
 	// Unlike in std::map, insert / try_emplace can only provide a time
 	// complexity that matches an insert into the underlying container, which is
 	// to say, linear. An insertion implies shifting all of the elements.
-	template<typename Key, typename... MappedArgs>
-	constexpr auto try_emplace(Key && key, MappedArgs && ... mapped_args) {
+	constexpr auto try_emplace(auto && key, auto && ... mapped_args) {
 		auto const position = upper_bound(key);
 		return try_emplace_at(position, BOUNDED_FORWARD(key), BOUNDED_FORWARD(mapped_args)...);
 	}
-	template<typename Key, typename... MappedArgs>
-	constexpr auto try_emplace_hint(const_iterator hint, Key && key, MappedArgs && ... mapped_args) {
+	constexpr auto try_emplace_hint(const_iterator hint, auto && key, auto && ... mapped_args) {
 		auto impl = [&](const_iterator position){
 			return try_emplace_at(position, BOUNDED_FORWARD(key), BOUNDED_FORWARD(mapped_args)...);
 		};
@@ -336,8 +328,8 @@ public:
 	constexpr auto insert(const_iterator const hint, value_type && value) {
 		return try_emplace_hint(hint, std::move(value).key(), std::move(value).mapped());
 	}
-	template<typename Range = std::initializer_list<value_type>>
-	constexpr auto insert(Range && range) {
+	template<range Range = std::initializer_list<value_type>>
+	constexpr auto insert(Range && init) {
 		// Because my underlying container is expected to be contiguous storage,
 		// it's best to do a batch insert and then just sort it all. However,
 		// because I know that the first section of the final range is already
@@ -345,7 +337,7 @@ public:
 		// merge sort on both ranges, rather than calling std::sort on the
 		// entire container.
 		auto const original_size = size(m_container);
-		append(m_container, BOUNDED_FORWARD(range));
+		append(m_container, BOUNDED_FORWARD(init));
 		auto const midpoint = begin(m_container) + original_size;
 
 		ska_sort(midpoint, end(m_container), extract_key());
@@ -384,8 +376,7 @@ public:
 	}
 	
 private:
-	template<typename Key, typename... MappedArgs>
-	constexpr auto try_emplace_at(const_iterator position, Key && key, MappedArgs && ... mapped_args) {
+	constexpr auto try_emplace_at(const_iterator position, auto && key, auto && ... mapped_args) {
 		auto add_element = [&] {
 			return ::containers::emplace(
 				m_container,
@@ -458,42 +449,36 @@ public:
 	
 	using base::erase;
 
-	template<typename Key>
-	constexpr auto const & at(Key && key) const {
+	constexpr auto const & at(auto && key) const {
 		auto const it = find(BOUNDED_FORWARD(key));
 		if (it == end(*this)) {
 			throw std::out_of_range{"Key not found"};
 		}
 		return it->mapped();
 	}
-	template<typename Key>
-	constexpr auto & at(Key && key) {
+	constexpr auto & at(auto && key) {
 		auto const it = this->find(BOUNDED_FORWARD(key));
 		if (it == end(*this)) {
 			throw std::out_of_range{"Key not found"};
 		}
 		return it->mapped();
 	}
-	template<typename Key>
-	constexpr auto & operator[](Key && key) {
+	constexpr auto & operator[](auto && key) {
 		return this->try_emplace(BOUNDED_FORWARD(key)).first->mapped();
 	}
 
-	template<typename Key>
-	constexpr auto equal_range(Key && key) const {
+	constexpr auto equal_range(auto && key) const {
 		auto const it = find(BOUNDED_FORWARD(key));
 		bool const found = it != end(*this);
 		return std::make_pair(it, found ? ::containers::next(it) : it);
 	}
 
-	template<typename Key>
-	constexpr size_type count(Key && key) const {
+	constexpr size_type count(auto && key) const {
 		bool const found = this->find(BOUNDED_FORWARD(key)) != end(*this);
 		return found ? 1 : 0;
 	}
 
-	template<typename Key>
-	constexpr size_type erase(Key && key) {
+	constexpr size_type erase(auto && key) {
 		auto const it = this->find(BOUNDED_FORWARD(key));
 		if (it == end(*this)) {
 			return 0;
@@ -554,23 +539,19 @@ public:
 	// compiler to be able to optimize based on the fact that values in flat_map
 	// are unique, so I have slightly different versions in flat_map.
 
-	template<typename Key>
-	constexpr auto equal_range(Key && key) const {
+	constexpr auto equal_range(auto && key) const {
 		return std::equal_range(begin(*this), end(*this), BOUNDED_FORWARD(key), compare());
 	}
-	template<typename Key>
-	constexpr auto equal_range(Key && key) {
+	constexpr auto equal_range(auto && key) {
 		return std::equal_range(begin(*this), end(*this), BOUNDED_FORWARD(key), compare);
 	}
 
-	template<typename Key>
-	constexpr auto count(Key && key) const {
+	constexpr auto count(auto && key) const {
 		auto const range = this->equal_range(BOUNDED_FORWARD(key));
 		return static_cast<size_type>(std::distance(range.first, range.second));
 	}
 	
-	template<typename Key>
-	constexpr size_type erase(Key && key) {
+	constexpr size_type erase(auto && key) {
 		auto const range = this->equal_range(BOUNDED_FORWARD(key));
 		if (range.first == end(*this)) {
 			return 0;

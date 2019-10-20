@@ -20,24 +20,23 @@ namespace containers {
 namespace detail {
 namespace common {
 
-template<container Container, range Range>
-constexpr void assign(Container & container, Range && range) {
-	auto it = begin(container);
-	auto first = begin(BOUNDED_FORWARD(range));
-	auto last = end(BOUNDED_FORWARD(range));
+constexpr void assign(container auto & destination, range auto && source) {
+	auto it = begin(destination);
+	auto first = begin(BOUNDED_FORWARD(source));
+	auto last = end(BOUNDED_FORWARD(source));
 	for (; first != last; ++first) {
-		if (it == end(container)) {
+		if (it == end(destination)) {
 			break;
 		}
 		*it = *first;
 		++it;
 	}
-	erase(container, it, end(container));
-	append(container, range_view(first, last));
+	erase(destination, it, end(destination));
+	append(destination, range_view(first, last));
 }
 template<container Container>
-constexpr void assign(Container & container, std::initializer_list<typename Container::value_type> init) {
-	assign(container, range_view(init));
+constexpr void assign(Container & destination, std::initializer_list<typename Container::value_type> init) {
+	assign(destination, range_view(init));
 }
 
 }	// namespace common

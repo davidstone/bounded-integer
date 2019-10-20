@@ -34,8 +34,7 @@ struct dynamic_array_data {
 	
 	constexpr dynamic_array_data() = default;
 
-	template<typename Size>
-	constexpr dynamic_array_data(T * const pointer_, Size const size_):
+	constexpr dynamic_array_data(T * const pointer_, auto const size_):
 		pointer(pointer_),
 		size(static_cast<size_type>(size_))
 	{
@@ -55,8 +54,8 @@ constexpr auto end(dynamic_array_data<T> const container) {
 }
 
 
-template<typename T, typename Size>
-constexpr auto make_storage(Size const size) {
+template<typename T>
+constexpr auto make_storage(auto const size) {
 	return dynamic_array_data(
 		std::allocator<T>{}.allocate(static_cast<std::size_t>(size)),
 		size
@@ -81,13 +80,13 @@ constexpr auto cleanup(dynamic_array_data<T> const data) {
 
 
 
-template<typename T, range Range>
-auto dynamic_array_initializer(Range && range) {
-	auto const data = make_storage<T>(::containers::detail::linear_size(range));
+template<typename T>
+auto dynamic_array_initializer(range auto && init) {
+	auto const data = make_storage<T>(::containers::detail::linear_size(init));
 	try {
 		containers::uninitialized_copy(
-			begin(BOUNDED_FORWARD(range)),
-			end(BOUNDED_FORWARD(range)),
+			begin(BOUNDED_FORWARD(init)),
+			end(BOUNDED_FORWARD(init)),
 			begin(data)
 		);
 	} catch(...) {

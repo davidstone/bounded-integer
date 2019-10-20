@@ -22,14 +22,13 @@ namespace containers {
 namespace detail {
 namespace common {
 
-// TODO: this implementation is for contiguous ranges
-template<container Container, iterator Iterator>
-constexpr auto erase(Container & container, Iterator const first_, Iterator const last_) {
-	auto const first = ::containers::detail::mutable_iterator(container, first_);
-	auto const last = ::containers::detail::mutable_iterator(container, last_);
-	auto const to_clear = ::containers::move(last, end(container), first).output;
-	while (to_clear != end(container)) {
-		pop_back(container);
+template<iterator Iterator>
+constexpr auto erase(container auto & source, Iterator const first_, Iterator const last_) {
+	auto const first = ::containers::detail::mutable_iterator(source, first_);
+	auto const last = ::containers::detail::mutable_iterator(source, last_);
+	auto const to_clear = ::containers::move(last, end(source), first).output;
+	while (to_clear != end(source)) {
+		pop_back(source);
 	}
 	return first;
 }
@@ -39,9 +38,8 @@ constexpr auto erase(Container & container, typename Container::const_iterator c
 	return erase(container, it, ::containers::next(it));
 }
 
-template<container Container, typename Predicate>
-constexpr auto erase_if(Container & container, Predicate predicate) {
-	return erase(container, ::containers::remove_if(container, std::move(predicate)), end(container));
+constexpr auto erase_if(container auto & source, auto predicate) {
+	return erase(source, ::containers::remove_if(source, std::move(predicate)), end(source));
 }
 
 

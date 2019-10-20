@@ -28,6 +28,7 @@ struct reference_wrapper {
 		return *m_ptr;
 	}
 
+	// TODO: Use terse syntax when clang does not crash
 	template<typename... Args>
 	constexpr auto operator()(Args && ... args) const BOUNDED_RETURNS(
 		get()(BOUNDED_FORWARD(args)...)

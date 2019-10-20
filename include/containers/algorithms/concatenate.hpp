@@ -19,9 +19,9 @@ namespace detail {
 
 // This assumes that the begining of the result is full of unused memory, and
 // all elements in result are already where they belong.
-template<typename Result, typename Range, typename... Ranges>
-constexpr auto concatenate_prepend_append(Result & result, typename Result::iterator const it, Range && range, Ranges && ... ranges) {
-	if constexpr (std::is_same_v<Result, std::remove_reference_t<Range>>) {
+template<typename Result>
+constexpr auto concatenate_prepend_append(Result & result, typename Result::iterator const it, auto && range, auto && ... ranges) {
+	if constexpr (std::is_same_v<Result, std::remove_reference_t<decltype(range)>>) {
 		if (std::addressof(result) == std::addressof(range)) {
 			(..., append(result, BOUNDED_FORWARD(ranges)));
 			return;
@@ -74,8 +74,8 @@ constexpr auto ugly_size_hack(Size const size) {
 
 // TODO: support non-sized input ranges, splicable output ranges, and
 // non-reservable output ranges
-template<typename Result, typename... Ranges>
-constexpr auto concatenate(Ranges && ... ranges) {
+template<typename Result>
+constexpr auto concatenate(auto && ... ranges) {
 	auto const total_size = (0_bi + ... + ::containers::detail::ugly_size_hack(size(ranges)));
 	using Integer = std::remove_const_t<decltype(total_size)>;
 

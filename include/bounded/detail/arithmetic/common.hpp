@@ -35,32 +35,34 @@ BOUNDED_INTEGER_COMPOUND_ASSIGNMENT_OPERATOR(^)
 
 #undef BOUNDED_INTEGER_COMPOUND_ASSIGNMENT_OPERATOR
 
-template<typename T>
-constexpr auto operator++(T & value) BOUNDED_RETURNS(
+constexpr auto operator++(auto & value) BOUNDED_RETURNS(
 	value += constant<1>
 )
 
 template<typename T>
 concept incrementable = requires(T value) { ++value; };
 
-template<incrementable T> requires std::is_copy_constructible_v<T>
-constexpr auto operator++(T & value, int) {
+template<typename T>
+concept generic_postfix_incrementable = incrementable<T> and std::is_copy_constructible_v<T>;
+
+constexpr auto operator++(generic_postfix_incrementable auto & value, int) {
 	auto previous = value;
 	++value;
 	return previous;
 }
 
 
-template<typename T>
-constexpr auto operator--(T & value) BOUNDED_RETURNS(
+constexpr auto operator--(auto & value) BOUNDED_RETURNS(
 	value -= constant<1>
 )
 
 template<typename T>
 concept decrementable = requires(T value) { --value; };
 
-template<decrementable T> requires std::is_copy_constructible_v<T>
-constexpr auto operator--(T & value, int) {
+template<typename T>
+concept generic_postfix_decrementable = decrementable<T> and std::is_copy_constructible_v<T>;
+
+constexpr auto operator--(generic_postfix_decrementable auto & value, int) {
 	auto previous = value;
 	--value;
 	return previous;

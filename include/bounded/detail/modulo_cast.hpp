@@ -41,8 +41,8 @@ constexpr auto cast_to_signed_integer(detail_signed_builtin auto const value) {
 }
 
 // Returns the equivalent value under modular arithmetic
-template<typename Result, typename Source>
-constexpr auto modulo_cast(Source const source) {
+template<typename Result>
+constexpr auto modulo_cast(auto const source) {
 	if constexpr (std::is_signed_v<Result>) {
 		return ::bounded::detail::cast_to_signed_integer(static_cast<std::make_unsigned_t<Result>>(source));
 	} else {

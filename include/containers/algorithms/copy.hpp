@@ -19,12 +19,11 @@ constexpr auto copy(T && value) {
 	return std::decay_t<T>(BOUNDED_FORWARD(value));
 }
 
-
-template<typename InputIterator, typename Sentinel, typename OutputIterator>
-constexpr auto copy(InputIterator first, Sentinel const last, OutputIterator out) {
+template<iterator InputIterator>
+constexpr auto copy(InputIterator first, sentinel_for<InputIterator> auto const last, iterator auto out) {
 	struct result {
 		InputIterator input;
-		OutputIterator output;
+		decltype(out) output;
 	};
 	for (; first != last; ++first) {
 		*out = *first;
@@ -33,23 +32,23 @@ constexpr auto copy(InputIterator first, Sentinel const last, OutputIterator out
 	return result { first, out };
 }
 
-template<typename InputIterator, typename Sentinel, typename OutputIterator>
-constexpr auto move(InputIterator const first, Sentinel const last, OutputIterator const out) {
+template<iterator InputIterator>
+constexpr auto move(InputIterator const first, sentinel_for<InputIterator> auto const last, iterator auto const out) {
 	auto const iterators = ::containers::copy(::containers::move_iterator(first), ::containers::move_iterator(last), out);
 	struct result {
 		InputIterator input;
-		OutputIterator output;
+		decltype(out) output;
 	};
 	return result { iterators.input.base(), iterators.output };
 }
 
-template<typename BidirectionalIterator, typename BidirectionalOutput>
-constexpr auto copy_backward(BidirectionalIterator const first, BidirectionalIterator const last, BidirectionalOutput const out_last) {
+template<bidirectional_iterator BidirectionalIterator>
+constexpr auto copy_backward(BidirectionalIterator const first, BidirectionalIterator const last, bidirectional_iterator auto const out_last) {
 	return ::containers::copy(::containers::reverse_iterator(last), ::containers::reverse_iterator(first), ::containers::reverse_iterator(out_last)).output.base();
 }
 
-template<typename BidirectionalIterator, typename BidirectionalOutput>
-constexpr auto move_backward(BidirectionalIterator const first, BidirectionalIterator const last, BidirectionalOutput const out_last) {
+template<bidirectional_iterator BidirectionalIterator>
+constexpr auto move_backward(BidirectionalIterator const first, BidirectionalIterator const last, bidirectional_iterator auto const out_last) {
 	return ::containers::copy_backward(::containers::move_iterator(first), ::containers::move_iterator(last), out_last);
 }
 

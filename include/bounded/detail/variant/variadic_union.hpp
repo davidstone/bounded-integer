@@ -16,41 +16,35 @@
 namespace bounded {
 namespace detail {
 
-template<bool, typename... Ts>
+template<typename... Ts>
 union variadic_union {
 };
 
-template<typename... Ts>
-using variadic_union_t = variadic_union<(... and std::is_trivially_destructible_v<Ts>), Ts...>;
-
-
-template<typename T, typename... Ts>
-union variadic_union<true, T, Ts...> {
-	template<typename... Args>
-	explicit constexpr variadic_union(constant_t<0>, Args && ... args):
+template<typename T, typename... Ts> requires(std::is_trivially_destructible_v<T> and ... and std::is_trivially_destructible_v<Ts>)
+union variadic_union<T, Ts...> {
+	explicit constexpr variadic_union(constant_t<0>, auto && ... args):
 		head(BOUNDED_FORWARD(args)...)
 	{
 	}
-	template<auto n, typename... Args>
-	explicit constexpr variadic_union(constant_t<n> const index, Args && ... args):
+	template<auto n>
+	explicit constexpr variadic_union(constant_t<n> const index, auto && ... args):
 		tail(index - constant<1>, BOUNDED_FORWARD(args)...)
 	{
 	}
 
 	T head;
-	variadic_union_t<Ts...> tail;
+	variadic_union<Ts...> tail;
 };
 
 
 template<typename T, typename... Ts>
-union variadic_union<false, T, Ts...> {
-	template<typename... Args>
-	explicit constexpr variadic_union(constant_t<0>, Args && ... args):
+union variadic_union<T, Ts...> {
+	explicit constexpr variadic_union(constant_t<0>, auto && ... args):
 		head(BOUNDED_FORWARD(args)...)
 	{
 	}
-	template<auto n, typename... Args>
-	explicit constexpr variadic_union(constant_t<n> const index, Args && ... args):
+	template<auto n>
+	explicit constexpr variadic_union(constant_t<n> const index, auto && ... args):
 		tail(index - constant<1>, BOUNDED_FORWARD(args)...)
 	{
 	}
@@ -62,13 +56,13 @@ union variadic_union<false, T, Ts...> {
 	~variadic_union() {}
 
 	T head;
-	variadic_union_t<Ts...> tail;
+	variadic_union<Ts...> tail;
 };
 
 
 
-template<typename V, auto n> requires(n >= 0)
-constexpr auto && get_union_element(V && v, constant_t<n> const index) {
+template<auto n> requires(n >= 0)
+constexpr auto && get_union_element(auto && v, constant_t<n> const index) {
 	if constexpr (index == constant<0>) {
 		return BOUNDED_FORWARD(v).head;
 	} else {

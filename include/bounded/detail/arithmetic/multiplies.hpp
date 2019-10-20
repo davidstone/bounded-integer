@@ -41,14 +41,7 @@ auto multiplies = [](auto const lhs, auto const rhs) {
 
 }	// namespace detail
 
-template<
-	auto lhs_min, auto lhs_max, typename lhs_policy,
-	auto rhs_min, auto rhs_max, typename rhs_policy
->
-constexpr auto operator*(
-	integer<lhs_min, lhs_max, lhs_policy> const lhs_,
-	integer<rhs_min, rhs_max, rhs_policy> const rhs_
-) {
+constexpr auto operator*(bounded_integer auto const lhs_, bounded_integer auto const rhs_) {
 	return detail::operator_overload(lhs_, rhs_, detail::multiplies, [](auto const lhs, auto const rhs) {
 		auto p0 = detail::safer_multiply(lhs.min, rhs.min);
 		auto p1 = detail::safer_multiply(lhs.min, rhs.max);

@@ -16,8 +16,8 @@
 namespace containers {
 
 // TODO: Integrate this with "relocate"
-template<typename T>
-constexpr auto move_destroy(T && ref) noexcept {
+constexpr auto move_destroy(auto && ref) noexcept {
+	using T = std::remove_reference_t<decltype(ref)>;
 	static_assert(std::is_nothrow_move_constructible_v<T>, "Please provide a noexcept move_destroy overload for your type or mark its move constructor noexcept.");
 	static_assert(std::is_nothrow_destructible_v<T>, "Do not mark your destructor as noexcept(false)");
 	auto result = std::move(ref);
@@ -25,9 +25,12 @@ constexpr auto move_destroy(T && ref) noexcept {
 	return result;
 }
 
-template<typename Iterator>
-constexpr auto move_destroy_iterator(Iterator it_) {
-	return ::containers::transform_iterator_dereference(it_, [](Iterator const it) noexcept {
+constexpr auto move_destroy(auto & ref) noexcept {
+	return move_destroy(std::move(ref));
+}
+
+constexpr auto move_destroy_iterator(iterator auto it_) {
+	return ::containers::transform_iterator_dereference(it_, [](decltype(it_) const it) noexcept {
 		if constexpr (std::is_reference_v<decltype(*it)>) {
 			return move_destroy(*it);
 		} else {

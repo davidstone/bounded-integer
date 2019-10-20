@@ -25,13 +25,12 @@ concept pop_backable = is_container<Container> and (has_member_pop_back<Containe
 
 } // namespace detail
 
-template<typename Container> requires detail::pop_backable<Container>
-constexpr auto pop_back(Container & container) -> void {
-	if constexpr (detail::has_member_pop_back<Container>) {
-		container.pop_back();
+constexpr auto pop_back(detail::pop_backable auto & c) -> void {
+	if constexpr (detail::has_member_pop_back<decltype(c)>) {
+		c.pop_back();
 	} else {
-		bounded::destroy(back(container));
-		container.append_from_capacity(bounded::constant<-1>);
+		bounded::destroy(back(c));
+		c.append_from_capacity(bounded::constant<-1>);
 	}
 }
 

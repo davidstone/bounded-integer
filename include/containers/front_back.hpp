@@ -20,15 +20,13 @@ namespace containers {
 namespace detail {
 namespace common {
 
-template<range Range>
-constexpr decltype(auto) front(Range && range) {
-	BOUNDED_ASSERT(!empty(range));
-	return *begin(BOUNDED_FORWARD(range));
+constexpr decltype(auto) front(range auto && r) {
+	BOUNDED_ASSERT(!empty(r));
+	return *begin(BOUNDED_FORWARD(r));
 }
-template<range Range>
-constexpr decltype(auto) back(Range && range) {
-	BOUNDED_ASSERT(!empty(range));
-	return *containers::prev(end(BOUNDED_FORWARD(range)));
+constexpr decltype(auto) back(range auto && r) {
+	BOUNDED_ASSERT(!empty(r));
+	return *containers::prev(end(BOUNDED_FORWARD(r)));
 }
 
 }	// namespace common

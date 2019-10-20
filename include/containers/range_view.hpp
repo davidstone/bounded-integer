@@ -36,9 +36,10 @@ struct range_view {
 		range_view(std::move(pair).first, std::move(pair).second)
 	{
 	}
+	// TODO: Use terse syntax when clang does not crash
 	template<typename Range> requires range<Range>
-	constexpr explicit range_view(Range & range):
-		range_view(begin(range), end(range))
+	constexpr explicit range_view(Range & r):
+		range_view(begin(r), end(r))
 	{
 	}
 	

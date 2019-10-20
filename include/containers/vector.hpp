@@ -62,8 +62,7 @@ struct vector_base {
 		return ::containers::size(m_container);
 	}
 
-	template<typename Size>
-	auto make_storage(Size const new_capacity) {
+	auto make_storage(auto const new_capacity) {
 		return raw_container(repeat_default_n<typename raw_container::value_type>(new_capacity));
 	}
 	auto relocate_preallocated(raw_container temp) {
@@ -71,8 +70,7 @@ struct vector_base {
 		// m_size remains the same
 	}
 
-	template<typename Size>
-	auto relocate(Size const requested_capacity) {
+	auto relocate(auto const requested_capacity) {
 		auto temp = make_storage(requested_capacity);
 		containers::uninitialized_move_destroy(
 			*this,
@@ -81,8 +79,7 @@ struct vector_base {
 		relocate_preallocated(std::move(temp));
 	}
 	
-	template<typename Size>
-	auto set_size(Size const s) {
+	auto set_size(auto const s) {
 		m_size = s;
 	}
 private:

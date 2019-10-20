@@ -58,8 +58,8 @@ constexpr auto insertion_sort = [](auto const first, auto const last, auto cmp) 
 // implementation of O(n^2) insertion sort. When the standard library has been
 // updated to C++20, std::sort will be constexpr.
 constexpr inline struct sort_t {
-	template<iterator Iterator, typename Compare>
-	constexpr void operator()(Iterator const first, sentinel_for<Iterator> auto const last, Compare cmp) const {
+	template<iterator Iterator>
+	constexpr void operator()(Iterator const first, sentinel_for<Iterator> auto const last, auto cmp) const {
 		// Temporary, until std::sort is constexpr
 		if (std::is_constant_evaluated()) {
 			detail::insertion_sort(first, last, cmp);
@@ -67,21 +67,18 @@ constexpr inline struct sort_t {
 			std::sort(make_legacy_iterator(first), make_legacy_iterator(last), cmp);
 		}
 	}
-	template<range Range, typename Compare>
-	constexpr void operator()(Range & range, Compare cmp) const {
-		operator()(begin(range), end(range), cmp);
+	constexpr void operator()(range auto & to_sort, auto cmp) const {
+		operator()(begin(to_sort), end(to_sort), cmp);
 	}
-	template<range Range>
-	constexpr void operator()(Range & range) const {
-		operator()(range, std::less{});
+	constexpr void operator()(range auto & to_sort) const {
+		operator()(to_sort, std::less{});
 	}
 } sort;
 
 constexpr inline struct is_sorted_t {
-	template<range Range, typename Compare>
-	constexpr bool operator()(Range && range, Compare cmp) const {
-		auto first = begin(range);
-		auto const last = end(range);
+	constexpr bool operator()(range auto && to_sort, auto cmp) const {
+		auto first = begin(to_sort);
+		auto const last = end(to_sort);
 		if (first != last) {
 			for (auto next = containers::next(first); next != last; ++next) {
 				if (cmp(*next, *first)) {
@@ -92,9 +89,8 @@ constexpr inline struct is_sorted_t {
 		}
 		return true;
 	}
-	template<range Range>
-	constexpr bool operator()(Range && range) const {
-		return operator()(range, std::less{});
+	constexpr bool operator()(range auto && to_sort) const {
+		return operator()(to_sort, std::less{});
 	}
 } is_sorted;
 

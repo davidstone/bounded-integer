@@ -10,8 +10,7 @@
 namespace {
 using namespace bounded::literal;
 
-template<typename Range, typename MinIndex, typename MaxIndex>
-constexpr auto correct_min_max(Range const & range, MinIndex const min_index, MaxIndex const max_index) {
+constexpr auto correct_min_max(auto const & range, auto const min_index, auto const max_index) {
 	return
 		containers::min_element(range) == begin(range) + min_index and
 		containers::max_element(range) == begin(range) + max_index;

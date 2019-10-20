@@ -10,7 +10,6 @@
 #include <bounded/detail/forward.hpp>
 #include <bounded/detail/is_bounded_integer.hpp>
 #include <bounded/detail/make_index_sequence.hpp>
-#include <bounded/detail/requires.hpp>
 #include <bounded/detail/type.hpp>
 
 #include <type_traits>
@@ -38,8 +37,7 @@ template<std::size_t index, typename T>
 struct tuple_value {
 	tuple_value() = default;
 
-	template<lazy_construct_function_for<T> Function>
-	constexpr explicit tuple_value(lazy_init_t, Function function):
+	constexpr explicit tuple_value(lazy_init_t, lazy_construct_function_for<T> auto function):
 		m_value(std::move(function)())
 	{
 	}
@@ -83,8 +81,7 @@ template<std::size_t index>
 struct tuple_value<index, void> {
 	tuple_value() = default;
 
-	template<lazy_construct_function_for<void> Function>
-	constexpr explicit tuple_value(lazy_init_t, Function function) {
+	constexpr explicit tuple_value(lazy_init_t, lazy_construct_function_for<void> auto function) {
 		std::move(function)();
 	}
 
@@ -114,14 +111,13 @@ struct tuple_impl<std::index_sequence<indexes...>, Types...> : tuple_value<index
 
 	tuple_impl() = default;
 
-	template<typename... Args, BOUNDED_REQUIRES((... and std::is_convertible_v<Args, Types>))>
+	template<typename... Args> requires(... and std::is_convertible_v<Args, Types>)
 	constexpr tuple_impl(Args && ... args):
 		tuple_value<indexes, Types>(BOUNDED_FORWARD(args))...
 	{
 	}
 
-	template<typename... Functions> requires(... and lazy_construct_function_for<Functions, Types>)
-	constexpr tuple_impl(lazy_init_t, Functions... functions):
+	constexpr tuple_impl(lazy_init_t, lazy_construct_function_for<Types> auto ... functions):
 		tuple_value<indexes, Types>(lazy_init, std::move(functions))...
 	{
 	}
@@ -188,8 +184,8 @@ constexpr auto compare_impl(tuple<lhs_types...> const & lhs, tuple<rhs_types...>
 
 
 
-template<typename LHS, typename RHS, std::size_t... indexes>
-constexpr auto equal_impl(LHS const & lhs, RHS const & rhs, std::index_sequence<indexes...>) {
+template<std::size_t... indexes>
+constexpr auto equal_impl(auto const & lhs, auto const & rhs, std::index_sequence<indexes...>) {
 	return (... and (lhs[constant<indexes>] == rhs[constant<indexes>]));
 }
 
@@ -252,11 +248,11 @@ indexed_tuple(Tuple &&) -> indexed_tuple<std::make_index_sequence<tuple_size<Tup
 
 inline constexpr struct tuple_cat_t {
 private:
-	template<std::size_t... first_indexes, typename First, std::size_t... second_indexes, typename Second, typename... Tail>
+	template<std::size_t... first_indexes, typename First, std::size_t... second_indexes, typename Second>
 	constexpr auto cat_impl(
 		indexed_tuple<std::index_sequence<first_indexes...>, First> first,
 		indexed_tuple<std::index_sequence<second_indexes...>, Second> second,
-		Tail && ... tail
+		auto && ... tail
 	) const {
 		return operator()(
 			tuple<
@@ -273,9 +269,9 @@ private:
 public:
 	template<typename... Tuples> requires(... and detail::is_constructible<std::decay_t<Tuples>, Tuples &&>)
 	constexpr auto operator()(Tuples && ... tuples) const {
-		if constexpr (sizeof...(Tuples) == 0) {
+		if constexpr (sizeof...(tuples) == 0) {
 			return tuple<>{};
-		} else if constexpr (sizeof...(Tuples) == 1) {
+		} else if constexpr (sizeof...(tuples) == 1) {
 			return (..., BOUNDED_FORWARD(tuples));
 		} else {
 			return cat_impl(indexed_tuple{BOUNDED_FORWARD(tuples)}...);
@@ -286,17 +282,16 @@ public:
 
 inline constexpr struct apply_t {
 private:
-	template<typename Tuple, std::size_t... indexes, typename Function>
-	static constexpr decltype(auto) implementation(Tuple && tuple_args, std::index_sequence<indexes...>, Function && f) {
-		return BOUNDED_FORWARD(f)(BOUNDED_FORWARD(tuple_args)[constant<indexes>]...);
+	template<std::size_t... indexes>
+	static constexpr decltype(auto) implementation(auto && tuple_args, std::index_sequence<indexes...>, auto && function) {
+		return BOUNDED_FORWARD(function)(BOUNDED_FORWARD(tuple_args)[constant<indexes>]...);
 	}
 public:
-	template<typename Tuple, typename Function>
-	constexpr decltype(auto) operator()(Tuple && tuple_args, Function && f) const {
+	constexpr decltype(auto) operator()(auto && tuple_args, auto && function) const {
 		return implementation(
 			BOUNDED_FORWARD(tuple_args),
-			bounded::make_index_sequence(tuple_size<Tuple>),
-			BOUNDED_FORWARD(f)
+			bounded::make_index_sequence(tuple_size<decltype(tuple_args)>),
+			BOUNDED_FORWARD(function)
 		);
 	}
 } apply;
@@ -310,9 +305,9 @@ constexpr auto all_tuple_sizes() {
 }
 
 
-template<auto i, typename Function, typename... Tuples>
-constexpr auto transform_impl(constant_t<i> index, Function && function, Tuples && ... tuples) {
-	if constexpr (index == all_tuple_sizes<Tuples...>()) {
+template<auto i>
+constexpr auto transform_impl(constant_t<i> index, auto && function, auto && ... tuples) {
+	if constexpr (index == all_tuple_sizes<decltype(tuples)...>()) {
 		return tuple<>{};
 	} else {
 		return tuple_cat(
@@ -324,23 +319,14 @@ constexpr auto transform_impl(constant_t<i> index, Function && function, Tuples 
 
 }	// namespace detail
 
-template<typename Function, tuple_like... Tuples>
-constexpr auto transform(Function && function, Tuples && ... tuples) {
+constexpr auto transform(auto && function, tuple_like auto && ... tuples) {
 	return detail::transform_impl(constant<0>, function, BOUNDED_FORWARD(tuples)...);
 }
 
 
-template<std::size_t index, typename... Ts>
-constexpr auto && get(tuple<Ts...> const & t) {
-	return t[constant<index>];
-}
-template<std::size_t index, typename... Ts>
-constexpr auto && get(tuple<Ts...> & t) {
-	return t[constant<index>];
-}
-template<std::size_t index, typename... Ts>
-constexpr auto && get(tuple<Ts...> && t) {
-	return std::move(t)[constant<index>];
+template<std::size_t index>
+constexpr auto && get(tuple_like auto && t) {
+	return BOUNDED_FORWARD(t)[constant<index>];
 }
 
 }	// namespace bounded

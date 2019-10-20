@@ -12,9 +12,8 @@
 namespace bounded {
 namespace detail {
 
-template<typename T>
-constexpr auto as_builtin_integer(T const value) {
-	if constexpr (is_bounded_integer<T>) {
+constexpr auto as_builtin_integer(auto const value) {
+	if constexpr (is_bounded_integer<decltype(value)>) {
 		return value.value();
 	} else {
 		return value;

@@ -42,6 +42,7 @@ constexpr decltype(auto) operator_bracket(Range && range, index_type<std::decay_
 }	// namespace detail
 }	// namespace containers
 
+// TODO: This currently crashes clang to use terse syntax
 #define CONTAINERS_OPERATOR_BRACKET_DEFINITIONS(type) \
 	template<typename Index> \
 	constexpr auto operator[](Index const index) const & -> \

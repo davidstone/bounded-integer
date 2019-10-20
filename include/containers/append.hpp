@@ -36,8 +36,8 @@ namespace common {
 // I would like to return an iterator to the start of the appended range, but
 // that does not seem possible to do efficiently in general due to potential
 // iterator instability.
-template<push_backable Container, typename Range>
-constexpr auto append(Container & output, Range && input) -> void {
+template<push_backable Container>
+constexpr auto append(Container & output, range auto && input) -> void {
 	// TODO: Define InputRange and ForwardRange concepts
 	using iterator_category = typename std::iterator_traits<decltype(begin(input))>::iterator_category;
 	constexpr auto reserve_space = std::is_convertible_v<iterator_category, std::forward_iterator_tag> and reservable<Container>;
@@ -62,7 +62,7 @@ constexpr auto append(Container & output, Range && input) -> void {
 			end(output)
 		);
 		output.append_from_capacity(new_end - end(output));
-	} else if constexpr (member_insertable<Container, Range> and std::is_move_constructible_v<typename Container::value_type> and std::is_move_assignable_v<typename Container::value_type>) {
+	} else if constexpr (member_insertable<Container, decltype(input)> and std::is_move_constructible_v<typename Container::value_type> and std::is_move_assignable_v<typename Container::value_type>) {
 		output.insert(end(output), begin(BOUNDED_FORWARD(input)), end(BOUNDED_FORWARD(input)));
 	} else {
 		for (decltype(auto) value : BOUNDED_FORWARD(input)) {

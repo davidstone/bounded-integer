@@ -11,8 +11,8 @@
 namespace bounded {
 namespace detail {
 
-template<typename T, typename Value>
-constexpr auto value_fits_in_type(Value const value) {
+template<typename T>
+constexpr auto value_fits_in_type(auto const value) {
 	return safe_compare(builtin_min_value<T>, value) <= 0 and safe_compare(value, builtin_max_value<T>) <= 0;
 }
 

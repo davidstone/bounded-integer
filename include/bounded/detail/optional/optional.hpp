@@ -50,14 +50,12 @@ struct default_optional_storage {
 	{
 	}
 	
-	template<typename... Args>
-	constexpr default_optional_storage(Args && ... args):
+	constexpr default_optional_storage(auto && ... args):
 		m_data(std::in_place, value_index, BOUNDED_FORWARD(args)...)
 	{
 	}
 	
-	template<typename... Args>
-	constexpr auto initialize(optional_tag, Args && ... args) {
+	constexpr auto initialize(optional_tag, auto && ... args) {
 		m_data.emplace(value_index, BOUNDED_FORWARD(args)...);
 	}
 	
@@ -85,8 +83,7 @@ private:
 	variant<none_t, T> m_data;
 };
 
-template<typename Optional, typename T>
-constexpr auto & assign(Optional & target, T && source) {
+constexpr auto & assign(auto & target, auto && source) {
 	if (target) {
 		*target = BOUNDED_FORWARD(source);
 	} else {
@@ -95,8 +92,7 @@ constexpr auto & assign(Optional & target, T && source) {
 	return target;
 }
 
-template<typename Target, typename Source>
-constexpr auto & assign_from_optional(Target & target, Source && source) {
+constexpr auto & assign_from_optional(auto & target, auto && source) {
 	if (!source) {
 		target = none;
 	} else {
@@ -190,8 +186,7 @@ public:
 	}
 
 	// TODO: handle std::initializer_list
-	template<typename... Args>
-	constexpr auto emplace(Args && ... args) {
+	constexpr auto emplace(auto && ... args) {
 		m_value.initialize(optional_tag{}, BOUNDED_FORWARD(args)...);
 	}
 
@@ -207,11 +202,10 @@ public:
 	
 private:
 
-	template<typename Optional>
-	constexpr optional(Optional && other, common_init_tag):
+	constexpr optional(auto && other_optional, common_init_tag):
 		optional(none) {
-		if (other) {
-			emplace(*BOUNDED_FORWARD(other));
+		if (other_optional) {
+			emplace(*BOUNDED_FORWARD(other_optional));
 		}
 	}
 	
@@ -221,8 +215,7 @@ private:
 template<typename T> requires(!std::is_same_v<T, none_t> and !std::is_same_v<T, std::in_place_t>)
 optional(T) -> optional<T>;
 
-template<typename T>
-constexpr auto make_optional(T && value) -> optional<std::remove_cv_t<std::remove_reference_t<T>>> {
+constexpr auto make_optional(auto && value) -> optional<std::remove_cv_t<std::remove_reference_t<decltype(value)>>> {
 	return { BOUNDED_FORWARD(value) };
 }
 

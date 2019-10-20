@@ -21,9 +21,8 @@ namespace containers {
 namespace detail {
 
 // This is written so that a special predicate built on std::less can work
-// TODO: Handle OutputIterator in addition to MutableForwardIterator
-template<typename InputIterator, typename Sentinel, typename MutableForwardIterator, typename BinaryPredicate>
-constexpr auto unique_common(InputIterator first, Sentinel const last, MutableForwardIterator output, BinaryPredicate equal) {
+template<iterator Iterator>
+constexpr auto unique_common(Iterator first, sentinel_for<Iterator> auto const last, iterator auto output, auto equal) {
 	for (; first != last; ++first) {
 		auto && output_ref = *output;
 		auto && first_ref = *first;
@@ -39,8 +38,8 @@ constexpr auto unique_common(InputIterator first, Sentinel const last, MutableFo
 }	// namespace detail
 
 
-template<typename InputIterator, typename Sentinel, typename MutableForwardIterator, typename BinaryPredicate = std::equal_to<>>
-constexpr auto unique_copy(InputIterator const first, Sentinel const last, MutableForwardIterator const output, BinaryPredicate equal = BinaryPredicate{}) {
+template<iterator Iterator, typename BinaryPredicate = std::equal_to<>>
+constexpr auto unique_copy(Iterator const first, sentinel_for<Iterator> auto const last, iterator auto const output, BinaryPredicate equal = BinaryPredicate{}) {
 	if (first == last) {
 		return output;
 	}
@@ -51,8 +50,8 @@ constexpr auto unique_copy(InputIterator const first, Sentinel const last, Mutab
 
 namespace detail {
 
-template<typename MutableForwardIterator, typename Sentinel, typename BinaryPredicate>
-constexpr auto find_first_equal(MutableForwardIterator first, Sentinel const last, BinaryPredicate equal) {
+template<iterator Iterator>
+constexpr auto find_first_equal(Iterator first, sentinel_for<Iterator> auto const last, auto equal) {
 	if (first == last) {
 		return first;
 	}
@@ -71,8 +70,8 @@ constexpr auto find_first_equal(MutableForwardIterator first, Sentinel const las
 
 
 
-template<typename MutableForwardIterator, typename Sentinel, typename BinaryPredicate = std::equal_to<>>
-constexpr auto unique(MutableForwardIterator const first, Sentinel const last, BinaryPredicate equal = BinaryPredicate{}) {
+template<iterator Iterator, typename BinaryPredicate = std::equal_to<>>
+constexpr auto unique(Iterator const first, sentinel_for<Iterator> auto const last, BinaryPredicate equal = BinaryPredicate{}) {
 	auto const equal_element = detail::find_first_equal(first, last, equal);
 	if (equal_element == last) {
 		return equal_element;
@@ -90,20 +89,20 @@ constexpr auto unique(MutableForwardIterator const first, Sentinel const last, B
 	);
 }
 
-template<typename InputIterator, typename Sentinel, typename MutableForwardIterator, typename BinaryPredicate = std::less<>>
-constexpr auto unique_copy_less(InputIterator const first, Sentinel const last, MutableForwardIterator const output, BinaryPredicate less = BinaryPredicate{}) {
+template<iterator Iterator, typename BinaryPredicate = std::less<>>
+constexpr auto unique_copy_less(Iterator const first, sentinel_for<Iterator> auto const last, iterator auto const output, BinaryPredicate less = BinaryPredicate{}) {
 	return ::containers::unique_copy(first, last, output, negate(less));
 }
-template<typename MutableForwardIterator, typename Sentinel, typename BinaryPredicate = std::less<>>
-constexpr auto unique_less(MutableForwardIterator const first, Sentinel const last, BinaryPredicate less = BinaryPredicate{}) {
+template<iterator Iterator, typename BinaryPredicate = std::less<>>
+constexpr auto unique_less(Iterator const first, sentinel_for<Iterator> auto const last, BinaryPredicate less = BinaryPredicate{}) {
 	return ::containers::unique(first, last, negate(less));
 }
 
 
 namespace detail {
 
-template<typename InputIterator, typename Sentinel, typename T, typename BinaryPredicate>
-constexpr auto next_greater(InputIterator const first, Sentinel const last, T const & x, BinaryPredicate less) {
+template<iterator Iterator>
+constexpr auto next_greater(Iterator const first, sentinel_for<Iterator> auto const last, auto const & x, auto less) {
 	return ::containers::find_if(first, last, [&](auto const & value) { return less(x, value); });
 }
 
@@ -111,8 +110,8 @@ constexpr auto next_greater(InputIterator const first, Sentinel const last, T co
 }	// namespace detail
 
 
-template<typename InputIterator1, typename Sentinel1, typename InputIterator2, typename Sentinel2, typename MutableForwardIterator, typename BinaryPredicate = std::less<>>
-constexpr auto unique_merge_copy(InputIterator1 first1, Sentinel1 const last1, InputIterator2 first2, Sentinel2 const last2, MutableForwardIterator output, BinaryPredicate less = BinaryPredicate{}) {
+template<iterator Iterator1, iterator Iterator2, typename BinaryPredicate = std::less<>>
+constexpr auto unique_merge_copy(Iterator1 first1, sentinel_for<Iterator1> auto const last1, Iterator2 first2, sentinel_for<Iterator2> auto const last2, iterator auto output, BinaryPredicate less = BinaryPredicate{}) {
 	while (first1 != last1 and first2 != last2) {
 		*output = less(*first2, *first1) ? *first2++ : *first1++;
 		first1 = ::containers::detail::next_greater(first1, last1, *output, less);
@@ -120,16 +119,14 @@ constexpr auto unique_merge_copy(InputIterator1 first1, Sentinel1 const last1, I
 		++output;
 	}
 
-	if (first1 != last1) {
-		return ::containers::unique_copy_less(first1, last1, output, less);
-	} else {
-		return ::containers::unique_copy_less(first2, last2, output, less);
-	}
+	return (first1 != last1) ?
+		::containers::unique_copy_less(first1, last1, output, less) :
+		::containers::unique_copy_less(first2, last2, output, less);
 }
 
 // Both ranges must be sorted
-template<typename MutableForwardIterator, typename Sentinel, typename BinaryPredicate = std::less<>>
-auto unique_inplace_merge(MutableForwardIterator first, MutableForwardIterator middle, Sentinel const last, BinaryPredicate less = BinaryPredicate{}) {
+template<iterator Iterator, typename BinaryPredicate = std::less<>>
+auto unique_inplace_merge(Iterator first, Iterator middle, sentinel_for<Iterator> auto const last, BinaryPredicate less = BinaryPredicate{}) {
 	BOUNDED_ASSERT(containers::is_sorted(range_view(first, middle), less));
 	BOUNDED_ASSERT(containers::is_sorted(range_view(middle, last), less));
 	auto less_to_equal = [&](auto const & lhs, auto const & rhs) {
@@ -159,8 +156,8 @@ auto unique_inplace_merge(MutableForwardIterator first, MutableForwardIterator m
 	// Keep all the elements that will end up at the beginning where they are
 	auto find_first_to_move = [=]() mutable {
 		struct Result {
-			MutableForwardIterator before_target;
-			MutableForwardIterator target;
+			Iterator before_target;
+			Iterator target;
 		};
 
 		auto before = first;

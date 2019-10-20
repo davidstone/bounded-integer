@@ -6,6 +6,9 @@
 #pragma once
 
 #include <containers/algorithms/negate.hpp>
+#include <containers/is_iterator.hpp>
+#include <containers/is_iterator_sentinel.hpp>
+#include <containers/is_range.hpp>
 
 #include <bounded/integer.hpp>
 
@@ -14,40 +17,37 @@
 
 namespace containers {
 
-template<typename InputIterator, typename Sentinel, typename UnaryPredicate>
-constexpr auto find_if(InputIterator first, Sentinel const last, UnaryPredicate p) {
+template<iterator InputIterator>
+constexpr auto find_if(InputIterator first, sentinel_for<InputIterator> auto const last, auto predicate) {
 	for (; first != last; ++first) {
-		if (p(*first)) {
+		if (predicate(*first)) {
 			break;
 		}
 	}
 	return first;
 }
 
-template<typename Range, typename UnaryPredicate>
-constexpr auto find_if(Range && range, UnaryPredicate p) {
-	return ::containers::find_if(begin(BOUNDED_FORWARD(range)), end(BOUNDED_FORWARD(range)), std::move(p));
+constexpr auto find_if(range auto && range, auto predicate) {
+	return ::containers::find_if(begin(BOUNDED_FORWARD(range)), end(BOUNDED_FORWARD(range)), std::move(predicate));
 }
 
 
-template<typename InputIterator, typename Sentinel, typename UnaryPredicate>
-constexpr auto find_if_not(InputIterator const first, Sentinel const last, UnaryPredicate p) {
-	return ::containers::find_if(first, last, ::containers::negate(std::move(p)));
+template<iterator InputIterator>
+constexpr auto find_if_not(InputIterator const first, sentinel_for<InputIterator> auto const last, auto predicate) {
+	return ::containers::find_if(first, last, ::containers::negate(std::move(predicate)));
 }
 
-template<typename Range, typename UnaryPredicate>
-constexpr auto find_if_not(Range && range, UnaryPredicate p) {
-	return ::containers::find_if_not(begin(BOUNDED_FORWARD(range)), end(BOUNDED_FORWARD(range)), std::move(p));
+constexpr auto find_if_not(range auto && range, auto predicate) {
+	return ::containers::find_if_not(begin(BOUNDED_FORWARD(range)), end(BOUNDED_FORWARD(range)), std::move(predicate));
 }
 
 
-template<typename InputIterator, typename Sentinel, typename T>
-constexpr auto find(InputIterator const first, Sentinel const last, T const & value) {
+template<iterator InputIterator>
+constexpr auto find(InputIterator const first, sentinel_for<InputIterator> auto const last, auto const & value) {
 	return ::containers::find_if(first, last, bounded::equal_to(value));
 }
 
-template<typename Range, typename T>
-constexpr auto find(Range && range, T const & value) {
+constexpr auto find(range auto && range, auto const & value) {
 	return ::containers::find(begin(BOUNDED_FORWARD(range)), end(BOUNDED_FORWARD(range)), value);
 }
 

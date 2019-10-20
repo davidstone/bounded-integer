@@ -17,8 +17,7 @@ namespace containers {
 
 using namespace bounded::literal;
 
-template<typename Range, typename Predicate>
-constexpr auto count_if(Range && range, Predicate predicate) {
+constexpr auto count_if(range auto && range, auto predicate) {
 	constexpr auto maximum = bounded::max_value<decltype(size(range))>;
 	bounded::integer<0, bounded::detail::normalize<maximum.value()>> sum = 0_bi;
 	for (decltype(auto) value : BOUNDED_FORWARD(range)) {
@@ -29,18 +28,17 @@ constexpr auto count_if(Range && range, Predicate predicate) {
 	return sum;
 }
 
-template<typename Iterator, typename Sentinel, typename Predicate>
-constexpr auto count_if(Iterator const first, Sentinel const last, Predicate predicate) {
+template<iterator Iterator>
+constexpr auto count_if(Iterator const first, sentinel_for<Iterator> auto const last, auto predicate) {
 	return ::containers::count_if(range_view(first, last), std::move(predicate));
 }
 
-template<typename Range, typename T>
-constexpr auto count(Range && range, T const & value) {
+constexpr auto count(range auto && range, auto const & value) {
 	return ::containers::count_if(BOUNDED_FORWARD(range), bounded::equal_to(value));
 }
 
-template<typename Iterator, typename Sentinel, typename T>
-constexpr auto count(Iterator const first, Sentinel const last, T const & value) {
+template<iterator Iterator>
+constexpr auto count(Iterator const first, sentinel_for<Iterator> auto const last, auto const & value) {
 	return ::containers::count_if(range_view(first, last), bounded::equal_to(value));
 }
 

@@ -10,8 +10,7 @@
 #include <iostream>
 #include <string_view>
 
-template<typename LHS, typename RHS>
-void assert_eq(LHS const & lhs, RHS const & rhs, std::size_t const line) {
+void assert_eq(auto const & lhs, auto const & rhs, std::size_t const line) {
 	if (lhs != rhs) {
 		auto print = [](auto const & container) {
 			std::cerr << "{ ";

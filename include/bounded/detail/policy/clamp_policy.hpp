@@ -12,15 +12,14 @@
 namespace bounded {
 
 struct clamp_policy {
-	template<typename T, typename Minimum, typename Maximum>
-	static constexpr auto assignment(T const & value, Minimum const & minimum, Maximum const & maximum) {
-		using policy = bounded::null_policy;
+	static constexpr auto assignment(auto const & value, auto const & minimum, auto const & maximum) {
+		constexpr auto policy = bounded::null_policy();
 		return min(
 			max(
-				integer(value, policy{}),
-				integer(minimum, policy{})
+				integer(value, policy),
+				integer(minimum, policy)
 			),
-			integer(maximum, policy{})
+			integer(maximum, policy)
 		);
 	}
 

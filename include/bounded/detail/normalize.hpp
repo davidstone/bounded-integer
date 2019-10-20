@@ -13,8 +13,7 @@
 namespace bounded {
 namespace detail {
 
-template<typename T>
-constexpr auto must_use_unsigned(T const value) {
+constexpr auto must_use_unsigned(auto const value) {
 	return value > 0 and static_cast<max_unsigned_t>(value) > static_cast<max_unsigned_t>(max_value<max_signed_t>);
 }
 

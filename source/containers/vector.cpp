@@ -131,6 +131,13 @@ constexpr auto operator==(complex_resource const & lhs, complex_resource const &
 	return lhs.data == rhs.data;
 }
 
+auto move_destroy(complex_resource && value) noexcept {
+	auto result = complex_resource();
+	result.data = std::move(value).data;
+	bounded::destroy(value);
+	return result;
+}
+
 BOUNDED_COMPARISON
 
 }	// namespace

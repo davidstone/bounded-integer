@@ -12,8 +12,7 @@
 
 namespace containers {
 
-template<typename Predicate>
-constexpr auto negate(Predicate predicate) {
+constexpr auto negate(auto predicate) {
 	return [predicate = std::move(predicate)](auto && ... args) {
 		return !predicate(BOUNDED_FORWARD(args)...);
 	};

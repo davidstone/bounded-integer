@@ -33,16 +33,8 @@ template<typename Compare, typename T1, typename T2>
 using extreme_t = typename extreme_type<Compare, std::decay_t<T1>, std::decay_t<T2>>::type;
 
 // TODO: This should be selected only for less and greater
-template<
-	typename Compare,
-	auto lhs_min, auto lhs_max, typename lhs_policy,
-	auto rhs_min, auto rhs_max, typename rhs_policy
->
-struct extreme_type<
-	Compare,
-	integer<lhs_min, lhs_max, lhs_policy>,
-	integer<rhs_min, rhs_max, rhs_policy>
-> {
+template<typename Compare, bounded_integer LHS, bounded_integer RHS>
+struct extreme_type<Compare, LHS, RHS> {
 private:
 	static constexpr auto select = [](auto const lhs, auto const rhs) {
 		if constexpr (Compare{}(lhs, rhs)) {
@@ -51,8 +43,8 @@ private:
 			return detail::normalize<rhs.value()>;
 		}
 	};
-	static constexpr auto minimum = select(constant<lhs_min>, constant<rhs_min>);
-	static constexpr auto maximum = select(constant<lhs_max>, constant<rhs_max>);
+	static constexpr auto minimum = select(min_value<LHS>, min_value<RHS>);
+	static constexpr auto maximum = select(max_value<LHS>, max_value<RHS>);
 public:
 	using type = integer<minimum, maximum>;
 };
@@ -72,23 +64,23 @@ private:
 	template<typename Compare, typename T1, typename T2>
 	using result_type = detail::add_common_cv_reference_t<extreme_t<Compare, T2, T1>, T1, T2>;
 	
-	template<typename Compare, typename T1, typename T2, typename result_t = result_type<Compare, T1, T2>>
-	static constexpr decltype(auto) extreme_two(Compare compare, T1 && t1, T2 && t2) {
+	template<typename T1, typename T2>
+	static constexpr decltype(auto) extreme_two(auto compare, T1 && t1, T2 && t2) {
+		using result_t = result_type<decltype(compare), T1, T2>;
 		return compare(t2, t1) ?
 			static_cast<result_t>(BOUNDED_FORWARD(t2)) :
 			static_cast<result_t>(BOUNDED_FORWARD(t1));
 	}
 
 public:
-	template<typename Compare, typename T>
-	constexpr decltype(auto) operator()(Compare, T && t) const {
+	constexpr decltype(auto) operator()(auto /* compare */, auto && t) const {
 		return BOUNDED_FORWARD(t);
 	}
 
 
-	template<typename Compare, typename T1, typename T2>
-	constexpr decltype(auto) operator()(Compare compare [[maybe_unused]], T1 && t1, T2 && t2) const {
-		using result_t = result_type<Compare, T1, T2>;
+	template<typename T1, typename T2>
+	constexpr decltype(auto) operator()(auto compare, T1 && t1, T2 && t2) const {
+		using result_t = result_type<decltype(compare), T1, T2>;
 		if constexpr (not std::is_constructible_v<result_t, T2>) {
 			return BOUNDED_FORWARD(t1);
 		} else if constexpr (not std::is_constructible_v<result_t, T1>) {
@@ -98,8 +90,7 @@ public:
 		}
 	}
 
-	template<typename Compare, typename T1, typename T2, typename... Ts>
-	constexpr decltype(auto) operator()(Compare compare, T1 && t1, T2 && t2, Ts && ... ts) const {
+	constexpr decltype(auto) operator()(auto compare, auto && t1, auto && t2, auto && ... ts) const {
 		return operator()(
 			compare,
 			operator()(compare, BOUNDED_FORWARD(t1), BOUNDED_FORWARD(t2)),
@@ -110,19 +101,12 @@ public:
 } extreme;
 
 
+inline constexpr auto min = [](auto && ... ts) -> decltype(auto) {
+	return extreme(less(), BOUNDED_FORWARD(ts)...);
+};
 
-constexpr inline struct min_t {
-	template<typename... Ts>
-	constexpr decltype(auto) operator()(Ts && ... ts) const {
-		return extreme(less(), BOUNDED_FORWARD(ts)...);
-	}
-} min;
-
-constexpr inline struct max_t {
-	template<typename... Ts>
-	constexpr decltype(auto) operator()(Ts && ... ts) const {
-		return extreme(greater(), BOUNDED_FORWARD(ts)...);
-	}
-} max;
+inline constexpr auto max = [](auto && ... ts) -> decltype(auto) {
+	return extreme(greater(), BOUNDED_FORWARD(ts)...);
+};
 
 }	// namespace bounded

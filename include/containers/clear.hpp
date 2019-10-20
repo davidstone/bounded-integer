@@ -19,18 +19,18 @@ concept member_pop_frontable = requires(Container & container) { container.pop_f
 namespace common {
 
 // TODO: Should probably get rid of the fallback to default construction
-template<container Container>
-constexpr auto clear(Container & container) {
+constexpr auto clear(container auto & value) {
+	using Container = decltype(value);
 	if constexpr (pop_backable<Container>) {
-		while (!empty(container)) {
-			pop_back(container);
+		while (!empty(value)) {
+			pop_back(value);
 		}
 	} else if constexpr (member_pop_frontable<Container>) {
-		while (!empty(container)) {
-			container.pop_front();
+		while (!empty(value)) {
+			value.pop_front();
 		}
 	} else {
-		container = {};
+		value = {};
 	}
 }
 

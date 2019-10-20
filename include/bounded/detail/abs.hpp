@@ -12,8 +12,8 @@
 
 namespace bounded {
 
-template<bounded_integer Integer>
-constexpr auto abs(Integer const value) {
+constexpr auto abs(bounded_integer auto const value) {
+	using Integer = decltype(value);
 	if constexpr (min_value<Integer> >= constant<0>) {
 		return value;
 	} else if constexpr (max_value<Integer> <= constant<0>) {

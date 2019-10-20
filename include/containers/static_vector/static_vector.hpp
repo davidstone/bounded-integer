@@ -41,9 +41,8 @@ struct static_vector_data {
 	static_vector_data & operator=(static_vector_data &&) & = default;
 	static_vector_data & operator=(static_vector_data const &) & = default;
 
-	template<typename Range> requires(range<Range>)
-	constexpr explicit static_vector_data(Range && range) {
-		for (decltype(auto) value : BOUNDED_FORWARD(range)) {
+	constexpr explicit static_vector_data(range auto && source) {
+		for (decltype(auto) value : BOUNDED_FORWARD(source)) {
 			::containers::emplace_back(*this, BOUNDED_FORWARD(value));
 		}
 	}
@@ -76,8 +75,7 @@ struct static_vector_data {
 	CONTAINERS_OPERATOR_BRACKET_DEFINITIONS(static_vector_data)
 	
 	// Assumes that elements are already constructed in the spare capacity
-	template<typename Integer>
-	constexpr void append_from_capacity(Integer const count) {
+	constexpr void append_from_capacity(auto const count) {
 		BOUNDED_ASSERT(count + m_size <= capacity());
 		m_size += count;
 	}
