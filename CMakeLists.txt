@@ -4,6 +4,11 @@
 # http://www.boost.org/LICENSE_1_0.txt)
 
 cmake_minimum_required(VERSION 3.14 FATAL_ERROR)
+
+if(NOT CMAKE_BUILD_TYPE)
+	set(CMAKE_BUILD_TYPE "Debug" CACHE STRING "Build type" FORCE)
+endif()
+
 project(bounded_integer LANGUAGES CXX)
 
 enable_testing()
