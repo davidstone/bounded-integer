@@ -17,6 +17,6 @@
 	// but is still carefully written to not defeat warnings for expressions
 	// like `assert(false, "My error message")` which actually would invoke the
 	// comma operator.
-	#define BOUNDED_ASSERT(...) (static_cast<bool>(__VA_ARGS__) ? void(0) : assert((__VA_ARGS__)))
+	#define BOUNDED_ASSERT(...) ((__VA_ARGS__) ? void() : assert((__VA_ARGS__)))
 	#define BOUNDED_ASSERT_OR_ASSUME BOUNDED_ASSERT
 #endif

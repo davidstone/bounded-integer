@@ -11,6 +11,7 @@
 #include <bounded/detail/construct_destroy.hpp>
 #include <bounded/detail/forward.hpp>
 #include <bounded/integer.hpp>
+#include <bounded/unreachable.hpp>
 
 #include <iterator>
 #include <utility>
@@ -88,7 +89,7 @@ public:
 
 template<typename Size, typename Function> requires(bounded::max_value<Size> == bounded::constant<0>)
 constexpr auto & operator++(repeat_n_iterator<Size, Function> & it) {
-	BOUNDED_ASSERT_OR_ASSUME(false);
+	bounded::unreachable();
 	return it;
 }
 

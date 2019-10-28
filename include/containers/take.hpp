@@ -11,6 +11,7 @@
 
 #include <bounded/detail/forward.hpp>
 #include <bounded/integer.hpp>
+#include <bounded/unreachable.hpp>
 
 #include <iterator>
 #include <utility>
@@ -115,7 +116,7 @@ private:
 
 template<typename Iterator, typename Count> requires(bounded::max_value<Count> == bounded::constant<0>)
 constexpr auto & operator++(counted_iterator<Iterator, Count> & it) {
-	BOUNDED_ASSERT_OR_ASSUME(false);
+	bounded::unreachable();
 	return it;
 }
 

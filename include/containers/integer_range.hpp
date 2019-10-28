@@ -11,6 +11,7 @@
 
 #include <bounded/assert.hpp>
 #include <bounded/integer.hpp>
+#include <bounded/unreachable.hpp>
 
 #include <iterator>
 #include <type_traits>
@@ -79,7 +80,7 @@ constexpr auto operator+(typename integer_range_iterator<Integer, Sentinel, Step
 
 template<typename Integer, typename Sentinel, typename Step>
 constexpr auto operator+(integer_range_iterator<Integer, Sentinel, Step> it, bounded::constant_t<1>) requires(bounded::max_value<typename decltype(it)::difference_type> == bounded::constant<0>) {
-	BOUNDED_ASSERT_OR_ASSUME(false);
+	bounded::unreachable();
 	return it;
 }
 

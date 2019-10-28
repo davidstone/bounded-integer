@@ -13,6 +13,7 @@
 #include <bounded/detail/forward.hpp>
 #include <bounded/assert.hpp>
 #include <bounded/integer.hpp>
+#include <bounded/unreachable.hpp>
 
 namespace containers {
 namespace detail {
@@ -33,7 +34,7 @@ constexpr auto concatenate_prepend_append(Result & result, typename Result::iter
 
 template<typename Result>
 constexpr auto concatenate_prepend_append(Result &, typename Result::iterator) {
-	BOUNDED_ASSERT_OR_ASSUME(false);
+	bounded::assert_or_assume_unreachable();
 }
 
 template<typename Result, typename Integer>

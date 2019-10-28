@@ -12,6 +12,7 @@
 #include <containers/size.hpp>
 
 #include <bounded/integer.hpp>
+#include <bounded/unreachable.hpp>
 
 namespace containers {
 namespace detail {
@@ -41,7 +42,7 @@ constexpr auto & emplace_back(Container & container, Args && ... args) {
 			temp.append_from_capacity(initial_size + 1_bi);
 			container = std::move(temp);
 		} else {
-			BOUNDED_ASSERT_OR_ASSUME(false);
+			bounded::assert_or_assume_unreachable();
 		}
 		return back(container);
 	}

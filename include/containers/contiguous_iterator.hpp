@@ -10,6 +10,7 @@
 #include <bounded/integer.hpp>
 
 #include <bounded/assert.hpp>
+#include <bounded/unreachable.hpp>
 
 #include <cstddef>
 
@@ -85,7 +86,7 @@ constexpr auto operator+(
 	contiguous_iterator<T, 0> const lhs,
 	bounded::constant_t<1>
 ) -> decltype(lhs) {
-	BOUNDED_ASSERT_OR_ASSUME(false);
+	bounded::unreachable();
 }
 
 

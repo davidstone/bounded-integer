@@ -253,7 +253,7 @@ struct sbo_vector_base {
 			if constexpr (std::is_constructible_v<typename small_t::size_type, decltype(new_size)>) {
 				m_small.set_size(static_cast<typename small_t::size_type>(new_size));
 			} else {
-				BOUNDED_ASSERT_OR_ASSUME(false);
+				bounded::assert_or_assume_unreachable();
 			}
 		} else {
 			m_large.set_size(static_cast<typename large_t::size_type>(new_size));

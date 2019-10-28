@@ -16,6 +16,7 @@
 #include <containers/reserve_if_reservable.hpp>
 
 #include <bounded/integer.hpp>
+#include <bounded/unreachable.hpp>
 
 #include <utility>
 
@@ -72,7 +73,7 @@ constexpr auto emplace(Container & container, typename Container::const_iterator
 			bounded::construct(*ptr, BOUNDED_FORWARD(args)...);
 		});
 	} else {
-		BOUNDED_ASSERT_OR_ASSUME(false);
+		bounded::assert_or_assume_unreachable();
 	}
 	return begin(container) + offset;
 }
@@ -105,7 +106,7 @@ constexpr auto insert(Container & container, typename Container::const_iterator 
 			::containers::uninitialized_copy(BOUNDED_FORWARD(range), ptr);
 		});
 	} else {
-		BOUNDED_ASSERT_OR_ASSUME(false);
+		bounded::assert_or_assume_unreachable();
 	}
 }
 
