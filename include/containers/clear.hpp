@@ -7,30 +7,22 @@
 
 #include <containers/is_container.hpp>
 #include <containers/pop_back.hpp>
+#include <containers/pop_front.hpp>
 
 #include <bounded/integer.hpp>
 
 namespace containers {
 namespace detail {
-
-template<typename Container>
-concept member_pop_frontable = requires(Container & container) { container.pop_front(); };
-
 namespace common {
 
-// TODO: Should probably get rid of the fallback to default construction
-constexpr auto clear(container auto & value) {
-	using Container = decltype(value);
-	if constexpr (pop_backable<Container>) {
-		while (!empty(value)) {
+template<typename Container> requires pop_backable<Container> or pop_frontable<Container>
+constexpr auto clear(Container & value) {
+	while (!empty(value)) {
+		if constexpr (pop_backable<Container>) {
 			pop_back(value);
+		} else {
+			pop_front(value);
 		}
-	} else if constexpr (member_pop_frontable<Container>) {
-		while (!empty(value)) {
-			value.pop_front();
-		}
-	} else {
-		value = {};
 	}
 }
 

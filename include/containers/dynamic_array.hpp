@@ -164,6 +164,10 @@ private:
 	detail::dynamic_array_data<value_type> m_data = {};
 };
 
+template<typename T>
+void clear(dynamic_array<T> & value) {
+	value = {};
+}
 
 template<typename T>
 inline constexpr auto is_container<dynamic_array<T>> = true;

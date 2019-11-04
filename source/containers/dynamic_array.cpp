@@ -53,7 +53,6 @@ void test_generic(T const & t, auto capacity, std::initializer_list<T> init) {
 	BOUNDED_TEST(containers::equal(copy, init));
 	
 	auto move = std::move(copy);
-	clear(copy);
 	BOUNDED_TEST(move == init_list);
 	
 	copy = move;
@@ -61,7 +60,6 @@ void test_generic(T const & t, auto capacity, std::initializer_list<T> init) {
 	BOUNDED_TEST(copy == move);
 	
 	move = std::move(copy);
-	clear(copy);
 	BOUNDED_TEST(empty(copy));
 	
 	BOUNDED_TEST(copy == default_constructed);
