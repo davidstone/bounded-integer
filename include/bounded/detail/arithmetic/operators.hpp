@@ -5,8 +5,8 @@
 
 #pragma once
 
+#include <bounded/detail/arithmetic/common.hpp>
 #include <bounded/detail/arithmetic/plus.hpp>
-#include <bounded/detail/arithmetic/minus.hpp>
 #include <bounded/detail/arithmetic/multiplies.hpp>
 #include <bounded/detail/arithmetic/divides.hpp>
 #include <bounded/detail/arithmetic/modulus.hpp>

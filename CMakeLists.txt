@@ -22,7 +22,6 @@ target_sources(bounded INTERFACE
 	$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>/include/bounded/detail/arithmetic/common.hpp
 	$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>/include/bounded/detail/arithmetic/divides.hpp
 	$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>/include/bounded/detail/arithmetic/left_shift.hpp
-	$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>/include/bounded/detail/arithmetic/minus.hpp
 	$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>/include/bounded/detail/arithmetic/modulus.hpp
 	$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>/include/bounded/detail/arithmetic/multiplies.hpp
 	$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>/include/bounded/detail/arithmetic/operators_builtin.hpp
@@ -193,7 +192,6 @@ add_executable(bounded_test
 	source/bounded/detail/arithmetic/common.cpp
 	source/bounded/detail/arithmetic/divides.cpp
 	source/bounded/detail/arithmetic/left_shift.cpp
-	source/bounded/detail/arithmetic/minus.cpp
 	source/bounded/detail/arithmetic/modulus.cpp
 	source/bounded/detail/arithmetic/multiplies.cpp
 	source/bounded/detail/arithmetic/operators_builtin.cpp

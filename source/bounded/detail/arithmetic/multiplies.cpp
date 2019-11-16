@@ -4,6 +4,7 @@
 // http://www.boost.org/LICENSE_1_0.txt)
 
 #include <bounded/detail/arithmetic/multiplies.hpp>
+#include <bounded/detail/arithmetic/unary_minus.hpp>
 #include <bounded/detail/class.hpp>
 #include <bounded/detail/typedefs.hpp>
 #include "extreme_values.hpp"

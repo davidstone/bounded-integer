@@ -4,14 +4,40 @@
 // http://www.boost.org/LICENSE_1_0.txt)
 
 #include <bounded/detail/arithmetic/common.hpp>
+#include <bounded/detail/arithmetic/operators.hpp>
 #include <bounded/detail/arithmetic/operators_builtin.hpp>
 #include <bounded/detail/comparison.hpp>
 #include <bounded/detail/comparison_mixed.hpp>
 #include <bounded/detail/typedefs.hpp>
 
+#include "../../homogeneous_equals.hpp"
 #include "../../../test_assert.hpp"
 
 namespace {
+
+static_assert(homogeneous_equals(
+	bounded::constant<0> - bounded::constant<0>,
+	bounded::constant<0>
+));
+static_assert(homogeneous_equals(
+	bounded::constant<0> - bounded::constant<1>,
+	bounded::constant<-1>
+));
+#if 0
+static_assert(homogeneous_equals(
+	unsigned_max - signed_max,
+	bounded::constant<static_cast<bounded::detail::unsigned_max_t>(unsigned_max) - static_cast<bounded::detail::unsigned_max_t>(signed_max)>
+));
+#endif
+static_assert(homogeneous_equals(
+	bounded::checked_integer<1, 10>(9, bounded::non_check) - bounded::checked_integer<-3, 11>(4, bounded::non_check),
+	bounded::integer<-10, 13>(5, bounded::non_check)
+));
+
+static_assert(homogeneous_equals(
+	bounded::checked_integer<1, 10>(9, bounded::non_check) - bounded::clamped_integer<-3, 11>(4, bounded::non_check),
+	bounded::integer<-10, 13>(5, bounded::non_check)
+));
 
 constexpr auto plus_equals(auto lhs, auto rhs) {
 	return lhs += rhs;

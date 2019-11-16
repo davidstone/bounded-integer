@@ -6,7 +6,7 @@
 #pragma once
 
 #include <bounded/detail/variant/is_valid_index.hpp>
-#include <bounded/detail/arithmetic/minus.hpp>
+#include <bounded/detail/arithmetic/operators.hpp>
 #include <bounded/detail/class.hpp>
 #include <bounded/detail/comparison.hpp>
 #include <bounded/detail/type.hpp>

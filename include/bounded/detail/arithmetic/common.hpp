@@ -5,10 +5,7 @@
 
 #pragma once
 
-#include <bounded/detail/arithmetic/operators.hpp>
 #include <bounded/detail/class.hpp>
-#include <bounded/detail/forward.hpp>
-#include <bounded/detail/is_bounded_integer.hpp>
 #include <bounded/detail/returns.hpp>
 
 #include <type_traits>
@@ -16,6 +13,10 @@
 namespace bounded {
 namespace detail {
 namespace arithmetic {
+
+constexpr auto operator-(auto && lhs, auto && rhs) BOUNDED_RETURNS(
+	BOUNDED_FORWARD(lhs) + -BOUNDED_FORWARD(rhs)
+)
 
 #define BOUNDED_INTEGER_COMPOUND_ASSIGNMENT_OPERATOR(symbol) \
 constexpr auto operator symbol##=(auto & lhs, auto && rhs) BOUNDED_RETURNS( \
