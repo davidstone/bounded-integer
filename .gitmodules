@@ -1,3 +1,6 @@
 [submodule "operators"]
 	path = operators
 	url = https://github.com/davidstone/operators.git
+[submodule "benchmark"]
+	path = source/benchmark
+	url = https://github.com/google/benchmark.git
