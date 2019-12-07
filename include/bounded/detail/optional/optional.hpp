@@ -13,6 +13,8 @@
 #include <bounded/detail/construct_destroy.hpp>
 #include <bounded/detail/forward.hpp>
 
+#include <operators/arrow.hpp>
+
 #include <stdexcept>
 #include <type_traits>
 #include <utility>
@@ -174,13 +176,8 @@ public:
 		return std::move(m_value);
 	}
 
-	constexpr auto operator->() const {
-		return &operator*();
-	}
-	constexpr auto operator->() {
-		return &operator*();
-	}
-	
+	OPERATORS_ARROW_DEFINITIONS
+
 	constexpr explicit operator bool() const {
 		return m_value.is_initialized(optional_tag{});
 	}

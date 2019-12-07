@@ -12,6 +12,8 @@
 #include <bounded/assert.hpp>
 #include <bounded/unreachable.hpp>
 
+#include <operators/operators.hpp>
+
 #include <cstddef>
 
 namespace containers {
@@ -38,13 +40,8 @@ struct contiguous_iterator {
 	constexpr auto & operator*() const {
 		return *m_ptr;
 	}
-	constexpr auto operator->() const {
-		return std::addressof(operator*());
-	}
-
-	constexpr auto & operator[](index_type<contiguous_iterator> const index) const {
-		return *(*this + index);
-	}
+	OPERATORS_ARROW_DEFINITIONS
+	OPERATORS_BRACKET_ITERATOR_DEFINITIONS
 
 	friend constexpr auto pointer_from(contiguous_iterator const it) {
 		return it.m_ptr;

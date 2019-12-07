@@ -11,6 +11,8 @@
 #include <bounded/assert.hpp>
 #include <bounded/integer.hpp>
 
+#include <operators/arrow.hpp>
+
 #include <iterator>
 #include <type_traits>
 #include <utility>
@@ -41,9 +43,7 @@ struct single_element_iterator {
 		BOUNDED_ASSERT_OR_ASSUME(!m_is_end);
 		return static_cast<T>(*m_value);
 	}
-	constexpr auto operator->() const {
-		return std::addressof(operator*());
-	}
+	OPERATORS_ARROW_DEFINITIONS
 	constexpr auto is_end() const {
 		return m_is_end;
 	}

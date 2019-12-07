@@ -6,12 +6,13 @@
 #pragma once
 
 #include <containers/common_iterator_functions.hpp>
-#include <containers/operator_bracket.hpp>
 #include <containers/range_view.hpp>
 
 #include <bounded/detail/forward.hpp>
 #include <bounded/integer.hpp>
 #include <bounded/unreachable.hpp>
+
+#include <operators/operators.hpp>
 
 #include <iterator>
 #include <utility>
@@ -37,7 +38,7 @@ private:
 };
 
 template<typename Iterator, typename Count>
-struct counted_iterator : detail::operator_arrow<counted_iterator<Iterator, Count>> {
+struct counted_iterator {
 	using iterator_category = typename std::iterator_traits<Iterator>::iterator_category;
 	using value_type = typename std::iterator_traits<Iterator>::value_type;
 	using difference_type = decltype(std::declval<Count>() - std::declval<Count>());
@@ -53,9 +54,8 @@ struct counted_iterator : detail::operator_arrow<counted_iterator<Iterator, Coun
 	constexpr decltype(auto) operator*() const {
 		return *m_it;
 	}
-	constexpr auto operator->() const {
-		return std::addressof(operator*());
-	}
+	OPERATORS_ARROW_DEFINITIONS
+	OPERATORS_BRACKET_ITERATOR_DEFINITIONS
 
 	friend constexpr auto operator==(counted_iterator const & lhs, counted_iterator const & rhs) {
 		return rhs.m_count == lhs.m_count;
@@ -101,13 +101,6 @@ struct counted_iterator : detail::operator_arrow<counted_iterator<Iterator, Coun
 	friend constexpr auto operator-(counted_iterator const & lhs, counted_sentinel<Sentinel> const & rhs) {
 		return -(rhs - lhs);
 	}
-
-	template<typename Index>
-	constexpr auto operator[](Index const index) const -> decltype(*(*this  + index)) {
-		BOUNDED_ASSERT(index < m_count);
-		return m_it[index];
-	}
-
 private:
 	Iterator m_it;
 	// TODO: Constrain maximum value with the difference type?

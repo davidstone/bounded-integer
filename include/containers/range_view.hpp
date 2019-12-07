@@ -6,9 +6,10 @@
 #pragma once
 
 #include <containers/is_range.hpp>
-#include <containers/operator_bracket.hpp>
 
 #include <bounded/integer.hpp>
+
+#include <operators/bracket.hpp>
 
 #include <iterator>
 #include <utility>
@@ -50,7 +51,7 @@ struct range_view {
 		return view.m_end;
 	}
 
-	CONTAINERS_OPERATOR_BRACKET_DEFINITIONS(range_view)
+	OPERATORS_BRACKET_SEQUENCE_RANGE_DEFINITIONS
 	
 private:
 	Iterator m_begin;

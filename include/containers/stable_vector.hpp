@@ -14,10 +14,11 @@
 #include <containers/index_type.hpp>
 #include <containers/integer_range.hpp>
 #include <containers/is_iterator_sentinel.hpp>
-#include <containers/operator_bracket.hpp>
 #include <containers/pop_back.hpp>
 #include <containers/repeat_n.hpp>
 #include <containers/uninitialized_storage.hpp>
+
+#include <operators/bracket.hpp>
 
 namespace containers {
 
@@ -116,7 +117,7 @@ struct stable_vector {
 		return begin(container) + container.m_size;
 	}
 
-	CONTAINERS_OPERATOR_BRACKET_DEFINITIONS(stable_vector)
+	OPERATORS_BRACKET_SEQUENCE_RANGE_DEFINITIONS
 	
 	// Assumes that elements are already constructed in the spare capacity
 	void append_from_capacity(auto const count) {

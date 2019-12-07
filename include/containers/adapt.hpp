@@ -7,10 +7,11 @@
 
 #include <containers/iterator_adapter.hpp>
 #include <containers/non_modifying_common_container_functions.hpp>
-#include <containers/operator_bracket.hpp>
 #include <containers/reference_wrapper.hpp>
 
 #include <bounded/integer.hpp>
+
+#include <operators/bracket.hpp>
 
 #include <type_traits>
 #include <utility>
@@ -87,7 +88,7 @@ public:
 		);
 	}
 	
-	CONTAINERS_OPERATOR_BRACKET_DEFINITIONS(adapt)
+	OPERATORS_BRACKET_SEQUENCE_RANGE_DEFINITIONS
 };
 
 template<typename Range, typename Traits>

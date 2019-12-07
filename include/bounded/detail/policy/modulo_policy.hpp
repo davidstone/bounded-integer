@@ -5,13 +5,10 @@
 
 #pragma once
 
+#include <bounded/detail/arithmetic/operators.hpp>
 #include <bounded/detail/class.hpp>
 #include <bounded/detail/common_type.hpp>
 #include <bounded/detail/comparison.hpp>
-#include <bounded/detail/arithmetic/common.hpp>
-#include <bounded/detail/arithmetic/modulus.hpp>
-#include <bounded/detail/arithmetic/plus.hpp>
-#include <bounded/detail/arithmetic/unary_minus.hpp>
 
 #include <type_traits>
 

@@ -4,7 +4,6 @@
 // http://www.boost.org/LICENSE_1_0.txt)
 
 #include <bounded/detail/log.hpp>
-#include <bounded/detail/arithmetic/common.hpp>
 #include <bounded/detail/comparison_mixed.hpp>
 #include <bounded/detail/class.hpp>
 

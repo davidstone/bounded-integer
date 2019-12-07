@@ -5,9 +5,8 @@
 
 #pragma once
 
-#include <bounded/detail/arithmetic/common.hpp>
+#include <bounded/detail/arithmetic/operators.hpp>
 #include <bounded/detail/arithmetic/safe_abs.hpp>
-#include <bounded/detail/arithmetic/unary_minus.hpp>
 #include <bounded/detail/conditional.hpp>
 #include <bounded/detail/policy/throw_policy.hpp>
 #include <bounded/detail/class.hpp>

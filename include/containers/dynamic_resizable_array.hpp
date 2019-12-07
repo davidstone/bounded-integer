@@ -91,7 +91,7 @@ struct dynamic_resizable_array : private Container {
 		return end(static_cast<Container &>(container));
 	}
 
-	CONTAINERS_OPERATOR_BRACKET_DEFINITIONS(dynamic_resizable_array)
+	OPERATORS_BRACKET_SEQUENCE_RANGE_DEFINITIONS
 	
 	using Container::capacity;
 	auto reserve(size_type const requested_capacity) {

@@ -13,13 +13,15 @@ project(bounded_integer LANGUAGES CXX)
 
 enable_testing()
 
+add_library(operators INTERFACE)
+set_property(TARGET operators PROPERTY INTERFACE_INCLUDE_DIRECTORIES $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>/operators/include)
+
 add_library(bounded INTERFACE)
 add_library(containers INTERFACE)
 
 target_sources(bounded INTERFACE
 	$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>/include/bounded/detail/arithmetic/base.hpp
 	$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>/include/bounded/detail/arithmetic/bitwise_and.hpp
-	$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>/include/bounded/detail/arithmetic/common.hpp
 	$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>/include/bounded/detail/arithmetic/divides.hpp
 	$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>/include/bounded/detail/arithmetic/left_shift.hpp
 	$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>/include/bounded/detail/arithmetic/modulus.hpp
@@ -152,8 +154,6 @@ target_sources(containers INTERFACE
 	$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>/include/containers/maximum_array_size.hpp
 	$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>/include/containers/mutable_iterator.hpp
 	$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>/include/containers/non_modifying_common_container_functions.hpp
-	$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>/include/containers/operator_arrow.hpp
-	$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>/include/containers/operator_bracket.hpp
 	$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>/include/containers/pop_back.hpp
 	$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>/include/containers/pop_front.hpp
 	$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>/include/containers/push_back.hpp
@@ -182,6 +182,10 @@ target_include_directories(containers INTERFACE
 	$<INSTALL_INTERFACE:include>
 )
 
+target_link_libraries(bounded INTERFACE
+	operators
+)
+
 target_link_libraries(containers INTERFACE
 	bounded
 )
@@ -189,7 +193,6 @@ target_link_libraries(containers INTERFACE
 add_executable(bounded_test
 	source/bounded/detail/arithmetic/base.cpp
 	source/bounded/detail/arithmetic/bitwise_and.cpp
-	source/bounded/detail/arithmetic/common.cpp
 	source/bounded/detail/arithmetic/divides.cpp
 	source/bounded/detail/arithmetic/left_shift.cpp
 	source/bounded/detail/arithmetic/modulus.cpp
@@ -315,7 +318,6 @@ add_library(containers_test STATIC
 	source/containers/maximum_array_size.cpp
 	source/containers/mutable_iterator.cpp
 	source/containers/non_modifying_common_container_functions.cpp
-	source/containers/operator_arrow.cpp
 	source/containers/pop_back.cpp
 	source/containers/pop_front.cpp
 	source/containers/push_back.cpp

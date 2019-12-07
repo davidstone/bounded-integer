@@ -8,10 +8,11 @@
 #include <containers/contiguous_iterator.hpp>
 #include <containers/is_container.hpp>
 #include <containers/non_modifying_common_container_functions.hpp>
-#include <containers/operator_bracket.hpp>
 
 #include <bounded/integer.hpp>
 #include <bounded/detail/returns.hpp>
+
+#include <operators/bracket.hpp>
 
 #include <algorithm>
 #include <cstddef>
@@ -47,7 +48,7 @@ struct array {
 	using const_iterator = contiguous_iterator<value_type const, static_cast<std::ptrdiff_t>(size)>;
 	using iterator = contiguous_iterator<value_type, static_cast<std::ptrdiff_t>(size)>;
 
-	CONTAINERS_OPERATOR_BRACKET_DEFINITIONS(array)
+	OPERATORS_BRACKET_SEQUENCE_RANGE_DEFINITIONS
 
 	// Consider this private. It must be public for the class to be an
 	// aggregate

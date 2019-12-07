@@ -19,7 +19,6 @@
 #include <bounded/detail/size_of.hpp>
 #include <bounded/detail/stream.hpp>
 #include <bounded/detail/typedefs.hpp>
-#include <bounded/detail/arithmetic/common.hpp>
 #include <bounded/detail/arithmetic/operators.hpp>
 #include <bounded/detail/arithmetic/operators_builtin.hpp>
 #include <bounded/detail/arithmetic/pointer.hpp>

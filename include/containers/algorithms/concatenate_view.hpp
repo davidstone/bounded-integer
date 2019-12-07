@@ -8,8 +8,6 @@
 #include <containers/algorithms/move_iterator.hpp>
 #include <containers/front_back.hpp>
 #include <containers/is_range.hpp>
-#include <containers/operator_arrow.hpp>
-#include <containers/operator_bracket.hpp>
 #include <containers/range_view.hpp>
 
 #include <bounded/detail/construct_destroy.hpp>
@@ -17,6 +15,8 @@
 #include <bounded/detail/returns.hpp>
 #include <bounded/detail/tuple.hpp>
 #include <bounded/integer.hpp>
+
+#include <operators/operators.hpp>
 
 namespace containers {
 
@@ -55,6 +55,12 @@ template<typename... RangeViews>
 inline constexpr bool any_is_output_iterator = any_is_category<std::output_iterator_tag, RangeViews...>;
 
 
+template<typename Iterator>
+concept forward_random_access_iterator = iterator<Iterator> and iterator<decltype(std::declval<Iterator>() + std::declval<index_type<std::decay_t<Iterator>>>())>;
+
+template<typename Range>
+concept forward_random_access_range = range<Range> and forward_random_access_iterator<decltype(begin(std::declval<Range>()))>;
+
 } // namespace detail
 
 // This is an interesting iterator type. If the iterators of the underlying
@@ -68,7 +74,7 @@ inline constexpr bool any_is_output_iterator = any_is_category<std::output_itera
 // `it + offset - it == offset` holds, but `it + offset - offset == it` cannot
 // be computed.
 template<typename... RangeViews>
-struct concatenate_view_iterator : detail::operator_arrow<concatenate_view_iterator<RangeViews...>> {
+struct concatenate_view_iterator {
 private:
 	static_assert((... and is_range_view<RangeViews>));
 
@@ -171,6 +177,8 @@ public:
 		// TODO: Implement with an expansion statement `for...`
 		return operator_star(bounded::constant<0>);
 	}
+	OPERATORS_ARROW_DEFINITIONS
+	OPERATORS_BRACKET_ITERATOR_DEFINITIONS
 
 	template<typename Offset> requires(
 		std::is_convertible_v<Offset, difference_type> and
@@ -248,12 +256,6 @@ public:
 		auto get_end_iterators = [](auto const range) { return end(range); };
 		return lhs.begin_iterators() == bounded::transform(get_end_iterators, lhs.m_range_views);
 	}
-
-
-	template<typename Index>
-	constexpr decltype(auto) operator[](Index const index) const {
-		return *(*this + index);
-	}
 };
 
 
@@ -299,7 +301,7 @@ struct concatenate_view {
 		return concatenate_view_sentinel();
 	}
 
-	CONTAINERS_OPERATOR_BRACKET_DEFINITIONS(concatenate_view)
+	OPERATORS_BRACKET_SEQUENCE_RANGE_DEFINITIONS
 private:
 	bounded::tuple<Ranges...> m_ranges;
 };

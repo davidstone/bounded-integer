@@ -6,17 +6,22 @@
 #pragma once
 
 #include <containers/common_iterator_functions.hpp>
-#include <containers/operator_bracket.hpp>
+#include <containers/reference_wrapper.hpp>
 
 #include <bounded/detail/construct_destroy.hpp>
 #include <bounded/detail/forward.hpp>
 #include <bounded/integer.hpp>
 #include <bounded/unreachable.hpp>
 
+#include <operators/operators.hpp>
+
 #include <iterator>
 #include <utility>
 
 namespace containers {
+
+using namespace bounded::literal;
+
 namespace detail {
 
 template<typename LHS, typename RHS>
@@ -50,9 +55,8 @@ public:
 	constexpr decltype(auto) operator*() const {
 		return m_get_value();
 	}
-	constexpr auto operator->() const {
-		return std::addressof(operator*());
-	}
+	OPERATORS_ARROW_DEFINITIONS
+	OPERATORS_BRACKET_ITERATOR_DEFINITIONS
 
 	// It is undefined behavior to compare iterators into different ranges
 	friend constexpr auto operator<=>(repeat_n_iterator const lhs, repeat_n_iterator const rhs) {
@@ -133,7 +137,7 @@ public:
 		return repeat_n_sentinel{};
 	}
 
-	CONTAINERS_OPERATOR_BRACKET_DEFINITIONS(repeat_n)
+	OPERATORS_BRACKET_SEQUENCE_RANGE_DEFINITIONS
 };
 
 template<typename Size, typename T>
@@ -161,7 +165,7 @@ public:
 		return repeat_n_sentinel{};
 	}
 
-	CONTAINERS_OPERATOR_BRACKET_DEFINITIONS(repeat_default_n_t)
+	OPERATORS_BRACKET_SEQUENCE_RANGE_DEFINITIONS
 };
 
 template<typename T, typename Size>

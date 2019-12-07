@@ -5,7 +5,7 @@
 
 #pragma once
 
-#include <bounded/detail/arithmetic/common.hpp>
+#include <bounded/detail/arithmetic/operators.hpp>
 #include <bounded/detail/class.hpp>
 #include <bounded/detail/is_bounded_integer.hpp>
 #include <bounded/detail/max_builtin.hpp>

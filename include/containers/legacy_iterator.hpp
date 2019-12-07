@@ -9,16 +9,17 @@
 
 #include <containers/common_iterator_functions.hpp>
 #include <containers/is_iterator.hpp>
-#include <containers/operator_arrow.hpp>
 
 #include <bounded/integer.hpp>
+
+#include <operators/operators.hpp>
 
 #include <iterator>
 
 namespace containers {
 
 template<typename Iterator>
-struct legacy_iterator : detail::operator_arrow<legacy_iterator<Iterator>> {
+struct legacy_iterator {
 	using value_type = typename std::iterator_traits<Iterator>::value_type;
 	using difference_type = std::ptrdiff_t;
 	using pointer = typename std::iterator_traits<Iterator>::pointer;
@@ -37,12 +38,8 @@ struct legacy_iterator : detail::operator_arrow<legacy_iterator<Iterator>> {
 	constexpr decltype(auto) operator*() const {
 		return *base();
 	}
-	constexpr auto operator->() const {
-		return std::addressof(operator*());
-	}
-	constexpr decltype(auto) operator[](auto const index) const {
-		return base()[static_cast<index_type<Iterator>>(index)];
-	}
+	OPERATORS_ARROW_DEFINITIONS
+	OPERATORS_BRACKET_ITERATOR_DEFINITIONS
 
 private:
 	Iterator m_it;

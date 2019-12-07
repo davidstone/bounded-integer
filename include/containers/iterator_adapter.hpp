@@ -7,11 +7,12 @@
 
 #include <containers/common_iterator_functions.hpp>
 #include <containers/index_type.hpp>
-#include <containers/operator_arrow.hpp>
 #include <containers/reference_wrapper.hpp>
 
 #include <bounded/integer.hpp>
 #include <bounded/detail/returns.hpp>
+
+#include <operators/operators.hpp>
 
 #include <iterator>
 #include <type_traits>
@@ -120,8 +121,7 @@ public:
 
 template<typename Iterator, typename Traits>
 struct adapt_iterator :
-	detail::iterator_typedefs_base<Iterator, decltype(containers::unwrap(std::declval<Traits>()))>,
-	detail::operator_arrow<adapt_iterator<Iterator, Traits>>
+	detail::iterator_typedefs_base<Iterator, decltype(containers::unwrap(std::declval<Traits>()))>
 {
 	static_assert(std::is_copy_assignable_v<Iterator>);
 	static_assert(std::is_copy_assignable_v<Traits>);
@@ -141,9 +141,8 @@ struct adapt_iterator :
 		return containers::unwrap(m_traits);
 	}
 
-	constexpr auto operator[](auto const index) const {
-		return *(*this + index);
-	}
+	OPERATORS_ARROW_DEFINITIONS
+	OPERATORS_BRACKET_ITERATOR_DEFINITIONS
 
 private:
 	[[no_unique_address]] Iterator m_base;

@@ -7,11 +7,12 @@
 
 #include <containers/algorithms/transform.hpp>
 #include <containers/non_modifying_common_container_functions.hpp>
-#include <containers/operator_bracket.hpp>
 
 #include <bounded/assert.hpp>
 #include <bounded/integer.hpp>
 #include <bounded/unreachable.hpp>
+
+#include <operators/bracket.hpp>
 
 #include <iterator>
 #include <type_traits>
@@ -70,7 +71,7 @@ public:
 	constexpr auto operator*() const {
 		return value_type(m_value);
 	}
-	CONTAINERS_OPERATOR_BRACKET_DEFINITIONS(integer_range_iterator)
+	OPERATORS_BRACKET_ITERATOR_DEFINITIONS
 };
 
 template<typename Integer, typename Sentinel, typename Step>
@@ -124,7 +125,7 @@ struct integer_range {
 		return iterator(range.m_end, range.m_step);
 	}
 
-	CONTAINERS_OPERATOR_BRACKET_DEFINITIONS(integer_range)
+	OPERATORS_BRACKET_SEQUENCE_RANGE_DEFINITIONS
 
 private:
 	Integer m_begin;

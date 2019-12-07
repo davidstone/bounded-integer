@@ -13,11 +13,12 @@
 #include <containers/contiguous_iterator.hpp>
 #include <containers/is_iterator.hpp>
 #include <containers/maximum_array_size.hpp>
-#include <containers/operator_bracket.hpp>
 #include <containers/repeat_n.hpp>
 #include <containers/uninitialized_storage.hpp>
 
 #include <bounded/detail/forward.hpp>
+
+#include <operators/bracket.hpp>
 
 #include <iterator>
 #include <memory>
@@ -158,7 +159,7 @@ struct dynamic_array {
 		return begin(container) + container.m_data.size;
 	}
 
-	CONTAINERS_OPERATOR_BRACKET_DEFINITIONS(dynamic_array)
+	OPERATORS_BRACKET_SEQUENCE_RANGE_DEFINITIONS
 	
 private:
 	detail::dynamic_array_data<value_type> m_data = {};

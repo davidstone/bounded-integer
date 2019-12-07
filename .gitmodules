@@ -1,0 +1,3 @@
+[submodule "operators"]
+	path = operators
+	url = https://github.com/davidstone/operators.git

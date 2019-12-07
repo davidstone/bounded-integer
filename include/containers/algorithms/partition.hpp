@@ -57,8 +57,13 @@ constexpr inline struct partition_point_t {
 	}
 } partition_point;
 
+namespace detail {
 
-// TODO: Support bidirectional iterators
+template<typename T>
+concept decrementable = requires(T value) { --value; };
+
+} // namespace detail
+
 constexpr inline struct partition_t {
 	template<iterator ForwardIterator>
 	constexpr auto operator()(ForwardIterator first, sentinel_for<ForwardIterator> auto last, auto predicate) const {
@@ -67,7 +72,7 @@ constexpr inline struct partition_t {
 		};
 		advance_first();
 
-		if constexpr (bounded::detail::arithmetic::decrementable<decltype(last)>) {
+		if constexpr (detail::decrementable<decltype(last)>) {
 			auto advance_last = [&]{
 				while (first != last) {
 					--last;
