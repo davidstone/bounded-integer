@@ -13,11 +13,20 @@ project(bounded_integer LANGUAGES CXX)
 
 enable_testing()
 
-add_library(operators INTERFACE)
-set_property(TARGET operators PROPERTY INTERFACE_INCLUDE_DIRECTORIES $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>/operators/include)
+add_subdirectory(operators)
+
+add_library(bounded_warnings INTERFACE)
 
 add_library(bounded INTERFACE)
-add_library(containers INTERFACE)
+
+target_link_libraries(bounded INTERFACE
+	operators
+)
+
+target_include_directories(bounded INTERFACE
+	$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
+	$<INSTALL_INTERFACE:include>
+)
 
 target_sources(bounded INTERFACE
 	$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>/include/bounded/detail/arithmetic/base.hpp
@@ -91,6 +100,17 @@ target_sources(bounded INTERFACE
 	$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>/include/bounded/optional.hpp
 	$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>/include/bounded/string.hpp
 	$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>/include/bounded/to_integer.hpp
+)
+
+add_library(containers INTERFACE)
+
+target_link_libraries(containers INTERFACE
+	bounded
+)
+
+target_include_directories(containers INTERFACE
+	$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
+	$<INSTALL_INTERFACE:include>
 )
 
 target_sources(containers INTERFACE
@@ -174,23 +194,6 @@ target_sources(containers INTERFACE
 	$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>/include/containers/vector.hpp
 )
 
-target_include_directories(bounded INTERFACE
-	$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
-	$<INSTALL_INTERFACE:include>
-)
-target_include_directories(containers INTERFACE
-	$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
-	$<INSTALL_INTERFACE:include>
-)
-
-target_link_libraries(bounded INTERFACE
-	operators
-)
-
-target_link_libraries(containers INTERFACE
-	bounded
-)
-
 add_executable(bounded_test
 	source/bounded/detail/arithmetic/base.cpp
 	source/bounded/detail/arithmetic/bitwise_and.cpp
@@ -260,9 +263,9 @@ add_executable(bounded_test
 	source/bounded/optional.cpp
 	source/bounded/string.cpp
 	source/bounded/to_integer.cpp
-	)
+)
 
-	target_link_libraries(bounded_test PUBLIC bounded)
+target_link_libraries(bounded_test PUBLIC bounded bounded_warnings)
 
 add_library(containers_test STATIC
 	source/containers/algorithms/accumulate.cpp
@@ -334,59 +337,59 @@ add_library(containers_test STATIC
 	source/containers/take.cpp
 )
 
-target_link_libraries(containers_test PUBLIC containers)
+target_link_libraries(containers_test PUBLIC containers bounded_warnings)
 
 add_executable(concatenate
 	source/containers/algorithms/concatenate.cpp
 )
-target_link_libraries(concatenate PUBLIC containers)
+target_link_libraries(concatenate PUBLIC containers bounded_warnings)
 
 add_executable(stable_vector
 	source/containers/stable_vector.cpp
 )
-target_link_libraries(stable_vector PUBLIC containers)
+target_link_libraries(stable_vector PUBLIC containers bounded_warnings)
 
 add_executable(static_vector
 	source/containers/static_vector/static_vector.cpp
 )
-target_link_libraries(static_vector PUBLIC containers)
+target_link_libraries(static_vector PUBLIC containers bounded_warnings)
 
 add_executable(small_buffer_optimized_vector
 	source/containers/small_buffer_optimized_vector.cpp
 )
-target_link_libraries(small_buffer_optimized_vector PUBLIC containers)
+target_link_libraries(small_buffer_optimized_vector PUBLIC containers bounded_warnings)
 
 add_executable(flat_map
 	source/containers/flat_map.cpp
 )
 target_compile_definitions(flat_map PRIVATE "USE_FLAT_MAP")
-target_link_libraries(flat_map PUBLIC containers)
+target_link_libraries(flat_map PUBLIC containers bounded_warnings)
 
 add_executable(std_map
 	source/containers/flat_map.cpp
 )
 target_compile_definitions(std_map PRIVATE "USE_SYSTEM_MAP")
-target_link_libraries(std_map PUBLIC containers)
+target_link_libraries(std_map PUBLIC containers bounded_warnings)
 
 add_executable(vector
 	source/containers/vector.cpp
 )
-target_link_libraries(vector PUBLIC containers)
+target_link_libraries(vector PUBLIC containers bounded_warnings)
 
 add_executable(string
 	source/containers/string.cpp
 )
-target_link_libraries(string PUBLIC containers)
+target_link_libraries(string PUBLIC containers bounded_warnings)
 
 add_executable(dynamic_array
 	source/containers/dynamic_array.cpp
 )
-target_link_libraries(dynamic_array PUBLIC containers)
+target_link_libraries(dynamic_array PUBLIC containers bounded_warnings)
 
 add_executable(variant
 	source/bounded/detail/variant/variant.cpp
 )
-target_link_libraries(variant PUBLIC bounded)
+target_link_libraries(variant PUBLIC bounded bounded_warnings)
 
 add_subdirectory("${PROJECT_SOURCE_DIR}/source/googletest-1.8.1")
 set_target_properties(gtest PROPERTIES FOLDER extern)
@@ -401,20 +404,21 @@ set_target_properties(benchmark PROPERTIES FOLDER extern)
 add_executable(ska_sort
 	source/containers/algorithms/ska_sort.cpp
 )
-target_link_libraries(ska_sort PUBLIC bounded gtest gtest_main benchmark)
+target_link_libraries(ska_sort PUBLIC bounded gtest gtest_main benchmark bounded_warnings)
 
 
 set(COMMON_CLANG_COMPILE_OPTIONS
 	"-Xclang"
 	"-fconcepts-ts"
+)
+set(COMMON_CLANG_WARNINGS
 	"-Weverything"
 	"-Werror"
 	"-Wno-c++98-compat"
 	"-Wno-c++98-compat-pedantic"
+	"-Wno-ctad-maybe-unsupported"
 	# Floating-point comparisons are safe in these tests
 	"-Wno-float-equal"
-	#
-	"-Wno-inaccessible-base"
 	# -Wmissing-braces wants two sets of braces when using constructs such
 	# as std::array
 	"-Wno-missing-braces"
@@ -429,13 +433,16 @@ set(COMMON_CLANG_COMPILE_OPTIONS
 	# emulation
 	"-Wno-zero-as-null-pointer-constant"
 )
-
-if(${CMAKE_CXX_COMPILER_VERSION} VERSION_GREATER 8)
-	set(COMMON_CLANG_COMPILE_OPTIONS
-		${COMMON_CLANG_COMPILE_OPTIONS}
-		"-Wno-ctad-maybe-unsupported"
-	)
-endif()
+set(SKA_SORT_COMMON_COMPILE_OPTIONS
+	"-Wno-global-constructors"
+	"-Wno-implicit-int-conversion"
+	"-Wno-sign-conversion"
+	"-Wno-used-but-marked-unused"
+	"-Wno-unused-function"
+	"-Wno-unused-macros"
+	"-Wno-unused-template"
+	"-Wno-unused-variable"
+)
 
 if(MSVC)
 	target_compile_options(bounded INTERFACE
@@ -447,15 +454,9 @@ if(MSVC)
 	)
 
 	if("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang")
-		target_compile_options(bounded INTERFACE
-			${COMMON_CLANG_COMPILE_OPTIONS}
-		)
-		target_compile_options(ska_sort PRIVATE
-			"-Wno-global-constructors"
-			"-Wno-implicit-int-conversion"
-			"-Wno-sign-conversion"
-			"-Wno-used-but-marked-unused"
-		)
+		target_compile_options(bounded INTERFACE ${COMMON_CLANG_COMPILE_OPTIONS})
+		target_compile_options(bounded_warnings INTERFACE ${COMMON_CLANG_WARNINGS})
+		target_compile_options(ska_sort PRIVATE ${SKA_SORT_COMMON_COMPILE_OPTIONS})
 		# Sanitizers currently do not work very well on Windows
 		set(USE_SANITIZERS OFF)
 	else()
@@ -467,12 +468,13 @@ if(MSVC)
 
 elseif("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang")
 	target_compile_options(bounded INTERFACE
-		"-std=c++2a"
-	)
-	target_compile_options(bounded INTERFACE
 		${COMMON_CLANG_COMPILE_OPTIONS}
-		"-g"
+		"-std=c++2a"
 		"-stdlib=libc++"
+	)
+	target_compile_options(bounded_warnings INTERFACE
+		${COMMON_CLANG_WARNINGS}
+		"-g"
 		"-march=native"
 		$<$<CONFIG:Release>:-flto=thin>
 	)
@@ -495,25 +497,16 @@ elseif("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang")
 		"-std=c++2a"
 		"-stdlib=libc++"
 	)
-	target_compile_options(ska_sort PRIVATE
-		"-Wno-global-constructors"
-		"-Wno-implicit-int-conversion"
-		"-Wno-sign-conversion"
-		"-Wno-used-but-marked-unused"
-		"-Wno-unused-function"
-		"-Wno-unused-macros"
-		"-Wno-unused-template"
-		"-Wno-unused-variable"
-	)
+	target_compile_options(ska_sort PRIVATE ${SKA_SORT_COMMON_COMPILE_OPTIONS})
 
 elseif("${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU")
 	target_compile_options(bounded INTERFACE
 		"-std=c++2a"
+		"-fconcepts"
 	)
-	target_compile_options(bounded INTERFACE
+	target_compile_options(bounded_warnings INTERFACE
 		"-g"
 		"-march=native"
-		"-fconcepts"
 		$<$<CONFIG:Release>:-flto=4 -flto-odr-type-merging -fuse-linker-plugin>
 		# We have to start by turning off all warnings just so we can disable a
 		# warning about an inaccessible base class. Then we turn on all
@@ -643,24 +636,20 @@ set(test_targets
 	variant
 	ska_sort
 )
-set(all_targets ${test_targets} containers_test gtest gtest_main benchmark)
 
-set(sanitizers "-fsanitize=undefined" "-fsanitize=address")
-foreach(target ${all_targets})
-	if(DEFINED USE_SANITIZERS)
-		if(${USE_SANITIZERS})
-			target_compile_options(${target} PUBLIC ${sanitizers})
-			target_link_options(${target} PUBLIC ${sanitizers})
-		endif()
-	else()
-		target_compile_options(${target} PUBLIC
-			$<$<CONFIG:Debug>:${sanitizers}>
-		)
-		target_link_options(${target} PUBLIC
-			$<$<CONFIG:Debug>:${sanitizers}>
-		)
+if(DEFINED USE_SANITIZERS)
+	if(${USE_SANITIZERS})
+		target_compile_options(bounded_warnings PUBLIC ${sanitizers})
+		target_link_options(bounded_warnings PUBLIC ${sanitizers})
 	endif()
-endforeach()
+else()
+	target_compile_options(bounded_warnings INTERFACE
+		$<$<CONFIG:Debug>:${sanitizers}>
+	)
+	target_link_options(bounded_warnings INTERFACE
+		$<$<CONFIG:Debug>:${sanitizers}>
+	)
+endif()
 
 foreach(test_target ${test_targets})
 	add_test(${test_target} ${test_target})
