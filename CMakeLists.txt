@@ -234,11 +234,10 @@ add_executable(variant
 )
 target_link_libraries(variant PUBLIC bounded strict_defaults)
 
+SET(gtest_disable_pthreads ON CACHE BOOL "Disable uses of pthreads in gtest.")
 add_subdirectory("${PROJECT_SOURCE_DIR}/source/googletest-1.8.1")
 set_target_properties(gtest PROPERTIES FOLDER extern)
 set_target_properties(gtest_main PROPERTIES FOLDER extern)
-set_target_properties(gmock PROPERTIES FOLDER extern)
-set_target_properties(gmock_main PROPERTIES FOLDER extern)
 
 set(BENCHMARK_ENABLE_TESTING OFF)
 add_subdirectory("${PROJECT_SOURCE_DIR}/source/benchmark")
@@ -254,12 +253,15 @@ if("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang")
 	if(NOT MSVC)
 		target_compile_options(gtest PUBLIC
 			"-stdlib=libc++"
+			"-std=c++2a"
 		)
 		target_compile_options(gtest_main PUBLIC
 			"-stdlib=libc++"
+			"-std=c++2a"
 		)
 		target_compile_options(benchmark PUBLIC
 			"-stdlib=libc++"
+			"-std=c++2a"
 		)
 	endif()
 
