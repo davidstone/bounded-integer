@@ -211,8 +211,13 @@ private:
 			static_cast<underlying_type>(minimum - 1) : static_cast<underlying_type>(maximum + 1);
 	}
 
-	static constexpr decltype(auto) apply_overflow_policy(auto const & value) {
-		return overflow_policy{}.assignment(value, constant<minimum>, constant<maximum>);
+	template<typename T>
+	static constexpr auto apply_overflow_policy(T const value) {
+		return overflow_policy{}.assignment(
+			integer<detail::builtin_min_value<T>, detail::builtin_max_value<T>>(value, non_check),
+			constant<minimum>,
+			constant<maximum>
+		);
 	}
 
 	using storage_type = std::conditional_t<minimum == maximum, detail::empty, underlying_type>;

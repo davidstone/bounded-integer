@@ -7,7 +7,6 @@
 
 #include <bounded/detail/arithmetic/operators.hpp>
 #include <bounded/detail/class.hpp>
-#include <bounded/detail/common_type.hpp>
 #include <bounded/detail/comparison.hpp>
 
 #include <type_traits>
@@ -25,7 +24,7 @@ private:
 	}
 
 public:
-	static constexpr auto assignment(auto const & value, bounded_integer auto const & minimum, bounded_integer auto const & maximum) {
+	static constexpr auto assignment(bounded_integer auto const & value, bounded_integer auto const & minimum, bounded_integer auto const & maximum) {
 		return positive_remainder(
 			(value - minimum) % (maximum - minimum + constant<1>),
 			maximum - minimum + constant<1>

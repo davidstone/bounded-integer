@@ -7,12 +7,13 @@
 
 #include <bounded/detail/policy/null_policy.hpp>
 #include <bounded/detail/class.hpp>
+#include <bounded/detail/is_bounded_integer.hpp>
 #include <bounded/detail/minmax.hpp>
 
 namespace bounded {
 
 struct clamp_policy {
-	static constexpr auto assignment(auto const & value, auto const & minimum, auto const & maximum) {
+	static constexpr auto assignment(bounded_integer auto const & value, bounded_integer auto const & minimum, bounded_integer auto const & maximum) {
 		constexpr auto policy = bounded::null_policy();
 		return min(
 			max(

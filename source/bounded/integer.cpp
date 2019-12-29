@@ -21,12 +21,12 @@ auto check_throw_policy() {
 	constexpr auto maximum = bounded::constant<10>;
 	using policy = bounded::throw_policy<>;
 	try {
-		policy::assignment(20, minimum, maximum);
+		policy::assignment(bounded::integer<-20, 20>(bounded::constant<20>), minimum, maximum);
 		BOUNDED_TEST(false);
 	} catch (...) {
 	}
 	try {
-		policy::assignment(-6, minimum, maximum);
+		policy::assignment(bounded::integer<-6, 6>(bounded::constant<6>), minimum, maximum);
 		BOUNDED_TEST(false);
 	} catch (...) {
 	}

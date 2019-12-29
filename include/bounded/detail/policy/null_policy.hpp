@@ -5,6 +5,7 @@
 
 #pragma once
 
+#include <bounded/detail/comparison.hpp>
 #include <bounded/detail/is_bounded_integer.hpp>
 #include <bounded/unreachable.hpp>
 
@@ -12,7 +13,7 @@ namespace bounded {
 
 // Does nothing. Overflow is undefined behavior.
 struct null_policy {
-	static constexpr auto const & assignment(auto const & value, bounded_integer auto const & minimum, bounded_integer auto const & maximum) {
+	static constexpr auto const & assignment(bounded_integer auto const & value, bounded_integer auto const & minimum, bounded_integer auto const & maximum) {
 		if (value < minimum or maximum < value) {
 			bounded::unreachable();
 		}

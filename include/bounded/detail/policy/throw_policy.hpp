@@ -5,7 +5,6 @@
 
 #pragma once
 
-#include <bounded/detail/policy/null_policy.hpp>
 #include <bounded/detail/class.hpp>
 #include <bounded/detail/comparison.hpp>
 #include <bounded/detail/comparison_mixed.hpp>
@@ -24,8 +23,7 @@ template<typename T, auto minimum, auto maximum>
 constexpr auto reduce_range(T const & value, constant_t<minimum>, constant_t<maximum>) {
 	return integer<
 		detail::normalize<detail::safe_max(minimum, detail::builtin_min_value<T>)>,
-		detail::normalize<detail::safe_min(maximum, detail::builtin_max_value<T>)>,
-		null_policy
+		detail::normalize<detail::safe_min(maximum, detail::builtin_max_value<T>)>
 	>(value);
 }
 
@@ -34,7 +32,7 @@ constexpr auto reduce_range(T const & value, constant_t<minimum>, constant_t<max
 template<typename Exception = policy_detail::default_exception>
 struct throw_policy {
 	template<bounded_integer Minimum, bounded_integer Maximum>
-	static constexpr auto assignment(auto const & value, Minimum const & minimum, Maximum const & maximum) {
+	static constexpr auto assignment(bounded_integer auto const & value, Minimum const & minimum, Maximum const & maximum) {
 		if (minimum <= value and value <= maximum) {
 			return policy_detail::reduce_range(value, min_value<Minimum>, max_value<Maximum>);
 		} else {

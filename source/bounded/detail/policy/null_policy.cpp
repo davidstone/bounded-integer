@@ -5,10 +5,9 @@
 
 #include <bounded/detail/policy/null_policy.hpp>
 #include <bounded/detail/class.hpp>
-#include <bounded/detail/comparison_mixed.hpp>
 
 namespace {
-static_assert(bounded::null_policy::assignment(5, bounded::constant<0>, bounded::constant<10>) == 5);
+static_assert(bounded::null_policy::assignment(bounded::constant<5>, bounded::constant<0>, bounded::constant<10>) == bounded::constant<5>);
 // This should not compile
 // constexpr auto value2 = bounded::null_policy::assignment(15, bounded::constant<0>, bounded::constant<10>);
 
