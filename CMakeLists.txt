@@ -239,7 +239,7 @@ add_subdirectory("${PROJECT_SOURCE_DIR}/source/googletest-1.8.1")
 set_target_properties(gtest PROPERTIES FOLDER extern)
 set_target_properties(gtest_main PROPERTIES FOLDER extern)
 
-set(BENCHMARK_ENABLE_TESTING OFF)
+set(BENCHMARK_ENABLE_TESTING OFF CACHE BOOL "Disable testing benchmark.")
 add_subdirectory("${PROJECT_SOURCE_DIR}/source/benchmark")
 set_target_properties(benchmark PROPERTIES FOLDER extern)
 
