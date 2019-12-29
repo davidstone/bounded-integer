@@ -34,6 +34,10 @@ template<typename T>
 concept integral = is_integer<T>;
 
 
+// Use non_check_t constructors if you know by means that cannot be determined
+// by the type system that the value fits in the range.
+inline constexpr struct non_check_t{} non_check;
+
 namespace detail {
 
 template<typename T, auto minimum, auto maximum, typename policy>
@@ -118,9 +122,6 @@ struct integer {
 	// All constructors not taking a non_check_t argument accept an
 	// overflow_policy, which they default and ignore. This is solely to make
 	// the class work better with deduction guides.
-
-	// Use non_check_t constructors if you know by means that cannot be
-	// determined by the type system that the value fits in the range.
 
 	template<typename T> requires detail::overlapping_integer<T, minimum, maximum, overflow_policy>
 	constexpr integer(T const & other, non_check_t):

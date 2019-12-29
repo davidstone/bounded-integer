@@ -18,8 +18,4 @@ template<auto minimum, auto maximum, typename overflow_policy>
 inline constexpr auto is_bounded_integer<integer<minimum, maximum, overflow_policy>> = true;
 
 } // namespace detail
-
-// Does not verify that the value is in range with the policy
-constexpr struct non_check_t{} non_check ;
-
-}	// namespace bounded
+} // namespace bounded
