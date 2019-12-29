@@ -5,9 +5,10 @@
 
 #include <bounded/detail/arithmetic/operators.hpp>
 #include <bounded/detail/arithmetic/operators_builtin.hpp>
+#include <bounded/detail/policy/clamp_policy.hpp>
+#include <bounded/detail/policy/throw_policy.hpp>
 #include <bounded/detail/comparison.hpp>
 #include <bounded/detail/comparison_mixed.hpp>
-#include <bounded/detail/typedefs.hpp>
 
 #include "../../homogeneous_equals.hpp"
 #include "../../../test_assert.hpp"

@@ -29,4 +29,7 @@ struct clamp_policy {
 	static constexpr bool overflow_is_error = false;
 };
 
+template<auto minimum, auto maximum>
+using clamped_integer = integer<minimum, maximum, clamp_policy>;
+
 }	// namespace bounded

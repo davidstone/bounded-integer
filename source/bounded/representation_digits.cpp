@@ -8,7 +8,6 @@
 #include <bounded/detail/class.hpp>
 #include <bounded/detail/comparison_mixed.hpp>
 #include <bounded/detail/literal.hpp>
-#include <bounded/detail/typedefs.hpp>
 
 namespace {
 using namespace bounded::literal;

@@ -45,4 +45,7 @@ struct throw_policy {
 	static constexpr bool overflow_is_error = true;
 };
 
+template<auto minimum, auto maximum, typename Exception = policy_detail::default_exception>
+using checked_integer = integer<minimum, maximum, throw_policy<Exception>>;
+
 }	// namespace bounded

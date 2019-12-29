@@ -17,10 +17,12 @@
 #include <bounded/detail/minmax.hpp>
 #include <bounded/detail/size_of.hpp>
 #include <bounded/detail/stream.hpp>
-#include <bounded/detail/typedefs.hpp>
 #include <bounded/detail/arithmetic/operators.hpp>
 #include <bounded/detail/arithmetic/operators_builtin.hpp>
 #include <bounded/detail/arithmetic/pointer.hpp>
-#include <bounded/detail/policy/all.hpp>
+#include <bounded/detail/policy/clamp_policy.hpp>
+#include <bounded/detail/policy/modulo_policy.hpp>
+#include <bounded/detail/policy/null_policy.hpp>
+#include <bounded/detail/policy/throw_policy.hpp>
 
 // optional is not included here

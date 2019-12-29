@@ -56,7 +56,6 @@ add_executable(bounded_test
 	source/bounded/detail/optional/comparison_operators.cpp
 	source/bounded/detail/optional/forward_declaration.cpp
 	source/bounded/detail/optional/optional.cpp
-	source/bounded/detail/policy/all.cpp
 	source/bounded/detail/policy/clamp_policy.cpp
 	source/bounded/detail/policy/modulo_policy.cpp
 	source/bounded/detail/policy/null_policy.cpp
@@ -93,7 +92,6 @@ add_executable(bounded_test
 	source/bounded/detail/stream.cpp
 	source/bounded/detail/tuple.cpp
 	source/bounded/detail/type.cpp
-	source/bounded/detail/typedefs.cpp
 	source/bounded/detail/underlying_type.cpp
 	source/bounded/assert.cpp
 	source/bounded/assert-NDEBUG.cpp

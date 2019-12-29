@@ -5,7 +5,6 @@
 
 #include <bounded/detail/arithmetic/modulus.hpp>
 #include <bounded/detail/class.hpp>
-#include <bounded/detail/typedefs.hpp>
 #include "extreme_values.hpp"
 #include "../../homogeneous_equals.hpp"
 

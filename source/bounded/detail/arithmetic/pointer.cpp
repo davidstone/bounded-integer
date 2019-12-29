@@ -5,7 +5,6 @@
 
 #include <bounded/detail/arithmetic/pointer.hpp>
 #include <bounded/detail/class.hpp>
-#include <bounded/detail/typedefs.hpp>
 
 namespace {
 

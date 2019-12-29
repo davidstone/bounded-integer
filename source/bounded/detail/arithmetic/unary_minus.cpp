@@ -4,8 +4,8 @@
 // http://www.boost.org/LICENSE_1_0.txt)
 
 #include <bounded/detail/arithmetic/unary_minus.hpp>
+#include <bounded/detail/policy/throw_policy.hpp>
 #include <bounded/detail/class.hpp>
-#include <bounded/detail/typedefs.hpp>
 #include "../../homogeneous_equals.hpp"
 
 namespace {

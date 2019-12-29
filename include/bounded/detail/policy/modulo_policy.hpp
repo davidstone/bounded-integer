@@ -36,4 +36,7 @@ public:
 	static constexpr bool overflow_is_error = false;
 };
 
+template<auto minimum, auto maximum>
+using wrapping_integer = integer<minimum, maximum, modulo_policy>;
+
 }	// namespace bounded

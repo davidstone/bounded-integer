@@ -4,9 +4,9 @@
 // http://www.boost.org/LICENSE_1_0.txt)
 
 #include <bounded/detail/comparison.hpp>
+#include <bounded/detail/policy/throw_policy.hpp>
 #include <bounded/detail/class.hpp>
 #include <bounded/detail/comparison_mixed.hpp>
-#include <bounded/detail/typedefs.hpp>
 
 namespace {
 
