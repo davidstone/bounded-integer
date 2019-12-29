@@ -56,6 +56,13 @@ public:
 
 namespace bounded {
 
+template<auto minimum, auto maximum, typename overflow_policy>
+inline constexpr auto max_value<integer<minimum, maximum, overflow_policy>> = integer<maximum, maximum, null_policy>();
+
+template<auto minimum, auto maximum, typename overflow_policy>
+inline constexpr auto min_value<integer<minimum, maximum, overflow_policy>> = integer<minimum, minimum, null_policy>();
+
+
 template<typename T>
 inline constexpr auto is_integer = detail_builtin_integer<T> or bounded_integer<T>;
 
