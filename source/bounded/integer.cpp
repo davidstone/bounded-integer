@@ -65,11 +65,9 @@ template<typename integer_type>
 constexpr auto check_integer_optional() {
 	constexpr bounded::optional<integer_type> uninitialized_optional;
 	static_assert(!uninitialized_optional, "Default constructor should leave uninitialized.");
-	static_assert(value_or(uninitialized_optional, integer_type(9)) == integer_type(9), "value_or incorrect for uninitialized");
 	constexpr bounded::optional<integer_type> constexpr_optional_integer(integer_type(5));
 	static_assert(constexpr_optional_integer, "Value constructor should initialize optional.");
 	static_assert(*constexpr_optional_integer == 5, "Value in an optional incorrect.");
-	static_assert(value_or(constexpr_optional_integer, integer_type(9)) == integer_type(5), "value_or incorrect for initialized");
 
 	bounded::optional<integer_type> optional_integer(integer_type(4));
 	optional_integer = uninitialized_optional;
@@ -93,16 +91,8 @@ template<typename type>
 constexpr auto check_non_trivial_optional() {
 	bounded::optional<type> uninitialized_optional;
 	BOUNDED_TEST(!uninitialized_optional);
-	decltype(auto) uninitialized_value_or = value_or(uninitialized_optional, "spork");
-	BOUNDED_TEST(uninitialized_value_or == "spork");
-	static_assert(std::is_same_v<decltype(uninitialized_value_or), type>, "value_or incorrect for uninitialized");
-	static_assert(std::is_same_v<decltype(value_or(std::move(uninitialized_optional), type("spoon"))), type &&>, "value_or incorrect for uninitialized");
 	bounded::optional<type> optional_string("Hello");
 	BOUNDED_TEST(optional_string);
-	auto const default_value = type("knife");
-	decltype(auto) initialized_value_or = value_or(optional_string, default_value);
-	BOUNDED_TEST(initialized_value_or == "Hello");
-	static_assert(std::is_same_v<decltype(initialized_value_or), type const &>, "value_or incorrect for initialized");
 	BOUNDED_TEST(*optional_string == "Hello");
 
 	optional_string = uninitialized_optional;

@@ -8,6 +8,5 @@
 #include <bounded/detail/optional/common_type.hpp>
 #include <bounded/detail/optional/comparison_operators.hpp>
 #include <bounded/detail/optional/optional.hpp>
-#include <bounded/detail/optional/value_or.hpp>
 #include <bounded/integer.hpp>
 
