@@ -26,7 +26,7 @@ auto check_throw_policy() {
 	} catch (...) {
 	}
 	try {
-		policy::assignment(bounded::integer<-6, 6>(bounded::constant<6>), minimum, maximum);
+		policy::assignment(bounded::integer<-6, 6>(bounded::constant<-6>), minimum, maximum);
 		BOUNDED_TEST(false);
 	} catch (...) {
 	}
