@@ -6,6 +6,7 @@
 #pragma once
 
 #include <bounded/detail/assume.hpp>
+#include <bounded/detail/builtin_min_max_value.hpp>
 #include <bounded/detail/comparison.hpp>
 #include <bounded/detail/forward_declaration.hpp>
 #include <bounded/detail/is_bounded_integer.hpp>
@@ -21,6 +22,16 @@
 #include <limits>
 #include <type_traits>
 #include <utility>
+
+namespace bounded::detail {
+
+template<auto minimum, auto maximum, typename policy>
+inline constexpr auto builtin_max_value<integer<minimum, maximum, policy>> = maximum;
+
+template<auto minimum, auto maximum, typename policy>
+inline constexpr auto builtin_min_value<integer<minimum, maximum, policy>> = minimum;
+
+} // namespace bounded::detail
 
 namespace bounded {
 

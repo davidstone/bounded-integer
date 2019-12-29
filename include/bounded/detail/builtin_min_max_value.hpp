@@ -26,11 +26,5 @@ inline constexpr auto builtin_max_value = normalize<as_builtin_integer(max_value
 template<typename T> requires(!std::is_same_v<decltype(max_value<T>), incomplete>)
 inline constexpr auto builtin_min_value = normalize<as_builtin_integer(min_value<T>)>;
 
-template<auto minimum, auto maximum, typename policy>
-inline constexpr auto builtin_max_value<integer<minimum, maximum, policy>> = maximum;
-
-template<auto minimum, auto maximum, typename policy>
-inline constexpr auto builtin_min_value<integer<minimum, maximum, policy>> = minimum;
-
 }	// namespace detail
 }	// namespace bounded
