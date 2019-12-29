@@ -5,9 +5,6 @@
 
 #pragma once
 
-// Default constructors must be provided to work around
-// http://www.open-std.org/jtc1/sc22/wg21/docs/cwg_active.html#253
-
 #include <bounded/detail/policy/clamp_policy.hpp>
 #include <bounded/detail/policy/modulo_policy.hpp>
 #include <bounded/detail/policy/null_policy.hpp>
