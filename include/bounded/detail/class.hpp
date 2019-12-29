@@ -32,6 +32,27 @@ template<auto minimum, auto maximum, typename policy>
 inline constexpr auto builtin_min_value<integer<minimum, maximum, policy>> = minimum;
 
 } // namespace bounded::detail
+namespace std {
+
+// I do not have to specialize the single-argument version, as it just returns
+// the type passed in, which will always work.
+
+template<bounded::bounded_integer LHS, bounded::bounded_integer RHS> requires(std::is_same_v<LHS, std::decay_t<LHS>> and std::is_same_v<RHS, std::decay_t<RHS>>)
+struct common_type<LHS, RHS> {
+private:
+	static inline constexpr auto minimum = bounded::detail::normalize<bounded::detail::safe_min(
+		bounded::detail::builtin_min_value<LHS>,
+		bounded::detail::builtin_min_value<RHS>
+	)>;
+	static inline constexpr auto maximum = bounded::detail::normalize<bounded::detail::safe_max(
+		bounded::detail::builtin_max_value<LHS>,
+		bounded::detail::builtin_max_value<RHS>
+	)>;
+public:
+	using type = bounded::integer<minimum, maximum, bounded::null_policy>;
+};
+
+}	// namespace std
 
 namespace bounded {
 

@@ -5,11 +5,7 @@
 
 #pragma once
 
-#include <bounded/detail/common_type.hpp>
-#include <bounded/detail/comparison.hpp>
-#include <bounded/detail/forward_declaration.hpp>
-#include <bounded/detail/overlapping_range.hpp>
-#include <utility>
+#include <type_traits>
 
 namespace bounded {
 namespace detail {

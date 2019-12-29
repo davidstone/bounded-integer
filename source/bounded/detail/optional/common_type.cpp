@@ -5,7 +5,6 @@
 
 #include <bounded/detail/optional/common_type.hpp>
 #include <bounded/detail/class.hpp>
-#include <bounded/detail/common_type.hpp>
 
 static_assert(
 	std::is_same<std::common_type_t<bounded::none_t, int>, bounded::optional<int>>{},

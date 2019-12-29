@@ -8,7 +8,6 @@
 #include <bounded/detail/abs.hpp>
 #include <bounded/detail/cast.hpp>
 #include <bounded/detail/class.hpp>
-#include <bounded/detail/common_type.hpp>
 #include <bounded/detail/comparison.hpp>
 #include <bounded/detail/comparison_mixed.hpp>
 #include <bounded/detail/conditional.hpp>

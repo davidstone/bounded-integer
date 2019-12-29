@@ -6,7 +6,6 @@
 #pragma once
 
 #include <bounded/detail/class.hpp>
-#include <bounded/detail/common_type.hpp>
 #include <bounded/detail/common_type_and_value_category.hpp>
 #include <bounded/detail/comparison.hpp>
 #include <bounded/detail/comparison_function_object.hpp>

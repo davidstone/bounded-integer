@@ -6,7 +6,6 @@
 #pragma once
 
 #include <bounded/detail/class.hpp>
-#include <bounded/detail/common_type.hpp>
 #include <bounded/detail/is_bounded_integer.hpp>
 
 #include <type_traits>
