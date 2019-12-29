@@ -5,16 +5,11 @@
 
 #pragma once
 
-#include <bounded/detail/forward_declaration.hpp>
-
 namespace bounded {
 namespace detail {
 
 template<typename T>
 inline constexpr auto is_bounded_integer = false;
-
-template<auto minimum, auto maximum, typename overflow_policy>
-inline constexpr auto is_bounded_integer<integer<minimum, maximum, overflow_policy>> = true;
 
 template<typename T>
 inline constexpr auto is_bounded_integer<T const> = is_bounded_integer<T>;
