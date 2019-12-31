@@ -10,7 +10,7 @@
 #include <containers/empty.hpp>
 #include <containers/is_range.hpp>
 
-#include <bounded/detail/forward.hpp>
+#include <bounded/forward.hpp>
 #include <bounded/assert.hpp>
 #include <bounded/integer.hpp>
 

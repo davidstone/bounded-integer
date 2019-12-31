@@ -10,7 +10,7 @@
 #include <containers/is_iterator.hpp>
 #include <containers/size.hpp>
 
-#include <bounded/detail/forward.hpp>
+#include <bounded/forward.hpp>
 #include <bounded/assert.hpp>
 #include <bounded/integer.hpp>
 #include <bounded/unreachable.hpp>

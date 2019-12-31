@@ -7,7 +7,7 @@
 
 #include <bounded/detail/class.hpp>
 #include <bounded/detail/comparison.hpp>
-#include <bounded/detail/forward.hpp>
+#include <bounded/forward.hpp>
 #include <bounded/detail/is_bounded_integer.hpp>
 #include <bounded/detail/make_index_sequence.hpp>
 #include <bounded/detail/type.hpp>

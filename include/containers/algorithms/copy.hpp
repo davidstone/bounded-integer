@@ -8,7 +8,7 @@
 #include <containers/algorithms/move_iterator.hpp>
 #include <containers/algorithms/reverse_iterator.hpp>
 
-#include <bounded/detail/forward.hpp>
+#include <bounded/forward.hpp>
 #include <bounded/integer.hpp>
 
 namespace containers {

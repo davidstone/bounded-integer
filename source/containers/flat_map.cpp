@@ -9,7 +9,7 @@
 #include <containers/emplace_back.hpp>
 #include <containers/vector.hpp>
 
-#include <bounded/detail/forward.hpp>
+#include <bounded/forward.hpp>
 
 #include "../test_assert.hpp"
 

@@ -8,7 +8,7 @@
 #include <containers/algorithms/advance.hpp>
 #include <containers/reference_wrapper.hpp>
 
-#include <bounded/detail/forward.hpp>
+#include <bounded/forward.hpp>
 
 #include <iterator>
 #include <type_traits>

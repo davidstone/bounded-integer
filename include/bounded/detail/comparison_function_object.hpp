@@ -6,7 +6,7 @@
 #pragma once
 
 #include <bounded/detail/comparison.hpp>
-#include <bounded/detail/forward.hpp>
+#include <bounded/forward.hpp>
 
 #include <utility>
 

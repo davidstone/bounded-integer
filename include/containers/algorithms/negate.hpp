@@ -5,7 +5,7 @@
 
 #pragma once
 
-#include <bounded/detail/forward.hpp>
+#include <bounded/forward.hpp>
 #include <bounded/integer.hpp>
 
 #include <type_traits>

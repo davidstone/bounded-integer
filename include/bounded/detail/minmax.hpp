@@ -9,7 +9,7 @@
 #include <bounded/detail/common_type_and_value_category.hpp>
 #include <bounded/detail/comparison.hpp>
 #include <bounded/detail/comparison_function_object.hpp>
-#include <bounded/detail/forward.hpp>
+#include <bounded/forward.hpp>
 #include <bounded/detail/is_bounded_integer.hpp>
 #include <bounded/detail/max_builtin.hpp>
 #include <bounded/detail/normalize.hpp>

@@ -10,7 +10,7 @@
 #include <containers/is_range.hpp>
 
 #include <bounded/detail/comparison_function_object.hpp>
-#include <bounded/detail/forward.hpp>
+#include <bounded/forward.hpp>
 
 namespace containers {
 

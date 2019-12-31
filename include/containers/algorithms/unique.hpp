@@ -11,7 +11,7 @@
 #include <containers/dynamic_array.hpp>
 
 #include <bounded/assert.hpp>
-#include <bounded/detail/forward.hpp>
+#include <bounded/forward.hpp>
 
 #include <functional>
 #include <iterator>

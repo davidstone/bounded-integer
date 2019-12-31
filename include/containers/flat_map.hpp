@@ -13,7 +13,7 @@
 #include <containers/legacy_iterator.hpp>
 #include <containers/vector.hpp>
 
-#include <bounded/detail/forward.hpp>
+#include <bounded/forward.hpp>
 #include <bounded/detail/tuple.hpp>
 #include <bounded/detail/type.hpp>
 #include <bounded/integer.hpp>

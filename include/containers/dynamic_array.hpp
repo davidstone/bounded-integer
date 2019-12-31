@@ -16,7 +16,7 @@
 #include <containers/repeat_n.hpp>
 #include <containers/uninitialized_storage.hpp>
 
-#include <bounded/detail/forward.hpp>
+#include <bounded/forward.hpp>
 
 #include <operators/bracket.hpp>
 

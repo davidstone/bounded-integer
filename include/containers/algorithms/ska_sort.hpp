@@ -6,7 +6,7 @@
 #pragma once
 
 #include <bounded/detail/copy_cv_ref.hpp>
-#include <bounded/detail/forward.hpp>
+#include <bounded/forward.hpp>
 #include <containers/algorithms/count.hpp>
 #include <containers/algorithms/minmax_element.hpp>
 #include <containers/algorithms/negate.hpp>

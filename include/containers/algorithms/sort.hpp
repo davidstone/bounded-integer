@@ -12,7 +12,7 @@
 #include <containers/legacy_iterator.hpp>
 #include <containers/range_view.hpp>
 
-#include <bounded/detail/forward.hpp>
+#include <bounded/forward.hpp>
 #include <bounded/integer.hpp>
 
 #include <algorithm>

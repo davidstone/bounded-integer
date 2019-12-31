@@ -9,7 +9,7 @@
 #include <containers/reference_wrapper.hpp>
 
 #include <bounded/detail/construct_destroy.hpp>
-#include <bounded/detail/forward.hpp>
+#include <bounded/forward.hpp>
 #include <bounded/integer.hpp>
 #include <bounded/unreachable.hpp>
 

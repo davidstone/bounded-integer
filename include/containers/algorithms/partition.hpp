@@ -11,7 +11,7 @@
 #include <containers/is_range.hpp>
 
 #include <bounded/assert.hpp>
-#include <bounded/detail/forward.hpp>
+#include <bounded/forward.hpp>
 #include <bounded/integer.hpp>
 
 #include <limits>

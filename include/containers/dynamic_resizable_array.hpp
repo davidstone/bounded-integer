@@ -16,7 +16,7 @@
 #include <containers/reserve_if_reservable.hpp>
 #include <containers/uninitialized_storage.hpp>
 
-#include <bounded/detail/forward.hpp>
+#include <bounded/forward.hpp>
 #include <bounded/assert.hpp>
 
 #include <algorithm>

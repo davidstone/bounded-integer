@@ -11,7 +11,7 @@
 #include <containers/iterator_adapter.hpp>
 #include <containers/reference_wrapper.hpp>
 
-#include <bounded/detail/forward.hpp>
+#include <bounded/forward.hpp>
 #include <bounded/detail/returns.hpp>
 #include <bounded/assert.hpp>
 #include <bounded/integer.hpp>
