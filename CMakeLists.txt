@@ -73,7 +73,6 @@ add_executable(bounded_test
 	source/bounded/detail/conditional.cpp
 	source/bounded/detail/construct_destroy.cpp
 	source/bounded/detail/copy_cv_ref.cpp
-	source/bounded/detail/forward_declaration.cpp
 	source/bounded/detail/int128.cpp
 	source/bounded/detail/is_bounded_integer.cpp
 	source/bounded/detail/literal.cpp

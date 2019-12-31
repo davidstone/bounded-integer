@@ -8,7 +8,6 @@
 #include <bounded/detail/assume.hpp>
 #include <bounded/detail/builtin_min_max_value.hpp>
 #include <bounded/detail/comparison.hpp>
-#include <bounded/detail/forward_declaration.hpp>
 #include <bounded/detail/is_bounded_integer.hpp>
 #include <bounded/detail/min_max_value.hpp>
 #include <bounded/detail/normalize.hpp>
@@ -23,7 +22,21 @@
 #include <type_traits>
 #include <utility>
 
-namespace bounded::detail {
+namespace bounded {
+
+template<auto minimum, auto maximum, typename overflow_policy>
+struct integer;
+
+template<auto minimum, auto maximum, typename overflow_policy>
+inline constexpr auto max_value<integer<minimum, maximum, overflow_policy>> = integer<maximum, maximum, null_policy>();
+
+template<auto minimum, auto maximum, typename overflow_policy>
+inline constexpr auto min_value<integer<minimum, maximum, overflow_policy>> = integer<minimum, minimum, null_policy>();
+
+namespace detail {
+
+template<auto minimum, auto maximum, typename overflow_policy>
+inline constexpr auto is_bounded_integer<integer<minimum, maximum, overflow_policy>> = true;
 
 template<auto minimum, auto maximum, typename policy>
 inline constexpr auto builtin_max_value<integer<minimum, maximum, policy>> = maximum;
@@ -31,7 +44,8 @@ inline constexpr auto builtin_max_value<integer<minimum, maximum, policy>> = max
 template<auto minimum, auto maximum, typename policy>
 inline constexpr auto builtin_min_value<integer<minimum, maximum, policy>> = minimum;
 
-} // namespace bounded::detail
+} // namespace detail
+} // namespace bounded
 namespace std {
 
 // I do not have to specialize the single-argument version, as it just returns
@@ -52,16 +66,8 @@ public:
 	using type = bounded::integer<minimum, maximum, bounded::null_policy>;
 };
 
-}	// namespace std
-
+} // namespace std
 namespace bounded {
-
-template<auto minimum, auto maximum, typename overflow_policy>
-inline constexpr auto max_value<integer<minimum, maximum, overflow_policy>> = integer<maximum, maximum, null_policy>();
-
-template<auto minimum, auto maximum, typename overflow_policy>
-inline constexpr auto min_value<integer<minimum, maximum, overflow_policy>> = integer<minimum, minimum, null_policy>();
-
 
 template<typename T>
 inline constexpr auto is_integer = detail_builtin_integer<T> or bounded_integer<T>;
