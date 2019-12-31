@@ -7,7 +7,6 @@
 
 #include <bounded/detail/class.hpp>
 #include <bounded/detail/literal.hpp>
-#include <bounded/detail/returns.hpp>
 #include <bounded/detail/type.hpp>
 
 #include <type_traits>
@@ -200,7 +199,7 @@ private:
 		Function && function;
 		// TODO: use terse syntax when it does not crash clang
 		template<typename... Args>
-		constexpr auto operator()(Args && ... args) && BOUNDED_RETURNS(
+		constexpr auto operator()(Args && ... args) && OPERATORS_RETURNS(
 			BOUNDED_FORWARD(function)(BOUNDED_FORWARD(args).value...)
 		)
 	};

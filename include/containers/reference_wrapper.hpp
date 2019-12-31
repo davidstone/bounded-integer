@@ -6,7 +6,9 @@
 #pragma once
 
 #include <bounded/forward.hpp>
-#include <bounded/detail/returns.hpp>
+
+#include <operators/returns.hpp>
+
 #include <utility>
 
 namespace containers {
@@ -30,7 +32,7 @@ struct reference_wrapper {
 
 	// TODO: Use terse syntax when clang does not crash
 	template<typename... Args>
-	constexpr auto operator()(Args && ... args) const BOUNDED_RETURNS(
+	constexpr auto operator()(Args && ... args) const OPERATORS_RETURNS(
 		get()(BOUNDED_FORWARD(args)...)
 	)
 

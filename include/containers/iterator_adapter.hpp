@@ -10,7 +10,6 @@
 #include <containers/reference_wrapper.hpp>
 
 #include <bounded/integer.hpp>
-#include <bounded/detail/returns.hpp>
 
 #include <operators/operators.hpp>
 
@@ -37,13 +36,13 @@ struct default_dereference {
 };
 
 struct default_add {
-	static constexpr auto add(iterator auto it, auto const & offset) BOUNDED_RETURNS(
+	static constexpr auto add(iterator auto it, auto const & offset) OPERATORS_RETURNS(
 		std::move(it) + offset
 	)
 };
 
 struct default_subtract {
-	static constexpr auto subtract(iterator auto const & lhs, iterator auto const & rhs) BOUNDED_RETURNS(
+	static constexpr auto subtract(iterator auto const & lhs, iterator auto const & rhs) OPERATORS_RETURNS(
 		lhs - rhs
 	)
 };
@@ -156,23 +155,23 @@ constexpr decltype(auto) operator*(adapt_iterator<Iterator, Traits> const it) {
 }
 
 template<typename Iterator, typename Traits>
-constexpr auto operator+(adapt_iterator<Iterator, Traits> const lhs, auto const rhs) BOUNDED_RETURNS(
+constexpr auto operator+(adapt_iterator<Iterator, Traits> const lhs, auto const rhs) OPERATORS_RETURNS(
 	adapt_iterator<Iterator, Traits>(lhs.traits().add(lhs.base(), rhs), lhs.traits())
 )
 
 
 template<typename LHSIterator, typename RHSIterator, typename Traits>
-constexpr auto operator-(adapt_iterator<LHSIterator, Traits> const lhs, adapt_iterator<RHSIterator, Traits> const rhs) BOUNDED_RETURNS(
+constexpr auto operator-(adapt_iterator<LHSIterator, Traits> const lhs, adapt_iterator<RHSIterator, Traits> const rhs) OPERATORS_RETURNS(
 	lhs.traits().subtract(lhs.base(), rhs.base())
 )
 
 template<typename LHSIterator, typename RHSIterator, typename Traits>
-constexpr auto operator<=>(adapt_iterator<LHSIterator, Traits> const lhs, adapt_iterator<RHSIterator, Traits> const rhs) BOUNDED_RETURNS(
+constexpr auto operator<=>(adapt_iterator<LHSIterator, Traits> const lhs, adapt_iterator<RHSIterator, Traits> const rhs) OPERATORS_RETURNS(
 	lhs.traits().compare(lhs.base(), rhs.base())
 )
 
 template<typename LHSIterator, typename RHSIterator, typename Traits>
-constexpr auto operator==(adapt_iterator<LHSIterator, Traits> const lhs, adapt_iterator<RHSIterator, Traits> const rhs) BOUNDED_RETURNS(
+constexpr auto operator==(adapt_iterator<LHSIterator, Traits> const lhs, adapt_iterator<RHSIterator, Traits> const rhs) OPERATORS_RETURNS(
 	lhs.traits().equal(lhs.base(), rhs.base())
 )
 

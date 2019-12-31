@@ -10,7 +10,6 @@
 #include <containers/non_modifying_common_container_functions.hpp>
 
 #include <bounded/integer.hpp>
-#include <bounded/detail/returns.hpp>
 
 #include <operators/bracket.hpp>
 

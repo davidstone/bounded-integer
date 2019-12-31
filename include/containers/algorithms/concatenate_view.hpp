@@ -12,7 +12,6 @@
 
 #include <bounded/detail/construct_destroy.hpp>
 #include <bounded/detail/make_index_sequence.hpp>
-#include <bounded/detail/returns.hpp>
 #include <bounded/detail/tuple.hpp>
 #include <bounded/integer.hpp>
 
@@ -260,7 +259,7 @@ public:
 
 
 template<typename... Ranges>
-constexpr auto operator-(concatenate_view_iterator<Ranges...> const lhs, concatenate_view_sentinel const rhs) BOUNDED_RETURNS(
+constexpr auto operator-(concatenate_view_iterator<Ranges...> const lhs, concatenate_view_sentinel const rhs) OPERATORS_RETURNS(
 	-(rhs - lhs)
 )
 

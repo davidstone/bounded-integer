@@ -8,8 +8,6 @@
 #include <containers/iterator_adapter.hpp>
 #include <containers/reference_wrapper.hpp>
 
-#include <bounded/detail/returns.hpp>
-
 #include <functional>
 
 namespace containers {
@@ -34,7 +32,7 @@ struct function_wrapper {
 
 	// TODO: Use terse syntax when clang doesn't crash
 	template<typename... Args>
-	constexpr auto operator()(Args && ... args) const BOUNDED_RETURNS(
+	constexpr auto operator()(Args && ... args) const OPERATORS_RETURNS(
 		  function(BOUNDED_FORWARD(args)...)
 	)
 };

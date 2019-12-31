@@ -15,7 +15,6 @@
 #include <bounded/detail/arithmetic/unary_minus.hpp>
 #include <bounded/detail/arithmetic/unary_plus.hpp>
 #include <bounded/detail/class.hpp>
-#include <bounded/detail/returns.hpp>
 
 #include <operators/binary_minus.hpp>
 #include <operators/compound_assignment.hpp>
@@ -27,11 +26,11 @@ namespace bounded {
 namespace detail {
 namespace arithmetic {
 
-constexpr auto operator++(auto & value) BOUNDED_RETURNS(
+constexpr auto operator++(auto & value) OPERATORS_RETURNS(
 	value += constant<1>
 )
 
-constexpr auto operator--(auto & value) BOUNDED_RETURNS(
+constexpr auto operator--(auto & value) OPERATORS_RETURNS(
 	value -= constant<1>
 )
 

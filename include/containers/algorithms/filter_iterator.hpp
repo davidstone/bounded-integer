@@ -12,7 +12,6 @@
 #include <containers/reference_wrapper.hpp>
 
 #include <bounded/forward.hpp>
-#include <bounded/detail/returns.hpp>
 #include <bounded/assert.hpp>
 #include <bounded/integer.hpp>
 
@@ -74,12 +73,12 @@ struct filter_iterator_sentinel {
 };
 
 template<iterator Iterator, is_filter_iterator_traits Traits>
-constexpr auto operator<=>(adapt_iterator<Iterator, Traits> const lhs, filter_iterator_sentinel) BOUNDED_RETURNS(
+constexpr auto operator<=>(adapt_iterator<Iterator, Traits> const lhs, filter_iterator_sentinel) OPERATORS_RETURNS(
 	lhs.traits().compare(lhs.base(), lhs.traits().sentinel())
 )
 
 template<iterator Iterator, is_filter_iterator_traits Traits>
-constexpr auto operator<=>(filter_iterator_sentinel, adapt_iterator<Iterator, Traits> const rhs) BOUNDED_RETURNS(
+constexpr auto operator<=>(filter_iterator_sentinel, adapt_iterator<Iterator, Traits> const rhs) OPERATORS_RETURNS(
 	rhs.traits().compare(rhs.traits().sentinel(), rhs.base())
 )
 

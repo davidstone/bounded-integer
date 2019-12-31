@@ -12,8 +12,6 @@
 #include <containers/adapt.hpp>
 #include <containers/is_range.hpp>
 
-#include <bounded/detail/returns.hpp>
-
 #include <iterator>
 
 namespace containers {
@@ -32,7 +30,7 @@ struct reverse_traits {
 		return *::containers::prev(it);
 	}
 
-	static constexpr auto add(random_access_iterator auto it, auto const offset) BOUNDED_RETURNS(
+	static constexpr auto add(random_access_iterator auto it, auto const offset) OPERATORS_RETURNS(
 		it - offset
 	)
 
