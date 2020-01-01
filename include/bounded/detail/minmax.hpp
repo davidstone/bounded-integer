@@ -9,11 +9,12 @@
 #include <bounded/detail/common_type_and_value_category.hpp>
 #include <bounded/detail/comparison.hpp>
 #include <bounded/detail/comparison_function_object.hpp>
-#include <bounded/forward.hpp>
 #include <bounded/detail/is_bounded_integer.hpp>
 #include <bounded/detail/max_builtin.hpp>
 #include <bounded/detail/normalize.hpp>
 #include <bounded/detail/overlapping_range.hpp>
+#include <bounded/forward.hpp>
+#include <bounded/is_constructible.hpp>
 
 #include <utility>
 
@@ -80,9 +81,9 @@ public:
 	template<typename T1, typename T2>
 	constexpr decltype(auto) operator()(auto compare, T1 && t1, T2 && t2) const {
 		using result_t = result_type<decltype(compare), T1, T2>;
-		if constexpr (not std::is_constructible_v<result_t, T2>) {
+		if constexpr (not is_constructible<result_t, T2>) {
 			return BOUNDED_FORWARD(t1);
-		} else if constexpr (not std::is_constructible_v<result_t, T1>) {
+		} else if constexpr (not is_constructible<result_t, T1>) {
 			return BOUNDED_FORWARD(t2);
 		} else {
 			return extreme_two(std::move(compare), BOUNDED_FORWARD(t1), BOUNDED_FORWARD(t2));

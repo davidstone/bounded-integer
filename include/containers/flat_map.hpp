@@ -17,6 +17,7 @@
 #include <bounded/detail/tuple.hpp>
 #include <bounded/detail/type.hpp>
 #include <bounded/integer.hpp>
+#include <bounded/is_constructible.hpp>
 
 #include <algorithm>
 #include <stdexcept>
@@ -33,7 +34,7 @@ public:
 	using key_type = Key;
 	using mapped_type = Mapped;
 
-	template<typename... Args> requires std::is_constructible_v<bounded::tuple<key_type, mapped_type>, Args...>
+	template<typename... Args> requires bounded::is_constructible<bounded::tuple<key_type, mapped_type>, Args...>
 	constexpr map_value_type(Args && ... args):
 		m_data(BOUNDED_FORWARD(args)...)
 	{

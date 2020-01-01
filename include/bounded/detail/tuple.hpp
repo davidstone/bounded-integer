@@ -12,38 +12,27 @@
 #include <bounded/detail/make_index_sequence.hpp>
 #include <bounded/detail/type.hpp>
 
+#include <bounded/is_constructible.hpp>
+#include <bounded/lazy_init.hpp>
+
 #include <type_traits>
 #include <utility>
 
 namespace bounded {
-
-struct lazy_init_t {
-} inline constexpr lazy_init;
-
 namespace detail {
-
-// TODO: File a bug against the standard?
-template<typename T>
-T declval();
-
-template<typename T, typename... Args>
-concept is_constructible = requires { T(declval<Args>()...); };
-
-template<typename Function, typename T>
-concept lazy_construct_function_for = (std::is_void_v<T> and std::is_void_v<decltype(std::declval<Function>()())>) or is_constructible<T, decltype(std::declval<Function>()())>;
 
 // index is the index of this value within the tuple that contains it
 template<std::size_t index, typename T>
 struct tuple_value {
 	tuple_value() = default;
 
-	constexpr explicit tuple_value(lazy_init_t, lazy_construct_function_for<T> auto function):
+	constexpr explicit tuple_value(lazy_init_t, construct_function_for<T> auto function):
 		m_value(std::move(function)())
 	{
 	}
 
 	// TODO: convertible
-	template<typename Arg> requires detail::is_constructible<T, Arg>
+	template<typename Arg> requires is_constructible<T, Arg>
 	constexpr explicit tuple_value(Arg && arg):
 		m_value(BOUNDED_FORWARD(arg))
 	{
@@ -81,7 +70,7 @@ template<std::size_t index>
 struct tuple_value<index, void> {
 	tuple_value() = default;
 
-	constexpr explicit tuple_value(lazy_init_t, lazy_construct_function_for<void> auto function) {
+	constexpr explicit tuple_value(lazy_init_t, construct_function_for<void> auto function) {
 		std::move(function)();
 	}
 
@@ -117,7 +106,7 @@ struct tuple_impl<std::index_sequence<indexes...>, Types...> : tuple_value<index
 	{
 	}
 
-	constexpr tuple_impl(lazy_init_t, lazy_construct_function_for<Types> auto ... functions):
+	constexpr tuple_impl(lazy_init_t, construct_function_for<Types> auto ... functions):
 		tuple_value<indexes, Types>(lazy_init, std::move(functions))...
 	{
 	}
@@ -267,7 +256,7 @@ private:
 	}
 
 public:
-	template<typename... Tuples> requires(... and detail::is_constructible<std::decay_t<Tuples>, Tuples &&>)
+	template<typename... Tuples> requires(... and is_constructible<std::decay_t<Tuples>, Tuples &&>)
 	constexpr auto operator()(Tuples && ... tuples) const {
 		if constexpr (sizeof...(tuples) == 0) {
 			return tuple<>{};

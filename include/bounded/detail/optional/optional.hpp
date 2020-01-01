@@ -12,6 +12,7 @@
 #include <bounded/assert.hpp>
 #include <bounded/detail/construct_destroy.hpp>
 #include <bounded/forward.hpp>
+#include <bounded/is_constructible.hpp>
 
 #include <operators/arrow.hpp>
 
@@ -125,7 +126,7 @@ public:
 	{
 	}
 
-	template<typename... Args> requires std::is_constructible_v<value_type, Args && ...>
+	template<typename... Args> requires is_constructible<value_type, Args && ...>
 	constexpr explicit optional(std::in_place_t, Args && ... other):
 		m_value(BOUNDED_FORWARD(other)...) {
 	}
@@ -134,7 +135,7 @@ public:
 		optional(std::in_place, BOUNDED_FORWARD(other))
 	{
 	}
-	template<typename U> requires (!std::is_convertible_v<U &&, value_type> and std::is_constructible_v<value_type, U &&>)
+	template<typename U> requires (!std::is_convertible_v<U &&, value_type> and is_constructible<value_type, U &&>)
 	constexpr explicit optional(U && other):
 		optional(std::in_place, BOUNDED_FORWARD(other))
 	{
@@ -151,12 +152,12 @@ public:
 		optional(std::move(other), common_init_tag{})
 	{
 	}
-	template<typename U> requires (!std::is_convertible_v<U const &, value_type> and std::is_constructible_v<value_type, U const &>)
+	template<typename U> requires (!std::is_convertible_v<U const &, value_type> and is_constructible<value_type, U const &>)
 	constexpr explicit optional(optional<U> const & other):
 		optional(other, common_init_tag{})
 	{
 	}
-	template<typename U> requires (!std::is_convertible_v<U &&, value_type> and std::is_constructible_v<value_type, U &&>)
+	template<typename U> requires (!std::is_convertible_v<U &&, value_type> and is_constructible<value_type, U &&>)
 	constexpr explicit optional(optional<U> && other):
 		optional(std::move(other), common_init_tag{})
 	{

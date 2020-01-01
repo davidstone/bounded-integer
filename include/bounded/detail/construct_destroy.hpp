@@ -6,6 +6,7 @@
 #pragma once
 
 #include <bounded/forward.hpp>
+#include <bounded/is_constructible.hpp>
 
 #include <memory>
 #include <type_traits>
@@ -21,12 +22,12 @@ concept constexpr_constructible = std::is_move_assignable_v<T> and std::is_trivi
 
 template<typename T>
 struct construct_return_t {
-	template<typename... Args> requires std::is_constructible_v<T, Args...>
+	template<typename... Args> requires is_constructible<T, Args...>
 	constexpr auto operator()(Args && ... args) const {
 		return T(BOUNDED_FORWARD(args)...);
 	}
 	
-	template<typename... Args> requires(!std::is_constructible_v<T, Args...> and requires (Args && ... args) { T{BOUNDED_FORWARD(args)...}; })
+	template<typename... Args> requires(!is_constructible<T, Args...> and requires (Args && ... args) { T{BOUNDED_FORWARD(args)...}; })
 	constexpr auto operator()(Args && ... args) const {
 		return T{BOUNDED_FORWARD(args)...};
 	}

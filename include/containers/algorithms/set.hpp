@@ -9,6 +9,7 @@
 #include <containers/reference_wrapper.hpp>
 
 #include <bounded/forward.hpp>
+#include <bounded/is_constructible.hpp>
 
 #include <iterator>
 #include <type_traits>
@@ -23,7 +24,7 @@ constexpr auto less_to_compare = [](auto const & cmp) {
 		if constexpr (std::is_convertible_v<result_t, std::strong_ordering>) {
 			return cmp(lhs, rhs);
 		} else {
-			static_assert(std::is_constructible_v<bool, result_t>);
+			static_assert(bounded::is_constructible<bool, result_t>);
 			return
 				cmp(lhs, rhs) ? std::strong_ordering::less :
 				cmp(rhs, lhs) ? std::strong_ordering::greater :

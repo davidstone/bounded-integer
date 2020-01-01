@@ -10,11 +10,12 @@
 
 #include <bounded/forward.hpp>
 #include <bounded/integer.hpp>
+#include <bounded/is_constructible.hpp>
 
 namespace containers {
 
 // Works with explicit copy constructors
-template<typename T> requires std::is_constructible_v<std::decay_t<T>, T &&>
+template<typename T> requires bounded::is_constructible<std::decay_t<T>, T &&>
 constexpr auto copy(T && value) {
 	return std::decay_t<T>(BOUNDED_FORWARD(value));
 }

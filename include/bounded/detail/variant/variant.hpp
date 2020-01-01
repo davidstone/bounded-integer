@@ -9,6 +9,7 @@
 #include <bounded/detail/comparison.hpp>
 #include <bounded/detail/copy_cv_ref.hpp>
 #include <bounded/forward.hpp>
+#include <bounded/is_constructible.hpp>
 #include <bounded/detail/type.hpp>
 #include <bounded/detail/variant/get_index.hpp>
 #include <bounded/detail/variant/is_valid_index.hpp>
@@ -45,7 +46,7 @@ public:
 
 	template<typename F, typename Index, typename... Args> requires(
 		std::is_convertible_v<F, GetFunction> and
-		std::is_constructible_v<typename decltype(detail::get_type(Index{}, detail::types<Ts>{}...))::type, Args...>
+		is_constructible<typename decltype(detail::get_type(Index{}, detail::types<Ts>{}...))::type, Args...>
 	)
 	constexpr basic_variant(std::in_place_t, F && function, Index index_, Args && ... args):
 		m_function(BOUNDED_FORWARD(function)),
@@ -63,7 +64,7 @@ public:
 
 	template<typename Index, typename... Args> requires(
 		not std::is_convertible_v<Index, GetFunction> and
-		std::is_constructible_v<typename decltype(detail::get_type(Index{}, detail::types<Ts>{}...))::type, Args...>
+		is_constructible<typename decltype(detail::get_type(Index{}, detail::types<Ts>{}...))::type, Args...>
 	)
 	constexpr basic_variant(std::in_place_t, Index const index_, Args && ... args):
 		basic_variant(
@@ -143,7 +144,7 @@ public:
 
 	template<typename T> requires(
 		!std::is_same_v<std::decay_t<T>, basic_variant> and
-		std::is_constructible_v<std::decay_t<T>, T &&> and
+		is_constructible<std::decay_t<T>, T &&> and
 		std::is_assignable_v<std::decay_t<T> &, T &&>
 	)
 	constexpr auto & operator=(T && value) & {

@@ -16,6 +16,7 @@
 #include <containers/uninitialized_storage.hpp>
 
 #include <bounded/assert.hpp>
+#include <bounded/is_constructible.hpp>
 
 #include <algorithm>
 #include <cstddef>
@@ -250,7 +251,7 @@ struct sbo_vector_base {
 	
 	auto set_size(auto const new_size) {
 		if (is_small()) {
-			if constexpr (std::is_constructible_v<typename small_t::size_type, decltype(new_size)>) {
+			if constexpr (bounded::is_constructible<typename small_t::size_type, decltype(new_size)>) {
 				m_small.set_size(static_cast<typename small_t::size_type>(new_size));
 			} else {
 				bounded::assert_or_assume_unreachable();

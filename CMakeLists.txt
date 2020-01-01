@@ -95,6 +95,8 @@ add_executable(bounded_test
 	source/bounded/representation_digits.cpp
 	source/bounded/hash.cpp
 	source/bounded/integer.cpp
+	source/bounded/is_constructible.cpp
+	source/bounded/lazy_init.cpp
 	source/bounded/numeric_limits.cpp
 	source/bounded/optional.cpp
 	source/bounded/string.cpp
