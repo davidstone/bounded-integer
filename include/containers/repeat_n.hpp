@@ -12,6 +12,7 @@
 #include <bounded/forward.hpp>
 #include <bounded/integer.hpp>
 #include <bounded/unreachable.hpp>
+#include <bounded/value_to_function.hpp>
 
 #include <operators/operators.hpp>
 
@@ -97,20 +98,6 @@ constexpr auto & operator++(repeat_n_iterator<Size, Function> & it) {
 	return it;
 }
 
-namespace detail {
-
-constexpr inline auto value_to_function = [](auto && value) {
-	struct result {
-		containers::reference_wrapper<std::remove_reference_t<decltype(value)>> m_ref;
-		constexpr auto & operator()() const {
-			return m_ref.get();
-		}
-	};
-	return result{value};
-};
-
-} // namespace detail
-
 template<typename Size, typename T>
 struct repeat_n {
 private:
@@ -121,7 +108,7 @@ public:
 	using size_type = Size;
 	using value_type = T;
 
-	using const_iterator = repeat_n_iterator<size_type, decltype(detail::value_to_function(std::declval<T const &>()))>;
+	using const_iterator = repeat_n_iterator<size_type, decltype(bounded::value_to_function(std::declval<T const &>()))>;
 
 	template<typename U>	
 	constexpr repeat_n(size_type const size, U && value):
@@ -131,7 +118,7 @@ public:
 	}
 
 	constexpr auto begin() const {
-		return const_iterator(m_size, detail::value_to_function(m_value));
+		return const_iterator(m_size, bounded::value_to_function(m_value));
 	}
 	constexpr auto end() const {
 		return repeat_n_sentinel{};
