@@ -35,6 +35,8 @@ private:
 		(... and std::is_trivially_move_constructible_v<Ts>) and
 		(... and std::is_trivially_destructible_v<Ts>);
 
+	template<typename Index>
+	using type_at = typename decltype(detail::get_type(Index(), detail::types<Ts>()...))::type;
 public:
 	friend detail::variant_destructor<GetFunction, Ts...>;
 
@@ -46,7 +48,7 @@ public:
 
 	template<typename F, typename Index, typename... Args> requires(
 		std::is_convertible_v<F, GetFunction> and
-		is_constructible<typename decltype(detail::get_type(Index{}, detail::types<Ts>{}...))::type, Args...>
+		is_constructible<type_at<Index>, Args...>
 	)
 	constexpr basic_variant(std::in_place_t, F && function, Index index_, Args && ... args):
 		m_function(BOUNDED_FORWARD(function)),
@@ -64,7 +66,7 @@ public:
 
 	template<typename Index, typename... Args> requires(
 		not std::is_convertible_v<Index, GetFunction> and
-		is_constructible<typename decltype(detail::get_type(Index{}, detail::types<Ts>{}...))::type, Args...>
+		is_constructible<type_at<Index>, Args...>
 	)
 	constexpr basic_variant(std::in_place_t, Index const index_, Args && ... args):
 		basic_variant(
@@ -176,8 +178,8 @@ public:
 	}
 
 
-	constexpr auto & emplace(auto index, auto && ... args) & requires requires { construct_return<typename decltype(detail::get_type(index, detail::types<Ts>{}...))::type>(BOUNDED_FORWARD(args)...); } {
-		using indexed = typename decltype(detail::get_type(index, detail::types<Ts>{}...))::type;
+	constexpr auto & emplace(auto index, auto && ... args) & requires requires { construct_return<type_at<decltype(index)>>(BOUNDED_FORWARD(args)...); } {
+		using indexed = type_at<decltype(index)>;
 		if constexpr (std::is_nothrow_constructible_v<indexed, decltype(args)...>) {
 			visit(*this, destroy);
 			return replace_active_member(index, BOUNDED_FORWARD(args)...);
