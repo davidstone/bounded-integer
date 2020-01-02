@@ -7,6 +7,7 @@
 
 #include <bounded/forward.hpp>
 #include <bounded/is_constructible.hpp>
+#include <bounded/lazy_init.hpp>
 
 #include <memory>
 #include <type_traits>
@@ -39,18 +40,21 @@ template<typename T>
 inline constexpr auto construct_return = detail::construct_return_t<T>{};
 
 
-inline constexpr struct construct_t {
-	// The assignment operator must return a T & if it is trivial
-	template<detail::constexpr_constructible T, typename... Args>
-	constexpr auto & operator()(T & ref, Args && ... args) const {
-		return ref = construct_return<T>(BOUNDED_FORWARD(args)...);
+struct construct_t {
+	template<typename T, typename Function>
+	constexpr auto & operator()(lazy_init_t, T & ref, Function && function) const requires construct_function_for<Function, T> {
+		if constexpr (detail::constexpr_constructible<T>) {
+			return ref = BOUNDED_FORWARD(function)();
+		} else {
+			return *::new(static_cast<void *>(std::addressof(ref))) T(BOUNDED_FORWARD(function)());
+		}
 	}
 
-	template<typename T, typename... Args> requires(!detail::constexpr_constructible<T> and requires (Args && ... args) { construct_return<T>(BOUNDED_FORWARD(args)...); })
+	template<typename T, typename... Args> requires(requires (Args && ... args) { construct_return<T>(BOUNDED_FORWARD(args)...); })
 	constexpr auto & operator()(T & ref, Args && ... args) const {
-		return *::new(static_cast<void *>(std::addressof(ref))) T(construct_return<T>(BOUNDED_FORWARD(args)...));
+		return operator()(lazy_init, ref, [&]{ return construct_return<T>(BOUNDED_FORWARD(args)...); });
 	}
-} construct;
+} inline constexpr construct;
 
 
 inline constexpr auto destroy = [](auto & ref) {
