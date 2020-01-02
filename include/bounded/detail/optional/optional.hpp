@@ -130,12 +130,12 @@ public:
 	constexpr explicit optional(std::in_place_t, Args && ... other):
 		m_value(BOUNDED_FORWARD(other)...) {
 	}
-	template<typename U> requires std::is_convertible_v<U &&, value_type>
+	template<typename U = T> requires std::is_convertible_v<U &&, value_type>
 	constexpr optional(U && other):
 		optional(std::in_place, BOUNDED_FORWARD(other))
 	{
 	}
-	template<typename U> requires (!std::is_convertible_v<U &&, value_type> and is_constructible<value_type, U &&>)
+	template<typename U = T> requires (!std::is_convertible_v<U &&, value_type> and is_constructible<value_type, U &&>)
 	constexpr explicit optional(U && other):
 		optional(std::in_place, BOUNDED_FORWARD(other))
 	{
