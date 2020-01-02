@@ -92,6 +92,7 @@ add_executable(bounded_test
 	source/bounded/detail/underlying_type.cpp
 	source/bounded/assert.cpp
 	source/bounded/assert-NDEBUG.cpp
+	source/bounded/copy.cpp
 	source/bounded/representation_digits.cpp
 	source/bounded/hash.cpp
 	source/bounded/integer.cpp

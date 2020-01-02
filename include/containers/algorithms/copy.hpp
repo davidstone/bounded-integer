@@ -8,17 +8,7 @@
 #include <containers/algorithms/move_iterator.hpp>
 #include <containers/algorithms/reverse_iterator.hpp>
 
-#include <bounded/forward.hpp>
-#include <bounded/integer.hpp>
-#include <bounded/is_constructible.hpp>
-
 namespace containers {
-
-// Works with explicit copy constructors
-template<typename T> requires bounded::is_constructible<std::decay_t<T>, T &&>
-constexpr auto copy(T && value) {
-	return std::decay_t<T>(BOUNDED_FORWARD(value));
-}
 
 template<iterator InputIterator>
 constexpr auto copy(InputIterator first, sentinel_for<InputIterator> auto const last, iterator auto out) {

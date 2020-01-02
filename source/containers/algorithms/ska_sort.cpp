@@ -12,6 +12,7 @@
 #include <containers/vector.hpp>
 
 #include <bounded/detail/tuple.hpp>
+#include <bounded/copy.hpp>
 
 #include <gtest/gtest.h>
 #include <benchmark/benchmark.h>
@@ -23,10 +24,6 @@
 #include "../../test_assert.hpp"
 
 using namespace containers;
-
-// identity returns by reference. Make sure we can handle key extraction
-// functions that return by value.
-constexpr auto identity_by_value = [](auto value) { return value; };
 
 template<typename T, std::size_t size>
 using c_array = T[size];
@@ -72,7 +69,7 @@ constexpr bool test_sort(auto original, auto const & expected, auto function) {
 
 constexpr bool test_sort(auto original, auto const & expected) {
 	test_sort(original, expected, containers::detail::identity);
-	test_sort(std::move(original), expected, identity_by_value);
+	test_sort(std::move(original), expected, bounded::copy);
 	return true;
 }
 
@@ -89,7 +86,7 @@ constexpr bool test_sort(c_array<T, size> const & original, c_array<T, size> con
 template<typename T, std::size_t size>
 constexpr bool test_sort(c_array<T, size> const & original, c_array<T, size> const & expected) {
 	test_sort(original, expected, containers::detail::identity);
-	test_sort(original, expected, identity_by_value);
+	test_sort(original, expected, bounded::copy);
 	return true;
 }
 
@@ -1032,7 +1029,7 @@ static_assert(test_sort_inplace(
 		"There",
 		"World!",
 	},
-	identity_by_value
+	bounded::copy
 ));
 
 TEST(radix_sort, vector) {
@@ -1084,7 +1081,7 @@ TEST(radix_sort, vector) {
 			{ 2, 3, 2, 4, 5 },
 			{ 3, 2, 4, 5 },
 		},
-		identity_by_value
+		bounded::copy
 	);
 }
 

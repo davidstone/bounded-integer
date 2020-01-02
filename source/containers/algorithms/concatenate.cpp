@@ -7,6 +7,8 @@
 #include <containers/string.hpp>
 #include <containers/vector.hpp>
 
+#include <bounded/copy.hpp>
+
 #include <iostream>
 #include <string_view>
 
@@ -57,22 +59,22 @@ auto main() -> int {
 	
 	ASSERT_EQ(::containers::concatenate<Expected>(a, b, c), expected_result);
 
-	ASSERT_EQ(::containers::concatenate<Expected>(::containers::copy(a), b, c), expected_result);
-	ASSERT_EQ(::containers::concatenate<Expected>(a, ::containers::copy(b), c), expected_result);
-	ASSERT_EQ(::containers::concatenate<Expected>(a, b, ::containers::copy(c)), expected_result);
+	ASSERT_EQ(::containers::concatenate<Expected>(bounded::copy(a), b, c), expected_result);
+	ASSERT_EQ(::containers::concatenate<Expected>(a, bounded::copy(b), c), expected_result);
+	ASSERT_EQ(::containers::concatenate<Expected>(a, b, bounded::copy(c)), expected_result);
 
-	ASSERT_EQ(::containers::concatenate<Expected>(::containers::copy(a), ::containers::copy(b), c), expected_result);
-	ASSERT_EQ(::containers::concatenate<Expected>(::containers::copy(a), b, ::containers::copy(c)), expected_result);
-	ASSERT_EQ(::containers::concatenate<Expected>(a, ::containers::copy(b), ::containers::copy(c)), expected_result);
+	ASSERT_EQ(::containers::concatenate<Expected>(bounded::copy(a), bounded::copy(b), c), expected_result);
+	ASSERT_EQ(::containers::concatenate<Expected>(bounded::copy(a), b, bounded::copy(c)), expected_result);
+	ASSERT_EQ(::containers::concatenate<Expected>(a, bounded::copy(b), bounded::copy(c)), expected_result);
 
-	ASSERT_EQ(::containers::concatenate<Expected>(::containers::copy(a), ::containers::copy(b), ::containers::copy(c)), expected_result);
+	ASSERT_EQ(::containers::concatenate<Expected>(bounded::copy(a), bounded::copy(b), bounded::copy(c)), expected_result);
 
 	ASSERT_EQ(::containers::concatenate<Expected>(a, b, c, d), expected_result);
 
-	ASSERT_EQ(::containers::concatenate<Expected>(::containers::copy(d), a, b, c), expected_result);
-	ASSERT_EQ(::containers::concatenate<Expected>(a, ::containers::copy(d), b, c), expected_result);
-	ASSERT_EQ(::containers::concatenate<Expected>(a, b, ::containers::copy(d), c), expected_result);
-	ASSERT_EQ(::containers::concatenate<Expected>(a, b, c, ::containers::copy(d)), expected_result);
+	ASSERT_EQ(::containers::concatenate<Expected>(bounded::copy(d), a, b, c), expected_result);
+	ASSERT_EQ(::containers::concatenate<Expected>(a, bounded::copy(d), b, c), expected_result);
+	ASSERT_EQ(::containers::concatenate<Expected>(a, b, bounded::copy(d), c), expected_result);
+	ASSERT_EQ(::containers::concatenate<Expected>(a, b, c, bounded::copy(d)), expected_result);
 
 	ASSERT_EQ(::containers::concatenate<Expected>(make_reusable_container(), a, b, c), expected_result);
 	ASSERT_EQ(::containers::concatenate<Expected>(a, make_reusable_container(), b, c), expected_result);
