@@ -422,7 +422,7 @@ int main(int argc, char ** argv) {
 	}
 
 	test_unique();
-	test<map_type<int, int, containers::detail::identity_t>>();
+	test<map_type<int, int, bounded::identity_t>>();
 
 	std::cout << "Testing performance.\n" << std::flush;
 	test_performance<1, 1>(loop_count);

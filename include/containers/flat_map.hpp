@@ -406,7 +406,7 @@ private:
 }	// namespace detail
 
 
-template<typename Container, typename ExtractKey = detail::identity_t>
+template<typename Container, typename ExtractKey = bounded::identity_t>
 class basic_flat_map : private detail::flat_map_base<Container, ExtractKey, false> {
 private:
 	using base = detail::flat_map_base<Container, ExtractKey, false>;
@@ -492,7 +492,7 @@ public:
 template<typename Container, typename ExtractKey>
 inline constexpr auto is_container<basic_flat_map<Container, ExtractKey>> = is_container<Container>;
 
-template<typename Container, typename ExtractKey = detail::identity_t>
+template<typename Container, typename ExtractKey = bounded::identity_t>
 class basic_flat_multimap : private detail::flat_map_base<Container, ExtractKey, true> {
 private:
 	using base = detail::flat_map_base<Container, ExtractKey, true>;

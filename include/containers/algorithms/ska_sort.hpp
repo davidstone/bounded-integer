@@ -5,8 +5,6 @@
 
 #pragma once
 
-#include <bounded/detail/copy_cv_ref.hpp>
-#include <bounded/forward.hpp>
 #include <containers/algorithms/count.hpp>
 #include <containers/algorithms/minmax_element.hpp>
 #include <containers/algorithms/negate.hpp>
@@ -17,6 +15,10 @@
 #include <containers/legacy_iterator.hpp>
 #include <containers/is_range.hpp>
 #include <containers/is_iterator_sentinel.hpp>
+
+#include <bounded/detail/copy_cv_ref.hpp>
+#include <bounded/forward.hpp>
+#include <bounded/identity.hpp>
 
 #include <cassert>
 #include <climits>
@@ -506,11 +508,6 @@ constexpr void inplace_radix_sort(Iterator begin_, sentinel_for<Iterator> auto e
 	sort_starter<AmericanFlagSortThreshold, SubKey>(begin, end, extract_key, nullptr);
 }
 
-inline constexpr auto identity = [](auto && value) -> auto && {
-	return BOUNDED_FORWARD(value);
-};
-using identity_t = std::decay_t<decltype(identity)>;
-
 namespace extract {
 
 using std::get;
@@ -540,14 +537,14 @@ struct ska_sort_t {
 
 	template<iterator Iterator>
 	constexpr void operator()(Iterator begin, sentinel_for<Iterator> auto end) const {
-		operator()(begin, end, detail::identity);
+		operator()(begin, end, bounded::identity);
 	}
 
 	constexpr void operator()(range auto && to_sort, auto && extract_key) const {
 		operator()(begin(to_sort), end(to_sort), BOUNDED_FORWARD(extract_key));
 	}
 	constexpr void operator()(range auto && to_sort) const {
-		operator()(BOUNDED_FORWARD(to_sort), detail::identity);
+		operator()(BOUNDED_FORWARD(to_sort), bounded::identity);
 	}
 } inline constexpr ska_sort;
 
@@ -619,14 +616,14 @@ struct ska_sort_copy_t {
 
 	template<iterator SourceIterator>
 	constexpr auto operator()(SourceIterator source_begin, sentinel_for<SourceIterator> auto source_end, iterator auto buffer_begin) const -> bool {
-		return operator()(source_begin, source_end, buffer_begin, detail::identity);
+		return operator()(source_begin, source_end, buffer_begin, bounded::identity);
 	}
 
 	constexpr auto operator()(range auto && source_range, range auto && buffer_range, auto && extract_key) const -> bool {
 		return operator()(begin(source_range), end(source_range), begin(buffer_range), BOUNDED_FORWARD(extract_key));
 	}
 	constexpr auto operator()(range auto && source_range, range auto && buffer_range) const -> bool {
-		return operator()(source_range, buffer_range, detail::identity);
+		return operator()(source_range, buffer_range, bounded::identity);
 	}
 private:
 	template<typename Iterator, typename ExtractKey>
@@ -702,7 +699,7 @@ constexpr inline struct unique_ska_sort_t {
 		);
 	}
 	constexpr auto operator()(range auto && to_sort) const {
-		return operator()(to_sort, detail::identity);
+		return operator()(to_sort, bounded::identity);
 	}
 } unique_ska_sort;
 

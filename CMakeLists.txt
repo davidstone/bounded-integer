@@ -95,6 +95,7 @@ add_executable(bounded_test
 	source/bounded/copy.cpp
 	source/bounded/representation_digits.cpp
 	source/bounded/hash.cpp
+	source/bounded/identity.cpp
 	source/bounded/integer.cpp
 	source/bounded/is_constructible.cpp
 	source/bounded/lazy_init.cpp

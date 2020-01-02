@@ -38,7 +38,7 @@ static constexpr void inplace_radix_sort(auto begin, auto end, auto && extract_k
 }
 
 static constexpr void inplace_radix_sort(auto begin, auto end) {
-	inplace_radix_sort(begin, end, detail::identity);
+	inplace_radix_sort(begin, end, bounded::identity);
 }
 
 template<typename Container>
@@ -68,7 +68,7 @@ constexpr bool test_sort(auto original, auto const & expected, auto function) {
 }
 
 constexpr bool test_sort(auto original, auto const & expected) {
-	test_sort(original, expected, containers::detail::identity);
+	test_sort(original, expected, bounded::identity);
 	test_sort(std::move(original), expected, bounded::copy);
 	return true;
 }
@@ -85,7 +85,7 @@ constexpr bool test_sort(c_array<T, size> const & original, c_array<T, size> con
 
 template<typename T, std::size_t size>
 constexpr bool test_sort(c_array<T, size> const & original, c_array<T, size> const & expected) {
-	test_sort(original, expected, containers::detail::identity);
+	test_sort(original, expected, bounded::identity);
 	test_sort(original, expected, bounded::copy);
 	return true;
 }
@@ -96,8 +96,8 @@ constexpr bool test_common_prefix(c_array<T, size> const & source, std::size_t c
 		std::begin(source),
 		std::end(source),
 		start_index,
-		containers::detail::identity,
-		containers::detail::identity
+		bounded::identity,
+		bounded::identity
 	);
 	BOUNDED_TEST(prefix == expected);
 	return true;
@@ -1006,7 +1006,7 @@ static_assert(test_sort_inplace(
 		"There",
 		"World!",
 	},
-	containers::detail::identity
+	bounded::identity
 ));
 static_assert(test_sort_inplace(
 	containers::array<std::string_view, 8>{
@@ -1056,7 +1056,7 @@ TEST(radix_sort, vector) {
 			{ 2, 3, 2, 4, 5 },
 			{ 3, 2, 4, 5 },
 		},
-		containers::detail::identity
+		bounded::identity
 	);
 	test_sort_inplace(
 		std::vector<std::vector<int>>{
@@ -1111,7 +1111,7 @@ TEST(radix_sort, string_in_vector) {
 			{ "time" },
 			{ "to", "pass" },
 		},
-		containers::detail::identity
+		bounded::identity
 	);
 	#if 0
 	test_sort_inplace(
@@ -1186,7 +1186,7 @@ TEST(radix_sort, vector_tuple_string_reference) {
 			{"test", "the"},
 			{"you", "are"},
 		},
-		containers::detail::identity
+		bounded::identity
 	);
 }
 
@@ -1481,7 +1481,7 @@ static void american_flag_sort(auto begin, auto end, auto && extract_key) {
 }
 
 static void american_flag_sort(auto begin, auto end) {
-	american_flag_sort(begin, end, detail::identity);
+	american_flag_sort(begin, end, bounded::identity);
 }
 
 static void benchmark_american_flag_sort(benchmark::State & state, auto create) {
