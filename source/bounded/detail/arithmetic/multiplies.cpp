@@ -39,12 +39,10 @@ static_assert(homogeneous_equals(
 	signed_max * bounded::constant<-1>,
 	-signed_max
 ));
-#if 0
 static_assert(homogeneous_equals(
 	signed_min * bounded::constant<-1>,
 	-signed_min
 ));
-#endif
 static_assert(homogeneous_equals(
 	signed_max * bounded::constant<2>,
 	signed_max + signed_max

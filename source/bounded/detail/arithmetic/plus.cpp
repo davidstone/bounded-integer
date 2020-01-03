@@ -26,16 +26,30 @@ static_assert(homogeneous_equals(
 	bounded::constant<0>
 ));
 
+using bounded::detail::max_unsigned_t;
+
 static_assert(homogeneous_equals(
 	signed_max + bounded::constant<1>,
-	bounded::constant<static_cast<bounded::detail::max_unsigned_t>(signed_max) + 1>
+	bounded::constant<static_cast<max_unsigned_t>(signed_max) + 1>
 ));
-#if 0
+
+static_assert(homogeneous_equals(
+	signed_max + signed_max,
+	bounded::constant<static_cast<max_unsigned_t>(signed_max) + static_cast<max_unsigned_t>(signed_max)>
+));
+
+// Do not use bounded's operator- for this test
+constexpr auto negative_signed_min = bounded::constant<-static_cast<max_unsigned_t>(signed_min)>;
+static_assert(negative_signed_min == signed_max + bounded::constant<1>);
+static_assert(homogeneous_equals(
+	signed_min + negative_signed_min,
+	bounded::constant<0>
+));
+
 static_assert(homogeneous_equals(
 	unsigned_max + signed_min,
-	bounded::constant<static_cast<bounded::detail::unsigned_max_t>(unsigned_max) + static_cast<bounded::detail::unsigned_max_t>(signed_min)>
+	bounded::constant<static_cast<max_unsigned_t>(unsigned_max) + static_cast<max_unsigned_t>(signed_min)>
 ));
-#endif
 
 static_assert(homogeneous_equals(
 	bounded::checked_integer<1, 10>(9, bounded::non_check) + bounded::checked_integer<-3, 11>(4, bounded::non_check),

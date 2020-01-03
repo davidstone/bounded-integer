@@ -42,7 +42,7 @@ auto multiplies = [](auto const lhs, auto const rhs) {
 }	// namespace detail
 
 constexpr auto operator*(bounded_integer auto const lhs_, bounded_integer auto const rhs_) {
-	return detail::operator_overload(lhs_, rhs_, detail::multiplies, [](auto const lhs, auto const rhs) {
+	return detail::modulo_equivalent_operator_overload(lhs_, rhs_, detail::multiplies, [](auto const lhs, auto const rhs) {
 		auto p0 = detail::safer_multiply(lhs.min, rhs.min);
 		auto p1 = detail::safer_multiply(lhs.min, rhs.max);
 		auto p2 = detail::safer_multiply(lhs.max, rhs.min);

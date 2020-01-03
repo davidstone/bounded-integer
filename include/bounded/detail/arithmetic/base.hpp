@@ -7,6 +7,7 @@
 
 #include <bounded/detail/class.hpp>
 #include <bounded/detail/is_bounded_integer.hpp>
+#include <bounded/detail/modulo_cast.hpp>
 
 #include <type_traits>
 #include <utility>
@@ -34,6 +35,25 @@ constexpr auto operator_overload(LHS const lhs, RHS const rhs, auto const arithm
 	// the result will fit in result_t. We have to cast to the intermediate
 	// common_t in case result_t is narrower than one of the arguments.
 	return result_t(arithmetic_function(static_cast<common_t>(lhs), static_cast<common_t>(rhs)), non_check);
+}
+
+template<bounded_integer LHS, bounded_integer RHS>
+constexpr auto modulo_equivalent_operator_overload(LHS const lhs, RHS const rhs, auto const arithmetic_function, auto const operator_range) {
+	constexpr auto range = operator_range(min_max_range<LHS>, min_max_range<RHS>);
+	using result_t = integer<normalize<range.min>, normalize<range.max>>;
+	using intermediate_t = std::make_unsigned_t<std::common_type_t<
+		typename result_t::underlying_type,
+		typename LHS::underlying_type,
+		typename RHS::underlying_type
+	>>;
+	auto const intermediate = arithmetic_function(
+		static_cast<intermediate_t>(lhs),
+		static_cast<intermediate_t>(rhs)
+	);
+	return result_t(
+		modulo_cast<typename result_t::underlying_type>(intermediate),
+		non_check
+	);
 }
 
 } // namespace detail
