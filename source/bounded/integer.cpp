@@ -22,12 +22,12 @@ auto check_throw_policy() {
 	using policy = bounded::throw_policy<>;
 	try {
 		policy::assignment(bounded::integer<-20, 20>(bounded::constant<20>), minimum, maximum);
-		BOUNDED_TEST(false);
+		BOUNDED_TEST((false));
 	} catch (...) {
 	}
 	try {
 		policy::assignment(bounded::integer<-6, 6>(bounded::constant<-6>), minimum, maximum);
-		BOUNDED_TEST(false);
+		BOUNDED_TEST((false));
 	} catch (...) {
 	}
 }
@@ -166,27 +166,27 @@ auto check_streaming() {
 auto check_to_integer() {
 	try {
 		bounded::to_integer<0, 0>("");
-		BOUNDED_TEST(false);
+		BOUNDED_TEST((false));
 	} catch (std::invalid_argument const &) {
 	}
 	try {
 		bounded::to_integer<-1, 1>("-");
-		BOUNDED_TEST(false);
+		BOUNDED_TEST((false));
 	} catch (std::invalid_argument const &) {
 	}
 	try {
 		bounded::to_integer<0, 0>("1");
-		BOUNDED_TEST(false);
+		BOUNDED_TEST((false));
 	} catch (std::invalid_argument const &) {
 	}
 	try {
 		bounded::to_integer<0, 100>("101");
-		BOUNDED_TEST(false);
+		BOUNDED_TEST((false));
 	} catch (std::invalid_argument const &) {
 	}
 	try {
 		bounded::to_integer<0, 100>("-90");
-		BOUNDED_TEST(false);
+		BOUNDED_TEST((false));
 	} catch (std::invalid_argument const &) {
 	}
 }

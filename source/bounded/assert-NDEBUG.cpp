@@ -9,7 +9,7 @@
 #include <bounded/assert.hpp>
 
 static_assert([]{ BOUNDED_ASSERT(true); return true; }());
-static_assert([]{ BOUNDED_ASSERT(false); return true; }());
+// static_assert([]{ BOUNDED_ASSERT(false); return true; }());
 static_assert([]{ BOUNDED_ASSERT_OR_ASSUME(true); return true; }());
 // static_assert([]{ BOUNDED_ASSERT_OR_ASSUME(false); return true; }());
 

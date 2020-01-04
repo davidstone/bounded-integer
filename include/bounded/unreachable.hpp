@@ -9,11 +9,11 @@
 
 
 #if defined __clang__ or defined __INTEL_COMPILER
-    #define BOUNDED_DETAIL_BUILTIN_UNREACHABLE __builtin_unreachable
+	#define BOUNDED_DETAIL_BUILTIN_UNREACHABLE __builtin_unreachable
 #elif defined _MSC_VER
 	#define BOUNDED_DETAIL_BUILTIN_UNREACHABLE() __assume(false)
 #elif defined __GNUC__
-    #define BOUNDED_DETAIL_BUILTIN_UNREACHABLE __builtin_unreachable
+	#define BOUNDED_DETAIL_BUILTIN_UNREACHABLE __builtin_unreachable
 #endif
 
 namespace bounded {
