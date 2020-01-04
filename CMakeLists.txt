@@ -74,6 +74,7 @@ add_executable(bounded_test
 	source/bounded/detail/construct_destroy.cpp
 	source/bounded/detail/copy_cv_ref.cpp
 	source/bounded/detail/int128.cpp
+	source/bounded/detail/integer_tombstone_traits.cpp
 	source/bounded/detail/is_bounded_integer.cpp
 	source/bounded/detail/literal.cpp
 	source/bounded/detail/log.cpp
@@ -96,6 +97,7 @@ add_executable(bounded_test
 	source/bounded/representation_digits.cpp
 	source/bounded/hash.cpp
 	source/bounded/identity.cpp
+	source/bounded/insert.cpp
 	source/bounded/integer.cpp
 	source/bounded/is_constructible.cpp
 	source/bounded/lazy_init.cpp
@@ -103,6 +105,8 @@ add_executable(bounded_test
 	source/bounded/optional.cpp
 	source/bounded/string.cpp
 	source/bounded/to_integer.cpp
+	source/bounded/tombstone_traits.cpp
+	source/bounded/value_to_function.cpp
 )
 
 target_link_libraries(bounded_test PUBLIC bounded strict_defaults)

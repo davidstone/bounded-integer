@@ -13,6 +13,8 @@
 #include <bounded/detail/construct_destroy.hpp>
 #include <bounded/forward.hpp>
 #include <bounded/is_constructible.hpp>
+#include <bounded/tombstone_traits.hpp>
+#include <bounded/value_to_function.hpp>
 
 #include <operators/arrow.hpp>
 
@@ -22,61 +24,46 @@
 
 namespace bounded {
 
-// There are three general classifications of objects that can be stored in an optional:
-//
-// nullable: The object has the ability to store a null state within itself. For
-// instance, a bounded::integer that has a narrower range than its underlying
-// type can store a value outside of its range to indicate the null state.
-//
-// non-nullable, but trivially_destructible: The object has a trivial
-// destructor, allowing optional<T> to be a literal type
-//
-// Any other type
-//
-// The last two cases are handled generally. For a type to opt-in to a
-// space-efficient representation, it needs the following member functions:
-//
-//	* `T(optional_tag)` constructs an uninitialized value
-//	* `initialize(optional_tag, T && ...)` constructs an object when there may
-//		be one in existence already
-//	* `uninitialize(optional_tag)` destroys the contained object
-//	* `is_initialized(optional_tag)` checks whether the object is currently in
-//		an initialized state
-
-
 namespace detail {
 
 template<typename T>
-struct default_optional_storage {
-	constexpr explicit default_optional_storage(optional_tag):
-		m_data(std::in_place, none_index, none)
+struct optional_storage {
+	constexpr optional_storage():
+		m_data(none_index, none)
 	{
 	}
 	
-	constexpr default_optional_storage(auto && ... args):
-		m_data(std::in_place, value_index, BOUNDED_FORWARD(args)...)
+	template<typename Construct> requires construct_function_for<Construct, T>
+	constexpr explicit optional_storage(lazy_init_t, Construct && construct_):
+		m_data(lazy_init, value_index, BOUNDED_FORWARD(construct_))
 	{
 	}
 	
-	constexpr auto initialize(optional_tag, auto && ... args) {
-		m_data.emplace(value_index, BOUNDED_FORWARD(args)...);
+	template<typename U> requires is_constructible<T, U &&>
+	constexpr explicit optional_storage(U && value):
+		m_data(value_index, BOUNDED_FORWARD(value))
+	{
 	}
 	
-	constexpr auto uninitialize(optional_tag) {
-		m_data.emplace(none_index, none);
-	}
-
-	constexpr auto is_initialized(optional_tag) const {
+	constexpr auto is_initialized() const {
 		return m_data.index() == value_index;
 	}
 
-	constexpr operator T const & () const & {
+	constexpr auto uninitialize() {
+		::bounded::insert(m_data, none_index, none);
+	}
+
+	constexpr auto initialize(construct_function_for<T> auto && construct_) {
+		m_data.emplace(value_index, BOUNDED_FORWARD(construct_));
+	}
+	
+	constexpr auto && get() const & {
 		return m_data[value_index];
 	}
-	constexpr operator T & () & {
+	constexpr auto && get() & {
 		return m_data[value_index];
 	}
-	constexpr operator T && () && {
+	constexpr auto && get() && {
 		return std::move(m_data)[value_index];
 	}
 
@@ -86,11 +73,66 @@ private:
 	variant<none_t, T> m_data;
 };
 
+template<typename T>
+concept nullable = tombstone_traits<T>::spare_representations != constant<0>;
+
+template<nullable T>
+struct optional_storage<T> {
+	constexpr optional_storage():
+		m_data(make_uninitialized())
+	{
+	}
+	
+	template<typename Construct> requires construct_function_for<Construct, T>
+	constexpr explicit optional_storage(lazy_init_t, Construct && construct_):
+		m_data(lazy_init, BOUNDED_FORWARD(construct_)())
+	{
+	}
+	
+	template<typename U> requires is_constructible<T, U &&>
+	constexpr explicit optional_storage(U && value):
+		m_data(BOUNDED_FORWARD(value))
+	{
+	}
+	
+	constexpr auto is_initialized() const {
+		return tombstone_traits<T>::index(m_data) != uninitialized_index;
+	}
+
+	constexpr auto uninitialize() {
+		destroy(m_data);
+		construct(lazy_init, m_data, make_uninitialized);
+	}
+
+	constexpr auto initialize(construct_function_for<T> auto && construct_) {
+		uninitialize();
+		construct(lazy_init, m_data, BOUNDED_FORWARD(construct_));
+	}
+
+	constexpr auto && get() const & {
+		return m_data;
+	}
+	constexpr auto && get() & {
+		return m_data;
+	}
+	constexpr auto && get() && {
+		return std::move(m_data);
+	}
+
+private:
+	static constexpr auto uninitialized_index = constant<0>;
+	static constexpr auto make_uninitialized() noexcept {
+		static_assert(noexcept(tombstone_traits<T>::make(uninitialized_index)));
+		return tombstone_traits<T>::make(uninitialized_index);
+	}
+	T m_data;
+};
+
 constexpr auto & assign(auto & target, auto && source) {
 	if (target) {
 		*target = BOUNDED_FORWARD(source);
 	} else {
-		target.emplace(BOUNDED_FORWARD(source));
+		::bounded::insert(target, BOUNDED_FORWARD(source));
 	}
 	return target;
 }
@@ -104,40 +146,31 @@ constexpr auto & assign_from_optional(auto & target, auto && source) {
 	return target;
 }
 
-
 }	// namespace detail
 
 template<typename T>
 struct optional {
 private:
 	struct common_init_tag{};
-	// Cannot use concepts or std::is_constructible because this could require
-	// friendship
-	template<typename U>
-	static constexpr auto is_specialized(decltype(U(std::declval<optional_tag>())) *) { return true; }
-	template<typename>
-	static constexpr auto is_specialized(...) { return false; }
-	using optional_storage = std::conditional_t<is_specialized<T>(nullptr), T, detail::default_optional_storage<T>>;
+
 public:
 	using value_type = T;
 
-	constexpr optional(none_t = none):
-		m_value(optional_tag{})
-	{
+	constexpr optional(none_t = none) {
 	}
 
-	template<typename... Args> requires is_constructible<value_type, Args && ...>
-	constexpr explicit optional(std::in_place_t, Args && ... other):
-		m_value(BOUNDED_FORWARD(other)...) {
+	template<typename Construct> requires construct_function_for<Construct, T>
+	constexpr explicit optional(lazy_init_t, Construct && construct_):
+		m_storage(lazy_init, BOUNDED_FORWARD(construct_)) {
 	}
-	template<typename U = T> requires std::is_convertible_v<U &&, value_type>
+	template<typename U> requires std::is_convertible_v<U &&, value_type>
 	constexpr optional(U && other):
-		optional(std::in_place, BOUNDED_FORWARD(other))
+		m_storage(BOUNDED_FORWARD(other))
 	{
 	}
-	template<typename U = T> requires (!std::is_convertible_v<U &&, value_type> and is_constructible<value_type, U &&>)
+	template<typename U> requires (!std::is_convertible_v<U &&, value_type> and is_constructible<value_type, U &&>)
 	constexpr explicit optional(U && other):
-		optional(std::in_place, BOUNDED_FORWARD(other))
+		m_storage(BOUNDED_FORWARD(other))
 	{
 	}
 
@@ -166,30 +199,29 @@ public:
 	
 	constexpr auto operator*() const & -> value_type const & {
 		BOUNDED_ASSERT(*this);
-		return m_value;
+		return m_storage.get();
 	}
 	constexpr auto operator*() & -> value_type & {
 		BOUNDED_ASSERT(*this);
-		return m_value;
+		return m_storage.get();
 	}
 	constexpr auto operator*() && -> value_type && {
 		BOUNDED_ASSERT(*this);
-		return std::move(m_value);
+		return std::move(m_storage).get();
 	}
 
 	OPERATORS_ARROW_DEFINITIONS
 
 	constexpr explicit operator bool() const {
-		return m_value.is_initialized(optional_tag{});
+		return m_storage.is_initialized();
 	}
 
-	// TODO: handle std::initializer_list
-	constexpr auto emplace(auto && ... args) {
-		m_value.initialize(optional_tag{}, BOUNDED_FORWARD(args)...);
+	constexpr auto emplace(construct_function_for<T> auto && construct_) {
+		m_storage.initialize(BOUNDED_FORWARD(construct_));
 	}
 
 	constexpr auto && operator=(none_t) & {
-		m_value.uninitialize(optional_tag{});
+		m_storage.uninitialize();
 		return *this;
 	}
 	// TODO: make this work when value_type is a reference
@@ -199,22 +231,27 @@ public:
 	}
 	
 private:
-
 	constexpr optional(auto && other_optional, common_init_tag):
 		optional(none) {
 		if (other_optional) {
-			emplace(*BOUNDED_FORWARD(other_optional));
+			::bounded::insert(*this, *BOUNDED_FORWARD(other_optional));
 		}
 	}
 	
-	optional_storage m_value;
+	detail::optional_storage<T> m_storage;
 };
 
-template<typename T> requires(!std::is_same_v<T, none_t> and !std::is_same_v<T, std::in_place_t>)
+// A limitation of emulating lazy parameters is that we cannot tell if the user
+// is trying to create an optional function or lazily create an optional value
+template<typename T> requires(!std::is_same_v<T, none_t> and !std::is_invocable_v<T>)
 optional(T) -> optional<T>;
 
-constexpr auto make_optional(auto && value) -> optional<std::remove_cv_t<std::remove_reference_t<decltype(value)>>> {
-	return { BOUNDED_FORWARD(value) };
+constexpr auto make_optional(auto && value) {
+	return optional<std::decay_t<decltype(value)>>(BOUNDED_FORWARD(value));
+}
+
+constexpr auto make_optional_lazy(auto && function) -> optional<std::invoke_result_t<decltype(function)>> {
+	return {BOUNDED_FORWARD(function)()};
 }
 
 }	// namespace bounded

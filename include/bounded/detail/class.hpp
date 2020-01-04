@@ -96,15 +96,6 @@ template<typename T, auto minimum, auto maximum, typename policy>
 concept bounded_by_range = !std::is_same_v<T, bool> and !std::is_enum_v<T> and overlapping_integer<T, minimum, maximum, policy> and safe_compare(minimum, builtin_min_value<T>) <= 0 and safe_compare(builtin_max_value<T>, maximum) <= 0;
 
 
-// Necessary for optional specialization
-template<typename T>
-concept has_extra_space =
-	builtin_min_value<T> != builtin_max_value<T> and
-	(
-		min_value<typename T::underlying_type> < builtin_min_value<T> or
-		builtin_max_value<T> < max_value<typename T::underlying_type>
-	);
-
 // The user can specialize min_value and max_value for their enum type to
 // provide tighter bounds than the underlying_type might suggest. This forwards
 // along non-enum types without doing anything, but constructs a
@@ -224,34 +215,6 @@ struct integer {
 		return static_cast<T>(value());
 	}
 	
-	// Allow a compressed optional representation
-	template<typename Tag> requires (std::is_same_v<Tag, optional_tag> and detail::has_extra_space<integer>)
-	constexpr explicit integer(Tag):
-		m_value(uninitialized_value()) {
-	}
-
-	template<typename... Args> requires(
-		detail::has_extra_space<integer> and
-		std::is_constructible_v<integer, Args...>
-	)
-	constexpr auto initialize(optional_tag, Args... args) {
-		return *this = integer(args...);
-	}
-
-	template<typename Tag> requires (
-		std::is_same_v<Tag, optional_tag> and
-		detail::has_extra_space<integer>
-	)
-	constexpr auto uninitialize(Tag) {
-		unchecked_assignment(uninitialized_value());
-	}
-	template<typename Tag> requires (
-		std::is_same_v<Tag, optional_tag> and
-		detail::has_extra_space<integer>
-	)
-	constexpr auto is_initialized(Tag) const {
-		return m_value != uninitialized_value();
-	}
 private:
 	static constexpr auto uninitialized_value() {
 		return minimum > min_value<underlying_type> ?
@@ -268,6 +231,10 @@ private:
 	}
 
 	using storage_type = std::conditional_t<minimum == maximum, detail::empty, underlying_type>;
+
+public:
+	// Do not access this directly. This must be public to be usable as a
+	// non-type template parameter in C++20.
 	[[no_unique_address]] storage_type m_value;
 };
 

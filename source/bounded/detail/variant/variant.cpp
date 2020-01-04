@@ -83,33 +83,33 @@ static_assert(bounded::is_constructible<thing_t, long>);
 static_assert(bounded::is_constructible<thing_t, char>);
 
 static_assert(bounded::visit_with_index(
-	thing_t(std::in_place, 0_bi, 0),
-	thing_t(std::in_place, 0_bi, 0),
+	thing_t(0_bi, 0),
+	thing_t(0_bi, 0),
 	bounded::detail::equality_visitor{}
 ));
 
-static_assert(thing_t(std::in_place, 0_bi, 0) == thing_t(std::in_place, 0_bi, 0));
-static_assert(thing_t(std::in_place, 0_bi, 0) != thing_t(std::in_place, 0_bi, 1));
-static_assert(thing_t(std::in_place, 0_bi, 0) != thing_t(std::in_place, 1_bi, static_cast<short>(0)));
-static_assert(thing_t(std::in_place, 0_bi, 0) != thing_t(std::in_place, 4_bi, 0));
-static_assert(thing_t(std::in_place, 0_bi, 0) != thing_t(std::in_place, 4_bi, 1));
+static_assert(thing_t(0_bi, 0) == thing_t(0_bi, 0));
+static_assert(thing_t(0_bi, 0) != thing_t(0_bi, 1));
+static_assert(thing_t(0_bi, 0) != thing_t(1_bi, static_cast<short>(0)));
+static_assert(thing_t(0_bi, 0) != thing_t(4_bi, 0));
+static_assert(thing_t(0_bi, 0) != thing_t(4_bi, 1));
 
-static_assert(thing_t(std::in_place, 1_bi, static_cast<short>(5)) == thing_t(static_cast<short>(5)));
+static_assert(thing_t(1_bi, static_cast<short>(5)) == thing_t(static_cast<short>(5)));
 
-static_assert(holds_alternative(thing_t(std::in_place, 1_bi, static_cast<short>(0)), bounded::detail::types<short>{}));
-static_assert(holds_alternative(thing_t(std::in_place, 2_bi, 0), bounded::detail::types<long>{}));
-static_assert(holds_alternative(thing_t(std::in_place, 3_bi, '\0'), bounded::detail::types<char>{}));
+static_assert(holds_alternative(thing_t(1_bi, static_cast<short>(0)), bounded::detail::types<short>{}));
+static_assert(holds_alternative(thing_t(2_bi, 0), bounded::detail::types<long>{}));
+static_assert(holds_alternative(thing_t(3_bi, '\0'), bounded::detail::types<char>{}));
 
 #if 0
 // std::variant has these calls ill-formed (and that naturally happens with my
 // implementation), but it seems like it should be legal.
 static_assert(holds_alternative(
-	thing_t(std::in_place, 0_bi, 0),
+	thing_t(0_bi, 0),
 	bounded::detail::types<int>{}
 ));
 
 static_assert(holds_alternative(
-	thing_t(std::in_place, 4_bi, 0),
+	thing_t(4_bi, 0),
 	bounded::detail::types<int>{}
 ));
 #endif
@@ -117,7 +117,7 @@ static_assert(holds_alternative(
 constexpr auto index = 1_bi;
 constexpr auto value = static_cast<short>(8);
 
-constexpr auto thing = thing_t(std::in_place, index, value);
+constexpr auto thing = thing_t(index, value);
 using thingy = decltype(thing[index]);
 
 static_assert(std::is_same_v<thingy, short const &>);
@@ -126,15 +126,15 @@ static_assert(thing[index] == value);
 static_assert(bounded::visit(thing, [](auto x) { return std::is_same_v<decltype(x), short>; }));
 
 constexpr auto test_assignment_from_variant() {
-	auto thing1 = thing_t(std::in_place, index, value);
-	thing1 = thing_t(std::in_place, index, value);
+	auto thing1 = thing_t(index, value);
+	thing1 = thing_t(index, value);
 	BOUNDED_TEST(thing1[index] == value);
 	return true;
 }
 static_assert(test_assignment_from_variant());
 
 constexpr auto test_assignment_from_value() {
-	auto thing1 = thing_t(std::in_place, index, value);
+	auto thing1 = thing_t(index, value);
 	thing1 = -1L;
 	BOUNDED_TEST(holds_alternative(thing1, bounded::detail::types<long>{}));
 	BOUNDED_TEST(thing1[bounded::detail::types<long>{}] == -1L);
@@ -180,6 +180,7 @@ static_assert(!bounded::equality_comparable<bounded::variant<int, non_comparable
 }	// namespace
 
 int main() {
+	using bounded::construct_return;
 	{
 		using non_trivial_variant_t = bounded::variant<non_trivial>;
 
@@ -189,9 +190,9 @@ int main() {
 		static_assert(std::is_move_assignable_v<non_trivial_variant_t>);
 		static_assert(std::is_destructible_v<non_trivial_variant_t>);
 
-		auto non_trivial_variant = non_trivial_variant_t(std::in_place, 0_bi);
+		auto non_trivial_variant = non_trivial_variant_t(bounded::lazy_init, 0_bi, construct_return<non_trivial>);
 		static_assert(non_trivial_variant.index() == 0_bi);
-		non_trivial_variant = non_trivial_variant_t(std::in_place, 0_bi);
+		non_trivial_variant = non_trivial_variant_t(bounded::lazy_init, 0_bi, construct_return<non_trivial>);
 		// Silence self-assignment warning
 		non_trivial_variant = *&non_trivial_variant;
 
@@ -206,7 +207,8 @@ int main() {
 	
 	{
 		using non_copyable_variant_t = bounded::variant<non_copyable>;
-		auto non_copyable_variant = non_copyable_variant_t(std::in_place, 0_bi);
+
+		auto non_copyable_variant = non_copyable_variant_t(bounded::lazy_init, 0_bi, construct_return<non_copyable>);
 		static_assert(non_copyable_variant.index() == 0_bi);
 		static_assert(not std::is_copy_constructible_v<non_copyable_variant_t>);
 		static_assert(not std::is_copy_assignable_v<non_copyable_variant_t>);
@@ -216,7 +218,7 @@ int main() {
 		{
 			static_assert(!std::is_trivially_destructible_v<destructor_checker>);
 			static_assert(!std::is_trivially_destructible_v<bounded::variant<destructor_checker>>);
-			auto v = bounded::variant<destructor_checker>(std::in_place, 0_bi);
+			auto v = bounded::variant<destructor_checker>(bounded::lazy_init, 0_bi, construct_return<destructor_checker>);
 		}
 		BOUNDED_TEST(destructor_checker::destructed == 1U);
 	}

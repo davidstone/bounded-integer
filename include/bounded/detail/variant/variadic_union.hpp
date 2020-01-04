@@ -22,13 +22,13 @@ union variadic_union {
 
 template<typename T, typename... Ts> requires(std::is_trivially_destructible_v<T> and ... and std::is_trivially_destructible_v<Ts>)
 union variadic_union<T, Ts...> {
-	explicit constexpr variadic_union(constant_t<0>, auto && ... args):
-		head(BOUNDED_FORWARD(args)...)
+	explicit constexpr variadic_union(constant_t<0>, auto && construct_):
+		head(BOUNDED_FORWARD(construct_)())
 	{
 	}
 	template<auto n>
-	explicit constexpr variadic_union(constant_t<n> const index, auto && ... args):
-		tail(index - constant<1>, BOUNDED_FORWARD(args)...)
+	explicit constexpr variadic_union(constant_t<n> const index, auto && construct_):
+		tail(index - constant<1>, BOUNDED_FORWARD(construct_))
 	{
 	}
 
@@ -39,13 +39,13 @@ union variadic_union<T, Ts...> {
 
 template<typename T, typename... Ts>
 union variadic_union<T, Ts...> {
-	explicit constexpr variadic_union(constant_t<0>, auto && ... args):
-		head(BOUNDED_FORWARD(args)...)
+	explicit constexpr variadic_union(constant_t<0>, auto && construct_):
+		head(BOUNDED_FORWARD(construct_)())
 	{
 	}
 	template<auto n>
-	explicit constexpr variadic_union(constant_t<n> const index, auto && ... args):
-		tail(index - constant<1>, BOUNDED_FORWARD(args)...)
+	explicit constexpr variadic_union(constant_t<n> const index, auto && construct_):
+		tail(index - constant<1>, BOUNDED_FORWARD(construct_))
 	{
 	}
 

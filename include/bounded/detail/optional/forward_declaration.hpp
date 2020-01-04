@@ -10,16 +10,6 @@ namespace bounded {
 template<typename T>
 struct optional;
 
-struct optional_tag {
-private:
-	template<typename>
-	friend struct optional;
-	
-	optional_tag() = default;
-	optional_tag(optional_tag const &) = default;
-	optional_tag(optional_tag &&) = default;
-};
-
 // none_t cannot be default constructible or we get an ambiguity in op = {};
 struct none_t {
 	constexpr explicit none_t(int) {}

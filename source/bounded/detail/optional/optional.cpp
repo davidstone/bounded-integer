@@ -28,7 +28,12 @@ struct S {
 static_assert(test_optional<int>());
 static_assert(test_optional<bounded::integer<0, 10>>());
 static_assert(test_optional<decltype(bounded::integer(0))>());
-static_assert((void(bounded::optional<S>{}.emplace(0)), true));
+constexpr auto test_insert() {
+	auto op = bounded::optional<S>();
+	bounded::insert(op, S{3});
+	return op and op->member == 3;
+}
+static_assert(test_insert());
 
 static_assert(*bounded::optional(5) == 5);
 
