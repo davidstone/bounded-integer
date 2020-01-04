@@ -5,8 +5,6 @@
 
 #pragma once
 
-#include <bounded/detail/optional/forward_declaration.hpp>
-
 #include <bounded/detail/variant/variant.hpp>
 
 #include <bounded/assert.hpp>
@@ -23,6 +21,12 @@
 #include <utility>
 
 namespace bounded {
+
+// none_t cannot be default constructible or we get an ambiguity in op = {};
+struct none_t {
+	constexpr explicit none_t(int) {}
+};
+constexpr auto none = none_t(0);
 
 namespace detail {
 
@@ -146,7 +150,7 @@ constexpr auto & assign_from_optional(auto & target, auto && source) {
 	return target;
 }
 
-}	// namespace detail
+} // namespace detail
 
 template<typename T>
 struct optional {
@@ -254,4 +258,44 @@ constexpr auto make_optional_lazy(auto && function) -> optional<std::invoke_resu
 	return {BOUNDED_FORWARD(function)()};
 }
 
-}	// namespace bounded
+} // namespace bounded
+namespace std {
+
+template<typename LHS, typename RHS>
+struct common_type<bounded::optional<LHS>, RHS> {
+	using type = bounded::optional<common_type_t<LHS, RHS>>;
+};
+template<typename LHS, typename RHS>
+struct common_type<LHS, bounded::optional<RHS>> {
+	using type = bounded::optional<common_type_t<LHS, RHS>>;
+};
+template<typename LHS, typename RHS>
+struct common_type<bounded::optional<LHS>, bounded::optional<RHS>> {
+	using type = bounded::optional<common_type_t<LHS, RHS>>;
+};
+
+
+template<typename RHS>
+struct common_type<bounded::none_t, RHS> {
+	using type = bounded::optional<RHS>;
+};
+template<typename LHS>
+struct common_type<LHS, bounded::none_t> {
+	using type = bounded::optional<LHS>;
+};
+template<>
+struct common_type<bounded::none_t, bounded::none_t> {
+	using type = bounded::none_t;
+};
+
+
+template<typename RHS>
+struct common_type<bounded::none_t, bounded::optional<RHS>> {
+	using type = bounded::optional<RHS>;
+};
+template<typename LHS>
+struct common_type<bounded::optional<LHS>, bounded::none_t> {
+	using type = bounded::optional<LHS>;
+};
+
+} // namespace std

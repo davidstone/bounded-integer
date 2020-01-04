@@ -14,8 +14,6 @@
 #include <bounded/detail/overlapping_range.hpp>
 #include <bounded/detail/underlying_type.hpp>
 
-#include <bounded/detail/optional/forward_declaration.hpp>
-
 #include <bounded/detail/policy/null_policy.hpp>
 
 #include <bounded/is_constructible.hpp>
