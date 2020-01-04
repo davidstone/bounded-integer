@@ -20,8 +20,8 @@ using namespace bounded::literal;
 constexpr auto count_if(range auto && range, auto predicate) {
 	constexpr auto maximum = bounded::max_value<decltype(size(range))>;
 	bounded::integer<0, bounded::detail::normalize<maximum.value()>> sum = 0_bi;
-	for (decltype(auto) value : BOUNDED_FORWARD(range)) {
-		if (predicate(BOUNDED_FORWARD(value))) {
+	for (decltype(auto) value : OPERATORS_FORWARD(range)) {
+		if (predicate(OPERATORS_FORWARD(value))) {
 			++sum;
 		}
 	}
@@ -34,7 +34,7 @@ constexpr auto count_if(Iterator const first, sentinel_for<Iterator> auto const 
 }
 
 constexpr auto count(range auto && range, auto const & value) {
-	return ::containers::count_if(BOUNDED_FORWARD(range), bounded::equal_to(value));
+	return ::containers::count_if(OPERATORS_FORWARD(range), bounded::equal_to(value));
 }
 
 template<iterator Iterator>

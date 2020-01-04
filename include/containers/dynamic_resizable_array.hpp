@@ -16,7 +16,7 @@
 #include <containers/reserve_if_reservable.hpp>
 #include <containers/uninitialized_storage.hpp>
 
-#include <bounded/forward.hpp>
+#include <operators/forward.hpp>
 #include <bounded/assert.hpp>
 
 #include <algorithm>
@@ -43,7 +43,7 @@ struct dynamic_resizable_array : private Container {
 		!std::is_array_v<std::remove_cv_t<std::remove_reference_t<Range>>>
 	)
 	constexpr explicit dynamic_resizable_array(Range && source) {
-		append(*this, BOUNDED_FORWARD(source));
+		append(*this, OPERATORS_FORWARD(source));
 	}
 	
 	constexpr dynamic_resizable_array(std::initializer_list<value_type> init) {

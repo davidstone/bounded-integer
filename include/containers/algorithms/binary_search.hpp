@@ -8,7 +8,7 @@
 #include <containers/algorithms/partition.hpp>
 #include <containers/is_range.hpp>
 
-#include <bounded/forward.hpp>
+#include <operators/forward.hpp>
 
 #include <functional>
 
@@ -16,19 +16,19 @@ namespace containers {
 
 constexpr inline struct lower_bound_t {
 	constexpr auto operator()(range auto && sorted, auto const & value, auto cmp) const {
-		return partition_point(BOUNDED_FORWARD(sorted), [&](auto const & element) { return cmp(element, value); });
+		return partition_point(OPERATORS_FORWARD(sorted), [&](auto const & element) { return cmp(element, value); });
 	}
 	constexpr auto operator()(range auto && sorted, auto const & value) const {
-		return operator()(BOUNDED_FORWARD(sorted), value, std::less{});
+		return operator()(OPERATORS_FORWARD(sorted), value, std::less{});
 	}
 } lower_bound;
 
 constexpr inline struct upper_bound_t {
 	constexpr auto operator()(range auto && sorted, auto const & value, auto cmp) const {
-		return partition_point(BOUNDED_FORWARD(sorted), [&](auto const & element) { return !cmp(value, element); });
+		return partition_point(OPERATORS_FORWARD(sorted), [&](auto const & element) { return !cmp(value, element); });
 	}
 	constexpr auto operator()(range auto && sorted, auto const & value) const {
-		return operator()(BOUNDED_FORWARD(sorted), value, std::less{});
+		return operator()(OPERATORS_FORWARD(sorted), value, std::less{});
 	}
 } upper_bound;
 
@@ -36,7 +36,7 @@ constexpr inline struct upper_bound_t {
 // TODO: This is sub-optimal. Unsure how to make it optimal without copy + paste
 constexpr inline struct binary_search_t {
 	constexpr bool operator()(range auto && sorted, auto const & value, auto cmp) const {
-		return lower_bound(BOUNDED_FORWARD(sorted), value, cmp) == end(sorted);
+		return lower_bound(OPERATORS_FORWARD(sorted), value, cmp) == end(sorted);
 	}
 	constexpr bool operator()(range auto && sorted, auto const & value) const {
 		return operator()(sorted, value, std::less{});

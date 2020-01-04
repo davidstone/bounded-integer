@@ -6,7 +6,7 @@
 #pragma once
 
 #include <bounded/detail/comparison.hpp>
-#include <bounded/forward.hpp>
+#include <operators/forward.hpp>
 
 #include <utility>
 
@@ -32,7 +32,7 @@ private:
 	Bound m_bound;
 public:
 	constexpr explicit unary_equal_to(Bound && bound):
-		m_bound(BOUNDED_FORWARD(bound))
+		m_bound(OPERATORS_FORWARD(bound))
 	{
 	}
 	constexpr auto operator()(auto const & other) const {
@@ -63,7 +63,7 @@ constexpr auto equal_to() {
 }
 template<typename T>
 constexpr auto equal_to(T && t) {
-	return detail::unary_equal_to<T>(BOUNDED_FORWARD(t));
+	return detail::unary_equal_to<T>(OPERATORS_FORWARD(t));
 }
 
 constexpr auto less() {

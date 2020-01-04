@@ -46,7 +46,7 @@ public:
 	>;
 	
 	constexpr adapt(Range && range, Traits traits):
-		m_range(BOUNDED_FORWARD(range)),
+		m_range(OPERATORS_FORWARD(range)),
 		m_traits(std::move(traits))
 	{
 	}

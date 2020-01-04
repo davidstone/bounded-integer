@@ -26,8 +26,8 @@ template<typename Container, typename Range>
 concept member_insertable = requires(Container & container, Range && range) {
 	container.insert(
 		end(container),
-		begin(BOUNDED_FORWARD(range)),
-		end(BOUNDED_FORWARD(range))
+		begin(OPERATORS_FORWARD(range)),
+		end(OPERATORS_FORWARD(range))
 	);
 };
 
@@ -57,16 +57,16 @@ constexpr auto append(Container & output, range auto && input) -> void {
 	}
 	if constexpr (reserve_space and appendable_from_capacity<Container>) {
 		auto const new_end = containers::uninitialized_copy(
-			begin(BOUNDED_FORWARD(input)),
-			end(BOUNDED_FORWARD(input)),
+			begin(OPERATORS_FORWARD(input)),
+			end(OPERATORS_FORWARD(input)),
 			end(output)
 		);
 		output.append_from_capacity(new_end - end(output));
 	} else if constexpr (member_insertable<Container, decltype(input)> and std::is_move_constructible_v<typename Container::value_type> and std::is_move_assignable_v<typename Container::value_type>) {
-		output.insert(end(output), begin(BOUNDED_FORWARD(input)), end(BOUNDED_FORWARD(input)));
+		output.insert(end(output), begin(OPERATORS_FORWARD(input)), end(OPERATORS_FORWARD(input)));
 	} else {
-		for (decltype(auto) value : BOUNDED_FORWARD(input)) {
-			push_back(output, BOUNDED_FORWARD(value));
+		for (decltype(auto) value : OPERATORS_FORWARD(input)) {
+			push_back(output, OPERATORS_FORWARD(value));
 		}
 	}
 }

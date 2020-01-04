@@ -22,8 +22,8 @@ namespace common {
 
 constexpr void assign(container auto & destination, range auto && source) {
 	auto it = begin(destination);
-	auto first = begin(BOUNDED_FORWARD(source));
-	auto last = end(BOUNDED_FORWARD(source));
+	auto first = begin(OPERATORS_FORWARD(source));
+	auto last = end(OPERATORS_FORWARD(source));
 	for (; first != last; ++first) {
 		if (it == end(destination)) {
 			break;

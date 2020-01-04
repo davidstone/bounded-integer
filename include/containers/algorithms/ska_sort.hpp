@@ -17,7 +17,7 @@
 #include <containers/is_iterator_sentinel.hpp>
 
 #include <bounded/detail/copy_cv_ref.hpp>
-#include <bounded/forward.hpp>
+#include <operators/forward.hpp>
 #include <bounded/identity.hpp>
 
 #include <cassert>
@@ -95,8 +95,8 @@ using key_type = std::decay_t<decltype(std::declval<ExtractKey>()(*std::declval<
 
 template<typename T>
 concept indexable =
-	requires(T && value) { BOUNDED_FORWARD(value)[0]; } or
-	requires(T && value) { BOUNDED_FORWARD(value)[bounded::constant<0>]; };
+	requires(T && value) { OPERATORS_FORWARD(value)[0]; } or
+	requires(T && value) { OPERATORS_FORWARD(value)[bounded::constant<0>]; };
 
 struct PartitionInfo {
 	constexpr PartitionInfo()
@@ -541,10 +541,10 @@ struct ska_sort_t {
 	}
 
 	constexpr void operator()(range auto && to_sort, auto && extract_key) const {
-		operator()(begin(to_sort), end(to_sort), BOUNDED_FORWARD(extract_key));
+		operator()(begin(to_sort), end(to_sort), OPERATORS_FORWARD(extract_key));
 	}
 	constexpr void operator()(range auto && to_sort) const {
-		operator()(BOUNDED_FORWARD(to_sort), bounded::identity);
+		operator()(OPERATORS_FORWARD(to_sort), bounded::identity);
 	}
 } inline constexpr ska_sort;
 
@@ -620,7 +620,7 @@ struct ska_sort_copy_t {
 	}
 
 	constexpr auto operator()(range auto && source_range, range auto && buffer_range, auto && extract_key) const -> bool {
-		return operator()(begin(source_range), end(source_range), begin(buffer_range), BOUNDED_FORWARD(extract_key));
+		return operator()(begin(source_range), end(source_range), begin(buffer_range), OPERATORS_FORWARD(extract_key));
 	}
 	constexpr auto operator()(range auto && source_range, range auto && buffer_range) const -> bool {
 		return operator()(source_range, buffer_range, bounded::identity);

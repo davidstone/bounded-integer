@@ -7,7 +7,7 @@
 
 #include <containers/array/array.hpp>
 
-#include <bounded/forward.hpp>
+#include <operators/forward.hpp>
 #include <bounded/detail/make_index_sequence.hpp>
 #include <bounded/integer.hpp>
 
@@ -37,11 +37,11 @@ struct final_dimension {
 // These assume that all of the dimensions have been passed in.
 template<typename element_type, std::size_t... dimensions>
 constexpr auto make_explicit_array(auto && ... args) {
-	return array<element_type, dimensions...>{ BOUNDED_FORWARD(args)... };
+	return array<element_type, dimensions...>{ OPERATORS_FORWARD(args)... };
 }
 template<std::size_t... dimensions>
 constexpr auto make_explicit_array(auto && ... args) {
-	return array<std::common_type_t<std::decay_t<decltype(args)>...>, dimensions...>{ BOUNDED_FORWARD(args)... };
+	return array<std::common_type_t<std::decay_t<decltype(args)>...>, dimensions...>{ OPERATORS_FORWARD(args)... };
 }
 
 
@@ -51,7 +51,7 @@ constexpr auto make_array(auto && ... args) {
 	return array<
 		element_type,
 		detail::final_dimension<sizeof...(args), dimensions...>::value, dimensions...
-	>{ BOUNDED_FORWARD(args)... };
+	>{ OPERATORS_FORWARD(args)... };
 }
 
 template<std::size_t... dimensions>
@@ -59,7 +59,7 @@ constexpr auto make_array(auto && ... args) {
 	return array<
 		std::common_type_t<std::decay_t<decltype(args)>...>,
 		detail::final_dimension<sizeof...(args), dimensions...>::value, dimensions...
-	>{ BOUNDED_FORWARD(args)... };
+	>{ OPERATORS_FORWARD(args)... };
 }
 
 
@@ -70,7 +70,7 @@ namespace detail {
 // aggregate initialization, so there is no risk of copy-after-move
 template<std::size_t size, std::size_t... indexes>
 constexpr auto make_array_n_impl(auto && value, std::index_sequence<indexes...>) {
-	return array<std::decay_t<decltype(value)>, size>{(void(indexes), value)..., BOUNDED_FORWARD(value)};
+	return array<std::decay_t<decltype(value)>, size>{(void(indexes), value)..., OPERATORS_FORWARD(value)};
 }
 
 }	// namespace detail
@@ -80,7 +80,7 @@ constexpr auto make_array_n(bounded::constant_t<size_> size, auto && value) {
 	if constexpr (size == 0_bi) {
 		return array<std::decay_t<decltype(value)>, 0>{};
 	} else {
-		return detail::make_array_n_impl<size_>(BOUNDED_FORWARD(value), bounded::make_index_sequence(size - 1_bi));
+		return detail::make_array_n_impl<size_>(OPERATORS_FORWARD(value), bounded::make_index_sequence(size - 1_bi));
 	}
 }
 

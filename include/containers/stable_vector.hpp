@@ -52,8 +52,8 @@ struct stable_vector {
 	explicit stable_vector(Range && range):
 		stable_vector()
 	{
-		for (decltype(auto) value : BOUNDED_FORWARD(range)) {
-			::containers::emplace_back(*this, BOUNDED_FORWARD(value));
+		for (decltype(auto) value : OPERATORS_FORWARD(range)) {
+			::containers::emplace_back(*this, OPERATORS_FORWARD(value));
 		}
 	}
 	

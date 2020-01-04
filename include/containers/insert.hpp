@@ -59,7 +59,7 @@ constexpr auto emplace(Container & container, typename Container::const_iterator
 	BOUNDED_ASSERT(::containers::detail::iterator_points_into_container(container, position));
 	auto const offset = position - begin(container);
 	if (position == end(container)) {
-		::containers::emplace_back(container, BOUNDED_FORWARD(args)...);
+		::containers::emplace_back(container, OPERATORS_FORWARD(args)...);
 	} else if (size(container) < container.capacity()) {
 		auto const mutable_position = ::containers::detail::mutable_iterator(container, position);
 		auto const original_end = end(container);
@@ -67,10 +67,10 @@ constexpr auto emplace(Container & container, typename Container::const_iterator
 		::containers::move_backward(mutable_position, containers::prev(original_end), original_end);
 		auto const pointer = std::addressof(*mutable_position);
 		bounded::destroy(*pointer);
-		bounded::construct(*pointer, BOUNDED_FORWARD(args)...);
+		bounded::construct(*pointer, OPERATORS_FORWARD(args)...);
 	} else if constexpr (reservable<Container>) {
 		insert_or_emplace_with_reallocation(container, position, 1_bi, [&](auto const ptr) {
-			bounded::construct(*ptr, BOUNDED_FORWARD(args)...);
+			bounded::construct(*ptr, OPERATORS_FORWARD(args)...);
 		});
 	} else {
 		bounded::assert_or_assume_unreachable();
@@ -85,7 +85,7 @@ template<typename Container, typename Range = std::initializer_list<typename Con
 constexpr auto insert(Container & container, typename Container::const_iterator position, Range && range) {
 	BOUNDED_ASSERT(iterator_points_into_container(container, position));
 	if (position == end(container)) {
-		append(container, BOUNDED_FORWARD(range));
+		append(container, OPERATORS_FORWARD(range));
 		return;
 	}
 
@@ -94,16 +94,16 @@ constexpr auto insert(Container & container, typename Container::const_iterator 
 		auto const distance_to_end = typename Container::size_type(end(container) - position, bounded::non_check);
 		auto const mutable_position = ::containers::detail::mutable_iterator(container, position);
 		::containers::uninitialized_move_backward(mutable_position, end(container), end(container) + range_size);
-		auto const first = begin(BOUNDED_FORWARD(range));
+		auto const first = begin(OPERATORS_FORWARD(range));
 		// TODO: use a view over a counted iterator
 		auto const remainder = ::containers::copy_n(first, bounded::min(range_size, distance_to_end), mutable_position);
-		auto const last = end(BOUNDED_FORWARD(range));
+		auto const last = end(OPERATORS_FORWARD(range));
 		::containers::uninitialized_copy(remainder.input, last, remainder.output);
 		container.append_from_capacity(range_size);
 		// return mutable_position;
 	} else if constexpr (reservable<Container>) {
 		insert_or_emplace_with_reallocation(container, position, range_size, [&](auto const ptr) {
-			::containers::uninitialized_copy(BOUNDED_FORWARD(range), ptr);
+			::containers::uninitialized_copy(OPERATORS_FORWARD(range), ptr);
 		});
 	} else {
 		bounded::assert_or_assume_unreachable();

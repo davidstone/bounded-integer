@@ -11,11 +11,11 @@
 namespace containers {
 
 constexpr auto transform(range auto && source, auto dereference) {
-	return adapt(BOUNDED_FORWARD(source), detail::transform_traits(std::move(dereference)));
+	return adapt(OPERATORS_FORWARD(source), detail::transform_traits(std::move(dereference)));
 }
 
 constexpr auto transform_dereference(range auto && source, auto dereference) {
-	return adapt(BOUNDED_FORWARD(source), detail::transform_traits_dereference(std::move(dereference)));
+	return adapt(OPERATORS_FORWARD(source), detail::transform_traits_dereference(std::move(dereference)));
 }
 
 }	// namespace containers

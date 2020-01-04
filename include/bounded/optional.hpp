@@ -10,7 +10,7 @@
 #include <bounded/detail/construct_destroy.hpp>
 #include <bounded/detail/variant/variant.hpp>
 #include <bounded/assert.hpp>
-#include <bounded/forward.hpp>
+#include <operators/forward.hpp>
 #include <bounded/is_constructible.hpp>
 #include <bounded/tombstone_traits.hpp>
 #include <bounded/value_to_function.hpp>
@@ -40,13 +40,13 @@ struct optional_storage {
 	
 	template<typename Construct> requires construct_function_for<Construct, T>
 	constexpr explicit optional_storage(lazy_init_t, Construct && construct_):
-		m_data(lazy_init, value_index, BOUNDED_FORWARD(construct_))
+		m_data(lazy_init, value_index, OPERATORS_FORWARD(construct_))
 	{
 	}
 	
 	template<typename U> requires is_constructible<T, U &&>
 	constexpr explicit optional_storage(U && value):
-		m_data(value_index, BOUNDED_FORWARD(value))
+		m_data(value_index, OPERATORS_FORWARD(value))
 	{
 	}
 	
@@ -59,7 +59,7 @@ struct optional_storage {
 	}
 
 	constexpr auto initialize(construct_function_for<T> auto && construct_) {
-		m_data.emplace(value_index, BOUNDED_FORWARD(construct_));
+		m_data.emplace(value_index, OPERATORS_FORWARD(construct_));
 	}
 	
 	constexpr auto && get() const & {
@@ -90,13 +90,13 @@ struct optional_storage<T> {
 	
 	template<typename Construct> requires construct_function_for<Construct, T>
 	constexpr explicit optional_storage(lazy_init_t, Construct && construct_):
-		m_data(lazy_init, BOUNDED_FORWARD(construct_)())
+		m_data(lazy_init, OPERATORS_FORWARD(construct_)())
 	{
 	}
 	
 	template<typename U> requires is_constructible<T, U &&>
 	constexpr explicit optional_storage(U && value):
-		m_data(BOUNDED_FORWARD(value))
+		m_data(OPERATORS_FORWARD(value))
 	{
 	}
 	
@@ -111,7 +111,7 @@ struct optional_storage<T> {
 
 	constexpr auto initialize(construct_function_for<T> auto && construct_) {
 		uninitialize();
-		construct(lazy_init, m_data, BOUNDED_FORWARD(construct_));
+		construct(lazy_init, m_data, OPERATORS_FORWARD(construct_));
 	}
 
 	constexpr auto && get() const & {
@@ -135,9 +135,9 @@ private:
 
 constexpr auto & assign(auto & target, auto && source) {
 	if (target) {
-		*target = BOUNDED_FORWARD(source);
+		*target = OPERATORS_FORWARD(source);
 	} else {
-		::bounded::insert(target, BOUNDED_FORWARD(source));
+		::bounded::insert(target, OPERATORS_FORWARD(source));
 	}
 	return target;
 }
@@ -146,7 +146,7 @@ constexpr auto & assign_from_optional(auto & target, auto && source) {
 	if (!source) {
 		target = none;
 	} else {
-		assign(target, *BOUNDED_FORWARD(source));
+		assign(target, *OPERATORS_FORWARD(source));
 	}
 	return target;
 }
@@ -166,16 +166,16 @@ public:
 
 	template<typename Construct> requires construct_function_for<Construct, T>
 	constexpr explicit optional(lazy_init_t, Construct && construct_):
-		m_storage(lazy_init, BOUNDED_FORWARD(construct_)) {
+		m_storage(lazy_init, OPERATORS_FORWARD(construct_)) {
 	}
 	template<typename U> requires std::is_convertible_v<U &&, value_type>
 	constexpr optional(U && other):
-		m_storage(BOUNDED_FORWARD(other))
+		m_storage(OPERATORS_FORWARD(other))
 	{
 	}
 	template<typename U> requires (!std::is_convertible_v<U &&, value_type> and is_constructible<value_type, U &&>)
 	constexpr explicit optional(U && other):
-		m_storage(BOUNDED_FORWARD(other))
+		m_storage(OPERATORS_FORWARD(other))
 	{
 	}
 
@@ -222,7 +222,7 @@ public:
 	}
 
 	constexpr auto emplace(construct_function_for<T> auto && construct_) {
-		m_storage.initialize(BOUNDED_FORWARD(construct_));
+		m_storage.initialize(OPERATORS_FORWARD(construct_));
 	}
 
 	constexpr auto && operator=(none_t) & {
@@ -232,14 +232,14 @@ public:
 	// TODO: make this work when value_type is a reference
 	template<typename U> requires(std::is_convertible_v<U &&, value_type>)
 	constexpr auto && operator=(U && other) & {
-		return detail::assign(*this, BOUNDED_FORWARD(other));
+		return detail::assign(*this, OPERATORS_FORWARD(other));
 	}
 	
 private:
 	constexpr optional(auto && other_optional, common_init_tag):
 		optional(none) {
 		if (other_optional) {
-			::bounded::insert(*this, *BOUNDED_FORWARD(other_optional));
+			::bounded::insert(*this, *OPERATORS_FORWARD(other_optional));
 		}
 	}
 	
@@ -252,11 +252,11 @@ template<typename T> requires(!std::is_same_v<T, none_t> and !std::is_invocable_
 optional(T) -> optional<T>;
 
 constexpr auto make_optional(auto && value) {
-	return optional<std::decay_t<decltype(value)>>(BOUNDED_FORWARD(value));
+	return optional<std::decay_t<decltype(value)>>(OPERATORS_FORWARD(value));
 }
 
 constexpr auto make_optional_lazy(auto && function) -> optional<std::invoke_result_t<decltype(function)>> {
-	return {BOUNDED_FORWARD(function)()};
+	return {OPERATORS_FORWARD(function)()};
 }
 
 template<typename LHS, typename RHS> requires equality_comparable<LHS, RHS>

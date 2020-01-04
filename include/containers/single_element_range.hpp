@@ -117,7 +117,7 @@ constexpr auto operator-(single_element_iterator<T> const lhs, single_element_se
 // Note: the element must outlive the range. The range stores a reference
 template<typename T>
 constexpr auto single_element_range(T && value) {
-	return range_view(detail::single_element_iterator(BOUNDED_FORWARD(value)), detail::single_element_sentinel{});
+	return range_view(detail::single_element_iterator(OPERATORS_FORWARD(value)), detail::single_element_sentinel{});
 }
 
 }	// namespace containers

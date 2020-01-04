@@ -11,7 +11,7 @@
 #include <containers/iterator_adapter.hpp>
 #include <containers/reference_wrapper.hpp>
 
-#include <bounded/forward.hpp>
+#include <operators/forward.hpp>
 #include <bounded/assert.hpp>
 #include <bounded/integer.hpp>
 
@@ -128,7 +128,7 @@ public:
 	>;
 
 	constexpr filter(Range && range, UnaryPredicate predicate):
-		m_range(BOUNDED_FORWARD(range)),
+		m_range(OPERATORS_FORWARD(range)),
 		m_traits(end(m_range), std::move(predicate))
 	{
 	}

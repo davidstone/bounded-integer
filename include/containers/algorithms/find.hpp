@@ -28,7 +28,7 @@ constexpr auto find_if(InputIterator first, sentinel_for<InputIterator> auto con
 }
 
 constexpr auto find_if(range auto && range, auto predicate) {
-	return ::containers::find_if(begin(BOUNDED_FORWARD(range)), end(BOUNDED_FORWARD(range)), std::move(predicate));
+	return ::containers::find_if(begin(OPERATORS_FORWARD(range)), end(OPERATORS_FORWARD(range)), std::move(predicate));
 }
 
 
@@ -38,7 +38,7 @@ constexpr auto find_if_not(InputIterator const first, sentinel_for<InputIterator
 }
 
 constexpr auto find_if_not(range auto && range, auto predicate) {
-	return ::containers::find_if_not(begin(BOUNDED_FORWARD(range)), end(BOUNDED_FORWARD(range)), std::move(predicate));
+	return ::containers::find_if_not(begin(OPERATORS_FORWARD(range)), end(OPERATORS_FORWARD(range)), std::move(predicate));
 }
 
 
@@ -48,7 +48,7 @@ constexpr auto find(InputIterator const first, sentinel_for<InputIterator> auto 
 }
 
 constexpr auto find(range auto && range, auto const & value) {
-	return ::containers::find(begin(BOUNDED_FORWARD(range)), end(BOUNDED_FORWARD(range)), value);
+	return ::containers::find(begin(OPERATORS_FORWARD(range)), end(OPERATORS_FORWARD(range)), value);
 }
 
 }	// namespace containers

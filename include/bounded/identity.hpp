@@ -5,14 +5,14 @@
 
 #pragma once
 
-#include <bounded/forward.hpp>
+#include <operators/forward.hpp>
 
 #include <type_traits>
 
 namespace bounded {
 
 inline constexpr auto identity = [](auto && value) -> auto && {
-	return BOUNDED_FORWARD(value);
+	return OPERATORS_FORWARD(value);
 };
 using identity_t = std::decay_t<decltype(identity)>;
 

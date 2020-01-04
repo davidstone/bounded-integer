@@ -13,7 +13,7 @@
 #include <bounded/detail/max_builtin.hpp>
 #include <bounded/detail/normalize.hpp>
 #include <bounded/detail/overlapping_range.hpp>
-#include <bounded/forward.hpp>
+#include <operators/forward.hpp>
 #include <bounded/is_constructible.hpp>
 
 #include <utility>
@@ -68,13 +68,13 @@ private:
 	static constexpr decltype(auto) extreme_two(auto compare, T1 && t1, T2 && t2) {
 		using result_t = result_type<decltype(compare), T1, T2>;
 		return compare(t2, t1) ?
-			static_cast<result_t>(BOUNDED_FORWARD(t2)) :
-			static_cast<result_t>(BOUNDED_FORWARD(t1));
+			static_cast<result_t>(OPERATORS_FORWARD(t2)) :
+			static_cast<result_t>(OPERATORS_FORWARD(t1));
 	}
 
 public:
 	constexpr decltype(auto) operator()(auto /* compare */, auto && t) const {
-		return BOUNDED_FORWARD(t);
+		return OPERATORS_FORWARD(t);
 	}
 
 
@@ -82,19 +82,19 @@ public:
 	constexpr decltype(auto) operator()(auto compare, T1 && t1, T2 && t2) const {
 		using result_t = result_type<decltype(compare), T1, T2>;
 		if constexpr (not is_constructible<result_t, T2>) {
-			return BOUNDED_FORWARD(t1);
+			return OPERATORS_FORWARD(t1);
 		} else if constexpr (not is_constructible<result_t, T1>) {
-			return BOUNDED_FORWARD(t2);
+			return OPERATORS_FORWARD(t2);
 		} else {
-			return extreme_two(std::move(compare), BOUNDED_FORWARD(t1), BOUNDED_FORWARD(t2));
+			return extreme_two(std::move(compare), OPERATORS_FORWARD(t1), OPERATORS_FORWARD(t2));
 		}
 	}
 
 	constexpr decltype(auto) operator()(auto compare, auto && t1, auto && t2, auto && ... ts) const {
 		return operator()(
 			compare,
-			operator()(compare, BOUNDED_FORWARD(t1), BOUNDED_FORWARD(t2)),
-			BOUNDED_FORWARD(ts)...
+			operator()(compare, OPERATORS_FORWARD(t1), OPERATORS_FORWARD(t2)),
+			OPERATORS_FORWARD(ts)...
 		);
 	}
 
@@ -102,11 +102,11 @@ public:
 
 
 inline constexpr auto min = [](auto && ... ts) -> decltype(auto) {
-	return extreme(less(), BOUNDED_FORWARD(ts)...);
+	return extreme(less(), OPERATORS_FORWARD(ts)...);
 };
 
 inline constexpr auto max = [](auto && ... ts) -> decltype(auto) {
-	return extreme(greater(), BOUNDED_FORWARD(ts)...);
+	return extreme(greater(), OPERATORS_FORWARD(ts)...);
 };
 
 }	// namespace bounded

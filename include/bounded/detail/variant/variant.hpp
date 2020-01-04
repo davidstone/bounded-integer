@@ -8,7 +8,7 @@
 #include <bounded/detail/class.hpp>
 #include <bounded/detail/comparison.hpp>
 #include <bounded/detail/copy_cv_ref.hpp>
-#include <bounded/forward.hpp>
+#include <operators/forward.hpp>
 #include <bounded/insert.hpp>
 #include <bounded/lazy_init.hpp>
 #include <bounded/is_constructible.hpp>
@@ -59,8 +59,8 @@ public:
 
 	template<typename F, typename Index, typename Construct> requires(std::is_convertible_v<F, GetFunction> and construct_function_for<Construct, type_at<Index>>)
 	constexpr basic_variant(lazy_init_t, F && function, Index index_, Construct && construct_):
-		m_function(BOUNDED_FORWARD(function)),
-		m_data(detail::get_index(index_, detail::types<Ts>()...), BOUNDED_FORWARD(construct_))
+		m_function(OPERATORS_FORWARD(function)),
+		m_data(detail::get_index(index_, detail::types<Ts>()...), OPERATORS_FORWARD(construct_))
 	{
 		static_assert(
 			min_value<decltype(index())> == 0_bi,
@@ -76,9 +76,9 @@ public:
 	constexpr basic_variant(F && function, Index index_, T && value):
 		basic_variant(
 			lazy_init,
-			BOUNDED_FORWARD(function),
+			OPERATORS_FORWARD(function),
 			index_,
-			value_to_function(BOUNDED_FORWARD(value))
+			value_to_function(OPERATORS_FORWARD(value))
 		)
 	{
 	}
@@ -89,7 +89,7 @@ public:
 			lazy_init,
 			GetFunction(detail::get_index(index_, detail::types<Ts>()...)),
 			index_,
-			BOUNDED_FORWARD(construct_)
+			OPERATORS_FORWARD(construct_)
 		)
 	{
 	}
@@ -99,7 +99,7 @@ public:
 		basic_variant(
 			lazy_init,
 			index_,
-			value_to_function(BOUNDED_FORWARD(value))
+			value_to_function(OPERATORS_FORWARD(value))
 		)
 	{
 	}
@@ -109,7 +109,7 @@ public:
 		basic_variant(
 			lazy_init,
 			detail::types<constructed_type<Construct>>(),
-			BOUNDED_FORWARD(construct_)
+			OPERATORS_FORWARD(construct_)
 		)
 	{
 	}
@@ -118,7 +118,7 @@ public:
 	constexpr explicit basic_variant(T && value):
 		basic_variant(
 			lazy_init,
-			value_to_function(BOUNDED_FORWARD(value))
+			value_to_function(OPERATORS_FORWARD(value))
 		)
 	{
 	}
@@ -187,10 +187,10 @@ public:
 	constexpr auto & operator=(T && value) & {
 		visit(*this, [&](auto & original) {
 			if constexpr (std::is_same_v<std::decay_t<decltype(original)>, std::decay_t<T>>) {
-				original = BOUNDED_FORWARD(value);
+				original = OPERATORS_FORWARD(value);
 			} else {
 				destroy(original);
-				replace_active_member(detail::types<std::decay_t<T>>(), value_to_function(BOUNDED_FORWARD(value)));
+				replace_active_member(detail::types<std::decay_t<T>>(), value_to_function(OPERATORS_FORWARD(value)));
 			}
 		});
 		return *this;
@@ -214,25 +214,25 @@ public:
 
 	template<typename Index, construct_function_for<type_at<Index>> Construct>
 	constexpr auto & emplace(Index index, Construct && construct_) & {
-		if constexpr (noexcept(type_at<decltype(index)>(BOUNDED_FORWARD(construct_())))) {
+		if constexpr (noexcept(type_at<decltype(index)>(OPERATORS_FORWARD(construct_())))) {
 			visit(*this, destroy);
-			return replace_active_member(index, BOUNDED_FORWARD(construct_));
+			return replace_active_member(index, OPERATORS_FORWARD(construct_));
 		} else {
-			auto value = BOUNDED_FORWARD(construct_);
+			auto value = OPERATORS_FORWARD(construct_);
 			visit(*this, destroy);
 			return replace_active_member(index, value_to_function(std::move(value)));
 		}
 	}
 	template<typename Construct> requires unique_construct_function<Construct, Ts...>
 	constexpr auto & emplace(Construct && construct_) & {
-		return emplace(detail::types<constructed_type<Construct>>(), BOUNDED_FORWARD(construct_));
+		return emplace(detail::types<constructed_type<Construct>>(), OPERATORS_FORWARD(construct_));
 	}
 	
 private:
 	struct copy_move_tag{};
 	constexpr basic_variant(auto && other, copy_move_tag):
 		basic_variant(visit_with_index(
-			BOUNDED_FORWARD(other),
+			OPERATORS_FORWARD(other),
 			[&](auto parameter) {
 				return basic_variant(
 					other.m_function,
@@ -247,12 +247,12 @@ private:
 	constexpr void assign(auto && other) {
 		visit_with_index(
 			*this,
-			BOUNDED_FORWARD(other),
+			OPERATORS_FORWARD(other),
 			[&](auto lhs, auto rhs) {
 				if constexpr (lhs.index == rhs.index) {
-					lhs.value = BOUNDED_FORWARD(rhs.value);
+					lhs.value = OPERATORS_FORWARD(rhs.value);
 				} else {
-					::bounded::insert(*this, rhs.index, BOUNDED_FORWARD(rhs.value));
+					::bounded::insert(*this, rhs.index, OPERATORS_FORWARD(rhs.value));
 				}
 				m_function = other.m_function;
 			}
@@ -265,7 +265,7 @@ private:
 		// TODO: This can be simplified when construct uses std::construct_at
 		constexpr auto index_value = detail::get_index(index, detail::types<Ts>()...);
 		m_function = GetFunction(index_value);
-		return construct(lazy_init, operator[](index_value), BOUNDED_FORWARD(construct_));
+		return construct(lazy_init, operator[](index_value), OPERATORS_FORWARD(construct_));
 		#endif
 		constexpr auto trivial = (... and (
 			std::is_trivially_copy_constructible_v<Ts> and
@@ -275,16 +275,16 @@ private:
 		constexpr auto index_value = detail::get_index(index, detail::types<Ts>()...);
 		m_function = GetFunction(index_value);
 		if constexpr (trivial) {
-			m_data = detail::variadic_union<Ts...>(index_value, BOUNDED_FORWARD(construct_));
+			m_data = detail::variadic_union<Ts...>(index_value, OPERATORS_FORWARD(construct_));
 			return operator[](index_value);
 		} else {
-			return construct(lazy_init, operator[](index_value), BOUNDED_FORWARD(construct_));
+			return construct(lazy_init, operator[](index_value), OPERATORS_FORWARD(construct_));
 		}
 	}
 
 	static constexpr auto && operator_bracket(auto && data, auto const index_) {
 		return ::bounded::detail::get_union_element(
-			BOUNDED_FORWARD(data),
+			OPERATORS_FORWARD(data),
 			detail::get_index(index_, detail::types<Ts>{}...)
 		);
 	}

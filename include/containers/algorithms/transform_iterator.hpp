@@ -33,7 +33,7 @@ struct function_wrapper {
 	// TODO: Use terse syntax when clang doesn't crash
 	template<typename... Args>
 	constexpr auto operator()(Args && ... args) const OPERATORS_RETURNS(
-		  function(BOUNDED_FORWARD(args)...)
+		  function(OPERATORS_FORWARD(args)...)
 	)
 };
 
@@ -44,20 +44,20 @@ struct function_wrapper<Result Type::*> {
 	constexpr auto operator()(auto && object, auto && ... args) const {
 		using Object = std::decay_t<decltype(object)>;
 		if constexpr (is_reference_wrapper<Object>) {
-			return operator()(function, object.get(), BOUNDED_FORWARD(args)...);
+			return operator()(function, object.get(), OPERATORS_FORWARD(args)...);
 		} else if constexpr (std::is_member_function_pointer_v<decltype(function)>) {
 			if constexpr (std::is_base_of_v<Type, Object>) {
-				return (BOUNDED_FORWARD(object).*function)(BOUNDED_FORWARD(args)...);
+				return (OPERATORS_FORWARD(object).*function)(OPERATORS_FORWARD(args)...);
 			} else {
-				return (BOUNDED_FORWARD(object)->*function)(BOUNDED_FORWARD(args)...);
+				return (OPERATORS_FORWARD(object)->*function)(OPERATORS_FORWARD(args)...);
 			}
 		} else {
 			static_assert(std::is_member_object_pointer_v<decltype(function)>);
 			static_assert(sizeof...(args) == 0);
 			if constexpr (std::is_base_of_v<Type, Object>) {
-				return BOUNDED_FORWARD(object).*function;
+				return OPERATORS_FORWARD(object).*function;
 			} else {
-				return BOUNDED_FORWARD(object)->*function;
+				return OPERATORS_FORWARD(object)->*function;
 			}
 		}
 	}

@@ -179,7 +179,7 @@ template<detail::string_like LHS, detail::string_like RHS> requires(
 )
 auto operator+(LHS && lhs, RHS && rhs) {
 	using result_t = std::decay_t<std::conditional_t<detail::is_string<std::decay_t<LHS>>, LHS, RHS>>;
-	return ::containers::concatenate<result_t>(BOUNDED_FORWARD(lhs), BOUNDED_FORWARD(rhs));
+	return ::containers::concatenate<result_t>(OPERATORS_FORWARD(lhs), OPERATORS_FORWARD(rhs));
 }
 
 template<typename CharT>
@@ -203,11 +203,11 @@ auto operator+(CharT const * const lhs, basic_string<CharT> const & rhs) {
 
 template<detail::string_specialization String>
 auto operator+(String && lhs, typename std::remove_reference_t<String>::value_type const rhs) {
-	return containers::concatenate<std::decay_t<String>>(BOUNDED_FORWARD(lhs), ::containers::single_element_range(rhs));
+	return containers::concatenate<std::decay_t<String>>(OPERATORS_FORWARD(lhs), ::containers::single_element_range(rhs));
 }
 template<detail::string_specialization String>
 auto operator+(typename std::remove_reference_t<String>::value_type const lhs, String && rhs) {
-	return containers::concatenate<std::decay_t<String>>(::containers::single_element_range(lhs), BOUNDED_FORWARD(rhs));
+	return containers::concatenate<std::decay_t<String>>(::containers::single_element_range(lhs), OPERATORS_FORWARD(rhs));
 }
 
 using string = basic_string<char>;

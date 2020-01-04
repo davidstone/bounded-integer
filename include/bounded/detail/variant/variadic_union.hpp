@@ -8,7 +8,7 @@
 #include <bounded/detail/arithmetic/operators.hpp>
 #include <bounded/detail/class.hpp>
 #include <bounded/detail/comparison.hpp>
-#include <bounded/forward.hpp>
+#include <operators/forward.hpp>
 #include <bounded/integer.hpp>
 
 #include <type_traits>
@@ -23,12 +23,12 @@ union variadic_union {
 template<typename T, typename... Ts> requires(std::is_trivially_destructible_v<T> and ... and std::is_trivially_destructible_v<Ts>)
 union variadic_union<T, Ts...> {
 	explicit constexpr variadic_union(constant_t<0>, auto && construct_):
-		head(BOUNDED_FORWARD(construct_)())
+		head(OPERATORS_FORWARD(construct_)())
 	{
 	}
 	template<auto n>
 	explicit constexpr variadic_union(constant_t<n> const index, auto && construct_):
-		tail(index - constant<1>, BOUNDED_FORWARD(construct_))
+		tail(index - constant<1>, OPERATORS_FORWARD(construct_))
 	{
 	}
 
@@ -40,12 +40,12 @@ union variadic_union<T, Ts...> {
 template<typename T, typename... Ts>
 union variadic_union<T, Ts...> {
 	explicit constexpr variadic_union(constant_t<0>, auto && construct_):
-		head(BOUNDED_FORWARD(construct_)())
+		head(OPERATORS_FORWARD(construct_)())
 	{
 	}
 	template<auto n>
 	explicit constexpr variadic_union(constant_t<n> const index, auto && construct_):
-		tail(index - constant<1>, BOUNDED_FORWARD(construct_))
+		tail(index - constant<1>, OPERATORS_FORWARD(construct_))
 	{
 	}
 
@@ -64,9 +64,9 @@ union variadic_union<T, Ts...> {
 template<auto n> requires(n >= 0)
 constexpr auto && get_union_element(auto && v, constant_t<n> const index) {
 	if constexpr (index == constant<0>) {
-		return BOUNDED_FORWARD(v).head;
+		return OPERATORS_FORWARD(v).head;
 	} else {
-		return get_union_element(BOUNDED_FORWARD(v).tail, index - constant<1>);
+		return get_union_element(OPERATORS_FORWARD(v).tail, index - constant<1>);
 	}
 }
 

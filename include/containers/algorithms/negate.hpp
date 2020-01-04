@@ -5,7 +5,7 @@
 
 #pragma once
 
-#include <bounded/forward.hpp>
+#include <operators/forward.hpp>
 #include <bounded/integer.hpp>
 
 #include <type_traits>
@@ -14,7 +14,7 @@ namespace containers {
 
 constexpr auto negate(auto predicate) {
 	return [predicate = std::move(predicate)](auto && ... args) {
-		return !predicate(BOUNDED_FORWARD(args)...);
+		return !predicate(OPERATORS_FORWARD(args)...);
 	};
 }
 

@@ -12,7 +12,7 @@
 #include <containers/size.hpp>
 #include <containers/take.hpp>
 
-#include <bounded/forward.hpp>
+#include <operators/forward.hpp>
 #include <bounded/integer.hpp>
 
 #include <utility>

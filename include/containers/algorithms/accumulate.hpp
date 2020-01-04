@@ -7,7 +7,7 @@
 
 #include <containers/is_range.hpp>
 
-#include <bounded/forward.hpp>
+#include <operators/forward.hpp>
 #include <bounded/integer.hpp>
 
 #include <functional>
@@ -52,9 +52,9 @@ using accumulate_t = typename accumulate_c<Range, std::decay_t<Initial>, BinaryF
 
 template<typename Result>
 constexpr auto accumulate(range auto && source, auto && initial, auto function) {
-	auto result = static_cast<Result>(BOUNDED_FORWARD(initial));
-	for (decltype(auto) value : BOUNDED_FORWARD(source)) {
-		result = static_cast<Result>(function(std::move(result), BOUNDED_FORWARD(value)));
+	auto result = static_cast<Result>(OPERATORS_FORWARD(initial));
+	for (decltype(auto) value : OPERATORS_FORWARD(source)) {
+		result = static_cast<Result>(function(std::move(result), OPERATORS_FORWARD(value)));
 	}
 	return result;
 }
@@ -62,8 +62,8 @@ constexpr auto accumulate(range auto && source, auto && initial, auto function) 
 
 constexpr auto accumulate(range auto && source, auto && initial, auto function) {
 	return ::containers::accumulate<detail::accumulate_t<decltype(source), decltype(initial), decltype(function)>>(
-		BOUNDED_FORWARD(source),
-		BOUNDED_FORWARD(initial),
+		OPERATORS_FORWARD(source),
+		OPERATORS_FORWARD(initial),
 		std::move(function)
 	);
 }
@@ -71,11 +71,11 @@ constexpr auto accumulate(range auto && source, auto && initial, auto function) 
 
 template<typename Result>
 constexpr auto accumulate(range auto && source, auto && initial) {
-	return ::containers::accumulate<Result>(BOUNDED_FORWARD(source), BOUNDED_FORWARD(initial), std::plus<>{});
+	return ::containers::accumulate<Result>(OPERATORS_FORWARD(source), OPERATORS_FORWARD(initial), std::plus<>{});
 }
 
 constexpr auto accumulate(range auto && source, auto && initial) {
-	return ::containers::accumulate(BOUNDED_FORWARD(source), BOUNDED_FORWARD(initial), std::plus<>{});
+	return ::containers::accumulate(OPERATORS_FORWARD(source), OPERATORS_FORWARD(initial), std::plus<>{});
 }
 
 
@@ -95,7 +95,7 @@ constexpr auto initial_accumulate_value() {
 template<typename Result>
 constexpr auto accumulate(range auto && source) {
 	return ::containers::accumulate<Result>(
-		BOUNDED_FORWARD(source),
+		OPERATORS_FORWARD(source),
 		detail::initial_accumulate_value<typename std::remove_reference_t<decltype(source)>::value_type>(),
 		std::plus<>{}
 	);
@@ -103,7 +103,7 @@ constexpr auto accumulate(range auto && source) {
 
 constexpr auto accumulate(range auto && source) {
 	return ::containers::accumulate(
-		BOUNDED_FORWARD(source),
+		OPERATORS_FORWARD(source),
 		detail::initial_accumulate_value<typename std::remove_reference_t<decltype(source)>::value_type>(),
 		std::plus<>{}
 	);

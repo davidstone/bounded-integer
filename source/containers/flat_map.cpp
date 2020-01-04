@@ -9,7 +9,7 @@
 #include <containers/emplace_back.hpp>
 #include <containers/vector.hpp>
 
-#include <bounded/forward.hpp>
+#include <operators/forward.hpp>
 
 #include "../test_assert.hpp"
 
@@ -237,11 +237,11 @@ using extract_key_t = Extract;
 
 	template<typename Map>
 	auto construct_from_range(auto && range) {
-		return Map(BOUNDED_FORWARD(begin(range)), BOUNDED_FORWARD(end(range)));
+		return Map(OPERATORS_FORWARD(begin(range)), OPERATORS_FORWARD(end(range)));
 	}
 
 	void insert_range(auto & map, auto && range) {
-		map.insert(BOUNDED_FORWARD(begin(range)), BOUNDED_FORWARD(end(range)));
+		map.insert(OPERATORS_FORWARD(begin(range)), OPERATORS_FORWARD(end(range)));
 	}
 
 #elif defined USE_FLAT_MAP
@@ -257,11 +257,11 @@ using extract_key_t = Extract;
 
 	template<typename Map>
 	auto construct_from_range(auto && range) {
-		return Map(BOUNDED_FORWARD(range));
+		return Map(OPERATORS_FORWARD(range));
 	}
 
 	void insert_range(auto & map, auto && range) {
-		map.insert(BOUNDED_FORWARD(range));
+		map.insert(OPERATORS_FORWARD(range));
 	}
 
 #else

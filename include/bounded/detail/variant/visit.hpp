@@ -15,11 +15,11 @@ namespace bounded {
 namespace detail {
 
 constexpr decltype(auto) reorder_transform_implementation(bounded::constant_t<0>, auto transform, auto && function, auto && ... args) {
-	return transform(BOUNDED_FORWARD(function), BOUNDED_FORWARD(args)...);
+	return transform(OPERATORS_FORWARD(function), OPERATORS_FORWARD(args)...);
 }
 template<auto index_>
 constexpr decltype(auto) reorder_transform_implementation(bounded::constant_t<index_> index, auto transform, auto && arg, auto && ... args) {
-	return ::bounded::detail::reorder_transform_implementation(index - 1_bi, transform, BOUNDED_FORWARD(args)..., BOUNDED_FORWARD(arg));
+	return ::bounded::detail::reorder_transform_implementation(index - 1_bi, transform, OPERATORS_FORWARD(args)..., OPERATORS_FORWARD(arg));
 }
 
 // Often, we want to write a function that accepts a variadic number of
@@ -36,7 +36,7 @@ constexpr decltype(auto) reorder_transform(auto transform, auto && ... args) {
 	return ::bounded::detail::reorder_transform_implementation(
 		bounded::constant<bounded::detail::normalize<sizeof...(args) - 1U>>,
 		transform,
-		BOUNDED_FORWARD(args)...
+		OPERATORS_FORWARD(args)...
 	);
 };
 
@@ -118,11 +118,11 @@ constexpr decltype(auto) visit_implementation(
 	bounded::constant_t<0>,
 	auto && ... variants
 ) requires(sizeof...(indexes) == sizeof...(variants)) {
-	return BOUNDED_FORWARD(function)(
+	return OPERATORS_FORWARD(function)(
 		visitor_parameter<
-			decltype(BOUNDED_FORWARD(variants)[bounded::constant<indexes>]),
+			decltype(OPERATORS_FORWARD(variants)[bounded::constant<indexes>]),
 			indexes
-		>{BOUNDED_FORWARD(variants)[bounded::constant<indexes>]}...
+		>{OPERATORS_FORWARD(variants)[bounded::constant<indexes>]}...
 	);
 }
 
@@ -138,10 +138,10 @@ constexpr decltype(auto) visit_implementation(
 ) requires(sizeof...(indexes) < sizeof...(variants)) {
 	auto found = [&]() -> decltype(auto) {
 		return ::bounded::detail::visit_implementation(
-			BOUNDED_FORWARD(function),
+			OPERATORS_FORWARD(function),
 			std::index_sequence<indexes..., static_cast<std::size_t>(possible_index)>{},
 			0_bi,
-			BOUNDED_FORWARD(variants)...
+			OPERATORS_FORWARD(variants)...
 		);
 	};
 	auto const search_index = variant.index();
@@ -151,11 +151,11 @@ constexpr decltype(auto) visit_implementation(
 		return found();
 	} else {
 		return ::bounded::detail::visit_implementation(
-			BOUNDED_FORWARD(function),
+			OPERATORS_FORWARD(function),
 			initial_indexes,
 			possible_index + 1_bi,
 			variant,
-			BOUNDED_FORWARD(variants)...
+			OPERATORS_FORWARD(variants)...
 		);
 	}
 }
@@ -163,11 +163,11 @@ constexpr decltype(auto) visit_implementation(
 inline constexpr auto visit_interface = [](auto transform) {
 	return [=](auto && function, auto && ... variants) {
 		return ::bounded::detail::visit_implementation(
-			transform(BOUNDED_FORWARD(function)),
+			transform(OPERATORS_FORWARD(function)),
 			std::index_sequence<>{},
 			0_bi,
 			variants...,
-			BOUNDED_FORWARD(variants)...
+			OPERATORS_FORWARD(variants)...
 		);
 	};
 };
@@ -177,13 +177,13 @@ inline constexpr auto visit_interface = [](auto transform) {
 inline constexpr struct visit_with_index_t {
 private:
 	static inline constexpr auto identity = [](auto && function) -> decltype(auto) {
-		return BOUNDED_FORWARD(function);
+		return OPERATORS_FORWARD(function);
 	};
 public:
 	// Any number of variants (including 0) followed by one function
 	template<typename... Args> requires detail::is_variants_then_visit_function<sizeof...(Args) - 1U, decltype(identity), Args...>
 	constexpr decltype(auto) operator()(Args && ... args) const {
-		return detail::reorder_transform(detail::visit_interface(identity), BOUNDED_FORWARD(args)...);
+		return detail::reorder_transform(detail::visit_interface(identity), OPERATORS_FORWARD(args)...);
 	}
 } visit_with_index;
 
@@ -200,17 +200,17 @@ private:
 		// TODO: use terse syntax when it does not crash clang
 		template<typename... Args>
 		constexpr auto operator()(Args && ... args) && OPERATORS_RETURNS(
-			BOUNDED_FORWARD(function)(BOUNDED_FORWARD(args).value...)
+			OPERATORS_FORWARD(function)(OPERATORS_FORWARD(args).value...)
 		)
 	};
 
 	static inline constexpr auto get_value_only = [](auto && function) {
-		return unwrap_visitor_parameter<decltype(function)>{BOUNDED_FORWARD(function)};
+		return unwrap_visitor_parameter<decltype(function)>{OPERATORS_FORWARD(function)};
 	};
 public:
 	template<typename... Args> requires detail::is_variants_then_visit_function<sizeof...(Args) - 1U, decltype(get_value_only), Args...>
 	constexpr decltype(auto) operator()(Args && ... args) const {
-		return detail::reorder_transform(detail::visit_interface(get_value_only), BOUNDED_FORWARD(args)...);
+		return detail::reorder_transform(detail::visit_interface(get_value_only), OPERATORS_FORWARD(args)...);
 	}
 } visit;
 

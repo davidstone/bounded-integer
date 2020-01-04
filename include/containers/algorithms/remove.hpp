@@ -29,7 +29,7 @@ constexpr auto remove_if(ForwardIterator const first, sentinel_for<ForwardIterat
 }
 
 constexpr auto remove_if(range auto & source, auto predicate) {
-	return ::containers::remove_if(begin(source), end(source), BOUNDED_FORWARD(predicate));
+	return ::containers::remove_if(begin(source), end(source), OPERATORS_FORWARD(predicate));
 }
 
 

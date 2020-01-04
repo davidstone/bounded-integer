@@ -5,7 +5,7 @@
 
 #pragma once
 
-#include <bounded/forward.hpp>
+#include <operators/forward.hpp>
 #include <bounded/is_constructible.hpp>
 #include <bounded/lazy_init.hpp>
 
@@ -25,12 +25,12 @@ template<typename T>
 struct construct_return_t {
 	template<typename... Args> requires is_constructible<T, Args...>
 	constexpr auto operator()(Args && ... args) const {
-		return T(BOUNDED_FORWARD(args)...);
+		return T(OPERATORS_FORWARD(args)...);
 	}
 	
-	template<typename... Args> requires(!is_constructible<T, Args...> and requires (Args && ... args) { T{BOUNDED_FORWARD(args)...}; })
+	template<typename... Args> requires(!is_constructible<T, Args...> and requires (Args && ... args) { T{OPERATORS_FORWARD(args)...}; })
 	constexpr auto operator()(Args && ... args) const {
-		return T{BOUNDED_FORWARD(args)...};
+		return T{OPERATORS_FORWARD(args)...};
 	}
 };
 
@@ -44,15 +44,15 @@ struct construct_t {
 	template<typename T, typename Function>
 	constexpr auto & operator()(lazy_init_t, T & ref, Function && function) const requires construct_function_for<Function, T> {
 		if constexpr (detail::constexpr_constructible<T>) {
-			return ref = BOUNDED_FORWARD(function)();
+			return ref = OPERATORS_FORWARD(function)();
 		} else {
-			return *::new(static_cast<void *>(std::addressof(ref))) T(BOUNDED_FORWARD(function)());
+			return *::new(static_cast<void *>(std::addressof(ref))) T(OPERATORS_FORWARD(function)());
 		}
 	}
 
-	template<typename T, typename... Args> requires(requires (Args && ... args) { construct_return<T>(BOUNDED_FORWARD(args)...); })
+	template<typename T, typename... Args> requires(requires (Args && ... args) { construct_return<T>(OPERATORS_FORWARD(args)...); })
 	constexpr auto & operator()(T & ref, Args && ... args) const {
-		return operator()(lazy_init, ref, [&]{ return construct_return<T>(BOUNDED_FORWARD(args)...); });
+		return operator()(lazy_init, ref, [&]{ return construct_return<T>(OPERATORS_FORWARD(args)...); });
 	}
 } inline constexpr construct;
 

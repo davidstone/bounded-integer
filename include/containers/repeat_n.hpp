@@ -9,7 +9,7 @@
 #include <containers/reference_wrapper.hpp>
 
 #include <bounded/detail/construct_destroy.hpp>
-#include <bounded/forward.hpp>
+#include <operators/forward.hpp>
 #include <bounded/integer.hpp>
 #include <bounded/unreachable.hpp>
 #include <bounded/value_to_function.hpp>
@@ -113,7 +113,7 @@ public:
 	template<typename U>	
 	constexpr repeat_n(size_type const size, U && value):
 		m_size(size),
-		m_value(BOUNDED_FORWARD(value))
+		m_value(OPERATORS_FORWARD(value))
 	{
 	}
 

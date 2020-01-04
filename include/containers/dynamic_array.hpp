@@ -16,7 +16,7 @@
 #include <containers/repeat_n.hpp>
 #include <containers/uninitialized_storage.hpp>
 
-#include <bounded/forward.hpp>
+#include <operators/forward.hpp>
 
 #include <operators/bracket.hpp>
 
@@ -86,8 +86,8 @@ auto dynamic_array_initializer(range auto && init) {
 	auto const data = make_storage<T>(::containers::detail::linear_size(init));
 	try {
 		containers::uninitialized_copy(
-			begin(BOUNDED_FORWARD(init)),
-			end(BOUNDED_FORWARD(init)),
+			begin(OPERATORS_FORWARD(init)),
+			end(OPERATORS_FORWARD(init)),
 			begin(data)
 		);
 	} catch(...) {
@@ -112,7 +112,7 @@ struct dynamic_array {
 
 	template<range Range> requires(!std::is_array_v<std::remove_cv_t<std::remove_reference_t<Range>>>)
 	constexpr explicit dynamic_array(Range && range):
-		m_data(::containers::detail::dynamic_array_initializer<value_type>(BOUNDED_FORWARD(range)))
+		m_data(::containers::detail::dynamic_array_initializer<value_type>(OPERATORS_FORWARD(range)))
 	{
 	}
 
@@ -188,10 +188,10 @@ template<typename T, range Range> requires(!detail::is_initializer_list<std::dec
 auto assign(dynamic_array<T> & container, Range && range) {
 	auto const difference = detail::linear_size(range);
 	if (difference == size(container)) {
-		::containers::copy(begin(BOUNDED_FORWARD(range)), end(BOUNDED_FORWARD(range)), begin(container));
+		::containers::copy(begin(OPERATORS_FORWARD(range)), end(OPERATORS_FORWARD(range)), begin(container));
 	} else {
 		clear(container);
-		container = dynamic_array<T>(BOUNDED_FORWARD(range));
+		container = dynamic_array<T>(OPERATORS_FORWARD(range));
 	}
 }
 

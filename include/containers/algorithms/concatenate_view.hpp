@@ -286,7 +286,7 @@ struct concatenate_view {
 	>;
 	
 	constexpr concatenate_view(Ranges && ... ranges):
-		m_ranges(BOUNDED_FORWARD(ranges)...)
+		m_ranges(OPERATORS_FORWARD(ranges)...)
 	{
 	}
 	

@@ -10,7 +10,7 @@
 #include <containers/empty.hpp>
 #include <containers/is_range.hpp>
 
-#include <bounded/forward.hpp>
+#include <operators/forward.hpp>
 #include <bounded/assert.hpp>
 #include <bounded/integer.hpp>
 
@@ -22,11 +22,11 @@ namespace common {
 
 constexpr decltype(auto) front(range auto && r) {
 	BOUNDED_ASSERT(!empty(r));
-	return *begin(BOUNDED_FORWARD(r));
+	return *begin(OPERATORS_FORWARD(r));
 }
 constexpr decltype(auto) back(range auto && r) {
 	BOUNDED_ASSERT(!empty(r));
-	return *containers::prev(end(BOUNDED_FORWARD(r)));
+	return *containers::prev(end(OPERATORS_FORWARD(r)));
 }
 
 }	// namespace common

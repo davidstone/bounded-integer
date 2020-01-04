@@ -43,8 +43,8 @@ struct static_vector_data {
 	static_vector_data & operator=(static_vector_data const &) & = default;
 
 	constexpr explicit static_vector_data(range auto && source) {
-		for (decltype(auto) value : BOUNDED_FORWARD(source)) {
-			::containers::emplace_back(*this, BOUNDED_FORWARD(value));
+		for (decltype(auto) value : OPERATORS_FORWARD(source)) {
+			::containers::emplace_back(*this, OPERATORS_FORWARD(value));
 		}
 	}
 	

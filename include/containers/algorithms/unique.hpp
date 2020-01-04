@@ -11,7 +11,7 @@
 #include <containers/dynamic_array.hpp>
 
 #include <bounded/assert.hpp>
-#include <bounded/forward.hpp>
+#include <operators/forward.hpp>
 
 #include <functional>
 #include <iterator>
@@ -30,7 +30,7 @@ constexpr auto unique_common(Iterator first, sentinel_for<Iterator> auto const l
 			continue;
 		}
 		++output;
-		*output = BOUNDED_FORWARD(first_ref);
+		*output = OPERATORS_FORWARD(first_ref);
 	}
 	return ::containers::next(output);
 }

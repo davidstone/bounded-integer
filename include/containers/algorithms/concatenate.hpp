@@ -10,7 +10,7 @@
 #include <containers/is_iterator.hpp>
 #include <containers/size.hpp>
 
-#include <bounded/forward.hpp>
+#include <operators/forward.hpp>
 #include <bounded/assert.hpp>
 #include <bounded/integer.hpp>
 #include <bounded/unreachable.hpp>
@@ -24,12 +24,12 @@ template<typename Result>
 constexpr auto concatenate_prepend_append(Result & result, typename Result::iterator const it, auto && range, auto && ... ranges) {
 	if constexpr (std::is_same_v<Result, std::remove_reference_t<decltype(range)>>) {
 		if (std::addressof(result) == std::addressof(range)) {
-			(..., append(result, BOUNDED_FORWARD(ranges)));
+			(..., append(result, OPERATORS_FORWARD(ranges)));
 			return;
 		}
 	}
-	auto const next_it = ::containers::uninitialized_copy(begin(BOUNDED_FORWARD(range)), end(BOUNDED_FORWARD(range)), it);
-	concatenate_prepend_append(result, next_it, BOUNDED_FORWARD(ranges)...);
+	auto const next_it = ::containers::uninitialized_copy(begin(OPERATORS_FORWARD(range)), end(OPERATORS_FORWARD(range)), it);
+	concatenate_prepend_append(result, next_it, OPERATORS_FORWARD(ranges)...);
 }
 
 template<typename Result>
@@ -81,20 +81,20 @@ constexpr auto concatenate(auto && ... ranges) {
 	using Integer = std::remove_const_t<decltype(total_size)>;
 
 	auto reusable = detail::reusable_concatenate_t<Result, Integer>{nullptr, 0_bi};
-	(..., (reusable = ::containers::detail::reusable_concatenate_container(reusable, total_size, BOUNDED_FORWARD(ranges))));
+	(..., (reusable = ::containers::detail::reusable_concatenate_container(reusable, total_size, OPERATORS_FORWARD(ranges))));
 	if (reusable.ptr) {
 		auto & ref = *reusable.ptr;
 		// Use data instead of begin to construct an iterator after `end()`.
 		auto const new_begin = data(ref) + reusable.before_size;
 		::containers::uninitialized_move_destroy(containers::reversed(ref), containers::reverse_iterator(new_begin + size(ref)));
 		ref.append_from_capacity(reusable.before_size);
-		::containers::detail::concatenate_prepend_append(ref, begin(ref), BOUNDED_FORWARD(ranges)...);
+		::containers::detail::concatenate_prepend_append(ref, begin(ref), OPERATORS_FORWARD(ranges)...);
 		return std::move(ref);
 	}
 
 	Result result;
 	result.reserve(static_cast<typename Result::size_type>(total_size));
-	(..., append(result, BOUNDED_FORWARD(ranges)));
+	(..., append(result, OPERATORS_FORWARD(ranges)));
 	return result;
 }
 

@@ -5,7 +5,7 @@
 
 #pragma once
 
-#include <bounded/forward.hpp>
+#include <operators/forward.hpp>
 
 #include <operators/returns.hpp>
 
@@ -33,7 +33,7 @@ struct reference_wrapper {
 	// TODO: Use terse syntax when clang does not crash
 	template<typename... Args>
 	constexpr auto operator()(Args && ... args) const OPERATORS_RETURNS(
-		get()(BOUNDED_FORWARD(args)...)
+		get()(OPERATORS_FORWARD(args)...)
 	)
 
 private:
@@ -61,7 +61,7 @@ constexpr auto && unwrap(reference_wrapper<T> reference) {
 }
 template<typename T>
 constexpr auto && unwrap(T && reference) {
-	return BOUNDED_FORWARD(reference);
+	return OPERATORS_FORWARD(reference);
 }
 
 }	// namespace containers

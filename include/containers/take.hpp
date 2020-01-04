@@ -8,7 +8,7 @@
 #include <containers/common_iterator_functions.hpp>
 #include <containers/range_view.hpp>
 
-#include <bounded/forward.hpp>
+#include <operators/forward.hpp>
 #include <bounded/integer.hpp>
 #include <bounded/unreachable.hpp>
 
@@ -119,8 +119,8 @@ template<bounded::bounded_integer Count>
 constexpr auto take(range auto && source, Count count_) {
 	auto const count = bounded::integer<0, bounded::detail::builtin_max_value<Count>, typename Count::overflow_policy>(count_);
 	return containers::range_view(
-		counted_iterator(begin(BOUNDED_FORWARD(source)), count),
-		counted_sentinel(end(BOUNDED_FORWARD(source)))
+		counted_iterator(begin(OPERATORS_FORWARD(source)), count),
+		counted_sentinel(end(OPERATORS_FORWARD(source)))
 	);
 }
 

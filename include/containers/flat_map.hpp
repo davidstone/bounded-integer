@@ -13,7 +13,7 @@
 #include <containers/legacy_iterator.hpp>
 #include <containers/vector.hpp>
 
-#include <bounded/forward.hpp>
+#include <operators/forward.hpp>
 #include <bounded/detail/tuple.hpp>
 #include <bounded/detail/type.hpp>
 #include <bounded/integer.hpp>
@@ -36,7 +36,7 @@ public:
 
 	template<typename... Args> requires bounded::is_constructible<bounded::tuple<key_type, mapped_type>, Args...>
 	constexpr map_value_type(Args && ... args):
-		m_data(BOUNDED_FORWARD(args)...)
+		m_data(OPERATORS_FORWARD(args)...)
 	{
 	}
 	
@@ -145,14 +145,14 @@ public:
 
 	template<range InputRange>
 	constexpr explicit flat_map_base(InputRange && range):
-		m_container(BOUNDED_FORWARD(range))
+		m_container(OPERATORS_FORWARD(range))
 	{
 		unique_ska_sort(m_container, extract_key());
 	}
 
 	template<range InputRange>
 	constexpr flat_map_base(InputRange && range, ExtractKey extract_key):
-		m_container(BOUNDED_FORWARD(range)),
+		m_container(OPERATORS_FORWARD(range)),
 		m_extract_key(std::move(extract_key))
 	{
 		unique_ska_sort(m_container, extract_key());
@@ -160,14 +160,14 @@ public:
 
 	template<range InputRange>
 	constexpr flat_map_base(assume_sorted_unique_t, InputRange && range):
-		m_container(BOUNDED_FORWARD(range))
+		m_container(OPERATORS_FORWARD(range))
 	{
 		BOUNDED_ASSERT(is_sorted(m_container, compare()));
 	}
 
 	template<range InputRange>
 	constexpr flat_map_base(assume_sorted_unique_t, InputRange && range, ExtractKey extract_key):
-		m_container(BOUNDED_FORWARD(range)),
+		m_container(OPERATORS_FORWARD(range)),
 		m_extract_key(std::move(extract_key))
 	{
 		BOUNDED_ASSERT(is_sorted(m_container, compare()));
@@ -175,14 +175,14 @@ public:
 
 	template<range InputRange>
 	constexpr flat_map_base(assume_unique_t, InputRange && range):
-		m_container(BOUNDED_FORWARD(range))
+		m_container(OPERATORS_FORWARD(range))
 	{
 		ska_sort(m_container, extract_key());
 	}
 
 	template<range InputRange>
 	constexpr flat_map_base(assume_unique_t, InputRange && range, ExtractKey extract_key):
-		m_container(BOUNDED_FORWARD(range)),
+		m_container(OPERATORS_FORWARD(range)),
 		m_extract_key(std::move(extract_key))
 	{
 		ska_sort(m_container, extract_key());
@@ -260,28 +260,28 @@ public:
 	constexpr auto lower_bound(auto && key) const {
 		return containers::lower_bound(
 			*this,
-			BOUNDED_FORWARD(key),
+			OPERATORS_FORWARD(key),
 			compare()
 		);
 	}
 	constexpr auto lower_bound(auto && key) {
 		return containers::lower_bound(
 			*this,
-			BOUNDED_FORWARD(key),
+			OPERATORS_FORWARD(key),
 			compare()
 		);
 	}
 	constexpr auto upper_bound(auto && key) const {
 		return containers::upper_bound(
 			*this,
-			BOUNDED_FORWARD(key),
+			OPERATORS_FORWARD(key),
 			compare()
 		);
 	}
 	constexpr auto upper_bound(auto && key) {
 		return containers::upper_bound(
 			*this,
-			BOUNDED_FORWARD(key),
+			OPERATORS_FORWARD(key),
 			compare()
 		);
 	}
@@ -300,11 +300,11 @@ public:
 	// to say, linear. An insertion implies shifting all of the elements.
 	constexpr auto try_emplace(auto && key, auto && ... mapped_args) {
 		auto const position = upper_bound(key);
-		return try_emplace_at(position, BOUNDED_FORWARD(key), BOUNDED_FORWARD(mapped_args)...);
+		return try_emplace_at(position, OPERATORS_FORWARD(key), OPERATORS_FORWARD(mapped_args)...);
 	}
 	constexpr auto try_emplace_hint(const_iterator hint, auto && key, auto && ... mapped_args) {
 		auto impl = [&](const_iterator position){
-			return try_emplace_at(position, BOUNDED_FORWARD(key), BOUNDED_FORWARD(mapped_args)...);
+			return try_emplace_at(position, OPERATORS_FORWARD(key), OPERATORS_FORWARD(mapped_args)...);
 		};
 		auto const correct_next = hint == end(*this) or compare()(key, *hint);
 		if (!correct_next) {
@@ -338,7 +338,7 @@ public:
 		// merge sort on both ranges, rather than calling std::sort on the
 		// entire container.
 		auto const original_size = size(m_container);
-		append(m_container, BOUNDED_FORWARD(init));
+		append(m_container, OPERATORS_FORWARD(init));
 		auto const midpoint = begin(m_container) + original_size;
 
 		ska_sort(midpoint, end(m_container), extract_key());
@@ -383,8 +383,8 @@ private:
 				m_container,
 				position,
 				bounded::lazy_init,
-				[&]{ return key_type(BOUNDED_FORWARD(key)); },
-				[&]{ return mapped_type(BOUNDED_FORWARD(mapped_args)...); }
+				[&]{ return key_type(OPERATORS_FORWARD(key)); },
+				[&]{ return mapped_type(OPERATORS_FORWARD(mapped_args)...); }
 			);
 		};
 		if constexpr (allow_duplicates) {
@@ -451,36 +451,36 @@ public:
 	using base::erase;
 
 	constexpr auto const & at(auto && key) const {
-		auto const it = find(BOUNDED_FORWARD(key));
+		auto const it = find(OPERATORS_FORWARD(key));
 		if (it == end(*this)) {
 			throw std::out_of_range{"Key not found"};
 		}
 		return it->mapped();
 	}
 	constexpr auto & at(auto && key) {
-		auto const it = this->find(BOUNDED_FORWARD(key));
+		auto const it = this->find(OPERATORS_FORWARD(key));
 		if (it == end(*this)) {
 			throw std::out_of_range{"Key not found"};
 		}
 		return it->mapped();
 	}
 	constexpr auto & operator[](auto && key) {
-		return this->try_emplace(BOUNDED_FORWARD(key)).first->mapped();
+		return this->try_emplace(OPERATORS_FORWARD(key)).first->mapped();
 	}
 
 	constexpr auto equal_range(auto && key) const {
-		auto const it = find(BOUNDED_FORWARD(key));
+		auto const it = find(OPERATORS_FORWARD(key));
 		bool const found = it != end(*this);
 		return std::make_pair(it, found ? ::containers::next(it) : it);
 	}
 
 	constexpr size_type count(auto && key) const {
-		bool const found = this->find(BOUNDED_FORWARD(key)) != end(*this);
+		bool const found = this->find(OPERATORS_FORWARD(key)) != end(*this);
 		return found ? 1 : 0;
 	}
 
 	constexpr size_type erase(auto && key) {
-		auto const it = this->find(BOUNDED_FORWARD(key));
+		auto const it = this->find(OPERATORS_FORWARD(key));
 		if (it == end(*this)) {
 			return 0;
 		}
@@ -541,19 +541,19 @@ public:
 	// are unique, so I have slightly different versions in flat_map.
 
 	constexpr auto equal_range(auto && key) const {
-		return std::equal_range(begin(*this), end(*this), BOUNDED_FORWARD(key), compare());
+		return std::equal_range(begin(*this), end(*this), OPERATORS_FORWARD(key), compare());
 	}
 	constexpr auto equal_range(auto && key) {
-		return std::equal_range(begin(*this), end(*this), BOUNDED_FORWARD(key), compare);
+		return std::equal_range(begin(*this), end(*this), OPERATORS_FORWARD(key), compare);
 	}
 
 	constexpr auto count(auto && key) const {
-		auto const range = this->equal_range(BOUNDED_FORWARD(key));
+		auto const range = this->equal_range(OPERATORS_FORWARD(key));
 		return static_cast<size_type>(std::distance(range.first, range.second));
 	}
 	
 	constexpr size_type erase(auto && key) {
-		auto const range = this->equal_range(BOUNDED_FORWARD(key));
+		auto const range = this->equal_range(OPERATORS_FORWARD(key));
 		if (range.first == end(*this)) {
 			return 0;
 		}

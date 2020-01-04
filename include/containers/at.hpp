@@ -9,7 +9,7 @@
 #include <containers/is_range.hpp>
 #include <containers/size.hpp>
 
-#include <bounded/forward.hpp>
+#include <operators/forward.hpp>
 #include <bounded/integer.hpp>
 
 #include <utility>
@@ -22,7 +22,7 @@ namespace detail {
 namespace common {
 
 constexpr decltype(auto) at(range auto && r, auto const index) {
-	return BOUNDED_FORWARD(r)[typename index_type<decltype(r)>::overflow_policy{}.assignment(
+	return OPERATORS_FORWARD(r)[typename index_type<decltype(r)>::overflow_policy{}.assignment(
 		bounded::integer(index),
 		0_bi,
 		size(r) - 1_bi
@@ -30,7 +30,7 @@ constexpr decltype(auto) at(range auto && r, auto const index) {
 }
 
 constexpr decltype(auto) at(range auto && r, auto const index, bounded::non_check_t) {
-	return BOUNDED_FORWARD(r)[static_cast<index_type<decltype(r)>>(index)];
+	return OPERATORS_FORWARD(r)[static_cast<index_type<decltype(r)>>(index)];
 }
 
 

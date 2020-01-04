@@ -8,7 +8,7 @@
 #include <containers/algorithms/advance.hpp>
 #include <containers/reference_wrapper.hpp>
 
-#include <bounded/forward.hpp>
+#include <operators/forward.hpp>
 #include <bounded/is_constructible.hpp>
 
 #include <iterator>
@@ -130,16 +130,16 @@ struct set_intersection_pair {
 
 	template<typename R1, typename R2>
 	constexpr set_intersection_pair(R1 && range1, R2 && range2, Compare compare):
-		m_range1(BOUNDED_FORWARD(range1)),
-		m_range2(BOUNDED_FORWARD(range2)),
+		m_range1(OPERATORS_FORWARD(range1)),
+		m_range2(OPERATORS_FORWARD(range2)),
 		m_compare(std::move(compare))
 	{
 	}
 	
 	template<typename R1, typename R2>
 	constexpr set_intersection_pair(R1 && range1, R2 && range2):
-		m_range1(BOUNDED_FORWARD(range1)),
-		m_range2(BOUNDED_FORWARD(range2))
+		m_range1(OPERATORS_FORWARD(range1)),
+		m_range2(OPERATORS_FORWARD(range2))
 	{
 	}
 	

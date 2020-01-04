@@ -7,7 +7,7 @@
 
 #include <bounded/detail/class.hpp>
 #include <bounded/detail/comparison.hpp>
-#include <bounded/forward.hpp>
+#include <operators/forward.hpp>
 #include <bounded/detail/is_bounded_integer.hpp>
 #include <bounded/detail/make_index_sequence.hpp>
 #include <bounded/detail/type.hpp>
@@ -34,7 +34,7 @@ struct tuple_value {
 	// TODO: convertible
 	template<typename Arg> requires is_constructible<T, Arg>
 	constexpr explicit tuple_value(Arg && arg):
-		m_value(BOUNDED_FORWARD(arg))
+		m_value(OPERATORS_FORWARD(arg))
 	{
 	}
 
@@ -102,7 +102,7 @@ struct tuple_impl<std::index_sequence<indexes...>, Types...> : tuple_value<index
 
 	template<typename... Args> requires(... and std::is_convertible_v<Args, Types>)
 	constexpr tuple_impl(Args && ... args):
-		tuple_value<indexes, Types>(BOUNDED_FORWARD(args))...
+		tuple_value<indexes, Types>(OPERATORS_FORWARD(args))...
 	{
 	}
 
@@ -195,11 +195,11 @@ constexpr auto operator==(tuple<lhs_types...> const & lhs, tuple<rhs_types...> c
 
 // TODO: unwrap reference_wrapper?
 constexpr auto make_tuple = [](auto && ... args) {
-	return tuple<std::decay_t<decltype(args)>...>(BOUNDED_FORWARD(args)...);
+	return tuple<std::decay_t<decltype(args)>...>(OPERATORS_FORWARD(args)...);
 };
 
 constexpr auto tie = [](auto && ... args) {
-	return tuple<decltype(args)...>(BOUNDED_FORWARD(args)...);
+	return tuple<decltype(args)...>(OPERATORS_FORWARD(args)...);
 };
 
 template<typename Tuple>
@@ -248,10 +248,10 @@ private:
 				tuple_element<first_indexes, First>...,
 				tuple_element<second_indexes, Second>...
 			>(
-				BOUNDED_FORWARD(first).tuple[constant<first_indexes>]...,
-				BOUNDED_FORWARD(second).tuple[constant<second_indexes>]...
+				OPERATORS_FORWARD(first).tuple[constant<first_indexes>]...,
+				OPERATORS_FORWARD(second).tuple[constant<second_indexes>]...
 			),
-			BOUNDED_FORWARD(tail).tuple...
+			OPERATORS_FORWARD(tail).tuple...
 		);
 	}
 
@@ -261,9 +261,9 @@ public:
 		if constexpr (sizeof...(tuples) == 0) {
 			return tuple<>{};
 		} else if constexpr (sizeof...(tuples) == 1) {
-			return (..., BOUNDED_FORWARD(tuples));
+			return (..., OPERATORS_FORWARD(tuples));
 		} else {
-			return cat_impl(indexed_tuple{BOUNDED_FORWARD(tuples)}...);
+			return cat_impl(indexed_tuple{OPERATORS_FORWARD(tuples)}...);
 		}
 	}
 } tuple_cat;
@@ -273,14 +273,14 @@ inline constexpr struct apply_t {
 private:
 	template<std::size_t... indexes>
 	static constexpr decltype(auto) implementation(auto && tuple_args, std::index_sequence<indexes...>, auto && function) {
-		return BOUNDED_FORWARD(function)(BOUNDED_FORWARD(tuple_args)[constant<indexes>]...);
+		return OPERATORS_FORWARD(function)(OPERATORS_FORWARD(tuple_args)[constant<indexes>]...);
 	}
 public:
 	constexpr decltype(auto) operator()(auto && tuple_args, auto && function) const {
 		return implementation(
-			BOUNDED_FORWARD(tuple_args),
+			OPERATORS_FORWARD(tuple_args),
 			bounded::make_index_sequence(tuple_size<decltype(tuple_args)>),
-			BOUNDED_FORWARD(function)
+			OPERATORS_FORWARD(function)
 		);
 	}
 } apply;
@@ -300,8 +300,8 @@ constexpr auto transform_impl(constant_t<i> index, auto && function, auto && ...
 		return tuple<>{};
 	} else {
 		return tuple_cat(
-			tuple<decltype(function(BOUNDED_FORWARD(tuples)[index]...))>(function(BOUNDED_FORWARD(tuples)[index]...)),
-			detail::transform_impl(index + constant<1>, function, BOUNDED_FORWARD(tuples)...)
+			tuple<decltype(function(OPERATORS_FORWARD(tuples)[index]...))>(function(OPERATORS_FORWARD(tuples)[index]...)),
+			detail::transform_impl(index + constant<1>, function, OPERATORS_FORWARD(tuples)...)
 		);
 	}
 }
@@ -309,13 +309,13 @@ constexpr auto transform_impl(constant_t<i> index, auto && function, auto && ...
 }	// namespace detail
 
 constexpr auto transform(auto && function, tuple_like auto && ... tuples) {
-	return detail::transform_impl(constant<0>, function, BOUNDED_FORWARD(tuples)...);
+	return detail::transform_impl(constant<0>, function, OPERATORS_FORWARD(tuples)...);
 }
 
 
 template<std::size_t index>
 constexpr auto && get(tuple_like auto && t) {
-	return BOUNDED_FORWARD(t)[constant<index>];
+	return OPERATORS_FORWARD(t)[constant<index>];
 }
 
 }	// namespace bounded
