@@ -100,8 +100,7 @@ struct tuple_impl<std::index_sequence<indexes...>, Types...> : tuple_value<index
 
 	tuple_impl() = default;
 
-	template<typename... Args> requires(... and std::is_convertible_v<Args, Types>)
-	constexpr tuple_impl(Args && ... args):
+	constexpr tuple_impl(convertible_to<Types> auto && ... args):
 		tuple_value<indexes, Types>(OPERATORS_FORWARD(args))...
 	{
 	}

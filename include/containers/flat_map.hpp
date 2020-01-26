@@ -26,51 +26,60 @@ namespace containers {
 
 template<typename Key, typename Mapped>
 struct map_value_type {
-//private:
-	// Treat this as private. Public until we have C++20 `<=>` and `==`.
-	bounded::tuple<Key, Mapped> m_data;
-
-public:
 	using key_type = Key;
 	using mapped_type = Mapped;
 
-	template<typename... Args> requires bounded::is_constructible<bounded::tuple<key_type, mapped_type>, Args...>
-	constexpr map_value_type(Args && ... args):
-		m_data(OPERATORS_FORWARD(args)...)
+	constexpr map_value_type(Key key_, Mapped mapped_):
+		m_key(std::move(key_)),
+		m_mapped(std::move(mapped_))
+	{
+	}
+	constexpr map_value_type(
+		bounded::lazy_init_t,
+		bounded::construct_function_for<Key> auto && key_,
+		bounded::construct_function_for<Mapped> auto && mapped_
+	):
+		m_key(OPERATORS_FORWARD(key_)()),
+		m_mapped(OPERATORS_FORWARD(mapped_)())
 	{
 	}
 	
 	constexpr auto && key() const & {
-		return m_data[0_bi];
+		return m_key;
 	}
 	constexpr auto && key() & {
-		return m_data[0_bi];
+		return m_key;
 	}
 	constexpr auto && key() && {
-		return std::move(m_data)[0_bi];
+		return std::move(m_key);
 	}
 	constexpr auto && mapped() const & {
-		return m_data[1_bi];
+		return m_mapped;
 	}
 	constexpr auto && mapped() & {
-		return m_data[1_bi];
+		return m_mapped;
 	}
 	constexpr auto && mapped() && {
-		return std::move(m_data)[1_bi];
+		return std::move(m_mapped);
 	}
 
+	// These functions just become defaulted <=> and == in C++20.
+	friend constexpr auto operator<=>(map_value_type const & lhs, map_value_type const & rhs) {
+		return tie(lhs) <=> tie(rhs);
+	}
+
+	friend constexpr auto operator==(map_value_type const & lhs, map_value_type const & rhs) {
+		return tie(lhs) == tie(rhs);
+	}
+
+private:
+	static constexpr auto tie(map_value_type const & value) {
+		return bounded::tie(value.m_key, value.m_mapped);
+	}
+
+	[[no_unique_address]] Key m_key;
+	[[no_unique_address]] Mapped m_mapped;
 };
-
-// These functions just become defaulted <=> and == in C++20.
-template<typename Key, typename Mapped>
-constexpr auto operator<=>(map_value_type<Key, Mapped> const & lhs, map_value_type<Key, Mapped> const & rhs) {
-	return lhs.m_data <=> rhs.m_data;
-}
-
-template<typename Key, typename Mapped>
-constexpr auto operator==(map_value_type<Key, Mapped> const & lhs, map_value_type<Key, Mapped> const & rhs) {
-	return lhs.m_data == rhs.m_data;
-}
 
 constexpr inline struct assume_sorted_unique_t {} assume_sorted_unique;
 constexpr inline struct assume_unique_t {} assume_unique;

@@ -15,7 +15,7 @@ using namespace bounded::literal;
 template<typename LHS, typename RHS>
 constexpr bool equal_values_and_types(LHS const & lhs, RHS const & rhs) {
 	static_assert(std::is_same_v<typename LHS::value_type, typename RHS::value_type>);
-	return containers::equal(begin(lhs), end(lhs), begin(rhs), end(rhs));
+	return containers::equal(lhs, rhs);
 }
 
 constexpr auto array1 = containers::array{1, 2, 3};

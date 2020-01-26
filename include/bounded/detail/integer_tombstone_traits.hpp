@@ -27,7 +27,8 @@ public:
 		spare_below + spare_above
 	);
 
-	static constexpr auto make(auto const index) noexcept requires (index < spare_representations) {
+	template<typename Index> requires(Index() < spare_representations)
+	static constexpr auto make(Index const index) noexcept {
 		auto const value = BOUNDED_CONDITIONAL(index < spare_below,
 			index + underlying_min,
 			index - spare_below + max_value<T> + constant<1>

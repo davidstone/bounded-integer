@@ -49,7 +49,7 @@ constexpr auto lexicographical_compare_3way(Range1 const & range1, Range2 const 
 
 
 template<iterator InputIterator1, iterator InputIterator2>
-constexpr auto lexicographical_compare_3way(InputIterator1 first1, sentinel_for<InputIterator1> auto const last1, InputIterator2 first2, auto cmp) {
+constexpr auto lexicographical_compare_3way(InputIterator1 first1, sentinel_for<InputIterator1> auto const last1, InputIterator2 first2, auto cmp) requires(!sentinel_for<decltype(cmp), InputIterator2>) {
 	for (; first1 != last1; ++first1, ++first2) {
 		if (auto const result = cmp(*first1, *first2); result != 0) {
 			return result;
@@ -94,7 +94,7 @@ constexpr auto equal(Range1 const & range1, Range2 const & range2) {
 
 
 template<iterator InputIterator1, iterator InputIterator2>
-constexpr auto equal(InputIterator1 first1, sentinel_for<InputIterator1> auto const last1, InputIterator2 first2, auto cmp) {
+constexpr auto equal(InputIterator1 first1, sentinel_for<InputIterator1> auto const last1, InputIterator2 first2, auto cmp) requires(!sentinel_for<decltype(cmp), InputIterator2>) {
 	for (; first1 != last1; ++first1, ++first2) {
 		if (!cmp(*first1, *first2)) {
 			return false;

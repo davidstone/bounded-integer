@@ -26,6 +26,29 @@
 #include <utility>
 
 namespace bounded {
+namespace detail {
+
+template<typename T>
+concept copy_constructible = std::is_copy_constructible_v<T>;
+template<typename T>
+concept trivially_copy_constructible = copy_constructible<T> and std::is_trivially_copy_constructible_v<T>;
+
+template<typename T>
+concept move_constructible = std::is_move_constructible_v<T>;
+template<typename T>
+concept trivially_move_constructible = move_constructible<T> and std::is_trivially_move_constructible_v<T>;
+
+template<typename T>
+concept variant_copy_assignable = copy_constructible<T> and std::is_copy_assignable_v<T>;
+template<typename T>
+concept variant_trivially_copy_assignable = variant_copy_assignable<T> and trivially_copy_constructible<T> and std::is_trivially_copy_assignable_v<T>;
+
+template<typename T>
+concept variant_move_assignable = move_constructible<T> and std::is_move_assignable_v<T>;
+template<typename T>
+concept variant_trivially_move_assignable = variant_move_assignable<T> and trivially_move_constructible<T> and std::is_trivially_move_assignable_v<T>;
+
+} // namespace detail
 
 template<typename Function, typename... Ts>
 concept unique_construct_function = matches_exactly_one_type<std::invoke_result_t<Function>, detail::types<Ts>...>;
@@ -33,16 +56,6 @@ concept unique_construct_function = matches_exactly_one_type<std::invoke_result_
 template<typename GetFunction, typename... Ts>
 struct basic_variant : private detail::variant_destructor<GetFunction, Ts...> {
 private:
-	static inline constexpr bool has_trivial_copy_assignment =
-		(... and std::is_trivially_copy_assignable_v<Ts>) and
-		(... and std::is_trivially_copy_constructible_v<Ts>) and
-		(... and std::is_trivially_destructible_v<Ts>);
-
-	static inline constexpr bool has_trivial_move_assignment =
-		(... and std::is_trivially_move_assignable_v<Ts>) and
-		(... and std::is_trivially_move_constructible_v<Ts>) and
-		(... and std::is_trivially_destructible_v<Ts>);
-
 	template<typename Index>
 	using type_at = typename decltype(detail::get_type(Index(), detail::types<Ts>()...))::type;
 
@@ -57,8 +70,8 @@ public:
 	static_assert(std::is_trivially_move_assignable_v<GetFunction>);
 	static_assert(std::is_trivially_destructible_v<GetFunction>);
 
-	template<typename F, typename Index, typename Construct> requires(std::is_convertible_v<F, GetFunction> and construct_function_for<Construct, type_at<Index>>)
-	constexpr basic_variant(lazy_init_t, F && function, Index index_, Construct && construct_):
+	template<typename Index, typename Construct> requires(construct_function_for<Construct, type_at<Index>>)
+	constexpr basic_variant(lazy_init_t, convertible_to<GetFunction> auto && function, Index index_, Construct && construct_):
 		m_function(OPERATORS_FORWARD(function)),
 		m_data(detail::get_index(index_, detail::types<Ts>()...), OPERATORS_FORWARD(construct_))
 	{
@@ -72,8 +85,8 @@ public:
 		);
 	}
 
-	template<typename F, typename Index, typename T> requires(std::is_convertible_v<F, GetFunction> and std::is_convertible_v<T, type_at<Index>>)
-	constexpr basic_variant(F && function, Index index_, T && value):
+	template<typename Index>
+	constexpr basic_variant(convertible_to<GetFunction> auto && function, Index index_, convertible_to<type_at<Index>> auto && value):
 		basic_variant(
 			lazy_init,
 			OPERATORS_FORWARD(function),
@@ -94,8 +107,8 @@ public:
 	{
 	}
 	
-	template<typename Index, typename T> requires(std::is_convertible_v<T, type_at<Index>>)
-	constexpr basic_variant(Index index_, T && value):
+	template<typename Index>
+	constexpr basic_variant(Index index_, convertible_to<type_at<Index>> auto && value):
 		basic_variant(
 			lazy_init,
 			index_,
@@ -124,57 +137,42 @@ public:
 	}
 	
 
-	constexpr basic_variant(basic_variant const &) requires(... and std::is_trivially_copy_constructible_v<Ts>) = default;
+	constexpr basic_variant(basic_variant const &) requires (... and detail::trivially_copy_constructible<Ts>) = default;
 
 	constexpr basic_variant(basic_variant const & other) noexcept(
 		(... and std::is_nothrow_copy_constructible_v<Ts>)
-	) requires(
-		(... and std::is_copy_constructible_v<Ts>) and
-		!(... and std::is_trivially_copy_constructible_v<Ts>)
-	):
+	) requires((... and detail::copy_constructible<Ts>) and !(... and detail::trivially_copy_constructible<Ts>)):
 		basic_variant(other, copy_move_tag{})
 	{
 	}
 
 
-	constexpr basic_variant(basic_variant &&) requires(... and std::is_trivially_move_constructible_v<Ts>) = default;
+	constexpr basic_variant(basic_variant &&) requires(... and detail::trivially_move_constructible<Ts>) = default;
 
 	constexpr basic_variant(basic_variant && other) noexcept(
 		(... and std::is_nothrow_move_constructible_v<Ts>)
-	) requires(
-		(... and std::is_move_constructible_v<Ts>) and
-		!(... and std::is_trivially_move_constructible_v<Ts>)
-	):
+	) requires((... and detail::move_constructible<Ts>) and !(... and detail::trivially_move_constructible<Ts>)):
 		basic_variant(std::move(other), copy_move_tag{})
 	{
 	}
 
-
-	constexpr auto operator=(basic_variant const &) & -> basic_variant & requires has_trivial_copy_assignment = default;
+	constexpr auto operator=(basic_variant const &) & -> basic_variant & requires(... and detail::variant_trivially_copy_assignable<Ts>) = default;
 
 	constexpr auto operator=(basic_variant const & other) & noexcept(
 		(... and std::is_nothrow_copy_assignable_v<Ts>) and
 		(... and std::is_nothrow_copy_constructible_v<Ts>)
-	) -> basic_variant & requires(
-		(... and std::is_copy_assignable_v<Ts>) and
-		(... and std::is_copy_constructible_v<Ts>) and
-		!has_trivial_copy_assignment
-	) {
+	) -> basic_variant & requires((... and detail::variant_copy_assignable<Ts>) and !(... and detail::variant_trivially_copy_assignable<Ts>)) {
 		assign(other);
 		return *this;
 	}
 
 
-	constexpr auto operator=(basic_variant &&) & -> basic_variant & requires has_trivial_move_assignment = default;
+	constexpr auto operator=(basic_variant &&) & -> basic_variant & requires(... and detail::variant_trivially_move_assignable<Ts>) = default;
 
 	constexpr auto operator=(basic_variant && other) & noexcept(
 		(... and std::is_nothrow_move_assignable_v<Ts>) and
 		(... and std::is_nothrow_move_constructible_v<Ts>)
-	) -> basic_variant & requires(
-		(... and std::is_move_assignable_v<Ts>) and
-		(... and std::is_move_constructible_v<Ts>) and
-		!has_trivial_move_assignment
-	) {
+	) -> basic_variant & requires((... and detail::variant_move_assignable<Ts>) and !(... and detail::variant_trivially_move_assignable<Ts>)) {
 		assign(std::move(other));
 		return *this;
 	}

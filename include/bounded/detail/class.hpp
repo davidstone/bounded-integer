@@ -170,7 +170,7 @@ struct integer {
 	{
 	}
 
-	template<typename T> requires detail::overlapping_integer<T, minimum, maximum, overflow_policy>
+	template<typename T> requires (detail::overlapping_integer<T, minimum, maximum, overflow_policy> and !detail::bounded_by_range<T, minimum, maximum, overflow_policy>)
 	constexpr explicit integer(T const & other, overflow_policy = overflow_policy{}):
 		integer(apply_overflow_policy(detail::as_integer(other)), non_check)
 	{

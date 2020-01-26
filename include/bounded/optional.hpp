@@ -168,34 +168,22 @@ public:
 	constexpr explicit optional(lazy_init_t, Construct && construct_):
 		m_storage(lazy_init, OPERATORS_FORWARD(construct_)) {
 	}
-	template<typename U> requires std::is_convertible_v<U &&, value_type>
-	constexpr optional(U && other):
+	constexpr optional(convertible_to<value_type> auto && other):
 		m_storage(OPERATORS_FORWARD(other))
 	{
 	}
-	template<typename U> requires (!std::is_convertible_v<U &&, value_type> and is_constructible<value_type, U &&>)
-	constexpr explicit optional(U && other):
+	constexpr explicit optional(explicitly_convertible_to<value_type> auto && other):
 		m_storage(OPERATORS_FORWARD(other))
 	{
 	}
 
 
-	template<typename U> requires std::is_convertible_v<U const &, value_type>
-	constexpr optional(optional<U> const & other):
-		optional(other, common_init_tag{})
-	{
-	}
-	template<typename U> requires std::is_convertible_v<U &&, value_type>
-	constexpr optional(optional<U> && other):
-		optional(std::move(other), common_init_tag{})
-	{
-	}
-	template<typename U> requires (!std::is_convertible_v<U const &, value_type> and is_constructible<value_type, U const &>)
+	template<typename U> requires explicitly_convertible_to<U const &, value_type>
 	constexpr explicit optional(optional<U> const & other):
 		optional(other, common_init_tag{})
 	{
 	}
-	template<typename U> requires (!std::is_convertible_v<U &&, value_type> and is_constructible<value_type, U &&>)
+	template<typename U> requires explicitly_convertible_to<U &&, value_type>
 	constexpr explicit optional(optional<U> && other):
 		optional(std::move(other), common_init_tag{})
 	{
@@ -229,9 +217,7 @@ public:
 		m_storage.uninitialize();
 		return *this;
 	}
-	// TODO: make this work when value_type is a reference
-	template<typename U> requires(std::is_convertible_v<U &&, value_type>)
-	constexpr auto && operator=(U && other) & {
+	constexpr auto && operator=(convertible_to<value_type> auto && other) & {
 		return detail::assign(*this, OPERATORS_FORWARD(other));
 	}
 	
