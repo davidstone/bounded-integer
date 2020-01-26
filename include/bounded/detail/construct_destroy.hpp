@@ -19,25 +19,19 @@ namespace detail {
 template<typename T>
 concept constexpr_constructible = std::is_move_assignable_v<T> and std::is_trivially_move_assignable_v<T> and std::is_trivially_destructible_v<T>;
 
-// Try () initialization first, then {} initialization
-
-template<typename T>
-struct construct_return_t {
-	template<typename... Args> requires is_constructible<T, Args...>
-	constexpr auto operator()(Args && ... args) const {
-		return T(OPERATORS_FORWARD(args)...);
-	}
-	
-	template<typename... Args> requires(!is_constructible<T, Args...> and requires (Args && ... args) { T{OPERATORS_FORWARD(args)...}; })
-	constexpr auto operator()(Args && ... args) const {
-		return T{OPERATORS_FORWARD(args)...};
-	}
-};
+template<typename T, typename... Args>
+concept brace_constructible = requires (Args && ... args) { T{OPERATORS_FORWARD(args)...}; };
 
 }	// namespace detail
 
 template<typename T>
-inline constexpr auto construct_return = detail::construct_return_t<T>{};
+inline constexpr auto construct_return = [](auto && ... args) requires is_constructible<T, decltype(args)...> or detail::brace_constructible<T, decltype(args)...> {
+	if constexpr (is_constructible<T, decltype(args)...>) {
+		return T(OPERATORS_FORWARD(args)...);
+	} else {
+		return T{OPERATORS_FORWARD(args)...};
+	}
+};
 
 
 struct construct_t {
