@@ -32,7 +32,7 @@ struct tuple_value {
 	}
 
 	// TODO: convertible
-	template<typename Arg> requires is_constructible<T, Arg>
+	template<typename Arg> requires constructible_from<T, Arg>
 	constexpr explicit tuple_value(Arg && arg):
 		m_value(OPERATORS_FORWARD(arg))
 	{
@@ -255,7 +255,7 @@ private:
 	}
 
 public:
-	template<typename... Tuples> requires(... and is_constructible<std::decay_t<Tuples>, Tuples &&>)
+	template<typename... Tuples> requires(... and constructible_from<std::decay_t<Tuples>, Tuples &&>)
 	constexpr auto operator()(Tuples && ... tuples) const {
 		if constexpr (sizeof...(tuples) == 0) {
 			return tuple<>{};

@@ -179,7 +179,7 @@ public:
 
 	template<typename T> requires(
 		!std::is_same_v<std::decay_t<T>, basic_variant> and
-		is_constructible<std::decay_t<T>, T &&> and
+		constructible_from<std::decay_t<T>, T &&> and
 		std::is_assignable_v<std::decay_t<T> &, T &&>
 	)
 	constexpr auto & operator=(T && value) & {

@@ -24,7 +24,7 @@ constexpr auto less_to_compare = [](auto const & cmp) {
 		if constexpr (std::is_convertible_v<result_t, std::strong_ordering>) {
 			return cmp(lhs, rhs);
 		} else {
-			static_assert(bounded::is_constructible<bool, result_t>);
+			static_assert(bounded::constructible_from<bool, result_t>);
 			return
 				cmp(lhs, rhs) ? std::strong_ordering::less :
 				cmp(rhs, lhs) ? std::strong_ordering::greater :

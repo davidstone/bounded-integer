@@ -13,6 +13,6 @@ struct lazy_init_t {
 } inline constexpr lazy_init;
 
 template<typename Function, typename T>
-concept construct_function_for = is_constructible<T, decltype(declval<Function>()())>;
+concept construct_function_for = constructible_from<T, decltype(declval<Function>()())>;
 
 } // namespace bounded

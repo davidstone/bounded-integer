@@ -81,9 +81,9 @@ public:
 	template<typename T1, typename T2>
 	constexpr decltype(auto) operator()(auto compare, T1 && t1, T2 && t2) const {
 		using result_t = result_type<decltype(compare), T1, T2>;
-		if constexpr (not is_constructible<result_t, T2>) {
+		if constexpr (not constructible_from<result_t, T2>) {
 			return OPERATORS_FORWARD(t1);
-		} else if constexpr (not is_constructible<result_t, T1>) {
+		} else if constexpr (not constructible_from<result_t, T1>) {
 			return OPERATORS_FORWARD(t2);
 		} else {
 			return extreme_two(std::move(compare), OPERATORS_FORWARD(t1), OPERATORS_FORWARD(t2));

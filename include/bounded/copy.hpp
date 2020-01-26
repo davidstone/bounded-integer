@@ -13,7 +13,7 @@
 namespace bounded {
 
 // Works with explicit copy constructors
-constexpr auto copy = []<typename T>(T && value) requires is_constructible<std::decay_t<T>, T &&> {
+constexpr auto copy = []<typename T>(T && value) requires constructible_from<std::decay_t<T>, T &&> {
 	return std::decay_t<T>(OPERATORS_FORWARD(value));
 };
 

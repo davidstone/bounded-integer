@@ -77,10 +77,10 @@ static_assert(assert_integer_index_concepts<true, 1, int, int>());
 static_assert(assert_integer_index_concepts<false, 1, int>());
 static_assert(assert_integer_index_concepts<false, 0>());
 
-static_assert(!bounded::is_constructible<thing_t, int>);
-static_assert(bounded::is_constructible<thing_t, short>);
-static_assert(bounded::is_constructible<thing_t, long>);
-static_assert(bounded::is_constructible<thing_t, char>);
+static_assert(!bounded::constructible_from<thing_t, int>);
+static_assert(bounded::constructible_from<thing_t, short>);
+static_assert(bounded::constructible_from<thing_t, long>);
+static_assert(bounded::constructible_from<thing_t, char>);
 
 static_assert(bounded::visit_with_index(
 	thing_t(0_bi, 0),
@@ -144,7 +144,7 @@ static_assert(test_assignment_from_value());
 
 using empty_variant_t = bounded::variant<>;
 static_assert(not std::is_default_constructible_v<empty_variant_t>);
-static_assert(not bounded::is_constructible<empty_variant_t, bounded::constant_t<0>>);
+static_assert(not bounded::constructible_from<empty_variant_t, bounded::constant_t<0>>);
 
 struct non_trivial {
 	constexpr non_trivial() {}

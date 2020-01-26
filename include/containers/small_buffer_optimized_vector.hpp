@@ -258,7 +258,7 @@ struct sbo_vector_base {
 	
 	auto set_size(auto const new_size) {
 		if (is_small()) {
-			if constexpr (bounded::is_constructible<typename small_t::size_type, decltype(new_size)>) {
+			if constexpr (bounded::constructible_from<typename small_t::size_type, decltype(new_size)>) {
 				m_small.set_size(static_cast<typename small_t::size_type>(new_size));
 			} else {
 				bounded::assert_or_assume_unreachable();

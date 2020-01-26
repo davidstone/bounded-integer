@@ -40,8 +40,8 @@ static_assert(std::is_empty<bounded::constant_t<-1>>{});
 static_assert(std::is_empty<bounded::constant_t<bounded::min_value<std::intmax_t>>>{});
 
 static_assert(!std::is_convertible_v<bool, bounded::integer<0, 1>>);
-static_assert(bounded::is_constructible<bounded::integer<0, 1>, bool>);
-static_assert(bounded::is_constructible<bounded::integer<0, 0>, bool>);
+static_assert(bounded::constructible_from<bounded::integer<0, 1>, bool>);
+static_assert(bounded::constructible_from<bounded::integer<0, 0>, bool>);
 
 namespace check_constructibility {
 	constexpr auto min = bounded::min_value<int>;
@@ -57,7 +57,7 @@ namespace check_constructibility {
 		"Cannot convert integer type to bounded::integer with same range."
 	);
 	static_assert(
-		bounded::is_constructible<type, type, bounded::non_check_t>,
+		bounded::constructible_from<type, type, bounded::non_check_t>,
 		"Cannot construct a type from itself with non_check_t."
 	);
 
@@ -66,7 +66,7 @@ namespace check_constructibility {
 		"Should not be able to convert a bool to a bounded::integer."
 	);
 	static_assert(
-		bounded::is_constructible<type, bool>,
+		bounded::constructible_from<type, bool>,
 		"Should be able to construct a bounded::integer from a bool."
 	);
 }
@@ -106,7 +106,7 @@ constexpr auto max_value<bounded_enum> = 0;
 namespace {
 
 enum unscoped_enum : int {};
-static_assert(bounded::is_constructible<bounded::integer<0, 10>, unscoped_enum>);
+static_assert(bounded::constructible_from<bounded::integer<0, 10>, unscoped_enum>);
 static_assert(!std::is_convertible_v<unscoped_enum, bounded::integer<0, 10>>);
 static_assert(homogeneous_equals(
 	bounded::integer(unscoped_enum{}),
@@ -114,11 +114,11 @@ static_assert(homogeneous_equals(
 ));
 
 enum class scoped_enum {};
-static_assert(bounded::is_constructible<bounded::integer<0, 10>, scoped_enum>);
+static_assert(bounded::constructible_from<bounded::integer<0, 10>, scoped_enum>);
 static_assert(!std::is_convertible_v<scoped_enum, bounded::integer<0, 10>>);
 // constexpr auto b = bounded::integer(scoped_enum{});
 
-static_assert(bounded::is_constructible<bounded::integer<0, 10>, bounded_enum>);
+static_assert(bounded::constructible_from<bounded::integer<0, 10>, bounded_enum>);
 static_assert(!std::is_convertible_v<bounded_enum, bounded::integer<0, 10>>);
 static_assert(bounded::integer(bounded_enum{}) == bounded::constant<0>);
 static_assert(bounded::constant<bounded_enum{}> == bounded::constant<0>);

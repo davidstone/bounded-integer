@@ -44,7 +44,7 @@ struct optional_storage {
 	{
 	}
 	
-	template<typename U> requires is_constructible<T, U &&>
+	template<typename U> requires constructible_from<T, U &&>
 	constexpr explicit optional_storage(U && value):
 		m_data(value_index, OPERATORS_FORWARD(value))
 	{
@@ -94,7 +94,7 @@ struct optional_storage<T> {
 	{
 	}
 	
-	template<typename U> requires is_constructible<T, U &&>
+	template<typename U> requires constructible_from<T, U &&>
 	constexpr explicit optional_storage(U && value):
 		m_data(OPERATORS_FORWARD(value))
 	{

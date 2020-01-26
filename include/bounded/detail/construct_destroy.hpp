@@ -25,8 +25,8 @@ concept brace_constructible = requires (Args && ... args) { T{OPERATORS_FORWARD(
 }	// namespace detail
 
 template<typename T>
-inline constexpr auto construct_return = [](auto && ... args) requires is_constructible<T, decltype(args)...> or detail::brace_constructible<T, decltype(args)...> {
-	if constexpr (is_constructible<T, decltype(args)...>) {
+inline constexpr auto construct_return = [](auto && ... args) requires constructible_from<T, decltype(args)...> or detail::brace_constructible<T, decltype(args)...> {
+	if constexpr (constructible_from<T, decltype(args)...>) {
 		return T(OPERATORS_FORWARD(args)...);
 	} else {
 		return T{OPERATORS_FORWARD(args)...};
