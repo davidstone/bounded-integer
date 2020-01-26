@@ -159,6 +159,7 @@ add_library(containers_test STATIC
 	source/containers/is_iterator_sentinel.cpp
 	source/containers/is_range.cpp
 	source/containers/iterator_adapter.cpp
+	source/containers/lazy_push_back.cpp
 	source/containers/legacy_iterator.cpp
 	source/containers/maximum_array_size.cpp
 	source/containers/mutable_iterator.cpp

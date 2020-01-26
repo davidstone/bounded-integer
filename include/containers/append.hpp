@@ -7,7 +7,7 @@
 
 #include <containers/algorithms/uninitialized.hpp>
 #include <containers/begin_end.hpp>
-#include <containers/push_back.hpp>
+#include <containers/lazy_push_back.hpp>
 #include <containers/reserve_if_reservable.hpp>
 #include <containers/size.hpp>
 
@@ -15,12 +15,6 @@
 
 namespace containers {
 namespace detail {
-
-template<typename Container>
-concept push_backable = requires(Container & container, typename Container::value_type value_type) { push_back(container, std::move(value_type)); };
-
-template<typename Container>
-concept appendable_from_capacity = requires(Container & container, typename Container::size_type count) { container.append_from_capacity(count); };
 
 template<typename Container, typename Range>
 concept member_insertable = requires(Container & container, Range && range) {
@@ -30,6 +24,12 @@ concept member_insertable = requires(Container & container, Range && range) {
 		end(OPERATORS_FORWARD(range))
 	);
 };
+
+template<typename Container>
+concept lazy_push_backable = requires(Container & container, typename Container::value_type (&constructor)()) { lazy_push_back(container, constructor); };
+
+template<typename Container>
+concept push_backable = requires(Container & container, typename Container::value_type value_type) { push_back(container, std::move(value_type)); };
 
 namespace common {
 
@@ -55,7 +55,7 @@ constexpr auto append(Container & output, range auto && input) -> void {
 			::containers::detail::growth_reallocation(output, input_size);
 		}
 	}
-	if constexpr (reserve_space and appendable_from_capacity<Container>) {
+	if constexpr (appendable_from_capacity<Container> and (!reservable<Container> or reserve_space)) {
 		auto const new_end = containers::uninitialized_copy(
 			begin(OPERATORS_FORWARD(input)),
 			end(OPERATORS_FORWARD(input)),
@@ -64,6 +64,11 @@ constexpr auto append(Container & output, range auto && input) -> void {
 		output.append_from_capacity(new_end - end(output));
 	} else if constexpr (member_insertable<Container, decltype(input)> and std::is_move_constructible_v<typename Container::value_type> and std::is_move_assignable_v<typename Container::value_type>) {
 		output.insert(end(output), begin(OPERATORS_FORWARD(input)), end(OPERATORS_FORWARD(input)));
+	} else if constexpr (lazy_push_backable<Container>) {
+		auto const last = end(OPERATORS_FORWARD(input));
+		for (auto it = begin(OPERATORS_FORWARD(input)); it != last; ++it) {
+			lazy_push_back(output, [&] { return *it; });
+		}
 	} else {
 		for (decltype(auto) value : OPERATORS_FORWARD(input)) {
 			push_back(output, OPERATORS_FORWARD(value));

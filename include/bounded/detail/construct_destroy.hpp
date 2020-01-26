@@ -42,17 +42,12 @@ inline constexpr auto construct_return = detail::construct_return_t<T>{};
 
 struct construct_t {
 	template<typename T, typename Function>
-	constexpr auto & operator()(lazy_init_t, T & ref, Function && function) const requires construct_function_for<Function, T> {
+	constexpr auto & operator()(T & ref, Function && function) const requires construct_function_for<Function, T> {
 		if constexpr (detail::constexpr_constructible<T>) {
 			return ref = OPERATORS_FORWARD(function)();
 		} else {
 			return *::new(static_cast<void *>(std::addressof(ref))) T(OPERATORS_FORWARD(function)());
 		}
-	}
-
-	template<typename T, typename... Args> requires(requires (Args && ... args) { construct_return<T>(OPERATORS_FORWARD(args)...); })
-	constexpr auto & operator()(T & ref, Args && ... args) const {
-		return operator()(lazy_init, ref, [&]{ return construct_return<T>(OPERATORS_FORWARD(args)...); });
 	}
 } inline constexpr construct;
 

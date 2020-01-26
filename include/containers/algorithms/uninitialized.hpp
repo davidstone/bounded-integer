@@ -52,7 +52,7 @@ constexpr auto uninitialized_copy(InputIterator first, sentinel_for<InputIterato
 	auto out_first = out;
 	try {
 		for (; first != last; ++first) {
-			bounded::construct(*out, *first);
+			bounded::construct(*out, [&] { return *first; });
 			++out;
 		}
 	} catch (...) {

@@ -8,9 +8,9 @@
 #include <containers/algorithms/copy.hpp>
 #include <containers/algorithms/uninitialized.hpp>
 #include <containers/array/array.hpp>
+#include <containers/append.hpp>
 #include <containers/common_container_functions.hpp>
 #include <containers/contiguous_iterator.hpp>
-#include <containers/emplace_back.hpp>
 #include <containers/index_type.hpp>
 #include <containers/integer_range.hpp>
 #include <containers/is_iterator_sentinel.hpp>
@@ -52,17 +52,13 @@ struct stable_vector {
 	explicit stable_vector(Range && range):
 		stable_vector()
 	{
-		for (decltype(auto) value : OPERATORS_FORWARD(range)) {
-			::containers::emplace_back(*this, OPERATORS_FORWARD(value));
-		}
+		::containers::append(*this, OPERATORS_FORWARD(range));
 	}
 	
 	stable_vector(std::initializer_list<value_type> init):
 		stable_vector()
 	{
-		for (auto const & value : init) {
-			::containers::emplace_back(*this, value);
-		}
+		::containers::append(*this, init);
 	}
 	
 	// TODO: Support trivial relocatability

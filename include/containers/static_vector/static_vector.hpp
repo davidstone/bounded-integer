@@ -7,9 +7,9 @@
 
 #include <containers/algorithms/copy.hpp>
 #include <containers/array/array.hpp>
+#include <containers/append.hpp>
 #include <containers/common_container_functions.hpp>
 #include <containers/contiguous_iterator.hpp>
-#include <containers/emplace_back.hpp>
 #include <containers/index_type.hpp>
 #include <containers/integer_range.hpp>
 #include <containers/is_iterator_sentinel.hpp>
@@ -43,15 +43,11 @@ struct static_vector_data {
 	static_vector_data & operator=(static_vector_data const &) & = default;
 
 	constexpr explicit static_vector_data(range auto && source) {
-		for (decltype(auto) value : OPERATORS_FORWARD(source)) {
-			::containers::emplace_back(*this, OPERATORS_FORWARD(value));
-		}
+		::containers::append(*this, OPERATORS_FORWARD(source));
 	}
 	
 	constexpr static_vector_data(std::initializer_list<T> init) {
-		for (auto const & value : init) {
-			::containers::emplace_back(*this, value);
-		}
+		::containers::append(*this, init);
 	}
 	
 	friend constexpr auto begin(static_vector_data const & container) {

@@ -5,9 +5,10 @@
 
 #pragma once
 
-#include <containers/emplace_back.hpp>
+#include <containers/lazy_push_back.hpp>
 
 #include <bounded/integer.hpp>
+#include <bounded/value_to_function.hpp>
 
 #include <utility>
 
@@ -23,16 +24,24 @@ template<typename Container>
 constexpr decltype(auto) push_back(Container & container, typename Container::value_type const & value) {
 	if constexpr (member_push_backable<Container>) {
 		container.push_back(value);
+		return back(container);
 	} else {
-		::containers::emplace_back(container, value);
+		return ::containers::lazy_push_back(
+			container,
+			::bounded::value_to_function(value)
+		);
 	}
 }
 template<typename Container>
 constexpr decltype(auto) push_back(Container & container, typename Container::value_type && value) {
 	if constexpr (member_push_backable<Container>) {
 		container.push_back(std::move(value));
+		return back(container);
 	} else {
-		::containers::emplace_back(container, std::move(value));
+		return ::containers::lazy_push_back(
+			container,
+			::bounded::value_to_function(std::move(value))
+		);
 	}
 }
 

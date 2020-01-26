@@ -185,16 +185,19 @@ struct sbo_vector_base {
 	// The elements are destroyed, but any storage may still remain
 	auto move_assign_to_empty(sbo_vector_base && other) & {
 		deallocate_large();
+		auto make_small = [](small_t & small) {
+			::bounded::construct(small, bounded::construct_return<small_t>);
+		};
 		if (other.is_small()) {
-			::bounded::construct(m_small);
+			make_small(m_small);
 			containers::uninitialized_move_destroy(other, m_small.data());
 			m_small.set_size(other.m_small.size());
 			other.m_small.set_size(0_bi);
 		} else {
-			::bounded::construct(m_large, other.m_large);
+			::bounded::construct(m_large, bounded::value_to_function(other.m_large));
 			// It is safe to skip the destructor call of other.m_large because
 			// we do not rely on its side-effects
-			::bounded::construct(other.m_small);
+			make_small(other.m_small);
 		}
 	}
 
@@ -229,9 +232,13 @@ struct sbo_vector_base {
 		deallocate_large();
 		::bounded::construct(
 			m_large,
-			size(),
-			static_cast<typename large_t::capacity_type>(new_large.storage.size),
-			reinterpret_cast<value_type *>(new_large.storage.pointer)
+			[&] {
+				return large_t(
+					size(),
+					static_cast<typename large_t::capacity_type>(new_large.storage.size),
+					reinterpret_cast<value_type *>(new_large.storage.pointer)
+				);
+			}
 		);
 		BOUNDED_ASSERT(is_large());
 		new_large.active = false;
@@ -275,7 +282,7 @@ private:
 		});
 		// It is safe to skip the destructor call of m_large
 		// because we do not rely on its side-effects
-		::bounded::construct(m_small);
+		::bounded::construct(m_small, []{ return small_t(); });
 		containers::uninitialized_move_destroy(temp.data(), temp.data() + temp.size(), m_small.data());
 		BOUNDED_ASSERT(is_small());
 	}

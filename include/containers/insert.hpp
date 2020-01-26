@@ -9,9 +9,9 @@
 #include <containers/algorithms/copy_n.hpp>
 #include <containers/algorithms/uninitialized.hpp>
 #include <containers/begin_end.hpp>
-#include <containers/emplace_back.hpp>
 #include <containers/is_container.hpp>
 #include <containers/mutable_iterator.hpp>
+#include <containers/push_back.hpp>
 #include <containers/repeat_n.hpp>
 #include <containers/reserve_if_reservable.hpp>
 
@@ -55,27 +55,38 @@ namespace common {
 
 // TODO: exception safety
 template<typename Container>
-constexpr auto emplace(Container & container, typename Container::const_iterator const position, auto && ... args) {
+constexpr auto lazy_insert(
+	Container & container,
+	typename Container::const_iterator const position,
+	bounded::construct_function_for<typename Container::value_type> auto && constructor
+) {
 	BOUNDED_ASSERT(::containers::detail::iterator_points_into_container(container, position));
 	auto const offset = position - begin(container);
 	if (position == end(container)) {
-		::containers::emplace_back(container, OPERATORS_FORWARD(args)...);
+		::containers::lazy_push_back(container, OPERATORS_FORWARD(constructor));
 	} else if (size(container) < container.capacity()) {
 		auto const mutable_position = ::containers::detail::mutable_iterator(container, position);
 		auto const original_end = end(container);
-		::containers::emplace_back(container, std::move(back(container)));
+		::containers::push_back(container, std::move(back(container)));
 		::containers::move_backward(mutable_position, containers::prev(original_end), original_end);
 		auto const pointer = std::addressof(*mutable_position);
 		bounded::destroy(*pointer);
-		bounded::construct(*pointer, OPERATORS_FORWARD(args)...);
+		bounded::construct(*pointer, OPERATORS_FORWARD(constructor));
 	} else if constexpr (reservable<Container>) {
 		insert_or_emplace_with_reallocation(container, position, 1_bi, [&](auto const ptr) {
-			bounded::construct(*ptr, OPERATORS_FORWARD(args)...);
+			bounded::construct(*ptr, OPERATORS_FORWARD(constructor));
 		});
 	} else {
 		bounded::assert_or_assume_unreachable();
 	}
 	return begin(container) + offset;
+}
+
+template<typename Container>
+constexpr auto emplace(Container & container, typename Container::const_iterator const position, auto && ... args) {
+	return ::containers::detail::common::lazy_insert(container, position, [&] {
+		return bounded::construct_return<typename Container::value_type>(OPERATORS_FORWARD(args)...);
+	});
 }
 
 // TODO: exception safety
@@ -112,20 +123,22 @@ constexpr auto insert(Container & container, typename Container::const_iterator 
 
 template<container Container>
 constexpr auto insert(Container & container, typename Container::const_iterator const position, typename Container::value_type const & value) {
-	return ::containers::detail::common::emplace(container, position, value);
+	return ::containers::detail::common::lazy_insert(container, position, bounded::value_to_function(value));
 }
 template<container Container>
 constexpr auto insert(Container & container, typename Container::const_iterator const position, typename Container::value_type && value) {
-	return ::containers::detail::common::emplace(container, position, std::move(value));
+	return ::containers::detail::common::lazy_insert(container, position, bounded::value_to_function(std::move(value)));
 }
 
 }	// namespace common
 
+using ::containers::detail::common::lazy_insert;
 using ::containers::detail::common::emplace;
 using ::containers::detail::common::insert;
 
 }	// namespace detail
 
+using ::containers::detail::common::lazy_insert;
 using ::containers::detail::common::emplace;
 using ::containers::detail::common::insert;
 

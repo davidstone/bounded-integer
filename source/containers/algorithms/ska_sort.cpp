@@ -1397,7 +1397,7 @@ static std::vector<std::tuple<benchmark_sort_key, benchmark_sort_value>> SKA_SOR
 	std::uniform_int_distribution<benchmark_sort_key> distribution(bounded::min_value<benchmark_sort_key>, bounded::max_value<benchmark_sort_key>);
 	for (int i = 0; i < size; ++i)
 	{
-		result.emplace_back(distribution(randomness), benchmark_sort_value());
+		result.push_back(distribution(randomness), benchmark_sort_value());
 	}
 	return result;
 }
@@ -1409,7 +1409,7 @@ static std::vector<std::tuple<std::pair<benchmark_sort_key, benchmark_sort_key>,
 	std::uniform_int_distribution<benchmark_sort_key> distribution(bounded::min_value<benchmark_sort_key>, bounded::max_value<benchmark_sort_key>);
 	for (int i = 0; i < size; ++i)
 	{
-		result.emplace_back(std::make_pair(distribution(randomness), distribution(randomness)), benchmark_sort_value());
+		result.push_back(std::make_pair(distribution(randomness), distribution(randomness)), benchmark_sort_value());
 	}
 	return result;
 }
@@ -1424,7 +1424,7 @@ static std::vector<std::tuple<std::array<benchmark_sort_key, NUM_SORT_KEYS>, ben
 		std::array<benchmark_sort_key, NUM_SORT_KEYS> key;
 		for (int i = 0; i < NUM_SORT_KEYS; ++i)
 			key[i] = distribution(randomness);
-		result.emplace_back(key, benchmark_sort_value());
+		result.push_back(key, benchmark_sort_value());
 	}
 	return result;
 }
@@ -1552,7 +1552,7 @@ static std::vector<std::int8_t> SKA_SORT_NOINLINE create_limited_radix_sort_data
 	result.reserve(size);
 	std::uniform_int_distribution<std::int8_t> int_distribution(-128, range_end);
 	for (size_t i = 0; i < size; ++i) {
-		result.emplace_back(permutation[to_radix_sort_key(int_distribution(randomness))]);
+		result.push_back(permutation[to_radix_sort_key(int_distribution(randomness))]);
 	}
 	return result;
 }

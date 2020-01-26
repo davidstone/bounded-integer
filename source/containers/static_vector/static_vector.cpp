@@ -5,6 +5,7 @@
 
 #include <containers/static_vector/static_vector.hpp>
 #include <containers/array/array.hpp>
+#include <containers/emplace_back.hpp>
 #include <containers/repeat_n.hpp>
 
 #include "../../test_assert.hpp"
@@ -33,8 +34,8 @@ using namespace bounded::literal;
 	
 	constexpr auto make = []{
 		auto value = containers::static_vector<int, 10>{};
-		containers::emplace_back(value, 5);
-		containers::emplace_back(value, 15);
+		containers::lazy_push_back(value, bounded::value_to_function(5));
+		containers::push_back(value, 15);
 		containers::emplace_back(value, 20);
 		::containers::emplace(value, begin(value) + 1_bi, 10);
 		containers::pop_back(value);

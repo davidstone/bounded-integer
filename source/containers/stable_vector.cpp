@@ -5,6 +5,7 @@
 
 #include <containers/stable_vector.hpp>
 #include <containers/array/array.hpp>
+#include <containers/emplace_back.hpp>
 #include <containers/repeat_n.hpp>
 
 #include "../test_assert.hpp"

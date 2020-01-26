@@ -265,7 +265,7 @@ private:
 		// TODO: This can be simplified when construct uses std::construct_at
 		constexpr auto index_value = detail::get_index(index, detail::types<Ts>()...);
 		m_function = GetFunction(index_value);
-		return construct(lazy_init, operator[](index_value), OPERATORS_FORWARD(construct_));
+		return construct(operator[](index_value), OPERATORS_FORWARD(construct_));
 		#endif
 		constexpr auto trivial = (... and (
 			std::is_trivially_copy_constructible_v<Ts> and
@@ -278,7 +278,7 @@ private:
 			m_data = detail::variadic_union<Ts...>(index_value, OPERATORS_FORWARD(construct_));
 			return operator[](index_value);
 		} else {
-			return construct(lazy_init, operator[](index_value), OPERATORS_FORWARD(construct_));
+			return construct(operator[](index_value), OPERATORS_FORWARD(construct_));
 		}
 	}
 

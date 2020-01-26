@@ -106,12 +106,12 @@ struct optional_storage<T> {
 
 	constexpr auto uninitialize() {
 		destroy(m_data);
-		construct(lazy_init, m_data, make_uninitialized);
+		construct(m_data, make_uninitialized);
 	}
 
 	constexpr auto initialize(construct_function_for<T> auto && construct_) {
 		uninitialize();
-		construct(lazy_init, m_data, OPERATORS_FORWARD(construct_));
+		construct(m_data, OPERATORS_FORWARD(construct_));
 	}
 
 	constexpr auto && get() const & {

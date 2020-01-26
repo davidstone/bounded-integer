@@ -8,7 +8,6 @@
 #include <containers/common_container_functions.hpp>
 #include <containers/contiguous_iterator.hpp>
 #include <containers/dynamic_array.hpp>
-#include <containers/emplace_back.hpp>
 #include <containers/index_type.hpp>
 #include <containers/is_container.hpp>
 #include <containers/pop_back.hpp>
