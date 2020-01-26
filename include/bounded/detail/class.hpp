@@ -159,18 +159,18 @@ struct integer {
 	// overflow_policy, which they default and ignore. This is solely to make
 	// the class work better with deduction guides.
 
-	template<typename T> requires detail::overlapping_integer<T, minimum, maximum, overflow_policy>
+	template<detail::overlapping_integer<minimum, maximum, overflow_policy> T>
 	constexpr integer(T const & other, non_check_t):
 		m_value(static_cast<underlying_type>(other)) {
 	}
 
-	template<typename T> requires detail::bounded_by_range<T, minimum, maximum, overflow_policy>
+	template<detail::bounded_by_range<minimum, maximum, overflow_policy> T>
 	constexpr integer(T const other, overflow_policy = overflow_policy{}):
 		integer(other, non_check)
 	{
 	}
 
-	template<typename T> requires (detail::overlapping_integer<T, minimum, maximum, overflow_policy> and !detail::bounded_by_range<T, minimum, maximum, overflow_policy>)
+	template<detail::overlapping_integer<minimum, maximum, overflow_policy> T> requires(!detail::bounded_by_range<T, minimum, maximum, overflow_policy>)
 	constexpr explicit integer(T const & other, overflow_policy = overflow_policy{}):
 		integer(apply_overflow_policy(detail::as_integer(other)), non_check)
 	{
