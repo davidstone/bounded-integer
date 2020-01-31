@@ -39,9 +39,6 @@ private:
 constexpr auto operator==(compares_address const lhs, std::pair<int const &, int const &> rhs) -> bool {
 	return lhs == compares_address(rhs);
 }
-constexpr auto operator==(std::pair<int const &, int const &> lhs, compares_address const rhs) -> bool {
-	return compares_address(rhs) == lhs;
-}
 
 using init_list = std::initializer_list<compares_address>;
 

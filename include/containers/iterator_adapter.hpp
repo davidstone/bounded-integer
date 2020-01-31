@@ -50,7 +50,6 @@ struct default_subtract {
 struct default_compare {
 	template<typename LHS, typename RHS> requires bounded::ordered<LHS, RHS>
 	static constexpr auto compare(LHS const & lhs, RHS const & rhs) {
-		using bounded::operator<=>;
 		return lhs <=> rhs;
 	}
 	template<typename LHS, typename RHS> requires bounded::equality_comparable<LHS, RHS>

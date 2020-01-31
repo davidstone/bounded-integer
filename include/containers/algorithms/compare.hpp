@@ -114,18 +114,12 @@ namespace common {
 
 template<range T>
 constexpr auto operator<=>(T const & lhs, T const & rhs) {
-	return ::containers::lexicographical_compare_3way(
-		begin(std::as_const(lhs)), end(std::as_const(lhs)),
-		begin(std::as_const(rhs)), end(std::as_const(rhs))
-	);
+	return ::containers::lexicographical_compare_3way(lhs, rhs);
 }
 
 template<range T>
 constexpr auto operator==(T const & lhs, T const & rhs) -> bool {
-	return size(lhs) == size(rhs) and ::containers::equal(
-		begin(std::as_const(lhs)), end(std::as_const(lhs)),
-		begin(std::as_const(rhs))
-	);
+	return size(lhs) == size(rhs) and ::containers::equal(begin(lhs), end(lhs), begin(rhs));
 }
 
 }	// namespace common

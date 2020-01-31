@@ -63,20 +63,9 @@ struct map_value_type {
 		return std::move(m_mapped);
 	}
 
-	// These functions just become defaulted <=> and == in C++20.
-	friend constexpr auto operator<=>(map_value_type const & lhs, map_value_type const & rhs) {
-		return tie(lhs) <=> tie(rhs);
-	}
-
-	friend constexpr auto operator==(map_value_type const & lhs, map_value_type const & rhs) -> bool {
-		return tie(lhs) == tie(rhs);
-	}
+	friend auto operator<=>(map_value_type const & lhs, map_value_type const & rhs) = default;
 
 private:
-	static constexpr auto tie(map_value_type const & value) {
-		return bounded::tie(value.m_key, value.m_mapped);
-	}
-
 	[[no_unique_address]] Key m_key;
 	[[no_unique_address]] Mapped m_mapped;
 };

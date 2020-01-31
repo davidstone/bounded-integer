@@ -52,6 +52,8 @@ struct range_view {
 	}
 
 	OPERATORS_BRACKET_SEQUENCE_RANGE_DEFINITIONS
+
+	friend auto operator==(range_view const &, range_view const &) -> bool = default;
 	
 private:
 	Iterator m_begin;
@@ -60,11 +62,6 @@ private:
 
 template<typename Range>
 range_view(Range &) -> range_view<decltype(begin(std::declval<Range &>()), end(std::declval<Range &>()))>;
-
-template<typename Iterator, typename Sentinel>
-constexpr auto operator==(range_view<Iterator, Sentinel> const lhs, range_view<Iterator, Sentinel> const rhs) -> bool {
-	return begin(lhs) == begin(rhs) and end(lhs) == end(rhs);
-}
 
 template<typename>
 inline constexpr auto is_range_view = false;

@@ -15,15 +15,9 @@ using namespace bounded::literal;
 static_assert(std::is_empty_v<bounded::tuple<>>);
 static_assert(bounded::tuple{} == bounded::tuple{});
 
-struct empty {};
-
-constexpr auto operator<=>(empty, empty) {
-	return std::strong_ordering::equal;
-}
-
-constexpr auto operator==(empty, empty) -> bool {
-	return true;
-}
+struct empty {
+	friend auto operator<=>(empty const &, empty const &) = default;
+};
 
 template<typename T, typename Index>
 concept indexable_by = requires(T t, Index index) { t[index]; };
@@ -170,14 +164,9 @@ struct non_movable {
 	non_movable() = default;
 	non_movable(non_movable const &) = delete;
 	non_movable(non_movable &&) = delete;
-};
 
-constexpr auto operator<=>(non_movable const &, non_movable const &) {
-	return std::strong_ordering::equal;
-}
-constexpr auto operator==(non_movable const &, non_movable const &) -> bool {
-	return true;
-}
+	friend auto operator<=>(non_movable const &, non_movable const &) = default;
+};
 
 static_assert(bounded::constructible_from<bounded::tuple<non_movable>>);
 

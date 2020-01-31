@@ -11,12 +11,11 @@ namespace {
 
 struct S {
 	constexpr auto f() const { return n; }
+
+	friend auto operator==(S const &, S const &) -> bool = default;
+
 	int n;
 };
-
-constexpr auto operator==(S const lhs, S const rhs) -> bool {
-	return lhs.n == rhs.n;
-}
 
 constexpr auto array = containers::array{S{0}, S{1}, S{2}, S{3}, S{4}};
 

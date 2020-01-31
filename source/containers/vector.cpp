@@ -124,12 +124,10 @@ struct complex_resource {
 	complex_resource(complex_resource const & other) = default;
 	complex_resource & operator=(complex_resource const & other) = default;
 
+	friend auto operator==(complex_resource const &, complex_resource const &) -> bool = default;
+
 	containers::vector<int> data;
 };
-
-constexpr auto operator==(complex_resource const & lhs, complex_resource const & rhs) -> bool {
-	return lhs.data == rhs.data;
-}
 
 auto move_destroy(complex_resource && value) noexcept {
 	auto result = complex_resource();

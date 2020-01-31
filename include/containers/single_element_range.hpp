@@ -76,10 +76,6 @@ template<typename T>
 constexpr auto operator<=>(single_element_iterator<T> const lhs, single_element_sentinel) {
 	return lhs.is_end() <=> true;
 }
-template<typename T>
-constexpr auto operator<=>(single_element_sentinel, single_element_iterator<T> const rhs) {
-	return true <=> rhs.is_end();
-}
 
 template<typename T>
 constexpr auto operator==(single_element_iterator<T> const lhs, single_element_iterator<T> const rhs) -> bool {
@@ -89,10 +85,6 @@ constexpr auto operator==(single_element_iterator<T> const lhs, single_element_i
 template<typename T>
 constexpr auto operator==(single_element_iterator<T> const lhs, single_element_sentinel) -> bool {
 	return lhs.is_end();
-}
-template<typename T>
-constexpr auto operator==(single_element_sentinel, single_element_iterator<T> const rhs) -> bool {
-	return rhs.is_end();
 }
 
 template<typename T>

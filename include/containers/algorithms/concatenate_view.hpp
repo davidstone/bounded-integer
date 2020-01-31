@@ -264,17 +264,6 @@ constexpr auto operator-(concatenate_view_iterator<Ranges...> const lhs, concate
 )
 
 
-template<typename... Ranges> requires bounded::ordered<concatenate_view_iterator<Ranges...>, concatenate_view_sentinel>
-constexpr auto operator<=>(concatenate_view_sentinel const lhs, concatenate_view_iterator<Ranges...> const rhs) {
-	return 0 <=> (rhs <=> lhs);
-}
-
-
-template<typename... Ranges>
-constexpr auto operator==(concatenate_view_sentinel const lhs, concatenate_view_iterator<Ranges...> const rhs) -> bool {
-	return rhs == lhs;
-}
-
 template<typename... Ranges>
 struct concatenate_view {
 	using const_iterator = concatenate_view_iterator<decltype(range_view(std::declval<Ranges const &>()))...>;

@@ -92,18 +92,8 @@ constexpr auto operator<=>(CharT const * lhs, c_string_sentinel_t<CharT>) {
 }
 
 template<typename CharT>
-constexpr auto operator<=>(c_string_sentinel_t<CharT> const lhs, CharT const * rhs) {
-	return 0 <=> (rhs <=> lhs);
-}
-
-template<typename CharT>
 constexpr auto operator==(CharT const * first, c_string_sentinel_t<CharT>) -> bool {
 	return *first == '\0';
-}
-
-template<typename CharT>
-constexpr auto operator==(c_string_sentinel_t<CharT> const lhs, CharT const * rhs) -> bool {
-	return rhs == lhs;
 }
 
 template<typename CharT>
@@ -115,36 +105,20 @@ template<typename CharT>
 constexpr auto operator<=>(basic_string<CharT> const & lhs, CharT const * const rhs) {
 	return ::containers::lexicographical_compare_3way(begin(lhs), end(lhs), rhs, detail::c_string_sentinel<CharT>);
 }
-template<typename CharT>
-constexpr auto operator<=>(CharT const * const lhs, basic_string<CharT> const & rhs) {
-	return 0 <=> (rhs <=> lhs);
-}
 
 template<typename CharT>
 constexpr auto operator==(basic_string<CharT> const & lhs, CharT const * const rhs) -> bool {
 	return ::containers::equal(begin(lhs), end(lhs), rhs, detail::c_string_sentinel<CharT>);
-}
-template<typename CharT>
-constexpr auto operator==(CharT const * const lhs, basic_string<CharT> const & rhs) -> bool {
-	return rhs == lhs;
 }
 
 template<typename CharT>
 constexpr auto operator<=>(basic_string<CharT> const & lhs, std::basic_string_view<CharT> const rhs) {
 	return ::containers::lexicographical_compare_3way(lhs, rhs);
 }
-template<typename CharT>
-constexpr auto operator<=>(std::basic_string_view<CharT> const lhs, basic_string<CharT> const & rhs) {
-	return 0 <=> (rhs <=> lhs);
-}
 
 template<typename CharT>
 constexpr auto operator==(basic_string<CharT> const & lhs, std::basic_string_view<CharT> const rhs) -> bool {
 	return size(lhs) == rhs.size() and ::containers::equal(begin(lhs), end(lhs), begin(rhs));
-}
-template<typename CharT>
-constexpr auto operator==(std::basic_string_view<CharT> const lhs, basic_string<CharT> const & rhs) -> bool {
-	return rhs == lhs;
 }
 
 

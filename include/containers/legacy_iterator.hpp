@@ -41,6 +41,8 @@ struct legacy_iterator {
 	OPERATORS_ARROW_DEFINITIONS
 	OPERATORS_BRACKET_ITERATOR_DEFINITIONS
 
+	friend auto operator<=>(legacy_iterator const &, legacy_iterator const &) = default;
+
 private:
 	Iterator m_it;
 };
@@ -52,16 +54,6 @@ constexpr auto operator+(legacy_iterator<Iterator> const lhs, bounded::integral 
 template<typename Iterator>
 constexpr auto operator-(legacy_iterator<Iterator> const lhs, legacy_iterator<Iterator> const rhs) {
 	return static_cast<typename legacy_iterator<Iterator>::difference_type>(lhs.base() - rhs.base());
-}
-
-template<typename Iterator>
-constexpr auto operator<=>(legacy_iterator<Iterator> const lhs, legacy_iterator<Iterator> const rhs) {
-	return lhs.base() <=> rhs.base();
-}
-
-template<typename Iterator>
-constexpr auto operator==(legacy_iterator<Iterator> const lhs, legacy_iterator<Iterator> const rhs) -> bool {
-	return lhs.base() == rhs.base();
 }
 
 constexpr auto make_legacy_iterator = [](auto it) {

@@ -46,23 +46,10 @@ struct contiguous_iterator {
 	friend constexpr auto pointer_from(contiguous_iterator const it) {
 		return it.m_ptr;
 	}
+	friend auto operator<=>(contiguous_iterator const &, contiguous_iterator const &) = default;
 private:
 	T * m_ptr = nullptr;
 };
-
-template<typename T, typename U, std::ptrdiff_t max_difference> requires(
-	std::is_same_v<std::remove_const_t<T>, std::remove_const_t<U>>
-)
-constexpr auto operator<=>(contiguous_iterator<T, max_difference> const lhs, contiguous_iterator<U, max_difference> const rhs) {
-	return pointer_from(lhs) <=> pointer_from(rhs);
-}
-
-template<typename T, typename U, std::ptrdiff_t max_difference> requires(
-	std::is_same_v<std::remove_const_t<T>, std::remove_const_t<U>>
-)
-constexpr auto operator==(contiguous_iterator<T, max_difference> const lhs, contiguous_iterator<U, max_difference> const rhs) -> bool {
-	return pointer_from(lhs) == pointer_from(rhs);
-}
 
 
 template<typename T, std::ptrdiff_t max_difference>

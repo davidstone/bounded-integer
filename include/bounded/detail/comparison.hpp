@@ -83,7 +83,7 @@ constexpr auto safe_max(auto... values) {
 
 
 template<bounded_integer LHS, bounded_integer RHS>
-constexpr auto operator<=>(LHS const & lhs, RHS const & rhs) {
+constexpr auto operator<=>(LHS const & lhs, RHS const & rhs) -> std::strong_ordering {
 	constexpr auto lhs_min = detail::builtin_min_value<LHS>;
 	constexpr auto lhs_max = detail::builtin_max_value<LHS>;
 	constexpr auto rhs_min = detail::builtin_min_value<RHS>;
@@ -124,11 +124,6 @@ concept member_comparable = requires(LHS const & lhs, RHS const & rhs) { lhs.com
 template<typename LHS, typename RHS> requires detail::member_comparable<LHS, RHS>
 constexpr auto operator<=>(LHS const & lhs, RHS const & rhs) {
 	return lhs.compare(rhs) <=> 0;
-}
-
-template<typename LHS, typename RHS> requires (detail::member_comparable<RHS, LHS> and !detail::member_comparable<LHS, RHS>)
-constexpr auto operator<=>(LHS const & lhs, RHS const & rhs) {
-	return 0 <=> rhs.compare(lhs);
 }
 
 

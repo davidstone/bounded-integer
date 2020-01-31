@@ -258,19 +258,9 @@ constexpr auto operator==(optional<T> const & lhs, T const & rhs) -> bool {
 	return static_cast<bool>(lhs) and *lhs == rhs;
 }
 
-template<equality_comparable T>
-constexpr auto operator==(T const & lhs, optional<T> const & rhs) -> bool {
-	return rhs == lhs;
-}
-
 template<typename T>
 constexpr auto operator==(optional<T> const & lhs, none_t) -> bool {
 	return !lhs;
-}
-
-template<typename T>
-constexpr auto operator==(none_t, optional<T> const & rhs) -> bool {
-	return !rhs;
 }
 
 } // namespace bounded
