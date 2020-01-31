@@ -110,8 +110,6 @@ private:
 	bool m_destructed = false;
 };
 
-BOUNDED_COMPARISON;
-
 template<typename Container>
 void test_unique_copy_less(Container const & source, Container const & expected) {
 	auto destination = Container(containers::repeat_n(containers::size(source), 0));

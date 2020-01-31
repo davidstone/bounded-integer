@@ -138,8 +138,6 @@ auto move_destroy(complex_resource && value) noexcept {
 	return result;
 }
 
-BOUNDED_COMPARISON
-
 }	// namespace
 
 int main() {

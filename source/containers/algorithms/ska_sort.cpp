@@ -905,8 +905,6 @@ private:
 	bool moved_from = false;
 };
 
-BOUNDED_COMPARISON
-
 static_assert(test_sort_copy(
 	containers::array<move_only, 4>{
 		5,

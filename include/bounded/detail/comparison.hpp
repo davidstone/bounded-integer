@@ -139,27 +139,4 @@ template<typename LHS, typename RHS = LHS>
 concept ordered = requires(LHS const & lhs, RHS const & rhs) { lhs <=> rhs; };
 
 
-template<typename LHS, typename RHS> requires ordered<LHS, RHS>
-constexpr auto operator<(LHS const & lhs, RHS const & rhs) {
-	return lhs <=> rhs < 0;
-}
-template<typename LHS, typename RHS> requires ordered<LHS, RHS>
-constexpr auto operator>(LHS const & lhs, RHS const & rhs) {
-	return lhs <=> rhs > 0;
-}
-template<typename LHS, typename RHS> requires ordered<LHS, RHS>
-constexpr auto operator<=(LHS const & lhs, RHS const & rhs) {
-	return lhs <=> rhs <= 0;
-}
-template<typename LHS, typename RHS> requires ordered<LHS, RHS>
-constexpr auto operator>=(LHS const & lhs, RHS const & rhs) {
-	return lhs <=> rhs >= 0;
-}
-
-#define BOUNDED_COMPARISON \
-	using ::bounded::operator<; \
-	using ::bounded::operator>; \
-	using ::bounded::operator<=; \
-	using ::bounded::operator>=;
-
 }	// namespace bounded

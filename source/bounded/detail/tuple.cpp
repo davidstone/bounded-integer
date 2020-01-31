@@ -11,7 +11,6 @@
 namespace {
 
 using namespace bounded::literal;
-BOUNDED_COMPARISON
 
 static_assert(std::is_empty_v<bounded::tuple<>>);
 static_assert(bounded::tuple{} == bounded::tuple{});

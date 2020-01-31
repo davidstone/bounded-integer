@@ -9,8 +9,6 @@
 
 namespace bounded_test {
 
-BOUNDED_COMPARISON
-
 // Add in some asserts and manually make special member functions non-trivial
 struct string_view {
 	constexpr string_view(char const * value_):

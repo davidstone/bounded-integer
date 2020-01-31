@@ -20,8 +20,6 @@ namespace detail {
 namespace common {
 
 #define CONTAINERS_COMMON_USING_DECLARATIONS \
-	CONTAINERS_DETAIL_COMMON_USING_DECLARATIONS \
-	CONTAINERS_COMMON_BEGIN_END_USING_DECLARATIONS \
 	CONTAINERS_NON_MODIFYING_COMMON_USING_DECLARATIONS \
 	using ::containers::detail::common::push_back; \
 	using ::containers::detail::common::append; \

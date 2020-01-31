@@ -19,7 +19,7 @@ namespace detail {
 namespace common {
 
 #define CONTAINERS_NON_MODIFYING_COMMON_USING_DECLARATIONS \
-	CONTAINERS_DETAIL_COMMON_USING_DECLARATIONS \
+	BOUNDED_COMMON_ARITHMETIC \
 	CONTAINERS_COMMON_BEGIN_END_USING_DECLARATIONS \
 	using ::containers::detail::common::data; \
 	using ::containers::detail::common::at; \
