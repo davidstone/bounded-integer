@@ -27,10 +27,6 @@ static_assert(std::is_empty_v<containers::array<int, 0>>);
 constexpr containers::array<int, 0> empty_array = {};
 static_assert(begin(empty_array) == end(empty_array), "Empty array.");
 
-template<typename Array>
-concept indexable_by_zero = requires(Array const & array) { array[0_bi]; };
-static_assert(!indexable_by_zero<containers::array<int, 0>>);
-
 constexpr auto array = containers::make_array(0_bi, 3_bi, 2_bi, 3_bi, 5_bi);
 static_assert(containers::count(array, 3_bi) == 2_bi);
 static_assert(containers::count(array, 2_bi) == 1_bi);

@@ -35,6 +35,23 @@ struct array_value_type<T> {
 	using type = T;
 };
 
+struct monostate{};
+
+template<std::size_t size>
+struct array_trait {
+	template<typename T>
+	using type = T[size];
+};
+
+template<>
+struct array_trait<0> {
+	template<typename>
+	using type = monostate;
+};
+
+template<typename T, std::size_t size>
+using array_type = typename array_trait<size>::template type<T>;
+
 }	// namespace detail
 
 template<typename T, std::size_t size, std::size_t... sizes>
@@ -51,19 +68,7 @@ struct array {
 
 	// Consider this private. It must be public for the class to be an
 	// aggregate
-	value_type m_value[size];
-};
-
-template<typename T, std::size_t... sizes>
-struct array<T, 0, sizes...> {
-	using value_type = typename detail::array_value_type<T, sizes...>::type;
-
-	using size_type = bounded::constant_t<0>;
-	
-	using const_iterator = contiguous_iterator<value_type const, 0>;
-	using iterator = contiguous_iterator<value_type, 0>;
-
-	// No operator[]
+	[[no_unique_address]] detail::array_type<value_type, size> m_value;
 };
 
 template<typename... Args>
