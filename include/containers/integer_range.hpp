@@ -61,7 +61,7 @@ public:
 		return lhs.m_value <=> rhs.m_value;
 	}
 
-	friend constexpr auto operator==(integer_range_iterator const lhs, integer_range_iterator const rhs) {
+	friend constexpr auto operator==(integer_range_iterator const lhs, integer_range_iterator const rhs) -> bool {
 		return lhs.m_value == rhs.m_value;
 	}
 

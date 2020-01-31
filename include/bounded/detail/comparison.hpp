@@ -100,7 +100,7 @@ constexpr auto operator<=>(LHS const & lhs, RHS const & rhs) {
 }
 
 template<bounded_integer LHS, bounded_integer RHS>
-constexpr auto operator==(LHS const & lhs, RHS const & rhs) {
+constexpr auto operator==(LHS const & lhs, RHS const & rhs) -> bool {
 	constexpr auto lhs_min = detail::builtin_min_value<LHS>;
 	constexpr auto lhs_max = detail::builtin_max_value<LHS>;
 	constexpr auto rhs_min = detail::builtin_min_value<RHS>;
@@ -139,11 +139,6 @@ template<typename LHS, typename RHS = LHS>
 concept ordered = requires(LHS const & lhs, RHS const & rhs) { lhs <=> rhs; };
 
 
-template<typename LHS, typename RHS> requires equality_comparable<LHS, RHS>
-constexpr auto operator!=(LHS const & lhs, RHS const & rhs) {
-	return !(lhs == rhs);
-}
-
 template<typename LHS, typename RHS> requires ordered<LHS, RHS>
 constexpr auto operator<(LHS const & lhs, RHS const & rhs) {
 	return lhs <=> rhs < 0;
@@ -162,7 +157,6 @@ constexpr auto operator>=(LHS const & lhs, RHS const & rhs) {
 }
 
 #define BOUNDED_COMPARISON \
-	using ::bounded::operator!=; \
 	using ::bounded::operator<; \
 	using ::bounded::operator>; \
 	using ::bounded::operator<=; \

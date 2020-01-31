@@ -121,7 +121,7 @@ constexpr auto operator<=>(T const & lhs, T const & rhs) {
 }
 
 template<range T>
-constexpr auto operator==(T const & lhs, T const & rhs) {
+constexpr auto operator==(T const & lhs, T const & rhs) -> bool {
 	return size(lhs) == size(rhs) and ::containers::equal(
 		begin(std::as_const(lhs)), end(std::as_const(lhs)),
 		begin(std::as_const(rhs))

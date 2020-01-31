@@ -18,17 +18,17 @@ constexpr auto operator<=>(detail_builtin_integer auto const lhs, bounded_intege
 	return integer(lhs) <=> rhs;
 }
 
-constexpr auto operator==(bounded_integer auto const lhs, detail_builtin_integer auto const rhs) {
+constexpr auto operator==(bounded_integer auto const lhs, detail_builtin_integer auto const rhs) -> bool {
 	return lhs == integer(rhs);
 }
-constexpr auto operator==(detail_builtin_integer auto const lhs, bounded_integer auto const rhs) {
+constexpr auto operator==(detail_builtin_integer auto const lhs, bounded_integer auto const rhs) -> bool {
 	return integer(lhs) == rhs;
 }
 
 constexpr auto operator<=>(bounded_integer auto const lhs, bool const rhs) = delete;
 constexpr auto operator<=>(bool const lhs, bounded_integer auto const rhs) = delete;
 
-constexpr auto operator==(bounded_integer auto const lhs, bool const rhs) = delete;
-constexpr auto operator==(bool const lhs, bounded_integer auto const rhs) = delete;
+constexpr auto operator==(bounded_integer auto const lhs, bool const rhs) -> bool = delete;
+constexpr auto operator==(bool const lhs, bounded_integer auto const rhs) -> bool = delete;
 
 }	// namespace bounded

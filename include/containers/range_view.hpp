@@ -62,7 +62,7 @@ template<typename Range>
 range_view(Range &) -> range_view<decltype(begin(std::declval<Range &>()), end(std::declval<Range &>()))>;
 
 template<typename Iterator, typename Sentinel>
-constexpr auto operator==(range_view<Iterator, Sentinel> const lhs, range_view<Iterator, Sentinel> const rhs) {
+constexpr auto operator==(range_view<Iterator, Sentinel> const lhs, range_view<Iterator, Sentinel> const rhs) -> bool {
 	return begin(lhs) == begin(rhs) and end(lhs) == end(rhs);
 }
 

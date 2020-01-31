@@ -246,12 +246,12 @@ public:
 
 
 	template<typename... RHSRanges>
-	friend constexpr auto operator==(concatenate_view_iterator const lhs, concatenate_view_iterator<RHSRanges...> const rhs) {
+	friend constexpr auto operator==(concatenate_view_iterator const lhs, concatenate_view_iterator<RHSRanges...> const rhs) -> bool {
 		::containers::detail::assert_same_ends(lhs.m_range_views, rhs.m_range_views);
 		return lhs.begin_iterators() == rhs.begin_iterators();
 	}
 
-	friend constexpr auto operator==(concatenate_view_iterator const lhs, concatenate_view_sentinel) {
+	friend constexpr auto operator==(concatenate_view_iterator const lhs, concatenate_view_sentinel) -> bool {
 		auto get_end_iterators = [](auto const range) { return end(range); };
 		return lhs.begin_iterators() == bounded::transform(get_end_iterators, lhs.m_range_views);
 	}
@@ -271,7 +271,7 @@ constexpr auto operator<=>(concatenate_view_sentinel const lhs, concatenate_view
 
 
 template<typename... Ranges>
-constexpr auto operator==(concatenate_view_sentinel const lhs, concatenate_view_iterator<Ranges...> const rhs) {
+constexpr auto operator==(concatenate_view_sentinel const lhs, concatenate_view_iterator<Ranges...> const rhs) -> bool {
 	return rhs == lhs;
 }
 

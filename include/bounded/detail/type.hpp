@@ -17,18 +17,13 @@ struct types<T> {
 };
 
 template<typename... LHS, typename... RHS>
-constexpr bool operator==(types<LHS...>, types<RHS...>) {
+constexpr auto operator==(types<LHS...>, types<RHS...>) -> bool {
 	return false;
 }
 
 template<typename... Ts>
-constexpr bool operator==(types<Ts...>, types<Ts...>) {
+constexpr auto operator==(types<Ts...>, types<Ts...>) -> bool {
 	return true;
-}
-
-template<typename... LHS, typename... RHS>
-constexpr bool operator!=(types<LHS...> lhs, types<RHS...> rhs) {
-	return !(lhs == rhs);
 }
 
 }	// namespace detail

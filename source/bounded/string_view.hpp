@@ -51,7 +51,7 @@ struct string_view {
 			++rhs.value;
 		}
 	}
-	friend constexpr auto operator==(string_view lhs, string_view rhs) {
+	friend constexpr auto operator==(string_view lhs, string_view rhs) -> bool {
 		BOUNDED_TEST(not lhs.moved_from and not rhs.moved_from);
 		while (true) {
 			if (*lhs.value != *rhs.value) {

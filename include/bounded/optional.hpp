@@ -246,7 +246,7 @@ constexpr auto make_optional_lazy(auto && function) -> optional<std::invoke_resu
 }
 
 template<typename LHS, typename RHS> requires equality_comparable<LHS, RHS>
-constexpr auto operator==(optional<LHS> const & lhs, optional<RHS> const & rhs) {
+constexpr auto operator==(optional<LHS> const & lhs, optional<RHS> const & rhs) -> bool {
 	return (lhs and rhs) ?
 		*lhs == *rhs :
 		static_cast<bool>(lhs) == static_cast<bool>(rhs);
@@ -254,22 +254,22 @@ constexpr auto operator==(optional<LHS> const & lhs, optional<RHS> const & rhs) 
 
 
 template<equality_comparable T>
-constexpr auto operator==(optional<T> const & lhs, T const & rhs) {
+constexpr auto operator==(optional<T> const & lhs, T const & rhs) -> bool {
 	return static_cast<bool>(lhs) and *lhs == rhs;
 }
 
 template<equality_comparable T>
-constexpr auto operator==(T const & lhs, optional<T> const & rhs) {
+constexpr auto operator==(T const & lhs, optional<T> const & rhs) -> bool {
 	return rhs == lhs;
 }
 
 template<typename T>
-constexpr auto operator==(optional<T> const & lhs, none_t) {
+constexpr auto operator==(optional<T> const & lhs, none_t) -> bool {
 	return !lhs;
 }
 
 template<typename T>
-constexpr auto operator==(none_t, optional<T> const & rhs) {
+constexpr auto operator==(none_t, optional<T> const & rhs) -> bool {
 	return !rhs;
 }
 

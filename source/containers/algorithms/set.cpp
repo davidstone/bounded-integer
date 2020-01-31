@@ -25,7 +25,7 @@ struct compares_address {
 	{
 	}
 	
-	friend constexpr auto operator==(compares_address const lhs, compares_address const rhs) {
+	friend constexpr auto operator==(compares_address const lhs, compares_address const rhs) -> bool {
 		return
 			std::addressof(lhs.m_first) == std::addressof(rhs.m_first) and
 			std::addressof(lhs.m_second) == std::addressof(rhs.m_second);
@@ -36,10 +36,10 @@ private:
 	int const & m_second;
 };
 
-constexpr auto operator==(compares_address const lhs, std::pair<int const &, int const &> rhs) {
+constexpr auto operator==(compares_address const lhs, std::pair<int const &, int const &> rhs) -> bool {
 	return lhs == compares_address(rhs);
 }
-constexpr auto operator==(std::pair<int const &, int const &> lhs, compares_address const rhs) {
+constexpr auto operator==(std::pair<int const &, int const &> lhs, compares_address const rhs) -> bool {
 	return compares_address(rhs) == lhs;
 }
 

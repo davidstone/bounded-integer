@@ -886,7 +886,7 @@ struct move_only {
 		return *this;
 	}
 
-	friend constexpr auto operator==(move_only const & lhs, move_only const & rhs) {
+	friend constexpr auto operator==(move_only const & lhs, move_only const & rhs) -> bool {
 		BOUNDED_TEST(!lhs.moved_from and !rhs.moved_from);
 		return lhs.value == rhs.value;
 	}
@@ -1289,7 +1289,7 @@ struct move_only_with_to_sort_key {
 		return *this;
 	}
 
-	friend constexpr auto operator==(move_only_with_to_sort_key const & lhs, move_only_with_to_sort_key const & rhs) {
+	friend constexpr auto operator==(move_only_with_to_sort_key const & lhs, move_only_with_to_sort_key const & rhs) -> bool {
 		BOUNDED_TEST(!lhs.moved_from and !rhs.moved_from);
 		return lhs.value == rhs.value;
 	}
@@ -1311,7 +1311,7 @@ private:
 template<bool by_value>
 struct wrapper {
 	move_only_with_to_sort_key<by_value> value;
-	friend constexpr auto operator==(wrapper const & lhs, wrapper const & rhs) {
+	friend constexpr auto operator==(wrapper const & lhs, wrapper const & rhs) -> bool {
 		return to_radix_sort_key(lhs.value) == to_radix_sort_key(rhs.value);
 	}
 	friend constexpr auto operator<=>(wrapper const & lhs, wrapper const & rhs) {

@@ -102,7 +102,7 @@ template<
 constexpr auto operator==(
 	set_intersection_pair_iterator<LHSForwardIterator1, LHSForwardIterator2, LHSRange> const lhs,
 	set_intersection_pair_iterator<RHSForwardIterator1, RHSForwardIterator2, RHSRange> const rhs
-) {
+) -> bool {
 	return lhs.first() == rhs.first();
 }
 

@@ -22,7 +22,7 @@ constexpr auto operator<=>(empty, empty) {
 	return std::strong_ordering::equal;
 }
 
-constexpr auto operator==(empty, empty) {
+constexpr auto operator==(empty, empty) -> bool {
 	return true;
 }
 
@@ -176,7 +176,7 @@ struct non_movable {
 constexpr auto operator<=>(non_movable const &, non_movable const &) {
 	return std::strong_ordering::equal;
 }
-constexpr auto operator==(non_movable const &, non_movable const &) {
+constexpr auto operator==(non_movable const &, non_movable const &) -> bool {
 	return true;
 }
 

@@ -14,7 +14,7 @@ struct S {
 	int n;
 };
 
-constexpr auto operator==(S const lhs, S const rhs) {
+constexpr auto operator==(S const lhs, S const rhs) -> bool {
 	return lhs.n == rhs.n;
 }
 

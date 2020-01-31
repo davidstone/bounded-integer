@@ -68,7 +68,7 @@ struct map_value_type {
 		return tie(lhs) <=> tie(rhs);
 	}
 
-	friend constexpr auto operator==(map_value_type const & lhs, map_value_type const & rhs) {
+	friend constexpr auto operator==(map_value_type const & lhs, map_value_type const & rhs) -> bool {
 		return tie(lhs) == tie(rhs);
 	}
 

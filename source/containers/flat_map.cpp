@@ -97,7 +97,7 @@ public:
 		BOUNDED_TEST(!rhs.m_destructed);
 		return lhs.m_value <=> rhs.m_value;
 	}
-	friend constexpr auto operator==(CheckedMover const & lhs, CheckedMover const & rhs) {
+	friend constexpr auto operator==(CheckedMover const & lhs, CheckedMover const & rhs) -> bool {
 		BOUNDED_TEST(!lhs.m_moved);
 		BOUNDED_TEST(!rhs.m_moved);
 		BOUNDED_TEST(!lhs.m_destructed);

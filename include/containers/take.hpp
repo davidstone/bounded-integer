@@ -57,15 +57,15 @@ struct counted_iterator {
 	OPERATORS_ARROW_DEFINITIONS
 	OPERATORS_BRACKET_ITERATOR_DEFINITIONS
 
-	friend constexpr auto operator==(counted_iterator const & lhs, counted_iterator const & rhs) {
+	friend constexpr auto operator==(counted_iterator const & lhs, counted_iterator const & rhs) -> bool {
 		return rhs.m_count == lhs.m_count;
 	}
 	template<typename Sentinel>
-	friend constexpr auto operator==(counted_iterator const & lhs, counted_sentinel<Sentinel> const & rhs) {
+	friend constexpr auto operator==(counted_iterator const & lhs, counted_sentinel<Sentinel> const & rhs) -> bool {
 		return lhs.m_count == 0_bi or lhs.m_it == rhs.base();
 	}
 	template<typename Sentinel>
-	friend constexpr auto operator==(counted_sentinel<Sentinel> const & lhs, counted_iterator const & rhs) {
+	friend constexpr auto operator==(counted_sentinel<Sentinel> const & lhs, counted_iterator const & rhs) -> bool {
 		return rhs == lhs;
 	}
 

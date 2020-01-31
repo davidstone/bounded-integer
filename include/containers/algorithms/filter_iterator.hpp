@@ -83,12 +83,12 @@ constexpr auto operator<=>(filter_iterator_sentinel, adapt_iterator<Iterator, Tr
 )
 
 template<iterator Iterator, is_filter_iterator_traits Traits>
-constexpr auto operator==(adapt_iterator<Iterator, Traits> const lhs, filter_iterator_sentinel) {
+constexpr auto operator==(adapt_iterator<Iterator, Traits> const lhs, filter_iterator_sentinel) -> bool {
 	return lhs.traits().equal(lhs.base(), lhs.traits().sentinel());
 }
 
 template<iterator Iterator, is_filter_iterator_traits Traits>
-constexpr auto operator==(filter_iterator_sentinel, adapt_iterator<Iterator, Traits> const rhs) {
+constexpr auto operator==(filter_iterator_sentinel, adapt_iterator<Iterator, Traits> const rhs) -> bool {
 	return rhs.traits().equal(rhs.traits().sentinel(), rhs.base());
 }
 

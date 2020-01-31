@@ -302,7 +302,7 @@ struct equality_visitor {
 } // namespace detail
 
 template<typename GetFunction, equality_comparable... Ts>
-constexpr auto operator==(basic_variant<GetFunction, Ts...> const & lhs, basic_variant<GetFunction, Ts...> const & rhs) {
+constexpr auto operator==(basic_variant<GetFunction, Ts...> const & lhs, basic_variant<GetFunction, Ts...> const & rhs) -> bool {
 	return visit_with_index(lhs, rhs, detail::equality_visitor{});
 }
 

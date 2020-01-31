@@ -60,7 +60,7 @@ constexpr auto operator<=>(legacy_iterator<Iterator> const lhs, legacy_iterator<
 }
 
 template<typename Iterator>
-constexpr auto operator==(legacy_iterator<Iterator> const lhs, legacy_iterator<Iterator> const rhs) {
+constexpr auto operator==(legacy_iterator<Iterator> const lhs, legacy_iterator<Iterator> const rhs) -> bool {
 	return lhs.base() == rhs.base();
 }
 

@@ -186,7 +186,7 @@ constexpr auto operator<=>(tuple<lhs_types...> const & lhs, tuple<rhs_types...> 
 
 
 template<typename... lhs_types, typename... rhs_types> requires(sizeof...(lhs_types) == sizeof...(rhs_types))
-constexpr auto operator==(tuple<lhs_types...> const & lhs, tuple<rhs_types...> const & rhs) {
+constexpr auto operator==(tuple<lhs_types...> const & lhs, tuple<rhs_types...> const & rhs) -> bool {
 	return detail::equal_impl(lhs, rhs, bounded::make_index_sequence(constant<sizeof...(lhs_types)>));
 }
 
