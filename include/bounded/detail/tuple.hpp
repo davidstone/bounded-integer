@@ -12,7 +12,7 @@
 #include <bounded/detail/make_index_sequence.hpp>
 #include <bounded/detail/type.hpp>
 
-#include <bounded/is_constructible.hpp>
+#include <bounded/concepts.hpp>
 #include <bounded/lazy_init.hpp>
 
 #include <type_traits>

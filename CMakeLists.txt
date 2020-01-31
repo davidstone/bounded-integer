@@ -89,13 +89,13 @@ add_executable(bounded_test
 	source/bounded/detail/underlying_type.cpp
 	source/bounded/assert.cpp
 	source/bounded/assert-NDEBUG.cpp
+	source/bounded/concepts.cpp
 	source/bounded/copy.cpp
 	source/bounded/representation_digits.cpp
 	source/bounded/hash.cpp
 	source/bounded/identity.cpp
 	source/bounded/insert.cpp
 	source/bounded/integer.cpp
-	source/bounded/is_constructible.cpp
 	source/bounded/lazy_init.cpp
 	source/bounded/numeric_limits.cpp
 	source/bounded/optional.cpp

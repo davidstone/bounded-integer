@@ -17,6 +17,8 @@
 #include <containers/repeat_n.hpp>
 #include <containers/uninitialized_storage.hpp>
 
+#include <bounded/concepts.hpp>
+
 #include <operators/bracket.hpp>
 
 namespace containers {

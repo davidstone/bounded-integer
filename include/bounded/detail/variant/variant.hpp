@@ -8,10 +8,10 @@
 #include <bounded/detail/class.hpp>
 #include <bounded/detail/comparison.hpp>
 #include <bounded/detail/copy_cv_ref.hpp>
+#include <bounded/concepts.hpp>
 #include <operators/forward.hpp>
 #include <bounded/insert.hpp>
 #include <bounded/lazy_init.hpp>
-#include <bounded/is_constructible.hpp>
 #include <bounded/value_to_function.hpp>
 #include <bounded/detail/type.hpp>
 #include <bounded/detail/variant/get_index.hpp>
@@ -29,24 +29,14 @@ namespace bounded {
 namespace detail {
 
 template<typename T>
-concept copy_constructible = std::is_copy_constructible_v<T>;
+concept variant_copy_assignable = copy_constructible<T> and copy_assignable<T>;
 template<typename T>
-concept trivially_copy_constructible = copy_constructible<T> and std::is_trivially_copy_constructible_v<T>;
+concept variant_trivially_copy_assignable = variant_copy_assignable<T> and trivially_copy_constructible<T> and trivially_copy_assignable<T>;
 
 template<typename T>
-concept move_constructible = std::is_move_constructible_v<T>;
+concept variant_move_assignable = move_constructible<T> and move_assignable<T>;
 template<typename T>
-concept trivially_move_constructible = move_constructible<T> and std::is_trivially_move_constructible_v<T>;
-
-template<typename T>
-concept variant_copy_assignable = copy_constructible<T> and std::is_copy_assignable_v<T>;
-template<typename T>
-concept variant_trivially_copy_assignable = variant_copy_assignable<T> and trivially_copy_constructible<T> and std::is_trivially_copy_assignable_v<T>;
-
-template<typename T>
-concept variant_move_assignable = move_constructible<T> and std::is_move_assignable_v<T>;
-template<typename T>
-concept variant_trivially_move_assignable = variant_move_assignable<T> and trivially_move_constructible<T> and std::is_trivially_move_assignable_v<T>;
+concept variant_trivially_move_assignable = variant_move_assignable<T> and trivially_move_constructible<T> and trivially_move_assignable<T>;
 
 } // namespace detail
 
@@ -64,11 +54,11 @@ private:
 public:
 	friend detail::variant_destructor<GetFunction, Ts...>;
 
-	static_assert(std::is_trivially_copy_constructible_v<GetFunction>);
-	static_assert(std::is_trivially_move_constructible_v<GetFunction>);
-	static_assert(std::is_trivially_copy_assignable_v<GetFunction>);
-	static_assert(std::is_trivially_move_assignable_v<GetFunction>);
-	static_assert(std::is_trivially_destructible_v<GetFunction>);
+	static_assert(trivially_copy_constructible<GetFunction>);
+	static_assert(trivially_move_constructible<GetFunction>);
+	static_assert(trivially_copy_assignable<GetFunction>);
+	static_assert(trivially_move_assignable<GetFunction>);
+	static_assert(trivially_destructible<GetFunction>);
 
 	template<typename Index, typename Construct> requires(construct_function_for<Construct, type_at<Index>>)
 	constexpr basic_variant(lazy_init_t, convertible_to<GetFunction> auto && function, Index index_, Construct && construct_):
@@ -137,21 +127,21 @@ public:
 	}
 	
 
-	constexpr basic_variant(basic_variant const &) requires (... and detail::trivially_copy_constructible<Ts>) = default;
+	constexpr basic_variant(basic_variant const &) requires (... and trivially_copy_constructible<Ts>) = default;
 
 	constexpr basic_variant(basic_variant const & other) noexcept(
 		(... and std::is_nothrow_copy_constructible_v<Ts>)
-	) requires((... and detail::copy_constructible<Ts>) and !(... and detail::trivially_copy_constructible<Ts>)):
+	) requires((... and copy_constructible<Ts>) and !(... and trivially_copy_constructible<Ts>)):
 		basic_variant(other, copy_move_tag{})
 	{
 	}
 
 
-	constexpr basic_variant(basic_variant &&) requires(... and detail::trivially_move_constructible<Ts>) = default;
+	constexpr basic_variant(basic_variant &&) requires(... and trivially_move_constructible<Ts>) = default;
 
 	constexpr basic_variant(basic_variant && other) noexcept(
 		(... and std::is_nothrow_move_constructible_v<Ts>)
-	) requires((... and detail::move_constructible<Ts>) and !(... and detail::trivially_move_constructible<Ts>)):
+	) requires((... and move_constructible<Ts>) and !(... and trivially_move_constructible<Ts>)):
 		basic_variant(std::move(other), copy_move_tag{})
 	{
 	}
@@ -266,9 +256,9 @@ private:
 		return construct(operator[](index_value), OPERATORS_FORWARD(construct_));
 		#endif
 		constexpr auto trivial = (... and (
-			std::is_trivially_copy_constructible_v<Ts> and
-			std::is_trivially_copy_assignable_v<Ts> and
-			std::is_trivially_destructible_v<Ts>
+			trivially_copy_constructible<Ts> and
+			trivially_copy_assignable<Ts> and
+			trivially_destructible<Ts>
 		));
 		constexpr auto index_value = detail::get_index(index, detail::types<Ts>()...);
 		m_function = GetFunction(index_value);
