@@ -11,11 +11,11 @@
 
 namespace bounded {
 
-constexpr auto operator<=>(bounded_integer auto const lhs, detail_builtin_integer auto const rhs) {
+constexpr auto operator<=>(bounded_integer auto const lhs, detail::builtin_integer auto const rhs) {
 	return lhs <=> integer(rhs);
 }
 
-constexpr auto operator==(bounded_integer auto const lhs, detail_builtin_integer auto const rhs) -> bool {
+constexpr auto operator==(bounded_integer auto const lhs, detail::builtin_integer auto const rhs) -> bool {
 	return lhs == integer(rhs);
 }
 

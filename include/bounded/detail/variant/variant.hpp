@@ -60,7 +60,9 @@ public:
 	static_assert(trivially_move_assignable<GetFunction>);
 	static_assert(trivially_destructible<GetFunction>);
 
-	template<typename Index, typename Construct> requires(construct_function_for<Construct, type_at<Index>>)
+	// Cannot use more terse syntax until fix for
+	// https://bugs.llvm.org/show_bug.cgi?id=44751
+	template<typename Index, construct_function_for<type_at<Index>> Construct>
 	constexpr basic_variant(lazy_init_t, convertible_to<GetFunction> auto && function, Index index_, Construct && construct_):
 		m_function(OPERATORS_FORWARD(function)),
 		m_data(detail::get_index(index_, detail::types<Ts>()...), OPERATORS_FORWARD(construct_))
@@ -86,7 +88,7 @@ public:
 	{
 	}
 
-	template<typename Index, typename Construct> requires construct_function_for<Construct, type_at<Index>>
+	template<typename Index, construct_function_for<type_at<Index>> Construct>
 	constexpr basic_variant(lazy_init_t, Index const index_, Construct && construct_):
 		basic_variant(
 			lazy_init,
@@ -107,18 +109,16 @@ public:
 	{
 	}
 
-	template<typename Construct> requires unique_construct_function<Construct, Ts...>
-	constexpr explicit basic_variant(lazy_init_t, Construct && construct_):
+	constexpr explicit basic_variant(lazy_init_t, unique_construct_function<Ts...> auto && construct_):
 		basic_variant(
 			lazy_init,
-			detail::types<constructed_type<Construct>>(),
+			detail::types<constructed_type<decltype(construct_)>>(),
 			OPERATORS_FORWARD(construct_)
 		)
 	{
 	}
 	
-	template<typename T> requires matches_exactly_one_type<T, detail::types<Ts>...>
-	constexpr explicit basic_variant(T && value):
+	constexpr explicit basic_variant(matches_exactly_one_type<detail::types<Ts>...> auto && value):
 		basic_variant(
 			lazy_init,
 			value_to_function(OPERATORS_FORWARD(value))
@@ -127,7 +127,7 @@ public:
 	}
 	
 
-	constexpr basic_variant(basic_variant const &) requires (... and trivially_copy_constructible<Ts>) = default;
+	constexpr basic_variant(basic_variant const &) = default;
 
 	constexpr basic_variant(basic_variant const & other) noexcept(
 		(... and std::is_nothrow_copy_constructible_v<Ts>)
@@ -137,7 +137,7 @@ public:
 	}
 
 
-	constexpr basic_variant(basic_variant &&) requires(... and trivially_move_constructible<Ts>) = default;
+	constexpr basic_variant(basic_variant &&) = default;
 
 	constexpr basic_variant(basic_variant && other) noexcept(
 		(... and std::is_nothrow_move_constructible_v<Ts>)
@@ -146,7 +146,7 @@ public:
 	{
 	}
 
-	constexpr auto operator=(basic_variant const &) & -> basic_variant & requires(... and detail::variant_trivially_copy_assignable<Ts>) = default;
+	constexpr auto operator=(basic_variant const &) & -> basic_variant & = default;
 
 	constexpr auto operator=(basic_variant const & other) & noexcept(
 		(... and std::is_nothrow_copy_assignable_v<Ts>) and
@@ -157,7 +157,7 @@ public:
 	}
 
 
-	constexpr auto operator=(basic_variant &&) & -> basic_variant & requires(... and detail::variant_trivially_move_assignable<Ts>) = default;
+	constexpr auto operator=(basic_variant &&) & -> basic_variant & = default;
 
 	constexpr auto operator=(basic_variant && other) & noexcept(
 		(... and std::is_nothrow_move_assignable_v<Ts>) and
@@ -200,8 +200,8 @@ public:
 		return operator_bracket(std::move(m_data), index_);
 	}
 
-	template<typename Index, construct_function_for<type_at<Index>> Construct>
-	constexpr auto & emplace(Index index, Construct && construct_) & {
+	template<typename Index>
+	constexpr auto & emplace(Index index, construct_function_for<type_at<Index>> auto && construct_) & {
 		if constexpr (noexcept(type_at<decltype(index)>(OPERATORS_FORWARD(construct_())))) {
 			visit(*this, destroy);
 			return replace_active_member(index, OPERATORS_FORWARD(construct_));
@@ -211,9 +211,8 @@ public:
 			return replace_active_member(index, value_to_function(std::move(value)));
 		}
 	}
-	template<typename Construct> requires unique_construct_function<Construct, Ts...>
-	constexpr auto & emplace(Construct && construct_) & {
-		return emplace(detail::types<constructed_type<Construct>>(), OPERATORS_FORWARD(construct_));
+	constexpr auto & emplace(unique_construct_function<Ts...> auto && construct_) & {
+		return emplace(detail::types<constructed_type<decltype(construct_)>>(), OPERATORS_FORWARD(construct_));
 	}
 	
 private:

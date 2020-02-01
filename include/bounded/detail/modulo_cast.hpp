@@ -16,7 +16,7 @@ namespace detail {
 
 // https://stackoverflow.com/questions/13150449/efficient-unsigned-to-signed-cast-avoiding-implementation-defined-behavior/57947296#57947296
 // has the full explanation for this code
-template<detail_unsigned_builtin T>
+template<unsigned_builtin T>
 constexpr auto cast_to_signed_integer(T const value) {
 	using unsigned_t = std::conditional_t<sizeof(T) <= sizeof(unsigned), unsigned, T>;
 	using signed_t = std::make_signed_t<unsigned_t>;
@@ -36,7 +36,7 @@ constexpr auto cast_to_signed_integer(T const value) {
 	}
 }
 
-constexpr auto cast_to_signed_integer(detail_signed_builtin auto const value) {
+constexpr auto cast_to_signed_integer(signed_builtin auto const value) {
 	return value;
 }
 

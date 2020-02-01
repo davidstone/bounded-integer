@@ -87,8 +87,7 @@ private:
 	static constexpr auto index_sequence = std::make_index_sequence<sizeof...(RangeViews)>{};
 	static constexpr auto max_index = bounded::constant<sizeof...(RangeViews)> - bounded::constant<1>;
 
-	template<typename Index>
-	constexpr decltype(auto) operator_star(Index const index) const {
+	constexpr decltype(auto) operator_star(auto const index) const {
 		auto const range_view = m_range_views[index];
 		if constexpr (index == max_index) {
 			return front(range_view);
@@ -99,8 +98,8 @@ private:
 		}
 	}
 
-	template<typename Index, typename Offset, std::size_t... indexes>
-	static constexpr auto operator_plus(bounded::tuple<RangeViews...> const range_views, Index const index, Offset const offset, std::index_sequence<indexes...> indexes_) {
+	template<std::size_t... indexes>
+	static constexpr auto operator_plus(bounded::tuple<RangeViews...> const range_views, auto const index, auto const offset, std::index_sequence<indexes...> indexes_) {
 		if constexpr (index == sizeof...(RangeViews)) {
 			return bounded::apply(range_views, bounded::construct_return<concatenate_view_iterator>);
 		} else if constexpr ((... and detail::forward_random_access_range<RangeViews>)) {

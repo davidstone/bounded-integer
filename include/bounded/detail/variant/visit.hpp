@@ -197,9 +197,7 @@ private:
 	template<typename Function>
 	struct unwrap_visitor_parameter {
 		Function && function;
-		// TODO: use terse syntax when it does not crash clang
-		template<typename... Args>
-		constexpr auto operator()(Args && ... args) && OPERATORS_RETURNS(
+		constexpr auto operator()(auto && ... args) && OPERATORS_RETURNS(
 			OPERATORS_FORWARD(function)(OPERATORS_FORWARD(args).value...)
 		)
 	};

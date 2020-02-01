@@ -70,7 +70,7 @@ public:
 namespace bounded {
 
 template<typename T>
-inline constexpr auto is_integer = detail_builtin_integer<T> or bounded_integer<T>;
+inline constexpr auto is_integer = detail::builtin_integer<T> or bounded_integer<T>;
 
 template<typename T, T value>
 inline constexpr auto is_integer<std::integral_constant<T, value>> = is_integer<T>;
@@ -131,9 +131,6 @@ template<auto value, typename overflow_policy = null_policy>
 inline constexpr auto constant = constant_t<detail::normalize<value>, overflow_policy>{};
 
 
-// TODO: Use terse concepts syntax on most of these constructors after fix for
-// https://github.com/saarraz/clang-concepts-monorepo/issues/17
-
 template<auto minimum, auto maximum, typename overflow_policy_ = null_policy>
 struct integer {
 	static_assert(std::is_same_v<decltype(minimum), std::remove_const_t<decltype(detail::normalize<minimum>)>>);
@@ -159,13 +156,11 @@ struct integer {
 	// overflow_policy, which they default and ignore. This is solely to make
 	// the class work better with deduction guides.
 
-	template<detail::overlapping_integer<minimum, maximum, overflow_policy> T>
-	constexpr integer(T const & other, non_check_t):
+	constexpr integer(detail::overlapping_integer<minimum, maximum, overflow_policy> auto const & other, non_check_t):
 		m_value(static_cast<underlying_type>(other)) {
 	}
 
-	template<detail::bounded_by_range<minimum, maximum, overflow_policy> T>
-	constexpr integer(T const other, overflow_policy = overflow_policy{}):
+	constexpr integer(detail::bounded_by_range<minimum, maximum, overflow_policy> auto const other, overflow_policy = overflow_policy{}):
 		integer(other, non_check)
 	{
 	}
@@ -208,7 +203,7 @@ struct integer {
 	// Do not verify that the value is in range because the user has requested a
 	// conversion out of the safety of bounded::integer. It is subject to all
 	// the standard rules of conversion from one integer type to another.
-	template<typename T> requires (detail_builtin_arithmetic<T> or std::is_enum_v<T>)
+	template<typename T> requires (detail::builtin_arithmetic<T> or std::is_enum_v<T>)
 	constexpr explicit operator T() const {
 		return static_cast<T>(value());
 	}

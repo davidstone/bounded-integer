@@ -43,10 +43,16 @@ inline constexpr auto const & min_value<T volatile> = min_value<T>;
 template<typename T>
 inline constexpr auto const & min_value<T const volatile> = min_value<T>;
 
-template<detail_unsigned_builtin T>
+template<>
+inline constexpr auto max_value<bool> = true;
+
+template<>
+inline constexpr auto min_value<bool> = false;
+
+template<detail::unsigned_builtin T>
 inline constexpr auto max_value<T> = T(-1);
 
-template<detail_unsigned_builtin T>
+template<detail::unsigned_builtin T>
 inline constexpr auto min_value<T> = T(0);
 
 template<typename T> requires std::is_signed_v<T>

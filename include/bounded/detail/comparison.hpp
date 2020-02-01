@@ -17,13 +17,13 @@
 namespace bounded {
 namespace detail {
 
-template<detail_builtin_integer LHS, detail_builtin_integer RHS>
+template<builtin_integer LHS, builtin_integer RHS>
 constexpr auto safe_compare(LHS const lhs, RHS const rhs) -> std::strong_ordering {
-	if constexpr (detail_signed_builtin<LHS> == detail_signed_builtin<RHS>) {
+	if constexpr (signed_builtin<LHS> == signed_builtin<RHS>) {
 		return lhs <=> rhs;
 	} else if constexpr (not std::is_same_v<LHS, detail::max_unsigned_t> and not std::is_same_v<RHS, detail::max_unsigned_t>) {
 		return static_cast<detail::max_signed_t>(lhs) <=> static_cast<detail::max_signed_t>(rhs);
-	} else if constexpr (detail_signed_builtin<LHS>) {
+	} else if constexpr (signed_builtin<LHS>) {
 		static_assert(std::is_same_v<RHS, detail::max_unsigned_t>);
 		return lhs < 0 ? std::strong_ordering::less : static_cast<RHS>(lhs) <=> rhs;
 	} else {
@@ -32,14 +32,14 @@ constexpr auto safe_compare(LHS const lhs, RHS const rhs) -> std::strong_orderin
 	}
 }
 
-template<detail_builtin_integer LHS, detail_builtin_integer RHS>
+template<builtin_integer LHS, builtin_integer RHS>
 constexpr auto safe_equal(LHS const lhs, RHS const rhs) -> bool {
 	constexpr auto signed_max = max_value<detail::max_signed_t>;
-	if constexpr (detail_signed_builtin<LHS> == detail_signed_builtin<RHS>) {
+	if constexpr (signed_builtin<LHS> == signed_builtin<RHS>) {
 		return lhs == rhs;
 	} else if constexpr (max_value<LHS> <= signed_max and max_value<RHS> <= signed_max) {
 		return static_cast<detail::max_signed_t>(lhs) == static_cast<detail::max_signed_t>(rhs);
-	} else if constexpr (detail_signed_builtin<LHS>) {
+	} else if constexpr (signed_builtin<LHS>) {
 		static_assert(std::is_same_v<RHS, detail::max_unsigned_t>);
 		return lhs >= 0 and static_cast<RHS>(lhs) == rhs;
 	} else {
@@ -52,7 +52,7 @@ template<typename Limited>
 constexpr auto safe_extreme(auto const pick_lhs, auto const lhs_, auto const rhs_) {
 	auto normalized = [](auto const value) {
 		using normalized_t = std::conditional_t<
-			detail_signed_builtin<std::decay_t<decltype(value)>>,
+			signed_builtin<std::decay_t<decltype(value)>>,
 			max_signed_t,
 			max_unsigned_t
 		>;

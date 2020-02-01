@@ -45,21 +45,17 @@ using max_signed_t = std::intmax_t;
 using max_unsigned_t = std::uintmax_t;
 #endif
 
-}	// namespace detail
-
-// These are not in the detail namespace to work around
-// https://github.com/saarraz/clang-concepts-monorepo/issues/18
+template<typename T>
+concept builtin_arithmetic = (std::is_arithmetic_v<T> and !std::is_same_v<T, bool>) or std::is_same_v<T, detail::max_signed_t> or std::is_same_v<T, detail::max_unsigned_t>;
 
 template<typename T>
-concept detail_builtin_integer = (std::is_integral_v<T> and !std::is_same_v<T, bool>) or std::is_same_v<T, detail::max_signed_t> or std::is_same_v<T, detail::max_unsigned_t>;
-
-// Work around 
-template<typename T>
-concept detail_builtin_arithmetic = (std::is_arithmetic_v<T> and !std::is_same_v<T, bool>) or std::is_same_v<T, detail::max_signed_t> or std::is_same_v<T, detail::max_unsigned_t>;
+concept builtin_integer = builtin_arithmetic<T> and !std::is_floating_point_v<T>;
 
 template<typename T>
-concept detail_signed_builtin = std::is_signed_v<T> or std::is_same_v<T, detail::max_signed_t>;
-template<typename T>
-concept detail_unsigned_builtin = std::is_unsigned_v<T> or std::is_same_v<T, detail::max_unsigned_t>;
+concept signed_builtin = builtin_integer<T> and (std::is_signed_v<T> or std::is_same_v<T, detail::max_signed_t>);
 
-}	// namespace bounded
+template<typename T>
+concept unsigned_builtin = builtin_integer<T> and (std::is_unsigned_v<T> or std::is_same_v<T, detail::max_unsigned_t>);
+
+} // namespace detail
+} // namespace bounded

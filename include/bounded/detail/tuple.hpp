@@ -31,9 +31,7 @@ struct tuple_value {
 	{
 	}
 
-	// TODO: convertible
-	template<typename Arg> requires constructible_from<T, Arg>
-	constexpr explicit tuple_value(Arg && arg):
+	constexpr explicit tuple_value(convertible_to<T> auto && arg):
 		m_value(OPERATORS_FORWARD(arg))
 	{
 	}

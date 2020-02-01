@@ -38,14 +38,12 @@ struct optional_storage {
 	{
 	}
 	
-	template<typename Construct> requires construct_function_for<Construct, T>
-	constexpr explicit optional_storage(lazy_init_t, Construct && construct_):
+	constexpr explicit optional_storage(lazy_init_t, construct_function_for<T> auto && construct_):
 		m_data(lazy_init, value_index, OPERATORS_FORWARD(construct_))
 	{
 	}
 	
-	template<typename U> requires constructible_from<T, U &&>
-	constexpr explicit optional_storage(U && value):
+	constexpr explicit optional_storage(explicitly_convertible_to<T> auto && value):
 		m_data(value_index, OPERATORS_FORWARD(value))
 	{
 	}
@@ -88,14 +86,12 @@ struct optional_storage<T> {
 	{
 	}
 	
-	template<typename Construct> requires construct_function_for<Construct, T>
-	constexpr explicit optional_storage(lazy_init_t, Construct && construct_):
+	constexpr explicit optional_storage(lazy_init_t, construct_function_for<T> auto && construct_):
 		m_data(lazy_init, OPERATORS_FORWARD(construct_)())
 	{
 	}
 	
-	template<typename U> requires constructible_from<T, U &&>
-	constexpr explicit optional_storage(U && value):
+	constexpr explicit optional_storage(explicitly_convertible_to<T> auto && value):
 		m_data(OPERATORS_FORWARD(value))
 	{
 	}
@@ -164,8 +160,7 @@ public:
 	constexpr optional(none_t = none) {
 	}
 
-	template<typename Construct> requires construct_function_for<Construct, T>
-	constexpr explicit optional(lazy_init_t, Construct && construct_):
+	constexpr explicit optional(lazy_init_t, construct_function_for<T> auto && construct_):
 		m_storage(lazy_init, OPERATORS_FORWARD(construct_)) {
 	}
 	constexpr optional(convertible_to<value_type> auto && other):

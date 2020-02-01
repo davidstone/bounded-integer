@@ -34,16 +34,13 @@ inline constexpr auto construct_return = [](auto && ... args) requires construct
 };
 
 
-struct construct_t {
-	template<typename T, typename Function>
-	constexpr auto & operator()(T & ref, Function && function) const requires construct_function_for<Function, T> {
-		if constexpr (detail::constexpr_constructible<T>) {
-			return ref = OPERATORS_FORWARD(function)();
-		} else {
-			return *::new(static_cast<void *>(std::addressof(ref))) T(OPERATORS_FORWARD(function)());
-		}
+inline constexpr auto construct = []<typename T>(T & ref, construct_function_for<T> auto && function) -> auto & {
+	if constexpr (detail::constexpr_constructible<T>) {
+		return ref = OPERATORS_FORWARD(function)();
+	} else {
+		return *::new(static_cast<void *>(std::addressof(ref))) T(OPERATORS_FORWARD(function)());
 	}
-} inline constexpr construct;
+};
 
 
 inline constexpr auto destroy = [](auto & ref) {

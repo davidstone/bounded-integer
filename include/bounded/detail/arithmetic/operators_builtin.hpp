@@ -14,10 +14,10 @@
 namespace bounded {
 
 #define BOUNDED_INTEGER_MIXED_OPERATOR_OVERLOADS(symbol) \
-constexpr auto operator symbol(bounded_integer auto const lhs, detail_builtin_integer auto const rhs) { \
+constexpr auto operator symbol(bounded_integer auto const lhs, detail::builtin_integer auto const rhs) { \
 	return lhs.value() symbol rhs; \
 } \
-constexpr auto operator symbol(detail_builtin_integer auto const lhs, bounded_integer auto const rhs) { \
+constexpr auto operator symbol(detail::builtin_integer auto const lhs, bounded_integer auto const rhs) { \
 	return lhs symbol rhs.value(); \
 } \
 \
