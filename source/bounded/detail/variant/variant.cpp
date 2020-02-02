@@ -11,6 +11,14 @@ namespace {
 
 using namespace bounded::literal;
 
+using empty_variant_t = bounded::variant<>;
+static_assert(not std::is_default_constructible_v<empty_variant_t>);
+static_assert(not bounded::constructible_from<empty_variant_t, bounded::constant_t<0>>);
+static_assert(std::is_empty_v<empty_variant_t>);
+
+struct empty {};
+static_assert(std::is_empty_v<bounded::variant<empty>>);
+
 using thing_t = bounded::variant<int, short, long, char, int>;
 
 static_assert(std::is_trivially_copy_constructible_v<thing_t>);
@@ -141,10 +149,6 @@ constexpr auto test_assignment_from_value() {
 	return true;
 }
 static_assert(test_assignment_from_value());
-
-using empty_variant_t = bounded::variant<>;
-static_assert(not std::is_default_constructible_v<empty_variant_t>);
-static_assert(not bounded::constructible_from<empty_variant_t, bounded::constant_t<0>>);
 
 struct non_trivial {
 	constexpr non_trivial() {}

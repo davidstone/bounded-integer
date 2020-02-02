@@ -319,7 +319,7 @@ struct variant_selector {
 		return index;
 	}
 private:
-	integer<0, normalize<size - 1U>> index;
+	[[no_unique_address]] integer<0, normalize<size - 1U>> index;
 };
 
 template<>

@@ -32,8 +32,8 @@ union variadic_union<T, Ts...> {
 	{
 	}
 
-	T head;
-	variadic_union<Ts...> tail;
+	[[no_unique_address]] T head;
+	[[no_unique_address]] variadic_union<Ts...> tail;
 };
 
 
@@ -55,8 +55,8 @@ union variadic_union<T, Ts...> {
 	variadic_union & operator=(variadic_union const &) = default;
 	~variadic_union() {}
 
-	T head;
-	variadic_union<Ts...> tail;
+	[[no_unique_address]] T head;
+	[[no_unique_address]] variadic_union<Ts...> tail;
 };
 
 
