@@ -60,10 +60,12 @@ public:
 	static_assert(trivially_move_assignable<GetFunction>);
 	static_assert(trivially_destructible<GetFunction>);
 
-	// Cannot use more terse syntax until fix for
-	// https://bugs.llvm.org/show_bug.cgi?id=44751
-	template<typename Index, construct_function_for<type_at<Index>> Construct>
-	constexpr basic_variant(lazy_init_t, convertible_to<GetFunction> auto && function, Index index_, Construct && construct_):
+	constexpr basic_variant(
+		lazy_init_t,
+		convertible_to<GetFunction> auto && function,
+		auto index_,
+		construct_function_for<type_at<decltype(index_)>> auto && construct_
+	):
 		m_function(OPERATORS_FORWARD(function)),
 		m_data(detail::get_index(index_, detail::types<Ts>()...), OPERATORS_FORWARD(construct_))
 	{
@@ -77,8 +79,11 @@ public:
 		);
 	}
 
-	template<typename Index>
-	constexpr basic_variant(convertible_to<GetFunction> auto && function, Index index_, convertible_to<type_at<Index>> auto && value):
+	constexpr basic_variant(
+		convertible_to<GetFunction> auto && function,
+		auto index_,
+		convertible_to<type_at<decltype(index_)>> auto && value
+	):
 		basic_variant(
 			lazy_init,
 			OPERATORS_FORWARD(function),
@@ -88,8 +93,11 @@ public:
 	{
 	}
 
-	template<typename Index, construct_function_for<type_at<Index>> Construct>
-	constexpr basic_variant(lazy_init_t, Index const index_, Construct && construct_):
+	constexpr basic_variant(
+		lazy_init_t,
+		auto const index_,
+		construct_function_for<type_at<decltype(index_)>> auto && construct_
+	):
 		basic_variant(
 			lazy_init,
 			GetFunction(detail::get_index(index_, detail::types<Ts>()...)),
@@ -99,8 +107,10 @@ public:
 	{
 	}
 	
-	template<typename Index>
-	constexpr basic_variant(Index index_, convertible_to<type_at<Index>> auto && value):
+	constexpr basic_variant(
+		auto index_,
+		convertible_to<type_at<decltype(index_)>> auto && value
+	):
 		basic_variant(
 			lazy_init,
 			index_,
@@ -200,8 +210,7 @@ public:
 		return operator_bracket(std::move(m_data), index_);
 	}
 
-	template<typename Index>
-	constexpr auto & emplace(Index index, construct_function_for<type_at<Index>> auto && construct_) & {
+	constexpr auto & emplace(auto index, construct_function_for<type_at<decltype(index)>> auto && construct_) & {
 		if constexpr (noexcept(type_at<decltype(index)>(OPERATORS_FORWARD(construct_())))) {
 			visit(*this, destroy);
 			return replace_active_member(index, OPERATORS_FORWARD(construct_));
