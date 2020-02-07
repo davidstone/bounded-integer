@@ -56,6 +56,7 @@ add_executable(bounded_test
 	source/bounded/detail/policy/modulo_policy.cpp
 	source/bounded/detail/policy/null_policy.cpp
 	source/bounded/detail/policy/throw_policy.cpp
+	source/bounded/detail/variant/get_index.cpp
 	source/bounded/detail/variant/visit.cpp
 	source/bounded/detail/abs.cpp
 	source/bounded/detail/assume.cpp
@@ -98,6 +99,7 @@ add_executable(bounded_test
 	source/bounded/integer.cpp
 	source/bounded/lazy_init.cpp
 	source/bounded/numeric_limits.cpp
+	source/bounded/nth_type.cpp
 	source/bounded/optional.cpp
 	source/bounded/string.cpp
 	source/bounded/to_integer.cpp

@@ -14,6 +14,7 @@
 
 #include <bounded/concepts.hpp>
 #include <bounded/lazy_init.hpp>
+#include <bounded/nth_type.hpp>
 
 #include <type_traits>
 #include <utility>
@@ -77,18 +78,6 @@ struct tuple_value<index, void> {
 	constexpr void operator[](types<void>) const {
 	}
 };
-
-template<std::size_t index, typename T, typename... Ts>
-struct nth_type_c {
-	using type = typename nth_type_c<index - 1, Ts...>::type;
-};
-template<typename T, typename... Ts>
-struct nth_type_c<0, T, Ts...> {
-	using type = T;
-};
-template<std::size_t index, typename... Ts>
-using nth_type = typename nth_type_c<index, Ts...>::type;
-
 
 template<typename Indexes, typename... Types>
 struct tuple_impl;
@@ -214,7 +203,7 @@ struct tuple_element_c;
 
 template<std::size_t index, typename... Types>
 struct tuple_element_c<index, tuple<Types...>> {
-	using type = detail::nth_type<index, Types...>;
+	using type = nth_type<index, Types...>;
 };
 
 template<std::size_t index, typename Tuple>
