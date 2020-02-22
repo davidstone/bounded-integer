@@ -29,36 +29,6 @@ namespace detail {
 // Explanation of SSO (small / short string optimization)
 // https://stackoverflow.com/a/10319672/852254
 
-
-template<typename T>
-struct owning_storage {
-	owning_storage(dynamic_array_data<T> storage_):
-		storage(std::move(storage_)),
-		active(true)
-	{
-	}
-	owning_storage(owning_storage && other) noexcept:
-		storage(other.storage),
-		active(std::exchange(other.active, false))
-	{
-	}
-	~owning_storage() {
-		if (active) {
-			::containers::detail::deallocate_storage(storage);
-		}
-	}
-	
-	dynamic_array_data<T> storage;
-	bool active;
-};
-
-
-template<typename T>
-constexpr auto data(owning_storage<T> & container) {
-	return container.storage.pointer;
-}
-
-
 // If size remains below requested_small_capacity, there will be no allocations.
 // requested_small_capacity is a guaranteed minimum. The implementation may
 // reserve more space if it is less than minimum_small_capacity.
@@ -335,21 +305,20 @@ private:
 	}
 
 	constexpr auto relocate_to_large(auto const requested_capacity) {
-		auto temp = detail::owning_storage<value_type>(detail::make_storage<value_type>(requested_capacity));
-		containers::uninitialized_move_destroy(*this, data(temp));
+		auto temp = detail::make_storage<value_type>(requested_capacity);
+		containers::uninitialized_move_destroy(*this, temp.pointer);
 		deallocate_large();
 		::bounded::construct(
 			m_large,
 			[&] {
 				return large_t(
 					size(),
-					static_cast<typename large_t::capacity_type>(temp.storage.size),
-					reinterpret_cast<value_type *>(temp.storage.pointer)
+					static_cast<typename large_t::capacity_type>(temp.size),
+					reinterpret_cast<value_type *>(temp.pointer)
 				);
 			}
 		);
 		BOUNDED_ASSERT(is_large());
-		temp.active = false;
 	}
 
 
