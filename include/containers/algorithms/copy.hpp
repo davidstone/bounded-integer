@@ -23,6 +23,10 @@ constexpr auto copy(InputIterator first, sentinel_for<InputIterator> auto const 
 	return result { first, out };
 }
 
+constexpr auto copy(range auto && input, iterator auto out) {
+	return ::containers::copy(begin(input), end(input), out);
+}
+
 template<iterator InputIterator>
 constexpr auto move(InputIterator const first, sentinel_for<InputIterator> auto const last, iterator auto const out) {
 	auto const iterators = ::containers::copy(::containers::move_iterator(first), ::containers::move_iterator(last), out);
@@ -33,14 +37,26 @@ constexpr auto move(InputIterator const first, sentinel_for<InputIterator> auto 
 	return result { iterators.input.base(), iterators.output };
 }
 
+constexpr auto move(range auto && input, iterator auto out) {
+	return ::containers::move(begin(input), end(input), out);
+}
+
 template<bidirectional_iterator BidirectionalIterator>
 constexpr auto copy_backward(BidirectionalIterator const first, BidirectionalIterator const last, bidirectional_iterator auto const out_last) {
 	return ::containers::copy(::containers::reverse_iterator(last), ::containers::reverse_iterator(first), ::containers::reverse_iterator(out_last)).output.base();
 }
 
+constexpr auto copy_backward(range auto && input, iterator auto out) {
+	return ::containers::copy_backward(begin(input), end(input), out);
+}
+
 template<bidirectional_iterator BidirectionalIterator>
 constexpr auto move_backward(BidirectionalIterator const first, BidirectionalIterator const last, bidirectional_iterator auto const out_last) {
 	return ::containers::copy_backward(::containers::move_iterator(first), ::containers::move_iterator(last), out_last);
+}
+
+constexpr auto move_backward(range auto && input, iterator auto out) {
+	return ::containers::move_backward(begin(input), end(input), out);
 }
 
 }	// namespace containers
