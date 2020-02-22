@@ -9,7 +9,6 @@
 #include <containers/common_container_functions.hpp>
 #include <containers/contiguous_iterator.hpp>
 #include <containers/dynamic_array.hpp>
-#include <containers/dynamic_resizable_array.hpp>
 #include <containers/index_type.hpp>
 #include <containers/repeat_n.hpp>
 #include <containers/scope_guard.hpp>
@@ -17,12 +16,10 @@
 
 #include <bounded/assert.hpp>
 #include <bounded/concepts.hpp>
+#include <bounded/integer.hpp>
 
-#include <algorithm>
 #include <cstddef>
 #include <initializer_list>
-#include <memory>
-#include <cstring>
 #include <type_traits>
 #include <utility>
 
@@ -73,9 +70,10 @@ constexpr auto data(owning_storage<T> & container) {
 template<typename T>
 inline constexpr auto minimum_small_capacity = (bounded::size_of<std::pair<typename dynamic_array_data<T>::size_type, dynamic_array_data<T>>> - bounded::size_of<unsigned char>) / bounded::size_of<T>;
 
+} // namespace detail
 
 template<typename T, std::size_t requested_small_capacity>
-struct sbo_vector_base {
+struct small_buffer_optimized_vector {
 	using value_type = T;
 
 	struct small_t {
@@ -91,7 +89,7 @@ struct sbo_vector_base {
 			return m_force_large;
 		}
 		static constexpr auto capacity() {
-			return bounded::max(minimum_small_capacity<T>, bounded::constant<requested_small_capacity>);
+			return bounded::max(detail::minimum_small_capacity<T>, bounded::constant<requested_small_capacity>);
 		}
 
 		using size_type = bounded::integer<0, bounded::detail::normalize<capacity().value()>>;
@@ -157,7 +155,7 @@ struct sbo_vector_base {
 	private:
 		bool m_force_large : 1;
 		typename size_type::underlying_type m_size : (bounded::size_of_bits<size_type> - 1_bi).value();
-		dynamic_array_data<trivial_storage<T>> m_data;
+		detail::dynamic_array_data<trivial_storage<T>> m_data;
 	};
 	
 	static_assert(std::is_nothrow_move_constructible_v<value_type>);
@@ -173,90 +171,97 @@ struct sbo_vector_base {
 	using const_iterator = contiguous_iterator<value_type const, bounded::detail::builtin_max_value<size_type>>;
 	using iterator = contiguous_iterator<value_type, bounded::detail::builtin_max_value<size_type>>;
 
-	constexpr sbo_vector_base():
+	constexpr small_buffer_optimized_vector():
 		m_small()
 	{
 	}
 	
-	~sbo_vector_base() {
-		deallocate_large();
+	template<range Range> requires(
+		!std::is_array_v<std::remove_cv_t<std::remove_reference_t<Range>>>
+	)
+	constexpr explicit small_buffer_optimized_vector(Range && source):
+		small_buffer_optimized_vector()
+	{
+		append(*this, OPERATORS_FORWARD(source));
 	}
 	
-	// The elements are destroyed, but any storage may still remain
-	auto move_assign_to_empty(sbo_vector_base && other) & {
-		deallocate_large();
-		auto make_small = [](small_t & small) {
-			::bounded::construct(small, bounded::construct_return<small_t>);
-		};
-		if (other.is_small()) {
-			make_small(m_small);
-			containers::uninitialized_move_destroy(other, m_small.data());
-			m_small.set_size(other.m_small.size());
-			other.m_small.set_size(0_bi);
-		} else {
-			::bounded::construct(m_large, bounded::value_to_function(other.m_large));
-			// It is safe to skip the destructor call of other.m_large because
-			// we do not rely on its side-effects
-			make_small(other.m_small);
-		}
+	constexpr small_buffer_optimized_vector(std::initializer_list<value_type> init):
+		small_buffer_optimized_vector()
+	{
+		append(*this, init);
 	}
 
-	friend constexpr auto begin(sbo_vector_base const & container) {
+	constexpr small_buffer_optimized_vector(small_buffer_optimized_vector const & other):
+		small_buffer_optimized_vector()
+	{
+		append(*this, other);
+	}
+
+	constexpr small_buffer_optimized_vector(small_buffer_optimized_vector && other) noexcept:
+		small_buffer_optimized_vector()
+	{
+		move_assign_to_empty(std::move(other));
+	}
+
+	constexpr auto & operator=(small_buffer_optimized_vector const & other) & {
+		assign(*this, other);
+		return *this;
+	}
+	constexpr auto & operator=(small_buffer_optimized_vector && other) & noexcept {
+		::containers::detail::destroy_range(*this);
+		deallocate_large();
+		move_assign_to_empty(std::move(other));
+		return *this;
+	}
+
+	constexpr auto & operator=(std::initializer_list<value_type> init) & {
+		assign(*this, init);
+		return *this;
+	}
+
+	constexpr ~small_buffer_optimized_vector() {
+		::containers::detail::destroy_range(*this);
+		deallocate_large();
+	}
+
+	friend constexpr auto begin(small_buffer_optimized_vector const & container) {
 		auto const result = container.is_small() ?
 			container.m_small.data() :
 			container.m_large.data();
 		BOUNDED_ASSERT_OR_ASSUME(result != nullptr);
 		return const_iterator(result);
 	}
-	friend constexpr auto begin(sbo_vector_base & container) {
+	friend constexpr auto begin(small_buffer_optimized_vector & container) {
 		return iterator(const_cast<value_type *>(pointer_from(begin(std::as_const(container)))));
 	}
 	
-	friend constexpr auto end(sbo_vector_base const & container) {
+	friend constexpr auto end(small_buffer_optimized_vector const & container) {
 		return begin(container) + container.size();
 	}
-	friend constexpr auto end(sbo_vector_base & container) {
+	friend constexpr auto end(small_buffer_optimized_vector & container) {
 		return begin(container) + container.size();
 	}
 
-	auto capacity() const {
+	OPERATORS_BRACKET_SEQUENCE_RANGE_DEFINITIONS
+	
+	constexpr auto capacity() const {
 		return BOUNDED_CONDITIONAL(is_small(), m_small.capacity(), m_large.capacity());
 	}
-
-
-	auto make_storage(auto const new_capacity) & {
-		return owning_storage<value_type>(detail::make_storage<value_type>(new_capacity));
-	}
-
-	auto relocate_preallocated(owning_storage<value_type> new_large) {
-		deallocate_large();
-		::bounded::construct(
-			m_large,
-			[&] {
-				return large_t(
-					size(),
-					static_cast<typename large_t::capacity_type>(new_large.storage.size),
-					reinterpret_cast<value_type *>(new_large.storage.pointer)
-				);
-			}
-		);
-		BOUNDED_ASSERT(is_large());
-		new_large.active = false;
-	}
-
-
-	// Assumes that requested_capacity is large enough
-	auto relocate(auto const requested_capacity) {
-		if (requested_capacity <= small_t::capacity()) {
-			relocate_to_small();
-		} else {
-			auto temp = make_storage(requested_capacity);
-			containers::uninitialized_move_destroy(*this, data(temp));
-			relocate_preallocated(std::move(temp));
+	constexpr auto reserve(size_type const requested_capacity) {
+		if (requested_capacity > capacity()) {
+			relocate(requested_capacity);
 		}
 	}
-	
-	auto set_size(auto const new_size) {
+	constexpr auto shrink_to_fit() {
+		auto const s = size();
+		if (s != capacity()) {
+			relocate(s);
+		}
+	}
+
+	// Assumes that elements are already constructed in the spare capacity
+	constexpr void append_from_capacity(auto const count) {
+		auto const new_size = size() + count;
 		if (is_small()) {
 			if constexpr (bounded::constructible_from<typename small_t::size_type, decltype(new_size)>) {
 				m_small.set_size(static_cast<typename small_t::size_type>(new_size));
@@ -266,19 +271,21 @@ struct sbo_vector_base {
 		} else {
 			m_large.set_size(static_cast<typename large_t::size_type>(new_size));
 		}
+		BOUNDED_ASSERT(size() == new_size);
 	}
 
+
 private:
-	auto size() const {
+	constexpr auto size() const {
 		return BOUNDED_CONDITIONAL(is_small(), m_small.size(), m_large.size());
 	}
-	auto relocate_to_small() {
+	constexpr auto relocate_to_small() {
 		if (is_small()) {
 			return;
 		}
 		auto temp = std::move(m_large);
 		auto const guard = scope_guard([&]{
-			detail::deallocate_storage(dynamic_array_data(temp.data(), temp.capacity()));
+			detail::deallocate_storage(detail::dynamic_array_data(temp.data(), temp.capacity()));
 		});
 		// It is safe to skip the destructor call of m_large
 		// because we do not rely on its side-effects
@@ -304,9 +311,54 @@ private:
 		return !is_large();
 	}
 	
-	auto deallocate_large() {
+	constexpr auto deallocate_large() {
 		if (is_large()) {
-			detail::deallocate_storage(dynamic_array_data(m_large.data(), m_large.capacity()));
+			detail::deallocate_storage(detail::dynamic_array_data(m_large.data(), m_large.capacity()));
+		}
+	}
+	
+	constexpr auto move_assign_to_empty(small_buffer_optimized_vector && other) & {
+		auto make_small = [](small_t & small) {
+			::bounded::construct(small, bounded::construct_return<small_t>);
+		};
+		if (other.is_small()) {
+			make_small(m_small);
+			containers::uninitialized_move_destroy(other, m_small.data());
+			m_small.set_size(other.m_small.size());
+			other.m_small.set_size(0_bi);
+		} else {
+			::bounded::construct(m_large, bounded::value_to_function(other.m_large));
+			// It is safe to skip the destructor call of other.m_large because
+			// we do not rely on its side-effects
+			make_small(other.m_small);
+		}
+	}
+
+	constexpr auto relocate_to_large(auto const requested_capacity) {
+		auto temp = detail::owning_storage<value_type>(detail::make_storage<value_type>(requested_capacity));
+		containers::uninitialized_move_destroy(*this, data(temp));
+		deallocate_large();
+		::bounded::construct(
+			m_large,
+			[&] {
+				return large_t(
+					size(),
+					static_cast<typename large_t::capacity_type>(temp.storage.size),
+					reinterpret_cast<value_type *>(temp.storage.pointer)
+				);
+			}
+		);
+		BOUNDED_ASSERT(is_large());
+		temp.active = false;
+	}
+
+
+	// Assumes that requested_capacity is large enough
+	constexpr auto relocate(auto const requested_capacity) {
+		if (requested_capacity <= small_t::capacity()) {
+			relocate_to_small();
+		} else {
+			relocate_to_large(requested_capacity);
 		}
 	}
 	
@@ -321,12 +373,7 @@ private:
 };
 
 
-}	// namespace detail
-
 template<typename T, std::size_t requested_capacity>
-inline constexpr auto is_container<detail::sbo_vector_base<T, requested_capacity>> = true;
-
-template<typename T, std::size_t requested_small_capacity>
-using small_buffer_optimized_vector = detail::dynamic_resizable_array<detail::sbo_vector_base<T, requested_small_capacity>>;
+inline constexpr auto is_container<small_buffer_optimized_vector<T, requested_capacity>> = true;
 
 }	// namespace containers
