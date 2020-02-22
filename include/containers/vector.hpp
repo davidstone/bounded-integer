@@ -86,7 +86,7 @@ struct vector {
 	}
 
 	OPERATORS_BRACKET_SEQUENCE_RANGE_DEFINITIONS
-	
+
 	constexpr auto capacity() const {
 		return ::containers::size(m_container);
 	}
@@ -126,6 +126,9 @@ private:
 	raw_container m_container;
 	size_type m_size = 0_bi;
 };
+
+template<typename Range>
+vector(Range &&) -> vector<std::decay_t<typename std::decay_t<Range>::value_type>>;
 
 template<typename T>
 inline constexpr auto is_container<vector<T>> = true;
