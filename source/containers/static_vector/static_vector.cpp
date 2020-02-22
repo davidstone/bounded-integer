@@ -154,6 +154,21 @@ static_assert(std::is_trivially_destructible_v<containers::static_vector<int, 3>
 static_assert(std::is_trivially_copy_assignable_v<containers::static_vector<int, 3>>);
 static_assert(std::is_trivially_move_assignable_v<containers::static_vector<int, 3>>);
 
+struct non_trivial {
+	non_trivial();
+	non_trivial(non_trivial &&);
+	non_trivial(non_trivial const &);
+	non_trivial & operator=(non_trivial &&);
+	non_trivial & operator=(non_trivial const &);
+	~non_trivial();
+};
+
+static_assert(!std::is_trivially_copy_constructible_v<containers::static_vector<non_trivial, 3>>);
+static_assert(!std::is_trivially_move_constructible_v<containers::static_vector<non_trivial, 3>>);
+static_assert(!std::is_trivially_destructible_v<containers::static_vector<non_trivial, 3>>);
+static_assert(!std::is_trivially_copy_assignable_v<containers::static_vector<non_trivial, 3>>);
+static_assert(!std::is_trivially_move_assignable_v<containers::static_vector<non_trivial, 3>>);
+
 }	// namespace
 
 int main() {

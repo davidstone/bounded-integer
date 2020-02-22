@@ -24,7 +24,7 @@
 namespace containers {
 namespace detail {
 
-template<typename T, std::size_t capacity_, bool = std::is_trivial_v<T>>
+template<typename T, std::size_t capacity_, bool = std::is_trivially_destructible_v<T>>
 struct static_vector_data {
 	static constexpr auto capacity() {
 		return bounded::constant<bounded::detail::normalize<capacity_>>;
@@ -39,10 +39,29 @@ struct static_vector_data {
 	using iterator = contiguous_iterator<T, static_cast<std::ptrdiff_t>(capacity_)>;
 
 	static_vector_data() = default;
-	static_vector_data(static_vector_data &&) = default;
-	static_vector_data(static_vector_data const &) = default;
-	static_vector_data & operator=(static_vector_data &&) & = default;
-	static_vector_data & operator=(static_vector_data const &) & = default;
+
+	static_vector_data(static_vector_data &&) requires std::is_trivially_move_constructible_v<T> = default;
+	static_vector_data(static_vector_data const &) requires std::is_trivially_copy_constructible_v<T> = default;
+	static_vector_data & operator=(static_vector_data &&) & requires std::is_trivially_move_assignable_v<T> = default;
+	static_vector_data & operator=(static_vector_data const &) & requires std::is_trivially_copy_assignable_v<T> = default;
+
+	constexpr static_vector_data(static_vector_data && other) noexcept(std::is_nothrow_move_constructible_v<T>) {
+		std::uninitialized_move(begin(other), end(other), begin(*this));
+		this->m_size = other.m_size;
+	}
+	constexpr static_vector_data(static_vector_data const & other) {
+		std::uninitialized_copy(begin(other), end(other), begin(*this));
+		this->m_size = other.m_size;
+	}
+
+	constexpr auto & operator=(static_vector_data && other) & noexcept(std::is_nothrow_move_assignable_v<T> and std::is_nothrow_move_constructible_v<T>) {
+		assign(*this, std::move(other));
+		return *this;
+	}
+	constexpr auto & operator=(static_vector_data const & other) & {
+		assign(*this, other);
+		return *this;
+	}
 
 	constexpr explicit static_vector_data(range auto && source) {
 		::containers::append(*this, OPERATORS_FORWARD(source));
@@ -92,29 +111,14 @@ public:
 	using base::base;
 	using base::operator=;
 
-	static_vector_data(static_vector_data && other) noexcept(std::is_nothrow_move_constructible_v<T>) {
-		std::uninitialized_move(begin(other), end(other), begin(*this));
-		this->m_size = other.m_size;
-	}
-	static_vector_data(static_vector_data const & other) {
-		std::uninitialized_copy(begin(other), end(other), begin(*this));
-		this->m_size = other.m_size;
-	}
+	static_vector_data(static_vector_data &&) = default;
+	static_vector_data(static_vector_data const &) = default;
+	static_vector_data & operator=(static_vector_data &&) & = default;
+	static_vector_data & operator=(static_vector_data const &) & = default;
 
-	~static_vector_data() {
+	constexpr ~static_vector_data() {
 		::containers::detail::destroy_range(*this);
 	}
-
-	auto & operator=(static_vector_data && other) & noexcept(std::is_nothrow_move_assignable_v<T> and std::is_nothrow_move_constructible_v<T>) {
-		assign(*this, std::move(other));
-		return *this;
-	}
-
-	auto & operator=(static_vector_data const & other) & {
-		assign(*this, other);
-		return *this;
-	}
-
 };
 
 } // namespace detail
