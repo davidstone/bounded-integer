@@ -36,7 +36,7 @@ namespace detail {
 // support the small buffer optimization, so there is no point going below it.
 //
 // Therefore, to request the smallest possible buffer, the user can request a
-// size of 1
+// size of 0.
 template<typename T>
 inline constexpr auto minimum_small_capacity = (bounded::size_of<std::pair<typename dynamic_array_data<T>::size_type, dynamic_array_data<T>>> - bounded::size_of<unsigned char>) / bounded::size_of<T>;
 
@@ -136,7 +136,6 @@ struct small_buffer_optimized_vector {
 		bounded::max_value<size_type> <= bounded::constant<(1ULL << (CHAR_BIT * sizeof(value_type *) - 1)) - 1>,
 		"Maximum possible size is too large -- would use bit reserved for small-buffer optimization."
 	);
-	static_assert(requested_small_capacity > 0, "Must request at least one element for the minimum capacity, otherwise you should use vector.");
 
 	using const_iterator = contiguous_iterator<value_type const, bounded::detail::builtin_max_value<size_type>>;
 	using iterator = contiguous_iterator<value_type, bounded::detail::builtin_max_value<size_type>>;

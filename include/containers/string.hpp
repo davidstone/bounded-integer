@@ -23,10 +23,10 @@ concept char_like = std::is_trivial_v<CharT> and std::is_standard_layout_v<CharT
 
 // Unlike std::basic_string, there is no null terminator.
 template<typename CharT>
-struct basic_string : private small_buffer_optimized_vector<CharT, 1> {
+struct basic_string : private small_buffer_optimized_vector<CharT, 0> {
 	static_assert(detail::char_like<CharT>);
 private:
-	using base = small_buffer_optimized_vector<CharT, 1>;
+	using base = small_buffer_optimized_vector<CharT, 0>;
 public:
 	using typename base::value_type;
 	using typename base::size_type;
