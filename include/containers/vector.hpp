@@ -8,91 +8,126 @@
 #include <containers/common_container_functions.hpp>
 #include <containers/contiguous_iterator.hpp>
 #include <containers/dynamic_array.hpp>
-#include <containers/dynamic_resizable_array.hpp>
 #include <containers/index_type.hpp>
+#include <containers/is_container.hpp>
 #include <containers/repeat_n.hpp>
 #include <containers/uninitialized_storage.hpp>
 
-#include <algorithm>
-#include <cstddef>
+#include <operators/forward.hpp>
+
 #include <initializer_list>
-#include <memory>
 #include <type_traits>
 #include <utility>
 
 namespace containers {
-namespace detail {
 
 template<typename T>
-struct vector_base {
+struct vector {
 	using value_type = T;
-	using size_type = typename dynamic_array_data<value_type>::size_type;
+	using size_type = typename detail::dynamic_array_data<value_type>::size_type;
 
 	using const_iterator = contiguous_iterator<value_type const, bounded::detail::builtin_max_value<size_type>>;
 	using iterator = contiguous_iterator<value_type, bounded::detail::builtin_max_value<size_type>>;
 	using raw_container = dynamic_array<trivial_storage<value_type>>;
 
-	constexpr vector_base() = default;
+	constexpr vector() = default;
 
-	constexpr vector_base(vector_base && other) noexcept:
+	template<range Range> requires(
+		!std::is_array_v<std::remove_cv_t<std::remove_reference_t<Range>>>
+	)
+	constexpr explicit vector(Range && source) {
+		append(*this, OPERATORS_FORWARD(source));
+	}
+	
+	constexpr vector(std::initializer_list<value_type> init) {
+		append(*this, init);
+	}
+
+	constexpr vector(vector && other) noexcept:
 		m_container(std::move(other.m_container)),
 		m_size(std::exchange(other.m_size, 0_bi))
 	{
 	}
 
-	constexpr auto move_assign_to_empty(vector_base && other) & {
+	constexpr vector(vector const & other) {
+		append(*this, other);
+	}
+
+	constexpr auto & operator=(vector && other) & noexcept {
+		::containers::detail::destroy_range(*this);
 		m_container = std::move(other.m_container);
 		m_size = std::exchange(other.m_size, 0_bi);
+		return *this;
+	}
+	constexpr auto & operator=(vector const & other) & {
+		assign(*this, other);
+		return *this;
 	}
 
-	friend constexpr auto begin(vector_base const & container) {
+	constexpr auto & operator=(std::initializer_list<value_type> init) & {
+		assign(*this, init);
+		return *this;
+	}
+
+	constexpr ~vector() {
+		::containers::detail::destroy_range(*this);
+	}
+
+	friend constexpr auto begin(vector const & container) {
 		return const_iterator(::containers::detail::static_or_reinterpret_cast<value_type const *>(data(container.m_container)));
 	}
-	friend constexpr auto begin(vector_base & container) {
+	friend constexpr auto begin(vector & container) {
 		return iterator(::containers::detail::static_or_reinterpret_cast<value_type *>(data(container.m_container)));
 	}
-	friend constexpr auto end(vector_base const & container) {
+	friend constexpr auto end(vector const & container) {
 		return begin(container) + container.m_size;
 	}
-	friend constexpr auto end(vector_base & container) {
+	friend constexpr auto end(vector & container) {
 		return begin(container) + container.m_size;
 	}
 
+	OPERATORS_BRACKET_SEQUENCE_RANGE_DEFINITIONS
+	
 	constexpr auto capacity() const {
 		return ::containers::size(m_container);
 	}
+	constexpr auto reserve(size_type const requested_capacity) {
+		if (requested_capacity > capacity()) {
+			relocate(requested_capacity);
+		}
+	}
+	constexpr auto shrink_to_fit() {
+		auto const s = size(*this);
+		if (s != capacity()) {
+			relocate(s);
+		}
+	}
 
-	auto make_storage(auto const new_capacity) {
+	// Assumes that elements are already constructed in the spare capacity
+	constexpr void append_from_capacity(auto const count) {
+		m_size = size(*this) + count;
+	}
+
+private:
+	constexpr auto make_storage(auto const new_capacity) {
 		return raw_container(repeat_default_n<typename raw_container::value_type>(new_capacity));
 	}
-	auto relocate_preallocated(raw_container temp) {
-		m_container = std::move(temp);
-		// m_size remains the same
-	}
 
-	auto relocate(auto const requested_capacity) {
+	constexpr auto relocate(auto const requested_capacity) {
 		auto temp = make_storage(requested_capacity);
 		containers::uninitialized_move_destroy(
 			*this,
 			::containers::detail::static_or_reinterpret_cast<value_type *>(data(temp))
 		);
-		relocate_preallocated(std::move(temp));
+		m_container = std::move(temp);
+		// m_size remains the same
 	}
 	
-	auto set_size(auto const s) {
-		m_size = s;
-	}
-private:
 	raw_container m_container;
 	size_type m_size = 0_bi;
 };
 
-}	// namespace detail
-
 template<typename T>
-inline constexpr auto is_container<detail::vector_base<T>> = true;
-
-template<typename T>
-using vector = detail::dynamic_resizable_array<detail::vector_base<T>>;
+inline constexpr auto is_container<vector<T>> = true;
 
 }	// namespace containers
