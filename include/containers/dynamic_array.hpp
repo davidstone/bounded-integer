@@ -64,7 +64,7 @@ constexpr auto make_storage(auto const size) {
 }
 
 template<typename T>
-auto deallocate_storage(dynamic_array_data<T> const data) {
+constexpr auto deallocate_storage(dynamic_array_data<T> const data) {
 	std::allocator<T>{}.deallocate(
 		data.pointer,
 		static_cast<std::size_t>(data.size)
@@ -82,7 +82,7 @@ constexpr auto cleanup(dynamic_array_data<T> const data) {
 
 
 template<typename T>
-auto dynamic_array_initializer(range auto && init) {
+constexpr auto dynamic_array_initializer(range auto && init) {
 	auto const data = make_storage<T>(::containers::detail::linear_size(init));
 	try {
 		containers::uninitialized_copy(
@@ -131,7 +131,7 @@ struct dynamic_array {
 	{
 	}
 	
-	~dynamic_array() {
+	constexpr ~dynamic_array() {
 		detail::cleanup(m_data);
 	}
 
@@ -166,7 +166,7 @@ private:
 };
 
 template<typename T>
-void clear(dynamic_array<T> & value) {
+constexpr void clear(dynamic_array<T> & value) {
 	value = {};
 }
 
@@ -185,7 +185,7 @@ inline constexpr bool is_initializer_list<std::initializer_list<T>> = true;
 
 
 template<typename T, range Range> requires(!detail::is_initializer_list<std::decay_t<Range>>)
-auto assign(dynamic_array<T> & container, Range && range) {
+constexpr auto assign(dynamic_array<T> & container, Range && range) {
 	auto const difference = detail::linear_size(range);
 	if (difference == size(container)) {
 		::containers::copy(begin(OPERATORS_FORWARD(range)), end(OPERATORS_FORWARD(range)), begin(container));
