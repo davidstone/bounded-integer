@@ -82,6 +82,7 @@ inline constexpr auto is_container<basic_string<CharT>> = true;
 
 namespace detail {
 
+// TODO: non-template
 template<typename CharT>
 struct c_string_sentinel_t {
 };
@@ -151,36 +152,36 @@ template<detail::string_like LHS, detail::string_like RHS> requires(
 	(detail::string_specialization<LHS> or detail::string_specialization<RHS>) and
 	std::is_same_v<typename std::decay_t<LHS>::value_type, typename std::decay_t<RHS>::value_type>
 )
-auto operator+(LHS && lhs, RHS && rhs) {
+constexpr auto operator+(LHS && lhs, RHS && rhs) {
 	using result_t = std::decay_t<std::conditional_t<detail::is_string<std::decay_t<LHS>>, LHS, RHS>>;
 	return ::containers::concatenate<result_t>(OPERATORS_FORWARD(lhs), OPERATORS_FORWARD(rhs));
 }
 
 template<typename CharT>
-auto operator+(basic_string<CharT> && lhs, CharT const * const rhs) {
+constexpr auto operator+(basic_string<CharT> && lhs, CharT const * const rhs) {
 	return std::move(lhs) + std::basic_string_view(rhs);
 }
 template<typename CharT>
-auto operator+(basic_string<CharT> const & lhs, CharT const * const rhs) {
+constexpr auto operator+(basic_string<CharT> const & lhs, CharT const * const rhs) {
 	return lhs + std::basic_string_view(rhs);
 }
 
 template<typename CharT>
-auto operator+(CharT const * const lhs, basic_string<CharT> && rhs) {
+constexpr auto operator+(CharT const * const lhs, basic_string<CharT> && rhs) {
 	return std::basic_string_view(lhs) + std::move(rhs);
 }
 template<typename CharT>
-auto operator+(CharT const * const lhs, basic_string<CharT> const & rhs) {
+constexpr auto operator+(CharT const * const lhs, basic_string<CharT> const & rhs) {
 	return std::basic_string_view(lhs) + rhs;
 }
 
 
 template<detail::string_specialization String>
-auto operator+(String && lhs, typename std::remove_reference_t<String>::value_type const rhs) {
+constexpr auto operator+(String && lhs, typename std::remove_reference_t<String>::value_type const rhs) {
 	return containers::concatenate<std::decay_t<String>>(OPERATORS_FORWARD(lhs), ::containers::single_element_range(rhs));
 }
 template<detail::string_specialization String>
-auto operator+(typename std::remove_reference_t<String>::value_type const lhs, String && rhs) {
+constexpr auto operator+(typename std::remove_reference_t<String>::value_type const lhs, String && rhs) {
 	return containers::concatenate<std::decay_t<String>>(::containers::single_element_range(lhs), OPERATORS_FORWARD(rhs));
 }
 
