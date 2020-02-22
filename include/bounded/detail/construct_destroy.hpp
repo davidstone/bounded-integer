@@ -12,17 +12,44 @@
 #include <memory>
 #include <type_traits>
 
+// In namespace std to trick clang until libc++ has construct_at
+namespace std {
+
+template<typename T>
+constexpr auto construct_at(T * p, auto && ... args) {
+	return ::new(p) T(OPERATORS_FORWARD(args)...);
+}
+
+} // namespace std
+
 namespace bounded {
 namespace detail {
 
-// A non-movable type still returns true for is_trivially_copyable and friends
-template<typename T>
-concept constexpr_constructible = std::is_move_assignable_v<T> and std::is_trivially_move_assignable_v<T> and std::is_trivially_destructible_v<T>;
+// https://quuxplusone.github.io/blog/2018/05/17/super-elider-round-2/
+template<typename Function>
+struct superconstructing_super_elider {
+	constexpr explicit superconstructing_super_elider(Function function):
+		m_function(std::move(function))
+	{
+	}
+
+	// Deleting the move constructor limits the cases where this will silently
+	// collide with an "accepts anything" constructor. For instance, this class
+	// can be used with std::any.
+	superconstructing_super_elider(superconstructing_super_elider &&) = delete;
+
+	constexpr operator auto() && {
+		return std::move(m_function)();
+	}
+
+private:
+	Function m_function;
+};
 
 template<typename T, typename... Args>
 concept brace_constructible = requires (Args && ... args) { T{OPERATORS_FORWARD(args)...}; };
 
-}	// namespace detail
+} // namespace detail
 
 template<typename T>
 inline constexpr auto construct_return = [](auto && ... args) requires constructible_from<T, decltype(args)...> or detail::brace_constructible<T, decltype(args)...> {
@@ -35,13 +62,11 @@ inline constexpr auto construct_return = [](auto && ... args) requires construct
 
 
 inline constexpr auto construct = []<typename T>(T & ref, construct_function_for<T> auto && function) -> auto & {
-	if constexpr (detail::constexpr_constructible<T>) {
-		return ref = OPERATORS_FORWARD(function)();
-	} else {
-		return *::new(static_cast<void *>(std::addressof(ref))) T(OPERATORS_FORWARD(function)());
-	}
+	return *std::construct_at(
+		std::addressof(ref),
+		detail::superconstructing_super_elider([&] { return static_cast<T>(OPERATORS_FORWARD(function)()); })
+	);
 };
-
 
 inline constexpr auto destroy = [](auto & ref) {
 	using T = std::decay_t<decltype(ref)>;
@@ -50,4 +75,4 @@ inline constexpr auto destroy = [](auto & ref) {
 	}
 };
 
-}	// namespace bounded
+} // namespace bounded
