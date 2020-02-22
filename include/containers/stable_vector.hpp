@@ -39,7 +39,7 @@ struct stable_vector {
 	using iterator = contiguous_iterator<value_type, static_cast<std::ptrdiff_t>(capacity_)>;
 
 	// Allocates the full capacity
-	stable_vector():
+	constexpr stable_vector():
 		m_storage(std::allocator<T>{}.allocate(static_cast<std::ptrdiff_t>(capacity()))),
 		m_size(0_bi)
 	{
@@ -49,40 +49,40 @@ struct stable_vector {
 		range<Range> and
 		!std::is_array_v<std::remove_cv_t<std::remove_reference_t<Range>>>
 	)
-	explicit stable_vector(Range && range):
+	constexpr explicit stable_vector(Range && range):
 		stable_vector()
 	{
 		::containers::append(*this, OPERATORS_FORWARD(range));
 	}
 	
-	stable_vector(std::initializer_list<value_type> init):
+	constexpr stable_vector(std::initializer_list<value_type> init):
 		stable_vector()
 	{
 		::containers::append(*this, init);
 	}
 	
 	// TODO: Support trivial relocatability
-	stable_vector(stable_vector && other) noexcept:
+	constexpr stable_vector(stable_vector && other) noexcept:
 		m_storage(std::move(other.m_storage)),
 		m_size(std::exchange(other.m_size, 0_bi))
 	{
 	}
-	stable_vector(stable_vector const & other):
+	constexpr stable_vector(stable_vector const & other):
 		stable_vector()
 	{
-		std::uninitialized_copy(begin(other), end(other), begin(*this));
+		::containers::uninitialized_copy(begin(other), end(other), begin(*this));
 		m_size = other.m_size;
 	}
 
-	~stable_vector() {
+	constexpr ~stable_vector() {
 		detail::destroy_range(*this);
 	}
 
-	auto & operator=(stable_vector && other) & noexcept {
+	constexpr auto & operator=(stable_vector && other) & noexcept {
 		swap(*this, other);
 		return *this;
 	}
-	auto & operator=(stable_vector const & other) & {
+	constexpr auto & operator=(stable_vector const & other) & {
 		if (!m_storage) {
 			*this = stable_vector();
 		}
@@ -90,43 +90,79 @@ struct stable_vector {
 		return *this;
 	}
 
-	auto & operator=(std::initializer_list<value_type> init) & {
+	constexpr auto & operator=(std::initializer_list<value_type> init) & {
 		assign(*this, init);
 		return *this;
 	}
 
-	friend auto swap(stable_vector & lhs, stable_vector & rhs) noexcept {
-		std::swap(lhs.m_storage, rhs.m_storage);
+	friend constexpr auto swap(stable_vector & lhs, stable_vector & rhs) noexcept {
+		swap(lhs.m_storage, rhs.m_storage);
 		std::swap(lhs.m_size, rhs.m_size);
 	}
 
-	friend auto begin(stable_vector const & container) {
+	friend constexpr auto begin(stable_vector const & container) {
 		return const_iterator(container.m_storage.get());
 	}
-	friend auto begin(stable_vector & container) {
+	friend constexpr auto begin(stable_vector & container) {
 		return iterator(container.m_storage.get());
 	}
-	friend auto end(stable_vector const & container) {
+	friend constexpr auto end(stable_vector const & container) {
 		return begin(container) + container.m_size;
 	}
-	friend auto end(stable_vector & container) {
+	friend constexpr auto end(stable_vector & container) {
 		return begin(container) + container.m_size;
 	}
 
 	OPERATORS_BRACKET_SEQUENCE_RANGE_DEFINITIONS
 	
 	// Assumes that elements are already constructed in the spare capacity
-	void append_from_capacity(auto const count) {
+	constexpr void append_from_capacity(auto const count) {
 		BOUNDED_ASSERT(count + m_size <= capacity());
 		m_size += count;
 	}
 private:
 	struct deleter {
-		auto operator()(T * ptr) const {
+		constexpr auto operator()(T * ptr) const {
 			std::allocator<T>{}.deallocate(ptr, static_cast<std::ptrdiff_t>(capacity()));
 		}
 	};
+	#if 0
+	// TODO: When std::unique_ptr is constexpr, implement as
 	std::unique_ptr<T, deleter> m_storage;
+	#endif
+	struct unique_ptr {
+		constexpr explicit unique_ptr(T * ptr):
+			m_ptr(ptr)
+		{
+		}
+		constexpr unique_ptr(unique_ptr && other):
+			m_ptr(other.release())
+		{
+		}
+		constexpr unique_ptr & operator=(unique_ptr && other) & {
+			m_ptr = other.release();
+		}
+		constexpr ~unique_ptr() {
+			deleter()(m_ptr);
+		}
+		friend constexpr void swap(unique_ptr & lhs, unique_ptr & rhs) {
+			std::swap(lhs.m_ptr, rhs.m_ptr);
+		}
+
+		constexpr auto get() const {
+			return m_ptr;
+		}
+		constexpr auto release() {
+			return std::exchange(m_ptr, nullptr);
+		}
+
+		constexpr operator bool() const {
+			return m_ptr;
+		}
+	private:
+		T * m_ptr;
+	};
+	unique_ptr m_storage;
 	size_type m_size;
 
 };
