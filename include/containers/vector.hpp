@@ -28,7 +28,6 @@ struct vector {
 
 	using const_iterator = contiguous_iterator<value_type const, bounded::detail::builtin_max_value<size_type>>;
 	using iterator = contiguous_iterator<value_type, bounded::detail::builtin_max_value<size_type>>;
-	using raw_container = dynamic_array<trivial_storage<value_type>>;
 
 	constexpr vector() = default;
 
@@ -123,6 +122,7 @@ private:
 		// m_size remains the same
 	}
 	
+	using raw_container = dynamic_array<trivial_storage<value_type>>;
 	raw_container m_container;
 	size_type m_size = 0_bi;
 };
