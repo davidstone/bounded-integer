@@ -18,6 +18,11 @@
 namespace containers {
 namespace detail {
 
+template<typename Result>
+constexpr auto concatenate_prepend_append(Result &, typename Result::iterator) {
+	bounded::assert_or_assume_unreachable();
+}
+
 // This assumes that the begining of the result is full of unused memory, and
 // all elements in result are already where they belong.
 template<typename Result>
@@ -29,12 +34,7 @@ constexpr auto concatenate_prepend_append(Result & result, typename Result::iter
 		}
 	}
 	auto const next_it = ::containers::uninitialized_copy(begin(OPERATORS_FORWARD(range)), end(OPERATORS_FORWARD(range)), it);
-	concatenate_prepend_append(result, next_it, OPERATORS_FORWARD(ranges)...);
-}
-
-template<typename Result>
-constexpr auto concatenate_prepend_append(Result &, typename Result::iterator) {
-	bounded::assert_or_assume_unreachable();
+	::containers::detail::concatenate_prepend_append(result, next_it, OPERATORS_FORWARD(ranges)...);
 }
 
 template<typename Result, typename Integer>
