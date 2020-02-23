@@ -177,6 +177,7 @@ add_library(containers_test STATIC
 	source/containers/scope_guard.cpp
 	source/containers/single_element_range.cpp
 	source/containers/size.cpp
+	source/containers/stable_vector.cpp
 	source/containers/take.cpp
 )
 
@@ -186,11 +187,6 @@ add_executable(concatenate
 	source/containers/algorithms/concatenate.cpp
 )
 target_link_libraries(concatenate PUBLIC containers strict_defaults)
-
-add_executable(stable_vector
-	source/containers/stable_vector.cpp
-)
-target_link_libraries(stable_vector PUBLIC containers strict_defaults)
 
 add_executable(static_vector
 	source/containers/static_vector/static_vector.cpp
@@ -284,7 +280,6 @@ endif()
 set(test_targets
 	bounded_test
 	concatenate
-	stable_vector
 	static_vector
 	small_buffer_optimized_vector
 	flat_map
