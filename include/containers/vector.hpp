@@ -91,15 +91,16 @@ struct vector {
 		return ::containers::size(m_container);
 	}
 	constexpr auto reserve(size_type const requested_capacity) {
-		if (requested_capacity > capacity()) {
-			relocate(requested_capacity);
+		if (requested_capacity <= capacity()) {
+			return;
 		}
-	}
-	constexpr auto shrink_to_fit() {
-		auto const s = size(*this);
-		if (s != capacity()) {
-			relocate(s);
-		}
+		auto temp = make_storage(requested_capacity);
+		containers::uninitialized_move_destroy(
+			*this,
+			temp.data()
+		);
+		m_container = std::move(temp);
+		// m_size remains the same
 	}
 
 	// Assumes that elements are already constructed in the spare capacity
@@ -110,16 +111,6 @@ struct vector {
 private:
 	constexpr auto make_storage(auto const new_capacity) {
 		return raw_container(repeat_default_n<typename raw_container::value_type>(new_capacity));
-	}
-
-	constexpr auto relocate(auto const requested_capacity) {
-		auto temp = make_storage(requested_capacity);
-		containers::uninitialized_move_destroy(
-			*this,
-			::containers::detail::static_or_reinterpret_cast<value_type *>(data(temp))
-		);
-		m_container = std::move(temp);
-		// m_size remains the same
 	}
 	
 	using raw_container = dynamic_array<trivial_storage<value_type>>;

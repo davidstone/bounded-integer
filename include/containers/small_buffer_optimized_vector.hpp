@@ -212,21 +212,21 @@ struct small_buffer_optimized_vector {
 	}
 
 	OPERATORS_BRACKET_SEQUENCE_RANGE_DEFINITIONS
-	
+
 	constexpr auto capacity() const {
 		return BOUNDED_CONDITIONAL(is_small(), m_small.capacity(), m_large.capacity());
 	}
-	constexpr auto reserve(size_type const requested_capacity) {
-		if (requested_capacity > capacity()) {
-			relocate(requested_capacity);
+	constexpr auto reserve(size_type const requested_capacity) -> void {
+		if (requested_capacity <= capacity()) {
+			return;
+		}
+		if (requested_capacity <= small_t::capacity()) {
+			relocate_to_small();
+		} else {
+			relocate_to_large(requested_capacity);
 		}
 	}
-	constexpr auto shrink_to_fit() {
-		auto const s = size();
-		if (s != capacity()) {
-			relocate(s);
-		}
-	}
+
 
 	// Assumes that elements are already constructed in the spare capacity
 	constexpr void append_from_capacity(auto const count) {
@@ -321,15 +321,6 @@ private:
 	}
 
 
-	// Assumes that requested_capacity is large enough
-	constexpr auto relocate(auto const requested_capacity) {
-		if (requested_capacity <= small_t::capacity()) {
-			relocate_to_small();
-		} else {
-			relocate_to_large(requested_capacity);
-		}
-	}
-	
 	static_assert(sizeof(small_t) >= sizeof(large_t), "Incorrect buffer sizes.");
 	static_assert(std::is_standard_layout_v<small_t>);
 	static_assert(std::is_standard_layout_v<large_t>);

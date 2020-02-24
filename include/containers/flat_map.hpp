@@ -251,9 +251,6 @@ public:
 	constexpr auto reserve(size_type const new_capacity) {
 		return m_container.reserve(new_capacity);
 	}
-	constexpr auto shrink_to_fit() {
-		return m_container.shrink_to_fit();
-	}
 	
 	constexpr auto lower_bound(auto && key) const {
 		return containers::lower_bound(
@@ -436,7 +433,6 @@ public:
 
 	using base::capacity;
 	using base::reserve;
-	using base::shrink_to_fit;
 	
 	using base::lower_bound;
 	using base::upper_bound;
@@ -522,7 +518,6 @@ public:
 
 	using base::capacity;
 	using base::reserve;
-	using base::shrink_to_fit;
 	
 	using base::lower_bound;
 	using base::upper_bound;

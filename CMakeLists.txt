@@ -176,6 +176,7 @@ add_library(containers_test STATIC
 	source/containers/resize.cpp
 	source/containers/scope_guard.cpp
 	source/containers/single_element_range.cpp
+	source/containers/shrink_to_fit.cpp
 	source/containers/size.cpp
 	source/containers/stable_vector.cpp
 	source/containers/take.cpp

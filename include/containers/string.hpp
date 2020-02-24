@@ -67,7 +67,6 @@ public:
 	
 	using base::capacity;
 	using base::reserve;
-	using base::shrink_to_fit;
 	
 	using base::append_from_capacity;
 	

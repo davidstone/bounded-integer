@@ -104,14 +104,25 @@ auto test_erase() {
 	BOUNDED_TEST(v == container({ 1, 3, 5, 7 }));
 }
 
-auto test_reserve() {
+constexpr auto test_reserve() {
 	using container = containers::vector<int>;
-	auto v = container{};
+	auto v = container();
 	BOUNDED_TEST(v.capacity() == 0_bi);
+	BOUNDED_TEST(size(v) == 0_bi);
 	v.reserve(10_bi);
 	BOUNDED_TEST(v.capacity() == 10_bi);
-	v.shrink_to_fit();
+	BOUNDED_TEST(size(v) == 0_bi);
+	shrink_to_fit(v);
+	BOUNDED_TEST(size(v) == 0_bi);
 	BOUNDED_TEST(v.capacity() == 0_bi);
+	v.reserve(10_bi);
+	BOUNDED_TEST(size(v) == 0_bi);
+	push_back(v, 1);
+	BOUNDED_TEST(size(v) == 1_bi);
+	shrink_to_fit(v);
+	BOUNDED_TEST(size(v) == 1_bi);
+	BOUNDED_TEST(v.capacity() == 1_bi);
+	return true;
 }
 
 struct complex_resource {
