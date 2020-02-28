@@ -24,5 +24,8 @@ inline constexpr auto maximum_array_size = bounded::detail::normalize<
 	).value()
 >;
 
+template<typename T>
+using array_size_type = bounded::integer<0, maximum_array_size<T>>;
+
 } // namespace detail
 } // namespace containers
