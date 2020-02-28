@@ -180,6 +180,7 @@ add_library(containers_test STATIC
 	source/containers/size.cpp
 	source/containers/stable_vector.cpp
 	source/containers/take.cpp
+	source/containers/uninitialized_dynamic_array.cpp
 )
 
 target_link_libraries(containers_test PUBLIC containers strict_defaults)
