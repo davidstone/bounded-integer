@@ -179,8 +179,10 @@ add_library(containers_test STATIC
 	source/containers/shrink_to_fit.cpp
 	source/containers/size.cpp
 	source/containers/stable_vector.cpp
+	source/containers/string.cpp
 	source/containers/take.cpp
 	source/containers/uninitialized_dynamic_array.cpp
+	source/containers/vector.cpp
 )
 
 target_link_libraries(containers_test PUBLIC containers strict_defaults)
@@ -211,16 +213,6 @@ add_executable(std_map
 )
 target_compile_definitions(std_map PRIVATE "USE_SYSTEM_MAP")
 target_link_libraries(std_map PUBLIC containers strict_defaults)
-
-add_executable(vector
-	source/containers/vector.cpp
-)
-target_link_libraries(vector PUBLIC containers strict_defaults)
-
-add_executable(string
-	source/containers/string.cpp
-)
-target_link_libraries(string PUBLIC containers strict_defaults)
 
 add_executable(dynamic_array
 	source/containers/dynamic_array.cpp
@@ -285,8 +277,6 @@ set(test_targets
 	static_vector
 	small_buffer_optimized_vector
 	flat_map
-	vector
-	string
 	dynamic_array
 	variant
 	ska_sort

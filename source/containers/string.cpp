@@ -7,9 +7,11 @@
 
 #include "../test_assert.hpp"
 
+namespace {
+
 using namespace bounded::literal;
 
-int main() {
+constexpr bool test() {
 	auto const from_string_literal = containers::string("David");
 	BOUNDED_TEST(from_string_literal == from_string_literal);
 	BOUNDED_TEST(from_string_literal == containers::string({'D', 'a', 'v', 'i', 'd'}));
@@ -45,4 +47,10 @@ int main() {
 	BOUNDED_TEST(string_view + from_string_literal == "StoneDavid");
 	BOUNDED_TEST(array + from_string_literal == "StoneDavid");
 	BOUNDED_TEST(c_string + from_string_literal == "StoneDavid");
+	
+	return true;
 }
+
+static_assert(test());
+
+} // namespace
