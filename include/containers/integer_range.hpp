@@ -141,6 +141,10 @@ constexpr auto inclusive_integer_range(auto const first, auto const last, Step c
 	return integer_range(first, last + step, step);
 }
 
+constexpr auto inclusive_integer_range(auto const last) {
+	return inclusive_integer_range(bounded::constant<0>, last);
+}
+
 template<typename Enum> requires std::is_enum_v<Enum>
 constexpr auto enum_range(Enum last = static_cast<Enum>(bounded::max_value<Enum>)) {
 	return containers::transform(
