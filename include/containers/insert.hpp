@@ -69,9 +69,9 @@ constexpr auto lazy_insert(
 		auto const original_end = end(container);
 		::containers::push_back(container, std::move(back(container)));
 		::containers::move_backward(mutable_position, containers::prev(original_end), original_end);
-		auto const pointer = std::addressof(*mutable_position);
-		bounded::destroy(*pointer);
-		bounded::construct(*pointer, OPERATORS_FORWARD(constructor));
+		auto & ref = *mutable_position;
+		bounded::destroy(ref);
+		bounded::construct(ref, OPERATORS_FORWARD(constructor));
 	} else if constexpr (reservable<Container>) {
 		insert_or_emplace_with_reallocation(container, position, 1_bi, [&](auto const ptr) {
 			bounded::construct(*ptr, OPERATORS_FORWARD(constructor));
