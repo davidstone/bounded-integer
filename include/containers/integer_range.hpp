@@ -145,12 +145,20 @@ constexpr auto inclusive_integer_range(auto const last) {
 	return inclusive_integer_range(bounded::constant<0>, last);
 }
 
+// Technically this could construct a more efficient object for compile-time
+// constant arguments, which will be almost all of them. However, it is hard to
+// make this a nice interface until we get constexpr function parameters.
 template<typename Enum> requires std::is_enum_v<Enum>
-constexpr auto enum_range(Enum last = static_cast<Enum>(bounded::max_value<Enum>)) {
+constexpr auto enum_range(Enum const first, Enum const last) {
 	return containers::transform(
-		inclusive_integer_range(bounded::constant<0>, bounded::integer(last)),
+		inclusive_integer_range(bounded::integer(first), bounded::integer(last)),
 		[](auto e) { return static_cast<Enum>(e); }
 	);
+}
+
+template<typename Enum> requires std::is_enum_v<Enum>
+constexpr auto enum_range(Enum const last = static_cast<Enum>(bounded::max_value<Enum>)) {
+	return enum_range(static_cast<Enum>(0), last);
 }
 
 }	// namespace containers
