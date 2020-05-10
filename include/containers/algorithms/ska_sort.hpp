@@ -57,7 +57,7 @@ constexpr auto to_radix_sort_key(T const value) {
 		auto u = unsigned_t{};
 		std::memcpy(std::addressof(u), std::addressof(value), sizeof(value));
 		constexpr auto sign_bit_position = std::numeric_limits<unsigned_t>::digits - 1U;
-		unsigned_t const sign_bit = -static_cast<std::make_signed_t<unsigned_t>>(u >> (sign_bit_position));
+		auto const sign_bit = static_cast<unsigned_t>(-static_cast<std::make_signed_t<unsigned_t>>(u >> (sign_bit_position)));
 		return u ^ (sign_bit | (static_cast<unsigned_t>(1U) << sign_bit_position));
 	} else if constexpr (is_character_type) {
 		return static_cast<std::make_unsigned_t<T>>(value);
