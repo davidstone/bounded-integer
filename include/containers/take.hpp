@@ -79,8 +79,10 @@ struct counted_iterator {
 		bounded::max_value<decltype(std::declval<Count>() - std::declval<Offset>())> >= bounded::constant<0>
 	)
 	friend constexpr auto operator+(counted_iterator it, Offset const offset) {
-		auto const count = bounded::increase_min<0>(it.m_count - offset);
-		return counted_iterator(std::move(it).m_it + offset, count);
+		return counted_iterator(
+			std::move(it).m_it + offset,
+			static_cast<Count>(it.m_count - offset)
+		);
 	}
 	friend constexpr auto operator-(counted_iterator const & lhs, counted_iterator const & rhs) {
 		return lhs.m_count - rhs.m_count;
