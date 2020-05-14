@@ -6,6 +6,8 @@
 #include <bounded/detail/arithmetic/pointer.hpp>
 #include <bounded/detail/class.hpp>
 
+#include <iterator>
+
 namespace {
 
 using array_type = int[5];
