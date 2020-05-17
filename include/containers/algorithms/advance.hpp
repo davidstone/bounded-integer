@@ -22,17 +22,21 @@ concept random_access_advancable_by = requires(Iterator & it, Offset offset) {
 	it += offset;
 };
 
+template<typename Iterator, typename Offset>
+using advance_counter = std::common_type_t<
+	typename std::iterator_traits<std::decay_t<Iterator>>::difference_type,
+	std::decay_t<Offset>
+>;
+
 }	// namespace detail
 
 constexpr auto advance(forward_iterator auto & it, auto const offset) {
-	using counter = std::common_type_t<decltype(offset), bounded::constant_t<0>>;
-	for (auto n = counter(0_bi); n != offset; ++n) {
+	for (auto n = detail::advance_counter<decltype(it), decltype(offset)>(0_bi); n != offset; ++n) {
 		++it;
 	}
 }
 constexpr auto advance(bidirectional_iterator auto & it, auto const offset) {
-	using counter = std::common_type_t<decltype(bounded::abs(offset)), bounded::constant_t<0>>;
-	for (auto n = counter(0_bi); n != bounded::abs(offset); ++n) {
+	for (auto n = detail::advance_counter<decltype(it), decltype(offset)>(0_bi); n != bounded::abs(offset); ++n) {
 		if (offset >= 0_bi) {
 			++it;
 		} else {
