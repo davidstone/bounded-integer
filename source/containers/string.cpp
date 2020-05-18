@@ -9,6 +9,8 @@
 
 namespace {
 
+#if 0
+
 using namespace bounded::literal;
 
 constexpr bool test() {
@@ -52,5 +54,7 @@ constexpr bool test() {
 }
 
 static_assert(test());
+
+#endif
 
 } // namespace

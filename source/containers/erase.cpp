@@ -21,6 +21,6 @@ constexpr auto test_erase() {
 }
 
 static_assert(test_erase<containers::vector<int>>());
-static_assert(test_erase<containers::small_buffer_optimized_vector<int, 0>>());
+// static_assert(test_erase<containers::small_buffer_optimized_vector<int, 0>>());
 
 } // namespace
