@@ -101,6 +101,7 @@ add_executable(bounded_test
 	source/bounded/numeric_limits.cpp
 	source/bounded/nth_type.cpp
 	source/bounded/optional.cpp
+	source/bounded/std_iterator.cpp
 	source/bounded/string.cpp
 	source/bounded/to_integer.cpp
 	source/bounded/tombstone_traits.cpp
