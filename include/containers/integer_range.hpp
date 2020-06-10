@@ -156,9 +156,17 @@ constexpr auto enum_range(Enum const first, Enum const last) {
 	);
 }
 
-template<typename Enum> requires std::is_enum_v<Enum>
-constexpr auto enum_range(Enum const last = static_cast<Enum>(bounded::max_value<Enum>)) {
+template<typename Enum> requires (
+	std::is_enum_v<Enum> and
+	bounded::integer(bounded::min_value<Enum>) == bounded::constant<0>
+)
+constexpr auto enum_range(Enum const last) {
 	return enum_range(static_cast<Enum>(0), last);
+}
+
+template<typename Enum> requires std::is_enum_v<Enum>
+constexpr auto enum_range() {
+	return enum_range(bounded::min_value<Enum>, bounded::max_value<Enum>);
 }
 
 }	// namespace containers
