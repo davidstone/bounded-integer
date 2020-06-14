@@ -38,7 +38,7 @@ The general form of the class is `bounded::integer<minimum, maximum, policy = bo
 
 ## Prerequisites
 
-* Compile with the clang-concepts branch
+* Compile with clang master
 * cmake (3.14+) is used to build tests, but it is not needed to use the library (this library is header-only).
 
 ## Building and running tests (Linux)
@@ -57,7 +57,7 @@ The general form of the class is `bounded::integer<minimum, maximum, policy = bo
 * A `bounded::integer` cannot be used as a non-type template parameter prior to C++20. No compiler currently is able to compile `bounded::integer` that also has support for class types as non-type template parameters.
 * `bounded::integer` uses built-in integers as the template parameter to determine its bounds. This means that it cannot store an integer larger than an unsigned 64-bit integer or smaller than a signed 64-bit integer. This restriction should be removed at some point in the future.
 * `bounded::integer` is currently still under active development, so some interfaces are still subject to change.
-* `bounded::integer` cannot be used as the argument to a `switch` statement. There is work in C++23 to add pattern matching, which would be a replacement for `switch` statements that does work on the library.
+* `bounded::integer` cannot be used as the argument to a `switch` statement. There is work in C++23 to add pattern matching, which would be a replacement for `switch` statements, and pattern matching would work with `bounded::integer`.
 * `bounded::integer` cannot be used to express the size of a bit-field.
 
 # Reference
