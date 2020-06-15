@@ -13,10 +13,6 @@
 	#define BOUNDED_ASSERT(...) BOUNDED_DETAIL_NON_CONSTEXPR_IF(__VA_ARGS__)
 	#define BOUNDED_ASSERT_OR_ASSUME BOUNDED_ASSUME
 #else
-	// This is not defined to just be assert to support expressions with commas,
-	// but is still carefully written to not defeat warnings for expressions
-	// like `assert(false, "My error message")` which actually would invoke the
-	// comma operator.
-	#define BOUNDED_ASSERT(...) ((__VA_ARGS__) ? void() : assert((__VA_ARGS__)))
+	#define BOUNDED_ASSERT(...) (BOUNDED_DETAIL_PREVENT_COMMA(__VA_ARGS__), assert((__VA_ARGS__)))
 	#define BOUNDED_ASSERT_OR_ASSUME BOUNDED_ASSERT
 #endif

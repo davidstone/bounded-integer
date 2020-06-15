@@ -23,14 +23,24 @@ namespace bounded::detail {
 inline void non_constexpr() {
 }
 
+void prevent_comma(auto &&);
+
 } // namespace bounded::detail
+
+// An expression of type `void`. This is used to allow using variadic
+// function-like macros to support expressions that contain commas, such as
+// `BOUNDED_ASSERT(f<a, b>())`, but prevents expressions that look like two
+// arguments from being treated as a comma operator, such as
+// `BOUNDED_ASSERT(false, "Error message")`.
+#define BOUNDED_DETAIL_PREVENT_COMMA(...) \
+	decltype(::bounded::detail::prevent_comma(__VA_ARGS__))()
 
 // Check is_constant_evaluated() first so that we do not evaluate the expression
 // when assertions are disabled
 #define BOUNDED_DETAIL_NON_CONSTEXPR_IF(...) ( \
 	std::is_constant_evaluated() and !(__VA_ARGS__) ? \
 		::bounded::detail::non_constexpr() : \
-		void() \
+		BOUNDED_DETAIL_PREVENT_COMMA(__VA_ARGS__) \
 )
 
 #define BOUNDED_ASSUME(...) ( \
