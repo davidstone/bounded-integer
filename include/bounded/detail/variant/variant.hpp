@@ -82,14 +82,6 @@ public:
 		m_function(OPERATORS_FORWARD(function)),
 		m_data(detail::get_index(index_, detail::types<Ts>()...), OPERATORS_FORWARD(construct_))
 	{
-		static_assert(
-			min_value<decltype(index())> == 0_bi,
-			"Type returned by your function must have a minimum value of 0."
-		);
-		static_assert(
-			max_value<decltype(index())> == sizeof...(Ts) - 1,
-			"Range of values of type returned by your function must equal the number of types."
-		);
 	}
 
 	constexpr variant(
