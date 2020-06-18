@@ -58,7 +58,7 @@ using variant_selector = typename variant_selector_c<size>::type;
 } // namespace detail
 
 template<typename Function, typename... Ts>
-concept unique_construct_function = matches_exactly_one_type<std::invoke_result_t<Function>, detail::types<Ts>...>;
+concept unique_construct_function = matches_exactly_one_type<std::invoke_result_t<Function>, Ts...>;
 
 template<typename... Ts>
 struct variant : private detail::variant_destructor<Ts...> {

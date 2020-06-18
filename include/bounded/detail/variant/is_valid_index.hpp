@@ -12,23 +12,18 @@
 namespace bounded {
 namespace detail {
 
-template<typename LHS, typename RHS>
-constexpr auto types_equal(types<LHS> lhs, types<RHS> rhs) {
-	return bounded::integer(lhs == rhs);
-}
-
 template<typename Index, typename... Ts>
-concept matches_exactly_one_type_impl = (constant<0> + ... + ::bounded::detail::types_equal(Index(), Ts())) == constant<1>;
+concept matches_exactly_one_type_impl = (constant<0> + ... + bounded::integer(std::is_same_v<Index, Ts>)) == constant<1>;
 
 }	// namespace detail
 
 template<typename Index, typename... Ts>
-concept matches_exactly_one_type = detail::matches_exactly_one_type_impl<detail::types<std::decay_t<Index>>, Ts...>;
+concept matches_exactly_one_type = detail::matches_exactly_one_type_impl<std::decay_t<Index>, Ts...>;
+
+template<typename Index, std::size_t size>
+concept variant_integer_index = bounded_integer<Index> and Index::value() < size;
 
 template<typename Index, typename... Ts>
-concept variant_integer_index = bounded_integer<Index> and Index::value() < sizeof...(Ts);
+concept unique_type_identifier = detail::matches_exactly_one_type_impl<typename Index::type, Ts...> or variant_integer_index<Index, sizeof...(Ts)>;
 
-template<typename Index, typename... Ts>
-concept unique_type_identifier = detail::matches_exactly_one_type_impl<Index, Ts...> or variant_integer_index<Index, Ts...>;
-
-}	// namespace bounded
+} // namespace bounded

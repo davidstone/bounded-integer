@@ -29,47 +29,17 @@ static_assert(std::is_trivially_destructible_v<thing_t>);
 
 template<bool expected, typename Index, typename... Ts>
 constexpr bool assert_type_index_concepts() {
-	static_assert(
-		bounded::matches_exactly_one_type<
-			Index,
-			bounded::detail::types<Ts>...
-		> == expected
-	);
-	static_assert(
-		!bounded::variant_integer_index<
-			bounded::detail::types<Index>,
-			bounded::detail::types<Ts>...
-		>
-	);
-	static_assert(
-		bounded::unique_type_identifier<
-			bounded::detail::types<Index>,
-			bounded::detail::types<Ts>...
-		> == expected
-	);
+	static_assert(bounded::matches_exactly_one_type<Index, Ts...> == expected);
+	static_assert(!bounded::variant_integer_index<bounded::detail::types<Index>, sizeof...(Ts)>);
+	static_assert(bounded::unique_type_identifier<bounded::detail::types<Index>, Ts...> == expected);
 	return true;
 }
 
 template<bool expected, auto index, typename... Ts>
 constexpr bool assert_integer_index_concepts() {
-	static_assert(
-		!bounded::matches_exactly_one_type<
-			bounded::constant_t<index>,
-			bounded::detail::types<Ts>...
-		>
-	);
-	static_assert(
-		bounded::variant_integer_index<
-			bounded::constant_t<index>,
-			bounded::detail::types<Ts>...
-		> == expected
-	);
-	static_assert(
-		bounded::unique_type_identifier<
-			bounded::constant_t<index>,
-			bounded::detail::types<Ts>...
-		> == expected
-	);
+	static_assert(!bounded::matches_exactly_one_type<bounded::constant_t<index>, Ts...>);
+	static_assert(bounded::variant_integer_index<bounded::constant_t<index>, sizeof...(Ts)> == expected);
+	static_assert(bounded::unique_type_identifier<bounded::constant_t<index>, Ts...> == expected);
 	return true;
 }
 

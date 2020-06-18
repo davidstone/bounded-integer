@@ -17,7 +17,7 @@ namespace bounded {
 namespace detail {
 
 struct get_index_t {
-	template<typename Index, typename... Ts> requires matches_exactly_one_type<Index, Ts...>
+	template<typename Index, typename... Ts> requires matches_exactly_one_type<Index, typename Ts::type...>
 	constexpr auto operator()(types<Index> index, Ts... ts) const {
 		constexpr auto result = [=] {
 			bool found = false;
@@ -33,7 +33,7 @@ struct get_index_t {
 		}();
 		return constant<result>;
 	}
-	template<auto n, typename... Ts> requires variant_integer_index<constant_t<n>, Ts...>
+	template<auto n, typename... Ts> requires variant_integer_index<constant_t<n>, sizeof...(Ts)>
 	constexpr auto operator()(constant_t<n> index, Ts...) const {
 		return index;
 	}
@@ -41,12 +41,12 @@ struct get_index_t {
 
 
 struct get_type_t {
-	template<typename Index, typename... Ts> requires matches_exactly_one_type<Index, Ts...>
+	template<typename Index, typename... Ts> requires matches_exactly_one_type<Index, typename Ts::type...>
 	constexpr auto operator()(types<Index> index, Ts...) const {
 		return index;
 	}
 
-	template<auto n, typename... Ts> requires variant_integer_index<constant_t<n>, Ts...>
+	template<auto n, typename... Ts> requires variant_integer_index<constant_t<n>, sizeof...(Ts)>
 	constexpr auto operator()(constant_t<n>, Ts...) const {
 		return types<nth_type<n, typename Ts::type...>>();
 	}
