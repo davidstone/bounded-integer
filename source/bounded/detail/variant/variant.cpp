@@ -120,11 +120,30 @@ constexpr auto test_assignment_from_value() {
 }
 static_assert(test_assignment_from_value());
 
+// This allocates memory to force the compiler to ensure the destructor is run
+// exactly once for every instance of the object
 struct non_trivial {
-	constexpr non_trivial() {}
-	constexpr non_trivial(non_trivial const &) {}
-	constexpr non_trivial & operator=(non_trivial const &) { return *this; }
-	~non_trivial() {}
+	constexpr non_trivial(int x_):
+		x(new int(x_))
+	{
+	}
+	constexpr non_trivial(non_trivial const & other):
+		x(new int(*other.x))
+	{
+	}
+	constexpr non_trivial & operator=(non_trivial const & other) {
+		*x = *other.x;
+		return *this;
+	}
+	constexpr ~non_trivial() {
+		delete x;
+	}
+
+	friend constexpr auto operator==(non_trivial const & lhs, non_trivial const & rhs) -> bool {
+		return *lhs.x == *rhs.x;
+	}
+
+	int * x;
 };
 
 struct non_copyable {
@@ -135,12 +154,12 @@ struct non_copyable {
 	constexpr non_copyable & operator=(non_copyable &&) = default;
 };
 
-struct destructor_checker {
-	static inline auto destructed = 0U;
-	~destructor_checker() {
-		++destructed;
-	}
-};
+using non_copyable_variant_t = bounded::variant<non_copyable>;
+static_assert(not std::is_copy_constructible_v<non_copyable_variant_t>);
+static_assert(not std::is_copy_assignable_v<non_copyable_variant_t>);
+static_assert(std::is_move_constructible_v<non_copyable_variant_t>);
+static_assert(std::is_move_assignable_v<non_copyable_variant_t>);
+static_assert(std::is_same_v<decltype(non_copyable_variant_t(bounded::lazy_init, 0_bi, bounded::construct_return<non_copyable>)[0_bi]), non_copyable &&>);
 
 struct non_comparable {
 };
@@ -151,49 +170,15 @@ static_assert(!bounded::equality_comparable<bounded::variant<int, non_comparable
 static_assert(!bounded::equality_comparable<bounded::variant<non_comparable, int>>);
 static_assert(!bounded::equality_comparable<bounded::variant<int, non_comparable, int>>);
 
-}	// namespace
-
-int main() {
-	using bounded::construct_return;
-	{
-		using non_trivial_variant_t = bounded::variant<non_trivial>;
-
-		static_assert(std::is_copy_constructible_v<non_trivial_variant_t>);
-		static_assert(std::is_move_constructible_v<non_trivial_variant_t>);
-		static_assert(std::is_copy_assignable_v<non_trivial_variant_t>);
-		static_assert(std::is_move_assignable_v<non_trivial_variant_t>);
-		static_assert(std::is_destructible_v<non_trivial_variant_t>);
-
-		auto non_trivial_variant = non_trivial_variant_t(bounded::lazy_init, 0_bi, construct_return<non_trivial>);
-		static_assert(non_trivial_variant.index() == 0_bi);
-		non_trivial_variant = non_trivial_variant_t(bounded::lazy_init, 0_bi, construct_return<non_trivial>);
-		// Silence self-assignment warning
-		non_trivial_variant = *&non_trivial_variant;
-
-		// TODO
-		// auto const non_trivial_copy = non_trivial_variant;
-		// assert(non_trivial_copy == non_trivial_variant);
-
-		// TODO
-		// auto const non_trivial_move = std::move(non_trivial_variant);
-		// assert(non_trivial_copy == non_trivial_move);
-	}
-	
-	{
-		using non_copyable_variant_t = bounded::variant<non_copyable>;
-
-		auto non_copyable_variant = non_copyable_variant_t(bounded::lazy_init, 0_bi, construct_return<non_copyable>);
-		static_assert(non_copyable_variant.index() == 0_bi);
-		static_assert(not std::is_copy_constructible_v<non_copyable_variant_t>);
-		static_assert(not std::is_copy_assignable_v<non_copyable_variant_t>);
-		static_assert(std::is_move_constructible_v<non_copyable_variant_t>);
-		static_assert(std::is_move_assignable_v<non_copyable_variant_t>);
-		static_assert(std::is_same_v<decltype(std::move(non_copyable_variant)[0_bi]), non_copyable &&>);
-		{
-			static_assert(!std::is_trivially_destructible_v<destructor_checker>);
-			static_assert(!std::is_trivially_destructible_v<bounded::variant<destructor_checker>>);
-			auto v = bounded::variant<destructor_checker>(bounded::lazy_init, 0_bi, construct_return<destructor_checker>);
-		}
-		BOUNDED_TEST(destructor_checker::destructed == 1U);
-	}
+constexpr bool test_non_trivial() {
+	using non_trivial_variant_t = bounded::variant<non_trivial>;
+	auto a = non_trivial_variant_t(non_trivial(3));
+	static_assert(a.index() == 0_bi);
+	auto b = a;
+	BOUNDED_TEST(*a[0_bi].x == 3);
+	BOUNDED_TEST(a == b);
+	return true;
 }
+static_assert(test_non_trivial());
+
+} // namespace

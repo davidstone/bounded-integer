@@ -13,10 +13,10 @@
 #include <bounded/insert.hpp>
 #include <bounded/lazy_init.hpp>
 #include <bounded/value_to_function.hpp>
+#include <bounded/detail/construct_destroy.hpp>
 #include <bounded/detail/type.hpp>
 #include <bounded/detail/variant/get_index.hpp>
 #include <bounded/detail/variant/is_valid_index.hpp>
-#include <bounded/detail/variant/special_member_functions.hpp>
 #include <bounded/detail/variant/variadic_union.hpp>
 #include <bounded/detail/variant/visit.hpp>
 
@@ -60,8 +60,10 @@ using variant_selector = typename variant_selector_c<size>::type;
 template<typename Function, typename... Ts>
 concept unique_construct_function = matches_exactly_one_type<std::invoke_result_t<Function>, Ts...>;
 
+namespace detail {
+
 template<typename... Ts>
-struct variant : private detail::variant_destructor<Ts...> {
+struct variant_impl {
 private:
 	template<typename Index>
 	using type_at = typename decltype(detail::get_type(Index(), detail::types<Ts>()...))::type;
@@ -69,9 +71,7 @@ private:
 	template<typename Construct>
 	using constructed_type = std::decay_t<std::invoke_result_t<Construct>>;
 public:
-	friend detail::variant_destructor<Ts...>;
-
-	constexpr variant(
+	constexpr variant_impl(
 		lazy_init_t,
 		auto index_,
 		construct_function_for<type_at<decltype(index_)>> auto && construct_
@@ -81,8 +81,8 @@ public:
 	{
 	}
 
-	constexpr variant(auto index_, convertible_to<type_at<decltype(index_)>> auto && value):
-		variant(
+	constexpr variant_impl(auto index_, convertible_to<type_at<decltype(index_)>> auto && value):
+		variant_impl(
 			lazy_init,
 			index_,
 			value_to_function(OPERATORS_FORWARD(value))
@@ -90,8 +90,8 @@ public:
 	{
 	}
 
-	constexpr variant(lazy_init_t, unique_construct_function<Ts...> auto && construct_):
-		variant(
+	constexpr variant_impl(lazy_init_t, unique_construct_function<Ts...> auto && construct_):
+		variant_impl(
 			lazy_init,
 			detail::types<constructed_type<decltype(construct_)>>(),
 			OPERATORS_FORWARD(construct_)
@@ -99,8 +99,8 @@ public:
 	{
 	}
 	
-	constexpr explicit variant(matches_exactly_one_type<detail::types<Ts>...> auto && value):
-		variant(
+	constexpr explicit variant_impl(matches_exactly_one_type<Ts...> auto && value):
+		variant_impl(
 			lazy_init,
 			value_to_function(OPERATORS_FORWARD(value))
 		)
@@ -108,76 +108,58 @@ public:
 	}
 	
 
-	constexpr variant(variant const &) = default;
+	constexpr variant_impl(variant_impl const &) = default;
 
-	constexpr variant(variant const & other) noexcept(
+	constexpr variant_impl(variant_impl const & other) noexcept(
 		(... and std::is_nothrow_copy_constructible_v<Ts>)
 	) requires((... and copy_constructible<Ts>) and !(... and trivially_copy_constructible<Ts>)):
-		variant(other, copy_move_tag{})
+		variant_impl(other, copy_move_tag{})
 	{
 	}
 
 
-	constexpr variant(variant &&) = default;
+	constexpr variant_impl(variant_impl &&) = default;
 
-	constexpr variant(variant && other) noexcept(
+	constexpr variant_impl(variant_impl && other) noexcept(
 		(... and std::is_nothrow_move_constructible_v<Ts>)
 	) requires((... and move_constructible<Ts>) and !(... and trivially_move_constructible<Ts>)):
-		variant(std::move(other), copy_move_tag{})
+		variant_impl(std::move(other), copy_move_tag{})
 	{
 	}
 
-	constexpr auto operator=(variant const &) & -> variant & = default;
+	constexpr auto operator=(variant_impl const &) & -> variant_impl & = default;
 
-	constexpr auto operator=(variant const & other) & noexcept(
+	constexpr auto operator=(variant_impl const & other) & noexcept(
 		(... and std::is_nothrow_copy_assignable_v<Ts>) and
 		(... and std::is_nothrow_copy_constructible_v<Ts>)
-	) -> variant & requires((... and detail::variant_copy_assignable<Ts>) and !(... and detail::variant_trivially_copy_assignable<Ts>)) {
+	) -> variant_impl & requires((... and detail::variant_copy_assignable<Ts>) and !(... and detail::variant_trivially_copy_assignable<Ts>)) {
 		assign(other);
 		return *this;
 	}
 
 
-	constexpr auto operator=(variant &&) & -> variant & = default;
+	constexpr auto operator=(variant_impl &&) & -> variant_impl & = default;
 
-	constexpr auto operator=(variant && other) & noexcept(
+	constexpr auto operator=(variant_impl && other) & noexcept(
 		(... and std::is_nothrow_move_assignable_v<Ts>) and
 		(... and std::is_nothrow_move_constructible_v<Ts>)
-	) -> variant & requires((... and detail::variant_move_assignable<Ts>) and !(... and detail::variant_trivially_move_assignable<Ts>)) {
+	) -> variant_impl & requires((... and detail::variant_move_assignable<Ts>) and !(... and detail::variant_trivially_move_assignable<Ts>)) {
 		assign(std::move(other));
 		return *this;
 	}
-
-	template<typename T> requires(
-		!std::is_same_v<std::decay_t<T>, variant> and
-		constructible_from<std::decay_t<T>, T &&> and
-		std::is_assignable_v<std::decay_t<T> &, T &&>
-	)
-	constexpr auto & operator=(T && value) & {
-		visit(*this, [&](auto & original) {
-			if constexpr (std::is_same_v<std::decay_t<decltype(original)>, std::decay_t<T>>) {
-				original = OPERATORS_FORWARD(value);
-			} else {
-				destroy(original);
-				replace_active_member(detail::types<std::decay_t<T>>(), value_to_function(OPERATORS_FORWARD(value)));
-			}
-		});
-		return *this;
-	}
-
 
 	constexpr auto index() const {
 		return m_index;
 	}
 
 
-	constexpr auto const & operator[](unique_type_identifier<detail::types<Ts>...> auto index_) const & {
+	constexpr auto const & operator[](unique_type_identifier<Ts...> auto index_) const & {
 		return operator_bracket(m_data, index_);
 	}
-	constexpr auto & operator[](unique_type_identifier<detail::types<Ts>...> auto index_) & {
+	constexpr auto & operator[](unique_type_identifier<Ts...> auto index_) & {
 		return operator_bracket(m_data, index_);
 	}
-	constexpr auto && operator[](unique_type_identifier<detail::types<Ts>...> auto index_) && {
+	constexpr auto && operator[](unique_type_identifier<Ts...> auto index_) && {
 		return operator_bracket(std::move(m_data), index_);
 	}
 
@@ -195,19 +177,25 @@ public:
 		return emplace(detail::types<constructed_type<decltype(construct_)>>(), OPERATORS_FORWARD(construct_));
 	}
 	
+	// Assumes the old object has already been destroyed
+	constexpr auto & replace_active_member(auto const index, auto && construct_) {
+		constexpr auto index_value = detail::get_index(index, detail::types<Ts>()...);
+		m_index = index_value;
+		return construct(m_data, [&] { return detail::variadic_union<Ts...>(index_value, OPERATORS_FORWARD(construct_)); });
+	}
+
 private:
 	struct copy_move_tag{};
-	constexpr variant(auto && other, copy_move_tag):
-		variant(visit_with_index(
+	constexpr variant_impl(auto && other, copy_move_tag):
+		m_index(other.m_index),
+		m_data(uninitialized_union())
+	{
+		visit_with_index(
 			OPERATORS_FORWARD(other),
 			[&](auto parameter) {
-				return variant(
-					parameter.index,
-					[&] { return std::move(parameter).value; }
-				);
+				replace_active_member(parameter.index, [&] { return std::move(parameter).value; });
 			}
-		))
-	{
+		);
 	}
 
 	constexpr void assign(auto && other) {
@@ -225,13 +213,6 @@ private:
 		);
 	}
 
-	// Assumes the old object has already been destroyed
-	constexpr auto & replace_active_member(auto const index, auto && construct_) {
-		constexpr auto index_value = detail::get_index(index, detail::types<Ts>()...);
-		m_index = index_value;
-		return construct(m_data, [&] { return detail::variadic_union<Ts...>(index_value, OPERATORS_FORWARD(construct_)); });
-	}
-
 	static constexpr auto && operator_bracket(auto && data, auto const index_) {
 		return ::bounded::detail::get_union_element(
 			OPERATORS_FORWARD(data),
@@ -241,6 +222,67 @@ private:
 
 	[[no_unique_address]] detail::variant_selector<sizeof...(Ts)> m_index;
 	[[no_unique_address]] detail::variadic_union<Ts...> m_data;
+};
+
+} // namespace detail
+
+template<typename... Ts>
+struct variant : private detail::variant_impl<Ts...> {
+	using detail::variant_impl<Ts...>::variant_impl;
+	using detail::variant_impl<Ts...>::index;
+	using detail::variant_impl<Ts...>::operator[];
+	using detail::variant_impl<Ts...>::emplace;
+
+	variant(variant const &) = default;
+	variant(variant &&) = default;
+	variant & operator=(variant const &) & = default;
+	variant & operator=(variant &&) & = default;
+
+	constexpr ~variant() {
+		visit(*this, destroy);
+	}
+
+	template<typename T> requires(
+		!std::is_same_v<std::decay_t<T>, variant> and
+		constructible_from<std::decay_t<T>, T &&> and
+		std::is_assignable_v<std::decay_t<T> &, T &&>
+	)
+	constexpr auto & operator=(T && value) & {
+		visit(*this, [&](auto & original) {
+			if constexpr (std::is_same_v<std::decay_t<decltype(original)>, std::decay_t<T>>) {
+				original = OPERATORS_FORWARD(value);
+			} else {
+				destroy(original);
+				this->replace_active_member(detail::types<std::decay_t<T>>(), value_to_function(OPERATORS_FORWARD(value)));
+			}
+		});
+		return *this;
+	}
+};
+
+template<typename... Ts> requires(... and std::is_trivially_destructible_v<Ts>)
+struct variant<Ts...> : private detail::variant_impl<Ts...> {
+	using detail::variant_impl<Ts...>::variant_impl;
+	using detail::variant_impl<Ts...>::index;
+	using detail::variant_impl<Ts...>::operator[];
+	using detail::variant_impl<Ts...>::emplace;
+
+	template<typename T> requires(
+		!std::is_same_v<std::decay_t<T>, variant> and
+		constructible_from<std::decay_t<T>, T &&> and
+		std::is_assignable_v<std::decay_t<T> &, T &&>
+	)
+	constexpr auto & operator=(T && value) & {
+		visit(*this, [&](auto & original) {
+			if constexpr (std::is_same_v<std::decay_t<decltype(original)>, std::decay_t<T>>) {
+				original = OPERATORS_FORWARD(value);
+			} else {
+				destroy(original);
+				this->replace_active_member(detail::types<std::decay_t<T>>(), value_to_function(OPERATORS_FORWARD(value)));
+			}
+		});
+		return *this;
+	}
 };
 
 template<typename... Ts, typename T>

@@ -57,6 +57,7 @@ add_executable(bounded_test
 	source/bounded/detail/policy/null_policy.cpp
 	source/bounded/detail/policy/throw_policy.cpp
 	source/bounded/detail/variant/get_index.cpp
+	source/bounded/detail/variant/variant.cpp
 	source/bounded/detail/variant/visit.cpp
 	source/bounded/detail/abs.cpp
 	source/bounded/detail/assume.cpp
@@ -219,11 +220,6 @@ add_executable(dynamic_array
 	source/containers/dynamic_array.cpp
 )
 target_link_libraries(dynamic_array PUBLIC containers strict_defaults)
-
-add_executable(variant
-	source/bounded/detail/variant/variant.cpp
-)
-target_link_libraries(variant PUBLIC bounded strict_defaults)
 
 SET(gtest_disable_pthreads ON CACHE BOOL "Disable uses of pthreads in gtest.")
 add_subdirectory("${PROJECT_SOURCE_DIR}/source/googletest-1.8.1")
