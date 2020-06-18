@@ -63,7 +63,7 @@ template<typename Function, typename... Ts>
 concept unique_construct_function = matches_exactly_one_type<std::invoke_result_t<Function>, detail::types<Ts>...>;
 
 template<typename... Ts>
-struct basic_variant : private detail::variant_destructor<Ts...> {
+struct variant : private detail::variant_destructor<Ts...> {
 private:
 	template<typename Index>
 	using type_at = typename decltype(detail::get_type(Index(), detail::types<Ts>()...))::type;
@@ -73,7 +73,7 @@ private:
 public:
 	friend detail::variant_destructor<Ts...>;
 
-	constexpr basic_variant(
+	constexpr variant(
 		lazy_init_t,
 		convertible_to<detail::variant_selector<sizeof...(Ts)>> auto && function,
 		auto index_,
@@ -92,12 +92,12 @@ public:
 		);
 	}
 
-	constexpr basic_variant(
+	constexpr variant(
 		convertible_to<detail::variant_selector<sizeof...(Ts)>> auto && function,
 		auto index_,
 		convertible_to<type_at<decltype(index_)>> auto && value
 	):
-		basic_variant(
+		variant(
 			lazy_init,
 			OPERATORS_FORWARD(function),
 			index_,
@@ -106,12 +106,12 @@ public:
 	{
 	}
 
-	constexpr basic_variant(
+	constexpr variant(
 		lazy_init_t,
 		auto const index_,
 		construct_function_for<type_at<decltype(index_)>> auto && construct_
 	):
-		basic_variant(
+		variant(
 			lazy_init,
 			detail::variant_selector<sizeof...(Ts)>(detail::get_index(index_, detail::types<Ts>()...)),
 			index_,
@@ -120,11 +120,11 @@ public:
 	{
 	}
 	
-	constexpr basic_variant(
+	constexpr variant(
 		auto index_,
 		convertible_to<type_at<decltype(index_)>> auto && value
 	):
-		basic_variant(
+		variant(
 			lazy_init,
 			index_,
 			value_to_function(OPERATORS_FORWARD(value))
@@ -132,8 +132,8 @@ public:
 	{
 	}
 
-	constexpr explicit basic_variant(lazy_init_t, unique_construct_function<Ts...> auto && construct_):
-		basic_variant(
+	constexpr explicit variant(lazy_init_t, unique_construct_function<Ts...> auto && construct_):
+		variant(
 			lazy_init,
 			detail::types<constructed_type<decltype(construct_)>>(),
 			OPERATORS_FORWARD(construct_)
@@ -141,8 +141,8 @@ public:
 	{
 	}
 	
-	constexpr explicit basic_variant(matches_exactly_one_type<detail::types<Ts>...> auto && value):
-		basic_variant(
+	constexpr explicit variant(matches_exactly_one_type<detail::types<Ts>...> auto && value):
+		variant(
 			lazy_init,
 			value_to_function(OPERATORS_FORWARD(value))
 		)
@@ -150,48 +150,48 @@ public:
 	}
 	
 
-	constexpr basic_variant(basic_variant const &) = default;
+	constexpr variant(variant const &) = default;
 
-	constexpr basic_variant(basic_variant const & other) noexcept(
+	constexpr variant(variant const & other) noexcept(
 		(... and std::is_nothrow_copy_constructible_v<Ts>)
 	) requires((... and copy_constructible<Ts>) and !(... and trivially_copy_constructible<Ts>)):
-		basic_variant(other, copy_move_tag{})
+		variant(other, copy_move_tag{})
 	{
 	}
 
 
-	constexpr basic_variant(basic_variant &&) = default;
+	constexpr variant(variant &&) = default;
 
-	constexpr basic_variant(basic_variant && other) noexcept(
+	constexpr variant(variant && other) noexcept(
 		(... and std::is_nothrow_move_constructible_v<Ts>)
 	) requires((... and move_constructible<Ts>) and !(... and trivially_move_constructible<Ts>)):
-		basic_variant(std::move(other), copy_move_tag{})
+		variant(std::move(other), copy_move_tag{})
 	{
 	}
 
-	constexpr auto operator=(basic_variant const &) & -> basic_variant & = default;
+	constexpr auto operator=(variant const &) & -> variant & = default;
 
-	constexpr auto operator=(basic_variant const & other) & noexcept(
+	constexpr auto operator=(variant const & other) & noexcept(
 		(... and std::is_nothrow_copy_assignable_v<Ts>) and
 		(... and std::is_nothrow_copy_constructible_v<Ts>)
-	) -> basic_variant & requires((... and detail::variant_copy_assignable<Ts>) and !(... and detail::variant_trivially_copy_assignable<Ts>)) {
+	) -> variant & requires((... and detail::variant_copy_assignable<Ts>) and !(... and detail::variant_trivially_copy_assignable<Ts>)) {
 		assign(other);
 		return *this;
 	}
 
 
-	constexpr auto operator=(basic_variant &&) & -> basic_variant & = default;
+	constexpr auto operator=(variant &&) & -> variant & = default;
 
-	constexpr auto operator=(basic_variant && other) & noexcept(
+	constexpr auto operator=(variant && other) & noexcept(
 		(... and std::is_nothrow_move_assignable_v<Ts>) and
 		(... and std::is_nothrow_move_constructible_v<Ts>)
-	) -> basic_variant & requires((... and detail::variant_move_assignable<Ts>) and !(... and detail::variant_trivially_move_assignable<Ts>)) {
+	) -> variant & requires((... and detail::variant_move_assignable<Ts>) and !(... and detail::variant_trivially_move_assignable<Ts>)) {
 		assign(std::move(other));
 		return *this;
 	}
 
 	template<typename T> requires(
-		!std::is_same_v<std::decay_t<T>, basic_variant> and
+		!std::is_same_v<std::decay_t<T>, variant> and
 		constructible_from<std::decay_t<T>, T &&> and
 		std::is_assignable_v<std::decay_t<T> &, T &&>
 	)
@@ -239,11 +239,11 @@ public:
 	
 private:
 	struct copy_move_tag{};
-	constexpr basic_variant(auto && other, copy_move_tag):
-		basic_variant(visit_with_index(
+	constexpr variant(auto && other, copy_move_tag):
+		variant(visit_with_index(
 			OPERATORS_FORWARD(other),
 			[&](auto parameter) {
-				return basic_variant(
+				return variant(
 					other.m_function,
 					parameter.index,
 					[&] { return std::move(parameter).value; }
@@ -303,7 +303,7 @@ private:
 };
 
 template<typename... Ts, typename T>
-constexpr auto holds_alternative(basic_variant<Ts...> const & variant, detail::types<T> type) {
+constexpr auto holds_alternative(variant<Ts...> const & variant, detail::types<T> type) {
 	return variant.index() == detail::get_index(type, detail::types<Ts>{}...);
 }
 
@@ -323,13 +323,8 @@ struct equality_visitor {
 } // namespace detail
 
 template<equality_comparable... Ts>
-constexpr auto operator==(basic_variant<Ts...> const & lhs, basic_variant<Ts...> const & rhs) -> bool {
+constexpr auto operator==(variant<Ts...> const & lhs, variant<Ts...> const & rhs) -> bool {
 	return visit_with_index(lhs, rhs, detail::equality_visitor{});
 }
-
-
-template<typename... Ts>
-using variant = basic_variant<Ts...>;
-
 
 }	// namespace bounded

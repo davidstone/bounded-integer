@@ -13,14 +13,14 @@
 namespace bounded {
 
 template<typename... Ts>
-struct basic_variant;
+struct variant;
 
 namespace detail {
 
 template<typename... Ts>
 struct variant_destructor {
 	~variant_destructor() {
-		visit(static_cast<basic_variant<Ts...> &>(*this), destroy);
+		visit(static_cast<variant<Ts...> &>(*this), destroy);
 	}
 };
 
