@@ -53,7 +53,7 @@ union variadic_union<T, Ts...> {
 	variadic_union(variadic_union const &) = default;
 	variadic_union & operator=(variadic_union &&) = default;
 	variadic_union & operator=(variadic_union const &) = default;
-	~variadic_union() {}
+	constexpr ~variadic_union() {}
 
 	[[no_unique_address]] T head;
 	[[no_unique_address]] variadic_union<Ts...> tail;
