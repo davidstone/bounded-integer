@@ -38,24 +38,22 @@ concept variant_move_assignable = move_constructible<T> and move_assignable<T>;
 template<typename T>
 concept variant_trivially_move_assignable = variant_move_assignable<T> and trivially_move_constructible<T> and trivially_move_assignable<T>;
 
+struct non_constructible {
+	non_constructible() = delete;
+};
+
 template<std::size_t size>
-struct variant_selector {
-	template<auto n>
-	constexpr explicit variant_selector(constant_t<n> index_):
-		index(index_)
-	{
-	}
-	constexpr auto operator()(auto const &) const {
-		return index;
-	}
-private:
-	[[no_unique_address]] integer<0, normalize<size - 1U>> index;
+struct variant_selector_c {
+	using type = integer<0, normalize<size - 1U>>;
 };
 
 template<>
-struct variant_selector<0> {
-	variant_selector() = delete;
+struct variant_selector_c<0> {
+	using type = non_constructible;
 };
+
+template<std::size_t size>
+using variant_selector = typename variant_selector_c<size>::type;
 
 } // namespace detail
 
@@ -75,47 +73,15 @@ public:
 
 	constexpr variant(
 		lazy_init_t,
-		convertible_to<detail::variant_selector<sizeof...(Ts)>> auto && function,
 		auto index_,
 		construct_function_for<type_at<decltype(index_)>> auto && construct_
 	):
-		m_function(OPERATORS_FORWARD(function)),
+		m_index(detail::get_index(index_, detail::types<Ts>()...)),
 		m_data(detail::get_index(index_, detail::types<Ts>()...), OPERATORS_FORWARD(construct_))
 	{
 	}
 
-	constexpr variant(
-		convertible_to<detail::variant_selector<sizeof...(Ts)>> auto && function,
-		auto index_,
-		convertible_to<type_at<decltype(index_)>> auto && value
-	):
-		variant(
-			lazy_init,
-			OPERATORS_FORWARD(function),
-			index_,
-			value_to_function(OPERATORS_FORWARD(value))
-		)
-	{
-	}
-
-	constexpr variant(
-		lazy_init_t,
-		auto const index_,
-		construct_function_for<type_at<decltype(index_)>> auto && construct_
-	):
-		variant(
-			lazy_init,
-			detail::variant_selector<sizeof...(Ts)>(detail::get_index(index_, detail::types<Ts>()...)),
-			index_,
-			OPERATORS_FORWARD(construct_)
-		)
-	{
-	}
-	
-	constexpr variant(
-		auto index_,
-		convertible_to<type_at<decltype(index_)>> auto && value
-	):
+	constexpr variant(auto index_, convertible_to<type_at<decltype(index_)>> auto && value):
 		variant(
 			lazy_init,
 			index_,
@@ -124,7 +90,7 @@ public:
 	{
 	}
 
-	constexpr explicit variant(lazy_init_t, unique_construct_function<Ts...> auto && construct_):
+	constexpr variant(lazy_init_t, unique_construct_function<Ts...> auto && construct_):
 		variant(
 			lazy_init,
 			detail::types<constructed_type<decltype(construct_)>>(),
@@ -201,7 +167,7 @@ public:
 
 
 	constexpr auto index() const {
-		return m_function(m_data);
+		return m_index;
 	}
 
 
@@ -236,7 +202,6 @@ private:
 			OPERATORS_FORWARD(other),
 			[&](auto parameter) {
 				return variant(
-					other.m_function,
 					parameter.index,
 					[&] { return std::move(parameter).value; }
 				);
@@ -254,8 +219,8 @@ private:
 					lhs.value = OPERATORS_FORWARD(rhs.value);
 				} else {
 					::bounded::insert(*this, rhs.index, OPERATORS_FORWARD(rhs.value));
+					m_index = rhs.index;
 				}
-				m_function = other.m_function;
 			}
 		);
 	}
@@ -265,7 +230,7 @@ private:
 		#if 0
 		// TODO: This can be simplified when construct uses std::construct_at
 		constexpr auto index_value = detail::get_index(index, detail::types<Ts>()...);
-		m_function = detail::variant_selector<sizeof...(Ts)>(index_value);
+		m_index = index_value;
 		return construct(operator[](index_value), OPERATORS_FORWARD(construct_));
 		#endif
 		constexpr auto trivial = (... and (
@@ -274,7 +239,7 @@ private:
 			trivially_destructible<Ts>
 		));
 		constexpr auto index_value = detail::get_index(index, detail::types<Ts>()...);
-		m_function = detail::variant_selector<sizeof...(Ts)>(index_value);
+		m_index = index_value;
 		if constexpr (trivial) {
 			m_data = detail::variadic_union<Ts...>(index_value, OPERATORS_FORWARD(construct_));
 			return operator[](index_value);
@@ -290,7 +255,7 @@ private:
 		);
 	}
 
-	[[no_unique_address]] detail::variant_selector<sizeof...(Ts)> m_function;
+	[[no_unique_address]] detail::variant_selector<sizeof...(Ts)> m_index;
 	[[no_unique_address]] detail::variadic_union<Ts...> m_data;
 };
 
