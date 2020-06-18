@@ -227,25 +227,9 @@ private:
 
 	// Assumes the old object has already been destroyed
 	constexpr auto & replace_active_member(auto const index, auto && construct_) {
-		#if 0
-		// TODO: This can be simplified when construct uses std::construct_at
 		constexpr auto index_value = detail::get_index(index, detail::types<Ts>()...);
 		m_index = index_value;
-		return construct(operator[](index_value), OPERATORS_FORWARD(construct_));
-		#endif
-		constexpr auto trivial = (... and (
-			trivially_copy_constructible<Ts> and
-			trivially_copy_assignable<Ts> and
-			trivially_destructible<Ts>
-		));
-		constexpr auto index_value = detail::get_index(index, detail::types<Ts>()...);
-		m_index = index_value;
-		if constexpr (trivial) {
-			m_data = detail::variadic_union<Ts...>(index_value, OPERATORS_FORWARD(construct_));
-			return operator[](index_value);
-		} else {
-			return construct(operator[](index_value), OPERATORS_FORWARD(construct_));
-		}
+		return construct(m_data, [&] { return detail::variadic_union<Ts...>(index_value, OPERATORS_FORWARD(construct_)); });
 	}
 
 	static constexpr auto && operator_bracket(auto && data, auto const index_) {
