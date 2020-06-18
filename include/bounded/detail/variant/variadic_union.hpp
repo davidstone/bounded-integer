@@ -16,6 +16,8 @@
 namespace bounded {
 namespace detail {
 
+struct uninitialized_union {};
+
 template<typename... Ts>
 union variadic_union {
 };
@@ -30,6 +32,9 @@ union variadic_union<T, Ts...> {
 	explicit constexpr variadic_union(constant_t<n> const index, auto && construct_):
 		tail(index - constant<1>, OPERATORS_FORWARD(construct_))
 	{
+	}
+
+	explicit constexpr variadic_union(uninitialized_union) {
 	}
 
 	[[no_unique_address]] T head;
@@ -47,6 +52,9 @@ union variadic_union<T, Ts...> {
 	explicit constexpr variadic_union(constant_t<n> const index, auto && construct_):
 		tail(index - constant<1>, OPERATORS_FORWARD(construct_))
 	{
+	}
+
+	explicit constexpr variadic_union(uninitialized_union) {
 	}
 
 	variadic_union(variadic_union &&) = default;
