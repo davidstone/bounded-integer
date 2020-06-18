@@ -38,13 +38,32 @@ concept variant_move_assignable = move_constructible<T> and move_assignable<T>;
 template<typename T>
 concept variant_trivially_move_assignable = variant_move_assignable<T> and trivially_move_constructible<T> and trivially_move_assignable<T>;
 
+template<std::size_t size>
+struct variant_selector {
+	template<auto n>
+	constexpr explicit variant_selector(constant_t<n> index_):
+		index(index_)
+	{
+	}
+	constexpr auto operator()(auto const &) const {
+		return index;
+	}
+private:
+	[[no_unique_address]] integer<0, normalize<size - 1U>> index;
+};
+
+template<>
+struct variant_selector<0> {
+	variant_selector() = delete;
+};
+
 } // namespace detail
 
 template<typename Function, typename... Ts>
 concept unique_construct_function = matches_exactly_one_type<std::invoke_result_t<Function>, detail::types<Ts>...>;
 
-template<typename GetFunction, typename... Ts>
-struct basic_variant : private detail::variant_destructor<GetFunction, Ts...> {
+template<typename... Ts>
+struct basic_variant : private detail::variant_destructor<Ts...> {
 private:
 	template<typename Index>
 	using type_at = typename decltype(detail::get_type(Index(), detail::types<Ts>()...))::type;
@@ -52,17 +71,11 @@ private:
 	template<typename Construct>
 	using constructed_type = std::decay_t<std::invoke_result_t<Construct>>;
 public:
-	friend detail::variant_destructor<GetFunction, Ts...>;
-
-	static_assert(trivially_copy_constructible<GetFunction>);
-	static_assert(trivially_move_constructible<GetFunction>);
-	static_assert(trivially_copy_assignable<GetFunction>);
-	static_assert(trivially_move_assignable<GetFunction>);
-	static_assert(trivially_destructible<GetFunction>);
+	friend detail::variant_destructor<Ts...>;
 
 	constexpr basic_variant(
 		lazy_init_t,
-		convertible_to<GetFunction> auto && function,
+		convertible_to<detail::variant_selector<sizeof...(Ts)>> auto && function,
 		auto index_,
 		construct_function_for<type_at<decltype(index_)>> auto && construct_
 	):
@@ -80,7 +93,7 @@ public:
 	}
 
 	constexpr basic_variant(
-		convertible_to<GetFunction> auto && function,
+		convertible_to<detail::variant_selector<sizeof...(Ts)>> auto && function,
 		auto index_,
 		convertible_to<type_at<decltype(index_)>> auto && value
 	):
@@ -100,7 +113,7 @@ public:
 	):
 		basic_variant(
 			lazy_init,
-			GetFunction(detail::get_index(index_, detail::types<Ts>()...)),
+			detail::variant_selector<sizeof...(Ts)>(detail::get_index(index_, detail::types<Ts>()...)),
 			index_,
 			OPERATORS_FORWARD(construct_)
 		)
@@ -260,7 +273,7 @@ private:
 		#if 0
 		// TODO: This can be simplified when construct uses std::construct_at
 		constexpr auto index_value = detail::get_index(index, detail::types<Ts>()...);
-		m_function = GetFunction(index_value);
+		m_function = detail::variant_selector<sizeof...(Ts)>(index_value);
 		return construct(operator[](index_value), OPERATORS_FORWARD(construct_));
 		#endif
 		constexpr auto trivial = (... and (
@@ -269,7 +282,7 @@ private:
 			trivially_destructible<Ts>
 		));
 		constexpr auto index_value = detail::get_index(index, detail::types<Ts>()...);
-		m_function = GetFunction(index_value);
+		m_function = detail::variant_selector<sizeof...(Ts)>(index_value);
 		if constexpr (trivial) {
 			m_data = detail::variadic_union<Ts...>(index_value, OPERATORS_FORWARD(construct_));
 			return operator[](index_value);
@@ -285,12 +298,12 @@ private:
 		);
 	}
 
-	[[no_unique_address]] GetFunction m_function;
+	[[no_unique_address]] detail::variant_selector<sizeof...(Ts)> m_function;
 	[[no_unique_address]] detail::variadic_union<Ts...> m_data;
 };
 
-template<typename GetFunction, typename... Ts, typename T>
-constexpr auto holds_alternative(basic_variant<GetFunction, Ts...> const & variant, detail::types<T> type) {
+template<typename... Ts, typename T>
+constexpr auto holds_alternative(basic_variant<Ts...> const & variant, detail::types<T> type) {
 	return variant.index() == detail::get_index(type, detail::types<Ts>{}...);
 }
 
@@ -309,37 +322,14 @@ struct equality_visitor {
 
 } // namespace detail
 
-template<typename GetFunction, equality_comparable... Ts>
-constexpr auto operator==(basic_variant<GetFunction, Ts...> const & lhs, basic_variant<GetFunction, Ts...> const & rhs) -> bool {
+template<equality_comparable... Ts>
+constexpr auto operator==(basic_variant<Ts...> const & lhs, basic_variant<Ts...> const & rhs) -> bool {
 	return visit_with_index(lhs, rhs, detail::equality_visitor{});
 }
 
 
-namespace detail {
-
-template<std::size_t size>
-struct variant_selector {
-	template<auto n>
-	constexpr explicit variant_selector(constant_t<n> index_):
-		index(index_)
-	{
-	}
-	constexpr auto operator()(auto const &) const {
-		return index;
-	}
-private:
-	[[no_unique_address]] integer<0, normalize<size - 1U>> index;
-};
-
-template<>
-struct variant_selector<0> {
-	variant_selector() = delete;
-};
-
-}	// namespace detail
-
 template<typename... Ts>
-using variant = basic_variant<detail::variant_selector<sizeof...(Ts)>, Ts...>;
+using variant = basic_variant<Ts...>;
 
 
 }	// namespace bounded

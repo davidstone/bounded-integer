@@ -12,20 +12,20 @@
 
 namespace bounded {
 
-template<typename GetFunction, typename... Ts>
+template<typename... Ts>
 struct basic_variant;
 
 namespace detail {
 
-template<typename GetFunction, typename... Ts>
+template<typename... Ts>
 struct variant_destructor {
 	~variant_destructor() {
-		visit(static_cast<basic_variant<GetFunction, Ts...> &>(*this), destroy);
+		visit(static_cast<basic_variant<Ts...> &>(*this), destroy);
 	}
 };
 
-template<typename GetFunction, typename... Ts> requires(... and std::is_trivially_destructible_v<Ts>)
-struct variant_destructor<GetFunction, Ts...> {
+template<typename... Ts> requires(... and std::is_trivially_destructible_v<Ts>)
+struct variant_destructor<Ts...> {
 };
 
 }	// namespace detail
