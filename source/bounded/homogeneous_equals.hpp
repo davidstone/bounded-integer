@@ -7,6 +7,8 @@
 
 #include <type_traits>
 
+#pragma once
+
 template<typename LHS, typename RHS>
 inline constexpr auto is_same_bounded = std::is_same_v<LHS, RHS>;
 
