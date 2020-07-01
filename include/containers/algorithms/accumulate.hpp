@@ -33,10 +33,22 @@ struct accumulate_c<Range, Initial, std::plus<>> {
 			std::declval<typename std::remove_reference_t<Range>::value_type>() *
 			std::declval<bounded::integer<
 				0,
-				bounded::detail::normalize<
-					bounded::max_value<
-						typename std::iterator_traits<decltype(begin(std::declval<Range>()))>::difference_type
-					>.value()
+				bounded::detail::builtin_max_value<typename std::iterator_traits<decltype(begin(std::declval<Range>()))>::difference_type>
+			>>()
+		)
+	);
+};
+
+template<typename Range, typename Initial> requires bounded::bounded_integer<Initial>
+struct accumulate_c<Range, Initial, std::multiplies<>> {
+	using type = decltype(
+		std::declval<Initial>() *
+		::bounded::pow(
+			std::declval<typename std::remove_reference_t<Range>::value_type>(),
+			std::declval<bounded::integer<
+				0,
+				bounded::detail::builtin_max_value<
+					typename std::iterator_traits<decltype(begin(std::declval<Range>()))>::difference_type
 				>
 			>>()
 		)
@@ -69,44 +81,60 @@ constexpr auto accumulate(range auto && source, auto && initial, auto function) 
 }
 
 
-template<typename Result>
-constexpr auto accumulate(range auto && source, auto && initial) {
-	return ::containers::accumulate<Result>(OPERATORS_FORWARD(source), OPERATORS_FORWARD(initial), std::plus<>{});
-}
-
-constexpr auto accumulate(range auto && source, auto && initial) {
-	return ::containers::accumulate(OPERATORS_FORWARD(source), OPERATORS_FORWARD(initial), std::plus<>{});
-}
-
-
 namespace detail {
 
 template<typename T> requires std::is_default_constructible_v<T>
-constexpr auto initial_accumulate_value() {
+constexpr auto initial_sum_value() {
 	if constexpr (bounded::bounded_integer<T>) {
 		return 0_bi;
 	} else {
-		return T{};
+		return T();
 	}
 }
 
-}	// namespace detail
+template<typename T>
+constexpr auto initial_product_value() {
+	if constexpr (bounded::bounded_integer<T>) {
+		return 1_bi;
+	} else {
+		return T(1);
+	}
+}
+
+} // namespace detail
 
 template<typename Result>
-constexpr auto accumulate(range auto && source) {
+constexpr auto sum(range auto && source) {
 	return ::containers::accumulate<Result>(
 		OPERATORS_FORWARD(source),
-		detail::initial_accumulate_value<typename std::remove_reference_t<decltype(source)>::value_type>(),
-		std::plus<>{}
+		detail::initial_sum_value<typename std::remove_reference_t<decltype(source)>::value_type>(),
+		std::plus()
 	);
 }
 
-constexpr auto accumulate(range auto && source) {
+constexpr auto sum(range auto && source) {
 	return ::containers::accumulate(
 		OPERATORS_FORWARD(source),
-		detail::initial_accumulate_value<typename std::remove_reference_t<decltype(source)>::value_type>(),
-		std::plus<>{}
+		detail::initial_sum_value<typename std::remove_reference_t<decltype(source)>::value_type>(),
+		std::plus()
 	);
 }
 
-}	// namespace containers
+template<typename Result>
+constexpr auto product(range auto && source) {
+	return ::containers::accumulate<Result>(
+		OPERATORS_FORWARD(source),
+		detail::initial_product_value<typename std::remove_reference_t<decltype(source)>::value_type>(),
+		std::multiplies()
+	);
+}
+
+constexpr auto product(range auto && source) {
+	return ::containers::accumulate(
+		OPERATORS_FORWARD(source),
+		detail::initial_product_value<typename std::remove_reference_t<decltype(source)>::value_type>(),
+		std::multiplies()
+	);
+}
+
+} // namespace containers

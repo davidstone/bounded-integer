@@ -51,9 +51,9 @@ constexpr auto first = bounded::integer<-4, 1>(-3);
 constexpr auto last = bounded::integer<0, 1>(1);
 constexpr auto range = containers::integer_range(first, last);
 
-static_assert(containers::accumulate(range) == -6_bi);
+static_assert(containers::sum(range) == -6_bi);
 
-static_assert(containers::accumulate(containers::integer_range(4_bi, 10_bi, 2_bi)) == 18_bi);
+static_assert(containers::sum(containers::integer_range(4_bi, 10_bi, 2_bi)) == 18_bi);
 
 // Ensure it works with a range-based for loop
 static_assert([]{

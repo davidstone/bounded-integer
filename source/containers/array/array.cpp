@@ -38,11 +38,10 @@ using namespace bounded::literal;
 
 static_assert(containers::count_if(array, true_function) == containers::size(array));
 
-static_assert(containers::accumulate(array) == (0_bi + 3_bi + 2_bi + 3_bi + 5_bi));
-static_assert(containers::accumulate(array, 10_bi) == (10_bi + 0_bi + 3_bi + 2_bi + 3_bi + 5_bi));
+static_assert(containers::sum(array) == (0_bi + 3_bi + 2_bi + 3_bi + 5_bi));
 
 constexpr auto double_array = containers::make_array(0.0, 1.0, 2.0);
 
-static_assert(containers::accumulate(double_array) == (0.0 + 1.0 + 2.0));
+static_assert(containers::sum(double_array) == (0.0 + 1.0 + 2.0));
 
 }	// namespace
