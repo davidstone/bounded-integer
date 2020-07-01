@@ -48,6 +48,20 @@ static_assert(homogeneous_equals(
 	signed_max + signed_max
 ));
 static_assert(homogeneous_equals(
+	-signed_min * bounded::constant<-1>,
+	signed_min
+));
+
+#if BOUNDED_DETAIL_HAS_128_BIT
+
+static_assert(homogeneous_equals(
+	bounded::constant<1'000'000'000'000'000'000> * bounded::constant<1'000'000'000'000'000'000>,
+	bounded::constant<bounded::detail::uint128_t(1'000'000'000'000'000'000) * bounded::detail::uint128_t(1'000'000'000'000'000'000)>
+));
+
+#endif
+
+static_assert(homogeneous_equals(
 	bounded::integer<-3, 3>(1, bounded::non_check) * bounded::integer<0, 1>(1, bounded::non_check),
 	bounded::integer<-3, 3>(1, bounded::non_check)
 ));

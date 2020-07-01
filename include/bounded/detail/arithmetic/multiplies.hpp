@@ -16,21 +16,16 @@ namespace detail {
 
 template<auto lhs, auto rhs>
 constexpr auto safer_multiply(constant_t<lhs> const &, constant_t<rhs> const &) {
-	// If both are positive, the result is positive and I can safely use
-	// unsigned integers. If one is positive and one is negative, the result is
-	// negative and I can use signed integers. Overflow will be caught by the
-	// constexpr evaluation rules. If both are negative, I can cast them both to
-	// unsigned and the result will be positive and thus fit in unsigned. The
-	// conversion to unsigned will preserve the value under multiplication.
-	if constexpr ((lhs < 0) xor (rhs < 0)) {
-		constexpr auto signed_max = max_value<max_signed_t>;
-		static_assert(lhs <= signed_max or rhs == 0);
-		static_assert(rhs <= signed_max or lhs == 0);
-		return static_cast<max_signed_t>(lhs) * static_cast<max_signed_t>(rhs);
+	constexpr auto negative = (lhs < 0) xor (rhs < 0);
+	constexpr auto positive_lhs = safe_abs(lhs);
+	constexpr auto positive_rhs = safe_abs(rhs);
+	constexpr auto positive_result = positive_lhs * positive_rhs;
+	static_assert(positive_lhs == 0 or positive_rhs == 0 or positive_result / positive_lhs == positive_rhs);
+	if constexpr (negative) {
+		static_assert(positive_result <= -static_cast<max_unsigned_t>(min_value<max_signed_t>));
+		return static_cast<max_signed_t>(-positive_result);
 	} else {
-		constexpr auto result = static_cast<max_unsigned_t>(lhs) * static_cast<max_unsigned_t>(rhs);
-		static_assert((safe_abs(lhs) <= result and safe_abs(rhs) <= result) or (lhs == 0 or rhs == 0), "Integer overflow in multiplication.");
-		return result;
+		return positive_result;
 	}
 }
 
@@ -43,10 +38,10 @@ auto multiplies = [](auto const lhs, auto const rhs) {
 
 constexpr auto operator*(bounded_integer auto const lhs_, bounded_integer auto const rhs_) {
 	return detail::modulo_equivalent_operator_overload(lhs_, rhs_, detail::multiplies, [](auto const lhs, auto const rhs) {
-		auto p0 = detail::safer_multiply(lhs.min, rhs.min);
-		auto p1 = detail::safer_multiply(lhs.min, rhs.max);
-		auto p2 = detail::safer_multiply(lhs.max, rhs.min);
-		auto p3 = detail::safer_multiply(lhs.max, rhs.max);
+		constexpr auto p0 = detail::safer_multiply(lhs.min, rhs.min);
+		constexpr auto p1 = detail::safer_multiply(lhs.min, rhs.max);
+		constexpr auto p2 = detail::safer_multiply(lhs.max, rhs.min);
+		constexpr auto p3 = detail::safer_multiply(lhs.max, rhs.max);
 		return detail::min_max{
 			detail::safe_min(p0, p1, p2, p3),
 			detail::safe_max(p0, p1, p2, p3)
