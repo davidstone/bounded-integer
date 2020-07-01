@@ -10,7 +10,7 @@
 namespace bounded {
 namespace detail {
 
-#if 0 and defined __GNUC__ and !defined __clang__
+#if defined __GNUC__
 	#define BOUNDED_DETAIL_HAS_128_BIT 1
 	using int128_t = __int128_t;
 	using uint128_t = __uint128_t;
