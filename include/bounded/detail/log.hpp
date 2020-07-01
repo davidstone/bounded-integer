@@ -14,10 +14,6 @@
 namespace bounded {
 namespace detail {
 
-constexpr inline auto as_unsigned = [](auto const value) {
-	return static_cast<promoted_unsigned<decltype(value)>>(value);
-};
-
 constexpr auto log_impl(auto value, auto const base) {
 	auto sum = 0;
 	while (value >= base) {

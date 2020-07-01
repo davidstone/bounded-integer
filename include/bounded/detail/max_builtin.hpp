@@ -57,5 +57,9 @@ concept signed_builtin = builtin_integer<T> and (std::is_signed_v<T> or std::is_
 template<typename T>
 concept unsigned_builtin = builtin_integer<T> and (std::is_unsigned_v<T> or std::is_same_v<T, detail::max_unsigned_t>);
 
+constexpr inline auto as_unsigned = [](auto const value) {
+	return static_cast<promoted_unsigned<decltype(value)>>(value);
+};
+
 } // namespace detail
 } // namespace bounded
