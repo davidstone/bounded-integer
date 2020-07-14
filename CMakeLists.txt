@@ -264,6 +264,10 @@ if("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang")
 		"-Wno-unused-variable"
 	)
 
+	target_compile_options(benchmark PUBLIC
+		"-Wno-suggest-override"
+	)
+
 elseif("${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU")
 else()
 	message(FATAL_ERROR "Unknown compiler " "${CMAKE_CXX_COMPILER_ID}")
