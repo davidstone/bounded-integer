@@ -39,6 +39,10 @@ struct default_add {
 	static constexpr auto add(iterator auto it, auto const & offset) OPERATORS_RETURNS(
 		std::move(it) + offset
 	)
+	static constexpr auto add(iterator auto it, bounded::constant_t<1>) {
+		++it;
+		return it;
+	}
 };
 
 struct default_subtract {
