@@ -241,15 +241,15 @@ if("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang")
 	if(NOT MSVC)
 		target_compile_options(gtest PUBLIC
 			"-stdlib=libc++"
-			"-std=c++2a"
+			"-std=c++20"
 		)
 		target_compile_options(gtest_main PUBLIC
 			"-stdlib=libc++"
-			"-std=c++2a"
+			"-std=c++20"
 		)
 		target_compile_options(benchmark PUBLIC
 			"-stdlib=libc++"
-			"-std=c++2a"
+			"-std=c++20"
 		)
 	endif()
 
