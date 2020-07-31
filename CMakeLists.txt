@@ -236,6 +236,11 @@ add_executable(ska_sort
 )
 target_link_libraries(ska_sort PUBLIC bounded gtest gtest_main benchmark strict_defaults)
 
+add_executable(trivial_inplace_function
+	source/containers/trivial_inplace_function.cpp
+)
+target_link_libraries(trivial_inplace_function PUBLIC containers strict_defaults)
+
 
 if("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang")
 	if(NOT MSVC)
