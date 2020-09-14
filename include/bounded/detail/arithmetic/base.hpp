@@ -7,7 +7,6 @@
 
 #include <bounded/detail/class.hpp>
 #include <bounded/detail/is_bounded_integer.hpp>
-#include <bounded/detail/modulo_cast.hpp>
 
 #include <type_traits>
 #include <utility>
@@ -51,7 +50,7 @@ constexpr auto modulo_equivalent_operator_overload(LHS const lhs, RHS const rhs,
 		static_cast<intermediate_t>(rhs)
 	);
 	return result_t(
-		modulo_cast<typename result_t::underlying_type>(intermediate),
+		static_cast<typename result_t::underlying_type>(intermediate),
 		non_check
 	);
 }

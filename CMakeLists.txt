@@ -80,7 +80,6 @@ add_executable(bounded_test
 	source/bounded/detail/max_builtin.cpp
 	source/bounded/detail/minmax.cpp
 	source/bounded/detail/min_max_value.cpp
-	source/bounded/detail/modulo_cast.cpp
 	source/bounded/detail/normalize.cpp
 	source/bounded/detail/overlapping_range.cpp
 	source/bounded/detail/overload.cpp

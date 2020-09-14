@@ -8,7 +8,6 @@
 #include <bounded/detail/class.hpp>
 #include <bounded/detail/max_builtin.hpp>
 #include <bounded/detail/min_max_value.hpp>
-#include <bounded/detail/modulo_cast.hpp>
 
 namespace bounded {
 namespace detail {
@@ -37,7 +36,7 @@ constexpr auto operator-(integer<minimum, maximum, overflow_policy> const value)
 	using underlying_type = typename result_type::underlying_type;
 	using promoted_unsigned_type = detail::promoted_unsigned<underlying_type>;
 	return result_type(
-		detail::modulo_cast<underlying_type>(-static_cast<promoted_unsigned_type>(value)),
+		static_cast<underlying_type>(-static_cast<promoted_unsigned_type>(value)),
 		non_check
 	);
 }
