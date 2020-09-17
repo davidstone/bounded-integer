@@ -173,7 +173,7 @@ static_assert(!bounded::equality_comparable<bounded::variant<int, non_comparable
 constexpr bool test_non_trivial() {
 	using non_trivial_variant_t = bounded::variant<non_trivial>;
 	auto a = non_trivial_variant_t(non_trivial(3));
-	static_assert(a.index() == 0_bi);
+	BOUNDED_TEST(a.index() == 0_bi);
 	auto b = a;
 	BOUNDED_TEST(*a[0_bi].x == 3);
 	BOUNDED_TEST(a == b);
