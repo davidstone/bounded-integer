@@ -12,16 +12,6 @@
 #include <memory>
 #include <type_traits>
 
-// In namespace std to trick clang until libc++ has construct_at
-namespace std {
-
-template<typename T>
-constexpr auto construct_at(T * p, auto && ... args) {
-	return ::new(p) T(OPERATORS_FORWARD(args)...);
-}
-
-} // namespace std
-
 namespace bounded {
 namespace detail {
 
