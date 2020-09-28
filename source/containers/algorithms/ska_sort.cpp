@@ -23,6 +23,8 @@
 
 #include "../../test_assert.hpp"
 
+namespace {
+
 using namespace containers;
 
 template<typename T, std::size_t size>
@@ -33,11 +35,11 @@ constexpr auto copy_from_c_array(c_array<T, size> const & original, std::index_s
 	return containers::array<std::remove_cvref_t<T>, sizeof...(indexes)>{original[indexes]...};
 }
 
-static constexpr void inplace_radix_sort(auto begin, auto end, auto && extract_key) {
+constexpr void inplace_radix_sort(auto begin, auto end, auto && extract_key) {
 	detail::inplace_radix_sort<1>(begin, end, extract_key);
 }
 
-static constexpr void inplace_radix_sort(auto begin, auto end) {
+constexpr void inplace_radix_sort(auto begin, auto end) {
 	inplace_radix_sort(begin, end, bounded::identity);
 }
 
@@ -702,14 +704,10 @@ TEST(radix_sort, double) {
 	);
 }
 
-namespace {
-
 template<typename Char, std::size_t size>
 constexpr auto array_from_c_string(c_array<Char, size> const & str) {
 	return copy_from_c_array(str, std::make_index_sequence<size - 1U>{});
 }
-
-} // namespace
 
 // TODO: This assumes a particular sort order based on ASCII; maybe use
 // std::sort for the baseline?
@@ -1341,7 +1339,7 @@ static_assert(test_sort_copy(
 #define SKA_SORT_NOINLINE __attribute__((noinline))
 
 template<typename Container>
-static auto create_radix_sort_data(std::mt19937_64 & engine, std::int64_t const size, auto distribution) {
+auto create_radix_sort_data(std::mt19937_64 & engine, std::int64_t const size, auto distribution) {
 	auto result = Container();
 	containers::detail::reserve_if_reservable(result, static_cast<typename Container::size_type>(size));
 	for (std::int64_t n = 0; n != size; ++n) {
@@ -1350,7 +1348,7 @@ static auto create_radix_sort_data(std::mt19937_64 & engine, std::int64_t const 
 	return result;
 }
 
-static auto create_radix_sort_data(std::mt19937_64 & engine, std::int64_t const size, auto distribution) {
+auto create_radix_sort_data(std::mt19937_64 & engine, std::int64_t const size, auto distribution) {
 	return create_radix_sort_data<std::vector<decltype(distribution(engine))>>(engine, size, distribution);
 }
 
@@ -1358,7 +1356,7 @@ static auto create_radix_sort_data(std::mt19937_64 & engine, std::int64_t const 
 #if 0
 
 extern const std::vector<const char *> & get_word_list();
-static std::vector<std::string> SKA_SORT_NOINLINE create_radix_sort_data(std::mt19937_64 & randomness, std::int64_t size)
+std::vector<std::string> SKA_SORT_NOINLINE create_radix_sort_data(std::mt19937_64 & randomness, std::int64_t size)
 {
 	const std::vector<const char *> & words = get_word_list();
 	std::vector<std::string> result;
@@ -1388,7 +1386,7 @@ struct benchmark_sort_value {
 typedef std::int64_t benchmark_sort_key;
 #define NUM_SORT_KEYS 1
 #if NUM_SORT_KEYS == 1
-static std::vector<std::tuple<benchmark_sort_key, benchmark_sort_value>> SKA_SORT_NOINLINE create_radix_sort_data(std::mt19937_64 & randomness, int size)
+std::vector<std::tuple<benchmark_sort_key, benchmark_sort_value>> SKA_SORT_NOINLINE create_radix_sort_data(std::mt19937_64 & randomness, int size)
 {
 	std::vector<std::tuple<benchmark_sort_key, benchmark_sort_value>> result;
 	result.reserve(size);
@@ -1400,7 +1398,7 @@ static std::vector<std::tuple<benchmark_sort_key, benchmark_sort_value>> SKA_SOR
 	return result;
 }
 #elif NUM_SORT_KEYS == 2
-static std::vector<std::tuple<std::pair<benchmark_sort_key, benchmark_sort_key>, benchmark_sort_value>> SKA_SORT_NOINLINE create_radix_sort_data(std::mt19937_64 & randomness, int size)
+std::vector<std::tuple<std::pair<benchmark_sort_key, benchmark_sort_key>, benchmark_sort_value>> SKA_SORT_NOINLINE create_radix_sort_data(std::mt19937_64 & randomness, int size)
 {
 	std::vector<std::tuple<std::pair<benchmark_sort_key, benchmark_sort_key>, benchmark_sort_value>> result;
 	result.reserve(size);
@@ -1412,7 +1410,7 @@ static std::vector<std::tuple<std::pair<benchmark_sort_key, benchmark_sort_key>,
 	return result;
 }
 #else
-static std::vector<std::tuple<std::array<benchmark_sort_key, NUM_SORT_KEYS>, benchmark_sort_value>> SKA_SORT_NOINLINE create_radix_sort_data(std::mt19937_64 & randomness, int size)
+std::vector<std::tuple<std::array<benchmark_sort_key, NUM_SORT_KEYS>, benchmark_sort_value>> SKA_SORT_NOINLINE create_radix_sort_data(std::mt19937_64 & randomness, int size)
 {
 	std::vector<std::tuple<std::array<benchmark_sort_key, NUM_SORT_KEYS>, benchmark_sort_value>> result;
 	result.reserve(size);
@@ -1429,8 +1427,8 @@ static std::vector<std::tuple<std::array<benchmark_sort_key, NUM_SORT_KEYS>, ben
 #endif
 #endif
 
-static constexpr int profile_multiplier = 2;
-static constexpr int max_profile_range = 1 << 20;
+constexpr int profile_multiplier = 2;
+constexpr int max_profile_range = 1 << 20;
 
 void benchmark_ska_sort_copy(benchmark::State & state, auto create) {
 	auto randomness = std::mt19937_64(77342348);
@@ -1458,7 +1456,7 @@ void benchmark_ska_sort_copy(benchmark::State & state, auto create) {
 	}
 }
 
-static void benchmark_std_sort(benchmark::State & state, auto create) {
+void benchmark_std_sort(benchmark::State & state, auto create) {
 	auto randomness = std::mt19937_64(77342348);
 	create(randomness, state.range(0));
 	for (auto _ : state) {
@@ -1474,15 +1472,15 @@ static void benchmark_std_sort(benchmark::State & state, auto create) {
 	}
 }
 
-static void american_flag_sort(auto begin, auto end, auto && extract_key) {
+void american_flag_sort(auto begin, auto end, auto && extract_key) {
 	detail::inplace_radix_sort<bounded::max_value<std::ptrdiff_t>>(begin, end, extract_key);
 }
 
-static void american_flag_sort(auto begin, auto end) {
+void american_flag_sort(auto begin, auto end) {
 	american_flag_sort(begin, end, bounded::identity);
 }
 
-static void benchmark_american_flag_sort(benchmark::State & state, auto create) {
+void benchmark_american_flag_sort(benchmark::State & state, auto create) {
 	auto randomness = std::mt19937_64(77342348);
 	create(randomness, state.range(0));
 	for (auto _ : state) {
@@ -1498,7 +1496,7 @@ static void benchmark_american_flag_sort(benchmark::State & state, auto create) 
 	}
 }
 
-static void benchmark_ska_sort(benchmark::State & state, auto create) {
+void benchmark_ska_sort(benchmark::State & state, auto create) {
 	auto randomness = std::mt19937_64(77342348);
 	create(randomness, state.range(0));
 	for (auto _ : state) {
@@ -1514,7 +1512,7 @@ static void benchmark_ska_sort(benchmark::State & state, auto create) {
 	}
 }
 
-static void benchmark_inplace_radix_sort(benchmark::State & state, auto create) {
+void benchmark_inplace_radix_sort(benchmark::State & state, auto create) {
 	auto randomness = std::mt19937_64(77342348);
 	create(randomness, state.range(0));
 	for (auto _ : state) {
@@ -1530,7 +1528,7 @@ static void benchmark_inplace_radix_sort(benchmark::State & state, auto create) 
 	}
 }
 
-static void benchmark_generation(benchmark::State & state, auto create) {
+void benchmark_generation(benchmark::State & state, auto create) {
 	auto randomness = std::mt19937_64(77342348);
 	create(randomness, state.range(0));
 	for (auto _ : state) {
@@ -1541,7 +1539,7 @@ static void benchmark_generation(benchmark::State & state, auto create) {
 }
 
 
-static std::vector<std::int8_t> SKA_SORT_NOINLINE create_limited_radix_sort_data(std::mt19937_64 & randomness, std::int8_t range_end) {
+std::vector<std::int8_t> SKA_SORT_NOINLINE create_limited_radix_sort_data(std::mt19937_64 & randomness, std::int8_t range_end) {
 	std::int8_t permutation[256];
 	std::iota(permutation, permutation + 256, -128);
 	std::shuffle(permutation, permutation + 256, randomness);
@@ -1554,7 +1552,7 @@ static std::vector<std::int8_t> SKA_SORT_NOINLINE create_limited_radix_sort_data
 	}
 	return result;
 }
-static void benchmark_limited_generation(benchmark::State & state) {
+void benchmark_limited_generation(benchmark::State & state) {
 	auto randomness = std::mt19937_64(77342348);
 	for (auto _ : state) {
 		auto to_sort = create_limited_radix_sort_data(randomness, state.range(0));
@@ -1566,7 +1564,7 @@ static void benchmark_limited_generation(benchmark::State & state) {
 #define LIMITED_RANGE() Arg(-128)->Arg(-127)->Arg(-120)->Arg(-96)->Arg(-64)->Arg(-32)->Arg(0)->Arg(32)->Arg(64)->Arg(96)->Arg(127)
 BENCHMARK(benchmark_limited_generation)->LIMITED_RANGE();
 
-static void benchmark_limited_inplace_sort(benchmark::State & state) {
+void benchmark_limited_inplace_sort(benchmark::State & state) {
 	std::mt19937_64 randomness(77342348);
 	for (auto _ : state) {
 		auto to_sort = create_limited_radix_sort_data(randomness, state.range(0));
@@ -1601,8 +1599,6 @@ BENCHMARK(benchmark_limited_inplace_sort)->LIMITED_RANGE();
 		REGISTER_INDIVIDUAL_BENCHMARK("ska_sort_copy_" name, benchmark_ska_sort_copy, create); \
 	} while (false)
 
-namespace {
-
 auto create_simple_data = [](auto distribution) {
 	return [=](auto & engine, std::int64_t const size) {
 		return create_radix_sort_data(engine, size, distribution);
@@ -1632,7 +1628,7 @@ auto create_range_data = [](int max_size, auto generate) {
 using bounded::min_value;
 using bounded::max_value;
 
-static auto SKA_SORT_NOINLINE create_radix_sort_data_bool(std::mt19937_64 & engine, std::int64_t const size) {
+auto SKA_SORT_NOINLINE create_radix_sort_data_bool(std::mt19937_64 & engine, std::int64_t const size) {
 	auto int_distribution = std::uniform_int_distribution<int>(0, 1);
 	return create_radix_sort_data<containers::vector<bool>>(engine, size, [&](auto &) {
 		return int_distribution(engine) != 0;
