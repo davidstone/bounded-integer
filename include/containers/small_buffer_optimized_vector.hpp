@@ -216,18 +216,6 @@ struct small_buffer_optimized_vector {
 	constexpr auto capacity() const {
 		return BOUNDED_CONDITIONAL(is_small(), m_small.capacity(), m_large.capacity());
 	}
-	constexpr auto reserve(size_type const requested_capacity) -> void {
-		if (requested_capacity <= capacity()) {
-			return;
-		}
-		if (requested_capacity <= small_t::capacity()) {
-			relocate_to_small();
-		} else {
-			relocate_to_large(requested_capacity);
-		}
-	}
-
-
 	// Assumes that elements are already constructed in the spare capacity
 	constexpr void append_from_capacity(auto const count) {
 		auto const new_size = size() + count;
@@ -243,6 +231,16 @@ struct small_buffer_optimized_vector {
 		BOUNDED_ASSERT(size() == new_size);
 	}
 
+	constexpr auto reserve(size_type const requested_capacity) -> void {
+		if (requested_capacity <= capacity()) {
+			return;
+		}
+		if (requested_capacity <= small_t::capacity()) {
+			relocate_to_small();
+		} else {
+			relocate_to_large(requested_capacity);
+		}
+	}
 
 private:
 	constexpr auto size() const {

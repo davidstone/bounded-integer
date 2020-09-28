@@ -96,7 +96,6 @@ struct stable_vector {
 	static constexpr auto capacity() {
 		return bounded::constant<bounded::detail::normalize<capacity_>>;
 	}
-
 	// Assumes that elements are already constructed in the spare capacity
 	constexpr void append_from_capacity(auto const count) {
 		BOUNDED_ASSERT(count + m_size <= capacity());

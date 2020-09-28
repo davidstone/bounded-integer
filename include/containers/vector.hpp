@@ -90,6 +90,12 @@ struct vector {
 	constexpr auto capacity() const {
 		return m_storage.capacity();
 	}
+	// Assumes that elements are already constructed in the spare capacity
+	constexpr void append_from_capacity(auto const count) {
+		BOUNDED_ASSERT(m_size + count <= capacity());
+		m_size += count;
+	}
+
 	constexpr auto reserve(size_type const requested_capacity) {
 		if (requested_capacity <= capacity()) {
 			return;
@@ -101,12 +107,6 @@ struct vector {
 		);
 		m_storage = std::move(temp);
 		// m_size remains the same
-	}
-
-	// Assumes that elements are already constructed in the spare capacity
-	constexpr void append_from_capacity(auto const count) {
-		BOUNDED_ASSERT(m_size + count <= capacity());
-		m_size += count;
 	}
 
 private:

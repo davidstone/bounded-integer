@@ -26,10 +26,6 @@ namespace detail {
 
 template<typename T, std::size_t capacity_, bool = std::is_trivially_destructible_v<T>>
 struct static_vector_data {
-	static constexpr auto capacity() {
-		return bounded::constant<bounded::detail::normalize<capacity_>>;
-	}
-
 	using value_type = T;
 	using size_type = bounded::integer<
 		0,
@@ -92,6 +88,9 @@ struct static_vector_data {
 
 	OPERATORS_BRACKET_SEQUENCE_RANGE_DEFINITIONS
 	
+	static constexpr auto capacity() {
+		return bounded::constant<bounded::detail::normalize<capacity_>>;
+	}
 	// Assumes that elements are already constructed in the spare capacity
 	constexpr void append_from_capacity(auto const count) {
 		BOUNDED_ASSERT(count + m_size <= capacity());
@@ -135,8 +134,6 @@ public:
 	using typename base::const_iterator;
 	using typename base::iterator;
 
-	using base::capacity;
-
 	using base::base;
 	using base::operator=;
 	
@@ -156,6 +153,7 @@ public:
 		return end(static_cast<base &>(container));
 	}
 
+	using base::capacity;
 	using base::append_from_capacity;
 };
 
