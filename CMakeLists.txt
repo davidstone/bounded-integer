@@ -152,6 +152,7 @@ add_library(containers_test STATIC
 	source/containers/common_container_functions.cpp
 	source/containers/contiguous_iterator.cpp
 	source/containers/data.cpp
+	source/containers/dynamic_array.cpp
 	source/containers/emplace_back.cpp
 	source/containers/empty.cpp
 	source/containers/erase.cpp
@@ -216,11 +217,6 @@ add_executable(std_map
 target_compile_definitions(std_map PRIVATE "USE_SYSTEM_MAP")
 target_link_libraries(std_map PUBLIC containers strict_defaults)
 
-add_executable(dynamic_array
-	source/containers/dynamic_array.cpp
-)
-target_link_libraries(dynamic_array PUBLIC containers strict_defaults)
-
 SET(gtest_disable_pthreads ON CACHE BOOL "Disable uses of pthreads in gtest.")
 add_subdirectory("${PROJECT_SOURCE_DIR}/source/googletest-1.8.1")
 set_target_properties(gtest PROPERTIES FOLDER extern)
@@ -283,7 +279,6 @@ set(test_targets
 	static_vector
 	small_buffer_optimized_vector
 	flat_map
-	dynamic_array
 	variant
 	ska_sort
 )
