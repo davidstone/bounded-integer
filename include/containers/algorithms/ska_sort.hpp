@@ -30,6 +30,17 @@
 #include <utility>
 
 namespace containers {
+namespace detail {
+
+struct unknown_floating_point;
+template<typename T>
+using float_to_unsigned =
+	std::conditional_t<sizeof(T) == 4, std::uint32_t,
+	std::conditional_t<sizeof(T) == 8, std::uint64_t,
+	unknown_floating_point
+>>;
+
+} // namespace detail
 
 // TODO: Delete bool overload, currently relying on implicit conversions
 constexpr auto to_radix_sort_key(bool const value) {
@@ -45,17 +56,10 @@ constexpr auto to_radix_sort_key(T const value) {
 		std::is_same_v<T, wchar_t>;
 
 	if constexpr (std::is_floating_point_v<T>) {
-		// TODO: implement with std::bit_cast to allow constexpr evaluation
 		static_assert(std::numeric_limits<T>::is_iec559);
-		struct unknown_floating_point;
-		using unsigned_t =
-			std::conditional_t<sizeof(T) == 4, std::uint32_t,
-			std::conditional_t<sizeof(T) == 8, std::uint64_t,
-			unknown_floating_point
-		>>;
+		using unsigned_t = detail::float_to_unsigned<T>;
 		static_assert(sizeof(T) == sizeof(unsigned_t));
-		auto u = unsigned_t{};
-		std::memcpy(std::addressof(u), std::addressof(value), sizeof(value));
+		auto const u = __builtin_bit_cast(unsigned_t, value);
 		constexpr auto sign_bit_position = std::numeric_limits<unsigned_t>::digits - 1U;
 		auto const sign_bit = static_cast<unsigned_t>(-static_cast<std::make_signed_t<unsigned_t>>(u >> (sign_bit_position)));
 		return u ^ (sign_bit | (static_cast<unsigned_t>(1U) << sign_bit_position));
