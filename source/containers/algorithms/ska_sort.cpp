@@ -951,13 +951,6 @@ static_assert(test_sort_inplace(
 	[](auto const & value) { return value.get(); }
 ));
 
-TEST(radix_sort, vector_bool) {
-	test_sort(
-		std::vector<bool>{true, false, true, true, false, true, true, true, false, true, false, false},
-		std::vector<bool>{false, false, false, false, false, true, true, true, true, true, true, true}
-	);
-}
-
 
 // These two were labelled as "error cases" in the original unit tests
 static_assert(test_sort<std::int8_t>(
