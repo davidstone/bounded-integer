@@ -98,45 +98,6 @@ private:
 		}
 	}
 
-	template<std::size_t... indexes>
-	static constexpr auto operator_plus(bounded::tuple<RangeViews...> const range_views, auto const index, auto const offset, std::index_sequence<indexes...> indexes_) {
-		if constexpr (index == sizeof...(RangeViews)) {
-			return bounded::apply(range_views, bounded::construct_return<concatenate_view_iterator>);
-		} else if constexpr ((... and detail::forward_random_access_range<RangeViews>)) {
-			auto const range = range_views[index];
-			auto const added_size = bounded::max(-size(range), bounded::min(size(range), offset));
-			auto specific_range = [=](auto const current_index) {
-				auto const current_range = range_views[current_index];
-				if constexpr (index == current_index) {
-					return range_view(begin(current_range) + added_size, end(current_range));
-				} else {
-					return current_range;
-				}
-			};
-			auto const temp = bounded::tuple(specific_range(bounded::constant<indexes>)...);
-			return operator_plus(
-				temp,
-				index + bounded::constant<1>,
-				offset - added_size,
-				indexes_
-			);
-		} else {
-			auto const range = range_views[index];
-			auto specific_range = [=](auto const current_index) {
-				auto const current_range = range_views[current_index];
-				if constexpr (index == current_index) {
-					return range_view(::containers::next(begin(current_range)), end(current_range));
-				} else {
-					return current_range;
-				}
-			};
-			auto const temp = bounded::tuple(specific_range(bounded::constant<indexes>)...);
-			return empty(range) ?
-				operator_plus(temp, index + bounded::constant<1>, offset, indexes_) :
-				operator_plus(temp, index + bounded::constant<1>, bounded::constant<0>, indexes_);
-		}
-	}
-
 	constexpr auto begin_iterators() const {
 		return bounded::transform([](auto const range) { return begin(range); }, m_range_views);
 	}
@@ -176,7 +137,6 @@ public:
 		return operator_star(bounded::constant<0>);
 	}
 	OPERATORS_ARROW_DEFINITIONS
-	OPERATORS_BRACKET_ITERATOR_DEFINITIONS
 
 	template<typename Offset> requires(
 		std::is_convertible_v<Offset, difference_type> and
@@ -193,12 +153,22 @@ public:
 		)
 	)
 	friend constexpr auto operator+(concatenate_view_iterator const lhs, Offset const offset) {
-		return operator_plus(
-			lhs.m_range_views,
-			bounded::constant<0>,
-			offset,
-			std::make_index_sequence<sizeof...(RangeViews)>{}
-		);
+		return [=]<std::size_t... indexes>(std::index_sequence<indexes...>) {
+			BOUNDED_ASSERT(offset >= bounded::constant<0>);
+			auto remaining_offset = bounded::integer<0, bounded::detail::builtin_max_value<Offset>>(offset);
+			auto specific_range = [&](auto const index) {
+				auto const range = lhs.m_range_views[index];
+				using size_type = typename decltype(range)::size_type;
+				auto const added_size = size_type(bounded::min(size(range), remaining_offset));
+				remaining_offset -= added_size;
+				return range_view(begin(range) + size_type(added_size), end(range));
+			};
+			// Use {} to enforce initialization order
+			return bounded::apply(
+				bounded::tuple{specific_range(bounded::constant<indexes>)...},
+				bounded::construct_return<concatenate_view_iterator>
+			);
+		}(std::make_index_sequence<sizeof...(RangeViews)>());
 	}
 
 	template<typename... RHSRanges>

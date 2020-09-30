@@ -55,7 +55,6 @@ struct counted_iterator {
 		return *m_it;
 	}
 	OPERATORS_ARROW_DEFINITIONS
-	OPERATORS_BRACKET_ITERATOR_DEFINITIONS
 
 	friend constexpr auto operator==(counted_iterator const & lhs, counted_iterator const & rhs) -> bool {
 		return rhs.m_count == lhs.m_count;

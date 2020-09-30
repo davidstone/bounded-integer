@@ -5,8 +5,6 @@
 
 #pragma once
 
-#include <containers/index_type.hpp>
-
 #include <bounded/integer.hpp>
 
 #include <bounded/assert.hpp>
@@ -41,7 +39,6 @@ struct contiguous_iterator {
 		return *m_ptr;
 	}
 	OPERATORS_ARROW_DEFINITIONS
-	OPERATORS_BRACKET_ITERATOR_DEFINITIONS
 
 	friend constexpr auto pointer_from(contiguous_iterator const it) {
 		return it.m_ptr;

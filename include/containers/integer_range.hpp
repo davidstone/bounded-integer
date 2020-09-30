@@ -71,7 +71,6 @@ public:
 	constexpr auto operator*() const {
 		return value_type(m_value);
 	}
-	OPERATORS_BRACKET_ITERATOR_DEFINITIONS
 };
 
 template<typename Integer, typename Sentinel, typename Step>

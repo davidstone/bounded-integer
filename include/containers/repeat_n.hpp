@@ -57,7 +57,6 @@ public:
 		return m_get_value();
 	}
 	OPERATORS_ARROW_DEFINITIONS
-	OPERATORS_BRACKET_ITERATOR_DEFINITIONS
 
 	// It is undefined behavior to compare iterators into different ranges
 	friend constexpr auto operator<=>(repeat_n_iterator const lhs, repeat_n_iterator const rhs) {
