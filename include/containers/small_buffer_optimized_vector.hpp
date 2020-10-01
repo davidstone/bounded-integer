@@ -9,7 +9,6 @@
 #include <containers/common_container_functions.hpp>
 #include <containers/contiguous_iterator.hpp>
 #include <containers/dynamic_array.hpp>
-#include <containers/index_type.hpp>
 #include <containers/repeat_n.hpp>
 #include <containers/scope_guard.hpp>
 #include <containers/uninitialized_storage.hpp>

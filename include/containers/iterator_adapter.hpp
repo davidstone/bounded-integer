@@ -6,7 +6,6 @@
 #pragma once
 
 #include <containers/common_iterator_functions.hpp>
-#include <containers/index_type.hpp>
 #include <containers/reference_wrapper.hpp>
 
 #include <bounded/integer.hpp>
@@ -144,7 +143,6 @@ struct adapt_iterator :
 	}
 
 	OPERATORS_ARROW_DEFINITIONS
-	OPERATORS_BRACKET_ITERATOR_DEFINITIONS
 
 private:
 	[[no_unique_address]] Iterator m_base;
