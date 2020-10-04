@@ -20,7 +20,6 @@
 #include <operators/forward.hpp>
 #include <bounded/identity.hpp>
 
-#include <cassert>
 #include <climits>
 #include <cstdint>
 #include <cstring>
@@ -398,7 +397,7 @@ constexpr void inplace_sort(Iterator begin, sentinel_for<Iterator> auto end, Ext
 
 template<typename Iterator>
 constexpr size_t common_prefix(Iterator first, sentinel_for<Iterator> auto last, size_t start_index, auto && extract_key, auto && element_key) {
-	assert(first != last);
+	BOUNDED_ASSERT(first != last);
 	auto const & first_range = extract_key(*first);
 	auto largest_match = end(first_range) - (begin(first_range) + start_index);
 	for (auto it = containers::next(first); it != last; ++it) {
