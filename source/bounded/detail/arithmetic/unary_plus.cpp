@@ -9,9 +9,6 @@
 #include "extreme_values.hpp"
 #include "../../homogeneous_equals.hpp"
 
-#include <cstdint>
-#include <limits>
-
 namespace {
 
 static_assert(homogeneous_equals(

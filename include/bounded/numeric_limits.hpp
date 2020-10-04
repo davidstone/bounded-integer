@@ -13,7 +13,6 @@
 #include <bounded/detail/max_builtin.hpp>
 #include <bounded/detail/minmax.hpp>
 
-#include <climits>
 #include <limits>
 
 namespace bounded {

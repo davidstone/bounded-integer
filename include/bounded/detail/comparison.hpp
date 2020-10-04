@@ -11,7 +11,6 @@
 #include <bounded/detail/min_max_value.hpp>
 
 #include <compare>
-#include <cstddef>
 #include <type_traits>
 
 namespace bounded {
