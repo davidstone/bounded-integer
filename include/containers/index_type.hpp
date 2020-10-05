@@ -11,12 +11,25 @@
 #include <type_traits>
 
 namespace containers {
+namespace detail {
+
+template<typename Size>
+struct size_type_to_index_type {
+	using type = Size;
+};
+
+template<bounded::bounded_integer Size>
+struct size_type_to_index_type<Size> {
+	using type  = bounded::checked_integer<
+		0,
+		bounded::detail::normalize<(bounded::max_value<Size> - bounded::constant<1>).value()>,
+		std::out_of_range
+	>;
+};
+
+}
 
 template<typename T>
-using index_type = bounded::checked_integer<
-	0,
-	bounded::detail::normalize<(bounded::max_value<typename std::decay_t<T>::size_type> - bounded::constant<1>).value()>,
-	std::out_of_range
->;
+using index_type = typename detail::size_type_to_index_type<typename std::decay_t<T>::size_type>::type;
 
 }	// namespace containers
