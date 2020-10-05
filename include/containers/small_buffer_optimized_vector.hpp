@@ -72,10 +72,10 @@ struct small_buffer_optimized_vector {
 		}
 
 		constexpr auto data() const {
-			return reinterpret_cast<T const *>(containers::data(m_data));
+			return ::containers::detail::static_or_reinterpret_cast<T const *>(containers::data(m_data));
 		}
 		constexpr auto data() {
-			return reinterpret_cast<T *>(containers::data(m_data));
+			return ::containers::detail::static_or_reinterpret_cast<T *>(containers::data(m_data));
 		}
 
 	private:
