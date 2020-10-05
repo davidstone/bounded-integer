@@ -396,7 +396,13 @@ constexpr void inplace_sort(Iterator first, sentinel_for<Iterator> auto last, Ex
 }
 
 template<typename Iterator>
-constexpr size_t common_prefix(Iterator first, sentinel_for<Iterator> auto last, size_t start_index, auto && extract_key, auto && element_key) {
+constexpr size_t common_prefix(
+	Iterator first,
+	sentinel_for<Iterator> auto last,
+	auto && extract_key,
+	auto && element_key,
+	typename std::iterator_traits<decltype(begin(extract_key(*first)))>::difference_type const start_index
+) {
 	BOUNDED_ASSERT(first != last);
 	auto const & first_range = extract_key(*first);
 	auto largest_match = end(first_range) - (begin(first_range) + start_index);
@@ -437,13 +443,13 @@ struct ListInplaceSorter {
 
 private:
 	struct ElementSubKey {
-		using base = SubKey<typename std::decay<decltype(std::declval<ListType>()[0])>::type>;
+		using base = SubKey<typename std::decay<decltype(std::declval<ListType>()[index_type<ListType>(0)])>::type>;
 
 		using next = ElementSubKey;
 
 		static constexpr decltype(auto) sub_key(auto const & value, BaseListSortData * sort_data) {
 			auto const & list = CurrentSubKey::sub_key(value, sort_data->next_sort_data);
-			return base::sub_key(list[sort_data->current_index], sort_data->next_sort_data);
+			return base::sub_key(list[index_type<decltype(list)>(sort_data->current_index)], sort_data->next_sort_data);
 		}
 	};
 
@@ -455,8 +461,15 @@ private:
 		auto element_key = [&](auto && elem) -> decltype(auto) {
 			return ElementSubKey::base::sub_key(elem, std::addressof(sort_data));
 		};
+		sort_data.current_index += common_prefix(
+			first,
+			last,
+			current_key,
+			element_key,
+			typename std::iterator_traits<decltype(begin(current_key(*first)))>::difference_type(sort_data.current_index)
+		);
 		auto end_of_shorter_ones = containers::partition(first, last, [&](auto const & elem) {
-			return current_key(elem).size() <= sort_data.current_index;
+			return size(current_key(elem)) <= sort_data.current_index;
 		});
 		if (end_of_shorter_ones - first > 1) {
 			sort_data.next_sort(first, end_of_shorter_ones, extract_key, sort_data.next_sort_data);

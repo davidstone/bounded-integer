@@ -97,9 +97,9 @@ constexpr bool test_common_prefix(c_array<T, size> const & source, std::size_t c
 	auto const prefix = containers::detail::common_prefix(
 		std::begin(source),
 		std::end(source),
-		start_index,
 		bounded::identity,
-		bounded::identity
+		bounded::identity,
+		start_index
 	);
 	BOUNDED_TEST(prefix == expected);
 	return true;
