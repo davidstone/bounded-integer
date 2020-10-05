@@ -39,7 +39,7 @@ public:
 		base(sv)
 	{
 	}
-	explicit constexpr basic_string(CharT const * const c_str):
+	constexpr basic_string(CharT const * const c_str):
 		base(std::basic_string_view<CharT>(c_str))
 	{
 	}
