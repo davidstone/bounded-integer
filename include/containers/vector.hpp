@@ -37,7 +37,7 @@ struct vector {
 		::containers::append(*this, OPERATORS_FORWARD(source));
 	}
 	
-	constexpr vector(std::initializer_list<value_type> init) {
+	constexpr vector(std::initializer_list<T> init) {
 		::containers::append(*this, init);
 	}
 
