@@ -217,11 +217,6 @@ add_executable(std_map
 target_compile_definitions(std_map PRIVATE "USE_SYSTEM_MAP")
 target_link_libraries(std_map PUBLIC containers strict_defaults)
 
-SET(gtest_disable_pthreads ON CACHE BOOL "Disable uses of pthreads in gtest.")
-add_subdirectory("${PROJECT_SOURCE_DIR}/source/googletest-1.8.1")
-set_target_properties(gtest PROPERTIES FOLDER extern)
-set_target_properties(gtest_main PROPERTIES FOLDER extern)
-
 set(BENCHMARK_ENABLE_TESTING OFF CACHE BOOL "Disable testing benchmark.")
 add_subdirectory("${PROJECT_SOURCE_DIR}/source/benchmark")
 set_target_properties(benchmark PROPERTIES FOLDER extern)
@@ -229,7 +224,7 @@ set_target_properties(benchmark PROPERTIES FOLDER extern)
 add_executable(ska_sort
 	source/containers/algorithms/ska_sort.cpp
 )
-target_link_libraries(ska_sort PUBLIC bounded gtest gtest_main benchmark strict_defaults)
+target_link_libraries(ska_sort PUBLIC bounded benchmark strict_defaults)
 
 add_executable(trivial_inplace_function
 	source/containers/trivial_inplace_function.cpp
@@ -239,14 +234,6 @@ target_link_libraries(trivial_inplace_function PUBLIC containers strict_defaults
 
 if("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang")
 	if(NOT MSVC)
-		target_compile_options(gtest PUBLIC
-			"-stdlib=libc++"
-			"-std=c++20"
-		)
-		target_compile_options(gtest_main PUBLIC
-			"-stdlib=libc++"
-			"-std=c++20"
-		)
 		target_compile_options(benchmark PUBLIC
 			"-stdlib=libc++"
 			"-std=c++20"

@@ -9,12 +9,12 @@
 #include <containers/array/make_array.hpp>
 #include <containers/reserve_if_reservable.hpp>
 #include <containers/static_vector/static_vector.hpp>
+#include <containers/string.hpp>
 #include <containers/vector.hpp>
 
 #include <bounded/detail/tuple.hpp>
 #include <bounded/copy.hpp>
 
-#include <gtest/gtest.h>
 #include <benchmark/benchmark.h>
 
 #include <deque>
@@ -1037,9 +1037,9 @@ static_assert(test_sort_inplace(
 	bounded::copy
 ));
 
-TEST(radix_sort, vector) {
+static_assert(
 	test_sort_inplace(
-		std::vector<std::vector<int>>{
+		containers::vector<containers::vector<int>>{
 			{ 1, 2, 3 },
 			{ 1, 2, 2 },
 			{ 1, 3, 2 },
@@ -1050,7 +1050,7 @@ TEST(radix_sort, vector) {
 			{ 1 },
 			{},
 		},
-		std::vector<std::vector<int>>{
+		containers::vector<containers::vector<int>>{
 			{},
 			{ 1 },
 			{ 1, 2, 2 },
@@ -1062,9 +1062,12 @@ TEST(radix_sort, vector) {
 			{ 3, 2, 4, 5 },
 		},
 		bounded::identity
-	);
+	)
+);
+
+static_assert(
 	test_sort_inplace(
-		std::vector<std::vector<int>>{
+		containers::vector<containers::vector<int>>{
 			{ 1, 2, 3 },
 			{ 1, 2, 2 },
 			{ 1, 3, 2 },
@@ -1075,7 +1078,7 @@ TEST(radix_sort, vector) {
 			{ 1 },
 			{},
 		},
-		std::vector<std::vector<int>>{
+		containers::vector<containers::vector<int>>{
 			{},
 			{ 1 },
 			{ 1, 2, 2 },
@@ -1087,12 +1090,12 @@ TEST(radix_sort, vector) {
 			{ 3, 2, 4, 5 },
 		},
 		bounded::copy
-	);
-}
+	)
+);
 
-TEST(radix_sort, string_in_vector) {
+static_assert(
 	test_sort_inplace(
-		std::vector<std::vector<std::string>>{
+		containers::vector<containers::vector<containers::string>>{
 			{ "hi", "there", "you" },
 			{ "are", "probably", "not", "going" },
 			{ "to", "pass" },
@@ -1104,7 +1107,7 @@ TEST(radix_sort, string_in_vector) {
 			{ "hi", "there", "I", "added", "more", "tests" },
 			{ "hi", "there", "needed", "the", "same", "prefix" },
 		},
-		std::vector<std::vector<std::string>>{
+		containers::vector<containers::vector<containers::string>>{
 			{ },
 			{ "" },
 			{ "are", "probably", "not", "going" },
@@ -1117,88 +1120,44 @@ TEST(radix_sort, string_in_vector) {
 			{ "to", "pass" },
 		},
 		bounded::identity
-	);
-	#if 0
-	test_sort_inplace(
-		std::vector<std::vector<std::string>>{
-			{ "hi", "there", "you" },
-			{ "are", "probably", "not", "going" },
-			{ "to", "pass" },
-			{ "" },
-			{ },
-			{ "this", "test", "the", "first" },
-			{ "time" },
-			{ "oh it did pass", "n", "e", "a", "t!" },
-			{ "hi", "there", "I", "added", "more", "tests" },
-			{ "hi", "there", "needed", "the", "same", "prefix" },
-		},
-		std::vector<std::vector<std::string>>{
-			{ },
-			{ "" },
-			{ "are", "probably", "not", "going" },
-			{ "hi", "there", "I", "added", "more", "tests" },
-			{ "hi", "there", "needed", "the", "same", "prefix" },
-			{ "hi", "there", "you" },
-			{ "oh it did pass", "n", "e", "a", "t!" },
-			{ "this", "test", "the", "first" },
-			{ "time" },
-			{ "to", "pass" },
-		},
-		identity_by_value
-	);
-	#endif
-}
-
-TEST(radix_sort, vector_tuple_string_reference) {
-	test_sort_inplace(
-		std::vector<std::tuple<std::string, std::string>>{
-			{"hi", "there"},
-			{"you", "are"},
-			{"probably", "not"},
-			{"going", "to"},
-			{"pass", ""},
-			{"", ""},
-			{"", "this"},
-			{"test", "the"},
-			{"first", "time"},
-			{"oh it did pass", "n"},
-			{"e", "a"},
-			{"t!", ""},
-			{"hi", "there"},
-			{"I", "added"},
-			{"more", "tests"},
-			{"hi", "there"},
-			{"needed", "the"},
-			{"same", "prefix"},
-		},
-		std::vector<std::tuple<std::string, std::string>>{
-			{"", ""},
-			{"", "this"},
-			{"I", "added"},
-			{"e", "a"},
-			{"first", "time"},
-			{"going", "to"},
-			{"hi", "there"},
-			{"hi", "there"},
-			{"hi", "there"},
-			{"more", "tests"},
-			{"needed", "the"},
-			{"oh it did pass", "n"},
-			{"pass", ""},
-			{"probably", "not"},
-			{"same", "prefix"},
-			{"t!", ""},
-			{"test", "the"},
-			{"you", "are"},
-		},
-		bounded::identity
-	);
-}
+	)
+);
 
 #if 0
-TEST(radix_sort, vector_tuple_string_value) {
+static_assert(
 	test_sort_inplace(
-		std::vector<std::tuple<std::string, std::string>>{
+		containers::vector<containers::vector<containers::string>>{
+			{ "hi", "there", "you" },
+			{ "are", "probably", "not", "going" },
+			{ "to", "pass" },
+			{ "" },
+			{ },
+			{ "this", "test", "the", "first" },
+			{ "time" },
+			{ "oh it did pass", "n", "e", "a", "t!" },
+			{ "hi", "there", "I", "added", "more", "tests" },
+			{ "hi", "there", "needed", "the", "same", "prefix" },
+		},
+		containers::vector<containers::vector<containers::string>>{
+			{ },
+			{ "" },
+			{ "are", "probably", "not", "going" },
+			{ "hi", "there", "I", "added", "more", "tests" },
+			{ "hi", "there", "needed", "the", "same", "prefix" },
+			{ "hi", "there", "you" },
+			{ "oh it did pass", "n", "e", "a", "t!" },
+			{ "this", "test", "the", "first" },
+			{ "time" },
+			{ "to", "pass" },
+		},
+		identity_by_value
+	)
+);
+#endif
+
+static_assert(
+	test_sort_inplace(
+		containers::vector<bounded::tuple<containers::string, containers::string>>{
 			{"hi", "there"},
 			{"you", "are"},
 			{"probably", "not"},
@@ -1218,7 +1177,54 @@ TEST(radix_sort, vector_tuple_string_value) {
 			{"needed", "the"},
 			{"same", "prefix"},
 		},
-		std::vector<std::tuple<std::string, std::string>>{
+		containers::vector<bounded::tuple<containers::string, containers::string>>{
+			{"", ""},
+			{"", "this"},
+			{"I", "added"},
+			{"e", "a"},
+			{"first", "time"},
+			{"going", "to"},
+			{"hi", "there"},
+			{"hi", "there"},
+			{"hi", "there"},
+			{"more", "tests"},
+			{"needed", "the"},
+			{"oh it did pass", "n"},
+			{"pass", ""},
+			{"probably", "not"},
+			{"same", "prefix"},
+			{"t!", ""},
+			{"test", "the"},
+			{"you", "are"},
+		},
+		bounded::identity
+	)
+);
+
+#if 0
+static_assert(
+	test_sort_inplace(
+		containers::vector<bounded::tuple<containers::string, containers::string>>{
+			{"hi", "there"},
+			{"you", "are"},
+			{"probably", "not"},
+			{"going", "to"},
+			{"pass", ""},
+			{"", ""},
+			{"", "this"},
+			{"test", "the"},
+			{"first", "time"},
+			{"oh it did pass", "n"},
+			{"e", "a"},
+			{"t!", ""},
+			{"hi", "there"},
+			{"I", "added"},
+			{"more", "tests"},
+			{"hi", "there"},
+			{"needed", "the"},
+			{"same", "prefix"},
+		},
+		containers::vector<bounded::tuple<containers::string, containers::string>>{
 			{"", ""},
 			{"", "this"},
 			{"I", "added"},
@@ -1239,37 +1245,9 @@ TEST(radix_sort, vector_tuple_string_value) {
 			{"you", "are"},
 		},
 		identity_by_value
-	);
-}
+	)
+);
 #endif
-
-TEST(radix_sort, pointers) {
-	constexpr int array[] = { 1, 2, 3, 4, 5, 6, 7, 8 };
-	test_sort<int const *>(
-		{
-			array + 1,
-			array + 3,
-			array,
-			array + 2,
-			array + 7,
-			array + 8,
-			array + 6,
-			array + 4,
-			array + 5,
-		},
-		{
-			array,
-			array + 1,
-			array + 2,
-			array + 3,
-			array + 4,
-			array + 5,
-			array + 6,
-			array + 7,
-			array + 8,
-		}
-	);
-}
 
 template<bool by_value>
 struct move_only_with_to_sort_key {
@@ -1776,11 +1754,6 @@ void register_all_benchmarks() {
 	);
 }
 
-auto run_unit_tests(int argc, char * * argv) {
-	::testing::InitGoogleTest(&argc, argv);
-	return RUN_ALL_TESTS();
-}
-
 void run_benchmarks(int argc, char * * argv) {
 	register_all_benchmarks();
 	benchmark::Initialize(&argc, argv);
@@ -1790,9 +1763,33 @@ void run_benchmarks(int argc, char * * argv) {
 } // namespace
 
 int main(int argc, char * * argv) {
-	auto result = run_unit_tests(argc, argv);
+	constexpr int array[] = { 1, 2, 3, 4, 5, 6, 7, 8 };
+	test_sort<int const *>(
+		{
+			array + 1,
+			array + 3,
+			array,
+			array + 2,
+			array + 7,
+			array + 8,
+			array + 6,
+			array + 4,
+			array + 5,
+		},
+		{
+			array,
+			array + 1,
+			array + 2,
+			array + 3,
+			array + 4,
+			array + 5,
+			array + 6,
+			array + 7,
+			array + 8,
+		}
+	);
+
 	if (argc != 1) {
 		run_benchmarks(argc, argv);
 	}
-	return result;
 }
