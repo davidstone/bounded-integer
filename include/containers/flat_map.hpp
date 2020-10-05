@@ -537,7 +537,7 @@ public:
 		return std::equal_range(begin(*this), end(*this), OPERATORS_FORWARD(key), compare());
 	}
 	constexpr auto equal_range(auto && key) {
-		return std::equal_range(begin(*this), end(*this), OPERATORS_FORWARD(key), compare);
+		return std::equal_range(begin(*this), end(*this), OPERATORS_FORWARD(key), compare());
 	}
 
 	constexpr auto count(auto && key) const {
