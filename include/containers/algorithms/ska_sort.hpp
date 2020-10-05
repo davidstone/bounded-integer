@@ -237,8 +237,8 @@ private:
 };
 
 template<iterator Iterator>
-constexpr void StdSortFallback(Iterator begin, sentinel_for<Iterator> auto end, auto extract_key) {
-	sort(begin, end, extract_key_to_compare(std::move(extract_key)));
+constexpr void StdSortFallback(Iterator first, sentinel_for<Iterator> auto last, auto extract_key) {
+	sort(first, last, extract_key_to_compare(std::move(extract_key)));
 }
 
 struct PartitionCounts {
@@ -251,8 +251,8 @@ template<std::ptrdiff_t AmericanFlagSortThreshold, typename CurrentSubKey, size_
 struct UnsignedInplaceSorter {
 	// Must have this exact signature, no defaulted arguments
 	template<iterator Iterator, typename ExtractKey>
-	static constexpr void sort(Iterator begin, sentinel_for<Iterator> auto end, ExtractKey & extract_key, NextSort<Iterator, ExtractKey> next_sort, BaseListSortData * sort_data) {
-		sort_selector(begin, end, extract_key, next_sort, sort_data, 0U);
+	static constexpr void sort(Iterator first, sentinel_for<Iterator> auto last, ExtractKey & extract_key, NextSort<Iterator, ExtractKey> next_sort, BaseListSortData * sort_data) {
+		sort_selector(first, last, extract_key, next_sort, sort_data, 0U);
 	}
 private:
 
@@ -283,26 +283,26 @@ private:
 	}
 
 	template<iterator Iterator, typename ExtractKey>
-	static constexpr void sort_selector(Iterator begin, sentinel_for<Iterator> auto end, ExtractKey & extract_key, NextSort<Iterator, ExtractKey> next_sort, BaseListSortData * sort_data, std::size_t const offset) {
+	static constexpr void sort_selector(Iterator first, sentinel_for<Iterator> auto last, ExtractKey & extract_key, NextSort<Iterator, ExtractKey> next_sort, BaseListSortData * sort_data, std::size_t const offset) {
 		if (NumBytes == offset) {
-			next_sort(begin, end, extract_key, sort_data);
-		} else if (end - begin < bounded::constant<AmericanFlagSortThreshold>) {
-			american_flag_sort(begin, end, extract_key, next_sort, sort_data, offset);
+			next_sort(first, last, extract_key, sort_data);
+		} else if (last - first < bounded::constant<AmericanFlagSortThreshold>) {
+			american_flag_sort(first, last, extract_key, next_sort, sort_data, offset);
 		} else {
-			ska_byte_sort(begin, end, extract_key, next_sort, sort_data, offset);
+			ska_byte_sort(first, last, extract_key, next_sort, sort_data, offset);
 		}
 	}
 	template<typename Iterator, typename ExtractKey>
-	static constexpr void american_flag_sort(Iterator begin, sentinel_for<Iterator> auto end, ExtractKey & extract_key, NextSort<Iterator, ExtractKey> next_sort, BaseListSortData * sort_data, std::size_t const offset) {
-		auto partitions = partition_counts(begin, end, extract_key, sort_data, offset);
+	static constexpr void american_flag_sort(Iterator first, sentinel_for<Iterator> auto last, ExtractKey & extract_key, NextSort<Iterator, ExtractKey> next_sort, BaseListSortData * sort_data, std::size_t const offset) {
+		auto partitions = partition_counts(first, last, extract_key, sort_data, offset);
 		[&]{
 			if (partitions.number > 1) {
 				uint8_t * current_block_ptr = partitions.remaining.data();
 				PartitionInfo * current_block = partitions.partitions.data() + *current_block_ptr;
 				uint8_t * last_block = partitions.remaining.data() + partitions.number - 1;
-				auto it = begin;
-				auto block_end = begin + current_block->next_offset;
-				auto last_element = end - 1;
+				auto it = first;
+				auto block_end = first + current_block->next_offset;
+				auto last_element = last - 1;
 				for (;;) {
 					PartitionInfo * block = partitions.partitions.data() + current_byte(extract_key(*it), sort_data, offset);
 					if (block == current_block) {
@@ -319,22 +319,22 @@ private:
 									break;
 							}
 
-							it = begin + current_block->offset;
-							block_end = begin + current_block->next_offset;
+							it = first + current_block->offset;
+							block_end = first + current_block->next_offset;
 						}
 					} else {
 						size_t partition_offset = block->offset++;
 						// TODO: ADL
-						containers::swap(*it, *(begin + partition_offset));
+						containers::swap(*it, *(first + partition_offset));
 					}
 				}
 			}
 		}();
 		size_t start_offset = 0;
-		auto partition_begin = begin;
+		auto partition_begin = first;
 		for (uint8_t * it = partitions.remaining.data(), * remaining_end = partitions.remaining.data() + partitions.number; it != remaining_end; ++it) {
 			size_t end_offset = partitions.partitions[*it].next_offset;
-			auto partition_end = begin + end_offset;
+			auto partition_end = first + end_offset;
 			if (partition_end - partition_begin > bounded::constant<1>) {
 				sort_selector(partition_begin, partition_end, extract_key, next_sort, sort_data, offset + 1U);
 			}
@@ -344,8 +344,8 @@ private:
 	}
 
 	template<typename Iterator, typename ExtractKey>
-	static constexpr void ska_byte_sort(Iterator begin, sentinel_for<Iterator> auto end, ExtractKey & extract_key, NextSort<Iterator, ExtractKey> next_sort, BaseListSortData * sort_data, std::size_t const offset) {
-		auto partitions = partition_counts(begin, end, extract_key, sort_data, offset);
+	static constexpr void ska_byte_sort(Iterator first, sentinel_for<Iterator> auto last, ExtractKey & extract_key, NextSort<Iterator, ExtractKey> next_sort, BaseListSortData * sort_data, std::size_t const offset) {
+		auto partitions = partition_counts(first, last, extract_key, sort_data, offset);
 		for (uint8_t * last_remaining = partitions.remaining.data() + partitions.number, * end_partition = partitions.remaining.data() + 1; last_remaining > end_partition;) {
 			last_remaining = containers::partition(partitions.remaining.data(), last_remaining, [&](uint8_t partition) {
 				size_t & begin_offset = partitions.partitions[partition].offset;
@@ -356,11 +356,11 @@ private:
 				// TODO: This can sometimes perform a self-swap. If this could
 				// be restructured to avoid that, it would also be a
 				// performance gain.
-				for (auto it = begin + begin_offset; it != begin + end_offset; ++it) {
+				for (auto it = first + begin_offset; it != first + end_offset; ++it) {
 					uint8_t this_partition = current_byte(extract_key(*it), sort_data, offset);
 					size_t partition_offset = partitions.partitions[this_partition].offset++;
 					// TODO: ADL
-					containers::swap(*it, *(begin + partition_offset));
+					containers::swap(*it, *(first + partition_offset));
 				}
 				return begin_offset != end_offset;
 			});
@@ -369,8 +369,8 @@ private:
 			uint8_t partition = it[-1];
 			size_t start_offset = (partition == 0 ? 0 : partitions.partitions[partition - 1].next_offset);
 			size_t end_offset = partitions.partitions[partition].next_offset;
-			auto partition_begin = begin + start_offset;
-			auto partition_end = begin + end_offset;
+			auto partition_begin = first + start_offset;
+			auto partition_end = first + end_offset;
 			if (partition_end - partition_begin > bounded::constant<1>) {
 				sort_selector(partition_begin, partition_end, extract_key, next_sort, sort_data, offset + 1U);
 			}
@@ -382,16 +382,16 @@ template<std::ptrdiff_t AmericanFlagSortThreshold, typename CurrentSubKey, typen
 struct ListInplaceSorter;
 
 template<std::ptrdiff_t AmericanFlagSortThreshold, typename CurrentSubKey, typename Iterator, typename ExtractKey>
-constexpr void inplace_sort(Iterator begin, sentinel_for<Iterator> auto end, ExtractKey & extract_key, NextSort<Iterator, ExtractKey> next_sort, BaseListSortData * sort_data) {
-	using SubKeyType = decltype(CurrentSubKey::sub_key(extract_key(*begin), sort_data));
+constexpr void inplace_sort(Iterator first, sentinel_for<Iterator> auto last, ExtractKey & extract_key, NextSort<Iterator, ExtractKey> next_sort, BaseListSortData * sort_data) {
+	using SubKeyType = decltype(CurrentSubKey::sub_key(extract_key(*first), sort_data));
 	if constexpr (std::is_same_v<SubKeyType, bool>) {
-		auto middle = containers::partition(begin, end, [&](auto && a){ return !CurrentSubKey::sub_key(extract_key(a), sort_data); });
-		next_sort(begin, middle, extract_key, sort_data);
-		next_sort(middle, end, extract_key, sort_data);
+		auto middle = containers::partition(first, last, [&](auto && a){ return !CurrentSubKey::sub_key(extract_key(a), sort_data); });
+		next_sort(first, middle, extract_key, sort_data);
+		next_sort(middle, last, extract_key, sort_data);
 	} else if constexpr (std::is_unsigned_v<SubKeyType>) {
-		UnsignedInplaceSorter<AmericanFlagSortThreshold, CurrentSubKey, sizeof(SubKeyType)>::sort(begin, end, extract_key, next_sort, sort_data);
+		UnsignedInplaceSorter<AmericanFlagSortThreshold, CurrentSubKey, sizeof(SubKeyType)>::sort(first, last, extract_key, next_sort, sort_data);
 	} else {
-		ListInplaceSorter<AmericanFlagSortThreshold, CurrentSubKey, SubKeyType>::sort(begin, end, extract_key, next_sort, sort_data);
+		ListInplaceSorter<AmericanFlagSortThreshold, CurrentSubKey, SubKeyType>::sort(first, last, extract_key, next_sort, sort_data);
 	}
 }
 
@@ -421,7 +421,7 @@ constexpr size_t common_prefix(Iterator first, sentinel_for<Iterator> auto last,
 template<std::ptrdiff_t AmericanFlagSortThreshold, typename CurrentSubKey, typename ListType>
 struct ListInplaceSorter {
 	template<typename Iterator, typename ExtractKey>
-	static constexpr void sort(Iterator begin, sentinel_for<Iterator> auto end, ExtractKey & extract_key, NextSort<Iterator, ExtractKey> next_sort, BaseListSortData * next_sort_data) {
+	static constexpr void sort(Iterator first, sentinel_for<Iterator> auto last, ExtractKey & extract_key, NextSort<Iterator, ExtractKey> next_sort, BaseListSortData * next_sort_data) {
 		constexpr auto current_index = 0U;
 		constexpr auto recursion_limit = 16U;
 		auto const offset = ListSortData<Iterator, ExtractKey>{
@@ -432,7 +432,7 @@ struct ListInplaceSorter {
 			},
 			next_sort,
 		};
-		sort(begin, end, extract_key, offset);
+		sort(first, last, extract_key, offset);
 	}
 
 private:
@@ -448,24 +448,23 @@ private:
 	};
 
 	template<typename Iterator, typename ExtractKey>
-	static constexpr void sort(Iterator begin, sentinel_for<Iterator> auto end, ExtractKey & extract_key, ListSortData<Iterator, ExtractKey> sort_data) {
+	static constexpr void sort(Iterator first, sentinel_for<Iterator> auto last, ExtractKey & extract_key, ListSortData<Iterator, ExtractKey> sort_data) {
 		auto current_key = [&](auto const & elem) -> decltype(auto) {
 			return CurrentSubKey::sub_key(extract_key(elem), sort_data.next_sort_data);
 		};
 		auto element_key = [&](auto && elem) -> decltype(auto) {
 			return ElementSubKey::base::sub_key(elem, std::addressof(sort_data));
 		};
-		sort_data.current_index += common_prefix(begin, end, sort_data.current_index, current_key, element_key);
-		auto end_of_shorter_ones = containers::partition(begin, end, [&](auto const & elem) {
+		auto end_of_shorter_ones = containers::partition(first, last, [&](auto const & elem) {
 			return current_key(elem).size() <= sort_data.current_index;
 		});
-		if (end_of_shorter_ones - begin > 1) {
-			sort_data.next_sort(begin, end_of_shorter_ones, extract_key, sort_data.next_sort_data);
+		if (end_of_shorter_ones - first > 1) {
+			sort_data.next_sort(first, end_of_shorter_ones, extract_key, sort_data.next_sort_data);
 		}
-		if (end - end_of_shorter_ones > bounded::constant<1>) {
+		if (last - end_of_shorter_ones > bounded::constant<1>) {
 			inplace_sort<AmericanFlagSortThreshold, ElementSubKey>(
 				end_of_shorter_ones,
-				end,
+				last,
 				extract_key,
 				static_cast<NextSort<Iterator, ExtractKey>>(sort_from_recursion),
 				std::addressof(sort_data)
@@ -474,28 +473,28 @@ private:
 	}
 
 	template<typename Iterator, typename ExtractKey>
-	static constexpr void sort_from_recursion(Iterator begin, sentinel_for<Iterator> auto end, ExtractKey & extract_key, BaseListSortData * next_sort_data) {
+	static constexpr void sort_from_recursion(Iterator first, sentinel_for<Iterator> auto last, ExtractKey & extract_key, BaseListSortData * next_sort_data) {
 		auto offset = *static_cast<ListSortData<Iterator, ExtractKey> *>(next_sort_data);
 		++offset.current_index;
 		--offset.recursion_limit;
 		if (offset.recursion_limit == 0) {
-			StdSortFallback(begin, end, extract_key);
+			StdSortFallback(first, last, extract_key);
 		} else {
-			sort(begin, end, extract_key, offset);
+			sort(first, last, extract_key, offset);
 		}
 	}
 };
 
 template<std::ptrdiff_t AmericanFlagSortThreshold, typename CurrentSubKey, typename Iterator, typename ExtractKey>
-constexpr void sort_starter(Iterator begin, sentinel_for<Iterator> auto end, ExtractKey & extract_key, BaseListSortData * next_sort_data) {
+constexpr void sort_starter(Iterator first, sentinel_for<Iterator> auto last, ExtractKey & extract_key, BaseListSortData * next_sort_data) {
 	if constexpr (!std::is_same_v<CurrentSubKey, SubKey<void>>) {
-		if (end - begin <= bounded::constant<1>) {
+		if (last - first <= bounded::constant<1>) {
 			return;
 		}
 
 		inplace_sort<AmericanFlagSortThreshold, CurrentSubKey>(
-			begin,
-			end,
+			first,
+			last,
 			extract_key,
 			static_cast<NextSort<Iterator, ExtractKey>>(sort_starter<AmericanFlagSortThreshold, typename CurrentSubKey::next>),
 			next_sort_data
@@ -504,11 +503,11 @@ constexpr void sort_starter(Iterator begin, sentinel_for<Iterator> auto end, Ext
 }
 
 template<std::ptrdiff_t AmericanFlagSortThreshold, typename Iterator>
-constexpr void inplace_radix_sort(Iterator begin_, sentinel_for<Iterator> auto end_, auto & extract_key) {
-	auto begin = make_legacy_iterator(begin_);
-	auto end = make_legacy_iterator(end_);
-	using SubKey = SubKey<decltype(extract_key(*begin))>;
-	sort_starter<AmericanFlagSortThreshold, SubKey>(begin, end, extract_key, nullptr);
+constexpr void inplace_radix_sort(Iterator first_, sentinel_for<Iterator> auto last_, auto & extract_key) {
+	auto first = make_legacy_iterator(first_);
+	auto last = make_legacy_iterator(last_);
+	using SubKey = SubKey<decltype(extract_key(*first))>;
+	sort_starter<AmericanFlagSortThreshold, SubKey>(first, last, extract_key, nullptr);
 }
 
 namespace extract {
@@ -534,13 +533,13 @@ using extract_return_type = typename extract::return_type_impl<index, ExtractKey
 
 struct ska_sort_t {
 	template<iterator Iterator>
-	constexpr void operator()(Iterator begin, sentinel_for<Iterator> auto end, auto && extract_key) const {
-		detail::inplace_radix_sort<1024>(begin, end, extract_key);
+	constexpr void operator()(Iterator first, sentinel_for<Iterator> auto last, auto && extract_key) const {
+		detail::inplace_radix_sort<1024>(first, last, extract_key);
 	}
 
 	template<iterator Iterator>
-	constexpr void operator()(Iterator begin, sentinel_for<Iterator> auto end) const {
-		operator()(begin, end, bounded::identity);
+	constexpr void operator()(Iterator first, sentinel_for<Iterator> auto last) const {
+		operator()(first, last, bounded::identity);
 	}
 
 	constexpr void operator()(range auto && to_sort, auto && extract_key) const {
@@ -553,9 +552,9 @@ struct ska_sort_t {
 
 struct ska_sort_copy_t {
 	template<iterator SourceIterator, typename ExtractKey>
-	constexpr bool operator()(SourceIterator begin_, sentinel_for<SourceIterator> auto end_, iterator auto buffer_begin_, ExtractKey && extract_key) const {
-		auto begin = make_legacy_iterator(begin_);
-		auto end = make_legacy_iterator(end_);
+	constexpr bool operator()(SourceIterator first_, sentinel_for<SourceIterator> auto last_, iterator auto buffer_begin_, ExtractKey && extract_key) const {
+		auto first = make_legacy_iterator(first_);
+		auto last = make_legacy_iterator(last_);
 		auto buffer_begin = make_legacy_iterator(buffer_begin_);
 
 		using key_t = detail::key_type<SourceIterator, ExtractKey>;
@@ -563,18 +562,18 @@ struct ska_sort_copy_t {
 			auto false_position = buffer_begin;
 			auto true_position = std::next(
 				buffer_begin,
-				containers::count_if(begin, end, containers::negate(extract_key)).value()
+				containers::count_if(first, last, containers::negate(extract_key)).value()
 			);
-			for (; begin != end; ++begin) {
-				auto & position = extract_key(*begin) ? true_position : false_position;
-				*position = std::move(*begin);
+			for (; first != last; ++first) {
+				auto & position = extract_key(*first) ? true_position : false_position;
+				*position = std::move(*first);
 				++position;
 			}
 			return true;
 		} else if constexpr (std::is_arithmetic_v<key_t>) {
-			return numeric_sort_impl(begin, end, buffer_begin, extract_key);
+			return numeric_sort_impl(first, last, buffer_begin, extract_key);
 		} else if constexpr (containers::range<key_t>) {
-			if (begin == end) {
+			if (first == last) {
 				return false;
 			}
 			// Currently just sized ranges
@@ -588,7 +587,7 @@ struct ska_sort_copy_t {
 #if 0
 					return *containers::max_element(
 						containers::transform(
-							range_view(begin, end),
+							range_view(first, last),
 							[](auto const & range) { return size(range); }
 						)
 					);
@@ -596,22 +595,22 @@ struct ska_sort_copy_t {
 				}
 			}();
 			bool which = false;
-			auto buffer_end = buffer_begin + (end - begin);
+			auto buffer_end = buffer_begin + (last - first);
 			for (size_t index = max_size; index > 0; --index) {
 				auto extract_n = [&, index = index - 1](auto && o) {
 					return extract_key(o)[index];
 				};
 				if (which) {
-					which = !operator()(buffer_begin, buffer_end, begin, extract_n);
+					which = !operator()(buffer_begin, buffer_end, first, extract_n);
 				} else {
-					which = operator()(begin, end, buffer_begin, extract_n);
+					which = operator()(first, last, buffer_begin, extract_n);
 				}
 			}
 			return which;
 		} else if constexpr (detail::tuple_like<key_t>) {
-			return tuple_sort_impl<0U>(begin, end, buffer_begin, extract_key);
+			return tuple_sort_impl<0U>(first, last, buffer_begin, extract_key);
 		} else {
-			return operator()(begin, end, buffer_begin, [&](auto && a) -> decltype(auto) {
+			return operator()(first, last, buffer_begin, [&](auto && a) -> decltype(auto) {
 				return to_radix_sort_key(extract_key(a));
 			});
 		}
@@ -630,12 +629,12 @@ struct ska_sort_copy_t {
 	}
 private:
 	template<typename Iterator, typename ExtractKey>
-	static constexpr bool numeric_sort_impl(Iterator begin, sentinel_for<Iterator> auto end, iterator auto out_begin, ExtractKey && extract_key) {
-		auto const out_end = out_begin + (end - begin);
+	static constexpr bool numeric_sort_impl(Iterator first, sentinel_for<Iterator> auto last, iterator auto out_begin, ExtractKey && extract_key) {
+		auto const out_end = out_begin + (last - first);
 		constexpr auto size = sizeof(detail::key_type<Iterator, ExtractKey>);
 		std::array<std::array<std::size_t, 256>, size> counts = {};
 
-		for (auto it = begin; it != end; ++it) {
+		for (auto it = first; it != last; ++it) {
 			auto key = to_radix_sort_key(extract_key(*it));
 			for (std::size_t index = 0U; index != size; ++index) {
 				auto const inner_index = (key >> (index * 8U)) & 0xFF;
@@ -652,7 +651,7 @@ private:
 		}
 		static_assert(size == 1U or size % 2 == 0);
 		for (std::size_t index = 0U; index != size; ) {
-			for (auto it = begin; it != end; ++it) {
+			for (auto it = first; it != last; ++it) {
 				std::uint8_t const key = to_radix_sort_key(extract_key(*it)) >> (index * 8U);
 				out_begin[counts[index][key]++] = std::move(*it);
 			}
@@ -660,7 +659,7 @@ private:
 			if constexpr (size != 1U) {
 				for (auto it = out_begin; it != out_end; ++it) {
 					std::uint8_t const key = to_radix_sort_key(extract_key(*it)) >> ((index) * 8U);
-					begin[counts[index][key]++] = std::move(*it);
+					first[counts[index][key]++] = std::move(*it);
 				}
 				++index;
 			}
@@ -669,21 +668,21 @@ private:
 	}
 
 	template<std::size_t index, typename Iterator, typename ExtractKey>
-	static constexpr bool tuple_sort_impl(Iterator begin, sentinel_for<Iterator> auto end, iterator auto out_begin, ExtractKey && extract_key) {
+	static constexpr bool tuple_sort_impl(Iterator first, sentinel_for<Iterator> auto last, iterator auto out_begin, ExtractKey && extract_key) {
 		using key_t = detail::key_type<Iterator, ExtractKey>;
 		if constexpr (index == std::tuple_size_v<key_t>) {
 			return false;
 		} else {
-			auto const out_end = out_begin + (end - begin);
-			bool which = tuple_sort_impl<index + 1U>(begin, end, out_begin, extract_key);
+			auto const out_end = out_begin + (last - first);
+			bool which = tuple_sort_impl<index + 1U>(first, last, out_begin, extract_key);
 			using std::get;
 			auto extract_i = [&](auto && o) -> detail::extract_return_type<index, ExtractKey, decltype(o)> {
 				return get<index>(extract_key(o));
 			};
 			if (which) {
-				return !ska_sort_copy_t{}(out_begin, out_end, begin, extract_i);
+				return !ska_sort_copy_t{}(out_begin, out_end, first, extract_i);
 			} else {
-				return ska_sort_copy_t{}(begin, end, out_begin, extract_i);
+				return ska_sort_copy_t{}(first, last, out_begin, extract_i);
 			}
 		}
 	}
