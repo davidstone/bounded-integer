@@ -1014,7 +1014,7 @@ static_assert(test_sort_inplace(
 	bounded::identity
 ));
 static_assert(test_sort_inplace(
-	containers::array<std::string_view, 8>{
+	std::array<std::string_view, 8>{
 		"Hi",
 		"There",
 		"Hello",
@@ -1024,7 +1024,7 @@ static_assert(test_sort_inplace(
 		"Baz",
 		"",
 	},
-	containers::array<std::string_view, 8>{
+	std::array<std::string_view, 8>{
 		"",
 		"Bar",
 		"Baz",
