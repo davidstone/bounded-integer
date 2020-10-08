@@ -35,12 +35,12 @@ constexpr auto copy_from_c_array(c_array<T, size> const & original, std::index_s
 	return containers::array<std::remove_cvref_t<T>, sizeof...(indexes)>{original[indexes]...};
 }
 
-constexpr void inplace_radix_sort(auto begin, auto end, auto && extract_key) {
-	detail::inplace_radix_sort<1>(begin, end, extract_key);
+constexpr void inplace_radix_sort(auto const first, auto const last, auto && extract_key) {
+	detail::inplace_radix_sort<1>(first, last, extract_key);
 }
 
-constexpr void inplace_radix_sort(auto begin, auto end) {
-	inplace_radix_sort(begin, end, bounded::identity);
+constexpr void inplace_radix_sort(auto const first, auto const last) {
+	inplace_radix_sort(first, last, bounded::identity);
 }
 
 template<typename Container>
@@ -1459,12 +1459,12 @@ void benchmark_std_sort(benchmark::State & state, auto create) {
 	}
 }
 
-void american_flag_sort(auto begin, auto end, auto && extract_key) {
-	detail::inplace_radix_sort<bounded::max_value<std::ptrdiff_t>>(begin, end, extract_key);
+void american_flag_sort(auto const first, auto const last, auto && extract_key) {
+	detail::inplace_radix_sort<bounded::max_value<std::ptrdiff_t>>(first, last, extract_key);
 }
 
-void american_flag_sort(auto begin, auto end) {
-	american_flag_sort(begin, end, bounded::identity);
+void american_flag_sort(auto const first, auto const last) {
+	american_flag_sort(first, last, bounded::identity);
 }
 
 void benchmark_american_flag_sort(benchmark::State & state, auto create) {
