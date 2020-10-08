@@ -45,15 +45,6 @@ struct dynamic_array_data {
 	size_type size = 0_bi;
 };
 
-template<typename T>
-constexpr auto begin(dynamic_array_data<T> const container) {
-	return container.pointer;
-}
-template<typename T>
-constexpr auto end(dynamic_array_data<T> const container) {
-	return begin(container) + container.size;
-}
-
 
 template<typename T>
 constexpr auto make_storage(auto const size) {
@@ -75,7 +66,7 @@ constexpr auto deallocate_storage(dynamic_array_data<T> const data) {
 
 template<typename T>
 constexpr auto cleanup(dynamic_array_data<T> const data) {
-	::containers::detail::destroy_range(data);
+	::containers::detail::destroy_range(data.pointer, data.pointer + data.size);
 	deallocate_storage(data);
 }
 
@@ -88,7 +79,7 @@ constexpr auto dynamic_array_initializer(range auto && init) {
 		containers::uninitialized_copy(
 			begin(OPERATORS_FORWARD(init)),
 			end(OPERATORS_FORWARD(init)),
-			begin(data)
+			data.pointer
 		);
 	} catch(...) {
 		deallocate_storage(data);

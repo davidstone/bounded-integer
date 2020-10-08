@@ -95,7 +95,7 @@ struct small_buffer_optimized_vector {
 		constexpr large_t(size_type size_, capacity_type capacity_, T * pointer_):
 			m_force_large(true),
 			m_size(size_),
-			m_data{reinterpret_cast<trivial_storage<T> *>(pointer_), capacity_}
+			m_data(pointer_, capacity_)
 		{
 			BOUNDED_ASSERT_OR_ASSUME(pointer_ != nullptr);
 		}
@@ -115,16 +115,16 @@ struct small_buffer_optimized_vector {
 		}
 
 		constexpr auto data() const {
-			return reinterpret_cast<T const *>(containers::data(m_data));
+			return m_data.pointer;
 		}
 		constexpr auto data() {
-			return reinterpret_cast<T *>(containers::data(m_data));
+			return m_data.pointer;
 		}
 
 	private:
 		bool m_force_large : 1;
 		typename size_type::underlying_type m_size : (bounded::size_of_bits<size_type> - 1_bi).value();
-		detail::dynamic_array_data<trivial_storage<T>> m_data;
+		detail::dynamic_array_data<T> m_data;
 	};
 	
 	static_assert(std::is_nothrow_move_constructible_v<value_type>);
