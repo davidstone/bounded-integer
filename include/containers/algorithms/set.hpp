@@ -6,6 +6,7 @@
 #pragma once
 
 #include <containers/algorithms/advance.hpp>
+#include <containers/begin_end.hpp>
 #include <containers/reference_wrapper.hpp>
 
 #include <operators/forward.hpp>
@@ -143,18 +144,26 @@ struct set_intersection_pair {
 	{
 	}
 	
-	friend constexpr auto begin(set_intersection_pair const & range) {
-		return find_first_matching(range, begin(range.m_range1), begin(range.m_range2));
+	constexpr auto begin() const & {
+		return find_first_matching(
+			*this,
+			::containers::begin(m_range1),
+			::containers::begin(m_range2)
+		);
 	}
-	friend constexpr auto begin(set_intersection_pair & range) {
-		return find_first_matching(range, begin(range.m_range1), begin(range.m_range2));
+	constexpr auto begin() & {
+		return find_first_matching(
+			*this,
+			::containers::begin(m_range1),
+			::containers::begin(m_range2)
+		);
 	}
 
-	friend constexpr auto end(set_intersection_pair const & range) {
-		return const_iterator(range, end(range.m_range1), end(range.m_range2));
+	constexpr auto end() const & {
+		return const_iterator(*this, ::containers::end(m_range1), ::containers::end(m_range2));
 	}
-	friend constexpr auto end(set_intersection_pair & range) {
-		return iterator(range, end(range.m_range1), end(range.m_range2));
+	constexpr auto end() & {
+		return iterator(*this, ::containers::end(m_range1), ::containers::end(m_range2));
 	}
 
 private:
@@ -162,8 +171,8 @@ private:
 	friend const_iterator;
 
 	static constexpr auto find_first_matching(auto & self, auto it1, auto it2) {
-		auto const last1 = end(self.m_range1);
-		auto const last2 = end(self.m_range2);
+		auto const last1 = ::containers::end(self.m_range1);
+		auto const last2 = ::containers::end(self.m_range2);
 		auto const comp = detail::less_to_compare(self.m_compare);
 		
 		while (it1 != last1 and it2 != last2) {

@@ -72,17 +72,23 @@ struct vector {
 		return *this;
 	}
 
-	friend constexpr auto begin(vector const & container) {
-		return const_iterator(container.m_storage.data());
+	constexpr auto begin() const & {
+		return const_iterator(m_storage.data());
 	}
-	friend constexpr auto begin(vector & container) {
-		return iterator(container.m_storage.data());
+	constexpr auto begin() & {
+		return iterator(m_storage.data());
 	}
-	friend constexpr auto end(vector const & container) {
-		return begin(container) + container.m_size;
+	constexpr auto begin() && {
+		return ::containers::move_iterator(begin());
 	}
-	friend constexpr auto end(vector & container) {
-		return begin(container) + container.m_size;
+	constexpr auto end() const & {
+		return begin() + m_size;
+	}
+	constexpr auto end() & {
+		return begin() + m_size;
+	}
+	constexpr auto end() && {
+		return std::move(*this).begin() + m_size;
 	}
 
 	OPERATORS_BRACKET_SEQUENCE_RANGE_DEFINITIONS

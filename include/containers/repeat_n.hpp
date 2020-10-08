@@ -113,8 +113,8 @@ public:
 	constexpr auto begin() const {
 		return const_iterator(m_size, bounded::value_to_function(m_value));
 	}
-	constexpr auto end() const {
-		return repeat_n_sentinel{};
+	static constexpr auto end() {
+		return repeat_n_sentinel();
 	}
 
 	OPERATORS_BRACKET_SEQUENCE_RANGE_DEFINITIONS
@@ -142,7 +142,7 @@ public:
 		return const_iterator(m_size, bounded::construct_return<value_type>);
 	}
 	constexpr auto end() const {
-		return repeat_n_sentinel{};
+		return repeat_n_sentinel();
 	}
 
 	OPERATORS_BRACKET_SEQUENCE_RANGE_DEFINITIONS

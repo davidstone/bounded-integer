@@ -192,22 +192,28 @@ struct small_buffer_optimized_vector {
 		deallocate_large();
 	}
 
-	friend constexpr auto begin(small_buffer_optimized_vector const & container) {
-		auto const result = container.is_small() ?
-			container.m_small.data() :
-			container.m_large.data();
+	constexpr auto begin() const & {
+		auto const result = is_small() ? m_small.data() : m_large.data();
 		BOUNDED_ASSERT_OR_ASSUME(result != nullptr);
 		return const_iterator(result);
 	}
-	friend constexpr auto begin(small_buffer_optimized_vector & container) {
-		return iterator(const_cast<value_type *>(pointer_from(begin(std::as_const(container)))));
+	constexpr auto begin() & {
+		auto const result = is_small() ? m_small.data() : m_large.data();
+		BOUNDED_ASSERT_OR_ASSUME(result != nullptr);
+		return iterator(result);
+	}
+	constexpr auto begin() && {
+		return ::containers::move_iterator(begin());
 	}
 	
-	friend constexpr auto end(small_buffer_optimized_vector const & container) {
-		return begin(container) + container.size();
+	constexpr auto end() const & {
+		return begin() + size();
 	}
-	friend constexpr auto end(small_buffer_optimized_vector & container) {
-		return begin(container) + container.size();
+	constexpr auto end() & {
+		return begin() + size();
+	}
+	constexpr auto end() && {
+		return std::move(*this).begin() + size();
 	}
 
 	OPERATORS_BRACKET_SEQUENCE_RANGE_DEFINITIONS

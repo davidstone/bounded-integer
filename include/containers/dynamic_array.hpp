@@ -145,18 +145,24 @@ struct dynamic_array {
 		return *this;
 	}
 	
-	friend constexpr auto begin(dynamic_array const & container) {
-		return const_iterator(container.m_data.pointer);
+	constexpr auto begin() const & {
+		return const_iterator(m_data.pointer);
 	}
-	friend constexpr auto begin(dynamic_array & container) {
-		return iterator(container.m_data.pointer);
+	constexpr auto begin() & {
+		return iterator(m_data.pointer);
+	}
+	constexpr auto begin() && {
+		return ::containers::move_iterator(begin());
 	}
 	
-	friend constexpr auto end(dynamic_array const & container) {
-		return begin(container) + container.m_data.size;
+	constexpr auto end() const & {
+		return begin() + m_data.size;
 	}
-	friend constexpr auto end(dynamic_array & container) {
-		return begin(container) + container.m_data.size;
+	constexpr auto end() & {
+		return begin() + m_data.size;
+	}
+	constexpr auto end() && {
+		return std::move(*this).begin() + m_data.size;
 	}
 
 	OPERATORS_BRACKET_SEQUENCE_RANGE_DEFINITIONS

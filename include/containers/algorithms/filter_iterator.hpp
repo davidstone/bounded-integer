@@ -7,6 +7,7 @@
 
 #include <containers/algorithms/advance.hpp>
 #include <containers/algorithms/find.hpp>
+#include <containers/begin_end.hpp>
 #include <containers/is_iterator_sentinel.hpp>
 #include <containers/iterator_adapter.hpp>
 #include <containers/reference_wrapper.hpp>
@@ -119,21 +120,21 @@ public:
 
 	constexpr filter(Range && range, UnaryPredicate predicate):
 		m_range(OPERATORS_FORWARD(range)),
-		m_traits(end(m_range), std::move(predicate))
+		m_traits(::containers::end(m_range), std::move(predicate))
 	{
 	}
 	
-	friend constexpr auto begin(filter const & filtered) {
-		return detail::filter_iterator_impl(begin(filtered.m_range), reference_wrapper(filtered.m_traits));
+	constexpr auto begin() const & {
+		return detail::filter_iterator_impl(::containers::begin(m_range), reference_wrapper(m_traits));
 	}
-	friend constexpr auto begin(filter & filtered) {
-		return detail::filter_iterator_impl(begin(filtered.m_range), reference_wrapper(filtered.m_traits));
+	constexpr auto begin() & {
+		return detail::filter_iterator_impl(::containers::begin(m_range), reference_wrapper(m_traits));
 	}
-	friend constexpr auto begin(filter && filtered) {
-		return detail::filter_iterator_impl(begin(std::move(filtered).m_range), reference_wrapper(filtered.m_traits));
+	constexpr auto begin() && {
+		return detail::filter_iterator_impl(::containers::begin(std::move(*this).m_range), reference_wrapper(m_traits));
 	}
-	friend constexpr auto end(filter const &) {
-		return detail::filter_iterator_sentinel{};
+	static constexpr auto end() {
+		return detail::filter_iterator_sentinel();
 	}
 	
 private:

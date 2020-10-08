@@ -248,13 +248,13 @@ struct concatenate_view {
 	{
 	}
 	
-	friend constexpr auto begin(concatenate_view & view) {
-		return iterator(bounded::transform([](auto && range){ return range_view(range); }, view.m_ranges));
+	constexpr auto begin() const & {
+		return const_iterator(bounded::transform([](auto && range){ return range_view(range); }, m_ranges));
 	}
-	friend constexpr auto begin(concatenate_view const & view) {
-		return const_iterator(bounded::transform([](auto && range){ return range_view(range); }, view.m_ranges));
+	constexpr auto begin() & {
+		return iterator(bounded::transform([](auto && range){ return range_view(range); }, m_ranges));
 	}
-	friend constexpr auto end(concatenate_view) {
+	static constexpr auto end() {
 		return concatenate_view_sentinel();
 	}
 

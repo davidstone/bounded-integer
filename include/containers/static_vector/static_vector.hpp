@@ -41,11 +41,11 @@ struct static_vector_data {
 	static_vector_data & operator=(static_vector_data const &) & requires std::is_trivially_copy_assignable_v<T> = default;
 
 	constexpr static_vector_data(static_vector_data && other) noexcept(std::is_nothrow_move_constructible_v<T>) {
-		std::uninitialized_move(begin(other), end(other), begin(*this));
+		std::uninitialized_move(other.begin(), other.end(), begin());
 		this->m_size = other.m_size;
 	}
 	constexpr static_vector_data(static_vector_data const & other) {
-		std::uninitialized_copy(begin(other), end(other), begin(*this));
+		std::uninitialized_copy(other.begin(), other.end(), begin());
 		this->m_size = other.m_size;
 	}
 
@@ -66,18 +66,24 @@ struct static_vector_data {
 		::containers::append(*this, init);
 	}
 	
-	friend constexpr auto begin(static_vector_data const & container) {
-		return const_iterator(::containers::detail::static_or_reinterpret_cast<T const *>(data(container.m_storage)));
+	constexpr auto begin() const & {
+		return const_iterator(::containers::detail::static_or_reinterpret_cast<T const *>(::containers::data(m_storage)));
 	}
-	friend constexpr auto begin(static_vector_data & container) {
-		return iterator(::containers::detail::static_or_reinterpret_cast<T *>(data(container.m_storage)));
+	constexpr auto begin() & {
+		return iterator(::containers::detail::static_or_reinterpret_cast<T *>(::containers::data(m_storage)));
+	}
+	constexpr auto begin() && {
+		return ::containers::move_iterator(begin());
 	}
 
-	friend constexpr auto end(static_vector_data const & container) {
-		return begin(container) + container.m_size;
+	constexpr auto end() const & {
+		return begin() + m_size;
 	}
-	friend constexpr auto end(static_vector_data & container) {
-		return begin(container) + container.m_size;
+	constexpr auto end() & {
+		return begin() + m_size;
+	}
+	constexpr auto end() && {
+		return std::move(*this).begin() + m_size;
 	}
 
 	constexpr auto & operator=(std::initializer_list<value_type> init) & {
@@ -138,19 +144,8 @@ public:
 	
 	using base::operator[];
 
-	friend constexpr auto begin(static_vector const & container) {
-		return begin(static_cast<base const &>(container));
-	}
-	friend constexpr auto begin(static_vector & container) {
-		return begin(static_cast<base &>(container));
-	}
-
-	friend constexpr auto end(static_vector const & container) {
-		return end(static_cast<base const &>(container));
-	}
-	friend constexpr auto end(static_vector & container) {
-		return end(static_cast<base &>(container));
-	}
+	using base::begin;
+	using base::end;
 
 	using base::capacity;
 	using base::append_from_capacity;

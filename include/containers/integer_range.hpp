@@ -117,11 +117,11 @@ struct integer_range {
 	{
 	}
 
-	friend constexpr auto begin(integer_range const range) {
-		return iterator(range.m_begin, range.m_step);
+	constexpr auto begin() const {
+		return iterator(m_begin, m_step);
 	}
-	friend constexpr auto end(integer_range const range) {
-		return iterator(range.m_end, range.m_step);
+	constexpr auto end() const {
+		return iterator(m_end, m_step);
 	}
 
 	OPERATORS_BRACKET_SEQUENCE_RANGE_DEFINITIONS

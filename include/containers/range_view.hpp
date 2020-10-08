@@ -40,15 +40,15 @@ struct range_view {
 	// TODO: Use terse syntax when clang does not crash
 	template<typename Range> requires range<Range>
 	constexpr explicit range_view(Range & r):
-		range_view(begin(r), end(r))
+		range_view(containers::begin(r), containers::end(r))
 	{
 	}
 	
-	friend constexpr Iterator begin(range_view view) {
-		return view.m_begin;
+	constexpr auto begin() const {
+		return m_begin;
 	}
-	friend constexpr Sentinel end(range_view view) {
-		return view.m_end;
+	constexpr auto end() const {
+		return m_end;
 	}
 
 	OPERATORS_BRACKET_SEQUENCE_RANGE_DEFINITIONS
@@ -56,12 +56,12 @@ struct range_view {
 	friend auto operator==(range_view const &, range_view const &) -> bool = default;
 	
 private:
-	Iterator m_begin;
-	Sentinel m_end;
+	[[no_unique_address]] Iterator m_begin;
+	[[no_unique_address]] Sentinel m_end;
 };
 
 template<typename Range>
-range_view(Range &) -> range_view<decltype(begin(std::declval<Range &>()), end(std::declval<Range &>()))>;
+range_view(Range &) -> range_view<decltype(containers::begin(std::declval<Range &>()), containers::end(std::declval<Range &>()))>;
 
 template<typename>
 inline constexpr auto is_range_view = false;

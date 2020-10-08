@@ -231,17 +231,23 @@ public:
 		return *this = flat_map_base(init);
 	}
 	
-	friend constexpr auto begin(flat_map_base const & c) {
-		return begin(c.m_container);
+	constexpr auto begin() const & {
+		return ::containers::begin(m_container);
 	}
-	friend constexpr auto begin(flat_map_base & c) {
-		return begin(c.m_container);
+	constexpr auto begin() & {
+		return ::containers::begin(m_container);
 	}
-	friend constexpr auto end(flat_map_base const & c) {
-		return end(c.m_container);
+	constexpr auto begin() && {
+		return ::containers::begin(std::move(m_container));
 	}
-	friend constexpr auto end(flat_map_base & c) {
-		return end(c.m_container);
+	constexpr auto end() const & {
+		return ::containers::end(m_container);
+	}
+	constexpr auto end() & {
+		return ::containers::end(m_container);
+	}
+	constexpr auto end() && {
+		return ::containers::end(std::move(m_container));
 	}
 	
 	// Extra functions on top of the regular map interface
@@ -283,11 +289,11 @@ public:
 
 	constexpr auto find(auto const & key) const {
 		auto const it = lower_bound(key);
-		return (it == end(*this) or compare()(key, it->key())) ? end(*this) : it;
+		return (it == end() or compare()(key, it->key())) ? end() : it;
 	}
 	constexpr auto find(auto const & key) {
 		auto const it = lower_bound(key);
-		return (it == end(*this) or compare()(key, it->key())) ? end(*this) : it;
+		return (it == end() or compare()(key, it->key())) ? end() : it;
 	}
 	
 	// Unlike in std::map, insert / try_emplace can only provide a time
@@ -301,11 +307,11 @@ public:
 		auto impl = [&](const_iterator position){
 			return try_emplace_at(position, OPERATORS_FORWARD(key), OPERATORS_FORWARD(mapped_args)...);
 		};
-		auto const correct_next = hint == end(*this) or compare()(key, *hint);
+		auto const correct_next = hint == end() or compare()(key, *hint);
 		if (!correct_next) {
 			return impl(upper_bound(key));
 		}
-		auto const correct_previous = hint == begin(*this) or compare()(*::containers::prev(hint), key);
+		auto const correct_previous = hint == begin() or compare()(*::containers::prev(hint), key);
 		if (!correct_previous) {
 			return impl(upper_bound(key));
 		}
@@ -334,25 +340,25 @@ public:
 		// entire container.
 		auto const original_size = size(m_container);
 		append(m_container, OPERATORS_FORWARD(init));
-		auto const midpoint = begin(m_container) + original_size;
+		auto const midpoint = begin() + original_size;
 
-		ska_sort(midpoint, end(m_container), extract_key());
+		ska_sort(midpoint, end(), extract_key());
 		if constexpr (allow_duplicates) {
 			std::inplace_merge(
-				make_legacy_iterator(begin(m_container)),
+				make_legacy_iterator(begin()),
 				make_legacy_iterator(midpoint),
-				make_legacy_iterator(end(m_container)),
+				make_legacy_iterator(end()),
 				compare()
 			);
 		} else {
 			auto const position = ::containers::unique_inplace_merge(
-				begin(m_container),
+				begin(),
 				midpoint,
-				end(m_container),
+				end(),
 				compare()
 			);
 			using containers::erase;
-			erase(m_container, position, end(m_container));
+			erase(m_container, position, end());
 		}
 	}
 	
@@ -385,7 +391,7 @@ private:
 		if constexpr (allow_duplicates) {
 			return add_element();
 		} else {
-			bool const there_is_element_before = position != begin(*this);
+			bool const there_is_element_before = position != begin();
 			if (!there_is_element_before) {
 				return inserted_t{add_element(), true};
 			}
@@ -417,19 +423,9 @@ public:
 
 	using base::base;
 	using base::operator=;
-	
-	friend constexpr auto begin(basic_flat_map const & container) {
-		return begin(static_cast<base const &>(container));
-	}
-	friend constexpr auto begin(basic_flat_map & container) {
-		return begin(static_cast<base &>(container));
-	}
-	friend constexpr auto end(basic_flat_map const & container) {
-		return end(static_cast<base const &>(container));
-	}
-	friend constexpr auto end(basic_flat_map & container) {
-		return end(static_cast<base &>(container));
-	}
+
+	using base::begin;
+	using base::end;
 
 	using base::capacity;
 	using base::reserve;
@@ -446,14 +442,14 @@ public:
 
 	constexpr auto const & at(auto && key) const {
 		auto const it = find(OPERATORS_FORWARD(key));
-		if (it == end(*this)) {
+		if (it == end()) {
 			throw std::out_of_range{"Key not found"};
 		}
 		return it->mapped();
 	}
 	constexpr auto & at(auto && key) {
 		auto const it = this->find(OPERATORS_FORWARD(key));
-		if (it == end(*this)) {
+		if (it == end()) {
 			throw std::out_of_range{"Key not found"};
 		}
 		return it->mapped();
@@ -464,18 +460,18 @@ public:
 
 	constexpr auto equal_range(auto && key) const {
 		auto const it = find(OPERATORS_FORWARD(key));
-		bool const found = it != end(*this);
+		bool const found = it != end();
 		return std::make_pair(it, found ? ::containers::next(it) : it);
 	}
 
 	constexpr size_type count(auto && key) const {
-		bool const found = this->find(OPERATORS_FORWARD(key)) != end(*this);
+		bool const found = this->find(OPERATORS_FORWARD(key)) != end();
 		return found ? 1 : 0;
 	}
 
 	constexpr size_type erase(auto && key) {
 		auto const it = this->find(OPERATORS_FORWARD(key));
-		if (it == end(*this)) {
+		if (it == end()) {
 			return 0;
 		}
 		this->erase(it);
@@ -503,18 +499,8 @@ public:
 	using base::base;
 	using base::operator=;
 	
-	friend constexpr auto begin(basic_flat_multimap const & container) {
-		return begin(static_cast<base const &>(container));
-	}
-	friend constexpr auto begin(basic_flat_multimap & container) {
-		return begin(static_cast<base &>(container));
-	}
-	friend constexpr auto end(basic_flat_multimap const & container) {
-		return end(static_cast<base const &>(container));
-	}
-	friend constexpr auto end(basic_flat_multimap & container) {
-		return end(static_cast<base &>(container));
-	}
+	using base::begin;
+	using base::end;
 
 	using base::capacity;
 	using base::reserve;
@@ -534,10 +520,10 @@ public:
 	// are unique, so I have slightly different versions in flat_map.
 
 	constexpr auto equal_range(auto && key) const {
-		return std::equal_range(begin(*this), end(*this), OPERATORS_FORWARD(key), compare());
+		return std::equal_range(begin(), end(), OPERATORS_FORWARD(key), compare());
 	}
 	constexpr auto equal_range(auto && key) {
-		return std::equal_range(begin(*this), end(*this), OPERATORS_FORWARD(key), compare());
+		return std::equal_range(begin(), end(), OPERATORS_FORWARD(key), compare());
 	}
 
 	constexpr auto count(auto && key) const {
@@ -547,7 +533,7 @@ public:
 	
 	constexpr size_type erase(auto && key) {
 		auto const range = this->equal_range(OPERATORS_FORWARD(key));
-		if (range.first == end(*this)) {
+		if (range.first == end()) {
 			return 0;
 		}
 		auto const distance = std::distance(range.first, range.second);

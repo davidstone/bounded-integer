@@ -51,40 +51,40 @@ public:
 	{
 	}
 	
-	friend constexpr auto begin(adapt const & adapted) {
+	constexpr auto begin() const & {
 		return containers::adapt_iterator(
-			containers::unwrap(adapted.m_traits).get_begin(adapted.m_range),
-			adapt_iterator_traits(adapted.m_traits)
+			containers::unwrap(m_traits).get_begin(m_range),
+			adapt_iterator_traits(m_traits)
 		);
 	}
-	friend constexpr auto begin(adapt & adapted) {
+	constexpr auto begin() & {
 		return containers::adapt_iterator(
-			containers::unwrap(adapted.m_traits.get_begin(adapted.m_range)),
-			adapt_iterator_traits(adapted.m_traits)
+			containers::unwrap(m_traits).get_begin(m_range),
+			adapt_iterator_traits(m_traits)
 		);
 	}
-	friend constexpr auto begin(adapt && adapted) {
+	constexpr auto begin() && {
 		return containers::adapt_iterator(
-			containers::unwrap(adapted.m_traits.get_begin(std::move(adapted).m_range)),
-			adapt_iterator_traits(adapted.m_traits)
+			containers::unwrap(m_traits).get_begin(std::move(*this).m_range),
+			adapt_iterator_traits(m_traits)
 		);
 	}
-	friend constexpr auto end(adapt const & adapted) {
+	constexpr auto end() const & {
 		return containers::adapt_iterator(
-			containers::unwrap(adapted.m_traits.get_end(adapted.m_range)),
-			adapt_iterator_traits(adapted.m_traits)
+			containers::unwrap(m_traits).get_end(m_range),
+			adapt_iterator_traits(m_traits)
 		);
 	}
-	friend constexpr auto end(adapt & adapted) {
+	constexpr auto end() & {
 		return containers::adapt_iterator(
-			containers::unwrap(adapted.m_traits.get_end(adapted.m_range)),
-			adapt_iterator_traits(adapted.m_traits)
+			containers::unwrap(m_traits).get_end(m_range),
+			adapt_iterator_traits(m_traits)
 		);
 	}
-	friend constexpr auto end(adapt && adapted) {
+	constexpr auto end() && {
 		return containers::adapt_iterator(
-			containers::unwrap(adapted.m_traits.get_end(std::move(adapted).m_range)),
-			adapt_iterator_traits(adapted.m_traits)
+			containers::unwrap(m_traits).get_end(std::move(*this).m_range),
+			adapt_iterator_traits(m_traits)
 		);
 	}
 	

@@ -50,18 +50,8 @@ public:
 	basic_string & operator=(basic_string &&) & = default;
 	using base::operator=;
 	
-	friend constexpr auto begin(basic_string const & container) {
-		return begin(static_cast<base const &>(container));
-	}
-	friend constexpr auto begin(basic_string & container) {
-		return begin(static_cast<base &>(container));
-	}
-	friend constexpr auto end(basic_string const & container) {
-		return end(static_cast<base const &>(container));
-	}
-	friend constexpr auto end(basic_string & container) {
-		return end(static_cast<base &>(container));
-	}
+	using base::begin;
+	using base::end;
 
 	using base::operator[];
 	
