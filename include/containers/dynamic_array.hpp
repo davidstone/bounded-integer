@@ -141,7 +141,8 @@ struct dynamic_array {
 	}
 	constexpr auto & operator=(dynamic_array && other) & noexcept {
 		detail::cleanup(m_data);
-		m_data = std::exchange(other.m_data, {});
+		m_data = other.m_data;
+		other.m_data = {};
 		return *this;
 	}
 	
