@@ -21,7 +21,7 @@ template<typename Container>
 concept has_member_append_from_capacity = requires (Container & container) { container.append_from_capacity(bounded::constant<-1>); };
 
 template<typename Container>
-concept pop_backable = is_container<Container> and (has_member_pop_back<Container> or has_member_append_from_capacity<Container>);
+concept pop_backable = has_member_pop_back<Container> or has_member_append_from_capacity<Container>;
 
 } // namespace detail
 

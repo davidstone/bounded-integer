@@ -15,7 +15,7 @@ namespace containers {
 namespace detail {
 
 template<typename Container>
-concept pop_frontable = is_container<Container> and requires (Container & container) { container.pop_front(); };
+concept pop_frontable = requires (Container & container) { container.pop_front(); };
 
 } // namespace detail
 
