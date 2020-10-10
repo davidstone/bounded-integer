@@ -65,9 +65,6 @@ public:
 	}
 };
 
-template<typename CharT>
-inline constexpr auto is_container<basic_string<CharT>> = true;
-
 
 namespace detail {
 

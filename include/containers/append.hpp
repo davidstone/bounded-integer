@@ -8,6 +8,7 @@
 #include <containers/algorithms/uninitialized.hpp>
 #include <containers/begin_end.hpp>
 #include <containers/lazy_push_back.hpp>
+#include <containers/push_back.hpp>
 #include <containers/reserve_if_reservable.hpp>
 #include <containers/size.hpp>
 
@@ -27,9 +28,6 @@ concept member_insertable = requires(Container & container, Range && range) {
 
 template<typename Container>
 concept lazy_push_backable = requires(Container & container, typename Container::value_type (&constructor)()) { lazy_push_back(container, constructor); };
-
-template<typename Container>
-concept push_backable = requires(Container & container, typename Container::value_type value_type) { push_back(container, std::move(value_type)); };
 
 namespace common {
 

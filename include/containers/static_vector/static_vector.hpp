@@ -151,10 +151,4 @@ public:
 	using base::append_from_capacity;
 };
 
-template<typename T, std::size_t capacity, bool is_trivial>
-inline constexpr auto is_container<detail::static_vector_data<T, capacity, is_trivial>> = true;
-
-template<typename T, std::size_t capacity>
-inline constexpr auto is_container<static_vector<T, capacity>> = true;
-
 }	// namespace containers

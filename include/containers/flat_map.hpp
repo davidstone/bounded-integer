@@ -479,9 +479,6 @@ public:
 	}
 };
 
-template<typename Container, typename ExtractKey>
-inline constexpr auto is_container<basic_flat_map<Container, ExtractKey>> = is_container<Container>;
-
 template<typename Container, typename ExtractKey = bounded::identity_t>
 class basic_flat_multimap : private detail::flat_map_base<Container, ExtractKey, true> {
 private:
@@ -541,9 +538,6 @@ public:
 		return distance;
 	}
 };
-
-template<typename Container, typename ExtractKey>
-inline constexpr auto is_container<basic_flat_multimap<Container, ExtractKey>> = is_container<Container>;
 
 
 template<typename Key, typename T, typename... MaybeExtractKey>

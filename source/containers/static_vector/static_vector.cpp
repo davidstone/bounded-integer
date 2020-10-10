@@ -31,7 +31,6 @@ static_assert(bounded::min_value<index_type> == 0_bi);
 static_assert(bounded::max_value<index_type> == 9_bi);
 static_assert(std::is_same<index_type::overflow_policy, bounded::throw_policy<std::out_of_range>>{});
 static_assert(!containers::iterator<containers::static_vector<std::string, 6>>);
-static_assert(containers::is_container<containers::static_vector<std::string, 6>>);
 
 static_assert(containers_test::check_non_triviality<test_static_vector>());
 

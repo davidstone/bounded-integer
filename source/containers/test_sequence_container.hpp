@@ -4,6 +4,7 @@
 // http://www.boost.org/LICENSE_1_0.txt)
 
 #include <containers/algorithms/compare.hpp>
+#include <containers/assign.hpp>
 #include <containers/push_back.hpp>
 #include <containers/range_view.hpp>
 #include <containers/repeat_n.hpp>
@@ -132,10 +133,14 @@ constexpr bool test_special_members(auto const & initializer) {
 
 template<typename Container>
 constexpr bool test_assign(auto const & source) {
-	auto container = Container();
-	assign(container, source);
-	BOUNDED_ASSERT(containers::equal(container, source));
-	return true;
+	if constexpr (containers::resizable_container<Container>) {
+		auto container = Container();
+		assign(container, source);
+		BOUNDED_ASSERT(containers::equal(container, source));
+		return true;
+	} else {
+		return true;
+	}
 }
 
 struct complex_resource {
@@ -228,9 +233,6 @@ constexpr auto test_sequence_container_single(std::initializer_list<std::initial
 	static_assert(!containers::iterator<Container>);
 	static_assert(containers::iterator<typename Container::const_iterator>);
 	static_assert(containers::iterator<typename Container::iterator>);
-	static_assert(containers::is_container<Container>);
-	static_assert(!containers::is_container<typename Container::const_iterator>);
-	static_assert(!containers::is_container<typename Container::iterator>);
 
 	test_sequence_container_default_constructed_empty<Container>();
 	if constexpr (containers::detail::reservable<Container>) {

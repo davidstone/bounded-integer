@@ -6,7 +6,6 @@
 #pragma once
 
 #include <containers/algorithms/move_iterator.hpp>
-#include <containers/is_container.hpp>
 
 #include <operators/forward.hpp>
 #include <bounded/integer.hpp>
@@ -17,22 +16,6 @@
 namespace containers {
 namespace detail {
 namespace common {
-
-// Provide a free function begin that resolves to member begin if the user has
-// defined one with the rvalue qualifier, otherwise default to a definition
-// based on the lvalue begin function.
-//
-// It would be nice if we could define mutable begin from const begin, and at
-// first it seems possible to do so at least for containers with contiguous
-// iterators. It would look something like (assuming pointers for iterators):
-//
-// return const_cast<Container::value_type *>(begin(std::as_const(container)));
-//
-// However, this assumes that a mutable container implies mutable access to the
-// elements in the container. This is not necessarily the case, making this
-// generic function dangerous for some types. It is better to accept the burden
-// of defining essentially the same function (const and mutable begin and end)
-// for types that want to allow mutable access to the elements.
 
 template<typename Return, typename T>
 void rvalue_ref_qualified(Return (T::*)() &&);
@@ -52,14 +35,6 @@ template<typename Range> requires( \
 ) \
 constexpr auto begin_or_end(Range && range) { \
 	return std::move(range).begin_or_end(); \
-} \
-\
-template<container Container> requires( \
-	std::is_rvalue_reference_v<Container &&> and \
-	!has_rvalue_ ## begin_or_end<std::decay_t<Container>> \
-) \
-constexpr auto begin_or_end(Container && container) { \
-	return ::containers::move_iterator(begin_or_end(container)); \
 }
 
 CONTAINERS_DETAIL_BEGIN_END_OVERLOADS(begin)

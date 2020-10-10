@@ -168,9 +168,6 @@ constexpr void clear(dynamic_array<T> & value) {
 	value = {};
 }
 
-template<typename T>
-inline constexpr auto is_container<dynamic_array<T>> = true;
-
 namespace detail {
 
 template<typename>

@@ -6,9 +6,9 @@
 #pragma once
 
 #include <containers/append.hpp>
-#include <containers/is_container.hpp>
 #include <containers/pop_back.hpp>
 #include <containers/repeat_n.hpp>
+#include <containers/resizable_container.hpp>
 #include <containers/size.hpp>
 #include <containers/take.hpp>
 
@@ -30,11 +30,11 @@ constexpr auto resize_impl(auto & container_to_resize, auto const initializer_ra
 
 namespace common {
 
-template<container Container>
+template<resizable_container Container>
 constexpr auto resize(Container & container_to_resize, auto const count) {
 	resize_impl(container_to_resize, repeat_default_n<typename Container::value_type>(count));
 }
-template<container Container>
+template<resizable_container Container>
 constexpr auto resize(Container & container_to_resize, auto const count, typename Container::value_type const & value) {
 	resize_impl(container_to_resize, repeat_n(count, value));
 }

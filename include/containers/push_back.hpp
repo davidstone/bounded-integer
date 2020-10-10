@@ -18,9 +18,12 @@ namespace detail {
 template<typename Container>
 concept member_push_backable = requires(Container & container, typename Container::value_type value) { container.push_back(std::move(value)); };
 
+template<typename Container>
+concept push_backable = member_push_backable<Container> or appendable_from_capacity<Container>;
+
 namespace common {
 
-template<typename Container>
+template<push_backable Container>
 constexpr decltype(auto) push_back(Container & container, typename Container::value_type const & value) {
 	if constexpr (member_push_backable<Container>) {
 		container.push_back(value);
@@ -32,7 +35,7 @@ constexpr decltype(auto) push_back(Container & container, typename Container::va
 		);
 	}
 }
-template<typename Container>
+template<push_backable Container>
 constexpr decltype(auto) push_back(Container & container, typename Container::value_type && value) {
 	if constexpr (member_push_backable<Container>) {
 		container.push_back(std::move(value));

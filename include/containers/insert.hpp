@@ -9,11 +9,11 @@
 #include <containers/algorithms/copy_n.hpp>
 #include <containers/algorithms/uninitialized.hpp>
 #include <containers/begin_end.hpp>
-#include <containers/is_container.hpp>
 #include <containers/mutable_iterator.hpp>
 #include <containers/push_back.hpp>
 #include <containers/repeat_n.hpp>
 #include <containers/reserve_if_reservable.hpp>
+#include <containers/resizable_container.hpp>
 
 #include <bounded/integer.hpp>
 #include <bounded/unreachable.hpp>
@@ -54,7 +54,7 @@ constexpr auto iterator_points_into_container(Container const & container, typen
 namespace common {
 
 // TODO: exception safety
-template<typename Container>
+template<resizable_container Container>
 constexpr auto lazy_insert(
 	Container & container,
 	typename Container::const_iterator const position,
@@ -82,7 +82,7 @@ constexpr auto lazy_insert(
 	return begin(container) + offset;
 }
 
-template<typename Container>
+template<resizable_container Container>
 constexpr auto emplace(Container & container, typename Container::const_iterator const position, auto && ... args) {
 	return ::containers::detail::common::lazy_insert(container, position, [&] {
 		return bounded::construct_return<typename Container::value_type>(OPERATORS_FORWARD(args)...);
@@ -92,7 +92,7 @@ constexpr auto emplace(Container & container, typename Container::const_iterator
 // TODO: exception safety
 // TODO: Check if the range lies within the container
 // TODO: Return an iterator to the first element inserted
-template<typename Container, typename Range = std::initializer_list<typename Container::value_type>>
+template<resizable_container Container, range Range = std::initializer_list<typename Container::value_type>> requires bounded::convertible_to<typename Container::value_type, typename Range::value_type>
 constexpr auto insert(Container & container, typename Container::const_iterator position, Range && range) {
 	BOUNDED_ASSERT(iterator_points_into_container(container, position));
 	if (position == end(container)) {
@@ -121,11 +121,11 @@ constexpr auto insert(Container & container, typename Container::const_iterator 
 	}
 }
 
-template<container Container>
+template<resizable_container Container>
 constexpr auto insert(Container & container, typename Container::const_iterator const position, typename Container::value_type const & value) {
 	return ::containers::detail::common::lazy_insert(container, position, bounded::value_to_function(value));
 }
-template<container Container>
+template<resizable_container Container>
 constexpr auto insert(Container & container, typename Container::const_iterator const position, typename Container::value_type && value) {
 	return ::containers::detail::common::lazy_insert(container, position, bounded::value_to_function(std::move(value)));
 }

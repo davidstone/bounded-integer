@@ -5,7 +5,6 @@
 
 #pragma once
 
-#include <containers/is_container.hpp>
 #include <containers/pop_back.hpp>
 #include <containers/pop_front.hpp>
 

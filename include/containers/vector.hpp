@@ -7,7 +7,6 @@
 
 #include <containers/common_container_functions.hpp>
 #include <containers/contiguous_iterator.hpp>
-#include <containers/is_container.hpp>
 #include <containers/maximum_array_size.hpp>
 #include <containers/uninitialized_dynamic_array.hpp>
 
@@ -131,8 +130,5 @@ private:
 
 template<typename Range>
 vector(Range &&) -> vector<std::decay_t<typename std::decay_t<Range>::value_type>>;
-
-template<typename T>
-inline constexpr auto is_container<vector<T>> = true;
 
 }	// namespace containers

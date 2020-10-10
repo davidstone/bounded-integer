@@ -159,7 +159,6 @@ add_library(containers_test STATIC
 	source/containers/front_back.cpp
 	source/containers/insert.cpp
 	source/containers/integer_range.cpp
-	source/containers/is_container.cpp
 	source/containers/is_iterator.cpp
 	source/containers/is_iterator_sentinel.cpp
 	source/containers/is_range.cpp
@@ -176,6 +175,7 @@ add_library(containers_test STATIC
 	source/containers/reference_wrapper.cpp
 	source/containers/repeat_n.cpp
 	source/containers/reserve_if_reservable.cpp
+	source/containers/resizable_container.cpp
 	source/containers/resize.cpp
 	source/containers/scope_guard.cpp
 	source/containers/single_element_range.cpp
@@ -266,7 +266,6 @@ set(test_targets
 	static_vector
 	small_buffer_optimized_vector
 	flat_map
-	variant
 	ska_sort
 )
 

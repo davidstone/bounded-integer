@@ -8,10 +8,10 @@
 #include <containers/algorithms/copy.hpp>
 #include <containers/algorithms/remove.hpp>
 #include <containers/begin_end.hpp>
-#include <containers/is_container.hpp>
 #include <containers/is_iterator.hpp>
 #include <containers/mutable_iterator.hpp>
 #include <containers/pop_back.hpp>
+#include <containers/resizable_container.hpp>
 
 #include <bounded/assert.hpp>
 #include <bounded/integer.hpp>
@@ -23,7 +23,7 @@ namespace detail {
 namespace common {
 
 template<iterator Iterator>
-constexpr auto erase(container auto & source, Iterator const first_, Iterator const last_) {
+constexpr auto erase(resizable_container auto & source, Iterator const first_, Iterator const last_) {
 	auto const first = ::containers::detail::mutable_iterator(source, first_);
 	auto const last = ::containers::detail::mutable_iterator(source, last_);
 	auto const to_clear = ::containers::move(last, end(source), first).output;
@@ -32,13 +32,14 @@ constexpr auto erase(container auto & source, Iterator const first_, Iterator co
 	}
 	return first;
 }
-template<container Container>
+
+template<resizable_container Container>
 constexpr auto erase(Container & container, typename Container::const_iterator const it) {
 	BOUNDED_ASSERT(it != end(container));
 	return erase(container, it, ::containers::next(it));
 }
 
-constexpr auto erase_if(container auto & source, auto predicate) {
+constexpr auto erase_if(resizable_container auto & source, auto predicate) {
 	return erase(source, ::containers::remove_if(source, std::move(predicate)), end(source));
 }
 

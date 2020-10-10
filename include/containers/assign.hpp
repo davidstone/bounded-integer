@@ -8,9 +8,9 @@
 #include <containers/append.hpp>
 #include <containers/begin_end.hpp>
 #include <containers/erase.hpp>
-#include <containers/is_container.hpp>
 #include <containers/is_range.hpp>
 #include <containers/range_view.hpp>
+#include <containers/resizable_container.hpp>
 
 #include <bounded/integer.hpp>
 
@@ -20,7 +20,7 @@ namespace containers {
 namespace detail {
 namespace common {
 
-constexpr void assign(container auto & destination, range auto && source) {
+constexpr void assign(resizable_container auto & destination, range auto && source) {
 	auto it = begin(destination);
 	auto first = begin(OPERATORS_FORWARD(source));
 	auto last = end(OPERATORS_FORWARD(source));
@@ -34,7 +34,7 @@ constexpr void assign(container auto & destination, range auto && source) {
 	erase(destination, it, end(destination));
 	append(destination, range_view(first, last));
 }
-template<container Container>
+template<resizable_container Container>
 constexpr void assign(Container & destination, std::initializer_list<typename Container::value_type> init) {
 	assign(destination, range_view(init));
 }

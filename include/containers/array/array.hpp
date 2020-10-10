@@ -6,7 +6,6 @@
 #pragma once
 
 #include <containers/contiguous_iterator.hpp>
-#include <containers/is_container.hpp>
 #include <containers/non_modifying_common_container_functions.hpp>
 
 #include <bounded/integer.hpp>
@@ -100,8 +99,5 @@ struct array {
 
 template<typename... Args>
 array(Args && ...) -> array<std::common_type_t<std::decay_t<Args>...>, sizeof...(Args)>;
-
-template<typename T, std::size_t... sizes>
-inline constexpr auto is_container<array<T, sizes...>> = true;
 
 }	// namespace containers

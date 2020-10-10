@@ -5,7 +5,6 @@
 
 #pragma once
 
-#include <containers/is_container.hpp>
 #include <containers/size.hpp>
 
 #include <bounded/assert.hpp>
@@ -17,30 +16,30 @@ namespace containers {
 namespace detail {
 
 template<typename Container>
-concept reservable = container<Container> and requires(Container & container, typename Container::size_type size) { container.reserve(size); };
+concept reservable = requires(Container & container, typename Container::size_type size) { container.reserve(size); };
 
-template<container Container>
-constexpr void reserve_if_reservable(Container &, typename Container::size_type) {
-}
-
-template<reservable Container>
+template<typename Container>
 constexpr void reserve_if_reservable(Container & container, typename Container::size_type const size) {
-	container.reserve(size);
+	if constexpr (reservable<Container>) {
+		container.reserve(size);
+	}
 }
 
-template<container Container>
+template<typename Container>
 constexpr auto reallocation_size(Container const & container, auto const count) {
-	return static_cast<typename Container::size_type>(bounded::max(size(container) + count, container.capacity() * 2_bi));
+	return static_cast<typename Container::size_type>(bounded::max(
+		size(container) + count,
+		container.capacity() * 2_bi
+	));
 }
 
-template<container Container>
-constexpr void growth_reallocation(Container const & container, auto const count) {
-	BOUNDED_ASSERT(container.capacity() >= size(container) + count);
-}
-
-template<reservable Container>
+template<typename Container>
 constexpr void growth_reallocation(Container & container, auto const count) {
-	container.reserve(::containers::detail::reallocation_size(container, count));
+	if constexpr (reservable<Container>) {
+		container.reserve(::containers::detail::reallocation_size(container, count));
+	} else {
+		BOUNDED_ASSERT(container.capacity() >= size(container) + count);
+	}
 }
 
 }	// namespace detail

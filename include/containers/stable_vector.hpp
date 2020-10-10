@@ -7,7 +7,6 @@
 
 #include <containers/common_container_functions.hpp>
 #include <containers/contiguous_iterator.hpp>
-#include <containers/is_container.hpp>
 #include <containers/maximum_array_size.hpp>
 #include <containers/uninitialized_dynamic_array.hpp>
 
@@ -120,8 +119,5 @@ private:
 	storage_type m_storage{capacity()};
 	[[no_unique_address]] size_type m_size = 0_bi;
 };
-
-template<typename T, std::size_t capacity>
-inline constexpr auto is_container<stable_vector<T, capacity>> = true;
 
 }	// namespace containers
