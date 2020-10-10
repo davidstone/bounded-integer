@@ -33,9 +33,9 @@ struct uninitialized_dynamic_array {
 	{
 	}
 	constexpr uninitialized_dynamic_array & operator=(uninitialized_dynamic_array && other) & noexcept {
+		auto ptr = other.release();
 		deallocate();
-		m_ptr = nullptr;
-		m_ptr = other.release();
+		m_ptr = ptr;
 		m_capacity = other.m_capacity;
 		return *this;
 	}
