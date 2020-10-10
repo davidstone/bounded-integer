@@ -58,7 +58,8 @@ struct vector {
 	constexpr auto & operator=(vector && other) & noexcept {
 		::containers::detail::destroy_range(*this);
 		m_storage = std::move(other.m_storage);
-		m_size = std::exchange(other.m_size, 0_bi);
+		m_size = other.m_size;
+		other.m_size = 0_bi;
 		return *this;
 	}
 	constexpr auto & operator=(vector const & other) & {
