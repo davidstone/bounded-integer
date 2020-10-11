@@ -38,25 +38,25 @@ constexpr bool test_range_constructor(auto const & source) {
 	return true;
 }
 
+constexpr void validate_range(auto const & container) {
+	for (auto const & value : container) {
+		BOUNDED_TEST(value == value);
+	}
+}
+template<typename T, typename Capacity>
+constexpr void validate_range(containers::uninitialized_dynamic_array<T, Capacity> const & container) {
+	auto const last = container.data() + container.capacity();
+	for (auto ptr = container.data(); ptr != last; ++ptr) {
+	}
+}
+
 // Self move assignment should have well-defined effects, regardless of whether
 // the source is moved from.
 template<typename Container>
-constexpr void run_self_move_assignment_from_not_moved_from(auto const & initializer) {
-	auto a = Container(initializer);
-	a = std::move(a);
-}
-
-template<typename Container>
-constexpr void run_self_move_assignment_from_moved_from(auto const & initializer) {
-	auto a = Container(initializer);
-	auto b = std::move(a);
-	a = std::move(a);
-}
-
-template<typename Container>
 constexpr bool run_self_move_assignment(auto const & initializer) {
-	run_self_move_assignment_from_not_moved_from<Container>(initializer);
-	run_self_move_assignment_from_moved_from<Container>(initializer);
+	auto a = Container(initializer);
+	a = std::move(a);
+	validate_range(a);
 	return true;
 }
 
