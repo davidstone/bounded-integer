@@ -25,7 +25,7 @@ constexpr bool test() {
 		result.reserve(static_cast<containers::vector<int>::size_type>(size(a) + size(b) + size(c)));
 		return result;
 	};
-	auto d = make_reusable_container();
+	auto const d = make_reusable_container();
 	
 	using Expected = containers::vector<int>;
 	auto const expected_result = Expected{ 2, 6, 8, 3, 5, 1, 2, 3 };
