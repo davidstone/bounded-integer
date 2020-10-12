@@ -126,7 +126,7 @@ constexpr auto unique_merge_copy(Iterator1 first1, sentinel_for<Iterator1> auto 
 
 // Both ranges must be sorted
 template<iterator Iterator, typename BinaryPredicate = std::less<>>
-auto unique_inplace_merge(Iterator first, Iterator middle, sentinel_for<Iterator> auto const last, BinaryPredicate less = BinaryPredicate{}) {
+constexpr auto unique_inplace_merge(Iterator first, Iterator middle, sentinel_for<Iterator> auto const last, BinaryPredicate less = BinaryPredicate{}) {
 	BOUNDED_ASSERT(containers::is_sorted(range_view(first, middle), less));
 	BOUNDED_ASSERT(containers::is_sorted(range_view(middle, last), less));
 	auto less_to_equal = [&](auto const & lhs, auto const & rhs) {

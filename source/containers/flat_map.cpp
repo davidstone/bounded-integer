@@ -26,7 +26,6 @@
 namespace {
 
 using namespace bounded::literal;
-using namespace containers;
 
 using base = containers::array<containers::map_value_type<int, int>, 3>;
 constexpr auto constexpr_constructible = containers::basic_flat_map<base>(
@@ -41,145 +40,6 @@ static_assert(constexpr_constructible.at(0) == 4);
 static_assert(constexpr_constructible.at(1) == 2);
 static_assert(constexpr_constructible.at(3) == 5);
 static_assert(constexpr_constructible.find(2) == end(constexpr_constructible));
-
-class CheckedMover {
-public:
-	constexpr CheckedMover(int value):
-		m_value(value),
-		m_moved(false)
-	{
-	}
-		
-	constexpr CheckedMover(CheckedMover const & other):
-		m_value(other.m_value),
-		m_moved(other.m_moved)
-	{
-		BOUNDED_TEST(!other.m_moved);
-		BOUNDED_TEST(!other.m_destructed);
-	}
-	constexpr CheckedMover(CheckedMover && other) noexcept:
-		m_value(other.m_value),
-		m_moved(other.m_moved)
-	{
-		BOUNDED_TEST(this != &other);
-		BOUNDED_TEST(!other.m_moved);
-		BOUNDED_TEST(!other.m_destructed);
-		other.m_moved = true;
-	}
-	constexpr CheckedMover & operator=(CheckedMover const & other) {
-		BOUNDED_TEST(!other.m_moved);
-		BOUNDED_TEST(!other.m_destructed);
-		BOUNDED_TEST(!m_destructed);
-		m_value = other.m_value;
-		m_moved = other.m_moved;
-		return *this;
-	}
-	constexpr CheckedMover & operator=(CheckedMover && other) noexcept {
-		BOUNDED_TEST(this != &other);
-		BOUNDED_TEST(!other.m_moved);
-		BOUNDED_TEST(!other.m_destructed);
-		BOUNDED_TEST(!m_destructed);
-		m_value = other.m_value;
-		m_moved = other.m_moved;
-		other.m_moved = true;
-		return *this;
-	}
-	~CheckedMover() {
-		BOUNDED_TEST(!m_destructed);
-		m_destructed = true;
-	}
-	
-	
-	friend constexpr auto operator<=>(CheckedMover const & lhs, CheckedMover const & rhs) {
-		BOUNDED_TEST(!lhs.m_moved);
-		BOUNDED_TEST(!rhs.m_moved);
-		BOUNDED_TEST(!lhs.m_destructed);
-		BOUNDED_TEST(!rhs.m_destructed);
-		return lhs.m_value <=> rhs.m_value;
-	}
-	friend constexpr auto operator==(CheckedMover const & lhs, CheckedMover const & rhs) -> bool {
-		BOUNDED_TEST(!lhs.m_moved);
-		BOUNDED_TEST(!rhs.m_moved);
-		BOUNDED_TEST(!lhs.m_destructed);
-		BOUNDED_TEST(!rhs.m_destructed);
-		return lhs.m_value== rhs.m_value;
-	}
-private:
-	int m_value;
-	bool m_moved;
-	bool m_destructed = false;
-};
-
-template<typename Container>
-void test_unique_copy_less(Container const & source, Container const & expected) {
-	auto destination = Container(containers::repeat_n(containers::size(source), 0));
-	auto const it = containers::unique_copy_less(begin(source), end(source), begin(destination));
-	erase(destination, it, end(destination));
-	BOUNDED_TEST(destination == expected);
-}
-
-template<typename Container>
-void test_unique_less(Container source, Container const & expected) {
-	BOUNDED_TEST(std::is_sorted(begin(source), end(source)));
-	BOUNDED_TEST(std::is_sorted(begin(expected), end(expected)));
-	test_unique_copy_less(source, expected);
-	test_unique_copy_less(std::move(source), expected);
-}
-
-template<typename Container>
-void test_unique_merge_copy(Container const & lhs, Container const & rhs, Container const & expected) {
-	auto result = Container(containers::repeat_n(typename Container::size_type(containers::size(lhs) + containers::size(rhs)), 0));
-	auto const it = containers::unique_merge_copy(begin(lhs), end(lhs), begin(rhs), end(rhs), begin(result));
-	erase(result, it, end(result));
-
-	BOUNDED_TEST(result == expected);
-}
-
-template<typename Container>
-void test_unique_inplace_merge(Container v, Container const & other, Container const & expected) {
-	using iterator = typename Container::iterator;
-	auto const midpoint = static_cast<typename std::iterator_traits<iterator>::difference_type>(containers::size(v));
-	append(v, other);
-	auto const it = containers::unique_inplace_merge(begin(v), begin(v) + midpoint, end(v));
-	erase(v, it, end(v));
-
-	BOUNDED_TEST(v == expected);
-}
-
-template<typename Container>
-void test_unique_merge(Container v, Container const & other, Container const & expected) {
-	BOUNDED_TEST(std::is_sorted(begin(v), end(v)));
-	BOUNDED_TEST(std::is_sorted(begin(other), end(other)));
-	test_unique_merge_copy(v, other, expected);
-	test_unique_inplace_merge(std::move(v), other, expected);
-}
-
-template<typename Container>
-void test_unique_specific() {
-	test_unique_less<Container>({ 1 }, { 1 });
-	test_unique_less<Container>({ 1, 2 }, { 1, 2 });
-	test_unique_less<Container>({ }, { });
-	test_unique_less<Container>({ 1, 3, 5, 5, 5, 6, 10, 10 }, { 1, 3, 5, 6, 10 });
-	test_unique_less<Container>({ 1, 1, 1, 1, 1, 1, 1, 1 }, { 1 });
-	test_unique_merge<Container>({ 1, 2, 3, 5 }, { 7, 8, 9 }, { 1, 2, 3, 5, 7, 8, 9 });
-	test_unique_merge<Container>({ 1, 3, 5, 7, 9 }, { 2, 2, 2, 3, 3, 6, 7 }, { 1, 2, 3, 5, 6, 7, 9 });
-	test_unique_merge<Container>({ 2 }, { 1 }, { 1, 2 });
-	test_unique_merge<Container>({ }, { 6 }, { 6 });
-	test_unique_merge<Container>({ 4 }, { }, { 4 });
-	test_unique_merge<Container>({ }, { }, { });
-	test_unique_merge<Container>({ 1 }, { 1 }, { 1 });
-	test_unique_merge<Container>({ 8 }, { 8, 8, 8, 8, 8 }, { 8 });
-	// Ideally unique_inplace_merge would not assume the first range has no
-	// duplicates, but that is my current use-case. I do not know how to remove
-	// this limitation without making the algorithm less efficient.
-	// test_unique_merge<Container>({ 8, 8 }, { 8, 8, 8, 8, 8 }, { 8 });
-}
-
-void test_unique() {
-	std::cout << "Testing unique_inplace_merge.\n" << std::flush;
-	// test_unique_specific<std::vector<CheckedMover>>();
-	test_unique_specific<vector<CheckedMover>>();
-}
 
 template<typename container_type>
 void test() {
@@ -244,7 +104,7 @@ using extract_key_t = Extract;
 
 #elif defined USE_FLAT_MAP
 	template<typename Key, typename Value, typename Extract>
-	using map_type = flat_map<Key, Value, extract_key_t<Extract>>;
+	using map_type = containers::flat_map<Key, Value, extract_key_t<Extract>>;
 
 	template<typename Key, typename Value>
 	using value_type = containers::map_value_type<Key, Value>;
@@ -419,7 +279,6 @@ int main(int argc, char ** argv) {
 		return 1;
 	}
 
-	test_unique();
 	test<map_type<int, int, bounded::identity_t>>();
 
 	std::cout << "Testing performance.\n" << std::flush;
