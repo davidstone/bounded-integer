@@ -11,9 +11,6 @@
 
 namespace {
 
-using namespace bounded::literal;
-using namespace containers;
-
 class CheckedMover {
 public:
 	constexpr CheckedMover(int value):
@@ -152,6 +149,6 @@ constexpr bool test_unique() {
 	return true;
 }
 
-static_assert(test_unique<vector<CheckedMover>>());
+static_assert(test_unique<containers::vector<CheckedMover>>());
 
 } // namespace
