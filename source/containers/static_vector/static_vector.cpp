@@ -22,7 +22,7 @@ static_assert(std::is_trivially_copy_assignable_v<containers::static_vector<int,
 static_assert(std::is_trivially_move_assignable_v<containers::static_vector<int, 3>>);
 
 template<typename T>
-using test_static_vector = containers::static_vector<T, 1000>;
+using test_static_vector = containers::static_vector<T, 40>;
 
 static_assert(containers_test::test_sequence_container_int<test_static_vector>());
 
