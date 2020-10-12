@@ -41,22 +41,23 @@ static_assert(constexpr_constructible.at(1) == 2);
 static_assert(constexpr_constructible.at(3) == 5);
 static_assert(constexpr_constructible.find(2) == end(constexpr_constructible));
 
-template<typename container_type>
-void test() {
-	std::cout << "Testing many member functions.\n" << std::flush;
-
+constexpr auto test() {
+	using container_type = containers::flat_map<int, int>;
 	auto empty = container_type();
-	auto const init = std::initializer_list<typename container_type::value_type>{{1, 2}, {2, 5}, {3, 3}};
+	auto const init = std::initializer_list<container_type::value_type>{{1, 2}, {2, 5}, {3, 3}};
 	auto container = container_type(init);
 	BOUNDED_TEST((container == container_type(init)));
-	container.insert(typename container_type::value_type(4, 4));
+	container.insert(container_type::value_type(4, 4));
 	container.try_emplace(5, 3);
 	BOUNDED_TEST(container.at(5) == 3);
 	BOUNDED_TEST(size(container) == 5_bi);
 	container.insert(typename container_type::value_type(3, 10));
 	BOUNDED_TEST(size(container) == 5_bi);
 	BOUNDED_TEST(container.at(3) == 3);
+	return true;
 }
+
+static_assert(test());
 
 #define TRACK_EXTRACTIONS
 #if defined TRACK_EXTRACTIONS
@@ -278,8 +279,6 @@ int main(int argc, char ** argv) {
 		std::cerr << "Must pass a positive number\n";
 		return 1;
 	}
-
-	test<map_type<int, int, bounded::identity_t>>();
 
 	std::cout << "Testing performance.\n" << std::flush;
 	test_performance<1, 1>(loop_count);
