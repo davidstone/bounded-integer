@@ -190,11 +190,6 @@ add_library(containers_test STATIC
 
 target_link_libraries(containers_test PUBLIC containers strict_defaults)
 
-add_executable(concatenate
-	source/containers/algorithms/concatenate.cpp
-)
-target_link_libraries(concatenate PUBLIC containers strict_defaults)
-
 add_executable(static_vector
 	source/containers/static_vector/static_vector.cpp
 )
@@ -262,7 +257,6 @@ endif()
 
 set(test_targets
 	bounded_test
-	concatenate
 	static_vector
 	small_buffer_optimized_vector
 	flat_map

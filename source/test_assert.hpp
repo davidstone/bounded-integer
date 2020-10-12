@@ -14,7 +14,7 @@
 #include <cassert>
 
 // Like assert, but always evaluated
-#define BOUNDED_TEST assert
+#define BOUNDED_TEST(...) assert((__VA_ARGS__))
 
 #if defined BOUNDED_NDEBUG_WAS_DEFINED
 	#define NDEBUG BOUNDED_NDEBUG_WAS_DEFINED
