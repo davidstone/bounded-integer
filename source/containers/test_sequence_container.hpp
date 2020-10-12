@@ -53,10 +53,23 @@ constexpr void validate_range(containers::uninitialized_dynamic_array<T, Capacit
 // Self move assignment should have well-defined effects, regardless of whether
 // the source is moved from.
 template<typename Container>
-constexpr bool run_self_move_assignment(auto const & initializer) {
+constexpr void run_self_move_assignment_from_not_moved_from(auto const & initializer) {
 	auto a = Container(initializer);
 	a = std::move(a);
 	validate_range(a);
+}
+
+template<typename Container>
+constexpr void run_self_move_assignment_from_moved_from(auto const & initializer) {
+	auto a = Container(initializer);
+	auto b = std::move(a);
+	a = std::move(a);
+}
+
+template<typename Container>
+constexpr bool run_self_move_assignment(auto const & initializer) {
+	run_self_move_assignment_from_not_moved_from<Container>(initializer);
+	run_self_move_assignment_from_moved_from<Container>(initializer);
 	return true;
 }
 
