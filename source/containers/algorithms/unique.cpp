@@ -11,22 +11,22 @@
 
 namespace {
 
-class CheckedMover {
+class checked_mover {
 public:
-	constexpr CheckedMover(int value):
+	constexpr checked_mover(int value):
 		m_value(value),
 		m_moved(false)
 	{
 	}
 		
-	constexpr CheckedMover(CheckedMover const & other):
+	constexpr checked_mover(checked_mover const & other):
 		m_value(other.m_value),
 		m_moved(other.m_moved)
 	{
 		BOUNDED_TEST(!other.m_moved);
 		BOUNDED_TEST(!other.m_destructed);
 	}
-	constexpr CheckedMover(CheckedMover && other) noexcept:
+	constexpr checked_mover(checked_mover && other) noexcept:
 		m_value(other.m_value),
 		m_moved(other.m_moved)
 	{
@@ -35,7 +35,7 @@ public:
 		BOUNDED_TEST(!other.m_destructed);
 		other.m_moved = true;
 	}
-	constexpr CheckedMover & operator=(CheckedMover const & other) {
+	constexpr checked_mover & operator=(checked_mover const & other) {
 		BOUNDED_TEST(!other.m_moved);
 		BOUNDED_TEST(!other.m_destructed);
 		BOUNDED_TEST(!m_destructed);
@@ -43,7 +43,7 @@ public:
 		m_moved = other.m_moved;
 		return *this;
 	}
-	constexpr CheckedMover & operator=(CheckedMover && other) noexcept {
+	constexpr checked_mover & operator=(checked_mover && other) noexcept {
 		BOUNDED_TEST(this != &other);
 		BOUNDED_TEST(!other.m_moved);
 		BOUNDED_TEST(!other.m_destructed);
@@ -53,20 +53,20 @@ public:
 		other.m_moved = true;
 		return *this;
 	}
-	constexpr ~CheckedMover() {
+	constexpr ~checked_mover() {
 		BOUNDED_TEST(!m_destructed);
 		m_destructed = true;
 	}
 	
 	
-	friend constexpr auto operator<=>(CheckedMover const & lhs, CheckedMover const & rhs) {
+	friend constexpr auto operator<=>(checked_mover const & lhs, checked_mover const & rhs) {
 		BOUNDED_TEST(!lhs.m_moved);
 		BOUNDED_TEST(!rhs.m_moved);
 		BOUNDED_TEST(!lhs.m_destructed);
 		BOUNDED_TEST(!rhs.m_destructed);
 		return lhs.m_value <=> rhs.m_value;
 	}
-	friend constexpr auto operator==(CheckedMover const & lhs, CheckedMover const & rhs) -> bool {
+	friend constexpr auto operator==(checked_mover const & lhs, checked_mover const & rhs) -> bool {
 		BOUNDED_TEST(!lhs.m_moved);
 		BOUNDED_TEST(!rhs.m_moved);
 		BOUNDED_TEST(!lhs.m_destructed);
@@ -149,6 +149,6 @@ constexpr bool test_unique() {
 	return true;
 }
 
-static_assert(test_unique<containers::vector<CheckedMover>>());
+static_assert(test_unique<containers::vector<checked_mover>>());
 
 } // namespace
