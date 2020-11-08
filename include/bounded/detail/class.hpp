@@ -167,7 +167,14 @@ struct integer {
 
 	template<detail::overlapping_integer<minimum, maximum, overflow_policy> T> requires(!detail::bounded_by_range<T, minimum, maximum, overflow_policy>)
 	constexpr explicit integer(T const & other, overflow_policy = overflow_policy{}):
-		integer(apply_overflow_policy(detail::as_integer(other)), non_check)
+		integer(
+			overflow_policy().assignment(
+				integer<detail::builtin_min_value<T>, detail::builtin_max_value<T>>(detail::as_integer(other), non_check),
+				constant<minimum>,
+				constant<maximum>
+			),
+			non_check
+		)
 	{
 	}
 
@@ -197,7 +204,7 @@ struct integer {
 	constexpr auto operator=(integer && other) & -> integer & = default;
 
 	constexpr auto && operator=(detail::overlapping_integer<minimum, maximum, overflow_policy> auto const & other) & {
-		return unchecked_assignment(apply_overflow_policy(other));
+		return *this = integer(other);
 	}
 	
 	// Do not verify that the value is in range because the user has requested a
@@ -212,15 +219,6 @@ private:
 	static constexpr auto uninitialized_value() {
 		return minimum > min_value<underlying_type> ?
 			static_cast<underlying_type>(minimum - 1) : static_cast<underlying_type>(maximum + 1);
-	}
-
-	template<typename T>
-	static constexpr auto apply_overflow_policy(T const value) {
-		return overflow_policy{}.assignment(
-			integer<detail::builtin_min_value<T>, detail::builtin_max_value<T>>(value, non_check),
-			constant<minimum>,
-			constant<maximum>
-		);
 	}
 
 	using storage_type = std::conditional_t<minimum == maximum, detail::empty, underlying_type>;
