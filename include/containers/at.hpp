@@ -22,7 +22,7 @@ namespace detail {
 namespace common {
 
 constexpr decltype(auto) at(range auto && r, auto const index) {
-	return OPERATORS_FORWARD(r)[typename index_type<decltype(r)>::overflow_policy{}.assignment(
+	return OPERATORS_FORWARD(r)[bounded::throw_policy<std::out_of_range>::assignment(
 		bounded::integer(index),
 		0_bi,
 		size(r) - 1_bi

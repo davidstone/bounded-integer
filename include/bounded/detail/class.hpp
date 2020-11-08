@@ -131,14 +131,13 @@ template<auto value, typename overflow_policy = null_policy>
 inline constexpr auto constant = constant_t<detail::normalize<value>, overflow_policy>{};
 
 
-template<auto minimum, auto maximum, typename overflow_policy_ = null_policy>
+template<auto minimum, auto maximum, typename overflow_policy = null_policy>
 struct integer {
 	static_assert(std::is_same_v<decltype(minimum), std::remove_const_t<decltype(detail::normalize<minimum>)>>);
 	static_assert(std::is_same_v<decltype(maximum), std::remove_const_t<decltype(detail::normalize<maximum>)>>);
 	static_assert(detail::safe_compare(minimum, maximum) <= 0, "Maximum cannot be less than minimum");
 
 	using underlying_type = detail::underlying_type_t<minimum, maximum>;
-	using overflow_policy = overflow_policy_;
 	
 	constexpr auto value() const requires(minimum != maximum) {
 		BOUNDED_ASSUME(minimum <= m_value and m_value <= maximum);

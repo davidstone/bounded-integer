@@ -19,6 +19,5 @@ static_assert(containers_test::test_sequence_container<test_stable_vector>());
 using index_type = containers::index_type<containers::stable_vector<int, 10>>;
 static_assert(bounded::min_value<index_type> == 0_bi);
 static_assert(bounded::max_value<index_type> == 9_bi);
-static_assert(std::is_same_v<index_type::overflow_policy, bounded::throw_policy<std::out_of_range>>);
 
 } // namespace

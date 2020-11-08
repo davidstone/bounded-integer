@@ -25,8 +25,7 @@ struct integer_range_iterator {
 private:
 	using storage_type = bounded::integer<
 		bounded::detail::builtin_min_value<Integer>,
-		bounded::detail::builtin_max_value<Sentinel>,
-		typename Integer::overflow_policy
+		bounded::detail::builtin_max_value<Sentinel>
 	>;
 	storage_type m_value;
 	Step m_step;
@@ -34,8 +33,7 @@ private:
 public:
 	using value_type = bounded::integer<
 		bounded::detail::builtin_min_value<storage_type>,
-		bounded::detail::normalize<bounded::max(bounded::min_value<storage_type>, bounded::max_value<storage_type> - bounded::min_value<Step>).value()>,
-		typename Integer::overflow_policy
+		bounded::detail::normalize<bounded::max(bounded::min_value<storage_type>, bounded::max_value<storage_type> - bounded::min_value<Step>).value()>
 	>;
 	using difference_type = decltype((std::declval<storage_type>() - std::declval<storage_type>()) / std::declval<Step>());
 	using pointer = value_type const *;

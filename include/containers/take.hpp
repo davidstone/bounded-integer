@@ -110,7 +110,7 @@ constexpr auto & operator++(counted_iterator<Iterator, Count> & it) {
 // TODO: Handle range having a sentinel type
 template<bounded::bounded_integer Count>
 constexpr auto take(range auto && source, Count count_) {
-	auto const count = bounded::integer<0, bounded::detail::builtin_max_value<Count>, typename Count::overflow_policy>(count_);
+	auto const count = bounded::integer<0, bounded::detail::builtin_max_value<Count>>(count_);
 	return containers::range_view(
 		counted_iterator(begin(OPERATORS_FORWARD(source)), count),
 		counted_sentinel(end(OPERATORS_FORWARD(source)))
