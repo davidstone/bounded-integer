@@ -61,7 +61,8 @@ public:
 	static constexpr auto round_style = std::round_toward_zero;
 	static constexpr auto is_iec559 = false;
 	static constexpr auto is_bounded = true;
-	static constexpr auto is_modulo = overflow_policy::is_modulo;
+	// This is meaningless for all specializations
+	static constexpr auto is_modulo = false;
 	static constexpr auto radix = 2;
 	static constexpr auto digits = bounded::detail::digits(bounded::constant<minimum>, bounded::constant<maximum>, bounded::constant<radix>);
 	static constexpr auto digits10 = bounded::detail::digits(bounded::constant<minimum>, bounded::constant<maximum>, bounded::constant<10>);

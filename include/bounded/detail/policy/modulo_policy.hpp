@@ -31,7 +31,6 @@ public:
 		) + minimum;
 	}
 
-	static constexpr bool is_modulo = true;
 	static constexpr bool overflow_is_error = false;
 };
 

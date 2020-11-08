@@ -20,7 +20,6 @@ struct null_policy {
 		return value;
 	}
 
-	static constexpr bool is_modulo = false;
 	static constexpr bool overflow_is_error = true;
 };
 

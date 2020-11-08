@@ -35,11 +35,7 @@ constexpr auto check_numeric_limits() {
 	BOUNDED_INTEGER_CHECK_CONDITION(has_denorm_loss);
 	BOUNDED_INTEGER_CHECK_CONDITION(is_iec559);
 	BOUNDED_INTEGER_CHECK_CONDITION(is_bounded);
-	// is_modulo intentionally left out because bounded::integer may differ from
-	// the behavior of built-ins. Instead, just instantiate it with a
-	// do-nothing test to verify that it compiles.
-	static_assert(bounded_limits::is_modulo == bounded_limits::is_modulo);
-	// BOUNDED_INTEGER_CHECK_CONDITION(is_modulo);
+	// is_modulo intentionally left out because it is meaningless
 	BOUNDED_INTEGER_CHECK_CONDITION(radix);
 	BOUNDED_INTEGER_CHECK_CONDITION(digits);
 	BOUNDED_INTEGER_CHECK_CONDITION(digits10);
