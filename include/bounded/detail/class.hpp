@@ -193,13 +193,6 @@ struct integer {
 	}
 
 
-	constexpr auto && unchecked_assignment(auto const & other) & {
-		if constexpr (minimum != maximum) {
-			m_value = static_cast<underlying_type>(other);
-		}
-		return *this;
-	}
-	
 	constexpr auto operator=(integer const & other) & -> integer & = default;
 	constexpr auto operator=(integer && other) & -> integer & = default;
 
