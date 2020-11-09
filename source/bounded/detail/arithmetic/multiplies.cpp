@@ -6,7 +6,6 @@
 #include <bounded/detail/arithmetic/multiplies.hpp>
 #include <bounded/detail/arithmetic/plus.hpp>
 #include <bounded/detail/arithmetic/unary_minus.hpp>
-#include <bounded/detail/policy/modulo_policy.hpp>
 #include <bounded/detail/class.hpp>
 #include "extreme_values.hpp"
 #include "../../homogeneous_equals.hpp"

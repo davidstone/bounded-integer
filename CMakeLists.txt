@@ -52,7 +52,6 @@ add_executable(bounded_test
 	source/bounded/detail/arithmetic/safe_abs.cpp
 	source/bounded/detail/arithmetic/unary_minus.cpp
 	source/bounded/detail/arithmetic/unary_plus.cpp
-	source/bounded/detail/policy/modulo_policy.cpp
 	source/bounded/detail/policy/null_policy.cpp
 	source/bounded/detail/variant/get_index.cpp
 	source/bounded/detail/variant/variant.cpp

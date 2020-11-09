@@ -4,7 +4,6 @@
 // http://www.boost.org/LICENSE_1_0.txt)
 
 #include <bounded/detail/arithmetic/divides.hpp>
-#include <bounded/detail/policy/modulo_policy.hpp>
 #include <bounded/detail/class.hpp>
 #include "extreme_values.hpp"
 #include "../../homogeneous_equals.hpp"
