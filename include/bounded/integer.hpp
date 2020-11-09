@@ -22,10 +22,10 @@
 #include <bounded/detail/arithmetic/operators.hpp>
 #include <bounded/detail/arithmetic/operators_builtin.hpp>
 #include <bounded/detail/arithmetic/pointer.hpp>
-#include <bounded/detail/policy/clamp_policy.hpp>
 #include <bounded/detail/policy/modulo_policy.hpp>
 #include <bounded/detail/policy/null_policy.hpp>
 #include <bounded/detail/policy/throw_policy.hpp>
+#include <bounded/clamp.hpp>
 #include <bounded/std_iterator.hpp>
 
 // optional is not included here

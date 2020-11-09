@@ -5,7 +5,6 @@
 
 #include <bounded/detail/class.hpp>
 
-#include <bounded/detail/policy/clamp_policy.hpp>
 #include <bounded/detail/comparison.hpp>
 #include <bounded/detail/conditional.hpp>
 
@@ -28,11 +27,11 @@ using common_type4 = std::common_type_t<type1, type2, type3, type4>;
 using expected_type4 = bounded::integer<-5, 10>;
 static_assert(is_same_bounded<expected_type4, common_type4>, "common_type wrong for 4 values.");
 
-static_assert(bounded::detail::overlapping_integer<bounded::integer<0, 0>, 0, 0, bounded::null_policy>, "Type should overlap its own range.");
-static_assert(!bounded::detail::overlapping_integer<bounded::integer<0, 0>, 1, 1, bounded::null_policy>, "Type should not overlap a disjoint range.");
+static_assert(bounded::detail::overlapping_integer<bounded::integer<0, 0>, 0, 0>, "Type should overlap its own range.");
+static_assert(!bounded::detail::overlapping_integer<bounded::integer<0, 0>, 1, 1>, "Type should not overlap a disjoint range.");
 
-static_assert(bounded::detail::bounded_by_range<bounded::integer<0, 0>, -1, 1, bounded::null_policy>);
-static_assert(!bounded::detail::bounded_by_range<bounded::integer<0, 1>, 0, 0, bounded::null_policy>);
+static_assert(bounded::detail::bounded_by_range<bounded::integer<0, 0>, -1, 1>);
+static_assert(!bounded::detail::bounded_by_range<bounded::integer<0, 1>, 0, 0>);
 
 static_assert(std::is_empty<bounded::constant_t<0>>{});
 static_assert(std::is_empty<bounded::constant_t<1>>{});
@@ -51,7 +50,7 @@ namespace check_constructibility {
 	constexpr auto max = bounded::max_value<int>;
 	using type = bounded::integer<min, max, bounded::null_policy>;
 	static_assert(
-		bounded::detail::overlapping_integer<type, min, max, bounded::null_policy>,
+		bounded::detail::overlapping_integer<type, min, max>,
 		"Bounds of type do not overlap its own range."
 	);
 
@@ -84,10 +83,6 @@ constexpr auto check_assignment() {
 	static_assert(!std::is_assignable<decltype((x)), bounded::constant_t<11>>{}, "Should not be assignable.");
 	x = bounded::integer<10, 11>(10, bounded::non_check);
 	BOUNDED_TEST(x == bounded::constant<10>);
-
-	bounded::clamped_integer<0, 10> y(5, bounded::non_check);
-	y = bounded::constant<11>;
-	BOUNDED_TEST(y == bounded::constant<10>);
 	return true;
 }
 

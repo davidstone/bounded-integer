@@ -5,7 +5,7 @@
 
 #include <bounded/detail/arithmetic/operators.hpp>
 #include <bounded/detail/arithmetic/operators_builtin.hpp>
-#include <bounded/detail/policy/clamp_policy.hpp>
+#include <bounded/detail/policy/modulo_policy.hpp>
 #include <bounded/detail/policy/throw_policy.hpp>
 #include <bounded/detail/comparison.hpp>
 #include <bounded/detail/comparison_mixed.hpp>
@@ -34,7 +34,7 @@ static_assert(homogeneous_equals(
 ));
 
 static_assert(homogeneous_equals(
-	bounded::checked_integer<1, 10>(9, bounded::non_check) - bounded::clamped_integer<-3, 11>(4, bounded::non_check),
+	bounded::checked_integer<1, 10>(9, bounded::non_check) - bounded::wrapping_integer<-3, 11>(4, bounded::non_check),
 	bounded::integer<-10, 13>(5, bounded::non_check)
 ));
 
@@ -86,8 +86,6 @@ constexpr auto check_compound_arithmetic() {
 	BOUNDED_TEST(post_increment == 0);
 	BOUNDED_TEST(z == 1);
 
-	static_assert(minus_equals(bounded::clamped_integer<0, 10>(bounded::constant<5>), bounded::constant<20>) == bounded::constant<0>);
-	
 	return true;
 }
 static_assert(check_compound_arithmetic());

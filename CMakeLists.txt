@@ -52,7 +52,6 @@ add_executable(bounded_test
 	source/bounded/detail/arithmetic/safe_abs.cpp
 	source/bounded/detail/arithmetic/unary_minus.cpp
 	source/bounded/detail/arithmetic/unary_plus.cpp
-	source/bounded/detail/policy/clamp_policy.cpp
 	source/bounded/detail/policy/modulo_policy.cpp
 	source/bounded/detail/policy/null_policy.cpp
 	source/bounded/detail/policy/throw_policy.cpp
@@ -91,6 +90,7 @@ add_executable(bounded_test
 	source/bounded/detail/underlying_type.cpp
 	source/bounded/assert.cpp
 	source/bounded/assert-NDEBUG.cpp
+	source/bounded/clamp.cpp
 	source/bounded/concepts.cpp
 	source/bounded/copy.cpp
 	source/bounded/representation_digits.cpp

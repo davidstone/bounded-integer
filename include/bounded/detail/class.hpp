@@ -85,13 +85,13 @@ inline constexpr struct non_check_t{} non_check;
 
 namespace detail {
 
-template<typename T, auto minimum, auto maximum, typename policy>
+template<typename T, auto minimum, auto maximum>
 concept overlapping_integer =
 	(is_integer<T> or std::is_enum_v<T> or std::is_same_v<T, bool>) and
-	(!policy::overflow_is_error or (safe_compare(builtin_min_value<T>, maximum) <= 0 and safe_compare(minimum, builtin_max_value<T>) <= 0));
+	safe_compare(builtin_min_value<T>, maximum) <= 0 and safe_compare(minimum, builtin_max_value<T>) <= 0;
 
-template<typename T, auto minimum, auto maximum, typename policy>
-concept bounded_by_range = !std::is_same_v<T, bool> and !std::is_enum_v<T> and overlapping_integer<T, minimum, maximum, policy> and safe_compare(minimum, builtin_min_value<T>) <= 0 and safe_compare(builtin_max_value<T>, maximum) <= 0;
+template<typename T, auto minimum, auto maximum>
+concept bounded_by_range = !std::is_same_v<T, bool> and !std::is_enum_v<T> and overlapping_integer<T, minimum, maximum> and safe_compare(minimum, builtin_min_value<T>) <= 0 and safe_compare(builtin_max_value<T>, maximum) <= 0;
 
 
 // The user can specialize min_value and max_value for their enum type to
@@ -155,16 +155,16 @@ struct integer {
 	// overflow_policy, which they default and ignore. This is solely to make
 	// the class work better with deduction guides.
 
-	constexpr integer(detail::overlapping_integer<minimum, maximum, overflow_policy> auto const & other, non_check_t):
+	constexpr integer(detail::overlapping_integer<minimum, maximum> auto const & other, non_check_t):
 		m_value(static_cast<underlying_type>(other)) {
 	}
 
-	constexpr integer(detail::bounded_by_range<minimum, maximum, overflow_policy> auto const other, overflow_policy = overflow_policy{}):
+	constexpr integer(detail::bounded_by_range<minimum, maximum> auto const other, overflow_policy = overflow_policy{}):
 		integer(other, non_check)
 	{
 	}
 
-	template<detail::overlapping_integer<minimum, maximum, overflow_policy> T> requires(!detail::bounded_by_range<T, minimum, maximum, overflow_policy>)
+	template<detail::overlapping_integer<minimum, maximum> T> requires(!detail::bounded_by_range<T, minimum, maximum>)
 	constexpr explicit integer(T const & other, overflow_policy = overflow_policy{}):
 		integer(
 			overflow_policy().assignment(
@@ -178,13 +178,13 @@ struct integer {
 	}
 
 	template<typename Enum> requires(
-		std::is_enum_v<Enum> and !detail::overlapping_integer<Enum, minimum, maximum, overflow_policy>
+		std::is_enum_v<Enum> and !detail::overlapping_integer<Enum, minimum, maximum>
 	)
 	constexpr integer(Enum other, non_check_t):
 		integer(static_cast<std::underlying_type_t<Enum>>(other), non_check) {
 	}
 	template<typename Enum> requires(
-		std::is_enum_v<Enum> and !detail::overlapping_integer<Enum, minimum, maximum, overflow_policy>
+		std::is_enum_v<Enum> and !detail::overlapping_integer<Enum, minimum, maximum>
 	)
 	constexpr explicit integer(Enum other, overflow_policy = overflow_policy{}):
 		integer(static_cast<std::underlying_type_t<Enum>>(other))
@@ -195,7 +195,7 @@ struct integer {
 	constexpr auto operator=(integer const & other) & -> integer & = default;
 	constexpr auto operator=(integer && other) & -> integer & = default;
 
-	constexpr auto && operator=(detail::overlapping_integer<minimum, maximum, overflow_policy> auto const & other) & {
+	constexpr auto && operator=(detail::overlapping_integer<minimum, maximum> auto const & other) & {
 		return *this = integer(other);
 	}
 	
