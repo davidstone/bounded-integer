@@ -4,7 +4,6 @@
 // http://www.boost.org/LICENSE_1_0.txt)
 
 #include <bounded/detail/arithmetic/unary_minus.hpp>
-#include <bounded/detail/policy/throw_policy.hpp>
 #include <bounded/detail/class.hpp>
 #include "../../homogeneous_equals.hpp"
 
@@ -58,13 +57,13 @@ constexpr auto check_all_limits() {
 static_assert(check_all_limits());
 
 static_assert(homogeneous_equals(
-	-bounded::checked_integer<1, 10>(9, bounded::non_check),
-	bounded::checked_integer<-10, -1>(-9, bounded::non_check)
+	-bounded::integer<1, 10>(9, bounded::non_check),
+	bounded::integer<-10, -1>(-9, bounded::non_check)
 ));
 
 static_assert(homogeneous_equals(
-	-bounded::checked_integer<-3, 6>(4, bounded::non_check),
-	bounded::checked_integer<-6, 3>(-4, bounded::non_check)
+	-bounded::integer<-3, 6>(4, bounded::non_check),
+	bounded::integer<-6, 3>(-4, bounded::non_check)
 ));
 
 }	// namespace

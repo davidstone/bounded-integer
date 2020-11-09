@@ -4,13 +4,12 @@
 // http://www.boost.org/LICENSE_1_0.txt)
 
 #include <bounded/detail/comparison.hpp>
-#include <bounded/detail/policy/throw_policy.hpp>
 #include <bounded/detail/class.hpp>
 #include <bounded/detail/comparison_mixed.hpp>
 
 namespace {
 
-constexpr bounded::integer<1, 10> a(5, bounded::non_check);
+constexpr auto a = bounded::integer<1, 10>(5, bounded::non_check);
 static_assert(
 	a == a,
 	"Values do not equal themselves"
@@ -19,7 +18,7 @@ static_assert(
 	a == 5,
 	"Values do not equal their underlying value"
 );
-constexpr bounded::checked_integer<4, 36346> b(5, bounded::non_check);
+constexpr auto b = bounded::integer<4, 36346>(5, bounded::non_check);
 static_assert(
 	a == b,
 	"Values do not equal equivalent other bounded::integer types"

@@ -11,6 +11,7 @@
 #include <containers/algorithms/partition.hpp>
 #include <containers/algorithms/sort.hpp>
 #include <containers/algorithms/unique.hpp>
+#include <containers/at.hpp>
 #include <containers/erase.hpp>
 #include <containers/legacy_iterator.hpp>
 #include <containers/is_range.hpp>
@@ -443,13 +444,16 @@ struct ListInplaceSorter {
 
 private:
 	struct ElementSubKey {
-		using base = SubKey<typename std::decay<decltype(std::declval<ListType>()[index_type<ListType>(0)])>::type>;
+		using base = SubKey<std::decay_t<decltype(containers::at(std::declval<ListType const &>(), 0, bounded::non_check))>>;
 
 		using next = ElementSubKey;
 
 		static constexpr decltype(auto) sub_key(auto const & value, BaseListSortData * sort_data) {
 			auto const & list = CurrentSubKey::sub_key(value, sort_data->next_sort_data);
-			return base::sub_key(list[index_type<decltype(list)>(sort_data->current_index)], sort_data->next_sort_data);
+			return base::sub_key(
+				containers::at(list, sort_data->current_index, bounded::non_check),
+				sort_data->next_sort_data
+			);
 		}
 	};
 

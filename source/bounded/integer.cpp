@@ -4,6 +4,8 @@
 // http://www.boost.org/LICENSE_1_0.txt)
 
 #include <bounded/integer.hpp>
+
+#include <bounded/check_in_range.hpp>
 #include <bounded/optional.hpp>
 #include <bounded/to_integer.hpp>
 
@@ -15,17 +17,16 @@
 
 namespace {
 
-auto check_throw_policy() {
+auto check_check_in_range() {
 	constexpr auto minimum = bounded::constant<0>;
 	constexpr auto maximum = bounded::constant<10>;
-	using policy = bounded::throw_policy<>;
 	try {
-		policy::assignment(bounded::integer<-20, 20>(bounded::constant<20>), minimum, maximum);
+		bounded::check_in_range(bounded::integer<-20, 20>(bounded::constant<20>), minimum, maximum);
 		BOUNDED_TEST((false));
 	} catch (...) {
 	}
 	try {
-		policy::assignment(bounded::integer<-6, 6>(bounded::constant<-6>), minimum, maximum);
+		bounded::check_in_range(bounded::integer<-6, 6>(bounded::constant<-6>), minimum, maximum);
 		BOUNDED_TEST((false));
 	} catch (...) {
 	}
@@ -51,7 +52,7 @@ auto streaming_test(int const initial, int const final) {
 }
 
 auto check_streaming() {
-	streaming_test<bounded::checked_integer<0, 100>>(7, 0);
+	streaming_test<bounded::integer<0, 100>>(7, 0);
 	constexpr auto large_initial = bounded::max_value<int> / 3;
 	constexpr auto large_final = -49;
 	streaming_test<decltype(bounded::integer(0))>(large_initial, large_final);
@@ -88,7 +89,7 @@ auto check_to_integer() {
 }	// namespace
 
 auto main() -> int {
-	check_throw_policy();
+	check_check_in_range();
 	check_to_string();
 	check_streaming();
 	check_to_integer();

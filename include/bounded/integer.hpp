@@ -24,7 +24,6 @@
 #include <bounded/detail/arithmetic/pointer.hpp>
 #include <bounded/detail/policy/modulo_policy.hpp>
 #include <bounded/detail/policy/null_policy.hpp>
-#include <bounded/detail/policy/throw_policy.hpp>
 #include <bounded/clamp.hpp>
 #include <bounded/std_iterator.hpp>
 

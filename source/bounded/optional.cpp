@@ -176,7 +176,7 @@ constexpr auto check_optional() {
 	check_uncompressed_optional<bounded::detail::max_signed_t>();
 
 	check_integer_optional<int>();
-	check_integer_optional<bounded::checked_integer<1, 10>>();
+	check_integer_optional<bounded::integer<1, 10>>();
 	check_non_trivial_optional<bounded_test::string_view>();
 
 	constexpr auto original = bounded::make_optional(bounded::constant<0>);

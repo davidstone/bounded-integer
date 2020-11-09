@@ -6,6 +6,7 @@
 #pragma once
 
 #include <bounded/detail/is_bounded_integer.hpp>
+#include <bounded/check_in_range.hpp>
 
 #include <iosfwd>
 #include <type_traits>
@@ -24,10 +25,17 @@ decltype(auto) operator<<(std::basic_ostream<CharT, Traits> & out, bounded_integ
 template<typename CharT, typename Traits, bounded_integer Integer>
 decltype(auto) operator>>(std::basic_istream<CharT, Traits> & in, Integer & x) {
 	using underlying = typename Integer::underlying_type;
-	std::conditional_t<sizeof(underlying) < sizeof(int), int, underlying> temp;
+	constexpr auto use_int = sizeof(underlying) < sizeof(int) or (sizeof(underlying) == sizeof(int) and std::is_signed_v<underlying>);
+	constexpr auto use_unsigned = sizeof(underlying) == sizeof(unsigned) and std::is_unsigned_v<underlying>;
+	using intermediate =
+		std::conditional_t<use_int, int,
+		std::conditional_t<use_unsigned, unsigned,
+		underlying
+	>>;
+	intermediate temp;
 	in >> temp;
-	x = temp;
+	x = check_in_range<Integer>(integer(temp));
 	return in;
 }
 
-}	// namespace bounded
+} // namespace bounded

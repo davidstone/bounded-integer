@@ -10,6 +10,7 @@
 #include <containers/size.hpp>
 
 #include <operators/forward.hpp>
+#include <bounded/check_in_range.hpp>
 #include <bounded/integer.hpp>
 
 #include <utility>
@@ -22,7 +23,7 @@ namespace detail {
 namespace common {
 
 constexpr decltype(auto) at(range auto && r, auto const index) {
-	return OPERATORS_FORWARD(r)[bounded::throw_policy<std::out_of_range>::assignment(
+	return OPERATORS_FORWARD(r)[bounded::check_in_range<std::out_of_range>(
 		bounded::integer(index),
 		0_bi,
 		size(r) - 1_bi
@@ -30,9 +31,10 @@ constexpr decltype(auto) at(range auto && r, auto const index) {
 }
 
 constexpr decltype(auto) at(range auto && r, auto const index, bounded::non_check_t) {
-	return OPERATORS_FORWARD(r)[static_cast<index_type<decltype(r)>>(index)];
+	using index_t = index_type<decltype(r)>;
+	auto const converted = index_t(index);
+	return OPERATORS_FORWARD(r)[converted];
 }
-
 
 }	// namespace common
 

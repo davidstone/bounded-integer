@@ -5,7 +5,6 @@
 
 #include <bounded/numeric_limits.hpp>
 
-#include <bounded/detail/policy/throw_policy.hpp>
 #include <bounded/detail/class.hpp>
 #include <bounded/detail/comparison_mixed.hpp>
 
@@ -14,13 +13,13 @@ namespace {
 template<typename integer>
 constexpr auto check_numeric_limits() {
 	using int_limits = std::numeric_limits<integer>;
-	using bounded_t = bounded::checked_integer<
+	using bounded_t = bounded::integer<
 		bounded::detail::normalize<int_limits::min()>,
 		bounded::detail::normalize<int_limits::max()>
 	>;
 	static_assert(std::is_same_v<typename bounded_t::underlying_type, integer>, "Incorrect underlying_type.");
 	using bounded_limits = std::numeric_limits<bounded_t>;
-	static_assert(sizeof(bounded_t) == sizeof(integer), "checked_integer wrong size.");
+	static_assert(sizeof(bounded_t) == sizeof(integer), "bounded::integer wrong size.");
 
 	// I have to use the preprocessor here to create a string literal
 	#define BOUNDED_INTEGER_CHECK_CONDITION(condition) \

@@ -6,7 +6,6 @@
 #include <bounded/detail/arithmetic/operators.hpp>
 #include <bounded/detail/arithmetic/operators_builtin.hpp>
 #include <bounded/detail/policy/modulo_policy.hpp>
-#include <bounded/detail/policy/throw_policy.hpp>
 #include <bounded/detail/comparison.hpp>
 #include <bounded/detail/comparison_mixed.hpp>
 
@@ -29,12 +28,7 @@ static_assert(homogeneous_equals(
 	bounded::constant<static_cast<bounded::detail::max_unsigned_t>(unsigned_max) - static_cast<bounded::detail::max_unsigned_t>(signed_max)>
 ));
 static_assert(homogeneous_equals(
-	bounded::checked_integer<1, 10>(9, bounded::non_check) - bounded::checked_integer<-3, 11>(4, bounded::non_check),
-	bounded::integer<-10, 13>(5, bounded::non_check)
-));
-
-static_assert(homogeneous_equals(
-	bounded::checked_integer<1, 10>(9, bounded::non_check) - bounded::wrapping_integer<-3, 11>(4, bounded::non_check),
+	bounded::integer<1, 10>(9, bounded::non_check) - bounded::integer<-3, 11>(4, bounded::non_check),
 	bounded::integer<-10, 13>(5, bounded::non_check)
 ));
 
@@ -55,13 +49,13 @@ constexpr auto modulo_equals(auto lhs, auto rhs) {
 }
 
 constexpr auto check_compound_arithmetic() {
-	using x_type = bounded::checked_integer<0, 10>;
-	using y_type = bounded::checked_integer<-10, 10>;
+	using x_type = bounded::integer<0, 10>;
+	using y_type = bounded::integer<-10, 10>;
 	static_assert(plus_equals(x_type(bounded::constant<5>), bounded::constant<5>) == bounded::constant<10>);
 	static_assert(plus_equals(y_type(-bounded::constant<5>), 5) == bounded::constant<0>);
 	static_assert(plus_equals(y_type(bounded::constant<0>), x_type(bounded::constant<10>)) == bounded::constant<10>);
 	
-	using z_type = bounded::checked_integer<-1000, 1000>;
+	using z_type = bounded::integer<-1000, 1000>;
 	static_assert(plus_equals(z_type(bounded::constant<0>), x_type(bounded::constant<10>)) == bounded::constant<10>);
 	static_assert(times_equals(z_type(bounded::constant<10>), x_type(bounded::constant<10>) - 5) == bounded::constant<50>);
 	static_assert(times_equals(z_type(bounded::constant<10>), x_type(bounded::constant<10>) - 5) == bounded::constant<50>);

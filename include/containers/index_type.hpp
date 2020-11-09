@@ -20,10 +20,9 @@ struct size_type_to_index_type {
 
 template<bounded::bounded_integer Size>
 struct size_type_to_index_type<Size> {
-	using type  = bounded::checked_integer<
+	using type  = bounded::integer<
 		0,
-		bounded::detail::normalize<(bounded::max_value<Size> - bounded::constant<1>).value()>,
-		std::out_of_range
+		bounded::detail::normalize<(bounded::max_value<Size> - bounded::constant<1>).value()>
 	>;
 };
 
