@@ -21,7 +21,7 @@ The `bounded::integer` philosophy is the same as the C++ philosophy: you don't p
 	auto z = x + y;
 	static_assert(std::is_same<decltype(z), bounded::integer<-2, 107>>::value, "Type of z incorrect.");
 
-The type of `z` is calculated as the smallest type that can hold all possible values of the calculation `x + y`. The `integer` type by defaults says that when modifying or constructing a value, the compiler should not do any run time checks. Other possibilities, such as throwing an exception on overflow or clamping the value to the minimum or maximum are also possible by use of template policies.
+The type of `z` is calculated as the smallest type that can hold all possible values of the calculation `x + y`. The `integer` type by defaults says that when modifying or constructing a value, the compiler should not do any run time checks.
 
 `bounded::integer` has the following goals:
 1. Never perform a run-time check when a static check would work instead
@@ -29,10 +29,6 @@ The type of `z` is calculated as the smallest type that can hold all possible va
 3. Allow conversions that might be wrong (assigning a value between 1 and 10 to a value between 5 and 20), but only when explicitly requested.
 4. Allow implicit conversions to larger types.
 5. Have no space or time overhead, assuming basic compiler optimizations like inlining, so that `bounded::integer` can be used on very large data sets or systems with hard real-time requirements.
-
-## Using policies
-
-The general form of the class is `bounded::integer<minimum, maximum, policy = bounded::null_policy>`. `policy` is some user-provided function to handle assignment of an out-of-range value. The default `null_policy` asserts the value is in range if asserts are enabled.
 
 # bounded::integer installation instructions
 

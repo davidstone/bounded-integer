@@ -11,21 +11,14 @@
 namespace bounded {
 
 // Other args allow you to declare the conversion as non_check
-template<auto new_minimum, auto minimum, auto maximum, typename overflow_policy, typename... Args>
-constexpr auto increase_min(integer<minimum, maximum, overflow_policy> const & value, Args... args) {
-	return integer<detail::normalize<detail::safe_max(new_minimum, minimum)>, maximum, overflow_policy>(value, args...);
+template<auto new_minimum, auto minimum, auto maximum, typename... Args>
+constexpr auto increase_min(integer<minimum, maximum> const & value, Args... args) {
+	return integer<detail::normalize<detail::safe_max(new_minimum, minimum)>, maximum>(value, args...);
 }
 
-template<auto new_maximum, auto minimum, auto maximum, typename overflow_policy, typename... Args>
-constexpr auto decrease_max(integer<minimum, maximum, overflow_policy> const & value, Args... args) {
-	return integer<minimum, detail::normalize<detail::safe_min(new_maximum, maximum)>, overflow_policy>(value, args...);
+template<auto new_maximum, auto minimum, auto maximum, typename... Args>
+constexpr auto decrease_max(integer<minimum, maximum> const & value, Args... args) {
+	return integer<minimum, detail::normalize<detail::safe_min(new_maximum, maximum)>>(value, args...);
 }
 
-template<typename Source, template<auto, auto, typename...> typename Target, typename... Extra>
-using change_policy = Target<
-	detail::builtin_min_value<Source>,
-	detail::builtin_max_value<Source>,
-	Extra...
->;
-
-}	// namespace bounded
+} // namespace bounded

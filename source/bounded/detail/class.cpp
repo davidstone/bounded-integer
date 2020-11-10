@@ -48,7 +48,7 @@ static_assert(bounded::constructible_from<bounded::integer<0, 0>, bool>);
 namespace check_constructibility {
 	constexpr auto min = bounded::min_value<int>;
 	constexpr auto max = bounded::max_value<int>;
-	using type = bounded::integer<min, max, bounded::null_policy>;
+	using type = bounded::integer<min, max>;
 	static_assert(
 		bounded::detail::overlapping_integer<type, min, max>,
 		"Bounds of type do not overlap its own range."

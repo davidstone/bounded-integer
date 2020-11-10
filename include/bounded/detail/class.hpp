@@ -14,8 +14,7 @@
 #include <bounded/detail/overlapping_range.hpp>
 #include <bounded/detail/underlying_type.hpp>
 
-#include <bounded/detail/policy/null_policy.hpp>
-
+#include <bounded/assume_in_range.hpp>
 #include <bounded/concepts.hpp>
 
 #include <limits>
@@ -24,25 +23,25 @@
 
 namespace bounded {
 
-template<auto minimum, auto maximum, typename overflow_policy>
+template<auto minimum, auto maximum>
 struct integer;
 
-template<auto minimum, auto maximum, typename overflow_policy>
-inline constexpr auto max_value<integer<minimum, maximum, overflow_policy>> = integer<maximum, maximum, null_policy>();
+template<auto minimum, auto maximum>
+inline constexpr auto max_value<integer<minimum, maximum>> = integer<maximum, maximum>();
 
-template<auto minimum, auto maximum, typename overflow_policy>
-inline constexpr auto min_value<integer<minimum, maximum, overflow_policy>> = integer<minimum, minimum, null_policy>();
+template<auto minimum, auto maximum>
+inline constexpr auto min_value<integer<minimum, maximum>> = integer<minimum, minimum>();
 
 namespace detail {
 
-template<auto minimum, auto maximum, typename overflow_policy>
-inline constexpr auto is_bounded_integer<integer<minimum, maximum, overflow_policy>> = true;
+template<auto minimum, auto maximum>
+inline constexpr auto is_bounded_integer<integer<minimum, maximum>> = true;
 
-template<auto minimum, auto maximum, typename policy>
-inline constexpr auto builtin_max_value<integer<minimum, maximum, policy>> = maximum;
+template<auto minimum, auto maximum>
+inline constexpr auto builtin_max_value<integer<minimum, maximum>> = maximum;
 
-template<auto minimum, auto maximum, typename policy>
-inline constexpr auto builtin_min_value<integer<minimum, maximum, policy>> = minimum;
+template<auto minimum, auto maximum>
+inline constexpr auto builtin_min_value<integer<minimum, maximum>> = minimum;
 
 } // namespace detail
 } // namespace bounded
@@ -63,7 +62,7 @@ private:
 		bounded::detail::builtin_max_value<RHS>
 	)>;
 public:
-	using type = bounded::integer<minimum, maximum, bounded::null_policy>;
+	using type = bounded::integer<minimum, maximum>;
 };
 
 } // namespace std
@@ -103,12 +102,11 @@ constexpr decltype(auto) as_integer(T const & value) {
 	if constexpr (std::is_enum_v<T>) {
 		using result_type = integer<
 			builtin_min_value<T>,
-			builtin_max_value<T>,
-			null_policy
+			builtin_max_value<T>
 		>;
 		return result_type(static_cast<std::underlying_type_t<T>>(value));
 	} else if constexpr (std::is_same_v<T, bool>) {
-		return integer<0, 1, null_policy>(value, non_check);
+		return integer<0, 1>(value, non_check);
 	} else {
 		return value;
 	}
@@ -124,14 +122,14 @@ struct empty {
 }	// namespace detail
 
 
-template<auto value, typename overflow_policy = null_policy>
-using constant_t = integer<value, value, overflow_policy>;
+template<auto value>
+using constant_t = integer<value, value>;
 
-template<auto value, typename overflow_policy = null_policy>
-inline constexpr auto constant = constant_t<detail::normalize<value>, overflow_policy>{};
+template<auto value>
+inline constexpr auto constant = constant_t<detail::normalize<value>>{};
 
 
-template<auto minimum, auto maximum, typename overflow_policy = null_policy>
+template<auto minimum, auto maximum>
 struct integer {
 	static_assert(std::is_same_v<decltype(minimum), std::remove_const_t<decltype(detail::normalize<minimum>)>>);
 	static_assert(std::is_same_v<decltype(maximum), std::remove_const_t<decltype(detail::normalize<maximum>)>>);
@@ -151,23 +149,19 @@ struct integer {
 	constexpr integer(integer const &) = default;
 	constexpr integer(integer &&) = default;
 
-	// All constructors not taking a non_check_t argument accept an
-	// overflow_policy, which they default and ignore. This is solely to make
-	// the class work better with deduction guides.
-
 	constexpr integer(detail::overlapping_integer<minimum, maximum> auto const & other, non_check_t):
 		m_value(static_cast<underlying_type>(other)) {
 	}
 
-	constexpr integer(detail::bounded_by_range<minimum, maximum> auto const other, overflow_policy = overflow_policy{}):
+	constexpr integer(detail::bounded_by_range<minimum, maximum> auto const other):
 		integer(other, non_check)
 	{
 	}
 
 	template<detail::overlapping_integer<minimum, maximum> T> requires(!detail::bounded_by_range<T, minimum, maximum>)
-	constexpr explicit integer(T const & other, overflow_policy = overflow_policy{}):
+	constexpr explicit integer(T const & other):
 		integer(
-			overflow_policy().assignment(
+			::bounded::assume_in_range(
 				integer<detail::builtin_min_value<T>, detail::builtin_max_value<T>>(detail::as_integer(other), non_check),
 				constant<minimum>,
 				constant<maximum>
@@ -186,7 +180,7 @@ struct integer {
 	template<typename Enum> requires(
 		std::is_enum_v<Enum> and !detail::overlapping_integer<Enum, minimum, maximum>
 	)
-	constexpr explicit integer(Enum other, overflow_policy = overflow_policy{}):
+	constexpr explicit integer(Enum other):
 		integer(static_cast<std::underlying_type_t<Enum>>(other))
 	{
 	}
@@ -225,15 +219,6 @@ public:
 namespace detail {
 
 template<typename T>
-struct equivalent_overflow_policy_c {
-	using type = null_policy;
-};
-template<auto minimum, auto maximum, typename overflow_policy>
-struct equivalent_overflow_policy_c<integer<minimum, maximum, overflow_policy>> {
-	using type = overflow_policy;
-};
-
-template<typename T>
 constexpr auto deduced_min() {
 	return builtin_min_value<T>;
 }
@@ -253,19 +238,10 @@ constexpr auto deduced_max() {
 
 }	// namespace detail
 
-template<typename T, typename overflow_policy = typename detail::equivalent_overflow_policy_c<std::decay_t<T>>::type>
-integer(T const & value, overflow_policy = overflow_policy{}) -> integer<
-	detail::normalize<detail::deduced_min<T>()>,
-	detail::normalize<detail::deduced_max<T>()>,
-	overflow_policy
->;
-
-#if 0
 template<typename T>
-integer(T const & value, non_check_t) = delete;
-
-template<typename T, typename overflow_policy>
-integer(T const & value, overflow_policy, non_check_t) = delete;
-#endif
+integer(T const & value) -> integer<
+	detail::normalize<detail::deduced_min<T>()>,
+	detail::normalize<detail::deduced_max<T>()>
+>;
 
 }	// namespace bounded

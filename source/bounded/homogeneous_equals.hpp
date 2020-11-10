@@ -12,10 +12,10 @@
 template<typename LHS, typename RHS>
 inline constexpr auto is_same_bounded = std::is_same_v<LHS, RHS>;
 
-template<auto lhs_min, auto lhs_max, auto rhs_min, auto rhs_max, typename policy>
+template<auto lhs_min, auto lhs_max, auto rhs_min, auto rhs_max>
 inline constexpr auto is_same_bounded<
-	bounded::integer<lhs_min, lhs_max, policy>,
-	bounded::integer<rhs_min, rhs_max, policy>
+	bounded::integer<lhs_min, lhs_max>,
+	bounded::integer<rhs_min, rhs_max>
 > =
 	bounded::constant<lhs_min> == bounded::constant<rhs_min> and
 	bounded::constant<lhs_max> == bounded::constant<rhs_max>;

@@ -26,12 +26,11 @@ constexpr auto safer_negation() {
 
 }	// namespace detail
 
-template<auto minimum, auto maximum, typename overflow_policy>
-constexpr auto operator-(integer<minimum, maximum, overflow_policy> const value) {
+template<auto minimum, auto maximum>
+constexpr auto operator-(integer<minimum, maximum> const value) {
 	using result_type = integer<
 		detail::normalize<detail::safer_negation<maximum>()>,
-		detail::normalize<detail::safer_negation<minimum>()>,
-		overflow_policy
+		detail::normalize<detail::safer_negation<minimum>()>
 	>;
 	using underlying_type = typename result_type::underlying_type;
 	using promoted_unsigned_type = detail::promoted_unsigned<underlying_type>;
