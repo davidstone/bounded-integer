@@ -202,11 +202,6 @@ struct integer {
 	}
 	
 private:
-	static constexpr auto uninitialized_value() {
-		return minimum > min_value<underlying_type> ?
-			static_cast<underlying_type>(minimum - 1) : static_cast<underlying_type>(maximum + 1);
-	}
-
 	using storage_type = std::conditional_t<minimum == maximum, detail::empty, underlying_type>;
 
 public:
