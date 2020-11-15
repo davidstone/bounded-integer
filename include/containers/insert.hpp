@@ -50,8 +50,7 @@ constexpr auto iterator_points_into_container(Container const & container, typen
 	return (begin(container) <= it) and (it <= end(container));
 }
 
-
-namespace common {
+} // namespace detail
 
 // TODO: exception safety
 template<resizable_container Container>
@@ -72,8 +71,8 @@ constexpr auto lazy_insert(
 		auto & ref = *mutable_position;
 		bounded::destroy(ref);
 		bounded::construct(ref, OPERATORS_FORWARD(constructor));
-	} else if constexpr (reservable<Container>) {
-		insert_or_emplace_with_reallocation(container, position, 1_bi, [&](auto const ptr) {
+	} else if constexpr (detail::reservable<Container>) {
+		::containers::detail::insert_or_emplace_with_reallocation(container, position, 1_bi, [&](auto const ptr) {
 			bounded::construct(*ptr, OPERATORS_FORWARD(constructor));
 		});
 	} else {
@@ -84,7 +83,7 @@ constexpr auto lazy_insert(
 
 template<resizable_container Container>
 constexpr auto emplace(Container & container, typename Container::const_iterator const position, auto && ... args) {
-	return ::containers::detail::common::lazy_insert(container, position, [&] {
+	return ::containers::lazy_insert(container, position, [&] {
 		return bounded::construct_return<typename Container::value_type>(OPERATORS_FORWARD(args)...);
 	});
 }
@@ -93,7 +92,7 @@ constexpr auto emplace(Container & container, typename Container::const_iterator
 // TODO: Check if the range lies within the container
 template<resizable_container Container, range Range = std::initializer_list<typename Container::value_type>> requires bounded::convertible_to<typename Container::value_type, typename Range::value_type>
 constexpr auto insert(Container & container, typename Container::const_iterator position, Range && range) {
-	BOUNDED_ASSERT(iterator_points_into_container(container, position));
+	BOUNDED_ASSERT(::containers::detail::iterator_points_into_container(container, position));
 	auto const range_size = ::containers::detail::linear_size(range);
 	if (size(container) + range_size <= container.capacity()) {
 		auto const mutable_position = ::containers::detail::mutable_iterator(container, position);
@@ -104,8 +103,8 @@ constexpr auto insert(Container & container, typename Container::const_iterator 
 		::containers::uninitialized_copy(OPERATORS_FORWARD(range), position);
 		container.append_from_capacity(range_size);
 		return mutable_position;
-	} else if constexpr (reservable<Container>) {
-		return insert_or_emplace_with_reallocation(container, position, range_size, [&](auto const ptr) {
+	} else if constexpr (detail::reservable<Container>) {
+		return ::containers::detail::insert_or_emplace_with_reallocation(container, position, range_size, [&](auto const ptr) {
 			::containers::uninitialized_copy(OPERATORS_FORWARD(range), ptr);
 		});
 	} else {
@@ -115,23 +114,11 @@ constexpr auto insert(Container & container, typename Container::const_iterator 
 
 template<resizable_container Container>
 constexpr auto insert(Container & container, typename Container::const_iterator const position, typename Container::value_type const & value) {
-	return ::containers::detail::common::lazy_insert(container, position, bounded::value_to_function(value));
+	return ::containers::lazy_insert(container, position, bounded::value_to_function(value));
 }
 template<resizable_container Container>
 constexpr auto insert(Container & container, typename Container::const_iterator const position, typename Container::value_type && value) {
-	return ::containers::detail::common::lazy_insert(container, position, bounded::value_to_function(std::move(value)));
+	return ::containers::lazy_insert(container, position, bounded::value_to_function(std::move(value)));
 }
 
-}	// namespace common
-
-using ::containers::detail::common::lazy_insert;
-using ::containers::detail::common::emplace;
-using ::containers::detail::common::insert;
-
-}	// namespace detail
-
-using ::containers::detail::common::lazy_insert;
-using ::containers::detail::common::emplace;
-using ::containers::detail::common::insert;
-
-}	// namespace containers
+} // namespace containers

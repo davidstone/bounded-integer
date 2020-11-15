@@ -5,6 +5,7 @@
 
 #include <containers/small_buffer_optimized_vector.hpp>
 #include <containers/assign.hpp>
+#include <containers/insert.hpp>
 #include <containers/string.hpp>
 #include <containers/resize.hpp>
 
@@ -77,7 +78,7 @@ void test_generic(bounded::constant_t<capacity_> const capacity, T const & t, st
 	BOUNDED_TEST(size(copy) == 1_bi);
 	BOUNDED_TEST(back(copy) == t);
 	clear(copy);
-	insert(copy, begin(copy), t);
+	containers::insert(copy, begin(copy), t);
 	BOUNDED_TEST(size(copy) == 1_bi);
 	BOUNDED_TEST(back(copy) == t);
 	
