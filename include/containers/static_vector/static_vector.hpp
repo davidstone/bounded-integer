@@ -6,6 +6,7 @@
 #pragma once
 
 #include <containers/algorithms/copy.hpp>
+#include <containers/algorithms/uninitialized.hpp>
 #include <containers/array/array.hpp>
 #include <containers/append.hpp>
 #include <containers/common_container_functions.hpp>
@@ -43,11 +44,11 @@ struct static_vector_data {
 		// Ensure that a move is not more expensive than a copy
 		if constexpr (std::is_trivially_copyable_v<T>) {
 			containers::uninitialized_copy(other, begin());
-		this->m_size = other.m_size;
+			this->m_size = other.m_size;
 		} else {
 			containers::uninitialized_move_destroy(other, begin());
 			this->m_size = std::exchange(other.m_size, 0_bi);
-	}
+		}
 	}
 	constexpr static_vector_data(static_vector_data const & other) {
 		containers::uninitialized_copy(other, begin());
@@ -81,14 +82,8 @@ struct static_vector_data {
 		return ::containers::move_iterator(begin());
 	}
 
-	constexpr auto end() const & {
-		return begin() + m_size;
-	}
-	constexpr auto end() & {
-		return begin() + m_size;
-	}
-	constexpr auto end() && {
-		return std::move(*this).begin() + m_size;
+	constexpr auto size() const {
+		return m_size;
 	}
 
 	constexpr auto & operator=(std::initializer_list<value_type> init) & {
@@ -150,7 +145,7 @@ public:
 	using base::operator[];
 
 	using base::begin;
-	using base::end;
+	using base::size;
 
 	using base::capacity;
 	using base::append_from_capacity;

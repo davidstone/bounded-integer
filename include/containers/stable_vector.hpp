@@ -87,14 +87,8 @@ struct stable_vector {
 	constexpr auto begin() && {
 		return ::containers::move_iterator(begin());
 	}
-	constexpr auto end() const & {
-		return begin() + m_size;
-	}
-	constexpr auto end() & {
-		return begin() + m_size;
-	}
-	constexpr auto end() && {
-		return std::move(*this).begin() + m_size;
+	constexpr auto size() const {
+		return m_size;
 	}
 
 	OPERATORS_BRACKET_SEQUENCE_RANGE_DEFINITIONS

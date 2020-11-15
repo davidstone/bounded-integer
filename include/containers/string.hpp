@@ -51,7 +51,7 @@ public:
 	using base::operator=;
 	
 	using base::begin;
-	using base::end;
+	using base::size;
 
 	using base::operator[];
 	
@@ -61,7 +61,7 @@ public:
 	using base::append_from_capacity;
 	
 	constexpr operator std::basic_string_view<CharT>() const {
-		return {data(*this), static_cast<typename std::basic_string_view<CharT>::size_type>(size(*this))};
+		return {data(*this), static_cast<typename std::basic_string_view<CharT>::size_type>(size())};
 	}
 };
 

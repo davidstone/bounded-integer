@@ -205,14 +205,8 @@ struct small_buffer_optimized_vector {
 		return ::containers::move_iterator(begin());
 	}
 	
-	constexpr auto end() const & {
-		return begin() + size();
-	}
-	constexpr auto end() & {
-		return begin() + size();
-	}
-	constexpr auto end() && {
-		return std::move(*this).begin() + size();
+	constexpr auto size() const {
+		return BOUNDED_CONDITIONAL(is_small(), m_small.size(), m_large.size());
 	}
 
 	OPERATORS_BRACKET_SEQUENCE_RANGE_DEFINITIONS
@@ -247,9 +241,6 @@ struct small_buffer_optimized_vector {
 	}
 
 private:
-	constexpr auto size() const {
-		return BOUNDED_CONDITIONAL(is_small(), m_small.size(), m_large.size());
-	}
 	constexpr auto relocate_to_small() {
 		if (is_small()) {
 			return;
