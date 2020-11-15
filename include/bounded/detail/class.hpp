@@ -158,7 +158,7 @@ struct integer {
 	{
 	}
 
-	template<detail::overlapping_integer<minimum, maximum> T> requires(!detail::bounded_by_range<T, minimum, maximum>)
+	template<detail::overlapping_integer<minimum, maximum> T>
 	constexpr explicit integer(T const & other):
 		integer(
 			::bounded::assume_in_range(
