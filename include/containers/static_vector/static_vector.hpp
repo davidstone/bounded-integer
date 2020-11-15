@@ -44,7 +44,7 @@ struct static_vector_data {
 		this->m_size = other.m_size;
 	}
 	constexpr static_vector_data(static_vector_data const & other) {
-		std::uninitialized_copy(other.begin(), other.end(), begin());
+		containers::uninitialized_copy(other, begin());
 		this->m_size = other.m_size;
 	}
 
