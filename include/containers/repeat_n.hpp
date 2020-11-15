@@ -141,7 +141,7 @@ public:
 	constexpr auto begin() const {
 		return const_iterator(m_size, bounded::construct_return<value_type>);
 	}
-	constexpr auto end() const {
+	static constexpr auto end() {
 		return repeat_n_sentinel();
 	}
 
