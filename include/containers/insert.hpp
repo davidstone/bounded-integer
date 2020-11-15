@@ -11,7 +11,6 @@
 #include <containers/begin_end.hpp>
 #include <containers/mutable_iterator.hpp>
 #include <containers/push_back.hpp>
-#include <containers/repeat_n.hpp>
 #include <containers/reserve_if_reservable.hpp>
 #include <containers/resizable_container.hpp>
 

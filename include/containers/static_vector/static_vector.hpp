@@ -13,7 +13,6 @@
 #include <containers/integer_range.hpp>
 #include <containers/is_iterator_sentinel.hpp>
 #include <containers/pop_back.hpp>
-#include <containers/repeat_n.hpp>
 #include <containers/uninitialized_storage.hpp>
 
 #include <bounded/concepts.hpp>

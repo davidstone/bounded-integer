@@ -13,7 +13,6 @@
 #include <containers/contiguous_iterator.hpp>
 #include <containers/is_iterator.hpp>
 #include <containers/maximum_array_size.hpp>
-#include <containers/repeat_n.hpp>
 #include <containers/uninitialized_storage.hpp>
 
 #include <operators/forward.hpp>

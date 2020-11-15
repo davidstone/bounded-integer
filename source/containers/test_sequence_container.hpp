@@ -7,7 +7,6 @@
 #include <containers/assign.hpp>
 #include <containers/push_back.hpp>
 #include <containers/range_view.hpp>
-#include <containers/repeat_n.hpp>
 #include <containers/reserve_if_reservable.hpp>
 #include <containers/shrink_to_fit.hpp>
 #include <containers/uninitialized_dynamic_array.hpp>
