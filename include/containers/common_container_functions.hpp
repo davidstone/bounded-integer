@@ -12,7 +12,6 @@
 #include <containers/insert.hpp>
 #include <containers/non_modifying_common_container_functions.hpp>
 #include <containers/push_back.hpp>
-#include <containers/resize.hpp>
 
 namespace containers {
 namespace detail {
@@ -24,8 +23,7 @@ namespace common {
 	using ::containers::detail::common::append; \
 	using ::containers::detail::common::insert; \
 	using ::containers::detail::common::assign; \
-	using ::containers::detail::common::clear; \
-	using ::containers::detail::common::resize;
+	using ::containers::detail::common::clear;
 
 }	// namespace common
 

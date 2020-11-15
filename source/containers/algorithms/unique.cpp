@@ -6,6 +6,7 @@
 #include <containers/algorithms/unique.hpp>
 
 #include <containers/erase.hpp>
+#include <containers/repeat_n.hpp>
 #include <containers/vector.hpp>
 
 #include "../../test_assert.hpp"

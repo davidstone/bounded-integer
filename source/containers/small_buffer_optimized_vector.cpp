@@ -5,6 +5,7 @@
 
 #include <containers/small_buffer_optimized_vector.hpp>
 #include <containers/string.hpp>
+#include <containers/resize.hpp>
 
 #include "../test_assert.hpp"
 
@@ -84,15 +85,15 @@ void test_generic(bounded::constant_t<capacity_> const capacity, T const & t, st
 	
 	// TODO: insert(it, it, it) overload
 	auto const old_front = front(copy);
-	resize(copy, capacity);
+	containers::resize(copy, capacity);
 	BOUNDED_TEST(front(copy) == old_front);
 	clear(copy);
-	resize(copy, capacity);
+	containers::resize(copy, capacity);
 	BOUNDED_TEST(front(copy) == T{});
 	BOUNDED_TEST(size(copy) == capacity);
-	resize(copy, 0_bi);
+	containers::resize(copy, 0_bi);
 	BOUNDED_TEST(empty(copy));
-	resize(copy, capacity, t);
+	containers::resize(copy, capacity, t);
 	BOUNDED_TEST(copy == count_arg);
 }
 

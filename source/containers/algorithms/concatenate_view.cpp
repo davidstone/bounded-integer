@@ -7,6 +7,7 @@
 
 #include <containers/array/array.hpp>
 #include <containers/static_vector/static_vector.hpp>
+#include <containers/repeat_n.hpp>
 #include <containers/size.hpp>
 
 namespace {

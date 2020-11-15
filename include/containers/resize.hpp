@@ -28,23 +28,15 @@ constexpr auto resize_impl(auto & container_to_resize, auto const initializer_ra
 	append(container_to_resize, containers::take(initializer_range, remaining));
 }
 
-namespace common {
+} // namespace detail
 
 template<resizable_container Container>
 constexpr auto resize(Container & container_to_resize, auto const count) {
-	resize_impl(container_to_resize, repeat_default_n<typename Container::value_type>(count));
+	::containers::detail::resize_impl(container_to_resize, repeat_default_n<typename Container::value_type>(count));
 }
 template<resizable_container Container>
 constexpr auto resize(Container & container_to_resize, auto const count, typename Container::value_type const & value) {
-	resize_impl(container_to_resize, repeat_n(count, value));
+	::containers::detail::resize_impl(container_to_resize, repeat_n(count, value));
 }
 
-}	// namespace common
-
-using ::containers::detail::common::resize;
-
-}	// namespace detail
-
-using ::containers::detail::common::resize;
-
-}	// namespace containers
+} // namespace containers
