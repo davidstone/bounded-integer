@@ -7,6 +7,7 @@
 #include <containers/assign.hpp>
 #include <containers/clear.hpp>
 #include <containers/insert.hpp>
+#include <containers/push_back.hpp>
 #include <containers/string.hpp>
 #include <containers/resize.hpp>
 
@@ -71,11 +72,11 @@ void test_generic(bounded::constant_t<capacity_> const capacity, T const & t, st
 	BOUNDED_TEST(copy == init_list);
 
 	containers::clear(copy);
-	push_back(copy, t);
+	containers::push_back(copy, t);
 	BOUNDED_TEST(size(copy) == 1_bi);
 	BOUNDED_TEST(back(copy) == t);
 	containers::pop_back(copy);
-	push_back(copy, T(t));
+	containers::push_back(copy, T(t));
 	BOUNDED_TEST(size(copy) == 1_bi);
 	BOUNDED_TEST(back(copy) == t);
 	containers::clear(copy);

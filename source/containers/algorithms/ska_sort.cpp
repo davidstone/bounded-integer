@@ -7,6 +7,7 @@
 #include <containers/algorithms/sort.hpp>
 #include <containers/array/array.hpp>
 #include <containers/array/make_array.hpp>
+#include <containers/push_back.hpp>
 #include <containers/reserve_if_reservable.hpp>
 #include <containers/static_vector/static_vector.hpp>
 #include <containers/string.hpp>

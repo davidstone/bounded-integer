@@ -21,11 +21,11 @@ concept member_push_backable = requires(Container & container, typename Containe
 template<typename Container>
 concept push_backable = member_push_backable<Container> or appendable_from_capacity<Container>;
 
-namespace common {
+} // namespace detail
 
-template<push_backable Container>
+template<detail::push_backable Container>
 constexpr decltype(auto) push_back(Container & container, typename Container::value_type const & value) {
-	if constexpr (member_push_backable<Container>) {
+	if constexpr (detail::member_push_backable<Container>) {
 		container.push_back(value);
 		return back(container);
 	} else {
@@ -35,9 +35,9 @@ constexpr decltype(auto) push_back(Container & container, typename Container::va
 		);
 	}
 }
-template<push_backable Container>
+template<detail::push_backable Container>
 constexpr decltype(auto) push_back(Container & container, typename Container::value_type && value) {
-	if constexpr (member_push_backable<Container>) {
+	if constexpr (detail::member_push_backable<Container>) {
 		container.push_back(std::move(value));
 		return back(container);
 	} else {
@@ -48,12 +48,4 @@ constexpr decltype(auto) push_back(Container & container, typename Container::va
 	}
 }
 
-}	// namespace common
-
-using ::containers::detail::common::push_back;
-
-}	// namespace detail
-
-using ::containers::detail::common::push_back;
-
-}	// namespace containers
+} // namespace containers
