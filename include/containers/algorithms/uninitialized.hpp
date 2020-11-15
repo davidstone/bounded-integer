@@ -62,6 +62,14 @@ constexpr auto uninitialized_copy(InputIterator first, sentinel_for<InputIterato
 	return out;
 }
 
+constexpr auto uninitialized_copy(range auto && input, iterator auto output) {
+	return uninitialized_copy(
+		containers::begin(OPERATORS_FORWARD(input)),
+		containers::end(OPERATORS_FORWARD(input)),
+		output
+	);
+}
+
 
 template<iterator InputIterator>
 constexpr auto uninitialized_move(InputIterator const first, sentinel_for<InputIterator> auto const last, iterator auto const out) {
