@@ -75,11 +75,7 @@ template<typename T>
 constexpr auto dynamic_array_initializer(range auto && init) {
 	auto const data = make_storage<T>(::containers::detail::linear_size(init));
 	try {
-		containers::uninitialized_copy(
-			begin(OPERATORS_FORWARD(init)),
-			end(OPERATORS_FORWARD(init)),
-			data.pointer
-		);
+		containers::uninitialized_copy(OPERATORS_FORWARD(init), data.pointer);
 	} catch(...) {
 		deallocate_storage(data);
 		throw;

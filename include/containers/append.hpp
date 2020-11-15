@@ -54,11 +54,7 @@ constexpr auto append(Container & output, range auto && input) -> void {
 		}
 	}
 	if constexpr (appendable_from_capacity<Container> and (!reservable<Container> or reserve_space)) {
-		auto const new_end = containers::uninitialized_copy(
-			begin(OPERATORS_FORWARD(input)),
-			end(OPERATORS_FORWARD(input)),
-			end(output)
-		);
+		auto const new_end = containers::uninitialized_copy(OPERATORS_FORWARD(input), end(output));
 		output.append_from_capacity(new_end - end(output));
 	} else if constexpr (member_insertable<Container, decltype(input)> and std::is_move_constructible_v<typename Container::value_type> and std::is_move_assignable_v<typename Container::value_type>) {
 		output.insert(end(output), begin(OPERATORS_FORWARD(input)), end(OPERATORS_FORWARD(input)));
