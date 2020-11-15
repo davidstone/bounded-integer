@@ -147,7 +147,7 @@ template<typename Container>
 constexpr bool test_assign(auto const & source) {
 	if constexpr (containers::resizable_container<Container>) {
 		auto container = Container();
-		assign(container, source);
+		containers::assign(container, source);
 		BOUNDED_ASSERT(containers::equal(container, source));
 		return true;
 	} else {

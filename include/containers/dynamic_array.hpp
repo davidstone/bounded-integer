@@ -9,6 +9,7 @@
 #include <containers/algorithms/copy.hpp>
 #include <containers/algorithms/distance.hpp>
 #include <containers/algorithms/uninitialized.hpp>
+#include <containers/assign.hpp>
 #include <containers/common_container_functions.hpp>
 #include <containers/contiguous_iterator.hpp>
 #include <containers/is_iterator.hpp>
@@ -87,6 +88,36 @@ constexpr auto dynamic_array_initializer(range auto && init) {
 }	// namespace detail
 
 template<typename T>
+struct dynamic_array;
+
+template<typename T>
+constexpr void clear(dynamic_array<T> & value) {
+	value = {};
+}
+
+namespace detail {
+
+template<typename>
+inline constexpr bool is_initializer_list = false;
+
+template<typename T>
+inline constexpr bool is_initializer_list<std::initializer_list<T>> = true;
+
+} // namespace detail
+
+
+template<typename T, range Range> requires(!detail::is_initializer_list<std::decay_t<Range>>)
+constexpr auto assign(dynamic_array<T> & container, Range && range) {
+	auto const difference = detail::linear_size(range);
+	if (difference == size(container)) {
+		::containers::copy(begin(OPERATORS_FORWARD(range)), end(OPERATORS_FORWARD(range)), begin(container));
+	} else {
+		clear(container);
+		container = dynamic_array<T>(OPERATORS_FORWARD(range));
+	}
+}
+
+template<typename T>
 struct dynamic_array {
 	using value_type = T;
 	using size_type = typename detail::dynamic_array_data<value_type>::size_type;
@@ -122,7 +153,7 @@ struct dynamic_array {
 	}
 
 	constexpr auto & operator=(dynamic_array const & other) & {
-		assign(*this, other);
+		containers::assign(*this, other);
 		return *this;
 	}
 	constexpr auto & operator=(dynamic_array && other) & noexcept {
@@ -151,32 +182,5 @@ struct dynamic_array {
 private:
 	detail::dynamic_array_data<value_type> m_data = {};
 };
-
-template<typename T>
-constexpr void clear(dynamic_array<T> & value) {
-	value = {};
-}
-
-namespace detail {
-
-template<typename>
-inline constexpr bool is_initializer_list = false;
-
-template<typename T>
-inline constexpr bool is_initializer_list<std::initializer_list<T>> = true;
-
-} // namespace detail
-
-
-template<typename T, range Range> requires(!detail::is_initializer_list<std::decay_t<Range>>)
-constexpr auto assign(dynamic_array<T> & container, Range && range) {
-	auto const difference = detail::linear_size(range);
-	if (difference == size(container)) {
-		::containers::copy(begin(OPERATORS_FORWARD(range)), end(OPERATORS_FORWARD(range)), begin(container));
-	} else {
-		clear(container);
-		container = dynamic_array<T>(OPERATORS_FORWARD(range));
-	}
-}
 
 } // namespace containers

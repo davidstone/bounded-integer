@@ -5,6 +5,7 @@
 
 #pragma once
 
+#include <containers/assign.hpp>
 #include <containers/common_container_functions.hpp>
 #include <containers/contiguous_iterator.hpp>
 #include <containers/maximum_array_size.hpp>
@@ -108,7 +109,7 @@ private:
 			BOUNDED_ASSERT(m_size == 0_bi);
 			m_storage = storage_type(capacity());
 		}
-		assign(*this, other);
+		containers::assign(*this, other);
 	}
 	using storage_type = uninitialized_dynamic_array<T, decltype(capacity())>;
 	storage_type m_storage{capacity()};

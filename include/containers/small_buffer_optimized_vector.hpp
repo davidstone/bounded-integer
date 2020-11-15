@@ -6,6 +6,7 @@
 #pragma once
 
 #include <containers/array/array.hpp>
+#include <containers/assign.hpp>
 #include <containers/common_container_functions.hpp>
 #include <containers/contiguous_iterator.hpp>
 #include <containers/dynamic_array.hpp>
@@ -171,7 +172,7 @@ struct small_buffer_optimized_vector {
 	}
 
 	constexpr auto & operator=(small_buffer_optimized_vector const & other) & {
-		assign(*this, other);
+		containers::assign(*this, other);
 		return *this;
 	}
 	constexpr auto & operator=(small_buffer_optimized_vector && other) & noexcept {
@@ -182,7 +183,7 @@ struct small_buffer_optimized_vector {
 	}
 
 	constexpr auto & operator=(std::initializer_list<value_type> init) & {
-		assign(*this, init);
+		containers::assign(*this, init);
 		return *this;
 	}
 

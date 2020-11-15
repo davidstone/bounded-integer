@@ -17,8 +17,6 @@
 #include <initializer_list>
 
 namespace containers {
-namespace detail {
-namespace common {
 
 constexpr void assign(resizable_container auto & destination, range auto && source) {
 	auto it = begin(destination);
@@ -39,12 +37,4 @@ constexpr void assign(Container & destination, std::initializer_list<typename Co
 	assign(destination, range_view(init));
 }
 
-}	// namespace common
-
-using ::containers::detail::common::assign;
-
-}	// namespace detail
-
-using ::containers::detail::common::assign;
-
-}	// namespace containers
+} // namespace containers

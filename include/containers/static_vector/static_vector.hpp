@@ -9,6 +9,7 @@
 #include <containers/algorithms/uninitialized.hpp>
 #include <containers/array/array.hpp>
 #include <containers/append.hpp>
+#include <containers/assign.hpp>
 #include <containers/common_container_functions.hpp>
 #include <containers/contiguous_iterator.hpp>
 #include <containers/integer_range.hpp>
@@ -56,11 +57,11 @@ struct static_vector_data {
 	}
 
 	constexpr auto & operator=(static_vector_data && other) & noexcept(std::is_nothrow_move_assignable_v<T> and std::is_nothrow_move_constructible_v<T>) {
-		assign(*this, std::move(other));
+		containers::assign(*this, std::move(other));
 		return *this;
 	}
 	constexpr auto & operator=(static_vector_data const & other) & {
-		assign(*this, other);
+		containers::assign(*this, other);
 		return *this;
 	}
 
@@ -87,7 +88,7 @@ struct static_vector_data {
 	}
 
 	constexpr auto & operator=(std::initializer_list<value_type> init) & {
-		assign(*this, init);
+		containers::assign(*this, init);
 		return *this;
 	}
 

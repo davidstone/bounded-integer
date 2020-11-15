@@ -7,7 +7,6 @@
 
 #include <containers/algorithms/compare.hpp>
 #include <containers/append.hpp>
-#include <containers/assign.hpp>
 #include <containers/clear.hpp>
 #include <containers/insert.hpp>
 #include <containers/non_modifying_common_container_functions.hpp>
@@ -22,7 +21,6 @@ namespace common {
 	using ::containers::detail::common::push_back; \
 	using ::containers::detail::common::append; \
 	using ::containers::detail::common::insert; \
-	using ::containers::detail::common::assign; \
 	using ::containers::detail::common::clear;
 
 }	// namespace common
