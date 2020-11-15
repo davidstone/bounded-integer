@@ -11,6 +11,7 @@
 #include <containers/algorithms/unique.hpp>
 #include <containers/append.hpp>
 #include <containers/common_container_functions.hpp>
+#include <containers/compare_container.hpp>
 #include <containers/insert.hpp>
 #include <containers/erase.hpp>
 #include <containers/legacy_iterator.hpp>
@@ -118,7 +119,7 @@ concept extract_key_function = requires(ExtractKey const & extract_key, T const 
 // compile-time checks.
 
 template<typename Container, extract_key_function<typename Container::value_type::key_type> ExtractKey, bool allow_duplicates>
-struct flat_map_base {
+struct flat_map_base : private lexicographical_comparison::base {
 private:
 	Container m_container;
 	[[no_unique_address]] ExtractKey m_extract_key;

@@ -8,6 +8,7 @@
 #include <containers/append.hpp>
 #include <containers/assign.hpp>
 #include <containers/common_container_functions.hpp>
+#include <containers/compare_container.hpp>
 #include <containers/contiguous_iterator.hpp>
 #include <containers/maximum_array_size.hpp>
 #include <containers/uninitialized_dynamic_array.hpp>
@@ -23,7 +24,7 @@ namespace containers {
 // See https://probablydance.com/2013/05/13/4gb-per-vector/
 // TODO: ensure proper exception safety
 template<typename T, std::size_t capacity_>
-struct stable_vector {
+struct stable_vector : private lexicographical_comparison::base {
 	using value_type = T;
 	using size_type = bounded::integer<0, bounded::detail::normalize<capacity_>>;
 	

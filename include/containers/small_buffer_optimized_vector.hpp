@@ -9,6 +9,7 @@
 #include <containers/append.hpp>
 #include <containers/assign.hpp>
 #include <containers/common_container_functions.hpp>
+#include <containers/compare_container.hpp>
 #include <containers/contiguous_iterator.hpp>
 #include <containers/dynamic_array.hpp>
 #include <containers/scope_guard.hpp>
@@ -43,7 +44,7 @@ inline constexpr auto minimum_small_capacity = (bounded::size_of<std::pair<typen
 } // namespace detail
 
 template<typename T, std::size_t requested_small_capacity>
-struct small_buffer_optimized_vector {
+struct small_buffer_optimized_vector : private lexicographical_comparison::base {
 	using value_type = T;
 
 	struct small_t {

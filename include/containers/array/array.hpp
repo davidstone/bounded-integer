@@ -86,6 +86,8 @@ struct array {
 
 	OPERATORS_BRACKET_SEQUENCE_RANGE_DEFINITIONS
 
+	friend auto operator<=>(array const &, array const &) = default;
+
 	// Consider this private. It must be public for the class to be an
 	// aggregate
 	[[no_unique_address]] detail::array_type<value_type, size_> m_value;

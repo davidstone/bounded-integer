@@ -11,6 +11,7 @@
 #include <containers/algorithms/uninitialized.hpp>
 #include <containers/assign.hpp>
 #include <containers/common_container_functions.hpp>
+#include <containers/compare_container.hpp>
 #include <containers/contiguous_iterator.hpp>
 #include <containers/is_iterator.hpp>
 #include <containers/maximum_array_size.hpp>
@@ -118,7 +119,7 @@ constexpr auto assign(dynamic_array<T> & container, Range && range) {
 }
 
 template<typename T>
-struct dynamic_array {
+struct dynamic_array : private lexicographical_comparison::base {
 	using value_type = T;
 	using size_type = typename detail::dynamic_array_data<value_type>::size_type;
 

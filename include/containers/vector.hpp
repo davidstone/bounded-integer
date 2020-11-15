@@ -8,6 +8,7 @@
 #include <containers/append.hpp>
 #include <containers/assign.hpp>
 #include <containers/common_container_functions.hpp>
+#include <containers/compare_container.hpp>
 #include <containers/contiguous_iterator.hpp>
 #include <containers/maximum_array_size.hpp>
 #include <containers/uninitialized_dynamic_array.hpp>
@@ -22,7 +23,7 @@
 namespace containers {
 
 template<typename T>
-struct vector {
+struct vector : private lexicographical_comparison::base {
 	using value_type = T;
 	using size_type = detail::array_size_type<T>;
 

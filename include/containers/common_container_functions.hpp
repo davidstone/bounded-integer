@@ -5,7 +5,6 @@
 
 #pragma once
 
-#include <containers/algorithms/compare.hpp>
 #include <containers/non_modifying_common_container_functions.hpp>
 
 namespace containers {

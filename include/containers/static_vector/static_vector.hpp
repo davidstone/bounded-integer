@@ -11,6 +11,7 @@
 #include <containers/append.hpp>
 #include <containers/assign.hpp>
 #include <containers/common_container_functions.hpp>
+#include <containers/compare_container.hpp>
 #include <containers/contiguous_iterator.hpp>
 #include <containers/integer_range.hpp>
 #include <containers/is_iterator_sentinel.hpp>
@@ -25,7 +26,7 @@ namespace containers {
 namespace detail {
 
 template<typename T, std::size_t capacity_, bool = std::is_trivially_destructible_v<T>>
-struct static_vector_data {
+struct static_vector_data : private lexicographical_comparison::base {
 	using value_type = T;
 	using size_type = bounded::integer<
 		0,
