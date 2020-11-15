@@ -11,6 +11,7 @@
 #include <containers/begin_end.hpp>
 #include <containers/mutable_iterator.hpp>
 #include <containers/push_back.hpp>
+#include <containers/range_view.hpp>
 #include <containers/reserve_if_reservable.hpp>
 #include <containers/resizable_container.hpp>
 
@@ -90,29 +91,21 @@ constexpr auto emplace(Container & container, typename Container::const_iterator
 
 // TODO: exception safety
 // TODO: Check if the range lies within the container
-// TODO: Return an iterator to the first element inserted
 template<resizable_container Container, range Range = std::initializer_list<typename Container::value_type>> requires bounded::convertible_to<typename Container::value_type, typename Range::value_type>
 constexpr auto insert(Container & container, typename Container::const_iterator position, Range && range) {
 	BOUNDED_ASSERT(iterator_points_into_container(container, position));
-	if (position == end(container)) {
-		append(container, OPERATORS_FORWARD(range));
-		return;
-	}
-
 	auto const range_size = ::containers::detail::linear_size(range);
 	if (size(container) + range_size <= container.capacity()) {
-		auto const distance_to_end = typename Container::size_type(end(container) - position, bounded::non_check);
 		auto const mutable_position = ::containers::detail::mutable_iterator(container, position);
-		::containers::uninitialized_move_backward(mutable_position, end(container), end(container) + range_size);
-		auto const first = begin(OPERATORS_FORWARD(range));
-		// TODO: use a view over a counted iterator
-		auto const remainder = ::containers::copy_n(first, bounded::min(range_size, distance_to_end), mutable_position);
-		auto const last = end(OPERATORS_FORWARD(range));
-		::containers::uninitialized_copy(remainder.input, last, remainder.output);
+		::containers::uninitialized_move_destroy(
+			containers::reversed(range_view(mutable_position, end(container))),
+			containers::reverse_iterator(end(container) + range_size)
+		);
+		::containers::uninitialized_copy(OPERATORS_FORWARD(range), position);
 		container.append_from_capacity(range_size);
-		// return mutable_position;
+		return mutable_position;
 	} else if constexpr (reservable<Container>) {
-		insert_or_emplace_with_reallocation(container, position, range_size, [&](auto const ptr) {
+		return insert_or_emplace_with_reallocation(container, position, range_size, [&](auto const ptr) {
 			::containers::uninitialized_copy(OPERATORS_FORWARD(range), ptr);
 		});
 	} else {
