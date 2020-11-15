@@ -20,7 +20,8 @@ namespace common {
 
 #define CONTAINERS_NON_MODIFYING_COMMON_USING_DECLARATIONS \
 	BOUNDED_COMMON_ARITHMETIC \
-	CONTAINERS_COMMON_BEGIN_END_USING_DECLARATIONS \
+	using ::containers::begin; \
+	using ::containers::end; \
 	using ::containers::detail::common::data; \
 	using ::containers::detail::common::at; \
 	using ::containers::detail::common::front; \

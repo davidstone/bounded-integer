@@ -6,6 +6,7 @@
 #pragma once
 
 #include <containers/algorithms/move_iterator.hpp>
+#include <containers/contiguous_iterator.hpp>
 
 #include <operators/forward.hpp>
 #include <bounded/integer.hpp>
@@ -15,43 +16,67 @@
 
 namespace containers {
 namespace detail {
-namespace common {
 
-template<typename Return, typename T>
-void rvalue_ref_qualified(Return (T::*)() &&);
+template<typename Range>
+concept has_member_begin = requires(Range range) {
+	OPERATORS_FORWARD(range).begin();
+};
 
-#define CONTAINERS_DETAIL_BEGIN_END_OVERLOADS(begin_or_end) \
-\
-using std::begin_or_end; \
-\
-\
-template<typename T> \
-concept has_rvalue_ ## begin_or_end = requires { rvalue_ref_qualified(&T::begin_or_end); }; \
-\
-\
-template<typename Range> requires( \
-	std::is_rvalue_reference_v<Range &&> and \
-	has_rvalue_ ## begin_or_end<Range> \
-) \
-constexpr auto begin_or_end(Range && range) { \
-	return std::move(range).begin_or_end(); \
+template<typename Range>
+concept beginable = std::is_array_v<std::remove_reference_t<Range>> or has_member_begin<Range>;
+
+} // namespace detail
+
+template<detail::beginable Range>
+constexpr auto begin(Range && range) {
+	if constexpr (detail::has_member_begin<Range>) {
+		return OPERATORS_FORWARD(range).begin();
+	} else {
+		static_assert(std::is_array_v<std::remove_reference_t<Range>>);
+		auto const base = contiguous_iterator(std::begin(range));
+		if constexpr (std::is_rvalue_reference_v<Range>) {
+			return move_iterator(base);
+		} else {
+			return base;
+		}
+	}
 }
 
-CONTAINERS_DETAIL_BEGIN_END_OVERLOADS(begin)
-CONTAINERS_DETAIL_BEGIN_END_OVERLOADS(end)
+namespace detail {
 
+template<typename Range>
+concept has_member_end = requires(Range range) {
+	OPERATORS_FORWARD(range).end();
+};
 
+template<typename Range>
+concept has_member_size = requires(Range const & range) {
+	range.size();
+};
 
-#define CONTAINERS_COMMON_BEGIN_END_USING_DECLARATIONS \
-	using ::containers::detail::common::begin; \
-	using ::containers::detail::common::end;
+template<typename Range>
+concept endable =
+	std::is_array_v<std::remove_reference_t<Range>> or
+	has_member_end<Range> or
+	(has_member_begin<Range> and has_member_size<Range>);
 
-}	// namespace common
+} // namespace detail
 
-CONTAINERS_COMMON_BEGIN_END_USING_DECLARATIONS
+template<detail::endable Range>
+constexpr auto end(Range && range) {
+	if constexpr (detail::has_member_end<Range>) {
+		return OPERATORS_FORWARD(range).end();
+	} else if constexpr (detail::has_member_begin<Range> and detail::has_member_size<Range>) {
+		return OPERATORS_FORWARD(range).begin() + range.size();
+	} else {
+		static_assert(std::is_array_v<std::remove_reference_t<Range>>);
+		auto const base = contiguous_iterator(std::end(range));
+		if constexpr (std::is_rvalue_reference_v<Range>) {
+			return move_iterator(base);
+		} else {
+			return base;
+		}
+	}
+}
 
-}	// namespace detail
-
-CONTAINERS_COMMON_BEGIN_END_USING_DECLARATIONS
-
-}	// namespace containers
+} // namespace containers

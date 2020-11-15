@@ -15,9 +15,6 @@ namespace containers {
 namespace detail {
 
 template<typename Range>
-concept has_member_size = requires(Range const & range) { range.size(); };
-
-template<typename Range>
 concept random_access_range = requires(Range const & range) {
 	static_cast<typename Range::size_type>(end(range) - begin(range));
 };
