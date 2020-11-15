@@ -112,7 +112,7 @@ constexpr auto assign(dynamic_array<T> & container, Range && range) {
 	if (difference == size(container)) {
 		::containers::copy(begin(OPERATORS_FORWARD(range)), end(OPERATORS_FORWARD(range)), begin(container));
 	} else {
-		clear(container);
+		containers::clear(container);
 		container = dynamic_array<T>(OPERATORS_FORWARD(range));
 	}
 }

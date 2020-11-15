@@ -5,6 +5,7 @@
 
 #include <containers/small_buffer_optimized_vector.hpp>
 #include <containers/assign.hpp>
+#include <containers/clear.hpp>
 #include <containers/insert.hpp>
 #include <containers/string.hpp>
 #include <containers/resize.hpp>
@@ -53,7 +54,7 @@ void test_generic(bounded::constant_t<capacity_> const capacity, T const & t, st
 	BOUNDED_TEST(containers::equal(copy, init));
 	
 	auto move = std::move(copy);
-	clear(copy);
+	containers::clear(copy);
 	BOUNDED_TEST(move == init_list);
 	
 	copy = move;
@@ -61,7 +62,7 @@ void test_generic(bounded::constant_t<capacity_> const capacity, T const & t, st
 	BOUNDED_TEST(copy == move);
 	
 	move = std::move(copy);
-	clear(copy);
+	containers::clear(copy);
 	BOUNDED_TEST(empty(copy));
 	
 	BOUNDED_TEST(copy == default_constructed);
@@ -69,7 +70,7 @@ void test_generic(bounded::constant_t<capacity_> const capacity, T const & t, st
 	copy = init;
 	BOUNDED_TEST(copy == init_list);
 
-	clear(copy);
+	containers::clear(copy);
 	push_back(copy, t);
 	BOUNDED_TEST(size(copy) == 1_bi);
 	BOUNDED_TEST(back(copy) == t);
@@ -77,7 +78,7 @@ void test_generic(bounded::constant_t<capacity_> const capacity, T const & t, st
 	push_back(copy, T(t));
 	BOUNDED_TEST(size(copy) == 1_bi);
 	BOUNDED_TEST(back(copy) == t);
-	clear(copy);
+	containers::clear(copy);
 	containers::insert(copy, begin(copy), t);
 	BOUNDED_TEST(size(copy) == 1_bi);
 	BOUNDED_TEST(back(copy) == t);
@@ -89,7 +90,7 @@ void test_generic(bounded::constant_t<capacity_> const capacity, T const & t, st
 	auto const old_front = front(copy);
 	containers::resize(copy, capacity);
 	BOUNDED_TEST(front(copy) == old_front);
-	clear(copy);
+	containers::clear(copy);
 	containers::resize(copy, capacity);
 	BOUNDED_TEST(front(copy) == T{});
 	BOUNDED_TEST(size(copy) == capacity);
