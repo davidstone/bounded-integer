@@ -10,6 +10,7 @@
 #include <containers/algorithms/ska_sort.hpp>
 #include <containers/algorithms/unique.hpp>
 #include <containers/common_container_functions.hpp>
+#include <containers/erase.hpp>
 #include <containers/legacy_iterator.hpp>
 #include <containers/vector.hpp>
 
@@ -357,8 +358,7 @@ public:
 				end(),
 				compare()
 			);
-			using containers::erase;
-			erase(m_container, position, end());
+			containers::erase(m_container, position, end());
 		}
 	}
 	

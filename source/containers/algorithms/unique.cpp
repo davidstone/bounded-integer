@@ -5,6 +5,7 @@
 
 #include <containers/algorithms/unique.hpp>
 
+#include <containers/erase.hpp>
 #include <containers/vector.hpp>
 
 #include "../../test_assert.hpp"
@@ -83,7 +84,7 @@ template<typename Container>
 constexpr void test_unique_copy_less(Container const & source, Container const & expected) {
 	auto destination = Container(containers::repeat_n(containers::size(source), 0));
 	auto const it = containers::unique_copy_less(begin(source), end(source), begin(destination));
-	erase(destination, it, end(destination));
+	containers::erase(destination, it, end(destination));
 	BOUNDED_TEST(destination == expected);
 }
 
@@ -99,7 +100,7 @@ template<typename Container>
 constexpr void test_unique_merge_copy(Container const & lhs, Container const & rhs, Container const & expected) {
 	auto result = Container(containers::repeat_n(typename Container::size_type(containers::size(lhs) + containers::size(rhs)), 0));
 	auto const it = containers::unique_merge_copy(begin(lhs), end(lhs), begin(rhs), end(rhs), begin(result));
-	erase(result, it, end(result));
+	containers::erase(result, it, end(result));
 
 	BOUNDED_TEST(result == expected);
 }
@@ -114,7 +115,7 @@ constexpr void test_unique_inplace_merge(Container && v, Container const & other
 	auto const midpoint = static_cast<typename std::iterator_traits<iterator>::difference_type>(containers::size(v));
 	append(v, other);
 	auto const it = containers::unique_inplace_merge(begin(v), begin(v) + midpoint, end(v));
-	erase(v, it, end(v));
+	containers::erase(v, it, end(v));
 
 	BOUNDED_TEST(v == expected);
 }

@@ -19,8 +19,6 @@
 #include <utility>
 
 namespace containers {
-namespace detail {
-namespace common {
 
 template<iterator Iterator>
 constexpr auto erase(resizable_container auto & source, Iterator const first_, Iterator const last_) {
@@ -43,15 +41,4 @@ constexpr auto erase_if(resizable_container auto & source, auto predicate) {
 	return erase(source, ::containers::remove_if(source, std::move(predicate)), end(source));
 }
 
-
-}	// namespace common
-
-using ::containers::detail::common::erase;
-using ::containers::detail::common::erase_if;
-
-}	// namespace detail
-
-using ::containers::detail::common::erase;
-using ::containers::detail::common::erase_if;
-
-}	// namespace containers
+} // namespace containers
