@@ -33,7 +33,7 @@ constexpr auto concatenate_prepend_append(Result & result, typename Result::iter
 			return;
 		}
 	}
-	auto const next_it = ::containers::uninitialized_copy(begin(OPERATORS_FORWARD(range)), end(OPERATORS_FORWARD(range)), it);
+	auto const next_it = ::containers::uninitialized_copy(OPERATORS_FORWARD(range), it);
 	::containers::detail::concatenate_prepend_append(result, next_it, OPERATORS_FORWARD(ranges)...);
 }
 
