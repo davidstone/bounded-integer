@@ -29,16 +29,16 @@ concept member_insertable = requires(Container & container, Range && range) {
 template<typename Container>
 concept lazy_push_backable = requires(Container & container, typename Container::value_type (&constructor)()) { lazy_push_back(container, constructor); };
 
-namespace common {
+} // namespace detail
 
 // I would like to return an iterator to the start of the appended range, but
 // that does not seem possible to do efficiently in general due to potential
 // iterator instability.
-template<push_backable Container>
+template<detail::push_backable Container>
 constexpr auto append(Container & output, range auto && input) -> void {
 	// TODO: Define InputRange and ForwardRange concepts
 	using iterator_category = typename std::iterator_traits<decltype(begin(input))>::iterator_category;
-	constexpr auto reserve_space = std::is_convertible_v<iterator_category, std::forward_iterator_tag> and reservable<Container>;
+	constexpr auto reserve_space = std::is_convertible_v<iterator_category, std::forward_iterator_tag> and detail::reservable<Container>;
 	if constexpr (reserve_space) {
 		auto const input_size = [&] {
 			auto const value = size(input);
@@ -48,17 +48,17 @@ constexpr auto append(Container & output, range auto && input) -> void {
 				return typename Container::size_type(value);
 			}
 		}();
-		auto const offset = linear_size(output);
+		auto const offset = ::containers::detail::linear_size(output);
 		if (offset + input_size > output.capacity()) {
 			::containers::detail::growth_reallocation(output, input_size);
 		}
 	}
-	if constexpr (appendable_from_capacity<Container> and (!reservable<Container> or reserve_space)) {
+	if constexpr (detail::appendable_from_capacity<Container> and (!detail::reservable<Container> or reserve_space)) {
 		auto const new_end = containers::uninitialized_copy(OPERATORS_FORWARD(input), end(output));
 		output.append_from_capacity(new_end - end(output));
-	} else if constexpr (member_insertable<Container, decltype(input)> and std::is_move_constructible_v<typename Container::value_type> and std::is_move_assignable_v<typename Container::value_type>) {
+	} else if constexpr (detail::member_insertable<Container, decltype(input)> and std::is_move_constructible_v<typename Container::value_type> and std::is_move_assignable_v<typename Container::value_type>) {
 		output.insert(end(output), begin(OPERATORS_FORWARD(input)), end(OPERATORS_FORWARD(input)));
-	} else if constexpr (lazy_push_backable<Container>) {
+	} else if constexpr (detail::lazy_push_backable<Container>) {
 		auto const last = end(OPERATORS_FORWARD(input));
 		for (auto it = begin(OPERATORS_FORWARD(input)); it != last; ++it) {
 			lazy_push_back(output, [&] { return *it; });
@@ -70,12 +70,4 @@ constexpr auto append(Container & output, range auto && input) -> void {
 	}
 }
 
-}	// namespace common
-
-using ::containers::detail::common::append;
-
-}	// namespace detail
-
-using ::containers::detail::common::append;
-
-}	// namespace containers
+} // namespace containers

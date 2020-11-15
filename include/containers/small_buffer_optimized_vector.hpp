@@ -6,6 +6,7 @@
 #pragma once
 
 #include <containers/array/array.hpp>
+#include <containers/append.hpp>
 #include <containers/assign.hpp>
 #include <containers/common_container_functions.hpp>
 #include <containers/contiguous_iterator.hpp>
@@ -150,19 +151,19 @@ struct small_buffer_optimized_vector {
 	constexpr explicit small_buffer_optimized_vector(Range && source):
 		small_buffer_optimized_vector()
 	{
-		append(*this, OPERATORS_FORWARD(source));
+		::containers::append(*this, OPERATORS_FORWARD(source));
 	}
 	
 	constexpr small_buffer_optimized_vector(std::initializer_list<value_type> init):
 		small_buffer_optimized_vector()
 	{
-		append(*this, init);
+		::containers::append(*this, init);
 	}
 
 	constexpr small_buffer_optimized_vector(small_buffer_optimized_vector const & other):
 		small_buffer_optimized_vector()
 	{
-		append(*this, other);
+		::containers::append(*this, other);
 	}
 
 	constexpr small_buffer_optimized_vector(small_buffer_optimized_vector && other) noexcept:

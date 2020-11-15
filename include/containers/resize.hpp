@@ -25,7 +25,7 @@ constexpr auto resize_impl(auto & container_to_resize, auto const initializer_ra
 		pop_back(container_to_resize);
 	}
 	auto const remaining = size(initializer_range) - size(container_to_resize);
-	append(container_to_resize, containers::take(initializer_range, remaining));
+	::containers::append(container_to_resize, containers::take(initializer_range, remaining));
 }
 
 } // namespace detail

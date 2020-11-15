@@ -6,7 +6,6 @@
 #pragma once
 
 #include <containers/algorithms/compare.hpp>
-#include <containers/append.hpp>
 #include <containers/non_modifying_common_container_functions.hpp>
 #include <containers/push_back.hpp>
 
@@ -16,8 +15,7 @@ namespace common {
 
 #define CONTAINERS_COMMON_USING_DECLARATIONS \
 	CONTAINERS_NON_MODIFYING_COMMON_USING_DECLARATIONS \
-	using ::containers::detail::common::push_back; \
-	using ::containers::detail::common::append;
+	using ::containers::detail::common::push_back;
 
 }	// namespace common
 

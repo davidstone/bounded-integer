@@ -5,6 +5,7 @@
 
 #pragma once
 
+#include <containers/append.hpp>
 #include <containers/assign.hpp>
 #include <containers/common_container_functions.hpp>
 #include <containers/contiguous_iterator.hpp>

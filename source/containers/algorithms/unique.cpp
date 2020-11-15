@@ -5,6 +5,7 @@
 
 #include <containers/algorithms/unique.hpp>
 
+#include <containers/append.hpp>
 #include <containers/erase.hpp>
 #include <containers/repeat_n.hpp>
 #include <containers/vector.hpp>
@@ -114,7 +115,7 @@ template<typename Container>
 constexpr void test_unique_inplace_merge(Container && v, Container const & other, Container const & expected) {
 	using iterator = typename Container::iterator;
 	auto const midpoint = static_cast<typename std::iterator_traits<iterator>::difference_type>(containers::size(v));
-	append(v, other);
+	containers::append(v, other);
 	auto const it = containers::unique_inplace_merge(begin(v), begin(v) + midpoint, end(v));
 	containers::erase(v, it, end(v));
 

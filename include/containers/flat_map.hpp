@@ -9,6 +9,7 @@
 #include <containers/algorithms/negate.hpp>
 #include <containers/algorithms/ska_sort.hpp>
 #include <containers/algorithms/unique.hpp>
+#include <containers/append.hpp>
 #include <containers/common_container_functions.hpp>
 #include <containers/insert.hpp>
 #include <containers/erase.hpp>
@@ -341,7 +342,7 @@ public:
 		// merge sort on both ranges, rather than calling std::sort on the
 		// entire container.
 		auto const original_size = size(m_container);
-		append(m_container, OPERATORS_FORWARD(init));
+		::containers::append(m_container, OPERATORS_FORWARD(init));
 		auto const midpoint = begin() + original_size;
 
 		ska_sort(midpoint, end(), extract_key());

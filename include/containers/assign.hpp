@@ -29,8 +29,8 @@ constexpr void assign(resizable_container auto & destination, range auto && sour
 		*it = *first;
 		++it;
 	}
-	erase(destination, it, end(destination));
-	append(destination, range_view(first, last));
+	::containers::erase(destination, it, end(destination));
+	::containers::append(destination, range_view(first, last));
 }
 template<resizable_container Container>
 constexpr void assign(Container & destination, std::initializer_list<typename Container::value_type> init) {
