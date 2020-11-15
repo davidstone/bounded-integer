@@ -40,8 +40,14 @@ struct static_vector_data {
 	static_vector_data & operator=(static_vector_data const &) & requires std::is_trivially_copy_assignable_v<T> = default;
 
 	constexpr static_vector_data(static_vector_data && other) noexcept(std::is_nothrow_move_constructible_v<T>) {
-		std::uninitialized_move(other.begin(), other.end(), begin());
+		// Ensure that a move is not more expensive than a copy
+		if constexpr (std::is_trivially_copyable_v<T>) {
+			containers::uninitialized_copy(other, begin());
 		this->m_size = other.m_size;
+		} else {
+			containers::uninitialized_move_destroy(other, begin());
+			this->m_size = std::exchange(other.m_size, 0_bi);
+	}
 	}
 	constexpr static_vector_data(static_vector_data const & other) {
 		containers::uninitialized_copy(other, begin());
