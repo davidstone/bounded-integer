@@ -53,25 +53,25 @@ using array_type = typename array_trait<size>::template type<T>;
 
 }	// namespace detail
 
-template<typename T, std::size_t size, std::size_t... sizes>
+template<typename T, std::size_t size_, std::size_t... sizes>
 struct array {
-	static_assert(size <= static_cast<std::size_t>(bounded::max_value<std::ptrdiff_t>));
+	static_assert(size_ <= static_cast<std::size_t>(bounded::max_value<std::ptrdiff_t>));
 	using value_type = typename detail::array_value_type<T, sizes...>::type;
 
-	using size_type = bounded::constant_t<bounded::detail::normalize<size>>;
+	using size_type = bounded::constant_t<bounded::detail::normalize<size_>>;
 	
-	using const_iterator = contiguous_iterator<value_type const, static_cast<std::ptrdiff_t>(size)>;
-	using iterator = contiguous_iterator<value_type, static_cast<std::ptrdiff_t>(size)>;
+	using const_iterator = contiguous_iterator<value_type const, static_cast<std::ptrdiff_t>(size_)>;
+	using iterator = contiguous_iterator<value_type, static_cast<std::ptrdiff_t>(size_)>;
 
 	constexpr auto begin() const & {
-		if constexpr (size != 0) {
+		if constexpr (size() != 0) {
 			return const_iterator(m_value);
 		} else {
 			return const_iterator();
 		}
 	}
 	constexpr auto begin() & {
-		if constexpr (size != 0) {
+		if constexpr (size() != 0) {
 			return iterator(m_value);
 		} else {
 			return iterator();
@@ -80,21 +80,15 @@ struct array {
 	constexpr auto begin() && {
 		return ::containers::move_iterator(begin());
 	}
-	constexpr auto end() const & {
-		return begin() + bounded::constant<size>;
-	}
-	constexpr auto end() & {
-		return begin() + bounded::constant<size>;
-	}
-	constexpr auto end() && {
-		return std::move(*this).begin() + bounded::constant<size>;
+	static constexpr auto size() {
+		return bounded::constant<size_>;
 	}
 
 	OPERATORS_BRACKET_SEQUENCE_RANGE_DEFINITIONS
 
 	// Consider this private. It must be public for the class to be an
 	// aggregate
-	[[no_unique_address]] detail::array_type<value_type, size> m_value;
+	[[no_unique_address]] detail::array_type<value_type, size_> m_value;
 };
 
 template<typename... Args>
