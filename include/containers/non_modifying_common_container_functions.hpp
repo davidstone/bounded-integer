@@ -6,11 +6,9 @@
 #pragma once
 
 #include <containers/algorithms/compare.hpp>
-#include <containers/at.hpp>
 #include <containers/begin_end.hpp>
 #include <containers/common_functions.hpp>
 #include <containers/data.hpp>
-#include <containers/is_empty.hpp>
 #include <containers/front_back.hpp>
 #include <containers/size.hpp>
 
@@ -23,7 +21,6 @@ namespace common {
 	using ::containers::begin; \
 	using ::containers::end; \
 	using ::containers::detail::common::data; \
-	using ::containers::detail::common::at; \
 	using ::containers::detail::common::front; \
 	using ::containers::detail::common::back; \
 	using ::containers::detail::common::size;

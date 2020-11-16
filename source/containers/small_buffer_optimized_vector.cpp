@@ -5,6 +5,7 @@
 
 #include <containers/small_buffer_optimized_vector.hpp>
 #include <containers/assign.hpp>
+#include <containers/at.hpp>
 #include <containers/clear.hpp>
 #include <containers/insert.hpp>
 #include <containers/is_empty.hpp>
@@ -42,9 +43,9 @@ void test_generic(bounded::constant_t<capacity_> const capacity, T const & t, st
 	BOUNDED_TEST(front(count_arg) == t);
 	BOUNDED_TEST(back(count_arg) == t);
 	BOUNDED_TEST(count_arg[0_bi] == t);
-	BOUNDED_TEST(at(count_arg, 0_bi) == t);
+	BOUNDED_TEST(containers::at(count_arg, 0_bi) == t);
 	try {
-		at(count_arg, static_cast<unsigned>(capacity + 1_bi));
+		containers::at(count_arg, static_cast<unsigned>(capacity + 1_bi));
 		BOUNDED_TEST(false);
 	} catch (std::out_of_range const &) {
 	}

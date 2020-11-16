@@ -7,6 +7,7 @@
 #include <containers/array/make_array.hpp>
 #include <containers/algorithms/accumulate.hpp>
 #include <containers/algorithms/count.hpp>
+#include <containers/at.hpp>
 
 #include <bounded/integer.hpp>
 
@@ -18,7 +19,7 @@ using array_type = containers::array<int, size>;
 constexpr array_type a = {};
 static_assert(containers::size(a) == size, "Incorrect size.");
 static_assert(a[0_bi] == 0, "Incorrect value.");
-static_assert(at(a, size - 1) == 0, "Incorrect value with at.");
+static_assert(containers::at(a, size - 1) == 0, "Incorrect value with at.");
 static_assert(end(a) - begin(a) == size, "Incorrect difference type.");
 
 static_assert(std::is_standard_layout_v<containers::array<int, 0>>);

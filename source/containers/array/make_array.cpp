@@ -5,6 +5,7 @@
 
 #include <containers/array/make_array.hpp>
 
+#include <containers/at.hpp>
 #include <containers/is_empty.hpp>
 
 #include <bounded/integer.hpp>
@@ -14,7 +15,7 @@ using namespace bounded::literal;
 
 constexpr auto dynamic_int_array = containers::make_array(0, 3, 6);
 static_assert(size(dynamic_int_array) == 3, "Array size wrong.");
-static_assert(at(dynamic_int_array, 2) == 6, "Array element wrong.");
+static_assert(containers::at(dynamic_int_array, 2) == 6, "Array element wrong.");
 static_assert(
 	std::is_same_v<int, decltype(dynamic_int_array)::value_type>,
 	"Array element type wrong for all int arguments."
