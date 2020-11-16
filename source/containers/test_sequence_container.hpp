@@ -5,6 +5,7 @@
 
 #include <containers/algorithms/compare.hpp>
 #include <containers/assign.hpp>
+#include <containers/is_empty.hpp>
 #include <containers/push_back.hpp>
 #include <containers/range_view.hpp>
 #include <containers/reserve_if_reservable.hpp>
@@ -25,7 +26,7 @@ constexpr bool test_sequence_container_default_constructed_empty() {
 	BOUNDED_TEST(end(default_constructed) == begin(default_constructed));
 	BOUNDED_TEST(end(default_constructed) == end(default_constructed));
 	BOUNDED_TEST(default_constructed == default_constructed);
-	BOUNDED_TEST(empty(default_constructed));
+	BOUNDED_TEST(containers::is_empty(default_constructed));
 	BOUNDED_TEST(size(default_constructed) == 0_bi);
 	return true;
 }

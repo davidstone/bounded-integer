@@ -5,6 +5,7 @@
 
 #include <containers/integer_range.hpp>
 #include <containers/algorithms/accumulate.hpp>
+#include <containers/is_empty.hpp>
 #include <bounded/detail/literal.hpp>
 
 namespace {
@@ -34,7 +35,7 @@ static_assert(
 	"Incorrect size of empty range."
 );
 static_assert(
-	empty(containers::integer_range(-5_bi, -5_bi)),
+	containers::is_empty(containers::integer_range(-5_bi, -5_bi)),
 	"Incorrect size of empty range."
 );
 

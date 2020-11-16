@@ -10,7 +10,7 @@
 #include <containers/begin_end.hpp>
 #include <containers/common_functions.hpp>
 #include <containers/data.hpp>
-#include <containers/empty.hpp>
+#include <containers/is_empty.hpp>
 #include <containers/front_back.hpp>
 #include <containers/size.hpp>
 
@@ -26,8 +26,7 @@ namespace common {
 	using ::containers::detail::common::at; \
 	using ::containers::detail::common::front; \
 	using ::containers::detail::common::back; \
-	using ::containers::detail::common::size; \
-	using ::containers::detail::common::empty;
+	using ::containers::detail::common::size;
 
 }	// namespace common
 

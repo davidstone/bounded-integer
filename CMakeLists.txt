@@ -153,11 +153,11 @@ add_library(containers_test STATIC
 	source/containers/data.cpp
 	source/containers/dynamic_array.cpp
 	source/containers/emplace_back.cpp
-	source/containers/empty.cpp
 	source/containers/erase.cpp
 	source/containers/front_back.cpp
 	source/containers/insert.cpp
 	source/containers/integer_range.cpp
+	source/containers/is_empty.cpp
 	source/containers/is_iterator.cpp
 	source/containers/is_iterator_sentinel.cpp
 	source/containers/is_range.cpp

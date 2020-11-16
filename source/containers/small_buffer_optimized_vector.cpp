@@ -7,6 +7,7 @@
 #include <containers/assign.hpp>
 #include <containers/clear.hpp>
 #include <containers/insert.hpp>
+#include <containers/is_empty.hpp>
 #include <containers/push_back.hpp>
 #include <containers/string.hpp>
 #include <containers/resize.hpp>
@@ -21,7 +22,7 @@ template<auto capacity_, typename T>
 void test_generic(bounded::constant_t<capacity_> const capacity, T const & t, std::initializer_list<T> init) {
 	using container = containers::small_buffer_optimized_vector<T, 1>;
 	auto const default_constructed = container{};
-	BOUNDED_TEST(empty(default_constructed));
+	BOUNDED_TEST(containers::is_empty(default_constructed));
 	
 	BOUNDED_TEST(begin(default_constructed) == begin(default_constructed));
 	BOUNDED_TEST(begin(default_constructed) == end(default_constructed));
@@ -64,7 +65,7 @@ void test_generic(bounded::constant_t<capacity_> const capacity, T const & t, st
 	
 	move = std::move(copy);
 	containers::clear(copy);
-	BOUNDED_TEST(empty(copy));
+	BOUNDED_TEST(containers::is_empty(copy));
 	
 	BOUNDED_TEST(copy == default_constructed);
 	
@@ -96,7 +97,7 @@ void test_generic(bounded::constant_t<capacity_> const capacity, T const & t, st
 	BOUNDED_TEST(front(copy) == T{});
 	BOUNDED_TEST(size(copy) == capacity);
 	containers::resize(copy, 0_bi);
-	BOUNDED_TEST(empty(copy));
+	BOUNDED_TEST(containers::is_empty(copy));
 	containers::resize(copy, capacity, t);
 	BOUNDED_TEST(copy == count_arg);
 }

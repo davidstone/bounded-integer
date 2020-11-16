@@ -5,6 +5,8 @@
 
 #include <containers/array/make_array.hpp>
 
+#include <containers/is_empty.hpp>
+
 #include <bounded/integer.hpp>
 
 namespace {
@@ -82,13 +84,13 @@ struct non_copyable {
 };
 
 constexpr auto array_non_copyable = containers::make_array_n(1_bi, non_copyable());
-static_assert(size(array_non_copyable) == 1_bi, "Incorrect array size of 1 for move-only types.");
+static_assert(size(array_non_copyable) == 1_bi);
 
 constexpr auto array_empty = containers::make_array_n(0_bi, 2);
-static_assert(empty(array_empty), "Incorrect array size for empty array.");
+static_assert(containers::is_empty(array_empty));
 
 constexpr auto array_non_copyable_empty = containers::make_array_n(0_bi, non_copyable());
-static_assert(empty(array_non_copyable_empty), "Incorrect array size for empty array of move-only.");
+static_assert(containers::is_empty(array_non_copyable_empty));
 
 constexpr auto large_size = 10000_bi;
 constexpr auto large_array_n = containers::make_array_n(large_size, 0);

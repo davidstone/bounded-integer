@@ -7,6 +7,7 @@
 
 #include <containers/algorithms/move_iterator.hpp>
 #include <containers/front_back.hpp>
+#include <containers/is_empty.hpp>
 #include <containers/is_range.hpp>
 #include <containers/range_view.hpp>
 
@@ -91,7 +92,7 @@ private:
 		auto const range_view = m_range_views[index];
 		if constexpr (index == max_index) {
 			return front(range_view);
-		} else if (!empty(range_view)) {
+		} else if (!containers::is_empty(range_view)) {
 			return front(range_view);
 		} else {
 			return operator_star(index + bounded::constant<1>);

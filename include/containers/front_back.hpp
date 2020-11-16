@@ -7,7 +7,7 @@
 
 #include <containers/algorithms/advance.hpp>
 #include <containers/begin_end.hpp>
-#include <containers/empty.hpp>
+#include <containers/is_empty.hpp>
 #include <containers/is_range.hpp>
 
 #include <operators/forward.hpp>
@@ -21,12 +21,12 @@ namespace detail {
 namespace common {
 
 constexpr decltype(auto) front(range auto && r) {
-	BOUNDED_ASSERT(!empty(r));
-	return *begin(OPERATORS_FORWARD(r));
+	BOUNDED_ASSERT(!containers::is_empty(r));
+	return *containers::begin(OPERATORS_FORWARD(r));
 }
 constexpr decltype(auto) back(range auto && r) {
-	BOUNDED_ASSERT(!empty(r));
-	return *containers::prev(end(OPERATORS_FORWARD(r)));
+	BOUNDED_ASSERT(!containers::is_empty(r));
+	return *containers::prev(containers::end(OPERATORS_FORWARD(r)));
 }
 
 }	// namespace common
