@@ -9,7 +9,6 @@
 #include <containers/begin_end.hpp>
 #include <containers/common_functions.hpp>
 #include <containers/data.hpp>
-#include <containers/front_back.hpp>
 #include <containers/size.hpp>
 
 namespace containers {
@@ -21,8 +20,6 @@ namespace common {
 	using ::containers::begin; \
 	using ::containers::end; \
 	using ::containers::detail::common::data; \
-	using ::containers::detail::common::front; \
-	using ::containers::detail::common::back; \
 	using ::containers::detail::common::size;
 
 }	// namespace common

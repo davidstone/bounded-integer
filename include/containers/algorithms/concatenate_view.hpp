@@ -91,9 +91,9 @@ private:
 	constexpr decltype(auto) operator_star(auto const index) const {
 		auto const range_view = m_range_views[index];
 		if constexpr (index == max_index) {
-			return front(range_view);
+			return containers::front(range_view);
 		} else if (!containers::is_empty(range_view)) {
-			return front(range_view);
+			return containers::front(range_view);
 		} else {
 			return operator_star(index + bounded::constant<1>);
 		}

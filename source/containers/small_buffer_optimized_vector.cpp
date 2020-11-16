@@ -7,6 +7,7 @@
 #include <containers/assign.hpp>
 #include <containers/at.hpp>
 #include <containers/clear.hpp>
+#include <containers/front_back.hpp>
 #include <containers/insert.hpp>
 #include <containers/is_empty.hpp>
 #include <containers/push_back.hpp>
@@ -40,8 +41,8 @@ void test_generic(bounded::constant_t<capacity_> const capacity, T const & t, st
 	for (auto const & value : count_arg) {
 		BOUNDED_TEST(value == t);
 	}
-	BOUNDED_TEST(front(count_arg) == t);
-	BOUNDED_TEST(back(count_arg) == t);
+	BOUNDED_TEST(containers::front(count_arg) == t);
+	BOUNDED_TEST(containers::back(count_arg) == t);
 	BOUNDED_TEST(count_arg[0_bi] == t);
 	BOUNDED_TEST(containers::at(count_arg, 0_bi) == t);
 	try {
@@ -76,26 +77,26 @@ void test_generic(bounded::constant_t<capacity_> const capacity, T const & t, st
 	containers::clear(copy);
 	containers::push_back(copy, t);
 	BOUNDED_TEST(size(copy) == 1_bi);
-	BOUNDED_TEST(back(copy) == t);
+	BOUNDED_TEST(containers::back(copy) == t);
 	containers::pop_back(copy);
 	containers::push_back(copy, T(t));
 	BOUNDED_TEST(size(copy) == 1_bi);
-	BOUNDED_TEST(back(copy) == t);
+	BOUNDED_TEST(containers::back(copy) == t);
 	containers::clear(copy);
 	containers::insert(copy, begin(copy), t);
 	BOUNDED_TEST(size(copy) == 1_bi);
-	BOUNDED_TEST(back(copy) == t);
+	BOUNDED_TEST(containers::back(copy) == t);
 	
 	containers::assign(copy, init);
 	containers::assign(copy, containers::repeat_n(capacity, t));
 	
 	// TODO: insert(it, it, it) overload
-	auto const old_front = front(copy);
+	auto const old_front = containers::front(copy);
 	containers::resize(copy, capacity);
-	BOUNDED_TEST(front(copy) == old_front);
+	BOUNDED_TEST(containers::front(copy) == old_front);
 	containers::clear(copy);
 	containers::resize(copy, capacity);
-	BOUNDED_TEST(front(copy) == T{});
+	BOUNDED_TEST(containers::front(copy) == T{});
 	BOUNDED_TEST(size(copy) == capacity);
 	containers::resize(copy, 0_bi);
 	BOUNDED_TEST(containers::is_empty(copy));

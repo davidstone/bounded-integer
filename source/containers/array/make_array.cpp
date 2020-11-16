@@ -6,6 +6,7 @@
 #include <containers/array/make_array.hpp>
 
 #include <containers/at.hpp>
+#include <containers/front_back.hpp>
 #include <containers/is_empty.hpp>
 
 #include <bounded/integer.hpp>
@@ -70,7 +71,7 @@ using explicit_type = bounded::integer<0, 1>;
 constexpr auto typed_array = containers::make_array<explicit_type>(0_bi);
 static_assert(size(typed_array) == 1_bi, "Incorrect size with explicit type.");
 static_assert(std::is_same_v<decltype(typed_array)::value_type, explicit_type>, "Incorrect type with explicit type.");
-static_assert(front(typed_array) == 0_bi, "Incorrect value with explicit type.");
+static_assert(containers::front(typed_array) == 0_bi, "Incorrect value with explicit type.");
 
 
 constexpr auto array_n = containers::make_array_n(6_bi, 5);

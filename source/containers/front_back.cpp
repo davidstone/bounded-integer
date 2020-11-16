@@ -9,10 +9,10 @@
 
 namespace {
 
-static_assert(front(containers::array{5}) == 5);
-static_assert(back(containers::array{5}) == 5);
+static_assert(containers::front(containers::array{5}) == 5);
+static_assert(containers::back(containers::array{5}) == 5);
 
-static_assert(front(containers::array{2, 3, 4}) == 2);
-static_assert(back(containers::array{2, 3, 4}) == 4);
+static_assert(containers::front(containers::array{2, 3, 4}) == 2);
+static_assert(containers::back(containers::array{2, 3, 4}) == 4);
 
 } // namespace

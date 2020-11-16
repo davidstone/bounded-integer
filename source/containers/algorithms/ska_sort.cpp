@@ -7,6 +7,7 @@
 #include <containers/algorithms/sort.hpp>
 #include <containers/array/array.hpp>
 #include <containers/array/make_array.hpp>
+#include <containers/front_back.hpp>
 #include <containers/push_back.hpp>
 #include <containers/reserve_if_reservable.hpp>
 #include <containers/static_vector/static_vector.hpp>
@@ -279,7 +280,7 @@ static_assert(test_sort<std::uint8_t>(
 
 constexpr auto uint8_256_items = []{
 	auto to_sort = containers::make_array_n(256_bi, static_cast<std::uint8_t>(254));
-	back(to_sort) = 255;
+	containers::back(to_sort) = 255;
 	return to_sort;
 }();
 static_assert(test_sort(

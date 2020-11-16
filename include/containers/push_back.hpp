@@ -8,6 +8,7 @@
 #include <containers/lazy_push_back.hpp>
 
 #include <bounded/integer.hpp>
+#include <containers/front_back.hpp>
 #include <bounded/value_to_function.hpp>
 
 #include <utility>
@@ -27,7 +28,7 @@ template<detail::push_backable Container>
 constexpr decltype(auto) push_back(Container & container, typename Container::value_type const & value) {
 	if constexpr (detail::member_push_backable<Container>) {
 		container.push_back(value);
-		return back(container);
+		return containers::back(container);
 	} else {
 		return ::containers::lazy_push_back(
 			container,
@@ -39,7 +40,7 @@ template<detail::push_backable Container>
 constexpr decltype(auto) push_back(Container & container, typename Container::value_type && value) {
 	if constexpr (detail::member_push_backable<Container>) {
 		container.push_back(std::move(value));
-		return back(container);
+		return containers::back(container);
 	} else {
 		return ::containers::lazy_push_back(
 			container,

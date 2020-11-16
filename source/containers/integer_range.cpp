@@ -5,6 +5,7 @@
 
 #include <containers/integer_range.hpp>
 #include <containers/algorithms/accumulate.hpp>
+#include <containers/front_back.hpp>
 #include <containers/is_empty.hpp>
 #include <bounded/detail/literal.hpp>
 
@@ -17,11 +18,11 @@ static_assert(
 	"Incorrect initial value of range."
 );
 static_assert(
-	front(x) == 0_bi,
+	containers::front(x) == 0_bi,
 	"Incorrect initial value of range."
 );
 static_assert(
-	back(x) == 9_bi,
+	containers::back(x) == 9_bi,
 	"Incorrect initial value of range."
 );
 

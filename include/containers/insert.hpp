@@ -9,6 +9,7 @@
 #include <containers/algorithms/copy_n.hpp>
 #include <containers/algorithms/uninitialized.hpp>
 #include <containers/begin_end.hpp>
+#include <containers/front_back.hpp>
 #include <containers/mutable_iterator.hpp>
 #include <containers/push_back.hpp>
 #include <containers/range_view.hpp>
@@ -66,7 +67,7 @@ constexpr auto lazy_insert(
 	} else if (size(container) < container.capacity()) {
 		auto const mutable_position = ::containers::detail::mutable_iterator(container, position);
 		auto const original_end = end(container);
-		::containers::push_back(container, std::move(back(container)));
+		::containers::push_back(container, std::move(containers::back(container)));
 		::containers::move_backward(mutable_position, containers::prev(original_end), original_end);
 		auto & ref = *mutable_position;
 		bounded::destroy(ref);

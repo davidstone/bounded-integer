@@ -17,8 +17,6 @@
 #include <utility>
 
 namespace containers {
-namespace detail {
-namespace common {
 
 constexpr decltype(auto) front(range auto && r) {
 	BOUNDED_ASSERT(!containers::is_empty(r));
@@ -29,14 +27,4 @@ constexpr decltype(auto) back(range auto && r) {
 	return *containers::prev(containers::end(OPERATORS_FORWARD(r)));
 }
 
-}	// namespace common
-
-using ::containers::detail::common::front;
-using ::containers::detail::common::back;
-
-}	// namespace detail
-
-using ::containers::detail::common::front;
-using ::containers::detail::common::back;
-
-}	// namespace containers
+} // namespace containers

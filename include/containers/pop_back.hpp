@@ -29,7 +29,7 @@ constexpr auto pop_back(detail::pop_backable auto & c) -> void {
 	if constexpr (detail::has_member_pop_back<decltype(c)>) {
 		c.pop_back();
 	} else {
-		bounded::destroy(back(c));
+		bounded::destroy(containers::back(c));
 		c.append_from_capacity(bounded::constant<-1>);
 	}
 }
