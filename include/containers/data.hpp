@@ -12,23 +12,13 @@
 #include <bounded/integer.hpp>
 
 namespace containers {
-namespace detail {
-namespace common {
 
 constexpr auto data(range auto && r) {
 	if constexpr (requires { r.data(); }) {
 		return r.data();
 	} else {
-		return pointer_from(begin(r));
+		return pointer_from(containers::begin(r));
 	}
 }
 
-}	// namespace common
-
-using ::containers::detail::common::data;
-
-}	// namespace detail
-
-using ::containers::detail::common::data;
-
-}	// namespace containers
+} // namespace containers

@@ -6,7 +6,6 @@
 #pragma once
 
 #include <containers/algorithms/uninitialized.hpp>
-#include <containers/data.hpp>
 #include <containers/front_back.hpp>
 #include <containers/lazy_push_back.hpp>
 #include <containers/reserve_if_reservable.hpp>

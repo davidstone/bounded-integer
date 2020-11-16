@@ -9,6 +9,7 @@
 #include <containers/algorithms/copy_n.hpp>
 #include <containers/algorithms/uninitialized.hpp>
 #include <containers/begin_end.hpp>
+#include <containers/data.hpp>
 #include <containers/front_back.hpp>
 #include <containers/mutable_iterator.hpp>
 #include <containers/push_back.hpp>
@@ -35,7 +36,7 @@ constexpr auto insert_or_emplace_with_reallocation(Container & container, typena
 	// construct it may reference an old element. We cannot move
 	// elements it references before constructing it
 	auto const offset = position - begin(container);
-	construct(data(temp) + offset);
+	construct(containers::data(temp) + offset);
 	auto const mutable_position = begin(container) + offset;
 	auto const temp_begin = begin(temp);
 	auto const it = containers::uninitialized_move_destroy(begin(container), mutable_position, temp_begin);

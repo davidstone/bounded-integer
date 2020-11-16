@@ -33,12 +33,12 @@ constexpr auto & lazy_push_back(
 		bounded::construct(ref, OPERATORS_FORWARD(constructor));
 	};
 	if (initial_size < container.capacity()) {
-		construct(*(data(container) + initial_size));
+		construct(*(containers::data(container) + initial_size));
 		container.append_from_capacity(1_bi);
 	} else if constexpr (detail::reservable<Container>) {
 		auto temp = Container();
 		temp.reserve(::containers::detail::reallocation_size(container, 1_bi));
-		auto & ref = *(data(temp) + container.capacity());
+		auto & ref = *(containers::data(temp) + container.capacity());
 		construct(ref);
 		containers::detail::transfer_all_contents(container, temp);
 		temp.append_from_capacity(initial_size + 1_bi);
