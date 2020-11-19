@@ -32,24 +32,38 @@ concept std_random_access_iterator =
 		std::is_same_v<T, typename std::vector<value_type>::const_iterator>
 	);
 
+template<
+	typename T,
+	typename value_type = typename std::iterator_traits<T>::value_type,
+	typename key_type = typename value_type::first_type,
+	typename mapped_type = typename value_type::second_type
+>
+concept std_map_bidirectional_iterator =
+	!std::is_reference_v<value_type> and !std::is_const_v<value_type> and
+	!std::is_reference_v<key_type> and !std::is_const_v<key_type> and
+	!std::is_reference_v<mapped_type> and !std::is_const_v<mapped_type> and
+	(
+		std::is_same_v<T, typename std::map<key_type, mapped_type>::iterator> or
+		std::is_same_v<T, typename std::map<key_type, mapped_type>::const_iterator> or
+		std::is_same_v<T, typename std::multimap<key_type, mapped_type>::iterator> or
+		std::is_same_v<T, typename std::multimap<key_type, mapped_type>::const_iterator> or
+		std::is_same_v<T, typename std::unordered_map<key_type, mapped_type>::iterator> or
+		std::is_same_v<T, typename std::unordered_map<key_type, mapped_type>::const_iterator> or
+		std::is_same_v<T, typename std::unordered_multimap<key_type, mapped_type>::iterator> or
+		std::is_same_v<T, typename std::unordered_multimap<key_type, mapped_type>::const_iterator>
+	);
+
 template<typename T, typename value_type = typename std::iterator_traits<T>::value_type>
 concept std_bidirectional_iterator =
 	!std::is_reference_v<value_type> and !std::is_const_v<value_type> and (
 		std_random_access_iterator<T> or
+		std_map_bidirectional_iterator<T> or
 		std::is_same_v<T, typename std::list<value_type>::iterator> or
 		std::is_same_v<T, typename std::list<value_type>::const_iterator> or
-		std::is_same_v<T, typename std::map<typename value_type::first_type, typename value_type::second_type>::iterator> or
-		std::is_same_v<T, typename std::map<typename value_type::first_type, typename value_type::second_type>::const_iterator> or
-		std::is_same_v<T, typename std::multimap<typename value_type::first_type, typename value_type::second_type>::iterator> or
-		std::is_same_v<T, typename std::multimap<typename value_type::first_type, typename value_type::second_type>::const_iterator> or
 		std::is_same_v<T, typename std::set<value_type>::iterator> or
 		std::is_same_v<T, typename std::set<value_type>::const_iterator> or
 		std::is_same_v<T, typename std::multiset<value_type>::iterator> or
 		std::is_same_v<T, typename std::multiset<value_type>::const_iterator> or
-		std::is_same_v<T, typename std::unordered_map<typename value_type::first_type, typename value_type::second_type>::iterator> or
-		std::is_same_v<T, typename std::unordered_map<typename value_type::first_type, typename value_type::second_type>::const_iterator> or
-		std::is_same_v<T, typename std::unordered_multimap<typename value_type::first_type, typename value_type::second_type>::iterator> or
-		std::is_same_v<T, typename std::unordered_multimap<typename value_type::first_type, typename value_type::second_type>::const_iterator> or
 		std::is_same_v<T, typename std::unordered_set<value_type>::iterator> or
 		std::is_same_v<T, typename std::unordered_set<value_type>::const_iterator> or
 		std::is_same_v<T, typename std::unordered_multiset<value_type>::iterator> or
@@ -74,15 +88,15 @@ constexpr auto operator+(bounded::bounded_integer auto const offset, detail::std
 	return offset.value() + it;
 }
 
-constexpr auto operator+(detail::std_iterator auto const it, bounded::constant_t<0>) {
+constexpr auto operator+(detail::std_iterator auto it, bounded::constant_t<1>) {
 	return ++it;
 }
 
-constexpr auto operator+(bounded::constant_t<0>, detail::std_iterator auto const it) {
+constexpr auto operator+(bounded::constant_t<1>, detail::std_iterator auto it) {
 	return ++it;
 }
 
-constexpr auto operator-(detail::std_bidirectional_iterator auto const it, bounded::constant_t<0>) {
+constexpr auto operator-(detail::std_bidirectional_iterator auto it, bounded::constant_t<1>) {
 	return --it;
 }
 
