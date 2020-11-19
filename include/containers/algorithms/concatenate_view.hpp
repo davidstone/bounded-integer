@@ -6,6 +6,7 @@
 #pragma once
 
 #include <containers/algorithms/move_iterator.hpp>
+#include <containers/begin_end.hpp>
 #include <containers/front_back.hpp>
 #include <containers/is_empty.hpp>
 #include <containers/is_range.hpp>
@@ -28,7 +29,7 @@ namespace detail {
 
 template<typename LHS, typename RHS, std::size_t... indexes>
 constexpr auto have_same_ends(LHS const & lhs, RHS const & rhs, std::index_sequence<indexes...>) {
-	return (... and (end(lhs[bounded::constant<indexes>]) == end(rhs[bounded::constant<indexes>])));
+	return (... and (containers::end(lhs[bounded::constant<indexes>]) == containers::end(rhs[bounded::constant<indexes>])));
 }
 
 template<typename LHS, typename RHS>
@@ -38,7 +39,7 @@ constexpr auto assert_same_ends(LHS const & lhs, RHS const & rhs) {
 }
 
 template<typename RangeView>
-using view_iterator = decltype(begin(std::declval<RangeView>()));
+using view_iterator = decltype(containers::begin(std::declval<RangeView>()));
 
 template<typename RangeView>
 using view_iterator_traits = std::iterator_traits<view_iterator<RangeView>>;
@@ -60,7 +61,7 @@ template<typename Iterator>
 concept forward_random_access_iterator = iterator<Iterator> and iterator<decltype(std::declval<Iterator>() + std::declval<typename std::decay_t<Iterator>::difference_type>())>;
 
 template<typename Range>
-concept forward_random_access_range = range<Range> and forward_random_access_iterator<decltype(begin(std::declval<Range>()))>;
+concept forward_random_access_range = range<Range> and forward_random_access_iterator<decltype(containers::begin(std::declval<Range>()))>;
 
 } // namespace detail
 
@@ -101,7 +102,7 @@ private:
 	}
 
 	constexpr auto begin_iterators() const {
-		return bounded::transform([](auto const range) { return begin(range); }, m_range_views);
+		return bounded::transform([](auto const range) { return containers::begin(range); }, m_range_views);
 	}
 
 
@@ -163,7 +164,7 @@ public:
 				using size_type = typename decltype(range)::size_type;
 				auto const added_size = size_type(bounded::min(containers::size(range), remaining_offset));
 				remaining_offset -= added_size;
-				return range_view(begin(range) + size_type(added_size), end(range));
+				return range_view(containers::begin(range) + size_type(added_size), containers::end(range));
 			};
 			// Use {} to enforce initialization order
 			return bounded::apply(
@@ -181,7 +182,7 @@ public:
 		::containers::detail::assert_same_ends(lhs.m_range_views, rhs.m_range_views);
 
 		auto transform = [](auto const lhs_range, auto const rhs_range) {
-			return begin(lhs_range) - begin(rhs_range);
+			return containers::begin(lhs_range) - containers::begin(rhs_range);
 		};
 		return bounded::apply(
 			bounded::transform(transform, lhs.m_range_views, rhs.m_range_views),
@@ -223,7 +224,7 @@ public:
 	}
 
 	friend constexpr auto operator==(concatenate_view_iterator const lhs, concatenate_view_sentinel) -> bool {
-		auto get_end_iterators = [](auto const range) { return end(range); };
+		auto get_end_iterators = [](auto const range) { return containers::end(range); };
 		return lhs.begin_iterators() == bounded::transform(get_end_iterators, lhs.m_range_views);
 	}
 };

@@ -8,9 +8,11 @@
 #include <containers/algorithms/find.hpp>
 #include <containers/algorithms/negate.hpp>
 #include <containers/algorithms/sort.hpp>
+#include <containers/begin_end.hpp>
 #include <containers/dynamic_array.hpp>
 
 #include <bounded/assert.hpp>
+
 #include <operators/forward.hpp>
 
 #include <functional>
@@ -146,7 +148,7 @@ constexpr auto unique_inplace_merge(Iterator first, Iterator middle, sentinel_fo
 			::containers::move_iterator(middle)
 		));
 		return ::containers::unique_merge_copy(
-			::containers::move_iterator(begin(temp)), ::containers::move_iterator(end(temp)),
+			::containers::move_iterator(containers::begin(temp)), ::containers::move_iterator(containers::end(temp)),
 			::containers::move_iterator(middle), ::containers::move_iterator(last),
 			first,
 			less
@@ -185,7 +187,7 @@ constexpr auto unique_inplace_merge(Iterator first, Iterator middle, sentinel_fo
 	auto const new_middle = ::containers::detail::next_greater(middle, last, *first_to_move.before_target, less);
 
 	return ::containers::unique_merge_copy(
-		::containers::move_iterator(begin(temp)), ::containers::move_iterator(end(temp)),
+		::containers::move_iterator(containers::begin(temp)), ::containers::move_iterator(containers::end(temp)),
 		::containers::move_iterator(new_middle), ::containers::move_iterator(last),
 		first_to_move.target,
 		less

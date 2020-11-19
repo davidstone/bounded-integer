@@ -16,7 +16,7 @@ namespace detail {
 
 template<typename Range>
 concept random_access_range = requires(Range const & range) {
-	static_cast<typename Range::size_type>(end(range) - begin(range));
+	static_cast<typename Range::size_type>(containers::end(range) - containers::begin(range));
 };
 
 } // namespace detail
@@ -26,9 +26,9 @@ constexpr auto size(Range const & range) {
 	if constexpr (detail::has_member_size<Range>) {
 		return range.size();
 	} else if constexpr (bounded::bounded_integer<typename Range::size_type>) {
-		return typename Range::size_type(end(range) - begin(range), bounded::non_check);
+		return typename Range::size_type(containers::end(range) - containers::begin(range), bounded::non_check);
 	} else {
-		return typename Range::size_type(end(range) - begin(range));
+		return typename Range::size_type(containers::end(range) - containers::begin(range));
 	}
 }
 
@@ -38,7 +38,7 @@ constexpr auto linear_size(range auto const & r) {
 	if constexpr (requires { containers::size(r); }) {
 		return containers::size(r);
 	} else {
-		return containers::distance(begin(r), end(r));
+		return containers::distance(containers::begin(r), containers::end(r));
 	}
 }
 

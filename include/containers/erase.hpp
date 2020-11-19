@@ -24,8 +24,8 @@ template<iterator Iterator>
 constexpr auto erase(resizable_container auto & source, Iterator const first_, Iterator const last_) {
 	auto const first = ::containers::detail::mutable_iterator(source, first_);
 	auto const last = ::containers::detail::mutable_iterator(source, last_);
-	auto const to_clear = ::containers::move(last, end(source), first).output;
-	while (to_clear != end(source)) {
+	auto const to_clear = ::containers::move(last, containers::end(source), first).output;
+	while (to_clear != containers::end(source)) {
 		pop_back(source);
 	}
 	return first;
@@ -33,12 +33,12 @@ constexpr auto erase(resizable_container auto & source, Iterator const first_, I
 
 template<resizable_container Container>
 constexpr auto erase(Container & container, typename Container::const_iterator const it) {
-	BOUNDED_ASSERT(it != end(container));
+	BOUNDED_ASSERT(it != containers::end(container));
 	return erase(container, it, ::containers::next(it));
 }
 
 constexpr auto erase_if(resizable_container auto & source, auto predicate) {
-	return erase(source, ::containers::remove_if(source, std::move(predicate)), end(source));
+	return erase(source, ::containers::remove_if(source, std::move(predicate)), containers::end(source));
 }
 
 } // namespace containers

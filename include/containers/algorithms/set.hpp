@@ -115,13 +115,13 @@ template<typename Range1, typename Range2, typename Compare>
 struct set_intersection_pair {
 	using iterator = detail::set_intersection_pair_iterator<
 		set_intersection_pair<Range1, Range2, Compare>,
-		decltype(begin(std::declval<Range1 &>())),
-		decltype(begin(std::declval<Range2 &>()))
+		decltype(containers::begin(std::declval<Range1 &>())),
+		decltype(containers::begin(std::declval<Range2 &>()))
 	>;
 	using const_iterator = detail::set_intersection_pair_iterator<
 		set_intersection_pair<Range1, Range2, Compare> const,
-		decltype(begin(std::declval<Range1 const &>())),
-		decltype(begin(std::declval<Range2 const &>()))
+		decltype(containers::begin(std::declval<Range1 const &>())),
+		decltype(containers::begin(std::declval<Range2 const &>()))
 	>;
 	using value_type = decltype(*std::declval<iterator>());
 	using size_type = bounded::integer<

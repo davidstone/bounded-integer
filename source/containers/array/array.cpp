@@ -8,6 +8,7 @@
 #include <containers/algorithms/accumulate.hpp>
 #include <containers/algorithms/count.hpp>
 #include <containers/at.hpp>
+#include <containers/begin_end.hpp>
 
 #include <bounded/integer.hpp>
 
@@ -20,13 +21,13 @@ constexpr array_type a = {};
 static_assert(containers::size(a) == size, "Incorrect size.");
 static_assert(a[0_bi] == 0, "Incorrect value.");
 static_assert(containers::at(a, size - 1) == 0, "Incorrect value with at.");
-static_assert(end(a) - begin(a) == size, "Incorrect difference type.");
+static_assert(containers::end(a) - containers::begin(a) == size, "Incorrect difference type.");
 
 static_assert(std::is_standard_layout_v<containers::array<int, 0>>);
 static_assert(std::is_trivial_v<containers::array<int, 0>>);
 static_assert(std::is_empty_v<containers::array<int, 0>>);
 constexpr containers::array<int, 0> empty_array = {};
-static_assert(begin(empty_array) == end(empty_array), "Empty array.");
+static_assert(containers::begin(empty_array) == containers::end(empty_array), "Empty array.");
 
 constexpr auto array = containers::make_array(0_bi, 3_bi, 2_bi, 3_bi, 5_bi);
 static_assert(containers::count(array, 3_bi) == 2_bi);

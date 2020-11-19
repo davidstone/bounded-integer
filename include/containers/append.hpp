@@ -20,9 +20,9 @@ namespace detail {
 template<typename Container, typename Range>
 concept member_insertable = requires(Container & container, Range && range) {
 	container.insert(
-		end(container),
-		begin(OPERATORS_FORWARD(range)),
-		end(OPERATORS_FORWARD(range))
+		containers::end(container),
+		containers::begin(OPERATORS_FORWARD(range)),
+		containers::end(OPERATORS_FORWARD(range))
 	);
 };
 
@@ -37,7 +37,7 @@ concept lazy_push_backable = requires(Container & container, typename Container:
 template<detail::push_backable Container>
 constexpr auto append(Container & output, range auto && input) -> void {
 	// TODO: Define InputRange and ForwardRange concepts
-	using iterator_category = typename std::iterator_traits<decltype(begin(input))>::iterator_category;
+	using iterator_category = typename std::iterator_traits<decltype(containers::begin(input))>::iterator_category;
 	constexpr auto reserve_space = std::is_convertible_v<iterator_category, std::forward_iterator_tag> and detail::reservable<Container>;
 	if constexpr (reserve_space) {
 		auto const input_size = [&] {
@@ -54,13 +54,13 @@ constexpr auto append(Container & output, range auto && input) -> void {
 		}
 	}
 	if constexpr (detail::appendable_from_capacity<Container> and (!detail::reservable<Container> or reserve_space)) {
-		auto const new_end = containers::uninitialized_copy(OPERATORS_FORWARD(input), end(output));
-		output.append_from_capacity(new_end - end(output));
+		auto const new_end = containers::uninitialized_copy(OPERATORS_FORWARD(input), containers::end(output));
+		output.append_from_capacity(new_end - containers::end(output));
 	} else if constexpr (detail::member_insertable<Container, decltype(input)> and std::is_move_constructible_v<typename Container::value_type> and std::is_move_assignable_v<typename Container::value_type>) {
-		output.insert(end(output), begin(OPERATORS_FORWARD(input)), end(OPERATORS_FORWARD(input)));
+		output.insert(containers::end(output), containers::begin(OPERATORS_FORWARD(input)), containers::end(OPERATORS_FORWARD(input)));
 	} else if constexpr (detail::lazy_push_backable<Container>) {
-		auto const last = end(OPERATORS_FORWARD(input));
-		for (auto it = begin(OPERATORS_FORWARD(input)); it != last; ++it) {
+		auto const last = containers::end(OPERATORS_FORWARD(input));
+		for (auto it = containers::begin(OPERATORS_FORWARD(input)); it != last; ++it) {
 			lazy_push_back(output, [&] { return *it; });
 		}
 	} else {

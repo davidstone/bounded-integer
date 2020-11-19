@@ -30,7 +30,7 @@ constexpr auto lexicographical_compare_3way(InputIterator1 first1, sentinel_for<
 }
 
 constexpr auto lexicographical_compare_3way(range auto const & range1, range auto const & range2, auto cmp) {
-	return ::containers::lexicographical_compare_3way(begin(range1), end(range1), begin(range2), end(range2), std::move(cmp));
+	return ::containers::lexicographical_compare_3way(containers::begin(range1), containers::end(range1), containers::begin(range2), containers::end(range2), std::move(cmp));
 }
 
 
@@ -40,7 +40,7 @@ constexpr auto lexicographical_compare_3way(InputIterator1 const first1, sentine
 }
 
 constexpr auto lexicographical_compare_3way(range auto const & range1, range auto const & range2) {
-	return ::containers::lexicographical_compare_3way(begin(range1), end(range1), begin(range2), end(range2));
+	return ::containers::lexicographical_compare_3way(containers::begin(range1), containers::end(range1), containers::begin(range2), containers::end(range2));
 }
 
 
@@ -131,15 +131,15 @@ constexpr auto equal(Range1 const & range1, Range2 const & range2, auto cmp) {
 	if constexpr (detail::sized_range<Range1> and detail::sized_range<Range2>) {
 		return
 			::containers::size(range1) == ::containers::size(range2) and
-			::containers::equal(begin(range1), end(range1), begin(range2), std::move(cmp));
+			::containers::equal(containers::begin(range1), containers::end(range1), containers::begin(range2), std::move(cmp));
 	} else {
-		return ::containers::equal(begin(range1), end(range1), begin(range2), end(range2), std::move(cmp));
+		return ::containers::equal(containers::begin(range1), containers::end(range1), containers::begin(range2), containers::end(range2), std::move(cmp));
 	}
 }
 
 template<range Range1, range Range2>
 constexpr auto equal(Range1 const & range1, Range2 const & range2) {
-	return ::containers::equal(begin(range1), end(range1), begin(range2), end(range2));
+	return ::containers::equal(containers::begin(range1), containers::end(range1), containers::begin(range2), containers::end(range2));
 }
 
 

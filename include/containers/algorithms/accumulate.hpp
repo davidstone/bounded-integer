@@ -5,10 +5,12 @@
 
 #pragma once
 
+#include <containers/begin_end.hpp>
 #include <containers/is_range.hpp>
 
-#include <operators/forward.hpp>
 #include <bounded/integer.hpp>
+
+#include <operators/forward.hpp>
 
 #include <functional>
 #include <type_traits>
@@ -33,7 +35,7 @@ struct accumulate_c<Range, Initial, std::plus<>> {
 			std::declval<typename std::remove_reference_t<Range>::value_type>() *
 			std::declval<bounded::integer<
 				0,
-				bounded::detail::builtin_max_value<typename std::iterator_traits<decltype(begin(std::declval<Range>()))>::difference_type>
+				bounded::detail::builtin_max_value<typename std::iterator_traits<decltype(containers::begin(std::declval<Range>()))>::difference_type>
 			>>()
 		)
 	);
@@ -48,7 +50,7 @@ struct accumulate_c<Range, Initial, std::multiplies<>> {
 			std::declval<bounded::integer<
 				0,
 				bounded::detail::builtin_max_value<
-					typename std::iterator_traits<decltype(begin(std::declval<Range>()))>::difference_type
+					typename std::iterator_traits<decltype(containers::begin(std::declval<Range>()))>::difference_type
 				>
 			>>()
 		)

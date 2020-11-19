@@ -8,6 +8,8 @@
 #include <containers/algorithms/advance.hpp>
 #include <containers/algorithms/find.hpp>
 #include <containers/begin_end.hpp>
+#include <containers/default_adapt_traits.hpp>
+#include <containers/default_begin_end.hpp>
 #include <containers/is_iterator_sentinel.hpp>
 #include <containers/iterator_adapter.hpp>
 #include <containers/reference_wrapper.hpp>

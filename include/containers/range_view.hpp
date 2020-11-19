@@ -5,6 +5,7 @@
 
 #pragma once
 
+#include <containers/begin_end.hpp>
 #include <containers/is_range.hpp>
 
 #include <bounded/integer.hpp>

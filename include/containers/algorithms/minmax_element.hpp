@@ -17,8 +17,8 @@ namespace containers {
 // TODO: minmax_element
 
 constexpr auto min_element(range auto && source, auto compare) {
-	auto smallest = begin(OPERATORS_FORWARD(source));
-	auto const last = end(OPERATORS_FORWARD(source));
+	auto smallest = containers::begin(OPERATORS_FORWARD(source));
+	auto const last = containers::end(OPERATORS_FORWARD(source));
 	if (smallest == last) {
 		return smallest;
 	}

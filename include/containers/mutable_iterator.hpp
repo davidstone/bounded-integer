@@ -15,7 +15,7 @@ namespace containers {
 namespace detail {
 
 constexpr auto mutable_iterator(range auto & r, iterator auto const it) {
-	return begin(r) + (it - begin(r));
+	return containers::begin(r) + (it - containers::begin(r));
 }
 
 }	// namespace detail

@@ -8,6 +8,7 @@
 #include <containers/algorithms/advance.hpp>
 #include <containers/algorithms/find.hpp>
 #include <containers/algorithms/reverse_iterator.hpp>
+#include <containers/begin_end.hpp>
 #include <containers/is_range.hpp>
 #include <containers/size.hpp>
 
@@ -27,8 +28,8 @@ constexpr void swap(auto & lhs, auto & rhs) {
 
 constexpr inline struct is_partitioned_t {
 	constexpr auto operator()(range auto && input, auto predicate) const -> bool {
-		auto first = begin(input);
-		auto last = end(input);
+		auto first = containers::begin(input);
+		auto last = containers::end(input);
 		auto it = containers::find_if_not(first, last, predicate);
 		return containers::find_if(it, last, predicate) == last;
 	}
@@ -38,7 +39,7 @@ constexpr inline struct partition_point_t {
 	constexpr auto operator()(range auto && input, auto predicate) const {
 		using size_type = decltype(containers::size(input));
 		auto count = bounded::integer<0, bounded::detail::builtin_max_value<size_type>>(containers::size(input));
-		auto first = begin(input);
+		auto first = containers::begin(input);
 		if constexpr (bounded::max_value<decltype(count)> == bounded::constant<0>) {
 			return first;
 		} else {
@@ -106,7 +107,7 @@ constexpr inline struct partition_t {
 		return first;
 	}
 	constexpr auto operator()(range auto && input, auto predicate) const {
-		return operator()(begin(input), end(input), predicate);
+		return operator()(containers::begin(input), containers::end(input), predicate);
 	}
 } partition;
 

@@ -6,6 +6,7 @@
 #pragma once
 
 #include <containers/algorithms/transform.hpp>
+#include <containers/begin_end.hpp>
 #include <containers/non_modifying_common_container_functions.hpp>
 
 #include <bounded/assert.hpp>

@@ -5,13 +5,14 @@
 
 #pragma once
 
+#include <containers/begin_end.hpp>
 #include <containers/common_iterator_functions.hpp>
 #include <containers/range_view.hpp>
 
-#include <operators/forward.hpp>
 #include <bounded/integer.hpp>
 #include <bounded/unreachable.hpp>
 
+#include <operators/forward.hpp>
 #include <operators/operators.hpp>
 
 #include <iterator>
@@ -112,8 +113,8 @@ template<bounded::bounded_integer Count>
 constexpr auto take(range auto && source, Count count_) {
 	auto const count = bounded::integer<0, bounded::detail::builtin_max_value<Count>>(count_);
 	return containers::range_view(
-		counted_iterator(begin(OPERATORS_FORWARD(source)), count),
-		counted_sentinel(end(OPERATORS_FORWARD(source)))
+		counted_iterator(containers::begin(OPERATORS_FORWARD(source)), count),
+		counted_sentinel(containers::end(OPERATORS_FORWARD(source)))
 	);
 }
 

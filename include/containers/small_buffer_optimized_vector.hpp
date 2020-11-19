@@ -8,6 +8,7 @@
 #include <containers/array/array.hpp>
 #include <containers/append.hpp>
 #include <containers/assign.hpp>
+#include <containers/begin_end.hpp>
 #include <containers/compare_container.hpp>
 #include <containers/contiguous_iterator.hpp>
 #include <containers/dynamic_array.hpp>

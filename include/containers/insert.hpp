@@ -36,13 +36,13 @@ constexpr auto insert_or_emplace_with_reallocation(Container & container, typena
 	// First construct the new element because the arguments to
 	// construct it may reference an old element. We cannot move
 	// elements it references before constructing it
-	auto const offset = position - begin(container);
+	auto const offset = position - containers::begin(container);
 	construct(containers::data(temp) + offset);
-	auto const mutable_position = begin(container) + offset;
-	auto const temp_begin = begin(temp);
-	auto const it = containers::uninitialized_move_destroy(begin(container), mutable_position, temp_begin);
+	auto const mutable_position = containers::begin(container) + offset;
+	auto const temp_begin = containers::begin(temp);
+	auto const it = containers::uninitialized_move_destroy(containers::begin(container), mutable_position, temp_begin);
 	BOUNDED_ASSERT(temp_begin + offset == it);
-	::containers::uninitialized_move_destroy(mutable_position, end(container), it + number_of_elements);
+	::containers::uninitialized_move_destroy(mutable_position, containers::end(container), it + number_of_elements);
 	container = std::move(temp);
 	container.append_from_capacity(original_size + number_of_elements);
 	return mutable_position;
@@ -50,7 +50,7 @@ constexpr auto insert_or_emplace_with_reallocation(Container & container, typena
 
 template<typename Container>
 constexpr auto iterator_points_into_container(Container const & container, typename Container::const_iterator it) {
-	return (begin(container) <= it) and (it <= end(container));
+	return (containers::begin(container) <= it) and (it <= containers::end(container));
 }
 
 } // namespace detail
@@ -63,12 +63,12 @@ constexpr auto lazy_insert(
 	bounded::construct_function_for<typename Container::value_type> auto && constructor
 ) {
 	BOUNDED_ASSERT(::containers::detail::iterator_points_into_container(container, position));
-	auto const offset = position - begin(container);
-	if (position == end(container)) {
+	auto const offset = position - containers::begin(container);
+	if (position == containers::end(container)) {
 		::containers::lazy_push_back(container, OPERATORS_FORWARD(constructor));
 	} else if (containers::size(container) < container.capacity()) {
 		auto const mutable_position = ::containers::detail::mutable_iterator(container, position);
-		auto const original_end = end(container);
+		auto const original_end = containers::end(container);
 		::containers::push_back(container, std::move(containers::back(container)));
 		::containers::move_backward(mutable_position, containers::prev(original_end), original_end);
 		auto & ref = *mutable_position;
@@ -81,7 +81,7 @@ constexpr auto lazy_insert(
 	} else {
 		bounded::assert_or_assume_unreachable();
 	}
-	return begin(container) + offset;
+	return containers::begin(container) + offset;
 }
 
 template<resizable_container Container>
@@ -100,8 +100,8 @@ constexpr auto insert(Container & container, typename Container::const_iterator 
 	if (containers::size(container) + range_size <= container.capacity()) {
 		auto const mutable_position = ::containers::detail::mutable_iterator(container, position);
 		::containers::uninitialized_move_destroy(
-			containers::reversed(range_view(mutable_position, end(container))),
-			containers::reverse_iterator(end(container) + range_size)
+			containers::reversed(range_view(mutable_position, containers::end(container))),
+			containers::reverse_iterator(containers::end(container) + range_size)
 		);
 		::containers::uninitialized_copy(OPERATORS_FORWARD(range), position);
 		container.append_from_capacity(range_size);

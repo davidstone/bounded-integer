@@ -12,6 +12,7 @@
 #include <containers/algorithms/sort.hpp>
 #include <containers/algorithms/unique.hpp>
 #include <containers/at.hpp>
+#include <containers/begin_end.hpp>
 #include <containers/erase.hpp>
 #include <containers/legacy_iterator.hpp>
 #include <containers/is_range.hpp>
@@ -403,24 +404,24 @@ constexpr size_t common_prefix(
 	sentinel_for<Iterator> auto last,
 	auto && extract_key,
 	auto && element_key,
-	typename std::iterator_traits<decltype(begin(extract_key(*first)))>::difference_type const start_index
+	typename std::iterator_traits<decltype(containers::begin(extract_key(*first)))>::difference_type const start_index
 ) {
 	BOUNDED_ASSERT(first != last);
 	auto const & first_range = extract_key(*first);
-	auto largest_match = end(first_range) - (begin(first_range) + start_index);
+	auto largest_match = containers::end(first_range) - (containers::begin(first_range) + start_index);
 	for (auto it = containers::next(first); it != last; ++it) {
 		auto const & current_range = extract_key(*it);
 		largest_match = std::min(
 			largest_match,
 			std::mismatch(
-				begin(first_range) + start_index,
-				end(first_range),
-				begin(current_range) + start_index,
-				end(current_range),
+				containers::begin(first_range) + start_index,
+				containers::end(first_range),
+				containers::begin(current_range) + start_index,
+				containers::end(current_range),
 				[&](auto const & lhs, auto const & rhs) {
 					return element_key(lhs) == element_key(rhs);
 				}
-			).first - (begin(first_range) + start_index)
+			).first - (containers::begin(first_range) + start_index)
 		);
 	}
 	return static_cast<std::size_t>(largest_match);
@@ -471,7 +472,7 @@ private:
 			last,
 			current_key,
 			element_key,
-			typename std::iterator_traits<decltype(begin(current_key(*first)))>::difference_type(sort_data.current_index)
+			typename std::iterator_traits<decltype(containers::begin(current_key(*first)))>::difference_type(sort_data.current_index)
 		);
 		auto end_of_shorter_ones = containers::partition(first, last, [&](auto const & elem) {
 			return containers::size(current_key(elem)) <= sort_data.current_index;
@@ -561,7 +562,7 @@ struct ska_sort_t {
 	}
 
 	constexpr void operator()(range auto && to_sort, auto && extract_key) const {
-		operator()(begin(to_sort), end(to_sort), OPERATORS_FORWARD(extract_key));
+		operator()(containers::begin(to_sort), containers::end(to_sort), OPERATORS_FORWARD(extract_key));
 	}
 	constexpr void operator()(range auto && to_sort) const {
 		operator()(OPERATORS_FORWARD(to_sort), bounded::identity);
@@ -640,7 +641,7 @@ struct ska_sort_copy_t {
 	}
 
 	constexpr auto operator()(range auto && source_range, range auto && buffer_range, auto && extract_key) const -> bool {
-		return operator()(begin(source_range), end(source_range), begin(buffer_range), OPERATORS_FORWARD(extract_key));
+		return operator()(containers::begin(source_range), containers::end(source_range), containers::begin(buffer_range), OPERATORS_FORWARD(extract_key));
 	}
 	constexpr auto operator()(range auto && source_range, range auto && buffer_range) const -> bool {
 		return operator()(source_range, buffer_range, bounded::identity);
@@ -714,8 +715,8 @@ constexpr inline struct unique_ska_sort_t {
 		};
 		return ::containers::erase(
 			to_sort,
-			::containers::unique(begin(to_sort), end(to_sort), equal),
-			end(to_sort)
+			::containers::unique(containers::begin(to_sort), containers::end(to_sort), equal),
+			containers::end(to_sort)
 		);
 	}
 	constexpr auto operator()(range auto && to_sort) const {

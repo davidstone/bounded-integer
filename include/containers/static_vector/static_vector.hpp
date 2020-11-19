@@ -10,6 +10,7 @@
 #include <containers/array/array.hpp>
 #include <containers/append.hpp>
 #include <containers/assign.hpp>
+#include <containers/begin_end.hpp>
 #include <containers/compare_container.hpp>
 #include <containers/contiguous_iterator.hpp>
 #include <containers/data.hpp>
@@ -94,8 +95,6 @@ struct static_vector_data : private lexicographical_comparison::base {
 		return *this;
 	}
 
-	OPERATORS_BRACKET_SEQUENCE_RANGE_DEFINITIONS
-	
 	static constexpr auto capacity() {
 		return bounded::constant<bounded::detail::normalize<capacity_>>;
 	}
@@ -145,8 +144,8 @@ public:
 	using base::base;
 	using base::operator=;
 	
-	using base::operator[];
-
+	OPERATORS_BRACKET_SEQUENCE_RANGE_DEFINITIONS
+	
 	using base::begin;
 	using base::size;
 

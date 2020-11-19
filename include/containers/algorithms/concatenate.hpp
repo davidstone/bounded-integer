@@ -7,6 +7,7 @@
 
 #include <containers/algorithms/uninitialized.hpp>
 #include <containers/append.hpp>
+#include <containers/begin_end.hpp>
 #include <containers/data.hpp>
 #include <containers/is_iterator.hpp>
 #include <containers/size.hpp>
@@ -89,7 +90,7 @@ constexpr auto concatenate(auto && ... ranges) {
 		auto const new_begin = containers::data(ref) + reusable.before_size;
 		::containers::uninitialized_move_destroy(containers::reversed(ref), containers::reverse_iterator(new_begin + size(ref)));
 		ref.append_from_capacity(reusable.before_size);
-		::containers::detail::concatenate_prepend_append(ref, begin(ref), OPERATORS_FORWARD(ranges)...);
+		::containers::detail::concatenate_prepend_append(ref, containers::begin(ref), OPERATORS_FORWARD(ranges)...);
 		return std::move(ref);
 	}
 

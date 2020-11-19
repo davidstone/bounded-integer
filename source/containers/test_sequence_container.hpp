@@ -5,6 +5,7 @@
 
 #include <containers/algorithms/compare.hpp>
 #include <containers/assign.hpp>
+#include <containers/begin_end.hpp>
 #include <containers/is_empty.hpp>
 #include <containers/push_back.hpp>
 #include <containers/range_view.hpp>
@@ -21,10 +22,10 @@ using namespace bounded::literal;
 template<typename Container>
 constexpr bool test_sequence_container_default_constructed_empty() {
 	auto const default_constructed = Container();
-	BOUNDED_TEST(begin(default_constructed) == begin(default_constructed));
-	BOUNDED_TEST(begin(default_constructed) == end(default_constructed));
-	BOUNDED_TEST(end(default_constructed) == begin(default_constructed));
-	BOUNDED_TEST(end(default_constructed) == end(default_constructed));
+	BOUNDED_TEST(containers::begin(default_constructed) == containers::begin(default_constructed));
+	BOUNDED_TEST(containers::begin(default_constructed) == containers::end(default_constructed));
+	BOUNDED_TEST(containers::end(default_constructed) == containers::begin(default_constructed));
+	BOUNDED_TEST(containers::end(default_constructed) == containers::end(default_constructed));
 	BOUNDED_TEST(default_constructed == default_constructed);
 	BOUNDED_TEST(containers::is_empty(default_constructed));
 	BOUNDED_TEST(containers::size(default_constructed) == 0_bi);

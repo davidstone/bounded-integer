@@ -5,6 +5,7 @@
 
 #pragma once
 
+#include <containers/begin_end.hpp>
 #include <containers/is_iterator_sentinel.hpp>
 
 #include <iterator>
@@ -16,6 +17,6 @@ using std::begin;
 using std::end;
 
 template<typename T>
-concept range = sentinel_for<decltype(end(std::declval<T const &>())), decltype(begin(std::declval<T const &>()))>;
+concept range = sentinel_for<decltype(containers::end(std::declval<T const &>())), decltype(containers::begin(std::declval<T const &>()))>;
 
 }	// namespace containers

@@ -19,11 +19,11 @@ namespace detail {
 
 struct reverse_traits {
 	static constexpr auto get_begin(auto && range) {
-		return end(OPERATORS_FORWARD(range));
+		return containers::end(OPERATORS_FORWARD(range));
 	}
 
 	static constexpr auto get_end(auto && range) {
-		return begin(OPERATORS_FORWARD(range));
+		return containers::begin(OPERATORS_FORWARD(range));
 	}
 
 	static constexpr decltype(auto) dereference(bidirectional_iterator auto it) {

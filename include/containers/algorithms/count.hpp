@@ -5,7 +5,6 @@
 
 #pragma once
 
-#include <containers/begin_end.hpp>
 #include <containers/range_view.hpp>
 #include <containers/size.hpp>
 

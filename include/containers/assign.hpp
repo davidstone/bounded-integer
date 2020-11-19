@@ -19,17 +19,17 @@
 namespace containers {
 
 constexpr void assign(resizable_container auto & destination, range auto && source) {
-	auto it = begin(destination);
-	auto first = begin(OPERATORS_FORWARD(source));
-	auto last = end(OPERATORS_FORWARD(source));
+	auto it = containers::begin(destination);
+	auto first = containers::begin(OPERATORS_FORWARD(source));
+	auto last = containers::end(OPERATORS_FORWARD(source));
 	for (; first != last; ++first) {
-		if (it == end(destination)) {
+		if (it == containers::end(destination)) {
 			break;
 		}
 		*it = *first;
 		++it;
 	}
-	::containers::erase(destination, it, end(destination));
+	::containers::erase(destination, it, containers::end(destination));
 	::containers::append(destination, range_view(first, last));
 }
 template<resizable_container Container>

@@ -6,14 +6,15 @@
 #pragma once
 
 #include <containers/common_iterator_functions.hpp>
+#include <containers/begin_end.hpp>
 #include <containers/reference_wrapper.hpp>
 
 #include <bounded/detail/construct_destroy.hpp>
-#include <operators/forward.hpp>
 #include <bounded/integer.hpp>
 #include <bounded/unreachable.hpp>
 #include <bounded/value_to_function.hpp>
 
+#include <operators/forward.hpp>
 #include <operators/operators.hpp>
 
 #include <iterator>

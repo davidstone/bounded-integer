@@ -6,29 +6,31 @@
 #pragma once
 
 #include <containers/algorithms/find.hpp>
+#include <containers/begin_end.hpp>
 #include <containers/is_range.hpp>
 
-#include <operators/forward.hpp>
 #include <bounded/integer.hpp>
+
+#include <operators/forward.hpp>
 
 namespace containers {
 
 constexpr auto all(range auto && range, auto predicate) {
-	return ::containers::find_if_not(OPERATORS_FORWARD(range), predicate) == end(OPERATORS_FORWARD(range));
+	return ::containers::find_if_not(OPERATORS_FORWARD(range), predicate) == containers::end(OPERATORS_FORWARD(range));
 }
 constexpr auto all_equal(range auto && range, auto && value) {
 	return ::containers::all(OPERATORS_FORWARD(range), bounded::equal_to(OPERATORS_FORWARD(value)));
 }
 
 constexpr auto any(range auto && range, auto predicate) {
-	return ::containers::find_if(OPERATORS_FORWARD(range), predicate) != end(OPERATORS_FORWARD(range));
+	return ::containers::find_if(OPERATORS_FORWARD(range), predicate) != containers::end(OPERATORS_FORWARD(range));
 }
 constexpr auto any_equal(range auto && range, auto && value) {
 	return ::containers::any(OPERATORS_FORWARD(range), bounded::equal_to(OPERATORS_FORWARD(value)));
 }
 
 constexpr auto none(range auto && range, auto predicate) {
-	return ::containers::find_if(OPERATORS_FORWARD(range), predicate) == end(OPERATORS_FORWARD(range));
+	return ::containers::find_if(OPERATORS_FORWARD(range), predicate) == containers::end(OPERATORS_FORWARD(range));
 }
 constexpr auto none_equal(range auto && range, auto && value) {
 	return ::containers::none(OPERATORS_FORWARD(range), bounded::equal_to(OPERATORS_FORWARD(value)));

@@ -7,6 +7,7 @@
 
 #include <containers/algorithms/compare.hpp>
 #include <containers/algorithms/concatenate.hpp>
+#include <containers/begin_end.hpp>
 #include <containers/range_view.hpp>
 #include <containers/single_element_range.hpp>
 #include <containers/small_buffer_optimized_vector.hpp>
@@ -90,12 +91,12 @@ inline constexpr auto c_string_sentinel = c_string_sentinel_t<CharT>{};
 
 template<typename CharT>
 constexpr auto operator<=>(basic_string<CharT> const & lhs, CharT const * const rhs) {
-	return ::containers::lexicographical_compare_3way(begin(lhs), end(lhs), rhs, detail::c_string_sentinel<CharT>);
+	return ::containers::lexicographical_compare_3way(containers::begin(lhs), containers::end(lhs), rhs, detail::c_string_sentinel<CharT>);
 }
 
 template<typename CharT>
 constexpr auto operator==(basic_string<CharT> const & lhs, CharT const * const rhs) -> bool {
-	return ::containers::equal(begin(lhs), end(lhs), rhs, detail::c_string_sentinel<CharT>);
+	return ::containers::equal(containers::begin(lhs), containers::end(lhs), rhs, detail::c_string_sentinel<CharT>);
 }
 
 template<typename CharT>

@@ -151,6 +151,8 @@ add_library(containers_test STATIC
 	source/containers/compare_container.cpp
 	source/containers/contiguous_iterator.cpp
 	source/containers/data.cpp
+	source/containers/default_adapt_traits.cpp
+	source/containers/default_begin_end.cpp
 	source/containers/dynamic_array.cpp
 	source/containers/emplace_back.cpp
 	source/containers/erase.cpp

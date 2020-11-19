@@ -6,6 +6,7 @@
 #pragma once
 
 #include <containers/algorithms/partition.hpp>
+#include <containers/begin_end.hpp>
 #include <containers/is_range.hpp>
 
 #include <operators/forward.hpp>
@@ -37,7 +38,7 @@ constexpr inline struct upper_bound_t {
 constexpr inline struct binary_search_t {
 	constexpr bool operator()(range auto && sorted, auto const & value, auto cmp) const {
 		auto const it = lower_bound(OPERATORS_FORWARD(sorted), value, cmp);
-		return it != end(sorted) and !cmp(value, *it);
+		return it != containers::end(sorted) and !cmp(value, *it);
 	}
 	constexpr bool operator()(range auto && sorted, auto const & value) const {
 		return operator()(sorted, value, std::less{});

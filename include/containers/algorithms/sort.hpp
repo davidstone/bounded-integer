@@ -7,6 +7,7 @@
 
 #include <containers/algorithms/advance.hpp>
 #include <containers/algorithms/binary_search.hpp>
+#include <containers/begin_end.hpp>
 #include <containers/is_iterator_sentinel.hpp>
 #include <containers/is_range.hpp>
 #include <containers/legacy_iterator.hpp>
@@ -68,7 +69,7 @@ constexpr inline struct sort_t {
 		}
 	}
 	constexpr void operator()(range auto & to_sort, auto cmp) const {
-		operator()(begin(to_sort), end(to_sort), cmp);
+		operator()(containers::begin(to_sort), containers::end(to_sort), cmp);
 	}
 	constexpr void operator()(range auto & to_sort) const {
 		operator()(to_sort, std::less{});
@@ -77,8 +78,8 @@ constexpr inline struct sort_t {
 
 constexpr inline struct is_sorted_t {
 	constexpr bool operator()(range auto && to_sort, auto cmp) const {
-		auto first = begin(to_sort);
-		auto const last = end(to_sort);
+		auto first = containers::begin(to_sort);
+		auto const last = containers::end(to_sort);
 		if (first != last) {
 			for (auto next = containers::next(first); next != last; ++next) {
 				if (cmp(*next, *first)) {

@@ -10,6 +10,7 @@
 #include <containers/algorithms/distance.hpp>
 #include <containers/algorithms/uninitialized.hpp>
 #include <containers/assign.hpp>
+#include <containers/begin_end.hpp>
 #include <containers/compare_container.hpp>
 #include <containers/contiguous_iterator.hpp>
 #include <containers/is_iterator.hpp>
@@ -112,7 +113,7 @@ template<typename T, range Range> requires(!detail::is_initializer_list<std::dec
 constexpr auto assign(dynamic_array<T> & container, Range && range) {
 	auto const difference = detail::linear_size(range);
 	if (difference == containers::size(container)) {
-		::containers::copy(begin(OPERATORS_FORWARD(range)), end(OPERATORS_FORWARD(range)), begin(container));
+		::containers::copy(containers::begin(OPERATORS_FORWARD(range)), containers::end(OPERATORS_FORWARD(range)), containers::begin(container));
 	} else {
 		containers::clear(container);
 		container = dynamic_array<T>(OPERATORS_FORWARD(range));

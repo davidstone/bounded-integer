@@ -7,6 +7,7 @@
 
 #include <containers/algorithms/advance.hpp>
 #include <containers/algorithms/find.hpp>
+#include <containers/begin_end.hpp>
 
 #include <bounded/integer.hpp>
 
@@ -29,7 +30,7 @@ constexpr auto remove_if(ForwardIterator const first, sentinel_for<ForwardIterat
 }
 
 constexpr auto remove_if(range auto & source, auto predicate) {
-	return ::containers::remove_if(begin(source), end(source), OPERATORS_FORWARD(predicate));
+	return ::containers::remove_if(containers::begin(source), containers::end(source), OPERATORS_FORWARD(predicate));
 }
 
 
@@ -39,7 +40,7 @@ constexpr auto remove(ForwardIterator const first, sentinel_for<ForwardIterator>
 }
 
 constexpr auto remove(range auto & source, auto const & value) {
-	return ::containers::remove_if(begin(source), end(source), value);
+	return ::containers::remove_if(containers::begin(source), containers::end(source), value);
 }
 
 }	// namespace containers

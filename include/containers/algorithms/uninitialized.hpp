@@ -8,6 +8,7 @@
 #include <containers/algorithms/move_destroy_iterator.hpp>
 #include <containers/algorithms/move_iterator.hpp>
 #include <containers/algorithms/reverse_iterator.hpp>
+#include <containers/begin_end.hpp>
 #include <containers/is_iterator_sentinel.hpp>
 #include <containers/is_range.hpp>
 #include <containers/size.hpp>
@@ -42,7 +43,7 @@ constexpr void destroy_range(InputIterator first, sentinel_for<InputIterator> au
 }
 
 constexpr void destroy_range(range auto && r) {
-	::containers::detail::destroy_range(begin(OPERATORS_FORWARD(r)), end(OPERATORS_FORWARD(r)));
+	::containers::detail::destroy_range(containers::begin(OPERATORS_FORWARD(r)), containers::end(OPERATORS_FORWARD(r)));
 }
 
 }	// namespace detail
@@ -107,8 +108,8 @@ constexpr auto uninitialized_move_destroy(InputIterator const first, sentinel_fo
 
 constexpr auto uninitialized_move_destroy(range auto && source, iterator auto out) {
 	return ::containers::uninitialized_move_destroy(
-		begin(OPERATORS_FORWARD(source)),
-		end(OPERATORS_FORWARD(source)),
+		containers::begin(OPERATORS_FORWARD(source)),
+		containers::end(OPERATORS_FORWARD(source)),
 		out
 	);
 }
@@ -117,7 +118,7 @@ constexpr auto uninitialized_move_destroy(range auto && source, iterator auto ou
 namespace detail {
 
 constexpr auto transfer_all_contents(auto && source, auto & destination) {
-	::containers::uninitialized_move_destroy(OPERATORS_FORWARD(source), begin(destination));
+	::containers::uninitialized_move_destroy(OPERATORS_FORWARD(source), containers::begin(destination));
 	source.append_from_capacity(-containers::size(source));
 }
 

@@ -22,8 +22,8 @@ constexpr auto shrink_to_fit(Container & c) {
 		return;
 	}
 	auto temp = Container(range_view(
-		::containers::move_destroy_iterator(begin(c)),
-		::containers::move_destroy_iterator(end(c))
+		::containers::move_destroy_iterator(containers::begin(c)),
+		::containers::move_destroy_iterator(containers::end(c))
 	));
 	c.append_from_capacity(-containers::size(c));
 	c = std::move(temp);

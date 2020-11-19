@@ -5,6 +5,7 @@
 
 #pragma once
 
+#include <containers/begin_end.hpp>
 #include <containers/iterator_adapter.hpp>
 #include <containers/non_modifying_common_container_functions.hpp>
 #include <containers/reference_wrapper.hpp>

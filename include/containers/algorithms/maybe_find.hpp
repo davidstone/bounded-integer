@@ -6,6 +6,7 @@
 #pragma once
 
 #include <containers/algorithms/find.hpp>
+#include <containers/begin_end.hpp>
 #include <containers/is_iterator_sentinel.hpp>
 #include <containers/is_range.hpp>
 
@@ -30,7 +31,7 @@ constexpr auto maybe_find_if(ForwardIterator const first, sentinel_for<ForwardIt
 }
 
 constexpr auto maybe_find_if(range auto && range, auto predicate) {
-	return ::containers::maybe_find_if(begin(OPERATORS_FORWARD(range)), end(OPERATORS_FORWARD(range)), std::move(predicate));
+	return ::containers::maybe_find_if(containers::begin(OPERATORS_FORWARD(range)), containers::end(OPERATORS_FORWARD(range)), std::move(predicate));
 }
 
 
@@ -40,7 +41,7 @@ constexpr auto maybe_find(ForwardIterator const first, sentinel_for<ForwardItera
 }
 
 constexpr auto maybe_find(range auto && range, auto const & value) {
-	return ::containers::maybe_find(begin(OPERATORS_FORWARD(range)), end(OPERATORS_FORWARD(range)), value);
+	return ::containers::maybe_find(containers::begin(OPERATORS_FORWARD(range)), containers::end(OPERATORS_FORWARD(range)), value);
 }
 
 }	// namespace containers
