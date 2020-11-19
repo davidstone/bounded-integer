@@ -28,7 +28,7 @@ constexpr void reserve_if_reservable(Container & container, typename Container::
 template<typename Container>
 constexpr auto reallocation_size(Container const & container, auto const count) {
 	return static_cast<typename Container::size_type>(bounded::max(
-		size(container) + count,
+		containers::size(container) + count,
 		container.capacity() * 2_bi
 	));
 }

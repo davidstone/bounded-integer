@@ -30,14 +30,14 @@ void test_generic(bounded::constant_t<capacity_> const capacity, T const & t, st
 	BOUNDED_TEST(begin(default_constructed) == end(default_constructed));
 	
 	auto const count = container(containers::repeat_default_n<T>(capacity));
-	BOUNDED_TEST(size(count) == capacity);
+	BOUNDED_TEST(containers::size(count) == capacity);
 
 	for (auto const & value : count) {
 		BOUNDED_TEST(value == T{});
 	}
 	
 	auto const count_arg = container(containers::repeat_n(capacity, t));
-	BOUNDED_TEST(size(count_arg) == capacity);
+	BOUNDED_TEST(containers::size(count_arg) == capacity);
 	for (auto const & value : count_arg) {
 		BOUNDED_TEST(value == t);
 	}
@@ -62,7 +62,7 @@ void test_generic(bounded::constant_t<capacity_> const capacity, T const & t, st
 	BOUNDED_TEST(move == init_list);
 	
 	copy = move;
-	BOUNDED_TEST(size(copy) == init.size());
+	BOUNDED_TEST(containers::size(copy) == init.size());
 	BOUNDED_TEST(copy == move);
 	
 	move = std::move(copy);
@@ -76,15 +76,15 @@ void test_generic(bounded::constant_t<capacity_> const capacity, T const & t, st
 
 	containers::clear(copy);
 	containers::push_back(copy, t);
-	BOUNDED_TEST(size(copy) == 1_bi);
+	BOUNDED_TEST(containers::size(copy) == 1_bi);
 	BOUNDED_TEST(containers::back(copy) == t);
 	containers::pop_back(copy);
 	containers::push_back(copy, T(t));
-	BOUNDED_TEST(size(copy) == 1_bi);
+	BOUNDED_TEST(containers::size(copy) == 1_bi);
 	BOUNDED_TEST(containers::back(copy) == t);
 	containers::clear(copy);
 	containers::insert(copy, begin(copy), t);
-	BOUNDED_TEST(size(copy) == 1_bi);
+	BOUNDED_TEST(containers::size(copy) == 1_bi);
 	BOUNDED_TEST(containers::back(copy) == t);
 	
 	containers::assign(copy, init);
@@ -97,7 +97,7 @@ void test_generic(bounded::constant_t<capacity_> const capacity, T const & t, st
 	containers::clear(copy);
 	containers::resize(copy, capacity);
 	BOUNDED_TEST(containers::front(copy) == T{});
-	BOUNDED_TEST(size(copy) == capacity);
+	BOUNDED_TEST(containers::size(copy) == capacity);
 	containers::resize(copy, 0_bi);
 	BOUNDED_TEST(containers::is_empty(copy));
 	containers::resize(copy, capacity, t);

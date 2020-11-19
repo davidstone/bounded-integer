@@ -14,7 +14,7 @@ using namespace bounded::literal;
 constexpr auto forward = containers::array<int, 5>{0, 1, 2, 3, 4};
 constexpr auto reversed = containers::reversed(forward);
 
-static_assert(size(reversed) == 5_bi);
+static_assert(containers::size(reversed) == 5_bi);
 static_assert(begin(reversed) < end(reversed));
 static_assert(begin(reversed) + 5_bi == end(reversed));
 

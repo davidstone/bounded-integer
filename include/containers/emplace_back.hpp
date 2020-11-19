@@ -9,7 +9,6 @@
 #include <containers/front_back.hpp>
 #include <containers/lazy_push_back.hpp>
 #include <containers/reserve_if_reservable.hpp>
-#include <containers/size.hpp>
 
 #include <bounded/integer.hpp>
 #include <bounded/unreachable.hpp>

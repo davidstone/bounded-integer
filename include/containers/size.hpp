@@ -19,11 +19,11 @@ concept random_access_range = requires(Range const & range) {
 	static_cast<typename Range::size_type>(end(range) - begin(range));
 };
 
-namespace common {
+} // namespace detail
 
-template<range Range> requires has_member_size<Range> or random_access_range<Range>
+template<range Range> requires detail::has_member_size<Range> or detail::random_access_range<Range>
 constexpr auto size(Range const & range) {
-	if constexpr (has_member_size<Range>) {
+	if constexpr (detail::has_member_size<Range>) {
 		return range.size();
 	} else if constexpr (bounded::bounded_integer<typename Range::size_type>) {
 		return typename Range::size_type(end(range) - begin(range), bounded::non_check);
@@ -32,20 +32,15 @@ constexpr auto size(Range const & range) {
 	}
 }
 
-}	// namespace common
-
-using ::containers::detail::common::size;
+namespace detail {
 
 constexpr auto linear_size(range auto const & r) {
-	if constexpr (requires { size(r); }) {
-		return size(r);
+	if constexpr (requires { containers::size(r); }) {
+		return containers::size(r);
 	} else {
 		return containers::distance(begin(r), end(r));
 	}
 }
 
-}	// namespace detail
-
-using ::containers::detail::common::size;
-
-}	// namespace containers
+} // namespace detail
+} // namespace containers

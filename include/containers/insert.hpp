@@ -16,6 +16,7 @@
 #include <containers/range_view.hpp>
 #include <containers/reserve_if_reservable.hpp>
 #include <containers/resizable_container.hpp>
+#include <containers/size.hpp>
 
 #include <bounded/integer.hpp>
 #include <bounded/unreachable.hpp>
@@ -29,7 +30,7 @@ template<typename Container>
 constexpr auto insert_or_emplace_with_reallocation(Container & container, typename Container::const_iterator const position, auto const number_of_elements, auto construct) {
 	// There is a reallocation required, so just put everything in the
 	// correct place to begin with
-	auto const original_size = size(container);
+	auto const original_size = containers::size(container);
 	auto temp = Container();
 	temp.reserve(::containers::detail::reallocation_size(container, number_of_elements));
 	// First construct the new element because the arguments to
@@ -65,7 +66,7 @@ constexpr auto lazy_insert(
 	auto const offset = position - begin(container);
 	if (position == end(container)) {
 		::containers::lazy_push_back(container, OPERATORS_FORWARD(constructor));
-	} else if (size(container) < container.capacity()) {
+	} else if (containers::size(container) < container.capacity()) {
 		auto const mutable_position = ::containers::detail::mutable_iterator(container, position);
 		auto const original_end = end(container);
 		::containers::push_back(container, std::move(containers::back(container)));
@@ -96,7 +97,7 @@ template<resizable_container Container, range Range = std::initializer_list<type
 constexpr auto insert(Container & container, typename Container::const_iterator position, Range && range) {
 	BOUNDED_ASSERT(::containers::detail::iterator_points_into_container(container, position));
 	auto const range_size = ::containers::detail::linear_size(range);
-	if (size(container) + range_size <= container.capacity()) {
+	if (containers::size(container) + range_size <= container.capacity()) {
 		auto const mutable_position = ::containers::detail::mutable_iterator(container, position);
 		::containers::uninitialized_move_destroy(
 			containers::reversed(range_view(mutable_position, end(container))),

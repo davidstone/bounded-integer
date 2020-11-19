@@ -10,6 +10,7 @@
 #include <containers/algorithms/reverse_iterator.hpp>
 #include <containers/is_iterator_sentinel.hpp>
 #include <containers/is_range.hpp>
+#include <containers/size.hpp>
 
 #include <operators/forward.hpp>
 #include <bounded/integer.hpp>
@@ -117,7 +118,7 @@ namespace detail {
 
 constexpr auto transfer_all_contents(auto && source, auto & destination) {
 	::containers::uninitialized_move_destroy(OPERATORS_FORWARD(source), begin(destination));
-	source.append_from_capacity(-size(source));
+	source.append_from_capacity(-containers::size(source));
 }
 
 } // namespace detail

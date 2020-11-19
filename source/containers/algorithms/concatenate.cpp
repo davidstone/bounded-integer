@@ -22,7 +22,7 @@ constexpr bool test() {
 	
 	auto make_reusable_container = [&]{
 		auto result = containers::vector<int>{};
-		result.reserve(static_cast<containers::vector<int>::size_type>(size(a) + size(b) + size(c)));
+		result.reserve(static_cast<containers::vector<int>::size_type>(containers::size(a) + containers::size(b) + containers::size(c)));
 		return result;
 	};
 	auto const d = make_reusable_container();

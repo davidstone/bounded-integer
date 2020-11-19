@@ -9,6 +9,7 @@
 #include <containers/algorithms/find.hpp>
 #include <containers/algorithms/reverse_iterator.hpp>
 #include <containers/is_range.hpp>
+#include <containers/size.hpp>
 
 #include <bounded/assert.hpp>
 #include <operators/forward.hpp>
@@ -35,8 +36,8 @@ constexpr inline struct is_partitioned_t {
 
 constexpr inline struct partition_point_t {
 	constexpr auto operator()(range auto && input, auto predicate) const {
-		using size_type = decltype(size(input));
-		auto count = bounded::integer<0, bounded::detail::builtin_max_value<size_type>>(size(input));
+		using size_type = decltype(containers::size(input));
+		auto count = bounded::integer<0, bounded::detail::builtin_max_value<size_type>>(containers::size(input));
 		auto first = begin(input);
 		if constexpr (bounded::max_value<decltype(count)> == bounded::constant<0>) {
 			return first;

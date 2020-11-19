@@ -32,7 +32,7 @@ static_assert(
 );
 
 static_assert(
-	size(containers::integer_range(0_bi, 0_bi)) == 0_bi,
+	containers::size(containers::integer_range(0_bi, 0_bi)) == 0_bi,
 	"Incorrect size of empty range."
 );
 static_assert(
@@ -41,7 +41,7 @@ static_assert(
 );
 
 static_assert(
-	size(containers::integer_range(
+	containers::size(containers::integer_range(
 		static_cast<bounded::integer<1, 2>>(1_bi),
 		static_cast<bounded::integer<3, 5>>(3_bi)
 	)) == 2_bi,

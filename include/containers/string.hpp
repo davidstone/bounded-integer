@@ -105,7 +105,7 @@ constexpr auto operator<=>(basic_string<CharT> const & lhs, std::basic_string_vi
 
 template<typename CharT>
 constexpr auto operator==(basic_string<CharT> const & lhs, std::basic_string_view<CharT> const rhs) -> bool {
-	return size(lhs) == rhs.size() and ::containers::equal(begin(lhs), end(lhs), begin(rhs));
+	return std::string_view(lhs) == rhs;
 }
 
 

@@ -10,6 +10,7 @@
 #include <containers/is_empty.hpp>
 #include <containers/is_range.hpp>
 #include <containers/range_view.hpp>
+#include <containers/size.hpp>
 
 #include <bounded/detail/construct_destroy.hpp>
 #include <bounded/detail/make_index_sequence.hpp>
@@ -160,7 +161,7 @@ public:
 			auto specific_range = [&](auto const index) {
 				auto const range = lhs.m_range_views[index];
 				using size_type = typename decltype(range)::size_type;
-				auto const added_size = size_type(bounded::min(size(range), remaining_offset));
+				auto const added_size = size_type(bounded::min(containers::size(range), remaining_offset));
 				remaining_offset -= added_size;
 				return range_view(begin(range) + size_type(added_size), end(range));
 			};
@@ -193,7 +194,7 @@ public:
 		concatenate_view_sentinel,
 		concatenate_view_iterator const rhs
 	) {
-		auto transform = [](auto const range) { return size(range); };
+		auto transform = [](auto const range) { return containers::size(range); };
 		return bounded::apply(
 			bounded::transform(transform, rhs.m_range_views),
 			[](auto... integers) { return (... + integers); }

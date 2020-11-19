@@ -21,10 +21,10 @@ namespace containers {
 namespace detail {
 
 constexpr auto resize_impl(auto & container_to_resize, auto const initializer_range) {
-	while (size(container_to_resize) > size(initializer_range)) {
+	while (containers::size(container_to_resize) > containers::size(initializer_range)) {
 		pop_back(container_to_resize);
 	}
-	auto const remaining = size(initializer_range) - size(container_to_resize);
+	auto const remaining = containers::size(initializer_range) - containers::size(container_to_resize);
 	::containers::append(container_to_resize, containers::take(initializer_range, remaining));
 }
 

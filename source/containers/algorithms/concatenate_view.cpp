@@ -32,22 +32,22 @@ static_assert(containers::iterator<iterator>);
 static_assert(containers::sentinel_for<sentinel, iterator>);
 static_assert(containers::range<decltype(two)>);
 
-static_assert(size(two) == size(array1) + size(array2));
+static_assert(containers::size(two) == containers::size(array1) + containers::size(array2));
 static_assert(equal_values_and_types(
 	two,
 	containers::array{1, 2, 3, 2, 3, 5, 7}
 ));
-static_assert(begin(two) + size(two) == end(two));
-static_assert(begin(two) + size(two) - begin(two) == size(two));
+static_assert(begin(two) + containers::size(two) == end(two));
+static_assert(begin(two) + containers::size(two) - begin(two) == containers::size(two));
 
 constexpr auto three = containers::concatenate_view(array3, array1, array2);
-static_assert(size(three) == size(array3) + size(array1) + size(array2));
+static_assert(containers::size(three) == containers::size(array3) + containers::size(array1) + containers::size(array2));
 static_assert(equal_values_and_types(
 	three,
 	containers::array{1, 1, 2, 3, 5, 1, 2, 3, 2, 3, 5, 7}
 ));
-static_assert(begin(three) + size(three) == end(three));
-static_assert(begin(three) + size(three) - begin(three) == size(three));
+static_assert(begin(three) + containers::size(three) == end(three));
+static_assert(begin(three) + containers::size(three) - begin(three) == containers::size(three));
 
 static_assert(*(begin(three) + 7_bi) == 3);
 

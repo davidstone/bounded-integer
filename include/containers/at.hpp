@@ -26,7 +26,7 @@ constexpr decltype(auto) at(range auto && r, auto const index) {
 	return OPERATORS_FORWARD(r)[bounded::check_in_range<std::out_of_range>(
 		bounded::integer(index),
 		0_bi,
-		size(r) - 1_bi
+		containers::size(r) - 1_bi
 	)];
 }
 

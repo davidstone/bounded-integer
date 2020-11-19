@@ -17,7 +17,7 @@ namespace containers {
 
 template<range Container>
 constexpr auto shrink_to_fit(Container & c) {
-	auto const s = size(c);
+	auto const s = containers::size(c);
 	if (s == c.capacity() or c.capacity() <= bounded::min_value<decltype(c.capacity())>) {
 		return;
 	}
@@ -25,7 +25,7 @@ constexpr auto shrink_to_fit(Container & c) {
 		::containers::move_destroy_iterator(begin(c)),
 		::containers::move_destroy_iterator(end(c))
 	));
-	c.append_from_capacity(-size(c));
+	c.append_from_capacity(-containers::size(c));
 	c = std::move(temp);
 }
 

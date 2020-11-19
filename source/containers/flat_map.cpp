@@ -50,9 +50,9 @@ constexpr auto test() {
 	container.insert(container_type::value_type(4, 4));
 	container.try_emplace(5, 3);
 	BOUNDED_TEST(container.at(5) == 3);
-	BOUNDED_TEST(size(container) == 5_bi);
+	BOUNDED_TEST(containers::size(container) == 5_bi);
 	container.insert(typename container_type::value_type(3, 10));
-	BOUNDED_TEST(size(container) == 5_bi);
+	BOUNDED_TEST(containers::size(container) == 5_bi);
 	BOUNDED_TEST(container.at(3) == 3);
 	return true;
 }
@@ -248,7 +248,7 @@ void test_performance(std::size_t const loop_count) {
 	#if defined TRACK_EXTRACTIONS
 		auto const found_with_extra_extractions = number_of_extractions;
 	#endif
-	std::cout << "map size: " << size(map) << "\n\n";
+	std::cout << "map size: " << containers::size(map) << "\n\n";
 	
 	#if defined TRACK_EXTRACTIONS
 		std::cout << "Constructed extractions: " << constructed_extractions << '\n';

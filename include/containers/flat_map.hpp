@@ -15,6 +15,7 @@
 #include <containers/erase.hpp>
 #include <containers/legacy_iterator.hpp>
 #include <containers/non_modifying_common_container_functions.hpp>
+#include <containers/size.hpp>
 #include <containers/vector.hpp>
 
 #include <operators/forward.hpp>
@@ -342,7 +343,7 @@ public:
 		// sorted, it's probably better to just sort the new elements then do a
 		// merge sort on both ranges, rather than calling std::sort on the
 		// entire container.
-		auto const original_size = size(m_container);
+		auto const original_size = containers::size(m_container);
 		::containers::append(m_container, OPERATORS_FORWARD(init));
 		auto const midpoint = begin() + original_size;
 

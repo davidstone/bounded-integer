@@ -27,7 +27,7 @@ constexpr bool test_sequence_container_default_constructed_empty() {
 	BOUNDED_TEST(end(default_constructed) == end(default_constructed));
 	BOUNDED_TEST(default_constructed == default_constructed);
 	BOUNDED_TEST(containers::is_empty(default_constructed));
-	BOUNDED_TEST(size(default_constructed) == 0_bi);
+	BOUNDED_TEST(containers::size(default_constructed) == 0_bi);
 	return true;
 }
 
@@ -199,23 +199,23 @@ constexpr auto test_reserve() {
 	auto v = Container();
 	auto const capacity0 = v.capacity();
 	BOUNDED_TEST(capacity0 >= 0_bi);
-	BOUNDED_TEST(size(v) == 0_bi);
+	BOUNDED_TEST(containers::size(v) == 0_bi);
 	v.reserve(10_bi);
 	auto const capacity10 = v.capacity();
 	BOUNDED_TEST(capacity10 >= 10_bi);
 	BOUNDED_TEST(capacity10 >= capacity0);
-	BOUNDED_TEST(size(v) == 0_bi);
+	BOUNDED_TEST(containers::size(v) == 0_bi);
 	shrink_to_fit(v);
-	BOUNDED_TEST(size(v) == 0_bi);
+	BOUNDED_TEST(containers::size(v) == 0_bi);
 	BOUNDED_TEST(v.capacity() == capacity0);
 	v.reserve(10_bi);
-	BOUNDED_TEST(size(v) == 0_bi);
+	BOUNDED_TEST(containers::size(v) == 0_bi);
 	BOUNDED_TEST(v.capacity() == capacity10);
 	containers::push_back(v, {});
-	BOUNDED_TEST(size(v) == 1_bi);
+	BOUNDED_TEST(containers::size(v) == 1_bi);
 	BOUNDED_TEST(v.capacity() == capacity10);
 	shrink_to_fit(v);
-	BOUNDED_TEST(size(v) == 1_bi);
+	BOUNDED_TEST(containers::size(v) == 1_bi);
 	BOUNDED_TEST(v.capacity() >= capacity0);
 	BOUNDED_TEST(v.capacity() <= capacity10);
 	return true;

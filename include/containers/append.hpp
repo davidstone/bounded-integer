@@ -41,7 +41,7 @@ constexpr auto append(Container & output, range auto && input) -> void {
 	constexpr auto reserve_space = std::is_convertible_v<iterator_category, std::forward_iterator_tag> and detail::reservable<Container>;
 	if constexpr (reserve_space) {
 		auto const input_size = [&] {
-			auto const value = size(input);
+			auto const value = containers::size(input);
 			if constexpr (bounded::bounded_integer<decltype(value)>) {
 				return value;
 			} else {

@@ -15,6 +15,7 @@
 #include <containers/is_iterator.hpp>
 #include <containers/maximum_array_size.hpp>
 #include <containers/non_modifying_common_container_functions.hpp>
+#include <containers/size.hpp>
 #include <containers/uninitialized_storage.hpp>
 
 #include <operators/forward.hpp>
@@ -110,7 +111,7 @@ inline constexpr bool is_initializer_list<std::initializer_list<T>> = true;
 template<typename T, range Range> requires(!detail::is_initializer_list<std::decay_t<Range>>)
 constexpr auto assign(dynamic_array<T> & container, Range && range) {
 	auto const difference = detail::linear_size(range);
-	if (difference == size(container)) {
+	if (difference == containers::size(container)) {
 		::containers::copy(begin(OPERATORS_FORWARD(range)), end(OPERATORS_FORWARD(range)), begin(container));
 	} else {
 		containers::clear(container);

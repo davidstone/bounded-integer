@@ -28,7 +28,7 @@ constexpr auto & lazy_push_back(
 	Container & container,
 	bounded::construct_function_for<typename Container::value_type> auto && constructor
 ) {
-	auto const initial_size = size(container);
+	auto const initial_size = containers::size(container);
 	auto construct = [&](auto & ref) {
 		bounded::construct(ref, OPERATORS_FORWARD(constructor));
 	};

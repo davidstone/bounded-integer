@@ -8,7 +8,6 @@
 #include <containers/algorithms/compare.hpp>
 #include <containers/begin_end.hpp>
 #include <containers/common_functions.hpp>
-#include <containers/size.hpp>
 
 namespace containers {
 namespace detail {
@@ -17,8 +16,7 @@ namespace common {
 #define CONTAINERS_NON_MODIFYING_COMMON_USING_DECLARATIONS \
 	BOUNDED_COMMON_ARITHMETIC \
 	using ::containers::begin; \
-	using ::containers::end; \
-	using ::containers::detail::common::size;
+	using ::containers::end;
 
 }	// namespace common
 

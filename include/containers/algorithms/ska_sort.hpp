@@ -16,6 +16,7 @@
 #include <containers/legacy_iterator.hpp>
 #include <containers/is_range.hpp>
 #include <containers/is_iterator_sentinel.hpp>
+#include <containers/size.hpp>
 
 #include <bounded/detail/copy_cv_ref.hpp>
 #include <operators/forward.hpp>
@@ -473,7 +474,7 @@ private:
 			typename std::iterator_traits<decltype(begin(current_key(*first)))>::difference_type(sort_data.current_index)
 		);
 		auto end_of_shorter_ones = containers::partition(first, last, [&](auto const & elem) {
-			return size(current_key(elem)) <= sort_data.current_index;
+			return containers::size(current_key(elem)) <= sort_data.current_index;
 		});
 		if (end_of_shorter_ones - first > 1) {
 			sort_data.next_sort(first, end_of_shorter_ones, extract_key, sort_data.next_sort_data);
@@ -605,7 +606,7 @@ struct ska_sort_copy_t {
 					return *containers::max_element(
 						containers::transform(
 							range_view(first, last),
-							[](auto const & range) { return size(range); }
+							[](auto const & range) { return containers::size(range); }
 						)
 					);
 #endif
