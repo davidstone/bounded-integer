@@ -13,14 +13,11 @@
 #include <bounded/check_in_range.hpp>
 #include <bounded/integer.hpp>
 
-#include <utility>
+#include <stdexcept>
 
 namespace containers {
 
 using namespace bounded::literal;
-
-namespace detail {
-namespace common {
 
 constexpr decltype(auto) at(range auto && r, auto const index) {
 	return OPERATORS_FORWARD(r)[bounded::check_in_range<std::out_of_range>(
@@ -36,12 +33,4 @@ constexpr decltype(auto) at(range auto && r, auto const index, bounded::non_chec
 	return OPERATORS_FORWARD(r)[converted];
 }
 
-}	// namespace common
-
-using ::containers::detail::common::at;
-
-}	// namespace detail
-
-using ::containers::detail::common::at;
-
-}	// namespace containers
+} // namespace containers
