@@ -32,10 +32,6 @@ constexpr auto operator+(bounded::integral auto const offset, iterator auto cons
 	return it + offset;
 }
 
-constexpr auto pointer_from(auto * pointer) {
-	return pointer;
-}
-
 }	// namespace common
 
 using containers::detail::common::operator+;
@@ -43,7 +39,6 @@ using bounded::operator+=;
 using bounded::operator-=;
 using bounded::operator++;
 using bounded::operator--;
-using containers::detail::common::pointer_from;
 
 }	// namespace detail
 
@@ -52,6 +47,5 @@ using bounded::operator+=;
 using bounded::operator-=;
 using bounded::operator++;
 using bounded::operator--;
-using containers::detail::common::pointer_from;
 
 }	// namespace containers

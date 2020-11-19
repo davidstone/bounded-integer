@@ -183,6 +183,7 @@ add_library(containers_test STATIC
 	source/containers/stable_vector.cpp
 	source/containers/string.cpp
 	source/containers/take.cpp
+	source/containers/to_address.cpp
 	source/containers/uninitialized_dynamic_array.cpp
 	source/containers/vector.cpp
 )

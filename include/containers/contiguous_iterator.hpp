@@ -5,6 +5,8 @@
 
 #pragma once
 
+#include <containers/to_address.hpp>
+
 #include <bounded/integer.hpp>
 
 #include <bounded/assert.hpp>
@@ -40,8 +42,8 @@ struct contiguous_iterator {
 	}
 	OPERATORS_ARROW_DEFINITIONS
 
-	friend constexpr auto pointer_from(contiguous_iterator const it) {
-		return it.m_ptr;
+	constexpr auto to_address() const {
+		return m_ptr;
 	}
 	friend auto operator<=>(contiguous_iterator const &, contiguous_iterator const &) = default;
 private:
@@ -54,7 +56,7 @@ constexpr auto operator+(
 	contiguous_iterator<T, max_difference> const lhs,
 	typename contiguous_iterator<T, max_difference>::difference_type const rhs
 ) {
-	return contiguous_iterator<T, max_difference>(pointer_from(lhs) + rhs);
+	return contiguous_iterator<T, max_difference>(to_address(lhs) + rhs);
 }
 
 // Iterators over ranges of zero size tend to come up only in generic code, and
@@ -73,7 +75,7 @@ constexpr auto operator+(
 
 template<typename T, std::ptrdiff_t max_difference>
 constexpr auto operator-(contiguous_iterator<T, max_difference> const lhs, contiguous_iterator<T, max_difference> const rhs) {
-	return static_cast<typename contiguous_iterator<T, max_difference>::difference_type>(pointer_from(lhs) - pointer_from(rhs));
+	return static_cast<typename contiguous_iterator<T, max_difference>::difference_type>(to_address(lhs) - to_address(rhs));
 }
 
 template<typename T, std::ptrdiff_t max_difference>

@@ -8,6 +8,7 @@
 #include <containers/begin_end.hpp>
 #include <containers/common_iterator_functions.hpp>
 #include <containers/is_range.hpp>
+#include <containers/to_address.hpp>
 
 #include <bounded/integer.hpp>
 
@@ -17,7 +18,7 @@ constexpr auto data(range auto && r) {
 	if constexpr (requires { r.data(); }) {
 		return r.data();
 	} else {
-		return pointer_from(containers::begin(r));
+		return containers::to_address(containers::begin(r));
 	}
 }
 
