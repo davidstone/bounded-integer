@@ -6,6 +6,7 @@
 #include <containers/static_vector/static_vector.hpp>
 #include <containers/array/array.hpp>
 #include <containers/emplace_back.hpp>
+#include <containers/index_type.hpp>
 
 #include "../../test_assert.hpp"
 #include "../test_sequence_container.hpp"

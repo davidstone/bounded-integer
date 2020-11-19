@@ -5,6 +5,8 @@
 
 #include <containers/stable_vector.hpp>
 
+#include <containers/index_type.hpp>
+
 #include "test_sequence_container.hpp"
 
 namespace {
