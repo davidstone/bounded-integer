@@ -6,6 +6,8 @@
 #include <containers/algorithms/reverse_iterator.hpp>
 
 #include <containers/array/array.hpp>
+#include <containers/algorithms/compare.hpp>
+#include <containers/size.hpp>
 
 namespace {
 

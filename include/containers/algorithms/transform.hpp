@@ -8,6 +8,7 @@
 #include <containers/algorithms/transform_iterator.hpp>
 #include <containers/adapt.hpp>
 #include <containers/default_begin_end.hpp>
+#include <containers/is_range.hpp>
 
 namespace containers {
 namespace detail {

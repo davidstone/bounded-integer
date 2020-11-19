@@ -7,6 +7,7 @@
 #include <containers/algorithms/accumulate.hpp>
 #include <containers/front_back.hpp>
 #include <containers/is_empty.hpp>
+#include <containers/size.hpp>
 #include <bounded/detail/literal.hpp>
 
 namespace {

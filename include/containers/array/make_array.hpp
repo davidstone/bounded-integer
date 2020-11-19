@@ -16,6 +16,9 @@
 #include <utility>
 
 namespace containers {
+
+using namespace bounded::literal;
+
 namespace detail {
 
 template<std::size_t number_of_values, std::size_t... dimensions>
