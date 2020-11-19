@@ -168,7 +168,6 @@ add_library(containers_test STATIC
 	source/containers/legacy_iterator.cpp
 	source/containers/maximum_array_size.cpp
 	source/containers/mutable_iterator.cpp
-	source/containers/non_modifying_common_container_functions.cpp
 	source/containers/pop_back.cpp
 	source/containers/pop_front.cpp
 	source/containers/push_back.cpp

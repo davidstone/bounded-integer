@@ -5,8 +5,6 @@
 
 #pragma once
 
-#include <containers/index_type.hpp>
-
 #include <bounded/integer.hpp>
 
 namespace containers {

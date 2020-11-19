@@ -11,11 +11,11 @@
 #include <containers/algorithms/unique.hpp>
 #include <containers/append.hpp>
 #include <containers/begin_end.hpp>
+#include <containers/common_functions.hpp>
 #include <containers/compare_container.hpp>
 #include <containers/insert.hpp>
 #include <containers/erase.hpp>
 #include <containers/legacy_iterator.hpp>
-#include <containers/non_modifying_common_container_functions.hpp>
 #include <containers/size.hpp>
 #include <containers/vector.hpp>
 

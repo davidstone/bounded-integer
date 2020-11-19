@@ -7,7 +7,7 @@
 
 #include <containers/begin_end.hpp>
 #include <containers/contiguous_iterator.hpp>
-#include <containers/non_modifying_common_container_functions.hpp>
+#include <containers/common_functions.hpp>
 
 #include <bounded/integer.hpp>
 

@@ -11,12 +11,12 @@
 #include <containers/append.hpp>
 #include <containers/assign.hpp>
 #include <containers/begin_end.hpp>
+#include <containers/common_functions.hpp>
 #include <containers/compare_container.hpp>
 #include <containers/contiguous_iterator.hpp>
 #include <containers/data.hpp>
 #include <containers/integer_range.hpp>
 #include <containers/is_iterator_sentinel.hpp>
-#include <containers/non_modifying_common_container_functions.hpp>
 #include <containers/pop_back.hpp>
 #include <containers/uninitialized_storage.hpp>
 
