@@ -7,6 +7,7 @@
 
 #include <containers/algorithms/distance.hpp>
 #include <containers/begin_end.hpp>
+#include <containers/c_array.hpp>
 #include <containers/is_range.hpp>
 
 #include <bounded/integer.hpp>
@@ -30,6 +31,11 @@ constexpr auto size(Range const & range) {
 	} else {
 		return typename Range::size_type(containers::end(range) - containers::begin(range));
 	}
+}
+
+template<typename T, std::size_t size_>
+constexpr auto size(c_array<T, size_> const &) {
+	return bounded::constant<size_>;
 }
 
 namespace detail {

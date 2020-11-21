@@ -4,3 +4,13 @@
 // http://www.boost.org/LICENSE_1_0.txt)
 
 #include <containers/size.hpp>
+
+namespace {
+
+using namespace bounded::literal;
+
+constexpr int a[] = {0, 1, 2, 3, 4};
+
+static_assert(containers::size(a) == 5_bi);
+
+} // namespace
