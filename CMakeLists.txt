@@ -147,6 +147,7 @@ add_library(containers_test STATIC
 	source/containers/assign.cpp
 	source/containers/at.cpp
 	source/containers/begin_end.cpp
+	source/containers/c_array.cpp
 	source/containers/clear.cpp
 	source/containers/compare_container.cpp
 	source/containers/contiguous_iterator.cpp

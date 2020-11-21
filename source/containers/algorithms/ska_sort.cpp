@@ -7,6 +7,7 @@
 #include <containers/algorithms/sort.hpp>
 #include <containers/array/array.hpp>
 #include <containers/array/make_array.hpp>
+#include <containers/c_array.hpp>
 #include <containers/front_back.hpp>
 #include <containers/push_back.hpp>
 #include <containers/reserve_if_reservable.hpp>
@@ -28,9 +29,6 @@
 namespace {
 
 using namespace containers;
-
-template<typename T, std::size_t size>
-using c_array = T[size];
 
 template<typename T, std::size_t size, std::size_t... indexes>
 constexpr auto copy_from_c_array(c_array<T, size> const & original, std::index_sequence<indexes...>) {
