@@ -4,3 +4,14 @@
 // http://www.boost.org/LICENSE_1_0.txt)
 
 #include <containers/begin_end.hpp>
+
+namespace {
+
+using namespace bounded::literal;
+
+constexpr int a[] = {0, 1, 2, 3, 4};
+
+static_assert(*containers::begin(a) == 0);
+static_assert(containers::end(a) == containers::begin(a) + 5_bi);
+
+} // namespace

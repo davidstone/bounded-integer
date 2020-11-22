@@ -6,6 +6,7 @@
 #pragma once
 
 #include <containers/algorithms/move_iterator.hpp>
+#include <containers/c_array.hpp>
 #include <containers/contiguous_iterator.hpp>
 
 #include <operators/forward.hpp>
@@ -22,24 +23,25 @@ concept has_member_begin = requires(Range range) {
 	OPERATORS_FORWARD(range).begin();
 };
 
-template<typename Range>
-concept beginable = std::is_array_v<std::remove_reference_t<Range>> or has_member_begin<Range>;
-
 } // namespace detail
 
-template<detail::beginable Range>
-constexpr auto begin(Range && range) {
-	if constexpr (detail::has_member_begin<Range>) {
-		return OPERATORS_FORWARD(range).begin();
-	} else {
-		static_assert(std::is_array_v<std::remove_reference_t<Range>>);
-		auto const base = contiguous_iterator(std::begin(range));
-		if constexpr (std::is_rvalue_reference_v<Range>) {
-			return move_iterator(base);
-		} else {
-			return base;
-		}
-	}
+constexpr auto begin(detail::has_member_begin auto && range) {
+	return OPERATORS_FORWARD(range).begin();
+}
+
+template<typename T, std::size_t size>
+constexpr auto begin(c_array<T, size> const & a) {
+	return contiguous_iterator<T const, size>(a);
+}
+
+template<typename T, std::size_t size>
+constexpr auto begin(c_array<T, size> & a) {
+	return contiguous_iterator<T, size>(a);
+}
+
+template<typename T, std::size_t size>
+constexpr auto begin(c_array<T, size> && a) {
+	return move_iterator(contiguous_iterator<T, size>(a));
 }
 
 namespace detail {
@@ -56,7 +58,6 @@ concept has_member_size = requires(Range const & range) {
 
 template<typename Range>
 concept endable =
-	std::is_array_v<std::remove_reference_t<Range>> or
 	has_member_end<Range> or
 	(has_member_begin<Range> and has_member_size<Range>);
 
@@ -66,17 +67,25 @@ template<detail::endable Range>
 constexpr auto end(Range && range) {
 	if constexpr (detail::has_member_end<Range>) {
 		return OPERATORS_FORWARD(range).end();
-	} else if constexpr (detail::has_member_begin<Range> and detail::has_member_size<Range>) {
-		return OPERATORS_FORWARD(range).begin() + range.size();
 	} else {
-		static_assert(std::is_array_v<std::remove_reference_t<Range>>);
-		auto const base = contiguous_iterator(std::end(range));
-		if constexpr (std::is_rvalue_reference_v<Range>) {
-			return move_iterator(base);
-		} else {
-			return base;
-		}
+		static_assert(detail::has_member_begin<Range> and detail::has_member_size<Range>);
+		return OPERATORS_FORWARD(range).begin() + range.size();
 	}
+}
+
+template<typename T, std::size_t size>
+constexpr auto end(c_array<T, size> const & a) {
+	return contiguous_iterator<T const, size>(a + size);
+}
+
+template<typename T, std::size_t size>
+constexpr auto end(c_array<T, size> & a) {
+	return contiguous_iterator<T, size>(a + size);
+}
+
+template<typename T, std::size_t size>
+constexpr auto end(c_array<T, size> && a) {
+	return move_iterator(contiguous_iterator<T, size>(a + size));
 }
 
 } // namespace containers
