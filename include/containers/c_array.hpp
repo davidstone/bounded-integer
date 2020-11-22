@@ -12,4 +12,8 @@ namespace containers {
 template<typename T, std::size_t size>
 using c_array = T[size];
 
+// Using this as a parameter allows construction from `{}` to work
+struct empty_c_array_parameter {
+};
+
 } // namespace containers

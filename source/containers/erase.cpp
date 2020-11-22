@@ -14,7 +14,7 @@ namespace {
 
 template<typename Container>
 constexpr auto test_erase() {
-	Container v = {1, 2, 3, 4, 5, 6, 7};
+	auto v = Container({1, 2, 3, 4, 5, 6, 7});
 	erase_if(v, [](auto const & value) { return value % 2 == 0; });
 	BOUNDED_TEST(v == Container({1, 3, 5, 7}));
 	return true;

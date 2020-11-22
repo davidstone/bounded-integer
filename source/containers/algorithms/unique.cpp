@@ -132,23 +132,23 @@ constexpr void test_unique_merge(Container && v, Container const & other, Contai
 
 template<typename Container>
 constexpr bool test_unique() {
-	test_unique_less<Container>({ 1 }, { 1 });
-	test_unique_less<Container>({ 1, 2 }, { 1, 2 });
-	test_unique_less<Container>({ }, { });
-	test_unique_less<Container>({ 1, 3, 5, 5, 5, 6, 10, 10 }, { 1, 3, 5, 6, 10 });
-	test_unique_less<Container>({ 1, 1, 1, 1, 1, 1, 1, 1 }, { 1 });
-	test_unique_merge<Container>({ 1, 2, 3, 5 }, { 7, 8, 9 }, { 1, 2, 3, 5, 7, 8, 9 });
-	test_unique_merge<Container>({ 1, 3, 5, 7, 9 }, { 2, 2, 2, 3, 3, 6, 7 }, { 1, 2, 3, 5, 6, 7, 9 });
-	test_unique_merge<Container>({ 2 }, { 1 }, { 1, 2 });
-	test_unique_merge<Container>({ }, { 6 }, { 6 });
-	test_unique_merge<Container>({ 4 }, { }, { 4 });
-	test_unique_merge<Container>({ }, { }, { });
-	test_unique_merge<Container>({ 1 }, { 1 }, { 1 });
-	test_unique_merge<Container>({ 8 }, { 8, 8, 8, 8, 8 }, { 8 });
+	test_unique_less<Container>({{1}}, {{1}});
+	test_unique_less<Container>({{1, 2}}, {{1, 2}});
+	test_unique_less<Container>({{}}, {{}});
+	test_unique_less<Container>({{1, 3, 5, 5, 5, 6, 10, 10}}, {{1, 3, 5, 6, 10}});
+	test_unique_less<Container>({{1, 1, 1, 1, 1, 1, 1, 1}}, {{1}});
+	test_unique_merge<Container>({{1, 2, 3, 5}}, {{7, 8, 9}}, {{1, 2, 3, 5, 7, 8, 9}});
+	test_unique_merge<Container>({{1, 3, 5, 7, 9}}, {{2, 2, 2, 3, 3, 6, 7}}, {{1, 2, 3, 5, 6, 7, 9}});
+	test_unique_merge<Container>({{2}}, {{1}}, {{1, 2}});
+	test_unique_merge<Container>({{}}, {{6}}, {{6}});
+	test_unique_merge<Container>({{4}}, {{}}, {{4}});
+	test_unique_merge<Container>({{}}, {{}}, {{}});
+	test_unique_merge<Container>({{1}}, {{1}}, {{1}});
+	test_unique_merge<Container>({{8}}, {{8, 8, 8, 8, 8}}, {{8}});
 	// Ideally unique_inplace_merge would not assume the first range has no
 	// duplicates, but that is my current use-case. I do not know how to remove
 	// this limitation without making the algorithm less efficient.
-	// test_unique_merge<Container>({ 8, 8 }, { 8, 8, 8, 8, 8 }, { 8 });
+	// test_unique_merge<Container>({{8, 8}}, {{8, 8, 8, 8, 8}}, {{8}});
 	return true;
 }
 

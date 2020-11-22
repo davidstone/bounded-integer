@@ -282,7 +282,7 @@ constexpr auto test_sequence_container_int() {
 template<template<typename> typename Container>
 constexpr auto test_sequence_container_recursive() {
 	test_sequence_container_single<Container<Container<int>>>({
-		{{}, {2, 3, 5}, {0}}
+		{Container<int>(), Container<int>({2, 3, 5}), Container<int>({0})}
 	});
 	return true;
 }

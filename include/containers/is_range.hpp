@@ -13,9 +13,6 @@
 
 namespace containers {
 
-using std::begin;
-using std::end;
-
 template<typename T>
 concept range = sentinel_for<decltype(containers::end(std::declval<T const &>())), decltype(containers::begin(std::declval<T const &>()))>;
 

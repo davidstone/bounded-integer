@@ -16,24 +16,24 @@ constexpr bool test() {
 	using ::containers::begin;
 	using ::containers::end;
 
-	auto const a = containers::vector<int>{ 2, 6, 8 };
-	auto const b = containers::vector<int>{ 3, 5 };
-	auto const c = containers::vector<int>{ 1, 2, 3 };
+	auto const a = containers::vector<int>({2, 6, 8});
+	auto const b = containers::vector<int>({3, 5});
+	auto const c = containers::vector<int>({1, 2, 3});
 	
 	auto make_reusable_container = [&]{
-		auto result = containers::vector<int>{};
+		auto result = containers::vector<int>();
 		result.reserve(static_cast<containers::vector<int>::size_type>(containers::size(a) + containers::size(b) + containers::size(c)));
 		return result;
 	};
 	auto const d = make_reusable_container();
 	
 	using Expected = containers::vector<int>;
-	auto const expected_result = Expected{ 2, 6, 8, 3, 5, 1, 2, 3 };
+	auto const expected_result = Expected({2, 6, 8, 3, 5, 1, 2, 3});
 	
-	BOUNDED_TEST(::containers::concatenate<Expected>() == Expected{});
+	BOUNDED_TEST(::containers::concatenate<Expected>() == Expected());
 	BOUNDED_TEST(::containers::concatenate<Expected>(expected_result) == expected_result);
-	BOUNDED_TEST(::containers::concatenate<Expected>(expected_result, Expected{}) == expected_result);
-	BOUNDED_TEST(::containers::concatenate<Expected>(Expected{}, expected_result) == expected_result);
+	BOUNDED_TEST(::containers::concatenate<Expected>(expected_result, Expected()) == expected_result);
+	BOUNDED_TEST(::containers::concatenate<Expected>(Expected(), expected_result) == expected_result);
 	
 	BOUNDED_TEST(::containers::concatenate<Expected>(a, b, c) == expected_result);
 

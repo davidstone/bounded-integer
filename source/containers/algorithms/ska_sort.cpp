@@ -1039,86 +1039,86 @@ static_assert(test_sort_inplace(
 
 static_assert(
 	test_sort_inplace(
-		containers::vector<containers::vector<int>>{
-			{ 1, 2, 3 },
-			{ 1, 2, 2 },
-			{ 1, 3, 2 },
-			{ 2, 3, 2 },
-			{ 2, 3, 2, 4 },
-			{ 2, 3, 2, 4, 5 },
-			{ 3, 2, 4, 5 },
-			{ 1 },
-			{},
-		},
-		containers::vector<containers::vector<int>>{
-			{},
-			{ 1 },
-			{ 1, 2, 2 },
-			{ 1, 2, 3 },
-			{ 1, 3, 2 },
-			{ 2, 3, 2 },
-			{ 2, 3, 2, 4 },
-			{ 2, 3, 2, 4, 5 },
-			{ 3, 2, 4, 5 },
-		},
+		containers::vector({
+			containers::vector({1, 2, 3}),
+			containers::vector({1, 2, 2}),
+			containers::vector({1, 3, 2}),
+			containers::vector({2, 3, 2}),
+			containers::vector({2, 3, 2, 4}),
+			containers::vector({2, 3, 2, 4, 5}),
+			containers::vector({3, 2, 4, 5}),
+			containers::vector({1}),
+			containers::vector<int>(),
+		}),
+		containers::vector({
+			containers::vector<int>(),
+			containers::vector({1}),
+			containers::vector({1, 2, 2}),
+			containers::vector({1, 2, 3}),
+			containers::vector({1, 3, 2}),
+			containers::vector({2, 3, 2}),
+			containers::vector({2, 3, 2, 4}),
+			containers::vector({2, 3, 2, 4, 5}),
+			containers::vector({3, 2, 4, 5}),
+		}),
 		bounded::identity
 	)
 );
 
 static_assert(
 	test_sort_inplace(
-		containers::vector<containers::vector<int>>{
-			{ 1, 2, 3 },
-			{ 1, 2, 2 },
-			{ 1, 3, 2 },
-			{ 2, 3, 2 },
-			{ 2, 3, 2, 4 },
-			{ 2, 3, 2, 4, 5 },
-			{ 3, 2, 4, 5 },
-			{ 1 },
-			{},
-		},
-		containers::vector<containers::vector<int>>{
-			{},
-			{ 1 },
-			{ 1, 2, 2 },
-			{ 1, 2, 3 },
-			{ 1, 3, 2 },
-			{ 2, 3, 2 },
-			{ 2, 3, 2, 4 },
-			{ 2, 3, 2, 4, 5 },
-			{ 3, 2, 4, 5 },
-		},
+		containers::vector({
+			containers::vector({1, 2, 3}),
+			containers::vector({1, 2, 2}),
+			containers::vector({1, 3, 2}),
+			containers::vector({2, 3, 2}),
+			containers::vector({2, 3, 2, 4}),
+			containers::vector({2, 3, 2, 4, 5}),
+			containers::vector({3, 2, 4, 5}),
+			containers::vector({1}),
+			containers::vector<int>(),
+		}),
+		containers::vector({
+			containers::vector<int>(),
+			containers::vector({1}),
+			containers::vector({1, 2, 2}),
+			containers::vector({1, 2, 3}),
+			containers::vector({1, 3, 2}),
+			containers::vector({2, 3, 2}),
+			containers::vector({2, 3, 2, 4}),
+			containers::vector({2, 3, 2, 4, 5}),
+			containers::vector({3, 2, 4, 5}),
+		}),
 		bounded::copy
 	)
 );
 
 static_assert(
 	test_sort_inplace(
-		containers::vector<containers::vector<containers::string>>{
-			{ "hi", "there", "you" },
-			{ "are", "probably", "not", "going" },
-			{ "to", "pass" },
-			{ "" },
-			{ },
-			{ "this", "test", "the", "first" },
-			{ "time" },
-			{ "oh it did pass", "n", "e", "a", "t!" },
-			{ "hi", "there", "I", "added", "more", "tests" },
-			{ "hi", "there", "needed", "the", "same", "prefix" },
-		},
-		containers::vector<containers::vector<containers::string>>{
-			{ },
-			{ "" },
-			{ "are", "probably", "not", "going" },
-			{ "hi", "there", "I", "added", "more", "tests" },
-			{ "hi", "there", "needed", "the", "same", "prefix" },
-			{ "hi", "there", "you" },
-			{ "oh it did pass", "n", "e", "a", "t!" },
-			{ "this", "test", "the", "first" },
-			{ "time" },
-			{ "to", "pass" },
-		},
+		containers::vector({
+			containers::vector<containers::string>({"hi", "there", "you"}),
+			containers::vector<containers::string>({"are", "probably", "not", "going"}),
+			containers::vector<containers::string>({"to", "pass"}),
+			containers::vector<containers::string>({""}),
+			containers::vector<containers::string>(),
+			containers::vector<containers::string>({"this", "test", "the", "first"}),
+			containers::vector<containers::string>({"time"}),
+			containers::vector<containers::string>({"oh it did pass", "n", "e", "a", "t!"}),
+			containers::vector<containers::string>({"hi", "there", "I", "added", "more", "tests"}),
+			containers::vector<containers::string>({"hi", "there", "needed", "the", "same", "prefix"}),
+		}),
+		containers::vector({
+			containers::vector<containers::string>(),
+			containers::vector<containers::string>({""}),
+			containers::vector<containers::string>({"are", "probably", "not", "going"}),
+			containers::vector<containers::string>({"hi", "there", "I", "added", "more", "tests"}),
+			containers::vector<containers::string>({"hi", "there", "needed", "the", "same", "prefix"}),
+			containers::vector<containers::string>({"hi", "there", "you"}),
+			containers::vector<containers::string>({"oh it did pass", "n", "e", "a", "t!"}),
+			containers::vector<containers::string>({"this", "test", "the", "first"}),
+			containers::vector<containers::string>({"time"}),
+			containers::vector<containers::string>({"to", "pass"}),
+		}),
 		bounded::identity
 	)
 );
@@ -1126,30 +1126,30 @@ static_assert(
 #if 0
 static_assert(
 	test_sort_inplace(
-		containers::vector<containers::vector<containers::string>>{
-			{ "hi", "there", "you" },
-			{ "are", "probably", "not", "going" },
-			{ "to", "pass" },
-			{ "" },
-			{ },
-			{ "this", "test", "the", "first" },
-			{ "time" },
-			{ "oh it did pass", "n", "e", "a", "t!" },
-			{ "hi", "there", "I", "added", "more", "tests" },
-			{ "hi", "there", "needed", "the", "same", "prefix" },
-		},
-		containers::vector<containers::vector<containers::string>>{
-			{ },
-			{ "" },
-			{ "are", "probably", "not", "going" },
-			{ "hi", "there", "I", "added", "more", "tests" },
-			{ "hi", "there", "needed", "the", "same", "prefix" },
-			{ "hi", "there", "you" },
-			{ "oh it did pass", "n", "e", "a", "t!" },
-			{ "this", "test", "the", "first" },
-			{ "time" },
-			{ "to", "pass" },
-		},
+		containers::vector({
+			containers::vector({"hi", "there", "you"}),
+			containers::vector({"are", "probably", "not", "going"}),
+			containers::vector({"to", "pass"}),
+			containers::vector({""}),
+			containers::vector(),
+			containers::vector({"this", "test", "the", "first"}),
+			containers::vector({"time"}),
+			containers::vector({"oh it did pass", "n", "e", "a", "t!"}),
+			containers::vector({"hi", "there", "I", "added", "more", "tests"}),
+			containers::vector({"hi", "there", "needed", "the", "same", "prefix"}),
+		}),
+		containers::vector({
+			containers::vector(),
+			containers::vector({""}),
+			containers::vector({"are", "probably", "not", "going"}),
+			containers::vector({"hi", "there", "I", "added", "more", "tests"}),
+			containers::vector({"hi", "there", "needed", "the", "same", "prefix"}),
+			containers::vector({"hi", "there", "you"}),
+			containers::vector({"oh it did pass", "n", "e", "a", "t!"}),
+			containers::vector({"this", "test", "the", "first"}),
+			containers::vector({"time"}),
+			containers::vector({"to", "pass"}),
+		}),
 		identity_by_value
 	)
 );
@@ -1157,7 +1157,7 @@ static_assert(
 
 static_assert(
 	test_sort_inplace(
-		containers::vector<bounded::tuple<containers::string, containers::string>>{
+		containers::vector<bounded::tuple<containers::string, containers::string>>({
 			{"hi", "there"},
 			{"you", "are"},
 			{"probably", "not"},
@@ -1176,8 +1176,8 @@ static_assert(
 			{"hi", "there"},
 			{"needed", "the"},
 			{"same", "prefix"},
-		},
-		containers::vector<bounded::tuple<containers::string, containers::string>>{
+		}),
+		containers::vector<bounded::tuple<containers::string, containers::string>>({
 			{"", ""},
 			{"", "this"},
 			{"I", "added"},
@@ -1196,7 +1196,7 @@ static_assert(
 			{"t!", ""},
 			{"test", "the"},
 			{"you", "are"},
-		},
+		}),
 		bounded::identity
 	)
 );
@@ -1204,7 +1204,7 @@ static_assert(
 #if 0
 static_assert(
 	test_sort_inplace(
-		containers::vector<bounded::tuple<containers::string, containers::string>>{
+		containers::vector<bounded::tuple<containers::string, containers::string>>({
 			{"hi", "there"},
 			{"you", "are"},
 			{"probably", "not"},
@@ -1223,8 +1223,8 @@ static_assert(
 			{"hi", "there"},
 			{"needed", "the"},
 			{"same", "prefix"},
-		},
-		containers::vector<bounded::tuple<containers::string, containers::string>>{
+		}),
+		containers::vector<bounded::tuple<containers::string, containers::string>>({
 			{"", ""},
 			{"", "this"},
 			{"I", "added"},
@@ -1243,7 +1243,7 @@ static_assert(
 			{"t!", ""},
 			{"test", "the"},
 			{"you", "are"},
-		},
+		}),
 		identity_by_value
 	)
 );
