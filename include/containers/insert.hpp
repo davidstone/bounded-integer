@@ -93,7 +93,7 @@ constexpr auto emplace(Container & container, typename Container::const_iterator
 
 // TODO: exception safety
 // TODO: Check if the range lies within the container
-template<resizable_container Container, range Range = std::initializer_list<typename Container::value_type>> requires bounded::convertible_to<typename Container::value_type, typename Range::value_type>
+template<resizable_container Container, range Range> requires bounded::convertible_to<typename Container::value_type, typename Range::value_type>
 constexpr auto insert(Container & container, typename Container::const_iterator position, Range && range) {
 	BOUNDED_ASSERT(::containers::detail::iterator_points_into_container(container, position));
 	auto const range_size = ::containers::detail::linear_size(range);

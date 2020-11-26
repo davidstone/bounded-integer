@@ -7,14 +7,13 @@
 
 #include <containers/append.hpp>
 #include <containers/begin_end.hpp>
+#include <containers/c_array.hpp>
 #include <containers/erase.hpp>
 #include <containers/is_range.hpp>
 #include <containers/range_view.hpp>
 #include <containers/resizable_container.hpp>
 
 #include <bounded/integer.hpp>
-
-#include <initializer_list>
 
 namespace containers {
 
@@ -32,9 +31,9 @@ constexpr void assign(resizable_container auto & destination, range auto && sour
 	::containers::erase(destination, it, containers::end(destination));
 	::containers::append(destination, range_view(first, last));
 }
-template<resizable_container Container>
-constexpr void assign(Container & destination, std::initializer_list<typename Container::value_type> init) {
-	assign(destination, range_view(init));
+template<resizable_container Container, std::size_t init_size>
+constexpr void assign(Container & destination, c_array<typename Container::value_type, init_size> && init) {
+	assign(destination, range_view(std::move(init)));
 }
 
 } // namespace containers

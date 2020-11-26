@@ -11,6 +11,7 @@
 #include <containers/algorithms/uninitialized.hpp>
 #include <containers/assign.hpp>
 #include <containers/begin_end.hpp>
+#include <containers/c_array.hpp>
 #include <containers/common_functions.hpp>
 #include <containers/compare_container.hpp>
 #include <containers/contiguous_iterator.hpp>
@@ -98,18 +99,7 @@ constexpr void clear(dynamic_array<T> & value) {
 	value = {};
 }
 
-namespace detail {
-
-template<typename>
-inline constexpr bool is_initializer_list = false;
-
-template<typename T>
-inline constexpr bool is_initializer_list<std::initializer_list<T>> = true;
-
-} // namespace detail
-
-
-template<typename T, range Range> requires(!detail::is_initializer_list<std::decay_t<Range>>)
+template<typename T, range Range> requires(!std::is_array_v<Range>)
 constexpr auto assign(dynamic_array<T> & container, Range && range) {
 	auto const difference = detail::linear_size(range);
 	if (difference == containers::size(container)) {
@@ -136,8 +126,9 @@ struct dynamic_array : private lexicographical_comparison::base {
 	{
 	}
 
-	constexpr dynamic_array(std::initializer_list<value_type> init):
-		dynamic_array(range_view(init))
+	template<std::size_t init_size>
+	constexpr dynamic_array(c_array<value_type, init_size> && init):
+		dynamic_array(range_view(std::move(init)))
 	{
 	}
 

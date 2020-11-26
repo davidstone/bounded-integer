@@ -23,7 +23,7 @@ constexpr bool test_pop_back(containers::static_vector<int, 4> const & original)
     return true;
 }
 
-static_assert(test_pop_back({1}));
-static_assert(test_pop_back({1, 2}));
+static_assert(test_pop_back({{1}}));
+static_assert(test_pop_back({{1, 2}}));
 
 } // namespace

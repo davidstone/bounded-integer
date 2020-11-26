@@ -8,6 +8,7 @@
 #include <containers/append.hpp>
 #include <containers/assign.hpp>
 #include <containers/begin_end.hpp>
+#include <containers/c_array.hpp>
 #include <containers/common_functions.hpp>
 #include <containers/compare_container.hpp>
 #include <containers/contiguous_iterator.hpp>
@@ -16,7 +17,6 @@
 
 #include <operators/forward.hpp>
 
-#include <initializer_list>
 #include <type_traits>
 #include <utility>
 
@@ -42,8 +42,11 @@ struct stable_vector : private lexicographical_comparison::base {
 		::containers::append(*this, OPERATORS_FORWARD(source));
 	}
 	
-	constexpr stable_vector(std::initializer_list<value_type> init) {
-		::containers::append(*this, init);
+	template<std::size_t init_size>
+	constexpr stable_vector(c_array<T, init_size> && init) {
+		::containers::append(*this, std::move(init));
+	}
+	constexpr stable_vector(empty_c_array_parameter) {
 	}
 	
 	// TODO: Support trivial relocatability
@@ -69,11 +72,6 @@ struct stable_vector : private lexicographical_comparison::base {
 	}
 	constexpr auto & operator=(stable_vector const & other) & {
 		assign_range(other);
-		return *this;
-	}
-
-	constexpr auto & operator=(std::initializer_list<value_type> init) & {
-		assign_range(init);
 		return *this;
 	}
 

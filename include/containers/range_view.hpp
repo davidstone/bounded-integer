@@ -11,6 +11,7 @@
 #include <bounded/integer.hpp>
 
 #include <operators/bracket.hpp>
+#include <operators/forward.hpp>
 
 #include <iterator>
 #include <utility>
@@ -38,10 +39,8 @@ struct range_view {
 		range_view(std::move(pair).first, std::move(pair).second)
 	{
 	}
-	// TODO: Use terse syntax when clang does not crash
-	template<typename Range> requires range<Range>
-	constexpr explicit range_view(Range & r):
-		range_view(containers::begin(r), containers::end(r))
+	constexpr range_view(range auto && r):
+		range_view(containers::begin(OPERATORS_FORWARD(r)), containers::end(OPERATORS_FORWARD(r)))
 	{
 	}
 	
@@ -62,7 +61,7 @@ private:
 };
 
 template<typename Range>
-range_view(Range &) -> range_view<decltype(containers::begin(std::declval<Range &>()), containers::end(std::declval<Range &>()))>;
+range_view(Range &&) -> range_view<decltype(containers::begin(std::declval<Range &&>()), containers::end(std::declval<Range &&>()))>;
 
 template<typename>
 inline constexpr auto is_range_view = false;

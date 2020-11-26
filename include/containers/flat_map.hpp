@@ -11,6 +11,7 @@
 #include <containers/algorithms/unique.hpp>
 #include <containers/append.hpp>
 #include <containers/begin_end.hpp>
+#include <containers/c_array.hpp>
 #include <containers/common_functions.hpp>
 #include <containers/compare_container.hpp>
 #include <containers/insert.hpp>
@@ -149,95 +150,96 @@ public:
 	}
 
 	template<range InputRange>
-	constexpr explicit flat_map_base(InputRange && range):
-		m_container(OPERATORS_FORWARD(range))
+	constexpr explicit flat_map_base(InputRange && init):
+		m_container(OPERATORS_FORWARD(init))
 	{
 		unique_ska_sort(m_container, extract_key());
 	}
 
 	template<range InputRange>
-	constexpr flat_map_base(InputRange && range, ExtractKey extract_key):
-		m_container(OPERATORS_FORWARD(range)),
+	constexpr flat_map_base(InputRange && init, ExtractKey extract_key):
+		m_container(OPERATORS_FORWARD(init)),
 		m_extract_key(std::move(extract_key))
 	{
 		unique_ska_sort(m_container, extract_key());
 	}
 
 	template<range InputRange>
-	constexpr flat_map_base(assume_sorted_unique_t, InputRange && range):
-		m_container(OPERATORS_FORWARD(range))
+	constexpr flat_map_base(assume_sorted_unique_t, InputRange && init):
+		m_container(OPERATORS_FORWARD(init))
 	{
 		BOUNDED_ASSERT(is_sorted(m_container, compare()));
 	}
 
 	template<range InputRange>
-	constexpr flat_map_base(assume_sorted_unique_t, InputRange && range, ExtractKey extract_key):
-		m_container(OPERATORS_FORWARD(range)),
+	constexpr flat_map_base(assume_sorted_unique_t, InputRange && init, ExtractKey extract_key):
+		m_container(OPERATORS_FORWARD(init)),
 		m_extract_key(std::move(extract_key))
 	{
 		BOUNDED_ASSERT(is_sorted(m_container, compare()));
 	}
 
 	template<range InputRange>
-	constexpr flat_map_base(assume_unique_t, InputRange && range):
-		m_container(OPERATORS_FORWARD(range))
+	constexpr flat_map_base(assume_unique_t, InputRange && init):
+		m_container(OPERATORS_FORWARD(init))
 	{
 		ska_sort(m_container, extract_key());
 	}
 
 	template<range InputRange>
-	constexpr flat_map_base(assume_unique_t, InputRange && range, ExtractKey extract_key):
-		m_container(OPERATORS_FORWARD(range)),
+	constexpr flat_map_base(assume_unique_t, InputRange && init, ExtractKey extract_key):
+		m_container(OPERATORS_FORWARD(init)),
 		m_extract_key(std::move(extract_key))
 	{
 		ska_sort(m_container, extract_key());
 	}
 
 
-
-	constexpr flat_map_base(std::initializer_list<value_type> range):
-		m_container(range)
+	template<std::size_t init_size>
+	constexpr flat_map_base(c_array<value_type, init_size> && init):
+		m_container(std::move(init))
 	{
 		unique_ska_sort(m_container, extract_key());
 	}
 
-	constexpr flat_map_base(std::initializer_list<value_type> range, ExtractKey extract_key):
-		m_container(range),
+	template<std::size_t init_size>
+	constexpr flat_map_base(c_array<value_type, init_size> && init, ExtractKey extract_key):
+		m_container(std::move(init)),
 		m_extract_key(std::move(extract_key))
 	{
 		unique_ska_sort(m_container, extract_key());
 	}
 
-	constexpr flat_map_base(assume_sorted_unique_t, std::initializer_list<value_type> range):
-		m_container(range)
+	template<std::size_t init_size>
+	constexpr flat_map_base(assume_sorted_unique_t, c_array<value_type, init_size> && init):
+		m_container(std::move(init))
 	{
 		BOUNDED_ASSERT(is_sorted(m_container, compare()));
 	}
 
-	constexpr flat_map_base(assume_sorted_unique_t, std::initializer_list<value_type> range, ExtractKey extract_key):
-		m_container(range),
+	template<std::size_t init_size>
+	constexpr flat_map_base(assume_sorted_unique_t, c_array<value_type, init_size> && init, ExtractKey extract_key):
+		m_container(std::move(init)),
 		m_extract_key(std::move(extract_key))
 	{
 		BOUNDED_ASSERT(is_sorted(m_container, compare()));
 	}
 
-	constexpr flat_map_base(assume_unique_t, std::initializer_list<value_type> range):
-		m_container(range)
+	template<std::size_t init_size>
+	constexpr flat_map_base(assume_unique_t, c_array<value_type, init_size> && init):
+		m_container(std::move(init))
 	{
 		ska_sort(m_container, extract_key());
 	}
 
-	constexpr flat_map_base(assume_unique_t, std::initializer_list<value_type> range, ExtractKey extract_key):
-		m_container(range),
+	template<std::size_t init_size>
+	constexpr flat_map_base(assume_unique_t, c_array<value_type, init_size> && init, ExtractKey extract_key):
+		m_container(std::move(init)),
 		m_extract_key(std::move(extract_key))
 	{
 		ska_sort(m_container, extract_key());
 	}
 
-	constexpr auto & operator=(std::initializer_list<value_type> init) & {
-		return *this = flat_map_base(init);
-	}
-	
 	constexpr auto begin() const & {
 		return ::containers::begin(m_container);
 	}
@@ -337,7 +339,7 @@ public:
 	constexpr auto insert(const_iterator const hint, value_type && value) {
 		return try_emplace_hint(hint, std::move(value).key(), std::move(value).mapped());
 	}
-	template<range Range = std::initializer_list<value_type>>
+	template<range Range>
 	constexpr auto insert(Range && init) {
 		// Because my underlying container is expected to be contiguous storage,
 		// it's best to do a batch insert and then just sort it all. However,

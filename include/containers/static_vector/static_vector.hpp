@@ -11,6 +11,7 @@
 #include <containers/append.hpp>
 #include <containers/assign.hpp>
 #include <containers/begin_end.hpp>
+#include <containers/c_array.hpp>
 #include <containers/common_functions.hpp>
 #include <containers/compare_container.hpp>
 #include <containers/contiguous_iterator.hpp>
@@ -72,8 +73,11 @@ struct static_vector_data : private lexicographical_comparison::base {
 		::containers::append(*this, OPERATORS_FORWARD(source));
 	}
 	
-	constexpr static_vector_data(std::initializer_list<T> init) {
-		::containers::append(*this, init);
+	template<std::size_t init_size>
+	constexpr static_vector_data(c_array<T, init_size> && init) {
+		::containers::append(*this, std::move(init));
+	}
+	constexpr static_vector_data(empty_c_array_parameter) {
 	}
 	
 	constexpr auto begin() const & {
@@ -88,11 +92,6 @@ struct static_vector_data : private lexicographical_comparison::base {
 
 	constexpr auto size() const {
 		return m_size;
-	}
-
-	constexpr auto & operator=(std::initializer_list<value_type> init) & {
-		containers::assign(*this, init);
-		return *this;
 	}
 
 	static constexpr auto capacity() {
@@ -142,7 +141,6 @@ public:
 	using typename base::iterator;
 
 	using base::base;
-	using base::operator=;
 	
 	OPERATORS_BRACKET_SEQUENCE_RANGE_DEFINITIONS
 	

@@ -71,9 +71,6 @@ void test_generic(bounded::constant_t<capacity_> const capacity, T const & t, st
 	
 	BOUNDED_TEST(copy == default_constructed);
 	
-	copy = init;
-	BOUNDED_TEST(copy == init_list);
-
 	containers::clear(copy);
 	containers::push_back(copy, t);
 	BOUNDED_TEST(containers::size(copy) == 1_bi);
@@ -106,23 +103,23 @@ void test_generic(bounded::constant_t<capacity_> const capacity, T const & t, st
 
 auto test_erase() {
 	using container = containers::small_buffer_optimized_vector<char, 1>;
-	container v = { 1, 2, 3, 4, 5, 6, 7 };
+	auto v = container({1, 2, 3, 4, 5, 6, 7});
 	erase_if(v, [](auto const & value) { return value % 2 == 0; });
-	BOUNDED_TEST(v == container({ 1, 3, 5, 7 }));
+	BOUNDED_TEST(v == container({1, 3, 5, 7}));
 }
 
 }	// namespace
 
 int main() {
-	test_generic(1_bi, '0', { });
-	test_generic(1_bi, '0', { '5' });
+	test_generic(1_bi, '0', {});
+	test_generic(1_bi, '0', {'5'});
 
-	test_generic(5_bi, '0', { });
-	test_generic(5_bi, '9', { '0', '1', '4' });
-	test_generic(5_bi, '-', { '0', '1', '2', '3', '4' });
+	test_generic(5_bi, '0', {});
+	test_generic(5_bi, '9', {'0', '1', '4'});
+	test_generic(5_bi, '-', {'0', '1', '2', '3', '4'});
 
 	test_generic(containers::detail::minimum_small_capacity<char> + 1_bi, '-', {});
-	test_generic(containers::detail::minimum_small_capacity<char> + 1_bi, '-', { '0', '1', '2', '3', '4' });
+	test_generic(containers::detail::minimum_small_capacity<char> + 1_bi, '-', {'0', '1', '2', '3', '4'});
 	static_assert(containers::detail::minimum_small_capacity<char> < 30_bi);
 	test_generic(30_bi, '-', {
 		'0', '1', '2', '3', '4', '5', '6', '7', '8', '9',
@@ -133,7 +130,7 @@ int main() {
 	test_generic(
 		3_bi,
 		containers::string("hi"),
-		{ containers::string(""), containers::string("hello"), containers::string(containers::repeat_n(100_bi, '=')) }
+		{containers::string(""), containers::string("hello"), containers::string(containers::repeat_n(100_bi, '='))}
 	);
 	
 	test_erase();

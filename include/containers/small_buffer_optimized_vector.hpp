@@ -9,6 +9,7 @@
 #include <containers/append.hpp>
 #include <containers/assign.hpp>
 #include <containers/begin_end.hpp>
+#include <containers/c_array.hpp>
 #include <containers/common_functions.hpp>
 #include <containers/compare_container.hpp>
 #include <containers/contiguous_iterator.hpp>
@@ -21,7 +22,6 @@
 #include <bounded/integer.hpp>
 
 #include <cstddef>
-#include <initializer_list>
 #include <type_traits>
 #include <utility>
 
@@ -156,10 +156,11 @@ struct small_buffer_optimized_vector : private lexicographical_comparison::base 
 		::containers::append(*this, OPERATORS_FORWARD(source));
 	}
 	
-	constexpr small_buffer_optimized_vector(std::initializer_list<value_type> init):
+	template<std::size_t init_size>
+	constexpr small_buffer_optimized_vector(c_array<T, init_size> && init):
 		small_buffer_optimized_vector()
 	{
-		::containers::append(*this, init);
+		::containers::append(*this, std::move(init));
 	}
 
 	constexpr small_buffer_optimized_vector(small_buffer_optimized_vector const & other):
@@ -182,11 +183,6 @@ struct small_buffer_optimized_vector : private lexicographical_comparison::base 
 		::containers::detail::destroy_range(*this);
 		deallocate_large();
 		move_assign_to_empty(std::move(other));
-		return *this;
-	}
-
-	constexpr auto & operator=(std::initializer_list<value_type> init) & {
-		containers::assign(*this, init);
 		return *this;
 	}
 

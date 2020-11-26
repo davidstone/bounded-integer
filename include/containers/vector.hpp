@@ -8,6 +8,7 @@
 #include <containers/append.hpp>
 #include <containers/assign.hpp>
 #include <containers/begin_end.hpp>
+#include <containers/c_array.hpp>
 #include <containers/common_functions.hpp>
 #include <containers/compare_container.hpp>
 #include <containers/contiguous_iterator.hpp>
@@ -17,7 +18,6 @@
 #include <operators/bracket.hpp>
 #include <operators/forward.hpp>
 
-#include <initializer_list>
 #include <type_traits>
 #include <utility>
 
@@ -40,8 +40,11 @@ struct vector : private lexicographical_comparison::base {
 		::containers::append(*this, OPERATORS_FORWARD(source));
 	}
 	
-	constexpr vector(std::initializer_list<T> init) {
-		::containers::append(*this, init);
+	template<std::size_t source_size>
+	constexpr vector(c_array<T, source_size> && init) {
+		::containers::append(*this, std::move(init));
+	}
+	constexpr vector(empty_c_array_parameter) {
 	}
 
 	// TODO: Support trivial relocatability
@@ -68,11 +71,6 @@ struct vector : private lexicographical_comparison::base {
 	}
 	constexpr auto & operator=(vector const & other) & {
 		assign_range(other);
-		return *this;
-	}
-
-	constexpr auto & operator=(std::initializer_list<value_type> init) & {
-		assign_range(init);
 		return *this;
 	}
 
@@ -119,7 +117,7 @@ private:
 			BOUNDED_ASSERT(m_size == 0_bi);
 			m_storage = storage_type();
 		}
-		containers::assign(*this, other);
+		containers::assign(*this, OPERATORS_FORWARD(other));
 	}
 	
 	using storage_type = uninitialized_dynamic_array<T, size_type>;
