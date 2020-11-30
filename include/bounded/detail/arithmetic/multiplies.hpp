@@ -36,7 +36,7 @@ constexpr auto safer_multiply(constant_t<lhs> const &, constant_t<rhs> const &) 
 }
 
 // #include <functional> is really expensive, and we just need this one part
-auto multiplies = [](auto const lhs, auto const rhs) {
+inline constexpr auto multiplies = [](auto const lhs, auto const rhs) {
 	return lhs * rhs;
 };
 

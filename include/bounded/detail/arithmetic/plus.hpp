@@ -38,7 +38,7 @@ constexpr auto safer_add(constant_t<lhs>, constant_t<rhs>) {
 }
 
 // #include <functional> is really expensive, and we just need this one part
-auto plus = [](auto const lhs, auto const rhs) {
+inline constexpr auto plus = [](auto const lhs, auto const rhs) {
 	return lhs + rhs;
 };
 

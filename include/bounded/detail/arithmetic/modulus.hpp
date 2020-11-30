@@ -98,7 +98,7 @@ constexpr auto modulus_operator_range = [](auto const lhs_, auto const rhs_) {
 };
 
 // #include <functional> is really expensive, and we just need this one part
-auto modulus = [](auto const lhs, auto const rhs) {
+inline constexpr auto modulus = [](auto const lhs, auto const rhs) {
 	return lhs % rhs;
 };
 

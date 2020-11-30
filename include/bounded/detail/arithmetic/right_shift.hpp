@@ -11,7 +11,7 @@
 namespace bounded {
 namespace detail {
 
-constexpr auto right_shift = [](auto const lhs, auto const rhs) {
+inline constexpr auto right_shift = [](auto const lhs, auto const rhs) {
 	return lhs >> rhs;
 };
 

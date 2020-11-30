@@ -16,7 +16,7 @@ namespace bounded {
 namespace detail {
 
 // #include <functional> is really expensive, and we just need this one part
-auto bit_and = [](auto const lhs, auto const rhs) {
+inline constexpr auto bit_and = [](auto const lhs, auto const rhs) {
 	return lhs & rhs;
 };
 

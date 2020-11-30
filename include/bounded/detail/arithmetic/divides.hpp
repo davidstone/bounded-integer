@@ -61,7 +61,7 @@ constexpr auto divides_operator_range = [](auto const lhs_, auto const rhs_) {
 };
 
 // #include <functional> is really expensive, and we just need this one part
-auto divides = [](auto const lhs, auto const rhs) {
+inline constexpr auto divides = [](auto const lhs, auto const rhs) {
 	return lhs / rhs;
 };
 

@@ -33,7 +33,10 @@ constexpr auto operator_overload(LHS const lhs, RHS const rhs, auto const arithm
 	// It is safe to use the non_check constructor because we already know that
 	// the result will fit in result_t. We have to cast to the intermediate
 	// common_t in case result_t is narrower than one of the arguments.
-	return result_t(arithmetic_function(static_cast<common_t>(lhs), static_cast<common_t>(rhs)), non_check);
+	return result_t(
+		arithmetic_function(static_cast<common_t>(lhs), static_cast<common_t>(rhs)),
+		non_check
+	);
 }
 
 template<bounded_integer LHS, bounded_integer RHS>
