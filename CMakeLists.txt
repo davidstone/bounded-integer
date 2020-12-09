@@ -101,6 +101,7 @@ add_executable(bounded_test
 	source/bounded/numeric_limits.cpp
 	source/bounded/nth_type.cpp
 	source/bounded/optional.cpp
+	source/bounded/scope_guard.cpp
 	source/bounded/std_iterator.cpp
 	source/bounded/string.cpp
 	source/bounded/to_integer.cpp
@@ -178,7 +179,6 @@ add_library(containers_test STATIC
 	source/containers/reserve_if_reservable.cpp
 	source/containers/resizable_container.cpp
 	source/containers/resize.cpp
-	source/containers/scope_guard.cpp
 	source/containers/single_element_range.cpp
 	source/containers/shrink_to_fit.cpp
 	source/containers/size.cpp

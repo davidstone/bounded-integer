@@ -8,7 +8,7 @@
 #include <type_traits>
 #include <utility>
 
-namespace containers {
+namespace bounded {
 
 template<typename Function>
 struct scope_guard {
@@ -39,4 +39,4 @@ private:
 	bool m_is_active;
 };
 
-}	// namespace containers
+} // namespace bounded

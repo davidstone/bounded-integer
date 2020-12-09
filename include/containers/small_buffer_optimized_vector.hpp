@@ -14,12 +14,12 @@
 #include <containers/compare_container.hpp>
 #include <containers/contiguous_iterator.hpp>
 #include <containers/dynamic_array.hpp>
-#include <containers/scope_guard.hpp>
 #include <containers/uninitialized_storage.hpp>
 
 #include <bounded/assert.hpp>
 #include <bounded/concepts.hpp>
 #include <bounded/integer.hpp>
+#include <bounded/scope_guard.hpp>
 
 #include <cstddef>
 #include <type_traits>
@@ -246,7 +246,7 @@ private:
 			return;
 		}
 		auto temp = std::move(m_large);
-		auto const guard = scope_guard([&]{
+		auto const guard = bounded::scope_guard([&]{
 			detail::deallocate_storage(detail::dynamic_array_data(temp.data(), temp.capacity()));
 		});
 		// It is safe to skip the destructor call of m_large
