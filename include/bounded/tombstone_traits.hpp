@@ -21,6 +21,7 @@ struct tombstone_traits {
 	static constexpr auto spare_representations = constant<0>;
 
 	static auto make(auto index) -> T = delete;
+	// Returns constant<-1> if there is an object present
 	static auto index(T const &) = delete;
 };
 
