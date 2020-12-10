@@ -19,7 +19,7 @@ using namespace bounded::literal;
 
 constexpr auto count_if(range auto && range, auto predicate) {
 	constexpr auto maximum = bounded::max_value<decltype(containers::size(range))>;
-	bounded::integer<0, bounded::detail::normalize<maximum.value()>> sum = 0_bi;
+	bounded::integer<0, bounded::normalize<maximum.value()>> sum = 0_bi;
 	for (decltype(auto) value : OPERATORS_FORWARD(range)) {
 		if (predicate(OPERATORS_FORWARD(value))) {
 			++sum;

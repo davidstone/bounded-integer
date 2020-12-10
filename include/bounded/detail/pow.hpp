@@ -44,8 +44,8 @@ constexpr auto pow(bounded_integer auto const base, bounded_integer auto const e
 	static_assert(min_value<exponent_t> >= constant<0>);
 	static_assert(min_value<base_t> >= constant<0>);
 	return integer<
-		detail::normalize<::bounded::detail::pow_impl(detail::builtin_min_value<base_t>, detail::builtin_min_value<exponent_t>)>,
-		detail::normalize<::bounded::detail::pow_impl(detail::builtin_max_value<base_t>, detail::builtin_max_value<exponent_t>)>
+		normalize<::bounded::detail::pow_impl(detail::builtin_min_value<base_t>, detail::builtin_min_value<exponent_t>)>,
+		normalize<::bounded::detail::pow_impl(detail::builtin_max_value<base_t>, detail::builtin_max_value<exponent_t>)>
 	>(::bounded::detail::pow_impl(base.value(), exponent.value()));
 }
 

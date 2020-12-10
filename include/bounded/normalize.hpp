@@ -24,15 +24,16 @@ constexpr auto fits_in_int(T const value) {
 		value <= static_cast<T>(max_value<int>);
 }
 
+} // namespace detail
+
 template<auto value>
 inline constexpr auto normalize = static_cast<
-	std::conditional_t<fits_in_int(+value), int,
-	std::conditional_t<must_use_unsigned(value), max_unsigned_t,
-	max_signed_t
+	std::conditional_t<detail::fits_in_int(+value), int,
+	std::conditional_t<detail::must_use_unsigned(value), detail::max_unsigned_t,
+	detail::max_signed_t
 >>>(value);
 
 template<auto value> requires std::is_enum_v<decltype(value)>
 inline constexpr auto normalize<value> = normalize<static_cast<std::underlying_type_t<decltype(value)>>(value)>;
 
-} // namespace detail
 } // namespace bounded

@@ -10,7 +10,7 @@
 #include <bounded/detail/comparison.hpp>
 #include <bounded/detail/is_bounded_integer.hpp>
 #include <bounded/detail/min_max_value.hpp>
-#include <bounded/detail/normalize.hpp>
+#include <bounded/normalize.hpp>
 #include <bounded/detail/overlapping_range.hpp>
 #include <bounded/detail/underlying_type.hpp>
 
@@ -53,11 +53,11 @@ namespace std {
 template<bounded::bounded_integer LHS, bounded::bounded_integer RHS> requires(std::is_same_v<LHS, std::decay_t<LHS>> and std::is_same_v<RHS, std::decay_t<RHS>>)
 struct common_type<LHS, RHS> {
 private:
-	static inline constexpr auto minimum = bounded::detail::normalize<bounded::detail::safe_min(
+	static inline constexpr auto minimum = bounded::normalize<bounded::detail::safe_min(
 		bounded::detail::builtin_min_value<LHS>,
 		bounded::detail::builtin_min_value<RHS>
 	)>;
-	static inline constexpr auto maximum = bounded::detail::normalize<bounded::detail::safe_max(
+	static inline constexpr auto maximum = bounded::normalize<bounded::detail::safe_max(
 		bounded::detail::builtin_max_value<LHS>,
 		bounded::detail::builtin_max_value<RHS>
 	)>;
@@ -126,13 +126,13 @@ template<auto value>
 using constant_t = integer<value, value>;
 
 template<auto value>
-inline constexpr auto constant = constant_t<detail::normalize<value>>{};
+inline constexpr auto constant = constant_t<normalize<value>>{};
 
 
 template<auto minimum, auto maximum>
 struct integer {
-	static_assert(std::is_same_v<decltype(minimum), std::remove_const_t<decltype(detail::normalize<minimum>)>>);
-	static_assert(std::is_same_v<decltype(maximum), std::remove_const_t<decltype(detail::normalize<maximum>)>>);
+	static_assert(std::is_same_v<decltype(minimum), std::remove_const_t<decltype(normalize<minimum>)>>);
+	static_assert(std::is_same_v<decltype(maximum), std::remove_const_t<decltype(normalize<maximum>)>>);
 	static_assert(detail::safe_compare(minimum, maximum) <= 0, "Maximum cannot be less than minimum");
 
 	using underlying_type = detail::underlying_type_t<minimum, maximum>;
@@ -235,8 +235,8 @@ constexpr auto deduced_max() {
 
 template<typename T>
 integer(T const & value) -> integer<
-	detail::normalize<detail::deduced_min<T>()>,
-	detail::normalize<detail::deduced_max<T>()>
+	normalize<detail::deduced_min<T>()>,
+	normalize<detail::deduced_max<T>()>
 >;
 
 }	// namespace bounded

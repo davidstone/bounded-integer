@@ -33,7 +33,7 @@ struct static_vector_data : private lexicographical_comparison::base {
 	using value_type = T;
 	using size_type = bounded::integer<
 		0,
-		bounded::detail::normalize<static_cast<std::ptrdiff_t>(capacity_)>
+		bounded::normalize<static_cast<std::ptrdiff_t>(capacity_)>
 	>;
 	using const_iterator = contiguous_iterator<T const, static_cast<std::ptrdiff_t>(capacity_)>;
 	using iterator = contiguous_iterator<T, static_cast<std::ptrdiff_t>(capacity_)>;
@@ -95,7 +95,7 @@ struct static_vector_data : private lexicographical_comparison::base {
 	}
 
 	static constexpr auto capacity() {
-		return bounded::constant<bounded::detail::normalize<capacity_>>;
+		return bounded::constant<bounded::normalize<capacity_>>;
 	}
 	// Assumes that elements are already constructed in the spare capacity
 	constexpr void append_from_capacity(auto const count) {

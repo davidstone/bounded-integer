@@ -243,7 +243,7 @@ struct concatenate_view {
 	using value_type = typename iterator::value_type;
 	using size_type = bounded::integer<
 		0,
-		bounded::detail::normalize<bounded::max_value<typename iterator::difference_type>.value()>
+		bounded::normalize<bounded::max_value<typename iterator::difference_type>.value()>
 	>;
 	
 	constexpr concatenate_view(Ranges && ... ranges):

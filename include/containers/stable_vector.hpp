@@ -27,7 +27,7 @@ namespace containers {
 template<typename T, std::size_t capacity_>
 struct stable_vector : private lexicographical_comparison::base {
 	using value_type = T;
-	using size_type = bounded::integer<0, bounded::detail::normalize<capacity_>>;
+	using size_type = bounded::integer<0, bounded::normalize<capacity_>>;
 	
 	using const_iterator = contiguous_iterator<value_type const, static_cast<std::ptrdiff_t>(capacity_)>;
 	using iterator = contiguous_iterator<value_type, static_cast<std::ptrdiff_t>(capacity_)>;
@@ -96,7 +96,7 @@ struct stable_vector : private lexicographical_comparison::base {
 	OPERATORS_BRACKET_SEQUENCE_RANGE_DEFINITIONS
 	
 	static constexpr auto capacity() {
-		return bounded::constant<bounded::detail::normalize<capacity_>>;
+		return bounded::constant<bounded::normalize<capacity_>>;
 	}
 	// Assumes that elements are already constructed in the spare capacity
 	constexpr void append_from_capacity(auto const count) {

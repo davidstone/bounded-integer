@@ -10,7 +10,7 @@
 #include <bounded/detail/comparison.hpp>
 #include <bounded/detail/is_bounded_integer.hpp>
 #include <bounded/detail/min_max_value.hpp>
-#include <bounded/detail/normalize.hpp>
+#include <bounded/normalize.hpp>
 #include <bounded/string.hpp>
 
 #include <stdexcept>
@@ -21,8 +21,8 @@ namespace detail {
 template<typename T, auto minimum, auto maximum>
 constexpr auto reduce_range(T const value, constant_t<minimum>, constant_t<maximum>) {
 	return integer<
-		detail::normalize<detail::safe_max(minimum, detail::builtin_min_value<T>)>,
-		detail::normalize<detail::safe_min(maximum, detail::builtin_max_value<T>)>
+		normalize<detail::safe_max(minimum, detail::builtin_min_value<T>)>,
+		normalize<detail::safe_min(maximum, detail::builtin_max_value<T>)>
 	>(value, non_check);
 }
 

@@ -14,8 +14,8 @@ template<typename integer>
 constexpr auto check_numeric_limits() {
 	using int_limits = std::numeric_limits<integer>;
 	using bounded_t = bounded::integer<
-		bounded::detail::normalize<int_limits::min()>,
-		bounded::detail::normalize<int_limits::max()>
+		bounded::normalize<int_limits::min()>,
+		bounded::normalize<int_limits::max()>
 	>;
 	static_assert(std::is_same_v<typename bounded_t::underlying_type, integer>, "Incorrect underlying_type.");
 	using bounded_limits = std::numeric_limits<bounded_t>;

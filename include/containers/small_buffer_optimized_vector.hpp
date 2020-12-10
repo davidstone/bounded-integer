@@ -64,7 +64,7 @@ struct small_buffer_optimized_vector : private lexicographical_comparison::base 
 			return bounded::max(detail::minimum_small_capacity<T>, bounded::constant<requested_small_capacity>);
 		}
 
-		using size_type = bounded::integer<0, bounded::detail::normalize<capacity().value()>>;
+		using size_type = bounded::integer<0, bounded::normalize<capacity().value()>>;
 		static_assert(sizeof(size_type) == sizeof(unsigned char));
 
 		constexpr auto size() const {
@@ -90,7 +90,7 @@ struct small_buffer_optimized_vector : private lexicographical_comparison::base 
 	struct large_t {
 		using size_type = typename detail::dynamic_array_data<T>::size_type;
 		using capacity_type = bounded::integer<
-			bounded::detail::normalize<(small_t::capacity() + bounded::constant<1>).value()>,
+			bounded::normalize<(small_t::capacity() + bounded::constant<1>).value()>,
 			bounded::detail::builtin_max_value<size_type>
 		>;
 

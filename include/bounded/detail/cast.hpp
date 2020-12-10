@@ -13,12 +13,12 @@ namespace bounded {
 // Other args allow you to declare the conversion as non_check
 template<auto new_minimum, auto minimum, auto maximum, typename... Args>
 constexpr auto increase_min(integer<minimum, maximum> const & value, Args... args) {
-	return integer<detail::normalize<detail::safe_max(new_minimum, minimum)>, maximum>(value, args...);
+	return integer<normalize<detail::safe_max(new_minimum, minimum)>, maximum>(value, args...);
 }
 
 template<auto new_maximum, auto minimum, auto maximum, typename... Args>
 constexpr auto decrease_max(integer<minimum, maximum> const & value, Args... args) {
-	return integer<minimum, detail::normalize<detail::safe_min(new_maximum, maximum)>>(value, args...);
+	return integer<minimum, normalize<detail::safe_min(new_maximum, maximum)>>(value, args...);
 }
 
 } // namespace bounded

@@ -76,7 +76,6 @@ add_executable(bounded_test
 	source/bounded/detail/max_builtin.cpp
 	source/bounded/detail/minmax.cpp
 	source/bounded/detail/min_max_value.cpp
-	source/bounded/detail/normalize.cpp
 	source/bounded/detail/overlapping_range.cpp
 	source/bounded/detail/overload.cpp
 	source/bounded/detail/pow.cpp
@@ -98,6 +97,7 @@ add_executable(bounded_test
 	source/bounded/insert.cpp
 	source/bounded/integer.cpp
 	source/bounded/lazy_init.cpp
+	source/bounded/normalize.cpp
 	source/bounded/numeric_limits.cpp
 	source/bounded/nth_type.cpp
 	source/bounded/optional.cpp

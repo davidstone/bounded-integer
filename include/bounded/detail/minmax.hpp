@@ -11,7 +11,7 @@
 #include <bounded/detail/comparison_function_object.hpp>
 #include <bounded/detail/is_bounded_integer.hpp>
 #include <bounded/detail/max_builtin.hpp>
-#include <bounded/detail/normalize.hpp>
+#include <bounded/normalize.hpp>
 #include <bounded/detail/overlapping_range.hpp>
 #include <operators/forward.hpp>
 #include <bounded/concepts.hpp>
@@ -38,9 +38,9 @@ struct extreme_type<Compare, LHS, RHS> {
 private:
 	static constexpr auto select = [](auto const lhs, auto const rhs) {
 		if constexpr (Compare{}(lhs, rhs)) {
-			return detail::normalize<lhs.value()>;
+			return normalize<lhs.value()>;
 		} else {
-			return detail::normalize<rhs.value()>;
+			return normalize<rhs.value()>;
 		}
 	};
 	static constexpr auto minimum = select(min_value<LHS>, min_value<RHS>);

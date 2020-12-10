@@ -47,8 +47,8 @@ public:
 		decltype(*std::declval<ForwardIterator2>())
 	>;
 	using difference_type = bounded::integer<
-		bounded::detail::normalize<static_cast<std::intmax_t>(-max_difference)>,
-		bounded::detail::normalize<static_cast<std::intmax_t>(max_difference)>
+		bounded::normalize<static_cast<std::intmax_t>(-max_difference)>,
+		bounded::normalize<static_cast<std::intmax_t>(max_difference)>
 	>;
 	using pointer = value_type *;
 	using reference = value_type;

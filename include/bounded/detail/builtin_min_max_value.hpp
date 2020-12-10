@@ -7,7 +7,7 @@
 
 #include <bounded/detail/is_bounded_integer.hpp>
 #include <bounded/detail/min_max_value.hpp>
-#include <bounded/detail/normalize.hpp>
+#include <bounded/normalize.hpp>
 
 namespace bounded {
 namespace detail {

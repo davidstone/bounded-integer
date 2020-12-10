@@ -65,7 +65,7 @@ constexpr auto ugly_size_hack(Size const size) {
 	if constexpr (std::is_integral_v<Size>) {
 		using result_t = bounded::integer<
 			0,
-			bounded::detail::normalize<std::min(bounded::max_value<Size>, bounded::max_value<std::uintmax_t> / 64)>
+			bounded::normalize<std::min(bounded::max_value<Size>, bounded::max_value<std::uintmax_t> / 64)>
 		>;
 		return static_cast<result_t>(size);
 	} else {

@@ -29,8 +29,8 @@ constexpr auto safer_negation() {
 template<auto minimum, auto maximum>
 constexpr auto operator-(integer<minimum, maximum> const value) {
 	using result_type = integer<
-		detail::normalize<detail::safer_negation<maximum>()>,
-		detail::normalize<detail::safer_negation<minimum>()>
+		normalize<detail::safer_negation<maximum>()>,
+		normalize<detail::safer_negation<minimum>()>
 	>;
 	using underlying_type = typename result_type::underlying_type;
 	using promoted_unsigned_type = detail::promoted_unsigned<underlying_type>;

@@ -34,7 +34,7 @@ private:
 public:
 	using value_type = bounded::integer<
 		bounded::detail::builtin_min_value<storage_type>,
-		bounded::detail::normalize<bounded::max(bounded::min_value<storage_type>, bounded::max_value<storage_type> - bounded::min_value<Step>).value()>
+		bounded::normalize<bounded::max(bounded::min_value<storage_type>, bounded::max_value<storage_type> - bounded::min_value<Step>).value()>
 	>;
 	using difference_type = decltype((std::declval<storage_type>() - std::declval<storage_type>()) / std::declval<Step>());
 	using pointer = value_type const *;

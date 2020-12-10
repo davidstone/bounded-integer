@@ -59,7 +59,7 @@ struct array {
 	static_assert(size_ <= static_cast<std::size_t>(bounded::max_value<std::ptrdiff_t>));
 	using value_type = typename detail::array_value_type<T, sizes...>::type;
 
-	using size_type = bounded::constant_t<bounded::detail::normalize<size_>>;
+	using size_type = bounded::constant_t<bounded::normalize<size_>>;
 	
 	using const_iterator = contiguous_iterator<value_type const, static_cast<std::ptrdiff_t>(size_)>;
 	using iterator = contiguous_iterator<value_type, static_cast<std::ptrdiff_t>(size_)>;

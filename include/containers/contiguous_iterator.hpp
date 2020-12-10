@@ -21,7 +21,7 @@ namespace containers {
 template<typename T, std::ptrdiff_t max_difference>
 struct contiguous_iterator {
 	using value_type = T;
-	using difference_type = bounded::integer<bounded::detail::normalize<-max_difference>, bounded::detail::normalize<max_difference>>;
+	using difference_type = bounded::integer<bounded::normalize<-max_difference>, bounded::normalize<max_difference>>;
 	using pointer = value_type *;
 	using reference = value_type &;
 	using iterator_category = std::random_access_iterator_tag;
