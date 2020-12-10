@@ -31,10 +31,16 @@ private:
 	storage_type m_value;
 	Step m_step;
 
-public:
-	using value_type = bounded::integer<
+	using bounded_type = bounded::integer<
 		bounded::detail::builtin_min_value<storage_type>,
 		bounded::normalize<bounded::max(bounded::min_value<storage_type>, bounded::max_value<storage_type> - bounded::min_value<Step>).value()>
+	>;
+
+public:
+	using value_type = std::conditional_t<
+		bounded::bounded_integer<Integer>,
+		bounded_type,
+		typename bounded_type::underlying_type
 	>;
 	using difference_type = decltype((std::declval<storage_type>() - std::declval<storage_type>()) / std::declval<Step>());
 	using pointer = value_type const *;
@@ -85,10 +91,8 @@ constexpr auto operator+(integer_range_iterator<Integer, Sentinel, Step> it, bou
 
 }	// namespace detail
 
-template<typename Integer, typename Sentinel = Integer, typename Step = bounded::constant_t<1>>
+template<bounded::integral Integer, bounded::integral Sentinel = Integer, bounded::integral Step = bounded::constant_t<1>>
 struct integer_range {
-	static_assert(bounded::bounded_integer<Integer>);
-	static_assert(bounded::bounded_integer<Sentinel>);
 	static_assert(bounded::max_value<Sentinel> >= bounded::min_value<Integer>, "Cannot construct inverted integer ranges.");
 
 	using iterator = detail::integer_range_iterator<Integer, Sentinel, Step>;
@@ -107,12 +111,11 @@ struct integer_range {
 	}
 
 	constexpr integer_range(Integer const first, Sentinel const last):
-		integer_range(first, last, bounded::constant<1>)
+		integer_range(first, last, Step(bounded::constant<1>))
 	{
 	}
-	template<typename Size>
-	constexpr integer_range(Size const size):
-		integer_range(bounded::constant<0>, size)
+	constexpr integer_range(Sentinel const size):
+		integer_range(Integer(bounded::constant<0>), size)
 	{
 	}
 
@@ -132,7 +135,10 @@ private:
 };
 
 template<typename Size>
-integer_range(Size) -> integer_range<bounded::constant_t<0>, Size>;
+integer_range(Size) -> integer_range<
+	std::conditional_t<bounded::bounded_integer<Size>, bounded::constant_t<0>, Size>,
+	Size
+>;
 
 template<typename Step = bounded::constant_t<1>>
 constexpr auto inclusive_integer_range(auto const first, auto const last, Step const step = bounded::constant<1>) {
