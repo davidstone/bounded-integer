@@ -14,32 +14,43 @@
 namespace bounded {
 namespace detail {
 
-template<typename T>
-struct promoted_unsigned_c {
-	using type = std::conditional_t<sizeof(T) <= sizeof(unsigned), unsigned, std::make_unsigned_t<T>>;
-};
-
-template<typename T>
-using promoted_unsigned = typename promoted_unsigned_c<std::decay_t<T>>::type;
-
 #if defined BOUNDED_DETAIL_HAS_128_BIT
 
-template<>
-struct promoted_unsigned_c<int128_t> {
-	using type = uint128_t;
+template<typename T>
+struct make_unsigned_c {
+	using type = std::make_unsigned_t<T>;
 };
+
 template<>
-struct promoted_unsigned_c<uint128_t> {
+struct make_unsigned_c<uint128_t> {
 	using type = uint128_t;
 };
 
+template<>
+struct make_unsigned_c<int128_t> {
+	using type = uint128_t;
+};
 
+template<typename T>
+using make_unsigned = typename make_unsigned_c<T>::type;
+
+#else
+
+template<typename T>
+using make_unsigned = std::make_unsigned_t<T>;
+
+#endif
+
+template<typename T>
+using promoted_unsigned = std::conditional_t<
+	sizeof(T) <= sizeof(unsigned),
+	unsigned,
+	make_unsigned<std::decay_t<T>>
+>;
+
+#if defined BOUNDED_DETAIL_HAS_128_BIT
 using max_signed_t = int128_t;
 using max_unsigned_t = uint128_t;
-
-static_assert(sizeof(max_signed_t) > sizeof(std::intmax_t));
-static_assert(sizeof(max_unsigned_t) > sizeof(std::uintmax_t));
-
 #else
 using max_signed_t = std::intmax_t;
 using max_unsigned_t = std::uintmax_t;
