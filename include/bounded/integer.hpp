@@ -16,7 +16,6 @@
 #include <bounded/detail/log.hpp>
 #include <bounded/detail/min_max_value.hpp>
 #include <bounded/detail/minmax.hpp>
-#include <bounded/detail/pow.hpp>
 #include <bounded/detail/size_of.hpp>
 #include <bounded/detail/stream.hpp>
 #include <bounded/detail/arithmetic/operators.hpp>

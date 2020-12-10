@@ -9,6 +9,7 @@
 #include <containers/is_range.hpp>
 
 #include <bounded/integer.hpp>
+#include <bounded/pow.hpp>
 
 #include <operators/forward.hpp>
 

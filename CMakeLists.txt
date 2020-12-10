@@ -78,7 +78,6 @@ add_executable(bounded_test
 	source/bounded/detail/min_max_value.cpp
 	source/bounded/detail/overlapping_range.cpp
 	source/bounded/detail/overload.cpp
-	source/bounded/detail/pow.cpp
 	source/bounded/detail/size_of.cpp
 	source/bounded/detail/stream.cpp
 	source/bounded/detail/tuple.cpp
@@ -101,6 +100,7 @@ add_executable(bounded_test
 	source/bounded/numeric_limits.cpp
 	source/bounded/nth_type.cpp
 	source/bounded/optional.cpp
+	source/bounded/pow.cpp
 	source/bounded/scope_guard.cpp
 	source/bounded/std_iterator.cpp
 	source/bounded/string.cpp
