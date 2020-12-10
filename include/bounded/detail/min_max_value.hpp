@@ -8,7 +8,6 @@
 #include <bounded/detail/int128.hpp>
 #include <bounded/detail/max_builtin.hpp>
 
-#include <limits>
 #include <type_traits>
 
 namespace bounded {
@@ -55,21 +54,12 @@ inline constexpr auto max_value<T> = T(-1);
 template<detail::unsigned_builtin T>
 inline constexpr auto min_value<T> = T(0);
 
-template<typename T> requires std::is_signed_v<T>
-inline constexpr auto max_value<T> = std::numeric_limits<T>::max();
+// Signed integers are two's complement
+template<detail::signed_builtin T>
+inline constexpr auto max_value<T> = static_cast<T>(max_value<detail::make_unsigned<T>> / 2);
 
-template<typename T> requires std::is_signed_v<T>
-inline constexpr auto min_value<T> = std::numeric_limits<T>::min();
-
-#if defined BOUNDED_DETAIL_HAS_128_BIT
-
-template<>
-inline constexpr auto max_value<detail::int128_t> = static_cast<detail::int128_t>(max_value<detail::uint128_t> / 2);
-
-template<>
-inline constexpr auto min_value<detail::int128_t> = -max_value<detail::int128_t> - 1;
-
-#endif
+template<detail::signed_builtin T>
+inline constexpr auto min_value<T> = static_cast<T>(-max_value<T> - 1);
 
 template<typename T, T value>
 inline constexpr auto max_value<std::integral_constant<T, value>> = value;
