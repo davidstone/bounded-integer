@@ -22,7 +22,7 @@ static_assert(!std::is_invocable_v<mutable_function const &>);
 static_assert(std::is_invocable_v<mutable_function &>);
 
 static_assert(!std::is_constructible_v<const_function, void(*)()>);
-static_assert(std::is_constructible_v<const_function, long(*)()>);
+static_assert(!std::is_constructible_v<const_function, long(*)()>);
 
 template<std::size_t size>
 struct sized_function {
