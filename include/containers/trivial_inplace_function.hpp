@@ -67,22 +67,37 @@ struct padded {
 template<bool is_const, std::size_t capacity, std::size_t alignment, typename R, typename... Args>
 struct trivial_inplace_function_impl {
 private:
+	static constexpr auto use_single_indirection = capacity == 0 and alignment == alignment_for_capacity<0>;
 	using storage_type = containers::array<std::byte, capacity>;
-	using function_ptr = R(*)(std::conditional_t<is_const, storage_type const &, storage_type &>, Args...);
+	using function_ptr = std::conditional_t<
+		use_single_indirection,
+		R(*)(Args...),
+		R(*)(std::conditional_t<is_const, storage_type const &, storage_type &>, Args...)
+	>;
 
 	[[no_unique_address]] alignas(alignment) storage_type m_storage;
 	function_ptr m_function_indirection;
 
 	template<typename Function>
-	static constexpr auto create_function_indirection() {
-		if constexpr (is_const) {
-			return [](storage_type const & storage, Args... args) -> R {
-				return std::invoke(reinterpret_cast<Function const &>(storage), OPERATORS_FORWARD(args)...);
-			};
+	static constexpr auto create_function_indirection(Function & function) -> function_ptr {
+		if constexpr (use_single_indirection) {
+			if constexpr (std::is_convertible_v<Function, function_ptr>) {
+				return function;
+			} else {
+				return [](Args... args) {
+					return Function()(OPERATORS_FORWARD(args)...);
+				};
+			}
 		} else {
-			return [](storage_type & storage, Args... args) -> R {
-				return std::invoke(reinterpret_cast<Function &>(storage), OPERATORS_FORWARD(args)...);
-			};
+			if constexpr (is_const) {
+				return [](storage_type const & storage, Args... args) {
+					return std::invoke(reinterpret_cast<Function const &>(storage), OPERATORS_FORWARD(args)...);
+				};
+			} else {
+				return [](storage_type & storage, Args... args) {
+					return std::invoke(reinterpret_cast<Function &>(storage), OPERATORS_FORWARD(args)...);
+				};
+			}
 		}
 	}
 
@@ -90,24 +105,50 @@ public:
 	// I would prefer that this not be default constructible. However, that
 	// would mean it could not be stored in a constexpr static_vector
 	trivial_inplace_function_impl() = default;
-	constexpr trivial_inplace_function_impl(trivially_storable<capacity, alignment, R, Args...> auto function):
+
+	constexpr trivial_inplace_function_impl(trivially_storable<capacity, alignment, R, Args...> auto function) requires(!use_single_indirection):
 		m_storage(__builtin_bit_cast(
 			storage_type,
 			padded(function, bounded::constant<capacity>)
 		)),
-		m_function_indirection(create_function_indirection<decltype(function)>())
+		m_function_indirection(create_function_indirection(function))
 	{
 	}
 
-	auto operator()(Args... args) const -> R requires(is_const) {
-		return m_function_indirection(m_storage, OPERATORS_FORWARD(args)...);
+	template<trivially_storable<capacity, alignment, R, Args...> Function> requires(
+		use_single_indirection and
+		(std::is_convertible_v<Function, function_ptr> or std::is_trivially_default_constructible_v<Function>)
+	)
+	constexpr trivial_inplace_function_impl(Function function):
+		m_storage(),
+		m_function_indirection(create_function_indirection(function))
+	{
 	}
-	auto operator()(Args... args) -> R {
-		return m_function_indirection(m_storage, OPERATORS_FORWARD(args)...);
+
+	constexpr auto operator()(Args... args) const -> R requires(is_const) {
+		if constexpr (use_single_indirection) {
+			return m_function_indirection(OPERATORS_FORWARD(args)...);
+		} else {
+			return m_function_indirection(m_storage, OPERATORS_FORWARD(args)...);
+		}
+	}
+	constexpr auto operator()(Args... args) -> R {
+		if constexpr (use_single_indirection) {
+			return m_function_indirection(OPERATORS_FORWARD(args)...);
+		} else {
+			return m_function_indirection(m_storage, OPERATORS_FORWARD(args)...);
+		}
 	}
 };
 
 } // namespace detail
+
+// If your function type is convertible to a function pointer, calling through
+// the function must have the same semantics as calling through the function
+// pointer.
+//
+// If `capacity` is 0 and `alignment` is the default, your type must be
+// trivially default constructible or convertible to a function pointer.
 
 template<typename, std::size_t capacity, std::size_t alignment = detail::alignment_for_capacity<capacity>>
 struct trivial_inplace_function;
