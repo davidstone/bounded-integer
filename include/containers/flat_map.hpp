@@ -312,32 +312,12 @@ public:
 		auto const position = upper_bound(key);
 		return try_emplace_at(position, OPERATORS_FORWARD(key), OPERATORS_FORWARD(mapped_args)...);
 	}
-	constexpr auto try_emplace_hint(const_iterator hint, auto && key, auto && ... mapped_args) {
-		auto impl = [&](const_iterator position){
-			return try_emplace_at(position, OPERATORS_FORWARD(key), OPERATORS_FORWARD(mapped_args)...);
-		};
-		auto const correct_next = hint == end() or compare()(key, *hint);
-		if (!correct_next) {
-			return impl(upper_bound(key));
-		}
-		auto const correct_previous = hint == begin() or compare()(*::containers::prev(hint), key);
-		if (!correct_previous) {
-			return impl(upper_bound(key));
-		}
-		return impl(hint);
-	}
 
 	constexpr auto insert(value_type const & value) {
 		return try_emplace(value.key(), value.mapped());
 	}
 	constexpr auto insert(value_type && value) {
 		return try_emplace(std::move(value).key(), std::move(value).mapped());
-	}
-	constexpr auto insert(const_iterator const hint, value_type const & value) {
-		return try_emplace_hint(hint, value.key(), value.mapped());
-	}
-	constexpr auto insert(const_iterator const hint, value_type && value) {
-		return try_emplace_hint(hint, std::move(value).key(), std::move(value).mapped());
 	}
 	template<range Range>
 	constexpr auto insert(Range && init) {
@@ -443,7 +423,6 @@ public:
 	using base::find;
 	
 	using base::try_emplace;
-	using base::try_emplace_hint;
 	using base::insert;
 	
 	using base::erase;
@@ -512,7 +491,6 @@ public:
 	using base::find;
 	
 	using base::try_emplace;
-	using base::try_emplace_hint;
 	using base::insert;
 	
 	using base::erase;
