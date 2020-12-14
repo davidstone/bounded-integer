@@ -462,9 +462,6 @@ public:
 		}
 		return it->mapped();
 	}
-	constexpr auto & operator[](auto && key) {
-		return this->try_emplace(OPERATORS_FORWARD(key)).first->mapped();
-	}
 
 	constexpr auto equal_range(auto && key) const {
 		auto const it = find(OPERATORS_FORWARD(key));
