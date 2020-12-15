@@ -296,15 +296,6 @@ public:
 		);
 	}
 
-	constexpr auto find(auto const & key) const {
-		auto const it = lower_bound(key);
-		return (it == end() or compare()(key, it->key())) ? end() : it;
-	}
-	constexpr auto find(auto const & key) {
-		auto const it = lower_bound(key);
-		return (it == end() or compare()(key, it->key())) ? end() : it;
-	}
-	
 	// Unlike in std::map, insert / try_emplace can only provide a time
 	// complexity that matches an insert into the underlying container, which is
 	// to say, linear. An insertion implies shifting all of the elements.
@@ -420,13 +411,21 @@ public:
 	
 	using base::lower_bound;
 	using base::upper_bound;
-	using base::find;
 	
 	using base::try_emplace;
 	using base::insert;
 	
 	using base::erase;
 
+	constexpr auto find(auto const & key) const {
+		auto const it = lower_bound(key);
+		return (it == end() or compare()(key, it->key())) ? end() : it;
+	}
+	constexpr auto find(auto const & key) {
+		auto const it = lower_bound(key);
+		return (it == end() or compare()(key, it->key())) ? end() : it;
+	}
+	
 	constexpr auto const & at(auto && key) const {
 		auto const it = find(OPERATORS_FORWARD(key));
 		if (it == end()) {
@@ -488,7 +487,6 @@ public:
 	
 	using base::lower_bound;
 	using base::upper_bound;
-	using base::find;
 	
 	using base::try_emplace;
 	using base::insert;
