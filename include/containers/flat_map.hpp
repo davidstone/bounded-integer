@@ -314,9 +314,8 @@ public:
 		// Because my underlying container is expected to be contiguous storage,
 		// it's best to do a batch insert and then just sort it all. However,
 		// because I know that the first section of the final range is already
-		// sorted, it's probably better to just sort the new elements then do a
-		// merge sort on both ranges, rather than calling std::sort on the
-		// entire container.
+		// sorted, it's better to just sort the new elements and then do a
+		// merge sort on both ranges, rather than sorting the entire container.
 		auto const original_size = containers::size(m_container);
 		::containers::append(m_container, OPERATORS_FORWARD(init));
 		auto const midpoint = begin() + original_size;
