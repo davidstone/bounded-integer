@@ -398,6 +398,7 @@ public:
 	using typename base::iterator;
 
 	using base::compare;
+	using base::extract_key;
 
 	using base::base;
 	using base::operator=;
@@ -459,6 +460,7 @@ public:
 	using typename base::iterator;
 
 	using base::compare;
+	using base::extract_key;
 
 	using base::base;
 	using base::operator=;
