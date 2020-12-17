@@ -18,7 +18,7 @@ namespace containers {
 template<range Container>
 constexpr auto shrink_to_fit(Container & c) {
 	auto const s = containers::size(c);
-	if (s == c.capacity() or c.capacity() <= bounded::min_value<decltype(c.capacity())>) {
+	if (s == c.capacity() or c.capacity() == bounded::min_value<decltype(c.capacity())>) {
 		return;
 	}
 	auto temp = Container(range_view(
