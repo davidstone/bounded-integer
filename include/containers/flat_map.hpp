@@ -14,9 +14,10 @@
 #include <containers/c_array.hpp>
 #include <containers/common_functions.hpp>
 #include <containers/compare_container.hpp>
-#include <containers/insert.hpp>
 #include <containers/erase.hpp>
+#include <containers/insert.hpp>
 #include <containers/legacy_iterator.hpp>
+#include <containers/lookup.hpp>
 #include <containers/size.hpp>
 #include <containers/vector.hpp>
 
@@ -28,7 +29,6 @@
 #include <operators/forward.hpp>
 
 #include <algorithm>
-#include <stdexcept>
 
 namespace containers {
 
@@ -426,21 +426,6 @@ public:
 		return (it == end() or compare()(key, it->key())) ? end() : it;
 	}
 	
-	constexpr auto const & at(auto && key) const {
-		auto const it = find(OPERATORS_FORWARD(key));
-		if (it == end()) {
-			throw std::out_of_range{"Key not found"};
-		}
-		return it->mapped();
-	}
-	constexpr auto & at(auto && key) {
-		auto const it = this->find(OPERATORS_FORWARD(key));
-		if (it == end()) {
-			throw std::out_of_range{"Key not found"};
-		}
-		return it->mapped();
-	}
-
 	constexpr auto equal_range(auto && key) const {
 		auto const it = find(OPERATORS_FORWARD(key));
 		bool const found = it != end();
