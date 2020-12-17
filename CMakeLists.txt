@@ -169,6 +169,7 @@ add_library(containers_test STATIC
 	source/containers/iterator_adapter.cpp
 	source/containers/lazy_push_back.cpp
 	source/containers/legacy_iterator.cpp
+	source/containers/lookup.cpp
 	source/containers/maximum_array_size.cpp
 	source/containers/mutable_iterator.cpp
 	source/containers/pop_back.cpp
