@@ -167,6 +167,7 @@ add_library(containers_test STATIC
 	source/containers/is_iterator_sentinel.cpp
 	source/containers/is_range.cpp
 	source/containers/iterator_adapter.cpp
+	source/containers/key_comparison_function.cpp
 	source/containers/lazy_push_back.cpp
 	source/containers/legacy_iterator.cpp
 	source/containers/lookup.cpp
