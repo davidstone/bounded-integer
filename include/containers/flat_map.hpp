@@ -140,7 +140,7 @@ public:
 		return extract_map_key<value_type, ExtractKey>(m_extract_key);
 	}
 	constexpr auto compare() const {
-		return ::containers::detail::extract_key_to_compare(extract_key());
+		return ::containers::detail::extract_key_to_less(extract_key());
 	}
 	
 	flat_map_base() = default;

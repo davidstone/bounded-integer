@@ -224,9 +224,9 @@ struct SubKey<T> {
 };
 
 template<typename ExtractKey>
-struct extract_key_to_compare {
-	extract_key_to_compare() = default;
-	explicit constexpr extract_key_to_compare(ExtractKey extract_key):
+struct extract_key_to_less {
+	extract_key_to_less() = default;
+	explicit constexpr extract_key_to_less(ExtractKey extract_key):
 		m_extract_key(std::move(extract_key))
 	{
 	}
@@ -241,7 +241,7 @@ private:
 
 template<iterator Iterator>
 constexpr void StdSortFallback(Iterator first, sentinel_for<Iterator> auto last, auto extract_key) {
-	sort(first, last, extract_key_to_compare(std::move(extract_key)));
+	sort(first, last, extract_key_to_less(std::move(extract_key)));
 }
 
 struct PartitionCounts {

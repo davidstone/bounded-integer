@@ -192,7 +192,7 @@ using extract_key_t = Extract;
 	using map_type = std::map<
 		Key,
 		Value,
-		containers::detail::extract_key_to_compare<extract_key_t<Extract>>
+		containers::detail::extract_key_to_less<extract_key_t<Extract>>
 	>;
 
 	template<typename Key, typename Value>
