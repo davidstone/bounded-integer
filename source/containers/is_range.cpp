@@ -5,6 +5,7 @@
 
 #include <containers/is_range.hpp>
 #include <containers/array/array.hpp>
+#include <containers/c_array.hpp>
 #include <containers/string.hpp>
 #include <containers/vector.hpp>
 
@@ -15,9 +16,6 @@
 
 namespace {
 
-template<typename T, std::size_t size>
-using c_array = T[size];
-
 template<typename... Ts>
 constexpr auto all_qualifications_are_ranges_helper = (... and containers::range<Ts>);
 
@@ -27,8 +25,8 @@ constexpr auto all_qualifications_are_ranges = all_qualifications_are_ranges_hel
 static_assert(!containers::range<int>);
 static_assert(!containers::range<int *>);
 
-static_assert(containers::range<c_array<int, 5> &>, "Incorrectly detects c-arrays as non-ranges.");
-static_assert(containers::range<c_array<int, 5> const &>, "Incorrectly detects c-arrays as non-ranges.");
+static_assert(containers::range<containers::c_array<int, 5> &>, "Incorrectly detects c-arrays as non-ranges.");
+static_assert(containers::range<containers::c_array<int, 5> const &>, "Incorrectly detects c-arrays as non-ranges.");
 
 static_assert(all_qualifications_are_ranges<containers::array<int, 5>>, "Incorrectly detects containers::array as a non-range.");
 static_assert(all_qualifications_are_ranges<containers::array<int, 0>>, "Incorrectly detects empty containers::array as a non-range.");
