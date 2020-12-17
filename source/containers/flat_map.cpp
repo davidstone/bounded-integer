@@ -27,33 +27,141 @@ namespace {
 
 using namespace bounded::literal;
 
-using base = containers::array<containers::map_value_type<int, int>, 3>;
-constexpr auto constexpr_constructible = containers::basic_flat_map<base>(
-	containers::assume_sorted_unique,
-	base{{
-		{0, 4},
-		{1, 2},
-		{3, 5}
-	}}
-);
-static_assert(constexpr_constructible.at(0) == 4);
-static_assert(constexpr_constructible.at(1) == 2);
-static_assert(constexpr_constructible.at(3) == 5);
-static_assert(constexpr_constructible.find(2) == end(constexpr_constructible));
+template<typename Container>
+constexpr auto map_equals(containers::basic_flat_map<Container> const & lhs, std::initializer_list<typename Container::value_type> const rhs) {
+	return containers::equal(lhs, rhs);
+}
+
+constexpr auto test_constructor(
+	std::initializer_list<containers::map_value_type<int, int>> input,
+	std::initializer_list<containers::map_value_type<int, int>> expected,
+	auto... maybe_constructor_arg
+) {
+	auto const map = containers::flat_map<int, int>(maybe_constructor_arg..., input);
+	return map_equals(map, expected);
+}
+constexpr auto test_constructor(
+	std::initializer_list<containers::map_value_type<int, int>> input,
+	auto... maybe_constructor_arg
+) {
+	return test_constructor(input, input, maybe_constructor_arg...);
+}
+
+static_assert(test_constructor(
+	{}
+));
+static_assert(test_constructor(
+	{},
+	containers::assume_unique
+));
+static_assert(test_constructor(
+	{},
+	containers::assume_sorted_unique
+));
+
+
+static_assert(test_constructor(
+	{{0, 4}}
+));
+static_assert(test_constructor(
+	{{0, 4}},
+	containers::assume_unique
+));
+static_assert(test_constructor(
+	{{0, 4}},
+	containers::assume_sorted_unique
+));
+
+
+static_assert(test_constructor(
+	{{0, 4}, {1, 2}}
+));
+static_assert(test_constructor(
+	{{0, 4}, {1, 2}},
+	containers::assume_unique
+));
+static_assert(test_constructor(
+	{{0, 4}, {1, 2}},
+	containers::assume_sorted_unique
+));
+
+static_assert(test_constructor(
+	{{1, 2}, {0, 4}},
+	{{0, 4}, {1, 2}}
+));
+static_assert(test_constructor(
+	{{1, 2}, {0, 4}},
+	{{0, 4}, {1, 2}},
+	containers::assume_unique
+));
+
+static_assert(test_constructor(
+	{{1, 4}, {1, 2}},
+	{{1, 4}}
+));
+
+
+static_assert(test_constructor(
+	{{0, 4}, {1, 2}, {3, 5}}
+));
+static_assert(test_constructor(
+	{{0, 4}, {1, 2}, {3, 5}},
+	containers::assume_unique
+));
+static_assert(test_constructor(
+	{{0, 4}, {1, 2}, {3, 5}},
+	containers::assume_sorted_unique
+));
+
+static_assert(test_constructor(
+	{{3, 5}, {1, 2}, {0, 4}},
+	{{0, 4}, {1, 2}, {3, 5}}
+));
+static_assert(test_constructor(
+	{{1, 2}, {0, 4}, {3, 5}},
+	{{0, 4}, {1, 2}, {3, 5}}
+));
+static_assert(test_constructor(
+	{{3, 5}, {1, 2}, {0, 4}},
+	{{0, 4}, {1, 2}, {3, 5}},
+	containers::assume_unique
+));
+static_assert(test_constructor(
+	{{1, 2}, {0, 4}, {3, 5}},
+	{{0, 4}, {1, 2}, {3, 5}},
+	containers::assume_unique
+));
+
+static_assert(test_constructor(
+	{{0, 4}, {1, 2}, {0, 5}},
+	{{0, 4}, {1, 2}}
+));
+static_assert(test_constructor(
+	{{0, 4}, {0, 5}, {1, 2}},
+	{{0, 4}, {1, 2}}
+));
+static_assert(test_constructor(
+	{{0, 4}, {0, 2}, {0, 5}},
+	{{0, 4}}
+));
+
 
 constexpr auto test() {
 	using container_type = containers::flat_map<int, int>;
-	auto empty = container_type();
 	auto const init = std::initializer_list<container_type::value_type>{{1, 2}, {2, 5}, {3, 3}};
+
 	auto container = container_type(init);
-	BOUNDED_TEST((container == container_type(init)));
+	BOUNDED_TEST(map_equals(container, init));
+
 	container.insert(container_type::value_type(4, 4));
+	BOUNDED_TEST(map_equals(container, {{1, 2}, {2, 5}, {3, 3}, {4, 4}}));
+
 	container.try_emplace(5, 3);
-	BOUNDED_TEST(container.at(5) == 3);
-	BOUNDED_TEST(containers::size(container) == 5_bi);
-	container.insert(typename container_type::value_type(3, 10));
-	BOUNDED_TEST(containers::size(container) == 5_bi);
-	BOUNDED_TEST(container.at(3) == 3);
+	BOUNDED_TEST(map_equals(container, {{1, 2}, {2, 5}, {3, 3}, {4, 4}, {5, 3}}));
+
+	container.insert(container_type::value_type(3, 10));
+	BOUNDED_TEST(map_equals(container, {{1, 2}, {2, 5}, {3, 3}, {4, 4}, {5, 3}}));
+
 	return true;
 }
 
