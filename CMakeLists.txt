@@ -146,6 +146,7 @@ add_library(containers_test STATIC
 	source/containers/adapt.cpp
 	source/containers/append.cpp
 	source/containers/assign.cpp
+	source/containers/associative_container.cpp
 	source/containers/at.cpp
 	source/containers/begin_end.cpp
 	source/containers/c_array.cpp
