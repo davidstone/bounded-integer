@@ -95,7 +95,7 @@ inserted_t(Iterator, bool) -> inserted_t<Iterator>;
 template<typename T, typename ExtractKey>
 struct extract_map_key {
 	constexpr explicit extract_map_key(ExtractKey extract_key):
-		m_extract(extract_key)
+		m_extract(std::move(extract_key))
 	{
 	}
 	constexpr decltype(auto) operator()(T const & value) const {
