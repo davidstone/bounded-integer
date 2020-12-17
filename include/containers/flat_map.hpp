@@ -259,7 +259,6 @@ public:
 		return ::containers::end(std::move(m_container));
 	}
 	
-	// Extra functions on top of the regular map interface
 	constexpr auto capacity() const {
 		return m_container.capacity();
 	}
