@@ -144,8 +144,8 @@ public:
 	}
 	
 	flat_map_base() = default;
-	constexpr explicit flat_map_base(ExtractKey extract_key):
-		m_extract_key(std::move(extract_key))
+	constexpr explicit flat_map_base(ExtractKey extract_key_):
+		m_extract_key(std::move(extract_key_))
 	{
 	}
 
@@ -157,9 +157,9 @@ public:
 	}
 
 	template<range InputRange>
-	constexpr flat_map_base(InputRange && init, ExtractKey extract_key):
+	constexpr flat_map_base(InputRange && init, ExtractKey extract_key_):
 		m_container(OPERATORS_FORWARD(init)),
-		m_extract_key(std::move(extract_key))
+		m_extract_key(std::move(extract_key_))
 	{
 		unique_ska_sort(m_container, extract_key());
 	}
@@ -172,9 +172,9 @@ public:
 	}
 
 	template<range InputRange>
-	constexpr flat_map_base(assume_sorted_unique_t, InputRange && init, ExtractKey extract_key):
+	constexpr flat_map_base(assume_sorted_unique_t, InputRange && init, ExtractKey extract_key_):
 		m_container(OPERATORS_FORWARD(init)),
-		m_extract_key(std::move(extract_key))
+		m_extract_key(std::move(extract_key_))
 	{
 		BOUNDED_ASSERT(is_sorted(m_container, compare()));
 	}
@@ -187,9 +187,9 @@ public:
 	}
 
 	template<range InputRange>
-	constexpr flat_map_base(assume_unique_t, InputRange && init, ExtractKey extract_key):
+	constexpr flat_map_base(assume_unique_t, InputRange && init, ExtractKey extract_key_):
 		m_container(OPERATORS_FORWARD(init)),
-		m_extract_key(std::move(extract_key))
+		m_extract_key(std::move(extract_key_))
 	{
 		ska_sort(m_container, extract_key());
 	}
@@ -203,9 +203,9 @@ public:
 	}
 
 	template<std::size_t init_size>
-	constexpr flat_map_base(c_array<value_type, init_size> && init, ExtractKey extract_key):
+	constexpr flat_map_base(c_array<value_type, init_size> && init, ExtractKey extract_key_):
 		m_container(std::move(init)),
-		m_extract_key(std::move(extract_key))
+		m_extract_key(std::move(extract_key_))
 	{
 		unique_ska_sort(m_container, extract_key());
 	}
@@ -218,9 +218,9 @@ public:
 	}
 
 	template<std::size_t init_size>
-	constexpr flat_map_base(assume_sorted_unique_t, c_array<value_type, init_size> && init, ExtractKey extract_key):
+	constexpr flat_map_base(assume_sorted_unique_t, c_array<value_type, init_size> && init, ExtractKey extract_key_):
 		m_container(std::move(init)),
-		m_extract_key(std::move(extract_key))
+		m_extract_key(std::move(extract_key_))
 	{
 		BOUNDED_ASSERT(is_sorted(m_container, compare()));
 	}
@@ -233,9 +233,9 @@ public:
 	}
 
 	template<std::size_t init_size>
-	constexpr flat_map_base(assume_unique_t, c_array<value_type, init_size> && init, ExtractKey extract_key):
+	constexpr flat_map_base(assume_unique_t, c_array<value_type, init_size> && init, ExtractKey extract_key_):
 		m_container(std::move(init)),
-		m_extract_key(std::move(extract_key))
+		m_extract_key(std::move(extract_key_))
 	{
 		ska_sort(m_container, extract_key());
 	}
