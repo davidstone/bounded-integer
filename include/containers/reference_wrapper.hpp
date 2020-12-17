@@ -9,6 +9,7 @@
 
 #include <operators/returns.hpp>
 
+#include <memory>
 #include <utility>
 
 namespace containers {
