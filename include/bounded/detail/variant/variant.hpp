@@ -168,7 +168,7 @@ public:
 			visit(*this, destroy);
 			return replace_active_member(index, OPERATORS_FORWARD(construct_));
 		} else {
-			auto value = OPERATORS_FORWARD(construct_);
+			auto value = OPERATORS_FORWARD(construct_)();
 			visit(*this, destroy);
 			return replace_active_member(index, value_to_function(std::move(value)));
 		}
