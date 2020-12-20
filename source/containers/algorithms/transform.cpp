@@ -12,7 +12,7 @@ namespace {
 struct S {
 	constexpr auto f() const { return n; }
 
-	friend auto operator==(S const &, S const &) -> bool = default;
+	friend auto operator==(S, S) -> bool = default;
 
 	int n;
 };

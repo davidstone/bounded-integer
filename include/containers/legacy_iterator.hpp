@@ -41,7 +41,7 @@ struct legacy_iterator {
 	OPERATORS_ARROW_DEFINITIONS
 	OPERATORS_BRACKET_ITERATOR_DEFINITIONS
 
-	friend auto operator<=>(legacy_iterator const &, legacy_iterator const &) = default;
+	friend auto operator<=>(legacy_iterator, legacy_iterator) = default;
 
 private:
 	Iterator m_it;

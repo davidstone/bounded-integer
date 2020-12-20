@@ -53,7 +53,7 @@ struct range_view {
 
 	OPERATORS_BRACKET_SEQUENCE_RANGE_DEFINITIONS
 
-	friend auto operator==(range_view const &, range_view const &) -> bool = default;
+	friend auto operator==(range_view, range_view) -> bool = default;
 	
 private:
 	[[no_unique_address]] Iterator m_begin;

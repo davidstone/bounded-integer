@@ -45,7 +45,7 @@ struct contiguous_iterator {
 	constexpr auto to_address() const {
 		return m_ptr;
 	}
-	friend auto operator<=>(contiguous_iterator const &, contiguous_iterator const &) = default;
+	friend auto operator<=>(contiguous_iterator, contiguous_iterator) = default;
 private:
 	T * m_ptr = nullptr;
 };

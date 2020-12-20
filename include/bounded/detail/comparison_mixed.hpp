@@ -19,7 +19,7 @@ constexpr auto operator==(bounded_integer auto const lhs, detail::builtin_intege
 	return lhs == integer(rhs);
 }
 
-constexpr auto operator<=>(bounded_integer auto const lhs, bool const rhs) = delete;
-constexpr auto operator==(bounded_integer auto const lhs, bool const rhs) -> bool = delete;
+constexpr auto operator<=>(bounded_integer auto, bool) = delete;
+constexpr auto operator==(bounded_integer auto, bool) -> bool = delete;
 
 }	// namespace bounded

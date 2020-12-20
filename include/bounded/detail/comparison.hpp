@@ -82,7 +82,7 @@ constexpr auto safe_max(auto... values) {
 
 
 template<bounded_integer LHS, bounded_integer RHS>
-constexpr auto operator<=>(LHS const & lhs, RHS const & rhs) -> std::strong_ordering {
+constexpr auto operator<=>(LHS const lhs, RHS const rhs) -> std::strong_ordering {
 	constexpr auto lhs_min = detail::builtin_min_value<LHS>;
 	constexpr auto lhs_max = detail::builtin_max_value<LHS>;
 	constexpr auto rhs_min = detail::builtin_min_value<RHS>;
@@ -99,7 +99,7 @@ constexpr auto operator<=>(LHS const & lhs, RHS const & rhs) -> std::strong_orde
 }
 
 template<bounded_integer LHS, bounded_integer RHS>
-constexpr auto operator==(LHS const & lhs, RHS const & rhs) -> bool {
+constexpr auto operator==(LHS const lhs, RHS const rhs) -> bool {
 	constexpr auto lhs_min = detail::builtin_min_value<LHS>;
 	constexpr auto lhs_max = detail::builtin_max_value<LHS>;
 	constexpr auto rhs_min = detail::builtin_min_value<RHS>;

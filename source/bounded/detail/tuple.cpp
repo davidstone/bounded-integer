@@ -16,7 +16,7 @@ static_assert(std::is_empty_v<bounded::tuple<>>);
 static_assert(bounded::tuple{} == bounded::tuple{});
 
 struct empty {
-	friend auto operator<=>(empty const &, empty const &) = default;
+	friend auto operator<=>(empty, empty) = default;
 };
 
 template<typename T, typename Index>
