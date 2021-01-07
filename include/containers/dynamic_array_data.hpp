@@ -17,7 +17,11 @@ template<typename T, typename Size = array_size_type<T>>
 struct dynamic_array_data {
 	using size_type = Size;
 	
-	constexpr dynamic_array_data() = default;
+	constexpr dynamic_array_data():
+		pointer(nullptr),
+		size(0_bi)
+	{
+	}
 
 	constexpr dynamic_array_data(T * const pointer_, auto const size_):
 		pointer(pointer_),
@@ -25,8 +29,8 @@ struct dynamic_array_data {
 	{
 	}
 
-	T * pointer = nullptr;
-	size_type size = 0_bi;
+	T * pointer;
+	size_type size;
 };
 
 
