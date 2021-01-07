@@ -297,7 +297,7 @@ private:
 	}
 
 	constexpr auto relocate_to_large(auto const requested_capacity) {
-		auto temp = detail::make_storage<value_type>(requested_capacity);
+		auto temp = detail::allocate_storage<value_type>(requested_capacity);
 		containers::uninitialized_move_destroy(*this, temp.pointer);
 		deallocate_large();
 		::bounded::construct(

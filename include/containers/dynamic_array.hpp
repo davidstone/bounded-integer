@@ -39,7 +39,7 @@ constexpr auto cleanup(dynamic_array_data<T> const data) {
 
 template<typename T>
 constexpr auto dynamic_array_initializer(range auto && init) {
-	auto const data = make_storage<T>(::containers::detail::linear_size(init));
+	auto const data = allocate_storage<T>(::containers::detail::linear_size(init));
 	try {
 		containers::uninitialized_copy(OPERATORS_FORWARD(init), data.pointer);
 	} catch(...) {
