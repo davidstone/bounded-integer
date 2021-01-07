@@ -15,6 +15,7 @@
 #include <containers/common_functions.hpp>
 #include <containers/compare_container.hpp>
 #include <containers/contiguous_iterator.hpp>
+#include <containers/dynamic_array_data.hpp>
 #include <containers/is_iterator.hpp>
 #include <containers/maximum_array_size.hpp>
 #include <containers/size.hpp>
@@ -28,53 +29,13 @@
 #include <memory>
 
 namespace containers {
-
-using namespace bounded::literal;
-
 namespace detail {
-
-template<typename T>
-struct dynamic_array_data {
-	using size_type = bounded::integer<0, maximum_array_size<T>>;
-	
-	constexpr dynamic_array_data() = default;
-
-	constexpr dynamic_array_data(T * const pointer_, auto const size_):
-		pointer(pointer_),
-		size(static_cast<size_type>(size_))
-	{
-	}
-
-	T * pointer = nullptr;
-	size_type size = 0_bi;
-};
-
-
-template<typename T>
-constexpr auto make_storage(auto const size) {
-	return dynamic_array_data(
-		std::allocator<T>{}.allocate(static_cast<std::size_t>(size)),
-		size
-	);
-}
-
-template<typename T>
-constexpr auto deallocate_storage(dynamic_array_data<T> const data) {
-	std::allocator<T>{}.deallocate(
-		data.pointer,
-		static_cast<std::size_t>(data.size)
-	);
-}
-
-
 
 template<typename T>
 constexpr auto cleanup(dynamic_array_data<T> const data) {
 	::containers::detail::destroy_range(data.pointer, data.pointer + data.size);
 	deallocate_storage(data);
 }
-
-
 
 template<typename T>
 constexpr auto dynamic_array_initializer(range auto && init) {
@@ -88,8 +49,7 @@ constexpr auto dynamic_array_initializer(range auto && init) {
 	return data;
 }
 
-
-}	// namespace detail
+} // namespace detail
 
 template<typename T>
 struct dynamic_array;
