@@ -72,7 +72,7 @@ constexpr auto assign(dynamic_array<T> & container, Range && range) {
 template<typename T>
 struct dynamic_array : private lexicographical_comparison::base {
 	using value_type = T;
-	using size_type = typename detail::dynamic_array_data<value_type>::size_type;
+	using size_type = typename detail::array_size_type<value_type>;
 
 	using const_iterator = contiguous_iterator<value_type const, bounded::detail::builtin_max_value<size_type>>;
 	using iterator = contiguous_iterator<value_type, bounded::detail::builtin_max_value<size_type>>;
