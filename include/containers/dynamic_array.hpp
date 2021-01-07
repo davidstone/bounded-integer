@@ -17,7 +17,6 @@
 #include <containers/contiguous_iterator.hpp>
 #include <containers/dynamic_array_data.hpp>
 #include <containers/is_iterator.hpp>
-#include <containers/maximum_array_size.hpp>
 #include <containers/size.hpp>
 #include <containers/uninitialized_storage.hpp>
 
@@ -25,14 +24,14 @@
 
 #include <operators/bracket.hpp>
 
-#include <iterator>
-#include <memory>
+#include <type_traits>
+#include <utility>
 
 namespace containers {
 namespace detail {
 
-template<typename T>
-constexpr auto cleanup(dynamic_array_data<T> const data) {
+template<typename T, typename Size>
+constexpr auto cleanup(dynamic_array_data<T, Size> const data) {
 	::containers::detail::destroy_range(data.pointer, data.pointer + data.size);
 	deallocate_storage(data);
 }

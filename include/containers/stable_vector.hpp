@@ -12,7 +12,6 @@
 #include <containers/common_functions.hpp>
 #include <containers/compare_container.hpp>
 #include <containers/contiguous_iterator.hpp>
-#include <containers/maximum_array_size.hpp>
 #include <containers/uninitialized_dynamic_array.hpp>
 
 #include <operators/forward.hpp>

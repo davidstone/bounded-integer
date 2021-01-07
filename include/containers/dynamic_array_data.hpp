@@ -5,35 +5,17 @@
 
 #pragma once
 
-#include <containers/algorithms/compare.hpp>
-#include <containers/algorithms/copy.hpp>
-#include <containers/algorithms/distance.hpp>
-#include <containers/algorithms/uninitialized.hpp>
-#include <containers/assign.hpp>
-#include <containers/begin_end.hpp>
-#include <containers/c_array.hpp>
-#include <containers/common_functions.hpp>
-#include <containers/compare_container.hpp>
-#include <containers/contiguous_iterator.hpp>
-#include <containers/is_iterator.hpp>
 #include <containers/maximum_array_size.hpp>
-#include <containers/size.hpp>
-#include <containers/uninitialized_storage.hpp>
 
-#include <operators/forward.hpp>
-
-#include <operators/bracket.hpp>
-
-#include <iterator>
 #include <memory>
 
 namespace containers::detail {
 
 using namespace bounded::literal;
 
-template<typename T>
+template<typename T, typename Size = array_size_type<T>>
 struct dynamic_array_data {
-	using size_type = bounded::integer<0, maximum_array_size<T>>;
+	using size_type = Size;
 	
 	constexpr dynamic_array_data() = default;
 
@@ -56,8 +38,8 @@ constexpr auto allocate_storage(auto const size) {
 	);
 }
 
-template<typename T>
-constexpr auto deallocate_storage(dynamic_array_data<T> const data) {
+template<typename T, typename Size>
+constexpr auto deallocate_storage(dynamic_array_data<T, Size> const data) {
 	std::allocator<T>{}.deallocate(
 		data.pointer,
 		static_cast<std::size_t>(data.size)
