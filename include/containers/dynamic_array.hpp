@@ -62,7 +62,7 @@ template<typename T, range Range> requires(!std::is_array_v<Range>)
 constexpr auto assign(dynamic_array<T> & container, Range && range) {
 	auto const difference = detail::linear_size(range);
 	if (difference == containers::size(container)) {
-		::containers::copy(containers::begin(OPERATORS_FORWARD(range)), containers::end(OPERATORS_FORWARD(range)), containers::begin(container));
+		::containers::copy(OPERATORS_FORWARD(range), containers::begin(container));
 	} else {
 		containers::clear(container);
 		container = dynamic_array<T>(OPERATORS_FORWARD(range));
