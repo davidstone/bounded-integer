@@ -78,6 +78,11 @@ struct vector : private lexicographical_comparison::base {
 		return *this;
 	}
 
+	friend constexpr auto swap(vector & lhs, vector & rhs) noexcept {
+		swap(lhs.m_storage, rhs.m_storage);
+		std::swap(lhs.m_size, rhs.m_size);
+	}
+
 	constexpr auto begin() const & {
 		return const_iterator(m_storage.data());
 	}
@@ -90,7 +95,7 @@ struct vector : private lexicographical_comparison::base {
 	constexpr auto size() const {
 		return m_size;
 	}
-
+	
 	OPERATORS_BRACKET_SEQUENCE_RANGE_DEFINITIONS
 
 	constexpr auto capacity() const {
