@@ -22,7 +22,6 @@
 namespace containers {
 
 // See https://probablydance.com/2013/05/13/4gb-per-vector/
-// TODO: ensure proper exception safety
 template<typename T, std::size_t capacity_>
 struct stable_vector : private lexicographical_comparison::base {
 	using value_type = T;
@@ -70,7 +69,11 @@ struct stable_vector : private lexicographical_comparison::base {
 		return *this;
 	}
 	constexpr auto & operator=(stable_vector const & other) & {
-		assign_range(other);
+		if (!m_storage.data()) {
+			BOUNDED_ASSERT(m_size == 0_bi);
+			m_storage = storage_type(capacity());
+		}
+		containers::assign(*this, other);
 		return *this;
 	}
 
@@ -104,16 +107,9 @@ struct stable_vector : private lexicographical_comparison::base {
 	}
 
 private:
-	constexpr auto assign_range(auto && other) & {
-		if (!m_storage.data()) {
-			BOUNDED_ASSERT(m_size == 0_bi);
-			m_storage = storage_type(capacity());
-		}
-		containers::assign(*this, other);
-	}
 	using storage_type = uninitialized_dynamic_array<T, decltype(capacity())>;
 	storage_type m_storage{capacity()};
 	[[no_unique_address]] size_type m_size = 0_bi;
 };
 
-}	// namespace containers
+} // namespace containers

@@ -70,7 +70,11 @@ struct vector : private lexicographical_comparison::base {
 		return *this;
 	}
 	constexpr auto & operator=(vector const & other) & {
-		assign_range(other);
+		if (!m_storage.data()) {
+			BOUNDED_ASSERT(m_size == 0_bi);
+			m_storage = storage_type();
+		}
+		containers::assign(*this, OPERATORS_FORWARD(other));
 		return *this;
 	}
 
@@ -112,14 +116,6 @@ struct vector : private lexicographical_comparison::base {
 	}
 
 private:
-	constexpr auto assign_range(auto && other) & {
-		if (!m_storage.data()) {
-			BOUNDED_ASSERT(m_size == 0_bi);
-			m_storage = storage_type();
-		}
-		containers::assign(*this, OPERATORS_FORWARD(other));
-	}
-	
 	using storage_type = uninitialized_dynamic_array<T, size_type>;
 	storage_type m_storage;
 	size_type m_size = 0_bi;
@@ -128,4 +124,4 @@ private:
 template<typename Range>
 vector(Range &&) -> vector<std::decay_t<typename std::decay_t<Range>::value_type>>;
 
-}	// namespace containers
+} // namespace containers
