@@ -208,11 +208,11 @@ public:
 		m_storage.initialize(OPERATORS_FORWARD(construct_));
 	}
 
-	constexpr auto && operator=(none_t) & {
+	constexpr auto operator=(none_t) & -> optional & {
 		m_storage.uninitialize();
 		return *this;
 	}
-	constexpr auto && operator=(convertible_to<value_type> auto && other) & {
+	constexpr auto operator=(convertible_to<value_type> auto && other) & -> optional & {
 		return detail::assign(*this, OPERATORS_FORWARD(other));
 	}
 	
