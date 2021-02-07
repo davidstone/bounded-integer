@@ -98,7 +98,7 @@ concept bounded_by_range = !std::is_same_v<T, bool> and !std::is_enum_v<T> and o
 // along non-enum types without doing anything, but constructs a
 // bounded::integer with the tighter bounds from an enumeration.
 template<typename T>
-constexpr decltype(auto) as_integer(T const & value) {
+constexpr decltype(auto) as_integer(T const value) {
 	if constexpr (std::is_enum_v<T>) {
 		using result_type = integer<
 			builtin_min_value<T>,
@@ -149,7 +149,7 @@ struct integer {
 	constexpr integer(integer const &) = default;
 	constexpr integer(integer &&) = default;
 
-	constexpr integer(detail::overlapping_integer<minimum, maximum> auto const & other, non_check_t):
+	constexpr integer(detail::overlapping_integer<minimum, maximum> auto const other, non_check_t):
 		m_value(static_cast<underlying_type>(other)) {
 	}
 
@@ -159,7 +159,7 @@ struct integer {
 	}
 
 	template<detail::overlapping_integer<minimum, maximum> T>
-	constexpr explicit integer(T const & other):
+	constexpr explicit integer(T const other):
 		integer(
 			::bounded::assume_in_range(
 				integer<detail::builtin_min_value<T>, detail::builtin_max_value<T>>(detail::as_integer(other), non_check),
@@ -189,7 +189,7 @@ struct integer {
 	constexpr auto operator=(integer const & other) & -> integer & = default;
 	constexpr auto operator=(integer && other) & -> integer & = default;
 
-	constexpr auto && operator=(detail::overlapping_integer<minimum, maximum> auto const & other) & {
+	constexpr auto && operator=(detail::overlapping_integer<minimum, maximum> auto const other) & {
 		return *this = integer(other);
 	}
 	
@@ -234,7 +234,7 @@ constexpr auto deduced_max() {
 }	// namespace detail
 
 template<typename T>
-integer(T const & value) -> integer<
+integer(T value) -> integer<
 	normalize<detail::deduced_min<T>()>,
 	normalize<detail::deduced_max<T>()>
 >;
