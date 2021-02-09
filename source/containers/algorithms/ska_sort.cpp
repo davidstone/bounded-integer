@@ -1451,12 +1451,12 @@ void benchmark_std_sort(benchmark::State & state, auto create) {
 	create(randomness, state.range(0));
 	for (auto _ : state) {
 		auto to_sort = create(randomness, state.range(0));
-		benchmark::DoNotOptimize(to_sort.data());
+		benchmark::DoNotOptimize(containers::data(to_sort));
 #ifdef SORT_ON_FIRST_ONLY
-		std::sort(to_sort.begin(), to_sort.end(), [](auto && l, auto && r){ return std::get<0>(l) < std::get<0>(r); });
+		std::sort(containers::begin(to_sort), containers::end(to_sort), [](auto && l, auto && r){ return std::get<0>(l) < std::get<0>(r); });
 #else
-		std::sort(to_sort.begin(), to_sort.end());
-		assert(std::is_sorted(to_sort.begin(), to_sort.end()));
+		containers::sort(to_sort);
+		assert(std::is_sorted(containers::begin(to_sort), containers::end(to_sort)));
 #endif
 		benchmark::ClobberMemory();
 	}
@@ -1475,12 +1475,12 @@ void benchmark_american_flag_sort(benchmark::State & state, auto create) {
 	create(randomness, state.range(0));
 	for (auto _ : state) {
 		auto to_sort = create(randomness, state.range(0));
-		benchmark::DoNotOptimize(to_sort.data());
+		benchmark::DoNotOptimize(containers::data(to_sort));
 #ifdef SORT_ON_FIRST_ONLY
-		american_flag_sort(to_sort.begin(), to_sort.end(), [](auto && a) -> decltype(auto){ return std::get<0>(a); });
+		american_flag_sort(containers::begin(to_sort), containers::end(to_sort), [](auto && a) -> decltype(auto){ return std::get<0>(a); });
 #else
-		american_flag_sort(to_sort.begin(), to_sort.end());
-		assert(std::is_sorted(to_sort.begin(), to_sort.end()));
+		american_flag_sort(containers::begin(to_sort), containers::end(to_sort));
+		assert(std::is_sorted(containers::begin(to_sort), containers::end(to_sort)));
 #endif
 		benchmark::ClobberMemory();
 	}
@@ -1491,12 +1491,12 @@ void benchmark_ska_sort(benchmark::State & state, auto create) {
 	create(randomness, state.range(0));
 	for (auto _ : state) {
 		auto to_sort = create(randomness, state.range(0));
-		benchmark::DoNotOptimize(to_sort.data());
+		benchmark::DoNotOptimize(containers::data(to_sort));
 #ifdef SORT_ON_FIRST_ONLY
-		ska_sort(to_sort.begin(), to_sort.end(), [](auto && a) -> decltype(auto){ return std::get<0>(a); });
+		ska_sort(containers::begin(to_sort), containers::end(to_sort), [](auto && a) -> decltype(auto){ return std::get<0>(a); });
 #else
-		ska_sort(to_sort.begin(), to_sort.end());
-		assert(std::is_sorted(to_sort.begin(), to_sort.end()));
+		ska_sort(containers::begin(to_sort), containers::end(to_sort));
+		assert(std::is_sorted(containers::begin(to_sort), containers::end(to_sort)));
 #endif
 		benchmark::ClobberMemory();
 	}
@@ -1507,12 +1507,12 @@ void benchmark_inplace_radix_sort(benchmark::State & state, auto create) {
 	create(randomness, state.range(0));
 	for (auto _ : state) {
 		auto to_sort = create(randomness, state.range(0));
-		benchmark::DoNotOptimize(to_sort.data());
+		benchmark::DoNotOptimize(containers::data(to_sort));
 #ifdef SORT_ON_FIRST_ONLY
-		inplace_radix_sort(to_sort.begin(), to_sort.end(), [](auto && a) -> decltype(auto) { return std::get<0>(a); });
+		inplace_radix_sort(containers::begin(to_sort), containers::end(to_sort), [](auto && a) -> decltype(auto) { return std::get<0>(a); });
 #else
-		inplace_radix_sort(to_sort.begin(), to_sort.end());
-		assert(std::is_sorted(to_sort.begin(), to_sort.end()));
+		inplace_radix_sort(containers::begin(to_sort), containers::end(to_sort));
+		assert(std::is_sorted(containers::begin(to_sort), containers::end(to_sort)));
 #endif
 		benchmark::ClobberMemory();
 	}
@@ -1523,7 +1523,7 @@ void benchmark_generation(benchmark::State & state, auto create) {
 	create(randomness, state.range(0));
 	for (auto _ : state) {
 		auto to_sort = create(randomness, state.range(0));
-		benchmark::DoNotOptimize(to_sort.data());
+		benchmark::DoNotOptimize(containers::data(to_sort));
 		benchmark::ClobberMemory();
 	}
 }
@@ -1546,7 +1546,7 @@ void benchmark_limited_generation(benchmark::State & state) {
 	auto randomness = std::mt19937_64(77342348);
 	for (auto _ : state) {
 		auto to_sort = create_limited_radix_sort_data(randomness, state.range(0));
-		benchmark::DoNotOptimize(to_sort.data());
+		benchmark::DoNotOptimize(containers::data(to_sort));
 		benchmark::ClobberMemory();
 	}
 }
@@ -1558,9 +1558,9 @@ void benchmark_limited_inplace_sort(benchmark::State & state) {
 	std::mt19937_64 randomness(77342348);
 	for (auto _ : state) {
 		auto to_sort = create_limited_radix_sort_data(randomness, state.range(0));
-		benchmark::DoNotOptimize(to_sort.data());
-		ska_sort(to_sort.begin(), to_sort.end());
-		assert(std::is_sorted(to_sort.begin(), to_sort.end()));
+		benchmark::DoNotOptimize(containers::data(to_sort));
+		ska_sort(containers::begin(to_sort), containers::end(to_sort));
+		assert(std::is_sorted(containers::begin(to_sort), containers::end(to_sort)));
 		benchmark::ClobberMemory();
 	}
 }
@@ -1626,6 +1626,10 @@ auto SKA_SORT_NOINLINE create_radix_sort_data_bool(std::mt19937_64 & engine, std
 }
 
 void register_all_benchmarks() {
+	REGISTER_BENCHMARK(
+		"bool",
+		create_radix_sort_data_bool
+	);
 	REGISTER_BENCHMARK(
 		"uint8",
 		create_simple_data(std::uniform_int_distribution(min_value<std::uint8_t>, max_value<std::uint8_t>))
