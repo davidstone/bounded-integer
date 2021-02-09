@@ -33,7 +33,10 @@ public:
 		m_value(other.m_value),
 		m_moved(other.m_moved)
 	{
-		BOUNDED_TEST(this != &other);
+		// Work around https://gcc.gnu.org/bugzilla/show_bug.cgi?id=99018
+		#if !defined __GNUC__ or defined __clang__
+			BOUNDED_TEST(this != &other);
+		#endif
 		BOUNDED_TEST(!other.m_moved);
 		BOUNDED_TEST(!other.m_destructed);
 		other.m_moved = true;
@@ -47,7 +50,10 @@ public:
 		return *this;
 	}
 	constexpr checked_mover & operator=(checked_mover && other) noexcept {
-		BOUNDED_TEST(this != &other);
+		// Work around https://gcc.gnu.org/bugzilla/show_bug.cgi?id=99018
+		#if !defined __GNUC__ or defined __clang__
+			BOUNDED_TEST(this != &other);
+		#endif
 		BOUNDED_TEST(!other.m_moved);
 		BOUNDED_TEST(!other.m_destructed);
 		BOUNDED_TEST(!m_destructed);
