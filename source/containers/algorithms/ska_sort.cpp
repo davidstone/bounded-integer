@@ -1037,6 +1037,8 @@ static_assert(test_sort_inplace(
 	bounded::copy
 ));
 
+// Work around https://gcc.gnu.org/bugzilla/show_bug.cgi?id=99018
+#if !defined __GNUC__ or defined __clang__
 static_assert(
 	test_sort_inplace(
 		containers::vector({
@@ -1247,6 +1249,7 @@ static_assert(
 		identity_by_value
 	)
 );
+#endif
 #endif
 
 template<bool by_value>
