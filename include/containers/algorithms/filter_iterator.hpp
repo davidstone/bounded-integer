@@ -102,15 +102,15 @@ constexpr auto filter_iterator(ForwardIterator first, sentinel_for<ForwardIterat
 template<typename Range, typename UnaryPredicate>
 struct filter {
 private:
-	using sentinel = decltype(end(std::declval<Range &>()));
+	using sentinel = decltype(::containers::end(std::declval<Range &>()));
 	using traits = detail::filter_iterator_traits<sentinel, UnaryPredicate>;
 public:
 	using const_iterator = decltype(detail::filter_iterator_impl(
-		begin(std::declval<Range const &>()),
+		::containers::begin(std::declval<Range const &>()),
 		reference_wrapper(std::declval<traits const &>())
 	));
 	using iterator = decltype(detail::filter_iterator_impl(
-		begin(std::declval<Range &>()),
+		::containers::begin(std::declval<Range &>()),
 		reference_wrapper(std::declval<traits &>())
 	));
 
