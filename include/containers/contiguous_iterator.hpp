@@ -56,7 +56,7 @@ constexpr auto operator+(
 	contiguous_iterator<T, max_difference> const lhs,
 	typename contiguous_iterator<T, max_difference>::difference_type const rhs
 ) {
-	return contiguous_iterator<T, max_difference>(to_address(lhs) + rhs);
+	return contiguous_iterator<T, max_difference>(::containers::to_address(lhs) + rhs);
 }
 
 // Iterators over ranges of zero size tend to come up only in generic code, and
@@ -75,7 +75,7 @@ constexpr auto operator+(
 
 template<typename T, std::ptrdiff_t max_difference>
 constexpr auto operator-(contiguous_iterator<T, max_difference> const lhs, contiguous_iterator<T, max_difference> const rhs) {
-	return static_cast<typename contiguous_iterator<T, max_difference>::difference_type>(to_address(lhs) - to_address(rhs));
+	return static_cast<typename contiguous_iterator<T, max_difference>::difference_type>(::containers::to_address(lhs) - ::containers::to_address(rhs));
 }
 
 template<typename T, std::ptrdiff_t max_difference>
