@@ -32,6 +32,9 @@ namespace detail {
 
 template<typename T, typename Size>
 constexpr auto cleanup(dynamic_array_data<T, Size> const data) {
+	if (data.pointer == nullptr) {
+		return;
+	}
 	::containers::detail::destroy_range(data.pointer, data.pointer + data.size);
 	deallocate_storage(data);
 }
