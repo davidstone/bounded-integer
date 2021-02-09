@@ -240,8 +240,8 @@ constexpr auto make_optional_lazy(auto && function) -> optional<std::invoke_resu
 	return {OPERATORS_FORWARD(function)()};
 }
 
-template<typename LHS, typename RHS> requires equality_comparable<LHS, RHS>
-constexpr auto operator==(optional<LHS> const & lhs, optional<RHS> const & rhs) -> bool {
+template<equality_comparable T>
+constexpr auto operator==(optional<T> const & lhs, optional<T> const & rhs) -> bool {
 	return (lhs and rhs) ?
 		*lhs == *rhs :
 		static_cast<bool>(lhs) == static_cast<bool>(rhs);
