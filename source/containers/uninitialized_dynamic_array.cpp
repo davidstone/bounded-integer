@@ -22,7 +22,10 @@ constexpr auto basic_test() -> bool {
     auto b = container<10>(1_bi);
     BOUNDED_TEST(a.data() != nullptr);
     BOUNDED_TEST(b.data() != nullptr);
+    // Work around https://gcc.gnu.org/bugzilla/show_bug.cgi?id=99031
+    #if !defined __GNUC__ or defined __clang__
     BOUNDED_TEST(a.data() != b.data());
+    #endif
     BOUNDED_TEST(a.capacity() == 1_bi);
     BOUNDED_TEST(b.capacity() == 1_bi);
     return true;
