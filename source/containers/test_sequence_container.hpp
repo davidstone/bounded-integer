@@ -3,6 +3,8 @@
 // (See accompanying file LICENSE_1_0.txt or copy at
 // http://www.boost.org/LICENSE_1_0.txt)
 
+#pragma once
+
 #include <containers/algorithms/compare.hpp>
 #include <containers/assign.hpp>
 #include <containers/begin_end.hpp>
