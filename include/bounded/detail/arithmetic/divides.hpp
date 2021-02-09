@@ -28,7 +28,7 @@ constexpr auto conditional_function(auto if_true, auto if_false) {
 // Ignores divide by 0, caught by constexpr
 template<auto lhs, auto rhs>
 constexpr auto safer_divide() {
-	constexpr auto is_negative = lhs < 0 xor rhs < 0;
+	constexpr auto is_negative = (lhs < 0) xor (rhs < 0);
 	constexpr auto positive_result = bounded::constant<safe_abs(lhs) / safe_abs(rhs)>;
 	if constexpr (is_negative) {
 		return (-positive_result).value();
