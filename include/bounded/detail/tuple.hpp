@@ -62,7 +62,12 @@ struct tuple_value {
 	}
 
 private:
+	// Work around https://gcc.gnu.org/bugzilla/show_bug.cgi?id=98995
+#if defined __GNUC__ and !defined __clang__
+	T m_value;
+#else
 	[[no_unique_address]] T m_value;
+#endif
 };
 
 template<std::size_t index>

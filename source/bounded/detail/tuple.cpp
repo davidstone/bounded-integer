@@ -32,7 +32,10 @@ concept type_indexable_by = indexable_by<T, bounded::detail::types<Index>>;
 namespace tuple_empty {
 
 using type = bounded::tuple<empty>;
+// Work around https://gcc.gnu.org/bugzilla/show_bug.cgi?id=98995
+#if !defined __GNUC__ or defined __clang__
 static_assert(std::is_empty_v<type>);
+#endif
 static_assert(std::is_trivially_default_constructible_v<type>);
 static_assert(std::is_trivially_copyable_v<type>);
 static_assert(std::is_same_v<
@@ -50,7 +53,10 @@ static_assert(std::is_same_v<
 namespace tuple_empty_empty {
 
 using type = bounded::tuple<empty, empty>;
+// Work around https://gcc.gnu.org/bugzilla/show_bug.cgi?id=98995
+#if !defined __GNUC__ or defined __clang__
 static_assert(std::is_empty_v<type>);
+#endif
 static_assert(std::is_trivially_default_constructible_v<type>);
 static_assert(std::is_trivially_copyable_v<type>);
 static_assert(std::is_same_v<
@@ -69,7 +75,10 @@ static_assert(!type_indexable_by<type, empty>);
 namespace tuple_tuple {
 
 using type = bounded::tuple<bounded::tuple<>>;
+// Work around https://gcc.gnu.org/bugzilla/show_bug.cgi?id=98995
+#if !defined __GNUC__ or defined __clang__
 static_assert(std::is_empty_v<type>);
+#endif
 static_assert(std::is_trivially_default_constructible_v<type>);
 static_assert(std::is_trivially_copyable_v<type>);
 static_assert(std::is_same_v<
@@ -87,7 +96,10 @@ static_assert(std::is_same_v<
 namespace tuple_empty_tuple_empty {
 
 using type = bounded::tuple<empty, bounded::tuple<empty>>;
+// Work around https://gcc.gnu.org/bugzilla/show_bug.cgi?id=98995
+#if !defined __GNUC__ or defined __clang__
 static_assert(std::is_empty_v<type>);
+#endif
 static_assert(std::is_trivially_default_constructible_v<type>);
 static_assert(std::is_trivially_copyable_v<type>);
 static_assert(std::is_same_v<
@@ -113,7 +125,10 @@ static_assert(std::is_same_v<
 namespace tuple_tuple_empty_tuple_empty {
 
 using type = bounded::tuple<bounded::tuple<empty>, bounded::tuple<empty>>;
+// Work around https://gcc.gnu.org/bugzilla/show_bug.cgi?id=98995
+#if !defined __GNUC__ or defined __clang__
 static_assert(std::is_empty_v<type>);
+#endif
 static_assert(std::is_trivially_default_constructible_v<type>);
 static_assert(std::is_trivially_copyable_v<type>);
 static_assert(std::is_same_v<
@@ -132,12 +147,18 @@ static_assert(!type_indexable_by<type, empty>);
 
 static_assert(std::is_empty_v<bounded::tuple<void>>);
 
+// Work around https://gcc.gnu.org/bugzilla/show_bug.cgi?id=98995
+#if !defined __GNUC__ or defined __clang__
 static_assert(std::is_empty_v<bounded::tuple<void, void, empty, void>>);
+#endif
 
 static_assert(sizeof(bounded::tuple<int>) == sizeof(int));
 static_assert(sizeof(bounded::tuple<int, bounded::tuple<int>>) == sizeof(int) * 2);
 
+// Work around https://gcc.gnu.org/bugzilla/show_bug.cgi?id=98995
+#if !defined __GNUC__ or defined __clang__
 static_assert(sizeof(bounded::tuple<int, empty>) == sizeof(int));
+#endif
 
 constexpr auto a = bounded::tuple<int, empty, int>(0, empty{}, 5);
 
@@ -149,7 +170,10 @@ static_assert(std::is_same_v<decltype(bounded::tuple<int>{}[0_bi]), int &&>);
 static_assert(std::is_same_v<decltype(bounded::tuple<empty>{}[0_bi]), empty &&>);
 
 struct different_empty {};
+// Work around https://gcc.gnu.org/bugzilla/show_bug.cgi?id=98995
+#if !defined __GNUC__ or defined __clang__
 static_assert(std::is_empty_v<bounded::tuple<empty, different_empty>>);
+#endif
 using nested_t = bounded::tuple<bounded::tuple<empty, different_empty>>;
 constexpr auto nested = nested_t{};
 static_assert(std::is_same_v<decltype(nested[0_bi][0_bi]), empty const &>);
