@@ -73,7 +73,17 @@ struct map_value_type {
 
 	friend auto operator<=>(map_value_type const & lhs, map_value_type const & rhs) = default;
 
+	friend constexpr auto move_destroy(map_value_type && value) noexcept {
+		return map_value_type(std::move(value), tag());
+	}
+
 private:
+	struct tag{};
+	constexpr map_value_type(map_value_type && other, tag):
+		m_key(move_destroy(other.m_key)),
+		m_mapped(move_destroy(other.m_mapped))
+	{
+	}
 	[[no_unique_address]] Key m_key;
 	[[no_unique_address]] Mapped m_mapped;
 };
