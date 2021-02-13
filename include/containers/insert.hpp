@@ -43,8 +43,9 @@ constexpr auto insert_or_emplace_with_reallocation(Container & container, typena
 	auto const it = containers::uninitialized_move_destroy(containers::begin(container), mutable_position, temp_begin);
 	BOUNDED_ASSERT(temp_begin + offset == it);
 	::containers::uninitialized_move_destroy(mutable_position, containers::end(container), it + number_of_elements);
+	container.append_from_capacity(-original_size);
+	temp.append_from_capacity(original_size + number_of_elements);
 	container = std::move(temp);
-	container.append_from_capacity(original_size + number_of_elements);
 	return mutable_position;
 }
 
