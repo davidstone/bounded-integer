@@ -6,6 +6,7 @@
 #include <bounded/detail/variant/variant.hpp>
 
 #include "../../../test_assert.hpp"
+#include "../../../test_int.hpp"
 
 namespace {
 
@@ -120,32 +121,6 @@ constexpr auto test_assignment_from_value() {
 }
 static_assert(test_assignment_from_value());
 
-// This allocates memory to force the compiler to ensure the destructor is run
-// exactly once for every instance of the object
-struct non_trivial {
-	constexpr non_trivial(int x_):
-		x(new int(x_))
-	{
-	}
-	constexpr non_trivial(non_trivial const & other):
-		x(new int(*other.x))
-	{
-	}
-	constexpr non_trivial & operator=(non_trivial const & other) {
-		*x = *other.x;
-		return *this;
-	}
-	constexpr ~non_trivial() {
-		delete x;
-	}
-
-	friend constexpr auto operator==(non_trivial const & lhs, non_trivial const & rhs) -> bool {
-		return *lhs.x == *rhs.x;
-	}
-
-	int * x;
-};
-
 struct non_copyable {
 	constexpr non_copyable() = default;
 	constexpr non_copyable(non_copyable const &) = delete;
@@ -171,11 +146,11 @@ static_assert(!bounded::equality_comparable<bounded::variant<non_comparable, int
 static_assert(!bounded::equality_comparable<bounded::variant<int, non_comparable, int>>);
 
 constexpr bool test_non_trivial() {
-	using non_trivial_variant_t = bounded::variant<non_trivial>;
-	auto a = non_trivial_variant_t(non_trivial(3));
+	using non_trivial_variant_t = bounded::variant<bounded::test_int>;
+	auto a = non_trivial_variant_t(bounded::test_int(3));
 	BOUNDED_TEST(a.index() == 0_bi);
 	auto b = a;
-	BOUNDED_TEST(*a[0_bi].x == 3);
+	BOUNDED_TEST(a[0_bi].value() == 3);
 	BOUNDED_TEST(a == b);
 	return true;
 }
