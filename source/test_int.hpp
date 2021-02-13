@@ -5,12 +5,15 @@
 
 #pragma once
 
+#include "test_assert.hpp"
+
 #include <compare>
 
 namespace bounded {
 
-// This allocates memory to force the compiler to ensure the destructor is run
-// exactly once for every instance of the object
+// Every constructor allocates memory. During constant evaluation, this forces
+// the compiler to ensure the destructor is run exactly once for every instance
+// of the object. Sanitizers should ensure the same during run time.
 struct test_int {
 	constexpr test_int(int x_):
 		m_value(new int(x_))
@@ -20,14 +23,41 @@ struct test_int {
 		test_int(0)
 	{
 	}
+
+	constexpr test_int(test_int && other):
+		m_value(new int(*other.m_value))
+	{
+		// Work around https://gcc.gnu.org/bugzilla/show_bug.cgi?id=99018
+		#if !defined __GNUC__ or defined __clang__
+			BOUNDED_TEST(this != &other);
+		#endif
+		BOUNDED_TEST(!other.m_moved_from);
+		other.m_moved_from = true;
+	}
 	constexpr test_int(test_int const & other):
 		m_value(new int(*other.m_value))
 	{
+		// Work around https://gcc.gnu.org/bugzilla/show_bug.cgi?id=99018
+		#if !defined __GNUC__ or defined __clang__
+			BOUNDED_TEST(this != &other);
+		#endif
+		BOUNDED_TEST(!other.m_moved_from);
 	}
-	constexpr test_int & operator=(test_int const & other) {
+
+	constexpr test_int & operator=(test_int && other) {
+		BOUNDED_TEST(!other.m_moved_from);
 		*m_value = *other.m_value;
+		m_moved_from = false;
+		other.m_moved_from = true;
 		return *this;
 	}
+	constexpr test_int & operator=(test_int const & other) {
+		BOUNDED_TEST(!other.m_moved_from);
+		*m_value = *other.m_value;
+		m_moved_from = false;
+		return *this;
+	}
+
 	constexpr ~test_int() {
 		delete m_value;
 	}
@@ -37,15 +67,21 @@ struct test_int {
 	}
 
 	friend constexpr auto operator<=>(test_int const & lhs, test_int const & rhs) {
+		BOUNDED_TEST(!lhs.m_moved_from);
+		BOUNDED_TEST(!rhs.m_moved_from);
 		return *lhs.m_value <=> *rhs.m_value;
 	}
 	friend constexpr auto operator==(test_int const & lhs, test_int const & rhs) -> bool {
+		BOUNDED_TEST(!lhs.m_moved_from);
+		BOUNDED_TEST(!rhs.m_moved_from);
 		return *lhs.m_value == *rhs.m_value;
 	}
-	friend constexpr auto move_destroy(test_int && value) noexcept {
-		return test_int(std::move(value), tag());
+	friend constexpr auto move_destroy(test_int && x) noexcept {
+		BOUNDED_TEST(!x.m_moved_from);
+		return test_int(std::move(x), tag());
 	}
 	friend constexpr auto to_radix_sort_key(test_int const & x) {
+		BOUNDED_TEST(!x.m_moved_from);
 		return x.value();
 	}
 private:
@@ -56,6 +92,7 @@ private:
 	}
 
 	int * m_value;
+	bool m_moved_from = false;
 };
 
 } // namespace bounded
