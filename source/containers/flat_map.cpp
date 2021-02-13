@@ -12,6 +12,7 @@
 #include <operators/forward.hpp>
 
 #include "../test_assert.hpp"
+#include "../test_int.hpp"
 
 #include <algorithm>
 #include <array>
@@ -33,15 +34,15 @@ constexpr auto map_equals(containers::basic_flat_map<Container> const & lhs, std
 }
 
 constexpr auto test_constructor(
-	std::initializer_list<containers::map_value_type<int, int>> input,
-	std::initializer_list<containers::map_value_type<int, int>> expected,
+	std::initializer_list<containers::map_value_type<bounded::test_int, bounded::test_int>> input,
+	std::initializer_list<containers::map_value_type<bounded::test_int, bounded::test_int>> expected,
 	auto... maybe_constructor_arg
 ) {
-	auto const map = containers::flat_map<int, int>(maybe_constructor_arg..., input);
+	auto const map = containers::flat_map<bounded::test_int, bounded::test_int>(maybe_constructor_arg..., input);
 	return map_equals(map, expected);
 }
 constexpr auto test_constructor(
-	std::initializer_list<containers::map_value_type<int, int>> input,
+	std::initializer_list<containers::map_value_type<bounded::test_int, bounded::test_int>> input,
 	auto... maybe_constructor_arg
 ) {
 	return test_constructor(input, input, maybe_constructor_arg...);
@@ -147,7 +148,7 @@ static_assert(test_constructor(
 
 
 constexpr auto test() {
-	using container_type = containers::flat_map<int, int>;
+	using container_type = containers::flat_map<bounded::test_int, bounded::test_int>;
 	auto const init = std::initializer_list<container_type::value_type>{{1, 2}, {2, 5}, {3, 3}};
 
 	auto container = container_type(init);
