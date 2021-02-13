@@ -32,6 +32,10 @@ struct test_int {
 		delete m_value;
 	}
 
+	constexpr auto value() const {
+		return *m_value;
+	}
+
 	friend constexpr auto operator<=>(test_int const & lhs, test_int const & rhs) {
 		return *lhs.m_value <=> *rhs.m_value;
 	}
@@ -41,11 +45,9 @@ struct test_int {
 	friend constexpr auto move_destroy(test_int && value) noexcept {
 		return test_int(std::move(value), tag());
 	}
-
-	constexpr auto value() const {
-		return *m_value;
+	friend constexpr auto to_radix_sort_key(test_int const & x) {
+		return x.value();
 	}
-
 private:
 	struct tag{};
 	constexpr test_int(test_int && other, tag) noexcept:
