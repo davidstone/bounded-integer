@@ -226,7 +226,12 @@ set_target_properties(benchmark PROPERTIES FOLDER extern)
 add_executable(ska_sort
 	source/containers/algorithms/ska_sort.cpp
 )
-target_link_libraries(ska_sort PUBLIC bounded benchmark strict_defaults)
+target_link_libraries(ska_sort PUBLIC bounded strict_defaults)
+
+add_executable(ska_sort_benchmark
+	source/containers/algorithms/ska_sort_benchmark.cpp
+)
+target_link_libraries(ska_sort_benchmark PUBLIC bounded benchmark strict_defaults)
 
 add_executable(trivial_inplace_function
 	source/containers/trivial_inplace_function.cpp
@@ -243,6 +248,9 @@ if("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang")
 	endif()
 
 	target_compile_options(ska_sort PRIVATE
+		"-Wno-sign-conversion"
+	)
+	target_compile_options(ska_sort_benchmark PRIVATE
 		"-Wno-global-constructors"
 		"-Wno-implicit-int-conversion"
 		"-Wno-sign-conversion"
