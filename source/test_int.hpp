@@ -5,6 +5,8 @@
 
 #pragma once
 
+#include <compare>
+
 namespace bounded {
 
 // This allocates memory to force the compiler to ensure the destructor is run
@@ -30,6 +32,9 @@ struct test_int {
 		delete m_value;
 	}
 
+	friend constexpr auto operator<=>(test_int const & lhs, test_int const & rhs) {
+		return *lhs.m_value <=> *rhs.m_value;
+	}
 	friend constexpr auto operator==(test_int const & lhs, test_int const & rhs) -> bool {
 		return *lhs.m_value == *rhs.m_value;
 	}
