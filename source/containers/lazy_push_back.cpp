@@ -9,13 +9,14 @@
 #include <containers/vector.hpp>
 
 #include "../test_assert.hpp"
+#include "../test_int.hpp"
 
 namespace {
 
 using namespace bounded::literal;
 
 constexpr bool test_lazy_push_back() {
-    auto c = containers::vector<int>();
+    auto c = containers::vector<bounded::test_int>();
 
     BOUNDED_TEST(c.capacity() == 0_bi);
 
