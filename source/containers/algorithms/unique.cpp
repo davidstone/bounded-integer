@@ -11,82 +11,9 @@
 #include <containers/vector.hpp>
 
 #include "../../test_assert.hpp"
+#include "../../test_int.hpp"
 
 namespace {
-
-class checked_mover {
-public:
-	constexpr checked_mover(int value):
-		m_value(value),
-		m_moved(false)
-	{
-	}
-		
-	constexpr checked_mover(checked_mover const & other):
-		m_value(other.m_value),
-		m_moved(other.m_moved)
-	{
-		BOUNDED_TEST(!other.m_moved);
-		BOUNDED_TEST(!other.m_destructed);
-	}
-	constexpr checked_mover(checked_mover && other) noexcept:
-		m_value(other.m_value),
-		m_moved(other.m_moved)
-	{
-		// Work around https://gcc.gnu.org/bugzilla/show_bug.cgi?id=99018
-		#if !defined __GNUC__ or defined __clang__
-			BOUNDED_TEST(this != &other);
-		#endif
-		BOUNDED_TEST(!other.m_moved);
-		BOUNDED_TEST(!other.m_destructed);
-		other.m_moved = true;
-	}
-	constexpr checked_mover & operator=(checked_mover const & other) {
-		BOUNDED_TEST(!other.m_moved);
-		BOUNDED_TEST(!other.m_destructed);
-		BOUNDED_TEST(!m_destructed);
-		m_value = other.m_value;
-		m_moved = other.m_moved;
-		return *this;
-	}
-	constexpr checked_mover & operator=(checked_mover && other) noexcept {
-		// Work around https://gcc.gnu.org/bugzilla/show_bug.cgi?id=99018
-		#if !defined __GNUC__ or defined __clang__
-			BOUNDED_TEST(this != &other);
-		#endif
-		BOUNDED_TEST(!other.m_moved);
-		BOUNDED_TEST(!other.m_destructed);
-		BOUNDED_TEST(!m_destructed);
-		m_value = other.m_value;
-		m_moved = other.m_moved;
-		other.m_moved = true;
-		return *this;
-	}
-	constexpr ~checked_mover() {
-		BOUNDED_TEST(!m_destructed);
-		m_destructed = true;
-	}
-	
-	
-	friend constexpr auto operator<=>(checked_mover const & lhs, checked_mover const & rhs) {
-		BOUNDED_TEST(!lhs.m_moved);
-		BOUNDED_TEST(!rhs.m_moved);
-		BOUNDED_TEST(!lhs.m_destructed);
-		BOUNDED_TEST(!rhs.m_destructed);
-		return lhs.m_value <=> rhs.m_value;
-	}
-	friend constexpr auto operator==(checked_mover const & lhs, checked_mover const & rhs) -> bool {
-		BOUNDED_TEST(!lhs.m_moved);
-		BOUNDED_TEST(!rhs.m_moved);
-		BOUNDED_TEST(!lhs.m_destructed);
-		BOUNDED_TEST(!rhs.m_destructed);
-		return lhs.m_value== rhs.m_value;
-	}
-private:
-	int m_value;
-	bool m_moved;
-	bool m_destructed = false;
-};
 
 template<typename Container>
 constexpr void test_unique_copy_less(Container const & source, Container const & expected) {
@@ -158,6 +85,6 @@ constexpr bool test_unique() {
 	return true;
 }
 
-static_assert(test_unique<containers::vector<checked_mover>>());
+static_assert(test_unique<containers::vector<bounded::test_int>>());
 
 } // namespace
