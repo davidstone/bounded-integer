@@ -14,6 +14,10 @@ struct test_int {
 		m_value(new int(x_))
 	{
 	}
+	constexpr test_int():
+		test_int(0)
+	{
+	}
 	constexpr test_int(test_int const & other):
 		m_value(new int(*other.m_value))
 	{
