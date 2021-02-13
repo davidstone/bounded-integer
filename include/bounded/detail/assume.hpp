@@ -25,15 +25,6 @@ inline void non_constexpr() {
 
 void prevent_comma(auto &&);
 
-// Work around https://gcc.gnu.org/bugzilla/show_bug.cgi?id=97051
-constexpr bool is_constant_evaluated() {
-	#if !defined __clang__ and defined __GNUC__
-		return false;
-	#else
-		return std::is_constant_evaluated();
-	#endif
-}
-
 } // namespace bounded::detail
 
 // An expression of type `void`. This is used to allow using variadic
@@ -47,7 +38,7 @@ constexpr bool is_constant_evaluated() {
 // Check is_constant_evaluated() first so that we do not evaluate the expression
 // when assertions are disabled
 #define BOUNDED_DETAIL_NON_CONSTEXPR_IF(...) ( \
-	::bounded::detail::is_constant_evaluated() and !(__VA_ARGS__) ? \
+	std::is_constant_evaluated() and !(__VA_ARGS__) ? \
 		::bounded::detail::non_constexpr() : \
 		BOUNDED_DETAIL_PREVENT_COMMA(__VA_ARGS__) \
 )
