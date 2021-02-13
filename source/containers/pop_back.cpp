@@ -6,14 +6,15 @@
 #include <containers/pop_back.hpp>
 
 #include <containers/algorithms/advance.hpp>
-#include <containers/static_vector/static_vector.hpp>
 #include <containers/range_view.hpp>
+#include <containers/vector.hpp>
 
 #include "../test_assert.hpp"
+#include "../test_int.hpp"
 
 namespace {
 
-constexpr bool test_pop_back(containers::static_vector<int, 4> const & original) {
+constexpr bool test_pop_back(containers::vector<bounded::test_int> const & original) {
     auto copy = original;
     containers::pop_back(copy);
     BOUNDED_TEST(containers::equal(
