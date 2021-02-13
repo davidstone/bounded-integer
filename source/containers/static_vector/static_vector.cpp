@@ -15,27 +15,30 @@ namespace {
 
 using namespace bounded::literal;
 
-static_assert(std::is_trivially_copy_constructible_v<containers::static_vector<int, 3>>);
-static_assert(std::is_trivially_move_constructible_v<containers::static_vector<int, 3>>);
-static_assert(std::is_trivially_destructible_v<containers::static_vector<int, 3>>);
-static_assert(std::is_trivially_copy_assignable_v<containers::static_vector<int, 3>>);
-static_assert(std::is_trivially_move_assignable_v<containers::static_vector<int, 3>>);
-
 template<typename T>
 using test_static_vector = containers::static_vector<T, 40>;
 
-static_assert(containers_test::test_sequence_container_int<test_static_vector>());
+static_assert(std::is_trivially_copy_constructible_v<test_static_vector<int>>);
+static_assert(std::is_trivially_move_constructible_v<test_static_vector<int>>);
+static_assert(std::is_trivially_destructible_v<test_static_vector<int>>);
+static_assert(std::is_trivially_copy_assignable_v<test_static_vector<int>>);
+static_assert(std::is_trivially_move_assignable_v<test_static_vector<int>>);
+
+static_assert(!std::is_trivially_copy_constructible_v<test_static_vector<bounded::test_int>>);
+static_assert(!std::is_trivially_move_constructible_v<test_static_vector<bounded::test_int>>);
+static_assert(!std::is_trivially_destructible_v<test_static_vector<bounded::test_int>>);
+static_assert(!std::is_trivially_copy_assignable_v<test_static_vector<bounded::test_int>>);
+static_assert(!std::is_trivially_move_assignable_v<test_static_vector<bounded::test_int>>);
+
+static_assert(containers_test::test_sequence_container<test_static_vector<int>>());
 
 using index_type = containers::index_type<containers::static_vector<int, 10>>;
 static_assert(bounded::min_value<index_type> == 0_bi);
 static_assert(bounded::max_value<index_type> == 9_bi);
 static_assert(!containers::iterator<containers::static_vector<std::string, 6>>);
 
-static_assert(containers_test::check_non_triviality<test_static_vector>());
-
 } // namespace
 
 int main() {
-	BOUNDED_TEST(containers_test::test_sequence_container_recursive<test_static_vector>());
-	BOUNDED_TEST(containers_test::test_sequence_container_complex<test_static_vector>());
+	BOUNDED_TEST(containers_test::test_sequence_container<test_static_vector<bounded::test_int>>());
 }

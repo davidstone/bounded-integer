@@ -14,6 +14,6 @@ namespace {
 
 using namespace bounded::literal;
 
-static_assert(containers_test::test_sequence_container<containers::vector>());
+static_assert(containers_test::test_sequence_container<containers::vector<bounded::test_int>>());
 
 } // namespace

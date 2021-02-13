@@ -7,4 +7,4 @@
 
 #include "test_sequence_container.hpp"
 
-static_assert(containers_test::test_sequence_container<containers::dynamic_array>());
+static_assert(containers_test::test_sequence_container<containers::dynamic_array<bounded::test_int>>());
