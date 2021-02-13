@@ -38,9 +38,11 @@ constexpr auto & lazy_push_back(
 	} else if constexpr (detail::reservable<Container>) {
 		auto temp = Container();
 		temp.reserve(::containers::detail::reallocation_size(container, 1_bi));
-		auto & ref = *(containers::data(temp) + container.capacity());
-		construct(ref);
-		containers::detail::transfer_all_contents(container, temp);
+		construct(*(containers::data(temp) + container.capacity()));
+
+		::containers::uninitialized_move_destroy(container, containers::begin(temp));
+		container.append_from_capacity(-initial_size);
+
 		temp.append_from_capacity(initial_size + 1_bi);
 		container = std::move(temp);
 	} else {

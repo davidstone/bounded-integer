@@ -115,16 +115,6 @@ constexpr auto uninitialized_move_destroy(range auto && source, iterator auto ou
 }
 
 
-namespace detail {
-
-constexpr auto transfer_all_contents(auto && source, auto & destination) {
-	::containers::uninitialized_move_destroy(OPERATORS_FORWARD(source), containers::begin(destination));
-	source.append_from_capacity(-containers::size(source));
-}
-
-} // namespace detail
-
-
 template<iterator ForwardIterator>
 constexpr auto uninitialized_default_construct(ForwardIterator const first, sentinel_for<ForwardIterator> auto const last) {
 	auto it = first;
