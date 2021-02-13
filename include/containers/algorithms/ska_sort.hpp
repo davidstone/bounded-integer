@@ -671,13 +671,13 @@ private:
 		static_assert(size == 1U or size % 2 == 0);
 		for (std::size_t index = 0U; index != size; ) {
 			for (auto it = first; it != last; ++it) {
-				std::uint8_t const key = to_radix_sort_key(extract_key(*it)) >> (index * 8U);
+				auto const key = static_cast<std::uint8_t>(to_radix_sort_key(extract_key(*it)) >> (index * 8U));
 				out_begin[counts[index][key]++] = std::move(*it);
 			}
 			++index;
 			if constexpr (size != 1U) {
 				for (auto it = out_begin; it != out_end; ++it) {
-					std::uint8_t const key = to_radix_sort_key(extract_key(*it)) >> ((index) * 8U);
+					auto const key = static_cast<std::uint8_t>(to_radix_sort_key(extract_key(*it)) >> ((index) * 8U));
 					first[counts[index][key]++] = std::move(*it);
 				}
 				++index;
