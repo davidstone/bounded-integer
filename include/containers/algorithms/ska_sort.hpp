@@ -579,9 +579,9 @@ struct ska_sort_copy_t {
 		using key_t = detail::key_type<SourceIterator, ExtractKey>;
 		if constexpr (std::is_same_v<key_t, bool>) {
 			auto false_position = buffer_begin;
-			auto true_position = std::next(
+			auto true_position = ::containers::next(
 				buffer_begin,
-				containers::count_if(first, last, containers::negate(extract_key)).value()
+				containers::count_if(first, last, containers::negate(extract_key))
 			);
 			for (; first != last; ++first) {
 				auto & position = extract_key(*first) ? true_position : false_position;
@@ -656,7 +656,7 @@ private:
 		for (auto it = first; it != last; ++it) {
 			auto key = to_radix_sort_key(extract_key(*it));
 			for (std::size_t index = 0U; index != size; ++index) {
-				auto const inner_index = (key >> (index * 8U)) & 0xFF;
+				auto const inner_index = (key >> (index * 8U)) & 0xFFU;
 				++counts[index][inner_index];
 			}
 		}
@@ -664,7 +664,7 @@ private:
 		for (std::size_t index = 0U; index != size; ++index) {
 			auto & indexed_total = total[index];
 			auto & count = counts[index];
-			for (int i = 0; i < 256; ++i) {
+			for (std::size_t i = 0; i < 256; ++i) {
 				indexed_total += std::exchange(count[i], indexed_total);
 			}
 		}

@@ -247,9 +247,6 @@ if("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang")
 		)
 	endif()
 
-	target_compile_options(ska_sort PRIVATE
-		"-Wno-sign-conversion"
-	)
 	target_compile_options(ska_sort_benchmark PRIVATE
 		"-Wno-global-constructors"
 		"-Wno-implicit-int-conversion"

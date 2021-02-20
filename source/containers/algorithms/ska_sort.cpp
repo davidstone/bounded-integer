@@ -83,7 +83,7 @@ constexpr bool test_sort(c_array<T, size> const & original, c_array<T, size> con
 }
 
 template<typename T, std::size_t size>
-constexpr bool test_common_prefix(c_array<T, size> const & source, std::size_t const start_index, std::size_t const expected) {
+constexpr bool test_common_prefix(c_array<T, size> const & source, std::ptrdiff_t const start_index, std::size_t const expected) {
 	auto const prefix = containers::detail::common_prefix(
 		std::begin(source),
 		std::end(source),
