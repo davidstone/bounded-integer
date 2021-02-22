@@ -113,19 +113,6 @@ constexpr auto operator==(LHS const lhs, RHS const rhs) -> bool {
 	}
 }
 
-namespace detail {
-
-template<typename LHS, typename RHS>
-concept member_comparable = requires(LHS const & lhs, RHS const & rhs) { lhs.compare(rhs) <=> 0; };
-
-} // namespace detail
-
-template<typename LHS, typename RHS> requires detail::member_comparable<LHS, RHS>
-constexpr auto operator<=>(LHS const & lhs, RHS const & rhs) {
-	return lhs.compare(rhs) <=> 0;
-}
-
-
 template<typename LHS, typename RHS = LHS>
 concept equality_comparable = requires(LHS const & lhs, RHS const & rhs) { lhs == rhs; };
 
