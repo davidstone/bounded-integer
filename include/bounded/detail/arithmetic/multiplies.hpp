@@ -10,6 +10,7 @@
 #include <bounded/detail/max_builtin.hpp>
 #include <bounded/detail/min_max_value.hpp>
 #include <bounded/detail/minmax.hpp>
+#include <bounded/detail/safe_extreme.hpp>
 
 namespace bounded {
 namespace detail {

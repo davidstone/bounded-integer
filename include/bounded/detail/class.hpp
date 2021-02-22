@@ -12,6 +12,7 @@
 #include <bounded/detail/min_max_value.hpp>
 #include <bounded/normalize.hpp>
 #include <bounded/detail/overlapping_range.hpp>
+#include <bounded/detail/safe_extreme.hpp>
 #include <bounded/detail/underlying_type.hpp>
 
 #include <bounded/assume_in_range.hpp>

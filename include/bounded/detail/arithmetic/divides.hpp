@@ -11,6 +11,7 @@
 #include <bounded/detail/comparison.hpp>
 #include <bounded/detail/max_builtin.hpp>
 #include <bounded/detail/minmax.hpp>
+#include <bounded/detail/safe_extreme.hpp>
 
 namespace bounded {
 namespace detail {

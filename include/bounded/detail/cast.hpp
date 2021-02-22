@@ -7,6 +7,7 @@
 
 #include <bounded/detail/class.hpp>
 #include <bounded/detail/comparison.hpp>
+#include <bounded/detail/safe_extreme.hpp>
 
 namespace bounded {
 

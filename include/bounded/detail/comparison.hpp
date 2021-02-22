@@ -47,37 +47,6 @@ constexpr auto safe_equal(LHS const lhs, RHS const rhs) -> bool {
 	}
 }
 
-template<typename Limited>
-constexpr auto safe_extreme(auto const pick_lhs, auto const lhs_, auto const rhs_) {
-	auto normalized = [](auto const value) {
-		using normalized_t = std::conditional_t<
-			signed_builtin<std::decay_t<decltype(value)>>,
-			max_signed_t,
-			max_unsigned_t
-		>;
-		return static_cast<normalized_t>(value);
-	};
-	auto const lhs = normalized(lhs_);
-	auto const rhs = normalized(rhs_);
-	using result_type = std::conditional_t<std::is_same_v<decltype(lhs), decltype(rhs)>, decltype(lhs), Limited>;
-	return (pick_lhs(safe_compare(lhs, rhs))) ?
-		static_cast<result_type>(lhs) :
-		static_cast<result_type>(rhs);
-}
-
-template<typename Limited>
-constexpr auto safe_extreme(auto const pick_lhs, auto const lhs, auto const rhs, auto const ... rest) {
-	return safe_extreme<Limited>(pick_lhs, safe_extreme<Limited>(pick_lhs, lhs, rhs), rest...);
-}
-
-constexpr auto safe_min(auto... values) {
-	return safe_extreme<max_signed_t>([](auto const cmp) { return cmp <= 0; }, values...);
-}
-
-constexpr auto safe_max(auto... values) {
-	return safe_extreme<max_unsigned_t>([](auto const cmp) { return cmp > 0; }, values...);
-}
-
 }	// namespace detail
 
 

@@ -10,6 +10,7 @@
 #include <bounded/detail/comparison.hpp>
 #include <bounded/detail/is_bounded_integer.hpp>
 #include <bounded/detail/min_max_value.hpp>
+#include <bounded/detail/safe_extreme.hpp>
 #include <bounded/normalize.hpp>
 #include <bounded/string.hpp>
 
