@@ -26,27 +26,4 @@ concept explicitly_convertible_to = constructible_from<To, From>;
 template<typename From, typename To>
 concept convertible_to = explicitly_convertible_to<From, To> and std::is_convertible_v<From, To>;
 
-template<typename T>
-concept copy_constructible = std::is_copy_constructible_v<T>;
-template<typename T>
-concept trivially_copy_constructible = copy_constructible<T> and std::is_trivially_copy_constructible_v<T>;
-
-template<typename T>
-concept move_constructible = std::is_move_constructible_v<T>;
-template<typename T>
-concept trivially_move_constructible = move_constructible<T> and std::is_trivially_move_constructible_v<T>;
-
-template<typename T>
-concept copy_assignable = std::is_copy_assignable_v<T>;
-template<typename T>
-concept trivially_copy_assignable = copy_assignable<T> and std::is_trivially_copy_assignable_v<T>;
-
-template<typename T>
-concept move_assignable = std::is_move_assignable_v<T>;
-template<typename T>
-concept trivially_move_assignable = move_assignable<T> and std::is_trivially_move_assignable_v<T>;
-
-template<typename T>
-concept trivially_destructible = std::is_trivially_destructible_v<T>;
-
 } // namespace bounded

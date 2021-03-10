@@ -29,14 +29,18 @@ namespace bounded {
 namespace detail {
 
 template<typename T>
-concept variant_copy_assignable = copy_constructible<T> and copy_assignable<T>;
-template<typename T>
-concept variant_trivially_copy_assignable = variant_copy_assignable<T> and trivially_copy_constructible<T> and trivially_copy_assignable<T>;
+concept variant_copy_assignable = std::is_copy_constructible_v<T> and std::is_copy_assignable_v<T>;
 
 template<typename T>
-concept variant_move_assignable = move_constructible<T> and move_assignable<T>;
+concept variant_trivially_copy_assignable = std::is_trivially_copy_constructible_v<T> and std::is_trivially_copy_assignable_v<T>;
+
+
 template<typename T>
-concept variant_trivially_move_assignable = variant_move_assignable<T> and trivially_move_constructible<T> and trivially_move_assignable<T>;
+concept variant_move_assignable = std::is_move_constructible_v<T> and std::is_move_assignable_v<T>;
+
+template<typename T>
+concept variant_trivially_move_assignable = std::is_trivially_move_constructible_v<T> and std::is_trivially_move_assignable_v<T>;
+
 
 struct non_constructible {
 	non_constructible() = delete;
@@ -112,7 +116,7 @@ public:
 
 	constexpr variant_impl(variant_impl const & other) noexcept(
 		(... and std::is_nothrow_copy_constructible_v<Ts>)
-	) requires((... and copy_constructible<Ts>) and !(... and trivially_copy_constructible<Ts>)):
+	) requires((... and std::is_copy_constructible_v<Ts>) and !(... and std::is_trivially_copy_constructible_v<Ts>)):
 		variant_impl(other, copy_move_tag{})
 	{
 	}
@@ -122,7 +126,7 @@ public:
 
 	constexpr variant_impl(variant_impl && other) noexcept(
 		(... and std::is_nothrow_move_constructible_v<Ts>)
-	) requires((... and move_constructible<Ts>) and !(... and trivially_move_constructible<Ts>)):
+	) requires((... and std::is_move_constructible_v<Ts>) and !(... and std::is_trivially_move_constructible_v<Ts>)):
 		variant_impl(std::move(other), copy_move_tag{})
 	{
 	}

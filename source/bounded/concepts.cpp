@@ -15,13 +15,4 @@ static_assert(bounded::constructible_from<long, int>);
 static_assert(!bounded::constructible_from<int, void>);
 static_assert(bounded::constructible_from<unsigned long long, unsigned long long *>);
 
-static_assert(bounded::copy_constructible<int>);
-static_assert(bounded::trivially_copy_constructible<int>);
-static_assert(bounded::move_constructible<int>);
-static_assert(bounded::trivially_move_constructible<int>);
-static_assert(bounded::copy_assignable<int>);
-static_assert(bounded::trivially_copy_assignable<int>);
-static_assert(bounded::move_assignable<int>);
-static_assert(bounded::trivially_move_assignable<int>);
-
 } // namespace
