@@ -7,91 +7,44 @@
 
 #include <containers/default_adapt_traits.hpp>
 #include <containers/iterator_adapter.hpp>
-#include <containers/reference_wrapper.hpp>
 
 #include <functional>
 
 namespace containers {
 namespace detail {
 
-// TODO: [[no_unique_address]]
-// TODO: std::invoke
+template<typename UnaryFunction>
+struct transform_traits : default_add, default_subtract, default_compare {
+private:
+	[[no_unique_address]] UnaryFunction m_dereference;
 
-template<typename T>
-inline constexpr auto is_reference_wrapper = false;
-
-template<typename T>
-inline constexpr auto is_reference_wrapper<reference_wrapper<T>> = true;
-
-template<typename T>
-inline constexpr auto is_reference_wrapper<std::reference_wrapper<T>> = true;
-
-// TODO: try having a conversion operator for function pointers?
-template<typename Function>
-struct function_wrapper {
-	Function function;
-
-	// TODO: Use terse syntax when clang doesn't crash
-	template<typename... Args>
-	constexpr auto operator()(Args && ... args) const OPERATORS_RETURNS(
-		  function(OPERATORS_FORWARD(args)...)
+public:
+	transform_traits() = default;
+	constexpr explicit transform_traits(UnaryFunction dereference_):
+		m_dereference(std::move(dereference_))
+	{
+	}
+	
+	constexpr auto dereference(iterator auto const it) const OPERATORS_RETURNS(
+		std::invoke(m_dereference, *it)
 	)
 };
 
-template<typename Result, typename Type>
-struct function_wrapper<Result Type::*> {
-	Result Type::* function;
-
-	constexpr auto operator()(auto && object, auto && ... args) const {
-		using Object = std::decay_t<decltype(object)>;
-		if constexpr (is_reference_wrapper<Object>) {
-			return operator()(function, object.get(), OPERATORS_FORWARD(args)...);
-		} else if constexpr (std::is_member_function_pointer_v<decltype(function)>) {
-			if constexpr (std::is_base_of_v<Type, Object>) {
-				return (OPERATORS_FORWARD(object).*function)(OPERATORS_FORWARD(args)...);
-			} else {
-				return (OPERATORS_FORWARD(object)->*function)(OPERATORS_FORWARD(args)...);
-			}
-		} else {
-			static_assert(std::is_member_object_pointer_v<decltype(function)>);
-			static_assert(sizeof...(args) == 0);
-			if constexpr (std::is_base_of_v<Type, Object>) {
-				return OPERATORS_FORWARD(object).*function;
-			} else {
-				return OPERATORS_FORWARD(object)->*function;
-			}
-		}
-	}
-};
-
-template<typename Function> requires(std::is_class_v<Function> and !std::is_final_v<Function> and std::is_empty_v<Function>)
-struct function_wrapper<Function> : Function {
-	using Function::operator();
-};
-
 template<typename UnaryFunction>
-struct transform_traits : default_add, default_subtract, default_compare, private function_wrapper<UnaryFunction> {
-	transform_traits() = default;
-	constexpr explicit transform_traits(UnaryFunction dereference_):
-		function_wrapper<UnaryFunction>{std::move(dereference_)}
-	{
-	}
-	
-	constexpr auto dereference(iterator auto const it) const -> decltype(std::declval<function_wrapper<UnaryFunction> const &>()(*it)) {
-		return static_cast<function_wrapper<UnaryFunction> const &>(*this)(*it);
-	}
-};
+struct transform_traits_dereference : default_add, default_subtract, default_compare {
+private:
+	[[no_unique_address]] UnaryFunction m_dereference;
 
-template<typename UnaryFunction>
-struct transform_traits_dereference : default_add, default_subtract, default_compare, private function_wrapper<UnaryFunction> {
+public:
 	constexpr explicit transform_traits_dereference(UnaryFunction dereference_):
-		function_wrapper<UnaryFunction>{std::move(dereference_)}
+		m_dereference(std::move(dereference_))
 	{
 	}
 	
-	constexpr auto dereference(iterator auto const it) const -> decltype(std::declval<function_wrapper<UnaryFunction> const &>()(it)) {
-		return static_cast<function_wrapper<UnaryFunction> const &>(*this)(it);
-	}
+	constexpr auto dereference(iterator auto const it) const OPERATORS_RETURNS(
+		std::invoke(m_dereference, it)
+	)
+
 };
 
 }	// namespace detail
