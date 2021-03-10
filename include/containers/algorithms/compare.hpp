@@ -40,7 +40,7 @@ constexpr auto lexicographical_compare_3way(InputIterator1 const first1, sentine
 }
 
 constexpr auto lexicographical_compare_3way(range auto const & range1, range auto const & range2) {
-	return ::containers::lexicographical_compare_3way(containers::begin(range1), containers::end(range1), containers::begin(range2), containers::end(range2));
+	return ::containers::lexicographical_compare_3way(range1, range2, bounded::compare_3way());
 }
 
 
@@ -139,7 +139,7 @@ constexpr auto equal(Range1 const & range1, Range2 const & range2, auto cmp) {
 
 template<range Range1, range Range2>
 constexpr auto equal(Range1 const & range1, Range2 const & range2) {
-	return ::containers::equal(containers::begin(range1), containers::end(range1), containers::begin(range2), containers::end(range2));
+	return ::containers::equal(range1, range2, bounded::equal_to());
 }
 
 
