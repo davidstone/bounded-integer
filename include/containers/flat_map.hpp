@@ -6,6 +6,7 @@
 #pragma once
 
 #include <containers/algorithms/binary_search.hpp>
+#include <containers/algorithms/keyed_binary_search.hpp>
 #include <containers/algorithms/negate.hpp>
 #include <containers/algorithms/ska_sort.hpp>
 #include <containers/algorithms/unique.hpp>
@@ -168,8 +169,8 @@ public:
 		if constexpr (allow_duplicates) {
 			ska_sort(m_container, extract_key());
 		} else {
-		unique_ska_sort(m_container, extract_key());
-	}
+			unique_ska_sort(m_container, extract_key());
+		}
 	}
 
 	template<range InputRange>
@@ -180,8 +181,8 @@ public:
 		if constexpr (allow_duplicates) {
 			ska_sort(m_container, extract_key());
 		} else {
-		unique_ska_sort(m_container, extract_key());
-	}
+			unique_ska_sort(m_container, extract_key());
+		}
 	}
 
 	template<range InputRange>
@@ -222,8 +223,8 @@ public:
 		if constexpr (allow_duplicates) {
 			ska_sort(m_container, extract_key());
 		} else {
-		unique_ska_sort(m_container, extract_key());
-	}
+			unique_ska_sort(m_container, extract_key());
+		}
 	}
 
 	template<std::size_t init_size>
@@ -234,8 +235,8 @@ public:
 		if constexpr (allow_duplicates) {
 			ska_sort(m_container, extract_key());
 		} else {
-		unique_ska_sort(m_container, extract_key());
-	}
+			unique_ska_sort(m_container, extract_key());
+		}
 	}
 
 	template<std::size_t init_size>
@@ -294,40 +295,11 @@ public:
 		return m_container.reserve(new_capacity);
 	}
 	
-	constexpr auto lower_bound(auto && key) const {
-		return containers::lower_bound(
-			*this,
-			OPERATORS_FORWARD(key),
-			compare()
-		);
-	}
-	constexpr auto lower_bound(auto && key) {
-		return containers::lower_bound(
-			*this,
-			OPERATORS_FORWARD(key),
-			compare()
-		);
-	}
-	constexpr auto upper_bound(auto && key) const {
-		return containers::upper_bound(
-			*this,
-			OPERATORS_FORWARD(key),
-			compare()
-		);
-	}
-	constexpr auto upper_bound(auto && key) {
-		return containers::upper_bound(
-			*this,
-			OPERATORS_FORWARD(key),
-			compare()
-		);
-	}
-
 	// Unlike in std::map, insert / try_emplace can only provide a time
 	// complexity that matches an insert into the underlying container, which is
 	// to say, linear. An insertion implies shifting all of the elements.
 	constexpr auto try_emplace(auto && key, auto && ... mapped_args) {
-		auto const position = upper_bound(key);
+		auto const position = containers::keyed_upper_bound(*this, key);
 		return try_emplace_at(position, OPERATORS_FORWARD(key), OPERATORS_FORWARD(mapped_args)...);
 	}
 
@@ -436,34 +408,20 @@ public:
 	using base::capacity;
 	using base::reserve;
 	
-	using base::lower_bound;
-	using base::upper_bound;
-	
 	using base::try_emplace;
 	using base::insert;
 	
 	using base::erase;
 
 	constexpr auto find(auto const & key) const {
-		auto const it = lower_bound(key);
+		auto const it = containers::keyed_lower_bound(*this, key);
 		return (it == end() or compare()(key, it->key())) ? end() : it;
 	}
 	constexpr auto find(auto const & key) {
-		auto const it = lower_bound(key);
+		auto const it = containers::keyed_lower_bound(*this, key);
 		return (it == end() or compare()(key, it->key())) ? end() : it;
 	}
 	
-	constexpr auto equal_range(auto && key) const {
-		auto const it = find(OPERATORS_FORWARD(key));
-		bool const found = it != end();
-		return std::make_pair(it, found ? ::containers::next(it) : it);
-	}
-
-	constexpr size_type count(auto && key) const {
-		bool const found = this->find(OPERATORS_FORWARD(key)) != end();
-		return found ? 1 : 0;
-	}
-
 	constexpr size_type erase(auto && key) {
 		auto const it = this->find(OPERATORS_FORWARD(key));
 		if (it == end()) {
@@ -498,38 +456,19 @@ public:
 	using base::capacity;
 	using base::reserve;
 	
-	using base::lower_bound;
-	using base::upper_bound;
-	
 	using base::try_emplace;
 	using base::insert;
 	
 	using base::erase;
 
-	// These implementations work for map or multimap, but I don't expect the
-	// compiler to be able to optimize based on the fact that values in flat_map
-	// are unique, so I have slightly different versions in flat_map.
-
-	constexpr auto equal_range(auto && key) const {
-		return std::equal_range(begin(), end(), OPERATORS_FORWARD(key), compare());
-	}
-	constexpr auto equal_range(auto && key) {
-		return std::equal_range(begin(), end(), OPERATORS_FORWARD(key), compare());
-	}
-
-	constexpr auto count(auto && key) const {
-		auto const range = this->equal_range(OPERATORS_FORWARD(key));
-		return static_cast<size_type>(std::distance(range.first, range.second));
-	}
-	
 	constexpr size_type erase(auto && key) {
-		auto const range = this->equal_range(OPERATORS_FORWARD(key));
-		if (range.first == end()) {
+		auto const range = keyed_equal_range(*this, OPERATORS_FORWARD(key));
+		if (containers::begin(range) == end()) {
 			return 0;
 		}
-		auto const distance = std::distance(range.first, range.second);
-		this->erase(range.first, range.second);
-		return distance;
+		auto const erased = containers::size(range);
+		this->erase(containers::begin(range), containers::end(range));
+		return erased;
 	}
 };
 
