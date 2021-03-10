@@ -456,7 +456,6 @@ public:
 	using base::capacity;
 	using base::reserve;
 	
-	using base::try_emplace;
 	using base::insert;
 	
 	using base::erase;
