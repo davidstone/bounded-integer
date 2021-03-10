@@ -24,7 +24,11 @@ constexpr bool test_pop_back(containers::vector<bounded::test_int> const & origi
     return true;
 }
 
-static_assert(test_pop_back({{1}}));
-static_assert(test_pop_back({{1, 2}}));
+// Work around https://gcc.gnu.org/bugzilla/show_bug.cgi?id=99018
+static_assert([] {
+    static_assert(test_pop_back({{1}}));
+    static_assert(test_pop_back({{1, 2}}));
+    return true;
+}());
 
 } // namespace
