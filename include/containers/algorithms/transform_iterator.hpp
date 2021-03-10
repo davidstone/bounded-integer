@@ -19,7 +19,6 @@ private:
 	[[no_unique_address]] UnaryFunction m_dereference;
 
 public:
-	transform_traits() = default;
 	constexpr explicit transform_traits(UnaryFunction dereference_):
 		m_dereference(std::move(dereference_))
 	{
