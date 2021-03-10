@@ -165,7 +165,11 @@ public:
 	constexpr explicit flat_map_base(InputRange && init):
 		m_container(OPERATORS_FORWARD(init))
 	{
+		if constexpr (allow_duplicates) {
+			ska_sort(m_container, extract_key());
+		} else {
 		unique_ska_sort(m_container, extract_key());
+	}
 	}
 
 	template<range InputRange>
@@ -173,7 +177,11 @@ public:
 		m_container(OPERATORS_FORWARD(init)),
 		m_extract_key(std::move(extract_key_))
 	{
+		if constexpr (allow_duplicates) {
+			ska_sort(m_container, extract_key());
+		} else {
 		unique_ska_sort(m_container, extract_key());
+	}
 	}
 
 	template<range InputRange>
@@ -211,7 +219,11 @@ public:
 	constexpr flat_map_base(c_array<value_type, init_size> && init):
 		m_container(std::move(init))
 	{
+		if constexpr (allow_duplicates) {
+			ska_sort(m_container, extract_key());
+		} else {
 		unique_ska_sort(m_container, extract_key());
+	}
 	}
 
 	template<std::size_t init_size>
@@ -219,7 +231,11 @@ public:
 		m_container(std::move(init)),
 		m_extract_key(std::move(extract_key_))
 	{
+		if constexpr (allow_duplicates) {
+			ska_sort(m_container, extract_key());
+		} else {
 		unique_ska_sort(m_container, extract_key());
+	}
 	}
 
 	template<std::size_t init_size>
