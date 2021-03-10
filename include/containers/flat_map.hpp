@@ -37,6 +37,8 @@ struct map_value_type {
 	using key_type = Key;
 	using mapped_type = Mapped;
 
+	map_value_type() = default;
+
 	constexpr map_value_type(Key key_, Mapped mapped_):
 		m_key(std::move(key_)),
 		m_mapped(std::move(mapped_))
