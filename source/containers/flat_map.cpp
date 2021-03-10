@@ -8,6 +8,8 @@
 #include <containers/algorithms/compare.hpp>
 #include <containers/array/make_array.hpp>
 
+#include <bounded/value_to_function.hpp>
+
 #include "../test_assert.hpp"
 #include "../test_int.hpp"
 
@@ -195,7 +197,7 @@ constexpr auto test() {
 	container.insert(container_type::value_type(4, 4));
 	BOUNDED_TEST(containers::equal(container, containers::make_array(mapped_type(1, 2), mapped_type(2, 5), mapped_type(3, 3), mapped_type(4, 4))));
 
-	container.try_emplace(5, 3);
+	container.lazy_insert(5, bounded::value_to_function(3));
 	BOUNDED_TEST(containers::equal(container, containers::make_array(mapped_type(1, 2), mapped_type(2, 5), mapped_type(3, 3), mapped_type(4, 4), mapped_type(5, 3))));
 
 	container.insert(container_type::value_type(3, 10));

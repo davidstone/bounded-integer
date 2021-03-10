@@ -295,19 +295,19 @@ public:
 		return m_container.reserve(new_capacity);
 	}
 	
-	// Unlike in std::map, insert / try_emplace can only provide a time
-	// complexity that matches an insert into the underlying container, which is
-	// to say, linear. An insertion implies shifting all of the elements.
-	constexpr auto try_emplace(auto && key, auto && ... mapped_args) {
+	// Unlike in std::map, insert can only provide a time complexity that
+	// matches an insert into the underlying container, which is to say,
+	// linear. An insertion implies shifting all of the elements.
+	constexpr auto lazy_insert(auto && key, bounded::construct_function_for<mapped_type> auto && mapped) {
 		auto const position = containers::keyed_upper_bound(*this, key);
-		return try_emplace_at(position, OPERATORS_FORWARD(key), OPERATORS_FORWARD(mapped_args)...);
+		return lazy_insert_at(position, OPERATORS_FORWARD(key), OPERATORS_FORWARD(mapped));
 	}
 
 	constexpr auto insert(value_type const & value) {
-		return try_emplace(value.key(), value.mapped());
+		return lazy_insert(value.key(), [&] { return value.mapped(); });
 	}
 	constexpr auto insert(value_type && value) {
-		return try_emplace(std::move(value).key(), std::move(value).mapped());
+		return lazy_insert(std::move(value).key(), [&] { return std::move(value).mapped(); });
 	}
 	template<range Range>
 	constexpr auto insert(Range && init) {
@@ -355,14 +355,14 @@ public:
 	}
 	
 private:
-	constexpr auto try_emplace_at(const_iterator position, auto && key, auto && ... mapped_args) {
+	constexpr auto lazy_insert_at(const_iterator position, auto && key, bounded::construct_function_for<mapped_type> auto && mapped) {
 		auto add_element = [&] {
 			return ::containers::emplace(
 				m_container,
 				position,
 				bounded::lazy_init,
 				[&]{ return key_type(OPERATORS_FORWARD(key)); },
-				[&]{ return mapped_type(OPERATORS_FORWARD(mapped_args)...); }
+				OPERATORS_FORWARD(mapped)
 			);
 		};
 		if constexpr (allow_duplicates) {
@@ -408,7 +408,7 @@ public:
 	using base::capacity;
 	using base::reserve;
 	
-	using base::try_emplace;
+	using base::lazy_insert;
 	using base::insert;
 	
 	using base::erase;
@@ -456,6 +456,7 @@ public:
 	using base::capacity;
 	using base::reserve;
 	
+	using base::lazy_insert;
 	using base::insert;
 	
 	using base::erase;
