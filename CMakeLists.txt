@@ -161,6 +161,7 @@ add_library(containers_test STATIC
 	source/containers/dynamic_array_data.cpp
 	source/containers/emplace_back.cpp
 	source/containers/erase.cpp
+	source/containers/flat_map.cpp
 	source/containers/front_back.cpp
 	source/containers/insert.cpp
 	source/containers/integer_range.cpp
@@ -209,13 +210,13 @@ add_executable(small_buffer_optimized_vector
 target_link_libraries(small_buffer_optimized_vector PUBLIC containers strict_defaults)
 
 add_executable(flat_map
-	source/containers/flat_map.cpp
+	source/containers/map_benchmark.cpp
 )
 target_compile_definitions(flat_map PRIVATE "USE_FLAT_MAP")
 target_link_libraries(flat_map PUBLIC containers strict_defaults)
 
 add_executable(std_map
-	source/containers/flat_map.cpp
+	source/containers/map_benchmark.cpp
 )
 target_compile_definitions(std_map PRIVATE "USE_SYSTEM_MAP")
 target_link_libraries(std_map PUBLIC containers strict_defaults)
