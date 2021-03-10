@@ -11,14 +11,7 @@
 #include "../test_assert.hpp"
 #include "../test_int.hpp"
 
-#include <initializer_list>
-
 namespace {
-
-template<typename Container>
-constexpr auto map_equals(containers::basic_flat_map<Container> const & lhs, std::initializer_list<typename Container::value_type> const rhs) {
-	return containers::equal(lhs, rhs);
-}
 
 using mapped_type = containers::map_value_type<bounded::test_int, bounded::test_int>;
 
@@ -194,19 +187,19 @@ static_assert(test_three_duplicate_keys());
 
 constexpr auto test() {
 	using container_type = containers::flat_map<bounded::test_int, bounded::test_int>;
-	auto const init = std::initializer_list<container_type::value_type>{{1, 2}, {2, 5}, {3, 3}};
+	auto const init = containers::make_array(mapped_type(1, 2), mapped_type(2, 5), mapped_type(3, 3));
 
 	auto container = container_type(init);
-	BOUNDED_TEST(map_equals(container, init));
+	BOUNDED_TEST(containers::equal(container, init));
 
 	container.insert(container_type::value_type(4, 4));
-	BOUNDED_TEST(map_equals(container, {{1, 2}, {2, 5}, {3, 3}, {4, 4}}));
+	BOUNDED_TEST(containers::equal(container, containers::make_array(mapped_type(1, 2), mapped_type(2, 5), mapped_type(3, 3), mapped_type(4, 4))));
 
 	container.try_emplace(5, 3);
-	BOUNDED_TEST(map_equals(container, {{1, 2}, {2, 5}, {3, 3}, {4, 4}, {5, 3}}));
+	BOUNDED_TEST(containers::equal(container, containers::make_array(mapped_type(1, 2), mapped_type(2, 5), mapped_type(3, 3), mapped_type(4, 4), mapped_type(5, 3))));
 
 	container.insert(container_type::value_type(3, 10));
-	BOUNDED_TEST(map_equals(container, {{1, 2}, {2, 5}, {3, 3}, {4, 4}, {5, 3}}));
+	BOUNDED_TEST(containers::equal(container, containers::make_array(mapped_type(1, 2), mapped_type(2, 5), mapped_type(3, 3), mapped_type(4, 4), mapped_type(5, 3))));
 
 	return true;
 }
