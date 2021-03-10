@@ -8,6 +8,7 @@
 #include <containers/algorithms/partition.hpp>
 #include <containers/begin_end.hpp>
 #include <containers/is_range.hpp>
+#include <containers/range_view.hpp>
 
 #include <operators/forward.hpp>
 
@@ -32,6 +33,20 @@ constexpr inline struct upper_bound_t {
 		return operator()(OPERATORS_FORWARD(sorted), value, std::less{});
 	}
 } upper_bound;
+
+// TODO: This can be implemented more efficiently
+constexpr inline struct equal_range_t {
+	constexpr auto operator()(range auto && sorted, auto const & value, auto cmp) const {
+		auto it = lower_bound(OPERATORS_FORWARD(sorted), value, cmp);
+		return range_view(
+			it,
+			upper_bound(range_view(it, containers::end(OPERATORS_FORWARD(sorted))))
+		);
+	}
+	constexpr auto operator()(range auto && sorted, auto const & value) const {
+		return operator()(OPERATORS_FORWARD(sorted), value, std::less{});
+	}
+} equal_range;
 
 
 // TODO: This is sub-optimal. Unsure how to make it optimal without copy + paste
