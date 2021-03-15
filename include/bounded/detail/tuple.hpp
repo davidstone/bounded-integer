@@ -146,23 +146,12 @@ concept tuple_like = detail::is_tuple<std::decay_t<T>>;
 
 namespace detail {
 
-template<
-	typename... lhs_types,
-	typename... rhs_types,
-	auto i
->
-constexpr auto compare_impl(tuple<lhs_types...> const & lhs, tuple<rhs_types...> const & rhs, constant_t<i> index) {
-	if constexpr (index == constant<sizeof...(lhs_types)>) {
-		return std::strong_ordering::equal;
-	} else {
-		if (auto const cmp = lhs[index] <=> rhs[index]; cmp != 0) {
-			return cmp;
-		}
-		return compare_impl(lhs, rhs, index + constant<1>);
-	}
+template<std::size_t... indexes>
+constexpr auto compare_impl(auto const & lhs, auto const & rhs, std::index_sequence<indexes...>) {
+	auto cmp = std::strong_ordering::equal;
+	void((... or ((cmp = lhs[constant<indexes>] <=> rhs[constant<indexes>]), cmp != 0)));
+	return cmp;
 }
-
-
 
 template<std::size_t... indexes>
 constexpr auto equal_impl(auto const & lhs, auto const & rhs, std::index_sequence<indexes...>) {
@@ -173,7 +162,7 @@ constexpr auto equal_impl(auto const & lhs, auto const & rhs, std::index_sequenc
 
 template<typename... lhs_types, typename... rhs_types> requires(sizeof...(lhs_types) == sizeof...(rhs_types))
 constexpr auto operator<=>(tuple<lhs_types...> const & lhs, tuple<rhs_types...> const & rhs) {
-	return detail::compare_impl(lhs, rhs, constant<0>);
+	return detail::compare_impl(lhs, rhs, bounded::make_index_sequence(constant<sizeof...(lhs_types)>));
 }
 
 
