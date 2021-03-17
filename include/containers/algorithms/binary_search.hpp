@@ -40,7 +40,7 @@ constexpr inline struct equal_range_t {
 		auto it = lower_bound(OPERATORS_FORWARD(sorted), value, cmp);
 		return range_view(
 			it,
-			upper_bound(range_view(it, containers::end(OPERATORS_FORWARD(sorted))))
+			upper_bound(range_view(it, containers::end(OPERATORS_FORWARD(sorted))), value, cmp)
 		);
 	}
 	constexpr auto operator()(range auto && sorted, auto const & value) const {
