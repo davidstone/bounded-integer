@@ -8,8 +8,6 @@
 #include <containers/static_vector/static_vector.hpp>
 #include <containers/flat_map.hpp>
 
-#include <containers/algorithms/compare.hpp>
-
 namespace {
 
 using namespace bounded::literal;
