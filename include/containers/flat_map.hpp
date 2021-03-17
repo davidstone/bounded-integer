@@ -19,6 +19,7 @@
 #include <containers/insert.hpp>
 #include <containers/legacy_iterator.hpp>
 #include <containers/lookup.hpp>
+#include <containers/move_destroy.hpp>
 #include <containers/size.hpp>
 #include <containers/vector.hpp>
 
