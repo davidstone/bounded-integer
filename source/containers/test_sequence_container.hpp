@@ -29,9 +29,15 @@ constexpr bool test_sequence_container_default_constructed_empty() {
 	BOUNDED_TEST(containers::begin(default_constructed) == containers::end(default_constructed));
 	BOUNDED_TEST(containers::end(default_constructed) == containers::begin(default_constructed));
 	BOUNDED_TEST(containers::end(default_constructed) == containers::end(default_constructed));
-	BOUNDED_TEST(default_constructed == default_constructed);
 	BOUNDED_TEST(containers::is_empty(default_constructed));
 	BOUNDED_TEST(containers::size(default_constructed) == 0_bi);
+	BOUNDED_TEST(default_constructed == default_constructed);
+	BOUNDED_TEST(default_constructed == Container());
+	BOUNDED_TEST(default_constructed == Container({}));
+	Container implicit_from_empty_braces = {};
+	BOUNDED_TEST(default_constructed == implicit_from_empty_braces);
+	Container implicit_from_two_empty_braces = {{}};
+	BOUNDED_TEST(default_constructed == implicit_from_two_empty_braces);
 	return true;
 }
 

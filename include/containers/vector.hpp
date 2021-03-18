@@ -18,6 +18,7 @@
 #include <operators/bracket.hpp>
 #include <operators/forward.hpp>
 
+#include <concepts>
 #include <type_traits>
 #include <utility>
 
@@ -44,7 +45,8 @@ struct vector : private lexicographical_comparison::base {
 	constexpr vector(c_array<T, source_size> && init) {
 		::containers::append(*this, std::move(init));
 	}
-	constexpr vector(empty_c_array_parameter) {
+	template<std::same_as<empty_c_array_parameter> Source = empty_c_array_parameter>
+	constexpr vector(Source) {
 	}
 
 	// TODO: Support trivial relocatability

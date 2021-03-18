@@ -24,6 +24,7 @@
 
 #include <operators/bracket.hpp>
 
+#include <concepts>
 #include <type_traits>
 #include <utility>
 
@@ -92,6 +93,9 @@ struct dynamic_array : private lexicographical_comparison::base {
 	constexpr dynamic_array(c_array<value_type, init_size> && init):
 		dynamic_array(range_view(std::move(init)))
 	{
+	}
+	template<std::same_as<empty_c_array_parameter> Source = empty_c_array_parameter>
+	constexpr dynamic_array(Source) {
 	}
 
 	constexpr dynamic_array(dynamic_array const & other):

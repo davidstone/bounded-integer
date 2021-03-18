@@ -16,6 +16,7 @@
 
 #include <operators/forward.hpp>
 
+#include <concepts>
 #include <type_traits>
 #include <utility>
 
@@ -44,7 +45,8 @@ struct stable_vector : private lexicographical_comparison::base {
 	constexpr stable_vector(c_array<T, init_size> && init) {
 		::containers::append(*this, std::move(init));
 	}
-	constexpr stable_vector(empty_c_array_parameter) {
+	template<std::same_as<empty_c_array_parameter> Source = empty_c_array_parameter>
+	constexpr stable_vector(Source) {
 	}
 	
 	// TODO: Support trivial relocatability
