@@ -5,12 +5,11 @@
 
 #pragma once
 
-#include <containers/algorithms/copy.hpp>
 #include <containers/algorithms/remove.hpp>
+#include <containers/algorithms/uninitialized.hpp>
 #include <containers/begin_end.hpp>
-#include <containers/is_iterator.hpp>
+#include <containers/move_destroy.hpp>
 #include <containers/mutable_iterator.hpp>
-#include <containers/pop_back.hpp>
 #include <containers/resizable_container.hpp>
 
 #include <bounded/assert.hpp>
@@ -19,26 +18,58 @@
 #include <utility>
 
 namespace containers {
+namespace detail {
 
-template<iterator Iterator>
-constexpr auto erase(resizable_container auto & source, Iterator const first_, Iterator const last_) {
-	auto const first = ::containers::detail::mutable_iterator(source, first_);
-	auto const last = ::containers::detail::mutable_iterator(source, last_);
-	auto const to_clear = ::containers::move(last, containers::end(source), first).output;
-	while (to_clear != containers::end(source)) {
-		pop_back(source);
+template<typename Container>
+concept member_erasable = requires(Container & container, typename Container::const_iterator const it1, typename Container::const_iterator const it2) {
+	container.erase(it1);
+	container.erase(it1, it2);
+};
+
+template<typename Container>
+concept erasable = member_erasable<Container> or resizable_container<Container>;
+
+} // namespace detail
+
+template<detail::erasable Container>
+constexpr auto erase(Container & container, typename Container::const_iterator const first, typename Container::const_iterator const last) {
+	if constexpr (detail::member_erasable<Container>) {
+		return container.erase(first, last);
+	} else {
+		auto const offset = first - containers::begin(container);
+		auto const count = last - first;
+		auto const end_ = containers::end(container);
+		auto target = ::containers::detail::mutable_iterator(container, first);
+		auto source = ::containers::detail::mutable_iterator(container, last);
+		// TODO: Write a `move_destroy` algorithm for this loop?
+		while (target != last and source != end_) {
+			bounded::destroy(*target);
+			bounded::construct(*target, [&]{ return move_destroy(*source); });
+			++target;
+			++source;
+		}
+		if (source != end_) {
+			containers::uninitialized_move_destroy(target, source, end_);
+		} else {
+			containers::detail::destroy_range(target, last);
+		}
+		container.append_from_capacity(-count);
+		return containers::begin(container) + offset;
 	}
-	return first;
 }
 
-template<resizable_container Container>
+template<detail::erasable Container>
 constexpr auto erase(Container & container, typename Container::const_iterator const it) {
-	BOUNDED_ASSERT(it != containers::end(container));
-	return erase(container, it, ::containers::next(it));
+	if constexpr (detail::member_erasable<Container>) {
+		return container.erase(it);
+	} else {
+		BOUNDED_ASSERT(it != containers::end(container));
+		return erase(container, it, ::containers::next(it));
+	}
 }
 
-constexpr auto erase_if(resizable_container auto & source, auto predicate) {
-	return erase(source, ::containers::remove_if(source, std::move(predicate)), containers::end(source));
+constexpr auto erase_if(resizable_container auto & container, auto predicate) {
+	return erase(container, ::containers::remove_if(container, std::move(predicate)), containers::end(container));
 }
 
 } // namespace containers
