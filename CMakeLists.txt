@@ -162,6 +162,7 @@ add_library(containers_test STATIC
 	source/containers/dynamic_array.cpp
 	source/containers/dynamic_array_data.cpp
 	source/containers/emplace_back.cpp
+	source/containers/empty_range.cpp
 	source/containers/flat_map.cpp
 	source/containers/front_back.cpp
 	source/containers/insert.cpp
