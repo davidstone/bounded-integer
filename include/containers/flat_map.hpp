@@ -340,19 +340,11 @@ public:
 		}
 	}
 	
-	// These maintain the relative order of all elements in the container, so I
-	// don't have to worry about re-sorting
 	constexpr auto erase(const_iterator const it) {
-		return m_container.erase(it);
-	}
-	// Need mutable iterator overload to avoid ambiguity if key_type can be
-	// constructed from iterator (for instance, an unconstrained constructor
-	// template).
-	constexpr auto erase(iterator const it) {
-		return m_container.erase(it);
+		return containers::erase(m_container, it);
 	}
 	constexpr auto erase(const_iterator const first, const_iterator const last) {
-		return m_container.erase(first, last);
+		return containers::erase(m_container, first, last);
 	}
 	
 private:
@@ -422,15 +414,6 @@ public:
 		auto const it = containers::keyed_lower_bound(*this, key);
 		return (it == end() or compare()(key, it->key())) ? end() : it;
 	}
-	
-	constexpr size_type erase(auto && key) {
-		auto const it = this->find(OPERATORS_FORWARD(key));
-		if (it == end()) {
-			return 0;
-		}
-		this->erase(it);
-		return 1;
-	}
 };
 
 template<typename Container, typename ExtractKey = bounded::identity_t>
@@ -461,16 +444,6 @@ public:
 	using base::insert;
 	
 	using base::erase;
-
-	constexpr size_type erase(auto && key) {
-		auto const range = keyed_equal_range(*this, OPERATORS_FORWARD(key));
-		if (containers::begin(range) == end()) {
-			return 0;
-		}
-		auto const erased = containers::size(range);
-		this->erase(containers::begin(range), containers::end(range));
-		return erased;
-	}
 };
 
 
