@@ -6,6 +6,7 @@
 #pragma once
 
 #include <containers/algorithms/count.hpp>
+#include <containers/algorithms/erase.hpp>
 #include <containers/algorithms/minmax_element.hpp>
 #include <containers/algorithms/negate.hpp>
 #include <containers/algorithms/partition.hpp>
@@ -13,7 +14,6 @@
 #include <containers/algorithms/unique.hpp>
 #include <containers/at.hpp>
 #include <containers/begin_end.hpp>
-#include <containers/erase.hpp>
 #include <containers/legacy_iterator.hpp>
 #include <containers/is_range.hpp>
 #include <containers/is_iterator_sentinel.hpp>

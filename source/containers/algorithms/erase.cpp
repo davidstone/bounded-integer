@@ -3,12 +3,12 @@
 // (See accompanying file LICENSE_1_0.txt or copy at
 // http://www.boost.org/LICENSE_1_0.txt)
 
-#include <containers/erase.hpp>
+#include <containers/algorithms/erase.hpp>
 
 #include <containers/vector.hpp>
 
-#include "../test_assert.hpp"
-#include "../test_int.hpp"
+#include "../../test_assert.hpp"
+#include "../../test_int.hpp"
 
 namespace {
 

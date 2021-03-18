@@ -124,6 +124,7 @@ add_library(containers_test STATIC
 	source/containers/algorithms/copy_n.cpp
 	source/containers/algorithms/count.cpp
 	source/containers/algorithms/distance.cpp
+	source/containers/algorithms/erase.cpp
 	source/containers/algorithms/filter_iterator.cpp
 	source/containers/algorithms/find.cpp
 	source/containers/algorithms/keyed_binary_search.cpp
@@ -161,7 +162,6 @@ add_library(containers_test STATIC
 	source/containers/dynamic_array.cpp
 	source/containers/dynamic_array_data.cpp
 	source/containers/emplace_back.cpp
-	source/containers/erase.cpp
 	source/containers/flat_map.cpp
 	source/containers/front_back.cpp
 	source/containers/insert.cpp

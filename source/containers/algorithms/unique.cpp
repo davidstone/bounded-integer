@@ -5,8 +5,8 @@
 
 #include <containers/algorithms/unique.hpp>
 
+#include <containers/algorithms/erase.hpp>
 #include <containers/append.hpp>
-#include <containers/erase.hpp>
 #include <containers/repeat_n.hpp>
 #include <containers/vector.hpp>
 

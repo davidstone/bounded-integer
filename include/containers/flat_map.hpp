@@ -6,6 +6,7 @@
 #pragma once
 
 #include <containers/algorithms/binary_search.hpp>
+#include <containers/algorithms/erase.hpp>
 #include <containers/algorithms/keyed_binary_search.hpp>
 #include <containers/algorithms/negate.hpp>
 #include <containers/algorithms/ska_sort.hpp>
@@ -15,7 +16,6 @@
 #include <containers/c_array.hpp>
 #include <containers/common_functions.hpp>
 #include <containers/compare_container.hpp>
-#include <containers/erase.hpp>
 #include <containers/insert.hpp>
 #include <containers/legacy_iterator.hpp>
 #include <containers/lookup.hpp>

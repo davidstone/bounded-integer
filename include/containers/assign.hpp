@@ -5,10 +5,10 @@
 
 #pragma once
 
+#include <containers/algorithms/erase.hpp>
 #include <containers/append.hpp>
 #include <containers/begin_end.hpp>
 #include <containers/c_array.hpp>
-#include <containers/erase.hpp>
 #include <containers/is_range.hpp>
 #include <containers/range_view.hpp>
 #include <containers/resizable_container.hpp>
