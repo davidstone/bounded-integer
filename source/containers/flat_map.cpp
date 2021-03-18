@@ -194,14 +194,8 @@ constexpr auto test() {
 	auto container = container_type(init);
 	BOUNDED_TEST(containers::equal(container, init));
 
-	container.insert(container_type::value_type(4, 4));
-	BOUNDED_TEST(containers::equal(container, containers::make_array(mapped_type(1, 2), mapped_type(2, 5), mapped_type(3, 3), mapped_type(4, 4))));
-
 	container.lazy_insert(5, bounded::value_to_function(3));
-	BOUNDED_TEST(containers::equal(container, containers::make_array(mapped_type(1, 2), mapped_type(2, 5), mapped_type(3, 3), mapped_type(4, 4), mapped_type(5, 3))));
-
-	container.insert(container_type::value_type(3, 10));
-	BOUNDED_TEST(containers::equal(container, containers::make_array(mapped_type(1, 2), mapped_type(2, 5), mapped_type(3, 3), mapped_type(4, 4), mapped_type(5, 3))));
+	BOUNDED_TEST(containers::equal(container, containers::make_array(mapped_type(1, 2), mapped_type(2, 5), mapped_type(3, 3), mapped_type(5, 3))));
 
 	return true;
 }

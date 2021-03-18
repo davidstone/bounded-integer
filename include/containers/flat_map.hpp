@@ -304,12 +304,6 @@ public:
 		return lazy_insert_at(position, OPERATORS_FORWARD(key), OPERATORS_FORWARD(mapped));
 	}
 
-	constexpr auto insert(value_type const & value) {
-		return lazy_insert(value.key(), [&] { return value.mapped(); });
-	}
-	constexpr auto insert(value_type && value) {
-		return lazy_insert(std::move(value).key(), [&] { return std::move(value).mapped(); });
-	}
 	template<range Range>
 	constexpr auto insert(Range && init) {
 		// Because my underlying container is expected to be contiguous storage,

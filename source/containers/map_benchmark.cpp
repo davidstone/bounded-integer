@@ -3,6 +3,8 @@
 // (See accompanying file LICENSE_1_0.txt or copy at
 // http://www.boost.org/LICENSE_1_0.txt)
 
+#include <containers/algorithms/keyed_insert.hpp>
+
 #include <containers/flat_map.hpp>
 #include <containers/emplace_back.hpp>
 #include <containers/size.hpp>
@@ -184,7 +186,7 @@ void test_performance(std::size_t const loop_count) {
 		ignore(thing);
 	}
 	for (auto const & value : additional) {
-		map.insert(value);
+		containers::keyed_insert(map, value);
 	}
 	auto const inserted = high_resolution_clock::now();
 	#if defined TRACK_EXTRACTIONS
