@@ -132,7 +132,7 @@ std::vector<std::tuple<std::array<benchmark_sort_key, NUM_SORT_KEYS>, benchmark_
 constexpr int profile_multiplier = 2;
 constexpr int max_profile_range = 1 << 20;
 
-void benchmark_ska_sort_copy(benchmark::State & state, auto create) {
+void benchmark_double_buffered_ska_sort(benchmark::State & state, auto create) {
 	auto randomness = std::mt19937_64(77342348);
 	auto buffer = create(randomness, state.range(0));
 	for (auto _ : state) {
@@ -143,12 +143,12 @@ void benchmark_ska_sort_copy(benchmark::State & state, auto create) {
 		using containers::begin;
 		using containers::end;
 #ifdef SORT_ON_FIRST_ONLY
-		ska_sort_copy(begin(to_sort), end(to_sort), begin(buffer), [](auto && a){
+		double_buffered_ska_sort(begin(to_sort), end(to_sort), begin(buffer), [](auto && a){
 			using std::get;
 			return get<0>(a);
 		});
 #else
-		bool which = ska_sort_copy(begin(to_sort), end(to_sort), begin(buffer));
+		bool which = double_buffered_ska_sort(begin(to_sort), end(to_sort), begin(buffer));
 		if (which)
 			assert(containers::is_sorted(buffer));
 		else
@@ -298,7 +298,7 @@ BENCHMARK(benchmark_limited_inplace_sort)->LIMITED_RANGE();
 #define REGISTER_BENCHMARK(name, create) \
 	do { \
 		REGISTER_SOME_BENCHMARKS(name, create); \
-		REGISTER_INDIVIDUAL_BENCHMARK("ska_sort_copy_" name, benchmark_ska_sort_copy, create); \
+		REGISTER_INDIVIDUAL_BENCHMARK("double_buffered_ska_sort_" name, benchmark_double_buffered_ska_sort, create); \
 	} while (false)
 
 auto create_simple_data = [](auto distribution) {

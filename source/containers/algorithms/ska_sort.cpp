@@ -40,7 +40,7 @@ constexpr bool test_sort_copy(Container source, Container const & expected, auto
 	if constexpr (requires(Container c) { c.resize(size(c)); }) {
 		other.resize(size(source));
 	}
-	bool const data_in_other = ska_sort_copy(source, other, std::move(function));
+	bool const data_in_other = double_buffered_ska_sort(source, other, std::move(function));
 	auto const & sorted = data_in_other ? other : source;
 	BOUNDED_TEST(sorted == expected);
 	return true;

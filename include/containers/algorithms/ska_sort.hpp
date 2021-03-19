@@ -569,7 +569,7 @@ struct ska_sort_t {
 	}
 } inline constexpr ska_sort;
 
-struct ska_sort_copy_t {
+struct double_buffered_ska_sort_t {
 	template<iterator SourceIterator, typename ExtractKey>
 	constexpr bool operator()(SourceIterator first_, sentinel_for<SourceIterator> auto last_, iterator auto buffer_begin_, ExtractKey && extract_key) const {
 		auto first = make_legacy_iterator(first_);
@@ -699,13 +699,13 @@ private:
 				return get<index>(extract_key(o));
 			};
 			if (which) {
-				return !ska_sort_copy_t{}(out_begin, out_end, first, extract_i);
+				return !double_buffered_ska_sort_t{}(out_begin, out_end, first, extract_i);
 			} else {
-				return ska_sort_copy_t{}(first, last, out_begin, extract_i);
+				return double_buffered_ska_sort_t{}(first, last, out_begin, extract_i);
 			}
 		}
 	}
-} inline constexpr ska_sort_copy;
+} inline constexpr double_buffered_ska_sort;
 
 constexpr inline struct unique_ska_sort_t {
 	constexpr auto operator()(range auto & to_sort, auto extract_key) const {
