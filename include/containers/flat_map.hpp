@@ -268,7 +268,26 @@ public:
 	// linear. An insertion implies shifting all of the elements.
 	constexpr auto lazy_insert(auto && key, bounded::construct_function_for<mapped_type> auto && mapped) {
 		auto const position = containers::keyed_upper_bound(*this, key);
-		return lazy_insert_at(position, OPERATORS_FORWARD(key), OPERATORS_FORWARD(mapped));
+		auto add_element = [&] {
+			return ::containers::lazy_insert(
+				m_container,
+				position,
+				[&] { return value_type{OPERATORS_FORWARD(key), OPERATORS_FORWARD(mapped)()}; }
+			);
+		};
+		if constexpr (allow_duplicates) {
+			return add_element();
+		} else {
+			bool const there_is_element_before = position != begin();
+			if (!there_is_element_before) {
+				return inserted_t{add_element(), true};
+			}
+			bool const that_element_is_equal = !compare()(get_key(*containers::prev(position)), key);
+			if (!that_element_is_equal) {
+				return inserted_t{add_element(), true};
+			}
+			return inserted_t{mutable_iterator(*this, containers::prev(position)), false};
+		}
 	}
 
 	template<range Range>
@@ -306,30 +325,6 @@ public:
 	}
 	constexpr auto erase(const_iterator const first, const_iterator const last) {
 		return containers::erase(m_container, first, last);
-	}
-	
-private:
-	constexpr auto lazy_insert_at(const_iterator position, auto && key, bounded::construct_function_for<mapped_type> auto && mapped) {
-		auto add_element = [&] {
-			return ::containers::lazy_insert(
-				m_container,
-				position,
-				[&] { return value_type{OPERATORS_FORWARD(key), OPERATORS_FORWARD(mapped)()}; }
-			);
-		};
-		if constexpr (allow_duplicates) {
-			return add_element();
-		} else {
-			bool const there_is_element_before = position != begin();
-			if (!there_is_element_before) {
-				return inserted_t{add_element(), true};
-			}
-			bool const that_element_is_equal = !compare()(get_key(*containers::prev(position)), key);
-			if (!that_element_is_equal) {
-				return inserted_t{add_element(), true};
-			}
-			return inserted_t{mutable_iterator(*this, containers::prev(position)), false};
-		}
 	}
 };
 
