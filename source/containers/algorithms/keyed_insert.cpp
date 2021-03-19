@@ -26,7 +26,7 @@ constexpr auto test_rvalue_into_empty() {
 template<typename Map>
 constexpr auto test_lvalue_into_empty() {
 	auto m = Map();
-	auto value = value_type(1, 2);
+	auto value = value_type{1, 2};
 	containers::keyed_insert(m, value);
 	BOUNDED_TEST(m == Map({{1, 2}}));
 }

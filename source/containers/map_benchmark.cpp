@@ -8,6 +8,7 @@
 #include <containers/flat_map.hpp>
 #include <containers/emplace_back.hpp>
 #include <containers/size.hpp>
+#include <containers/vector.hpp>
 
 #include <operators/forward.hpp>
 
@@ -22,7 +23,6 @@
 #include <map>
 #include <random>
 #include <string>
-#include <vector>
 
 namespace {
 
@@ -77,10 +77,6 @@ using extract_key_t = Extract;
 	template<typename Key, typename Value>
 	using value_type = containers::map_value_type<Key, Value>;
 
-	constexpr auto const & get_key(auto const & pair) {
-		return pair.key();
-	}
-
 	template<typename Map>
 	auto construct_from_range(auto && range) {
 		return Map(OPERATORS_FORWARD(range));
@@ -133,8 +129,9 @@ void test_performance(std::size_t const loop_count) {
 	auto const generator = [](std::size_t size) {
 		static std::mt19937 engine(0);
 		static std::uniform_int_distribution<std::uint32_t> distribution;
-		std::vector<value_type<Thing<key_size>, Thing<value_size>>> source;
-		source.reserve(size);
+		using container_type = containers::vector<value_type<Thing<key_size>, Thing<value_size>>>;
+		auto source = container_type();
+		source.reserve(bounded::check_in_range<typename container_type::size_type>(bounded::integer(size)));
 		for (std::size_t n = 0; n != size; ++n) {
 			::containers::emplace_back(source, distribution(engine), distribution(engine));
 		}

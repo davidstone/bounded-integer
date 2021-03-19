@@ -39,58 +39,25 @@ struct map_value_type {
 	using key_type = Key;
 	using mapped_type = Mapped;
 
-	map_value_type() = default;
-
-	constexpr map_value_type(Key key_, Mapped mapped_):
-		m_key(std::move(key_)),
-		m_mapped(std::move(mapped_))
-	{
-	}
-	constexpr map_value_type(
-		bounded::lazy_init_t,
-		bounded::construct_function_for<Key> auto && key_,
-		bounded::construct_function_for<Mapped> auto && mapped_
-	):
-		m_key(OPERATORS_FORWARD(key_)()),
-		m_mapped(OPERATORS_FORWARD(mapped_)())
-	{
-	}
-	
-	constexpr auto && key() const & {
-		return m_key;
-	}
-	constexpr auto && key() & {
-		return m_key;
-	}
-	constexpr auto && key() && {
-		return std::move(m_key);
-	}
-	constexpr auto && mapped() const & {
-		return m_mapped;
-	}
-	constexpr auto && mapped() & {
-		return m_mapped;
-	}
-	constexpr auto && mapped() && {
-		return std::move(m_mapped);
-	}
-
 	friend auto operator<=>(map_value_type const & lhs, map_value_type const & rhs) = default;
 
 	friend constexpr auto move_destroy(map_value_type && value) noexcept {
-		return map_value_type(std::move(value), tag());
+		return map_value_type{
+			move_destroy(value.key),
+			move_destroy(value.mapped)
+		};
 	}
 
-private:
-	struct tag{};
-	constexpr map_value_type(map_value_type && other, tag):
-		m_key(move_destroy(other.m_key)),
-		m_mapped(move_destroy(other.m_mapped))
-	{
-	}
-	[[no_unique_address]] Key m_key;
-	[[no_unique_address]] Mapped m_mapped;
+	[[no_unique_address]] Key key;
+	[[no_unique_address]] Mapped mapped;
 };
+
+constexpr auto && get_key(auto && value) {
+	return OPERATORS_FORWARD(value).key;
+}
+constexpr auto && get_mapped(auto && value) {
+	return OPERATORS_FORWARD(value).mapped;
+}
 
 constexpr inline struct assume_sorted_unique_t {} assume_sorted_unique;
 constexpr inline struct assume_unique_t {} assume_unique;
@@ -113,7 +80,7 @@ struct extract_map_key {
 	{
 	}
 	constexpr decltype(auto) operator()(T const & value) const {
-		return m_extract(value.key());
+		return m_extract(get_key(value));
 	}
 	constexpr decltype(auto) operator()(typename T::key_type const & key) const {
 		return m_extract(key);
@@ -344,12 +311,10 @@ public:
 private:
 	constexpr auto lazy_insert_at(const_iterator position, auto && key, bounded::construct_function_for<mapped_type> auto && mapped) {
 		auto add_element = [&] {
-			return ::containers::emplace(
+			return ::containers::lazy_insert(
 				m_container,
 				position,
-				bounded::lazy_init,
-				[&]{ return key_type(OPERATORS_FORWARD(key)); },
-				OPERATORS_FORWARD(mapped)
+				[&] { return value_type{OPERATORS_FORWARD(key), OPERATORS_FORWARD(mapped)()}; }
 			);
 		};
 		if constexpr (allow_duplicates) {
@@ -359,7 +324,7 @@ private:
 			if (!there_is_element_before) {
 				return inserted_t{add_element(), true};
 			}
-			bool const that_element_is_equal = !compare()(containers::prev(position)->key(), key);
+			bool const that_element_is_equal = !compare()(get_key(*containers::prev(position)), key);
 			if (!that_element_is_equal) {
 				return inserted_t{add_element(), true};
 			}
@@ -402,11 +367,11 @@ public:
 
 	constexpr auto find(auto const & key) const {
 		auto const it = containers::keyed_lower_bound(*this, key);
-		return (it == end() or compare()(key, it->key())) ? end() : it;
+		return (it == end() or compare()(key, get_key(*it))) ? end() : it;
 	}
 	constexpr auto find(auto const & key) {
 		auto const it = containers::keyed_lower_bound(*this, key);
-		return (it == end() or compare()(key, it->key())) ? end() : it;
+		return (it == end() or compare()(key, get_key(*it))) ? end() : it;
 	}
 };
 

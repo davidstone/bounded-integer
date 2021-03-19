@@ -22,7 +22,7 @@ constexpr auto keyed_insert(Container & container, typename Container::value_typ
 	if constexpr (detail::legacy_map<Container>) {
 		return container.insert(value);
 	} else {
-		return container.lazy_insert(value.key(), [&] { return value.mapped(); });
+		return container.lazy_insert(get_key(value), [&] { return get_mapped(value); });
 	}
 }
 template<associative_container Container>
@@ -30,7 +30,7 @@ constexpr auto keyed_insert(Container & container, typename Container::value_typ
 	if constexpr (detail::legacy_map<Container>) {
 		return container.insert(std::move(value));
 	} else {
-		return container.lazy_insert(std::move(value).key(), [&] { return std::move(value).mapped(); });
+		return container.lazy_insert(get_key(std::move(value)), [&] { return get_mapped(std::move(value)); });
 	}
 }
 
