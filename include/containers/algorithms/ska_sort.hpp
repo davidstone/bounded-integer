@@ -77,7 +77,7 @@ constexpr auto to_radix_sort_key(T const value) {
 }
 
 template<typename T> requires std::is_enum_v<T>
-auto to_radix_sort_key(T const value) {
+constexpr auto to_radix_sort_key(T const value) {
 	return to_radix_sort_key(static_cast<std::underlying_type_t<T>>(value));
 }
 
