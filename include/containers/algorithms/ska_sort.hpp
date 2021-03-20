@@ -583,6 +583,88 @@ constexpr bool double_buffered_numeric_sort(Source & source, Buffer & buffer, Ex
 	return size == 1U;
 }
 
+template<typename ExtractKey>
+constexpr auto double_buffered_sort_impl(range auto & source, range auto & buffer, ExtractKey && extract_key) -> bool;
+
+template<std::size_t index, typename ExtractKey>
+constexpr bool double_buffered_tuple_sort(range auto & source, range auto & buffer, ExtractKey && extract_key) {
+	using key_t = std::decay_t<decltype(extract_key(containers::front(source)))>;
+	if constexpr (index == std::tuple_size_v<key_t>) {
+		return false;
+	} else {
+		bool const which = containers::detail::double_buffered_tuple_sort<index + 1U>(source, buffer, extract_key);
+		using std::get;
+		auto extract_i = [&](auto && o) -> extract_return_type<index, ExtractKey, decltype(o)> {
+			return get<index>(extract_key(o));
+		};
+		if (which) {
+			return !containers::detail::double_buffered_sort_impl(buffer, source, extract_i);
+		} else {
+			return containers::detail::double_buffered_sort_impl(source, buffer, extract_i);
+		}
+	}
+}
+
+template<typename ExtractKey>
+constexpr auto double_buffered_sort_impl(range auto & source, range auto & buffer, ExtractKey && extract_key) -> bool {
+	using key_t = std::decay_t<decltype(extract_key(containers::front(source)))>;
+	if constexpr (std::is_same_v<key_t, bool>) {
+		auto false_position = containers::begin(buffer);
+		auto true_position = ::containers::next(
+			false_position,
+			containers::count_if(source, containers::negate(extract_key))
+		);
+		for (auto && value : source) {
+			auto & position = extract_key(value) ? true_position : false_position;
+			*position = std::move(value);
+			++position;
+		}
+		return true;
+	} else if constexpr (std::is_arithmetic_v<key_t>) {
+		return containers::detail::double_buffered_numeric_sort(source, buffer, extract_key);
+	} else if constexpr (containers::range<key_t>) {
+		if (containers::is_empty(source)) {
+			return false;
+		}
+		// Currently just sized ranges
+		auto const max_size = [&]{
+			if constexpr (requires { key_t::size(); }) {
+				return key_t::size();
+			} else if constexpr (requires { std::tuple_size<key_t>::value; }) {
+				return std::tuple_size<key_t>::value;
+			} else {
+				// TODO: Support variable-sized ranges
+#if 0
+				return *containers::max_element(
+					containers::transform(
+						source,
+						[](auto const & range) { return containers::size(range); }
+					)
+				);
+#endif
+			}
+		}();
+		bool which = false;
+		for (size_t index = max_size; index > 0; --index) {
+			auto extract_n = [&, index = index - 1](auto && o) {
+				return extract_key(o)[index];
+			};
+			if (which) {
+				which = !containers::detail::double_buffered_sort_impl(buffer, source, extract_n);
+			} else {
+				which = containers::detail::double_buffered_sort_impl(source, buffer, extract_n);
+			}
+		}
+		return which;
+	} else if constexpr (tuple_like<key_t>) {
+		return containers::detail::double_buffered_tuple_sort<0U>(source, buffer, extract_key);
+	} else {
+		return containers::detail::double_buffered_sort_impl(source, buffer, [&](auto && a) -> decltype(auto) {
+			return to_radix_sort_key(extract_key(a));
+		});
+	}
+}
+
 } // namespace detail
 
 struct ska_sort_t {
@@ -609,85 +691,15 @@ struct double_buffered_ska_sort_t {
 	constexpr auto operator()(range auto && source, range auto && buffer, ExtractKey && extract_key) const -> bool {
 		// TODO: Allow buffer to be larger, return range_view instead of bool
 		BOUNDED_ASSERT(containers::size(source) == containers::size(buffer));
-		using key_t = std::decay_t<decltype(extract_key(containers::front(source)))>;
-		if constexpr (std::is_same_v<key_t, bool>) {
-			auto false_position = containers::begin(buffer);
-			auto true_position = ::containers::next(
-				false_position,
-				containers::count_if(source, containers::negate(extract_key))
-			);
-			for (auto && value : source) {
-				auto & position = extract_key(value) ? true_position : false_position;
-				*position = std::move(value);
-				++position;
-			}
-			return true;
-		} else if constexpr (std::is_arithmetic_v<key_t>) {
-			return detail::double_buffered_numeric_sort(source, buffer, extract_key);
-		} else if constexpr (containers::range<key_t>) {
-			if (containers::is_empty(source)) {
-				return false;
-			}
-			// Currently just sized ranges
-			auto const max_size = [&]{
-				if constexpr (requires { key_t::size(); }) {
-					return key_t::size();
-				} else if constexpr (requires { std::tuple_size<key_t>::value; }) {
-					return std::tuple_size<key_t>::value;
-				} else {
-					// TODO: Support variable-sized ranges
-#if 0
-					return *containers::max_element(
-						containers::transform(
-							source,
-							[](auto const & range) { return containers::size(range); }
-						)
-					);
-#endif
-				}
-			}();
-			bool which = false;
-			for (size_t index = max_size; index > 0; --index) {
-				auto extract_n = [&, index = index - 1](auto && o) {
-					return extract_key(o)[index];
-				};
-				if (which) {
-					which = !operator()(buffer, source, extract_n);
-				} else {
-					which = operator()(source, buffer, extract_n);
-				}
-			}
-			return which;
-		} else if constexpr (detail::tuple_like<key_t>) {
-			return tuple_sort_impl<0U>(source, buffer, extract_key);
-		} else {
-			return operator()(source, buffer, [&](auto && a) -> decltype(auto) {
-				return to_radix_sort_key(extract_key(a));
-			});
-		}
+		// This delegates to an implementation function to collapse lvalue and
+		// rvalue code into a single instantiation and to let the tuple version
+		// be recursive with the main function. We need to accept rvalues so
+		// that users can easily pass in view types.
+		return detail::double_buffered_sort_impl(source, buffer, extract_key);
 	}
 
 	constexpr auto operator()(range auto && source, range auto && buffer) const -> bool {
 		return operator()(source, buffer, bounded::identity);
-	}
-private:
-	template<std::size_t index, typename ExtractKey>
-	static constexpr bool tuple_sort_impl(range auto & source, range auto & buffer, ExtractKey && extract_key) {
-		using key_t = std::decay_t<decltype(extract_key(containers::front(source)))>;
-		if constexpr (index == std::tuple_size_v<key_t>) {
-			return false;
-		} else {
-			bool const which = tuple_sort_impl<index + 1U>(source, buffer, extract_key);
-			using std::get;
-			auto extract_i = [&](auto && o) -> detail::extract_return_type<index, ExtractKey, decltype(o)> {
-				return get<index>(extract_key(o));
-			};
-			if (which) {
-				return !double_buffered_ska_sort_t{}(buffer, source, extract_i);
-			} else {
-				return double_buffered_ska_sort_t{}(source, buffer, extract_i);
-			}
-		}
 	}
 } inline constexpr double_buffered_ska_sort;
 
