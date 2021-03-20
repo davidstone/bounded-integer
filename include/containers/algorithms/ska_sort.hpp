@@ -96,9 +96,6 @@ concept tuple_like = requires{
 template<typename T>
 concept is_boolean = std::is_arithmetic_v<T> and std::is_same_v<T, bool>;
 
-template<typename Iterator, typename ExtractKey>
-using key_type = std::decay_t<decltype(std::declval<ExtractKey>()(*std::declval<Iterator>()))>;
-
 template<typename T>
 concept indexable =
 	requires(T && value) { OPERATORS_FORWARD(value)[0]; } or
@@ -570,29 +567,27 @@ struct ska_sort_t {
 } inline constexpr ska_sort;
 
 struct double_buffered_ska_sort_t {
-	template<iterator SourceIterator, typename ExtractKey>
-	constexpr bool operator()(SourceIterator first_, sentinel_for<SourceIterator> auto last_, iterator auto buffer_begin_, ExtractKey && extract_key) const {
-		auto first = make_legacy_iterator(first_);
-		auto last = make_legacy_iterator(last_);
-		auto buffer_begin = make_legacy_iterator(buffer_begin_);
-
-		using key_t = detail::key_type<SourceIterator, ExtractKey>;
+	template<typename ExtractKey>
+	constexpr auto operator()(range auto && source, range auto && buffer, ExtractKey && extract_key) const -> bool {
+		// TODO: Allow buffer to be larger, return range_view instead of bool
+		BOUNDED_ASSERT(containers::size(source) == containers::size(buffer));
+		using key_t = std::decay_t<decltype(extract_key(containers::front(source)))>;
 		if constexpr (std::is_same_v<key_t, bool>) {
-			auto false_position = buffer_begin;
+			auto false_position = containers::begin(buffer);
 			auto true_position = ::containers::next(
-				buffer_begin,
-				containers::count_if(first, last, containers::negate(extract_key))
+				false_position,
+				containers::count_if(source, containers::negate(extract_key))
 			);
-			for (; first != last; ++first) {
-				auto & position = extract_key(*first) ? true_position : false_position;
-				*position = std::move(*first);
+			for (auto && value : source) {
+				auto & position = extract_key(value) ? true_position : false_position;
+				*position = std::move(value);
 				++position;
 			}
 			return true;
 		} else if constexpr (std::is_arithmetic_v<key_t>) {
-			return numeric_sort_impl(first, last, buffer_begin, extract_key);
+			return numeric_sort_impl(source, buffer, extract_key);
 		} else if constexpr (containers::range<key_t>) {
-			if (first == last) {
+			if (containers::is_empty(source)) {
 				return false;
 			}
 			// Currently just sized ranges
@@ -606,7 +601,7 @@ struct double_buffered_ska_sort_t {
 #if 0
 					return *containers::max_element(
 						containers::transform(
-							range_view(first, last),
+							source,
 							[](auto const & range) { return containers::size(range); }
 						)
 					);
@@ -614,53 +609,43 @@ struct double_buffered_ska_sort_t {
 				}
 			}();
 			bool which = false;
-			auto buffer_end = buffer_begin + (last - first);
 			for (size_t index = max_size; index > 0; --index) {
 				auto extract_n = [&, index = index - 1](auto && o) {
 					return extract_key(o)[index];
 				};
 				if (which) {
-					which = !operator()(buffer_begin, buffer_end, first, extract_n);
+					which = !operator()(buffer, source, extract_n);
 				} else {
-					which = operator()(first, last, buffer_begin, extract_n);
+					which = operator()(source, buffer, extract_n);
 				}
 			}
 			return which;
 		} else if constexpr (detail::tuple_like<key_t>) {
-			return tuple_sort_impl<0U>(first, last, buffer_begin, extract_key);
+			return tuple_sort_impl<0U>(source, buffer, extract_key);
 		} else {
-			return operator()(first, last, buffer_begin, [&](auto && a) -> decltype(auto) {
+			return operator()(source, buffer, [&](auto && a) -> decltype(auto) {
 				return to_radix_sort_key(extract_key(a));
 			});
 		}
 	}
 
-	template<iterator SourceIterator>
-	constexpr auto operator()(SourceIterator source_begin, sentinel_for<SourceIterator> auto source_end, iterator auto buffer_begin) const -> bool {
-		return operator()(source_begin, source_end, buffer_begin, bounded::identity);
-	}
-
-	constexpr auto operator()(range auto && source_range, range auto && buffer_range, auto && extract_key) const -> bool {
-		return operator()(containers::begin(source_range), containers::end(source_range), containers::begin(buffer_range), OPERATORS_FORWARD(extract_key));
-	}
-	constexpr auto operator()(range auto && source_range, range auto && buffer_range) const -> bool {
-		return operator()(source_range, buffer_range, bounded::identity);
+	constexpr auto operator()(range auto && source, range auto && buffer) const -> bool {
+		return operator()(source, buffer, bounded::identity);
 	}
 private:
-	template<typename Iterator, typename ExtractKey>
-	static constexpr bool numeric_sort_impl(Iterator first, sentinel_for<Iterator> auto last, iterator auto out_begin, ExtractKey && extract_key) {
-		auto const out_end = out_begin + (last - first);
-		constexpr auto size = sizeof(detail::key_type<Iterator, ExtractKey>);
-		std::array<std::array<std::size_t, 256>, size> counts = {};
+	template<range Source, range Buffer, typename ExtractKey>
+	static constexpr bool numeric_sort_impl(Source & source, Buffer & buffer, ExtractKey && extract_key) {
+		constexpr auto size = sizeof(std::decay_t<decltype(extract_key(containers::front(source)))>);
+		auto counts = std::array<std::array<std::size_t, 256>, size>();
 
-		for (auto it = first; it != last; ++it) {
-			auto key = to_radix_sort_key(extract_key(*it));
+		for (auto const & value : source) {
+			auto key = to_radix_sort_key(extract_key(value));
 			for (std::size_t index = 0U; index != size; ++index) {
 				auto const inner_index = (key >> (index * 8U)) & 0xFFU;
 				++counts[index][inner_index];
 			}
 		}
-		std::array<std::size_t, size> total = {};
+		auto total = std::array<std::size_t, size>();
 		for (std::size_t index = 0U; index != size; ++index) {
 			auto & indexed_total = total[index];
 			auto & count = counts[index];
@@ -670,15 +655,15 @@ private:
 		}
 		static_assert(size == 1U or size % 2 == 0);
 		for (std::size_t index = 0U; index != size; ) {
-			for (auto it = first; it != last; ++it) {
-				auto const key = static_cast<std::uint8_t>(to_radix_sort_key(extract_key(*it)) >> (index * 8U));
-				out_begin[counts[index][key]++] = std::move(*it);
+			for (auto && value : source) {
+				auto const key = static_cast<std::uint8_t>(to_radix_sort_key(extract_key(value)) >> (index * 8U));
+				buffer[containers::index_type<Buffer>(counts[index][key]++)] = std::move(value);
 			}
 			++index;
 			if constexpr (size != 1U) {
-				for (auto it = out_begin; it != out_end; ++it) {
-					auto const key = static_cast<std::uint8_t>(to_radix_sort_key(extract_key(*it)) >> ((index) * 8U));
-					first[counts[index][key]++] = std::move(*it);
+				for (auto && value : buffer) {
+					auto const key = static_cast<std::uint8_t>(to_radix_sort_key(extract_key(value)) >> ((index) * 8U));
+					source[containers::index_type<Source>(counts[index][key]++)] = std::move(value);
 				}
 				++index;
 			}
@@ -686,22 +671,21 @@ private:
 		return size == 1U;
 	}
 
-	template<std::size_t index, typename Iterator, typename ExtractKey>
-	static constexpr bool tuple_sort_impl(Iterator first, sentinel_for<Iterator> auto last, iterator auto out_begin, ExtractKey && extract_key) {
-		using key_t = detail::key_type<Iterator, ExtractKey>;
+	template<std::size_t index, typename ExtractKey>
+	static constexpr bool tuple_sort_impl(range auto & source, range auto & buffer, ExtractKey && extract_key) {
+		using key_t = std::decay_t<decltype(extract_key(containers::front(source)))>;
 		if constexpr (index == std::tuple_size_v<key_t>) {
 			return false;
 		} else {
-			auto const out_end = out_begin + (last - first);
-			bool which = tuple_sort_impl<index + 1U>(first, last, out_begin, extract_key);
+			bool const which = tuple_sort_impl<index + 1U>(source, buffer, extract_key);
 			using std::get;
 			auto extract_i = [&](auto && o) -> detail::extract_return_type<index, ExtractKey, decltype(o)> {
 				return get<index>(extract_key(o));
 			};
 			if (which) {
-				return !double_buffered_ska_sort_t{}(out_begin, out_end, first, extract_i);
+				return !double_buffered_ska_sort_t{}(buffer, source, extract_i);
 			} else {
-				return double_buffered_ska_sort_t{}(first, last, out_begin, extract_i);
+				return double_buffered_ska_sort_t{}(source, buffer, extract_i);
 			}
 		}
 	}

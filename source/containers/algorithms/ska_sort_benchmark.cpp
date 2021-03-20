@@ -143,12 +143,12 @@ void benchmark_double_buffered_ska_sort(benchmark::State & state, auto create) {
 		using containers::begin;
 		using containers::end;
 #ifdef SORT_ON_FIRST_ONLY
-		double_buffered_ska_sort(begin(to_sort), end(to_sort), begin(buffer), [](auto && a){
+		double_buffered_ska_sort(to_sort, buffer, [](auto && a){
 			using std::get;
 			return get<0>(a);
 		});
 #else
-		bool which = double_buffered_ska_sort(begin(to_sort), end(to_sort), begin(buffer));
+		bool which = double_buffered_ska_sort(to_sort, buffer);
 		if (which)
 			assert(containers::is_sorted(buffer));
 		else
