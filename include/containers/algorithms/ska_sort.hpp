@@ -634,9 +634,6 @@ constexpr auto double_buffered_sort_impl(range auto & source, range auto & buffe
 	} else if constexpr (std::is_arithmetic_v<key_t>) {
 		return containers::detail::double_buffered_numeric_sort(source, buffer, extract_key);
 	} else if constexpr (containers::range<key_t>) {
-		if (containers::is_empty(source)) {
-			return false;
-		}
 		// Currently just sized ranges
 		auto const max_size = [&]{
 			if constexpr (requires { key_t::size(); }) {
