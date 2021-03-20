@@ -585,22 +585,20 @@ constexpr bool double_buffered_numeric_sort(Source & source, Buffer & buffer, Ex
 			indexed_total += std::exchange(count[i], indexed_total);
 		}
 	}
-	static_assert(size == 1U or size % 2 == 0);
 	for (std::size_t index = 0U; index != size; ) {
-		for (auto && value : source) {
-			auto const key = static_cast<std::uint8_t>(to_radix_sort_key(extract_key(value)) >> (index * 8U));
-			buffer[containers::index_type<Buffer>(counts[index][key]++)] = std::move(value);
-		}
-		++index;
-		if constexpr (size != 1U) {
-			for (auto && value : buffer) {
-				auto const key = static_cast<std::uint8_t>(to_radix_sort_key(extract_key(value)) >> ((index) * 8U));
-				source[containers::index_type<Source>(counts[index][key]++)] = std::move(value);
+		auto sort_segment_copy = [&](auto & current, auto & next) {
+			for (auto && value : current) {
+				auto const key = static_cast<std::uint8_t>(to_radix_sort_key(extract_key(value)) >> (index * 8U));
+				next[containers::index_type<Buffer>(counts[index][key]++)] = std::move(value);
 			}
 			++index;
+		};
+		sort_segment_copy(source, buffer);
+		if constexpr (size % 2U == 0U) {
+			sort_segment_copy(buffer, source);
 		}
 	}
-	return size == 1U;
+	return size % 2U == 1U;
 }
 
 template<typename ExtractKey>
