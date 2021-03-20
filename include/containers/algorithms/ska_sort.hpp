@@ -545,6 +545,26 @@ public:
 template<std::size_t index, typename ExtractKey, typename T>
 using extract_return_type = typename extract::return_type_impl<index, ExtractKey, T>::type;
 
+
+// TODO: Generalize to any two-valued type
+constexpr void bool_sort_copy(auto & source, auto & output, auto const & extract_key) {
+	// As an optimization, we could copy all initial false values and all
+	// trailing true values, then only do this algorithm on the middle section.
+	// I'm not sure if the increased code size is worth the benefit of iterating
+	// over those values only once.
+	auto false_position = containers::begin(output);
+	auto true_position = containers::next(
+		false_position,
+		containers::count_if(source, containers::negate(extract_key))
+	);
+	for (auto && value : source) {
+		auto & position = extract_key(value) ? true_position : false_position;
+		*position = std::move(value);
+		++position;
+	}
+}
+
+
 template<range Source, range Buffer, typename ExtractKey>
 constexpr bool double_buffered_numeric_sort(Source & source, Buffer & buffer, ExtractKey const & extract_key) {
 	constexpr auto size = sizeof(std::decay_t<decltype(extract_key(containers::front(source)))>);
@@ -609,16 +629,7 @@ template<typename ExtractKey>
 constexpr auto double_buffered_sort_impl(range auto & source, range auto & buffer, ExtractKey const & extract_key) -> bool {
 	using key_t = std::decay_t<decltype(extract_key(containers::front(source)))>;
 	if constexpr (std::is_same_v<key_t, bool>) {
-		auto false_position = containers::begin(buffer);
-		auto true_position = ::containers::next(
-			false_position,
-			containers::count_if(source, containers::negate(extract_key))
-		);
-		for (auto && value : source) {
-			auto & position = extract_key(value) ? true_position : false_position;
-			*position = std::move(value);
-			++position;
-		}
+		containers::detail::bool_sort_copy(source, buffer, extract_key);
 		return true;
 	} else if constexpr (std::is_arithmetic_v<key_t>) {
 		return containers::detail::double_buffered_numeric_sort(source, buffer, extract_key);
