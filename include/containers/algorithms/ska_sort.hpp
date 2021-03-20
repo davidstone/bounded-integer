@@ -546,7 +546,6 @@ template<std::size_t index, typename ExtractKey, typename T>
 using extract_return_type = typename extract::return_type_impl<index, ExtractKey, T>::type;
 
 
-// TODO: Generalize to any two-valued type
 constexpr void bool_sort_copy(auto & source, auto & output, auto const & extract_key) {
 	// As an optimization, we could copy all initial false values and all
 	// trailing true values, then only do this algorithm on the middle section.
