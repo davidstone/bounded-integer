@@ -545,6 +545,44 @@ public:
 template<std::size_t index, typename ExtractKey, typename T>
 using extract_return_type = typename extract::return_type_impl<index, ExtractKey, T>::type;
 
+template<range Source, range Buffer, typename ExtractKey>
+constexpr bool double_buffered_numeric_sort(Source & source, Buffer & buffer, ExtractKey && extract_key) {
+	constexpr auto size = sizeof(std::decay_t<decltype(extract_key(containers::front(source)))>);
+	auto counts = std::array<std::array<std::size_t, 256>, size>();
+
+	for (auto const & value : source) {
+		auto key = to_radix_sort_key(extract_key(value));
+		for (std::size_t index = 0U; index != size; ++index) {
+			auto const inner_index = (key >> (index * 8U)) & 0xFFU;
+			++counts[index][inner_index];
+		}
+	}
+	auto total = std::array<std::size_t, size>();
+	for (std::size_t index = 0U; index != size; ++index) {
+		auto & indexed_total = total[index];
+		auto & count = counts[index];
+		for (std::size_t i = 0; i < 256; ++i) {
+			indexed_total += std::exchange(count[i], indexed_total);
+		}
+	}
+	static_assert(size == 1U or size % 2 == 0);
+	for (std::size_t index = 0U; index != size; ) {
+		for (auto && value : source) {
+			auto const key = static_cast<std::uint8_t>(to_radix_sort_key(extract_key(value)) >> (index * 8U));
+			buffer[containers::index_type<Buffer>(counts[index][key]++)] = std::move(value);
+		}
+		++index;
+		if constexpr (size != 1U) {
+			for (auto && value : buffer) {
+				auto const key = static_cast<std::uint8_t>(to_radix_sort_key(extract_key(value)) >> ((index) * 8U));
+				source[containers::index_type<Source>(counts[index][key]++)] = std::move(value);
+			}
+			++index;
+		}
+	}
+	return size == 1U;
+}
+
 } // namespace detail
 
 struct ska_sort_t {
@@ -585,7 +623,7 @@ struct double_buffered_ska_sort_t {
 			}
 			return true;
 		} else if constexpr (std::is_arithmetic_v<key_t>) {
-			return numeric_sort_impl(source, buffer, extract_key);
+			return detail::double_buffered_numeric_sort(source, buffer, extract_key);
 		} else if constexpr (containers::range<key_t>) {
 			if (containers::is_empty(source)) {
 				return false;
@@ -633,44 +671,6 @@ struct double_buffered_ska_sort_t {
 		return operator()(source, buffer, bounded::identity);
 	}
 private:
-	template<range Source, range Buffer, typename ExtractKey>
-	static constexpr bool numeric_sort_impl(Source & source, Buffer & buffer, ExtractKey && extract_key) {
-		constexpr auto size = sizeof(std::decay_t<decltype(extract_key(containers::front(source)))>);
-		auto counts = std::array<std::array<std::size_t, 256>, size>();
-
-		for (auto const & value : source) {
-			auto key = to_radix_sort_key(extract_key(value));
-			for (std::size_t index = 0U; index != size; ++index) {
-				auto const inner_index = (key >> (index * 8U)) & 0xFFU;
-				++counts[index][inner_index];
-			}
-		}
-		auto total = std::array<std::size_t, size>();
-		for (std::size_t index = 0U; index != size; ++index) {
-			auto & indexed_total = total[index];
-			auto & count = counts[index];
-			for (std::size_t i = 0; i < 256; ++i) {
-				indexed_total += std::exchange(count[i], indexed_total);
-			}
-		}
-		static_assert(size == 1U or size % 2 == 0);
-		for (std::size_t index = 0U; index != size; ) {
-			for (auto && value : source) {
-				auto const key = static_cast<std::uint8_t>(to_radix_sort_key(extract_key(value)) >> (index * 8U));
-				buffer[containers::index_type<Buffer>(counts[index][key]++)] = std::move(value);
-			}
-			++index;
-			if constexpr (size != 1U) {
-				for (auto && value : buffer) {
-					auto const key = static_cast<std::uint8_t>(to_radix_sort_key(extract_key(value)) >> ((index) * 8U));
-					source[containers::index_type<Source>(counts[index][key]++)] = std::move(value);
-				}
-				++index;
-			}
-		}
-		return size == 1U;
-	}
-
 	template<std::size_t index, typename ExtractKey>
 	static constexpr bool tuple_sort_impl(range auto & source, range auto & buffer, ExtractKey && extract_key) {
 		using key_t = std::decay_t<decltype(extract_key(containers::front(source)))>;
