@@ -82,7 +82,7 @@ constexpr auto to_radix_sort_key(bounded::bounded_integer auto const value) {
 
 template<typename T> requires std::is_enum_v<T>
 constexpr auto to_radix_sort_key(T const value) {
-	return to_radix_sort_key(static_cast<std::underlying_type_t<T>>(value));
+	return to_radix_sort_key(bounded::integer(value));
 }
 
 auto to_radix_sort_key(auto * ptr) {
