@@ -47,6 +47,117 @@ constexpr auto is_sorted_converted_to_radix(auto... values) {
 	return is_sorted_to_radix(static_cast<T>(values)...);
 }
 
+
+static_assert(is_sorted_converted_to_radix<std::int8_t>(
+	-128,
+	-55,
+	-4,
+	0,
+	2,
+	5,
+	5,
+	6,
+	6,
+	7,
+	8,
+	19,
+	23,
+	99,
+	127
+));
+
+static_assert(is_sorted_converted_to_radix<std::int16_t>(
+	-32768,
+	-256,
+	-129,
+	-128,
+	-55,
+	-4,
+	0,
+	2,
+	5,
+	5,
+	6,
+	6,
+	7,
+	8,
+	19,
+	23,
+	99,
+	127,
+	1000,
+	32767
+));
+
+static_assert(is_sorted_converted_to_radix<std::int32_t>(
+	bounded::min_value<std::int32_t>,
+	bounded::min_value<std::int32_t> + 1,
+	-1000001,
+	-32769,
+	-32768,
+	-256,
+	-129,
+	-128,
+	-55,
+	-4,
+	0,
+	2,
+	5,
+	5,
+	6,
+	6,
+	7,
+	8,
+	19,
+	23,
+	99,
+	127,
+	1000,
+	32767,
+	32768,
+	1000000,
+	bounded::max_value<std::int32_t> - 1,
+	bounded::max_value<std::int32_t>
+));
+
+static_assert(is_sorted_converted_to_radix<std::int64_t>(
+	bounded::min_value<int64_t>,
+	-1'000'000'000'000,
+	static_cast<std::int64_t>(bounded::min_value<std::int32_t>) - 1,
+	bounded::min_value<std::int32_t>,
+	bounded::min_value<std::int32_t> + 1,
+	-1'000'001,
+	-32'769,
+	-32'768,
+	-256,
+	-129,
+	-128,
+	-55,
+	-4,
+	0,
+	2,
+	5,
+	5,
+	6,
+	6,
+	7,
+	8,
+	19,
+	23,
+	99,
+	127,
+	1'000,
+	32'767,
+	32'768,
+	1'000'000,
+	bounded::max_value<std::int32_t> - 1,
+	bounded::max_value<std::int32_t>,
+	bounded::max_value<std::int32_t>,
+	1'000'000'000'000,
+	bounded::max_value<std::int64_t>
+));
+
+
 template<typename T>
 constexpr auto test_floating_point() {
 	return is_sorted_converted_to_radix<T>(

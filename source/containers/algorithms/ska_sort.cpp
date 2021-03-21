@@ -276,19 +276,9 @@ static_assert(test_sort(
 	uint8_256_items
 ));
 
-static_assert(test_sort<std::int8_t>(
-	{5, 6, 19, -4, 2, 5, 0, -55, 7, 23, 6, 8, 127, -128, 99},
-	{-128, -55, -4, 0, 2, 5, 5, 6, 6, 7, 8, 19, 23, 99, 127}
-));
-
 static_assert(test_sort<std::uint16_t>(
 	{5, 6, 19, 2, 5, 7, 0, 23, 6, 256, 255, 8, 99, 1024, 65535, 65534},
 	{0, 2, 5, 5, 6, 6, 7, 8, 19, 23, 99, 255, 256, 1024, 65534, 65535}
-));
-
-static_assert(test_sort<std::int16_t>(
-	{5, 6, 19, -4, 2, 5, 0, -55, 7, 1000, 23, 6, 8, 127, -128, -129, -256, -32768, 32767, 99},
-	{-32768, -256, -129, -128, -55, -4, 0, 2, 5, 5, 6, 6, 7, 8, 19, 23, 99, 127, 1000, 32767}
 ));
 
 static_assert(test_sort<std::uint32_t>(
@@ -333,69 +323,6 @@ static_assert(test_sort<std::uint32_t>(
 		65536,
 		1000000,
 		bounded::max_value<std::uint32_t>
-	}
-));
-
-static_assert(test_sort<std::int32_t>(
-	{
-		5,
-		6,
-		19,
-		-4,
-		2,
-		5,
-		0,
-		-55,
-		7,
-		1000,
-		23,
-		6,
-		8,
-		127,
-		-128,
-		-129,
-		-256,
-		32768,
-		-32769,
-		-32768,
-		32767,
-		99,
-		1000000,
-		-1000001,
-		bounded::min_value<std::int32_t>,
-		bounded::max_value<std::int32_t>,
-		bounded::max_value<std::int32_t> - 1,
-		bounded::min_value<std::int32_t> + 1
-	},
-	{
-		bounded::min_value<std::int32_t>,
-		bounded::min_value<std::int32_t> + 1,
-		-1000001,
-		-32769,
-		-32768,
-		-256,
-		-129,
-		-128,
-		-55,
-		-4,
-		0,
-		2,
-		5,
-		5,
-		6,
-		6,
-		7,
-		8,
-		19,
-		23,
-		99,
-		127,
-		1000,
-		32767,
-		32768,
-		1000000,
-		bounded::max_value<std::int32_t> - 1,
-		bounded::max_value<std::int32_t>
 	}
 ));
 
@@ -447,81 +374,6 @@ static_assert(test_sort<std::uint64_t>(
 		static_cast<std::uint64_t>(bounded::max_value<std::uint32_t>) + 1,
 		1'000'000'000'000,
 		bounded::max_value<std::uint64_t>,
-	}
-));
-
-static_assert(test_sort<std::int64_t>(
-	{
-		5,
-		6,
-		19,
-		static_cast<std::int64_t>(bounded::min_value<std::int32_t>) - 1,
-		bounded::min_value<std::int64_t>,
-		-1'000'000'000'000,
-		1'000'000'000'000,
-		bounded::max_value<std::int32_t>,
-		bounded::max_value<std::int64_t>,
-		-4,
-		2,
-		5,
-		0,
-		-55,
-		7,
-		1'000,
-		23,
-		6,
-		8,
-		127,
-		-128,
-		-129,
-		-256,
-		32'768,
-		-32'769,
-		-32'768,
-		32'767,
-		99,
-		1'000'000,
-		-1'000'001,
-		bounded::min_value<std::int32_t>,
-		bounded::max_value<std::int32_t>,
-		bounded::max_value<std::int32_t> - 1,
-		bounded::min_value<std::int32_t> + 1,
-	},
-	{
-		bounded::min_value<int64_t>,
-		-1'000'000'000'000,
-		static_cast<std::int64_t>(bounded::min_value<std::int32_t>) - 1,
-		bounded::min_value<std::int32_t>,
-		bounded::min_value<std::int32_t> + 1,
-		-1'000'001,
-		-32'769,
-		-32'768,
-		-256,
-		-129,
-		-128,
-		-55,
-		-4,
-		0,
-		2,
-		5,
-		5,
-		6,
-		6,
-		7,
-		8,
-		19,
-		23,
-		99,
-		127,
-		1'000,
-		32'767,
-		32'768,
-		1'000'000,
-		bounded::max_value<std::int32_t> - 1,
-		bounded::max_value<std::int32_t>,
-		bounded::max_value<std::int32_t>,
-		1'000'000'000'000,
-		bounded::max_value<std::int64_t>,
 	}
 ));
 
