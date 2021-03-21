@@ -20,12 +20,6 @@
 
 namespace containers {
 
-constexpr void swap(auto & lhs, auto & rhs) {
-	auto temp = std::move(lhs);
-	lhs = std::move(rhs);
-	rhs = std::move(temp);
-}
-
 constexpr inline struct is_partitioned_t {
 	constexpr auto operator()(range auto && input, auto predicate) const -> bool {
 		auto first = containers::begin(input);
@@ -86,6 +80,7 @@ constexpr inline struct partition_t {
 
 			advance_last();
 			while (first != last) {
+				using std::swap;
 				swap(*first, *last);
 				advance_first();
 				if (first == last) {
@@ -99,6 +94,7 @@ constexpr inline struct partition_t {
 			}
 			for (auto it = containers::next(first); it != last; ++it) {
 				if (predicate(*it)) {
+					using std::swap;
 					swap(*it, *first);
 					++first;
 				}

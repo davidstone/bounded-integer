@@ -269,8 +269,8 @@ private:
 						}
 					} else {
 						size_t partition_offset = block->offset++;
-						// TODO: ADL
-						containers::swap(*it, *(first + partition_offset));
+						using std::swap;
+						swap(*it, *(first + partition_offset));
 					}
 				}
 			}
@@ -304,8 +304,8 @@ private:
 					auto const other = first + partition_offset;
 					// Is there a better way to avoid self swap?
 					if (it != other) {
-						// TODO: ADL
-						containers::swap(*it, *(first + partition_offset));
+						using std::swap;
+						swap(*it, *(first + partition_offset));
 					}
 				}
 				return begin_offset != end_offset;

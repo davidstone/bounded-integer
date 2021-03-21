@@ -35,7 +35,8 @@ constexpr auto rotate(ForwardIterator first, ForwardIterator middle, sentinel_fo
 		if (first == next_middle) {
 			next_middle = middle;
 		}
-		::containers::swap(*first, *middle);
+		using std::swap;
+		swap(*first, *middle);
 		++first;
 	}
 
