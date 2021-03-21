@@ -512,77 +512,60 @@ static_assert(test_sort<std::array<int, 4>>(
 	}
 ));
 
+template<bool by_value>
 struct move_only {
 	move_only() = default;
 
 	constexpr move_only(int x):
-		value(x)
+		m_value(x)
 	{
 	}
 
-	constexpr move_only(move_only && other) noexcept:
-		value(other.value),
-		moved_from(other.moved_from)
-	{
-		other.moved_from = true;
-	}
+	constexpr move_only(move_only &&) = default;
+	constexpr move_only(move_only const &) = delete;
+	constexpr move_only & operator=(move_only &&) & = default;
+	constexpr move_only & operator=(move_only const &) & = default;
 
-	constexpr move_only & operator=(move_only && other) & noexcept {
-		value = other.value;
-		moved_from = other.moved_from;
-		other.moved_from = true;
-		return *this;
-	}
+	friend constexpr auto operator<=>(move_only const &, move_only const &) = default;
 
-	friend constexpr auto operator==(move_only const & lhs, move_only const & rhs) -> bool {
-		BOUNDED_TEST(!lhs.moved_from and !rhs.moved_from);
-		return lhs.value == rhs.value;
-	}
-	friend constexpr auto operator<=>(move_only const & lhs, move_only const & rhs) {
-		BOUNDED_TEST(!lhs.moved_from and !rhs.moved_from);
-		return lhs.value <=> rhs.value;
-	}
-
-	constexpr auto get() const {
-		BOUNDED_TEST(!moved_from);
-		return value;
+	friend constexpr auto to_radix_sort_key(move_only const & arg) -> std::conditional_t<by_value, int, int const &> {
+		return arg.m_value.value();
 	}
 
 private:
-	int value = 0;
-	bool moved_from = false;
+	bounded::test_int m_value = 0;
 };
 
 static_assert(test_sort_copy(
-	containers::array<move_only, 4>{
+	containers::array<move_only<true>, 4>{
 		5,
 		0,
 		1234567,
 		-1000,
 	},
-	containers::array<move_only, 4>{
+	containers::array<move_only<true>, 4>{
 		-1000,
 		0,
 		5,
 		1234567,
 	},
-	[](auto const & value) { return value.get(); }
+	[](auto const & value) { return to_radix_sort_key(value); }
 ));
 
 static_assert(test_sort_inplace(
-	containers::array<move_only, 4>{
+	containers::array<move_only<true>, 4>{
 		5,
 		0,
 		1234567,
 		-1000,
 	},
-	containers::array<move_only, 4>{
+	containers::array<move_only<true>, 4>{
 		-1000,
 		0,
 		5,
 		1234567,
 	},
-	[](auto const & value) { return value.get(); }
+	[](auto const & value) { return to_radix_sort_key(value); }
 ));
 
 
@@ -887,32 +870,8 @@ static_assert(
 #endif
 
 template<bool by_value>
-struct move_only_with_to_sort_key {
-	move_only_with_to_sort_key() = default;
-
-	constexpr move_only_with_to_sort_key(int x):
-		m_value(x)
-	{
-	}
-
-	constexpr move_only_with_to_sort_key(move_only_with_to_sort_key &&) = default;
-	constexpr move_only_with_to_sort_key(move_only_with_to_sort_key const &) = delete;
-	constexpr move_only_with_to_sort_key & operator=(move_only_with_to_sort_key &&) & = default;
-	constexpr move_only_with_to_sort_key & operator=(move_only_with_to_sort_key const &) & = default;
-
-	friend constexpr auto operator<=>(move_only_with_to_sort_key const &, move_only_with_to_sort_key const &) = default;
-
-	friend constexpr auto to_radix_sort_key(move_only_with_to_sort_key const & arg) -> std::conditional_t<by_value, int, int const &> {
-		return arg.m_value.value();
-	}
-
-private:
-	bounded::test_int m_value = 0;
-};
-
-template<bool by_value>
 struct wrapper {
-	move_only_with_to_sort_key<by_value> value;
+	move_only<by_value> value;
 	friend constexpr auto operator==(wrapper const & lhs, wrapper const & rhs) -> bool {
 		return to_radix_sort_key(lhs.value) == to_radix_sort_key(rhs.value);
 	}
