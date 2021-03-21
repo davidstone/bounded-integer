@@ -569,17 +569,6 @@ static_assert(test_sort_inplace(
 ));
 
 
-// These two were labelled as "error cases" in the original unit tests
-static_assert(test_sort<std::int8_t>(
-	{46, 7, 33, -78, -114, -78, 33, 82},
-	{-114, -78, -78, 7, 33, 33, 46, 82}
-));
-
-static_assert(test_sort<std::int8_t>(
-	{-104, 50, 108, 105, 112, 53, 47, 102},
-	{-104, 47, 50, 53, 102, 105, 108, 112}
-));
-
 static_assert(test_sort<bounded::tuple<bool, bounded::tuple<int, bounded::tuple<int, int>>, bounded::tuple<bool, bool, bool>>>(
 	{
 		{true, bounded::tuple(5, bounded::tuple(6, 7)), bounded::tuple(true, false, true)},
