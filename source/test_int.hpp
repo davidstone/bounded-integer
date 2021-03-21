@@ -62,7 +62,8 @@ struct test_int {
 		delete m_value;
 	}
 
-	constexpr auto value() const {
+	constexpr auto const & value() const {
+		BOUNDED_TEST(!m_moved_from);
 		return *m_value;
 	}
 
