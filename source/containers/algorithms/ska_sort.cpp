@@ -1130,31 +1130,3 @@ static_assert(test_sort_copy(
 ));
 
 } // namespace
-
-int main() {
-	constexpr int array[] = { 1, 2, 3, 4, 5, 6, 7, 8 };
-	test_sort<int const *>(
-		{
-			array + 1,
-			array + 3,
-			array,
-			array + 2,
-			array + 7,
-			array + 8,
-			array + 6,
-			array + 4,
-			array + 5,
-		},
-		{
-			array,
-			array + 1,
-			array + 2,
-			array + 3,
-			array + 4,
-			array + 5,
-			array + 6,
-			array + 7,
-			array + 8,
-		}
-	);
-}

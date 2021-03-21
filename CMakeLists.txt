@@ -139,6 +139,7 @@ add_library(containers_test STATIC
 	source/containers/algorithms/remove.cpp
 	source/containers/algorithms/reverse_iterator.cpp
 	source/containers/algorithms/set.cpp
+	source/containers/algorithms/ska_sort.cpp
 	source/containers/algorithms/sort.cpp
 	source/containers/algorithms/transform.cpp
 	source/containers/algorithms/transform_iterator.cpp
@@ -198,7 +199,6 @@ add_library(containers_test STATIC
 	source/containers/string.cpp
 	source/containers/take.cpp
 	source/containers/to_address.cpp
-	source/containers/to_radix_sort_key.cpp
 	source/containers/uninitialized_dynamic_array.cpp
 	source/containers/vector.cpp
 )
@@ -231,10 +231,10 @@ set(BENCHMARK_ENABLE_TESTING OFF CACHE BOOL "Disable testing benchmark.")
 add_subdirectory("${PROJECT_SOURCE_DIR}/source/benchmark")
 set_target_properties(benchmark PROPERTIES FOLDER extern)
 
-add_executable(ska_sort
-	source/containers/algorithms/ska_sort.cpp
+add_executable(to_radix_sort_key
+	source/containers/to_radix_sort_key.cpp
 )
-target_link_libraries(ska_sort PUBLIC bounded strict_defaults)
+target_link_libraries(to_radix_sort_key PUBLIC bounded strict_defaults)
 
 add_executable(ska_sort_benchmark
 	source/containers/algorithms/ska_sort_benchmark.cpp
@@ -280,7 +280,7 @@ set(test_targets
 	static_vector
 	small_buffer_optimized_vector
 	flat_map
-	ska_sort
+	to_radix_sort_key
 )
 
 foreach(test_target ${test_targets})
