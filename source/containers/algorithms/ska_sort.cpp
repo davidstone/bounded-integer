@@ -758,7 +758,7 @@ static_assert(
 			containers::vector({"time"}),
 			containers::vector({"to", "pass"}),
 		}),
-		identity_by_value
+		bounded::copy
 	)
 );
 #endif
@@ -852,7 +852,7 @@ static_assert(
 			{"test", "the"},
 			{"you", "are"},
 		}),
-		identity_by_value
+		bounded::copy
 	)
 );
 #endif
