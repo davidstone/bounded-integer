@@ -298,14 +298,15 @@ private:
 				if (begin_offset == end_offset)
 					return false;
 
-				// TODO: This can sometimes perform a self-swap. If this could
-				// be restructured to avoid that, it would also be a
-				// performance gain.
 				for (auto it = first + begin_offset; it != first + end_offset; ++it) {
 					uint8_t this_partition = current_byte(extract_key(*it), sort_data, offset);
 					size_t partition_offset = partitions.partitions[this_partition].offset++;
-					// TODO: ADL
-					containers::swap(*it, *(first + partition_offset));
+					auto const other = first + partition_offset;
+					// Is there a better way to avoid self swap?
+					if (it != other) {
+						// TODO: ADL
+						containers::swap(*it, *(first + partition_offset));
+					}
 				}
 				return begin_offset != end_offset;
 			});
