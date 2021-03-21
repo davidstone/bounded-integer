@@ -23,6 +23,7 @@
 #include <vector>
 
 #include "../../test_assert.hpp"
+#include "../../test_int.hpp"
 
 namespace {
 
@@ -890,41 +891,23 @@ struct move_only_with_to_sort_key {
 	move_only_with_to_sort_key() = default;
 
 	constexpr move_only_with_to_sort_key(int x):
-		value(x)
+		m_value(x)
 	{
 	}
 
-	constexpr move_only_with_to_sort_key(move_only_with_to_sort_key && other) noexcept:
-		value(other.value),
-		moved_from(other.moved_from)
-	{
-		other.moved_from = true;
-	}
+	constexpr move_only_with_to_sort_key(move_only_with_to_sort_key &&) = default;
+	constexpr move_only_with_to_sort_key(move_only_with_to_sort_key const &) = delete;
+	constexpr move_only_with_to_sort_key & operator=(move_only_with_to_sort_key &&) & = default;
+	constexpr move_only_with_to_sort_key & operator=(move_only_with_to_sort_key const &) & = default;
 
-	constexpr move_only_with_to_sort_key & operator=(move_only_with_to_sort_key && other) & noexcept {
-		value = other.value;
-		moved_from = other.moved_from;
-		other.moved_from = true;
-		return *this;
-	}
-
-	friend constexpr auto operator==(move_only_with_to_sort_key const & lhs, move_only_with_to_sort_key const & rhs) -> bool {
-		BOUNDED_TEST(!lhs.moved_from and !rhs.moved_from);
-		return lhs.value == rhs.value;
-	}
-	friend constexpr auto operator<=>(move_only_with_to_sort_key const & lhs, move_only_with_to_sort_key const & rhs) {
-		BOUNDED_TEST(!lhs.moved_from and !rhs.moved_from);
-		return lhs.value <=> rhs.value;
-	}
+	friend constexpr auto operator<=>(move_only_with_to_sort_key const &, move_only_with_to_sort_key const &) = default;
 
 	friend constexpr auto to_radix_sort_key(move_only_with_to_sort_key const & arg) -> std::conditional_t<by_value, int, int const &> {
-		BOUNDED_TEST(!arg.moved_from);
-		return arg.value;
+		return arg.m_value.value();
 	}
 
 private:
-	int value = 0;
-	bool moved_from = false;
+	bounded::test_int m_value = 0;
 };
 
 template<bool by_value>
