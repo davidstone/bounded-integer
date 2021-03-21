@@ -35,7 +35,7 @@ static_assert(increase_float_magnitude(-0.0, 1) < -0.0);
 static_assert(increase_float_magnitude(-0.0, 1) > -0.1);
 
 
-constexpr auto is_sorted_converted(auto... values) {
+constexpr auto is_sorted_to_radix(auto... values) {
 	auto const original = containers::array{values...};
 	BOUNDED_TEST(containers::is_sorted(original));
 	auto const converted = containers::array{containers::to_radix_sort_key(values)...};
@@ -43,43 +43,48 @@ constexpr auto is_sorted_converted(auto... values) {
 }
 
 template<typename T>
+constexpr auto is_sorted_converted_to_radix(auto... values) {
+	return is_sorted_to_radix(static_cast<T>(values)...);
+}
+
+template<typename T>
 constexpr auto test_floating_point() {
-	return is_sorted_converted(
+	return is_sorted_converted_to_radix<T>(
 		-std::numeric_limits<T>::infinity(),
-		T(-777777777.7),
-		T(-1000001.0),
-		T(-32769.0),
-		T(-32768.0),
-		T(-256.0),
-		T(-129.0),
-		T(-128.0),
-		T(-55.0),
-		T(-12.4),
-		T(-4.0),
-		T(-0.0000002),
+		-777777777.7,
+		-1000001.0,
+		-32769.0,
+		-32768.0,
+		-256.0,
+		-129.0,
+		-128.0,
+		-55.0,
+		-12.4,
+		-4.0,
+		-0.0000002,
 		increase_float_magnitude(T(-0.0), 2),
 		increase_float_magnitude(T(-0.0), 1),
-		T(-0.0),
-		T(0.0),
+		-0.0,
+		0.0,
 		increase_float_magnitude(T(0.0), 1),
 		increase_float_magnitude(T(0.0), 2),
-		T(0.1),
-		T(2.0),
-		T(2.5),
-		T(5.0),
-		T(6.0),
-		T(7.0),
-		T(8.0),
-		T(17.8),
-		T(19.0),
-		T(23.0),
-		T(99.0),
-		T(127.0),
-		T(1000.0),
-		T(32767.0),
-		T(32768.0),
-		T(1000000.0),
-		T(444444444444.4),
+		0.1,
+		2.0,
+		2.5,
+		5.0,
+		6.0,
+		7.0,
+		8.0,
+		17.8,
+		19.0,
+		23.0,
+		99.0,
+		127.0,
+		1000.0,
+		32767.0,
+		32768.0,
+		1000000.0,
+		444444444444.4,
 		std::numeric_limits<T>::infinity()
 	);
 }
@@ -91,7 +96,7 @@ static_assert(test_floating_point<double>());
 
 int main() {
 	constexpr int array[] = { 1, 2, 3, 4, 5, 6, 7, 8 };
-	BOUNDED_TEST(is_sorted_converted(
+	BOUNDED_TEST(is_sorted_to_radix(
 		array + 0,
 		array + 1,
 		array + 2,
