@@ -203,6 +203,28 @@ constexpr auto test_floating_point() {
 static_assert(test_floating_point<float>());
 static_assert(test_floating_point<double>());
 
+template<typename Char>
+constexpr auto test_character() {
+	return is_sorted_converted_to_radix<Char>(
+		'\0',
+		' ',
+		'!',
+		'0',
+		'A',
+		'Z',
+		'a',
+		'b',
+		'c',
+		'z'
+	);
+}
+
+static_assert(test_character<char>());
+static_assert(test_character<char8_t>());
+static_assert(test_character<char16_t>());
+static_assert(test_character<char32_t>());
+static_assert(test_character<wchar_t>());
+
 } // namespace
 
 int main() {

@@ -377,30 +377,6 @@ static_assert(test_sort<std::uint64_t>(
 	}
 ));
 
-template<typename Char, std::size_t size>
-constexpr auto array_from_c_string(c_array<Char, size> const & str) {
-	return copy_from_c_array(str, std::make_index_sequence<size - 1U>{});
-}
-
-// TODO: This assumes a particular sort order based on ASCII; maybe use
-// std::sort for the baseline?
-static_assert(test_sort(
-	array_from_c_string("Hello, World!"),
-	array_from_c_string(" !,HWdellloor")
-));
-static_assert(test_sort(
-	array_from_c_string(u"Hello, World!"),
-	array_from_c_string(u" !,HWdellloor")
-));
-static_assert(test_sort(
-	array_from_c_string(U"Hello, World!"),
-	array_from_c_string(U" !,HWdellloor")
-));
-static_assert(test_sort(
-	array_from_c_string(L"Hello, World!"),
-	array_from_c_string(L" !,HWdellloor")
-));
-
 static_assert(test_sort<bounded::tuple<int, bool>>(
 	{{5, true}, {5, false}, {6, false}, {7, true}, {4, false}, {4, true}},
 	{{4, false}, {4, true}, {5, false}, {5, true}, {6, false}, {7, true}}
