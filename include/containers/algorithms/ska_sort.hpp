@@ -657,7 +657,7 @@ constexpr inline struct unique_ska_sort_t {
 			containers::end(to_sort)
 		);
 	}
-	constexpr auto operator()(range auto && to_sort) const {
+	constexpr auto operator()(range auto & to_sort) const {
 		return operator()(to_sort, bounded::identity);
 	}
 } unique_ska_sort;
