@@ -646,19 +646,19 @@ struct double_buffered_ska_sort_t {
 } inline constexpr double_buffered_ska_sort;
 
 constexpr inline struct unique_ska_sort_t {
-	constexpr auto operator()(range auto & to_sort, auto const & extract_key) const {
+	constexpr void operator()(range auto & to_sort, auto const & extract_key) const {
 		ska_sort(to_sort, extract_key);
 		auto const equal = [&](auto const & lhs, auto const & rhs) {
 			return extract_key(lhs) == extract_key(rhs);
 		};
-		return ::containers::erase(
+		::containers::erase(
 			to_sort,
 			::containers::unique(containers::begin(to_sort), containers::end(to_sort), equal),
 			containers::end(to_sort)
 		);
 	}
-	constexpr auto operator()(range auto & to_sort) const {
-		return operator()(to_sort, bounded::identity);
+	constexpr void operator()(range auto & to_sort) const {
+		operator()(to_sort, bounded::identity);
 	}
 } unique_ska_sort;
 
