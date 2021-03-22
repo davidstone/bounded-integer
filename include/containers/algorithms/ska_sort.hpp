@@ -631,13 +631,18 @@ struct ska_sort_t {
 
 struct double_buffered_ska_sort_t {
 	constexpr auto operator()(range auto && source, range auto && buffer, auto const & extract_key) const -> bool {
-		// TODO: Allow buffer to be larger, return range_view instead of bool
-		BOUNDED_ASSERT(containers::size(source) == containers::size(buffer));
-		// This delegates to an implementation function to collapse lvalue and
-		// rvalue code into a single instantiation and to let the tuple version
-		// be recursive with the main function. We need to accept rvalues so
-		// that users can easily pass in view types.
-		return detail::double_buffered_sort_impl(source, buffer, extract_key);
+		if constexpr (bounded::max_value<typename std::remove_reference_t<decltype(source)>::size_type> <= bounded::constant<1>) {
+			return false;
+		} else {
+			// TODO: Allow buffer to be larger, return range_view instead of bool
+			// TODO: The actual algorithm doesn't require a sized range
+			BOUNDED_ASSERT(containers::size(source) == containers::size(buffer));
+			// This delegates to an implementation function to collapse lvalue and
+			// rvalue code into a single instantiation and to let the tuple version
+			// be recursive with the main function. We need to accept rvalues so
+			// that users can easily pass in view types.
+			return detail::double_buffered_sort_impl(source, buffer, extract_key);
+		}
 	}
 
 	constexpr auto operator()(range auto && source, range auto && buffer) const -> bool {
