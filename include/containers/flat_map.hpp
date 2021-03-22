@@ -301,7 +301,7 @@ public:
 		::containers::append(m_container, OPERATORS_FORWARD(init));
 		auto const midpoint = begin() + original_size;
 
-		ska_sort(midpoint, end(), extract_key());
+		ska_sort(containers::range_view(midpoint, end()), extract_key());
 		if constexpr (allow_duplicates) {
 			std::inplace_merge(
 				make_legacy_iterator(begin()),

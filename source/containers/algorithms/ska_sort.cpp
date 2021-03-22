@@ -49,7 +49,7 @@ constexpr bool test_sort_copy(Container source, Container const & expected, auto
 
 constexpr bool test_sort_inplace(auto source, auto const & expected, auto function) {
 	BOUNDED_TEST(containers::is_sorted(expected));
-	detail::inplace_radix_sort<1>(begin(source), end(source), function);
+	detail::inplace_radix_sort<1>(containers::range_view(source), function);
 	BOUNDED_TEST(source == expected);
 	return true;
 }
@@ -86,8 +86,7 @@ constexpr bool test_sort(c_array<T, size> const & original, c_array<T, size> con
 template<typename T, std::size_t size>
 constexpr bool test_common_prefix(c_array<T, size> const & source, std::ptrdiff_t const start_index, std::size_t const expected) {
 	auto const prefix = containers::detail::common_prefix(
-		std::begin(source),
-		std::end(source),
+		containers::range_view(source),
 		bounded::identity,
 		bounded::identity,
 		start_index
