@@ -22,7 +22,7 @@ constexpr auto safer_multiply(constant_t<lhs> const &, constant_t<rhs> const &) 
 	constexpr auto positive_rhs = safe_abs(rhs);
 	constexpr auto positive_result = positive_lhs * positive_rhs;
 	static_assert(
-		positive_lhs == 0 or positive_rhs == 0 or positive_result / positive_lhs == positive_rhs,
+		lhs == 0 or positive_result / positive_lhs == positive_rhs,
 		"Multiplication requires a larger type than currently supported."
 	);
 	if constexpr (negative) {
