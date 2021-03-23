@@ -730,37 +730,29 @@ static_assert(
 	)
 );
 
-#if 0
 static_assert(
 	test_sort_inplace(
 		containers::vector({
-			containers::vector({"hi", "there", "you"}),
-			containers::vector({"are", "probably", "not", "going"}),
-			containers::vector({"to", "pass"}),
-			containers::vector({""}),
-			containers::vector(),
-			containers::vector({"this", "test", "the", "first"}),
-			containers::vector({"time"}),
-			containers::vector({"oh it did pass", "n", "e", "a", "t!"}),
-			containers::vector({"hi", "there", "I", "added", "more", "tests"}),
-			containers::vector({"hi", "there", "needed", "the", "same", "prefix"}),
+			containers::vector<containers::string>({"hi", "there", "you"}),
+			containers::vector<containers::string>({"are", "probably", "not", "going"}),
+			containers::vector<containers::string>({"to", "pass"}),
+			containers::vector<containers::string>({""}),
+			containers::vector<containers::string>(),
+			containers::vector<containers::string>({"hi", "there", "I", "added", "more", "tests"}),
+			containers::vector<containers::string>({"hi", "there", "needed", "the", "same", "prefix"}),
 		}),
 		containers::vector({
-			containers::vector(),
-			containers::vector({""}),
-			containers::vector({"are", "probably", "not", "going"}),
-			containers::vector({"hi", "there", "I", "added", "more", "tests"}),
-			containers::vector({"hi", "there", "needed", "the", "same", "prefix"}),
-			containers::vector({"hi", "there", "you"}),
-			containers::vector({"oh it did pass", "n", "e", "a", "t!"}),
-			containers::vector({"this", "test", "the", "first"}),
-			containers::vector({"time"}),
-			containers::vector({"to", "pass"}),
+			containers::vector<containers::string>(),
+			containers::vector<containers::string>({""}),
+			containers::vector<containers::string>({"are", "probably", "not", "going"}),
+			containers::vector<containers::string>({"hi", "there", "I", "added", "more", "tests"}),
+			containers::vector<containers::string>({"hi", "there", "needed", "the", "same", "prefix"}),
+			containers::vector<containers::string>({"hi", "there", "you"}),
+			containers::vector<containers::string>({"to", "pass"}),
 		}),
 		bounded::copy
 	)
 );
-#endif
 
 static_assert(
 	test_sort_inplace(
@@ -808,7 +800,6 @@ static_assert(
 	)
 );
 
-#if 0
 static_assert(
 	test_sort_inplace(
 		containers::vector<bounded::tuple<containers::string, containers::string>>({
@@ -854,7 +845,6 @@ static_assert(
 		bounded::copy
 	)
 );
-#endif
 #endif
 
 template<bool by_value>

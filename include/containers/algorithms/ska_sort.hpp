@@ -86,8 +86,8 @@ struct ListSortData : BaseListSortData {
 template<typename T>
 struct SubKey {
 	using base = SubKey<decltype(to_radix_sort_key(std::declval<T>()))>;
-	static constexpr decltype(auto) sub_key(T const & value, BaseListSortData * data) {
-		return base::sub_key(to_radix_sort_key(value), data);
+	static constexpr decltype(auto) sub_key(auto && value, BaseListSortData * data) {
+		return base::sub_key(to_radix_sort_key(OPERATORS_FORWARD(value)), data);
 	}
 
 	using next = typename base::next;
@@ -133,10 +133,9 @@ struct NextTupleSubKey<Index, SubKey<void>> {
 
 template<size_t Index, typename Current, typename... More>
 struct TupleSubKey {
-	template<typename Tuple>
-	static constexpr decltype(auto) sub_key(const Tuple & value, BaseListSortData * sort_data) {
+	static constexpr decltype(auto) sub_key(auto && value, BaseListSortData * sort_data) {
 		using std::get;
-		return Current::sub_key(get<Index>(value), sort_data);
+		return Current::sub_key(get<Index>(OPERATORS_FORWARD(value)), sort_data);
 	}
 
 	using next = typename NextTupleSubKey<Index, typename Current::next, More...>::type;
@@ -398,10 +397,10 @@ private:
 
 		using next = ElementSubKey;
 
-		static constexpr decltype(auto) sub_key(auto const & value, BaseListSortData * sort_data) {
-			auto const & list = CurrentSubKey::sub_key(value, sort_data->next_sort_data);
+		static constexpr decltype(auto) sub_key(auto && value, BaseListSortData * sort_data) {
+			auto && list = CurrentSubKey::sub_key(OPERATORS_FORWARD(value), sort_data->next_sort_data);
 			return base::sub_key(
-				containers::at(list, sort_data->current_index, bounded::non_check),
+				containers::at(OPERATORS_FORWARD(list), sort_data->current_index, bounded::non_check),
 				sort_data->next_sort_data
 			);
 		}
