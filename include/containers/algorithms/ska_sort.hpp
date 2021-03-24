@@ -94,7 +94,7 @@ template<typename T>
 struct SubKey<T &&> : SubKey<T> {
 };
 
-template<typename T> requires(std::is_pointer_v<T> or std::is_unsigned_v<T>)
+template<typename T> requires(std::is_unsigned_v<T>)
 struct SubKey<T> {
 	static constexpr auto sub_key(T const value, BaseListSortData *) {
 		return to_radix_sort_key(value);
@@ -152,7 +152,7 @@ struct SubKey<Tuple> : TupleSubKeyWrapper<
 > {
 };
 
-template<typename T> requires (!std::is_pointer_v<T> and indexable<T> and range<T>)
+template<typename T> requires (indexable<T> and range<T>)
 struct SubKey<T> {
 	static constexpr const T & sub_key(T const & value, BaseListSortData *) {
 		return value;
