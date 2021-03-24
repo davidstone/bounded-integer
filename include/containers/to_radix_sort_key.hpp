@@ -22,7 +22,7 @@ using float_to_unsigned =
 	unknown_floating_point
 >>;
 
-} // namespace detail
+namespace to_radix_sort_key_adl {
 
 // TODO: Delete bool overload, currently relying on implicit conversions
 constexpr auto to_radix_sort_key(bool const value) {
@@ -39,7 +39,7 @@ constexpr auto to_radix_sort_key(T const value) {
 
 	if constexpr (std::is_floating_point_v<T>) {
 		static_assert(std::numeric_limits<T>::is_iec559);
-		using unsigned_t = detail::float_to_unsigned<T>;
+		using unsigned_t = float_to_unsigned<T>;
 		static_assert(sizeof(T) == sizeof(unsigned_t));
 		auto const u = __builtin_bit_cast(unsigned_t, value);
 		constexpr auto sign_bit_position = std::numeric_limits<unsigned_t>::digits - 1U;
@@ -68,5 +68,26 @@ constexpr auto to_radix_sort_key(T const value) {
 auto to_radix_sort_key(auto * ptr) {
 	return reinterpret_cast<std::uintptr_t>(ptr);
 }
+
+template<typename T>
+concept default_ska_sortable_value = requires(T && value) {
+	to_radix_sort_key(OPERATORS_FORWARD(value));
+};
+
+constexpr decltype(auto) to_radix_sort_key_impl(default_ska_sortable_value auto && value) {
+	return to_radix_sort_key(OPERATORS_FORWARD(value));
+}
+
+} // namespace to_radix_sort_key_adl
+
+using to_radix_sort_key_adl::default_ska_sortable_value;
+
+} // namespace detail
+
+struct to_radix_sort_key_t {
+	constexpr decltype(auto) operator()(detail::default_ska_sortable_value auto && value) const {
+		return containers::detail::to_radix_sort_key_adl::to_radix_sort_key_impl(OPERATORS_FORWARD(value));
+	}
+} inline constexpr to_radix_sort_key;
 
 } // namespace containers
