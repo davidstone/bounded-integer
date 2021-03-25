@@ -550,6 +550,40 @@ constexpr bool double_buffered_numeric_sort(Source & source, Buffer & buffer, Ex
 template<typename ExtractKey>
 constexpr auto double_buffered_sort_impl(range auto & source, range auto & buffer, ExtractKey const & extract_key) -> bool;
 
+constexpr bool double_buffered_range_sort(range auto & source, range auto & buffer, auto const & extract_key) {
+	using key_t = std::decay_t<decltype(extract_key(containers::front(source)))>;
+	// Currently just sized ranges
+	auto const max_size = [&]{
+		if constexpr (requires { key_t::size(); }) {
+			return key_t::size();
+		} else if constexpr (requires { std::tuple_size<key_t>::value; }) {
+			return std::tuple_size<key_t>::value;
+		} else {
+			// TODO: Support variable-sized ranges
+#if 0
+			return *containers::max_element(
+				containers::transform(
+					source,
+					[](auto const & range) { return containers::size(range); }
+				)
+			);
+#endif
+		}
+	}();
+	bool which = false;
+	for (size_t index = max_size; index > 0; --index) {
+		auto extract_n = [&, index = index - 1](auto && o) {
+			return extract_key(o)[index];
+		};
+		if (which) {
+			which = !containers::detail::double_buffered_sort_impl(buffer, source, extract_n);
+		} else {
+			which = containers::detail::double_buffered_sort_impl(source, buffer, extract_n);
+		}
+	}
+	return which;
+}
+
 template<std::size_t index, typename ExtractKey>
 constexpr bool double_buffered_tuple_sort(range auto & source, range auto & buffer, ExtractKey const & extract_key) {
 	using key_t = std::decay_t<decltype(extract_key(containers::front(source)))>;
@@ -578,36 +612,7 @@ constexpr auto double_buffered_sort_impl(range auto & source, range auto & buffe
 	} else if constexpr (std::is_arithmetic_v<key_t>) {
 		return containers::detail::double_buffered_numeric_sort(source, buffer, extract_key);
 	} else if constexpr (containers::range<key_t>) {
-		// Currently just sized ranges
-		auto const max_size = [&]{
-			if constexpr (requires { key_t::size(); }) {
-				return key_t::size();
-			} else if constexpr (requires { std::tuple_size<key_t>::value; }) {
-				return std::tuple_size<key_t>::value;
-			} else {
-				// TODO: Support variable-sized ranges
-#if 0
-				return *containers::max_element(
-					containers::transform(
-						source,
-						[](auto const & range) { return containers::size(range); }
-					)
-				);
-#endif
-			}
-		}();
-		bool which = false;
-		for (size_t index = max_size; index > 0; --index) {
-			auto extract_n = [&, index = index - 1](auto && o) {
-				return extract_key(o)[index];
-			};
-			if (which) {
-				which = !containers::detail::double_buffered_sort_impl(buffer, source, extract_n);
-			} else {
-				which = containers::detail::double_buffered_sort_impl(source, buffer, extract_n);
-			}
-		}
-		return which;
+		return containers::detail::double_buffered_range_sort(source, buffer, extract_key);
 	} else if constexpr (tuple_like<key_t>) {
 		return containers::detail::double_buffered_tuple_sort<0U>(source, buffer, extract_key);
 	} else {
