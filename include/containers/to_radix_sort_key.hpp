@@ -5,6 +5,8 @@
 
 #pragma once
 
+#include <containers/is_range.hpp>
+
 #include <bounded/integer.hpp>
 
 #include <cstdint>
@@ -13,6 +15,19 @@
 
 namespace containers {
 namespace detail {
+
+// TODO: Also validate get and tuple_element
+template<typename T>
+concept tuple_like = requires{
+	std::tuple_size<std::decay_t<T>>::value;
+};
+
+template<typename T>
+concept indexable_range =
+	range<T> and (
+		requires(T && value) { OPERATORS_FORWARD(value)[0]; } or
+		requires(T && value) { OPERATORS_FORWARD(value)[bounded::constant<0>]; }
+	);
 
 struct unknown_floating_point;
 template<typename T>
@@ -67,6 +82,17 @@ constexpr auto to_radix_sort_key(T const value) {
 
 auto to_radix_sort_key(auto * ptr) {
 	return reinterpret_cast<std::uintptr_t>(ptr);
+}
+
+// TODO: This should not be the default behavior.
+constexpr auto && to_radix_sort_key(indexable_range auto && value) {
+	return OPERATORS_FORWARD(value);
+}
+
+// TODO: This should not be the default behavior.
+template<tuple_like T> requires(!indexable_range<T>)
+constexpr auto && to_radix_sort_key(T && value) {
+	return OPERATORS_FORWARD(value);
 }
 
 template<typename T>

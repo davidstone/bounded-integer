@@ -44,17 +44,6 @@ constexpr inline auto is_view<range_view<Iterator, Sentinel>> = true;
 template<typename T>
 concept view = is_view<T>;
 
-// TODO: Also validate get and tuple_element
-template<typename T>
-concept tuple_like = requires{
-	std::tuple_size<T>::value;
-};
-
-template<typename T>
-concept indexable =
-	requires(T && value) { OPERATORS_FORWARD(value)[0]; } or
-	requires(T && value) { OPERATORS_FORWARD(value)[bounded::constant<0>]; };
-
 struct PartitionInfo {
 	constexpr PartitionInfo()
 		: count(0)
@@ -160,7 +149,7 @@ struct SubKey<Tuple> : TupleSubKeyWrapper<
 > {
 };
 
-template<typename T> requires (indexable<T> and range<T>)
+template<indexable_range T>
 struct SubKey<T> {
 	static constexpr const T & sub_key(T const & value, BaseListSortData *) {
 		return value;
