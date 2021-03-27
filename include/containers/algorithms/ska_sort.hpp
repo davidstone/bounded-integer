@@ -584,23 +584,22 @@ constexpr bool double_buffered_range_sort(range auto & source, range auto & buff
 	return which;
 }
 
-template<std::size_t index, typename ExtractKey>
-constexpr bool double_buffered_tuple_sort(range auto & source, range auto & buffer, ExtractKey const & extract_key) {
-	using key_t = std::decay_t<decltype(extract_key(containers::front(source)))>;
-	if constexpr (index == std::tuple_size_v<key_t>) {
-		return false;
-	} else {
-		bool const which = containers::detail::double_buffered_tuple_sort<index + 1U>(source, buffer, extract_key);
+template<typename ExtractKey, std::size_t... indexes>
+constexpr bool double_buffered_tuple_sort(range auto & source, range auto & buffer, ExtractKey const & extract_key, std::index_sequence<indexes...>) {
+	auto which = false;
+	auto do_iteration = [&]<auto index>(bounded::constant_t<index>) {
 		using std::get;
 		auto extract_i = [&](auto && o) -> extract_return_type<index, ExtractKey, decltype(o)> {
 			return get<index>(extract_key(o));
 		};
 		if (which) {
-			return !containers::detail::double_buffered_sort_impl(buffer, source, extract_i);
+			which = !containers::detail::double_buffered_sort_impl(buffer, source, extract_i);
 		} else {
-			return containers::detail::double_buffered_sort_impl(source, buffer, extract_i);
+			which = containers::detail::double_buffered_sort_impl(source, buffer, extract_i);
 		}
-	}
+	};
+	(..., do_iteration(bounded::constant<sizeof...(indexes) - indexes - 1>));
+	return which;
 }
 
 template<typename ExtractKey>
@@ -614,7 +613,7 @@ constexpr auto double_buffered_sort_impl(range auto & source, range auto & buffe
 	} else if constexpr (containers::range<key_t>) {
 		return containers::detail::double_buffered_range_sort(source, buffer, extract_key);
 	} else if constexpr (tuple_like<key_t>) {
-		return containers::detail::double_buffered_tuple_sort<0U>(source, buffer, extract_key);
+		return containers::detail::double_buffered_tuple_sort(source, buffer, extract_key, std::make_index_sequence<std::tuple_size_v<key_t>>());
 	} else {
 		return containers::detail::double_buffered_sort_impl(source, buffer, [&](auto && a) -> decltype(auto) {
 			return to_radix_sort_key(extract_key(a));
