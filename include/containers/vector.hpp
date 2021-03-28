@@ -114,7 +114,7 @@ struct vector : private lexicographical_comparison::base {
 			return;
 		}
 		auto temp = storage_type(requested_capacity);
-		containers::uninitialized_move_destroy(
+		containers::uninitialized_relocate(
 			*this,
 			temp.data()
 		);

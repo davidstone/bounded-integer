@@ -40,9 +40,9 @@ constexpr auto insert_or_emplace_with_reallocation(Container & container, typena
 	construct(containers::data(temp) + offset);
 	auto const mutable_position = containers::begin(container) + offset;
 	auto const temp_begin = containers::begin(temp);
-	auto const it = containers::uninitialized_move_destroy(containers::begin(container), mutable_position, temp_begin);
+	auto const it = containers::uninitialized_relocate(containers::begin(container), mutable_position, temp_begin);
 	BOUNDED_ASSERT(temp_begin + offset == it);
-	::containers::uninitialized_move_destroy(mutable_position, containers::end(container), it + number_of_elements);
+	::containers::uninitialized_relocate(mutable_position, containers::end(container), it + number_of_elements);
 	container.append_from_capacity(-original_size);
 	temp.append_from_capacity(original_size + number_of_elements);
 	container = std::move(temp);
@@ -100,7 +100,7 @@ constexpr auto insert(Container & container, typename Container::const_iterator 
 	auto const range_size = ::containers::detail::linear_size(range);
 	if (containers::size(container) + range_size <= container.capacity()) {
 		auto const mutable_position = ::containers::detail::mutable_iterator(container, position);
-		::containers::uninitialized_move_destroy(
+		::containers::uninitialized_relocate(
 			containers::reversed(range_view(mutable_position, containers::end(container))),
 			containers::reverse_iterator(containers::end(container) + range_size)
 		);

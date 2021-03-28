@@ -5,7 +5,7 @@
 
 #pragma once
 
-#include <containers/algorithms/move_destroy_iterator.hpp>
+#include <containers/algorithms/relocate_iterator.hpp>
 #include <containers/algorithms/move_iterator.hpp>
 #include <containers/algorithms/reverse_iterator.hpp>
 #include <containers/begin_end.hpp>
@@ -98,16 +98,16 @@ constexpr auto uninitialized_move_backward(BidirectionalInputIterator const firs
 
 
 template<iterator InputIterator>
-constexpr auto uninitialized_move_destroy(InputIterator const first, sentinel_for<InputIterator> auto const last, iterator auto out) {
+constexpr auto uninitialized_relocate(InputIterator const first, sentinel_for<InputIterator> auto const last, iterator auto out) {
 	return ::containers::uninitialized_copy(
-		::containers::move_destroy_iterator(first),
-		::containers::move_destroy_iterator(last),
+		::containers::relocate_iterator(first),
+		::containers::relocate_iterator(last),
 		out
 	);
 }
 
-constexpr auto uninitialized_move_destroy(range auto && source, iterator auto out) {
-	return ::containers::uninitialized_move_destroy(
+constexpr auto uninitialized_relocate(range auto && source, iterator auto out) {
+	return ::containers::uninitialized_relocate(
 		containers::begin(OPERATORS_FORWARD(source)),
 		containers::end(OPERATORS_FORWARD(source)),
 		out

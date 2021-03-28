@@ -19,7 +19,7 @@
 #include <containers/insert.hpp>
 #include <containers/legacy_iterator.hpp>
 #include <containers/lookup.hpp>
-#include <containers/move_destroy.hpp>
+#include <containers/relocate.hpp>
 #include <containers/size.hpp>
 #include <containers/vector.hpp>
 
@@ -41,10 +41,10 @@ struct map_value_type {
 
 	friend auto operator<=>(map_value_type const & lhs, map_value_type const & rhs) = default;
 
-	friend constexpr auto move_destroy(map_value_type && value) noexcept {
+	friend constexpr auto relocate(map_value_type && value) noexcept {
 		return map_value_type{
-			move_destroy(value.key),
-			move_destroy(value.mapped)
+			relocate(value.key),
+			relocate(value.mapped)
 		};
 	}
 

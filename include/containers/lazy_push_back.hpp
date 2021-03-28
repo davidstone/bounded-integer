@@ -40,7 +40,7 @@ constexpr auto & lazy_push_back(
 		temp.reserve(::containers::detail::reallocation_size(container, 1_bi));
 		construct(*(containers::data(temp) + container.capacity()));
 
-		::containers::uninitialized_move_destroy(container, containers::begin(temp));
+		::containers::uninitialized_relocate(container, containers::begin(temp));
 		container.append_from_capacity(-initial_size);
 
 		temp.append_from_capacity(initial_size + 1_bi);

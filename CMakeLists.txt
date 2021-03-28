@@ -132,7 +132,7 @@ add_library(containers_test STATIC
 	source/containers/algorithms/keyed_insert.cpp
 	source/containers/algorithms/maybe_find.cpp
 	source/containers/algorithms/minmax_element.cpp
-	source/containers/algorithms/move_destroy_iterator.cpp
+	source/containers/algorithms/relocate_iterator.cpp
 	source/containers/algorithms/move_iterator.cpp
 	source/containers/algorithms/negate.cpp
 	source/containers/algorithms/partition.cpp
@@ -180,7 +180,7 @@ add_library(containers_test STATIC
 	source/containers/legacy_iterator.cpp
 	source/containers/lookup.cpp
 	source/containers/maximum_array_size.cpp
-	source/containers/move_destroy.cpp
+	source/containers/relocate.cpp
 	source/containers/mutable_iterator.cpp
 	source/containers/ordered_associative_container.cpp
 	source/containers/pop_back.cpp

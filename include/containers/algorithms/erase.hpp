@@ -8,7 +8,7 @@
 #include <containers/algorithms/remove.hpp>
 #include <containers/algorithms/uninitialized.hpp>
 #include <containers/begin_end.hpp>
-#include <containers/move_destroy.hpp>
+#include <containers/relocate.hpp>
 #include <containers/mutable_iterator.hpp>
 #include <containers/resizable_container.hpp>
 
@@ -41,15 +41,15 @@ constexpr auto erase(Container & container, typename Container::const_iterator c
 		auto const end_ = containers::end(container);
 		auto target = ::containers::detail::mutable_iterator(container, first);
 		auto source = ::containers::detail::mutable_iterator(container, last);
-		// TODO: Write a `move_destroy` algorithm for this loop?
+		// TODO: Write a `relocate` algorithm for this loop?
 		while (target != last and source != end_) {
 			bounded::destroy(*target);
-			bounded::construct(*target, [&]{ return move_destroy(*source); });
+			bounded::construct(*target, [&]{ return relocate(*source); });
 			++target;
 			++source;
 		}
 		if (source != end_) {
-			containers::uninitialized_move_destroy(target, source, end_);
+			containers::uninitialized_relocate(target, source, end_);
 		} else {
 			containers::detail::destroy_range(target, last);
 		}

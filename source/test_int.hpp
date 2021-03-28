@@ -69,7 +69,7 @@ struct test_int {
 	friend constexpr auto operator==(test_int const & lhs, test_int const & rhs) -> bool {
 		return lhs.value() == rhs.value();
 	}
-	friend constexpr auto move_destroy(test_int && x) noexcept {
+	friend constexpr auto relocate(test_int && x) noexcept {
 		BOUNDED_TEST(!x.m_moved_from);
 		return test_int(std::move(x), tag());
 	}

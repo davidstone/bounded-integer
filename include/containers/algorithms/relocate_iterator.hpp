@@ -7,16 +7,16 @@
 
 #include <containers/algorithms/transform_iterator.hpp>
 
-#include <containers/move_destroy.hpp>
+#include <containers/relocate.hpp>
 
 #include <type_traits>
 
 namespace containers {
 
-constexpr auto move_destroy_iterator(iterator auto it_) {
+constexpr auto relocate_iterator(iterator auto it_) {
 	return ::containers::transform_iterator_dereference(it_, [](decltype(it_) const it) noexcept {
 		if constexpr (std::is_reference_v<decltype(*it)>) {
-			return move_destroy(*it);
+			return relocate(*it);
 		} else {
 			return *it;
 		}

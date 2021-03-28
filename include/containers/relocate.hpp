@@ -13,18 +13,17 @@
 
 namespace containers {
 
-// TODO: Integrate this with "relocate"
-constexpr auto move_destroy(auto && ref) noexcept {
+constexpr auto relocate(auto && ref) noexcept {
 	using T = std::remove_reference_t<decltype(ref)>;
-	static_assert(std::is_nothrow_move_constructible_v<T>, "Please provide a noexcept move_destroy overload for your type or mark its move constructor noexcept.");
+	static_assert(std::is_nothrow_move_constructible_v<T>, "Please provide a noexcept relocate overload for your type or mark its move constructor noexcept.");
 	static_assert(std::is_nothrow_destructible_v<T>, "Do not mark your destructor as noexcept(false)");
 	auto result = std::move(ref);
 	bounded::destroy(ref);
 	return result;
 }
 
-constexpr auto move_destroy(auto & ref) noexcept {
-	return move_destroy(std::move(ref));
+constexpr auto relocate(auto & ref) noexcept {
+	return relocate(std::move(ref));
 }
 
 } // namespace containers

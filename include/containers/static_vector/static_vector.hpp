@@ -51,7 +51,7 @@ struct static_vector_data : private lexicographical_comparison::base {
 			containers::uninitialized_copy(other, begin());
 			this->m_size = other.m_size;
 		} else {
-			containers::uninitialized_move_destroy(other, begin());
+			containers::uninitialized_relocate(other, begin());
 			this->m_size = std::exchange(other.m_size, 0_bi);
 		}
 	}

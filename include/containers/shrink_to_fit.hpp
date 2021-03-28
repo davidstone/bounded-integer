@@ -5,7 +5,7 @@
 
 #pragma once
 
-#include <containers/algorithms/move_destroy_iterator.hpp>
+#include <containers/algorithms/relocate_iterator.hpp>
 #include <containers/begin_end.hpp>
 #include <containers/is_range.hpp>
 #include <containers/range_view.hpp>
@@ -22,8 +22,8 @@ constexpr auto shrink_to_fit(Container & c) {
 		return;
 	}
 	auto temp = Container(range_view(
-		::containers::move_destroy_iterator(containers::begin(c)),
-		::containers::move_destroy_iterator(containers::end(c))
+		::containers::relocate_iterator(containers::begin(c)),
+		::containers::relocate_iterator(containers::end(c))
 	));
 	c.append_from_capacity(-s);
 	c = std::move(temp);
