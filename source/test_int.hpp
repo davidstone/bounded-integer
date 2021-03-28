@@ -69,16 +69,16 @@ struct test_int {
 	friend constexpr auto operator==(test_int const & lhs, test_int const & rhs) -> bool {
 		return lhs.value() == rhs.value();
 	}
-	friend constexpr auto relocate(test_int && x) noexcept {
+	friend constexpr auto relocate(test_int & x) noexcept {
 		BOUNDED_TEST(!x.m_moved_from);
-		return test_int(std::move(x), tag());
+		return test_int(x, tag());
 	}
 	friend constexpr auto to_radix_sort_key(test_int const & x) {
 		return x.value();
 	}
 private:
 	struct tag{};
-	constexpr test_int(test_int && other, tag) noexcept:
+	constexpr test_int(test_int & other, tag) noexcept:
 		m_value(other.m_value)
 	{
 	}

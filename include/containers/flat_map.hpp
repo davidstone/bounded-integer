@@ -41,7 +41,7 @@ struct map_value_type {
 
 	friend auto operator<=>(map_value_type const & lhs, map_value_type const & rhs) = default;
 
-	friend constexpr auto relocate(map_value_type && value) noexcept {
+	friend constexpr auto relocate(map_value_type & value) noexcept {
 		return map_value_type{
 			relocate(value.key),
 			relocate(value.mapped)
