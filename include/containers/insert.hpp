@@ -27,7 +27,7 @@ namespace containers {
 namespace detail {
 
 template<typename Container>
-constexpr auto insert_or_emplace_with_reallocation(Container & container, typename Container::const_iterator const position, auto const number_of_elements, auto construct) {
+constexpr auto insert_with_reallocation(Container & container, typename Container::const_iterator const position, auto const number_of_elements, auto construct) {
 	// There is a reallocation required, so just put everything in the
 	// correct place to begin with
 	auto const original_size = containers::size(container);
@@ -76,7 +76,7 @@ constexpr auto lazy_insert(
 		bounded::destroy(ref);
 		bounded::construct(ref, OPERATORS_FORWARD(constructor));
 	} else if constexpr (detail::reservable<Container>) {
-		::containers::detail::insert_or_emplace_with_reallocation(container, position, 1_bi, [&](auto const ptr) {
+		::containers::detail::insert_with_reallocation(container, position, 1_bi, [&](auto const ptr) {
 			bounded::construct(*ptr, OPERATORS_FORWARD(constructor));
 		});
 	} else {
@@ -108,7 +108,7 @@ constexpr auto insert(Container & container, typename Container::const_iterator 
 		container.append_from_capacity(range_size);
 		return mutable_position;
 	} else if constexpr (detail::reservable<Container>) {
-		return ::containers::detail::insert_or_emplace_with_reallocation(container, position, range_size, [&](auto const ptr) {
+		return ::containers::detail::insert_with_reallocation(container, position, range_size, [&](auto const ptr) {
 			::containers::uninitialized_copy(OPERATORS_FORWARD(range), ptr);
 		});
 	} else {
