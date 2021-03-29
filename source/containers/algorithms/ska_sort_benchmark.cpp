@@ -16,7 +16,6 @@
 #include <containers/vector.hpp>
 
 #include <bounded/detail/tuple.hpp>
-#include <bounded/copy.hpp>
 
 #include <benchmark/benchmark.h>
 
@@ -35,7 +34,7 @@ constexpr void inplace_radix_sort(range auto && to_sort, auto extract_key) {
 }
 
 constexpr void inplace_radix_sort(range auto && to_sort) {
-	inplace_radix_sort(to_sort, bounded::identity);
+	inplace_radix_sort(to_sort, containers::to_radix_sort_key);
 }
 
 #define SKA_SORT_NOINLINE __attribute__((noinline))
@@ -177,7 +176,7 @@ void american_flag_sort(range auto && to_sort, auto && extract_key) {
 }
 
 void american_flag_sort(range auto && to_sort) {
-	american_flag_sort(to_sort, bounded::identity);
+	american_flag_sort(to_sort, containers::to_radix_sort_key);
 }
 
 void benchmark_american_flag_sort(benchmark::State & state, auto create) {

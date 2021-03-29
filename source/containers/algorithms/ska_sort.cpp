@@ -17,6 +17,7 @@
 
 #include <bounded/detail/tuple.hpp>
 #include <bounded/copy.hpp>
+#include <bounded/detail/overload.hpp>
 
 #include <deque>
 #include <random>
@@ -28,6 +29,8 @@
 namespace {
 
 using namespace containers;
+
+constexpr auto default_copy = [](auto && value) { return to_radix_sort_key(OPERATORS_FORWARD(value)); };
 
 template<typename T, std::size_t size, std::size_t... indexes>
 constexpr auto copy_from_c_array(c_array<T, size> const & original, std::index_sequence<indexes...>) {
@@ -61,8 +64,8 @@ constexpr bool test_sort(auto original, auto const & expected, auto function) {
 }
 
 constexpr bool test_sort(auto original, auto const & expected) {
-	test_sort(original, expected, bounded::identity);
-	test_sort(std::move(original), expected, bounded::copy);
+	test_sort(original, expected, to_radix_sort_key);
+	test_sort(std::move(original), expected, default_copy);
 	return true;
 }
 
@@ -78,8 +81,8 @@ constexpr bool test_sort(c_array<T, size> const & original, c_array<T, size> con
 
 template<typename T, std::size_t size>
 constexpr bool test_sort(c_array<T, size> const & original, c_array<T, size> const & expected) {
-	test_sort(original, expected, bounded::identity);
-	test_sort(original, expected, bounded::copy);
+	test_sort(original, expected, containers::to_radix_sort_key);
+	test_sort(original, expected, default_copy);
 	return true;
 }
 
@@ -87,8 +90,8 @@ template<typename T, std::size_t size>
 constexpr bool test_common_prefix(c_array<T, size> const & source, std::ptrdiff_t const start_index, std::size_t const expected) {
 	auto const prefix = containers::detail::common_prefix(
 		containers::range_view(source),
-		bounded::identity,
-		bounded::identity,
+		to_radix_sort_key,
+		to_radix_sort_key,
 		start_index
 	);
 	BOUNDED_TEST(prefix == expected);
@@ -511,7 +514,6 @@ static_assert(test_sort<std::array<int, 4>>(
 	}
 ));
 
-template<bool by_value>
 struct move_only {
 	move_only() = default;
 
@@ -527,8 +529,8 @@ struct move_only {
 
 	friend constexpr auto operator<=>(move_only const &, move_only const &) = default;
 
-	friend constexpr auto to_radix_sort_key(move_only const & arg) -> std::conditional_t<by_value, int, int const &> {
-		return arg.m_value.value();
+	friend constexpr auto to_radix_sort_key(move_only const & arg) {
+		return containers::to_radix_sort_key(arg.m_value.value());
 	}
 
 private:
@@ -536,13 +538,13 @@ private:
 };
 
 static_assert(test_sort_copy(
-	containers::array<move_only<true>, 4>{
+	containers::array<move_only, 4>{
 		5,
 		0,
 		1234567,
 		-1000,
 	},
-	containers::array<move_only<true>, 4>{
+	containers::array<move_only, 4>{
 		-1000,
 		0,
 		5,
@@ -552,13 +554,13 @@ static_assert(test_sort_copy(
 ));
 
 static_assert(test_sort_inplace(
-	containers::array<move_only<true>, 4>{
+	containers::array<move_only, 4>{
 		5,
 		0,
 		1234567,
 		-1000,
 	},
-	containers::array<move_only<true>, 4>{
+	containers::array<move_only, 4>{
 		-1000,
 		0,
 		5,
@@ -616,7 +618,7 @@ static_assert(test_sort_inplace(
 		"There",
 		"World!",
 	},
-	bounded::identity
+	containers::to_radix_sort_key
 ));
 static_assert(test_sort_inplace(
 	std::array<std::string_view, 8>{
@@ -639,7 +641,7 @@ static_assert(test_sort_inplace(
 		"There",
 		"World!",
 	},
-	bounded::copy
+	default_copy
 ));
 
 // Work around https://gcc.gnu.org/bugzilla/show_bug.cgi?id=99018
@@ -668,7 +670,7 @@ static_assert(
 			containers::vector({2, 3, 2, 4, 5}),
 			containers::vector({3, 2, 4, 5}),
 		}),
-		bounded::identity
+		containers::to_radix_sort_key
 	)
 );
 
@@ -696,7 +698,7 @@ static_assert(
 			containers::vector({2, 3, 2, 4, 5}),
 			containers::vector({3, 2, 4, 5}),
 		}),
-		bounded::copy
+		default_copy
 	)
 );
 
@@ -726,7 +728,7 @@ static_assert(
 			containers::vector<containers::string>({"time"}),
 			containers::vector<containers::string>({"to", "pass"}),
 		}),
-		bounded::identity
+		containers::to_radix_sort_key
 	)
 );
 
@@ -750,7 +752,7 @@ static_assert(
 			containers::vector<containers::string>({"hi", "there", "you"}),
 			containers::vector<containers::string>({"to", "pass"}),
 		}),
-		bounded::copy
+		default_copy
 	)
 );
 
@@ -796,7 +798,7 @@ static_assert(
 			{"test", "the"},
 			{"you", "are"},
 		}),
-		bounded::identity
+		containers::to_radix_sort_key
 	)
 );
 
@@ -842,14 +844,13 @@ static_assert(
 			{"test", "the"},
 			{"you", "are"},
 		}),
-		bounded::copy
+		default_copy
 	)
 );
 #endif
 
-template<bool by_value>
 struct wrapper {
-	move_only<by_value> value;
+	move_only value;
 	friend constexpr auto operator==(wrapper const & lhs, wrapper const & rhs) -> bool {
 		return to_radix_sort_key(lhs.value) == to_radix_sort_key(rhs.value);
 	}
@@ -858,21 +859,24 @@ struct wrapper {
 	}
 };
 
-constexpr auto get_value_member = [](auto const & w) { return bounded::tie(w.value); };
+constexpr auto get_value_member = bounded::overload(
+	[](wrapper const & w) { return bounded::tie(w.value); },
+	[](move_only const & m) { return to_radix_sort_key(m); }
+);
 static_assert(test_sort_copy(
-	containers::array<wrapper<true>, 5>{
-		wrapper<true>{2},
-		wrapper<true>{3},
-		wrapper<true>{1},
-		wrapper<true>{5},
-		wrapper<true>{4},
+	containers::array<wrapper, 5>{
+		wrapper{2},
+		wrapper{3},
+		wrapper{1},
+		wrapper{5},
+		wrapper{4},
 	},
-	containers::array<wrapper<true>, 5>{
-		wrapper<true>{1},
-		wrapper<true>{2},
-		wrapper<true>{3},
-		wrapper<true>{4},
-		wrapper<true>{5},
+	containers::array<wrapper, 5>{
+		wrapper{1},
+		wrapper{2},
+		wrapper{3},
+		wrapper{4},
+		wrapper{5},
 	},
 	get_value_member
 ));

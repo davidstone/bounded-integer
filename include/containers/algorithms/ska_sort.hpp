@@ -15,14 +15,12 @@
 #include <containers/at.hpp>
 #include <containers/begin_end.hpp>
 #include <containers/legacy_iterator.hpp>
-#include <containers/is_range.hpp>
 #include <containers/is_iterator_sentinel.hpp>
 #include <containers/size.hpp>
 #include <containers/to_radix_sort_key.hpp>
 
 #include <bounded/detail/copy_cv_ref.hpp>
 #include <operators/forward.hpp>
-#include <bounded/identity.hpp>
 
 #include <array>
 #include <climits>
@@ -96,7 +94,7 @@ struct SubKey<T &&> : SubKey<T> {
 template<typename T> requires(std::is_unsigned_v<T>)
 struct SubKey<T> {
 	static constexpr auto sub_key(T const value, BaseListSortData *) {
-		return to_radix_sort_key(value);
+		return value;
 	}
 
 	using next = SubKey<void>;
@@ -467,20 +465,42 @@ namespace extract {
 
 using std::get;
 
-template<std::size_t index, typename ExtractKey, typename T>
+template<typename T, std::size_t index, typename OriginalExtractor, typename CurrentExtractor>
 struct return_type_impl {
 private:
-	using tuple = decltype(std::declval<ExtractKey &>()(std::declval<T &>()));
-	using reference_type = decltype(get<index>(std::declval<tuple>()));
-	using value_type = bounded::detail::copy_cv_ref<tuple, std::tuple_element_t<index, std::decay_t<tuple>>>;
+	using tuple = decltype(std::declval<CurrentExtractor const &>()(std::declval<T &&>()));
+	using element_type = std::tuple_element_t<index, std::decay_t<tuple>>;
+	using get_type = decltype(get<index>(std::declval<tuple>()));
+	using translated_type = decltype(std::declval<OriginalExtractor const &>()(std::declval<get_type>()));
+	static constexpr auto force_value =
+		!std::is_reference_v<get_type> or
+		(!std::is_reference_v<tuple> and !std::is_reference_v<element_type>);
 public:
-	using type = std::conditional_t<std::is_reference_v<tuple>, reference_type, value_type>;
+	using type = std::conditional_t<force_value, std::decay_t<translated_type>, translated_type>;
 };
 
 } // namespace extract
 
-template<std::size_t index, typename ExtractKey, typename T>
-using extract_return_type = typename extract::return_type_impl<index, ExtractKey, T>::type;
+template<typename T, std::size_t index, typename OriginalExtractor, typename CurrentExtractor>
+using extract_return_type_tuple = typename extract::return_type_impl<T, index, OriginalExtractor, CurrentExtractor>::type;
+
+
+template<typename T, typename OriginalExtractor, typename CurrentExtractor>
+struct extract_return_type_range_impl {
+private:
+	using range = decltype(std::declval<CurrentExtractor const &>()(std::declval<T &&>()));
+	using get_type = decltype(std::declval<range>()[0]);
+	using translated_type = decltype(std::declval<OriginalExtractor const &>()(std::declval<get_type>()));
+	// TODO: This doesn't work properly with range views
+	static constexpr auto force_value =
+		!std::is_reference_v<get_type> or
+		!std::is_reference_v<range>;
+public:
+	using type = std::conditional_t<force_value, std::decay_t<translated_type>, translated_type>;
+};
+
+template<typename T, typename OriginalExtractor, typename CurrentExtractor>
+using extract_return_type_range = typename extract_return_type_range_impl<T, OriginalExtractor, CurrentExtractor>::type;
 
 
 constexpr void bool_sort_copy(auto & source, auto & output, auto const & extract_key) {
@@ -507,7 +527,7 @@ constexpr bool double_buffered_numeric_sort(Source & source, Buffer & buffer, Ex
 	auto counts = std::array<std::array<std::size_t, 256>, size>();
 
 	for (auto const & value : source) {
-		auto key = to_radix_sort_key(extract_key(value));
+		auto key = extract_key(value);
 		for (std::size_t index = 0U; index != size; ++index) {
 			auto const inner_index = (key >> (index * 8U)) & 0xFFU;
 			++counts[index][inner_index];
@@ -524,7 +544,7 @@ constexpr bool double_buffered_numeric_sort(Source & source, Buffer & buffer, Ex
 	for (std::size_t index = 0U; index != size; ) {
 		auto sort_segment_copy = [&](auto & current, auto & next) {
 			for (auto && value : current) {
-				auto const key = static_cast<std::uint8_t>(to_radix_sort_key(extract_key(value)) >> (index * 8U));
+				auto const key = static_cast<std::uint8_t>(extract_key(value) >> (index * 8U));
 				next[containers::index_type<Buffer>(counts[index][key]++)] = std::move(value);
 			}
 			++index;
@@ -537,11 +557,11 @@ constexpr bool double_buffered_numeric_sort(Source & source, Buffer & buffer, Ex
 	return size % 2U == 1U;
 }
 
-template<typename ExtractKey>
-constexpr auto double_buffered_sort_impl(range auto & source, range auto & buffer, ExtractKey const & extract_key) -> bool;
+constexpr auto double_buffered_sort_impl(range auto & source, range auto & buffer, auto const & original_extractor, auto const & current_extractor) -> bool;
 
-constexpr bool double_buffered_range_sort(range auto & source, range auto & buffer, auto const & extract_key) {
-	using key_t = std::decay_t<decltype(extract_key(containers::front(source)))>;
+template<typename OriginalExtractor, typename CurrentExtractor, std::size_t... indexes>
+constexpr bool double_buffered_range_sort(range auto & source, range auto & buffer, OriginalExtractor const & original_extractor, CurrentExtractor const & current_extractor) {
+	using key_t = std::decay_t<decltype(current_extractor(containers::front(source)))>;
 	// Currently just sized ranges
 	auto const max_size = [&]{
 		if constexpr (requires { key_t::size(); }) {
@@ -561,53 +581,50 @@ constexpr bool double_buffered_range_sort(range auto & source, range auto & buff
 		}
 	}();
 	bool which = false;
-	for (size_t index = max_size; index > 0; --index) {
-		auto extract_n = [&, index = index - 1](auto && o) {
-			return extract_key(o)[index];
+	for (std::size_t iteration = 0; iteration != max_size; ++iteration) {
+		auto extract_index = [&, index = max_size - iteration - 1](auto && value) -> decltype(auto) {
+			return static_cast<extract_return_type_range<decltype(value), OriginalExtractor, CurrentExtractor>>(original_extractor(current_extractor(OPERATORS_FORWARD(value))[index]));
 		};
 		if (which) {
-			which = !containers::detail::double_buffered_sort_impl(buffer, source, extract_n);
+			which = !containers::detail::double_buffered_sort_impl(buffer, source, original_extractor, extract_index);
 		} else {
-			which = containers::detail::double_buffered_sort_impl(source, buffer, extract_n);
+			which = containers::detail::double_buffered_sort_impl(source, buffer, original_extractor, extract_index);
 		}
 	}
 	return which;
 }
 
-template<typename ExtractKey, std::size_t... indexes>
-constexpr bool double_buffered_tuple_sort(range auto & source, range auto & buffer, ExtractKey const & extract_key, std::index_sequence<indexes...>) {
+template<typename OriginalExtractor, typename CurrentExtractor, std::size_t... indexes>
+constexpr bool double_buffered_tuple_sort(range auto & source, range auto & buffer, OriginalExtractor const & original_extractor, CurrentExtractor const & current_extractor, std::index_sequence<indexes...>) {
 	auto which = false;
 	auto do_iteration = [&]<auto index>(bounded::constant_t<index>) {
 		using std::get;
-		auto extract_i = [&](auto && o) -> extract_return_type<index, ExtractKey, decltype(o)> {
-			return get<index>(extract_key(o));
+		auto extract_index = [&](auto && value) -> decltype(auto) {
+			using std::get;
+			return static_cast<extract_return_type_tuple<decltype(value), index, OriginalExtractor, CurrentExtractor>>(original_extractor(get<index>(current_extractor(OPERATORS_FORWARD(value)))));
 		};
 		if (which) {
-			which = !containers::detail::double_buffered_sort_impl(buffer, source, extract_i);
+			which = !containers::detail::double_buffered_sort_impl(buffer, source, original_extractor, extract_index);
 		} else {
-			which = containers::detail::double_buffered_sort_impl(source, buffer, extract_i);
+			which = containers::detail::double_buffered_sort_impl(source, buffer, original_extractor, extract_index);
 		}
 	};
 	(..., do_iteration(bounded::constant<sizeof...(indexes) - indexes - 1>));
 	return which;
 }
 
-template<typename ExtractKey>
-constexpr auto double_buffered_sort_impl(range auto & source, range auto & buffer, ExtractKey const & extract_key) -> bool {
-	using key_t = std::decay_t<decltype(extract_key(containers::front(source)))>;
+constexpr auto double_buffered_sort_impl(range auto & source, range auto & buffer, auto const & original_extractor, auto const & current_extractor) -> bool {
+	using key_t = std::decay_t<decltype(current_extractor(containers::front(source)))>;
 	if constexpr (std::is_same_v<key_t, bool>) {
-		containers::detail::bool_sort_copy(source, buffer, extract_key);
+		containers::detail::bool_sort_copy(source, buffer, current_extractor);
 		return true;
-	} else if constexpr (std::is_arithmetic_v<key_t>) {
-		return containers::detail::double_buffered_numeric_sort(source, buffer, extract_key);
+	} else if constexpr (std::is_unsigned_v<key_t>) {
+		return containers::detail::double_buffered_numeric_sort(source, buffer, current_extractor);
 	} else if constexpr (containers::range<key_t>) {
-		return containers::detail::double_buffered_range_sort(source, buffer, extract_key);
-	} else if constexpr (tuple_like<key_t>) {
-		return containers::detail::double_buffered_tuple_sort(source, buffer, extract_key, std::make_index_sequence<std::tuple_size_v<key_t>>());
+		return containers::detail::double_buffered_range_sort(source, buffer, original_extractor, current_extractor);
 	} else {
-		return containers::detail::double_buffered_sort_impl(source, buffer, [&](auto && a) -> decltype(auto) {
-			return to_radix_sort_key(extract_key(a));
-		});
+		static_assert(tuple_like<key_t>);
+		return containers::detail::double_buffered_tuple_sort(source, buffer, original_extractor, current_extractor, std::make_index_sequence<std::tuple_size_v<key_t>>());
 	}
 }
 
@@ -618,7 +635,7 @@ struct ska_sort_t {
 		containers::detail::inplace_radix_sort<1024>(containers::range_view(to_sort), extract_key);
 	}
 	constexpr void operator()(range auto && to_sort) const {
-		operator()(to_sort, bounded::identity);
+		operator()(to_sort, to_radix_sort_key);
 	}
 } inline constexpr ska_sort;
 
@@ -634,12 +651,12 @@ struct double_buffered_ska_sort_t {
 			// rvalue code into a single instantiation and to let the tuple version
 			// be recursive with the main function. We need to accept rvalues so
 			// that users can easily pass in view types.
-			return detail::double_buffered_sort_impl(source, buffer, extract_key);
+			return detail::double_buffered_sort_impl(source, buffer, extract_key, extract_key);
 		}
 	}
 
 	constexpr auto operator()(range auto && source, range auto && buffer) const -> bool {
-		return operator()(source, buffer, bounded::identity);
+		return operator()(source, buffer, to_radix_sort_key);
 	}
 } inline constexpr double_buffered_ska_sort;
 
@@ -656,7 +673,7 @@ constexpr inline struct unique_ska_sort_t {
 		);
 	}
 	constexpr void operator()(range auto & to_sort) const {
-		operator()(to_sort, bounded::identity);
+		operator()(to_sort, to_radix_sort_key);
 	}
 } unique_ska_sort;
 

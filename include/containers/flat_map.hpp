@@ -331,7 +331,7 @@ public:
 }	// namespace detail
 
 
-template<typename Container, typename ExtractKey = bounded::identity_t>
+template<typename Container, typename ExtractKey = to_radix_sort_key_t>
 class basic_flat_map : private detail::flat_map_base<Container, ExtractKey, false> {
 private:
 	using base = detail::flat_map_base<Container, ExtractKey, false>;
@@ -370,7 +370,7 @@ public:
 	}
 };
 
-template<typename Container, typename ExtractKey = bounded::identity_t>
+template<typename Container, typename ExtractKey = to_radix_sort_key_t>
 class basic_flat_multimap : private detail::flat_map_base<Container, ExtractKey, true> {
 private:
 	using base = detail::flat_map_base<Container, ExtractKey, true>;
