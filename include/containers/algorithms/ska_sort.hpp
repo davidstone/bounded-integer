@@ -15,7 +15,9 @@
 #include <containers/at.hpp>
 #include <containers/begin_end.hpp>
 #include <containers/legacy_iterator.hpp>
+#include <containers/integer_range.hpp>
 #include <containers/is_iterator_sentinel.hpp>
+#include <containers/algorithms/reverse_iterator.hpp>
 #include <containers/size.hpp>
 #include <containers/to_radix_sort_key.hpp>
 
@@ -581,8 +583,8 @@ constexpr bool double_buffered_range_sort(range auto & source, range auto & buff
 		}
 	}();
 	bool which = false;
-	for (std::size_t iteration = 0; iteration != max_size; ++iteration) {
-		auto extract_index = [&, index = max_size - iteration - 1](auto && value) -> decltype(auto) {
+	for (auto const index : containers::reversed(containers::integer_range(max_size))) {
+		auto extract_index = [&](auto && value) -> decltype(auto) {
 			return static_cast<extract_return_type_range<decltype(value), OriginalExtractor, CurrentExtractor>>(original_extractor(current_extractor(OPERATORS_FORWARD(value))[index]));
 		};
 		if (which) {
