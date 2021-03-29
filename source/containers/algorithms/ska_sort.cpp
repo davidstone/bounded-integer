@@ -57,6 +57,16 @@ constexpr bool test_sort_inplace(auto source, auto const & expected, auto functi
 	return true;
 }
 
+template<typename T, std::size_t size>
+constexpr bool test_sort_inplace(c_array<T, size> const & original_, c_array<T, size> const & expected_) {
+	constexpr auto indexes = std::make_index_sequence<size>{};
+	auto const original = copy_from_c_array(original_, indexes);
+	auto const expected = copy_from_c_array(expected_, indexes);
+	test_sort_inplace(original, expected, to_radix_sort_key);
+	test_sort_inplace(original, expected, default_copy);
+	return true;
+}
+
 constexpr bool test_sort(auto original, auto const & expected, auto function) {
 	test_sort_copy(original, expected, function);
 	test_sort_inplace(std::move(original), expected, std::move(function));
@@ -597,8 +607,8 @@ static_assert(test_sort<bounded::tuple<bool, bounded::tuple<int, bounded::tuple<
 
 static_assert(containers::range<std::string>);
 
-static_assert(test_sort_inplace(
-	containers::array<std::string_view, 8>{
+static_assert(test_sort_inplace<std::string_view>(
+	{
 		"Hi",
 		"There",
 		"Hello",
@@ -608,7 +618,7 @@ static_assert(test_sort_inplace(
 		"Baz",
 		"",
 	},
-	containers::array<std::string_view, 8>{
+	{
 		"",
 		"Bar",
 		"Baz",
@@ -617,88 +627,35 @@ static_assert(test_sort_inplace(
 		"Hi",
 		"There",
 		"World!",
-	},
-	containers::to_radix_sort_key
-));
-static_assert(test_sort_inplace(
-	std::array<std::string_view, 8>{
-		"Hi",
-		"There",
-		"Hello",
-		"World!",
-		"Foo",
-		"Bar",
-		"Baz",
-		"",
-	},
-	std::array<std::string_view, 8>{
-		"",
-		"Bar",
-		"Baz",
-		"Foo",
-		"Hello",
-		"Hi",
-		"There",
-		"World!",
-	},
-	default_copy
+	}
 ));
 
 // Work around https://gcc.gnu.org/bugzilla/show_bug.cgi?id=99018
 #if !defined __GNUC__ or defined __clang__
 static_assert(
-	test_sort_inplace(
-		containers::vector({
-			containers::vector({1, 2, 3}),
-			containers::vector({1, 2, 2}),
-			containers::vector({1, 3, 2}),
-			containers::vector({2, 3, 2}),
-			containers::vector({2, 3, 2, 4}),
-			containers::vector({2, 3, 2, 4, 5}),
-			containers::vector({3, 2, 4, 5}),
-			containers::vector({1}),
-			containers::vector<int>(),
-		}),
-		containers::vector({
-			containers::vector<int>(),
-			containers::vector({1}),
-			containers::vector({1, 2, 2}),
-			containers::vector({1, 2, 3}),
-			containers::vector({1, 3, 2}),
-			containers::vector({2, 3, 2}),
-			containers::vector({2, 3, 2, 4}),
-			containers::vector({2, 3, 2, 4, 5}),
-			containers::vector({3, 2, 4, 5}),
-		}),
-		containers::to_radix_sort_key
-	)
-);
-
-static_assert(
-	test_sort_inplace(
-		containers::vector({
-			containers::vector({1, 2, 3}),
-			containers::vector({1, 2, 2}),
-			containers::vector({1, 3, 2}),
-			containers::vector({2, 3, 2}),
-			containers::vector({2, 3, 2, 4}),
-			containers::vector({2, 3, 2, 4, 5}),
-			containers::vector({3, 2, 4, 5}),
-			containers::vector({1}),
-			containers::vector<int>(),
-		}),
-		containers::vector({
-			containers::vector<int>(),
-			containers::vector({1}),
-			containers::vector({1, 2, 2}),
-			containers::vector({1, 2, 3}),
-			containers::vector({1, 3, 2}),
-			containers::vector({2, 3, 2}),
-			containers::vector({2, 3, 2, 4}),
-			containers::vector({2, 3, 2, 4, 5}),
-			containers::vector({3, 2, 4, 5}),
-		}),
-		default_copy
+	test_sort_inplace<containers::vector<int>>(
+		{
+			{{1, 2, 3}},
+			{{1, 2, 2}},
+			{{1, 3, 2}},
+			{{2, 3, 2}},
+			{{2, 3, 2, 4}},
+			{{2, 3, 2, 4, 5}},
+			{{3, 2, 4, 5}},
+			{{1}},
+			{{}},
+		},
+		{
+			{{}},
+			{{1}},
+			{{1, 2, 2}},
+			{{1, 2, 3}},
+			{{1, 3, 2}},
+			{{2, 3, 2}},
+			{{2, 3, 2, 4}},
+			{{2, 3, 2, 4, 5}},
+			{{3, 2, 4, 5}},
+		}
 	)
 );
 
