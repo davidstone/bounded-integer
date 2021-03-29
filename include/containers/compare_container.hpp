@@ -7,11 +7,13 @@
 
 #include <containers/algorithms/compare.hpp>
 
+#include <bounded/detail/comparison.hpp>
+
 namespace containers {
 namespace range_equality {
 
 struct base {
-	template<range T>
+	template<range T> requires bounded::equality_comparable<typename T::value_type>
 	friend constexpr auto operator==(T const & lhs, T const & rhs) -> bool {
 		return ::containers::equal(lhs, rhs);
 	}
@@ -22,11 +24,11 @@ struct base {
 namespace lexicographical_comparison {
 
 struct base {
-	template<range T>
+	template<range T> requires bounded::ordered<typename T::value_type>
 	friend constexpr auto operator<=>(T const & lhs, T const & rhs) {
 		return ::containers::lexicographical_compare_3way(lhs, rhs);
 	}
-	template<range T>
+	template<range T> requires bounded::equality_comparable<typename T::value_type>
 	friend constexpr auto operator==(T const & lhs, T const & rhs) -> bool {
 		return ::containers::equal(lhs, rhs);
 	}
@@ -37,11 +39,11 @@ struct base {
 namespace shortlex_comparison {
 
 struct base {
-	template<range T>
+	template<range T> requires bounded::ordered<typename T::value_type>
 	friend constexpr auto operator<=>(T const & lhs, T const & rhs) {
 		return ::containers::shortlex_compare(lhs, rhs);
 	}
-	template<range T>
+	template<range T> requires bounded::equality_comparable<typename T::value_type>
 	friend constexpr auto operator==(T const & lhs, T const & rhs) -> bool {
 		return ::containers::equal(lhs, rhs);
 	}
