@@ -24,6 +24,7 @@
 #include <operators/forward.hpp>
 #include <bounded/identity.hpp>
 
+#include <array>
 #include <climits>
 #include <cstdint>
 #include <cstring>

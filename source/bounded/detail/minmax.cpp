@@ -9,6 +9,8 @@
 #include "../homogeneous_equals.hpp"
 #include "../string_view.hpp"
 
+#include <memory>
+
 namespace {
 
 namespace check_single_argument_minmax {
