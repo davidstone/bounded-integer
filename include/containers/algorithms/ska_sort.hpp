@@ -341,7 +341,9 @@ constexpr size_t common_prefix(
 	auto && element_key,
 	typename std::iterator_traits<decltype(containers::begin(extract_key(containers::front(to_sort))))>::difference_type const start_index
 ) {
-	BOUNDED_ASSERT(!containers::is_empty(to_sort));
+	if (containers::is_empty(to_sort)) {
+		return 0;
+	}
 	auto const first = containers::begin(to_sort);
 	auto const last = containers::end(to_sort);
 	auto const & first_range = extract_key(*first);
