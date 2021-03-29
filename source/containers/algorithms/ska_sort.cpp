@@ -660,150 +660,70 @@ static_assert(
 );
 
 static_assert(
-	test_sort_inplace(
-		containers::vector({
-			containers::vector<containers::string>({"hi", "there", "you"}),
-			containers::vector<containers::string>({"are", "probably", "not", "going"}),
-			containers::vector<containers::string>({"to", "pass"}),
-			containers::vector<containers::string>({""}),
-			containers::vector<containers::string>(),
-			containers::vector<containers::string>({"this", "test", "the", "first"}),
-			containers::vector<containers::string>({"time"}),
-			containers::vector<containers::string>({"oh it did pass", "n", "e", "a", "t!"}),
-			containers::vector<containers::string>({"hi", "there", "I", "added", "more", "tests"}),
-			containers::vector<containers::string>({"hi", "there", "needed", "the", "same", "prefix"}),
-		}),
-		containers::vector({
-			containers::vector<containers::string>(),
-			containers::vector<containers::string>({""}),
-			containers::vector<containers::string>({"are", "probably", "not", "going"}),
-			containers::vector<containers::string>({"hi", "there", "I", "added", "more", "tests"}),
-			containers::vector<containers::string>({"hi", "there", "needed", "the", "same", "prefix"}),
-			containers::vector<containers::string>({"hi", "there", "you"}),
-			containers::vector<containers::string>({"oh it did pass", "n", "e", "a", "t!"}),
-			containers::vector<containers::string>({"this", "test", "the", "first"}),
-			containers::vector<containers::string>({"time"}),
-			containers::vector<containers::string>({"to", "pass"}),
-		}),
-		containers::to_radix_sort_key
+	test_sort_inplace<containers::vector<containers::vector<bool>>>(
+		{
+			{{
+				{{true}},
+			}},
+			{{
+				{{true}},
+				{{false}},
+			}},
+			{{
+				{{}},
+			}},
+		},
+		{
+			{{
+				{{}},
+			}},
+			{{
+				{{true}},
+			}},
+			{{
+				{{true}},
+				{{false}},
+			}},
+		}
+	)
+);
+
+static_assert(
+	test_sort_inplace<containers::vector<bounded::tuple<bool>>>(
+		{
+			{{
+				bounded::tuple(true),
+				bounded::tuple(false),
+			}},
+			{{
+				bounded::tuple(true),
+			}},
+		},
+		{
+			{{
+				bounded::tuple(true),
+			}},
+			{{
+				bounded::tuple(true),
+				bounded::tuple(false),
+			}},
+		}
 	)
 );
 
 static_assert(
 	test_sort_inplace(
-		containers::vector({
-			containers::vector<containers::string>({"hi", "there", "you"}),
-			containers::vector<containers::string>({"are", "probably", "not", "going"}),
-			containers::vector<containers::string>({"to", "pass"}),
-			containers::vector<containers::string>({""}),
-			containers::vector<containers::string>(),
-			containers::vector<containers::string>({"hi", "there", "I", "added", "more", "tests"}),
-			containers::vector<containers::string>({"hi", "there", "needed", "the", "same", "prefix"}),
-		}),
-		containers::vector({
-			containers::vector<containers::string>(),
-			containers::vector<containers::string>({""}),
-			containers::vector<containers::string>({"are", "probably", "not", "going"}),
-			containers::vector<containers::string>({"hi", "there", "I", "added", "more", "tests"}),
-			containers::vector<containers::string>({"hi", "there", "needed", "the", "same", "prefix"}),
-			containers::vector<containers::string>({"hi", "there", "you"}),
-			containers::vector<containers::string>({"to", "pass"}),
-		}),
-		default_copy
+		{
+			bounded::tuple(containers::vector({true, false})),
+			bounded::tuple(containers::vector({true})),
+		},
+		{
+			bounded::tuple(containers::vector({true})),
+			bounded::tuple(containers::vector({true, false})),
+		}
 	)
 );
 
-static_assert(
-	test_sort_inplace(
-		containers::vector<bounded::tuple<containers::string, containers::string>>({
-			{"hi", "there"},
-			{"you", "are"},
-			{"probably", "not"},
-			{"going", "to"},
-			{"pass", ""},
-			{"", ""},
-			{"", "this"},
-			{"test", "the"},
-			{"first", "time"},
-			{"oh it did pass", "n"},
-			{"e", "a"},
-			{"t!", ""},
-			{"hi", "there"},
-			{"I", "added"},
-			{"more", "tests"},
-			{"hi", "there"},
-			{"needed", "the"},
-			{"same", "prefix"},
-		}),
-		containers::vector<bounded::tuple<containers::string, containers::string>>({
-			{"", ""},
-			{"", "this"},
-			{"I", "added"},
-			{"e", "a"},
-			{"first", "time"},
-			{"going", "to"},
-			{"hi", "there"},
-			{"hi", "there"},
-			{"hi", "there"},
-			{"more", "tests"},
-			{"needed", "the"},
-			{"oh it did pass", "n"},
-			{"pass", ""},
-			{"probably", "not"},
-			{"same", "prefix"},
-			{"t!", ""},
-			{"test", "the"},
-			{"you", "are"},
-		}),
-		containers::to_radix_sort_key
-	)
-);
-
-static_assert(
-	test_sort_inplace(
-		containers::vector<bounded::tuple<containers::string, containers::string>>({
-			{"hi", "there"},
-			{"you", "are"},
-			{"probably", "not"},
-			{"going", "to"},
-			{"pass", ""},
-			{"", ""},
-			{"", "this"},
-			{"test", "the"},
-			{"first", "time"},
-			{"oh it did pass", "n"},
-			{"e", "a"},
-			{"t!", ""},
-			{"hi", "there"},
-			{"I", "added"},
-			{"more", "tests"},
-			{"hi", "there"},
-			{"needed", "the"},
-			{"same", "prefix"},
-		}),
-		containers::vector<bounded::tuple<containers::string, containers::string>>({
-			{"", ""},
-			{"", "this"},
-			{"I", "added"},
-			{"e", "a"},
-			{"first", "time"},
-			{"going", "to"},
-			{"hi", "there"},
-			{"hi", "there"},
-			{"hi", "there"},
-			{"more", "tests"},
-			{"needed", "the"},
-			{"oh it did pass", "n"},
-			{"pass", ""},
-			{"probably", "not"},
-			{"same", "prefix"},
-			{"t!", ""},
-			{"test", "the"},
-			{"you", "are"},
-		}),
-		default_copy
-	)
-);
 #endif
 
 struct wrapper {
