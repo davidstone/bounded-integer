@@ -605,8 +605,6 @@ static_assert(test_sort<bounded::tuple<bool, bounded::tuple<int, bounded::tuple<
 	}
 ));
 
-static_assert(containers::range<std::string>);
-
 static_assert(test_sort_inplace<std::string_view>(
 	{
 		"Hi",
