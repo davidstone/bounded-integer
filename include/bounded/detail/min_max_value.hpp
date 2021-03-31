@@ -48,6 +48,12 @@ inline constexpr auto max_value<bool> = true;
 template<>
 inline constexpr auto min_value<bool> = false;
 
+template<>
+inline constexpr auto max_value<std::byte> = std::byte(-1);
+
+template<>
+inline constexpr auto min_value<std::byte> = std::byte(0);
+
 template<detail::unsigned_builtin T>
 inline constexpr auto max_value<T> = T(-1);
 
