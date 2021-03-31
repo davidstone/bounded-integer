@@ -11,17 +11,11 @@
 #include <containers/front_back.hpp>
 #include <containers/push_back.hpp>
 #include <containers/reserve_if_reservable.hpp>
-#include <containers/static_vector/static_vector.hpp>
-#include <containers/string.hpp>
 #include <containers/vector.hpp>
 
 #include <bounded/detail/tuple.hpp>
 #include <bounded/copy.hpp>
 #include <bounded/detail/overload.hpp>
-
-#include <deque>
-#include <random>
-#include <vector>
 
 #include "../../test_assert.hpp"
 #include "../../test_int.hpp"
