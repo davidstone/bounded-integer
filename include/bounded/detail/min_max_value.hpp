@@ -8,6 +8,7 @@
 #include <bounded/detail/int128.hpp>
 #include <bounded/detail/max_builtin.hpp>
 
+#include <cstddef>
 #include <type_traits>
 
 namespace bounded {
