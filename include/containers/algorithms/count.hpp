@@ -5,6 +5,7 @@
 
 #pragma once
 
+#include <containers/count_type.hpp>
 #include <containers/range_view.hpp>
 #include <containers/size.hpp>
 
@@ -17,10 +18,10 @@ namespace containers {
 
 using namespace bounded::literal;
 
-constexpr auto count_if(range auto && range, auto predicate) {
-	constexpr auto maximum = bounded::max_value<decltype(containers::size(range))>;
-	bounded::integer<0, bounded::normalize<maximum.value()>> sum = 0_bi;
-	for (decltype(auto) value : OPERATORS_FORWARD(range)) {
+template<range Range>
+constexpr auto count_if(Range && r, auto predicate) {
+	auto sum = count_type<Range>(0_bi);
+	for (decltype(auto) value : OPERATORS_FORWARD(r)) {
 		if (predicate(OPERATORS_FORWARD(value))) {
 			++sum;
 		}
