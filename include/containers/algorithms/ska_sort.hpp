@@ -493,7 +493,7 @@ template<typename T, typename OriginalExtractor, typename CurrentExtractor>
 struct extract_return_type_range_impl {
 private:
 	using range = decltype(std::declval<CurrentExtractor const &>()(std::declval<T &&>()));
-	using get_type = decltype(std::declval<range>()[0]);
+	using get_type = decltype(containers::front(std::declval<range>()));
 	using translated_type = decltype(std::declval<OriginalExtractor const &>()(std::declval<get_type>()));
 	// TODO: This doesn't work properly with range views
 	static constexpr auto force_value =
