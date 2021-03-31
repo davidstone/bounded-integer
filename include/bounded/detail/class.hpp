@@ -18,7 +18,6 @@
 #include <bounded/assume_in_range.hpp>
 #include <bounded/concepts.hpp>
 
-#include <limits>
 #include <type_traits>
 #include <utility>
 
