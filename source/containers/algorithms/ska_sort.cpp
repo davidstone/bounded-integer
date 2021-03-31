@@ -119,8 +119,8 @@ static_assert(test_common_prefix<std::array<std::uint8_t, 1>>(
 ));
 
 static_assert(test_sort(
-	containers::static_vector<bool, 1>{},
-	containers::static_vector<bool, 1>{}
+	containers::vector<bool>(),
+	containers::vector<bool>()
 ));
 
 static_assert(test_sort<bool>(
@@ -200,8 +200,8 @@ static_assert(test_sort<bool>(
 
 
 static_assert(test_sort(
-	containers::static_vector<std::uint8_t, 1>{},
-	containers::static_vector<std::uint8_t, 1>{}
+	containers::vector<std::uint8_t>(),
+	containers::vector<std::uint8_t>()
 ));
 static_assert(test_sort<std::uint8_t>(
 	{1},
