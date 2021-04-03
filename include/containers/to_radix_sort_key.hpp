@@ -43,6 +43,11 @@ namespace to_radix_sort_key_adl {
 constexpr auto to_radix_sort_key(bool const value) {
 	return value;
 }
+
+constexpr auto to_radix_sort_key(std::byte const value) {
+	return static_cast<unsigned char>(value);
+}
+
 template<typename T> requires std::is_arithmetic_v<T>
 constexpr auto to_radix_sort_key(T const value) {
 	constexpr auto is_character_type =
