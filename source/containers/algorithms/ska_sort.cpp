@@ -330,88 +330,79 @@ static_assert(test_sort<std::uint32_t>(
 		65536,
 		1000000,
 		bounded::max_value<std::uint32_t>
-	}
-));
-
-static_assert(test_sort<std::uint64_t>(
-	{
-		5,
-		6,
-		19,
-		2,
-		5,
-		7,
-		0,
-		static_cast<std::uint64_t>(bounded::max_value<std::uint32_t>) + 1,
-		1'000'000'000'000,
-		bounded::max_value<std::uint64_t>,
-		23,
-		6,
-		256,
-		255,
-		8,
-		99,
-		1'024,
-		65'536,
-		65'535,
-		65'534,
-		1'000'000,
-		bounded::max_value<std::uint32_t>,
 	},
-	{
-		0,
-		2,
-		5,
-		5,
-		6,
-		6,
-		7,
-		8,
-		19,
-		23,
-		99,
-		255,
-		256,
-		1'024,
-		65'534,
-		65'535,
-		65'536,
-		1'000'000,
-		bounded::max_value<std::uint32_t>,
-		static_cast<std::uint64_t>(bounded::max_value<std::uint32_t>) + 1,
-		1'000'000'000'000,
-		bounded::max_value<std::uint64_t>,
-	}
+	containers::to_radix_sort_key
 ));
 
-static_assert(test_sort<bounded::tuple<int, bool>>(
-	{{5, true}, {5, false}, {6, false}, {7, true}, {4, false}, {4, true}},
-	{{4, false}, {4, true}, {5, false}, {5, true}, {6, false}, {7, true}}
-));
+constexpr auto source_64 = containers::array{
+	5,
+	6,
+	19,
+	2,
+	5,
+	7,
+	0,
+	static_cast<std::uint64_t>(bounded::max_value<std::uint32_t>) + 1,
+	1'000'000'000'000,
+	bounded::max_value<std::uint64_t>,
+	23,
+	6,
+	256,
+	255,
+	8,
+	99,
+	1'024,
+	65'536,
+	65'535,
+	65'534,
+	1'000'000,
+	bounded::max_value<std::uint32_t>,
+};
+constexpr auto expected_64 = containers::array{
+	0,
+	2,
+	5,
+	5,
+	6,
+	6,
+	7,
+	8,
+	19,
+	23,
+	99,
+	255,
+	256,
+	1'024,
+	65'534,
+	65'535,
+	65'536,
+	1'000'000,
+	bounded::max_value<std::uint32_t>,
+	static_cast<std::uint64_t>(bounded::max_value<std::uint32_t>) + 1,
+	1'000'000'000'000,
+	bounded::max_value<std::uint64_t>,
+};
+static_assert(test_sort_copy(source_64, expected_64, containers::to_radix_sort_key));
+static_assert(test_sort_inplace(source_64, expected_64, containers::to_radix_sort_key));
 
-static_assert(test_sort<bounded::tuple<bool, int>>(
-	{{true, 5}, {false, 5}, {false, 6}, {true, 7}, {false, 4}, {true, 4}},
-	{{false, 4}, {false, 5}, {false, 6}, {true, 4}, {true, 5}, {true, 7}}
-));
-
-static_assert(test_sort<bounded::tuple<bool, int, bool>>(
-	{
-		{true, 5, true},
-		{true, 5, false},
-		{false, 6, false},
-		{true, 7, true},
-		{true, 4, false},
-		{false, 4, true},
-		{false, 5, false},
+static_assert(test_sort(
+	containers::array{
+		bounded::tuple(true, std::uint16_t(5), true),
+		bounded::tuple(true, std::uint16_t(5), false),
+		bounded::tuple(false, std::uint16_t(6), false),
+		bounded::tuple(true, std::uint16_t(7), true),
+		bounded::tuple(true, std::uint16_t(4), false),
+		bounded::tuple(false, std::uint16_t(4), true),
+		bounded::tuple(false, std::uint16_t(5), false),
 	},
-	{
-		{false, 4, true},
-		{false, 5, false},
-		{false, 6, false},
-		{true, 4, false},
-		{true, 5, false},
-		{true, 5, true},
-		{true, 7, true},
+	containers::array{
+		bounded::tuple(false, std::uint16_t(4), true),
+		bounded::tuple(false, std::uint16_t(5), false),
+		bounded::tuple(false, std::uint16_t(6), false),
+		bounded::tuple(true, std::uint16_t(4), false),
+		bounded::tuple(true, std::uint16_t(5), false),
+		bounded::tuple(true, std::uint16_t(5), true),
+		bounded::tuple(true, std::uint16_t(7), true),
 	}
 ));
 
@@ -499,7 +490,7 @@ static_assert(test_sort<std::array<std::uint8_t, 4>>(
 	}
 ));
 
-static_assert(test_sort<std::array<int, 4>>(
+static_assert(test_sort<std::array<std::int16_t, 4>>(
 	{
 		{1, 2, 3, 4},
 		{0, 3, 4, 5},
@@ -726,7 +717,7 @@ struct wrapper {
 
 constexpr auto get_value_member = bounded::overload(
 	[](wrapper const & w) { return bounded::tie(w.value); },
-	[](move_only const & m) { return to_radix_sort_key(m); }
+	containers::to_radix_sort_key
 );
 static_assert(test_sort_copy(
 	containers::array<wrapper, 5>{
