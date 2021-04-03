@@ -574,28 +574,24 @@ static_assert(test_sort_inplace(
 ));
 
 
-static_assert(test_sort<bounded::tuple<bool, bounded::tuple<int, bounded::tuple<int, int>>, bounded::tuple<bool, bool, bool>>>(
+static_assert(test_sort<bounded::tuple<bool, bounded::tuple<bounded::tuple<bool, bool>, bool>>>(
 	{
-		{true, bounded::tuple(5, bounded::tuple(6, 7)), bounded::tuple(true, false, true)},
-		{false, bounded::tuple(5, bounded::tuple(6, 7)), bounded::tuple(true, false, true)},
-		{false, bounded::tuple(5, bounded::tuple(6, 8)), bounded::tuple(true, false, true)},
-		{false, bounded::tuple(5, bounded::tuple(6, 6)), bounded::tuple(true, false, true)},
-		{false, bounded::tuple(5, bounded::tuple(7, 6)), bounded::tuple(true, false, true)},
-		{false, bounded::tuple(5, bounded::tuple(7, 6)), bounded::tuple(true, true, true)},
-		{false, bounded::tuple(5, bounded::tuple(7, 6)), bounded::tuple(true, true, false)},
-		{false, bounded::tuple(5, bounded::tuple(7, 6)), bounded::tuple(false, true, false)},
-		{false, bounded::tuple(4, bounded::tuple(7, 6)), bounded::tuple(false, true, false)},
+		{true, bounded::tuple(bounded::tuple(false, true), true)},
+		{false, bounded::tuple(bounded::tuple(false, true), true)},
+		{false, bounded::tuple(bounded::tuple(false, true), true)},
+		{false, bounded::tuple(bounded::tuple(false, false), true)},
+		{false, bounded::tuple(bounded::tuple(true, false), true)},
+		{false, bounded::tuple(bounded::tuple(true, false), true)},
+		{false, bounded::tuple(bounded::tuple(true, false), false)},
 	},
 	{
-		{false, bounded::tuple(4, bounded::tuple(7, 6)), bounded::tuple(false, true, false)},
-		{false, bounded::tuple(5, bounded::tuple(6, 6)), bounded::tuple(true, false, true)},
-		{false, bounded::tuple(5, bounded::tuple(6, 7)), bounded::tuple(true, false, true)},
-		{false, bounded::tuple(5, bounded::tuple(6, 8)), bounded::tuple(true, false, true)},
-		{false, bounded::tuple(5, bounded::tuple(7, 6)), bounded::tuple(false, true, false)},
-		{false, bounded::tuple(5, bounded::tuple(7, 6)), bounded::tuple(true, false, true)},
-		{false, bounded::tuple(5, bounded::tuple(7, 6)), bounded::tuple(true, true, false)},
-		{false, bounded::tuple(5, bounded::tuple(7, 6)), bounded::tuple(true, true, true)},
-		{true, bounded::tuple(5, bounded::tuple(6, 7)), bounded::tuple(true, false, true)},
+		{false, bounded::tuple(bounded::tuple(false, false), true)},
+		{false, bounded::tuple(bounded::tuple(false, true), true)},
+		{false, bounded::tuple(bounded::tuple(false, true), true)},
+		{false, bounded::tuple(bounded::tuple(true, false), false)},
+		{false, bounded::tuple(bounded::tuple(true, false), true)},
+		{false, bounded::tuple(bounded::tuple(true, false), true)},
+		{true, bounded::tuple(bounded::tuple(false, true), true)},
 	}
 ));
 
