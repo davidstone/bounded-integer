@@ -6,11 +6,12 @@
 #pragma once
 
 #include <containers/algorithms/advance.hpp>
+#include <containers/adapt.hpp>
 #include <containers/begin_end.hpp>
 #include <containers/is_iterator.hpp>
 #include <containers/iterator_adapter.hpp>
-#include <containers/adapt.hpp>
 #include <containers/is_range.hpp>
+#include <containers/size.hpp>
 
 #include <iterator>
 
@@ -24,6 +25,14 @@ struct reverse_traits {
 
 	static constexpr auto get_end(auto && range) {
 		return containers::begin(OPERATORS_FORWARD(range));
+	}
+
+	static constexpr auto get_size(auto const & range) requires requires { containers::size(range); } {
+		return containers::size(range);
+	}
+	template<typename Range> requires requires { Range::size(); }
+	static constexpr auto get_size() {
+		return Range::size();
 	}
 
 	static constexpr decltype(auto) dereference(bidirectional_iterator auto it) {
