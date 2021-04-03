@@ -18,6 +18,17 @@
 #include <utility>
 
 namespace containers {
+namespace detail {
+
+template<typename Range, typename Traits>
+concept sized_adapted_range = requires(Traits const traits, Range const range) { containers::unwrap(traits).get_size(range); };
+
+template<typename Range, typename Traits>
+concept statically_sized_adapted_range = sized_adapted_range<Range, Traits> and requires(Traits const traits) {
+	std::remove_reference_t<decltype(containers::unwrap(traits))>::template get_size<Range>();
+};
+
+} // namespace detail
 
 template<typename Range, typename Traits>
 struct adapt {
@@ -87,6 +98,13 @@ public:
 			containers::unwrap(m_traits).get_end(std::move(*this).m_range),
 			adapt_iterator_traits(m_traits)
 		);
+	}
+
+	constexpr auto size() const requires detail::sized_adapted_range<Range, Traits> {
+		return containers::unwrap(m_traits).get_size(m_range);
+	}
+	static constexpr auto size() requires detail::statically_sized_adapted_range<Range, Traits> {
+		return std::remove_reference_t<decltype(containers::unwrap(m_traits))>::template get_size<Range>();
 	}
 	
 	OPERATORS_BRACKET_SEQUENCE_RANGE_DEFINITIONS
