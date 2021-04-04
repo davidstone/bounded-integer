@@ -17,15 +17,6 @@
 namespace containers {
 namespace detail {
 
-template<typename Container, typename Range>
-concept member_insertable = requires(Container & container, Range && range) {
-	container.insert(
-		containers::end(container),
-		containers::begin(OPERATORS_FORWARD(range)),
-		containers::end(OPERATORS_FORWARD(range))
-	);
-};
-
 template<typename Container>
 concept lazy_push_backable = requires(Container & container, typename Container::value_type (&constructor)()) { lazy_push_back(container, constructor); };
 
@@ -56,8 +47,6 @@ constexpr auto append(Container & output, range auto && input) -> void {
 	if constexpr (detail::appendable_from_capacity<Container> and (!detail::reservable<Container> or reserve_space)) {
 		auto const new_end = containers::uninitialized_copy(OPERATORS_FORWARD(input), containers::end(output));
 		output.append_from_capacity(new_end - containers::end(output));
-	} else if constexpr (detail::member_insertable<Container, decltype(input)> and std::is_move_constructible_v<typename Container::value_type> and std::is_move_assignable_v<typename Container::value_type>) {
-		output.insert(containers::end(output), containers::begin(OPERATORS_FORWARD(input)), containers::end(OPERATORS_FORWARD(input)));
 	} else if constexpr (detail::lazy_push_backable<Container>) {
 		auto const last = containers::end(OPERATORS_FORWARD(input));
 		for (auto it = containers::begin(OPERATORS_FORWARD(input)); it != last; ++it) {
