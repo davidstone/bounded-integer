@@ -268,28 +268,30 @@ public:
 
 namespace detail {
 
-template<typename Tuple, typename... Tuples> requires(... and (tuple_size<Tuple> == tuple_size<Tuples>))
-constexpr auto all_tuple_sizes() {
-	return tuple_size<Tuple>;
-}
+template<typename... Tuples>
+inline constexpr auto all_tuple_sizes_equal = true;
 
+template<typename Tuple, typename... Tuples>
+inline constexpr auto all_tuple_sizes_equal<Tuple, Tuples...> = (... and (tuple_size<Tuple> == tuple_size<Tuples>));
 
-template<auto i>
-constexpr auto transform_impl(constant_t<i> index, auto && function, auto && ... tuples) {
-	if constexpr (index == all_tuple_sizes<decltype(tuples)...>()) {
-		return tuple<>{};
-	} else {
-		return tuple_cat(
-			tuple<decltype(function(OPERATORS_FORWARD(tuples)[index]...))>(function(OPERATORS_FORWARD(tuples)[index]...)),
-			detail::transform_impl(index + constant<1>, function, OPERATORS_FORWARD(tuples)...)
-		);
-	}
-}
+template<typename... Tuples>
+inline constexpr auto all_tuple_sizes = constant<0>;
+
+template<typename Tuple, typename... Tuples>
+inline constexpr auto all_tuple_sizes<Tuple, Tuples...> = tuple_size<Tuple>;
 
 }	// namespace detail
 
-constexpr auto transform(auto && function, tuple_like auto && ... tuples) {
-	return detail::transform_impl(constant<0>, function, OPERATORS_FORWARD(tuples)...);
+template<tuple_like... Tuples>
+constexpr auto transform(auto && function, Tuples && ... tuples) requires(detail::all_tuple_sizes_equal<Tuples...>) {
+	constexpr auto size = detail::all_tuple_sizes<Tuples...>;
+	auto single = [&](auto const index) -> decltype(auto) {
+		return function(OPERATORS_FORWARD(tuples)[index]...);
+	};
+	auto all = [&]<std::size_t... indexes>(std::index_sequence<indexes...>) {
+		return tuple<decltype(single(constant<indexes>))...>(single(constant<indexes>)...);
+	};
+	return all(std::make_index_sequence<static_cast<std::size_t>(size)>());
 }
 
 
