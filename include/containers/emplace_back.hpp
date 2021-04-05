@@ -9,6 +9,7 @@
 #include <containers/front_back.hpp>
 #include <containers/lazy_push_back.hpp>
 #include <containers/reserve_if_reservable.hpp>
+#include <containers/value_type.hpp>
 
 #include <bounded/integer.hpp>
 #include <bounded/unreachable.hpp>
@@ -29,7 +30,7 @@ constexpr auto & emplace_back(Container & container, Args && ... args) {
 		return container.emplace_back(OPERATORS_FORWARD(args)...);
 	} else {
 		return ::containers::lazy_push_back(container, [&]{
-			return bounded::construct_return<typename Container::value_type>(OPERATORS_FORWARD(args)...);
+			return bounded::construct_return<range_value_t<Container>>(OPERATORS_FORWARD(args)...);
 		});
 	}
 }

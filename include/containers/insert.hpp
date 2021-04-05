@@ -17,6 +17,7 @@
 #include <containers/reserve_if_reservable.hpp>
 #include <containers/resizable_container.hpp>
 #include <containers/size.hpp>
+#include <containers/value_type.hpp>
 
 #include <bounded/integer.hpp>
 #include <bounded/unreachable.hpp>
@@ -61,7 +62,7 @@ template<resizable_container Container>
 constexpr auto lazy_insert(
 	Container & container,
 	typename Container::const_iterator const position,
-	bounded::construct_function_for<typename Container::value_type> auto && constructor
+	bounded::construct_function_for<range_value_t<Container>> auto && constructor
 ) {
 	BOUNDED_ASSERT(::containers::detail::iterator_points_into_container(container, position));
 	auto const offset = position - containers::begin(container);
@@ -88,13 +89,13 @@ constexpr auto lazy_insert(
 template<resizable_container Container>
 constexpr auto emplace(Container & container, typename Container::const_iterator const position, auto && ... args) {
 	return ::containers::lazy_insert(container, position, [&] {
-		return bounded::construct_return<typename Container::value_type>(OPERATORS_FORWARD(args)...);
+		return bounded::construct_return<range_value_t<Container>>(OPERATORS_FORWARD(args)...);
 	});
 }
 
 // TODO: exception safety
 // TODO: Check if the range lies within the container
-template<resizable_container Container, range Range> requires bounded::convertible_to<typename Container::value_type, typename Range::value_type>
+template<resizable_container Container, range Range> requires bounded::convertible_to<range_value_t<Container>, range_value_t<Range>>
 constexpr auto insert(Container & container, typename Container::const_iterator position, Range && range) {
 	BOUNDED_ASSERT(::containers::detail::iterator_points_into_container(container, position));
 	auto const range_size = ::containers::detail::linear_size(range);
@@ -117,11 +118,11 @@ constexpr auto insert(Container & container, typename Container::const_iterator 
 }
 
 template<resizable_container Container>
-constexpr auto insert(Container & container, typename Container::const_iterator const position, typename Container::value_type const & value) {
+constexpr auto insert(Container & container, typename Container::const_iterator const position, range_value_t<Container> const & value) {
 	return ::containers::lazy_insert(container, position, bounded::value_to_function(value));
 }
 template<resizable_container Container>
-constexpr auto insert(Container & container, typename Container::const_iterator const position, typename Container::value_type && value) {
+constexpr auto insert(Container & container, typename Container::const_iterator const position, range_value_t<Container> && value) {
 	return ::containers::lazy_insert(container, position, bounded::value_to_function(std::move(value)));
 }
 

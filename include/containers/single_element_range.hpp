@@ -27,7 +27,7 @@ struct single_element_sentinel {
 template<typename T>
 struct single_element_iterator {
 	static_assert(std::is_reference_v<T>);
-	using value_type = std::remove_reference_t<T>;
+	using value_type = std::remove_cvref_t<T>;
 	using difference_type = bounded::integer<0, 1>;
 	using pointer = value_type *;
 	using reference = T;

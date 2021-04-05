@@ -7,6 +7,7 @@
 
 #include <containers/begin_end.hpp>
 #include <containers/is_range.hpp>
+#include <containers/value_type.hpp>
 
 #include <bounded/integer.hpp>
 
@@ -20,7 +21,7 @@ namespace containers {
 
 template<typename Iterator, typename Sentinel = Iterator>
 struct range_view {
-	using value_type = typename std::iterator_traits<Iterator>::value_type;
+	using value_type = iter_value_t<Iterator>;
 
 	using size_type = bounded::integer<
 		0,

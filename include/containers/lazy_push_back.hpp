@@ -10,6 +10,7 @@
 #include <containers/front_back.hpp>
 #include <containers/reserve_if_reservable.hpp>
 #include <containers/size.hpp>
+#include <containers/value_type.hpp>
 
 #include <bounded/integer.hpp>
 #include <bounded/lazy_init.hpp>
@@ -26,7 +27,7 @@ concept appendable_from_capacity = requires(Container & container, typename Cont
 template<detail::appendable_from_capacity Container>
 constexpr auto & lazy_push_back(
 	Container & container,
-	bounded::construct_function_for<typename Container::value_type> auto && constructor
+	bounded::construct_function_for<range_value_t<Container>> auto && constructor
 ) {
 	auto const initial_size = containers::size(container);
 	auto construct = [&](auto & ref) {

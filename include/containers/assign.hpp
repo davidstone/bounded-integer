@@ -12,6 +12,7 @@
 #include <containers/is_range.hpp>
 #include <containers/range_view.hpp>
 #include <containers/resizable_container.hpp>
+#include <containers/value_type.hpp>
 
 #include <bounded/integer.hpp>
 
@@ -32,7 +33,7 @@ constexpr void assign(resizable_container auto & destination, range auto && sour
 	::containers::append(destination, range_view(first, last));
 }
 template<resizable_container Container, std::size_t init_size>
-constexpr void assign(Container & destination, c_array<typename Container::value_type, init_size> && init) {
+constexpr void assign(Container & destination, c_array<range_value_t<Container>, init_size> && init) {
 	assign(destination, range_view(std::move(init)));
 }
 

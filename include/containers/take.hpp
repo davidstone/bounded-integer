@@ -8,6 +8,7 @@
 #include <containers/begin_end.hpp>
 #include <containers/common_iterator_functions.hpp>
 #include <containers/range_view.hpp>
+#include <containers/value_type.hpp>
 
 #include <bounded/integer.hpp>
 #include <bounded/unreachable.hpp>
@@ -41,7 +42,7 @@ private:
 template<typename Iterator, typename Count>
 struct counted_iterator {
 	using iterator_category = typename std::iterator_traits<Iterator>::iterator_category;
-	using value_type = typename std::iterator_traits<Iterator>::value_type;
+	using value_type = iter_value_t<Iterator>;
 	using difference_type = decltype(std::declval<Count>() - std::declval<Count>());
 	using pointer = typename std::iterator_traits<Iterator>::pointer;
 	using reference = typename std::iterator_traits<Iterator>::reference;

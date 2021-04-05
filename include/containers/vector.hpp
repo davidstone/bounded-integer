@@ -14,6 +14,7 @@
 #include <containers/contiguous_iterator.hpp>
 #include <containers/maximum_array_size.hpp>
 #include <containers/uninitialized_dynamic_array.hpp>
+#include <containers/value_type.hpp>
 
 #include <operators/bracket.hpp>
 #include <operators/forward.hpp>
@@ -129,6 +130,6 @@ private:
 };
 
 template<typename Range>
-vector(Range &&) -> vector<std::decay_t<typename std::decay_t<Range>::value_type>>;
+vector(Range &&) -> vector<std::decay_t<range_value_t<Range>>>;
 
 } // namespace containers

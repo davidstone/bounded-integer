@@ -13,6 +13,7 @@
 #include <containers/is_iterator_sentinel.hpp>
 #include <containers/iterator_adapter.hpp>
 #include <containers/reference_wrapper.hpp>
+#include <containers/value_type.hpp>
 
 #include <operators/forward.hpp>
 #include <bounded/assert.hpp>
@@ -114,7 +115,7 @@ public:
 		reference_wrapper(std::declval<traits &>())
 	));
 
-	using value_type = typename std::remove_reference_t<Range>::value_type;
+	using value_type = range_value_t<Range>;
 	using size_type = bounded::integer<
 		0,
 		bounded::normalize<static_cast<std::uintmax_t>(bounded::max_value<typename std::iterator_traits<iterator>::difference_type>)>

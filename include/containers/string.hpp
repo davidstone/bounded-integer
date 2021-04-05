@@ -11,6 +11,7 @@
 #include <containers/range_view.hpp>
 #include <containers/single_element_range.hpp>
 #include <containers/small_buffer_optimized_vector.hpp>
+#include <containers/value_type.hpp>
 
 #include <iosfwd>
 
@@ -29,7 +30,7 @@ struct basic_string : private small_buffer_optimized_vector<CharT, 0> {
 private:
 	using base = small_buffer_optimized_vector<CharT, 0>;
 public:
-	using typename base::value_type;
+	using value_type = CharT;
 	using typename base::size_type;
 	using typename base::const_iterator;
 	using typename base::iterator;
@@ -137,7 +138,7 @@ concept string_like = is_string_like<std::decay_t<T>>;
 
 template<detail::string_like LHS, detail::string_like RHS> requires(
 	(detail::string_specialization<LHS> or detail::string_specialization<RHS>) and
-	std::is_same_v<typename std::decay_t<LHS>::value_type, typename std::decay_t<RHS>::value_type>
+	std::is_same_v<range_value_t<LHS>, range_value_t<RHS>>
 )
 constexpr auto operator+(LHS && lhs, RHS && rhs) {
 	using result_t = std::decay_t<std::conditional_t<detail::is_string<std::decay_t<LHS>>, LHS, RHS>>;

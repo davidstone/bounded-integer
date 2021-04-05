@@ -6,6 +6,7 @@
 #include <containers/algorithms/keyed_insert.hpp>
 
 #include <containers/flat_map.hpp>
+#include <containers/value_type.hpp>
 
 #include "../../test_assert.hpp"
 #include "../../test_int.hpp"
@@ -14,7 +15,7 @@ namespace {
 
 using map_type = containers::flat_map<bounded::test_int, bounded::test_int>;
 using multimap_type = containers::flat_map<bounded::test_int, bounded::test_int>;
-using value_type = map_type::value_type;
+using value_type = containers::range_value_t<map_type>;
 
 template<typename Map>
 constexpr auto test_rvalue_into_empty() {

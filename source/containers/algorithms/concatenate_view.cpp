@@ -9,13 +9,14 @@
 #include <containers/static_vector/static_vector.hpp>
 #include <containers/repeat_n.hpp>
 #include <containers/size.hpp>
+#include <containers/value_type.hpp>
 
 namespace {
 using namespace bounded::literal;
 
 template<typename LHS, typename RHS>
 constexpr bool equal_values_and_types(LHS const & lhs, RHS const & rhs) {
-	static_assert(std::is_same_v<typename LHS::value_type, typename RHS::value_type>);
+	static_assert(std::is_same_v<containers::range_value_t<LHS>, containers::range_value_t<RHS>>);
 	return containers::equal(lhs, rhs);
 }
 

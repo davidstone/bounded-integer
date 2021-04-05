@@ -9,6 +9,7 @@
 
 #include <containers/common_iterator_functions.hpp>
 #include <containers/is_iterator.hpp>
+#include <containers/value_type.hpp>
 
 #include <bounded/integer.hpp>
 
@@ -20,7 +21,7 @@ namespace containers {
 
 template<typename Iterator>
 struct legacy_iterator {
-	using value_type = typename std::iterator_traits<Iterator>::value_type;
+	using value_type = iter_value_t<Iterator>;
 	using difference_type = std::ptrdiff_t;
 	using pointer = typename std::iterator_traits<Iterator>::pointer;
 	using reference = typename std::iterator_traits<Iterator>::reference;

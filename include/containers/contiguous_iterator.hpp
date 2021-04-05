@@ -5,8 +5,6 @@
 
 #pragma once
 
-#include <containers/to_address.hpp>
-
 #include <bounded/integer.hpp>
 
 #include <bounded/assert.hpp>
@@ -20,10 +18,10 @@ namespace containers {
 
 template<typename T, std::ptrdiff_t max_difference>
 struct contiguous_iterator {
-	using value_type = T;
+	using value_type = std::remove_cv_t<T>;
 	using difference_type = bounded::integer<bounded::normalize<-max_difference>, bounded::normalize<max_difference>>;
-	using pointer = value_type *;
-	using reference = value_type &;
+	using pointer = T *;
+	using reference = T &;
 	using iterator_category = std::random_access_iterator_tag;
 
 	contiguous_iterator() = default;
@@ -56,7 +54,7 @@ constexpr auto operator+(
 	contiguous_iterator<T, max_difference> const lhs,
 	typename contiguous_iterator<T, max_difference>::difference_type const rhs
 ) {
-	return contiguous_iterator<T, max_difference>(::containers::to_address(lhs) + rhs);
+	return contiguous_iterator<T, max_difference>(lhs.to_address() + rhs);
 }
 
 // Iterators over ranges of zero size tend to come up only in generic code, and
@@ -75,7 +73,7 @@ constexpr auto operator+(
 
 template<typename T, std::ptrdiff_t max_difference>
 constexpr auto operator-(contiguous_iterator<T, max_difference> const lhs, contiguous_iterator<T, max_difference> const rhs) {
-	return static_cast<typename contiguous_iterator<T, max_difference>::difference_type>(::containers::to_address(lhs) - ::containers::to_address(rhs));
+	return static_cast<typename contiguous_iterator<T, max_difference>::difference_type>(lhs.to_address() - rhs.to_address());
 }
 
 template<typename T, std::ptrdiff_t max_difference>

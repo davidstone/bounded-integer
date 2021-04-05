@@ -21,6 +21,7 @@
 #include <containers/lookup.hpp>
 #include <containers/relocate.hpp>
 #include <containers/size.hpp>
+#include <containers/value_type.hpp>
 #include <containers/vector.hpp>
 
 #include <bounded/detail/tuple.hpp>
@@ -103,13 +104,13 @@ concept extract_key_function = requires(ExtractKey const & extract_key, T const 
 // operator. To get the code to work with a vector, we have to sacrifice some
 // compile-time checks.
 
-template<typename Container, extract_key_function<typename Container::value_type::key_type> ExtractKey, bool allow_duplicates>
+template<typename Container, extract_key_function<typename range_value_t<Container>::key_type> ExtractKey, bool allow_duplicates>
 struct flat_map_base : private lexicographical_comparison::base {
 private:
 	Container m_container;
 	[[no_unique_address]] ExtractKey m_extract_key;
 public:
-	using value_type = typename Container::value_type;
+	using value_type = range_value_t<Container>;
 	using key_type = typename value_type::key_type;
 	using mapped_type = typename value_type::mapped_type;
 	using size_type = typename Container::size_type;

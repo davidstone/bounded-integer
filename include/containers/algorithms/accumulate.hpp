@@ -7,6 +7,7 @@
 
 #include <containers/begin_end.hpp>
 #include <containers/is_range.hpp>
+#include <containers/value_type.hpp>
 
 #include <bounded/integer.hpp>
 #include <bounded/pow.hpp>
@@ -33,7 +34,7 @@ struct accumulate_c<Range, Initial, std::plus<>> {
 	using type = decltype(
 		std::declval<Initial>() +
 		(
-			std::declval<typename std::remove_reference_t<Range>::value_type>() *
+			std::declval<containers::range_value_t<Range>>() *
 			std::declval<bounded::integer<
 				0,
 				bounded::detail::builtin_max_value<typename std::iterator_traits<decltype(containers::begin(std::declval<Range>()))>::difference_type>
@@ -47,7 +48,7 @@ struct accumulate_c<Range, Initial, std::multiplies<>> {
 	using type = decltype(
 		std::declval<Initial>() *
 		::bounded::pow(
-			std::declval<typename std::remove_reference_t<Range>::value_type>(),
+			std::declval<range_value_t<Range>>(),
 			std::declval<bounded::integer<
 				0,
 				bounded::detail::builtin_max_value<
@@ -110,7 +111,7 @@ template<typename Result>
 constexpr auto sum(range auto && source) {
 	return ::containers::accumulate<Result>(
 		OPERATORS_FORWARD(source),
-		detail::initial_sum_value<typename std::remove_reference_t<decltype(source)>::value_type>(),
+		detail::initial_sum_value<range_value_t<decltype(source)>>(),
 		std::plus()
 	);
 }
@@ -118,7 +119,7 @@ constexpr auto sum(range auto && source) {
 constexpr auto sum(range auto && source) {
 	return ::containers::accumulate(
 		OPERATORS_FORWARD(source),
-		detail::initial_sum_value<typename std::remove_reference_t<decltype(source)>::value_type>(),
+		detail::initial_sum_value<range_value_t<decltype(source)>>(),
 		std::plus()
 	);
 }
@@ -127,7 +128,7 @@ template<typename Result>
 constexpr auto product(range auto && source) {
 	return ::containers::accumulate<Result>(
 		OPERATORS_FORWARD(source),
-		detail::initial_product_value<typename std::remove_reference_t<decltype(source)>::value_type>(),
+		detail::initial_product_value<range_value_t<decltype(source)>>(),
 		std::multiplies()
 	);
 }
@@ -135,7 +136,7 @@ constexpr auto product(range auto && source) {
 constexpr auto product(range auto && source) {
 	return ::containers::accumulate(
 		OPERATORS_FORWARD(source),
-		detail::initial_product_value<typename std::remove_reference_t<decltype(source)>::value_type>(),
+		detail::initial_product_value<range_value_t<decltype(source)>>(),
 		std::multiplies()
 	);
 }

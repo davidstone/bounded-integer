@@ -8,6 +8,7 @@
 #include <containers/at.hpp>
 #include <containers/front_back.hpp>
 #include <containers/is_empty.hpp>
+#include <containers/value_type.hpp>
 
 #include <bounded/integer.hpp>
 
@@ -18,15 +19,15 @@ constexpr auto dynamic_int_array = containers::make_array(0, 3, 6);
 static_assert(containers::size(dynamic_int_array) == 3, "Array size wrong.");
 static_assert(containers::at(dynamic_int_array, 2) == 6, "Array element wrong.");
 static_assert(
-	std::is_same_v<int, decltype(dynamic_int_array)::value_type>,
+	std::is_same_v<int, containers::range_value_t<decltype(dynamic_int_array)>>,
 	"Array element type wrong for all int arguments."
 );
 
 constexpr auto bounded_array = containers::make_array(-100_bi, 5_bi, 378_bi, 23_bi, 10000_bi);
 static_assert(containers::size(bounded_array) == 5, "Array size wrong.");
 static_assert(bounded_array[2_bi] == 378, "Array element wrong.");
-static_assert(bounded::min_value<decltype(bounded_array)::value_type> == -100_bi);
-static_assert(bounded::max_value<decltype(bounded_array)::value_type> == 10000_bi);
+static_assert(bounded::min_value<containers::range_value_t<decltype(bounded_array)>> == -100_bi);
+static_assert(bounded::max_value<containers::range_value_t<decltype(bounded_array)>> == 10000_bi);
 
 constexpr auto value = containers::make_explicit_array<5, 4>(
 	0_bi, 1_bi, 2_bi, 3_bi,
@@ -38,7 +39,7 @@ constexpr auto value = containers::make_explicit_array<5, 4>(
 static_assert(containers::size(value) == 5, "First dimension wrong.");
 static_assert(containers::size(value[0_bi]) == 4, "Second dimension wrong.");
 static_assert(value[3_bi][1_bi] == 2467_bi, "Value wrong.");
-using value_type = decltype(value)::value_type::value_type;
+using value_type = containers::range_value_t<containers::range_value_t<decltype(value)>>;
 static_assert(bounded::min_value<value_type> == -4573, "min wrong");
 static_assert(bounded::max_value<value_type> == 2474, "max wrong");
 
@@ -70,12 +71,12 @@ static_assert(containers::size(four_dimensions[0_bi][0_bi][0_bi]) == fourth, "Fo
 using explicit_type = bounded::integer<0, 1>;
 constexpr auto typed_array = containers::make_array<explicit_type>(0_bi);
 static_assert(containers::size(typed_array) == 1_bi, "Incorrect size with explicit type.");
-static_assert(std::is_same_v<decltype(typed_array)::value_type, explicit_type>, "Incorrect type with explicit type.");
+static_assert(std::is_same_v<containers::range_value_t<decltype(typed_array)>, explicit_type>, "Incorrect type with explicit type.");
 static_assert(containers::front(typed_array) == 0_bi, "Incorrect value with explicit type.");
 
 
 constexpr auto array_n = containers::make_array_n(6_bi, 5);
-static_assert(std::is_same_v<std::decay_t<decltype(array_n)>::value_type, int>, "Incorrect type from make_array_n.");
+static_assert(std::is_same_v<containers::range_value_t<decltype(array_n)>, int>, "Incorrect type from make_array_n.");
 static_assert(containers::size(array_n) == 6_bi, "Incorrect size from make_array_n.");
 static_assert(array_n[3_bi] == 5, "Incorrect values from make_array_n.");
 

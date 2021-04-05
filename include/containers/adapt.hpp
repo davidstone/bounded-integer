@@ -9,6 +9,7 @@
 #include <containers/common_functions.hpp>
 #include <containers/iterator_adapter.hpp>
 #include <containers/reference_wrapper.hpp>
+#include <containers/value_type.hpp>
 
 #include <bounded/integer.hpp>
 
@@ -51,7 +52,7 @@ public:
 		containers::unwrap(std::declval<adapt_iterator_traits &>()).get_begin(std::declval<Range const &>()),
 		std::declval<adapt_iterator_traits>()
 	));
-	using value_type = decltype(*std::declval<iterator>());
+	using value_type = iter_value_t<iterator>;
 	using size_type = bounded::integer<
 		0,
 		bounded::normalize<static_cast<std::uintmax_t>(bounded::max_value<typename std::iterator_traits<iterator>::difference_type>)>

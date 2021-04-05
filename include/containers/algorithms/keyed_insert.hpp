@@ -6,6 +6,7 @@
 #pragma once
 
 #include <containers/associative_container.hpp>
+#include <containers/value_type.hpp>
 
 #include <utility>
 
@@ -18,7 +19,7 @@ concept legacy_map = requires { typename Map::allocator_type; };
 } // namespace detail
 
 template<associative_container Container>
-constexpr auto keyed_insert(Container & container, typename Container::value_type const & value) {
+constexpr auto keyed_insert(Container & container, range_value_t<Container> const & value) {
 	if constexpr (detail::legacy_map<Container>) {
 		return container.insert(value);
 	} else {
@@ -26,7 +27,7 @@ constexpr auto keyed_insert(Container & container, typename Container::value_typ
 	}
 }
 template<associative_container Container>
-constexpr auto keyed_insert(Container & container, typename Container::value_type && value) {
+constexpr auto keyed_insert(Container & container, range_value_t<Container> && value) {
 	if constexpr (detail::legacy_map<Container>) {
 		return container.insert(std::move(value));
 	} else {

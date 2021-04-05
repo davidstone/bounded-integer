@@ -43,10 +43,10 @@ private:
 
 public:
 	using iterator_category = std::random_access_iterator_tag;
-	using value_type = std::remove_reference_t<decltype(std::declval<Function>()())>;
+	using reference = decltype(std::declval<Function>()());
+	using value_type = std::remove_cvref_t<reference>;
 	using difference_type = decltype(std::declval<Size>() - std::declval<Size>());
-	using pointer = value_type *;
-	using reference = value_type &;
+	using pointer = std::remove_reference_t<reference> *;
 	
 	constexpr repeat_n_iterator(Size const remaining, Function get_value):
 		m_remaining(remaining),

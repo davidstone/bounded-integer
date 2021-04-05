@@ -14,6 +14,7 @@
 #include <containers/reserve_if_reservable.hpp>
 #include <containers/shrink_to_fit.hpp>
 #include <containers/uninitialized_dynamic_array.hpp>
+#include <containers/value_type.hpp>
 
 #include "../test_assert.hpp"
 #include "../test_int.hpp"
@@ -194,7 +195,7 @@ constexpr auto test_reserve() {
 }
 
 template<typename Container>
-constexpr auto test_sequence_container_single(std::initializer_list<typename Container::value_type> init) {
+constexpr auto test_sequence_container_single(std::initializer_list<containers::range_value_t<Container>> init) {
 	test_range_constructor<Container>(init);
 	test_range_constructor<Container>(containers::range_view(init));
 	test_special_members<Container>(init);

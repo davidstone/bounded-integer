@@ -12,6 +12,7 @@
 #include <containers/is_range.hpp>
 #include <containers/range_view.hpp>
 #include <containers/size.hpp>
+#include <containers/value_type.hpp>
 
 #include <bounded/detail/construct_destroy.hpp>
 #include <bounded/detail/make_index_sequence.hpp>
@@ -39,10 +40,7 @@ constexpr auto assert_same_ends(LHS const & lhs, RHS const & rhs) {
 }
 
 template<typename RangeView>
-using view_iterator = decltype(containers::begin(std::declval<RangeView>()));
-
-template<typename RangeView>
-using view_iterator_traits = std::iterator_traits<view_iterator<RangeView>>;
+using view_iterator_traits = std::iterator_traits<iterator_t<RangeView>>;
 
 template<typename category, typename... RangeViews>
 inline constexpr bool any_is_category = (
@@ -77,38 +75,14 @@ concept forward_random_access_range = range<Range> and forward_random_access_ite
 // be computed.
 template<typename... RangeViews>
 struct concatenate_view_iterator {
-private:
 	static_assert((... and is_range_view<RangeViews>));
-
 	static_assert(
 		!detail::any_is_input_iterator<RangeViews...> or !detail::any_is_output_iterator<RangeViews...>,
 		"Cannot combine input and output ranges in concatenate_view"
 	);
 
-	bounded::tuple<RangeViews...> m_range_views;
-
-	static constexpr auto index_sequence = std::make_index_sequence<sizeof...(RangeViews)>{};
-	static constexpr auto max_index = bounded::constant<sizeof...(RangeViews)> - bounded::constant<1>;
-
-	constexpr decltype(auto) operator_star(auto const index) const {
-		auto const range_view = m_range_views[index];
-		if constexpr (index == max_index) {
-			return containers::front(range_view);
-		} else if (!containers::is_empty(range_view)) {
-			return containers::front(range_view);
-		} else {
-			return operator_star(index + bounded::constant<1>);
-		}
-	}
-
-	constexpr auto begin_iterators() const {
-		return bounded::transform([](auto const range) { return containers::begin(range); }, m_range_views);
-	}
-
-
-public:
 	using value_type = bounded::detail::common_type_and_value_category_t<
-		typename detail::view_iterator_traits<RangeViews>::value_type...
+		range_value_t<RangeViews>...
 	>;
 	using difference_type = decltype((... + std::declval<typename detail::view_iterator_traits<RangeViews>::difference_type>()));
 	
@@ -227,6 +201,26 @@ public:
 		auto get_end_iterators = [](auto const range) { return containers::end(range); };
 		return lhs.begin_iterators() == bounded::transform(get_end_iterators, lhs.m_range_views);
 	}
+
+private:
+	static constexpr auto max_index = bounded::constant<sizeof...(RangeViews)> - bounded::constant<1>;
+
+	constexpr auto operator_star(auto const index) const -> reference {
+		auto const range_view = m_range_views[index];
+		if constexpr (index == max_index) {
+			return containers::front(range_view);
+		} else if (!containers::is_empty(range_view)) {
+			return containers::front(range_view);
+		} else {
+			return operator_star(index + bounded::constant<1>);
+		}
+	}
+
+	constexpr auto begin_iterators() const {
+		return bounded::transform([](auto const range) { return containers::begin(range); }, m_range_views);
+	}
+
+	bounded::tuple<RangeViews...> m_range_views;
 };
 
 
@@ -240,7 +234,7 @@ template<typename... Ranges>
 struct concatenate_view {
 	using const_iterator = concatenate_view_iterator<decltype(range_view(std::declval<Ranges const &>()))...>;
 	using iterator = concatenate_view_iterator<decltype(range_view(std::declval<Ranges &>()))...>;
-	using value_type = typename iterator::value_type;
+	using value_type = iter_value_t<iterator>;
 	using size_type = bounded::integer<
 		0,
 		bounded::normalize<bounded::max_value<typename iterator::difference_type>.value()>

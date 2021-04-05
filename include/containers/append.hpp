@@ -11,6 +11,7 @@
 #include <containers/push_back.hpp>
 #include <containers/reserve_if_reservable.hpp>
 #include <containers/size.hpp>
+#include <containers/value_type.hpp>
 
 #include <bounded/integer.hpp>
 
@@ -18,7 +19,7 @@ namespace containers {
 namespace detail {
 
 template<typename Container>
-concept lazy_push_backable = requires(Container & container, typename Container::value_type (&constructor)()) { lazy_push_back(container, constructor); };
+concept lazy_push_backable = requires(Container & container, range_value_t<Container> (&constructor)()) { lazy_push_back(container, constructor); };
 
 } // namespace detail
 

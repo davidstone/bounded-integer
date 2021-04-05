@@ -43,11 +43,11 @@ struct iterator_typedefs_base<Iterator, Traits> {
 private:
 	using base_category = typename std::iterator_traits<Iterator>::iterator_category;
 public:
-	using value_type = decltype(containers::unwrap(std::declval<Traits>()).dereference(std::declval<Iterator>()));
+	using reference = decltype(containers::unwrap(std::declval<Traits>()).dereference(std::declval<Iterator>()));
+	using value_type = std::remove_cvref_t<reference>;
 
-	// Not sure what these actually mean...
-	using pointer = std::remove_reference_t<value_type> *;
-	using reference = value_type;
+	// Not sure what this actually means...
+	using pointer = std::remove_reference_t<reference> *;
 
 	// TODO: technically not correct. For instance, consider an iterator adapter
 	// that visits each element twice.

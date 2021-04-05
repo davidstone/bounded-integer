@@ -8,6 +8,7 @@
 #include <containers/algorithms/transform.hpp>
 #include <containers/begin_end.hpp>
 #include <containers/common_functions.hpp>
+#include <containers/value_type.hpp>
 
 #include <bounded/assert.hpp>
 #include <bounded/integer.hpp>
@@ -98,7 +99,7 @@ struct integer_range {
 	using iterator = detail::integer_range_iterator<Integer, Sentinel, Step>;
 	using const_iterator = iterator;
 
-	using value_type = typename iterator::value_type;
+	using value_type = iter_value_t<iterator>;
 	using size_type = bounded::integer<0, bounded::detail::builtin_max_value<typename iterator::difference_type>>;
 	
 	// If `last` is not reachable by adding `step` to `first` some number of

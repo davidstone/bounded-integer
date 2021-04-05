@@ -11,6 +11,7 @@
 #include <containers/resizable_container.hpp>
 #include <containers/size.hpp>
 #include <containers/take.hpp>
+#include <containers/value_type.hpp>
 
 #include <operators/forward.hpp>
 #include <bounded/integer.hpp>
@@ -32,10 +33,10 @@ constexpr auto resize_impl(auto & container_to_resize, auto const initializer_ra
 
 template<resizable_container Container>
 constexpr auto resize(Container & container_to_resize, auto const count) {
-	::containers::detail::resize_impl(container_to_resize, repeat_default_n<typename Container::value_type>(count));
+	::containers::detail::resize_impl(container_to_resize, repeat_default_n<range_value_t<Container>>(count));
 }
 template<resizable_container Container>
-constexpr auto resize(Container & container_to_resize, auto const count, typename Container::value_type const & value) {
+constexpr auto resize(Container & container_to_resize, auto const count, range_value_t<Container> const & value) {
 	::containers::detail::resize_impl(container_to_resize, repeat_n(count, value));
 }
 
