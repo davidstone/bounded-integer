@@ -14,6 +14,7 @@
 #include <containers/value_type.hpp>
 
 #include <iosfwd>
+#include <type_traits>
 
 namespace containers {
 namespace detail {
@@ -68,46 +69,14 @@ public:
 };
 
 
-namespace detail {
-
-// TODO: non-template
 template<typename CharT>
-struct c_string_sentinel_t {
-};
-
-template<typename CharT>
-constexpr auto operator<=>(CharT const * lhs, c_string_sentinel_t<CharT>) {
-	return *lhs == '\0' ? std::strong_ordering::equal : std::strong_ordering::less;
-}
-
-template<typename CharT>
-constexpr auto operator==(CharT const * first, c_string_sentinel_t<CharT>) -> bool {
-	return *first == '\0';
-}
-
-template<typename CharT>
-inline constexpr auto c_string_sentinel = c_string_sentinel_t<CharT>{};
-
-} // namespace detail
-
-template<typename CharT>
-constexpr auto operator<=>(basic_string<CharT> const & lhs, CharT const * const rhs) {
-	return ::containers::lexicographical_compare_3way(containers::begin(lhs), containers::end(lhs), rhs, detail::c_string_sentinel<CharT>);
-}
-
-template<typename CharT>
-constexpr auto operator==(basic_string<CharT> const & lhs, CharT const * const rhs) -> bool {
-	return ::containers::equal(containers::begin(lhs), containers::end(lhs), rhs, detail::c_string_sentinel<CharT>);
-}
-
-template<typename CharT>
-constexpr auto operator<=>(basic_string<CharT> const & lhs, std::basic_string_view<CharT> const rhs) {
+constexpr auto operator<=>(basic_string<CharT> const & lhs, std::basic_string_view<std::type_identity_t<CharT>> const rhs) {
 	return ::containers::lexicographical_compare_3way(lhs, rhs);
 }
 
 template<typename CharT>
-constexpr auto operator==(basic_string<CharT> const & lhs, std::basic_string_view<CharT> const rhs) -> bool {
-	return std::string_view(lhs) == rhs;
+constexpr auto operator==(basic_string<CharT> const & lhs, std::basic_string_view<std::type_identity_t<CharT>> const rhs) -> bool {
+	return ::containers::equal(lhs, rhs);
 }
 
 
@@ -122,47 +91,20 @@ inline constexpr auto is_string<basic_string<CharT>> = true;
 template<typename T>
 concept string_specialization = is_string<std::decay_t<T>>;
 
-template<typename T>
-inline constexpr auto is_string_like = false;
-
-template<typename CharT>
-inline constexpr auto is_string_like<basic_string<CharT>> = true;
-
-template<typename CharT>
-inline constexpr auto is_string_like<std::basic_string_view<CharT>> = true;
-
-template<typename T>
-concept string_like = is_string_like<std::decay_t<T>>;
-
 }	// namespace detail
 
-template<detail::string_like LHS, detail::string_like RHS> requires(
-	(detail::string_specialization<LHS> or detail::string_specialization<RHS>) and
-	std::is_same_v<range_value_t<LHS>, range_value_t<RHS>>
-)
+template<detail::string_specialization LHS, detail::string_specialization RHS> requires(std::is_same_v<range_value_t<LHS>, range_value_t<RHS>>)
 constexpr auto operator+(LHS && lhs, RHS && rhs) {
-	using result_t = std::decay_t<std::conditional_t<detail::is_string<std::decay_t<LHS>>, LHS, RHS>>;
-	return ::containers::concatenate<result_t>(OPERATORS_FORWARD(lhs), OPERATORS_FORWARD(rhs));
+	return ::containers::concatenate<std::decay_t<LHS>>(OPERATORS_FORWARD(lhs), OPERATORS_FORWARD(rhs));
 }
-
-template<typename CharT>
-constexpr auto operator+(basic_string<CharT> && lhs, CharT const * const rhs) {
-	return std::move(lhs) + std::basic_string_view(rhs);
+template<detail::string_specialization String>
+constexpr auto operator+(String && lhs, std::basic_string_view<range_value_t<String>> rhs) {
+	return ::containers::concatenate<std::decay_t<String>>(OPERATORS_FORWARD(lhs), rhs);
 }
-template<typename CharT>
-constexpr auto operator+(basic_string<CharT> const & lhs, CharT const * const rhs) {
-	return lhs + std::basic_string_view(rhs);
+template<detail::string_specialization String>
+constexpr auto operator+(std::basic_string_view<range_value_t<String>> lhs, String && rhs) {
+	return ::containers::concatenate<std::decay_t<String>>(lhs, OPERATORS_FORWARD(rhs));
 }
-
-template<typename CharT>
-constexpr auto operator+(CharT const * const lhs, basic_string<CharT> && rhs) {
-	return std::basic_string_view(lhs) + std::move(rhs);
-}
-template<typename CharT>
-constexpr auto operator+(CharT const * const lhs, basic_string<CharT> const & rhs) {
-	return std::basic_string_view(lhs) + rhs;
-}
-
 
 template<detail::string_specialization String>
 constexpr auto operator+(String && lhs, typename std::remove_reference_t<String>::value_type const rhs) {
