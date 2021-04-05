@@ -30,16 +30,16 @@ constexpr auto & lazy_push_back(
 	bounded::construct_function_for<range_value_t<Container>> auto && constructor
 ) {
 	auto const initial_size = containers::size(container);
-	auto construct = [&](auto & ref) {
-		bounded::construct(ref, OPERATORS_FORWARD(constructor));
+	auto construct = [&](Container & target) {
+		bounded::construct(*(containers::data(target) + initial_size), OPERATORS_FORWARD(constructor));
 	};
 	if (initial_size < container.capacity()) {
-		construct(*(containers::data(container) + initial_size));
+		construct(container);
 		container.append_from_capacity(1_bi);
 	} else if constexpr (detail::reservable<Container>) {
 		auto temp = Container();
 		temp.reserve(::containers::detail::reallocation_size(container, 1_bi));
-		construct(*(containers::data(temp) + container.capacity()));
+		construct(temp);
 
 		::containers::uninitialized_relocate(container, containers::begin(temp));
 		container.append_from_capacity(-initial_size);
