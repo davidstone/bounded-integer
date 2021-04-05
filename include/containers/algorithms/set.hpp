@@ -34,7 +34,35 @@ constexpr auto less_to_compare = [](auto const & cmp) {
 	};
 };
 
-template<typename Range, typename ForwardIterator1, typename ForwardIterator2>
+template<typename Members, typename ForwardIterator1, typename ForwardIterator2>
+struct set_intersection_pair_iterator;
+
+template<typename Range1, typename Range2, typename Compare>
+struct set_intersection_members {
+	Range1 range1;
+	Range2 range2;
+	Compare compare;
+};
+
+constexpr auto find_first_matching(auto & members, auto it1, auto it2) {
+	auto const last1 = ::containers::end(members.range1);
+	auto const last2 = ::containers::end(members.range2);
+	auto const comp = detail::less_to_compare(members.compare);
+	
+	while (it1 != last1 and it2 != last2) {
+		auto const cmp = comp(*it1, *it2);
+		if (cmp < 0) {
+			++it1;
+		} else if (cmp > 0) {
+			++it2;
+		} else {
+			return detail::set_intersection_pair_iterator(members, it1, it2);
+		}
+	}
+	return detail::set_intersection_pair_iterator(members, last1, last2);
+}
+
+template<typename Members, typename ForwardIterator1, typename ForwardIterator2>
 struct set_intersection_pair_iterator {
 private:
 	static constexpr auto max_difference = bounded::min(
@@ -54,8 +82,8 @@ public:
 	using reference = value_type;
 	using iterator_category = std::forward_iterator_tag;
 	
-	constexpr set_intersection_pair_iterator(Range & range, ForwardIterator1 it1, ForwardIterator2 it2):
-		m_range(range),
+	constexpr set_intersection_pair_iterator(Members & members, ForwardIterator1 it1, ForwardIterator2 it2):
+		m_members(members),
 		m_it1(it1),
 		m_it2(it2)
 	{
@@ -69,40 +97,40 @@ public:
 	}
 	
 	constexpr auto operator+(bounded::constant_t<1>) const {
-		return Range::find_first_matching(m_range.get(), containers::next(m_it1), containers::next(m_it2));
+		return find_first_matching(m_members.get(), containers::next(m_it1), containers::next(m_it2));
 	}
 
 private:
-	reference_wrapper<Range> m_range;	
+	reference_wrapper<Members> m_members;	
 	ForwardIterator1 m_it1;
 	ForwardIterator2 m_it2;
 };
 
-template<typename Range, typename ForwardIterator1, typename ForwardIterator2>
-constexpr auto operator*(set_intersection_pair_iterator<Range, ForwardIterator1, ForwardIterator2> const it) {
-	return typename set_intersection_pair_iterator<Range, ForwardIterator1, ForwardIterator2>::value_type(*it.first(), *it.second());
+template<typename Members, typename ForwardIterator1, typename ForwardIterator2>
+constexpr auto operator*(set_intersection_pair_iterator<Members, ForwardIterator1, ForwardIterator2> const it) {
+	return typename set_intersection_pair_iterator<Members, ForwardIterator1, ForwardIterator2>::value_type(*it.first(), *it.second());
 }
 
 // These functions can compare only one pair of iterators because it is not
 // legal to compare iterators from two different ranges. We know that if one
 // set matches, the other must.
 template<
-	typename LHSForwardIterator1, typename LHSForwardIterator2, typename LHSRange,
-	typename RHSForwardIterator1, typename RHSForwardIterator2, typename RHSRange
-> requires (std::is_same_v<std::remove_const_t<LHSRange>, std::remove_const_t<RHSRange>>)
+	typename LHSMembers, typename LHSForwardIterator1, typename LHSForwardIterator2,
+	typename RHSMembers, typename RHSForwardIterator1, typename RHSForwardIterator2
+> requires (std::is_same_v<std::remove_const_t<LHSMembers>, std::remove_const_t<RHSMembers>>)
 constexpr auto operator<=>(
-	set_intersection_pair_iterator<LHSForwardIterator1, LHSForwardIterator2, LHSRange> const lhs,
-	set_intersection_pair_iterator<RHSForwardIterator1, RHSForwardIterator2, RHSRange> const rhs
+	set_intersection_pair_iterator<LHSMembers, LHSForwardIterator1, LHSForwardIterator2> const lhs,
+	set_intersection_pair_iterator<RHSMembers, RHSForwardIterator1, RHSForwardIterator2> const rhs
 ) {
 	return lhs.first() <=> rhs.first();
 }
 template<
-	typename LHSForwardIterator1, typename LHSForwardIterator2, typename LHSRange,
-	typename RHSForwardIterator1, typename RHSForwardIterator2, typename RHSRange
-> requires (std::is_same_v<std::remove_const_t<LHSRange>, std::remove_const_t<RHSRange>>)
+	typename LHSMembers, typename LHSForwardIterator1, typename LHSForwardIterator2,
+	typename RHSMembers, typename RHSForwardIterator1, typename RHSForwardIterator2
+> requires (std::is_same_v<std::remove_const_t<LHSMembers>, std::remove_const_t<RHSMembers>>)
 constexpr auto operator==(
-	set_intersection_pair_iterator<LHSForwardIterator1, LHSForwardIterator2, LHSRange> const lhs,
-	set_intersection_pair_iterator<RHSForwardIterator1, RHSForwardIterator2, RHSRange> const rhs
+	set_intersection_pair_iterator<LHSMembers, LHSForwardIterator1, LHSForwardIterator2> const lhs,
+	set_intersection_pair_iterator<RHSMembers, RHSForwardIterator1, RHSForwardIterator2> const rhs
 ) -> bool {
 	return lhs.first() == rhs.first();
 }
@@ -113,13 +141,16 @@ constexpr auto operator==(
 // TODO: find a better name for this
 template<typename Range1, typename Range2, typename Compare>
 struct set_intersection_pair {
+private:
+	using members_t = detail::set_intersection_members<Range1, Range2, Compare>;
+public:
 	using iterator = detail::set_intersection_pair_iterator<
-		set_intersection_pair<Range1, Range2, Compare>,
+		members_t,
 		decltype(containers::begin(std::declval<Range1 &>())),
 		decltype(containers::begin(std::declval<Range2 &>()))
 	>;
 	using const_iterator = detail::set_intersection_pair_iterator<
-		set_intersection_pair<Range1, Range2, Compare> const,
+		members_t const,
 		decltype(containers::begin(std::declval<Range1 const &>())),
 		decltype(containers::begin(std::declval<Range2 const &>()))
 	>;
@@ -130,67 +161,39 @@ struct set_intersection_pair {
 	>;
 
 	template<typename R1, typename R2>
-	constexpr set_intersection_pair(R1 && range1, R2 && range2, Compare compare):
-		m_range1(OPERATORS_FORWARD(range1)),
-		m_range2(OPERATORS_FORWARD(range2)),
-		m_compare(std::move(compare))
-	{
-	}
-	
-	template<typename R1, typename R2>
-	constexpr set_intersection_pair(R1 && range1, R2 && range2):
-		m_range1(OPERATORS_FORWARD(range1)),
-		m_range2(OPERATORS_FORWARD(range2))
+	constexpr set_intersection_pair(R1 && range1, R2 && range2, Compare compare = Compare()):
+		m_members{
+			OPERATORS_FORWARD(range1),
+			OPERATORS_FORWARD(range2),
+			std::move(compare)
+		}
 	{
 	}
 	
 	constexpr auto begin() const & {
 		return find_first_matching(
-			*this,
-			::containers::begin(m_range1),
-			::containers::begin(m_range2)
+			m_members,
+			::containers::begin(m_members.range1),
+			::containers::begin(m_members.range2)
 		);
 	}
 	constexpr auto begin() & {
 		return find_first_matching(
 			*this,
-			::containers::begin(m_range1),
-			::containers::begin(m_range2)
+			::containers::begin(m_members.range1),
+			::containers::begin(m_members.range2)
 		);
 	}
 
 	constexpr auto end() const & {
-		return const_iterator(*this, ::containers::end(m_range1), ::containers::end(m_range2));
+		return const_iterator(m_members, ::containers::end(m_members.range1), ::containers::end(m_members.range2));
 	}
 	constexpr auto end() & {
-		return iterator(*this, ::containers::end(m_range1), ::containers::end(m_range2));
+		return iterator(m_members, ::containers::end(m_members.range1), ::containers::end(m_members.range2));
 	}
 
 private:
-	friend iterator;
-	friend const_iterator;
-
-	static constexpr auto find_first_matching(auto & self, auto it1, auto it2) {
-		auto const last1 = ::containers::end(self.m_range1);
-		auto const last2 = ::containers::end(self.m_range2);
-		auto const comp = detail::less_to_compare(self.m_compare);
-		
-		while (it1 != last1 and it2 != last2) {
-			auto const cmp = comp(*it1, *it2);
-			if (cmp < 0) {
-				++it1;
-			} else if (cmp > 0) {
-				++it2;
-			} else {
-				return detail::set_intersection_pair_iterator(self, it1, it2);
-			}
-		}
-		return detail::set_intersection_pair_iterator(self, last1, last2);
-	}
-
-	Range1 m_range1;
-	Range2 m_range2;
-	Compare m_compare;
+	members_t m_members;
 };
 
 template<typename Range1, typename Range2, typename Compare>
