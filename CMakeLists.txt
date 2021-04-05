@@ -123,6 +123,7 @@ add_library(containers_test STATIC
 	source/containers/algorithms/copy.cpp
 	source/containers/algorithms/copy_n.cpp
 	source/containers/algorithms/count.cpp
+	source/containers/algorithms/destroy_range.cpp
 	source/containers/algorithms/distance.cpp
 	source/containers/algorithms/erase.cpp
 	source/containers/algorithms/filter_iterator.cpp

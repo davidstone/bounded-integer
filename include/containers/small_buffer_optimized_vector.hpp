@@ -5,6 +5,7 @@
 
 #pragma once
 
+#include <containers/algorithms/destroy_range.hpp>
 #include <containers/array/array.hpp>
 #include <containers/append.hpp>
 #include <containers/assign.hpp>
@@ -180,14 +181,14 @@ struct small_buffer_optimized_vector : private lexicographical_comparison::base 
 		return *this;
 	}
 	constexpr auto & operator=(small_buffer_optimized_vector && other) & noexcept {
-		::containers::detail::destroy_range(*this);
+		::containers::destroy_range(*this);
 		deallocate_large();
 		move_assign_to_empty(std::move(other));
 		return *this;
 	}
 
 	constexpr ~small_buffer_optimized_vector() {
-		::containers::detail::destroy_range(*this);
+		::containers::destroy_range(*this);
 		deallocate_large();
 	}
 

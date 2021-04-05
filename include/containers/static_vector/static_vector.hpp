@@ -6,6 +6,7 @@
 #pragma once
 
 #include <containers/algorithms/copy.hpp>
+#include <containers/algorithms/destroy_range.hpp>
 #include <containers/algorithms/uninitialized.hpp>
 #include <containers/array/array.hpp>
 #include <containers/append.hpp>
@@ -122,7 +123,7 @@ public:
 	static_vector_data & operator=(static_vector_data const &) & = default;
 
 	constexpr ~static_vector_data() {
-		::containers::detail::destroy_range(*this);
+		::containers::destroy_range(*this);
 	}
 };
 

@@ -5,6 +5,7 @@
 
 #pragma once
 
+#include <containers/algorithms/destroy_range.hpp>
 #include <containers/algorithms/remove.hpp>
 #include <containers/algorithms/uninitialized.hpp>
 #include <containers/begin_end.hpp>
@@ -51,7 +52,7 @@ constexpr auto erase(Container & container, typename Container::const_iterator c
 		if (source != end_) {
 			containers::uninitialized_relocate(target, source, end_);
 		} else {
-			containers::detail::destroy_range(target, last);
+			containers::destroy_range(target, last);
 		}
 		container.append_from_capacity(-count);
 		return containers::begin(container) + offset;

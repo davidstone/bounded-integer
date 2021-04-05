@@ -5,8 +5,9 @@
 
 #pragma once
 
-#include <containers/algorithms/relocate_iterator.hpp>
+#include <containers/algorithms/destroy_range.hpp>
 #include <containers/algorithms/move_iterator.hpp>
+#include <containers/algorithms/relocate_iterator.hpp>
 #include <containers/algorithms/reverse_iterator.hpp>
 #include <containers/begin_end.hpp>
 #include <containers/is_iterator_sentinel.hpp>
@@ -35,17 +36,6 @@ constexpr auto static_or_reinterpret_cast(auto && source) {
 	}
 }
 
-template<iterator InputIterator>
-constexpr void destroy_range(InputIterator first, sentinel_for<InputIterator> auto const last) {
-	for (; first != last; ++first) {
-		bounded::destroy(*first);
-	}
-}
-
-constexpr void destroy_range(range auto && r) {
-	::containers::detail::destroy_range(containers::begin(OPERATORS_FORWARD(r)), containers::end(OPERATORS_FORWARD(r)));
-}
-
 }	// namespace detail
 
 
@@ -58,7 +48,7 @@ constexpr auto uninitialized_copy(InputIterator first, sentinel_for<InputIterato
 			++out;
 		}
 	} catch (...) {
-		detail::destroy_range(out_first, out);
+		containers::destroy_range(out_first, out);
 		throw;
 	}
 	return out;
@@ -123,7 +113,7 @@ constexpr auto uninitialized_default_construct(ForwardIterator const first, sent
 			bounded::construct(*it);
 		}
 	} catch (...) {
-		detail::destroy_range(first, it);
+		containers::destroy_range(first, it);
 		throw;
 	}
 }

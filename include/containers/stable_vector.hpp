@@ -5,6 +5,7 @@
 
 #pragma once
 
+#include <containers/algorithms/destroy_range.hpp>
 #include <containers/append.hpp>
 #include <containers/assign.hpp>
 #include <containers/begin_end.hpp>
@@ -60,11 +61,11 @@ struct stable_vector : private lexicographical_comparison::base {
 	}
 
 	constexpr ~stable_vector() {
-		::containers::detail::destroy_range(*this);
+		::containers::destroy_range(*this);
 	}
 
 	constexpr auto & operator=(stable_vector && other) & noexcept {
-		::containers::detail::destroy_range(*this);
+		::containers::destroy_range(*this);
 		m_storage = std::move(other.m_storage);
 		m_size = other.m_size;
 		other.m_size = 0_bi;
