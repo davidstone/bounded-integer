@@ -13,16 +13,8 @@
 #include <bounded/integer.hpp>
 
 namespace containers {
-namespace detail {
 
-template<typename Range>
-concept random_access_range = requires(Range const & range) {
-	static_cast<typename Range::size_type>(containers::end(range) - containers::begin(range));
-};
-
-} // namespace detail
-
-template<range Range> requires detail::has_member_size<Range> or detail::random_access_range<Range>
+template<range Range> requires detail::has_member_size<Range> or forward_random_access_range<Range>
 constexpr auto size(Range const & range) {
 	if constexpr (detail::has_member_size<Range>) {
 		return range.size();

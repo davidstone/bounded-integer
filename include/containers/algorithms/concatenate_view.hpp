@@ -57,12 +57,6 @@ template<typename... RangeViews>
 inline constexpr bool any_is_output_iterator = any_is_category<std::output_iterator_tag, RangeViews...>;
 
 
-template<typename Iterator>
-concept forward_random_access_iterator = iterator<Iterator> and iterator<decltype(std::declval<Iterator>() + std::declval<typename std::decay_t<Iterator>::difference_type>())>;
-
-template<typename Range>
-concept forward_random_access_range = range<Range> and forward_random_access_iterator<decltype(containers::begin(std::declval<Range>()))>;
-
 } // namespace detail
 
 // This is an interesting iterator type. If the iterators of the underlying
@@ -127,7 +121,7 @@ struct concatenate_view_iterator {
 			) or
 			(
 				bounded::min_value<Offset> >= bounded::constant<0> and
-				(... and detail::forward_random_access_range<RangeViews>)
+				(... and forward_random_access_range<RangeViews>)
 			)
 		)
 	)

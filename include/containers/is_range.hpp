@@ -25,4 +25,16 @@ using sentinel_t = decltype(containers::end(std::declval<Range>()));
 template<typename T>
 concept range = sentinel_for<detail::sentinel_t<T>, detail::iterator_t_impl<T>>;
 
+template<typename T>
+concept forward_range = range<T> and forward_iterator<detail::iterator_t_impl<T>>;
+
+template<typename T>
+concept bidirectional_range = forward_range<T> and bidirectional_iterator<detail::iterator_t_impl<T>>;
+
+template<typename T>
+concept forward_random_access_range = forward_range<T> and forward_random_access_iterator<detail::iterator_t_impl<T>>;
+
+template<typename T>
+concept random_access_range = bidirectional_range<T> and forward_random_access_range<T>;
+
 }	// namespace containers
