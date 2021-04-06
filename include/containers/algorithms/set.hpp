@@ -7,6 +7,7 @@
 
 #include <containers/algorithms/advance.hpp>
 #include <containers/begin_end.hpp>
+#include <containers/iter_value_t.hpp>
 #include <containers/reference_wrapper.hpp>
 
 #include <operators/forward.hpp>
@@ -154,7 +155,7 @@ public:
 		decltype(containers::begin(std::declval<Range1 const &>())),
 		decltype(containers::begin(std::declval<Range2 const &>()))
 	>;
-	using value_type = decltype(*std::declval<iterator>());
+	using value_type = iter_value_t<iterator>;
 	using size_type = bounded::integer<
 		0,
 		bounded::detail::builtin_max_value<typename iterator::difference_type>

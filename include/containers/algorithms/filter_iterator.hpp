@@ -10,7 +10,7 @@
 #include <containers/begin_end.hpp>
 #include <containers/default_adapt_traits.hpp>
 #include <containers/default_begin_end.hpp>
-#include <containers/is_iterator_sentinel.hpp>
+#include <containers/is_range.hpp>
 #include <containers/iterator_adapter.hpp>
 #include <containers/range_value_t.hpp>
 #include <containers/reference_wrapper.hpp>
@@ -103,7 +103,7 @@ constexpr auto filter_iterator(ForwardIterator first, sentinel_for<ForwardIterat
 template<typename Range, typename UnaryPredicate>
 struct filter {
 private:
-	using sentinel = decltype(::containers::end(std::declval<Range &>()));
+	using sentinel = detail::sentinel_t<Range const &>;
 	using traits = detail::filter_iterator_traits<sentinel, UnaryPredicate>;
 public:
 	using const_iterator = decltype(detail::filter_iterator_impl(
