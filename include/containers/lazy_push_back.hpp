@@ -22,9 +22,12 @@ namespace detail {
 template<typename Container>
 concept appendable_from_capacity = requires(Container & container, typename Container::size_type count) { container.append_from_capacity(count); };
 
+template<typename Container>
+concept lazy_push_backable = appendable_from_capacity<Container>;
+
 } // namespace detail
 
-template<detail::appendable_from_capacity Container>
+template<detail::lazy_push_backable Container>
 constexpr auto & lazy_push_back(
 	Container & container,
 	bounded::construct_function_for<range_value_t<Container>> auto && constructor

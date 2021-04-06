@@ -16,12 +16,6 @@
 #include <bounded/integer.hpp>
 
 namespace containers {
-namespace detail {
-
-template<typename Container>
-concept lazy_push_backable = requires(Container & container, range_value_t<Container> (&constructor)()) { lazy_push_back(container, constructor); };
-
-} // namespace detail
 
 // I would like to return an iterator to the start of the appended range, but
 // that does not seem possible to do efficiently in general due to potential
