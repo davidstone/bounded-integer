@@ -88,4 +88,10 @@ constexpr auto end(c_array<T, size> && a) {
 	return move_iterator(contiguous_iterator<T, size>(a + size));
 }
 
+namespace detail {
+
+using ::containers::begin;
+using ::containers::end;
+
+} // namespace detail
 } // namespace containers
