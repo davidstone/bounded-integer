@@ -32,6 +32,19 @@ concept erasable = member_erasable<Container> or resizable_container<Container>;
 
 } // namespace detail
 
+template<resizable_container Container>
+constexpr void erase_after(Container & container, iterator_t<Container const &> const_position) {
+	auto const last = containers::end(container);
+	if constexpr (detail::appendable_from_capacity<Container>) {
+		auto const count = last - const_position;
+		auto target = ::containers::detail::mutable_iterator(container, const_position);
+		containers::destroy_range(range_view(target, last));
+		container.append_from_capacity(-count);
+	} else {
+		container.erase(const_position, last);
+	}
+}
+
 template<detail::erasable Container>
 constexpr auto erase(Container & container, typename Container::const_iterator const first, typename Container::const_iterator const last) {
 	if constexpr (detail::member_erasable<Container>) {
