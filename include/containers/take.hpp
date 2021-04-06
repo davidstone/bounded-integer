@@ -10,6 +10,7 @@
 #include <containers/iter_value_t.hpp>
 #include <containers/range_view.hpp>
 
+#include <bounded/clamp.hpp>
 #include <bounded/integer.hpp>
 #include <bounded/unreachable.hpp>
 
@@ -39,17 +40,30 @@ private:
 	Sentinel m_sentinel;
 };
 
+namespace detail {
+
+template<typename Difference, typename Count>
+using counted_offset_type = bounded::integer<
+	0,
+	bounded::normalize<bounded::min(bounded::integer(bounded::max_value<Difference>), bounded::max_value<Count>).value()>
+>;
+
+} // namespace detail
+
 template<typename Iterator, typename Count>
 struct counted_iterator {
+private:
+	using offset_type = detail::counted_offset_type<typename Iterator::difference_type, Count>;
+public:
 	using iterator_category = typename std::iterator_traits<Iterator>::iterator_category;
 	using value_type = iter_value_t<Iterator>;
-	using difference_type = decltype(std::declval<Count>() - std::declval<Count>());
+	using difference_type = decltype(std::declval<offset_type>() - std::declval<offset_type>());
 	using pointer = typename std::iterator_traits<Iterator>::pointer;
 	using reference = typename std::iterator_traits<Iterator>::reference;
 
 	constexpr explicit counted_iterator(Iterator it, Count count):
 		m_it(std::move(it)),
-		m_count(count)
+		m_count(bounded::clamp(count, bounded::min_value<offset_type>, bounded::max_value<offset_type>))
 	{
 	}
 
@@ -77,12 +91,12 @@ struct counted_iterator {
 
 	// TODO: Properly constrain this function
 	template<bounded::integral Offset> requires(
-		bounded::max_value<decltype(std::declval<Count>() - std::declval<Offset>())> >= bounded::constant<0>
+		bounded::max_value<decltype(std::declval<offset_type>() - std::declval<Offset>())> >= bounded::constant<0>
 	)
 	friend constexpr auto operator+(counted_iterator it, Offset const offset) {
 		return counted_iterator(
 			std::move(it).m_it + offset,
-			static_cast<Count>(it.m_count - offset)
+			static_cast<offset_type>(it.m_count - offset)
 		);
 	}
 	friend constexpr auto operator-(counted_iterator const & lhs, counted_iterator const & rhs) {
@@ -98,18 +112,15 @@ struct counted_iterator {
 	}
 private:
 	Iterator m_it;
-	// TODO: Constrain maximum value with the difference type?
-	Count m_count;
+	offset_type m_count;
 };
 
-template<typename Iterator, typename Count> requires(bounded::max_value<Count> == bounded::constant<0>)
+template<typename Iterator, typename Count> requires(bounded::max_value<typename counted_iterator<Iterator, Count>::difference_type> == bounded::constant<0>)
 constexpr auto & operator++(counted_iterator<Iterator, Count> & it) {
 	bounded::unreachable();
 	return it;
 }
 
-
-// TODO: Handle range having a sentinel type
 template<bounded::bounded_integer Count>
 constexpr auto take(range auto && source, Count count_) {
 	auto const count = bounded::integer<0, bounded::detail::builtin_max_value<Count>>(count_);
