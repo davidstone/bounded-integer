@@ -6,6 +6,7 @@
 #pragma once
 
 #include <containers/common_functions.hpp>
+#include <containers/offset_type.hpp>
 #include <containers/range_view.hpp>
 
 #include <bounded/assert.hpp>
@@ -48,15 +49,19 @@ struct single_element_iterator {
 		return m_is_end;
 	}
 
-	friend constexpr auto operator+(single_element_iterator lhs, bounded::constant_t<1>) {
-		BOUNDED_ASSERT_OR_ASSUME(!lhs.m_is_end);
-		lhs.m_is_end = true;
+	friend constexpr auto operator+(single_element_iterator lhs, offset_type<single_element_iterator> const offset) {
+		if (offset == 1_bi) {
+			BOUNDED_ASSERT_OR_ASSUME(!lhs.m_is_end);
+			lhs.m_is_end = true;
+		}
 		return lhs;
 	}
 
-	friend constexpr auto operator-(single_element_iterator lhs, bounded::constant_t<1>) {
-		BOUNDED_ASSERT_OR_ASSUME(lhs.m_is_end);
-		lhs.m_is_end = false;
+	friend constexpr auto operator-(single_element_iterator lhs, offset_type<single_element_iterator> const offset) {
+		if (offset == 1_bi) {
+			BOUNDED_ASSERT_OR_ASSUME(lhs.m_is_end);
+			lhs.m_is_end = false;
+		}
 		return lhs;
 	}
 
@@ -89,19 +94,17 @@ constexpr auto operator==(single_element_iterator<T> const lhs, single_element_s
 
 template<typename T>
 constexpr auto operator-(single_element_iterator<T> const lhs, single_element_iterator<T> const rhs) {
-	BOUNDED_ASSERT(lhs >= rhs);
-	return BOUNDED_CONDITIONAL(lhs == rhs, 0_bi, 1_bi);
+	return bounded::integer(lhs.is_end()) - bounded::integer(rhs.is_end());
 }
 
 template<typename T>
 constexpr auto operator-(single_element_sentinel, single_element_iterator<T> const rhs) {
-	return BOUNDED_CONDITIONAL(rhs.is_end(), 0_bi, 1_bi);
+	return 1_bi - bounded::integer(rhs.is_end());
 }
 
 template<typename T>
 constexpr auto operator-(single_element_iterator<T> const lhs, single_element_sentinel) {
-	BOUNDED_ASSERT(lhs.is_end());
-	return 0_bi;
+	return bounded::integer(lhs.is_end()) - 1_bi;
 }
 
 }	// namespace detail
