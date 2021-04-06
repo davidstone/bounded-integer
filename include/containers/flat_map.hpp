@@ -19,9 +19,9 @@
 #include <containers/insert.hpp>
 #include <containers/legacy_iterator.hpp>
 #include <containers/lookup.hpp>
+#include <containers/range_value_t.hpp>
 #include <containers/relocate.hpp>
 #include <containers/size.hpp>
-#include <containers/value_type.hpp>
 #include <containers/vector.hpp>
 
 #include <bounded/detail/tuple.hpp>

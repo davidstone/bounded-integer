@@ -7,8 +7,8 @@
 
 #include <containers/begin_end.hpp>
 #include <containers/common_iterator_functions.hpp>
+#include <containers/iter_value_t.hpp>
 #include <containers/range_view.hpp>
-#include <containers/value_type.hpp>
 
 #include <bounded/integer.hpp>
 #include <bounded/unreachable.hpp>

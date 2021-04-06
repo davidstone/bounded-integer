@@ -10,9 +10,11 @@
 #include <containers/front_back.hpp>
 #include <containers/is_empty.hpp>
 #include <containers/is_range.hpp>
+#include <containers/iter_value_t.hpp>
+#include <containers/iterator_t.hpp>
+#include <containers/range_value_t.hpp>
 #include <containers/range_view.hpp>
 #include <containers/size.hpp>
-#include <containers/value_type.hpp>
 
 #include <bounded/detail/construct_destroy.hpp>
 #include <bounded/detail/make_index_sequence.hpp>

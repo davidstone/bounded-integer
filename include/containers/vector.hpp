@@ -14,8 +14,8 @@
 #include <containers/compare_container.hpp>
 #include <containers/contiguous_iterator.hpp>
 #include <containers/maximum_array_size.hpp>
+#include <containers/range_value_t.hpp>
 #include <containers/uninitialized_dynamic_array.hpp>
-#include <containers/value_type.hpp>
 
 #include <operators/bracket.hpp>
 #include <operators/forward.hpp>

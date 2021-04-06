@@ -13,11 +13,11 @@
 #include <containers/front_back.hpp>
 #include <containers/mutable_iterator.hpp>
 #include <containers/push_back.hpp>
+#include <containers/range_value_t.hpp>
 #include <containers/range_view.hpp>
 #include <containers/reserve_if_reservable.hpp>
 #include <containers/resizable_container.hpp>
 #include <containers/size.hpp>
-#include <containers/value_type.hpp>
 
 #include <bounded/integer.hpp>
 #include <bounded/unreachable.hpp>

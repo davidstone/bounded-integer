@@ -8,7 +8,7 @@
 #include <containers/algorithms/transform.hpp>
 #include <containers/begin_end.hpp>
 #include <containers/common_functions.hpp>
-#include <containers/value_type.hpp>
+#include <containers/iter_value_t.hpp>
 
 #include <bounded/assert.hpp>
 #include <bounded/integer.hpp>

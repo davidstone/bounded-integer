@@ -12,8 +12,17 @@
 #include <type_traits>
 
 namespace containers {
+namespace detail {
+
+template<typename Range>
+using iterator_t_impl = decltype(containers::begin(std::declval<Range>()));
+
+template<typename Range>
+using sentinel_t = decltype(containers::end(std::declval<Range>()));
+
+} // namespace detail
 
 template<typename T>
-concept range = sentinel_for<decltype(containers::end(std::declval<T const &>())), decltype(containers::begin(std::declval<T const &>()))>;
+concept range = sentinel_for<detail::sentinel_t<T>, detail::iterator_t_impl<T>>;
 
 }	// namespace containers

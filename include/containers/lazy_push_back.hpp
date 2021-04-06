@@ -8,9 +8,9 @@
 #include <containers/algorithms/uninitialized.hpp>
 #include <containers/data.hpp>
 #include <containers/front_back.hpp>
+#include <containers/range_value_t.hpp>
 #include <containers/reserve_if_reservable.hpp>
 #include <containers/size.hpp>
-#include <containers/value_type.hpp>
 
 #include <bounded/integer.hpp>
 #include <bounded/lazy_init.hpp>

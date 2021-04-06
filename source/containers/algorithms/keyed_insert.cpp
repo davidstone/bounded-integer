@@ -6,7 +6,7 @@
 #include <containers/algorithms/keyed_insert.hpp>
 
 #include <containers/flat_map.hpp>
-#include <containers/value_type.hpp>
+#include <containers/range_value_t.hpp>
 
 #include "../../test_assert.hpp"
 #include "../../test_int.hpp"

@@ -10,11 +10,11 @@
 #include <containers/begin_end.hpp>
 #include <containers/is_empty.hpp>
 #include <containers/push_back.hpp>
+#include <containers/range_value_t.hpp>
 #include <containers/range_view.hpp>
 #include <containers/reserve_if_reservable.hpp>
 #include <containers/shrink_to_fit.hpp>
 #include <containers/uninitialized_dynamic_array.hpp>
-#include <containers/value_type.hpp>
 
 #include "../test_assert.hpp"
 #include "../test_int.hpp"

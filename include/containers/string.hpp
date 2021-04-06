@@ -8,10 +8,10 @@
 #include <containers/algorithms/compare.hpp>
 #include <containers/algorithms/concatenate.hpp>
 #include <containers/begin_end.hpp>
+#include <containers/range_value_t.hpp>
 #include <containers/range_view.hpp>
 #include <containers/single_element_range.hpp>
 #include <containers/small_buffer_optimized_vector.hpp>
-#include <containers/value_type.hpp>
 
 #include <iosfwd>
 #include <type_traits>

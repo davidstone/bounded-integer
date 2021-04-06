@@ -6,7 +6,7 @@
 #pragma once
 
 #include <containers/algorithms/compare.hpp>
-#include <containers/value_type.hpp>
+#include <containers/range_value_t.hpp>
 
 #include <bounded/detail/comparison.hpp>
 

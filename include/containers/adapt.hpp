@@ -7,9 +7,9 @@
 
 #include <containers/begin_end.hpp>
 #include <containers/common_functions.hpp>
+#include <containers/iter_value_t.hpp>
 #include <containers/iterator_adapter.hpp>
 #include <containers/reference_wrapper.hpp>
-#include <containers/value_type.hpp>
 
 #include <bounded/integer.hpp>
 

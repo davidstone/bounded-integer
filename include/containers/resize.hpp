@@ -7,11 +7,11 @@
 
 #include <containers/append.hpp>
 #include <containers/pop_back.hpp>
+#include <containers/range_value_t.hpp>
 #include <containers/repeat_n.hpp>
 #include <containers/resizable_container.hpp>
 #include <containers/size.hpp>
 #include <containers/take.hpp>
-#include <containers/value_type.hpp>
 
 #include <operators/forward.hpp>
 #include <bounded/integer.hpp>

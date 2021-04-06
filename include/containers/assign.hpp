@@ -10,9 +10,9 @@
 #include <containers/begin_end.hpp>
 #include <containers/c_array.hpp>
 #include <containers/is_range.hpp>
+#include <containers/range_value_t.hpp>
 #include <containers/range_view.hpp>
 #include <containers/resizable_container.hpp>
-#include <containers/value_type.hpp>
 
 #include <bounded/integer.hpp>
 

@@ -12,8 +12,8 @@
 #include <containers/default_begin_end.hpp>
 #include <containers/is_iterator_sentinel.hpp>
 #include <containers/iterator_adapter.hpp>
+#include <containers/range_value_t.hpp>
 #include <containers/reference_wrapper.hpp>
-#include <containers/value_type.hpp>
 
 #include <operators/forward.hpp>
 #include <bounded/assert.hpp>

@@ -5,9 +5,7 @@
 
 #pragma once
 
-#include <containers/begin_end.hpp>
 #include <containers/is_iterator.hpp>
-#include <containers/is_range.hpp>
 
 #include <type_traits>
 
@@ -28,13 +26,7 @@ struct iter_value_t_impl<Iterator> {
 
 } // namespace detail
 
-template<range Range>
-using iterator_t = decltype(containers::begin(std::declval<Range &>()));
-
 template<iterator Iterator>
 using iter_value_t = typename detail::iter_value_t_impl<Iterator>::type;
-
-template<range Range>
-using range_value_t = iter_value_t<iterator_t<Range>>;
 
 } // namespace containers

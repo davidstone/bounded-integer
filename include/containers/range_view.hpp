@@ -7,7 +7,7 @@
 
 #include <containers/begin_end.hpp>
 #include <containers/is_range.hpp>
-#include <containers/value_type.hpp>
+#include <containers/iter_value_t.hpp>
 
 #include <bounded/integer.hpp>
 

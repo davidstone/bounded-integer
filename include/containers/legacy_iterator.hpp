@@ -9,7 +9,7 @@
 
 #include <containers/common_iterator_functions.hpp>
 #include <containers/is_iterator.hpp>
-#include <containers/value_type.hpp>
+#include <containers/iter_value_t.hpp>
 
 #include <bounded/integer.hpp>
 

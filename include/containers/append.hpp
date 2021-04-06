@@ -9,9 +9,9 @@
 #include <containers/begin_end.hpp>
 #include <containers/lazy_push_back.hpp>
 #include <containers/push_back.hpp>
+#include <containers/range_value_t.hpp>
 #include <containers/reserve_if_reservable.hpp>
 #include <containers/size.hpp>
-#include <containers/value_type.hpp>
 
 #include <bounded/integer.hpp>
 

@@ -9,7 +9,7 @@
 #include <containers/front_back.hpp>
 #include <containers/lazy_push_back.hpp>
 #include <containers/reserve_if_reservable.hpp>
-#include <containers/value_type.hpp>
+#include <containers/range_value_t.hpp>
 
 #include <bounded/integer.hpp>
 #include <bounded/unreachable.hpp>

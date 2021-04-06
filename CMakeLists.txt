@@ -177,7 +177,9 @@ add_library(containers_test STATIC
 	source/containers/is_iterator.cpp
 	source/containers/is_iterator_sentinel.cpp
 	source/containers/is_range.cpp
+	source/containers/iter_value_t.cpp
 	source/containers/iterator_adapter.cpp
+	source/containers/iterator_t.cpp
 	source/containers/key_comparison_function.cpp
 	source/containers/lazy_push_back.cpp
 	source/containers/legacy_iterator.cpp
@@ -189,6 +191,7 @@ add_library(containers_test STATIC
 	source/containers/pop_back.cpp
 	source/containers/pop_front.cpp
 	source/containers/push_back.cpp
+	source/containers/range_value_t.cpp
 	source/containers/range_view.cpp
 	source/containers/reference_wrapper.cpp
 	source/containers/repeat_n.cpp
@@ -203,7 +206,6 @@ add_library(containers_test STATIC
 	source/containers/take.cpp
 	source/containers/to_address.cpp
 	source/containers/uninitialized_dynamic_array.cpp
-	source/containers/value_type.cpp
 	source/containers/vector.cpp
 )
 
