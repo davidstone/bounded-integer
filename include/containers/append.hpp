@@ -49,14 +49,9 @@ constexpr auto append(Container & output, range auto && input) -> void {
 		auto const new_end = containers::uninitialized_copy(OPERATORS_FORWARD(input), containers::end(output));
 		output.append_from_capacity(new_end - containers::end(output));
 	} else if constexpr (detail::lazy_push_backable<Container>) {
-		auto const last = containers::end(OPERATORS_FORWARD(input));
-		for (auto it = containers::begin(OPERATORS_FORWARD(input)); it != last; ++it) {
-			lazy_push_back(output, [&] { return *it; });
-		}
+		::containers::detail::lazy_push_back_range(output, OPERATORS_FORWARD(input));
 	} else {
-		for (decltype(auto) value : OPERATORS_FORWARD(input)) {
-			::containers::push_back(output, OPERATORS_FORWARD(value));
-		}
+		::containers::detail::push_back_range(output, OPERATORS_FORWARD(input));
 	}
 }
 

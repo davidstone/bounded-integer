@@ -51,5 +51,15 @@ constexpr auto & lazy_push_back(
 	}
 	return containers::back(container);
 }
-	
-}	// namespace containers
+
+namespace detail {
+
+constexpr auto lazy_push_back_range(auto & target, auto && source) {
+	auto const last = containers::end(OPERATORS_FORWARD(source));
+	for (auto it = containers::begin(OPERATORS_FORWARD(source)); it != last; ++it) {
+		::containers::lazy_push_back(target, [&] { return *it; });
+	}
+}
+
+} // namespace detail
+} // namespace containers
