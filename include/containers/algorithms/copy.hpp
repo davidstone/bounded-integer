@@ -11,21 +11,45 @@
 
 namespace containers {
 
-template<iterator InputIterator>
-constexpr auto copy(InputIterator first, sentinel_for<InputIterator> auto const last, iterator auto out) {
+template<iterator InputIterator, iterator OutputIterator>
+constexpr auto copy(InputIterator first, sentinel_for<InputIterator> auto const last, OutputIterator out) {
 	struct result {
 		InputIterator input;
-		decltype(out) output;
+		OutputIterator output;
 	};
-	for (; first != last; ++first) {
+	for (; first != last; ++first, ++out) {
 		*out = *first;
-		++out;
 	}
-	return result { first, out };
+	return result{std::move(first), std::move(out)};
 }
 
-constexpr auto copy(range auto && input, iterator auto out) {
-	return ::containers::copy(containers::begin(input), containers::end(input), out);
+template<iterator InputIterator, iterator OutputIterator>
+constexpr auto copy(InputIterator in_first, sentinel_for<InputIterator> auto const in_last, OutputIterator out_first, sentinel_for<OutputIterator> auto const out_last) {
+	struct result {
+		InputIterator input;
+		OutputIterator output;
+	};
+	for (; in_first != in_last and out_first != out_last; ++in_first, ++out_first) {
+		*out_first = *in_first;
+	}
+	return result{std::move(in_first), std::move(out_first)};
+}
+
+constexpr auto copy(range auto && input, iterator auto output) {
+	return ::containers::copy(
+		containers::begin(OPERATORS_FORWARD(input)),
+		containers::end(OPERATORS_FORWARD(input)),
+		std::move(output)
+	);
+}
+
+constexpr auto copy(range auto && input, range auto && output) {
+	return ::containers::copy(
+		containers::begin(OPERATORS_FORWARD(input)),
+		containers::end(OPERATORS_FORWARD(input)),
+		containers::begin(OPERATORS_FORWARD(output)),
+		containers::end(OPERATORS_FORWARD(output))
+	);
 }
 
 template<iterator InputIterator>
