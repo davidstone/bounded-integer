@@ -24,8 +24,8 @@ struct equal_only : containers::range_equality::base {
 	constexpr auto begin() const {
 		return static_cast<int const *>(m_data);
 	}
-	constexpr auto end() const {
-		return begin() + m_size;
+	constexpr auto size() const {
+		return m_size;
 	}
 
 private:
@@ -62,8 +62,8 @@ struct lexicographical : containers::lexicographical_comparison::base {
 	constexpr auto begin() const {
 		return static_cast<int const *>(m_data);
 	}
-	constexpr auto end() const {
-		return begin() + m_size;
+	constexpr auto size() const {
+		return m_size;
 	}
 
 private:
@@ -137,9 +137,6 @@ struct shortlex : containers::shortlex_comparison::base {
 	}
 	constexpr auto begin() const {
 		return static_cast<int const *>(m_data);
-	}
-	constexpr auto end() const {
-		return begin() + m_size;
 	}
 	constexpr auto size() const {
 		return m_size;
