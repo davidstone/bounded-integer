@@ -16,10 +16,10 @@
 #include <containers/common_functions.hpp>
 #include <containers/compare_container.hpp>
 #include <containers/contiguous_iterator.hpp>
-#include <containers/dynamic_array_data.hpp>
 #include <containers/is_iterator.hpp>
+#include <containers/maximum_array_size.hpp>
 #include <containers/size.hpp>
-#include <containers/uninitialized_storage.hpp>
+#include <containers/uninitialized_dynamic_array.hpp>
 
 #include <operators/forward.hpp>
 
@@ -30,30 +30,6 @@
 #include <utility>
 
 namespace containers {
-namespace detail {
-
-template<typename T, typename Size>
-constexpr auto cleanup(dynamic_array_data<T, Size> const data) {
-	if (data.pointer == nullptr) {
-		return;
-	}
-	::containers::destroy_range(range_view(data.pointer, data.pointer + data.size));
-	deallocate_storage(data);
-}
-
-template<typename T>
-constexpr auto dynamic_array_initializer(range auto && init) {
-	auto const data = allocate_storage<T>(::containers::detail::linear_size(init));
-	try {
-		containers::uninitialized_copy(OPERATORS_FORWARD(init), data.pointer);
-	} catch(...) {
-		deallocate_storage(data);
-		throw;
-	}
-	return data;
-}
-
-} // namespace detail
 
 template<typename T>
 struct dynamic_array;
@@ -85,9 +61,10 @@ struct dynamic_array : private lexicographical_comparison::base {
 	constexpr dynamic_array() = default;
 
 	template<range Range> requires(!std::is_array_v<std::remove_cv_t<std::remove_reference_t<Range>>>)
-	constexpr explicit dynamic_array(Range && range):
-		m_data(::containers::detail::dynamic_array_initializer<value_type>(OPERATORS_FORWARD(range)))
+	constexpr explicit dynamic_array(Range && init):
+		m_data(size_type(::containers::detail::linear_size(init)))
 	{
+		containers::uninitialized_copy(OPERATORS_FORWARD(init), begin());
 	}
 
 	template<std::size_t init_size>
@@ -110,7 +87,7 @@ struct dynamic_array : private lexicographical_comparison::base {
 	}
 	
 	constexpr ~dynamic_array() {
-		detail::cleanup(m_data);
+		::containers::destroy_range(*this);
 	}
 
 	constexpr auto & operator=(dynamic_array const & other) & {
@@ -118,30 +95,30 @@ struct dynamic_array : private lexicographical_comparison::base {
 		return *this;
 	}
 	constexpr auto & operator=(dynamic_array && other) & noexcept {
-		detail::cleanup(m_data);
-		m_data = other.m_data;
+		::containers::destroy_range(*this);
+		m_data = std::move(other.m_data);
 		other.m_data = {};
 		return *this;
 	}
 	
 	constexpr auto begin() const & {
-		return const_iterator(m_data.pointer);
+		return const_iterator(m_data.data());
 	}
 	constexpr auto begin() & {
-		return iterator(m_data.pointer);
+		return iterator(m_data.data());
 	}
 	constexpr auto begin() && {
 		return ::containers::move_iterator(begin());
 	}
 
 	constexpr auto size() const {
-		return m_data.size;
+		return m_data.capacity();
 	}
 
 	OPERATORS_BRACKET_SEQUENCE_RANGE_DEFINITIONS
 	
 private:
-	detail::dynamic_array_data<value_type> m_data = {};
+	uninitialized_dynamic_array<value_type, size_type> m_data;
 };
 
 } // namespace containers

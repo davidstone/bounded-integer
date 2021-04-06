@@ -14,7 +14,7 @@
 #include <containers/common_functions.hpp>
 #include <containers/compare_container.hpp>
 #include <containers/contiguous_iterator.hpp>
-#include <containers/dynamic_array.hpp>
+#include <containers/dynamic_array_data.hpp>
 #include <containers/uninitialized_storage.hpp>
 
 #include <bounded/assert.hpp>
