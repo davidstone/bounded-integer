@@ -12,6 +12,7 @@
 #include <containers/begin_end.hpp>
 #include <containers/is_iterator_sentinel.hpp>
 #include <containers/is_range.hpp>
+#include <containers/range_view.hpp>
 #include <containers/size.hpp>
 
 #include <operators/forward.hpp>
@@ -48,7 +49,7 @@ constexpr auto uninitialized_copy(InputIterator first, sentinel_for<InputIterato
 			++out;
 		}
 	} catch (...) {
-		containers::destroy_range(out_first, out);
+		containers::destroy_range(range_view(out_first, out));
 		throw;
 	}
 	return out;
@@ -113,7 +114,7 @@ constexpr auto uninitialized_default_construct(ForwardIterator const first, sent
 			bounded::construct(*it);
 		}
 	} catch (...) {
-		containers::destroy_range(first, it);
+		containers::destroy_range(range_view(first, it));
 		throw;
 	}
 }

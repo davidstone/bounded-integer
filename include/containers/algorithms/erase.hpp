@@ -52,7 +52,7 @@ constexpr auto erase(Container & container, typename Container::const_iterator c
 		if (source != end_) {
 			containers::uninitialized_relocate(target, source, end_);
 		} else {
-			containers::destroy_range(target, last);
+			containers::destroy_range(range_view(target, last));
 		}
 		container.append_from_capacity(-count);
 		return containers::begin(container) + offset;

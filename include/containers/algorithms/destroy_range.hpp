@@ -5,22 +5,16 @@
 
 #pragma once
 
-#include <containers/begin_end.hpp>
 #include <containers/is_range.hpp>
 
 #include <bounded/detail/construct_destroy.hpp>
 
 namespace containers {
 
-template<iterator InputIterator>
-constexpr void destroy_range(InputIterator first, sentinel_for<InputIterator> auto const last) {
-	for (; first != last; ++first) {
-		bounded::destroy(*first);
-	}
-}
-
 constexpr void destroy_range(range auto && r) {
-	::containers::destroy_range(containers::begin(OPERATORS_FORWARD(r)), containers::end(OPERATORS_FORWARD(r)));
+	for (auto & value : OPERATORS_FORWARD(r)) {
+		bounded::destroy(value);
+	}
 }
 
 } // namespace containers
