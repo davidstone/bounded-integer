@@ -14,7 +14,10 @@
 
 namespace containers {
 
-template<range Range> requires detail::has_member_size<Range> or forward_random_access_range<Range>
+template<typename Range>
+concept sized_range = (range<Range> and detail::has_member_size<Range>) or forward_random_access_range<Range>;
+
+template<sized_range Range>
 constexpr auto size(Range const & range) {
 	if constexpr (detail::has_member_size<Range>) {
 		return range.size();
@@ -32,11 +35,12 @@ constexpr auto size(c_array<T, size_> const &) {
 
 namespace detail {
 
-constexpr auto linear_size(range auto const & r) {
+template<range Range>
+constexpr auto linear_size(Range const & r) {
 	if constexpr (requires { containers::size(r); }) {
 		return containers::size(r);
 	} else {
-		return containers::distance(containers::begin(r), containers::end(r));
+		return static_cast<typename Range::size_type>(containers::distance(containers::begin(r), containers::end(r)));
 	}
 }
 

@@ -61,17 +61,9 @@ constexpr auto lexicographical_compare_3way(InputIterator1 const first1, sentine
 
 
 
-namespace detail {
-
-template<typename Range>
-concept sized_range = range<Range> and requires(Range const & r) { ::containers::size(r); };
-
-} // namespace detail
-
-
 // Shorter ranges compare less than longer ranges. Ranges of the same length
 // compare lexicographically.
-constexpr auto shortlex_compare(detail::sized_range auto const & range1, detail::sized_range auto const & range2, auto cmp) {
+constexpr auto shortlex_compare(sized_range auto const & range1, sized_range auto const & range2, auto cmp) {
 	if (auto const result = ::containers::size(range1) <=> ::containers::size(range2); result != 0) {
 		return result;
 	}
@@ -83,7 +75,7 @@ constexpr auto shortlex_compare(detail::sized_range auto const & range1, detail:
 	);
 }
 
-constexpr auto shortlex_compare(detail::sized_range auto const & range1, detail::sized_range auto const & range2) {
+constexpr auto shortlex_compare(sized_range auto const & range1, sized_range auto const & range2) {
 	return ::containers::shortlex_compare(range1, range2, bounded::compare_3way());
 }
 
@@ -128,7 +120,7 @@ constexpr auto equal(InputIterator1 const first1, sentinel_for<InputIterator1> a
 
 template<range Range1, range Range2>
 constexpr auto equal(Range1 const & range1, Range2 const & range2, auto cmp) {
-	if constexpr (detail::sized_range<Range1> and detail::sized_range<Range2>) {
+	if constexpr (sized_range<Range1> and sized_range<Range2>) {
 		return
 			::containers::size(range1) == ::containers::size(range2) and
 			::containers::equal(containers::begin(range1), containers::end(range1), containers::begin(range2), std::move(cmp));
