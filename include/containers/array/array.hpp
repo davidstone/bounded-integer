@@ -15,6 +15,7 @@
 
 #include <algorithm>
 #include <cstddef>
+#include <compare>
 #include <iterator>
 #include <type_traits>
 #include <utility>
@@ -35,7 +36,9 @@ struct array_value_type<T> {
 	using type = T;
 };
 
-struct monostate{};
+struct monostate {
+	friend auto operator<=>(monostate, monostate) = default;
+};
 
 template<std::size_t size>
 struct array_trait {
