@@ -3,6 +3,7 @@
 // (See accompanying file LICENSE_1_0.txt or copy at
 // http://www.boost.org/LICENSE_1_0.txt)
 
+#include <containers/algorithms/double_buffered_ska_sort.hpp>
 #include <containers/algorithms/ska_sort.hpp>
 #include <containers/algorithms/sort.hpp>
 #include <containers/array/array.hpp>

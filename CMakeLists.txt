@@ -125,6 +125,7 @@ add_library(containers_test STATIC
 	source/containers/algorithms/count.cpp
 	source/containers/algorithms/destroy_range.cpp
 	source/containers/algorithms/distance.cpp
+	source/containers/algorithms/double_buffered_ska_sort.cpp
 	source/containers/algorithms/erase.cpp
 	source/containers/algorithms/filter_iterator.cpp
 	source/containers/algorithms/find.cpp
