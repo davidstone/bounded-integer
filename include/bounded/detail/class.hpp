@@ -93,23 +93,14 @@ template<typename T, auto minimum, auto maximum>
 concept bounded_by_range = !std::is_same_v<T, bool> and !std::is_enum_v<T> and overlapping_integer<T, minimum, maximum> and safe_compare(minimum, builtin_min_value<T>) <= 0 and safe_compare(builtin_max_value<T>, maximum) <= 0;
 
 
-// The user can specialize min_value and max_value for their enum type to
-// provide tighter bounds than the underlying_type might suggest. This forwards
-// along non-enum types without doing anything, but constructs a
-// bounded::integer with the tighter bounds from an enumeration.
+// Cannot use CTAD in the constructor
 template<typename T>
-constexpr decltype(auto) as_integer(T const value) {
-	if constexpr (std::is_enum_v<T>) {
-		using result_type = integer<
-			builtin_min_value<T>,
-			builtin_max_value<T>
-		>;
-		return result_type(static_cast<std::underlying_type_t<T>>(value));
-	} else if constexpr (std::is_same_v<T, bool>) {
-		return integer<0, 1>(value, non_check);
-	} else {
-		return value;
-	}
+constexpr auto as_integer(T const value) {
+	using result_type = integer<
+		builtin_min_value<T>,
+		builtin_max_value<T>
+	>;
+	return result_type(value, non_check);
 }
 
 
@@ -150,23 +141,23 @@ struct integer {
 	constexpr integer(integer &&) = default;
 
 	constexpr integer(detail::overlapping_integer<minimum, maximum> auto const other, non_check_t):
-		m_value(static_cast<underlying_type>(other)) {
+		m_value(static_cast<underlying_type>(other))
+	{
 	}
 
 	constexpr integer(detail::bounded_by_range<minimum, maximum> auto const other):
-		integer(other, non_check)
+		m_value(static_cast<underlying_type>(other))
 	{
 	}
 
 	template<detail::overlapping_integer<minimum, maximum> T>
 	constexpr explicit integer(T const other):
-		integer(
+		m_value(
 			::bounded::assume_in_range(
-				integer<detail::builtin_min_value<T>, detail::builtin_max_value<T>>(detail::as_integer(other), non_check),
+				detail::as_integer(other),
 				constant<minimum>,
 				constant<maximum>
-			),
-			non_check
+			)
 		)
 	{
 	}
@@ -175,7 +166,8 @@ struct integer {
 		std::is_enum_v<Enum> and !detail::overlapping_integer<Enum, minimum, maximum>
 	)
 	constexpr integer(Enum other, non_check_t):
-		integer(static_cast<std::underlying_type_t<Enum>>(other), non_check) {
+		m_value(static_cast<underlying_type>(other))
+	{
 	}
 	template<typename Enum> requires(
 		std::is_enum_v<Enum> and !detail::overlapping_integer<Enum, minimum, maximum>
