@@ -9,6 +9,7 @@
 #include <containers/algorithms/minmax_element.hpp>
 #include <containers/algorithms/negate.hpp>
 #include <containers/algorithms/reverse_iterator.hpp>
+#include <containers/array/array.hpp>
 #include <containers/begin_end.hpp>
 #include <containers/front_back.hpp>
 #include <containers/index_type.hpp>
@@ -20,7 +21,6 @@
 #include <bounded/integer.hpp>
 #include <operators/forward.hpp>
 
-#include <array>
 #include <cstddef>
 #include <cstdint>
 #include <tuple>
@@ -91,38 +91,39 @@ constexpr void bool_sort_copy(auto & source, auto & output, auto const & extract
 
 template<range Source, range Buffer, typename ExtractKey>
 constexpr bool double_buffered_numeric_sort(Source & source, Buffer & buffer, ExtractKey const & extract_key) {
-	constexpr auto size = sizeof(std::decay_t<decltype(extract_key(containers::front(source)))>);
-	auto counts = std::array<std::array<std::size_t, 256>, size>();
+	constexpr auto size = bounded::constant<sizeof(std::decay_t<decltype(extract_key(containers::front(source)))>)>;
+	auto counts = containers::array<containers::array<std::size_t, 256>, static_cast<std::size_t>(size)>();
+	auto const index_range = integer_range(size);
 
 	for (auto const & value : source) {
-		auto key = extract_key(value);
-		for (std::size_t index = 0U; index != size; ++index) {
-			auto const inner_index = (key >> (index * 8U)) & 0xFFU;
+		auto key = bounded::integer(extract_key(value));
+		for (auto const index : index_range) {
+			auto const inner_index = (key >> (index * 8_bi)) % 256_bi;
 			++counts[index][inner_index];
 		}
 	}
-	auto total = std::array<std::size_t, size>();
-	for (std::size_t index = 0U; index != size; ++index) {
+	auto total = containers::array<std::size_t, static_cast<std::size_t>(size)>();
+	for (auto const index : index_range) {
 		auto & indexed_total = total[index];
 		auto & count = counts[index];
-		for (std::size_t i = 0; i < 256; ++i) {
+		for (auto const i : containers::integer_range(256_bi)) {
 			indexed_total += std::exchange(count[i], indexed_total);
 		}
 	}
-	for (std::size_t index = 0U; index != size; ) {
+	for (auto index_it = containers::begin(index_range); index_it != containers::end(index_range); ) {
 		auto sort_segment_copy = [&](auto & current, auto & next) {
 			for (auto && value : current) {
-				auto const key = static_cast<std::uint8_t>(extract_key(value) >> (index * 8U));
-				next[containers::index_type<Buffer>(counts[index][key]++)] = std::move(value);
+				auto const key = (bounded::integer(extract_key(value)) >> (*index_it * 8_bi)) % 256_bi;
+				next[containers::index_type<Buffer>(counts[*index_it][key]++)] = std::move(value);
 			}
-			++index;
+			++index_it;
 		};
 		sort_segment_copy(source, buffer);
-		if constexpr (size % 2U == 0U) {
+		if constexpr (size % 2_bi == 0_bi) {
 			sort_segment_copy(buffer, source);
 		}
 	}
-	return size % 2U == 1U;
+	return size % 2_bi == 1_bi;
 }
 
 constexpr auto double_buffered_sort_impl(range auto & source, range auto & buffer, auto const & original_extractor, auto const & current_extractor) -> bool;
