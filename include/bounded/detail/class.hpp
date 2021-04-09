@@ -108,6 +108,7 @@ struct empty {
 	constexpr empty() = default;
 	constexpr explicit empty(auto) {
 	}
+	friend constexpr auto operator<=>(empty, empty) = default;
 };
 
 }	// namespace detail
@@ -192,6 +193,8 @@ struct integer {
 	constexpr explicit operator T() const {
 		return static_cast<T>(value());
 	}
+
+	friend constexpr auto operator<=>(integer, integer) = default;
 	
 private:
 	using storage_type = std::conditional_t<minimum == maximum, detail::empty, underlying_type>;
