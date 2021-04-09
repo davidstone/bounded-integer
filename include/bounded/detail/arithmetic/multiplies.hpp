@@ -56,4 +56,15 @@ constexpr auto operator*(bounded_integer auto const lhs_, bounded_integer auto c
 	});
 }
 
+// Not technically necessary, but improves compile times in some common cases
+constexpr auto operator*(bounded_integer auto const lhs, bounded::constant_t<1>) {
+	return lhs;
+}
+constexpr auto operator*(bounded::constant_t<1>, bounded_integer auto const rhs) {
+	return rhs;
+}
+constexpr auto operator*(bounded::constant_t<1>, bounded::constant_t<1>) {
+	return bounded::constant<1>;
+}
+
 }	// namespace bounded
