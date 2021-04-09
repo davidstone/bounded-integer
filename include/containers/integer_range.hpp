@@ -22,13 +22,10 @@
 namespace containers {
 namespace detail {
 
-template<typename Integer, typename Sentinel, typename Step>
+template<bool use_bounded, auto value_min, auto sentinel_max, typename Step>
 struct integer_range_iterator {
 private:
-	using storage_type = bounded::integer<
-		bounded::detail::builtin_min_value<Integer>,
-		bounded::detail::builtin_max_value<Sentinel>
-	>;
+	using storage_type = bounded::integer<value_min, sentinel_max>;
 	using bounded_type = bounded::integer<
 		bounded::detail::builtin_min_value<storage_type>,
 		bounded::normalize<bounded::max(bounded::min_value<storage_type>, bounded::max_value<storage_type> - bounded::min_value<Step>).value()>
@@ -36,7 +33,7 @@ private:
 
 public:
 	using value_type = std::conditional_t<
-		bounded::bounded_integer<Integer>,
+		use_bounded,
 		bounded_type,
 		typename bounded_type::underlying_type
 	>;
@@ -56,40 +53,43 @@ public:
 		BOUNDED_ASSERT(lhs.m_step == rhs.m_step);
 		return (lhs.m_value - rhs.m_value) / lhs.m_step;
 	}
-	friend constexpr auto operator+(integer_range_iterator const lhs, difference_type const rhs) {
-		return integer_range_iterator(storage_type(lhs.m_value + rhs * lhs.m_step), lhs.m_step);
+
+	friend constexpr auto operator+(integer_range_iterator const lhs, bounded::convertible_to<difference_type> auto const rhs) {
+		if constexpr (has_no_values) {
+			bounded::unreachable();
+			return lhs;
+		} else {
+			return integer_range_iterator(storage_type(lhs.m_value + rhs * lhs.m_step), lhs.m_step);
+		}
 	}
 	
-	friend constexpr auto operator<=>(integer_range_iterator const lhs, integer_range_iterator const rhs) {
-		return lhs.m_value <=> rhs.m_value;
+	friend constexpr auto operator+(difference_type const lhs, integer_range_iterator const rhs) {
+		return rhs + lhs;
 	}
 
-	friend constexpr auto operator==(integer_range_iterator const lhs, integer_range_iterator const rhs) -> bool {
-		return lhs.m_value == rhs.m_value;
+	// Not technically needed, but helps compile faster
+	friend constexpr auto & operator++(integer_range_iterator & it) {
+		if constexpr (has_no_values) {
+			bounded::unreachable();
+		} else {
+			it.m_value += it.m_step;
+		}
+		return it;
 	}
+
+	friend constexpr auto operator<=>(integer_range_iterator, integer_range_iterator) = default;
 
 	// It is undefined behavior to dereference a past-the-end iterator.
-	//
-	// Note that this returns a value, not a reference.
 	constexpr auto operator*() const {
 		return value_type(m_value);
 	}
 
 private:
+	static constexpr auto has_no_values = bounded::max_value<difference_type> == bounded::constant<0>;
+
 	[[no_unique_address]] storage_type m_value;
 	[[no_unique_address]] Step m_step;
 };
-
-template<typename Integer, typename Sentinel, typename Step>
-constexpr auto operator+(typename integer_range_iterator<Integer, Sentinel, Step>::difference_type const lhs, integer_range_iterator<Integer, Sentinel, Step> const rhs) {
-	return rhs + lhs;
-}
-
-template<typename Integer, typename Sentinel, typename Step>
-constexpr auto operator+(integer_range_iterator<Integer, Sentinel, Step> it, bounded::constant_t<1>) requires(bounded::max_value<typename decltype(it)::difference_type> == bounded::constant<0>) {
-	bounded::unreachable();
-	return it;
-}
 
 }	// namespace detail
 
@@ -97,7 +97,12 @@ template<bounded::integral Integer, bounded::integral Sentinel = Integer, bounde
 struct integer_range {
 	static_assert(bounded::max_value<Sentinel> >= bounded::min_value<Integer>, "Cannot construct inverted integer ranges.");
 
-	using iterator = detail::integer_range_iterator<Integer, Sentinel, Step>;
+	using iterator = detail::integer_range_iterator<
+		bounded::bounded_integer<Integer>,
+		bounded::detail::builtin_min_value<Integer>,
+		bounded::detail::builtin_max_value<Sentinel>,
+		Step
+	>;
 	using const_iterator = iterator;
 
 	using value_type = iter_value_t<iterator>;
