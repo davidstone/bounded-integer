@@ -421,48 +421,25 @@ inline constexpr auto array_uint8_1_2 = containers::array{
 	)
 };
 
-inline constexpr auto array_uint8_1_3 = containers::array{
+inline constexpr auto array_uint8_1_3_one_value = sort_test_data(
+	containers::array<containers::array<std::uint8_t, 1>, 3>{{
+		{1},
+		{1},
+		{1},
+	}},
+	containers::array<containers::array<std::uint8_t, 1>, 3>{{
+		{1},
+		{1},
+		{1},
+	}}
+);
+
+inline constexpr auto array_uint8_1_3_two_values = containers::array{
 	sort_test_data(
 		containers::array<containers::array<std::uint8_t, 1>, 3>{{
 			{1},
 			{1},
-			{1},
-		}},
-		containers::array<containers::array<std::uint8_t, 1>, 3>{{
-			{1},
-			{1},
-			{1},
-		}}
-	),
-	sort_test_data(
-		containers::array<containers::array<std::uint8_t, 1>, 3>{{
-			{1},
-			{1},
 			{2},
-		}},
-		containers::array<containers::array<std::uint8_t, 1>, 3>{{
-			{1},
-			{1},
-			{2},
-		}}
-	),
-	sort_test_data(
-		containers::array<containers::array<std::uint8_t, 1>, 3>{{
-			{1},
-			{2},
-			{1},
-		}},
-		containers::array<containers::array<std::uint8_t, 1>, 3>{{
-			{1},
-			{1},
-			{2},
-		}}
-	),
-	sort_test_data(
-		containers::array<containers::array<std::uint8_t, 1>, 3>{{
-			{2},
-			{1},
-			{1},
 		}},
 		containers::array<containers::array<std::uint8_t, 1>, 3>{{
 			{1},
@@ -474,6 +451,30 @@ inline constexpr auto array_uint8_1_3 = containers::array{
 		containers::array<containers::array<std::uint8_t, 1>, 3>{{
 			{1},
 			{2},
+			{1},
+		}},
+		containers::array<containers::array<std::uint8_t, 1>, 3>{{
+			{1},
+			{1},
+			{2},
+		}}
+	),
+	sort_test_data(
+		containers::array<containers::array<std::uint8_t, 1>, 3>{{
+			{2},
+			{1},
+			{1},
+		}},
+		containers::array<containers::array<std::uint8_t, 1>, 3>{{
+			{1},
+			{1},
+			{2},
+		}}
+	),
+	sort_test_data(
+		containers::array<containers::array<std::uint8_t, 1>, 3>{{
+			{1},
+			{2},
 			{2},
 		}},
 		containers::array<containers::array<std::uint8_t, 1>, 3>{{
@@ -505,7 +506,10 @@ inline constexpr auto array_uint8_1_3 = containers::array{
 			{2},
 			{2},
 		}}
-	),
+	)
+};
+
+inline constexpr auto array_uint8_1_3_three_values = containers::array{
 	sort_test_data(
 		containers::array<containers::array<std::uint8_t, 1>, 3>{{
 			{1},

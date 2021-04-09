@@ -97,7 +97,9 @@ static_assert(test_sort(tuple_many));
 
 static_assert(test_sort_default_and_copy(array_uint8_1_1));
 static_assert(test_sort_default_and_copy_all(array_uint8_1_2));
-static_assert(test_sort_default_and_copy_all(array_uint8_1_3));
+static_assert(test_sort_default_and_copy(array_uint8_1_3_one_value));
+static_assert(test_sort_default_and_copy_all(array_uint8_1_3_two_values));
+static_assert(test_sort_default_and_copy_all(array_uint8_1_3_three_values));
 static_assert(test_sort_default_and_copy(array_uint8_4_many));
 static_assert(test_sort_default_and_copy(array_uint16_many));
 
