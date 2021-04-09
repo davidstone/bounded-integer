@@ -29,9 +29,6 @@ private:
 		bounded::detail::builtin_min_value<Integer>,
 		bounded::detail::builtin_max_value<Sentinel>
 	>;
-	storage_type m_value;
-	Step m_step;
-
 	using bounded_type = bounded::integer<
 		bounded::detail::builtin_min_value<storage_type>,
 		bounded::normalize<bounded::max(bounded::min_value<storage_type>, bounded::max_value<storage_type> - bounded::min_value<Step>).value()>
@@ -77,6 +74,10 @@ public:
 	constexpr auto operator*() const {
 		return value_type(m_value);
 	}
+
+private:
+	[[no_unique_address]] storage_type m_value;
+	[[no_unique_address]] Step m_step;
 };
 
 template<typename Integer, typename Sentinel, typename Step>
@@ -130,9 +131,9 @@ struct integer_range {
 	OPERATORS_BRACKET_SEQUENCE_RANGE_DEFINITIONS
 
 private:
-	Integer m_begin;
-	Sentinel m_end;
-	Step m_step;
+	[[no_unique_address]] Integer m_begin;
+	[[no_unique_address]] Sentinel m_end;
+	[[no_unique_address]] Step m_step;
 };
 
 template<typename Size>
