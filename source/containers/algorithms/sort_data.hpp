@@ -600,22 +600,14 @@ inline constexpr auto array_uint8_4_many = sort_test_data(
 	}}
 );
 
-inline constexpr auto array_uint16_4_many = sort_test_data(
-	containers::array<containers::array<std::uint16_t, 4>, 6>{{
-		{1, 2, 3, 4},
-		{0, 3, 4, 5},
-		{1, 1, 2, 2},
-		{1, 2, 2, 4},
-		{1, 2, 2, 3},
-		{0, 3, 4, 4},
+inline constexpr auto array_uint16_many = sort_test_data(
+	containers::array<containers::array<std::uint16_t, 3>, 2>{{
+		{0, 3, 5},
+		{0, 3, 4},
 	}},
-	containers::array<containers::array<std::uint16_t, 4>, 6>{{
-		{0, 3, 4, 4},
-		{0, 3, 4, 5},
-		{1, 1, 2, 2},
-		{1, 2, 2, 3},
-		{1, 2, 2, 4},
-		{1, 2, 3, 4},
+	containers::array<containers::array<std::uint16_t, 3>, 2>{{
+		{0, 3, 4},
+		{0, 3, 5},
 	}}
 );
 
