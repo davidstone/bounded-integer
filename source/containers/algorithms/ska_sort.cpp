@@ -112,7 +112,7 @@ static_assert(test_sort(make_vector_tuple()));
 static_assert(test_sort(make_tuple_vector()));
 static_assert(test_sort(tuple_tuple));
 
-static_assert(test_sort(make_move_only_4(), default_copy));
-static_assert(test_sort(make_wrapper_5(), get_value_member));
+static_assert(test_sort(make_move_only(), default_copy));
+static_assert(test_sort(make_wrapper(), get_value_member));
 
 } // namespace

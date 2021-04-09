@@ -86,7 +86,7 @@ static_assert(test_double_buffered_sort_default_and_copy(array_uint16_many));
 
 static_assert(test_double_buffered_sort(tuple_tuple));
 
-static_assert(test_double_buffered_sort(make_move_only_4(), default_copy));
-static_assert(test_double_buffered_sort(make_wrapper_5(), get_value_member));
+static_assert(test_double_buffered_sort(make_move_only(), default_copy));
+static_assert(test_double_buffered_sort(make_wrapper(), get_value_member));
 
 } // namespace

@@ -605,13 +605,13 @@ inline constexpr auto array_uint8_4_many = sort_test_data(
 );
 
 inline constexpr auto array_uint16_many = sort_test_data(
-	containers::array<containers::array<std::uint16_t, 3>, 2>{{
-		{0, 3, 5},
-		{0, 3, 4},
+	containers::array<containers::array<std::uint16_t, 2>, 2>{{
+		{0, 5},
+		{0, 4},
 	}},
-	containers::array<containers::array<std::uint16_t, 3>, 2>{{
-		{0, 3, 4},
-		{0, 3, 5},
+	containers::array<containers::array<std::uint16_t, 2>, 2>{{
+		{0, 4},
+		{0, 5},
 	}}
 );
 
@@ -758,7 +758,7 @@ inline constexpr auto tuple_tuple = sort_test_data(
 struct move_only {
 	move_only() = default;
 
-	constexpr move_only(int x):
+	constexpr explicit move_only(int x):
 		m_value(x)
 	{
 	}
@@ -779,31 +779,36 @@ private:
 };
 
 
-constexpr auto make_move_only_4() {
+constexpr auto make_move_only() {
 	return sort_test_data(
-		containers::array<move_only, 4>{
-			5,
-			0,
-			1234567,
-			-1000,
+		containers::array{
+			move_only(5),
+			move_only(1234567),
+			move_only(-1000),
 		},
-		containers::array<move_only, 4>{
-			-1000,
-			0,
-			5,
-			1234567,
+		containers::array{
+			move_only(-1000),
+			move_only(5),
+			move_only(1234567),
 		}
 	);
 }
 
 struct wrapper {
-	move_only value;
+	wrapper() = default;
+	constexpr explicit wrapper(int x):
+		value(x)
+	{
+	}
+
 	friend constexpr auto operator==(wrapper const & lhs, wrapper const & rhs) -> bool {
 		return to_radix_sort_key(lhs.value) == to_radix_sort_key(rhs.value);
 	}
 	friend constexpr auto operator<=>(wrapper const & lhs, wrapper const & rhs) {
 		return to_radix_sort_key(lhs.value) <=> to_radix_sort_key(rhs.value);
 	}
+
+	move_only value;
 };
 
 inline constexpr auto get_value_member = bounded::overload(
@@ -811,22 +816,18 @@ inline constexpr auto get_value_member = bounded::overload(
 	containers::to_radix_sort_key
 );
 
-constexpr auto make_wrapper_5() {
+constexpr auto make_wrapper() {
 	return sort_test_data(
-		containers::array<wrapper, 5>{{
-			wrapper{2},
-			wrapper{3},
-			wrapper{1},
-			wrapper{5},
-			wrapper{4},
-		}},
-		containers::array<wrapper, 5>{{
-			wrapper{1},
-			wrapper{2},
-			wrapper{3},
-			wrapper{4},
-			wrapper{5},
-		}}
+		containers::array{
+			wrapper(2),
+			wrapper(3),
+			wrapper(1),
+		},
+		containers::array{
+			wrapper(1),
+			wrapper(2),
+			wrapper(3),
+		}
 	);
 }
 
