@@ -111,18 +111,15 @@ struct concatenate_view_iterator {
 	}
 	OPERATORS_ARROW_DEFINITIONS
 
-	template<typename Offset> requires(
-		std::is_convertible_v<Offset, difference_type> and
+	template<bounded::convertible_to<difference_type> Offset> requires(
+		!bounded::bounded_integer<difference_type> or
 		(
-			!bounded::bounded_integer<difference_type> or
-			(
-				bounded::min_value<Offset> == bounded::constant<1> and
-				bounded::max_value<Offset> == bounded::constant<1>
-			) or
-			(
-				bounded::min_value<Offset> >= bounded::constant<0> and
-				(... and forward_random_access_range<RangeViews>)
-			)
+			bounded::min_value<Offset> == bounded::constant<1> and
+			bounded::max_value<Offset> == bounded::constant<1>
+		) or
+		(
+			bounded::min_value<Offset> >= bounded::constant<0> and
+			(... and forward_random_access_range<RangeViews>)
 		)
 	)
 	friend constexpr auto operator+(concatenate_view_iterator const lhs, Offset const offset) {
