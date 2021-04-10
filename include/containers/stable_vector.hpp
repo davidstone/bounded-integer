@@ -6,8 +6,8 @@
 #pragma once
 
 #include <containers/algorithms/destroy_range.hpp>
-#include <containers/append.hpp>
 #include <containers/assign.hpp>
+#include <containers/assign_to_empty.hpp>
 #include <containers/begin_end.hpp>
 #include <containers/c_array.hpp>
 #include <containers/common_functions.hpp>
@@ -39,12 +39,12 @@ struct stable_vector : private lexicographical_comparison::base {
 		!std::is_array_v<std::remove_cv_t<std::remove_reference_t<Range>>>
 	)
 	constexpr explicit stable_vector(Range && source) {
-		::containers::append(*this, OPERATORS_FORWARD(source));
+		::containers::assign_to_empty(*this, OPERATORS_FORWARD(source));
 	}
 	
 	template<std::size_t init_size>
 	constexpr stable_vector(c_array<T, init_size> && init) {
-		::containers::append(*this, std::move(init));
+		::containers::assign_to_empty(*this, std::move(init));
 	}
 	template<std::same_as<empty_c_array_parameter> Source = empty_c_array_parameter>
 	constexpr stable_vector(Source) {
@@ -57,7 +57,7 @@ struct stable_vector : private lexicographical_comparison::base {
 	{
 	}
 	constexpr stable_vector(stable_vector const & other) {
-		::containers::append(*this, other);
+		::containers::assign_to_empty(*this, other);
 	}
 
 	constexpr ~stable_vector() {
