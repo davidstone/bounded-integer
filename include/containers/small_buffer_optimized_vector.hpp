@@ -7,8 +7,8 @@
 
 #include <containers/algorithms/destroy_range.hpp>
 #include <containers/array/array.hpp>
-#include <containers/append.hpp>
 #include <containers/assign.hpp>
+#include <containers/assign_to_empty.hpp>
 #include <containers/begin_end.hpp>
 #include <containers/c_array.hpp>
 #include <containers/common_functions.hpp>
@@ -154,20 +154,20 @@ struct small_buffer_optimized_vector : private lexicographical_comparison::base 
 	constexpr explicit small_buffer_optimized_vector(Range && source):
 		small_buffer_optimized_vector()
 	{
-		::containers::append(*this, OPERATORS_FORWARD(source));
+		::containers::assign_to_empty(*this, OPERATORS_FORWARD(source));
 	}
 	
 	template<std::size_t init_size>
 	constexpr small_buffer_optimized_vector(c_array<T, init_size> && init):
 		small_buffer_optimized_vector()
 	{
-		::containers::append(*this, std::move(init));
+		::containers::assign_to_empty(*this, std::move(init));
 	}
 
 	constexpr small_buffer_optimized_vector(small_buffer_optimized_vector const & other):
 		small_buffer_optimized_vector()
 	{
-		::containers::append(*this, other);
+		::containers::assign_to_empty(*this, other);
 	}
 
 	constexpr small_buffer_optimized_vector(small_buffer_optimized_vector && other) noexcept:
