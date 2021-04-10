@@ -39,11 +39,7 @@ constexpr void test_unique_merge_copy(Container const & lhs, Container const & r
 	BOUNDED_TEST(result == expected);
 }
 
-// `Container &&` instead of `Container` to avoid
-// https://bugs.llvm.org/show_bug.cgi?id=47805 and
-// https://gcc.gnu.org/bugzilla/show_bug.cgi?id=97388
-
-constexpr void test_unique_inplace_merge(Container && v, Container const & other, Container const & expected) {
+constexpr void test_unique_inplace_merge(Container v, Container const & other, Container const & expected) {
 	using iterator = Container::iterator;
 	auto const midpoint = static_cast<std::iterator_traits<iterator>::difference_type>(containers::size(v));
 	containers::append(v, other);
@@ -53,7 +49,7 @@ constexpr void test_unique_inplace_merge(Container && v, Container const & other
 	BOUNDED_TEST(v == expected);
 }
 
-constexpr void test_unique_merge(Container && v, Container const & other, Container const & expected) {
+constexpr void test_unique_merge(Container v, Container const & other, Container const & expected) {
 	BOUNDED_TEST(std::is_sorted(begin(v), end(v)));
 	BOUNDED_TEST(std::is_sorted(begin(other), end(other)));
 	test_unique_merge_copy(v, other, expected);
