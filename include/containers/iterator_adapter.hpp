@@ -6,6 +6,7 @@
 #pragma once
 
 #include <containers/common_iterator_functions.hpp>
+#include <containers/iter_difference_t.hpp>
 #include <containers/reference_wrapper.hpp>
 
 #include <bounded/integer.hpp>
@@ -51,7 +52,7 @@ public:
 
 	// TODO: technically not correct. For instance, consider an iterator adapter
 	// that visits each element twice.
-	using difference_type = typename std::iterator_traits<Iterator>::difference_type;
+	using difference_type = iter_difference_t<Iterator>;
 	using iterator_category =
 		std::conditional_t<std::is_same_v<base_category, std::output_iterator_tag>, std::output_iterator_tag,
 		std::conditional_t<std::is_same_v<base_category, std::input_iterator_tag>, std::input_iterator_tag,

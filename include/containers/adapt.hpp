@@ -7,6 +7,7 @@
 
 #include <containers/begin_end.hpp>
 #include <containers/common_functions.hpp>
+#include <containers/iter_difference_t.hpp>
 #include <containers/iter_value_t.hpp>
 #include <containers/iterator_adapter.hpp>
 #include <containers/reference_wrapper.hpp>
@@ -55,7 +56,7 @@ public:
 	using value_type = iter_value_t<iterator>;
 	using size_type = bounded::integer<
 		0,
-		bounded::normalize<static_cast<std::uintmax_t>(bounded::max_value<typename std::iterator_traits<iterator>::difference_type>)>
+		bounded::normalize<static_cast<std::uintmax_t>(bounded::max_value<iter_difference_t<iterator>>)>
 	>;
 	
 	constexpr adapt(Range && range, Traits traits):

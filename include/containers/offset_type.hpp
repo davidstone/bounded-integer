@@ -5,9 +5,9 @@
 
 #pragma once
 
-#include <bounded/integer.hpp>
+#include <containers/iter_difference_t.hpp>
 
-#include <iterator>
+#include <bounded/integer.hpp>
 
 namespace containers {
 namespace detail {
@@ -28,6 +28,6 @@ struct difference_type_to_offset_type<Difference> {
 } // namespace detail
 
 template<typename T>
-using offset_type = typename detail::difference_type_to_offset_type<typename std::iterator_traits<T>::difference_type>::type;
+using offset_type = typename detail::difference_type_to_offset_type<iter_difference_t<T>>::type;
 
 } // namespace containers

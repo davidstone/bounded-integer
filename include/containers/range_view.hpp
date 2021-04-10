@@ -7,6 +7,7 @@
 
 #include <containers/begin_end.hpp>
 #include <containers/is_range.hpp>
+#include <containers/iter_difference_t.hpp>
 #include <containers/iter_value_t.hpp>
 
 #include <bounded/integer.hpp>
@@ -25,7 +26,7 @@ struct range_view {
 
 	using size_type = bounded::integer<
 		0,
-		bounded::normalize<static_cast<std::uintmax_t>(bounded::max_value<typename std::iterator_traits<Iterator>::difference_type>)>
+		bounded::normalize<static_cast<std::uintmax_t>(bounded::max_value<iter_difference_t<Iterator>>)>
 	>;
 	
 	using const_iterator = Iterator;

@@ -7,6 +7,7 @@
 
 #include <containers/algorithms/advance.hpp>
 #include <containers/begin_end.hpp>
+#include <containers/iter_difference_t.hpp>
 #include <containers/iter_value_t.hpp>
 #include <containers/reference_wrapper.hpp>
 
@@ -67,8 +68,8 @@ template<typename Members, typename ForwardIterator1, typename ForwardIterator2>
 struct set_intersection_pair_iterator {
 private:
 	static constexpr auto max_difference = bounded::min(
-		bounded::max_value<typename std::iterator_traits<ForwardIterator1>::difference_type>,
-		bounded::max_value<typename std::iterator_traits<ForwardIterator2>::difference_type>
+		bounded::max_value<iter_difference_t<ForwardIterator1>>,
+		bounded::max_value<iter_difference_t<ForwardIterator2>>
 	);
 public:
 	using value_type = std::pair<

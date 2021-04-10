@@ -11,6 +11,7 @@
 #include <containers/default_adapt_traits.hpp>
 #include <containers/default_begin_end.hpp>
 #include <containers/is_range.hpp>
+#include <containers/iter_difference_t.hpp>
 #include <containers/iterator_adapter.hpp>
 #include <containers/range_value_t.hpp>
 #include <containers/reference_wrapper.hpp>
@@ -118,7 +119,7 @@ public:
 	using value_type = range_value_t<Range>;
 	using size_type = bounded::integer<
 		0,
-		bounded::normalize<static_cast<std::uintmax_t>(bounded::max_value<typename std::iterator_traits<iterator>::difference_type>)>
+		bounded::normalize<static_cast<std::uintmax_t>(bounded::max_value<iter_difference_t<iterator>>)>
 	>;
 
 	constexpr filter(Range && range, UnaryPredicate predicate):

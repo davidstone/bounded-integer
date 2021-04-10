@@ -10,6 +10,7 @@
 #include <containers/algorithms/minmax_element.hpp>
 #include <containers/algorithms/negate.hpp>
 #include <containers/algorithms/partition.hpp>
+#include <containers/algorithms/reverse_iterator.hpp>
 #include <containers/algorithms/sort.hpp>
 #include <containers/algorithms/unique.hpp>
 #include <containers/at.hpp>
@@ -17,7 +18,7 @@
 #include <containers/legacy_iterator.hpp>
 #include <containers/integer_range.hpp>
 #include <containers/is_iterator_sentinel.hpp>
-#include <containers/algorithms/reverse_iterator.hpp>
+#include <containers/iter_difference_t.hpp>
 #include <containers/size.hpp>
 #include <containers/to_radix_sort_key.hpp>
 
@@ -234,7 +235,7 @@ private:
 	static constexpr void american_flag_sort(View to_sort, ExtractKey const & extract_key, NextSort<View, ExtractKey> next_sort, BaseListSortData * sort_data, std::size_t const offset) {
 		auto partitions = partition_counts(to_sort, extract_key, sort_data, offset);
 		auto const first = containers::begin(to_sort);
-		using difference_type = typename std::iterator_traits<std::remove_const_t<decltype(first)>>::difference_type;
+		using difference_type = iter_difference_t<decltype(first)>;
 		[&]{
 			if (partitions.number > 1) {
 				uint8_t * current_block_ptr = partitions.remaining.data();
@@ -285,7 +286,7 @@ private:
 	static constexpr void ska_byte_sort(View to_sort, ExtractKey const & extract_key, NextSort<View, ExtractKey> next_sort, BaseListSortData * sort_data, std::size_t const offset) {
 		auto partitions = partition_counts(to_sort, extract_key, sort_data, offset);
 		auto const first = containers::begin(to_sort);
-		using difference_type = typename std::iterator_traits<std::remove_const_t<decltype(first)>>::difference_type;
+		using difference_type = iter_difference_t<decltype(first)>;
 		for (uint8_t * last_remaining = partitions.remaining.data() + partitions.number, * end_partition = partitions.remaining.data() + 1; last_remaining > end_partition;) {
 			last_remaining = containers::partition(partitions.remaining.data(), last_remaining, [&](uint8_t partition) {
 				auto const begin_offset = static_cast<difference_type>(partitions.partitions[partition].offset);
@@ -340,7 +341,7 @@ constexpr size_t common_prefix(
 	view auto to_sort,
 	auto const & extract_key,
 	auto && element_key,
-	typename std::iterator_traits<decltype(containers::begin(extract_key(containers::front(to_sort))))>::difference_type const start_index
+	iter_difference_t<decltype(containers::begin(extract_key(containers::front(to_sort))))> const start_index
 ) {
 	if (containers::is_empty(to_sort)) {
 		return 0;
@@ -411,7 +412,7 @@ private:
 			to_sort,
 			current_key,
 			element_key,
-			typename std::iterator_traits<decltype(containers::begin(current_key(containers::front(to_sort))))>::difference_type(sort_data.current_index)
+			iter_difference_t<decltype(containers::begin(current_key(containers::front(to_sort))))>(sort_data.current_index)
 		);
 		auto end_of_shorter_ones = containers::partition(to_sort, [&](auto const & elem) {
 			return containers::size(current_key(elem)) <= sort_data.current_index;

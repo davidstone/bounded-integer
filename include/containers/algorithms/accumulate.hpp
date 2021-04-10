@@ -7,6 +7,8 @@
 
 #include <containers/begin_end.hpp>
 #include <containers/is_range.hpp>
+#include <containers/iter_difference_t.hpp>
+#include <containers/iterator_t.hpp>
 #include <containers/range_value_t.hpp>
 
 #include <bounded/integer.hpp>
@@ -37,7 +39,7 @@ struct accumulate_c<Range, Initial, std::plus<>> {
 			std::declval<containers::range_value_t<Range>>() *
 			std::declval<bounded::integer<
 				0,
-				bounded::detail::builtin_max_value<typename std::iterator_traits<decltype(containers::begin(std::declval<Range>()))>::difference_type>
+				bounded::detail::builtin_max_value<iter_difference_t<iterator_t<Range>>>
 			>>()
 		)
 	);
@@ -51,9 +53,7 @@ struct accumulate_c<Range, Initial, std::multiplies<>> {
 			std::declval<range_value_t<Range>>(),
 			std::declval<bounded::integer<
 				0,
-				bounded::detail::builtin_max_value<
-					typename std::iterator_traits<decltype(containers::begin(std::declval<Range>()))>::difference_type
-				>
+				bounded::detail::builtin_max_value<iter_difference_t<iterator_t<Range>>>
 			>>()
 		)
 	);

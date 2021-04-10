@@ -5,6 +5,7 @@
 
 #pragma once
 
+#include <containers/iter_difference_t.hpp>
 #include <containers/offset_type.hpp>
 
 #include <iterator>
@@ -33,7 +34,7 @@ concept forward_random_access_iterator = forward_iterator<Iterator> and requires
 
 // TODO: require bounded::ordered<Iterator> when more types support <=>
 template<typename Iterator>
-concept random_access_iterator = bidirectional_iterator<Iterator> and forward_random_access_iterator<Iterator> and requires(Iterator it, typename std::iterator_traits<Iterator>::difference_type offset) {
+concept random_access_iterator = bidirectional_iterator<Iterator> and forward_random_access_iterator<Iterator> and requires(Iterator it, iter_difference_t<Iterator> offset) {
 	it + offset;
 };
 

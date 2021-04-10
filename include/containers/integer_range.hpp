@@ -8,6 +8,7 @@
 #include <containers/algorithms/transform.hpp>
 #include <containers/begin_end.hpp>
 #include <containers/common_functions.hpp>
+#include <containers/iter_difference_t.hpp>
 #include <containers/iter_value_t.hpp>
 
 #include <bounded/assert.hpp>
@@ -106,7 +107,7 @@ struct integer_range {
 	using const_iterator = iterator;
 
 	using value_type = iter_value_t<iterator>;
-	using size_type = bounded::integer<0, bounded::detail::builtin_max_value<typename iterator::difference_type>>;
+	using size_type = bounded::integer<0, bounded::detail::builtin_max_value<iter_difference_t<iterator>>>;
 	
 	// If `last` is not reachable by adding `step` to `first` some number of
 	// times, the behavior is undefined.

@@ -6,6 +6,7 @@
 #pragma once
 
 #include <containers/is_iterator.hpp>
+#include <containers/iter_difference_t.hpp>
 
 #include <bounded/integer.hpp>
 
@@ -24,7 +25,7 @@ concept random_access_advancable_by = requires(Iterator & it, Offset offset) {
 
 template<typename Iterator, typename Offset>
 using advance_counter = std::common_type_t<
-	typename std::iterator_traits<std::decay_t<Iterator>>::difference_type,
+	iter_difference_t<Iterator>,
 	std::decay_t<Offset>
 >;
 
@@ -56,7 +57,7 @@ namespace detail {
 
 template<iterator Iterator>
 constexpr auto iterator_one() {
-	if constexpr (bounded::bounded_integer<typename std::iterator_traits<Iterator>::difference_type>) {
+	if constexpr (bounded::bounded_integer<iter_difference_t<Iterator>>) {
 		return 1_bi;
 	} else {
 		return 1;

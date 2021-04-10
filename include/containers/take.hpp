@@ -7,6 +7,7 @@
 
 #include <containers/begin_end.hpp>
 #include <containers/common_iterator_functions.hpp>
+#include <containers/iter_difference_t.hpp>
 #include <containers/iter_value_t.hpp>
 #include <containers/range_view.hpp>
 
@@ -53,7 +54,7 @@ using counted_offset_type = bounded::integer<
 template<typename Iterator, typename Count>
 struct counted_iterator {
 private:
-	using offset_type = detail::counted_offset_type<typename Iterator::difference_type, Count>;
+	using offset_type = detail::counted_offset_type<iter_difference_t<Iterator>, Count>;
 public:
 	using iterator_category = typename std::iterator_traits<Iterator>::iterator_category;
 	using value_type = iter_value_t<Iterator>;
@@ -115,7 +116,7 @@ private:
 	offset_type m_count;
 };
 
-template<typename Iterator, typename Count> requires(bounded::max_value<typename counted_iterator<Iterator, Count>::difference_type> == bounded::constant<0>)
+template<typename Iterator, typename Count> requires(bounded::max_value<iter_difference_t<counted_iterator<Iterator, Count>>> == bounded::constant<0>)
 constexpr auto & operator++(counted_iterator<Iterator, Count> & it) {
 	bounded::unreachable();
 	return it;

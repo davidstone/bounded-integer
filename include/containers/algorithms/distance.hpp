@@ -6,6 +6,7 @@
 #pragma once
 
 #include <containers/is_iterator_sentinel.hpp>
+#include <containers/iter_difference_t.hpp>
 
 #include <bounded/integer.hpp>
 
@@ -20,7 +21,7 @@ constexpr auto distance(InputIterator first, sentinel_for<InputIterator> auto co
 	if constexpr (std::is_same_v<typename std::iterator_traits<InputIterator>::iterator_category, std::random_access_iterator_tag>) {
 		return last - first;
 	} else {
-		auto difference = typename std::iterator_traits<InputIterator>::difference_type(0_bi);
+		auto difference = iter_difference_t<InputIterator>(0_bi);
 		for (; first != last; ++first) {
 			++difference;
 		}

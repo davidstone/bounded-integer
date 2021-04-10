@@ -179,6 +179,7 @@ add_library(containers_test STATIC
 	source/containers/is_iterator.cpp
 	source/containers/is_iterator_sentinel.cpp
 	source/containers/is_range.cpp
+	source/containers/iter_difference_t.cpp
 	source/containers/iter_value_t.cpp
 	source/containers/iterator_adapter.cpp
 	source/containers/iterator_t.cpp
