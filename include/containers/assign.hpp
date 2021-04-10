@@ -9,36 +9,67 @@
 #include <containers/algorithms/erase.hpp>
 #include <containers/append.hpp>
 #include <containers/assign_to_empty.hpp>
-#include <containers/begin_end.hpp>
 #include <containers/c_array.hpp>
 #include <containers/clear.hpp>
 #include <containers/is_range.hpp>
 #include <containers/range_value_t.hpp>
-#include <containers/range_view.hpp>
 #include <containers/resizable_container.hpp>
 
 #include <bounded/integer.hpp>
 
 namespace containers {
+namespace detail {
 
-template<resizable_container Target>
-constexpr void assign(Target & target, range auto && source) {
-	// Either of these implementations work for any type. For types that are not
-	// trivially copyable, we want to reuse the existing storage where that
-	// makes sense. For types that are trivially copyable, that concept doesn't
-	// make sense, so we instead use code that optimizes better.
-	if constexpr (std::is_trivially_copyable_v<range_value_t<Target>>) {
-		::containers::clear(target);
-		::containers::assign_to_empty(target, OPERATORS_FORWARD(source));
+template<typename Target, typename Source>
+concept member_range_assignable = requires(Target & target, Source && source) {
+	target.assign(OPERATORS_FORWARD(source));
+};
+
+template<typename Target, typename Source>
+concept member_iterator_assignable = requires(Target & target, Source && source) {
+	target.assign(containers::begin(OPERATORS_FORWARD(source)), containers::end(OPERATORS_FORWARD(source)));
+};
+
+template<typename Source, typename Target>
+concept range_assignable_to =
+	range<Source> and (
+		member_range_assignable<Target, Source> or
+		member_iterator_assignable<Target, Source> or
+		// TODO: Wrong type to assign from
+		(resizable_container<Target> and std::is_assignable_v<range_value_t<Target> &, range_value_t<Source>>)
+	);
+
+template<typename Target, typename Source>
+constexpr void assign_impl(Target & target, Source && source) {
+	if constexpr (member_range_assignable<Target, Source>) {
+		target.assign(OPERATORS_FORWARD(source));
+	} else if constexpr (member_iterator_assignable<Target, Source>) {
+		target.assign(containers::begin(OPERATORS_FORWARD(source)), containers::end(OPERATORS_FORWARD(source)));
 	} else {
-		auto result = ::containers::copy(OPERATORS_FORWARD(source), OPERATORS_FORWARD(target));
-		::containers::erase_after(target, std::move(result.output));
-		::containers::append(target, range_view(std::move(result.input), containers::end(OPERATORS_FORWARD(source))));
+		// Either of these implementations work for any type. For types that are
+		// not trivially copyable, we want to reuse the existing storage where
+		// that makes sense. For types that are trivially copyable, that concept
+		// does not make sense, so we instead use code that optimizes better.
+		if constexpr (std::is_trivially_copyable_v<range_value_t<Target>>) {
+			::containers::clear(target);
+			::containers::assign_to_empty(target, OPERATORS_FORWARD(source));
+		} else {
+			auto result = ::containers::copy(OPERATORS_FORWARD(source), OPERATORS_FORWARD(target));
+			::containers::erase_after(target, std::move(result.output));
+			::containers::append(target, range_view(std::move(result.input), containers::end(OPERATORS_FORWARD(source))));
+		}
 	}
 }
-template<resizable_container Container, std::size_t init_size>
-constexpr void assign(Container & destination, c_array<range_value_t<Container>, init_size> && init) {
-	assign(destination, range_view(std::move(init)));
+
+} // namespace detail
+
+template<range Target>
+constexpr void assign(Target & target, detail::range_assignable_to<Target> auto && source) {
+	containers::detail::assign_impl(target, OPERATORS_FORWARD(source));
+}
+template<range Target, std::size_t init_size> requires detail::range_assignable_to<c_array<range_value_t<Target>, init_size>, Target>
+constexpr void assign(Target & target, c_array<range_value_t<Target>, init_size> && source) {
+	containers::detail::assign_impl(target, std::move(source));
 }
 
 } // namespace containers
