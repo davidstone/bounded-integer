@@ -23,17 +23,15 @@ namespace detail {
 template<typename Range>
 concept size_then_use_range = forward_range<Range const &> or requires(Range const & r) { containers::size(r); };
 
-} // namespace detail
-
 template<resizable_container Target, range Source>
-constexpr auto assign_to_empty(Target & target, Source && source) -> void {
+constexpr auto assign_to_empty_impl(Target & target, Source && source) -> void {
 	BOUNDED_ASSERT(containers::is_empty(target));
-	if constexpr (detail::appendable_from_capacity<Target> and detail::reservable<Target> and detail::size_then_use_range<Source>) {
+	if constexpr (appendable_from_capacity<Target> and reservable<Target> and size_then_use_range<Source>) {
 		auto const source_size = static_cast<typename Target::size_type>(containers::detail::linear_size(source));
 		target.reserve(source_size);
 		containers::uninitialized_copy(OPERATORS_FORWARD(source), containers::begin(target));
 		target.append_from_capacity(source_size);
-	} else if constexpr (detail::appendable_from_capacity<Target> and !detail::reservable<Target>) {
+	} else if constexpr (appendable_from_capacity<Target> and !reservable<Target>) {
 		auto const it = containers::uninitialized_copy(OPERATORS_FORWARD(source), containers::begin(target));
 		auto const source_size = [&] {
 			if constexpr (sized_range<Source>) {
@@ -43,16 +41,22 @@ constexpr auto assign_to_empty(Target & target, Source && source) -> void {
 			}
 		}();
 		target.append_from_capacity(source_size);
-	} else if constexpr (detail::lazy_push_backable<Target>) {
+	} else if constexpr (lazy_push_backable<Target>) {
 		::containers::detail::lazy_push_back_range(target, OPERATORS_FORWARD(source));
 	} else {
 		::containers::detail::push_back_range(target, OPERATORS_FORWARD(source));
 	}
 }
 
+} // namespace detail
+
+constexpr auto assign_to_empty(resizable_container auto & target, range auto && source) -> void {
+	containers::detail::assign_to_empty_impl(target, OPERATORS_FORWARD(source));
+}
+
 template<resizable_container Container, std::size_t init_size>
-constexpr void assign_to_empty(Container & destination, c_array<range_value_t<Container>, init_size> && init) {
-	assign(destination, range_view(std::move(init)));
+constexpr auto assign_to_empty(Container & target, c_array<range_value_t<Container>, init_size> && source) -> void {
+	containers::detail::assign_to_empty_impl(target, std::move(source));
 }
 
 } // namespace containers
