@@ -15,13 +15,12 @@ namespace detail {
 template<typename Iterator>
 struct iter_value_t_impl {
 	using type = std::remove_cvref_t<decltype(*std::declval<Iterator>())>;
-};
-
-template<typename Iterator> requires requires { typename Iterator::value_type; }
-struct iter_value_t_impl<Iterator> {
-	using specified_type = typename Iterator::value_type;
-	using type = std::remove_cvref_t<decltype(*std::declval<Iterator>())>;
-	static_assert(std::is_same_v<specified_type, type>);
+private:
+	static void check() {
+		if constexpr (requires { typename Iterator::value_type; }) {
+			static_assert(std::is_same_v<typename Iterator::value_type, type>);
+		}
+	}
 };
 
 } // namespace detail
