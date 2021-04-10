@@ -89,9 +89,9 @@ public:
 		return lhs == rhs ? std::strong_ordering::equal : std::strong_ordering::less;
 	}
 
-	// TODO: Properly constrain this function
-	template<bounded::integral Offset> requires(
-		bounded::max_value<decltype(std::declval<offset_type>() - std::declval<Offset>())> >= bounded::constant<0>
+	template<typename Offset> requires(
+		bounded::max_value<decltype(std::declval<offset_type>() - std::declval<Offset>())> >= bounded::constant<0> and
+		requires(Iterator it, Offset offset) { it + offset; }
 	)
 	friend constexpr auto operator+(counted_iterator it, Offset const offset) {
 		return counted_iterator(
