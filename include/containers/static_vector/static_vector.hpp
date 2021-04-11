@@ -9,8 +9,8 @@
 #include <containers/algorithms/destroy_range.hpp>
 #include <containers/algorithms/uninitialized.hpp>
 #include <containers/array/array.hpp>
-#include <containers/append.hpp>
 #include <containers/assign.hpp>
+#include <containers/assign_to_empty.hpp>
 #include <containers/begin_end.hpp>
 #include <containers/c_array.hpp>
 #include <containers/common_functions.hpp>
@@ -71,12 +71,12 @@ struct static_vector_data : private lexicographical_comparison::base {
 	}
 
 	constexpr explicit static_vector_data(range auto && source) {
-		::containers::append(*this, OPERATORS_FORWARD(source));
+		::containers::assign_to_empty(*this, OPERATORS_FORWARD(source));
 	}
 	
 	template<std::size_t init_size>
 	constexpr static_vector_data(c_array<T, init_size> && init) {
-		::containers::append(*this, std::move(init));
+		::containers::assign_to_empty(*this, std::move(init));
 	}
 	constexpr static_vector_data(empty_c_array_parameter) {
 	}
