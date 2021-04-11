@@ -21,10 +21,8 @@ template<sized_range Range>
 constexpr auto size(Range const & range) {
 	if constexpr (detail::has_member_size<Range>) {
 		return range.size();
-	} else if constexpr (bounded::bounded_integer<typename Range::size_type>) {
-		return typename Range::size_type(containers::end(range) - containers::begin(range), bounded::non_check);
 	} else {
-		return typename Range::size_type(containers::end(range) - containers::begin(range));
+		return static_cast<typename Range::size_type>(containers::end(range) - containers::begin(range));
 	}
 }
 
