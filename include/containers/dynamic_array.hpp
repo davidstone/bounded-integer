@@ -32,25 +32,6 @@
 namespace containers {
 
 template<typename T>
-struct dynamic_array;
-
-template<typename T>
-constexpr void clear(dynamic_array<T> & value) {
-	value = {};
-}
-
-template<typename T, range Range> requires(!std::is_array_v<Range>)
-constexpr auto assign(dynamic_array<T> & container, Range && range) {
-	auto const difference = detail::linear_size(range);
-	if (difference == containers::size(container)) {
-		::containers::copy(OPERATORS_FORWARD(range), containers::begin(container));
-	} else {
-		containers::clear(container);
-		container = dynamic_array<T>(OPERATORS_FORWARD(range));
-	}
-}
-
-template<typename T>
 struct dynamic_array : private lexicographical_comparison::base {
 	using value_type = T;
 	using size_type = typename detail::array_size_type<value_type>;
@@ -117,6 +98,21 @@ struct dynamic_array : private lexicographical_comparison::base {
 
 	OPERATORS_BRACKET_SEQUENCE_RANGE_DEFINITIONS
 	
+	constexpr void clear() & {
+		*this = {};
+	}
+
+	template<range Range> requires(!std::is_array_v<Range> or !std::is_reference_v<Range>)
+	constexpr auto assign(Range && range) & {
+		auto const difference = detail::linear_size(range);
+		if (difference == size()) {
+			::containers::copy(OPERATORS_FORWARD(range), begin());
+		} else {
+			clear();
+			*this = dynamic_array<T>(OPERATORS_FORWARD(range));
+		}
+	}
+
 private:
 	uninitialized_dynamic_array<value_type, size_type> m_data;
 };
