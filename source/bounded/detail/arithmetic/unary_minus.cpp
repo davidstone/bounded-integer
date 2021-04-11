@@ -57,13 +57,13 @@ constexpr auto check_all_limits() {
 static_assert(check_all_limits());
 
 static_assert(homogeneous_equals(
-	-bounded::integer<1, 10>(9, bounded::non_check),
-	bounded::integer<-10, -1>(-9, bounded::non_check)
+	-bounded::integer<1, 10>(bounded::constant<9>),
+	bounded::integer<-10, -1>(bounded::constant<-9>)
 ));
 
 static_assert(homogeneous_equals(
-	-bounded::integer<-3, 6>(4, bounded::non_check),
-	bounded::integer<-6, 3>(-4, bounded::non_check)
+	-bounded::integer<-3, 6>(bounded::constant<4>),
+	bounded::integer<-6, 3>(bounded::constant<-4>)
 ));
 
 }	// namespace

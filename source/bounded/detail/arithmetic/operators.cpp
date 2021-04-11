@@ -27,8 +27,8 @@ static_assert(homogeneous_equals(
 	bounded::constant<static_cast<bounded::detail::max_unsigned_t>(unsigned_max) - static_cast<bounded::detail::max_unsigned_t>(signed_max)>
 ));
 static_assert(homogeneous_equals(
-	bounded::integer<1, 10>(9, bounded::non_check) - bounded::integer<-3, 11>(4, bounded::non_check),
-	bounded::integer<-10, 13>(5, bounded::non_check)
+	bounded::integer<1, 10>(bounded::constant<9>) - bounded::integer<-3, 11>(bounded::constant<4>),
+	bounded::integer<-10, 13>(bounded::constant<5>)
 ));
 
 constexpr auto plus_equals(auto lhs, auto rhs) {

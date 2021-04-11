@@ -10,8 +10,8 @@
 namespace {
 
 static_assert(homogeneous_equals(
-	bounded::constant<100> >> bounded::integer<0, 50>(1, bounded::non_check),
-	bounded::integer<0, 100>(100 >> 1, bounded::non_check)
+	bounded::constant<100> >> bounded::integer<0, 50>(bounded::constant<1>),
+	bounded::integer<0, 100>(bounded::constant<(100 >> 1)>)
 ));
 
 }	// namespace

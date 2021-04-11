@@ -50,12 +50,12 @@ namespace check_many_argument_minmax {
 	constexpr auto value = bounded::integer<-53, 1000>(bounded::constant<3>);
 	static_assert(homogeneous_equals(
 		bounded::min(bounded::constant<0>, bounded::constant<10>, bounded::constant<5>, value),
-		bounded::integer<-53, 0>(0, bounded::non_check)
+		bounded::integer<-53, 0>(bounded::constant<0>)
 	));
 
 	static_assert(homogeneous_equals(
 		bounded::max(bounded::constant<0>, bounded::constant<10>, bounded::constant<5>, value),
-		bounded::integer<10, 1000>(10, bounded::non_check)
+		bounded::integer<10, 1000>(bounded::constant<10>)
 	));
 
 	static_assert(homogeneous_equals(

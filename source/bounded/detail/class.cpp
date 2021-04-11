@@ -75,13 +75,13 @@ namespace check_constructibility {
 
 static_assert(homogeneous_equals(
 	BOUNDED_CONDITIONAL(true, bounded::constant<7>, bounded::constant<9>),
-	bounded::integer<7, 9>(7, bounded::non_check)
+	bounded::integer<7, 9>(bounded::constant<7>)
 ));
 
 constexpr auto check_assignment() {
-	bounded::integer<0, 10> x(5, bounded::non_check);
+	bounded::integer<0, 10> x(bounded::constant<5>);
 	static_assert(!std::is_assignable<decltype((x)), bounded::constant_t<11>>{}, "Should not be assignable.");
-	x = bounded::integer<10, 11>(10, bounded::non_check);
+	x = bounded::integer<10, 11>(bounded::constant<10>);
 	BOUNDED_TEST(x == bounded::constant<10>);
 	return true;
 }

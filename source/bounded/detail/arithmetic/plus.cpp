@@ -50,12 +50,12 @@ static_assert(homogeneous_equals(
 ));
 
 static_assert(homogeneous_equals(
-	bounded::integer<1, 10>(9, bounded::non_check) + bounded::integer<-3, 11>(4, bounded::non_check),
-	bounded::integer<-2, 21>(13, bounded::non_check)
+	bounded::integer<1, 10>(bounded::constant<9>) + bounded::integer<-3, 11>(bounded::constant<4>),
+	bounded::integer<-2, 21>(bounded::constant<13>)
 ));
 static_assert(homogeneous_equals(
-	bounded::integer<1, 10>(9, bounded::non_check) + std::integral_constant<int, 5>{},
-	bounded::integer<6, 15>(14, bounded::non_check)
+	bounded::integer<1, 10>(bounded::constant<9>) + std::integral_constant<int, 5>{},
+	bounded::integer<6, 15>(bounded::constant<14>)
 ));
 
 }	// namespace

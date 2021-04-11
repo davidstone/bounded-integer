@@ -31,7 +31,7 @@ static_assert(homogeneous_equals(
 	unsigned_max
 ));
 
-constexpr auto x = bounded::integer<1, 10>(9, bounded::non_check);
+constexpr auto x = bounded::integer<1, 10>(bounded::constant<9>);
 static_assert(homogeneous_equals(
 	+x,
 	x

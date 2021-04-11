@@ -9,7 +9,7 @@
 
 namespace {
 
-constexpr auto a = bounded::integer<1, 10>(5, bounded::non_check);
+constexpr auto a = bounded::integer<1, 10>(bounded::constant<5>);
 static_assert(
 	a == a,
 	"Values do not equal themselves"
@@ -18,7 +18,7 @@ static_assert(
 	a == 5,
 	"Values do not equal their underlying value"
 );
-constexpr auto b = bounded::integer<4, 36346>(5, bounded::non_check);
+constexpr auto b = bounded::integer<4, 36346>(bounded::constant<5>);
 static_assert(
 	a == b,
 	"Values do not equal equivalent other bounded::integer types"

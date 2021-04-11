@@ -60,12 +60,12 @@ static_assert(homogeneous_equals(
 #endif
 
 static_assert(homogeneous_equals(
-	bounded::integer<-3, 3>(1, bounded::non_check) * bounded::integer<0, 1>(1, bounded::non_check),
-	bounded::integer<-3, 3>(1, bounded::non_check)
+	bounded::integer<-3, 3>(bounded::constant<1>) * bounded::integer<0, 1>(bounded::constant<1>),
+	bounded::integer<-3, 3>(bounded::constant<1>)
 ));
 static_assert(homogeneous_equals(
-	bounded::integer<1, 10>(9, bounded::non_check) * bounded::integer<-3, 11>(4, bounded::non_check),
-	bounded::integer<-30, 110>(36, bounded::non_check)
+	bounded::integer<1, 10>(bounded::constant<9>) * bounded::integer<-3, 11>(bounded::constant<4>),
+	bounded::integer<-30, 110>(bounded::constant<36>)
 ));
 
 }	// namespace

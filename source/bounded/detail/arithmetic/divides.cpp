@@ -71,8 +71,8 @@ static_assert(homogeneous_equals(
 ));
 
 static_assert(homogeneous_equals(
-	bounded::integer<1, 10>(9, bounded::non_check) / bounded::integer<-3, 11>(4, bounded::non_check),
-	bounded::integer<-10, 10>(2, bounded::non_check)
+	bounded::integer<1, 10>(bounded::constant<9>) / bounded::integer<-3, 11>(bounded::constant<4>),
+	bounded::integer<-10, 10>(bounded::constant<2>)
 ));
 
 // constexpr auto fails_to_compile = bounded::constant<1> / bounded::constant<0>;

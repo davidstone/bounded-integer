@@ -48,32 +48,32 @@ static_assert(homogeneous_equals(
 	bounded::constant<0>
 ));
 static_assert(homogeneous_equals(
-	bounded::integer<17, 23>(20, bounded::non_check) % bounded::integer<-54, -6>(-33, bounded::non_check),
-	bounded::integer<0, 23>(20 % -33, bounded::non_check)
+	bounded::integer<17, 23>(bounded::constant<20>) % bounded::integer<-54, -6>(bounded::constant<-33>),
+	bounded::integer<0, 23>(bounded::constant<20 % -33>)
 ));
 static_assert(homogeneous_equals(
-	bounded::integer<-54, -6>(-33, bounded::non_check) % bounded::integer<17, 23>(20, bounded::non_check),
-	bounded::integer<-22, 0>(-33 % 20, bounded::non_check)
+	bounded::integer<-54, -6>(bounded::constant<-33>) % bounded::integer<17, 23>(bounded::constant<20>),
+	bounded::integer<-22, 0>(bounded::constant<-33 % 20>)
 ));
 static_assert(homogeneous_equals(
-	bounded::integer<-22, 0>(-33 % 20, bounded::non_check) % bounded::integer<0, 23>(20 % -33, bounded::non_check),
-	bounded::integer<-22, 0>(-13, bounded::non_check)
+	bounded::integer<-22, 0>(bounded::constant<-33 % 20>) % bounded::integer<0, 23>(bounded::constant<20 % -33>),
+	bounded::integer<-22, 0>(bounded::constant<-13>)
 ));
 static_assert(homogeneous_equals(
-	bounded::integer<0, 10>(10, bounded::non_check) % bounded::constant<6>,
-	bounded::integer<0, 5>(4, bounded::non_check)
+	bounded::integer<0, 10>(bounded::constant<10>) % bounded::constant<6>,
+	bounded::integer<0, 5>(bounded::constant<4>)
 ));
 static_assert(homogeneous_equals(
 	bounded::constant<0> % bounded::constant<1>,
 	bounded::constant<0>
 ));
 static_assert(homogeneous_equals(
-	bounded::integer<73, 76>(73, bounded::non_check) % bounded::integer<7, 8>(7, bounded::non_check),
-	bounded::integer<1, 6>(73 % 7, bounded::non_check)
+	bounded::integer<73, 76>(bounded::constant<73>) % bounded::integer<7, 8>(bounded::constant<7>),
+	bounded::integer<1, 6>(bounded::constant<73 % 7>)
 ));
 static_assert(homogeneous_equals(
-	bounded::integer<74, 75>(74, bounded::non_check) % bounded::integer<7, 8>(7, bounded::non_check),
-	bounded::integer<2, 5>(74 % 7, bounded::non_check)
+	bounded::integer<74, 75>(bounded::constant<74>) % bounded::integer<7, 8>(bounded::constant<7>),
+	bounded::integer<2, 5>(bounded::constant<74 % 7>)
 ));
 
 // auto undefined = 1 % zero;
