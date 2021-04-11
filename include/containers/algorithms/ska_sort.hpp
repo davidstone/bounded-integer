@@ -387,14 +387,14 @@ struct ListInplaceSorter {
 
 private:
 	struct ElementSubKey {
-		using base = SubKey<std::decay_t<decltype(containers::at(std::declval<ListType const &>(), 0, bounded::non_check))>>;
+		using base = SubKey<std::decay_t<decltype(containers::at(std::declval<ListType const &>(), 0))>>;
 
 		using next = ElementSubKey;
 
 		static constexpr decltype(auto) sub_key(auto && value, BaseListSortData * sort_data) {
 			auto && list = CurrentSubKey::sub_key(OPERATORS_FORWARD(value), sort_data->next_sort_data);
 			return base::sub_key(
-				containers::at(OPERATORS_FORWARD(list), sort_data->current_index, bounded::non_check),
+				containers::at(OPERATORS_FORWARD(list), sort_data->current_index),
 				sort_data->next_sort_data
 			);
 		}
