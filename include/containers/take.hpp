@@ -8,8 +8,10 @@
 #include <containers/begin_end.hpp>
 #include <containers/common_iterator_functions.hpp>
 #include <containers/iter_difference_t.hpp>
+#include <containers/iterator_t.hpp>
 #include <containers/iter_value_t.hpp>
 #include <containers/range_view.hpp>
+#include <containers/size.hpp>
 
 #include <bounded/clamp.hpp>
 #include <bounded/integer.hpp>
@@ -22,10 +24,10 @@
 #include <utility>
 
 namespace containers {
+namespace detail {
 
 using namespace bounded::literal;
 
-// TODO: Make this an iterator if it can be?
 template<typename Sentinel>
 struct counted_sentinel {
 	constexpr explicit counted_sentinel(Sentinel sentinel):
@@ -41,30 +43,17 @@ private:
 	Sentinel m_sentinel;
 };
 
-namespace detail {
-
-template<typename Difference, typename Count>
-using counted_offset_type = bounded::integer<
-	0,
-	bounded::normalize<bounded::min(bounded::integer(bounded::max_value<Difference>), bounded::max_value<Count>).value()>
->;
-
-} // namespace detail
-
 template<typename Iterator, typename Count>
 struct counted_iterator {
-private:
-	using offset_type = detail::counted_offset_type<iter_difference_t<Iterator>, Count>;
-public:
 	using iterator_category = typename std::iterator_traits<Iterator>::iterator_category;
 	using value_type = iter_value_t<Iterator>;
-	using difference_type = decltype(std::declval<offset_type>() - std::declval<offset_type>());
+	using difference_type = decltype(std::declval<Count>() - std::declval<Count>());
 	using pointer = typename std::iterator_traits<Iterator>::pointer;
 	using reference = typename std::iterator_traits<Iterator>::reference;
 
 	constexpr explicit counted_iterator(Iterator it, Count count):
 		m_it(std::move(it)),
-		m_count(bounded::clamp(count, bounded::min_value<offset_type>, bounded::max_value<offset_type>))
+		m_count(count)
 	{
 	}
 
@@ -91,17 +80,17 @@ public:
 	}
 
 	template<typename Offset> requires(
-		bounded::max_value<decltype(std::declval<offset_type>() - std::declval<Offset>())> >= bounded::constant<0> and
+		bounded::max_value<decltype(std::declval<Count>() - std::declval<Offset>())> >= 0_bi and
 		requires(Iterator it, Offset offset) { it + offset; }
 	)
 	friend constexpr auto operator+(counted_iterator it, Offset const offset) {
 		return counted_iterator(
 			std::move(it).m_it + offset,
-			static_cast<offset_type>(it.m_count - offset)
+			static_cast<Count>(it.m_count - offset)
 		);
 	}
 	friend constexpr auto operator-(counted_iterator const & lhs, counted_iterator const & rhs) {
-		return lhs.m_count - rhs.m_count;
+		return rhs.m_count - lhs.m_count;
 	}
 	template<typename Sentinel>
 	friend constexpr auto operator-(counted_sentinel<Sentinel> const & lhs, counted_iterator const & rhs) {
@@ -111,24 +100,77 @@ public:
 	friend constexpr auto operator-(counted_iterator const & lhs, counted_sentinel<Sentinel> const & rhs) {
 		return -(rhs - lhs);
 	}
+
+	friend auto & operator++(counted_iterator & it) requires(bounded::max_value<difference_type> == 0_bi) {
+		bounded::unreachable();
+		return it;
+	}
+
 private:
 	Iterator m_it;
-	offset_type m_count;
+	Count m_count;
 };
 
-template<typename Iterator, typename Count> requires(bounded::max_value<iter_difference_t<counted_iterator<Iterator, Count>>> == bounded::constant<0>)
-constexpr auto & operator++(counted_iterator<Iterator, Count> & it) {
-	bounded::unreachable();
-	return it;
-}
+template<typename Iterator, typename Count>
+struct random_access_counted_iterator {
+	using iterator_category = typename std::iterator_traits<Iterator>::iterator_category;
+	using value_type = iter_value_t<Iterator>;
+	using difference_type = decltype(std::declval<Count>() - std::declval<Count>());
+	using pointer = typename std::iterator_traits<Iterator>::pointer;
+	using reference = typename std::iterator_traits<Iterator>::reference;
 
-template<bounded::bounded_integer Count>
-constexpr auto take(range auto && source, Count count_) {
-	auto const count = bounded::integer<0, bounded::detail::builtin_max_value<Count>>(count_);
-	return containers::range_view(
-		counted_iterator(containers::begin(OPERATORS_FORWARD(source)), count),
-		counted_sentinel(containers::end(OPERATORS_FORWARD(source)))
-	);
+	constexpr explicit random_access_counted_iterator(Iterator it):
+		m_it(std::move(it))
+	{
+	}
+
+	constexpr decltype(auto) operator*() const {
+		return *m_it;
+	}
+	OPERATORS_ARROW_DEFINITIONS
+
+	friend auto operator<=>(random_access_counted_iterator const &, random_access_counted_iterator const &) = default;
+
+	friend constexpr auto operator+(random_access_counted_iterator it, difference_type const offset) {
+		return random_access_counted_iterator(std::move(it).m_it + offset);
+	}
+	friend constexpr auto operator-(random_access_counted_iterator lhs, random_access_counted_iterator rhs) {
+		return static_cast<difference_type>(std::move(lhs).m_it - std::move(rhs).m_it);
+	}
+
+	friend auto & operator++(random_access_counted_iterator & it) requires(bounded::max_value<difference_type> == 0_bi) {
+		bounded::unreachable();
+		return it;
+	}
+
+private:
+	Iterator m_it;
+};
+
+} // namespace detail
+
+template<range Range, bounded::bounded_integer Count> requires(bounded::min_value<Count> >= 0_bi)
+constexpr auto take(Range && source, Count const count) {
+	using iterator = iterator_t<Range>;
+	using count_type = bounded::integer<
+		0,
+		bounded::normalize<bounded::min(
+			bounded::integer(bounded::max_value<iter_difference_t<iterator>>),
+			bounded::constant<bounded::detail::builtin_max_value<Count>>
+		).value()>
+	>;
+
+	if constexpr (sized_range<Range> and forward_random_access_iterator<iterator>) {
+		auto const true_count = bounded::min(containers::size(source), count);
+		auto first = detail::random_access_counted_iterator<iterator, count_type>(containers::begin(OPERATORS_FORWARD(source)));
+		return containers::range_view(first, first + true_count);
+	} else {
+		auto const upper_bound_count = count_type(bounded::min(count, bounded::max_value<count_type>));
+		return containers::range_view(
+			detail::counted_iterator(containers::begin(OPERATORS_FORWARD(source)), upper_bound_count),
+			detail::counted_sentinel(containers::end(OPERATORS_FORWARD(source)))
+		);
+	}
 }
 
 } // namespace containers

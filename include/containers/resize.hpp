@@ -14,6 +14,7 @@
 #include <containers/take.hpp>
 
 #include <operators/forward.hpp>
+#include <bounded/detail/cast.hpp>
 #include <bounded/integer.hpp>
 
 #include <utility>
@@ -25,7 +26,7 @@ constexpr auto resize_impl(auto & container_to_resize, auto const initializer_ra
 	while (containers::size(container_to_resize) > containers::size(initializer_range)) {
 		pop_back(container_to_resize);
 	}
-	auto const remaining = containers::size(initializer_range) - containers::size(container_to_resize);
+	auto const remaining = bounded::increase_min<0>(containers::size(initializer_range) - containers::size(container_to_resize), bounded::non_check);
 	::containers::append(container_to_resize, containers::take(initializer_range, remaining));
 }
 
