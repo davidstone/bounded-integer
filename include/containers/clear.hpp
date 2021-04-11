@@ -14,11 +14,22 @@
 #include <bounded/integer.hpp>
 
 namespace containers {
+namespace detail {
 
-template<typename Container> requires detail::pop_backable<Container> or detail::pop_frontable<Container>
+template<typename Container>
+concept member_clearable = requires(Container & container) { container.clear(); };
+
+template<typename Container>
+concept clearable = member_clearable<Container> or pop_backable<Container> or pop_frontable<Container>;
+
+} // namespace detail
+
+template<detail::clearable Container>
 constexpr auto clear(Container & container) {
-	// TODO: Link to Godbolt showing better code gen
-	if constexpr (detail::has_member_append_from_capacity<Container>) {
+	if constexpr (detail::member_clearable<Container>) {
+		container.clear();
+	} else if constexpr (detail::has_member_append_from_capacity<Container>) {
+		// TODO: Link to Godbolt showing better code gen
 		containers::destroy_range(container);
 		container.append_from_capacity(-containers::size(container));
 	} else {
