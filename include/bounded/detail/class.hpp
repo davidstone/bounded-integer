@@ -209,29 +209,23 @@ public:
 namespace detail {
 
 template<typename T>
-constexpr auto deduced_min() {
-	return builtin_min_value<T>;
-}
+inline constexpr auto deduced_min = builtin_min_value<T>;
+
 template<typename T>
-constexpr auto deduced_max() {
-	return builtin_max_value<T>;
-}
+inline constexpr auto deduced_max = builtin_max_value<T>;
 
 template<typename T> requires std::is_same_v<decltype(min_value<T>), incomplete>
-constexpr auto deduced_min() {
-	return min_value<std::underlying_type_t<T>>;
-}
+inline constexpr auto deduced_min<T> = min_value<std::underlying_type_t<T>>;
+
 template<typename T> requires std::is_same_v<decltype(max_value<T>), incomplete>
-constexpr auto deduced_max() {
-	return max_value<std::underlying_type_t<T>>;
-}
+inline constexpr auto deduced_max<T> = max_value<std::underlying_type_t<T>>;
 
 }	// namespace detail
 
 template<typename T>
 integer(T value) -> integer<
-	normalize<detail::deduced_min<T>()>,
-	normalize<detail::deduced_max<T>()>
+	normalize<detail::deduced_min<T>>,
+	normalize<detail::deduced_max<T>>
 >;
 
 }	// namespace bounded
