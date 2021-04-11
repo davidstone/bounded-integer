@@ -20,11 +20,12 @@ namespace containers {
 using namespace bounded::literal;
 
 constexpr decltype(auto) at(range auto && r, auto const index) {
-	return OPERATORS_FORWARD(r)[bounded::check_in_range<std::out_of_range>(
+	auto const checked_index = bounded::check_in_range<std::out_of_range>(
 		bounded::integer(index),
 		0_bi,
-		containers::size(r) - 1_bi
-	)];
+		bounded::integer(containers::size(r)) - 1_bi
+	);
+	return OPERATORS_FORWARD(r)[static_cast<index_type<decltype(r)>>(checked_index)];
 }
 
 constexpr decltype(auto) at(range auto && r, auto const index, bounded::non_check_t) {
