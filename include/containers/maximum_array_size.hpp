@@ -20,7 +20,7 @@ template<typename T>
 inline constexpr auto maximum_array_size = bounded::normalize<
 	bounded::min(
 		bounded::constant<bounded::max_value<std::ptrdiff_t>> / bounded::size_of<T>,
-		(1_bi << 31_bi) - 1_bi
+		(1_bi << 52_bi) - 1_bi
 	).value()
 >;
 
