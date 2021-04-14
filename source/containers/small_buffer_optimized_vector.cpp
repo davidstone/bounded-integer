@@ -118,9 +118,9 @@ int main() {
 	test_generic(5_bi, '9', {'0', '1', '4'});
 	test_generic(5_bi, '-', {'0', '1', '2', '3', '4'});
 
-	test_generic(containers::detail::minimum_small_capacity<char> + 1_bi, '-', {});
-	test_generic(containers::detail::minimum_small_capacity<char> + 1_bi, '-', {'0', '1', '2', '3', '4'});
-	static_assert(containers::detail::minimum_small_capacity<char> < 30_bi);
+	test_generic(containers::detail::minimum_small_capacity<char, containers::detail::array_size_type<char>> + 1_bi, '-', {});
+	test_generic(containers::detail::minimum_small_capacity<char, containers::detail::array_size_type<char>> + 1_bi, '-', {'0', '1', '2', '3', '4'});
+	static_assert(containers::detail::minimum_small_capacity<char, containers::detail::array_size_type<char>> < 30_bi);
 	test_generic(30_bi, '-', {
 		'0', '1', '2', '3', '4', '5', '6', '7', '8', '9',
 		'0', '1', '2', '3', '4', '5', '6', '7', '8', '9',

@@ -13,30 +13,29 @@ namespace containers::detail {
 
 using namespace bounded::literal;
 
-template<typename T, typename Size = array_size_type<T>>
+template<typename T, typename Size>
 struct dynamic_array_data {
-	using size_type = Size;
-	
 	constexpr dynamic_array_data():
 		pointer(nullptr),
 		size(0_bi)
 	{
 	}
 
-	constexpr dynamic_array_data(T * const pointer_, auto const size_):
+	// Do not allow CTAD to deduce the size
+	constexpr dynamic_array_data(T * const pointer_, bounded::convertible_to<Size> auto const size_):
 		pointer(pointer_),
-		size(static_cast<size_type>(size_))
+		size(size_)
 	{
 	}
 
 	T * pointer;
-	[[no_unique_address]] size_type size;
+	[[no_unique_address]] Size size;
 };
 
 
-template<typename T>
+template<typename T, typename Size>
 constexpr auto allocate_storage(auto const size) {
-	return dynamic_array_data(
+	return dynamic_array_data<T, Size>(
 		std::allocator<T>{}.allocate(static_cast<std::size_t>(size)),
 		size
 	);

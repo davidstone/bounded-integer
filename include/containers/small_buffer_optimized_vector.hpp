@@ -15,6 +15,7 @@
 #include <containers/compare_container.hpp>
 #include <containers/contiguous_iterator.hpp>
 #include <containers/dynamic_array_data.hpp>
+#include <containers/maximum_array_size.hpp>
 #include <containers/uninitialized_storage.hpp>
 
 #include <bounded/assert.hpp>
@@ -40,14 +41,16 @@ namespace detail {
 //
 // Therefore, to request the smallest possible buffer, the user can request a
 // size of 0.
-template<typename T>
-inline constexpr auto minimum_small_capacity = (bounded::size_of<std::pair<typename dynamic_array_data<T>::size_type, dynamic_array_data<T>>> - bounded::size_of<unsigned char>) / bounded::size_of<T>;
+template<typename T, typename Size>
+inline constexpr auto minimum_small_capacity = (bounded::size_of<std::pair<Size, dynamic_array_data<T, Size>>> - bounded::size_of<unsigned char>) / bounded::size_of<T>;
 
 } // namespace detail
 
-template<typename T, std::size_t requested_small_capacity>
+template<typename T, std::size_t requested_small_capacity, std::size_t max_size = containers::detail::maximum_array_size<T>>
 struct small_buffer_optimized_vector : private lexicographical_comparison::base {
+	static_assert(max_size <= containers::detail::maximum_array_size<T>, "Cannot actually allocate that many elements");
 	using value_type = T;
+	using size_type = bounded::integer<0, bounded::normalize<max_size>>;
 
 	struct small_t {
 		// m_force_large exists just to be a bit that's always 0. This allows
@@ -62,7 +65,7 @@ struct small_buffer_optimized_vector : private lexicographical_comparison::base 
 			return m_force_large;
 		}
 		static constexpr auto capacity() {
-			return bounded::max(detail::minimum_small_capacity<T>, bounded::constant<requested_small_capacity>);
+			return bounded::max(detail::minimum_small_capacity<T, small_buffer_optimized_vector::size_type>, bounded::constant<requested_small_capacity>);
 		}
 
 		using size_type = bounded::integer<0, bounded::normalize<capacity().value()>>;
@@ -89,7 +92,7 @@ struct small_buffer_optimized_vector : private lexicographical_comparison::base 
 	};
 
 	struct large_t {
-		using size_type = typename detail::dynamic_array_data<T>::size_type;
+		using size_type = small_buffer_optimized_vector::size_type;
 		using capacity_type = bounded::integer<
 			bounded::normalize<(small_t::capacity() + bounded::constant<1>).value()>,
 			bounded::detail::builtin_max_value<size_type>
@@ -128,12 +131,11 @@ struct small_buffer_optimized_vector : private lexicographical_comparison::base 
 	private:
 		bool m_force_large : 1;
 		typename size_type::underlying_type m_size : (bounded::size_of_bits<size_type> - 1_bi).value();
-		detail::dynamic_array_data<T> m_data;
+		detail::dynamic_array_data<T, size_type> m_data;
 	};
 	
 	static_assert(std::is_nothrow_move_constructible_v<value_type>);
 	static_assert(std::is_nothrow_move_assignable_v<value_type>);
-	using size_type = typename large_t::size_type;
 
 	static_assert(
 		bounded::max_value<size_type> <= bounded::constant<(1ULL << (CHAR_BIT * sizeof(value_type *) - 1)) - 1>,
@@ -248,7 +250,7 @@ private:
 		}
 		auto temp = std::move(m_large);
 		auto const guard = bounded::scope_guard([&]{
-			detail::deallocate_storage(detail::dynamic_array_data(temp.data(), temp.capacity()));
+			detail::deallocate_storage(detail::dynamic_array_data<T, size_type>(temp.data(), temp.capacity()));
 		});
 		// It is safe to skip the destructor call of m_large
 		// because we do not rely on its side-effects
@@ -276,7 +278,7 @@ private:
 	
 	constexpr auto deallocate_large() {
 		if (is_large()) {
-			detail::deallocate_storage(detail::dynamic_array_data(m_large.data(), m_large.capacity()));
+			detail::deallocate_storage(detail::dynamic_array_data<T, size_type>(m_large.data(), m_large.capacity()));
 		}
 	}
 	
@@ -298,7 +300,7 @@ private:
 	}
 
 	constexpr auto relocate_to_large(auto const requested_capacity) {
-		auto temp = detail::allocate_storage<value_type>(requested_capacity);
+		auto temp = detail::allocate_storage<value_type, size_type>(requested_capacity);
 		containers::uninitialized_relocate(*this, temp.pointer);
 		deallocate_large();
 		::bounded::construct(

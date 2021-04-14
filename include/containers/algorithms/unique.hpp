@@ -11,6 +11,7 @@
 #include <containers/begin_end.hpp>
 #include <containers/dynamic_array.hpp>
 #include <containers/iter_value_t.hpp>
+#include <containers/offset_type.hpp>
 
 #include <bounded/assert.hpp>
 
@@ -141,7 +142,7 @@ constexpr auto unique_inplace_merge(Iterator first, Iterator middle, sentinel_fo
 		return unique_less(first, last, less);
 	}
 	
-	using storage_type = dynamic_array<iter_value_t<Iterator>>;
+	using storage_type = dynamic_array<iter_value_t<Iterator>, offset_type<Iterator>>;
 
 	if (less(*middle, *first)) {
 		auto temp = storage_type(range_view(

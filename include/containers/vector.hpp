@@ -26,10 +26,12 @@
 
 namespace containers {
 
-template<typename T>
+// TODO: max_size should be an array_size_type<T> instead of a size_t
+template<typename T, std::size_t max_size = containers::detail::maximum_array_size<T>>
 struct vector : private lexicographical_comparison::base {
+	static_assert(max_size <= containers::detail::maximum_array_size<T>, "Cannot actually allocate that many elements");
 	using value_type = T;
-	using size_type = detail::array_size_type<T>;
+	using size_type = bounded::integer<0, bounded::normalize<max_size>>;
 
 	using const_iterator = contiguous_iterator<value_type const, bounded::detail::builtin_max_value<size_type>>;
 	using iterator = contiguous_iterator<value_type, bounded::detail::builtin_max_value<size_type>>;

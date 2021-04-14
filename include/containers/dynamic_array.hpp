@@ -31,10 +31,10 @@
 
 namespace containers {
 
-template<typename T>
+template<typename T, typename Size = detail::array_size_type<T>>
 struct dynamic_array : private lexicographical_comparison::base {
 	using value_type = T;
-	using size_type = typename detail::array_size_type<value_type>;
+	using size_type = Size;
 
 	using const_iterator = contiguous_iterator<value_type const, bounded::detail::builtin_max_value<size_type>>;
 	using iterator = contiguous_iterator<value_type, bounded::detail::builtin_max_value<size_type>>;
