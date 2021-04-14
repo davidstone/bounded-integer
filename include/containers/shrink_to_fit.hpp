@@ -15,11 +15,19 @@
 
 namespace containers {
 
+using namespace bounded::literal;
+
 template<range Container>
 constexpr auto shrink_to_fit(Container & c) {
 	auto const s = containers::size(c);
-	if (s == c.capacity() or c.capacity() == bounded::min_value<decltype(c.capacity())>) {
+	if (s == c.capacity()) {
 		return;
+	}
+	constexpr auto min_capacity = bounded::min_value<decltype(c.capacity())>;
+	if constexpr (min_capacity > 0_bi) {
+		if (c.capacity() == min_capacity) {
+			return;
+		}
 	}
 	auto temp = Container(range_view(
 		::containers::relocate_iterator(containers::begin(c)),
