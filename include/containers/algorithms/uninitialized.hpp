@@ -130,12 +130,13 @@ constexpr auto uninitialized_relocate(range auto && source, iterator auto out) {
 }
 
 
-template<iterator ForwardIterator>
-constexpr auto uninitialized_default_construct(ForwardIterator const first, sentinel_for<ForwardIterator> auto const last) {
+// TODO: Define in terms of uninitialized_copy + repeat_default_n?
+template<forward_iterator ForwardIterator, sentinel_for<ForwardIterator> Sentinel>
+constexpr auto uninitialized_default_construct(ForwardIterator const first, Sentinel const last) {
 	auto it = first;
 	try {
 		for (; it != last; ++it) {
-			bounded::construct(*it);
+			bounded::construct(*it, bounded::construct_return<iter_value_t<ForwardIterator>>);
 		}
 	} catch (...) {
 		containers::destroy_range(range_view(first, it));
