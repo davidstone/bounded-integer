@@ -92,11 +92,11 @@ struct counted_iterator {
 	friend constexpr auto operator-(counted_iterator const & lhs, counted_iterator const & rhs) {
 		return rhs.m_count - lhs.m_count;
 	}
-	template<typename Sentinel>
+	template<random_access_sentinel_for<Iterator> Sentinel>
 	friend constexpr auto operator-(counted_sentinel<Sentinel> const & lhs, counted_iterator const & rhs) {
 		return bounded::min(rhs.m_count, lhs.base() - rhs.m_it);
 	}
-	template<typename Sentinel>
+	template<random_access_sentinel_for<Iterator> Sentinel>
 	friend constexpr auto operator-(counted_iterator const & lhs, counted_sentinel<Sentinel> const & rhs) {
 		return -(rhs - lhs);
 	}
