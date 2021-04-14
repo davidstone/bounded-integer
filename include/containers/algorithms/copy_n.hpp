@@ -11,17 +11,22 @@
 
 namespace containers {
 
-constexpr auto copy_n(iterator auto first, auto const count, iterator auto out) {
+template<iterator InputIterator, typename Count, iterator OutputIterator>
+constexpr auto copy_n(InputIterator first, Count const count, OutputIterator out) {
 	using namespace bounded::literal;
-	static_assert(count > -1_bi, "Negative numbers not supported.");
+	static_assert(bounded::min_value<Count> > -1_bi, "Negative numbers not supported.");
 	struct result {
-		decltype(first) input;
-		decltype(out) output;
+		InputIterator input;
+		OutputIterator output;
 	};
-	for (auto const n [[maybe_unused]] : integer_range(count)) {
-		*out = *first;
-		++out;
-		++first;
+	for (auto const n : integer_range(count)) {
+		if constexpr (requires { out + n; first + n; }) {
+			*(out + n) = *(first + n);
+		} else {
+			*out = *first;
+			++out;
+			++first;
+		}
 	}
 	return result{std::move(first), std::move(out)};
 }
