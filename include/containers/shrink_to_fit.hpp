@@ -5,10 +5,9 @@
 
 #pragma once
 
-#include <containers/algorithms/relocate_iterator.hpp>
+#include <containers/algorithms/uninitialized.hpp>
 #include <containers/begin_end.hpp>
 #include <containers/is_range.hpp>
-#include <containers/range_view.hpp>
 #include <containers/size.hpp>
 
 #include <bounded/integer.hpp>
@@ -29,10 +28,10 @@ constexpr auto shrink_to_fit(Container & c) {
 			return;
 		}
 	}
-	auto temp = Container(range_view(
-		::containers::detail::relocate_iterator(containers::begin(c)),
-		::containers::detail::relocate_iterator(containers::end(c))
-	));
+	auto temp = Container();
+	temp.reserve(s);
+	containers::uninitialized_relocate(c, containers::begin(temp));
+	temp.append_from_capacity(s);
 	c.append_from_capacity(-s);
 	c = std::move(temp);
 }
