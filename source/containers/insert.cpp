@@ -42,11 +42,13 @@ static_assert(test_value_insert<containers::vector<bounded::test_int>>());
 
 struct non_trivial_non_copyable {
 	constexpr non_trivial_non_copyable() {}
+	constexpr non_trivial_non_copyable(non_trivial_non_copyable &&) noexcept {}
 	non_trivial_non_copyable(non_trivial_non_copyable const &) = delete;
-	non_trivial_non_copyable(non_trivial_non_copyable &&) = default;
+	constexpr non_trivial_non_copyable & operator=(non_trivial_non_copyable &&) noexcept { return *this; }
 	non_trivial_non_copyable & operator=(non_trivial_non_copyable const &) = delete;
-	non_trivial_non_copyable & operator=(non_trivial_non_copyable &&) = default;
 };
+
+static_assert(!std::is_trivially_copyable_v<non_trivial_non_copyable>);
 
 constexpr bool test_no_copies() {
 	auto container = containers::vector<non_trivial_non_copyable>();
