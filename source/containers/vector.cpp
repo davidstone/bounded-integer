@@ -5,14 +5,10 @@
 
 #include <containers/vector.hpp>
 
-#include <containers/shrink_to_fit.hpp>
-
-#include "../test_assert.hpp"
 #include "test_sequence_container.hpp"
+#include "../test_int.hpp"
 
 namespace {
-
-using namespace bounded::literal;
 
 static_assert(containers_test::test_sequence_container<containers::vector<bounded::test_int>>());
 
