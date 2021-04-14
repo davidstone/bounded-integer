@@ -57,7 +57,7 @@ constexpr auto uninitialized_copy(InputIterator first, Sentinel const last, Outp
 		auto out_first = out;
 		try {
 			for (; first != last; ++first) {
-				bounded::construct(*out, [&] { return *first; });
+				bounded::construct(*out, [&]() -> decltype(auto) { return *first; });
 				++out;
 			}
 		} catch (...) {
