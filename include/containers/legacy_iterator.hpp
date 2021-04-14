@@ -10,6 +10,7 @@
 #include <containers/common_iterator_functions.hpp>
 #include <containers/is_iterator.hpp>
 #include <containers/iter_value_t.hpp>
+#include <containers/to_address.hpp>
 
 #include <bounded/integer.hpp>
 
@@ -46,6 +47,10 @@ struct legacy_iterator {
 	}
 	OPERATORS_ARROW_DEFINITIONS
 	OPERATORS_BRACKET_ITERATOR_DEFINITIONS
+
+	constexpr auto to_address() const requires detail::to_addressable<Iterator> {
+		return containers::to_address(m_it);
+	}
 
 	friend auto operator<=>(legacy_iterator, legacy_iterator) = default;
 
