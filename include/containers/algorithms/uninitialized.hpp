@@ -115,8 +115,8 @@ constexpr auto uninitialized_move_backward(BidirectionalInputIterator const firs
 template<iterator InputIterator>
 constexpr auto uninitialized_relocate(InputIterator const first, sentinel_for<InputIterator> auto const last, iterator auto out) {
 	return ::containers::uninitialized_copy(
-		::containers::relocate_iterator(first),
-		::containers::relocate_iterator(last),
+		::containers::detail::relocate_iterator(first),
+		::containers::detail::relocate_iterator(last),
 		out
 	);
 }

@@ -11,10 +11,11 @@
 
 #include <type_traits>
 
-namespace containers {
+namespace containers::detail {
 
-constexpr auto relocate_iterator(iterator auto it_) {
-	return ::containers::transform_iterator_dereference(it_, [](decltype(it_) const it) noexcept {
+template<iterator Iterator>
+constexpr auto relocate_iterator(Iterator it_) {
+	return ::containers::transform_iterator_dereference(it_, [](Iterator const it) noexcept {
 		if constexpr (std::is_reference_v<decltype(*it)>) {
 			return relocate(*it);
 		} else {
@@ -23,4 +24,4 @@ constexpr auto relocate_iterator(iterator auto it_) {
 	});
 }
 
-}	// namespace containers
+} // namespace containers

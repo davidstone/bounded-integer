@@ -30,8 +30,8 @@ constexpr auto shrink_to_fit(Container & c) {
 		}
 	}
 	auto temp = Container(range_view(
-		::containers::relocate_iterator(containers::begin(c)),
-		::containers::relocate_iterator(containers::end(c))
+		::containers::detail::relocate_iterator(containers::begin(c)),
+		::containers::detail::relocate_iterator(containers::end(c))
 	));
 	c.append_from_capacity(-s);
 	c = std::move(temp);
