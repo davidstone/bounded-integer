@@ -9,6 +9,7 @@
 #include <containers/algorithms/copy_n.hpp>
 #include <containers/algorithms/uninitialized.hpp>
 #include <containers/begin_end.hpp>
+#include <containers/count_type.hpp>
 #include <containers/data.hpp>
 #include <containers/front_back.hpp>
 #include <containers/mutable_iterator.hpp>
@@ -43,7 +44,11 @@ constexpr auto insert_with_reallocation(Container & container, typename Containe
 	auto const temp_begin = containers::begin(temp);
 	auto const it = containers::uninitialized_relocate(containers::begin(container), mutable_position, temp_begin);
 	BOUNDED_ASSERT(temp_begin + offset == it);
-	::containers::uninitialized_relocate(mutable_position, containers::end(container), it + number_of_elements);
+	::containers::uninitialized_relocate(
+		mutable_position,
+		containers::end(container),
+		it + static_cast<offset_type<iterator_t<Container>>>(number_of_elements)
+	);
 	container.append_from_capacity(-original_size);
 	temp.append_from_capacity(original_size + number_of_elements);
 	container = std::move(temp);
@@ -103,9 +108,9 @@ constexpr auto insert(Container & container, typename Container::const_iterator 
 		auto const mutable_position = ::containers::detail::mutable_iterator(container, position);
 		::containers::uninitialized_relocate(
 			containers::reversed(range_view(mutable_position, containers::end(container))),
-			containers::reverse_iterator(containers::end(container) + range_size)
+			containers::reverse_iterator(containers::end(container) + static_cast<count_type<Container>>(range_size))
 		);
-		::containers::uninitialized_copy(OPERATORS_FORWARD(range), position);
+		::containers::uninitialized_copy(OPERATORS_FORWARD(range), mutable_position);
 		container.append_from_capacity(range_size);
 		return mutable_position;
 	} else if constexpr (detail::reservable<Container>) {
