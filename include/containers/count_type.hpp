@@ -5,29 +5,12 @@
 
 #pragma once
 
-#include <bounded/integer.hpp>
-
-#include <type_traits>
+#include <containers/iterator_t.hpp>
+#include <containers/offset_type.hpp>
 
 namespace containers {
-namespace detail {
 
-template<typename Size>
-struct size_type_to_count_type {
-	using type = Size;
-};
-
-template<bounded::bounded_integer Size>
-struct size_type_to_count_type<Size> {
-	using type  = bounded::integer<
-		0,
-		bounded::normalize<bounded::max_value<Size>.value()>
-	>;
-};
-
-}
-
-template<typename T>
-using count_type = typename detail::size_type_to_count_type<typename std::decay_t<T>::size_type>::type;
+template<typename Range>
+using count_type = offset_type<iterator_t<Range>>;
 
 }	// namespace containers
