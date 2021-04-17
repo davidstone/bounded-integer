@@ -6,6 +6,10 @@
 #pragma once
 
 namespace bounded {
+
+template<auto minimum, auto maximum>
+struct integer;
+
 namespace detail {
 
 template<typename T>
@@ -25,6 +29,9 @@ inline constexpr auto is_bounded_integer<T &> = is_bounded_integer<T>;
 
 template<typename T>
 inline constexpr auto is_bounded_integer<T &&> = is_bounded_integer<T>;
+
+template<auto minimum, auto maximum>
+inline constexpr auto is_bounded_integer<integer<minimum, maximum>> = true;
 
 } // namespace detail
 

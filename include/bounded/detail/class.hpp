@@ -35,9 +35,6 @@ inline constexpr auto min_value<integer<minimum, maximum>> = integer<minimum, mi
 namespace detail {
 
 template<auto minimum, auto maximum>
-inline constexpr auto is_bounded_integer<integer<minimum, maximum>> = true;
-
-template<auto minimum, auto maximum>
 inline constexpr auto builtin_max_value<integer<minimum, maximum>> = maximum;
 
 template<auto minimum, auto maximum>
