@@ -261,7 +261,7 @@ if("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang")
 	if(NOT MSVC)
 		target_compile_options(benchmark PUBLIC
 			"-stdlib=libc++"
-			"-std=c++20"
+			"-std=c++2b"
 		)
 	endif()
 
