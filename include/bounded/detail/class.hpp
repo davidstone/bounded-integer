@@ -65,15 +65,6 @@ public:
 } // namespace std
 namespace bounded {
 
-template<typename T>
-inline constexpr auto is_integer = detail::builtin_integer<T> or bounded_integer<T>;
-
-template<typename T, T value>
-inline constexpr auto is_integer<std::integral_constant<T, value>> = is_integer<T>;
-
-template<typename T>
-concept integral = is_integer<T>;
-
 
 // Use non_check_t constructors if you know by means that cannot be determined
 // by the type system that the value fits in the range.
@@ -83,7 +74,7 @@ namespace detail {
 
 template<typename T, auto minimum, auto maximum>
 concept overlapping_integer =
-	(is_integer<T> or std::is_enum_v<T> or std::is_same_v<T, bool>) and
+	(integral<T> or std::is_enum_v<T> or std::is_same_v<T, bool>) and
 	safe_compare(builtin_min_value<T>, maximum) <= 0 and safe_compare(minimum, builtin_max_value<T>) <= 0;
 
 template<typename T, auto minimum, auto maximum>

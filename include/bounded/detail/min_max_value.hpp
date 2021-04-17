@@ -7,6 +7,7 @@
 
 #include <bounded/detail/int128.hpp>
 #include <bounded/detail/max_builtin.hpp>
+#include <bounded/detail/is_bounded_integer.hpp>
 
 #include <cstddef>
 #include <type_traits>

@@ -56,18 +56,6 @@ using max_signed_t = std::intmax_t;
 using max_unsigned_t = std::uintmax_t;
 #endif
 
-template<typename T>
-concept builtin_arithmetic = (std::is_arithmetic_v<T> and !std::is_same_v<T, bool>) or std::is_same_v<T, detail::max_signed_t> or std::is_same_v<T, detail::max_unsigned_t>;
-
-template<typename T>
-concept builtin_integer = builtin_arithmetic<T> and !std::is_floating_point_v<T>;
-
-template<typename T>
-concept signed_builtin = builtin_integer<T> and (std::is_signed_v<T> or std::is_same_v<T, detail::max_signed_t>);
-
-template<typename T>
-concept unsigned_builtin = builtin_integer<T> and (std::is_unsigned_v<T> or std::is_same_v<T, detail::max_unsigned_t>);
-
 constexpr inline auto as_unsigned = [](auto const value) {
 	return static_cast<promoted_unsigned<decltype(value)>>(value);
 };
