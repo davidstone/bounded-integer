@@ -45,6 +45,15 @@ template<typename T>
 reference_wrapper(T &) -> reference_wrapper<T>;
 
 template<typename T>
+inline constexpr auto is_reference_wrapper = false;
+
+template<typename T>
+inline constexpr auto is_reference_wrapper<reference_wrapper<T>> = true;
+
+template<typename T>
+inline constexpr auto is_reference_wrapper<std::reference_wrapper<T>> = true;
+
+template<typename T>
 constexpr auto ref(T & value) {
 	return reference_wrapper<T>(value);
 }
@@ -57,12 +66,12 @@ template<typename T>
 constexpr auto cref(T && value) = delete;
 
 template<typename T>
-constexpr auto && unwrap(reference_wrapper<T> reference) {
-	return reference.get();
-}
-template<typename T>
 constexpr auto && unwrap(T && reference) {
-	return OPERATORS_FORWARD(reference);
+	if constexpr (is_reference_wrapper<std::remove_cvref_t<T>>) {
+		return reference.get();
+	} else {
+		return OPERATORS_FORWARD(reference);
+	}
 }
 
 }	// namespace containers
