@@ -126,7 +126,7 @@ struct concatenate_view_iterator {
 	friend constexpr auto operator+(concatenate_view_iterator const lhs, Offset const offset) {
 		return [=]<std::size_t... indexes>(std::index_sequence<indexes...>) {
 			BOUNDED_ASSERT(offset >= bounded::constant<0>);
-			auto remaining_offset = bounded::integer<0, bounded::detail::builtin_max_value<Offset>>(offset);
+			auto remaining_offset = bounded::integer<0, bounded::builtin_max_value<Offset>>(offset);
 			auto specific_range = [&](auto const index) {
 				auto const range = lhs.m_range_views[index];
 				using size_type = typename decltype(range)::size_type;
@@ -231,7 +231,7 @@ struct concatenate_view {
 	using value_type = iter_value_t<iterator>;
 	using size_type = bounded::integer<
 		0,
-		bounded::normalize<bounded::max_value<typename iterator::difference_type>.value()>
+		bounded::builtin_max_value<typename iterator::difference_type>
 	>;
 	
 	constexpr concatenate_view(Ranges && ... ranges):

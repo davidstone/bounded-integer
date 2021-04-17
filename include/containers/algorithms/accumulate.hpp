@@ -39,7 +39,7 @@ struct accumulate_c<Range, Initial, std::plus<>> {
 			std::declval<containers::range_value_t<Range>>() *
 			std::declval<bounded::integer<
 				0,
-				bounded::detail::builtin_max_value<iter_difference_t<iterator_t<Range>>>
+				bounded::builtin_max_value<iter_difference_t<iterator_t<Range>>>
 			>>()
 		)
 	);
@@ -53,7 +53,7 @@ struct accumulate_c<Range, Initial, std::multiplies<>> {
 			std::declval<range_value_t<Range>>(),
 			std::declval<bounded::integer<
 				0,
-				bounded::detail::builtin_max_value<iter_difference_t<iterator_t<Range>>>
+				bounded::builtin_max_value<iter_difference_t<iterator_t<Range>>>
 			>>()
 		)
 	);

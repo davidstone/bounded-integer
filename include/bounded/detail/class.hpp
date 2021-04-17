@@ -32,15 +32,12 @@ inline constexpr auto max_value<integer<minimum, maximum>> = integer<maximum, ma
 template<auto minimum, auto maximum>
 inline constexpr auto min_value<integer<minimum, maximum>> = integer<minimum, minimum>();
 
-namespace detail {
-
 template<auto minimum, auto maximum>
 inline constexpr auto builtin_max_value<integer<minimum, maximum>> = maximum;
 
 template<auto minimum, auto maximum>
 inline constexpr auto builtin_min_value<integer<minimum, maximum>> = minimum;
 
-} // namespace detail
 } // namespace bounded
 namespace std {
 
@@ -51,12 +48,12 @@ template<bounded::bounded_integer LHS, bounded::bounded_integer RHS> requires(st
 struct common_type<LHS, RHS> {
 private:
 	static inline constexpr auto minimum = bounded::normalize<bounded::detail::safe_min(
-		bounded::detail::builtin_min_value<LHS>,
-		bounded::detail::builtin_min_value<RHS>
+		bounded::builtin_min_value<LHS>,
+		bounded::builtin_min_value<RHS>
 	)>;
 	static inline constexpr auto maximum = bounded::normalize<bounded::detail::safe_max(
-		bounded::detail::builtin_max_value<LHS>,
-		bounded::detail::builtin_max_value<RHS>
+		bounded::builtin_max_value<LHS>,
+		bounded::builtin_max_value<RHS>
 	)>;
 public:
 	using type = bounded::integer<minimum, maximum>;
@@ -203,17 +200,17 @@ template<typename T>
 inline constexpr auto deduced_max = builtin_max_value<T>;
 
 template<typename T> requires std::is_same_v<decltype(min_value<T>), incomplete>
-inline constexpr auto deduced_min<T> = min_value<std::underlying_type_t<T>>;
+inline constexpr auto deduced_min<T> = builtin_min_value<std::underlying_type_t<T>>;
 
 template<typename T> requires std::is_same_v<decltype(max_value<T>), incomplete>
-inline constexpr auto deduced_max<T> = max_value<std::underlying_type_t<T>>;
+inline constexpr auto deduced_max<T> = builtin_max_value<std::underlying_type_t<T>>;
 
 }	// namespace detail
 
 template<typename T>
 integer(T value) -> integer<
-	normalize<detail::deduced_min<T>>,
-	normalize<detail::deduced_max<T>>
+	detail::deduced_min<T>,
+	detail::deduced_max<T>
 >;
 
 }	// namespace bounded

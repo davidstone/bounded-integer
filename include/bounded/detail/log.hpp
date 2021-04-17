@@ -30,8 +30,8 @@ constexpr auto log(Value const value, Base const base) {
 	static_assert(base > constant<1>, "Negative bases not currently supported.");
 	static_assert(value > constant<0>, "The log of a negative number or zero is undefined.");
 	using result_type = integer<
-		detail::log_impl(static_cast<detail::max_unsigned_t>(detail::builtin_min_value<Value>), static_cast<detail::max_unsigned_t>(max_value<Base>)),
-		detail::log_impl(static_cast<detail::max_unsigned_t>(detail::builtin_max_value<Value>), static_cast<detail::max_unsigned_t>(min_value<Base>))
+		detail::log_impl(static_cast<detail::max_unsigned_t>(builtin_min_value<Value>), static_cast<detail::max_unsigned_t>(max_value<Base>)),
+		detail::log_impl(static_cast<detail::max_unsigned_t>(builtin_max_value<Value>), static_cast<detail::max_unsigned_t>(min_value<Base>))
 	>;
 	return result_type(detail::log_impl(detail::as_unsigned(value.value()), detail::as_unsigned(base.value())), non_check);
 }

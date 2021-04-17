@@ -52,10 +52,10 @@ constexpr auto safe_equal(LHS const lhs, RHS const rhs) -> bool {
 
 template<bounded_integer LHS, bounded_integer RHS>
 constexpr auto operator<=>(LHS const lhs, RHS const rhs) -> std::strong_ordering {
-	constexpr auto lhs_min = detail::builtin_min_value<LHS>;
-	constexpr auto lhs_max = detail::builtin_max_value<LHS>;
-	constexpr auto rhs_min = detail::builtin_min_value<RHS>;
-	constexpr auto rhs_max = detail::builtin_max_value<RHS>;
+	constexpr auto lhs_min = builtin_min_value<LHS>;
+	constexpr auto lhs_max = builtin_max_value<LHS>;
+	constexpr auto rhs_min = builtin_min_value<RHS>;
+	constexpr auto rhs_max = builtin_max_value<RHS>;
 	if constexpr (detail::safe_compare(lhs_min, rhs_max) > 0) {
 		return std::strong_ordering::greater;
 	} else if constexpr (detail::safe_compare(lhs_max, rhs_min) < 0) {
@@ -69,10 +69,10 @@ constexpr auto operator<=>(LHS const lhs, RHS const rhs) -> std::strong_ordering
 
 template<bounded_integer LHS, bounded_integer RHS>
 constexpr auto operator==(LHS const lhs, RHS const rhs) -> bool {
-	constexpr auto lhs_min = detail::builtin_min_value<LHS>;
-	constexpr auto lhs_max = detail::builtin_max_value<LHS>;
-	constexpr auto rhs_min = detail::builtin_min_value<RHS>;
-	constexpr auto rhs_max = detail::builtin_max_value<RHS>;
+	constexpr auto lhs_min = builtin_min_value<LHS>;
+	constexpr auto lhs_max = builtin_max_value<LHS>;
+	constexpr auto rhs_min = builtin_min_value<RHS>;
+	constexpr auto rhs_max = builtin_max_value<RHS>;
 	if constexpr (detail::safe_compare(lhs_min, rhs_max) > 0 or detail::safe_compare(lhs_max, rhs_min) < 0) {
 		return false;
 	} else if constexpr (detail::safe_equal(lhs_min, lhs_max) and detail::safe_equal(rhs_min, rhs_max) and detail::safe_equal(lhs_min, rhs_min)) {

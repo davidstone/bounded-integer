@@ -10,13 +10,11 @@
 #include <bounded/normalize.hpp>
 
 namespace bounded {
-namespace detail {
 
-template<typename T> requires(!std::is_same_v<decltype(max_value<T>), incomplete>)
-inline constexpr auto builtin_max_value = normalize<as_builtin_integer(max_value<T>)>;
+template<typename T> requires(!std::is_same_v<decltype(max_value<T>), detail::incomplete>)
+inline constexpr auto builtin_max_value = normalize<max_value<T>>;
 
-template<typename T> requires(!std::is_same_v<decltype(max_value<T>), incomplete>)
-inline constexpr auto builtin_min_value = normalize<as_builtin_integer(min_value<T>)>;
+template<typename T> requires(!std::is_same_v<decltype(max_value<T>), detail::incomplete>)
+inline constexpr auto builtin_min_value = normalize<min_value<T>>;
 
-}	// namespace detail
-}	// namespace bounded
+} // namespace bounded

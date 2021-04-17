@@ -122,7 +122,7 @@ public:
 };
 
 template<typename Size, typename T>
-repeat_n(Size, T &&) -> repeat_n<bounded::integer<0, bounded::detail::builtin_max_value<Size>>, T>;
+repeat_n(Size, T &&) -> repeat_n<bounded::integer<0, bounded::builtin_max_value<Size>>, T>;
 
 template<typename Size, typename T>
 struct repeat_default_n_t {
@@ -152,7 +152,7 @@ public:
 template<typename T, typename Size>
 constexpr auto repeat_default_n(Size size) {
 	return repeat_default_n_t<
-		bounded::integer<0, bounded::detail::builtin_max_value<Size>>,
+		bounded::integer<0, bounded::builtin_max_value<Size>>,
 		T
 	>(size);
 }

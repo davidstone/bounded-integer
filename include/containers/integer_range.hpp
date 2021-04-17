@@ -28,8 +28,8 @@ struct integer_range_iterator {
 private:
 	using storage_type = bounded::integer<value_min, sentinel_max>;
 	using bounded_type = bounded::integer<
-		bounded::detail::builtin_min_value<storage_type>,
-		bounded::normalize<bounded::max(bounded::min_value<storage_type>, bounded::max_value<storage_type> - bounded::min_value<Step>).value()>
+		bounded::builtin_min_value<storage_type>,
+		bounded::normalize<bounded::max(bounded::min_value<storage_type>, bounded::max_value<storage_type> - bounded::min_value<Step>)>
 	>;
 
 public:
@@ -100,14 +100,14 @@ struct integer_range {
 
 	using iterator = detail::integer_range_iterator<
 		bounded::bounded_integer<Integer>,
-		bounded::detail::builtin_min_value<Integer>,
-		bounded::detail::builtin_max_value<Sentinel>,
+		bounded::builtin_min_value<Integer>,
+		bounded::builtin_max_value<Sentinel>,
 		Step
 	>;
 	using const_iterator = iterator;
 
 	using value_type = iter_value_t<iterator>;
-	using size_type = bounded::integer<0, bounded::detail::builtin_max_value<iter_difference_t<iterator>>>;
+	using size_type = bounded::integer<0, bounded::builtin_max_value<iter_difference_t<iterator>>>;
 	
 	// If `last` is not reachable by adding `step` to `first` some number of
 	// times, the behavior is undefined.

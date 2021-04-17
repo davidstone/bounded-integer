@@ -156,8 +156,8 @@ constexpr auto take(Range && source, Count const count) {
 		0,
 		bounded::normalize<bounded::min(
 			bounded::integer(bounded::max_value<iter_difference_t<iterator>>),
-			bounded::constant<bounded::detail::builtin_max_value<Count>>
-		).value()>
+			bounded::constant<bounded::builtin_max_value<Count>>
+		)>
 	>;
 
 	if constexpr (sized_range<Range> and forward_random_access_iterator<iterator>) {

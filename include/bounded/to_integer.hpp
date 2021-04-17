@@ -66,7 +66,7 @@ constexpr auto to_integer(std::string_view str) {
 
 template<typename Integer>
 constexpr auto to_integer(std::string_view const str) {
-	return static_cast<Integer>(to_integer<detail::builtin_min_value<Integer>, detail::builtin_max_value<Integer>>(str));
+	return static_cast<Integer>(to_integer<builtin_min_value<Integer>, builtin_max_value<Integer>>(str));
 }
 
 } // namespace bounded

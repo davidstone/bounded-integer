@@ -21,7 +21,7 @@ template<bounded::bounded_integer Difference>
 struct difference_type_to_offset_type<Difference> {
 	using type = bounded::integer<
 		0,
-		bounded::normalize<bounded::max_value<Difference>.value()>
+		bounded::normalize<bounded::max_value<Difference>>
 	>;
 };
 

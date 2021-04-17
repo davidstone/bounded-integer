@@ -29,9 +29,9 @@ constexpr auto digits_impl(auto const base) {
 			return ::bounded::log(-value, base) + constant<sign == count_sign::negative>;
 		}
 	};
-	auto const representation_min = safe_log(constant<detail::builtin_min_value<T>>);
-	auto const representation_max = safe_log(constant<detail::builtin_max_value<T>>);
-	constexpr auto sign_bits = constant<detail::builtin_min_value<T> < 0 and sign == count_sign::all>;
+	auto const representation_min = safe_log(constant<builtin_min_value<T>>);
+	auto const representation_max = safe_log(constant<builtin_max_value<T>>);
+	constexpr auto sign_bits = constant<builtin_min_value<T> < 0 and sign == count_sign::all>;
 	return ::bounded::max(representation_min, representation_max) + sign_bits + constant<1>;
 }
 

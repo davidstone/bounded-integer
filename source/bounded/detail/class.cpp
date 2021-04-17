@@ -33,13 +33,13 @@ static_assert(!bounded::detail::overlapping_integer<bounded::integer<0, 0>, 1, 1
 static_assert(bounded::detail::bounded_by_range<bounded::integer<0, 0>, -1, 1>);
 static_assert(!bounded::detail::bounded_by_range<bounded::integer<0, 1>, 0, 0>);
 
-static_assert(std::is_empty<bounded::constant_t<0>>{});
-static_assert(std::is_empty<bounded::constant_t<1>>{});
-static_assert(std::is_empty<bounded::constant_t<-1>>{});
-static_assert(std::is_empty<bounded::constant_t<bounded::normalize<bounded::min_value<std::intmax_t>>>>{});
-static_assert(std::is_empty<bounded::constant_t<bounded::min_value<bounded::detail::max_signed_t>>>{});
-static_assert(std::is_empty<bounded::constant_t<bounded::max_value<bounded::detail::max_signed_t>>>{});
-static_assert(std::is_empty<bounded::constant_t<bounded::max_value<bounded::detail::max_unsigned_t>>>{});
+static_assert(std::is_empty_v<bounded::constant_t<0>>);
+static_assert(std::is_empty_v<bounded::constant_t<1>>);
+static_assert(std::is_empty_v<bounded::constant_t<-1>>);
+static_assert(std::is_empty_v<bounded::constant_t<bounded::builtin_min_value<std::intmax_t>>>);
+static_assert(std::is_empty_v<bounded::constant_t<bounded::builtin_min_value<bounded::detail::max_signed_t>>>);
+static_assert(std::is_empty_v<bounded::constant_t<bounded::builtin_max_value<bounded::detail::max_signed_t>>>);
+static_assert(std::is_empty_v<bounded::constant_t<bounded::builtin_max_value<bounded::detail::max_unsigned_t>>>);
 
 static_assert(!std::is_convertible_v<bool, bounded::integer<0, 1>>);
 static_assert(bounded::constructible_from<bounded::integer<0, 1>, bool>);

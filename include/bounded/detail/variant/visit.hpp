@@ -34,7 +34,7 @@ constexpr decltype(auto) reorder_transform_implementation(bounded::constant_t<in
 // arguments in some way before calling the user function.
 constexpr decltype(auto) reorder_transform(auto transform, auto && ... args) {
 	return ::bounded::detail::reorder_transform_implementation(
-		bounded::constant<bounded::normalize<sizeof...(args) - 1U>>,
+		bounded::constant<sizeof...(args) - 1U>,
 		transform,
 		OPERATORS_FORWARD(args)...
 	);

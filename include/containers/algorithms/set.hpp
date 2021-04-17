@@ -77,8 +77,8 @@ public:
 		decltype(*std::declval<ForwardIterator2>())
 	>;
 	using difference_type = bounded::integer<
-		bounded::normalize<static_cast<std::intmax_t>(-max_difference)>,
-		bounded::normalize<static_cast<std::intmax_t>(max_difference)>
+		bounded::normalize<-max_difference>,
+		bounded::normalize<max_difference>
 	>;
 	using pointer = value_type *;
 	using reference = value_type;
@@ -159,7 +159,7 @@ public:
 	using value_type = iter_value_t<iterator>;
 	using size_type = bounded::integer<
 		0,
-		bounded::detail::builtin_max_value<typename iterator::difference_type>
+		bounded::builtin_max_value<typename iterator::difference_type>
 	>;
 
 	template<typename R1, typename R2>

@@ -17,7 +17,9 @@ namespace detail {
 
 template<typename T>
 constexpr auto as_builtin_integer(T const x) {
-	if constexpr (is_integral_constant_of_integral<T>) {
+	if constexpr (bounded_integer<T>) {
+		return x.value();
+	} else if constexpr (is_integral_constant_of_integral<T>) {
 		return x.get();
 	} else if constexpr (std::is_enum_v<T>) {
 		return std::to_underlying(x);
@@ -42,8 +44,8 @@ constexpr auto fits_in_int(T const value) {
 
 template<auto value>
 inline constexpr auto normalize = static_cast<
-	std::conditional_t<detail::fits_in_int(+detail::as_builtin_integer(value)), int,
-	std::conditional_t<detail::must_use_unsigned(detail::as_builtin_integer(value)), detail::max_unsigned_t,
+	std::conditional_t<detail::fits_in_int(+bounded::detail::as_builtin_integer(value)), int,
+	std::conditional_t<detail::must_use_unsigned(bounded::detail::as_builtin_integer(value)), detail::max_unsigned_t,
 	detail::max_signed_t
 >>>(value);
 

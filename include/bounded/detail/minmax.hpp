@@ -38,9 +38,9 @@ struct extreme_type<Compare, LHS, RHS> {
 private:
 	static constexpr auto select = [](auto const lhs, auto const rhs) {
 		if constexpr (Compare{}(lhs, rhs)) {
-			return normalize<lhs.value()>;
+			return normalize<lhs>;
 		} else {
-			return normalize<rhs.value()>;
+			return normalize<rhs>;
 		}
 	};
 	static constexpr auto minimum = select(min_value<LHS>, min_value<RHS>);

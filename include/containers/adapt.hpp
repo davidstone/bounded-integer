@@ -56,7 +56,7 @@ public:
 	using value_type = iter_value_t<iterator>;
 	using size_type = bounded::integer<
 		0,
-		bounded::normalize<static_cast<std::uintmax_t>(bounded::max_value<iter_difference_t<iterator>>)>
+		bounded::builtin_max_value<iter_difference_t<iterator>>
 	>;
 	
 	constexpr adapt(Range && range, Traits traits):

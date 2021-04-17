@@ -22,7 +22,7 @@ template<bounded::bounded_integer Size>
 struct size_type_to_index_type<Size> {
 	using type  = bounded::integer<
 		0,
-		bounded::normalize<(bounded::max_value<Size> - bounded::constant<1>).value()>
+		bounded::normalize<bounded::max_value<Size> - bounded::constant<1>>
 	>;
 };
 

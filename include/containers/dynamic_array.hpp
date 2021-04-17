@@ -36,8 +36,8 @@ struct dynamic_array : private lexicographical_comparison::base {
 	using value_type = T;
 	using size_type = Size;
 
-	using const_iterator = contiguous_iterator<value_type const, bounded::detail::builtin_max_value<size_type>>;
-	using iterator = contiguous_iterator<value_type, bounded::detail::builtin_max_value<size_type>>;
+	using const_iterator = contiguous_iterator<value_type const, bounded::builtin_max_value<size_type>>;
+	using iterator = contiguous_iterator<value_type, bounded::builtin_max_value<size_type>>;
 	
 	constexpr dynamic_array() = default;
 

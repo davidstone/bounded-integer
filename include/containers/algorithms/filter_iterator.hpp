@@ -119,7 +119,7 @@ public:
 	using value_type = range_value_t<Range>;
 	using size_type = bounded::integer<
 		0,
-		bounded::normalize<static_cast<std::uintmax_t>(bounded::max_value<iter_difference_t<iterator>>)>
+		bounded::builtin_max_value<iter_difference_t<iterator>>
 	>;
 
 	constexpr filter(Range && range, UnaryPredicate predicate):
