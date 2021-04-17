@@ -41,7 +41,7 @@ constexpr auto & lazy_push_back(
 		container.append_from_capacity(1_bi);
 	} else if constexpr (detail::reservable<Container>) {
 		auto temp = Container();
-		temp.reserve(::containers::detail::reallocation_size(container, 1_bi));
+		temp.reserve(::containers::detail::reallocation_size(container.capacity(), initial_size, 1_bi));
 		construct(temp);
 
 		::containers::uninitialized_relocate(container, containers::begin(temp));

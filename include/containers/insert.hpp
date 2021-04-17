@@ -34,7 +34,7 @@ constexpr auto insert_with_reallocation(Container & container, typename Containe
 	// correct place to begin with
 	auto const original_size = containers::size(container);
 	auto temp = Container();
-	temp.reserve(::containers::detail::reallocation_size(container, number_of_elements));
+	temp.reserve(::containers::detail::reallocation_size(container.capacity(), original_size, number_of_elements));
 	// First construct the new element because the arguments to
 	// construct it may reference an old element. We cannot move
 	// elements it references before constructing it
