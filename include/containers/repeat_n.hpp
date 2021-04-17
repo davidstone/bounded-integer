@@ -5,156 +5,21 @@
 
 #pragma once
 
-#include <containers/common_iterator_functions.hpp>
-#include <containers/begin_end.hpp>
-#include <containers/reference_wrapper.hpp>
+#include <containers/algorithms/generate.hpp>
 
 #include <bounded/detail/construct_destroy.hpp>
-#include <bounded/integer.hpp>
-#include <bounded/unreachable.hpp>
 #include <bounded/value_to_function.hpp>
-
-#include <operators/forward.hpp>
-#include <operators/operators.hpp>
-
-#include <iterator>
-#include <utility>
 
 namespace containers {
 
-using namespace bounded::literal;
-
-namespace detail {
-
-template<typename LHS, typename RHS>
-concept construct_subtractible = requires(LHS const lhs, RHS const rhs) {
-	LHS(lhs - rhs);
-};
-
-} // namespace detail
-
-struct repeat_n_sentinel {};
-
-template<typename Size, typename Function>
-struct repeat_n_iterator {
-private:
-	Size m_remaining;
-	Function m_get_value;
-
-public:
-	using iterator_category = std::random_access_iterator_tag;
-	using reference = decltype(std::declval<Function>()());
-	using value_type = std::remove_cvref_t<reference>;
-	using difference_type = decltype(std::declval<Size>() - std::declval<Size>());
-	using pointer = std::remove_reference_t<reference> *;
-	
-	constexpr repeat_n_iterator(Size const remaining, Function get_value):
-		m_remaining(remaining),
-		m_get_value(std::move(get_value))
-	{
-	}
-
-	constexpr decltype(auto) operator*() const {
-		return m_get_value();
-	}
-	OPERATORS_ARROW_DEFINITIONS
-
-	// It is undefined behavior to compare iterators into different ranges
-	friend constexpr auto operator<=>(repeat_n_iterator const lhs, repeat_n_iterator const rhs) {
-		return lhs.m_remaining <=> rhs.m_remaining;
-	}
-	friend constexpr auto operator<=>(repeat_n_iterator const lhs, repeat_n_sentinel) {
-		return lhs.m_remaining <=> 0_bi;
-	}
-
-	friend constexpr auto operator==(repeat_n_iterator const lhs, repeat_n_iterator const rhs) -> bool {
-		return lhs.m_remaining == rhs.m_remaining;
-	}
-	friend constexpr auto operator==(repeat_n_iterator const lhs, repeat_n_sentinel) -> bool {
-		return lhs.m_remaining == 0_bi;
-	}
-
-	template<bounded::integral Offset> requires(detail::construct_subtractible<Size, Offset>)
-	friend constexpr auto operator+(repeat_n_iterator it, Offset const offset) -> repeat_n_iterator {
-		return repeat_n_iterator(Size(it.m_remaining - offset), std::move(it).m_get_value);
-	}
-	friend constexpr auto operator-(repeat_n_iterator const lhs, repeat_n_iterator const rhs) {
-		return rhs.m_remaining - lhs.m_remaining;
-	}
-	friend constexpr auto operator-(repeat_n_sentinel, repeat_n_iterator const rhs) {
-		return rhs.m_remaining;
-	}
-};
-
-template<typename Size, typename Function> requires(bounded::max_value<Size> == bounded::constant<0>)
-constexpr auto & operator++(repeat_n_iterator<Size, Function> & it) {
-	bounded::unreachable();
-	return it;
+template<typename Size, typename T>
+constexpr auto repeat_n(Size const size, T && value) {
+	return generate_n(size, bounded::value_to_function(OPERATORS_FORWARD(value)));
 }
-
-template<typename Size, typename T>
-struct repeat_n {
-private:
-	Size m_size;
-	T m_value;
-
-public:
-	using size_type = Size;
-	using value_type = T;
-
-	using const_iterator = repeat_n_iterator<size_type, decltype(bounded::value_to_function(std::declval<T const &>()))>;
-
-	template<typename U>	
-	constexpr repeat_n(size_type const size, U && value):
-		m_size(size),
-		m_value(OPERATORS_FORWARD(value))
-	{
-	}
-
-	constexpr auto begin() const {
-		return const_iterator(m_size, bounded::value_to_function(m_value));
-	}
-	static constexpr auto end() {
-		return repeat_n_sentinel();
-	}
-
-	OPERATORS_BRACKET_SEQUENCE_RANGE_DEFINITIONS
-};
-
-template<typename Size, typename T>
-repeat_n(Size, T &&) -> repeat_n<bounded::integer<0, bounded::builtin_max_value<Size>>, T>;
-
-template<typename Size, typename T>
-struct repeat_default_n_t {
-private:
-	Size m_size;
-
-public:
-	using size_type = Size;
-	using value_type = T;
-	using const_iterator = repeat_n_iterator<size_type, std::decay_t<decltype(bounded::construct_return<value_type>)>>;
-
-	explicit constexpr repeat_default_n_t(size_type const size):
-		m_size(size)
-	{
-	}
-
-	constexpr auto begin() const {
-		return const_iterator(m_size, bounded::construct_return<value_type>);
-	}
-	static constexpr auto end() {
-		return repeat_n_sentinel();
-	}
-
-	OPERATORS_BRACKET_SEQUENCE_RANGE_DEFINITIONS
-};
 
 template<typename T, typename Size>
-constexpr auto repeat_default_n(Size size) {
-	return repeat_default_n_t<
-		bounded::integer<0, bounded::builtin_max_value<Size>>,
-		T
-	>(size);
+constexpr auto repeat_default_n(Size const size) {
+	return generate_n(size, bounded::construct_return<T>);
 }
 
-}	// namespace containers
+} // namespace containers

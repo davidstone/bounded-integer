@@ -129,6 +129,7 @@ add_library(containers_test STATIC
 	source/containers/algorithms/erase.cpp
 	source/containers/algorithms/filter_iterator.cpp
 	source/containers/algorithms/find.cpp
+	source/containers/algorithms/generate.cpp
 	source/containers/algorithms/keyed_binary_search.cpp
 	source/containers/algorithms/keyed_erase.cpp
 	source/containers/algorithms/keyed_insert.cpp
