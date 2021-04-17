@@ -33,14 +33,12 @@ constexpr auto reallocation_size(Capacity const current_capacity, auto const cur
 	));
 }
 
-template<typename Container>
-constexpr void growth_reallocation(Container & container, auto const input_size) {
-	if constexpr (reservable<Container>) {
+constexpr auto reserve_if_needed(auto & container, auto const input_size) {
+	auto const current_size = ::containers::detail::linear_size(container);
+	if (current_size + input_size > container.capacity()) {
 		container.reserve(::containers::detail::reallocation_size(container.capacity(), current_size, input_size));
-	} else {
-		BOUNDED_ASSERT(container.capacity() >= size(container) + input_size);
 	}
 }
 
-}	// namespace detail
-}	// namespace containers
+} // namespace detail
+} // namespace containers

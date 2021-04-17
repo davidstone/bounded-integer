@@ -5,13 +5,15 @@
 
 #pragma once
 
+#include <containers/algorithms/erase.hpp>
+#include <containers/algorithms/generate.hpp>
 #include <containers/append.hpp>
+#include <containers/count_type.hpp>
 #include <containers/pop_back.hpp>
 #include <containers/range_value_t.hpp>
 #include <containers/repeat_n.hpp>
 #include <containers/resizable_container.hpp>
 #include <containers/size.hpp>
-#include <containers/take.hpp>
 
 #include <operators/forward.hpp>
 #include <bounded/detail/cast.hpp>
@@ -22,23 +24,26 @@
 namespace containers {
 namespace detail {
 
-constexpr auto resize_impl(auto & container_to_resize, auto const initializer_range) {
-	while (containers::size(container_to_resize) > containers::size(initializer_range)) {
-		pop_back(container_to_resize);
+template<typename Container>
+constexpr auto resize_impl(Container & container_to_resize, auto const new_size, auto const generator) {
+	auto const container_size = bounded::integer(containers::size(container_to_resize));
+	if (new_size <= container_size) {
+		containers::erase_after(container_to_resize, containers::begin(container_to_resize) + static_cast<containers::count_type<Container>>(new_size));
+	} else {
+		auto const remaining = bounded::increase_min<0>(new_size - container_size, bounded::non_check);
+		::containers::append(container_to_resize, containers::generate_n(remaining, generator));
 	}
-	auto const remaining = bounded::increase_min<0>(containers::size(initializer_range) - containers::size(container_to_resize), bounded::non_check);
-	::containers::append(container_to_resize, containers::take(initializer_range, remaining));
 }
 
 } // namespace detail
 
 template<resizable_container Container>
-constexpr auto resize(Container & container_to_resize, auto const count) {
-	::containers::detail::resize_impl(container_to_resize, repeat_default_n<range_value_t<Container>>(count));
+constexpr auto resize(Container & container_to_resize, auto const new_size) {
+	::containers::detail::resize_impl(container_to_resize, bounded::integer(new_size), bounded::construct_return<range_value_t<Container>>);
 }
 template<resizable_container Container>
-constexpr auto resize(Container & container_to_resize, auto const count, range_value_t<Container> const & value) {
-	::containers::detail::resize_impl(container_to_resize, repeat_n(count, value));
+constexpr auto resize(Container & container_to_resize, auto const new_size, range_value_t<Container> const & value) {
+	::containers::detail::resize_impl(container_to_resize, bounded::integer(new_size), bounded::value_to_function(value));
 }
 
 } // namespace containers

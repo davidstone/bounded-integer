@@ -16,6 +16,20 @@
 #include <bounded/integer.hpp>
 
 namespace containers {
+namespace detail {
+
+template<typename Container>
+constexpr auto get_input_size(auto const & input) {
+	auto const value = containers::detail::linear_size(input);
+	if constexpr (bounded::bounded_integer<decltype(value)>) {
+		return value;
+	} else {
+		// TODO: This cast might be hiding an overflow bug
+		return typename Container::size_type(value);
+	}
+}
+
+} // namespace detail
 
 // I would like to return an iterator to the start of the appended range, but
 // that does not seem possible to do efficiently in general due to potential
@@ -25,26 +39,26 @@ constexpr auto append(Container & output, range auto && input) -> void {
 	// TODO: Define InputRange and ForwardRange concepts
 	using iterator_category = typename std::iterator_traits<decltype(containers::begin(input))>::iterator_category;
 	constexpr auto reserve_space = std::is_convertible_v<iterator_category, std::forward_iterator_tag> and detail::reservable<Container>;
-	if constexpr (reserve_space) {
-		auto const input_size = [&] {
-			auto const value = containers::size(input);
-			if constexpr (bounded::bounded_integer<decltype(value)>) {
-				return value;
-			} else {
-				return typename Container::size_type(value);
-			}
-		}();
-		auto const offset = ::containers::detail::linear_size(output);
-		if (offset + input_size > output.capacity()) {
-			::containers::detail::growth_reallocation(output, input_size);
+	constexpr auto use_append_from_capacity = detail::appendable_from_capacity<Container> and (!detail::reservable<Container> or reserve_space);
+	auto maybe_reserve = [&] {
+		if constexpr (reserve_space) {
+			auto const input_size = ::containers::detail::get_input_size<Container>(input);
+			::containers::detail::reserve_if_needed(output, input_size);
 		}
-	}
-	if constexpr (detail::appendable_from_capacity<Container> and (!detail::reservable<Container> or reserve_space)) {
+	};
+	if constexpr (reserve_space and use_append_from_capacity) {
+		auto const input_size = ::containers::detail::get_input_size<Container>(input);
+		::containers::detail::reserve_if_needed(output, input_size);
+		containers::uninitialized_copy(OPERATORS_FORWARD(input), containers::end(output));
+		output.append_from_capacity(input_size);
+	} else if constexpr (use_append_from_capacity) {
 		auto const new_end = containers::uninitialized_copy(OPERATORS_FORWARD(input), containers::end(output));
 		output.append_from_capacity(new_end - containers::end(output));
 	} else if constexpr (detail::lazy_push_backable<Container>) {
+		maybe_reserve();
 		::containers::detail::lazy_push_back_range(output, OPERATORS_FORWARD(input));
 	} else {
+		maybe_reserve();
 		::containers::detail::push_back_range(output, OPERATORS_FORWARD(input));
 	}
 }
