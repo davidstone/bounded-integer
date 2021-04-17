@@ -31,7 +31,7 @@ using advance_counter = std::common_type_t<
 
 }	// namespace detail
 
-constexpr auto advance(forward_iterator auto & it, auto const offset) {
+constexpr auto advance(iterator auto & it, auto const offset) {
 	for (auto n = detail::advance_counter<decltype(it), decltype(offset)>(0_bi); n != offset; ++n) {
 		++it;
 	}
