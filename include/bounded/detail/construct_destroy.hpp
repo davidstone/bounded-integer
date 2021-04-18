@@ -51,7 +51,7 @@ inline constexpr auto construct_return = [](auto && ... args) requires construct
 };
 
 
-inline constexpr auto construct = []<typename T>(T & ref, construct_function_for<T> auto && function) -> auto & {
+inline constexpr auto construct = []<typename T>(T & ref, construct_function_for<T> auto && function) -> auto & requires(!std::is_const_v<T>){
 	return *std::construct_at(
 		std::addressof(ref),
 		detail::superconstructing_super_elider([&] { return static_cast<T>(OPERATORS_FORWARD(function)()); })
