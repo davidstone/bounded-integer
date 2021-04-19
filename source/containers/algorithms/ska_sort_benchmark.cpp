@@ -250,7 +250,7 @@ std::vector<std::int8_t> SKA_SORT_NOINLINE create_limited_radix_sort_data(std::m
 void benchmark_limited_generation(benchmark::State & state) {
 	auto randomness = std::mt19937_64(77342348);
 	for (auto _ : state) {
-		auto to_sort = create_limited_radix_sort_data(randomness, state.range(0));
+		auto to_sort = create_limited_radix_sort_data(randomness, static_cast<std::int8_t>(state.range(0)));
 		benchmark::DoNotOptimize(containers::data(to_sort));
 		benchmark::ClobberMemory();
 	}
@@ -262,7 +262,7 @@ BENCHMARK(benchmark_limited_generation)->LIMITED_RANGE();
 void benchmark_limited_inplace_sort(benchmark::State & state) {
 	std::mt19937_64 randomness(77342348);
 	for (auto _ : state) {
-		auto to_sort = create_limited_radix_sort_data(randomness, state.range(0));
+		auto to_sort = create_limited_radix_sort_data(randomness, static_cast<std::int8_t>(state.range(0)));
 		benchmark::DoNotOptimize(containers::data(to_sort));
 		ska_sort(to_sort);
 		assert(containers::is_sorted(to_sort));

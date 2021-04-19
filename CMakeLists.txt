@@ -268,7 +268,6 @@ if("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang")
 
 	target_compile_options(ska_sort_benchmark PRIVATE
 		"-Wno-global-constructors"
-		"-Wno-implicit-int-conversion"
 		"-Wno-sign-conversion"
 		"-Wno-used-but-marked-unused"
 		"-Wno-unused-function"
