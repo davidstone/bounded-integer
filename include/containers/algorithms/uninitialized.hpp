@@ -53,6 +53,8 @@ concept memcpyable =
 
 template<iterator InputIterator, sentinel_for<InputIterator> Sentinel, iterator OutputIterator>
 constexpr auto uninitialized_copy(InputIterator first, Sentinel const last, OutputIterator out) {
+	// TODO: Figure out how to tell the optimizer there is no overlap so I do
+	// not need to explicitly call `memcpy`.
 	auto slow_path = [&] {
 		auto out_first = out;
 		try {
