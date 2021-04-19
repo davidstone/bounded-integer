@@ -234,16 +234,13 @@ void benchmark_generation(benchmark::State & state, auto create) {
 }
 
 
-std::vector<std::int8_t> SKA_SORT_NOINLINE create_limited_radix_sort_data(std::mt19937_64 & randomness, std::int8_t range_end) {
-	std::int8_t permutation[256];
-	std::iota(permutation, permutation + 256, -128);
-	std::shuffle(permutation, permutation + 256, randomness);
-	std::vector<std::int8_t> result;
-	std::size_t size = 2 * 1024 * 1024;
+auto SKA_SORT_NOINLINE create_limited_radix_sort_data(std::mt19937_64 & randomness, std::int8_t range_end) {
+	auto result = std::vector<std::int8_t>();
+	constexpr auto size = 2UZ * 1024UZ * 1024UZ;
 	result.reserve(size);
-	std::uniform_int_distribution<std::int8_t> int_distribution(-128, range_end);
-	for (size_t i = 0; i < size; ++i) {
-		result.push_back(permutation[to_radix_sort_key(int_distribution(randomness))]);
+	auto int_distribution = std::uniform_int_distribution<std::int8_t>(-128, range_end);
+	for ([[maybe_unused]] auto n : containers::integer_range(size)) {
+		result.push_back(int_distribution(randomness));
 	}
 	return result;
 }
