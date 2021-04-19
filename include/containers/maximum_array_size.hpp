@@ -8,24 +8,14 @@
 #include <bounded/integer.hpp>
 
 #include <cstddef>
-#include <limits>
 
-namespace containers {
-namespace detail {
+namespace containers::detail {
 
-using namespace bounded::literal;
-
-// TODO: support larger array sizes
+// TODO: Should this be limited to 2^52 - 1 bytes?
 template<typename T>
-inline constexpr auto maximum_array_size = bounded::normalize<
-	bounded::min(
-		bounded::constant<bounded::max_value<std::ptrdiff_t>> / bounded::size_of<T>,
-		(1_bi << 52_bi) - 1_bi
-	)
->;
+inline constexpr auto maximum_array_size = bounded::normalize<bounded::max_value<std::ptrdiff_t> / sizeof(T)>;
 
 template<typename T>
 using array_size_type = bounded::integer<0, maximum_array_size<T>>;
 
-} // namespace detail
-} // namespace containers
+} // namespace containers::detail
