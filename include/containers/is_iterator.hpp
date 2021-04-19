@@ -21,7 +21,7 @@ concept iterator = requires(Iterator it) {
 };
 
 template<typename Iterator>
-concept forward_iterator = iterator<Iterator> and std::is_copy_constructible_v<Iterator>;
+concept forward_iterator = iterator<Iterator> and std::is_copy_constructible_v<Iterator> and !std::is_same_v<typename std::iterator_traits<Iterator>::iterator_category, std::input_iterator_tag>;
 
 template<typename Iterator>
 concept bidirectional_iterator = forward_iterator<Iterator> and requires(Iterator it) { --it; };
