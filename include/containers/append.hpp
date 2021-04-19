@@ -5,28 +5,44 @@
 
 #pragma once
 
-#include <containers/algorithms/uninitialized.hpp>
+#include <containers/assign_to_empty.hpp>
 #include <containers/begin_end.hpp>
-#include <containers/lazy_push_back.hpp>
+#include <containers/c_array.hpp>
+#include <containers/is_range.hpp>
 #include <containers/push_back.hpp>
 #include <containers/range_value_t.hpp>
 #include <containers/reserve_if_reservable.hpp>
-#include <containers/size.hpp>
 
 #include <bounded/integer.hpp>
+
+#include <operators/forward.hpp>
+
+#include <utility>
 
 namespace containers {
 namespace detail {
 
-template<typename Container>
-constexpr auto get_input_size(auto const & input) {
-	auto const value = containers::detail::linear_size(input);
-	if constexpr (bounded::bounded_integer<decltype(value)>) {
-		return value;
-	} else {
-		// TODO: This cast might be hiding an overflow bug
-		return typename Container::size_type(value);
+inline constexpr auto exponential_reserve = [](auto & container, auto const source_size) {
+	auto const current_size = ::containers::detail::linear_size(container);
+	if (current_size + source_size > container.capacity()) {
+		container.reserve(::containers::detail::reallocation_size(container.capacity(), current_size, source_size));
 	}
+};
+
+inline constexpr auto push_back_range = [](auto & target, auto && source) {
+	for (decltype(auto) value : OPERATORS_FORWARD(source)) {
+		::containers::push_back(target, OPERATORS_FORWARD(value));
+	}
+};
+
+constexpr auto append_impl(auto & target, auto && source) -> void {
+	::containers::detail::assign_to_empty_or_append(
+		target,
+		OPERATORS_FORWARD(source),
+		exponential_reserve,
+		[&] { return containers::end(target); },
+		push_back_range
+	);
 }
 
 } // namespace detail
@@ -34,33 +50,16 @@ constexpr auto get_input_size(auto const & input) {
 // I would like to return an iterator to the start of the appended range, but
 // that does not seem possible to do efficiently in general due to potential
 // iterator instability.
-template<detail::push_backable Container>
-constexpr auto append(Container & output, range auto && input) -> void {
-	// TODO: Define InputRange and ForwardRange concepts
-	using iterator_category = typename std::iterator_traits<decltype(containers::begin(input))>::iterator_category;
-	constexpr auto reserve_space = std::is_convertible_v<iterator_category, std::forward_iterator_tag> and detail::reservable<Container>;
-	constexpr auto use_append_from_capacity = detail::appendable_from_capacity<Container> and (!detail::reservable<Container> or reserve_space);
-	auto maybe_reserve = [&] {
-		if constexpr (reserve_space) {
-			auto const input_size = ::containers::detail::get_input_size<Container>(input);
-			::containers::detail::reserve_if_needed(output, input_size);
-		}
-	};
-	if constexpr (reserve_space and use_append_from_capacity) {
-		auto const input_size = ::containers::detail::get_input_size<Container>(input);
-		::containers::detail::reserve_if_needed(output, input_size);
-		containers::uninitialized_copy(OPERATORS_FORWARD(input), containers::end(output));
-		output.append_from_capacity(input_size);
-	} else if constexpr (use_append_from_capacity) {
-		auto const new_end = containers::uninitialized_copy(OPERATORS_FORWARD(input), containers::end(output));
-		output.append_from_capacity(new_end - containers::end(output));
-	} else if constexpr (detail::lazy_push_backable<Container>) {
-		maybe_reserve();
-		::containers::detail::lazy_push_back_range(output, OPERATORS_FORWARD(input));
-	} else {
-		maybe_reserve();
-		::containers::detail::push_back_range(output, OPERATORS_FORWARD(input));
-	}
+//
+// TODO: Support the source range being a subset of the target range
+
+constexpr auto append(detail::push_backable auto & target, range auto && source) -> void {
+	::containers::detail::append_impl(target, OPERATORS_FORWARD(source));
+}
+
+template<detail::push_backable Target, std::size_t init_size>
+constexpr auto append(Target & target, c_array<range_value_t<Target>, init_size> && source) -> void {
+	::containers::detail::append_impl(target, std::move(source));
 }
 
 } // namespace containers

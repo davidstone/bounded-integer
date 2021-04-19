@@ -50,13 +50,4 @@ constexpr decltype(auto) push_back(Container & container, range_value_t<Containe
 	}
 }
 
-namespace detail {
-
-constexpr auto push_back_range(auto & target, auto && source) {
-	for (decltype(auto) value : OPERATORS_FORWARD(source)) {
-		::containers::push_back(target, OPERATORS_FORWARD(value));
-	}
-}
-
-} // namespace detail
 } // namespace containers

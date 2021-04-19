@@ -20,7 +20,7 @@ namespace containers {
 namespace detail {
 
 template<typename Container>
-concept appendable_from_capacity = requires(Container & container, typename Container::size_type count) { container.append_from_capacity(count); };
+concept appendable_from_capacity = range<Container> and requires(Container & container, typename Container::size_type count) { container.append_from_capacity(count); };
 
 template<typename Container>
 concept lazy_push_backable = appendable_from_capacity<Container>;
@@ -55,14 +55,4 @@ constexpr auto & lazy_push_back(
 	return containers::back(container);
 }
 
-namespace detail {
-
-constexpr auto lazy_push_back_range(auto & target, auto && source) {
-	auto const last = containers::end(OPERATORS_FORWARD(source));
-	for (auto it = containers::begin(OPERATORS_FORWARD(source)); it != last; ++it) {
-		::containers::lazy_push_back(target, [&] { return *it; });
-	}
-}
-
-} // namespace detail
 } // namespace containers

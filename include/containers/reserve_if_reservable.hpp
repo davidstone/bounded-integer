@@ -33,12 +33,8 @@ constexpr auto reallocation_size(Capacity const current_capacity, auto const cur
 	));
 }
 
-constexpr auto reserve_if_needed(auto & container, auto const input_size) {
-	auto const current_size = ::containers::detail::linear_size(container);
-	if (current_size + input_size > container.capacity()) {
-		container.reserve(::containers::detail::reallocation_size(container.capacity(), current_size, input_size));
-	}
-}
+template<typename Range>
+concept size_then_use_range = forward_range<Range const &> or requires(Range const & r) { containers::size(r); };
 
 } // namespace detail
 } // namespace containers
