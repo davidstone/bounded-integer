@@ -112,12 +112,12 @@ constexpr auto insert(Container & container, typename Container::const_iterator 
 			containers::reversed(range_view(mutable_position, containers::end(container))),
 			containers::reverse_iterator(containers::end(container) + static_cast<count_type<Container>>(range_size))
 		);
-		::containers::uninitialized_copy(OPERATORS_FORWARD(range), mutable_position);
+		::containers::uninitialized_copy_no_overlap(OPERATORS_FORWARD(range), mutable_position);
 		container.append_from_capacity(range_size);
 		return mutable_position;
 	} else if constexpr (detail::reservable<Container>) {
 		return ::containers::detail::insert_with_reallocation(container, position, range_size, [&](auto const ptr) {
-			::containers::uninitialized_copy(OPERATORS_FORWARD(range), ptr);
+			::containers::uninitialized_copy_no_overlap(OPERATORS_FORWARD(range), ptr);
 		});
 	} else {
 		bounded::assert_or_assume_unreachable();
