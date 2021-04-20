@@ -9,11 +9,11 @@
 #include <containers/begin_end.hpp>
 #include <containers/iter_difference_t.hpp>
 #include <containers/iter_value_t.hpp>
-#include <containers/reference_wrapper.hpp>
 
 #include <operators/forward.hpp>
 #include <bounded/concepts.hpp>
 
+#include <functional>
 #include <iterator>
 #include <type_traits>
 #include <utility>
@@ -103,7 +103,7 @@ public:
 	}
 
 private:
-	reference_wrapper<Members> m_members;	
+	std::reference_wrapper<Members> m_members;	
 	ForwardIterator1 m_it1;
 	ForwardIterator2 m_it2;
 };

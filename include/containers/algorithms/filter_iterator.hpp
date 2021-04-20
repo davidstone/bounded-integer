@@ -63,7 +63,7 @@ template<typename Sentinel, typename UnaryPredicate>
 inline constexpr auto is_filter_iterator_traits<filter_iterator_traits<Sentinel, UnaryPredicate>> = true;
 
 template<typename T>
-inline constexpr auto is_filter_iterator_traits<reference_wrapper<T>> = is_filter_iterator_traits<T>;
+inline constexpr auto is_filter_iterator_traits<std::reference_wrapper<T>> = is_filter_iterator_traits<T>;
 
 template<typename T>
 inline constexpr auto is_filter_iterator_traits<T const> = is_filter_iterator_traits<T>;
@@ -89,7 +89,7 @@ constexpr auto operator==(adapt_iterator<Iterator, Traits> const lhs, filter_ite
 
 constexpr auto filter_iterator_impl(iterator auto first, is_filter_iterator_traits auto traits) {
 	return containers::adapt_iterator(
-		containers::find_if(first, containers::unwrap(traits).sentinel(), containers::unwrap(traits).predicate()),
+		containers::find_if(first, ::containers::detail::unwrap(traits).sentinel(), ::containers::detail::unwrap(traits).predicate()),
 		traits
 	);
 }
@@ -109,11 +109,11 @@ private:
 public:
 	using const_iterator = decltype(detail::filter_iterator_impl(
 		::containers::begin(std::declval<Range const &>()),
-		reference_wrapper(std::declval<traits const &>())
+		std::reference_wrapper(std::declval<traits const &>())
 	));
 	using iterator = decltype(detail::filter_iterator_impl(
 		::containers::begin(std::declval<Range &>()),
-		reference_wrapper(std::declval<traits &>())
+		std::reference_wrapper(std::declval<traits &>())
 	));
 
 	using value_type = range_value_t<Range>;
@@ -129,13 +129,13 @@ public:
 	}
 	
 	constexpr auto begin() const & {
-		return detail::filter_iterator_impl(::containers::begin(m_range), reference_wrapper(m_traits));
+		return detail::filter_iterator_impl(::containers::begin(m_range), std::reference_wrapper(m_traits));
 	}
 	constexpr auto begin() & {
-		return detail::filter_iterator_impl(::containers::begin(m_range), reference_wrapper(m_traits));
+		return detail::filter_iterator_impl(::containers::begin(m_range), std::reference_wrapper(m_traits));
 	}
 	constexpr auto begin() && {
-		return detail::filter_iterator_impl(::containers::begin(std::move(*this).m_range), reference_wrapper(m_traits));
+		return detail::filter_iterator_impl(::containers::begin(std::move(*this).m_range), std::reference_wrapper(m_traits));
 	}
 	static constexpr auto end() {
 		return detail::filter_iterator_sentinel();

@@ -44,7 +44,7 @@ struct iterator_typedefs_base<Iterator, Traits> {
 private:
 	using base_category = typename std::iterator_traits<Iterator>::iterator_category;
 public:
-	using reference = decltype(containers::unwrap(std::declval<Traits>()).dereference(std::declval<Iterator>()));
+	using reference = decltype(::containers::detail::unwrap(std::declval<Traits>()).dereference(std::declval<Iterator>()));
 	using value_type = std::remove_cvref_t<reference>;
 
 	// Not sure what this actually means...
@@ -80,7 +80,7 @@ public:
 
 template<typename Iterator, typename Traits>
 struct adapt_iterator :
-	detail::iterator_typedefs_base<Iterator, decltype(containers::unwrap(std::declval<Traits>()))>
+	detail::iterator_typedefs_base<Iterator, decltype(::containers::detail::unwrap(std::declval<Traits>()))>
 {
 	static_assert(std::is_copy_assignable_v<Iterator>);
 	static_assert(std::is_copy_assignable_v<Traits>);
@@ -97,7 +97,7 @@ struct adapt_iterator :
 	}
 
 	constexpr auto && traits() const {
-		return containers::unwrap(m_traits);
+		return ::containers::detail::unwrap(m_traits);
 	}
 
 	OPERATORS_ARROW_DEFINITIONS

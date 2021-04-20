@@ -7,7 +7,6 @@
 
 #include <containers/common_iterator_functions.hpp>
 #include <containers/begin_end.hpp>
-#include <containers/reference_wrapper.hpp>
 
 #include <bounded/integer.hpp>
 #include <bounded/unreachable.hpp>
@@ -15,6 +14,7 @@
 #include <operators/forward.hpp>
 #include <operators/operators.hpp>
 
+#include <functional>
 #include <iterator>
 #include <type_traits>
 #include <utility>
@@ -42,7 +42,7 @@ private:
 	using stored_function = std::conditional_t<
 		std::is_empty_v<Function> and std::is_trivially_copyable_v<Function>,
 		Function,
-		decltype(containers::reference_wrapper(std::declval<Function const &>()))
+		decltype(std::reference_wrapper(std::declval<Function const &>()))
 	>;
 	[[no_unique_address]] Size m_remaining;
 	[[no_unique_address]] stored_function m_generator;
