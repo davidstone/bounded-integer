@@ -97,6 +97,13 @@ constexpr auto test_erase_second_from_two() {
 }
 
 template<typename Container>
+constexpr auto test_erase_first_from_three() {
+	auto v = Container({1, 2, 3});
+	containers::erase(v, containers::begin(v));
+	BOUNDED_TEST(v == Container({2, 3}));
+}
+
+template<typename Container>
 constexpr auto test_erase_middle_range() {
 	auto v = Container({1, 2, 3, 4});
 	containers::erase(v, containers::begin(v) + 1_bi, containers::begin(v) + 3_bi);
@@ -121,6 +128,7 @@ constexpr auto test_all() {
 	test_erase_all_from_two<Container>();
 	test_erase_first_from_two<Container>();
 	test_erase_second_from_two<Container>();
+	test_erase_first_from_three<Container>();
 	test_erase_middle_range<Container>();
 	test_erase_if<Container>();
 	return true;
