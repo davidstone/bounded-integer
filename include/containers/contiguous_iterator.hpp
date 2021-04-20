@@ -69,6 +69,13 @@ constexpr auto operator+(
 ) -> decltype(lhs) {
 	bounded::unreachable();
 }
+template<typename T>
+constexpr auto operator+(
+	contiguous_iterator<T, 0> const lhs,
+	bounded::constant_t<-1>
+) -> decltype(lhs) {
+	bounded::unreachable();
+}
 
 
 template<typename T, std::ptrdiff_t max_difference>
