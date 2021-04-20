@@ -49,16 +49,14 @@ struct static_vector_data : private lexicographical_comparison::base {
 	constexpr static_vector_data(static_vector_data && other) noexcept(std::is_nothrow_move_constructible_v<T>) {
 		// Ensure that a move is not more expensive than a copy
 		if constexpr (std::is_trivially_copyable_v<T>) {
-			containers::uninitialized_copy(other, begin());
-			this->m_size = other.m_size;
+			containers::assign_to_empty(*this, std::move(other));
 		} else {
 			containers::uninitialized_relocate(other, begin());
 			this->m_size = std::exchange(other.m_size, 0_bi);
 		}
 	}
 	constexpr static_vector_data(static_vector_data const & other) {
-		containers::uninitialized_copy(other, begin());
-		this->m_size = other.m_size;
+		containers::assign_to_empty(*this, other);
 	}
 
 	constexpr auto & operator=(static_vector_data && other) & noexcept(std::is_nothrow_move_assignable_v<T> and std::is_nothrow_move_constructible_v<T>) {
