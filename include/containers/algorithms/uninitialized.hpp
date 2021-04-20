@@ -51,30 +51,20 @@ concept memcpyable =
 
 } // namespace detail
 
-struct uninitialized_copy_t {
-	template<iterator InputIterator, sentinel_for<InputIterator> Sentinel, iterator OutputIterator>
-	constexpr auto operator()(InputIterator first, Sentinel const last, OutputIterator out) const {
-		auto out_first = out;
-		try {
-			for (; first != last; ++first) {
-				bounded::construct(*out, [&]() -> decltype(auto) { return *first; });
-				++out;
-			}
-		} catch (...) {
-			containers::destroy_range(range_view(out_first, out));
-			throw;
+inline constexpr auto uninitialized_copy = [](range auto && input, iterator auto output) {
+	auto out_first = output;
+	try {
+		auto const last = containers::end(OPERATORS_FORWARD(input));
+		for (auto first = containers::begin(OPERATORS_FORWARD(input)); first != last; ++first) {
+			bounded::construct(*output, [&]() -> decltype(auto) { return *first; });
+			++output;
 		}
-		return out;
+	} catch (...) {
+		containers::destroy_range(range_view(out_first, output));
+		throw;
 	}
-
-	constexpr auto operator()(range auto && input, iterator auto output) const {
-		return operator()(
-			containers::begin(OPERATORS_FORWARD(input)),
-			containers::end(OPERATORS_FORWARD(input)),
-			output
-		);
-	}
-} inline constexpr uninitialized_copy;
+	return output;
+};
 
 template<range InputRange, iterator OutputIterator>
 constexpr auto uninitialized_copy_no_overlap(InputRange && source, OutputIterator out) {
