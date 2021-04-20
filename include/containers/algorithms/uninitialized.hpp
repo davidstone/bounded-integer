@@ -76,31 +76,6 @@ struct uninitialized_copy_t {
 	}
 } inline constexpr uninitialized_copy;
 
-
-template<iterator InputIterator>
-constexpr auto uninitialized_move(InputIterator const first, sentinel_for<InputIterator> auto const last, iterator auto const out) {
-	return ::containers::uninitialized_copy(::containers::move_iterator(first), ::containers::move_iterator(last), out);
-}
-
-template<bidirectional_iterator BidirectionalInputIterator>
-constexpr auto uninitialized_copy_backward(BidirectionalInputIterator const first, BidirectionalInputIterator const last, bidirectional_iterator auto const out_last) {
-	return containers::uninitialized_copy(
-		containers::reverse_iterator(last),
-		containers::reverse_iterator(first),
-		containers::reverse_iterator(out_last)
-	).base();
-}
-
-template<bidirectional_iterator BidirectionalInputIterator>
-constexpr auto uninitialized_move_backward(BidirectionalInputIterator const first, BidirectionalInputIterator const last, bidirectional_iterator auto const out_last) {
-	return containers::uninitialized_copy_backward(
-		containers::move_iterator(first),
-		containers::move_iterator(last),
-		out_last
-	);
-}
-
-
 template<range InputRange, iterator OutputIterator>
 constexpr auto uninitialized_relocate(InputRange && source, OutputIterator out) {
 	if constexpr (detail::memcpyable<InputRange, OutputIterator>) {
@@ -115,19 +90,4 @@ constexpr auto uninitialized_relocate(InputRange && source, OutputIterator out) 
 	}
 }
 
-
-// TODO: Define in terms of uninitialized_copy + repeat_default_n?
-template<forward_iterator ForwardIterator, sentinel_for<ForwardIterator> Sentinel>
-constexpr auto uninitialized_default_construct(ForwardIterator const first, Sentinel const last) {
-	auto it = first;
-	try {
-		for (; it != last; ++it) {
-			bounded::construct(*it, bounded::construct_return<iter_value_t<ForwardIterator>>);
-		}
-	} catch (...) {
-		containers::destroy_range(range_view(first, it));
-		throw;
-	}
-}
-
-}	// namespace containers
+} // namespace containers
