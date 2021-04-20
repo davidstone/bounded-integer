@@ -46,26 +46,26 @@ constexpr void erase_after(Container & container, iterator_t<Container const &> 
 }
 
 template<detail::erasable Container>
-constexpr auto erase(Container & container, typename Container::const_iterator const first, typename Container::const_iterator const last) {
+constexpr auto erase(Container & container, typename Container::const_iterator const first, typename Container::const_iterator const middle) {
 	if constexpr (detail::member_erasable<Container>) {
-		return container.erase(first, last);
+		return container.erase(first, middle);
 	} else {
 		auto const offset = first - containers::begin(container);
-		auto const count = last - first;
-		auto const end_ = containers::end(container);
+		auto const count = middle - first;
+		auto const last = containers::end(container);
 		auto target = ::containers::detail::mutable_iterator(container, first);
-		auto source = ::containers::detail::mutable_iterator(container, last);
+		auto source = ::containers::detail::mutable_iterator(container, middle);
 		// TODO: Write a `relocate` algorithm for this loop?
-		while (target != last and source != end_) {
+		while (target != middle and source != last) {
 			bounded::destroy(*target);
 			bounded::construct(*target, [&]{ return relocate(*source); });
 			++target;
 			++source;
 		}
-		if (source != end_) {
-			containers::uninitialized_relocate(range_view(target, source), end_);
+		if (source != last) {
+			containers::uninitialized_relocate(range_view(target, source), last);
 		} else {
-			containers::destroy_range(range_view(target, last));
+			containers::destroy_range(range_view(target, middle));
 		}
 		container.append_from_capacity(-count);
 		return containers::begin(container) + offset;
