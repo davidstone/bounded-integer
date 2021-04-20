@@ -255,7 +255,7 @@ private:
 		// It is safe to skip the destructor call of m_large
 		// because we do not rely on its side-effects
 		::bounded::construct(m_small, []{ return small_t(); });
-		containers::uninitialized_relocate(temp.data(), temp.data() + temp.size(), m_small.data());
+		containers::uninitialized_relocate(range_view(temp.data(), temp.data() + temp.size()), m_small.data());
 		BOUNDED_ASSERT(is_small());
 	}
 	

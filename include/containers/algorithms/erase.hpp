@@ -63,7 +63,7 @@ constexpr auto erase(Container & container, typename Container::const_iterator c
 			++source;
 		}
 		if (source != end_) {
-			containers::uninitialized_relocate(target, source, end_);
+			containers::uninitialized_relocate(range_view(target, source), end_);
 		} else {
 			containers::destroy_range(range_view(target, last));
 		}

@@ -42,11 +42,13 @@ constexpr auto insert_with_reallocation(Container & container, typename Containe
 	construct(containers::data(temp) + offset);
 	auto const mutable_position = containers::begin(container) + offset;
 	auto const temp_begin = containers::begin(temp);
-	auto const it = containers::uninitialized_relocate(containers::begin(container), mutable_position, temp_begin);
+	auto const it = containers::uninitialized_relocate(
+		range_view(containers::begin(container), mutable_position),
+		temp_begin
+	);
 	BOUNDED_ASSERT(temp_begin + offset == it);
 	::containers::uninitialized_relocate(
-		mutable_position,
-		containers::end(container),
+		range_view(mutable_position, containers::end(container)),
 		it + static_cast<offset_type<iterator_t<Container>>>(number_of_elements)
 	);
 	container.append_from_capacity(-original_size);
