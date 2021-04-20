@@ -77,6 +77,23 @@ struct uninitialized_copy_t {
 } inline constexpr uninitialized_copy;
 
 template<range InputRange, iterator OutputIterator>
+constexpr auto uninitialized_copy_no_overlap(InputRange && source, OutputIterator out) {
+	// TODO: Figure out how to tell the optimizer there is no overlap so I do
+	// not need to explicitly call `memcpy`.
+	if constexpr (detail::memcpyable<InputRange, OutputIterator>) {
+		if (std::is_constant_evaluated()) {
+			return uninitialized_copy(OPERATORS_FORWARD(source), out);
+		} else {
+			auto const offset = containers::size(source);
+			std::memcpy(containers::to_address(out), containers::data(source), static_cast<std::size_t>(offset) * sizeof(range_value_t<InputRange>));
+			return out + static_cast<iter_difference_t<OutputIterator>>(offset);
+		}
+	} else {
+		return uninitialized_copy(OPERATORS_FORWARD(source), out);
+	}
+}
+
+template<range InputRange, iterator OutputIterator>
 constexpr auto uninitialized_relocate(InputRange && source, OutputIterator out) {
 	if constexpr (detail::memcpyable<InputRange, OutputIterator>) {
 		auto result = ::containers::uninitialized_copy(source, out);
