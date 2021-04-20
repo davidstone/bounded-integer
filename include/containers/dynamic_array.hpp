@@ -45,7 +45,7 @@ struct dynamic_array : private lexicographical_comparison::base {
 	constexpr explicit dynamic_array(Range && init):
 		m_data(size_type(::containers::detail::linear_size(init)))
 	{
-		containers::uninitialized_copy(OPERATORS_FORWARD(init), begin());
+		containers::uninitialized_copy_no_overlap(OPERATORS_FORWARD(init), begin());
 	}
 
 	template<std::size_t init_size>

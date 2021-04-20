@@ -58,13 +58,13 @@ constexpr auto assign_to_empty_or_append(Target & target, Source && source, auto
 	if constexpr (appendable_from_capacity<Target> and reservable<Target> and size_then_use_range<Source>) {
 		auto const source_size = get_source_size();
 		reserve(target, source_size);
-		containers::uninitialized_copy(OPERATORS_FORWARD(source), get_target_position());
+		containers::uninitialized_copy_no_overlap(OPERATORS_FORWARD(source), get_target_position());
 		target.append_from_capacity(source_size);
 	} else if constexpr (appendable_from_capacity<Target> and !reservable<Target>) {
 		auto const target_position = get_target_position();
 		// TODO: Use an iterator that includes a count if we do not have a sized
 		// source range or a random-access iterator for the target
-		auto const new_end = containers::uninitialized_copy(OPERATORS_FORWARD(source), target_position);
+		auto const new_end = containers::uninitialized_copy_no_overlap(OPERATORS_FORWARD(source), target_position);
 		auto const source_size = [&] {
 			if constexpr (sized_range<Source>) {
 				return containers::size(source);
