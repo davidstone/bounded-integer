@@ -7,12 +7,14 @@
 
 #include <containers/algorithms/destroy_range.hpp>
 #include <containers/algorithms/move_iterator.hpp>
-#include <containers/algorithms/relocate_iterator.hpp>
+#include <containers/algorithms/relocate_range_adapter.hpp>
 #include <containers/algorithms/reverse_iterator.hpp>
 #include <containers/begin_end.hpp>
+#include <containers/data.hpp>
 #include <containers/is_iterator_sentinel.hpp>
 #include <containers/is_range.hpp>
 #include <containers/iter_value_t.hpp>
+#include <containers/range_value_t.hpp>
 #include <containers/range_view.hpp>
 #include <containers/size.hpp>
 #include <containers/to_address.hpp>
@@ -40,22 +42,18 @@ constexpr auto static_or_reinterpret_cast(auto && source) {
 	}
 }
 
-template<typename InputIterator, typename Sentinel, typename OutputIterator>
+template<typename InputRange, typename OutputIterator>
 concept memcpyable =
-	to_addressable<InputIterator> and
-	random_access_sentinel_for<Sentinel, InputIterator> and
+	contiguous_range<InputRange> and
 	to_addressable<OutputIterator> and
-	std::is_same_v<iter_value_t<InputIterator>, iter_value_t<OutputIterator>> and
+	std::is_same_v<range_value_t<InputRange>, iter_value_t<OutputIterator>> and
 	std::is_trivially_copyable_v<iter_value_t<OutputIterator>>;
 
 } // namespace detail
 
-
-template<iterator InputIterator, sentinel_for<InputIterator> Sentinel, iterator OutputIterator>
-constexpr auto uninitialized_copy(InputIterator first, Sentinel const last, OutputIterator out) {
-	// TODO: Figure out how to tell the optimizer there is no overlap so I do
-	// not need to explicitly call `memcpy`.
-	auto slow_path = [&] {
+struct uninitialized_copy_t {
+	template<iterator InputIterator, sentinel_for<InputIterator> Sentinel, iterator OutputIterator>
+	constexpr auto operator()(InputIterator first, Sentinel const last, OutputIterator out) const {
 		auto out_first = out;
 		try {
 			for (; first != last; ++first) {
@@ -67,27 +65,16 @@ constexpr auto uninitialized_copy(InputIterator first, Sentinel const last, Outp
 			throw;
 		}
 		return out;
-	};
-	if constexpr (detail::memcpyable<InputIterator, Sentinel, OutputIterator>) {
-		if (std::is_constant_evaluated()) {
-			return slow_path();
-		} else {
-			auto const offset = last - first;
-			std::memcpy(containers::to_address(out), containers::to_address(first), static_cast<std::size_t>(offset) * sizeof(iter_value_t<InputIterator>));
-			return out + static_cast<iter_difference_t<OutputIterator>>(offset);
-		}
-	} else {
-		return slow_path();
 	}
-}
 
-constexpr auto uninitialized_copy(range auto && input, iterator auto output) {
-	return uninitialized_copy(
-		containers::begin(OPERATORS_FORWARD(input)),
-		containers::end(OPERATORS_FORWARD(input)),
-		output
-	);
-}
+	constexpr auto operator()(range auto && input, iterator auto output) const {
+		return operator()(
+			containers::begin(OPERATORS_FORWARD(input)),
+			containers::end(OPERATORS_FORWARD(input)),
+			output
+		);
+	}
+} inline constexpr uninitialized_copy;
 
 
 template<iterator InputIterator>
@@ -114,27 +101,18 @@ constexpr auto uninitialized_move_backward(BidirectionalInputIterator const firs
 }
 
 
-template<iterator InputIterator, sentinel_for<InputIterator> Sentinel, iterator OutputIterator>
-constexpr auto uninitialized_relocate(InputIterator const first, Sentinel const last, OutputIterator out) {
-	if constexpr (detail::memcpyable<InputIterator, Sentinel, OutputIterator>) {
-		auto result = ::containers::uninitialized_copy(first, last, out);
-		containers::destroy_range(range_view(first, last));
+template<range InputRange, iterator OutputIterator>
+constexpr auto uninitialized_relocate(InputRange && source, OutputIterator out) {
+	if constexpr (detail::memcpyable<InputRange, OutputIterator>) {
+		auto result = ::containers::uninitialized_copy(source, out);
+		containers::destroy_range(source);
 		return result;
 	} else {
 		return ::containers::uninitialized_copy(
-			::containers::detail::relocate_iterator(first),
-			::containers::detail::relocate_iterator(last),
+			::containers::detail::relocate_range_adapter(OPERATORS_FORWARD(source)),
 			out
 		);
 	}
-}
-
-constexpr auto uninitialized_relocate(range auto && source, iterator auto out) {
-	return ::containers::uninitialized_relocate(
-		containers::begin(OPERATORS_FORWARD(source)),
-		containers::end(OPERATORS_FORWARD(source)),
-		out
-	);
 }
 
 

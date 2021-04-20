@@ -5,17 +5,19 @@
 
 #pragma once
 
-#include <containers/algorithms/transform_iterator.hpp>
-
+#include <containers/algorithms/transform.hpp>
+#include <containers/iterator_t.hpp>
 #include <containers/relocate.hpp>
+
+#include <operators/forward.hpp>
 
 #include <type_traits>
 
 namespace containers::detail {
 
-template<iterator Iterator>
-constexpr auto relocate_iterator(Iterator it_) {
-	return ::containers::transform_iterator_dereference(it_, [](Iterator const it) noexcept {
+template<range Range>
+constexpr auto relocate_range_adapter(Range && r) {
+	return ::containers::transform_dereference(OPERATORS_FORWARD(r), [](iterator_t<Range> const & it) noexcept {
 		if constexpr (std::is_reference_v<decltype(*it)>) {
 			return relocate(*it);
 		} else {

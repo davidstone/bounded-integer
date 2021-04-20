@@ -135,10 +135,10 @@ add_library(containers_test STATIC
 	source/containers/algorithms/keyed_insert.cpp
 	source/containers/algorithms/maybe_find.cpp
 	source/containers/algorithms/minmax_element.cpp
-	source/containers/algorithms/relocate_iterator.cpp
 	source/containers/algorithms/move_iterator.cpp
 	source/containers/algorithms/negate.cpp
 	source/containers/algorithms/partition.cpp
+	source/containers/algorithms/relocate_range_adapter.cpp
 	source/containers/algorithms/remove.cpp
 	source/containers/algorithms/reverse_iterator.cpp
 	source/containers/algorithms/set.cpp
