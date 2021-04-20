@@ -89,7 +89,7 @@ inline constexpr auto uninitialized_relocate = [](range auto && source, iterator
 
 inline constexpr auto uninitialized_relocate_no_overlap = []<range InputRange, iterator OutputIterator>(InputRange && source, OutputIterator out) {
 	if constexpr (detail::memcpyable<InputRange, OutputIterator>) {
-		auto result = ::containers::uninitialized_copy(source, out);
+		auto result = ::containers::uninitialized_copy_no_overlap(source, out);
 		containers::destroy_range(source);
 		return result;
 	} else {
