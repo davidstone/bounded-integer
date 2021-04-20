@@ -159,7 +159,7 @@ struct integer {
 		std::is_enum_v<Enum> and !detail::overlapping_integer<Enum, minimum, maximum>
 	)
 	constexpr explicit integer(Enum other):
-		integer(static_cast<std::underlying_type_t<Enum>>(other))
+		integer(std::to_underlying(other))
 	{
 	}
 
