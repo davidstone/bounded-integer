@@ -158,8 +158,7 @@ struct SubKey<T> {
 		return value;
 	}
 	static constexpr T sub_key(T && value, BaseListSortData *) {
-		// TODO: This std::move is not needed in C++20
-		return std::move(value);
+		return value;
 	}
 
 	using next = SubKey<void>;
