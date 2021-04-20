@@ -5,6 +5,7 @@
 
 #pragma once
 
+#include <containers/algorithms/reverse_iterator.hpp>
 #include <containers/algorithms/uninitialized.hpp>
 #include <containers/append.hpp>
 #include <containers/begin_end.hpp>

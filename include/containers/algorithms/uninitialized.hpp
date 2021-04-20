@@ -6,12 +6,9 @@
 #pragma once
 
 #include <containers/algorithms/destroy_range.hpp>
-#include <containers/algorithms/move_iterator.hpp>
 #include <containers/algorithms/relocate_range_adapter.hpp>
-#include <containers/algorithms/reverse_iterator.hpp>
 #include <containers/begin_end.hpp>
 #include <containers/data.hpp>
-#include <containers/is_iterator_sentinel.hpp>
 #include <containers/is_range.hpp>
 #include <containers/iter_value_t.hpp>
 #include <containers/range_value_t.hpp>
@@ -19,11 +16,12 @@
 #include <containers/size.hpp>
 #include <containers/to_address.hpp>
 
-#include <operators/forward.hpp>
 #include <bounded/integer.hpp>
 
+#include <operators/forward.hpp>
+
+#include <cstddef>
 #include <cstring>
-#include <iterator>
 #include <type_traits>
 
 namespace containers {
