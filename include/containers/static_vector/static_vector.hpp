@@ -51,7 +51,7 @@ struct static_vector_data : private lexicographical_comparison::base {
 		if constexpr (std::is_trivially_copyable_v<T>) {
 			containers::assign_to_empty(*this, std::move(other));
 		} else {
-			containers::uninitialized_relocate(other, begin());
+			containers::uninitialized_relocate_no_overlap(other, begin());
 			this->m_size = std::exchange(other.m_size, 0_bi);
 		}
 	}

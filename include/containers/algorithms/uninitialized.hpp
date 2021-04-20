@@ -66,8 +66,7 @@ inline constexpr auto uninitialized_copy = [](range auto && input, iterator auto
 	return output;
 };
 
-template<range InputRange, iterator OutputIterator>
-constexpr auto uninitialized_copy_no_overlap(InputRange && source, OutputIterator out) {
+inline constexpr auto uninitialized_copy_no_overlap = []<range InputRange, iterator OutputIterator>(InputRange && source, OutputIterator out) {
 	// TODO: Figure out how to tell the optimizer there is no overlap so I do
 	// not need to explicitly call `memcpy`.
 	if constexpr (detail::memcpyable<InputRange, OutputIterator>) {
@@ -81,20 +80,23 @@ constexpr auto uninitialized_copy_no_overlap(InputRange && source, OutputIterato
 	} else {
 		return uninitialized_copy(OPERATORS_FORWARD(source), out);
 	}
-}
+};
 
-template<range InputRange, iterator OutputIterator>
-constexpr auto uninitialized_relocate(InputRange && source, OutputIterator out) {
+inline constexpr auto uninitialized_relocate = [](range auto && source, iterator auto out) {
+	return uninitialized_copy(
+		::containers::detail::relocate_range_adapter(OPERATORS_FORWARD(source)),
+		out
+	);
+};
+
+inline constexpr auto uninitialized_relocate_no_overlap = []<range InputRange, iterator OutputIterator>(InputRange && source, OutputIterator out) {
 	if constexpr (detail::memcpyable<InputRange, OutputIterator>) {
 		auto result = ::containers::uninitialized_copy(source, out);
 		containers::destroy_range(source);
 		return result;
 	} else {
-		return ::containers::uninitialized_copy(
-			::containers::detail::relocate_range_adapter(OPERATORS_FORWARD(source)),
-			out
-		);
+		return uninitialized_relocate(OPERATORS_FORWARD(source), out);
 	}
-}
+};
 
 } // namespace containers

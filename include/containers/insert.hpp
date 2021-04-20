@@ -42,12 +42,12 @@ constexpr auto insert_with_reallocation(Container & container, typename Containe
 	construct(containers::data(temp) + offset);
 	auto const mutable_position = containers::begin(container) + offset;
 	auto const temp_begin = containers::begin(temp);
-	auto const it = containers::uninitialized_relocate(
+	auto const it = containers::uninitialized_relocate_no_overlap(
 		range_view(containers::begin(container), mutable_position),
 		temp_begin
 	);
 	BOUNDED_ASSERT(temp_begin + offset == it);
-	::containers::uninitialized_relocate(
+	::containers::uninitialized_relocate_no_overlap(
 		range_view(mutable_position, containers::end(container)),
 		it + static_cast<offset_type<iterator_t<Container>>>(number_of_elements)
 	);
@@ -108,16 +108,16 @@ constexpr auto insert(Container & container, typename Container::const_iterator 
 	auto const range_size = ::containers::detail::linear_size(range);
 	if (containers::size(container) + range_size <= container.capacity()) {
 		auto const mutable_position = ::containers::detail::mutable_iterator(container, position);
-		::containers::uninitialized_relocate(
+		containers::uninitialized_relocate(
 			containers::reversed(range_view(mutable_position, containers::end(container))),
 			containers::reverse_iterator(containers::end(container) + static_cast<count_type<Container>>(range_size))
 		);
-		::containers::uninitialized_copy_no_overlap(OPERATORS_FORWARD(range), mutable_position);
+		containers::uninitialized_copy_no_overlap(OPERATORS_FORWARD(range), mutable_position);
 		container.append_from_capacity(range_size);
 		return mutable_position;
 	} else if constexpr (detail::reservable<Container>) {
 		return ::containers::detail::insert_with_reallocation(container, position, range_size, [&](auto const ptr) {
-			::containers::uninitialized_copy_no_overlap(OPERATORS_FORWARD(range), ptr);
+			containers::uninitialized_copy_no_overlap(OPERATORS_FORWARD(range), ptr);
 		});
 	} else {
 		bounded::assert_or_assume_unreachable();

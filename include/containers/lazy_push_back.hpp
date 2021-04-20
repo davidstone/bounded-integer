@@ -44,7 +44,7 @@ constexpr auto & lazy_push_back(
 		temp.reserve(::containers::detail::reallocation_size(container.capacity(), initial_size, 1_bi));
 		construct(temp);
 
-		::containers::uninitialized_relocate(container, containers::begin(temp));
+		containers::uninitialized_relocate_no_overlap(container, containers::begin(temp));
 		container.append_from_capacity(-initial_size);
 
 		temp.append_from_capacity(initial_size + 1_bi);

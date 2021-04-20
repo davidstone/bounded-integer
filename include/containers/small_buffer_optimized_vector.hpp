@@ -255,7 +255,7 @@ private:
 		// It is safe to skip the destructor call of m_large
 		// because we do not rely on its side-effects
 		::bounded::construct(m_small, []{ return small_t(); });
-		containers::uninitialized_relocate(range_view(temp.data(), temp.data() + temp.size()), m_small.data());
+		containers::uninitialized_relocate_no_overlap(range_view(temp.data(), temp.data() + temp.size()), m_small.data());
 		BOUNDED_ASSERT(is_small());
 	}
 	
@@ -288,7 +288,7 @@ private:
 		};
 		if (other.is_small()) {
 			make_small(m_small);
-			containers::uninitialized_relocate(other, m_small.data());
+			containers::uninitialized_relocate_no_overlap(other, m_small.data());
 			m_small.set_size(other.m_small.size());
 			other.m_small.set_size(0_bi);
 		} else {
@@ -301,7 +301,7 @@ private:
 
 	constexpr auto relocate_to_large(auto const requested_capacity) {
 		auto temp = detail::allocate_storage<value_type, size_type>(requested_capacity);
-		containers::uninitialized_relocate(*this, temp.pointer);
+		containers::uninitialized_relocate_no_overlap(*this, temp.pointer);
 		deallocate_large();
 		::bounded::construct(
 			m_large,

@@ -30,7 +30,7 @@ constexpr auto shrink_to_fit(Container & c) {
 	}
 	auto temp = Container();
 	temp.reserve(s);
-	containers::uninitialized_relocate(c, containers::begin(temp));
+	containers::uninitialized_relocate_no_overlap(c, containers::begin(temp));
 	temp.append_from_capacity(s);
 	c.append_from_capacity(-s);
 	c = std::move(temp);

@@ -118,7 +118,7 @@ struct vector : private lexicographical_comparison::base {
 			return;
 		}
 		auto temp = storage_type(requested_capacity);
-		containers::uninitialized_relocate(
+		containers::uninitialized_relocate_no_overlap(
 			*this,
 			temp.data()
 		);
