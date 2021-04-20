@@ -269,11 +269,6 @@ if("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang")
 	target_compile_options(ska_sort_benchmark PRIVATE
 		"-Wno-global-constructors"
 		"-Wno-sign-conversion"
-		"-Wno-used-but-marked-unused"
-		"-Wno-unused-function"
-		"-Wno-unused-macros"
-		"-Wno-unused-template"
-		"-Wno-unused-variable"
 	)
 
 	target_compile_options(benchmark PUBLIC
