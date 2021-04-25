@@ -13,11 +13,18 @@ project(bounded_integer LANGUAGES CXX)
 
 enable_testing()
 
-add_subdirectory(operators)
+get_directory_property(has_parent PARENT_DIRECTORY)
+if (NOT has_parent)
+	add_subdirectory(cmake_strict_defaults)
+	add_subdirectory(numeric-traits)
+	add_subdirectory(operators)
+endif()
 
 add_library(bounded INTERFACE)
 
 target_link_libraries(bounded INTERFACE
+	strict_defaults_interface
+	numeric_traits
 	operators
 )
 
