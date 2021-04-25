@@ -23,6 +23,8 @@
 #include <bounded/integer.hpp>
 #include <bounded/scope_guard.hpp>
 
+#include <numeric_traits/min_max_value.hpp>
+
 #include <cstddef>
 #include <type_traits>
 #include <utility>
@@ -138,7 +140,7 @@ struct small_buffer_optimized_vector : private lexicographical_comparison::base 
 	static_assert(std::is_nothrow_move_assignable_v<value_type>);
 
 	static_assert(
-		bounded::max_value<size_type> <= bounded::constant<(1ULL << (CHAR_BIT * sizeof(value_type *) - 1)) - 1>,
+		numeric_traits::max_value<size_type> <= bounded::constant<(1ULL << (CHAR_BIT * sizeof(value_type *) - 1)) - 1>,
 		"Maximum possible size is too large -- would use bit reserved for small-buffer optimization."
 	);
 

@@ -5,6 +5,9 @@
 
 #include <bounded/detail/arithmetic/unary_minus.hpp>
 #include <bounded/detail/class.hpp>
+
+#include <numeric_traits/min_max_value.hpp>
+
 #include "../../homogeneous_equals.hpp"
 
 namespace {
@@ -21,25 +24,25 @@ static_assert(homogeneous_equals(
 template<typename Signed, typename Unsigned>
 constexpr auto check_signed_limits() {
 	static_assert(homogeneous_equals(
-		-bounded::constant<bounded::max_value<Signed>>,
-		bounded::constant<-bounded::max_value<Signed>>
+		-bounded::constant<numeric_traits::max_value<Signed>>,
+		bounded::constant<-numeric_traits::max_value<Signed>>
 	));
 	static_assert(homogeneous_equals(
-		-bounded::constant<bounded::min_value<Signed>>,
+		-bounded::constant<numeric_traits::min_value<Signed>>,
 		// The outer cast to unsigned is to counteract integer promotion
-		bounded::constant<static_cast<Unsigned>(-static_cast<Unsigned>(bounded::min_value<Signed>))>
+		bounded::constant<static_cast<Unsigned>(-static_cast<Unsigned>(numeric_traits::min_value<Signed>))>
 	));
 	static_assert(homogeneous_equals(
-		-(-bounded::constant<bounded::min_value<Signed>>),
-		bounded::constant<bounded::min_value<Signed>>
+		-(-bounded::constant<numeric_traits::min_value<Signed>>),
+		bounded::constant<numeric_traits::min_value<Signed>>
 	));
 }
 template<typename Signed, typename Unsigned, typename LargerSigned>
 constexpr auto check_limits() {
 	check_signed_limits<Signed, Unsigned>();
 	static_assert(homogeneous_equals(
-		-bounded::constant<bounded::max_value<Unsigned>>,
-		bounded::constant<-static_cast<LargerSigned>(bounded::max_value<Unsigned>)>
+		-bounded::constant<numeric_traits::max_value<Unsigned>>,
+		bounded::constant<-static_cast<LargerSigned>(numeric_traits::max_value<Unsigned>)>
 	));
 }
 

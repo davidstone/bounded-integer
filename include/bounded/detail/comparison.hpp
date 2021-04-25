@@ -8,7 +8,8 @@
 #include <bounded/detail/builtin_min_max_value.hpp>
 #include <bounded/detail/is_bounded_integer.hpp>
 #include <bounded/detail/max_builtin.hpp>
-#include <bounded/detail/min_max_value.hpp>
+
+#include <numeric_traits/min_max_value.hpp>
 
 #include <compare>
 #include <type_traits>
@@ -33,10 +34,10 @@ constexpr auto safe_compare(LHS const lhs, RHS const rhs) -> std::strong_orderin
 
 template<builtin_integer LHS, builtin_integer RHS>
 constexpr auto safe_equal(LHS const lhs, RHS const rhs) -> bool {
-	constexpr auto signed_max = max_value<detail::max_signed_t>;
+	constexpr auto signed_max = numeric_traits::max_value<detail::max_signed_t>;
 	if constexpr (signed_builtin<LHS> == signed_builtin<RHS>) {
 		return lhs == rhs;
-	} else if constexpr (max_value<LHS> <= signed_max and max_value<RHS> <= signed_max) {
+	} else if constexpr (numeric_traits::max_value<LHS> <= signed_max and numeric_traits::max_value<RHS> <= signed_max) {
 		return static_cast<detail::max_signed_t>(lhs) == static_cast<detail::max_signed_t>(rhs);
 	} else if constexpr (signed_builtin<LHS>) {
 		static_assert(std::is_same_v<RHS, detail::max_unsigned_t>);

@@ -6,15 +6,16 @@
 #pragma once
 
 #include <bounded/detail/is_bounded_integer.hpp>
-#include <bounded/detail/min_max_value.hpp>
 #include <bounded/normalize.hpp>
+
+#include <numeric_traits/min_max_value.hpp>
 
 namespace bounded {
 
-template<typename T> requires(!std::is_same_v<decltype(max_value<T>), detail::incomplete>)
-inline constexpr auto builtin_max_value = normalize<max_value<T>>;
+template<numeric_traits::has_max_value T>
+inline constexpr auto builtin_max_value = normalize<numeric_traits::max_value<T>>;
 
-template<typename T> requires(!std::is_same_v<decltype(max_value<T>), detail::incomplete>)
-inline constexpr auto builtin_min_value = normalize<min_value<T>>;
+template<numeric_traits::has_min_value T>
+inline constexpr auto builtin_min_value = normalize<numeric_traits::min_value<T>>;
 
 } // namespace bounded

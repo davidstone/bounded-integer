@@ -13,8 +13,11 @@
 #include <containers/size.hpp>
 
 #include <bounded/assert.hpp>
-#include <operators/forward.hpp>
 #include <bounded/integer.hpp>
+
+#include <numeric_traits/min_max_value.hpp>
+
+#include <operators/forward.hpp>
 
 #include <limits>
 
@@ -34,7 +37,7 @@ constexpr inline struct partition_point_t {
 		using size_type = decltype(containers::size(input));
 		auto count = bounded::integer<0, bounded::builtin_max_value<size_type>>(containers::size(input));
 		auto first = containers::begin(input);
-		if constexpr (bounded::max_value<decltype(count)> == bounded::constant<0>) {
+		if constexpr (numeric_traits::max_value<decltype(count)> == bounded::constant<0>) {
 			return first;
 		} else {
 			while (count > bounded::constant<0>) {

@@ -16,6 +16,8 @@
 #include <bounded/detail/tuple.hpp>
 #include <bounded/detail/overload.hpp>
 
+#include <numeric_traits/min_max_value.hpp>
+
 #include <operators/forward.hpp>
 
 #include "../../test_assert.hpp"
@@ -280,7 +282,7 @@ inline constexpr auto uint32_many = sort_test_data(
 		65535_u32,
 		65534_u32,
 		1000000_u32,
-		bounded::max_value<std::uint32_t>
+		numeric_traits::max_value<std::uint32_t>
 	},
 	containers::array{
 		0_u32,
@@ -301,7 +303,7 @@ inline constexpr auto uint32_many = sort_test_data(
 		65535_u32,
 		65536_u32,
 		1000000_u32,
-		bounded::max_value<std::uint32_t>
+		numeric_traits::max_value<std::uint32_t>
 	}
 );
 
@@ -314,9 +316,9 @@ inline constexpr auto uint64_many = sort_test_data(
 		5_u64,
 		7_u64,
 		0_u64,
-		static_cast<std::uint64_t>(bounded::max_value<std::uint32_t>) + 1_u64,
+		static_cast<std::uint64_t>(numeric_traits::max_value<std::uint32_t>) + 1_u64,
 		1'000'000'000'000_u64,
-		bounded::max_value<std::uint64_t>,
+		numeric_traits::max_value<std::uint64_t>,
 		23_u64,
 		6_u64,
 		256_u64,
@@ -328,7 +330,7 @@ inline constexpr auto uint64_many = sort_test_data(
 		65'535_u64,
 		65'534_u64,
 		1'000'000_u64,
-		bounded::max_value<std::uint32_t>,
+		numeric_traits::max_value<std::uint32_t>,
 	},
 	containers::array{
 		0_u64,
@@ -349,10 +351,10 @@ inline constexpr auto uint64_many = sort_test_data(
 		65'535_u64,
 		65'536_u64,
 		1'000'000_u64,
-		bounded::max_value<std::uint32_t>,
-		static_cast<std::uint64_t>(bounded::max_value<std::uint32_t>) + 1_u64,
+		numeric_traits::max_value<std::uint32_t>,
+		static_cast<std::uint64_t>(numeric_traits::max_value<std::uint32_t>) + 1_u64,
 		1'000'000'000'000_u64,
-		bounded::max_value<std::uint64_t>,
+		numeric_traits::max_value<std::uint64_t>,
 	}
 );
 

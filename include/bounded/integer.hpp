@@ -14,7 +14,6 @@
 #include <bounded/detail/integer_tombstone_traits.hpp>
 #include <bounded/detail/literal.hpp>
 #include <bounded/detail/log.hpp>
-#include <bounded/detail/min_max_value.hpp>
 #include <bounded/detail/minmax.hpp>
 #include <bounded/detail/size_of.hpp>
 #include <bounded/detail/stream.hpp>

@@ -8,9 +8,10 @@
 #include <bounded/detail/arithmetic/base.hpp>
 #include <bounded/detail/arithmetic/safe_abs.hpp>
 #include <bounded/detail/max_builtin.hpp>
-#include <bounded/detail/min_max_value.hpp>
 #include <bounded/detail/minmax.hpp>
 #include <bounded/detail/safe_extreme.hpp>
+
+#include <numeric_traits/min_max_value.hpp>
 
 namespace bounded {
 namespace detail {
@@ -27,7 +28,7 @@ constexpr auto safer_multiply(constant_t<lhs> const &, constant_t<rhs> const &) 
 	);
 	if constexpr (negative) {
 		static_assert(
-			positive_result <= -static_cast<max_unsigned_t>(min_value<max_signed_t>),
+			positive_result <= -static_cast<max_unsigned_t>(numeric_traits::min_value<max_signed_t>),
 			"Multiplication requires a larger type than currently supported."
 		);
 		return static_cast<max_signed_t>(-positive_result);

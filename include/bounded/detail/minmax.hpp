@@ -16,6 +16,8 @@
 #include <operators/forward.hpp>
 #include <bounded/concepts.hpp>
 
+#include <numeric_traits/min_max_value.hpp>
+
 #include <utility>
 
 namespace bounded {
@@ -43,8 +45,8 @@ private:
 			return normalize<rhs>;
 		}
 	};
-	static constexpr auto minimum = select(min_value<LHS>, min_value<RHS>);
-	static constexpr auto maximum = select(max_value<LHS>, max_value<RHS>);
+	static constexpr auto minimum = select(numeric_traits::min_value<LHS>, numeric_traits::min_value<RHS>);
+	static constexpr auto maximum = select(numeric_traits::max_value<LHS>, numeric_traits::max_value<RHS>);
 public:
 	using type = integer<minimum, maximum>;
 };

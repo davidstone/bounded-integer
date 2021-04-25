@@ -9,6 +9,8 @@
 #include <bounded/detail/is_bounded_integer.hpp>
 #include <bounded/detail/max_builtin.hpp>
 
+#include <numeric_traits/min_max_value.hpp>
+
 #include <type_traits>
 #include <utility>
 
@@ -24,7 +26,7 @@ template<typename Min, typename Max>
 min_max(Min min, Max max) -> min_max<Min, Max>;
 
 template<typename T>
-inline constexpr auto min_max_range = min_max{min_value<T>, max_value<T>};
+inline constexpr auto min_max_range = min_max{numeric_traits::min_value<T>, numeric_traits::max_value<T>};
 
 template<bounded_integer LHS, bounded_integer RHS>
 constexpr auto operator_overload(LHS const lhs, RHS const rhs, auto const arithmetic_function, auto const operator_range) {

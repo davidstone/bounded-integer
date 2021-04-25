@@ -7,7 +7,8 @@
 
 #include <bounded/detail/class.hpp>
 #include <bounded/detail/max_builtin.hpp>
-#include <bounded/detail/min_max_value.hpp>
+
+#include <numeric_traits/min_max_value.hpp>
 
 namespace bounded {
 namespace detail {
@@ -18,7 +19,7 @@ constexpr auto safer_negation() {
 	if constexpr (value <= 0) {
 		return negated;
 	} else {
-		constexpr auto max_positive_input = -static_cast<max_unsigned_t>(min_value<max_signed_t>);
+		constexpr auto max_positive_input = -static_cast<max_unsigned_t>(numeric_traits::min_value<max_signed_t>);
 		static_assert(value <= max_positive_input, "Negation would overflow.");
 		return static_cast<max_signed_t>(negated);
 	}

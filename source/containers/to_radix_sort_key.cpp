@@ -10,6 +10,8 @@
 #include <containers/array/array.hpp>
 #include <containers/c_array.hpp>
 
+#include <numeric_traits/min_max_value.hpp>
+
 #include "../test_assert.hpp"
 #include "../test_int.hpp"
 
@@ -90,8 +92,8 @@ static_assert(is_sorted_converted_to_radix<std::int16_t>(
 ));
 
 static_assert(is_sorted_converted_to_radix<std::int32_t>(
-	bounded::min_value<std::int32_t>,
-	bounded::min_value<std::int32_t> + 1,
+	numeric_traits::min_value<std::int32_t>,
+	numeric_traits::min_value<std::int32_t> + 1,
 	-1000001,
 	-32769,
 	-32768,
@@ -116,16 +118,16 @@ static_assert(is_sorted_converted_to_radix<std::int32_t>(
 	32767,
 	32768,
 	1000000,
-	bounded::max_value<std::int32_t> - 1,
-	bounded::max_value<std::int32_t>
+	numeric_traits::max_value<std::int32_t> - 1,
+	numeric_traits::max_value<std::int32_t>
 ));
 
 static_assert(is_sorted_converted_to_radix<std::int64_t>(
-	bounded::min_value<int64_t>,
+	numeric_traits::min_value<int64_t>,
 	-1'000'000'000'000,
-	static_cast<std::int64_t>(bounded::min_value<std::int32_t>) - 1,
-	bounded::min_value<std::int32_t>,
-	bounded::min_value<std::int32_t> + 1,
+	static_cast<std::int64_t>(numeric_traits::min_value<std::int32_t>) - 1,
+	numeric_traits::min_value<std::int32_t>,
+	numeric_traits::min_value<std::int32_t> + 1,
 	-1'000'001,
 	-32'769,
 	-32'768,
@@ -150,11 +152,11 @@ static_assert(is_sorted_converted_to_radix<std::int64_t>(
 	32'767,
 	32'768,
 	1'000'000,
-	bounded::max_value<std::int32_t> - 1,
-	bounded::max_value<std::int32_t>,
-	bounded::max_value<std::int32_t>,
+	numeric_traits::max_value<std::int32_t> - 1,
+	numeric_traits::max_value<std::int32_t>,
+	numeric_traits::max_value<std::int32_t>,
 	1'000'000'000'000,
-	bounded::max_value<std::int64_t>
+	numeric_traits::max_value<std::int64_t>
 ));
 
 

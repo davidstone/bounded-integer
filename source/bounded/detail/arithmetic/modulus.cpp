@@ -5,6 +5,9 @@
 
 #include <bounded/detail/arithmetic/modulus.hpp>
 #include <bounded/detail/class.hpp>
+
+#include <numeric_traits/min_max_value.hpp>
+
 #include "extreme_values.hpp"
 #include "../../homogeneous_equals.hpp"
 
@@ -81,10 +84,10 @@ static_assert(homogeneous_equals(
 #if 0	
 // The algorithm to compute the bounds currently runs in O(n) compile time,
 // and thus this test exceed's the constexpr evaluation limits.
-constexpr auto bounded_max_range = bounded::integer(bounded::min_value<bounded::detail::signed_max_t>);
+constexpr auto bounded_max_range = bounded::integer(numeric_traits::min_value<bounded::detail::signed_max_t>);
 static_assert(homogeneous_equals(
 	bounded_max_range % bounded_max_range,
-	bounded::integer<bounded::min_value<signed_max_t> + 1, -(bounded::min_value<signed_max_t> + 1)>(0)
+	bounded::integer<numeric_traits::min_value<signed_max_t> + 1, -(numeric_traits::min_value<signed_max_t> + 1)>(0)
 ));
 #endif
 

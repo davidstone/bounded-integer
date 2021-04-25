@@ -13,10 +13,13 @@
 #include <containers/is_iterator.hpp>
 #include <containers/size.hpp>
 
-#include <operators/forward.hpp>
 #include <bounded/assert.hpp>
 #include <bounded/integer.hpp>
 #include <bounded/unreachable.hpp>
+
+#include <numeric_traits/min_max_value.hpp>
+
+#include <operators/forward.hpp>
 
 namespace containers {
 namespace detail {
@@ -66,7 +69,7 @@ constexpr auto ugly_size_hack(Size const size) {
 	if constexpr (std::is_integral_v<Size>) {
 		using result_t = bounded::integer<
 			0,
-			bounded::normalize<std::min(bounded::max_value<Size>, bounded::max_value<std::uintmax_t> / 64)>
+			bounded::normalize<std::min(numeric_traits::max_value<Size>, numeric_traits::max_value<std::uintmax_t> / 64)>
 		>;
 		return static_cast<result_t>(size);
 	} else {

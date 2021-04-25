@@ -8,7 +8,8 @@
 #include <bounded/detail/arithmetic/base.hpp>
 #include <bounded/detail/comparison.hpp>
 #include <bounded/detail/max_builtin.hpp>
-#include <bounded/detail/min_max_value.hpp>
+
+#include <numeric_traits/min_max_value.hpp>
 
 namespace bounded {
 namespace detail {
@@ -16,7 +17,7 @@ namespace detail {
 template<auto lhs, auto rhs>
 constexpr auto safer_add(constant_t<lhs>, constant_t<rhs>) {
 	constexpr auto modulo_equivalent_value = static_cast<max_unsigned_t>(lhs) + static_cast<max_unsigned_t>(rhs);
-	constexpr auto max_signed = max_value<max_signed_t>;
+	constexpr auto max_signed = numeric_traits::max_value<max_signed_t>;
 	if constexpr ((lhs >= 0 and rhs >= 0) or lhs > max_signed or rhs > max_signed) {
 		static_assert(
 			(lhs < 0 or rhs < 0) or

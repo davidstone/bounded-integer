@@ -11,6 +11,8 @@
 #include <bounded/integer.hpp>
 #include <bounded/unreachable.hpp>
 
+#include <numeric_traits/min_max_value.hpp>
+
 #include <operators/forward.hpp>
 #include <operators/operators.hpp>
 
@@ -90,7 +92,7 @@ public:
 	friend constexpr auto operator-(generate_sentinel, generate_n_iterator const rhs) {
 		return rhs.m_remaining;
 	}
-	friend constexpr auto & operator++(generate_n_iterator & it) requires(bounded::max_value<Size> == bounded::constant<0>) {
+	friend constexpr auto & operator++(generate_n_iterator & it) requires(numeric_traits::max_value<Size> == bounded::constant<0>) {
 		bounded::unreachable();
 		return it;
 	}

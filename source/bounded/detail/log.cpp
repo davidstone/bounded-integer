@@ -7,6 +7,8 @@
 #include <bounded/detail/comparison_mixed.hpp>
 #include <bounded/detail/class.hpp>
 
+#include <numeric_traits/min_max_value.hpp>
+
 namespace {
 
 constexpr auto test_log(auto const value, bounded::constant_t<2>) {
@@ -26,11 +28,11 @@ constexpr auto test_log(auto const value, bounded::constant_t<2>) {
 		case 1023: return 9;
 		case 1024: return 10;
 		case 1025: return 10;
-		case bounded::max_value<std::int64_t>: return 62;
-		case bounded::max_value<std::uint64_t>: return 63;
+		case numeric_traits::max_value<std::int64_t>: return 62;
+		case numeric_traits::max_value<std::uint64_t>: return 63;
 #if defined BOUNDED_DETAIL_HAS_128_BIT
-		case bounded::max_value<bounded::detail::int128_t>: return 126;
-		case bounded::max_value<bounded::detail::uint128_t>: return 127;
+		case numeric_traits::max_value<bounded::detail::int128_t>: return 126;
+		case numeric_traits::max_value<bounded::detail::uint128_t>: return 127;
 #endif
 		// doesn't matter what we throw, compilation error
 		default: throw 0;
@@ -54,11 +56,11 @@ constexpr auto test_log(auto const value, bounded::constant_t<10>) {
 		case 1023: return 3;
 		case 1024: return 3;
 		case 1025: return 3;
-		case bounded::max_value<std::int64_t>: return 18;
-		case bounded::max_value<std::uint64_t>: return 19;
+		case numeric_traits::max_value<std::int64_t>: return 18;
+		case numeric_traits::max_value<std::uint64_t>: return 19;
 #if defined BOUNDED_DETAIL_HAS_128_BIT
-		case bounded::max_value<bounded::detail::int128_t>: return 38;
-		case bounded::max_value<bounded::detail::uint128_t>: return 38;
+		case numeric_traits::max_value<bounded::detail::int128_t>: return 38;
+		case numeric_traits::max_value<bounded::detail::uint128_t>: return 38;
 #endif
 		// doesn't matter what we throw, compilation error
 		default: throw 0;
@@ -90,11 +92,11 @@ BOUNDED_INTEGER_LOG_TEST(1022);
 BOUNDED_INTEGER_LOG_TEST(1023);
 BOUNDED_INTEGER_LOG_TEST(1024);
 BOUNDED_INTEGER_LOG_TEST(1025);
-BOUNDED_INTEGER_LOG_TEST(bounded::max_value<std::int64_t>);
-BOUNDED_INTEGER_LOG_TEST(bounded::max_value<std::uint64_t>);
+BOUNDED_INTEGER_LOG_TEST(numeric_traits::max_value<std::int64_t>);
+BOUNDED_INTEGER_LOG_TEST(numeric_traits::max_value<std::uint64_t>);
 #if defined BOUNDED_DETAIL_HAS_128_BIT
-BOUNDED_INTEGER_LOG_TEST(bounded::max_value<bounded::detail::int128_t>);
-BOUNDED_INTEGER_LOG_TEST(bounded::max_value<bounded::detail::uint128_t>);
+BOUNDED_INTEGER_LOG_TEST(numeric_traits::max_value<bounded::detail::int128_t>);
+BOUNDED_INTEGER_LOG_TEST(numeric_traits::max_value<bounded::detail::uint128_t>);
 #endif
 
 #undef BOUNDED_INTEGER_LOG_TEST

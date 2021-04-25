@@ -7,6 +7,8 @@
 
 #include <bounded/detail/class.hpp>
 
+#include <numeric_traits/min_max_value.hpp>
+
 #include "homogeneous_equals.hpp"
 
 namespace {
@@ -16,9 +18,9 @@ static_assert(homogeneous_equals(bounded::normalize<1>, 1));
 static_assert(homogeneous_equals(bounded::normalize<-1>, -1));
 static_assert(homogeneous_equals(bounded::normalize<0U>, 0));
 static_assert(homogeneous_equals(bounded::normalize<static_cast<unsigned char>(0)>, 0));
-static_assert(homogeneous_equals(bounded::normalize<bounded::max_value<bounded::detail::max_unsigned_t>>, bounded::max_value<bounded::detail::max_unsigned_t>));
-static_assert(homogeneous_equals(bounded::normalize<bounded::max_value<bounded::detail::max_signed_t>>, bounded::max_value<bounded::detail::max_signed_t>));
-static_assert(homogeneous_equals(bounded::normalize<bounded::min_value<bounded::detail::max_signed_t>>, bounded::min_value<bounded::detail::max_signed_t>));
+static_assert(homogeneous_equals(bounded::normalize<numeric_traits::max_value<bounded::detail::max_unsigned_t>>, numeric_traits::max_value<bounded::detail::max_unsigned_t>));
+static_assert(homogeneous_equals(bounded::normalize<numeric_traits::max_value<bounded::detail::max_signed_t>>, numeric_traits::max_value<bounded::detail::max_signed_t>));
+static_assert(homogeneous_equals(bounded::normalize<numeric_traits::min_value<bounded::detail::max_signed_t>>, numeric_traits::min_value<bounded::detail::max_signed_t>));
 static_assert(homogeneous_equals(bounded::normalize<bounded::constant<0>>, 0));
 
 } // namespace

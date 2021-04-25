@@ -8,6 +8,8 @@
 #include <containers/emplace_back.hpp>
 #include <containers/index_type.hpp>
 
+#include <numeric_traits/min_max_value.hpp>
+
 #include "../../test_assert.hpp"
 #include "../test_sequence_container.hpp"
 
@@ -33,8 +35,8 @@ static_assert(!std::is_trivially_move_assignable_v<test_static_vector<bounded::t
 static_assert(containers_test::test_sequence_container<test_static_vector<int>>());
 
 using index_type = containers::index_type<containers::static_vector<int, 10>>;
-static_assert(bounded::min_value<index_type> == 0_bi);
-static_assert(bounded::max_value<index_type> == 9_bi);
+static_assert(numeric_traits::min_value<index_type> == 0_bi);
+static_assert(numeric_traits::max_value<index_type> == 9_bi);
 static_assert(!containers::iterator<containers::static_vector<std::string, 6>>);
 
 } // namespace

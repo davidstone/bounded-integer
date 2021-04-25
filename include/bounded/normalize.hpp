@@ -6,8 +6,9 @@
 #pragma once
 
 #include <bounded/detail/max_builtin.hpp>
-#include <bounded/detail/min_max_value.hpp>
 #include <bounded/detail/is_bounded_integer.hpp>
+
+#include <numeric_traits/min_max_value.hpp>
 
 #include <type_traits>
 #include <utility>
@@ -30,14 +31,14 @@ constexpr auto as_builtin_integer(T const x) {
 }
 
 constexpr auto must_use_unsigned(auto const value) {
-	return value > 0 and static_cast<max_unsigned_t>(value) > static_cast<max_unsigned_t>(max_value<max_signed_t>);
+	return value > 0 and static_cast<max_unsigned_t>(value) > static_cast<max_unsigned_t>(numeric_traits::max_value<max_signed_t>);
 }
 
 template<typename T>
 constexpr auto fits_in_int(T const value) {
 	return (value < static_cast<T>(0)) ?
-		value >= static_cast<T>(min_value<int>) :
-		value <= static_cast<T>(max_value<int>);
+		value >= static_cast<T>(numeric_traits::min_value<int>) :
+		value <= static_cast<T>(numeric_traits::max_value<int>);
 }
 
 } // namespace detail

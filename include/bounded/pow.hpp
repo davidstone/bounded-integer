@@ -11,6 +11,8 @@
 #include <bounded/detail/class.hpp>
 #include <bounded/detail/max_builtin.hpp>
 
+#include <numeric_traits/min_max_value.hpp>
+
 namespace bounded {
 namespace detail {
 
@@ -41,8 +43,8 @@ constexpr auto pow_impl(max_unsigned_t base, max_unsigned_t exponent) {
 constexpr auto pow(bounded_integer auto const base, bounded_integer auto const exponent) {
 	using base_t = decltype(base);
 	using exponent_t = decltype(exponent);
-	static_assert(min_value<exponent_t> >= constant<0>);
-	static_assert(min_value<base_t> >= constant<0>);
+	static_assert(numeric_traits::min_value<exponent_t> >= constant<0>);
+	static_assert(numeric_traits::min_value<base_t> >= constant<0>);
 	return integer<
 		normalize<::bounded::detail::pow_impl(builtin_min_value<base_t>, builtin_min_value<exponent_t>)>,
 		normalize<::bounded::detail::pow_impl(builtin_max_value<base_t>, builtin_max_value<exponent_t>)>

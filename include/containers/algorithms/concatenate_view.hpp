@@ -22,6 +22,8 @@
 #include <bounded/detail/tuple.hpp>
 #include <bounded/integer.hpp>
 
+#include <numeric_traits/min_max_value.hpp>
+
 #include <operators/operators.hpp>
 
 namespace containers {
@@ -115,11 +117,11 @@ struct concatenate_view_iterator {
 	template<bounded::convertible_to<difference_type> Offset> requires(
 		!bounded::bounded_integer<difference_type> or
 		(
-			bounded::min_value<Offset> == bounded::constant<1> and
-			bounded::max_value<Offset> == bounded::constant<1>
+			numeric_traits::min_value<Offset> == bounded::constant<1> and
+			numeric_traits::max_value<Offset> == bounded::constant<1>
 		) or
 		(
-			bounded::min_value<Offset> >= bounded::constant<0> and
+			numeric_traits::min_value<Offset> >= bounded::constant<0> and
 			(... and forward_random_access_range<RangeViews>)
 		)
 	)

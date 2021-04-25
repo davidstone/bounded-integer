@@ -7,6 +7,8 @@
 #include <bounded/detail/class.hpp>
 #include <bounded/detail/comparison_mixed.hpp>
 
+#include <numeric_traits/min_max_value.hpp>
+
 namespace {
 
 constexpr auto a = bounded::integer<1, 10>(bounded::constant<5>);
@@ -33,8 +35,8 @@ static_assert(
 	bounded::constant<-1> < bounded::constant<1>,
 	"Small negative values should be less than small positive values."
 );
-constexpr intmax_t int_min = bounded::min_value<int>;
-constexpr intmax_t int_max = bounded::max_value<int>;
+constexpr intmax_t int_min = numeric_traits::min_value<int>;
+constexpr intmax_t int_max = numeric_traits::max_value<int>;
 static_assert(
 	bounded::constant<int_min> < bounded::constant<int_max + 1>,
 	"Large negative values should be less than large positive values."

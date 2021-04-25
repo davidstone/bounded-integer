@@ -10,13 +10,15 @@
 #include <bounded/detail/minmax.hpp>
 #include <bounded/detail/arithmetic/unary_minus.hpp>
 
+#include <numeric_traits/min_max_value.hpp>
+
 namespace bounded {
 
 constexpr auto abs(bounded_integer auto const value) {
 	using Integer = decltype(value);
-	if constexpr (min_value<Integer> >= constant<0>) {
+	if constexpr (numeric_traits::min_value<Integer> >= constant<0>) {
 		return value;
-	} else if constexpr (max_value<Integer> <= constant<0>) {
+	} else if constexpr (numeric_traits::max_value<Integer> <= constant<0>) {
 		return -value;
 	} else {
 		// The 0 has to be there to restrict the range of possible values. Without

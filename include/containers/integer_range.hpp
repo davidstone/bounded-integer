@@ -15,6 +15,8 @@
 #include <bounded/integer.hpp>
 #include <bounded/unreachable.hpp>
 
+#include <numeric_traits/min_max_value.hpp>
+
 #include <operators/bracket.hpp>
 
 #include <iterator>
@@ -29,7 +31,7 @@ private:
 	using storage_type = bounded::integer<value_min, sentinel_max>;
 	using bounded_type = bounded::integer<
 		bounded::builtin_min_value<storage_type>,
-		bounded::normalize<bounded::max(bounded::min_value<storage_type>, bounded::max_value<storage_type> - bounded::min_value<Step>)>
+		bounded::normalize<bounded::max(numeric_traits::min_value<storage_type>, numeric_traits::max_value<storage_type> - numeric_traits::min_value<Step>)>
 	>;
 
 public:
@@ -86,7 +88,7 @@ public:
 	}
 
 private:
-	static constexpr auto has_no_values = bounded::max_value<difference_type> == bounded::constant<0>;
+	static constexpr auto has_no_values = numeric_traits::max_value<difference_type> == bounded::constant<0>;
 
 	[[no_unique_address]] storage_type m_value;
 	[[no_unique_address]] Step m_step;
@@ -96,7 +98,7 @@ private:
 
 template<bounded::integral Integer, bounded::integral Sentinel = Integer, bounded::integral Step = bounded::constant_t<1>>
 struct integer_range {
-	static_assert(bounded::max_value<Sentinel> >= bounded::min_value<Integer>, "Cannot construct inverted integer ranges.");
+	static_assert(numeric_traits::max_value<Sentinel> >= numeric_traits::min_value<Integer>, "Cannot construct inverted integer ranges.");
 
 	using iterator = detail::integer_range_iterator<
 		bounded::bounded_integer<Integer>,
@@ -170,7 +172,7 @@ constexpr auto enum_range(Enum const first, Enum const last) {
 
 template<typename Enum> requires (
 	std::is_enum_v<Enum> and
-	bounded::integer(bounded::min_value<Enum>) == bounded::constant<0>
+	bounded::integer(numeric_traits::min_value<Enum>) == bounded::constant<0>
 )
 constexpr auto enum_range(Enum const last) {
 	return enum_range(static_cast<Enum>(0), last);
@@ -178,7 +180,7 @@ constexpr auto enum_range(Enum const last) {
 
 template<typename Enum> requires std::is_enum_v<Enum>
 constexpr auto enum_range() {
-	return enum_range(bounded::min_value<Enum>, bounded::max_value<Enum>);
+	return enum_range(numeric_traits::min_value<Enum>, numeric_traits::max_value<Enum>);
 }
 
 }	// namespace containers

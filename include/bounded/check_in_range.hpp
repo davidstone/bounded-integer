@@ -9,10 +9,11 @@
 #include <bounded/detail/class.hpp>
 #include <bounded/detail/comparison.hpp>
 #include <bounded/detail/is_bounded_integer.hpp>
-#include <bounded/detail/min_max_value.hpp>
 #include <bounded/detail/safe_extreme.hpp>
 #include <bounded/normalize.hpp>
 #include <bounded/string.hpp>
+
+#include <numeric_traits/min_max_value.hpp>
 
 #include <stdexcept>
 
@@ -32,7 +33,7 @@ constexpr auto reduce_range(T const value, constant_t<minimum>, constant_t<maxim
 template<typename Exception = std::range_error, bounded_integer Minimum, bounded_integer Maximum>
 constexpr auto check_in_range(bounded_integer auto const value, Minimum const minimum, Maximum const maximum) {
 	if (minimum <= value and value <= maximum) {
-		return detail::reduce_range(value, min_value<Minimum>, max_value<Maximum>);
+		return detail::reduce_range(value, numeric_traits::min_value<Minimum>, numeric_traits::max_value<Maximum>);
 	} else {
 		throw Exception("Got a value of " + to_string(value) + " but expected a value in the range [" + to_string(minimum) + ", " + to_string(maximum) + "]");
 	}
@@ -40,7 +41,7 @@ constexpr auto check_in_range(bounded_integer auto const value, Minimum const mi
 
 template<typename Target, typename Exception = std::range_error>
 constexpr auto check_in_range(bounded_integer auto const value) {
-	return check_in_range<Exception>(value, bounded::min_value<Target>, bounded::max_value<Target>);
+	return check_in_range<Exception>(value, numeric_traits::min_value<Target>, numeric_traits::max_value<Target>);
 }
 
 } // namespace bounded

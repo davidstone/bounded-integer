@@ -7,14 +7,17 @@
 
 #include <containers/integer_range.hpp>
 #include <containers/is_iterator.hpp>
+
 #include <bounded/integer.hpp>
+
+#include <numeric_traits/min_max_value.hpp>
 
 namespace containers {
 
 template<iterator InputIterator, typename Count, iterator OutputIterator>
 constexpr auto copy_n(InputIterator first, Count const count, OutputIterator out) {
 	using namespace bounded::literal;
-	static_assert(bounded::min_value<Count> > -1_bi, "Negative numbers not supported.");
+	static_assert(numeric_traits::min_value<Count> > -1_bi, "Negative numbers not supported.");
 	struct result {
 		InputIterator input;
 		OutputIterator output;

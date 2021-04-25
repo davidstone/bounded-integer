@@ -8,6 +8,8 @@
 #include <bounded/detail/comparison.hpp>
 #include <bounded/detail/conditional.hpp>
 
+#include <numeric_traits/min_max_value.hpp>
+
 #include "../homogeneous_equals.hpp"
 #include "../../test_assert.hpp"
 
@@ -46,8 +48,8 @@ static_assert(bounded::constructible_from<bounded::integer<0, 1>, bool>);
 static_assert(bounded::constructible_from<bounded::integer<0, 0>, bool>);
 
 namespace check_constructibility {
-	constexpr auto min = bounded::min_value<int>;
-	constexpr auto max = bounded::max_value<int>;
+	constexpr auto min = numeric_traits::min_value<int>;
+	constexpr auto max = numeric_traits::max_value<int>;
 	using type = bounded::integer<min, max>;
 	static_assert(
 		bounded::detail::overlapping_integer<type, min, max>,
@@ -92,7 +94,7 @@ static_assert(check_assignment());
 enum class bounded_enum{};
 
 } // namespace
-namespace bounded {
+namespace numeric_traits {
 
 template<>
 constexpr auto min_value<bounded_enum> = 0;
@@ -100,7 +102,7 @@ constexpr auto min_value<bounded_enum> = 0;
 template<>
 constexpr auto max_value<bounded_enum> = 0;
 
-} // namespace bounded
+} // namespace numeric_traits
 namespace {
 
 enum unscoped_enum : int {};
@@ -124,7 +126,7 @@ static_assert(bounded::constant<bounded_enum{}> == bounded::constant<0>);
 enum class bounded_integer_enum{};
 
 } // namespace
-namespace bounded {
+namespace numeric_traits {
 
 template<>
 constexpr auto min_value<bounded_integer_enum> = bounded::constant<0>;
@@ -132,7 +134,7 @@ constexpr auto min_value<bounded_integer_enum> = bounded::constant<0>;
 template<>
 constexpr auto max_value<bounded_integer_enum> = bounded::constant<0>;
 
-} // namespace bounded
+} // namespace numeric_traits
 namespace {
 
 static_assert(!std::is_convertible_v<bounded_integer_enum, bounded::integer<0, 0>>);
@@ -142,7 +144,7 @@ static_assert(bounded::constant<bounded_integer_enum{}> == bounded::constant<0>)
 enum class enum_bounded_enum{};
 
 } // namespace
-namespace bounded {
+namespace numeric_traits {
 
 template<>
 constexpr auto min_value<enum_bounded_enum> = enum_bounded_enum();
@@ -150,7 +152,7 @@ constexpr auto min_value<enum_bounded_enum> = enum_bounded_enum();
 template<>
 constexpr auto max_value<enum_bounded_enum> = enum_bounded_enum();
 
-} // namespace bounded
+} // namespace numeric_traits
 namespace {
 
 static_assert(!std::is_convertible_v<enum_bounded_enum, bounded::integer<0, 0>>);

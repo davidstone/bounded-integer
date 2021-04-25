@@ -9,6 +9,8 @@
 #include <bounded/detail/literal.hpp>
 #include <bounded/detail/type.hpp>
 
+#include <numeric_traits/min_max_value.hpp>
+
 #include <type_traits>
 
 namespace bounded {
@@ -68,7 +70,7 @@ template<typename Variant>
 using variant_types = typename variant_types_impl<
 	Variant,
 	std::make_index_sequence<static_cast<std::size_t>(
-		max_value<decltype(std::declval<Variant>().index())> + constant<1>
+		numeric_traits::max_value<decltype(std::declval<Variant>().index())> + constant<1>
 	)>
 >::type;
 
@@ -145,7 +147,7 @@ constexpr decltype(auto) visit_implementation(
 		);
 	};
 	auto const search_index = variant.index();
-	if constexpr (possible_index == max_value<decltype(search_index)>) {
+	if constexpr (possible_index == numeric_traits::max_value<decltype(search_index)>) {
 		return found();
 	} else if (possible_index == search_index) {
 		return found();

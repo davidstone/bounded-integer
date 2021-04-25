@@ -12,6 +12,8 @@
 
 #include <bounded/integer.hpp>
 
+#include <numeric_traits/min_max_value.hpp>
+
 namespace containers {
 
 using namespace bounded::literal;
@@ -22,7 +24,7 @@ constexpr auto shrink_to_fit(Container & c) {
 	if (s == c.capacity()) {
 		return;
 	}
-	constexpr auto min_capacity = bounded::min_value<decltype(c.capacity())>;
+	constexpr auto min_capacity = numeric_traits::min_value<decltype(c.capacity())>;
 	if constexpr (min_capacity > 0_bi) {
 		if (c.capacity() == min_capacity) {
 			return;

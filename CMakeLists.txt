@@ -82,7 +82,6 @@ add_executable(bounded_test
 	source/bounded/detail/make_index_sequence.cpp
 	source/bounded/detail/max_builtin.cpp
 	source/bounded/detail/minmax.cpp
-	source/bounded/detail/min_max_value.cpp
 	source/bounded/detail/overlapping_range.cpp
 	source/bounded/detail/overload.cpp
 	source/bounded/detail/safe_extreme.cpp

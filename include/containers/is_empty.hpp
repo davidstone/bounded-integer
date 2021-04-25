@@ -10,13 +10,15 @@
 
 #include <bounded/integer.hpp>
 
+#include <numeric_traits/min_max_value.hpp>
+
 #include <type_traits>
 
 namespace containers {
 namespace detail {
 
 template<typename Range>
-concept never_empty_range = bounded::min_value<typename std::remove_reference_t<Range>::size_type> > bounded::constant<0>;
+concept never_empty_range = numeric_traits::min_value<typename std::remove_reference_t<Range>::size_type> > bounded::constant<0>;
 
 } // namespace detail
 

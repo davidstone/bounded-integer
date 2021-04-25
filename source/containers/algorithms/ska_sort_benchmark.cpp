@@ -16,6 +16,8 @@
 #include <containers/string.hpp>
 #include <containers/vector.hpp>
 
+#include <numeric_traits/min_max_value.hpp>
+
 #include <benchmark/benchmark.h>
 
 #include <random>
@@ -87,7 +89,7 @@ std::vector<std::tuple<benchmark_sort_key, benchmark_sort_value>> SKA_SORT_NOINL
 {
 	std::vector<std::tuple<benchmark_sort_key, benchmark_sort_value>> result;
 	result.reserve(size);
-	std::uniform_int_distribution<benchmark_sort_key> distribution(bounded::min_value<benchmark_sort_key>, bounded::max_value<benchmark_sort_key>);
+	std::uniform_int_distribution<benchmark_sort_key> distribution(numeric_traits::min_value<benchmark_sort_key>, numeric_traits::max_value<benchmark_sort_key>);
 	for (int i = 0; i < size; ++i)
 	{
 		result.push_back(distribution(randomness), benchmark_sort_value());
@@ -99,7 +101,7 @@ std::vector<std::tuple<std::pair<benchmark_sort_key, benchmark_sort_key>, benchm
 {
 	std::vector<std::tuple<std::pair<benchmark_sort_key, benchmark_sort_key>, benchmark_sort_value>> result;
 	result.reserve(size);
-	std::uniform_int_distribution<benchmark_sort_key> distribution(bounded::min_value<benchmark_sort_key>, bounded::max_value<benchmark_sort_key>);
+	std::uniform_int_distribution<benchmark_sort_key> distribution(numeric_traits::min_value<benchmark_sort_key>, numeric_traits::max_value<benchmark_sort_key>);
 	for (int i = 0; i < size; ++i)
 	{
 		result.push_back(std::make_pair(distribution(randomness), distribution(randomness)), benchmark_sort_value());
@@ -111,7 +113,7 @@ std::vector<std::tuple<std::array<benchmark_sort_key, NUM_SORT_KEYS>, benchmark_
 {
 	std::vector<std::tuple<std::array<benchmark_sort_key, NUM_SORT_KEYS>, benchmark_sort_value>> result;
 	result.reserve(size);
-	std::uniform_int_distribution<benchmark_sort_key> distribution(bounded::min_value<benchmark_sort_key>, bounded::max_value<benchmark_sort_key>);
+	std::uniform_int_distribution<benchmark_sort_key> distribution(numeric_traits::min_value<benchmark_sort_key>, numeric_traits::max_value<benchmark_sort_key>);
 	for (int i = 0; i < size; ++i)
 	{
 		std::array<benchmark_sort_key, NUM_SORT_KEYS> key;
@@ -168,7 +170,7 @@ void benchmark_std_sort(benchmark::State & state, auto create) {
 }
 
 void american_flag_sort(range auto && to_sort, auto && extract_key) {
-	detail::inplace_radix_sort<bounded::max_value<std::ptrdiff_t>>(containers::range_view(to_sort), extract_key);
+	detail::inplace_radix_sort<numeric_traits::max_value<std::ptrdiff_t>>(containers::range_view(to_sort), extract_key);
 }
 
 void american_flag_sort(range auto && to_sort) {
@@ -317,8 +319,8 @@ auto create_range_data = [](int max_size, auto generate) {
 	};
 };
 
-using bounded::min_value;
-using bounded::max_value;
+using numeric_traits::min_value;
+using numeric_traits::max_value;
 
 auto SKA_SORT_NOINLINE create_radix_sort_data_bool(std::mt19937_64 & engine, std::int64_t const size) {
 	auto int_distribution = std::uniform_int_distribution<int>(0, 1);

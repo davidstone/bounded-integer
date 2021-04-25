@@ -9,8 +9,9 @@
 #include <bounded/detail/arithmetic/safe_abs.hpp>
 #include <bounded/detail/comparison.hpp>
 #include <bounded/detail/max_builtin.hpp>
-#include <bounded/detail/min_max_value.hpp>
 #include <bounded/detail/minmax.hpp>
+
+#include <numeric_traits/min_max_value.hpp>
 
 namespace bounded {
 namespace detail {
@@ -46,8 +47,8 @@ constexpr auto sign_free_value = [](auto const dividend, auto divisor) {
 	// value. This allows us to use them as the initial value in an
 	// accumulation, as they will "lose" to any value.
 	auto current = min_max{
-		max_value<max_unsigned_t>,
-		min_value<max_unsigned_t>
+		numeric_traits::max_value<max_unsigned_t>,
+		numeric_traits::min_value<max_unsigned_t>
 	};
 	while (current.min != 0 or (current.max != divisor.max - 1 and current.max != dividend.max)) {
 		current = update_modulo_range(current, modulo_round(dividend, divisor.min));
@@ -87,10 +88,10 @@ constexpr auto modulus_operator_range = [](auto const lhs_, auto const rhs_) {
 	constexpr auto has_negative_values = lhs.min < constant<0>;
 	constexpr auto has_positive_values = lhs.max > constant<0>;
 	
-	static_assert(not has_negative_values or negative.max <= -static_cast<max_unsigned_t>(min_value<max_signed_t>));
+	static_assert(not has_negative_values or negative.max <= -static_cast<max_unsigned_t>(numeric_traits::min_value<max_signed_t>));
 
-	using min_type = std::conditional_t<has_negative_values or positive.min <= max_value<max_signed_t>, max_signed_t, max_unsigned_t>;
-	using max_type = std::conditional_t<not has_positive_values or positive.max <= max_value<max_signed_t>, max_signed_t, max_unsigned_t>;
+	using min_type = std::conditional_t<has_negative_values or positive.min <= numeric_traits::max_value<max_signed_t>, max_signed_t, max_unsigned_t>;
+	using max_type = std::conditional_t<not has_positive_values or positive.max <= numeric_traits::max_value<max_signed_t>, max_signed_t, max_unsigned_t>;
 	return min_max{
 		has_negative_values ? static_cast<min_type>(-static_cast<max_signed_t>(negative.max)) : static_cast<min_type>(positive.min),
 		has_positive_values ? static_cast<max_type>(positive.max) : static_cast<max_type>(-static_cast<max_signed_t>(negative.min))

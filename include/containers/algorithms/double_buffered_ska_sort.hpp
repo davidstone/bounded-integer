@@ -19,6 +19,9 @@
 #include <containers/to_radix_sort_key.hpp>
 
 #include <bounded/integer.hpp>
+
+#include <numeric_traits/min_max_value.hpp>
+
 #include <operators/forward.hpp>
 
 #include <cstddef>
@@ -201,7 +204,7 @@ constexpr auto double_buffered_sort_impl(range auto & source, range auto & buffe
 
 struct double_buffered_ska_sort_t {
 	constexpr auto operator()(range auto && source, range auto && buffer, auto const & extract_key) const -> bool {
-		if constexpr (bounded::max_value<typename std::remove_reference_t<decltype(source)>::size_type> <= bounded::constant<1>) {
+		if constexpr (numeric_traits::max_value<typename std::remove_reference_t<decltype(source)>::size_type> <= bounded::constant<1>) {
 			return false;
 		} else {
 			// TODO: Allow buffer to be larger, return range_view instead of bool

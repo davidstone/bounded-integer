@@ -9,6 +9,8 @@
 #include <bounded/optional.hpp>
 #include <bounded/to_integer.hpp>
 
+#include <numeric_traits/min_max_value.hpp>
+
 #include "homogeneous_equals.hpp"
  
 #include "../test_assert.hpp"
@@ -53,7 +55,7 @@ auto streaming_test(int const initial, int const final) {
 
 auto check_streaming() {
 	streaming_test<bounded::integer<0, 100>>(7, 0);
-	constexpr auto large_initial = bounded::max_value<int> / 3;
+	constexpr auto large_initial = numeric_traits::max_value<int> / 3;
 	constexpr auto large_final = -49;
 	streaming_test<decltype(bounded::integer(0))>(large_initial, large_final);
 }

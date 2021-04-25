@@ -9,6 +9,8 @@
 
 #include <bounded/integer.hpp>
 
+#include <numeric_traits/min_max_value.hpp>
+
 namespace containers {
 namespace detail {
 
@@ -21,7 +23,7 @@ template<bounded::bounded_integer Difference>
 struct difference_type_to_offset_type<Difference> {
 	using type = bounded::integer<
 		0,
-		bounded::normalize<bounded::max_value<Difference>>
+		bounded::normalize<numeric_traits::max_value<Difference>>
 	>;
 };
 

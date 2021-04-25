@@ -17,6 +17,8 @@
 #include <bounded/integer.hpp>
 #include <bounded/unreachable.hpp>
 
+#include <numeric_traits/min_max_value.hpp>
+
 #include <operators/forward.hpp>
 #include <operators/operators.hpp>
 
@@ -80,7 +82,7 @@ struct counted_iterator {
 	}
 
 	template<typename Offset> requires(
-		bounded::max_value<decltype(std::declval<Count>() - std::declval<Offset>())> >= 0_bi and
+		numeric_traits::max_value<decltype(std::declval<Count>() - std::declval<Offset>())> >= 0_bi and
 		requires(Iterator it, Offset offset) { it + offset; }
 	)
 	friend constexpr auto operator+(counted_iterator it, Offset const offset) {
@@ -101,7 +103,7 @@ struct counted_iterator {
 		return -(rhs - lhs);
 	}
 
-	friend auto & operator++(counted_iterator & it) requires(bounded::max_value<difference_type> == 0_bi) {
+	friend auto & operator++(counted_iterator & it) requires(numeric_traits::max_value<difference_type> == 0_bi) {
 		bounded::unreachable();
 		return it;
 	}
@@ -138,7 +140,7 @@ struct random_access_counted_iterator {
 		return static_cast<difference_type>(std::move(lhs).m_it - std::move(rhs).m_it);
 	}
 
-	friend auto & operator++(random_access_counted_iterator & it) requires(bounded::max_value<difference_type> == 0_bi) {
+	friend auto & operator++(random_access_counted_iterator & it) requires(numeric_traits::max_value<difference_type> == 0_bi) {
 		bounded::unreachable();
 		return it;
 	}
@@ -149,7 +151,7 @@ private:
 
 } // namespace detail
 
-template<range Range, bounded::bounded_integer Count> requires(bounded::min_value<Count> >= 0_bi)
+template<range Range, bounded::bounded_integer Count> requires(numeric_traits::min_value<Count> >= 0_bi)
 constexpr auto take(Range && source, Count const count) {
 	using iterator = iterator_t<Range>;
 	using count_type = bounded::integer<
@@ -165,7 +167,7 @@ constexpr auto take(Range && source, Count const count) {
 		auto first = detail::random_access_counted_iterator<iterator, count_type>(containers::begin(OPERATORS_FORWARD(source)));
 		return containers::range_view(first, first + true_count);
 	} else {
-		auto const upper_bound_count = count_type(bounded::min(count, bounded::max_value<count_type>));
+		auto const upper_bound_count = count_type(bounded::min(count, numeric_traits::max_value<count_type>));
 		return containers::range_view(
 			detail::counted_iterator(containers::begin(OPERATORS_FORWARD(source)), upper_bound_count),
 			detail::counted_sentinel(containers::end(OPERATORS_FORWARD(source)))

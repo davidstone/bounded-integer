@@ -9,14 +9,15 @@
 #include <bounded/detail/builtin_min_max_value.hpp>
 #include <bounded/detail/comparison.hpp>
 #include <bounded/detail/is_bounded_integer.hpp>
-#include <bounded/detail/min_max_value.hpp>
-#include <bounded/normalize.hpp>
 #include <bounded/detail/overlapping_range.hpp>
 #include <bounded/detail/safe_extreme.hpp>
 #include <bounded/detail/underlying_type.hpp>
 
 #include <bounded/assume_in_range.hpp>
 #include <bounded/concepts.hpp>
+#include <bounded/normalize.hpp>
+
+#include <numeric_traits/min_max_value.hpp>
 
 #include <type_traits>
 #include <utility>
@@ -26,11 +27,17 @@ namespace bounded {
 template<auto minimum, auto maximum>
 struct integer;
 
-template<auto minimum, auto maximum>
-inline constexpr auto max_value<integer<minimum, maximum>> = integer<maximum, maximum>();
+} // namespace bounded
+namespace numeric_traits {
 
 template<auto minimum, auto maximum>
-inline constexpr auto min_value<integer<minimum, maximum>> = integer<minimum, minimum>();
+inline constexpr auto max_value<bounded::integer<minimum, maximum>> = bounded::integer<maximum, maximum>();
+
+template<auto minimum, auto maximum>
+inline constexpr auto min_value<bounded::integer<minimum, maximum>> = bounded::integer<minimum, minimum>();
+
+} // namespace numeric_traits
+namespace bounded {
 
 template<auto minimum, auto maximum>
 inline constexpr auto builtin_max_value<integer<minimum, maximum>> = maximum;
@@ -199,10 +206,10 @@ inline constexpr auto deduced_min = builtin_min_value<T>;
 template<typename T>
 inline constexpr auto deduced_max = builtin_max_value<T>;
 
-template<typename T> requires std::is_same_v<decltype(min_value<T>), incomplete>
+template<typename T> requires(!numeric_traits::has_min_value<T>)
 inline constexpr auto deduced_min<T> = builtin_min_value<std::underlying_type_t<T>>;
 
-template<typename T> requires std::is_same_v<decltype(max_value<T>), incomplete>
+template<typename T> requires(!numeric_traits::has_max_value<T>)
 inline constexpr auto deduced_max<T> = builtin_max_value<std::underlying_type_t<T>>;
 
 }	// namespace detail

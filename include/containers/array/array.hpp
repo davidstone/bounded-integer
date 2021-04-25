@@ -11,6 +11,8 @@
 
 #include <bounded/integer.hpp>
 
+#include <numeric_traits/min_max_value.hpp>
+
 #include <operators/bracket.hpp>
 
 #include <algorithm>
@@ -59,7 +61,7 @@ using array_type = typename array_trait<size>::template type<T>;
 
 template<typename T, std::size_t size_, std::size_t... sizes>
 struct array {
-	static_assert(size_ <= static_cast<std::size_t>(bounded::max_value<std::ptrdiff_t>));
+	static_assert(size_ <= static_cast<std::size_t>(numeric_traits::max_value<std::ptrdiff_t>));
 	using value_type = typename detail::array_value_type<T, sizes...>::type;
 
 	using size_type = bounded::constant_t<bounded::normalize<size_>>;

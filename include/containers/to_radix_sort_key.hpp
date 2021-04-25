@@ -9,6 +9,8 @@
 
 #include <bounded/integer.hpp>
 
+#include <numeric_traits/min_max_value.hpp>
+
 #include <cstdint>
 #include <limits>
 #include <type_traits>
@@ -72,7 +74,7 @@ constexpr auto to_radix_sort_key(T const value) {
 	} else {
 		static_assert(std::is_signed_v<T>);
 		using unsigned_t = std::make_unsigned_t<T>;
-		return static_cast<unsigned_t>(static_cast<unsigned_t>(value) + static_cast<unsigned_t>(bounded::min_value<T>));
+		return static_cast<unsigned_t>(static_cast<unsigned_t>(value) + static_cast<unsigned_t>(numeric_traits::min_value<T>));
 	}
 }
 

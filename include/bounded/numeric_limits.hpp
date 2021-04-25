@@ -13,6 +13,8 @@
 #include <bounded/detail/max_builtin.hpp>
 #include <bounded/detail/minmax.hpp>
 
+#include <numeric_traits/min_max_value.hpp>
+
 #include <climits>
 #include <limits>
 
@@ -27,7 +29,7 @@ constexpr auto digits(auto const minimum, auto const maximum, auto const base) n
 	static_assert(base > constant<1>, "Base must be greater than 1.");
 	if constexpr (minimum > constant<0> or maximum <= constant<0>) {
 		return constant<0>;
-	} else if constexpr (maximum == constant<max_value<max_unsigned_t>>) {
+	} else if constexpr (maximum == constant<numeric_traits::max_value<max_unsigned_t>>) {
 		if constexpr (base == constant<2>) {
 			return constant<sizeof(max_unsigned_t) * CHAR_BIT>;
 		} else {
