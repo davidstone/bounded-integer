@@ -64,6 +64,22 @@ inline constexpr auto uninitialized_copy = [](range auto && input, iterator auto
 	return output;
 };
 
+namespace detail {
+
+// std::memcpy does not allow either argument to be null, even when size is 0
+inline constexpr auto memcpy(void * destination, void const * source, std::size_t const size) {
+	#if defined __clang
+		return __builtin_memcpy(destination, source, size);
+	#else
+		if (size == 0) {
+			return destination;
+		}
+		return std::memcpy(destination, source, size);
+	#endif
+}
+
+} // namespace detail
+
 inline constexpr auto uninitialized_copy_no_overlap = []<range InputRange, iterator OutputIterator>(InputRange && source, OutputIterator out) {
 	// TODO: Figure out how to tell the optimizer there is no overlap so I do
 	// not need to explicitly call `memcpy`.
@@ -72,7 +88,7 @@ inline constexpr auto uninitialized_copy_no_overlap = []<range InputRange, itera
 			return uninitialized_copy(OPERATORS_FORWARD(source), out);
 		} else {
 			auto const offset = containers::size(source);
-			std::memcpy(containers::to_address(out), containers::data(source), static_cast<std::size_t>(offset) * sizeof(range_value_t<InputRange>));
+			::containers::detail::memcpy(containers::to_address(out), containers::data(source), static_cast<std::size_t>(offset) * sizeof(range_value_t<InputRange>));
 			return out + static_cast<iter_difference_t<OutputIterator>>(offset);
 		}
 	} else {
