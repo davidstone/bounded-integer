@@ -16,7 +16,10 @@ struct iter_difference_t_impl {
 	using type = typename Iterator::difference_type;
 };
 
-template<typename Iterator> requires requires(Iterator it) { it - it; }
+template<typename Iterator>
+concept subtractable = requires(Iterator it) { it - it; };
+
+template<subtractable Iterator>
 struct iter_difference_t_impl<Iterator> {
 	using type = decltype(std::declval<Iterator>() - std::declval<Iterator>());
 private:
