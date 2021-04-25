@@ -155,7 +155,7 @@ constexpr auto take(Range && source, Count const count) {
 	using count_type = bounded::integer<
 		0,
 		bounded::normalize<bounded::min(
-			bounded::integer(bounded::max_value<iter_difference_t<iterator>>),
+			bounded::constant<bounded::builtin_max_value<iter_difference_t<iterator>>>,
 			bounded::constant<bounded::builtin_max_value<Count>>
 		)>
 	>;
