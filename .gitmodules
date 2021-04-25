@@ -4,3 +4,6 @@
 [submodule "benchmark"]
 	path = source/benchmark
 	url = https://github.com/google/benchmark.git
+[submodule "numeric-traits"]
+	path = numeric-traits
+	url = https://github.com/davidstone/numeric-traits
