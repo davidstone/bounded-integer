@@ -13,7 +13,8 @@
 #include <containers/single_element_range.hpp>
 #include <containers/small_buffer_optimized_vector.hpp>
 
-#include <iosfwd>
+#include <istream>
+#include <ostream>
 #include <type_traits>
 
 namespace containers {
@@ -120,14 +121,22 @@ using wstring = basic_string<wchar_t>;
 using u16string = basic_string<char16_t>;
 using u32string = basic_string<char32_t>;
 
-template<typename CharT, typename Traits>
-auto & operator<<(std::basic_ostream<CharT, Traits> & out, basic_string<CharT> const & str) {
-	return out << static_cast<std::string_view>(str);
+template<typename CharT>
+auto & operator<<(std::basic_ostream<CharT> & stream, basic_string<CharT> const & str) {
+	return stream << static_cast<std::string_view>(str);
 }
 
-template<typename CharT, typename Traits>
-auto & operator>>(std::basic_istream<CharT, Traits> & in, basic_string<CharT> const & str) {
-	return in >> static_cast<std::string_view>(str);
+template<typename CharT>
+auto & operator>>(std::basic_istream<CharT> & stream, basic_string<CharT> & str) {
+	stream >> std::ws;
+	containers::clear(str);
+	for (auto it = std::istreambuf_iterator(stream); it != std::istreambuf_iterator<char>(); ++it) {
+		if (std::isspace(*it, stream.getloc())) {
+			break;
+		}
+		containers::push_back(str, *it);
+	}
+	return stream;
 }
 
 // TODO: Add in a null-terminated string class
