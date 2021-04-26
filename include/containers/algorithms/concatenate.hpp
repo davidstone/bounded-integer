@@ -95,7 +95,7 @@ constexpr auto move_existing_data_to_final_position(Container & container, auto 
 	} else {
 		static_assert(std::is_trivial_v<range_value_t<Container>> and resizable_container<Container>);
 		using difference_type = iter_difference_t<iterator_t<Container>>;
-		auto const original_size = ::containers::size(container);
+		auto const original_size = bounded::integer(::containers::size(container));
 		auto const new_size = original_size + before_size;
 		::containers::resize(container, new_size);
 		::containers::copy_backward(containers::begin(container), containers::begin(container) + static_cast<difference_type>(original_size), containers::begin(container) + static_cast<difference_type>(new_size));
