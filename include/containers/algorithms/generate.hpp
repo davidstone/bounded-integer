@@ -43,27 +43,27 @@ struct generate_n_iterator {
 private:
 	using stored_function = std::conditional_t<
 		std::is_empty_v<Function> and std::is_trivially_copyable_v<Function>,
-		Function,
-		decltype(std::reference_wrapper(std::declval<Function const &>()))
+		std::remove_const_t<Function>,
+		decltype(std::reference_wrapper(std::declval<Function &>()))
 	>;
 	[[no_unique_address]] Size m_remaining;
 	[[no_unique_address]] stored_function m_generator;
 
 public:
-	using iterator_category = std::random_access_iterator_tag;
-	using reference = decltype(std::declval<Function>()());
+	using iterator_category = std::input_iterator_tag;
+	using reference = std::invoke_result_t<Function &>;
 	using value_type = std::remove_cvref_t<reference>;
 	using difference_type = decltype(std::declval<Size>() - std::declval<Size>());
 	using pointer = std::remove_reference_t<reference> *;
 	
-	constexpr generate_n_iterator(Size const remaining, Function const & generator):
+	constexpr generate_n_iterator(Size const remaining, Function & generator):
 		m_remaining(remaining),
 		m_generator(generator)
 	{
 	}
 
 	constexpr decltype(auto) operator*() const {
-		return m_generator();
+		return std::invoke(m_generator);
 	}
 	OPERATORS_ARROW_DEFINITIONS
 
@@ -82,19 +82,13 @@ public:
 		return lhs.m_remaining == 0_bi;
 	}
 
-	template<bounded::integral Offset> requires(detail::construct_subtractable<Size, Offset>)
-	friend constexpr auto operator+(generate_n_iterator it, Offset const offset) -> generate_n_iterator {
-		return generate_n_iterator(Size(it.m_remaining - offset), std::move(it).m_generator);
-	}
-	friend constexpr auto operator-(generate_n_iterator const lhs, generate_n_iterator const rhs) {
-		return rhs.m_remaining - lhs.m_remaining;
-	}
-	friend constexpr auto operator-(generate_sentinel, generate_n_iterator const rhs) {
-		return rhs.m_remaining;
-	}
-	friend constexpr auto & operator++(generate_n_iterator & it) requires(numeric_traits::max_value<Size> == bounded::constant<0>) {
-		bounded::unreachable();
-		return it;
+	friend constexpr auto operator+(generate_n_iterator it, bounded::constant_t<1>) -> generate_n_iterator {
+		if constexpr (numeric_traits::max_value<Size> == bounded::constant<0>) {
+			bounded::unreachable();
+		} else {
+			--it.m_remaining;
+			return it;
+		}
 	}
 };
 
@@ -107,9 +101,6 @@ private:
 
 public:
 	using size_type = Size;
-	using value_type = std::invoke_result_t<Function const &>;
-
-	using const_iterator = generate_n_iterator<bounded::integer<0, bounded::builtin_max_value<size_type>>, Function>;
 
 	constexpr generate_n(Size const size, Function generator):
 		m_size(size),
@@ -117,14 +108,18 @@ public:
 	{
 	}
 
-	constexpr auto begin() const {
-		return const_iterator(m_size, m_generator);
+	constexpr auto begin() const requires std::is_invocable_v<Function const &> {
+		return generate_n_iterator<bounded::integer<0, bounded::builtin_max_value<size_type>>, Function const>(m_size, m_generator);
+	}
+	constexpr auto begin() {
+		return generate_n_iterator<bounded::integer<0, bounded::builtin_max_value<size_type>>, Function>(m_size, m_generator);
 	}
 	static constexpr auto end() {
 		return generate_sentinel();
 	}
-
-	OPERATORS_BRACKET_SEQUENCE_RANGE_DEFINITIONS
+	constexpr auto size() const {
+		return m_size;
+	}
 };
 
 } // namespace containers
