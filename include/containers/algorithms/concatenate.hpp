@@ -5,12 +5,15 @@
 
 #pragma once
 
+#include <containers/algorithms/copy.hpp>
 #include <containers/algorithms/reverse_iterator.hpp>
 #include <containers/algorithms/uninitialized.hpp>
 #include <containers/append.hpp>
 #include <containers/begin_end.hpp>
 #include <containers/data.hpp>
+#include <containers/lazy_push_back.hpp>
 #include <containers/is_iterator.hpp>
+#include <containers/resize.hpp>
 #include <containers/size.hpp>
 
 #include <bounded/assert.hpp>
@@ -77,6 +80,28 @@ constexpr auto ugly_size_hack(Size const size) {
 	}
 }
 
+template<typename Container>
+concept can_reuse_storage =
+	appendable_from_capacity<Container> or
+	(std::is_trivial_v<range_value_t<Container>> and resizable_container<Container>);
+
+template<typename Container>
+constexpr auto move_existing_data_to_final_position(Container & container, auto const before_size) {
+	if constexpr (appendable_from_capacity<Container>) {
+		// Use data instead of begin to construct an iterator after `end()`.
+		auto const new_begin = containers::data(container) + before_size;
+		::containers::uninitialized_relocate(containers::reversed(container), containers::reverse_iterator(new_begin + ::containers::size(container)));
+		container.append_from_capacity(before_size);
+	} else {
+		static_assert(std::is_trivial_v<range_value_t<Container>> and resizable_container<Container>);
+		using difference_type = iter_difference_t<iterator_t<Container>>;
+		auto const original_size = ::containers::size(container);
+		auto const new_size = original_size + before_size;
+		::containers::resize(container, new_size);
+		::containers::copy_backward(containers::begin(container), containers::begin(container) + static_cast<difference_type>(original_size), containers::begin(container) + static_cast<difference_type>(new_size));
+	}
+}
+
 }	// namespace detail
 
 // TODO: support non-sized input ranges, splicable output ranges, and
@@ -86,16 +111,15 @@ constexpr auto concatenate(auto && ... ranges) {
 	auto const total_size = (0_bi + ... + ::containers::detail::ugly_size_hack(size(ranges)));
 	using Integer = std::remove_const_t<decltype(total_size)>;
 
-	auto reusable = detail::reusable_concatenate_t<Result, Integer>{nullptr, 0_bi};
-	(..., (reusable = ::containers::detail::reusable_concatenate_container(reusable, total_size, OPERATORS_FORWARD(ranges))));
-	if (reusable.ptr) {
-		auto & ref = *reusable.ptr;
-		// Use data instead of begin to construct an iterator after `end()`.
-		auto const new_begin = containers::data(ref) + reusable.before_size;
-		::containers::uninitialized_relocate(containers::reversed(ref), containers::reverse_iterator(new_begin + size(ref)));
-		ref.append_from_capacity(reusable.before_size);
-		::containers::detail::concatenate_prepend_append(ref, containers::begin(ref), OPERATORS_FORWARD(ranges)...);
-		return std::move(ref);
+	if constexpr (detail::can_reuse_storage<Result>) {
+		auto reusable = detail::reusable_concatenate_t<Result, Integer>{nullptr, 0_bi};
+		(..., (reusable = ::containers::detail::reusable_concatenate_container(reusable, total_size, OPERATORS_FORWARD(ranges))));
+		if (reusable.ptr) {
+			auto & ref = *reusable.ptr;
+			::containers::detail::move_existing_data_to_final_position(ref, reusable.before_size);
+			::containers::detail::concatenate_prepend_append(ref, containers::begin(ref), OPERATORS_FORWARD(ranges)...);
+			return std::move(ref);
+		}
 	}
 
 	Result result;
