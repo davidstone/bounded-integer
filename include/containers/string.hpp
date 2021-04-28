@@ -10,7 +10,6 @@
 #include <containers/begin_end.hpp>
 #include <containers/range_value_t.hpp>
 #include <containers/range_view.hpp>
-#include <containers/single_element_range.hpp>
 #include <containers/small_buffer_optimized_vector.hpp>
 
 #include <istream>
@@ -93,28 +92,6 @@ template<typename T>
 concept string_specialization = is_string<std::decay_t<T>>;
 
 }	// namespace detail
-
-template<detail::string_specialization LHS, detail::string_specialization RHS> requires(std::is_same_v<range_value_t<LHS>, range_value_t<RHS>>)
-constexpr auto operator+(LHS && lhs, RHS && rhs) {
-	return ::containers::concatenate<std::decay_t<LHS>>(OPERATORS_FORWARD(lhs), OPERATORS_FORWARD(rhs));
-}
-template<detail::string_specialization String>
-constexpr auto operator+(String && lhs, std::basic_string_view<range_value_t<String>> rhs) {
-	return ::containers::concatenate<std::decay_t<String>>(OPERATORS_FORWARD(lhs), rhs);
-}
-template<detail::string_specialization String>
-constexpr auto operator+(std::basic_string_view<range_value_t<String>> lhs, String && rhs) {
-	return ::containers::concatenate<std::decay_t<String>>(lhs, OPERATORS_FORWARD(rhs));
-}
-
-template<detail::string_specialization String>
-constexpr auto operator+(String && lhs, typename std::remove_reference_t<String>::value_type const rhs) {
-	return containers::concatenate<std::decay_t<String>>(OPERATORS_FORWARD(lhs), ::containers::single_element_range(rhs));
-}
-template<detail::string_specialization String>
-constexpr auto operator+(typename std::remove_reference_t<String>::value_type const lhs, String && rhs) {
-	return containers::concatenate<std::decay_t<String>>(::containers::single_element_range(lhs), OPERATORS_FORWARD(rhs));
-}
 
 using string = basic_string<char>;
 using wstring = basic_string<wchar_t>;
