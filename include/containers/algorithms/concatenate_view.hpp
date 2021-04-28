@@ -7,6 +7,7 @@
 
 #include <containers/algorithms/move_iterator.hpp>
 #include <containers/begin_end.hpp>
+#include <containers/common_iterator_functions.hpp>
 #include <containers/front_back.hpp>
 #include <containers/is_empty.hpp>
 #include <containers/is_range.hpp>
@@ -21,6 +22,7 @@
 #include <bounded/detail/make_index_sequence.hpp>
 #include <bounded/detail/tuple.hpp>
 #include <bounded/integer.hpp>
+#include <bounded/std_iterator.hpp>
 
 #include <numeric_traits/min_max_value.hpp>
 
@@ -114,13 +116,11 @@ struct concatenate_view_iterator {
 	}
 	OPERATORS_ARROW_DEFINITIONS
 
-	template<bounded::convertible_to<difference_type> Offset> requires(
-		!bounded::bounded_integer<difference_type> or
+	template<typename Offset> requires(
+		std::is_same_v<Offset, bounded::constant_t<1>> or
+		(!bounded::bounded_integer<difference_type> and numeric_traits::max_value<Offset> >= bounded::constant<0> and (... and forward_random_access_range<RangeViews>)) or
 		(
-			numeric_traits::min_value<Offset> == bounded::constant<1> and
-			numeric_traits::max_value<Offset> == bounded::constant<1>
-		) or
-		(
+			bounded::convertible_to<Offset, difference_type> and
 			numeric_traits::min_value<Offset> >= bounded::constant<0> and
 			(... and forward_random_access_range<RangeViews>)
 		)

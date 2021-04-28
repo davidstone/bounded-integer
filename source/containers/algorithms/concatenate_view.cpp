@@ -11,6 +11,8 @@
 #include <containers/repeat_n.hpp>
 #include <containers/size.hpp>
 
+#include <string_view>
+
 namespace {
 using namespace bounded::literal;
 
@@ -59,5 +61,7 @@ static_assert(containers::equal(
 	containers::concatenate_view(array1, containers::static_vector<int, 4>(containers::repeat_n(2_bi, 8))),
 	containers::array{1, 2, 3, 8, 8}
 ));
+
+static_assert(containers::forward_random_access_range<containers::concatenate_view<std::string_view>>);
 
 } // namespace
