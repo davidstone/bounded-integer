@@ -83,7 +83,7 @@ struct concatenate_view_iterator {
 	using value_type = bounded::detail::common_type_and_value_category_t<
 		range_value_t<RangeViews>...
 	>;
-	using difference_type = decltype((... + std::declval<iter_difference_t<iterator_t<RangeViews>>>()));
+	using difference_type = decltype((0_bi + ... + std::declval<iter_difference_t<iterator_t<RangeViews>>>()));
 	
 	using iterator_category =
 		std::conditional_t<detail::any_is_output_iterator<RangeViews...>, std::output_iterator_tag,
