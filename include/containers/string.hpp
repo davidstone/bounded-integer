@@ -12,6 +12,8 @@
 #include <containers/range_view.hpp>
 #include <containers/small_buffer_optimized_vector.hpp>
 
+#include <bounded/clamp.hpp>
+
 #include <istream>
 #include <ostream>
 #include <type_traits>
@@ -105,14 +107,27 @@ auto & operator<<(std::basic_ostream<CharT> & stream, basic_string<CharT> const 
 
 template<typename CharT>
 auto & operator>>(std::basic_istream<CharT> & stream, basic_string<CharT> & str) {
-	stream >> std::ws;
+	auto const sentry = typename std::basic_istream<CharT>::sentry(stream);
+	if (!sentry) {
+		return stream;
+	}
+	constexpr auto max_width = numeric_traits::max_value<typename basic_string<CharT>::size_type>;
+	auto const width = stream.width();
+	auto const max_characters = width <= 0 ? max_width : bounded::clamp(bounded::integer(width), 1_bi, max_width);
 	containers::clear(str);
-	for (auto it = std::istreambuf_iterator(stream); it != std::istreambuf_iterator<char>(); ++it) {
+	for (auto it = std::istreambuf_iterator(stream); it != std::istreambuf_iterator<CharT>(); ++it) {
+		if (containers::size(str) == max_characters) {
+			break;
+		}
 		if (std::isspace(*it, stream.getloc())) {
 			break;
 		}
 		containers::push_back(str, *it);
 	}
+	if (containers::is_empty(str)) {
+		stream.setstate(std::ios::failbit);
+	}
+	stream.width(0);
 	return stream;
 }
 
