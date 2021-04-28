@@ -108,7 +108,7 @@ constexpr auto move_existing_data_to_final_position(Container & container, auto 
 // non-reservable output ranges
 template<typename Result>
 constexpr auto concatenate(auto && ... ranges) {
-	auto const total_size = (0_bi + ... + ::containers::detail::ugly_size_hack(size(ranges)));
+	auto const total_size = (0_bi + ... + ::containers::detail::ugly_size_hack(::containers::size(ranges)));
 	using Integer = std::remove_const_t<decltype(total_size)>;
 
 	if constexpr (detail::can_reuse_storage<Result>) {
