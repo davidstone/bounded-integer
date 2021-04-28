@@ -80,12 +80,13 @@ concept std_iterator =
 
 } // namespace detail
 
-constexpr auto operator+(detail::std_random_access_iterator auto const it, bounded::bounded_integer auto const offset) {
-	return it + offset.value();
+template<detail::std_random_access_iterator Iterator>
+constexpr auto operator+(Iterator const it, bounded::bounded_integer auto const offset) {
+	return it + static_cast<typename std::iterator_traits<Iterator>::difference_type>(offset);
 }
 
 constexpr auto operator+(bounded::bounded_integer auto const offset, detail::std_random_access_iterator auto const it) {
-	return offset.value() + it;
+	return offset + it;
 }
 
 constexpr auto operator+(detail::std_iterator auto it, bounded::constant_t<1>) {
