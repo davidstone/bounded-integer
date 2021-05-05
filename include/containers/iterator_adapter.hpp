@@ -109,9 +109,9 @@ private:
 
 
 template<typename Iterator, typename Traits>
-constexpr decltype(auto) operator*(adapt_iterator<Iterator, Traits> const it) {
-	return it.traits().dereference(it.base());
-}
+constexpr auto operator*(adapt_iterator<Iterator, Traits> const it) OPERATORS_RETURNS(
+	it.traits().dereference(it.base())
+)
 
 template<typename Iterator, typename Traits>
 constexpr auto operator+(adapt_iterator<Iterator, Traits> const lhs, auto const rhs) OPERATORS_RETURNS(
