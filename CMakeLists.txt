@@ -47,6 +47,7 @@ target_include_directories(containers INTERFACE
 add_executable(bounded_test
 	source/bounded/detail/arithmetic/base.cpp
 	source/bounded/detail/arithmetic/bitwise_and.cpp
+	source/bounded/detail/arithmetic/byte.cpp
 	source/bounded/detail/arithmetic/divides.cpp
 	source/bounded/detail/arithmetic/left_shift.cpp
 	source/bounded/detail/arithmetic/modulus.cpp
