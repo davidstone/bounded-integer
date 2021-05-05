@@ -5,11 +5,11 @@
 
 #include <containers/string.hpp>
 
+#include <containers/repeat_n.hpp>
+
 #include "../test_assert.hpp"
 
 namespace {
-
-#if 0
 
 using namespace bounded::literal;
 
@@ -40,21 +40,15 @@ constexpr bool test() {
 	// Verify this works in a range-based for loop	
 	for (auto const & c [[maybe_unused]] : from_string_literal) {
 	}
-	
-	BOUNDED_TEST(from_string_literal + from_string_view == "DavidStone");
-	BOUNDED_TEST(from_string_literal + string_view == "DavidStone");
-	BOUNDED_TEST(from_string_literal + array == "DavidStone");
-	BOUNDED_TEST(from_string_literal + c_string == "DavidStone");
 
-	BOUNDED_TEST(string_view + from_string_literal == "StoneDavid");
-	BOUNDED_TEST(array + from_string_literal == "StoneDavid");
-	BOUNDED_TEST(c_string + from_string_literal == "StoneDavid");
+#if 0
+	auto small_to_large = containers::string("a");
+	small_to_large = containers::string(containers::repeat_n(40_bi, 'c'));
+#endif
 	
 	return true;
 }
 
 static_assert(test());
-
-#endif
 
 } // namespace
