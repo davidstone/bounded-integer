@@ -14,6 +14,8 @@
 #include <bounded/detail/arithmetic/bitwise_and.hpp>
 #include <bounded/detail/arithmetic/unary_minus.hpp>
 #include <bounded/detail/arithmetic/unary_plus.hpp>
+#include <bounded/detail/arithmetic/byte.hpp>
+#include <bounded/detail/arithmetic/pointer.hpp>
 #include <bounded/detail/class.hpp>
 
 #include <operators/binary_minus.hpp>
