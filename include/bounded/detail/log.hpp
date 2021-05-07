@@ -38,13 +38,3 @@ constexpr auto log(Value const value, Base const base) {
 }
 
 }	// namespace bounded
-
-namespace std {
-// This overload is required for std::sort to work on gcc with iterators whose
-// difference_type is a bounded::integer. It is not guaranteed to continue to be
-// supported. It returns a built-in integer that is the log2 of the number
-constexpr auto __lg(bounded::bounded_integer auto const value) {
-	return __lg(value.value());
-}
-
-}	// namespace std
