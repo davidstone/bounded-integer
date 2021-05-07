@@ -52,7 +52,7 @@ struct set_intersection_members {
 constexpr auto find_first_matching(auto & members, auto it1, auto it2) {
 	auto const last1 = ::containers::end(members.range1);
 	auto const last2 = ::containers::end(members.range2);
-	auto const comp = detail::less_to_compare(members.compare);
+	auto const comp = ::containers::detail::less_to_compare(members.compare);
 	
 	while (it1 != last1 and it2 != last2) {
 		auto const cmp = comp(*it1, *it2);
@@ -61,10 +61,10 @@ constexpr auto find_first_matching(auto & members, auto it1, auto it2) {
 		} else if (cmp > 0) {
 			++it2;
 		} else {
-			return detail::set_intersection_pair_iterator(members, it1, it2);
+			return set_intersection_pair_iterator(members, it1, it2);
 		}
 	}
-	return detail::set_intersection_pair_iterator(members, last1, last2);
+	return set_intersection_pair_iterator(members, last1, last2);
 }
 
 template<typename Members, typename ForwardIterator1, typename ForwardIterator2>
