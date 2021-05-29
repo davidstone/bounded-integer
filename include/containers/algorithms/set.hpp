@@ -184,7 +184,7 @@ public:
 	}
 	constexpr auto begin() & {
 		return find_first_matching(
-			*this,
+			m_members,
 			::containers::begin(m_members.range1),
 			::containers::begin(m_members.range2)
 		);
