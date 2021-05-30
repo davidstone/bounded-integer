@@ -80,10 +80,10 @@ struct small_buffer_optimized_vector : private lexicographical_comparison::base 
 			m_size = size_.value();
 		}
 
-		constexpr auto data() const {
+		constexpr auto begin() const {
 			return ::containers::detail::static_or_reinterpret_cast<T const *>(containers::data(m_data));
 		}
-		constexpr auto data() {
+		constexpr auto begin() {
 			return ::containers::detail::static_or_reinterpret_cast<T *>(containers::data(m_data));
 		}
 
@@ -123,10 +123,10 @@ struct small_buffer_optimized_vector : private lexicographical_comparison::base 
 			m_size = size_.value();
 		}
 
-		constexpr auto data() const {
+		constexpr auto begin() const {
 			return m_data.pointer;
 		}
-		constexpr auto data() {
+		constexpr auto begin() {
 			return m_data.pointer;
 		}
 
@@ -197,13 +197,11 @@ struct small_buffer_optimized_vector : private lexicographical_comparison::base 
 	}
 
 	constexpr auto begin() const & {
-		auto const result = is_small() ? m_small.data() : m_large.data();
-		BOUNDED_ASSERT_OR_ASSUME(result != nullptr);
+		auto const result = is_small() ? containers::begin(m_small) : containers::begin(m_large);
 		return const_iterator(result);
 	}
 	constexpr auto begin() & {
-		auto const result = is_small() ? m_small.data() : m_large.data();
-		BOUNDED_ASSERT_OR_ASSUME(result != nullptr);
+		auto const result = is_small() ? containers::begin(m_small) : containers::begin(m_large);
 		return iterator(result);
 	}
 	constexpr auto begin() && {
@@ -252,12 +250,12 @@ private:
 		}
 		auto temp = std::move(m_large);
 		auto const guard = bounded::scope_guard([&]{
-			detail::deallocate_storage(detail::dynamic_array_data<T, size_type>(temp.data(), temp.capacity()));
+			detail::deallocate_storage(detail::dynamic_array_data<T, size_type>(containers::data(temp), temp.capacity()));
 		});
 		// It is safe to skip the destructor call of m_large
 		// because we do not rely on its side-effects
 		::bounded::construct(m_small, []{ return small_t(); });
-		containers::uninitialized_relocate_no_overlap(range_view(temp.data(), temp.data() + temp.size()), m_small.data());
+		containers::uninitialized_relocate_no_overlap(temp, containers::begin(m_small));
 		BOUNDED_ASSERT(is_small());
 	}
 	
@@ -280,7 +278,7 @@ private:
 	
 	constexpr auto deallocate_large() {
 		if (is_large()) {
-			detail::deallocate_storage(detail::dynamic_array_data<T, size_type>(m_large.data(), m_large.capacity()));
+			detail::deallocate_storage(detail::dynamic_array_data<T, size_type>(containers::data(m_large), m_large.capacity()));
 		}
 	}
 	
@@ -290,7 +288,7 @@ private:
 		};
 		if (other.is_small()) {
 			make_small(m_small);
-			containers::uninitialized_relocate_no_overlap(other, m_small.data());
+			containers::uninitialized_relocate_no_overlap(other, containers::begin(m_small));
 			m_small.set_size(other.m_small.size());
 			other.m_small.set_size(0_bi);
 		} else {
