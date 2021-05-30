@@ -23,4 +23,9 @@ static_assert(containers::size(containers::take(range, 12_bi)) == 8_bi);
 constexpr auto taken = containers::take(range, 4_bi);
 static_assert(taken[3_bi] == 3);
 
+template<auto index>
+concept takeable = requires { containers::take(range, index); };
+
+static_assert(!takeable<-1_bi>);
+
 } // namespace
