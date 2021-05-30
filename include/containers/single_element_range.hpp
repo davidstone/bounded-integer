@@ -45,8 +45,19 @@ struct single_element_iterator {
 		return static_cast<T>(*m_value);
 	}
 	OPERATORS_ARROW_DEFINITIONS
-	constexpr auto is_end() const {
-		return m_is_end;
+
+	friend constexpr auto operator<=>(single_element_iterator const lhs, single_element_iterator const rhs) {
+		return lhs.m_is_end <=> rhs.m_is_end;
+	}
+	friend constexpr auto operator<=>(single_element_iterator const lhs, single_element_sentinel) {
+		return lhs.m_is_end <=> true;
+	}
+
+	friend constexpr auto operator==(single_element_iterator const lhs, single_element_iterator const rhs) -> bool {
+		return lhs.m_is_end == rhs.m_is_end;
+	}
+	friend constexpr auto operator==(single_element_iterator const lhs, single_element_sentinel) -> bool {
+		return lhs.m_is_end;
 	}
 
 	friend constexpr auto operator+(single_element_iterator lhs, offset_type<single_element_iterator> const offset) {
@@ -64,6 +75,15 @@ struct single_element_iterator {
 		}
 		return lhs;
 	}
+	friend constexpr auto operator-(single_element_iterator const lhs, single_element_iterator const rhs) {
+		return bounded::integer(lhs.m_is_end) - bounded::integer(rhs.m_is_end);
+	}
+	friend constexpr auto operator-(single_element_sentinel, single_element_iterator const rhs) {
+		return 1_bi - bounded::integer(rhs.m_is_end);
+	}
+	friend constexpr auto operator-(single_element_iterator const lhs, single_element_sentinel) {
+		return bounded::integer(lhs.m_is_end) - 1_bi;
+	}
 
 private:
 	std::remove_reference_t<T> * m_value;
@@ -72,46 +92,10 @@ private:
 template<typename T>
 single_element_iterator(T &&) -> single_element_iterator<T &&>;
 
-template<typename T>
-constexpr auto operator<=>(single_element_iterator<T> const lhs, single_element_iterator<T> const rhs) {
-	return lhs.is_end() <=> rhs.is_end();
-}
-
-template<typename T>
-constexpr auto operator<=>(single_element_iterator<T> const lhs, single_element_sentinel) {
-	return lhs.is_end() <=> true;
-}
-
-template<typename T>
-constexpr auto operator==(single_element_iterator<T> const lhs, single_element_iterator<T> const rhs) -> bool {
-	return lhs.is_end() == rhs.is_end();
-}
-
-template<typename T>
-constexpr auto operator==(single_element_iterator<T> const lhs, single_element_sentinel) -> bool {
-	return lhs.is_end();
-}
-
-template<typename T>
-constexpr auto operator-(single_element_iterator<T> const lhs, single_element_iterator<T> const rhs) {
-	return bounded::integer(lhs.is_end()) - bounded::integer(rhs.is_end());
-}
-
-template<typename T>
-constexpr auto operator-(single_element_sentinel, single_element_iterator<T> const rhs) {
-	return 1_bi - bounded::integer(rhs.is_end());
-}
-
-template<typename T>
-constexpr auto operator-(single_element_iterator<T> const lhs, single_element_sentinel) {
-	return bounded::integer(lhs.is_end()) - 1_bi;
-}
-
-}	// namespace detail
+} // namespace detail
 
 // Note: the element must outlive the range. The range stores a reference
-template<typename T>
-constexpr auto single_element_range(T && value) {
+constexpr auto single_element_range(auto && value) {
 	return range_view(detail::single_element_iterator(OPERATORS_FORWARD(value)), detail::single_element_sentinel{});
 }
 
