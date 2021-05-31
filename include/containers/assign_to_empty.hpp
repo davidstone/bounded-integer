@@ -52,7 +52,7 @@ constexpr auto assign_to_empty_or_append(Target & target, Source && source, auto
 			return value;
 		} else {
 			// TODO: This cast might be hiding an overflow bug
-			return static_cast<typename Target::size_type>(value);
+			return static_cast<range_size_t<Target>>(value);
 		}
 	};
 	if constexpr (appendable_from_capacity<Target> and reservable<Target> and size_then_use_range<Source>) {
@@ -69,7 +69,7 @@ constexpr auto assign_to_empty_or_append(Target & target, Source && source, auto
 			if constexpr (sized_range<Source>) {
 				return containers::size(source);
 			} else {
-				return static_cast<typename Target::size_type>(new_end - target_position);
+				return static_cast<range_size_t<Target>>(new_end - target_position);
 			}
 		}();
 		target.append_from_capacity(source_size);
@@ -89,7 +89,7 @@ constexpr auto assign_to_empty_or_append(Target & target, Source && source, auto
 
 inline constexpr auto exact_reserve = []<typename Container>(Container & container, auto const requested_size) {
 	// TODO: How to handle overflow here?
-	container.reserve(static_cast<typename Container::size_type>(requested_size));
+	container.reserve(static_cast<range_size_t<Container>>(requested_size));
 };
 
 constexpr auto assign_to_empty_impl(auto & target, auto && source) -> void {

@@ -7,6 +7,7 @@
 
 #include <containers/begin_end.hpp>
 #include <containers/is_range.hpp>
+#include <containers/size.hpp>
 
 #include <bounded/integer.hpp>
 
@@ -18,7 +19,7 @@ namespace containers {
 namespace detail {
 
 template<typename Range>
-concept never_empty_range = numeric_traits::min_value<typename std::remove_reference_t<Range>::size_type> > bounded::constant<0>;
+concept never_empty_range = numeric_traits::min_value<range_size_t<Range>> > bounded::constant<0>;
 
 } // namespace detail
 

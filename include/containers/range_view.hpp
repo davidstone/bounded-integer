@@ -24,11 +24,6 @@ template<typename Iterator, typename Sentinel = Iterator>
 struct range_view {
 	using value_type = iter_value_t<Iterator>;
 
-	using size_type = bounded::integer<
-		0,
-		bounded::builtin_max_value<iter_difference_t<Iterator>>
-	>;
-	
 	using const_iterator = Iterator;
 	using iterator = Iterator;
 

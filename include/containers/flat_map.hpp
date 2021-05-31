@@ -113,7 +113,6 @@ public:
 	using value_type = range_value_t<Container>;
 	using key_type = typename value_type::key_type;
 	using mapped_type = typename value_type::mapped_type;
-	using size_type = typename Container::size_type;
 
 	using const_iterator = typename Container::const_iterator;
 	using iterator = typename Container::iterator;
@@ -260,7 +259,7 @@ public:
 	constexpr auto capacity() const {
 		return m_container.capacity();
 	}
-	constexpr auto reserve(size_type const new_capacity) {
+	constexpr auto reserve(range_size_t<Container> const new_capacity) {
 		return m_container.reserve(new_capacity);
 	}
 	
@@ -340,7 +339,6 @@ public:
 	using typename base::key_type;
 	using typename base::mapped_type;
 	using typename base::value_type;
-	using typename base::size_type;
 	using typename base::const_iterator;
 	using typename base::iterator;
 
@@ -379,7 +377,6 @@ public:
 	using typename base::key_type;
 	using typename base::mapped_type;
 	using typename base::value_type;
-	using typename base::size_type;
 	using typename base::const_iterator;
 	using typename base::iterator;
 

@@ -100,8 +100,6 @@ private:
 	[[no_unique_address]] Function m_generator;
 
 public:
-	using size_type = Size;
-
 	constexpr generate_n(Size const size, Function generator):
 		m_size(size),
 		m_generator(std::move(generator))
@@ -109,10 +107,10 @@ public:
 	}
 
 	constexpr auto begin() const requires std::is_invocable_v<Function const &> {
-		return generate_n_iterator<bounded::integer<0, bounded::builtin_max_value<size_type>>, Function const>(m_size, m_generator);
+		return generate_n_iterator<bounded::integer<0, bounded::builtin_max_value<Size>>, Function const>(m_size, m_generator);
 	}
 	constexpr auto begin() {
-		return generate_n_iterator<bounded::integer<0, bounded::builtin_max_value<size_type>>, Function>(m_size, m_generator);
+		return generate_n_iterator<bounded::integer<0, bounded::builtin_max_value<Size>>, Function>(m_size, m_generator);
 	}
 	static constexpr auto end() {
 		return generate_sentinel();

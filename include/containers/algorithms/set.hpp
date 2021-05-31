@@ -160,10 +160,6 @@ public:
 		decltype(containers::begin(std::declval<Range2 const &>()))
 	>;
 	using value_type = iter_value_t<iterator>;
-	using size_type = bounded::integer<
-		0,
-		bounded::builtin_max_value<typename iterator::difference_type>
-	>;
 
 	template<typename R1, typename R2>
 	constexpr set_intersection_pair(R1 && range1, R2 && range2, Compare compare = Compare()):

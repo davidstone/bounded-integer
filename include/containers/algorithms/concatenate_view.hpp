@@ -131,7 +131,7 @@ struct concatenate_view_iterator {
 			auto remaining_offset = bounded::integer<0, bounded::builtin_max_value<Offset>>(offset);
 			auto specific_range = [&](auto const index) {
 				auto const range = lhs.m_range_views[index];
-				using size_type = typename decltype(range)::size_type;
+				using size_type = range_size_t<decltype(range)>;
 				auto const added_size = size_type(bounded::min(containers::size(range), remaining_offset));
 				remaining_offset -= added_size;
 				return range_view(containers::begin(range) + size_type(added_size), containers::end(range));
@@ -231,10 +231,6 @@ struct concatenate_view {
 	using const_iterator = concatenate_view_iterator<decltype(range_view(std::declval<Ranges const &>()))...>;
 	using iterator = concatenate_view_iterator<decltype(range_view(std::declval<Ranges &>()))...>;
 	using value_type = iter_value_t<iterator>;
-	using size_type = bounded::integer<
-		0,
-		bounded::builtin_max_value<typename iterator::difference_type>
-	>;
 	
 	constexpr concatenate_view(Ranges && ... ranges):
 		m_ranges(OPERATORS_FORWARD(ranges)...)

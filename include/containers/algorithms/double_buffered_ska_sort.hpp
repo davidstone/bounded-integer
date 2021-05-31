@@ -204,7 +204,7 @@ constexpr auto double_buffered_sort_impl(range auto & source, range auto & buffe
 
 struct double_buffered_ska_sort_t {
 	constexpr auto operator()(range auto && source, range auto && buffer, auto const & extract_key) const -> bool {
-		if constexpr (numeric_traits::max_value<typename std::remove_reference_t<decltype(source)>::size_type> <= bounded::constant<1>) {
+		if constexpr (numeric_traits::max_value<range_size_t<decltype(source)>> <= bounded::constant<1>) {
 			return false;
 		} else {
 			// TODO: Allow buffer to be larger, return range_view instead of bool

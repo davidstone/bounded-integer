@@ -123,7 +123,7 @@ constexpr auto concatenate(auto && ... ranges) {
 	}
 
 	Result result;
-	result.reserve(static_cast<typename Result::size_type>(total_size));
+	result.reserve(static_cast<range_size_t<Result>>(total_size));
 	(..., ::containers::append(result, OPERATORS_FORWARD(ranges)));
 	return result;
 }

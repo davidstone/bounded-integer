@@ -131,7 +131,7 @@ void test_performance(std::size_t const loop_count) {
 		static std::uniform_int_distribution<std::uint32_t> distribution;
 		using container_type = containers::vector<value_type<Thing<key_size>, Thing<value_size>>>;
 		auto source = container_type();
-		source.reserve(bounded::check_in_range<typename container_type::size_type>(bounded::integer(size)));
+		source.reserve(bounded::check_in_range<containers::range_size_t<container_type>>(bounded::integer(size)));
 		for (std::size_t n = 0; n != size; ++n) {
 			::containers::emplace_back(source, distribution(engine), distribution(engine));
 		}

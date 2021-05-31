@@ -109,7 +109,6 @@ struct integer_range {
 	using const_iterator = iterator;
 
 	using value_type = iter_value_t<iterator>;
-	using size_type = bounded::integer<0, bounded::builtin_max_value<iter_difference_t<iterator>>>;
 	
 	// If `last` is not reachable by adding `step` to `first` some number of
 	// times, the behavior is undefined.

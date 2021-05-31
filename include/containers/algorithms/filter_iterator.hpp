@@ -117,10 +117,6 @@ public:
 	));
 
 	using value_type = range_value_t<Range>;
-	using size_type = bounded::integer<
-		0,
-		bounded::builtin_max_value<iter_difference_t<iterator>>
-	>;
 
 	constexpr filter(Range && range, UnaryPredicate predicate):
 		m_range(OPERATORS_FORWARD(range)),

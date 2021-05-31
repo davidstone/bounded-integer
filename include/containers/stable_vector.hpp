@@ -27,7 +27,6 @@ namespace containers {
 template<typename T, std::size_t capacity_>
 struct stable_vector : private lexicographical_comparison::base {
 	using value_type = T;
-	using size_type = bounded::integer<0, bounded::normalize<capacity_>>;
 	
 	using const_iterator = contiguous_iterator<value_type const, static_cast<std::ptrdiff_t>(capacity_)>;
 	using iterator = contiguous_iterator<value_type, static_cast<std::ptrdiff_t>(capacity_)>;
@@ -112,7 +111,7 @@ struct stable_vector : private lexicographical_comparison::base {
 private:
 	using storage_type = uninitialized_dynamic_array<T, decltype(capacity())>;
 	storage_type m_storage{capacity()};
-	[[no_unique_address]] size_type m_size = 0_bi;
+	[[no_unique_address]] bounded::integer<0, bounded::normalize<capacity_>> m_size = 0_bi;
 };
 
 } // namespace containers

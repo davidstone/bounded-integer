@@ -94,10 +94,9 @@ struct small_buffer_optimized_vector : private lexicographical_comparison::base 
 	};
 
 	struct large_t {
-		using size_type = small_buffer_optimized_vector::size_type;
 		using capacity_type = bounded::integer<
 			bounded::normalize<small_t::capacity() + bounded::constant<1>>,
-			bounded::builtin_max_value<size_type>
+			bounded::normalize<max_size>
 		>;
 
 		// m_force_large exists just to be a bit that's always 1.
@@ -221,13 +220,13 @@ struct small_buffer_optimized_vector : private lexicographical_comparison::base 
 	constexpr void append_from_capacity(auto const count) {
 		auto const new_size = size() + count;
 		if (is_small()) {
-			if constexpr (bounded::constructible_from<typename small_t::size_type, decltype(new_size)>) {
-				m_small.set_size(static_cast<typename small_t::size_type>(new_size));
+			if constexpr (bounded::constructible_from<range_size_t<small_t>, decltype(new_size)>) {
+				m_small.set_size(static_cast<range_size_t<small_t>>(new_size));
 			} else {
 				bounded::assert_or_assume_unreachable();
 			}
 		} else {
-			m_large.set_size(static_cast<typename large_t::size_type>(new_size));
+			m_large.set_size(static_cast<range_size_t<large_t>>(new_size));
 		}
 		BOUNDED_ASSERT(size() == new_size);
 	}

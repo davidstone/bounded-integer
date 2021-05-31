@@ -24,7 +24,7 @@ constexpr bool test() {
 	
 	auto make_reusable_container = [&]{
 		auto result = Container();
-		result.reserve(static_cast<Container::size_type>(containers::size(a) + containers::size(b) + containers::size(c)));
+		result.reserve(static_cast<containers::range_size_t<Container>>(containers::size(a) + containers::size(b) + containers::size(c)));
 		return result;
 	};
 	auto const d = make_reusable_container();

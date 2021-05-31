@@ -34,7 +34,7 @@ struct member_size {
 };
 static_assert(containers::size(member_size()) == 2);
 
-struct member_end {
+struct member_size_type {
 	using size_type = int;
 	constexpr auto begin() const -> int const * {
 		return a;
@@ -43,6 +43,16 @@ struct member_end {
 		return begin() + 3;
 	}
 };
-static_assert(containers::size(member_end()) == 3);
+static_assert(containers::size(member_size_type()) == 3);
+
+struct member_begin_end {
+	constexpr auto begin() const -> int const * {
+		return a;
+	}
+	constexpr auto end() const -> int const * {
+		return begin() + 4;
+	}
+};
+static_assert(containers::size(member_begin_end()) == 4);
 
 } // namespace

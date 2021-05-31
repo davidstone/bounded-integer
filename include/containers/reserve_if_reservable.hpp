@@ -16,10 +16,10 @@ namespace containers {
 namespace detail {
 
 template<typename Container>
-concept reservable = requires(Container & container, typename Container::size_type size) { container.reserve(size); };
+concept reservable = requires(Container & container, range_size_t<Container> size) { container.reserve(size); };
 
 template<typename Container>
-constexpr void reserve_if_reservable(Container & container, typename Container::size_type const size) {
+constexpr void reserve_if_reservable(Container & container, range_size_t<Container> const size) {
 	if constexpr (reservable<Container>) {
 		container.reserve(size);
 	}

@@ -25,7 +25,6 @@ struct string : private small_buffer_optimized_vector<char, 0> {
 	using base = small_buffer_optimized_vector<char, 0>;
 public:
 	using value_type = char;
-	using base::size_type;
 	using base::const_iterator;
 	using base::iterator;
 	
@@ -57,7 +56,7 @@ public:
 	using base::append_from_capacity;
 	
 	constexpr operator std::string_view() const {
-		return std::string_view(data(*this), static_cast<std::string_view::size_type>(size()));
+		return std::string_view(data(*this), static_cast<range_size_t<std::string_view>>(size()));
 	}
 	friend constexpr auto operator<=>(string const & lhs, std::string_view const rhs) {
 		return ::containers::lexicographical_compare_3way(lhs, rhs);
@@ -75,7 +74,7 @@ public:
 		if (!sentry) {
 			return stream;
 		}
-		constexpr auto max_width = numeric_traits::max_value<string::size_type>;
+		constexpr auto max_width = numeric_traits::max_value<range_size_t<string>>;
 		auto const width = stream.width();
 		auto const max_characters = width <= 0 ? max_width : bounded::clamp(bounded::integer(width), 1_bi, max_width);
 		containers::clear(str);

@@ -33,9 +33,9 @@ constexpr inline struct is_partitioned_t {
 } is_partitioned;
 
 constexpr inline struct partition_point_t {
-	constexpr auto operator()(range auto && input, auto predicate) const {
-		using size_type = decltype(containers::size(input));
-		auto count = bounded::integer<0, bounded::builtin_max_value<size_type>>(containers::size(input));
+	template<range Input>
+	constexpr auto operator()(Input && input, auto predicate) const {
+		auto count = bounded::integer<0, bounded::builtin_max_value<range_size_t<Input>>>(containers::size(input));
 		auto first = containers::begin(input);
 		if constexpr (numeric_traits::max_value<decltype(count)> == bounded::constant<0>) {
 			return first;

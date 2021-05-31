@@ -5,6 +5,8 @@
 
 #pragma once
 
+#include <containers/size.hpp>
+
 #include <bounded/integer.hpp>
 
 #include <numeric_traits/min_max_value.hpp>
@@ -31,6 +33,6 @@ struct size_type_to_index_type<Size> {
 }
 
 template<typename T>
-using index_type = typename detail::size_type_to_index_type<typename std::decay_t<T>::size_type>::type;
+using index_type = typename detail::size_type_to_index_type<range_size_t<T>>::type;
 
 }	// namespace containers

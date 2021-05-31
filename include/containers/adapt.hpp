@@ -55,10 +55,6 @@ public:
 		std::declval<adapt_iterator_traits>()
 	));
 	using value_type = iter_value_t<iterator>;
-	using size_type = bounded::integer<
-		0,
-		bounded::builtin_max_value<iter_difference_t<iterator>>
-	>;
 	
 	constexpr adapt(Range && range, Traits traits):
 		m_range(OPERATORS_FORWARD(range)),

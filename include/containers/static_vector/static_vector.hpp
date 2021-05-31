@@ -32,10 +32,6 @@ namespace detail {
 template<typename T, std::size_t capacity_, bool = std::is_trivially_destructible_v<T>>
 struct static_vector_data : private lexicographical_comparison::base {
 	using value_type = T;
-	using size_type = bounded::integer<
-		0,
-		bounded::normalize<capacity_>
-	>;
 	using const_iterator = contiguous_iterator<T const, static_cast<std::ptrdiff_t>(capacity_)>;
 	using iterator = contiguous_iterator<T, static_cast<std::ptrdiff_t>(capacity_)>;
 
@@ -103,7 +99,7 @@ struct static_vector_data : private lexicographical_comparison::base {
 	}
 
 	array<trivial_storage<T>, capacity_> m_storage = {};
-	size_type m_size = 0_bi;
+	bounded::integer<0, bounded::normalize<capacity_>> m_size = 0_bi;
 };
 
 template<typename T, std::size_t capacity>
@@ -135,7 +131,6 @@ private:
 public:
 
 	using typename base::value_type;
-	using typename base::size_type;
 	using typename base::const_iterator;
 	using typename base::iterator;
 
