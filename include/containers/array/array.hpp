@@ -100,4 +100,7 @@ struct array {
 template<typename... Args>
 array(Args && ...) -> array<std::common_type_t<std::decay_t<Args>...>, sizeof...(Args)>;
 
+template<typename T, std::size_t size>
+array(c_array<T, size> &&) -> array<T, size>;
+
 }	// namespace containers
