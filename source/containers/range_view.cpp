@@ -4,3 +4,13 @@
 // http://www.boost.org/LICENSE_1_0.txt)
 
 #include <containers/range_view.hpp>
+
+#include <containers/array/array.hpp>
+#include <containers/algorithms/compare.hpp>
+
+namespace {
+
+constexpr auto a = containers::array({0, 1, 2, 3, 4});
+static_assert(containers::equal(a, containers::range_view(a)));
+
+} // namespace
