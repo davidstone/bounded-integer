@@ -4,3 +4,24 @@
 // http://www.boost.org/LICENSE_1_0.txt)
 
 #include <containers/push_back.hpp>
+
+#include <containers/vector.hpp>
+
+#include "../test_int.hpp"
+
+namespace {
+
+static_assert([]{
+	auto v = containers::vector<bounded::test_int>();
+	containers::push_back(v, 0);
+	BOUNDED_TEST(v == containers::vector<bounded::test_int>({0}));
+	containers::push_back(v, 1);
+	BOUNDED_TEST(v == containers::vector<bounded::test_int>({0, 1}));
+	containers::push_back(v, 2);
+	BOUNDED_TEST(v == containers::vector<bounded::test_int>({0, 1, 2}));
+	containers::push_back(v, 3);
+	BOUNDED_TEST(v == containers::vector<bounded::test_int>({0, 1, 2, 3}));
+	return true;
+}());
+
+} // namespace
