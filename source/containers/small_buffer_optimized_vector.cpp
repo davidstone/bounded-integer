@@ -16,7 +16,11 @@
 
 #include "../test_assert.hpp"
 
+#include "test_sequence_container.hpp"
+
 namespace {
+
+static_assert(containers_test::test_sequence_container<containers::small_buffer_optimized_vector<int, 40>>());
 
 using namespace bounded::literal;
 

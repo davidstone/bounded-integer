@@ -41,8 +41,12 @@ constexpr auto move_construction() -> bool {
 }
 static_assert(move_construction());
 
-static_assert(containers_test::run_self_move_assignment<container<10>>(0_bi));
-static_assert(containers_test::run_self_move_assignment<container<10>>(1_bi));
-static_assert(containers_test::run_self_move_assignment<container<0>>(0_bi));
+static_assert(containers_test::test_self_move_assignment<container<10>>(0_bi));
+static_assert(containers_test::test_self_move_assignment<container<10>>(1_bi));
+static_assert(containers_test::test_self_move_assignment<container<0>>(0_bi));
+
+static_assert(containers_test::test_self_swap<container<10>>(0_bi));
+static_assert(containers_test::test_self_swap<container<10>>(1_bi));
+static_assert(containers_test::test_self_swap<container<0>>(0_bi));
 
 } // namespace

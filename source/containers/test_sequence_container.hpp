@@ -30,7 +30,6 @@ constexpr bool test_sequence_container_default_constructed_empty() {
 	BOUNDED_TEST(containers::begin(default_constructed) == containers::end(default_constructed));
 	BOUNDED_TEST(containers::end(default_constructed) == containers::begin(default_constructed));
 	BOUNDED_TEST(containers::end(default_constructed) == containers::end(default_constructed));
-	BOUNDED_TEST(containers::is_empty(default_constructed));
 	BOUNDED_TEST(containers::size(default_constructed) == 0_bi);
 	BOUNDED_TEST(default_constructed == default_constructed);
 	BOUNDED_TEST(default_constructed == Container());
@@ -49,13 +48,11 @@ constexpr bool test_range_constructor(auto const & source) {
 	return true;
 }
 
-constexpr void validate_range(auto const & container) {
-	for (auto const & value : container) {
-		BOUNDED_TEST(value == value);
-	}
+constexpr void validate_range(auto const & container, auto const & initializer) {
+	BOUNDED_TEST(containers::equal(container, initializer));
 }
 template<typename T, typename Capacity>
-constexpr void validate_range(containers::uninitialized_dynamic_array<T, Capacity> const & container) {
+constexpr void validate_range(containers::uninitialized_dynamic_array<T, Capacity> const & container, auto const &) {
 	auto const last = container.data() + container.capacity();
 	for (auto ptr = container.data(); ptr != last; ++ptr) {
 	}
@@ -64,63 +61,32 @@ constexpr void validate_range(containers::uninitialized_dynamic_array<T, Capacit
 // Self move assignment should have well-defined effects, regardless of whether
 // the source is moved from.
 template<typename Container>
-constexpr void run_self_move_assignment_from_not_moved_from(auto const & initializer) {
+constexpr auto test_self_move_assignment(auto const & initializer) {
 	auto a = Container(initializer);
 	a = std::move(a);
-	validate_range(a);
-}
+	a = Container(initializer);
+	validate_range(a, initializer);
 
-template<typename Container>
-constexpr void run_self_move_assignment_from_moved_from(auto const & initializer) {
-	auto a = Container(initializer);
-	auto b = std::move(a);
+	[[maybe_unused]] auto b = std::move(a);
 	a = std::move(a);
-}
 
-template<typename Container>
-constexpr bool run_self_move_assignment(auto const & initializer) {
-	run_self_move_assignment_from_not_moved_from<Container>(initializer);
-	run_self_move_assignment_from_moved_from<Container>(initializer);
 	return true;
 }
 
 template<typename Container>
-constexpr bool test_move_special_members(auto const & initializer) {
-	run_self_move_assignment<Container>(initializer);
-
-	auto const container = Container(initializer);
-
+constexpr auto test_self_swap(auto const & initializer) {
 	auto a = Container(initializer);
-	BOUNDED_TEST(container == a);
-
-	auto b = std::move(a);
-	BOUNDED_TEST(container == b);
-
-	a = b;
-	BOUNDED_TEST(container == a);
-	BOUNDED_TEST(container == b);
-
-	b = std::move(a);
-	BOUNDED_TEST(container == b);
-
-	a = container;
-	BOUNDED_TEST(container == a);
-
 	using std::swap;
 	swap(a, a);
-	BOUNDED_TEST(container == a);
-
-	a = {};
-	BOUNDED_TEST(a == Container());
-
-	swap(a, b);
-	BOUNDED_TEST(container == a);
-	BOUNDED_TEST(b == Container());
+	validate_range(a, initializer);
 	return true;
 }
 
 template<typename Container>
 constexpr bool test_special_members(auto const & initializer) {
+	test_self_move_assignment<Container>(initializer);
+	test_self_swap<Container>(initializer);
+
 	auto const container = Container(initializer);
 
 	auto a = container;
@@ -129,9 +95,6 @@ constexpr bool test_special_members(auto const & initializer) {
 	auto b = std::move(a);
 	BOUNDED_TEST(container == b);
 
-	// Self move assignment should have well-defined effects
-	a = std::move(a);
-
 	a = b;
 	BOUNDED_TEST(container == a);
 	BOUNDED_TEST(container == b);
@@ -142,13 +105,10 @@ constexpr bool test_special_members(auto const & initializer) {
 	a = container;
 	BOUNDED_TEST(container == a);
 
-	using std::swap;
-	swap(a, a);
-	BOUNDED_TEST(container == a);
-
 	a = {};
 	BOUNDED_TEST(a == Container());
 
+	using std::swap;
 	swap(a, b);
 	BOUNDED_TEST(container == a);
 	BOUNDED_TEST(b == Container());

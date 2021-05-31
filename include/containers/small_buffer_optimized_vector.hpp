@@ -135,9 +135,6 @@ struct small_buffer_optimized_vector : private lexicographical_comparison::base 
 		detail::dynamic_array_data<T, size_type> m_data;
 	};
 	
-	static_assert(std::is_nothrow_move_constructible_v<value_type>);
-	static_assert(std::is_nothrow_move_assignable_v<value_type>);
-
 	static_assert(
 		numeric_traits::max_value<size_type> <= bounded::constant<(1ULL << (CHAR_BIT * sizeof(value_type *) - 1)) - 1>,
 		"Maximum possible size is too large -- would use bit reserved for small-buffer optimization."
@@ -165,6 +162,11 @@ struct small_buffer_optimized_vector : private lexicographical_comparison::base 
 		small_buffer_optimized_vector()
 	{
 		::containers::assign_to_empty(*this, std::move(init));
+	}
+	template<std::same_as<empty_c_array_parameter> Source = empty_c_array_parameter>
+	constexpr small_buffer_optimized_vector(Source):
+		small_buffer_optimized_vector()
+	{
 	}
 
 	constexpr small_buffer_optimized_vector(small_buffer_optimized_vector const & other):
