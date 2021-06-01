@@ -11,10 +11,13 @@
 
 #include <bounded/integer.hpp>
 
+#include <type_traits>
+
 namespace containers {
 namespace detail {
 
-constexpr auto mutable_iterator(range auto & r, iterator auto const it) {
+template<range Range> requires(!std::is_const_v<Range>)
+constexpr auto mutable_iterator(Range & r, iterator auto const it) {
 	return containers::begin(r) + (it - containers::begin(r));
 }
 
