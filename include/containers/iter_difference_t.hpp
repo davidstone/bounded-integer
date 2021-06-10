@@ -8,26 +8,32 @@
 #include <type_traits>
 
 namespace containers {
-
 namespace detail {
 
-template<typename Iterator>
+template<typename T>
 struct iter_difference_t_impl {
-	using type = typename Iterator::difference_type;
 };
 
-template<typename Iterator>
-concept subtractable = requires(Iterator it) { it - it; };
+template<typename T>
+concept has_difference_type = requires { typename T::difference_type; };
 
-template<subtractable Iterator>
-struct iter_difference_t_impl<Iterator> {
-	using type = decltype(std::declval<Iterator>() - std::declval<Iterator>());
-private:
-	static void check() {
-		if constexpr (requires { typename Iterator::difference_type; }) {
-			static_assert(std::is_same_v<typename Iterator::difference_type, type>);
-		}
-	}
+template<typename Iterator>
+concept subtractable = requires(Iterator const it) { it - it; };
+
+template<typename T> requires has_difference_type<T> and subtractable<T>
+struct iter_difference_t_impl<T> {
+	static_assert(std::is_same_v<decltype(std::declval<T const &>() - std::declval<T const &>()), typename T::difference_type>);
+	using type = typename T::difference_type;
+};
+
+template<has_difference_type T>
+struct iter_difference_t_impl<T> {
+	using type = typename T::difference_type;
+};
+
+template<subtractable T>
+struct iter_difference_t_impl<T> {
+	using type = decltype(std::declval<T const &>() - std::declval<T const &>());
 };
 
 } // namespace detail
