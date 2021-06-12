@@ -12,44 +12,33 @@
 
 namespace bounded::detail {
 
-template<typename Limited>
-constexpr auto safe_extreme(auto const pick_lhs, auto const lhs_, auto const rhs_) {
-	auto normalized = [](auto const value) {
-		using normalized_t = std::conditional_t<
-			signed_builtin<std::decay_t<decltype(value)>>,
-			max_signed_t,
-			max_unsigned_t
-		>;
-		return static_cast<normalized_t>(value);
-	};
-	auto const lhs = normalized(lhs_);
-	auto const rhs = normalized(rhs_);
-	using result_type = std::conditional_t<std::is_same_v<decltype(lhs), decltype(rhs)>, decltype(lhs), Limited>;
-	return (pick_lhs(bounded::detail::safe_compare(lhs, rhs))) ?
-		static_cast<result_type>(lhs) :
-		static_cast<result_type>(rhs);
+template<typename LHS, typename RHS>
+constexpr auto safe_min(LHS const lhs, RHS const rhs) {
+	using result_t = std::conditional_t<unsigned_builtin<LHS> and unsigned_builtin<RHS>, max_unsigned_t, max_signed_t>;
+	return ::bounded::detail::safe_compare(lhs, rhs) <= 0 ?
+		static_cast<result_t>(lhs) :
+		static_cast<result_t>(rhs);
 }
 
-template<typename Limited>
-constexpr auto safe_extreme(auto const pick_lhs, auto const lhs, auto const rhs, auto const ... rest) {
-	return bounded::detail::safe_extreme<Limited>(
-		pick_lhs,
-		bounded::detail::safe_extreme<Limited>(pick_lhs, lhs, rhs),
-		rest...
+constexpr auto safe_min(auto const arg0, auto const arg1, auto const ... args) {
+	return ::bounded::detail::safe_min(
+		::bounded::detail::safe_min(arg0, arg1),
+		args...
 	);
 }
 
-constexpr auto safe_min(auto... values) {
-	return bounded::detail::safe_extreme<max_signed_t>(
-		[](auto const cmp) { return cmp <= 0; },
-		values...
-	);
+template<typename LHS, typename RHS>
+constexpr auto safe_max(LHS const lhs, RHS const rhs) {
+	using result_t = std::conditional_t<signed_builtin<LHS> and signed_builtin<RHS>, max_signed_t, max_unsigned_t>;
+	return ::bounded::detail::safe_compare(lhs, rhs) > 0 ?
+		static_cast<result_t>(lhs) :
+		static_cast<result_t>(rhs);
 }
 
-constexpr auto safe_max(auto... values) {
-	return bounded::detail::safe_extreme<max_unsigned_t>(
-		[](auto const cmp) { return cmp > 0; },
-		values...
+constexpr auto safe_max(auto const arg0, auto const arg1, auto const ... args) {
+	return ::bounded::detail::safe_max(
+		::bounded::detail::safe_max(arg0, arg1),
+		args...
 	);
 }
 
