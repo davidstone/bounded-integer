@@ -24,14 +24,14 @@ constexpr auto pow_impl(max_unsigned_t base, max_unsigned_t exponent) {
 	while (exponent % 2 == 0) {
 		auto const original_base = base;
 		base *= base;
-		BOUNDED_ASSERT(base / original_base == original_base);
+		BOUNDED_ASSERT(original_base == 0 or base / original_base == original_base);
 		exponent /= 2;
 	}
 	auto result = base;
 	for (auto n = max_unsigned_t(0); n != exponent - 1; ++n) {
 		auto const original_result = result;
 		result *= base;
-		BOUNDED_ASSERT(result / base == original_result);
+		BOUNDED_ASSERT(base == 0 or result / base == original_result);
 	}
 	return result;
 }

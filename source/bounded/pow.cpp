@@ -10,6 +10,9 @@
 namespace {
 
 static_assert(bounded::pow(bounded::constant<0>, bounded::constant<1>) == bounded::constant<0>);
+static_assert(bounded::pow(bounded::constant<0>, bounded::constant<2>) == bounded::constant<0>);
+static_assert(bounded::pow(bounded::constant<0>, bounded::constant<3>) == bounded::constant<0>);
+static_assert(bounded::pow(bounded::constant<0>, bounded::constant<4>) == bounded::constant<0>);
 static_assert(bounded::pow(bounded::constant<1>, bounded::constant<1>) == bounded::constant<1>);
 static_assert(bounded::pow(bounded::constant<123>, bounded::constant<1>) == bounded::constant<123>);
 static_assert(bounded::pow(bounded::constant<9235234>, bounded::constant<0>) == bounded::constant<1>);
