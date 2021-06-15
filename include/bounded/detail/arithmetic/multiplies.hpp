@@ -19,21 +19,35 @@ namespace detail {
 template<auto lhs, auto rhs>
 constexpr auto safer_multiply(constant_t<lhs> const &, constant_t<rhs> const &) {
 	constexpr auto negative = (lhs < 0) xor (rhs < 0);
-	constexpr auto positive_lhs = safe_abs(lhs);
-	constexpr auto positive_rhs = safe_abs(rhs);
-	constexpr auto positive_result = positive_lhs * positive_rhs;
-	static_assert(
-		lhs == 0 or positive_result / positive_lhs == positive_rhs,
-		"Multiplication requires a larger type than currently supported."
-	);
+	constexpr auto ulhs = static_cast<max_unsigned_t>(lhs);
+	constexpr auto urhs = static_cast<max_unsigned_t>(rhs);
+	constexpr auto modulo_equivalent_result = ulhs * urhs;
 	if constexpr (negative) {
-		static_assert(
-			positive_result <= -static_cast<max_unsigned_t>(numeric_traits::min_value<max_signed_t>),
-			"Multiplication requires a larger type than currently supported."
-		);
-		return static_cast<max_signed_t>(-positive_result);
+		if constexpr (lhs > 0) {
+			static_assert(
+				-modulo_equivalent_result / ulhs == -urhs,
+				"Multiplication requires a larger type than currently supported."
+			);
+		} else if constexpr (rhs > 0) {
+			static_assert(
+				-modulo_equivalent_result / urhs == -ulhs,
+				"Multiplication requires a larger type than currently supported."
+			);
+		}
+		return static_cast<max_signed_t>(modulo_equivalent_result);
 	} else {
-		return positive_result;
+		if constexpr (lhs > 0) {
+			static_assert(
+				modulo_equivalent_result / ulhs == urhs,
+				"Multiplication requires a larger type than currently supported."
+			);
+		} else if constexpr (lhs < 0) {
+			static_assert(
+				modulo_equivalent_result / -ulhs == -urhs,
+				"Multiplication requires a larger type than currently supported."
+			);
+		}
+		return modulo_equivalent_result;
 	}
 }
 
