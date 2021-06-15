@@ -6,6 +6,7 @@
 #include <bounded/detail/log.hpp>
 #include <bounded/detail/comparison_mixed.hpp>
 #include <bounded/detail/class.hpp>
+#include <bounded/unreachable.hpp>
 
 #include <numeric_traits/min_max_value.hpp>
 
@@ -34,8 +35,7 @@ constexpr auto test_log(auto const value, bounded::constant_t<2>) {
 		case numeric_traits::max_value<bounded::detail::int128_t>: return 126;
 		case numeric_traits::max_value<bounded::detail::uint128_t>: return 127;
 #endif
-		// doesn't matter what we throw, compilation error
-		default: throw 0;
+		default: bounded::unreachable();
 	}
 }
 
@@ -62,8 +62,7 @@ constexpr auto test_log(auto const value, bounded::constant_t<10>) {
 		case numeric_traits::max_value<bounded::detail::int128_t>: return 38;
 		case numeric_traits::max_value<bounded::detail::uint128_t>: return 38;
 #endif
-		// doesn't matter what we throw, compilation error
-		default: throw 0;
+		default: bounded::unreachable();
 	}
 }
 
