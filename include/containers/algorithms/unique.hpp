@@ -6,6 +6,7 @@
 #pragma once
 
 #include <containers/algorithms/find.hpp>
+#include <containers/algorithms/is_sorted.hpp>
 #include <containers/algorithms/negate.hpp>
 #include <containers/algorithms/sort.hpp>
 #include <containers/begin_end.hpp>

@@ -7,6 +7,7 @@
 
 #include <containers/algorithms/binary_search.hpp>
 #include <containers/algorithms/erase.hpp>
+#include <containers/algorithms/is_sorted.hpp>
 #include <containers/algorithms/keyed_binary_search.hpp>
 #include <containers/algorithms/negate.hpp>
 #include <containers/algorithms/ska_sort.hpp>

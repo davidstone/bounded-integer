@@ -6,6 +6,7 @@
 #pragma once
 
 #include <containers/algorithms/advance.hpp>
+#include <containers/algorithms/is_sorted.hpp>
 #include <containers/begin_end.hpp>
 #include <containers/iter_difference_t.hpp>
 #include <containers/iter_value_t.hpp>

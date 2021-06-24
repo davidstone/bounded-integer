@@ -3,6 +3,7 @@
 // (See accompanying file LICENSE_1_0.txt or copy at
 // http://www.boost.org/LICENSE_1_0.txt)
 
+#include <containers/algorithms/is_sorted.hpp>
 #include <containers/algorithms/unique.hpp>
 
 #include <containers/algorithms/erase.hpp>
@@ -26,8 +27,8 @@ constexpr void test_unique_copy_less(Container const & source, Container const &
 }
 
 constexpr void test_unique_less(Container source, Container const & expected) {
-	BOUNDED_TEST(std::is_sorted(begin(source), end(source)));
-	BOUNDED_TEST(std::is_sorted(begin(expected), end(expected)));
+	BOUNDED_TEST(containers::is_sorted(source));
+	BOUNDED_TEST(containers::is_sorted(expected));
 	test_unique_copy_less(source, expected);
 	test_unique_copy_less(std::move(source), expected);
 }
@@ -51,8 +52,8 @@ constexpr void test_unique_inplace_merge(Container v, Container const & other, C
 }
 
 constexpr void test_unique_merge(Container v, Container const & other, Container const & expected) {
-	BOUNDED_TEST(std::is_sorted(begin(v), end(v)));
-	BOUNDED_TEST(std::is_sorted(begin(other), end(other)));
+	BOUNDED_TEST(containers::is_sorted(v));
+	BOUNDED_TEST(containers::is_sorted(other));
 	test_unique_merge_copy(v, other, expected);
 	test_unique_inplace_merge(std::move(v), other, expected);
 }

@@ -5,6 +5,7 @@
 
 #include <containers/to_radix_sort_key.hpp>
 
+#include <containers/algorithms/is_sorted.hpp>
 #include <containers/algorithms/sort.hpp>
 
 #include <containers/array/array.hpp>

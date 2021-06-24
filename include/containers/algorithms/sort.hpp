@@ -13,10 +13,8 @@
 #include <containers/legacy_iterator.hpp>
 #include <containers/range_view.hpp>
 
-#include <operators/forward.hpp>
-#include <bounded/integer.hpp>
-
 #include <algorithm>
+#include <functional>
 
 namespace containers {
 
@@ -77,24 +75,4 @@ constexpr inline struct sort_t {
 	}
 } sort;
 
-constexpr inline struct is_sorted_t {
-	constexpr bool operator()(range auto && to_sort, auto cmp) const {
-		auto first = containers::begin(to_sort);
-		auto const last = containers::end(to_sort);
-		if (first != last) {
-			for (auto next = containers::next(first); next != last; ++next) {
-				if (cmp(*next, *first)) {
-					return false;
-				}
-				first = next;
-			}
-		}
-		return true;
-	}
-	constexpr bool operator()(range auto && to_sort) const {
-		return operator()(to_sort, std::less{});
-	}
-} is_sorted;
-
-
-}	// namespace containers
+} // namespace containers
