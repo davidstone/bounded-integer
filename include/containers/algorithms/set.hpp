@@ -170,6 +170,12 @@ public:
 			std::move(compare)
 		}
 	{
+		if constexpr (forward_range<Range1>) {
+			BOUNDED_ASSERT(is_sorted(m_members.range1, m_members.compare));
+		}
+		if constexpr (forward_range<Range2>) {
+			BOUNDED_ASSERT(is_sorted(m_members.range2, m_members.compare));
+		}
 	}
 	
 	constexpr auto begin() const & {
