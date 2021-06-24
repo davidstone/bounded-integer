@@ -6,7 +6,6 @@
 #include <containers/algorithms/sort.hpp>
 #include <containers/algorithms/is_sorted.hpp>
 #include <containers/array/array.hpp>
-#include <containers/static_vector/static_vector.hpp>
 
 namespace {
 
@@ -17,8 +16,6 @@ constexpr auto verify_sort(auto && range_) {
 	};
 	return impl(range_, std::less{}) and impl(range_, std::greater{});
 }
-
-static_assert(verify_sort(containers::static_vector<int, 1>{}));
 
 static_assert(verify_sort(containers::array{1}));
 
