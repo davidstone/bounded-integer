@@ -18,6 +18,7 @@
 #include <operators/forward.hpp>
 
 #include <concepts>
+#include <span>
 #include <type_traits>
 #include <utility>
 
@@ -106,6 +107,13 @@ struct stable_vector : private lexicographical_comparison::base {
 	constexpr void append_from_capacity(auto const count) {
 		BOUNDED_ASSERT(count + m_size <= capacity());
 		m_size += count;
+	}
+
+	constexpr operator std::span<T const>() const & {
+		return std::span<T const>(containers::data(*this), static_cast<std::size_t>(size()));
+	}
+	constexpr operator std::span<T>() & {
+		return std::span<T>(containers::data(*this), static_cast<std::size_t>(size()));
 	}
 
 private:

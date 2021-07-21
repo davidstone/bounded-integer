@@ -46,4 +46,14 @@ constexpr auto double_array = containers::make_array(0.0, 1.0, 2.0);
 
 static_assert(containers::sum(double_array) == (0.0 + 1.0 + 2.0));
 
+static_assert(std::is_convertible_v<containers::array<int, 3> const &, std::span<int const>>);
+static_assert(!std::is_convertible_v<containers::array<int, 3> const &, std::span<int>>);
+static_assert(std::is_convertible_v<containers::array<int, 3> &, std::span<int const>>);
+static_assert(std::is_convertible_v<containers::array<int, 3> &, std::span<int>>);
+
+static_assert(std::is_convertible_v<containers::array<int, 3> const &, std::span<int const, 3>>);
+static_assert(!std::is_convertible_v<containers::array<int, 3> const &, std::span<int, 3>>);
+static_assert(std::is_convertible_v<containers::array<int, 3> &, std::span<int const, 3>>);
+static_assert(std::is_convertible_v<containers::array<int, 3> &, std::span<int, 3>>);
+
 }	// namespace

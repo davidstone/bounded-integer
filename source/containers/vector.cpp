@@ -11,5 +11,7 @@
 namespace {
 
 static_assert(containers_test::test_sequence_container<containers::vector<bounded::test_int>>());
+static_assert(std::is_convertible_v<containers::vector<bounded::test_int> const &, std::span<bounded::test_int const>>);
+static_assert(std::is_convertible_v<containers::vector<bounded::test_int> &, std::span<bounded::test_int>>);
 
 } // namespace

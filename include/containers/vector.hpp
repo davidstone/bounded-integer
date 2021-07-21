@@ -21,6 +21,7 @@
 #include <operators/forward.hpp>
 
 #include <concepts>
+#include <span>
 #include <type_traits>
 #include <utility>
 
@@ -124,6 +125,13 @@ struct vector : private lexicographical_comparison::base {
 		);
 		m_storage = std::move(temp);
 		// m_size remains the same
+	}
+
+	constexpr operator std::span<T const>() const & {
+		return std::span<T const>(containers::data(*this), static_cast<std::size_t>(size()));
+	}
+	constexpr operator std::span<T>() & {
+		return std::span<T>(containers::data(*this), static_cast<std::size_t>(size()));
 	}
 
 private:

@@ -26,6 +26,7 @@
 #include <operators/bracket.hpp>
 
 #include <concepts>
+#include <span>
 #include <type_traits>
 #include <utility>
 
@@ -111,6 +112,13 @@ struct dynamic_array : private lexicographical_comparison::base {
 			clear();
 			*this = dynamic_array<T>(OPERATORS_FORWARD(range));
 		}
+	}
+
+	constexpr operator std::span<T const>() const & {
+		return std::span<T const>(containers::data(*this), static_cast<std::size_t>(size()));
+	}
+	constexpr operator std::span<T>() & {
+		return std::span<T>(containers::data(*this), static_cast<std::size_t>(size()));
 	}
 
 private:

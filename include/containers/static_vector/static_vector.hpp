@@ -26,6 +26,8 @@
 
 #include <operators/bracket.hpp>
 
+#include <span>
+
 namespace containers {
 namespace detail {
 
@@ -143,6 +145,13 @@ public:
 
 	using base::capacity;
 	using base::append_from_capacity;
+
+	constexpr operator std::span<T const>() const & {
+		return std::span<T const>(containers::data(*this), static_cast<std::size_t>(size()));
+	}
+	constexpr operator std::span<T>() & {
+		return std::span<T>(containers::data(*this), static_cast<std::size_t>(size()));
+	}
 };
 
 }	// namespace containers

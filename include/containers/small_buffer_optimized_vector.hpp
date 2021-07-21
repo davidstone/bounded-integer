@@ -26,6 +26,7 @@
 #include <numeric_traits/min_max_value.hpp>
 
 #include <cstddef>
+#include <span>
 #include <type_traits>
 #include <utility>
 
@@ -242,6 +243,13 @@ struct small_buffer_optimized_vector : private lexicographical_comparison::base 
 		} else {
 			relocate_to_large(requested_capacity);
 		}
+	}
+
+	constexpr operator std::span<T const>() const & {
+		return std::span<T const>(containers::data(*this), static_cast<std::size_t>(size()));
+	}
+	constexpr operator std::span<T>() & {
+		return std::span<T>(containers::data(*this), static_cast<std::size_t>(size()));
 	}
 
 private:

@@ -19,6 +19,7 @@
 #include <cstddef>
 #include <compare>
 #include <iterator>
+#include <span>
 #include <type_traits>
 #include <utility>
 
@@ -91,6 +92,19 @@ struct array {
 	OPERATORS_BRACKET_SEQUENCE_RANGE_DEFINITIONS
 
 	friend auto operator<=>(array const &, array const &) = default;
+
+	constexpr operator std::span<T const>() const & requires(sizeof...(sizes) == 0) {
+		return std::span<T const>(m_value);
+	}
+	constexpr operator std::span<T>() & requires(sizeof...(sizes) == 0) {
+		return std::span<T>(m_value);
+	}
+	constexpr operator std::span<T const, size_>() const & requires(sizeof...(sizes) == 0) {
+		return std::span<T const, size_>(m_value);
+	}
+	constexpr operator std::span<T, size_>() & requires(sizeof...(sizes) == 0) {
+		return std::span<T, size_>(m_value);
+	}
 
 	// Consider this private. It must be public for the class to be an
 	// aggregate
