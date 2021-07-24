@@ -778,7 +778,7 @@ struct move_only {
 	}
 
 private:
-	bounded::test_int m_value = 0;
+	bounded_test::integer m_value = 0;
 };
 
 

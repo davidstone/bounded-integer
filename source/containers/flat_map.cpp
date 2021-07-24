@@ -15,10 +15,10 @@
 
 namespace {
 
-using mapped_type = containers::map_value_type<bounded::test_int, bounded::test_int>;
+using mapped_type = containers::map_value_type<bounded_test::integer, bounded_test::integer>;
 
 constexpr auto test_constructor(auto const & input, auto const & expected, auto... maybe_constructor_arg) {
-	auto const map = containers::flat_map<bounded::test_int, bounded::test_int>(maybe_constructor_arg..., input);
+	auto const map = containers::flat_map<bounded_test::integer, bounded_test::integer>(maybe_constructor_arg..., input);
 	return containers::equal(map, expected);
 }
 
@@ -188,7 +188,7 @@ constexpr auto test_three_duplicate_keys() {
 static_assert(test_three_duplicate_keys());
 
 constexpr auto test() {
-	using container_type = containers::flat_map<bounded::test_int, bounded::test_int>;
+	using container_type = containers::flat_map<bounded_test::integer, bounded_test::integer>;
 	auto const init = containers::make_array(mapped_type{1, 2}, mapped_type{2, 5}, mapped_type{3, 3});
 
 	auto container = container_type(init);

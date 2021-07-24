@@ -26,11 +26,11 @@ static_assert(std::is_trivially_destructible_v<test_static_vector<int>>);
 static_assert(std::is_trivially_copy_assignable_v<test_static_vector<int>>);
 static_assert(std::is_trivially_move_assignable_v<test_static_vector<int>>);
 
-static_assert(!std::is_trivially_copy_constructible_v<test_static_vector<bounded::test_int>>);
-static_assert(!std::is_trivially_move_constructible_v<test_static_vector<bounded::test_int>>);
-static_assert(!std::is_trivially_destructible_v<test_static_vector<bounded::test_int>>);
-static_assert(!std::is_trivially_copy_assignable_v<test_static_vector<bounded::test_int>>);
-static_assert(!std::is_trivially_move_assignable_v<test_static_vector<bounded::test_int>>);
+static_assert(!std::is_trivially_copy_constructible_v<test_static_vector<bounded_test::integer>>);
+static_assert(!std::is_trivially_move_constructible_v<test_static_vector<bounded_test::integer>>);
+static_assert(!std::is_trivially_destructible_v<test_static_vector<bounded_test::integer>>);
+static_assert(!std::is_trivially_copy_assignable_v<test_static_vector<bounded_test::integer>>);
+static_assert(!std::is_trivially_move_assignable_v<test_static_vector<bounded_test::integer>>);
 
 static_assert(containers_test::test_sequence_container<test_static_vector<int>>());
 
@@ -42,5 +42,5 @@ static_assert(!containers::iterator<containers::static_vector<std::string, 6>>);
 } // namespace
 
 int main() {
-	BOUNDED_TEST(containers_test::test_sequence_container<test_static_vector<bounded::test_int>>());
+	BOUNDED_TEST(containers_test::test_sequence_container<test_static_vector<bounded_test::integer>>());
 }

@@ -13,7 +13,7 @@ namespace {
 using namespace bounded::literal;
 
 template<int max>
-using container = containers::uninitialized_dynamic_array<bounded::test_int, bounded::integer<0, max>>;
+using container = containers::uninitialized_dynamic_array<bounded_test::integer, bounded::integer<0, max>>;
 
 static_assert(container<0>().capacity() == 0_bi);
 static_assert(container<1>().capacity() == 0_bi);

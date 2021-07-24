@@ -14,7 +14,7 @@
 
 namespace {
 
-constexpr bool test_pop_back(containers::vector<bounded::test_int> const & original) {
+constexpr bool test_pop_back(containers::vector<bounded_test::integer> const & original) {
     auto copy = original;
     containers::pop_back(copy);
     BOUNDED_TEST(containers::equal(

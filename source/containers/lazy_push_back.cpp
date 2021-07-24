@@ -16,7 +16,7 @@ namespace {
 using namespace bounded::literal;
 
 constexpr bool test_lazy_push_back() {
-    auto c = containers::vector<bounded::test_int>();
+    auto c = containers::vector<bounded_test::integer>();
 
     BOUNDED_TEST(c.capacity() == 0_bi);
 

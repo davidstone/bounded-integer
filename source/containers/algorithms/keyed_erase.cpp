@@ -14,8 +14,8 @@ namespace {
 
 using namespace bounded::literal;
 
-using map_type = containers::flat_map<bounded::test_int, bounded::test_int>;
-using multimap_type = containers::flat_multimap<bounded::test_int, bounded::test_int>;
+using map_type = containers::flat_map<bounded_test::integer, bounded_test::integer>;
+using multimap_type = containers::flat_multimap<bounded_test::integer, bounded_test::integer>;
 
 template<typename Map>
 constexpr auto test_empty() {

@@ -16,7 +16,7 @@ namespace {
 constexpr bool test() {
 	using ::containers::begin;
 	using ::containers::end;
-	using Container = containers::vector<bounded::test_int>;
+	using Container = containers::vector<bounded_test::integer>;
 
 	auto const a = Container({2, 6, 8});
 	auto const b = Container({3, 5});

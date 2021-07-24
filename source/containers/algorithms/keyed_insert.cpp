@@ -13,8 +13,8 @@
 
 namespace {
 
-using map_type = containers::flat_map<bounded::test_int, bounded::test_int>;
-using multimap_type = containers::flat_map<bounded::test_int, bounded::test_int>;
+using map_type = containers::flat_map<bounded_test::integer, bounded_test::integer>;
+using multimap_type = containers::flat_map<bounded_test::integer, bounded_test::integer>;
 using value_type = containers::range_value_t<map_type>;
 
 template<typename Map>

@@ -19,14 +19,14 @@ using namespace bounded::literal;
 template<typename Container>
 constexpr bool test_range_insert() {
 	auto container = Container({ 1, 2, 3 });
-	containers::insert(container, begin(container) + 1_bi, containers::repeat_n(3_bi, bounded::test_int(12)));
+	containers::insert(container, begin(container) + 1_bi, containers::repeat_n(3_bi, bounded_test::integer(12)));
 	auto const expected = { 1, 12, 12, 12, 2, 3 };
 	BOUNDED_TEST(containers::equal(container, expected));
     return true;
 }
 
-static_assert(test_range_insert<containers::stable_vector<bounded::test_int, 10>>());
-static_assert(test_range_insert<containers::vector<bounded::test_int>>());
+static_assert(test_range_insert<containers::stable_vector<bounded_test::integer, 10>>());
+static_assert(test_range_insert<containers::vector<bounded_test::integer>>());
 
 template<typename Container>
 constexpr bool test_value_insert() {
@@ -37,8 +37,8 @@ constexpr bool test_value_insert() {
     return true;
 }
 
-static_assert(test_value_insert<containers::stable_vector<bounded::test_int, 10>>());
-static_assert(test_value_insert<containers::vector<bounded::test_int>>());
+static_assert(test_value_insert<containers::stable_vector<bounded_test::integer, 10>>());
+static_assert(test_value_insert<containers::vector<bounded_test::integer>>());
 
 struct non_trivial_non_copyable {
 	constexpr non_trivial_non_copyable() {}

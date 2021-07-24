@@ -17,7 +17,7 @@
 
 namespace {
 
-using Container = containers::vector<bounded::test_int>;
+using Container = containers::vector<bounded_test::integer>;
 
 constexpr void test_unique_copy_less(Container const & source, Container const & expected) {
 	auto destination = Container(containers::repeat_n(containers::size(source), 0));

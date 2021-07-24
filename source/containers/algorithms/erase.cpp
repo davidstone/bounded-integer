@@ -134,6 +134,6 @@ constexpr auto test_all() {
 	return true;
 }
 
-static_assert(test_all<containers::vector<bounded::test_int>>());
+static_assert(test_all<containers::vector<bounded_test::integer>>());
 
 } // namespace

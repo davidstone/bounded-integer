@@ -146,8 +146,8 @@ static_assert(!bounded::equality_comparable<bounded::variant<non_comparable, int
 static_assert(!bounded::equality_comparable<bounded::variant<int, non_comparable, int>>);
 
 constexpr bool test_non_trivial() {
-	using non_trivial_variant_t = bounded::variant<bounded::test_int>;
-	auto a = non_trivial_variant_t(bounded::test_int(3));
+	using non_trivial_variant_t = bounded::variant<bounded_test::integer>;
+	auto a = non_trivial_variant_t(bounded_test::integer(3));
 	BOUNDED_TEST(a.index() == 0_bi);
 	auto b = a;
 	BOUNDED_TEST(a[0_bi].value() == 3);

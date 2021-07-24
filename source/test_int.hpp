@@ -9,22 +9,22 @@
 
 #include <compare>
 
-namespace bounded {
+namespace bounded_test {
 
 // Every constructor allocates memory. During constant evaluation, this forces
 // the compiler to ensure the destructor is run exactly once for every instance
 // of the object. Sanitizers should ensure the same during run time.
-struct test_int {
-	constexpr test_int(int x_):
+struct integer {
+	constexpr integer(int x_):
 		m_value(new int(x_))
 	{
 	}
-	constexpr test_int():
-		test_int(0)
+	constexpr integer():
+		integer(0)
 	{
 	}
 
-	constexpr test_int(test_int && other):
+	constexpr integer(integer && other):
 		m_value(new int(other.value()))
 	{
 		// Work around https://gcc.gnu.org/bugzilla/show_bug.cgi?id=99018
@@ -33,7 +33,7 @@ struct test_int {
 		#endif
 		other.m_moved_from = true;
 	}
-	constexpr test_int(test_int const & other):
+	constexpr integer(integer const & other):
 		m_value(new int(other.value()))
 	{
 		// Work around https://gcc.gnu.org/bugzilla/show_bug.cgi?id=99018
@@ -42,19 +42,19 @@ struct test_int {
 		#endif
 	}
 
-	constexpr test_int & operator=(test_int && other) {
+	constexpr integer & operator=(integer && other) {
 		*m_value = other.value();
 		m_moved_from = false;
 		other.m_moved_from = true;
 		return *this;
 	}
-	constexpr test_int & operator=(test_int const & other) {
+	constexpr integer & operator=(integer const & other) {
 		*m_value = other.value();
 		m_moved_from = false;
 		return *this;
 	}
 
-	constexpr ~test_int() {
+	constexpr ~integer() {
 		delete m_value;
 	}
 
@@ -63,22 +63,22 @@ struct test_int {
 		return *m_value;
 	}
 
-	friend constexpr auto operator<=>(test_int const & lhs, test_int const & rhs) {
+	friend constexpr auto operator<=>(integer const & lhs, integer const & rhs) {
 		return lhs.value() <=> rhs.value();
 	}
-	friend constexpr auto operator==(test_int const & lhs, test_int const & rhs) -> bool {
+	friend constexpr auto operator==(integer const & lhs, integer const & rhs) -> bool {
 		return lhs.value() == rhs.value();
 	}
-	friend constexpr auto relocate(test_int & x) noexcept {
+	friend constexpr auto relocate(integer & x) noexcept {
 		BOUNDED_TEST(!x.m_moved_from);
-		return test_int(x, tag());
+		return integer(x, tag());
 	}
-	friend constexpr auto to_radix_sort_key(test_int const & x) {
+	friend constexpr auto to_radix_sort_key(integer const & x) {
 		return x.value();
 	}
 private:
 	struct tag{};
-	constexpr test_int(test_int & other, tag) noexcept:
+	constexpr integer(integer & other, tag) noexcept:
 		m_value(other.m_value)
 	{
 	}
