@@ -7,7 +7,8 @@
 
 #include <containers/algorithms/transform.hpp>
 #include <containers/iterator_t.hpp>
-#include <containers/relocate.hpp>
+
+#include <bounded/relocate.hpp>
 
 #include <operators/forward.hpp>
 
@@ -19,7 +20,7 @@ template<range Range>
 constexpr auto relocate_range_adapter(Range && r) {
 	return ::containers::transform_dereference(OPERATORS_FORWARD(r), [](iterator_t<Range> const & it) noexcept {
 		if constexpr (std::is_reference_v<decltype(*it)>) {
-			return relocate(*it);
+			return bounded::relocate(*it);
 		} else {
 			return *it;
 		}

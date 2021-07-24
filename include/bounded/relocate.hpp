@@ -6,12 +6,10 @@
 #pragma once
 
 #include <bounded/detail/construct_destroy.hpp>
-#include <operators/forward.hpp>
-#include <bounded/integer.hpp>
 
 #include <type_traits>
 
-namespace containers {
+namespace bounded_relocate_adl_detail {
 
 constexpr auto relocate(auto & ref) noexcept {
 	using T = std::remove_reference_t<decltype(ref)>;
@@ -22,4 +20,15 @@ constexpr auto relocate(auto & ref) noexcept {
 	return result;
 }
 
-} // namespace containers
+constexpr auto relocate_impl(auto & ref) noexcept {
+	return relocate(ref);
+}
+
+} // namespace relocate_adl_detail
+namespace bounded {
+
+inline constexpr auto relocate = []<typename T>(T & ref) noexcept requires(!std::is_const_v<T>) {
+	return ::bounded_relocate_adl_detail::relocate_impl(ref);
+};
+
+} // namespace bounded

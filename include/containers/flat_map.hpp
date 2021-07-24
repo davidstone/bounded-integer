@@ -21,7 +21,6 @@
 #include <containers/legacy_iterator.hpp>
 #include <containers/lookup.hpp>
 #include <containers/range_value_t.hpp>
-#include <containers/relocate.hpp>
 #include <containers/size.hpp>
 #include <containers/vector.hpp>
 
@@ -29,6 +28,7 @@
 #include <bounded/detail/type.hpp>
 #include <bounded/integer.hpp>
 #include <bounded/concepts.hpp>
+#include <bounded/relocate.hpp>
 
 #include <operators/forward.hpp>
 
@@ -45,8 +45,8 @@ struct map_value_type {
 
 	friend constexpr auto relocate(map_value_type & value) noexcept {
 		return map_value_type{
-			relocate(value.key),
-			relocate(value.mapped)
+			bounded::relocate(value.key),
+			bounded::relocate(value.mapped)
 		};
 	}
 

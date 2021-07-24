@@ -9,12 +9,12 @@
 #include <containers/algorithms/remove.hpp>
 #include <containers/algorithms/uninitialized.hpp>
 #include <containers/begin_end.hpp>
-#include <containers/relocate.hpp>
 #include <containers/mutable_iterator.hpp>
 #include <containers/resizable_container.hpp>
 
 #include <bounded/assert.hpp>
 #include <bounded/integer.hpp>
+#include <bounded/relocate.hpp>
 
 #include <utility>
 
@@ -62,7 +62,7 @@ constexpr auto erase(Container & container, typename Container::const_iterator c
 		// TODO: Write a `relocate` algorithm for this loop?
 		while (target != middle and source != last) {
 			bounded::destroy(*target);
-			bounded::construct(*target, [&]{ return relocate(*source); });
+			bounded::construct(*target, [&]{ return bounded::relocate(*source); });
 			++target;
 			++source;
 		}

@@ -109,6 +109,7 @@ add_executable(bounded_test
 	source/bounded/nth_type.cpp
 	source/bounded/optional.cpp
 	source/bounded/pow.cpp
+	source/bounded/relocate.cpp
 	source/bounded/scope_guard.cpp
 	source/bounded/std_iterator.cpp
 	source/bounded/string.cpp
@@ -196,7 +197,6 @@ add_library(containers_test STATIC
 	source/containers/legacy_iterator.cpp
 	source/containers/lookup.cpp
 	source/containers/maximum_array_size.cpp
-	source/containers/relocate.cpp
 	source/containers/mutable_iterator.cpp
 	source/containers/offset_type.cpp
 	source/containers/ordered_associative_container.cpp
