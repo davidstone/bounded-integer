@@ -160,6 +160,7 @@ add_library(containers_test STATIC
 	source/containers/array/make_array.cpp
 	source/containers/array/tuple.cpp
 	source/containers/static_vector/make_static_vector.cpp
+	source/containers/std/vector.cpp
 	source/containers/adapt.cpp
 	source/containers/append.cpp
 	source/containers/assign.cpp
@@ -254,15 +255,20 @@ add_executable(to_radix_sort_key
 )
 target_link_libraries(to_radix_sort_key PUBLIC bounded strict_defaults)
 
+add_executable(trivial_inplace_function
+	source/containers/trivial_inplace_function.cpp
+)
+target_link_libraries(trivial_inplace_function PUBLIC containers strict_defaults)
+
 add_executable(ska_sort_benchmark
 	source/containers/algorithms/ska_sort_benchmark.cpp
 )
 target_link_libraries(ska_sort_benchmark PUBLIC bounded benchmark strict_defaults)
 
-add_executable(trivial_inplace_function
-	source/containers/trivial_inplace_function.cpp
+add_executable(vector_benchmark
+	source/containers/std/vector_benchmark.cpp
 )
-target_link_libraries(trivial_inplace_function PUBLIC containers strict_defaults)
+target_link_libraries(vector_benchmark PUBLIC bounded benchmark strict_defaults)
 
 
 if("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang")
@@ -273,7 +279,7 @@ if("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang")
 		)
 	endif()
 
-	target_compile_options(ska_sort_benchmark PRIVATE
+	target_compile_options(benchmark PUBLIC
 		"-Wno-global-constructors"
 		"-Wno-sign-conversion"
 	)
