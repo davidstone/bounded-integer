@@ -12,6 +12,8 @@
 #include <operators/forward.hpp>
 #include <bounded/insert.hpp>
 #include <bounded/lazy_init.hpp>
+#include <bounded/relocate.hpp>
+#include <bounded/unreachable.hpp>
 #include <bounded/value_to_function.hpp>
 #include <bounded/detail/construct_destroy.hpp>
 #include <bounded/detail/type.hpp>
@@ -168,19 +170,30 @@ public:
 	}
 
 	constexpr auto & emplace(auto index, construct_function_for<type_at<decltype(index)>> auto && construct_) & {
-		if constexpr (noexcept(type_at<decltype(index)>(OPERATORS_FORWARD(construct_())))) {
-			visit(*this, destroy);
-			return replace_active_member(index, OPERATORS_FORWARD(construct_));
-		} else {
-			auto value = OPERATORS_FORWARD(construct_)();
-			visit(*this, destroy);
-			return replace_active_member(index, value_to_function(std::move(value)));
-		}
+		return emplace_impl(index, OPERATORS_FORWARD(construct_), [&] { visit(*this, destroy); });
 	}
 	constexpr auto & emplace(unique_construct_function<Ts...> auto && construct_) & {
 		return emplace(detail::types<constructed_type<decltype(construct_)>>(), OPERATORS_FORWARD(construct_));
 	}
 	
+	constexpr auto & emplace_impl(auto index, construct_function_for<type_at<decltype(index)>> auto && construct_, auto && destroy_active) & {
+		using value_t = type_at<decltype(index)>;
+		if constexpr (noexcept(value_t(OPERATORS_FORWARD(construct_)()))) {
+			destroy_active();
+			return replace_active_member(index, OPERATORS_FORWARD(construct_));
+		} else {
+			// TODO: Add fallback before this one that does trivial default
+			// construction on exception
+			union skip_destructor {
+				constexpr ~skip_destructor() {}
+				value_t value;
+			};
+			auto storage = skip_destructor{value_t(OPERATORS_FORWARD(construct_)())};
+			destroy_active();
+			return replace_active_member(index, [&]{ return bounded::relocate(storage.value); });
+		}
+	}
+
 	// Assumes the old object has already been destroyed
 	constexpr auto & replace_active_member(auto const index, auto && construct_) {
 		constexpr auto index_value = detail::get_index(index, detail::types<Ts>()...);
@@ -256,8 +269,11 @@ struct variant : private detail::variant_impl<Ts...> {
 			if constexpr (std::is_same_v<std::decay_t<decltype(original)>, std::decay_t<T>>) {
 				original = OPERATORS_FORWARD(value);
 			} else {
-				destroy(original);
-				this->replace_active_member(detail::types<std::decay_t<T>>(), value_to_function(OPERATORS_FORWARD(value)));
+				this->emplace_impl(
+					detail::types<std::decay_t<T>>(),
+					value_to_function(OPERATORS_FORWARD(value)),
+					[&] { destroy(original); }
+				);
 			}
 		});
 		return *this;
@@ -281,8 +297,11 @@ struct variant<Ts...> : private detail::variant_impl<Ts...> {
 			if constexpr (std::is_same_v<std::decay_t<decltype(original)>, std::decay_t<T>>) {
 				original = OPERATORS_FORWARD(value);
 			} else {
-				destroy(original);
-				this->replace_active_member(detail::types<std::decay_t<T>>(), value_to_function(OPERATORS_FORWARD(value)));
+				this->emplace_impl(
+					detail::types<std::decay_t<T>>(),
+					value_to_function(OPERATORS_FORWARD(value)),
+					[&] { destroy(original); }
+				);
 			}
 		});
 		return *this;
