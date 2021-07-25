@@ -31,7 +31,6 @@ namespace containers {
 // TODO: max_size should be an array_size_type<T> instead of a size_t
 template<typename T, std::size_t max_size = containers::detail::maximum_array_size<T>>
 struct vector : private lexicographical_comparison::base {
-	static_assert(max_size <= containers::detail::maximum_array_size<T>, "Cannot actually allocate that many elements");
 	using value_type = T;
 	using size_type = bounded::integer<0, bounded::normalize<max_size>>;
 
@@ -67,14 +66,14 @@ struct vector : private lexicographical_comparison::base {
 		::containers::destroy_range(*this);
 	}
 
-	constexpr auto & operator=(vector && other) & noexcept {
+	constexpr auto operator=(vector && other) & noexcept -> vector & {
 		::containers::destroy_range(*this);
 		m_storage = std::move(other.m_storage);
 		m_size = other.m_size;
 		other.m_size = 0_bi;
 		return *this;
 	}
-	constexpr auto & operator=(vector const & other) & {
+	constexpr auto operator=(vector const & other) & -> vector & {
 		if (!m_storage.data()) {
 			BOUNDED_ASSERT(m_size == 0_bi);
 			m_storage = storage_type();
@@ -83,7 +82,7 @@ struct vector : private lexicographical_comparison::base {
 		return *this;
 	}
 
-	friend constexpr auto swap(vector & lhs, vector & rhs) noexcept {
+	friend constexpr auto swap(vector & lhs, vector & rhs) noexcept -> void {
 		swap(lhs.m_storage, rhs.m_storage);
 		std::swap(lhs.m_size, rhs.m_size);
 	}
@@ -107,12 +106,12 @@ struct vector : private lexicographical_comparison::base {
 		return m_storage.capacity();
 	}
 	// Assumes that elements are already constructed in the spare capacity
-	constexpr void append_from_capacity(auto const count) {
+	constexpr auto append_from_capacity(auto const count) -> void {
 		BOUNDED_ASSERT(m_size + count <= capacity());
 		m_size += count;
 	}
 
-	constexpr auto reserve(size_type const requested_capacity) {
+	constexpr auto reserve(size_type const requested_capacity) -> void {
 		if (requested_capacity <= capacity()) {
 			return;
 		}

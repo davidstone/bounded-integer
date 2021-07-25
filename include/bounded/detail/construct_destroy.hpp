@@ -42,7 +42,7 @@ concept brace_constructible = requires (Args && ... args) { T{OPERATORS_FORWARD(
 } // namespace detail
 
 template<typename T>
-inline constexpr auto construct_return = [](auto && ... args) requires constructible_from<T, decltype(args)...> or detail::brace_constructible<T, decltype(args)...> {
+inline constexpr auto construct_return = [](auto && ... args) -> T requires constructible_from<T, decltype(args)...> or detail::brace_constructible<T, decltype(args)...> {
 	if constexpr (constructible_from<T, decltype(args)...>) {
 		return T(OPERATORS_FORWARD(args)...);
 	} else {
@@ -51,14 +51,14 @@ inline constexpr auto construct_return = [](auto && ... args) requires construct
 };
 
 
-inline constexpr auto construct = []<typename T>(T & ref, construct_function_for<T> auto && function) -> auto & requires(!std::is_const_v<T>){
+inline constexpr auto construct = []<typename T>(T & ref, construct_function_for<T> auto && function) -> T & requires(!std::is_const_v<T>){
 	return *std::construct_at(
 		std::addressof(ref),
 		detail::superconstructing_super_elider([&] { return static_cast<T>(OPERATORS_FORWARD(function)()); })
 	);
 };
 
-inline constexpr auto destroy = [](auto & ref) {
+inline constexpr auto destroy = [](auto & ref) -> void {
 	using T = std::decay_t<decltype(ref)>;
 	if constexpr (!std::is_trivially_destructible_v<T>) {
 		ref.~T();

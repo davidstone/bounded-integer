@@ -52,7 +52,6 @@ inline constexpr auto minimum_small_capacity = (bounded::size_of<std::pair<Size,
 
 template<typename T, std::size_t requested_small_capacity, std::size_t max_size = containers::detail::maximum_array_size<T>>
 struct small_buffer_optimized_vector : private lexicographical_comparison::base {
-	static_assert(max_size <= containers::detail::maximum_array_size<T>, "Cannot actually allocate that many elements");
 	using value_type = T;
 	using size_type = bounded::integer<0, bounded::normalize<max_size>>;
 

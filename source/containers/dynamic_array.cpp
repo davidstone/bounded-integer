@@ -7,4 +7,12 @@
 
 #include "test_sequence_container.hpp"
 
+namespace {
+
 static_assert(containers_test::test_sequence_container<containers::dynamic_array<bounded_test::integer>>());
+
+struct recursive {
+	containers::dynamic_array<recursive, bounded::integer<0, 1>> m;
+};
+
+} // namespace

@@ -42,7 +42,7 @@ struct uninitialized_dynamic_array {
 	constexpr ~uninitialized_dynamic_array() noexcept {
 		deallocate();
 	}
-	friend constexpr void swap(uninitialized_dynamic_array & lhs, uninitialized_dynamic_array & rhs) noexcept {
+	friend constexpr auto swap(uninitialized_dynamic_array & lhs, uninitialized_dynamic_array & rhs) noexcept -> void {
 		std::swap(lhs.m_ptr, rhs.m_ptr);
 		std::swap(lhs.m_capacity, rhs.m_capacity);
 	}
@@ -62,7 +62,7 @@ private:
 	constexpr auto release() & noexcept {
 		return std::exchange(m_ptr, nullptr);
 	}
-	constexpr auto deallocate() & noexcept {
+	constexpr auto deallocate() & noexcept -> void {
 		if (m_ptr) {
 			std::allocator<T>().deallocate(m_ptr, static_cast<std::size_t>(m_capacity));
 		}

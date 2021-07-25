@@ -14,4 +14,8 @@ static_assert(containers_test::test_sequence_container<containers::vector<bounde
 static_assert(std::is_convertible_v<containers::vector<bounded_test::integer> const &, std::span<bounded_test::integer const>>);
 static_assert(std::is_convertible_v<containers::vector<bounded_test::integer> &, std::span<bounded_test::integer>>);
 
+struct recursive {
+	containers::vector<recursive, 1> m;
+};
+
 } // namespace

@@ -24,4 +24,8 @@ using index_type = containers::index_type<containers::stable_vector<int, 10>>;
 static_assert(numeric_traits::min_value<index_type> == 0_bi);
 static_assert(numeric_traits::max_value<index_type> == 9_bi);
 
+struct recursive {
+	containers::stable_vector<recursive, 1> m;
+};
+
 } // namespace

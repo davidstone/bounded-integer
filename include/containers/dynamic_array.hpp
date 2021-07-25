@@ -72,11 +72,11 @@ struct dynamic_array : private lexicographical_comparison::base {
 		::containers::destroy_range(*this);
 	}
 
-	constexpr auto & operator=(dynamic_array const & other) & {
+	constexpr auto operator=(dynamic_array const & other) & -> dynamic_array & {
 		containers::assign(*this, other);
 		return *this;
 	}
-	constexpr auto & operator=(dynamic_array && other) & noexcept {
+	constexpr auto operator=(dynamic_array && other) & noexcept -> dynamic_array & {
 		::containers::destroy_range(*this);
 		m_data = std::move(other.m_data);
 		other.m_data = {};
@@ -99,12 +99,12 @@ struct dynamic_array : private lexicographical_comparison::base {
 
 	OPERATORS_BRACKET_SEQUENCE_RANGE_DEFINITIONS
 	
-	constexpr void clear() & {
+	constexpr auto clear() & -> void {
 		*this = {};
 	}
 
 	template<range Range> requires(!std::is_array_v<Range> or !std::is_reference_v<Range>)
-	constexpr auto assign(Range && range) & {
+	constexpr auto assign(Range && range) & -> void {
 		auto const difference = detail::linear_size(range);
 		if (difference == size()) {
 			::containers::copy(OPERATORS_FORWARD(range), begin());

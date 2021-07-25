@@ -62,14 +62,14 @@ struct stable_vector : private lexicographical_comparison::base {
 		::containers::destroy_range(*this);
 	}
 
-	constexpr auto & operator=(stable_vector && other) & noexcept {
+	constexpr auto operator=(stable_vector && other) & noexcept -> stable_vector & {
 		::containers::destroy_range(*this);
 		m_storage = std::move(other.m_storage);
 		m_size = other.m_size;
 		other.m_size = 0_bi;
 		return *this;
 	}
-	constexpr auto & operator=(stable_vector const & other) & {
+	constexpr auto operator=(stable_vector const & other) & -> stable_vector & {
 		if (!m_storage.data()) {
 			BOUNDED_ASSERT(m_size == 0_bi);
 			m_storage = storage_type(capacity());
@@ -78,7 +78,7 @@ struct stable_vector : private lexicographical_comparison::base {
 		return *this;
 	}
 
-	friend constexpr auto swap(stable_vector & lhs, stable_vector & rhs) noexcept {
+	friend constexpr auto swap(stable_vector & lhs, stable_vector & rhs) noexcept -> void {
 		swap(lhs.m_storage, rhs.m_storage);
 		std::swap(lhs.m_size, rhs.m_size);
 	}
@@ -102,7 +102,7 @@ struct stable_vector : private lexicographical_comparison::base {
 		return bounded::constant<bounded::normalize<capacity_>>;
 	}
 	// Assumes that elements are already constructed in the spare capacity
-	constexpr void append_from_capacity(auto const count) {
+	constexpr auto append_from_capacity(auto const count) -> void {
 		BOUNDED_ASSERT(count + m_size <= capacity());
 		m_size += count;
 	}
