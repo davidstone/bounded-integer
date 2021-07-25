@@ -183,6 +183,7 @@ add_library(containers_test STATIC
 	source/containers/flat_map.cpp
 	source/containers/front_back.cpp
 	source/containers/index_type.cpp
+	source/containers/initializer_range.cpp
 	source/containers/insert.cpp
 	source/containers/integer_range.cpp
 	source/containers/is_empty.cpp

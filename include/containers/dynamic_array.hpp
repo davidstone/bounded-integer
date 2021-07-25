@@ -16,6 +16,7 @@
 #include <containers/common_functions.hpp>
 #include <containers/compare_container.hpp>
 #include <containers/contiguous_iterator.hpp>
+#include <containers/initializer_range.hpp>
 #include <containers/is_iterator.hpp>
 #include <containers/maximum_array_size.hpp>
 #include <containers/size.hpp>
@@ -42,16 +43,15 @@ struct dynamic_array : private lexicographical_comparison::base {
 	
 	constexpr dynamic_array() = default;
 
-	template<range Range> requires(!std::is_array_v<std::remove_cv_t<std::remove_reference_t<Range>>>)
-	constexpr explicit dynamic_array(Range && init):
-		m_data(size_type(::containers::detail::linear_size(init)))
+	constexpr explicit dynamic_array(initializer_range<dynamic_array> auto && source):
+		m_data(size_type(::containers::detail::linear_size(source)))
 	{
-		containers::uninitialized_copy_no_overlap(OPERATORS_FORWARD(init), begin());
+		containers::uninitialized_copy_no_overlap(OPERATORS_FORWARD(source), begin());
 	}
 
-	template<std::size_t init_size>
-	constexpr dynamic_array(c_array<value_type, init_size> && init):
-		dynamic_array(range_view(std::move(init)))
+	template<std::size_t source_size>
+	constexpr dynamic_array(c_array<value_type, source_size> && source):
+		dynamic_array(range_view(std::move(source)))
 	{
 	}
 	template<std::same_as<empty_c_array_parameter> Source = empty_c_array_parameter>

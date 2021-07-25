@@ -13,6 +13,7 @@
 #include <containers/common_functions.hpp>
 #include <containers/compare_container.hpp>
 #include <containers/contiguous_iterator.hpp>
+#include <containers/initializer_range.hpp>
 #include <containers/uninitialized_dynamic_array.hpp>
 
 #include <operators/forward.hpp>
@@ -35,16 +36,13 @@ struct stable_vector : private lexicographical_comparison::base {
 	// Allocates the full capacity
 	constexpr stable_vector() = default;
 
-	template<range Range> requires(
-		!std::is_array_v<std::remove_cv_t<std::remove_reference_t<Range>>>
-	)
-	constexpr explicit stable_vector(Range && source) {
+	constexpr explicit stable_vector(initializer_range<stable_vector> auto && source) {
 		::containers::assign_to_empty(*this, OPERATORS_FORWARD(source));
 	}
 	
-	template<std::size_t init_size>
-	constexpr stable_vector(c_array<T, init_size> && init) {
-		::containers::assign_to_empty(*this, std::move(init));
+	template<std::size_t source_size>
+	constexpr stable_vector(c_array<T, source_size> && source) {
+		::containers::assign_to_empty(*this, std::move(source));
 	}
 	template<std::same_as<empty_c_array_parameter> Source = empty_c_array_parameter>
 	constexpr stable_vector(Source) {

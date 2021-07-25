@@ -13,6 +13,7 @@
 #include <containers/common_functions.hpp>
 #include <containers/compare_container.hpp>
 #include <containers/contiguous_iterator.hpp>
+#include <containers/initializer_range.hpp>
 #include <containers/maximum_array_size.hpp>
 #include <containers/range_value_t.hpp>
 #include <containers/uninitialized_dynamic_array.hpp>
@@ -39,16 +40,13 @@ struct vector : private lexicographical_comparison::base {
 
 	constexpr vector() = default;
 
-	template<range Range> requires(
-		!std::is_array_v<std::remove_cv_t<std::remove_reference_t<Range>>>
-	)
-	constexpr explicit vector(Range && source) {
+	constexpr explicit vector(initializer_range<vector> auto && source) {
 		::containers::assign_to_empty(*this, OPERATORS_FORWARD(source));
 	}
 	
 	template<std::size_t source_size>
-	constexpr vector(c_array<T, source_size> && init) {
-		::containers::assign_to_empty(*this, std::move(init));
+	constexpr vector(c_array<T, source_size> && source) {
+		::containers::assign_to_empty(*this, std::move(source));
 	}
 	template<std::same_as<empty_c_array_parameter> Source = empty_c_array_parameter>
 	constexpr vector(Source) {

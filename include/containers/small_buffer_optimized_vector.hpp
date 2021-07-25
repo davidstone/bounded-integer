@@ -15,6 +15,7 @@
 #include <containers/compare_container.hpp>
 #include <containers/contiguous_iterator.hpp>
 #include <containers/dynamic_array_data.hpp>
+#include <containers/initializer_range.hpp>
 #include <containers/maximum_array_size.hpp>
 #include <containers/uninitialized_storage.hpp>
 
@@ -149,20 +150,17 @@ struct small_buffer_optimized_vector : private lexicographical_comparison::base 
 	{
 	}
 	
-	template<range Range> requires(
-		!std::is_array_v<std::remove_cv_t<std::remove_reference_t<Range>>>
-	)
-	constexpr explicit small_buffer_optimized_vector(Range && source):
+	constexpr explicit small_buffer_optimized_vector(initializer_range<small_buffer_optimized_vector> auto && source):
 		small_buffer_optimized_vector()
 	{
 		::containers::assign_to_empty(*this, OPERATORS_FORWARD(source));
 	}
 	
-	template<std::size_t init_size>
-	constexpr small_buffer_optimized_vector(c_array<T, init_size> && init):
+	template<std::size_t source_size>
+	constexpr small_buffer_optimized_vector(c_array<T, source_size> && source):
 		small_buffer_optimized_vector()
 	{
-		::containers::assign_to_empty(*this, std::move(init));
+		::containers::assign_to_empty(*this, std::move(source));
 	}
 	template<std::same_as<empty_c_array_parameter> Source = empty_c_array_parameter>
 	constexpr small_buffer_optimized_vector(Source):

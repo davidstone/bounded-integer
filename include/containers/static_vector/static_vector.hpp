@@ -17,6 +17,7 @@
 #include <containers/compare_container.hpp>
 #include <containers/contiguous_iterator.hpp>
 #include <containers/data.hpp>
+#include <containers/initializer_range.hpp>
 #include <containers/integer_range.hpp>
 #include <containers/is_iterator_sentinel.hpp>
 #include <containers/pop_back.hpp>
@@ -66,13 +67,13 @@ struct static_vector_data : private lexicographical_comparison::base {
 		return *this;
 	}
 
-	constexpr explicit static_vector_data(range auto && source) {
+	constexpr explicit static_vector_data(initializer_range<static_vector_data> auto && source) {
 		::containers::assign_to_empty(*this, OPERATORS_FORWARD(source));
 	}
 	
-	template<std::size_t init_size>
-	constexpr static_vector_data(c_array<T, init_size> && init) {
-		::containers::assign_to_empty(*this, std::move(init));
+	template<std::size_t source_size>
+	constexpr static_vector_data(c_array<T, source_size> && source) {
+		::containers::assign_to_empty(*this, std::move(source));
 	}
 	constexpr static_vector_data(empty_c_array_parameter) {
 	}
