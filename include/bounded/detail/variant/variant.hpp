@@ -308,7 +308,7 @@ struct variant<Ts...> : private detail::variant_impl<Ts...> {
 	}
 };
 
-template<typename... Ts, typename T>
+template<typename... Ts, matches_exactly_one_type<Ts...> T>
 constexpr auto holds_alternative(variant<Ts...> const & variant, detail::types<T> type) {
 	return variant.index() == detail::get_index(type, detail::types<Ts>{}...);
 }
