@@ -8,6 +8,7 @@
 #include <containers/begin_end.hpp>
 #include <containers/is_range.hpp>
 #include <containers/is_iterator.hpp>
+#include <containers/iterator_t.hpp>
 
 #include <bounded/integer.hpp>
 
@@ -16,10 +17,24 @@
 namespace containers {
 namespace detail {
 
-template<range Range> requires(!std::is_const_v<Range>)
-constexpr auto mutable_iterator(Range & r, iterator auto const it) {
-	return containers::begin(r) + (it - containers::begin(r));
+template<typename Container, typename Iterator>
+concept has_member_mutable_iterator = requires(Container & container, Iterator it) {
+	container.mutable_iterator(std::move(it));
+};
+
+template<typename Container, typename Iterator>
+concept mutable_container_for =
+	(!std::is_const_v<Container> and random_access_sentinel_for<Iterator, iterator_t<Container &>>) or
+	(range<Container> and has_member_mutable_iterator<Container, Iterator>);
+
+template<typename Iterator, mutable_container_for<Iterator> Container>
+constexpr auto mutable_iterator(Container & container, Iterator it) {
+	if constexpr (has_member_mutable_iterator<Container, Iterator>) {
+		return container.mutable_iterator(std::move(it));
+	} else {
+		return containers::begin(container) + (std::move(it) - containers::begin(container));
+	}
 }
 
-}	// namespace detail
-}	// namespace containers
+} // namespace detail
+} // namespace containers
