@@ -115,6 +115,8 @@ auto test_erase() {
 }	// namespace
 
 int main() {
+	containers_test::test_sequence_container<containers::small_buffer_optimized_vector<bounded_test::integer, 40>>();
+
 	test_generic(1_bi, '0', {});
 	test_generic(1_bi, '0', {'5'});
 

@@ -42,5 +42,5 @@ static_assert(!containers::iterator<containers::static_vector<std::string, 6>>);
 } // namespace
 
 int main() {
-	BOUNDED_TEST(containers_test::test_sequence_container<test_static_vector<bounded_test::integer>>());
+	containers_test::test_sequence_container<test_static_vector<bounded_test::integer>>();
 }

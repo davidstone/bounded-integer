@@ -18,6 +18,7 @@ using namespace bounded::literal;
 template<typename T>
 using test_stable_vector = containers::stable_vector<T, 1000>;
 
+static_assert(containers_test::test_sequence_container<test_stable_vector<int>>());
 static_assert(containers_test::test_sequence_container<test_stable_vector<bounded_test::integer>>());
 
 using index_type = containers::index_type<containers::stable_vector<int, 10>>;

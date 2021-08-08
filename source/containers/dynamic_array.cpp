@@ -9,6 +9,7 @@
 
 namespace {
 
+static_assert(containers_test::test_sequence_container<containers::dynamic_array<int>>());
 static_assert(containers_test::test_sequence_container<containers::dynamic_array<bounded_test::integer>>());
 
 struct recursive {

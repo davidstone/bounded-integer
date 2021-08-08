@@ -24,111 +24,163 @@ namespace containers_test {
 using namespace bounded::literal;
 
 template<typename Container>
-constexpr bool test_sequence_container_default_constructed_empty() {
+constexpr auto test_sequence_container_default_constructed_empty() -> bool {
 	auto const default_constructed = Container();
 	BOUNDED_TEST(containers::begin(default_constructed) == containers::begin(default_constructed));
 	BOUNDED_TEST(containers::begin(default_constructed) == containers::end(default_constructed));
 	BOUNDED_TEST(containers::end(default_constructed) == containers::begin(default_constructed));
 	BOUNDED_TEST(containers::end(default_constructed) == containers::end(default_constructed));
-	BOUNDED_TEST(containers::size(default_constructed) == 0_bi);
+	BOUNDED_TEST(containers::detail::linear_size(default_constructed) == 0_bi);
 	BOUNDED_TEST(default_constructed == default_constructed);
 	BOUNDED_TEST(default_constructed == Container());
 	BOUNDED_TEST(default_constructed == Container({}));
-	Container implicit_from_empty_braces = {};
+	Container const implicit_from_empty_braces = {};
 	BOUNDED_TEST(default_constructed == implicit_from_empty_braces);
-	Container implicit_from_two_empty_braces = {{}};
+	Container const implicit_from_two_empty_braces = {{}};
 	BOUNDED_TEST(default_constructed == implicit_from_two_empty_braces);
 	return true;
 }
 
 template<typename Container>
-constexpr bool test_range_constructor(auto const & source) {
+constexpr auto test_range_constructor(auto const & source) -> bool {
 	auto const container = Container(source);
 	BOUNDED_TEST(containers::equal(container, source));
 	return true;
 }
 
-constexpr void validate_range(auto const & container, auto const & initializer) {
-	BOUNDED_TEST(containers::equal(container, initializer));
+constexpr auto test_copy_constructor(auto const & container) -> void {
+	auto const copy = container;
+	BOUNDED_TEST(copy == container);
+}
+
+constexpr auto test_move_constructor(auto const & container) -> void {
+	auto copy = container;
+	auto const move = std::move(copy);
+	BOUNDED_TEST(move == container);
+}
+
+template<typename Container>
+constexpr auto test_copy_assignment_from_empty(Container const & container) -> void {
+	auto copy = Container();
+	copy = container;
+	BOUNDED_TEST(copy == container);
+}
+constexpr auto test_copy_assignment_from_non_empty(auto const & container) -> void {
+	auto copy = container;
+	copy = container;
+	BOUNDED_TEST(copy == container);
+}
+template<typename Container>
+constexpr auto test_copy_assignment_from_moved_from(Container const & container) -> void {
+	auto copy = Container();
+	[[maybe_unused]] auto const temp = std::move(copy);
+	copy = container;
+	BOUNDED_TEST(copy == container);
+}
+constexpr auto test_self_copy_assignment(auto const & container) -> void {
+	auto copy = container;
+	// Turn off compiler warning for self assignment
+	auto const & ref = copy;
+	copy = ref;
+	BOUNDED_TEST(copy == container);
+}
+constexpr auto test_copy_assignment(auto const & container) -> void {
+	test_copy_assignment_from_empty(container);
+	test_copy_assignment_from_non_empty(container);
+	test_copy_assignment_from_moved_from(container);
+	test_self_copy_assignment(container);
+}
+
+template<typename Container>
+constexpr auto test_move_assignment_from_empty(Container const & container) -> void {
+	auto temp = container;
+	auto move = Container();
+	move = std::move(temp);
+	BOUNDED_TEST(move == container);
+}
+constexpr auto test_move_assignment_from_non_empty(auto const & container) -> void {
+	auto temp = container;
+	auto move = container;
+	move = std::move(temp);
+	BOUNDED_TEST(move == container);
+}
+template<typename Container>
+constexpr auto test_move_assignment_from_moved_from(Container const & container) -> void {
+	auto move = container;
+	auto temp = std::move(move);
+	move = std::move(temp);
+	BOUNDED_TEST(move == container);
 }
 template<typename T, typename Capacity>
-constexpr void validate_range(containers::uninitialized_dynamic_array<T, Capacity> const & container, auto const &) {
+constexpr auto validate_range(containers::uninitialized_dynamic_array<T, Capacity> const & container, auto const &) -> void {
+	// Not anything useful to validate for a range of uninitialized memory,
+	// except that forming the begin and end pointers are still valid.
 	auto const last = container.data() + container.capacity();
-	for (auto ptr = container.data(); ptr != last; ++ptr) {
-	}
 }
-
-// Self move assignment should have well-defined effects, regardless of whether
-// the source is moved from.
 template<typename Container>
-constexpr auto test_self_move_assignment(auto const & initializer) {
-	auto a = Container(initializer);
-	a = std::move(a);
-	a = Container(initializer);
-	validate_range(a, initializer);
-
-	[[maybe_unused]] auto b = std::move(a);
-	a = std::move(a);
-
+constexpr auto test_recover_from_self_move(auto const & initializer, auto const & validate) -> void {
+	auto container = Container(initializer);
+	container = std::move(container);
+	container = Container(initializer);
+	BOUNDED_TEST(validate(container));
+}
+constexpr auto test_self_move_defined_when_already_moved_from(auto container) -> void {
+	[[maybe_unused]] auto temp = std::move(container);
+	container = std::move(container);
+}
+template<typename Container>
+constexpr auto test_self_move_assignment(auto const & initializer, auto const & validate) -> bool {
+	test_recover_from_self_move<Container>(initializer, validate);
+	test_self_move_defined_when_already_moved_from(Container(initializer));
 	return true;
 }
-
 template<typename Container>
-constexpr auto test_self_swap(auto const & initializer) {
-	auto a = Container(initializer);
-	using std::swap;
-	swap(a, a);
-	validate_range(a, initializer);
-	return true;
+constexpr auto test_move_assignment(Container const & container) -> void {
+	test_move_assignment_from_empty(container);
+	test_move_assignment_from_non_empty(container);
+	test_move_assignment_from_moved_from(container);
+	test_self_move_assignment<Container>(container, bounded::equal_to(container));
 }
 
 template<typename Container>
-constexpr bool test_special_members(auto const & initializer) {
-	test_self_move_assignment<Container>(initializer);
-	test_self_swap<Container>(initializer);
+constexpr auto test_assignment_from_empty_braces(Container const & container) -> void {
+	auto temp = container;
+	temp = {};
+	BOUNDED_TEST(temp == Container());
+}
 
-	auto const container = Container(initializer);
-
+template<typename Container>
+constexpr auto test_swap_with_empty(Container const & container) -> void {
 	auto a = container;
-	BOUNDED_TEST(container == a);
-
-	auto b = std::move(a);
-	BOUNDED_TEST(container == b);
-
-	a = b;
-	BOUNDED_TEST(container == a);
-	BOUNDED_TEST(container == b);
-
-	b = std::move(a);
-	BOUNDED_TEST(container == b);
-
-	a = container;
-	BOUNDED_TEST(container == a);
-
-	a = {};
-	BOUNDED_TEST(a == Container());
-
+	auto b = Container();
 	using std::swap;
 	swap(a, b);
-	BOUNDED_TEST(container == a);
-	BOUNDED_TEST(b == Container());
+	BOUNDED_TEST(b == container);
+	BOUNDED_TEST(a == Container());
+}
+constexpr auto test_self_swap(auto container, auto const & validate) -> bool {
+	using std::swap;
+	swap(container, container);
+	validate(container);
 	return true;
 }
-
 template<typename Container>
-constexpr bool test_assign(auto const & source) {
-	if constexpr (containers::resizable_container<Container>) {
-		auto container = Container();
-		containers::assign(container, source);
-		BOUNDED_ASSERT(containers::equal(container, source));
-		return true;
-	} else {
-		return true;
-	}
+constexpr auto test_swap(Container const & container) -> void {
+	test_swap_with_empty(container);
+	test_self_swap(container, bounded::equal_to(container));
+}
+
+constexpr auto test_special_members(auto const & container) -> void {
+	test_copy_constructor(container);
+	test_move_constructor(container);
+	test_copy_assignment(container);
+	test_move_assignment(container);
+	test_assignment_from_empty_braces(container);
+	test_swap(container);
 }
 
 template<typename Container>
-constexpr auto test_reserve() {
+constexpr auto test_reserve() -> bool {
 	auto v = Container();
 	auto const capacity0 = v.capacity();
 	BOUNDED_TEST(capacity0 >= 0_bi);
@@ -155,15 +207,14 @@ constexpr auto test_reserve() {
 }
 
 template<typename Container>
-constexpr auto test_sequence_container_single(std::initializer_list<containers::range_value_t<Container>> init) {
+constexpr auto test_sequence_container_single(std::initializer_list<containers::range_value_t<Container>> init) -> void {
 	test_range_constructor<Container>(init);
 	test_range_constructor<Container>(containers::range_view(init));
-	test_special_members<Container>(init);
-	test_assign<Container>(init);
+	test_special_members(Container(init));
 }
 
 template<typename Container>
-constexpr auto test_sequence_container() {
+constexpr auto test_sequence_container() -> bool {
 	static_assert(!containers::iterator<Container>);
 	static_assert(containers::iterator<typename Container::const_iterator>);
 	static_assert(containers::iterator<typename Container::iterator>);
