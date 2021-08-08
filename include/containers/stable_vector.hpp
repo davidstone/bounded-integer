@@ -70,6 +70,9 @@ struct stable_vector : private lexicographical_comparison::base {
 		return *this;
 	}
 	constexpr auto operator=(stable_vector const & other) & -> stable_vector & {
+		if (std::addressof(other) == this) {
+			return *this;
+		}
 		if (!m_storage.data()) {
 			BOUNDED_ASSERT(m_size == 0_bi);
 			m_storage = storage_type(capacity());

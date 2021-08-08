@@ -63,6 +63,9 @@ struct static_vector_data : private lexicographical_comparison::base {
 		return *this;
 	}
 	constexpr auto & operator=(static_vector_data const & other) & {
+		if (std::addressof(other) == this) {
+			return *this;
+		}
 		containers::assign(*this, other);
 		return *this;
 	}

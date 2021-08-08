@@ -74,11 +74,14 @@ struct vector : private lexicographical_comparison::base {
 		return *this;
 	}
 	constexpr auto operator=(vector const & other) & -> vector & {
+		if (std::addressof(other) == this) {
+			return *this;
+		}
 		if (!m_storage.data()) {
 			BOUNDED_ASSERT(m_size == 0_bi);
 			m_storage = storage_type();
 		}
-		containers::assign(*this, OPERATORS_FORWARD(other));
+		containers::assign(*this, other);
 		return *this;
 	}
 

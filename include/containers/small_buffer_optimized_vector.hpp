@@ -180,6 +180,9 @@ struct small_buffer_optimized_vector : private lexicographical_comparison::base 
 	}
 
 	constexpr auto & operator=(small_buffer_optimized_vector const & other) & {
+		if (std::addressof(other) == this) {
+			return *this;
+		}
 		containers::assign(*this, other);
 		return *this;
 	}

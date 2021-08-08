@@ -73,6 +73,9 @@ struct dynamic_array : private lexicographical_comparison::base {
 	}
 
 	constexpr auto operator=(dynamic_array const & other) & -> dynamic_array & {
+		if (std::addressof(other) == this) {
+			return *this;
+		}
 		containers::assign(*this, other);
 		return *this;
 	}
