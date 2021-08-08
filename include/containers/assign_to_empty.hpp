@@ -6,6 +6,7 @@
 #pragma once
 
 #include <containers/algorithms/uninitialized.hpp>
+#include <containers/appendable_from_capacity.hpp>
 #include <containers/begin_end.hpp>
 #include <containers/c_array.hpp>
 #include <containers/is_range.hpp>

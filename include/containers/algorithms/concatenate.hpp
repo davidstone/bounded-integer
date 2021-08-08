@@ -9,6 +9,7 @@
 #include <containers/algorithms/reverse_iterator.hpp>
 #include <containers/algorithms/uninitialized.hpp>
 #include <containers/append.hpp>
+#include <containers/appendable_from_capacity.hpp>
 #include <containers/begin_end.hpp>
 #include <containers/data.hpp>
 #include <containers/lazy_push_back.hpp>

@@ -163,6 +163,7 @@ add_library(containers_test STATIC
 	source/containers/std/vector.cpp
 	source/containers/adapt.cpp
 	source/containers/append.cpp
+	source/containers/appendable_from_capacity.cpp
 	source/containers/assign.cpp
 	source/containers/assign_to_empty.cpp
 	source/containers/associative_container.cpp

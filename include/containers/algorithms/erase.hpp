@@ -8,6 +8,7 @@
 #include <containers/algorithms/destroy_range.hpp>
 #include <containers/algorithms/remove.hpp>
 #include <containers/algorithms/uninitialized.hpp>
+#include <containers/appendable_from_capacity.hpp>
 #include <containers/begin_end.hpp>
 #include <containers/mutable_iterator.hpp>
 #include <containers/resizable_container.hpp>

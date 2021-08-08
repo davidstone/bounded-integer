@@ -6,6 +6,7 @@
 #pragma once
 
 #include <containers/algorithms/uninitialized.hpp>
+#include <containers/appendable_from_capacity.hpp>
 #include <containers/data.hpp>
 #include <containers/front_back.hpp>
 #include <containers/range_value_t.hpp>
@@ -18,9 +19,6 @@
 
 namespace containers {
 namespace detail {
-
-template<typename Container>
-concept appendable_from_capacity = range<Container> and requires(Container & container, range_size_t<Container> count) { container.append_from_capacity(count); };
 
 template<typename Container>
 concept lazy_push_backable = appendable_from_capacity<Container>;
