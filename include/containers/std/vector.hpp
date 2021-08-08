@@ -225,7 +225,7 @@ struct vector {
 	}
 
 	constexpr void reserve(size_type const requested_capacity) {
-		m_impl.reserve(range_size_t<impl_t>(requested_capacity));
+		m_impl.reserve(containers::range_size_t<impl_t>(requested_capacity));
 	}
 
 	constexpr auto capacity() const noexcept -> size_type {
