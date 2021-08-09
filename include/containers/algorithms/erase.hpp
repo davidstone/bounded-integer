@@ -5,11 +5,13 @@
 
 #pragma once
 
+#include <containers/algorithms/advance.hpp>
 #include <containers/algorithms/destroy_range.hpp>
-#include <containers/algorithms/remove.hpp>
+#include <containers/algorithms/find.hpp>
 #include <containers/algorithms/uninitialized.hpp>
 #include <containers/appendable_from_capacity.hpp>
 #include <containers/begin_end.hpp>
+#include <containers/count_type.hpp>
 #include <containers/mutable_iterator.hpp>
 
 #include <bounded/assert.hpp>
@@ -82,8 +84,25 @@ constexpr auto erase(Container & container, typename Container::const_iterator c
 }
 
 // TODO: Handle splicable containers
-constexpr auto erase_if(detail::erasable auto & container, auto predicate) {
-	return ::containers::erase_after(container, ::containers::remove_if(container, std::move(predicate)));
+template<detail::erasable Container>
+constexpr auto erase_if(Container & container, auto predicate) {
+	auto const first = containers::begin(container);
+	auto const last = containers::end(container);
+	auto new_last = ::containers::find_if(first, last, predicate);
+	auto result = count_type<Container>(0_bi);
+	if (new_last == last) {
+		return result;
+	}
+	for (auto it = ::containers::next(new_last); it != last; ++it) {
+		if (!predicate(*it)) {
+			// TODO: Relocate?
+			*new_last = std::move(*it);
+			++new_last;
+			++result;
+		}
+	}
+	containers::erase_after(container, new_last);
+	return result;
 }
 
 } // namespace containers

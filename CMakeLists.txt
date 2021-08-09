@@ -147,7 +147,6 @@ add_library(containers_test STATIC
 	source/containers/algorithms/negate.cpp
 	source/containers/algorithms/partition.cpp
 	source/containers/algorithms/relocate_range_adapter.cpp
-	source/containers/algorithms/remove.cpp
 	source/containers/algorithms/reverse_iterator.cpp
 	source/containers/algorithms/set.cpp
 	source/containers/algorithms/ska_sort.cpp
