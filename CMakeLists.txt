@@ -172,6 +172,7 @@ add_library(containers_test STATIC
 	source/containers/c_array.cpp
 	source/containers/clear.cpp
 	source/containers/compare_container.cpp
+	source/containers/constant_time_erasable.cpp
 	source/containers/contiguous_iterator.cpp
 	source/containers/count_type.cpp
 	source/containers/data.cpp
