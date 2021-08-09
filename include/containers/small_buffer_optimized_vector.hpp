@@ -52,7 +52,6 @@ inline constexpr auto minimum_small_capacity = (bounded::size_of<std::pair<Size,
 
 template<typename T, std::size_t requested_small_capacity, std::size_t max_size = containers::detail::maximum_array_size<T>>
 struct small_buffer_optimized_vector : private lexicographical_comparison::base {
-	using value_type = T;
 	using size_type = bounded::integer<0, bounded::normalize<max_size>>;
 
 	struct small_t {
@@ -137,12 +136,9 @@ struct small_buffer_optimized_vector : private lexicographical_comparison::base 
 	};
 	
 	static_assert(
-		numeric_traits::max_value<size_type> <= bounded::constant<(1ULL << (CHAR_BIT * sizeof(value_type *) - 1)) - 1>,
+		numeric_traits::max_value<size_type> <= bounded::constant<(1ULL << (CHAR_BIT * sizeof(T *) - 1)) - 1>,
 		"Maximum possible size is too large -- would use bit reserved for small-buffer optimization."
 	);
-
-	using const_iterator = contiguous_iterator<value_type const, bounded::builtin_max_value<size_type>>;
-	using iterator = contiguous_iterator<value_type, bounded::builtin_max_value<size_type>>;
 
 	constexpr small_buffer_optimized_vector():
 		m_small()
@@ -200,11 +196,11 @@ struct small_buffer_optimized_vector : private lexicographical_comparison::base 
 
 	constexpr auto begin() const & {
 		auto const result = is_small() ? containers::begin(m_small) : containers::begin(m_large);
-		return const_iterator(result);
+		return contiguous_iterator<T const, bounded::builtin_max_value<size_type>>(result);
 	}
 	constexpr auto begin() & {
 		auto const result = is_small() ? containers::begin(m_small) : containers::begin(m_large);
-		return iterator(result);
+		return contiguous_iterator<T, bounded::builtin_max_value<size_type>>(result);
 	}
 	constexpr auto begin() && {
 		return ::containers::move_iterator(begin());
@@ -309,7 +305,7 @@ private:
 	}
 
 	constexpr auto relocate_to_large(auto const requested_capacity) {
-		auto temp = detail::allocate_storage<value_type, size_type>(requested_capacity);
+		auto temp = detail::allocate_storage<T, size_type>(requested_capacity);
 		containers::uninitialized_relocate_no_overlap(*this, temp.pointer);
 		deallocate_large();
 		::bounded::construct(
@@ -318,7 +314,7 @@ private:
 				return large_t(
 					size(),
 					static_cast<typename large_t::capacity_type>(temp.size),
-					reinterpret_cast<value_type *>(temp.pointer)
+					reinterpret_cast<T *>(temp.pointer)
 				);
 			}
 		);

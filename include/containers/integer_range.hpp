@@ -106,9 +106,6 @@ struct integer_range {
 		bounded::builtin_max_value<Sentinel>,
 		Step
 	>;
-	using const_iterator = iterator;
-
-	using value_type = iter_value_t<iterator>;
 	
 	// If `last` is not reachable by adding `step` to `first` some number of
 	// times, the behavior is undefined.

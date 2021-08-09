@@ -228,20 +228,16 @@ constexpr auto operator-(concatenate_view_iterator<Ranges...> const lhs, concate
 
 template<typename... Ranges>
 struct concatenate_view {
-	using const_iterator = concatenate_view_iterator<decltype(range_view(std::declval<Ranges const &>()))...>;
-	using iterator = concatenate_view_iterator<decltype(range_view(std::declval<Ranges &>()))...>;
-	using value_type = iter_value_t<iterator>;
-	
 	constexpr concatenate_view(Ranges && ... ranges):
 		m_ranges(OPERATORS_FORWARD(ranges)...)
 	{
 	}
 	
 	constexpr auto begin() const & {
-		return const_iterator(bounded::transform([](auto && range){ return range_view(range); }, m_ranges));
+		return concatenate_view_iterator(bounded::transform([](auto && range){ return range_view(range); }, m_ranges));
 	}
 	constexpr auto begin() & {
-		return iterator(bounded::transform([](auto && range){ return range_view(range); }, m_ranges));
+		return concatenate_view_iterator(bounded::transform([](auto && range){ return range_view(range); }, m_ranges));
 	}
 	static constexpr auto end() {
 		return concatenate_view_sentinel();

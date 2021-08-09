@@ -26,8 +26,6 @@ struct string : private small_buffer_optimized_vector<char, 0> {
 	using base = small_buffer_optimized_vector<char, 0>;
 public:
 	using value_type = char;
-	using base::const_iterator;
-	using base::iterator;
 	
 	using base::base;
 	

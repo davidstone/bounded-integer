@@ -24,9 +24,6 @@ template<typename Iterator, typename Sentinel = Iterator>
 struct range_view {
 	using value_type = iter_value_t<Iterator>;
 
-	using const_iterator = Iterator;
-	using iterator = Iterator;
-
 	constexpr range_view(Iterator first, Sentinel last):
 		m_begin(std::move(first)),
 		m_end(std::move(last))

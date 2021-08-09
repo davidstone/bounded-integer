@@ -147,21 +147,6 @@ constexpr auto operator==(
 // TODO: find a better name for this
 template<typename Range1, typename Range2, typename Compare>
 struct set_intersection_pair {
-private:
-	using members_t = detail::set_intersection_members<Range1, Range2, Compare>;
-public:
-	using iterator = detail::set_intersection_pair_iterator<
-		members_t,
-		decltype(containers::begin(std::declval<Range1 &>())),
-		decltype(containers::begin(std::declval<Range2 &>()))
-	>;
-	using const_iterator = detail::set_intersection_pair_iterator<
-		members_t const,
-		decltype(containers::begin(std::declval<Range1 const &>())),
-		decltype(containers::begin(std::declval<Range2 const &>()))
-	>;
-	using value_type = iter_value_t<iterator>;
-
 	template<typename R1, typename R2>
 	constexpr set_intersection_pair(R1 && range1, R2 && range2, Compare compare = Compare()):
 		m_members{
@@ -194,14 +179,14 @@ public:
 	}
 
 	constexpr auto end() const & {
-		return const_iterator(m_members, ::containers::end(m_members.range1), ::containers::end(m_members.range2));
+		return detail::set_intersection_pair_iterator(m_members, ::containers::end(m_members.range1), ::containers::end(m_members.range2));
 	}
 	constexpr auto end() & {
-		return iterator(m_members, ::containers::end(m_members.range1), ::containers::end(m_members.range2));
+		return detail::set_intersection_pair_iterator(m_members, ::containers::end(m_members.range1), ::containers::end(m_members.range2));
 	}
 
 private:
-	members_t m_members;
+	detail::set_intersection_members<Range1, Range2, Compare> m_members;
 };
 
 template<typename Range1, typename Range2, typename Compare>

@@ -35,12 +35,8 @@ namespace containers {
 
 template<typename T, typename Size = detail::array_size_type<T>>
 struct dynamic_array : private lexicographical_comparison::base {
-	using value_type = T;
 	using size_type = Size;
 
-	using const_iterator = contiguous_iterator<value_type const, bounded::builtin_max_value<size_type>>;
-	using iterator = contiguous_iterator<value_type, bounded::builtin_max_value<size_type>>;
-	
 	constexpr dynamic_array() = default;
 
 	constexpr explicit dynamic_array(initializer_range<dynamic_array> auto && source):
@@ -50,7 +46,7 @@ struct dynamic_array : private lexicographical_comparison::base {
 	}
 
 	template<std::size_t source_size>
-	constexpr dynamic_array(c_array<value_type, source_size> && source):
+	constexpr dynamic_array(c_array<T, source_size> && source):
 		dynamic_array(range_view(std::move(source)))
 	{
 	}
@@ -87,10 +83,10 @@ struct dynamic_array : private lexicographical_comparison::base {
 	}
 	
 	constexpr auto begin() const & {
-		return const_iterator(m_data.data());
+		return contiguous_iterator<T const, bounded::builtin_max_value<size_type>>(m_data.data());
 	}
 	constexpr auto begin() & {
-		return iterator(m_data.data());
+		return contiguous_iterator<T, bounded::builtin_max_value<size_type>>(m_data.data());
 	}
 	constexpr auto begin() && {
 		return ::containers::move_iterator(begin());
@@ -125,7 +121,7 @@ struct dynamic_array : private lexicographical_comparison::base {
 	}
 
 private:
-	uninitialized_dynamic_array<value_type, size_type> m_data;
+	uninitialized_dynamic_array<T, size_type> m_data;
 };
 
 } // namespace containers

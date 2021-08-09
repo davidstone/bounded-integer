@@ -18,6 +18,7 @@
 #include <containers/common_functions.hpp>
 #include <containers/compare_container.hpp>
 #include <containers/insert.hpp>
+#include <containers/iterator_t.hpp>
 #include <containers/legacy_iterator.hpp>
 #include <containers/lookup.hpp>
 #include <containers/range_value_t.hpp>
@@ -115,8 +116,7 @@ public:
 	using key_type = typename value_type::key_type;
 	using mapped_type = typename value_type::mapped_type;
 
-	using const_iterator = typename Container::const_iterator;
-	using iterator = typename Container::iterator;
+	using const_iterator = iterator_t<Container const &>;
 	
 	constexpr auto extract_key() const {
 		return extract_map_key<value_type, ExtractKey>(m_extract_key);
@@ -339,8 +339,6 @@ private:
 public:
 	using typename base::key_type;
 	using typename base::mapped_type;
-	using typename base::const_iterator;
-	using typename base::iterator;
 
 	using base::compare;
 	using base::extract_key;
@@ -376,8 +374,6 @@ private:
 public:
 	using typename base::key_type;
 	using typename base::mapped_type;
-	using typename base::const_iterator;
-	using typename base::iterator;
 
 	using base::compare;
 	using base::extract_key;

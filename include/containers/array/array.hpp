@@ -65,10 +65,8 @@ struct array {
 	static_assert(size_ <= static_cast<std::size_t>(numeric_traits::max_value<std::ptrdiff_t>));
 	using value_type = typename detail::array_value_type<T, sizes...>::type;
 
-	using const_iterator = contiguous_iterator<value_type const, static_cast<std::ptrdiff_t>(size_)>;
-	using iterator = contiguous_iterator<value_type, static_cast<std::ptrdiff_t>(size_)>;
-
 	constexpr auto begin() const & {
+		using const_iterator = contiguous_iterator<value_type const, static_cast<std::ptrdiff_t>(size_)>;
 		if constexpr (size() != 0) {
 			return const_iterator(m_value);
 		} else {
@@ -76,6 +74,7 @@ struct array {
 		}
 	}
 	constexpr auto begin() & {
+		using iterator = contiguous_iterator<value_type, static_cast<std::ptrdiff_t>(size_)>;
 		if constexpr (size() != 0) {
 			return iterator(m_value);
 		} else {

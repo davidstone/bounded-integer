@@ -28,11 +28,6 @@ namespace containers {
 // See https://probablydance.com/2013/05/13/4gb-per-vector/
 template<typename T, std::size_t capacity_>
 struct stable_vector : private lexicographical_comparison::base {
-	using value_type = T;
-	
-	using const_iterator = contiguous_iterator<value_type const, static_cast<std::ptrdiff_t>(capacity_)>;
-	using iterator = contiguous_iterator<value_type, static_cast<std::ptrdiff_t>(capacity_)>;
-
 	// Allocates the full capacity
 	constexpr stable_vector() = default;
 
@@ -87,10 +82,10 @@ struct stable_vector : private lexicographical_comparison::base {
 	}
 
 	constexpr auto begin() const & {
-		return const_iterator(m_storage.data());
+		return contiguous_iterator<T const, static_cast<std::ptrdiff_t>(capacity_)>(m_storage.data());
 	}
 	constexpr auto begin() & {
-		return iterator(m_storage.data());
+		return contiguous_iterator<T, static_cast<std::ptrdiff_t>(capacity_)>(m_storage.data());
 	}
 	constexpr auto begin() && {
 		return ::containers::move_iterator(begin());

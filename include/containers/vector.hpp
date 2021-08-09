@@ -34,9 +34,6 @@ struct vector : private lexicographical_comparison::base {
 	using value_type = T;
 	using size_type = bounded::integer<0, bounded::normalize<max_size>>;
 
-	using const_iterator = contiguous_iterator<value_type const, max_size>;
-	using iterator = contiguous_iterator<value_type, max_size>;
-
 	constexpr vector() = default;
 
 	constexpr explicit vector(initializer_range<vector> auto && source) {
@@ -91,10 +88,10 @@ struct vector : private lexicographical_comparison::base {
 	}
 
 	constexpr auto begin() const & {
-		return const_iterator(m_storage.data());
+		return contiguous_iterator<value_type const, max_size>(m_storage.data());
 	}
 	constexpr auto begin() & {
-		return iterator(m_storage.data());
+		return contiguous_iterator<value_type, max_size>(m_storage.data());
 	}
 	constexpr auto begin() && {
 		return ::containers::move_iterator(begin());

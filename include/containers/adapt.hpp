@@ -35,27 +35,6 @@ concept statically_sized_adapted_range = sized_adapted_range<Range, Traits> and 
 
 template<typename Range, typename Traits>
 struct adapt {
-private:
-	using adapt_iterator_traits = std::conditional_t<
-		std::is_empty_v<Traits> and std::is_copy_assignable_v<Traits>,
-		Traits,
-		decltype(std::reference_wrapper(std::declval<Traits const &>()))
-	>;
-
-	[[no_unique_address]] Range m_range;
-	[[no_unique_address]] Traits m_traits;
-
-public:
-	using iterator = decltype(containers::adapt_iterator(
-		::containers::detail::unwrap(std::declval<adapt_iterator_traits &>()).get_begin(std::declval<Range &>()),
-		std::declval<adapt_iterator_traits>()
-	));
-	using const_iterator = decltype(containers::adapt_iterator(
-		::containers::detail::unwrap(std::declval<adapt_iterator_traits &>()).get_begin(std::declval<Range const &>()),
-		std::declval<adapt_iterator_traits>()
-	));
-	using value_type = iter_value_t<iterator>;
-	
 	constexpr adapt(Range && range, Traits traits):
 		m_range(OPERATORS_FORWARD(range)),
 		m_traits(std::move(traits))
@@ -107,6 +86,16 @@ public:
 	}
 	
 	OPERATORS_BRACKET_SEQUENCE_RANGE_DEFINITIONS
+
+private:
+	using adapt_iterator_traits = std::conditional_t<
+		std::is_empty_v<Traits> and std::is_copy_assignable_v<Traits>,
+		Traits,
+		decltype(std::reference_wrapper(std::declval<Traits const &>()))
+	>;
+
+	[[no_unique_address]] Range m_range;
+	[[no_unique_address]] Traits m_traits;
 };
 
 template<typename Range, typename Traits>
