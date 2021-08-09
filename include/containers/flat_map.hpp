@@ -339,7 +339,6 @@ private:
 public:
 	using typename base::key_type;
 	using typename base::mapped_type;
-	using typename base::value_type;
 	using typename base::const_iterator;
 	using typename base::iterator;
 
@@ -377,7 +376,6 @@ private:
 public:
 	using typename base::key_type;
 	using typename base::mapped_type;
-	using typename base::value_type;
 	using typename base::const_iterator;
 	using typename base::iterator;
 

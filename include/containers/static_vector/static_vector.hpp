@@ -34,7 +34,6 @@ namespace detail {
 
 template<typename T, std::size_t capacity_, bool = std::is_trivially_destructible_v<T>>
 struct static_vector_data : private lexicographical_comparison::base {
-	using value_type = T;
 	using const_iterator = contiguous_iterator<T const, static_cast<std::ptrdiff_t>(capacity_)>;
 	using iterator = contiguous_iterator<T, static_cast<std::ptrdiff_t>(capacity_)>;
 
@@ -136,7 +135,6 @@ private:
 	using base = detail::static_vector_data<T, capacity_>;
 public:
 
-	using typename base::value_type;
 	using typename base::const_iterator;
 	using typename base::iterator;
 
