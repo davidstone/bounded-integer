@@ -12,6 +12,7 @@
 #include <containers/appendable_from_capacity.hpp>
 #include <containers/begin_end.hpp>
 #include <containers/count_type.hpp>
+#include <containers/iterator_t.hpp>
 #include <containers/mutable_iterator.hpp>
 
 #include <bounded/assert.hpp>
@@ -24,7 +25,7 @@ namespace containers {
 namespace detail {
 
 template<typename Container>
-concept member_erasable = requires(Container & container, typename Container::const_iterator const it1, typename Container::const_iterator const it2) {
+concept member_erasable = requires(Container & container, iterator_t<Container const &> const it1, iterator_t<Container const &> const it2) {
 	container.erase(it1, it2);
 };
 
@@ -47,7 +48,7 @@ constexpr void erase_after(Container & container, iterator_t<Container const &> 
 }
 
 template<detail::erasable Container>
-constexpr auto erase(Container & container, typename Container::const_iterator const first, typename Container::const_iterator const middle_) {
+constexpr auto erase(Container & container, iterator_t<Container const &> const first, iterator_t<Container const &> const middle_) {
 	if constexpr (detail::member_erasable<Container>) {
 		return container.erase(first, middle_);
 	} else {
@@ -78,7 +79,7 @@ constexpr auto erase(Container & container, typename Container::const_iterator c
 }
 
 template<detail::erasable Container>
-constexpr auto erase(Container & container, typename Container::const_iterator const it) {
+constexpr auto erase(Container & container, iterator_t<Container const &> const it) {
 	BOUNDED_ASSERT(it != containers::end(container));
 	return erase(container, it, ::containers::next(it));
 }

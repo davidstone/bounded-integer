@@ -14,6 +14,7 @@
 #include <containers/data.hpp>
 #include <containers/lazy_push_back.hpp>
 #include <containers/is_iterator.hpp>
+#include <containers/iterator_t.hpp>
 #include <containers/resize.hpp>
 #include <containers/size.hpp>
 
@@ -29,14 +30,14 @@ namespace containers {
 namespace detail {
 
 template<typename Result>
-constexpr auto concatenate_prepend_append(Result &, typename Result::iterator) {
+constexpr auto concatenate_prepend_append(Result &, iterator_t<Result &>) {
 	bounded::assert_or_assume_unreachable();
 }
 
 // This assumes that the begining of the result is full of unused memory, and
 // all elements in result are already where they belong.
 template<typename Result>
-constexpr auto concatenate_prepend_append(Result & result, typename Result::iterator const it, auto && range, auto && ... ranges) {
+constexpr auto concatenate_prepend_append(Result & result, iterator_t<Result &> const it, auto && range, auto && ... ranges) {
 	if constexpr (std::is_same_v<Result, std::remove_reference_t<decltype(range)>>) {
 		if (std::addressof(result) == std::addressof(range)) {
 			(..., ::containers::append(result, OPERATORS_FORWARD(ranges)));
@@ -95,7 +96,7 @@ constexpr auto move_existing_data_to_final_position(Container & container, auto 
 		container.append_from_capacity(before_size);
 	} else {
 		static_assert(std::is_trivial_v<range_value_t<Container>> and resizable_container<Container>);
-		using difference_type = iter_difference_t<iterator_t<Container>>;
+		using difference_type = iter_difference_t<iterator_t<Container &>>;
 		auto const original_size = bounded::integer(::containers::size(container));
 		auto const new_size = original_size + before_size;
 		::containers::resize(container, new_size);

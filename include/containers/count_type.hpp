@@ -11,6 +11,6 @@
 namespace containers {
 
 template<typename Range>
-using count_type = offset_type<iterator_t<Range>>;
+using count_type = offset_type<iterator_t<Range &>>;
 
 }	// namespace containers

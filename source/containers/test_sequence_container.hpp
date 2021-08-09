@@ -9,6 +9,7 @@
 #include <containers/assign.hpp>
 #include <containers/begin_end.hpp>
 #include <containers/is_empty.hpp>
+#include <containers/iterator_t.hpp>
 #include <containers/push_back.hpp>
 #include <containers/range_value_t.hpp>
 #include <containers/range_view.hpp>
@@ -216,8 +217,9 @@ constexpr auto test_sequence_container_single(std::initializer_list<containers::
 template<typename Container>
 constexpr auto test_sequence_container() -> bool {
 	static_assert(!containers::iterator<Container>);
-	static_assert(containers::iterator<typename Container::const_iterator>);
-	static_assert(containers::iterator<typename Container::iterator>);
+	static_assert(containers::iterator<containers::iterator_t<Container const &>>);
+	static_assert(containers::iterator<containers::iterator_t<Container &>>);
+	static_assert(containers::iterator<containers::iterator_t<Container>>);
 
 	test_sequence_container_default_constructed_empty<Container>();
 

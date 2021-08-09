@@ -42,7 +42,7 @@ constexpr void test_unique_merge_copy(Container const & lhs, Container const & r
 }
 
 constexpr void test_unique_inplace_merge(Container v, Container const & other, Container const & expected) {
-	using iterator = Container::iterator;
+	using iterator = containers::iterator_t<Container const &>;
 	auto const midpoint = static_cast<containers::iter_difference_t<iterator>>(containers::size(v));
 	containers::append(v, other);
 	auto const it = containers::unique_inplace_merge(begin(v), begin(v) + midpoint, end(v));

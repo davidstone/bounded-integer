@@ -6,6 +6,7 @@
 #include <containers/mutable_iterator.hpp>
 
 #include <containers/array/array.hpp>
+#include <containers/iterator_t.hpp>
 
 #include "../test_assert.hpp"
 
@@ -15,7 +16,7 @@ using container = containers::array<int, 1>;
 
 template<typename Range, typename Iterator>
 concept can_get_mutable_iterator_from = requires(Iterator it) {
-	{ containers::detail::mutable_iterator(std::declval<Range>(), it) } -> std::same_as<container::iterator>;
+	{ containers::detail::mutable_iterator(std::declval<Range>(), it) } -> std::same_as<containers::iterator_t<container &>>;
 };
 
 template<typename Range>

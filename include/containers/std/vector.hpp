@@ -312,7 +312,7 @@ struct vector {
 private:
 	using impl_t = containers::vector<T, max_size()>;
 	static constexpr auto impl_iterator(const_iterator it) {
-		return typename impl_t::const_iterator(it);
+		return containers::iterator_t<impl_t const &>(it);
 	}
 	impl_t m_impl;
 };
