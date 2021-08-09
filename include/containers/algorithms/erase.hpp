@@ -11,7 +11,6 @@
 #include <containers/appendable_from_capacity.hpp>
 #include <containers/begin_end.hpp>
 #include <containers/mutable_iterator.hpp>
-#include <containers/resizable_container.hpp>
 
 #include <bounded/assert.hpp>
 #include <bounded/integer.hpp>
@@ -24,16 +23,15 @@ namespace detail {
 
 template<typename Container>
 concept member_erasable = requires(Container & container, typename Container::const_iterator const it1, typename Container::const_iterator const it2) {
-	container.erase(it1);
 	container.erase(it1, it2);
 };
 
 template<typename Container>
-concept erasable = member_erasable<Container> or resizable_container<Container>;
+concept erasable = member_erasable<Container> or appendable_from_capacity<Container>;
 
 } // namespace detail
 
-template<resizable_container Container>
+template<detail::erasable Container>
 constexpr void erase_after(Container & container, iterator_t<Container const &> const_position) {
 	auto const last = containers::end(container);
 	if constexpr (detail::appendable_from_capacity<Container>) {
@@ -79,16 +77,13 @@ constexpr auto erase(Container & container, typename Container::const_iterator c
 
 template<detail::erasable Container>
 constexpr auto erase(Container & container, typename Container::const_iterator const it) {
-	if constexpr (detail::member_erasable<Container>) {
-		return container.erase(it);
-	} else {
-		BOUNDED_ASSERT(it != containers::end(container));
-		return erase(container, it, ::containers::next(it));
-	}
+	BOUNDED_ASSERT(it != containers::end(container));
+	return erase(container, it, ::containers::next(it));
 }
 
-constexpr auto erase_if(resizable_container auto & container, auto predicate) {
-	return erase(container, ::containers::remove_if(container, std::move(predicate)), containers::end(container));
+// TODO: Handle splicable containers
+constexpr auto erase_if(detail::erasable auto & container, auto predicate) {
+	return ::containers::erase_after(container, ::containers::remove_if(container, std::move(predicate)));
 }
 
 } // namespace containers
