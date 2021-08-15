@@ -167,8 +167,8 @@ constexpr auto test_range_constructor(auto const & source) -> void {
 
 template<typename Container>
 constexpr auto test_sequence_container_single(std::initializer_list<containers::range_value_t<Container>> init) -> void {
-	test_special_members(Container(init));
 	test_range_constructor<Container>(init);
+	test_special_members(Container(init));
 }
 
 template<typename Container>
