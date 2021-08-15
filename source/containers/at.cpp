@@ -4,3 +4,13 @@
 // http://www.boost.org/LICENSE_1_0.txt)
 
 #include <containers/at.hpp>
+
+#include <containers/array/array.hpp>
+
+namespace {
+
+using namespace bounded::literal;
+
+static_assert(containers::array({1, 2, 3})[0_bi] == 1);
+
+} // namespace
