@@ -11,12 +11,16 @@
 
 #include "test_sequence_container.hpp"
 
+#include "../test_int.hpp"
+
 namespace {
 
 using namespace bounded::literal;
 
 template<typename T>
 using test_stable_vector = containers::stable_vector<T, 1000>;
+
+static_assert(test_stable_vector<int>::capacity() == 1000_bi);
 
 static_assert(containers_test::test_sequence_container<test_stable_vector<int>>());
 static_assert(containers_test::test_sequence_container<test_stable_vector<bounded_test::integer>>());

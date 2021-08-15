@@ -15,7 +15,9 @@
 #include <containers/resize.hpp>
 
 #include "../test_assert.hpp"
+#include "../test_int.hpp"
 
+#include "test_reserve_and_capacity.hpp"
 #include "test_sequence_container.hpp"
 
 namespace {
@@ -116,6 +118,8 @@ auto test_erase() {
 
 int main() {
 	containers_test::test_sequence_container<containers::small_buffer_optimized_vector<bounded_test::integer, 40>>();
+	containers_test::test_reserve_and_capacity<containers::small_buffer_optimized_vector<int, 40>>();
+	containers_test::test_reserve_and_capacity<containers::small_buffer_optimized_vector<bounded_test::integer, 40>>();
 
 	test_generic(1_bi, '0', {});
 	test_generic(1_bi, '0', {'5'});

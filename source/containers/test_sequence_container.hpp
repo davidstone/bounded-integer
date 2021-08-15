@@ -6,19 +6,12 @@
 #pragma once
 
 #include <containers/algorithms/compare.hpp>
-#include <containers/assign.hpp>
 #include <containers/begin_end.hpp>
-#include <containers/is_empty.hpp>
 #include <containers/iterator_t.hpp>
-#include <containers/push_back.hpp>
 #include <containers/range_value_t.hpp>
 #include <containers/range_view.hpp>
-#include <containers/reserve_if_reservable.hpp>
-#include <containers/shrink_to_fit.hpp>
-#include <containers/uninitialized_dynamic_array.hpp>
 
 #include "../test_assert.hpp"
-#include "../test_int.hpp"
 
 namespace containers_test {
 
@@ -39,13 +32,6 @@ constexpr auto test_sequence_container_default_constructed_empty() -> bool {
 	BOUNDED_TEST(default_constructed == implicit_from_empty_braces);
 	Container const implicit_from_two_empty_braces = {{}};
 	BOUNDED_TEST(default_constructed == implicit_from_two_empty_braces);
-	return true;
-}
-
-template<typename Container>
-constexpr auto test_range_constructor(auto const & source) -> bool {
-	auto const container = Container(source);
-	BOUNDED_TEST(containers::equal(container, source));
 	return true;
 }
 
@@ -112,12 +98,6 @@ constexpr auto test_move_assignment_from_moved_from(Container const & container)
 	move = std::move(temp);
 	BOUNDED_TEST(move == container);
 }
-template<typename T, typename Capacity>
-constexpr auto validate_range(containers::uninitialized_dynamic_array<T, Capacity> const & container, auto const &) -> void {
-	// Not anything useful to validate for a range of uninitialized memory,
-	// except that forming the begin and end pointers are still valid.
-	auto const last = container.data() + container.capacity();
-}
 template<typename Container>
 constexpr auto test_recover_from_self_move(auto const & initializer, auto const & validate) -> void {
 	auto container = Container(initializer);
@@ -181,37 +161,16 @@ constexpr auto test_special_members(auto const & container) -> void {
 }
 
 template<typename Container>
-constexpr auto test_reserve() -> bool {
-	auto v = Container();
-	auto const capacity0 = v.capacity();
-	BOUNDED_TEST(capacity0 >= 0_bi);
-	BOUNDED_TEST(containers::size(v) == 0_bi);
-	v.reserve(10_bi);
-	auto const capacity10 = v.capacity();
-	BOUNDED_TEST(capacity10 >= 10_bi);
-	BOUNDED_TEST(capacity10 >= capacity0);
-	BOUNDED_TEST(containers::size(v) == 0_bi);
-	shrink_to_fit(v);
-	BOUNDED_TEST(containers::size(v) == 0_bi);
-	BOUNDED_TEST(v.capacity() == capacity0);
-	v.reserve(10_bi);
-	BOUNDED_TEST(containers::size(v) == 0_bi);
-	BOUNDED_TEST(v.capacity() == capacity10);
-	containers::push_back(v, {});
-	BOUNDED_TEST(containers::size(v) == 1_bi);
-	BOUNDED_TEST(v.capacity() == capacity10);
-	shrink_to_fit(v);
-	BOUNDED_TEST(containers::size(v) == 1_bi);
-	BOUNDED_TEST(v.capacity() >= capacity0);
-	BOUNDED_TEST(v.capacity() <= capacity10);
-	return true;
+constexpr auto test_range_constructor(auto const & source) -> void {
+	auto const container = Container(source);
+	BOUNDED_TEST(containers::equal(container, source));
 }
 
 template<typename Container>
 constexpr auto test_sequence_container_single(std::initializer_list<containers::range_value_t<Container>> init) -> void {
+	test_special_members(Container(init));
 	test_range_constructor<Container>(init);
 	test_range_constructor<Container>(containers::range_view(init));
-	test_special_members(Container(init));
 }
 
 template<typename Container>
@@ -223,9 +182,6 @@ constexpr auto test_sequence_container() -> bool {
 
 	test_sequence_container_default_constructed_empty<Container>();
 
-	if constexpr (containers::detail::reservable<Container>) {
-		test_reserve<Container>();
-	}
 	test_sequence_container_single<Container>({});
 	test_sequence_container_single<Container>({5});
 	test_sequence_container_single<Container>({0, 1, 4});

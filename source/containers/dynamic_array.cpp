@@ -6,6 +6,7 @@
 #include <containers/dynamic_array.hpp>
 
 #include "test_sequence_container.hpp"
+#include "../test_int.hpp"
 
 namespace {
 

@@ -11,6 +11,7 @@
 #include <numeric_traits/min_max_value.hpp>
 
 #include "../../test_assert.hpp"
+#include "../../test_int.hpp"
 #include "../test_sequence_container.hpp"
 
 namespace {
@@ -19,6 +20,8 @@ using namespace bounded::literal;
 
 template<typename T>
 using test_static_vector = containers::static_vector<T, 40>;
+
+static_assert(test_static_vector<int>::capacity() == 40_bi);
 
 static_assert(std::is_trivially_copy_constructible_v<test_static_vector<int>>);
 static_assert(std::is_trivially_move_constructible_v<test_static_vector<int>>);
