@@ -175,10 +175,14 @@ constexpr auto test_sequence_container_single(std::initializer_list<containers::
 
 template<typename Container>
 constexpr auto test_sequence_container() -> bool {
+	static_assert(!containers::iterator<Container const &>);
+	static_assert(!containers::iterator<Container &>);
+	static_assert(!containers::iterator<Container &&>);
 	static_assert(!containers::iterator<Container>);
-	static_assert(containers::iterator<containers::iterator_t<Container const &>>);
-	static_assert(containers::iterator<containers::iterator_t<Container &>>);
-	static_assert(containers::iterator<containers::iterator_t<Container>>);
+	static_assert(containers::forward_range<Container const &>);
+	static_assert(containers::forward_range<Container &>);
+	static_assert(containers::forward_range<Container &&>);
+	static_assert(containers::forward_range<Container>);
 
 	test_sequence_container_default_constructed_empty<Container>();
 
