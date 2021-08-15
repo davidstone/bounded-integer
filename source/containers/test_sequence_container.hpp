@@ -9,7 +9,6 @@
 #include <containers/begin_end.hpp>
 #include <containers/iterator_t.hpp>
 #include <containers/range_value_t.hpp>
-#include <containers/range_view.hpp>
 
 #include "../test_assert.hpp"
 
@@ -170,7 +169,6 @@ template<typename Container>
 constexpr auto test_sequence_container_single(std::initializer_list<containers::range_value_t<Container>> init) -> void {
 	test_special_members(Container(init));
 	test_range_constructor<Container>(init);
-	test_range_constructor<Container>(containers::range_view(init));
 }
 
 template<typename Container>
