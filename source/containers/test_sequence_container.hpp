@@ -150,13 +150,14 @@ constexpr auto test_swap(Container const & container) -> void {
 	test_self_swap(container, bounded::equal_to(container));
 }
 
-constexpr auto test_special_members(auto const & container) -> void {
+constexpr auto test_special_members(auto const & container) -> bool {
 	test_copy_constructor(container);
 	test_move_constructor(container);
 	test_copy_assignment(container);
 	test_move_assignment(container);
 	test_assignment_from_empty_braces(container);
 	test_swap(container);
+	return true;
 }
 
 template<typename Container>
