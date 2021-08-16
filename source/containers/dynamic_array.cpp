@@ -13,6 +13,9 @@ namespace {
 static_assert(containers_test::test_sequence_container<containers::dynamic_array<int>>());
 static_assert(containers_test::test_sequence_container<containers::dynamic_array<bounded_test::integer>>());
 
+static_assert(std::is_convertible_v<containers::dynamic_array<bounded_test::integer> const &, std::span<bounded_test::integer const>>);
+static_assert(std::is_convertible_v<containers::dynamic_array<bounded_test::integer> &, std::span<bounded_test::integer>>);
+
 struct recursive {
 	containers::dynamic_array<recursive, bounded::integer<0, 1>> m;
 };
