@@ -8,7 +8,6 @@
 #include <containers/algorithms/ska_sort.hpp>
 #include <containers/algorithms/sort.hpp>
 #include <containers/array/array.hpp>
-#include <containers/array/make_array.hpp>
 #include <containers/c_array.hpp>
 #include <containers/front_back.hpp>
 #include <containers/push_back.hpp>
