@@ -32,16 +32,14 @@ constexpr auto && get(array<T, size> && a) {
 
 // I am not sure yet if it is legal to specialize these classes.
 #if 0
-namespace std {
 
 template<typename T, std::size_t size>
-struct tuple_size<::containers::array<T, size>> : integral_constant<std::size_t, size> {};
+struct std::tuple_size<::containers::array<T, size>> : integral_constant<std::size_t, size> {};
 
 template<std::size_t index, typename T, std::size_t size>
-struct tuple_element<index, ::containers::array<T, size>> {
+struct std::tuple_element<index, ::containers::array<T, size>> {
 	using type = T;
 };
 
-}	// namespace std
 #endif
 

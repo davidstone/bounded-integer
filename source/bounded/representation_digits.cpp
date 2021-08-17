@@ -28,14 +28,12 @@ using negative_one_to_ninety_nine = bounded::integer<-1, 99>;
 enum class sixty_three_enum : std::uint16_t { value = 63 };
 
 } // namespace
-namespace numeric_traits {
 
 template<>
-constexpr auto min_value<sixty_three_enum> = sixty_three_enum::value;
+constexpr auto numeric_traits::min_value<sixty_three_enum> = sixty_three_enum::value;
 template<>
-constexpr auto max_value<sixty_three_enum> = sixty_three_enum::value;
+constexpr auto numeric_traits::max_value<sixty_three_enum> = sixty_three_enum::value;
 
-} // namespace numeric_traits
 namespace {
 
 static_assert(bounded::representation_bits<sixty_three> == 6_bi);

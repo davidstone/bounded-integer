@@ -259,43 +259,40 @@ constexpr auto operator==(optional<T> const & lhs, none_t) -> bool {
 }
 
 } // namespace bounded
-namespace std {
 
 template<typename LHS, typename RHS>
-struct common_type<bounded::optional<LHS>, RHS> {
+struct std::common_type<bounded::optional<LHS>, RHS> {
 	using type = bounded::optional<common_type_t<LHS, RHS>>;
 };
 template<typename LHS, typename RHS>
-struct common_type<LHS, bounded::optional<RHS>> {
+struct std::common_type<LHS, bounded::optional<RHS>> {
 	using type = bounded::optional<common_type_t<LHS, RHS>>;
 };
 template<typename LHS, typename RHS>
-struct common_type<bounded::optional<LHS>, bounded::optional<RHS>> {
+struct std::common_type<bounded::optional<LHS>, bounded::optional<RHS>> {
 	using type = bounded::optional<common_type_t<LHS, RHS>>;
 };
 
 
 template<typename RHS>
-struct common_type<bounded::none_t, RHS> {
+struct std::common_type<bounded::none_t, RHS> {
 	using type = bounded::optional<RHS>;
 };
 template<typename LHS>
-struct common_type<LHS, bounded::none_t> {
+struct std::common_type<LHS, bounded::none_t> {
 	using type = bounded::optional<LHS>;
 };
 template<>
-struct common_type<bounded::none_t, bounded::none_t> {
+struct std::common_type<bounded::none_t, bounded::none_t> {
 	using type = bounded::none_t;
 };
 
 
 template<typename RHS>
-struct common_type<bounded::none_t, bounded::optional<RHS>> {
+struct std::common_type<bounded::none_t, bounded::optional<RHS>> {
 	using type = bounded::optional<RHS>;
 };
 template<typename LHS>
-struct common_type<bounded::optional<LHS>, bounded::none_t> {
+struct std::common_type<bounded::optional<LHS>, bounded::none_t> {
 	using type = bounded::optional<LHS>;
 };
-
-} // namespace std

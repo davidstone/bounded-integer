@@ -94,15 +94,13 @@ static_assert(check_assignment());
 enum class bounded_enum{};
 
 } // namespace
-namespace numeric_traits {
 
 template<>
-constexpr auto min_value<bounded_enum> = 0;
+constexpr auto numeric_traits::min_value<bounded_enum> = 0;
 
 template<>
-constexpr auto max_value<bounded_enum> = 0;
+constexpr auto numeric_traits::max_value<bounded_enum> = 0;
 
-} // namespace numeric_traits
 namespace {
 
 enum unscoped_enum : int {};
@@ -126,15 +124,13 @@ static_assert(bounded::constant<bounded_enum{}> == bounded::constant<0>);
 enum class bounded_integer_enum{};
 
 } // namespace
-namespace numeric_traits {
 
 template<>
-constexpr auto min_value<bounded_integer_enum> = bounded::constant<0>;
+constexpr auto numeric_traits::min_value<bounded_integer_enum> = bounded::constant<0>;
 
 template<>
-constexpr auto max_value<bounded_integer_enum> = bounded::constant<0>;
+constexpr auto numeric_traits::max_value<bounded_integer_enum> = bounded::constant<0>;
 
-} // namespace numeric_traits
 namespace {
 
 static_assert(!std::is_convertible_v<bounded_integer_enum, bounded::integer<0, 0>>);
@@ -144,15 +140,13 @@ static_assert(bounded::constant<bounded_integer_enum{}> == bounded::constant<0>)
 enum class enum_bounded_enum{};
 
 } // namespace
-namespace numeric_traits {
 
 template<>
-constexpr auto min_value<enum_bounded_enum> = enum_bounded_enum();
+constexpr auto numeric_traits::min_value<enum_bounded_enum> = enum_bounded_enum();
 
 template<>
-constexpr auto max_value<enum_bounded_enum> = enum_bounded_enum();
+constexpr auto numeric_traits::max_value<enum_bounded_enum> = enum_bounded_enum();
 
-} // namespace numeric_traits
 namespace {
 
 static_assert(!std::is_convertible_v<enum_bounded_enum, bounded::integer<0, 0>>);

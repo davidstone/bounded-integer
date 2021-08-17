@@ -45,10 +45,9 @@ constexpr auto digits(auto const minimum, auto const maximum, auto const base) n
 
 }	// namespace detail
 }	// namespace bounded
-namespace std {
 
 template<auto minimum, auto maximum>
-struct numeric_limits<bounded::integer<minimum, maximum>> {
+struct std::numeric_limits<bounded::integer<minimum, maximum>> {
 private:
 	using type = bounded::integer<minimum, maximum>;
 public:
@@ -112,5 +111,3 @@ public:
 		return bounded::constant<0>;
 	}
 };
-
-}	// namespace std

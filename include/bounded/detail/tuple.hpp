@@ -301,12 +301,9 @@ constexpr auto && get(tuple_like auto && t) {
 }
 
 }	// namespace bounded
-namespace std {
 
 template<typename... Ts>
-class tuple_size<bounded::tuple<Ts...>> : public std::integral_constant<std::size_t, sizeof...(Ts)> {};
+class std::tuple_size<bounded::tuple<Ts...>> : public std::integral_constant<std::size_t, sizeof...(Ts)> {};
 
 template<std::size_t index, typename... Ts>
-class tuple_element<index, bounded::tuple<Ts...>> : public bounded::tuple_element_c<index, bounded::tuple<Ts...>> {};
-
-} // namespace std
+class std::tuple_element<index, bounded::tuple<Ts...>> : public bounded::tuple_element_c<index, bounded::tuple<Ts...>> {};

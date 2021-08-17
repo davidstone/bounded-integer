@@ -28,15 +28,13 @@ template<auto minimum, auto maximum>
 struct integer;
 
 } // namespace bounded
-namespace numeric_traits {
 
 template<auto minimum, auto maximum>
-inline constexpr auto max_value<bounded::integer<minimum, maximum>> = bounded::integer<maximum, maximum>();
+inline constexpr auto numeric_traits::max_value<bounded::integer<minimum, maximum>> = bounded::integer<maximum, maximum>();
 
 template<auto minimum, auto maximum>
-inline constexpr auto min_value<bounded::integer<minimum, maximum>> = bounded::integer<minimum, minimum>();
+inline constexpr auto numeric_traits::min_value<bounded::integer<minimum, maximum>> = bounded::integer<minimum, minimum>();
 
-} // namespace numeric_traits
 namespace bounded {
 
 template<auto minimum, auto maximum>
@@ -46,13 +44,12 @@ template<auto minimum, auto maximum>
 inline constexpr auto builtin_min_value<integer<minimum, maximum>> = minimum;
 
 } // namespace bounded
-namespace std {
 
 // I do not have to specialize the single-argument version, as it just returns
 // the type passed in, which will always work.
 
 template<bounded::bounded_integer LHS, bounded::bounded_integer RHS> requires(std::is_same_v<LHS, std::decay_t<LHS>> and std::is_same_v<RHS, std::decay_t<RHS>>)
-struct common_type<LHS, RHS> {
+struct std::common_type<LHS, RHS> {
 private:
 	static inline constexpr auto minimum = bounded::normalize<bounded::detail::safe_min(
 		bounded::builtin_min_value<LHS>,
@@ -66,7 +63,6 @@ public:
 	using type = bounded::integer<minimum, maximum>;
 };
 
-} // namespace std
 namespace bounded {
 
 
