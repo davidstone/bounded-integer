@@ -5,7 +5,7 @@
 
 #include <containers/algorithms/partition.hpp>
 #include <containers/array/array.hpp>
-#include <containers/static_vector/static_vector.hpp>
+#include <containers/static_vector.hpp>
 
 namespace {
 

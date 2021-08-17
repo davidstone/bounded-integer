@@ -5,8 +5,8 @@
 
 #include <containers/algorithms/keyed_binary_search.hpp>
 
-#include <containers/static_vector/static_vector.hpp>
 #include <containers/flat_map.hpp>
+#include <containers/static_vector.hpp>
 
 namespace {
 

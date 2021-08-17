@@ -20,10 +20,15 @@
 #include <containers/initializer_range.hpp>
 #include <containers/integer_range.hpp>
 #include <containers/is_iterator_sentinel.hpp>
+#include <containers/is_range.hpp>
 #include <containers/pop_back.hpp>
+#include <containers/range_value_t.hpp>
+#include <containers/size.hpp>
 #include <containers/uninitialized_storage.hpp>
 
 #include <bounded/concepts.hpp>
+
+#include <numeric_traits/min_max_value.hpp>
 
 #include <operators/bracket.hpp>
 
@@ -152,4 +157,11 @@ public:
 	}
 };
 
-}	// namespace containers
+template<range Source>
+constexpr auto make_static_vector(Source && source) {
+	using value_type = range_value_t<Source>;
+	constexpr auto size = static_cast<std::size_t>(numeric_traits::max_value<range_size_t<Source>>);
+	return static_vector<value_type, size>(OPERATORS_FORWARD(source));
+}
+
+} // namespace containers

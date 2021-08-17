@@ -3,17 +3,19 @@
 // (See accompanying file LICENSE_1_0.txt or copy at
 // http://www.boost.org/LICENSE_1_0.txt)
 
-#include <containers/static_vector/static_vector.hpp>
+#include <containers/static_vector.hpp>
+
 #include <containers/array/array.hpp>
 #include <containers/emplace_back.hpp>
 #include <containers/index_type.hpp>
 
 #include <numeric_traits/min_max_value.hpp>
 
-#include "../../test_assert.hpp"
-#include "../../test_int.hpp"
-#include "../test_append_from_capacity.hpp"
-#include "../test_sequence_container.hpp"
+#include "../bounded/homogeneous_equals.hpp"
+#include "../test_assert.hpp"
+#include "../test_int.hpp"
+#include "test_append_from_capacity.hpp"
+#include "test_sequence_container.hpp"
 
 namespace {
 
@@ -43,6 +45,11 @@ using index_type = containers::index_type<containers::static_vector<int, 10>>;
 static_assert(numeric_traits::min_value<index_type> == 0_bi);
 static_assert(numeric_traits::max_value<index_type> == 9_bi);
 static_assert(!containers::iterator<containers::static_vector<std::string, 6>>);
+
+static_assert(homogeneous_equals(
+	containers::make_static_vector(containers::array({5, 3})),
+	containers::static_vector<int, 2>({5, 3})
+));
 
 } // namespace
 

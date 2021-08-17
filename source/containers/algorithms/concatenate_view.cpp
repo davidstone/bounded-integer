@@ -6,10 +6,10 @@
 #include <containers/algorithms/concatenate_view.hpp>
 
 #include <containers/array/array.hpp>
-#include <containers/static_vector/static_vector.hpp>
 #include <containers/range_value_t.hpp>
 #include <containers/repeat_n.hpp>
 #include <containers/size.hpp>
+#include <containers/static_vector.hpp>
 
 #include <string_view>
 

@@ -158,7 +158,6 @@ add_library(containers_test STATIC
 	source/containers/array/array.cpp
 	source/containers/array/make_array.cpp
 	source/containers/array/tuple.cpp
-	source/containers/static_vector/make_static_vector.cpp
 	source/containers/std/vector.cpp
 	source/containers/adapt.cpp
 	source/containers/append.cpp
@@ -227,7 +226,7 @@ add_library(containers_test STATIC
 target_link_libraries(containers_test PUBLIC containers strict_defaults)
 
 add_executable(static_vector
-	source/containers/static_vector/static_vector.cpp
+	source/containers/static_vector.cpp
 )
 target_link_libraries(static_vector PUBLIC containers strict_defaults)
 
