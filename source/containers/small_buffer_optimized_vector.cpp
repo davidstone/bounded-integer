@@ -17,12 +17,14 @@
 #include "../test_assert.hpp"
 #include "../test_int.hpp"
 
+#include "test_append_from_capacity.hpp"
 #include "test_reserve_and_capacity.hpp"
 #include "test_sequence_container.hpp"
 
 namespace {
 
 static_assert(containers_test::test_sequence_container<containers::small_buffer_optimized_vector<int, 40>>());
+static_assert(containers_test::test_append_from_capacity<containers::small_buffer_optimized_vector<int, 1>>());
 
 using namespace bounded::literal;
 
@@ -120,6 +122,7 @@ int main() {
 	containers_test::test_sequence_container<containers::small_buffer_optimized_vector<bounded_test::integer, 40>>();
 	containers_test::test_reserve_and_capacity<containers::small_buffer_optimized_vector<int, 40>>();
 	containers_test::test_reserve_and_capacity<containers::small_buffer_optimized_vector<bounded_test::integer, 40>>();
+	containers_test::test_append_from_capacity<containers::small_buffer_optimized_vector<bounded_test::integer, 1>>();
 
 	test_generic(1_bi, '0', {});
 	test_generic(1_bi, '0', {'5'});

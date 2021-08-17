@@ -12,6 +12,7 @@
 
 #include "../../test_assert.hpp"
 #include "../../test_int.hpp"
+#include "../test_append_from_capacity.hpp"
 #include "../test_sequence_container.hpp"
 
 namespace {
@@ -36,6 +37,7 @@ static_assert(!std::is_trivially_copy_assignable_v<test_static_vector<bounded_te
 static_assert(!std::is_trivially_move_assignable_v<test_static_vector<bounded_test::integer>>);
 
 static_assert(containers_test::test_sequence_container<test_static_vector<int>>());
+static_assert(containers_test::test_append_from_capacity<test_static_vector<int>>());
 
 using index_type = containers::index_type<containers::static_vector<int, 10>>;
 static_assert(numeric_traits::min_value<index_type> == 0_bi);
@@ -46,4 +48,5 @@ static_assert(!containers::iterator<containers::static_vector<std::string, 6>>);
 
 int main() {
 	containers_test::test_sequence_container<test_static_vector<bounded_test::integer>>();
+	containers_test::test_append_from_capacity<test_static_vector<bounded_test::integer>>();
 }
