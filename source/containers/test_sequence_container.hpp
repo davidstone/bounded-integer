@@ -16,6 +16,19 @@ namespace containers_test {
 
 using namespace bounded::literal;
 
+// Because it would be really embarassing if this didn't work...
+template<typename Container>
+constexpr auto test_range_based_for_loop() {
+	auto const ccontainer = Container();
+	for ([[maybe_unused]] auto const & value : ccontainer) {
+	}
+	auto mcontainer = Container();
+	for ([[maybe_unused]] auto & value : mcontainer) {
+	}
+	for ([[maybe_unused]] auto && value : Container()) {
+	}
+}
+
 template<typename Container>
 constexpr auto test_sequence_container_default_constructed_empty() -> bool {
 	auto const default_constructed = Container();
@@ -182,6 +195,8 @@ constexpr auto test_sequence_container() -> bool {
 	static_assert(containers::forward_range<Container &>);
 	static_assert(containers::forward_range<Container &&>);
 	static_assert(containers::forward_range<Container>);
+
+	test_range_based_for_loop<Container>();
 
 	test_sequence_container_default_constructed_empty<Container>();
 
