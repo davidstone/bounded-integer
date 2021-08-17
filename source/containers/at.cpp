@@ -7,10 +7,16 @@
 
 #include <containers/array/array.hpp>
 
+#include <catch2/catch_test_macros.hpp>
+
 namespace {
 
 using namespace bounded::literal;
 
-static_assert(containers::array({1, 2, 3})[0_bi] == 1);
+static_assert(containers::at(containers::array({1, 2, 3}), 0_bi) == 1);
+
+TEST_CASE("at throws for out-of-bounds", "[at]") {
+	CHECK_THROWS(containers::at(containers::array({1}), 1U));
+}
 
 } // namespace
