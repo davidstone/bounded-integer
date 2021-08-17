@@ -13,6 +13,8 @@
 
 #include <numeric_traits/min_max_value.hpp>
 
+#include <catch2/catch_test_macros.hpp>
+
 #include "../test_assert.hpp"
 #include "../test_int.hpp"
 
@@ -228,9 +230,7 @@ static_assert(test_character<char16_t>());
 static_assert(test_character<char32_t>());
 static_assert(test_character<wchar_t>());
 
-} // namespace
-
-int main() {
+TEST_CASE("to_radix_sort_key", "[to_radix_sort_key]") {
 	constexpr int array[] = { 1, 2, 3, 4, 5, 6, 7, 8 };
 	BOUNDED_TEST(is_sorted_to_radix(
 		array + 0,
@@ -244,3 +244,5 @@ int main() {
 		array + 8
 	));
 }
+
+} // namespace

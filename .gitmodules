@@ -7,3 +7,6 @@
 [submodule "numeric-traits"]
 	path = numeric-traits
 	url = https://github.com/davidstone/numeric-traits
+[submodule "Catch2"]
+	path = Catch2
+	url = https://github.com/catchorg/Catch2.git

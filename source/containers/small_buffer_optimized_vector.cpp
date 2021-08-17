@@ -5,6 +5,8 @@
 
 #include <containers/small_buffer_optimized_vector.hpp>
 
+#include <catch2/catch_test_macros.hpp>
+
 #include "../test_int.hpp"
 
 #include "test_append_from_capacity.hpp"
@@ -16,12 +18,12 @@ namespace {
 static_assert(containers_test::test_sequence_container<containers::small_buffer_optimized_vector<int, 40>>());
 static_assert(containers_test::test_append_from_capacity<containers::small_buffer_optimized_vector<int, 1>>());
 
-} // namespace
-
-int main() {
+TEST_CASE("small_buffer_optimized_vector", "[small_buffer_optimized_vector]") {
 	containers_test::test_sequence_container<containers::small_buffer_optimized_vector<int, 3>>();
 	containers_test::test_sequence_container<containers::small_buffer_optimized_vector<bounded_test::integer, 3>>();
 	containers_test::test_reserve_and_capacity<containers::small_buffer_optimized_vector<int, 3>>();
 	containers_test::test_reserve_and_capacity<containers::small_buffer_optimized_vector<bounded_test::integer, 3>>();
 	containers_test::test_append_from_capacity<containers::small_buffer_optimized_vector<bounded_test::integer, 1>>();
 }
+
+} // namespace

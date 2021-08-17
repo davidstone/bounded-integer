@@ -15,6 +15,7 @@ enable_testing()
 
 get_directory_property(has_parent PARENT_DIRECTORY)
 if (NOT has_parent)
+	add_subdirectory(Catch2)
 	add_subdirectory(cmake_strict_defaults)
 	add_subdirectory(numeric-traits)
 	add_subdirectory(operators)
@@ -120,7 +121,7 @@ add_executable(bounded_test
 
 target_link_libraries(bounded_test PUBLIC bounded strict_defaults)
 
-add_library(containers_test STATIC
+add_executable(containers_test
 	source/containers/algorithms/accumulate.cpp
 	source/containers/algorithms/advance.cpp
 	source/containers/algorithms/all_any_none.cpp
@@ -215,25 +216,25 @@ add_library(containers_test STATIC
 	source/containers/single_element_range.cpp
 	source/containers/shrink_to_fit.cpp
 	source/containers/size.cpp
+	source/containers/small_buffer_optimized_vector.cpp
 	source/containers/stable_vector.cpp
+	source/containers/static_vector.cpp
 	source/containers/string.cpp
 	source/containers/take.cpp
 	source/containers/to_address.cpp
+	source/containers/to_radix_sort_key.cpp
+	source/containers/trivial_inplace_function.cpp
 	source/containers/uninitialized_dynamic_array.cpp
 	source/containers/vector.cpp
 )
 
-target_link_libraries(containers_test PUBLIC containers strict_defaults)
-
-add_executable(static_vector
-	source/containers/static_vector.cpp
-)
-target_link_libraries(static_vector PUBLIC containers strict_defaults)
-
-add_executable(small_buffer_optimized_vector
-	source/containers/small_buffer_optimized_vector.cpp
-)
-target_link_libraries(small_buffer_optimized_vector PUBLIC containers strict_defaults)
+target_link_libraries(containers_test PRIVATE Catch2::Catch2WithMain containers strict_defaults)
+# https://github.com/catchorg/Catch2/issues/578
+if("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang")
+	target_compile_options(containers_test PRIVATE
+		"-Wno-reserved-identifier"
+	)
+endif()
 
 add_executable(flat_map
 	source/containers/map_benchmark.cpp
@@ -250,16 +251,6 @@ target_link_libraries(std_map PUBLIC containers strict_defaults)
 set(BENCHMARK_ENABLE_TESTING OFF CACHE BOOL "Disable testing benchmark.")
 add_subdirectory("${PROJECT_SOURCE_DIR}/source/benchmark")
 set_target_properties(benchmark PROPERTIES FOLDER extern)
-
-add_executable(to_radix_sort_key
-	source/containers/to_radix_sort_key.cpp
-)
-target_link_libraries(to_radix_sort_key PUBLIC bounded strict_defaults)
-
-add_executable(trivial_inplace_function
-	source/containers/trivial_inplace_function.cpp
-)
-target_link_libraries(trivial_inplace_function PUBLIC containers strict_defaults)
 
 add_executable(ska_sort_benchmark
 	source/containers/algorithms/ska_sort_benchmark.cpp
@@ -296,10 +287,8 @@ endif()
 
 set(test_targets
 	bounded_test
-	static_vector
-	small_buffer_optimized_vector
+	containers_test
 	flat_map
-	to_radix_sort_key
 )
 
 foreach(test_target ${test_targets})

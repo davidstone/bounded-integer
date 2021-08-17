@@ -11,6 +11,8 @@
 
 #include <numeric_traits/min_max_value.hpp>
 
+#include <catch2/catch_test_macros.hpp>
+
 #include "../bounded/homogeneous_equals.hpp"
 #include "../test_assert.hpp"
 #include "../test_int.hpp"
@@ -51,9 +53,9 @@ static_assert(homogeneous_equals(
 	containers::static_vector<int, 2>({5, 3})
 ));
 
-} // namespace
-
-int main() {
+TEST_CASE("static_vector", "[static_vector]") {
 	containers_test::test_sequence_container<test_static_vector<bounded_test::integer>>();
 	containers_test::test_append_from_capacity<test_static_vector<bounded_test::integer>>();
 }
+
+} // namespace
