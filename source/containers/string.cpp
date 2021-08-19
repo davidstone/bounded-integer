@@ -5,50 +5,53 @@
 
 #include <containers/string.hpp>
 
-#include <containers/repeat_n.hpp>
+#include <containers/c_array.hpp>
 
-#include "../test_assert.hpp"
+#include <catch2/catch_test_macros.hpp>
+
+#include "test_append_from_capacity.hpp"
+#include "test_reserve_and_capacity.hpp"
+#include "test_sequence_container.hpp"
 
 namespace {
 
-using namespace bounded::literal;
-
-constexpr bool test() {
-	auto const from_string_literal = containers::string("David");
-	BOUNDED_TEST(from_string_literal == from_string_literal);
-	BOUNDED_TEST(from_string_literal == containers::string({'D', 'a', 'v', 'i', 'd'}));
-
-	constexpr decltype(auto) array = "Stone"; // char const (&)[6]
-	constexpr auto string_view = std::string_view(array);
-	constexpr char const * c_string = array;
-
-	auto const from_string_view = containers::string(string_view);
-	BOUNDED_TEST(from_string_view == containers::string({'S', 't', 'o', 'n', 'e'}));
-	BOUNDED_TEST(from_string_view == string_view);
-	BOUNDED_TEST(string_view == from_string_view);
-
-	auto const from_array = containers::string(array);
-	BOUNDED_TEST(from_array == containers::string({'S', 't', 'o', 'n', 'e'}));
-	BOUNDED_TEST(from_array == array);
-	BOUNDED_TEST(array == from_array);
-
-	auto const from_c_string = containers::string(c_string);
-	BOUNDED_TEST(from_c_string == containers::string({'S', 't', 'o', 'n', 'e'}));
-	BOUNDED_TEST(from_c_string == c_string);
-	BOUNDED_TEST(c_string == from_c_string);
-
-	// Verify this works in a range-based for loop	
-	for (auto const & c [[maybe_unused]] : from_string_literal) {
+struct to_sv {
+	constexpr operator std::string_view() const {
+		return "";
 	}
+};
 
-#if 0
-	auto small_to_large = containers::string("a");
-	small_to_large = containers::string(containers::repeat_n(40_bi, 'c'));
-#endif
-	
-	return true;
+struct to_cstr {
+	constexpr operator char const *() const {
+		return "";
+	}
+};
+
+struct to_both {
+	constexpr operator char const *() const {
+		return "";
+	}
+	constexpr operator std::string_view() const {
+		return "";
+	}
+};
+
+static_assert(std::convertible_to<char const *, containers::string>);
+static_assert(std::convertible_to<char *, containers::string>);
+static_assert(std::convertible_to<containers::c_array<char, 5> const &, containers::string>);
+static_assert(std::convertible_to<containers::c_array<char, 5> &, containers::string>);
+static_assert(std::convertible_to<std::string_view, containers::string>);
+static_assert(!std::convertible_to<to_sv, containers::string>);
+static_assert(!std::convertible_to<to_cstr, containers::string>);
+static_assert(!std::convertible_to<to_both, containers::string>);
+static_assert(std::constructible_from<containers::string, to_sv>);
+static_assert(std::constructible_from<containers::string, to_cstr>);
+static_assert(std::constructible_from<containers::string, to_both>);
+
+TEST_CASE("string", "[string]") {
+	containers_test::test_sequence_container<containers::string>();
+	containers_test::test_reserve_and_capacity<containers::string>();
+	containers_test::test_append_from_capacity<containers::string>();
 }
-
-static_assert(test());
 
 } // namespace

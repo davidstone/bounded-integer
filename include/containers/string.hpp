@@ -14,6 +14,7 @@
 
 #include <bounded/clamp.hpp>
 
+#include <concepts>
 #include <istream>
 #include <ostream>
 #include <span>
@@ -29,12 +30,12 @@ public:
 	
 	using base::base;
 	
-	constexpr string(std::string_view const sv):
-		base(sv)
-	{
+	template<std::same_as<empty_c_array_parameter> Source = empty_c_array_parameter>
+	constexpr string(Source) {
 	}
-	constexpr string(char const * const c_str):
-		base(std::string_view(c_str))
+	template<typename Source> requires std::convertible_to<Source, std::string_view> or std::convertible_to<Source, char const *>
+	constexpr explicit(!std::same_as<Source, std::string_view> and !std::same_as<Source, char const *> and !std::same_as<Source, char *>) string(Source const sv):
+		base(std::string_view(sv))
 	{
 	}
 
@@ -42,7 +43,6 @@ public:
 	string(string &&) = default;
 	string & operator=(string const &) & = default;
 	string & operator=(string &&) & = default;
-	using base::operator=;
 	
 	using base::begin;
 	using base::size;
