@@ -23,7 +23,4 @@ concept constructible_from = requires { T(declval<Args>()...); };
 template<typename From, typename To>
 concept explicitly_convertible_to = constructible_from<To, From>;
 
-template<typename From, typename To>
-concept convertible_to = explicitly_convertible_to<From, To> and std::is_convertible_v<From, To>;
-
 } // namespace bounded

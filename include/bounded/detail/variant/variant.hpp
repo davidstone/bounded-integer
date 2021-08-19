@@ -24,6 +24,7 @@
 
 #include <operators/returns.hpp>
 
+#include <concepts>
 #include <type_traits>
 #include <utility>
 
@@ -87,7 +88,7 @@ public:
 	{
 	}
 
-	constexpr variant_impl(auto index_, convertible_to<type_at<decltype(index_)>> auto && value):
+	constexpr variant_impl(auto index_, std::convertible_to<type_at<decltype(index_)>> auto && value):
 		variant_impl(
 			lazy_init,
 			index_,

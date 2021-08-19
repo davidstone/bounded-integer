@@ -16,6 +16,7 @@
 
 #include <operators/operators.hpp>
 
+#include <concepts>
 #include <iterator>
 
 namespace containers {
@@ -32,7 +33,7 @@ struct legacy_iterator {
 	constexpr legacy_iterator(Iterator it):
 		m_it(std::move(it)) {
 	}
-	template<bounded::convertible_to<Iterator> It>
+	template<std::convertible_to<Iterator> It>
 	constexpr legacy_iterator(legacy_iterator<It> other):
 		m_it(other.base())
 	{

@@ -7,6 +7,7 @@
 
 #include <containers/maximum_array_size.hpp>
 
+#include <concepts>
 #include <memory>
 
 namespace containers::detail {
@@ -22,7 +23,7 @@ struct dynamic_array_data {
 	}
 
 	// Do not allow CTAD to deduce the size
-	constexpr dynamic_array_data(T * const pointer_, bounded::convertible_to<Size> auto const size_):
+	constexpr dynamic_array_data(T * const pointer_, std::convertible_to<Size> auto const size_):
 		pointer(pointer_),
 		size(size_)
 	{

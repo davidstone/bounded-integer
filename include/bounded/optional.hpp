@@ -17,6 +17,7 @@
 
 #include <operators/arrow.hpp>
 
+#include <concepts>
 #include <stdexcept>
 #include <type_traits>
 #include <utility>
@@ -163,15 +164,12 @@ public:
 	constexpr explicit optional(lazy_init_t, construct_function_for<T> auto && construct_):
 		m_storage(lazy_init, OPERATORS_FORWARD(construct_)) {
 	}
-	constexpr optional(convertible_to<value_type> auto && other):
-		m_storage(OPERATORS_FORWARD(other))
-	{
-	}
-	constexpr explicit optional(explicitly_convertible_to<value_type> auto && other):
-		m_storage(OPERATORS_FORWARD(other))
-	{
-	}
 
+	template<explicitly_convertible_to<value_type> Value>
+	constexpr explicit(!std::convertible_to<Value, value_type>) optional(Value && other):
+		m_storage(OPERATORS_FORWARD(other))
+	{
+	}
 
 	template<typename U> requires explicitly_convertible_to<U const &, value_type>
 	constexpr explicit optional(optional<U> const & other):
@@ -212,7 +210,7 @@ public:
 		m_storage.uninitialize();
 		return *this;
 	}
-	constexpr auto operator=(convertible_to<value_type> auto && other) & -> optional & {
+	constexpr auto operator=(std::convertible_to<value_type> auto && other) & -> optional & {
 		return detail::assign(*this, OPERATORS_FORWARD(other));
 	}
 	

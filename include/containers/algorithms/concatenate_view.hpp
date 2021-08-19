@@ -28,6 +28,8 @@
 
 #include <operators/operators.hpp>
 
+#include <concepts>
+
 namespace containers {
 
 struct concatenate_view_sentinel {
@@ -120,7 +122,7 @@ struct concatenate_view_iterator {
 		std::is_same_v<Offset, bounded::constant_t<1>> or
 		(!bounded::bounded_integer<difference_type> and numeric_traits::max_value<Offset> >= bounded::constant<0> and (... and forward_random_access_range<RangeViews>)) or
 		(
-			bounded::convertible_to<Offset, difference_type> and
+			std::convertible_to<Offset, difference_type> and
 			numeric_traits::min_value<Offset> >= bounded::constant<0> and
 			(... and forward_random_access_range<RangeViews>)
 		)

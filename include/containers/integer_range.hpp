@@ -19,6 +19,7 @@
 
 #include <operators/bracket.hpp>
 
+#include <concepts>
 #include <iterator>
 #include <type_traits>
 
@@ -57,7 +58,7 @@ public:
 		return (lhs.m_value - rhs.m_value) / lhs.m_step;
 	}
 
-	friend constexpr auto operator+(integer_range_iterator const lhs, bounded::convertible_to<difference_type> auto const rhs) {
+	friend constexpr auto operator+(integer_range_iterator const lhs, std::convertible_to<difference_type> auto const rhs) {
 		if constexpr (has_no_values) {
 			bounded::unreachable();
 			return lhs;

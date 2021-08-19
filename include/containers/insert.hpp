@@ -24,6 +24,7 @@
 #include <bounded/integer.hpp>
 #include <bounded/unreachable.hpp>
 
+#include <concepts>
 #include <utility>
 
 namespace containers {
@@ -103,7 +104,7 @@ constexpr auto emplace(Container & container, iterator_t<Container const &> cons
 
 // TODO: exception safety
 // TODO: Check if the range lies within the container
-template<resizable_container Container, range Range> requires bounded::convertible_to<range_value_t<Container>, range_value_t<Range>>
+template<resizable_container Container, range Range> requires std::convertible_to<range_value_t<Container>, range_value_t<Range>>
 constexpr auto insert(Container & container, iterator_t<Container const &> position, Range && range) {
 	BOUNDED_ASSERT(::containers::detail::iterator_points_into_container(container, position));
 	auto const range_size = ::containers::detail::linear_size(range);
