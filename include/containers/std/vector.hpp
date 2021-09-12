@@ -69,8 +69,6 @@ concept std_allocator = is_std_allocator<T>;
 // Behavior if `allocate` throws is untested, but should give at least the weak
 // exception guarantee in all circumstances (usually the strong guarantee).
 //
-// `length_error` is never thrown.
-//
 // `max_size` is static. I believe this is a conforming extension.
 //
 // Some operations (such as assign) might not support the source element being a
@@ -225,7 +223,7 @@ struct vector {
 	}
 
 	constexpr void reserve(size_type const requested_capacity) {
-		m_impl.reserve(containers::range_size_t<impl_t>(requested_capacity));
+		m_impl.reserve(bounded::check_in_range<containers::range_size_t<impl_t>, std::length_error>(bounded::integer(requested_capacity)));
 	}
 
 	constexpr auto capacity() const noexcept -> size_type {
