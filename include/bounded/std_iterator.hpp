@@ -23,7 +23,7 @@ namespace detail {
 
 template<typename T, typename value_type = typename std::iterator_traits<T>::value_type>
 concept std_random_access_iterator =
-	!std::is_reference_v<value_type> and !std::is_const_v<value_type> and (
+	!std::is_void_v<value_type> and !std::is_reference_v<value_type> and !std::is_const_v<value_type> and (
 		std::is_same_v<T, std::string::iterator> or
 		std::is_same_v<T, std::string::const_iterator> or
 		std::is_same_v<T, typename std::deque<value_type>::iterator> or
@@ -39,7 +39,7 @@ template<
 	typename mapped_type = typename value_type::second_type
 >
 concept std_map_bidirectional_iterator =
-	!std::is_reference_v<value_type> and !std::is_const_v<value_type> and
+	!std::is_void_v<value_type> and !std::is_reference_v<value_type> and !std::is_const_v<value_type> and
 	!std::is_reference_v<key_type> and !std::is_const_v<key_type> and
 	!std::is_reference_v<mapped_type> and !std::is_const_v<mapped_type> and
 	(
@@ -55,7 +55,7 @@ concept std_map_bidirectional_iterator =
 
 template<typename T, typename value_type = typename std::iterator_traits<T>::value_type>
 concept std_bidirectional_iterator =
-	!std::is_reference_v<value_type> and !std::is_const_v<value_type> and (
+	!std::is_void_v<value_type> and !std::is_reference_v<value_type> and !std::is_const_v<value_type> and (
 		std_random_access_iterator<T> or
 		std_map_bidirectional_iterator<T> or
 		std::is_same_v<T, typename std::list<value_type>::iterator> or
@@ -72,7 +72,7 @@ concept std_bidirectional_iterator =
 
 template<typename T, typename value_type = typename std::iterator_traits<T>::value_type>
 concept std_iterator =
-	!std::is_reference_v<value_type> and !std::is_const_v<value_type> and (
+	!std::is_void_v<value_type> and !std::is_reference_v<value_type> and !std::is_const_v<value_type> and (
 		std_bidirectional_iterator<T> or
 		std::is_same_v<T, typename std::forward_list<value_type>::iterator> or
 		std::is_same_v<T, typename std::forward_list<value_type>::const_iterator>
