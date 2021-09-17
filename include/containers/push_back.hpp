@@ -22,7 +22,7 @@ template<typename Container>
 concept member_push_backable = requires(Container & container, range_value_t<Container> value) { container.push_back(std::move(value)); };
 
 template<typename Container>
-concept push_backable = member_push_backable<Container> or appendable_from_capacity<Container>;
+concept push_backable = member_push_backable<Container> or lazy_push_backable<Container>;
 
 } // namespace detail
 
