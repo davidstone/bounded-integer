@@ -35,19 +35,6 @@ concept erasable = member_erasable<Container> or appendable_from_capacity<Contai
 } // namespace detail
 
 template<detail::erasable Container>
-constexpr void erase_after(Container & container, iterator_t<Container const &> const_position) {
-	auto const last = containers::end(container);
-	if constexpr (detail::appendable_from_capacity<Container>) {
-		auto const count = last - const_position;
-		auto target = ::containers::detail::mutable_iterator(container, const_position);
-		containers::destroy_range(range_view(target, last));
-		container.append_from_capacity(-count);
-	} else {
-		container.erase(const_position, last);
-	}
-}
-
-template<detail::erasable Container>
 constexpr auto erase(Container & container, iterator_t<Container const &> const first, iterator_t<Container const &> const middle_) {
 	if constexpr (detail::member_erasable<Container>) {
 		return container.erase(first, middle_);
@@ -82,6 +69,19 @@ template<detail::erasable Container>
 constexpr auto erase(Container & container, iterator_t<Container const &> const it) {
 	BOUNDED_ASSERT(it != containers::end(container));
 	return erase(container, it, ::containers::next(it));
+}
+
+template<detail::erasable Container>
+constexpr void erase_after(Container & container, iterator_t<Container const &> const_position) {
+	auto const last = containers::end(container);
+	if constexpr (detail::appendable_from_capacity<Container>) {
+		auto const count = last - const_position;
+		auto target = ::containers::detail::mutable_iterator(container, const_position);
+		containers::destroy_range(range_view(target, last));
+		container.append_from_capacity(-count);
+	} else {
+		::containers::erase(container, const_position, last);
+	}
 }
 
 // TODO: Handle splicable containers
