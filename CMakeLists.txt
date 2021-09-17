@@ -224,6 +224,7 @@ add_executable(containers_test
 	source/containers/to_address.cpp
 	source/containers/to_radix_sort_key.cpp
 	source/containers/trivial_inplace_function.cpp
+	source/containers/uninitialized_array.cpp
 	source/containers/uninitialized_dynamic_array.cpp
 	source/containers/vector.cpp
 )

@@ -30,4 +30,21 @@ using c_array = T[size];
 struct empty_c_array_parameter {
 };
 
+namespace detail {
+
+template<typename T, std::size_t size>
+struct possibly_empty_c_array_impl {
+	using type = c_array<T, size>;
+};
+
+template<typename T>
+struct possibly_empty_c_array_impl<T, 0> {
+	using type = empty_c_array_parameter;
+};
+
+} // namespace detail
+
+template<typename T, std::size_t size>
+using possibly_empty_c_array = typename detail::possibly_empty_c_array_impl<T, size>::type;
+
 } // namespace containers

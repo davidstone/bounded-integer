@@ -17,7 +17,7 @@
 #include <containers/dynamic_array_data.hpp>
 #include <containers/initializer_range.hpp>
 #include <containers/maximum_array_size.hpp>
-#include <containers/uninitialized_storage.hpp>
+#include <containers/uninitialized_array.hpp>
 
 #include <bounded/assert.hpp>
 #include <bounded/concepts.hpp>
@@ -81,16 +81,16 @@ struct small_buffer_optimized_vector : private lexicographical_comparison::base 
 		}
 
 		constexpr auto begin() const {
-			return ::containers::detail::static_or_reinterpret_cast<T const *>(containers::data(m_data));
+			return m_storage.data();
 		}
 		constexpr auto begin() {
-			return ::containers::detail::static_or_reinterpret_cast<T *>(containers::data(m_data));
+			return m_storage.data();
 		}
 
 	private:
 		bool m_force_large : 1;
 		typename size_type::underlying_type m_size : (bounded::size_of_bits<size_type> - 1_bi).value();
-		array<trivial_storage<T>, capacity().value()> m_data;
+		uninitialized_array<T, capacity().value()> m_storage;
 	};
 
 	struct large_t {

@@ -27,19 +27,6 @@
 namespace containers {
 namespace detail {
 
-// reinterpret_cast or static_cast from void * are not allowed in constexpr
-template<typename Target, typename Source>
-concept static_castable = requires(Source source) { static_cast<Target>(source); };
-
-template<typename Target>
-constexpr auto static_or_reinterpret_cast(auto && source) {
-	if constexpr (static_castable<Target, decltype(source)>) {
-		return static_cast<Target>(source);
-	} else {
-		return reinterpret_cast<Target>(source);
-	}
-}
-
 template<typename InputRange, typename OutputIterator>
 concept memcpyable =
 	contiguous_range<InputRange> and

@@ -24,7 +24,7 @@
 #include <containers/pop_back.hpp>
 #include <containers/range_value_t.hpp>
 #include <containers/size.hpp>
-#include <containers/uninitialized_storage.hpp>
+#include <containers/uninitialized_array.hpp>
 
 #include <bounded/concepts.hpp>
 
@@ -84,11 +84,11 @@ struct static_vector_data : private lexicographical_comparison::base {
 	
 	constexpr auto begin() const & {
 		using const_iterator = contiguous_iterator<T const, static_cast<std::ptrdiff_t>(capacity_)>;
-		return const_iterator(::containers::detail::static_or_reinterpret_cast<T const *>(::containers::data(m_storage)));
+		return const_iterator(m_storage.data());
 	}
 	constexpr auto begin() & {
 		using iterator = contiguous_iterator<T, static_cast<std::ptrdiff_t>(capacity_)>;
-		return iterator(::containers::detail::static_or_reinterpret_cast<T *>(::containers::data(m_storage)));
+		return iterator(m_storage.data());
 	}
 	constexpr auto begin() && {
 		return ::containers::move_iterator(begin());
@@ -107,8 +107,8 @@ struct static_vector_data : private lexicographical_comparison::base {
 		m_size += count;
 	}
 
-	array<trivial_storage<T>, capacity_> m_storage = {};
-	bounded::integer<0, bounded::normalize<capacity_>> m_size = 0_bi;
+	[[no_unique_address]] uninitialized_array<T, capacity_> m_storage = {};
+	[[no_unique_address]] bounded::integer<0, bounded::normalize<capacity_>> m_size = 0_bi;
 };
 
 template<typename T, std::size_t capacity>
