@@ -11,8 +11,7 @@ namespace containers {
 namespace detail {
 
 template<typename T>
-struct iter_difference_t_impl {
-};
+struct iter_difference_t_impl;
 
 template<typename T>
 concept has_difference_type = requires { typename T::difference_type; };
@@ -38,7 +37,9 @@ struct iter_difference_t_impl<T> {
 
 } // namespace detail
 
-template<typename Iterator>
+template<typename Iterator> requires
+	detail::has_difference_type<std::remove_reference_t<Iterator>> or
+	detail::subtractable<std::remove_reference_t<Iterator>>
 using iter_difference_t = typename detail::iter_difference_t_impl<std::remove_reference_t<Iterator>>::type;
 
 } // namespace containers
