@@ -16,7 +16,7 @@ namespace bounded {
 namespace detail {
 
 // https://quuxplusone.github.io/blog/2018/05/17/super-elider-round-2/
-template<typename Function>
+template<typename T, typename Function>
 struct superconstructing_super_elider {
 	constexpr explicit superconstructing_super_elider(Function function):
 		m_function(std::move(function))
@@ -28,8 +28,8 @@ struct superconstructing_super_elider {
 	// can be used with std::any.
 	superconstructing_super_elider(superconstructing_super_elider &&) = delete;
 
-	constexpr operator auto() && {
-		return std::move(m_function)();
+	constexpr operator T() && {
+		return static_cast<T>(std::move(m_function)());
 	}
 
 private:
@@ -51,10 +51,10 @@ inline constexpr auto construct_return = [](auto && ... args) -> T requires cons
 };
 
 
-inline constexpr auto construct = []<typename T>(T & ref, construct_function_for<T> auto && function) -> T & requires(!std::is_const_v<T>){
+inline constexpr auto construct = []<typename T, construct_function_for<T> Function>(T & ref, Function && function) -> T & requires(!std::is_const_v<T>){
 	return *std::construct_at(
 		std::addressof(ref),
-		detail::superconstructing_super_elider([&] { return static_cast<T>(OPERATORS_FORWARD(function)()); })
+		detail::superconstructing_super_elider<T, Function>(OPERATORS_FORWARD(function))
 	);
 };
 
