@@ -71,7 +71,7 @@ struct vector : private lexicographical_comparison::base {
 		return *this;
 	}
 	constexpr auto operator=(vector const & other) & -> vector & {
-		if (std::addressof(other) == this) {
+		if (this == std::addressof(other)) {
 			return *this;
 		}
 		if (!m_storage.data()) {
