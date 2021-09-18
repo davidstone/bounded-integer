@@ -20,8 +20,16 @@
 namespace containers {
 namespace detail {
 
+template<typename Result, typename... Args>
+using function_ptr = Result(*)(Args...);
+
 template<typename Container>
-concept lazy_push_backable = appendable_from_capacity<Container>;
+concept member_lazy_push_backable = requires(Container container, function_ptr<range_value_t<Container>> constructor) {
+	container.lazy_push_back(constructor);
+};
+
+template<typename Container>
+concept lazy_push_backable = member_lazy_push_backable<Container> or appendable_from_capacity<Container>;
 
 } // namespace detail
 
@@ -30,27 +38,31 @@ constexpr auto & lazy_push_back(
 	Container & container,
 	bounded::construct_function_for<range_value_t<Container>> auto && constructor
 ) {
-	auto const initial_size = containers::size(container);
-	auto construct = [&](Container & target) {
-		bounded::construct(*(containers::data(target) + initial_size), OPERATORS_FORWARD(constructor));
-	};
-	if (initial_size < container.capacity()) {
-		construct(container);
-		container.append_from_capacity(1_bi);
-	} else if constexpr (detail::reservable<Container>) {
-		auto temp = Container();
-		temp.reserve(::containers::detail::reallocation_size(container.capacity(), initial_size, 1_bi));
-		construct(temp);
-
-		containers::uninitialized_relocate_no_overlap(container, containers::begin(temp));
-		container.append_from_capacity(-initial_size);
-
-		temp.append_from_capacity(initial_size + 1_bi);
-		container = std::move(temp);
+	if constexpr (detail::member_lazy_push_backable<Container>) {
+		return container.lazy_push_back(OPERATORS_FORWARD(constructor));
 	} else {
-		bounded::assert_or_assume_unreachable();
+		auto const initial_size = containers::size(container);
+		auto construct = [&](Container & target) {
+			bounded::construct(*(containers::data(target) + initial_size), OPERATORS_FORWARD(constructor));
+		};
+		if (initial_size < container.capacity()) {
+			construct(container);
+			container.append_from_capacity(1_bi);
+		} else if constexpr (detail::reservable<Container>) {
+			auto temp = Container();
+			temp.reserve(::containers::detail::reallocation_size(container.capacity(), initial_size, 1_bi));
+			construct(temp);
+
+			containers::uninitialized_relocate_no_overlap(container, containers::begin(temp));
+			container.append_from_capacity(-initial_size);
+
+			temp.append_from_capacity(initial_size + 1_bi);
+			container = std::move(temp);
+		} else {
+			bounded::assert_or_assume_unreachable();
+		}
+		return containers::back(container);
 	}
-	return containers::back(container);
 }
 
 } // namespace containers
