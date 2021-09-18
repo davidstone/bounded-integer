@@ -50,6 +50,7 @@ constexpr void assign_impl(Target & target, Source && source) {
 
 } // namespace detail
 
+// The behavior is undefined if `source` references elements in `target`
 template<range Target>
 constexpr void assign(Target & target, detail::range_assignable_to<Target> auto && source) {
 	containers::detail::assign_impl(target, OPERATORS_FORWARD(source));
