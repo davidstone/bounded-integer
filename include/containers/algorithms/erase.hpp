@@ -11,6 +11,7 @@
 #include <containers/algorithms/uninitialized.hpp>
 #include <containers/appendable_from_capacity.hpp>
 #include <containers/begin_end.hpp>
+#include <containers/constant_time_erasable.hpp>
 #include <containers/count_type.hpp>
 #include <containers/iterator_t.hpp>
 #include <containers/mutable_iterator.hpp>
@@ -30,7 +31,7 @@ concept member_erasable = requires(Container & container, iterator_t<Container c
 };
 
 template<typename Container>
-concept erasable = member_erasable<Container> or appendable_from_capacity<Container>;
+concept erasable = member_erasable<Container> or splicable<Container> or appendable_from_capacity<Container>;
 
 } // namespace detail
 
@@ -38,6 +39,10 @@ template<detail::erasable Container>
 constexpr auto erase(Container & container, iterator_t<Container const &> const first, iterator_t<Container const &> const middle_) {
 	if constexpr (detail::member_erasable<Container>) {
 		return container.erase(first, middle_);
+	} else if constexpr (splicable<Container>) {
+		auto temp = Container();
+		temp.splice(containers::begin(temp), container, first, middle_);
+		return mutable_iterator(container, middle_);
 	} else {
 		auto const middle = ::containers::detail::mutable_iterator(container, middle_);
 		if (first == middle) {
