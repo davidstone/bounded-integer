@@ -89,25 +89,35 @@ constexpr void erase_after(Container & container, iterator_t<Container const &> 
 	}
 }
 
-// TODO: Handle splicable containers
 template<detail::erasable Container>
 constexpr auto erase_if(Container & container, auto predicate) {
-	auto const first = containers::begin(container);
-	auto const last = containers::end(container);
-	auto new_last = ::containers::find_if(first, last, predicate);
 	auto result = count_type<Container>(0_bi);
-	if (new_last == last) {
-		return result;
-	}
-	for (auto it = ::containers::next(new_last); it != last; ++it) {
-		if (!predicate(*it)) {
-			// TODO: Relocate?
-			*new_last = std::move(*it);
-			++new_last;
-			++result;
+	if constexpr (constant_time_erasable<Container>) {
+		for (auto it = containers::begin(container); it != containers::end(container); ) {
+			if (predicate(*it)) {
+				it = ::containers::erase(container, it);
+				++result;
+			} else {
+				++it;
+			}
 		}
+	} else {
+		auto const first = containers::begin(container);
+		auto const last = containers::end(container);
+		auto new_last = ::containers::find_if(first, last, predicate);
+		if (new_last == last) {
+			return result;
+		}
+		for (auto it = ::containers::next(new_last); it != last; ++it) {
+			if (!predicate(*it)) {
+				// TODO: Relocate?
+				*new_last = std::move(*it);
+				++new_last;
+				++result;
+			}
+		}
+		containers::erase_after(container, new_last);
 	}
-	containers::erase_after(container, new_last);
 	return result;
 }
 
