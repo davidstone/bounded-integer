@@ -77,8 +77,9 @@ concept std_allocator = is_std_allocator<T>;
 // This is possibly not a complete list. It is expected that this list will
 // shrink over time, as the goal is to fix most of these inconsistencies.
 
-template<typename T, detail::std_allocator = std::allocator<T>>
+template<typename T, typename Allocator = std::allocator<T>>
 struct vector {
+	static_assert(detail::std_allocator<Allocator>);
 	using value_type = T;
 	using allocator_type = std::allocator<T>;
 	using size_type = std::size_t;
