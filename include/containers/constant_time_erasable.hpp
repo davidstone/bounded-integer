@@ -5,12 +5,15 @@
 
 #pragma once
 
+#include <containers/iterator_t.hpp>
+
 namespace containers {
 
 template<typename Container>
-concept splicable = requires(Container & container) {
-	container.splice(container.begin(), container);
+concept splicable = requires(Container target, iterator_t<Container const &> position, Container source) {
+	target.splice(position, source);
 };
+
 
 template<typename Container>
 concept constant_time_erasable = splicable<Container>;
