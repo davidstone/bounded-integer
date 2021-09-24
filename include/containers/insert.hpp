@@ -6,7 +6,6 @@
 #pragma once
 
 #include <containers/algorithms/copy.hpp>
-#include <containers/algorithms/copy_n.hpp>
 #include <containers/algorithms/uninitialized.hpp>
 #include <containers/begin_end.hpp>
 #include <containers/count_type.hpp>
