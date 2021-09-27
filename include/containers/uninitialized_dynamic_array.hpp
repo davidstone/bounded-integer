@@ -67,7 +67,7 @@ private:
 			std::allocator<T>().deallocate(m_ptr, static_cast<std::size_t>(m_capacity));
 		}
 	}
-	T * m_ptr;
+	[[no_unique_address]] T * m_ptr;
 	[[no_unique_address]] Capacity m_capacity;
 };
 
