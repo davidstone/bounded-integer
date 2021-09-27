@@ -118,7 +118,9 @@ constexpr auto concatenate(auto && ... ranges) {
 		(..., (reusable = ::containers::detail::reusable_concatenate_container(reusable, total_size, OPERATORS_FORWARD(ranges))));
 		if (reusable.ptr) {
 			auto & ref = *reusable.ptr;
-			::containers::detail::move_existing_data_to_final_position(ref, reusable.before_size);
+			if (reusable.before_size != 0_bi) {
+				::containers::detail::move_existing_data_to_final_position(ref, reusable.before_size);
+			}
 			::containers::detail::concatenate_prepend_append(ref, containers::begin(ref), OPERATORS_FORWARD(ranges)...);
 			return std::move(ref);
 		}
