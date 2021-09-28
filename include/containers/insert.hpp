@@ -6,6 +6,7 @@
 #pragma once
 
 #include <containers/algorithms/copy.hpp>
+#include <containers/algorithms/generate.hpp>
 #include <containers/algorithms/uninitialized.hpp>
 #include <containers/begin_end.hpp>
 #include <containers/count_type.hpp>
@@ -13,7 +14,6 @@
 #include <containers/front_back.hpp>
 #include <containers/iterator_t.hpp>
 #include <containers/mutable_iterator.hpp>
-#include <containers/push_back.hpp>
 #include <containers/range_value_t.hpp>
 #include <containers/range_view.hpp>
 #include <containers/reserve_if_reservable.hpp>
@@ -30,7 +30,27 @@ namespace containers {
 namespace detail {
 
 template<typename Container>
-constexpr auto insert_with_reallocation(Container & container, iterator_t<Container const &> const position, auto const number_of_elements, auto construct) {
+constexpr auto insert_without_reallocation(Container & container, iterator_t<Container const &> const position, auto && input_range, count_type<Container> const number_of_elements) {
+	auto const mutable_position = ::containers::detail::mutable_iterator(container, position);
+	auto const original_end = containers::end(container);
+	auto const new_end = original_end + number_of_elements;
+	auto const new_position = containers::uninitialized_relocate(
+		containers::reversed(range_view(mutable_position, original_end)),
+		containers::reverse_iterator(new_end)
+	).base();
+	try {
+		containers::uninitialized_copy_no_overlap(OPERATORS_FORWARD(input_range), mutable_position);
+	} catch (...) {
+		BOUNDED_ASSERT(new_position == mutable_position + number_of_elements);
+		::containers::uninitialized_relocate(range_view(new_position, new_end), mutable_position);
+		throw;
+	}
+	container.append_from_capacity(number_of_elements);
+	return mutable_position;
+}
+
+template<typename Container>
+constexpr auto insert_with_reallocation(Container & container, iterator_t<Container const &> const position, auto && input_range, auto const number_of_elements) {
 	// There is a reallocation required, so just put everything in the
 	// correct place to begin with
 	auto const original_size = containers::size(container);
@@ -40,7 +60,7 @@ constexpr auto insert_with_reallocation(Container & container, iterator_t<Contai
 	// construct it may reference an old element. We cannot move
 	// elements it references before constructing it
 	auto const offset = position - containers::begin(container);
-	construct(containers::data(temp) + offset);
+	containers::uninitialized_copy_no_overlap(OPERATORS_FORWARD(input_range), containers::data(temp) + offset);
 	auto const mutable_position = containers::begin(container) + offset;
 	auto const temp_begin = containers::begin(temp);
 	auto const it = containers::uninitialized_relocate_no_overlap(
@@ -65,33 +85,27 @@ constexpr auto iterator_points_into_container(Container const & container, itera
 
 } // namespace detail
 
-// TODO: exception safety
+// TODO: Check if the range lies within the container
+template<resizable_container Container, range Range> requires std::convertible_to<range_value_t<Container>, range_value_t<Range>>
+constexpr auto insert(Container & container, iterator_t<Container const &> position, Range && range) {
+	BOUNDED_ASSERT(::containers::detail::iterator_points_into_container(container, position));
+	auto const range_size = ::containers::detail::linear_size(range);
+	if (containers::size(container) + range_size <= container.capacity()) {
+		return ::containers::detail::insert_without_reallocation(container, position, OPERATORS_FORWARD(range), static_cast<count_type<Container>>(range_size));
+	} else if constexpr (detail::reservable<Container>) {
+		return ::containers::detail::insert_with_reallocation(container, position, OPERATORS_FORWARD(range), range_size);
+	} else {
+		bounded::assert_or_assume_unreachable();
+	}
+}
+
 template<resizable_container Container>
 constexpr auto lazy_insert(
 	Container & container,
 	iterator_t<Container const &> const position,
 	bounded::construct_function_for<range_value_t<Container>> auto && constructor
 ) {
-	BOUNDED_ASSERT(::containers::detail::iterator_points_into_container(container, position));
-	auto const offset = position - containers::begin(container);
-	if (position == containers::end(container)) {
-		::containers::lazy_push_back(container, OPERATORS_FORWARD(constructor));
-	} else if (containers::size(container) < container.capacity()) {
-		auto const mutable_position = ::containers::detail::mutable_iterator(container, position);
-		auto const original_end = containers::end(container);
-		::containers::push_back(container, std::move(containers::back(container)));
-		::containers::move_backward(mutable_position, containers::prev(original_end), original_end);
-		auto & ref = *mutable_position;
-		bounded::destroy(ref);
-		bounded::construct(ref, OPERATORS_FORWARD(constructor));
-	} else if constexpr (detail::reservable<Container>) {
-		::containers::detail::insert_with_reallocation(container, position, 1_bi, [&](auto const ptr) {
-			bounded::construct(*ptr, OPERATORS_FORWARD(constructor));
-		});
-	} else {
-		bounded::assert_or_assume_unreachable();
-	}
-	return containers::begin(container) + offset;
+	return ::containers::insert(container, position, generate_n(1_bi, [&] { return OPERATORS_FORWARD(constructor)(); }));
 }
 
 template<resizable_container Container>
@@ -99,30 +113,6 @@ constexpr auto emplace(Container & container, iterator_t<Container const &> cons
 	return ::containers::lazy_insert(container, position, [&] {
 		return bounded::construct_return<range_value_t<Container>>(OPERATORS_FORWARD(args)...);
 	});
-}
-
-// TODO: exception safety
-// TODO: Check if the range lies within the container
-template<resizable_container Container, range Range> requires std::convertible_to<range_value_t<Container>, range_value_t<Range>>
-constexpr auto insert(Container & container, iterator_t<Container const &> position, Range && range) {
-	BOUNDED_ASSERT(::containers::detail::iterator_points_into_container(container, position));
-	auto const range_size = ::containers::detail::linear_size(range);
-	if (containers::size(container) + range_size <= container.capacity()) {
-		auto const mutable_position = ::containers::detail::mutable_iterator(container, position);
-		containers::uninitialized_relocate(
-			containers::reversed(range_view(mutable_position, containers::end(container))),
-			containers::reverse_iterator(containers::end(container) + static_cast<count_type<Container>>(range_size))
-		);
-		containers::uninitialized_copy_no_overlap(OPERATORS_FORWARD(range), mutable_position);
-		container.append_from_capacity(range_size);
-		return mutable_position;
-	} else if constexpr (detail::reservable<Container>) {
-		return ::containers::detail::insert_with_reallocation(container, position, range_size, [&](auto const ptr) {
-			containers::uninitialized_copy_no_overlap(OPERATORS_FORWARD(range), ptr);
-		});
-	} else {
-		bounded::assert_or_assume_unreachable();
-	}
 }
 
 template<resizable_container Container>
