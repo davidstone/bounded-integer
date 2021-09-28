@@ -55,7 +55,7 @@ constexpr auto insert_with_reallocation(Container & container, iterator_t<Contai
 	container.append_from_capacity(-original_size);
 	temp.append_from_capacity(original_size + number_of_elements);
 	container = std::move(temp);
-	return mutable_position;
+	return containers::begin(container) + offset;
 }
 
 template<typename Container>
