@@ -100,7 +100,10 @@ constexpr auto move_existing_data_to_final_position(Container & container, auto 
 		auto const original_size = bounded::integer(::containers::size(container));
 		auto const new_size = original_size + before_size;
 		::containers::resize(container, new_size);
-		::containers::copy_backward(containers::begin(container), containers::begin(container) + static_cast<difference_type>(original_size), containers::begin(container) + static_cast<difference_type>(new_size));
+		::containers::copy_backward(
+			containers::range_view(containers::begin(container), containers::begin(container) + static_cast<difference_type>(original_size)),
+			containers::begin(container) + static_cast<difference_type>(new_size)
+		);
 	}
 }
 

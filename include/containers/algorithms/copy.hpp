@@ -11,77 +11,39 @@
 
 namespace containers {
 
-template<iterator InputIterator, iterator OutputIterator>
-constexpr auto copy(InputIterator first, sentinel_for<InputIterator> auto const last, OutputIterator out) {
-	struct result {
-		InputIterator input;
-		OutputIterator output;
-	};
-	for (; first != last; ++first, ++out) {
-		*out = *first;
-	}
-	return result{std::move(first), std::move(out)};
-}
-
-template<iterator InputIterator, iterator OutputIterator>
-constexpr auto copy(InputIterator in_first, sentinel_for<InputIterator> auto const in_last, OutputIterator out_first, sentinel_for<OutputIterator> auto const out_last) {
-	struct result {
-		InputIterator input;
-		OutputIterator output;
-	};
-	for (; in_first != in_last and out_first != out_last; ++in_first, ++out_first) {
-		*out_first = *in_first;
-	}
-	return result{std::move(in_first), std::move(out_first)};
-}
-
 constexpr auto copy(range auto && input, iterator auto output) {
-	return ::containers::copy(
-		containers::begin(OPERATORS_FORWARD(input)),
-		containers::end(OPERATORS_FORWARD(input)),
-		std::move(output)
-	);
+	auto first = containers::begin(OPERATORS_FORWARD(input));
+	auto const last = containers::end(OPERATORS_FORWARD(input));
+	for (; first != last; ++first, ++output) {
+		*output = *first;
+	}
+	struct result {
+		decltype(first) input;
+		decltype(output) output;
+	};
+	return result{std::move(first), std::move(output)};
 }
 
 constexpr auto copy(range auto && input, range auto && output) {
-	return ::containers::copy(
-		containers::begin(OPERATORS_FORWARD(input)),
-		containers::end(OPERATORS_FORWARD(input)),
-		containers::begin(OPERATORS_FORWARD(output)),
-		containers::end(OPERATORS_FORWARD(output))
-	);
-}
-
-template<iterator InputIterator>
-constexpr auto move(InputIterator const first, sentinel_for<InputIterator> auto const last, iterator auto const out) {
-	auto const iterators = ::containers::copy(::containers::move_iterator(first), ::containers::move_iterator(last), out);
+	auto in_first = containers::begin(OPERATORS_FORWARD(input));
+	auto const in_last = containers::end(OPERATORS_FORWARD(input));
+	auto out_first = containers::begin(OPERATORS_FORWARD(output));
+	auto const out_last = containers::end(OPERATORS_FORWARD(output));
+	for (; in_first != in_last and out_first != out_last; ++in_first, ++out_first) {
+		*out_first = *in_first;
+	}
 	struct result {
-		InputIterator input;
-		decltype(out) output;
+		decltype(in_first) input;
+		decltype(out_first) output;
 	};
-	return result { iterators.input.base(), iterators.output };
+	return result{std::move(in_first), std::move(out_first)};
 }
 
-constexpr auto move(range auto && input, iterator auto out) {
-	return ::containers::move(containers::begin(input), containers::end(input), out);
+constexpr auto copy_backward(range auto && input, iterator auto out_last) {
+	return ::containers::copy(
+		containers::reversed(OPERATORS_FORWARD(input)),
+		containers::reverse_iterator(std::move(out_last))
+	).output.base();
 }
 
-template<bidirectional_iterator BidirectionalIterator>
-constexpr auto copy_backward(BidirectionalIterator const first, BidirectionalIterator const last, bidirectional_iterator auto const out_last) {
-	return ::containers::copy(::containers::reverse_iterator(last), ::containers::reverse_iterator(first), ::containers::reverse_iterator(out_last)).output.base();
-}
-
-constexpr auto copy_backward(range auto && input, iterator auto out) {
-	return ::containers::copy_backward(containers::begin(input), containers::end(input), out);
-}
-
-template<bidirectional_iterator BidirectionalIterator>
-constexpr auto move_backward(BidirectionalIterator const first, BidirectionalIterator const last, bidirectional_iterator auto const out_last) {
-	return ::containers::copy_backward(::containers::move_iterator(first), ::containers::move_iterator(last), out_last);
-}
-
-constexpr auto move_backward(range auto && input, iterator auto out) {
-	return ::containers::move_backward(containers::begin(input), containers::end(input), out);
-}
-
-}	// namespace containers
+} // namespace containers
