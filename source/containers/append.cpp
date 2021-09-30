@@ -17,10 +17,6 @@ using non_copyable = bounded_test::non_copyable_integer;
 
 using container = containers::vector<bounded_test::non_copyable_integer>;
 
-constexpr auto copy_value(non_copyable const & x) -> non_copyable {
-	return non_copyable(x.value());
-}
-
 constexpr auto test_append(container const & expected, auto make_initial, auto... additional) {
 	{
 		auto c = make_initial();

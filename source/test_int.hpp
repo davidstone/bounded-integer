@@ -94,4 +94,8 @@ private:
 using integer = integer_impl<special::copyable>;
 using non_copyable_integer = integer_impl<special::non_copyable>;
 
+constexpr auto copy_value(non_copyable_integer const & x) -> non_copyable_integer {
+	return non_copyable_integer(x.value());
+}
+
 } // namespace bounded
