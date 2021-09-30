@@ -57,6 +57,9 @@ constexpr auto append(detail::push_backable auto & target, range auto && source)
 	::containers::detail::append_impl(target, OPERATORS_FORWARD(source));
 }
 
+template<detail::push_backable Target>
+constexpr auto append(Target &, empty_c_array_parameter) -> void {
+}
 template<detail::push_backable Target, std::size_t init_size>
 constexpr auto append(Target & target, c_array<range_value_t<Target>, init_size> && source) -> void {
 	::containers::detail::append_impl(target, std::move(source));
