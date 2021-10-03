@@ -71,8 +71,8 @@ concept std_allocator = is_std_allocator<T>;
 //
 // `max_size` is static. I believe this is a conforming extension.
 //
-// `insert` and `emplace` do not support the source element being a reference to
-// an element of the vector
+// `insert` does not support the source element being a reference to an element
+// of the vector.
 //
 // This is possibly not a complete list. It is expected that this list will
 // shrink over time, as the goal is to fix most of these inconsistencies.
@@ -269,7 +269,12 @@ struct vector {
 	}
 
 	constexpr auto emplace(const_iterator const position, auto && ... args) -> iterator {
-		return containers::to_address(containers::emplace(m_impl, impl_iterator(position), OPERATORS_FORWARD(args)...));
+		auto it = impl_iterator(position);
+		// Handle https://cplusplus.github.io/LWG/issue2164
+		auto out = (... and std::is_rvalue_reference_v<decltype(args)>) ?
+			containers::emplace(m_impl, it, OPERATORS_FORWARD(args)...) :
+			containers::insert(m_impl, it, T(OPERATORS_FORWARD(args)...));
+		return containers::to_address(out);
 	}
 
 	constexpr auto erase(const_iterator const position) -> iterator {
