@@ -99,6 +99,9 @@ constexpr auto insert(Container & container, iterator_t<Container const &> posit
 	}
 }
 
+// If `constructor` references any element at or beyond `position` and
+// `container` does not have reference stability on insertion, the behavior is
+// undefined.
 template<resizable_container Container>
 constexpr auto lazy_insert(
 	Container & container,
@@ -108,6 +111,14 @@ constexpr auto lazy_insert(
 	return ::containers::insert(container, position, generate_n(1_bi, [&] { return OPERATORS_FORWARD(constructor)(); }));
 }
 
+// If `args` reference any element at or beyond `position` and `container` does
+// not have reference stability on insertion, the behavior is undefined. Note
+// that this is unlike member `emplace` on `std::vector` and `std::deque`. See
+// https://cplusplus.github.io/LWG/issue2164 for a discussion on the standard
+// containers. This is an intentional behavioral difference; with the standard's
+// constraints, `emplace` becomes equivalent to
+// `insert(container, position, T(args...))` -- that is to say, the element is
+// not actually emplaced.
 template<resizable_container Container>
 constexpr auto emplace(Container & container, iterator_t<Container const &> const position, auto && ... args) {
 	return ::containers::lazy_insert(container, position, [&] {
@@ -115,6 +126,8 @@ constexpr auto emplace(Container & container, iterator_t<Container const &> cons
 	});
 }
 
+// TODO: Determine how to handle aliasing with `value`, probably with another
+// function
 template<resizable_container Container>
 constexpr auto insert(Container & container, iterator_t<Container const &> const position, range_value_t<Container> const & value) {
 	return ::containers::lazy_insert(container, position, bounded::value_to_function(value));

@@ -71,8 +71,8 @@ concept std_allocator = is_std_allocator<T>;
 //
 // `max_size` is static. I believe this is a conforming extension.
 //
-// Some operations (such as assign) might not support the source element being a
-// reference to an element of the vector
+// `insert` and `emplace` do not support the source element being a reference to
+// an element of the vector
 //
 // This is possibly not a complete list. It is expected that this list will
 // shrink over time, as the goal is to fix most of these inconsistencies.
