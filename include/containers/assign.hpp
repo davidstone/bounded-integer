@@ -55,6 +55,9 @@ template<range Target>
 constexpr void assign(Target & target, detail::range_assignable_to<Target> auto && source) {
 	containers::detail::assign_impl(target, OPERATORS_FORWARD(source));
 }
+constexpr void assign(range auto & target, empty_c_array_parameter) {
+	containers::clear(target);
+}
 template<range Target, std::size_t init_size> requires detail::range_assignable_to<c_array<range_value_t<Target>, init_size>, Target>
 constexpr void assign(Target & target, c_array<range_value_t<Target>, init_size> && source) {
 	containers::detail::assign_impl(target, std::move(source));
