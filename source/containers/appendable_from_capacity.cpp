@@ -4,3 +4,14 @@
 // http://www.boost.org/LICENSE_1_0.txt)
 
 #include <containers/appendable_from_capacity.hpp>
+
+#include <containers/array/array.hpp>
+#include <containers/vector.hpp>
+
+namespace {
+
+static_assert(!containers::detail::appendable_from_capacity<int>);
+static_assert(!containers::detail::appendable_from_capacity<containers::array<int, 1> &>);
+static_assert(containers::detail::appendable_from_capacity<containers::vector<int> &>);
+
+} // namespace
