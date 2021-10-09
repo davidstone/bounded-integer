@@ -110,6 +110,9 @@ constexpr auto assign_to_empty(detail::push_backable auto & target, range auto &
 	::containers::detail::assign_to_empty_impl(target, OPERATORS_FORWARD(source));
 }
 
+constexpr auto assign_to_empty(range auto & target, empty_c_array_parameter) -> void {
+	BOUNDED_ASSERT(containers::is_empty(target));
+}
 template<detail::push_backable Target, std::size_t init_size>
 constexpr auto assign_to_empty(Target & target, c_array<range_value_t<Target>, init_size> && source) -> void {
 	::containers::detail::assign_to_empty_impl(target, std::move(source));
