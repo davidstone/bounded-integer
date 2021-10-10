@@ -20,31 +20,31 @@ constexpr auto test_erase_all(Container container) {
 	BOUNDED_TEST(container == Container());
 }
 
-constexpr auto test_erase_nothing_from_begin(auto container) {
-	auto const original = container;
+constexpr auto test_erase_nothing_from_begin(auto make_container) {
+	auto container = make_container();
 	auto it = containers::begin(container);
 	containers::erase(container, it, it);
-	BOUNDED_TEST(container == original);
+	BOUNDED_TEST(container == make_container());
 }
 
-constexpr auto test_erase_nothing_from_middle(auto container) {
-	auto const original = container;
+constexpr auto test_erase_nothing_from_middle(auto make_container) {
+	auto container = make_container();
 	auto it = containers::begin(container) + (containers::end(container) - containers::begin(container)) / 2_bi;
 	containers::erase(container, it, it);
-	BOUNDED_TEST(container == original);
+	BOUNDED_TEST(container == make_container());
 }
 
-constexpr auto test_erase_nothing_from_end(auto container) {
-	auto const original = container;
+constexpr auto test_erase_nothing_from_end(auto make_container) {
+	auto container = make_container();
 	auto it = containers::end(container);
 	containers::erase(container, it, it);
-	BOUNDED_TEST(container == original);
+	BOUNDED_TEST(container == make_container());
 }
 
-constexpr auto test_erase_nothing(auto container) {
-	test_erase_nothing_from_begin(container);
-	test_erase_nothing_from_middle(container);
-	test_erase_nothing_from_end(container);
+constexpr auto test_erase_nothing(auto make_container) {
+	test_erase_nothing_from_begin(make_container);
+	test_erase_nothing_from_middle(make_container);
+	test_erase_nothing_from_end(make_container);
 }
 
 
@@ -56,7 +56,7 @@ constexpr auto test_erase_empty() {
 
 template<typename Container>
 constexpr auto test_erase_nothing_from_one() {
-	test_erase_nothing(Container({1}));
+	test_erase_nothing([] { return Container({1}); });
 }
 
 template<typename Container>
@@ -74,7 +74,7 @@ constexpr auto test_erase_from_one() {
 
 template<typename Container>
 constexpr auto test_erase_nothing_from_two() {
-	test_erase_nothing(Container({1, 2}));
+	test_erase_nothing([] { return Container({1, 2}); });
 }
 
 template<typename Container>
@@ -110,11 +110,19 @@ constexpr auto test_erase_middle_range() {
 	BOUNDED_TEST(v == Container({1, 4}));
 }
 
+struct is_even {
+	constexpr auto operator()(int const x) const {
+		return x % 2 == 0;
+	}
+	constexpr auto operator()(bounded_test::non_copyable_integer const & x) const {
+		return x.value() % 2 == 0;
+	}
+};
 
 template<typename Container>
 constexpr auto test_erase_if() {
 	auto v = Container({1, 2, 3, 4, 5, 6, 7});
-	erase_if(v, [](auto const & x) { return x.value() % 2 == 0; });
+	erase_if(v, is_even());
 	BOUNDED_TEST(v == Container({1, 3, 5, 7}));
 }
 
@@ -134,6 +142,7 @@ constexpr auto test_all() {
 	return true;
 }
 
-static_assert(test_all<containers::vector<bounded_test::integer>>());
+static_assert(test_all<containers::vector<int>>());
+static_assert(test_all<containers::vector<bounded_test::non_copyable_integer>>());
 
 } // namespace
