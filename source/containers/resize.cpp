@@ -65,6 +65,6 @@ constexpr auto test_resize() -> bool {
 }
 
 static_assert(test_resize<containers::vector<int>>());
-static_assert(test_resize<containers::vector<bounded_test::integer>>());
+static_assert(test_resize<containers::vector<bounded_test::non_copyable_integer>>());
 
 } // namespace
