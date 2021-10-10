@@ -57,10 +57,10 @@ public:
 	constexpr operator std::string_view() const {
 		return std::string_view(data(*this), static_cast<range_size_t<std::string_view>>(size()));
 	}
-	constexpr operator std::span<char const>() const & {
+	constexpr operator std::span<char const>() const {
 		return std::span<char const>(containers::data(*this), static_cast<std::size_t>(size()));
 	}
-	constexpr operator std::span<char>() & {
+	constexpr operator std::span<char>() {
 		return std::span<char>(containers::data(*this), static_cast<std::size_t>(size()));
 	}
 

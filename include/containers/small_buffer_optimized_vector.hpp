@@ -193,16 +193,13 @@ struct small_buffer_optimized_vector : private lexicographical_comparison::base 
 		deallocate_large();
 	}
 
-	constexpr auto begin() const & {
+	constexpr auto begin() const {
 		auto const result = is_small() ? containers::begin(m_small) : containers::begin(m_large);
 		return contiguous_iterator<T const, bounded::builtin_max_value<size_type>>(result);
 	}
-	constexpr auto begin() & {
+	constexpr auto begin() {
 		auto const result = is_small() ? containers::begin(m_small) : containers::begin(m_large);
 		return contiguous_iterator<T, bounded::builtin_max_value<size_type>>(result);
-	}
-	constexpr auto begin() && {
-		return ::containers::move_iterator(begin());
 	}
 	
 	constexpr auto size() const {
@@ -240,10 +237,10 @@ struct small_buffer_optimized_vector : private lexicographical_comparison::base 
 		}
 	}
 
-	constexpr operator std::span<T const>() const & {
+	constexpr operator std::span<T const>() const {
 		return std::span<T const>(containers::data(*this), static_cast<std::size_t>(size()));
 	}
-	constexpr operator std::span<T>() & {
+	constexpr operator std::span<T>() {
 		return std::span<T>(containers::data(*this), static_cast<std::size_t>(size()));
 	}
 

@@ -5,7 +5,6 @@
 
 #pragma once
 
-#include <containers/algorithms/move_iterator.hpp>
 #include <containers/begin_end.hpp>
 #include <containers/common_iterator_functions.hpp>
 #include <containers/front_back.hpp>
@@ -235,10 +234,10 @@ struct concatenate_view {
 	{
 	}
 	
-	constexpr auto begin() const & {
+	constexpr auto begin() const {
 		return concatenate_view_iterator(bounded::transform([](auto && range){ return range_view(range); }, m_ranges));
 	}
-	constexpr auto begin() & {
+	constexpr auto begin() {
 		return concatenate_view_iterator(bounded::transform([](auto && range){ return range_view(range); }, m_ranges));
 	}
 	static constexpr auto end() {

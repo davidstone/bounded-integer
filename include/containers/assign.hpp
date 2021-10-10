@@ -7,6 +7,7 @@
 
 #include <containers/algorithms/copy.hpp>
 #include <containers/algorithms/erase.hpp>
+#include <containers/algorithms/move_iterator.hpp>
 #include <containers/append.hpp>
 #include <containers/assign_to_empty.hpp>
 #include <containers/c_array.hpp>
@@ -44,7 +45,23 @@ constexpr void assign_impl(Target & target, Source && source) {
 	} else {
 		auto result = ::containers::copy(OPERATORS_FORWARD(source), OPERATORS_FORWARD(target));
 		::containers::erase_after(target, std::move(result.output));
-		::containers::append(target, range_view(std::move(result.input), containers::end(OPERATORS_FORWARD(source))));
+		if constexpr (is_container<Source>) {
+			::containers::append(
+				target,
+				range_view(
+					move_iterator(std::move(result.input)),
+					move_iterator(containers::end(OPERATORS_FORWARD(source)))
+				)
+			);
+		} else {
+			::containers::append(
+				target,
+				range_view(
+					std::move(result.input),
+					containers::end(OPERATORS_FORWARD(source))
+				)
+			);
+		}
 	}
 }
 

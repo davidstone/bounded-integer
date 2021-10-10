@@ -5,7 +5,6 @@
 
 #pragma once
 
-#include <containers/algorithms/move_iterator.hpp>
 #include <containers/c_array.hpp>
 #include <containers/contiguous_iterator.hpp>
 
@@ -41,7 +40,7 @@ constexpr auto begin(c_array<T, size> & a) {
 
 template<typename T, std::size_t size>
 constexpr auto begin(c_array<T, size> && a) {
-	return move_iterator(contiguous_iterator<T, size>(a));
+	return contiguous_iterator<T, size>(a);
 }
 
 namespace detail {
@@ -85,7 +84,7 @@ constexpr auto end(c_array<T, size> & a) {
 
 template<typename T, std::size_t size>
 constexpr auto end(c_array<T, size> && a) {
-	return move_iterator(contiguous_iterator<T, size>(a + size));
+	return contiguous_iterator<T, size>(a + size);
 }
 
 namespace detail {

@@ -175,6 +175,7 @@ add_executable(containers_test
 	source/containers/contiguous_iterator.cpp
 	source/containers/count_type.cpp
 	source/containers/data.cpp
+	source/containers/dereference.cpp
 	source/containers/default_adapt_traits.cpp
 	source/containers/default_begin_end.cpp
 	source/containers/dynamic_array.cpp

@@ -17,6 +17,7 @@
 #include <containers/compare_container.hpp>
 #include <containers/contiguous_iterator.hpp>
 #include <containers/initializer_range.hpp>
+#include <containers/is_container.hpp>
 #include <containers/is_iterator.hpp>
 #include <containers/maximum_array_size.hpp>
 #include <containers/size.hpp>
@@ -81,14 +82,11 @@ struct dynamic_array : private lexicographical_comparison::base {
 		return *this;
 	}
 	
-	constexpr auto begin() const & {
+	constexpr auto begin() const {
 		return contiguous_iterator<T const, bounded::builtin_max_value<size_type>>(m_data.data());
 	}
-	constexpr auto begin() & {
+	constexpr auto begin() {
 		return contiguous_iterator<T, bounded::builtin_max_value<size_type>>(m_data.data());
-	}
-	constexpr auto begin() && {
-		return ::containers::move_iterator(begin());
 	}
 
 	constexpr auto size() const {
@@ -112,15 +110,18 @@ struct dynamic_array : private lexicographical_comparison::base {
 		}
 	}
 
-	constexpr operator std::span<T const>() const & {
+	constexpr operator std::span<T const>() const {
 		return std::span<T const>(containers::data(*this), static_cast<std::size_t>(size()));
 	}
-	constexpr operator std::span<T>() & {
+	constexpr operator std::span<T>() {
 		return std::span<T>(containers::data(*this), static_cast<std::size_t>(size()));
 	}
 
 private:
 	uninitialized_dynamic_array<T, size_type> m_data;
 };
+
+template<typename T, typename Size>
+inline constexpr auto is_container<dynamic_array<T, Size>> = true;
 
 } // namespace containers

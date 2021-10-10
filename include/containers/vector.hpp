@@ -14,6 +14,7 @@
 #include <containers/compare_container.hpp>
 #include <containers/contiguous_iterator.hpp>
 #include <containers/initializer_range.hpp>
+#include <containers/is_container.hpp>
 #include <containers/maximum_array_size.hpp>
 #include <containers/range_value_t.hpp>
 #include <containers/uninitialized_dynamic_array.hpp>
@@ -87,14 +88,11 @@ struct vector : private lexicographical_comparison::base {
 		std::swap(lhs.m_size, rhs.m_size);
 	}
 
-	constexpr auto begin() const & {
+	constexpr auto begin() const {
 		return contiguous_iterator<value_type const, max_size>(m_storage.data());
 	}
-	constexpr auto begin() & {
+	constexpr auto begin() {
 		return contiguous_iterator<value_type, max_size>(m_storage.data());
-	}
-	constexpr auto begin() && {
-		return ::containers::move_iterator(begin());
 	}
 	constexpr auto size() const {
 		return m_size;
@@ -124,20 +122,23 @@ struct vector : private lexicographical_comparison::base {
 		// m_size remains the same
 	}
 
-	constexpr operator std::span<T const>() const & {
+	constexpr operator std::span<T const>() const {
 		return std::span<T const>(containers::data(*this), static_cast<std::size_t>(size()));
 	}
-	constexpr operator std::span<T>() & {
+	constexpr operator std::span<T>() {
 		return std::span<T>(containers::data(*this), static_cast<std::size_t>(size()));
 	}
 
 private:
 	using storage_type = uninitialized_dynamic_array<T, size_type>;
-	storage_type m_storage;
-	size_type m_size = 0_bi;
+	[[no_unique_address]] storage_type m_storage;
+	[[no_unique_address]] size_type m_size = 0_bi;
 };
 
 template<typename Range>
 vector(Range &&) -> vector<std::decay_t<range_value_t<Range>>>;
+
+template<typename T, std::size_t max_size>
+inline constexpr auto is_container<vector<T, max_size>> = true;
 
 } // namespace containers

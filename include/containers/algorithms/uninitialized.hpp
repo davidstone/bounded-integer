@@ -9,6 +9,7 @@
 #include <containers/algorithms/relocate_range_adapter.hpp>
 #include <containers/begin_end.hpp>
 #include <containers/data.hpp>
+#include <containers/dereference.hpp>
 #include <containers/is_range.hpp>
 #include <containers/iter_value_t.hpp>
 #include <containers/range_value_t.hpp>
@@ -41,7 +42,9 @@ inline constexpr auto uninitialized_copy = [](range auto && input, iterator auto
 	try {
 		auto const last = containers::end(OPERATORS_FORWARD(input));
 		for (auto first = containers::begin(OPERATORS_FORWARD(input)); first != last; ++first) {
-			bounded::construct(*output, [&]() -> decltype(auto) { return *first; });
+			bounded::construct(*output, [&]() -> decltype(auto) {
+				return dereference<decltype(input)>(first);
+			});
 			++output;
 		}
 	} catch (...) {

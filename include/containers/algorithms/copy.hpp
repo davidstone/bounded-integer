@@ -5,9 +5,9 @@
 
 #pragma once
 
-#include <containers/algorithms/move_iterator.hpp>
 #include <containers/algorithms/reverse_iterator.hpp>
 #include <containers/begin_end.hpp>
+#include <containers/dereference.hpp>
 
 namespace containers {
 
@@ -15,7 +15,7 @@ constexpr auto copy(range auto && input, iterator auto output) {
 	auto first = containers::begin(OPERATORS_FORWARD(input));
 	auto const last = containers::end(OPERATORS_FORWARD(input));
 	for (; first != last; ++first, ++output) {
-		*output = *first;
+		*output = dereference<decltype(input)>(first);
 	}
 	struct result {
 		decltype(first) input;
@@ -30,7 +30,7 @@ constexpr auto copy(range auto && input, range auto && output) {
 	auto out_first = containers::begin(OPERATORS_FORWARD(output));
 	auto const out_last = containers::end(OPERATORS_FORWARD(output));
 	for (; in_first != in_last and out_first != out_last; ++in_first, ++out_first) {
-		*out_first = *in_first;
+		*out_first = dereference<decltype(input)>(in_first);
 	}
 	struct result {
 		decltype(in_first) input;

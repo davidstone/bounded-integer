@@ -15,10 +15,10 @@ namespace containers {
 namespace detail {
 
 template<typename Range>
-using iterator_t_impl = decltype(containers::begin(std::declval<Range>()));
+using iterator_t_impl = decltype(containers::begin(std::declval<Range &>()));
 
 template<typename Range>
-using sentinel_t = decltype(containers::end(std::declval<Range>()));
+using sentinel_t = decltype(containers::end(std::declval<Range &>()));
 
 } // namespace detail
 

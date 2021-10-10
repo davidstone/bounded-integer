@@ -238,23 +238,17 @@ public:
 		ska_sort(m_container, extract_key());
 	}
 
-	constexpr auto begin() const & {
+	constexpr auto begin() const {
 		return ::containers::begin(m_container);
 	}
-	constexpr auto begin() & {
+	constexpr auto begin() {
 		return ::containers::begin(m_container);
 	}
-	constexpr auto begin() && {
-		return ::containers::begin(std::move(m_container));
-	}
-	constexpr auto end() const & {
+	constexpr auto end() const {
 		return ::containers::end(m_container);
 	}
-	constexpr auto end() & {
+	constexpr auto end() {
 		return ::containers::end(m_container);
-	}
-	constexpr auto end() && {
-		return ::containers::end(std::move(m_container));
 	}
 	
 	constexpr auto capacity() const {

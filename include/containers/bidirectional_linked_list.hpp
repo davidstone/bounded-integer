@@ -14,6 +14,7 @@
 #include <containers/compare_container.hpp>
 #include <containers/contiguous_iterator.hpp>
 #include <containers/initializer_range.hpp>
+#include <containers/is_container.hpp>
 #include <containers/maximum_array_size.hpp>
 #include <containers/range_value_t.hpp>
 
@@ -193,23 +194,17 @@ struct bidirectional_linked_list : private lexicographical_comparison::base {
 		link_in(rhs.m_sentinel, lhs.m_sentinel);
 	}
 
-	constexpr auto begin() const & -> const_iterator {
+	constexpr auto begin() const -> const_iterator {
 		return const_iterator(m_sentinel.next);
 	}
-	constexpr auto begin() & -> iterator {
+	constexpr auto begin() -> iterator {
 		return iterator(m_sentinel.next);
 	}
-	constexpr auto begin() && {
-		return ::containers::move_iterator(begin());
-	}
-	constexpr auto end() const & -> const_iterator {
+	constexpr auto end() const -> const_iterator {
 		return const_iterator(std::addressof(m_sentinel));
 	}
-	constexpr auto end() & -> iterator {
+	constexpr auto end() -> iterator {
 		return iterator(std::addressof(m_sentinel));
-	}
-	constexpr auto end() && {
-		return ::containers::move_iterator(end());
 	}
 
 	constexpr auto mutable_iterator(const_iterator const it) & -> iterator {
@@ -271,5 +266,8 @@ private:
 
 template<typename Range>
 bidirectional_linked_list(Range &&) -> bidirectional_linked_list<std::decay_t<range_value_t<Range>>>;
+
+template<typename T>
+inline constexpr auto is_container<bidirectional_linked_list<T>> = true;
 
 } // namespace containers

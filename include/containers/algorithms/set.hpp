@@ -163,14 +163,14 @@ struct set_intersection_pair {
 		}
 	}
 	
-	constexpr auto begin() const & {
+	constexpr auto begin() const {
 		return find_first_matching(
 			m_members,
 			::containers::begin(m_members.range1),
 			::containers::begin(m_members.range2)
 		);
 	}
-	constexpr auto begin() & {
+	constexpr auto begin() {
 		return find_first_matching(
 			m_members,
 			::containers::begin(m_members.range1),
@@ -178,10 +178,10 @@ struct set_intersection_pair {
 		);
 	}
 
-	constexpr auto end() const & {
+	constexpr auto end() const {
 		return detail::set_intersection_pair_iterator(m_members, ::containers::end(m_members.range1), ::containers::end(m_members.range2));
 	}
-	constexpr auto end() & {
+	constexpr auto end() {
 		return detail::set_intersection_pair_iterator(m_members, ::containers::end(m_members.range1), ::containers::end(m_members.range2));
 	}
 

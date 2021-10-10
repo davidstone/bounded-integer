@@ -14,6 +14,7 @@
 #include <containers/compare_container.hpp>
 #include <containers/contiguous_iterator.hpp>
 #include <containers/initializer_range.hpp>
+#include <containers/is_container.hpp>
 #include <containers/uninitialized_dynamic_array.hpp>
 
 #include <operators/forward.hpp>
@@ -81,14 +82,11 @@ struct stable_vector : private lexicographical_comparison::base {
 		std::swap(lhs.m_size, rhs.m_size);
 	}
 
-	constexpr auto begin() const & {
+	constexpr auto begin() const {
 		return contiguous_iterator<T const, static_cast<std::ptrdiff_t>(capacity_)>(m_storage.data());
 	}
-	constexpr auto begin() & {
+	constexpr auto begin() {
 		return contiguous_iterator<T, static_cast<std::ptrdiff_t>(capacity_)>(m_storage.data());
-	}
-	constexpr auto begin() && {
-		return ::containers::move_iterator(begin());
 	}
 	constexpr auto size() const {
 		return m_size;
@@ -105,10 +103,10 @@ struct stable_vector : private lexicographical_comparison::base {
 		m_size += count;
 	}
 
-	constexpr operator std::span<T const>() const & {
+	constexpr operator std::span<T const>() const {
 		return std::span<T const>(containers::data(*this), static_cast<std::size_t>(size()));
 	}
-	constexpr operator std::span<T>() & {
+	constexpr operator std::span<T>() {
 		return std::span<T>(containers::data(*this), static_cast<std::size_t>(size()));
 	}
 
@@ -117,5 +115,8 @@ private:
 	storage_type m_storage{capacity()};
 	[[no_unique_address]] bounded::integer<0, bounded::normalize<capacity_>> m_size = 0_bi;
 };
+
+template<typename T, std::size_t capacity>
+inline constexpr auto is_container<stable_vector<T, capacity>> = true;
 
 } // namespace containers

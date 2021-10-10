@@ -81,16 +81,13 @@ struct static_vector_data : private lexicographical_comparison::base {
 	constexpr static_vector_data(empty_c_array_parameter) {
 	}
 	
-	constexpr auto begin() const & {
+	constexpr auto begin() const {
 		using const_iterator = contiguous_iterator<T const, static_cast<std::ptrdiff_t>(capacity_)>;
 		return const_iterator(m_storage.data());
 	}
-	constexpr auto begin() & {
+	constexpr auto begin() {
 		using iterator = contiguous_iterator<T, static_cast<std::ptrdiff_t>(capacity_)>;
 		return iterator(m_storage.data());
-	}
-	constexpr auto begin() && {
-		return ::containers::move_iterator(begin());
 	}
 
 	constexpr auto size() const {
@@ -148,10 +145,10 @@ public:
 	using base::capacity;
 	using base::append_from_capacity;
 
-	constexpr operator std::span<T const>() const & {
+	constexpr operator std::span<T const>() const {
 		return std::span<T const>(containers::data(*this), static_cast<std::size_t>(size()));
 	}
-	constexpr operator std::span<T>() & {
+	constexpr operator std::span<T>() {
 		return std::span<T>(containers::data(*this), static_cast<std::size_t>(size()));
 	}
 };
