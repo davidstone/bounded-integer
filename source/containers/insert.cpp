@@ -40,20 +40,12 @@ constexpr bool test_value_insert() {
 static_assert(test_value_insert<containers::stable_vector<bounded_test::integer, 10>>());
 static_assert(test_value_insert<containers::vector<bounded_test::integer>>());
 
-struct non_trivial_non_copyable {
-	constexpr non_trivial_non_copyable() {}
-	constexpr non_trivial_non_copyable(non_trivial_non_copyable &&) noexcept {}
-	non_trivial_non_copyable(non_trivial_non_copyable const &) = delete;
-	constexpr non_trivial_non_copyable & operator=(non_trivial_non_copyable &&) noexcept { return *this; }
-	non_trivial_non_copyable & operator=(non_trivial_non_copyable const &) = delete;
-};
-
-static_assert(!std::is_trivially_copyable_v<non_trivial_non_copyable>);
+static_assert(!std::is_trivially_copyable_v<bounded_test::non_copyable_integer>);
 
 constexpr bool test_no_copies() {
-	auto container = containers::vector<non_trivial_non_copyable>();
-	containers::lazy_push_back(container, bounded::construct_return<non_trivial_non_copyable>);
-	insert(container, begin(container), non_trivial_non_copyable{});
+	auto container = containers::vector<bounded_test::non_copyable_integer>();
+	containers::lazy_push_back(container, bounded::construct_return<bounded_test::non_copyable_integer>);
+	insert(container, begin(container), bounded_test::non_copyable_integer(1));
 	return true;
 }
 
