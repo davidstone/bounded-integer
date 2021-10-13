@@ -33,7 +33,7 @@ inline auto to_string(detail::uint128_t x) {
 
 // TODO: Make this more efficient
 inline auto to_string(detail::int128_t const x) {
-	return x >= 0 ? to_string(static_cast<detail::uint128_t>(x)) : '-' + to_string(static_cast<detail::uint128_t>(x));
+	return x >= 0 ? to_string(static_cast<detail::uint128_t>(x)) : '-' + to_string(-static_cast<detail::uint128_t>(x));
 }
 
 #endif
