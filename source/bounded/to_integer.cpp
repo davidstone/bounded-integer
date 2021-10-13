@@ -12,6 +12,8 @@
 
 #include <cstdint>
 
+#include <catch2/catch_test_macros.hpp>
+
 namespace {
 using namespace bounded::literal;
 
@@ -39,5 +41,13 @@ static_assert(homogeneous_equals(
 	bounded::to_integer<156, 325>("256"),
 	bounded::to_integer<bounded::integer<156, 325>>("256")
 ));
+
+TEST_CASE("to_integer", "[to_integer]") {
+	CHECK_THROWS_AS((bounded::to_integer<0, 0>("")), std::invalid_argument);
+	CHECK_THROWS_AS((bounded::to_integer<-1, 1>("-")), std::invalid_argument);
+	CHECK_THROWS_AS((bounded::to_integer<0, 0>("1")), std::invalid_argument);
+	CHECK_THROWS_AS((bounded::to_integer<0, 100>("101")), std::invalid_argument);
+	CHECK_THROWS_AS((bounded::to_integer<0, 100>("-90")), std::invalid_argument);
+}
 
 } // namespace

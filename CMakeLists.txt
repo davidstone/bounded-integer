@@ -119,7 +119,7 @@ add_executable(bounded_test
 	source/bounded/value_to_function.cpp
 )
 
-target_link_libraries(bounded_test PUBLIC bounded strict_defaults)
+target_link_libraries(bounded_test PUBLIC Catch2::Catch2WithMain bounded strict_defaults)
 
 add_executable(containers_test
 	source/containers/algorithms/accumulate.cpp
