@@ -34,10 +34,11 @@ concept indexable_range =
 struct unknown_floating_point;
 template<typename T>
 using float_to_unsigned =
-	std::conditional_t<sizeof(T) == 4, std::uint32_t,
-	std::conditional_t<sizeof(T) == 8, std::uint64_t,
+	std::conditional_t<sizeof(T) == sizeof(std::uint16_t), std::uint16_t,
+	std::conditional_t<sizeof(T) == sizeof(std::uint32_t), std::uint32_t,
+	std::conditional_t<sizeof(T) == sizeof(std::uint64_t), std::uint64_t,
 	unknown_floating_point
->>;
+>>>;
 
 namespace to_radix_sort_key_adl {
 
