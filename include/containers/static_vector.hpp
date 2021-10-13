@@ -128,7 +128,6 @@ public:
 
 } // namespace detail
 
-// TODO: ensure proper exception safety
 template<typename T, std::size_t capacity_>
 struct static_vector : private detail::static_vector_data<T, capacity_> {
 private:
