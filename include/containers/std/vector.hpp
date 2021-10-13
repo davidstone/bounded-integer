@@ -72,9 +72,6 @@ concept std_allocator = is_std_allocator<T>;
 //
 // `max_size` is static. I believe this is a conforming extension.
 //
-// `insert` does not support the source element being a reference to an element
-// of the vector.
-//
 // This is possibly not a complete list. It is expected that this list will
 // shrink over time, as the goal is to fix most of these inconsistencies.
 
@@ -252,14 +249,25 @@ struct vector {
 		containers::clear(m_impl);
 	}
 
-	constexpr auto insert(const_iterator const position, T const & value) -> iterator {
-		return containers::to_address(containers::insert(m_impl, impl_iterator(position), value));
-	}
 	constexpr auto insert(const_iterator const position, T && value) -> iterator {
 		return containers::to_address(containers::insert(m_impl, impl_iterator(position), value));
 	}
+	constexpr auto insert(const_iterator const position, T const & value) -> iterator {
+		if (object_is_in_storage(value)) {
+			return insert(position, T(value));
+		} else {
+			return containers::to_address(containers::insert(m_impl, impl_iterator(position), T(value)));
+		}
+	}
 	constexpr auto insert(const_iterator const position, size_type const count, T const & value) -> iterator {
-		return containers::to_address(containers::insert(m_impl, impl_iterator(position), containers::repeat_n(count, value)));
+		auto do_insert = [&](auto range) {
+			return containers::to_address(containers::insert(m_impl, impl_iterator(position), std::move(range)));
+		};
+		if (object_is_in_storage(value)) {
+			return do_insert(containers::repeat_n(count, T(value)));
+		} else {
+			return do_insert(containers::repeat_n(count, value));
+		}
 	}
 	template<containers::iterator InputIterator>
 	constexpr auto insert(const_iterator const position, InputIterator first, InputIterator last) -> iterator {
@@ -319,6 +327,11 @@ private:
 	static constexpr auto impl_iterator(const_iterator it) {
 		return containers::iterator_t<impl_t const &>(it);
 	}
+	constexpr auto object_is_in_storage(T const & object) const {
+		auto const ptr = std::addressof(object);
+		return std::less_equal()(data(), ptr) and std::less()(ptr, data() + size());
+	}
+
 	impl_t m_impl;
 };
 

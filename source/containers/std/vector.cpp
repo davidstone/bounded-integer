@@ -47,4 +47,12 @@ static_assert([]{
 	return true;
 }());
 
+static_assert([]{
+	using vector = std_containers::vector<bounded_test::integer>;
+	auto v = vector({1, 2});
+	v.reserve(4);
+	v.insert(v.begin(), v[1]);
+	return v == vector({2, 1, 2});
+}());
+
 } // namespace
