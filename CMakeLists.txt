@@ -262,7 +262,7 @@ target_link_libraries(ska_sort_benchmark PUBLIC bounded benchmark strict_default
 add_executable(vector_benchmark
 	source/containers/std/vector_benchmark.cpp
 )
-target_link_libraries(vector_benchmark PUBLIC bounded benchmark strict_defaults)
+target_link_libraries(vector_benchmark PUBLIC bounded benchmark_main strict_defaults)
 
 
 if("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang")
