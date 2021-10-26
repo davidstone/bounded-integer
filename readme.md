@@ -34,7 +34,7 @@ The type of `z` is calculated as the smallest type that can hold all possible va
 
 ## Prerequisites
 
-* Compile with clang master
+* Compile with clang 13
 * cmake (3.14+) is used to build tests, but it is not needed to use the library (this library is header-only).
 
 ## Building and running tests (Linux)
