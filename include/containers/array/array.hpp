@@ -58,7 +58,7 @@ struct array_trait<0> {
 template<typename T, std::size_t size>
 using array_type = typename array_trait<size>::template type<T>;
 
-}	// namespace detail
+} // namespace detail
 
 template<typename T, std::size_t size_, std::size_t... sizes>
 struct array {
@@ -113,4 +113,26 @@ array(Args && ...) -> array<std::common_type_t<std::decay_t<Args>...>, sizeof...
 template<typename T, std::size_t size>
 array(c_array<T, size> &&) -> array<T, size>;
 
-}	// namespace containers
+
+template<std::size_t index, typename T, std::size_t size>
+constexpr auto && get(array<T, size> const & a) {
+	return a[bounded::constant<index>];
+}
+template<std::size_t index, typename T, std::size_t size>
+constexpr auto && get(array<T, size> & a) {
+	return a[bounded::constant<index>];
+}
+template<std::size_t index, typename T, std::size_t size>
+constexpr auto && get(array<T, size> && a) {
+	return std::move(a[bounded::constant<index>]);
+}
+
+} // namespace containers
+
+template<typename T, std::size_t size_>
+struct std::tuple_size<::containers::array<T, size_>> : std::integral_constant<std::size_t, size_> {};
+
+template<std::size_t index, typename T, std::size_t size>
+struct std::tuple_element<index, ::containers::array<T, size>> {
+	using type = T;
+};
