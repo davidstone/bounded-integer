@@ -16,13 +16,8 @@
 namespace bounded {
 namespace detail {
 
-constexpr decltype(auto) reorder_transform_implementation(bounded::constant_t<0>, auto transform, auto && function, auto && ... args) {
-	return transform(OPERATORS_FORWARD(function), OPERATORS_FORWARD(args)...);
-}
-template<auto index_>
-constexpr decltype(auto) reorder_transform_implementation(bounded::constant_t<index_> index, auto transform, auto && arg, auto && ... args) {
-	return ::bounded::detail::reorder_transform_implementation(index - 1_bi, transform, OPERATORS_FORWARD(args)..., OPERATORS_FORWARD(arg));
-}
+template<typename, auto>
+concept any_with_value = true;
 
 // Often, we want to write a function that accepts a variadic number of
 // arguments and a function. We would like to accept the function parameter
@@ -35,11 +30,11 @@ constexpr decltype(auto) reorder_transform_implementation(bounded::constant_t<in
 // stuff and a function to operate on the stuff, but allows us to transform the
 // arguments in some way before calling the user function.
 constexpr decltype(auto) reorder_transform(auto transform, auto && ... args) {
-	return ::bounded::detail::reorder_transform_implementation(
-		bounded::constant<sizeof...(args) - 1U>,
-		transform,
-		OPERATORS_FORWARD(args)...
-	);
+	return [&]<std::size_t... indexes>(std::index_sequence<indexes...>) {
+		return [&](any_with_value<indexes> auto && ... non_function_args, auto && function) {
+			return transform(OPERATORS_FORWARD(function), OPERATORS_FORWARD(non_function_args)...);
+		}(OPERATORS_FORWARD(args)...);
+	}(std::make_index_sequence<sizeof...(args) - 1>());
 };
 
 }	// namespace detail
