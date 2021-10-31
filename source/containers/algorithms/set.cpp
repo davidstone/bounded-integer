@@ -6,7 +6,7 @@
 #include <containers/algorithms/set.hpp>
 
 #include <containers/algorithms/compare.hpp>
-#include <containers/array/array.hpp>
+#include <containers/array.hpp>
 
 #include <initializer_list>
 

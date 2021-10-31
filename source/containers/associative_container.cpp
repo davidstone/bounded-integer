@@ -5,7 +5,7 @@
 
 #include <containers/associative_container.hpp>
 
-#include <containers/array/array.hpp>
+#include <containers/array.hpp>
 #include <containers/c_array.hpp>
 #include <containers/flat_map.hpp>
 #include <containers/string.hpp>

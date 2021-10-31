@@ -5,7 +5,7 @@
 
 #include <containers/take.hpp>
 
-#include <containers/array/array.hpp>
+#include <containers/array.hpp>
 #include <containers/size.hpp>
 
 namespace {

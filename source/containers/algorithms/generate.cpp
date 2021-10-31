@@ -6,7 +6,7 @@
 #include <containers/algorithms/generate.hpp>
 
 #include <containers/algorithms/compare.hpp>
-#include <containers/array/array.hpp>
+#include <containers/array.hpp>
 
 #include <bounded/value_to_function.hpp>
 

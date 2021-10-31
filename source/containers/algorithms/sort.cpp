@@ -5,7 +5,7 @@
 
 #include <containers/algorithms/sort.hpp>
 #include <containers/algorithms/is_sorted.hpp>
-#include <containers/array/array.hpp>
+#include <containers/array.hpp>
 
 namespace {
 

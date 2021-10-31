@@ -5,7 +5,7 @@
 
 #include <containers/algorithms/accumulate.hpp>
 
-#include <containers/array/array.hpp>
+#include <containers/array.hpp>
 
 namespace {
 

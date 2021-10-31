@@ -5,7 +5,7 @@
 
 #include <containers/algorithms/all_any_none.hpp>
 
-#include <containers/array/array.hpp>
+#include <containers/array.hpp>
 
 static_assert(containers::all_equal(containers::array{2, 2, 2}, 2));
 static_assert(!containers::all_equal(containers::array{2, 1, 2}, 2));

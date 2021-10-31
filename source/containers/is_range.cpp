@@ -4,7 +4,7 @@
 // http://www.boost.org/LICENSE_1_0.txt)
 
 #include <containers/is_range.hpp>
-#include <containers/array/array.hpp>
+#include <containers/array.hpp>
 #include <containers/c_array.hpp>
 #include <containers/string.hpp>
 #include <containers/vector.hpp>

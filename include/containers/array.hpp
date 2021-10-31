@@ -10,10 +10,12 @@
 #include <containers/common_functions.hpp>
 
 #include <bounded/integer.hpp>
+#include <bounded/detail/make_index_sequence.hpp>
 
 #include <numeric_traits/min_max_value.hpp>
 
 #include <operators/bracket.hpp>
+#include <operators/forward.hpp>
 
 #include <algorithm>
 #include <cstddef>
@@ -112,6 +114,28 @@ array(Args && ...) -> array<std::common_type_t<std::decay_t<Args>...>, sizeof...
 
 template<typename T, std::size_t size>
 array(c_array<T, size> &&) -> array<T, size>;
+
+
+namespace detail {
+
+// Use the comma operator to expand the variadic pack
+// Move the last element in if possible. Order of evaluation is well-defined for
+// aggregate initialization, so there is no risk of copy-after-move
+template<std::size_t size, std::size_t... indexes>
+constexpr auto make_array_n_impl(auto && value, std::index_sequence<indexes...>) {
+	return array<std::decay_t<decltype(value)>, size>{(void(indexes), value)..., OPERATORS_FORWARD(value)};
+}
+
+} // namespace detail
+
+template<auto size_>
+constexpr auto make_array_n(bounded::constant_t<size_> size, auto && value) {
+	if constexpr (size == bounded::constant<0>) {
+		return array<std::decay_t<decltype(value)>, 0>{};
+	} else {
+		return detail::make_array_n_impl<size_>(OPERATORS_FORWARD(value), bounded::make_index_sequence(size - bounded::constant<1>));
+	}
+}
 
 
 template<std::size_t index, typename T, std::size_t size>

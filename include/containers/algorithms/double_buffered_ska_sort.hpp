@@ -9,7 +9,7 @@
 #include <containers/algorithms/minmax_element.hpp>
 #include <containers/algorithms/negate.hpp>
 #include <containers/algorithms/reverse_iterator.hpp>
-#include <containers/array/array.hpp>
+#include <containers/array.hpp>
 #include <containers/begin_end.hpp>
 #include <containers/front_back.hpp>
 #include <containers/index_type.hpp>

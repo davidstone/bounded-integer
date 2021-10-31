@@ -8,7 +8,7 @@
 #include <containers/algorithms/is_sorted.hpp>
 #include <containers/algorithms/sort.hpp>
 
-#include <containers/array/array.hpp>
+#include <containers/array.hpp>
 #include <containers/c_array.hpp>
 
 #include <numeric_traits/min_max_value.hpp>

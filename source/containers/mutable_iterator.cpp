@@ -5,7 +5,7 @@
 
 #include <containers/mutable_iterator.hpp>
 
-#include <containers/array/array.hpp>
+#include <containers/array.hpp>
 #include <containers/iterator_t.hpp>
 
 #include "../test_assert.hpp"

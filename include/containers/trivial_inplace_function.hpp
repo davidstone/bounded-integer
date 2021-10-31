@@ -1,6 +1,6 @@
 #pragma once
 
-#include <containers/array/array.hpp>
+#include <containers/array.hpp>
 
 #include <cstdint>
 #include <type_traits>

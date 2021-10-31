@@ -5,7 +5,7 @@
 
 #include <containers/algorithms/concatenate_view.hpp>
 
-#include <containers/array/array.hpp>
+#include <containers/array.hpp>
 #include <containers/range_value_t.hpp>
 #include <containers/repeat_n.hpp>
 #include <containers/size.hpp>

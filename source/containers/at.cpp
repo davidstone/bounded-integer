@@ -5,7 +5,7 @@
 
 #include <containers/at.hpp>
 
-#include <containers/array/array.hpp>
+#include <containers/array.hpp>
 
 #include <catch2/catch_test_macros.hpp>
 

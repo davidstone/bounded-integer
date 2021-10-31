@@ -5,7 +5,7 @@
 
 #include <containers/front_back.hpp>
 
-#include <containers/array/array.hpp>
+#include <containers/array.hpp>
 
 namespace {
 

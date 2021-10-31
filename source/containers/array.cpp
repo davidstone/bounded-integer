@@ -3,14 +3,15 @@
 // (See accompanying file LICENSE_1_0.txt or copy at
 // http://www.boost.org/LICENSE_1_0.txt)
 
-#include <containers/array/array.hpp>
+#include <containers/array.hpp>
 #include <containers/begin_end.hpp>
 #include <containers/data.hpp>
+#include <containers/range_value_t.hpp>
 #include <containers/size.hpp>
 
 #include <bounded/integer.hpp>
 
-#include "../test_sequence_container.hpp"
+#include "test_sequence_container.hpp"
 
 namespace {
 using namespace bounded::literal;
@@ -47,4 +48,28 @@ static_assert(!std::is_convertible_v<containers::array<int, 3> const &, std::spa
 static_assert(std::is_convertible_v<containers::array<int, 3> &, std::span<int const, 3>>);
 static_assert(std::is_convertible_v<containers::array<int, 3> &, std::span<int, 3>>);
 
-}	// namespace
+constexpr auto array_n = containers::make_array_n(6_bi, 5);
+static_assert(std::is_same_v<containers::range_value_t<decltype(array_n)>, int>, "Incorrect type from make_array_n.");
+static_assert(containers::size(array_n) == 6_bi, "Incorrect size from make_array_n.");
+static_assert(array_n[3_bi] == 5, "Incorrect values from make_array_n.");
+
+struct non_copyable {
+	non_copyable() = default;
+	non_copyable(non_copyable const &) = delete;
+	non_copyable(non_copyable &&) = default;
+};
+
+constexpr auto array_non_copyable = containers::make_array_n(1_bi, non_copyable());
+static_assert(containers::size(array_non_copyable) == 1_bi);
+
+constexpr auto array_empty = containers::make_array_n(0_bi, 2);
+static_assert(array_empty.size() == 0_bi);
+
+constexpr auto array_non_copyable_empty = containers::make_array_n(0_bi, non_copyable());
+static_assert(array_non_copyable_empty.size() == 0_bi);
+
+constexpr auto large_size = 10000_bi;
+constexpr auto large_array_n = containers::make_array_n(large_size, 0);
+static_assert(containers::size(large_array_n) == large_size);
+
+} // namespace

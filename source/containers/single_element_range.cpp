@@ -6,7 +6,7 @@
 #include <containers/single_element_range.hpp>
 
 #include <containers/algorithms/compare.hpp>
-#include <containers/array/array.hpp>
+#include <containers/array.hpp>
 #include <containers/front_back.hpp>
 
 #include "../test_assert.hpp"

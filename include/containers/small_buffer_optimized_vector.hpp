@@ -6,7 +6,7 @@
 #pragma once
 
 #include <containers/algorithms/destroy_range.hpp>
-#include <containers/array/array.hpp>
+#include <containers/array.hpp>
 #include <containers/assign.hpp>
 #include <containers/assign_to_empty.hpp>
 #include <containers/begin_end.hpp>

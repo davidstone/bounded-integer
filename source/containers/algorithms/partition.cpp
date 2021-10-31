@@ -4,7 +4,7 @@
 // http://www.boost.org/LICENSE_1_0.txt)
 
 #include <containers/algorithms/partition.hpp>
-#include <containers/array/array.hpp>
+#include <containers/array.hpp>
 #include <containers/static_vector.hpp>
 
 namespace {

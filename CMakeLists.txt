@@ -155,12 +155,11 @@ add_executable(containers_test
 	source/containers/algorithms/transform_iterator.cpp
 	source/containers/algorithms/uninitialized.cpp
 	source/containers/algorithms/unique.cpp
-	source/containers/array/array.cpp
-	source/containers/array/make_array.cpp
 	source/containers/std/vector.cpp
 	source/containers/adapt.cpp
 	source/containers/append.cpp
 	source/containers/appendable_from_capacity.cpp
+	source/containers/array.cpp
 	source/containers/assign.cpp
 	source/containers/assign_to_empty.cpp
 	source/containers/associative_container.cpp

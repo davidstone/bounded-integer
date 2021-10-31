@@ -5,7 +5,7 @@
 
 #include <containers/algorithms/maybe_find.hpp>
 
-#include <containers/array/array.hpp>
+#include <containers/array.hpp>
 
 namespace {
 using namespace bounded::literal;

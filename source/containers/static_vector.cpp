@@ -5,7 +5,7 @@
 
 #include <containers/static_vector.hpp>
 
-#include <containers/array/array.hpp>
+#include <containers/array.hpp>
 #include <containers/emplace_back.hpp>
 #include <containers/index_type.hpp>
 

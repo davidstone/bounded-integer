@@ -5,7 +5,7 @@
 
 #include <containers/appendable_from_capacity.hpp>
 
-#include <containers/array/array.hpp>
+#include <containers/array.hpp>
 #include <containers/vector.hpp>
 
 namespace {

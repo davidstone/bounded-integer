@@ -5,7 +5,7 @@
 
 #include <containers/range_view.hpp>
 
-#include <containers/array/array.hpp>
+#include <containers/array.hpp>
 #include <containers/algorithms/compare.hpp>
 
 namespace {

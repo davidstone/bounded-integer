@@ -7,7 +7,7 @@
 #include <containers/algorithms/is_sorted.hpp>
 #include <containers/algorithms/ska_sort.hpp>
 #include <containers/algorithms/sort.hpp>
-#include <containers/array/array.hpp>
+#include <containers/array.hpp>
 #include <containers/c_array.hpp>
 #include <containers/front_back.hpp>
 #include <containers/push_back.hpp>

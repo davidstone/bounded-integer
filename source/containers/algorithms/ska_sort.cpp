@@ -5,7 +5,7 @@
 
 #include <containers/algorithms/ska_sort.hpp>
 
-#include <containers/array/array.hpp>
+#include <containers/array.hpp>
 #include <containers/c_array.hpp>
 #include <containers/range_view.hpp>
 #include <containers/to_radix_sort_key.hpp>
