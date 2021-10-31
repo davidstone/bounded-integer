@@ -122,6 +122,9 @@ public:
 	}
 };
 
+template<typename T>
+concept trivially_swappable = std::is_trivially_copyable_v<T> and std::is_trivially_copy_assignable_v<T> and std::is_trivially_destructible_v<T>;
+
 } // namespace detail
 
 template<typename T, std::size_t capacity_>
@@ -145,6 +148,23 @@ public:
 	}
 	constexpr operator std::span<T>() {
 		return std::span<T>(containers::data(*this), static_cast<std::size_t>(size()));
+	}
+
+	friend constexpr auto swap(static_vector & lhs, static_vector & rhs) noexcept(std::is_nothrow_swappable_v<T>) -> void requires(!detail::trivially_swappable<T>) {
+		if (std::addressof(lhs) == std::addressof(rhs)) {
+			return;
+		}
+		auto swap_impl = [](static_vector & longer, static_vector & shorter) {
+			auto shorter_last = containers::end(shorter);
+			auto longer_it = std::swap_ranges(containers::begin(shorter), shorter_last, containers::begin(longer));
+			containers::uninitialized_relocate_no_overlap(containers::range_view(longer_it, containers::end(longer)), shorter_last);
+		};
+		if (containers::size(lhs) >= containers::size(rhs)) {
+			swap_impl(lhs, rhs);
+		} else {
+			swap_impl(rhs, lhs);
+		}
+		std::swap(lhs.m_size, rhs.m_size);
 	}
 };
 
