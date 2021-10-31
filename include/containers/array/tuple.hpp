@@ -28,18 +28,12 @@ constexpr auto && get(array<T, size> && a) {
 	return std::move(a[bounded::constant<index>]);
 }
 
-}	// namespace containers
+} // namespace containers
 
-// I am not sure yet if it is legal to specialize these classes.
-#if 0
-
-template<typename T, std::size_t size>
-struct std::tuple_size<::containers::array<T, size>> : integral_constant<std::size_t, size> {};
+template<typename T, std::size_t size_>
+struct std::tuple_size<::containers::array<T, size_>> : std::integral_constant<std::size_t, size_> {};
 
 template<std::size_t index, typename T, std::size_t size>
 struct std::tuple_element<index, ::containers::array<T, size>> {
 	using type = T;
 };
-
-#endif
-
