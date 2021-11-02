@@ -82,6 +82,16 @@ constexpr auto operator==(LHS const lhs, RHS const rhs) -> bool {
 	}
 }
 
+constexpr auto operator<=>(bounded_integer auto const lhs, detail::builtin_integer auto const rhs) {
+	return lhs <=> integer(rhs);
+}
+constexpr auto operator==(bounded_integer auto const lhs, detail::builtin_integer auto const rhs) -> bool {
+	return lhs == integer(rhs);
+}
+
+constexpr auto operator<=>(bounded_integer auto, bool) = delete;
+constexpr auto operator==(bounded_integer auto, bool) -> bool = delete;
+
 template<typename LHS, typename RHS = LHS>
 concept equality_comparable = requires(LHS const & lhs, RHS const & rhs) { lhs == rhs; };
 

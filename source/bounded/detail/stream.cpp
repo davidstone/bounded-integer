@@ -6,7 +6,7 @@
 #include <bounded/detail/stream.hpp>
 
 #include <bounded/detail/class.hpp>
-#include <bounded/detail/comparison_mixed.hpp>
+#include <bounded/detail/comparison.hpp>
 
 #include <catch2/catch_test_macros.hpp>
 

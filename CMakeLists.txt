@@ -72,7 +72,6 @@ add_executable(bounded_test
 	source/bounded/detail/common_type_and_value_category.cpp
 	source/bounded/detail/comparison.cpp
 	source/bounded/detail/comparison_function_object.cpp
-	source/bounded/detail/comparison_mixed.cpp
 	source/bounded/detail/conditional.cpp
 	source/bounded/detail/construct_destroy.cpp
 	source/bounded/detail/copy_cv_ref.cpp

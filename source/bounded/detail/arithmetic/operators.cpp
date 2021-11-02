@@ -6,7 +6,6 @@
 #include <bounded/detail/arithmetic/operators.hpp>
 #include <bounded/detail/arithmetic/operators_builtin.hpp>
 #include <bounded/detail/comparison.hpp>
-#include <bounded/detail/comparison_mixed.hpp>
 
 #include "extreme_values.hpp"
 #include "../../homogeneous_equals.hpp"

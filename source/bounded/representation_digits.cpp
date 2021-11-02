@@ -6,7 +6,7 @@
 #include <bounded/representation_digits.hpp>
 
 #include <bounded/detail/class.hpp>
-#include <bounded/detail/comparison_mixed.hpp>
+#include <bounded/detail/comparison.hpp>
 #include <bounded/detail/literal.hpp>
 
 #include <numeric_traits/min_max_value.hpp>

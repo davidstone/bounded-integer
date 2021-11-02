@@ -6,7 +6,6 @@
 #pragma once
 
 #include <bounded/detail/comparison.hpp>
-#include <bounded/detail/comparison_mixed.hpp>
 #include <bounded/detail/construct_destroy.hpp>
 #include <bounded/detail/variant/variant.hpp>
 #include <bounded/assert.hpp>

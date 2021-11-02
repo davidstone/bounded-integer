@@ -9,7 +9,6 @@
 #include <bounded/detail/cast.hpp>
 #include <bounded/detail/class.hpp>
 #include <bounded/detail/comparison.hpp>
-#include <bounded/detail/comparison_mixed.hpp>
 #include <bounded/detail/conditional.hpp>
 #include <bounded/detail/integer_tombstone_traits.hpp>
 #include <bounded/detail/literal.hpp>

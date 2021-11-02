@@ -4,7 +4,7 @@
 // http://www.boost.org/LICENSE_1_0.txt)
 
 #include <bounded/pow.hpp>
-#include <bounded/detail/comparison_mixed.hpp>
+#include <bounded/detail/comparison.hpp>
 #include <bounded/detail/class.hpp>
 
 namespace {
