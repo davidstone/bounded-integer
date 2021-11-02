@@ -40,7 +40,7 @@ constexpr void inplace_radix_sort(range auto && to_sort) {
 template<typename Container>
 auto create_radix_sort_data(std::mt19937_64 & engine, std::int64_t const size, auto distribution) {
 	auto result = Container();
-	containers::detail::reserve_if_reservable(result, static_cast<range_size_t<Container>>(size));
+	containers::detail::reserve_if_reservable(result, bounded::assume_in_range<range_size_t<Container>>(size));
 	for (std::int64_t n = 0; n != size; ++n) {
 		containers::push_back(result, distribution(engine));
 	}

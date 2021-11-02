@@ -154,10 +154,10 @@ struct vector {
 	}
 
 	constexpr auto operator[](size_type const index) const -> const_reference {
-		return m_impl[static_cast<containers::index_type<impl_t>>(index)];
+		return m_impl[::bounded::assume_in_range<containers::index_type<impl_t>>(index)];
 	}
 	constexpr auto operator[](size_type const index) -> reference {
-		return m_impl[static_cast<containers::index_type<impl_t>>(index)];
+		return m_impl[::bounded::assume_in_range<containers::index_type<impl_t>>(index)];
 	}
 
 	constexpr auto front() const -> const_reference {

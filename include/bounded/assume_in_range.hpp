@@ -43,7 +43,7 @@ template<integral Target>
 constexpr auto assume_in_range(integral auto const value) {
 	constexpr auto minimum = numeric_traits::min_value<Target>;
 	constexpr auto maximum = numeric_traits::max_value<Target>;
-	if (value < minimum or maximum < value) {
+	if (integer(value) < integer(minimum) or integer(maximum) < integer(value)) {
 		bounded::unreachable();
 	}
 	if constexpr (bounded_integer<Target>) {

@@ -115,21 +115,21 @@ template<typename integer_type>
 constexpr auto check_integer_optional() {
 	constexpr auto uninitialized_optional = bounded::optional<integer_type>();
 	static_assert(!uninitialized_optional, "Default constructor should leave uninitialized.");
-	constexpr auto constexpr_optional_integer = bounded::optional<integer_type>(integer_type(5));
+	constexpr auto constexpr_optional_integer = bounded::optional<integer_type>(integer_type(5_bi));
 	static_assert(constexpr_optional_integer, "Value constructor should initialize optional.");
 	static_assert(*constexpr_optional_integer == 5, "Value in an optional incorrect.");
 
-	auto optional_integer = bounded::optional<integer_type>(integer_type(4));
+	auto optional_integer = bounded::optional<integer_type>(integer_type(4_bi));
 	optional_integer = uninitialized_optional;
 	BOUNDED_TEST(!optional_integer);
 
-	optional_integer = integer_type(7);
+	optional_integer = integer_type(7_bi);
 	BOUNDED_TEST(optional_integer);
 
 	static_assert(std::is_same_v<decltype(*optional_integer), integer_type &>, "Incorrect type of *optional.");
-	*optional_integer = integer_type(1);
+	*optional_integer = integer_type(1_bi);
 	BOUNDED_TEST(optional_integer);
-	BOUNDED_TEST(*optional_integer == 1);
+	BOUNDED_TEST(*optional_integer == 1_bi);
 	
 	optional_integer = bounded::none;
 	BOUNDED_TEST(!optional_integer);

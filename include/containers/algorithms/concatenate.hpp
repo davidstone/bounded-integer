@@ -76,7 +76,7 @@ constexpr auto ugly_size_hack(Size const size) {
 			0,
 			bounded::normalize<std::min(numeric_traits::max_value<Size>, numeric_traits::max_value<std::uintmax_t> / 64)>
 		>;
-		return static_cast<result_t>(size);
+		return ::bounded::assume_in_range<result_t>(size);
 	} else {
 		return size;
 	}
@@ -129,8 +129,8 @@ constexpr auto concatenate(auto && ... ranges) {
 		}
 	}
 
-	Result result;
-	result.reserve(static_cast<range_size_t<Result>>(total_size));
+	auto result = Result();
+	result.reserve(::bounded::assume_in_range<range_size_t<Result>>(total_size));
 	(..., ::containers::append(result, OPERATORS_FORWARD(ranges)));
 	return result;
 }

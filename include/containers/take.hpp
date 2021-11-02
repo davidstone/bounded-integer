@@ -88,7 +88,7 @@ struct counted_iterator {
 	friend constexpr auto operator+(counted_iterator it, Offset const offset) {
 		return counted_iterator(
 			std::move(it).m_it + offset,
-			static_cast<Count>(it.m_count - offset)
+			::bounded::assume_in_range<Count>(it.m_count - offset)
 		);
 	}
 	friend constexpr auto operator-(counted_iterator const & lhs, counted_iterator const & rhs) {
@@ -137,7 +137,7 @@ struct random_access_counted_iterator {
 		return random_access_counted_iterator(std::move(it).m_it + offset);
 	}
 	friend constexpr auto operator-(random_access_counted_iterator lhs, random_access_counted_iterator rhs) {
-		return static_cast<difference_type>(std::move(lhs).m_it - std::move(rhs).m_it);
+		return ::bounded::assume_in_range<difference_type>(std::move(lhs).m_it - std::move(rhs).m_it);
 	}
 
 	friend auto & operator++(random_access_counted_iterator & it) requires(numeric_traits::max_value<difference_type> == 0_bi) {

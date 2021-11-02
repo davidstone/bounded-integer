@@ -70,7 +70,7 @@ constexpr auto insert_with_reallocation(Container & container, iterator_t<Contai
 	BOUNDED_ASSERT(temp_begin + offset == it);
 	::containers::uninitialized_relocate_no_overlap(
 		range_view(mutable_position, containers::end(container)),
-		it + static_cast<offset_type<iterator_t<Container &>>>(number_of_elements)
+		it + ::bounded::assume_in_range<offset_type<iterator_t<Container &>>>(number_of_elements)
 	);
 	container.append_from_capacity(-original_size);
 	temp.append_from_capacity(original_size + number_of_elements);
@@ -91,7 +91,7 @@ constexpr auto insert(Container & container, iterator_t<Container const &> posit
 	BOUNDED_ASSERT(::containers::detail::iterator_points_into_container(container, position));
 	auto const range_size = ::containers::detail::linear_size(range);
 	if (containers::size(container) + range_size <= container.capacity()) {
-		return ::containers::detail::insert_without_reallocation(container, position, OPERATORS_FORWARD(range), static_cast<count_type<Container>>(range_size));
+		return ::containers::detail::insert_without_reallocation(container, position, OPERATORS_FORWARD(range), ::bounded::assume_in_range<count_type<Container>>(range_size));
 	} else if constexpr (detail::reservable<Container>) {
 		return ::containers::detail::insert_with_reallocation(container, position, OPERATORS_FORWARD(range), range_size);
 	} else {

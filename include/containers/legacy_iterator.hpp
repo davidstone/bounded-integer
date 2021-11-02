@@ -9,6 +9,7 @@
 
 #include <containers/common_iterator_functions.hpp>
 #include <containers/is_iterator.hpp>
+#include <containers/iter_difference_t.hpp>
 #include <containers/iter_value_t.hpp>
 #include <containers/to_address.hpp>
 
@@ -61,7 +62,7 @@ private:
 
 template<typename Iterator>
 constexpr auto operator+(legacy_iterator<Iterator> const lhs, bounded::integral auto const rhs) {
-	return legacy_iterator<Iterator>(lhs.base() + static_cast<typename std::iterator_traits<Iterator>::difference_type>(rhs));
+	return legacy_iterator<Iterator>(lhs.base() + ::bounded::assume_in_range<iter_difference_t<Iterator>>(rhs));
 }
 template<typename Iterator>
 constexpr auto operator-(legacy_iterator<Iterator> const lhs, legacy_iterator<Iterator> const rhs) {

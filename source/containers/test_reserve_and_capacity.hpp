@@ -31,7 +31,7 @@ template<typename Container>
 constexpr auto test_reserve_one_more_from_empty() -> void {
 	auto v = Container();
 	auto const initial_capacity = v.capacity();
-	v.reserve(static_cast<containers::range_size_t<Container>>(v.capacity() + 1_bi));
+	v.reserve(::bounded::assume_in_range<containers::range_size_t<Container>>(v.capacity() + 1_bi));
 	auto const capacity1 = v.capacity();
 	BOUNDED_TEST(capacity1 >= 1_bi);
 	BOUNDED_TEST(capacity1 >= initial_capacity + 1_bi);
@@ -42,7 +42,7 @@ template<typename Container>
 constexpr auto test_reserve_one_more_from_non_empty() -> void {
 	auto v = Container({containers::range_value_t<Container>(5)});
 	auto const initial_capacity = v.capacity();
-	v.reserve(static_cast<containers::range_size_t<Container>>(v.capacity() + 1_bi));
+	v.reserve(::bounded::assume_in_range<containers::range_size_t<Container>>(v.capacity() + 1_bi));
 	BOUNDED_TEST(v.capacity() >= initial_capacity + 1_bi);
 	BOUNDED_TEST(v == Container({containers::range_value_t<Container>(5)}));
 }
@@ -50,10 +50,10 @@ constexpr auto test_reserve_one_more_from_non_empty() -> void {
 template<typename Container>
 constexpr auto test_reserve_smaller_size_no_op() -> void {
 	auto v = Container();
-	v.reserve(static_cast<containers::range_size_t<Container>>(v.capacity() + 1_bi));
+	v.reserve(::bounded::assume_in_range<containers::range_size_t<Container>>(v.capacity() + 1_bi));
 	auto const initial_capacity = v.capacity();
 	auto const ptr = containers::data(v);
-	v.reserve(static_cast<containers::range_size_t<Container>>(0_bi));
+	v.reserve(0_bi);
 	BOUNDED_TEST(v.capacity() == initial_capacity);
 	BOUNDED_TEST(containers::size(v) == 0_bi);
 	BOUNDED_TEST(containers::data(v) == ptr);
@@ -62,7 +62,7 @@ constexpr auto test_reserve_smaller_size_no_op() -> void {
 template<typename Container>
 constexpr auto test_reserve_same_size_no_op() -> void {
 	auto v = Container();
-	v.reserve(static_cast<containers::range_size_t<Container>>(v.capacity() + 1_bi));
+	v.reserve(::bounded::assume_in_range<containers::range_size_t<Container>>(v.capacity() + 1_bi));
 	auto const initial_capacity = v.capacity();
 	auto const ptr = containers::data(v);
 	v.reserve(initial_capacity);

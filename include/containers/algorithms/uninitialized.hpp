@@ -79,7 +79,7 @@ inline constexpr auto uninitialized_copy_no_overlap = []<range InputRange, itera
 		} else {
 			auto const offset = containers::size(source);
 			::containers::detail::memcpy(containers::to_address(out), containers::data(source), static_cast<std::size_t>(offset) * sizeof(range_value_t<InputRange>));
-			return out + static_cast<iter_difference_t<OutputIterator>>(offset);
+			return out + ::bounded::assume_in_range<iter_difference_t<OutputIterator>>(offset);
 		}
 	} else {
 		return uninitialized_copy(OPERATORS_FORWARD(source), out);

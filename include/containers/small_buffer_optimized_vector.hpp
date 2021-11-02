@@ -74,7 +74,7 @@ struct small_buffer_optimized_vector : private lexicographical_comparison::base 
 		static_assert(sizeof(size_type) == sizeof(unsigned char));
 
 		constexpr auto size() const {
-			return static_cast<size_type>(m_size);
+			return ::bounded::assume_in_range<size_type>(m_size);
 		}
 		constexpr auto set_size(size_type const size_) {
 			m_size = size_.value();
@@ -116,7 +116,7 @@ struct small_buffer_optimized_vector : private lexicographical_comparison::base 
 		}
 
 		constexpr auto size() const {
-			return static_cast<size_type>(m_size);
+			return ::bounded::assume_in_range<size_type>(m_size);
 		}
 		constexpr auto set_size(size_type const size_) {
 			m_size = size_.value();
@@ -215,13 +215,13 @@ struct small_buffer_optimized_vector : private lexicographical_comparison::base 
 	constexpr void append_from_capacity(auto const count) {
 		auto const new_size = size() + count;
 		if (is_small()) {
-			if constexpr (bounded::constructible_from<range_size_t<small_t>, decltype(new_size)>) {
-				m_small.set_size(static_cast<range_size_t<small_t>>(new_size));
+			if constexpr (bounded::constructible_from<range_size_t<small_t>, decltype(new_size), bounded::non_check_t>) {
+				m_small.set_size(::bounded::assume_in_range<range_size_t<small_t>>(new_size));
 			} else {
 				bounded::assert_or_assume_unreachable();
 			}
 		} else {
-			m_large.set_size(static_cast<range_size_t<large_t>>(new_size));
+			m_large.set_size(::bounded::assume_in_range<range_size_t<large_t>>(new_size));
 		}
 		BOUNDED_ASSERT(size() == new_size);
 	}
@@ -309,7 +309,7 @@ private:
 			[&] {
 				return large_t(
 					size(),
-					static_cast<typename large_t::capacity_type>(temp.size),
+					::bounded::assume_in_range<typename large_t::capacity_type>(temp.size),
 					reinterpret_cast<T *>(temp.pointer)
 				);
 			}

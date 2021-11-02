@@ -32,7 +32,7 @@ struct container {
 		m_data.reserve(new_capacity);
 	}
 	constexpr auto capacity() const {
-		return bounded::integer<1, 5>(m_data.capacity());
+		return bounded::assume_in_range(m_data.capacity(), 1_bi, 5_bi);
 	}
 	constexpr void append_from_capacity(auto const added) {
 		m_data.append_from_capacity(added);

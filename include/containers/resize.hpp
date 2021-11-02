@@ -28,7 +28,7 @@ template<typename Container>
 constexpr auto resize_impl(Container & container_to_resize, auto const new_size, auto const generator) {
 	auto const container_size = bounded::integer(containers::size(container_to_resize));
 	if (new_size <= container_size) {
-		containers::erase_after(container_to_resize, containers::begin(container_to_resize) + static_cast<containers::count_type<Container>>(new_size));
+		containers::erase_after(container_to_resize, containers::begin(container_to_resize) + ::bounded::assume_in_range<containers::count_type<Container>>(new_size));
 	} else {
 		auto const remaining = bounded::increase_min<0>(new_size - container_size, bounded::non_check);
 		::containers::append(container_to_resize, containers::generate_n(remaining, generator));

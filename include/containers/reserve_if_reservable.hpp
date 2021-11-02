@@ -27,7 +27,7 @@ constexpr void reserve_if_reservable(Container & container, range_size_t<Contain
 
 template<typename Capacity>
 constexpr auto reallocation_size(Capacity const current_capacity, auto const current_size, auto const extra_elements) {
-	return static_cast<Capacity>(bounded::max(
+	return ::bounded::assume_in_range<Capacity>(bounded::max(
 		bounded::integer(current_size) + bounded::integer(extra_elements),
 		bounded::integer(current_capacity) * 2_bi
 	));

@@ -117,7 +117,7 @@ constexpr bool double_buffered_numeric_sort(Source & source, Buffer & buffer, Ex
 		auto sort_segment_copy = [&](auto & current, auto & next) {
 			for (auto && value : current) {
 				auto const key = (bounded::integer(extract_key(value)) >> (*index_it * 8_bi)) % 256_bi;
-				next[containers::index_type<Buffer>(counts[*index_it][key]++)] = std::move(value);
+				next[::bounded::assume_in_range<containers::index_type<Buffer>>(counts[*index_it][key]++)] = std::move(value);
 			}
 			++index_it;
 		};

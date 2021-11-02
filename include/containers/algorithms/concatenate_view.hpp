@@ -129,7 +129,7 @@ struct concatenate_view_iterator {
 	friend constexpr auto operator+(concatenate_view_iterator const lhs, Offset const offset) {
 		return [=]<std::size_t... indexes>(std::index_sequence<indexes...>) {
 			BOUNDED_ASSERT(offset >= bounded::constant<0>);
-			auto remaining_offset = bounded::integer<0, bounded::builtin_max_value<Offset>>(offset);
+			auto remaining_offset = bounded::integer<0, bounded::builtin_max_value<Offset>>(::bounded::assume_in_range(offset, 0_bi, bounded::integer(numeric_traits::max_value<Offset>)));
 			auto specific_range = [&](auto const index) {
 				auto const range = lhs.m_range_views[index];
 				using size_type = range_size_t<decltype(range)>;

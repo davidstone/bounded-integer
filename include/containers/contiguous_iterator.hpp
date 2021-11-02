@@ -80,7 +80,7 @@ constexpr auto operator+(
 
 template<typename T, std::ptrdiff_t max_difference>
 constexpr auto operator-(contiguous_iterator<T, max_difference> const lhs, contiguous_iterator<T, max_difference> const rhs) {
-	return static_cast<typename contiguous_iterator<T, max_difference>::difference_type>(lhs.to_address() - rhs.to_address());
+	return ::bounded::assume_in_range<typename contiguous_iterator<T, max_difference>::difference_type>(lhs.to_address() - rhs.to_address());
 }
 
 template<typename T, std::ptrdiff_t max_difference>

@@ -34,7 +34,7 @@ constexpr void test_unique_less(Container source, Container const & expected) {
 }
 
 constexpr void test_unique_merge_copy(Container const & lhs, Container const & rhs, Container const & expected) {
-	auto result = Container(containers::repeat_n(containers::range_size_t<Container>(containers::size(lhs) + containers::size(rhs)), 0));
+	auto result = Container(containers::repeat_n(::bounded::assume_in_range<containers::range_size_t<Container>>(containers::size(lhs) + containers::size(rhs)), 0));
 	auto const it = containers::unique_merge_copy(begin(lhs), end(lhs), begin(rhs), end(rhs), begin(result));
 	containers::erase(result, it, end(result));
 

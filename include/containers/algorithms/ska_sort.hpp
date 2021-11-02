@@ -241,7 +241,7 @@ private:
 				PartitionInfo * current_block = partitions.partitions.data() + *current_block_ptr;
 				uint8_t * last_block = partitions.remaining.data() + partitions.number - 1;
 				auto it = first;
-				auto block_end = first + static_cast<difference_type>(current_block->next_offset);
+				auto block_end = first + ::bounded::assume_in_range<difference_type>(current_block->next_offset);
 				auto last_element = containers::prev(containers::end(to_sort));
 				for (;;) {
 					PartitionInfo * block = partitions.partitions.data() + current_byte(extract_key(*it), sort_data, offset);
@@ -259,11 +259,11 @@ private:
 									break;
 							}
 
-							it = first + static_cast<difference_type>(current_block->offset);
-							block_end = first + static_cast<difference_type>(current_block->next_offset);
+							it = first + ::bounded::assume_in_range<difference_type>(current_block->offset);
+							block_end = first + ::bounded::assume_in_range<difference_type>(current_block->next_offset);
 						}
 					} else {
-						auto const partition_offset = static_cast<containers::index_type<View>>(block->offset++);
+						auto const partition_offset = ::bounded::assume_in_range<containers::index_type<View>>(block->offset++);
 						using std::swap;
 						swap(*it, to_sort[partition_offset]);
 					}
@@ -272,7 +272,7 @@ private:
 		}();
 		auto partition_begin = first;
 		for (uint8_t * it = partitions.remaining.data(), * remaining_end = partitions.remaining.data() + partitions.number; it != remaining_end; ++it) {
-			auto const end_offset = static_cast<difference_type>(partitions.partitions[*it].next_offset);
+			auto const end_offset = ::bounded::assume_in_range<difference_type>(partitions.partitions[*it].next_offset);
 			auto const partition_end = first + end_offset;
 			if (partition_end - partition_begin > bounded::constant<1>) {
 				sort_selector(containers::range_view(partition_begin, partition_end), extract_key, next_sort, sort_data, offset + 1U);
@@ -288,14 +288,14 @@ private:
 		using difference_type = iter_difference_t<decltype(first)>;
 		for (uint8_t * last_remaining = partitions.remaining.data() + partitions.number, * end_partition = partitions.remaining.data() + 1; last_remaining > end_partition;) {
 			last_remaining = containers::partition(partitions.remaining.data(), last_remaining, [&](uint8_t partition) {
-				auto const begin_offset = static_cast<difference_type>(partitions.partitions[partition].offset);
-				auto const end_offset = static_cast<difference_type>(partitions.partitions[partition].next_offset);
+				auto const begin_offset = ::bounded::assume_in_range<difference_type>(partitions.partitions[partition].offset);
+				auto const end_offset = ::bounded::assume_in_range<difference_type>(partitions.partitions[partition].next_offset);
 				if (begin_offset == end_offset)
 					return false;
 
 				for (auto it = first + begin_offset; it != first + end_offset; ++it) {
 					uint8_t this_partition = current_byte(extract_key(*it), sort_data, offset);
-					auto const partition_offset = static_cast<difference_type>(partitions.partitions[this_partition].offset++);
+					auto const partition_offset = ::bounded::assume_in_range<difference_type>(partitions.partitions[this_partition].offset++);
 					auto const other = first + partition_offset;
 					// Is there a better way to avoid self swap?
 					if (it != other) {
@@ -308,8 +308,8 @@ private:
 		}
 		for (uint8_t * it = partitions.remaining.data() + partitions.number; it != partitions.remaining.data(); --it) {
 			uint8_t partition = it[-1];
-			auto const start_offset = static_cast<difference_type>(partition == 0 ? 0 : partitions.partitions[partition - 1].next_offset);
-			auto const end_offset = static_cast<difference_type>(partitions.partitions[partition].next_offset);
+			auto const start_offset = ::bounded::assume_in_range<difference_type>(partition == 0 ? 0 : partitions.partitions[partition - 1].next_offset);
+			auto const end_offset = ::bounded::assume_in_range<difference_type>(partitions.partitions[partition].next_offset);
 			auto partition_begin = first + start_offset;
 			auto partition_end = first + end_offset;
 			if (partition_end - partition_begin > bounded::constant<1>) {
@@ -411,7 +411,7 @@ private:
 			to_sort,
 			current_key,
 			element_key,
-			iter_difference_t<decltype(containers::begin(current_key(containers::front(to_sort))))>(sort_data.current_index)
+			::bounded::assume_in_range<iter_difference_t<decltype(containers::begin(current_key(containers::front(to_sort))))>>(sort_data.current_index)
 		);
 		auto end_of_shorter_ones = containers::partition(to_sort, [&](auto const & elem) {
 			return containers::size(current_key(elem)) <= sort_data.current_index;

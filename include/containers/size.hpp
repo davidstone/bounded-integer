@@ -54,7 +54,7 @@ constexpr auto size(Range const & range) {
 	if constexpr (detail::has_member_size<Range>) {
 		return range.size();
 	} else {
-		return static_cast<range_size_t<Range>>(containers::end(range) - containers::begin(range));
+		return ::bounded::assume_in_range<range_size_t<Range>>(containers::end(range) - containers::begin(range));
 	}
 }
 
@@ -70,7 +70,7 @@ constexpr auto linear_size(Range const & r) {
 	if constexpr (requires { containers::size(r); }) {
 		return containers::size(r);
 	} else {
-		return static_cast<range_size_t<Range>>(containers::distance(containers::begin(r), containers::end(r)));
+		return ::bounded::assume_in_range<range_size_t<Range>>(containers::distance(containers::begin(r), containers::end(r)));
 	}
 }
 

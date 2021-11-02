@@ -63,7 +63,7 @@ public:
 			bounded::unreachable();
 			return lhs;
 		} else {
-			return integer_range_iterator(storage_type(lhs.m_value + rhs * lhs.m_step), lhs.m_step);
+			return integer_range_iterator(bounded::assume_in_range<storage_type>(lhs.m_value + rhs * lhs.m_step), lhs.m_step);
 		}
 	}
 	
@@ -85,7 +85,7 @@ public:
 
 	// It is undefined behavior to dereference a past-the-end iterator.
 	constexpr auto operator*() const {
-		return value_type(m_value);
+		return ::bounded::assume_in_range<value_type>(m_value);
 	}
 
 private:

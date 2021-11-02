@@ -23,7 +23,7 @@ constexpr bool test() {
 	auto const c = Container({1, 2, 3});
 	
 	auto reserve_extra_capacity = [&](auto container) {
-		container.reserve(static_cast<containers::range_size_t<Container>>(containers::size(a) + containers::size(b) + containers::size(c)));
+		container.reserve(::bounded::assume_in_range<containers::range_size_t<Container>>(containers::size(a) + containers::size(b) + containers::size(c)));
 		return container;
 	};
 	
