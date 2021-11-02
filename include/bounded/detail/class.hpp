@@ -64,12 +64,6 @@ public:
 };
 
 namespace bounded {
-
-
-// Use non_check_t constructors if you know by means that cannot be determined
-// by the type system that the value fits in the range.
-inline constexpr struct non_check_t{} non_check;
-
 namespace detail {
 
 template<typename T, auto minimum, auto maximum>
