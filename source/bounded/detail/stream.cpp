@@ -15,11 +15,11 @@
 namespace {
 
 template<typename integer>
-auto streaming_test(int const initial, int const expected) {
+auto streaming_test(auto const initial, auto const expected) {
 	auto value = integer(initial);
 	std::stringstream in;
 	in << value;
-	CHECK(in.str() == std::to_string(initial));
+	CHECK(in.str() == std::to_string(static_cast<int>(initial)));
 	std::stringstream out;
 	out << expected;
 	out >> value;
@@ -27,12 +27,12 @@ auto streaming_test(int const initial, int const expected) {
 }
 
 TEST_CASE("stream small", "[stream]") {
-	streaming_test<bounded::integer<0, 100>>(7, 0);
+	streaming_test<bounded::integer<0, 100>>(bounded::constant<7>, bounded::constant<0>);
 }
 
 TEST_CASE("stream large", "[stream]") {
-	constexpr auto large_initial = numeric_traits::max_value<int> / 3;
-	constexpr auto large_final = -49;
+	constexpr auto large_initial = bounded::constant<numeric_traits::max_value<int> / 3>;
+	constexpr auto large_final = bounded::constant<-49>;
 	streaming_test<decltype(bounded::integer(0))>(large_initial, large_final);
 }
 
