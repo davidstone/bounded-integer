@@ -4,65 +4,43 @@
 // http://www.boost.org/LICENSE_1_0.txt)
 
 #include <containers/integer_range.hpp>
-#include <containers/algorithms/accumulate.hpp>
-#include <containers/front_back.hpp>
-#include <containers/is_empty.hpp>
-#include <containers/size.hpp>
+
+#include <containers/algorithms/compare.hpp>
+#include <containers/array.hpp>
+
 #include <bounded/detail/literal.hpp>
 
 namespace {
 using namespace ::bounded::literal;
 
-constexpr auto x = containers::integer_range(10_bi);
-static_assert(
-	*begin(x) == 0_bi,
-	"Incorrect initial value of range."
-);
-static_assert(
-	containers::front(x) == 0_bi,
-	"Incorrect initial value of range."
-);
-static_assert(
-	containers::back(x) == 9_bi,
-	"Incorrect initial value of range."
-);
+static_assert(containers::equal(
+	containers::integer_range(0_bi),
+	containers::array<bounded::integer<0, 0>, 0>{}
+));
+static_assert(containers::equal(
+	containers::integer_range(3_bi),
+	containers::array{0_bi, 1_bi, 2_bi}
+));
+static_assert(containers::equal(
+	containers::integer_range(2_bi, 4_bi),
+	containers::array{2_bi, 3_bi}
+));
+static_assert(containers::equal(
+	containers::integer_range(2_bi, 6_bi, 2_bi),
+	containers::array{2_bi, 4_bi}
+));
 
-static_assert(
-	containers::integer_range(5_bi, 12_bi)[2_bi] == 7_bi,
-	"Incorrect indexed value of range that does not start with 0."
-);
+static_assert(containers::integer_range(3_bi)[1_bi] == 1_bi);
 
-static_assert(
-	containers::size(containers::integer_range(0_bi, 0_bi)) == 0_bi,
-	"Incorrect size of empty range."
-);
-static_assert(
-	containers::is_empty(containers::integer_range(-5_bi, -5_bi)),
-	"Incorrect size of empty range."
-);
+static_assert(containers::equal(
+	containers::integer_range(bounded::integer<1, 2>(1_bi), bounded::integer<3, 5>(3_bi)),
+	containers::array{1_bi, 2_bi}
+));
 
-static_assert(
-	containers::size(containers::integer_range(
-		static_cast<bounded::integer<1, 2>>(1_bi),
-		static_cast<bounded::integer<3, 5>>(3_bi)
-	)) == 2_bi,
-	"Incorrect size of range with non-overlapping and possibly variable begin and end."
-);
-
-
-constexpr auto first = bounded::integer<-4, 1>(-3);
-constexpr auto last = bounded::integer<0, 1>(1);
-constexpr auto range = containers::integer_range(first, last);
-
-static_assert(containers::sum(range) == -6_bi);
-
-static_assert(containers::sum(containers::integer_range(4_bi, 10_bi, 2_bi)) == 18_bi);
-
-// Ensure it works with a range-based for loop
 static_assert([]{
-	for (auto const n [[maybe_unused]] : range) {
+	for (auto const n [[maybe_unused]] : containers::integer_range(1_bi)) {
 	}
 	return true;
 }());
 
-}	// namespace
+} // namespace
