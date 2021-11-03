@@ -63,7 +63,7 @@ static_assert(*bounded::optional(5) == 5);
 using integer = bounded::integer<0, 10>;
 using optional = bounded::optional<integer>;
 
-constexpr optional uninitialized;
+constexpr auto uninitialized = optional();
 
 static_assert(uninitialized == bounded::none, "Fail to compare uninitialized optional to none_t.");
 static_assert(uninitialized == optional(bounded::none), "Fail to compare uninitialized optional to uninitialized optional.");
@@ -72,7 +72,7 @@ static_assert(bounded::none == uninitialized, "Fail to compare uninitialized opt
 static_assert(optional(bounded::none) == uninitialized, "Fail to compare uninitialized optional to uninitialized optional.");
 static_assert(optional(0_bi) != uninitialized, "Fail to compare uninitialized optional to a value.");
 
-constexpr optional initialized(5_bi);
+constexpr auto initialized = optional(5_bi);
 
 static_assert(initialized != bounded::none, "Fail to compare initialized optional to none_t.");
 static_assert(initialized != optional(bounded::none), "Fail to compare initialized optional to uninitialized optional.");
@@ -113,13 +113,13 @@ constexpr auto check_compressed_optional() {
 
 template<typename integer_type>
 constexpr auto check_integer_optional() {
-	constexpr bounded::optional<integer_type> uninitialized_optional;
+	constexpr auto uninitialized_optional = bounded::optional<integer_type>();
 	static_assert(!uninitialized_optional, "Default constructor should leave uninitialized.");
-	constexpr bounded::optional<integer_type> constexpr_optional_integer(integer_type(5));
+	constexpr auto constexpr_optional_integer = bounded::optional<integer_type>(integer_type(5));
 	static_assert(constexpr_optional_integer, "Value constructor should initialize optional.");
 	static_assert(*constexpr_optional_integer == 5, "Value in an optional incorrect.");
 
-	bounded::optional<integer_type> optional_integer(integer_type(4));
+	auto optional_integer = bounded::optional<integer_type>(integer_type(4));
 	optional_integer = uninitialized_optional;
 	BOUNDED_TEST(!optional_integer);
 
@@ -139,9 +139,9 @@ constexpr auto check_integer_optional() {
 
 template<typename type>
 constexpr auto check_non_trivial_optional() {
-	bounded::optional<type> uninitialized_optional;
+	auto uninitialized_optional = bounded::optional<type>();
 	BOUNDED_TEST(!uninitialized_optional);
-	bounded::optional<type> optional_string("Hello");
+	auto optional_string = bounded::optional<type>("Hello");
 	BOUNDED_TEST(optional_string);
 	BOUNDED_TEST(*optional_string == "Hello");
 
