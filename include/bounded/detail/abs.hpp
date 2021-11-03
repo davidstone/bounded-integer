@@ -6,6 +6,7 @@
 #pragma once
 
 #include <bounded/detail/cast.hpp>
+#include <bounded/detail/comparison.hpp>
 #include <bounded/detail/is_bounded_integer.hpp>
 #include <bounded/detail/minmax.hpp>
 #include <bounded/detail/arithmetic/unary_minus.hpp>
