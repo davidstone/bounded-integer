@@ -22,33 +22,49 @@
 
 namespace bounded {
 
-// Specialize this class to give the correct type for your own extreme function
-// if the default does not work. Types that cannot be used to construct this
-// type are assumed to never be valid results, and are thus implicitly ignored
-// as possible extreme candidates.
-template<typename Compare, typename T1, typename T2>
-struct extreme_type {
-	using type = std::common_type_t<T1, T2>;
+// Specialize this class to give the correct result for your own extreme
+// function if the default does not work.
+template<typename Compare, typename LHS, typename RHS>
+struct extreme_value {
+	constexpr decltype(auto) operator()(Compare const compare, LHS && lhs, RHS && rhs) const {
+		using result_t = detail::add_common_cv_reference_t<std::common_type_t<LHS, RHS>, LHS, RHS>;
+		return compare(rhs, lhs) ?
+			static_cast<result_t>(OPERATORS_FORWARD(rhs)) :
+			static_cast<result_t>(OPERATORS_FORWARD(lhs));
+	}
 };
-
-template<typename Compare, typename T1, typename T2>
-using extreme_t = typename extreme_type<Compare, std::decay_t<T1>, std::decay_t<T2>>::type;
 
 // TODO: This should be selected only for less and greater
 template<typename Compare, bounded_integer LHS, bounded_integer RHS>
-struct extreme_type<Compare, LHS, RHS> {
-private:
-	static constexpr auto select = [](auto const lhs, auto const rhs) {
-		if constexpr (Compare{}(lhs, rhs)) {
-			return normalize<lhs>;
+struct extreme_value<Compare, LHS, RHS> {
+	constexpr decltype(auto) operator()(Compare const compare, LHS && lhs, RHS && rhs) const {
+		constexpr auto select = [](auto const lhs_, auto const rhs_) {
+			if constexpr (Compare{}(rhs_, lhs_)) {
+				return normalize<rhs_>;
+			} else {
+				return normalize<lhs_>;
+			}
+		};
+		using lhs_t = std::remove_cvref_t<LHS>;
+		using rhs_t = std::remove_cvref_t<RHS>;
+		constexpr auto minimum = select(numeric_traits::min_value<lhs_t>, numeric_traits::min_value<rhs_t>);
+		constexpr auto maximum = select(numeric_traits::max_value<lhs_t>, numeric_traits::max_value<rhs_t>);
+		using type = integer<minimum, maximum>;
+		using result_t = detail::add_common_cv_reference_t<type, LHS, RHS>;
+		if constexpr (std::is_same_v<std::remove_cvref_t<result_t>, lhs_t> and std::is_same_v<lhs_t, rhs_t>) {
+			return compare(rhs, lhs) ?
+				OPERATORS_FORWARD(rhs) :
+				OPERATORS_FORWARD(lhs);
+		} else if constexpr (!constructible_from<result_t, RHS, non_check_t>) {
+			return lhs;
+		} else if constexpr (!constructible_from<result_t, LHS, non_check_t>) {
+			return rhs;
 		} else {
-			return normalize<rhs>;
+			return compare(rhs, lhs) ?
+				::bounded::assume_in_range<result_t>(OPERATORS_FORWARD(rhs)) :
+				::bounded::assume_in_range<result_t>(OPERATORS_FORWARD(lhs));
 		}
-	};
-	static constexpr auto minimum = select(numeric_traits::min_value<LHS>, numeric_traits::min_value<RHS>);
-	static constexpr auto maximum = select(numeric_traits::max_value<LHS>, numeric_traits::max_value<RHS>);
-public:
-	using type = integer<minimum, maximum>;
+	}
 };
 
 
@@ -62,34 +78,17 @@ public:
 // accepts the comparison function as the first argument
 
 constexpr inline struct extreme_function {
-private:
-	template<typename Compare, typename T1, typename T2>
-	using result_type = detail::add_common_cv_reference_t<extreme_t<Compare, T2, T1>, T1, T2>;
-	
-	template<typename T1, typename T2>
-	static constexpr decltype(auto) extreme_two(auto compare, T1 && t1, T2 && t2) {
-		using result_t = result_type<decltype(compare), T1, T2>;
-		return compare(t2, t1) ?
-			static_cast<result_t>(OPERATORS_FORWARD(t2)) :
-			static_cast<result_t>(OPERATORS_FORWARD(t1));
-	}
-
-public:
 	constexpr decltype(auto) operator()(auto /* compare */, auto && t) const {
 		return OPERATORS_FORWARD(t);
 	}
 
-
-	template<typename T1, typename T2>
-	constexpr decltype(auto) operator()(auto compare, T1 && t1, T2 && t2) const {
-		using result_t = result_type<decltype(compare), T1, T2>;
-		if constexpr (not constructible_from<result_t, T2>) {
-			return OPERATORS_FORWARD(t1);
-		} else if constexpr (not constructible_from<result_t, T1>) {
-			return OPERATORS_FORWARD(t2);
-		} else {
-			return extreme_two(std::move(compare), OPERATORS_FORWARD(t1), OPERATORS_FORWARD(t2));
-		}
+	template<typename Compare, typename T1, typename T2>
+	constexpr decltype(auto) operator()(Compare compare, T1 && t1, T2 && t2) const {
+		return extreme_value<Compare, T1, T2>()(
+			std::move(compare),
+			OPERATORS_FORWARD(t1),
+			OPERATORS_FORWARD(t2)
+		);
 	}
 
 	constexpr decltype(auto) operator()(auto compare, auto && t1, auto && t2, auto && ... ts) const {
