@@ -72,18 +72,7 @@ concept overlapping_integer =
 	safe_compare(builtin_min_value<T>, maximum) <= 0 and safe_compare(minimum, builtin_max_value<T>) <= 0;
 
 template<typename T, auto minimum, auto maximum>
-concept bounded_by_range = !std::is_same_v<T, bool> and !std::is_enum_v<T> and overlapping_integer<T, minimum, maximum> and safe_compare(minimum, builtin_min_value<T>) <= 0 and safe_compare(builtin_max_value<T>, maximum) <= 0;
-
-
-// Cannot use CTAD in the constructor
-template<typename T>
-constexpr auto as_integer(T const value) {
-	using result_type = integer<
-		builtin_min_value<T>,
-		builtin_max_value<T>
-	>;
-	return result_type(value, non_check);
-}
+concept bounded_by_range = overlapping_integer<T, minimum, maximum> and safe_compare(minimum, builtin_min_value<T>) <= 0 and safe_compare(builtin_max_value<T>, maximum) <= 0;
 
 
 struct empty {
@@ -93,7 +82,7 @@ struct empty {
 	friend constexpr auto operator<=>(empty, empty) = default;
 };
 
-}	// namespace detail
+} // namespace detail
 
 
 template<auto value>
@@ -128,44 +117,17 @@ struct integer {
 	{
 	}
 
-	constexpr integer(detail::bounded_by_range<minimum, maximum> auto const other):
+	template<detail::bounded_by_range<minimum, maximum> T>
+	constexpr explicit(std::is_same_v<T, bool> or std::is_enum_v<T>) integer(T const other):
 		m_value(static_cast<underlying_type>(other))
 	{
 	}
-
-	template<detail::overlapping_integer<minimum, maximum> T>
-	constexpr explicit integer(T const other):
-		m_value(
-			::bounded::assume_in_range(
-				detail::as_integer(other),
-				constant<minimum>,
-				constant<maximum>
-			)
-		)
-	{
-	}
-
-	template<typename Enum> requires(
-		std::is_enum_v<Enum> and !detail::overlapping_integer<Enum, minimum, maximum>
-	)
-	constexpr integer(Enum other, non_check_t):
-		m_value(static_cast<underlying_type>(other))
-	{
-	}
-	template<typename Enum> requires(
-		std::is_enum_v<Enum> and !detail::overlapping_integer<Enum, minimum, maximum>
-	)
-	constexpr explicit integer(Enum other):
-		integer(std::to_underlying(other))
-	{
-	}
-
 
 	constexpr auto operator=(integer const & other) & -> integer & = default;
 	constexpr auto operator=(integer && other) & -> integer & = default;
 
 	constexpr auto && operator=(detail::overlapping_integer<minimum, maximum> auto const other) & {
-		return *this = integer(other);
+		return *this = integer(::bounded::assume_in_range(other, constant<minimum>, constant<maximum>));
 	}
 	
 	// Do not verify that the value is in range because the user has requested a
@@ -186,7 +148,6 @@ public:
 	// non-type template parameter in C++20.
 	[[no_unique_address]] storage_type m_value;
 };
-
 
 namespace detail {
 

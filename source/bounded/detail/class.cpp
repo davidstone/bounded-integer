@@ -39,7 +39,7 @@ static_assert(std::is_empty_v<bounded::constant_t<bounded::builtin_max_value<bou
 
 static_assert(!std::is_convertible_v<bool, bounded::integer<0, 1>>);
 static_assert(bounded::constructible_from<bounded::integer<0, 1>, bool>);
-static_assert(bounded::constructible_from<bounded::integer<0, 0>, bool>);
+static_assert(!bounded::constructible_from<bounded::integer<0, 0>, bool>);
 
 namespace check_constructibility {
 	constexpr auto min = numeric_traits::min_value<int>;
@@ -98,17 +98,12 @@ constexpr auto numeric_traits::max_value<bounded_enum> = 0;
 namespace {
 
 enum unscoped_enum : int {};
-static_assert(bounded::constructible_from<bounded::integer<0, 10>, unscoped_enum>);
+static_assert(!bounded::constructible_from<bounded::integer<0, 10>, unscoped_enum>);
 static_assert(!std::is_convertible_v<unscoped_enum, bounded::integer<0, 10>>);
-static_assert(homogeneous_equals(
-	bounded::integer(unscoped_enum{}),
-	bounded::integer(static_cast<std::underlying_type_t<unscoped_enum>>(0))
-));
 
 enum class scoped_enum {};
-static_assert(bounded::constructible_from<bounded::integer<0, 10>, scoped_enum>);
+static_assert(!bounded::constructible_from<bounded::integer<0, 10>, scoped_enum>);
 static_assert(!std::is_convertible_v<scoped_enum, bounded::integer<0, 10>>);
-// constexpr auto b = bounded::integer(scoped_enum{});
 
 static_assert(bounded::constructible_from<bounded::integer<0, 10>, bounded_enum>);
 static_assert(!std::is_convertible_v<bounded_enum, bounded::integer<0, 10>>);

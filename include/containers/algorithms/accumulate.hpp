@@ -70,7 +70,12 @@ template<typename Result>
 constexpr auto accumulate(range auto && source, auto && initial, auto function) {
 	auto result = static_cast<Result>(OPERATORS_FORWARD(initial));
 	for (decltype(auto) value : OPERATORS_FORWARD(source)) {
-		result = static_cast<Result>(function(std::move(result), OPERATORS_FORWARD(value)));
+		// Not ideal to have this `if` here
+		if constexpr (bounded::bounded_integer<Result>) {
+			result = ::bounded::assume_in_range<Result>(function(std::move(result), OPERATORS_FORWARD(value)));
+		} else {
+			result = static_cast<Result>(function(std::move(result), OPERATORS_FORWARD(value)));
+		}
 	}
 	return result;
 }
