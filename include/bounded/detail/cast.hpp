@@ -11,15 +11,22 @@
 
 namespace bounded {
 
-// Other args allow you to declare the conversion as non_check
-template<auto new_minimum, auto minimum, auto maximum, typename... Args>
-constexpr auto increase_min(integer<minimum, maximum> const & value, Args... args) {
-	return integer<normalize<detail::safe_max(new_minimum, minimum)>, maximum>(value, args...);
+template<auto new_minimum, auto minimum, auto maximum>
+constexpr auto increase_min(integer<minimum, maximum> const & value) {
+	return ::bounded::assume_in_range(value, constant<detail::safe_max(new_minimum, minimum)>, constant<maximum>);
+}
+template<auto new_minimum, auto minimum, auto maximum>
+constexpr auto increase_min(integer<minimum, maximum> const & value, non_check_t) {
+	return integer<normalize<detail::safe_max(new_minimum, minimum)>, maximum>(value, non_check);
 }
 
-template<auto new_maximum, auto minimum, auto maximum, typename... Args>
-constexpr auto decrease_max(integer<minimum, maximum> const & value, Args... args) {
-	return integer<minimum, normalize<detail::safe_min(new_maximum, maximum)>>(value, args...);
+template<auto new_maximum, auto minimum, auto maximum>
+constexpr auto decrease_max(integer<minimum, maximum> const & value) {
+	return ::bounded::assume_in_range(value, constant<minimum>, constant<detail::safe_min(new_maximum, maximum)>);
+}
+template<auto new_maximum, auto minimum, auto maximum>
+constexpr auto decrease_max(integer<minimum, maximum> const & value, non_check_t) {
+	return integer<minimum, normalize<detail::safe_min(new_maximum, maximum)>>(value, non_check);
 }
 
 } // namespace bounded
