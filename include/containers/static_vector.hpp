@@ -176,9 +176,8 @@ inline constexpr auto is_container<static_vector<T, capacity>> = true;
 
 template<range Source>
 constexpr auto make_static_vector(Source && source) {
-	using value_type = range_value_t<Source>;
 	constexpr auto size = static_cast<std::size_t>(numeric_traits::max_value<range_size_t<Source>>);
-	return static_vector<value_type, size>(OPERATORS_FORWARD(source));
+	return static_vector<range_value_t<Source>, size>(OPERATORS_FORWARD(source));
 }
 
 } // namespace containers
