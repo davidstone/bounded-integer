@@ -87,9 +87,17 @@ struct adapt_iterator :
 	static_assert(std::is_copy_assignable_v<Traits>);
 
 	adapt_iterator() = default;
+
 	constexpr adapt_iterator(Iterator it, Traits traits):
 		m_base(std::move(it)),
 		m_traits(std::move(traits))
+	{
+	}
+
+	template<std::convertible_to<Iterator> It>
+	constexpr adapt_iterator(adapt_iterator<It, Traits> other):
+		m_base(std::move(other).base()),
+		m_traits(std::move(other).traits())
 	{
 	}
 	
@@ -107,7 +115,6 @@ private:
 	[[no_unique_address]] Iterator m_base;
 	[[no_unique_address]] Traits m_traits;
 };
-
 
 template<typename Iterator, typename Traits>
 constexpr auto operator*(adapt_iterator<Iterator, Traits> const it) OPERATORS_RETURNS(
