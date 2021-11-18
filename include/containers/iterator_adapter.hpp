@@ -7,6 +7,7 @@
 
 #include <containers/common_iterator_functions.hpp>
 #include <containers/iter_difference_t.hpp>
+#include <containers/iter_value_t.hpp>
 #include <containers/reference_wrapper.hpp>
 
 #include <bounded/integer.hpp>

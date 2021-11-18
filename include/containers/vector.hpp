@@ -32,7 +32,6 @@ namespace containers {
 // TODO: max_size should be an array_size_type<T> instead of a size_t
 template<typename T, std::size_t max_size = containers::detail::maximum_array_size<T>>
 struct vector : private lexicographical_comparison::base {
-	using value_type = T;
 	using size_type = bounded::integer<0, bounded::normalize<max_size>>;
 
 	constexpr vector() = default;
@@ -89,10 +88,10 @@ struct vector : private lexicographical_comparison::base {
 	}
 
 	constexpr auto begin() const {
-		return contiguous_iterator<value_type const, max_size>(m_storage.data());
+		return contiguous_iterator<T const, max_size>(m_storage.data());
 	}
 	constexpr auto begin() {
-		return contiguous_iterator<value_type, max_size>(m_storage.data());
+		return contiguous_iterator<T, max_size>(m_storage.data());
 	}
 	constexpr auto size() const {
 		return m_size;

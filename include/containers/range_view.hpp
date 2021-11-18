@@ -22,8 +22,6 @@ namespace containers {
 
 template<typename Iterator, typename Sentinel = Iterator>
 struct range_view {
-	using value_type = iter_value_t<Iterator>;
-
 	constexpr range_view(Iterator first, Sentinel last):
 		m_begin(std::move(first)),
 		m_end(std::move(last))

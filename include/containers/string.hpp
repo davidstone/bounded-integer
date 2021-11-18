@@ -26,8 +26,6 @@ namespace containers {
 struct string : private small_buffer_optimized_vector<char, 0> {
 	using base = small_buffer_optimized_vector<char, 0>;
 public:
-	using value_type = char;
-	
 	using base::base;
 	
 	template<std::same_as<empty_c_array_parameter> Source = empty_c_array_parameter>
