@@ -5,6 +5,7 @@
 
 #pragma once
 
+#include <containers/algorithms/concatenate.hpp>
 #include <containers/begin_end.hpp>
 #include <containers/common_iterator_functions.hpp>
 #include <containers/iter_difference_t.hpp>
@@ -15,6 +16,7 @@
 
 #include <bounded/clamp.hpp>
 #include <bounded/integer.hpp>
+#include <bounded/string.hpp>
 #include <bounded/unreachable.hpp>
 
 #include <numeric_traits/min_max_value.hpp>
@@ -23,6 +25,9 @@
 #include <operators/operators.hpp>
 
 #include <iterator>
+#include <stdexcept>
+#include <string>
+#include <string_view>
 #include <utility>
 
 namespace containers {
@@ -30,7 +35,11 @@ namespace detail {
 
 using namespace bounded::literal;
 
-template<typename Sentinel>
+enum class extra_elements_policy {
+	drop, exception
+};
+
+template<typename Sentinel, extra_elements_policy>
 struct counted_sentinel {
 	constexpr explicit counted_sentinel(Sentinel sentinel):
 		m_sentinel(std::move(sentinel))
@@ -67,17 +76,27 @@ struct counted_iterator {
 	friend constexpr auto operator==(counted_iterator const & lhs, counted_iterator const & rhs) -> bool {
 		return rhs.m_count == lhs.m_count;
 	}
-	template<typename Sentinel>
-	friend constexpr auto operator==(counted_iterator const & lhs, counted_sentinel<Sentinel> const & rhs) -> bool {
-		return lhs.m_count == 0_bi or lhs.m_it == rhs.base();
+	template<typename Sentinel, extra_elements_policy policy>
+	friend constexpr auto operator==(counted_iterator const & lhs, counted_sentinel<Sentinel, policy> const & rhs) -> bool {
+		if constexpr (policy == extra_elements_policy::drop) {
+			return lhs.m_count == 0_bi or lhs.m_it == rhs.base();
+		} else {
+			if (lhs.m_it == rhs.base()) {
+				return true;
+			}
+			if (lhs.m_count == 0_bi) {
+				throw std::runtime_error("Did not take all elements of range");
+			}
+			return false;
+		}
 	}
 
 	// A smaller count means you are further along
 	friend constexpr auto operator<=>(counted_iterator const & lhs, counted_iterator const & rhs) {
 		return rhs.m_count <=> lhs.m_count;
 	}
-	template<typename Sentinel>
-	friend constexpr auto operator<=>(counted_iterator const & lhs, counted_sentinel<Sentinel> const & rhs) {
+	template<typename Sentinel, extra_elements_policy policy>
+	friend constexpr auto operator<=>(counted_iterator const & lhs, counted_sentinel<Sentinel, policy> const & rhs) {
 		return lhs == rhs ? std::strong_ordering::equal : std::strong_ordering::less;
 	}
 
@@ -94,12 +113,17 @@ struct counted_iterator {
 	friend constexpr auto operator-(counted_iterator const & lhs, counted_iterator const & rhs) {
 		return rhs.m_count - lhs.m_count;
 	}
-	template<random_access_sentinel_for<Iterator> Sentinel>
-	friend constexpr auto operator-(counted_sentinel<Sentinel> const & lhs, counted_iterator const & rhs) {
-		return bounded::min(rhs.m_count, lhs.base() - rhs.m_it);
+	template<random_access_sentinel_for<Iterator> Sentinel, extra_elements_policy policy>
+	friend constexpr auto operator-(counted_sentinel<Sentinel, policy> const & lhs, counted_iterator const & rhs) {
+		static_assert(std::is_same_v<
+			decltype(rhs.m_count),
+			decltype(bounded::min(rhs.m_count, lhs.base() - rhs.m_it))
+		>);
+		BOUNDED_ASSERT(rhs.m_count == lhs.base() - rhs.m_it);
+		return rhs.m_count;
 	}
-	template<random_access_sentinel_for<Iterator> Sentinel>
-	friend constexpr auto operator-(counted_iterator const & lhs, counted_sentinel<Sentinel> const & rhs) {
+	template<random_access_sentinel_for<Iterator> Sentinel, extra_elements_policy policy>
+	friend constexpr auto operator-(counted_iterator const & lhs, counted_sentinel<Sentinel, policy> const & rhs) {
 		return -(rhs - lhs);
 	}
 
@@ -149,10 +173,8 @@ private:
 	Iterator m_it;
 };
 
-} // namespace detail
-
-template<range Range, bounded::bounded_integer Count> requires(numeric_traits::min_value<Count> >= 0_bi)
-constexpr auto take(Range && source, Count const count) {
+template<extra_elements_policy policy, range Range, bounded::bounded_integer Count> requires(numeric_traits::min_value<Count> >= 0_bi)
+constexpr auto take_impl(Range && source, Count const count) {
 	using iterator = iterator_t<Range>;
 	using count_type = bounded::integer<
 		0,
@@ -162,17 +184,45 @@ constexpr auto take(Range && source, Count const count) {
 		)>
 	>;
 
-	if constexpr (sized_range<Range> and forward_random_access_iterator<iterator>) {
+	if constexpr (sized_range<Range> and policy == extra_elements_policy::exception) {
+		auto const source_size = containers::size(source);
+		if (source_size > count) {
+			using namespace std::string_view_literals;
+			using bounded::to_string;
+			throw std::runtime_error(containers::concatenate<std::string>(
+				"Did not take all elements of range. size(source) == "sv,
+				to_string(source_size),
+				", given count == "sv,
+				to_string(count)
+			));
+		}
+		return containers::range_view(
+			containers::begin(OPERATORS_FORWARD(source)),
+			containers::end(OPERATORS_FORWARD(source))
+		);
+	} else if constexpr (sized_range<Range> and forward_random_access_iterator<iterator>) {
 		auto const true_count = bounded::min(containers::size(source), count);
-		auto first = detail::random_access_counted_iterator<iterator, count_type>(containers::begin(OPERATORS_FORWARD(source)));
+		auto first = random_access_counted_iterator<iterator, count_type>(containers::begin(OPERATORS_FORWARD(source)));
 		return containers::range_view(first, first + true_count);
 	} else {
-		auto const upper_bound_count = count_type(bounded::min(count, numeric_traits::max_value<count_type>));
+		auto const used_count = count_type(bounded::min(count, numeric_traits::max_value<count_type>));
 		return containers::range_view(
-			detail::counted_iterator(containers::begin(OPERATORS_FORWARD(source)), upper_bound_count),
-			detail::counted_sentinel(containers::end(OPERATORS_FORWARD(source)))
+			counted_iterator(containers::begin(OPERATORS_FORWARD(source)), used_count),
+			counted_sentinel<sentinel_t<Range>, policy>(containers::end(OPERATORS_FORWARD(source)))
 		);
 	}
+}
+
+} // namespace detail
+
+template<range Range, bounded::bounded_integer Count> requires(numeric_traits::min_value<Count> >= 0_bi)
+constexpr auto take(Range && source, Count const count) {
+	return ::containers::detail::take_impl<detail::extra_elements_policy::drop>(OPERATORS_FORWARD(source), count);
+}
+
+template<range Range, bounded::bounded_integer Count> requires(0_bi <= numeric_traits::min_value<Count> and numeric_traits::min_value<range_size_t<Range>> <= numeric_traits::max_value<Count>)
+constexpr auto check_size_not_greater_than(Range && source, Count const count) {
+	return ::containers::detail::take_impl<detail::extra_elements_policy::exception>(OPERATORS_FORWARD(source), count);
 }
 
 } // namespace containers
