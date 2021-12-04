@@ -5,6 +5,8 @@
 
 #pragma once
 
+#include <containers/common_functions.hpp>
+
 #include <bounded/integer.hpp>
 
 #include <bounded/assert.hpp>

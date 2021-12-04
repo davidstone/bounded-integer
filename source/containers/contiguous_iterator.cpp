@@ -4,3 +4,7 @@
 // http://www.boost.org/LICENSE_1_0.txt)
 
 #include <containers/contiguous_iterator.hpp>
+
+#include <containers/is_iterator.hpp>
+
+static_assert(containers::random_access_iterator<containers::contiguous_iterator<int, 5>>);
