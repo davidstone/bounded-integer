@@ -18,7 +18,7 @@ using namespace bounded::literal;
 
 template<iterator InputIterator>
 constexpr auto distance(InputIterator first, sentinel_for<InputIterator> auto const last) {
-	if constexpr (std::is_same_v<typename std::iterator_traits<InputIterator>::iterator_category, std::random_access_iterator_tag>) {
+	if constexpr (requires { last - first; }) {
 		return last - first;
 	} else {
 		auto difference = iter_difference_t<InputIterator>(0_bi);
