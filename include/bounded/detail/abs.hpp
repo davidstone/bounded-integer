@@ -13,6 +13,8 @@
 
 #include <numeric_traits/min_max_value.hpp>
 
+#include <cstdlib>
+
 namespace bounded {
 
 constexpr auto abs(bounded_integer auto const value) {
@@ -28,4 +30,6 @@ constexpr auto abs(bounded_integer auto const value) {
 	}
 }
 
-}	// namespace bounded
+using std::abs;
+
+} // namespace bounded
