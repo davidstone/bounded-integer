@@ -163,6 +163,7 @@ add_executable(containers_test
 	source/containers/assign_to_empty.cpp
 	source/containers/associative_container.cpp
 	source/containers/at.cpp
+	source/containers/batched.cpp
 	source/containers/begin_end.cpp
 	source/containers/bidirectional_linked_list.cpp
 	source/containers/c_array.cpp
