@@ -17,6 +17,9 @@ using namespace bounded::literal;
 
 template<typename T, typename Capacity>
 struct uninitialized_dynamic_array {
+	template<typename U, typename OtherCapacity>
+	friend struct uninitialized_dynamic_array;
+
 	constexpr uninitialized_dynamic_array() noexcept requires bounded::constructible_from<Capacity, bounded::constant_t<0>>:
 		m_ptr(nullptr),
 		m_capacity(0_bi)
@@ -25,6 +28,12 @@ struct uninitialized_dynamic_array {
 	constexpr explicit uninitialized_dynamic_array(Capacity capacity):
 		m_ptr(std::allocator<T>().allocate(static_cast<std::size_t>(capacity))),
 		m_capacity(capacity)
+	{
+	}
+	template<typename OtherCapacity>
+	constexpr explicit uninitialized_dynamic_array(uninitialized_dynamic_array<T, OtherCapacity> && other) noexcept:
+		m_ptr(other.release()),
+		m_capacity(bounded::assume_in_range<Capacity>(other.m_capacity))
 	{
 	}
 	constexpr uninitialized_dynamic_array(uninitialized_dynamic_array && other) noexcept:

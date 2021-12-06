@@ -32,6 +32,9 @@ namespace containers {
 // TODO: max_size should be an array_size_type<T> instead of a size_t
 template<typename T, std::size_t max_size = containers::detail::maximum_array_size<T>>
 struct vector : private lexicographical_comparison::base {
+	template<typename U, std::size_t other_max_size>
+	friend struct vector;
+
 	using size_type = bounded::integer<0, bounded::normalize<max_size>>;
 
 	constexpr vector() = default;
@@ -40,7 +43,7 @@ struct vector : private lexicographical_comparison::base {
 		::containers::assign_to_empty(*this, OPERATORS_FORWARD(source));
 	}
 	
-	template<std::size_t source_size>
+	template<std::size_t source_size> requires(source_size <= max_size)
 	constexpr vector(c_array<T, source_size> && source) {
 		::containers::assign_to_empty(*this, std::move(source));
 	}
@@ -48,6 +51,12 @@ struct vector : private lexicographical_comparison::base {
 	constexpr vector(Source) {
 	}
 
+	template<std::size_t other_max_size>
+	constexpr explicit vector(vector<T, other_max_size> && other) noexcept:
+		m_storage(std::move(other.m_storage)),
+		m_size(bounded::assume_in_range<size_type>(std::exchange(other.m_size, 0_bi)))
+	{
+	}
 	// TODO: Support trivial relocatability
 	constexpr vector(vector && other) noexcept:
 		m_storage(std::move(other.m_storage)),
