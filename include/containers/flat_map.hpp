@@ -23,6 +23,7 @@
 #include <containers/lookup.hpp>
 #include <containers/range_value_t.hpp>
 #include <containers/size.hpp>
+#include <containers/static_vector.hpp>
 #include <containers/vector.hpp>
 
 #include <bounded/detail/tuple.hpp>
@@ -391,8 +392,14 @@ public:
 template<typename Key, typename T, typename... MaybeExtractKey>
 using flat_map = basic_flat_map<vector<map_value_type<Key, T>>, MaybeExtractKey...>;
 
+template<typename Key, typename T, std::size_t capacity, typename... MaybeExtractKey>
+using static_flat_map = basic_flat_map<static_vector<map_value_type<Key, T>, capacity>, MaybeExtractKey...>;
+
 template<typename Key, typename T, typename... MaybeExtractKey>
 using flat_multimap = basic_flat_multimap<vector<map_value_type<Key, T>>, MaybeExtractKey...>;
+
+template<typename Key, typename T, std::size_t capacity, typename... MaybeExtractKey>
+using static_flat_multimap = basic_flat_multimap<static_vector<map_value_type<Key, T>, capacity>, MaybeExtractKey...>;
 
 
 }	// namespace containers
