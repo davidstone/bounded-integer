@@ -326,7 +326,7 @@ public:
 }	// namespace detail
 
 
-template<typename Container, typename ExtractKey = to_radix_sort_key_t>
+template<typename Container, detail::extract_key_function<typename range_value_t<Container>::key_type> ExtractKey = to_radix_sort_key_t>
 class basic_flat_map : private detail::flat_map_base<Container, ExtractKey, false> {
 private:
 	using base = detail::flat_map_base<Container, ExtractKey, false>;
@@ -361,7 +361,7 @@ public:
 	}
 };
 
-template<typename Container, typename ExtractKey = to_radix_sort_key_t>
+template<typename Container, detail::extract_key_function<typename range_value_t<Container>::key_type> ExtractKey = to_radix_sort_key_t>
 class basic_flat_multimap : private detail::flat_map_base<Container, ExtractKey, true> {
 private:
 	using base = detail::flat_map_base<Container, ExtractKey, true>;
