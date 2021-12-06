@@ -11,6 +11,8 @@
 #include <containers/array.hpp>
 #include <containers/c_array.hpp>
 
+#include <bounded/detail/tuple.hpp>
+
 #include <numeric_traits/min_max_value.hpp>
 
 #include <catch2/catch_test_macros.hpp>
@@ -229,6 +231,18 @@ static_assert(test_character<char8_t>());
 static_assert(test_character<char16_t>());
 static_assert(test_character<char32_t>());
 static_assert(test_character<wchar_t>());
+
+static_assert(is_sorted_converted_to_radix<std::byte>(
+	std::byte(0x00),
+	std::byte(0x01),
+	std::byte(0xFF)
+));
+
+static_assert(is_sorted_converted_to_radix<bounded::tuple<std::byte>>(
+	bounded::tuple(std::byte(0x00)),
+	bounded::tuple(std::byte(0x01)),
+	bounded::tuple(std::byte(0xFF))
+));
 
 TEST_CASE("to_radix_sort_key", "[to_radix_sort_key]") {
 	constexpr int array[] = { 1, 2, 3, 4, 5, 6, 7, 8 };
