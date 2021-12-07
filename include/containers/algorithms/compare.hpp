@@ -17,7 +17,7 @@
 namespace containers {
 
 template<iterator InputIterator1, iterator InputIterator2>
-constexpr auto lexicographical_compare_3way(InputIterator1 first1, sentinel_for<InputIterator1> auto const last1, InputIterator2 first2, sentinel_for<InputIterator2> auto const last2, auto cmp) {
+constexpr auto lexicographical_compare_3way(InputIterator1 first1, sentinel_for<InputIterator1> auto const last1, InputIterator2 first2, sentinel_for<InputIterator2> auto const last2, auto cmp) -> decltype(cmp(*first1, *first2)) {
 	for (; first1 != last1 and first2 != last2; ++first1, ++first2) {
 		if (auto const result = cmp(*first1, *first2); result != 0) {
 			return result;
