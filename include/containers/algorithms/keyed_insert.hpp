@@ -18,6 +18,18 @@ concept legacy_map = requires { typename Map::allocator_type; };
 
 } // namespace detail
 
+template<
+	associative_container Container,
+	std::convertible_to<typename Container::key_type> Key = typename Container::key_type,
+	std::convertible_to<typename Container::mapped_type> Mapped = typename Container::mapped_type
+>
+constexpr auto keyed_insert(Container & container, Key && key, Mapped && mapped) {
+	if constexpr (detail::legacy_map<Container>) {
+		return container.insert({OPERATORS_FORWARD(key), OPERATORS_FORWARD(mapped)});
+	} else {
+		return container.lazy_insert(OPERATORS_FORWARD(key), [&] { return OPERATORS_FORWARD(mapped); });
+	}
+}
 template<associative_container Container>
 constexpr auto keyed_insert(Container & container, range_value_t<Container> const & value) {
 	if constexpr (detail::legacy_map<Container>) {
