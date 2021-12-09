@@ -137,6 +137,23 @@ constexpr auto make_array_n(bounded::constant_t<size_> size, auto && value) {
 	}
 }
 
+namespace detail {
+
+template<std::size_t...indexes>
+constexpr auto to_array_impl(auto && source, std::index_sequence<indexes...>) {
+	return array{{OPERATORS_FORWARD(source)[indexes]...}};
+}
+
+} // namespace detail
+
+template<typename T, std::size_t size>
+constexpr auto to_array(c_array<T, size> & source) {
+	return ::containers::detail::to_array_impl(std::move(source), std::make_index_sequence<size>());
+}
+template<typename T, std::size_t size>
+constexpr auto to_array(c_array<T, size> && source) {
+	return ::containers::detail::to_array_impl(std::move(source), std::make_index_sequence<size>());
+}
 
 template<std::size_t index, typename T, std::size_t size>
 constexpr auto && get(array<T, size> const & a) {
