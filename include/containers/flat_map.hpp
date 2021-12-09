@@ -132,9 +132,8 @@ public:
 	{
 	}
 
-	template<range InputRange>
-	constexpr explicit flat_map_base(InputRange && init):
-		m_container(OPERATORS_FORWARD(init))
+	constexpr explicit flat_map_base(initializer_range<flat_map_base> auto && source):
+		m_container(OPERATORS_FORWARD(source))
 	{
 		if constexpr (allow_duplicates) {
 			ska_sort(m_container, extract_key());
@@ -143,9 +142,8 @@ public:
 		}
 	}
 
-	template<range InputRange>
-	constexpr flat_map_base(InputRange && init, ExtractKey extract_key_):
-		m_container(OPERATORS_FORWARD(init)),
+	constexpr flat_map_base(initializer_range<flat_map_base> auto && source, ExtractKey extract_key_):
+		m_container(OPERATORS_FORWARD(source)),
 		m_extract_key(std::move(extract_key_))
 	{
 		if constexpr (allow_duplicates) {
@@ -155,31 +153,27 @@ public:
 		}
 	}
 
-	template<range InputRange>
-	constexpr flat_map_base(assume_sorted_unique_t, InputRange && init):
-		m_container(OPERATORS_FORWARD(init))
+	constexpr flat_map_base(assume_sorted_unique_t, initializer_range<flat_map_base> auto && source):
+		m_container(OPERATORS_FORWARD(source))
 	{
 		BOUNDED_ASSERT(is_sorted(m_container, compare()));
 	}
 
-	template<range InputRange>
-	constexpr flat_map_base(assume_sorted_unique_t, InputRange && init, ExtractKey extract_key_):
-		m_container(OPERATORS_FORWARD(init)),
+	constexpr flat_map_base(assume_sorted_unique_t, initializer_range<flat_map_base> auto && source, ExtractKey extract_key_):
+		m_container(OPERATORS_FORWARD(source)),
 		m_extract_key(std::move(extract_key_))
 	{
 		BOUNDED_ASSERT(is_sorted(m_container, compare()));
 	}
 
-	template<range InputRange>
-	constexpr flat_map_base(assume_unique_t, InputRange && init):
-		m_container(OPERATORS_FORWARD(init))
+	constexpr flat_map_base(assume_unique_t, initializer_range<flat_map_base> auto && source):
+		m_container(OPERATORS_FORWARD(source))
 	{
 		ska_sort(m_container, extract_key());
 	}
 
-	template<range InputRange>
-	constexpr flat_map_base(assume_unique_t, InputRange && init, ExtractKey extract_key_):
-		m_container(OPERATORS_FORWARD(init)),
+	constexpr flat_map_base(assume_unique_t, initializer_range<flat_map_base> auto && source, ExtractKey extract_key_):
+		m_container(OPERATORS_FORWARD(source)),
 		m_extract_key(std::move(extract_key_))
 	{
 		ska_sort(m_container, extract_key());
@@ -187,8 +181,8 @@ public:
 
 
 	template<std::size_t init_size>
-	constexpr flat_map_base(c_array<value_type, init_size> && init):
-		m_container(std::move(init))
+	constexpr flat_map_base(c_array<value_type, init_size> && source):
+		m_container(std::move(source))
 	{
 		if constexpr (allow_duplicates) {
 			ska_sort(m_container, extract_key());
@@ -198,8 +192,8 @@ public:
 	}
 
 	template<std::size_t init_size>
-	constexpr flat_map_base(c_array<value_type, init_size> && init, ExtractKey extract_key_):
-		m_container(std::move(init)),
+	constexpr flat_map_base(c_array<value_type, init_size> && source, ExtractKey extract_key_):
+		m_container(std::move(source)),
 		m_extract_key(std::move(extract_key_))
 	{
 		if constexpr (allow_duplicates) {
@@ -210,30 +204,30 @@ public:
 	}
 
 	template<std::size_t init_size>
-	constexpr flat_map_base(assume_sorted_unique_t, c_array<value_type, init_size> && init):
-		m_container(std::move(init))
+	constexpr flat_map_base(assume_sorted_unique_t, c_array<value_type, init_size> && source):
+		m_container(std::move(source))
 	{
 		BOUNDED_ASSERT(is_sorted(m_container, compare()));
 	}
 
 	template<std::size_t init_size>
-	constexpr flat_map_base(assume_sorted_unique_t, c_array<value_type, init_size> && init, ExtractKey extract_key_):
-		m_container(std::move(init)),
+	constexpr flat_map_base(assume_sorted_unique_t, c_array<value_type, init_size> && source, ExtractKey extract_key_):
+		m_container(std::move(source)),
 		m_extract_key(std::move(extract_key_))
 	{
 		BOUNDED_ASSERT(is_sorted(m_container, compare()));
 	}
 
 	template<std::size_t init_size>
-	constexpr flat_map_base(assume_unique_t, c_array<value_type, init_size> && init):
-		m_container(std::move(init))
+	constexpr flat_map_base(assume_unique_t, c_array<value_type, init_size> && source):
+		m_container(std::move(source))
 	{
 		ska_sort(m_container, extract_key());
 	}
 
 	template<std::size_t init_size>
-	constexpr flat_map_base(assume_unique_t, c_array<value_type, init_size> && init, ExtractKey extract_key_):
-		m_container(std::move(init)),
+	constexpr flat_map_base(assume_unique_t, c_array<value_type, init_size> && source, ExtractKey extract_key_):
+		m_container(std::move(source)),
 		m_extract_key(std::move(extract_key_))
 	{
 		ska_sort(m_container, extract_key());
@@ -362,6 +356,22 @@ public:
 	}
 };
 
+template<typename Range>
+basic_flat_map(Range &&) -> basic_flat_map<std::remove_const_t<Range>>;
+template<typename Range, typename ExtractKey>
+basic_flat_map(Range &&, ExtractKey) -> basic_flat_map<std::remove_const_t<Range>, ExtractKey>;
+
+template<typename Range>
+basic_flat_map(assume_unique_t, Range &&) -> basic_flat_map<std::remove_const_t<Range>>;
+template<typename Range, typename ExtractKey>
+basic_flat_map(assume_unique_t, Range &&, ExtractKey) -> basic_flat_map<std::remove_const_t<Range>, ExtractKey>;
+
+template<typename Range>
+basic_flat_map(assume_sorted_unique_t, Range &&) -> basic_flat_map<std::remove_const_t<Range>>;
+template<typename Range, typename ExtractKey>
+basic_flat_map(assume_sorted_unique_t, Range &&, ExtractKey) -> basic_flat_map<std::remove_const_t<Range>, ExtractKey>;
+
+
 template<typename Container, detail::extract_key_function<typename range_value_t<Container>::key_type> ExtractKey = to_radix_sort_key_t>
 class basic_flat_multimap : private detail::flat_map_base<Container, ExtractKey, true> {
 private:
@@ -387,6 +397,21 @@ public:
 	
 	using base::erase;
 };
+
+template<typename Range>
+basic_flat_multimap(Range &&) -> basic_flat_multimap<std::remove_const_t<Range>>;
+template<typename Range, typename ExtractKey>
+basic_flat_multimap(Range &&, ExtractKey) -> basic_flat_multimap<std::remove_const_t<Range>, ExtractKey>;
+
+template<typename Range>
+basic_flat_multimap(assume_unique_t, Range &&) -> basic_flat_multimap<std::remove_const_t<Range>>;
+template<typename Range, typename ExtractKey>
+basic_flat_multimap(assume_unique_t, Range &&, ExtractKey) -> basic_flat_multimap<std::remove_const_t<Range>, ExtractKey>;
+
+template<typename Range>
+basic_flat_multimap(assume_sorted_unique_t, Range &&) -> basic_flat_multimap<std::remove_const_t<Range>>;
+template<typename Range, typename ExtractKey>
+basic_flat_multimap(assume_sorted_unique_t, Range &&, ExtractKey) -> basic_flat_multimap<std::remove_const_t<Range>, ExtractKey>;
 
 
 template<typename Key, typename T, typename... MaybeExtractKey>
