@@ -129,32 +129,62 @@ template<std::size_t... indexes>
 constexpr decltype(auto) visit_implementation(
 	auto && function,
 	std::index_sequence<indexes...> initial_indexes,
-	auto possible_index,
+	auto offset,
 	auto const & variant,
 	auto && ... variants
 ) requires(sizeof...(indexes) < sizeof...(variants)) {
-	auto found = [&]() -> decltype(auto) {
-		return ::bounded::detail::visit_implementation(
-			OPERATORS_FORWARD(function),
-			std::index_sequence<indexes..., static_cast<std::size_t>(possible_index)>{},
-			0_bi,
-			OPERATORS_FORWARD(variants)...
-		);
-	};
 	auto const search_index = variant.index();
-	if constexpr (possible_index == numeric_traits::max_value<decltype(search_index)>) {
-		return found();
-	} else if (possible_index == search_index) {
-		return found();
-	} else {
-		return ::bounded::detail::visit_implementation(
-			OPERATORS_FORWARD(function),
-			initial_indexes,
-			possible_index + 1_bi,
-			variant,
-			OPERATORS_FORWARD(variants)...
-		);
+
+	// Cannot use a lambda because there is no return type that would be valid
+	// there. A deduced return type would be potentially void.
+	#define BOUNDED_DETAIL_VISIT_IMPL(index) \
+		do { \
+			if constexpr (numeric_traits::max_value<decltype(search_index)> < index) { \
+				bounded::unreachable(); \
+			} else { \
+				return ::bounded::detail::visit_implementation( \
+					OPERATORS_FORWARD(function), \
+					std::index_sequence<indexes..., static_cast<std::size_t>(offset + index)>{}, \
+					0_bi, \
+					OPERATORS_FORWARD(variants)... \
+				); \
+			} \
+		} while (false)
+
+	// 16 is arbitrary
+	switch ((search_index - offset).value()) {
+		case 0: BOUNDED_DETAIL_VISIT_IMPL(0_bi);
+		case 1: BOUNDED_DETAIL_VISIT_IMPL(1_bi);
+		case 2: BOUNDED_DETAIL_VISIT_IMPL(2_bi);
+		case 3: BOUNDED_DETAIL_VISIT_IMPL(3_bi);
+		case 4: BOUNDED_DETAIL_VISIT_IMPL(4_bi);
+		case 5: BOUNDED_DETAIL_VISIT_IMPL(5_bi);
+		case 6: BOUNDED_DETAIL_VISIT_IMPL(6_bi);
+		case 7: BOUNDED_DETAIL_VISIT_IMPL(7_bi);
+		case 8: BOUNDED_DETAIL_VISIT_IMPL(8_bi);
+		case 9: BOUNDED_DETAIL_VISIT_IMPL(9_bi);
+		case 10: BOUNDED_DETAIL_VISIT_IMPL(10_bi);
+		case 11: BOUNDED_DETAIL_VISIT_IMPL(11_bi);
+		case 12: BOUNDED_DETAIL_VISIT_IMPL(12_bi);
+		case 13: BOUNDED_DETAIL_VISIT_IMPL(13_bi);
+		case 14: BOUNDED_DETAIL_VISIT_IMPL(14_bi);
+		case 15: BOUNDED_DETAIL_VISIT_IMPL(15_bi);
+		default: {
+			constexpr auto max_index = 16_bi;
+			if constexpr (numeric_traits::max_value<decltype(search_index)> < max_index) {
+				bounded::unreachable();
+			} else {
+				return ::bounded::detail::visit_implementation(
+					OPERATORS_FORWARD(function),
+					initial_indexes,
+					offset + max_index,
+					variant,
+					OPERATORS_FORWARD(variants)...
+				);
+			}
+		}
 	}
+	#undef BOUNDED_DETAIL_VISIT_IMPL
 }
 
 inline constexpr auto visit_interface = [](auto transform) {
