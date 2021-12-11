@@ -6,7 +6,6 @@
 #pragma once
 
 #include <containers/begin_end.hpp>
-#include <containers/is_iterator_sentinel.hpp>
 #include <containers/is_range.hpp>
 #include <containers/legacy_iterator.hpp>
 
@@ -15,17 +14,17 @@
 
 namespace containers {
 
-constexpr inline struct sort_t {
-	template<iterator Iterator>
-	constexpr void operator()(Iterator const first, sentinel_for<Iterator> auto const last, auto cmp) const {
-		std::sort(make_legacy_iterator(first), make_legacy_iterator(last), cmp);
+struct sort_t {
+	constexpr auto operator()(range auto & to_sort, auto cmp) const -> void {
+		std::sort(
+			make_legacy_iterator(containers::begin(to_sort)),
+			make_legacy_iterator(containers::end(to_sort)),
+			cmp
+		);
 	}
-	constexpr void operator()(range auto & to_sort, auto cmp) const {
-		operator()(containers::begin(to_sort), containers::end(to_sort), cmp);
-	}
-	constexpr void operator()(range auto & to_sort) const {
+	constexpr auto operator()(range auto & to_sort) const -> void {
 		operator()(to_sort, std::less{});
 	}
-} sort;
+} constexpr inline sort;
 
 } // namespace containers
