@@ -9,7 +9,6 @@
 #include <containers/algorithms/is_sorted.hpp>
 #include <containers/algorithms/move_iterator.hpp>
 #include <containers/algorithms/negate.hpp>
-#include <containers/algorithms/sort.hpp>
 #include <containers/begin_end.hpp>
 #include <containers/dynamic_array.hpp>
 #include <containers/iter_value_t.hpp>
