@@ -22,4 +22,7 @@ static_assert(begin(reversed) + 5_bi == end(reversed));
 
 static_assert(containers::equal(containers::reversed(reversed), forward));
 
+static_assert(*begin(reversed) == 4);
+static_assert(*(begin(reversed) + 1_bi) == 3);
+
 } // namespace
