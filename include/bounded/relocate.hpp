@@ -27,8 +27,12 @@ constexpr auto relocate_impl(auto & ref) noexcept {
 } // namespace relocate_adl_detail
 namespace bounded {
 
-inline constexpr auto relocate = []<typename T>(T & ref) noexcept requires(!std::is_const_v<T>) {
+inline constexpr auto relocate = [](detail::non_const auto & ref) noexcept {
 	return ::bounded_relocate_adl_detail::relocate_impl(ref);
+};
+
+inline constexpr auto relocate_at = [](detail::non_const auto & destination, detail::non_const auto & source) noexcept -> auto & {
+	return bounded::construct(destination, [&] { return bounded::relocate(source); });
 };
 
 } // namespace bounded

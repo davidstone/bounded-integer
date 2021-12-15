@@ -39,6 +39,9 @@ private:
 template<typename T, typename... Args>
 concept brace_constructible = requires (Args && ... args) { T{OPERATORS_FORWARD(args)...}; };
 
+template<typename T>
+concept non_const = !std::is_const_v<T>;
+
 } // namespace detail
 
 template<typename T>
@@ -51,7 +54,7 @@ inline constexpr auto construct_return = [](auto && ... args) -> T requires cons
 };
 
 
-inline constexpr auto construct = []<typename T, construct_function_for<T> Function>(T & ref, Function && function) -> T & requires(!std::is_const_v<T>){
+inline constexpr auto construct = []<detail::non_const T, construct_function_for<T> Function>(T & ref, Function && function) -> T & {
 	return *std::construct_at(
 		std::addressof(ref),
 		detail::superconstructing_super_elider<T, Function>(OPERATORS_FORWARD(function))
