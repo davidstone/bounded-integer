@@ -10,6 +10,15 @@
 #include <containers/dereference.hpp>
 
 namespace containers {
+namespace detail {
+
+template<typename Input, typename Output>
+struct copy_result {
+	Input input;
+	Output output;
+};
+
+} // namespace detail
 
 constexpr auto copy(range auto && input, iterator auto output) {
 	auto first = containers::begin(OPERATORS_FORWARD(input));
@@ -17,10 +26,7 @@ constexpr auto copy(range auto && input, iterator auto output) {
 	for (; first != last; ++first, ++output) {
 		*output = dereference<decltype(input)>(first);
 	}
-	struct result {
-		decltype(first) input;
-		decltype(output) output;
-	};
+	using result = detail::copy_result<decltype(first), decltype(output)>;
 	return result{std::move(first), std::move(output)};
 }
 
@@ -32,10 +38,7 @@ constexpr auto copy(range auto && input, range auto && output) {
 	for (; in_first != in_last and out_first != out_last; ++in_first, ++out_first) {
 		*out_first = dereference<decltype(input)>(in_first);
 	}
-	struct result {
-		decltype(in_first) input;
-		decltype(out_first) output;
-	};
+	using result = detail::copy_result<decltype(in_first), decltype(out_first)>;
 	return result{std::move(in_first), std::move(out_first)};
 }
 
