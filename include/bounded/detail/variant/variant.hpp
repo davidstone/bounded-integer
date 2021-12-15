@@ -13,6 +13,7 @@
 #include <bounded/insert.hpp>
 #include <bounded/lazy_init.hpp>
 #include <bounded/relocate.hpp>
+#include <bounded/single_element_storage.hpp>
 #include <bounded/unreachable.hpp>
 #include <bounded/value_to_function.hpp>
 #include <bounded/detail/construct_destroy.hpp>
@@ -185,11 +186,7 @@ public:
 		} else {
 			// TODO: Add fallback before this one that does trivial default
 			// construction on exception
-			union skip_destructor {
-				constexpr ~skip_destructor() {}
-				value_t value;
-			};
-			auto storage = skip_destructor{value_t(OPERATORS_FORWARD(construct_)())};
+			auto storage = single_element_storage<value_t>{value_t(OPERATORS_FORWARD(construct_)())};
 			destroy_active();
 			return replace_active_member(index, [&]{ return bounded::relocate(storage.value); });
 		}

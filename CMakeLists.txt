@@ -111,6 +111,7 @@ add_executable(bounded_test
 	source/bounded/pow.cpp
 	source/bounded/relocate.cpp
 	source/bounded/scope_guard.cpp
+	source/bounded/single_element_storage.cpp
 	source/bounded/std_iterator.cpp
 	source/bounded/string.cpp
 	source/bounded/to_integer.cpp
