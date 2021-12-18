@@ -7,6 +7,7 @@
 
 #include <containers/algorithms/copy.hpp>
 #include <containers/algorithms/generate.hpp>
+#include <containers/algorithms/reverse_iterator.hpp>
 #include <containers/algorithms/uninitialized.hpp>
 #include <containers/begin_end.hpp>
 #include <containers/count_type.hpp>
@@ -38,10 +39,10 @@ constexpr auto insert_without_reallocation(Container & container, iterator_t<Con
 		containers::reversed(range_view(mutable_position, original_end)),
 		containers::reverse_iterator(new_end)
 	).base();
+	BOUNDED_ASSERT(new_position == mutable_position + number_of_elements);
 	try {
 		containers::uninitialized_copy_no_overlap(OPERATORS_FORWARD(input_range), mutable_position);
 	} catch (...) {
-		BOUNDED_ASSERT(new_position == mutable_position + number_of_elements);
 		::containers::uninitialized_relocate(range_view(new_position, new_end), mutable_position);
 		throw;
 	}
