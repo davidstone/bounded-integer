@@ -7,7 +7,6 @@
 
 #include <containers/algorithms/advance.hpp>
 #include <containers/algorithms/find.hpp>
-#include <containers/algorithms/reverse_iterator.hpp>
 #include <containers/begin_end.hpp>
 #include <containers/is_range.hpp>
 #include <containers/size.hpp>
@@ -18,8 +17,6 @@
 #include <numeric_traits/min_max_value.hpp>
 
 #include <operators/forward.hpp>
-
-#include <limits>
 
 namespace containers {
 

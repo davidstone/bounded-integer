@@ -10,7 +10,6 @@
 #include <containers/algorithms/minmax_element.hpp>
 #include <containers/algorithms/negate.hpp>
 #include <containers/algorithms/partition.hpp>
-#include <containers/algorithms/reverse_iterator.hpp>
 #include <containers/algorithms/sort.hpp>
 #include <containers/algorithms/unique.hpp>
 #include <containers/at.hpp>
