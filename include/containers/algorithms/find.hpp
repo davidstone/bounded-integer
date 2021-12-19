@@ -18,8 +18,8 @@
 
 namespace containers {
 
-template<iterator InputIterator>
-constexpr auto find_if(InputIterator first, sentinel_for<InputIterator> auto const last, auto predicate) {
+template<iterator Iterator>
+constexpr auto find_if(Iterator first, sentinel_for<Iterator> auto const last, auto predicate) {
 	for (; first != last; ++first) {
 		if (predicate(*first)) {
 			break;
@@ -29,27 +29,87 @@ constexpr auto find_if(InputIterator first, sentinel_for<InputIterator> auto con
 }
 
 constexpr auto find_if(range auto && range, auto predicate) {
-	return ::containers::find_if(containers::begin(OPERATORS_FORWARD(range)), containers::end(OPERATORS_FORWARD(range)), std::move(predicate));
+	return ::containers::find_if(
+		containers::begin(OPERATORS_FORWARD(range)),
+		containers::end(OPERATORS_FORWARD(range)),
+		std::move(predicate)
+	);
 }
 
 
-template<iterator InputIterator>
-constexpr auto find_if_not(InputIterator const first, sentinel_for<InputIterator> auto const last, auto predicate) {
+template<bidirectional_iterator Iterator>
+constexpr auto find_last_if(Iterator const first, Iterator const last, auto predicate) {
+	for (auto it = last; it != first; ) {
+		--it;
+		if (predicate(*it)) {
+			return it;
+		}
+	}
+	return last;
+}
+
+constexpr auto find_last_if(bidirectional_range auto && range, auto predicate) {
+	return ::containers::find_last_if(
+		containers::begin(OPERATORS_FORWARD(range)),
+		containers::end(OPERATORS_FORWARD(range)),
+		std::move(predicate)
+	);
+}
+
+
+template<iterator Iterator>
+constexpr auto find_if_not(Iterator const first, sentinel_for<Iterator> auto const last, auto predicate) {
 	return ::containers::find_if(first, last, ::containers::negate(std::move(predicate)));
 }
 
 constexpr auto find_if_not(range auto && range, auto predicate) {
-	return ::containers::find_if_not(containers::begin(OPERATORS_FORWARD(range)), containers::end(OPERATORS_FORWARD(range)), std::move(predicate));
+	return ::containers::find_if_not(
+		containers::begin(OPERATORS_FORWARD(range)),
+		containers::end(OPERATORS_FORWARD(range)),
+		std::move(predicate)
+	);
 }
 
 
-template<iterator InputIterator>
-constexpr auto find(InputIterator const first, sentinel_for<InputIterator> auto const last, auto const & value) {
+template<bidirectional_iterator Iterator>
+constexpr auto find_last_if_not(Iterator const first, Iterator const last, auto predicate) {
+	return ::containers::find_last_if(first, last, ::containers::negate(std::move(predicate)));
+}
+
+constexpr auto find_last_if_not(bidirectional_range auto && range, auto predicate) {
+	return ::containers::find_last_if_not(
+		containers::begin(OPERATORS_FORWARD(range)),
+		containers::end(OPERATORS_FORWARD(range)),
+		std::move(predicate)
+	);
+}
+
+
+template<iterator Iterator>
+constexpr auto find(Iterator const first, sentinel_for<Iterator> auto const last, auto const & value) {
 	return ::containers::find_if(first, last, bounded::equal_to(value));
 }
 
 constexpr auto find(range auto && range, auto const & value) {
-	return ::containers::find(containers::begin(OPERATORS_FORWARD(range)), containers::end(OPERATORS_FORWARD(range)), value);
+	return ::containers::find(
+		containers::begin(OPERATORS_FORWARD(range)),
+		containers::end(OPERATORS_FORWARD(range)),
+		value
+	);
 }
 
-}	// namespace containers
+
+template<bidirectional_iterator Iterator>
+constexpr auto find_last(Iterator const first, Iterator const last, auto const & value) {
+	return ::containers::find_last_if(first, last, bounded::equal_to(value));
+}
+
+constexpr auto find_last(bidirectional_range auto && range, auto const & value) {
+	return ::containers::find_last(
+		containers::begin(OPERATORS_FORWARD(range)),
+		containers::end(OPERATORS_FORWARD(range)),
+		value
+	);
+}
+
+} // namespace containers
