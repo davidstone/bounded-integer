@@ -26,10 +26,11 @@ constexpr auto log_impl(auto value, auto const base) {
 
 }	// namespace detail
 
+// TODO: It's useful for 0 to return 0, but that's not `log`.
 template<bounded_integer Value, bounded_integer Base>
 constexpr auto log(Value const value, Base const base) {
 	static_assert(base > constant<1>, "Negative bases not currently supported.");
-	static_assert(value > constant<0>, "The log of a negative number or zero is undefined.");
+	static_assert(numeric_traits::min_value<Value> >= constant<0>, "The log of a negative number is undefined.");
 	using result_type = integer<
 		detail::log_impl(static_cast<detail::max_unsigned_t>(builtin_min_value<Value>), static_cast<detail::max_unsigned_t>(numeric_traits::max_value<Base>)),
 		detail::log_impl(static_cast<detail::max_unsigned_t>(builtin_max_value<Value>), static_cast<detail::max_unsigned_t>(numeric_traits::min_value<Base>))
