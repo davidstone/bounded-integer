@@ -267,7 +267,6 @@ target_link_libraries(vector_benchmark PUBLIC bounded benchmark_main strict_defa
 if("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang")
 	if(NOT MSVC)
 		target_compile_options(benchmark PUBLIC
-			"-stdlib=libc++"
 			"-std=c++2b"
 		)
 	endif()
