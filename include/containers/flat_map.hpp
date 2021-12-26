@@ -21,6 +21,7 @@
 #include <containers/iterator_t.hpp>
 #include <containers/legacy_iterator.hpp>
 #include <containers/lookup.hpp>
+#include <containers/map_value_type.hpp>
 #include <containers/range_value_t.hpp>
 #include <containers/size.hpp>
 #include <containers/static_vector.hpp>
@@ -30,38 +31,12 @@
 #include <bounded/detail/type.hpp>
 #include <bounded/integer.hpp>
 #include <bounded/concepts.hpp>
-#include <bounded/relocate.hpp>
 
 #include <operators/forward.hpp>
 
 #include <algorithm>
 
 namespace containers {
-
-template<typename Key, typename Mapped>
-struct map_value_type {
-	using key_type = Key;
-	using mapped_type = Mapped;
-
-	friend auto operator<=>(map_value_type const & lhs, map_value_type const & rhs) = default;
-
-	friend constexpr auto relocate(map_value_type & value) noexcept {
-		return map_value_type{
-			bounded::relocate(value.key),
-			bounded::relocate(value.mapped)
-		};
-	}
-
-	[[no_unique_address]] Key key;
-	[[no_unique_address]] Mapped mapped;
-};
-
-constexpr auto && get_key(auto && value) {
-	return OPERATORS_FORWARD(value).key;
-}
-constexpr auto && get_mapped(auto && value) {
-	return OPERATORS_FORWARD(value).mapped;
-}
 
 constexpr inline struct assume_sorted_unique_t {} assume_sorted_unique;
 constexpr inline struct assume_unique_t {} assume_unique;

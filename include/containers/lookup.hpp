@@ -7,6 +7,7 @@
 
 #include <containers/associative_container.hpp>
 #include <containers/begin_end.hpp>
+#include <containers/map_value_type.hpp>
 
 #include <operators/forward.hpp>
 
