@@ -1,15 +1,15 @@
 [submodule "benchmark"]
-	path = benchmark
+	path = dependencies/benchmark
 	url = https://github.com/google/benchmark.git
 [submodule "Catch2"]
-	path = Catch2
+	path = dependencies/Catch2
 	url = https://github.com/catchorg/Catch2.git
 [submodule "cmake_strict_defaults"]
-	path = cmake_strict_defaults
+	path = dependencies/cmake_strict_defaults
 	url = https://github.com/davidstone/cmake_strict_defaults
 [submodule "numeric-traits"]
-	path = numeric-traits
+	path = dependencies/numeric-traits
 	url = https://github.com/davidstone/numeric-traits
 [submodule "operators"]
-	path = operators
+	path = dependencies/operators
 	url = https://github.com/davidstone/operators.git
