@@ -15,10 +15,24 @@ enable_testing()
 
 get_directory_property(has_parent PARENT_DIRECTORY)
 if (NOT has_parent)
-	add_subdirectory(Catch2)
+	set(CMAKE_CXX_STANDARD 23)
+	set(CMAKE_CXX_STANDARD_REQUIRED On)
+	set(CMAKE_CXX_EXTENSIONS Off)
+
 	add_subdirectory(cmake_strict_defaults)
 	add_subdirectory(numeric-traits)
 	add_subdirectory(operators)
+
+	add_subdirectory(Catch2 EXCLUDE_FROM_ALL)
+
+	set(BENCHMARK_ENABLE_TESTING OFF CACHE BOOL "Disable testing benchmark.")
+	add_subdirectory(benchmark EXCLUDE_FROM_ALL)
+	if("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang")
+		target_compile_options(benchmark PUBLIC
+			"-Wno-global-constructors"
+			"-Wno-shift-sign-overflow"
+		)
+	endif()
 endif()
 
 add_library(bounded INTERFACE)
@@ -249,10 +263,6 @@ add_executable(std_map
 target_compile_definitions(std_map PRIVATE "USE_SYSTEM_MAP")
 target_link_libraries(std_map PUBLIC containers strict_defaults)
 
-set(BENCHMARK_ENABLE_TESTING OFF CACHE BOOL "Disable testing benchmark.")
-add_subdirectory("${PROJECT_SOURCE_DIR}/source/benchmark")
-set_target_properties(benchmark PROPERTIES FOLDER extern)
-
 add_executable(ska_sort_benchmark
 	source/containers/algorithms/ska_sort_benchmark.cpp
 )
@@ -263,27 +273,6 @@ add_executable(vector_benchmark
 )
 target_link_libraries(vector_benchmark PUBLIC bounded benchmark_main strict_defaults)
 
-
-if("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang")
-	if(NOT MSVC)
-		target_compile_options(benchmark PUBLIC
-			"-std=c++2b"
-		)
-	endif()
-
-	target_compile_options(benchmark PUBLIC
-		"-Wno-global-constructors"
-		"-Wno-sign-conversion"
-	)
-
-	target_compile_options(benchmark PUBLIC
-		"-Wno-suggest-override"
-	)
-
-elseif("${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU")
-else()
-	message(FATAL_ERROR "Unknown compiler " "${CMAKE_CXX_COMPILER_ID}")
-endif()
 
 set(test_targets
 	bounded_test

@@ -25,25 +25,26 @@ auto default_value() {
 
 template <class Container>
 void benchmark_construct_size(benchmark::State & state) {
-  auto const size = state.range(0);
-  for (auto _ : state) {
-	auto c = Container(size);
-	benchmark::DoNotOptimize(c.data());
-  }
+	auto const size = static_cast<containers::range_size_t<Container>>(state.range(0));
+	for (auto _ : state) {
+		auto c = Container(size);
+		benchmark::DoNotOptimize(c.data());
+	}
 }
 
 template <class Container, typename Container::value_type value>
 void benchmark_construct_repeat_value(benchmark::State & state) {
-  auto const size = state.range(0);
-  for (auto _ : state) {
-	auto c = Container(size, value);
-	benchmark::DoNotOptimize(c.data());
-  }
+	auto const size = static_cast<containers::range_size_t<Container>>(state.range(0));
+	for (auto _ : state) {
+		auto c = Container(size, value);
+		benchmark::DoNotOptimize(c.data());
+	}
 }
 
 template <class Container>
 void benchmark_construct_iterator_pair(benchmark::State & state) {
-	auto in = std::vector(state.range(0), default_value<typename Container::value_type>());
+	auto const size = static_cast<containers::range_size_t<Container>>(state.range(0));
+	auto in = std::vector(size, default_value<containers::range_value_t<Container>>());
 	auto const begin = in.begin();
 	auto const end = in.end();
 	benchmark::DoNotOptimize(std::addressof(in));

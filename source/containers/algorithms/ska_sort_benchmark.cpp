@@ -443,7 +443,7 @@ void register_all_benchmarks() {
 	REGISTER_SOME_BENCHMARKS(
 		"vector_int_wide",
 		create_range_data(128, [](auto &, auto size) {
-			auto to_add = std::vector<int>(size);
+			auto to_add = std::vector<int>(static_cast<std::size_t>(size));
 			std::iota(to_add.begin(), to_add.end(), 0);
 			return to_add;
 		})
