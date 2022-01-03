@@ -36,11 +36,11 @@ constexpr auto lexicographical_compare_3way(range auto const & range1, range aut
 
 template<iterator InputIterator1, iterator InputIterator2>
 constexpr auto lexicographical_compare_3way(InputIterator1 const first1, sentinel_for<InputIterator1> auto const last1, InputIterator2 const first2, sentinel_for<InputIterator2> auto const last2) {
-	return ::containers::lexicographical_compare_3way(first1, last1, first2, last2, bounded::compare_3way());
+	return ::containers::lexicographical_compare_3way(first1, last1, first2, last2, std::compare_three_way());
 }
 
 constexpr auto lexicographical_compare_3way(range auto const & range1, range auto const & range2) {
-	return ::containers::lexicographical_compare_3way(range1, range2, bounded::compare_3way());
+	return ::containers::lexicographical_compare_3way(range1, range2, std::compare_three_way());
 }
 
 
@@ -56,7 +56,7 @@ constexpr auto lexicographical_compare_3way(InputIterator1 first1, sentinel_for<
 
 template<iterator InputIterator1>
 constexpr auto lexicographical_compare_3way(InputIterator1 const first1, sentinel_for<InputIterator1> auto const last1, iterator auto const first2) {
-	return ::containers::lexicographical_compare_3way(first1, last1, first2, bounded::compare_3way());
+	return ::containers::lexicographical_compare_3way(first1, last1, first2, std::compare_three_way());
 }
 
 
@@ -76,7 +76,7 @@ constexpr auto shortlex_compare(sized_range auto const & range1, sized_range aut
 }
 
 constexpr auto shortlex_compare(sized_range auto const & range1, sized_range auto const & range2) {
-	return ::containers::shortlex_compare(range1, range2, bounded::compare_3way());
+	return ::containers::shortlex_compare(range1, range2, std::compare_three_way());
 }
 
 

@@ -23,7 +23,7 @@ struct sort_t {
 		);
 	}
 	constexpr auto operator()(range auto & to_sort) const -> void {
-		operator()(to_sort, std::less{});
+		operator()(to_sort, std::less());
 	}
 } constexpr inline sort;
 

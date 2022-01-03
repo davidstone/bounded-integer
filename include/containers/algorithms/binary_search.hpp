@@ -21,7 +21,7 @@ constexpr inline struct lower_bound_t {
 		return partition_point(OPERATORS_FORWARD(sorted), [&](auto const & element) { return cmp(element, value); });
 	}
 	constexpr auto operator()(range auto && sorted, auto const & value) const {
-		return operator()(OPERATORS_FORWARD(sorted), value, std::less{});
+		return operator()(OPERATORS_FORWARD(sorted), value, std::less());
 	}
 } lower_bound;
 
@@ -30,7 +30,7 @@ constexpr inline struct upper_bound_t {
 		return partition_point(OPERATORS_FORWARD(sorted), [&](auto const & element) { return !cmp(value, element); });
 	}
 	constexpr auto operator()(range auto && sorted, auto const & value) const {
-		return operator()(OPERATORS_FORWARD(sorted), value, std::less{});
+		return operator()(OPERATORS_FORWARD(sorted), value, std::less());
 	}
 } upper_bound;
 
@@ -44,7 +44,7 @@ constexpr inline struct equal_range_t {
 		);
 	}
 	constexpr auto operator()(range auto && sorted, auto const & value) const {
-		return operator()(OPERATORS_FORWARD(sorted), value, std::less{});
+		return operator()(OPERATORS_FORWARD(sorted), value, std::less());
 	}
 } equal_range;
 
@@ -56,7 +56,7 @@ constexpr inline struct binary_search_t {
 		return it != containers::end(sorted) and !cmp(value, *it);
 	}
 	constexpr bool operator()(range auto && sorted, auto const & value) const {
-		return operator()(sorted, value, std::less{});
+		return operator()(sorted, value, std::less());
 	}
 } binary_search;
 

@@ -193,6 +193,6 @@ template<typename Range1, typename Range2, typename Compare>
 set_intersection_pair(Range1 &&, Range2 &&, Compare) -> set_intersection_pair<Range1, Range2, Compare>;
 
 template<typename Range1, typename Range2>
-set_intersection_pair(Range1 &&, Range2 &&) -> set_intersection_pair<Range1, Range2, bounded::detail::compare_to_t>;
+set_intersection_pair(Range1 &&, Range2 &&) -> set_intersection_pair<Range1, Range2, std::compare_three_way>;
 
 }	// namespace containers

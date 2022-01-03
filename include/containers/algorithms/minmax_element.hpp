@@ -9,8 +9,9 @@
 #include <containers/begin_end.hpp>
 #include <containers/is_range.hpp>
 
-#include <bounded/detail/comparison_function_object.hpp>
 #include <operators/forward.hpp>
+
+#include <functional>
 
 namespace containers {
 
@@ -31,7 +32,7 @@ constexpr auto min_element(range auto && source, auto compare) {
 }
 
 constexpr auto min_element(range auto && source) {
-	return containers::min_element(OPERATORS_FORWARD(source), bounded::less());
+	return containers::min_element(OPERATORS_FORWARD(source), std::less());
 }
 
 constexpr auto max_element(range auto && source, auto greater) {
@@ -42,7 +43,7 @@ constexpr auto max_element(range auto && source, auto greater) {
 }
 
 constexpr auto max_element(range auto && source) {
-	return containers::max_element(OPERATORS_FORWARD(source), bounded::greater());
+	return containers::max_element(OPERATORS_FORWARD(source), std::greater());
 }
 
 }	// namespace containers

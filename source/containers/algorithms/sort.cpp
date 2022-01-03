@@ -14,7 +14,7 @@ constexpr auto verify_sort(auto && range_) {
 		containers::sort(range, cmp);
 		return containers::is_sorted(range, cmp);
 	};
-	return impl(range_, std::less{}) and impl(range_, std::greater{});
+	return impl(range_, std::less()) and impl(range_, std::greater());
 }
 
 static_assert(verify_sort(containers::array{1}));

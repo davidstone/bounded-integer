@@ -18,6 +18,7 @@
 
 #include <numeric_traits/min_max_value.hpp>
 
+#include <functional>
 #include <utility>
 
 namespace bounded {
@@ -103,11 +104,11 @@ constexpr inline struct extreme_function {
 
 
 inline constexpr auto min = [](auto && ... ts) -> decltype(auto) {
-	return extreme(less(), OPERATORS_FORWARD(ts)...);
+	return extreme(std::less(), OPERATORS_FORWARD(ts)...);
 };
 
 inline constexpr auto max = [](auto && ... ts) -> decltype(auto) {
-	return extreme(greater(), OPERATORS_FORWARD(ts)...);
+	return extreme(std::greater(), OPERATORS_FORWARD(ts)...);
 };
 
 }	// namespace bounded
