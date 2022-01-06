@@ -19,11 +19,11 @@ if (NOT has_parent)
 	set(CMAKE_CXX_STANDARD_REQUIRED On)
 	set(CMAKE_CXX_EXTENSIONS Off)
 
-	add_subdirectory(cmake_strict_defaults)
-	add_subdirectory(numeric-traits)
-	add_subdirectory(operators)
+	add_subdirectory(dependencies/cmake_strict_defaults)
+	add_subdirectory(dependencies/numeric-traits)
+	add_subdirectory(dependencies/operators)
 
-	add_subdirectory(Catch2 EXCLUDE_FROM_ALL)
+	add_subdirectory(dependencies/Catch2 EXCLUDE_FROM_ALL)
 
 	set(BENCHMARK_ENABLE_TESTING OFF CACHE BOOL "Disable testing benchmark.")
 	add_subdirectory(benchmark EXCLUDE_FROM_ALL)
