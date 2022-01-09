@@ -132,10 +132,9 @@ struct concatenate_view_iterator {
 			auto remaining_offset = bounded::integer<0, bounded::builtin_max_value<Offset>>(::bounded::assume_in_range(offset, 0_bi, bounded::integer(numeric_traits::max_value<Offset>)));
 			auto specific_range = [&](auto const index) {
 				auto const range = lhs.m_range_views[index];
-				using size_type = range_size_t<decltype(range)>;
-				auto const added_size = size_type(bounded::min(containers::size(range), remaining_offset));
+				auto const added_size = bounded::min(containers::size(range), remaining_offset);
 				remaining_offset -= added_size;
-				return range_view(containers::begin(range) + size_type(added_size), containers::end(range));
+				return range_view(containers::begin(range) + added_size, containers::end(range));
 			};
 			// Use {} to enforce initialization order
 			return bounded::apply(
@@ -235,10 +234,10 @@ struct concatenate_view {
 	}
 	
 	constexpr auto begin() const {
-		return concatenate_view_iterator(bounded::transform([](auto && range){ return range_view(range); }, m_ranges));
+		return begin_impl(m_ranges);
 	}
 	constexpr auto begin() {
-		return concatenate_view_iterator(bounded::transform([](auto && range){ return range_view(range); }, m_ranges));
+		return begin_impl(m_ranges);
 	}
 	static constexpr auto end() {
 		return concatenate_view_sentinel();
@@ -246,6 +245,12 @@ struct concatenate_view {
 
 	OPERATORS_BRACKET_SEQUENCE_RANGE_DEFINITIONS
 private:
+	static constexpr auto begin_impl(auto && ranges) {
+		return concatenate_view_iterator(bounded::transform(
+			[](auto && range){ return range_view(containers::begin(range), containers::end(range)); },
+			ranges
+		));
+	}
 	bounded::tuple<Ranges...> m_ranges;
 };
 
