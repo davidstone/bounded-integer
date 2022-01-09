@@ -21,7 +21,6 @@
 #include <benchmark/benchmark.h>
 
 #include <random>
-#include <vector>
 
 namespace {
 
@@ -39,27 +38,30 @@ constexpr void inplace_radix_sort(range auto && to_sort) {
 }
 
 template<typename Container>
-auto create_radix_sort_data(std::mt19937_64 & engine, std::int64_t const size, auto distribution) {
-	auto result = Container();
-	containers::detail::reserve_if_reservable(result, bounded::assume_in_range<range_size_t<Container>>(size));
-	for (std::int64_t n = 0; n != size; ++n) {
-		containers::push_back(result, distribution(engine));
-	}
-	return result;
+auto create_radix_sort_data(std::mt19937_64 & engine, bounded::bounded_integer auto const size, auto distribution) {
+	return Container(containers::generate_n(size, [&] { return distribution(engine); }));
 }
 
-auto create_radix_sort_data(std::mt19937_64 & engine, std::int64_t const size, auto distribution) {
-	return create_radix_sort_data<std::vector<decltype(distribution(engine))>>(engine, size, distribution);
+auto create_radix_sort_data(std::mt19937_64 & engine, bounded::bounded_integer auto const size, auto distribution) {
+	return create_radix_sort_data<containers::vector<decltype(distribution(engine))>>(engine, size, distribution);
 }
 
 constexpr int profile_multiplier = 2;
 constexpr int max_profile_range = 1 << 20;
 
+auto get_value(benchmark::State const & state) {
+	return bounded::assume_in_range(
+		bounded::integer(state.range(0)),
+		0_bi,
+		bounded::constant<numeric_traits::max_value<std::int64_t>>
+	);
+}
+
 void benchmark_double_buffered_ska_sort(benchmark::State & state, auto create) {
 	auto randomness = std::mt19937_64(77342348);
-	auto buffer = create(randomness, state.range(0));
+	auto buffer = create(randomness, get_value(state));
 	for (auto _ : state) {
-		auto to_sort = create(randomness, state.range(0));
+		auto to_sort = create(randomness, get_value(state));
 		using containers::data;
 		benchmark::DoNotOptimize(data(to_sort));
 		benchmark::DoNotOptimize(data(buffer));
@@ -81,9 +83,9 @@ void benchmark_double_buffered_ska_sort(benchmark::State & state, auto create) {
 
 void benchmark_std_sort(benchmark::State & state, auto create) {
 	auto randomness = std::mt19937_64(77342348);
-	create(randomness, state.range(0));
+	create(randomness, get_value(state));
 	for (auto _ : state) {
-		auto to_sort = create(randomness, state.range(0));
+		auto to_sort = create(randomness, get_value(state));
 		benchmark::DoNotOptimize(containers::data(to_sort));
 #ifdef SORT_ON_FIRST_ONLY
 		containers::sort(to_sort, [](auto && l, auto && r){ return std::get<0>(l) < std::get<0>(r); });
@@ -111,9 +113,9 @@ void american_flag_sort(range auto && to_sort) {
 
 void benchmark_american_flag_sort(benchmark::State & state, auto create) {
 	auto randomness = std::mt19937_64(77342348);
-	create(randomness, state.range(0));
+	create(randomness, get_value(state));
 	for (auto _ : state) {
-		auto to_sort = create(randomness, state.range(0));
+		auto to_sort = create(randomness, get_value(state));
 		benchmark::DoNotOptimize(containers::data(to_sort));
 #ifdef SORT_ON_FIRST_ONLY
 		american_flag_sort(to_sort, [](auto && a) -> decltype(auto){ return std::get<0>(a); });
@@ -127,9 +129,9 @@ void benchmark_american_flag_sort(benchmark::State & state, auto create) {
 
 void benchmark_ska_sort(benchmark::State & state, auto create) {
 	auto randomness = std::mt19937_64(77342348);
-	create(randomness, state.range(0));
+	create(randomness, get_value(state));
 	for (auto _ : state) {
-		auto to_sort = create(randomness, state.range(0));
+		auto to_sort = create(randomness, get_value(state));
 		benchmark::DoNotOptimize(containers::data(to_sort));
 #ifdef SORT_ON_FIRST_ONLY
 		ska_sort(to_sort, [](auto && a) -> decltype(auto){ return std::get<0>(a); });
@@ -143,9 +145,9 @@ void benchmark_ska_sort(benchmark::State & state, auto create) {
 
 void benchmark_inplace_radix_sort(benchmark::State & state, auto create) {
 	auto randomness = std::mt19937_64(77342348);
-	create(randomness, state.range(0));
+	create(randomness, get_value(state));
 	for (auto _ : state) {
-		auto to_sort = create(randomness, state.range(0));
+		auto to_sort = create(randomness, get_value(state));
 		benchmark::DoNotOptimize(containers::data(to_sort));
 #ifdef SORT_ON_FIRST_ONLY
 		inplace_radix_sort(to_sort, [](auto && a) -> decltype(auto) { return std::get<0>(a); });
@@ -159,9 +161,9 @@ void benchmark_inplace_radix_sort(benchmark::State & state, auto create) {
 
 void benchmark_generation(benchmark::State & state, auto create) {
 	auto randomness = std::mt19937_64(77342348);
-	create(randomness, state.range(0));
+	create(randomness, get_value(state));
 	for (auto _ : state) {
-		auto to_sort = create(randomness, state.range(0));
+		auto to_sort = create(randomness, get_value(state));
 		benchmark::DoNotOptimize(containers::data(to_sort));
 		benchmark::ClobberMemory();
 	}
@@ -169,19 +171,16 @@ void benchmark_generation(benchmark::State & state, auto create) {
 
 
 auto create_limited_radix_sort_data(std::mt19937_64 & randomness, std::int8_t range_end) {
-	auto result = std::vector<std::int8_t>();
-	constexpr auto size = 2UZ * 1024UZ * 1024UZ;
-	result.reserve(size);
 	auto int_distribution = std::uniform_int_distribution<std::int8_t>(-128, range_end);
-	for ([[maybe_unused]] auto n : containers::integer_range(size)) {
-		result.push_back(int_distribution(randomness));
-	}
-	return result;
+	return containers::vector(containers::generate_n(
+		2_bi * 1024_bi * 1024_bi,
+		[&] { return int_distribution(randomness); }
+	));
 }
 void benchmark_limited_generation(benchmark::State & state) {
 	auto randomness = std::mt19937_64(77342348);
 	for (auto _ : state) {
-		auto to_sort = create_limited_radix_sort_data(randomness, static_cast<std::int8_t>(state.range(0)));
+		auto to_sort = create_limited_radix_sort_data(randomness, static_cast<std::int8_t>(get_value(state)));
 		benchmark::DoNotOptimize(containers::data(to_sort));
 		benchmark::ClobberMemory();
 	}
@@ -193,7 +192,7 @@ BENCHMARK(benchmark_limited_generation)->LIMITED_RANGE();
 void benchmark_limited_inplace_sort(benchmark::State & state) {
 	std::mt19937_64 randomness(77342348);
 	for (auto _ : state) {
-		auto to_sort = create_limited_radix_sort_data(randomness, static_cast<std::int8_t>(state.range(0)));
+		auto to_sort = create_limited_radix_sort_data(randomness, static_cast<std::int8_t>(get_value(state)));
 		benchmark::DoNotOptimize(containers::data(to_sort));
 		ska_sort(to_sort);
 		assert(containers::is_sorted(to_sort));
@@ -226,7 +225,7 @@ BENCHMARK(benchmark_limited_inplace_sort)->LIMITED_RANGE();
 	} while (false)
 
 auto create_simple_data = [](auto distribution) {
-	return [=](auto & engine, std::int64_t const size) {
+	return [=](auto & engine, bounded::bounded_integer auto const size) {
 		return create_radix_sort_data(engine, size, distribution);
 	};
 };
@@ -234,19 +233,18 @@ auto create_simple_data = [](auto distribution) {
 // Technically this does not allow sharing a distribution for the same type, but
 // that is probably not a serious problem for this use case
 auto create_tuple_data = [](auto... distributions) {
-	return [=](auto & engine, std::int64_t const size) mutable {
+	return [=](auto & engine, bounded::bounded_integer auto const size) mutable {
 		return create_radix_sort_data(engine, size, [&](auto &) {
 			return std::tuple(distributions(engine)...);
 		});
 	};
 };
 
-auto create_range_data = [](int max_size, auto generate) {
-	auto size_distribution = std::uniform_int_distribution(0, max_size);
-	return [=](auto & engine, std::int64_t const size) mutable {
-		// TODO: Use integer range
+auto create_range_data = [](bounded::bounded_integer auto const max_size, auto generate) {
+	auto size_distribution = std::uniform_int_distribution(0, static_cast<int>(max_size));
+	return [=](auto & engine, bounded::bounded_integer auto const size) mutable {
 		return create_radix_sort_data(engine, size, [&](auto &) {
-			return generate(engine, size_distribution(engine));
+			return generate(engine, bounded::assume_in_range(size_distribution(engine), 0_bi, max_size));
 		});
 	};
 };
@@ -365,33 +363,31 @@ void register_all_benchmarks() {
 	REGISTER_SOME_BENCHMARKS(
 		"vector_int_narrow",
 		create_range_data(
-			20,
-			[value_distribution = std::uniform_int_distribution()](auto & engine, auto size) mutable {
+			20_bi,
+			[value_distribution = std::uniform_int_distribution()](auto & engine, bounded::bounded_integer auto size) mutable {
 				return create_radix_sort_data(engine, size, value_distribution);
 			}
 		)
 	);
 	REGISTER_SOME_BENCHMARKS(
 		"vector_int_wide",
-		create_range_data(128, [](auto &, auto size) {
-			auto to_add = std::vector<int>(static_cast<std::size_t>(size));
-			std::iota(to_add.begin(), to_add.end(), 0);
-			return to_add;
+		create_range_data(128_bi, [](auto &, auto size) {
+			return containers::vector(containers::integer_range(static_cast<int>(size)));
 		})
 	);
 	REGISTER_SOME_BENCHMARKS(
 		"string",
-		create_range_data(20, [char_distribution = std::uniform_int_distribution('a', 'z')](auto & engine, auto size) mutable {
-			return create_radix_sort_data<std::string>(engine, size, char_distribution);
+		create_range_data(20_bi, [char_distribution = std::uniform_int_distribution('a', 'z')](auto & engine, auto size) mutable {
+			return create_radix_sort_data<containers::string>(engine, size, char_distribution);
 		})
 	);
 	REGISTER_SOME_BENCHMARKS(
 		"vector_string",
-		create_range_data(10, [](auto & engine, auto size) {
+		create_range_data(10_bi, [](auto & engine, auto size) {
 			auto function = [&, char_distribution = std::uniform_int_distribution('a', 'c')](auto &, auto inner_size) mutable {
-				return create_radix_sort_data<std::string>(engine, inner_size, char_distribution);
+				return create_radix_sort_data<containers::string>(engine, inner_size, char_distribution);
 			};
-			return create_range_data(5, function)(engine, size);
+			return create_range_data(5_bi, function)(engine, size);
 		})
 	);
 }
