@@ -35,8 +35,6 @@ constexpr void inplace_radix_sort(range auto && to_sort) {
 	inplace_radix_sort(to_sort, containers::to_radix_sort_key);
 }
 
-#define SKA_SORT_NOINLINE __attribute__((noinline))
-
 template<typename Container>
 auto create_radix_sort_data(std::mt19937_64 & engine, std::int64_t const size, auto distribution) {
 	auto result = Container();
@@ -55,7 +53,7 @@ auto create_radix_sort_data(std::mt19937_64 & engine, std::int64_t const size, a
 #if 0
 
 extern const std::vector<const char *> & get_word_list();
-std::vector<std::string> SKA_SORT_NOINLINE create_radix_sort_data(std::mt19937_64 & randomness, std::int64_t size)
+std::vector<std::string> create_radix_sort_data(std::mt19937_64 & randomness, std::int64_t size)
 {
 	const std::vector<const char *> & words = get_word_list();
 	std::vector<std::string> result;
@@ -187,7 +185,7 @@ void benchmark_generation(benchmark::State & state, auto create) {
 }
 
 
-auto SKA_SORT_NOINLINE create_limited_radix_sort_data(std::mt19937_64 & randomness, std::int8_t range_end) {
+auto create_limited_radix_sort_data(std::mt19937_64 & randomness, std::int8_t range_end) {
 	auto result = std::vector<std::int8_t>();
 	constexpr auto size = 2UZ * 1024UZ * 1024UZ;
 	result.reserve(size);
@@ -273,17 +271,16 @@ auto create_range_data = [](int max_size, auto generate) {
 using numeric_traits::min_value;
 using numeric_traits::max_value;
 
-auto SKA_SORT_NOINLINE create_radix_sort_data_bool(std::mt19937_64 & engine, std::int64_t const size) {
-	auto int_distribution = std::uniform_int_distribution<int>(0, 1);
-	return create_radix_sort_data<containers::vector<bool>>(engine, size, [&](auto &) {
+auto make_bool_distribution() {
+	return [int_distribution = std::uniform_int_distribution<short>(0, 1)](std::mt19937_64 & engine) mutable {
 		return int_distribution(engine) != 0;
-	});
+	};
 }
 
 void register_all_benchmarks() {
 	REGISTER_BENCHMARK(
 		"bool",
-		create_radix_sort_data_bool
+		create_simple_data(make_bool_distribution())
 	);
 	REGISTER_BENCHMARK(
 		"uint8",
