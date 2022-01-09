@@ -38,28 +38,48 @@
 namespace containers {
 namespace detail {
 
+template<typename T>
+concept move_constructible = std::is_move_constructible_v<T>;
+template<typename T>
+concept trivially_move_constructible = move_constructible<T> and std::is_trivially_move_constructible_v<T>;
+
+template<typename T>
+concept copy_constructible = std::is_copy_constructible_v<T>;
+template<typename T>
+concept trivially_copy_constructible = copy_constructible<T> and std::is_trivially_copy_constructible_v<T>;
+
+template<typename T>
+concept move_assignable = std::is_move_assignable_v<T>;
+template<typename T>
+concept trivially_move_assignable = move_assignable<T> and std::is_trivially_move_assignable_v<T>;
+
+template<typename T>
+concept copy_assignable = std::is_copy_assignable_v<T>;
+template<typename T>
+concept trivially_copy_assignable = copy_assignable<T> and std::is_trivially_copy_assignable_v<T>;
+
 template<typename T, std::size_t capacity_, bool = std::is_trivially_destructible_v<T>>
 struct static_vector_data : private lexicographical_comparison::base {
 	static_vector_data() = default;
 
-	static_vector_data(static_vector_data &&) requires std::is_trivially_move_constructible_v<T> = default;
-	static_vector_data(static_vector_data const &) requires std::is_trivially_copy_constructible_v<T> = default;
-	static_vector_data & operator=(static_vector_data &&) & requires std::is_trivially_move_assignable_v<T> = default;
-	static_vector_data & operator=(static_vector_data const &) & requires std::is_trivially_copy_assignable_v<T> = default;
+	static_vector_data(static_vector_data &&) requires trivially_move_constructible<T> = default;
+	static_vector_data(static_vector_data const &) requires trivially_copy_constructible<T> = default;
+	static_vector_data & operator=(static_vector_data &&) & requires trivially_move_assignable<T> = default;
+	static_vector_data & operator=(static_vector_data const &) & requires trivially_copy_assignable<T> = default;
 
-	constexpr static_vector_data(static_vector_data && other) noexcept(std::is_nothrow_move_constructible_v<T>) {
+	constexpr static_vector_data(static_vector_data && other) noexcept(std::is_nothrow_move_constructible_v<T>) requires move_constructible<T> {
 		containers::uninitialized_relocate_no_overlap(other, begin());
 		this->m_size = std::exchange(other.m_size, 0_bi);
 	}
-	constexpr static_vector_data(static_vector_data const & other) {
+	constexpr static_vector_data(static_vector_data const & other) requires copy_constructible<T> {
 		containers::assign_to_empty(*this, other);
 	}
 
-	constexpr auto & operator=(static_vector_data && other) & noexcept(std::is_nothrow_move_assignable_v<T> and std::is_nothrow_move_constructible_v<T>) {
+	constexpr auto & operator=(static_vector_data && other) & noexcept(std::is_nothrow_move_assignable_v<T> and std::is_nothrow_move_constructible_v<T>) requires move_assignable<T> {
 		containers::assign(*this, std::move(other));
 		return *this;
 	}
-	constexpr auto & operator=(static_vector_data const & other) & {
+	constexpr auto & operator=(static_vector_data const & other) & requires copy_assignable<T> {
 		if (this != std::addressof(other)) {
 			containers::assign(*this, other);
 		}
