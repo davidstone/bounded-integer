@@ -52,32 +52,6 @@ auto create_radix_sort_data(std::mt19937_64 & engine, std::int64_t const size, a
 	return create_radix_sort_data<std::vector<decltype(distribution(engine))>>(engine, size, distribution);
 }
 
-
-#if 0
-
-extern const std::vector<const char *> & get_word_list();
-std::vector<std::string> create_radix_sort_data(std::mt19937_64 & randomness, std::int64_t size)
-{
-	const std::vector<const char *> & words = get_word_list();
-	std::vector<std::string> result;
-	result.reserve(size);
-	std::uniform_int_distribution<int> string_length_distribution(0, 10);
-	//std::uniform_int_distribution<int> string_length_distribution(1, 3);
-	std::uniform_int_distribution<size_t> word_picker(0, words.size() - 1);
-	for (std::int64_t outer = 0; outer < size; ++outer)
-	{
-		std::string to_add;
-		for (int inner = 0, end = string_length_distribution(randomness); inner < end; ++inner)
-		{
-			to_add += words[word_picker(randomness)];
-		}
-		result.push_back(std::move(to_add));
-	}
-	return result;
-}
-
-#endif
-
 constexpr int profile_multiplier = 2;
 constexpr int max_profile_range = 1 << 20;
 
