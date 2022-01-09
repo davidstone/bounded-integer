@@ -37,14 +37,8 @@
 namespace containers {
 namespace detail {
 
-template<typename>
-constexpr inline auto is_view = false;
-
-template<typename Iterator, typename Sentinel>
-constexpr inline auto is_view<range_view<Iterator, Sentinel>> = true;
-
 template<typename T>
-concept view = is_view<T>;
+concept view = is_range_view<T>;
 
 struct PartitionInfo {
 	constexpr PartitionInfo()
