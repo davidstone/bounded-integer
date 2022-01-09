@@ -77,55 +77,6 @@ std::vector<std::string> SKA_SORT_NOINLINE create_radix_sort_data(std::mt19937_6
 
 #endif
 
-#if 0
-struct benchmark_sort_value {
-	std::array<uint8_t, 1016> array = {};
-};
-#define SORT_ON_FIRST_ONLY
-typedef std::int64_t benchmark_sort_key;
-#define NUM_SORT_KEYS 1
-#if NUM_SORT_KEYS == 1
-std::vector<std::tuple<benchmark_sort_key, benchmark_sort_value>> SKA_SORT_NOINLINE create_radix_sort_data(std::mt19937_64 & randomness, int size)
-{
-	std::vector<std::tuple<benchmark_sort_key, benchmark_sort_value>> result;
-	result.reserve(size);
-	std::uniform_int_distribution<benchmark_sort_key> distribution(numeric_traits::min_value<benchmark_sort_key>, numeric_traits::max_value<benchmark_sort_key>);
-	for (int i = 0; i < size; ++i)
-	{
-		result.push_back(distribution(randomness), benchmark_sort_value());
-	}
-	return result;
-}
-#elif NUM_SORT_KEYS == 2
-std::vector<std::tuple<std::pair<benchmark_sort_key, benchmark_sort_key>, benchmark_sort_value>> SKA_SORT_NOINLINE create_radix_sort_data(std::mt19937_64 & randomness, int size)
-{
-	std::vector<std::tuple<std::pair<benchmark_sort_key, benchmark_sort_key>, benchmark_sort_value>> result;
-	result.reserve(size);
-	std::uniform_int_distribution<benchmark_sort_key> distribution(numeric_traits::min_value<benchmark_sort_key>, numeric_traits::max_value<benchmark_sort_key>);
-	for (int i = 0; i < size; ++i)
-	{
-		result.push_back(std::make_pair(distribution(randomness), distribution(randomness)), benchmark_sort_value());
-	}
-	return result;
-}
-#else
-std::vector<std::tuple<std::array<benchmark_sort_key, NUM_SORT_KEYS>, benchmark_sort_value>> SKA_SORT_NOINLINE create_radix_sort_data(std::mt19937_64 & randomness, int size)
-{
-	std::vector<std::tuple<std::array<benchmark_sort_key, NUM_SORT_KEYS>, benchmark_sort_value>> result;
-	result.reserve(size);
-	std::uniform_int_distribution<benchmark_sort_key> distribution(numeric_traits::min_value<benchmark_sort_key>, numeric_traits::max_value<benchmark_sort_key>);
-	for (int i = 0; i < size; ++i)
-	{
-		std::array<benchmark_sort_key, NUM_SORT_KEYS> key;
-		for (int i = 0; i < NUM_SORT_KEYS; ++i)
-			key[i] = distribution(randomness);
-		result.push_back(key, benchmark_sort_value());
-	}
-	return result;
-}
-#endif
-#endif
-
 constexpr int profile_multiplier = 2;
 constexpr int max_profile_range = 1 << 20;
 
