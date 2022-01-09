@@ -28,7 +28,10 @@ namespace {
 using namespace containers;
 
 constexpr void inplace_radix_sort(range auto && to_sort, auto extract_key) {
-	detail::inplace_radix_sort<1>(containers::range_view(to_sort), extract_key);
+	detail::inplace_radix_sort<1>(
+		containers::range_view(containers::begin(to_sort), containers::end(to_sort)),
+		extract_key
+	);
 }
 
 constexpr void inplace_radix_sort(range auto && to_sort) {
@@ -119,7 +122,13 @@ void benchmark_std_sort(benchmark::State & state, auto create) {
 }
 
 void american_flag_sort(range auto && to_sort, auto && extract_key) {
-	detail::inplace_radix_sort<numeric_traits::max_value<std::ptrdiff_t>>(containers::range_view(to_sort), extract_key);
+	detail::inplace_radix_sort<numeric_traits::max_value<std::ptrdiff_t>>(
+		containers::range_view(
+			containers::begin(to_sort),
+			containers::end(to_sort)
+		),
+		extract_key
+	);
 }
 
 void american_flag_sort(range auto && to_sort) {

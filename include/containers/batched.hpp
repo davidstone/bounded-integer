@@ -20,7 +20,7 @@ using namespace bounded::literal;
 
 struct batch_sentinel {};
 
-template<typename Iterator, typename Sentinel, typename Count>
+template<typename Iterator, typename Sentinel, typename Size, typename Count>
 struct batch_iterator {
 	using value_type = range_view<Iterator>;
 	using difference_type = bounded::integer<
@@ -31,7 +31,7 @@ struct batch_iterator {
 	using reference = value_type;
 	using iterator_category = std::random_access_iterator_tag;
 
-	constexpr explicit batch_iterator(range_view<Iterator, Sentinel> const all, Count const number_of_batches):
+	constexpr explicit batch_iterator(range_view<Iterator, Sentinel, Size> const all, Count const number_of_batches):
 		m_all(all),
 		m_number_of_batches(number_of_batches),
 		m_batch(0_bi)
@@ -80,9 +80,10 @@ private:
 		auto const total_elements = containers::size(m_all);
 		auto const base = total_elements / m_number_of_batches;
 		auto const add_one_if_below = total_elements % m_number_of_batches;
-		return bounded::assume_in_range<range_size_t<range_view<Iterator, Sentinel>>>(base * batch + bounded::min(add_one_if_below, batch));
+		using offset_t = offset_type<iterator_t<range_view<Iterator, Sentinel, Size>>>;
+		return bounded::assume_in_range<offset_t>(base * batch + bounded::min(add_one_if_below, batch));
 	}
-	[[no_unique_address]] range_view<Iterator, Sentinel> m_all;
+	[[no_unique_address]] range_view<Iterator, Sentinel, Size> m_all;
 	[[no_unique_address]] bounded::integer<1, bounded::builtin_max_value<Count>> m_number_of_batches;
 	[[no_unique_address]] batch_t m_batch;
 };

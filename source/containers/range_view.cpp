@@ -10,7 +10,19 @@
 
 namespace {
 
+static_assert(containers::range<containers::range_view<int *>>);
+
 constexpr auto a = containers::array({0, 1, 2, 3, 4});
+
+static_assert(std::is_same_v<
+	decltype(containers::range_view(a)),
+	containers::range_view<
+		containers::contiguous_iterator<int const, 5>,
+		containers::detail::compute_end_from_size,
+		bounded::constant_t<5>
+	>
+>);
+
 static_assert(containers::equal(a, containers::range_view(a)));
 
 } // namespace

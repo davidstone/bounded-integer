@@ -45,7 +45,10 @@ static_assert(test_common_prefix<containers::array<std::uint8_t, 1>>(
 
 
 constexpr auto test_sort(auto data, auto function) {
-	containers::detail::inplace_radix_sort<1>(containers::range_view(data.input), function);
+	containers::detail::inplace_radix_sort<1>(
+		containers::range_view(containers::begin(data.input), containers::end(data.input)),
+		function
+	);
 	BOUNDED_TEST(data.input == data.expected);
 	return true;
 }

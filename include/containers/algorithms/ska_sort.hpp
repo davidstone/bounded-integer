@@ -268,7 +268,13 @@ private:
 			auto const end_offset = ::bounded::assume_in_range<difference_type>(partitions.partitions[*it].next_offset);
 			auto const partition_end = first + end_offset;
 			if (partition_end - partition_begin > bounded::constant<1>) {
-				sort_selector(containers::range_view(partition_begin, partition_end), extract_key, next_sort, sort_data, offset + 1U);
+				sort_selector(
+					range_view(partition_begin, partition_end),
+					extract_key,
+					next_sort,
+					sort_data,
+					offset + 1U
+				);
 			}
 			partition_begin = partition_end;
 		}
@@ -306,7 +312,13 @@ private:
 			auto partition_begin = first + start_offset;
 			auto partition_end = first + end_offset;
 			if (partition_end - partition_begin > bounded::constant<1>) {
-				sort_selector(containers::range_view(partition_begin, partition_end), extract_key, next_sort, sort_data, offset + 1U);
+				sort_selector(
+					range_view(partition_begin, partition_end),
+					extract_key,
+					next_sort,
+					sort_data,
+					offset + 1U
+				);
 			}
 		}
 	}
@@ -320,8 +332,16 @@ constexpr void inplace_sort(View to_sort, ExtractKey const & extract_key, NextSo
 	using SubKeyType = decltype(CurrentSubKey::sub_key(extract_key(containers::front(to_sort)), sort_data));
 	if constexpr (std::is_same_v<SubKeyType, bool>) {
 		auto middle = containers::partition(to_sort, [&](auto && a){ return !CurrentSubKey::sub_key(extract_key(a), sort_data); });
-		next_sort(containers::range_view(containers::begin(to_sort), middle), extract_key, sort_data);
-		next_sort(containers::range_view(middle, containers::end(to_sort)), extract_key, sort_data);
+		next_sort(
+			range_view(containers::begin(to_sort), middle),
+			extract_key,
+			sort_data
+		);
+		next_sort(
+			range_view(middle, containers::end(to_sort)),
+			extract_key,
+			sort_data
+		);
 	} else if constexpr (std::is_unsigned_v<SubKeyType>) {
 		UnsignedInplaceSorter<AmericanFlagSortThreshold, CurrentSubKey, sizeof(SubKeyType)>::sort(to_sort, extract_key, next_sort, sort_data);
 	} else {
@@ -412,11 +432,15 @@ private:
 		auto const first = containers::begin(to_sort);
 		auto const last = containers::end(to_sort);
 		if (end_of_shorter_ones - first > 1) {
-			sort_data.next_sort(containers::range_view(first, end_of_shorter_ones), extract_key, sort_data.next_sort_data);
+			sort_data.next_sort(
+				range_view(first, end_of_shorter_ones),
+				extract_key,
+				sort_data.next_sort_data
+			);
 		}
 		if (last - end_of_shorter_ones > bounded::constant<1>) {
 			inplace_sort<AmericanFlagSortThreshold, ElementSubKey>(
-				containers::range_view(end_of_shorter_ones, last),
+				range_view(end_of_shorter_ones, last),
 				extract_key,
 				static_cast<NextSort<View, ExtractKey>>(sort_from_recursion),
 				std::addressof(sort_data)
@@ -463,7 +487,13 @@ constexpr void inplace_radix_sort(view auto to_sort, auto const & extract_key) {
 
 struct ska_sort_t {
 	constexpr void operator()(range auto && to_sort, auto const & extract_key) const {
-		containers::detail::inplace_radix_sort<1024>(containers::range_view(to_sort), extract_key);
+		containers::detail::inplace_radix_sort<1024>(
+			range_view(
+				containers::begin(to_sort),
+				containers::end(to_sort)
+			),
+			extract_key
+		);
 	}
 	constexpr void operator()(range auto && to_sort) const {
 		operator()(to_sort, to_radix_sort_key);
