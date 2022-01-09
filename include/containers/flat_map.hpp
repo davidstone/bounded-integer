@@ -308,7 +308,6 @@ public:
 	using base::extract_key;
 
 	using base::base;
-	using base::operator=;
 
 	using base::begin;
 	using base::end;
@@ -359,7 +358,6 @@ public:
 	using base::extract_key;
 
 	using base::base;
-	using base::operator=;
 	
 	using base::begin;
 	using base::end;
