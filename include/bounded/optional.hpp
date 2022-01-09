@@ -212,7 +212,19 @@ public:
 	constexpr auto operator=(std::convertible_to<value_type> auto && other) & -> optional & {
 		return detail::assign(*this, OPERATORS_FORWARD(other));
 	}
-	
+		
+	friend constexpr auto operator==(optional const & lhs, optional const & rhs) -> bool requires equality_comparable<T> {
+		return (lhs and rhs) ?
+			*lhs == *rhs :
+			static_cast<bool>(lhs) == static_cast<bool>(rhs);
+	}
+	friend constexpr auto operator==(optional const & lhs, T const & rhs) -> bool requires equality_comparable<T> {
+		return static_cast<bool>(lhs) and *lhs == rhs;
+	}
+	friend constexpr auto operator==(optional const & lhs, none_t) -> bool {
+		return !lhs;
+	}
+
 private:
 	constexpr optional(auto && other_optional, common_init_tag):
 		optional(none) {
@@ -235,24 +247,6 @@ constexpr auto make_optional(auto && value) {
 
 constexpr auto make_optional_lazy(auto && function) -> optional<std::invoke_result_t<decltype(function)>> {
 	return {OPERATORS_FORWARD(function)()};
-}
-
-template<equality_comparable T>
-constexpr auto operator==(optional<T> const & lhs, optional<T> const & rhs) -> bool {
-	return (lhs and rhs) ?
-		*lhs == *rhs :
-		static_cast<bool>(lhs) == static_cast<bool>(rhs);
-}
-
-
-template<equality_comparable T>
-constexpr auto operator==(optional<T> const & lhs, T const & rhs) -> bool {
-	return static_cast<bool>(lhs) and *lhs == rhs;
-}
-
-template<typename T>
-constexpr auto operator==(optional<T> const & lhs, none_t) -> bool {
-	return !lhs;
 }
 
 } // namespace bounded
