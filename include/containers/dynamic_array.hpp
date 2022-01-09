@@ -121,6 +121,9 @@ private:
 	uninitialized_dynamic_array<T, size_type> m_data;
 };
 
+template<typename Range>
+dynamic_array(Range &&) -> dynamic_array<std::decay_t<range_value_t<Range>>>;
+
 template<typename T, typename Size>
 inline constexpr auto is_container<dynamic_array<T, Size>> = true;
 
