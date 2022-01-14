@@ -12,7 +12,7 @@
 namespace containers {
 
 template<typename T>
-concept associative_container = range<T> and requires {
+concept associative_container = forward_range<T> and requires {
 	typename std::remove_reference_t<T>::key_type;
 	typename std::remove_reference_t<T>::mapped_type;
 };
