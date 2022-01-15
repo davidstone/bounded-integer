@@ -8,6 +8,7 @@
 #include <containers/begin_end.hpp>
 #include <containers/contiguous_iterator.hpp>
 #include <containers/common_functions.hpp>
+#include <containers/is_container.hpp>
 
 #include <bounded/integer.hpp>
 #include <bounded/detail/make_index_sequence.hpp>
@@ -115,6 +116,8 @@ array(Args && ...) -> array<std::common_type_t<std::decay_t<Args>...>, sizeof...
 template<typename T, std::size_t size>
 array(c_array<T, size> &&) -> array<T, size>;
 
+template<typename T, std::size_t... sizes>
+inline constexpr auto is_container<array<T, sizes...>> = true;
 
 namespace detail {
 
