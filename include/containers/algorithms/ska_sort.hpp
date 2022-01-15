@@ -506,10 +506,9 @@ constexpr inline struct unique_ska_sort_t {
 		auto const equal = [&](auto const & lhs, auto const & rhs) {
 			return extract_key(lhs) == extract_key(rhs);
 		};
-		::containers::erase(
+		::containers::erase_after(
 			to_sort,
-			::containers::unique(containers::begin(to_sort), containers::end(to_sort), equal),
-			containers::end(to_sort)
+			::containers::unique(containers::begin(to_sort), containers::end(to_sort), equal)
 		);
 	}
 	constexpr void operator()(range auto & to_sort) const {
