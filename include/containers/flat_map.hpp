@@ -84,10 +84,6 @@ concept extract_key_function = requires(ExtractKey const & extract_key, T const 
 
 template<typename Container, extract_key_function<typename range_value_t<Container>::key_type> ExtractKey, bool allow_duplicates>
 struct flat_map_base : private lexicographical_comparison::base {
-private:
-	Container m_container;
-	[[no_unique_address]] ExtractKey m_extract_key;
-public:
 	using value_type = range_value_t<Container>;
 	using key_type = typename value_type::key_type;
 	using mapped_type = typename value_type::mapped_type;
@@ -270,6 +266,10 @@ public:
 	constexpr auto erase(const_iterator const first, const_iterator const last) {
 		return containers::erase(m_container, first, last);
 	}
+
+private:
+	Container m_container;
+	[[no_unique_address]] ExtractKey m_extract_key;
 };
 
 }	// namespace detail
