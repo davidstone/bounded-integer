@@ -10,6 +10,7 @@
 #include <containers/common_iterator_functions.hpp>
 #include <containers/is_iterator.hpp>
 #include <containers/iter_difference_t.hpp>
+#include <containers/iter_reference_t.hpp>
 #include <containers/iter_value_t.hpp>
 #include <containers/to_address.hpp>
 
@@ -21,14 +22,31 @@
 #include <iterator>
 
 namespace containers {
+namespace detail {
+
+template<typename Iterator>
+struct iterator_category_impl {
+	using type = typename Iterator::iterator_category;
+};
+
+template<forward_iterator Iterator>
+struct iterator_category_impl<Iterator> {
+	using type =
+		std::conditional_t<random_access_iterator<Iterator>, std::random_access_iterator_tag,
+		std::conditional_t<bidirectional_iterator<Iterator>, std::bidirectional_iterator_tag,
+		std::forward_iterator_tag
+	>>;
+};
+
+} // namespace detail
 
 template<typename Iterator>
 struct legacy_iterator {
 	using value_type = iter_value_t<Iterator>;
 	using difference_type = std::ptrdiff_t;
-	using pointer = typename std::iterator_traits<Iterator>::pointer;
-	using reference = typename std::iterator_traits<Iterator>::reference;
-	using iterator_category = typename std::iterator_traits<Iterator>::iterator_category;
+	using reference = iter_reference_t<Iterator>;
+	using pointer = std::add_pointer_t<reference>;
+	using iterator_category = typename detail::iterator_category_impl<Iterator>::type;
 
 	legacy_iterator() = default;
 	constexpr legacy_iterator(Iterator it):

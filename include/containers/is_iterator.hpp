@@ -12,16 +12,27 @@
 #include <type_traits>
 
 namespace containers {
+namespace detail {
+
+template<typename Iterator>
+concept only_input_or_output_iterator =
+	std::is_same_v<typename Iterator::iterator_category, std::input_iterator_tag> or
+	std::is_same_v<typename Iterator::iterator_category, std::output_iterator_tag>;
+
+} // namespace detail
 
 template<typename Iterator>
 concept iterator = requires(Iterator it) {
-	typename std::iterator_traits<Iterator>::iterator_category;
-	++it;
 	*it;
+	++it;
 };
 
 template<typename Iterator>
-concept forward_iterator = iterator<Iterator> and std::is_copy_constructible_v<Iterator> and !std::is_same_v<typename std::iterator_traits<Iterator>::iterator_category, std::input_iterator_tag>;
+concept forward_iterator =
+	iterator<Iterator> and
+	std::is_copy_constructible_v<Iterator> and
+	// This test is needed only to support legacy copyable iterators
+	!detail::only_input_or_output_iterator<Iterator>;
 
 template<typename Iterator>
 concept bidirectional_iterator = forward_iterator<Iterator> and requires(Iterator it) { --it; };

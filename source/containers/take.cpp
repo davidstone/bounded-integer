@@ -27,11 +27,7 @@ BOUNDED_COMMON_ARITHMETIC
 struct unsized_range_t {
 	struct const_iterator {
 		using underlying_iterator = containers::iterator_t<sized_range_t const>;
-		using value_type = typename underlying_iterator::value_type;
-		using difference_type = typename underlying_iterator::difference_type;
-		using pointer = typename underlying_iterator::pointer;
-		using reference = typename underlying_iterator::reference;
-		using iterator_category = std::forward_iterator_tag;
+		using difference_type = containers::iter_difference_t<underlying_iterator>;
 		constexpr explicit const_iterator(underlying_iterator const it):
 			m_it(it)
 		{

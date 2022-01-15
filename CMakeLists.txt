@@ -206,8 +206,10 @@ add_executable(containers_test
 	source/containers/is_iterator_sentinel.cpp
 	source/containers/is_range.cpp
 	source/containers/iter_difference_t.cpp
+	source/containers/iter_reference_t.cpp
 	source/containers/iter_value_t.cpp
 	source/containers/iterator_adapter.cpp
+	source/containers/iterator_category_base.cpp
 	source/containers/iterator_t.cpp
 	source/containers/key_comparison_function.cpp
 	source/containers/lazy_push_back.cpp

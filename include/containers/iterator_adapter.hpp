@@ -6,66 +6,30 @@
 #pragma once
 
 #include <containers/common_iterator_functions.hpp>
-#include <containers/iter_difference_t.hpp>
-#include <containers/iter_value_t.hpp>
+#include <containers/is_iterator.hpp>
+#include <containers/iterator_category_base.hpp>
 #include <containers/reference_wrapper.hpp>
-
-#include <bounded/integer.hpp>
 
 #include <operators/operators.hpp>
 
-#include <iterator>
 #include <type_traits>
 #include <utility>
 
 namespace containers {
-
 namespace detail {
 
-template<typename Iterator, typename Traits>
-concept adapted_random_access_iterator = requires(Iterator it, Traits traits) { traits.subtract(it, it); };
-
-template<typename Iterator, typename Traits>
-concept adapted_bidirectional_iterator = requires(Iterator it, Traits traits) {
-	traits.add(it, bounded::constant<1>);
-	traits.add(it, bounded::constant<-1>);
+template<typename T>
+struct adapted_difference_type {
 };
 
-template<typename Iterator, typename Traits>
-concept adapted_forward_iterator = requires(Iterator it, Traits traits) { traits.add(it, bounded::constant<1>); };
-
-// This provides the nested typedefs iterator_category and difference_type if
-// and only if Iterator is an iterator, not a sentinel
-template<typename Iterator, typename Traits>
-struct iterator_typedefs_base {
-};
-
-template<typename Iterator, typename Traits> requires iterator<Iterator>
-struct iterator_typedefs_base<Iterator, Traits> {
-private:
-	using base_category = typename std::iterator_traits<Iterator>::iterator_category;
-public:
-	using reference = decltype(::containers::detail::unwrap(std::declval<Traits>()).dereference(std::declval<Iterator>()));
-	using value_type = std::remove_cvref_t<reference>;
-
-	// Not sure what this actually means...
-	using pointer = std::remove_reference_t<reference> *;
-
+template<iterator T>
+struct adapted_difference_type<T> {
 	// TODO: technically not correct. For instance, consider an iterator adapter
 	// that visits each element twice.
-	using difference_type = iter_difference_t<Iterator>;
-	using iterator_category =
-		std::conditional_t<std::is_same_v<base_category, std::output_iterator_tag>, std::output_iterator_tag,
-		std::conditional_t<std::is_same_v<base_category, std::input_iterator_tag>, std::input_iterator_tag,
-		std::conditional_t<detail::adapted_random_access_iterator<Iterator, Traits>, std::random_access_iterator_tag,
-		std::conditional_t<detail::adapted_bidirectional_iterator<Iterator, Traits>, std::bidirectional_iterator_tag,
-		std::conditional_t<detail::adapted_forward_iterator<Iterator, Traits>, std::forward_iterator_tag,
-		void
-	>>>>>;
-	static_assert(not std::is_void_v<iterator_category>);
+	using difference_type = iter_difference_t<T>;
 };
 
-}	// namespace detail
+} // namespace detail
 
 // There are a few functions of interest for an iterator:
 // 1) Dereferencing: *it
@@ -80,12 +44,7 @@ public:
 // that unifies these operations.
 
 template<typename Iterator, typename Traits>
-struct adapt_iterator :
-	detail::iterator_typedefs_base<Iterator, decltype(::containers::detail::unwrap(std::declval<Traits>()))>
-{
-	static_assert(std::is_copy_assignable_v<Iterator>);
-	static_assert(std::is_copy_assignable_v<Traits>);
-
+struct adapt_iterator : detail::iterator_category_base<Iterator>, detail::adapted_difference_type<Iterator> {
 	adapt_iterator() = default;
 
 	constexpr adapt_iterator(Iterator it, Traits traits):

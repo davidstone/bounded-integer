@@ -22,15 +22,6 @@ struct batch_sentinel {};
 
 template<typename Iterator, typename Sentinel, typename Size, typename Count>
 struct batch_iterator {
-	using value_type = range_view<Iterator>;
-	using difference_type = bounded::integer<
-		-bounded::builtin_max_value<Count>,
-		bounded::builtin_max_value<Count>
-	>;
-	using pointer = value_type *;
-	using reference = value_type;
-	using iterator_category = std::random_access_iterator_tag;
-
 	constexpr explicit batch_iterator(range_view<Iterator, Sentinel, Size> const all, Count const number_of_batches):
 		m_all(all),
 		m_number_of_batches(number_of_batches),
@@ -40,7 +31,7 @@ struct batch_iterator {
 
 	constexpr auto operator*() const {
 		auto const first = containers::begin(m_all);
-		return value_type(
+		return range_view<Iterator>(
 			first + elements_prior_to_batch(m_batch),
 			first + elements_prior_to_batch(bounded::assume_in_range<batch_t>(m_batch + 1_bi))
 		);

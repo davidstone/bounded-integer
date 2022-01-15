@@ -9,6 +9,7 @@
 #include <containers/begin_end.hpp>
 #include <containers/common_iterator_functions.hpp>
 #include <containers/iter_difference_t.hpp>
+#include <containers/iterator_category_base.hpp>
 #include <containers/iterator_t.hpp>
 #include <containers/iter_value_t.hpp>
 #include <containers/range_view.hpp>
@@ -55,12 +56,8 @@ private:
 };
 
 template<typename Iterator, typename Count>
-struct counted_iterator {
-	using iterator_category = typename std::iterator_traits<Iterator>::iterator_category;
-	using value_type = iter_value_t<Iterator>;
+struct counted_iterator : iterator_category_base<Iterator> {
 	using difference_type = decltype(std::declval<Count>() - std::declval<Count>());
-	using pointer = typename std::iterator_traits<Iterator>::pointer;
-	using reference = typename std::iterator_traits<Iterator>::reference;
 
 	constexpr explicit counted_iterator(Iterator it, Count count):
 		m_it(std::move(it)),
@@ -139,11 +136,7 @@ private:
 
 template<typename Iterator, typename Count>
 struct random_access_counted_iterator {
-	using iterator_category = typename std::iterator_traits<Iterator>::iterator_category;
-	using value_type = iter_value_t<Iterator>;
 	using difference_type = decltype(std::declval<Count>() - std::declval<Count>());
-	using pointer = typename std::iterator_traits<Iterator>::pointer;
-	using reference = typename std::iterator_traits<Iterator>::reference;
 
 	constexpr explicit random_access_counted_iterator(Iterator it):
 		m_it(std::move(it))

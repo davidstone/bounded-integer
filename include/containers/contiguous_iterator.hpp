@@ -20,11 +20,7 @@ namespace containers {
 
 template<typename T, std::ptrdiff_t max_difference>
 struct contiguous_iterator {
-	using value_type = std::remove_cv_t<T>;
 	using difference_type = bounded::integer<bounded::normalize<-max_difference>, bounded::normalize<max_difference>>;
-	using pointer = T *;
-	using reference = T &;
-	using iterator_category = std::random_access_iterator_tag;
 
 	contiguous_iterator() = default;
 	constexpr explicit contiguous_iterator(T * ptr):

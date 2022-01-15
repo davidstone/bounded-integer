@@ -18,12 +18,6 @@ using namespace bounded::literal;
 
 template<typename T>
 struct empty_iterator {
-	using value_type = T;
-	using difference_type = bounded::constant_t<0>;
-	using pointer = T *;
-	using reference = T;
-	using iterator_category = std::random_access_iterator_tag;
-
 	empty_iterator() = default;
 	
 	constexpr decltype(auto) operator*() const {

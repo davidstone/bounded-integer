@@ -6,7 +6,6 @@
 #pragma once
 
 #include <containers/common_functions.hpp>
-#include <containers/offset_type.hpp>
 #include <containers/range_view.hpp>
 
 #include <bounded/assert.hpp>
@@ -28,11 +27,6 @@ struct single_element_sentinel {
 template<typename T>
 struct single_element_iterator {
 	static_assert(std::is_reference_v<T>);
-	using value_type = std::remove_cvref_t<T>;
-	using difference_type = bounded::integer<0, 1>;
-	using pointer = value_type *;
-	using reference = T;
-	using iterator_category = std::output_iterator_tag;
 
 	single_element_iterator() = default;
 	constexpr explicit single_element_iterator(T && value):
@@ -60,7 +54,7 @@ struct single_element_iterator {
 		return lhs.m_is_end;
 	}
 
-	friend constexpr auto operator+(single_element_iterator lhs, offset_type<single_element_iterator> const offset) {
+	friend constexpr auto operator+(single_element_iterator lhs, bounded::integer<0, 1> const offset) {
 		if (offset == 1_bi) {
 			BOUNDED_ASSERT_OR_ASSUME(!lhs.m_is_end);
 			lhs.m_is_end = true;
@@ -68,7 +62,7 @@ struct single_element_iterator {
 		return lhs;
 	}
 
-	friend constexpr auto operator-(single_element_iterator lhs, offset_type<single_element_iterator> const offset) {
+	friend constexpr auto operator-(single_element_iterator lhs, bounded::integer<0, 1> const offset) {
 		if (offset == 1_bi) {
 			BOUNDED_ASSERT_OR_ASSUME(lhs.m_is_end);
 			lhs.m_is_end = false;

@@ -36,15 +36,7 @@ private:
 	>;
 
 public:
-	using value_type = std::conditional_t<
-		use_bounded,
-		bounded_type,
-		typename bounded_type::underlying_type
-	>;
 	using difference_type = decltype((std::declval<storage_type>() - std::declval<storage_type>()) / std::declval<Step>());
-	using pointer = value_type const *;
-	using reference = value_type;
-	using iterator_category = std::random_access_iterator_tag;
 
 	integer_range_iterator() = default;
 	explicit constexpr integer_range_iterator(storage_type const value, Step const step):
@@ -58,7 +50,7 @@ public:
 		return (lhs.m_value - rhs.m_value) / lhs.m_step;
 	}
 
-	friend constexpr auto operator+(integer_range_iterator const lhs, std::convertible_to<difference_type> auto const rhs) {
+	friend constexpr auto operator+(integer_range_iterator const lhs, difference_type const rhs) {
 		if constexpr (has_no_values) {
 			bounded::unreachable();
 			return lhs;
@@ -85,6 +77,11 @@ public:
 
 	// It is undefined behavior to dereference a past-the-end iterator.
 	constexpr auto operator*() const {
+		using value_type = std::conditional_t<
+			use_bounded,
+			bounded_type,
+			typename bounded_type::underlying_type
+		>;
 		return ::bounded::assume_in_range<value_type>(m_value);
 	}
 

@@ -76,17 +76,10 @@ private:
 		numeric_traits::max_value<iter_difference_t<ForwardIterator2>>
 	);
 public:
-	using value_type = std::pair<
-		decltype(*std::declval<ForwardIterator1>()),
-		decltype(*std::declval<ForwardIterator2>())
-	>;
 	using difference_type = bounded::integer<
 		bounded::normalize<-max_difference>,
 		bounded::normalize<max_difference>
 	>;
-	using pointer = value_type *;
-	using reference = value_type;
-	using iterator_category = std::forward_iterator_tag;
 	
 	constexpr set_intersection_pair_iterator(Members & members, ForwardIterator1 it1, ForwardIterator2 it2):
 		m_members(members),
@@ -114,7 +107,11 @@ private:
 
 template<typename Members, typename ForwardIterator1, typename ForwardIterator2>
 constexpr auto operator*(set_intersection_pair_iterator<Members, ForwardIterator1, ForwardIterator2> const it) {
-	return typename set_intersection_pair_iterator<Members, ForwardIterator1, ForwardIterator2>::value_type(*it.first(), *it.second());
+	using value_type = std::pair<
+		decltype(*std::declval<ForwardIterator1>()),
+		decltype(*std::declval<ForwardIterator2>())
+	>;
+	return value_type(*it.first(), *it.second());
 }
 
 // These functions can compare only one pair of iterators because it is not

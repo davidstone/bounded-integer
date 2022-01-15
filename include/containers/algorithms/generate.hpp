@@ -51,10 +51,7 @@ private:
 
 public:
 	using iterator_category = std::input_iterator_tag;
-	using reference = std::invoke_result_t<Function &>;
-	using value_type = std::remove_cvref_t<reference>;
 	using difference_type = decltype(std::declval<Size>() - std::declval<Size>());
-	using pointer = std::remove_reference_t<reference> *;
 	
 	constexpr generate_n_iterator(Size const remaining, Function & generator):
 		m_remaining(remaining),

@@ -1,4 +1,4 @@
-// Copyright David Stone 2021.
+// Copyright David Stone 2022.
 // Distributed under the Boost Software License, Version 1.0.
 // (See accompanying file LICENSE_1_0.txt or copy at
 // http://www.boost.org/LICENSE_1_0.txt)
@@ -13,22 +13,22 @@ namespace containers {
 namespace detail {
 
 template<typename Iterator>
-concept has_value_type = requires { typename Iterator::value_type; };
+concept has_reference_type = requires { typename Iterator::reference_type; };
 
 template<typename Iterator, typename T>
-concept value_type_matches =
-	!has_value_type<Iterator> or
-	std::is_same_v<typename Iterator::value_type, T>;
+concept reference_type_matches =
+	!has_reference_type<Iterator> or
+	std::is_same_v<typename Iterator::reference_type, T>;
 
 template<typename Iterator>
-struct iter_value_t_impl {
-	using type = std::remove_cvref_t<decltype(*std::declval<Iterator>())>;
-	static_assert(value_type_matches<Iterator, type>);
+struct iter_reference_t_impl {
+	using type = decltype(*std::declval<Iterator>());
+	static_assert(reference_type_matches<Iterator, type>);
 };
 
 } // namespace detail
 
 template<iterator Iterator>
-using iter_value_t = typename detail::iter_value_t_impl<Iterator>::type;
+using iter_reference_t = typename detail::iter_reference_t_impl<Iterator>::type;
 
 } // namespace containers

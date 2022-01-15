@@ -11,6 +11,7 @@
 #include <containers/is_empty.hpp>
 #include <containers/is_range.hpp>
 #include <containers/iter_difference_t.hpp>
+#include <containers/iter_reference_t.hpp>
 #include <containers/iter_value_t.hpp>
 #include <containers/iterator_t.hpp>
 #include <containers/range_value_t.hpp>
@@ -47,13 +48,13 @@ constexpr auto assert_same_ends(LHS const & lhs, RHS const & rhs) {
 	BOUNDED_ASSERT(have_same_ends(lhs, rhs, bounded::make_index_sequence(bounded::tuple_size<LHS>)));
 }
 
-template<typename RangeView>
-using view_iterator_traits = std::iterator_traits<iterator_t<RangeView>>;
+template<typename Category, typename RangeView>
+concept one_is_category = std::is_same_v<typename iterator_t<RangeView>::iterator_category, Category>;
 
-template<typename category, typename... RangeViews>
+template<typename Category, typename... RangeViews>
 inline constexpr bool any_is_category = (
 	... or
-	std::is_same_v<typename view_iterator_traits<RangeViews>::iterator_category, category>
+	one_is_category<Category, RangeViews>
 );
 
 template<typename... RangeViews>
@@ -83,9 +84,6 @@ struct concatenate_view_iterator {
 		"Cannot combine input and output ranges in concatenate_view"
 	);
 
-	using value_type = bounded::detail::common_type_and_value_category_t<
-		range_value_t<RangeViews>...
-	>;
 	using difference_type = decltype((0_bi + ... + std::declval<iter_difference_t<iterator_t<RangeViews>>>()));
 	
 	using iterator_category =
@@ -94,10 +92,8 @@ struct concatenate_view_iterator {
 		std::forward_iterator_tag
 	>>;
 	
-	using pointer = std::remove_reference_t<value_type> *;
-
 	using reference = bounded::detail::common_type_and_value_category_t<
-		typename detail::view_iterator_traits<RangeViews>::reference...
+		iter_reference_t<iterator_t<RangeViews>>...
 	>;
 
 	constexpr explicit concatenate_view_iterator(RangeViews... range_views):

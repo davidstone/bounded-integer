@@ -21,7 +21,7 @@
 namespace bounded {
 namespace detail {
 
-template<typename T, typename value_type = typename std::iterator_traits<T>::value_type>
+template<typename T, typename value_type = std::remove_cvref_t<decltype(*std::declval<T>())>>
 concept std_random_access_iterator =
 	!std::is_void_v<value_type> and !std::is_reference_v<value_type> and !std::is_const_v<value_type> and (
 		std::is_same_v<T, std::string::iterator> or
@@ -34,7 +34,7 @@ concept std_random_access_iterator =
 
 template<
 	typename T,
-	typename value_type = typename std::iterator_traits<T>::value_type,
+	typename value_type = std::remove_cvref_t<decltype(*std::declval<T>())>,
 	typename key_type = typename value_type::first_type,
 	typename mapped_type = typename value_type::second_type
 >
@@ -53,7 +53,7 @@ concept std_map_bidirectional_iterator =
 		std::is_same_v<T, typename std::unordered_multimap<key_type, mapped_type>::const_iterator>
 	);
 
-template<typename T, typename value_type = typename std::iterator_traits<T>::value_type>
+template<typename T, typename value_type = std::remove_cvref_t<decltype(*std::declval<T>())>>
 concept std_bidirectional_iterator =
 	!std::is_void_v<value_type> and !std::is_reference_v<value_type> and !std::is_const_v<value_type> and (
 		std_random_access_iterator<T> or
@@ -70,7 +70,7 @@ concept std_bidirectional_iterator =
 		std::is_same_v<T, typename std::unordered_multiset<value_type>::const_iterator>
 	);
 
-template<typename T, typename value_type = typename std::iterator_traits<T>::value_type>
+template<typename T, typename value_type = std::remove_cvref_t<decltype(*std::declval<T>())>>
 concept std_iterator =
 	!std::is_void_v<value_type> and !std::is_reference_v<value_type> and !std::is_const_v<value_type> and (
 		std_bidirectional_iterator<T> or
@@ -82,7 +82,7 @@ concept std_iterator =
 
 template<detail::std_random_access_iterator Iterator>
 constexpr auto operator+(Iterator const it, bounded::bounded_integer auto const offset) {
-	return it + static_cast<typename std::iterator_traits<Iterator>::difference_type>(offset);
+	return it + static_cast<typename Iterator::difference_type>(offset);
 }
 
 constexpr auto operator+(bounded::bounded_integer auto const offset, detail::std_random_access_iterator auto const it) {
