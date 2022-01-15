@@ -107,16 +107,6 @@ public:
 	{
 	}
 
-	constexpr explicit flat_map_base(initializer_range<flat_map_base> auto && source):
-		m_container(OPERATORS_FORWARD(source))
-	{
-		if constexpr (allow_duplicates) {
-			ska_sort(m_container, extract_key());
-		} else {
-			unique_ska_sort(m_container, extract_key());
-		}
-	}
-
 	constexpr flat_map_base(initializer_range<flat_map_base> auto && source, ExtractKey extract_key_):
 		m_container(OPERATORS_FORWARD(source)),
 		m_extract_key(std::move(extract_key_))
@@ -127,11 +117,9 @@ public:
 			unique_ska_sort(m_container, extract_key());
 		}
 	}
-
-	constexpr flat_map_base(assume_sorted_unique_t, initializer_range<flat_map_base> auto && source):
-		m_container(OPERATORS_FORWARD(source))
+	constexpr explicit flat_map_base(initializer_range<flat_map_base> auto && source):
+		flat_map_base(OPERATORS_FORWARD(source), ExtractKey())
 	{
-		BOUNDED_ASSERT(is_sorted(m_container, compare()));
 	}
 
 	constexpr flat_map_base(assume_sorted_unique_t, initializer_range<flat_map_base> auto && source, ExtractKey extract_key_):
@@ -140,11 +128,9 @@ public:
 	{
 		BOUNDED_ASSERT(is_sorted(m_container, compare()));
 	}
-
-	constexpr flat_map_base(assume_unique_t, initializer_range<flat_map_base> auto && source):
-		m_container(OPERATORS_FORWARD(source))
+	constexpr flat_map_base(assume_sorted_unique_t, initializer_range<flat_map_base> auto && source):
+		flat_map_base(assume_sorted_unique, OPERATORS_FORWARD(source), ExtractKey())
 	{
-		ska_sort(m_container, extract_key());
 	}
 
 	constexpr flat_map_base(assume_unique_t, initializer_range<flat_map_base> auto && source, ExtractKey extract_key_):
@@ -153,17 +139,9 @@ public:
 	{
 		ska_sort(m_container, extract_key());
 	}
-
-
-	template<std::size_t init_size>
-	constexpr flat_map_base(c_array<value_type, init_size> && source):
-		m_container(std::move(source))
+	constexpr flat_map_base(assume_unique_t, initializer_range<flat_map_base> auto && source):
+		flat_map_base(assume_unique, OPERATORS_FORWARD(source), ExtractKey())
 	{
-		if constexpr (allow_duplicates) {
-			ska_sort(m_container, extract_key());
-		} else {
-			unique_ska_sort(m_container, extract_key());
-		}
 	}
 
 	template<std::size_t init_size>
@@ -177,12 +155,10 @@ public:
 			unique_ska_sort(m_container, extract_key());
 		}
 	}
-
 	template<std::size_t init_size>
-	constexpr flat_map_base(assume_sorted_unique_t, c_array<value_type, init_size> && source):
-		m_container(std::move(source))
+	constexpr flat_map_base(c_array<value_type, init_size> && source):
+		flat_map_base(std::move(source), ExtractKey())
 	{
-		BOUNDED_ASSERT(is_sorted(m_container, compare()));
 	}
 
 	template<std::size_t init_size>
@@ -192,12 +168,10 @@ public:
 	{
 		BOUNDED_ASSERT(is_sorted(m_container, compare()));
 	}
-
 	template<std::size_t init_size>
-	constexpr flat_map_base(assume_unique_t, c_array<value_type, init_size> && source):
-		m_container(std::move(source))
+	constexpr flat_map_base(assume_sorted_unique_t, c_array<value_type, init_size> && source):
+		flat_map_base(assume_sorted_unique, std::move(source), ExtractKey())
 	{
-		ska_sort(m_container, extract_key());
 	}
 
 	template<std::size_t init_size>
@@ -206,6 +180,11 @@ public:
 		m_extract_key(std::move(extract_key_))
 	{
 		ska_sort(m_container, extract_key());
+	}
+	template<std::size_t init_size>
+	constexpr flat_map_base(assume_unique_t, c_array<value_type, init_size> && source):
+		flat_map_base(assume_unique, std::move(source), ExtractKey())
+	{
 	}
 
 	constexpr auto begin() const {
