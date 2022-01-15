@@ -235,7 +235,7 @@ public:
 	}
 
 	template<range Range>
-	constexpr auto insert(Range && init) {
+	constexpr auto insert(Range && init) -> void {
 		// Because my underlying container is expected to be contiguous storage,
 		// it's best to do a batch insert and then just sort it all. However,
 		// because I know that the first section of the final range is already
