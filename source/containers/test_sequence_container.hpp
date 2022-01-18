@@ -16,6 +16,19 @@ namespace containers_test {
 
 using namespace bounded::literal;
 
+template<typename Container>
+constexpr auto test_forward_range_concepts() -> bool {
+	static_assert(!containers::iterator<Container const &>);
+	static_assert(!containers::iterator<Container &>);
+	static_assert(!containers::iterator<Container &&>);
+	static_assert(!containers::iterator<Container>);
+	static_assert(containers::forward_range<Container const &>);
+	static_assert(containers::forward_range<Container &>);
+	static_assert(containers::forward_range<Container &&>);
+	static_assert(containers::forward_range<Container>);
+	return true;
+}
+
 // Because it would be really embarassing if this didn't work...
 template<typename Container>
 constexpr auto test_range_based_for_loop() {
@@ -42,8 +55,13 @@ constexpr auto test_sequence_container_default_constructed_empty() -> bool {
 	BOUNDED_TEST(default_constructed == Container({}));
 	Container const implicit_from_empty_braces = {};
 	BOUNDED_TEST(default_constructed == implicit_from_empty_braces);
-	Container const implicit_from_two_empty_braces = {{}};
-	BOUNDED_TEST(default_constructed == implicit_from_two_empty_braces);
+	return true;
+}
+
+template<typename Container>
+constexpr auto test_sequence_container_implicit_from_two_empty_braces() -> bool {
+	Container const c = {{}};
+	BOUNDED_TEST(c == Container());
 	return true;
 }
 
@@ -187,18 +205,12 @@ constexpr auto test_sequence_container_single(std::initializer_list<containers::
 
 template<typename Container>
 constexpr auto test_sequence_container() -> bool {
-	static_assert(!containers::iterator<Container const &>);
-	static_assert(!containers::iterator<Container &>);
-	static_assert(!containers::iterator<Container &&>);
-	static_assert(!containers::iterator<Container>);
-	static_assert(containers::forward_range<Container const &>);
-	static_assert(containers::forward_range<Container &>);
-	static_assert(containers::forward_range<Container &&>);
-	static_assert(containers::forward_range<Container>);
+	test_forward_range_concepts<Container>();
 
 	test_range_based_for_loop<Container>();
 
 	test_sequence_container_default_constructed_empty<Container>();
+	test_sequence_container_implicit_from_two_empty_braces<Container>();
 
 	test_sequence_container_single<Container>({});
 	test_sequence_container_single<Container>({5});
