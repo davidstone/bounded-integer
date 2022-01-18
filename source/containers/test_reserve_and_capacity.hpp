@@ -23,7 +23,7 @@ constexpr auto test_empty_capacity_not_negative() -> void {
 
 template<typename Container>
 constexpr auto test_non_empty_capacity_positive() -> void {
-	auto v = Container({containers::range_value_t<Container>(5)});
+	auto v = Container({containers::range_value_t<Container>()});
 	BOUNDED_TEST(v.capacity() > 0_bi);
 }
 
@@ -40,11 +40,11 @@ constexpr auto test_reserve_one_more_from_empty() -> void {
 
 template<typename Container>
 constexpr auto test_reserve_one_more_from_non_empty() -> void {
-	auto v = Container({containers::range_value_t<Container>(5)});
+	auto v = Container({containers::range_value_t<Container>()});
 	auto const initial_capacity = v.capacity();
 	v.reserve(::bounded::assume_in_range<containers::range_size_t<Container>>(v.capacity() + 1_bi));
 	BOUNDED_TEST(v.capacity() >= initial_capacity + 1_bi);
-	BOUNDED_TEST(v == Container({containers::range_value_t<Container>(5)}));
+	BOUNDED_TEST(v == Container({containers::range_value_t<Container>()}));
 }
 
 template<typename Container>
