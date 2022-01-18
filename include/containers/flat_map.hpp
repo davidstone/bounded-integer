@@ -74,6 +74,29 @@ concept extract_key_function = requires(ExtractKey const & extract_key, T const 
 	extract_key(value);
 };
 
+template<bool allow_duplicates, typename Container>
+constexpr auto merge_sorted_and_unsorted(Container & container, iterator_t<Container> midpoint, auto const extract_key) {
+	auto const first = ::containers::begin(container);
+	auto const last = ::containers::end(container);
+	auto const compare = ::containers::detail::extract_key_to_less(extract_key);
+	ska_sort(containers::range_view(midpoint, last), extract_key);
+	if constexpr (allow_duplicates) {
+		std::inplace_merge(
+			make_legacy_iterator(first),
+			make_legacy_iterator(midpoint),
+			make_legacy_iterator(last),
+			compare
+		);
+	} else {
+		auto const position = ::containers::unique_inplace_merge(
+			first,
+			midpoint,
+			last,
+			compare
+		);
+		containers::erase_after(container, position);
+	}
+}
 
 // The exact type of value_type should be considered implementation defined.
 // map_value_type<key_type const, mapped_type> does not work if the underlying
@@ -233,31 +256,11 @@ struct flat_map_base : private lexicographical_comparison::base {
 	template<range Range>
 	constexpr auto insert(Range && init) -> void {
 		// Because my underlying container is expected to be contiguous storage,
-		// it's best to do a batch insert and then just sort it all. However,
-		// because I know that the first section of the final range is already
-		// sorted, it's better to just sort the new elements and then do a
-		// merge sort on both ranges, rather than sorting the entire container.
+		// it's best to do a batch insert and then just sort it all.
 		auto const original_size = containers::size(m_container);
 		::containers::append(m_container, OPERATORS_FORWARD(init));
 		auto const midpoint = begin() + original_size;
-
-		ska_sort(containers::range_view(midpoint, end()), extract_key());
-		if constexpr (allow_duplicates) {
-			std::inplace_merge(
-				make_legacy_iterator(begin()),
-				make_legacy_iterator(midpoint),
-				make_legacy_iterator(end()),
-				compare()
-			);
-		} else {
-			auto const position = ::containers::unique_inplace_merge(
-				begin(),
-				midpoint,
-				end(),
-				compare()
-			);
-			containers::erase(m_container, position, end());
-		}
+		::containers::detail::merge_sorted_and_unsorted<allow_duplicates>(m_container, midpoint, extract_key());
 	}
 	
 	constexpr auto erase(const_iterator const it) {
