@@ -36,8 +36,8 @@ static_assert(qualifiers_are_contiguous_ranges<containers::array<int, 5>>);
 
 static_assert(containers_test::test_sequence_container_default_constructed_empty<containers::array<int, 0>>());
 static_assert(containers_test::test_sequence_container_implicit_from_two_empty_braces<containers::array<int, 0>>());
-static_assert(containers_test::test_special_members(containers::array<int, 0>({})));
-static_assert(containers_test::test_special_members(containers::array<int, 5>({0, 1, 2, 3, 4})));
+static_assert(containers_test::test_special_members<containers::array<int, 0>>([] { return containers::array<int, 0>({}); }));
+static_assert(containers_test::test_special_members<containers::array<int, 5>>([] { return containers::array<int, 5>({0, 1, 2, 3, 4}); }));
 
 static_assert(std::is_convertible_v<containers::array<int, 3> const &, std::span<int const>>);
 static_assert(!std::is_convertible_v<containers::array<int, 3> const &, std::span<int>>);

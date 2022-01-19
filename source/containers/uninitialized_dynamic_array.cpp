@@ -48,9 +48,18 @@ constexpr auto check_capacity(auto const value) {
 }
 
 
-static_assert(containers_test::test_self_move_assignment<container<10>>(0_bi, check_capacity(0_bi)));
-static_assert(containers_test::test_self_move_assignment<container<10>>(1_bi, check_capacity(1_bi)));
-static_assert(containers_test::test_self_move_assignment<container<0>>(0_bi, check_capacity(0_bi)));
+static_assert(containers_test::test_self_move_assignment<container<10>>(
+	[] { return 0_bi; },
+	check_capacity(0_bi)
+));
+static_assert(containers_test::test_self_move_assignment<container<10>>(
+	[] { return 1_bi; },
+	check_capacity(1_bi)
+));
+static_assert(containers_test::test_self_move_assignment<container<0>>(
+	[] { return 0_bi; },
+	check_capacity(0_bi)
+));
 
 static_assert(containers_test::test_self_swap(container<10>(0_bi), check_capacity(0_bi)));
 static_assert(containers_test::test_self_swap(container<10>(1_bi), check_capacity(1_bi)));
