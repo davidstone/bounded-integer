@@ -222,6 +222,7 @@ add_executable(containers_test
 	source/containers/pop_back.cpp
 	source/containers/pop_front.cpp
 	source/containers/push_back.cpp
+	source/containers/range_reference_t.cpp
 	source/containers/range_value_t.cpp
 	source/containers/range_view.cpp
 	source/containers/reference_wrapper.cpp

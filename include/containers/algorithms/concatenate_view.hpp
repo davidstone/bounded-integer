@@ -11,10 +11,8 @@
 #include <containers/is_empty.hpp>
 #include <containers/is_range.hpp>
 #include <containers/iter_difference_t.hpp>
-#include <containers/iter_reference_t.hpp>
-#include <containers/iter_value_t.hpp>
 #include <containers/iterator_t.hpp>
-#include <containers/range_value_t.hpp>
+#include <containers/range_reference_t.hpp>
 #include <containers/range_view.hpp>
 #include <containers/size.hpp>
 
@@ -93,7 +91,7 @@ struct concatenate_view_iterator {
 	>>;
 	
 	using reference = bounded::detail::common_type_and_value_category_t<
-		iter_reference_t<iterator_t<RangeViews>>...
+		range_reference_t<RangeViews>...
 	>;
 
 	constexpr explicit concatenate_view_iterator(RangeViews... range_views):
