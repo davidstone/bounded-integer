@@ -12,16 +12,10 @@
 #include <utility>
 
 namespace containers {
-namespace detail {
-
-template<typename Range>
-inline constexpr auto should_replace_copy_with_move = is_container<std::remove_reference_t<Range>> and !std::is_lvalue_reference_v<Range>;
-
-} // namespace detail
 
 template<typename Range>
 inline constexpr auto dereference = [](iterator_t<Range> const & it) -> decltype(auto) {
-	if constexpr (detail::should_replace_copy_with_move<Range>) {
+	if constexpr (is_container<Range>) {
 		static_assert(std::is_lvalue_reference_v<decltype(*it)>);
 		return std::move(*it);
 	} else {

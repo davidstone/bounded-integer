@@ -37,13 +37,13 @@ concept memcpyable =
 
 } // namespace detail
 
-inline constexpr auto uninitialized_copy = [](range auto && input, iterator auto output) {
+inline constexpr auto uninitialized_copy = []<range Input>(Input && input, iterator auto output) {
 	auto out_first = output;
 	try {
 		auto const last = containers::end(OPERATORS_FORWARD(input));
 		for (auto first = containers::begin(OPERATORS_FORWARD(input)); first != last; ++first) {
 			bounded::construct(*output, [&]() -> decltype(auto) {
-				return dereference<decltype(input)>(first);
+				return dereference<Input>(first);
 			});
 			++output;
 		}

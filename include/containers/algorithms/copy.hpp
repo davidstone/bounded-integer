@@ -20,23 +20,25 @@ struct copy_result {
 
 } // namespace detail
 
-constexpr auto copy(range auto && input, iterator auto output) {
+template<range Input>
+constexpr auto copy(Input && input, iterator auto output) {
 	auto first = containers::begin(OPERATORS_FORWARD(input));
 	auto const last = containers::end(OPERATORS_FORWARD(input));
 	for (; first != last; ++first, ++output) {
-		*output = dereference<decltype(input)>(first);
+		*output = dereference<Input>(first);
 	}
 	using result = detail::copy_result<decltype(first), decltype(output)>;
 	return result{std::move(first), std::move(output)};
 }
 
-constexpr auto copy(range auto && input, range auto && output) {
+template<range Input>
+constexpr auto copy(Input && input, range auto && output) {
 	auto in_first = containers::begin(OPERATORS_FORWARD(input));
 	auto const in_last = containers::end(OPERATORS_FORWARD(input));
 	auto out_first = containers::begin(OPERATORS_FORWARD(output));
 	auto const out_last = containers::end(OPERATORS_FORWARD(output));
 	for (; in_first != in_last and out_first != out_last; ++in_first, ++out_first) {
-		*out_first = dereference<decltype(input)>(in_first);
+		*out_first = dereference<Input>(in_first);
 	}
 	using result = detail::copy_result<decltype(in_first), decltype(out_first)>;
 	return result{std::move(in_first), std::move(out_first)};

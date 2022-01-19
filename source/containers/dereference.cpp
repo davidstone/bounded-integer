@@ -9,9 +9,17 @@
 
 namespace {
 
-static_assert(containers::detail::should_replace_copy_with_move<containers::array<int, 0>>);
-static_assert(containers::detail::should_replace_copy_with_move<containers::array<int, 0> &&>);
-static_assert(!containers::detail::should_replace_copy_with_move<containers::array<int, 0> const &>);
-static_assert(!containers::detail::should_replace_copy_with_move<containers::array<int, 0> &>);
+static_assert(std::is_same_v<
+	decltype(containers::dereference<containers::array<int, 0>>({})),
+	int &&
+>);
+static_assert(std::is_same_v<
+	decltype(containers::dereference<containers::array<int, 0> const &>({})),
+	int const &
+>);
+static_assert(std::is_same_v<
+	decltype(containers::dereference<containers::array<int, 0> &>({})),
+	int &
+>);
 
 } // namespace
