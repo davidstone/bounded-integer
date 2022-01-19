@@ -157,6 +157,10 @@ template<typename T, std::size_t size>
 constexpr auto to_array(c_array<T, size> && source) {
 	return ::containers::detail::to_array_impl(std::move(source), std::make_index_sequence<size>());
 }
+template<typename T>
+constexpr auto to_array(empty_c_array_parameter) {
+	return array<T, 0>();
+}
 
 template<std::size_t index, typename T, std::size_t size>
 constexpr auto && get(array<T, size> const & a) {
