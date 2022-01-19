@@ -5,16 +5,32 @@
 
 #pragma once
 
+#include <containers/is_container.hpp>
 #include <containers/is_range.hpp>
+#include <containers/range_reference_t.hpp>
+#include <containers/range_value_t.hpp>
+
+#include <bounded/concepts.hpp>
 
 #include <type_traits>
 
 namespace containers {
+namespace detail {
 
-template<typename T, typename Source>
+template<typename Source>
+using source_range_reference_t = std::conditional_t<
+	is_container<Source>,
+	range_value_t<Source> &&,
+	range_reference_t<Source>
+>;
+
+} // namespace detail
+
+template<typename Source, typename Target>
 concept initializer_range =
-	!std::is_same_v<std::remove_cvref_t<T>, Source> and
-	!std::is_array_v<std::remove_cvref_t<T>> and
-	range<T>;
+	!std::is_same_v<std::remove_cvref_t<Source>, Target> and
+	!std::is_array_v<std::remove_cvref_t<Source>> and
+	range<Source> and
+	bounded::constructible_from<range_value_t<Target>, detail::source_range_reference_t<Source>>;
 
 } // namespace containers
