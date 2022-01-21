@@ -271,6 +271,8 @@ struct flat_map_base : private lexicographical_comparison::base {
 	}
 
 private:
+	// TODO: Use [[no_unique_address]] after resolution of
+	// https://github.com/llvm/llvm-project/issues/53059
 	Container m_container;
 	[[no_unique_address]] ExtractKey m_extract_key;
 };
