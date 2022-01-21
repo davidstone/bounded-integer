@@ -5,201 +5,61 @@
 
 #include <containers/flat_map.hpp>
 
-#include <containers/algorithms/compare.hpp>
-#include <containers/array.hpp>
-
-#include <bounded/value_to_function.hpp>
-
-#include "../test_assert.hpp"
+#include "test_associative_container.hpp"
+#include "test_reserve_and_capacity.hpp"
 #include "../test_int.hpp"
 
 namespace {
 
-using mapped_type = containers::map_value_type<bounded_test::integer, bounded_test::integer>;
+using non_copyable_map = containers::flat_map<bounded_test::non_copyable_integer, bounded_test::non_copyable_integer>;
 
-constexpr auto test_constructor(auto const & input, auto const & expected, auto... maybe_constructor_arg) {
-	auto const map = containers::flat_map<bounded_test::integer, bounded_test::integer>(maybe_constructor_arg..., input);
-	return containers::equal(map, expected);
+static_assert(containers_test::test_reserve_and_capacity<non_copyable_map>());
+static_assert(containers_test::test_associative_container<non_copyable_map>());
+
+template<typename Container>
+constexpr auto test_zero_keys() -> void {
+	constexpr auto make = [] { return containers_test::make_zero_keys<Container>(); };
+	static_assert(containers::equal(
+		Container(containers::assume_sorted_unique, make()),
+		make()
+	));
 }
 
-// Work around https://gcc.gnu.org/bugzilla/show_bug.cgi?id=99018
-constexpr auto test_zero_keys() {
-	constexpr auto value = containers::array<mapped_type, 0>();
-	static_assert(test_constructor(
-		value,
-		value
+template<typename Container>
+constexpr auto test_one_key() -> void {
+	constexpr auto make = [] { return containers_test::make_one_key<Container>(); };
+	static_assert(containers::equal(
+		Container(containers::assume_sorted_unique, make()),
+		make()
 	));
-	static_assert(test_constructor(
-		value,
-		value,
-		containers::assume_unique
+}
+
+template<typename Container>
+constexpr auto test_two_sorted_unique_keys() -> void {
+	constexpr auto make = [] { return containers_test::make_two_sorted_unique_keys<Container>(); };
+	static_assert(containers::equal(
+		Container(containers::assume_sorted_unique, make()),
+		make()
 	));
-	static_assert(test_constructor(
-		value,
-		value,
-		containers::assume_sorted_unique
+}
+
+template<typename Container>
+constexpr auto test_three_sorted_unique_keys() -> void {
+	constexpr auto make = [] { return containers_test::make_three_sorted_unique_keys<Container>(); };
+	static_assert(containers::equal(
+		Container(containers::assume_sorted_unique, make()),
+		make()
 	));
+}
+
+template<typename Container>
+constexpr auto test_assume_sorted_unique() -> bool {
+	test_zero_keys<Container>();
+	test_one_key<Container>();
+	test_two_sorted_unique_keys<Container>();
+	test_three_sorted_unique_keys<Container>();
 	return true;
 }
-static_assert(test_zero_keys());
-
-constexpr auto test_one_key() {
-	constexpr auto value = [] { return containers::array({mapped_type{0, 4}}); };
-	static_assert(test_constructor(
-		value(),
-		value()
-	));
-	static_assert(test_constructor(
-		value(),
-		value(),
-		containers::assume_unique
-	));
-	static_assert(test_constructor(
-		value(),
-		value(),
-		containers::assume_sorted_unique
-	));
-	return true;
-}
-static_assert(test_one_key());
-
-constexpr auto test_two_sorted_unique_keys() {
-	constexpr auto value = [] { return containers::array({mapped_type{0, 4}, mapped_type{1, 2}}); };
-	static_assert(test_constructor(
-		value(),
-		value()
-	));
-	static_assert(test_constructor(
-		value(),
-		value(),
-		containers::assume_unique
-	));
-	static_assert(test_constructor(
-		value(),
-		value(),
-		containers::assume_sorted_unique
-	));
-	return true;
-}
-static_assert(test_two_sorted_unique_keys());
-
-
-constexpr auto test_two_unsorted_unique_keys() {
-	constexpr auto value = [] { return containers::array({mapped_type{1, 2}, mapped_type{0, 4}}); };
-	constexpr auto expected = [] { return containers::array({mapped_type{0, 4}, mapped_type{1, 2}}); };
-	static_assert(test_constructor(
-		value(),
-		expected()
-	));
-	static_assert(test_constructor(
-		value(),
-		expected(),
-		containers::assume_unique
-	));
-	return true;
-}
-static_assert(test_two_unsorted_unique_keys());
-
-
-constexpr auto test_two_duplicate_keys() {
-	constexpr auto value = [] { return containers::array({mapped_type{1, 4}, mapped_type{1, 2}}); };
-	constexpr auto expected = [] { return containers::array({mapped_type{1, 4}}); };
-	static_assert(test_constructor(
-		value(),
-		expected()
-	));
-	return true;
-}
-static_assert(test_two_duplicate_keys());
-
-constexpr auto test_three_sorted_unique_keys() {
-	constexpr auto value = [] { return containers::array({mapped_type{0, 4}, mapped_type{1, 2}, mapped_type{3, 5}}); };
-	static_assert(test_constructor(
-		value(),
-		value()
-	));
-	static_assert(test_constructor(
-		value(),
-		value(),
-		containers::assume_unique
-	));
-	static_assert(test_constructor(
-		value(),
-		value(),
-		containers::assume_sorted_unique
-	));
-	return true;
-}
-static_assert(test_three_sorted_unique_keys());
-
-constexpr auto test_three_descending_unique_keys() {
-	constexpr auto value = [] { return containers::array({mapped_type{3, 5}, mapped_type{1, 2}, mapped_type{0, 4}}); };
-	constexpr auto expected = [] { return containers::array({mapped_type{0, 4}, mapped_type{1, 2}, mapped_type{3, 5}}); };
-	static_assert(test_constructor(
-		value(),
-		expected()
-	));
-	static_assert(test_constructor(
-		value(),
-		expected(),
-		containers::assume_unique
-	));
-	return true;
-}
-static_assert(test_three_descending_unique_keys());
-
-constexpr auto test_three_shuffled_unique_keys() {
-	constexpr auto value = [] { return containers::array({mapped_type{1, 2}, mapped_type{0, 4}, mapped_type{3, 5}}); };
-	constexpr auto expected = [] { return containers::array({mapped_type{0, 4}, mapped_type{1, 2}, mapped_type{3, 5}}); };
-	static_assert(test_constructor(
-		value(),
-		expected()
-	));
-	static_assert(test_constructor(
-		value(),
-		expected(),
-		containers::assume_unique
-	));
-	return true;
-}
-static_assert(test_three_shuffled_unique_keys());
-
-constexpr auto test_three_keys_with_two_duplicates() {
-	constexpr auto expected = [] { return containers::array({mapped_type{0, 4}, mapped_type{1, 2}}); };
-	static_assert(test_constructor(
-		containers::array({mapped_type{0, 4}, mapped_type{1, 2}, mapped_type{0, 5}}),
-		expected()
-	));
-	static_assert(test_constructor(
-		containers::array({mapped_type{0, 4}, mapped_type{0, 5}, mapped_type{1, 2}}),
-		expected()
-	));
-	return true;
-}
-static_assert(test_three_keys_with_two_duplicates());
-
-constexpr auto test_three_duplicate_keys() {
-	static_assert(test_constructor(
-		containers::array({mapped_type{0, 4}, mapped_type{0, 2}, mapped_type{0, 5}}),
-		containers::array({mapped_type{0, 4}})
-	));
-	return true;
-}
-static_assert(test_three_duplicate_keys());
-
-constexpr auto test() {
-	using container_type = containers::flat_map<bounded_test::integer, bounded_test::integer>;
-	auto const init = containers::array({mapped_type{1, 2}, mapped_type{2, 5}, mapped_type{3, 3}});
-
-	auto container = container_type(init);
-	BOUNDED_TEST(containers::equal(container, init));
-
-	container.lazy_insert(5, bounded::value_to_function(3));
-	BOUNDED_TEST(containers::equal(container, containers::array({mapped_type{1, 2}, mapped_type{2, 5}, mapped_type{3, 3}, mapped_type{5, 3}})));
-
-	return true;
-}
-
-static_assert(test());
+static_assert(test_assume_sorted_unique<non_copyable_map>());
 
 } // namespace
