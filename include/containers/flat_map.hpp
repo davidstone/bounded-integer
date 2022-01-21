@@ -212,11 +212,8 @@ struct flat_map_base : private lexicographical_comparison::base {
 	constexpr auto begin() {
 		return ::containers::begin(m_container);
 	}
-	constexpr auto end() const {
-		return ::containers::end(m_container);
-	}
-	constexpr auto end() {
-		return ::containers::end(m_container);
+	constexpr auto size() const {
+		return ::containers::size(m_container);
 	}
 	
 	constexpr auto capacity() const {
@@ -294,7 +291,7 @@ public:
 	using base::base;
 
 	using base::begin;
-	using base::end;
+	using base::size;
 
 	using base::capacity;
 	using base::reserve;
@@ -306,11 +303,11 @@ public:
 
 	constexpr auto find(auto const & key) const {
 		auto const it = containers::keyed_lower_bound(*this, key);
-		return (it == end() or compare()(key, get_key(*it))) ? end() : it;
+		return (it == ::containers::end(*this) or compare()(key, get_key(*it))) ? ::containers::end(*this) : it;
 	}
 	constexpr auto find(auto const & key) {
 		auto const it = containers::keyed_lower_bound(*this, key);
-		return (it == end() or compare()(key, get_key(*it))) ? end() : it;
+		return (it == ::containers::end(*this) or compare()(key, get_key(*it))) ? ::containers::end(*this) : it;
 	}
 };
 
@@ -344,7 +341,7 @@ public:
 	using base::base;
 	
 	using base::begin;
-	using base::end;
+	using base::size;
 
 	using base::capacity;
 	using base::reserve;
