@@ -22,7 +22,7 @@ union aligned_storage_helper {
 	using maybe = std::conditional_t<capacity >= sizeof(T), T, empty>;
 	struct double_holder { double a; };
 
-	[[no_unique_address]] containers::array<std::byte, capacity> data;
+	[[no_unique_address]] containers::array<std::byte, bounded::constant<capacity>> data;
 	[[no_unique_address]] maybe<short> short_;
 	[[no_unique_address]] maybe<int> int_;
 	[[no_unique_address]] maybe<long> long_;
@@ -30,7 +30,7 @@ union aligned_storage_helper {
 	[[no_unique_address]] maybe<void *> void_star_;
 	[[no_unique_address]] maybe<void(*)()> function_ptr_;
 	[[no_unique_address]] maybe<double_holder> double_holder_;
-	[[no_unique_address]] maybe<containers::array<double, 4>> array_double_;
+	[[no_unique_address]] maybe<containers::array<double, bounded::constant<4>>> array_double_;
 	[[no_unique_address]] maybe<long double> long_double_;
 };
 
@@ -59,7 +59,7 @@ struct padded {
 	// If value is not declared [[no_unique_address]] but it is empty, the bytes
 	// would not be initialized. This would lead to uninitialized bytes being
 	// copied, which would be rejected by the constexpr evaluator.
-	using padding_type = containers::array<std::byte, size - (std::is_empty_v<T> ? 0 : sizeof(T))>;
+	using padding_type = containers::array<std::byte, bounded::constant<size - (std::is_empty_v<T> ? 0 : sizeof(T))>>;
 	[[no_unique_address]] T value;
 	[[no_unique_address]] padding_type padding;
 };
@@ -68,7 +68,7 @@ template<bool is_const, std::size_t capacity, std::size_t alignment, typename R,
 struct trivial_inplace_function_impl {
 private:
 	static constexpr auto use_single_indirection = capacity == 0 and alignment == alignment_for_capacity<0>;
-	using storage_type = containers::array<std::byte, capacity>;
+	using storage_type = containers::array<std::byte, bounded::constant<capacity>>;
 	using function_ptr = std::conditional_t<
 		use_single_indirection,
 		R(*)(Args...),

@@ -13,7 +13,7 @@ namespace {
 
 using namespace bounded::literal;
 
-constexpr auto forward = containers::array<int, 5>{0, 1, 2, 3, 4};
+constexpr auto forward = containers::array({0, 1, 2, 3, 4});
 constexpr auto reversed = containers::reversed(forward);
 
 static_assert(containers::size(reversed) == 5_bi);

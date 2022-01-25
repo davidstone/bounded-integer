@@ -16,7 +16,7 @@ constexpr auto correct_min_max(auto const & range, auto const min_index, auto co
 		containers::max_element(range) == begin(range) + max_index;
 }
 
-constexpr auto zero = containers::array<int, 0>{};
+constexpr auto zero = containers::array<int, 0_bi>{};
 static_assert(correct_min_max(zero, 0_bi, 0_bi));
 
 

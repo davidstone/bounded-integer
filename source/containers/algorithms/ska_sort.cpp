@@ -32,12 +32,12 @@ constexpr auto test_common_prefix(containers::c_array<T, size> const & source, a
 	BOUNDED_TEST(prefix == expected);
 	return true;
 }
-static_assert(test_common_prefix<containers::array<std::uint8_t, 1>>(
+static_assert(test_common_prefix<containers::array<std::uint8_t, 1_bi>>(
 	{{1}, {1}},
 	0_bi,
 	1U
 ));
-static_assert(test_common_prefix<containers::array<std::uint8_t, 1>>(
+static_assert(test_common_prefix<containers::array<std::uint8_t, 1_bi>>(
 	{{1}, {1}},
 	1_bi,
 	0U

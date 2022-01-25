@@ -11,13 +11,16 @@
 
 #include <cstddef>
 
-namespace containers::detail {
+namespace containers {
+namespace detail {
 
 // TODO: Should this be limited to 2^52 - 1 bytes?
 template<typename T>
 inline constexpr auto maximum_array_size = bounded::normalize<numeric_traits::max_value<std::ptrdiff_t> / sizeof(T)>;
 
-template<typename T>
-using array_size_type = bounded::integer<0, maximum_array_size<T>>;
+} // namespace detail
 
-} // namespace containers::detail
+template<typename T>
+using array_size_type = bounded::integer<0, detail::maximum_array_size<T>>;
+
+} // namespace containers

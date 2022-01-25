@@ -97,13 +97,13 @@ static_assert([] {
 	containers::equal(batches[7_bi], containers::array{7});
 	containers::equal(batches[8_bi], containers::array{8});
 	containers::equal(batches[9_bi], containers::array{9});
-	containers::equal(batches[10_bi], containers::array<int, 0>{});
-	containers::equal(batches[11_bi], containers::array<int, 0>{});
+	containers::equal(batches[10_bi], containers::array<int, 0_bi>{});
+	containers::equal(batches[11_bi], containers::array<int, 0_bi>{});
 	return true;
 }());
 
 static_assert([] {
-	constexpr auto empty = containers::array<int, 0>();
+	constexpr auto empty = containers::array<int, 0_bi>();
 	constexpr auto number_of_batches = 1_bi;
 	auto const batches = containers::batched(empty, number_of_batches);
 	BOUNDED_ASSERT(containers::size(batches) == number_of_batches);

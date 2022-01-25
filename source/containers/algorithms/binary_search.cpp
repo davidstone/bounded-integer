@@ -10,7 +10,7 @@ namespace {
 
 using namespace bounded::literal;
 
-constexpr auto zero = containers::array<int, 0>{};
+constexpr auto zero = containers::array<int, 0_bi>{};
 constexpr auto one = containers::array{1};
 constexpr auto two = containers::array{1, 2};
 constexpr auto three = containers::array{1, 2, 3};

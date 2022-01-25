@@ -42,7 +42,7 @@ constexpr auto operator==(compares_address const lhs, std::pair<int const &, int
 
 using init_list = std::initializer_list<compares_address>;
 
-constexpr auto empty = containers::array<int, 0>{};
+constexpr auto empty = containers::array<int, 0_bi>{};
 
 static_assert(containers::equal(
 	containers::set_intersection_pair(empty, empty),

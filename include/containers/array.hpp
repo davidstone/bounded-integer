@@ -5,6 +5,7 @@
 
 #pragma once
 
+#include <containers/maximum_array_size.hpp>
 #include <containers/begin_end.hpp>
 #include <containers/contiguous_iterator.hpp>
 #include <containers/common_functions.hpp>
@@ -28,12 +29,14 @@
 
 namespace containers {
 
-template<typename T, std::size_t size, std::size_t... sizes>
+using namespace bounded::literal;
+
+template<typename T, array_size_type<T> size, array_size_type<T>... sizes>
 struct array;
 
 namespace detail {
 
-template<typename T, std::size_t... sizes>
+template<typename T, array_size_type<T>... sizes>
 struct array_value_type {
 	using type = array<T, sizes...>;
 };
@@ -63,9 +66,8 @@ using array_type = typename array_trait<size>::template type<T>;
 
 } // namespace detail
 
-template<typename T, std::size_t size_, std::size_t... sizes>
+template<typename T, array_size_type<T> size_, array_size_type<T>... sizes>
 struct array {
-	static_assert(size_ <= static_cast<std::size_t>(numeric_traits::max_value<std::ptrdiff_t>));
 	using value_type = typename detail::array_value_type<T, sizes...>::type;
 
 	constexpr auto begin() const {
@@ -98,25 +100,25 @@ struct array {
 	constexpr operator std::span<T>() & requires(sizeof...(sizes) == 0) {
 		return std::span<T>(m_value);
 	}
-	constexpr operator std::span<T const, size_>() const & requires(sizeof...(sizes) == 0) {
-		return std::span<T const, size_>(m_value);
+	constexpr operator std::span<T const, static_cast<std::size_t>(size_)>() const & requires(sizeof...(sizes) == 0) {
+		return std::span<T const, static_cast<std::size_t>(size_)>(m_value);
 	}
-	constexpr operator std::span<T, size_>() & requires(sizeof...(sizes) == 0) {
-		return std::span<T, size_>(m_value);
+	constexpr operator std::span<T, static_cast<std::size_t>(size_)>() & requires(sizeof...(sizes) == 0) {
+		return std::span<T, static_cast<std::size_t>(size_)>(m_value);
 	}
 
 	// Consider this private. It must be public for the class to be an
 	// aggregate
-	[[no_unique_address]] detail::array_type<value_type, size_> m_value;
+	[[no_unique_address]] detail::array_type<value_type, static_cast<std::size_t>(size_)> m_value;
 };
 
 template<typename... Args>
-array(Args && ...) -> array<std::common_type_t<std::decay_t<Args>...>, sizeof...(Args)>;
+array(Args && ...) -> array<std::common_type_t<std::decay_t<Args>...>, bounded::constant<sizeof...(Args)>>;
 
 template<typename T, std::size_t size>
-array(c_array<T, size> &&) -> array<T, size>;
+array(c_array<T, size> &&) -> array<T, bounded::constant<size>>;
 
-template<typename T, std::size_t... sizes>
+template<typename T, array_size_type<T>... sizes>
 inline constexpr auto is_container<array<T, sizes...>> = true;
 
 namespace detail {
@@ -124,19 +126,23 @@ namespace detail {
 // Use the comma operator to expand the variadic pack
 // Move the last element in if possible. Order of evaluation is well-defined for
 // aggregate initialization, so there is no risk of copy-after-move
-template<std::size_t size, std::size_t... indexes>
-constexpr auto make_array_n_impl(auto && value, std::index_sequence<indexes...>) {
-	return array<std::decay_t<decltype(value)>, size>{(void(indexes), value)..., OPERATORS_FORWARD(value)};
+template<std::size_t... indexes>
+constexpr auto make_array_n_impl(auto const size, auto && value, std::index_sequence<indexes...>) {
+	return array<std::decay_t<decltype(value)>, size>({(void(indexes), value)..., OPERATORS_FORWARD(value)});
 }
 
 } // namespace detail
 
 template<auto size_>
 constexpr auto make_array_n(bounded::constant_t<size_> size, auto && value) {
-	if constexpr (size == bounded::constant<0>) {
-		return array<std::decay_t<decltype(value)>, 0>{};
+	if constexpr (size == 0_bi) {
+		return array<std::decay_t<decltype(value)>, 0_bi>();
 	} else {
-		return detail::make_array_n_impl<size_>(OPERATORS_FORWARD(value), bounded::make_index_sequence(size - bounded::constant<1>));
+		return detail::make_array_n_impl(
+			size,
+			OPERATORS_FORWARD(value),
+			bounded::make_index_sequence(size - 1_bi)
+		);
 	}
 }
 
@@ -144,7 +150,7 @@ namespace detail {
 
 template<std::size_t...indexes>
 constexpr auto to_array_impl(auto && source, std::index_sequence<indexes...>) {
-	return array{{OPERATORS_FORWARD(source)[indexes]...}};
+	return array({OPERATORS_FORWARD(source)[indexes]...});
 }
 
 } // namespace detail
@@ -159,28 +165,28 @@ constexpr auto to_array(c_array<T, size> && source) {
 }
 template<typename T>
 constexpr auto to_array(empty_c_array_parameter) {
-	return array<T, 0>();
+	return array<T, 0_bi>();
 }
 
-template<std::size_t index, typename T, std::size_t size>
+template<std::size_t index, typename T, array_size_type<T> size>
 constexpr auto && get(array<T, size> const & a) {
 	return a[bounded::constant<index>];
 }
-template<std::size_t index, typename T, std::size_t size>
+template<std::size_t index, typename T, array_size_type<T> size>
 constexpr auto && get(array<T, size> & a) {
 	return a[bounded::constant<index>];
 }
-template<std::size_t index, typename T, std::size_t size>
+template<std::size_t index, typename T, array_size_type<T> size>
 constexpr auto && get(array<T, size> && a) {
 	return std::move(a[bounded::constant<index>]);
 }
 
 } // namespace containers
 
-template<typename T, std::size_t size_>
-struct std::tuple_size<::containers::array<T, size_>> : std::integral_constant<std::size_t, size_> {};
+template<typename T, containers::array_size_type<T> size_>
+struct std::tuple_size<::containers::array<T, size_>> : std::integral_constant<std::size_t, static_cast<std::size_t>(size_)> {};
 
-template<std::size_t index, typename T, std::size_t size>
+template<std::size_t index, typename T, containers::array_size_type<T> size>
 struct std::tuple_element<index, ::containers::array<T, size>> {
 	using type = T;
 };

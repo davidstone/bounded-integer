@@ -15,7 +15,7 @@ using namespace ::bounded::literal;
 
 static_assert(containers::equal(
 	containers::integer_range(0_bi),
-	containers::array<bounded::integer<0, 0>, 0>{}
+	containers::array<bounded::integer<0, 0>, 0_bi>()
 ));
 static_assert(containers::equal(
 	containers::integer_range(3_bi),

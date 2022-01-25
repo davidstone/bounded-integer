@@ -12,7 +12,7 @@
 
 namespace {
 
-using container = containers::array<int, 1>;
+using container = containers::array<int, bounded::constant<1>>;
 
 template<typename Range, typename Iterator>
 concept can_get_mutable_iterator_from = requires(Iterator it) {

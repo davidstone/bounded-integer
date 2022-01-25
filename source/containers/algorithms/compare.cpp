@@ -8,7 +8,7 @@
 
 namespace {
 
-constexpr auto empty = containers::array<int, 0>{};
+constexpr auto empty = containers::array<int, bounded::constant<0>>{};
 
 static_assert(containers::lexicographical_compare_3way(empty, empty) == 0);
 static_assert(containers::equal(empty, empty));

@@ -34,7 +34,7 @@
 
 namespace containers {
 
-template<typename T, typename Size = detail::array_size_type<T>>
+template<typename T, typename Size = array_size_type<T>>
 struct dynamic_array : private lexicographical_comparison::base {
 	using size_type = Size;
 

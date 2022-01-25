@@ -18,6 +18,8 @@
 
 namespace {
 
+using namespace bounded::literal;
+
 template<typename... Ts>
 constexpr auto all_qualifications_are_associative_helper = (... and containers::associative_container<Ts>);
 
@@ -35,8 +37,8 @@ static_assert(no_qualifications_are_associative<int *>);
 
 static_assert(no_qualifications_are_associative<containers::c_array<int, 5>>);
 
-static_assert(no_qualifications_are_associative<containers::array<int, 5>>);
-static_assert(no_qualifications_are_associative<containers::array<int, 0>>);
+static_assert(no_qualifications_are_associative<containers::array<int, 5_bi>>);
+static_assert(no_qualifications_are_associative<containers::array<int, 0_bi>>);
 static_assert(no_qualifications_are_associative<containers::vector<int>>);
 static_assert(no_qualifications_are_associative<containers::string>);
 

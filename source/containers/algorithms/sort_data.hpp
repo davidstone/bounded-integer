@@ -27,6 +27,8 @@
 
 namespace containers_test {
 
+using namespace bounded::literal;
+
 inline constexpr auto default_copy = [](auto && value) { return containers::to_radix_sort_key(OPERATORS_FORWARD(value)); };
 
 template<typename Container>
@@ -42,8 +44,8 @@ struct sort_test_data {
 };
 
 inline constexpr auto bool_0 = sort_test_data(
-	containers::array<bool, 0>(),
-	containers::array<bool, 0>()
+	containers::array<bool, 0_bi>(),
+	containers::array<bool, 0_bi>()
 );
 
 inline constexpr auto bool_1 = containers::array{
@@ -381,41 +383,41 @@ inline constexpr auto tuple_many = sort_test_data(
 
 
 inline constexpr auto array_uint8_1_1 = sort_test_data(
-	containers::array<containers::array<std::uint8_t, 1>, 1>{{
+	containers::array<std::uint8_t, 1_bi, 1_bi>{{
 		{1},
 	}},
-	containers::array<containers::array<std::uint8_t, 1>, 1>{{
+	containers::array<std::uint8_t, 1_bi, 1_bi>{{
 		{1},
 	}}
 );
 
 inline constexpr auto array_uint8_1_2 = containers::array{
 	sort_test_data(
-		containers::array<containers::array<std::uint8_t, 1>, 2>{{
+		containers::array<std::uint8_t, 2_bi, 1_bi>{{
 			{1},
 			{1},
 		}},
-		containers::array<containers::array<std::uint8_t, 1>, 2>{{
+		containers::array<std::uint8_t, 2_bi, 1_bi>{{
 			{1},
 			{1},
 		}}
 	),
 	sort_test_data(
-		containers::array<containers::array<std::uint8_t, 1>, 2>{{
+		containers::array<std::uint8_t, 2_bi, 1_bi>{{
 			{1},
 			{2},
 		}},
-		containers::array<containers::array<std::uint8_t, 1>, 2>{{
+		containers::array<std::uint8_t, 2_bi, 1_bi>{{
 			{1},
 			{2},
 		}}
 	),
 	sort_test_data(
-		containers::array<containers::array<std::uint8_t, 1>, 2>{{
+		containers::array<std::uint8_t, 2_bi, 1_bi>{{
 			{2},
 			{1},
 		}},
-		containers::array<containers::array<std::uint8_t, 1>, 2>{{
+		containers::array<std::uint8_t, 2_bi, 1_bi>{{
 			{1},
 			{2},
 		}}
@@ -423,12 +425,12 @@ inline constexpr auto array_uint8_1_2 = containers::array{
 };
 
 inline constexpr auto array_uint8_1_3_one_value = sort_test_data(
-	containers::array<containers::array<std::uint8_t, 1>, 3>{{
+	containers::array<std::uint8_t, 3_bi, 1_bi>{{
 		{1},
 		{1},
 		{1},
 	}},
-	containers::array<containers::array<std::uint8_t, 1>, 3>{{
+	containers::array<std::uint8_t, 3_bi, 1_bi>{{
 		{1},
 		{1},
 		{1},
@@ -437,72 +439,72 @@ inline constexpr auto array_uint8_1_3_one_value = sort_test_data(
 
 inline constexpr auto array_uint8_1_3_two_values = containers::array{
 	sort_test_data(
-		containers::array<containers::array<std::uint8_t, 1>, 3>{{
+		containers::array<std::uint8_t, 3_bi, 1_bi>{{
 			{1},
 			{1},
 			{2},
 		}},
-		containers::array<containers::array<std::uint8_t, 1>, 3>{{
+		containers::array<std::uint8_t, 3_bi, 1_bi>{{
 			{1},
 			{1},
 			{2},
 		}}
 	),
 	sort_test_data(
-		containers::array<containers::array<std::uint8_t, 1>, 3>{{
+		containers::array<std::uint8_t, 3_bi, 1_bi>{{
 			{1},
 			{2},
 			{1},
 		}},
-		containers::array<containers::array<std::uint8_t, 1>, 3>{{
+		containers::array<std::uint8_t, 3_bi, 1_bi>{{
 			{1},
 			{1},
 			{2},
 		}}
 	),
 	sort_test_data(
-		containers::array<containers::array<std::uint8_t, 1>, 3>{{
+		containers::array<std::uint8_t, 3_bi, 1_bi>{{
 			{2},
 			{1},
 			{1},
 		}},
-		containers::array<containers::array<std::uint8_t, 1>, 3>{{
+		containers::array<std::uint8_t, 3_bi, 1_bi>{{
 			{1},
 			{1},
 			{2},
 		}}
 	),
 	sort_test_data(
-		containers::array<containers::array<std::uint8_t, 1>, 3>{{
+		containers::array<std::uint8_t, 3_bi, 1_bi>{{
 			{1},
 			{2},
 			{2},
 		}},
-		containers::array<containers::array<std::uint8_t, 1>, 3>{{
+		containers::array<std::uint8_t, 3_bi, 1_bi>{{
 			{1},
 			{2},
 			{2},
 		}}
 	),
 	sort_test_data(
-		containers::array<containers::array<std::uint8_t, 1>, 3>{{
+		containers::array<std::uint8_t, 3_bi, 1_bi>{{
 			{2},
 			{1},
 			{2},
 		}},
-		containers::array<containers::array<std::uint8_t, 1>, 3>{{
+		containers::array<std::uint8_t, 3_bi, 1_bi>{{
 			{1},
 			{2},
 			{2},
 		}}
 	),
 	sort_test_data(
-		containers::array<containers::array<std::uint8_t, 1>, 3>{{
+		containers::array<std::uint8_t, 3_bi, 1_bi>{{
 			{2},
 			{2},
 			{1},
 		}},
-		containers::array<containers::array<std::uint8_t, 1>, 3>{{
+		containers::array<std::uint8_t, 3_bi, 1_bi>{{
 			{1},
 			{2},
 			{2},
@@ -512,72 +514,72 @@ inline constexpr auto array_uint8_1_3_two_values = containers::array{
 
 inline constexpr auto array_uint8_1_3_three_values = containers::array{
 	sort_test_data(
-		containers::array<containers::array<std::uint8_t, 1>, 3>{{
+		containers::array<std::uint8_t, 3_bi, 1_bi>{{
 			{1},
 			{2},
 			{3},
 		}},
-		containers::array<containers::array<std::uint8_t, 1>, 3>{{
+		containers::array<std::uint8_t, 3_bi, 1_bi>{{
 			{1},
 			{2},
 			{3},
 		}}
 	),
 	sort_test_data(
-		containers::array<containers::array<std::uint8_t, 1>, 3>{{
+		containers::array<std::uint8_t, 3_bi, 1_bi>{{
 			{1},
 			{3},
 			{2},
 		}},
-		containers::array<containers::array<std::uint8_t, 1>, 3>{{
+		containers::array<std::uint8_t, 3_bi, 1_bi>{{
 			{1},
 			{2},
 			{3},
 		}}
 	),
 	sort_test_data(
-		containers::array<containers::array<std::uint8_t, 1>, 3>{{
+		containers::array<std::uint8_t, 3_bi, 1_bi>{{
 			{2},
 			{1},
 			{3},
 		}},
-		containers::array<containers::array<std::uint8_t, 1>, 3>{{
+		containers::array<std::uint8_t, 3_bi, 1_bi>{{
 			{1},
 			{2},
 			{3},
 		}}
 	),
 	sort_test_data(
-		containers::array<containers::array<std::uint8_t, 1>, 3>{{
+		containers::array<std::uint8_t, 3_bi, 1_bi>{{
 			{2},
 			{3},
 			{1},
 		}},
-		containers::array<containers::array<std::uint8_t, 1>, 3>{{
+		containers::array<std::uint8_t, 3_bi, 1_bi>{{
 			{1},
 			{2},
 			{3},
 		}}
 	),
 	sort_test_data(
-		containers::array<containers::array<std::uint8_t, 1>, 3>{{
+		containers::array<std::uint8_t, 3_bi, 1_bi>{{
 			{3},
 			{1},
 			{2},
 		}},
-		containers::array<containers::array<std::uint8_t, 1>, 3>{{
+		containers::array<std::uint8_t, 3_bi, 1_bi>{{
 			{1},
 			{2},
 			{3},
 		}}
 	),
 	sort_test_data(
-		containers::array<containers::array<std::uint8_t, 1>, 3>{{
+		containers::array<std::uint8_t, 3_bi, 1_bi>{{
 			{3},
 			{2},
 			{1},
 		}},
-		containers::array<containers::array<std::uint8_t, 1>, 3>{{
+		containers::array<std::uint8_t, 3_bi, 1_bi>{{
 			{1},
 			{2},
 			{3},
@@ -587,7 +589,7 @@ inline constexpr auto array_uint8_1_3_three_values = containers::array{
 
 
 inline constexpr auto array_uint8_4_many = sort_test_data(
-	containers::array<containers::array<std::uint8_t, 4>, 6>{{
+	containers::array<std::uint8_t, 6_bi, 4_bi>{{
 		{1, 2, 3, 4},
 		{0, 3, 4, 5},
 		{1, 1, 2, 2},
@@ -595,7 +597,7 @@ inline constexpr auto array_uint8_4_many = sort_test_data(
 		{1, 2, 2, 3},
 		{0, 3, 4, 4},
 	}},
-	containers::array<containers::array<std::uint8_t, 4>, 6>{{
+	containers::array<std::uint8_t, 6_bi, 4_bi>{{
 		{0, 3, 4, 4},
 		{0, 3, 4, 5},
 		{1, 1, 2, 2},
@@ -606,11 +608,11 @@ inline constexpr auto array_uint8_4_many = sort_test_data(
 );
 
 inline constexpr auto array_uint16_many = sort_test_data(
-	containers::array<containers::array<std::uint16_t, 2>, 2>{{
+	containers::array<std::uint16_t, 2_bi, 2_bi>{{
 		{0, 5},
 		{0, 4},
 	}},
-	containers::array<containers::array<std::uint16_t, 2>, 2>{{
+	containers::array<std::uint16_t, 2_bi, 2_bi>{{
 		{0, 4},
 		{0, 5},
 	}}
@@ -643,7 +645,7 @@ inline constexpr auto strings = sort_test_data(
 
 constexpr auto make_vector_int_9() {
 	return sort_test_data(
-		containers::array<containers::vector<int>, 9>{{
+		containers::to_array<containers::vector<int>>({
 			{{1, 2, 3}},
 			{{1, 2, 2}},
 			{{1, 3, 2}},
@@ -653,8 +655,8 @@ constexpr auto make_vector_int_9() {
 			{{3, 2, 4, 5}},
 			{{1}},
 			{{}},
-		}},
-		containers::array<containers::vector<int>, 9>{{
+		}),
+		containers::to_array<containers::vector<int>>({
 			{{}},
 			{{1}},
 			{{1, 2, 2}},
@@ -664,13 +666,13 @@ constexpr auto make_vector_int_9() {
 			{{2, 3, 2, 4}},
 			{{2, 3, 2, 4, 5}},
 			{{3, 2, 4, 5}},
-		}}
+		})
 	);
 }
 
 constexpr auto make_vector_vector() {
 	return sort_test_data(
-		containers::array<containers::vector<containers::vector<bool>>, 3>{{
+		containers::to_array<containers::vector<containers::vector<bool>>>({
 			{{
 				{{true}},
 			}},
@@ -681,8 +683,8 @@ constexpr auto make_vector_vector() {
 			{{
 				{{}},
 			}},
-		}},
-		containers::array<containers::vector<containers::vector<bool>>, 3>{{
+		}),
+		containers::to_array<containers::vector<containers::vector<bool>>>({
 			{{
 				{{}},
 			}},
@@ -693,13 +695,13 @@ constexpr auto make_vector_vector() {
 				{{true}},
 				{{false}},
 			}},
-		}}
+		})
 	);
 }
 
 constexpr auto make_vector_tuple() {
 	return sort_test_data(
-		containers::array<containers::vector<bounded::tuple<bool>>, 2>{{
+		containers::to_array<containers::vector<bounded::tuple<bool>>>({
 			{{
 				bounded::tuple(true),
 				bounded::tuple(false),
@@ -707,8 +709,8 @@ constexpr auto make_vector_tuple() {
 			{{
 				bounded::tuple(true),
 			}},
-		}},
-		containers::array<containers::vector<bounded::tuple<bool>>, 2>{{
+		}),
+		containers::to_array<containers::vector<bounded::tuple<bool>>>({
 			{{
 				bounded::tuple(true),
 			}},
@@ -716,26 +718,26 @@ constexpr auto make_vector_tuple() {
 				bounded::tuple(true),
 				bounded::tuple(false),
 			}},
-		}}
+		})
 	);
 }
 
 constexpr auto make_tuple_vector() {
 	return sort_test_data(
-		containers::array<bounded::tuple<containers::vector<bool>>, 2>{{
+		containers::to_array<bounded::tuple<containers::vector<bool>>>({
 			bounded::tuple(containers::vector({true, false})),
 			bounded::tuple(containers::vector({true})),
-		}},
-		containers::array<bounded::tuple<containers::vector<bool>>, 2>{{
+		}),
+		containers::to_array<bounded::tuple<containers::vector<bool>>>({
 			bounded::tuple(containers::vector({true})),
 			bounded::tuple(containers::vector({true, false})),
-		}}
+		})
 	);
 }
 
 
 inline constexpr auto tuple_tuple = sort_test_data(
-	containers::array<bounded::tuple<bool, bounded::tuple<bounded::tuple<bool, bool>, bool>>, 7>{{
+	containers::to_array<bounded::tuple<bool, bounded::tuple<bounded::tuple<bool, bool>, bool>>>({
 		{true, bounded::tuple(bounded::tuple(false, true), true)},
 		{false, bounded::tuple(bounded::tuple(false, true), true)},
 		{false, bounded::tuple(bounded::tuple(false, true), true)},
@@ -743,8 +745,8 @@ inline constexpr auto tuple_tuple = sort_test_data(
 		{false, bounded::tuple(bounded::tuple(true, false), true)},
 		{false, bounded::tuple(bounded::tuple(true, false), true)},
 		{false, bounded::tuple(bounded::tuple(true, false), false)},
-	}},
-	containers::array<bounded::tuple<bool, bounded::tuple<bounded::tuple<bool, bool>, bool>>, 7>{{
+	}),
+	containers::to_array<bounded::tuple<bool, bounded::tuple<bounded::tuple<bool, bool>, bool>>>({
 		{false, bounded::tuple(bounded::tuple(false, false), true)},
 		{false, bounded::tuple(bounded::tuple(false, true), true)},
 		{false, bounded::tuple(bounded::tuple(false, true), true)},
@@ -752,7 +754,7 @@ inline constexpr auto tuple_tuple = sort_test_data(
 		{false, bounded::tuple(bounded::tuple(true, false), true)},
 		{false, bounded::tuple(bounded::tuple(true, false), true)},
 		{true, bounded::tuple(bounded::tuple(false, true), true)},
-	}}
+	})
 );
 
 

@@ -17,7 +17,7 @@ namespace {
 
 using namespace bounded::literal;
 
-using sized_range_t = containers::array<int, 8>;
+using sized_range_t = containers::array<int, 8_bi>;
 constexpr auto sized_range = sized_range_t{0, 1, 2, 3, 4, 5, 6, 7};
 
 inline namespace adl {
@@ -61,7 +61,7 @@ constexpr auto test_take(auto const & source) {
 	BOUNDED_ASSERT(containers::equal(containers::take(source, 8_bi), sized_range));
 	BOUNDED_ASSERT(containers::equal(containers::take(source, 4_bi), containers::array{0, 1, 2, 3}));
 	BOUNDED_ASSERT(containers::equal(containers::take(source, 1_bi), containers::array{0}));
-	BOUNDED_ASSERT(containers::equal(containers::take(source, 0_bi), containers::array<int, 0>()));
+	BOUNDED_ASSERT(containers::equal(containers::take(source, 0_bi), containers::array<int, 0_bi>()));
 	BOUNDED_ASSERT(containers::equal(containers::take(source, 12_bi), sized_range));
 	return true;
 }

@@ -9,16 +9,19 @@
 
 namespace {
 
+using namespace bounded::literal;
+constexpr auto size = 0_bi;
+
 static_assert(std::is_same_v<
-	decltype(containers::dereference<containers::array<int, 0>>({})),
+	decltype(containers::dereference<containers::array<int, size>>({})),
 	int &&
 >);
 static_assert(std::is_same_v<
-	decltype(containers::dereference<containers::array<int, 0> const &>({})),
+	decltype(containers::dereference<containers::array<int, size> const &>({})),
 	int const &
 >);
 static_assert(std::is_same_v<
-	decltype(containers::dereference<containers::array<int, 0> &>({})),
+	decltype(containers::dereference<containers::array<int, size> &>({})),
 	int &
 >);
 

@@ -95,7 +95,7 @@ constexpr void bool_sort_copy(auto & source, auto & output, auto const & extract
 template<range Source, range Buffer, typename ExtractKey>
 constexpr bool double_buffered_numeric_sort(Source & source, Buffer & buffer, ExtractKey const & extract_key) {
 	constexpr auto size = bounded::constant<sizeof(std::decay_t<decltype(extract_key(containers::front(source)))>)>;
-	auto counts = containers::array<containers::array<std::size_t, 256>, static_cast<std::size_t>(size)>();
+	auto counts = containers::array<std::size_t, size, 256_bi>();
 	auto const index_range = integer_range(size);
 
 	for (auto const & value : source) {
@@ -105,7 +105,7 @@ constexpr bool double_buffered_numeric_sort(Source & source, Buffer & buffer, Ex
 			++counts[index][inner_index];
 		}
 	}
-	auto total = containers::array<std::size_t, static_cast<std::size_t>(size)>();
+	auto total = containers::array<std::size_t, size>();
 	for (auto const index : index_range) {
 		auto & indexed_total = total[index];
 		auto & count = counts[index];

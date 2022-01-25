@@ -38,7 +38,7 @@ static_assert(!std::is_constructible_v<const_function, long(*)()>);
 
 template<std::size_t size>
 struct sized_function {
-	[[no_unique_address]] containers::array<std::byte, size> a;
+	[[no_unique_address]] containers::array<std::byte, bounded::constant<size>> a;
 	auto operator()() const {
 		return 1;
 	}

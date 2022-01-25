@@ -16,6 +16,8 @@
 
 namespace {
 
+using namespace bounded::literal;
+
 template<typename... Ts>
 constexpr auto all_qualifications_are_ranges_helper = (... and containers::range<Ts>);
 
@@ -28,8 +30,8 @@ static_assert(!containers::range<int *>);
 static_assert(containers::range<containers::c_array<int, 5> &>, "Incorrectly detects c-arrays as non-ranges.");
 static_assert(containers::range<containers::c_array<int, 5> const &>, "Incorrectly detects c-arrays as non-ranges.");
 
-static_assert(all_qualifications_are_ranges<containers::array<int, 5>>, "Incorrectly detects containers::array as a non-range.");
-static_assert(all_qualifications_are_ranges<containers::array<int, 0>>, "Incorrectly detects empty containers::array as a non-range.");
+static_assert(all_qualifications_are_ranges<containers::array<int, 5_bi>>, "Incorrectly detects containers::array as a non-range.");
+static_assert(all_qualifications_are_ranges<containers::array<int, 0_bi>>, "Incorrectly detects empty containers::array as a non-range.");
 static_assert(all_qualifications_are_ranges<containers::vector<int>>, "Incorrectly detects containers::vector as a non-range.");
 static_assert(all_qualifications_are_ranges<containers::string>, "Incorrectly detects containers::string as a non-range.");
 

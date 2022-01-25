@@ -11,7 +11,7 @@
 namespace {
 
 static_assert(!containers::detail::appendable_from_capacity<int>);
-static_assert(!containers::detail::appendable_from_capacity<containers::array<int, 1> &>);
+static_assert(!containers::detail::appendable_from_capacity<containers::array<int, bounded::constant<1>> &>);
 static_assert(containers::detail::appendable_from_capacity<containers::vector<int> &>);
 
 } // namespace
