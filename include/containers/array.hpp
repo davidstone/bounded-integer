@@ -156,8 +156,8 @@ constexpr auto to_array_impl(auto && source, std::index_sequence<indexes...>) {
 } // namespace detail
 
 template<typename T, std::size_t size>
-constexpr auto to_array(c_array<T, size> & source) {
-	return ::containers::detail::to_array_impl(std::move(source), std::make_index_sequence<size>());
+constexpr auto to_array(c_array<T, size> const & source) {
+	return ::containers::detail::to_array_impl(source, std::make_index_sequence<size>());
 }
 template<typename T, std::size_t size>
 constexpr auto to_array(c_array<T, size> && source) {
