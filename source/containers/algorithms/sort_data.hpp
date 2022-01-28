@@ -132,8 +132,8 @@ constexpr auto operator""_u64(unsigned long long const x) {
 }
 
 inline constexpr auto uint8_0 = sort_test_data(
-	containers::static_vector<std::uint8_t, 2>(),
-	containers::static_vector<std::uint8_t, 2>()
+	containers::static_vector<std::uint8_t, 2_bi>(),
+	containers::static_vector<std::uint8_t, 2_bi>()
 );
 
 inline constexpr auto uint8_1 = sort_test_data(

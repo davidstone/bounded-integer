@@ -58,7 +58,7 @@ constexpr auto from_temp = containers::concatenate_view(containers::array{1}, co
 static_assert(equal_values_and_types(from_temp, containers::array{1, 2}));
 
 static_assert(containers::equal(
-	containers::concatenate_view(array1, containers::static_vector<int, 4>(containers::repeat_n(2_bi, 8))),
+	containers::concatenate_view(array1, containers::static_vector<int, 4_bi>(containers::repeat_n(2_bi, 8))),
 	containers::array{1, 2, 3, 8, 8}
 ));
 

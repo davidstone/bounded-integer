@@ -24,7 +24,7 @@ namespace {
 using namespace bounded::literal;
 
 template<typename T>
-using test_static_vector = containers::static_vector<T, 40>;
+using test_static_vector = containers::static_vector<T, 40_bi>;
 
 static_assert(test_static_vector<int>::capacity() == 40_bi);
 
@@ -43,14 +43,14 @@ static_assert(!std::is_trivially_move_assignable_v<test_static_vector<bounded_te
 static_assert(containers_test::test_sequence_container<test_static_vector<int>>());
 static_assert(containers_test::test_append_from_capacity<test_static_vector<int>>());
 
-using index_type = containers::index_type<containers::static_vector<int, 10>>;
+using index_type = containers::index_type<containers::static_vector<int, 10_bi>>;
 static_assert(numeric_traits::min_value<index_type> == 0_bi);
 static_assert(numeric_traits::max_value<index_type> == 9_bi);
-static_assert(!containers::iterator<containers::static_vector<std::string, 6>>);
+static_assert(!containers::iterator<containers::static_vector<std::string, 6_bi>>);
 
 static_assert(homogeneous_equals(
 	containers::make_static_vector(containers::array({5, 3})),
-	containers::static_vector<int, 2>({5, 3})
+	containers::static_vector<int, 2_bi>({5, 3})
 ));
 
 TEST_CASE("static_vector", "[static_vector]") {

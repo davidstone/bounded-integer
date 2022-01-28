@@ -371,13 +371,13 @@ basic_flat_multimap(assume_sorted_unique_t, Range &&, ExtractKey) -> basic_flat_
 template<typename Key, typename T, typename... MaybeExtractKey>
 using flat_map = basic_flat_map<vector<map_value_type<Key, T>>, MaybeExtractKey...>;
 
-template<typename Key, typename T, std::size_t capacity, typename... MaybeExtractKey>
+template<typename Key, typename T, array_size_type<map_value_type<Key, T>> capacity, typename... MaybeExtractKey>
 using static_flat_map = basic_flat_map<static_vector<map_value_type<Key, T>, capacity>, MaybeExtractKey...>;
 
 template<typename Key, typename T, typename... MaybeExtractKey>
 using flat_multimap = basic_flat_multimap<vector<map_value_type<Key, T>>, MaybeExtractKey...>;
 
-template<typename Key, typename T, std::size_t capacity, typename... MaybeExtractKey>
+template<typename Key, typename T, array_size_type<map_value_type<Key, T>> capacity, typename... MaybeExtractKey>
 using static_flat_multimap = basic_flat_multimap<static_vector<map_value_type<Key, T>, capacity>, MaybeExtractKey...>;
 
 

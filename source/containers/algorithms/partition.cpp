@@ -13,7 +13,7 @@ using namespace bounded::literal;
 
 constexpr auto predicate = [](bool const value) { return value; };
 
-static_assert(containers::is_partitioned(containers::static_vector<bool, 1>{}, predicate));
+static_assert(containers::is_partitioned(containers::static_vector<bool, 1_bi>{}, predicate));
 
 static_assert(containers::is_partitioned(containers::array{false}, predicate));
 static_assert(containers::is_partitioned(containers::array{true}, predicate));
@@ -38,7 +38,7 @@ constexpr auto test_partition_point(auto const & range, auto const expected_offs
 }
 
 static_assert(test_partition_point(
-	containers::static_vector<bool, 1>{},
+	containers::static_vector<bool, 1_bi>{},
 	0_bi
 ));
 
@@ -90,8 +90,8 @@ constexpr auto test_partition(auto && input, auto const & expected) -> bool {
 }
 
 static_assert(test_partition(
-	containers::static_vector<bool, 1>{},
-	containers::static_vector<bool, 1>{}
+	containers::static_vector<bool, 1_bi>{},
+	containers::static_vector<bool, 1_bi>{}
 ));
 
 static_assert(test_partition(

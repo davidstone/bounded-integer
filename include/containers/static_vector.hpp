@@ -58,7 +58,7 @@ concept copy_assignable = std::is_copy_assignable_v<T>;
 template<typename T>
 concept trivially_copy_assignable = copy_assignable<T> and std::is_trivially_copy_assignable_v<T>;
 
-template<typename T, std::size_t capacity_, bool = std::is_trivially_destructible_v<T>>
+template<typename T, array_size_type<T> capacity_, bool = std::is_trivially_destructible_v<T>>
 struct static_vector_data : private lexicographical_comparison::base {
 	static_vector_data() = default;
 
@@ -119,11 +119,11 @@ struct static_vector_data : private lexicographical_comparison::base {
 		m_size += count;
 	}
 
-	[[no_unique_address]] uninitialized_array<T, capacity()> m_storage = {};
+	[[no_unique_address]] uninitialized_array<T, capacity_> m_storage = {};
 	[[no_unique_address]] bounded::integer<0, bounded::normalize<capacity_>> m_size = 0_bi;
 };
 
-template<typename T, std::size_t capacity>
+template<typename T, array_size_type<T> capacity>
 struct static_vector_data<T, capacity, false> : static_vector_data<T, capacity, true> {
 private:
 	using base = static_vector_data<T, capacity, true>;
@@ -147,7 +147,7 @@ concept trivially_swappable = std::is_trivially_copyable_v<T> and std::is_trivia
 
 } // namespace detail
 
-template<typename T, std::size_t capacity_>
+template<typename T, array_size_type<T> capacity_>
 struct static_vector : private detail::static_vector_data<T, capacity_> {
 private:
 	using base = detail::static_vector_data<T, capacity_>;
@@ -188,15 +188,15 @@ public:
 	}
 };
 
-template<typename T, std::size_t capacity, bool is_trivially_destructible>
+template<typename T, array_size_type<T> capacity, bool is_trivially_destructible>
 inline constexpr auto is_container<detail::static_vector_data<T, capacity, is_trivially_destructible>> = true;
 
-template<typename T, std::size_t capacity>
+template<typename T, array_size_type<T> capacity>
 inline constexpr auto is_container<static_vector<T, capacity>> = true;
 
 template<range Source>
 constexpr auto make_static_vector(Source && source) {
-	constexpr auto size = static_cast<std::size_t>(numeric_traits::max_value<range_size_t<Source>>);
+	constexpr auto size = bounded::integer(numeric_traits::max_value<range_size_t<Source>>);
 	return static_vector<range_value_t<Source>, size>(OPERATORS_FORWARD(source));
 }
 

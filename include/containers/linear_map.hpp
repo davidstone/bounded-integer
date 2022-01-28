@@ -187,7 +187,7 @@ basic_linear_map(assume_sorted_unique_t, Range &&, Equal) -> basic_linear_map<st
 template<typename Key, typename T, typename... MaybeExtractKey>
 using linear_map = basic_linear_map<vector<map_value_type<Key, T>>, MaybeExtractKey...>;
 
-template<typename Key, typename T, std::size_t capacity, typename... MaybeExtractKey>
+template<typename Key, typename T, array_size_type<map_value_type<Key, T>> capacity, typename... MaybeExtractKey>
 using static_linear_map = basic_linear_map<static_vector<map_value_type<Key, T>, capacity>, MaybeExtractKey...>;
 
 } // namespace containers
