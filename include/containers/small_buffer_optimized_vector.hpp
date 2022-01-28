@@ -90,7 +90,7 @@ struct small_buffer_optimized_vector : private lexicographical_comparison::base 
 	private:
 		bool m_force_large : 1;
 		typename size_type::underlying_type m_size : (bounded::size_of_bits<size_type> - 1_bi).value();
-		uninitialized_array<T, capacity().value()> m_storage;
+		uninitialized_array<T, capacity()> m_storage;
 	};
 
 	struct large_t {

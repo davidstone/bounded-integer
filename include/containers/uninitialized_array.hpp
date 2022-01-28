@@ -6,13 +6,14 @@
 #pragma once
 
 #include <containers/c_array.hpp>
+#include <containers/maximum_array_size.hpp>
 
 #include <memory>
 #include <type_traits>
 
 namespace containers {
 
-template<typename T, std::size_t capacity>
+template<typename T, array_size_type<T> capacity>
 struct uninitialized_array {
 	constexpr uninitialized_array() = default;
 	constexpr auto data() const noexcept -> T const * {
@@ -42,8 +43,8 @@ private:
 
 	using storage_type = std::conditional_t<
 		is_sufficiently_trivial,
-		possibly_empty_c_array<T, capacity>,
-		std::aligned_storage_t<sizeof(T) * capacity, alignof(T)>
+		possibly_empty_c_array<T, static_cast<std::size_t>(capacity)>,
+		std::aligned_storage_t<sizeof(T) * static_cast<std::size_t>(capacity), alignof(T)>
 	>;
 	[[no_unique_address]] storage_type m_storage;
 };

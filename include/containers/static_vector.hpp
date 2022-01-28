@@ -119,7 +119,7 @@ struct static_vector_data : private lexicographical_comparison::base {
 		m_size += count;
 	}
 
-	[[no_unique_address]] uninitialized_array<T, capacity_> m_storage = {};
+	[[no_unique_address]] uninitialized_array<T, capacity()> m_storage = {};
 	[[no_unique_address]] bounded::integer<0, bounded::normalize<capacity_>> m_size = 0_bi;
 };
 

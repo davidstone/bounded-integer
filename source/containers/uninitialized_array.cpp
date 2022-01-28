@@ -7,6 +7,9 @@
 
 namespace {
 
-static_assert(containers::uninitialized_array<int, 5>().data() != containers::uninitialized_array<int, 5>().data());
+using namespace bounded::literal;
+using container = containers::uninitialized_array<int, 5_bi>;
+
+static_assert(container().data() != container().data());
 
 } // namespace
