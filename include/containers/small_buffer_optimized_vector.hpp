@@ -136,7 +136,7 @@ struct small_buffer_optimized_vector : private lexicographical_comparison::base 
 	};
 	
 	static_assert(
-		numeric_traits::max_value<size_type> <= bounded::constant<(1ULL << (CHAR_BIT * sizeof(T *) - 1)) - 1>,
+		numeric_traits::max_value<size_type> <= ((1_bi << (bounded::size_of_bits<T *> - 1_bi)) - 1_bi),
 		"Maximum possible size is too large -- would use bit reserved for small-buffer optimization."
 	);
 

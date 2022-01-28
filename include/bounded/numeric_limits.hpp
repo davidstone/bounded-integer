@@ -12,6 +12,7 @@
 #include <bounded/detail/log.hpp>
 #include <bounded/detail/max_builtin.hpp>
 #include <bounded/detail/minmax.hpp>
+#include <bounded/detail/size_of.hpp>
 
 #include <numeric_traits/min_max_value.hpp>
 
@@ -31,7 +32,7 @@ constexpr auto digits(auto const minimum, auto const maximum, auto const base) n
 		return constant<0>;
 	} else if constexpr (maximum == constant<numeric_traits::max_value<max_unsigned_t>>) {
 		if constexpr (base == constant<2>) {
-			return constant<sizeof(max_unsigned_t) * CHAR_BIT>;
+			return size_of_bits<max_unsigned_t>;
 		} else {
 			// TODO: Not quite right, but avoids overflow
 			return ::bounded::log(maximum, base);
