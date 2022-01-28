@@ -123,6 +123,7 @@ private:
 	links_ptr m_links = nullptr;
 };
 
+// Defined to prevent binding to temporaries
 template<typename T>
 constexpr auto & as_mutable(T & value) {
 	return const_cast<std::remove_const_t<T> &>(value);
