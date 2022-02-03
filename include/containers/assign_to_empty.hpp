@@ -44,19 +44,28 @@ inline constexpr auto member_assign = []<typename Target, typename Source>(Targe
 	}
 };
 
+template<typename Target>
+constexpr auto get_source_size(auto const & source) {
+	auto const value = containers::detail::linear_size(source);
+	if constexpr (bounded::bounded_integer<decltype(value)>) {
+		return value;
+	} else {
+		return ::bounded::assume_in_range<range_size_t<Target>>(value);
+	}
+};
+
+template<typename Target, typename Source>
+constexpr auto maybe_reserve(Target & target, Source const & source, auto reserve) {
+	if constexpr (forward_range<Source> and reservable<Target>) {
+		auto const source_size = ::containers::detail::get_source_size<Target>(source);
+		reserve(target, source_size);
+	}
+}
 
 template<typename Target, typename Source>
 constexpr auto assign_to_empty_or_append(Target & target, Source && source, auto reserve, auto get_target_position, auto fallback) {
-	auto get_source_size = [&] {
-		auto const value = containers::detail::linear_size(source);
-		if constexpr (bounded::bounded_integer<decltype(value)>) {
-			return value;
-		} else {
-			return ::bounded::assume_in_range<range_size_t<Target>>(value);
-		}
-	};
 	if constexpr (appendable_from_capacity<Target> and reservable<Target> and size_then_use_range<Source>) {
-		auto const source_size = get_source_size();
+		auto const source_size = ::containers::detail::get_source_size<Target>(source);
 		reserve(target, source_size);
 		containers::uninitialized_copy_no_overlap(OPERATORS_FORWARD(source), get_target_position());
 		target.append_from_capacity(source_size);
@@ -74,10 +83,7 @@ constexpr auto assign_to_empty_or_append(Target & target, Source && source, auto
 		}();
 		target.append_from_capacity(source_size);
 	} else if constexpr (lazy_push_backable<Target>) {
-		if constexpr (forward_range<Source> and reservable<Target>) {
-			auto const source_size = get_source_size();
-			reserve(target, source_size);
-		}
+		::containers::detail::maybe_reserve(target, source, reserve);
 		auto const last = containers::end(OPERATORS_FORWARD(source));
 		for (auto it = containers::begin(OPERATORS_FORWARD(source)); it != last; ++it) {
 			::containers::lazy_push_back(target, [&] { return *it; });
