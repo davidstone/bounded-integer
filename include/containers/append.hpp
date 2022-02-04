@@ -32,14 +32,21 @@ inline constexpr auto exponential_reserve = [](auto & container, auto const sour
 inline constexpr auto append_fallback = []<typename Target, typename Source>(Target & target, Source && source) {
 	using value_t = range_value_t<Target>;
 	constexpr auto sufficiently_trivial = std::is_trivially_move_assignable_v<value_t>;
+	decltype(auto) transformed = [&]() -> decltype(auto) {
+		if constexpr (is_container<Source>) {
+			return containers::transform(source, [](auto & value) -> auto && { return std::move(value); });
+		} else {
+			return OPERATORS_FORWARD(source);
+		}
+	}();
 	constexpr auto has_member_insert = requires {
-		target.insert(containers::end(target), containers::begin(source), containers::end(source));
+		target.insert(containers::end(target), containers::begin(transformed), containers::end(transformed));
 	};
 	if constexpr (sufficiently_trivial and has_member_insert) {
-		target.insert(containers::end(target), containers::begin(source), containers::end(source));
+		target.insert(containers::end(target), containers::begin(transformed), containers::end(transformed));
 	} else {
 		::containers::detail::maybe_reserve(target, source, exponential_reserve);
-		for (decltype(auto) value : OPERATORS_FORWARD(source)) {
+		for (decltype(auto) value : OPERATORS_FORWARD(transformed)) {
 			::containers::push_back(target, OPERATORS_FORWARD(value));
 		}
 	}
