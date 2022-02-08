@@ -40,10 +40,18 @@ inline constexpr auto append_fallback = []<typename Target, typename Source>(Tar
 		}
 	}();
 	constexpr auto has_member_insert = requires {
-		target.insert(containers::end(target), containers::begin(transformed), containers::end(transformed));
+		target.insert(
+			containers::end(target),
+			make_legacy_iterator(containers::begin(transformed)),
+			make_legacy_iterator(containers::end(transformed))
+		);
 	};
 	if constexpr (sufficiently_trivial and has_member_insert) {
-		target.insert(containers::end(target), containers::begin(transformed), containers::end(transformed));
+		target.insert(
+			containers::end(target),
+			make_legacy_iterator(containers::begin(transformed)),
+			make_legacy_iterator(containers::end(transformed))
+		);
 	} else {
 		::containers::detail::maybe_reserve(target, source, exponential_reserve);
 		for (decltype(auto) value : OPERATORS_FORWARD(transformed)) {
