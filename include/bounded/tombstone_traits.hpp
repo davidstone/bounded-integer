@@ -13,8 +13,8 @@ namespace bounded {
 // std::array<std::byte, sizeof(T)>. That approach is more correct because it
 // does not claim that there is a T object somewhere, but it would not work with
 // constexpr. This means all of the users of tombstone_traits would have to have
-// a separate code path guarded by `if (std::is_constant_evaluated())` to avoid
-// the small object optimization somehow.
+// a separate code path guarded by `if consteval` to avoid the small object
+// optimization somehow.
 
 template<typename T>
 struct tombstone_traits {

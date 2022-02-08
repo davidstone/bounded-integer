@@ -74,7 +74,7 @@ inline constexpr auto uninitialized_copy_no_overlap = []<range InputRange, itera
 	// TODO: Figure out how to tell the optimizer there is no overlap so I do
 	// not need to explicitly call `memcpy`.
 	if constexpr (detail::memcpyable<InputRange, OutputIterator>) {
-		if (std::is_constant_evaluated()) {
+		if consteval {
 			return uninitialized_copy(OPERATORS_FORWARD(source), out);
 		} else {
 			auto const offset = containers::size(source);
