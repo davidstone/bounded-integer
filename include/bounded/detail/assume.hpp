@@ -33,7 +33,7 @@ void prevent_comma(auto &&);
 )
 
 #if defined __clang__ or defined __INTEL_COMPILER
-	// https://bugs.llvm.org/show_bug.cgi?id=41313
+	// https://github.com/llvm/llvm-project/issues/40658
 	#define BOUNDED_ASSUME(...) ( \
 		std::is_constant_evaluated() and !(__VA_ARGS__) ? \
 			::bounded::detail::non_constexpr() : \
