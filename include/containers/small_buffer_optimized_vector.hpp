@@ -218,7 +218,7 @@ struct small_buffer_optimized_vector : private lexicographical_comparison::base 
 			if constexpr (bounded::constructible_from<range_size_t<small_t>, decltype(new_size), bounded::non_check_t>) {
 				m_small.set_size(::bounded::assume_in_range<range_size_t<small_t>>(new_size));
 			} else {
-				bounded::assert_or_assume_unreachable();
+				bounded::unreachable();
 			}
 		} else {
 			m_large.set_size(::bounded::assume_in_range<range_size_t<large_t>>(new_size));

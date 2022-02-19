@@ -31,7 +31,7 @@ namespace detail {
 
 template<typename Result>
 constexpr auto concatenate_prepend_append(Result &, iterator_t<Result &>) {
-	bounded::assert_or_assume_unreachable();
+	bounded::unreachable();
 }
 
 // This assumes that the begining of the result is full of unused memory, and

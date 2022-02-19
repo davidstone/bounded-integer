@@ -59,7 +59,7 @@ constexpr auto & lazy_push_back(
 			temp.append_from_capacity(initial_size + 1_bi);
 			container = std::move(temp);
 		} else {
-			bounded::assert_or_assume_unreachable();
+			bounded::unreachable();
 		}
 		return containers::back(container);
 	}

@@ -96,7 +96,7 @@ constexpr auto insert(Container & container, iterator_t<Container const &> posit
 	} else if constexpr (detail::reservable<Container>) {
 		return ::containers::detail::insert_with_reallocation(container, position, OPERATORS_FORWARD(range), range_size);
 	} else {
-		bounded::assert_or_assume_unreachable();
+		bounded::unreachable();
 	}
 }
 
