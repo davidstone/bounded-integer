@@ -26,28 +26,28 @@ void prevent_comma(auto &&);
 
 // Check is_constant_evaluated() first so that we do not evaluate the expression
 // when assertions are disabled
-#define BOUNDED_DETAIL_NON_CONSTEXPR_IF(...) ( \
-	std::is_constant_evaluated() and !(__VA_ARGS__) ? \
-		::bounded::detail::non_constexpr() : \
-		BOUNDED_DETAIL_PREVENT_COMMA(__VA_ARGS__) \
+#define BOUNDED_DETAIL_CONSTEXPR_ONLY_IF(...) ( \
+	(__VA_ARGS__) ? \
+		BOUNDED_DETAIL_PREVENT_COMMA(__VA_ARGS__) : \
+		::bounded::detail::non_constexpr() \
 )
 
 #if defined __clang__ or defined __INTEL_COMPILER
 	// https://github.com/llvm/llvm-project/issues/40658
 	#define BOUNDED_ASSUME(...) ( \
-		std::is_constant_evaluated() and !(__VA_ARGS__) ? \
-			::bounded::detail::non_constexpr() : \
+		std::is_constant_evaluated() ? \
+			BOUNDED_DETAIL_CONSTEXPR_ONLY_IF(__VA_ARGS__) : \
 			__builtin_assume(__VA_ARGS__) \
 	)
 #elif defined _MSC_VER
 	#define BOUNDED_ASSUME(...) ( \
-		std::is_constant_evaluated() and !(__VA_ARGS__) ? \
-			::bounded::detail::non_constexpr() : \
-			(BOUNDED_DETAIL_PREVENT_COMMA(__VA_ARGS__), __assume(__VA_ARGS__)) \
+		std::is_constant_evaluated() ? \
+			BOUNDED_DETAIL_CONSTEXPR_ONLY_IF(__VA_ARGS__) : \
+			__assume(__VA_ARGS__) \
 	)
 #elif defined __GNUC__
 	#define BOUNDED_ASSUME(...) \
 		(!(__VA_ARGS__) ? __builtin_unreachable() : BOUNDED_DETAIL_PREVENT_COMMA(__VA_ARGS__))
 #else
-	#define BOUNDED_ASSUME BOUNDED_DETAIL_NON_CONSTEXPR_IF
+	#define BOUNDED_ASSUME BOUNDED_DETAIL_CONSTEXPR_ONLY_IF
 #endif
