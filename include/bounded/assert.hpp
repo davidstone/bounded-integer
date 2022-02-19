@@ -5,7 +5,7 @@
 
 #pragma once
 
-#include <bounded/detail/assume.hpp>
+#include <bounded/assume.hpp>
 
 #include <cassert>
 

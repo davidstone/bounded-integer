@@ -79,7 +79,6 @@ add_executable(bounded_test
 	source/bounded/detail/variant/variant.cpp
 	source/bounded/detail/variant/visit.cpp
 	source/bounded/detail/abs.cpp
-	source/bounded/detail/assume.cpp
 	source/bounded/detail/builtin_min_max_value.cpp
 	source/bounded/detail/cast.cpp
 	source/bounded/detail/class.cpp
@@ -107,6 +106,7 @@ add_executable(bounded_test
 	source/bounded/detail/underlying_type.cpp
 	source/bounded/assert.cpp
 	source/bounded/assert-NDEBUG.cpp
+	source/bounded/assume.cpp
 	source/bounded/assume_in_range.cpp
 	source/bounded/check_in_range.cpp
 	source/bounded/clamp.cpp

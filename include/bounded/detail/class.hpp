@@ -5,7 +5,6 @@
 
 #pragma once
 
-#include <bounded/detail/assume.hpp>
 #include <bounded/detail/builtin_min_max_value.hpp>
 #include <bounded/detail/comparison.hpp>
 #include <bounded/detail/is_bounded_integer.hpp>
@@ -13,6 +12,7 @@
 #include <bounded/detail/safe_extreme.hpp>
 #include <bounded/detail/underlying_type.hpp>
 
+#include <bounded/assume.hpp>
 #include <bounded/assume_in_range.hpp>
 #include <bounded/concepts.hpp>
 #include <bounded/normalize.hpp>
