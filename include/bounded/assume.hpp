@@ -24,8 +24,6 @@ void prevent_comma(auto &&);
 #define BOUNDED_DETAIL_PREVENT_COMMA(...) \
 	decltype(::bounded::detail::prevent_comma(__VA_ARGS__))()
 
-// Check is_constant_evaluated() first so that we do not evaluate the expression
-// when assertions are disabled
 #define BOUNDED_DETAIL_CONSTEXPR_ONLY_IF(...) ( \
 	(__VA_ARGS__) ? \
 		BOUNDED_DETAIL_PREVENT_COMMA(__VA_ARGS__) : \
