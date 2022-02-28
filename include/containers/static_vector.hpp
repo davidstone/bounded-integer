@@ -67,7 +67,7 @@ struct static_vector_data : private lexicographical_comparison::base {
 	static_vector_data & operator=(static_vector_data &&) & requires trivially_move_assignable<T> = default;
 	static_vector_data & operator=(static_vector_data const &) & requires trivially_copy_assignable<T> = default;
 
-	constexpr static_vector_data(static_vector_data && other) noexcept(std::is_nothrow_move_constructible_v<T>) requires move_constructible<T> {
+	constexpr static_vector_data(static_vector_data && other) noexcept requires move_constructible<T> {
 		containers::uninitialized_relocate_no_overlap(other, begin());
 		this->m_size = std::exchange(other.m_size, 0_bi);
 	}
