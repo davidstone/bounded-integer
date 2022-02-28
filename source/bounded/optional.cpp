@@ -8,9 +8,8 @@
 #include <bounded/detail/literal.hpp>
 #include <bounded/integer.hpp>
 
-#include "string_view.hpp"
-
 #include "../test_assert.hpp"
+#include "../test_int.hpp"
 
 #include <type_traits>
  
@@ -141,27 +140,27 @@ template<typename type>
 constexpr auto check_non_trivial_optional() {
 	auto uninitialized_optional = bounded::optional<type>();
 	BOUNDED_TEST(!uninitialized_optional);
-	auto optional_string = bounded::optional<type>("Hello");
-	BOUNDED_TEST(optional_string);
-	BOUNDED_TEST(*optional_string == "Hello");
+	auto optional_int = bounded::optional<type>(1);
+	BOUNDED_TEST(optional_int);
+	BOUNDED_TEST(*optional_int == 1);
 
-	optional_string = uninitialized_optional;
-	BOUNDED_TEST(!optional_string);
+	optional_int = uninitialized_optional;
+	BOUNDED_TEST(!optional_int);
 
-	optional_string = type("Hi");
-	BOUNDED_TEST(optional_string);
-	optional_string = "Yo";
-	BOUNDED_TEST(optional_string);
-	BOUNDED_TEST(*optional_string == "Yo");
-	BOUNDED_TEST(*optional_string != "Sup");
+	optional_int = type(2);
+	BOUNDED_TEST(optional_int);
+	optional_int = 3;
+	BOUNDED_TEST(optional_int);
+	BOUNDED_TEST(*optional_int == 3);
+	BOUNDED_TEST(*optional_int != 4);
 
-	static_assert(std::is_same_v<decltype(*optional_string), type &>, "Incorrect type of *optional.");
-	*optional_string = type("Hiya");
-	BOUNDED_TEST(optional_string);
-	BOUNDED_TEST(*optional_string == "Hiya");
+	static_assert(std::is_same_v<decltype(*optional_int), type &>, "Incorrect type of *optional.");
+	*optional_int = type(5);
+	BOUNDED_TEST(optional_int);
+	BOUNDED_TEST(*optional_int == 5);
 	
-	optional_string = bounded::none;
-	BOUNDED_TEST(!optional_string);
+	optional_int = bounded::none;
+	BOUNDED_TEST(!optional_int);
 
 	check_empty_braces<bounded::optional<type>>();
 }
@@ -176,7 +175,7 @@ constexpr auto check_optional() {
 
 	check_integer_optional<int>();
 	check_integer_optional<bounded::integer<1, 10>>();
-	check_non_trivial_optional<bounded_test::string_view>();
+	check_non_trivial_optional<bounded_test::integer>();
 
 	constexpr auto original = bounded::make_optional(bounded::constant<0>);
 	constexpr auto copy = original;

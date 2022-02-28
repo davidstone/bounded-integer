@@ -7,7 +7,7 @@
 
 #include <bounded/detail/class.hpp>
 #include "../homogeneous_equals.hpp"
-#include "../string_view.hpp"
+#include "../../test_int.hpp"
 
 #include <memory>
 
@@ -65,26 +65,11 @@ namespace check_many_argument_minmax {
 }
 
 
-using bounded_test::string_view;
-namespace check_non_integer_minmax {
-
-	static_assert(string_view("0") < string_view("1"), "Incorrect string comparison function.");
-	static_assert(string_view("00") < string_view("1"), "Incorrect string comparison function.");
-	static_assert(string_view("0") < string_view("11"), "Incorrect string comparison function.");
-	static_assert(string_view("09") < string_view("1"), "Incorrect string comparison function.");
-	static_assert(string_view("09") < string_view("10"), "Incorrect string comparison function.");
-	static_assert(string_view("1") < string_view("10"), "Incorrect string comparison function.");
-	static_assert(string_view("10") > string_view("1"), "Incorrect string comparison function.");
-	static_assert(string_view("1") == string_view("1"), "Incorrect string comparison function.");
-
-	static_assert(bounded::min(string_view("0"), string_view("1")) == string_view("0"), "Incorrect value of min for string arguments.");
-	static_assert(bounded::min(string_view("00"), string_view("1")) == string_view("00"), "Incorrect value of min for string arguments.");
-	static_assert(bounded::min(string_view("0"), string_view("11")) == string_view("0"), "Incorrect value of min for string arguments.");
-	static_assert(bounded::min(string_view("09"), string_view("1")) == string_view("09"), "Incorrect value of min for string arguments.");
-	static_assert(bounded::min(string_view("09"), string_view("10")) == string_view("09"), "Incorrect value of min for string arguments.");
-	static_assert(bounded::min(string_view("1"), string_view("10")) == string_view("1"), "Incorrect value of min for string arguments.");
-	static_assert(bounded::min(string_view("10"), string_view("1")) == string_view("1"), "Incorrect value of min for string arguments.");
-	static_assert(bounded::min(string_view("1"), string_view("1")) == string_view("1"), "Incorrect value of min for string arguments.");
+namespace check_other_type_minmax {
+	using bounded_test::integer;
+	static_assert(bounded::min(integer(1), integer(2)) == integer(1));
+	static_assert(bounded::min(integer(4), integer(3)) == integer(3));
+	static_assert(bounded::min(integer(5), integer(5)) == integer(5));
 }
 
 template<typename T>
@@ -122,7 +107,7 @@ constexpr auto check_minmax() {
 	// Check that built-in and class types have the same behavior, unlike
 	// operator?:
 	check_specific_reference_minmax<int>();
-	check_specific_reference_minmax<string_view>();
+	check_specific_reference_minmax<bounded_test::integer>();
 	
 	static_assert(
 		std::is_same<decltype(bounded::min(std::declval<int const &>(), std::declval<long const &>())), long>{},
