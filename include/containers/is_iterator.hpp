@@ -37,11 +37,20 @@ concept forward_iterator =
 template<typename Iterator>
 concept bidirectional_iterator = forward_iterator<Iterator> and requires(Iterator it) { --it; };
 
-template<typename Iterator>
-concept forward_random_access_iterator = forward_iterator<Iterator> and requires(Iterator it, offset_type<Iterator> offset) {
-	it - it;
-	it + offset;
+namespace detail {
+
+template<typename LHS, typename RHS>
+concept addable = requires(LHS const lhs, RHS const rhs) {
+	lhs + rhs;
 };
+
+} // namespace detail
+
+template<typename Iterator>
+concept forward_random_access_iterator =
+	forward_iterator<Iterator> and
+	detail::subtractable<Iterator> and
+	detail::addable<Iterator, offset_type<Iterator>>;
 
 // TODO: require bounded::ordered<Iterator> when more types support <=>
 template<typename Iterator>
