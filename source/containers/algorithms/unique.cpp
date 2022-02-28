@@ -30,7 +30,6 @@ constexpr void test_unique_less(Container source, Container const & expected) {
 	BOUNDED_TEST(containers::is_sorted(source));
 	BOUNDED_TEST(containers::is_sorted(expected));
 	test_unique_copy_less(source, expected);
-	test_unique_copy_less(std::move(source), expected);
 }
 
 constexpr void test_unique_merge_copy(Container const & lhs, Container const & rhs, Container const & expected) {
