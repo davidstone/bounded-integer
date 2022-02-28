@@ -126,7 +126,7 @@ struct integer {
 	constexpr auto operator=(integer const & other) & -> integer & = default;
 	constexpr auto operator=(integer && other) & -> integer & = default;
 
-	constexpr auto && operator=(detail::overlapping_integer<minimum, maximum> auto const other) & {
+	constexpr auto operator=(detail::overlapping_integer<minimum, maximum> auto const other) & -> integer & {
 		return *this = integer(::bounded::assume_in_range(other, constant<minimum>, constant<maximum>));
 	}
 	
