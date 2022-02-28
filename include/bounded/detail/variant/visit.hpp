@@ -139,12 +139,12 @@ constexpr decltype(auto) visit_implementation(
 	// there. A deduced return type would be potentially void.
 	#define BOUNDED_DETAIL_VISIT_IMPL(index) \
 		do { \
-			if constexpr (numeric_traits::max_value<decltype(search_index)> < index) { \
+			if constexpr (numeric_traits::max_value<decltype(search_index)> < (index)) { \
 				bounded::unreachable(); \
 			} else { \
 				return ::bounded::detail::visit_implementation( \
 					OPERATORS_FORWARD(function), \
-					std::index_sequence<indexes..., static_cast<std::size_t>(offset + index)>{}, \
+					std::index_sequence<indexes..., static_cast<std::size_t>(offset + (index))>{}, \
 					0_bi, \
 					OPERATORS_FORWARD(variants)... \
 				); \
