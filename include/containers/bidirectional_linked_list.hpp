@@ -53,7 +53,9 @@ struct list_node_links {
 		next(this)
 	{
 	}
+	list_node_links(list_node_links &&) = delete;
 	list_node_links(list_node_links const &) = delete;
+	auto operator=(list_node_links &&) = delete;
 	auto operator=(list_node_links const &) = delete;
 
 	list_node_links * previous;
