@@ -55,13 +55,7 @@ struct small_buffer_optimized_vector : private lexicographical_comparison::base 
 	using size_type = bounded::integer<0, bounded::normalize<max_size>>;
 
 	struct small_t {
-		// m_force_large exists just to be a bit that's always 0. This allows
-		// is_large to return the correct answer even for 0-size containers.
-		constexpr small_t():
-			m_force_large(false),
-			m_size(0_bi)
-		{
-		}
+		constexpr small_t() = default;
 		
 		constexpr auto is_large() const {
 			return m_force_large;
@@ -88,8 +82,10 @@ struct small_buffer_optimized_vector : private lexicographical_comparison::base 
 		}
 
 	private:
-		bool m_force_large : 1;
-		typename size_type::underlying_type m_size : (bounded::size_of_bits<size_type> - 1_bi).value();
+		// m_force_large exists just to be a bit that's always 0. This allows
+		// is_large to return the correct answer even for 0-size containers.
+		bool m_force_large : 1 = false;
+		typename size_type::underlying_type m_size : (bounded::size_of_bits<size_type> - 1_bi).value() = 0;
 		uninitialized_array<T, capacity()> m_storage;
 	};
 
@@ -101,7 +97,6 @@ struct small_buffer_optimized_vector : private lexicographical_comparison::base 
 
 		// m_force_large exists just to be a bit that's always 1.
 		constexpr large_t(size_type size_, capacity_type capacity_, T * pointer_):
-			m_force_large(true),
 			m_size(size_),
 			m_data(pointer_, capacity_)
 		{
@@ -130,7 +125,7 @@ struct small_buffer_optimized_vector : private lexicographical_comparison::base 
 		}
 
 	private:
-		bool m_force_large : 1;
+		bool m_force_large : 1 = true;
 		typename size_type::underlying_type m_size : (bounded::size_of_bits<size_type> - 1_bi).value();
 		detail::dynamic_array_data<T, size_type> m_data;
 	};
