@@ -224,7 +224,7 @@ BENCHMARK(benchmark_limited_inplace_sort)->LIMITED_RANGE();
 		REGISTER_INDIVIDUAL_BENCHMARK("double_buffered_ska_sort_" name, benchmark_double_buffered_ska_sort, create); \
 	} while (false)
 
-auto create_simple_data = [](auto distribution) {
+constexpr auto create_simple_data = [](auto distribution) {
 	return [=](auto & engine, bounded::bounded_integer auto const size) {
 		return create_radix_sort_data(engine, size, distribution);
 	};
@@ -232,7 +232,7 @@ auto create_simple_data = [](auto distribution) {
 
 // Technically this does not allow sharing a distribution for the same type, but
 // that is probably not a serious problem for this use case
-auto create_tuple_data = [](auto... distributions) {
+constexpr auto create_tuple_data = [](auto... distributions) {
 	return [=](auto & engine, bounded::bounded_integer auto const size) mutable {
 		return create_radix_sort_data(engine, size, [&](auto &) {
 			return std::tuple(distributions(engine)...);
@@ -240,7 +240,7 @@ auto create_tuple_data = [](auto... distributions) {
 	};
 };
 
-auto create_range_data = [](bounded::bounded_integer auto const max_size, auto generate) {
+constexpr auto create_range_data = [](bounded::bounded_integer auto const max_size, auto generate) {
 	auto size_distribution = std::uniform_int_distribution(0, static_cast<int>(max_size));
 	return [=](auto & engine, bounded::bounded_integer auto const size) mutable {
 		return create_radix_sort_data(engine, size, [&](auto &) {
