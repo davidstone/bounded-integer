@@ -61,7 +61,7 @@ inline constexpr auto construct = []<detail::non_const T, construct_function_for
 	);
 };
 
-inline constexpr auto destroy = [](auto & ref) -> void {
+inline constexpr auto destroy = [](detail::non_const auto & ref) -> void {
 	using T = std::decay_t<decltype(ref)>;
 	if constexpr (!std::is_trivially_destructible_v<T>) {
 		ref.~T();
