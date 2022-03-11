@@ -190,7 +190,7 @@ add_executable(containers_test
 	source/containers/data.cpp
 	source/containers/dereference.cpp
 	source/containers/default_adapt_traits.cpp
-	source/containers/default_begin_end.cpp
+	source/containers/default_begin_end_size.cpp
 	source/containers/dynamic_array.cpp
 	source/containers/dynamic_array_data.cpp
 	source/containers/emplace_back.cpp

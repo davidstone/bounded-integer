@@ -9,7 +9,7 @@
 #include <containers/algorithms/find.hpp>
 #include <containers/begin_end.hpp>
 #include <containers/default_adapt_traits.hpp>
-#include <containers/default_begin_end.hpp>
+#include <containers/default_begin_end_size.hpp>
 #include <containers/is_range.hpp>
 #include <containers/iter_difference_t.hpp>
 #include <containers/iterator_adapter.hpp>
@@ -30,7 +30,7 @@ namespace detail {
 
 // TODO: use a custom begin function
 template<typename Sentinel, typename UnaryPredicate>
-struct filter_iterator_traits : default_begin_end, default_dereference, default_compare {
+struct filter_iterator_traits : default_begin_end_size, default_dereference, default_compare {
 private:
 	[[no_unique_address]] Sentinel m_sentinel;
 	[[no_unique_address]] UnaryPredicate m_predicate;

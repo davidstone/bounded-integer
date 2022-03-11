@@ -24,7 +24,9 @@ namespace containers {
 namespace detail {
 
 template<typename Range, typename Traits>
-concept sized_adapted_range = requires(Traits const traits, Range const range) { ::containers::detail::unwrap(traits).get_size(range); };
+concept sized_adapted_range = requires(Traits const traits, Range const range) {
+	::containers::detail::unwrap(traits).get_size(range);
+};
 
 template<typename Range, typename Traits>
 concept statically_sized_adapted_range = sized_adapted_range<Range, Traits> and requires(Traits const traits) {

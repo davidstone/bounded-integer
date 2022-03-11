@@ -7,14 +7,14 @@
 
 #include <containers/algorithms/transform_iterator.hpp>
 #include <containers/adapt.hpp>
-#include <containers/default_begin_end.hpp>
+#include <containers/default_begin_end_size.hpp>
 #include <containers/is_range.hpp>
 
 namespace containers {
 namespace detail {
 
 template<typename UnaryFunction>
-struct range_transform_traits : transform_traits<UnaryFunction>, default_begin_end {
+struct range_transform_traits : transform_traits<UnaryFunction>, default_begin_end_size {
 	using transform_traits<UnaryFunction>::transform_traits;
 };
 
@@ -22,7 +22,7 @@ template<typename UnaryFunction>
 range_transform_traits(UnaryFunction) -> range_transform_traits<UnaryFunction>;
 
 template<typename UnaryFunction>
-struct range_transform_traits_dereference : transform_traits_dereference<UnaryFunction>, default_begin_end {
+struct range_transform_traits_dereference : transform_traits_dereference<UnaryFunction>, default_begin_end_size {
 	using transform_traits_dereference<UnaryFunction>::transform_traits_dereference;
 };
 
