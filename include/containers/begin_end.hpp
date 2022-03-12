@@ -5,6 +5,7 @@
 
 #pragma once
 
+#include <containers/algorithms/advance.hpp>
 #include <containers/c_array.hpp>
 #include <containers/contiguous_iterator.hpp>
 
@@ -22,10 +23,22 @@ concept has_member_begin = requires(Range range) {
 	OPERATORS_FORWARD(range).begin();
 };
 
+template<typename Range>
+concept has_member_before_begin = requires(Range range) {
+	OPERATORS_FORWARD(range).before_begin();
+};
+
+template<typename Range>
+concept should_use_before_begin = has_member_before_begin<Range> and !has_member_begin<Range>;
+
 } // namespace detail
 
 constexpr auto begin(detail::has_member_begin auto && range) {
 	return OPERATORS_FORWARD(range).begin();
+}
+
+constexpr auto begin(detail::should_use_before_begin auto && range) {
+	return ::containers::next(OPERATORS_FORWARD(range).before_begin());
 }
 
 template<typename T, std::size_t size>
