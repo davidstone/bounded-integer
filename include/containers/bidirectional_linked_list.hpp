@@ -222,6 +222,7 @@ struct bidirectional_linked_list : private lexicographical_comparison::base {
 			});
 		} catch (...) {
 			deallocate_node(ptr);
+			throw;
 		}
 		link_range(end().m_links->previous, ptr, ptr, end().m_links);
 		return ptr->value;
