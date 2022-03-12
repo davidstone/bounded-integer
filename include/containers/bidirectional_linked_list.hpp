@@ -5,70 +5,49 @@
 
 #pragma once
 
-#include <containers/algorithms/destroy_range.hpp>
 #include <containers/assign.hpp>
 #include <containers/assign_to_empty.hpp>
 #include <containers/begin_end.hpp>
 #include <containers/c_array.hpp>
-#include <containers/common_functions.hpp>
 #include <containers/compare_container.hpp>
-#include <containers/contiguous_iterator.hpp>
 #include <containers/initializer_range.hpp>
 #include <containers/is_container.hpp>
-#include <containers/maximum_array_size.hpp>
+#include <containers/linked_list_helper.hpp>
 #include <containers/range_value_t.hpp>
 
 #include <operators/forward.hpp>
 
 #include <concepts>
-#include <span>
+#include <cstddef>
+#include <memory>
 #include <type_traits>
 #include <utility>
 
 namespace containers {
-
-// Traditionally, "next" on the last element of a linked list is a nullptr. This
-// implementation is a little more complicated than that because we want:
-// * a noexcept default constructor
-// * a noexcept move constructor
-// * a noexcept move assignment operator
-// * stability of the end iterator except for move and swap
-//
-// This implementation also separates out the concept of the links of the node
-// (`previous` and `next`) from the data because we store the sentinel links
-// directly in the list, and we do not want to increase the stack storage costs
-// by `sizeof(T)`.
-//
-// Every instance of `list_node_links` has a `list_node` that derives from it,
-// except for the sentinel stored directly in the list.
-
-template<typename T>
-struct bidirectional_linked_list;
-
 namespace detail {
 
-struct list_node_links {
-	constexpr list_node_links() noexcept:
+struct bidirectional_links {
+	constexpr bidirectional_links() noexcept:
 		previous(this),
 		next(this)
 	{
 	}
-	list_node_links(list_node_links &&) = delete;
-	list_node_links(list_node_links const &) = delete;
-	auto operator=(list_node_links &&) = delete;
-	auto operator=(list_node_links const &) = delete;
+	bidirectional_links(bidirectional_links &&) = delete;
+	bidirectional_links(bidirectional_links const &) = delete;
+	auto operator=(bidirectional_links &&) = delete;
+	auto operator=(bidirectional_links const &) = delete;
 
-	list_node_links * previous;
-	list_node_links * next;
+	bidirectional_links * previous;
+	bidirectional_links * next;
 };
 
-constexpr auto unlink_range(list_node_links * const first, list_node_links * const last) -> void {
+constexpr auto unlink_range(bidirectional_links * const first, bidirectional_links * const last) -> void {
 	auto const before_first = first->previous;
 	before_first->next = last;
 	last->previous = before_first;
 }
 
-constexpr auto link_range(list_node_links * const original_first, list_node_links * const additional_first, list_node_links * const additional_before_last, list_node_links * const original_last) -> void {
+constexpr auto link_range(bidirectional_links * const original_first, bidirectional_links * const additional_first, bidirectional_links * const additional_before_last, bidirectional_links * const original_last) -> void {
 	BOUNDED_ASSERT(original_first->next == original_last);
 	BOUNDED_ASSERT(original_last->previous == original_first);
 	original_first->next = additional_first;
@@ -77,70 +56,12 @@ constexpr auto link_range(list_node_links * const original_first, list_node_link
 	original_last->previous = additional_before_last;
 }
 
-
-template<typename T>
-struct list_node : list_node_links {
-	constexpr explicit list_node(bounded::construct_function_for<T> auto && constructor):
-		value(OPERATORS_FORWARD(constructor)())
-	{
-	}
-	[[no_unique_address]] T value;
-};
-
-template<typename T, bool is_const>
-struct list_iterator {
-private:
-	using links_ptr = std::conditional_t<is_const, list_node_links const *, list_node_links *>;
-public:
-	friend bidirectional_linked_list<T>;
-
-	// ???
-	using difference_type = array_size_type<T>;
-
-	list_iterator() = default;
-	constexpr explicit list_iterator(links_ptr const links):
-		m_links(links)
-	{
-	}
-
-	constexpr operator list_iterator<T, true>() const {
-		return list_iterator<T, true>(m_links);
-	}
-
-	constexpr auto & operator*() const {
-		using node_ptr = std::conditional_t<is_const, list_node<T> const *, list_node<T> *>;
-		return static_cast<node_ptr>(m_links)->value;
-	}
-	OPERATORS_ARROW_DEFINITIONS
-
-	friend auto operator<=>(list_iterator, list_iterator) = default;
-
-	friend constexpr auto operator+(list_iterator const it, bounded::constant_t<1>) {
-		return list_iterator<T, is_const>(it.m_links->next);
-	}
-	friend constexpr auto operator-(list_iterator const it, bounded::constant_t<1>) {
-		return list_iterator<T, is_const>(it.m_links->previous);
-	}
-private:
-	links_ptr m_links = nullptr;
-};
-
-// Defined to prevent binding to temporaries
-template<typename T>
-constexpr auto & as_mutable(T & value) {
-	return const_cast<std::remove_const_t<T> &>(value);
-}
-template<typename T>
-constexpr auto as_mutable(T const * value) -> T * {
-	return const_cast<T *>(value);
-}
-
 } // namespace detail
 
 template<typename T>
 struct bidirectional_linked_list : private lexicographical_comparison::base {
-	using const_iterator = detail::list_iterator<T, true>;
-	using iterator = detail::list_iterator<T, false>;
+	using const_iterator = detail::list_iterator<bidirectional_linked_list, detail::bidirectional_links const, T>;
+	using iterator = detail::list_iterator<bidirectional_linked_list, detail::bidirectional_links, T>;
 
 	constexpr bidirectional_linked_list() = default;
 
@@ -182,7 +103,7 @@ struct bidirectional_linked_list : private lexicographical_comparison::base {
 	friend constexpr auto swap(bidirectional_linked_list & lhs, bidirectional_linked_list & rhs) noexcept -> void {
 		std::swap(lhs.m_sentinel.previous, rhs.m_sentinel.previous);
 		std::swap(lhs.m_sentinel.next, rhs.m_sentinel.next);
-		constexpr auto link_in = [](detail::list_node_links & node, detail::list_node_links const & other) {
+		constexpr auto link_in = [](detail::bidirectional_links & node, detail::bidirectional_links const & other) {
 			if (node.previous == std::addressof(other)) {
 				BOUNDED_ASSERT(node.next == std::addressof(other));
 				node.previous = std::addressof(node);
@@ -215,24 +136,15 @@ struct bidirectional_linked_list : private lexicographical_comparison::base {
 	}
 
 	constexpr auto lazy_push_back(bounded::construct_function_for<T> auto && constructor) & -> T & {
-		auto ptr = allocate_node();
-		try {
-			bounded::construct(*ptr, [&] {
-				return detail::list_node<T>(OPERATORS_FORWARD(constructor));
-			});
-		} catch (...) {
-			deallocate_node(ptr);
-			throw;
-		}
+		auto ptr = containers::detail::make_node<node_t>(OPERATORS_FORWARD(constructor));
 		link_range(end().m_links->previous, ptr, ptr, end().m_links);
 		return ptr->value;
 	}
 	constexpr auto pop_back() & -> void {
 		auto const it = containers::prev(end());
 		unlink_range(it.m_links, end().m_links);
-		auto const ptr = static_cast<detail::list_node<T> *>(it.m_links);
-		bounded::destroy(*ptr);
-		deallocate_node(ptr);
+		auto const ptr = static_cast<node_t *>(it.m_links);
+		detail::destroy_node(ptr);
 	}
 
 	constexpr auto splice(const_iterator const position, bidirectional_linked_list &, const_iterator const first, const_iterator const last) & -> void {
@@ -255,17 +167,8 @@ struct bidirectional_linked_list : private lexicographical_comparison::base {
 	}
 
 private:
-	static constexpr auto allocator() -> std::allocator<detail::list_node<T>> {
-		return {};
-	}
-	static constexpr auto allocate_node() -> detail::list_node<T> * {
-		return allocator().allocate(1);
-	}
-	static constexpr auto deallocate_node(detail::list_node<T> * ptr) -> void {
-		allocator().deallocate(ptr, 1);
-	}
-
-	detail::list_node_links m_sentinel;
+	using node_t = detail::linked_list_node<detail::bidirectional_links, T>;
+	detail::bidirectional_links m_sentinel;
 };
 
 template<typename Range>

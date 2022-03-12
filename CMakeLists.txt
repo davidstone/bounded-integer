@@ -215,6 +215,7 @@ add_executable(containers_test
 	source/containers/lazy_push_back.cpp
 	source/containers/legacy_iterator.cpp
 	source/containers/linear_map.cpp
+	source/containers/linked_list_helper.cpp
 	source/containers/lookup.cpp
 	source/containers/maximum_array_size.cpp
 	source/containers/mutable_iterator.cpp
