@@ -11,8 +11,8 @@
 #include <containers/algorithms/uninitialized.hpp>
 #include <containers/appendable_from_capacity.hpp>
 #include <containers/begin_end.hpp>
-#include <containers/constant_time_erasable.hpp>
 #include <containers/count_type.hpp>
+#include <containers/erase_concepts.hpp>
 #include <containers/iterator_t.hpp>
 #include <containers/mutable_iterator.hpp>
 
@@ -39,7 +39,7 @@ template<detail::erasable Container>
 constexpr auto erase(Container & container, iterator_t<Container const &> const first, iterator_t<Container const &> const middle_) {
 	if constexpr (detail::member_erasable<Container>) {
 		return container.erase(first, middle_);
-	} else if constexpr (splicable<Container>) {
+	} else if constexpr (detail::splicable<Container>) {
 		auto temp = Container();
 		temp.splice(containers::begin(temp), container, first, middle_);
 		return mutable_iterator(container, middle_);
@@ -92,7 +92,7 @@ constexpr void erase_after(Container & container, iterator_t<Container const &> 
 template<detail::erasable Container>
 constexpr auto erase_if(Container & container, auto predicate) {
 	auto result = count_type<Container>(0_bi);
-	if constexpr (constant_time_erasable<Container>) {
+	if constexpr (detail::constant_time_erasable<Container>) {
 		for (auto it = containers::begin(container); it != containers::end(container); ) {
 			if (predicate(*it)) {
 				it = ::containers::erase(container, it);

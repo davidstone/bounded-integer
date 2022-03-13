@@ -183,7 +183,6 @@ add_executable(containers_test
 	source/containers/c_array.cpp
 	source/containers/clear.cpp
 	source/containers/compare_container.cpp
-	source/containers/constant_time_erasable.cpp
 	source/containers/contiguous_iterator.cpp
 	source/containers/count_type.cpp
 	source/containers/data.cpp
@@ -194,6 +193,7 @@ add_executable(containers_test
 	source/containers/dynamic_array_data.cpp
 	source/containers/emplace_back.cpp
 	source/containers/empty_range.cpp
+	source/containers/erase_concepts.cpp
 	source/containers/flat_map.cpp
 	source/containers/front_back.cpp
 	source/containers/index_type.cpp
