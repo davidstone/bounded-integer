@@ -6,7 +6,6 @@
 #pragma once
 
 #include <containers/algorithms/destroy_range.hpp>
-#include <containers/algorithms/relocate_range_adapter.hpp>
 #include <containers/begin_end.hpp>
 #include <containers/data.hpp>
 #include <containers/dereference.hpp>
@@ -18,6 +17,7 @@
 #include <containers/to_address.hpp>
 
 #include <bounded/integer.hpp>
+#include <bounded/relocate.hpp>
 
 #include <operators/forward.hpp>
 
@@ -78,7 +78,11 @@ inline constexpr auto uninitialized_copy_no_overlap = []<range InputRange, itera
 			return uninitialized_copy(OPERATORS_FORWARD(source), out);
 		} else {
 			auto const offset = containers::size(source);
-			::containers::detail::memcpy(containers::to_address(out), containers::data(source), static_cast<std::size_t>(offset) * sizeof(range_value_t<InputRange>));
+			::containers::detail::memcpy(
+				containers::to_address(out),
+				containers::data(source),
+				static_cast<std::size_t>(offset) * sizeof(range_value_t<InputRange>)
+			);
 			return out + ::bounded::assume_in_range<iter_difference_t<OutputIterator>>(offset);
 		}
 	} else {
@@ -86,17 +90,25 @@ inline constexpr auto uninitialized_copy_no_overlap = []<range InputRange, itera
 	}
 };
 
-inline constexpr auto uninitialized_relocate = [](range auto && source, iterator auto out) {
-	return uninitialized_copy(
-		::containers::detail::relocate_range_adapter(OPERATORS_FORWARD(source)),
-		out
-	);
+inline constexpr auto uninitialized_relocate = [](range auto && input, iterator auto output) {
+	auto const last = containers::end(OPERATORS_FORWARD(input));
+	for (auto it = containers::begin(OPERATORS_FORWARD(input)); it != last; ++it) {
+		bounded::construct(*output, [&] {
+			if constexpr (std::is_reference_v<decltype(*it)>) {
+				return bounded::relocate(*it);
+			} else {
+				return *it;
+			}
+		});
+		++output;
+	}
+	return output;
 };
 
 inline constexpr auto uninitialized_relocate_no_overlap = []<range InputRange, iterator OutputIterator>(InputRange && source, OutputIterator out) {
 	if constexpr (detail::memcpyable<InputRange, OutputIterator>) {
-		auto result = ::containers::uninitialized_copy_no_overlap(source, out);
-		containers::destroy_range(source);
+		auto result = uninitialized_copy_no_overlap(source, out);
+		::containers::destroy_range(source);
 		return result;
 	} else {
 		return uninitialized_relocate(OPERATORS_FORWARD(source), out);
