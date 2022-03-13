@@ -6,11 +6,16 @@
 #pragma once
 
 #include <containers/is_range.hpp>
-#include <containers/size.hpp>
+#include <containers/iter_difference_t.hpp>
+#include <containers/iterator_t.hpp>
 
 namespace containers::detail {
 
 template<typename Container>
-concept appendable_from_capacity = range<Container> and requires(Container & container, range_size_t<Container> count) { container.append_from_capacity(count); };
+concept appendable_from_capacity =
+	range<Container> and
+	requires(Container & container, iter_difference_t<iterator_t<Container>> const difference) {
+		container.append_from_capacity(difference);
+	};
 
 } // namespace containers::detail
