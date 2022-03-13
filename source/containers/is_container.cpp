@@ -20,9 +20,14 @@ static_assert(!containers::is_container<int>);
 static_assert(!containers::is_container<std::span<int>>);
 static_assert(!containers::is_container<std::string_view>);
 static_assert(containers::is_container<std::array<int, 1>>);
+static_assert(!containers::is_container<std::array<int, 1> &>);
 static_assert(containers::is_container<std::string>);
+static_assert(!containers::is_container<std::string &>);
 static_assert(containers::is_container<std::vector<int>>);
+static_assert(!containers::is_container<std::vector<int> &>);
 static_assert(containers::is_container<std::set<int>>);
+static_assert(!containers::is_container<std::set<int> &>);
 static_assert(containers::is_container<std::map<int, int>>);
+static_assert(!containers::is_container<std::map<int, int> &>);
 
 } // namespace
