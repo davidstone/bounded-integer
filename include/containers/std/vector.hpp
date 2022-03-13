@@ -15,7 +15,6 @@
 #include <containers/front_back.hpp>
 #include <containers/index_type.hpp>
 #include <containers/insert.hpp>
-#include <containers/is_container.hpp>
 #include <containers/is_empty.hpp>
 #include <containers/is_iterator.hpp>
 #include <containers/iter_value_t.hpp>
@@ -339,6 +338,3 @@ template<containers::iterator InputIterator>
 vector(InputIterator, InputIterator) -> vector<containers::iter_value_t<InputIterator>>;
 
 } // namespace std_containers
-
-template<typename T, typename Allocator>
-inline constexpr auto ::containers::is_container<std_containers::vector<T, Allocator>> = true;

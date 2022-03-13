@@ -19,7 +19,6 @@
 #include <containers/data.hpp>
 #include <containers/initializer_range.hpp>
 #include <containers/integer_range.hpp>
-#include <containers/is_container.hpp>
 #include <containers/is_iterator_sentinel.hpp>
 #include <containers/is_range.hpp>
 #include <containers/pop_back.hpp>
@@ -187,12 +186,6 @@ public:
 		std::swap(lhs.m_size, rhs.m_size);
 	}
 };
-
-template<typename T, array_size_type<T> capacity, bool is_trivially_destructible>
-inline constexpr auto is_container<detail::static_vector_data<T, capacity, is_trivially_destructible>> = true;
-
-template<typename T, array_size_type<T> capacity>
-inline constexpr auto is_container<static_vector<T, capacity>> = true;
 
 template<range Source>
 constexpr auto make_static_vector(Source && source) {

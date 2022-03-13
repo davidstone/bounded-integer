@@ -14,7 +14,6 @@
 #include <containers/compare_container.hpp>
 #include <containers/contiguous_iterator.hpp>
 #include <containers/initializer_range.hpp>
-#include <containers/is_container.hpp>
 #include <containers/maximum_array_size.hpp>
 #include <containers/range_value_t.hpp>
 #include <containers/uninitialized_dynamic_array.hpp>
@@ -145,8 +144,5 @@ private:
 
 template<typename Range>
 vector(Range &&) -> vector<std::decay_t<range_value_t<Range>>>;
-
-template<typename T, std::size_t max_size>
-inline constexpr auto is_container<vector<T, max_size>> = true;
 
 } // namespace containers

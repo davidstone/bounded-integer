@@ -323,7 +323,4 @@ private:
 	};
 };
 
-template<typename T, std::size_t requested_small_capacity, std::size_t max_size>
-inline constexpr auto is_container<small_buffer_optimized_vector<T, requested_small_capacity, max_size>> = true;
-
 } // namespace containers

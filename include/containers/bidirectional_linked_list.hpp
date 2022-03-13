@@ -11,7 +11,6 @@
 #include <containers/c_array.hpp>
 #include <containers/compare_container.hpp>
 #include <containers/initializer_range.hpp>
-#include <containers/is_container.hpp>
 #include <containers/linked_list_helper.hpp>
 #include <containers/range_value_t.hpp>
 
@@ -173,8 +172,5 @@ private:
 
 template<typename Range>
 bidirectional_linked_list(Range &&) -> bidirectional_linked_list<std::decay_t<range_value_t<Range>>>;
-
-template<typename T>
-inline constexpr auto is_container<bidirectional_linked_list<T>> = true;
 
 } // namespace containers

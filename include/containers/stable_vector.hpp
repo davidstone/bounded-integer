@@ -14,7 +14,6 @@
 #include <containers/compare_container.hpp>
 #include <containers/contiguous_iterator.hpp>
 #include <containers/initializer_range.hpp>
-#include <containers/is_container.hpp>
 #include <containers/uninitialized_dynamic_array.hpp>
 
 #include <operators/forward.hpp>
@@ -115,8 +114,5 @@ private:
 	storage_type m_storage{capacity()};
 	[[no_unique_address]] bounded::integer<0, bounded::normalize<capacity_>> m_size = 0_bi;
 };
-
-template<typename T, std::size_t capacity>
-inline constexpr auto is_container<stable_vector<T, capacity>> = true;
 
 } // namespace containers
