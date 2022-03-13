@@ -11,8 +11,8 @@
 #include <bounded/integer.hpp>
 
 // The strange namespacing and using declarations here are to ensure these
-// functions are picked up by ADL for types defined in namespaces ::container or
-// ::container::detail
+// functions are picked up by ADL for types defined in namespaces ::containers
+// or ::containers::detail
 
 namespace containers {
 namespace detail {
