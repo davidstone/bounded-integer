@@ -26,8 +26,9 @@ private:
 	// reinterpret_cast is not allowed in a constexpr function, so this avoids
 	// storage that requires a reinterpret_cast if possible.
 	//
-	// Once https://bugs.llvm.org/show_bug.cgi?id=51788 is fixed, this can use a
-	// union-based implementation to drop the trivially destructible requirement
+	// Once https://github.com/llvm/llvm-project/issues/51130 is fixed, this can
+	// use a union-based implementation to drop the trivially destructible
+	// requirement
 	static constexpr auto is_sufficiently_trivial = std::is_trivially_default_constructible_v<T> and std::is_trivially_destructible_v<T>;
 
 	template<typename Result>

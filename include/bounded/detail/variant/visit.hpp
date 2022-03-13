@@ -218,9 +218,8 @@ public:
 // arity equal to the number of variants
 inline constexpr struct visit_t {
 private:
-	// The reference is safe in the inner lambda because this function lives
-	// only for the duration of the call. Do not use a lambda to work around
-	// https://bugs.llvm.org/show_bug.cgi?id=42749
+	// Does not use a lambda because of
+	// https://github.com/llvm/llvm-project/issues/42094
 	template<typename Function>
 	struct unwrap_visitor_parameter {
 		Function && function;
