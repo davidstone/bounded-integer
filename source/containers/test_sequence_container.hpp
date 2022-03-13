@@ -243,6 +243,7 @@ constexpr auto test_sequence_container_from(auto const make) -> void {
 
 template<typename Container>
 constexpr auto test_sequence_container() -> bool {
+	static_assert(containers::is_container<Container>);
 	test_forward_range_concepts<Container>();
 
 	test_range_based_for_loop<Container>();

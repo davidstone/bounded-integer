@@ -31,6 +31,9 @@ concept qualifiers_are_contiguous_ranges =
 static_assert(qualifiers_are_contiguous_ranges<containers::array<int, 0_bi>>);
 static_assert(qualifiers_are_contiguous_ranges<containers::array<int, 5_bi>>);
 
+static_assert(containers::is_container<containers::array<int, 0_bi>>);
+static_assert(containers::is_container<containers::array<int, 1_bi>>);
+
 static_assert(containers_test::test_sequence_container_default_constructed_empty<containers::array<int, 0_bi>>());
 static_assert(containers_test::test_sequence_container_implicit_from_two_empty_braces<containers::array<int, 0_bi>>());
 static_assert(containers_test::test_special_members<containers::array<int, 0_bi>>([] { return containers::array<int, 0_bi>({}); }));
