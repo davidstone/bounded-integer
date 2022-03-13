@@ -6,7 +6,7 @@
 #pragma once
 
 #include <containers/appendable_from_capacity.hpp>
-#include <containers/begin_end.hpp>
+#include <containers/has_member_before_begin.hpp>
 #include <containers/is_range.hpp>
 #include <containers/iterator_t.hpp>
 

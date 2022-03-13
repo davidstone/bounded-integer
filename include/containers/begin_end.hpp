@@ -8,6 +8,7 @@
 #include <containers/algorithms/advance.hpp>
 #include <containers/c_array.hpp>
 #include <containers/contiguous_iterator.hpp>
+#include <containers/has_member_before_begin.hpp>
 
 #include <operators/forward.hpp>
 #include <bounded/integer.hpp>
@@ -21,11 +22,6 @@ namespace detail {
 template<typename Range>
 concept has_member_begin = requires(Range range) {
 	OPERATORS_FORWARD(range).begin();
-};
-
-template<typename Range>
-concept has_member_before_begin = requires(Range range) {
-	OPERATORS_FORWARD(range).before_begin();
 };
 
 template<typename Range>
