@@ -10,7 +10,7 @@
 
 namespace containers {
 
-template<typename Range>
+template<range Range>
 using count_type = offset_type<iterator_t<Range &>>;
 
 }	// namespace containers
