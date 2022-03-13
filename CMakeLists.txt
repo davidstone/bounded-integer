@@ -200,6 +200,7 @@ add_executable(containers_test
 	source/containers/initializer_range.cpp
 	source/containers/insert.cpp
 	source/containers/integer_range.cpp
+	source/containers/is_container.cpp
 	source/containers/is_empty.cpp
 	source/containers/is_iterator.cpp
 	source/containers/is_iterator_sentinel.cpp
