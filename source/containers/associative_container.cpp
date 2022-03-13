@@ -21,13 +21,13 @@ namespace {
 using namespace bounded::literal;
 
 template<typename... Ts>
-constexpr auto all_qualifications_are_associative_helper = (... and containers::associative_container<Ts>);
+constexpr auto all_qualifications_are_associative_helper = (... and containers::associative_range<Ts>);
 
 template<typename T>
 constexpr auto all_qualifications_are_associative = all_qualifications_are_associative_helper<T, T const, T &, T const &, T &&>;
 
 template<typename... Ts>
-constexpr auto no_qualifications_are_associative_helper = (... and !containers::associative_container<Ts>);
+constexpr auto no_qualifications_are_associative_helper = (... and !containers::associative_range<Ts>);
 
 template<typename T>
 constexpr auto no_qualifications_are_associative = no_qualifications_are_associative_helper<T, T const, T &, T const &, T &&>;

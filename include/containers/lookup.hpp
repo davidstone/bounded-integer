@@ -15,7 +15,7 @@
 
 namespace containers {
 
-constexpr auto lookup(associative_container auto && container, auto && key) {
+constexpr auto lookup(associative_range auto && container, auto && key) {
 	auto const it = container.find(OPERATORS_FORWARD(key));
 	return it != containers::end(container) ?
 		std::addressof(get_mapped(*it)) :

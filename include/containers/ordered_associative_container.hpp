@@ -25,8 +25,11 @@ concept has_extract_key = requires(T const & container) {
 } // namespace detail
 
 template<typename T>
-concept ordered_associative_container =
-	associative_container<T> and
+concept ordered_associative_range =
+	associative_range<T> and
 	(detail::has_key_comp<T> or detail::has_extract_key<T>);
+
+template<typename T>
+concept ordered_associative_container = ordered_associative_range<T> and associative_container<T>;
 
 } // namespace containers

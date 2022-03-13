@@ -22,9 +22,10 @@ using namespace bounded::literal;
 
 template<typename Container>
 constexpr auto test_associative_container_concepts() -> void {
-	static_assert(containers::associative_container<Container const &>);
-	static_assert(containers::associative_container<Container &>);
-	static_assert(containers::associative_container<Container &&>);
+	static_assert(containers::associative_range<Container const &>);
+	static_assert(containers::associative_range<Container &>);
+	static_assert(containers::associative_range<Container &&>);
+	static_assert(containers::associative_range<Container>);
 	static_assert(containers::associative_container<Container>);
 }
 

@@ -12,7 +12,7 @@
 
 namespace containers {
 
-constexpr auto keyed_lower_bound(auto && container, auto && key) {
+constexpr auto keyed_lower_bound(associative_range auto && container, auto && key) {
 	return containers::lower_bound(
 		OPERATORS_FORWARD(container),
 		OPERATORS_FORWARD(key),
@@ -20,7 +20,7 @@ constexpr auto keyed_lower_bound(auto && container, auto && key) {
 	);
 }
 
-constexpr auto keyed_upper_bound(auto && container, auto && key) {
+constexpr auto keyed_upper_bound(associative_range auto && container, auto && key) {
 	return containers::upper_bound(
 		OPERATORS_FORWARD(container),
 		OPERATORS_FORWARD(key),
@@ -28,7 +28,7 @@ constexpr auto keyed_upper_bound(auto && container, auto && key) {
 	);
 }
 
-constexpr auto keyed_equal_range(auto && container, auto && key) {
+constexpr auto keyed_equal_range(associative_range auto && container, auto && key) {
 	return containers::equal_range(
 		OPERATORS_FORWARD(container),
 		OPERATORS_FORWARD(key),
