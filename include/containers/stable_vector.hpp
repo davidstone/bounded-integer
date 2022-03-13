@@ -31,7 +31,7 @@ struct stable_vector : private lexicographical_comparison::base {
 	// Allocates the full capacity
 	constexpr stable_vector() = default;
 
-	constexpr explicit stable_vector(initializer_range<stable_vector> auto && source) {
+	constexpr explicit stable_vector(constructor_initializer_range<stable_vector> auto && source) {
 		::containers::assign_to_empty(*this, OPERATORS_FORWARD(source));
 	}
 	

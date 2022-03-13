@@ -64,7 +64,7 @@ struct bidirectional_linked_list : private lexicographical_comparison::base {
 
 	constexpr bidirectional_linked_list() = default;
 
-	constexpr explicit bidirectional_linked_list(initializer_range<bidirectional_linked_list> auto && source) {
+	constexpr explicit bidirectional_linked_list(constructor_initializer_range<bidirectional_linked_list> auto && source) {
 		::containers::assign_to_empty(*this, OPERATORS_FORWARD(source));
 	}
 	

@@ -35,23 +35,23 @@ struct basic_linear_map : private lexicographical_comparison::base {
 	{
 	}
 
-	constexpr basic_linear_map(initializer_range<basic_linear_map> auto && source, Equal equal_):
+	constexpr basic_linear_map(constructor_initializer_range<basic_linear_map> auto && source, Equal equal_):
 		m_container(OPERATORS_FORWARD(source)),
 		m_equal(std::move(equal_))
 	{
 		remove_duplicates();
 	}
-	constexpr explicit basic_linear_map(initializer_range<basic_linear_map> auto && source):
+	constexpr explicit basic_linear_map(constructor_initializer_range<basic_linear_map> auto && source):
 		basic_linear_map(OPERATORS_FORWARD(source), Equal())
 	{
 	}
 
-	constexpr basic_linear_map(assume_unique_t, initializer_range<basic_linear_map> auto && source, Equal equal_):
+	constexpr basic_linear_map(assume_unique_t, constructor_initializer_range<basic_linear_map> auto && source, Equal equal_):
 		m_container(OPERATORS_FORWARD(source)),
 		m_equal(std::move(equal_))
 	{
 	}
-	constexpr basic_linear_map(assume_unique_t, initializer_range<basic_linear_map> auto && source):
+	constexpr basic_linear_map(assume_unique_t, constructor_initializer_range<basic_linear_map> auto && source):
 		m_container(OPERATORS_FORWARD(source))
 	{
 	}

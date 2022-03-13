@@ -127,7 +127,7 @@ struct flat_map_base : private lexicographical_comparison::base {
 	{
 	}
 
-	constexpr flat_map_base(initializer_range<flat_map_base> auto && source, ExtractKey extract_key_):
+	constexpr flat_map_base(constructor_initializer_range<flat_map_base> auto && source, ExtractKey extract_key_):
 		m_container(OPERATORS_FORWARD(source)),
 		m_extract_key(std::move(extract_key_))
 	{
@@ -137,29 +137,29 @@ struct flat_map_base : private lexicographical_comparison::base {
 			unique_ska_sort(m_container, extract_key());
 		}
 	}
-	constexpr explicit flat_map_base(initializer_range<flat_map_base> auto && source):
+	constexpr explicit flat_map_base(constructor_initializer_range<flat_map_base> auto && source):
 		flat_map_base(OPERATORS_FORWARD(source), ExtractKey())
 	{
 	}
 
-	constexpr flat_map_base(assume_sorted_unique_t, initializer_range<flat_map_base> auto && source, ExtractKey extract_key_):
+	constexpr flat_map_base(assume_sorted_unique_t, constructor_initializer_range<flat_map_base> auto && source, ExtractKey extract_key_):
 		m_container(OPERATORS_FORWARD(source)),
 		m_extract_key(std::move(extract_key_))
 	{
 		BOUNDED_ASSERT(is_sorted(m_container, compare()));
 	}
-	constexpr flat_map_base(assume_sorted_unique_t, initializer_range<flat_map_base> auto && source):
+	constexpr flat_map_base(assume_sorted_unique_t, constructor_initializer_range<flat_map_base> auto && source):
 		flat_map_base(assume_sorted_unique, OPERATORS_FORWARD(source), ExtractKey())
 	{
 	}
 
-	constexpr flat_map_base(assume_unique_t, initializer_range<flat_map_base> auto && source, ExtractKey extract_key_):
+	constexpr flat_map_base(assume_unique_t, constructor_initializer_range<flat_map_base> auto && source, ExtractKey extract_key_):
 		m_container(OPERATORS_FORWARD(source)),
 		m_extract_key(std::move(extract_key_))
 	{
 		ska_sort(m_container, extract_key());
 	}
-	constexpr flat_map_base(assume_unique_t, initializer_range<flat_map_base> auto && source):
+	constexpr flat_map_base(assume_unique_t, constructor_initializer_range<flat_map_base> auto && source):
 		flat_map_base(assume_unique, OPERATORS_FORWARD(source), ExtractKey())
 	{
 	}

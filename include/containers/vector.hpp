@@ -38,7 +38,7 @@ struct vector : private lexicographical_comparison::base {
 
 	constexpr vector() = default;
 
-	constexpr explicit vector(initializer_range<vector> auto && source) {
+	constexpr explicit vector(constructor_initializer_range<vector> auto && source) {
 		::containers::assign_to_empty(*this, OPERATORS_FORWARD(source));
 	}
 	

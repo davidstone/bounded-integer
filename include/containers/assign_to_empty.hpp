@@ -9,10 +9,12 @@
 #include <containers/appendable_from_capacity.hpp>
 #include <containers/begin_end.hpp>
 #include <containers/c_array.hpp>
+#include <containers/initializer_range.hpp>
 #include <containers/is_range.hpp>
-#include <containers/push_back.hpp>
+#include <containers/lazy_push_back.hpp>
 #include <containers/range_value_t.hpp>
 #include <containers/reserve_if_reservable.hpp>
+#include <containers/resizable_container.hpp>
 #include <containers/size.hpp>
 
 #include <bounded/integer.hpp>
@@ -110,14 +112,15 @@ constexpr auto assign_to_empty_impl(auto & target, auto && source) -> void {
 
 } // namespace detail
 
-constexpr auto assign_to_empty(detail::push_backable auto & target, range auto && source) -> void {
+template<resizable_container Target, initializer_range<Target> Source>
+constexpr auto assign_to_empty(Target & target, Source && source) -> void {
 	::containers::detail::assign_to_empty_impl(target, OPERATORS_FORWARD(source));
 }
 
-constexpr auto assign_to_empty(range auto & target, empty_c_array_parameter) -> void {
+constexpr auto assign_to_empty(resizable_container auto & target, empty_c_array_parameter) -> void {
 	BOUNDED_ASSERT(containers::is_empty(target));
 }
-template<detail::push_backable Target, std::size_t init_size>
+template<resizable_container Target, std::size_t init_size> requires std::is_move_constructible_v<range_value_t<Target>>
 constexpr auto assign_to_empty(Target & target, c_array<range_value_t<Target>, init_size> && source) -> void {
 	::containers::detail::assign_to_empty_impl(target, std::move(source));
 }

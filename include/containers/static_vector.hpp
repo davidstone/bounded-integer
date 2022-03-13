@@ -85,7 +85,7 @@ struct static_vector_data : private lexicographical_comparison::base {
 		return *this;
 	}
 
-	constexpr explicit static_vector_data(initializer_range<static_vector_data> auto && source) {
+	constexpr explicit static_vector_data(constructor_initializer_range<static_vector_data> auto && source) {
 		::containers::assign_to_empty(*this, OPERATORS_FORWARD(source));
 	}
 	

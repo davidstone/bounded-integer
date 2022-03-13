@@ -140,7 +140,7 @@ struct small_buffer_optimized_vector : private lexicographical_comparison::base 
 	{
 	}
 	
-	constexpr explicit small_buffer_optimized_vector(initializer_range<small_buffer_optimized_vector> auto && source):
+	constexpr explicit small_buffer_optimized_vector(constructor_initializer_range<small_buffer_optimized_vector> auto && source):
 		small_buffer_optimized_vector()
 	{
 		::containers::assign_to_empty(*this, OPERATORS_FORWARD(source));
