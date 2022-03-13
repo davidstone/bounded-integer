@@ -6,12 +6,12 @@
 #pragma once
 
 #include <containers/algorithms/copy.hpp>
-#include <containers/algorithms/erase.hpp>
 #include <containers/algorithms/move_iterator.hpp>
 #include <containers/append.hpp>
 #include <containers/assign_to_empty.hpp>
 #include <containers/c_array.hpp>
 #include <containers/clear.hpp>
+#include <containers/is_container.hpp>
 #include <containers/is_range.hpp>
 #include <containers/range_value_t.hpp>
 #include <containers/resizable_container.hpp>

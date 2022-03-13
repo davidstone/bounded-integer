@@ -6,7 +6,6 @@
 #pragma once
 
 #include <containers/algorithms/compare.hpp>
-#include <containers/algorithms/concatenate.hpp>
 #include <containers/begin_end.hpp>
 #include <containers/range_value_t.hpp>
 #include <containers/range_view.hpp>

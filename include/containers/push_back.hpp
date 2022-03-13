@@ -5,7 +5,6 @@
 
 #pragma once
 
-#include <containers/appendable_from_capacity.hpp>
 #include <containers/front_back.hpp>
 #include <containers/lazy_push_back.hpp>
 #include <containers/range_value_t.hpp>

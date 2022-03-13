@@ -6,7 +6,6 @@
 #include <containers/static_vector.hpp>
 
 #include <containers/array.hpp>
-#include <containers/emplace_back.hpp>
 #include <containers/index_type.hpp>
 
 #include <numeric_traits/min_max_value.hpp>

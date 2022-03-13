@@ -12,7 +12,6 @@
 #include <containers/appendable_from_capacity.hpp>
 #include <containers/begin_end.hpp>
 #include <containers/data.hpp>
-#include <containers/lazy_push_back.hpp>
 #include <containers/is_iterator.hpp>
 #include <containers/iterator_t.hpp>
 #include <containers/resize.hpp>

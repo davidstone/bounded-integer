@@ -5,6 +5,7 @@
 
 #include <containers/insert.hpp>
 
+#include <containers/lazy_push_back.hpp>
 #include <containers/repeat_n.hpp>
 #include <containers/stable_vector.hpp>
 #include <containers/vector.hpp>

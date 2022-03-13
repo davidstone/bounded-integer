@@ -5,9 +5,11 @@
 
 #pragma once
 
+#include <containers/algorithms/transform.hpp>
 #include <containers/assign_to_empty.hpp>
 #include <containers/begin_end.hpp>
 #include <containers/c_array.hpp>
+#include <containers/is_container.hpp>
 #include <containers/is_range.hpp>
 #include <containers/push_back.hpp>
 #include <containers/range_value_t.hpp>

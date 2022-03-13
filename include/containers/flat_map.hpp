@@ -17,6 +17,7 @@
 #include <containers/c_array.hpp>
 #include <containers/common_functions.hpp>
 #include <containers/compare_container.hpp>
+#include <containers/initializer_range.hpp>
 #include <containers/insert.hpp>
 #include <containers/iterator_t.hpp>
 #include <containers/legacy_iterator.hpp>
