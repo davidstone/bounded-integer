@@ -30,10 +30,10 @@ private:
 
 } // namespace detail
 
-template<ordered_associative_range Container>
-constexpr auto key_comparison_function(Container const & container) {
-	if constexpr (requires(Container const & c) { c.extract_key(); }) {
-		return extract_key_to_compare(container.extract_key());
+template<ordered_associative_range Map>
+constexpr auto key_comparison_function(Map const & map) {
+	if constexpr (requires(Map const & c) { c.extract_key(); }) {
+		return extract_key_to_compare(map.extract_key());
 	} else {
 		// TODO: ???
 		assert(false);

@@ -95,8 +95,8 @@ constexpr auto assign_to_empty_or_append(Target & target, Source && source, auto
 	}
 }
 
-inline constexpr auto exact_reserve = []<typename Container>(Container & container, auto const requested_size) {
-	container.reserve(::bounded::assume_in_range<range_size_t<Container>>(requested_size));
+inline constexpr auto exact_reserve = []<typename Container>(Container & target, auto const requested_size) {
+	target.reserve(::bounded::assume_in_range<range_size_t<Container>>(requested_size));
 };
 
 constexpr auto assign_to_empty_impl(auto & target, auto && source) -> void {

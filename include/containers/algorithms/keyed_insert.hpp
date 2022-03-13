@@ -19,31 +19,31 @@ concept legacy_map = requires { typename Map::allocator_type; };
 } // namespace detail
 
 template<
-	associative_container Container,
-	std::convertible_to<typename Container::key_type> Key = typename Container::key_type,
-	std::convertible_to<typename Container::mapped_type> Mapped = typename Container::mapped_type
+	associative_container Map,
+	std::convertible_to<typename Map::key_type> Key = typename Map::key_type,
+	std::convertible_to<typename Map::mapped_type> Mapped = typename Map::mapped_type
 >
-constexpr auto keyed_insert(Container & container, Key && key, Mapped && mapped) {
-	if constexpr (detail::legacy_map<Container>) {
-		return container.insert({OPERATORS_FORWARD(key), OPERATORS_FORWARD(mapped)});
+constexpr auto keyed_insert(Map & map, Key && key, Mapped && mapped) {
+	if constexpr (detail::legacy_map<Map>) {
+		return map.insert({OPERATORS_FORWARD(key), OPERATORS_FORWARD(mapped)});
 	} else {
-		return container.lazy_insert(OPERATORS_FORWARD(key), [&] { return OPERATORS_FORWARD(mapped); });
+		return map.lazy_insert(OPERATORS_FORWARD(key), [&] { return OPERATORS_FORWARD(mapped); });
 	}
 }
-template<associative_container Container>
-constexpr auto keyed_insert(Container & container, range_value_t<Container> const & value) {
-	if constexpr (detail::legacy_map<Container>) {
-		return container.insert(value);
+template<associative_container Map>
+constexpr auto keyed_insert(Map & map, range_value_t<Map> const & value) {
+	if constexpr (detail::legacy_map<Map>) {
+		return map.insert(value);
 	} else {
-		return container.lazy_insert(get_key(value), [&] { return get_mapped(value); });
+		return map.lazy_insert(get_key(value), [&] { return get_mapped(value); });
 	}
 }
-template<associative_container Container>
-constexpr auto keyed_insert(Container & container, range_value_t<Container> && value) {
-	if constexpr (detail::legacy_map<Container>) {
-		return container.insert(std::move(value));
+template<associative_container Map>
+constexpr auto keyed_insert(Map & map, range_value_t<Map> && value) {
+	if constexpr (detail::legacy_map<Map>) {
+		return map.insert(std::move(value));
 	} else {
-		return container.lazy_insert(get_key(std::move(value)), [&] { return get_mapped(std::move(value)); });
+		return map.lazy_insert(get_key(std::move(value)), [&] { return get_mapped(std::move(value)); });
 	}
 }
 

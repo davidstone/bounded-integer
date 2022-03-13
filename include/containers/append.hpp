@@ -24,10 +24,10 @@
 namespace containers {
 namespace detail {
 
-inline constexpr auto exponential_reserve = [](auto & container, auto const source_size) {
-	auto const current_size = ::containers::detail::linear_size(container);
-	if (current_size + source_size > container.capacity()) {
-		container.reserve(::containers::detail::reallocation_size(container.capacity(), current_size, source_size));
+inline constexpr auto exponential_reserve = [](auto & target, auto const source_size) {
+	auto const current_size = ::containers::detail::linear_size(target);
+	if (current_size + source_size > target.capacity()) {
+		target.reserve(::containers::detail::reallocation_size(target.capacity(), current_size, source_size));
 	}
 };
 

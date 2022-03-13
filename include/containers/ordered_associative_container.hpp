@@ -13,13 +13,13 @@ namespace containers {
 namespace detail {
 
 template<typename T>
-concept has_key_comp = requires(T const & container) {
-	container.key_comp();
+concept has_key_comp = requires(T const & map) {
+	map.key_comp();
 };
 
 template<typename T>
-concept has_extract_key = requires(T const & container) {
-	container.extract_key();
+concept has_extract_key = requires(T const & map) {
+	map.extract_key();
 };
 
 } // namespace detail
