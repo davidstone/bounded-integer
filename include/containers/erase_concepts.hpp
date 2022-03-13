@@ -18,6 +18,11 @@ concept member_pop_backable = requires (Container & container) { container.pop_b
 template<typename Container>
 concept member_pop_frontable = requires (Container & container) { container.pop_front(); };
 
+template<typename Container>
+concept member_erasable = requires(Container & container, iterator_t<Container const &> const it) {
+	container.erase(it, it);
+};
+
 // splice is required to be constant time
 template<typename Container>
 concept splicable = requires(Container target, iterator_t<Container const &> position, Container source) {
@@ -48,5 +53,12 @@ concept pop_frontable =
 		constant_time_erasable<Container> or
 		(has_member_erase_after<Container> and has_member_before_begin<Container>)
 	);
+
+template<typename Container>
+concept erasable = range<Container> and (
+	member_erasable<Container> or
+	splicable<Container> or
+	appendable_from_capacity<Container>
+);
 
 } // namespace containers::detail

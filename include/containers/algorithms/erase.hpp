@@ -23,17 +23,6 @@
 #include <utility>
 
 namespace containers {
-namespace detail {
-
-template<typename Container>
-concept member_erasable = requires(Container & container, iterator_t<Container const &> const it1, iterator_t<Container const &> const it2) {
-	container.erase(it1, it2);
-};
-
-template<typename Container>
-concept erasable = member_erasable<Container> or splicable<Container> or appendable_from_capacity<Container>;
-
-} // namespace detail
 
 template<detail::erasable Container>
 constexpr auto erase(Container & container, iterator_t<Container const &> const first, iterator_t<Container const &> const middle_) {
