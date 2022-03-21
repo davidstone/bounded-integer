@@ -170,9 +170,15 @@ void benchmark_generation(benchmark::State & state, auto create) {
 	}
 }
 
+template<typename T>
+constexpr auto small_uniform_int_distribution(T const min, T const max) {
+	return [distribution = std::uniform_int_distribution<int>(min, max)](auto & engine) mutable {
+		return static_cast<T>(distribution(engine));
+	};
+}
 
 auto create_limited_radix_sort_data(std::mt19937_64 & randomness, std::int8_t range_end) {
-	auto int_distribution = std::uniform_int_distribution<std::int8_t>(-128, range_end);
+	auto int_distribution = small_uniform_int_distribution<std::int8_t>(-128, range_end);
 	return containers::vector(containers::generate_n(
 		2_bi * 1024_bi * 1024_bi,
 		[&] { return int_distribution(randomness); }
@@ -266,11 +272,11 @@ void register_all_benchmarks() {
 	);
 	REGISTER_BENCHMARK(
 		"uint8",
-		create_simple_data(std::uniform_int_distribution(min_value<std::uint8_t>, max_value<std::uint8_t>))
+		create_simple_data(small_uniform_int_distribution(min_value<std::uint8_t>, max_value<std::uint8_t>))
 	);
 	REGISTER_BENCHMARK(
 		"int8",
-		create_simple_data(std::uniform_int_distribution(min_value<std::int8_t>, max_value<std::int8_t>))
+		create_simple_data(small_uniform_int_distribution(min_value<std::int8_t>, max_value<std::int8_t>))
 	);
 	REGISTER_BENCHMARK(
 		"uint16",
@@ -333,11 +339,11 @@ void register_all_benchmarks() {
 
 	REGISTER_BENCHMARK(
 		"int8_0_1",
-		create_simple_data(std::uniform_int_distribution<std::int8_t>(0, 1))
+		create_simple_data(small_uniform_int_distribution<std::int8_t>(0, 1))
 	);
 	REGISTER_BENCHMARK(
-		"geometric_int8",
-		create_simple_data(std::geometric_distribution<std::uint8_t>(0.05))
+		"geometric_uint8",
+		create_simple_data([distribution = std::geometric_distribution<unsigned short>(0.05)](auto & engine) mutable { return static_cast<std::uint8_t>(distribution(engine)); })
 	);
 	REGISTER_BENCHMARK(
 		"int64_int64_positive",
@@ -378,14 +384,14 @@ void register_all_benchmarks() {
 	);
 	REGISTER_SOME_BENCHMARKS(
 		"string",
-		create_range_data(20_bi, [char_distribution = std::uniform_int_distribution('a', 'z')](auto & engine, auto size) mutable {
+		create_range_data(20_bi, [char_distribution = small_uniform_int_distribution('a', 'z')](auto & engine, auto size) mutable {
 			return create_radix_sort_data<containers::string>(engine, size, char_distribution);
 		})
 	);
 	REGISTER_SOME_BENCHMARKS(
 		"vector_string",
 		create_range_data(10_bi, [](auto & engine, auto size) {
-			auto function = [&, char_distribution = std::uniform_int_distribution('a', 'c')](auto &, auto inner_size) mutable {
+			auto function = [&, char_distribution = small_uniform_int_distribution('a', 'c')](auto &, auto inner_size) mutable {
 				return create_radix_sort_data<containers::string>(engine, inner_size, char_distribution);
 			};
 			return create_range_data(5_bi, function)(engine, size);
