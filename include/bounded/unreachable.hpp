@@ -5,15 +5,17 @@
 
 #pragma once
 
+#include <utility>
+
 namespace bounded {
 
+#if defined __cpp_lib_unreachable
+using std::unreachable;
+#else
 [[noreturn]] inline void unreachable() {
 	// This needs the call to a builtin to avoid warnings
-	#if defined __clang__ or defined __GNUC__ or defined __INTEL_COMPILER
-		__builtin_unreachable();
-	#elif defined _MSC_VER
-		__assume(false);
-	#endif
+	__builtin_unreachable();
 }
+#endif
 
 } // namespace bounded
