@@ -268,7 +268,7 @@ struct flat_map_base : private lexicographical_comparison::base {
 		return containers::erase(m_container, first, last);
 	}
 
-private:
+protected:
 	// TODO: Use [[no_unique_address]] after resolution of
 	// https://github.com/llvm/llvm-project/issues/53059
 	Container m_container;
@@ -309,6 +309,25 @@ public:
 	constexpr auto find(auto const & key) {
 		auto const it = containers::keyed_lower_bound(*this, key);
 		return (it == ::containers::end(*this) or compare()(key, get_key(*it))) ? ::containers::end(*this) : it;
+	}
+
+	// `Other` is required to be a unique range of elements
+	template<range Other>
+	constexpr auto upsert(Other && other, auto && update) -> void {
+		// TODO: Should this reserve?
+		auto const original_size = size();
+		auto const last = containers::end(OPERATORS_FORWARD(other));
+		for (auto it = containers::begin(OPERATORS_FORWARD(other)); it != last; ++it) {
+			auto && value = dereference<Other>(it);
+			auto const ptr = ::containers::lookup(*this, get_key(value));
+			if (ptr) {
+				update(*ptr, ::containers::get_mapped(OPERATORS_FORWARD(value)));
+			} else {
+				containers::push_back(this->m_container, OPERATORS_FORWARD(value));
+			}
+		}
+		auto const midpoint = begin() + original_size;
+		::containers::detail::merge_sorted_and_unsorted<false>(this->m_container, midpoint, extract_key());
 	}
 };
 
