@@ -227,7 +227,8 @@ struct flat_map_base : private lexicographical_comparison::base {
 	// Unlike in std::map, insert can only provide a time complexity that
 	// matches an insert into the underlying container, which is to say,
 	// linear. An insertion implies shifting all of the elements.
-	constexpr auto lazy_insert(auto && key, bounded::construct_function_for<mapped_type> auto && mapped) {
+	template<typename Key = key_type>
+	constexpr auto lazy_insert(Key && key, bounded::construct_function_for<mapped_type> auto && mapped) {
 		auto const position = containers::keyed_upper_bound(*this, key);
 		auto add_element = [&] {
 			return ::containers::lazy_insert(
