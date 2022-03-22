@@ -45,9 +45,9 @@ private:
 	using storage_type = std::conditional_t<
 		is_sufficiently_trivial,
 		possibly_empty_c_array<T, static_cast<std::size_t>(capacity)>,
-		std::aligned_storage_t<sizeof(T) * static_cast<std::size_t>(capacity), alignof(T)>
+		possibly_empty_c_array<std::byte, sizeof(T) * static_cast<std::size_t>(capacity)>
 	>;
-	[[no_unique_address]] storage_type m_storage;
+	alignas(alignof(T)) [[no_unique_address]] storage_type m_storage;
 };
 
 }	// namespace containers
