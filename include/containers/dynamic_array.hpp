@@ -41,7 +41,7 @@ struct dynamic_array : private lexicographical_comparison::base {
 	constexpr dynamic_array() = default;
 
 	constexpr explicit dynamic_array(constructor_initializer_range<dynamic_array> auto && source):
-		m_data(::bounded::assume_in_range<size_type>(::containers::detail::linear_size(source)))
+		m_data(::bounded::assume_in_range<size_type>(::containers::linear_size(source)))
 	{
 		containers::uninitialized_copy_no_overlap(OPERATORS_FORWARD(source), begin());
 	}
@@ -101,7 +101,7 @@ struct dynamic_array : private lexicographical_comparison::base {
 
 	template<range Range> requires(!std::is_array_v<Range> or !std::is_reference_v<Range>)
 	constexpr auto assign(Range && range) & -> void {
-		auto const difference = detail::linear_size(range);
+		auto const difference = ::containers::linear_size(range);
 		if (difference == size()) {
 			::containers::copy(OPERATORS_FORWARD(range), begin());
 		} else {

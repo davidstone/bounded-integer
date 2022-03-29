@@ -63,8 +63,6 @@ constexpr auto size(c_array<T, size_> const &) {
 	return bounded::constant<size_>;
 }
 
-namespace detail {
-
 template<range Range>
 constexpr auto linear_size(Range const & r) {
 	if constexpr (requires { containers::size(r); }) {
@@ -74,5 +72,4 @@ constexpr auto linear_size(Range const & r) {
 	}
 }
 
-} // namespace detail
 } // namespace containers

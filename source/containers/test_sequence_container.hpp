@@ -50,7 +50,7 @@ constexpr auto test_sequence_container_default_constructed_empty() -> bool {
 	BOUNDED_TEST(containers::begin(default_constructed) == containers::end(default_constructed));
 	BOUNDED_TEST(containers::end(default_constructed) == containers::begin(default_constructed));
 	BOUNDED_TEST(containers::end(default_constructed) == containers::end(default_constructed));
-	BOUNDED_TEST(containers::detail::linear_size(default_constructed) == 0_bi);
+	BOUNDED_TEST(containers::linear_size(default_constructed) == 0_bi);
 	BOUNDED_TEST(default_constructed == default_constructed);
 	BOUNDED_TEST(default_constructed == Container());
 	BOUNDED_TEST(default_constructed == Container({}));

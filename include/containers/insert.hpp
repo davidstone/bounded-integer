@@ -90,7 +90,7 @@ constexpr auto iterator_points_into_container(Container const & container, itera
 template<resizable_container Container, range Range> requires std::convertible_to<range_value_t<Container>, range_value_t<Range>>
 constexpr auto insert(Container & container, iterator_t<Container const &> position, Range && range) {
 	BOUNDED_ASSERT(::containers::detail::iterator_points_into_container(container, position));
-	auto const range_size = ::containers::detail::linear_size(range);
+	auto const range_size = ::containers::linear_size(range);
 	if (containers::size(container) + range_size <= container.capacity()) {
 		return ::containers::detail::insert_without_reallocation(container, position, OPERATORS_FORWARD(range), ::bounded::assume_in_range<count_type<Container>>(range_size));
 	} else if constexpr (detail::reservable<Container>) {

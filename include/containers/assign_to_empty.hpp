@@ -48,7 +48,7 @@ inline constexpr auto member_assign = []<typename Target, typename Source>(Targe
 
 template<typename Target>
 constexpr auto get_source_size(auto const & source) {
-	auto const value = containers::detail::linear_size(source);
+	auto const value = containers::linear_size(source);
 	if constexpr (bounded::bounded_integer<decltype(value)>) {
 		return value;
 	} else {
