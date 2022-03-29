@@ -112,6 +112,7 @@ add_executable(bounded_test
 	source/bounded/clamp.cpp
 	source/bounded/concepts.cpp
 	source/bounded/copy.cpp
+	source/bounded/number_of.cpp
 	source/bounded/representation_digits.cpp
 	source/bounded/hash.cpp
 	source/bounded/identity.cpp

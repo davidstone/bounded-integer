@@ -122,4 +122,14 @@ constexpr auto test_upsert() -> bool {
 }
 static_assert(test_upsert<non_copyable_map>());
 
+template<typename Key>
+constexpr auto max_map_size = numeric_traits::max_value<containers::range_size_t<containers::flat_map<Key, int>>>;
+
+using namespace bounded::literal;
+static_assert(max_map_size<bounded::integer<0, 2>> == 3_bi);
+static_assert(max_map_size<bounded::integer<1, 2>> == 2_bi);
+static_assert(max_map_size<bool> == 2_bi);
+static_assert(max_map_size<std::byte> == 256_bi);
+static_assert(max_map_size<std::string_view> == containers::detail::maximum_array_size<std::string_view>);
+
 } // namespace

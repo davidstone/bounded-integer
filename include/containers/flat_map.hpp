@@ -32,6 +32,7 @@
 #include <bounded/detail/type.hpp>
 #include <bounded/integer.hpp>
 #include <bounded/concepts.hpp>
+#include <bounded/number_of.hpp>
 
 #include <operators/forward.hpp>
 
@@ -387,18 +388,27 @@ basic_flat_multimap(assume_sorted_unique_t, Range &&) -> basic_flat_multimap<std
 template<typename Range, typename ExtractKey>
 basic_flat_multimap(assume_sorted_unique_t, Range &&, ExtractKey) -> basic_flat_multimap<std::remove_const_t<Range>, ExtractKey>;
 
+namespace detail {
 
-template<typename Key, typename T, typename... MaybeExtractKey>
-using flat_map = basic_flat_map<vector<map_value_type<Key, T>>, MaybeExtractKey...>;
+template<typename Key>
+inline constexpr auto maximum_map_size = maximum_array_size<Key>;
 
-template<typename Key, typename T, array_size_type<map_value_type<Key, T>> capacity, typename... MaybeExtractKey>
-using static_flat_map = basic_flat_map<static_vector<map_value_type<Key, T>, capacity>, MaybeExtractKey...>;
+template<bounded::isomorphic_to_integral Key>
+inline constexpr auto maximum_map_size<Key> = static_cast<std::size_t>(bounded::number_of<Key>);
 
-template<typename Key, typename T, typename... MaybeExtractKey>
-using flat_multimap = basic_flat_multimap<vector<map_value_type<Key, T>>, MaybeExtractKey...>;
+} // namepace detail
 
-template<typename Key, typename T, array_size_type<map_value_type<Key, T>> capacity, typename... MaybeExtractKey>
-using static_flat_multimap = basic_flat_multimap<static_vector<map_value_type<Key, T>, capacity>, MaybeExtractKey...>;
+template<typename Key, typename Mapped, typename... MaybeExtractKey>
+using flat_map = basic_flat_map<vector<map_value_type<Key, Mapped>, detail::maximum_map_size<Key>>, MaybeExtractKey...>;
+
+template<typename Key, typename Mapped, array_size_type<map_value_type<Key, Mapped>> capacity, typename... MaybeExtractKey>
+using static_flat_map = basic_flat_map<static_vector<map_value_type<Key, Mapped>, capacity>, MaybeExtractKey...>;
+
+template<typename Key, typename Mapped, typename... MaybeExtractKey>
+using flat_multimap = basic_flat_multimap<vector<map_value_type<Key, Mapped>>, MaybeExtractKey...>;
+
+template<typename Key, typename Mapped, array_size_type<map_value_type<Key, Mapped>> capacity, typename... MaybeExtractKey>
+using static_flat_multimap = basic_flat_multimap<static_vector<map_value_type<Key, Mapped>, capacity>, MaybeExtractKey...>;
 
 
 }	// namespace containers
