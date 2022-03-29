@@ -24,7 +24,7 @@ public:
 	{
 	}
 	
-	constexpr auto dereference(iterator auto const it) const OPERATORS_RETURNS(
+	constexpr auto dereference(iterator auto const & it) const OPERATORS_RETURNS(
 		std::invoke(m_dereference, *it)
 	)
 };
@@ -40,7 +40,7 @@ public:
 	{
 	}
 	
-	constexpr auto dereference(iterator auto const it) const OPERATORS_RETURNS(
+	constexpr auto dereference(iterator auto const & it) const OPERATORS_RETURNS(
 		std::invoke(m_dereference, it)
 	)
 
