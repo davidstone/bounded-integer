@@ -68,7 +68,7 @@ namespace detail {
 
 template<typename T, auto minimum, auto maximum>
 concept overlapping_integer =
-	(integral<T> or std::is_enum_v<T> or std::is_same_v<T, bool>) and
+	isomorphic_to_integral<T> and
 	safe_compare(builtin_min_value<T>, maximum) <= 0 and safe_compare(minimum, builtin_max_value<T>) <= 0;
 
 template<typename T, auto minimum, auto maximum>

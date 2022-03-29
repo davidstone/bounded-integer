@@ -7,6 +7,8 @@
 
 #include <bounded/detail/max_builtin.hpp>
 
+#include <type_traits>
+
 namespace bounded {
 
 template<auto minimum, auto maximum>
@@ -64,5 +66,8 @@ inline constexpr auto is_integral_constant_of_integral<std::integral_constant<T,
 
 template<typename T>
 concept integral = detail::builtin_integer<T> or bounded_integer<T> or detail::is_integral_constant_of_integral<T>;
+
+template<typename T>
+concept isomorphic_to_integral = integral<T> or std::is_enum_v<T> or std::is_same_v<T, bool>;
 
 } // namespace bounded
