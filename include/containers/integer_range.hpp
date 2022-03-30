@@ -112,6 +112,7 @@ struct integer_range {
 		m_end(last),
 		m_step(step)
 	{
+		BOUNDED_ASSERT((last - first) % step == 0_bi);
 	}
 
 	constexpr integer_range(Integer const first, Sentinel const last):
