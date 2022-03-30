@@ -76,19 +76,10 @@ constexpr auto operator+(
 }
 
 
-template<typename T, std::ptrdiff_t max_difference>
-constexpr auto operator-(contiguous_iterator<T, max_difference> const lhs, contiguous_iterator<T, max_difference> const rhs) {
-	return ::bounded::assume_in_range<typename contiguous_iterator<T, max_difference>::difference_type>(lhs.to_address() - rhs.to_address());
+template<typename LHS, typename RHS, std::ptrdiff_t max_difference> requires std::same_as<LHS const, RHS const>
+constexpr auto operator-(contiguous_iterator<LHS, max_difference> const lhs, contiguous_iterator<RHS, max_difference> const rhs) {
+	using difference_t = typename contiguous_iterator<LHS, max_difference>::difference_type;
+	return ::bounded::assume_in_range<difference_t>(lhs.to_address() - rhs.to_address());
 }
 
-template<typename T, std::ptrdiff_t max_difference>
-constexpr auto operator-(contiguous_iterator<T const, max_difference> const lhs, contiguous_iterator<T, max_difference> const rhs) {
-	return lhs - static_cast<decltype(lhs)>(rhs);
-}
-
-template<typename T, std::ptrdiff_t max_difference>
-constexpr auto operator-(contiguous_iterator<T, max_difference> const lhs, contiguous_iterator<T const, max_difference> const rhs) {
-	return static_cast<decltype(rhs)>(lhs) - rhs;
-}
-
-}	// namespace containers
+} // namespace containers
