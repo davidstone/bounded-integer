@@ -14,22 +14,16 @@
 namespace containers {
 namespace detail {
 
-template<typename Difference>
-struct difference_type_to_offset_type {
-	using type = Difference;
-};
-
-template<bounded::bounded_integer Difference>
-struct difference_type_to_offset_type<Difference> {
-	using type = bounded::integer<
-		0,
-		bounded::builtin_max_value<Difference>
-	>;
-};
+template<typename T>
+using to_offset_type = std::conditional_t<
+	bounded::bounded_integer<T>,
+	bounded::integer<0, bounded::builtin_max_value<T>>,
+	T
+>;
 
 } // namespace detail
 
 template<typename T>
-using offset_type = typename detail::difference_type_to_offset_type<iter_difference_t<T>>::type;
+using offset_type = detail::to_offset_type<iter_difference_t<T>>;
 
 } // namespace containers

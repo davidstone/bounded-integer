@@ -18,21 +18,24 @@ namespace containers {
 namespace detail {
 
 template<typename Size>
-struct size_type_to_index_type {
+struct to_index_type_impl {
 	using type = Size;
 };
 
 template<bounded::bounded_integer Size>
-struct size_type_to_index_type<Size> {
-	using type  = bounded::integer<
+struct to_index_type_impl<Size> {
+	using type = bounded::integer<
 		0,
 		bounded::normalize<numeric_traits::max_value<Size> - bounded::constant<1>>
 	>;
 };
 
-}
+template<typename Size>
+using to_index_type = typename to_index_type_impl<Size>::type;
+
+} // namespace detail
 
 template<typename T>
-using index_type = typename detail::size_type_to_index_type<range_size_t<T>>::type;
+using index_type = detail::to_index_type<range_size_t<T>>;
 
-}	// namespace containers
+} // namespace containers
