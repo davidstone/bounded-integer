@@ -54,7 +54,7 @@ struct reusable_concatenate_t {
 };
 
 template<typename Result, typename Integer, typename Range>
-constexpr auto reusable_concatenate_container(reusable_concatenate_t<Result, Integer> result, Integer const total_size, Range && range) {
+constexpr auto reusable_concatenate_container(reusable_concatenate_t<Result, Integer> result, auto const total_size, Range && range) {
 	if (result.ptr) {
 		return result;
 	}
@@ -113,9 +113,9 @@ constexpr auto move_existing_data_to_final_position(Container & container, auto 
 template<typename Result>
 constexpr auto concatenate(auto && ... ranges) {
 	auto const total_size = (0_bi + ... + ::containers::detail::ugly_size_hack(::containers::size(ranges)));
-	using Integer = std::remove_const_t<decltype(total_size)>;
 
 	if constexpr (detail::can_reuse_storage<Result>) {
+		using Integer = bounded::integer<0, bounded::builtin_max_value<decltype(total_size)>>;
 		auto reusable = detail::reusable_concatenate_t<Result, Integer>{nullptr, 0_bi};
 		(..., (reusable = ::containers::detail::reusable_concatenate_container(reusable, total_size, OPERATORS_FORWARD(ranges))));
 		if (reusable.ptr) {
