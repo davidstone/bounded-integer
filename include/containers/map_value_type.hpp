@@ -32,6 +32,9 @@ struct map_value_type {
 	[[no_unique_address]] Mapped mapped;
 };
 
+template<typename Key, typename Mapped>
+map_value_type(Key, Mapped) -> map_value_type<Key, Mapped>;
+
 namespace detail {
 
 template<typename T>
