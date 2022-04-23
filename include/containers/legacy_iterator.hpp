@@ -87,9 +87,9 @@ constexpr auto operator-(legacy_iterator<Iterator> const lhs, legacy_iterator<It
 	return static_cast<typename legacy_iterator<Iterator>::difference_type>(lhs.base() - rhs.base());
 }
 
-constexpr auto make_legacy_iterator = [](auto it) {
-	if constexpr (bounded::bounded_integer<decltype(it - it)>) {
-		return containers::legacy_iterator(it);
+constexpr auto make_legacy_iterator = []<iterator Iterator>(Iterator it) {
+	if constexpr (bounded::bounded_integer<iter_difference_t<Iterator>>) {
+		return containers::legacy_iterator(std::move(it));
 	} else {
 		return it;
 	}

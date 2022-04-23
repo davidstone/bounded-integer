@@ -11,6 +11,7 @@
 #include <containers/c_array.hpp>
 #include <containers/is_container.hpp>
 #include <containers/is_range.hpp>
+#include <containers/legacy_iterator.hpp>
 #include <containers/push_back.hpp>
 #include <containers/range_value_t.hpp>
 #include <containers/reserve_if_reservable.hpp>

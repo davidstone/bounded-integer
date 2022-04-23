@@ -7,6 +7,7 @@
 
 #include <containers/algorithms/all_any_none.hpp>
 #include <containers/algorithms/erase.hpp>
+#include <containers/append.hpp>
 #include <containers/flat_map.hpp>
 #include <containers/initializer_range.hpp>
 #include <containers/lazy_push_back.hpp>
