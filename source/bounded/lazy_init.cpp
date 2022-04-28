@@ -8,16 +8,26 @@
 namespace {
 
 template<typename T>
-auto function() {
-	return T();
-}
+auto function() -> T;
 template<typename T>
 constexpr auto object = []{ return T(); };
 
 static_assert(bounded::construct_function_for<decltype(function<void>), void>);
 static_assert(bounded::construct_function_for<decltype(object<void>), void>);
 
-static_assert(bounded::construct_function_for<decltype(function<int>), void>);
-static_assert(bounded::construct_function_for<decltype(object<int>), void>);
+static_assert(!bounded::construct_function_for<decltype(function<int>), void>);
+static_assert(!bounded::construct_function_for<decltype(object<int>), void>);
+
+static_assert(!bounded::construct_function_for<decltype(function<void>), int>);
+static_assert(!bounded::construct_function_for<decltype(object<void>), int>);
+
+static_assert(bounded::construct_function_for<decltype(function<int>), int>);
+static_assert(bounded::construct_function_for<decltype(object<int>), int>);
+
+static_assert(bounded::construct_function_for<decltype(function<int>), short>);
+static_assert(bounded::construct_function_for<decltype(object<int>), short>);
+
+static_assert(bounded::construct_function_for<decltype(function<short>), int>);
+static_assert(bounded::construct_function_for<decltype(object<short>), int>);
 
 } // namespace
