@@ -20,11 +20,8 @@
 namespace containers {
 namespace detail {
 
-template<typename Result, typename... Args>
-using function_ptr = Result(*)(Args...);
-
 template<typename Container>
-concept member_lazy_push_backable = requires(Container container, function_ptr<range_value_t<Container>> constructor) {
+concept member_lazy_push_backable = requires(Container container, bounded::detail::function_ptr<range_value_t<Container>> constructor) {
 	container.lazy_push_back(constructor);
 };
 
