@@ -74,18 +74,25 @@ struct legacy_iterator {
 
 	friend auto operator<=>(legacy_iterator, legacy_iterator) = default;
 
+	friend constexpr auto operator+(legacy_iterator const lhs, bounded::integral auto const rhs) requires detail::addable<Iterator, iter_difference_t<Iterator>> {
+		return legacy_iterator<Iterator>(lhs.base() + ::bounded::assume_in_range<iter_difference_t<Iterator>>(rhs));
+	}
+	friend constexpr auto operator++(legacy_iterator & it) -> legacy_iterator & {
+		++it.m_it;
+		return it;
+	}
+
+	friend constexpr auto operator-(legacy_iterator const lhs, legacy_iterator const rhs) requires detail::subtractable<Iterator> {
+		return static_cast<typename legacy_iterator<Iterator>::difference_type>(lhs.base() - rhs.base());
+	}
+	friend constexpr auto operator--(legacy_iterator & it) -> legacy_iterator & {
+		--it.m_it;
+		return it;
+	}
+
 private:
 	Iterator m_it;
 };
-
-template<typename Iterator>
-constexpr auto operator+(legacy_iterator<Iterator> const lhs, bounded::integral auto const rhs) {
-	return legacy_iterator<Iterator>(lhs.base() + ::bounded::assume_in_range<iter_difference_t<Iterator>>(rhs));
-}
-template<typename Iterator>
-constexpr auto operator-(legacy_iterator<Iterator> const lhs, legacy_iterator<Iterator> const rhs) {
-	return static_cast<typename legacy_iterator<Iterator>::difference_type>(lhs.base() - rhs.base());
-}
 
 constexpr auto make_legacy_iterator = []<iterator Iterator>(Iterator it) {
 	if constexpr (bounded::bounded_integer<iter_difference_t<Iterator>>) {
