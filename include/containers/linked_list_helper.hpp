@@ -80,7 +80,10 @@ struct list_iterator {
 	friend Container;
 
 	// ???
-	using difference_type = array_size_type<T>;
+	using difference_type = bounded::integer<
+		-detail::maximum_array_size<T>,
+		detail::maximum_array_size<T>
+	>;
 
 	list_iterator() = default;
 	constexpr explicit list_iterator(Links * const links):
