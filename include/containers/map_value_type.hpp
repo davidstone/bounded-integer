@@ -51,20 +51,22 @@ concept first_second_pair = requires(T value) {
 
 } // namespace detail
 
-constexpr auto && get_key(detail::key_mapped_pair auto && value) {
-	return OPERATORS_FORWARD(value).key;
-}
-constexpr auto && get_mapped(detail::key_mapped_pair auto && value) {
-	return OPERATORS_FORWARD(value).mapped;
-}
+struct get_key_t {
+	constexpr auto operator()(detail::key_mapped_pair auto && value) const -> auto && {
+		return OPERATORS_FORWARD(value).key;
+	}
+	constexpr auto operator()(detail::first_second_pair auto && value) const -> auto && {
+		return OPERATORS_FORWARD(value).first;
+	}
+} inline constexpr get_key;
 
-constexpr auto && get_key(detail::first_second_pair auto && value) {
-	return OPERATORS_FORWARD(value).first;
-}
-constexpr auto && get_mapped(detail::first_second_pair auto && value) {
-	return OPERATORS_FORWARD(value).second;
-}
-
-static_assert(detail::key_mapped_pair<map_value_type<int, int>>);
+struct get_mapped_t {
+	constexpr auto operator()(detail::key_mapped_pair auto && value) const -> auto && {
+		return OPERATORS_FORWARD(value).mapped;
+	}
+	constexpr auto operator()(detail::first_second_pair auto && value) const -> auto && {
+		return OPERATORS_FORWARD(value).second;
+	}
+} inline constexpr get_mapped;
 
 } // namespace containers
