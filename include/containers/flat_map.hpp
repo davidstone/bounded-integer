@@ -268,6 +268,9 @@ struct flat_map_base : private lexicographical_comparison::base {
 	constexpr auto erase(const_iterator const first, const_iterator const last) {
 		return containers::erase(m_container, first, last);
 	}
+	constexpr auto erase_if(auto const predicate) {
+		return containers::erase_if(m_container, predicate);
+	}
 
 protected:
 	// TODO: Use [[no_unique_address]] after resolution of
@@ -302,6 +305,7 @@ public:
 	using base::insert;
 	
 	using base::erase;
+	using base::erase_if;
 
 	constexpr auto find(auto const & key) const {
 		auto const it = containers::keyed_lower_bound(*this, key);
@@ -371,6 +375,7 @@ public:
 	using base::insert;
 	
 	using base::erase;
+	using base::erase_if;
 };
 
 template<typename Range>
