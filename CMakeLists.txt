@@ -219,6 +219,7 @@ add_executable(containers_test
 	source/containers/linear_map.cpp
 	source/containers/linked_list_helper.cpp
 	source/containers/lookup.cpp
+	source/containers/map_value_type.cpp
 	source/containers/maximum_array_size.cpp
 	source/containers/mutable_iterator.cpp
 	source/containers/offset_type.cpp
