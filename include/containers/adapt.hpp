@@ -89,6 +89,13 @@ struct adapt {
 	
 	OPERATORS_BRACKET_SEQUENCE_RANGE_DEFINITIONS
 
+	constexpr auto base() const & -> Range const &{
+		return m_range;
+	}
+	constexpr auto base() && -> Range && {
+		return std::move(m_range);
+	}
+
 private:
 	using adapt_iterator_traits = std::conditional_t<
 		std::is_empty_v<Traits> and std::is_copy_assignable_v<Traits>,
