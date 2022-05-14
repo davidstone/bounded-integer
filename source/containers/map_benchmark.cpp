@@ -159,7 +159,7 @@ void test_performance(std::size_t const loop_count) {
 		ignore(thing);
 	}
 	for (auto const & value : source) {
-		auto const volatile it [[maybe_unused]] = map.find(get_key(value));
+		auto const volatile it [[maybe_unused]] = map.find(containers::get_key(value));
 	}
 	auto const found = high_resolution_clock::now();
 	#if defined TRACK_EXTRACTIONS
@@ -206,7 +206,7 @@ void test_performance(std::size_t const loop_count) {
 	auto const iterated = high_resolution_clock::now();
 
 	for (auto const & value : source) {
-		auto const volatile it [[maybe_unused]] = map.find(get_key(value));
+		auto const volatile it [[maybe_unused]] = map.find(containers::get_key(value));
 	}
 	auto const found_in_extras = high_resolution_clock::now();
 	#if defined TRACK_EXTRACTIONS
