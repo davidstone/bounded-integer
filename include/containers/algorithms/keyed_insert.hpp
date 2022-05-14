@@ -6,6 +6,7 @@
 #pragma once
 
 #include <containers/associative_container.hpp>
+#include <containers/map_value_type.hpp>
 #include <containers/range_value_t.hpp>
 
 #include <utility>
