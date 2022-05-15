@@ -45,7 +45,7 @@ static_assert(test_common_prefix<containers::array<std::uint8_t, 1_bi>>(
 
 
 constexpr auto test_sort(auto data, auto function) {
-	containers::detail::inplace_radix_sort<1>(
+	containers::detail::inplace_radix_sort<1, 1>(
 		containers::range_view(containers::begin(data.input), containers::end(data.input)),
 		function
 	);

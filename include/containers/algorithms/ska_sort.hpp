@@ -179,7 +179,7 @@ struct PartitionCounts {
 	int number = 0;
 };
 
-template<std::ptrdiff_t AmericanFlagSortThreshold, typename CurrentSubKey, size_t NumBytes>
+template<std::ptrdiff_t std_sort_threshold, std::ptrdiff_t AmericanFlagSortThreshold, typename CurrentSubKey, size_t NumBytes>
 struct UnsignedInplaceSorter {
 	// Must have this exact signature, no defaulted arguments
 	template<view View, typename ExtractKey>
@@ -217,6 +217,8 @@ private:
 	static constexpr void sort_selector(View to_sort, ExtractKey const & extract_key, NextSort<View, ExtractKey> next_sort, BaseListSortData * sort_data, std::size_t const offset) {
 		if (NumBytes == offset) {
 			next_sort(to_sort, extract_key, sort_data);
+		} else if (containers::size(to_sort) <= bounded::constant<std_sort_threshold>) {
+			containers::sort(to_sort, extract_key_to_less(extract_key));
 		} else if (containers::size(to_sort) < bounded::constant<AmericanFlagSortThreshold>) {
 			american_flag_sort(to_sort, extract_key, next_sort, sort_data, offset);
 		} else {
@@ -324,10 +326,10 @@ private:
 	}
 };
 
-template<std::ptrdiff_t AmericanFlagSortThreshold, typename CurrentSubKey, typename SubKeyType>
+template<std::ptrdiff_t std_sort_threshold, std::ptrdiff_t AmericanFlagSortThreshold, typename CurrentSubKey, typename SubKeyType>
 struct ListInplaceSorter;
 
-template<std::ptrdiff_t AmericanFlagSortThreshold, typename CurrentSubKey, view View, typename ExtractKey>
+template<std::ptrdiff_t std_sort_threshold, std::ptrdiff_t AmericanFlagSortThreshold, typename CurrentSubKey, view View, typename ExtractKey>
 constexpr void inplace_sort(View to_sort, ExtractKey const & extract_key, NextSort<View, ExtractKey> next_sort, BaseListSortData * sort_data) {
 	using SubKeyType = decltype(CurrentSubKey::sub_key(extract_key(containers::front(to_sort)), sort_data));
 	if constexpr (std::is_same_v<SubKeyType, bool>) {
@@ -343,9 +345,9 @@ constexpr void inplace_sort(View to_sort, ExtractKey const & extract_key, NextSo
 			sort_data
 		);
 	} else if constexpr (std::is_unsigned_v<SubKeyType>) {
-		UnsignedInplaceSorter<AmericanFlagSortThreshold, CurrentSubKey, sizeof(SubKeyType)>::sort(to_sort, extract_key, next_sort, sort_data);
+		UnsignedInplaceSorter<std_sort_threshold, AmericanFlagSortThreshold, CurrentSubKey, sizeof(SubKeyType)>::sort(to_sort, extract_key, next_sort, sort_data);
 	} else {
-		ListInplaceSorter<AmericanFlagSortThreshold, CurrentSubKey, SubKeyType>::sort(to_sort, extract_key, next_sort, sort_data);
+		ListInplaceSorter<std_sort_threshold, AmericanFlagSortThreshold, CurrentSubKey, SubKeyType>::sort(to_sort, extract_key, next_sort, sort_data);
 	}
 }
 
@@ -380,7 +382,7 @@ constexpr size_t common_prefix(
 	return static_cast<std::size_t>(largest_match);
 }
 
-template<std::ptrdiff_t AmericanFlagSortThreshold, typename CurrentSubKey, typename ListType>
+template<std::ptrdiff_t std_sort_threshold, std::ptrdiff_t AmericanFlagSortThreshold, typename CurrentSubKey, typename ListType>
 struct ListInplaceSorter {
 	template<view View, typename ExtractKey>
 	static constexpr void sort(View to_sort, ExtractKey const & extract_key, NextSort<View, ExtractKey> next_sort, BaseListSortData * next_sort_data) {
@@ -439,7 +441,7 @@ private:
 			);
 		}
 		if (last - end_of_shorter_ones > bounded::constant<1>) {
-			inplace_sort<AmericanFlagSortThreshold, ElementSubKey>(
+			inplace_sort<std_sort_threshold, AmericanFlagSortThreshold, ElementSubKey>(
 				range_view(end_of_shorter_ones, last),
 				extract_key,
 				static_cast<NextSort<View, ExtractKey>>(sort_from_recursion),
@@ -461,33 +463,33 @@ private:
 	}
 };
 
-template<std::ptrdiff_t AmericanFlagSortThreshold, typename CurrentSubKey, view View, typename ExtractKey>
+template<std::ptrdiff_t std_sort_threshold, std::ptrdiff_t AmericanFlagSortThreshold, typename CurrentSubKey, view View, typename ExtractKey>
 constexpr void sort_starter(View to_sort, ExtractKey const & extract_key, BaseListSortData * next_sort_data) {
 	if constexpr (!std::is_same_v<CurrentSubKey, SubKey<void>>) {
 		if (containers::size(to_sort) <= bounded::constant<1>) {
 			return;
 		}
 
-		inplace_sort<AmericanFlagSortThreshold, CurrentSubKey>(
+		inplace_sort<std_sort_threshold, AmericanFlagSortThreshold, CurrentSubKey>(
 			to_sort,
 			extract_key,
-			static_cast<NextSort<View, ExtractKey>>(sort_starter<AmericanFlagSortThreshold, typename CurrentSubKey::next>),
+			static_cast<NextSort<View, ExtractKey>>(sort_starter<std_sort_threshold, AmericanFlagSortThreshold, typename CurrentSubKey::next>),
 			next_sort_data
 		);
 	}
 }
 
-template<std::ptrdiff_t AmericanFlagSortThreshold>
+template<std::ptrdiff_t std_sort_threshold, std::ptrdiff_t AmericanFlagSortThreshold>
 constexpr void inplace_radix_sort(view auto to_sort, auto const & extract_key) {
 	using SubKey = SubKey<decltype(extract_key(containers::front(to_sort)))>;
-	sort_starter<AmericanFlagSortThreshold, SubKey>(to_sort, extract_key, nullptr);
+	sort_starter<std_sort_threshold, AmericanFlagSortThreshold, SubKey>(to_sort, extract_key, nullptr);
 }
 
 } // namespace detail
 
 struct ska_sort_t {
 	constexpr void operator()(range auto && to_sort, auto const & extract_key) const {
-		containers::detail::inplace_radix_sort<1024>(
+		containers::detail::inplace_radix_sort<128, 1024>(
 			range_view(
 				containers::begin(to_sort),
 				containers::end(to_sort)
