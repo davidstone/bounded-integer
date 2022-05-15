@@ -35,7 +35,7 @@ public:
 			index + underlying_min,
 			index - spare_below + numeric_traits::max_value<T> + constant<1>
 		);
-		return T(underlying(value), non_check);
+		return T(underlying(value), unchecked);
 	}
 	static constexpr auto index(T const & value) {
 		auto const bounded_value = integer(value.m_value);

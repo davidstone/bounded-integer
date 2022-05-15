@@ -56,9 +56,9 @@ struct extreme_value<Compare, LHS, RHS> {
 			return compare(rhs, lhs) ?
 				OPERATORS_FORWARD(rhs) :
 				OPERATORS_FORWARD(lhs);
-		} else if constexpr (!constructible_from<result_t, RHS, non_check_t>) {
+		} else if constexpr (!constructible_from<result_t, RHS, unchecked_t>) {
 			return lhs;
-		} else if constexpr (!constructible_from<result_t, LHS, non_check_t>) {
+		} else if constexpr (!constructible_from<result_t, LHS, unchecked_t>) {
 			return rhs;
 		} else {
 			return compare(rhs, lhs) ?

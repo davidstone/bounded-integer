@@ -33,12 +33,12 @@ constexpr auto operator_overload(LHS const lhs, RHS const rhs, auto const arithm
 	constexpr auto range = operator_range(min_max_range<LHS>, min_max_range<RHS>);
 	using result_t = integer<normalize<range.min>, normalize<range.max>>;
 	using common_t = typename std::common_type_t<result_t, LHS, RHS>::underlying_type;
-	// It is safe to use the non_check constructor because we already know that
+	// It is safe to use the unchecked constructor because we already know that
 	// the result will fit in result_t. We have to cast to the intermediate
 	// common_t in case result_t is narrower than one of the arguments.
 	return result_t(
 		arithmetic_function(static_cast<common_t>(lhs), static_cast<common_t>(rhs)),
-		non_check
+		unchecked
 	);
 }
 
@@ -57,7 +57,7 @@ constexpr auto modulo_equivalent_operator_overload(LHS const lhs, RHS const rhs,
 	);
 	return result_t(
 		static_cast<typename result_t::underlying_type>(intermediate),
-		non_check
+		unchecked
 	);
 }
 

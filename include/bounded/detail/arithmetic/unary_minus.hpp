@@ -37,7 +37,7 @@ constexpr auto operator-(integer<minimum, maximum> const value) {
 	using promoted_unsigned_type = detail::promoted_unsigned<underlying_type>;
 	return result_type(
 		static_cast<underlying_type>(-static_cast<promoted_unsigned_type>(value)),
-		non_check
+		unchecked
 	);
 }
 

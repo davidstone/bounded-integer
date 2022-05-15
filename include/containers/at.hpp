@@ -28,7 +28,7 @@ constexpr decltype(auto) at(range auto && r, auto const index) {
 	return OPERATORS_FORWARD(r)[static_cast<index_type<decltype(r)>>(checked_index)];
 }
 
-constexpr decltype(auto) at(range auto && r, auto const index, bounded::non_check_t) {
+constexpr decltype(auto) at(range auto && r, auto const index, bounded::unchecked_t) {
 	using index_t = index_type<decltype(r)>;
 	auto const converted = index_t(index);
 	return OPERATORS_FORWARD(r)[converted];

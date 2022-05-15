@@ -16,9 +16,9 @@
 
 namespace bounded {
 
-struct non_check_t {
+struct unchecked_t {
 };
-inline constexpr auto non_check = non_check_t();
+inline constexpr auto unchecked = unchecked_t();
 
 namespace detail {
 
@@ -27,7 +27,7 @@ constexpr auto assume_in_range_impl(T const value, Minimum, Maximum) {
 	return integer<
 		normalize<detail::safe_max(builtin_min_value<Minimum>, builtin_min_value<T>)>,
 		normalize<detail::safe_min(builtin_max_value<Maximum>, builtin_max_value<T>)>
-	>(value, non_check);
+	>(value, unchecked);
 }
 
 } // namespace detail

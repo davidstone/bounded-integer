@@ -26,7 +26,7 @@ constexpr auto abs(bounded_integer auto const value) {
 	} else {
 		// The 0 has to be there to restrict the range of possible values. Without
 		// it, abs(integer<-7, 3>) would be [-3, 7] instead of [0, 7].
-		return increase_min<0>(max(value, -value), non_check);
+		return increase_min<0>(max(value, -value), unchecked);
 	}
 }
 

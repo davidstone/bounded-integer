@@ -210,7 +210,7 @@ struct small_buffer_optimized_vector : private lexicographical_comparison::base 
 	constexpr void append_from_capacity(auto const count) {
 		auto const new_size = size() + count;
 		if (is_small()) {
-			if constexpr (bounded::constructible_from<range_size_t<small_t>, decltype(new_size), bounded::non_check_t>) {
+			if constexpr (bounded::constructible_from<range_size_t<small_t>, decltype(new_size), bounded::unchecked_t>) {
 				m_small.set_size(::bounded::assume_in_range<range_size_t<small_t>>(new_size));
 			} else {
 				bounded::unreachable();

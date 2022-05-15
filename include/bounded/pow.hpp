@@ -48,7 +48,7 @@ constexpr auto pow(bounded_integer auto const base, bounded_integer auto const e
 	return integer<
 		normalize<::bounded::detail::pow_impl(builtin_min_value<base_t>, builtin_min_value<exponent_t>)>,
 		normalize<::bounded::detail::pow_impl(builtin_max_value<base_t>, builtin_max_value<exponent_t>)>
-	>(::bounded::detail::pow_impl(base.value(), exponent.value()), non_check);
+	>(::bounded::detail::pow_impl(base.value(), exponent.value()), unchecked);
 }
 
 } // namespace bounded

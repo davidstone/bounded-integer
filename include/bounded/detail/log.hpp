@@ -35,7 +35,7 @@ constexpr auto log(Value const value, Base const base) {
 		detail::log_impl(static_cast<detail::max_unsigned_t>(builtin_min_value<Value>), static_cast<detail::max_unsigned_t>(numeric_traits::max_value<Base>)),
 		detail::log_impl(static_cast<detail::max_unsigned_t>(builtin_max_value<Value>), static_cast<detail::max_unsigned_t>(numeric_traits::min_value<Base>))
 	>;
-	return result_type(detail::log_impl(detail::as_unsigned(value.value()), detail::as_unsigned(base.value())), non_check);
+	return result_type(detail::log_impl(detail::as_unsigned(value.value()), detail::as_unsigned(base.value())), unchecked);
 }
 
 }	// namespace bounded

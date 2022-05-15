@@ -112,7 +112,7 @@ struct integer {
 	constexpr integer(integer const &) = default;
 	constexpr integer(integer &&) = default;
 
-	constexpr integer(detail::overlapping_integer<minimum, maximum> auto const other, non_check_t):
+	constexpr integer(detail::overlapping_integer<minimum, maximum> auto const other, unchecked_t):
 		m_value(static_cast<underlying_type>(other))
 	{
 	}

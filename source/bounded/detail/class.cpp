@@ -55,8 +55,8 @@ namespace check_constructibility {
 		"Cannot convert integer type to bounded::integer with same range."
 	);
 	static_assert(
-		bounded::constructible_from<type, type, bounded::non_check_t>,
-		"Cannot construct a type from itself with non_check_t."
+		bounded::constructible_from<type, type, bounded::unchecked_t>,
+		"Cannot construct a type from itself with unchecked_t."
 	);
 
 	static_assert(
