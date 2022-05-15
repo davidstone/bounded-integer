@@ -14,6 +14,7 @@
 #include <containers/data.hpp>
 #include <containers/is_iterator.hpp>
 #include <containers/iterator_t.hpp>
+#include <containers/resizable_container.hpp>
 #include <containers/resize.hpp>
 #include <containers/size.hpp>
 
