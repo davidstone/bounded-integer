@@ -9,6 +9,7 @@
 #include <containers/has_member_before_begin.hpp>
 #include <containers/is_range.hpp>
 #include <containers/iterator_t.hpp>
+#include <containers/splicable.hpp>
 
 namespace containers::detail {
 
@@ -21,12 +22,6 @@ concept member_pop_frontable = requires (Container & container) { container.pop_
 template<typename Container>
 concept member_erasable = requires(Container & container, iterator_t<Container const &> const it) {
 	container.erase(it, it);
-};
-
-// splice is required to be constant time
-template<typename Container>
-concept splicable = requires(Container target, iterator_t<Container const &> position, Container source) {
-	target.splice(position, source);
 };
 
 // `erase_after` is required to be constant time

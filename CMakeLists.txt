@@ -239,6 +239,7 @@ add_executable(containers_test
 	source/containers/shrink_to_fit.cpp
 	source/containers/size.cpp
 	source/containers/small_buffer_optimized_vector.cpp
+	source/containers/splicable.cpp
 	source/containers/stable_vector.cpp
 	source/containers/static_vector.cpp
 	source/containers/string.cpp
