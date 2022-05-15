@@ -27,7 +27,7 @@ namespace bounded {
 struct none_t {
 	constexpr explicit none_t(int) {}
 };
-constexpr auto none = none_t(0);
+inline constexpr auto none = none_t(0);
 
 namespace detail {
 
