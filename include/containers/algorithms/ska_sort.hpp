@@ -3,6 +3,13 @@
 // (See accompanying file LICENSE_1_0.txt or copy at
 // http://www.boost.org/LICENSE_1_0.txt)
 
+// This is an implementation of ska_sort, as described in
+// https://probablydance.com/2016/12/27/i-wrote-a-faster-sorting-algorithm/ and
+// https://probablydance.com/2017/01/17/faster-sorting-algorithm-part-2/
+// https://github.com/skarupke/ska_sort is the original implementation. The
+// majority of this file is a reimplementation of the original algorithm, but it
+// still follows the overall structure of the original.
+
 #pragma once
 
 #include <containers/algorithms/count.hpp>
