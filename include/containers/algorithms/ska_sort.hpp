@@ -47,15 +47,15 @@ struct PartitionInfo {
 	}
 
 	union {
-		size_t count;
-		size_t offset;
+		std::size_t count;
+		std::size_t offset;
 	};
-	size_t next_offset = 0;
+	std::size_t next_offset = 0;
 };
 
 struct BaseListSortData {
-	size_t current_index;
-	size_t recursion_limit;
+	std::size_t current_index;
+	std::size_t recursion_limit;
 	BaseListSortData * next_sort_data;
 };
 
@@ -100,23 +100,23 @@ struct SubKey<T> {
 template<>
 struct SubKey<void>;
 
-template<size_t index, typename Current, typename... More>
+template<std::size_t index, typename Current, typename... More>
 struct TupleSubKey;
 
-template<size_t index, typename Next, typename... More>
+template<std::size_t index, typename Next, typename... More>
 struct NextTupleSubKey {
 	using type = TupleSubKey<index, Next, More...>;
 };
-template<size_t index, typename... More>
+template<std::size_t index, typename... More>
 struct NextTupleSubKey<index, SubKey<void>, More...> {
 	using type = TupleSubKey<index + 1, More...>;
 };
-template<size_t index>
+template<std::size_t index>
 struct NextTupleSubKey<index, SubKey<void>> {
 	using type = SubKey<void>;
 };
 
-template<size_t index, typename Current, typename... More>
+template<std::size_t index, typename Current, typename... More>
 struct TupleSubKey {
 	static constexpr decltype(auto) sub_key(auto && value, BaseListSortData * sort_data) {
 		using std::get;
@@ -175,11 +175,11 @@ private:
 
 struct PartitionCounts {
 	std::array<PartitionInfo, 256> partitions;
-	std::array<uint8_t, 256> remaining = {};
+	std::array<std::uint8_t, 256> remaining = {};
 	int number = 0;
 };
 
-template<std::ptrdiff_t std_sort_threshold, std::ptrdiff_t amerian_flag_sort_threshold, typename CurrentSubKey, size_t number_of_bytes>
+template<std::ptrdiff_t std_sort_threshold, std::ptrdiff_t amerian_flag_sort_threshold, typename CurrentSubKey, std::size_t number_of_bytes>
 struct UnsignedInplaceSorter {
 	// Must have this exact signature, no defaulted arguments
 	template<view View, typename ExtractKey>
@@ -198,10 +198,10 @@ private:
 		for (auto const & value : to_sort) {
 			++result.partitions[current_byte(extract_key(value), sort_data, offset)].count;
 		}
-		size_t total = 0;
+		std::size_t total = 0;
 		for (std::size_t i = 0; i < 256; ++i) {
 			auto & partition = result.partitions[i];
-			size_t count = partition.count;
+			std::size_t count = partition.count;
 			partition.offset = total;
 			total += count;
 			partition.next_offset = total;
@@ -232,9 +232,9 @@ private:
 		using difference_type = iter_difference_t<decltype(first)>;
 		[&]{
 			if (partitions.number > 1) {
-				uint8_t * current_block_ptr = partitions.remaining.data();
+				std::uint8_t * current_block_ptr = partitions.remaining.data();
 				PartitionInfo * current_block = partitions.partitions.data() + *current_block_ptr;
-				uint8_t * last_block = partitions.remaining.data() + partitions.number - 1;
+				std::uint8_t * last_block = partitions.remaining.data() + partitions.number - 1;
 				auto it = first;
 				auto block_end = first + ::bounded::assume_in_range<difference_type>(current_block->next_offset);
 				auto last_element = containers::prev(containers::end(to_sort));
@@ -266,7 +266,7 @@ private:
 			}
 		}();
 		auto partition_begin = first;
-		for (uint8_t * it = partitions.remaining.data(), * remaining_end = partitions.remaining.data() + partitions.number; it != remaining_end; ++it) {
+		for (std::uint8_t * it = partitions.remaining.data(), * remaining_end = partitions.remaining.data() + partitions.number; it != remaining_end; ++it) {
 			auto const end_offset = ::bounded::assume_in_range<difference_type>(partitions.partitions[*it].next_offset);
 			auto const partition_end = first + end_offset;
 			if (partition_end - partition_begin > bounded::constant<1>) {
@@ -287,15 +287,15 @@ private:
 		auto partitions = partition_counts(to_sort, extract_key, sort_data, offset);
 		auto const first = containers::begin(to_sort);
 		using difference_type = iter_difference_t<decltype(first)>;
-		for (uint8_t * last_remaining = partitions.remaining.data() + partitions.number, * end_partition = partitions.remaining.data() + 1; last_remaining > end_partition;) {
-			last_remaining = containers::partition(partitions.remaining.data(), last_remaining, [&](uint8_t partition) {
+		for (std::uint8_t * last_remaining = partitions.remaining.data() + partitions.number, * end_partition = partitions.remaining.data() + 1; last_remaining > end_partition;) {
+			last_remaining = containers::partition(partitions.remaining.data(), last_remaining, [&](std::uint8_t partition) {
 				auto const begin_offset = ::bounded::assume_in_range<difference_type>(partitions.partitions[partition].offset);
 				auto const end_offset = ::bounded::assume_in_range<difference_type>(partitions.partitions[partition].next_offset);
 				if (begin_offset == end_offset)
 					return false;
 
 				for (auto it = first + begin_offset; it != first + end_offset; ++it) {
-					uint8_t this_partition = current_byte(extract_key(*it), sort_data, offset);
+					std::uint8_t this_partition = current_byte(extract_key(*it), sort_data, offset);
 					auto const partition_offset = ::bounded::assume_in_range<difference_type>(partitions.partitions[this_partition].offset++);
 					auto const other = first + partition_offset;
 					// Is there a better way to avoid self swap?
@@ -307,8 +307,8 @@ private:
 				return begin_offset != end_offset;
 			});
 		}
-		for (uint8_t * it = partitions.remaining.data() + partitions.number; it != partitions.remaining.data(); --it) {
-			uint8_t partition = it[-1];
+		for (std::uint8_t * it = partitions.remaining.data() + partitions.number; it != partitions.remaining.data(); --it) {
+			std::uint8_t partition = it[-1];
 			auto const start_offset = ::bounded::assume_in_range<difference_type>(partition == 0 ? 0 : partitions.partitions[partition - 1].next_offset);
 			auto const end_offset = ::bounded::assume_in_range<difference_type>(partitions.partitions[partition].next_offset);
 			auto partition_begin = first + start_offset;
@@ -351,7 +351,7 @@ constexpr void inplace_sort(View to_sort, ExtractKey const & extract_key, NextSo
 	}
 }
 
-constexpr size_t common_prefix(
+constexpr std::size_t common_prefix(
 	view auto to_sort,
 	auto const & extract_key,
 	auto && element_key,
