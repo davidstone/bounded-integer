@@ -21,9 +21,10 @@ namespace containers {
 namespace detail {
 
 template<typename Container>
-concept member_lazy_push_backable = requires(Container container, bounded::detail::function_ptr<range_value_t<Container>> constructor) {
-	container.lazy_push_back(constructor);
-};
+concept member_lazy_push_backable =
+	requires(Container container, bounded::function_ptr<range_value_t<Container>> constructor) {
+		container.lazy_push_back(constructor);
+	};
 
 template<typename Container>
 concept lazy_push_backable = member_lazy_push_backable<Container> or appendable_from_capacity<Container>;

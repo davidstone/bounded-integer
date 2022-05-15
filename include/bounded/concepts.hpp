@@ -9,12 +9,9 @@
 #include <type_traits>
 
 namespace bounded {
-namespace detail {
 
 template<typename Result, typename... Args>
 using function_ptr = Result(*)(Args...);
-
-} // namespace detail
 
 // TODO: File a bug against the standard? The standard version always returns a
 // reference, which means it does not work with guaranteed copy elision.
@@ -32,7 +29,7 @@ concept explicitly_convertible_to = constructible_from<To, From>;
 
 template<typename From, typename To>
 concept convertible_to =
-	requires(detail::function_ptr<void, To> function) { function(declval<From>()); } or
+	requires(function_ptr<void, To> function) { function(declval<From>()); } or
 	(std::same_as<From, void> and std::same_as<To, void>);
 
 } // namespace bounded
