@@ -14,6 +14,7 @@
 #include <cstdint>
 #include <limits>
 #include <type_traits>
+#include <vector>
 
 namespace containers {
 namespace detail {
@@ -41,11 +42,6 @@ using float_to_unsigned =
 >>>;
 
 namespace to_radix_sort_key_adl {
-
-// TODO: Delete bool overload, currently relying on implicit conversions
-constexpr auto to_radix_sort_key(bool const value) {
-	return value;
-}
 
 constexpr auto to_radix_sort_key(std::byte const value) {
 	return static_cast<unsigned char>(value);
@@ -90,6 +86,10 @@ constexpr auto to_radix_sort_key(T const value) {
 
 auto to_radix_sort_key(auto * ptr) {
 	return reinterpret_cast<std::uintptr_t>(ptr);
+}
+
+constexpr auto to_radix_sort_key(std::vector<bool>::reference const value) {
+	return static_cast<bool>(value);
 }
 
 // TODO: This should not be the default behavior.
