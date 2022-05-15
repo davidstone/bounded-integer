@@ -25,7 +25,7 @@ concept push_backable = member_push_backable<Container> or lazy_push_backable<Co
 
 } // namespace detail
 
-template<detail::push_backable Container>
+template<detail::push_backable Container> requires std::copy_constructible<range_value_t<Container>>
 constexpr decltype(auto) push_back(Container & container, range_value_t<Container> const & value) {
 	if constexpr (detail::member_push_backable<Container>) {
 		container.push_back(value);
@@ -37,7 +37,7 @@ constexpr decltype(auto) push_back(Container & container, range_value_t<Containe
 		);
 	}
 }
-template<detail::push_backable Container>
+template<detail::push_backable Container> requires std::move_constructible<range_value_t<Container>>
 constexpr decltype(auto) push_back(Container & container, range_value_t<Container> && value) {
 	if constexpr (detail::member_push_backable<Container>) {
 		container.push_back(std::move(value));
