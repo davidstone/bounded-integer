@@ -19,7 +19,7 @@ namespace detail {
 template<typename T, typename Function>
 struct superconstructing_super_elider {
 	constexpr explicit superconstructing_super_elider(Function function):
-		m_function(std::move(function))
+		m_function(OPERATORS_FORWARD(function))
 	{
 	}
 
@@ -29,7 +29,7 @@ struct superconstructing_super_elider {
 	superconstructing_super_elider(superconstructing_super_elider &&) = delete;
 
 	constexpr operator T() && {
-		return static_cast<T>(std::move(m_function)());
+		return static_cast<T>(OPERATORS_FORWARD(m_function)());
 	}
 
 private:
