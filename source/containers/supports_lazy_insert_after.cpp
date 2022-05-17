@@ -6,11 +6,13 @@
 #include <containers/supports_lazy_insert_after.hpp>
 
 #include <containers/bidirectional_linked_list.hpp>
+#include <containers/forward_linked_list.hpp>
 
 #include <list>
 
 namespace {
 
+static_assert(containers::detail::supports_lazy_insert_after<containers::forward_linked_list<int>>);
 static_assert(!containers::detail::supports_lazy_insert_after<containers::bidirectional_linked_list<int>>);
 static_assert(!containers::detail::supports_lazy_insert_after<std::list<int>>);
 static_assert(!containers::detail::supports_lazy_insert_after<int>);

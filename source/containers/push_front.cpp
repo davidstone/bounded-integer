@@ -6,6 +6,7 @@
 #include <containers/push_front.hpp>
 
 #include <containers/bidirectional_linked_list.hpp>
+#include <containers/forward_linked_list.hpp>
 
 #include "../test_int.hpp"
 
@@ -26,5 +27,6 @@ constexpr auto test_push_front() -> bool {
 }
 
 static_assert(test_push_front<containers::bidirectional_linked_list<bounded_test::non_copyable_integer>>());
+static_assert(test_push_front<containers::forward_linked_list<bounded_test::non_copyable_integer>>());
 
 } // namespace

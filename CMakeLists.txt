@@ -197,6 +197,7 @@ add_executable(containers_test
 	source/containers/empty_range.cpp
 	source/containers/erase_concepts.cpp
 	source/containers/flat_map.cpp
+	source/containers/forward_linked_list.cpp
 	source/containers/front_back.cpp
 	source/containers/has_member_before_begin.cpp
 	source/containers/index_type.cpp
