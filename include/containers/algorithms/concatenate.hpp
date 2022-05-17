@@ -34,7 +34,7 @@ constexpr auto concatenate_prepend_append(Result &, iterator_t<Result &>) {
 	bounded::unreachable();
 }
 
-// This assumes that the begining of the result is full of unused memory, and
+// This assumes that the beginning of the result is full of unused memory, and
 // all elements in result are already where they belong.
 template<typename Result>
 constexpr auto concatenate_prepend_append(Result & result, iterator_t<Result &> const it, auto && range, auto && ... ranges) {
