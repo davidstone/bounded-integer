@@ -17,6 +17,7 @@
 #include <containers/reserve_if_reservable.hpp>
 #include <containers/resizable_container.hpp>
 #include <containers/size.hpp>
+#include <containers/supports_lazy_insert_after.hpp>
 
 #include <bounded/integer.hpp>
 
@@ -99,28 +100,40 @@ inline constexpr auto exact_reserve = []<typename Container>(Container & target,
 	target.reserve(::bounded::assume_in_range<range_size_t<Container>>(requested_size));
 };
 
-constexpr auto assign_to_empty_impl(auto & target, auto && source) -> void {
+template<typename Target>
+constexpr auto assign_to_empty_impl(Target & target, auto && source) -> void {
 	BOUNDED_ASSERT(containers::is_empty(target));
-	::containers::detail::assign_to_empty_or_append(
-		target,
-		OPERATORS_FORWARD(source),
-		exact_reserve,
-		[&] { return containers::begin(target); },
-		member_assign
-	);
+	if constexpr (resizable_container<Target>) {
+		::containers::detail::assign_to_empty_or_append(
+			target,
+			OPERATORS_FORWARD(source),
+			exact_reserve,
+			[&] { return containers::begin(target); },
+			member_assign
+		);
+	} else {
+		static_assert(supports_lazy_insert_after<Target>);
+		copy_or_relocate_from(OPERATORS_FORWARD(source), [&target, it = target.before_begin()](auto make) mutable {
+			it = target.lazy_insert_after(it, make);
+		});
+	}
 }
+
+template<typename Container>
+concept assignable_to_empty = resizable_container<Container> or supports_lazy_insert_after<Container>;
 
 } // namespace detail
 
-template<resizable_container Target, initializer_range<Target> Source>
+template<detail::assignable_to_empty Target, initializer_range<Target> Source>
 constexpr auto assign_to_empty(Target & target, Source && source) -> void {
 	::containers::detail::assign_to_empty_impl(target, OPERATORS_FORWARD(source));
 }
 
-constexpr auto assign_to_empty(resizable_container auto & target, empty_c_array_parameter) -> void {
+constexpr auto assign_to_empty(detail::assignable_to_empty auto & target, empty_c_array_parameter) -> void {
 	BOUNDED_ASSERT(containers::is_empty(target));
 }
-template<resizable_container Target, std::size_t init_size> requires std::is_move_constructible_v<range_value_t<Target>>
+template<detail::assignable_to_empty Target, std::size_t init_size>
+	requires std::is_move_constructible_v<range_value_t<Target>>
 constexpr auto assign_to_empty(Target & target, c_array<range_value_t<Target>, init_size> && source) -> void {
 	::containers::detail::assign_to_empty_impl(target, std::move(source));
 }
