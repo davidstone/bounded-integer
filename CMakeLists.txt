@@ -245,6 +245,7 @@ add_executable(containers_test
 	source/containers/stable_vector.cpp
 	source/containers/static_vector.cpp
 	source/containers/string.cpp
+	source/containers/supports_lazy_insert_after.cpp
 	source/containers/take.cpp
 	source/containers/to_address.cpp
 	source/containers/to_radix_sort_key.cpp
