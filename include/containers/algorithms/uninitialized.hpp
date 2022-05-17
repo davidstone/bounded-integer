@@ -6,9 +6,9 @@
 #pragma once
 
 #include <containers/algorithms/destroy_range.hpp>
+#include <containers/algorithms/copy_or_relocate_from.hpp>
 #include <containers/begin_end.hpp>
 #include <containers/data.hpp>
-#include <containers/dereference.hpp>
 #include <containers/is_range.hpp>
 #include <containers/iter_value_t.hpp>
 #include <containers/range_value_t.hpp>
@@ -37,16 +37,13 @@ concept memcpyable =
 
 } // namespace detail
 
-inline constexpr auto uninitialized_copy = []<range Input>(Input && input, iterator auto output) {
+inline constexpr auto uninitialized_copy = [](range auto && input, iterator auto output) {
 	auto out_first = output;
 	try {
-		auto const last = containers::end(OPERATORS_FORWARD(input));
-		for (auto first = containers::begin(OPERATORS_FORWARD(input)); first != last; ++first) {
-			bounded::construct(*output, [&]() -> decltype(auto) {
-				return dereference<Input>(first);
-			});
+		copy_or_relocate_from(OPERATORS_FORWARD(input), [&](auto make) {
+			bounded::construct(*output, make);
 			++output;
-		}
+		});
 	} catch (...) {
 		containers::destroy_range(range_view(out_first, output));
 		throw;

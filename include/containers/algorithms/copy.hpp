@@ -5,6 +5,7 @@
 
 #pragma once
 
+#include <containers/algorithms/copy_or_relocate_from.hpp>
 #include <containers/algorithms/reverse_iterator.hpp>
 #include <containers/begin_end.hpp>
 #include <containers/dereference.hpp>
@@ -18,21 +19,23 @@ struct copy_result {
 	Output output;
 };
 
+template<typename Input, typename Output>
+copy_result(Input, Output) -> copy_result<Input, Output>;
+
 } // namespace detail
 
 template<range Input>
 constexpr auto copy(Input && input, iterator auto output) {
-	auto first = containers::begin(OPERATORS_FORWARD(input));
-	auto const last = containers::end(OPERATORS_FORWARD(input));
-	for (; first != last; ++first, ++output) {
-		*output = dereference<Input>(first);
-	}
-	using result = detail::copy_result<decltype(first), decltype(output)>;
-	return result{std::move(first), std::move(output)};
+	auto first_it = copy_or_relocate_from(OPERATORS_FORWARD(input), [&](auto make) {
+		*output = make();
+		++output;
+	});
+	return detail::copy_result{std::move(first_it), std::move(output)};
 }
 
 template<range Input>
 constexpr auto copy(Input && input, range auto && output) {
+	// TODO: Transform this into a relocate when appropriate
 	auto in_first = containers::begin(OPERATORS_FORWARD(input));
 	auto const in_last = containers::end(OPERATORS_FORWARD(input));
 	auto out_first = containers::begin(OPERATORS_FORWARD(output));
@@ -40,8 +43,7 @@ constexpr auto copy(Input && input, range auto && output) {
 	for (; in_first != in_last and out_first != out_last; ++in_first, ++out_first) {
 		*out_first = dereference<Input>(in_first);
 	}
-	using result = detail::copy_result<decltype(in_first), decltype(out_first)>;
-	return result{std::move(in_first), std::move(out_first)};
+	return detail::copy_result{std::move(in_first), std::move(out_first)};
 }
 
 constexpr auto copy_backward(range auto && input, iterator auto out_last) {

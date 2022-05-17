@@ -5,11 +5,11 @@
 
 #pragma once
 
+#include <containers/algorithms/copy_or_relocate_from.hpp>
 #include <containers/algorithms/uninitialized.hpp>
 #include <containers/appendable_from_capacity.hpp>
 #include <containers/begin_end.hpp>
 #include <containers/c_array.hpp>
-#include <containers/dereference.hpp>
 #include <containers/initializer_range.hpp>
 #include <containers/is_range.hpp>
 #include <containers/lazy_push_back.hpp>
@@ -87,10 +87,9 @@ constexpr auto assign_to_empty_or_append(Target & target, Source && source, auto
 		target.append_from_capacity(source_size);
 	} else if constexpr (lazy_push_backable<Target>) {
 		::containers::detail::maybe_reserve(target, source, reserve);
-		auto const last = containers::end(OPERATORS_FORWARD(source));
-		for (auto it = containers::begin(OPERATORS_FORWARD(source)); it != last; ++it) {
-			::containers::lazy_push_back(target, [&] { return dereference<Source>(it); });
-		}
+		copy_or_relocate_from(OPERATORS_FORWARD(source), [&](auto make) {
+			::containers::lazy_push_back(target, make);
+		});
 	} else {
 		fallback(target, OPERATORS_FORWARD(source));
 	}

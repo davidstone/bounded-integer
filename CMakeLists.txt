@@ -145,6 +145,7 @@ add_executable(containers_test
 	source/containers/algorithms/concatenate.cpp
 	source/containers/algorithms/concatenate_view.cpp
 	source/containers/algorithms/copy.cpp
+	source/containers/algorithms/copy_or_relocate_from.cpp
 	source/containers/algorithms/count.cpp
 	source/containers/algorithms/destroy_range.cpp
 	source/containers/algorithms/distance.cpp
