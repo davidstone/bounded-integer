@@ -7,16 +7,24 @@
 
 #include <containers/c_array.hpp>
 #include <containers/erase_concepts.hpp>
+#include <containers/range_reference_t.hpp>
 
 #include <array>
 
 namespace containers {
+namespace detail {
+
+template<typename T>
+concept range_reference_t_is_reference = std::is_reference_v<range_reference_t<T>>;
+
+} // namespace detail
 
 // `is_container` means that if you own a value of type `T`, you can safely move
 // from any subset of the elements in the range.
 template<typename T>
 inline constexpr auto is_container =
-	!std::is_lvalue_reference_v<T> and (
+	!std::is_lvalue_reference_v<T> and
+	detail::range_reference_t_is_reference<T> and (
 		detail::pop_backable<T> or
 		detail::pop_frontable<T> or
 		detail::erasable<T>
