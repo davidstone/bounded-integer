@@ -15,11 +15,21 @@
 #include <containers/is_range.hpp>
 #include <containers/range_value_t.hpp>
 #include <containers/resizable_container.hpp>
+#include <containers/splicable.hpp>
+#include <containers/supports_lazy_insert_after.hpp>
 
 #include <bounded/integer.hpp>
 
 namespace containers {
 namespace detail {
+
+template<typename T>
+concept supports_erase_after = requires(T & container, iterator_t<T const &> const it) {
+	{ container.erase_after(it) } -> std::same_as<iterator_t<T &>>;
+};
+
+template<typename Target>
+concept should_use_after_algorithms = supports_lazy_insert_after<Target> and supports_erase_after<Target>;
 
 template<typename Source, typename Target>
 concept range_assignable_to =
@@ -27,7 +37,10 @@ concept range_assignable_to =
 		member_range_assignable<Target, Source> or
 		member_iterator_assignable<Target, Source> or
 		// TODO: Wrong type to assign from
-		(resizable_container<Target> and std::is_assignable_v<range_value_t<Target> &, range_value_t<Source>>)
+		(
+			std::is_assignable_v<range_value_t<Target> &, range_value_t<Source>> and
+			(resizable_container<Target> or should_use_after_algorithms<Target>)
+		)
 	);
 
 template<typename Target, typename Source>
@@ -39,6 +52,29 @@ constexpr void assign_impl(Target & target, Source && source) {
 	// optimizes better.
 	if constexpr (member_range_assignable<Target, Source> or member_iterator_assignable<Target, Source>) {
 		member_assign(target, OPERATORS_FORWARD(source));
+	} else if constexpr (should_use_after_algorithms<Target>) {
+		auto target_before_it = target.before_begin();
+		auto target_it = containers::next(target_before_it);
+		auto const target_last = containers::end(target);
+		auto source_it = containers::begin(source);
+		auto const source_last = containers::end(source);
+
+		// TODO: Add *_after algorithms to do this work
+		// copy
+		for (; source_it != source_last and target_it != target_last; ++source_it, ++target_it) {
+			*target_it = dereference<Source>(source_it);
+			target_before_it = target_it;
+		}
+
+		// erase remaining
+		while (target_it != target_last) {
+			target_it = target.erase_after(target_before_it);
+		}
+
+		// copy remaining
+		for (; source_it != source_last; ++source_it) {
+			target.lazy_insert_after(target_before_it, [&] { return dereference<Source>(source_it); });
+		}
 	} else if constexpr (std::is_trivially_copyable_v<range_value_t<Target>>) {
 		::containers::clear(target);
 		::containers::assign_to_empty(target, OPERATORS_FORWARD(source));
