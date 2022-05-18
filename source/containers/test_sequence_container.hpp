@@ -121,10 +121,11 @@ constexpr auto test_default_copy_assignment_from_non_empty(auto const make) -> v
 }
 template<typename Container>
 constexpr auto test_copy_assignment_from_moved_from(auto const make) -> void {
-	auto copy = Container();
-	[[maybe_unused]] auto const temp = std::move(copy);
-	copy = Container(make());
-	BOUNDED_TEST(containers::equal(copy, make()));
+	auto target = Container(make());
+	auto const source = std::move(target);
+	target = source;
+	BOUNDED_TEST(containers::equal(target, make()));
+	BOUNDED_TEST(containers::equal(target, source));
 }
 template<typename Container>
 constexpr auto test_self_copy_assignment(auto const make) -> void {
