@@ -10,11 +10,11 @@
 #include <bounded/integer.hpp>
 
 #include <bounded/assert.hpp>
-#include <bounded/unreachable.hpp>
 
 #include <operators/operators.hpp>
 
 #include <cstddef>
+#include <utility>
 
 namespace containers {
 
@@ -65,14 +65,14 @@ constexpr auto operator+(
 	contiguous_iterator<T, 0> const lhs,
 	bounded::constant_t<1>
 ) -> decltype(lhs) {
-	bounded::unreachable();
+	std::unreachable();
 }
 template<typename T>
 constexpr auto operator+(
 	contiguous_iterator<T, 0> const lhs,
 	bounded::constant_t<-1>
 ) -> decltype(lhs) {
-	bounded::unreachable();
+	std::unreachable();
 }
 
 

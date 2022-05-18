@@ -12,7 +12,6 @@
 #include <containers/range_value_t.hpp>
 
 #include <bounded/integer.hpp>
-#include <bounded/unreachable.hpp>
 
 namespace containers {
 namespace detail {

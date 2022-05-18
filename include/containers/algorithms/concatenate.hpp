@@ -20,18 +20,19 @@
 
 #include <bounded/assert.hpp>
 #include <bounded/integer.hpp>
-#include <bounded/unreachable.hpp>
 
 #include <numeric_traits/min_max_value.hpp>
 
 #include <operators/forward.hpp>
+
+#include <utility>
 
 namespace containers {
 namespace detail {
 
 template<typename Result>
 constexpr auto concatenate_prepend_append(Result &, iterator_t<Result &>) {
-	bounded::unreachable();
+	std::unreachable();
 }
 
 // This assumes that the beginning of the result is full of unused memory, and

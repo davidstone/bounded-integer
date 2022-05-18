@@ -12,6 +12,7 @@
 #include <numeric_traits/min_max_value.hpp>
 
 #include <type_traits>
+#include <utility>
 
 namespace bounded {
 namespace detail {
@@ -140,7 +141,7 @@ constexpr decltype(auto) visit_implementation(
 	#define BOUNDED_DETAIL_VISIT_IMPL(index) \
 		do { \
 			if constexpr (numeric_traits::max_value<decltype(search_index)> < (index)) { \
-				bounded::unreachable(); \
+				std::unreachable(); \
 			} else { \
 				return ::bounded::detail::visit_implementation( \
 					OPERATORS_FORWARD(function), \
@@ -172,7 +173,7 @@ constexpr decltype(auto) visit_implementation(
 		default: {
 			constexpr auto max_index = 16_bi;
 			if constexpr (numeric_traits::max_value<decltype(search_index)> < max_index) {
-				bounded::unreachable();
+				std::unreachable();
 			} else {
 				return ::bounded::detail::visit_implementation(
 					OPERATORS_FORWARD(function),

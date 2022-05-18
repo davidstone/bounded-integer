@@ -15,7 +15,8 @@
 
 #include <bounded/integer.hpp>
 #include <bounded/lazy_init.hpp>
-#include <bounded/unreachable.hpp>
+
+#include <utility>
 
 namespace containers {
 namespace detail {
@@ -57,7 +58,7 @@ constexpr auto & lazy_push_back(
 			temp.append_from_capacity(initial_size + 1_bi);
 			container = std::move(temp);
 		} else {
-			bounded::unreachable();
+			std::unreachable();
 		}
 		return containers::back(container);
 	}

@@ -13,7 +13,6 @@
 
 #include <bounded/assert.hpp>
 #include <bounded/integer.hpp>
-#include <bounded/unreachable.hpp>
 
 #include <numeric_traits/min_max_value.hpp>
 
@@ -22,6 +21,7 @@
 #include <concepts>
 #include <iterator>
 #include <type_traits>
+#include <utility>
 
 namespace containers {
 namespace detail {
@@ -52,7 +52,7 @@ public:
 
 	friend constexpr auto operator+(integer_range_iterator const lhs, difference_type const rhs) {
 		if constexpr (has_no_values) {
-			bounded::unreachable();
+			std::unreachable();
 			return lhs;
 		} else {
 			return integer_range_iterator(bounded::assume_in_range<storage_type>(lhs.m_value + rhs * lhs.m_step), lhs.m_step);
@@ -66,7 +66,7 @@ public:
 	// Not technically needed, but helps compile faster
 	friend constexpr auto & operator++(integer_range_iterator & it) {
 		if constexpr (has_no_values) {
-			bounded::unreachable();
+			std::unreachable();
 		} else {
 			it.m_value += it.m_step;
 		}

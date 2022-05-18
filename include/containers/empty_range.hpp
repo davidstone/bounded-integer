@@ -8,9 +8,9 @@
 #include <containers/common_functions.hpp>
 
 #include <bounded/integer.hpp>
-#include <bounded/unreachable.hpp>
 
 #include <iterator>
+#include <utility>
 
 namespace containers {
 namespace detail {
@@ -21,13 +21,13 @@ struct empty_iterator {
 	empty_iterator() = default;
 	
 	constexpr decltype(auto) operator*() const {
-		bounded::unreachable();
+		std::unreachable();
 		using fptr = T(*)();
 		return fptr()();
 	}
 
 	friend constexpr auto operator+(empty_iterator, bounded::constant_t<1>) {
-		bounded::unreachable();
+		std::unreachable();
 		return empty_iterator();
 	}
 	friend constexpr auto operator+(empty_iterator, bounded::constant_t<0>) {

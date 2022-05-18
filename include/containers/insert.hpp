@@ -22,7 +22,6 @@
 #include <containers/size.hpp>
 
 #include <bounded/integer.hpp>
-#include <bounded/unreachable.hpp>
 
 #include <concepts>
 #include <utility>
@@ -96,7 +95,7 @@ constexpr auto insert(Container & container, iterator_t<Container const &> posit
 	} else if constexpr (detail::reservable<Container>) {
 		return ::containers::detail::insert_with_reallocation(container, position, OPERATORS_FORWARD(range), range_size);
 	} else {
-		bounded::unreachable();
+		std::unreachable();
 	}
 }
 

@@ -18,7 +18,6 @@
 #include <bounded/clamp.hpp>
 #include <bounded/integer.hpp>
 #include <bounded/string.hpp>
-#include <bounded/unreachable.hpp>
 
 #include <numeric_traits/min_max_value.hpp>
 
@@ -125,7 +124,7 @@ struct counted_iterator : iterator_category_base<Iterator> {
 	}
 
 	friend auto & operator++(counted_iterator & it) requires(numeric_traits::max_value<difference_type> == 0_bi) {
-		bounded::unreachable();
+		std::unreachable();
 		return it;
 	}
 
@@ -158,7 +157,7 @@ struct random_access_counted_iterator {
 	}
 
 	friend auto & operator++(random_access_counted_iterator & it) requires(numeric_traits::max_value<difference_type> == 0_bi) {
-		bounded::unreachable();
+		std::unreachable();
 		return it;
 	}
 

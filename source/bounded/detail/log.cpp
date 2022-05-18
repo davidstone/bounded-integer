@@ -6,9 +6,10 @@
 #include <bounded/detail/log.hpp>
 #include <bounded/detail/comparison.hpp>
 #include <bounded/detail/class.hpp>
-#include <bounded/unreachable.hpp>
 
 #include <numeric_traits/min_max_value.hpp>
+
+#include <utility>
 
 namespace {
 
@@ -35,7 +36,7 @@ constexpr auto test_log(auto const value, bounded::constant_t<2>) {
 		case numeric_traits::max_value<bounded::detail::int128_t>: return 126;
 		case numeric_traits::max_value<bounded::detail::uint128_t>: return 127;
 #endif
-		default: bounded::unreachable();
+		default: std::unreachable();
 	}
 }
 
@@ -62,7 +63,7 @@ constexpr auto test_log(auto const value, bounded::constant_t<10>) {
 		case numeric_traits::max_value<bounded::detail::int128_t>: return 38;
 		case numeric_traits::max_value<bounded::detail::uint128_t>: return 38;
 #endif
-		default: bounded::unreachable();
+		default: std::unreachable();
 	}
 }
 

@@ -6,6 +6,7 @@
 #pragma once
 
 #include <type_traits>
+#include <utility>
 
 namespace bounded::detail {
 
@@ -45,7 +46,7 @@ void prevent_comma(auto &&);
 	)
 #elif defined __GNUC__
 	#define BOUNDED_ASSUME(...) \
-		(!(__VA_ARGS__) ? __builtin_unreachable() : BOUNDED_DETAIL_PREVENT_COMMA(__VA_ARGS__))
+		(!(__VA_ARGS__) ? std::unreachable() : BOUNDED_DETAIL_PREVENT_COMMA(__VA_ARGS__))
 #else
 	#define BOUNDED_ASSUME BOUNDED_DETAIL_CONSTEXPR_ONLY_IF
 #endif

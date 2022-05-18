@@ -11,7 +11,6 @@
 #include <containers/offset_type.hpp>
 
 #include <bounded/integer.hpp>
-#include <bounded/unreachable.hpp>
 
 #include <numeric_traits/min_max_value.hpp>
 
@@ -83,7 +82,7 @@ public:
 
 	friend constexpr auto operator+(generate_n_iterator it, bounded::constant_t<1>) -> generate_n_iterator {
 		if constexpr (numeric_traits::max_value<Offset> == 0_bi) {
-			bounded::unreachable();
+			std::unreachable();
 		} else {
 			--it.m_remaining;
 			return it;
@@ -167,14 +166,14 @@ public:
 		if constexpr (bounded::detail::builtin_integer<Offset>) {
 			return it + 1;
 		} else {
-			bounded::unreachable();
+			std::unreachable();
 		}
 	}
 	friend constexpr auto operator+(indexed_generate_n_iterator const it, bounded::constant_t<-1>) -> indexed_generate_n_iterator requires(bounded::detail::builtin_integer<Offset> or numeric_traits::max_value<Offset> == 0_bi) {
 		if constexpr (bounded::detail::builtin_integer<Offset>) {
 			return it - 1;
 		} else {
-			bounded::unreachable();
+			std::unreachable();
 		}
 	}
 

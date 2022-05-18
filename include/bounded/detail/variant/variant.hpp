@@ -14,7 +14,6 @@
 #include <bounded/lazy_init.hpp>
 #include <bounded/relocate.hpp>
 #include <bounded/single_element_storage.hpp>
-#include <bounded/unreachable.hpp>
 #include <bounded/value_to_function.hpp>
 #include <bounded/detail/construct_destroy.hpp>
 #include <bounded/detail/type.hpp>
