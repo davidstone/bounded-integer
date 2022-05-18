@@ -73,7 +73,7 @@ constexpr void assign_impl(Target & target, Source && source) {
 
 		// copy remaining
 		for (; source_it != source_last; ++source_it) {
-			target.lazy_insert_after(target_before_it, [&] { return dereference<Source>(source_it); });
+			target_before_it = target.lazy_insert_after(target_before_it, [&] { return dereference<Source>(source_it); });
 		}
 	} else if constexpr (std::is_trivially_copyable_v<range_value_t<Target>>) {
 		::containers::clear(target);
