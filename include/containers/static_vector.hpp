@@ -63,8 +63,8 @@ struct static_vector_data : private lexicographical_comparison::base {
 
 	static_vector_data(static_vector_data &&) requires trivially_move_constructible<T> = default;
 	static_vector_data(static_vector_data const &) requires trivially_copy_constructible<T> = default;
-	static_vector_data & operator=(static_vector_data &&) & requires trivially_move_assignable<T> = default;
-	static_vector_data & operator=(static_vector_data const &) & requires trivially_copy_assignable<T> = default;
+	auto operator=(static_vector_data &&) & -> static_vector_data & requires trivially_move_assignable<T> = default;
+	auto operator=(static_vector_data const &) & -> static_vector_data & requires trivially_copy_assignable<T> = default;
 
 	constexpr static_vector_data(static_vector_data && other) noexcept requires move_constructible<T> {
 		containers::uninitialized_relocate_no_overlap(other, begin());
@@ -74,11 +74,11 @@ struct static_vector_data : private lexicographical_comparison::base {
 		containers::assign_to_empty(*this, other);
 	}
 
-	constexpr auto & operator=(static_vector_data && other) & noexcept(std::is_nothrow_move_assignable_v<T> and std::is_nothrow_move_constructible_v<T>) requires move_assignable<T> {
+	constexpr auto operator=(static_vector_data && other) & noexcept(std::is_nothrow_move_assignable_v<T> and std::is_nothrow_move_constructible_v<T>)  -> static_vector_data & requires move_assignable<T> {
 		containers::assign(*this, std::move(other));
 		return *this;
 	}
-	constexpr auto & operator=(static_vector_data const & other) & requires copy_assignable<T> {
+	constexpr auto operator=(static_vector_data const & other) & -> static_vector_data & requires copy_assignable<T> {
 		if (this != std::addressof(other)) {
 			containers::assign(*this, other);
 		}
@@ -133,8 +133,8 @@ public:
 
 	static_vector_data(static_vector_data &&) = default;
 	static_vector_data(static_vector_data const &) = default;
-	static_vector_data & operator=(static_vector_data &&) & = default;
-	static_vector_data & operator=(static_vector_data const &) & = default;
+	auto operator=(static_vector_data &&) & -> static_vector_data & = default;
+	auto operator=(static_vector_data const &) & -> static_vector_data & = default;
 
 	constexpr ~static_vector_data() {
 		::containers::destroy_range(*this);
