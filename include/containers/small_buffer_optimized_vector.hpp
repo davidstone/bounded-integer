@@ -207,8 +207,7 @@ struct small_buffer_optimized_vector : private lexicographical_comparison::base 
 		return BOUNDED_CONDITIONAL(is_small(), m_small.capacity(), m_large.capacity());
 	}
 	// Assumes that elements are already constructed in the spare capacity
-	constexpr void append_from_capacity(auto const count) {
-		auto const new_size = size() + count;
+	constexpr void set_size(auto const new_size) {
 		if (is_small()) {
 			if constexpr (bounded::constructible_from<range_size_t<small_t>, decltype(new_size), bounded::unchecked_t>) {
 				m_small.set_size(::bounded::assume_in_range<range_size_t<small_t>>(new_size));

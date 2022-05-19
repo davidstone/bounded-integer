@@ -7,8 +7,8 @@
 
 #include <containers/algorithms/advance.hpp>
 #include <containers/algorithms/erase.hpp>
-#include <containers/appendable_from_capacity.hpp>
 #include <containers/begin_end.hpp>
+#include <containers/can_set_size.hpp>
 #include <containers/erase_concepts.hpp>
 #include <containers/front_back.hpp>
 
@@ -21,9 +21,9 @@ template<detail::pop_backable Container>
 constexpr auto pop_back(Container & c) -> void {
 	if constexpr (detail::member_pop_backable<Container>) {
 		c.pop_back();
-	} else if constexpr (detail::appendable_from_capacity<Container>) {
+	} else if constexpr (detail::can_set_size<Container>) {
 		bounded::destroy(containers::back(c));
-		c.append_from_capacity(bounded::constant<-1>);
+		c.set_size(containers::size(c) - 1_bi);
 	} else {
 		containers::erase(c, containers::prev(containers::end(c)));
 	}

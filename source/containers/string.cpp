@@ -9,9 +9,9 @@
 
 #include <catch2/catch_test_macros.hpp>
 
-#include "test_append_from_capacity.hpp"
 #include "test_reserve_and_capacity.hpp"
 #include "test_sequence_container.hpp"
+#include "test_set_size.hpp"
 
 namespace {
 
@@ -51,7 +51,7 @@ static_assert(std::constructible_from<containers::string, to_both>);
 TEST_CASE("string", "[string]") {
 	containers_test::test_sequence_container<containers::string>();
 	containers_test::test_reserve_and_capacity<containers::string>();
-	containers_test::test_append_from_capacity<containers::string>();
+	containers_test::test_set_size<containers::string>();
 }
 
 } // namespace

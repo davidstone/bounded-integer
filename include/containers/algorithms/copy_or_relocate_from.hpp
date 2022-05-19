@@ -5,8 +5,8 @@
 
 #pragma once
 
-#include <containers/appendable_from_capacity.hpp>
 #include <containers/begin_end.hpp>
+#include <containers/can_set_size.hpp>
 #include <containers/dereference.hpp>
 #include <containers/is_container.hpp>
 #include <containers/is_range.hpp>
@@ -30,7 +30,7 @@ inline constexpr auto copy_or_relocate_from = []<range Input>(Input && input, au
 	// TODO: Optimize node-based input containers
 	constexpr auto use_relocate =
 		is_container<Input> and
-		detail::appendable_from_capacity<Input> and
+		detail::can_set_size<Input> and
 		!std::is_trivially_copyable_v<range_value_t<Input>>;
 	auto it = containers::begin(OPERATORS_FORWARD(input));
 	auto const last = containers::end(OPERATORS_FORWARD(input));
@@ -38,7 +38,7 @@ inline constexpr auto copy_or_relocate_from = []<range Input>(Input && input, au
 		for (; it != last; ++it) {
 			function([&] { return bounded::relocate(*it); });
 		}
-		input.append_from_capacity(-containers::size(input));
+		input.set_size(0_bi);
 	} else {
 		for (; it != last; ++it) {
 			function([&] { return dereference<Input>(it); });

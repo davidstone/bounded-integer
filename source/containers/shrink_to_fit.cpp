@@ -34,8 +34,8 @@ struct container {
 	constexpr auto capacity() const {
 		return bounded::assume_in_range(m_data.capacity(), 1_bi, 5_bi);
 	}
-	constexpr void append_from_capacity(auto const added) {
-		m_data.append_from_capacity(added);
+	constexpr void set_size(auto const new_size) {
+		m_data.set_size(new_size);
 	}
 
 private:

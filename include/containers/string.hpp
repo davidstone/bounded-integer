@@ -49,7 +49,7 @@ public:
 	using base::capacity;
 	using base::reserve;
 	
-	using base::append_from_capacity;
+	using base::set_size;
 	
 	constexpr operator std::string_view() const {
 		return std::string_view(data(*this), static_cast<range_size_t<std::string_view>>(size()));

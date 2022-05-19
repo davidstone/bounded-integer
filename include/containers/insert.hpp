@@ -45,7 +45,7 @@ constexpr auto insert_without_reallocation(Container & container, iterator_t<Con
 		::containers::uninitialized_relocate(range_view(new_position, new_end), mutable_position);
 		throw;
 	}
-	container.append_from_capacity(number_of_elements);
+	container.set_size(containers::size(container) + number_of_elements);
 	return mutable_position;
 }
 
@@ -72,8 +72,8 @@ constexpr auto insert_with_reallocation(Container & container, iterator_t<Contai
 		range_view(mutable_position, containers::end(container)),
 		it + ::bounded::assume_in_range<offset_type<iterator_t<Container &>>>(number_of_elements)
 	);
-	container.append_from_capacity(-original_size);
-	temp.append_from_capacity(original_size + number_of_elements);
+	container.set_size(0_bi);
+	temp.set_size(original_size + number_of_elements);
 	container = std::move(temp);
 	return containers::begin(container) + offset;
 }

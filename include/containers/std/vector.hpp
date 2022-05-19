@@ -317,8 +317,8 @@ struct vector {
 	friend constexpr auto operator<=>(vector const &, vector const &) = default;
 
 	// Extensions
-	constexpr void append_from_capacity(auto const count) {
-		m_impl.append_from_capacity(count);
+	constexpr void set_size(auto const new_size) {
+		m_impl.set_size(new_size);
 	}
 
 private:

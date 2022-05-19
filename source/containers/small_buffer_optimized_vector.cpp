@@ -9,21 +9,21 @@
 
 #include "../test_int.hpp"
 
-#include "test_append_from_capacity.hpp"
 #include "test_reserve_and_capacity.hpp"
 #include "test_sequence_container.hpp"
+#include "test_set_size.hpp"
 
 namespace {
 
 static_assert(containers_test::test_sequence_container<containers::small_buffer_optimized_vector<int, 40>>());
-static_assert(containers_test::test_append_from_capacity<containers::small_buffer_optimized_vector<int, 1>>());
+static_assert(containers_test::test_set_size<containers::small_buffer_optimized_vector<int, 1>>());
 
 TEST_CASE("small_buffer_optimized_vector", "[small_buffer_optimized_vector]") {
 	containers_test::test_sequence_container<containers::small_buffer_optimized_vector<int, 3>>();
 	containers_test::test_sequence_container<containers::small_buffer_optimized_vector<bounded_test::integer, 3>>();
 	containers_test::test_reserve_and_capacity<containers::small_buffer_optimized_vector<int, 3>>();
 	containers_test::test_reserve_and_capacity<containers::small_buffer_optimized_vector<bounded_test::integer, 3>>();
-	containers_test::test_append_from_capacity<containers::small_buffer_optimized_vector<bounded_test::integer, 1>>();
+	containers_test::test_set_size<containers::small_buffer_optimized_vector<bounded_test::integer, 1>>();
 }
 
 } // namespace

@@ -20,7 +20,7 @@ template<typename Container>
 constexpr auto test_add_zero_to_empty() -> void {
 	auto const original = Container();
 	auto v = original;
-	v.append_from_capacity(0_bi);
+	v.set_size(0_bi);
 	BOUNDED_TEST(v == original);
 }
 
@@ -28,7 +28,7 @@ template<typename Container>
 constexpr auto test_add_zero_to_non_empty() -> void {
 	auto const original = Container({1});
 	auto v = original;
-	v.append_from_capacity(0_bi);
+	v.set_size(1_bi);
 	BOUNDED_TEST(v == original);
 }
 
@@ -36,7 +36,7 @@ template<typename Container>
 constexpr auto test_remove_one() -> void {
 	auto v = Container({1});
 	bounded::destroy(*containers::begin(v));
-	v.append_from_capacity(-1_bi);
+	v.set_size(0_bi);
 	BOUNDED_TEST(v == Container());
 }
 
@@ -44,14 +44,14 @@ template<typename Container>
 constexpr auto test_add_one() -> void {
 	auto v = Container({1});
 	bounded::destroy(*containers::begin(v));
-	v.append_from_capacity(-1_bi);
+	v.set_size(0_bi);
 	bounded::construct(*containers::data(v), [] { return 5; });
-	v.append_from_capacity(1_bi);
+	v.set_size(1_bi);
 	BOUNDED_TEST(v == Container({5}));
 }
 
 template<typename Container>
-constexpr auto test_append_from_capacity() -> bool {
+constexpr auto test_set_size() -> bool {
 	test_add_zero_to_empty<Container>();
 	test_add_zero_to_non_empty<Container>();
 	test_remove_one<Container>();

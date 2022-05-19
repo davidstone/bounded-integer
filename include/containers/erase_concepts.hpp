@@ -5,7 +5,7 @@
 
 #pragma once
 
-#include <containers/appendable_from_capacity.hpp>
+#include <containers/can_set_size.hpp>
 #include <containers/has_member_before_begin.hpp>
 #include <containers/is_range.hpp>
 #include <containers/iterator_t.hpp>
@@ -37,7 +37,7 @@ template<typename Container>
 concept pop_backable =
 	range<Container> and (
 		member_pop_backable<Container> or
-		appendable_from_capacity<Container> or
+		can_set_size<Container> or
 		(constant_time_erasable<Container> and bidirectional_range<Container>)
 	);
 
@@ -53,7 +53,7 @@ template<typename Container>
 concept erasable = range<Container> and (
 	member_erasable<Container> or
 	splicable<Container> or
-	appendable_from_capacity<Container>
+	can_set_size<Container>
 );
 
 } // namespace containers::detail

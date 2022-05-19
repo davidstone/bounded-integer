@@ -9,8 +9,8 @@
 
 #include <numeric_traits/min_max_value.hpp>
 
-#include "test_append_from_capacity.hpp"
 #include "test_sequence_container.hpp"
+#include "test_set_size.hpp"
 
 #include "../test_int.hpp"
 
@@ -26,8 +26,8 @@ static_assert(test_stable_vector<int>::capacity() == 1000_bi);
 static_assert(containers_test::test_sequence_container<test_stable_vector<int>>());
 static_assert(containers_test::test_sequence_container<test_stable_vector<bounded_test::integer>>());
 
-static_assert(containers_test::test_append_from_capacity<test_stable_vector<int>>());
-static_assert(containers_test::test_append_from_capacity<test_stable_vector<bounded_test::integer>>());
+static_assert(containers_test::test_set_size<test_stable_vector<int>>());
+static_assert(containers_test::test_set_size<test_stable_vector<bounded_test::integer>>());
 
 using index_type = containers::index_type<containers::stable_vector<int, 10>>;
 static_assert(numeric_traits::min_value<index_type> == 0_bi);

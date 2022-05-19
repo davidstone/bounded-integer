@@ -7,9 +7,9 @@
 
 #include <containers/algorithms/copy_or_relocate_from.hpp>
 #include <containers/algorithms/uninitialized.hpp>
-#include <containers/appendable_from_capacity.hpp>
 #include <containers/begin_end.hpp>
 #include <containers/c_array.hpp>
+#include <containers/can_set_size.hpp>
 #include <containers/initializer_range.hpp>
 #include <containers/is_range.hpp>
 #include <containers/lazy_push_back.hpp>
@@ -68,12 +68,12 @@ constexpr auto maybe_reserve(Target & target, Source const & source, auto reserv
 
 template<typename Target, typename Source>
 constexpr auto assign_to_empty_or_append(Target & target, Source && source, auto reserve, auto get_target_position, auto fallback) {
-	if constexpr (appendable_from_capacity<Target> and reservable<Target> and size_then_use_range<Source>) {
+	if constexpr (can_set_size<Target> and reservable<Target> and size_then_use_range<Source>) {
 		auto const source_size = ::containers::detail::get_source_size<Target>(source);
 		reserve(target, source_size);
 		containers::uninitialized_copy_no_overlap(OPERATORS_FORWARD(source), get_target_position());
-		target.append_from_capacity(source_size);
-	} else if constexpr (appendable_from_capacity<Target> and !reservable<Target>) {
+		target.set_size(containers::size(target) + source_size);
+	} else if constexpr (can_set_size<Target> and !reservable<Target>) {
 		auto const target_position = get_target_position();
 		// TODO: Use an iterator that includes a count if we do not have a sized
 		// source range or a random-access iterator for the target
@@ -85,7 +85,7 @@ constexpr auto assign_to_empty_or_append(Target & target, Source && source, auto
 				return ::bounded::assume_in_range<range_size_t<Target>>(new_end - target_position);
 			}
 		}();
-		target.append_from_capacity(source_size);
+		target.set_size(containers::size(target) + source_size);
 	} else if constexpr (lazy_push_backable<Target>) {
 		::containers::detail::maybe_reserve(target, source, reserve);
 		copy_or_relocate_from(OPERATORS_FORWARD(source), [&](auto make) {

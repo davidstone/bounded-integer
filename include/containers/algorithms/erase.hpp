@@ -9,8 +9,8 @@
 #include <containers/algorithms/destroy_range.hpp>
 #include <containers/algorithms/find.hpp>
 #include <containers/algorithms/uninitialized.hpp>
-#include <containers/appendable_from_capacity.hpp>
 #include <containers/begin_end.hpp>
+#include <containers/can_set_size.hpp>
 #include <containers/count_type.hpp>
 #include <containers/erase_concepts.hpp>
 #include <containers/iterator_t.hpp>
@@ -54,7 +54,7 @@ constexpr auto erase(Container & container, iterator_t<Container const &> const 
 		} else {
 			containers::destroy_range(range_view(target, middle));
 		}
-		container.append_from_capacity(-count);
+		container.set_size(containers::size(container) - count);
 		return containers::begin(container) + offset;
 	}
 }
@@ -68,11 +68,11 @@ constexpr auto erase(Container & container, iterator_t<Container const &> const 
 template<detail::erasable Container>
 constexpr void erase_after(Container & container, iterator_t<Container const &> const_position) {
 	auto const last = containers::end(container);
-	if constexpr (detail::appendable_from_capacity<Container>) {
+	if constexpr (detail::can_set_size<Container>) {
 		auto const count = last - const_position;
 		auto target = ::containers::detail::mutable_iterator(container, const_position);
 		containers::destroy_range(range_view(target, last));
-		container.append_from_capacity(-count);
+		container.set_size(containers::size(container) - count);
 	} else {
 		::containers::erase(container, const_position, last);
 	}

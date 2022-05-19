@@ -173,7 +173,6 @@ add_executable(containers_test
 	source/containers/std/vector.cpp
 	source/containers/adapt.cpp
 	source/containers/append.cpp
-	source/containers/appendable_from_capacity.cpp
 	source/containers/array.cpp
 	source/containers/assign.cpp
 	source/containers/assign_to_empty.cpp
@@ -183,6 +182,7 @@ add_executable(containers_test
 	source/containers/begin_end.cpp
 	source/containers/bidirectional_linked_list.cpp
 	source/containers/c_array.cpp
+	source/containers/can_set_size.cpp
 	source/containers/clear.cpp
 	source/containers/compare_container.cpp
 	source/containers/contiguous_iterator.cpp

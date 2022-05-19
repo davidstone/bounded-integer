@@ -6,7 +6,7 @@
 #pragma once
 
 #include <containers/algorithms/destroy_range.hpp>
-#include <containers/appendable_from_capacity.hpp>
+#include <containers/can_set_size.hpp>
 #include <containers/is_empty.hpp>
 #include <containers/pop_back.hpp>
 #include <containers/pop_front.hpp>
@@ -29,10 +29,10 @@ template<detail::clearable Container>
 constexpr auto clear(Container & container) {
 	if constexpr (detail::member_clearable<Container>) {
 		container.clear();
-	} else if constexpr (detail::appendable_from_capacity<Container>) {
+	} else if constexpr (detail::can_set_size<Container>) {
 		// TODO: Link to Godbolt showing better code gen
 		containers::destroy_range(container);
-		container.append_from_capacity(-containers::size(container));
+		container.set_size(0_bi);
 	} else {
 		while (!containers::is_empty(container)) {
 			if constexpr (detail::pop_backable<Container>) {

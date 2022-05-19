@@ -113,9 +113,9 @@ struct static_vector_data : private lexicographical_comparison::base {
 		return bounded::constant<capacity_>;
 	}
 	// Assumes that elements are already constructed in the spare capacity
-	constexpr void append_from_capacity(auto const count) {
-		BOUNDED_ASSERT(count + m_size <= capacity());
-		m_size += count;
+	constexpr void set_size(auto const new_size) {
+		BOUNDED_ASSERT(new_size <= capacity());
+		m_size = new_size;
 	}
 
 	[[no_unique_address]] uninitialized_array<T, capacity_> m_storage = {};
@@ -160,7 +160,7 @@ public:
 	using base::size;
 
 	using base::capacity;
-	using base::append_from_capacity;
+	using base::set_size;
 
 	constexpr operator std::span<T const>() const {
 		return std::span<T const>(containers::data(*this), static_cast<std::size_t>(size()));

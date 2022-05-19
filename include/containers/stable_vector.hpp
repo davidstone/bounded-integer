@@ -97,9 +97,9 @@ struct stable_vector : private lexicographical_comparison::base {
 		return bounded::constant<bounded::normalize<capacity_>>;
 	}
 	// Assumes that elements are already constructed in the spare capacity
-	constexpr auto append_from_capacity(auto const count) -> void {
-		BOUNDED_ASSERT(count + m_size <= capacity());
-		m_size += count;
+	constexpr auto set_size(auto const new_size) -> void {
+		BOUNDED_ASSERT(new_size <= capacity());
+		m_size = new_size;
 	}
 
 	constexpr operator std::span<T const>() const {

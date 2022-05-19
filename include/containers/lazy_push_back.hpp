@@ -6,7 +6,7 @@
 #pragma once
 
 #include <containers/algorithms/uninitialized.hpp>
-#include <containers/appendable_from_capacity.hpp>
+#include <containers/can_set_size.hpp>
 #include <containers/data.hpp>
 #include <containers/front_back.hpp>
 #include <containers/range_value_t.hpp>
@@ -28,7 +28,7 @@ concept member_lazy_push_backable =
 	};
 
 template<typename Container>
-concept lazy_push_backable = member_lazy_push_backable<Container> or appendable_from_capacity<Container>;
+concept lazy_push_backable = member_lazy_push_backable<Container> or can_set_size<Container>;
 
 } // namespace detail
 
@@ -46,16 +46,16 @@ constexpr auto & lazy_push_back(
 		};
 		if (initial_size < container.capacity()) {
 			construct(container);
-			container.append_from_capacity(1_bi);
+			container.set_size(initial_size + 1_bi);
 		} else if constexpr (detail::reservable<Container>) {
 			auto temp = Container();
 			temp.reserve(::containers::detail::reallocation_size(container.capacity(), initial_size, 1_bi));
 			construct(temp);
 
 			containers::uninitialized_relocate_no_overlap(container, containers::begin(temp));
-			container.append_from_capacity(-initial_size);
+			container.set_size(0_bi);
 
-			temp.append_from_capacity(initial_size + 1_bi);
+			temp.set_size(initial_size + 1_bi);
 			container = std::move(temp);
 		} else {
 			std::unreachable();

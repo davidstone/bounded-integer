@@ -111,9 +111,9 @@ struct vector : private lexicographical_comparison::base {
 		return m_storage.capacity();
 	}
 	// Assumes that elements are already constructed in the spare capacity
-	constexpr auto append_from_capacity(auto const count) -> void {
-		BOUNDED_ASSERT(m_size + count <= capacity());
-		m_size += count;
+	constexpr auto set_size(auto const new_size) -> void {
+		BOUNDED_ASSERT(new_size <= capacity());
+		m_size = new_size;
 	}
 
 	constexpr auto reserve(size_type const requested_capacity) -> void {

@@ -9,8 +9,8 @@
 #include <containers/algorithms/reverse_iterator.hpp>
 #include <containers/algorithms/uninitialized.hpp>
 #include <containers/append.hpp>
-#include <containers/appendable_from_capacity.hpp>
 #include <containers/begin_end.hpp>
+#include <containers/can_set_size.hpp>
 #include <containers/data.hpp>
 #include <containers/is_iterator.hpp>
 #include <containers/iterator_t.hpp>
@@ -85,16 +85,16 @@ constexpr auto ugly_size_hack(Size const size) {
 
 template<typename Container>
 concept can_reuse_storage =
-	appendable_from_capacity<Container> or
+	can_set_size<Container> or
 	(std::is_trivial_v<range_value_t<Container>> and resizable_container<Container>);
 
 template<typename Container>
 constexpr auto move_existing_data_to_final_position(Container & container, auto const before_size) {
-	if constexpr (appendable_from_capacity<Container>) {
+	if constexpr (can_set_size<Container>) {
 		// Use data instead of begin to construct an iterator after `end()`.
 		auto const new_begin = containers::data(container) + before_size;
 		::containers::uninitialized_relocate(containers::reversed(container), containers::reverse_iterator(new_begin + ::containers::size(container)));
-		container.append_from_capacity(before_size);
+		container.set_size(containers::size(container) + before_size);
 	} else {
 		static_assert(std::is_trivial_v<range_value_t<Container>> and resizable_container<Container>);
 		using difference_type = iter_difference_t<iterator_t<Container &>>;
