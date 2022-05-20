@@ -55,7 +55,7 @@ namespace detail {
 
 // std::memcpy does not allow either argument to be null, even when size is 0
 inline constexpr auto memcpy(void * destination, void const * source, std::size_t const size) {
-	#if defined __clang
+	#if defined __clang__
 		return __builtin_memcpy(destination, source, size);
 	#else
 		if (size == 0) {
