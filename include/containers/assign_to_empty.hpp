@@ -49,7 +49,7 @@ inline constexpr auto member_assign = []<typename Target, typename Source>(Targe
 };
 
 template<typename Target>
-constexpr auto get_source_size(auto const & source) {
+constexpr auto get_source_size(size_then_use_range auto const & source) {
 	auto const value = containers::linear_size(source);
 	if constexpr (bounded::bounded_integer<decltype(value)>) {
 		return value;
@@ -58,59 +58,44 @@ constexpr auto get_source_size(auto const & source) {
 	}
 };
 
-template<typename Target, typename Source>
-constexpr auto maybe_reserve(Target & target, Source const & source, auto reserve) {
-	if constexpr (forward_range<Source> and reservable<Target>) {
-		auto const source_size = ::containers::detail::get_source_size<Target>(source);
-		reserve(target, source_size);
-	}
-}
-
-template<typename Target, typename Source>
-constexpr auto assign_to_empty_or_append(Target & target, Source && source, auto reserve, auto get_target_position, auto fallback) {
-	if constexpr (can_set_size<Target> and reservable<Target> and size_then_use_range<Source>) {
-		auto const source_size = ::containers::detail::get_source_size<Target>(source);
-		reserve(target, source_size);
-		containers::uninitialized_copy_no_overlap(OPERATORS_FORWARD(source), get_target_position());
-		target.set_size(containers::size(target) + source_size);
-	} else if constexpr (can_set_size<Target> and !reservable<Target>) {
-		auto const target_position = get_target_position();
-		// TODO: Use an iterator that includes a count if we do not have a sized
-		// source range or a random-access iterator for the target
-		auto const new_end = containers::uninitialized_copy_no_overlap(OPERATORS_FORWARD(source), target_position);
-		auto const source_size = [&] {
-			if constexpr (sized_range<Source>) {
-				return containers::size(source);
-			} else {
-				return ::bounded::assume_in_range<range_size_t<Target>>(new_end - target_position);
-			}
-		}();
-		target.set_size(containers::size(target) + source_size);
-	} else if constexpr (lazy_push_backable<Target>) {
-		::containers::detail::maybe_reserve(target, source, reserve);
-		copy_or_relocate_from(OPERATORS_FORWARD(source), [&](auto make) {
-			::containers::lazy_push_back(target, make);
-		});
-	} else {
-		fallback(target, OPERATORS_FORWARD(source));
-	}
-}
-
 inline constexpr auto exact_reserve = []<typename Container>(Container & target, auto const requested_size) {
 	target.reserve(::bounded::assume_in_range<range_size_t<Container>>(requested_size));
 };
 
-template<typename Target>
-constexpr auto assign_to_empty_impl(Target & target, auto && source) -> void {
+template<typename Target, typename Source>
+constexpr auto assign_to_empty_impl(Target & target, Source && source) -> void {
 	BOUNDED_ASSERT(containers::is_empty(target));
 	if constexpr (resizable_container<Target>) {
-		::containers::detail::assign_to_empty_or_append(
-			target,
-			OPERATORS_FORWARD(source),
-			exact_reserve,
-			[&] { return containers::begin(target); },
-			member_assign
-		);
+		if constexpr (can_set_size<Target> and reservable<Target> and size_then_use_range<Source>) {
+			// This `if` is technically unnecessary, but the code generation is
+			// better with it here
+			if (containers::is_empty(source)) {
+				return;
+			}
+			auto const source_size = ::containers::detail::get_source_size<Target>(source);
+			exact_reserve(target, source_size);
+			containers::uninitialized_copy_no_overlap(OPERATORS_FORWARD(source), containers::begin(target));
+			target.set_size(source_size);
+		} else if constexpr (can_set_size<Target> and !reservable<Target>) {
+			// TODO: Use an iterator that includes a count if we do not have a
+			// sized source range or a random-access iterator for the target
+			auto const target_position = containers::begin(target);
+			auto const new_end = containers::uninitialized_copy_no_overlap(OPERATORS_FORWARD(source), target_position);
+			auto const source_size = [&] {
+				if constexpr (sized_range<Source>) {
+					return containers::size(source);
+				} else {
+					return ::bounded::assume_in_range<range_size_t<Target>>(new_end - target_position);
+				}
+			}();
+			target.set_size(source_size);
+		} else if constexpr (lazy_push_backable<Target>) {
+			copy_or_relocate_from(OPERATORS_FORWARD(source), [&](auto make) {
+				::containers::lazy_push_back(target, make);
+			});
+		} else {
+			member_assign(target, OPERATORS_FORWARD(source));
+		}
 	} else {
 		static_assert(supports_lazy_insert_after<Target>);
 		copy_or_relocate_from(OPERATORS_FORWARD(source), [&target, it = target.before_begin()](auto make) mutable {
