@@ -38,7 +38,7 @@ struct uninitialized_dynamic_array {
 	}
 	constexpr uninitialized_dynamic_array(uninitialized_dynamic_array && other) noexcept:
 		m_ptr(other.release()),
-		m_capacity(other.m_capacity)
+		m_capacity(std::exchange(other.m_capacity, {}))
 	{
 	}
 	constexpr uninitialized_dynamic_array & operator=(uninitialized_dynamic_array && other) & noexcept {

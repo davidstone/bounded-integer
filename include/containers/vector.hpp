@@ -82,10 +82,6 @@ struct vector : private lexicographical_comparison::base {
 		if (this == std::addressof(other)) {
 			return *this;
 		}
-		if (!m_storage.data()) {
-			BOUNDED_ASSERT(m_size == 0_bi);
-			m_storage = storage_type();
-		}
 		containers::assign(*this, other);
 		return *this;
 	}
