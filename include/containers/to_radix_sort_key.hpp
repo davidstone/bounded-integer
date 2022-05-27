@@ -88,7 +88,8 @@ auto to_radix_sort_key(auto * ptr) {
 	return reinterpret_cast<std::uintptr_t>(ptr);
 }
 
-constexpr auto to_radix_sort_key(std::vector<bool>::reference const value) {
+// libc++ doesn't have this constexpr yet
+inline auto to_radix_sort_key(std::vector<bool>::reference const value) {
 	return static_cast<bool>(value);
 }
 

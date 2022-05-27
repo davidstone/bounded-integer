@@ -186,16 +186,38 @@ constexpr auto test_three_keys_with_two_duplicates() -> void {
 template<typename Container>
 constexpr auto test_three_duplicate_keys() -> void {
 	using value_type = containers::range_value_t<Container>;
-	static_assert(map_contains_exactly(
-		Container(containers::to_array<value_type>({
-			{0, 4},
-			{0, 2},
-			{0, 5}
-		})),
-		containers::to_array<value_type>({
-			{0, 4}
-		})
-	));
+	static_assert(
+		map_contains_exactly(
+			Container(containers::to_array<value_type>({
+				{0, 4},
+				{0, 2},
+				{0, 5}
+			})),
+			containers::to_array<value_type>({
+				{0, 4}
+			})
+		) or
+		map_contains_exactly(
+			Container(containers::to_array<value_type>({
+				{0, 4},
+				{0, 2},
+				{0, 5}
+			})),
+			containers::to_array<value_type>({
+				{0, 2}
+			})
+		) or
+		map_contains_exactly(
+			Container(containers::to_array<value_type>({
+				{0, 4},
+				{0, 2},
+				{0, 5}
+			})),
+			containers::to_array<value_type>({
+				{0, 5}
+			})
+		)
+	);
 }
 
 template<typename Container>
