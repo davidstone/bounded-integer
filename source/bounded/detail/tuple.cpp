@@ -215,7 +215,7 @@ constexpr auto d = bounded::tuple(0, empty{}, 4);
 static_assert(a != d);
 static_assert(a > d);
 
-constexpr struct {
+struct {
 	constexpr auto operator()(float const x) const {
 		return static_cast<int>(x + 1);
 	}
@@ -228,7 +228,7 @@ constexpr struct {
 	constexpr auto operator()(int const x, int const y) const {
 		return static_cast<float>(x + y);
 	}
-} increment_and_swap_types{};
+} constexpr increment_and_swap_types{};
 
 constexpr auto input_tuple = bounded::make_tuple(0, 1.0F, 2, 3.0F, 4);
 constexpr auto type_swapped = bounded::transform(increment_and_swap_types, input_tuple);

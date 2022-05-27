@@ -509,7 +509,7 @@ struct ska_sort_t {
 	}
 } inline constexpr ska_sort;
 
-constexpr inline struct unique_ska_sort_t {
+struct unique_ska_sort_t {
 	constexpr void operator()(range auto & to_sort, auto const & extract_key) const {
 		ska_sort(to_sort, extract_key);
 		auto const equal = [&](auto const & lhs, auto const & rhs) {
@@ -523,6 +523,6 @@ constexpr inline struct unique_ska_sort_t {
 	constexpr void operator()(range auto & to_sort) const {
 		operator()(to_sort, to_radix_sort_key);
 	}
-} unique_ska_sort;
+} constexpr inline unique_ska_sort;
 
 } // namespace containers

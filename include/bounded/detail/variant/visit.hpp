@@ -202,7 +202,7 @@ inline constexpr auto visit_interface = [](auto transform) {
 
 } // namespace detail
 
-inline constexpr struct visit_with_index_t {
+struct visit_with_index_t {
 private:
 	static inline constexpr auto identity = [](auto && function) -> decltype(auto) {
 		return OPERATORS_FORWARD(function);
@@ -213,11 +213,11 @@ public:
 	constexpr decltype(auto) operator()(Args && ... args) const {
 		return detail::reorder_transform(detail::visit_interface(identity), OPERATORS_FORWARD(args)...);
 	}
-} visit_with_index;
+} constexpr inline visit_with_index;
 
 // Accepts any number of variants (including 0) followed by one function with
 // arity equal to the number of variants
-inline constexpr struct visit_t {
+struct visit_t {
 private:
 	// Does not use a lambda because of
 	// https://github.com/llvm/llvm-project/issues/42094
@@ -237,6 +237,6 @@ public:
 	constexpr decltype(auto) operator()(Args && ... args) const {
 		return detail::reorder_transform(detail::visit_interface(get_value_only), OPERATORS_FORWARD(args)...);
 	}
-} visit;
+} constexpr inline visit;
 
 }	// namespace bounded

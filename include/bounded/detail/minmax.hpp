@@ -78,7 +78,7 @@ struct extreme_value<Compare, LHS, RHS> {
 // Because the variadic pack must be at the end of the parameter list, `extreme`
 // accepts the comparison function as the first argument
 
-constexpr inline struct extreme_function {
+struct extreme_function {
 	constexpr decltype(auto) operator()(auto /* compare */, auto && t) const {
 		return OPERATORS_FORWARD(t);
 	}
@@ -100,7 +100,7 @@ constexpr inline struct extreme_function {
 		);
 	}
 
-} extreme;
+} constexpr inline extreme;
 
 
 inline constexpr auto min = [](auto && ... ts) -> decltype(auto) {

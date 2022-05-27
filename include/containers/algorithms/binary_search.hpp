@@ -16,26 +16,26 @@
 
 namespace containers {
 
-constexpr inline struct lower_bound_t {
+struct lower_bound_t {
 	constexpr auto operator()(range auto && sorted, auto const & value, auto cmp) const {
 		return partition_point(OPERATORS_FORWARD(sorted), [&](auto const & element) { return cmp(element, value); });
 	}
 	constexpr auto operator()(range auto && sorted, auto const & value) const {
 		return operator()(OPERATORS_FORWARD(sorted), value, std::less());
 	}
-} lower_bound;
+} constexpr inline lower_bound;
 
-constexpr inline struct upper_bound_t {
+struct upper_bound_t {
 	constexpr auto operator()(range auto && sorted, auto const & value, auto cmp) const {
 		return partition_point(OPERATORS_FORWARD(sorted), [&](auto const & element) { return !cmp(value, element); });
 	}
 	constexpr auto operator()(range auto && sorted, auto const & value) const {
 		return operator()(OPERATORS_FORWARD(sorted), value, std::less());
 	}
-} upper_bound;
+} constexpr inline upper_bound;
 
 // TODO: This can be implemented more efficiently
-constexpr inline struct equal_range_t {
+struct equal_range_t {
 	constexpr auto operator()(range auto && sorted, auto const & value, auto cmp) const {
 		auto it = lower_bound(OPERATORS_FORWARD(sorted), value, cmp);
 		return range_view(
@@ -46,11 +46,11 @@ constexpr inline struct equal_range_t {
 	constexpr auto operator()(range auto && sorted, auto const & value) const {
 		return operator()(OPERATORS_FORWARD(sorted), value, std::less());
 	}
-} equal_range;
+} constexpr inline equal_range;
 
 
 // TODO: This is sub-optimal. Unsure how to make it optimal without copy + paste
-constexpr inline struct binary_search_t {
+struct binary_search_t {
 	constexpr bool operator()(range auto && sorted, auto const & value, auto cmp) const {
 		auto const it = lower_bound(OPERATORS_FORWARD(sorted), value, cmp);
 		return it != containers::end(sorted) and !cmp(value, *it);
@@ -58,6 +58,6 @@ constexpr inline struct binary_search_t {
 	constexpr bool operator()(range auto && sorted, auto const & value) const {
 		return operator()(sorted, value, std::less());
 	}
-} binary_search;
+} constexpr inline binary_search;
 
 }	// namespace containers

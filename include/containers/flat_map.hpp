@@ -40,8 +40,8 @@
 
 namespace containers {
 
-constexpr inline struct assume_sorted_unique_t {} assume_sorted_unique;
-constexpr inline struct assume_unique_t {} assume_unique;
+struct assume_sorted_unique_t {} constexpr inline assume_sorted_unique;
+struct assume_unique_t {} constexpr inline assume_unique;
 
 namespace detail {
 

@@ -216,7 +216,7 @@ struct indexed_tuple<std::index_sequence<indexes...>, Tuple> {
 template<typename Tuple>
 indexed_tuple(Tuple &&) -> indexed_tuple<std::make_index_sequence<tuple_size<Tuple>.value()>, Tuple>;
 
-inline constexpr struct tuple_cat_t {
+struct tuple_cat_t {
 private:
 	template<std::size_t... first_indexes, typename First, std::size_t... second_indexes, typename Second>
 	constexpr auto cat_impl(
@@ -247,10 +247,10 @@ public:
 			return cat_impl(indexed_tuple{OPERATORS_FORWARD(tuples)}...);
 		}
 	}
-} tuple_cat;
+} constexpr inline tuple_cat;
 
 
-inline constexpr struct apply_t {
+struct apply_t {
 private:
 	template<std::size_t... indexes>
 	static constexpr decltype(auto) implementation(auto && tuple_args, std::index_sequence<indexes...>, auto && function) {
@@ -264,7 +264,7 @@ public:
 			OPERATORS_FORWARD(function)
 		);
 	}
-} apply;
+} constexpr inline apply;
 
 
 namespace detail {

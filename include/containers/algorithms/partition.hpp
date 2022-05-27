@@ -20,16 +20,16 @@
 
 namespace containers {
 
-constexpr inline struct is_partitioned_t {
+struct is_partitioned_t {
 	constexpr auto operator()(range auto && input, auto predicate) const -> bool {
 		auto first = containers::begin(input);
 		auto last = containers::end(input);
 		auto it = containers::find_if_not(first, last, predicate);
 		return containers::find_if(it, last, predicate) == last;
 	}
-} is_partitioned;
+} constexpr inline is_partitioned;
 
-constexpr inline struct partition_point_t {
+struct partition_point_t {
 	template<range Input>
 	constexpr auto operator()(Input && input, auto predicate) const {
 		auto count = bounded::integer<0, bounded::builtin_max_value<range_size_t<Input>>>(containers::size(input));
@@ -51,7 +51,7 @@ constexpr inline struct partition_point_t {
 			return first;
 		}
 	}
-} partition_point;
+} constexpr inline partition_point;
 
 namespace detail {
 
@@ -60,7 +60,7 @@ concept decrementable = requires(T value) { --value; };
 
 } // namespace detail
 
-constexpr inline struct partition_t {
+struct partition_t {
 	template<iterator ForwardIterator>
 	constexpr auto operator()(ForwardIterator first, sentinel_for<ForwardIterator> auto last, auto predicate) const {
 		auto advance_first = [&]{
@@ -105,6 +105,6 @@ constexpr inline struct partition_t {
 	constexpr auto operator()(range auto && input, auto predicate) const {
 		return operator()(containers::begin(input), containers::end(input), predicate);
 	}
-} partition;
+} constexpr inline partition;
 
-}	// namespace containers
+} // namespace containers
