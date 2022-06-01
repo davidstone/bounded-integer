@@ -20,14 +20,11 @@ using std::to_string;
 
 // TODO: Make this more efficient
 inline auto to_string(detail::uint128_t x) {
-	if (x == 0) {
-		return std::string({'0'});
-	}
 	auto result = std::string();
-	while (x > 0) {
+	do {
 		result.push_back(static_cast<char>(x % 10 + '0'));
 		x /= 10;
-	}
+	} while (x > 0);
 	std::reverse(result.begin(), result.end());
 	return result;
 }
