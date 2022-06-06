@@ -75,7 +75,13 @@ struct legacy_iterator {
 	friend auto operator<=>(legacy_iterator, legacy_iterator) = default;
 
 	friend constexpr auto operator+(legacy_iterator const lhs, bounded::integral auto const rhs) requires detail::addable<Iterator, iter_difference_t<Iterator>> {
-		return legacy_iterator<Iterator>(lhs.base() + ::bounded::assume_in_range<iter_difference_t<Iterator>>(rhs));
+		if constexpr (std::same_as<iter_difference_t<Iterator>, bounded::constant_t<0>>) {
+			std::unreachable();
+			return lhs;
+		} else {
+			return legacy_iterator<Iterator>(lhs.base() + ::bounded::assume_in_range<iter_difference_t<Iterator>>
+			(rhs));
+		}
 	}
 	friend constexpr auto operator++(legacy_iterator & it) -> legacy_iterator & {
 		++it.m_it;
