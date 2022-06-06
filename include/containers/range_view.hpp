@@ -48,7 +48,7 @@ concept range_view_size = bounded::integral<T> or std::is_same_v<T, no_explicit_
 
 } // namespace detail
 
-template<typename Iterator, detail::range_view_sentinel<Iterator> Sentinel = Iterator, detail::range_view_size Size = detail::no_explicit_size>
+template<iterator Iterator, detail::range_view_sentinel<Iterator> Sentinel = Iterator, detail::range_view_size Size = detail::no_explicit_size>
 struct range_view {
 	static_assert(detail::explicit_sentinel<Sentinel> or detail::explicit_size<Size>);
 
@@ -134,6 +134,19 @@ range_view(Range &&) -> range_view<
 	decltype(containers::begin(std::declval<Range &&>())),
 	detail::compute_end_from_size,
 	decltype(std::declval<Range &&>().size())
+>;
+
+template<iterator Iterator, sentinel_for<Iterator> Sentinel>
+range_view(Iterator, Sentinel) -> range_view<
+	Iterator,
+	Sentinel
+>;
+
+template<iterator Iterator, bounded::integral Size>
+range_view(Iterator, Size) -> range_view<
+	Iterator,
+	detail::compute_end_from_size,
+	Size
 >;
 
 template<typename>
