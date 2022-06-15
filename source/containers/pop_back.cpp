@@ -15,20 +15,20 @@
 namespace {
 
 constexpr bool test_pop_back(containers::vector<bounded_test::integer> const & original) {
-    auto copy = original;
-    containers::pop_back(copy);
-    BOUNDED_TEST(containers::equal(
-        copy,
-        containers::range_view(begin(original), containers::prev(end(original)))
-    ));
-    return true;
+	auto copy = original;
+	containers::pop_back(copy);
+	BOUNDED_TEST(containers::equal(
+		copy,
+		containers::range_view(begin(original), containers::prev(end(original)))
+	));
+	return true;
 }
 
 // Work around https://gcc.gnu.org/bugzilla/show_bug.cgi?id=99018
 static_assert([] {
-    static_assert(test_pop_back({{1}}));
-    static_assert(test_pop_back({{1, 2}}));
-    return true;
+	static_assert(test_pop_back({{1}}));
+	static_assert(test_pop_back({{1, 2}}));
+	return true;
 }());
 
 } // namespace

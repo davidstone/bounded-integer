@@ -19,21 +19,21 @@ using namespace bounded::literal;
 
 template<typename Container>
 constexpr auto test_lazy_push_front() -> bool {
-    auto c = Container();
+	auto c = Container();
 
-    containers::lazy_push_front(c, bounded::value_to_function(3));
-    BOUNDED_TEST(c == Container({3}));
+	containers::lazy_push_front(c, bounded::value_to_function(3));
+	BOUNDED_TEST(c == Container({3}));
 
-    containers::lazy_push_front(c, bounded::value_to_function(4));
-    BOUNDED_TEST(c == Container({4, 3}));
+	containers::lazy_push_front(c, bounded::value_to_function(4));
+	BOUNDED_TEST(c == Container({4, 3}));
 
-    containers::lazy_push_front(c, bounded::value_to_function(5));
-    BOUNDED_TEST(c == Container({5, 4, 3}));
+	containers::lazy_push_front(c, bounded::value_to_function(5));
+	BOUNDED_TEST(c == Container({5, 4, 3}));
 
-    containers::lazy_push_front(c, bounded::value_to_function(12));
-    BOUNDED_TEST(c == Container({12, 5, 4, 3}));
+	containers::lazy_push_front(c, bounded::value_to_function(12));
+	BOUNDED_TEST(c == Container({12, 5, 4, 3}));
 
-    return true;
+	return true;
 }
 
 static_assert(test_lazy_push_front<containers::bidirectional_linked_list<bounded_test::non_copyable_integer>>());

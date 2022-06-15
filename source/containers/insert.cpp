@@ -23,7 +23,7 @@ constexpr bool test_range_insert() {
 	containers::insert(container, begin(container) + 1_bi, containers::repeat_n(3_bi, bounded_test::integer(12)));
 	auto const expected = { 1, 12, 12, 12, 2, 3 };
 	BOUNDED_TEST(containers::equal(container, expected));
-    return true;
+	return true;
 }
 
 static_assert(test_range_insert<containers::stable_vector<bounded_test::integer, 10>>());
@@ -35,7 +35,7 @@ constexpr bool test_value_insert() {
 	containers::insert(container, begin(container) + 1_bi, 7);
 	auto const expected = {1, 7, 2, 3, 4, 5, 6};
 	BOUNDED_TEST(containers::equal(container, expected));
-    return true;
+	return true;
 }
 
 static_assert(test_value_insert<containers::stable_vector<bounded_test::integer, 10>>());
