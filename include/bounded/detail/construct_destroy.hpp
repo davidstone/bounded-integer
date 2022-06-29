@@ -45,7 +45,7 @@ concept non_const = !std::is_const_v<T>;
 } // namespace detail
 
 template<typename T>
-inline constexpr auto construct_return = [](auto && ... args) -> T requires constructible_from<T, decltype(args)...> or detail::brace_constructible<T, decltype(args)...> {
+inline constexpr auto construct = [](auto && ... args) -> T requires constructible_from<T, decltype(args)...> or detail::brace_constructible<T, decltype(args)...> {
 	if constexpr (constructible_from<T, decltype(args)...>) {
 		return T(OPERATORS_FORWARD(args)...);
 	} else {
@@ -54,7 +54,7 @@ inline constexpr auto construct_return = [](auto && ... args) -> T requires cons
 };
 
 
-inline constexpr auto construct = []<detail::non_const T, construct_function_for<T> Function>(T & ref, Function && function) -> T & {
+inline constexpr auto construct_at = []<detail::non_const T, construct_function_for<T> Function>(T & ref, Function && function) -> T & {
 	return *std::construct_at(
 		std::addressof(ref),
 		detail::superconstructing_super_elider<T, Function>(OPERATORS_FORWARD(function))

@@ -29,7 +29,7 @@ constexpr auto & emplace_back(Container & container, Args && ... args) {
 		return container.emplace_back(OPERATORS_FORWARD(args)...);
 	} else {
 		return ::containers::lazy_push_back(container, [&]{
-			return bounded::construct_return<range_value_t<Container>>(OPERATORS_FORWARD(args)...);
+			return bounded::construct<range_value_t<Container>>(OPERATORS_FORWARD(args)...);
 		});
 	}
 }

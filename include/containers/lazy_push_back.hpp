@@ -42,7 +42,7 @@ constexpr auto & lazy_push_back(
 	} else {
 		auto const initial_size = containers::size(container);
 		auto construct = [&](Container & target) {
-			bounded::construct(*(containers::data(target) + initial_size), OPERATORS_FORWARD(constructor));
+			bounded::construct_at(*(containers::data(target) + initial_size), OPERATORS_FORWARD(constructor));
 		};
 		if (initial_size < container.capacity()) {
 			construct(container);

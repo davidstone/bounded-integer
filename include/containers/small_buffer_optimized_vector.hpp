@@ -249,7 +249,7 @@ private:
 		});
 		// It is safe to skip the destructor call of m_large
 		// because we do not rely on its side-effects
-		::bounded::construct(m_small, []{ return small_t(); });
+		::bounded::construct_at(m_small, []{ return small_t(); });
 		containers::uninitialized_relocate_no_overlap(temp, containers::begin(m_small));
 		BOUNDED_ASSERT(is_small());
 	}
@@ -279,7 +279,7 @@ private:
 	
 	constexpr auto move_assign_to_empty(small_buffer_optimized_vector && other) & {
 		auto make_small = [](small_t & small) {
-			::bounded::construct(small, bounded::construct_return<small_t>);
+			::bounded::construct_at(small, bounded::construct<small_t>);
 		};
 		if (other.is_small()) {
 			make_small(m_small);
@@ -287,7 +287,7 @@ private:
 			m_small.set_size(other.m_small.size());
 			other.m_small.set_size(0_bi);
 		} else {
-			::bounded::construct(m_large, bounded::value_to_function(other.m_large));
+			::bounded::construct_at(m_large, bounded::value_to_function(other.m_large));
 			// It is safe to skip the destructor call of other.m_large because
 			// we do not rely on its side-effects
 			make_small(other.m_small);
@@ -298,7 +298,7 @@ private:
 		auto temp = detail::allocate_storage<T, size_type>(requested_capacity);
 		containers::uninitialized_relocate_no_overlap(*this, temp.pointer);
 		deallocate_large();
-		::bounded::construct(
+		::bounded::construct_at(
 			m_large,
 			[&] {
 				return large_t(

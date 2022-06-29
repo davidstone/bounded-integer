@@ -39,7 +39,7 @@ constexpr auto resize_impl(Container & container_to_resize, auto const new_size,
 
 template<resizable_container Container>
 constexpr auto resize(Container & container_to_resize, auto const new_size) {
-	::containers::detail::resize_impl(container_to_resize, bounded::integer(new_size), bounded::construct_return<range_value_t<Container>>);
+	::containers::detail::resize_impl(container_to_resize, bounded::integer(new_size), bounded::construct<range_value_t<Container>>);
 }
 template<resizable_container Container>
 constexpr auto resize(Container & container_to_resize, auto const new_size, range_value_t<Container> const & value) {

@@ -56,9 +56,7 @@ constexpr auto make_node(bounded::explicitly_convertible_to<Node> auto && arg) -
 	auto allocator = std::allocator<Node>();
 	auto node = allocator.allocate(1);
 	try {
-		bounded::construct(*node, [&] {
-			return Node(OPERATORS_FORWARD(arg));
-		});
+		bounded::construct_at(*node, [&] { return Node(OPERATORS_FORWARD(arg)); });
 	} catch (...) {
 		allocator.deallocate(node, 1);
 		throw;

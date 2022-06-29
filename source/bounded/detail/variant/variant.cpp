@@ -134,7 +134,7 @@ static_assert(not std::is_copy_constructible_v<non_copyable_variant_t>);
 static_assert(not std::is_copy_assignable_v<non_copyable_variant_t>);
 static_assert(std::is_move_constructible_v<non_copyable_variant_t>);
 static_assert(std::is_move_assignable_v<non_copyable_variant_t>);
-static_assert(std::is_same_v<decltype(non_copyable_variant_t(bounded::lazy_init, 0_bi, bounded::construct_return<non_copyable>)[0_bi]), non_copyable &&>);
+static_assert(std::is_same_v<decltype(non_copyable_variant_t(bounded::lazy_init, 0_bi, bounded::construct<non_copyable>)[0_bi]), non_copyable &&>);
 
 struct non_comparable {
 };

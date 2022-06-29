@@ -45,7 +45,7 @@ static_assert(!std::is_trivially_copyable_v<bounded_test::non_copyable_integer>)
 
 constexpr bool test_no_copies() {
 	auto container = containers::vector<bounded_test::non_copyable_integer>();
-	containers::lazy_push_back(container, bounded::construct_return<bounded_test::non_copyable_integer>);
+	containers::lazy_push_back(container, bounded::construct<bounded_test::non_copyable_integer>);
 	insert(container, begin(container), bounded_test::non_copyable_integer(1));
 	return true;
 }

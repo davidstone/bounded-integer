@@ -195,7 +195,7 @@ public:
 	constexpr auto & replace_active_member(auto const index, auto && construct_) {
 		constexpr auto index_value = detail::get_index(index, detail::types<Ts>()...);
 		m_index = index_value;
-		return construct(m_data, [&] { return detail::variadic_union<Ts...>(index_value, OPERATORS_FORWARD(construct_)); });
+		return construct_at(m_data, [&] { return detail::variadic_union<Ts...>(index_value, OPERATORS_FORWARD(construct_)); });
 	}
 
 private:

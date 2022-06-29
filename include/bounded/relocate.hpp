@@ -32,7 +32,7 @@ inline constexpr auto relocate = [](detail::non_const auto & ref) noexcept {
 };
 
 inline constexpr auto relocate_at = [](detail::non_const auto & destination, detail::non_const auto & source) noexcept -> auto & {
-	return bounded::construct(destination, [&] { return bounded::relocate(source); });
+	return bounded::construct_at(destination, [&] { return bounded::relocate(source); });
 };
 
 } // namespace bounded

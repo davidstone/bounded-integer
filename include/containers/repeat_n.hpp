@@ -19,7 +19,7 @@ constexpr auto repeat_n(Size const size, T && value) {
 
 template<typename T, typename Size>
 constexpr auto repeat_default_n(Size const size) {
-	return generate_n(size, bounded::construct_return<T>);
+	return generate_n(size, bounded::construct<T>);
 }
 
 } // namespace containers

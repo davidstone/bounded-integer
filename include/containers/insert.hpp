@@ -122,7 +122,7 @@ constexpr auto lazy_insert(
 template<resizable_container Container>
 constexpr auto emplace(Container & container, iterator_t<Container const &> const position, auto && ... args) {
 	return ::containers::lazy_insert(container, position, [&] {
-		return bounded::construct_return<range_value_t<Container>>(OPERATORS_FORWARD(args)...);
+		return bounded::construct<range_value_t<Container>>(OPERATORS_FORWARD(args)...);
 	});
 }
 

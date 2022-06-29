@@ -41,7 +41,7 @@ inline constexpr auto uninitialized_copy = [](range auto && input, iterator auto
 	auto out_first = output;
 	try {
 		copy_or_relocate_from(OPERATORS_FORWARD(input), [&](auto make) {
-			bounded::construct(*output, make);
+			bounded::construct_at(*output, make);
 			++output;
 		});
 	} catch (...) {
@@ -90,7 +90,7 @@ inline constexpr auto uninitialized_copy_no_overlap = []<range InputRange, itera
 inline constexpr auto uninitialized_relocate = [](range auto && input, iterator auto output) {
 	auto const last = containers::end(OPERATORS_FORWARD(input));
 	for (auto it = containers::begin(OPERATORS_FORWARD(input)); it != last; ++it) {
-		bounded::construct(*output, [&] {
+		bounded::construct_at(*output, [&] {
 			if constexpr (std::is_reference_v<decltype(*it)>) {
 				return bounded::relocate(*it);
 			} else {

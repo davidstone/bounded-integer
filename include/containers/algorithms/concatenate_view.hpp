@@ -133,7 +133,7 @@ struct concatenate_view_iterator {
 			// Use {} to enforce initialization order
 			return bounded::apply(
 				bounded::tuple{specific_range(bounded::constant<indexes>)...},
-				bounded::construct_return<concatenate_view_iterator>
+				bounded::construct<concatenate_view_iterator>
 			);
 		}(std::make_index_sequence<sizeof...(RangeViews)>());
 	}

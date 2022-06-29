@@ -45,7 +45,7 @@ constexpr auto erase(Container & container, iterator_t<Container const &> const 
 		// TODO: Write a `relocate` algorithm for this loop?
 		while (target != middle and source != last) {
 			bounded::destroy(*target);
-			bounded::construct(*target, [&]{ return bounded::relocate(*source); });
+			bounded::construct_at(*target, [&]{ return bounded::relocate(*source); });
 			++target;
 			++source;
 		}

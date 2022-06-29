@@ -45,7 +45,7 @@ constexpr auto test_add_one() -> void {
 	auto v = Container({1});
 	bounded::destroy(*containers::begin(v));
 	v.set_size(0_bi);
-	bounded::construct(*containers::data(v), [] { return 5; });
+	bounded::construct_at(*containers::data(v), [] { return 5; });
 	v.set_size(1_bi);
 	BOUNDED_TEST(v == Container({5}));
 }
