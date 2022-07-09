@@ -11,6 +11,7 @@
 
 #include <numeric_traits/min_max_value.hpp>
 
+#include <concepts>
 #include <type_traits>
 #include <utility>
 
@@ -22,29 +23,49 @@ concept any_with_value = true;
 
 // Often, we want to write a function that accepts a variadic number of
 // arguments and a function. We would like to accept the function parameter
-// last, since that gives the best syntax when passing a lamba. However, you
+// last, since that gives the best syntax when passing a lambda. However, you
 // cannot put something after a variadic pack, therefore the function is part of
-// the pack. reorder_transform accepts a parameter pack, followed by a function,
-// followed by another function. The final function is called with the penultimate
-// function as the first parameter, then all remaining arguments in their
-// original order after that. This allows us to write an interface that accepts
-// stuff and a function to operate on the stuff, but allows us to transform the
-// arguments in some way before calling the user function.
-constexpr decltype(auto) reorder_transform(auto transform, auto && ... args) {
-	return [&]<std::size_t... indexes>(std::index_sequence<indexes...>) {
-		return [&](any_with_value<indexes> auto && ... non_function_args, auto && function) {
-			return transform(OPERATORS_FORWARD(function), OPERATORS_FORWARD(non_function_args)...);
-		}(OPERATORS_FORWARD(args)...);
-	}(std::make_index_sequence<sizeof...(args) - 1>());
-};
+// the pack. rotate_transform accepts a function, followed by a parameter pack,
+// followed by a function. The first function is called with the final function
+// as the first parameter, then all remaining arguments in their original order
+// after that. This allows us to write an interface that accepts stuff and a
+// function to operate on the stuff, but allows us to transform the arguments in
+// some way before calling the user function.
+template<std::size_t... indexes>
+constexpr auto rotate_transform_impl(std::index_sequence<indexes...>) {
+	return [](
+		auto transform,
+		any_with_value<indexes> auto && ... non_function_args,
+		auto && function
+	) {
+		return transform(OPERATORS_FORWARD(function), OPERATORS_FORWARD(non_function_args)...);
+	};
+}
 
-}	// namespace detail
+constexpr auto rotate_transform(auto transform, auto && ... args) -> decltype(auto) {
+	auto impl = ::bounded::detail::rotate_transform_impl(std::make_index_sequence<sizeof...(args) - 1>());
+	return impl(transform, OPERATORS_FORWARD(args)...);
+}
+
+} // namespace detail
 
 template<typename T, std::size_t n>
 struct visitor_parameter {
 	static_assert(std::is_reference_v<T>);
-	T value;
+	constexpr explicit visitor_parameter(T value_):
+		m_value(OPERATORS_FORWARD(value_))
+	{
+	}
+	constexpr auto value() const & -> auto & {
+		return m_value;
+	}
+	constexpr auto value() && -> auto && {
+		return OPERATORS_FORWARD(m_value);
+	}
 	static constexpr auto index = constant<n>;
+
+private:
+	T m_value;
 };
 
 namespace detail {
@@ -120,7 +141,7 @@ constexpr decltype(auto) visit_implementation(
 		visitor_parameter<
 			decltype(OPERATORS_FORWARD(variants)[bounded::constant<indexes>]),
 			indexes
-		>{OPERATORS_FORWARD(variants)[bounded::constant<indexes>]}...
+		>(OPERATORS_FORWARD(variants)[bounded::constant<indexes>])...
 	);
 }
 
@@ -211,7 +232,7 @@ public:
 	// Any number of variants (including 0) followed by one function
 	template<typename... Args> requires detail::is_variants_then_visit_function<sizeof...(Args) - 1U, decltype(identity), Args...>
 	constexpr decltype(auto) operator()(Args && ... args) const {
-		return detail::reorder_transform(detail::visit_interface(identity), OPERATORS_FORWARD(args)...);
+		return ::bounded::detail::rotate_transform(detail::visit_interface(identity), OPERATORS_FORWARD(args)...);
 	}
 } constexpr inline visit_with_index;
 
@@ -224,8 +245,8 @@ private:
 	template<typename Function>
 	struct unwrap_visitor_parameter {
 		Function && function;
-		constexpr auto operator()(auto && ... args) && OPERATORS_RETURNS(
-			OPERATORS_FORWARD(function)(OPERATORS_FORWARD(args).value...)
+		constexpr auto operator()(auto... args) && OPERATORS_RETURNS(
+			OPERATORS_FORWARD(function)(std::move(args).value()...)
 		)
 	};
 
@@ -235,7 +256,7 @@ private:
 public:
 	template<typename... Args> requires detail::is_variants_then_visit_function<sizeof...(Args) - 1U, decltype(get_value_only), Args...>
 	constexpr decltype(auto) operator()(Args && ... args) const {
-		return detail::reorder_transform(detail::visit_interface(get_value_only), OPERATORS_FORWARD(args)...);
+		return ::bounded::detail::rotate_transform(detail::visit_interface(get_value_only), OPERATORS_FORWARD(args)...);
 	}
 } constexpr inline visit;
 

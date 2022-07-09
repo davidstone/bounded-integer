@@ -207,7 +207,7 @@ private:
 		visit_with_index(
 			OPERATORS_FORWARD(other),
 			[&](auto parameter) {
-				replace_active_member(parameter.index, [&] { return std::move(parameter).value; });
+				replace_active_member(parameter.index, [&] { return std::move(parameter).value(); });
 			}
 		);
 	}
@@ -218,9 +218,9 @@ private:
 			OPERATORS_FORWARD(other),
 			[&](auto lhs, auto rhs) {
 				if constexpr (lhs.index == rhs.index) {
-					lhs.value = OPERATORS_FORWARD(rhs.value);
+					lhs.value() = OPERATORS_FORWARD(rhs.value());
 				} else {
-					::bounded::insert(*this, rhs.index, OPERATORS_FORWARD(rhs.value));
+					::bounded::insert(*this, rhs.index, OPERATORS_FORWARD(rhs.value()));
 					m_index = rhs.index;
 				}
 			}
@@ -315,7 +315,7 @@ namespace detail {
 struct equality_visitor {
 	template<typename T, auto n>
 	constexpr auto operator()(visitor_parameter<T, n> const lhs, visitor_parameter<T, n> const rhs) const {
-		return lhs.value == rhs.value;
+		return lhs.value() == rhs.value();
 	}
 	template<typename LHS, auto lhs_n, typename RHS, auto rhs_n> requires(lhs_n != rhs_n)
 	constexpr auto operator()(visitor_parameter<LHS, lhs_n>, visitor_parameter<RHS, rhs_n>) const {
