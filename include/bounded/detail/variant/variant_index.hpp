@@ -6,7 +6,7 @@
 #pragma once
 
 #include <bounded/detail/class.hpp>
-#include <bounded/detail/type.hpp>
+#include <bounded/type.hpp>
 #include <bounded/detail/variant/get_index.hpp>
 
 #include <cstddef>
@@ -50,11 +50,11 @@ struct variant_index {
 		return lhs.integer() == rhs;
 	}
 	template<typename T> requires (... or std::same_as<T, Ts>)
-	friend constexpr auto operator==(variant_index const lhs, detail::types<T> const rhs) -> bool {
+	friend constexpr auto operator==(variant_index const lhs, types<T> const rhs) -> bool {
 		return [=]<std::size_t... indexes>(std::index_sequence<indexes...>) {
 			bool matched = false;
 			(..., (bounded::constant<indexes> == lhs.integer() ?
-				void(matched = (detail::get_type(bounded::constant<indexes>, detail::types<Ts>()...) == rhs)) :
+				void(matched = (detail::get_type(bounded::constant<indexes>, types<Ts>()...) == rhs)) :
 				void()
 			));
 			return matched;

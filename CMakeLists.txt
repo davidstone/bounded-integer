@@ -103,7 +103,6 @@ add_executable(bounded_test
 	source/bounded/detail/size_of.cpp
 	source/bounded/detail/stream.cpp
 	source/bounded/detail/tuple.cpp
-	source/bounded/detail/type.cpp
 	source/bounded/detail/underlying_type.cpp
 	source/bounded/assert.cpp
 	source/bounded/assert-NDEBUG.cpp
@@ -132,6 +131,7 @@ add_executable(bounded_test
 	source/bounded/string.cpp
 	source/bounded/to_integer.cpp
 	source/bounded/tombstone_traits.cpp
+	source/bounded/type.cpp
 	source/bounded/value_to_function.cpp
 )
 

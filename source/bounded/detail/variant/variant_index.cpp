@@ -35,24 +35,24 @@ static_assert(bounded::variant_index<int, int>(1_bi).integer() == 1_bi);
 
 static_assert(bounded::variant_index<int>(0_bi) == bounded::variant_index<int>(0_bi));
 static_assert(bounded::variant_index<int>(0_bi) == 0_bi);
-static_assert(bounded::variant_index<int>(0_bi) == bounded::detail::types<int>());
+static_assert(bounded::variant_index<int>(0_bi) == bounded::types<int>());
 
 static_assert(bounded::variant_index<int, long>(0_bi) == bounded::variant_index<int, long>(0_bi));
 static_assert(bounded::variant_index<int, long>(0_bi) != bounded::variant_index<int, long>(1_bi));
 static_assert(bounded::variant_index<int, long>(1_bi) == bounded::variant_index<int, long>(1_bi));
 static_assert(bounded::variant_index<int, long>(0_bi) == 0_bi);
 static_assert(bounded::variant_index<int, long>(1_bi) == 1_bi);
-static_assert(bounded::variant_index<int, long>(0_bi) == bounded::detail::types<int>());
-static_assert(bounded::variant_index<int, long>(0_bi) != bounded::detail::types<long>());
-static_assert(bounded::variant_index<int, long>(1_bi) == bounded::detail::types<long>());
-static_assert(bounded::variant_index<int, long>(1_bi) != bounded::detail::types<int>());
+static_assert(bounded::variant_index<int, long>(0_bi) == bounded::types<int>());
+static_assert(bounded::variant_index<int, long>(0_bi) != bounded::types<long>());
+static_assert(bounded::variant_index<int, long>(1_bi) == bounded::types<long>());
+static_assert(bounded::variant_index<int, long>(1_bi) != bounded::types<int>());
 
 static_assert(bounded::variant_index<int, int>(0_bi) == bounded::variant_index<int, int>(0_bi));
 static_assert(bounded::variant_index<int, int>(0_bi) != bounded::variant_index<int, int>(1_bi));
 static_assert(bounded::variant_index<int, int>(1_bi) == bounded::variant_index<int, int>(1_bi));
 static_assert(bounded::variant_index<int, int>(0_bi) == 0_bi);
 static_assert(bounded::variant_index<int, int>(1_bi) == 1_bi);
-static_assert(bounded::variant_index<int, int>(0_bi) == bounded::detail::types<int>());
-static_assert(bounded::variant_index<int, int>(1_bi) == bounded::detail::types<int>());
+static_assert(bounded::variant_index<int, int>(0_bi) == bounded::types<int>());
+static_assert(bounded::variant_index<int, int>(1_bi) == bounded::types<int>());
 
 } // namespace

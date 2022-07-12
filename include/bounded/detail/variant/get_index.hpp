@@ -9,7 +9,7 @@
 #include <bounded/detail/arithmetic/operators.hpp>
 #include <bounded/detail/class.hpp>
 #include <bounded/detail/comparison.hpp>
-#include <bounded/detail/type.hpp>
+#include <bounded/type.hpp>
 
 #include <bounded/nth_type.hpp>
 

@@ -6,10 +6,10 @@
 #pragma once
 
 namespace bounded {
-namespace detail {
 
 template<typename...>
-struct types{};
+struct types {
+};
 
 template<typename T>
 struct types<T> {
@@ -26,5 +26,4 @@ constexpr auto operator==(types<Ts...>, types<Ts...>) -> bool {
 	return true;
 }
 
-}	// namespace detail
-}	// namespace bounded
+} // namespace bounded

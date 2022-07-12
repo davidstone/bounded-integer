@@ -8,7 +8,7 @@
 #include <bounded/detail/comparison.hpp>
 #include <bounded/detail/int128.hpp>
 #include <bounded/detail/overlapping_range.hpp>
-#include <bounded/detail/type.hpp>
+#include <bounded/type.hpp>
 
 namespace bounded {
 namespace detail {

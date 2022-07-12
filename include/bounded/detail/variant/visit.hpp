@@ -7,7 +7,7 @@
 
 #include <bounded/detail/class.hpp>
 #include <bounded/detail/literal.hpp>
-#include <bounded/detail/type.hpp>
+#include <bounded/type.hpp>
 
 #include <numeric_traits/min_max_value.hpp>
 

@@ -10,7 +10,7 @@
 #include <operators/forward.hpp>
 #include <bounded/detail/is_bounded_integer.hpp>
 #include <bounded/detail/make_index_sequence.hpp>
-#include <bounded/detail/type.hpp>
+#include <bounded/type.hpp>
 
 #include <bounded/concepts.hpp>
 #include <bounded/lazy_init.hpp>

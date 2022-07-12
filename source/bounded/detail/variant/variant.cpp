@@ -31,8 +31,8 @@ static_assert(std::is_trivially_destructible_v<thing_t>);
 template<bool expected, typename Index, typename... Ts>
 constexpr bool assert_type_index_concepts() {
 	static_assert(bounded::matches_exactly_one_type<Index, Ts...> == expected);
-	static_assert(!bounded::variant_integer_index<bounded::detail::types<Index>, sizeof...(Ts)>);
-	static_assert(bounded::unique_type_identifier<bounded::detail::types<Index>, Ts...> == expected);
+	static_assert(!bounded::variant_integer_index<bounded::types<Index>, sizeof...(Ts)>);
+	static_assert(bounded::unique_type_identifier<bounded::types<Index>, Ts...> == expected);
 	return true;
 }
 
@@ -103,8 +103,8 @@ static_assert(test_assignment_from_variant());
 constexpr auto test_assignment_from_value() {
 	auto thing1 = thing_t(index, value);
 	thing1 = -1L;
-	BOUNDED_TEST(thing1.index() == bounded::detail::types<long>());
-	BOUNDED_TEST(thing1[bounded::detail::types<long>{}] == -1L);
+	BOUNDED_TEST(thing1.index() == bounded::types<long>());
+	BOUNDED_TEST(thing1[bounded::types<long>{}] == -1L);
 	return true;
 }
 static_assert(test_assignment_from_value());

@@ -16,7 +16,7 @@
 #include <bounded/single_element_storage.hpp>
 #include <bounded/value_to_function.hpp>
 #include <bounded/detail/construct_destroy.hpp>
-#include <bounded/detail/type.hpp>
+#include <bounded/type.hpp>
 #include <bounded/detail/variant/get_index.hpp>
 #include <bounded/detail/variant/is_valid_index.hpp>
 #include <bounded/detail/variant/variadic_union.hpp>
@@ -56,7 +56,7 @@ template<typename... Ts>
 struct variant_impl {
 private:
 	template<typename Index>
-	using type_at = typename decltype(detail::get_type(Index(), detail::types<Ts>()...))::type;
+	using type_at = typename decltype(detail::get_type(Index(), types<Ts>()...))::type;
 
 	template<typename Construct>
 	using constructed_type = std::decay_t<std::invoke_result_t<Construct>>;
@@ -66,8 +66,8 @@ public:
 		auto index_,
 		construct_function_for<type_at<decltype(index_)>> auto && construct_
 	):
-		m_index(detail::get_index(index_, detail::types<Ts>()...)),
-		m_data(detail::get_index(index_, detail::types<Ts>()...), OPERATORS_FORWARD(construct_))
+		m_index(detail::get_index(index_, types<Ts>()...)),
+		m_data(detail::get_index(index_, types<Ts>()...), OPERATORS_FORWARD(construct_))
 	{
 	}
 
@@ -83,7 +83,7 @@ public:
 	constexpr variant_impl(lazy_init_t, unique_construct_function<Ts...> auto && construct_):
 		variant_impl(
 			lazy_init,
-			detail::types<constructed_type<decltype(construct_)>>(),
+			types<constructed_type<decltype(construct_)>>(),
 			OPERATORS_FORWARD(construct_)
 		)
 	{
@@ -157,7 +157,7 @@ public:
 		return emplace_impl(index, OPERATORS_FORWARD(construct_), [&] { visit(*this, destroy); });
 	}
 	constexpr auto & emplace(unique_construct_function<Ts...> auto && construct_) & {
-		return emplace(detail::types<constructed_type<decltype(construct_)>>(), OPERATORS_FORWARD(construct_));
+		return emplace(types<constructed_type<decltype(construct_)>>(), OPERATORS_FORWARD(construct_));
 	}
 	
 	constexpr auto & emplace_impl(auto index, construct_function_for<type_at<decltype(index)>> auto && construct_, auto && destroy_active) & {
@@ -176,7 +176,7 @@ public:
 
 	// Assumes the old object has already been destroyed
 	constexpr auto & replace_active_member(auto const index, auto && construct_) {
-		constexpr auto index_value = detail::get_index(index, detail::types<Ts>()...);
+		constexpr auto index_value = detail::get_index(index, types<Ts>()...);
 		m_index = variant_index<Ts...>(index_value);
 		return construct_at(m_data, [&] { return detail::variadic_union<Ts...>(index_value, OPERATORS_FORWARD(construct_)); });
 	}
@@ -213,7 +213,7 @@ private:
 	static constexpr auto && operator_bracket(auto && data, auto const index_) {
 		return ::bounded::detail::get_union_element(
 			OPERATORS_FORWARD(data),
-			detail::get_index(index_, detail::types<Ts>{}...)
+			detail::get_index(index_, types<Ts>{}...)
 		);
 	}
 
@@ -250,7 +250,7 @@ struct variant : private detail::variant_impl<Ts...> {
 				original = OPERATORS_FORWARD(value);
 			} else {
 				this->emplace_impl(
-					detail::types<std::decay_t<T>>(),
+					types<std::decay_t<T>>(),
 					value_to_function(OPERATORS_FORWARD(value)),
 					[&] { destroy(original); }
 				);
@@ -278,7 +278,7 @@ struct variant<Ts...> : private detail::variant_impl<Ts...> {
 				original = OPERATORS_FORWARD(value);
 			} else {
 				this->emplace_impl(
-					detail::types<std::decay_t<T>>(),
+					types<std::decay_t<T>>(),
 					value_to_function(OPERATORS_FORWARD(value)),
 					[&] { destroy(original); }
 				);

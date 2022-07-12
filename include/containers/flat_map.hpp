@@ -29,7 +29,7 @@
 #include <containers/vector.hpp>
 
 #include <bounded/detail/tuple.hpp>
-#include <bounded/detail/type.hpp>
+#include <bounded/type.hpp>
 #include <bounded/integer.hpp>
 #include <bounded/concepts.hpp>
 #include <bounded/number_of.hpp>

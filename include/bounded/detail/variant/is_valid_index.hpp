@@ -7,7 +7,7 @@
 
 #include <bounded/detail/class.hpp>
 #include <bounded/detail/comparison.hpp>
-#include <bounded/detail/type.hpp>
+#include <bounded/type.hpp>
 
 namespace bounded {
 namespace detail {
