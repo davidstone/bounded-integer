@@ -87,7 +87,7 @@ template<typename Variant>
 using variant_types = typename variant_types_impl<
 	Variant,
 	std::make_index_sequence<static_cast<std::size_t>(
-		numeric_traits::max_value<decltype(std::declval<Variant>().index())> + constant<1>
+		numeric_traits::max_value<decltype(std::declval<Variant>().index().integer())> + constant<1>
 	)>
 >::type;
 
@@ -155,7 +155,7 @@ constexpr decltype(auto) visit_implementation(
 	auto const & variant,
 	auto && ... variants
 ) requires(sizeof...(indexes) < sizeof...(variants)) {
-	auto const search_index = variant.index();
+	auto const search_index = variant.index().integer();
 
 	// Cannot use a lambda because there is no return type that would be valid
 	// there. A deduced return type would be potentially void.

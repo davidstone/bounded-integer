@@ -20,6 +20,7 @@
 #include <bounded/detail/variant/get_index.hpp>
 #include <bounded/detail/variant/is_valid_index.hpp>
 #include <bounded/detail/variant/variadic_union.hpp>
+#include <bounded/detail/variant/variant_index.hpp>
 #include <bounded/detail/variant/visit.hpp>
 
 #include <operators/returns.hpp>
@@ -43,24 +44,6 @@ concept variant_move_assignable = std::is_move_constructible_v<T> and std::is_mo
 
 template<typename T>
 concept variant_trivially_move_assignable = std::is_trivially_move_constructible_v<T> and std::is_trivially_move_assignable_v<T>;
-
-
-struct non_constructible {
-	non_constructible() = delete;
-};
-
-template<std::size_t size>
-struct variant_selector_c {
-	using type = integer<0, normalize<size - 1U>>;
-};
-
-template<>
-struct variant_selector_c<0> {
-	using type = non_constructible;
-};
-
-template<std::size_t size>
-using variant_selector = typename variant_selector_c<size>::type;
 
 } // namespace detail
 
@@ -155,7 +138,7 @@ public:
 		return *this;
 	}
 
-	constexpr auto index() const {
+	constexpr auto index() const -> variant_index<Ts...> {
 		return m_index;
 	}
 
@@ -194,7 +177,7 @@ public:
 	// Assumes the old object has already been destroyed
 	constexpr auto & replace_active_member(auto const index, auto && construct_) {
 		constexpr auto index_value = detail::get_index(index, detail::types<Ts>()...);
-		m_index = index_value;
+		m_index = variant_index<Ts...>(index_value);
 		return construct_at(m_data, [&] { return detail::variadic_union<Ts...>(index_value, OPERATORS_FORWARD(construct_)); });
 	}
 
@@ -221,7 +204,7 @@ private:
 					lhs.value() = OPERATORS_FORWARD(rhs.value());
 				} else {
 					::bounded::insert(*this, rhs.index, OPERATORS_FORWARD(rhs.value()));
-					m_index = rhs.index;
+					m_index = variant_index<Ts...>(rhs.index);
 				}
 			}
 		);
@@ -234,7 +217,7 @@ private:
 		);
 	}
 
-	[[no_unique_address]] detail::variant_selector<sizeof...(Ts)> m_index;
+	[[no_unique_address]] variant_index<Ts...> m_index;
 	[[no_unique_address]] detail::variadic_union<Ts...> m_data;
 };
 
@@ -304,11 +287,6 @@ struct variant<Ts...> : private detail::variant_impl<Ts...> {
 		return *this;
 	}
 };
-
-template<typename... Ts, matches_exactly_one_type<Ts...> T>
-constexpr auto holds_alternative(variant<Ts...> const & variant, detail::types<T> type) {
-	return variant.index() == detail::get_index(type, detail::types<Ts>{}...);
-}
 
 namespace detail {
 

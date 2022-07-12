@@ -75,23 +75,11 @@ static_assert(thing_t(0_bi, 0) != thing_t(4_bi, 1));
 
 static_assert(thing_t(1_bi, static_cast<short>(5)) == thing_t(static_cast<short>(5)));
 
-static_assert(holds_alternative(thing_t(1_bi, static_cast<short>(0)), bounded::detail::types<short>{}));
-static_assert(holds_alternative(thing_t(2_bi, 0), bounded::detail::types<long>{}));
-static_assert(holds_alternative(thing_t(3_bi, '\0'), bounded::detail::types<char>{}));
-
-#if 0
-// std::variant has these calls ill-formed (and that naturally happens with my
-// implementation), but it seems like it should be legal.
-static_assert(holds_alternative(
-	thing_t(0_bi, 0),
-	bounded::detail::types<int>{}
-));
-
-static_assert(holds_alternative(
-	thing_t(4_bi, 0),
-	bounded::detail::types<int>{}
-));
-#endif
+static_assert(thing_t(0_bi, 0).index() == 0_bi);
+static_assert(thing_t(1_bi, static_cast<short>(0)).index() == 1_bi);
+static_assert(thing_t(2_bi, 0).index() == 2_bi);
+static_assert(thing_t(3_bi, '\0').index() == 3_bi);
+static_assert(thing_t(4_bi, 0).index() == 4_bi);
 
 constexpr auto index = 1_bi;
 constexpr auto value = static_cast<short>(8);
@@ -115,7 +103,7 @@ static_assert(test_assignment_from_variant());
 constexpr auto test_assignment_from_value() {
 	auto thing1 = thing_t(index, value);
 	thing1 = -1L;
-	BOUNDED_TEST(holds_alternative(thing1, bounded::detail::types<long>{}));
+	BOUNDED_TEST(thing1.index() == bounded::detail::types<long>());
 	BOUNDED_TEST(thing1[bounded::detail::types<long>{}] == -1L);
 	return true;
 }

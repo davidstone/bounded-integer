@@ -77,6 +77,7 @@ add_executable(bounded_test
 	source/bounded/detail/arithmetic/unary_plus.cpp
 	source/bounded/detail/variant/get_index.cpp
 	source/bounded/detail/variant/variant.cpp
+	source/bounded/detail/variant/variant_index.cpp
 	source/bounded/detail/variant/visit.cpp
 	source/bounded/detail/abs.cpp
 	source/bounded/detail/builtin_min_max_value.cpp
