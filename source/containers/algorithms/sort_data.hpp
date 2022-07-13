@@ -13,7 +13,7 @@
 #include <containers/vector.hpp>
 
 #include <bounded/detail/tuple.hpp>
-#include <bounded/detail/overload.hpp>
+#include <bounded/overload.hpp>
 
 #include <numeric_traits/min_max_value.hpp>
 

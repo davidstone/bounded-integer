@@ -98,7 +98,6 @@ add_executable(bounded_test
 	source/bounded/detail/max_builtin.cpp
 	source/bounded/detail/minmax.cpp
 	source/bounded/detail/overlapping_range.cpp
-	source/bounded/detail/overload.cpp
 	source/bounded/detail/safe_extreme.cpp
 	source/bounded/detail/size_of.cpp
 	source/bounded/detail/stream.cpp
@@ -123,6 +122,7 @@ add_executable(bounded_test
 	source/bounded/numeric_limits.cpp
 	source/bounded/nth_type.cpp
 	source/bounded/optional.cpp
+	source/bounded/overload.cpp
 	source/bounded/pow.cpp
 	source/bounded/relocate.cpp
 	source/bounded/scope_guard.cpp

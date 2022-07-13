@@ -3,7 +3,7 @@
 // (See accompanying file LICENSE_1_0.txt or copy at
 // http://www.boost.org/LICENSE_1_0.txt)
 
-#include <bounded/detail/overload.hpp>
+#include <bounded/overload.hpp>
 
 namespace {
 
