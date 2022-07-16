@@ -89,7 +89,7 @@ struct static_vector_data : private lexicographical_comparison::base {
 		::containers::assign_to_empty(*this, OPERATORS_FORWARD(source));
 	}
 	
-	template<std::size_t source_size>
+	template<std::size_t source_size> requires(source_size <= capacity_)
 	constexpr static_vector_data(c_array<T, source_size> && source) {
 		::containers::assign_to_empty(*this, std::move(source));
 	}

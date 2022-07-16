@@ -52,6 +52,8 @@ static_assert(homogeneous_equals(
 	containers::static_vector<int, 2_bi>({5, 3})
 ));
 
+static_assert(!bounded::constructible_from<containers::static_vector<int, 1_bi>, containers::c_array<int, 2> &&>);
+
 TEST_CASE("static_vector", "[static_vector]") {
 	containers_test::test_sequence_container<test_static_vector<bounded_test::integer>>();
 	containers_test::test_set_size<test_static_vector<bounded_test::integer>>();
