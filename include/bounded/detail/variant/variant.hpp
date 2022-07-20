@@ -268,7 +268,7 @@ struct variant<Ts...> : private detail::variant_impl<Ts...> {
 	using detail::variant_impl<Ts...>::emplace;
 
 	template<typename T> requires(
-		!std::is_same_v<std::decay_t<T>, variant> and
+		(bounded::constant<0> + ... + bounded::constant<std::same_as<std::decay_t<T>, Ts>>) == bounded::constant<1> and
 		constructible_from<std::decay_t<T>, T &&> and
 		std::is_assignable_v<std::decay_t<T> &, T &&>
 	)
