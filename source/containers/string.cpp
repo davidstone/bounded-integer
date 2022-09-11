@@ -48,10 +48,23 @@ static_assert(std::constructible_from<containers::string, to_sv>);
 static_assert(std::constructible_from<containers::string, to_cstr>);
 static_assert(std::constructible_from<containers::string, to_both>);
 
+constexpr auto check_equal(std::string_view const input) {
+	auto const output = containers::string(input);
+	BOUNDED_TEST(output == input);
+	BOUNDED_TEST(containers::size(output) == containers::size(input));
+	return true;
+}
+
+static_assert(check_equal(""));
+static_assert(check_equal("a"));
+static_assert(check_equal("01234567890123456789012"));
+
 TEST_CASE("string", "[string]") {
 	containers_test::test_sequence_container<containers::string>();
 	containers_test::test_reserve_and_capacity<containers::string>();
 	containers_test::test_set_size<containers::string>();
+	check_equal("012345678901234567890123");
+	check_equal("0123456789012345678901234");
 }
 
 } // namespace
