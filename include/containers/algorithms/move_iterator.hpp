@@ -15,6 +15,20 @@
 namespace containers {
 namespace detail {
 
+template<typename Iterator, typename Base>
+concept iterator_base_equality_comparable_with =
+	iterator<Iterator> and
+	requires(Iterator const it, Base const base) {
+		it.base() == base;
+	};
+
+template<typename Iterator, typename Base>
+concept iterator_base_three_way_comparable_with =
+	iterator<Iterator> and
+	requires(Iterator const it, Base const base) {
+		it.base() <=> base;
+	};
+
 template<typename Base>
 struct move_iterator_sentinel {
 	constexpr explicit move_iterator_sentinel(Base it):
@@ -24,13 +38,12 @@ struct move_iterator_sentinel {
 	constexpr auto const & base() const {
 		return m_it;
 	}
-	friend constexpr auto operator<=>(move_iterator_sentinel const & lhs, move_iterator_sentinel const & rhs);
-	template<iterator Iterator> requires requires(Iterator it, Base base) { it.base() <=> base; }
-	friend constexpr auto operator<=>(Iterator const & lhs, move_iterator_sentinel const & rhs) {
+	friend constexpr auto operator<=>(move_iterator_sentinel const & lhs, move_iterator_sentinel const & rhs) = default;
+	friend constexpr auto operator<=>(move_iterator_sentinel const & lhs, iterator_base_three_way_comparable_with<Base> auto const & rhs) {
 		return lhs.base() <=> rhs.base();
 	}
-	template<iterator Iterator> requires requires(Iterator it, Base base) { it.base() == base; }
-	friend constexpr auto operator==(Iterator const & lhs, move_iterator_sentinel const & rhs) {
+	friend constexpr auto operator==(move_iterator_sentinel const & lhs, move_iterator_sentinel const & rhs) -> bool = default;
+	friend constexpr auto operator==(move_iterator_sentinel const & lhs, iterator_base_equality_comparable_with<Base> auto const & rhs) -> bool {
 		return lhs.base() == rhs.base();
 	}
 private:
