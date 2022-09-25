@@ -24,9 +24,8 @@ namespace {
 // nextafter is not constexpr. This signature is easier to implement
 template<typename T>
 constexpr auto increase_float_magnitude(T const value, unsigned const offset) {
-	return __builtin_bit_cast(
-		T,
-		__builtin_bit_cast(containers::detail::float_to_unsigned<T>, value) + offset
+	return std::bit_cast<T>(
+		std::bit_cast<containers::detail::float_to_unsigned<T>>(value) + offset
 	);
 }
 

@@ -60,7 +60,7 @@ constexpr auto to_radix_sort_key(T const value) {
 		static_assert(std::numeric_limits<T>::is_iec559);
 		using unsigned_t = float_to_unsigned<T>;
 		static_assert(sizeof(T) == sizeof(unsigned_t));
-		auto const u = __builtin_bit_cast(unsigned_t, value);
+		auto const u = std::bit_cast<unsigned_t>(value);
 		constexpr auto sign_bit_position = std::numeric_limits<unsigned_t>::digits - 1U;
 		auto const sign_bit = static_cast<unsigned_t>(-static_cast<std::make_signed_t<unsigned_t>>(u >> (sign_bit_position)));
 		return u ^ (sign_bit | (static_cast<unsigned_t>(1U) << sign_bit_position));
