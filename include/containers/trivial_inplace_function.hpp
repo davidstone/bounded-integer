@@ -64,6 +64,9 @@ struct padded {
 	[[no_unique_address]] padding_type padding;
 };
 
+template<typename T>
+concept function_signature = std::is_function_v<T>;
+
 template<bool is_const, std::size_t capacity, std::size_t alignment, typename R, typename... Args>
 struct trivial_inplace_function_impl {
 private:
@@ -150,7 +153,7 @@ public:
 // If `capacity` is 0 and `alignment` is the default, your type must be
 // trivially default constructible or convertible to a function pointer.
 
-template<typename, std::size_t capacity, std::size_t alignment = detail::alignment_for_capacity<capacity>>
+template<detail::function_signature, std::size_t capacity, std::size_t alignment = detail::alignment_for_capacity<capacity>>
 struct trivial_inplace_function;
 
 template<typename R, typename... Args, std::size_t capacity, std::size_t alignment>
