@@ -104,26 +104,28 @@ private:
 		}
 	}
 
+	template<typename Function>
+	static constexpr auto make_storage(Function function) -> storage_type {
+		if constexpr (use_single_indirection) {
+			static_assert(
+				std::is_convertible_v<Function, function_ptr> or
+				std::is_trivially_default_constructible_v<Function>
+			);
+			return storage_type();
+		} else {
+			return std::bit_cast<storage_type>(
+				padded(function, bounded::constant<capacity>)
+			);
+		}
+	}
+
 public:
 	// I would prefer that this not be default constructible. However, that
 	// would mean it could not be stored in a constexpr static_vector
 	trivial_inplace_function_impl() = default;
 
-	constexpr trivial_inplace_function_impl(trivially_storable<capacity, alignment, R, Args...> auto function) requires(!use_single_indirection):
-		m_storage(__builtin_bit_cast(
-			storage_type,
-			padded(function, bounded::constant<capacity>)
-		)),
-		m_function_indirection(create_function_indirection(function))
-	{
-	}
-
-	template<trivially_storable<capacity, alignment, R, Args...> Function> requires(
-		use_single_indirection and
-		(std::is_convertible_v<Function, function_ptr> or std::is_trivially_default_constructible_v<Function>)
-	)
-	constexpr trivial_inplace_function_impl(Function function):
-		m_storage(),
+	constexpr trivial_inplace_function_impl(trivially_storable<capacity, alignment, R, Args...> auto function):
+		m_storage(make_storage(function)),
 		m_function_indirection(create_function_indirection(function))
 	{
 	}
