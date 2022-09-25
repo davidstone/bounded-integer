@@ -7,8 +7,6 @@
 
 #include <catch2/catch_test_macros.hpp>
 
-#include "../test_assert.hpp"
-
 namespace {
 
 using empty_const_function = containers::trivial_inplace_function<int() const, 0>;
@@ -80,12 +78,12 @@ static_assert(returns_five() == 5);
 constexpr auto big_returns_five = const_function([] { return 5; });
 
 TEST_CASE("trivial_inplace_function", "[trivial_inplace_function]") {
-	BOUNDED_TEST(big_returns_five() == 5);
+	CHECK(big_returns_five() == 5);
 
 	auto increments = mutable_function([x = 0]() mutable { return ++x; });
 
-	BOUNDED_TEST(increments() == 1);
-	BOUNDED_TEST(increments() == 2);
+	CHECK(increments() == 1);
+	CHECK(increments() == 2);
 }
 
 } // namespace
