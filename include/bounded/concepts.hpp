@@ -22,7 +22,9 @@ template<typename T> requires std::is_function_v<std::remove_cv_t<T>>
 auto declval() -> T &&;
 
 template<typename T, typename... Args>
-concept constructible_from = requires { T(declval<Args>()...); };
+concept constructible_from =
+	(sizeof...(Args) != 1 and requires { T(declval<Args>()...); }) or
+	(sizeof...(Args) == 1 and requires { static_cast<T>((..., declval<Args>())); });
 
 template<typename From, typename To>
 concept explicitly_convertible_to = constructible_from<To, From>;
