@@ -129,6 +129,43 @@ private:
 	T m_data;
 };
 
+template<typename T>
+struct optional_storage<T &> {
+	constexpr optional_storage():
+		m_data(nullptr)
+	{
+	}
+	
+	constexpr explicit optional_storage(lazy_init_t, construct_function_for<T &> auto && construct_):
+		m_data(std::addressof(OPERATORS_FORWARD(construct_)()))
+	{
+	}
+	
+	constexpr explicit optional_storage(explicitly_convertible_to<T &> auto && value):
+		m_data(std::addressof(OPERATORS_FORWARD(value)))
+	{
+	}
+	
+	constexpr auto is_initialized() const {
+		return static_cast<bool>(m_data);
+	}
+
+	constexpr auto uninitialize() {
+		m_data = nullptr;
+	}
+
+	constexpr auto initialize(construct_function_for<T &> auto && construct_) {
+		m_data = std::addressof(OPERATORS_FORWARD(construct_)());
+	}
+
+	constexpr auto get() const & -> auto && {
+		return *m_data;
+	}
+
+private:
+	T * m_data;
+};
+
 constexpr auto & assign(auto & target, auto && source) {
 	if (target) {
 		*target = OPERATORS_FORWARD(source);
@@ -181,6 +218,10 @@ public:
 	{
 	}
 
+	optional(optional const &) = default;
+	optional(optional &&) = default;
+	auto operator=(optional const &) & -> optional & requires(!std::is_reference_v<T>) = default;
+	auto operator=(optional &&) & -> optional & requires(!std::is_reference_v<T>) = default;
 	
 	constexpr auto operator*() const & -> value_type const & {
 		BOUNDED_ASSERT(*this);
@@ -209,16 +250,16 @@ public:
 		m_storage.uninitialize();
 		return *this;
 	}
-	constexpr auto operator=(std::convertible_to<value_type> auto && other) & -> optional & {
+	constexpr auto operator=(std::convertible_to<value_type> auto && other) & -> optional & requires(!std::is_reference_v<T>) {
 		return detail::assign(*this, OPERATORS_FORWARD(other));
 	}
 		
-	friend constexpr auto operator==(optional const & lhs, optional const & rhs) -> bool requires equality_comparable<T> {
+	friend constexpr auto operator==(optional const & lhs, optional const & rhs) -> bool requires(equality_comparable<T> and !std::is_reference_v<T>) {
 		return (lhs and rhs) ?
 			*lhs == *rhs :
 			static_cast<bool>(lhs) == static_cast<bool>(rhs);
 	}
-	friend constexpr auto operator==(optional const & lhs, T const & rhs) -> bool requires equality_comparable<T> {
+	friend constexpr auto operator==(optional const & lhs, T const & rhs) -> bool requires(equality_comparable<T> and !std::is_reference_v<T>) {
 		return static_cast<bool>(lhs) and *lhs == rhs;
 	}
 	friend constexpr auto operator==(optional const & lhs, none_t) -> bool {

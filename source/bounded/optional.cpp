@@ -186,4 +186,41 @@ constexpr auto check_optional() {
 
 static_assert(check_optional());
 
-}	// namespace
+static_assert(!bounded::optional<int const &>());
+static_assert(!bounded::optional<int &>());
+
+static_assert(bounded::constructible_from<bounded::optional<int const &>, int const &>);
+static_assert(bounded::constructible_from<bounded::optional<int const &>, int &&>);
+static_assert(bounded::constructible_from<bounded::optional<int const &>, int &>);
+static_assert(!bounded::constructible_from<bounded::optional<int &>, int const &>);
+static_assert(!bounded::constructible_from<bounded::optional<int &>, int &&>);
+static_assert(bounded::constructible_from<bounded::optional<int &>, int &>);
+static_assert(!std::is_assignable_v<bounded::optional<int &> &, int &>);
+
+static_assert([] {
+	auto const value = 5;
+	auto optional_ref = bounded::optional<int const &>(value);
+	return std::addressof(*optional_ref) == std::addressof(value);
+}());
+
+static_assert([] {
+	auto value = 5;
+	auto optional_ref = bounded::optional<int const &>(value);
+	return std::addressof(*optional_ref) == std::addressof(value);
+}());
+
+static_assert([] {
+	auto value = 5;
+	auto optional_ref = bounded::optional<int &>(value);
+	return std::addressof(*optional_ref) == std::addressof(value);
+}());
+
+static_assert([] {
+	auto value1 = 5;
+	auto value2 = 5;
+	auto optional_ref = bounded::optional<int &>(value1);
+	optional_ref.emplace(bounded::value_to_function(value2));
+	return std::addressof(*optional_ref) == std::addressof(value2);
+}());
+
+} // namespace
