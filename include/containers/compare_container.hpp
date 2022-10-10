@@ -24,14 +24,10 @@ struct base {
 
 namespace lexicographical_comparison {
 
-struct base {
+struct base : range_equality::base {
 	template<range T> requires bounded::ordered<range_value_t<T>>
 	friend constexpr auto operator<=>(T const & lhs, T const & rhs) {
 		return ::containers::lexicographical_compare_3way(lhs, rhs);
-	}
-	template<range T> requires bounded::equality_comparable<range_value_t<T>>
-	friend constexpr auto operator==(T const & lhs, T const & rhs) -> bool {
-		return ::containers::equal(lhs, rhs);
 	}
 };
 
@@ -39,14 +35,10 @@ struct base {
 
 namespace shortlex_comparison {
 
-struct base {
+struct base : range_equality::base {
 	template<range T> requires bounded::ordered<range_value_t<T>>
 	friend constexpr auto operator<=>(T const & lhs, T const & rhs) {
 		return ::containers::shortlex_compare(lhs, rhs);
-	}
-	template<range T> requires bounded::equality_comparable<range_value_t<T>>
-	friend constexpr auto operator==(T const & lhs, T const & rhs) -> bool {
-		return ::containers::equal(lhs, rhs);
 	}
 };
 
