@@ -75,17 +75,16 @@ template<typename T>
 concept is_filter_iterator_traits = detail::is_filter_iterator_traits<T>;
 
 struct filter_iterator_sentinel {
+	template<iterator Iterator, is_filter_iterator_traits Traits>
+	friend constexpr auto operator<=>(adapt_iterator<Iterator, Traits> const lhs, filter_iterator_sentinel) OPERATORS_RETURNS(
+		lhs.traits().compare(lhs.base(), lhs.traits().sentinel())
+	)
+
+	template<iterator Iterator, is_filter_iterator_traits Traits>
+	friend constexpr auto operator==(adapt_iterator<Iterator, Traits> const lhs, filter_iterator_sentinel) -> bool {
+		return lhs.traits().equal(lhs.base(), lhs.traits().sentinel());
+	}
 };
-
-template<iterator Iterator, is_filter_iterator_traits Traits>
-constexpr auto operator<=>(adapt_iterator<Iterator, Traits> const lhs, filter_iterator_sentinel) OPERATORS_RETURNS(
-	lhs.traits().compare(lhs.base(), lhs.traits().sentinel())
-)
-
-template<iterator Iterator, is_filter_iterator_traits Traits>
-constexpr auto operator==(adapt_iterator<Iterator, Traits> const lhs, filter_iterator_sentinel) -> bool {
-	return lhs.traits().equal(lhs.base(), lhs.traits().sentinel());
-}
 
 constexpr auto filter_iterator_impl(iterator auto first, is_filter_iterator_traits auto traits) {
 	return containers::adapt_iterator(
