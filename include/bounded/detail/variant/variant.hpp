@@ -45,6 +45,17 @@ concept variant_move_assignable = std::is_move_constructible_v<T> and std::is_mo
 template<typename T>
 concept variant_trivially_move_assignable = std::is_trivially_move_constructible_v<T> and std::is_trivially_move_assignable_v<T>;
 
+struct equality_visitor {
+	template<typename T, auto n>
+	constexpr auto operator()(visitor_parameter<T, n> const lhs, visitor_parameter<T, n> const rhs) const {
+		return lhs.value() == rhs.value();
+	}
+	template<typename LHS, auto lhs_n, typename RHS, auto rhs_n> requires(lhs_n != rhs_n)
+	constexpr auto operator()(visitor_parameter<LHS, lhs_n>, visitor_parameter<RHS, rhs_n>) const {
+		return false;
+	}
+};
+
 } // namespace detail
 
 template<typename Function, typename... Ts>
@@ -183,6 +194,12 @@ public:
 		return emplace(types<constructed_type<decltype(construct_)>>(), OPERATORS_FORWARD(construct_));
 	}
 	
+	friend constexpr auto operator==(variant const & lhs, variant const & rhs) -> bool
+		requires(... and equality_comparable<Ts>)
+	{
+		return visit_with_index(lhs, rhs, detail::equality_visitor{});
+	}
+
 private:
 	constexpr auto & emplace_impl(auto index, construct_function_for<type_at<decltype(index)>> auto && construct_, auto && destroy_active) & {
 		using value_t = type_at<decltype(index)>;
@@ -243,25 +260,5 @@ private:
 	[[no_unique_address]] variant_index<Ts...> m_index;
 	[[no_unique_address]] detail::variadic_union<Ts...> m_data;
 };
-
-namespace detail {
-
-struct equality_visitor {
-	template<typename T, auto n>
-	constexpr auto operator()(visitor_parameter<T, n> const lhs, visitor_parameter<T, n> const rhs) const {
-		return lhs.value() == rhs.value();
-	}
-	template<typename LHS, auto lhs_n, typename RHS, auto rhs_n> requires(lhs_n != rhs_n)
-	constexpr auto operator()(visitor_parameter<LHS, lhs_n>, visitor_parameter<RHS, rhs_n>) const {
-		return false;
-	}
-};
-
-} // namespace detail
-
-template<equality_comparable... Ts>
-constexpr auto operator==(variant<Ts...> const & lhs, variant<Ts...> const & rhs) -> bool {
-	return visit_with_index(lhs, rhs, detail::equality_visitor{});
-}
 
 }	// namespace bounded
