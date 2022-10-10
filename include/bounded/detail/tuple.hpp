@@ -23,6 +23,19 @@
 namespace bounded {
 namespace detail {
 
+template<std::size_t... indexes>
+constexpr auto compare_impl(auto const & lhs, auto const & rhs, std::index_sequence<indexes...>) {
+	auto cmp = std::strong_ordering::equal;
+	void((... or ((cmp = lhs[constant<indexes>] <=> rhs[constant<indexes>]), cmp != 0)));
+	return cmp;
+}
+
+template<std::size_t... indexes>
+constexpr auto equal_impl(auto const & lhs, auto const & rhs, std::index_sequence<indexes...>) {
+	return (... and (lhs[constant<indexes>] == rhs[constant<indexes>]));
+}
+
+
 // index is the index of this value within the tuple that contains it
 template<std::size_t index, typename T>
 struct tuple_value {
@@ -124,6 +137,16 @@ template<typename... Types>
 struct tuple : private detail::tuple_impl_t<Types...> {
 	using detail::tuple_impl_t<Types...>::tuple_impl_t;
 	using detail::tuple_impl_t<Types...>::operator[];
+
+	template<ordered<Types>... RHSTypes>
+	friend constexpr auto operator<=>(tuple const & lhs, tuple<RHSTypes...> const & rhs) {
+		return detail::compare_impl(lhs, rhs, bounded::make_index_sequence(constant<sizeof...(Types)>));
+	}
+
+	template<equality_comparable<Types>... RHSTypes>
+	friend constexpr auto operator==(tuple const & lhs, tuple<RHSTypes...> const & rhs) -> bool {
+		return detail::equal_impl(lhs, rhs, bounded::make_index_sequence(constant<sizeof...(Types)>));
+	}
 };
 
 template<typename... Ts>
@@ -143,35 +166,6 @@ inline constexpr auto is_tuple<tuple<Types...>> = true;
 // TODO: tuple_like to be based on requirements, not exact match
 template<typename T>
 concept tuple_like = detail::is_tuple<std::decay_t<T>>;
-
-
-namespace detail {
-
-template<std::size_t... indexes>
-constexpr auto compare_impl(auto const & lhs, auto const & rhs, std::index_sequence<indexes...>) {
-	auto cmp = std::strong_ordering::equal;
-	void((... or ((cmp = lhs[constant<indexes>] <=> rhs[constant<indexes>]), cmp != 0)));
-	return cmp;
-}
-
-template<std::size_t... indexes>
-constexpr auto equal_impl(auto const & lhs, auto const & rhs, std::index_sequence<indexes...>) {
-	return (... and (lhs[constant<indexes>] == rhs[constant<indexes>]));
-}
-
-}	// namespace detail
-
-template<typename... lhs_types, typename... rhs_types> requires(sizeof...(lhs_types) == sizeof...(rhs_types))
-constexpr auto operator<=>(tuple<lhs_types...> const & lhs, tuple<rhs_types...> const & rhs) {
-	return detail::compare_impl(lhs, rhs, bounded::make_index_sequence(constant<sizeof...(lhs_types)>));
-}
-
-
-template<typename... lhs_types, typename... rhs_types> requires(sizeof...(lhs_types) == sizeof...(rhs_types))
-constexpr auto operator==(tuple<lhs_types...> const & lhs, tuple<rhs_types...> const & rhs) -> bool {
-	return detail::equal_impl(lhs, rhs, bounded::make_index_sequence(constant<sizeof...(lhs_types)>));
-}
-
 
 
 // TODO: unwrap reference_wrapper?
