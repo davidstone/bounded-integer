@@ -28,6 +28,21 @@ static_assert(std::is_trivially_copy_assignable_v<thing_t>);
 static_assert(std::is_trivially_move_assignable_v<thing_t>);
 static_assert(std::is_trivially_destructible_v<thing_t>);
 
+struct non_trivial {
+	non_trivial();
+	non_trivial(non_trivial &&);
+	non_trivial(non_trivial const &);
+	auto operator=(non_trivial &&) -> non_trivial &;
+	auto operator=(non_trivial const &) -> non_trivial &;
+	~non_trivial();
+};
+
+static_assert(!std::is_trivially_copy_constructible_v<bounded::variant<non_trivial>>);
+static_assert(!std::is_trivially_move_constructible_v<bounded::variant<non_trivial>>);
+static_assert(!std::is_trivially_copy_assignable_v<bounded::variant<non_trivial>>);
+static_assert(!std::is_trivially_move_assignable_v<bounded::variant<non_trivial>>);
+static_assert(!std::is_trivially_destructible_v<bounded::variant<non_trivial>>);
+
 template<bool expected, typename Index, typename... Ts>
 constexpr bool assert_type_index_concepts() {
 	static_assert(bounded::matches_exactly_one_type<Index, Ts...> == expected);
