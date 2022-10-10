@@ -7,6 +7,7 @@
 
 #include <bounded/detail/class.hpp>
 #include <bounded/detail/literal.hpp>
+#include <bounded/identity.hpp>
 #include <bounded/type.hpp>
 
 #include <numeric_traits/min_max_value.hpp>
@@ -228,13 +229,8 @@ inline constexpr auto visit_interface = [](auto transform) {
 } // namespace detail
 
 struct visit_with_index_t {
-private:
-	static inline constexpr auto identity = [](auto && function) -> decltype(auto) {
-		return OPERATORS_FORWARD(function);
-	};
-public:
 	// Any number of variants (including 0) followed by one function
-	template<typename... Args> requires detail::is_variants_then_visit_function<sizeof...(Args) - 1U, decltype(identity), Args...>
+	template<typename... Args> requires detail::is_variants_then_visit_function<sizeof...(Args) - 1U, identity_t, Args...>
 	constexpr decltype(auto) operator()(Args && ... args) const {
 		return ::bounded::detail::rotate_transform(detail::visit_interface(identity), OPERATORS_FORWARD(args)...);
 	}
