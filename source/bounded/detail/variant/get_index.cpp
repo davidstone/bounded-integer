@@ -12,14 +12,14 @@ constexpr bool check_index() {
 	static_assert(
 		bounded::detail::get_index(
 			bounded::constant<index>,
-			bounded::types<Ts>()...
+			bounded::type<Ts>...
 		) == bounded::constant<index>
 	);
 	static_assert(
 		bounded::detail::get_type(
 			bounded::constant<index>,
-			bounded::types<Ts>()...
-		) == bounded::types<T>()
+			bounded::type<Ts>...
+		) == bounded::type<T>
 	);
 
 	return true;
@@ -30,15 +30,15 @@ constexpr bool check_type_and_index() {
 	static_assert(check_index<T, index, Ts...>());
 	static_assert(
 		bounded::detail::get_index(
-			bounded::types<T>(),
-			bounded::types<Ts>()...
+			bounded::type<T>,
+			bounded::type<Ts>...
 		) == bounded::constant<index>
 	);
 	static_assert(
 		bounded::detail::get_type(
-			bounded::types<T>(),
-			bounded::types<Ts>()...
-		) == bounded::types<T>()
+			bounded::type<T>,
+			bounded::type<Ts>...
+		) == bounded::type<T>
 	);
 
 	return true;

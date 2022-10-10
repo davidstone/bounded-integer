@@ -24,30 +24,30 @@ inline constexpr auto false_ = false;
 template<auto minimum, auto maximum>
 constexpr auto determine_type() {
 	if constexpr (range_fits_in_type<unsigned char>(minimum, maximum)) {
-		return types<unsigned char>{};
+		return type<unsigned char>;
 	} else if constexpr (range_fits_in_type<signed char>(minimum, maximum)) {
-		return types<signed char>{};
+		return type<signed char>;
 	} else if constexpr (range_fits_in_type<unsigned short>(minimum, maximum)) {
-		return types<unsigned short>{};
+		return type<unsigned short>;
 	} else if constexpr (range_fits_in_type<signed short>(minimum, maximum)) {
-		return types<signed short>{};
+		return type<signed short>;
 	} else if constexpr (range_fits_in_type<unsigned int>(minimum, maximum)) {
-		return types<unsigned int>{};
+		return type<unsigned int>;
 	} else if constexpr (range_fits_in_type<signed int>(minimum, maximum)) {
-		return types<signed int>{};
+		return type<signed int>;
 	} else if constexpr (range_fits_in_type<unsigned long>(minimum, maximum)) {
-		return types<unsigned long>{};
+		return type<unsigned long>;
 	} else if constexpr (range_fits_in_type<signed long>(minimum, maximum)) {
-		return types<signed long>{};
+		return type<signed long>;
 	} else if constexpr (range_fits_in_type<unsigned long long>(minimum, maximum)) {
-		return types<unsigned long long>{};
+		return type<unsigned long long>;
 	} else if constexpr (range_fits_in_type<signed long long>(minimum, maximum)) {
-		return types<signed long long>{};
+		return type<signed long long>;
 #if defined BOUNDED_DETAIL_HAS_128_BIT
 	} else if constexpr (range_fits_in_type<uint128_t>(minimum, maximum)) {
-		return types<uint128_t>{};
+		return type<uint128_t>;
 	} else if constexpr (range_fits_in_type<int128_t>(minimum, maximum)) {
-		return types<int128_t>{};
+		return type<int128_t>;
 #endif
 	} else {
 		static_assert(false_<minimum, maximum>, "Bounds cannot fit in any type.");

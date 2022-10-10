@@ -50,13 +50,13 @@ struct tuple_value {
 		return static_cast<T &&>(m_value);
 	}
 
-	constexpr auto && operator[](types<T>) const & {
+	constexpr auto && operator[](type_t<T>) const & {
 		return m_value;
 	}
-	constexpr auto && operator[](types<T>) & {
+	constexpr auto && operator[](type_t<T>) & {
 		return m_value;
 	}
-	constexpr auto && operator[](types<T>) && {
+	constexpr auto && operator[](type_t<T>) && {
 		// This should not be std::move because that would return an rvalue
 		// reference even if T is an lvalue reference type.
 		return static_cast<T &&>(m_value);
@@ -81,7 +81,7 @@ struct tuple_value<index, void> {
 
 	constexpr void operator[](constant_t<normalize<index>>) const {
 	}
-	constexpr void operator[](types<void>) const {
+	constexpr void operator[](type_t<void>) const {
 	}
 };
 

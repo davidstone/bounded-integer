@@ -65,7 +65,7 @@ template<typename... Ts>
 struct variant {
 private:
 	template<typename Index>
-	using type_at = typename decltype(detail::get_type(Index(), types<Ts>()...))::type;
+	using type_at = typename decltype(detail::get_type(Index(), type<Ts>...))::type;
 
 	template<typename Construct>
 	using constructed_type = std::decay_t<std::invoke_result_t<Construct>>;
@@ -75,8 +75,8 @@ public:
 		auto index_,
 		construct_function_for<type_at<decltype(index_)>> auto && construct_
 	):
-		m_index(detail::get_index(index_, types<Ts>()...)),
-		m_data(detail::get_index(index_, types<Ts>()...), OPERATORS_FORWARD(construct_))
+		m_index(detail::get_index(index_, type<Ts>...)),
+		m_data(detail::get_index(index_, type<Ts>...), OPERATORS_FORWARD(construct_))
 	{
 	}
 
@@ -92,7 +92,7 @@ public:
 	constexpr variant(lazy_init_t, unique_construct_function<Ts...> auto && construct_):
 		variant(
 			lazy_init,
-			types<constructed_type<decltype(construct_)>>(),
+			type_t<constructed_type<decltype(construct_)>>(),
 			OPERATORS_FORWARD(construct_)
 		)
 	{
@@ -158,7 +158,7 @@ public:
 				original = OPERATORS_FORWARD(value);
 			} else {
 				this->emplace_impl(
-					types<std::decay_t<T>>(),
+					type_t<std::decay_t<T>>(),
 					value_to_function(OPERATORS_FORWARD(value)),
 					[&] { destroy(original); }
 				);
@@ -191,7 +191,7 @@ public:
 		return emplace_impl(index, OPERATORS_FORWARD(construct_), [&] { visit(*this, destroy); });
 	}
 	constexpr auto & emplace(unique_construct_function<Ts...> auto && construct_) & {
-		return emplace(types<constructed_type<decltype(construct_)>>(), OPERATORS_FORWARD(construct_));
+		return emplace(type_t<constructed_type<decltype(construct_)>>(), OPERATORS_FORWARD(construct_));
 	}
 	
 	friend constexpr auto operator==(variant const & lhs, variant const & rhs) -> bool
@@ -217,7 +217,7 @@ private:
 
 	// Assumes the old object has already been destroyed
 	constexpr auto & replace_active_member(auto const index, auto && construct_) {
-		constexpr auto index_value = detail::get_index(index, types<Ts>()...);
+		constexpr auto index_value = detail::get_index(index, type<Ts>...);
 		m_index = variant_index<Ts...>(index_value);
 		return construct_at(m_data, [&] { return detail::variadic_union<Ts...>(index_value, OPERATORS_FORWARD(construct_)); });
 	}
@@ -253,7 +253,7 @@ private:
 	static constexpr auto && operator_bracket(auto && data, auto const index_) {
 		return ::bounded::detail::get_union_element(
 			OPERATORS_FORWARD(data),
-			detail::get_index(index_, types<Ts>{}...)
+			detail::get_index(index_, type<Ts>...)
 		);
 	}
 

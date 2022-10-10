@@ -26,7 +26,7 @@ template<typename T, auto index>
 concept constant_indexable_by = indexable_by<T, bounded::constant_t<index>>;
 
 template<typename T, typename Index>
-concept type_indexable_by = indexable_by<T, bounded::types<Index>>;
+concept type_indexable_by = indexable_by<T, bounded::type_t<Index>>;
 
 
 namespace tuple_empty {
@@ -44,7 +44,7 @@ static_assert(std::is_same_v<
 >);
 static_assert(!constant_indexable_by<type, 1>);
 static_assert(std::is_same_v<
-	decltype(type()[bounded::types<empty>()]),
+	decltype(type()[bounded::type<empty>]),
 	empty &&
 >);
 
@@ -87,7 +87,7 @@ static_assert(std::is_same_v<
 >);
 static_assert(!constant_indexable_by<type, 1>);
 static_assert(std::is_same_v<
-	decltype(type()[bounded::types<bounded::tuple<>>()]),
+	decltype(type()[bounded::type_t<bounded::tuple<>>()]),
 	bounded::tuple<> &&
 >);
 
@@ -112,11 +112,11 @@ static_assert(std::is_same_v<
 >);
 static_assert(!constant_indexable_by<type, 2>);
 static_assert(std::is_same_v<
-	decltype(type()[bounded::types<empty>()]),
+	decltype(type()[bounded::type<empty>]),
 	empty &&
 >);
 static_assert(std::is_same_v<
-	decltype(type()[bounded::types<bounded::tuple<empty>>()]),
+	decltype(type()[bounded::type_t<bounded::tuple<empty>>()]),
 	bounded::tuple<empty> &&
 >);
 

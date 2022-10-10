@@ -7,23 +7,18 @@
 
 namespace bounded {
 
-template<typename...>
-struct types {
+template<typename T>
+struct type_t {
+	using type = T;
+
+	friend constexpr auto operator==(type_t, type_t) -> bool = default;
+	template<typename U>
+	friend constexpr auto operator==(type_t, type_t<U>) -> bool {
+		return false;
+	}
 };
 
 template<typename T>
-struct types<T> {
-	using type = T;
-};
-
-template<typename... LHS, typename... RHS>
-constexpr auto operator==(types<LHS...>, types<RHS...>) -> bool {
-	return false;
-}
-
-template<typename... Ts>
-constexpr auto operator==(types<Ts...>, types<Ts...>) -> bool {
-	return true;
-}
+inline constexpr auto type = type_t<T>();
 
 } // namespace bounded

@@ -18,7 +18,7 @@ namespace detail {
 
 struct get_index_t {
 	template<typename Index, typename... Ts> requires matches_exactly_one_type<Index, typename Ts::type...>
-	constexpr auto operator()(types<Index> index, Ts... ts) const {
+	constexpr auto operator()(type_t<Index> index, Ts... ts) const {
 		constexpr auto result = [=] {
 			bool found = false;
 			std::size_t value = 0;
@@ -42,13 +42,13 @@ struct get_index_t {
 
 struct get_type_t {
 	template<typename Index, typename... Ts> requires matches_exactly_one_type<Index, typename Ts::type...>
-	constexpr auto operator()(types<Index> index, Ts...) const {
+	constexpr auto operator()(type_t<Index> index, Ts...) const {
 		return index;
 	}
 
 	template<auto n, typename... Ts> requires variant_integer_index<constant_t<n>, sizeof...(Ts)>
 	constexpr auto operator()(constant_t<n>, Ts...) const {
-		return types<nth_type<n, typename Ts::type...>>();
+		return type_t<nth_type<n, typename Ts::type...>>();
 	}
 } constexpr inline get_type;
 

@@ -70,6 +70,10 @@ private:
 
 namespace detail {
 
+template<typename...>
+struct types {
+};
+
 template<typename Variant, typename Indexes>
 struct variant_types_impl;
 
