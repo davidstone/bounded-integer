@@ -228,36 +228,39 @@ inline constexpr auto visit_interface = [](auto transform) {
 
 } // namespace detail
 
-struct visit_with_index_t {
-	// Any number of variants (including 0) followed by one function
-	template<typename... Args> requires detail::is_variants_then_visit_function<sizeof...(Args) - 1U, identity_t, Args...>
-	constexpr decltype(auto) operator()(Args && ... args) const {
-		return ::bounded::detail::rotate_transform(detail::visit_interface(identity), OPERATORS_FORWARD(args)...);
-	}
-} constexpr inline visit_with_index;
+// Accepts any number of variants (including 0) followed by one function
+inline constexpr auto visit_with_index = []<typename... Args>(Args && ... args)
+	 requires detail::is_variants_then_visit_function<sizeof...(Args) - 1U, identity_t, Args...>
+{
+	return ::bounded::detail::rotate_transform(detail::visit_interface(identity), OPERATORS_FORWARD(args)...);
+};
+
+namespace detail {
+
+// Is not a lambda because of
+// https://github.com/llvm/llvm-project/issues/42094
+template<typename Function>
+struct unwrap_visitor_parameter {
+	Function && function;
+	constexpr auto operator()(auto... args) && OPERATORS_RETURNS(
+		OPERATORS_FORWARD(function)(std::move(args).value()...)
+	)
+};
+inline constexpr auto get_value_only = [](auto && function) {
+	return unwrap_visitor_parameter<decltype(function)>{OPERATORS_FORWARD(function)};
+};
+
+} // namespace detail
 
 // Accepts any number of variants (including 0) followed by one function with
 // arity equal to the number of variants
-struct visit_t {
-private:
-	// Does not use a lambda because of
-	// https://github.com/llvm/llvm-project/issues/42094
-	template<typename Function>
-	struct unwrap_visitor_parameter {
-		Function && function;
-		constexpr auto operator()(auto... args) && OPERATORS_RETURNS(
-			OPERATORS_FORWARD(function)(std::move(args).value()...)
-		)
-	};
+inline constexpr auto visit = []<typename... Args>(Args && ... args) -> decltype(auto)
+	requires detail::is_variants_then_visit_function<sizeof...(Args) - 1U, decltype(detail::get_value_only), Args...>
+{
+	return ::bounded::detail::rotate_transform(
+		detail::visit_interface(detail::get_value_only),
+		OPERATORS_FORWARD(args)...
+	);
+};
 
-	static inline constexpr auto get_value_only = [](auto && function) {
-		return unwrap_visitor_parameter<decltype(function)>{OPERATORS_FORWARD(function)};
-	};
-public:
-	template<typename... Args> requires detail::is_variants_then_visit_function<sizeof...(Args) - 1U, decltype(get_value_only), Args...>
-	constexpr decltype(auto) operator()(Args && ... args) const {
-		return ::bounded::detail::rotate_transform(detail::visit_interface(get_value_only), OPERATORS_FORWARD(args)...);
-	}
-} constexpr inline visit;
-
-}	// namespace bounded
+} // namespace bounded

@@ -59,7 +59,7 @@ static_assert(bounded::visit(variant, special{}) == 2);
 static_assert(bounded::visit(variant, bounded::overload(int_visitor{}, [](auto) { return 0; })) == 3);
 static_assert(bounded::visit(bounded::variant<int>(1), [](int && x) { return x; }) == 1);
 
-static_assert(!std::is_invocable_v<bounded::visit_t, decltype(variant), int_visitor>);
-static_assert(!std::is_invocable_v<bounded::visit_t, decltype(variant), decltype(bounded::overload(int_visitor{}))>);
+static_assert(!std::is_invocable_v<decltype(bounded::visit), decltype(variant), int_visitor>);
+static_assert(!std::is_invocable_v<decltype(bounded::visit), decltype(variant), decltype(bounded::overload(int_visitor{}))>);
 
 } // namespace
