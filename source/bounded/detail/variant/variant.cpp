@@ -79,7 +79,7 @@ static_assert(bounded::constructible_from<thing_t, char>);
 static_assert(bounded::visit_with_index(
 	thing_t(0_bi, 0),
 	thing_t(0_bi, 0),
-	bounded::detail::equality_visitor{}
+	bounded::detail::equality_visitor
 ));
 
 static_assert(thing_t(0_bi, 0) == thing_t(0_bi, 0));

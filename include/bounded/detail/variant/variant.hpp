@@ -45,13 +45,13 @@ concept variant_move_assignable = std::is_move_constructible_v<T> and std::is_mo
 template<typename T>
 concept variant_trivially_move_assignable = std::is_trivially_move_constructible_v<T> and std::is_trivially_move_assignable_v<T>;
 
-struct equality_visitor {
-	template<typename T, auto n>
-	constexpr auto operator()(visitor_parameter<T, n> const lhs, visitor_parameter<T, n> const rhs) const {
+inline constexpr auto equality_visitor = []
+	<typename LHS, auto lhs_n, typename RHS, auto rhs_n>
+	(visitor_parameter<LHS, lhs_n> const lhs, visitor_parameter<RHS, rhs_n> const rhs)
+{
+	if constexpr (lhs_n == rhs_n) {
 		return lhs.value() == rhs.value();
-	}
-	template<typename LHS, auto lhs_n, typename RHS, auto rhs_n> requires(lhs_n != rhs_n)
-	constexpr auto operator()(visitor_parameter<LHS, lhs_n>, visitor_parameter<RHS, rhs_n>) const {
+	} else {
 		return false;
 	}
 };
@@ -197,7 +197,7 @@ public:
 	friend constexpr auto operator==(variant const & lhs, variant const & rhs) -> bool
 		requires(... and equality_comparable<Ts>)
 	{
-		return visit_with_index(lhs, rhs, detail::equality_visitor{});
+		return visit_with_index(lhs, rhs, detail::equality_visitor);
 	}
 
 private:
