@@ -31,14 +31,14 @@ struct compares_address {
 			std::addressof(lhs.m_second) == std::addressof(rhs.m_second);
 	}
 
+	friend constexpr auto operator==(compares_address const lhs, std::pair<int const &, int const &> rhs) -> bool {
+		return lhs == compares_address(rhs);
+	}
+
 private:
 	int const & m_first;
 	int const & m_second;
 };
-
-constexpr auto operator==(compares_address const lhs, std::pair<int const &, int const &> rhs) -> bool {
-	return lhs == compares_address(rhs);
-}
 
 using init_list = std::initializer_list<compares_address>;
 

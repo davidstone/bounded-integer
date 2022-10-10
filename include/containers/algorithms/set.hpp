@@ -99,44 +99,41 @@ public:
 		return find_first_matching(m_members.get(), containers::next(m_it1), containers::next(m_it2));
 	}
 
+	friend constexpr auto operator*(set_intersection_pair_iterator const it) {
+		using value_type = std::pair<
+			decltype(*std::declval<ForwardIterator1>()),
+			decltype(*std::declval<ForwardIterator2>())
+		>;
+		return value_type(*it.first(), *it.second());
+	}
+
+	// These functions can compare only one pair of iterators because it is not
+	// legal to compare iterators from two different ranges. We know that if one
+	// set matches, the other must.
+	template<
+		typename RHSMembers, typename RHSForwardIterator1, typename RHSForwardIterator2
+	> requires (std::is_same_v<std::remove_const_t<Members>, std::remove_const_t<RHSMembers>>)
+	friend constexpr auto operator<=>(
+		set_intersection_pair_iterator const lhs,
+		set_intersection_pair_iterator<RHSMembers, RHSForwardIterator1, RHSForwardIterator2> const rhs
+	) {
+		return lhs.first() <=> rhs.first();
+	}
+	template<
+		typename RHSMembers, typename RHSForwardIterator1, typename RHSForwardIterator2
+	> requires (std::is_same_v<std::remove_const_t<Members>, std::remove_const_t<RHSMembers>>)
+	friend constexpr auto operator==(
+		set_intersection_pair_iterator const lhs,
+		set_intersection_pair_iterator<RHSMembers, RHSForwardIterator1, RHSForwardIterator2> const rhs
+	) -> bool {
+		return lhs.first() == rhs.first();
+	}
+
 private:
 	std::reference_wrapper<Members> m_members;	
 	ForwardIterator1 m_it1;
 	ForwardIterator2 m_it2;
 };
-
-template<typename Members, typename ForwardIterator1, typename ForwardIterator2>
-constexpr auto operator*(set_intersection_pair_iterator<Members, ForwardIterator1, ForwardIterator2> const it) {
-	using value_type = std::pair<
-		decltype(*std::declval<ForwardIterator1>()),
-		decltype(*std::declval<ForwardIterator2>())
-	>;
-	return value_type(*it.first(), *it.second());
-}
-
-// These functions can compare only one pair of iterators because it is not
-// legal to compare iterators from two different ranges. We know that if one
-// set matches, the other must.
-template<
-	typename LHSMembers, typename LHSForwardIterator1, typename LHSForwardIterator2,
-	typename RHSMembers, typename RHSForwardIterator1, typename RHSForwardIterator2
-> requires (std::is_same_v<std::remove_const_t<LHSMembers>, std::remove_const_t<RHSMembers>>)
-constexpr auto operator<=>(
-	set_intersection_pair_iterator<LHSMembers, LHSForwardIterator1, LHSForwardIterator2> const lhs,
-	set_intersection_pair_iterator<RHSMembers, RHSForwardIterator1, RHSForwardIterator2> const rhs
-) {
-	return lhs.first() <=> rhs.first();
-}
-template<
-	typename LHSMembers, typename LHSForwardIterator1, typename LHSForwardIterator2,
-	typename RHSMembers, typename RHSForwardIterator1, typename RHSForwardIterator2
-> requires (std::is_same_v<std::remove_const_t<LHSMembers>, std::remove_const_t<RHSMembers>>)
-constexpr auto operator==(
-	set_intersection_pair_iterator<LHSMembers, LHSForwardIterator1, LHSForwardIterator2> const lhs,
-	set_intersection_pair_iterator<RHSMembers, RHSForwardIterator1, RHSForwardIterator2> const rhs
-) -> bool {
-	return lhs.first() == rhs.first();
-}
 
 } // namespace detail
 
