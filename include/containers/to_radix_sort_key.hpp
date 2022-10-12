@@ -119,11 +119,9 @@ using to_radix_sort_key_adl::default_ska_sortable_value;
 
 } // namespace detail
 
-struct to_radix_sort_key_t {
-	constexpr auto operator()(detail::default_ska_sortable_value auto && value) const -> decltype(auto) {
-		return containers::detail::to_radix_sort_key_adl::to_radix_sort_key_impl(OPERATORS_FORWARD(value));
-	}
+inline constexpr auto to_radix_sort_key = [](detail::default_ska_sortable_value auto && value) -> decltype(auto) {
+	return containers::detail::to_radix_sort_key_adl::to_radix_sort_key_impl(OPERATORS_FORWARD(value));
 };
-inline constexpr auto to_radix_sort_key = to_radix_sort_key_t();
+using to_radix_sort_key_t = std::remove_const_t<decltype(to_radix_sort_key)>;
 
 } // namespace containers
