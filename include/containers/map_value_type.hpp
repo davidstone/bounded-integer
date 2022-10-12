@@ -52,19 +52,19 @@ concept first_second_pair = requires(T value) {
 } // namespace detail
 
 struct get_key_t {
-	constexpr auto operator()(detail::key_mapped_pair auto && value) const -> auto && {
+	static constexpr auto operator()(detail::key_mapped_pair auto && value) -> auto && {
 		return OPERATORS_FORWARD(value).key;
 	}
-	constexpr auto operator()(detail::first_second_pair auto && value) const -> auto && {
+	static constexpr auto operator()(detail::first_second_pair auto && value) -> auto && {
 		return OPERATORS_FORWARD(value).first;
 	}
 } inline constexpr get_key;
 
 struct get_mapped_t {
-	constexpr auto operator()(detail::key_mapped_pair auto && value) const -> auto && {
+	static constexpr auto operator()(detail::key_mapped_pair auto && value) -> auto && {
 		return OPERATORS_FORWARD(value).mapped;
 	}
-	constexpr auto operator()(detail::first_second_pair auto && value) const -> auto && {
+	static constexpr auto operator()(detail::first_second_pair auto && value) -> auto && {
 		return OPERATORS_FORWARD(value).second;
 	}
 } inline constexpr get_mapped;

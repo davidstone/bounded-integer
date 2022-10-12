@@ -27,7 +27,7 @@ namespace bounded {
 // function if the default does not work.
 template<typename Compare, typename LHS, typename RHS>
 struct extreme_value {
-	constexpr decltype(auto) operator()(Compare const compare, LHS && lhs, RHS && rhs) const {
+	static constexpr decltype(auto) operator()(Compare const compare, LHS && lhs, RHS && rhs) {
 		using result_t = detail::add_common_cv_reference_t<std::common_type_t<LHS, RHS>, LHS, RHS>;
 		return compare(rhs, lhs) ?
 			static_cast<result_t>(OPERATORS_FORWARD(rhs)) :
@@ -38,7 +38,7 @@ struct extreme_value {
 // TODO: This should be selected only for less and greater
 template<typename Compare, bounded_integer LHS, bounded_integer RHS>
 struct extreme_value<Compare, LHS, RHS> {
-	constexpr decltype(auto) operator()(Compare const compare, LHS && lhs, RHS && rhs) const {
+	static constexpr decltype(auto) operator()(Compare const compare, LHS && lhs, RHS && rhs) {
 		constexpr auto select = [](auto const lhs_, auto const rhs_) {
 			if constexpr (Compare{}(rhs_, lhs_)) {
 				return normalize<rhs_>;
@@ -79,12 +79,12 @@ struct extreme_value<Compare, LHS, RHS> {
 // accepts the comparison function as the first argument
 
 struct extreme_function {
-	constexpr decltype(auto) operator()(auto /* compare */, auto && t) const {
+	static constexpr decltype(auto) operator()(auto /* compare */, auto && t) {
 		return OPERATORS_FORWARD(t);
 	}
 
 	template<typename Compare, typename T1, typename T2>
-	constexpr decltype(auto) operator()(Compare compare, T1 && t1, T2 && t2) const {
+	static constexpr decltype(auto) operator()(Compare compare, T1 && t1, T2 && t2) {
 		return extreme_value<Compare, T1, T2>()(
 			std::move(compare),
 			OPERATORS_FORWARD(t1),
@@ -92,7 +92,7 @@ struct extreme_function {
 		);
 	}
 
-	constexpr decltype(auto) operator()(auto compare, auto && t1, auto && t2, auto && ... ts) const {
+	static constexpr decltype(auto) operator()(auto compare, auto && t1, auto && t2, auto && ... ts) {
 		return operator()(
 			compare,
 			operator()(compare, OPERATORS_FORWARD(t1), OPERATORS_FORWARD(t2)),

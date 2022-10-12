@@ -15,10 +15,10 @@ constexpr auto int_visitor = [](int) {
 };
 
 struct special {
-	constexpr auto operator()(int) const {
+	static constexpr auto operator()(int) {
 		return 2;
 	}
-	constexpr auto operator()(auto) const {
+	static constexpr auto operator()(auto) {
 		return 1;
 	}
 };
@@ -37,7 +37,7 @@ static_assert(
 	) == 7
 );
 
-static_assert(bounded::visit(bounded::variant<int>(5), int_visitor{}) == 3);
+static_assert(bounded::visit(bounded::variant<int>(5), int_visitor) == 3);
 
 static_assert(
 	bounded::detail::rotate_transform(
@@ -50,14 +50,14 @@ static_assert(
 );
 
 
-static_assert(bounded::visit(variant, bounded::overload(int_visitor{}, [](int *) { return 0; })) == 3);
-static_assert(bounded::visit(variant, bounded::overload(int_visitor{}, [](int const *) { return 0; })) == 3);
+static_assert(bounded::visit(variant, bounded::overload(int_visitor, [](int *) { return 0; })) == 3);
+static_assert(bounded::visit(variant, bounded::overload(int_visitor, [](int const *) { return 0; })) == 3);
 static_assert(bounded::visit(variant, bounded::overload([](auto) { return 0; })) == 0);
 static_assert(bounded::visit(variant, special{}) == 2);
-static_assert(bounded::visit(variant, bounded::overload(int_visitor{}, [](auto) { return 0; })) == 3);
+static_assert(bounded::visit(variant, bounded::overload(int_visitor, [](auto) { return 0; })) == 3);
 static_assert(bounded::visit(bounded::variant<int>(1), [](int && x) { return x; }) == 1);
 
-static_assert(!std::is_invocable_v<decltype(bounded::visit), decltype(variant), int_visitor>);
-static_assert(!std::is_invocable_v<decltype(bounded::visit), decltype(variant), decltype(bounded::overload(int_visitor{}))>);
+static_assert(!std::is_invocable_v<decltype(bounded::visit), decltype(variant), decltype(int_visitor)>);
+static_assert(!std::is_invocable_v<decltype(bounded::visit), decltype(variant), decltype(bounded::overload(int_visitor))>);
 
 } // namespace

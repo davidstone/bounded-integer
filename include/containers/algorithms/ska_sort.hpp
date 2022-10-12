@@ -495,7 +495,7 @@ constexpr void inplace_radix_sort(view auto to_sort, auto const & extract_key) {
 } // namespace detail
 
 struct ska_sort_t {
-	constexpr void operator()(range auto && to_sort, auto const & extract_key) const {
+	static constexpr void operator()(range auto && to_sort, auto const & extract_key) {
 		containers::detail::inplace_radix_sort<128, 1024>(
 			range_view(
 				containers::begin(to_sort),
@@ -504,13 +504,13 @@ struct ska_sort_t {
 			extract_key
 		);
 	}
-	constexpr void operator()(range auto && to_sort) const {
+	static constexpr void operator()(range auto && to_sort) {
 		operator()(to_sort, to_radix_sort_key);
 	}
 } inline constexpr ska_sort;
 
 struct unique_ska_sort_t {
-	constexpr void operator()(range auto & to_sort, auto const & extract_key) const {
+	static constexpr void operator()(range auto & to_sort, auto const & extract_key) {
 		ska_sort(to_sort, extract_key);
 		auto const equal = [&](auto const & lhs, auto const & rhs) {
 			return extract_key(lhs) == extract_key(rhs);
@@ -520,7 +520,7 @@ struct unique_ska_sort_t {
 			::containers::unique(containers::begin(to_sort), containers::end(to_sort), equal)
 		);
 	}
-	constexpr void operator()(range auto & to_sort) const {
+	static constexpr void operator()(range auto & to_sort) {
 		operator()(to_sort, to_radix_sort_key);
 	}
 } constexpr inline unique_ska_sort;

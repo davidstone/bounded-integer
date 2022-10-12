@@ -216,16 +216,16 @@ static_assert(a != d);
 static_assert(a > d);
 
 struct {
-	constexpr auto operator()(float const x) const {
+	static constexpr auto operator()(float const x) {
 		return static_cast<int>(x + 1);
 	}
-	constexpr auto operator()(float const x, float const y) const {
+	static constexpr auto operator()(float const x, float const y) {
 		return static_cast<int>(x + y);
 	}
-	constexpr auto operator()(int const x) const {
+	static constexpr auto operator()(int const x) {
 		return static_cast<float>(x + 1);
 	}
-	constexpr auto operator()(int const x, int const y) const {
+	static constexpr auto operator()(int const x, int const y) {
 		return static_cast<float>(x + y);
 	}
 } constexpr increment_and_swap_types{};

@@ -14,7 +14,7 @@
 namespace containers {
 
 struct is_sorted_t {
-	constexpr bool operator()(range auto && to_sort, auto cmp) const {
+	static constexpr bool operator()(range auto && to_sort, auto cmp) {
 		auto first = containers::begin(to_sort);
 		auto const last = containers::end(to_sort);
 		if (first != last) {
@@ -34,7 +34,7 @@ struct is_sorted_t {
 		}
 		return true;
 	}
-	constexpr bool operator()(range auto && to_sort) const {
+	static constexpr bool operator()(range auto && to_sort) {
 		return operator()(to_sort, std::less());
 	}
 } constexpr inline is_sorted;

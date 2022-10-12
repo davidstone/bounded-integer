@@ -111,10 +111,10 @@ constexpr auto test_erase_middle_range() {
 }
 
 struct is_even {
-	constexpr auto operator()(int const x) const {
+	static constexpr auto operator()(int const x) {
 		return x % 2 == 0;
 	}
-	constexpr auto operator()(bounded_test::non_copyable_integer const & x) const {
+	static constexpr auto operator()(bounded_test::non_copyable_integer const & x) {
 		return x.value() % 2 == 0;
 	}
 };

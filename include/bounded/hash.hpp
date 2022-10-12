@@ -13,7 +13,7 @@
 template<bounded::bounded_integer Integer>
 struct std::hash<Integer> {
 	using argument_type = Integer;
-	constexpr decltype(auto) operator()(argument_type const & argument) const {
+	static constexpr decltype(auto) operator()(argument_type const & argument) {
 		using underlying_type = typename argument_type::underlying_type;
 		return hash<underlying_type>{}(static_cast<underlying_type>(argument));
 	}

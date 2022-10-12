@@ -203,7 +203,7 @@ constexpr auto double_buffered_sort_impl(range auto & source, range auto & buffe
 } // namespace detail
 
 struct double_buffered_ska_sort_t {
-	constexpr auto operator()(range auto && source, range auto && buffer, auto const & extract_key) const -> bool {
+	static constexpr auto operator()(range auto && source, range auto && buffer, auto const & extract_key) -> bool {
 		if constexpr (numeric_traits::max_value<range_size_t<decltype(source)>> <= bounded::constant<1>) {
 			return false;
 		} else {
@@ -218,7 +218,7 @@ struct double_buffered_ska_sort_t {
 		}
 	}
 
-	constexpr auto operator()(range auto && source, range auto && buffer) const -> bool {
+	static constexpr auto operator()(range auto && source, range auto && buffer) -> bool {
 		return operator()(source, buffer, to_radix_sort_key);
 	}
 } inline constexpr double_buffered_ska_sort;

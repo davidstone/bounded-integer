@@ -31,7 +31,7 @@ namespace {
 std::size_t number_of_extractions = 0;
 template<typename Extract>
 struct extract_tracker {
-	decltype(auto) operator()(auto const & key) const {
+	static decltype(auto) operator()(auto const & key) {
 		++number_of_extractions;
 		return Extract()(key);
 	}
@@ -119,7 +119,7 @@ private:
 
 struct Extract {
 	template<std::size_t size>
-	auto operator()(Thing<size> const thing) const -> std::uint32_t {
+	static auto operator()(Thing<size> const thing) -> std::uint32_t {
 		return thing.m_value[0];
 	}
 };

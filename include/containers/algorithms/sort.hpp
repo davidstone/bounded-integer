@@ -15,14 +15,14 @@
 namespace containers {
 
 struct sort_t {
-	constexpr auto operator()(range auto & to_sort, auto cmp) const -> void {
+	static constexpr auto operator()(range auto & to_sort, auto cmp) -> void {
 		std::sort(
 			make_legacy_iterator(containers::begin(to_sort)),
 			make_legacy_iterator(containers::end(to_sort)),
 			cmp
 		);
 	}
-	constexpr auto operator()(range auto & to_sort) const -> void {
+	static constexpr auto operator()(range auto & to_sort) -> void {
 		operator()(to_sort, std::less());
 	}
 } constexpr inline sort;

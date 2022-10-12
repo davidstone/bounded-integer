@@ -57,7 +57,7 @@ concept decrementable = requires(T value) { --value; };
 
 struct partition_t {
 	template<iterator ForwardIterator>
-	constexpr auto operator()(ForwardIterator first, sentinel_for<ForwardIterator> auto last, auto predicate) const {
+	static constexpr auto operator()(ForwardIterator first, sentinel_for<ForwardIterator> auto last, auto predicate) {
 		auto advance_first = [&]{
 			first = containers::find_if_not(first, last, predicate);
 		};
@@ -97,7 +97,7 @@ struct partition_t {
 		}
 		return first;
 	}
-	constexpr auto operator()(range auto && input, auto predicate) const {
+	static constexpr auto operator()(range auto && input, auto predicate) {
 		return operator()(containers::begin(input), containers::end(input), predicate);
 	}
 } constexpr inline partition;

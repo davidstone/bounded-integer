@@ -8,22 +8,22 @@
 namespace {
 
 struct int_function {
-	constexpr auto operator()(int) const {
+	static constexpr auto operator()(int) {
 		return 3;
 	}
 };
 
 struct pointer_function {
-	[[maybe_unused]] constexpr auto operator()(int *) const {
+	[[maybe_unused]] static constexpr auto operator()(int *) {
 		return 4;
 	}
 };
 
 struct direct {
-	constexpr auto operator()(int) const {
+	static constexpr auto operator()(int) {
 		return 2;
 	}
-	constexpr auto operator()(auto) const {
+	static constexpr auto operator()(auto) {
 		return 1;
 	}
 };

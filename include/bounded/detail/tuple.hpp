@@ -213,11 +213,11 @@ indexed_tuple(Tuple &&) -> indexed_tuple<std::make_index_sequence<tuple_size<Tup
 struct tuple_cat_t {
 private:
 	template<std::size_t... first_indexes, typename First, std::size_t... second_indexes, typename Second>
-	constexpr auto cat_impl(
+	static constexpr auto cat_impl(
 		indexed_tuple<std::index_sequence<first_indexes...>, First> first,
 		indexed_tuple<std::index_sequence<second_indexes...>, Second> second,
 		auto && ... tail
-	) const {
+	) {
 		return operator()(
 			tuple<
 				tuple_element<first_indexes, First>...,
@@ -232,7 +232,7 @@ private:
 
 public:
 	template<typename... Tuples> requires(... and constructible_from<std::decay_t<Tuples>, Tuples &&>)
-	constexpr auto operator()(Tuples && ... tuples) const {
+	static constexpr auto operator()(Tuples && ... tuples) {
 		if constexpr (sizeof...(tuples) == 0) {
 			return tuple<>{};
 		} else if constexpr (sizeof...(tuples) == 1) {
@@ -251,7 +251,7 @@ private:
 		return OPERATORS_FORWARD(function)(OPERATORS_FORWARD(tuple_args)[constant<indexes>]...);
 	}
 public:
-	constexpr decltype(auto) operator()(auto && tuple_args, auto && function) const {
+	static constexpr decltype(auto) operator()(auto && tuple_args, auto && function) {
 		return implementation(
 			OPERATORS_FORWARD(tuple_args),
 			bounded::make_index_sequence(tuple_size<decltype(tuple_args)>),
