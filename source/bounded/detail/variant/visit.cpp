@@ -10,10 +10,8 @@ namespace {
 
 constexpr auto variant = bounded::variant<int, int *>(5);
 
-struct int_visitor {
-	constexpr auto operator()(int) const {
-		return 3;
-	}
+constexpr auto int_visitor = [](int) {
+	return 3;
 };
 
 struct special {
