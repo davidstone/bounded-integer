@@ -20,38 +20,33 @@
 
 namespace containers {
 
-struct is_partitioned_t {
-	constexpr auto operator()(range auto && input, auto predicate) const -> bool {
-		auto first = containers::begin(input);
-		auto last = containers::end(input);
-		auto it = containers::find_if_not(first, last, predicate);
-		return containers::find_if(it, last, predicate) == last;
-	}
-} constexpr inline is_partitioned;
+inline constexpr auto is_partitioned = [](range auto && input, auto predicate) -> bool {
+	auto first = containers::begin(input);
+	auto last = containers::end(input);
+	auto it = containers::find_if_not(first, last, predicate);
+	return containers::find_if(it, last, predicate) == last;
+};
 
-struct partition_point_t {
-	template<range Input>
-	constexpr auto operator()(Input && input, auto predicate) const {
-		auto count = bounded::integer<0, bounded::builtin_max_value<range_size_t<Input>>>(containers::size(input));
-		auto first = containers::begin(input);
-		if constexpr (numeric_traits::max_value<decltype(count)> == bounded::constant<0>) {
-			return first;
-		} else {
-			while (count > bounded::constant<0>) {
-				auto it = first;
-				auto const step = count / bounded::constant<2>;
-				::containers::advance(it, step);
-				if (predicate(*it)) {
-					first = ::containers::next(it);
-					count -= step + bounded::constant<1>;
-				} else {
-					count = step;
-				}
+inline constexpr auto partition_point = []<range Input>(Input && input, auto predicate) {
+	auto count = bounded::integer<0, bounded::builtin_max_value<range_size_t<Input>>>(containers::size(input));
+	auto first = containers::begin(input);
+	if constexpr (numeric_traits::max_value<decltype(count)> == bounded::constant<0>) {
+		return first;
+	} else {
+		while (count > bounded::constant<0>) {
+			auto it = first;
+			auto const step = count / bounded::constant<2>;
+			::containers::advance(it, step);
+			if (predicate(*it)) {
+				first = ::containers::next(it);
+				count -= step + bounded::constant<1>;
+			} else {
+				count = step;
 			}
-			return first;
 		}
+		return first;
 	}
-} constexpr inline partition_point;
+};
 
 namespace detail {
 
