@@ -5,6 +5,7 @@
 
 #pragma once
 
+#include <concepts>
 #include <type_traits>
 
 namespace bounded {
@@ -15,7 +16,7 @@ struct common_cv_type {
 private:
 	using const_type = std::conditional_t<std::is_const_v<U>, std::add_const_t<T>, T>;
 public:
-	using type = std::conditional_t<std::is_same<std::remove_cv_t<T>, std::remove_cv_t<U>>{},
+	using type = std::conditional_t<std::same_as<std::remove_cv_t<T>, std::remove_cv_t<U>>,
 		std::conditional_t<std::is_volatile_v<U>, std::add_volatile_t<const_type>, const_type>,
 		std::common_type_t<std::decay_t<T>, std::decay_t<U>>
 	>;
@@ -29,7 +30,7 @@ struct add_common_cv_reference {
 private:
 	using CVTarget = common_cv_type_t<common_cv_type_t<Target, std::remove_reference_t<Source0>>, std::remove_reference_t<Source1>>;
 
-	static constexpr bool same_base_type = std::is_same<std::decay_t<Source0>, std::decay_t<Source1>>{};
+	static constexpr bool same_base_type = std::same_as<std::decay_t<Source0>, std::decay_t<Source1>>;
 	static constexpr bool rvalue_reference =
 		std::is_rvalue_reference_v<Source0> and
 		std::is_rvalue_reference_v<Source1> and

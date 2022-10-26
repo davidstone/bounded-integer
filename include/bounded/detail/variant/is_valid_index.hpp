@@ -13,7 +13,7 @@ namespace bounded {
 namespace detail {
 
 template<typename Index, typename... Ts>
-concept matches_exactly_one_type_impl = (constant<0> + ... + bounded::integer(std::is_same_v<Index, Ts>)) == constant<1>;
+concept matches_exactly_one_type_impl = (constant<0> + ... + bounded::integer(std::same_as<Index, Ts>)) == constant<1>;
 
 }	// namespace detail
 

@@ -339,7 +339,7 @@ struct ListInplaceSorter;
 template<std::ptrdiff_t std_sort_threshold, std::ptrdiff_t amerian_flag_sort_threshold, typename CurrentSubKey, view View, typename ExtractKey>
 constexpr void inplace_sort(View to_sort, ExtractKey const & extract_key, NextSort<View, ExtractKey> next_sort, BaseListSortData * sort_data) {
 	using SubKeyType = decltype(CurrentSubKey::sub_key(extract_key(containers::front(to_sort)), sort_data));
-	if constexpr (std::is_same_v<SubKeyType, bool>) {
+	if constexpr (std::same_as<SubKeyType, bool>) {
 		auto middle = containers::partition(to_sort, [&](auto && a){ return !CurrentSubKey::sub_key(extract_key(a), sort_data); });
 		next_sort(
 			range_view(containers::begin(to_sort), middle),
@@ -472,7 +472,7 @@ private:
 
 template<std::ptrdiff_t std_sort_threshold, std::ptrdiff_t amerian_flag_sort_threshold, typename CurrentSubKey, view View, typename ExtractKey>
 constexpr void sort_starter(View to_sort, ExtractKey const & extract_key, BaseListSortData * next_sort_data) {
-	if constexpr (!std::is_same_v<CurrentSubKey, SubKey<void>>) {
+	if constexpr (!std::same_as<CurrentSubKey, SubKey<void>>) {
 		if (containers::size(to_sort) <= bounded::constant<1>) {
 			return;
 		}

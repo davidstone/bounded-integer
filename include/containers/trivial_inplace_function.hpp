@@ -39,7 +39,7 @@ inline constexpr auto alignment_for_capacity = alignof(aligned_storage_helper<ca
 
 template<typename Function, std::size_t capacity, std::size_t alignment, typename R, typename... Args>
 concept trivially_storable =
-	std::is_same_v<std::invoke_result_t<Function, Args...>, R> and
+	std::same_as<std::invoke_result_t<Function, Args...>, R> and
 	(capacity == 0 ? std::is_empty_v<Function> : sizeof(Function) <= capacity) and
 	alignof(Function) <= alignment and
 	std::is_trivially_copyable_v<Function>;

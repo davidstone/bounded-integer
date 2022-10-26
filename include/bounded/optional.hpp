@@ -279,7 +279,7 @@ private:
 
 // A limitation of emulating lazy parameters is that we cannot tell if the user
 // is trying to create an optional function or lazily create an optional value
-template<typename T> requires(!std::is_same_v<T, none_t> and !std::is_invocable_v<T>)
+template<typename T> requires(!std::same_as<T, none_t> and !std::invocable<T>)
 optional(T) -> optional<T>;
 
 constexpr auto make_optional(auto && value) {

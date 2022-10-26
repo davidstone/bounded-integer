@@ -30,7 +30,7 @@ concept has_size_type = requires { typename T::size_type; };
 
 template<range T> requires has_size_type<T> and has_member_size<T>
 struct size_type_impl<T> {
-	static_assert(std::is_same_v<decltype(std::declval<T const &>().size()), typename T::size_type>);
+	static_assert(std::same_as<decltype(std::declval<T const &>().size()), typename T::size_type>);
 	using type = typename T::size_type;
 };
 

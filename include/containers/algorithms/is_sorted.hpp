@@ -20,7 +20,7 @@ struct is_sorted_t {
 		if (first != last) {
 			for (auto next = containers::next(first); next != last; ++next) {
 				// TODO: Handle this issue generically
-				if constexpr (std::is_same_v<decltype(cmp(*next, *first)), bool>) {
+				if constexpr (std::same_as<decltype(cmp(*next, *first)), bool>) {
 					if (cmp(*next, *first)) {
 						return false;
 					}

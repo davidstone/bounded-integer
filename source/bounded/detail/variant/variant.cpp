@@ -102,10 +102,10 @@ constexpr auto value = static_cast<short>(8);
 constexpr auto thing = thing_t(index, value);
 using thingy = decltype(thing[index]);
 
-static_assert(std::is_same_v<thingy, short const &>);
+static_assert(std::same_as<thingy, short const &>);
 
 static_assert(thing[index] == value);
-static_assert(bounded::visit(thing, [](auto x) { return std::is_same_v<decltype(x), short>; }));
+static_assert(bounded::visit(thing, [](auto x) { return std::same_as<decltype(x), short>; }));
 
 constexpr auto test_assignment_from_variant() {
 	auto thing1 = thing_t(index, value);
@@ -137,7 +137,7 @@ static_assert(not std::is_copy_constructible_v<non_copyable_variant_t>);
 static_assert(not std::is_copy_assignable_v<non_copyable_variant_t>);
 static_assert(std::is_move_constructible_v<non_copyable_variant_t>);
 static_assert(std::is_move_assignable_v<non_copyable_variant_t>);
-static_assert(std::is_same_v<decltype(non_copyable_variant_t(bounded::lazy_init, 0_bi, bounded::construct<non_copyable>)[0_bi]), non_copyable &&>);
+static_assert(std::same_as<decltype(non_copyable_variant_t(bounded::lazy_init, 0_bi, bounded::construct<non_copyable>)[0_bi]), non_copyable &&>);
 
 struct non_comparable {
 };

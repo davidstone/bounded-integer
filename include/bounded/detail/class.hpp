@@ -48,7 +48,7 @@ inline constexpr auto builtin_min_value<integer<minimum, maximum>> = minimum;
 // I do not have to specialize the single-argument version, as it just returns
 // the type passed in, which will always work.
 
-template<bounded::bounded_integer LHS, bounded::bounded_integer RHS> requires(std::is_same_v<LHS, std::decay_t<LHS>> and std::is_same_v<RHS, std::decay_t<RHS>>)
+template<bounded::bounded_integer LHS, bounded::bounded_integer RHS> requires std::same_as<LHS, std::decay_t<LHS>> and std::same_as<RHS, std::decay_t<RHS>>
 struct std::common_type<LHS, RHS> {
 private:
 	static inline constexpr auto minimum = bounded::normalize<bounded::detail::safe_min(
@@ -94,8 +94,8 @@ inline constexpr auto constant = constant_t<normalize<value>>{};
 
 template<auto minimum, auto maximum>
 struct integer {
-	static_assert(std::is_same_v<decltype(minimum), std::remove_const_t<decltype(normalize<minimum>)>>);
-	static_assert(std::is_same_v<decltype(maximum), std::remove_const_t<decltype(normalize<maximum>)>>);
+	static_assert(std::same_as<decltype(minimum), std::remove_const_t<decltype(normalize<minimum>)>>);
+	static_assert(std::same_as<decltype(maximum), std::remove_const_t<decltype(normalize<maximum>)>>);
 	static_assert(detail::safe_compare(minimum, maximum) <= 0, "Maximum cannot be less than minimum");
 
 	using underlying_type = detail::underlying_type_t<minimum, maximum>;
@@ -118,7 +118,7 @@ struct integer {
 	}
 
 	template<detail::bounded_by_range<minimum, maximum> T>
-	constexpr explicit(std::is_same_v<T, bool> or std::is_enum_v<T>) integer(T const other):
+	constexpr explicit(std::same_as<T, bool> or std::is_enum_v<T>) integer(T const other):
 		m_value(static_cast<underlying_type>(other))
 	{
 	}

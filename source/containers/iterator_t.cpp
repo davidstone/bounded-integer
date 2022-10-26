@@ -13,15 +13,15 @@ using namespace bounded::literal;
 
 constexpr auto size = 3_bi;
 
-static_assert(std::is_same_v<
+static_assert(std::same_as<
 	containers::iterator_t<containers::array<int, size> const &>,
 	containers::contiguous_iterator<int const, 3>
 >);
-static_assert(std::is_same_v<
+static_assert(std::same_as<
 	containers::iterator_t<containers::array<int, size> &>,
 	containers::contiguous_iterator<int, 3>
 >);
-static_assert(std::is_same_v<
+static_assert(std::same_as<
 	containers::iterator_t<containers::array<int, size> &&>,
 	containers::contiguous_iterator<int, 3>
 >);

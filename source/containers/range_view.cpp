@@ -14,7 +14,7 @@ static_assert(containers::range<containers::range_view<int *>>);
 
 constexpr auto a = containers::array({0, 1, 2, 3, 4});
 
-static_assert(std::is_same_v<
+static_assert(std::same_as<
 	decltype(containers::range_view(a)),
 	containers::range_view<
 		containers::contiguous_iterator<int const, 5>,

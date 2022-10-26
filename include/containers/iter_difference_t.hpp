@@ -5,6 +5,7 @@
 
 #pragma once
 
+#include <concepts>
 #include <type_traits>
 
 namespace containers {
@@ -21,7 +22,7 @@ concept subtractable = requires(Iterator const it) { it - it; };
 
 template<typename T> requires has_difference_type<T> and subtractable<T>
 struct iter_difference_t_impl<T> {
-	static_assert(std::is_same_v<decltype(std::declval<T const &>() - std::declval<T const &>()), typename T::difference_type>);
+	static_assert(std::same_as<decltype(std::declval<T const &>() - std::declval<T const &>()), typename T::difference_type>);
 	using type = typename T::difference_type;
 };
 

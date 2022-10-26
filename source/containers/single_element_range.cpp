@@ -14,9 +14,9 @@
 namespace {
 using namespace bounded::literal;
 
-static_assert(std::is_same_v<decltype(containers::front(containers::single_element_range(std::declval<int const &>()))), int const &>);
-static_assert(std::is_same_v<decltype(containers::front(containers::single_element_range(std::declval<int &&>()))), int &&>);
-static_assert(std::is_same_v<decltype(containers::front(containers::single_element_range(std::declval<int &>()))), int &>);
+static_assert(std::same_as<decltype(containers::front(containers::single_element_range(std::declval<int const &>()))), int const &>);
+static_assert(std::same_as<decltype(containers::front(containers::single_element_range(std::declval<int &&>()))), int &&>);
+static_assert(std::same_as<decltype(containers::front(containers::single_element_range(std::declval<int &>()))), int &>);
 
 constexpr auto value = 9;
 constexpr auto range = containers::single_element_range(value);

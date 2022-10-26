@@ -7,6 +7,7 @@
 
 #include <bounded/detail/max_builtin.hpp>
 
+#include <concepts>
 #include <type_traits>
 
 namespace bounded {
@@ -45,16 +46,16 @@ concept bounded_integer = detail::is_bounded_integer<T>;
 namespace detail {
 
 template<typename T>
-concept builtin_arithmetic = (std::is_arithmetic_v<T> and !std::is_same_v<T, bool>) or std::is_same_v<T, detail::max_signed_t> or std::is_same_v<T, detail::max_unsigned_t>;
+concept builtin_arithmetic = (std::is_arithmetic_v<T> and !std::same_as<T, bool>) or std::same_as<T, detail::max_signed_t> or std::same_as<T, detail::max_unsigned_t>;
 
 template<typename T>
 concept builtin_integer = builtin_arithmetic<T> and !std::is_floating_point_v<T>;
 
 template<typename T>
-concept signed_builtin = builtin_integer<T> and (std::is_signed_v<T> or std::is_same_v<T, detail::max_signed_t>);
+concept signed_builtin = builtin_integer<T> and (std::is_signed_v<T> or std::same_as<T, detail::max_signed_t>);
 
 template<typename T>
-concept unsigned_builtin = builtin_integer<T> and (std::is_unsigned_v<T> or std::is_same_v<T, detail::max_unsigned_t>);
+concept unsigned_builtin = builtin_integer<T> and (std::is_unsigned_v<T> or std::same_as<T, detail::max_unsigned_t>);
 
 template<typename T>
 inline constexpr auto is_integral_constant_of_integral = false;
@@ -68,6 +69,6 @@ template<typename T>
 concept integral = detail::builtin_integer<T> or bounded_integer<T> or detail::is_integral_constant_of_integral<T>;
 
 template<typename T>
-concept isomorphic_to_integral = integral<T> or std::is_enum_v<T> or std::is_same_v<T, bool>;
+concept isomorphic_to_integral = integral<T> or std::is_enum_v<T> or std::same_as<T, bool>;
 
 } // namespace bounded

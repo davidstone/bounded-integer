@@ -39,7 +39,7 @@ constexpr auto concatenate_prepend_append(Result &, iterator_t<Result &>) {
 // all elements in result are already where they belong.
 template<typename Result>
 constexpr auto concatenate_prepend_append(Result & result, iterator_t<Result &> const it, auto && range, auto && ... ranges) {
-	if constexpr (std::is_same_v<Result, std::remove_reference_t<decltype(range)>>) {
+	if constexpr (std::same_as<Result, std::remove_reference_t<decltype(range)>>) {
 		if (std::addressof(result) == std::addressof(range)) {
 			(..., ::containers::append(result, OPERATORS_FORWARD(ranges)));
 			return;
@@ -60,7 +60,7 @@ constexpr auto reusable_concatenate_container(reusable_concatenate_t<Result, Int
 	if (result.ptr) {
 		return result;
 	}
-	if constexpr (std::is_same_v<Result, Range>) {
+	if constexpr (std::same_as<Result, Range>) {
 		if (range.capacity() >= total_size) {
 			return reusable_concatenate_t<Result, Integer>{std::addressof(range), result.before_size};
 		}

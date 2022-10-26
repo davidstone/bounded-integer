@@ -17,11 +17,11 @@ namespace {
 
 using type1 = bounded::integer<1, 5>;
 using type2 = bounded::integer<3, 10>;
-static_assert(std::is_same_v<std::common_type_t<type1, type2>, bounded::integer<1, 10>>);
+static_assert(std::same_as<std::common_type_t<type1, type2>, bounded::integer<1, 10>>);
 using type3 = bounded::integer<-5, -5>;
-static_assert(std::is_same_v<std::common_type_t<type1, type2, type3>, bounded::integer<-5, 10>>);
+static_assert(std::same_as<std::common_type_t<type1, type2, type3>, bounded::integer<-5, 10>>);
 using type4 = bounded::integer<0, 0>;
-static_assert(std::is_same_v<std::common_type_t<type1, type2, type3, type4>, bounded::integer<-5, 10>>);
+static_assert(std::same_as<std::common_type_t<type1, type2, type3, type4>, bounded::integer<-5, 10>>);
 
 static_assert(bounded::detail::overlapping_integer<bounded::integer<0, 0>, 0, 0>, "Type should overlap its own range.");
 static_assert(!bounded::detail::overlapping_integer<bounded::integer<0, 0>, 1, 1>, "Type should not overlap a disjoint range.");

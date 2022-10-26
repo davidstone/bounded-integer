@@ -16,8 +16,8 @@ namespace detail {
 
 template<typename Iterator>
 concept only_input_or_output_iterator =
-	std::is_same_v<typename Iterator::iterator_category, std::input_iterator_tag> or
-	std::is_same_v<typename Iterator::iterator_category, std::output_iterator_tag>;
+	std::same_as<typename Iterator::iterator_category, std::input_iterator_tag> or
+	std::same_as<typename Iterator::iterator_category, std::output_iterator_tag>;
 
 } // namespace detail
 

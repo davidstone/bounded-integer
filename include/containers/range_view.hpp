@@ -29,10 +29,10 @@ struct compute_end_from_size {
 };
 
 template<typename T>
-concept explicit_sentinel = !std::is_same_v<T, compute_end_from_size>;
+concept explicit_sentinel = !std::same_as<T, compute_end_from_size>;
 
 template<typename Sentinel, typename Iterator>
-concept range_view_sentinel = sentinel_for<Sentinel, Iterator> or std::is_same_v<Sentinel, compute_end_from_size>;
+concept range_view_sentinel = sentinel_for<Sentinel, Iterator> or std::same_as<Sentinel, compute_end_from_size>;
 
 struct no_explicit_size {
 	constexpr no_explicit_size() = default;
@@ -41,10 +41,10 @@ struct no_explicit_size {
 };
 
 template<typename T>
-concept explicit_size = !std::is_same_v<T, no_explicit_size>;
+concept explicit_size = !std::same_as<T, no_explicit_size>;
 
 template<typename T>
-concept range_view_size = bounded::integral<T> or std::is_same_v<T, no_explicit_size>;
+concept range_view_size = bounded::integral<T> or std::same_as<T, no_explicit_size>;
 
 } // namespace detail
 

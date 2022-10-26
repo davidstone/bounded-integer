@@ -18,7 +18,7 @@ using namespace bounded::literal;
 
 template<typename LHS, typename RHS>
 constexpr bool equal_values_and_types(LHS const & lhs, RHS const & rhs) {
-	static_assert(std::is_same_v<containers::range_value_t<LHS>, containers::range_value_t<RHS>>);
+	static_assert(std::same_as<containers::range_value_t<LHS>, containers::range_value_t<RHS>>);
 	return containers::equal(lhs, rhs);
 }
 

@@ -32,7 +32,7 @@ template<typename InputRange, typename OutputIterator>
 concept memcpyable =
 	contiguous_range<InputRange> and
 	to_addressable<OutputIterator> and
-	std::is_same_v<range_value_t<InputRange>, iter_value_t<OutputIterator>> and
+	std::same_as<range_value_t<InputRange>, iter_value_t<OutputIterator>> and
 	std::is_trivially_copyable_v<iter_value_t<OutputIterator>>;
 
 } // namespace detail

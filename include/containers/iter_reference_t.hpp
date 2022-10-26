@@ -18,7 +18,7 @@ concept has_reference_type = requires { typename Iterator::reference_type; };
 template<typename Iterator, typename T>
 concept reference_type_matches =
 	!has_reference_type<Iterator> or
-	std::is_same_v<typename Iterator::reference_type, T>;
+	std::same_as<typename Iterator::reference_type, T>;
 
 template<typename Iterator>
 struct iter_reference_t_impl {

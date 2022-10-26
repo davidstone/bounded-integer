@@ -18,18 +18,18 @@ namespace {
 using namespace bounded::literal;
 
 static_assert(
-	std::is_same<std::common_type_t<bounded::none_t, int>, bounded::optional<int>>{},
+	std::same_as<std::common_type_t<bounded::none_t, int>, bounded::optional<int>>,
 	"common_type with none_t first wrong."
 );
 static_assert(
-	std::is_same<std::common_type_t<int, bounded::none_t>, bounded::optional<int>>{},
+	std::same_as<std::common_type_t<int, bounded::none_t>, bounded::optional<int>>,
 	"common_type with none_t last wrong."
 );
 static_assert(
-	std::is_same<
+	std::same_as<
 		std::common_type_t<bounded::constant_t<1>, bounded::none_t, bounded::constant_t<5>, bounded::none_t>,
 		bounded::optional<bounded::integer<1, 5>>
-	>{},
+	>,
 	"common_type with bounded::integer and none_t wrong."
 );
 
@@ -125,7 +125,7 @@ constexpr auto check_integer_optional() {
 	optional_integer = integer_type(7_bi);
 	BOUNDED_TEST(optional_integer);
 
-	static_assert(std::is_same_v<decltype(*optional_integer), integer_type &>, "Incorrect type of *optional.");
+	static_assert(std::same_as<decltype(*optional_integer), integer_type &>, "Incorrect type of *optional.");
 	*optional_integer = integer_type(1_bi);
 	BOUNDED_TEST(optional_integer);
 	BOUNDED_TEST(*optional_integer == 1_bi);
@@ -154,7 +154,7 @@ constexpr auto check_non_trivial_optional() {
 	BOUNDED_TEST(*optional_int == 3);
 	BOUNDED_TEST(*optional_int != 4);
 
-	static_assert(std::is_same_v<decltype(*optional_int), type &>, "Incorrect type of *optional.");
+	static_assert(std::same_as<decltype(*optional_int), type &>, "Incorrect type of *optional.");
 	*optional_int = type(5);
 	BOUNDED_TEST(optional_int);
 	BOUNDED_TEST(*optional_int == 5);

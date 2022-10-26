@@ -10,5 +10,5 @@
 #include <cstddef>
 #include <type_traits>
 
-static_assert(std::is_same_v<containers::offset_type<int *>, std::ptrdiff_t>);
-static_assert(std::is_same_v<containers::offset_type<containers::contiguous_iterator<int, 5>>, bounded::integer<0, 5>>);
+static_assert(std::same_as<containers::offset_type<int *>, std::ptrdiff_t>);
+static_assert(std::same_as<containers::offset_type<containers::contiguous_iterator<int, 5>>, bounded::integer<0, 5>>);

@@ -25,7 +25,7 @@ constexpr auto as_builtin_integer(T const x) {
 	} else if constexpr (std::is_enum_v<T>) {
 		return std::to_underlying(x);
 	} else {
-		static_assert(builtin_integer<T> or std::is_same_v<T, bool>);
+		static_assert(builtin_integer<T> or std::same_as<T, bool>);
 		return x;
 	}
 }

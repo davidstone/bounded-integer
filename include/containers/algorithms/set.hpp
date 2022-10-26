@@ -112,7 +112,7 @@ public:
 	// set matches, the other must.
 	template<
 		typename RHSMembers, typename RHSForwardIterator1, typename RHSForwardIterator2
-	> requires (std::is_same_v<std::remove_const_t<Members>, std::remove_const_t<RHSMembers>>)
+	> requires std::same_as<std::remove_const_t<Members>, std::remove_const_t<RHSMembers>>
 	friend constexpr auto operator<=>(
 		set_intersection_pair_iterator const lhs,
 		set_intersection_pair_iterator<RHSMembers, RHSForwardIterator1, RHSForwardIterator2> const rhs
@@ -121,7 +121,7 @@ public:
 	}
 	template<
 		typename RHSMembers, typename RHSForwardIterator1, typename RHSForwardIterator2
-	> requires (std::is_same_v<std::remove_const_t<Members>, std::remove_const_t<RHSMembers>>)
+	> requires std::same_as<std::remove_const_t<Members>, std::remove_const_t<RHSMembers>>
 	friend constexpr auto operator==(
 		set_intersection_pair_iterator const lhs,
 		set_intersection_pair_iterator<RHSMembers, RHSForwardIterator1, RHSForwardIterator2> const rhs

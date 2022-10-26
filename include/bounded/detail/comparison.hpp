@@ -39,10 +39,10 @@ constexpr auto safe_equal(LHS const lhs, RHS const rhs) -> bool {
 	} else if constexpr (numeric_traits::max_value<LHS> <= max_signed and numeric_traits::max_value<RHS> <= max_signed) {
 		return static_cast<detail::max_signed_t>(lhs) == static_cast<detail::max_signed_t>(rhs);
 	} else if constexpr (signed_builtin<LHS>) {
-		static_assert(std::is_same_v<RHS, detail::max_unsigned_t>);
+		static_assert(std::same_as<RHS, detail::max_unsigned_t>);
 		return lhs >= 0 and static_cast<RHS>(lhs) == rhs;
 	} else {
-		static_assert(std::is_same_v<LHS, detail::max_unsigned_t>);
+		static_assert(std::same_as<LHS, detail::max_unsigned_t>);
 		return rhs >= 0 and lhs == static_cast<LHS>(rhs);
 	}
 }

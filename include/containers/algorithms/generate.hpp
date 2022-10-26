@@ -124,7 +124,7 @@ namespace detail {
 
 template<typename T>
 using generate_index_type = to_index_type<std::conditional_t<
-	std::is_same_v<T, bounded::constant_t<0>>,
+	std::same_as<T, bounded::constant_t<0>>,
 	bounded::constant_t<1>,
 	T
 >>;

@@ -18,7 +18,7 @@ concept has_value_type = requires { typename Iterator::value_type; };
 template<typename Iterator, typename T>
 concept value_type_matches =
 	!has_value_type<Iterator> or
-	std::is_same_v<typename Iterator::value_type, T>;
+	std::same_as<typename Iterator::value_type, T>;
 
 template<typename Iterator>
 struct iter_value_t_impl {

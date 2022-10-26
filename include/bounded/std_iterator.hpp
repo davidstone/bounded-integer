@@ -24,12 +24,12 @@ namespace detail {
 template<typename T, typename value_type = std::remove_cvref_t<decltype(*std::declval<T>())>>
 concept std_random_access_iterator =
 	!std::is_void_v<value_type> and !std::is_reference_v<value_type> and !std::is_const_v<value_type> and (
-		std::is_same_v<T, std::string::iterator> or
-		std::is_same_v<T, std::string::const_iterator> or
-		std::is_same_v<T, typename std::deque<value_type>::iterator> or
-		std::is_same_v<T, typename std::deque<value_type>::const_iterator> or
-		std::is_same_v<T, typename std::vector<value_type>::iterator> or
-		std::is_same_v<T, typename std::vector<value_type>::const_iterator>
+		std::same_as<T, std::string::iterator> or
+		std::same_as<T, std::string::const_iterator> or
+		std::same_as<T, typename std::deque<value_type>::iterator> or
+		std::same_as<T, typename std::deque<value_type>::const_iterator> or
+		std::same_as<T, typename std::vector<value_type>::iterator> or
+		std::same_as<T, typename std::vector<value_type>::const_iterator>
 	);
 
 template<
@@ -43,14 +43,14 @@ concept std_map_bidirectional_iterator =
 	!std::is_reference_v<key_type> and !std::is_const_v<key_type> and
 	!std::is_reference_v<mapped_type> and !std::is_const_v<mapped_type> and
 	(
-		std::is_same_v<T, typename std::map<key_type, mapped_type>::iterator> or
-		std::is_same_v<T, typename std::map<key_type, mapped_type>::const_iterator> or
-		std::is_same_v<T, typename std::multimap<key_type, mapped_type>::iterator> or
-		std::is_same_v<T, typename std::multimap<key_type, mapped_type>::const_iterator> or
-		std::is_same_v<T, typename std::unordered_map<key_type, mapped_type>::iterator> or
-		std::is_same_v<T, typename std::unordered_map<key_type, mapped_type>::const_iterator> or
-		std::is_same_v<T, typename std::unordered_multimap<key_type, mapped_type>::iterator> or
-		std::is_same_v<T, typename std::unordered_multimap<key_type, mapped_type>::const_iterator>
+		std::same_as<T, typename std::map<key_type, mapped_type>::iterator> or
+		std::same_as<T, typename std::map<key_type, mapped_type>::const_iterator> or
+		std::same_as<T, typename std::multimap<key_type, mapped_type>::iterator> or
+		std::same_as<T, typename std::multimap<key_type, mapped_type>::const_iterator> or
+		std::same_as<T, typename std::unordered_map<key_type, mapped_type>::iterator> or
+		std::same_as<T, typename std::unordered_map<key_type, mapped_type>::const_iterator> or
+		std::same_as<T, typename std::unordered_multimap<key_type, mapped_type>::iterator> or
+		std::same_as<T, typename std::unordered_multimap<key_type, mapped_type>::const_iterator>
 	);
 
 template<typename T, typename value_type = std::remove_cvref_t<decltype(*std::declval<T>())>>
@@ -58,24 +58,24 @@ concept std_bidirectional_iterator =
 	!std::is_void_v<value_type> and !std::is_reference_v<value_type> and !std::is_const_v<value_type> and (
 		std_random_access_iterator<T> or
 		std_map_bidirectional_iterator<T> or
-		std::is_same_v<T, typename std::list<value_type>::iterator> or
-		std::is_same_v<T, typename std::list<value_type>::const_iterator> or
-		std::is_same_v<T, typename std::set<value_type>::iterator> or
-		std::is_same_v<T, typename std::set<value_type>::const_iterator> or
-		std::is_same_v<T, typename std::multiset<value_type>::iterator> or
-		std::is_same_v<T, typename std::multiset<value_type>::const_iterator> or
-		std::is_same_v<T, typename std::unordered_set<value_type>::iterator> or
-		std::is_same_v<T, typename std::unordered_set<value_type>::const_iterator> or
-		std::is_same_v<T, typename std::unordered_multiset<value_type>::iterator> or
-		std::is_same_v<T, typename std::unordered_multiset<value_type>::const_iterator>
+		std::same_as<T, typename std::list<value_type>::iterator> or
+		std::same_as<T, typename std::list<value_type>::const_iterator> or
+		std::same_as<T, typename std::set<value_type>::iterator> or
+		std::same_as<T, typename std::set<value_type>::const_iterator> or
+		std::same_as<T, typename std::multiset<value_type>::iterator> or
+		std::same_as<T, typename std::multiset<value_type>::const_iterator> or
+		std::same_as<T, typename std::unordered_set<value_type>::iterator> or
+		std::same_as<T, typename std::unordered_set<value_type>::const_iterator> or
+		std::same_as<T, typename std::unordered_multiset<value_type>::iterator> or
+		std::same_as<T, typename std::unordered_multiset<value_type>::const_iterator>
 	);
 
 template<typename T, typename value_type = std::remove_cvref_t<decltype(*std::declval<T>())>>
 concept std_iterator =
 	!std::is_void_v<value_type> and !std::is_reference_v<value_type> and !std::is_const_v<value_type> and (
 		std_bidirectional_iterator<T> or
-		std::is_same_v<T, typename std::forward_list<value_type>::iterator> or
-		std::is_same_v<T, typename std::forward_list<value_type>::const_iterator>
+		std::same_as<T, typename std::forward_list<value_type>::iterator> or
+		std::same_as<T, typename std::forward_list<value_type>::const_iterator>
 	);
 
 } // namespace detail

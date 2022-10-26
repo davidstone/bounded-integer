@@ -9,7 +9,7 @@ namespace {
 
 using integer = bounded::integer<0, 0>;
 
-static_assert(std::is_same_v<
+static_assert(std::same_as<
 	decltype(std::hash<integer>()(integer())),
 	decltype(std::hash<integer::underlying_type>()(integer::underlying_type()))
 >);

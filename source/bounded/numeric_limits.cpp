@@ -17,7 +17,7 @@ constexpr auto check_numeric_limits() {
 		bounded::normalize<int_limits::min()>,
 		bounded::normalize<int_limits::max()>
 	>;
-	static_assert(std::is_same_v<typename bounded_t::underlying_type, integer>, "Incorrect underlying_type.");
+	static_assert(std::same_as<typename bounded_t::underlying_type, integer>, "Incorrect underlying_type.");
 	using bounded_limits = std::numeric_limits<bounded_t>;
 	static_assert(sizeof(bounded_t) == sizeof(integer), "bounded::integer wrong size.");
 

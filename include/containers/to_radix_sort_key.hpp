@@ -50,11 +50,11 @@ constexpr auto to_radix_sort_key(std::byte const value) {
 template<typename T> requires std::is_arithmetic_v<T>
 constexpr auto to_radix_sort_key(T const value) {
 	constexpr auto is_character_type =
-		std::is_same_v<T, char> or
-		std::is_same_v<T, char8_t> or
-		std::is_same_v<T, char16_t> or
-		std::is_same_v<T, char32_t> or
-		std::is_same_v<T, wchar_t>;
+		std::same_as<T, char> or
+		std::same_as<T, char8_t> or
+		std::same_as<T, char16_t> or
+		std::same_as<T, char32_t> or
+		std::same_as<T, wchar_t>;
 
 	if constexpr (std::is_floating_point_v<T>) {
 		static_assert(std::numeric_limits<T>::is_iec559);

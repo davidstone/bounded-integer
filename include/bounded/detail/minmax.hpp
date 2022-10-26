@@ -52,7 +52,7 @@ struct extreme_value<Compare, LHS, RHS> {
 		constexpr auto maximum = select(numeric_traits::max_value<lhs_t>, numeric_traits::max_value<rhs_t>);
 		using type = integer<minimum, maximum>;
 		using result_t = detail::add_common_cv_reference_t<type, LHS, RHS>;
-		if constexpr (std::is_same_v<std::remove_cvref_t<result_t>, lhs_t> and std::is_same_v<lhs_t, rhs_t>) {
+		if constexpr (std::same_as<std::remove_cvref_t<result_t>, lhs_t> and std::same_as<lhs_t, rhs_t>) {
 			return compare(rhs, lhs) ?
 				OPERATORS_FORWARD(rhs) :
 				OPERATORS_FORWARD(lhs);

@@ -111,7 +111,7 @@ struct counted_iterator : iterator_category_base<Iterator> {
 	}
 	template<random_access_sentinel_for<Iterator> Sentinel, extra_elements_policy policy>
 	friend constexpr auto operator-(counted_sentinel<Sentinel, policy> const & lhs, counted_iterator const & rhs) {
-		static_assert(std::is_same_v<
+		static_assert(std::same_as<
 			decltype(rhs.m_count),
 			decltype(bounded::min(rhs.m_count, lhs.base() - rhs.m_it))
 		>);

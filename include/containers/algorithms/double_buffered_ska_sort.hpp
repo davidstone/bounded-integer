@@ -187,7 +187,7 @@ constexpr bool double_buffered_tuple_sort(range auto & source, range auto & buff
 
 constexpr auto double_buffered_sort_impl(range auto & source, range auto & buffer, auto const & original_extractor, auto const & current_extractor) -> bool {
 	using key_t = std::decay_t<decltype(current_extractor(containers::front(source)))>;
-	if constexpr (std::is_same_v<key_t, bool>) {
+	if constexpr (std::same_as<key_t, bool>) {
 		containers::detail::bool_sort_copy(source, buffer, current_extractor);
 		return true;
 	} else if constexpr (std::is_unsigned_v<key_t>) {

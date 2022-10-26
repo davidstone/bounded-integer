@@ -7,4 +7,4 @@
 
 #include <cstddef>
 
-static_assert(std::is_same_v<containers::iter_difference_t<int *>, std::ptrdiff_t>);
+static_assert(std::same_as<containers::iter_difference_t<int *>, std::ptrdiff_t>);

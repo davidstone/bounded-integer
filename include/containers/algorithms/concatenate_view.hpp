@@ -47,7 +47,7 @@ constexpr auto assert_same_ends(LHS const & lhs, RHS const & rhs) {
 }
 
 template<typename Category, typename RangeView>
-concept one_is_category = std::is_same_v<typename iterator_t<RangeView>::iterator_category, Category>;
+concept one_is_category = std::same_as<typename iterator_t<RangeView>::iterator_category, Category>;
 
 template<typename Category, typename... RangeViews>
 inline constexpr bool any_is_category = (
@@ -112,7 +112,7 @@ struct concatenate_view_iterator {
 	OPERATORS_ARROW_DEFINITIONS
 
 	template<typename Offset> requires(
-		std::is_same_v<Offset, bounded::constant_t<1>> or
+		std::same_as<Offset, bounded::constant_t<1>> or
 		(!bounded::bounded_integer<difference_type> and numeric_traits::max_value<Offset> >= bounded::constant<0> and (... and forward_random_access_range<RangeViews>)) or
 		(
 			std::convertible_to<Offset, difference_type> and

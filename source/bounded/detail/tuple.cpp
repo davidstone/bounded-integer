@@ -38,12 +38,12 @@ static_assert(std::is_empty_v<type>);
 #endif
 static_assert(std::is_trivially_default_constructible_v<type>);
 static_assert(std::is_trivially_copyable_v<type>);
-static_assert(std::is_same_v<
+static_assert(std::same_as<
 	decltype(type()[0_bi]),
 	empty &&
 >);
 static_assert(!constant_indexable_by<type, 1>);
-static_assert(std::is_same_v<
+static_assert(std::same_as<
 	decltype(type()[bounded::type<empty>]),
 	empty &&
 >);
@@ -59,11 +59,11 @@ static_assert(std::is_empty_v<type>);
 #endif
 static_assert(std::is_trivially_default_constructible_v<type>);
 static_assert(std::is_trivially_copyable_v<type>);
-static_assert(std::is_same_v<
+static_assert(std::same_as<
 	decltype(type()[0_bi]),
 	empty &&
 >);
-static_assert(std::is_same_v<
+static_assert(std::same_as<
 	decltype(type()[1_bi]),
 	empty &&
 >);
@@ -81,12 +81,12 @@ static_assert(std::is_empty_v<type>);
 #endif
 static_assert(std::is_trivially_default_constructible_v<type>);
 static_assert(std::is_trivially_copyable_v<type>);
-static_assert(std::is_same_v<
+static_assert(std::same_as<
 	decltype(type()[0_bi]),
 	bounded::tuple<> &&
 >);
 static_assert(!constant_indexable_by<type, 1>);
-static_assert(std::is_same_v<
+static_assert(std::same_as<
 	decltype(type()[bounded::type_t<bounded::tuple<>>()]),
 	bounded::tuple<> &&
 >);
@@ -102,20 +102,20 @@ static_assert(std::is_empty_v<type>);
 #endif
 static_assert(std::is_trivially_default_constructible_v<type>);
 static_assert(std::is_trivially_copyable_v<type>);
-static_assert(std::is_same_v<
+static_assert(std::same_as<
 	decltype(type()[0_bi]),
 	empty &&
 >);
-static_assert(std::is_same_v<
+static_assert(std::same_as<
 	decltype(type()[1_bi]),
 	bounded::tuple<empty> &&
 >);
 static_assert(!constant_indexable_by<type, 2>);
-static_assert(std::is_same_v<
+static_assert(std::same_as<
 	decltype(type()[bounded::type<empty>]),
 	empty &&
 >);
-static_assert(std::is_same_v<
+static_assert(std::same_as<
 	decltype(type()[bounded::type_t<bounded::tuple<empty>>()]),
 	bounded::tuple<empty> &&
 >);
@@ -131,11 +131,11 @@ static_assert(std::is_empty_v<type>);
 #endif
 static_assert(std::is_trivially_default_constructible_v<type>);
 static_assert(std::is_trivially_copyable_v<type>);
-static_assert(std::is_same_v<
+static_assert(std::same_as<
 	decltype(type()[0_bi]),
 	bounded::tuple<empty> &&
 >);
-static_assert(std::is_same_v<
+static_assert(std::same_as<
 	decltype(type()[1_bi]),
 	bounded::tuple<empty> &&
 >);
@@ -164,10 +164,10 @@ constexpr auto a = bounded::tuple<int, empty, int>(0, empty{}, 5);
 
 static_assert(a[0_bi] == 0);
 
-static_assert(std::is_same_v<decltype(a[1_bi]), empty const &>);
+static_assert(std::same_as<decltype(a[1_bi]), empty const &>);
 
-static_assert(std::is_same_v<decltype(bounded::tuple<int>{}[0_bi]), int &&>);
-static_assert(std::is_same_v<decltype(bounded::tuple<empty>{}[0_bi]), empty &&>);
+static_assert(std::same_as<decltype(bounded::tuple<int>{}[0_bi]), int &&>);
+static_assert(std::same_as<decltype(bounded::tuple<empty>{}[0_bi]), empty &&>);
 
 struct different_empty {};
 // Work around https://gcc.gnu.org/bugzilla/show_bug.cgi?id=98995
@@ -176,8 +176,8 @@ static_assert(std::is_empty_v<bounded::tuple<empty, different_empty>>);
 #endif
 using nested_t = bounded::tuple<bounded::tuple<empty, different_empty>>;
 constexpr auto nested = nested_t{};
-static_assert(std::is_same_v<decltype(nested[0_bi][0_bi]), empty const &>);
-static_assert(std::is_same_v<decltype(nested[0_bi][1_bi]), different_empty const &>);
+static_assert(std::same_as<decltype(nested[0_bi][0_bi]), empty const &>);
+static_assert(std::same_as<decltype(nested[0_bi][1_bi]), different_empty const &>);
 
 static_assert(!indexable_by<nested_t, bounded::constant_t<1>>);
 
@@ -200,7 +200,7 @@ static_assert(non_movable_constructor() == non_movable());
 static_assert(bounded::constructible_from<non_movable, non_movable>);
 static_assert(bounded::detail::tuple_value<0, non_movable>(bounded::lazy_init, non_movable_constructor)[0_bi] == non_movable());
 static_assert(bounded::constructible_from<bounded::tuple<non_movable>, bounded::lazy_init_t, decltype(non_movable_constructor)>);
-static_assert(std::is_same_v<bounded::tuple_element<0, bounded::tuple<non_movable>>, non_movable>);
+static_assert(std::same_as<bounded::tuple_element<0, bounded::tuple<non_movable>>, non_movable>);
 constexpr bounded::tuple<non_movable> non_movable_tuple = {};
 static_assert(non_movable_tuple[0_bi] == non_movable{});
 
@@ -232,10 +232,10 @@ struct {
 
 constexpr auto input_tuple = bounded::make_tuple(0, 1.0F, 2, 3.0F, 4);
 constexpr auto type_swapped = bounded::transform(increment_and_swap_types, input_tuple);
-static_assert(std::is_same_v<decltype(type_swapped), bounded::tuple<float, int, float, int, float> const>);
+static_assert(std::same_as<decltype(type_swapped), bounded::tuple<float, int, float, int, float> const>);
 static_assert(type_swapped == bounded::make_tuple(1.0F, 2, 3.0F, 4, 5.0F));
 constexpr auto merged = bounded::transform(increment_and_swap_types, input_tuple, input_tuple);
-static_assert(std::is_same_v<decltype(merged), bounded::tuple<float, int, float, int, float> const>);
+static_assert(std::same_as<decltype(merged), bounded::tuple<float, int, float, int, float> const>);
 static_assert(merged == bounded::make_tuple(0.0F, 2, 4.0F, 6, 8.0F));
 
 

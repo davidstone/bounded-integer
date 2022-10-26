@@ -154,7 +154,7 @@ public:
 	)
 	constexpr auto & operator=(T && value) & {
 		visit(*this, [&](auto & original) {
-			if constexpr (std::is_same_v<std::decay_t<decltype(original)>, std::decay_t<T>>) {
+			if constexpr (std::same_as<std::decay_t<decltype(original)>, std::decay_t<T>>) {
 				original = OPERATORS_FORWARD(value);
 			} else {
 				this->emplace_impl(

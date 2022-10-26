@@ -35,7 +35,7 @@ concept initializer_range =
 // This avoids checking properties of an incomplete type
 template<typename Source, typename Target>
 concept constructor_initializer_range =
-	!std::is_same_v<std::remove_cvref_t<Source>, Target> and
+	!std::same_as<std::remove_cvref_t<Source>, Target> and
 	initializer_range<Source, Target>;
 
 } // namespace containers

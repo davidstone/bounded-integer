@@ -5,12 +5,12 @@
 
 #include <bounded/nth_type.hpp>
 
-#include <type_traits>
+#include <concepts>
 
 namespace {
 
-static_assert(std::is_same_v<bounded::nth_type<0, int>, int>);
-static_assert(std::is_same_v<bounded::nth_type<0, int, long>, int>);
-static_assert(std::is_same_v<bounded::nth_type<1, int, long>, long>);
+static_assert(std::same_as<bounded::nth_type<0, int>, int>);
+static_assert(std::same_as<bounded::nth_type<0, int, long>, int>);
+static_assert(std::same_as<bounded::nth_type<1, int, long>, long>);
 
 }	// namespace
