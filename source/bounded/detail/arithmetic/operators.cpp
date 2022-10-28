@@ -23,7 +23,7 @@ static_assert(homogeneous_equals(
 ));
 static_assert(homogeneous_equals(
 	unsigned_max - signed_max,
-	bounded::constant<static_cast<bounded::detail::max_unsigned_t>(unsigned_max) - static_cast<bounded::detail::max_unsigned_t>(signed_max)>
+	bounded::constant<static_cast<numeric_traits::max_unsigned_t>(unsigned_max) - static_cast<numeric_traits::max_unsigned_t>(signed_max)>
 ));
 static_assert(homogeneous_equals(
 	bounded::integer<1, 10>(bounded::constant<9>) - bounded::integer<-3, 11>(bounded::constant<4>),

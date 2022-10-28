@@ -10,10 +10,10 @@
 #include <bounded/detail/class.hpp>
 #include <bounded/detail/comparison.hpp>
 #include <bounded/detail/log.hpp>
-#include <bounded/detail/max_builtin.hpp>
 #include <bounded/detail/minmax.hpp>
 #include <bounded/detail/size_of.hpp>
 
+#include <numeric_traits/int128.hpp>
 #include <numeric_traits/min_max_value.hpp>
 
 #include <climits>
@@ -30,9 +30,9 @@ constexpr auto digits(auto const minimum, auto const maximum, auto const base) n
 	static_assert(base > constant<1>, "Base must be greater than 1.");
 	if constexpr (minimum > constant<0> or maximum <= constant<0>) {
 		return constant<0>;
-	} else if constexpr (maximum == constant<numeric_traits::max_value<max_unsigned_t>>) {
+	} else if constexpr (maximum == constant<numeric_traits::max_value<numeric_traits::max_unsigned_t>>) {
 		if constexpr (base == constant<2>) {
-			return size_of_bits<max_unsigned_t>;
+			return size_of_bits<numeric_traits::max_unsigned_t>;
 		} else {
 			// TODO: Not quite right, but avoids overflow
 			return ::bounded::log(maximum, base);

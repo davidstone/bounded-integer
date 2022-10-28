@@ -5,7 +5,7 @@
 
 #pragma once
 
-#include <bounded/detail/max_builtin.hpp>
+#include <numeric_traits/int128.hpp>
 
 #include <concepts>
 #include <type_traits>
@@ -46,10 +46,10 @@ concept bounded_integer = detail::is_bounded_integer<T>;
 namespace detail {
 
 template<typename T>
-concept signed_builtin = std::signed_integral<T> or std::same_as<T, detail::max_signed_t>;
+concept signed_builtin = numeric_traits::signed_builtin<T>;
 
 template<typename T>
-concept unsigned_builtin = (std::unsigned_integral<T> and !std::same_as<T, bool>) or std::same_as<T, detail::max_unsigned_t>;
+concept unsigned_builtin = numeric_traits::unsigned_builtin<T> and !std::same_as<T, bool>;
 
 template<typename T>
 concept builtin_integer = signed_builtin<T> or unsigned_builtin<T>;

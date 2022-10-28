@@ -5,8 +5,9 @@
 
 #pragma once
 
-#include <bounded/detail/max_builtin.hpp>
 #include <bounded/detail/comparison.hpp>
+
+#include <numeric_traits/int128.hpp>
 
 #include <type_traits>
 
@@ -14,7 +15,7 @@ namespace bounded::detail {
 
 template<typename LHS, typename RHS>
 constexpr auto safe_min(LHS const lhs, RHS const rhs) {
-	using result_t = std::conditional_t<unsigned_builtin<LHS> and unsigned_builtin<RHS>, max_unsigned_t, max_signed_t>;
+	using result_t = std::conditional_t<numeric_traits::unsigned_builtin<LHS> and numeric_traits::unsigned_builtin<RHS>, numeric_traits::max_unsigned_t, numeric_traits::max_signed_t>;
 	return ::bounded::detail::safe_compare(lhs, rhs) <= 0 ?
 		static_cast<result_t>(lhs) :
 		static_cast<result_t>(rhs);
@@ -29,7 +30,7 @@ constexpr auto safe_min(auto const arg0, auto const arg1, auto const ... args) {
 
 template<typename LHS, typename RHS>
 constexpr auto safe_max(LHS const lhs, RHS const rhs) {
-	using result_t = std::conditional_t<signed_builtin<LHS> and signed_builtin<RHS>, max_signed_t, max_unsigned_t>;
+	using result_t = std::conditional_t<numeric_traits::signed_builtin<LHS> and numeric_traits::signed_builtin<RHS>, numeric_traits::max_signed_t, numeric_traits::max_unsigned_t>;
 	return ::bounded::detail::safe_compare(lhs, rhs) > 0 ?
 		static_cast<result_t>(lhs) :
 		static_cast<result_t>(rhs);

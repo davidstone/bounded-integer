@@ -7,8 +7,8 @@
 
 #include <bounded/detail/class.hpp>
 #include <bounded/detail/is_bounded_integer.hpp>
-#include <bounded/detail/max_builtin.hpp>
 
+#include <numeric_traits/int128.hpp>
 #include <numeric_traits/min_max_value.hpp>
 
 #include <type_traits>
@@ -46,7 +46,7 @@ template<bounded_integer LHS, bounded_integer RHS>
 constexpr auto modulo_equivalent_operator_overload(LHS const lhs, RHS const rhs, auto const arithmetic_function, auto const operator_range) {
 	constexpr auto range = operator_range(min_max_range<LHS>, min_max_range<RHS>);
 	using result_t = integer<normalize<range.min>, normalize<range.max>>;
-	using intermediate_t = make_unsigned<std::common_type_t<
+	using intermediate_t = numeric_traits::make_unsigned<std::common_type_t<
 		typename result_t::underlying_type,
 		typename LHS::underlying_type,
 		typename RHS::underlying_type

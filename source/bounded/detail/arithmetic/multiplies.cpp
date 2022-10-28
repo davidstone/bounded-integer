@@ -50,11 +50,11 @@ static_assert(homogeneous_equals(
 	signed_min
 ));
 
-#if BOUNDED_DETAIL_HAS_128_BIT
+#if NUMERIC_TRAITS_HAS_128_BIT
 
 static_assert(homogeneous_equals(
 	bounded::constant<1'000'000'000'000'000'000> * bounded::constant<1'000'000'000'000'000'000>,
-	bounded::constant<bounded::detail::uint128_t(1'000'000'000'000'000'000) * bounded::detail::uint128_t(1'000'000'000'000'000'000)>
+	bounded::constant<numeric_traits::uint128_t(1'000'000'000'000'000'000) * numeric_traits::uint128_t(1'000'000'000'000'000'000)>
 ));
 
 #endif

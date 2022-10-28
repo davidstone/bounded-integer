@@ -5,9 +5,9 @@
 
 #pragma once
 
-#include <bounded/detail/max_builtin.hpp>
 #include <bounded/detail/is_bounded_integer.hpp>
 
+#include <numeric_traits/int128.hpp>
 #include <numeric_traits/min_max_value.hpp>
 
 #include <type_traits>
@@ -31,7 +31,7 @@ constexpr auto as_builtin_integer(T const x) {
 }
 
 constexpr auto must_use_unsigned(auto const value) {
-	return value > 0 and static_cast<max_unsigned_t>(value) > static_cast<max_unsigned_t>(numeric_traits::max_value<max_signed_t>);
+	return value > 0 and static_cast<numeric_traits::max_unsigned_t>(value) > static_cast<numeric_traits::max_unsigned_t>(numeric_traits::max_value<numeric_traits::max_signed_t>);
 }
 
 template<typename T>
@@ -46,8 +46,8 @@ constexpr auto fits_in_int(T const value) {
 template<auto value>
 inline constexpr auto normalize = static_cast<
 	std::conditional_t<detail::fits_in_int(+bounded::detail::as_builtin_integer(value)), int,
-	std::conditional_t<detail::must_use_unsigned(bounded::detail::as_builtin_integer(value)), detail::max_unsigned_t,
-	detail::max_signed_t
+	std::conditional_t<detail::must_use_unsigned(bounded::detail::as_builtin_integer(value)), numeric_traits::max_unsigned_t,
+	numeric_traits::max_signed_t
 >>>(value);
 
 } // namespace bounded

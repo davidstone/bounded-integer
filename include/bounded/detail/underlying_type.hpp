@@ -6,9 +6,10 @@
 #pragma once
 
 #include <bounded/detail/comparison.hpp>
-#include <bounded/detail/int128.hpp>
 #include <bounded/detail/overlapping_range.hpp>
 #include <bounded/type.hpp>
+
+#include <numeric_traits/int128.hpp>
 
 namespace bounded {
 namespace detail {
@@ -43,11 +44,11 @@ constexpr auto determine_type() {
 		return type<unsigned long long>;
 	} else if constexpr (range_fits_in_type<signed long long>(minimum, maximum)) {
 		return type<signed long long>;
-#if defined BOUNDED_DETAIL_HAS_128_BIT
-	} else if constexpr (range_fits_in_type<uint128_t>(minimum, maximum)) {
-		return type<uint128_t>;
-	} else if constexpr (range_fits_in_type<int128_t>(minimum, maximum)) {
-		return type<int128_t>;
+#if defined NUMERIC_TRAITS_HAS_128_BIT
+	} else if constexpr (range_fits_in_type<numeric_traits::uint128_t>(minimum, maximum)) {
+		return type<numeric_traits::uint128_t>;
+	} else if constexpr (range_fits_in_type<numeric_traits::int128_t>(minimum, maximum)) {
+		return type<numeric_traits::int128_t>;
 #endif
 	} else {
 		static_assert(false_<minimum, maximum>, "Bounds cannot fit in any type.");

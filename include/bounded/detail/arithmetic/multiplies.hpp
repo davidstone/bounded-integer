@@ -7,10 +7,10 @@
 
 #include <bounded/detail/arithmetic/base.hpp>
 #include <bounded/detail/arithmetic/safe_abs.hpp>
-#include <bounded/detail/max_builtin.hpp>
 #include <bounded/detail/minmax.hpp>
 #include <bounded/detail/safe_extreme.hpp>
 
+#include <numeric_traits/int128.hpp>
 #include <numeric_traits/min_max_value.hpp>
 
 namespace bounded {
@@ -19,8 +19,8 @@ namespace detail {
 template<auto lhs, auto rhs>
 constexpr auto safer_multiply(constant_t<lhs> const &, constant_t<rhs> const &) {
 	constexpr auto negative = (lhs < 0) xor (rhs < 0);
-	constexpr auto ulhs = static_cast<max_unsigned_t>(lhs);
-	constexpr auto urhs = static_cast<max_unsigned_t>(rhs);
+	constexpr auto ulhs = static_cast<numeric_traits::max_unsigned_t>(lhs);
+	constexpr auto urhs = static_cast<numeric_traits::max_unsigned_t>(rhs);
 	constexpr auto modulo_equivalent_result = ulhs * urhs;
 	if constexpr (negative) {
 		if constexpr (lhs > 0) {
@@ -34,7 +34,7 @@ constexpr auto safer_multiply(constant_t<lhs> const &, constant_t<rhs> const &) 
 				"Multiplication requires a larger type than currently supported."
 			);
 		}
-		return static_cast<max_signed_t>(modulo_equivalent_result);
+		return static_cast<numeric_traits::max_signed_t>(modulo_equivalent_result);
 	} else {
 		if constexpr (lhs > 0) {
 			static_assert(

@@ -10,12 +10,12 @@
 #include <bounded/detail/comparison.hpp>
 #include <bounded/detail/comparison_function_object.hpp>
 #include <bounded/detail/is_bounded_integer.hpp>
-#include <bounded/detail/max_builtin.hpp>
 #include <bounded/normalize.hpp>
 #include <bounded/detail/overlapping_range.hpp>
 #include <operators/forward.hpp>
 #include <bounded/concepts.hpp>
 
+#include <numeric_traits/int128.hpp>
 #include <numeric_traits/min_max_value.hpp>
 
 #include <functional>

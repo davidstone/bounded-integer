@@ -9,17 +9,17 @@
 #include <bounded/detail/arithmetic/multiplies.hpp>
 #include <bounded/detail/cast.hpp>
 #include <bounded/detail/class.hpp>
-#include <bounded/detail/max_builtin.hpp>
 
+#include <numeric_traits/int128.hpp>
 #include <numeric_traits/min_max_value.hpp>
 
 namespace bounded {
 namespace detail {
 
-constexpr auto pow_impl(max_unsigned_t base, max_unsigned_t exponent) {
+constexpr auto pow_impl(numeric_traits::max_unsigned_t base, numeric_traits::max_unsigned_t exponent) {
 	if (exponent == 0) {
 		BOUNDED_ASSERT(base != 0);
-		return max_unsigned_t(1);
+		return numeric_traits::max_unsigned_t(1);
 	}
 	while (exponent % 2 == 0) {
 		auto const original_base = base;
@@ -28,7 +28,7 @@ constexpr auto pow_impl(max_unsigned_t base, max_unsigned_t exponent) {
 		exponent /= 2;
 	}
 	auto result = base;
-	for (auto n = max_unsigned_t(0); n != exponent - 1; ++n) {
+	for (auto n = numeric_traits::max_unsigned_t(0); n != exponent - 1; ++n) {
 		auto const original_result = result;
 		result *= base;
 		BOUNDED_ASSERT(base == 0 or result / base == original_result);

@@ -171,7 +171,7 @@ constexpr auto check_optional() {
 	check_uncompressed_optional<uint8_t>();
 	check_uncompressed_optional<int>();
 	check_uncompressed_optional<unsigned>();
-	check_uncompressed_optional<bounded::detail::max_signed_t>();
+	check_uncompressed_optional<numeric_traits::max_signed_t>();
 
 	check_integer_optional<int>();
 	check_integer_optional<bounded::integer<1, 10>>();

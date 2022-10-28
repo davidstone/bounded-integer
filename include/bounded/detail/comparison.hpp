@@ -7,8 +7,8 @@
 
 #include <bounded/detail/builtin_min_max_value.hpp>
 #include <bounded/detail/is_bounded_integer.hpp>
-#include <bounded/detail/max_builtin.hpp>
 
+#include <numeric_traits/int128.hpp>
 #include <numeric_traits/min_max_value.hpp>
 
 #include <compare>
@@ -17,14 +17,14 @@
 namespace bounded {
 namespace detail {
 
-inline constexpr auto max_signed = numeric_traits::max_value<max_signed_t>;
+inline constexpr auto max_signed = numeric_traits::max_value<numeric_traits::max_signed_t>;
 
 template<builtin_integer LHS, builtin_integer RHS>
 constexpr auto safe_compare(LHS const lhs, RHS const rhs) -> std::strong_ordering {
 	if constexpr (signed_builtin<LHS> == signed_builtin<RHS>) {
 		return lhs <=> rhs;
 	} else if constexpr (numeric_traits::max_value<LHS> <= max_signed and numeric_traits::max_value<RHS> <= max_signed) {
-		return static_cast<max_signed_t>(lhs) <=> static_cast<max_signed_t>(rhs);
+		return static_cast<numeric_traits::max_signed_t>(lhs) <=> static_cast<numeric_traits::max_signed_t>(rhs);
 	} else if constexpr (signed_builtin<LHS>) {
 		return lhs < 0 ? std::strong_ordering::less : static_cast<RHS>(lhs) <=> rhs;
 	} else {
@@ -37,12 +37,12 @@ constexpr auto safe_equal(LHS const lhs, RHS const rhs) -> bool {
 	if constexpr (signed_builtin<LHS> == signed_builtin<RHS>) {
 		return lhs == rhs;
 	} else if constexpr (numeric_traits::max_value<LHS> <= max_signed and numeric_traits::max_value<RHS> <= max_signed) {
-		return static_cast<detail::max_signed_t>(lhs) == static_cast<detail::max_signed_t>(rhs);
+		return static_cast<numeric_traits::max_signed_t>(lhs) == static_cast<numeric_traits::max_signed_t>(rhs);
 	} else if constexpr (signed_builtin<LHS>) {
-		static_assert(std::same_as<RHS, detail::max_unsigned_t>);
+		static_assert(std::same_as<RHS, numeric_traits::max_unsigned_t>);
 		return lhs >= 0 and static_cast<RHS>(lhs) == rhs;
 	} else {
-		static_assert(std::same_as<LHS, detail::max_unsigned_t>);
+		static_assert(std::same_as<LHS, numeric_traits::max_unsigned_t>);
 		return rhs >= 0 and lhs == static_cast<LHS>(rhs);
 	}
 }

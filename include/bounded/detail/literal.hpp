@@ -9,21 +9,22 @@
 #include <bounded/detail/arithmetic/multiplies.hpp>
 #include <bounded/detail/arithmetic/plus.hpp>
 #include <bounded/detail/class.hpp>
-#include <bounded/detail/max_builtin.hpp>
+
+#include <numeric_traits/int128.hpp>
 
 namespace bounded {
 namespace detail {
 
 template<char... digits>
 constexpr auto literal_impl() {
-	max_unsigned_t result = 0;
+	numeric_traits::max_unsigned_t result = 0;
 	auto accumulate_digit = [&](char const digit) {
 		if (digit == '\'') {
 			return;
 		}
 		constexpr auto radix = 10;
 		result *= radix;
-		auto const digit_num = static_cast<max_unsigned_t>(digit - '0');
+		auto const digit_num = static_cast<numeric_traits::max_unsigned_t>(digit - '0');
 		BOUNDED_ASSERT(digit_num <= 9);
 		result += digit_num;
 	};

@@ -18,9 +18,9 @@ static_assert(homogeneous_equals(bounded::normalize<1>, 1));
 static_assert(homogeneous_equals(bounded::normalize<-1>, -1));
 static_assert(homogeneous_equals(bounded::normalize<0U>, 0));
 static_assert(homogeneous_equals(bounded::normalize<static_cast<unsigned char>(0)>, 0));
-static_assert(homogeneous_equals(bounded::normalize<numeric_traits::max_value<bounded::detail::max_unsigned_t>>, numeric_traits::max_value<bounded::detail::max_unsigned_t>));
-static_assert(homogeneous_equals(bounded::normalize<numeric_traits::max_value<bounded::detail::max_signed_t>>, numeric_traits::max_value<bounded::detail::max_signed_t>));
-static_assert(homogeneous_equals(bounded::normalize<numeric_traits::min_value<bounded::detail::max_signed_t>>, numeric_traits::min_value<bounded::detail::max_signed_t>));
+static_assert(homogeneous_equals(bounded::normalize<numeric_traits::max_value<numeric_traits::max_unsigned_t>>, numeric_traits::max_value<numeric_traits::max_unsigned_t>));
+static_assert(homogeneous_equals(bounded::normalize<numeric_traits::max_value<numeric_traits::max_signed_t>>, numeric_traits::max_value<numeric_traits::max_signed_t>));
+static_assert(homogeneous_equals(bounded::normalize<numeric_traits::min_value<numeric_traits::max_signed_t>>, numeric_traits::min_value<numeric_traits::max_signed_t>));
 static_assert(homogeneous_equals(bounded::normalize<bounded::constant<0>>, 0));
 
 } // namespace

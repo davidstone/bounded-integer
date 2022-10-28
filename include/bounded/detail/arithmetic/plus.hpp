@@ -7,8 +7,8 @@
 
 #include <bounded/detail/arithmetic/base.hpp>
 #include <bounded/detail/comparison.hpp>
-#include <bounded/detail/max_builtin.hpp>
 
+#include <numeric_traits/int128.hpp>
 #include <numeric_traits/min_max_value.hpp>
 
 namespace bounded {
@@ -16,10 +16,10 @@ namespace detail {
 
 template<auto lhs, auto rhs>
 constexpr auto safer_add() {
-	constexpr auto modulo_equivalent_value = static_cast<max_unsigned_t>(lhs) + static_cast<max_unsigned_t>(rhs);
+	constexpr auto modulo_equivalent_value = static_cast<numeric_traits::max_unsigned_t>(lhs) + static_cast<numeric_traits::max_unsigned_t>(rhs);
 	if constexpr (lhs >= 0 and rhs >= 0) {
 		static_assert(
-			modulo_equivalent_value >= static_cast<max_unsigned_t>(lhs) and modulo_equivalent_value >= static_cast<max_unsigned_t>(rhs),
+			modulo_equivalent_value >= static_cast<numeric_traits::max_unsigned_t>(lhs) and modulo_equivalent_value >= static_cast<numeric_traits::max_unsigned_t>(rhs),
 			"Overflow in calculation of bounds."
 		);
 		return modulo_equivalent_value;
@@ -30,7 +30,7 @@ constexpr auto safer_add() {
 			lhs > 0 or rhs > 0 or modulo_equivalent_value > max_signed,
 			"Overflow in calculation of bounds."
 		);
-		return static_cast<max_signed_t>(modulo_equivalent_value);
+		return static_cast<numeric_traits::max_signed_t>(modulo_equivalent_value);
 	}
 }
 

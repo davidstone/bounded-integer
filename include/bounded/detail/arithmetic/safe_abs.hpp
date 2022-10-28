@@ -5,13 +5,13 @@
 
 #pragma once
 
-#include <bounded/detail/max_builtin.hpp>
+#include <numeric_traits/int128.hpp>
 
 namespace bounded {
 namespace detail {
 
 constexpr auto safe_abs = [](auto const value) {
-	return (value < 0) ? -static_cast<max_unsigned_t>(value) : static_cast<max_unsigned_t>(value);
+	return (value < 0) ? -static_cast<numeric_traits::max_unsigned_t>(value) : static_cast<numeric_traits::max_unsigned_t>(value);
 };
 
 }	// namespace detail

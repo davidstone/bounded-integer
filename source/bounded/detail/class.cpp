@@ -33,9 +33,9 @@ static_assert(std::is_empty_v<bounded::constant_t<0>>);
 static_assert(std::is_empty_v<bounded::constant_t<1>>);
 static_assert(std::is_empty_v<bounded::constant_t<-1>>);
 static_assert(std::is_empty_v<bounded::constant_t<bounded::builtin_min_value<std::intmax_t>>>);
-static_assert(std::is_empty_v<bounded::constant_t<bounded::builtin_min_value<bounded::detail::max_signed_t>>>);
-static_assert(std::is_empty_v<bounded::constant_t<bounded::builtin_max_value<bounded::detail::max_signed_t>>>);
-static_assert(std::is_empty_v<bounded::constant_t<bounded::builtin_max_value<bounded::detail::max_unsigned_t>>>);
+static_assert(std::is_empty_v<bounded::constant_t<bounded::builtin_min_value<numeric_traits::max_signed_t>>>);
+static_assert(std::is_empty_v<bounded::constant_t<bounded::builtin_max_value<numeric_traits::max_signed_t>>>);
+static_assert(std::is_empty_v<bounded::constant_t<bounded::builtin_max_value<numeric_traits::max_unsigned_t>>>);
 
 static_assert(!std::is_convertible_v<bool, bounded::integer<0, 1>>);
 static_assert(bounded::constructible_from<bounded::integer<0, 1>, bool>);

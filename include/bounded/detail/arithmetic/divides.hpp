@@ -8,9 +8,10 @@
 #include <bounded/detail/arithmetic/base.hpp>
 #include <bounded/detail/arithmetic/safe_abs.hpp>
 #include <bounded/detail/comparison.hpp>
-#include <bounded/detail/max_builtin.hpp>
 #include <bounded/detail/minmax.hpp>
 #include <bounded/detail/safe_extreme.hpp>
+
+#include <numeric_traits/int128.hpp>
 
 namespace bounded {
 namespace detail {
@@ -31,7 +32,7 @@ constexpr auto safer_divide() {
 	constexpr auto is_negative = (lhs < 0) xor (rhs < 0);
 	constexpr auto positive_result = safe_abs(lhs) / safe_abs(rhs);
 	if constexpr (is_negative) {
-		return static_cast<max_signed_t>(-positive_result);
+		return static_cast<numeric_traits::max_signed_t>(-positive_result);
 	} else {
 		return positive_result;
 	}

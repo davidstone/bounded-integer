@@ -89,13 +89,11 @@ add_executable(bounded_test
 	source/bounded/detail/conditional.cpp
 	source/bounded/detail/construct_destroy.cpp
 	source/bounded/detail/copy_cv_ref.cpp
-	source/bounded/detail/int128.cpp
 	source/bounded/detail/integer_tombstone_traits.cpp
 	source/bounded/detail/is_bounded_integer.cpp
 	source/bounded/detail/literal.cpp
 	source/bounded/detail/log.cpp
 	source/bounded/detail/make_index_sequence.cpp
-	source/bounded/detail/max_builtin.cpp
 	source/bounded/detail/minmax.cpp
 	source/bounded/detail/overlapping_range.cpp
 	source/bounded/detail/safe_extreme.cpp

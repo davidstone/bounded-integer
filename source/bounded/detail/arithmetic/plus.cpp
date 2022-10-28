@@ -24,7 +24,7 @@ static_assert(homogeneous_equals(
 	bounded::constant<0>
 ));
 
-using bounded::detail::max_unsigned_t;
+using numeric_traits::max_unsigned_t;
 
 static_assert(homogeneous_equals(
 	signed_max + bounded::constant<1>,
