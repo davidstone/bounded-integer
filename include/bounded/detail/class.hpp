@@ -133,7 +133,7 @@ struct integer {
 	// Do not verify that the value is in range because the user has requested a
 	// conversion out of the safety of bounded::integer. It is subject to all
 	// the standard rules of conversion from one integer type to another.
-	template<typename T> requires (detail::builtin_arithmetic<T> or std::is_enum_v<T>)
+	template<typename T> requires (detail::builtin_integer<T> or std::is_enum_v<T> or std::floating_point<T>)
 	constexpr explicit operator T() const {
 		return static_cast<T>(value());
 	}

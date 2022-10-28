@@ -46,22 +46,19 @@ concept bounded_integer = detail::is_bounded_integer<T>;
 namespace detail {
 
 template<typename T>
-concept builtin_arithmetic = (std::is_arithmetic_v<T> and !std::same_as<T, bool>) or std::same_as<T, detail::max_signed_t> or std::same_as<T, detail::max_unsigned_t>;
+concept signed_builtin = std::signed_integral<T> or std::same_as<T, detail::max_signed_t>;
 
 template<typename T>
-concept builtin_integer = builtin_arithmetic<T> and !std::is_floating_point_v<T>;
+concept unsigned_builtin = (std::unsigned_integral<T> and !std::same_as<T, bool>) or std::same_as<T, detail::max_unsigned_t>;
 
 template<typename T>
-concept signed_builtin = builtin_integer<T> and (std::is_signed_v<T> or std::same_as<T, detail::max_signed_t>);
-
-template<typename T>
-concept unsigned_builtin = builtin_integer<T> and (std::is_unsigned_v<T> or std::same_as<T, detail::max_unsigned_t>);
+concept builtin_integer = signed_builtin<T> or unsigned_builtin<T>;
 
 template<typename T>
 inline constexpr auto is_integral_constant_of_integral = false;
 
 template<typename T, T value>
-inline constexpr auto is_integral_constant_of_integral<std::integral_constant<T, value>> = std::is_integral_v<T>;
+inline constexpr auto is_integral_constant_of_integral<std::integral_constant<T, value>> = builtin_integer<T>;
 
 } // namespace detail
 

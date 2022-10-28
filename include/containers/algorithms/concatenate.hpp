@@ -72,7 +72,7 @@ constexpr auto reusable_concatenate_container(reusable_concatenate_t<Result, Int
 // Adding up a bunch of sizes leads to overflow in bounds
 template<typename Size>
 constexpr auto ugly_size_hack(Size const size) {
-	if constexpr (std::is_integral_v<Size>) {
+	if constexpr (std::integral<Size>) {
 		using result_t = bounded::integer<
 			0,
 			bounded::normalize<std::min(numeric_traits::max_value<Size>, numeric_traits::max_value<std::uintmax_t> / 64)>

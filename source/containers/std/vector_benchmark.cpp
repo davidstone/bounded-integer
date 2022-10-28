@@ -16,7 +16,7 @@ namespace {
 
 template<typename T>
 auto default_value() {
-	if constexpr (std::is_integral_v<T>) {
+	if constexpr (std::integral<T>) {
 		return 0;
 	} else {
 		return T(1024, typename T::value_type());
