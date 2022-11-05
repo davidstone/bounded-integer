@@ -42,27 +42,14 @@ struct static_vector_data : private lexicographical_comparison::base {
 	static_vector_data() = default;
 
 	static_vector_data(static_vector_data &&) requires bounded::trivially_move_constructible<T> = default;
-	static_vector_data(static_vector_data const &) requires bounded::trivially_copy_constructible<T> = default;
-	auto operator=(static_vector_data &&) & -> static_vector_data & requires bounded::trivially_move_assignable<T> = default;
-	auto operator=(static_vector_data const &) & -> static_vector_data & requires bounded::trivially_copy_assignable<T> = default;
-
 	constexpr static_vector_data(static_vector_data && other) noexcept requires bounded::move_constructible<T> {
 		containers::uninitialized_relocate_no_overlap(other, begin());
 		this->m_size = std::exchange(other.m_size, 0_bi);
 	}
+
+	static_vector_data(static_vector_data const &) requires bounded::trivially_copy_constructible<T> = default;
 	constexpr static_vector_data(static_vector_data const & other) requires bounded::copy_constructible<T> {
 		containers::assign_to_empty(*this, other);
-	}
-
-	constexpr auto operator=(static_vector_data && other) & noexcept(std::is_nothrow_move_assignable_v<T> and std::is_nothrow_move_constructible_v<T>)  -> static_vector_data & requires bounded::move_assignable<T> {
-		containers::assign(*this, std::move(other));
-		return *this;
-	}
-	constexpr auto operator=(static_vector_data const & other) & -> static_vector_data & requires bounded::copy_assignable<T> {
-		if (this != std::addressof(other)) {
-			containers::assign(*this, other);
-		}
-		return *this;
 	}
 
 	constexpr explicit static_vector_data(constructor_initializer_range<static_vector_data> auto && source) {
@@ -76,6 +63,20 @@ struct static_vector_data : private lexicographical_comparison::base {
 	constexpr static_vector_data(empty_c_array_parameter) {
 	}
 	
+	auto operator=(static_vector_data &&) & -> static_vector_data & requires bounded::trivially_move_assignable<T> = default;
+	constexpr auto operator=(static_vector_data && other) & noexcept(std::is_nothrow_move_assignable_v<T> and std::is_nothrow_move_constructible_v<T>)  -> static_vector_data & requires bounded::move_assignable<T> {
+		containers::assign(*this, std::move(other));
+		return *this;
+	}
+
+	auto operator=(static_vector_data const &) & -> static_vector_data & requires bounded::trivially_copy_assignable<T> = default;
+	constexpr auto operator=(static_vector_data const & other) & -> static_vector_data & requires bounded::copy_assignable<T> {
+		if (this != std::addressof(other)) {
+			containers::assign(*this, other);
+		}
+		return *this;
+	}
+
 	constexpr auto begin() const {
 		using const_iterator = contiguous_iterator<T const, static_cast<std::ptrdiff_t>(capacity_)>;
 		return const_iterator(m_storage.data());
