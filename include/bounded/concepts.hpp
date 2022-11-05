@@ -34,4 +34,27 @@ concept convertible_to =
 	requires(function_ptr<void, To> function) { function(declval<From>()); } or
 	(std::same_as<From, void> and std::same_as<To, void>);
 
+template<typename T>
+concept move_constructible = std::is_move_constructible_v<T>;
+template<typename T>
+concept trivially_move_constructible = move_constructible<T> and std::is_trivially_move_constructible_v<T>;
+
+template<typename T>
+concept copy_constructible = std::is_copy_constructible_v<T>;
+template<typename T>
+concept trivially_copy_constructible = copy_constructible<T> and std::is_trivially_copy_constructible_v<T>;
+
+template<typename T>
+concept move_assignable = std::is_move_assignable_v<T>;
+template<typename T>
+concept trivially_move_assignable = move_assignable<T> and std::is_trivially_move_assignable_v<T>;
+
+template<typename T>
+concept copy_assignable = std::is_copy_assignable_v<T>;
+template<typename T>
+concept trivially_copy_assignable = copy_assignable<T> and std::is_trivially_copy_assignable_v<T>;
+
+template<typename T>
+concept trivially_swappable = std::is_trivially_copyable_v<T> and std::is_trivially_copy_assignable_v<T> and std::is_trivially_destructible_v<T>;
+
 } // namespace bounded

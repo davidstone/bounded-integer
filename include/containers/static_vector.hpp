@@ -37,48 +37,28 @@
 namespace containers {
 namespace detail {
 
-template<typename T>
-concept move_constructible = std::is_move_constructible_v<T>;
-template<typename T>
-concept trivially_move_constructible = move_constructible<T> and std::is_trivially_move_constructible_v<T>;
-
-template<typename T>
-concept copy_constructible = std::is_copy_constructible_v<T>;
-template<typename T>
-concept trivially_copy_constructible = copy_constructible<T> and std::is_trivially_copy_constructible_v<T>;
-
-template<typename T>
-concept move_assignable = std::is_move_assignable_v<T>;
-template<typename T>
-concept trivially_move_assignable = move_assignable<T> and std::is_trivially_move_assignable_v<T>;
-
-template<typename T>
-concept copy_assignable = std::is_copy_assignable_v<T>;
-template<typename T>
-concept trivially_copy_assignable = copy_assignable<T> and std::is_trivially_copy_assignable_v<T>;
-
 template<typename T, array_size_type<T> capacity_, bool = std::is_trivially_destructible_v<T>>
 struct static_vector_data : private lexicographical_comparison::base {
 	static_vector_data() = default;
 
-	static_vector_data(static_vector_data &&) requires trivially_move_constructible<T> = default;
-	static_vector_data(static_vector_data const &) requires trivially_copy_constructible<T> = default;
-	auto operator=(static_vector_data &&) & -> static_vector_data & requires trivially_move_assignable<T> = default;
-	auto operator=(static_vector_data const &) & -> static_vector_data & requires trivially_copy_assignable<T> = default;
+	static_vector_data(static_vector_data &&) requires bounded::trivially_move_constructible<T> = default;
+	static_vector_data(static_vector_data const &) requires bounded::trivially_copy_constructible<T> = default;
+	auto operator=(static_vector_data &&) & -> static_vector_data & requires bounded::trivially_move_assignable<T> = default;
+	auto operator=(static_vector_data const &) & -> static_vector_data & requires bounded::trivially_copy_assignable<T> = default;
 
-	constexpr static_vector_data(static_vector_data && other) noexcept requires move_constructible<T> {
+	constexpr static_vector_data(static_vector_data && other) noexcept requires bounded::move_constructible<T> {
 		containers::uninitialized_relocate_no_overlap(other, begin());
 		this->m_size = std::exchange(other.m_size, 0_bi);
 	}
-	constexpr static_vector_data(static_vector_data const & other) requires copy_constructible<T> {
+	constexpr static_vector_data(static_vector_data const & other) requires bounded::copy_constructible<T> {
 		containers::assign_to_empty(*this, other);
 	}
 
-	constexpr auto operator=(static_vector_data && other) & noexcept(std::is_nothrow_move_assignable_v<T> and std::is_nothrow_move_constructible_v<T>)  -> static_vector_data & requires move_assignable<T> {
+	constexpr auto operator=(static_vector_data && other) & noexcept(std::is_nothrow_move_assignable_v<T> and std::is_nothrow_move_constructible_v<T>)  -> static_vector_data & requires bounded::move_assignable<T> {
 		containers::assign(*this, std::move(other));
 		return *this;
 	}
-	constexpr auto operator=(static_vector_data const & other) & -> static_vector_data & requires copy_assignable<T> {
+	constexpr auto operator=(static_vector_data const & other) & -> static_vector_data & requires bounded::copy_assignable<T> {
 		if (this != std::addressof(other)) {
 			containers::assign(*this, other);
 		}
@@ -141,9 +121,6 @@ public:
 	}
 };
 
-template<typename T>
-concept trivially_swappable = std::is_trivially_copyable_v<T> and std::is_trivially_copy_assignable_v<T> and std::is_trivially_destructible_v<T>;
-
 } // namespace detail
 
 template<typename T, array_size_type<T> capacity_>
@@ -169,7 +146,7 @@ public:
 		return std::span<T>(containers::data(*this), static_cast<std::size_t>(size()));
 	}
 
-	friend constexpr auto swap(static_vector & lhs, static_vector & rhs) noexcept(std::is_nothrow_swappable_v<T>) -> void requires(!detail::trivially_swappable<T>) {
+	friend constexpr auto swap(static_vector & lhs, static_vector & rhs) noexcept(std::is_nothrow_swappable_v<T>) -> void requires(!bounded::trivially_swappable<T>) {
 		if (std::addressof(lhs) == std::addressof(rhs)) {
 			return;
 		}
