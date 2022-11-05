@@ -60,7 +60,8 @@ struct static_vector_data : private lexicographical_comparison::base {
 	constexpr static_vector_data(c_array<T, source_size> && source) {
 		::containers::assign_to_empty(*this, std::move(source));
 	}
-	constexpr static_vector_data(empty_c_array_parameter) {
+	template<std::same_as<empty_c_array_parameter> Source = empty_c_array_parameter>
+	constexpr static_vector(Source) {
 	}
 	
 	~static_vector_data() requires std::is_trivially_destructible_v<T> = default;
