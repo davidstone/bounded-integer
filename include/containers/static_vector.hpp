@@ -37,7 +37,7 @@
 namespace containers {
 namespace detail {
 
-template<typename T, array_size_type<T> capacity_, bool = std::is_trivially_destructible_v<T>>
+template<typename T, array_size_type<T> capacity_>
 struct static_vector_data : private lexicographical_comparison::base {
 	static_vector_data() = default;
 
@@ -63,6 +63,11 @@ struct static_vector_data : private lexicographical_comparison::base {
 	constexpr static_vector_data(empty_c_array_parameter) {
 	}
 	
+	~static_vector_data() requires std::is_trivially_destructible_v<T> = default;
+	constexpr ~static_vector_data() {
+		::containers::destroy_range(*this);
+	}
+
 	auto operator=(static_vector_data &&) & -> static_vector_data & requires bounded::trivially_move_assignable<T> = default;
 	constexpr auto operator=(static_vector_data && other) & noexcept(std::is_nothrow_move_assignable_v<T> and std::is_nothrow_move_constructible_v<T>)  -> static_vector_data & requires bounded::move_assignable<T> {
 		containers::assign(*this, std::move(other));
@@ -101,25 +106,6 @@ struct static_vector_data : private lexicographical_comparison::base {
 
 	[[no_unique_address]] uninitialized_array<T, capacity_> m_storage = {};
 	[[no_unique_address]] bounded::integer<0, bounded::normalize<capacity_>> m_size = 0_bi;
-};
-
-template<typename T, array_size_type<T> capacity>
-struct static_vector_data<T, capacity, false> : static_vector_data<T, capacity, true> {
-private:
-	using base = static_vector_data<T, capacity, true>;
-public:
-
-	using base::base;
-	using base::operator=;
-
-	static_vector_data(static_vector_data &&) = default;
-	static_vector_data(static_vector_data const &) = default;
-	auto operator=(static_vector_data &&) & -> static_vector_data & = default;
-	auto operator=(static_vector_data const &) & -> static_vector_data & = default;
-
-	constexpr ~static_vector_data() {
-		::containers::destroy_range(*this);
-	}
 };
 
 } // namespace detail
