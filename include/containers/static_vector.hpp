@@ -35,48 +35,47 @@
 #include <span>
 
 namespace containers {
-namespace detail {
 
 template<typename T, array_size_type<T> capacity_>
-struct static_vector_data : private lexicographical_comparison::base {
-	static_vector_data() = default;
+struct static_vector : private lexicographical_comparison::base {
+	static_vector() = default;
 
-	static_vector_data(static_vector_data &&) requires bounded::trivially_move_constructible<T> = default;
-	constexpr static_vector_data(static_vector_data && other) noexcept requires bounded::move_constructible<T> {
+	static_vector(static_vector &&) requires bounded::trivially_move_constructible<T> = default;
+	constexpr static_vector(static_vector && other) noexcept requires bounded::move_constructible<T> {
 		containers::uninitialized_relocate_no_overlap(other, begin());
 		this->m_size = std::exchange(other.m_size, 0_bi);
 	}
 
-	static_vector_data(static_vector_data const &) requires bounded::trivially_copy_constructible<T> = default;
-	constexpr static_vector_data(static_vector_data const & other) requires bounded::copy_constructible<T> {
+	static_vector(static_vector const &) requires bounded::trivially_copy_constructible<T> = default;
+	constexpr static_vector(static_vector const & other) requires bounded::copy_constructible<T> {
 		containers::assign_to_empty(*this, other);
 	}
 
-	constexpr explicit static_vector_data(constructor_initializer_range<static_vector_data> auto && source) {
+	constexpr explicit static_vector(constructor_initializer_range<static_vector> auto && source) {
 		::containers::assign_to_empty(*this, OPERATORS_FORWARD(source));
 	}
 	
 	template<std::size_t source_size> requires(source_size <= capacity_)
-	constexpr static_vector_data(c_array<T, source_size> && source) {
+	constexpr static_vector(c_array<T, source_size> && source) {
 		::containers::assign_to_empty(*this, std::move(source));
 	}
 	template<std::same_as<empty_c_array_parameter> Source = empty_c_array_parameter>
 	constexpr static_vector(Source) {
 	}
 	
-	~static_vector_data() requires std::is_trivially_destructible_v<T> = default;
-	constexpr ~static_vector_data() {
+	~static_vector() requires std::is_trivially_destructible_v<T> = default;
+	constexpr ~static_vector() {
 		::containers::destroy_range(*this);
 	}
 
-	auto operator=(static_vector_data &&) & -> static_vector_data & requires bounded::trivially_move_assignable<T> = default;
-	constexpr auto operator=(static_vector_data && other) & noexcept(std::is_nothrow_move_assignable_v<T> and std::is_nothrow_move_constructible_v<T>)  -> static_vector_data & requires bounded::move_assignable<T> {
+	auto operator=(static_vector &&) & -> static_vector & requires bounded::trivially_move_assignable<T> = default;
+	constexpr auto operator=(static_vector && other) & noexcept(std::is_nothrow_move_assignable_v<T> and std::is_nothrow_move_constructible_v<T>)  -> static_vector & requires bounded::move_assignable<T> {
 		containers::assign(*this, std::move(other));
 		return *this;
 	}
 
-	auto operator=(static_vector_data const &) & -> static_vector_data & requires bounded::trivially_copy_assignable<T> = default;
-	constexpr auto operator=(static_vector_data const & other) & -> static_vector_data & requires bounded::copy_assignable<T> {
+	auto operator=(static_vector const &) & -> static_vector & requires bounded::trivially_copy_assignable<T> = default;
+	constexpr auto operator=(static_vector const & other) & -> static_vector & requires bounded::copy_assignable<T> {
 		if (this != std::addressof(other)) {
 			containers::assign(*this, other);
 		}
@@ -105,27 +104,7 @@ struct static_vector_data : private lexicographical_comparison::base {
 		m_size = new_size;
 	}
 
-	[[no_unique_address]] uninitialized_array<T, capacity_> m_storage = {};
-	[[no_unique_address]] bounded::integer<0, bounded::normalize<capacity_>> m_size = 0_bi;
-};
-
-} // namespace detail
-
-template<typename T, array_size_type<T> capacity_>
-struct static_vector : private detail::static_vector_data<T, capacity_> {
-private:
-	using base = detail::static_vector_data<T, capacity_>;
-public:
-
-	using base::base;
-	
 	OPERATORS_BRACKET_SEQUENCE_RANGE_DEFINITIONS
-	
-	using base::begin;
-	using base::size;
-
-	using base::capacity;
-	using base::set_size;
 
 	constexpr operator std::span<T const>() const {
 		return std::span<T const>(containers::data(*this), static_cast<std::size_t>(size()));
@@ -150,6 +129,10 @@ public:
 		}
 		std::swap(lhs.m_size, rhs.m_size);
 	}
+
+private:
+	[[no_unique_address]] uninitialized_array<T, capacity_> m_storage = {};
+	[[no_unique_address]] bounded::integer<0, bounded::normalize<capacity_>> m_size = 0_bi;
 };
 
 template<range Source>
