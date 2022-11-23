@@ -25,8 +25,8 @@ decltype(auto) operator<<(std::basic_ostream<CharT, Traits> & out, bounded_integ
 template<typename CharT, typename Traits, bounded_integer Integer>
 decltype(auto) operator>>(std::basic_istream<CharT, Traits> & in, Integer & x) {
 	using underlying = typename Integer::underlying_type;
-	constexpr auto use_int = sizeof(underlying) < sizeof(int) or (sizeof(underlying) == sizeof(int) and std::is_signed_v<underlying>);
-	constexpr auto use_unsigned = sizeof(underlying) == sizeof(unsigned) and std::is_unsigned_v<underlying>;
+	constexpr auto use_int = sizeof(underlying) < sizeof(int) or (sizeof(underlying) == sizeof(int) and std::signed_integral<underlying>);
+	constexpr auto use_unsigned = sizeof(underlying) == sizeof(unsigned);
 	using intermediate =
 		std::conditional_t<use_int, int,
 		std::conditional_t<use_unsigned, unsigned,

@@ -95,7 +95,7 @@ template<typename T>
 struct SubKey<T &&> : SubKey<T> {
 };
 
-template<typename T> requires(std::is_unsigned_v<T>)
+template<typename T> requires bounded::detail::unsigned_builtin<T> or std::same_as<T, bool>
 struct SubKey<T> {
 	static constexpr auto sub_key(T const value, BaseListSortData *) {
 		return value;
@@ -351,7 +351,7 @@ constexpr void inplace_sort(View to_sort, ExtractKey const & extract_key, NextSo
 			extract_key,
 			sort_data
 		);
-	} else if constexpr (std::is_unsigned_v<SubKeyType>) {
+	} else if constexpr (bounded::detail::unsigned_builtin<SubKeyType>) {
 		UnsignedInplaceSorter<std_sort_threshold, amerian_flag_sort_threshold, CurrentSubKey, sizeof(SubKeyType)>::sort(to_sort, extract_key, next_sort, sort_data);
 	} else {
 		ListInplaceSorter<std_sort_threshold, amerian_flag_sort_threshold, CurrentSubKey, SubKeyType>::sort(to_sort, extract_key, next_sort, sort_data);

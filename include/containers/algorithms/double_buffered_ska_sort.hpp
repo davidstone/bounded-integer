@@ -190,7 +190,7 @@ constexpr auto double_buffered_sort_impl(range auto & source, range auto & buffe
 	if constexpr (std::same_as<key_t, bool>) {
 		containers::detail::bool_sort_copy(source, buffer, current_extractor);
 		return true;
-	} else if constexpr (std::is_unsigned_v<key_t>) {
+	} else if constexpr (bounded::detail::unsigned_builtin<key_t>) {
 		return containers::detail::double_buffered_numeric_sort(source, buffer, current_extractor);
 	} else if constexpr (containers::range<key_t>) {
 		return containers::detail::double_buffered_range_sort(source, buffer, original_extractor, current_extractor);

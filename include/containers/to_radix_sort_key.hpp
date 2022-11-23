@@ -41,35 +41,32 @@ using float_to_unsigned =
 	unknown_floating_point
 >>>;
 
+template<typename T>
+concept character = 
+	std::same_as<T, char> or
+	std::same_as<T, char8_t> or
+	std::same_as<T, char16_t> or
+	std::same_as<T, char32_t> or
+	std::same_as<T, wchar_t>;
+
 namespace to_radix_sort_key_adl {
+
+constexpr auto to_radix_sort_key(bool const value) {
+	return value;
+}
 
 constexpr auto to_radix_sort_key(std::byte const value) {
 	return static_cast<unsigned char>(value);
 }
 
-template<typename T> requires std::is_arithmetic_v<T>
+template<bounded::detail::builtin_integer T>
 constexpr auto to_radix_sort_key(T const value) {
-	constexpr auto is_character_type =
-		std::same_as<T, char> or
-		std::same_as<T, char8_t> or
-		std::same_as<T, char16_t> or
-		std::same_as<T, char32_t> or
-		std::same_as<T, wchar_t>;
-
-	if constexpr (std::is_floating_point_v<T>) {
-		static_assert(std::numeric_limits<T>::is_iec559);
-		using unsigned_t = float_to_unsigned<T>;
-		static_assert(sizeof(T) == sizeof(unsigned_t));
-		auto const u = std::bit_cast<unsigned_t>(value);
-		constexpr auto sign_bit_position = std::numeric_limits<unsigned_t>::digits - 1U;
-		auto const sign_bit = static_cast<unsigned_t>(-static_cast<std::make_signed_t<unsigned_t>>(u >> (sign_bit_position)));
-		return u ^ (sign_bit | (static_cast<unsigned_t>(1U) << sign_bit_position));
-	} else if constexpr (is_character_type) {
+	if constexpr (character<T>) {
 		return static_cast<std::make_unsigned_t<T>>(value);
-	} else if constexpr (std::is_unsigned_v<T>) {
+	} else if constexpr (bounded::detail::unsigned_builtin<T>) {
 		return value;
 	} else {
-		static_assert(std::is_signed_v<T>);
+		static_assert(bounded::detail::signed_builtin<T>);
 		using unsigned_t = std::make_unsigned_t<T>;
 		return static_cast<unsigned_t>(static_cast<unsigned_t>(value) + static_cast<unsigned_t>(numeric_traits::min_value<T>));
 	}
@@ -82,6 +79,17 @@ constexpr auto to_radix_sort_key(bounded::bounded_integer auto const value) {
 template<typename T> requires std::is_enum_v<T>
 constexpr auto to_radix_sort_key(T const value) {
 	return to_radix_sort_key(bounded::integer(value));
+}
+
+template<std::floating_point T>
+constexpr auto to_radix_sort_key(T const value) {
+	static_assert(std::numeric_limits<T>::is_iec559);
+	using unsigned_t = float_to_unsigned<T>;
+	static_assert(sizeof(T) == sizeof(unsigned_t));
+	auto const u = std::bit_cast<unsigned_t>(value);
+	constexpr auto sign_bit_position = std::numeric_limits<unsigned_t>::digits - 1U;
+	auto const sign_bit = static_cast<unsigned_t>(-static_cast<std::make_signed_t<unsigned_t>>(u >> (sign_bit_position)));
+	return u ^ (sign_bit | (static_cast<unsigned_t>(1U) << sign_bit_position));
 }
 
 auto to_radix_sort_key(auto * ptr) {
