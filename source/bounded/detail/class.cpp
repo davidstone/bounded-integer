@@ -76,7 +76,7 @@ static_assert(homogeneous_equals(
 
 constexpr auto check_assignment() {
 	bounded::integer<0, 10> x(bounded::constant<5>);
-	static_assert(!std::is_assignable<decltype((x)), bounded::constant_t<11>>{}, "Should not be assignable.");
+	static_assert(!std::is_assignable_v<decltype((x)), bounded::constant_t<11>>);
 	x = bounded::integer<10, 11>(bounded::constant<10>);
 	BOUNDED_TEST(x == bounded::constant<10>);
 	return true;
