@@ -29,10 +29,10 @@ static_assert(!std::invocable<mutable_function const &>);
 static_assert(std::invocable<empty_mutable_function &>);
 static_assert(std::invocable<mutable_function &>);
 
-static_assert(!std::is_constructible_v<empty_const_function, void(*)()>);
-static_assert(!std::is_constructible_v<const_function, void(*)()>);
-static_assert(!std::is_constructible_v<empty_const_function, long(*)()>);
-static_assert(!std::is_constructible_v<const_function, long(*)()>);
+static_assert(!bounded::constructible_from<empty_const_function, void(*)()>);
+static_assert(!bounded::constructible_from<const_function, void(*)()>);
+static_assert(!bounded::constructible_from<empty_const_function, long(*)()>);
+static_assert(!bounded::constructible_from<const_function, long(*)()>);
 
 template<std::size_t size>
 struct sized_function {
@@ -42,20 +42,20 @@ struct sized_function {
 	}
 };
 
-static_assert(std::is_constructible_v<empty_const_function, sized_function<0>>);
-static_assert(std::is_constructible_v<const_function, sized_function<0>>);
-static_assert(std::is_constructible_v<empty_mutable_function, sized_function<0>>);
-static_assert(std::is_constructible_v<mutable_function, sized_function<0>>);
+static_assert(bounded::constructible_from<empty_const_function, sized_function<0>>);
+static_assert(bounded::constructible_from<const_function, sized_function<0>>);
+static_assert(bounded::constructible_from<empty_mutable_function, sized_function<0>>);
+static_assert(bounded::constructible_from<mutable_function, sized_function<0>>);
 
-static_assert(!std::is_constructible_v<empty_const_function, sized_function<24>>);
-static_assert(std::is_constructible_v<const_function, sized_function<24>>);
-static_assert(!std::is_constructible_v<empty_mutable_function, sized_function<24>>);
-static_assert(std::is_constructible_v<mutable_function, sized_function<24>>);
+static_assert(!bounded::constructible_from<empty_const_function, sized_function<24>>);
+static_assert(bounded::constructible_from<const_function, sized_function<24>>);
+static_assert(!bounded::constructible_from<empty_mutable_function, sized_function<24>>);
+static_assert(bounded::constructible_from<mutable_function, sized_function<24>>);
 
-static_assert(!std::is_constructible_v<empty_const_function, sized_function<25>>);
-static_assert(!std::is_constructible_v<const_function, sized_function<25>>);
-static_assert(!std::is_constructible_v<empty_mutable_function, sized_function<25>>);
-static_assert(!std::is_constructible_v<mutable_function, sized_function<25>>);
+static_assert(!bounded::constructible_from<empty_const_function, sized_function<25>>);
+static_assert(!bounded::constructible_from<const_function, sized_function<25>>);
+static_assert(!bounded::constructible_from<empty_mutable_function, sized_function<25>>);
+static_assert(!bounded::constructible_from<mutable_function, sized_function<25>>);
 
 static_assert(sizeof(containers::trivial_inplace_function<void() const, 0>) == sizeof(void(*)()));
 
@@ -67,12 +67,12 @@ static_assert(returns_five() == 5);
 	using empty_capture_lambda_t = decltype(empty_capture_lambda);
 	static_assert(std::is_empty_v<empty_capture_lambda_t>);
 	static_assert(!std::is_trivially_default_constructible_v<empty_capture_lambda_t>);
-	static_assert(!std::is_constructible_v<empty_const_function, empty_capture_lambda_t>);
+	static_assert(!bounded::constructible_from<empty_const_function, empty_capture_lambda_t>);
 
 	constexpr auto non_empty_lambda = [x = 0]{ static_cast<void>(x); };
 	using non_empty_lambda_t = decltype(non_empty_lambda);
 	static_assert(!std::is_empty_v<non_empty_lambda_t>);
-	static_assert(!std::is_constructible_v<empty_const_function, non_empty_lambda_t>);
+	static_assert(!bounded::constructible_from<empty_const_function, non_empty_lambda_t>);
 }
 
 constexpr auto big_returns_five = const_function([] { return 5; });
