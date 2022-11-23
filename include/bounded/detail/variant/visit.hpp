@@ -102,7 +102,7 @@ template<typename Function, typename Args, typename... Lists>
 inline constexpr auto is_cartesian_product_callable = false;
 
 template<typename Function, typename... Args>
-inline constexpr auto is_cartesian_product_callable<Function, types<Args...>> = std::is_invocable_v<Function, Args...>;
+inline constexpr auto is_cartesian_product_callable<Function, types<Args...>> = std::invocable<Function, Args...>;
 
 template<typename Function, typename... Args, typename... Types, typename... Rest>
 inline constexpr auto is_cartesian_product_callable<Function, types<Args...>, types<Types...>, Rest...> = (

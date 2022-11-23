@@ -106,7 +106,7 @@ public:
 	{
 	}
 
-	constexpr auto begin() const requires std::is_invocable_v<Function const &> {
+	constexpr auto begin() const requires std::invocable<Function const &> {
 		return detail::generate_n_iterator(detail::to_offset_type<Size>(m_size), m_generator);
 	}
 	constexpr auto begin() {
@@ -130,7 +130,7 @@ using generate_index_type = to_index_type<std::conditional_t<
 >>;
 
 template<typename Function, typename Size>
-concept index_invocable = std::is_invocable_v<Function const &, generate_index_type<Size>>;
+concept index_invocable = std::invocable<Function const &, generate_index_type<Size>>;
 
 template<typename Offset, typename Function>
 struct indexed_generate_n_iterator {

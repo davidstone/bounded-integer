@@ -42,6 +42,6 @@ static_assert(bounded::overload(direct{})(static_cast<short>(10)) == 1);
 static_assert(indirect{}(10) == 3);
 static_assert(bounded::overload(indirect{})(10) == 3);
 static_assert(bounded::overload(int_function{}, [](auto) { return 0; })(10) == 3);
-static_assert(!std::is_invocable_v<decltype(bounded::overload(int_function{})), std::nullptr_t>);
+static_assert(!std::invocable<decltype(bounded::overload(int_function{})), std::nullptr_t>);
 
 } // namespace

@@ -19,15 +19,15 @@ static_assert(std::is_trivially_copyable_v<const_function>);
 static_assert(std::is_trivially_copyable_v<empty_mutable_function>);
 static_assert(std::is_trivially_copyable_v<mutable_function>);
 
-static_assert(std::is_invocable_v<empty_const_function const &>);
-static_assert(std::is_invocable_v<const_function const &>);
-static_assert(std::is_invocable_v<empty_const_function &>);
-static_assert(std::is_invocable_v<const_function &>);
+static_assert(std::invocable<empty_const_function const &>);
+static_assert(std::invocable<const_function const &>);
+static_assert(std::invocable<empty_const_function &>);
+static_assert(std::invocable<const_function &>);
 
-static_assert(!std::is_invocable_v<empty_mutable_function const &>);
-static_assert(!std::is_invocable_v<mutable_function const &>);
-static_assert(std::is_invocable_v<empty_mutable_function &>);
-static_assert(std::is_invocable_v<mutable_function &>);
+static_assert(!std::invocable<empty_mutable_function const &>);
+static_assert(!std::invocable<mutable_function const &>);
+static_assert(std::invocable<empty_mutable_function &>);
+static_assert(std::invocable<mutable_function &>);
 
 static_assert(!std::is_constructible_v<empty_const_function, void(*)()>);
 static_assert(!std::is_constructible_v<const_function, void(*)()>);
