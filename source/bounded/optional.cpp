@@ -36,7 +36,7 @@ static_assert(
 template<typename T>
 constexpr auto test_optional_traits() {
 	using bounded::optional;
-	static_assert(std::is_convertible_v<T, optional<T>>);
+	static_assert(bounded::convertible_to<T, optional<T>>);
 	static_assert(std::is_trivially_destructible_v<T> == std::is_trivially_destructible_v<optional<T>>);
 	static_assert(std::is_trivially_copy_constructible_v<T> == std::is_trivially_copy_constructible_v<T>);
 	static_assert(std::is_trivially_copy_assignable_v<T> == std::is_trivially_copy_assignable_v<T>);

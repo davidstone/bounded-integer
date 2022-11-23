@@ -30,7 +30,7 @@ public:
 	template<std::same_as<empty_c_array_parameter> Source = empty_c_array_parameter>
 	constexpr string(Source) {
 	}
-	template<typename Source> requires std::convertible_to<Source, std::string_view> or std::convertible_to<Source, char const *>
+	template<typename Source> requires bounded::convertible_to<Source, std::string_view> or bounded::convertible_to<Source, char const *>
 	constexpr explicit(!std::same_as<Source, std::string_view> and !std::same_as<Source, char const *> and !std::same_as<Source, char *>) string(Source const sv):
 		base(std::string_view(sv))
 	{

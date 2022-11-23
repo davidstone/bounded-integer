@@ -39,15 +39,15 @@ static_assert(containers_test::test_sequence_container_implicit_from_two_empty_b
 static_assert(containers_test::test_special_members<containers::array<int, 0_bi>>([] { return containers::array<int, 0_bi>({}); }));
 static_assert(containers_test::test_special_members<containers::array<int, 5_bi>>([] { return containers::array({0, 1, 2, 3, 4}); }));
 
-static_assert(std::is_convertible_v<containers::array<int, 3_bi> const &, std::span<int const>>);
-static_assert(!std::is_convertible_v<containers::array<int, 3_bi> const &, std::span<int>>);
-static_assert(std::is_convertible_v<containers::array<int, 3_bi> &, std::span<int const>>);
-static_assert(std::is_convertible_v<containers::array<int, 3_bi> &, std::span<int>>);
+static_assert(bounded::convertible_to<containers::array<int, 3_bi> const &, std::span<int const>>);
+static_assert(!bounded::convertible_to<containers::array<int, 3_bi> const &, std::span<int>>);
+static_assert(bounded::convertible_to<containers::array<int, 3_bi> &, std::span<int const>>);
+static_assert(bounded::convertible_to<containers::array<int, 3_bi> &, std::span<int>>);
 
-static_assert(std::is_convertible_v<containers::array<int, 3_bi> const &, std::span<int const, 3>>);
-static_assert(!std::is_convertible_v<containers::array<int, 3_bi> const &, std::span<int, 3>>);
-static_assert(std::is_convertible_v<containers::array<int, 3_bi> &, std::span<int const, 3>>);
-static_assert(std::is_convertible_v<containers::array<int, 3_bi> &, std::span<int, 3>>);
+static_assert(bounded::convertible_to<containers::array<int, 3_bi> const &, std::span<int const, 3>>);
+static_assert(!bounded::convertible_to<containers::array<int, 3_bi> const &, std::span<int, 3>>);
+static_assert(bounded::convertible_to<containers::array<int, 3_bi> &, std::span<int const, 3>>);
+static_assert(bounded::convertible_to<containers::array<int, 3_bi> &, std::span<int, 3>>);
 
 constexpr auto array_n = containers::make_array_n(6_bi, 5);
 static_assert(std::same_as<containers::range_value_t<decltype(array_n)>, int>, "Incorrect type from make_array_n.");

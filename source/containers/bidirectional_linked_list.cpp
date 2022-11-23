@@ -10,7 +10,7 @@
 
 namespace {
 
-static_assert(std::is_convertible_v<containers::bidirectional_linked_list<int>::iterator, containers::bidirectional_linked_list<int>::const_iterator>);
+static_assert(bounded::convertible_to<containers::bidirectional_linked_list<int>::iterator, containers::bidirectional_linked_list<int>::const_iterator>);
 
 static_assert(containers_test::test_sequence_container<containers::bidirectional_linked_list<int>>());
 static_assert(containers_test::test_sequence_container<containers::bidirectional_linked_list<bounded_test::integer>>());

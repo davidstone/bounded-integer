@@ -24,9 +24,9 @@ using iterator = containers::adapt_iterator<containers::contiguous_iterator<T, 2
 using const_iterator = iterator<int const>;
 using mutable_iterator = iterator<int>;
 
-static_assert(std::convertible_to<const_iterator, const_iterator>);
-static_assert(std::convertible_to<mutable_iterator, mutable_iterator>);
-static_assert(std::convertible_to<mutable_iterator, const_iterator>);
-static_assert(!std::convertible_to<const_iterator, mutable_iterator>);
+static_assert(bounded::convertible_to<const_iterator, const_iterator>);
+static_assert(bounded::convertible_to<mutable_iterator, mutable_iterator>);
+static_assert(bounded::convertible_to<mutable_iterator, const_iterator>);
+static_assert(!bounded::convertible_to<const_iterator, mutable_iterator>);
 
 } // namespace

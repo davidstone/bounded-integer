@@ -115,7 +115,7 @@ struct concatenate_view_iterator {
 		std::same_as<Offset, bounded::constant_t<1>> or
 		(!bounded::bounded_integer<difference_type> and numeric_traits::max_value<Offset> >= bounded::constant<0> and (... and forward_random_access_range<RangeViews>)) or
 		(
-			std::convertible_to<Offset, difference_type> and
+			bounded::convertible_to<Offset, difference_type> and
 			numeric_traits::min_value<Offset> >= bounded::constant<0> and
 			(... and forward_random_access_range<RangeViews>)
 		)

@@ -80,7 +80,7 @@ public:
 	{
 	}
 
-	constexpr variant(auto index_, std::convertible_to<type_at<decltype(index_)>> auto && value):
+	constexpr variant(auto index_, bounded::convertible_to<type_at<decltype(index_)>> auto && value):
 		variant(
 			lazy_init,
 			index_,

@@ -36,14 +36,14 @@ struct to_both {
 	}
 };
 
-static_assert(std::convertible_to<char const *, containers::string>);
-static_assert(std::convertible_to<char *, containers::string>);
-static_assert(std::convertible_to<containers::c_array<char, 5> const &, containers::string>);
-static_assert(std::convertible_to<containers::c_array<char, 5> &, containers::string>);
-static_assert(std::convertible_to<std::string_view, containers::string>);
-static_assert(!std::convertible_to<to_sv, containers::string>);
-static_assert(!std::convertible_to<to_cstr, containers::string>);
-static_assert(!std::convertible_to<to_both, containers::string>);
+static_assert(bounded::convertible_to<char const *, containers::string>);
+static_assert(bounded::convertible_to<char *, containers::string>);
+static_assert(bounded::convertible_to<containers::c_array<char, 5> const &, containers::string>);
+static_assert(bounded::convertible_to<containers::c_array<char, 5> &, containers::string>);
+static_assert(bounded::convertible_to<std::string_view, containers::string>);
+static_assert(!bounded::convertible_to<to_sv, containers::string>);
+static_assert(!bounded::convertible_to<to_cstr, containers::string>);
+static_assert(!bounded::convertible_to<to_both, containers::string>);
 static_assert(std::constructible_from<containers::string, to_sv>);
 static_assert(std::constructible_from<containers::string, to_cstr>);
 static_assert(std::constructible_from<containers::string, to_both>);

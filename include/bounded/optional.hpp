@@ -202,7 +202,7 @@ public:
 	}
 
 	template<explicitly_convertible_to<value_type> Value>
-	constexpr explicit(!std::convertible_to<Value, value_type>) optional(Value && other):
+	constexpr explicit(!bounded::convertible_to<Value, value_type>) optional(Value && other):
 		m_storage(OPERATORS_FORWARD(other))
 	{
 	}
@@ -250,7 +250,7 @@ public:
 		m_storage.uninitialize();
 		return *this;
 	}
-	constexpr auto operator=(std::convertible_to<value_type> auto && other) & -> optional & requires(!std::is_reference_v<T>) {
+	constexpr auto operator=(bounded::convertible_to<value_type> auto && other) & -> optional & requires(!std::is_reference_v<T>) {
 		return detail::assign(*this, OPERATORS_FORWARD(other));
 	}
 		

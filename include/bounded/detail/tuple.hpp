@@ -46,7 +46,7 @@ struct tuple_value {
 	{
 	}
 
-	constexpr explicit tuple_value(std::convertible_to<T> auto && arg):
+	constexpr explicit tuple_value(bounded::convertible_to<T> auto && arg):
 		m_value(OPERATORS_FORWARD(arg))
 	{
 	}
@@ -106,7 +106,7 @@ struct tuple_impl<std::index_sequence<indexes...>, Types...> : tuple_value<index
 
 	tuple_impl() = default;
 
-	constexpr tuple_impl(std::convertible_to<Types> auto && ... args):
+	constexpr tuple_impl(bounded::convertible_to<Types> auto && ... args):
 		tuple_value<indexes, Types>(OPERATORS_FORWARD(args))...
 	{
 	}

@@ -9,10 +9,10 @@
 
 #include <type_traits>
 
-static_assert(std::is_convertible_v<containers::legacy_iterator<int const *>, containers::legacy_iterator<int const *>>);
-static_assert(std::is_convertible_v<containers::legacy_iterator<int *>, containers::legacy_iterator<int *>>);
-static_assert(std::is_convertible_v<containers::legacy_iterator<int *>, containers::legacy_iterator<int const *>>);
-static_assert(!std::is_convertible_v<containers::legacy_iterator<int const *>, containers::legacy_iterator<int *>>);
+static_assert(bounded::convertible_to<containers::legacy_iterator<int const *>, containers::legacy_iterator<int const *>>);
+static_assert(bounded::convertible_to<containers::legacy_iterator<int *>, containers::legacy_iterator<int *>>);
+static_assert(bounded::convertible_to<containers::legacy_iterator<int *>, containers::legacy_iterator<int const *>>);
+static_assert(!bounded::convertible_to<containers::legacy_iterator<int const *>, containers::legacy_iterator<int *>>);
 
 template<typename T>
 concept incrementable = requires(T value) { ++value; };

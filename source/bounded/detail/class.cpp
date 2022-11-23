@@ -37,7 +37,7 @@ static_assert(std::is_empty_v<bounded::constant_t<bounded::builtin_min_value<num
 static_assert(std::is_empty_v<bounded::constant_t<bounded::builtin_max_value<numeric_traits::max_signed_t>>>);
 static_assert(std::is_empty_v<bounded::constant_t<bounded::builtin_max_value<numeric_traits::max_unsigned_t>>>);
 
-static_assert(!std::is_convertible_v<bool, bounded::integer<0, 1>>);
+static_assert(!bounded::convertible_to<bool, bounded::integer<0, 1>>);
 static_assert(bounded::constructible_from<bounded::integer<0, 1>, bool>);
 static_assert(!bounded::constructible_from<bounded::integer<0, 0>, bool>);
 
@@ -51,7 +51,7 @@ namespace check_constructibility {
 	);
 
 	static_assert(
-		std::is_convertible_v<int, type>,
+		bounded::convertible_to<int, type>,
 		"Cannot convert integer type to bounded::integer with same range."
 	);
 	static_assert(
@@ -60,7 +60,7 @@ namespace check_constructibility {
 	);
 
 	static_assert(
-		!std::is_convertible_v<bool, type>,
+		!bounded::convertible_to<bool, type>,
 		"Should not be able to convert a bool to a bounded::integer."
 	);
 	static_assert(
@@ -99,14 +99,14 @@ namespace {
 
 enum unscoped_enum : int {};
 static_assert(!bounded::constructible_from<bounded::integer<0, 10>, unscoped_enum>);
-static_assert(!std::is_convertible_v<unscoped_enum, bounded::integer<0, 10>>);
+static_assert(!bounded::convertible_to<unscoped_enum, bounded::integer<0, 10>>);
 
 enum class scoped_enum {};
 static_assert(!bounded::constructible_from<bounded::integer<0, 10>, scoped_enum>);
-static_assert(!std::is_convertible_v<scoped_enum, bounded::integer<0, 10>>);
+static_assert(!bounded::convertible_to<scoped_enum, bounded::integer<0, 10>>);
 
 static_assert(bounded::constructible_from<bounded::integer<0, 10>, bounded_enum>);
-static_assert(!std::is_convertible_v<bounded_enum, bounded::integer<0, 10>>);
+static_assert(!bounded::convertible_to<bounded_enum, bounded::integer<0, 10>>);
 static_assert(bounded::integer(bounded_enum{}) == bounded::constant<0>);
 static_assert(bounded::constant<bounded_enum{}> == bounded::constant<0>);
 
@@ -122,7 +122,7 @@ constexpr auto numeric_traits::max_value<bounded_integer_enum> = bounded::consta
 
 namespace {
 
-static_assert(!std::is_convertible_v<bounded_integer_enum, bounded::integer<0, 0>>);
+static_assert(!bounded::convertible_to<bounded_integer_enum, bounded::integer<0, 0>>);
 static_assert(bounded::integer(bounded_integer_enum{}) == bounded::constant<0>);
 static_assert(bounded::constant<bounded_integer_enum{}> == bounded::constant<0>);
 
@@ -138,7 +138,7 @@ constexpr auto numeric_traits::max_value<enum_bounded_enum> = enum_bounded_enum(
 
 namespace {
 
-static_assert(!std::is_convertible_v<enum_bounded_enum, bounded::integer<0, 0>>);
+static_assert(!bounded::convertible_to<enum_bounded_enum, bounded::integer<0, 0>>);
 static_assert(bounded::integer(enum_bounded_enum{}) == bounded::constant<0>);
 static_assert(bounded::constant<enum_bounded_enum{}> == bounded::constant<0>);
 

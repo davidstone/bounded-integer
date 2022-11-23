@@ -53,7 +53,7 @@ struct adapt_iterator : detail::iterator_category_base<Iterator>, detail::adapte
 	{
 	}
 
-	template<std::convertible_to<Iterator> It>
+	template<bounded::convertible_to<Iterator> It>
 	constexpr adapt_iterator(adapt_iterator<It, Traits> other):
 		m_base(std::move(other).base()),
 		m_traits(std::move(other).traits())

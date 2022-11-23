@@ -84,7 +84,7 @@ private:
 	template<typename Function>
 	static constexpr auto create_function_indirection(Function & function) -> function_ptr {
 		if constexpr (use_single_indirection) {
-			if constexpr (std::is_convertible_v<Function, function_ptr>) {
+			if constexpr (bounded::convertible_to<Function, function_ptr>) {
 				return function;
 			} else {
 				return [](Args... args) {
@@ -108,7 +108,7 @@ private:
 	static constexpr auto make_storage(Function function) -> storage_type {
 		if constexpr (use_single_indirection) {
 			static_assert(
-				std::is_convertible_v<Function, function_ptr> or
+				bounded::convertible_to<Function, function_ptr> or
 				std::is_trivially_default_constructible_v<Function>
 			);
 			return storage_type();

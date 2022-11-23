@@ -28,7 +28,7 @@ namespace detail {
 constexpr auto less_to_compare = [](auto const & cmp) {
 	return [&](auto const & lhs, auto const & rhs) {
 		using result_t = decltype(cmp(lhs, rhs));
-		if constexpr (std::is_convertible_v<result_t, std::strong_ordering>) {
+		if constexpr (bounded::convertible_to<result_t, std::strong_ordering>) {
 			return cmp(lhs, rhs);
 		} else {
 			static_assert(bounded::constructible_from<bool, result_t>);

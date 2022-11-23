@@ -21,8 +21,8 @@ concept legacy_map = requires { typename Map::allocator_type; };
 
 template<
 	associative_container Map,
-	std::convertible_to<typename Map::key_type> Key = typename Map::key_type,
-	std::convertible_to<typename Map::mapped_type> Mapped = typename Map::mapped_type
+	bounded::convertible_to<typename Map::key_type> Key = typename Map::key_type,
+	bounded::convertible_to<typename Map::mapped_type> Mapped = typename Map::mapped_type
 >
 constexpr auto keyed_insert(Map & map, Key && key, Mapped && mapped) {
 	if constexpr (detail::legacy_map<Map>) {
