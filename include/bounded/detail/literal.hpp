@@ -12,37 +12,41 @@
 
 #include <numeric_traits/int128.hpp>
 
+#include <cstddef>
+
 namespace bounded {
 namespace detail {
 
-template<char... digits>
-constexpr auto literal_impl() {
+template<typename T, std::size_t size>
+using c_array = T[size];
+
+template<std::size_t size>
+consteval auto literal_impl(c_array<char, size> && digits) {
 	numeric_traits::max_unsigned_t result = 0;
-	auto accumulate_digit = [&](char const digit) {
+	for (auto const digit : digits) {
 		if (digit == '\'') {
-			return;
+			continue;
 		}
 		constexpr auto radix = 10;
 		result *= radix;
 		auto const digit_num = static_cast<numeric_traits::max_unsigned_t>(digit - '0');
 		BOUNDED_ASSERT(digit_num <= 9);
 		result += digit_num;
-	};
-	(..., accumulate_digit(digits));
+	}
 	return result;
 }
 
-}	// namespace detail
+} // namespace detail
 
 namespace literal {
 
 template<char... digits>
-constexpr auto operator""_bi() {
-	return constant<::bounded::detail::literal_impl<digits...>()>;
+consteval auto operator""_bi() {
+	return constant<::bounded::detail::literal_impl({digits...})>;
 }
 
-}	// namespace literal
+} // namespace literal
 
 using namespace literal;
 
-}	// namespace bounded
+} // namespace bounded
