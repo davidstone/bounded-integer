@@ -30,7 +30,7 @@ constexpr auto test_forward_range_concepts() -> bool {
 	return true;
 }
 
-// Because it would be really embarassing if this didn't work...
+// Because it would be really embarrassing if this didn't work...
 template<typename Container>
 constexpr auto test_range_based_for_loop() {
 	auto const ccontainer = Container();
