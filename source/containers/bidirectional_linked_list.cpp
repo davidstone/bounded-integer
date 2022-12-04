@@ -43,7 +43,33 @@ constexpr auto test_lazy_push_back() {
 static_assert(test_lazy_push_back<int>());
 static_assert(test_lazy_push_back<bounded_test::non_copyable_integer>());
 
-// TODO: Directly test `splice`, `pop_back`
+template<typename Integer>
+constexpr auto test_pop_back_one() {
+	auto list = containers::bidirectional_linked_list<Integer>({1});
+	list.pop_back();
+	BOUNDED_TEST(containers::is_empty(list));
+}
+
+template<typename Integer>
+constexpr auto test_pop_back_two() {
+	auto list = containers::bidirectional_linked_list<Integer>({1, 2});
+	auto const ptr = std::addressof(containers::front(list));
+	list.pop_back();
+	BOUNDED_TEST(containers::equal(list, containers::array{1}));
+	BOUNDED_TEST(ptr == std::addressof(containers::front(list)));
+}
+
+template<typename Integer>
+constexpr auto test_pop_back() {
+	test_pop_back_one<Integer>();
+	test_pop_back_two<Integer>();
+	return true;
+}
+
+static_assert(test_pop_back<int>());
+static_assert(test_pop_back<bounded_test::non_copyable_integer>());
+
+// TODO: Directly test `splice`
 
 struct recursive {
 	containers::bidirectional_linked_list<recursive> m;
