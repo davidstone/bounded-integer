@@ -76,11 +76,11 @@ constexpr auto next(iterator auto it) {
 }
 
 
-constexpr auto prev(iterator auto it, auto const offset) {
+constexpr auto prev(bidirectional_iterator auto it, auto const offset) {
 	::containers::advance(it, -offset);
 	return it;
 }
-constexpr auto prev(iterator auto it) {
+constexpr auto prev(bidirectional_iterator auto it) {
 	return ::containers::prev(std::move(it), ::containers::detail::iterator_one<decltype(it)>());
 }
 
