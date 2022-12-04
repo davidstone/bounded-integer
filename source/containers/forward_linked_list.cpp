@@ -28,17 +28,21 @@ constexpr auto test_lazy_insert_after_empty() {
 template<typename Integer>
 constexpr auto test_lazy_insert_after_non_empty_before_begin() {
 	auto list = containers::forward_linked_list<Integer>({1});
+	auto const ptr = std::addressof(containers::front(list));
 	auto const it = list.lazy_insert_after(list.before_begin(), bounded::construct<Integer>);
 	BOUNDED_TEST(containers::equal(list, containers::array{0, 1}));
 	BOUNDED_TEST(it == containers::begin(list));
+	BOUNDED_TEST(ptr == std::addressof(*containers::next(containers::begin(list), 1_bi)));
 }
 
 template<typename Integer>
 constexpr auto test_lazy_insert_after_non_empty_begin() {
 	auto list = containers::forward_linked_list<Integer>({1});
+	auto const ptr = std::addressof(containers::front(list));
 	auto const it = list.lazy_insert_after(containers::begin(list), bounded::construct<Integer>);
 	BOUNDED_TEST(containers::equal(list, containers::array{1, 0}));
 	BOUNDED_TEST(it == containers::next(containers::begin(list)));
+	BOUNDED_TEST(ptr == std::addressof(containers::front(list)));
 }
 
 template<typename Integer>
