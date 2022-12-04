@@ -15,7 +15,7 @@ using namespace bounded::literal;
 static_assert(bounded::convertible_to<containers::forward_linked_list<int>::iterator, containers::forward_linked_list<int>::const_iterator>);
 
 static_assert(containers_test::test_sequence_container<containers::forward_linked_list<int>>());
-static_assert(containers_test::test_sequence_container<containers::forward_linked_list<bounded_test::integer>>());
+static_assert(containers_test::test_sequence_container<containers::forward_linked_list<bounded_test::non_copyable_integer>>());
 
 template<typename Integer>
 constexpr auto test_lazy_insert_after_empty() {
@@ -50,7 +50,7 @@ constexpr auto test_lazy_insert_after() {
 }
 
 static_assert(test_lazy_insert_after<int>());
-static_assert(test_lazy_insert_after<bounded_test::integer>());
+static_assert(test_lazy_insert_after<bounded_test::non_copyable_integer>());
 
 
 template<typename Integer>
@@ -86,7 +86,7 @@ constexpr auto test_erase_after() {
 }
 
 static_assert(test_erase_after<int>());
-static_assert(test_erase_after<bounded_test::integer>());
+static_assert(test_erase_after<bounded_test::non_copyable_integer>());
 
 
 template<typename Integer>
@@ -185,7 +185,7 @@ constexpr auto test_splice_after() {
 }
 
 static_assert(test_splice_after<int>());
-static_assert(test_splice_after<bounded_test::integer>());
+static_assert(test_splice_after<bounded_test::non_copyable_integer>());
 
 
 struct recursive {
