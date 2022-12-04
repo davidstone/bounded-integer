@@ -112,6 +112,7 @@ struct forward_linked_list : private lexicographical_comparison::base {
 		return iterator(ptr);
 	}
 	constexpr auto erase_after(const_iterator const before) & -> iterator {
+		BOUNDED_ASSERT(before != end());
 		auto const mutable_before = mutable_iterator(before);
 		auto const it = containers::next(mutable_before);
 		auto const after = containers::next(it);
@@ -121,10 +122,19 @@ struct forward_linked_list : private lexicographical_comparison::base {
 		return after;
 	}
 
-	constexpr auto splice_after([[maybe_unused]] const_iterator const position, forward_linked_list &, const_iterator const first, const_iterator const last) & -> void {
-		if (first == last) {
+	// Unlike `std::forward_list`, the final iterator is before_last, not last.
+	// This allows splice_after to operate in constant time.
+	constexpr auto splice_after(const_iterator const before, forward_linked_list & other, const_iterator const before_first, const_iterator const before_last) & -> void {
+		BOUNDED_ASSERT(this != std::addressof(other));
+		BOUNDED_ASSERT(before_last != other.end());
+		if (before_first == before_last) {
 			return;
 		}
+		auto const mutable_before = other.mutable_iterator(before);
+		auto const mutable_before_first = other.mutable_iterator(before_first);
+		auto const mutable_before_last = other.mutable_iterator(before_last);
+		auto const original_next = std::exchange(mutable_before.m_links->next, mutable_before_first.m_links->next);
+		mutable_before_first.m_links->next = std::exchange(mutable_before_last.m_links->next, original_next);
 	}
 
 private:
