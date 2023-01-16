@@ -133,6 +133,10 @@ add_executable(bounded_test
 	source/bounded/value_to_function.cpp
 )
 
+set_source_files_properties(source/bounded/detail/arithmetic/operators.cpp
+	PROPERTIES COMPILE_FLAGS "-Wno-implicit-int-conversion -Wno-shorten-64-to-32"
+)
+
 target_link_libraries(bounded_test PUBLIC Catch2::Catch2WithMain bounded strict_defaults)
 
 add_executable(containers_test
