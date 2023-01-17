@@ -1,18 +1,78 @@
-// Copyright David Stone 2018.
+// Copyright David Stone 2022.
 // Distributed under the Boost Software License, Version 1.0.
 // (See accompanying file LICENSE_1_0.txt or copy at
 // http://www.boost.org/LICENSE_1_0.txt)
 
-#include <bounded/to_integer.hpp>
-#include <bounded/detail/literal.hpp>
+module;
 
-#include <numeric_traits/min_max_value.hpp>
+#include <bounded/conditional.hpp>
 
-#include "homogeneous_equals.hpp"
+export module bounded.to_integer;
 
-#include <cstdint>
+import bounded.arithmetic.operators;
+import bounded.arithmetic.safe_abs;
+import bounded.builtin_min_max_value;
+import bounded.check_in_range;
+import bounded.homogeneous_equals;
+import bounded.integer;
+import bounded.literal;
+import bounded.normalize;
 
-#include <catch2/catch_test_macros.hpp>
+import numeric_traits;
+import std_module;
+
+namespace bounded {
+
+template<auto maximum>
+constexpr auto to_integer_positive_impl(std::string_view str) {
+	constexpr auto check = [](auto const value, auto const max) {
+		return check_in_range<std::invalid_argument>(value, constant<0>, max);
+	};
+	auto positive_result = integer<0, normalize<maximum>>(constant<0>);
+	for (auto const c : str) {
+		auto const shifted = positive_result * constant<10>;
+		auto const digit = check(integer(c - '0'), constant<9>);
+		positive_result = check(shifted + digit, constant<maximum>);
+	}
+	return positive_result;
+}
+
+// TODO: Support things other than throwing an exception?
+export template<auto minimum, auto maximum>
+constexpr auto to_integer(std::string_view str) {
+	if (str.empty()) {
+		throw std::invalid_argument("Cannot convert empty string to integer");
+	}
+
+	auto impl = [&] {
+		if constexpr(minimum < 0) {
+			constexpr auto combined_max = std::max(
+				bounded::detail::safe_abs(minimum),
+				bounded::detail::safe_abs(maximum)
+			);
+			auto negative = false;
+			if (str.front() == '-') {
+				str.remove_prefix(1);
+				if (str.empty()) {
+					throw std::invalid_argument("Cannot convert empty string to integer");
+				}
+				negative = true;
+			}
+			auto const positive_result = ::bounded::to_integer_positive_impl<combined_max>(str);
+			return BOUNDED_CONDITIONAL(negative, -positive_result, positive_result);
+		} else {
+			return ::bounded::to_integer_positive_impl<maximum>(str);
+		}
+	};
+	return check_in_range<std::invalid_argument>(impl(), constant<minimum>, constant<maximum>);
+}
+
+export template<typename Integer>
+constexpr auto to_integer(std::string_view const str) {
+	return static_cast<Integer>(to_integer<builtin_min_value<Integer>, builtin_max_value<Integer>>(str));
+}
+
+} // namespace bounded
 
 namespace {
 using namespace bounded::literal;
@@ -41,13 +101,5 @@ static_assert(homogeneous_equals(
 	bounded::to_integer<156, 325>("256"),
 	bounded::to_integer<bounded::integer<156, 325>>("256")
 ));
-
-TEST_CASE("to_integer", "[to_integer]") {
-	CHECK_THROWS_AS((bounded::to_integer<0, 0>("")), std::invalid_argument);
-	CHECK_THROWS_AS((bounded::to_integer<-1, 1>("-")), std::invalid_argument);
-	CHECK_THROWS_AS((bounded::to_integer<0, 0>("1")), std::invalid_argument);
-	CHECK_THROWS_AS((bounded::to_integer<0, 100>("101")), std::invalid_argument);
-	CHECK_THROWS_AS((bounded::to_integer<0, 100>("-90")), std::invalid_argument);
-}
 
 } // namespace

@@ -3,11 +3,106 @@
 // (See accompanying file LICENSE_1_0.txt or copy at
 // http://www.boost.org/LICENSE_1_0.txt)
 
-#include <containers/algorithms/partition.hpp>
-#include <containers/array.hpp>
-#include <containers/static_vector.hpp>
+module;
 
-namespace {
+#include <bounded/assert.hpp>
+
+export module containers.algorithms.partition;
+
+import containers.algorithms.advance;
+import containers.algorithms.find;
+import containers.array;
+import containers.begin_end;
+import containers.is_range;
+import containers.is_iterator;
+import containers.is_iterator_sentinel;
+import containers.size;
+import containers.static_vector;
+
+import bounded;
+import numeric_traits;
+import std_module;
+
+namespace containers {
+
+export constexpr auto is_partitioned = [](range auto && input, auto predicate) -> bool {
+	auto first = containers::begin(input);
+	auto last = containers::end(input);
+	auto it = containers::find_if_not(first, last, predicate);
+	return containers::find_if(it, last, predicate) == last;
+};
+
+export constexpr auto partition_point = []<range Input>(Input && input, auto predicate) {
+	auto count = bounded::integer<0, bounded::builtin_max_value<range_size_t<Input>>>(containers::size(input));
+	auto first = containers::begin(input);
+	if constexpr (numeric_traits::max_value<decltype(count)> == bounded::constant<0>) {
+		return first;
+	} else {
+		while (count > bounded::constant<0>) {
+			auto it = first;
+			auto const step = count / bounded::constant<2>;
+			::containers::advance(it, step);
+			if (predicate(*it)) {
+				first = ::containers::next(it);
+				count -= step + bounded::constant<1>;
+			} else {
+				count = step;
+			}
+		}
+		return first;
+	}
+};
+
+template<typename T>
+concept decrementable = requires(T value) { --value; };
+
+struct partition_t {
+	template<iterator ForwardIterator>
+	static constexpr auto operator()(ForwardIterator first, sentinel_for<ForwardIterator> auto last, auto predicate) {
+		auto advance_first = [&]{
+			first = containers::find_if_not(first, last, predicate);
+		};
+		advance_first();
+
+		if constexpr (decrementable<decltype(last)>) {
+			auto advance_last = [&]{
+				while (first != last) {
+					--last;
+					if (predicate(*last)) {
+						break;
+					}
+				}
+			};
+
+			advance_last();
+			while (first != last) {
+				std::ranges::swap(*first, *last);
+				advance_first();
+				if (first == last) {
+					break;
+				}
+				advance_last();
+			}
+		} else {
+			if (first == last) {
+				return first;
+			}
+			for (auto it = containers::next(first); it != last; ++it) {
+				if (predicate(*it)) {
+					std::ranges::swap(*it, *first);
+					++first;
+				}
+			}
+		}
+		return first;
+	}
+	static constexpr auto operator()(range auto && input, auto predicate) {
+		return operator()(containers::begin(input), containers::end(input), predicate);
+	}
+};
+export constexpr auto partition = partition_t();
+
+} // namespace containers
 
 using namespace bounded::literal;
 
@@ -152,5 +247,3 @@ static_assert(test_partition(
 	containers::array{true, true, true},
 	containers::array{true, true, true}
 ));
-
-} // namespace

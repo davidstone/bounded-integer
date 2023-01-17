@@ -3,9 +3,28 @@
 // (See accompanying file LICENSE_1_0.txt or copy at
 // http://www.boost.org/LICENSE_1_0.txt)
 
-#include <containers/to_address.hpp>
+export module containers.to_address;
 
-namespace {
+import std_module;
+
+namespace containers {
+
+template<typename T>
+concept pointer_like = std::is_pointer_v<T> or std::is_null_pointer_v<T>;
+
+export template<typename T>
+concept to_addressable = pointer_like<T> or requires(T const x) { x.to_address(); };
+
+export template<to_addressable Iterator>
+constexpr auto to_address(Iterator const it) {
+	if constexpr (pointer_like<Iterator>) {
+		return it;
+	} else {
+		return it.to_address();
+	}
+}
+
+} // namespace containers
 
 static_assert(containers::to_address(nullptr) == nullptr);
 static_assert(containers::to_address(static_cast<void *>(nullptr)) == nullptr);
@@ -24,5 +43,3 @@ private:
 };
 
 static_assert(containers::to_address(my_iterator(nullptr)) == nullptr);
-
-} // namespace

@@ -3,4 +3,15 @@
 // (See accompanying file LICENSE_1_0.txt or copy at
 // http://www.boost.org/LICENSE_1_0.txt)
 
-#include <containers/range_reference_t.hpp>
+export module containers.range_reference_t;
+
+import containers.is_range;
+import containers.iter_reference_t;
+import containers.iterator_t;
+
+namespace containers {
+
+export template<range Range>
+using range_reference_t = iter_reference_t<iterator_t<Range>>;
+
+} // namespace containers

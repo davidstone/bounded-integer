@@ -3,16 +3,46 @@
 // (See accompanying file LICENSE_1_0.txt or copy at
 // http://www.boost.org/LICENSE_1_0.txt)
 
-#include <containers/algorithms/keyed_erase.hpp>
+module;
 
-#include <containers/flat_map.hpp>
+#include <operators/forward.hpp>
 
 #include "../../test_assert.hpp"
-#include "../../test_int.hpp"
 
-namespace {
+export module containers.algorithms.keyed_erase;
+
+import containers.algorithms.erase;
+import containers.algorithms.keyed_binary_search;
+import containers.associative_container;
+import containers.begin_end;
+import containers.flat_map;
+import containers.size;
+
+import bounded;
+import bounded.test_int;
 
 using namespace bounded::literal;
+
+namespace containers {
+
+export constexpr auto keyed_erase(associative_container auto & map, auto && key) {
+	if constexpr (requires { map.find(OPERATORS_FORWARD(key)); }) {
+		auto const it = map.find(OPERATORS_FORWARD(key));
+		if (it == containers::end(map)) {
+			return bounded::integer<0, 1>(bounded::constant<0>);
+		}
+		map.erase(it);
+		return bounded::integer<0, 1>(bounded::constant<1>);
+	} else {
+		// TODO: This can be made more efficient for node-based containers
+		auto const to_erase = keyed_equal_range(map, OPERATORS_FORWARD(key));
+		auto const erased = containers::size(to_erase);
+		containers::erase(map, containers::begin(to_erase), containers::end(to_erase));
+		return erased;
+	}
+}
+
+} // namespace containers
 
 using map_type = containers::flat_map<bounded_test::integer, bounded_test::integer>;
 using multimap_type = containers::flat_multimap<bounded_test::integer, bounded_test::integer>;
@@ -143,5 +173,3 @@ constexpr auto test_duplicates() {
 static_assert(test_all<map_type>());
 static_assert(test_all<multimap_type>());
 static_assert(test_duplicates<multimap_type>());
-
-} // namespace

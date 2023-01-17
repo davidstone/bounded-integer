@@ -3,20 +3,47 @@
 // (See accompanying file LICENSE_1_0.txt or copy at
 // http://www.boost.org/LICENSE_1_0.txt)
 
-#include <bounded/string.hpp>
+module;
 
-#include <bounded/detail/class.hpp>
+#include <compare>
+#include <string>
 
-#include <catch2/catch_test_macros.hpp>
+#include <numeric_traits/has_int128.hpp>
 
-#include <type_traits>
+export module bounded.string;
 
-namespace {
+import bounded.is_bounded_integer;
 
-TEST_CASE("to_string", "[to_string]") {
-	auto const result = bounded::to_string(bounded::constant<4>);
-	static_assert(std::same_as<decltype(result), std::string const>, "Incorrect type of to_string.");
-	CHECK(result == "4");
+import numeric_traits;
+import std_module;
+
+namespace bounded {
+
+// Import to_string for the numeric types
+export using std::to_string;
+
+#if defined NUMERIC_TRAITS_HAS_INT128
+
+// TODO: Make this more efficient
+export auto to_string(numeric_traits::uint128_t x) {
+	auto result = std::string();
+	do {
+		result.push_back(static_cast<char>(x % 10 + '0'));
+		x /= 10;
+	} while (x > 0);
+	std::reverse(result.begin(), result.end());
+	return result;
 }
 
-} // namespace
+// TODO: Make this more efficient
+export auto to_string(numeric_traits::int128_t const x) {
+	return x >= 0 ? to_string(static_cast<numeric_traits::uint128_t>(x)) : '-' + to_string(-static_cast<numeric_traits::uint128_t>(x));
+}
+
+#endif
+
+export auto to_string(bounded_integer auto const x) {
+	return to_string(+x.value());
+}
+
+} // namespace bounded

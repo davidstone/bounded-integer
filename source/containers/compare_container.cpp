@@ -1,13 +1,50 @@
-// Copyright David Stone 2018.
+// Copyright David Stone 2020.
 // Distributed under the Boost Software License, Version 1.0.
 // (See accompanying file LICENSE_1_0.txt or copy at
 // http://www.boost.org/LICENSE_1_0.txt)
 
-#include <containers/compare_container.hpp>
+export module containers.compare_container;
 
-#include <containers/vector.hpp>
+import containers.algorithms.compare;
+import containers.is_range;
+import containers.range_value_t;
 
-namespace {
+import bounded;
+
+namespace containers {
+namespace range_equality {
+
+export struct base {
+	template<range T> requires bounded::equality_comparable<range_value_t<T>>
+	friend constexpr auto operator==(T const & lhs, T const & rhs) -> bool {
+		return ::containers::equal(lhs, rhs);
+	}
+};
+
+} // namespace range_equality
+
+namespace lexicographical_comparison {
+
+export struct base : range_equality::base {
+	template<range T> requires bounded::ordered<range_value_t<T>>
+	friend constexpr auto operator<=>(T const & lhs, T const & rhs) {
+		return ::containers::lexicographical_compare_3way(lhs, rhs);
+	}
+};
+
+} // namespace lexicographical_comparison
+
+namespace shortlex_comparison {
+
+export struct base : range_equality::base {
+	template<range T> requires bounded::ordered<range_value_t<T>>
+	friend constexpr auto operator<=>(T const & lhs, T const & rhs) {
+		return ::containers::shortlex_compare(lhs, rhs);
+	}
+};
+
+} // namespace shortlex_comparison
+} // namespace containers
 
 constexpr auto max_size = 3;
 
@@ -193,6 +230,3 @@ static_assert(shortlex(1, 2) < shortlex(0, 1, 2));
 
 static_assert(shortlex(1, 2) != shortlex(3, 1, 2));
 static_assert(shortlex(1, 2) < shortlex(3, 1, 2));
-
-
-} // namespace

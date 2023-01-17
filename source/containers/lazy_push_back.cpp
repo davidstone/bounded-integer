@@ -1,46 +1,70 @@
-// Copyright David Stone 2020.
+// Copyright David Stone 2019.
 // Distributed under the Boost Software License, Version 1.0.
 // (See accompanying file LICENSE_1_0.txt or copy at
 // http://www.boost.org/LICENSE_1_0.txt)
 
-#include <containers/lazy_push_back.hpp>
+module;
 
-#include <containers/algorithms/compare.hpp>
-#include <containers/vector.hpp>
+#include <operators/forward.hpp>
 
-#include "../test_assert.hpp"
-#include "../test_int.hpp"
+export module containers.lazy_push_back;
 
-namespace {
+import containers.algorithms.uninitialized;
+import containers.begin_end;
+import containers.can_set_size;
+import containers.data;
+import containers.front_back;
+import containers.range_value_t;
+import containers.reserve_if_reservable;
+import containers.size;
+
+import bounded;
+import bounded.test_int;
+import std_module;
 
 using namespace bounded::literal;
 
-constexpr bool test_lazy_push_back() {
-	auto c = containers::vector<bounded_test::integer>();
+namespace containers {
 
-	BOUNDED_TEST(c.capacity() == 0_bi);
+template<typename Container>
+concept member_lazy_push_backable =
+	requires(Container container, bounded::function_ptr<range_value_t<Container>> constructor) {
+		container.lazy_push_back(constructor);
+	};
 
-	lazy_push_back(c, []{ return 3; });
-	BOUNDED_TEST(containers::equal(c, containers::vector({3})));
+export template<typename Container>
+concept lazy_push_backable = member_lazy_push_backable<Container> or can_set_size<Container>;
 
-	BOUNDED_TEST(c.capacity() == 1_bi);
+export template<lazy_push_backable Container>
+constexpr auto & lazy_push_back(
+	Container & container,
+	bounded::construct_function_for<range_value_t<Container>> auto && constructor
+) {
+	if constexpr (member_lazy_push_backable<Container>) {
+		return container.lazy_push_back(OPERATORS_FORWARD(constructor));
+	} else {
+		auto const initial_size = containers::size(container);
+		auto construct = [&](Container & target) {
+			bounded::construct_at(*(containers::data(target) + initial_size), OPERATORS_FORWARD(constructor));
+		};
+		if (initial_size < container.capacity()) {
+			construct(container);
+			container.set_size(initial_size + 1_bi);
+		} else if constexpr (reservable<Container>) {
+			auto temp = Container();
+			temp.reserve(::containers::reallocation_size(container.capacity(), initial_size, 1_bi));
+			construct(temp);
 
-	lazy_push_back(c, []{ return 4; });
-	BOUNDED_TEST(containers::equal(c, containers::vector({3, 4})));
+			containers::uninitialized_relocate_no_overlap(container, containers::begin(temp));
+			container.set_size(0_bi);
 
-	BOUNDED_TEST(c.capacity() == 2_bi);
-
-	lazy_push_back(c, []{ return 5; });
-	BOUNDED_TEST(containers::equal(c, containers::vector({3, 4, 5})));
-
-	BOUNDED_TEST(c.capacity() == 4_bi);
-
-	lazy_push_back(c, []{ return 12; });
-	BOUNDED_TEST(containers::equal(c, containers::vector({3, 4, 5, 12})));
-
-	return true;
+			temp.set_size(initial_size + 1_bi);
+			container = std::move(temp);
+		} else {
+			std::unreachable();
+		}
+		return containers::back(container);
+	}
 }
 
-static_assert(test_lazy_push_back());
-
-} // namespace
+} // namespace containers

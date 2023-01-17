@@ -3,11 +3,55 @@
 // (See accompanying file LICENSE_1_0.txt or copy at
 // http://www.boost.org/LICENSE_1_0.txt)
 
-#include <containers/algorithms/minmax_element.hpp>
+module;
 
-#include <containers/array.hpp>
+#include <operators/forward.hpp>
 
-namespace {
+export module containers.algorithms.minmax_element;
+
+import containers.algorithms.advance;
+import containers.array;
+import containers.begin_end;
+import containers.is_range;
+
+import bounded;
+import std_module;
+
+namespace containers {
+
+// TODO: minmax_element
+
+export constexpr auto min_element(range auto && source, auto compare) {
+	auto smallest = containers::begin(OPERATORS_FORWARD(source));
+	auto const last = containers::end(OPERATORS_FORWARD(source));
+	if (smallest == last) {
+		return smallest;
+	}
+	for (auto it = containers::next(smallest); it != last; ++it) {
+		if (compare(*it, *smallest)) {
+			smallest = it;
+		}
+	}
+	return smallest;
+}
+
+export constexpr auto min_element(range auto && source) {
+	return containers::min_element(OPERATORS_FORWARD(source), std::less());
+}
+
+export constexpr auto max_element(range auto && source, auto greater) {
+	auto compare = [cmp = std::move(greater)](auto const & lhs, auto const & rhs) {
+		return !(cmp(rhs, lhs));
+	};
+	return containers::min_element(OPERATORS_FORWARD(source), std::move(compare));
+}
+
+export constexpr auto max_element(range auto && source) {
+	return containers::max_element(OPERATORS_FORWARD(source), std::greater());
+}
+
+} // namespace containers
+
 using namespace bounded::literal;
 
 constexpr auto correct_min_max(auto const & range, auto const min_index, auto const max_index) {
@@ -67,5 +111,3 @@ static_assert(correct_min_max(three_equal_reversed_greater, 0_bi, 2_bi));
 
 constexpr auto three_equal_mixed_greater = containers::array{0, -8, 0};
 static_assert(correct_min_max(three_equal_mixed_greater, 1_bi, 2_bi));
-
-} // namespace

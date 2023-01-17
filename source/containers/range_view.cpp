@@ -3,12 +3,161 @@
 // (See accompanying file LICENSE_1_0.txt or copy at
 // http://www.boost.org/LICENSE_1_0.txt)
 
-#include <containers/range_view.hpp>
+module;
 
-#include <containers/array.hpp>
-#include <containers/algorithms/compare.hpp>
+#include <operators/bracket.hpp>
+#include <operators/forward.hpp>
 
-namespace {
+export module containers.range_view;
+
+import containers.algorithms.compare;
+import containers.array;
+import containers.begin_end;
+import containers.has_member_size;
+import containers.is_range;
+import containers.is_iterator_sentinel;
+import containers.iter_value_t;
+import containers.size;
+
+import bounded;
+import std_module;
+
+namespace containers {
+
+struct compute_end_from_size {
+	constexpr compute_end_from_size() = default;
+	constexpr compute_end_from_size(auto const &) {
+	}
+};
+
+template<typename T>
+concept explicit_sentinel = !std::same_as<T, compute_end_from_size>;
+
+template<typename Sentinel, typename Iterator>
+concept range_view_sentinel = sentinel_for<Sentinel, Iterator> or std::same_as<Sentinel, compute_end_from_size>;
+
+struct no_explicit_size {
+	constexpr no_explicit_size() = default;
+	constexpr no_explicit_size(auto const &) {
+	}
+};
+
+template<typename T>
+concept explicit_size = !std::same_as<T, no_explicit_size>;
+
+template<typename T>
+concept range_view_size = bounded::integral<T> or std::same_as<T, no_explicit_size>;
+
+export template<iterator Iterator, range_view_sentinel<Iterator> Sentinel = Iterator, range_view_size Size = no_explicit_size>
+struct range_view {
+	static_assert(explicit_sentinel<Sentinel> or explicit_size<Size>);
+
+	constexpr range_view(Iterator first, Sentinel last, Size size_) requires explicit_size<Size>:
+		m_begin(std::move(first)),
+		m_end(std::move(last)),
+		m_size(size_)
+	{
+	}
+	constexpr range_view(Iterator first, Sentinel last) requires(!explicit_size<Size>):
+		m_begin(std::move(first)),
+		m_end(std::move(last))
+	{
+	}
+	constexpr range_view(Iterator first, Size size_) requires(!explicit_sentinel<Sentinel>):
+		m_begin(std::move(first)),
+		m_size(size_)
+	{
+	}
+
+	constexpr range_view(sized_range auto && r) requires explicit_size<Size>:
+		range_view(
+			containers::begin(OPERATORS_FORWARD(r)),
+			containers::end(OPERATORS_FORWARD(r)),
+			containers::size(r)
+		)
+	{
+	}
+	constexpr range_view(range auto && r) requires(!explicit_size<Size>):
+		range_view(
+			containers::begin(OPERATORS_FORWARD(r)),
+			containers::end(OPERATORS_FORWARD(r))
+		)
+	{
+	}
+	
+	constexpr auto begin() const -> Iterator {
+		return m_begin;
+	}
+	constexpr auto size() const -> Size requires explicit_size<Size> {
+		return m_size;
+	}
+	// This is required for range-based for loops to work. A constrained `end`
+	// is found by language rules and then causes an error when it cannot be
+	// called.
+	constexpr auto end() const {
+		if constexpr (explicit_sentinel<Sentinel>) {
+			return m_end;
+		} else {
+			return begin() + size();
+		}
+	}
+
+	OPERATORS_BRACKET_SEQUENCE_RANGE_DEFINITIONS
+
+	friend auto operator==(range_view, range_view) -> bool = default;
+	
+private:
+	[[no_unique_address]] Iterator m_begin;
+	[[no_unique_address]] Sentinel m_end;
+	[[no_unique_address]] Size m_size;
+};
+
+template<range Range>
+range_view(Range &&) -> range_view<
+	decltype(containers::begin(bounded::declval<Range &&>())),
+	decltype(containers::end(bounded::declval<Range &&>()))
+>;
+
+template<range Range> requires has_member_size<Range>
+range_view(Range &&) -> range_view<
+	decltype(containers::begin(bounded::declval<Range &&>())),
+	decltype(containers::end(bounded::declval<Range &&>())),
+	decltype(bounded::declval<Range &&>().size())
+>;
+
+template<forward_random_access_range Range> requires has_member_size<Range>
+range_view(Range &&) -> range_view<
+	decltype(containers::begin(bounded::declval<Range &&>())),
+	compute_end_from_size,
+	decltype(bounded::declval<Range &&>().size())
+>;
+
+template<iterator Iterator, sentinel_for<Iterator> Sentinel>
+range_view(Iterator, Sentinel) -> range_view<
+	Iterator,
+	Sentinel
+>;
+
+template<iterator Iterator, bounded::integral Size>
+range_view(Iterator, Size) -> range_view<
+	Iterator,
+	compute_end_from_size,
+	Size
+>;
+
+export template<typename>
+constexpr auto is_range_view = false;
+
+template<typename Iterator, typename Sentinel, typename Size>
+constexpr auto is_range_view<range_view<Iterator, Sentinel, Size>> = true;
+
+export template<typename Iterator, typename Sentinel>
+constexpr auto to_range_view(std::pair<Iterator, Sentinel> pair) {
+	return range_view(std::move(pair).first, std::move(pair).second);
+}
+
+
+} // namespace containers
 
 static_assert(containers::range<containers::range_view<int *>>);
 
@@ -18,11 +167,9 @@ static_assert(std::same_as<
 	decltype(containers::range_view(a)),
 	containers::range_view<
 		containers::contiguous_iterator<int const, 5>,
-		containers::detail::compute_end_from_size,
+		containers::compute_end_from_size,
 		bounded::constant_t<5>
 	>
 >);
 
 static_assert(containers::equal(a, containers::range_view(a)));
-
-} // namespace

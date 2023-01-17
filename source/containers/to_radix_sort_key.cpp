@@ -3,29 +3,146 @@
 // (See accompanying file LICENSE_1_0.txt or copy at
 // http://www.boost.org/LICENSE_1_0.txt)
 
-#include <containers/to_radix_sort_key.hpp>
+module;
 
-#include <containers/algorithms/is_sorted.hpp>
-
-#include <containers/array.hpp>
-#include <containers/c_array.hpp>
-
-#include <bounded/detail/tuple.hpp>
-
-#include <numeric_traits/min_max_value.hpp>
-
-#include <catch2/catch_test_macros.hpp>
+#include <operators/forward.hpp>
 
 #include "../test_assert.hpp"
-#include "../test_int.hpp"
 
-namespace {
+export module containers.to_radix_sort_key;
+
+import containers.algorithms.is_sorted;
+import containers.array;
+import containers.is_range;
+
+import bounded;
+import bounded.test_int;
+import numeric_traits;
+import tv;
+import std_module;
+
+namespace containers {
+
+// TODO: Also validate get and tuple_element
+export template<typename T>
+concept tuple_like = requires{
+	std::tuple_size<std::decay_t<T>>::value;
+};
+
+export template<typename T>
+concept indexable_range =
+	range<T> and (
+		requires(T && value) { OPERATORS_FORWARD(value)[0]; } or
+		requires(T && value) { OPERATORS_FORWARD(value)[bounded::constant<0>]; }
+	);
+
+struct unknown_floating_point;
+template<typename T>
+using float_to_unsigned =
+	std::conditional_t<sizeof(T) == sizeof(std::uint16_t), std::uint16_t,
+	std::conditional_t<sizeof(T) == sizeof(std::uint32_t), std::uint32_t,
+	std::conditional_t<sizeof(T) == sizeof(std::uint64_t), std::uint64_t,
+	unknown_floating_point
+>>>;
+
+template<typename T>
+concept character = 
+	std::same_as<T, char> or
+	std::same_as<T, char8_t> or
+	std::same_as<T, char16_t> or
+	std::same_as<T, char32_t> or
+	std::same_as<T, wchar_t>;
+
+namespace to_radix_sort_key_adl {
+
+constexpr auto to_radix_sort_key(bool const value) {
+	return value;
+}
+
+constexpr auto to_radix_sort_key(std::byte const value) {
+	return static_cast<unsigned char>(value);
+}
+
+template<bounded::builtin_integer T>
+constexpr auto to_radix_sort_key(T const value) {
+	if constexpr (character<T>) {
+		return static_cast<std::make_unsigned_t<T>>(value);
+	} else if constexpr (bounded::unsigned_builtin<T>) {
+		return value;
+	} else {
+		static_assert(bounded::signed_builtin<T>);
+		using unsigned_t = std::make_unsigned_t<T>;
+		return static_cast<unsigned_t>(static_cast<unsigned_t>(value) + static_cast<unsigned_t>(numeric_traits::min_value<T>));
+	}
+}
+
+constexpr auto to_radix_sort_key(bounded::bounded_integer auto const value) {
+	return to_radix_sort_key(value.value());
+}
+
+template<typename T> requires std::is_enum_v<T>
+constexpr auto to_radix_sort_key(T const value) {
+	return to_radix_sort_key(bounded::integer(value));
+}
+
+template<std::floating_point T>
+constexpr auto to_radix_sort_key(T const value) {
+	static_assert(std::numeric_limits<T>::is_iec559);
+	using unsigned_t = float_to_unsigned<T>;
+	static_assert(sizeof(T) == sizeof(unsigned_t));
+	auto const u = std::bit_cast<unsigned_t>(value);
+	constexpr auto sign_bit_position = std::numeric_limits<unsigned_t>::digits - 1U;
+	auto const sign_bit = static_cast<unsigned_t>(-static_cast<std::make_signed_t<unsigned_t>>(u >> (sign_bit_position)));
+	return u ^ (sign_bit | (static_cast<unsigned_t>(1U) << sign_bit_position));
+}
+
+auto to_radix_sort_key(auto * ptr) {
+	return reinterpret_cast<std::uintptr_t>(ptr);
+}
+
+// libc++ doesn't have this constexpr yet
+inline auto to_radix_sort_key(std::vector<bool>::reference const value) {
+	return static_cast<bool>(value);
+}
+
+// TODO: This should not be the default behavior.
+constexpr auto && to_radix_sort_key(indexable_range auto && value) {
+	return OPERATORS_FORWARD(value);
+}
+
+// TODO: This should not be the default behavior.
+template<tuple_like T> requires(!indexable_range<T>)
+constexpr auto && to_radix_sort_key(T && value) {
+	return OPERATORS_FORWARD(value);
+}
+
+template<typename T>
+concept default_ska_sortable_value = requires(T && value) {
+	to_radix_sort_key(OPERATORS_FORWARD(value));
+};
+
+constexpr decltype(auto) to_radix_sort_key_impl(default_ska_sortable_value auto && value) {
+	return to_radix_sort_key(OPERATORS_FORWARD(value));
+}
+
+} // namespace to_radix_sort_key_adl
+
+using to_radix_sort_key_adl::default_ska_sortable_value;
+
+export struct to_radix_sort_key_t {
+	static constexpr auto operator()(default_ska_sortable_value auto && value) -> decltype(auto) {
+		return containers::to_radix_sort_key_adl::to_radix_sort_key_impl(OPERATORS_FORWARD(value));
+	}
+};
+export constexpr auto to_radix_sort_key = to_radix_sort_key_t();
+
+} // namespace containers
 
 // nextafter is not constexpr. This signature is easier to implement
 template<typename T>
 constexpr auto increase_float_magnitude(T const value, unsigned const offset) {
 	return std::bit_cast<T>(
-		std::bit_cast<containers::detail::float_to_unsigned<T>>(value) + offset
+		std::bit_cast<containers::float_to_unsigned<T>>(value) + offset
 	);
 }
 
@@ -126,7 +243,7 @@ static_assert(is_sorted_converted_to_radix<std::int32_t>(
 ));
 
 static_assert(is_sorted_converted_to_radix<std::int64_t>(
-	numeric_traits::min_value<int64_t>,
+	numeric_traits::min_value<std::int64_t>,
 	-1'000'000'000'000,
 	static_cast<std::int64_t>(numeric_traits::min_value<std::int32_t>) - 1,
 	numeric_traits::min_value<std::int32_t>,
@@ -236,25 +353,9 @@ static_assert(is_sorted_converted_to_radix<std::byte>(
 	std::byte(0xFF)
 ));
 
-static_assert(is_sorted_converted_to_radix<bounded::tuple<std::byte>>(
-	bounded::tuple(std::byte(0x00)),
-	bounded::tuple(std::byte(0x01)),
-	bounded::tuple(std::byte(0xFF))
+static_assert(is_sorted_converted_to_radix<tv::tuple<std::byte>>(
+	tv::tuple(std::byte(0x00)),
+	tv::tuple(std::byte(0x01)),
+	tv::tuple(std::byte(0xFF))
 ));
 
-TEST_CASE("to_radix_sort_key", "[to_radix_sort_key]") {
-	constexpr int array[] = { 1, 2, 3, 4, 5, 6, 7, 8 };
-	BOUNDED_TEST(is_sorted_to_radix(
-		array + 0,
-		array + 1,
-		array + 2,
-		array + 3,
-		array + 4,
-		array + 5,
-		array + 6,
-		array + 7,
-		array + 8
-	));
-}
-
-} // namespace

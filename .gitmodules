@@ -13,3 +13,6 @@
 [submodule "operators"]
 	path = dependencies/operators
 	url = https://github.com/davidstone/operators.git
+[submodule "dependencies/std_module"]
+	path = dependencies/std_module
+	url = https://github.com/davidstone/std_module.git

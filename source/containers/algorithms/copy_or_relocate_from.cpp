@@ -3,98 +3,50 @@
 // (See accompanying file LICENSE_1_0.txt or copy at
 // http://www.boost.org/LICENSE_1_0.txt)
 
-#include <containers/algorithms/copy_or_relocate_from.hpp>
+module;
 
-#include <containers/vector.hpp>
+#include <operators/forward.hpp>
 
-#include "../../test_assert.hpp"
-#include "../../test_int.hpp"
+export module containers.algorithms.copy_or_relocate_from;
 
-namespace {
+import containers.begin_end;
+import containers.can_set_size;
+import containers.dereference;
+import containers.is_container;
+import containers.is_range;
+import containers.range_value_t;
 
-static_assert([] {
-	using container_t = containers::vector<bounded_test::integer>;
-	auto const original = container_t({1, 2});
-	auto container = original;
-	auto result = container_t();
-	containers::copy_or_relocate_from(
-		container,
-		[&](auto function) { containers::lazy_push_back(result, function); }
-	);
-	BOUNDED_TEST(container == original);
-	BOUNDED_TEST(result == original);
-	return true;
-}());
+import bounded;
+import std_module;
 
-static_assert([] {
-	using container_t = containers::vector<bounded_test::integer>;
-	auto const original = container_t({1, 2});
-	auto container = original;
-	auto result = container_t();
-	containers::copy_or_relocate_from(
-		std::move(container),
-		[&](auto function) { containers::lazy_push_back(result, function); }
-	);
-	BOUNDED_TEST(containers::is_empty(container));
-	BOUNDED_TEST(result == original);
-	return true;
-}());
+using namespace bounded::literal;
 
-static_assert([] {
-	using container_t = containers::vector<bounded_test::integer>;
-	auto const original = container_t({1, 2});
-	auto container = original;
-	auto result = container_t();
-	containers::copy_or_relocate_from(
-		containers::range_view(container),
-		[&](auto function) { containers::lazy_push_back(result, function); }
-	);
-	BOUNDED_TEST(container == original);
-	BOUNDED_TEST(result == original);
-	return true;
-}());
+namespace containers {
 
+export constexpr auto copy_or_relocate_from = []<range Input>(Input && input, auto function) {
+	// We do not relocate trivially copyable types because that requires setting
+	// the size of the source range to 0. This is extra work that is not
+	// necessary -- we don't want to make operations on rvalues more expensive
+	// than operations on lvalues.
+	//
+	// TODO: Optimize node-based input containers
+	constexpr auto use_relocate =
+		is_container<Input> and
+		can_set_size<Input> and
+		!std::is_trivially_copyable_v<range_value_t<Input>>;
+	auto it = containers::begin(OPERATORS_FORWARD(input));
+	auto const last = containers::end(OPERATORS_FORWARD(input));
+	if constexpr (use_relocate) {
+		for (; it != last; ++it) {
+			function([&] { return bounded::relocate(*it); });
+		}
+		input.set_size(0_bi);
+	} else {
+		for (; it != last; ++it) {
+			function([&] { return dereference<Input>(it); });
+		}
+	}
+	return it;
+};
 
-static_assert([] {
-	using container_t = containers::vector<int>;
-	auto const original = container_t({1, 2});
-	auto container = original;
-	auto result = container_t();
-	containers::copy_or_relocate_from(
-		container,
-		[&](auto function) { containers::lazy_push_back(result, function); }
-	);
-	BOUNDED_TEST(container == original);
-	BOUNDED_TEST(result == original);
-	return true;
-}());
-
-static_assert([] {
-	using container_t = containers::vector<int>;
-	auto const original = container_t({1, 2});
-	auto container = original;
-	auto result = container_t();
-	containers::copy_or_relocate_from(
-		std::move(container),
-		[&](auto function) { containers::lazy_push_back(result, function); }
-	);
-	BOUNDED_TEST(container == original);
-	BOUNDED_TEST(result == original);
-	return true;
-}());
-
-static_assert([] {
-	using container_t = containers::vector<int>;
-	auto const original = container_t({1, 2});
-	auto container = original;
-	auto result = container_t();
-	containers::copy_or_relocate_from(
-		containers::range_view(container),
-		[&](auto function) { containers::lazy_push_back(result, function); }
-	);
-	BOUNDED_TEST(container == original);
-	BOUNDED_TEST(result == original);
-	return true;
-}());
-
-} // namespace
+} // namespace containers

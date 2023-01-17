@@ -3,26 +3,40 @@
 // (See accompanying file LICENSE_1_0.txt or copy at
 // http://www.boost.org/LICENSE_1_0.txt)
 
-#include <containers/dereference.hpp>
+export module containers.dereference;
 
-#include <containers/array.hpp>
+import containers.c_array;
+import containers.is_container;
+import containers.iterator_t;
 
-namespace {
+import bounded;
+import std_module;
+
+namespace containers {
+
+export template<typename Range>
+constexpr auto dereference = [](iterator_t<Range> const & it) -> decltype(auto) {
+	if constexpr (is_container<Range>) {
+		static_assert(std::is_lvalue_reference_v<decltype(*it)>);
+		return std::move(*it);
+	} else {
+		return *it;
+	}
+};
+
+} // namespace containers
 
 using namespace bounded::literal;
-constexpr auto size = 0_bi;
 
 static_assert(std::same_as<
-	decltype(containers::dereference<containers::array<int, size>>({})),
+	decltype(containers::dereference<containers::c_array<int, 1>>({})),
 	int &&
 >);
 static_assert(std::same_as<
-	decltype(containers::dereference<containers::array<int, size> const &>({})),
+	decltype(containers::dereference<containers::c_array<int, 1> const &>({})),
 	int const &
 >);
 static_assert(std::same_as<
-	decltype(containers::dereference<containers::array<int, size> &>({})),
+	decltype(containers::dereference<containers::c_array<int, 1> &>({})),
 	int &
 >);
-
-} // namespace

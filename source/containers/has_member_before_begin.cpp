@@ -3,4 +3,17 @@
 // (See accompanying file LICENSE_1_0.txt or copy at
 // http://www.boost.org/LICENSE_1_0.txt)
 
-#include <containers/has_member_before_begin.hpp>
+module;
+
+#include <operators/forward.hpp>
+
+export module containers.has_member_before_begin;
+
+namespace containers {
+
+export template<typename Range>
+concept has_member_before_begin = requires(Range range) {
+	OPERATORS_FORWARD(range).before_begin();
+};
+
+} // namespace containers

@@ -3,4 +3,15 @@
 // (See accompanying file LICENSE_1_0.txt or copy at
 // http://www.boost.org/LICENSE_1_0.txt)
 
-#include <bounded/number_of.hpp>
+export module bounded.number_of;
+
+import bounded.integer;
+import bounded.is_bounded_integer;
+import numeric_traits;
+
+namespace bounded {
+
+export template<isomorphic_to_integral T>
+constexpr auto number_of = constant<numeric_traits::max_value<T>> - constant<numeric_traits::min_value<T>> + constant<1>;
+
+} // namespace bounded

@@ -3,27 +3,13 @@
 // (See accompanying file LICENSE_1_0.txt or copy at
 // http://www.boost.org/LICENSE_1_0.txt)
 
-#include <containers/iterator_t.hpp>
+export module containers.iterator_t;
 
-#include <containers/array.hpp>
+import containers.is_range;
 
-namespace {
+namespace containers {
 
-using namespace bounded::literal;
+export template<range Range>
+using iterator_t = iterator_t_impl<Range>;
 
-constexpr auto size = 3_bi;
-
-static_assert(std::same_as<
-	containers::iterator_t<containers::array<int, size> const &>,
-	containers::contiguous_iterator<int const, 3>
->);
-static_assert(std::same_as<
-	containers::iterator_t<containers::array<int, size> &>,
-	containers::contiguous_iterator<int, 3>
->);
-static_assert(std::same_as<
-	containers::iterator_t<containers::array<int, size> &&>,
-	containers::contiguous_iterator<int, 3>
->);
-
-} // namespace
+} // namespace containers

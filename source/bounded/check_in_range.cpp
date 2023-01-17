@@ -1,27 +1,33 @@
-// Copyright David Stone 2015.
+// Copyright David Stone 2020.
 // Distributed under the Boost Software License, Version 1.0.
 // (See accompanying file LICENSE_1_0.txt or copy at
 // http://www.boost.org/LICENSE_1_0.txt)
 
-#include <bounded/check_in_range.hpp>
+export module bounded.check_in_range;
 
-#include <catch2/catch_test_macros.hpp>
+import bounded.integer;
+import bounded.comparison;
+import bounded.comparison_builtin;
+import bounded.is_bounded_integer;
+import bounded.string;
 
-namespace {
+import numeric_traits;
+import std_module;
 
-TEST_CASE("check_in_range", "[check_in_range]") {
-	constexpr auto minimum = bounded::constant<0>;
-	constexpr auto maximum = bounded::constant<10>;
-	CHECK_THROWS(bounded::check_in_range(
-		bounded::integer<-20, 20>(bounded::constant<20>),
-		minimum,
-		maximum
-	));
-	CHECK_THROWS(bounded::check_in_range(
-		bounded::integer<-6, 6>(bounded::constant<-6>),
-		minimum,
-		maximum
-	));
+namespace bounded {
+
+export template<typename Exception = std::range_error>
+constexpr auto check_in_range(integral auto const value, bounded_integer auto const minimum, bounded_integer auto const maximum) {
+	if (minimum <= value and value <= maximum) {
+		return ::bounded::detail::assume_in_range_impl(value, minimum, maximum);
+	} else {
+		throw Exception("Got a value of " + to_string(value) + " but expected a value in the range [" + to_string(minimum) + ", " + to_string(maximum) + "]");
+	}
 }
 
-} // namespace
+export template<typename Target, typename Exception = std::range_error>
+constexpr auto check_in_range(integral auto const value) {
+	return ::bounded::check_in_range<Exception>(value, numeric_traits::min_value<Target>, numeric_traits::max_value<Target>);
+}
+
+} // namespace bounded

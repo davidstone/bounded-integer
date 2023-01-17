@@ -1,18 +1,40 @@
-// Copyright David Stone 2020.
+// Copyright David Stone 2016.
 // Distributed under the Boost Software License, Version 1.0.
 // (See accompanying file LICENSE_1_0.txt or copy at
 // http://www.boost.org/LICENSE_1_0.txt)
 
-#include <containers/front_back.hpp>
+module;
 
-#include <containers/array.hpp>
+#include <operators/forward.hpp>
+#include <bounded/assert.hpp>
 
-namespace {
+export module containers.front_back;
 
-static_assert(containers::front(containers::array{5}) == 5);
-static_assert(containers::back(containers::array{5}) == 5);
+import containers.algorithms.advance;
+import containers.begin_end;
+import containers.c_array;
+import containers.is_empty;
+import containers.is_range;
 
-static_assert(containers::front(containers::array{2, 3, 4}) == 2);
-static_assert(containers::back(containers::array{2, 3, 4}) == 4);
+import std_module;
 
-} // namespace
+namespace containers {
+
+export constexpr decltype(auto) front(range auto && r) {
+	BOUNDED_ASSERT(!containers::is_empty(r));
+	return *containers::begin(OPERATORS_FORWARD(r));
+}
+export constexpr decltype(auto) back(range auto && r) {
+	BOUNDED_ASSERT(!containers::is_empty(r));
+	return *containers::prev(containers::end(OPERATORS_FORWARD(r)));
+}
+
+} // namespace containers
+
+constexpr containers::c_array<int, 1> one = {5};
+static_assert(containers::front(one) == 5);
+static_assert(containers::back(one) == 5);
+
+constexpr containers::c_array<int, 3> three = {2, 3, 4};
+static_assert(containers::front(three) == 2);
+static_assert(containers::back(three) == 4);

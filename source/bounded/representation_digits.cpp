@@ -3,15 +3,52 @@
 // (See accompanying file LICENSE_1_0.txt or copy at
 // http://www.boost.org/LICENSE_1_0.txt)
 
-#include <bounded/representation_digits.hpp>
+export module bounded.representation_digits;
 
-#include <bounded/detail/class.hpp>
-#include <bounded/detail/comparison.hpp>
-#include <bounded/detail/literal.hpp>
+import bounded.arithmetic.plus;
+import bounded.arithmetic.unary_minus;
+import bounded.builtin_min_max_value;
+import bounded.comparison;
+import bounded.integer;
+import bounded.literal;
+import bounded.log;
+import bounded.minmax;
 
-#include <numeric_traits/min_max_value.hpp>
+import numeric_traits;
+import std_module;
 
-namespace {
+namespace bounded {
+
+enum class count_sign { all, negative };
+
+template<typename T, count_sign sign>
+constexpr auto digits_impl(auto const base) {
+	auto safe_log = [=](auto value) {
+		if constexpr (value == constant<0>) {
+			return constant<0>;
+		} else if constexpr (value > constant<0>) {
+			return ::bounded::log(value, base);
+		} else {
+			return ::bounded::log(-value, base) + constant<sign == count_sign::negative>;
+		}
+	};
+	auto const representation_min = safe_log(constant<builtin_min_value<T>>);
+	auto const representation_max = safe_log(constant<builtin_max_value<T>>);
+	constexpr auto sign_bits = constant<builtin_min_value<T> < 0 and sign == count_sign::all>;
+	return ::bounded::max(representation_min, representation_max) + sign_bits + constant<1>;
+}
+
+export template<typename T>
+constexpr auto digits_in_string_representation(auto const base) {
+	return ::bounded::digits_impl<T, count_sign::negative>(base);
+}
+
+// This can be used for determining the size of a bitfield of a value
+export template<typename T>
+constexpr auto representation_bits = ::bounded::digits_impl<T, count_sign::all>(constant<2>);
+
+} // namespace bounded
+
 using namespace bounded::literal;
 
 using sixty_three = bounded::constant_t<63>;
@@ -27,14 +64,10 @@ using negative_one_to_ninety_nine = bounded::integer<-1, 99>;
 
 enum class sixty_three_enum : std::uint16_t { value = 63 };
 
-} // namespace
-
 template<>
 constexpr auto numeric_traits::min_value<sixty_three_enum> = sixty_three_enum::value;
 template<>
 constexpr auto numeric_traits::max_value<sixty_three_enum> = sixty_three_enum::value;
-
-namespace {
 
 static_assert(bounded::representation_bits<sixty_three> == 6_bi);
 static_assert(bounded::digits_in_string_representation<sixty_three>(2_bi) == 6_bi);
@@ -75,5 +108,3 @@ static_assert(bounded::digits_in_string_representation<negative_one_to_ninety_ni
 static_assert(bounded::representation_bits<sixty_three_enum> == 6_bi);
 static_assert(bounded::digits_in_string_representation<sixty_three_enum>(2_bi) == 6_bi);
 static_assert(bounded::digits_in_string_representation<sixty_three_enum>(10_bi) == 2_bi);
-
-} // namespace

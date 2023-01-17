@@ -1,11 +1,77 @@
-// Copyright David Stone 2016.
+// Copyright David Stone 2018.
 // Distributed under the Boost Software License, Version 1.0.
 // (See accompanying file LICENSE_1_0.txt or copy at
 // http://www.boost.org/LICENSE_1_0.txt)
 
-#include <containers/size.hpp>
+export module containers.size;
 
-namespace {
+import containers.algorithms.distance;
+import containers.begin_end;
+import containers.c_array;
+import containers.has_member_size;
+import containers.is_range;
+import containers.iter_difference_t;
+import containers.iterator_t;
+
+import bounded;
+import std_module;
+
+namespace containers {
+
+export template<typename Range>
+concept sized_range = (range<Range> and has_member_size<Range>) or forward_random_access_range<Range>;
+
+template<range T>
+struct size_type_impl {
+	using type = bounded::integer<0, bounded::builtin_max_value<iter_difference_t<iterator_t<T>>>>;
+};
+
+template<typename T>
+concept has_size_type = requires { typename T::size_type; };
+
+template<range T> requires has_size_type<T> and has_member_size<T>
+struct size_type_impl<T> {
+	static_assert(std::same_as<decltype(bounded::declval<T const &>().size()), typename T::size_type>);
+	using type = typename T::size_type;
+};
+
+template<range T> requires has_size_type<T>
+struct size_type_impl<T> {
+	using type = typename T::size_type;
+};
+
+template<range T> requires has_member_size<T>
+struct size_type_impl<T> {
+	using type = decltype(bounded::declval<T const &>().size());
+};
+
+export template<typename T>
+using range_size_t = typename size_type_impl<std::remove_cvref_t<T>>::type;
+
+export template<sized_range Range>
+constexpr auto size(Range const & range) {
+	if constexpr (has_member_size<Range>) {
+		return range.size();
+	} else {
+		return ::bounded::assume_in_range<range_size_t<Range>>(containers::end(range) - containers::begin(range));
+	}
+}
+
+export template<typename T, std::size_t size_>
+constexpr auto size(c_array<T, size_> const &) {
+	return bounded::constant<size_>;
+}
+
+export template<range Range>
+constexpr auto linear_size(Range const & r) {
+	if constexpr (requires { containers::size(r); }) {
+		return containers::size(r);
+	} else {
+		return ::bounded::assume_in_range<range_size_t<Range>>(containers::distance(containers::begin(r), containers::end(r)));
+	}
+}
+
+} // namespace containers
 
 using namespace bounded::literal;
 
@@ -54,5 +120,3 @@ struct member_begin_end {
 	}
 };
 static_assert(containers::size(member_begin_end()) == 4);
-
-} // namespace

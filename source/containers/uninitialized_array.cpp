@@ -3,13 +3,56 @@
 // (See accompanying file LICENSE_1_0.txt or copy at
 // http://www.boost.org/LICENSE_1_0.txt)
 
-#include <containers/uninitialized_array.hpp>
+export module containers.uninitialized_array;
 
-namespace {
+import containers.c_array;
+import containers.maximum_array_size;
+
+import bounded;
+import std_module;
+
+namespace containers {
+
+export template<typename T, array_size_type<T> capacity>
+struct uninitialized_array {
+	constexpr uninitialized_array() = default;
+	constexpr auto data() const noexcept -> T const * {
+		return data_impl<T const *>(m_storage);
+	}
+	constexpr auto data() noexcept -> T * {
+		return data_impl<T *>(m_storage);
+	}
+private:
+	// reinterpret_cast is not allowed in a constexpr function, so this avoids
+	// storage that requires a reinterpret_cast if possible.
+	//
+	// Once https://github.com/llvm/llvm-project/issues/51130 is fixed, this can
+	// use a union-based implementation to drop the trivially destructible
+	// requirement
+	static constexpr auto is_sufficiently_trivial = std::is_trivially_default_constructible_v<T> and std::is_trivially_destructible_v<T>;
+
+	template<typename Result>
+	static constexpr auto data_impl(auto & storage) -> Result {
+		if constexpr (capacity == 0) {
+			return nullptr;
+		} else if constexpr (is_sufficiently_trivial) {
+			return static_cast<Result>(storage);
+		} else {
+			return reinterpret_cast<Result>(std::addressof(storage));
+		}
+	}
+
+	using storage_type = std::conditional_t<
+		is_sufficiently_trivial,
+		possibly_empty_c_array<T, static_cast<std::size_t>(capacity)>,
+		possibly_empty_c_array<std::byte, sizeof(T) * static_cast<std::size_t>(capacity)>
+	>;
+	alignas(alignof(T)) [[no_unique_address]] storage_type m_storage;
+};
+
+} // namespace containers
 
 using namespace bounded::literal;
 using container = containers::uninitialized_array<int, 5_bi>;
 
 static_assert(container().data() != container().data());
-
-} // namespace
