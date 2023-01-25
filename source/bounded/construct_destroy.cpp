@@ -57,12 +57,21 @@ struct construct_t {
 export template<typename T>
 constexpr auto construct = construct_t<T>();
 
+template<typename T>
+constexpr auto is_no_lazy_construction = false;
+
+template<typename T>
+constexpr auto is_no_lazy_construction<no_lazy_construction<T>> = true;
 
 export constexpr auto construct_at = []<non_const T, construct_function_for<T> Function>(T & ref, Function && function) -> T & {
-	return *std::construct_at(
-		std::addressof(ref),
-		superconstructing_super_elider<T, Function>(OPERATORS_FORWARD(function))
-	);
+	auto make = [&] {
+		if constexpr (is_no_lazy_construction<std::invoke_result_t<Function>>) {
+			return OPERATORS_FORWARD(function)().value;
+		} else {
+			return superconstructing_super_elider<T, Function>(OPERATORS_FORWARD(function));
+		}
+	};
+	return *std::construct_at(std::addressof(ref), make());
 };
 
 export constexpr auto destroy = [](non_const auto & ref) -> void {
@@ -70,3 +79,27 @@ export constexpr auto destroy = [](non_const auto & ref) -> void {
 };
 
 } // namespace bounded
+
+struct empty {};
+
+struct accepts_anything {
+	template<typename T>
+	explicit constexpr accepts_anything(T &&) {
+		static_assert(std::same_as<T, int>);
+	}
+};
+
+union u {
+	constexpr u():
+		e()
+	{
+	}
+	empty e;
+	accepts_anything a;
+};
+
+static_assert([]{
+	auto x = u();
+	bounded::construct_at(x.a, [] { return bounded::no_lazy_construction(accepts_anything(5)); });
+	return true;
+}());
