@@ -40,5 +40,5 @@ Once built (see [the readme](readme.md)), there are a few tests that can be run 
 
 * `bounded::integer` uses built-in integers as the template parameter to determine its bounds. This means that it cannot store an integer larger than an unsigned 64-bit or 128-bit integer or smaller than a signed 64-bit or 128-bit integer (depending on your platform). This restriction should be removed at some point in the future.
 * `bounded::integer` is currently still under active development, so some interfaces are still subject to change.
-* `bounded::integer` cannot be used as the argument to a `switch` statement. There is work in C++23 to add pattern matching, which would be a replacement for `switch` statements, and pattern matching would work with `bounded::integer`.
+* `bounded::integer` cannot be used as the argument to a `switch` statement. There is work in C++26 to add pattern matching, which would be a replacement for `switch` statements, and pattern matching would work with `bounded::integer`.
 * `bounded::integer` cannot be used to express the size of a bit-field.
