@@ -30,6 +30,14 @@ The type of `z` is calculated as the smallest type that can hold all possible va
 4. Allow implicit conversions to larger types.
 5. Have no space or time overhead, assuming basic compiler optimizations like inlining, so that `bounded::integer` can be used on very large data sets or systems with hard real-time requirements.
 
+## Safety
+
+`bounded::integer` does not protect against divide-by-zero. This is a fundamentally different problem than having correct bounds. Such an operation is still undefined behavior.
+
+Constructing a `bounded::integer` will never invoke undefined behavior, unless the user explicitly passes `bounded::unchecked` to the constructor. There are additional functions, `bounded::check_in_range<TargetType>(value)` and `bounded::check_in_range(value, minimum, maximum)` that throw an exception if the value is not in range, otherwise they return a value of a type with new bounds based on the boundary checks. For instance, `bounded::check_in_range<bounded::integer<0, 10>>(bounded::integer<-5, 5>(0_bi))` will evaluate to `bounded::integer<0, 5>(0_bi)`. There is a similar set of functions, `bounded::assume_in_range`, that reduce the range of the value but have undefined behavior if the value is out of range. Finally, the `bounded::clamp` set of functions sets too-small values to the minimum legal value and sets too-large values to the maximum legal value.
+
+Assignment to a `bounded::integer` requires that there exists at least one value of overlap in the source and the target types, and has undefined behavior for assigning out-of-range values. This is unfortunate, but is seems like the only effective choice to make things like incrementing have maximal performance.
+
 # Building and running tests
 
 Once built (see [the readme](readme.md)), there are a few tests that can be run with `./build/bounded_test`. The majority of the tests are compile-time tests that execute while compiling the library.
