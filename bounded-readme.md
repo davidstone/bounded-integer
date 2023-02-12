@@ -2,7 +2,7 @@
 
 ## The situation so far
 
-The built-in integer types in C++ (`int`, `unsigned`, `long long`, etc.) are mostly unusable because of the lax requirements on bounds. The types defined in `cstdint` are better because they give you stronger guarantees.
+The built-in integer types in C++ (`int`, `unsigned`, `long long`, etc.) are almost impossible to use correctly because of the lax requirements on bounds. The types defined in `cstdint` are slightly better because they give you stronger guarantees.
 
 However, integer comparisons between signed and unsigned types are broken. `cstdint` integers are merely typedefs and thus inherit the same brokenness. Integer arithmetic is also broken. Signed overflow invokes undefined behavior, and unsigned overflow gives a result modulo the upper bound + 1.
 
