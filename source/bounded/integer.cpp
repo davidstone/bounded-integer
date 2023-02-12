@@ -131,7 +131,7 @@ struct integer<minimum, minimum> {
 
 	using underlying_type = detail::underlying_type_t<minimum, minimum>;
 	
-	static constexpr auto value() {
+	static constexpr auto value() -> underlying_type {
 		return static_cast<underlying_type>(minimum);
 	}
 	
@@ -175,7 +175,7 @@ struct integer {
 
 	using underlying_type = detail::underlying_type_t<minimum, maximum>;
 	
-	constexpr auto value() const {
+	constexpr auto value() const -> underlying_type {
 		BOUNDED_ASSUME(minimum <= m_value and m_value <= maximum);
 		return m_value;
 	}
