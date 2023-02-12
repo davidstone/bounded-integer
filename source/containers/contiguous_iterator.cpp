@@ -17,10 +17,12 @@ import bounded;
 import operators;
 import std_module;
 
+using namespace bounded::literal;
+
 namespace containers {
 
-template<typename T, typename U>
-concept same_as_ignore_const = std::same_as<T const, U const>;
+template<typename T>
+using opposite_const = std::conditional_t<std::is_const_v<T>, std::remove_const_t<T>, T const>;
 
 export template<typename T, std::ptrdiff_t max_difference>
 struct contiguous_iterator {
@@ -54,8 +56,6 @@ struct contiguous_iterator {
 	// Iterators over ranges of zero size tend to come up only in generic code, and
 	// it is annoying to be unable to do things like use a range-based for loop over
 	// an empty array
-	// Specifying the return type triggers a gcc bug where it thinks that parameter
-	// pack lengths are mismatched in the constructor of tuple.
 	friend auto operator+(contiguous_iterator, bounded::constant_t<1>) -> contiguous_iterator requires(max_difference == 0) {
 		std::unreachable();
 	}
@@ -63,8 +63,10 @@ struct contiguous_iterator {
 		std::unreachable();
 	}
 
-	template<same_as_ignore_const<T> RHS>
-	friend constexpr auto operator-(contiguous_iterator const lhs, contiguous_iterator<RHS, max_difference> const rhs) {
+	friend constexpr auto operator-(contiguous_iterator const lhs, contiguous_iterator const rhs) -> difference_type {
+		return ::bounded::assume_in_range<difference_type>(lhs.to_address() - rhs.to_address());
+	}
+	friend constexpr auto operator-(contiguous_iterator const lhs, contiguous_iterator<opposite_const<T>, max_difference> const rhs) -> difference_type {
 		return ::bounded::assume_in_range<difference_type>(lhs.to_address() - rhs.to_address());
 	}
 
@@ -76,3 +78,19 @@ private:
 
 static_assert(containers::random_access_iterator<containers::contiguous_iterator<int, 5>>);
 static_assert(std::same_as<containers::offset_type<containers::contiguous_iterator<int, 5>>, bounded::integer<0, 5>>);
+
+using const_iterator = containers::contiguous_iterator<int const, 0>;
+using iterator = containers::contiguous_iterator<int, 0>;
+
+static_assert(const_iterator() == const_iterator());
+static_assert(const_iterator() == iterator());
+static_assert(iterator() == const_iterator());
+static_assert(iterator() == iterator());
+
+static_assert(const_iterator() + 0_bi == const_iterator());
+static_assert(iterator() + 0_bi == iterator());
+
+static_assert(const_iterator() - const_iterator() == 0_bi);
+static_assert(const_iterator() - iterator() == 0_bi);
+static_assert(iterator() - const_iterator() == 0_bi);
+static_assert(iterator() - iterator() == 0_bi);
