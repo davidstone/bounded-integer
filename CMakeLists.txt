@@ -217,6 +217,7 @@ target_sources(containers PUBLIC
 		source/containers/algorithms/move_iterator.cpp
 		source/containers/algorithms/negate.cpp
 		source/containers/algorithms/partition.cpp
+		source/containers/algorithms/remove_none.cpp
 		source/containers/algorithms/reverse_iterator.cpp
 		source/containers/algorithms/set.cpp
 		source/containers/algorithms/ska_sort.cpp
