@@ -14,4 +14,4 @@ You can read the [documentation](containers-readme.md) and view the [headers](in
 
 * `git submodule update --init` will check out any necessary dependencies
 * Configure with cmake
-* Build with clang 13+
+* Build with clang 16+
