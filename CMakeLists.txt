@@ -9,7 +9,15 @@ if(NOT CMAKE_BUILD_TYPE)
 	set(CMAKE_BUILD_TYPE "Debug" CACHE STRING "Build type" FORCE)
 endif()
 
+#set(CMAKE_CXX_COMPILER "/usr/bin/clang++")
 project(bounded_integer LANGUAGES CXX)
+if(NOT DEFINED REQUIRED_GCC_VER )
+	set(REQUIRED_GCC_VER 13)
+endif()
+
+if(NOT DEFINED REQUIRED_CLANG_VER )
+	set(REQUIRED_CLANG_VER 16)
+endif()
 
 enable_testing()
 
@@ -34,6 +42,27 @@ if (NOT has_parent)
 		)
 	endif()
 endif()
+
+if(DEFINED FATAL_ERR)
+	set(MFLAG_FETAL FATAL_ERROR)
+else()
+	set(MFLAG_FETAL WARNING)
+endif()
+
+if(${CMAKE_CXX_COMPILER_ID} STREQUAL "Clang")
+	string(REPLACE "." ";" __VLIST ${CMAKE_CXX_COMPILER_VERSION} ) 
+	list(GET __VLIST 0 CXX_CMP_V_1)
+	if(${CXX_CMP_V_1} LESS ${REQUIRED_CLANG_VER}) 
+		message(${MFLAG_FETAL} "${CMAKE_CXX_COMPILER_ID}: detected version ${CXX_CMP_V_1}(${CMAKE_CXX_COMPILER_VERSION}); you must use ver ${REQUIRED_CLANG_VER}")
+	endif()
+elseif(${CMAKE_CXX_COMPILER_ID} STREQUAL "GNU")
+	string(REPLACE "." ";" __VLIST ${CMAKE_CXX_COMPILER_VERSION} ) 
+	list(GET __VLIST 0 CXX_CMP_V_1)
+	if(${CXX_CMP_V_1} LESS ${REQUIRED_GCC_VER}) 
+		message(${MFLAG_FETAL} "${CMAKE_CXX_COMPILER_ID}: detected version ${CXX_CMP_V_1}(${CMAKE_CXX_COMPILER_VERSION}); you must use ver ${REQUIRED_GCC_VER}")
+	endif()
+endif()
+	
 
 add_library(bounded INTERFACE)
 
