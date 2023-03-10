@@ -5,6 +5,8 @@
 
 module;
 
+#include <cstdint>
+
 #include <bounded/assert.hpp>
 
 #include <operators/forward.hpp>
@@ -49,25 +51,25 @@ struct optional_storage {
 	{
 	}
 	
-	constexpr auto is_initialized() const {
+	constexpr auto is_initialized() const -> bool {
 		return m_data.index() == value_index;
 	}
 
-	constexpr auto uninitialize() {
+	constexpr auto uninitialize() -> void {
 		::tv::insert(m_data, none_index, none);
 	}
 
-	constexpr auto initialize(bounded::construct_function_for<T> auto && construct_) {
-		m_data.emplace(value_index, OPERATORS_FORWARD(construct_));
+	constexpr auto initialize(bounded::construct_function_for<T> auto && construct_) -> T & {
+		return m_data.emplace(value_index, OPERATORS_FORWARD(construct_));
 	}
 	
-	constexpr auto && get() const & {
+	constexpr auto get() const & -> T const & {
 		return m_data[value_index];
 	}
-	constexpr auto && get() & {
+	constexpr auto get() & -> T & {
 		return m_data[value_index];
 	}
-	constexpr auto && get() && {
+	constexpr auto get() && -> T && {
 		return std::move(m_data)[value_index];
 	}
 
@@ -97,33 +99,33 @@ struct optional_storage<T> {
 	{
 	}
 	
-	constexpr auto is_initialized() const {
+	constexpr auto is_initialized() const -> bool {
 		return bounded::tombstone_traits<T>::index(m_data) != uninitialized_index;
 	}
 
-	constexpr auto uninitialize() {
+	constexpr auto uninitialize() -> void {
 		bounded::destroy(m_data);
 		bounded::construct_at(m_data, make_uninitialized);
 	}
 
-	constexpr auto initialize(bounded::construct_function_for<T> auto && construct_) {
+	constexpr auto initialize(bounded::construct_function_for<T> auto && construct_) -> T & {
 		uninitialize();
-		bounded::construct_at(m_data, OPERATORS_FORWARD(construct_));
+		return bounded::construct_at(m_data, OPERATORS_FORWARD(construct_));
 	}
 
-	constexpr auto && get() const & {
+	constexpr auto get() const & -> T const & {
 		return m_data;
 	}
-	constexpr auto && get() & {
+	constexpr auto get() & -> T & {
 		return m_data;
 	}
-	constexpr auto && get() && {
+	constexpr auto get() && -> T && {
 		return std::move(m_data);
 	}
 
 private:
 	static constexpr auto uninitialized_index = 0_bi;
-	static constexpr auto make_uninitialized() noexcept {
+	static constexpr auto make_uninitialized() noexcept -> T {
 		static_assert(noexcept(bounded::tombstone_traits<T>::make(uninitialized_index)));
 		return bounded::tombstone_traits<T>::make(uninitialized_index);
 	}
@@ -147,19 +149,20 @@ struct optional_storage<T &> {
 	{
 	}
 	
-	constexpr auto is_initialized() const {
+	constexpr auto is_initialized() const -> bool {
 		return static_cast<bool>(m_data);
 	}
 
-	constexpr auto uninitialize() {
+	constexpr auto uninitialize() -> void {
 		m_data = nullptr;
 	}
 
-	constexpr auto initialize(bounded::construct_function_for<T &> auto && construct_) {
+	constexpr auto initialize(bounded::construct_function_for<T &> auto && construct_) -> T & {
 		m_data = std::addressof(OPERATORS_FORWARD(construct_)());
+		return *m_data;
 	}
 
-	constexpr auto get() const & -> auto && {
+	constexpr auto get() const & -> T & {
 		return *m_data;
 	}
 
@@ -167,7 +170,7 @@ private:
 	T * m_data;
 };
 
-constexpr auto & assign(auto & target, auto && source) {
+constexpr auto assign(auto & target, auto && source) -> auto & {
 	if (target) {
 		*target = OPERATORS_FORWARD(source);
 	} else {
@@ -176,7 +179,7 @@ constexpr auto & assign(auto & target, auto && source) {
 	return target;
 }
 
-constexpr auto & assign_from_optional(auto & target, auto && source) {
+constexpr auto assign_from_optional(auto & target, auto && source) -> auto & {
 	if (!source) {
 		target = none;
 	} else {
@@ -186,6 +189,12 @@ constexpr auto & assign_from_optional(auto & target, auto && source) {
 }
 
 struct common_init_tag{};
+
+template<typename T>
+concept non_reference = !std::is_reference_v<T>;
+
+template<typename T>
+concept optional_equality_comparable = bounded::equality_comparable<T> and non_reference<T>;
 
 export template<typename T>
 struct optional {
@@ -198,18 +207,18 @@ struct optional {
 		m_storage(bounded::lazy_init, OPERATORS_FORWARD(construct_)) {
 	}
 
-	template<bounded::explicitly_convertible_to<value_type> Value>
-	constexpr explicit(!bounded::convertible_to<Value, value_type>) optional(Value && other):
+	template<bounded::explicitly_convertible_to<T> Value>
+	constexpr explicit(!bounded::convertible_to<Value, T>) optional(Value && other):
 		m_storage(OPERATORS_FORWARD(other))
 	{
 	}
 
-	template<typename U> requires bounded::explicitly_convertible_to<U const &, value_type>
+	template<typename U> requires bounded::explicitly_convertible_to<U const &, T>
 	constexpr explicit optional(optional<U> const & other):
 		optional(other, common_init_tag{})
 	{
 	}
-	template<typename U> requires bounded::explicitly_convertible_to<U &&, value_type>
+	template<typename U> requires bounded::explicitly_convertible_to<U &&, T>
 	constexpr explicit optional(optional<U> && other):
 		optional(std::move(other), common_init_tag{})
 	{
@@ -217,18 +226,18 @@ struct optional {
 
 	optional(optional const &) = default;
 	optional(optional &&) = default;
-	auto operator=(optional const &) & -> optional & requires(!std::is_reference_v<T>) = default;
-	auto operator=(optional &&) & -> optional & requires(!std::is_reference_v<T>) = default;
+	auto operator=(optional const &) & -> optional & requires non_reference<T> = default;
+	auto operator=(optional &&) & -> optional & requires non_reference<T> = default;
 	
-	constexpr auto operator*() const & -> value_type const & {
+	constexpr auto operator*() const & -> T const & {
 		BOUNDED_ASSERT(*this);
 		return m_storage.get();
 	}
-	constexpr auto operator*() & -> value_type & {
+	constexpr auto operator*() & -> T & {
 		BOUNDED_ASSERT(*this);
 		return m_storage.get();
 	}
-	constexpr auto operator*() && -> value_type && {
+	constexpr auto operator*() && -> T && {
 		BOUNDED_ASSERT(*this);
 		return std::move(m_storage).get();
 	}
@@ -239,24 +248,24 @@ struct optional {
 		return m_storage.is_initialized();
 	}
 
-	constexpr auto emplace(bounded::construct_function_for<T> auto && construct_) {
-		m_storage.initialize(OPERATORS_FORWARD(construct_));
+	constexpr auto emplace(bounded::construct_function_for<T> auto && construct_) -> T & {
+		return m_storage.initialize(OPERATORS_FORWARD(construct_));
 	}
 
 	constexpr auto operator=(none_t) & -> optional & {
 		m_storage.uninitialize();
 		return *this;
 	}
-	constexpr auto operator=(bounded::convertible_to<value_type> auto && other) & -> optional & requires(!std::is_reference_v<T>) {
+	constexpr auto operator=(bounded::convertible_to<T> auto && other) & -> optional & requires non_reference<T> {
 		return ::tv::assign(*this, OPERATORS_FORWARD(other));
 	}
 		
-	friend constexpr auto operator==(optional const & lhs, optional const & rhs) -> bool requires(bounded::equality_comparable<T> and !std::is_reference_v<T>) {
+	friend constexpr auto operator==(optional const & lhs, optional const & rhs) -> bool requires optional_equality_comparable<T> {
 		return (lhs and rhs) ?
 			*lhs == *rhs :
 			static_cast<bool>(lhs) == static_cast<bool>(rhs);
 	}
-	friend constexpr auto operator==(optional const & lhs, T const & rhs) -> bool requires(bounded::equality_comparable<T> and !std::is_reference_v<T>) {
+	friend constexpr auto operator==(optional const & lhs, T const & rhs) -> bool requires optional_equality_comparable<T> {
 		return static_cast<bool>(lhs) and *lhs == rhs;
 	}
 	friend constexpr auto operator==(optional const & lhs, none_t) -> bool {
@@ -274,9 +283,7 @@ private:
 	optional_storage<T> m_storage;
 };
 
-// A limitation of emulating lazy parameters is that we cannot tell if the user
-// is trying to create an optional function or lazily create an optional value
-template<typename T> requires(!std::same_as<T, none_t> and !std::invocable<T>)
+template<typename T> requires(!std::same_as<T, none_t>)
 optional(T) -> optional<T>;
 
 export constexpr auto make_optional(auto && value) {

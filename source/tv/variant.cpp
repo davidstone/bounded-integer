@@ -217,7 +217,8 @@ private:
 	constexpr auto & replace_active_member(auto const index, auto && construct_) {
 		constexpr auto index_value = ::tv::get_index(index, bounded::type<Ts>...);
 		m_index = variant_index<Ts...>(index_value);
-		return bounded::construct_at(m_data, [&] { return variadic_union<Ts...>(index_value, OPERATORS_FORWARD(construct_)); });
+		auto & data = bounded::construct_at(m_data, [&] { return variadic_union<Ts...>(index_value, OPERATORS_FORWARD(construct_)); });
+		return ::tv::get_union_element(data, index_value);
 	}
 
 	constexpr variant(auto && other, copy_move_tag):
@@ -435,5 +436,7 @@ static_assert(tv::visit(tv::variant<int>(1), [](int && x) { return x; }) == 1);
 
 static_assert(!std::invocable<decltype(tv::visit), decltype(variant), decltype(int_visitor)>);
 static_assert(!std::invocable<decltype(tv::visit), decltype(variant), decltype(tv::overload(int_visitor))>);
+
+static_assert(std::same_as<decltype(bounded::declval<tv::variant<int> &>().emplace(0_bi, [] { return 0; })), int &>);
 
 } // namespace
