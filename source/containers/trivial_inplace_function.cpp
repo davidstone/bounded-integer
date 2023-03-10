@@ -40,12 +40,19 @@ union aligned_storage_helper {
 template<std::size_t capacity>
 constexpr auto alignment_for_capacity = alignof(aligned_storage_helper<capacity>);
 
-template<typename Function, std::size_t capacity, std::size_t alignment, typename R, typename... Args>
-concept trivially_storable =
-	std::same_as<std::invoke_result_t<Function, Args...>, R> and
+template<typename Function>
+concept function_pointer = std::is_function_v<std::remove_pointer_t<Function>>;
+
+template<typename Function, std::size_t capacity, std::size_t alignment>
+concept trivially_storable_class = 
 	(capacity == 0 ? std::is_empty_v<Function> : sizeof(Function) <= capacity) and
 	alignof(Function) <= alignment and
 	std::is_trivially_copyable_v<Function>;
+
+template<typename Function, std::size_t capacity, std::size_t alignment, typename R, typename... Args>
+concept trivially_storable =
+	std::same_as<std::invoke_result_t<Function, Args...>, R> and
+	(function_pointer<Function> or trivially_storable_class<Function, capacity, alignment>);
 
 // bit_cast requires that the source and destination are exactly the same size.
 // We use this struct to pad the function out to the size needed. We cannot use
@@ -90,17 +97,17 @@ private:
 			if constexpr (bounded::convertible_to<Function, function_ptr>) {
 				return function;
 			} else {
-				return [](Args... args) {
+				return [](Args... args) -> R {
 					return Function()(OPERATORS_FORWARD(args)...);
 				};
 			}
 		} else {
 			if constexpr (is_const) {
-				return [](storage_type const & storage, Args... args) {
+				return [](storage_type const & storage, Args... args) -> R {
 					return std::invoke(reinterpret_cast<Function const &>(storage), OPERATORS_FORWARD(args)...);
 				};
 			} else {
-				return [](storage_type & storage, Args... args) {
+				return [](storage_type & storage, Args... args) -> R {
 					return std::invoke(reinterpret_cast<Function &>(storage), OPERATORS_FORWARD(args)...);
 				};
 			}
@@ -202,6 +209,14 @@ static_assert(!std::invocable<empty_mutable_function const &>);
 static_assert(!std::invocable<mutable_function const &>);
 static_assert(std::invocable<empty_mutable_function &>);
 static_assert(std::invocable<mutable_function &>);
+
+constexpr auto normal_function() -> int {
+	return 2;
+}
+static_assert(empty_const_function(normal_function)() == 2);
+static_assert(bounded::constructible_from<const_function, int(*)()>);
+static_assert(empty_mutable_function(normal_function)() == 2);
+static_assert(bounded::constructible_from<const_function, int(*)()>);
 
 static_assert(!bounded::constructible_from<empty_const_function, void(*)()>);
 static_assert(!bounded::constructible_from<const_function, void(*)()>);
