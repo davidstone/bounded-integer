@@ -19,7 +19,9 @@ namespace bounded {
 // https://quuxplusone.github.io/blog/2018/05/17/super-elider-round-2/
 template<typename T, typename Function>
 struct superconstructing_super_elider {
-	constexpr explicit superconstructing_super_elider(Function function):
+	static_assert(std::is_reference_v<Function>);
+
+	constexpr explicit superconstructing_super_elider(Function function) noexcept:
 		m_function(OPERATORS_FORWARD(function))
 	{
 	}
@@ -29,7 +31,7 @@ struct superconstructing_super_elider {
 	// can be used with std::any.
 	superconstructing_super_elider(superconstructing_super_elider &&) = delete;
 
-	constexpr operator T() && {
+	constexpr operator T() && noexcept(noexcept(static_cast<T>(declval<Function>()()))) {
 		return static_cast<T>(OPERATORS_FORWARD(m_function)());
 	}
 
@@ -43,7 +45,8 @@ concept non_const = !std::is_const_v<T>;
 // TODO: Use lambda https://github.com/llvm/llvm-project/issues/59513
 template<typename T>
 struct construct_t {
-	static constexpr auto operator()(auto && ... args) -> T requires constructible_from<T, decltype(args)...> {
+	template<typename... Args> requires constructible_from<T, Args &&...>
+	static constexpr auto operator()(Args && ... args) noexcept(std::is_nothrow_constructible_v<T, Args &&...>) -> T {
 		return T(OPERATORS_FORWARD(args)...);
 	}
 };
@@ -56,18 +59,24 @@ constexpr auto is_no_lazy_construction = false;
 template<typename T>
 constexpr auto is_no_lazy_construction<no_lazy_construction<T>> = true;
 
-export constexpr auto construct_at = []<non_const T, construct_function_for<T> Function>(T & ref, Function && function) -> T & {
+template<typename T, typename Function>
+constexpr auto is_noexcept_construct_at = noexcept(static_cast<T>(declval<Function>()()));
+
+template<typename T, typename Function> requires is_no_lazy_construction<std::invoke_result_t<Function>>
+constexpr auto is_noexcept_construct_at<T, Function> = noexcept(static_cast<T>(declval<Function>()().value));
+
+export constexpr auto construct_at = []<non_const T, construct_function_for<T> Function>(T & ref, Function && function) noexcept(is_noexcept_construct_at<T, Function>) -> T & {
 	auto make = [&] {
 		if constexpr (is_no_lazy_construction<std::invoke_result_t<Function>>) {
 			return OPERATORS_FORWARD(function)().value;
 		} else {
-			return superconstructing_super_elider<T, Function>(OPERATORS_FORWARD(function));
+			return superconstructing_super_elider<T, Function &&>(OPERATORS_FORWARD(function));
 		}
 	};
 	return *std::construct_at(std::addressof(ref), make());
 };
 
-export constexpr auto destroy = [](non_const auto & ref) -> void {
+export constexpr auto destroy = []<non_const T>(T & ref) noexcept(std::is_nothrow_destructible_v<T>) -> void {
 	std::destroy_at(std::addressof(ref));
 };
 
@@ -96,3 +105,25 @@ static_assert([]{
 	bounded::construct_at(x.a, [] { return bounded::no_lazy_construction(accepts_anything(5)); });
 	return true;
 }());
+
+auto make_int_noexcept() noexcept -> int;
+static_assert(noexcept(bounded::construct_at(bounded::declval<int &>(), make_int_noexcept)));
+
+auto make_int_throws() -> int;
+static_assert(!noexcept(bounded::construct_at(bounded::declval<int &>(), make_int_throws)));
+
+struct convert_to_int_throws {
+	operator int() const;
+};
+auto make_convert_to_int_throws() noexcept -> convert_to_int_throws;
+static_assert(!noexcept(bounded::construct_at(bounded::declval<int &>(), make_convert_to_int_throws)));
+
+auto make_no_lazy_construction_int_noexcept() noexcept -> bounded::no_lazy_construction<int>;
+static_assert(noexcept(bounded::construct_at(bounded::declval<int &>(), make_no_lazy_construction_int_noexcept)));
+
+auto make_no_lazy_construction_int_throws() -> bounded::no_lazy_construction<int>;
+static_assert(!noexcept(bounded::construct_at(bounded::declval<int &>(), make_no_lazy_construction_int_throws)));
+
+auto make_no_lazy_construction_convert_to_int_throws() noexcept -> bounded::no_lazy_construction<convert_to_int_throws>;
+static_assert(!noexcept(bounded::construct_at(bounded::declval<int &>(), make_no_lazy_construction_convert_to_int_throws)));
+
