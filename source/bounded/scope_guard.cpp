@@ -23,7 +23,7 @@ struct scope_guard {
 	{
 	}
 
-	~scope_guard() {
+	constexpr ~scope_guard() {
 		if (m_is_active) {
 			std::move(m_function)();
 		}
