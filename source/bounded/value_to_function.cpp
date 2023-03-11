@@ -11,15 +11,15 @@ namespace bounded {
 
 export template<typename T>
 struct value_to_function {
-	constexpr explicit value_to_function(T && ref):
+	constexpr explicit value_to_function(T && ref) noexcept:
 		m_ptr(std::addressof(ref))
 	{
 	}
 
-	constexpr T & operator()() const & {
+	constexpr auto operator()() const & noexcept -> T & {
 		return *m_ptr;
 	}
-	constexpr T && operator()() && {
+	constexpr auto operator()() && noexcept -> T && {
 		return static_cast<T &&>(*m_ptr);
 	}
 
