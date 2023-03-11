@@ -37,21 +37,14 @@ private:
 	Function m_function;
 };
 
-template<typename T, typename... Args>
-concept brace_constructible = requires (Args && ... args) { T{OPERATORS_FORWARD(args)...}; };
-
 export template<typename T>
 concept non_const = !std::is_const_v<T>;
 
 // TODO: Use lambda https://github.com/llvm/llvm-project/issues/59513
 template<typename T>
 struct construct_t {
-	static constexpr auto operator()(auto && ... args) -> T requires constructible_from<T, decltype(args)...> or brace_constructible<T, decltype(args)...> {
-		if constexpr (constructible_from<T, decltype(args)...>) {
-			return T(OPERATORS_FORWARD(args)...);
-		} else {
-			return T{OPERATORS_FORWARD(args)...};
-		}
+	static constexpr auto operator()(auto && ... args) -> T requires constructible_from<T, decltype(args)...> {
+		return T(OPERATORS_FORWARD(args)...);
 	}
 };
 export template<typename T>
