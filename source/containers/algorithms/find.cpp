@@ -11,7 +11,6 @@ module;
 
 export module containers.algorithms.find;
 
-import containers.algorithms.negate;
 import containers.begin_end;
 import containers.c_array;
 import containers.empty_range;
@@ -68,7 +67,7 @@ export constexpr auto find_last_if(bidirectional_range auto && range, auto predi
 
 export template<iterator Iterator>
 constexpr auto find_if_not(Iterator const first, sentinel_for<Iterator> auto const last, auto predicate) {
-	return ::containers::find_if(first, last, ::containers::negate(std::move(predicate)));
+	return ::containers::find_if(first, last, std::not_fn(std::move(predicate)));
 }
 
 export constexpr auto find_if_not(range auto && range, auto predicate) {
@@ -82,7 +81,7 @@ export constexpr auto find_if_not(range auto && range, auto predicate) {
 
 export template<bidirectional_iterator Iterator>
 constexpr auto find_last_if_not(Iterator const first, Iterator const last, auto predicate) {
-	return ::containers::find_last_if(first, last, ::containers::negate(std::move(predicate)));
+	return ::containers::find_last_if(first, last, std::not_fn(std::move(predicate)));
 }
 
 export constexpr auto find_last_if_not(bidirectional_range auto && range, auto predicate) {

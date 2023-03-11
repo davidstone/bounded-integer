@@ -19,7 +19,6 @@ import containers.algorithms.compare;
 import containers.algorithms.erase;
 import containers.algorithms.is_sorted;
 import containers.algorithms.keyed_binary_search;
-import containers.algorithms.negate;
 import containers.algorithms.ska_sort;
 import containers.algorithms.unique;
 import containers.append;

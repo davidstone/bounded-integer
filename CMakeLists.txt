@@ -215,7 +215,6 @@ target_sources(containers PUBLIC
 		source/containers/algorithms/maybe_find.cpp
 		source/containers/algorithms/minmax_element.cpp
 		source/containers/algorithms/move_iterator.cpp
-		source/containers/algorithms/negate.cpp
 		source/containers/algorithms/partition.cpp
 		source/containers/algorithms/remove_none.cpp
 		source/containers/algorithms/reverse_iterator.cpp

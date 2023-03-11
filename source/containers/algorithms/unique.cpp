@@ -18,7 +18,6 @@ import containers.algorithms.erase;
 import containers.algorithms.find;
 import containers.algorithms.is_sorted;
 import containers.algorithms.move_iterator;
-import containers.algorithms.negate;
 import containers.append;
 import containers.begin_end;
 import containers.dynamic_array;
@@ -102,11 +101,11 @@ constexpr auto unique(Iterator const first, sentinel_for<Iterator> auto const la
 
 export template<iterator Iterator, typename BinaryPredicate = std::less<>>
 constexpr auto unique_copy_less(Iterator const first, sentinel_for<Iterator> auto const last, iterator auto const output, BinaryPredicate less = BinaryPredicate{}) {
-	return ::containers::unique_copy(first, last, output, negate(less));
+	return ::containers::unique_copy(first, last, output, std::not_fn(less));
 }
 export template<iterator Iterator, typename BinaryPredicate = std::less<>>
 constexpr auto unique_less(Iterator const first, sentinel_for<Iterator> auto const last, BinaryPredicate less = BinaryPredicate{}) {
-	return ::containers::unique(first, last, negate(less));
+	return ::containers::unique(first, last, std::not_fn(less));
 }
 
 

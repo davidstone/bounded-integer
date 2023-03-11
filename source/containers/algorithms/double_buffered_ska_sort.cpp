@@ -16,7 +16,6 @@ export module containers.algorithms.double_buffered_ska_sort;
 import containers.algorithms.advance;
 import containers.algorithms.count;
 import containers.algorithms.minmax_element;
-import containers.algorithms.negate;
 import containers.algorithms.reverse_iterator;
 import containers.array;
 import containers.begin_end;
@@ -89,7 +88,7 @@ constexpr auto bool_sort_copy(auto & source, auto & output, auto const & extract
 	auto false_position = containers::begin(output);
 	auto true_position = containers::next(
 		false_position,
-		containers::count_if(source, containers::negate(extract_key))
+		containers::count_if(source, std::not_fn(extract_key))
 	);
 	for (auto && value : source) {
 		auto & position = extract_key(value) ? true_position : false_position;

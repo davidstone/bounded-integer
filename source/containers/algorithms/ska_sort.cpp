@@ -25,7 +25,6 @@ import containers.algorithms.advance;
 import containers.algorithms.count;
 import containers.algorithms.erase;
 import containers.algorithms.minmax_element;
-import containers.algorithms.negate;
 import containers.algorithms.partition;
 import containers.algorithms.sort;
 import containers.algorithms.unique;
