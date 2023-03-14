@@ -25,4 +25,21 @@ struct tombstone_traits {
 	static auto index(T const &) noexcept = delete;
 };
 
+export struct tombstone_tag {};
+
+export template<auto>
+struct tombstone_traits_composer;
+
+template<typename Outer, typename Inner, Inner Outer::* pointer>
+struct tombstone_traits_composer<pointer> {
+	static constexpr auto spare_representations = tombstone_traits<Inner>::spare_representations;
+
+	static constexpr auto make(auto const index) noexcept -> Outer {
+		return Outer(tombstone_tag(), [=]() noexcept { return tombstone_traits<Inner>::make(index); });
+	}
+	static constexpr auto index(Outer const & value) noexcept {
+		return tombstone_traits<Inner>::index(value.*pointer);
+	}
+};
+
 } // namespace bounded
