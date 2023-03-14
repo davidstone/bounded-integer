@@ -8,6 +8,7 @@ module;
 #include <cstdint>
 
 #include <bounded/assert.hpp>
+#include <bounded/conditional.hpp>
 
 #include <operators/forward.hpp>
 #include <operators/arrow.hpp>
@@ -73,6 +74,9 @@ struct optional_storage {
 		return std::move(m_data)[value_index];
 	}
 
+	// TODO: Implement tombstone_traits for variant
+	static constexpr auto spare_representations = 0_bi;
+
 private:
 	static constexpr auto none_index = 0_bi;
 	static constexpr auto value_index = 1_bi;
@@ -123,10 +127,18 @@ struct optional_storage<T> {
 		return std::move(m_data);
 	}
 
+	static constexpr auto spare_representations = bounded::tombstone_traits<T>::spare_representations - 1_bi;
+	constexpr explicit optional_storage(bounded::tombstone_tag, auto const index) noexcept:
+		m_data(bounded::tombstone_traits<T>::make(index + 1_bi))
+	{
+	}
+	constexpr auto tombstone_index() const noexcept {
+		return bounded::tombstone_traits<T>::index(m_data) - 1_bi;
+	}
+
 private:
 	static constexpr auto uninitialized_index = 0_bi;
 	static constexpr auto make_uninitialized() noexcept -> T {
-		static_assert(noexcept(bounded::tombstone_traits<T>::make(uninitialized_index)));
 		return bounded::tombstone_traits<T>::make(uninitialized_index);
 	}
 	T m_data;
@@ -166,9 +178,28 @@ struct optional_storage<T &> {
 		return *m_data;
 	}
 
+	// TODO: look into using the unused bits of the pointer
+	static constexpr auto spare_representations = 0_bi;
+
 private:
 	T * m_data;
 };
+
+} // namespace tv
+
+template<typename T>
+struct bounded::tombstone_traits<tv::optional_storage<T>>  {
+	static constexpr auto spare_representations = tv::optional_storage<T>::spare_representations;
+
+	static constexpr auto make(auto const index) noexcept -> tv::optional_storage<T> {
+		return tv::optional_storage<T>(tombstone_tag(), index);
+	}
+	static constexpr auto index(tv::optional_storage<T> const & value) noexcept {
+		return value.tombstone_index();
+	}
+};
+
+namespace tv {
 
 constexpr auto assign(auto & target, auto && source) -> auto & {
 	if (target) {
@@ -260,8 +291,14 @@ struct optional {
 	}
 
 private:
+	constexpr explicit optional(bounded::tombstone_tag, auto const make):
+		m_storage(make())
+	{
+	}
 	
 	optional_storage<T> m_storage;
+	friend bounded::tombstone_traits<optional<T>>;
+	friend bounded::tombstone_traits_composer<&optional<T>::m_storage>;
 };
 
 template<typename T> requires(!std::same_as<T, none_t>)
@@ -276,6 +313,10 @@ export constexpr auto make_optional_lazy(auto && function) -> optional<std::invo
 }
 
 } // namespace tv
+
+template<typename T>
+struct bounded::tombstone_traits<tv::optional<T>> : bounded::tombstone_traits_composer<&tv::optional<T>::m_storage> {
+};
 
 template<typename LHS, typename RHS>
 struct std::common_type<tv::optional<LHS>, RHS> {
@@ -528,3 +569,44 @@ static_assert(tv::optional<tv::optional<int>>(tv::optional<int>()) != tv::none);
 static_assert(tv::optional<tv::optional<int>>(tv::optional<int>()) == tv::optional<int>());
 static_assert(tv::optional<tv::optional<int>>(tv::optional<int>(3)) == tv::optional<int>(3));
 
+struct two_spare_representations {
+	int x;
+	friend auto operator==(two_spare_representations, two_spare_representations) -> bool = default;
+};
+
+template<>
+struct bounded::tombstone_traits<two_spare_representations> {
+	static constexpr auto spare_representations = 2_bi;
+
+	static constexpr auto make(auto const index) noexcept -> two_spare_representations {
+		return two_spare_representations{index == 0_bi ? 12 : 19};
+	}
+	static constexpr auto index(two_spare_representations const & value) noexcept {
+		return
+			BOUNDED_CONDITIONAL(value.x == 12, 0_bi,
+			BOUNDED_CONDITIONAL(value.x == 19, 1_bi,
+			-1_bi
+		));
+	}
+};
+
+static_assert(bounded::tombstone_traits<two_spare_representations>::spare_representations == 2_bi);
+
+static_assert(tv::nullable<two_spare_representations>);
+static_assert(tv::optional_storage<two_spare_representations>::spare_representations == 1_bi);
+
+static_assert(bounded::tombstone_traits<tv::optional<two_spare_representations>>::spare_representations == 1_bi);
+static_assert(bounded::tombstone_traits<tv::optional<tv::optional<two_spare_representations>>>::spare_representations == 0_bi);
+
+static_assert(sizeof(tv::optional<two_spare_representations>) == sizeof(two_spare_representations));
+static_assert(sizeof(tv::optional<tv::optional<two_spare_representations>>) == sizeof(two_spare_representations));
+static_assert(sizeof(tv::optional<tv::optional<tv::optional<two_spare_representations>>>) > sizeof(two_spare_representations));
+
+static_assert(tv::optional<two_spare_representations>() == tv::none);
+static_assert(tv::optional<two_spare_representations>(two_spare_representations(3)) == two_spare_representations(3));
+
+static_assert(tv::optional<tv::optional<two_spare_representations>>() == tv::none);
+
+static_assert(tv::optional<tv::optional<two_spare_representations>>(tv::optional<two_spare_representations>()) != tv::none);
+static_assert(tv::optional<tv::optional<two_spare_representations>>(tv::optional<two_spare_representations>()) == tv::optional<two_spare_representations>());
+static_assert(*tv::optional<tv::optional<two_spare_representations>>(tv::optional<two_spare_representations>(two_spare_representations(3))) == two_spare_representations(3));
