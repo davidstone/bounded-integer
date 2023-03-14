@@ -20,9 +20,9 @@ export template<typename T>
 struct tombstone_traits {
 	static constexpr auto spare_representations = constant<0>;
 
-	static auto make(auto index) -> T = delete;
+	static auto make(auto index) noexcept -> T = delete;
 	// Returns constant<-1> if there is an object present
-	static auto index(T const &) = delete;
+	static auto index(T const &) noexcept = delete;
 };
 
 } // namespace bounded
