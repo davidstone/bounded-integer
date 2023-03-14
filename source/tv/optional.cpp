@@ -205,7 +205,7 @@ struct optional {
 		m_storage(bounded::lazy_init, OPERATORS_FORWARD(construct_)) {
 	}
 
-	template<bounded::explicitly_convertible_to<T> Value>
+	template<bounded::explicitly_convertible_to<T> Value = T>
 	constexpr explicit(!bounded::convertible_to<Value, T>) optional(Value && other):
 		m_storage(OPERATORS_FORWARD(other))
 	{
