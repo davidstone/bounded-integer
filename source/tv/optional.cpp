@@ -188,8 +188,6 @@ constexpr auto assign_from_optional(auto & target, auto && source) -> auto & {
 	return target;
 }
 
-struct common_init_tag{};
-
 template<typename T>
 concept non_reference = !std::is_reference_v<T>;
 
@@ -210,17 +208,6 @@ struct optional {
 	template<bounded::explicitly_convertible_to<T> Value>
 	constexpr explicit(!bounded::convertible_to<Value, T>) optional(Value && other):
 		m_storage(OPERATORS_FORWARD(other))
-	{
-	}
-
-	template<typename U> requires bounded::explicitly_convertible_to<U const &, T>
-	constexpr explicit optional(optional<U> const & other):
-		optional(other, common_init_tag{})
-	{
-	}
-	template<typename U> requires bounded::explicitly_convertible_to<U &&, T>
-	constexpr explicit optional(optional<U> && other):
-		optional(std::move(other), common_init_tag{})
 	{
 	}
 
@@ -273,12 +260,6 @@ struct optional {
 	}
 
 private:
-	constexpr optional(auto && other_optional, common_init_tag):
-		optional(none) {
-		if (other_optional) {
-			::tv::insert(*this, *OPERATORS_FORWARD(other_optional));
-		}
-	}
 	
 	optional_storage<T> m_storage;
 };
@@ -541,3 +522,9 @@ static_assert([] {
 	optional_ref.emplace(bounded::value_to_function(value2));
 	return std::addressof(*optional_ref) == std::addressof(value2);
 }());
+
+static_assert(tv::optional<tv::optional<int>>() == tv::none);
+static_assert(tv::optional<tv::optional<int>>(tv::optional<int>()) != tv::none);
+static_assert(tv::optional<tv::optional<int>>(tv::optional<int>()) == tv::optional<int>());
+static_assert(tv::optional<tv::optional<int>>(tv::optional<int>(3)) == tv::optional<int>(3));
+
