@@ -143,8 +143,16 @@ struct static_vector : private lexicographical_comparison::base {
 	}
 
 private:
+	constexpr explicit static_vector(bounded::tombstone_tag, auto const make) noexcept:
+		m_size(make())
+	{
+	}
+
 	[[no_unique_address]] uninitialized_array<T, capacity_> m_storage = {};
 	[[no_unique_address]] bounded::integer<0, bounded::normalize<capacity_>> m_size = 0_bi;
+
+	friend bounded::tombstone_traits<static_vector<T, capacity_>>;
+	friend bounded::tombstone_traits_composer<&static_vector<T, capacity_>::m_size>;
 };
 
 export template<range Source>
@@ -154,6 +162,10 @@ constexpr auto make_static_vector(Source && source) {
 }
 
 } // namespace containers
+
+template<typename T, containers::array_size_type<T> capacity>
+struct bounded::tombstone_traits<containers::static_vector<T, capacity>> : bounded::tombstone_traits_composer<&containers::static_vector<T, capacity>::m_size> {
+};
 
 template<typename T>
 using test_static_vector = containers::static_vector<T, 40_bi>;
