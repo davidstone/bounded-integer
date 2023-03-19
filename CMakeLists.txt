@@ -116,7 +116,6 @@ target_sources(bounded PUBLIC
 		source/bounded/size_of.cpp
 		source/bounded/std_iterator.cpp
 		source/bounded/stream.cpp
-		source/bounded/string.cpp
 		source/bounded/test_int.cpp
 		source/bounded/to_integer.cpp
 		source/bounded/tombstone_traits.cpp
@@ -143,7 +142,6 @@ target_sources(bounded_test PUBLIC
 		test/bounded/comparison.cpp
 		test/bounded/conditional.cpp
 		test/bounded/stream.cpp
-		test/bounded/string.cpp
 		test/bounded/to_integer.cpp
 )
 
@@ -325,6 +323,7 @@ target_sources(containers PUBLIC
 		source/containers/test_set_size.cpp
 		source/containers/to_address.cpp
 		source/containers/to_radix_sort_key.cpp
+		source/containers/to_string.cpp
 		source/containers/trivial_inplace_function.cpp
 		source/containers/uninitialized_array.cpp
 		source/containers/uninitialized_dynamic_array.cpp

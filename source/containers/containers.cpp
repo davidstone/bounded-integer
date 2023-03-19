@@ -82,5 +82,6 @@ export import containers.static_vector;
 export import containers.string;
 export import containers.take;
 export import containers.to_radix_sort_key;
+export import containers.to_string;
 export import containers.trivial_inplace_function;
 export import containers.vector;

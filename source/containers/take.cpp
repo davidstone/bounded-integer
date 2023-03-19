@@ -28,6 +28,7 @@ import containers.iter_value_t;
 import containers.iterator_t;
 import containers.range_view;
 import containers.size;
+import containers.to_string;
 
 import bounded;
 import numeric_traits;
@@ -185,7 +186,7 @@ constexpr auto take_impl(Range && source, Count const count) {
 		auto const source_size = containers::size(source);
 		if (source_size > count) {
 			using namespace std::string_view_literals;
-			using bounded::to_string;
+			using containers::to_string;
 			throw std::runtime_error(containers::concatenate<std::string>(
 				"Did not take all elements of range. size(source) == "sv,
 				to_string(source_size),

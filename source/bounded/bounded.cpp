@@ -37,7 +37,6 @@ export import bounded.scope_guard;
 export import bounded.size_of;
 export import bounded.std_iterator;
 export import bounded.stream;
-export import bounded.string;
 export import bounded.to_integer;
 export import bounded.tombstone_traits;
 export import bounded.type;
