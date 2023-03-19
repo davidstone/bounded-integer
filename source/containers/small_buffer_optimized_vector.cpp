@@ -308,7 +308,7 @@ private:
 				return large_t(
 					size(),
 					::bounded::assume_in_range<typename large_t::capacity_type>(temp.size),
-					reinterpret_cast<T *>(temp.pointer)
+					temp.pointer
 				);
 			}
 		);
