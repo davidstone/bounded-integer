@@ -31,6 +31,7 @@ export import containers.algorithms.minmax_element;
 export import containers.algorithms.move_iterator;
 export import containers.algorithms.partition;
 export import containers.algorithms.remove_none;
+export import containers.algorithms.reverse;
 export import containers.algorithms.reverse_iterator;
 export import containers.algorithms.set;
 export import containers.algorithms.ska_sort;
