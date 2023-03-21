@@ -15,8 +15,15 @@ import std_module;
 
 namespace bounded {
 
+// This is faster to compile than `std::is_pointer_v`
+template<typename>
+constexpr auto is_pointer = false;
+
+template<typename T>
+constexpr auto is_pointer<T *> = true;
+
 export template<typename T, bounded_integer Integer> requires(
-	(std::is_pointer_v<T> or (std::is_array_v<T> and numeric_traits::max_value<Integer> <= constant<std::extent_v<T>>))
+	(is_pointer<T> or (std::is_array_v<T> and numeric_traits::max_value<Integer> <= constant<std::extent_v<T>>))
 )
 constexpr auto operator+(T const & array, Integer const number) {
 	return array + number.value();
@@ -24,7 +31,7 @@ constexpr auto operator+(T const & array, Integer const number) {
 
 
 export template<bounded_integer Integer, typename T> requires(
-	(std::is_pointer_v<T> or (std::is_array_v<T> and numeric_traits::max_value<Integer> <= constant<std::extent_v<T>>))
+	(is_pointer<T> or (std::is_array_v<T> and numeric_traits::max_value<Integer> <= constant<std::extent_v<T>>))
 )
 constexpr auto operator+(Integer const number, T const & array) {
 	return number.value() + array;
