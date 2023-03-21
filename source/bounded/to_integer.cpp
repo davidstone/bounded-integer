@@ -21,18 +21,24 @@ import bounded.normalize;
 import numeric_traits;
 import std_module;
 
+using namespace bounded::literal;
+
 namespace bounded {
 
+constexpr auto check(auto const value, auto const max) {
+	return check_in_range<std::invalid_argument>(value, 0_bi, max);
+};
+
+constexpr auto as_digit(char const c) -> integer<0, 9> {
+	return check(c - '0', 9_bi);
+}
+
 template<auto maximum>
-constexpr auto to_integer_positive_impl(std::string_view str) {
-	constexpr auto check = [](auto const value, auto const max) {
-		return check_in_range<std::invalid_argument>(value, constant<0>, max);
-	};
-	auto positive_result = integer<0, normalize<maximum>>(constant<0>);
+constexpr auto to_integer_positive_impl(std::string_view const str) {
+	auto positive_result = integer<0, normalize<maximum>>(0_bi);
 	for (auto const c : str) {
-		auto const shifted = positive_result * constant<10>;
-		auto const digit = check(integer(c - '0'), constant<9>);
-		positive_result = check(shifted + digit, constant<maximum>);
+		auto const shifted = positive_result * 10_bi;
+		positive_result = check(shifted + as_digit(c), constant<maximum>);
 	}
 	return positive_result;
 }
@@ -75,7 +81,6 @@ constexpr auto to_integer(std::string_view const str) {
 } // namespace bounded
 
 namespace {
-using namespace bounded::literal;
 
 static_assert(bounded::to_integer<0, 0>("0") == 0_bi);
 static_assert(bounded::to_integer<-100, 100>("0") == 0_bi);
