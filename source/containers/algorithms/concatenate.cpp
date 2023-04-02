@@ -118,7 +118,7 @@ constexpr auto move_existing_data_to_final_position(Container & container, auto 
 // TODO: support non-sized input ranges, splicable output ranges, and
 // non-reservable output ranges
 export template<typename Result>
-constexpr auto concatenate(auto && ... ranges) {
+constexpr auto concatenate(auto && ... ranges) -> Result {
 	auto const total_size = (0_bi + ... + ::containers::ugly_size_hack(::containers::size(ranges)));
 
 	if constexpr (can_reuse_storage<Result>) {
