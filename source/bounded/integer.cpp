@@ -5,7 +5,6 @@
 
 module;
 
-#include <bounded/assume.hpp>
 #include <bounded/conditional.hpp>
 
 #include "../test_assert.hpp"
@@ -176,7 +175,6 @@ struct integer {
 	using underlying_type = detail::underlying_type_t<minimum, maximum>;
 	
 	constexpr auto value() const -> underlying_type {
-		BOUNDED_ASSUME(minimum <= m_value and m_value <= maximum);
 		return m_value;
 	}
 	
@@ -185,13 +183,13 @@ struct integer {
 	constexpr integer(integer &&) = default;
 
 	constexpr integer(overlapping_integer<minimum, maximum> auto const other, unchecked_t):
-		m_value(static_cast<underlying_type>(other))
+		m_value(underlying_type(other))
 	{
 	}
 
 	template<bounded_by_range<minimum, maximum> T>
 	constexpr explicit(std::same_as<T, bool> or std::is_enum_v<T>) integer(T const other):
-		m_value(static_cast<underlying_type>(other))
+		m_value(underlying_type(other))
 	{
 	}
 
