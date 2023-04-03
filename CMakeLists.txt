@@ -75,6 +75,7 @@ target_sources(bounded PUBLIC
 		source/bounded/arithmetic/plus.cpp
 		source/bounded/arithmetic/pointer.cpp
 		source/bounded/arithmetic/right_shift.cpp
+		source/bounded/arithmetic/round_up_divide.cpp
 		source/bounded/arithmetic/safe_abs.cpp
 		source/bounded/arithmetic/unary_minus.cpp
 		source/bounded/arithmetic/unary_plus.cpp
