@@ -9,6 +9,8 @@
 
 #include <benchmark/benchmark.h>
 
+import containers.algorithms.inplace_radix_sort;
+
 import bounded;
 import containers;
 import numeric_traits;

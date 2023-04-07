@@ -192,6 +192,7 @@ target_sources(containers PUBLIC
 		source/containers/algorithms/advance.cpp
 		source/containers/algorithms/all_any_none.cpp
 		source/containers/algorithms/binary_search.cpp
+		source/containers/algorithms/common_prefix.cpp
 		source/containers/algorithms/compare.cpp
 		source/containers/algorithms/concatenate.cpp
 		source/containers/algorithms/concatenate_view.cpp
@@ -207,6 +208,7 @@ target_sources(containers PUBLIC
 		source/containers/algorithms/filter.cpp
 		source/containers/algorithms/find.cpp
 		source/containers/algorithms/generate.cpp
+		source/containers/algorithms/inplace_radix_sort.cpp
 		source/containers/algorithms/is_sorted.cpp
 		source/containers/algorithms/keyed_binary_search.cpp
 		source/containers/algorithms/keyed_erase.cpp
@@ -342,7 +344,17 @@ target_link_libraries(containers
 		strict_defaults
 )
 
-add_executable(containers_test
+add_executable(containers_test)
+
+target_sources(containers_test PUBLIC
+	FILE_SET CXX_MODULES
+	BASE_DIRS "${CMAKE_CURRENT_SOURCE_DIR}"
+	FILES
+		test/containers/double_buffered_ska_sort.cpp
+		test/containers/ska_sort.cpp
+)
+
+target_sources(containers_test PUBLIC
 	test/containers/at.cpp
 	test/containers/small_buffer_optimized_vector.cpp
 	test/containers/static_vector.cpp
