@@ -32,7 +32,7 @@ constexpr auto unsafe_push_back(Container & container, range_value_t<Container> 
 	}
 }
 export template<unsafe_push_backable Container> requires std::move_constructible<range_value_t<Container>>
-constexpr auto push_back(Container & container, range_value_t<Container> && value) -> auto & {
+constexpr auto unsafe_push_back(Container & container, range_value_t<Container> && value) -> auto & {
 	if constexpr (unsafe_lazy_push_backable<Container>) {
 		return ::containers::unsafe_lazy_push_back(
 			container,
