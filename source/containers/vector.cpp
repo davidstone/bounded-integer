@@ -83,9 +83,9 @@ struct vector : private lexicographical_comparison::base {
 
 	constexpr auto operator=(vector && other) & noexcept -> vector & {
 		::containers::destroy_range(*this);
-		m_storage = std::move(other.m_storage);
 		m_size = other.m_size;
 		other.m_size = 0_bi;
+		m_storage = std::move(other.m_storage);
 		return *this;
 	}
 	constexpr auto operator=(vector const & other) & -> vector & {

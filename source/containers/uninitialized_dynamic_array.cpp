@@ -46,14 +46,14 @@ struct uninitialized_dynamic_array {
 	{
 	}
 	constexpr uninitialized_dynamic_array & operator=(uninitialized_dynamic_array && other) & noexcept {
-		auto ptr = other.release();
-		deallocate();
-		m_ptr = ptr;
-		m_capacity = other.m_capacity;
+		auto const original_ptr = release();
+		m_ptr = other.release();
+		auto const original_capacity = std::exchange(m_capacity, other.m_capacity);
+		deallocate(original_ptr, original_capacity);
 		return *this;
 	}
 	constexpr ~uninitialized_dynamic_array() noexcept {
-		deallocate();
+		deallocate(m_ptr, m_capacity);
 	}
 	friend constexpr auto swap(uninitialized_dynamic_array & lhs, uninitialized_dynamic_array & rhs) noexcept -> void {
 		std::swap(lhs.m_ptr, rhs.m_ptr);
@@ -75,9 +75,9 @@ private:
 	constexpr auto release() & noexcept {
 		return std::exchange(m_ptr, nullptr);
 	}
-	constexpr auto deallocate() & noexcept -> void {
-		if (m_ptr) {
-			std::allocator<T>().deallocate(m_ptr, static_cast<std::size_t>(m_capacity));
+	static constexpr auto deallocate(T * const ptr, Capacity const capacity) noexcept -> void {
+		if (ptr) {
+			std::allocator<T>().deallocate(ptr, static_cast<std::size_t>(capacity));
 		}
 	}
 	[[no_unique_address]] T * m_ptr;
