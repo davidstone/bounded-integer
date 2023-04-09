@@ -10,6 +10,11 @@ import std_module;
 
 namespace {
 
+// https://github.com/google/benchmark/issues/1584
+auto DoNotOptimize(auto && value) -> void {
+	benchmark::DoNotOptimize(value);
+}
+
 template<typename T>
 auto default_value() {
 	if constexpr (std::integral<T>) {
@@ -24,7 +29,7 @@ void benchmark_construct_size(benchmark::State & state) {
 	auto const size = static_cast<containers::range_size_t<Container>>(state.range(0));
 	for (auto _ : state) {
 		auto c = Container(size);
-		benchmark::DoNotOptimize(c.data());
+		DoNotOptimize(c.data());
 	}
 }
 
@@ -33,7 +38,7 @@ void benchmark_construct_repeat_value(benchmark::State & state) {
 	auto const size = static_cast<containers::range_size_t<Container>>(state.range(0));
 	for (auto _ : state) {
 		auto c = Container(size, value);
-		benchmark::DoNotOptimize(c.data());
+		DoNotOptimize(c.data());
 	}
 }
 
@@ -43,11 +48,11 @@ void benchmark_construct_iterator_pair(benchmark::State & state) {
 	auto in = std::vector(size, default_value<containers::range_value_t<Container>>());
 	auto const begin = in.begin();
 	auto const end = in.end();
-	benchmark::DoNotOptimize(std::addressof(in));
+	DoNotOptimize(std::addressof(in));
 	benchmark::ClobberMemory();
 	for (auto _ : state) {
 		auto c = Container(begin, end);
-		benchmark::DoNotOptimize(c.data());
+		DoNotOptimize(c.data());
 		benchmark::ClobberMemory();
 	}
 }
@@ -72,7 +77,7 @@ void benchmark_push_back(benchmark::State & state) {
 	for (auto _ : state) {
 		auto v = Container();
 		v.push_back(42);
-		benchmark::DoNotOptimize(v.data());
+		DoNotOptimize(v.data());
 		benchmark::ClobberMemory();
 	}
 }
@@ -81,10 +86,10 @@ template<typename Container>
 void benchmark_resize(benchmark::State & state) {
 	for (auto _ : state) {
 		auto v = Container();
-		benchmark::DoNotOptimize(v.data());
+		DoNotOptimize(v.data());
 		benchmark::ClobberMemory();
 		v.resize(static_cast<std::size_t>(state.range(0)));
-		benchmark::DoNotOptimize(v.data());
+		DoNotOptimize(v.data());
 		benchmark::ClobberMemory();
 	}
 }
