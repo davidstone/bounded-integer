@@ -46,10 +46,10 @@ concept random_access_range = bidirectional_range<T> and forward_random_access_r
 using namespace bounded::literal;
 
 template<typename... Ts>
-constexpr auto all_qualifications_are_ranges_helper = (... and containers::range<Ts>);
+concept all_qualifications_are_ranges_helper = (... and containers::range<Ts>);
 
 template<typename T>
-constexpr auto all_qualifications_are_ranges = all_qualifications_are_ranges_helper<T, T const, T &, T const &, T &&>;
+concept all_qualifications_are_ranges = all_qualifications_are_ranges_helper<T, T const, T &, T const &, T &&>;
 
 static_assert(!containers::range<int>);
 static_assert(!containers::range<int *>);
