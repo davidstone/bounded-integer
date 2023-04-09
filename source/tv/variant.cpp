@@ -5,10 +5,10 @@
 
 module;
 
+#include <bounded/assert.hpp>
+
 #include <operators/forward.hpp>
 #include <operators/returns.hpp>
-
-#include "../test_assert.hpp"
 
 export module tv.variant;
 
@@ -361,7 +361,7 @@ static_assert(tv::visit(thing, [](auto x) { return std::same_as<decltype(x), sho
 constexpr auto test_assignment_from_variant() {
 	auto thing1 = thing_t(index, value);
 	thing1 = thing_t(index, value);
-	BOUNDED_TEST(thing1[index] == value);
+	BOUNDED_ASSERT(thing1[index] == value);
 	return true;
 }
 static_assert(test_assignment_from_variant());
@@ -369,8 +369,8 @@ static_assert(test_assignment_from_variant());
 constexpr auto test_assignment_from_value() {
 	auto thing1 = thing_t(index, value);
 	thing1 = -1L;
-	BOUNDED_TEST(thing1.index() == bounded::type<long>);
-	BOUNDED_TEST(thing1[bounded::type<long>] == -1L);
+	BOUNDED_ASSERT(thing1.index() == bounded::type<long>);
+	BOUNDED_ASSERT(thing1[bounded::type<long>] == -1L);
 	return true;
 }
 static_assert(test_assignment_from_value());
@@ -402,10 +402,10 @@ static_assert(!bounded::equality_comparable<tv::variant<int, non_comparable, int
 constexpr bool test_non_trivial() {
 	using non_trivial_variant_t = tv::variant<bounded_test::integer>;
 	auto a = non_trivial_variant_t(bounded_test::integer(3));
-	BOUNDED_TEST(a.index() == 0_bi);
+	BOUNDED_ASSERT(a.index() == 0_bi);
 	auto b = a;
-	BOUNDED_TEST(a[0_bi].value() == 3);
-	BOUNDED_TEST(a == b);
+	BOUNDED_ASSERT(a[0_bi].value() == 3);
+	BOUNDED_ASSERT(a == b);
 	return true;
 }
 static_assert(test_non_trivial());

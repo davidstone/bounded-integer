@@ -9,8 +9,6 @@ module;
 
 #include <operators/forward.hpp>
 
-#include "../test_assert.hpp"
-
 export module containers.flat_map;
 
 import containers.algorithms.advance;
@@ -473,7 +471,7 @@ template<typename Container>
 constexpr auto test_upsert_empty_empty() -> void {
 	auto container = Container();
 	container.upsert(Container(), add);
-	BOUNDED_TEST(container == Container());
+	BOUNDED_ASSERT(container == Container());
 }
 
 template<typename Container>
@@ -481,7 +479,7 @@ constexpr auto test_upsert_non_empty_empty() -> void {
 	constexpr auto make = [] { return Container(containers_test::make_one_key<Container>()); };
 	auto container = make();
 	container.upsert(Container(), add);
-	BOUNDED_TEST(container == make());
+	BOUNDED_ASSERT(container == make());
 }
 
 template<typename Container>
@@ -489,28 +487,28 @@ constexpr auto test_upsert_empty_non_empty() -> void {
 	constexpr auto make = [] { return Container(containers_test::make_one_key<Container>()); };
 	auto container = Container();
 	container.upsert(make(), add);
-	BOUNDED_TEST(container == make());
+	BOUNDED_ASSERT(container == make());
 }
 
 template<typename Container>
 constexpr auto test_upsert_1_2() -> void {
 	auto container = Container({{1, 3}});
 	container.upsert(Container({{2, 4}}), add);
-	BOUNDED_TEST(container == Container({{1, 3}, {2, 4}}));
+	BOUNDED_ASSERT(container == Container({{1, 3}, {2, 4}}));
 }
 
 template<typename Container>
 constexpr auto test_upsert_2_1() -> void {
 	auto container = Container({{2, 4}});
 	container.upsert(Container({{1, 3}}), add);
-	BOUNDED_TEST(container == Container({{1, 3}, {2, 4}}));
+	BOUNDED_ASSERT(container == Container({{1, 3}, {2, 4}}));
 }
 
 template<typename Container>
 constexpr auto test_upsert_1_1() -> void {
 	auto container = Container({{1, 4}});
 	container.upsert(Container({{1, 3}}), add);
-	BOUNDED_TEST(container == Container({{1, 7}}));
+	BOUNDED_ASSERT(container == Container({{1, 7}}));
 }
 
 template<typename Container>

@@ -5,7 +5,7 @@
 
 module;
 
-#include "../test_assert.hpp"
+#include <bounded/assert.hpp>
 
 export module containers.push_front;
 
@@ -60,13 +60,13 @@ template<typename Container>
 constexpr auto test_push_front() -> bool {
 	auto v = Container();
 	containers::push_front(v, 0);
-	BOUNDED_TEST(v == Container({0}));
+	BOUNDED_ASSERT(v == Container({0}));
 	containers::push_front(v, 1);
-	BOUNDED_TEST(v == Container({1, 0}));
+	BOUNDED_ASSERT(v == Container({1, 0}));
 	containers::push_front(v, 2);
-	BOUNDED_TEST(v == Container({2, 1, 0}));
+	BOUNDED_ASSERT(v == Container({2, 1, 0}));
 	containers::push_front(v, 3);
-	BOUNDED_TEST(v == Container({3, 2, 1, 0}));
+	BOUNDED_ASSERT(v == Container({3, 2, 1, 0}));
 	return true;
 }
 

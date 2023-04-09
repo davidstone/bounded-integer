@@ -5,7 +5,7 @@
 
 module;
 
-#include "../test_assert.hpp"
+#include <bounded/assert.hpp>
 
 export module containers.assign_test;
 
@@ -27,9 +27,9 @@ constexpr auto test_assign(bool const same_allocation, auto make_initial, auto..
 		auto c = make_initial();
 		auto const ptr = containers::data(c);
 		do_assign(c);
-		BOUNDED_TEST(c == container({copy_value(additional)...}));
+		BOUNDED_ASSERT(c == container({copy_value(additional)...}));
 		if (same_allocation) {
-			BOUNDED_TEST(ptr == containers::data(c));
+			BOUNDED_ASSERT(ptr == containers::data(c));
 		}
 	};
 	individual_test([&](container & c) { containers::assign(c, {copy_value(additional)...}); });

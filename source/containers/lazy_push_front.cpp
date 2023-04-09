@@ -5,9 +5,9 @@
 
 module;
 
-#include <operators/forward.hpp>
+#include <bounded/assert.hpp>
 
-#include "../test_assert.hpp"
+#include <operators/forward.hpp>
 
 export module containers.lazy_push_front;
 
@@ -56,16 +56,16 @@ constexpr auto test_lazy_push_front() -> bool {
 	auto c = Container();
 
 	containers::lazy_push_front(c, bounded::value_to_function(3));
-	BOUNDED_TEST(c == Container({3}));
+	BOUNDED_ASSERT(c == Container({3}));
 
 	containers::lazy_push_front(c, bounded::value_to_function(4));
-	BOUNDED_TEST(c == Container({4, 3}));
+	BOUNDED_ASSERT(c == Container({4, 3}));
 
 	containers::lazy_push_front(c, bounded::value_to_function(5));
-	BOUNDED_TEST(c == Container({5, 4, 3}));
+	BOUNDED_ASSERT(c == Container({5, 4, 3}));
 
 	containers::lazy_push_front(c, bounded::value_to_function(12));
-	BOUNDED_TEST(c == Container({12, 5, 4, 3}));
+	BOUNDED_ASSERT(c == Container({12, 5, 4, 3}));
 
 	return true;
 }

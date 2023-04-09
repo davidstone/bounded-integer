@@ -7,8 +7,6 @@ module;
 
 #include <bounded/assert.hpp>
 
-#include "../test_assert.hpp"
-
 export module containers.uninitialized_dynamic_array;
 
 import containers.test_sequence_container;
@@ -97,11 +95,11 @@ static_assert(container<1>().capacity() == 0_bi);
 constexpr auto basic_test() -> bool {
 	auto a = container<10>(1_bi);
 	auto b = container<10>(1_bi);
-	BOUNDED_TEST(a.data() != nullptr);
-	BOUNDED_TEST(b.data() != nullptr);
-	BOUNDED_TEST(a.data() != b.data());
-	BOUNDED_TEST(a.capacity() == 1_bi);
-	BOUNDED_TEST(b.capacity() == 1_bi);
+	BOUNDED_ASSERT(a.data() != nullptr);
+	BOUNDED_ASSERT(b.data() != nullptr);
+	BOUNDED_ASSERT(a.data() != b.data());
+	BOUNDED_ASSERT(a.capacity() == 1_bi);
+	BOUNDED_ASSERT(b.capacity() == 1_bi);
 	return true;
 }
 static_assert(basic_test());
@@ -110,9 +108,9 @@ constexpr auto move_construction() -> bool {
 	auto a = container<1>(1_bi);
 	auto const original_pointer = a.data();
 	auto b = std::move(a);
-	BOUNDED_TEST(a.data() == nullptr);
-	BOUNDED_TEST(b.data() == original_pointer);
-	BOUNDED_TEST(b.capacity() == 1_bi);
+	BOUNDED_ASSERT(a.data() == nullptr);
+	BOUNDED_ASSERT(b.data() == original_pointer);
+	BOUNDED_ASSERT(b.capacity() == 1_bi);
 	return true;
 }
 static_assert(move_construction());

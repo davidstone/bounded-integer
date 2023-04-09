@@ -5,7 +5,7 @@
 
 module;
 
-#include "../../test_assert.hpp"
+#include <bounded/assert.hpp>
 
 export module containers.algorithms.erase_test;
 
@@ -21,28 +21,28 @@ using namespace bounded::literal;
 template<typename Container>
 constexpr auto test_erase_all(Container container) {
 	containers::erase(container, containers::begin(container), containers::end(container));
-	BOUNDED_TEST(container == Container());
+	BOUNDED_ASSERT(container == Container());
 }
 
 constexpr auto test_erase_nothing_from_begin(auto make_container) {
 	auto container = make_container();
 	auto it = containers::begin(container);
 	containers::erase(container, it, it);
-	BOUNDED_TEST(container == make_container());
+	BOUNDED_ASSERT(container == make_container());
 }
 
 constexpr auto test_erase_nothing_from_middle(auto make_container) {
 	auto container = make_container();
 	auto it = containers::begin(container) + (containers::end(container) - containers::begin(container)) / 2_bi;
 	containers::erase(container, it, it);
-	BOUNDED_TEST(container == make_container());
+	BOUNDED_ASSERT(container == make_container());
 }
 
 constexpr auto test_erase_nothing_from_end(auto make_container) {
 	auto container = make_container();
 	auto it = containers::end(container);
 	containers::erase(container, it, it);
-	BOUNDED_TEST(container == make_container());
+	BOUNDED_ASSERT(container == make_container());
 }
 
 constexpr auto test_erase_nothing(auto make_container) {
@@ -72,7 +72,7 @@ template<typename Container>
 constexpr auto test_erase_from_one() {
 	auto v = Container({1});
 	containers::erase(v, containers::begin(v));
-	BOUNDED_TEST(v == Container({}));
+	BOUNDED_ASSERT(v == Container({}));
 }
 
 
@@ -90,28 +90,28 @@ template<typename Container>
 constexpr auto test_erase_first_from_two() {
 	auto v = Container({1, 2});
 	containers::erase(v, containers::begin(v));
-	BOUNDED_TEST(v == Container({2}));
+	BOUNDED_ASSERT(v == Container({2}));
 }
 
 template<typename Container>
 constexpr auto test_erase_second_from_two() {
 	auto v = Container({1, 2});
 	containers::erase(v, containers::begin(v) + 1_bi);
-	BOUNDED_TEST(v == Container({1}));
+	BOUNDED_ASSERT(v == Container({1}));
 }
 
 template<typename Container>
 constexpr auto test_erase_first_from_three() {
 	auto v = Container({1, 2, 3});
 	containers::erase(v, containers::begin(v));
-	BOUNDED_TEST(v == Container({2, 3}));
+	BOUNDED_ASSERT(v == Container({2, 3}));
 }
 
 template<typename Container>
 constexpr auto test_erase_middle_range() {
 	auto v = Container({1, 2, 3, 4});
 	containers::erase(v, containers::begin(v) + 1_bi, containers::begin(v) + 3_bi);
-	BOUNDED_TEST(v == Container({1, 4}));
+	BOUNDED_ASSERT(v == Container({1, 4}));
 }
 
 struct is_even {
@@ -127,7 +127,7 @@ template<typename Container>
 constexpr auto test_erase_if() {
 	auto v = Container({1, 2, 3, 4, 5, 6, 7});
 	erase_if(v, is_even());
-	BOUNDED_TEST(v == Container({1, 3, 5, 7}));
+	BOUNDED_ASSERT(v == Container({1, 3, 5, 7}));
 }
 
 template<typename Container>

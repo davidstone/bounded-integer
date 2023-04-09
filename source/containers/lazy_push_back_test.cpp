@@ -5,7 +5,7 @@
 
 module;
 
-#include "../test_assert.hpp"
+#include <bounded/assert.hpp>
 
 export module containers.lazy_push_back_test;
 
@@ -22,23 +22,23 @@ constexpr bool test_lazy_push_back() {
 	using vector = containers::vector<bounded_test::integer>;
 	auto c = vector();
 
-	BOUNDED_TEST(c.capacity() == 0_bi);
+	BOUNDED_ASSERT(c.capacity() == 0_bi);
 
 	lazy_push_back(c, []{ return 3; });
-	BOUNDED_TEST(c.capacity() == 1_bi);
-	BOUNDED_TEST(c == vector({3}));
+	BOUNDED_ASSERT(c.capacity() == 1_bi);
+	BOUNDED_ASSERT(c == vector({3}));
 
 	lazy_push_back(c, []{ return 4; });
-	BOUNDED_TEST(c.capacity() == 2_bi);
-	BOUNDED_TEST(c == vector({3, 4}));
+	BOUNDED_ASSERT(c.capacity() == 2_bi);
+	BOUNDED_ASSERT(c == vector({3, 4}));
 
 	lazy_push_back(c, []{ return 5; });
-	BOUNDED_TEST(c.capacity() == 4_bi);
-	BOUNDED_TEST(c == vector({3, 4, 5}));
+	BOUNDED_ASSERT(c.capacity() == 4_bi);
+	BOUNDED_ASSERT(c == vector({3, 4, 5}));
 
 	lazy_push_back(c, []{ return 12; });
-	BOUNDED_TEST(c.capacity() == 4_bi);
-	BOUNDED_TEST(c == vector({3, 4, 5, 12}));
+	BOUNDED_ASSERT(c.capacity() == 4_bi);
+	BOUNDED_ASSERT(c == vector({3, 4, 5, 12}));
 
 	return true;
 }

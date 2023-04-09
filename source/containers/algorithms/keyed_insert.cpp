@@ -5,9 +5,9 @@
 
 module;
 
-#include <operators/forward.hpp>
+#include <bounded/assert.hpp>
 
-#include "../../test_assert.hpp"
+#include <operators/forward.hpp>
 
 export module containers.algorithms.keyed_insert;
 
@@ -64,7 +64,7 @@ template<typename Map>
 constexpr auto test_rvalue_into_empty(auto function) {
 	auto m = Map();
 	function(m, 1, 2);
-	BOUNDED_TEST(m == Map({{1, 2}}));
+	BOUNDED_ASSERT(m == Map({{1, 2}}));
 }
 
 template<typename Map>
@@ -72,28 +72,28 @@ constexpr auto test_lvalue_into_empty() {
 	auto m = Map();
 	auto value = value_type{1, 2};
 	containers::keyed_insert(m, value);
-	BOUNDED_TEST(m == Map({{1, 2}}));
+	BOUNDED_ASSERT(m == Map({{1, 2}}));
 }
 
 template<typename Map>
 constexpr auto test_before_value(auto function) {
 	auto m = Map({{3, 4}});
 	function(m, 1, 2);
-	BOUNDED_TEST(m == Map({{1, 2}, {3, 4}}));
+	BOUNDED_ASSERT(m == Map({{1, 2}, {3, 4}}));
 }
 
 template<typename Map>
 constexpr auto test_after_value(auto function) {
 	auto m = Map({{1, 2}});
 	function(m, 3, 4);
-	BOUNDED_TEST(m == Map({{1, 2}, {3, 4}}));
+	BOUNDED_ASSERT(m == Map({{1, 2}, {3, 4}}));
 }
 
 template<typename Map>
 constexpr auto test_between_values(auto function) {
 	auto m = Map({{1, 2}, {5, 6}});
 	function(m, 3, 4);
-	BOUNDED_TEST(m == Map({{1, 2}, {3, 4}, {5, 6}}));
+	BOUNDED_ASSERT(m == Map({{1, 2}, {3, 4}, {5, 6}}));
 }
 
 constexpr auto one_argument = [](auto & container, auto && key, auto && mapped) {
@@ -117,7 +117,7 @@ template<typename Map>
 constexpr auto test_duplicate(auto function) {
 	auto m = Map({{1, 2}});
 	function(m, 1, 4);
-	BOUNDED_TEST(m == Map({{1, 2}}));
+	BOUNDED_ASSERT(m == Map({{1, 2}}));
 	return true;
 }
 

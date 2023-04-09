@@ -9,7 +9,7 @@ module;
 #include <iterator>
 #include <string_view>
 
-#include "../test_assert.hpp"
+#include <bounded/assert.hpp>
 
 export module containers.string;
 
@@ -149,8 +149,8 @@ static_assert(bounded::constructible_from<containers::string, to_both>);
 
 constexpr auto check_equal(std::string_view const input) {
 	auto const output = containers::string(input);
-	BOUNDED_TEST(output == input);
-	BOUNDED_TEST(containers::size(output) == containers::size(input));
+	BOUNDED_ASSERT(output == input);
+	BOUNDED_ASSERT(containers::size(output) == containers::size(input));
 	return true;
 }
 

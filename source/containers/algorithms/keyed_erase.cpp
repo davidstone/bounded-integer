@@ -5,9 +5,9 @@
 
 module;
 
-#include <operators/forward.hpp>
+#include <bounded/assert.hpp>
 
-#include "../../test_assert.hpp"
+#include <operators/forward.hpp>
 
 export module containers.algorithms.keyed_erase;
 
@@ -51,56 +51,56 @@ template<typename Map>
 constexpr auto test_empty() {
 	auto m = Map();
 	auto const erased = containers::keyed_erase(m, 0);
-	BOUNDED_TEST(m == Map());
-	BOUNDED_TEST(erased == 0_bi);
+	BOUNDED_ASSERT(m == Map());
+	BOUNDED_ASSERT(erased == 0_bi);
 }
 
 template<typename Map>
 constexpr auto test_failed_erase_one() {
 	auto m = Map({{1, 2}});
 	auto const erased = containers::keyed_erase(m, 2);
-	BOUNDED_TEST(m == Map({{1, 2}}));
-	BOUNDED_TEST(erased == 0_bi);
+	BOUNDED_ASSERT(m == Map({{1, 2}}));
+	BOUNDED_ASSERT(erased == 0_bi);
 }
 
 template<typename Map>
 constexpr auto test_successful_erase_one() {
 	auto m = Map({{1, 2}});
 	auto const erased = containers::keyed_erase(m, 1);
-	BOUNDED_TEST(m == Map());
-	BOUNDED_TEST(erased == 1_bi);
+	BOUNDED_ASSERT(m == Map());
+	BOUNDED_ASSERT(erased == 1_bi);
 }
 
 template<typename Map>
 constexpr auto test_failed_erase_two() {
 	auto m = Map({{1, 2}, {3, 4}});
 	auto const erased = containers::keyed_erase(m, 2);
-	BOUNDED_TEST(m == Map({{1, 2}, {3, 4}}));
-	BOUNDED_TEST(erased == 0_bi);
+	BOUNDED_ASSERT(m == Map({{1, 2}, {3, 4}}));
+	BOUNDED_ASSERT(erased == 0_bi);
 }
 
 template<typename Map>
 constexpr auto test_successful_erase_two_first() {
 	auto m = Map({{1, 2}, {3, 4}});
 	auto const erased = containers::keyed_erase(m, 1);
-	BOUNDED_TEST(m == Map({{3, 4}}));
-	BOUNDED_TEST(erased == 1_bi);
+	BOUNDED_ASSERT(m == Map({{3, 4}}));
+	BOUNDED_ASSERT(erased == 1_bi);
 }
 
 template<typename Map>
 constexpr auto test_successful_erase_two_second() {
 	auto m = Map({{1, 2}, {3, 4}});
 	auto const erased = containers::keyed_erase(m, 3);
-	BOUNDED_TEST(m == Map({{1, 2}}));
-	BOUNDED_TEST(erased == 1_bi);
+	BOUNDED_ASSERT(m == Map({{1, 2}}));
+	BOUNDED_ASSERT(erased == 1_bi);
 }
 
 template<typename Map>
 constexpr auto test_successful_erase_middle() {
 	auto m = Map({{1, 2}, {3, 4}, {5, 6}});
 	auto const erased = containers::keyed_erase(m, 3);
-	BOUNDED_TEST(m == Map({{1, 2}, {5, 6}}));
-	BOUNDED_TEST(erased == 1_bi);
+	BOUNDED_ASSERT(m == Map({{1, 2}, {5, 6}}));
+	BOUNDED_ASSERT(erased == 1_bi);
 }
 
 template<typename Map>
@@ -119,8 +119,8 @@ template<typename Map>
 constexpr auto test_failed_erase_duplicates_after() {
 	auto m = Map({{1, 2}, {1, 4}});
 	auto const erased = containers::keyed_erase(m, 0);
-	BOUNDED_TEST(m == Map({{1, 2}, {1, 4}}));
-	BOUNDED_TEST(erased == 0_bi);
+	BOUNDED_ASSERT(m == Map({{1, 2}, {1, 4}}));
+	BOUNDED_ASSERT(erased == 0_bi);
 	return true;
 }
 
@@ -128,8 +128,8 @@ template<typename Map>
 constexpr auto test_failed_erase_duplicates_before() {
 	auto m = Map({{1, 2}, {1, 4}});
 	auto const erased = containers::keyed_erase(m, 2);
-	BOUNDED_TEST(m == Map({{1, 2}, {1, 4}}));
-	BOUNDED_TEST(erased == 0_bi);
+	BOUNDED_ASSERT(m == Map({{1, 2}, {1, 4}}));
+	BOUNDED_ASSERT(erased == 0_bi);
 	return true;
 }
 
@@ -137,8 +137,8 @@ template<typename Map>
 constexpr auto test_successful_erase_duplicates_before() {
 	auto m = Map({{1, 2}, {3, 4}, {3, 6}});
 	auto const erased = containers::keyed_erase(m, 3);
-	BOUNDED_TEST(m == Map({{1, 2}}));
-	BOUNDED_TEST(erased == 2_bi);
+	BOUNDED_ASSERT(m == Map({{1, 2}}));
+	BOUNDED_ASSERT(erased == 2_bi);
 	return true;
 }
 
@@ -146,8 +146,8 @@ template<typename Map>
 constexpr auto test_successful_erase_duplicates_middle() {
 	auto m = Map({{1, 2}, {2, 4}, {2, 6}, {7, 8}});
 	auto const erased = containers::keyed_erase(m, 2);
-	BOUNDED_TEST(m == Map({{1, 2}, {7, 8}}));
-	BOUNDED_TEST(erased == 2_bi);
+	BOUNDED_ASSERT(m == Map({{1, 2}, {7, 8}}));
+	BOUNDED_ASSERT(erased == 2_bi);
 	return true;
 }
 
@@ -155,8 +155,8 @@ template<typename Map>
 constexpr auto test_successful_erase_duplicates_after() {
 	auto m = Map({{1, 2}, {1, 4}, {3, 6}});
 	auto const erased = containers::keyed_erase(m, 1);
-	BOUNDED_TEST(m == Map({{3, 6}}));
-	BOUNDED_TEST(erased == 2_bi);
+	BOUNDED_ASSERT(m == Map({{3, 6}}));
+	BOUNDED_ASSERT(erased == 2_bi);
 	return true;
 }
 

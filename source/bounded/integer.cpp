@@ -5,9 +5,8 @@
 
 module;
 
+#include <bounded/assert.hpp>
 #include <bounded/conditional.hpp>
-
-#include "../test_assert.hpp"
 
 export module bounded.integer;
 
@@ -310,7 +309,7 @@ constexpr auto check_assignment() {
 	bounded::integer<0, 10> x(bounded::constant<5>);
 	static_assert(!std::is_assignable_v<decltype((x)), bounded::constant_t<11>>);
 	x = bounded::integer<10, 11>(bounded::constant<10>);
-	BOUNDED_TEST(x == bounded::constant<10>);
+	BOUNDED_ASSERT(x == bounded::constant<10>);
 	return true;
 }
 

@@ -5,7 +5,7 @@
 
 module;
 
-#include "../test_assert.hpp"
+#include <bounded/assert.hpp>
 
 export module containers.push_back_test;
 
@@ -17,12 +17,12 @@ import bounded.test_int;
 static_assert([]{
 	auto v = containers::vector<bounded_test::integer>();
 	containers::push_back(v, 0);
-	BOUNDED_TEST(v == containers::vector<bounded_test::integer>({0}));
+	BOUNDED_ASSERT(v == containers::vector<bounded_test::integer>({0}));
 	containers::push_back(v, 1);
-	BOUNDED_TEST(v == containers::vector<bounded_test::integer>({0, 1}));
+	BOUNDED_ASSERT(v == containers::vector<bounded_test::integer>({0, 1}));
 	containers::push_back(v, 2);
-	BOUNDED_TEST(v == containers::vector<bounded_test::integer>({0, 1, 2}));
+	BOUNDED_ASSERT(v == containers::vector<bounded_test::integer>({0, 1, 2}));
 	containers::push_back(v, 3);
-	BOUNDED_TEST(v == containers::vector<bounded_test::integer>({0, 1, 2, 3}));
+	BOUNDED_ASSERT(v == containers::vector<bounded_test::integer>({0, 1, 2, 3}));
 	return true;
 }());

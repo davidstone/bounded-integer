@@ -9,8 +9,6 @@ module;
 
 #include <operators/forward.hpp>
 
-#include "../test_assert.hpp"
-
 export module containers.insert;
 
 import containers.algorithms.compare;
@@ -156,7 +154,7 @@ constexpr bool test_range_insert() {
 	auto container = Container({ 1, 2, 3 });
 	containers::insert(container, begin(container) + 1_bi, containers::repeat_n(3_bi, bounded_test::integer(12)));
 	auto const expected = { 1, 12, 12, 12, 2, 3 };
-	BOUNDED_TEST(containers::equal(container, expected));
+	BOUNDED_ASSERT(containers::equal(container, expected));
 	return true;
 }
 
@@ -168,7 +166,7 @@ constexpr bool test_value_insert() {
 	auto container = Container({1, 2, 3, 4, 5, 6});
 	containers::insert(container, begin(container) + 1_bi, 7);
 	auto const expected = {1, 7, 2, 3, 4, 5, 6};
-	BOUNDED_TEST(containers::equal(container, expected));
+	BOUNDED_ASSERT(containers::equal(container, expected));
 	return true;
 }
 

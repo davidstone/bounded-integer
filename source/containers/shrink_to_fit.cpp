@@ -5,7 +5,7 @@
 
 module;
 
-#include "../test_assert.hpp"
+#include <bounded/assert.hpp>
 
 export module containers.shrink_to_fit;
 
@@ -84,8 +84,8 @@ static_assert(container().capacity() == 1_bi);
 static_assert([]{
 	auto x = container();
 	containers::shrink_to_fit(x);
-	BOUNDED_TEST(x.capacity() == 1_bi);
-	BOUNDED_TEST(containers::equal(x, containers::vector<bounded_test::integer>()));
+	BOUNDED_ASSERT(x.capacity() == 1_bi);
+	BOUNDED_ASSERT(containers::equal(x, containers::vector<bounded_test::integer>()));
 	return true;
 }());
 
@@ -93,8 +93,8 @@ static_assert([]{
 	auto x = container();
 	containers::push_back(x, 5);
 	containers::shrink_to_fit(x);
-	BOUNDED_TEST(x.capacity() == 1_bi);
-	BOUNDED_TEST(containers::equal(x, containers::vector({bounded_test::integer(5)})));
+	BOUNDED_ASSERT(x.capacity() == 1_bi);
+	BOUNDED_ASSERT(containers::equal(x, containers::vector({bounded_test::integer(5)})));
 	return true;
 }());
 
@@ -102,8 +102,8 @@ static_assert([]{
 	auto x = container();
 	x.reserve(4_bi);
 	containers::shrink_to_fit(x);
-	BOUNDED_TEST(x.capacity() == 1_bi);
-	BOUNDED_TEST(containers::equal(x, containers::vector<bounded_test::integer>()));
+	BOUNDED_ASSERT(x.capacity() == 1_bi);
+	BOUNDED_ASSERT(containers::equal(x, containers::vector<bounded_test::integer>()));
 	return true;
 }());
 
@@ -112,8 +112,8 @@ static_assert([]{
 	x.reserve(4_bi);
 	containers::push_back(x, 5);
 	containers::shrink_to_fit(x);
-	BOUNDED_TEST(x.capacity() == 1_bi);
-	BOUNDED_TEST(containers::equal(x, containers::vector({bounded_test::integer(5)})));
+	BOUNDED_ASSERT(x.capacity() == 1_bi);
+	BOUNDED_ASSERT(containers::equal(x, containers::vector({bounded_test::integer(5)})));
 	return true;
 }());
 
@@ -123,8 +123,8 @@ static_assert([]{
 	containers::push_back(x, 5);
 	containers::push_back(x, 7);
 	containers::shrink_to_fit(x);
-	BOUNDED_TEST(x.capacity() == 2_bi);
-	BOUNDED_TEST(containers::equal(x, containers::vector({bounded_test::integer(5), bounded_test::integer(7)})));
+	BOUNDED_ASSERT(x.capacity() == 2_bi);
+	BOUNDED_ASSERT(containers::equal(x, containers::vector({bounded_test::integer(5), bounded_test::integer(7)})));
 	return true;
 }());
 

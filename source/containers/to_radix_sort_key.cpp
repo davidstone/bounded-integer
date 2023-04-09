@@ -5,9 +5,9 @@
 
 module;
 
-#include <operators/forward.hpp>
+#include <bounded/assert.hpp>
 
-#include "../test_assert.hpp"
+#include <operators/forward.hpp>
 
 export module containers.to_radix_sort_key;
 
@@ -159,7 +159,7 @@ static_assert(increase_float_magnitude(-0.0, 1) > -0.1);
 
 constexpr auto is_sorted_to_radix(auto... values) {
 	auto const original = containers::array{values...};
-	BOUNDED_TEST(containers::is_sorted(original));
+	BOUNDED_ASSERT(containers::is_sorted(original));
 	auto const converted = containers::array{containers::to_radix_sort_key(values)...};
 	return containers::is_sorted(converted);
 }

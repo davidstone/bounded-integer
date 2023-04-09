@@ -5,7 +5,7 @@
 
 module;
 
-#include "../../test_assert.hpp"
+#include <bounded/assert.hpp>
 
 export module containers.algorithms.copy_or_relocate_from_test;
 
@@ -27,8 +27,8 @@ static_assert([] {
 		container,
 		[&](auto function) { containers::lazy_push_back(result, function); }
 	);
-	BOUNDED_TEST(container == original);
-	BOUNDED_TEST(result == original);
+	BOUNDED_ASSERT(container == original);
+	BOUNDED_ASSERT(result == original);
 	return true;
 }());
 
@@ -41,8 +41,8 @@ static_assert([] {
 		std::move(container),
 		[&](auto function) { containers::lazy_push_back(result, function); }
 	);
-	BOUNDED_TEST(containers::is_empty(container));
-	BOUNDED_TEST(result == original);
+	BOUNDED_ASSERT(containers::is_empty(container));
+	BOUNDED_ASSERT(result == original);
 	return true;
 }());
 
@@ -55,8 +55,8 @@ static_assert([] {
 		containers::range_view(container),
 		[&](auto function) { containers::lazy_push_back(result, function); }
 	);
-	BOUNDED_TEST(container == original);
-	BOUNDED_TEST(result == original);
+	BOUNDED_ASSERT(container == original);
+	BOUNDED_ASSERT(result == original);
 	return true;
 }());
 
@@ -70,8 +70,8 @@ static_assert([] {
 		container,
 		[&](auto function) { containers::lazy_push_back(result, function); }
 	);
-	BOUNDED_TEST(container == original);
-	BOUNDED_TEST(result == original);
+	BOUNDED_ASSERT(container == original);
+	BOUNDED_ASSERT(result == original);
 	return true;
 }());
 
@@ -84,8 +84,8 @@ static_assert([] {
 		std::move(container),
 		[&](auto function) { containers::lazy_push_back(result, function); }
 	);
-	BOUNDED_TEST(container == original);
-	BOUNDED_TEST(result == original);
+	BOUNDED_ASSERT(container == original);
+	BOUNDED_ASSERT(result == original);
 	return true;
 }());
 
@@ -98,7 +98,7 @@ static_assert([] {
 		containers::range_view(container),
 		[&](auto function) { containers::lazy_push_back(result, function); }
 	);
-	BOUNDED_TEST(container == original);
-	BOUNDED_TEST(result == original);
+	BOUNDED_ASSERT(container == original);
+	BOUNDED_ASSERT(result == original);
 	return true;
 }());

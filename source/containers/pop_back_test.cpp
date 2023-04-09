@@ -5,7 +5,7 @@
 
 module;
 
-#include "../test_assert.hpp"
+#include <bounded/assert.hpp>
 
 export module containers.pop_back_test;
 
@@ -22,7 +22,7 @@ import bounded.test_int;
 constexpr bool test_pop_back(containers::vector<bounded_test::integer> const & original) {
 	auto copy = original;
 	containers::pop_back(copy);
-	BOUNDED_TEST(containers::equal(
+	BOUNDED_ASSERT(containers::equal(
 		copy,
 		containers::range_view(begin(original), containers::prev(end(original)))
 	));

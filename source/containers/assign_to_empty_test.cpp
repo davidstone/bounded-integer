@@ -5,7 +5,7 @@
 
 module;
 
-#include "../test_assert.hpp"
+#include <bounded/assert.hpp>
 
 export module containers.assign_to_empty_test;
 
@@ -26,12 +26,12 @@ using container = containers::vector<non_copyable>;
 constexpr auto test_assign(bool const same_allocation, auto make_initial, auto... additional) {
 	auto individual_test = [&](auto do_assign) {
 		auto c = make_initial();
-		BOUNDED_TEST(containers::is_empty(c));
+		BOUNDED_ASSERT(containers::is_empty(c));
 		auto const ptr = containers::data(c);
 		do_assign(c);
-		BOUNDED_TEST(c == container({copy_value(additional)...}));
+		BOUNDED_ASSERT(c == container({copy_value(additional)...}));
 		if (same_allocation) {
-			BOUNDED_TEST(ptr == containers::data(c));
+			BOUNDED_ASSERT(ptr == containers::data(c));
 		}
 	};
 	individual_test([&](container & c) { containers::assign_to_empty(c, {copy_value(additional)...}); });

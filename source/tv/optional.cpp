@@ -13,8 +13,6 @@ module;
 #include <operators/forward.hpp>
 #include <operators/arrow.hpp>
 
-#include "../test_assert.hpp"
-
 export module tv.optional;
  
 import tv.insert;
@@ -426,9 +424,9 @@ static_assert(optional(1_bi) != initialized, "Fail to compare initialized option
 template<typename Optional>
 constexpr auto check_empty_braces() {
 	Optional op = {};
-	BOUNDED_TEST(!op);
+	BOUNDED_ASSERT(!op);
 	op = {};
-	BOUNDED_TEST(!op);
+	BOUNDED_ASSERT(!op);
 	return true;
 }
 
@@ -461,18 +459,18 @@ constexpr auto check_integer_optional() {
 
 	auto optional_integer = tv::optional<integer_type>(integer_type(4_bi));
 	optional_integer = uninitialized_optional;
-	BOUNDED_TEST(!optional_integer);
+	BOUNDED_ASSERT(!optional_integer);
 
 	optional_integer = integer_type(7_bi);
-	BOUNDED_TEST(optional_integer);
+	BOUNDED_ASSERT(optional_integer);
 
 	static_assert(std::same_as<decltype(*optional_integer), integer_type &>, "Incorrect type of *optional.");
 	*optional_integer = integer_type(1_bi);
-	BOUNDED_TEST(optional_integer);
-	BOUNDED_TEST(*optional_integer == 1_bi);
+	BOUNDED_ASSERT(optional_integer);
+	BOUNDED_ASSERT(*optional_integer == 1_bi);
 	
 	optional_integer = tv::none;
-	BOUNDED_TEST(!optional_integer);
+	BOUNDED_ASSERT(!optional_integer);
 
 	check_empty_braces<tv::optional<integer_type>>();
 }
@@ -480,28 +478,28 @@ constexpr auto check_integer_optional() {
 template<typename type>
 constexpr auto check_non_trivial_optional() {
 	auto uninitialized_optional = tv::optional<type>();
-	BOUNDED_TEST(!uninitialized_optional);
+	BOUNDED_ASSERT(!uninitialized_optional);
 	auto optional_int = tv::optional<type>(1);
-	BOUNDED_TEST(optional_int);
-	BOUNDED_TEST(*optional_int == 1);
+	BOUNDED_ASSERT(optional_int);
+	BOUNDED_ASSERT(*optional_int == 1);
 
 	optional_int = uninitialized_optional;
-	BOUNDED_TEST(!optional_int);
+	BOUNDED_ASSERT(!optional_int);
 
 	optional_int = type(2);
-	BOUNDED_TEST(optional_int);
+	BOUNDED_ASSERT(optional_int);
 	optional_int = 3;
-	BOUNDED_TEST(optional_int);
-	BOUNDED_TEST(*optional_int == 3);
-	BOUNDED_TEST(*optional_int != 4);
+	BOUNDED_ASSERT(optional_int);
+	BOUNDED_ASSERT(*optional_int == 3);
+	BOUNDED_ASSERT(*optional_int != 4);
 
 	static_assert(std::same_as<decltype(*optional_int), type &>, "Incorrect type of *optional.");
 	*optional_int = type(5);
-	BOUNDED_TEST(optional_int);
-	BOUNDED_TEST(*optional_int == 5);
+	BOUNDED_ASSERT(optional_int);
+	BOUNDED_ASSERT(*optional_int == 5);
 	
 	optional_int = tv::none;
-	BOUNDED_TEST(!optional_int);
+	BOUNDED_ASSERT(!optional_int);
 
 	check_empty_braces<tv::optional<type>>();
 }

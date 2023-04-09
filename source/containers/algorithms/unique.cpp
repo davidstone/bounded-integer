@@ -9,8 +9,6 @@ module;
 
 #include <operators/forward.hpp>
 
-#include "../../test_assert.hpp"
-
 export module containers.algorithms.unique;
 
 import containers.algorithms.advance;
@@ -205,12 +203,12 @@ constexpr void test_unique_copy_less(Container const & source, Container const &
 	auto destination = Container(containers::repeat_n(containers::size(source), 0));
 	auto const it = containers::unique_copy_less(begin(source), end(source), begin(destination));
 	containers::erase_after(destination, it);
-	BOUNDED_TEST(destination == expected);
+	BOUNDED_ASSERT(destination == expected);
 }
 
 constexpr void test_unique_less(Container source, Container const & expected) {
-	BOUNDED_TEST(containers::is_sorted(source));
-	BOUNDED_TEST(containers::is_sorted(expected));
+	BOUNDED_ASSERT(containers::is_sorted(source));
+	BOUNDED_ASSERT(containers::is_sorted(expected));
 	test_unique_copy_less(source, expected);
 }
 
@@ -219,7 +217,7 @@ constexpr void test_unique_merge_copy(Container const & lhs, Container const & r
 	auto const it = containers::unique_merge_copy(begin(lhs), end(lhs), begin(rhs), end(rhs), begin(result));
 	containers::erase_after(result, it);
 
-	BOUNDED_TEST(result == expected);
+	BOUNDED_ASSERT(result == expected);
 }
 
 constexpr void test_unique_inplace_merge(Container v, Container const & other, Container const & expected) {
@@ -229,12 +227,12 @@ constexpr void test_unique_inplace_merge(Container v, Container const & other, C
 	auto const it = containers::unique_inplace_merge(begin(v), begin(v) + midpoint, end(v));
 	containers::erase_after(v, it);
 
-	BOUNDED_TEST(v == expected);
+	BOUNDED_ASSERT(v == expected);
 }
 
 constexpr void test_unique_merge(Container v, Container const & other, Container const & expected) {
-	BOUNDED_TEST(containers::is_sorted(v));
-	BOUNDED_TEST(containers::is_sorted(other));
+	BOUNDED_ASSERT(containers::is_sorted(v));
+	BOUNDED_ASSERT(containers::is_sorted(other));
 	test_unique_merge_copy(v, other, expected);
 	test_unique_inplace_merge(std::move(v), other, expected);
 }

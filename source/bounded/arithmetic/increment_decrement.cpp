@@ -5,10 +5,10 @@
 
 module;
 
+#include <bounded/assert.hpp>
+
 #include <operators/returns.hpp>
 #include <operators/compound_assignment.hpp>
-
-#include "../../test_assert.hpp"
 
 export module bounded.arithmetic.increment_decrement;
 
@@ -49,15 +49,15 @@ export constexpr auto operator--(decrementable_by_bounded auto & value) -> declt
 static_assert([]{
 	auto x = bounded::integer<0, 1>(bounded::constant<0>);
 	auto & result = ++x;
-	BOUNDED_TEST(std::addressof(result) == std::addressof(x));
-	BOUNDED_TEST(x == bounded::constant<1>);
+	BOUNDED_ASSERT(std::addressof(result) == std::addressof(x));
+	BOUNDED_ASSERT(x == bounded::constant<1>);
 	return true;
 }());
 
 static_assert([]{
 	auto x = bounded::integer<0, 1>(bounded::constant<1>);
 	auto & result = --x;
-	BOUNDED_TEST(std::addressof(result) == std::addressof(x));
-	BOUNDED_TEST(x == bounded::constant<0>);
+	BOUNDED_ASSERT(std::addressof(result) == std::addressof(x));
+	BOUNDED_ASSERT(x == bounded::constant<0>);
 	return true;
 }());

@@ -5,9 +5,9 @@
 
 module;
 
-#include <operators/forward.hpp>
+#include <bounded/assert.hpp>
 
-#include "../test_assert.hpp"
+#include <operators/forward.hpp>
 
 export module containers.lookup;
 
@@ -54,7 +54,7 @@ struct container {
 
 static_assert([]{
 	auto const map = container({1, 3});
-	BOUNDED_TEST(*containers::lookup(map, 1) == 3);
-	BOUNDED_TEST(!containers::lookup(map, 2));
+	BOUNDED_ASSERT(*containers::lookup(map, 1) == 3);
+	BOUNDED_ASSERT(!containers::lookup(map, 2));
 	return true;
 }());

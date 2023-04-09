@@ -6,10 +6,9 @@
 module;
 
 #include <bounded/arithmetic/common_arithmetic.hpp>
+#include <bounded/assert.hpp>
 
 #include <operators/compound_assignment.hpp>
-
-#include "../../test_assert.hpp"
 
 export module bounded.arithmetic.operators;
 
@@ -86,7 +85,7 @@ static_assert(modulo_equals(x_type(bounded::constant<10>), bounded::constant<6>)
 static_assert([]{
 	auto z = z_type(bounded::constant<0>);
 	auto const post_increment = z++;
-	BOUNDED_TEST(post_increment == bounded::constant<0>);
-	BOUNDED_TEST(z == bounded::constant<1>);
+	BOUNDED_ASSERT(post_increment == bounded::constant<0>);
+	BOUNDED_ASSERT(z == bounded::constant<1>);
 	return true;
 }());
