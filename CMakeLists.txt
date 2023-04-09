@@ -293,6 +293,8 @@ target_sources(containers PUBLIC
 		source/containers/map_tags.cpp
 		source/containers/map_value_type.cpp
 		source/containers/maximum_array_size.cpp
+		source/containers/member_lazy_push_backable.cpp
+		source/containers/member_push_backable.cpp
 		source/containers/mutable_iterator.cpp
 		source/containers/offset_type.cpp
 		source/containers/ordered_associative_container.cpp
@@ -330,6 +332,10 @@ target_sources(containers PUBLIC
 		source/containers/trivial_inplace_function.cpp
 		source/containers/uninitialized_array.cpp
 		source/containers/uninitialized_dynamic_array.cpp
+		source/containers/unsafe_lazy_push_back.cpp
+		source/containers/unsafe_lazy_push_back_test.cpp
+		source/containers/unsafe_push_back.cpp
+		source/containers/unsafe_push_back_test.cpp
 		source/containers/vector.cpp
 )
 

@@ -7,15 +7,13 @@ export module containers.push_back;
 
 import containers.front_back;
 import containers.lazy_push_back;
+import containers.member_push_backable;
 import containers.range_value_t;
 
 import bounded;
 import std_module;
 
 namespace containers {
-
-template<typename Container>
-concept member_push_backable = requires(Container & container, range_value_t<Container> value) { container.push_back(std::move(value)); };
 
 export template<typename Container>
 concept push_backable = member_push_backable<Container> or lazy_push_backable<Container>;
