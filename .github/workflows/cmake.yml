@@ -20,18 +20,14 @@ jobs:
     steps:
     - uses: actions/checkout@v3
     
+    - uses: lukka/get-cmake@latest
+    
+    - uses: KyleMayes/install-llvm-action@v1.8.0
+      with:
+        version: 16
+
     - name: Pull dependencies
       run: git submodule update --init
-
-    - name: Install clang
-      run: |
-        sudo apt-get update
-        sudo apt-get install clang
-
-    - name: Install ninja-build tool
-      uses: seanmiddleditch/gha-setup-ninja@v3
-      with:
-        version: 1.11.1
 
     - name: Configure CMake
       # Configure CMake in a 'build' subdirectory. `CMAKE_BUILD_TYPE` is only required if you are using a single-configuration generator such as make.
