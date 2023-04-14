@@ -22,9 +22,10 @@ jobs:
     
     - uses: lukka/get-cmake@latest
     
-    - uses: KyleMayes/install-llvm-action@v1.8.0
+    - uses: KyleMayes/install-llvm-action@latest
       with:
-        version: 16
+        version: "16"
+        env: true
 
     - name: Pull dependencies
       run: git submodule update --init
