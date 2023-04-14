@@ -19,6 +19,9 @@ jobs:
 
     steps:
     - uses: actions/checkout@v3
+    
+    - name: Pull dependencies
+      run: git submodule update --init
 
     - name: Install ninja and clang
       run: |
