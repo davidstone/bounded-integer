@@ -20,13 +20,16 @@ jobs:
     steps:
     - uses: actions/checkout@v3
     
-    - uses: lukka/get-cmake@latest
-    
+    - name: Install clang dependencies
+      run: sudo apt-get install -y libtinfo5
+
     - uses: KyleMayes/install-llvm-action@v1.8.0
       with:
         version: "16"
         env: true
 
+    - uses: lukka/get-cmake@latest
+    
     - name: Pull dependencies
       run: git submodule update --init
 
