@@ -22,8 +22,10 @@ import containers.is_range;
 import containers.legacy_iterator;
 import containers.push_back;
 import containers.range_value_t;
+import containers.reallocation_size;
 import containers.reserve_if_reservable;
 import containers.size;
+import containers.size_then_use_range;
 
 import bounded;
 import std_module;

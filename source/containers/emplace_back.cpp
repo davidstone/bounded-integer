@@ -10,7 +10,6 @@ module;
 export module containers.emplace_back;
 
 import containers.lazy_push_back;
-import containers.reserve_if_reservable;
 import containers.range_value_t;
 
 import bounded;

@@ -11,7 +11,6 @@ export module containers.test_set_size;
 
 import containers.begin_end;
 import containers.data;
-import containers.reserve_if_reservable;
 
 import bounded;
 

@@ -323,6 +323,7 @@ target_sources(containers PUBLIC
 		source/containers/range_reference_t.cpp
 		source/containers/range_value_t.cpp
 		source/containers/range_view.cpp
+		source/containers/reallocation_size.cpp
 		source/containers/reference_wrapper.cpp
 		source/containers/repeat_n.cpp
 		source/containers/reserve_if_reservable.cpp
@@ -330,6 +331,7 @@ target_sources(containers PUBLIC
 		source/containers/resize.cpp
 		source/containers/shrink_to_fit.cpp
 		source/containers/size.cpp
+		source/containers/size_then_use_range.cpp
 		source/containers/small_buffer_optimized_vector.cpp
 		source/containers/splicable.cpp
 		source/containers/stable_vector.cpp

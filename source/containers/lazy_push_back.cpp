@@ -15,6 +15,7 @@ import containers.can_set_size;
 import containers.front_back;
 import containers.member_lazy_push_backable;
 import containers.range_value_t;
+import containers.reallocation_size;
 import containers.reserve_if_reservable;
 import containers.size;
 import containers.unsafe_lazy_push_back;

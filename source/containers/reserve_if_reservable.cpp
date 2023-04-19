@@ -5,7 +5,6 @@
 
 export module containers.reserve_if_reservable;
 
-import containers.is_range;
 import containers.size;
 
 import bounded;
@@ -24,16 +23,5 @@ constexpr void reserve_if_reservable(Container & container, range_size_t<Contain
 		container.reserve(size);
 	}
 }
-
-export template<typename Capacity>
-constexpr auto reallocation_size(Capacity const current_capacity, auto const current_size, auto const extra_elements) {
-	return ::bounded::assume_in_range<Capacity>(bounded::max(
-		bounded::integer(current_size) + bounded::integer(extra_elements),
-		bounded::integer(current_capacity) * 2_bi
-	));
-}
-
-export template<typename Range>
-concept size_then_use_range = forward_range<Range const &> or requires(Range const & r) { containers::size(r); };
 
 } // namespace containers
