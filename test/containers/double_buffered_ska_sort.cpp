@@ -9,13 +9,12 @@ module;
 
 export module containers.test.double_buffered_ska_sort;
 
-import containers.algorithms.double_buffered_ska_sort;
+import containers.algorithms.sort.double_buffered_ska_sort;
+import containers.algorithms.sort.sort_test_data;
+import containers.algorithms.sort.to_radix_sort_key;
 
 import containers.begin_end;
 import containers.size;
-import containers.to_radix_sort_key;
-
-import containers.sort_test_data;
 
 import std_module;
 
@@ -63,8 +62,8 @@ static_assert(test_double_buffered_sort_all(bool_2));
 static_assert(test_double_buffered_sort_all(bool_3));
 static_assert(test_double_buffered_sort(bool_many));
 
-static_assert(test_double_buffered_sort(uint8_0));
-static_assert(test_double_buffered_sort(uint8_1));
+static_assert(test_double_buffered_sort_all(uint8_0));
+static_assert(test_double_buffered_sort_all(uint8_1));
 static_assert(test_double_buffered_sort_all(uint8_2));
 static_assert(test_double_buffered_sort_all(uint8_3));
 static_assert(test_double_buffered_sort(uint8_many));

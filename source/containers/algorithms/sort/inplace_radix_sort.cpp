@@ -14,12 +14,14 @@ module;
 
 #include <operators/forward.hpp>
 
-export module containers.algorithms.inplace_radix_sort;
+export module containers.algorithms.sort.inplace_radix_sort;
+
+import containers.algorithms.sort.common_prefix;
+import containers.algorithms.sort.sort;
+import containers.algorithms.sort.to_radix_sort_key;
 
 import containers.algorithms.advance;
-import containers.algorithms.common_prefix;
 import containers.algorithms.partition;
-import containers.algorithms.sort;
 import containers.array;
 import containers.at;
 import containers.begin_end;
@@ -30,7 +32,6 @@ import containers.is_range;
 import containers.iter_difference_t;
 import containers.range_view;
 import containers.size;
-import containers.to_radix_sort_key;
 
 import bounded;
 import std_module;

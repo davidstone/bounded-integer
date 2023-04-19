@@ -188,11 +188,32 @@ target_sources(containers PUBLIC
 	FILE_SET CXX_MODULES
 	BASE_DIRS "${CMAKE_CURRENT_SOURCE_DIR}"
 	FILES
+		source/containers/algorithms/sort/cheaply_sortable.cpp
+		source/containers/algorithms/sort/common_prefix.cpp
+		source/containers/algorithms/sort/dereference_all.cpp
+		source/containers/algorithms/sort/double_buffered_ska_sort.cpp
+		source/containers/algorithms/sort/fixed_size_merge_sort.cpp
+		source/containers/algorithms/sort/inplace_radix_sort.cpp
+		source/containers/algorithms/sort/insertion_sort.cpp
+		source/containers/algorithms/sort/is_sorted.cpp
+		source/containers/algorithms/sort/relocate_in_order.cpp
+		source/containers/algorithms/sort/rotate_one.cpp
+		source/containers/algorithms/sort/ska_sort.cpp
+		source/containers/algorithms/sort/small_size_optimized_sort.cpp
+		source/containers/algorithms/sort/sort.cpp
+		source/containers/algorithms/sort/sort_exactly_1.cpp
+		source/containers/algorithms/sort/sort_exactly_2.cpp
+		source/containers/algorithms/sort/sort_exactly_3.cpp
+		source/containers/algorithms/sort/sort_exactly_4.cpp
+		source/containers/algorithms/sort/sort_exactly_5.cpp
+		source/containers/algorithms/sort/sort_exactly_6.cpp
+		source/containers/algorithms/sort/sort_test_data.cpp
+		source/containers/algorithms/sort/test_sort_inplace_and_relocate.cpp
+		source/containers/algorithms/sort/to_radix_sort_key.cpp
 		source/containers/algorithms/accumulate.cpp
 		source/containers/algorithms/advance.cpp
 		source/containers/algorithms/all_any_none.cpp
 		source/containers/algorithms/binary_search.cpp
-		source/containers/algorithms/common_prefix.cpp
 		source/containers/algorithms/compare.cpp
 		source/containers/algorithms/concatenate.cpp
 		source/containers/algorithms/concatenate_view.cpp
@@ -202,14 +223,11 @@ target_sources(containers PUBLIC
 		source/containers/algorithms/count.cpp
 		source/containers/algorithms/destroy_range.cpp
 		source/containers/algorithms/distance.cpp
-		source/containers/algorithms/double_buffered_ska_sort.cpp
 		source/containers/algorithms/erase.cpp
 		source/containers/algorithms/erase_test.cpp
 		source/containers/algorithms/filter.cpp
 		source/containers/algorithms/find.cpp
 		source/containers/algorithms/generate.cpp
-		source/containers/algorithms/inplace_radix_sort.cpp
-		source/containers/algorithms/is_sorted.cpp
 		source/containers/algorithms/keyed_binary_search.cpp
 		source/containers/algorithms/keyed_erase.cpp
 		source/containers/algorithms/keyed_insert.cpp
@@ -221,8 +239,6 @@ target_sources(containers PUBLIC
 		source/containers/algorithms/reverse.cpp
 		source/containers/algorithms/reverse_iterator.cpp
 		source/containers/algorithms/set.cpp
-		source/containers/algorithms/ska_sort.cpp
-		source/containers/algorithms/sort.cpp
 		source/containers/algorithms/transform.cpp
 		source/containers/algorithms/transform_iterator.cpp
 		source/containers/algorithms/uninitialized.cpp
@@ -315,7 +331,6 @@ target_sources(containers PUBLIC
 		source/containers/shrink_to_fit.cpp
 		source/containers/size.cpp
 		source/containers/small_buffer_optimized_vector.cpp
-		source/containers/sort_test_data.cpp
 		source/containers/splicable.cpp
 		source/containers/stable_vector.cpp
 		source/containers/static_vector.cpp
@@ -327,7 +342,6 @@ target_sources(containers PUBLIC
 		source/containers/test_sequence_container.cpp
 		source/containers/test_set_size.cpp
 		source/containers/to_address.cpp
-		source/containers/to_radix_sort_key.cpp
 		source/containers/to_string.cpp
 		source/containers/trivial_inplace_function.cpp
 		source/containers/uninitialized_array.cpp
@@ -394,6 +408,11 @@ add_executable(ska_sort_benchmark
 	test/containers/ska_sort_benchmark.cpp
 )
 target_link_libraries(ska_sort_benchmark PUBLIC bounded benchmark containers strict_defaults)
+
+add_executable(sort_benchmark
+	test/containers/sort_benchmark.cpp
+)
+target_link_libraries(sort_benchmark PUBLIC bounded benchmark_main containers strict_defaults)
 
 add_executable(vector_benchmark
 	test/containers/vector_benchmark.cpp

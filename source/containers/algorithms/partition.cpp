@@ -102,6 +102,34 @@ struct partition_t {
 };
 export constexpr auto partition = partition_t();
 
+// Partition the range such that all values for which `compare(value, *middle)`
+// returns true (prior to any elements moving) appear before the iterator
+// returned.
+struct iterator_partition_t {
+	template<bidirectional_iterator Iterator>
+	constexpr auto operator()(Iterator first, Iterator middle, Iterator last, auto const compare) const {
+		BOUNDED_ASSERT(first == last or middle != last);
+		auto predicate = [&](auto const & value) { return compare(value, *middle); };
+		while (true) {
+			first = containers::find_if_not(first, middle, predicate);
+			if (first == last) {
+				return first;
+			}
+			auto const last_less_than = containers::find_last_if(containers::next(first), last, predicate);
+			if (last_less_than == last) {
+				return first;
+			}
+			std::ranges::swap(*first, *last_less_than);
+			last = last_less_than;
+			if (first == middle) {
+				middle = last_less_than;
+			}
+			++first;
+		}
+	}
+};
+export constexpr auto iterator_partition = iterator_partition_t();
+
 } // namespace containers
 
 using namespace bounded::literal;
@@ -247,3 +275,133 @@ static_assert(test_partition(
 	containers::array{true, true, true},
 	containers::array{true, true, true}
 ));
+
+constexpr auto test_iterator_partition(bounded::bounded_integer auto const offset, containers::range auto && input, containers::range auto const & expected) -> bool {
+	BOUNDED_ASSERT(containers::is_partitioned(expected, predicate));
+	auto const first = containers::begin(input);
+	auto const it = containers::iterator_partition(first, first + offset, containers::end(input), std::greater());
+	BOUNDED_ASSERT(input == expected);
+	BOUNDED_ASSERT(it == containers::partition_point(input, predicate));
+	return true;
+}
+
+static_assert(test_iterator_partition(
+	0_bi,
+	containers::static_vector<bool, 1_bi>{},
+	containers::static_vector<bool, 1_bi>{}
+));
+
+static_assert(test_iterator_partition(
+	0_bi,
+	containers::array{false},
+	containers::array{false}
+));
+
+static_assert(test_iterator_partition(
+	0_bi,
+	containers::array{false, false},
+	containers::array{false, false}
+));
+static_assert(test_iterator_partition(
+	1_bi,
+	containers::array{false, false},
+	containers::array{false, false}
+));
+static_assert(test_iterator_partition(
+	0_bi,
+	containers::array{false, true},
+	containers::array{true, false}
+));
+static_assert(test_iterator_partition(
+	1_bi,
+	containers::array{true, false},
+	containers::array{true, false}
+));
+
+static_assert(test_iterator_partition(
+	0_bi,
+	containers::array{false, false, false},
+	containers::array{false, false, false}
+));
+static_assert(test_iterator_partition(
+	1_bi,
+	containers::array{false, false, false},
+	containers::array{false, false, false}
+));
+static_assert(test_iterator_partition(
+	2_bi,
+	containers::array{false, false, false},
+	containers::array{false, false, false}
+));
+static_assert(test_iterator_partition(
+	0_bi,
+	containers::array{false, false, true},
+	containers::array{true, false, false}
+));
+static_assert(test_iterator_partition(
+	1_bi,
+	containers::array{false, false, true},
+	containers::array{true, false, false}
+));
+static_assert(test_iterator_partition(
+	0_bi,
+	containers::array{false, true, false},
+	containers::array{true, false, false}
+));
+static_assert(test_iterator_partition(
+	2_bi,
+	containers::array{false, true, false},
+	containers::array{true, false, false}
+));
+static_assert(test_iterator_partition(
+	1_bi,
+	containers::array{true, false, false},
+	containers::array{true, false, false}
+));
+static_assert(test_iterator_partition(
+	2_bi,
+	containers::array{true, false, false},
+	containers::array{true, false, false}
+));
+static_assert(test_iterator_partition(
+	0_bi,
+	containers::array{false, true, true},
+	containers::array{true, true, false}
+));
+static_assert(test_iterator_partition(
+	1_bi,
+	containers::array{true, false, true},
+	containers::array{true, true, false}
+));
+static_assert(test_iterator_partition(
+	2_bi,
+	containers::array{true, true, false},
+	containers::array{true, true, false}
+));
+
+static_assert(test_iterator_partition(
+	0_bi,
+	containers::array{false, true, false, true, false, true, false, true, false, true},
+	containers::array{true, true, true, true, true, false, false, false, false, false}
+));
+static_assert(test_iterator_partition(
+	2_bi,
+	containers::array{false, true, false, true, false, true, false, true, false, true},
+	containers::array{true, true, true, true, true, false, false, false, false, false}
+));
+static_assert(test_iterator_partition(
+	4_bi,
+	containers::array{false, true, false, true, false, true, false, true, false, true},
+	containers::array{true, true, true, true, true, false, false, false, false, false}
+));
+static_assert(test_iterator_partition(
+	6_bi,
+	containers::array{false, true, false, true, false, true, false, true, false, true},
+	containers::array{true, true, true, true, true, false, false, false, false, false}
+));
+static_assert(test_iterator_partition(
+	8_bi,
+	containers::array{false, true, false, true, false, true, false, true, false, true},
+	containers::array{true, true, true, true, true, false, false, false, false, false}
+));
+

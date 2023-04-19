@@ -8,18 +8,19 @@ module;
 #include <compare>
 #include <string_view>
 
+#include <bounded/assert.hpp>
+
 #include <operators/forward.hpp>
 
-#include "../test_assert.hpp"
+export module containers.algorithms.sort.sort_test_data;
 
-export module containers.sort_test_data;
+import containers.algorithms.sort.is_sorted;
+import containers.algorithms.sort.to_radix_sort_key;
 
-import containers.algorithms.is_sorted;
 import containers.array;
 import containers.c_array;
 import containers.front_back;
 import containers.static_vector;
-import containers.to_radix_sort_key;
 import containers.vector;
 
 import bounded;
@@ -45,7 +46,7 @@ struct sort_test_data {
 		input(std::move(input_)),
 		expected(std::move(expected_))
 	{
-		BOUNDED_TEST(containers::is_sorted(expected));
+		BOUNDED_ASSERT(containers::is_sorted(expected));
 	}
 	Container input;
 	Container expected;
@@ -126,28 +127,32 @@ export constexpr auto bool_many = sort_test_data(
 	containers::array{false, false, false, false, false, true, true, true, true, true}
 );
 
-constexpr auto operator""_u8(unsigned long long const x) {
+consteval auto operator""_u8(unsigned long long const x) {
 	return static_cast<std::uint8_t>(x);
 }
-constexpr auto operator""_u16(unsigned long long const x) {
+consteval auto operator""_u16(unsigned long long const x) {
 	return static_cast<std::uint16_t>(x);
 }
-constexpr auto operator""_u32(unsigned long long const x) {
+consteval auto operator""_u32(unsigned long long const x) {
 	return static_cast<std::uint32_t>(x);
 }
-constexpr auto operator""_u64(unsigned long long const x) {
+consteval auto operator""_u64(unsigned long long const x) {
 	return static_cast<std::uint64_t>(x);
 }
 
-export constexpr auto uint8_0 = sort_test_data(
-	containers::static_vector<std::uint8_t, 2_bi>(),
-	containers::static_vector<std::uint8_t, 2_bi>()
-);
+export constexpr auto uint8_0 = containers::array{
+	sort_test_data(
+		containers::static_vector<std::uint8_t, 2_bi>(),
+		containers::static_vector<std::uint8_t, 2_bi>()
+	)
+};
 
-export constexpr auto uint8_1 = sort_test_data(
-	containers::array{1_u8},
-	containers::array{1_u8}
-);
+export constexpr auto uint8_1 = containers::array{
+	sort_test_data(
+		containers::array{1_u8},
+		containers::array{1_u8}
+	)
+};
 
 export constexpr auto uint8_2 = containers::array{
 	sort_test_data(
@@ -226,7 +231,7 @@ export constexpr auto uint8_many = sort_test_data(
 
 
 export constexpr auto uint8_256 = []{
-	auto to_sort = containers::make_array_n(bounded::constant<256>, static_cast<std::uint8_t>(254));
+	auto to_sort = containers::make_array_n(bounded::constant<256>, 254_u8);
 	containers::back(to_sort) = 255;
 	return sort_test_data(to_sort, to_sort);
 }();

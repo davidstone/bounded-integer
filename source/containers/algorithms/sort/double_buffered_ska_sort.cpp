@@ -9,7 +9,9 @@ module;
 
 #include <operators/forward.hpp>
 
-export module containers.algorithms.double_buffered_ska_sort;
+export module containers.algorithms.sort.double_buffered_ska_sort;
+
+import containers.algorithms.sort.to_radix_sort_key;
 
 import containers.algorithms.advance;
 import containers.algorithms.count;
@@ -25,7 +27,6 @@ import containers.is_range;
 import containers.range_value_t;
 import containers.range_view;
 import containers.size;
-import containers.to_radix_sort_key;
 
 import bounded;
 import numeric_traits;

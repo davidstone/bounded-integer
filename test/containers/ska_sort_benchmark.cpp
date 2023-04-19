@@ -9,7 +9,7 @@
 
 #include <benchmark/benchmark.h>
 
-import containers.algorithms.inplace_radix_sort;
+import containers.algorithms.sort.inplace_radix_sort;
 
 import bounded;
 import containers;

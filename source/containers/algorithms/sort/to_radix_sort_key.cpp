@@ -9,9 +9,10 @@ module;
 
 #include <operators/forward.hpp>
 
-export module containers.to_radix_sort_key;
+export module containers.algorithms.sort.to_radix_sort_key;
 
-import containers.algorithms.is_sorted;
+import containers.algorithms.sort.is_sorted;
+
 import containers.array;
 import containers.is_range;
 

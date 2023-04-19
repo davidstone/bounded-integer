@@ -3,9 +3,12 @@
 // (See accompanying file LICENSE_1_0.txt or copy at
 // http://www.boost.org/LICENSE_1_0.txt)
 
-export module containers.algorithms.common_prefix;
+export module containers.algorithms.sort.common_prefix;
+
+import containers.algorithms.sort.to_radix_sort_key;
 
 import containers.algorithms.advance;
+
 import containers.array;
 import containers.begin_end;
 import containers.c_array;
@@ -13,7 +16,6 @@ import containers.front_back;
 import containers.is_empty;
 import containers.iter_difference_t;
 import containers.range_view;
-import containers.to_radix_sort_key;
 
 import bounded;
 import std_module;

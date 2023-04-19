@@ -8,16 +8,17 @@
 // https://probablydance.com/2017/01/17/faster-sorting-algorithm-part-2/
 // https://github.com/skarupke/ska_sort is the original implementation.
 
-export module containers.algorithms.ska_sort;
+export module containers.algorithms.sort.ska_sort;
+
+import containers.algorithms.sort.inplace_radix_sort;
+import containers.algorithms.sort.to_radix_sort_key;
 
 import containers.algorithms.erase;
-import containers.algorithms.inplace_radix_sort;
 import containers.algorithms.unique;
 
 import containers.begin_end;
 import containers.is_range;
 import containers.range_view;
-import containers.to_radix_sort_key;
 
 namespace containers {
 

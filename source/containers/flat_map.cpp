@@ -11,13 +11,15 @@ module;
 
 export module containers.flat_map;
 
+import containers.algorithms.sort.is_sorted;
+import containers.algorithms.sort.ska_sort;
+import containers.algorithms.sort.to_radix_sort_key;
+
 import containers.algorithms.advance;
 import containers.algorithms.binary_search;
 import containers.algorithms.compare;
 import containers.algorithms.erase;
-import containers.algorithms.is_sorted;
 import containers.algorithms.keyed_binary_search;
-import containers.algorithms.ska_sort;
 import containers.algorithms.unique;
 import containers.append;
 import containers.associative_container;
@@ -44,7 +46,6 @@ import containers.size;
 import containers.static_vector;
 import containers.test_associative_container;
 import containers.test_reserve_and_capacity;
-import containers.to_radix_sort_key;
 import containers.vector;
 export import containers.common_iterator_functions;
 

@@ -11,10 +11,11 @@ module;
 
 export module containers.algorithms.unique;
 
+import containers.algorithms.sort.is_sorted;
+
 import containers.algorithms.advance;
 import containers.algorithms.erase;
 import containers.algorithms.find;
-import containers.algorithms.is_sorted;
 import containers.algorithms.move_iterator;
 import containers.append;
 import containers.begin_end;

@@ -3,7 +3,7 @@
 // (See accompanying file LICENSE_1_0.txt or copy at
 // http://www.boost.org/LICENSE_1_0.txt)
 
-export module containers.algorithms.is_sorted;
+export module containers.algorithms.sort.is_sorted;
 
 import containers.algorithms.advance;
 import containers.array;

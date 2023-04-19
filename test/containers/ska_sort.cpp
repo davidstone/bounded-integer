@@ -12,14 +12,14 @@ module;
 
 export module containers.test.ska_sort;
 
-import containers.algorithms.common_prefix;
-import containers.algorithms.inplace_radix_sort;
+import containers.algorithms.sort.common_prefix;
+import containers.algorithms.sort.inplace_radix_sort;
+import containers.algorithms.sort.sort_test_data;
+import containers.algorithms.sort.to_radix_sort_key;
 
 import containers.begin_end;
 import containers.c_array;
 import containers.range_view;
-import containers.sort_test_data;
-import containers.to_radix_sort_key;
 
 import std_module;
 
@@ -64,8 +64,8 @@ static_assert(test_sort_all(bool_2));
 static_assert(test_sort_all(bool_3));
 static_assert(test_sort(bool_many));
 
-static_assert(test_sort(uint8_0));
-static_assert(test_sort(uint8_1));
+static_assert(test_sort_all(uint8_0));
+static_assert(test_sort_all(uint8_1));
 static_assert(test_sort_all(uint8_2));
 static_assert(test_sort_all(uint8_3));
 static_assert(test_sort(uint8_many));

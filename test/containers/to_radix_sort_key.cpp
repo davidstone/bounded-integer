@@ -6,9 +6,10 @@
 #include <compare>
 #include <catch2/catch_test_macros.hpp>
 
-import containers.algorithms.is_sorted;
+import containers.algorithms.sort.is_sorted;
+import containers.algorithms.sort.to_radix_sort_key;
+
 import containers.array;
-import containers.to_radix_sort_key;
 
 import bounded.test_int;
 
