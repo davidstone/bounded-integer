@@ -53,9 +53,6 @@ concept std_allocator = is_std_allocator<T>;
 
 // This has the same interface as `std::vector`, with the following exceptions:
 //
-// Names are not uglified (`__foo`). When this becomes a module, that should not
-// matter.
-//
 // Allocators are not supported (`std::allocator` is used for all allocations).
 //
 // `operator<=>` is required for relational operators to exist
