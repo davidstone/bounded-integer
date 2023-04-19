@@ -31,19 +31,16 @@ import bounded;
 import std_module;
 
 namespace containers {
-
-constexpr auto exponential_reserve = [](auto & target, auto const source_size) {
-	auto const current_size = ::containers::linear_size(target);
-	if (current_size + source_size > target.capacity()) {
-		target.reserve(::containers::reallocation_size(target.capacity(), current_size, source_size));
-	}
-};
+using namespace bounded::literal;
 
 template<typename Target, typename Source>
 constexpr auto maybe_reserve(Target & target, Source const & source) {
 	if constexpr (size_then_use_range<Source> and reservable<Target>) {
 		auto const source_size = ::containers::get_source_size<Target>(source);
-		exponential_reserve(target, source_size);
+		auto const current_size = ::containers::linear_size(target);
+		if (current_size + source_size > target.capacity()) {
+			target.reserve(::containers::reallocation_size(target.capacity(), current_size, source_size));
+		}
 	}
 }
 
@@ -51,9 +48,19 @@ template<typename Target, typename Source>
 constexpr auto append_impl(Target & target, Source && source) -> void {
 	if constexpr (can_set_size<Target> and reservable<Target> and size_then_use_range<Source>) {
 		auto const source_size = ::containers::get_source_size<Target>(source);
-		exponential_reserve(target, source_size);
-		containers::uninitialized_copy_no_overlap(OPERATORS_FORWARD(source), containers::end(target));
-		target.set_size(containers::size(target) + source_size);
+		auto const original_size = ::containers::size(target);
+		auto const new_size = original_size + source_size;
+		if (new_size <= target.capacity()) {
+			containers::uninitialized_copy_no_overlap(OPERATORS_FORWARD(source), containers::end(target));
+		} else {
+			auto new_target = Target();
+			new_target.reserve(::containers::reallocation_size(target.capacity(), original_size, source_size));
+			containers::uninitialized_copy_no_overlap(OPERATORS_FORWARD(source), containers::begin(new_target) + original_size);
+			containers::uninitialized_relocate_no_overlap(target, containers::begin(new_target));
+			target.set_size(0_bi);
+			target = std::move(new_target);
+		}
+		target.set_size(new_size);
 	} else if constexpr (can_set_size<Target> and !reservable<Target>) {
 		// TODO: Use an iterator that includes a count if we do not have a sized
 		// source range or a random-access iterator for the target
@@ -68,6 +75,11 @@ constexpr auto append_impl(Target & target, Source && source) -> void {
 		}();
 		target.set_size(containers::size(target) + source_size);
 	} else if constexpr (lazy_push_backable<Target>) {
+		// TODO: How do we handle aliasing issues here? Do we assume that all
+		// containers that are not std-style containers and do not have
+		// `set_size` are stable on `push_back`? Related to that, is `reserve`
+		// ever helpful here? Does testing whether the target container is
+		// reservable also test for stability?
 		::containers::copy_or_relocate_from(OPERATORS_FORWARD(source), [&](auto make) {
 			::containers::lazy_push_back(target, make);
 		});
@@ -106,9 +118,6 @@ constexpr auto append_impl(Target & target, Source && source) -> void {
 // I would like to return an iterator to the start of the appended range, but
 // that does not seem possible to do efficiently in general due to potential
 // iterator instability.
-//
-// TODO: Support the source range being a subset of the target range
-
 export constexpr auto append(push_backable auto & target, range auto && source) -> void {
 	::containers::append_impl(target, OPERATORS_FORWARD(source));
 }
