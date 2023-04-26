@@ -14,7 +14,7 @@ export module containers.algorithms.concatenate;
 import containers.algorithms.copy;
 import containers.algorithms.reverse_iterator;
 import containers.algorithms.uninitialized;
-import containers.append;
+import containers.append_into_capacity;
 import containers.begin_end;
 import containers.can_set_size;
 import containers.data;
@@ -48,7 +48,7 @@ template<typename Result>
 constexpr auto concatenate_prepend_append(Result & result, iterator_t<Result &> const it, auto && range, auto && ... ranges) {
 	if constexpr (std::same_as<Result, std::remove_reference_t<decltype(range)>>) {
 		if (std::addressof(result) == std::addressof(range)) {
-			(..., ::containers::append(result, OPERATORS_FORWARD(ranges)));
+			(..., ::containers::append_into_capacity(result, OPERATORS_FORWARD(ranges)));
 			return;
 		}
 	}
@@ -137,7 +137,7 @@ constexpr auto concatenate(auto && ... ranges) -> Result {
 
 	auto result = Result();
 	result.reserve(::bounded::assume_in_range<range_size_t<Result>>(total_size));
-	(..., ::containers::append(result, OPERATORS_FORWARD(ranges)));
+	(..., ::containers::append_into_capacity(result, OPERATORS_FORWARD(ranges)));
 	return result;
 }
 

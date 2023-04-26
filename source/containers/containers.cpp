@@ -45,6 +45,7 @@ export import containers.algorithms.unique;
 export import containers.std.vector;
 
 export import containers.append;
+export import containers.append_into_capacity;
 export import containers.array;
 export import containers.assign;
 export import containers.assign_to_empty;
