@@ -12,8 +12,6 @@ export module containers.emplace_back;
 import containers.lazy_push_back;
 import containers.range_value_t;
 
-import bounded;
-
 namespace containers {
 
 template<typename Container, typename... Args>
@@ -27,7 +25,7 @@ constexpr auto & emplace_back(Container & container, Args && ... args) {
 		return container.emplace_back(OPERATORS_FORWARD(args)...);
 	} else {
 		return ::containers::lazy_push_back(container, [&]{
-			return bounded::construct<range_value_t<Container>>(OPERATORS_FORWARD(args)...);
+			return range_value_t<Container>(OPERATORS_FORWARD(args)...);
 		});
 	}
 }
