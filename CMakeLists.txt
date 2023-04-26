@@ -305,6 +305,7 @@ target_sources(containers PUBLIC
 		source/containers/lazy_push_back_into_capacity_test.cpp
 		source/containers/lazy_push_back_test.cpp
 		source/containers/lazy_push_front.cpp
+		source/containers/legacy_append.cpp
 		source/containers/legacy_iterator.cpp
 		source/containers/linear_map.cpp
 		source/containers/linked_list_helper.cpp

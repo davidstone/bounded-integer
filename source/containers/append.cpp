@@ -10,16 +10,14 @@ module;
 export module containers.append;
 
 import containers.algorithms.copy_or_relocate_from;
-import containers.algorithms.transform;
 import containers.algorithms.uninitialized;
-import containers.assign_to_empty;
 import containers.begin_end;
 import containers.c_array;
 import containers.can_set_size;
-import containers.lazy_push_back;
-import containers.is_container;
+import containers.get_source_size;
 import containers.is_range;
-import containers.legacy_iterator;
+import containers.lazy_push_back;
+import containers.legacy_append;
 import containers.push_back;
 import containers.range_value_t;
 import containers.reallocation_size;
@@ -32,17 +30,6 @@ import std_module;
 
 namespace containers {
 using namespace bounded::literal;
-
-template<typename Target, typename Source>
-constexpr auto maybe_reserve(Target & target, Source const & source) {
-	if constexpr (size_then_use_range<Source> and reservable<Target>) {
-		auto const source_size = ::containers::get_source_size<Target>(source);
-		auto const current_size = ::containers::linear_size(target);
-		if (current_size + source_size > target.capacity()) {
-			target.reserve(::containers::reallocation_size(target.capacity(), current_size, source_size));
-		}
-	}
-}
 
 template<typename Target, typename Source>
 constexpr auto append_impl(Target & target, Source && source) -> void {
@@ -84,34 +71,7 @@ constexpr auto append_impl(Target & target, Source && source) -> void {
 			::containers::lazy_push_back(target, make);
 		});
 	} else {
-		using value_t = range_value_t<Target>;
-		constexpr auto sufficiently_trivial = std::is_trivially_move_assignable_v<value_t>;
-		decltype(auto) transformed = [&]() -> decltype(auto) {
-			if constexpr (is_container<Source>) {
-				return containers::transform(source, [](auto & value) -> auto && { return std::move(value); });
-			} else {
-				return OPERATORS_FORWARD(source);
-			}
-		}();
-		constexpr auto has_member_insert = requires {
-			target.insert(
-				containers::end(target),
-				make_legacy_iterator(containers::begin(transformed)),
-				make_legacy_iterator(containers::end(transformed))
-			);
-		};
-		if constexpr (sufficiently_trivial and has_member_insert) {
-			target.insert(
-				containers::end(target),
-				make_legacy_iterator(containers::begin(transformed)),
-				make_legacy_iterator(containers::end(transformed))
-			);
-		} else {
-			::containers::maybe_reserve(target, source);
-			for (decltype(auto) value : OPERATORS_FORWARD(transformed)) {
-				::containers::push_back(target, OPERATORS_FORWARD(value));
-			}
-		}
+		::containers::legacy_append(target, OPERATORS_FORWARD(source));
 	}
 }
 
