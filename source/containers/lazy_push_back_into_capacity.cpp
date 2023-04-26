@@ -9,7 +9,7 @@ module;
 
 #include <operators/forward.hpp>
 
-export module containers.unsafe_lazy_push_back;
+export module containers.lazy_push_back_into_capacity;
 
 import containers.begin_end;
 import containers.can_set_size;
@@ -25,10 +25,10 @@ using namespace bounded::literal;
 namespace containers {
 
 export template<typename Container>
-concept unsafe_lazy_push_backable = is_container<Container> and (can_set_size<Container> or member_lazy_push_backable<Container>);
+concept can_lazy_push_back_into_capacity = is_container<Container> and (can_set_size<Container> or member_lazy_push_backable<Container>);
 
-export template<unsafe_lazy_push_backable Container>
-constexpr auto unsafe_lazy_push_back(
+export template<can_lazy_push_back_into_capacity Container>
+constexpr auto lazy_push_back_into_capacity(
 	Container & container,
 	bounded::construct_function_for<range_value_t<Container>> auto && constructor
 ) -> auto & {

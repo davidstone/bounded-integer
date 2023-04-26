@@ -13,12 +13,12 @@ import containers.algorithms.uninitialized;
 import containers.begin_end;
 import containers.can_set_size;
 import containers.front_back;
+import containers.lazy_push_back_into_capacity;
 import containers.member_lazy_push_backable;
 import containers.range_value_t;
 import containers.reallocation_size;
 import containers.reserve_if_reservable;
 import containers.size;
-import containers.unsafe_lazy_push_back;
 
 import bounded;
 import bounded.test_int;
@@ -43,7 +43,7 @@ constexpr auto & lazy_push_back(
 	} else {
 		auto const initial_size = containers::size(container);
 		if (initial_size < container.capacity()) {
-			return ::containers::unsafe_lazy_push_back(container, OPERATORS_FORWARD(constructor));
+			return ::containers::lazy_push_back_into_capacity(container, OPERATORS_FORWARD(constructor));
 		} else if constexpr (reservable<Container>) {
 			auto temp = Container();
 			temp.reserve(::containers::reallocation_size(container.capacity(), initial_size, 1_bi));

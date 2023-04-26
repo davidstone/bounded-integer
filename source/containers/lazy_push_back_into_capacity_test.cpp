@@ -7,10 +7,10 @@ module;
 
 #include <bounded/assert.hpp>
 
-export module containers.unsafe_lazy_push_back_test;
+export module containers.lazy_push_back_into_capacity_test;
 
 import containers.front_back;
-import containers.unsafe_lazy_push_back;
+import containers.lazy_push_back_into_capacity;
 import containers.vector;
 
 import bounded;
@@ -21,7 +21,7 @@ using namespace bounded::literal;
 using vector = containers::vector<bounded_test::integer>;
 
 constexpr auto impl(vector & v, int const value, vector const & expected) -> void {
-	auto & result = unsafe_lazy_push_back(v, [=]{ return value; });
+	auto & result = lazy_push_back_into_capacity(v, [=]{ return value; });
 	BOUNDED_ASSERT(&result == std::addressof(containers::back(v)));
 	BOUNDED_ASSERT(v.capacity() == 2_bi);
 	BOUNDED_ASSERT(v == expected);

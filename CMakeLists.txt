@@ -301,6 +301,8 @@ target_sources(containers PUBLIC
 		source/containers/iterator_t.cpp
 		source/containers/key_comparison_function.cpp
 		source/containers/lazy_push_back.cpp
+		source/containers/lazy_push_back_into_capacity.cpp
+		source/containers/lazy_push_back_into_capacity_test.cpp
 		source/containers/lazy_push_back_test.cpp
 		source/containers/lazy_push_front.cpp
 		source/containers/legacy_iterator.cpp
@@ -319,6 +321,8 @@ target_sources(containers PUBLIC
 		source/containers/pop_back_test.cpp
 		source/containers/pop_front.cpp
 		source/containers/push_back.cpp
+		source/containers/push_back_into_capacity.cpp
+		source/containers/push_back_into_capacity_test.cpp
 		source/containers/push_back_test.cpp
 		source/containers/push_front.cpp
 		source/containers/range_reference_t.cpp
@@ -349,10 +353,6 @@ target_sources(containers PUBLIC
 		source/containers/trivial_inplace_function.cpp
 		source/containers/uninitialized_array.cpp
 		source/containers/uninitialized_dynamic_array.cpp
-		source/containers/unsafe_lazy_push_back.cpp
-		source/containers/unsafe_lazy_push_back_test.cpp
-		source/containers/unsafe_push_back.cpp
-		source/containers/unsafe_push_back_test.cpp
 		source/containers/vector.cpp
 )
 

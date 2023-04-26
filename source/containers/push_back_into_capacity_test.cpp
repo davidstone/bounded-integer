@@ -8,10 +8,10 @@ module;
 #include <bounded/assert.hpp>
 #include <operators/forward.hpp>
 
-export module containers.unsafe_push_back_test;
+export module containers.push_back_into_capacity_test;
 
 import containers.front_back;
-import containers.unsafe_push_back;
+import containers.push_back_into_capacity;
 import containers.vector;
 
 import bounded;
@@ -22,7 +22,7 @@ using namespace bounded::literal;
 using vector = containers::vector<bounded_test::integer>;
 
 constexpr auto impl(vector & v, auto && value, vector const & expected) -> void {
-	auto & result = unsafe_push_back(v, OPERATORS_FORWARD(value));
+	auto & result = push_back_into_capacity(v, OPERATORS_FORWARD(value));
 	BOUNDED_ASSERT(&result == std::addressof(containers::back(v)));
 	BOUNDED_ASSERT(v.capacity() == 2_bi);
 	BOUNDED_ASSERT(v == expected);
