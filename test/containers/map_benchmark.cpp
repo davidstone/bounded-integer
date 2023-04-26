@@ -122,6 +122,9 @@ struct Extract {
 	}
 };
 
+auto ignore(auto &&) -> void {
+}
+
 template<std::size_t key_size, std::size_t value_size>
 void test_performance(std::size_t const loop_count) {
 	auto const generator = [](std::size_t size) {
@@ -153,7 +156,6 @@ void test_performance(std::size_t const loop_count) {
 
 	for (auto const & value : map) {
 		auto const volatile & thing = value;
-		auto ignore = [](auto &&){};
 		ignore(thing);
 	}
 	for (auto const & value : source) {
@@ -166,7 +168,6 @@ void test_performance(std::size_t const loop_count) {
 
 	for (auto const & value : map) {
 		auto const volatile & thing = value;
-		auto ignore = [](auto &&){};
 		ignore(thing);
 	}
 	insert_range(map, additional_batch);
@@ -177,7 +178,6 @@ void test_performance(std::size_t const loop_count) {
 
 	for (auto const & value : map) {
 		auto const volatile & thing = value;
-		auto ignore = [](auto &&){};
 		ignore(thing);
 	}
 	for (auto const & value : additional) {
@@ -190,7 +190,6 @@ void test_performance(std::size_t const loop_count) {
 
 	for (auto const & value : map) {
 		auto const volatile & thing = value;
-		auto ignore = [](auto &&){};
 		ignore(thing);
 	}
 	auto map2 = map;
@@ -198,7 +197,6 @@ void test_performance(std::size_t const loop_count) {
 	
 	for (auto const & value : map) {
 		auto const volatile & thing = value;
-		auto ignore = [](auto &&){};
 		ignore(thing);
 	}
 	auto const iterated = high_resolution_clock::now();
