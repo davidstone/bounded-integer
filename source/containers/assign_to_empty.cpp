@@ -16,6 +16,7 @@ import containers.algorithms.uninitialized;
 import containers.begin_end;
 import containers.c_array;
 import containers.can_set_size;
+import containers.get_source_size;
 import containers.initializer_range;
 import containers.is_empty;
 import containers.is_range;
@@ -49,16 +50,6 @@ export constexpr auto member_assign = []<typename Target, typename Source>(Targe
 		static_assert(member_iterator_assignable<Target, Source>);
 		// TODO: Reserve for sized forward input ranges
 		target.assign(containers::begin(OPERATORS_FORWARD(source)), containers::end(OPERATORS_FORWARD(source)));
-	}
-};
-
-export template<typename Target>
-constexpr auto get_source_size(size_then_use_range auto const & source) {
-	auto const value = containers::linear_size(source);
-	if constexpr (bounded::bounded_integer<decltype(value)>) {
-		return value;
-	} else {
-		return ::bounded::assume_in_range<range_size_t<Target>>(value);
 	}
 };
 

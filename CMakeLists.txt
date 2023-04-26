@@ -280,6 +280,7 @@ target_sources(containers PUBLIC
 		source/containers/flat_map.cpp
 		source/containers/forward_linked_list.cpp
 		source/containers/front_back.cpp
+		source/containers/get_source_size.cpp
 		source/containers/has_member_before_begin.cpp
 		source/containers/has_member_size.cpp
 		source/containers/index_type.cpp
