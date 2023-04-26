@@ -43,7 +43,7 @@ export constexpr auto copy_or_relocate_from = []<range Input>(Input && input, au
 		input.set_size(0_bi);
 	} else {
 		for (; it != last; ++it) {
-			function([&] { return dereference<Input>(it); });
+			function([&] -> decltype(auto) { return dereference<Input>(it); });
 		}
 	}
 	return it;

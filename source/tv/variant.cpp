@@ -228,7 +228,7 @@ private:
 		visit_with_index(
 			OPERATORS_FORWARD(other),
 			[&](auto parameter) {
-				replace_active_member(parameter.index, [&] { return std::move(parameter).value(); });
+				replace_active_member(parameter.index, [&] -> decltype(auto) { return std::move(parameter).value(); });
 			}
 		);
 	}

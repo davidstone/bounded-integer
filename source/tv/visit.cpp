@@ -231,7 +231,7 @@ constexpr auto rotate_transform(auto const use_index, auto && ... args) -> declt
 }
 
 // Accepts any number of variants (including 0) followed by one function
-export constexpr auto visit_with_index = []<typename... Args>(Args && ... args)
+export constexpr auto visit_with_index = []<typename... Args>(Args && ... args) -> decltype(auto)
 	 requires is_variants_then_visit_function<sizeof...(Args) - 1U, indexed_variant_types, Args...>
 {
 	return ::tv::rotate_transform(std::true_type(), OPERATORS_FORWARD(args)...);

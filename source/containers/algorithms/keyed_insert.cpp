@@ -34,7 +34,7 @@ constexpr auto keyed_insert(Map & map, Key && key, Mapped && mapped) {
 	if constexpr (legacy_map<Map>) {
 		return map.insert({OPERATORS_FORWARD(key), OPERATORS_FORWARD(mapped)});
 	} else {
-		return map.lazy_insert(OPERATORS_FORWARD(key), [&] { return OPERATORS_FORWARD(mapped); });
+		return map.lazy_insert(OPERATORS_FORWARD(key), bounded::value_to_function(OPERATORS_FORWARD(mapped)));
 	}
 }
 export template<associative_container Map>
@@ -42,7 +42,7 @@ constexpr auto keyed_insert(Map & map, range_value_t<Map> const & value) {
 	if constexpr (legacy_map<Map>) {
 		return map.insert(value);
 	} else {
-		return map.lazy_insert(get_key(value), [&] { return get_mapped(value); });
+		return map.lazy_insert(get_key(value), [&] -> decltype(auto) { return get_mapped(value); });
 	}
 }
 export template<associative_container Map>
@@ -50,7 +50,7 @@ constexpr auto keyed_insert(Map & map, range_value_t<Map> && value) {
 	if constexpr (legacy_map<Map>) {
 		return map.insert(std::move(value));
 	} else {
-		return map.lazy_insert(get_key(std::move(value)), [&] { return get_mapped(std::move(value)); });
+		return map.lazy_insert(get_key(std::move(value)), [&] -> decltype(auto) { return get_mapped(std::move(value)); });
 	}
 }
 
