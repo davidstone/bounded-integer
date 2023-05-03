@@ -5,12 +5,11 @@
 
 export module bounded.concepts;
 
+import bounded.function_ptr;
+
 import std_module;
 
 namespace bounded {
-
-export template<typename Result, typename... Args>
-using function_ptr = Result(*)(Args...);
 
 // TODO: File a bug against the standard? The standard version always returns a
 // reference, which means it does not work with guaranteed copy elision.
