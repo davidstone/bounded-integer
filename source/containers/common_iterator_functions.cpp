@@ -9,13 +9,15 @@ import containers.is_iterator;
 
 import bounded;
 import operators;
+import std_module;
 
 export import containers.common_functions;
 
 namespace containers {
 
-export constexpr auto operator+(bounded::integral auto const offset, iterator auto const it) {
-	return it + offset;
+export template<bounded::integral LHS, iterator RHS> requires addable<RHS, LHS>
+constexpr auto operator+(LHS const offset, RHS it) {
+	return std::move(it) + offset;
 }
 
 export using operators::operator+=;
