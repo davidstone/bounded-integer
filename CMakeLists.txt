@@ -95,6 +95,7 @@ target_sources(bounded PUBLIC
 		source/bounded/construct_destroy.cpp
 		source/bounded/copy.cpp
 		source/bounded/copy_cv_ref.cpp
+		source/bounded/declval.cpp
 		source/bounded/function_ptr.cpp
 		source/bounded/hash.cpp
 		source/bounded/homogeneous_equals.cpp

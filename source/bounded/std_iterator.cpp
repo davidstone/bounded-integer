@@ -5,7 +5,7 @@
 
 export module bounded.std_iterator;
 
-import bounded.concepts;
+import bounded.declval;
 import bounded.integer;
 import bounded.is_bounded_integer;
 

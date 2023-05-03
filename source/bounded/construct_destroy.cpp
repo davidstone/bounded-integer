@@ -10,6 +10,7 @@ module;
 export module bounded.construct_destroy;
 
 import bounded.concepts;
+import bounded.declval;
 import bounded.lazy_init;
 
 import std_module;

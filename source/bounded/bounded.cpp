@@ -20,6 +20,7 @@ export import bounded.comparison_function_object;
 export import bounded.concepts;
 export import bounded.construct_destroy;
 export import bounded.copy;
+export import bounded.declval;
 export import bounded.function_ptr;
 export import bounded.hash;
 export import bounded.integer;
