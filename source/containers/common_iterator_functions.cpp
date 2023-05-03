@@ -18,11 +18,11 @@ export constexpr auto operator+(bounded::integral auto const offset, iterator au
 	return it + offset;
 }
 
-export using bounded::operator+=;
-export using bounded::operator-=;
-export using bounded::operator++;
-export using bounded::operator--;
+export using operators::operator+=;
+export using operators::operator-=;
 export using operators::operator++;
+export using bounded::operator++;
 export using operators::operator--;
+export using bounded::operator--;
 
 } // namespace containers
