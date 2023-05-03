@@ -66,6 +66,7 @@ export import containers.insert;
 export import containers.integer_range;
 export import containers.is_container;
 export import containers.is_empty;
+export import containers.is_iterator_sentinel;
 export import containers.is_range;
 export import containers.iter_difference_t;
 export import containers.iterator_t;
