@@ -18,6 +18,7 @@ import containers.algorithms.uninitialized;
 import containers.array;
 import containers.assign;
 import containers.assign_to_empty;
+import containers.assign_to_empty_into_capacity;
 import containers.begin_end;
 import containers.c_array;
 import containers.common_functions;
@@ -60,7 +61,7 @@ struct static_vector : private lexicographical_comparison::base {
 
 	static_vector(static_vector const &) requires bounded::trivially_copy_constructible<T> = default;
 	constexpr static_vector(static_vector const & other) requires bounded::copy_constructible<T> {
-		containers::assign_to_empty(*this, other);
+		::containers::assign_to_empty_into_capacity(*this, other);
 	}
 
 	constexpr explicit static_vector(constructor_initializer_range<static_vector> auto && source) {
@@ -69,7 +70,7 @@ struct static_vector : private lexicographical_comparison::base {
 	
 	template<std::size_t source_size> requires(source_size <= capacity_)
 	constexpr static_vector(c_array<T, source_size> && source) {
-		::containers::assign_to_empty(*this, std::move(source));
+		::containers::assign_to_empty_into_capacity(*this, std::move(source));
 	}
 	template<std::same_as<empty_c_array_parameter> Source = empty_c_array_parameter>
 	constexpr static_vector(Source) {

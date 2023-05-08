@@ -15,6 +15,7 @@ export module containers.stable_vector;
 import containers.algorithms.destroy_range;
 import containers.assign;
 import containers.assign_to_empty;
+import containers.assign_to_empty_into_capacity;
 import containers.begin_end;
 import containers.c_array;
 import containers.common_functions;
@@ -48,7 +49,7 @@ struct stable_vector : private lexicographical_comparison::base {
 	
 	template<std::size_t source_size> requires(source_size <= capacity_)
 	constexpr stable_vector(c_array<T, source_size> && source) {
-		::containers::assign_to_empty(*this, std::move(source));
+		::containers::assign_to_empty_into_capacity(*this, std::move(source));
 	}
 	template<std::same_as<empty_c_array_parameter> Source = empty_c_array_parameter>
 	constexpr stable_vector(Source) {
@@ -61,7 +62,7 @@ struct stable_vector : private lexicographical_comparison::base {
 	{
 	}
 	constexpr stable_vector(stable_vector const & other) {
-		::containers::assign_to_empty(*this, other);
+		::containers::assign_to_empty_into_capacity(*this, other);
 	}
 
 	constexpr ~stable_vector() {

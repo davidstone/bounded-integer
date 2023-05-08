@@ -13,6 +13,7 @@ export module containers.assign_to_empty;
 
 import containers.algorithms.copy_or_relocate_from;
 import containers.algorithms.uninitialized;
+import containers.assign_to_empty_into_capacity;
 import containers.begin_end;
 import containers.c_array;
 import containers.can_set_size;
@@ -31,14 +32,21 @@ import containers.supports_lazy_insert_after;
 import containers.take;
 
 import bounded;
+import numeric_traits;
 import std_module;
 
 namespace containers {
 
 template<typename Target, typename Source>
+concept size_always_fits_in_capacity =
+	numeric_traits::max_value<range_size_t<Source>> <= numeric_traits::min_value<decltype(bounded::declval<Target>().capacity())>;
+
+template<typename Target, typename Source>
 constexpr auto assign_to_empty_impl(Target & target, Source && source) -> void {
 	BOUNDED_ASSERT(containers::is_empty(target));
-	if constexpr (can_set_size<Target> and reservable<Target> and size_then_use_range<Source>) {
+	if constexpr (size_always_fits_in_capacity<Target, Source>) {
+		assign_to_empty_into_capacity(target, OPERATORS_FORWARD(source));
+	} else if constexpr (can_set_size<Target> and reservable<Target> and size_then_use_range<Source>) {
 		auto const source_size = ::bounded::assume_in_range<range_size_t<Target>>(::containers::get_source_size<Target>(source));
 		if (target.capacity() < source_size) {
 			auto temp = Target();

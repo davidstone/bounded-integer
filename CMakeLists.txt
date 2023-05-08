@@ -256,6 +256,7 @@ target_sources(containers PUBLIC
 		source/containers/assign.cpp
 		source/containers/assign_test.cpp
 		source/containers/assign_to_empty.cpp
+		source/containers/assign_to_empty_into_capacity.cpp
 		source/containers/associative_container.cpp
 		source/containers/at.cpp
 		source/containers/batched.cpp

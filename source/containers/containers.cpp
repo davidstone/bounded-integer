@@ -49,6 +49,7 @@ export import containers.append_into_capacity;
 export import containers.array;
 export import containers.assign;
 export import containers.assign_to_empty;
+export import containers.assign_to_empty_into_capacity;
 export import containers.at;
 export import containers.begin_end;
 export import containers.c_array;
