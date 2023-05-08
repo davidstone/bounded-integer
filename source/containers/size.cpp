@@ -3,6 +3,10 @@
 // (See accompanying file LICENSE_1_0.txt or copy at
 // http://www.boost.org/LICENSE_1_0.txt)
 
+module;
+
+#include <operators/forward.hpp>
+
 export module containers.size;
 
 import containers.algorithms.distance;
@@ -49,11 +53,13 @@ export template<typename T>
 using range_size_t = typename size_type_impl<std::remove_cvref_t<T>>::type;
 
 export template<sized_range Range>
-constexpr auto size(Range const & range) {
+constexpr auto size(Range && range) {
 	if constexpr (has_member_size<Range>) {
 		return range.size();
 	} else {
-		return ::bounded::assume_in_range<range_size_t<Range>>(containers::end(range) - containers::begin(range));
+		return ::bounded::assume_in_range<range_size_t<Range>>(
+			containers::end(OPERATORS_FORWARD(range)) - containers::begin(OPERATORS_FORWARD(range))
+		);
 	}
 }
 
@@ -63,11 +69,14 @@ constexpr auto size(c_array<T, size_> const &) {
 }
 
 export template<range Range>
-constexpr auto linear_size(Range const & r) {
-	if constexpr (requires { containers::size(r); }) {
-		return containers::size(r);
+constexpr auto linear_size(Range && r) {
+	if constexpr (requires { containers::size(OPERATORS_FORWARD(r)); }) {
+		return containers::size(OPERATORS_FORWARD(r));
 	} else {
-		return ::bounded::assume_in_range<range_size_t<Range>>(containers::distance(containers::begin(r), containers::end(r)));
+		return ::bounded::assume_in_range<range_size_t<Range>>(containers::distance(
+			containers::begin(OPERATORS_FORWARD(r)),
+			containers::end(OPERATORS_FORWARD(r))
+		));
 	}
 }
 
