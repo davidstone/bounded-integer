@@ -15,6 +15,7 @@ import containers.can_set_size;
 import containers.front_back;
 import containers.lazy_push_back_into_capacity;
 import containers.member_lazy_push_backable;
+import containers.range_reference_t;
 import containers.range_value_t;
 import containers.reallocation_size;
 import containers.reserve_if_reservable;
@@ -22,6 +23,7 @@ import containers.size;
 
 import bounded;
 import bounded.test_int;
+import numeric_traits;
 import std_module;
 
 using namespace bounded::literal;
@@ -34,12 +36,14 @@ concept lazy_push_backable = member_lazy_push_backable<Container> or can_set_siz
 // Requires that the type has a member function `lazy_push_back` or that
 // `*containers::end(container)` produces a reference to writable memory
 export template<lazy_push_backable Container>
-constexpr auto & lazy_push_back(
+constexpr auto lazy_push_back(
 	Container & container,
 	bounded::construct_function_for<range_value_t<Container>> auto && constructor
-) {
+) -> range_reference_t<Container &> {
 	if constexpr (member_lazy_push_backable<Container>) {
 		return container.lazy_push_back(OPERATORS_FORWARD(constructor));
+	} else if constexpr (numeric_traits::max_value<decltype(container.capacity())> == 0_bi) {
+		throw std::bad_alloc();
 	} else {
 		auto const initial_size = containers::size(container);
 		if (initial_size < container.capacity()) {
