@@ -7,6 +7,8 @@ module;
 
 export module containers.iter_difference_t;
 
+import containers.addable_subtractable;
+
 import bounded;
 import std_module;
 
@@ -17,9 +19,6 @@ struct iter_difference_t_impl;
 
 template<typename T>
 concept has_difference_type = requires { typename T::difference_type; };
-
-template<typename Iterator>
-concept subtractable = requires(Iterator const it) { it - it; };
 
 template<typename T> requires has_difference_type<T> and subtractable<T>
 struct iter_difference_t_impl<T> {

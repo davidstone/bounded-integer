@@ -5,6 +5,7 @@
 
 export module containers.is_iterator;
 
+import containers.addable_subtractable;
 import containers.iter_difference_t;
 import containers.offset_type;
 
@@ -32,14 +33,6 @@ concept forward_iterator =
 
 export template<typename Iterator>
 concept bidirectional_iterator = forward_iterator<Iterator> and requires(Iterator it) { --it; };
-
-export template<typename LHS, typename RHS>
-concept addable = requires(LHS const lhs, RHS const rhs) {
-	lhs + rhs;
-};
-
-template<typename Iterator>
-concept subtractable = requires(Iterator const it) { it - it; };
 
 export template<typename Iterator>
 concept forward_random_access_iterator =

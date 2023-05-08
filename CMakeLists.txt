@@ -247,6 +247,7 @@ target_sources(containers PUBLIC
 		source/containers/algorithms/unique.cpp
 		source/containers/std/vector.cpp
 		source/containers/adapt.cpp
+		source/containers/addable_subtractable.cpp
 		source/containers/append.cpp
 		source/containers/append_into_capacity.cpp
 		source/containers/append_test.cpp
@@ -353,6 +354,7 @@ target_sources(containers PUBLIC
 		source/containers/test_sequence_container.cpp
 		source/containers/test_set_size.cpp
 		source/containers/to_address.cpp
+		source/containers/to_any_string.cpp
 		source/containers/to_string.cpp
 		source/containers/trivial_inplace_function.cpp
 		source/containers/uninitialized_array.cpp
@@ -377,6 +379,7 @@ target_sources(containers_test PUBLIC
 	FILE_SET CXX_MODULES
 	BASE_DIRS "${CMAKE_CURRENT_SOURCE_DIR}"
 	FILES
+		test/containers/concatenate.cpp
 		test/containers/double_buffered_ska_sort.cpp
 		test/containers/ska_sort.cpp
 )

@@ -12,6 +12,7 @@ module;
 
 export module containers.legacy_iterator;
 
+import containers.addable_subtractable;
 import containers.common_iterator_functions;
 import containers.contiguous_iterator;
 import containers.is_iterator;
@@ -39,9 +40,6 @@ struct iterator_category_impl<Iterator> {
 		std::forward_iterator_tag
 	>>;
 };
-
-template<typename Iterator>
-concept subtractable = requires(Iterator const it) { it - it; };
 
 export template<typename Iterator>
 struct legacy_iterator {

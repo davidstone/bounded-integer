@@ -18,6 +18,7 @@ export module containers.take;
 
 import containers.algorithms.compare;
 import containers.algorithms.concatenate;
+import containers.addable_subtractable;
 import containers.array;
 import containers.begin_end;
 import containers.is_iterator_sentinel;
@@ -104,7 +105,7 @@ struct counted_iterator : iterator_category_base<Iterator> {
 
 	template<typename Offset> requires(
 		numeric_traits::max_value<decltype(bounded::declval<Count>() - bounded::declval<Offset>())> >= 0_bi and
-		requires(Iterator it, Offset offset) { it + offset; }
+		addable<Iterator, Offset>
 	)
 	friend constexpr auto operator+(counted_iterator it, Offset const offset) {
 		return counted_iterator(
