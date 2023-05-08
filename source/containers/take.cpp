@@ -194,14 +194,11 @@ constexpr auto take_impl(Range && source, Count const count) {
 				to_any_string<std::string>(count)
 			));
 		}
-		return containers::range_view(
-			containers::begin(OPERATORS_FORWARD(source)),
-			containers::end(OPERATORS_FORWARD(source))
-		);
+		return containers::range_view(OPERATORS_FORWARD(source));
 	} else if constexpr (sized_range<Range> and forward_random_access_iterator<iterator>) {
 		auto const true_count = bounded::min(containers::size(source), count);
 		auto first = random_access_counted_iterator<iterator, count_type>(containers::begin(OPERATORS_FORWARD(source)));
-		return containers::range_view(first, first + true_count);
+		return containers::range_view(first, true_count);
 	} else {
 		auto const used_count = count_type(bounded::min(count, numeric_traits::max_value<count_type>));
 		return containers::range_view(
