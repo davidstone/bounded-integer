@@ -39,13 +39,12 @@ template<typename Target, typename Source>
 constexpr auto assign_to_empty_impl(Target & target, Source && source) -> void {
 	BOUNDED_ASSERT(containers::is_empty(target));
 	if constexpr (can_set_size<Target> and reservable<Target> and size_then_use_range<Source>) {
-		// This `if` is technically unnecessary, but the code generation is
-		// better with it here
-		if (containers::is_empty(source)) {
-			return;
+		auto const source_size = ::bounded::assume_in_range<range_size_t<Target>>(::containers::get_source_size<Target>(source));
+		if (target.capacity() < source_size) {
+			auto temp = Target();
+			temp.reserve(source_size);
+			target = std::move(temp);
 		}
-		auto const source_size = ::containers::get_source_size<Target>(source);
-		target.reserve(::bounded::assume_in_range<range_size_t<Target>>(source_size));
 		containers::uninitialized_copy_no_overlap(OPERATORS_FORWARD(source), containers::begin(target));
 		target.set_size(source_size);
 	} else if constexpr (can_set_size<Target> and !reservable<Target>) {
