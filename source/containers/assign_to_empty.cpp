@@ -21,6 +21,7 @@ import containers.initializer_range;
 import containers.is_empty;
 import containers.is_range;
 import containers.lazy_push_back;
+import containers.member_assign;
 import containers.range_value_t;
 import containers.reserve_if_reservable;
 import containers.resizable_container;
@@ -33,26 +34,6 @@ import bounded;
 import std_module;
 
 namespace containers {
-
-export template<typename Target, typename Source>
-concept member_iterator_assignable = requires(Target & target, Source && source) {
-	target.assign(containers::begin(OPERATORS_FORWARD(source)), containers::end(OPERATORS_FORWARD(source)));
-};
-
-export template<typename Target, typename Source>
-concept member_range_assignable = requires(Target & target, Source && source) {
-	target.assign(OPERATORS_FORWARD(source));
-};
-
-export constexpr auto member_assign = []<typename Target, typename Source>(Target & target, Source && source) {
-	if constexpr (member_range_assignable<Target, Source>) {
-		target.assign(OPERATORS_FORWARD(source));
-	} else {
-		static_assert(member_iterator_assignable<Target, Source>);
-		// TODO: Reserve for sized forward input ranges
-		target.assign(containers::begin(OPERATORS_FORWARD(source)), containers::end(OPERATORS_FORWARD(source)));
-	}
-};
 
 constexpr auto exact_reserve = []<typename Container>(Container & target, auto const requested_size) {
 	target.reserve(::bounded::assume_in_range<range_size_t<Container>>(requested_size));
@@ -91,7 +72,7 @@ constexpr auto assign_to_empty_impl(Target & target, Source && source) -> void {
 			it = target.lazy_insert_after(it, make);
 		});
 	} else {
-		member_assign(target, OPERATORS_FORWARD(source));
+		::containers::member_assign(target, OPERATORS_FORWARD(source));
 	}
 }
 

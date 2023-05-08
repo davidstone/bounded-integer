@@ -317,6 +317,7 @@ target_sources(containers PUBLIC
 		source/containers/map_tags.cpp
 		source/containers/map_value_type.cpp
 		source/containers/maximum_array_size.cpp
+		source/containers/member_assign.cpp
 		source/containers/member_lazy_push_backable.cpp
 		source/containers/member_push_backable.cpp
 		source/containers/mutable_iterator.cpp

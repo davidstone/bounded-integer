@@ -22,6 +22,7 @@ import containers.dereference;
 import containers.is_container;
 import containers.is_range;
 import containers.iterator_t;
+import containers.member_assign;
 import containers.range_value_t;
 import containers.range_view;
 import containers.resizable_container;
@@ -43,8 +44,7 @@ concept should_use_after_algorithms = supports_lazy_insert_after<Target> and sup
 template<typename Source, typename Target>
 concept range_assignable_to =
 	range<Source> and (
-		member_range_assignable<Target, Source> or
-		member_iterator_assignable<Target, Source> or
+		member_assignable<Target, Source> or
 		// TODO: Wrong type to assign from
 		(
 			std::is_assignable_v<range_value_t<Target> &, range_value_t<Source>> and
@@ -59,8 +59,8 @@ constexpr void assign_impl(Target & target, Source && source) {
 	// existing storage where that makes sense. For types that are trivially
 	// copyable, that concept does not make sense, so we instead use code that
 	// optimizes better.
-	if constexpr (member_range_assignable<Target, Source> or member_iterator_assignable<Target, Source>) {
-		member_assign(target, OPERATORS_FORWARD(source));
+	if constexpr (member_assignable<Target, Source>) {
+		::containers::member_assign(target, OPERATORS_FORWARD(source));
 	} else if constexpr (should_use_after_algorithms<Target>) {
 		auto target_before_it = target.before_begin();
 		auto target_it = containers::next(target_before_it);
