@@ -27,6 +27,7 @@ import containers.resizable_container;
 import containers.size;
 import containers.size_then_use_range;
 import containers.supports_lazy_insert_after;
+import containers.take;
 
 import bounded;
 import std_module;
@@ -72,10 +73,8 @@ constexpr auto assign_to_empty_impl(Target & target, Source && source) -> void {
 			containers::uninitialized_copy_no_overlap(OPERATORS_FORWARD(source), containers::begin(target));
 			target.set_size(source_size);
 		} else if constexpr (can_set_size<Target> and !reservable<Target>) {
-			// TODO: Use an iterator that includes a count if we do not have a
-			// sized source range or a random-access iterator for the target
 			auto const target_position = containers::begin(target);
-			auto const new_end = containers::uninitialized_copy_no_overlap(OPERATORS_FORWARD(source), target_position);
+			auto const new_end = containers::uninitialized_copy_no_overlap(::containers::check_size_not_greater_than(OPERATORS_FORWARD(source), target.capacity()), target_position);
 			auto const source_size = [&] {
 				if constexpr (sized_range<Source>) {
 					return containers::size(source);
