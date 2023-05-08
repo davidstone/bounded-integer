@@ -23,7 +23,7 @@ import containers.is_range;
 import containers.lazy_push_back;
 import containers.member_assign;
 import containers.range_value_t;
-import containers.reserve_if_reservable;
+import containers.reservable;
 import containers.resizable_container;
 import containers.size;
 import containers.size_then_use_range;

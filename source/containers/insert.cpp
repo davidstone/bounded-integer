@@ -28,7 +28,7 @@ import containers.range_value_t;
 import containers.range_view;
 import containers.reallocation_size;
 import containers.repeat_n;
-import containers.reserve_if_reservable;
+import containers.reservable;
 import containers.resizable_container;
 import containers.size;
 import containers.stable_vector;

@@ -18,7 +18,7 @@ import containers.member_lazy_push_backable;
 import containers.range_reference_t;
 import containers.range_value_t;
 import containers.reallocation_size;
-import containers.reserve_if_reservable;
+import containers.reservable;
 import containers.size;
 
 import bounded;

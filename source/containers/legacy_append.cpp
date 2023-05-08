@@ -17,7 +17,7 @@ import containers.is_container;
 import containers.legacy_iterator;
 import containers.range_value_t;
 import containers.reallocation_size;
-import containers.reserve_if_reservable;
+import containers.reservable;
 import containers.size;
 import containers.size_then_use_range;
 
