@@ -5,42 +5,20 @@
 
 export module containers.to_string;
 
-import containers.algorithms.reverse;
-
-import containers.push_back;
 import containers.string;
+import containers.to_any_string;
 
 import bounded;
-import numeric_traits;
-import std_module;
 
 using namespace bounded::literal;
 namespace containers {
 
-constexpr auto to_string_impl(bounded::bounded_integer auto x, bool const include_minus) -> containers::string {
-	auto result = containers::string();
-	do {
-		::containers::push_back(result, static_cast<char>(x % 10_bi + bounded::constant<'0'>));
-		x /= 10_bi;
-	} while (x > 0_bi);
-	if (include_minus) {
-		::containers::push_back(result, '-');
-	}
-	::containers::reverse(result);
-	return result;
-}
-
-template<typename T>
-constexpr auto include_zero(T const x) {
-	return bounded::integer<0, bounded::builtin_max_value<T>>(x);
-}
-
 export constexpr auto to_string(bounded::bounded_integer auto const x) -> containers::string {
-	return ::containers::to_string_impl(::containers::include_zero(bounded::abs(x)), x < 0_bi);
+	return ::containers::to_any_string<containers::string>(x);
 }
 
 export constexpr auto to_string(bounded::builtin_integer auto const x) -> containers::string {
-	return containers::to_string(bounded::integer(x));
+	return ::containers::to_any_string<containers::string>(x);
 }
 
 } // namespace containers
