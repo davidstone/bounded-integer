@@ -21,10 +21,10 @@ import std_module;
 namespace containers {
 
 export template<typename Range>
-using iterator_t_impl = decltype(containers::begin(bounded::declval<Range &>()));
+using iterator_t_impl = decltype(containers::begin(bounded::declval<Range>()));
 
 export template<typename Range>
-using sentinel_t = decltype(containers::end(bounded::declval<Range &>()));
+using sentinel_t = decltype(containers::end(bounded::declval<Range>()));
 
 export template<typename T>
 concept range = sentinel_for<sentinel_t<T>, iterator_t_impl<T>>;

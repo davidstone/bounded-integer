@@ -13,9 +13,11 @@ export module containers.range_view;
 import containers.algorithms.compare;
 import containers.array;
 import containers.begin_end;
+import containers.common_iterator_functions;
 import containers.has_member_size;
 import containers.is_range;
 import containers.is_iterator_sentinel;
+import containers.iter_difference_t;
 import containers.iter_value_t;
 import containers.size;
 
@@ -85,21 +87,33 @@ struct range_view {
 	{
 	}
 	
-	constexpr auto begin() const -> Iterator {
+	constexpr auto begin() const & -> Iterator requires bounded::copy_constructible<Iterator> {
 		return m_begin;
 	}
+	constexpr auto begin() && -> Iterator {
+		return std::move(m_begin);
+	}
+
 	constexpr auto size() const -> Size requires explicit_size<Size> {
 		return m_size;
 	}
-	// This is required for range-based for loops to work. A constrained `end`
+
+	constexpr auto end() const & -> Sentinel requires explicit_sentinel<Sentinel> and bounded::copy_constructible<Sentinel> {
+		return m_end;
+	}
+	constexpr auto end() && -> Sentinel requires explicit_sentinel<Sentinel> {
+		return std::move(m_end);
+	}
+	// These are required for range-based for loops to work. A constrained `end`
 	// is found by language rules and then causes an error when it cannot be
 	// called.
-	constexpr auto end() const {
-		if constexpr (explicit_sentinel<Sentinel>) {
-			return m_end;
-		} else {
-			return begin() + size();
-		}
+	constexpr auto end() const & -> Iterator requires(!explicit_sentinel<Sentinel> and bounded::copy_constructible<Iterator>) {
+		using offset = std::conditional_t<bounded::builtin_integer<Size>, iter_difference_t<Iterator>, Size>;
+		return begin() + static_cast<offset>(size());
+	}
+	constexpr auto end() && -> Iterator {
+		using offset = std::conditional_t<bounded::builtin_integer<Size>, iter_difference_t<Iterator>, Size>;
+		return std::move(*this).begin() + static_cast<offset>(size());
 	}
 
 	OPERATORS_BRACKET_SEQUENCE_RANGE_DEFINITIONS
@@ -159,6 +173,8 @@ constexpr auto to_range_view(std::pair<Iterator, Sentinel> pair) {
 
 } // namespace containers
 
+static_assert(containers::range_view<int *>(nullptr, nullptr).begin() == nullptr);
+static_assert(containers::range_view<int *>(nullptr, nullptr).end() == nullptr);
 static_assert(containers::range<containers::range_view<int *>>);
 
 constexpr auto a = containers::array({0, 1, 2, 3, 4});
