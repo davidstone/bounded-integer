@@ -105,7 +105,7 @@ struct stable_vector : private lexicographical_comparison::base {
 	OPERATORS_BRACKET_SEQUENCE_RANGE_DEFINITIONS
 	
 	static constexpr auto capacity() {
-		return bounded::constant<bounded::normalize<capacity_>>;
+		return bounded::constant<capacity_>;
 	}
 	// Assumes that elements are already constructed in the spare capacity
 	constexpr auto set_size(auto const new_size) -> void {
