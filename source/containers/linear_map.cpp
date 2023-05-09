@@ -183,7 +183,7 @@ private:
 				++starting_from;
 			}
 		}
-		::containers::erase_after(m_container, to_remove);
+		::containers::erase_to_end(m_container, to_remove);
 	}
 	constexpr auto remove_duplicates() -> void {
 		remove_duplicates(containers::begin(m_container));

@@ -44,7 +44,7 @@ struct unique_ska_sort_t {
 		auto const equal = [&](auto const & lhs, auto const & rhs) {
 			return extract_key(lhs) == extract_key(rhs);
 		};
-		::containers::erase_after(
+		::containers::erase_to_end(
 			to_sort,
 			::containers::unique(containers::begin(to_sort), containers::end(to_sort), equal)
 		);

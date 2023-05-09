@@ -73,7 +73,7 @@ constexpr auto erase(Container & container, iterator_t<Container const &> const 
 }
 
 export template<erasable Container>
-constexpr void erase_after(Container & container, iterator_t<Container const &> const_position) {
+constexpr void erase_to_end(Container & container, iterator_t<Container const &> const_position) {
 	auto const last = containers::end(container);
 	if constexpr (can_set_size<Container>) {
 		auto const count = last - const_position;
@@ -112,7 +112,7 @@ constexpr auto erase_if(Container & container, auto predicate) {
 				++result;
 			}
 		}
-		containers::erase_after(container, new_last);
+		containers::erase_to_end(container, new_last);
 	}
 	return result;
 }

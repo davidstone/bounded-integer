@@ -203,7 +203,7 @@ using Container = containers::vector<bounded_test::integer>;
 constexpr void test_unique_copy_less(Container const & source, Container const & expected) {
 	auto destination = Container(containers::repeat_n(containers::size(source), 0));
 	auto const it = containers::unique_copy_less(begin(source), end(source), begin(destination));
-	containers::erase_after(destination, it);
+	containers::erase_to_end(destination, it);
 	BOUNDED_ASSERT(destination == expected);
 }
 
@@ -216,7 +216,7 @@ constexpr void test_unique_less(Container source, Container const & expected) {
 constexpr void test_unique_merge_copy(Container const & lhs, Container const & rhs, Container const & expected) {
 	auto result = Container(containers::repeat_n(::bounded::assume_in_range<containers::range_size_t<Container>>(containers::size(lhs) + containers::size(rhs)), 0));
 	auto const it = containers::unique_merge_copy(begin(lhs), end(lhs), begin(rhs), end(rhs), begin(result));
-	containers::erase_after(result, it);
+	containers::erase_to_end(result, it);
 
 	BOUNDED_ASSERT(result == expected);
 }
@@ -226,7 +226,7 @@ constexpr void test_unique_inplace_merge(Container v, Container const & other, C
 	auto const midpoint = static_cast<containers::iter_difference_t<iterator>>(containers::size(v));
 	containers::append(v, other);
 	auto const it = containers::unique_inplace_merge(begin(v), begin(v) + midpoint, end(v));
-	containers::erase_after(v, it);
+	containers::erase_to_end(v, it);
 
 	BOUNDED_ASSERT(v == expected);
 }

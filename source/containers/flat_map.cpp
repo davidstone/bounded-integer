@@ -98,7 +98,7 @@ constexpr auto merge_sorted_and_unsorted(Container & container, iterator_t<Conta
 			last,
 			compare
 		);
-		containers::erase_after(container, position);
+		containers::erase_to_end(container, position);
 	}
 }
 
