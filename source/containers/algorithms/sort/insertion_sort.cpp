@@ -269,7 +269,7 @@ static_assert([] {
 	auto buffer = containers::array({0, 1});
 	auto other = containers::array({4});
 	::containers::merge_relocate_second_range(
-		containers::range_view(containers::begin(buffer), containers::begin(buffer) + 1_bi),
+		containers::range_view(containers::begin(buffer), 1_bi),
 		other,
 		containers::end(buffer),
 		std::less()
@@ -281,7 +281,7 @@ static_assert([] {
 	auto buffer = containers::array({0, 1, 2});
 	auto other = containers::array({4});
 	::containers::merge_relocate_second_range(
-		containers::range_view(containers::begin(buffer), containers::begin(buffer) + 2_bi),
+		containers::range_view(containers::begin(buffer), 2_bi),
 		other,
 		containers::end(buffer),
 		std::less()
@@ -293,7 +293,7 @@ static_assert([] {
 	auto buffer = containers::array({0, 1, 2, 3});
 	auto other = containers::array({4, 5});
 	::containers::merge_relocate_second_range(
-		containers::range_view(containers::begin(buffer), containers::begin(buffer) + 2_bi),
+		containers::range_view(containers::begin(buffer), 2_bi),
 		other,
 		containers::end(buffer),
 		std::less()
@@ -305,7 +305,7 @@ static_assert([] {
 	auto buffer = containers::array({0, 3, 4});
 	auto other = containers::array({2});
 	::containers::merge_relocate_second_range(
-		containers::range_view(containers::begin(buffer), containers::begin(buffer) + 2_bi),
+		containers::range_view(containers::begin(buffer), 2_bi),
 		other,
 		containers::end(buffer),
 		std::less()
@@ -317,7 +317,7 @@ static_assert([] {
 	auto buffer = containers::array({0, 1, 2, 3, 5});
 	auto other = containers::array({4});
 	::containers::merge_relocate_second_range(
-		containers::range_view(containers::begin(buffer), containers::begin(buffer) + 4_bi),
+		containers::range_view(containers::begin(buffer), 4_bi),
 		other,
 		containers::end(buffer),
 		std::less()

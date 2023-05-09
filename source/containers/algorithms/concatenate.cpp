@@ -104,7 +104,7 @@ constexpr auto move_existing_data_to_final_position(Container & container, auto 
 		auto const new_size = original_size + before_size;
 		container.resize(static_cast<range_size_t<Container>>(new_size));
 		::containers::copy_backward(
-			containers::range_view(containers::begin(container), containers::begin(container) + static_cast<difference_type>(original_size)),
+			containers::range_view(containers::begin(container), original_size),
 			containers::begin(container) + static_cast<difference_type>(new_size)
 		);
 	}

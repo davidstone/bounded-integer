@@ -78,7 +78,7 @@ constexpr void erase_to_end(Container & container, iterator_t<Container const &>
 	if constexpr (can_set_size<Container>) {
 		auto const count = last - const_position;
 		auto target = ::containers::mutable_iterator(container, const_position);
-		containers::destroy_range(range_view(target, last));
+		containers::destroy_range(range_view(target, count));
 		container.set_size(containers::size(container) - count);
 	} else {
 		::containers::erase(container, const_position, last);
