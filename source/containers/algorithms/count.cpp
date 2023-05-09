@@ -12,10 +12,7 @@ export module containers.algorithms.count;
 import containers.array;
 import containers.begin_end;
 import containers.count_type;
-import containers.is_iterator;
-import containers.is_iterator_sentinel;
 import containers.is_range;
-import containers.range_view;
 import containers.size;
 
 import bounded;
@@ -36,18 +33,8 @@ constexpr auto count_if(Range && r, auto predicate) {
 	return sum;
 }
 
-export template<iterator Iterator>
-constexpr auto count_if(Iterator const first, sentinel_for<Iterator> auto const last, auto predicate) {
-	return ::containers::count_if(range_view(first, last), std::move(predicate));
-}
-
 export constexpr auto count(range auto && range, auto const & value) {
 	return ::containers::count_if(OPERATORS_FORWARD(range), bounded::equal_to(value));
-}
-
-export template<iterator Iterator>
-constexpr auto count(Iterator const first, sentinel_for<Iterator> auto const last, auto const & value) {
-	return ::containers::count_if(range_view(first, last), bounded::equal_to(value));
 }
 
 } // namespace containers
