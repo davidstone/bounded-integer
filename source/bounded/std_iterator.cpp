@@ -71,24 +71,31 @@ concept std_iterator =
 	);
 
 export template<std_random_access_iterator Iterator>
-constexpr auto operator+(Iterator const it, bounded::bounded_integer auto const offset) {
+constexpr auto operator+(Iterator const it, bounded::bounded_integer auto const offset) -> Iterator {
 	return it + static_cast<typename Iterator::difference_type>(offset);
 }
 
-export constexpr auto operator+(bounded::bounded_integer auto const offset, std_random_access_iterator auto const it) {
-	return offset + it;
+export template<std_random_access_iterator Iterator>
+constexpr auto operator+(bounded::bounded_integer auto const offset, Iterator const it) -> Iterator {
+	return it + offset;
 }
 
-export constexpr auto operator+(std_iterator auto it, bounded::constant_t<1>) {
-	return ++it;
+export template<std_iterator Iterator>
+constexpr auto operator+(Iterator it, bounded::constant_t<1>) -> Iterator {
+	++it;
+	return it;
 }
 
-export constexpr auto operator+(bounded::constant_t<1>, std_iterator auto it) {
-	return ++it;
+export template<std_iterator Iterator>
+constexpr auto operator+(bounded::constant_t<1>, Iterator it) -> Iterator {
+	++it;
+	return it;
 }
 
-export constexpr auto operator-(std_bidirectional_iterator auto it, bounded::constant_t<1>) {
-	return --it;
+export template<std_bidirectional_iterator Iterator>
+constexpr auto operator-(Iterator it, bounded::constant_t<1>) -> Iterator {
+	--it;
+	return it;
 }
 
 } // namespace bounded
