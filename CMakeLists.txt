@@ -253,6 +253,7 @@ target_sources(containers PUBLIC
 		source/containers/append_test.cpp
 		source/containers/array.cpp
 		source/containers/array_test.cpp
+		source/containers/as_mutable_ptr.cpp
 		source/containers/assign.cpp
 		source/containers/assign_test.cpp
 		source/containers/assign_to_empty.cpp

@@ -18,15 +18,6 @@ import std_module;
 
 namespace containers {
 
-export template<typename T>
-constexpr auto as_mutable(T & value) -> T & {
-	return const_cast<std::remove_const_t<T> &>(value);
-}
-export template<typename T>
-constexpr auto as_mutable(T const * value) -> T * {
-	return const_cast<T *>(value);
-}
-
 // We separate out the links of the node (`previous` and `next`) from the data
 // because we store the sentinel links directly in the list, allowing:
 // * a non-allocating, noexcept default constructor

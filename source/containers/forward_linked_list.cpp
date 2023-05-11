@@ -15,6 +15,7 @@ import containers.algorithms.advance;
 import containers.algorithms.compare;
 import containers.algorithms.destroy_range;
 import containers.array;
+import containers.as_mutable_ptr;
 import containers.assign;
 import containers.assign_to_empty;
 import containers.begin_end;
@@ -106,7 +107,7 @@ struct forward_linked_list : private lexicographical_comparison::base {
 	}
 
 	constexpr auto mutable_iterator(const_iterator const it) & -> iterator {
-		return iterator(as_mutable(it.m_links));
+		return iterator(::containers::as_mutable_ptr(it.m_links));
 	}
 
 	constexpr auto lazy_insert_after(const_iterator const before, bounded::construct_function_for<T> auto && constructor) & -> iterator {
