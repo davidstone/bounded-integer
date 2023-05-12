@@ -11,6 +11,8 @@ import containers.is_range;
 import containers.iterator_t;
 import containers.splicable;
 
+import std_module;
+
 namespace containers {
 
 export template<typename Container>
@@ -22,9 +24,9 @@ concept member_erasable = requires(Container & container, iterator_t<Container c
 };
 
 // `erase_after` is required to be constant time
-template<typename Container>
-concept has_member_erase_after = requires (Container & container, iterator_t<Container &> it) {
-	container.erase_after(it);
+export template<typename T>
+concept has_member_erase_after = requires(T & container, iterator_t<T const &> const it) {
+	{ container.erase_after(it) } -> std::same_as<iterator_t<T &>>;
 };
 
 export template<typename Container>

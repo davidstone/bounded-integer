@@ -249,6 +249,7 @@ target_sources(containers PUBLIC
 		source/containers/adapt.cpp
 		source/containers/addable_subtractable.cpp
 		source/containers/append.cpp
+		source/containers/append_after.cpp
 		source/containers/append_into_capacity.cpp
 		source/containers/append_test.cpp
 		source/containers/array.cpp

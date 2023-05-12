@@ -14,11 +14,13 @@ import containers.algorithms.copy;
 import containers.algorithms.erase;
 import containers.algorithms.move_iterator;
 import containers.append;
+import containers.append_after;
 import containers.assign_to_empty;
 import containers.begin_end;
 import containers.c_array;
 import containers.clear;
 import containers.dereference;
+import containers.erase_concepts;
 import containers.is_container;
 import containers.is_range;
 import containers.iterator_t;
@@ -33,13 +35,8 @@ import std_module;
 
 namespace containers {
 
-template<typename T>
-concept supports_erase_after = requires(T & container, iterator_t<T const &> const it) {
-	{ container.erase_after(it) } -> std::same_as<iterator_t<T &>>;
-};
-
 template<typename Target>
-concept should_use_after_algorithms = supports_lazy_insert_after<Target> and supports_erase_after<Target>;
+concept should_use_after_algorithms = supports_lazy_insert_after<Target> and has_member_erase_after<Target>;
 
 template<typename Source, typename Target>
 concept range_assignable_to =
@@ -62,28 +59,9 @@ constexpr void assign_impl(Target & target, Source && source) {
 	if constexpr (member_assignable<Target, Source>) {
 		::containers::member_assign(target, OPERATORS_FORWARD(source));
 	} else if constexpr (should_use_after_algorithms<Target>) {
-		auto target_before_it = target.before_begin();
-		auto target_it = containers::next(target_before_it);
-		auto const target_last = containers::end(target);
-		auto source_it = containers::begin(source);
-		auto const source_last = containers::end(source);
-
-		// TODO: Add *_after algorithms to do this work
-		// copy
-		for (; source_it != source_last and target_it != target_last; ++source_it, ++target_it) {
-			*target_it = dereference<Source>(source_it);
-			target_before_it = target_it;
-		}
-
-		// erase remaining
-		while (target_it != target_last) {
-			target_it = target.erase_after(target_before_it);
-		}
-
-		// copy remaining
-		for (; source_it != source_last; ++source_it) {
-			target_before_it = target.lazy_insert_after(target_before_it, [&] -> decltype(auto) { return dereference<Source>(source_it); });
-		}
+		auto const remainder = ::containers::copy_after(OPERATORS_FORWARD(source), target);
+		::containers::erase_after(target, remainder.output, containers::end(target));
+		::containers::append_after(target, remainder.output, range_view(remainder.input, containers::end(source)));
 	} else if constexpr (std::is_trivially_copyable_v<range_value_t<Target>>) {
 		::containers::clear(target);
 		::containers::assign_to_empty(target, OPERATORS_FORWARD(source));

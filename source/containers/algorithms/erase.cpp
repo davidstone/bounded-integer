@@ -117,4 +117,12 @@ constexpr auto erase_if(Container & container, auto predicate) {
 	return result;
 }
 
+export template<has_member_erase_after Container>
+constexpr void erase_after(Container & container, iterator_t<Container const &> const before_first, iterator_t<Container const &> const last) {
+	auto it = containers::next(before_first);
+	while (it != last) {
+		it = container.erase_after(before_first);
+	}
+}
+
 } // namespace containers
