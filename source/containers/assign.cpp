@@ -66,7 +66,7 @@ constexpr void assign_impl(Target & target, Source && source) {
 		::containers::clear(target);
 		::containers::assign_to_empty(target, OPERATORS_FORWARD(source));
 	} else {
-		auto result = ::containers::copy(OPERATORS_FORWARD(source), OPERATORS_FORWARD(target));
+		auto result = ::containers::copy(OPERATORS_FORWARD(source), target);
 		::containers::erase_to_end(target, std::move(result.output));
 		if constexpr (is_container<Source>) {
 			::containers::append(
