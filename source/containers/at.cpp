@@ -3,20 +3,39 @@
 // (See accompanying file LICENSE_1_0.txt or copy at
 // http://www.boost.org/LICENSE_1_0.txt)
 
-#include <containers/at.hpp>
+module;
 
-#include <containers/array.hpp>
+#include <operators/forward.hpp>
 
-#include <catch2/catch_test_macros.hpp>
+export module containers.at;
 
-namespace {
+import containers.array;
+import containers.index_type;
+import containers.is_range;
+import containers.size;
+
+import bounded;
+import std_module;
 
 using namespace bounded::literal;
 
-static_assert(containers::at(containers::array({1, 2, 3}), 0_bi) == 1);
+namespace containers {
 
-TEST_CASE("at throws for out-of-bounds", "[at]") {
-	CHECK_THROWS(containers::at(containers::array({1}), 1U));
+export constexpr decltype(auto) at(range auto && r, auto const index) {
+	auto const checked_index = bounded::check_in_range<std::out_of_range>(
+		bounded::integer(index),
+		0_bi,
+		bounded::integer(containers::size(r)) - 1_bi
+	);
+	return OPERATORS_FORWARD(r)[static_cast<index_type<decltype(r)>>(checked_index)];
 }
 
-} // namespace
+export constexpr decltype(auto) at(range auto && r, auto const index, bounded::unchecked_t) {
+	using index_t = index_type<decltype(r)>;
+	auto const converted = index_t(index);
+	return OPERATORS_FORWARD(r)[converted];
+}
+
+} // namespace containers
+
+static_assert(containers::at(containers::array({1, 2, 3}), 0_bi) == 1);

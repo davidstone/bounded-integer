@@ -3,26 +3,53 @@
 // (See accompanying file LICENSE_1_0.txt or copy at
 // http://www.boost.org/LICENSE_1_0.txt)
 
-#include <containers/is_range.hpp>
-#include <containers/array.hpp>
-#include <containers/c_array.hpp>
-#include <containers/string.hpp>
-#include <containers/vector.hpp>
+module;
 
-#include <array>
-#include <map>
+#include <std_module/prelude.hpp>
+#include <unordered_map>
 #include <unordered_set>
-#include <vector>
 
-namespace {
+export module containers.is_range;
+
+import containers.begin_end;
+import containers.c_array;
+import containers.is_iterator_sentinel;
+
+import bounded;
+import std_module;
+
+namespace containers {
+
+export template<typename Range>
+using iterator_t_impl = decltype(containers::begin(bounded::declval<Range>()));
+
+export template<typename Range>
+using sentinel_t = decltype(containers::end(bounded::declval<Range>()));
+
+export template<typename T>
+concept range = sentinel_for<sentinel_t<T>, iterator_t_impl<T>>;
+
+export template<typename T>
+concept forward_range = range<T> and forward_iterator<iterator_t_impl<T>>;
+
+export template<typename T>
+concept bidirectional_range = forward_range<T> and bidirectional_iterator<iterator_t_impl<T>>;
+
+export template<typename T>
+concept forward_random_access_range = forward_range<T> and forward_random_access_iterator<iterator_t_impl<T>>;
+
+export template<typename T>
+concept random_access_range = bidirectional_range<T> and forward_random_access_range<T>;
+
+} // namespace containers
 
 using namespace bounded::literal;
 
 template<typename... Ts>
-constexpr auto all_qualifications_are_ranges_helper = (... and containers::range<Ts>);
+concept all_qualifications_are_ranges_helper = (... and containers::range<Ts>);
 
 template<typename T>
-constexpr auto all_qualifications_are_ranges = all_qualifications_are_ranges_helper<T, T const, T &, T const &, T &&>;
+concept all_qualifications_are_ranges = all_qualifications_are_ranges_helper<T, T const, T &, T const &, T &&>;
 
 static_assert(!containers::range<int>);
 static_assert(!containers::range<int *>);
@@ -30,15 +57,8 @@ static_assert(!containers::range<int *>);
 static_assert(containers::range<containers::c_array<int, 5> &>, "Incorrectly detects c-arrays as non-ranges.");
 static_assert(containers::range<containers::c_array<int, 5> const &>, "Incorrectly detects c-arrays as non-ranges.");
 
-static_assert(all_qualifications_are_ranges<containers::array<int, 5_bi>>, "Incorrectly detects containers::array as a non-range.");
-static_assert(all_qualifications_are_ranges<containers::array<int, 0_bi>>, "Incorrectly detects empty containers::array as a non-range.");
-static_assert(all_qualifications_are_ranges<containers::vector<int>>, "Incorrectly detects containers::vector as a non-range.");
-static_assert(all_qualifications_are_ranges<containers::string>, "Incorrectly detects containers::string as a non-range.");
-
 static_assert(all_qualifications_are_ranges<std::array<int, 5>>, "Incorrectly detects std::array as a non-range.");
 static_assert(all_qualifications_are_ranges<std::array<int, 0>>, "Incorrectly detects empty std::array as a non-range.");
 static_assert(all_qualifications_are_ranges<std::vector<int>>, "Incorrectly detects std::vector as a non-range.");
-static_assert(all_qualifications_are_ranges<std::map<int, int>>, "Incorrectly detects std::map as a non-range.");
+static_assert(all_qualifications_are_ranges<std::unordered_map<int, int>>, "Incorrectly detects std::unordered_map as a non-range.");
 static_assert(all_qualifications_are_ranges<std::unordered_set<int>>, "Incorrectly detects std::unordered_set as a non-range.");
-
-}	// namespace

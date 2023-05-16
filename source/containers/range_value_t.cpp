@@ -3,4 +3,15 @@
 // (See accompanying file LICENSE_1_0.txt or copy at
 // http://www.boost.org/LICENSE_1_0.txt)
 
-#include <containers/range_value_t.hpp>
+export module containers.range_value_t;
+
+import containers.is_range;
+import containers.iter_value_t;
+import containers.iterator_t;
+
+namespace containers {
+
+export template<range Range>
+using range_value_t = iter_value_t<iterator_t<Range>>;
+
+} // namespace containers

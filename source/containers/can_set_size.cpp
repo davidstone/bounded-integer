@@ -3,15 +3,33 @@
 // (See accompanying file LICENSE_1_0.txt or copy at
 // http://www.boost.org/LICENSE_1_0.txt)
 
-#include <containers/can_set_size.hpp>
+export module containers.can_set_size;
 
-#include <containers/array.hpp>
-#include <containers/vector.hpp>
+import containers.is_range;
+import containers.size;
 
-namespace {
+namespace containers {
 
-static_assert(!containers::detail::can_set_size<int>);
-static_assert(!containers::detail::can_set_size<containers::array<int, bounded::constant<1>> &>);
-static_assert(containers::detail::can_set_size<containers::vector<int> &>);
+export template<typename Container>
+concept can_set_size =
+	range<Container> and
+	requires(Container & container, range_size_t<Container> const new_size) {
+		container.set_size(new_size);
+	};
 
-} // namespace
+} // namespace containers
+
+static_assert(!containers::can_set_size<int>);
+
+struct range_has_set_size {
+	auto begin() const -> int const *;
+	auto size() const -> int;
+	auto set_size(int) -> void;
+};
+
+struct non_range_has_set_size {
+	auto set_size(int) -> void;
+};
+
+static_assert(containers::can_set_size<range_has_set_size>);
+static_assert(!containers::can_set_size<non_range_has_set_size>);

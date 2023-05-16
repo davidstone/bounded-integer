@@ -3,4 +3,47 @@
 // (See accompanying file LICENSE_1_0.txt or copy at
 // http://www.boost.org/LICENSE_1_0.txt)
 
-#include <containers/is_iterator.hpp>
+export module containers.is_iterator;
+
+import containers.addable_subtractable;
+import containers.iter_difference_t;
+import containers.offset_type;
+
+import std_module;
+
+namespace containers {
+
+template<typename Iterator>
+concept only_input_or_output_iterator =
+	std::same_as<typename Iterator::iterator_category, std::input_iterator_tag> or
+	std::same_as<typename Iterator::iterator_category, std::output_iterator_tag>;
+
+export template<typename Iterator>
+concept iterator = requires(Iterator it) {
+	*it;
+	++it;
+};
+
+export template<typename Iterator>
+concept forward_iterator =
+	iterator<Iterator> and
+	std::is_copy_constructible_v<Iterator> and
+	// This test is needed only to support legacy copyable iterators
+	!only_input_or_output_iterator<Iterator>;
+
+export template<typename Iterator>
+concept bidirectional_iterator = forward_iterator<Iterator> and requires(Iterator it) { --it; };
+
+export template<typename Iterator>
+concept forward_random_access_iterator =
+	forward_iterator<Iterator> and
+	subtractable<Iterator> and
+	addable<Iterator, offset_type<Iterator>>;
+
+// TODO: require bounded::ordered<Iterator> when more types support <=>
+export template<typename Iterator>
+concept random_access_iterator = bidirectional_iterator<Iterator> and forward_random_access_iterator<Iterator> and requires(Iterator it, iter_difference_t<Iterator> offset) {
+	it + offset;
+};
+
+} // namespace containers

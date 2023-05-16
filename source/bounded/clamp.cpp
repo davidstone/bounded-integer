@@ -1,11 +1,27 @@
-// Copyright David Stone 2019.
+// Copyright David Stone 2020.
 // Distributed under the Boost Software License, Version 1.0.
 // (See accompanying file LICENSE_1_0.txt or copy at
 // http://www.boost.org/LICENSE_1_0.txt)
 
-#include <bounded/clamp.hpp>
+export module bounded.clamp;
 
-namespace {
+import bounded.integer;
+import bounded.is_bounded_integer;
+import bounded.minmax;
+
+namespace bounded {
+
+export constexpr auto clamp(bounded_integer auto const & value, bounded_integer auto const & minimum, bounded_integer auto const & maximum) {
+	return min(
+		max(
+			value,
+			minimum
+		),
+		maximum
+	);
+}
+
+} // namespace bounded
 
 constexpr auto minimum = bounded::constant<27>;
 constexpr auto maximum = bounded::constant<567>;
@@ -25,5 +41,3 @@ static_assert(
 	clamp(bounded::constant<2000>, minimum, maximum) == maximum,
 	"Fail to clamp above range with a strictly greater type."
 );
-
-} // namespace

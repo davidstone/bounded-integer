@@ -3,11 +3,48 @@
 // (See accompanying file LICENSE_1_0.txt or copy at
 // http://www.boost.org/LICENSE_1_0.txt)
 
-#include <containers/algorithms/transform.hpp>
-#include <containers/algorithms/compare.hpp>
-#include <containers/array.hpp>
+module;
 
-namespace {
+#include <operators/forward.hpp>
+
+export module containers.algorithms.transform;
+
+import containers.algorithms.compare;
+import containers.array;
+import containers.algorithms.transform_iterator;
+import containers.adapt;
+import containers.default_begin_end_size;
+import containers.is_range;
+
+import std_module;
+
+namespace containers {
+
+template<typename UnaryFunction>
+struct range_transform_traits : transform_traits<UnaryFunction>, default_begin_end_size {
+	using transform_traits<UnaryFunction>::transform_traits;
+};
+
+template<typename UnaryFunction>
+range_transform_traits(UnaryFunction) -> range_transform_traits<UnaryFunction>;
+
+template<typename UnaryFunction>
+struct range_transform_traits_dereference : transform_traits_dereference<UnaryFunction>, default_begin_end_size {
+	using transform_traits_dereference<UnaryFunction>::transform_traits_dereference;
+};
+
+template<typename UnaryFunction>
+range_transform_traits_dereference(UnaryFunction) -> range_transform_traits_dereference<UnaryFunction>;
+
+export constexpr auto transform(range auto && source, auto dereference) {
+	return adapt(OPERATORS_FORWARD(source), range_transform_traits(std::move(dereference)));
+}
+
+export constexpr auto transform_dereference(range auto && source, auto dereference) {
+	return adapt(OPERATORS_FORWARD(source), range_transform_traits_dereference(std::move(dereference)));
+}
+
+} // namespace containers
 
 struct S {
 	constexpr auto f() const { return n; }
@@ -34,5 +71,3 @@ static_assert(containers::equal(
 	containers::transform(array, [](S const s) { return s.f(); }),
 	integer_array
 ));
-
-} // namespace

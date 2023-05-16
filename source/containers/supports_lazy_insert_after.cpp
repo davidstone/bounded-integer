@@ -3,19 +3,37 @@
 // (See accompanying file LICENSE_1_0.txt or copy at
 // http://www.boost.org/LICENSE_1_0.txt)
 
-#include <containers/supports_lazy_insert_after.hpp>
+export module containers.supports_lazy_insert_after;
 
-#include <containers/bidirectional_linked_list.hpp>
-#include <containers/forward_linked_list.hpp>
+import containers.iterator_t;
+import containers.range_value_t;
 
-#include <list>
+import bounded;
+import std_module;
 
-namespace {
+namespace containers {
 
-static_assert(containers::detail::supports_lazy_insert_after<containers::forward_linked_list<int>>);
-static_assert(!containers::detail::supports_lazy_insert_after<containers::bidirectional_linked_list<int>>);
-static_assert(!containers::detail::supports_lazy_insert_after<std::list<int>>);
-static_assert(!containers::detail::supports_lazy_insert_after<int>);
-static_assert(!containers::detail::supports_lazy_insert_after<void>);
+export template<typename Container>
+concept supports_lazy_insert_after =
+	requires(Container container, bounded::function_ptr<range_value_t<Container>> make) {
+		{ container.lazy_insert_after(container.before_begin(), make) } -> std::same_as<iterator_t<Container &>>;
+	};
 
-} // namespace
+} // namespace containers
+
+struct has_lazy_insert_after {
+	auto before_begin() const -> int const *;
+	auto begin() const -> int const *;
+	auto end() const -> int const *;
+	auto lazy_insert_after(int const *, bounded::construct_function_for<int> auto) -> int const *;
+};
+
+struct has_no_lazy_insert_after {
+	auto begin() const -> int const *;
+	auto end() const -> int const *;
+};
+
+static_assert(containers::supports_lazy_insert_after<has_lazy_insert_after>);
+static_assert(!containers::supports_lazy_insert_after<has_no_lazy_insert_after>);
+static_assert(!containers::supports_lazy_insert_after<int>);
+static_assert(!containers::supports_lazy_insert_after<void>);

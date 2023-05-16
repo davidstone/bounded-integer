@@ -1,20 +1,34 @@
-// Copyright David Stone 2018.
+// Copyright David Stone 2020.
 // Distributed under the Boost Software License, Version 1.0.
 // (See accompanying file LICENSE_1_0.txt or copy at
 // http://www.boost.org/LICENSE_1_0.txt)
 
-#include <containers/associative_container.hpp>
+export module containers.associative_container;
 
-#include <containers/array.hpp>
-#include <containers/c_array.hpp>
-#include <containers/flat_map.hpp>
-#include <containers/string.hpp>
-#include <containers/vector.hpp>
+import containers.array;
+import containers.c_array;
+import containers.is_range;
+import containers.is_container;
+import containers.string;
+import containers.vector;
 
-#include <array>
-#include <map>
-#include <unordered_map>
-#include <vector>
+import bounded;
+import std_module;
+
+namespace containers {
+
+export template<typename T>
+concept associative_range =
+	forward_range<T> and
+	requires {
+		typename std::remove_reference_t<T>::key_type;
+		typename std::remove_reference_t<T>::mapped_type;
+	};
+
+export template<typename T>
+concept associative_container = associative_range<T> and is_container<T>;
+
+} // namespace containers
 
 namespace {
 
@@ -41,8 +55,6 @@ static_assert(no_qualifications_are_associative<containers::array<int, 5_bi>>);
 static_assert(no_qualifications_are_associative<containers::array<int, 0_bi>>);
 static_assert(no_qualifications_are_associative<containers::vector<int>>);
 static_assert(no_qualifications_are_associative<containers::string>);
-
-static_assert(all_qualifications_are_associative<containers::flat_map<int, int>>);
 
 static_assert(no_qualifications_are_associative<std::array<int, 5>>);
 static_assert(no_qualifications_are_associative<std::array<int, 0>>);

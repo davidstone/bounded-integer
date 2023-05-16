@@ -3,20 +3,45 @@
 // (See accompanying file LICENSE_1_0.txt or copy at
 // http://www.boost.org/LICENSE_1_0.txt)
 
-#include <containers/ordered_associative_container.hpp>
+module;
 
-#include <containers/array.hpp>
-#include <containers/c_array.hpp>
-#include <containers/flat_map.hpp>
-#include <containers/string.hpp>
-#include <containers/vector.hpp>
-
-#include <array>
+#include <std_module/prelude.hpp>
 #include <map>
 #include <unordered_map>
-#include <vector>
 
-namespace {
+export module containers.ordered_associative_container;
+
+import containers.associative_container;
+import containers.array;
+import containers.c_array;
+import containers.flat_map;
+import containers.string;
+import containers.vector;
+
+import bounded;
+import std_module;
+
+namespace containers {
+
+template<typename T>
+concept has_key_comp = requires(T const & map) {
+	map.key_comp();
+};
+
+template<typename T>
+concept has_extract_key = requires(T const & map) {
+	map.extract_key();
+};
+
+export template<typename T>
+concept ordered_associative_range =
+	associative_range<T> and
+	(has_key_comp<T> or has_extract_key<T>);
+
+export template<typename T>
+concept ordered_associative_container = ordered_associative_range<T> and associative_container<T>;
+
+} // namespace containers
 
 using namespace bounded::literal;
 
@@ -49,5 +74,3 @@ static_assert(no_qualifications_are_ordered_associative<std::array<int, 0>>);
 static_assert(no_qualifications_are_ordered_associative<std::vector<int>>);
 static_assert(all_qualifications_are_ordered_associative<std::map<int, int>>);
 static_assert(no_qualifications_are_ordered_associative<std::unordered_map<int, int>>);
-
-}	// namespace

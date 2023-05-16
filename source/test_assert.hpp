@@ -3,8 +3,10 @@
 // (See accompanying file LICENSE_1_0.txt or copy at
 // http://www.boost.org/LICENSE_1_0.txt)
 
-#pragma once
+#ifndef BOUNDED_TEST_ASSERT_HPP
+#define BOUNDED_TEST_ASSERT_HPP
 
+#include <std_module/prelude.hpp>
 
 #if defined NDEBUG
 	#define BOUNDED_NDEBUG_WAS_DEFINED NDEBUG
@@ -20,3 +22,5 @@
 	#define NDEBUG BOUNDED_NDEBUG_WAS_DEFINED
 	#undef BOUNDED_NDEBUG_WAS_DEFINED
 #endif
+
+#endif // BOUNDED_TEST_ASSERT_HPP
