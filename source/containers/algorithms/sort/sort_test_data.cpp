@@ -5,7 +5,7 @@
 
 module;
 
-#include <compare>
+#include <std_module/prelude.hpp>
 #include <string_view>
 
 #include <bounded/assert.hpp>

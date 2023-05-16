@@ -5,8 +5,7 @@
 
 module;
 
-#include <compare>
-#include <cstddef>
+#include <std_module/prelude.hpp>
 
 export module bounded.arithmetic.byte;
 

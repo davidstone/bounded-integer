@@ -13,7 +13,7 @@ import bounded;
 namespace containers {
 
 export template<typename Target>
-constexpr auto get_source_size(size_then_use_range auto const & source) {
+constexpr auto get_source_size(size_then_use_range auto && source) {
 	auto const value = containers::linear_size(source);
 	if constexpr (bounded::bounded_integer<decltype(value)>) {
 		return value;

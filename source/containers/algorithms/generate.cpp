@@ -86,7 +86,6 @@ public:
 	}
 };
 
-// TODO: support generators with mutable state
 export template<typename Size, typename Function>
 struct generate_n {
 private:

@@ -41,7 +41,7 @@ constexpr auto assign_to_empty_into_capacity_impl(Target & target, Source && sou
 		auto const target_position = containers::begin(target);
 		auto const new_end = containers::uninitialized_copy_no_overlap(OPERATORS_FORWARD(source), target_position);
 		auto const source_size = [&] {
-			if constexpr (sized_range<Source>) {
+			if constexpr (sized_range<Source &>) {
 				return ::containers::get_source_size<Target>(source);
 			} else {
 				return ::bounded::assume_in_range<range_size_t<Target>>(new_end - target_position);

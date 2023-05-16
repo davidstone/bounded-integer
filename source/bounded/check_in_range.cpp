@@ -5,7 +5,7 @@
 
 module;
 
-#include <compare>
+#include <std_module/prelude.hpp>
 #include <string>
 
 #include <numeric_traits/has_int128.hpp>

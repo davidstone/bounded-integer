@@ -6,6 +6,8 @@
 #ifndef BOUNDED_ASSERT_HPP
 #define BOUNDED_ASSERT_HPP
 
+#include <std_module/prelude.hpp>
+
 #include <bounded/assume.hpp>
 
 #include <cassert>

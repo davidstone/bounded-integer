@@ -5,7 +5,7 @@
 
 module;
 
-#include <cstdint>
+#include <std_module/prelude.hpp>
 
 #include <bounded/assert.hpp>
 #include <bounded/conditional.hpp>

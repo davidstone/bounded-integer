@@ -5,7 +5,7 @@
 
 module;
 
-#include <compare>
+#include <std_module/prelude.hpp>
 #include <catch2/catch_test_macros.hpp>
 
 export module bounded.check_in_range_test;
