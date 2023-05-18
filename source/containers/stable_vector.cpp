@@ -39,7 +39,7 @@ namespace containers {
 
 // See https://probablydance.com/2013/05/13/4gb-per-vector/
 export template<typename T, std::size_t capacity_>
-struct stable_vector : private lexicographical_comparison::base {
+struct [[clang::trivial_abi]] stable_vector : private lexicographical_comparison::base {
 	// Allocates the full capacity
 	constexpr stable_vector() = default;
 

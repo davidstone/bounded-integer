@@ -40,7 +40,7 @@ namespace containers {
 
 // TODO: max_size should be an array_size_type<T> instead of a size_t
 export template<typename T, std::size_t max_size = containers::maximum_array_size<T>>
-struct vector : private lexicographical_comparison::base {
+struct [[clang::trivial_abi]] vector : private lexicographical_comparison::base {
 	template<typename U, std::size_t other_max_size>
 	friend struct vector;
 

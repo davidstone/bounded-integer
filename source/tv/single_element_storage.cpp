@@ -11,7 +11,7 @@ import std_module;
 namespace tv {
 
 export template<typename T>
-union single_element_storage {
+union [[clang::trivial_abi]] single_element_storage {
 	constexpr ~single_element_storage() {}
 	T value;
 };

@@ -40,7 +40,7 @@ import std_module;
 namespace containers {
 
 export template<typename T, typename Size = array_size_type<T>>
-struct dynamic_array : private lexicographical_comparison::base {
+struct [[clang::trivial_abi]] dynamic_array : private lexicographical_comparison::base {
 	using size_type = Size;
 
 	constexpr dynamic_array() = default;

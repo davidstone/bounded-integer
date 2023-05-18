@@ -50,7 +50,7 @@ using namespace bounded::literal;
 namespace containers {
 
 export template<typename T, array_size_type<T> capacity_>
-struct static_vector : private lexicographical_comparison::base {
+struct [[clang::trivial_abi]] static_vector : private lexicographical_comparison::base {
 	static_vector() = default;
 
 	static_vector(static_vector &&) requires bounded::trivially_move_constructible<T> = default;

@@ -62,7 +62,7 @@ using constructed_type = std::decay_t<std::invoke_result_t<Construct>>;
 struct copy_move_tag{};
 
 export template<typename... Ts>
-struct variant {
+struct [[clang::trivial_abi]] variant {
 private:
 	template<typename Index>
 	using type_at = typename decltype(::tv::get_type(Index(), bounded::type<Ts>...))::type;

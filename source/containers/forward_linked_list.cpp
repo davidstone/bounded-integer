@@ -38,17 +38,11 @@ import std_module;
 namespace containers {
 
 struct forward_link {
-	forward_link() = default;
-	forward_link(forward_link &&) = delete;
-	forward_link(forward_link const &) = delete;
-	auto operator=(forward_link &&) = delete;
-	auto operator=(forward_link const &) = delete;
-
 	forward_link * next = nullptr;
 };
 
 export template<typename T>
-struct forward_linked_list : private lexicographical_comparison::base {
+struct [[clang::trivial_abi]] forward_linked_list : private lexicographical_comparison::base {
 	using const_iterator = list_iterator<forward_linked_list, forward_link const, T>;
 	using iterator = list_iterator<forward_linked_list, forward_link, T>;
 
