@@ -13,9 +13,7 @@ export module containers.dynamic_array;
 
 import containers.algorithms.copy;
 import containers.algorithms.destroy_range;
-import containers.algorithms.distance;
 import containers.algorithms.uninitialized;
-import containers.assign;
 import containers.begin_end;
 import containers.c_array;
 import containers.common_functions;
@@ -25,7 +23,6 @@ import containers.data;
 import containers.initializer_range;
 import containers.is_container;
 import containers.is_range;
-import containers.is_iterator;
 import containers.maximum_array_size;
 import containers.range_value_t;
 import containers.range_view;
@@ -76,7 +73,7 @@ struct [[clang::trivial_abi]] dynamic_array : private lexicographical_comparison
 
 	constexpr auto operator=(dynamic_array const & other) & -> dynamic_array & {
 		if (this != std::addressof(other)) {
-			containers::assign(*this, other);
+			assign(other);
 		}
 		return *this;
 	}
