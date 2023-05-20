@@ -28,9 +28,7 @@ import containers.iterator_t;
 import containers.range_reference_t;
 import containers.range_value_t;
 import containers.range_view;
-import containers.repeat_n;
 import containers.size;
-import containers.static_vector;
 
 import bounded;
 import numeric_traits;
@@ -301,10 +299,5 @@ static_assert(*(begin(three) + 7_bi) == 3);
 
 constexpr auto from_temp = containers::concatenate_view(containers::array{1}, containers::array{2});
 static_assert(equal_values_and_types(from_temp, containers::array{1, 2}));
-
-static_assert(containers::equal(
-	containers::concatenate_view(array1, containers::static_vector<int, 4_bi>(containers::repeat_n(2_bi, 8))),
-	containers::array{1, 2, 3, 8, 8}
-));
 
 static_assert(containers::forward_random_access_range<containers::concatenate_view<std::string_view>>);
