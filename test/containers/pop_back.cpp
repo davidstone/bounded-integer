@@ -7,7 +7,7 @@ module;
 
 #include <bounded/assert.hpp>
 
-export module containers.pop_back_test;
+export module containers.test.pop_back;
 
 import containers.algorithms.advance;
 import containers.algorithms.compare;

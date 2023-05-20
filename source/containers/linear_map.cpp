@@ -29,12 +29,9 @@ import containers.range_value_t;
 import containers.range_view;
 import containers.size;
 import containers.static_vector;
-import containers.test_associative_container;
-import containers.test_reserve_and_capacity;
 import containers.vector;
 
 import bounded;
-import bounded.test_int;
 import std_module;
 
 namespace containers {
@@ -218,8 +215,3 @@ export template<typename Key, typename T, array_size_type<map_value_type<Key, T>
 using static_linear_map = basic_linear_map<static_vector<map_value_type<Key, T>, capacity>, MaybeExtractKey...>;
 
 } // namespace containers
-
-using non_copyable_map = containers::linear_map<bounded_test::non_copyable_integer, bounded_test::non_copyable_integer>;
-
-static_assert(containers_test::test_reserve_and_capacity<non_copyable_map>());
-static_assert(containers_test::test_associative_container<non_copyable_map>());

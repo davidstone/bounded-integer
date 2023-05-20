@@ -7,10 +7,6 @@ export module containers.algorithms.sort.sort_exactly_2;
 
 import containers.algorithms.sort.dereference_all;
 import containers.algorithms.sort.relocate_in_order;
-import containers.algorithms.sort.sort_test_data;
-import containers.algorithms.sort.test_sort_inplace_and_relocate;
-
-import containers.begin_end;
 
 import bounded;
 import std_module;
@@ -40,13 +36,3 @@ export constexpr auto sort_exactly_n_relocate(auto it, bounded::constant_t<2> co
 }
 
 } // namespace containers
-
-using namespace containers_test;
-using namespace bounded::literal;
-
-static_assert(test_sort(uint8_2, [](auto & range) {
-	containers::sort_exactly_n(containers::begin(range), 2_bi, std::less());
-}));
-static_assert(test_sort_relocate(uint8_2, [](auto & range, auto & buffer) {
-	return containers::sort_exactly_n_relocate(containers::begin(range), 2_bi, buffer.data(), std::less());
-}));

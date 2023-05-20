@@ -7,7 +7,7 @@ module;
 
 #include <bounded/assert.hpp>
 
-export module containers.assign_test;
+export module containers.test.assign;
 
 import containers.assign;
 import containers.data;

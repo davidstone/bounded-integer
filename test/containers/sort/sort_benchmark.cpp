@@ -6,7 +6,7 @@
 #include <std_module/prelude.hpp>
 #include <benchmark/benchmark.h>
 
-import containers.algorithms.sort.insertion_sort;
+import containers.algorithms.sort.chunked_insertion_sort;
 
 import bounded;
 import containers;

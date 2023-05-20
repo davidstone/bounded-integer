@@ -7,13 +7,8 @@ export module containers.algorithms.sort.sort_exactly_6;
 
 import containers.algorithms.sort.fixed_size_merge_sort;
 import containers.algorithms.sort.sort_exactly_5;
-import containers.algorithms.sort.sort_test_data;
-import containers.algorithms.sort.test_sort_inplace_and_relocate;
 
 import containers.algorithms.advance;
-
-import containers.array;
-import containers.begin_end;
 
 import bounded;
 import std_module;
@@ -58,25 +53,3 @@ export constexpr auto sort_exactly_n(auto it, [[maybe_unused]] bounded::constant
 }
 
 } // namespace containers
-
-using namespace containers_test;
-using namespace bounded::literal;
-
-constexpr auto inputs = containers::array{
-	sort_test_data(
-		containers::array{0, 1, 2, 3, 4, 5},
-		containers::array{0, 1, 2, 3, 4, 5}
-	),
-	sort_test_data(
-		containers::array{5, 4, 3, 2, 1, 0},
-		containers::array{0, 1, 2, 3, 4, 5}
-	),
-	sort_test_data(
-		containers::array{0, 4, 1, 5, 3, 2},
-		containers::array{0, 1, 2, 3, 4, 5}
-	)
-};
-
-static_assert(test_sort(inputs, [](auto & range) {
-	containers::sort_exactly_n(containers::begin(range), 6_bi, std::less());
-}));

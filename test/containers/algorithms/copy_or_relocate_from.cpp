@@ -7,7 +7,7 @@ module;
 
 #include <bounded/assert.hpp>
 
-export module containers.algorithms.copy_or_relocate_from_test;
+export module containers.test.algorithms.copy_or_relocate_from;
 
 import containers.algorithms.copy_or_relocate_from;
 import containers.lazy_push_back;

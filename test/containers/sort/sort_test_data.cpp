@@ -12,7 +12,7 @@ module;
 
 #include <operators/forward.hpp>
 
-export module containers.algorithms.sort.sort_test_data;
+export module containers.test.sort.sort_test_data;
 
 import containers.algorithms.sort.is_sorted;
 import containers.algorithms.sort.to_radix_sort_key;

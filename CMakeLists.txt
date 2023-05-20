@@ -191,13 +191,14 @@ target_sources(containers PUBLIC
 	BASE_DIRS "${CMAKE_CURRENT_SOURCE_DIR}"
 	FILES
 		source/containers/algorithms/sort/cheaply_sortable.cpp
+		source/containers/algorithms/sort/chunked_insertion_sort.cpp
 		source/containers/algorithms/sort/common_prefix.cpp
 		source/containers/algorithms/sort/dereference_all.cpp
 		source/containers/algorithms/sort/double_buffered_ska_sort.cpp
 		source/containers/algorithms/sort/fixed_size_merge_sort.cpp
 		source/containers/algorithms/sort/inplace_radix_sort.cpp
-		source/containers/algorithms/sort/insertion_sort.cpp
 		source/containers/algorithms/sort/is_sorted.cpp
+		source/containers/algorithms/sort/merge_relocate_second_range.cpp
 		source/containers/algorithms/sort/relocate_in_order.cpp
 		source/containers/algorithms/sort/rotate_one.cpp
 		source/containers/algorithms/sort/ska_sort.cpp
@@ -209,8 +210,6 @@ target_sources(containers PUBLIC
 		source/containers/algorithms/sort/sort_exactly_4.cpp
 		source/containers/algorithms/sort/sort_exactly_5.cpp
 		source/containers/algorithms/sort/sort_exactly_6.cpp
-		source/containers/algorithms/sort/sort_test_data.cpp
-		source/containers/algorithms/sort/test_sort_inplace_and_relocate.cpp
 		source/containers/algorithms/sort/to_radix_sort_key.cpp
 		source/containers/algorithms/accumulate.cpp
 		source/containers/algorithms/advance.cpp
@@ -221,12 +220,10 @@ target_sources(containers PUBLIC
 		source/containers/algorithms/concatenate_view.cpp
 		source/containers/algorithms/copy.cpp
 		source/containers/algorithms/copy_or_relocate_from.cpp
-		source/containers/algorithms/copy_or_relocate_from_test.cpp
 		source/containers/algorithms/count.cpp
 		source/containers/algorithms/destroy_range.cpp
 		source/containers/algorithms/distance.cpp
 		source/containers/algorithms/erase.cpp
-		source/containers/algorithms/erase_test.cpp
 		source/containers/algorithms/filter.cpp
 		source/containers/algorithms/find.cpp
 		source/containers/algorithms/generate.cpp
@@ -251,12 +248,9 @@ target_sources(containers PUBLIC
 		source/containers/append.cpp
 		source/containers/append_after.cpp
 		source/containers/append_into_capacity.cpp
-		source/containers/append_test.cpp
 		source/containers/array.cpp
-		source/containers/array_test.cpp
 		source/containers/as_mutable_ptr.cpp
 		source/containers/assign.cpp
-		source/containers/assign_test.cpp
 		source/containers/assign_to_empty.cpp
 		source/containers/assign_to_empty_into_capacity.cpp
 		source/containers/associative_container.cpp
@@ -267,7 +261,6 @@ target_sources(containers PUBLIC
 		source/containers/c_array.cpp
 		source/containers/can_set_size.cpp
 		source/containers/clear.cpp
-		source/containers/clear_test.cpp
 		source/containers/common_functions.cpp
 		source/containers/common_iterator_functions.cpp
 		source/containers/compare_container.cpp
@@ -295,7 +288,6 @@ target_sources(containers PUBLIC
 		source/containers/insert.cpp
 		source/containers/integer_range.cpp
 		source/containers/is_container.cpp
-		source/containers/is_container_test.cpp
 		source/containers/is_empty.cpp
 		source/containers/is_iterator.cpp
 		source/containers/is_iterator_sentinel.cpp
@@ -309,8 +301,6 @@ target_sources(containers PUBLIC
 		source/containers/key_comparison_function.cpp
 		source/containers/lazy_push_back.cpp
 		source/containers/lazy_push_back_into_capacity.cpp
-		source/containers/lazy_push_back_into_capacity_test.cpp
-		source/containers/lazy_push_back_test.cpp
 		source/containers/lazy_push_front.cpp
 		source/containers/legacy_append.cpp
 		source/containers/legacy_iterator.cpp
@@ -327,12 +317,9 @@ target_sources(containers PUBLIC
 		source/containers/offset_type.cpp
 		source/containers/ordered_associative_container.cpp
 		source/containers/pop_back.cpp
-		source/containers/pop_back_test.cpp
 		source/containers/pop_front.cpp
 		source/containers/push_back.cpp
 		source/containers/push_back_into_capacity.cpp
-		source/containers/push_back_into_capacity_test.cpp
-		source/containers/push_back_test.cpp
 		source/containers/push_front.cpp
 		source/containers/range_reference_t.cpp
 		source/containers/range_value_t.cpp
@@ -353,10 +340,6 @@ target_sources(containers PUBLIC
 		source/containers/string.cpp
 		source/containers/supports_lazy_insert_after.cpp
 		source/containers/take.cpp
-		source/containers/test_associative_container.cpp
-		source/containers/test_reserve_and_capacity.cpp
-		source/containers/test_sequence_container.cpp
-		source/containers/test_set_size.cpp
 		source/containers/to_address.cpp
 		source/containers/to_any_string.cpp
 		source/containers/to_string.cpp
@@ -383,18 +366,48 @@ target_sources(containers_test PUBLIC
 	FILE_SET CXX_MODULES
 	BASE_DIRS "${CMAKE_CURRENT_SOURCE_DIR}"
 	FILES
+		test/containers/sort/chunked_insertion_sort.cpp
+		test/containers/sort/double_buffered_ska_sort.cpp
+		test/containers/sort/sort_test_data.cpp
+		test/containers/sort/ska_sort.cpp
+		test/containers/sort/sort.cpp
+		test/containers/sort/sort_exactly_n.cpp
+		test/containers/sort/test_sort.cpp
+		test/containers/algorithms/copy_or_relocate_from.cpp
+		test/containers/algorithms/erase.cpp
+		test/containers/append.cpp
+		test/containers/array.cpp
+		test/containers/assign.cpp
+		test/containers/assign_to_empty.cpp
+		test/containers/bidirectional_linked_list.cpp
+		test/containers/clear.cpp
 		test/containers/concatenate.cpp
-		test/containers/double_buffered_ska_sort.cpp
-		test/containers/ska_sort.cpp
+		test/containers/dynamic_array.cpp
+		test/containers/flat_map.cpp
+		test/containers/forward_linked_list.cpp
+		test/containers/is_container.cpp
+		test/containers/lazy_push_back.cpp
+		test/containers/lazy_push_back_into_capacity.cpp
+		test/containers/linear_map.cpp
+		test/containers/pop_back.cpp
+		test/containers/push_back.cpp
+		test/containers/push_back_into_capacity.cpp
+		test/containers/stable_vector.cpp
+		test/containers/test_associative_container.cpp
+		test/containers/test_reserve_and_capacity.cpp
+		test/containers/test_sequence_container.cpp
+		test/containers/test_set_size.cpp
+		test/containers/uninitialized_dynamic_array.cpp
+		test/containers/vector.cpp
 )
 
 target_sources(containers_test PUBLIC
+	test/containers/sort/to_radix_sort_key.cpp
 	test/containers/at.cpp
 	test/containers/small_buffer_optimized_vector.cpp
 	test/containers/static_vector.cpp
 	test/containers/string.cpp
 	test/containers/take.cpp
-	test/containers/to_radix_sort_key.cpp
 	test/containers/trivial_inplace_function.cpp
 )
 
@@ -419,12 +432,12 @@ target_compile_definitions(std_map PRIVATE "USE_SYSTEM_MAP")
 target_link_libraries(std_map PUBLIC containers strict_defaults)
 
 add_executable(ska_sort_benchmark
-	test/containers/ska_sort_benchmark.cpp
+	test/containers/sort/ska_sort_benchmark.cpp
 )
 target_link_libraries(ska_sort_benchmark PUBLIC bounded benchmark containers strict_defaults)
 
 add_executable(sort_benchmark
-	test/containers/sort_benchmark.cpp
+	test/containers/sort/sort_benchmark.cpp
 )
 target_link_libraries(sort_benchmark PUBLIC bounded benchmark_main containers strict_defaults)
 

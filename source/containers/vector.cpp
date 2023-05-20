@@ -25,13 +25,9 @@ import containers.data;
 import containers.initializer_range;
 import containers.maximum_array_size;
 import containers.range_value_t;
-import containers.test_reserve_and_capacity;
-import containers.test_sequence_container;
-import containers.test_set_size;
 import containers.uninitialized_dynamic_array;
 
 import bounded;
-import bounded.test_int;
 import std_module;
 
 using namespace bounded::literal;
@@ -152,19 +148,3 @@ template<typename Range>
 vector(Range &&) -> vector<std::decay_t<range_value_t<Range>>>;
 
 } // namespace containers
-
-static_assert(containers_test::test_sequence_container<containers::vector<int>>());
-static_assert(containers_test::test_sequence_container<containers::vector<bounded_test::integer>>());
-
-static_assert(containers_test::test_reserve_and_capacity<containers::vector<int>>());
-static_assert(containers_test::test_reserve_and_capacity<containers::vector<bounded_test::integer>>());
-
-static_assert(containers_test::test_set_size<containers::vector<int>>());
-static_assert(containers_test::test_set_size<containers::vector<bounded_test::integer>>());
-
-static_assert(bounded::convertible_to<containers::vector<bounded_test::integer> const &, std::span<bounded_test::integer const>>);
-static_assert(bounded::convertible_to<containers::vector<bounded_test::integer> &, std::span<bounded_test::integer>>);
-
-struct recursive {
-	containers::vector<recursive, 1> m;
-};

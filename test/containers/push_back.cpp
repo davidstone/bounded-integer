@@ -7,7 +7,7 @@ module;
 
 #include <bounded/assert.hpp>
 
-export module containers.push_back_test;
+export module containers.test.push_back;
 
 import containers.push_back;
 import containers.vector;

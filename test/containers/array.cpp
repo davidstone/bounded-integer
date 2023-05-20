@@ -3,10 +3,11 @@
 // (See accompanying file LICENSE_1_0.txt or copy at
 // http://www.boost.org/LICENSE_1_0.txt)
 
-export module containers.array_test;
+export module containers.test.array;
+
+import containers.test.test_sequence_container;
 
 import containers.array;
-import containers.test_sequence_container;
 
 import bounded;
 

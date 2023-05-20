@@ -3,13 +3,9 @@
 // (See accompanying file LICENSE_1_0.txt or copy at
 // http://www.boost.org/LICENSE_1_0.txt)
 
-module;
+export module containers.test.sort.test_sort;
 
-#include <bounded/assert.hpp>
-
-export module containers.algorithms.sort.test_sort_inplace_and_relocate;
-
-import containers.algorithms.sort.sort_test_data;
+import containers.test.sort.sort_test_data;
 
 import containers.algorithms.all_any_none;
 import containers.algorithms.compare;

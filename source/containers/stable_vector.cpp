@@ -22,15 +22,10 @@ import containers.common_functions;
 import containers.compare_container;
 import containers.contiguous_iterator;
 import containers.data;
-import containers.index_type;
 import containers.initializer_range;
-import containers.test_sequence_container;
-import containers.test_set_size;
 import containers.uninitialized_dynamic_array;
 
 import bounded;
-import bounded.test_int;
-import numeric_traits;
 import std_module;
 
 using namespace bounded::literal;
@@ -128,26 +123,3 @@ private:
 };
 
 } // namespace containers
-
-template<typename T>
-using test_stable_vector = containers::stable_vector<T, 1000>;
-
-static_assert(test_stable_vector<int>::capacity() == 1000_bi);
-
-static_assert(containers_test::test_sequence_container<test_stable_vector<int>>());
-static_assert(containers_test::test_sequence_container<test_stable_vector<bounded_test::integer>>());
-
-static_assert(containers_test::test_set_size<test_stable_vector<int>>());
-static_assert(containers_test::test_set_size<test_stable_vector<bounded_test::integer>>());
-
-using index_type = containers::index_type<containers::stable_vector<int, 10>>;
-static_assert(numeric_traits::min_value<index_type> == 0_bi);
-static_assert(numeric_traits::max_value<index_type> == 9_bi);
-
-namespace {
-
-struct recursive {
-	containers::stable_vector<recursive, 1> m;
-};
-
-} // namespace

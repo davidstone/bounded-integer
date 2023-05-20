@@ -5,12 +5,16 @@
 
 module;
 
-#include "../test_assert.hpp"
+#undef NDEBUG
+#include <bounded/assert.hpp>
 
-export module containers.test_associative_container;
+export module containers.test.test_associative_container;
 
 import containers.algorithms.all_any_none;
 import containers.algorithms.compare;
+
+import containers.test.test_sequence_container;
+
 import containers.array;
 import containers.associative_container;
 import containers.begin_end;
@@ -18,7 +22,6 @@ import containers.c_array;
 import containers.map_tags;
 import containers.range_value_t;
 import containers.size;
-import containers.test_sequence_container;
 
 import bounded;
 import std_module;
@@ -114,7 +117,7 @@ constexpr auto test_three_sorted_unique_keys() -> void {
 }
 
 constexpr auto map_contains_exactly(auto const & map, auto const & values) -> bool {
-	BOUNDED_TEST(containers::size(map) == containers::size(values));
+	BOUNDED_ASSERT(containers::size(map) == containers::size(values));
 	return containers::all(values, [&](auto const & value) {
 		auto const it = map.find(value.key);
 		return it != containers::end(map) and *it == value;
@@ -250,7 +253,7 @@ constexpr auto test_lazy_insert_new_key() {
 		{3, 3}
 	}));
 	container.lazy_insert(5, bounded::value_to_function(3));
-	BOUNDED_TEST(containers::equal(
+	BOUNDED_ASSERT(containers::equal(
 		container,
 		containers::to_array<value_type>({
 			{1, 2},
@@ -272,7 +275,7 @@ constexpr auto test_lazy_insert_existing_key() {
 		{3, 3}
 	}));
 	container.lazy_insert(2, bounded::value_to_function(3));
-	BOUNDED_TEST(containers::equal(
+	BOUNDED_ASSERT(containers::equal(
 		container,
 		containers::to_array<value_type>({
 			{1, 2},

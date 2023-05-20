@@ -10,11 +10,6 @@ import containers.algorithms.sort.dereference_all;
 import containers.algorithms.sort.relocate_in_order;
 import containers.algorithms.sort.rotate_one;
 import containers.algorithms.sort.sort_exactly_4;
-import containers.algorithms.sort.sort_test_data;
-import containers.algorithms.sort.test_sort_inplace_and_relocate;
-
-import containers.array;
-import containers.begin_end;
 
 import bounded;
 import std_module;
@@ -65,40 +60,3 @@ export constexpr auto sort_exactly_n(auto it, bounded::constant_t<5> const size,
 }
 
 } // namespace containers
-
-using namespace containers_test;
-using namespace bounded::literal;
-
-constexpr auto inputs = containers::array{
-	sort_test_data(
-		containers::array{0, 1, 2, 3, 4},
-		containers::array{0, 1, 2, 3, 4}
-	),
-	sort_test_data(
-		containers::array{4, 3, 2, 1, 0},
-		containers::array{0, 1, 2, 3, 4}
-	),
-	sort_test_data(
-		containers::array{0, 4, 1, 3, 2},
-		containers::array{0, 1, 2, 3, 4}
-	),
-
-	sort_test_data(
-		containers::array{0, 2, 1, 2, 0},
-		containers::array{0, 0, 1, 2, 2}
-	),
-
-	sort_test_data(
-		containers::array{0, 0, 1, 0, 0},
-		containers::array{0, 0, 0, 0, 1}
-	),
-
-	sort_test_data(
-		containers::array{0, 0, 0, 0, 0},
-		containers::array{0, 0, 0, 0, 0}
-	)
-};
-
-static_assert(test_sort(inputs, [](auto & range) {
-	containers::sort_exactly_n(containers::begin(range), 5_bi, std::less());
-}));

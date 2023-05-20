@@ -8,7 +8,7 @@ module;
 #include <bounded/assert.hpp>
 #include <operators/forward.hpp>
 
-export module containers.push_back_into_capacity_test;
+export module containers.test.push_back_into_capacity;
 
 import containers.front_back;
 import containers.push_back_into_capacity;

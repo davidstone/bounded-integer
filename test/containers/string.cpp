@@ -6,11 +6,12 @@
 #include <std_module/prelude.hpp>
 #include <catch2/catch_test_macros.hpp>
 
+import containers.test.test_reserve_and_capacity;
+import containers.test.test_sequence_container;
+import containers.test.test_set_size;
 import containers.size;
 import containers.string;
-import containers.test_reserve_and_capacity;
-import containers.test_sequence_container;
-import containers.test_set_size;
+
 import bounded;
 
 namespace {

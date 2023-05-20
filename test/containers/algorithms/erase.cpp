@@ -7,7 +7,7 @@ module;
 
 #include <bounded/assert.hpp>
 
-export module containers.algorithms.erase_test;
+export module containers.test.algorithms.erase_test;
 
 import containers.algorithms.erase;
 import containers.begin_end;

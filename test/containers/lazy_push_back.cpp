@@ -7,7 +7,7 @@ module;
 
 #include <bounded/assert.hpp>
 
-export module containers.lazy_push_back_test;
+export module containers.test.lazy_push_back;
 
 import containers.algorithms.compare;
 import containers.lazy_push_back;

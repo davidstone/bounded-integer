@@ -27,11 +27,9 @@ import containers.maximum_array_size;
 import containers.range_value_t;
 import containers.range_view;
 import containers.size;
-import containers.test_sequence_container;
 import containers.uninitialized_dynamic_array;
 
 import bounded;
-import bounded.test_int;
 import std_module;
 
 namespace containers {
@@ -130,17 +128,3 @@ template<typename T, typename Size>
 constexpr auto is_container<dynamic_array<T, Size>> = true;
 
 } // namespace containers
-
-static_assert(containers_test::test_sequence_container<containers::dynamic_array<int>>());
-static_assert(containers_test::test_sequence_container<containers::dynamic_array<bounded_test::integer>>());
-
-static_assert(bounded::convertible_to<containers::dynamic_array<bounded_test::integer> const &, std::span<bounded_test::integer const>>);
-static_assert(bounded::convertible_to<containers::dynamic_array<bounded_test::integer> &, std::span<bounded_test::integer>>);
-
-namespace {
-
-struct recursive {
-	containers::dynamic_array<recursive, bounded::integer<0, 1>> m;
-};
-
-} // namespace

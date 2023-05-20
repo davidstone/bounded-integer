@@ -23,9 +23,6 @@ import containers.push_back;
 import containers.range_value_t;
 import containers.size;
 import containers.small_buffer_optimized_vector;
-import containers.test_reserve_and_capacity;
-import containers.test_sequence_container;
-import containers.test_set_size;
 
 import bounded;
 import numeric_traits;

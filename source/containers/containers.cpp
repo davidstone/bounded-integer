@@ -74,6 +74,7 @@ export import containers.iterator_t;
 export import containers.lazy_push_back;
 export import containers.lazy_push_back_into_capacity;
 export import containers.legacy_iterator;
+export import containers.linear_map;
 export import containers.lookup;
 export import containers.map_tags;
 export import containers.map_value_type;

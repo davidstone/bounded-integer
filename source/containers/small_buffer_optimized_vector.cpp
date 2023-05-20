@@ -30,12 +30,9 @@ import containers.initializer_range;
 import containers.maximum_array_size;
 import containers.range_view;
 import containers.size;
-import containers.test_sequence_container;
-import containers.test_set_size;
 import containers.uninitialized_array;
 
 import bounded;
-import bounded.test_int;
 import numeric_traits;
 import std_module;
 
@@ -373,10 +370,7 @@ struct check_alignment_first {
 static_assert(sizeof(check_alignment_first) == sizeof(void *) * 4);
 
 struct check_alignment_last {
-	containers::small_buffer_optimized_vector<char, 0> a;
-	char b;
+	char a;
+	containers::small_buffer_optimized_vector<char, 0> b;
 };
 static_assert(sizeof(check_alignment_last) == sizeof(void *) * 4);
-
-static_assert(containers_test::test_sequence_container<containers::small_buffer_optimized_vector<int, 40>>());
-static_assert(containers_test::test_set_size<containers::small_buffer_optimized_vector<int, 1>>());

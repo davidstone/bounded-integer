@@ -187,12 +187,7 @@ constexpr auto take_impl(Range && source, Count const count) {
 		auto const source_size = containers::size(source);
 		if (source_size > count) {
 			using namespace std::string_view_literals;
-			throw std::runtime_error(containers::concatenate<std::string>(
-				"Did not take all elements of range. size(source) == "sv,
-				to_any_string<std::string>(source_size),
-				", given count == "sv,
-				to_any_string<std::string>(count)
-			));
+			throw std::runtime_error("Did not take all elements of range");
 		}
 		return containers::range_view(OPERATORS_FORWARD(source));
 	} else if constexpr (sized_range<Range> and forward_random_access_iterator<iterator>) {

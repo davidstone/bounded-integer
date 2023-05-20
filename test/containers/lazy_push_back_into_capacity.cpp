@@ -7,7 +7,7 @@ module;
 
 #include <bounded/assert.hpp>
 
-export module containers.lazy_push_back_into_capacity_test;
+export module containers.test.lazy_push_back_into_capacity;
 
 import containers.front_back;
 import containers.lazy_push_back_into_capacity;

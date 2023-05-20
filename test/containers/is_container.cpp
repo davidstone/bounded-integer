@@ -9,7 +9,7 @@ module;
 #include <map>
 #include <set>
 
-export module containers.is_container_test;
+export module containers.test.is_container;
 
 import containers.is_container;
 

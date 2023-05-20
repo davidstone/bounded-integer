@@ -12,13 +12,12 @@ module;
 
 export module containers.test.ska_sort;
 
-import containers.algorithms.sort.common_prefix;
+import containers.test.sort.sort_test_data;
+
 import containers.algorithms.sort.inplace_radix_sort;
-import containers.algorithms.sort.sort_test_data;
 import containers.algorithms.sort.to_radix_sort_key;
 
 import containers.begin_end;
-import containers.c_array;
 import containers.range_view;
 
 import std_module;

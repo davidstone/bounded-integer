@@ -6,17 +6,53 @@
 #include <std_module/prelude.hpp>
 #include <catch2/catch_test_macros.hpp>
 
+import containers.test.test_sequence_container;
+import containers.test.test_set_size;
+
+import containers.array;
+import containers.c_array;
+import containers.index_type;
+import containers.is_iterator;
 import containers.static_vector;
-import containers.test_sequence_container;
-import containers.test_set_size;
 
 import bounded;
+import bounded.homogeneous_equals;
 import bounded.test_int;
+import numeric_traits;
 
 using namespace bounded::literal;
 
 template<typename T>
 using test_static_vector = containers::static_vector<T, 40_bi>;
+
+static_assert(test_static_vector<int>::capacity() == 40_bi);
+
+static_assert(std::is_trivially_copy_constructible_v<test_static_vector<int>>);
+static_assert(std::is_trivially_move_constructible_v<test_static_vector<int>>);
+static_assert(std::is_trivially_destructible_v<test_static_vector<int>>);
+static_assert(std::is_trivially_copy_assignable_v<test_static_vector<int>>);
+static_assert(std::is_trivially_move_assignable_v<test_static_vector<int>>);
+
+static_assert(!std::is_trivially_copy_constructible_v<test_static_vector<bounded_test::integer>>);
+static_assert(!std::is_trivially_move_constructible_v<test_static_vector<bounded_test::integer>>);
+static_assert(!std::is_trivially_destructible_v<test_static_vector<bounded_test::integer>>);
+static_assert(!std::is_trivially_copy_assignable_v<test_static_vector<bounded_test::integer>>);
+static_assert(!std::is_trivially_move_assignable_v<test_static_vector<bounded_test::integer>>);
+
+static_assert(containers_test::test_sequence_container<test_static_vector<int>>());
+static_assert(containers_test::test_set_size<test_static_vector<int>>());
+
+using index_type = containers::index_type<containers::static_vector<int, 10_bi>>;
+static_assert(numeric_traits::min_value<index_type> == 0_bi);
+static_assert(numeric_traits::max_value<index_type> == 9_bi);
+static_assert(!containers::iterator<containers::static_vector<int, 6_bi>>);
+
+static_assert(homogeneous_equals(
+	containers::make_static_vector(containers::array({5, 3})),
+	containers::static_vector<int, 2_bi>({5, 3})
+));
+
+static_assert(!bounded::constructible_from<containers::static_vector<int, 1_bi>, containers::c_array<int, 2> &&>);
 
 TEST_CASE("static_vector", "[static_vector]") {
 	containers_test::test_sequence_container<test_static_vector<bounded_test::integer>>();

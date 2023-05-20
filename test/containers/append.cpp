@@ -7,7 +7,7 @@ module;
 
 #include <bounded/assert.hpp>
 
-export module containers.append_test;
+export module containers.test.append;
 
 import containers.append;
 import containers.vector;

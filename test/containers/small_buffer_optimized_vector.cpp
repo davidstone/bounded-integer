@@ -7,11 +7,11 @@
 #include <catch2/catch_test_macros.hpp>
 
 import containers.algorithms.compare;
+import containers.test.test_reserve_and_capacity;
+import containers.test.test_sequence_container;
+import containers.test.test_set_size;
 import containers.repeat_n;
 import containers.small_buffer_optimized_vector;
-import containers.test_reserve_and_capacity;
-import containers.test_sequence_container;
-import containers.test_set_size;
 
 import bounded;
 import bounded.test_int;
@@ -19,6 +19,9 @@ import bounded.test_int;
 namespace {
 
 using namespace bounded::literal;
+
+static_assert(containers_test::test_sequence_container<containers::small_buffer_optimized_vector<int, 40>>());
+static_assert(containers_test::test_set_size<containers::small_buffer_optimized_vector<int, 1>>());
 
 template<typename T>
 constexpr auto test_sbo_vector_impl(auto const capacity, auto const size) -> void {

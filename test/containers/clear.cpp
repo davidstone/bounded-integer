@@ -7,7 +7,7 @@ module;
 
 #include <bounded/assert.hpp>
 
-export module containers.clear_test;
+export module containers.test.clear;
 
 import containers.clear;
 import containers.is_empty;

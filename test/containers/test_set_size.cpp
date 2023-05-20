@@ -5,9 +5,10 @@
 
 module;
 
-#include "../test_assert.hpp"
+#undef NDEBUG
+#include <bounded/assert.hpp>
 
-export module containers.test_set_size;
+export module containers.test.test_set_size;
 
 import containers.begin_end;
 import containers.data;
@@ -23,7 +24,7 @@ constexpr auto test_add_zero_to_empty() -> void {
 	auto const original = Container();
 	auto v = original;
 	v.set_size(0_bi);
-	BOUNDED_TEST(v == original);
+	BOUNDED_ASSERT(v == original);
 }
 
 template<typename Container>
@@ -31,7 +32,7 @@ constexpr auto test_add_zero_to_non_empty() -> void {
 	auto const original = Container({1});
 	auto v = original;
 	v.set_size(1_bi);
-	BOUNDED_TEST(v == original);
+	BOUNDED_ASSERT(v == original);
 }
 
 template<typename Container>
@@ -39,7 +40,7 @@ constexpr auto test_remove_one() -> void {
 	auto v = Container({1});
 	bounded::destroy(*containers::begin(v));
 	v.set_size(0_bi);
-	BOUNDED_TEST(v == Container());
+	BOUNDED_ASSERT(v == Container());
 }
 
 template<typename Container>
@@ -49,7 +50,7 @@ constexpr auto test_add_one() -> void {
 	v.set_size(0_bi);
 	bounded::construct_at(*containers::data(v), [] { return 5; });
 	v.set_size(1_bi);
-	BOUNDED_TEST(v == Container({5}));
+	BOUNDED_ASSERT(v == Container({5}));
 }
 
 export template<typename Container>
