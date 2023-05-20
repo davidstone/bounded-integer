@@ -14,10 +14,10 @@ export module containers.algorithms.unique;
 import containers.algorithms.sort.is_sorted;
 
 import containers.algorithms.advance;
-import containers.algorithms.erase;
+import containers.algorithms.compare;
+import containers.algorithms.concatenate_view;
 import containers.algorithms.find;
 import containers.algorithms.move_iterator;
-import containers.append;
 import containers.begin_end;
 import containers.dynamic_array;
 import containers.is_iterator;
@@ -29,7 +29,6 @@ import containers.offset_type;
 import containers.range_view;
 import containers.repeat_n;
 import containers.size;
-import containers.vector;
 
 import bounded;
 import bounded.test_int;
@@ -198,13 +197,12 @@ constexpr auto unique_inplace_merge(Iterator first, Iterator middle, sentinel_fo
 
 } // namespace containers
 
-using Container = containers::vector<bounded_test::integer>;
+using Container = containers::dynamic_array<bounded_test::integer>;
 
 constexpr void test_unique_copy_less(Container const & source, Container const & expected) {
 	auto destination = Container(containers::repeat_n(containers::size(source), 0));
 	auto const it = containers::unique_copy_less(begin(source), end(source), begin(destination));
-	containers::erase_to_end(destination, it);
-	BOUNDED_ASSERT(destination == expected);
+	BOUNDED_ASSERT(containers::equal(containers::range_view(begin(destination), it), expected));
 }
 
 constexpr void test_unique_less(Container source, Container const & expected) {
@@ -216,19 +214,15 @@ constexpr void test_unique_less(Container source, Container const & expected) {
 constexpr void test_unique_merge_copy(Container const & lhs, Container const & rhs, Container const & expected) {
 	auto result = Container(containers::repeat_n(::bounded::assume_in_range<containers::range_size_t<Container>>(containers::size(lhs) + containers::size(rhs)), 0));
 	auto const it = containers::unique_merge_copy(begin(lhs), end(lhs), begin(rhs), end(rhs), begin(result));
-	containers::erase_to_end(result, it);
-
-	BOUNDED_ASSERT(result == expected);
+	BOUNDED_ASSERT(containers::equal(containers::range_view(begin(result), it), expected));
 }
 
 constexpr void test_unique_inplace_merge(Container v, Container const & other, Container const & expected) {
 	using iterator = containers::iterator_t<Container const &>;
 	auto const midpoint = static_cast<containers::iter_difference_t<iterator>>(containers::size(v));
-	containers::append(v, other);
+	v = Container(containers::concatenate_view(std::move(v), other));
 	auto const it = containers::unique_inplace_merge(begin(v), begin(v) + midpoint, end(v));
-	containers::erase_to_end(v, it);
-
-	BOUNDED_ASSERT(v == expected);
+	BOUNDED_ASSERT(containers::equal(containers::range_view(begin(v), it), expected));
 }
 
 constexpr void test_unique_merge(Container v, Container const & other, Container const & expected) {
