@@ -12,6 +12,7 @@ export module containers.std.vector;
 
 import containers.algorithms.compare;
 import containers.algorithms.erase;
+import containers.std.std_allocator;
 import containers.assign;
 import containers.at;
 import containers.begin_end;
@@ -41,15 +42,6 @@ import bounded.test_int;
 import std_module;
 
 namespace std_containers {
-
-template<typename T>
-inline constexpr auto is_std_allocator = false;
-
-template<typename T>
-inline constexpr auto is_std_allocator<std::allocator<T>> = true;
-
-template<typename T>
-concept std_allocator = is_std_allocator<T>;
 
 // This has the same interface as `std::vector`, with the following exceptions:
 //
