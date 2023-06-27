@@ -14,6 +14,8 @@ import tv.nth_type;
 import bounded;
 import std_module;
 
+using namespace bounded::literal;
+
 namespace tv {
 
 template<std::size_t... indexes>
@@ -257,7 +259,7 @@ template<typename Tuple, typename... Tuples>
 constexpr auto all_tuple_sizes_equal<Tuple, Tuples...> = (... and (tuple_size<Tuple> == tuple_size<Tuples>));
 
 template<typename... Tuples>
-constexpr auto all_tuple_sizes = bounded::constant<0>;
+constexpr auto all_tuple_sizes = 0_bi;
 
 template<typename Tuple, typename... Tuples>
 constexpr auto all_tuple_sizes<Tuple, Tuples...> = tuple_size<Tuple>;
@@ -289,8 +291,6 @@ template<std::size_t index, typename... Ts>
 class std::tuple_element<index, tv::tuple<Ts...>> : public tv::tuple_element_c<index, tv::tuple<Ts...>> {};
 
 namespace {
-
-using namespace bounded::literal;
 
 static_assert(std::is_empty_v<tv::tuple<>>);
 static_assert(tv::tuple() == tv::tuple());

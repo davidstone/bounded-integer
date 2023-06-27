@@ -24,9 +24,9 @@ enum class count_sign { all, negative };
 template<typename T, count_sign sign>
 constexpr auto digits_impl(auto const base) {
 	auto safe_log = [=](auto value) {
-		if constexpr (value == constant<0>) {
-			return constant<0>;
-		} else if constexpr (value > constant<0>) {
+		if constexpr (value == 0_bi) {
+			return 0_bi;
+		} else if constexpr (value > 0_bi) {
 			return ::bounded::log(value, base);
 		} else {
 			return ::bounded::log(-value, base) + constant<sign == count_sign::negative>;
@@ -35,7 +35,7 @@ constexpr auto digits_impl(auto const base) {
 	auto const representation_min = safe_log(constant<builtin_min_value<T>>);
 	auto const representation_max = safe_log(constant<builtin_max_value<T>>);
 	constexpr auto sign_bits = constant<builtin_min_value<T> < 0 and sign == count_sign::all>;
-	return ::bounded::max(representation_min, representation_max) + sign_bits + constant<1>;
+	return ::bounded::max(representation_min, representation_max) + sign_bits + 1_bi;
 }
 
 export template<typename T>
@@ -45,7 +45,7 @@ constexpr auto digits_in_string_representation(auto const base) {
 
 // This can be used for determining the size of a bitfield of a value
 export template<typename T>
-constexpr auto representation_bits = ::bounded::digits_impl<T, count_sign::all>(constant<2>);
+constexpr auto representation_bits = ::bounded::digits_impl<T, count_sign::all>(2_bi);
 
 } // namespace bounded
 

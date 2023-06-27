@@ -13,10 +13,12 @@ import bounded;
 import numeric_traits;
 import std_module;
 
+using namespace bounded::literal;
+
 namespace containers {
 
 template<typename Range>
-concept never_empty_range = numeric_traits::min_value<range_size_t<Range>> > bounded::constant<0>;
+concept never_empty_range = numeric_traits::min_value<range_size_t<Range>> > 0_bi;
 
 export constexpr auto is_empty = [](range auto && r) {
 	// The never_empty check is not needed for correctness, but allows this

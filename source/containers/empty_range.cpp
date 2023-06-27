@@ -10,9 +10,9 @@ import containers.common_functions;
 import bounded;
 import std_module;
 
-namespace containers {
-
 using namespace bounded::literal;
+
+namespace containers {
 
 template<typename T>
 struct empty_iterator {
@@ -65,5 +65,5 @@ static_assert(range.begin() == range.end());
 static_assert(requires(containers::empty_iterator<int> it) {
 	++it;
 	it - it;
-	it + bounded::constant<0>;
+	it + 0_bi;
 });

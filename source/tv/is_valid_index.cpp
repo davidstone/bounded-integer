@@ -8,10 +8,12 @@ export module tv.is_valid_index;
 import bounded;
 import std_module;
 
+using namespace bounded::literal;
+
 namespace tv {
 
 template<typename Index, typename... Ts>
-concept matches_exactly_one_type_impl = (bounded::constant<0> + ... + bounded::integer(std::same_as<Index, Ts>)) == bounded::constant<1>;
+concept matches_exactly_one_type_impl = (0_bi + ... + bounded::integer(std::same_as<Index, Ts>)) == 1_bi;
 
 export template<typename Index, typename... Ts>
 concept matches_exactly_one_type = matches_exactly_one_type_impl<std::decay_t<Index>, Ts...>;

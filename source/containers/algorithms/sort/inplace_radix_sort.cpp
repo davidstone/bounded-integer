@@ -37,6 +37,8 @@ import bounded;
 import std_module;
 import tv;
 
+using namespace bounded::literal;
+
 namespace containers {
 
 template<typename T>
@@ -256,7 +258,7 @@ private:
 		for (std::uint8_t * it = partitions.remaining.data(), * remaining_end = partitions.remaining.data() + partitions.number; it != remaining_end; ++it) {
 			auto const end_offset = ::bounded::assume_in_range<difference_type>(partitions.partitions[*it].next_offset);
 			auto const partition_end = first + end_offset;
-			if (partition_end - partition_begin > bounded::constant<1>) {
+			if (partition_end - partition_begin > 1_bi) {
 				sort_selector(
 					range_view(partition_begin, partition_end),
 					extract_key,
@@ -300,7 +302,7 @@ private:
 			auto const end_offset = ::bounded::assume_in_range<difference_type>(partitions.partitions[partition_index].next_offset);
 			auto partition_begin = first + start_offset;
 			auto partition_end = first + end_offset;
-			if (partition_end - partition_begin > bounded::constant<1>) {
+			if (partition_end - partition_begin > 1_bi) {
 				sort_selector(
 					range_view(partition_begin, partition_end),
 					extract_key,
@@ -396,7 +398,7 @@ private:
 				sort_data.next_sort_data
 			);
 		}
-		if (last - end_of_shorter_ones > bounded::constant<1>) {
+		if (last - end_of_shorter_ones > 1_bi) {
 			inplace_sort<std_sort_threshold, american_flag_sort_threshold, ElementSubKey>(
 				range_view(end_of_shorter_ones, last),
 				extract_key,
@@ -422,7 +424,7 @@ private:
 template<std::ptrdiff_t std_sort_threshold, std::ptrdiff_t american_flag_sort_threshold, typename CurrentSubKey, view View, typename ExtractKey>
 constexpr void sort_starter(View to_sort, ExtractKey const & extract_key, BaseListSortData * next_sort_data) {
 	if constexpr (!std::same_as<CurrentSubKey, SubKey<void>>) {
-		if (containers::size(to_sort) <= bounded::constant<1>) {
+		if (containers::size(to_sort) <= 1_bi) {
 			return;
 		}
 

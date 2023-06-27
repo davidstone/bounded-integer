@@ -113,22 +113,22 @@ struct concatenate_view_iterator {
 
 	constexpr decltype(auto) operator*() const {
 		// TODO: Implement with an expansion statement `for...`
-		return operator_star(bounded::constant<0>);
+		return operator_star(0_bi);
 	}
 	OPERATORS_ARROW_DEFINITIONS
 
 	template<typename Offset> requires(
 		std::same_as<Offset, bounded::constant_t<1>> or
-		(!bounded::bounded_integer<difference_type> and numeric_traits::max_value<Offset> >= bounded::constant<0> and (... and forward_random_access_range<RangeViews>)) or
+		(!bounded::bounded_integer<difference_type> and numeric_traits::max_value<Offset> >= 0_bi and (... and forward_random_access_range<RangeViews>)) or
 		(
 			bounded::convertible_to<Offset, difference_type> and
-			numeric_traits::min_value<Offset> >= bounded::constant<0> and
+			numeric_traits::min_value<Offset> >= 0_bi and
 			(... and forward_random_access_range<RangeViews>)
 		)
 	)
 	friend constexpr auto operator+(concatenate_view_iterator const lhs, Offset const offset) {
 		return [=]<std::size_t... indexes>(std::index_sequence<indexes...>) {
-			BOUNDED_ASSERT(offset >= bounded::constant<0>);
+			BOUNDED_ASSERT(offset >= 0_bi);
 			auto remaining_offset = bounded::integer<0, bounded::builtin_max_value<Offset>>(::bounded::assume_in_range(offset, 0_bi, bounded::integer(numeric_traits::max_value<Offset>)));
 			auto specific_range = [&](auto const index) {
 				auto const range = lhs.m_range_views[index];
@@ -202,7 +202,7 @@ struct concatenate_view_iterator {
 	}
 
 private:
-	static constexpr auto max_index = bounded::constant<sizeof...(RangeViews)> - bounded::constant<1>;
+	static constexpr auto max_index = bounded::constant<sizeof...(RangeViews)> - 1_bi;
 
 	constexpr auto operator_star(auto const index) const -> reference {
 		auto const range_view = m_range_views[index];
@@ -211,7 +211,7 @@ private:
 		} else if (!containers::is_empty(range_view)) {
 			return containers::front(range_view);
 		} else {
-			return operator_star(index + bounded::constant<1>);
+			return operator_star(index + 1_bi);
 		}
 	}
 

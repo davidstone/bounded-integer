@@ -12,6 +12,8 @@ export module tv.variadic_union;
 import bounded;
 import std_module;
 
+using namespace bounded::literal;
+
 namespace tv {
 
 export struct uninitialized_union {};
@@ -28,7 +30,7 @@ union variadic_union<T, Ts...> {
 	}
 	template<auto n>
 	explicit constexpr variadic_union(bounded::constant_t<n> const index, auto && construct_):
-		tail(index - bounded::constant<1>, OPERATORS_FORWARD(construct_))
+		tail(index - 1_bi, OPERATORS_FORWARD(construct_))
 	{
 	}
 
@@ -48,7 +50,7 @@ union [[clang::trivial_abi]] variadic_union<T, Ts...> {
 	}
 	template<auto n>
 	explicit constexpr variadic_union(bounded::constant_t<n> const index, auto && construct_):
-		tail(index - bounded::constant<1>, OPERATORS_FORWARD(construct_))
+		tail(index - 1_bi, OPERATORS_FORWARD(construct_))
 	{
 	}
 
@@ -68,10 +70,10 @@ union [[clang::trivial_abi]] variadic_union<T, Ts...> {
 
 export template<auto n> requires(n >= 0)
 constexpr auto && get_union_element(auto && v, bounded::constant_t<n> const index) {
-	if constexpr (index == bounded::constant<0>) {
+	if constexpr (index == 0_bi) {
 		return OPERATORS_FORWARD(v).head;
 	} else {
-		return get_union_element(OPERATORS_FORWARD(v).tail, index - bounded::constant<1>);
+		return get_union_element(OPERATORS_FORWARD(v).tail, index - 1_bi);
 	}
 }
 

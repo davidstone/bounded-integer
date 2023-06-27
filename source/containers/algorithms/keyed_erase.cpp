@@ -29,10 +29,10 @@ export constexpr auto keyed_erase(associative_container auto & map, auto && key)
 	if constexpr (requires { map.find(OPERATORS_FORWARD(key)); }) {
 		auto const it = map.find(OPERATORS_FORWARD(key));
 		if (it == containers::end(map)) {
-			return bounded::integer<0, 1>(bounded::constant<0>);
+			return bounded::integer<0, 1>(0_bi);
 		}
 		map.erase(it);
-		return bounded::integer<0, 1>(bounded::constant<1>);
+		return bounded::integer<0, 1>(1_bi);
 	} else {
 		// TODO: This can be made more efficient for node-based containers
 		auto const to_erase = keyed_equal_range(map, OPERATORS_FORWARD(key));

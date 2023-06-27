@@ -9,6 +9,8 @@ import containers.array;
 import bounded;
 import std_module;
 
+using namespace bounded::literal;
+
 namespace containers {
 // For a given size, we know the maximum natural alignment for any type that is
 // no larger than that size. This allows us to get a better default alignment
@@ -33,7 +35,7 @@ union aligned_storage_helper {
 	[[no_unique_address]] maybe<void *> void_star_;
 	[[no_unique_address]] maybe<void(*)()> function_ptr_;
 	[[no_unique_address]] maybe<double_holder> double_holder_;
-	[[no_unique_address]] maybe<containers::array<double, bounded::constant<4>>> array_double_;
+	[[no_unique_address]] maybe<containers::array<double, 4_bi>> array_double_;
 	[[no_unique_address]] maybe<long double> long_double_;
 };
 

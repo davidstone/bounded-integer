@@ -12,6 +12,8 @@ import numeric_traits;
 
 import std_module;
 
+using namespace bounded::literal;
+
 namespace containers {
 
 template<typename Size>
@@ -23,7 +25,7 @@ template<bounded::bounded_integer Size>
 struct to_index_type_impl<Size> {
 	using type = bounded::integer<
 		0,
-		bounded::normalize<numeric_traits::max_value<Size> - bounded::constant<1>>
+		bounded::normalize<numeric_traits::max_value<Size> - 1_bi>
 	>;
 };
 

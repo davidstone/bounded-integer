@@ -23,6 +23,8 @@ import bounded;
 import numeric_traits;
 import std_module;
 
+using namespace bounded::literal;
+
 namespace containers {
 
 export constexpr auto is_partitioned = [](range auto && input, auto predicate) -> bool {
@@ -35,16 +37,16 @@ export constexpr auto is_partitioned = [](range auto && input, auto predicate) -
 export constexpr auto partition_point = []<range Input>(Input && input, auto predicate) {
 	auto count = bounded::integer<0, bounded::builtin_max_value<range_size_t<Input>>>(containers::size(input));
 	auto first = containers::begin(input);
-	if constexpr (numeric_traits::max_value<decltype(count)> == bounded::constant<0>) {
+	if constexpr (numeric_traits::max_value<decltype(count)> == 0_bi) {
 		return first;
 	} else {
-		while (count > bounded::constant<0>) {
+		while (count > 0_bi) {
 			auto it = first;
-			auto const step = count / bounded::constant<2>;
+			auto const step = count / 2_bi;
 			::containers::advance(it, step);
 			if (predicate(*it)) {
 				first = ::containers::next(it);
-				count -= step + bounded::constant<1>;
+				count -= step + 1_bi;
 			} else {
 				count = step;
 			}
@@ -131,8 +133,6 @@ struct iterator_partition_t {
 export constexpr auto iterator_partition = iterator_partition_t();
 
 } // namespace containers
-
-using namespace bounded::literal;
 
 constexpr auto predicate = [](bool const value) { return value; };
 

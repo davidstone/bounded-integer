@@ -91,7 +91,7 @@ struct non_trivial {
 };
 template<>
 struct bounded::tombstone_traits<non_trivial> {
-	static constexpr auto spare_representations = constant<1>;
+	static constexpr auto spare_representations = 1_bi;
 
 	static constexpr auto make(bounded::constant_t<0>) noexcept -> non_trivial {
 		return non_trivial(17);

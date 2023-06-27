@@ -22,6 +22,8 @@ import numeric_traits;
 import tv;
 import std_module;
 
+using namespace bounded::literal;
+
 namespace containers {
 
 // TODO: Also validate get and tuple_element
@@ -34,7 +36,7 @@ export template<typename T>
 concept indexable_range =
 	range<T> and (
 		requires(T && value) { OPERATORS_FORWARD(value)[0]; } or
-		requires(T && value) { OPERATORS_FORWARD(value)[bounded::constant<0>]; }
+		requires(T && value) { OPERATORS_FORWARD(value)[0_bi]; }
 	);
 
 struct unknown_floating_point;

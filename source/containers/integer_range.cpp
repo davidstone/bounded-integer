@@ -86,7 +86,7 @@ public:
 	}
 
 private:
-	static constexpr auto has_no_values = numeric_traits::max_value<difference_type> == bounded::constant<0>;
+	static constexpr auto has_no_values = numeric_traits::max_value<difference_type> == 0_bi;
 
 	[[no_unique_address]] storage_type m_value;
 	[[no_unique_address]] Step m_step;
@@ -114,11 +114,11 @@ struct integer_range {
 	}
 
 	constexpr integer_range(Integer const first, Sentinel const last):
-		integer_range(first, last, Step(bounded::constant<1>))
+		integer_range(first, last, Step(1_bi))
 	{
 	}
 	constexpr integer_range(Sentinel const size):
-		integer_range(Integer(bounded::constant<0>), size)
+		integer_range(Integer(0_bi), size)
 	{
 	}
 
@@ -144,12 +144,12 @@ integer_range(Size) -> integer_range<
 >;
 
 export template<typename Step = bounded::constant_t<1>>
-constexpr auto inclusive_integer_range(auto const first, auto const last, Step const step = bounded::constant<1>) {
+constexpr auto inclusive_integer_range(auto const first, auto const last, Step const step = 1_bi) {
 	return integer_range(first, last + step, step);
 }
 
 export constexpr auto inclusive_integer_range(auto const last) {
-	return inclusive_integer_range(bounded::constant<0>, last);
+	return inclusive_integer_range(0_bi, last);
 }
 
 // Technically this could construct a more efficient object for compile-time
@@ -165,7 +165,7 @@ constexpr auto enum_range(Enum const first, Enum const last) {
 
 export template<typename Enum> requires (
 	std::is_enum_v<Enum> and
-	bounded::integer(numeric_traits::min_value<Enum>) == bounded::constant<0>
+	bounded::integer(numeric_traits::min_value<Enum>) == 0_bi
 )
 constexpr auto enum_range(Enum const last) {
 	return enum_range(static_cast<Enum>(0), last);

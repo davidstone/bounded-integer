@@ -15,6 +15,8 @@ import containers.iterator_t;
 import bounded;
 import std_module;
 
+using namespace bounded::literal;
+
 namespace containers {
 
 template<typename Container, typename Iterator>
@@ -38,7 +40,7 @@ constexpr auto mutable_iterator(Container & container, Iterator it) {
 
 } // namespace containers
 
-using container = containers::array<int, bounded::constant<1>>;
+using container = containers::array<int, 1_bi>;
 
 template<typename Range, typename Iterator>
 concept can_get_mutable_iterator_from = requires(Iterator it) {
