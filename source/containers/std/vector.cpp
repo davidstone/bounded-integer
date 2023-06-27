@@ -122,16 +122,16 @@ struct vector {
 		std::ranges::swap(*this, other);
 	}
 
-	constexpr void assign(size_type const count, T const & value) {
+	constexpr auto assign(size_type const count, T const & value) -> void {
 		containers::assign(m_impl, containers::repeat_n(count, value));
 	}
 
 	template<containers::iterator InputIterator>
-	constexpr void assign(InputIterator first, InputIterator last) {
+	constexpr auto assign(InputIterator first, InputIterator last) -> void {
 		containers::assign(m_impl, containers::range_view(std::move(first), std::move(last)));
 	}
 
-	constexpr void assign(std::initializer_list<T> init) {
+	constexpr auto assign(std::initializer_list<T> init) -> void {
 		containers::assign(m_impl, init);
 	}
 
@@ -214,7 +214,7 @@ struct vector {
 		return rend();
 	}
 
-	constexpr void reserve(size_type const requested_capacity) {
+	constexpr auto reserve(size_type const requested_capacity) -> void {
 		m_impl.reserve(bounded::check_in_range<containers::range_size_t<impl_t>, std::length_error>(bounded::integer(requested_capacity)));
 	}
 
@@ -222,7 +222,7 @@ struct vector {
 		return static_cast<size_type>(m_impl.capacity());
 	}
 
-	constexpr void shrink_to_fit() {
+	constexpr auto shrink_to_fit() -> void {
 		containers::shrink_to_fit(m_impl);
 	}
 
@@ -238,7 +238,7 @@ struct vector {
 		return containers::maximum_array_size<T>;
 	}
 
-	constexpr void clear() noexcept {
+	constexpr auto clear() noexcept -> void {
 		containers::clear(m_impl);
 	}
 
@@ -286,10 +286,10 @@ struct vector {
 		return containers::to_address(containers::erase(m_impl, impl_iterator(first), impl_iterator(last)));
 	}
 
-	constexpr void push_back(T const & value) {
+	constexpr auto push_back(T const & value) -> void {
 		containers::push_back(m_impl, value);
 	}
-	constexpr void push_back(T && value) {
+	constexpr auto push_back(T && value) -> void {
 		containers::push_back(m_impl, std::move(value));
 	}
 
@@ -297,21 +297,21 @@ struct vector {
 		return containers::emplace_back(m_impl, OPERATORS_FORWARD(args)...);
 	}
 
-	constexpr void pop_back() {
+	constexpr auto pop_back() -> void {
 		containers::pop_back(m_impl);
 	}
 
-	constexpr void resize(size_type const count) {
+	constexpr auto resize(size_type const count) -> void {
 		containers::resize(m_impl, count);
 	}
-	constexpr void resize(size_type const count, T const & value) {
+	constexpr auto resize(size_type const count, T const & value) -> void {
 		containers::resize(m_impl, count, value);
 	}
 
 	friend constexpr auto operator<=>(vector const &, vector const &) = default;
 
 	// Extensions
-	constexpr void set_size(auto const new_size) {
+	constexpr auto set_size(auto const new_size) -> void {
 		m_impl.set_size(new_size);
 	}
 
