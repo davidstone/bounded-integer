@@ -21,7 +21,7 @@ import containers.begin_end;
 import containers.bidirectional_linked_list;
 import containers.clear;
 import containers.emplace_back;
-//import containers.emplace_front;
+import containers.emplace_front;
 import containers.front_back;
 import containers.index_type;
 import containers.initializer_range;
@@ -352,11 +352,9 @@ struct list {
 		containers::push_front(m_impl, std::move(value));
 	}
 
-#if 0
 	constexpr auto emplace_front(auto && ... args) -> reference {
 		return containers::emplace_front(m_impl, OPERATORS_FORWARD(args)...);
 	}
-#endif
 	constexpr auto pop_front() -> void {
 		containers::pop_front(m_impl);
 	}

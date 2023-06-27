@@ -277,6 +277,7 @@ target_sources(containers PUBLIC
 		source/containers/dynamic_array.cpp
 		source/containers/dynamic_array_data.cpp
 		source/containers/emplace_back.cpp
+		source/containers/emplace_front.cpp
 		source/containers/empty_range.cpp
 		source/containers/erase_concepts.cpp
 		source/containers/extract_key_to_less.cpp
