@@ -15,6 +15,7 @@ import containers.algorithms.compare;
 import containers.algorithms.copy;
 import containers.algorithms.generate;
 import containers.algorithms.reverse_iterator;
+import containers.algorithms.splice;
 import containers.algorithms.uninitialized;
 import containers.begin_end;
 import containers.count_type;
@@ -31,6 +32,7 @@ import containers.repeat_n;
 import containers.reservable;
 import containers.resizable_container;
 import containers.size;
+import containers.splicable;
 import containers.stable_vector;
 import containers.vector;
 
@@ -96,17 +98,44 @@ constexpr auto iterator_points_into_container(Container const & container, itera
 	return (containers::begin(container) <= it) and (it <= containers::end(container));
 }
 
+template<typename Container, typename Range>
+constexpr auto to(Range && range) {
+	if constexpr (bounded::constructible_from<Container, Range &&>) {
+		return Container(OPERATORS_FORWARD(range));
+	} else {
+		return Container(
+			containers::begin(OPERATORS_FORWARD(range)),
+			containers::end(OPERATORS_FORWARD(range))
+		);
+	}
+}
+
 // TODO: Check if the range lies within the container
 export template<resizable_container Container, range Range> requires bounded::convertible_to<range_value_t<Container>, range_value_t<Range>>
 constexpr auto insert(Container & container, iterator_t<Container const &> position, Range && range) -> iterator_t<Container &> {
-	BOUNDED_ASSERT(::containers::iterator_points_into_container(container, position));
-	auto const range_size = ::containers::linear_size(range);
-	if (containers::size(container) + range_size <= container.capacity()) {
-		return ::containers::insert_without_reallocation(container, position, OPERATORS_FORWARD(range), ::bounded::assume_in_range<count_type<Container>>(range_size));
-	} else if constexpr (reservable<Container>) {
-		return ::containers::insert_with_reallocation(container, position, OPERATORS_FORWARD(range), range_size);
+	if constexpr (splicable<Container>) {
+		::containers::splice(container, position, ::containers::to<Container>(OPERATORS_FORWARD(range)));
+		return ::containers::mutable_iterator(container, position);
 	} else {
-		std::unreachable();
+		BOUNDED_ASSERT(::containers::iterator_points_into_container(container, position));
+		auto const range_size = ::containers::linear_size(range);
+		if (containers::size(container) + range_size <= container.capacity()) {
+			return ::containers::insert_without_reallocation(
+				container,
+				position,
+				OPERATORS_FORWARD(range),
+				::bounded::assume_in_range<count_type<Container>>(range_size)
+			);
+		} else if constexpr (reservable<Container>) {
+			return ::containers::insert_with_reallocation(
+				container,
+				position,
+				OPERATORS_FORWARD(range),
+				range_size
+			);
+		} else {
+			std::unreachable();
+		}
 	}
 }
 
