@@ -28,7 +28,6 @@ import containers.member_assign;
 import containers.range_value_t;
 import containers.range_view;
 import containers.resizable_container;
-import containers.splicable;
 import containers.supports_lazy_insert_after;
 
 import std_module;
