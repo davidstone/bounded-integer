@@ -243,7 +243,7 @@ struct vector {
 	}
 
 	constexpr auto insert(const_iterator const position, T && value) -> iterator {
-		return containers::to_address(containers::insert(m_impl, impl_iterator(position), value));
+		return containers::to_address(containers::insert(m_impl, impl_iterator(position), std::move(value)));
 	}
 	constexpr auto insert(const_iterator const position, T const & value) -> iterator {
 		if (object_is_in_storage(value)) {
