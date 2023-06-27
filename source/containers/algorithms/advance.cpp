@@ -32,8 +32,8 @@ export constexpr auto advance(iterator auto & it, auto const offset) {
 	}
 }
 export constexpr auto advance(bidirectional_iterator auto & it, auto const offset) {
-	using std::abs;
-	for (auto n = advance_counter<decltype(it), decltype(offset)>(0_bi); n != abs(offset); ++n) {
+	auto const positive_offset = bounded::abs(bounded::integer(offset));
+	for (auto n = advance_counter<decltype(it), decltype(offset)>(0_bi); n != positive_offset; ++n) {
 		if (offset >= 0_bi) {
 			++it;
 		} else {
