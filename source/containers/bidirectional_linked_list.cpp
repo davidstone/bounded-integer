@@ -159,12 +159,6 @@ struct bidirectional_linked_list : private lexicographical_comparison::base {
 		unlink_range(first_links, last_links);
 		link_range(before_position_links, first_links, before_last_links, position_links);
 	}
-	constexpr auto splice(const_iterator const position, bidirectional_linked_list & other) & -> void {
-		splice(position, other, other.begin(), other.end());
-	}
-	constexpr auto splice(const_iterator const position, bidirectional_linked_list && other) & -> void {
-		splice(position, other, other.begin(), other.end());
-	}
 
 private:
 	using node_t = linked_list_node<bidirectional_links, T>;
