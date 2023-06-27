@@ -12,6 +12,7 @@ export module containers.algorithms.erase;
 import containers.algorithms.advance;
 import containers.algorithms.destroy_range;
 import containers.algorithms.find;
+import containers.algorithms.splice;
 import containers.algorithms.uninitialized;
 import containers.begin_end;
 import containers.can_set_size;
@@ -37,7 +38,7 @@ constexpr auto erase(Container & container, iterator_t<Container const &> const 
 		return container.erase(first, middle_);
 	} else if constexpr (splicable<Container>) {
 		auto temp = Container();
-		temp.splice(containers::begin(temp), container, first, middle_);
+		::containers::splice(temp, containers::begin(temp), container, first, middle_);
 		return mutable_iterator(container, middle_);
 	} else {
 		auto const middle = ::containers::mutable_iterator(container, middle_);

@@ -11,6 +11,7 @@ module;
 
 export module containers.lazy_push_front;
 
+import containers.algorithms.splice;
 import containers.begin_end;
 import containers.bidirectional_linked_list;
 import containers.forward_linked_list;
@@ -41,8 +42,8 @@ constexpr auto lazy_push_front(
 		return *container.lazy_insert_after(container.before_begin(), OPERATORS_FORWARD(constructor));
 	} else {
 		auto temp = Container();
-		containers::lazy_push_back(temp, OPERATORS_FORWARD(constructor));
-		container.splice(containers::begin(container), temp);
+		::containers::lazy_push_back(temp, OPERATORS_FORWARD(constructor));
+		::containers::splice(container, containers::begin(container), temp);
 		return containers::front(container);
 	}
 }

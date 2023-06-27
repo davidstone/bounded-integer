@@ -11,8 +11,14 @@ namespace containers {
 
 // splice is required to be constant time
 export template<typename Container>
-concept splicable = requires(Container target, iterator_t<Container const &> position, Container source) {
-	target.splice(position, source);
+concept splicable = requires(
+	Container target,
+	iterator_t<Container const &> position,
+	Container source,
+	iterator_t<Container const &> first,
+	iterator_t<Container const &> last
+) {
+	target.splice(position, source, first, last);
 };
 
 } // namespace containers
