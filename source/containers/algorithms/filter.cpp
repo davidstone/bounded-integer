@@ -94,11 +94,6 @@ constexpr auto filter_iterator_impl(iterator auto first, is_filter_iterator_trai
 	);
 }
 
-template<iterator ForwardIterator>
-constexpr auto filter_iterator(ForwardIterator first, sentinel_for<ForwardIterator> auto last, auto predicate) {
-	return ::containers::filter_iterator_impl(first, filter_iterator_traits(last, std::move(predicate)));
-}
-
 export template<typename Range, typename UnaryPredicate>
 struct filter {
 	constexpr filter(Range && range, UnaryPredicate predicate):
