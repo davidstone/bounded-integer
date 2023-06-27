@@ -243,6 +243,7 @@ target_sources(containers PUBLIC
 		source/containers/algorithms/transform_iterator.cpp
 		source/containers/algorithms/uninitialized.cpp
 		source/containers/algorithms/unique.cpp
+		source/containers/std/list.cpp
 		source/containers/std/std_allocator.cpp
 		source/containers/std/vector.cpp
 		source/containers/adapt.cpp
