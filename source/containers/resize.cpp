@@ -31,23 +31,23 @@ import std_module;
 namespace containers {
 
 template<typename Container>
-constexpr auto resize_impl(Container & container_to_resize, auto const new_size, auto const generator) {
-	auto const container_size = bounded::integer(containers::size(container_to_resize));
+constexpr auto resize_impl(Container & container, auto const new_size, auto const generator) {
+	auto const container_size = bounded::integer(containers::size(container));
 	if (new_size <= container_size) {
-		containers::erase_to_end(container_to_resize, containers::begin(container_to_resize) + ::bounded::assume_in_range<containers::count_type<Container>>(new_size));
+		containers::erase_to_end(container, containers::begin(container) + ::bounded::assume_in_range<containers::count_type<Container>>(new_size));
 	} else {
 		auto const remaining = bounded::increase_min<0>(new_size - container_size, bounded::unchecked);
-		::containers::append(container_to_resize, containers::generate_n(remaining, generator));
+		::containers::append(container, containers::generate_n(remaining, generator));
 	}
 }
 
 export template<resizable_container Container>
-constexpr auto resize(Container & container_to_resize, auto const new_size) {
-	::containers::resize_impl(container_to_resize, bounded::integer(new_size), bounded::construct<range_value_t<Container>>);
+constexpr auto resize(Container & container, auto const new_size) {
+	::containers::resize_impl(container, bounded::integer(new_size), bounded::construct<range_value_t<Container>>);
 }
 export template<resizable_container Container>
-constexpr auto resize(Container & container_to_resize, auto const new_size, range_value_t<Container> const & value) {
-	::containers::resize_impl(container_to_resize, bounded::integer(new_size), bounded::value_to_function(value));
+constexpr auto resize(Container & container, auto const new_size, range_value_t<Container> const & value) {
+	::containers::resize_impl(container, bounded::integer(new_size), bounded::value_to_function(value));
 }
 
 } // namespace containers
