@@ -115,9 +115,11 @@ struct vector {
 		return *this;
 	}
 
-	friend constexpr void swap(vector & lhs, vector & rhs) noexcept {
-		using std::swap;
-		swap(lhs.m_impl, rhs.m_impl);
+	friend constexpr auto swap(vector & lhs, vector & rhs) noexcept -> void {
+		std::ranges::swap(lhs.m_impl, rhs.m_impl);
+	}
+	constexpr auto swap(vector & other) noexcept -> void {
+		std::ranges::swap(*this, other);
 	}
 
 	constexpr void assign(size_type const count, T const & value) {
