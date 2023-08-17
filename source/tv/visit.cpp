@@ -113,21 +113,16 @@ constexpr auto is_variants_then_visit_function<
 template<std::size_t... indexes>
 constexpr decltype(auto) visit_implementation(
 	auto && function,
-	auto const use_index,
 	std::index_sequence<indexes...>,
 	bounded::constant_t<0>,
 	auto && ... variants
 ) requires(sizeof...(indexes) == sizeof...(variants)) {
-	if constexpr (use_index) {
-		return OPERATORS_FORWARD(function)(
-			visitor_parameter<
-				decltype(OPERATORS_FORWARD(variants)[bounded::constant<indexes>]),
-				indexes
-			>(OPERATORS_FORWARD(variants)[bounded::constant<indexes>])...
-		);
-	} else {
-		return OPERATORS_FORWARD(function)(OPERATORS_FORWARD(variants)[bounded::constant<indexes>]...);
-	}
+	return OPERATORS_FORWARD(function)(
+		visitor_parameter<
+			decltype(OPERATORS_FORWARD(variants)[bounded::constant<indexes>]),
+			indexes
+		>(OPERATORS_FORWARD(variants)[bounded::constant<indexes>])...
+	);
 }
 
 // This function accepts the pack of all variants twice. It passes over them
@@ -135,7 +130,6 @@ constexpr decltype(auto) visit_implementation(
 template<std::size_t... indexes>
 constexpr decltype(auto) visit_implementation(
 	auto && function,
-	auto const use_index,
 	std::index_sequence<indexes...> initial_indexes,
 	auto offset,
 	auto const & variant,
@@ -152,7 +146,6 @@ constexpr decltype(auto) visit_implementation(
 			} else { \
 				return ::tv::visit_implementation( \
 					OPERATORS_FORWARD(function), \
-					use_index, \
 					std::index_sequence<indexes..., static_cast<std::size_t>(offset + (index))>{}, \
 					0_bi, \
 					OPERATORS_FORWARD(variants)... \
@@ -185,7 +178,6 @@ constexpr decltype(auto) visit_implementation(
 			} else {
 				return ::tv::visit_implementation(
 					OPERATORS_FORWARD(function),
-					use_index,
 					initial_indexes,
 					offset + max_index,
 					variant,
@@ -210,13 +202,12 @@ concept any_with_value = true;
 template<std::size_t... indexes>
 constexpr auto rotate_transform_impl(std::index_sequence<indexes...>) {
 	return [](
-		auto const use_index,
+		auto const transform,
 		any_with_value<indexes> auto && ... variants,
 		auto && function
 	) -> decltype(auto) {
 		return ::tv::visit_implementation(
-			OPERATORS_FORWARD(function),
-			use_index,
+			transform(OPERATORS_FORWARD(function)),
 			std::index_sequence<>{},
 			0_bi,
 			variants...,
@@ -225,16 +216,30 @@ constexpr auto rotate_transform_impl(std::index_sequence<indexes...>) {
 	};
 }
 
-constexpr auto rotate_transform(auto const use_index, auto && ... args) -> decltype(auto) {
+constexpr auto rotate_transform(auto const transform, auto && ... args) -> decltype(auto) {
 	auto impl = ::tv::rotate_transform_impl(std::make_index_sequence<sizeof...(args) - 1>());
-	return impl(use_index, OPERATORS_FORWARD(args)...);
+	return impl(transform, OPERATORS_FORWARD(args)...);
 }
+
+struct identity {
+	static constexpr auto operator()(auto && function) -> auto && {
+		return function;
+	}
+};
 
 // Accepts any number of variants (including 0) followed by one function
 export constexpr auto visit_with_index = []<typename... Args>(Args && ... args) -> decltype(auto)
 	 requires is_variants_then_visit_function<sizeof...(Args) - 1U, indexed_variant_types, Args...>
 {
-	return ::tv::rotate_transform(std::true_type(), OPERATORS_FORWARD(args)...);
+	return ::tv::rotate_transform(identity(), OPERATORS_FORWARD(args)...);
+};
+
+struct remove_index {
+	static constexpr auto operator()(auto && function) {
+		return [&](auto && ... args) -> decltype(auto) {
+			return OPERATORS_FORWARD(function)(OPERATORS_FORWARD(args).value()...);
+		};
+	}
 };
 
 // Accepts any number of variants (including 0) followed by one function with
@@ -242,7 +247,7 @@ export constexpr auto visit_with_index = []<typename... Args>(Args && ... args) 
 export constexpr auto visit = []<typename... Args>(Args && ... args) -> decltype(auto)
 	requires is_variants_then_visit_function<sizeof...(Args) - 1U, variant_types, Args...>
 {
-	return ::tv::rotate_transform(std::false_type(), OPERATORS_FORWARD(args)...);
+	return ::tv::rotate_transform(remove_index(), OPERATORS_FORWARD(args)...);
 };
 
 } // namespace tv
