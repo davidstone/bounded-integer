@@ -3,7 +3,7 @@
 # (See accompanying file LICENSE_1_0.txt or copy at
 # http://www.boost.org/LICENSE_1_0.txt)
 
-cmake_minimum_required(VERSION 3.26 FATAL_ERROR)
+cmake_minimum_required(VERSION 3.27 FATAL_ERROR)
 
 project(bounded_integer LANGUAGES CXX)
 
@@ -15,13 +15,11 @@ enable_testing()
 
 get_directory_property(has_parent PARENT_DIRECTORY)
 if (NOT has_parent)
-	set(CMAKE_CXX_STANDARD 23)
+	set(CMAKE_CXX_STANDARD 26)
 	set(CMAKE_CXX_STANDARD_REQUIRED On)
 	set(CMAKE_CXX_EXTENSIONS Off)
 
-	set(CMAKE_EXPERIMENTAL_CXX_MODULE_CMAKE_API "2182bf5c-ef0d-489a-91da-49dbc3090d2a")
-	set(CMake_TEST_CXXModules_UUID "a246741c-d067-4019-a8fb-3d16b0c9d1d3")
-	set(CMAKE_EXPERIMENTAL_CXX_MODULE_DYNDEP 1)
+	set(CMAKE_EXPERIMENTAL_CXX_MODULE_CMAKE_API "ac01f462-0f5f-432a-86aa-acef252918a6")
 
 	add_subdirectory(dependencies/cmake_strict_defaults)
 	add_subdirectory(dependencies/numeric-traits)
