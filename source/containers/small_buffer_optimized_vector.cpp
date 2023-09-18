@@ -233,11 +233,11 @@ public:
 
 	constexpr auto begin() const {
 		auto const result = is_small() ? m_state.small.data() : m_state.large.data();
-		return contiguous_iterator<T const, bounded::builtin_max_value<size_type>>(result);
+		return contiguous_iterator<T const, numeric_traits::max_value<size_type>>(result);
 	}
 	constexpr auto begin() {
 		auto const result = is_small() ? m_state.small.data() : m_state.large.data();
-		return contiguous_iterator<T, bounded::builtin_max_value<size_type>>(result);
+		return contiguous_iterator<T, numeric_traits::max_value<size_type>>(result);
 	}
 	
 	constexpr auto size() const {

@@ -22,6 +22,8 @@ import std_module;
 
 export import containers.common_iterator_functions;
 
+using namespace bounded::literal;
+
 namespace containers {
 
 template<typename T>
@@ -147,7 +149,7 @@ struct traits :
 };
 
 template<typename T>
-using iterator = containers::adapt_iterator<containers::contiguous_iterator<T, 2>, traits>;
+using iterator = containers::adapt_iterator<containers::contiguous_iterator<T, 2_bi>, traits>;
 
 using const_iterator = iterator<int const>;
 using mutable_iterator = iterator<int>;

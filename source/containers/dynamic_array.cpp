@@ -30,6 +30,7 @@ import containers.size;
 import containers.uninitialized_dynamic_array;
 
 import bounded;
+import numeric_traits;
 import std_module;
 
 namespace containers {
@@ -83,10 +84,10 @@ struct [[clang::trivial_abi]] dynamic_array : private lexicographical_comparison
 	}
 	
 	constexpr auto begin() const {
-		return contiguous_iterator<T const, bounded::builtin_max_value<size_type>>(m_data.data());
+		return contiguous_iterator<T const, numeric_traits::max_value<size_type>>(m_data.data());
 	}
 	constexpr auto begin() {
-		return contiguous_iterator<T, bounded::builtin_max_value<size_type>>(m_data.data());
+		return contiguous_iterator<T, numeric_traits::max_value<size_type>>(m_data.data());
 	}
 
 	constexpr auto size() const {

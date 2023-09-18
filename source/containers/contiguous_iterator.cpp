@@ -10,6 +10,7 @@ module;
 export module containers.contiguous_iterator;
 
 import containers.is_iterator;
+import containers.maximum_array_size;
 import containers.offset_type;
 export import containers.common_iterator_functions;
 
@@ -24,7 +25,7 @@ namespace containers {
 template<typename T>
 using opposite_const = std::conditional_t<std::is_const_v<T>, std::remove_const_t<T>, T const>;
 
-export template<typename T, std::ptrdiff_t max_difference>
+export template<typename T, array_size_type<T> max_difference>
 struct contiguous_iterator {
 	using difference_type = bounded::integer<bounded::normalize<-max_difference>, bounded::normalize<max_difference>>;
 
@@ -76,11 +77,11 @@ private:
 
 } // namespace containers
 
-static_assert(containers::random_access_iterator<containers::contiguous_iterator<int, 5>>);
-static_assert(std::same_as<containers::offset_type<containers::contiguous_iterator<int, 5>>, bounded::integer<0, 5>>);
+static_assert(containers::random_access_iterator<containers::contiguous_iterator<int, 5_bi>>);
+static_assert(std::same_as<containers::offset_type<containers::contiguous_iterator<int, 5_bi>>, bounded::integer<0, 5>>);
 
-using const_iterator = containers::contiguous_iterator<int const, 0>;
-using iterator = containers::contiguous_iterator<int, 0>;
+using const_iterator = containers::contiguous_iterator<int const, 0_bi>;
+using iterator = containers::contiguous_iterator<int, 0_bi>;
 
 static_assert(const_iterator() == const_iterator());
 static_assert(const_iterator() == iterator());

@@ -24,6 +24,8 @@ import containers.size;
 import bounded;
 import std_module;
 
+using namespace bounded::literal;
+
 namespace containers {
 
 struct compute_end_from_size {
@@ -182,7 +184,7 @@ constexpr auto a = containers::array({0, 1, 2, 3, 4});
 static_assert(std::same_as<
 	decltype(containers::range_view(a)),
 	containers::range_view<
-		containers::contiguous_iterator<int const, 5>,
+		containers::contiguous_iterator<int const, 5_bi>,
 		containers::compute_end_from_size,
 		bounded::constant_t<5>
 	>

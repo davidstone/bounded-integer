@@ -92,11 +92,11 @@ struct [[clang::trivial_abi]] static_vector : private lexicographical_comparison
 	}
 
 	constexpr auto begin() const {
-		using const_iterator = contiguous_iterator<T const, static_cast<std::ptrdiff_t>(capacity_)>;
+		using const_iterator = contiguous_iterator<T const, bounded::constant<capacity_>>;
 		return const_iterator(m_storage.data());
 	}
 	constexpr auto begin() {
-		using iterator = contiguous_iterator<T, static_cast<std::ptrdiff_t>(capacity_)>;
+		using iterator = contiguous_iterator<T, bounded::constant<capacity_>>;
 		return iterator(m_storage.data());
 	}
 

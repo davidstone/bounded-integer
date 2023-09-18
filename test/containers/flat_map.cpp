@@ -136,8 +136,10 @@ constexpr auto test_upsert() -> bool {
 }
 static_assert(test_upsert<non_copyable_map>());
 
+struct empty {};
+
 template<typename Key>
-constexpr auto max_map_size = numeric_traits::max_value<containers::range_size_t<containers::flat_map<Key, int>>>;
+constexpr auto max_map_size = numeric_traits::max_value<containers::range_size_t<containers::flat_map<Key, empty>>>;
 
 using namespace bounded::literal;
 static_assert(max_map_size<bounded::integer<0, 2>> == 3_bi);

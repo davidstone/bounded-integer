@@ -388,14 +388,17 @@ basic_flat_multimap(assume_sorted_unique_t, Range &&) -> basic_flat_multimap<std
 template<typename Range, typename ExtractKey>
 basic_flat_multimap(assume_sorted_unique_t, Range &&, ExtractKey) -> basic_flat_multimap<std::remove_const_t<Range>, ExtractKey>;
 
-template<typename Key>
-constexpr auto maximum_map_size = maximum_array_size<Key>;
+template<typename Key, typename Mapped>
+constexpr auto maximum_map_size = maximum_array_size<map_value_type<Key, Mapped>>;
 
-template<bounded::isomorphic_to_integral Key>
-constexpr auto maximum_map_size<Key> = static_cast<std::size_t>(bounded::number_of<Key>);
+template<bounded::isomorphic_to_integral Key, typename Mapped>
+constexpr auto maximum_map_size<Key, Mapped> = bounded::min(
+	static_cast<std::size_t>(bounded::number_of<Key>),
+	maximum_array_size<map_value_type<Key, Mapped>>
+);
 
 export template<typename Key, typename Mapped, typename... MaybeExtractKey>
-using flat_map = basic_flat_map<vector<map_value_type<Key, Mapped>, maximum_map_size<Key>>, MaybeExtractKey...>;
+using flat_map = basic_flat_map<vector<map_value_type<Key, Mapped>, maximum_map_size<Key, Mapped>>, MaybeExtractKey...>;
 
 export template<typename Key, typename Mapped, array_size_type<map_value_type<Key, Mapped>> capacity, typename... MaybeExtractKey>
 using static_flat_map = basic_flat_map<static_vector<map_value_type<Key, Mapped>, capacity>, MaybeExtractKey...>;

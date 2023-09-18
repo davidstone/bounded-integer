@@ -39,17 +39,17 @@ export constexpr auto begin(should_use_before_begin auto && range) {
 
 export template<typename T, std::size_t size>
 constexpr auto begin(c_array<T, size> const & a) {
-	return contiguous_iterator<T const, size>(a);
+	return contiguous_iterator<T const, bounded::constant<size>>(a);
 }
 
 export template<typename T, std::size_t size>
 constexpr auto begin(c_array<T, size> & a) {
-	return contiguous_iterator<T, size>(a);
+	return contiguous_iterator<T, bounded::constant<size>>(a);
 }
 
 export template<typename T, std::size_t size>
 constexpr auto begin(c_array<T, size> && a) {
-	return contiguous_iterator<T, size>(a);
+	return contiguous_iterator<T, bounded::constant<size>>(a);
 }
 
 template<typename Range>
@@ -74,17 +74,17 @@ constexpr auto end(Range && range) {
 
 export template<typename T, std::size_t size>
 constexpr auto end(c_array<T, size> const & a) {
-	return contiguous_iterator<T const, size>(a + size);
+	return contiguous_iterator<T const, bounded::constant<size>>(a + size);
 }
 
 export template<typename T, std::size_t size>
 constexpr auto end(c_array<T, size> & a) {
-	return contiguous_iterator<T, size>(a + size);
+	return contiguous_iterator<T, bounded::constant<size>>(a + size);
 }
 
 export template<typename T, std::size_t size>
 constexpr auto end(c_array<T, size> && a) {
-	return contiguous_iterator<T, size>(a + size);
+	return contiguous_iterator<T, bounded::constant<size>>(a + size);
 }
 
 } // namespace containers

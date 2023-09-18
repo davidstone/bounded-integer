@@ -61,8 +61,11 @@ export template<typename T, array_size_type<T> size_, array_size_type<T>... size
 struct array {
 	using value_type = typename array_value_type<T, sizes...>::type;
 
+	static constexpr auto size() {
+		return bounded::constant<size_>;
+	}
 	constexpr auto begin() const {
-		using const_iterator = contiguous_iterator<value_type const, static_cast<std::ptrdiff_t>(size_)>;
+		using const_iterator = contiguous_iterator<value_type const, bounded::check_in_range<array_size_type<value_type>>(size_)>;
 		if constexpr (size() != 0) {
 			return const_iterator(m_value);
 		} else {
@@ -70,15 +73,12 @@ struct array {
 		}
 	}
 	constexpr auto begin() {
-		using iterator = contiguous_iterator<value_type, static_cast<std::ptrdiff_t>(size_)>;
+		using iterator = contiguous_iterator<value_type, bounded::check_in_range<array_size_type<value_type>>(size_)>;
 		if constexpr (size() != 0) {
 			return iterator(m_value);
 		} else {
 			return iterator();
 		}
-	}
-	static constexpr auto size() {
-		return bounded::constant<size_>;
 	}
 
 	OPERATORS_BRACKET_SEQUENCE_RANGE_DEFINITIONS

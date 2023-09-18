@@ -25,6 +25,8 @@ import bounded;
 import operators;
 import std_module;
 
+using namespace bounded::literal;
+
 namespace containers {
 
 template<typename Iterator>
@@ -120,6 +122,6 @@ template<typename T>
 concept incrementable = requires(T value) { ++value; };
 
 static_assert(incrementable<containers::legacy_iterator<int *>>);
-static_assert(incrementable<containers::legacy_iterator<containers::contiguous_iterator<int, 1>>>);
-static_assert(incrementable<containers::contiguous_iterator<int, 0>>);
-static_assert(incrementable<containers::legacy_iterator<containers::contiguous_iterator<int, 0>>>);
+static_assert(incrementable<containers::legacy_iterator<containers::contiguous_iterator<int, 1_bi>>>);
+static_assert(incrementable<containers::contiguous_iterator<int, 0_bi>>);
+static_assert(incrementable<containers::legacy_iterator<containers::contiguous_iterator<int, 0_bi>>>);
