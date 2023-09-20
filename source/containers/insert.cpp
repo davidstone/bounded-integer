@@ -188,7 +188,7 @@ constexpr bool test_range_insert() {
 	return true;
 }
 
-static_assert(test_range_insert<containers::stable_vector<bounded_test::integer, 10>>());
+static_assert(test_range_insert<containers::stable_vector<bounded_test::integer, 10_bi>>());
 static_assert(test_range_insert<containers::vector<bounded_test::integer>>());
 
 template<typename Container>
@@ -200,7 +200,7 @@ constexpr bool test_value_insert() {
 	return true;
 }
 
-static_assert(test_value_insert<containers::stable_vector<bounded_test::integer, 10>>());
+static_assert(test_value_insert<containers::stable_vector<bounded_test::integer, 10_bi>>());
 static_assert(test_value_insert<containers::vector<bounded_test::integer>>());
 
 static_assert(!std::is_trivially_copyable_v<bounded_test::non_copyable_integer>);

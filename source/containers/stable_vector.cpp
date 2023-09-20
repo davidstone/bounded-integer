@@ -23,6 +23,7 @@ import containers.compare_container;
 import containers.contiguous_iterator;
 import containers.data;
 import containers.initializer_range;
+import containers.maximum_array_size;
 import containers.uninitialized_dynamic_array;
 
 import bounded;
@@ -33,7 +34,9 @@ using namespace bounded::literal;
 namespace containers {
 
 // See https://probablydance.com/2013/05/13/4gb-per-vector/
-export template<typename T, std::size_t capacity_>
+// `capacity_` cannot be `array_size_type<T>` because that would not support
+// incomplete types.
+export template<typename T, array_size_type<std::byte> capacity_>
 struct [[clang::trivial_abi]] stable_vector : private lexicographical_comparison::base {
 	// Allocates the full capacity
 	constexpr stable_vector() = default;
