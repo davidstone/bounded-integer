@@ -47,6 +47,7 @@ import containers.vector;
 export import containers.common_iterator_functions;
 
 import bounded;
+import numeric_traits;
 import std_module;
 
 namespace containers {
@@ -389,12 +390,12 @@ template<typename Range, typename ExtractKey>
 basic_flat_multimap(assume_sorted_unique_t, Range &&, ExtractKey) -> basic_flat_multimap<std::remove_const_t<Range>, ExtractKey>;
 
 template<typename Key, typename Mapped>
-constexpr auto maximum_map_size = maximum_array_size<map_value_type<Key, Mapped>>;
+constexpr auto maximum_map_size = numeric_traits::max_value<array_size_type<map_value_type<Key, Mapped>>>;
 
 template<bounded::isomorphic_to_integral Key, typename Mapped>
 constexpr auto maximum_map_size<Key, Mapped> = bounded::min(
-	static_cast<std::size_t>(bounded::number_of<Key>),
-	maximum_array_size<map_value_type<Key, Mapped>>
+	bounded::number_of<Key>,
+	numeric_traits::max_value<array_size_type<map_value_type<Key, Mapped>>>
 );
 
 export template<typename Key, typename Mapped, typename... MaybeExtractKey>

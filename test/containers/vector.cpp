@@ -15,6 +15,8 @@ import bounded;
 import bounded.test_int;
 import std_module;
 
+using namespace bounded::literal;
+
 static_assert(containers_test::test_sequence_container<containers::vector<int>>());
 static_assert(containers_test::test_sequence_container<containers::vector<bounded_test::integer>>());
 
@@ -28,5 +30,5 @@ static_assert(bounded::convertible_to<containers::vector<bounded_test::integer> 
 static_assert(bounded::convertible_to<containers::vector<bounded_test::integer> &, std::span<bounded_test::integer>>);
 
 struct recursive {
-	containers::vector<recursive, 1> m;
+	containers::vector<recursive, 1_bi> m;
 };

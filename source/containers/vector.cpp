@@ -28,16 +28,18 @@ import containers.range_value_t;
 import containers.uninitialized_dynamic_array;
 
 import bounded;
+import numeric_traits;
 import std_module;
 
 using namespace bounded::literal;
 
 namespace containers {
 
-// TODO: max_size should be an array_size_type<T> instead of a size_t
-export template<typename T, std::size_t max_size = containers::maximum_array_size<T>>
+// `max_size` cannot be `array_size_type<T>` because that would not support
+// incomplete types.
+export template<typename T, array_size_type<std::byte> max_size = numeric_traits::max_value<array_size_type<T>>>
 struct [[clang::trivial_abi]] vector : private lexicographical_comparison::base {
-	template<typename U, std::size_t other_max_size>
+	template<typename U, array_size_type<std::byte> other_max_size>
 	friend struct vector;
 
 	using size_type = bounded::integer<0, bounded::normalize<max_size>>;
@@ -56,7 +58,7 @@ struct [[clang::trivial_abi]] vector : private lexicographical_comparison::base 
 	constexpr vector(Source) {
 	}
 
-	template<std::size_t other_max_size>
+	template<array_size_type<std::byte> other_max_size>
 	constexpr explicit vector(vector<T, other_max_size> && other) noexcept:
 		m_storage(std::move(other.m_storage)),
 		m_size(bounded::assume_in_range<size_type>(std::exchange(other.m_size, 0_bi)))
