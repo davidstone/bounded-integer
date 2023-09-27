@@ -105,6 +105,7 @@ target_sources(bounded PUBLIC
 		source/bounded/log.cpp
 		source/bounded/make_index_sequence.cpp
 		source/bounded/minmax.cpp
+		source/bounded/non_const.cpp
 		source/bounded/normalize.cpp
 		source/bounded/number_of.cpp
 		source/bounded/numeric_limits.cpp

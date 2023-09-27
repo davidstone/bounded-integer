@@ -12,6 +12,7 @@ export module bounded.construct_destroy;
 import bounded.concepts;
 import bounded.declval;
 import bounded.lazy_init;
+import bounded.non_const;
 
 import std_module;
 
@@ -39,9 +40,6 @@ struct superconstructing_super_elider {
 private:
 	Function m_function;
 };
-
-export template<typename T>
-concept non_const = !std::is_const_v<T>;
 
 // TODO: Use lambda https://github.com/llvm/llvm-project/issues/59513
 template<typename T>

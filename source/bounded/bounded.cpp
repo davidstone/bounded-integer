@@ -31,6 +31,7 @@ export import bounded.literal;
 export import bounded.log;
 export import bounded.make_index_sequence;
 export import bounded.minmax;
+export import bounded.non_const;
 export import bounded.normalize;
 export import bounded.number_of;
 export import bounded.pow;
