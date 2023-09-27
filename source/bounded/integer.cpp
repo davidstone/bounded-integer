@@ -360,3 +360,12 @@ constexpr auto numeric_traits::max_value<T> = enum_bounded_enum();
 static_assert(!bounded::convertible_to<enum_bounded_enum, bounded::integer<0, 0>>);
 static_assert(bounded::integer(enum_bounded_enum{}) == bounded::constant<0>);
 static_assert(bounded::constant<enum_bounded_enum{}> == bounded::constant<0>);
+
+auto check_compile_time_comparison_of_runtime_constant() -> void {
+	auto one = bounded::constant<1>;
+	auto two = bounded::constant<2>;
+	static_assert(one == one);
+	static_assert(one <=> one == 0);
+	static_assert(one != two);
+	static_assert(one <=> two < 0);
+}

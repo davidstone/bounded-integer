@@ -56,8 +56,6 @@ constexpr auto operator<=>(LHS const lhs, RHS const rhs) -> std::strong_ordering
 		return std::strong_ordering::greater;
 	} else if constexpr (detail::safe_compare(lhs_max, rhs_min) < 0) {
 		return std::strong_ordering::less;
-	} else if constexpr (detail::safe_equal(lhs_min, rhs_max) and detail::safe_equal(rhs_min, lhs_max)) {
-		return std::strong_ordering::equal;
 	} else {
 		return detail::safe_compare(lhs.value(), rhs.value());
 	}
@@ -71,8 +69,6 @@ constexpr auto operator==(LHS const lhs, RHS const rhs) -> bool {
 	constexpr auto rhs_max = builtin_max_value<RHS>;
 	if constexpr (detail::safe_compare(lhs_min, rhs_max) > 0 or detail::safe_compare(lhs_max, rhs_min) < 0) {
 		return false;
-	} else if constexpr (detail::safe_equal(lhs_min, rhs_max) and detail::safe_equal(rhs_min, lhs_max)) {
-		return true;
 	} else {
 		return detail::safe_equal(lhs.value(), rhs.value());
 	}
