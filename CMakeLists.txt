@@ -90,10 +90,12 @@ target_sources(bounded PUBLIC
 		source/bounded/comparison_builtin.cpp
 		source/bounded/comparison_function_object.cpp
 		source/bounded/concepts.cpp
-		source/bounded/construct_destroy.cpp
+		source/bounded/construct.cpp
+		source/bounded/construct_at.cpp
 		source/bounded/copy.cpp
 		source/bounded/copy_cv_ref.cpp
 		source/bounded/declval.cpp
+		source/bounded/destroy.cpp
 		source/bounded/function_ptr.cpp
 		source/bounded/hash.cpp
 		source/bounded/homogeneous_equals.cpp

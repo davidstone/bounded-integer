@@ -5,7 +5,8 @@
 
 export module bounded.relocate;
 
-import bounded.construct_destroy;
+import bounded.construct_at;
+import bounded.destroy;
 import bounded.non_const;
 
 import std_module;

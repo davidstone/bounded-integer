@@ -7,9 +7,8 @@ module;
 
 #include <operators/forward.hpp>
 
-export module bounded.construct_destroy;
+export module bounded.construct_at;
 
-import bounded.concepts;
 import bounded.declval;
 import bounded.lazy_init;
 import bounded.non_const;
@@ -41,17 +40,6 @@ private:
 	Function m_function;
 };
 
-// TODO: Use lambda https://github.com/llvm/llvm-project/issues/59513
-template<typename T>
-struct construct_t {
-	template<typename... Args> requires constructible_from<T, Args &&...>
-	static constexpr auto operator()(Args && ... args) noexcept(std::is_nothrow_constructible_v<T, Args &&...>) -> T {
-		return T(OPERATORS_FORWARD(args)...);
-	}
-};
-export template<typename T>
-constexpr auto construct = construct_t<T>();
-
 template<typename T>
 constexpr auto is_no_lazy_construction = false;
 
@@ -73,10 +61,6 @@ export constexpr auto construct_at = []<non_const T, construct_function_for<T> F
 		}
 	};
 	return *std::construct_at(std::addressof(ref), make());
-};
-
-export constexpr auto destroy = []<non_const T>(T & ref) noexcept(std::is_nothrow_destructible_v<T>) -> void {
-	std::destroy_at(std::addressof(ref));
 };
 
 } // namespace bounded
