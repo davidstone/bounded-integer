@@ -3,7 +3,7 @@
 // (See accompanying file LICENSE_1_0.txt or copy at
 // http://www.boost.org/LICENSE_1_0.txt)
 
-export module bounded.assert_assume_helpers;
+export module bounded.constexpr_only_if;
 
 import bounded.concepts;
 
@@ -17,7 +17,5 @@ export constexpr auto constexpr_only_if(explicitly_convertible_to<bool> auto con
 		non_constexpr();
 	}
 }
-
-export auto prevent_comma(auto &&) -> void;
 
 } // namespace bounded::detail

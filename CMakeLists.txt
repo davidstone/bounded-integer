@@ -79,7 +79,6 @@ target_sources(bounded PUBLIC
 		source/bounded/arithmetic/unary_plus.cpp
 		source/bounded/abs.cpp
 		source/bounded/add_common_cv_reference.cpp
-		source/bounded/assert_assume_helpers.cpp
 		source/bounded/bounded.cpp
 		source/bounded/builtin_min_max_value.cpp
 		source/bounded/cast.cpp
@@ -90,6 +89,7 @@ target_sources(bounded PUBLIC
 		source/bounded/comparison_builtin.cpp
 		source/bounded/comparison_function_object.cpp
 		source/bounded/concepts.cpp
+		source/bounded/constexpr_only_if.cpp
 		source/bounded/construct.cpp
 		source/bounded/construct_at.cpp
 		source/bounded/copy.cpp
@@ -113,6 +113,7 @@ target_sources(bounded PUBLIC
 		source/bounded/numeric_limits.cpp
 		source/bounded/overlapping_range.cpp
 		source/bounded/pow.cpp
+		source/bounded/prevent_comma.cpp
 		source/bounded/relocate.cpp
 		source/bounded/representation_digits.cpp
 		source/bounded/safe_extreme.cpp

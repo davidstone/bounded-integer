@@ -12,7 +12,16 @@
 
 #include <cassert>
 
-import bounded.assert_assume_helpers;
+import bounded.constexpr_only_if;
+import bounded.prevent_comma;
+
+// An expression of type `void`. This is used to allow using variadic
+// function-like macros to support expressions that contain commas, such as
+// `BOUNDED_ASSERT(f<a, b>())`, but prevents expressions that look like two
+// arguments from being treated as a comma operator, such as
+// `BOUNDED_ASSERT(false, "Error message")`.
+#define BOUNDED_DETAIL_PREVENT_COMMA(...) \
+	decltype(::bounded::detail::prevent_comma(__VA_ARGS__))()
 
 #if defined NDEBUG or defined BOUNDED_NDEBUG
 	#define BOUNDED_ASSERT(...) (std::is_constant_evaluated() ? ::bounded::detail::constexpr_only_if(__VA_ARGS__) : void())

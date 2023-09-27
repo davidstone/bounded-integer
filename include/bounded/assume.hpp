@@ -6,17 +6,9 @@
 #ifndef BOUNDED_ASSUME_HPP
 #define BOUNDED_ASSUME_HPP
 
-import bounded.assert_assume_helpers;
+import bounded.constexpr_only_if;
 
 import std_module;
-
-// An expression of type `void`. This is used to allow using variadic
-// function-like macros to support expressions that contain commas, such as
-// `BOUNDED_ASSERT(f<a, b>())`, but prevents expressions that look like two
-// arguments from being treated as a comma operator, such as
-// `BOUNDED_ASSERT(false, "Error message")`.
-#define BOUNDED_DETAIL_PREVENT_COMMA(...) \
-	decltype(::bounded::detail::prevent_comma(__VA_ARGS__))()
 
 #if defined __clang__ or defined __INTEL_COMPILER
 	// https://github.com/llvm/llvm-project/issues/40658
@@ -33,7 +25,7 @@ import std_module;
 	)
 #else
 	#define BOUNDED_ASSUME(...) \
-		(!(__VA_ARGS__) ? std::unreachable() : BOUNDED_DETAIL_PREVENT_COMMA(__VA_ARGS__))
+		[[assume(__VA_ARGS__)]]
 #endif
 
 #endif // BOUNDED_ASSUME_HPP
