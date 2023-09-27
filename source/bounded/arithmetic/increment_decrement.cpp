@@ -7,7 +7,6 @@ module;
 
 #include <bounded/assert.hpp>
 
-#include <operators/returns.hpp>
 #include <operators/compound_assignment.hpp>
 
 export module bounded.arithmetic.increment_decrement;
