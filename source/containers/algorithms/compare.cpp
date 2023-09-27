@@ -112,7 +112,7 @@ constexpr auto equal(InputIterator1 first1, sentinel_for<InputIterator1> auto co
 			return false;
 		}
 	}
-	return first1 == last1;
+	return true;
 }
 
 export template<iterator InputIterator1, iterator InputIterator2>
