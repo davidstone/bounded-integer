@@ -29,6 +29,7 @@ import containers.iterator_t;
 import containers.maximum_array_size;
 import containers.pop_back;
 import containers.push_back;
+import containers.push_back_into_capacity;
 import containers.range_view;
 import containers.repeat_n;
 import containers.resize;
@@ -313,6 +314,13 @@ struct vector {
 	// Extensions
 	constexpr auto set_size(auto const new_size) -> void {
 		m_impl.set_size(new_size);
+	}
+
+	constexpr auto push_back_into_capacity(T const & value) -> void {
+		containers::push_back_into_capacity(m_impl, value);
+	}
+	constexpr auto push_back_into_capacity(T && value) -> void {
+		containers::push_back_into_capacity(m_impl, std::move(value));
 	}
 
 private:
