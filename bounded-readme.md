@@ -21,7 +21,7 @@ The `bounded::integer` philosophy is the same as the C++ philosophy: you don't p
 	auto z = x + y;
 	static_assert(std::same_as<decltype(z), bounded::integer<-2, 107>>, "Type of z incorrect.");
 
-The type of `z` is calculated as the smallest type that can hold all possible values of the calculation `x + y`. The `integer` type by defaults says that when modifying or constructing a value, the compiler should not do any run time checks.
+The type of `z` is calculated as the smallest type that can hold all possible values of the calculation `x + y`. The `integer` type by default says that when modifying or constructing a value, the compiler should not do any run time checks.
 
 `bounded::integer` has the following goals:
 1. Never perform a run-time check when a static check would work instead
