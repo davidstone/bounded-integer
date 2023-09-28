@@ -19,5 +19,5 @@ There are some [containers that have backward compatibility as a goal](source/co
 ## Getting the code
 
 * `git submodule update --init` will check out any necessary dependencies
-* Configure with cmake
-* Build with clang 16+
+* Configure with cmake 3.27.6+
+* Build with clang 17+
