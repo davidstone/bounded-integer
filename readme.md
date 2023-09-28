@@ -12,7 +12,9 @@ This provides `tv::tuple`, `tv::variant`, and `tv::optional`. You can view the [
 
 ## containers
 
-You can read the [documentation](containers-readme.md) and view the [sources](source/containers). This library implements many container types and algorithms. It follows the principles of the C++ standard library, but does not try to be perfectly backward compatible in most cases. There are some containers that have backward compatibility as a goal in `include/containers/std`. The focus is on maximum efficiency and fully decoupling data structures from algorithms.
+You can read the [documentation](containers-readme.md) and view the [sources](source/containers). This library implements many container types and algorithms. It follows the principles of the C++ standard library, but does not try to be perfectly backward compatible in most cases. The focus is on maximum efficiency and fully decoupling data structures from algorithms.
+
+There are some [containers that have backward compatibility as a goal](source/containers/std/) in `namespace std_containers` -- currently `std_containers::vector` and `std_containers::list`.
 
 ## Getting the code
 
