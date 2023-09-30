@@ -19,7 +19,11 @@ if (NOT has_parent)
 	set(CMAKE_CXX_STANDARD_REQUIRED On)
 	set(CMAKE_CXX_EXTENSIONS Off)
 
-	set(CMAKE_EXPERIMENTAL_CXX_MODULE_CMAKE_API "ac01f462-0f5f-432a-86aa-acef252918a6")
+	if(${CMAKE_VERSION} VERSION_GREATER "3.27.6")
+		set(CMAKE_EXPERIMENTAL_CXX_MODULE_CMAKE_API "ac01f462-0f5f-432a-86aa-acef252918a6")
+	else()
+		set(CMAKE_EXPERIMENTAL_CXX_MODULE_CMAKE_API "aa1f7df0-828a-4fcd-9afc-2dc80491aca7")
+	endif()
 
 	add_subdirectory(dependencies/cmake_strict_defaults)
 	add_subdirectory(dependencies/numeric-traits)
