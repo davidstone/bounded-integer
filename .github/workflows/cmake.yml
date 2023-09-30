@@ -29,6 +29,7 @@ jobs:
       with:
         version: "17"
         env: true
+        force: true
 
     - uses: lukka/get-cmake@latest
     
