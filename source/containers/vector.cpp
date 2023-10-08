@@ -120,6 +120,10 @@ struct [[clang::trivial_abi]] vector : private lexicographical_comparison::base 
 		m_size = new_size;
 	}
 
+	constexpr auto replace_empty_allocation(size_type const requested_capacity) -> void {
+		BOUNDED_ASSERT(size() == 0_bi);
+		m_storage.replace_allocation(requested_capacity);
+	}
 	constexpr auto reserve(size_type const requested_capacity) -> void {
 		if (requested_capacity <= capacity()) {
 			return;

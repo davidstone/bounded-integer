@@ -92,6 +92,7 @@ export import containers.reference_wrapper;
 export import containers.repeat_n;
 export import containers.resizable_container;
 export import containers.resize;
+export import containers.small_buffer_optimized_vector;
 export import containers.size;
 export import containers.size_then_use_range;
 export import containers.stable_vector;

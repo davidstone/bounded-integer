@@ -267,6 +267,23 @@ public:
 		BOUNDED_ASSERT(size() == new_size);
 	}
 
+	constexpr auto replace_empty_allocation(size_type const requested_capacity) -> void {
+		BOUNDED_ASSERT(size() == 0_bi);
+		deallocate_large();
+		if (requested_capacity <= small_t::capacity()) {
+			::bounded::construct_at(m_state.small, bounded::construct<small_t>);
+			m_state.last_byte.is_large = false;
+		} else {
+			::bounded::construct_at(m_state.large, [&] {
+				return large_t(
+					allocate_storage<T, typename large_t::capacity_type>(bounded::assume_in_range<typename large_t::capacity_type>(requested_capacity)),
+					{}
+				);
+			});
+			m_state.last_byte.is_large = true;
+		}
+		BOUNDED_ASSERT(size() == 0_bi);
+	}
 	constexpr auto reserve(size_type const requested_capacity) -> void {
 		if (requested_capacity <= capacity()) {
 			return;
@@ -286,6 +303,10 @@ public:
 	}
 
 private:
+	static constexpr auto deallocate_large(large_t & large) -> void {
+		deallocate_storage(dynamic_array_data<T, size_type>(large.data(), large.capacity()));
+	}
+
 	constexpr auto destroy() noexcept {
 		::containers::destroy_range(*this);
 		deallocate_large();
@@ -298,7 +319,7 @@ private:
 		auto temp = bounded::relocate(m_state.large);
 		::bounded::construct_at(m_state.small, bounded::construct<small_t>);
 		containers::uninitialized_relocate_no_overlap(range_view(temp.data(), temp.size(m_state.last_byte.size)), m_state.small.data());
-		deallocate_storage(dynamic_array_data<T, size_type>(temp.data(), temp.capacity()));
+		deallocate_large(temp);
 		set_size_impl(m_state.small, m_state.last_byte, temp.size(m_state.last_byte.size));
 		m_state.last_byte.is_large = false;
 	}
@@ -312,7 +333,7 @@ private:
 	
 	constexpr auto deallocate_large() {
 		if (is_large()) {
-			deallocate_storage(dynamic_array_data<T, size_type>(m_state.large.data(), m_state.large.capacity()));
+			deallocate_large(m_state.large);
 		}
 	}
 	

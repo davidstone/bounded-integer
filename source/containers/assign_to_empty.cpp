@@ -41,6 +41,22 @@ template<typename Target, typename Source>
 concept size_always_fits_in_capacity =
 	numeric_traits::max_value<range_size_t<Source>> <= numeric_traits::min_value<decltype(bounded::declval<Target>().capacity())>;
 
+template<typename Target>
+concept has_replace_empty_allocation = requires(Target & target, containers::range_size_t<Target> const source_size) {
+	target.replace_empty_allocation(source_size);
+};
+
+template<typename Target>
+constexpr auto do_reserve(Target & target, auto const source_size) -> void {
+	if constexpr (has_replace_empty_allocation<Target>) {
+		target.replace_empty_allocation(source_size);
+	} else {
+		auto temp = Target();
+		temp.reserve(source_size);
+		target = std::move(temp);
+	}
+}
+
 template<typename Target, typename Source>
 constexpr auto assign_to_empty_impl(Target & target, Source && source) -> void {
 	BOUNDED_ASSERT(containers::is_empty(target));
@@ -49,9 +65,7 @@ constexpr auto assign_to_empty_impl(Target & target, Source && source) -> void {
 	} else if constexpr (can_set_size<Target> and reservable<Target> and size_then_use_range<Source>) {
 		auto const source_size = ::bounded::assume_in_range<range_size_t<Target>>(::containers::get_source_size<Target>(source));
 		if (target.capacity() < source_size) {
-			auto temp = Target();
-			temp.reserve(source_size);
-			target = std::move(temp);
+			::containers::do_reserve(target, source_size);
 		}
 		containers::uninitialized_copy_no_overlap(OPERATORS_FORWARD(source), containers::begin(target));
 		target.set_size(source_size);

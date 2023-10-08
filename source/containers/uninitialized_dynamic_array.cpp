@@ -27,7 +27,7 @@ struct [[clang::trivial_abi]] uninitialized_dynamic_array {
 	{
 	}
 	constexpr explicit uninitialized_dynamic_array(Capacity capacity):
-		m_ptr(std::allocator<T>().allocate(static_cast<std::size_t>(capacity))),
+		m_ptr(allocate(capacity)),
 		m_capacity(capacity)
 	{
 	}
@@ -68,9 +68,18 @@ struct [[clang::trivial_abi]] uninitialized_dynamic_array {
 		return m_capacity;
 	}
 
+	constexpr auto replace_allocation(Capacity new_capacity) -> void {
+		deallocate(m_ptr, m_capacity);
+		m_ptr = allocate(new_capacity);
+		m_capacity = new_capacity;
+	}
+
 private:
 	constexpr auto release() & noexcept {
 		return std::exchange(m_ptr, nullptr);
+	}
+	static constexpr auto allocate(Capacity const capacity) -> T * {
+		return std::allocator<T>().allocate(static_cast<std::size_t>(capacity));
 	}
 	static constexpr auto deallocate(T * const ptr, Capacity const capacity) noexcept -> void {
 		if (ptr) {
