@@ -4,6 +4,7 @@
 # http://www.boost.org/LICENSE_1_0.txt)
 
 cmake_minimum_required(VERSION 3.27 FATAL_ERROR)
+cmake_policy(VERSION 3.27...3.28)
 
 project(bounded_integer LANGUAGES CXX)
 
@@ -138,7 +139,7 @@ set_source_files_properties(source/bounded/arithmetic/increment_decrement.cpp
 
 add_executable(bounded_test)
 
-target_sources(bounded_test PUBLIC
+target_sources(bounded_test PRIVATE
 	FILE_SET CXX_MODULES
 	BASE_DIRS "${CMAKE_CURRENT_SOURCE_DIR}"
 	FILES
@@ -370,7 +371,7 @@ target_link_libraries(containers
 
 add_executable(containers_test)
 
-target_sources(containers_test PUBLIC
+target_sources(containers_test PRIVATE
 	FILE_SET CXX_MODULES
 	BASE_DIRS "${CMAKE_CURRENT_SOURCE_DIR}"
 	FILES
@@ -409,7 +410,7 @@ target_sources(containers_test PUBLIC
 		test/containers/vector.cpp
 )
 
-target_sources(containers_test PUBLIC
+target_sources(containers_test PRIVATE
 	test/containers/sort/to_radix_sort_key.cpp
 	test/containers/at.cpp
 	test/containers/small_buffer_optimized_vector.cpp
