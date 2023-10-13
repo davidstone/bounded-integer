@@ -175,6 +175,7 @@ target_sources(tv PUBLIC
 	BASE_DIRS "${CMAKE_CURRENT_SOURCE_DIR}"
 	FILES
 		source/tv/get_index.cpp
+		source/tv/indexed_value.cpp
 		source/tv/insert.cpp
 		source/tv/is_valid_index.cpp
 		source/tv/nth_type.cpp

@@ -9,6 +9,8 @@ module;
 
 export module tv.visit;
 
+import tv.indexed_value;
+
 import bounded;
 import numeric_traits;
 import std_module;
@@ -16,25 +18,6 @@ import std_module;
 namespace tv {
 
 using namespace bounded::literal;
-
-export template<typename T, std::size_t n>
-struct visitor_parameter {
-	static_assert(std::is_reference_v<T>);
-	constexpr explicit visitor_parameter(T value_):
-		m_value(OPERATORS_FORWARD(value_))
-	{
-	}
-	constexpr auto value() const & -> auto & {
-		return m_value;
-	}
-	constexpr auto value() && -> auto && {
-		return OPERATORS_FORWARD(m_value);
-	}
-	static constexpr auto index = bounded::constant<n>;
-
-private:
-	T m_value;
-};
 
 template<typename...>
 struct types {
@@ -51,7 +34,7 @@ struct indexed_variant_types_impl;
 template<typename Variant, std::size_t... indexes>
 struct indexed_variant_types_impl<Variant, std::index_sequence<indexes...>> {
 	using type = types<
-		visitor_parameter<
+		indexed_value<
 			decltype(bounded::declval<Variant>()[bounded::constant<indexes>]),
 			indexes
 		>...
@@ -117,7 +100,7 @@ constexpr decltype(auto) visit_implementation(
 	auto && ... variants
 ) requires(sizeof...(indexes) == sizeof...(variants)) {
 	return OPERATORS_FORWARD(function)(
-		visitor_parameter<
+		indexed_value<
 			decltype(OPERATORS_FORWARD(variants)[bounded::constant<indexes>]),
 			indexes
 		>(OPERATORS_FORWARD(variants)[bounded::constant<indexes>])...
@@ -243,7 +226,7 @@ struct remove_index {
 
 // Accepts any number of variants (including 0) followed by one function with
 // arity equal to the number of variants
-export constexpr auto visit = []<typename... Args>(Args && ... args) -> decltype(auto)
+export constexpr auto visit = []<typename... Args>(Args && ... args) static -> decltype(auto)
 	requires is_variants_then_visit_function<sizeof...(Args) - 1U, variant_types, Args...>
 {
 	return ::tv::rotate_transform(remove_index(), OPERATORS_FORWARD(args)...);

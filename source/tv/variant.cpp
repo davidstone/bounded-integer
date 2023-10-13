@@ -19,6 +19,7 @@ import tv.single_element_storage;
 import tv.variadic_union;
 import tv.variant_index;
 import tv.visit;
+import tv.indexed_value;
 
 import bounded;
 import bounded.test_int;
@@ -43,7 +44,7 @@ concept variant_trivially_move_assignable = std::is_trivially_move_constructible
 
 constexpr auto equality_visitor = []
 	<typename LHS, auto lhs_n, typename RHS, auto rhs_n>
-	(visitor_parameter<LHS, lhs_n> const lhs, visitor_parameter<RHS, rhs_n> const rhs)
+	(indexed_value<LHS, lhs_n> const lhs, indexed_value<RHS, rhs_n> const rhs)
 {
 	if constexpr (lhs_n == rhs_n) {
 		return lhs.value() == rhs.value();
