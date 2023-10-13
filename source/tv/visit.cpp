@@ -210,7 +210,7 @@ struct identity {
 };
 
 // Accepts any number of variants (including 0) followed by one function
-export constexpr auto visit_with_index = []<typename... Args>(Args && ... args) -> decltype(auto)
+export constexpr auto visit_with_index = []<typename... Args>(Args && ... args) static -> decltype(auto)
 	 requires is_variants_then_visit_function<sizeof...(Args) - 1U, indexed_variant_types, Args...>
 {
 	return ::tv::rotate_transform(identity(), OPERATORS_FORWARD(args)...);
