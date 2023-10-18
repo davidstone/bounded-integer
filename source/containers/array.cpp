@@ -65,7 +65,7 @@ struct array {
 		return bounded::constant<size_>;
 	}
 	constexpr auto begin() const {
-		using const_iterator = contiguous_iterator<value_type const, bounded::check_in_range<array_size_type<value_type>>(size_)>;
+		using const_iterator = contiguous_iterator<value_type const, bounded::assume_in_range<array_size_type<value_type>>(size_)>;
 		if constexpr (size() != 0) {
 			return const_iterator(m_value);
 		} else {
@@ -73,7 +73,7 @@ struct array {
 		}
 	}
 	constexpr auto begin() {
-		using iterator = contiguous_iterator<value_type, bounded::check_in_range<array_size_type<value_type>>(size_)>;
+		using iterator = contiguous_iterator<value_type, bounded::assume_in_range<array_size_type<value_type>>(size_)>;
 		if constexpr (size() != 0) {
 			return iterator(m_value);
 		} else {
