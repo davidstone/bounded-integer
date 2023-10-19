@@ -401,6 +401,7 @@ target_sources(containers_test PRIVATE
 		test/containers/flat_map.cpp
 		test/containers/forward_linked_list.cpp
 		test/containers/is_container.cpp
+		test/containers/insert.cpp
 		test/containers/lazy_push_back.cpp
 		test/containers/lazy_push_back_into_capacity.cpp
 		test/containers/linear_map.cpp
