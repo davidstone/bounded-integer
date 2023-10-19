@@ -14,7 +14,6 @@ module;
 export module containers.string;
 
 import containers.algorithms.compare;
-import containers.begin_end;
 import containers.c_array;
 import containers.clear;
 import containers.data;

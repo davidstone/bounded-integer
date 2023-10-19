@@ -15,7 +15,6 @@ import containers.algorithms.advance;
 import containers.as_mutable_ptr;
 import containers.assign;
 import containers.assign_to_empty;
-import containers.begin_end;
 import containers.c_array;
 import containers.clear;
 import containers.compare_container;

@@ -11,7 +11,6 @@ export module containers.algorithms.generate;
 
 import containers.algorithms.compare;
 import containers.array;
-import containers.begin_end;
 import containers.common_iterator_functions;
 import containers.index_type;
 import containers.offset_type;
