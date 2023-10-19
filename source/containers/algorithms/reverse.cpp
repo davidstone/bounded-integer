@@ -11,7 +11,7 @@ import containers.array;
 import containers.begin_end;
 import containers.c_array;
 import containers.common_iterator_functions;
-import containers.is_range;
+import containers.range;
 
 import bounded;
 import std_module;

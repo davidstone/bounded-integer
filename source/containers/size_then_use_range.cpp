@@ -5,7 +5,7 @@
 
 export module containers.size_then_use_range;
 
-import containers.is_range;
+import containers.range;
 import containers.size;
 
 namespace containers {

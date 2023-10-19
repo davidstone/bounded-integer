@@ -6,7 +6,7 @@
 export module containers.is_empty;
 
 import containers.begin_end;
-import containers.is_range;
+import containers.range;
 import containers.size;
 
 import bounded;

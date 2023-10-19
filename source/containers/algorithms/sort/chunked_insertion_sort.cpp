@@ -15,8 +15,8 @@ import containers.algorithms.sort.sort_exactly_5;
 import containers.algorithms.sort.sort_exactly_6;
 
 import containers.begin_end;
-import containers.is_range;
 import containers.offset_type;
+import containers.range;
 import containers.range_view;
 import containers.size;
 import containers.uninitialized_array;

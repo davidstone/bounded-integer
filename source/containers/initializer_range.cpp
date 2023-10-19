@@ -6,7 +6,7 @@
 export module containers.initializer_range;
 
 import containers.is_container;
-import containers.is_range;
+import containers.range;
 import containers.range_reference_t;
 import containers.range_value_t;
 

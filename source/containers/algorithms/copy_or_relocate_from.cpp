@@ -13,7 +13,7 @@ import containers.begin_end;
 import containers.can_set_size;
 import containers.dereference;
 import containers.is_container;
-import containers.is_range;
+import containers.range;
 import containers.range_value_t;
 
 import bounded;

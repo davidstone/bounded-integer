@@ -14,7 +14,7 @@ export module containers.algorithms.sort.to_radix_sort_key;
 import containers.algorithms.sort.is_sorted;
 
 import containers.array;
-import containers.is_range;
+import containers.range;
 
 import bounded;
 import bounded.test_int;

@@ -18,7 +18,7 @@ import containers.algorithms.sort.sort_exactly_5;
 import containers.algorithms.sort.sort_exactly_6;
 
 import containers.begin_end;
-import containers.is_range;
+import containers.range;
 import containers.size;
 
 import bounded;

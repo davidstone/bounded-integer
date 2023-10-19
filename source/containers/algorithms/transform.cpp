@@ -14,7 +14,7 @@ import containers.array;
 import containers.algorithms.transform_iterator;
 import containers.adapt;
 import containers.default_begin_end_size;
-import containers.is_range;
+import containers.range;
 
 import std_module;
 

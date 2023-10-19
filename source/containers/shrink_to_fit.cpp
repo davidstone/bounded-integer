@@ -12,7 +12,7 @@ export module containers.shrink_to_fit;
 import containers.algorithms.compare;
 import containers.algorithms.uninitialized;
 import containers.begin_end;
-import containers.is_range;
+import containers.range;
 import containers.push_back;
 import containers.size;
 import containers.vector;

@@ -11,8 +11,8 @@ export module containers.append_after;
 
 import containers.algorithms.copy_or_relocate_from;
 import containers.c_array;
-import containers.is_range;
 import containers.iterator_t;
+import containers.range;
 import containers.range_value_t;
 import containers.supports_lazy_insert_after;
 

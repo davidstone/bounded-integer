@@ -7,8 +7,8 @@ export module containers.erase_concepts;
 
 import containers.can_set_size;
 import containers.has_member_before_begin;
-import containers.is_range;
 import containers.iterator_t;
+import containers.range;
 import containers.splicable;
 
 import std_module;

@@ -10,7 +10,7 @@ import containers.begin_end;
 import containers.empty_range;
 import containers.is_iterator;
 import containers.is_iterator_sentinel;
-import containers.is_range;
+import containers.range;
 import containers.size;
 
 import bounded;

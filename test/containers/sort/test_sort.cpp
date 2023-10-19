@@ -10,7 +10,7 @@ import containers.test.sort.sort_test_data;
 import containers.algorithms.all_any_none;
 import containers.algorithms.compare;
 
-import containers.is_range;
+import containers.range;
 import containers.range_value_t;
 import containers.range_view;
 import containers.uninitialized_array;

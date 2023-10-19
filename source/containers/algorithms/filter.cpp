@@ -21,8 +21,8 @@ import containers.default_adapt_traits;
 import containers.default_begin_end_size;
 import containers.is_iterator;
 import containers.is_iterator_sentinel;
-import containers.is_range;
 import containers.iterator_adapter;
+import containers.range;
 import containers.range_value_t;
 import containers.reference_wrapper;
 

@@ -7,8 +7,8 @@ export module containers.associative_container;
 
 import containers.array;
 import containers.c_array;
-import containers.is_range;
 import containers.is_container;
+import containers.range;
 import containers.string;
 import containers.vector;
 

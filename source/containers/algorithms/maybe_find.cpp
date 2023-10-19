@@ -13,7 +13,7 @@ import containers.algorithms.find;
 import containers.array;
 import containers.begin_end;
 import containers.is_iterator_sentinel;
-import containers.is_range;
+import containers.range;
 
 import bounded;
 import tv;

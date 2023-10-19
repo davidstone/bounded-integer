@@ -12,7 +12,8 @@ export module containers.algorithms.all_any_none;
 import containers.algorithms.find;
 import containers.array;
 import containers.begin_end;
-import containers.is_range;
+import containers.range;
+
 import bounded;
 
 namespace containers {

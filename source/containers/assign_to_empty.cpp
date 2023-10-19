@@ -20,7 +20,6 @@ import containers.can_set_size;
 import containers.get_source_size;
 import containers.initializer_range;
 import containers.is_empty;
-import containers.is_range;
 import containers.lazy_push_back;
 import containers.member_assign;
 import containers.range_value_t;

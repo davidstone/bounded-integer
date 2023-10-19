@@ -11,9 +11,9 @@ export module containers.algorithms.accumulate;
 
 import containers.array;
 import containers.begin_end;
-import containers.is_range;
 import containers.iter_difference_t;
 import containers.iterator_t;
+import containers.range;
 import containers.range_value_t;
 
 import bounded;

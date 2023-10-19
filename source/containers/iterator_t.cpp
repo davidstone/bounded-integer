@@ -5,7 +5,7 @@
 
 export module containers.iterator_t;
 
-import containers.is_range;
+import containers.range;
 
 namespace containers {
 

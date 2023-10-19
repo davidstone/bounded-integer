@@ -13,9 +13,9 @@ import containers.algorithms.compare;
 import containers.array;
 import containers.begin_end;
 import containers.common_iterator_functions;
-import containers.is_range;
 import containers.iterator_t;
 import containers.offset_type;
+import containers.range;
 import containers.range_view;
 import containers.size;
 

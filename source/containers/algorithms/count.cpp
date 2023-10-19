@@ -12,7 +12,7 @@ export module containers.algorithms.count;
 import containers.array;
 import containers.begin_end;
 import containers.count_type;
-import containers.is_range;
+import containers.range;
 import containers.size;
 
 import bounded;

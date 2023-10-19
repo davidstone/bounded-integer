@@ -15,10 +15,10 @@ import containers.array;
 import containers.begin_end;
 import containers.common_iterator_functions;
 import containers.has_member_size;
-import containers.is_range;
 import containers.is_iterator_sentinel;
 import containers.iter_difference_t;
 import containers.iter_value_t;
+import containers.range;
 import containers.size;
 
 import bounded;

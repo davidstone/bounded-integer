@@ -6,7 +6,7 @@
 export module containers.compare_container;
 
 import containers.algorithms.compare;
-import containers.is_range;
+import containers.range;
 import containers.range_value_t;
 
 import bounded;

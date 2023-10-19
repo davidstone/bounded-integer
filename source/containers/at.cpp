@@ -11,7 +11,7 @@ export module containers.at;
 
 import containers.array;
 import containers.index_type;
-import containers.is_range;
+import containers.range;
 import containers.size;
 
 import bounded;

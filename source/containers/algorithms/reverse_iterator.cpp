@@ -17,7 +17,7 @@ import containers.array;
 import containers.begin_end;
 import containers.is_iterator;
 import containers.iterator_adapter;
-import containers.is_range;
+import containers.range;
 import containers.size;
 
 import bounded;

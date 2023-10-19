@@ -13,9 +13,9 @@ import containers.algorithms.compare;
 import containers.array;
 import containers.begin_end;
 import containers.dereference;
-import containers.is_range;
 import containers.iter_difference_t;
 import containers.iterator_t;
+import containers.range;
 import containers.range_reference_t;
 
 import bounded;

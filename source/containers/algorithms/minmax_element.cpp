@@ -12,7 +12,7 @@ export module containers.algorithms.minmax_element;
 import containers.algorithms.advance;
 import containers.array;
 import containers.begin_end;
-import containers.is_range;
+import containers.range;
 
 import bounded;
 import std_module;

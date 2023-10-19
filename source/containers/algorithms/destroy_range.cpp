@@ -9,7 +9,7 @@ module;
 
 export module containers.algorithms.destroy_range;
 
-import containers.is_range;
+import containers.range;
 
 import bounded;
 

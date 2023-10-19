@@ -17,7 +17,7 @@ import containers.algorithms.erase;
 import containers.algorithms.unique;
 
 import containers.begin_end;
-import containers.is_range;
+import containers.range;
 import containers.range_view;
 
 namespace containers {

@@ -5,9 +5,9 @@
 
 export module containers.resizable_container;
 
-import containers.is_range;
 import containers.pop_back;
 import containers.push_back;
+import containers.range;
 
 namespace containers {
 

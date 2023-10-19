@@ -13,9 +13,9 @@ import containers.algorithms.distance;
 import containers.begin_end;
 import containers.c_array;
 import containers.has_member_size;
-import containers.is_range;
 import containers.iter_difference_t;
 import containers.iterator_t;
+import containers.range;
 
 import bounded;
 import std_module;
