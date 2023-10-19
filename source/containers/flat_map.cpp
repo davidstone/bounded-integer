@@ -26,6 +26,7 @@ import containers.begin_end;
 import containers.c_array;
 import containers.common_functions;
 import containers.compare_container;
+import containers.data;
 import containers.dereference;
 import containers.extract_key_to_less;
 import containers.initializer_range;
@@ -206,6 +207,12 @@ struct flat_map_base : private lexicographical_comparison::base {
 	{
 	}
 
+	constexpr auto data() const requires contiguous_range<Container> {
+		return ::containers::data(m_container);
+	}
+	constexpr auto data() requires contiguous_range<Container> {
+		return ::containers::data(m_container);
+	}
 	constexpr auto begin() const {
 		return ::containers::begin(m_container);
 	}
@@ -291,6 +298,7 @@ public:
 
 	using base::base;
 
+	using base::data;
 	using base::begin;
 	using base::size;
 
@@ -361,6 +369,7 @@ public:
 
 	using base::base;
 	
+	using base::data;
 	using base::begin;
 	using base::size;
 

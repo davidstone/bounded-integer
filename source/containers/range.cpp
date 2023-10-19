@@ -1,35 +1,39 @@
-// Copyright David Stone 2018.
+// Copyright David Stone 2023.
 // Distributed under the Boost Software License, Version 1.0.
 // (See accompanying file LICENSE_1_0.txt or copy at
 // http://www.boost.org/LICENSE_1_0.txt)
 
-module;
+export module containers.range;
 
-#include <std_module/prelude.hpp>
-#include <unordered_map>
-#include <unordered_set>
-
-export module containers.is_range;
-
-import containers.begin_end;
 import containers.c_array;
+import containers.data;
+import containers.has_member_size;
+import containers.is_iterator;
 import containers.is_iterator_sentinel;
-import containers.sentinel_t;
-
-import bounded;
-import std_module;
 
 namespace containers {
 
-export template<typename Range>
-using iterator_t_impl = decltype(containers::begin(bounded::declval<Range>()));
+template<typename T>
+concept size_based_range = has_member_size<T> and requires(T range) {
+	{ range.begin() } -> random_access_iterator;
+};
+
+template<typename T>
+concept basic_range = requires(T range) {
+	range.begin();
+	{ range.end() } -> sentinel_for<decltype(range.begin())>;
+};
+
+template<typename T>
+concept forward_linked_range = requires(T range) {
+	range.before_begin();
+	{ range.end() } -> sentinel_for<decltype(range.before_begin())>;
+};
 
 export template<typename T>
-concept range = sentinel_for<sentinel_t<T>, iterator_t_impl<T>>;
+concept range = contiguous_range<T> or size_based_range<T> or basic_range<T> or forward_linked_range<T>;
 
 } // namespace containers
-
-using namespace bounded::literal;
 
 template<typename... Ts>
 concept all_qualifications_are_ranges_helper = (... and containers::range<Ts>);
@@ -37,14 +41,49 @@ concept all_qualifications_are_ranges_helper = (... and containers::range<Ts>);
 template<typename T>
 concept all_qualifications_are_ranges = all_qualifications_are_ranges_helper<T, T const, T &, T const &, T &&>;
 
+struct begin_and_end {
+	auto begin() const -> int *;
+	auto end() const -> int *;
+};
+static_assert(all_qualifications_are_ranges<begin_and_end>);
+
+struct begin_and_size {
+	auto begin() const -> int *;
+	auto size() const -> int;
+};
+static_assert(all_qualifications_are_ranges<begin_and_size>);
+
+struct before_begin_and_end {
+	auto before_begin() const -> int *;
+	auto end() const -> int *;
+};
+static_assert(all_qualifications_are_ranges<before_begin_and_end>);
+
+struct data_and_size {
+	auto data() const -> int *;
+	auto size() const -> int;
+};
+static_assert(all_qualifications_are_ranges<data_and_size>);
+
+static_assert(all_qualifications_are_ranges<containers::c_array<int, 5>>);
+
 static_assert(!containers::range<int>);
 static_assert(!containers::range<int *>);
 
-static_assert(containers::range<containers::c_array<int, 5> &>, "Incorrectly detects c-arrays as non-ranges.");
-static_assert(containers::range<containers::c_array<int, 5> const &>, "Incorrectly detects c-arrays as non-ranges.");
+struct data_and_end {
+	auto data() const -> int *;
+	auto end() const -> int *;
+};
+static_assert(!containers::range<data_and_end>);
 
-static_assert(all_qualifications_are_ranges<std::array<int, 5>>, "Incorrectly detects std::array as a non-range.");
-static_assert(all_qualifications_are_ranges<std::array<int, 0>>, "Incorrectly detects empty std::array as a non-range.");
-static_assert(all_qualifications_are_ranges<std::vector<int>>, "Incorrectly detects std::vector as a non-range.");
-static_assert(all_qualifications_are_ranges<std::unordered_map<int, int>>, "Incorrectly detects std::unordered_map as a non-range.");
-static_assert(all_qualifications_are_ranges<std::unordered_set<int>>, "Incorrectly detects std::unordered_set as a non-range.");
+struct before_begin_and_size {
+	auto before_begin() const -> int *;
+	auto size() const -> int;
+};
+static_assert(!containers::range<before_begin_and_size>);
+
+struct begin_only {
+	auto begin() const -> int *;
+};
+static_assert(!containers::range<begin_only>);
+

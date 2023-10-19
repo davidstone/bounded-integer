@@ -1,36 +1,41 @@
-// Copyright David Stone 2016.
+// Copyright David Stone 2023.
 // Distributed under the Boost Software License, Version 1.0.
 // (See accompanying file LICENSE_1_0.txt or copy at
 // http://www.boost.org/LICENSE_1_0.txt)
 
 export module containers.data;
 
-import containers.begin_end;
-import containers.is_iterator_sentinel;
-import containers.iterator_t;
-import containers.random_access_range;
-import containers.to_address;
+import containers.c_array;
+import containers.has_member_size;
+
+import std_module;
 
 namespace containers {
 
 template<typename Range>
 concept has_member_data = requires(Range r) { r.data(); };
 
-template<typename Iterator, typename Sentinel>
-concept contiguous_iterator_sentinel = to_addressable<Iterator> and random_access_sentinel_for<Sentinel, Iterator>;
+template<typename T>
+concept class_contiguous_range = has_member_data<T> and has_member_size<T>;
 
 export template<typename T>
-concept contiguous_range =
-	random_access_range<T> and
-	(has_member_data<T> or contiguous_iterator_sentinel<iterator_t<T>, sentinel_t<T>>);
+concept contiguous_range = class_contiguous_range<T> or std::is_array_v<std::remove_reference_t<T>>;
 
-export template<contiguous_range Range>
-constexpr auto data(Range && r) {
-	if constexpr (has_member_data<Range>) {
-		return r.data();
-	} else {
-		return containers::to_address(containers::begin(r));
-	}
+export constexpr auto data(class_contiguous_range auto && r) {
+	return r.data();
+}
+
+export template<typename T, std::size_t size>
+constexpr auto data(c_array<T, size> const & a) -> T const * {
+	return a;
+}
+export template<typename T, std::size_t size>
+constexpr auto data(c_array<T, size> & a) -> T * {
+	return a;
+}
+export template<typename T, std::size_t size>
+constexpr auto data(c_array<T, size> && a) -> T * {
+	return a;
 }
 
 } // namespace containers

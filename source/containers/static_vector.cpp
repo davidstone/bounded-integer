@@ -51,7 +51,7 @@ struct [[clang::trivial_abi]] static_vector : private lexicographical_comparison
 
 	static_vector(static_vector &&) requires bounded::trivially_move_constructible<T> = default;
 	constexpr static_vector(static_vector && other) noexcept requires bounded::move_constructible<T> {
-		containers::uninitialized_relocate_no_overlap(other, begin());
+		containers::uninitialized_relocate_no_overlap(other, ::containers::begin(*this));
 		this->m_size = std::exchange(other.m_size, 0_bi);
 	}
 
@@ -91,13 +91,11 @@ struct [[clang::trivial_abi]] static_vector : private lexicographical_comparison
 		return *this;
 	}
 
-	constexpr auto begin() const {
-		using const_iterator = contiguous_iterator<T const, bounded::constant<capacity_>>;
-		return const_iterator(m_storage.data());
+	constexpr auto data() const -> T const * {
+		return m_storage.data();
 	}
-	constexpr auto begin() {
-		using iterator = contiguous_iterator<T, bounded::constant<capacity_>>;
-		return iterator(m_storage.data());
+	constexpr auto data() -> T * {
+		return m_storage.data();
 	}
 
 	constexpr auto size() const {

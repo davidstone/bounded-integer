@@ -16,7 +16,6 @@ export module containers.string;
 import containers.algorithms.compare;
 import containers.c_array;
 import containers.clear;
-import containers.data;
 import containers.is_empty;
 import containers.push_back;
 import containers.range_value_t;
@@ -51,7 +50,7 @@ public:
 	string & operator=(string const &) & = default;
 	string & operator=(string &&) & = default;
 	
-	using base::begin;
+	using base::data;
 	using base::size;
 
 	using base::operator[];
@@ -62,13 +61,13 @@ public:
 	using base::set_size;
 	
 	constexpr operator std::string_view() const {
-		return std::string_view(data(*this), static_cast<range_size_t<std::string_view>>(size()));
+		return std::string_view(data(), static_cast<range_size_t<std::string_view>>(size()));
 	}
 	constexpr operator std::span<char const>() const {
-		return std::span<char const>(containers::data(*this), static_cast<std::size_t>(size()));
+		return std::span<char const>(data(), static_cast<std::size_t>(size()));
 	}
 	constexpr operator std::span<char>() {
-		return std::span<char>(containers::data(*this), static_cast<std::size_t>(size()));
+		return std::span<char>(data(), static_cast<std::size_t>(size()));
 	}
 
 	friend constexpr auto operator<=>(string const & lhs, std::string_view const rhs) {

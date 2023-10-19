@@ -12,10 +12,8 @@ export module containers.array;
 
 import containers.begin_end;
 import containers.c_array;
-import containers.contiguous_iterator;
 import containers.data;
 import containers.is_container;
-import containers.iterator_t;
 import containers.maximum_array_size;
 import containers.range_value_t;
 
@@ -64,20 +62,18 @@ struct array {
 	static constexpr auto size() {
 		return bounded::constant<size_>;
 	}
-	constexpr auto begin() const {
-		using const_iterator = contiguous_iterator<value_type const, bounded::assume_in_range<array_size_type<value_type>>(size_)>;
+	constexpr auto data() const -> value_type const * {
 		if constexpr (size() != 0) {
-			return const_iterator(m_value);
+			return m_value;
 		} else {
-			return const_iterator();
+			return nullptr;
 		}
 	}
-	constexpr auto begin() {
-		using iterator = contiguous_iterator<value_type, bounded::assume_in_range<array_size_type<value_type>>(size_)>;
+	constexpr auto data() -> value_type * {
 		if constexpr (size() != 0) {
-			return iterator(m_value);
+			return m_value;
 		} else {
-			return iterator();
+			return nullptr;
 		}
 	}
 
@@ -228,16 +224,3 @@ static_assert(array_non_copyable_empty.size() == 0_bi);
 constexpr auto large_size = 10000_bi;
 constexpr auto large_array_n = containers::make_array_n(large_size, 0);
 static_assert(large_array_n.size() == large_size);
-
-static_assert(std::same_as<
-	containers::iterator_t<containers::array<int, size> const &>,
-	containers::contiguous_iterator<int const, size.value()>
->);
-static_assert(std::same_as<
-	containers::iterator_t<containers::array<int, size> &>,
-	containers::contiguous_iterator<int, size.value()>
->);
-static_assert(std::same_as<
-	containers::iterator_t<containers::array<int, size> &&>,
-	containers::contiguous_iterator<int, size.value()>
->);

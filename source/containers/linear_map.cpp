@@ -17,6 +17,7 @@ import containers.append;
 import containers.begin_end;
 import containers.c_array;
 import containers.compare_container;
+import containers.data;
 import containers.flat_map;
 import containers.initializer_range;
 import containers.iterator_t;
@@ -103,17 +104,20 @@ struct basic_linear_map : private lexicographical_comparison::base {
 	{
 	}
 
+	constexpr auto data() const requires contiguous_range<Container> {
+		return ::containers::data(m_container);
+	}
+	constexpr auto data() requires contiguous_range<Container> {
+		return ::containers::data(m_container);
+	}
 	constexpr auto begin() const {
 		return ::containers::begin(m_container);
 	}
 	constexpr auto begin() {
 		return ::containers::begin(m_container);
 	}
-	constexpr auto end() const {
-		return ::containers::end(m_container);
-	}
-	constexpr auto end() {
-		return ::containers::end(m_container);
+	constexpr auto size() const {
+		return ::containers::size(m_container);
 	}
 	
 	constexpr auto capacity() const {
@@ -135,14 +139,14 @@ struct basic_linear_map : private lexicographical_comparison::base {
 	// O(n) time
 	constexpr auto lazy_insert(auto && key, bounded::construct_function_for<mapped_type> auto && mapped) {
 		auto const it = find(key);
-		if (it != end()) {
+		if (it != ::containers::end(*this)) {
 			return inserted_t{it, false};
 		}
 		::containers::lazy_push_back(
 			m_container,
 			[&] { return value_type{OPERATORS_FORWARD(key), OPERATORS_FORWARD(mapped)()}; }
 		);
-		return inserted_t{containers::prev(end()), true};
+		return inserted_t{containers::prev(::containers::end(*this)), true};
 	}
 
 	// O(n * m) time
@@ -163,8 +167,8 @@ struct basic_linear_map : private lexicographical_comparison::base {
 
 private:
 	constexpr auto remove_duplicates(iterator starting_from) -> void {
-		auto const first = containers::begin(m_container);
-		auto to_remove = containers::end(m_container);
+		auto const first = begin();
+		auto to_remove = ::containers::end(*this);
 		while (starting_from != to_remove) {
 			auto const unique_range = containers::range_view(first, starting_from);
 			auto matches_this_value = [&](value_type const & verified) {
@@ -183,7 +187,7 @@ private:
 		::containers::erase_to_end(m_container, to_remove);
 	}
 	constexpr auto remove_duplicates() -> void {
-		remove_duplicates(containers::begin(m_container));
+		remove_duplicates(begin());
 	}
 
 	// TODO: Use [[no_unique_address]] after resolution of

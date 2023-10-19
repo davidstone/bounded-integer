@@ -5,11 +5,14 @@
 
 export module containers.iterator_t;
 
+import containers.begin_end;
 import containers.range;
+
+import bounded;
 
 namespace containers {
 
 export template<range Range>
-using iterator_t = iterator_t_impl<Range>;
+using iterator_t = decltype(containers::begin(bounded::declval<Range>()));
 
 } // namespace containers

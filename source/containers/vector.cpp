@@ -99,11 +99,11 @@ struct [[clang::trivial_abi]] vector : private lexicographical_comparison::base 
 		std::swap(lhs.m_size, rhs.m_size);
 	}
 
-	constexpr auto begin() const {
-		return contiguous_iterator<T const, bounded::constant<max_size>>(m_storage.data());
+	constexpr auto data() const -> T const * {
+		return m_storage.data();
 	}
-	constexpr auto begin() {
-		return contiguous_iterator<T, bounded::constant<max_size>>(m_storage.data());
+	constexpr auto data() -> T * {
+		return m_storage.data();
 	}
 	constexpr auto size() const {
 		return m_size;

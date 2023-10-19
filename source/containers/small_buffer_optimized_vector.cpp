@@ -231,13 +231,11 @@ public:
 		destroy();
 	}
 
-	constexpr auto begin() const {
-		auto const result = is_small() ? m_state.small.data() : m_state.large.data();
-		return contiguous_iterator<T const, numeric_traits::max_value<size_type>>(result);
+	constexpr auto data() const -> T const * {
+		return is_small() ? m_state.small.data() : m_state.large.data();
 	}
-	constexpr auto begin() {
-		auto const result = is_small() ? m_state.small.data() : m_state.large.data();
-		return contiguous_iterator<T, numeric_traits::max_value<size_type>>(result);
+	constexpr auto data() -> T * {
+		return is_small() ? m_state.small.data() : m_state.large.data();
 	}
 	
 	constexpr auto size() const {

@@ -58,6 +58,8 @@ constexpr auto push_front(Container & container, range_value_t<Container> && val
 
 template<typename Container>
 constexpr auto test_push_front() -> bool {
+	// TODO: Why is this line necessary?
+	static_assert(containers::lazy_push_frontable<Container>);
 	auto v = Container();
 	containers::push_front(v, 0);
 	BOUNDED_ASSERT(v == Container({0}));

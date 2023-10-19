@@ -18,8 +18,6 @@ import containers.begin_end;
 import containers.c_array;
 import containers.common_functions;
 import containers.compare_container;
-import containers.contiguous_iterator;
-import containers.data;
 import containers.initializer_range;
 import containers.is_container;
 import containers.maximum_array_size;
@@ -44,7 +42,7 @@ struct [[clang::trivial_abi]] dynamic_array : private lexicographical_comparison
 	constexpr explicit dynamic_array(constructor_initializer_range<dynamic_array> auto && source):
 		m_data(::bounded::assume_in_range<size_type>(::containers::linear_size(source)))
 	{
-		containers::uninitialized_copy_no_overlap(OPERATORS_FORWARD(source), begin());
+		containers::uninitialized_copy_no_overlap(OPERATORS_FORWARD(source), ::containers::begin(*this));
 	}
 
 	template<std::size_t source_size>
@@ -83,11 +81,11 @@ struct [[clang::trivial_abi]] dynamic_array : private lexicographical_comparison
 		return *this;
 	}
 	
-	constexpr auto begin() const {
-		return contiguous_iterator<T const, numeric_traits::max_value<size_type>>(m_data.data());
+	constexpr auto data() const {
+		return m_data.data();
 	}
-	constexpr auto begin() {
-		return contiguous_iterator<T, numeric_traits::max_value<size_type>>(m_data.data());
+	constexpr auto data() {
+		return m_data.data();
 	}
 
 	constexpr auto size() const {
@@ -104,7 +102,7 @@ struct [[clang::trivial_abi]] dynamic_array : private lexicographical_comparison
 	constexpr auto assign(Range && range) & -> void {
 		auto const difference = ::containers::linear_size(range);
 		if (difference == size()) {
-			::containers::copy(OPERATORS_FORWARD(range), begin());
+			::containers::copy(OPERATORS_FORWARD(range), ::containers::begin(*this));
 		} else {
 			clear();
 			*this = dynamic_array<T>(OPERATORS_FORWARD(range));
@@ -112,10 +110,10 @@ struct [[clang::trivial_abi]] dynamic_array : private lexicographical_comparison
 	}
 
 	constexpr operator std::span<T const>() const {
-		return std::span<T const>(containers::data(*this), static_cast<std::size_t>(size()));
+		return std::span<T const>(data(), static_cast<std::size_t>(size()));
 	}
 	constexpr operator std::span<T>() {
-		return std::span<T>(containers::data(*this), static_cast<std::size_t>(size()));
+		return std::span<T>(data(), static_cast<std::size_t>(size()));
 	}
 
 private:
