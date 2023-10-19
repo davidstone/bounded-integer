@@ -17,6 +17,7 @@ import containers.algorithms.compare;
 import containers.array;
 import containers.begin_end;
 import containers.common_iterator_functions;
+import containers.forward_random_access_range;
 import containers.front_back;
 import containers.is_empty;
 import containers.is_iterator;

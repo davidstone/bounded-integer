@@ -14,6 +14,7 @@ export module containers.is_range;
 import containers.begin_end;
 import containers.c_array;
 import containers.is_iterator_sentinel;
+import containers.sentinel_t;
 
 import bounded;
 import std_module;
@@ -23,23 +24,8 @@ namespace containers {
 export template<typename Range>
 using iterator_t_impl = decltype(containers::begin(bounded::declval<Range>()));
 
-export template<typename Range>
-using sentinel_t = decltype(containers::end(bounded::declval<Range>()));
-
 export template<typename T>
 concept range = sentinel_for<sentinel_t<T>, iterator_t_impl<T>>;
-
-export template<typename T>
-concept forward_range = range<T> and forward_iterator<iterator_t_impl<T>>;
-
-export template<typename T>
-concept bidirectional_range = forward_range<T> and bidirectional_iterator<iterator_t_impl<T>>;
-
-export template<typename T>
-concept forward_random_access_range = forward_range<T> and forward_random_access_iterator<iterator_t_impl<T>>;
-
-export template<typename T>
-concept random_access_range = bidirectional_range<T> and forward_random_access_range<T>;
 
 } // namespace containers
 

@@ -9,9 +9,10 @@ import containers.algorithms.copy;
 
 import containers.array;
 import containers.begin_end;
+import containers.bidirectional_range;
 import containers.c_array;
 import containers.common_iterator_functions;
-import containers.range;
+import containers.random_access_range;
 
 import bounded;
 import std_module;

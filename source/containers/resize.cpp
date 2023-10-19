@@ -17,6 +17,7 @@ import containers.append;
 import containers.begin_end;
 import containers.count_type;
 import containers.data;
+import containers.forward_random_access_range;
 import containers.pop_back;
 import containers.range;
 import containers.range_value_t;

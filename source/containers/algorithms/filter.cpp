@@ -22,9 +22,9 @@ import containers.default_begin_end_size;
 import containers.is_iterator;
 import containers.is_iterator_sentinel;
 import containers.iterator_adapter;
-import containers.range;
 import containers.range_value_t;
 import containers.reference_wrapper;
+import containers.sentinel_t;
 
 import bounded;
 import std_module;

@@ -8,7 +8,7 @@ export module containers.data;
 import containers.begin_end;
 import containers.is_iterator_sentinel;
 import containers.iterator_t;
-import containers.range;
+import containers.random_access_range;
 import containers.to_address;
 
 namespace containers {

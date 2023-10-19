@@ -12,6 +12,7 @@ export module containers.size;
 import containers.algorithms.distance;
 import containers.begin_end;
 import containers.c_array;
+import containers.forward_random_access_range;
 import containers.has_member_size;
 import containers.iter_difference_t;
 import containers.iterator_t;

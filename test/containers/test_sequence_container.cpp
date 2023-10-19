@@ -13,9 +13,9 @@ export module containers.test.test_sequence_container;
 import containers.algorithms.compare;
 import containers.array;
 import containers.begin_end;
+import containers.forward_range;
 import containers.is_container;
 import containers.is_iterator;
-import containers.range;
 import containers.range_value_t;
 import containers.size;
 

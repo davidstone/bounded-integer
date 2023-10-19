@@ -14,6 +14,7 @@ import containers.algorithms.compare;
 import containers.array;
 import containers.begin_end;
 import containers.common_iterator_functions;
+import containers.forward_random_access_range;
 import containers.has_member_size;
 import containers.is_iterator_sentinel;
 import containers.iter_difference_t;
@@ -89,6 +90,7 @@ struct range_view {
 	{
 	}
 	
+	// TODO: data?
 	constexpr auto begin() const & -> Iterator requires bounded::copy_constructible<Iterator> {
 		return m_begin;
 	}

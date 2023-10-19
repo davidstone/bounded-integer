@@ -267,6 +267,7 @@ target_sources(containers PUBLIC
 		source/containers/batched.cpp
 		source/containers/begin_end.cpp
 		source/containers/bidirectional_linked_list.cpp
+		source/containers/bidirectional_range.cpp
 		source/containers/c_array.cpp
 		source/containers/can_set_size.cpp
 		source/containers/clear.cpp
@@ -289,6 +290,8 @@ target_sources(containers PUBLIC
 		source/containers/extract_key_to_less.cpp
 		source/containers/flat_map.cpp
 		source/containers/forward_linked_list.cpp
+		source/containers/forward_random_access_range.cpp
+		source/containers/forward_range.cpp
 		source/containers/front_back.cpp
 		source/containers/get_source_size.cpp
 		source/containers/has_member_before_begin.cpp
@@ -330,6 +333,7 @@ target_sources(containers PUBLIC
 		source/containers/push_back.cpp
 		source/containers/push_back_into_capacity.cpp
 		source/containers/push_front.cpp
+		source/containers/random_access_range.cpp
 		source/containers/range.cpp
 		source/containers/range_reference_t.cpp
 		source/containers/range_value_t.cpp
@@ -340,6 +344,7 @@ target_sources(containers PUBLIC
 		source/containers/reservable.cpp
 		source/containers/resizable_container.cpp
 		source/containers/resize.cpp
+		source/containers/sentinel_t.cpp
 		source/containers/shrink_to_fit.cpp
 		source/containers/size.cpp
 		source/containers/size_then_use_range.cpp
