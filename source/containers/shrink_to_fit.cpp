@@ -3,22 +3,14 @@
 // (See accompanying file LICENSE_1_0.txt or copy at
 // http://www.boost.org/LICENSE_1_0.txt)
 
-module;
-
-#include <bounded/assert.hpp>
-
 export module containers.shrink_to_fit;
 
-import containers.algorithms.compare;
 import containers.algorithms.uninitialized;
 import containers.begin_end;
 import containers.range;
-import containers.push_back;
 import containers.size;
-import containers.vector;
 
 import bounded;
-import bounded.test_int;
 import numeric_traits;
 import std_module;
 
@@ -47,85 +39,3 @@ constexpr auto shrink_to_fit(Container & c) {
 }
 
 } // namespace containers
-
-namespace {
-
-struct container {
-	constexpr container() {
-		m_data.reserve(1_bi);
-	}
-
-	constexpr auto begin() const {
-		return containers::begin(m_data);
-	}
-	constexpr auto begin() {
-		return containers::begin(m_data);
-	}
-	constexpr auto size() const {
-		return containers::size(m_data);
-	}
-
-	constexpr void reserve(auto const new_capacity) & {
-		m_data.reserve(new_capacity);
-	}
-	constexpr auto capacity() const {
-		return bounded::assume_in_range(m_data.capacity(), 1_bi, 5_bi);
-	}
-	constexpr void set_size(auto const new_size) {
-		m_data.set_size(new_size);
-	}
-
-private:
-	containers::vector<bounded_test::integer> m_data;
-};
-
-static_assert(container().capacity() == 1_bi);
-
-static_assert([]{
-	auto x = container();
-	containers::shrink_to_fit(x);
-	BOUNDED_ASSERT(x.capacity() == 1_bi);
-	BOUNDED_ASSERT(containers::equal(x, containers::vector<bounded_test::integer>()));
-	return true;
-}());
-
-static_assert([]{
-	auto x = container();
-	containers::push_back(x, 5);
-	containers::shrink_to_fit(x);
-	BOUNDED_ASSERT(x.capacity() == 1_bi);
-	BOUNDED_ASSERT(containers::equal(x, containers::vector({bounded_test::integer(5)})));
-	return true;
-}());
-
-static_assert([]{
-	auto x = container();
-	x.reserve(4_bi);
-	containers::shrink_to_fit(x);
-	BOUNDED_ASSERT(x.capacity() == 1_bi);
-	BOUNDED_ASSERT(containers::equal(x, containers::vector<bounded_test::integer>()));
-	return true;
-}());
-
-static_assert([]{
-	auto x = container();
-	x.reserve(4_bi);
-	containers::push_back(x, 5);
-	containers::shrink_to_fit(x);
-	BOUNDED_ASSERT(x.capacity() == 1_bi);
-	BOUNDED_ASSERT(containers::equal(x, containers::vector({bounded_test::integer(5)})));
-	return true;
-}());
-
-static_assert([]{
-	auto x = container();
-	x.reserve(4_bi);
-	containers::push_back(x, 5);
-	containers::push_back(x, 7);
-	containers::shrink_to_fit(x);
-	BOUNDED_ASSERT(x.capacity() == 2_bi);
-	BOUNDED_ASSERT(containers::equal(x, containers::vector({bounded_test::integer(5), bounded_test::integer(7)})));
-	return true;
-}());
-
-} // namespace

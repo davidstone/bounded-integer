@@ -408,6 +408,7 @@ target_sources(containers_test PRIVATE
 		test/containers/pop_back.cpp
 		test/containers/push_back.cpp
 		test/containers/push_back_into_capacity.cpp
+		test/containers/shrink_to_fit.cpp
 		test/containers/stable_vector.cpp
 		test/containers/test_associative_container.cpp
 		test/containers/test_reserve_and_capacity.cpp
