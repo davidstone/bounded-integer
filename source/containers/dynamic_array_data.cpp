@@ -42,7 +42,7 @@ constexpr auto allocate_storage(bounded::convertible_to<Size> auto const size) {
 
 export template<typename T, typename Size>
 constexpr auto deallocate_storage(dynamic_array_data<T, Size> const data) {
-	std::allocator<T>{}.deallocate(
+	std::allocator<T>().deallocate(
 		data.pointer,
 		static_cast<std::size_t>(data.size)
 	);
