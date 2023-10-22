@@ -33,7 +33,7 @@ struct dynamic_array_data {
 
 
 export template<typename T, typename Size>
-constexpr auto allocate_storage(auto const size) {
+constexpr auto allocate_storage(bounded::convertible_to<Size> auto const size) {
 	return dynamic_array_data<T, Size>(
 		std::allocator<T>{}.allocate(static_cast<std::size_t>(size)),
 		size
