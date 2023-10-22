@@ -27,7 +27,7 @@ struct dynamic_array_data {
 	{
 	}
 
-	T * pointer;
+	[[no_unique_address]] T * pointer;
 	[[no_unique_address]] Size size;
 };
 
