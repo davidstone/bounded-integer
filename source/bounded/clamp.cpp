@@ -9,6 +9,8 @@ import bounded.integer;
 import bounded.is_bounded_integer;
 import bounded.minmax;
 
+import numeric_traits;
+
 namespace bounded {
 
 export constexpr auto clamp(bounded_integer auto const & value, bounded_integer auto const & minimum, bounded_integer auto const & maximum) {
@@ -19,6 +21,11 @@ export constexpr auto clamp(bounded_integer auto const & value, bounded_integer 
 		),
 		maximum
 	);
+}
+
+export template<typename Target>
+constexpr auto clamp(integral auto const value) {
+	return ::bounded::clamp(bounded::integer(value), numeric_traits::min_value<Target>, numeric_traits::max_value<Target>);
 }
 
 } // namespace bounded
@@ -41,3 +48,4 @@ static_assert(
 	clamp(bounded::constant<2000>, minimum, maximum) == maximum,
 	"Fail to clamp above range with a strictly greater type."
 );
+static_assert(bounded::clamp<bounded::integer<30, 40>>(20) == bounded::constant<30>);
