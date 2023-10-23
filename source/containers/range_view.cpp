@@ -21,6 +21,7 @@ import containers.iter_difference_t;
 import containers.iter_value_t;
 import containers.range;
 import containers.size;
+import containers.sized_range;
 
 import bounded;
 import std_module;

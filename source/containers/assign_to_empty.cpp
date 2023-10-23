@@ -27,6 +27,7 @@ import containers.reservable;
 import containers.resizable_container;
 import containers.size;
 import containers.size_then_use_range;
+import containers.sized_range;
 import containers.supports_lazy_insert_after;
 import containers.take;
 

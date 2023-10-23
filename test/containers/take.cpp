@@ -15,6 +15,7 @@ import containers.begin_end;
 import containers.common_iterator_functions;
 import containers.iter_difference_t;
 import containers.iterator_t;
+import containers.sized_range;
 import containers.take;
 
 import bounded;

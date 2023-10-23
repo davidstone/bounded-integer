@@ -24,6 +24,7 @@ import containers.reallocation_size;
 import containers.reservable;
 import containers.size;
 import containers.size_then_use_range;
+import containers.sized_range;
 
 import bounded;
 import std_module;

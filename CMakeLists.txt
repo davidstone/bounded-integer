@@ -348,6 +348,7 @@ target_sources(containers PUBLIC
 		source/containers/shrink_to_fit.cpp
 		source/containers/size.cpp
 		source/containers/size_then_use_range.cpp
+		source/containers/sized_range.cpp
 		source/containers/small_buffer_optimized_vector.cpp
 		source/containers/splicable.cpp
 		source/containers/stable_vector.cpp

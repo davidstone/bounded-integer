@@ -12,19 +12,16 @@ export module containers.size;
 import containers.algorithms.distance;
 import containers.begin_end;
 import containers.c_array;
-import containers.forward_random_access_range;
 import containers.has_member_size;
 import containers.iter_difference_t;
 import containers.iterator_t;
+import containers.sized_range;
 import containers.range;
 
 import bounded;
 import std_module;
 
 namespace containers {
-
-export template<typename Range>
-concept sized_range = (range<Range> and has_member_size<Range>) or forward_random_access_range<Range>;
 
 template<range T>
 struct size_type_impl {

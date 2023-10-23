@@ -30,6 +30,7 @@ import containers.range;
 import containers.range_view;
 import containers.sentinel_t;
 import containers.size;
+import containers.sized_range;
 import containers.to_any_string;
 
 import bounded;

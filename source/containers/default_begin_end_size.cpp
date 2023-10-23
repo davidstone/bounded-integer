@@ -11,6 +11,7 @@ export module containers.default_begin_end_size;
 
 import containers.begin_end;
 import containers.size;
+import containers.sized_range;
 
 namespace containers {
 
@@ -23,7 +24,7 @@ export struct default_begin_end_size {
 		return containers::end(OPERATORS_FORWARD(range));
 	}
 
-	static constexpr auto get_size(auto const & range) requires requires { containers::size(range); } {
+	static constexpr auto get_size(sized_range auto const & range) {
 		return containers::size(range);
 	}
 	template<typename Range> requires requires { Range::size(); }

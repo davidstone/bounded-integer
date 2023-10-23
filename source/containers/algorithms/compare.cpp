@@ -12,6 +12,7 @@ import containers.is_iterator;
 import containers.is_iterator_sentinel;
 import containers.range;
 import containers.size;
+import containers.sized_range;
 
 import bounded;
 import std_module;

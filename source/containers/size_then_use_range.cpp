@@ -6,7 +6,7 @@
 export module containers.size_then_use_range;
 
 import containers.forward_range;
-import containers.size;
+import containers.sized_range;
 
 namespace containers {
 
@@ -14,6 +14,6 @@ namespace containers {
 // range. An unsized input range is an example of a range that does not model
 // this concept.
 export template<typename Range>
-concept size_then_use_range = forward_range<Range const &> or requires(Range const & r) { containers::size(r); };
+concept size_then_use_range = forward_range<Range const &> or sized_range<Range const &>;
 
 } // namespace containers
