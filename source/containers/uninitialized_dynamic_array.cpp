@@ -26,6 +26,11 @@ struct [[clang::trivial_abi]] uninitialized_dynamic_array {
 		m_capacity(0_bi)
 	{
 	}
+	constexpr uninitialized_dynamic_array(bounded::constant_t<0>) noexcept requires bounded::constructible_from<Capacity, bounded::constant_t<0>>:
+		m_ptr(nullptr),
+		m_capacity(0_bi)
+	{
+	}
 	constexpr explicit uninitialized_dynamic_array(Capacity capacity):
 		m_ptr(allocate(capacity)),
 		m_capacity(capacity)
