@@ -19,6 +19,7 @@ import containers.begin_end;
 import containers.count_type;
 import containers.data;
 import containers.iterator_t;
+import containers.linear_size;
 import containers.mutable_iterator;
 import containers.offset_type;
 import containers.range;

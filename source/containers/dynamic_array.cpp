@@ -20,11 +20,11 @@ import containers.common_functions;
 import containers.compare_container;
 import containers.initializer_range;
 import containers.is_container;
+import containers.linear_size;
 import containers.maximum_array_size;
 import containers.range;
 import containers.range_value_t;
 import containers.range_view;
-import containers.size;
 import containers.uninitialized_dynamic_array;
 
 import bounded;

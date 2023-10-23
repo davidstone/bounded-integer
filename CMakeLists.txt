@@ -317,6 +317,7 @@ target_sources(containers PUBLIC
 		source/containers/legacy_append.cpp
 		source/containers/legacy_iterator.cpp
 		source/containers/linear_map.cpp
+		source/containers/linear_size.cpp
 		source/containers/linked_list_helper.cpp
 		source/containers/lookup.cpp
 		source/containers/map_tags.cpp

@@ -9,13 +9,11 @@ module;
 
 export module containers.size;
 
-import containers.algorithms.distance;
 import containers.begin_end;
 import containers.c_array;
 import containers.has_member_size;
 import containers.range_size_t;
 import containers.sized_range;
-import containers.range;
 
 import bounded;
 import std_module;
@@ -36,18 +34,6 @@ constexpr auto size(Range && range) {
 export template<typename T, std::size_t size_>
 constexpr auto size(c_array<T, size_> const &) {
 	return bounded::constant<size_>;
-}
-
-export template<range Range>
-constexpr auto linear_size(Range && r) {
-	if constexpr (requires { containers::size(OPERATORS_FORWARD(r)); }) {
-		return containers::size(OPERATORS_FORWARD(r));
-	} else {
-		return ::bounded::assume_in_range<range_size_t<Range>>(containers::distance(
-			containers::begin(OPERATORS_FORWARD(r)),
-			containers::end(OPERATORS_FORWARD(r))
-		));
-	}
 }
 
 } // namespace containers

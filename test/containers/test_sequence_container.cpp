@@ -16,8 +16,8 @@ import containers.begin_end;
 import containers.forward_range;
 import containers.is_container;
 import containers.is_iterator;
+import containers.linear_size;
 import containers.range_value_t;
-import containers.size;
 
 import bounded;
 import std_module;

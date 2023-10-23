@@ -15,10 +15,10 @@ import containers.begin_end;
 import containers.get_source_size;
 import containers.is_container;
 import containers.legacy_iterator;
+import containers.linear_size;
 import containers.range_value_t;
 import containers.reallocation_size;
 import containers.reservable;
-import containers.size;
 import containers.size_then_use_range;
 
 import std_module;
