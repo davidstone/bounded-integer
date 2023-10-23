@@ -68,7 +68,7 @@ constexpr auto reusable_concatenate_container(reusable_concatenate_t<Result, Int
 			return reusable_concatenate_t<Result, Integer>{std::addressof(range), result.before_size};
 		}
 	}
-	result.before_size += size(range);
+	result.before_size += ::containers::size(range);
 	return result;
 }
 
