@@ -20,6 +20,7 @@ import containers.algorithms.partition;
 import containers.begin_end;
 import containers.legacy_iterator;
 import containers.range;
+import containers.range_size_t;
 import containers.range_view;
 import containers.size;
 

@@ -7,7 +7,7 @@ export module containers.is_empty;
 
 import containers.begin_end;
 import containers.range;
-import containers.size;
+import containers.range_size_t;
 
 import bounded;
 import numeric_traits;

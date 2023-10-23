@@ -6,7 +6,7 @@
 export module containers.can_set_size;
 
 import containers.range;
-import containers.size;
+import containers.range_size_t;
 
 namespace containers {
 

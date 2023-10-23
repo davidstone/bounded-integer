@@ -19,6 +19,7 @@ import containers.lazy_push_back;
 import containers.legacy_append;
 import containers.push_back;
 import containers.range;
+import containers.range_size_t;
 import containers.range_value_t;
 import containers.reallocation_size;
 import containers.reservable;

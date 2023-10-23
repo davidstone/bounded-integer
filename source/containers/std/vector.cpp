@@ -30,6 +30,7 @@ import containers.maximum_array_size;
 import containers.pop_back;
 import containers.push_back;
 import containers.push_back_into_capacity;
+import containers.range_size_t;
 import containers.range_view;
 import containers.repeat_n;
 import containers.resize;

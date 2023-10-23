@@ -12,6 +12,7 @@ module;
 export module containers.test.test_reserve_and_capacity;
 
 import containers.data;
+import containers.range_size_t;
 import containers.range_value_t;
 import containers.size;
 

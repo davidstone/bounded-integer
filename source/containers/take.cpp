@@ -27,6 +27,7 @@ import containers.iterator_category_base;
 import containers.iter_value_t;
 import containers.iterator_t;
 import containers.range;
+import containers.range_size_t;
 import containers.range_view;
 import containers.sentinel_t;
 import containers.size;

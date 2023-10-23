@@ -18,6 +18,7 @@ import containers.c_array;
 import containers.clear;
 import containers.is_empty;
 import containers.push_back;
+import containers.range_size_t;
 import containers.range_value_t;
 import containers.size;
 import containers.small_buffer_optimized_vector;

@@ -11,6 +11,7 @@ export module containers.test.algorithms.concatenate;
 
 import containers.algorithms.concatenate;
 import containers.begin_end;
+import containers.range_size_t;
 import containers.size;
 import containers.vector;
 

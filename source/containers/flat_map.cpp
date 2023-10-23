@@ -40,6 +40,7 @@ import containers.maximum_array_size;
 import containers.mutable_iterator;
 import containers.push_back;
 import containers.range;
+import containers.range_size_t;
 import containers.range_value_t;
 import containers.range_view;
 import containers.size;

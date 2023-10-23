@@ -26,6 +26,7 @@ import containers.iter_difference_t;
 import containers.iter_value_t;
 import containers.iterator_t;
 import containers.offset_type;
+import containers.range_size_t;
 import containers.range_view;
 import containers.repeat_n;
 import containers.size;

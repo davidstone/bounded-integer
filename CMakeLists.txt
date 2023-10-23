@@ -336,6 +336,7 @@ target_sources(containers PUBLIC
 		source/containers/random_access_range.cpp
 		source/containers/range.cpp
 		source/containers/range_reference_t.cpp
+		source/containers/range_size_t.cpp
 		source/containers/range_value_t.cpp
 		source/containers/range_view.cpp
 		source/containers/reallocation_size.cpp

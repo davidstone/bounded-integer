@@ -19,6 +19,7 @@ import containers.data;
 import containers.is_iterator;
 import containers.iterator_t;
 import containers.iter_difference_t;
+import containers.range_size_t;
 import containers.range_value_t;
 import containers.range_view;
 import containers.resizable_container;

@@ -5,6 +5,7 @@
 
 export module containers.get_source_size;
 
+import containers.range_size_t;
 import containers.size;
 import containers.size_then_use_range;
 

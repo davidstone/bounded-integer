@@ -5,7 +5,7 @@
 
 export module containers.reservable;
 
-import containers.size;
+import containers.range_size_t;
 
 import bounded;
 import std_module;

@@ -5,7 +5,7 @@
 
 export module containers.index_type;
 
-import containers.size;
+import containers.range_size_t;
 
 import bounded;
 import numeric_traits;

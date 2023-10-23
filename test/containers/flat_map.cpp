@@ -18,7 +18,7 @@ import containers.associative_container;
 import containers.flat_map;
 import containers.map_tags;
 import containers.maximum_array_size;
-import containers.size;
+import containers.range_size_t;
 
 import bounded;
 import bounded.test_int;

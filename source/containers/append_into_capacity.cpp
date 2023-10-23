@@ -19,6 +19,7 @@ import containers.lazy_push_back_into_capacity;
 import containers.legacy_append;
 import containers.push_back_into_capacity;
 import containers.range;
+import containers.range_size_t;
 import containers.range_value_t;
 import containers.size;
 import containers.size_then_use_range;

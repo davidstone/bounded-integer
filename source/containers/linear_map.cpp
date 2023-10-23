@@ -26,6 +26,7 @@ import containers.map_tags;
 import containers.map_value_type;
 import containers.maximum_array_size;
 import containers.range;
+import containers.range_size_t;
 import containers.range_value_t;
 import containers.range_view;
 import containers.size;
