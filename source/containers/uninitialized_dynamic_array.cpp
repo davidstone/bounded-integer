@@ -47,7 +47,7 @@ struct [[clang::trivial_abi]] uninitialized_dynamic_array {
 		m_capacity(std::exchange(other.m_capacity, {}))
 	{
 	}
-	constexpr uninitialized_dynamic_array & operator=(uninitialized_dynamic_array && other) & noexcept {
+	constexpr auto operator=(uninitialized_dynamic_array && other) & noexcept -> uninitialized_dynamic_array & {
 		auto const original_ptr = release();
 		m_ptr = other.release();
 		auto const original_capacity = std::exchange(m_capacity, other.m_capacity);
@@ -68,7 +68,7 @@ struct [[clang::trivial_abi]] uninitialized_dynamic_array {
 	constexpr auto data() noexcept -> T * {
 		return m_ptr;
 	}
-	constexpr auto capacity() const noexcept {
+	constexpr auto capacity() const noexcept -> Capacity {
 		BOUNDED_ASSERT(m_ptr != nullptr or m_capacity == 0_bi);
 		return m_capacity;
 	}
@@ -80,7 +80,7 @@ struct [[clang::trivial_abi]] uninitialized_dynamic_array {
 	}
 
 private:
-	constexpr auto release() & noexcept {
+	constexpr auto release() & noexcept -> T * {
 		return std::exchange(m_ptr, nullptr);
 	}
 	static constexpr auto allocate(Capacity const capacity) -> T * {
