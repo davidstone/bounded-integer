@@ -15,6 +15,7 @@ import bounded.integer;
 import bounded.is_bounded_integer;
 import bounded.literal;
 import bounded.tombstone_traits;
+import bounded.unchecked;
 
 import numeric_traits;
 

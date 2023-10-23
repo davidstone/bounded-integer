@@ -18,6 +18,7 @@ import bounded.is_bounded_integer;
 import bounded.normalize;
 import bounded.overlapping_range;
 import bounded.safe_extreme;
+import bounded.unchecked;
 import bounded.underlying_type;
 
 import numeric_traits;
@@ -27,10 +28,6 @@ namespace bounded {
 
 export template<auto minimum, auto maximum>
 struct integer;
-
-export struct unchecked_t {
-};
-export constexpr auto unchecked = unchecked_t();
 
 } // namespace bounded
 

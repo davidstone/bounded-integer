@@ -16,6 +16,8 @@ import bounded.comparison;
 import bounded.integer;
 import bounded.is_bounded_integer;
 import bounded.normalize;
+import bounded.unchecked;
+
 import numeric_traits;
 
 namespace bounded {

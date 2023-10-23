@@ -128,6 +128,7 @@ target_sources(bounded PUBLIC
 		source/bounded/to_integer.cpp
 		source/bounded/tombstone_traits.cpp
 		source/bounded/type.cpp
+		source/bounded/unchecked.cpp
 		source/bounded/underlying_type.cpp
 		source/bounded/value_to_function.cpp
 )

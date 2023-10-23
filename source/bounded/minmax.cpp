@@ -20,6 +20,7 @@ import bounded.is_bounded_integer;
 import bounded.normalize;
 import bounded.overlapping_range;
 import bounded.test_int;
+import bounded.unchecked;
 
 import numeric_traits;
 import std_module;

@@ -12,6 +12,7 @@ import bounded.homogeneous_equals;
 import bounded.integer;
 import bounded.is_bounded_integer;
 import bounded.minmax;
+import bounded.unchecked;
 
 import numeric_traits;
 

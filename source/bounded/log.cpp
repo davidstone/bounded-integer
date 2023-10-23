@@ -15,6 +15,7 @@ import bounded.comparison;
 import bounded.comparison_builtin;
 import bounded.integer;
 import bounded.is_bounded_integer;
+import bounded.unchecked;
 
 import numeric_traits;
 import std_module;

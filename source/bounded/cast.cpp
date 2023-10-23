@@ -9,6 +9,7 @@ import bounded.integer;
 import bounded.comparison;
 import bounded.normalize;
 import bounded.safe_extreme;
+import bounded.unchecked;
 
 namespace bounded {
 

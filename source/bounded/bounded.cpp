@@ -46,4 +46,5 @@ export import bounded.stream;
 export import bounded.to_integer;
 export import bounded.tombstone_traits;
 export import bounded.type;
+export import bounded.unchecked;
 export import bounded.value_to_function;

@@ -12,6 +12,7 @@ export module bounded.arithmetic.unary_minus;
 import bounded.homogeneous_equals;
 import bounded.integer;
 import bounded.normalize;
+import bounded.unchecked;
 
 import numeric_traits;
 import std_module;
