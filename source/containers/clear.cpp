@@ -11,7 +11,6 @@ import containers.erase_concepts;
 import containers.is_empty;
 import containers.pop_back;
 import containers.pop_front;
-import containers.size;
 
 import bounded;
 

@@ -35,7 +35,6 @@ import containers.range_view;
 import containers.repeat_n;
 import containers.resize;
 import containers.shrink_to_fit;
-import containers.size;
 import containers.to_address;
 import containers.vector;
 
@@ -233,7 +232,7 @@ struct vector {
 	}
 
 	constexpr auto size() const noexcept -> size_type {
-		return static_cast<size_type>(containers::size(m_impl));
+		return static_cast<size_type>(m_impl.size());
 	}
 
 	static constexpr auto max_size() noexcept -> size_type {

@@ -29,7 +29,6 @@ import containers.dynamic_array_data;
 import containers.initializer_range;
 import containers.maximum_array_size;
 import containers.range_view;
-import containers.size;
 import containers.uninitialized_array;
 
 import bounded;

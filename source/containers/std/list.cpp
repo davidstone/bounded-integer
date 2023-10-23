@@ -39,7 +39,6 @@ import containers.push_front;
 import containers.range_view;
 import containers.repeat_n;
 import containers.resize;
-import containers.size;
 
 import bounded;
 import bounded.test_int;
