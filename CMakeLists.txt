@@ -269,6 +269,7 @@ target_sources(containers PUBLIC
 		source/containers/begin_end.cpp
 		source/containers/bidirectional_linked_list.cpp
 		source/containers/bidirectional_range.cpp
+		source/containers/bounded_vector.cpp
 		source/containers/c_array.cpp
 		source/containers/can_set_size.cpp
 		source/containers/clear.cpp
