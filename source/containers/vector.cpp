@@ -20,7 +20,6 @@ import containers.begin_end;
 import containers.c_array;
 import containers.common_functions;
 import containers.compare_container;
-import containers.contiguous_iterator;
 import containers.initializer_range;
 import containers.maximum_array_size;
 import containers.range_value_t;
