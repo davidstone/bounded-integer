@@ -47,7 +47,7 @@ auto to_string(bounded_integer auto const x) {
 }
 
 export template<typename Exception = std::range_error>
-constexpr auto check_in_range(integral auto const value, bounded_integer auto const minimum, bounded_integer auto const maximum) {
+constexpr auto check_in_range(integral auto const value, integral auto const minimum, integral auto const maximum) {
 	if (minimum <= value and value <= maximum) {
 		return ::bounded::detail::assume_in_range_impl(value, minimum, maximum);
 	} else {
@@ -57,7 +57,11 @@ constexpr auto check_in_range(integral auto const value, bounded_integer auto co
 
 export template<typename Target, typename Exception = std::range_error>
 constexpr auto check_in_range(integral auto const value) {
-	return ::bounded::check_in_range<Exception>(value, numeric_traits::min_value<Target>, numeric_traits::max_value<Target>);
+	return static_cast<Target>(::bounded::check_in_range<Exception>(
+		value,
+		numeric_traits::min_value<Target>,
+		numeric_traits::max_value<Target>
+	));
 }
 
 } // namespace bounded
