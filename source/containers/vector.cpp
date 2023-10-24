@@ -21,7 +21,6 @@ import containers.c_array;
 import containers.common_functions;
 import containers.compare_container;
 import containers.contiguous_iterator;
-import containers.data;
 import containers.initializer_range;
 import containers.maximum_array_size;
 import containers.range_value_t;
@@ -138,10 +137,10 @@ struct [[clang::trivial_abi]] vector : private lexicographical_comparison::base 
 	}
 
 	constexpr operator std::span<T const>() const {
-		return std::span<T const>(containers::data(*this), static_cast<std::size_t>(size()));
+		return std::span<T const>(data(), static_cast<std::size_t>(size()));
 	}
 	constexpr operator std::span<T>() {
-		return std::span<T>(containers::data(*this), static_cast<std::size_t>(size()));
+		return std::span<T>(data(), static_cast<std::size_t>(size()));
 	}
 
 private:
