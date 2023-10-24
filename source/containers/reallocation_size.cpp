@@ -6,6 +6,7 @@
 export module containers.reallocation_size;
 
 import bounded;
+import numeric_traits;
 
 using namespace bounded::literal;
 
@@ -15,7 +16,10 @@ export template<typename Capacity>
 constexpr auto reallocation_size(Capacity const current_capacity, auto const current_size, auto const extra_elements) {
 	return ::bounded::assume_in_range<Capacity>(bounded::max(
 		bounded::integer(current_size) + bounded::integer(extra_elements),
-		bounded::integer(current_capacity) * 2_bi
+		bounded::min(
+			bounded::integer(current_capacity) * 2_bi,
+			numeric_traits::max_value<Capacity>
+		)
 	));
 }
 
