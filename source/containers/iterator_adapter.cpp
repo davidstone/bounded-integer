@@ -44,7 +44,7 @@ template<typename T>
 using unwrapped_t = decltype(::containers::unwrap(bounded::declval<T>()));
 
 template<typename Iterator, typename Traits>
-concept adapted_dereferencable = requires(Iterator const it, unwrapped_t<Traits> const traits) {
+concept adapted_dereferenceable = requires(Iterator const it, unwrapped_t<Traits> const traits) {
 	traits.dereference(it);
 };
 
@@ -109,7 +109,7 @@ struct adapt_iterator : iterator_category_base<Iterator>, adapted_difference_typ
 
 	OPERATORS_ARROW_DEFINITIONS
 
-	friend constexpr auto operator*(adapt_iterator const it) -> decltype(auto) requires adapted_dereferencable<Iterator, Traits> {
+	friend constexpr auto operator*(adapt_iterator const it) -> decltype(auto) requires adapted_dereferenceable<Iterator, Traits> {
 		return it.traits().dereference(it.base());
 	}
 
