@@ -94,6 +94,7 @@ export import containers.range_view;
 export import containers.reallocation_size;
 export import containers.reference_wrapper;
 export import containers.repeat_n;
+export import containers.reserve_space_for;
 export import containers.resizable_container;
 export import containers.resize;
 export import containers.small_buffer_optimized_vector;

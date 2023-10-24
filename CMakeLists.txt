@@ -345,6 +345,7 @@ target_sources(containers PUBLIC
 		source/containers/reference_wrapper.cpp
 		source/containers/repeat_n.cpp
 		source/containers/reservable.cpp
+		source/containers/reserve_space_for.cpp
 		source/containers/resizable_container.cpp
 		source/containers/resize.cpp
 		source/containers/sentinel_t.cpp
