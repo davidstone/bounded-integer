@@ -9,6 +9,8 @@ module;
 
 export module containers.uninitialized_dynamic_array;
 
+import containers.dynamic_array_data;
+
 import bounded;
 import std_module;
 
@@ -21,78 +23,69 @@ struct [[clang::trivial_abi]] uninitialized_dynamic_array {
 	template<typename U, typename OtherCapacity>
 	friend struct uninitialized_dynamic_array;
 
-	constexpr uninitialized_dynamic_array() noexcept requires bounded::constructible_from<Capacity, bounded::constant_t<0>>:
-		m_ptr(nullptr),
-		m_capacity(0_bi)
-	{
-	}
-	constexpr uninitialized_dynamic_array(bounded::constant_t<0>) noexcept requires bounded::constructible_from<Capacity, bounded::constant_t<0>>:
-		m_ptr(nullptr),
-		m_capacity(0_bi)
-	{
+	constexpr uninitialized_dynamic_array() noexcept requires bounded::constructible_from<Capacity, bounded::constant_t<0>> = default;
+	constexpr uninitialized_dynamic_array(bounded::constant_t<0>) noexcept requires bounded::constructible_from<Capacity, bounded::constant_t<0>> {
 	}
 	constexpr explicit uninitialized_dynamic_array(Capacity capacity):
-		m_ptr(allocate(capacity)),
-		m_capacity(capacity)
+		m_storage(allocate(capacity))
 	{
 	}
 	template<typename OtherCapacity>
 	constexpr explicit uninitialized_dynamic_array(uninitialized_dynamic_array<T, OtherCapacity> && other) noexcept:
-		m_ptr(other.release()),
-		m_capacity(bounded::assume_in_range<Capacity>(other.m_capacity))
+		m_storage(
+			other.m_storage.pointer,
+			bounded::assume_in_range<Capacity>(other.m_storage.size)
+		)
 	{
+		other.m_storage.pointer = nullptr;
 	}
 	constexpr uninitialized_dynamic_array(uninitialized_dynamic_array && other) noexcept:
-		m_ptr(other.release()),
-		m_capacity(std::exchange(other.m_capacity, {}))
+		m_storage(other.m_storage)
 	{
+		other.m_storage.pointer = nullptr;
+		other.m_storage.size = {};
 	}
 	constexpr auto operator=(uninitialized_dynamic_array && other) & noexcept -> uninitialized_dynamic_array & {
-		auto const original_ptr = release();
-		m_ptr = other.release();
-		auto const original_capacity = std::exchange(m_capacity, other.m_capacity);
-		deallocate(original_ptr, original_capacity);
+		auto const original_storage = m_storage;
+		m_storage = other.m_storage;
+		other.m_storage.pointer = nullptr;
+		deallocate(original_storage);
 		return *this;
 	}
 	constexpr ~uninitialized_dynamic_array() noexcept {
-		deallocate(m_ptr, m_capacity);
+		deallocate(m_storage);
 	}
 	friend constexpr auto swap(uninitialized_dynamic_array & lhs, uninitialized_dynamic_array & rhs) noexcept -> void {
-		std::swap(lhs.m_ptr, rhs.m_ptr);
-		std::swap(lhs.m_capacity, rhs.m_capacity);
+		std::swap(lhs.m_storage, rhs.m_storage);
 	}
 
 	constexpr auto data() const noexcept -> T const * {
-		return m_ptr;
+		return m_storage.pointer;
 	}
 	constexpr auto data() noexcept -> T * {
-		return m_ptr;
+		return m_storage.pointer;
 	}
 	constexpr auto capacity() const noexcept -> Capacity {
-		BOUNDED_ASSERT(m_ptr != nullptr or m_capacity == 0_bi);
-		return m_capacity;
+		BOUNDED_ASSERT(m_storage.pointer != nullptr or m_storage.size == 0_bi);
+		return m_storage.size;
 	}
 
 	constexpr auto replace_allocation(Capacity new_capacity) -> void {
-		deallocate(m_ptr, m_capacity);
-		m_ptr = allocate(new_capacity);
-		m_capacity = new_capacity;
+		deallocate(m_storage);
+		m_storage = allocate(new_capacity);
 	}
 
 private:
-	constexpr auto release() & noexcept -> T * {
-		return std::exchange(m_ptr, nullptr);
+	using storage_t = dynamic_array_data<T, Capacity>;
+	static constexpr auto allocate(Capacity const capacity) -> storage_t {
+		return ::containers::allocate_storage<T, Capacity>(capacity);
 	}
-	static constexpr auto allocate(Capacity const capacity) -> T * {
-		return std::allocator<T>().allocate(static_cast<std::size_t>(capacity));
-	}
-	static constexpr auto deallocate(T * const ptr, Capacity const capacity) noexcept -> void {
-		if (ptr) {
-			std::allocator<T>().deallocate(ptr, static_cast<std::size_t>(capacity));
+	static constexpr auto deallocate(storage_t const storage) noexcept -> void {
+		if (storage.pointer) {
+			::containers::deallocate_storage(storage);
 		}
 	}
-	[[no_unique_address]] T * m_ptr;
-	[[no_unique_address]] Capacity m_capacity;
+	storage_t m_storage;
 };
 
 } // namespace containers
