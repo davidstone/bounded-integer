@@ -104,7 +104,7 @@ struct [[clang::trivial_abi]] vector : private lexicographical_comparison::base 
 	constexpr auto data() -> T * {
 		return m_storage.data();
 	}
-	constexpr auto size() const {
+	constexpr auto size() const -> size_type {
 		return m_size;
 	}
 	
