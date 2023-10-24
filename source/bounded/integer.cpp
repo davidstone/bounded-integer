@@ -80,7 +80,7 @@ concept bounded_by_range = overlapping_integer<T, minimum, maximum> and detail::
 
 namespace detail {
 
-export template<integral T, bounded_integer Minimum, bounded_integer Maximum>
+export template<integral T, integral Minimum, integral Maximum>
 constexpr auto assume_in_range_impl(T const value, Minimum, Maximum) {
 	return integer<
 		normalize<detail::safe_max(builtin_min_value<Minimum>, builtin_min_value<T>)>,
@@ -90,7 +90,7 @@ constexpr auto assume_in_range_impl(T const value, Minimum, Maximum) {
 
 } // namespace detail
 
-export constexpr auto assume_in_range(integral auto const value, bounded_integer auto const minimum, bounded_integer auto const maximum) {
+export constexpr auto assume_in_range(integral auto const value, integral auto const minimum, integral auto const maximum) {
 	if (value < minimum or maximum < value) {
 		std::unreachable();
 	}
@@ -242,6 +242,7 @@ static_assert(bounded::isomorphic_to_integral<bounded::integer<0, 1>>);
 static_assert(bounded::assume_in_range(bounded::constant<5>, bounded::constant<0>, bounded::constant<10>) == bounded::constant<5>);
 // This should not compile
 // constexpr auto value2 = bounded::assume_in_range(15, bounded::constant<0>, bounded::constant<10>);
+static_assert(bounded::assume_in_range(2, 1, 3) == bounded::integer(2));
 
 static_assert(homogeneous_equals(bounded::normalize<bounded::constant<0>>, 0));
 
