@@ -157,6 +157,11 @@ constexpr auto make_static_vector(Source && source) {
 	return static_vector<range_value_t<Source>, size>(OPERATORS_FORWARD(source));
 }
 
+export template<typename T, std::size_t size>
+constexpr auto make_static_vector(c_array<T, size> && source) {
+	return static_vector<T, bounded::constant<size>>(std::move(source));
+}
+
 } // namespace containers
 
 template<typename T, containers::array_size_type<T> capacity>
