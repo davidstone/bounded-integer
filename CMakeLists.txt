@@ -179,6 +179,7 @@ target_sources(tv PUBLIC
 		source/tv/indexed_value.cpp
 		source/tv/insert.cpp
 		source/tv/is_valid_index.cpp
+		source/tv/none.cpp
 		source/tv/nth_type.cpp
 		source/tv/optional.cpp
 		source/tv/overload.cpp

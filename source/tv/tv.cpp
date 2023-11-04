@@ -7,6 +7,7 @@ export module tv;
 
 export import tv.indexed_value;
 export import tv.insert;
+export import tv.none;
 export import tv.optional;
 export import tv.overload;
 export import tv.single_element_storage;

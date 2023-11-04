@@ -16,6 +16,7 @@ module;
 export module tv.optional;
  
 import tv.insert;
+import tv.none;
 import tv.variant;
 
 import bounded;
@@ -26,12 +27,6 @@ import std_module;
 using namespace bounded::literal;
 
 namespace tv {
-
-// none_t cannot be default constructible or we get an ambiguity in op = {};
-export struct none_t {
-	constexpr explicit none_t(int) {}
-};
-export constexpr auto none = none_t(0);
 
 template<typename T>
 struct optional_storage {
