@@ -96,7 +96,7 @@ public:
 	{
 	}
 	
-	constexpr explicit variant(matches_exactly_one_type<Ts...> auto && value):
+	constexpr variant(matches_exactly_one_type<Ts...> auto && value):
 		variant(
 			bounded::lazy_init,
 			bounded::value_to_function(OPERATORS_FORWARD(value))
@@ -438,5 +438,9 @@ static_assert(!std::invocable<decltype(tv::visit), decltype(variant), decltype(i
 static_assert(!std::invocable<decltype(tv::visit), decltype(variant), decltype(tv::overload(int_visitor))>);
 
 static_assert(std::same_as<decltype(bounded::declval<tv::variant<int> &>().emplace(0_bi, [] { return 0; })), int &>);
+
+static_assert(bounded::convertible_to<int, tv::variant<int, unsigned>>);
+static_assert(!bounded::convertible_to<short, tv::variant<int, unsigned>>);
+static_assert(!bounded::convertible_to<int, tv::variant<int, int>>);
 
 } // namespace
