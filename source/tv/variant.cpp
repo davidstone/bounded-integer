@@ -443,4 +443,22 @@ static_assert(bounded::convertible_to<int, tv::variant<int, unsigned>>);
 static_assert(!bounded::convertible_to<short, tv::variant<int, unsigned>>);
 static_assert(!bounded::convertible_to<int, tv::variant<int, int>>);
 
+struct unused {
+};
+struct multi_visitor {
+	static constexpr auto operator()(int const arg0, int const arg1) -> bool {
+		return arg0 == 0 and arg1 == 1;
+	}
+	static constexpr auto operator()(unused, int) -> bool {
+		return false;
+	}
+	static constexpr auto operator()(int, unused) -> bool {
+		return false;
+	}
+	static constexpr auto operator()(unused, unused) -> bool {
+		return false;
+	}
+};
+static_assert(tv::visit(tv::variant<int, unused>(0), tv::variant<unused, int>(1), multi_visitor()));
+
 } // namespace
