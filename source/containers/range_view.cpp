@@ -34,6 +34,7 @@ struct compute_end_from_size {
 	constexpr compute_end_from_size() = default;
 	constexpr compute_end_from_size(auto const &) {
 	}
+	friend auto operator<=>(compute_end_from_size, compute_end_from_size) = default;
 };
 
 template<typename T>
@@ -46,6 +47,7 @@ struct no_explicit_size {
 	constexpr no_explicit_size() = default;
 	constexpr no_explicit_size(auto const &) {
 	}
+	friend auto operator<=>(no_explicit_size, no_explicit_size) = default;
 };
 
 template<typename T>
