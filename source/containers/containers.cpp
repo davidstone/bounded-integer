@@ -41,6 +41,7 @@ export import containers.algorithms.set;
 export import containers.algorithms.transform;
 export import containers.algorithms.uninitialized;
 export import containers.algorithms.unique;
+export import containers.algorithms.zip;
 
 export import containers.std.vector;
 
