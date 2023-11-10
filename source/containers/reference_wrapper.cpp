@@ -13,7 +13,7 @@ import std_module;
 
 namespace containers {
 
-export template<typename T>
+template<typename T>
 constexpr auto is_reference_wrapper = false;
 
 template<typename T>
