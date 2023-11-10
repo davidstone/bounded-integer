@@ -14,6 +14,7 @@ import containers.array;
 import containers.common_iterator_functions;
 import containers.index_type;
 import containers.offset_type;
+import containers.stored_function;
 
 import bounded;
 import numeric_traits;
@@ -24,13 +25,6 @@ import std_module;
 using namespace bounded::literal;
 
 namespace containers {
-
-template<typename Function>
-using stored_function = std::conditional_t<
-	std::is_empty_v<Function> and std::is_trivially_copyable_v<Function>,
-	std::remove_const_t<Function>,
-	decltype(std::reference_wrapper(bounded::declval<Function &>()))
->;
 
 template<typename LHS, typename RHS>
 concept construct_subtractable = requires(LHS const lhs, RHS const rhs) {

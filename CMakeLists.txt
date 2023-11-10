@@ -360,6 +360,7 @@ target_sources(containers PUBLIC
 		source/containers/splicable.cpp
 		source/containers/stable_vector.cpp
 		source/containers/static_vector.cpp
+		source/containers/stored_function.cpp
 		source/containers/string.cpp
 		source/containers/supports_lazy_insert_after.cpp
 		source/containers/take.cpp
