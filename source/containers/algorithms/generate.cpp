@@ -35,11 +35,6 @@ struct generate_sentinel {};
 
 template<typename Offset, typename Function>
 struct generate_n_iterator {
-private:
-	[[no_unique_address]] Offset m_remaining;
-	[[no_unique_address]] stored_function<Function> m_generator;
-
-public:
 	using iterator_category = std::input_iterator_tag;
 	using difference_type = decltype(bounded::declval<Offset>() - bounded::declval<Offset>());
 	
@@ -77,6 +72,9 @@ public:
 			return it;
 		}
 	}
+private:
+	[[no_unique_address]] Offset m_remaining;
+	[[no_unique_address]] stored_function<Function> m_generator;
 };
 
 export template<typename Size, typename Function>
