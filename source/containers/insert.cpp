@@ -142,7 +142,11 @@ constexpr auto lazy_insert(
 	iterator_t<Container const &> const position,
 	bounded::construct_function_for<range_value_t<Container>> auto && constructor
 ) -> iterator_t<Container &> {
-	return ::containers::insert(container, position, generate_n(1_bi, [&] -> decltype(auto) { return OPERATORS_FORWARD(constructor)(); }));
+	return ::containers::insert(
+		container,
+		position,
+		generate_n(1_bi, OPERATORS_FORWARD(constructor))
+	);
 }
 
 // If `args` reference any element at or beyond `position` and `container` does
