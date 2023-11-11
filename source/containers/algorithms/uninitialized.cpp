@@ -34,13 +34,24 @@ concept memcpyable =
 	std::same_as<range_value_t<InputRange>, iter_value_t<OutputIterator>> and
 	std::is_trivially_copyable_v<iter_value_t<OutputIterator>>;
 
+template<typename Iterator>
+struct construct_at_output {
+	explicit constexpr construct_at_output(Iterator & output):
+		m_output(output)
+	{
+	}
+	constexpr auto operator()(auto make) const -> void {
+		bounded::construct_at(*m_output, make);
+		++m_output;
+	}
+private:
+	Iterator & m_output;
+};
+
 export constexpr auto uninitialized_copy = [](range auto && input, iterator auto output) {
 	auto out_first = output;
 	try {
-		copy_or_relocate_from(OPERATORS_FORWARD(input), [&](auto make) {
-			bounded::construct_at(*output, make);
-			++output;
-		});
+		copy_or_relocate_from(OPERATORS_FORWARD(input), construct_at_output(output));
 	} catch (...) {
 		containers::destroy_range(range_view(out_first, output));
 		throw;
