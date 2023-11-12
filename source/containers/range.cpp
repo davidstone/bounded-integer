@@ -11,17 +11,18 @@ import containers.has_member_size;
 import containers.is_iterator;
 import containers.is_iterator_sentinel;
 
+import bounded;
+
 namespace containers {
 
 template<typename T>
-concept size_based_range = has_member_size<T> and requires(T range) {
-	{ range.begin() } -> random_access_iterator;
+concept size_based_range = has_member_size<T> and requires {
+	{ bounded::declval<T>().begin() } -> random_access_iterator;
 };
 
 template<typename T>
-concept basic_range = requires(T range) {
-	range.begin();
-	{ range.end() } -> sentinel_for<decltype(range.begin())>;
+concept basic_range = requires {
+	{ bounded::declval<T>().end() } -> sentinel_for<decltype(bounded::declval<T>().begin())>;
 };
 
 template<typename T>
@@ -47,11 +48,25 @@ struct begin_and_end {
 };
 static_assert(all_qualifications_are_ranges<begin_and_end>);
 
+struct begin_and_end_rvalue {
+	auto begin() && -> int *;
+	auto end() && -> int *;
+};
+static_assert(containers::range<begin_and_end_rvalue>);
+static_assert(!containers::range<begin_and_end_rvalue const &>);
+
 struct begin_and_size {
 	auto begin() const -> int *;
 	auto size() const -> int;
 };
 static_assert(all_qualifications_are_ranges<begin_and_size>);
+
+struct begin_and_size_rvalue {
+	auto begin() && -> int *;
+	auto size() const -> int;
+};
+static_assert(containers::range<begin_and_size_rvalue>);
+static_assert(!containers::range<begin_and_size_rvalue const &>);
 
 struct before_begin_and_end {
 	auto before_begin() const -> int *;
