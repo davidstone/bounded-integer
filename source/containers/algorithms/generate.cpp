@@ -52,15 +52,20 @@ struct generate_n_iterator {
 	{
 	}
 
+	generate_n_iterator(generate_n_iterator &&) = default;
+	generate_n_iterator(generate_n_iterator const &) = delete;
+	auto operator=(generate_n_iterator &&) & -> generate_n_iterator & = default;
+	auto operator=(generate_n_iterator const &) & -> generate_n_iterator & = delete;
+
 	constexpr auto operator*() const -> decltype(auto) {
 		return std::invoke(::containers::get_generator<Offset>(m_generator));
 	}
 	OPERATORS_ARROW_DEFINITIONS
 
-	friend constexpr auto operator<=>(generate_n_iterator const lhs, generate_sentinel) {
+	friend constexpr auto operator<=>(generate_n_iterator const & lhs, generate_sentinel) {
 		return lhs.m_remaining <=> 0_bi;
 	}
-	friend constexpr auto operator==(generate_n_iterator const lhs, generate_sentinel) -> bool {
+	friend constexpr auto operator==(generate_n_iterator const & lhs, generate_sentinel) -> bool {
 		return lhs.m_remaining == 0_bi;
 	}
 
