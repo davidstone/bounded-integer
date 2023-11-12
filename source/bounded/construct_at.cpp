@@ -52,16 +52,21 @@ constexpr auto is_noexcept_construct_at = noexcept(static_cast<T>(declval<Functi
 template<typename T, typename Function> requires is_no_lazy_construction<std::invoke_result_t<Function>>
 constexpr auto is_noexcept_construct_at<T, Function> = noexcept(static_cast<T>(declval<Function>()().value));
 
-export constexpr auto construct_at = []<non_const T, construct_function_for<T> Function>(T & ref, Function && function) noexcept(is_noexcept_construct_at<T, Function>) -> T & {
-	auto make = [&] {
-		if constexpr (is_no_lazy_construction<std::invoke_result_t<Function>>) {
-			return OPERATORS_FORWARD(function)().value;
-		} else {
-			return superconstructing_super_elider<T, Function &&>(OPERATORS_FORWARD(function));
-		}
-	};
-	return *std::construct_at(std::addressof(ref), make());
+// https://github.com/llvm/llvm-project/issues/59513
+struct construct_at_t {
+	template<non_const T, construct_function_for<T> Function>
+	static constexpr auto operator()(T & ref, Function && function) noexcept(is_noexcept_construct_at<T, Function>) -> T & {
+		auto make = [&] {
+			if constexpr (is_no_lazy_construction<std::invoke_result_t<Function>>) {
+				return OPERATORS_FORWARD(function)().value;
+			} else {
+				return superconstructing_super_elider<T, Function &&>(OPERATORS_FORWARD(function));
+			}
+		};
+		return *std::construct_at(std::addressof(ref), make());
+	}
 };
+export constexpr auto construct_at = construct_at_t();
 
 } // namespace bounded
 
