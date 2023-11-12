@@ -116,11 +116,6 @@ concept index_invocable = std::invocable<Function const &, generate_index_type<S
 
 template<typename Offset, typename Function>
 struct indexed_generate_n_iterator {
-private:
-	[[no_unique_address]] Offset m_offset;
-	[[no_unique_address]] stored_function<Function const> m_generator;
-
-public:
 	using difference_type = decltype(bounded::declval<Offset>() - bounded::declval<Offset>());
 	
 	constexpr indexed_generate_n_iterator(Offset const remaining, Function const & generator):
@@ -162,6 +157,9 @@ public:
 	friend constexpr auto operator-(indexed_generate_n_iterator const lhs, indexed_generate_n_iterator const rhs) -> difference_type {
 		return lhs.m_offset - rhs.m_offset;
 	}
+private:
+	[[no_unique_address]] Offset m_offset;
+	[[no_unique_address]] stored_function<Function const> m_generator;
 };
 
 export template<typename Size, index_invocable<Size> Function>
