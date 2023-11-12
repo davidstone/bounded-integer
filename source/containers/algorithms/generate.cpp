@@ -124,8 +124,11 @@ struct indexed_generate_n_iterator {
 	{
 	}
 
-	constexpr decltype(auto) operator*() const {
-		return std::invoke(m_generator, bounded::assume_in_range<generate_index_type<Offset>>(m_offset));
+	constexpr auto operator*() const -> decltype(auto) {
+		return std::invoke(
+			m_generator,
+			bounded::assume_in_range<generate_index_type<Offset>>(m_offset)
+		);
 	}
 	OPERATORS_ARROW_DEFINITIONS
 
