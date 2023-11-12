@@ -38,8 +38,14 @@ export constexpr auto lexicographical_compare_3way(range auto && range1, range a
 
 
 export template<iterator InputIterator1, iterator InputIterator2>
-constexpr auto lexicographical_compare_3way(InputIterator1 const first1, sentinel_for<InputIterator1> auto const last1, InputIterator2 const first2, sentinel_for<InputIterator2> auto const last2) {
-	return ::containers::lexicographical_compare_3way(first1, last1, first2, last2, std::compare_three_way());
+constexpr auto lexicographical_compare_3way(InputIterator1 first1, sentinel_for<InputIterator1> auto last1, InputIterator2 first2, sentinel_for<InputIterator2> auto last2) {
+	return ::containers::lexicographical_compare_3way(
+		std::move(first1),
+		std::move(last1),
+		std::move(first2),
+		std::move(last2),
+		std::compare_three_way()
+	);
 }
 
 export constexpr auto lexicographical_compare_3way(range auto && range1, range auto && range2) {
@@ -58,8 +64,13 @@ constexpr auto lexicographical_compare_3way(InputIterator1 first1, sentinel_for<
 }
 
 export template<iterator InputIterator1>
-constexpr auto lexicographical_compare_3way(InputIterator1 const first1, sentinel_for<InputIterator1> auto const last1, iterator auto const first2) {
-	return ::containers::lexicographical_compare_3way(first1, last1, first2, std::compare_three_way());
+constexpr auto lexicographical_compare_3way(InputIterator1 first1, sentinel_for<InputIterator1> auto last1, iterator auto first2) {
+	return ::containers::lexicographical_compare_3way(
+		std::move(first1),
+		std::move(last1),
+		std::move(first2),
+		std::compare_three_way()
+	);
 }
 
 
@@ -102,8 +113,14 @@ constexpr auto equal(InputIterator1 first1, sentinel_for<InputIterator1> auto co
 
 
 export template<iterator InputIterator1, iterator InputIterator2>
-constexpr auto equal(InputIterator1 const first1, sentinel_for<InputIterator1> auto const last1, InputIterator2 const first2, sentinel_for<InputIterator2> auto const last2) {
-	return ::containers::equal(first1, last1, first2, last2, bounded::equal_to());
+constexpr auto equal(InputIterator1 first1, sentinel_for<InputIterator1> auto last1, InputIterator2 first2, sentinel_for<InputIterator2> auto last2) {
+	return ::containers::equal(
+		std::move(first1),
+		std::move(last1),
+		std::move(first2),
+		std::move(last2),
+		bounded::equal_to()
+	);
 }
 
 export template<iterator InputIterator1, iterator InputIterator2>
@@ -117,8 +134,13 @@ constexpr auto equal(InputIterator1 first1, sentinel_for<InputIterator1> auto co
 }
 
 export template<iterator InputIterator1, iterator InputIterator2>
-constexpr auto equal(InputIterator1 const first1, sentinel_for<InputIterator1> auto const last1, InputIterator2 const first2) {
-	return ::containers::equal(first1, last1, first2, bounded::equal_to());
+constexpr auto equal(InputIterator1 first1, sentinel_for<InputIterator1> auto last1, InputIterator2 first2) {
+	return ::containers::equal(
+		std::move(first1),
+		std::move(last1),
+		std::move(first2),
+		bounded::equal_to()
+	);
 }
 
 export template<range Range1, range Range2>
