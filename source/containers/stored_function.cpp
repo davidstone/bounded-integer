@@ -10,11 +10,30 @@ import std_module;
 
 namespace containers {
 
+// Use CTAD to avoid making a reference_wrapper<reference_wrapper>
+template<typename Function>
+using function_reference = decltype(std::reference_wrapper(bounded::declval<Function &>()));
+
+// This used to check if the function is empty instead of whether it is small
+// enough. The sizeof optimization is valid in all cases except those in which
+// the address of state in the function is relevant. In those cases, the
+// function should probably not be copyable (and definitely not trivially
+// copyable), so it seems safe to do.
+template<typename Function>
+constexpr auto can_store_copy =
+	std::invocable<Function const &> and
+	std::is_trivially_move_constructible_v<Function> and
+	std::is_trivially_copy_constructible_v<Function> and
+	std::is_trivially_move_assignable_v<Function> and
+	std::is_trivially_copy_assignable_v<Function> and
+	std::is_trivially_destructible_v<Function> and
+	sizeof(Function) <= sizeof(function_reference<Function>);
+
 export template<typename Function>
 using stored_function = std::conditional_t<
-	std::is_empty_v<Function> and std::is_trivially_copyable_v<Function>,
+	can_store_copy<Function>,
 	std::remove_const_t<Function>,
-	decltype(std::reference_wrapper(bounded::declval<Function &>()))
+	function_reference<Function>
 >;
 
 } // namespace containers
