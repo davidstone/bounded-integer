@@ -49,16 +49,8 @@ struct generate_n_iterator {
 	}
 	OPERATORS_ARROW_DEFINITIONS
 
-	// It is undefined behavior to compare iterators into different ranges
-	friend constexpr auto operator<=>(generate_n_iterator const lhs, generate_n_iterator const rhs) {
-		return lhs.m_remaining <=> rhs.m_remaining;
-	}
 	friend constexpr auto operator<=>(generate_n_iterator const lhs, generate_sentinel) {
 		return lhs.m_remaining <=> 0_bi;
-	}
-
-	friend constexpr auto operator==(generate_n_iterator const lhs, generate_n_iterator const rhs) -> bool {
-		return lhs.m_remaining == rhs.m_remaining;
 	}
 	friend constexpr auto operator==(generate_n_iterator const lhs, generate_sentinel) -> bool {
 		return lhs.m_remaining == 0_bi;
