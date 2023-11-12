@@ -44,27 +44,27 @@ template<typename T>
 using unwrapped_t = decltype(::containers::unwrap(bounded::declval<T>()));
 
 template<typename Iterator, typename Traits>
-concept adapted_dereferenceable = requires(Iterator const it, unwrapped_t<Traits> const traits) {
+concept adapted_dereferenceable = requires(Iterator const & it, unwrapped_t<Traits> const traits) {
 	traits.dereference(it);
 };
 
 template<typename Offset, typename Iterator, typename Traits>
-concept adapted_addable = requires(Offset const offset, Iterator const it, unwrapped_t<Traits> const traits) {
-	adapt_iterator<Iterator, Traits>(traits.add(it, offset), traits);
+concept adapted_addable = requires(Offset const offset, Iterator it, unwrapped_t<Traits> const traits) {
+	adapt_iterator<Iterator, Traits>(traits.add(std::move(it), offset), traits);
 };
 
 template<typename RHSIterator, typename LHSIterator, typename Traits>
-concept adapted_subtractable = requires(LHSIterator const lhs, RHSIterator const rhs, unwrapped_t<Traits> const traits) {
-	traits.subtract(lhs, rhs);
+concept adapted_subtractable = requires(LHSIterator lhs, RHSIterator rhs, unwrapped_t<Traits> const traits) {
+	traits.subtract(std::move(lhs), std::move(rhs));
 };
 
 template<typename RHSIterator, typename LHSIterator, typename Traits>
-concept adapted_ordered = requires(LHSIterator const lhs, RHSIterator const rhs, unwrapped_t<Traits> const traits) {
+concept adapted_ordered = requires(LHSIterator const & lhs, RHSIterator const & rhs, unwrapped_t<Traits> const traits) {
 	traits.compare(lhs, rhs);
 };
 
 template<typename RHSIterator, typename LHSIterator, typename Traits>
-concept adapted_equality_comparable = requires(LHSIterator const lhs, RHSIterator const rhs, unwrapped_t<Traits> const traits) {
+concept adapted_equality_comparable = requires(LHSIterator const & lhs, RHSIterator const & rhs, unwrapped_t<Traits> const traits) {
 	traits.equal(lhs, rhs);
 };
 
@@ -99,8 +99,11 @@ struct adapt_iterator : iterator_category_base<Iterator>, adapted_difference_typ
 	{
 	}
 	
-	constexpr auto base() const {
+	constexpr auto base() const & -> Iterator const & {
 		return m_base;
+	}
+	constexpr auto base() && -> Iterator && {
+		return std::move(m_base);
 	}
 
 	constexpr auto && traits() const {
@@ -109,27 +112,27 @@ struct adapt_iterator : iterator_category_base<Iterator>, adapted_difference_typ
 
 	OPERATORS_ARROW_DEFINITIONS
 
-	friend constexpr auto operator*(adapt_iterator const it) -> decltype(auto) requires adapted_dereferenceable<Iterator, Traits> {
+	friend constexpr auto operator*(adapt_iterator const & it) -> decltype(auto) requires adapted_dereferenceable<Iterator, Traits> {
 		return it.traits().dereference(it.base());
 	}
 
-	friend constexpr auto operator+(adapt_iterator const lhs, adapted_addable<Iterator, Traits> auto const rhs) -> adapt_iterator {
-		return adapt_iterator(lhs.traits().add(lhs.base(), rhs), lhs.traits());
+	friend constexpr auto operator+(adapt_iterator lhs, adapted_addable<Iterator, Traits> auto const rhs) -> adapt_iterator {
+		return adapt_iterator(lhs.traits().add(std::move(lhs).base(), rhs), lhs.traits());
 	}
 
 
 	template<adapted_subtractable<Iterator, Traits> RHSIterator>
-	friend constexpr auto operator-(adapt_iterator const lhs, adapt_iterator<RHSIterator, Traits> const rhs) {
-		return lhs.traits().subtract(lhs.base(), rhs.base());
+	friend constexpr auto operator-(adapt_iterator lhs, adapt_iterator<RHSIterator, Traits> rhs) {
+		return lhs.traits().subtract(std::move(lhs).base(), std::move(rhs).base());
 	}
 
 	template<adapted_ordered<Iterator, Traits> RHSIterator>
-	friend constexpr auto operator<=>(adapt_iterator const lhs, adapt_iterator<RHSIterator, Traits> const rhs) {
+	friend constexpr auto operator<=>(adapt_iterator const & lhs, adapt_iterator<RHSIterator, Traits> const & rhs) {
 		return lhs.traits().compare(lhs.base(), rhs.base());
 	}
 
 	template<adapted_equality_comparable<Iterator, Traits> RHSIterator>
-	friend constexpr auto operator==(adapt_iterator const lhs, adapt_iterator<RHSIterator, Traits> const rhs) -> bool {
+	friend constexpr auto operator==(adapt_iterator const & lhs, adapt_iterator<RHSIterator, Traits> const & rhs) -> bool {
 		return lhs.traits().equal(lhs.base(), rhs.base());
 	}
 
