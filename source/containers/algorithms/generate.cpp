@@ -14,13 +14,12 @@ import containers.array;
 import containers.common_iterator_functions;
 import containers.index_type;
 import containers.offset_type;
+import containers.reference_wrapper;
 import containers.stored_function;
 
 import bounded;
 import numeric_traits;
 import std_module;
-
-// TODO: Implement `generate`, then `generate_n(f, n)` is `take(generate(f), n)`
 
 using namespace bounded::literal;
 
@@ -33,6 +32,15 @@ concept construct_subtractable = requires(LHS const lhs, RHS const rhs) {
 
 struct generate_sentinel {};
 
+template<typename Offset>
+constexpr auto get_generator(auto && generator) -> auto && {
+	if constexpr (numeric_traits::max_value<Offset> <= 1_bi) {
+		return std::move(containers::unwrap(generator));
+	} else {
+		return containers::unwrap(generator);
+	}
+}
+
 template<typename Offset, typename Function>
 struct generate_n_iterator {
 	using iterator_category = std::input_iterator_tag;
@@ -44,8 +52,8 @@ struct generate_n_iterator {
 	{
 	}
 
-	constexpr decltype(auto) operator*() const {
-		return std::invoke(m_generator);
+	constexpr auto operator*() const -> decltype(auto) {
+		return std::invoke(::containers::get_generator<Offset>(m_generator));
 	}
 	OPERATORS_ARROW_DEFINITIONS
 
