@@ -48,6 +48,11 @@ concept trivially_copy_assignable = copy_assignable<T> and std::is_trivially_cop
 export template<typename T>
 concept trivially_swappable = std::is_trivially_copyable_v<T> and std::is_trivially_copy_assignable_v<T> and std::is_trivially_destructible_v<T>;
 
+export template<typename Function, typename Return, typename... Args>
+concept invocable_r = requires(Function function) {
+	{ function(declval<Args>()...) } -> convertible_to<Return>;
+};
+
 } // namespace bounded
 
 static_assert(bounded::constructible_from<void, void>);
@@ -69,3 +74,11 @@ static_assert(!bounded::convertible_to<void, int>);
 static_assert(!bounded::convertible_to<unsigned long long *, unsigned long long>);
 static_assert(!bounded::convertible_to<unsigned long long, unsigned long long *>);
 static_assert(!bounded::convertible_to<int *, unsigned *>);
+
+static_assert(bounded::invocable_r<void(*)(), void>);
+static_assert(!bounded::invocable_r<void(*)(int), void>);
+static_assert(bounded::invocable_r<void(*)(int), void, int>);
+static_assert(bounded::invocable_r<bool(*)(), bool>);
+static_assert(!bounded::invocable_r<bool(*)(int), bool>);
+static_assert(bounded::invocable_r<bool(*)(int), bool, int>);
+static_assert(bounded::invocable_r<int(*)(unsigned), bool, int>);
