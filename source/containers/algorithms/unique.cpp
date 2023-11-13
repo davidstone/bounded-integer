@@ -17,7 +17,7 @@ import containers.algorithms.advance;
 import containers.algorithms.compare;
 import containers.algorithms.concatenate_view;
 import containers.algorithms.find;
-import containers.algorithms.move_iterator;
+import containers.algorithms.move_range;
 import containers.begin_end;
 import containers.dynamic_array;
 import containers.is_iterator;
@@ -26,6 +26,7 @@ import containers.iter_difference_t;
 import containers.iter_value_t;
 import containers.iterator_t;
 import containers.offset_type;
+import containers.range;
 import containers.range_size_t;
 import containers.range_view;
 import containers.repeat_n;
@@ -38,16 +39,14 @@ import std_module;
 namespace containers {
 
 // This is written so that a special predicate built on std::less can work
-template<iterator Iterator>
-constexpr auto unique_common(Iterator first, sentinel_for<Iterator> auto const last, iterator auto output, auto equal) {
-	for (; first != last; ++first) {
+constexpr auto unique_common(range auto && input, iterator auto output, auto equal) {
+	for (auto && input_ref : input) {
 		auto && output_ref = *output;
-		auto && first_ref = *first;
-		if (equal(output_ref, first_ref)) {
+		if (equal(output_ref, input_ref)) {
 			continue;
 		}
 		++output;
-		*output = OPERATORS_FORWARD(first_ref);
+		*output = OPERATORS_FORWARD(input_ref);
 	}
 	return ::containers::next(output);
 }
@@ -58,7 +57,11 @@ constexpr auto unique_copy(Iterator const first, sentinel_for<Iterator> auto con
 		return output;
 	}
 	*output = *first;
-	return ::containers::unique_common(::containers::next(first), last, output, equal);
+	return ::containers::unique_common(
+		range_view(::containers::next(first), last),
+		output,
+		equal
+	);
 }
 
 
@@ -91,8 +94,7 @@ constexpr auto unique(Iterator const first, sentinel_for<Iterator> auto const la
 	}
 	*equal_element = std::move(*other);
 	return ::containers::unique_common(
-		::containers::move_iterator(containers::next(other)),
-		::containers::move_iterator(last),
+		::containers::move_range(range_view(containers::next(other), last)),
 		equal_element,
 		equal
 	);
@@ -114,8 +116,12 @@ constexpr auto next_greater(Iterator const first, sentinel_for<Iterator> auto co
 }
 
 
-export template<iterator Iterator1, iterator Iterator2, typename BinaryPredicate = std::less<>>
-constexpr auto unique_merge_copy(Iterator1 first1, sentinel_for<Iterator1> auto const last1, Iterator2 first2, sentinel_for<Iterator2> auto const last2, iterator auto output, BinaryPredicate less = BinaryPredicate{}) {
+export template<typename BinaryPredicate = std::less<>>
+constexpr auto unique_merge_copy(range auto && r1, range auto && r2, iterator auto output, BinaryPredicate less = BinaryPredicate{}) {
+	auto first1 = containers::begin(r1);
+	auto const last1 = containers::end(r1);
+	auto first2 = containers::begin(r2);
+	auto const last2 = containers::end(r2);
 	while (first1 != last1 and first2 != last2) {
 		*output = less(*first2, *first1) ? *first2++ : *first1++;
 		first1 = ::containers::next_greater(first1, last1, *output, less);
@@ -145,13 +151,10 @@ constexpr auto unique_inplace_merge(Iterator first, Iterator middle, sentinel_fo
 	using storage_type = dynamic_array<iter_value_t<Iterator>, offset_type<Iterator>>;
 
 	if (less(*middle, *first)) {
-		auto temp = storage_type(range_view(
-			::containers::move_iterator(first),
-			::containers::move_iterator(middle)
-		));
+		auto temp = storage_type(::containers::move_range(range_view(first, middle)));
 		return ::containers::unique_merge_copy(
-			::containers::move_iterator(containers::begin(temp)), ::containers::move_iterator(containers::end(temp)),
-			::containers::move_iterator(middle), ::containers::move_iterator(last),
+			::containers::move_range(temp),
+			::containers::move_range(range_view(middle, last)),
 			first,
 			less
 		);
@@ -182,15 +185,15 @@ constexpr auto unique_inplace_merge(Iterator first, Iterator middle, sentinel_fo
 	
 	// Move the rest of the elements so we can use their space without
 	// overwriting.
-	auto temp = storage_type(range_view(
-		::containers::move_iterator(first_to_move.target),
-		::containers::move_iterator(middle)
-	));
+	auto temp = storage_type(::containers::move_range(range_view(
+		first_to_move.target,
+		middle
+	)));
 	auto const new_middle = ::containers::next_greater(middle, last, *first_to_move.before_target, less);
 
 	return ::containers::unique_merge_copy(
-		::containers::move_iterator(containers::begin(temp)), ::containers::move_iterator(containers::end(temp)),
-		::containers::move_iterator(new_middle), ::containers::move_iterator(last),
+		::containers::move_range(temp),
+		::containers::move_range(range_view(new_middle, last)),
 		first_to_move.target,
 		less
 	);
@@ -214,7 +217,7 @@ constexpr void test_unique_less(Container source, Container const & expected) {
 
 constexpr void test_unique_merge_copy(Container const & lhs, Container const & rhs, Container const & expected) {
 	auto result = Container(containers::repeat_n(::bounded::assume_in_range<containers::range_size_t<Container>>(containers::size(lhs) + containers::size(rhs)), 0));
-	auto const it = containers::unique_merge_copy(begin(lhs), end(lhs), begin(rhs), end(rhs), begin(result));
+	auto const it = containers::unique_merge_copy(lhs, rhs, begin(result));
 	BOUNDED_ASSERT(containers::equal(containers::range_view(begin(result), it), expected));
 }
 

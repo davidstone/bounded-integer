@@ -12,7 +12,7 @@ export module containers.assign;
 import containers.algorithms.advance;
 import containers.algorithms.copy;
 import containers.algorithms.erase;
-import containers.algorithms.move_iterator;
+import containers.algorithms.move_range;
 import containers.append;
 import containers.append_after;
 import containers.assign_to_empty;
@@ -53,6 +53,15 @@ concept has_capacity = requires(T const & container) {
 	container.capacity();
 };
 
+template<typename Source>
+constexpr auto maybe_transform(auto view) {
+	if constexpr (is_container<Source>) {
+		return move_range(std::move(view));
+	} else {
+		return view;
+	}
+};
+
 template<typename Target, typename Source>
 constexpr void assign_impl(Target & target, Source && source) {
 	// Either of the two generic implementations (the last two options) work for
@@ -72,23 +81,13 @@ constexpr void assign_impl(Target & target, Source && source) {
 	} else {
 		auto result = ::containers::copy(OPERATORS_FORWARD(source), target);
 		::containers::erase_to_end(target, std::move(result.output));
-		if constexpr (is_container<Source>) {
-			::containers::append(
-				target,
-				range_view(
-					move_iterator(std::move(result.input)),
-					move_iterator(containers::end(OPERATORS_FORWARD(source)))
-				)
-			);
-		} else {
-			::containers::append(
-				target,
-				range_view(
-					std::move(result.input),
-					containers::end(OPERATORS_FORWARD(source))
-				)
-			);
-		}
+		::containers::append(
+			target,
+			maybe_transform<Source>(range_view(
+				std::move(result.input),
+				containers::end(OPERATORS_FORWARD(source))
+			))
+		);
 	}
 }
 
