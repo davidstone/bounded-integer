@@ -36,27 +36,31 @@ namespace containers {
 // TODO: use a custom begin function
 template<typename Sentinel, typename UnaryPredicate>
 struct filter_iterator_traits : default_begin_end_size, default_dereference, default_compare {
-private:
-	[[no_unique_address]] Sentinel m_sentinel;
-	[[no_unique_address]] UnaryPredicate m_predicate;
-public:
 	constexpr filter_iterator_traits(Sentinel last, UnaryPredicate condition):
 		m_sentinel(std::move(last)),
 		m_predicate(std::move(condition))
 	{
 	}
 
-	constexpr auto sentinel() const {
+	constexpr auto sentinel() const -> Sentinel {
 		return m_sentinel;
 	}
-	constexpr auto const & predicate() const {
+	constexpr auto predicate() const -> UnaryPredicate const & {
 		return m_predicate;
 	}
 
-	constexpr auto add(iterator auto const it, bounded::constant_t<1>) const {
+	template<iterator Iterator>
+	constexpr auto add(Iterator it, bounded::constant_t<1>) const -> Iterator {
 		BOUNDED_ASSERT(it != m_sentinel);
-		return containers::find_if(containers::next(it), m_sentinel, m_predicate);
+		return containers::find_if(
+			containers::next(std::move(it)),
+			m_sentinel,
+			m_predicate
+		);
 	}
+private:
+	[[no_unique_address]] Sentinel m_sentinel;
+	[[no_unique_address]] UnaryPredicate m_predicate;
 };
 
 template<typename T>
@@ -77,19 +81,23 @@ concept is_filter_iterator_traits = is_filter_iterator_traits_impl<T>;
 
 struct filter_iterator_sentinel {
 	template<iterator Iterator, is_filter_iterator_traits Traits>
-	friend constexpr auto operator<=>(adapt_iterator<Iterator, Traits> const lhs, filter_iterator_sentinel) OPERATORS_RETURNS(
+	friend constexpr auto operator<=>(adapt_iterator<Iterator, Traits> const & lhs, filter_iterator_sentinel) OPERATORS_RETURNS(
 		lhs.traits().compare(lhs.base(), lhs.traits().sentinel())
 	)
 
 	template<iterator Iterator, is_filter_iterator_traits Traits>
-	friend constexpr auto operator==(adapt_iterator<Iterator, Traits> const lhs, filter_iterator_sentinel) -> bool {
+	friend constexpr auto operator==(adapt_iterator<Iterator, Traits> const & lhs, filter_iterator_sentinel) -> bool {
 		return lhs.traits().equal(lhs.base(), lhs.traits().sentinel());
 	}
 };
 
 constexpr auto filter_iterator_impl(iterator auto first, is_filter_iterator_traits auto traits) {
 	return containers::adapt_iterator(
-		containers::find_if(first, ::containers::unwrap(traits).sentinel(), ::containers::unwrap(traits).predicate()),
+		containers::find_if(
+			std::move(first),
+			::containers::unwrap(traits).sentinel(),
+			::containers::unwrap(traits).predicate()
+		),
 		traits
 	);
 }
