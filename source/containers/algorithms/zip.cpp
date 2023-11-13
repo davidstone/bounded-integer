@@ -20,6 +20,7 @@ import containers.range_view;
 import containers.size;
 
 import bounded;
+import numeric_traits;
 import std_module;
 import tv;
 
@@ -42,8 +43,13 @@ constexpr auto add(tv::tuple<Iterators...> const & tuple, auto const offset, std
 
 template<typename... Iterators>
 struct zip_difference_type_impl {
-	// TODO: Wrong type
-	using type = std::common_type_t<iter_difference_t<Iterators>...>;
+	static constexpr auto min_max = bounded::min(
+		bounded::constant<numeric_traits::max_value<iter_difference_t<Iterators>>>...
+	);
+	using type = bounded::integer<
+		bounded::normalize<-min_max>,
+		bounded::normalize<min_max>
+	>;
 };
 
 template<>
