@@ -22,26 +22,6 @@ export template<typename... Ts>
 union variadic_union {
 };
 
-template<typename T, typename... Ts> requires(bounded::trivially_destructible<T> and ... and bounded::trivially_destructible<Ts>)
-union variadic_union<T, Ts...> {
-	explicit constexpr variadic_union(bounded::constant_t<0>, auto && construct_):
-		head(OPERATORS_FORWARD(construct_)())
-	{
-	}
-	template<auto n>
-	explicit constexpr variadic_union(bounded::constant_t<n> const index, auto && construct_):
-		tail(index - 1_bi, OPERATORS_FORWARD(construct_))
-	{
-	}
-
-	explicit constexpr variadic_union(uninitialized_union) {
-	}
-
-	[[no_unique_address]] T head;
-	[[no_unique_address]] variadic_union<Ts...> tail;
-};
-
-
 template<typename T, typename... Ts>
 union [[clang::trivial_abi]] variadic_union<T, Ts...> {
 	explicit constexpr variadic_union(bounded::constant_t<0>, auto && construct_):
@@ -61,6 +41,7 @@ union [[clang::trivial_abi]] variadic_union<T, Ts...> {
 	variadic_union(variadic_union const &) = default;
 	variadic_union & operator=(variadic_union &&) = default;
 	variadic_union & operator=(variadic_union const &) = default;
+	~variadic_union() requires(bounded::trivially_destructible<T> and ... and bounded::trivially_destructible<Ts>) = default;
 	constexpr ~variadic_union() {}
 
 	[[no_unique_address]] T head;

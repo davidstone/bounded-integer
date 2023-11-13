@@ -165,8 +165,8 @@ public:
 		return *this;
 	}
 
-	~variant() = default;
-	constexpr ~variant() requires(... or !bounded::trivially_destructible<Ts>) {
+	~variant() requires(... and bounded::trivially_destructible<Ts>) = default;
+	constexpr ~variant() {
 		visit(*this, bounded::destroy);
 	}
 

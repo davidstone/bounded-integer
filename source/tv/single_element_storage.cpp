@@ -12,12 +12,8 @@ namespace tv {
 
 export template<typename T>
 union [[clang::trivial_abi]] single_element_storage {
+	~single_element_storage() requires bounded::trivially_destructible<T> = default;
 	constexpr ~single_element_storage() {}
-	T value;
-};
-template<typename T> requires bounded::trivially_destructible<T>
-union single_element_storage<T> {
-	~single_element_storage() = default;
 	T value;
 };
 
