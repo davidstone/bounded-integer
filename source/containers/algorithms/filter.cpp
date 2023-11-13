@@ -106,7 +106,7 @@ export template<typename Range, typename UnaryPredicate>
 struct filter {
 	constexpr filter(Range && range, UnaryPredicate predicate):
 		m_range(OPERATORS_FORWARD(range)),
-		m_traits(::containers::end(std::as_const(m_range)), std::move(predicate))
+		m_traits(::containers::end(m_range), std::move(predicate))
 	{
 	}
 	
@@ -125,7 +125,7 @@ struct filter {
 	
 private:
 	Range m_range;
-	filter_iterator_traits<sentinel_t<Range const &>, UnaryPredicate> m_traits;
+	filter_iterator_traits<sentinel_t<Range &>, UnaryPredicate> m_traits;
 };
 
 template<typename Range, typename UnaryPredicate>
