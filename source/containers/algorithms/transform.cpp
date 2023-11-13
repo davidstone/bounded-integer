@@ -37,11 +37,11 @@ struct range_transform_traits_dereference : transform_traits_dereference<UnaryFu
 template<typename UnaryFunction>
 range_transform_traits_dereference(UnaryFunction) -> range_transform_traits_dereference<UnaryFunction>;
 
-export constexpr auto transform(range auto && source, auto dereference) {
+export constexpr auto transform(range auto && source, auto dereference) -> range auto {
 	return adapt(OPERATORS_FORWARD(source), range_transform_traits(std::move(dereference)));
 }
 
-export constexpr auto transform_dereference(range auto && source, auto dereference) {
+export constexpr auto transform_dereference(range auto && source, auto dereference) -> range auto {
 	return adapt(OPERATORS_FORWARD(source), range_transform_traits_dereference(std::move(dereference)));
 }
 
