@@ -11,6 +11,8 @@ module;
 export module containers.adapt;
 
 import containers.begin_end;
+import containers.is_iterator;
+import containers.is_iterator_sentinel;
 import containers.iter_value_t;
 import containers.iterator_adapter;
 import containers.reference_wrapper;
@@ -34,43 +36,54 @@ concept statically_sized_adapted_range = sized_adapted_range<Range, Traits> and 
 
 export template<typename Range, typename Traits>
 struct adapt {
+private:
+	using adapt_iterator_traits = std::conditional_t<
+		std::is_empty_v<Traits> and std::is_copy_assignable_v<Traits>,
+		Traits,
+		decltype(std::reference_wrapper(bounded::declval<Traits const &>()))
+	>;
+
+	[[no_unique_address]] Range m_range;
+	[[no_unique_address]] Traits m_traits;
+
+public:
 	constexpr adapt(Range && range, Traits traits):
 		m_range(OPERATORS_FORWARD(range)),
 		m_traits(std::move(traits))
 	{
 	}
 	
-	constexpr auto begin() const & {
+	constexpr auto begin() const & -> iterator auto {
 		return containers::adapt_iterator(
 			::containers::unwrap(m_traits).get_begin(m_range),
 			adapt_iterator_traits(m_traits)
 		);
 	}
-	constexpr auto begin() & {
+	constexpr auto begin() & -> iterator auto {
 		return containers::adapt_iterator(
 			::containers::unwrap(m_traits).get_begin(m_range),
 			adapt_iterator_traits(m_traits)
 		);
 	}
-	constexpr auto begin() && {
+	constexpr auto begin() && -> iterator auto {
 		return containers::adapt_iterator(
 			::containers::unwrap(m_traits).get_begin(std::move(*this).m_range),
 			adapt_iterator_traits(m_traits)
 		);
 	}
-	constexpr auto end() const & {
+	constexpr auto end() const & -> sentinel_for<decltype(begin())> auto {
 		return containers::adapt_iterator(
 			::containers::unwrap(m_traits).get_end(m_range),
 			adapt_iterator_traits(m_traits)
 		);
 	}
-	constexpr auto end() & {
+	constexpr auto end() & -> sentinel_for<decltype(begin())> auto {
 		return containers::adapt_iterator(
 			::containers::unwrap(m_traits).get_end(m_range),
 			adapt_iterator_traits(m_traits)
 		);
 	}
-	constexpr auto end() && {
+	constexpr auto end() && -> sentinel_for<decltype(begin())> auto {
 		return containers::adapt_iterator(
 			::containers::unwrap(m_traits).get_end(std::move(*this).m_range),
 			adapt_iterator_traits(m_traits)
@@ -92,16 +105,6 @@ struct adapt {
 	constexpr auto base() && -> Range && {
 		return std::move(m_range);
 	}
-
-private:
-	using adapt_iterator_traits = std::conditional_t<
-		std::is_empty_v<Traits> and std::is_copy_assignable_v<Traits>,
-		Traits,
-		decltype(std::reference_wrapper(bounded::declval<Traits const &>()))
-	>;
-
-	[[no_unique_address]] Range m_range;
-	[[no_unique_address]] Traits m_traits;
 };
 
 template<typename Range, typename Traits>
