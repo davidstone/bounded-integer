@@ -91,12 +91,12 @@ struct filter_iterator_sentinel {
 	}
 };
 
-constexpr auto filter_iterator_impl(iterator auto first, is_filter_iterator_traits auto traits) {
+constexpr auto filter_iterator_impl(iterator auto first, auto && traits) {
 	return containers::adapt_iterator(
 		containers::find_if(
 			std::move(first),
-			::containers::unwrap(traits).sentinel(),
-			::containers::unwrap(traits).predicate()
+			traits.sentinel(),
+			traits.predicate()
 		),
 		traits
 	);
@@ -111,13 +111,13 @@ struct filter {
 	}
 	
 	constexpr auto begin() const & {
-		return ::containers::filter_iterator_impl(::containers::begin(m_range), std::reference_wrapper(m_traits));
+		return ::containers::filter_iterator_impl(::containers::begin(m_range), m_traits);
 	}
 	constexpr auto begin() & {
-		return ::containers::filter_iterator_impl(::containers::begin(m_range), std::reference_wrapper(m_traits));
+		return ::containers::filter_iterator_impl(::containers::begin(m_range), m_traits);
 	}
 	constexpr auto begin() && {
-		return ::containers::filter_iterator_impl(::containers::begin(std::move(*this).m_range), std::reference_wrapper(m_traits));
+		return ::containers::filter_iterator_impl(::containers::begin(std::move(*this).m_range), m_traits);
 	}
 	static constexpr auto end() {
 		return filter_iterator_sentinel();

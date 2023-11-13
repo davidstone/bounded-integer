@@ -6,6 +6,7 @@
 module;
 
 #include <operators/arrow.hpp>
+#include <operators/forward.hpp>
 
 export module containers.iterator_adapter;
 
@@ -68,7 +69,18 @@ concept adapted_equality_comparable = requires(LHSIterator const & lhs, RHSItera
 	traits.equal(lhs, rhs);
 };
 
-using bounded::declval;
+template<typename Traits>
+constexpr auto can_store_copy =
+	bounded::mostly_trivial<Traits> and
+	sizeof(Traits) <= sizeof(std::reference_wrapper<Traits>);
+
+template<typename Traits>
+using stored_traits = std::conditional_t<
+	can_store_copy<Traits>,
+	std::remove_const_t<Traits>,
+	std::reference_wrapper<Traits const>
+>;
+
 
 // There are a few functions of interest for an iterator:
 // 1) Dereferencing: *it
@@ -86,9 +98,9 @@ export template<typename Iterator, typename Traits>
 struct adapt_iterator : iterator_category_base<Iterator>, adapted_difference_type<Iterator> {
 	adapt_iterator() = default;
 
-	constexpr adapt_iterator(Iterator it, Traits traits):
+	constexpr adapt_iterator(Iterator it, auto && traits):
 		m_base(std::move(it)),
-		m_traits(std::move(traits))
+		m_traits(OPERATORS_FORWARD(traits))
 	{
 	}
 
@@ -106,7 +118,7 @@ struct adapt_iterator : iterator_category_base<Iterator>, adapted_difference_typ
 		return std::move(m_base);
 	}
 
-	constexpr auto && traits() const {
+	constexpr auto traits() const -> auto && {
 		return ::containers::unwrap(m_traits);
 	}
 
@@ -138,8 +150,11 @@ struct adapt_iterator : iterator_category_base<Iterator>, adapted_difference_typ
 
 private:
 	[[no_unique_address]] Iterator m_base;
-	[[no_unique_address]] Traits m_traits;
+	[[no_unique_address]] stored_traits<Traits> m_traits;
 };
+
+template<typename Iterator, typename Traits>
+adapt_iterator(Iterator, Traits &&) -> adapt_iterator<Iterator, std::remove_cvref_t<Traits>>;
 
 } // namespace containers
 

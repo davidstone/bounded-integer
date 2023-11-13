@@ -37,12 +37,6 @@ concept statically_sized_adapted_range = sized_adapted_range<Range, Traits> and 
 export template<typename Range, typename Traits>
 struct adapt {
 private:
-	using adapt_iterator_traits = std::conditional_t<
-		std::is_empty_v<Traits> and bounded::copy_assignable<Traits>,
-		Traits,
-		decltype(std::reference_wrapper(bounded::declval<Traits const &>()))
-	>;
-
 	[[no_unique_address]] Range m_range;
 	[[no_unique_address]] Traits m_traits;
 
@@ -56,37 +50,37 @@ public:
 	constexpr auto begin() const & -> iterator auto {
 		return containers::adapt_iterator(
 			::containers::unwrap(m_traits).get_begin(m_range),
-			adapt_iterator_traits(m_traits)
+			m_traits
 		);
 	}
 	constexpr auto begin() & -> iterator auto {
 		return containers::adapt_iterator(
 			::containers::unwrap(m_traits).get_begin(m_range),
-			adapt_iterator_traits(m_traits)
+			m_traits
 		);
 	}
 	constexpr auto begin() && -> iterator auto {
 		return containers::adapt_iterator(
 			::containers::unwrap(m_traits).get_begin(std::move(*this).m_range),
-			adapt_iterator_traits(m_traits)
+			m_traits
 		);
 	}
 	constexpr auto end() const & -> sentinel_for<decltype(begin())> auto {
 		return containers::adapt_iterator(
 			::containers::unwrap(m_traits).get_end(m_range),
-			adapt_iterator_traits(m_traits)
+			m_traits
 		);
 	}
 	constexpr auto end() & -> sentinel_for<decltype(begin())> auto {
 		return containers::adapt_iterator(
 			::containers::unwrap(m_traits).get_end(m_range),
-			adapt_iterator_traits(m_traits)
+			m_traits
 		);
 	}
 	constexpr auto end() && -> sentinel_for<decltype(begin())> auto {
 		return containers::adapt_iterator(
 			::containers::unwrap(m_traits).get_end(std::move(*this).m_range),
-			adapt_iterator_traits(m_traits)
+			m_traits
 		);
 	}
 
