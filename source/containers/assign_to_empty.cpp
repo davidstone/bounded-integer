@@ -105,7 +105,7 @@ export constexpr auto assign_to_empty(assignable_to_empty auto & target, empty_c
 	BOUNDED_ASSERT(containers::is_empty(target));
 }
 export template<assignable_to_empty Target, std::size_t init_size>
-	requires std::is_move_constructible_v<range_value_t<Target>>
+	requires bounded::move_constructible<range_value_t<Target>>
 constexpr auto assign_to_empty(Target & target, c_array<range_value_t<Target>, init_size> && source) -> void {
 	::containers::assign_to_empty_impl(target, std::move(source));
 }

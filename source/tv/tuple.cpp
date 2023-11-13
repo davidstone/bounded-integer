@@ -316,7 +316,7 @@ using type = tv::tuple<empty>;
 #if !defined __GNUC__ or defined __clang__
 static_assert(std::is_empty_v<type>);
 #endif
-static_assert(std::is_trivially_default_constructible_v<type>);
+static_assert(bounded::trivially_default_constructible<type>);
 static_assert(std::is_trivially_copyable_v<type>);
 static_assert(std::same_as<
 	decltype(type()[0_bi]),
@@ -337,7 +337,7 @@ using type = tv::tuple<empty, empty>;
 #if !defined __GNUC__ or defined __clang__
 static_assert(std::is_empty_v<type>);
 #endif
-static_assert(std::is_trivially_default_constructible_v<type>);
+static_assert(bounded::trivially_default_constructible<type>);
 static_assert(std::is_trivially_copyable_v<type>);
 static_assert(std::same_as<
 	decltype(type()[0_bi]),
@@ -359,7 +359,7 @@ using type = tv::tuple<tv::tuple<>>;
 #if !defined __GNUC__ or defined __clang__
 static_assert(std::is_empty_v<type>);
 #endif
-static_assert(std::is_trivially_default_constructible_v<type>);
+static_assert(bounded::trivially_default_constructible<type>);
 static_assert(std::is_trivially_copyable_v<type>);
 static_assert(std::same_as<
 	decltype(type()[0_bi]),
@@ -380,7 +380,7 @@ using type = tv::tuple<empty, tv::tuple<empty>>;
 #if !defined __GNUC__ or defined __clang__
 static_assert(std::is_empty_v<type>);
 #endif
-static_assert(std::is_trivially_default_constructible_v<type>);
+static_assert(bounded::trivially_default_constructible<type>);
 static_assert(std::is_trivially_copyable_v<type>);
 static_assert(std::same_as<
 	decltype(type()[0_bi]),
@@ -409,7 +409,7 @@ using type = tv::tuple<tv::tuple<empty>, tv::tuple<empty>>;
 #if !defined __GNUC__ or defined __clang__
 static_assert(std::is_empty_v<type>);
 #endif
-static_assert(std::is_trivially_default_constructible_v<type>);
+static_assert(bounded::trivially_default_constructible<type>);
 static_assert(std::is_trivially_copyable_v<type>);
 static_assert(std::same_as<
 	decltype(type()[0_bi]),

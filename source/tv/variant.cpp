@@ -30,17 +30,17 @@ using namespace bounded::literal;
 namespace tv {
 
 template<typename T>
-concept variant_copy_assignable = std::is_copy_constructible_v<T> and std::is_copy_assignable_v<T>;
+concept variant_copy_assignable = bounded::copy_constructible<T> and bounded::copy_assignable<T>;
 
 template<typename T>
-concept variant_trivially_copy_assignable = std::is_trivially_copy_constructible_v<T> and std::is_trivially_copy_assignable_v<T>;
+concept variant_trivially_copy_assignable = bounded::trivially_copy_constructible<T> and bounded::trivially_copy_assignable<T>;
 
 
 template<typename T>
-concept variant_move_assignable = std::is_move_constructible_v<T> and std::is_move_assignable_v<T>;
+concept variant_move_assignable = bounded::move_constructible<T> and bounded::move_assignable<T>;
 
 template<typename T>
-concept variant_trivially_move_assignable = std::is_trivially_move_constructible_v<T> and std::is_trivially_move_assignable_v<T>;
+concept variant_trivially_move_assignable = bounded::trivially_move_constructible<T> and bounded::trivially_move_assignable<T>;
 
 constexpr auto equality_visitor = []
 	<typename LHS, auto lhs_n, typename RHS, auto rhs_n>
@@ -109,7 +109,7 @@ public:
 
 	constexpr variant(variant const & other) noexcept(
 		(... and std::is_nothrow_copy_constructible_v<Ts>)
-	) requires((... and std::is_copy_constructible_v<Ts>) and !(... and std::is_trivially_copy_constructible_v<Ts>)):
+	) requires((... and bounded::copy_constructible<Ts>) and !(... and bounded::trivially_copy_constructible<Ts>)):
 		variant(other, copy_move_tag{})
 	{
 	}
@@ -119,7 +119,7 @@ public:
 
 	constexpr variant(variant && other) noexcept(
 		(... and std::is_nothrow_move_constructible_v<Ts>)
-	) requires((... and std::is_move_constructible_v<Ts>) and !(... and std::is_trivially_move_constructible_v<Ts>)):
+	) requires((... and bounded::move_constructible<Ts>) and !(... and bounded::trivially_move_constructible<Ts>)):
 		variant(std::move(other), copy_move_tag{})
 	{
 	}
@@ -166,7 +166,7 @@ public:
 	}
 
 	~variant() = default;
-	constexpr ~variant() requires(... or !std::is_trivially_destructible_v<Ts>) {
+	constexpr ~variant() requires(... or !bounded::trivially_destructible<Ts>) {
 		visit(*this, bounded::destroy);
 	}
 
@@ -264,7 +264,7 @@ private:
 namespace {
 
 using empty_variant_t = tv::variant<>;
-static_assert(not std::is_default_constructible_v<empty_variant_t>);
+static_assert(not bounded::default_constructible<empty_variant_t>);
 static_assert(not bounded::constructible_from<empty_variant_t, bounded::constant_t<0>>);
 static_assert(std::is_empty_v<empty_variant_t>);
 
@@ -273,11 +273,11 @@ static_assert(std::is_empty_v<tv::variant<empty>>);
 
 using thing_t = tv::variant<int, short, long, char, int>;
 
-static_assert(std::is_trivially_copy_constructible_v<thing_t>);
-static_assert(std::is_trivially_move_constructible_v<thing_t>);
-static_assert(std::is_trivially_copy_assignable_v<thing_t>);
-static_assert(std::is_trivially_move_assignable_v<thing_t>);
-static_assert(std::is_trivially_destructible_v<thing_t>);
+static_assert(bounded::trivially_copy_constructible<thing_t>);
+static_assert(bounded::trivially_move_constructible<thing_t>);
+static_assert(bounded::trivially_copy_assignable<thing_t>);
+static_assert(bounded::trivially_move_assignable<thing_t>);
+static_assert(bounded::trivially_destructible<thing_t>);
 
 struct non_trivial {
 	non_trivial();
@@ -288,11 +288,11 @@ struct non_trivial {
 	~non_trivial();
 };
 
-static_assert(!std::is_trivially_copy_constructible_v<tv::variant<non_trivial>>);
-static_assert(!std::is_trivially_move_constructible_v<tv::variant<non_trivial>>);
-static_assert(!std::is_trivially_copy_assignable_v<tv::variant<non_trivial>>);
-static_assert(!std::is_trivially_move_assignable_v<tv::variant<non_trivial>>);
-static_assert(!std::is_trivially_destructible_v<tv::variant<non_trivial>>);
+static_assert(!bounded::trivially_copy_constructible<tv::variant<non_trivial>>);
+static_assert(!bounded::trivially_move_constructible<tv::variant<non_trivial>>);
+static_assert(!bounded::trivially_copy_assignable<tv::variant<non_trivial>>);
+static_assert(!bounded::trivially_move_assignable<tv::variant<non_trivial>>);
+static_assert(!bounded::trivially_destructible<tv::variant<non_trivial>>);
 
 template<bool expected, typename Index, typename... Ts>
 constexpr bool assert_type_index_concepts() {
@@ -384,10 +384,10 @@ struct non_copyable {
 };
 
 using non_copyable_variant_t = tv::variant<non_copyable>;
-static_assert(not std::is_copy_constructible_v<non_copyable_variant_t>);
-static_assert(not std::is_copy_assignable_v<non_copyable_variant_t>);
-static_assert(std::is_move_constructible_v<non_copyable_variant_t>);
-static_assert(std::is_move_assignable_v<non_copyable_variant_t>);
+static_assert(not bounded::copy_constructible<non_copyable_variant_t>);
+static_assert(not bounded::copy_assignable<non_copyable_variant_t>);
+static_assert(bounded::move_constructible<non_copyable_variant_t>);
+static_assert(bounded::move_assignable<non_copyable_variant_t>);
 static_assert(std::same_as<decltype(non_copyable_variant_t(bounded::lazy_init, 0_bi, bounded::construct<non_copyable>)[0_bi]), non_copyable &&>);
 
 struct non_comparable {

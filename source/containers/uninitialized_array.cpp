@@ -36,11 +36,11 @@ private:
 // reinterpret_cast is not allowed in a constexpr function, so this avoids
 // storage that requires a reinterpret_cast if possible.
 template<typename T>
-concept sufficiently_trivial = (std::is_trivially_default_constructible_v<T> or bounded::tombstone_traits<T>::spare_representations != 0_bi) and std::is_trivially_destructible_v<T>;
+concept sufficiently_trivial = (bounded::trivially_default_constructible<T> or bounded::tombstone_traits<T>::spare_representations != 0_bi) and bounded::trivially_destructible<T>;
 
 template<sufficiently_trivial T, array_size_type<T> size_> requires(size_ != 0_bi)
 struct uninitialized_array<T, size_> {
-	constexpr uninitialized_array() requires std::is_trivially_default_constructible_v<T> = default;
+	constexpr uninitialized_array() requires bounded::trivially_default_constructible<T> = default;
 	constexpr uninitialized_array() noexcept:
 		uninitialized_array(bounded::make_index_sequence(size()))
 	{

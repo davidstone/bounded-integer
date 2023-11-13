@@ -38,7 +38,7 @@ export template<typename Range, typename Traits>
 struct adapt {
 private:
 	using adapt_iterator_traits = std::conditional_t<
-		std::is_empty_v<Traits> and std::is_copy_assignable_v<Traits>,
+		std::is_empty_v<Traits> and bounded::copy_assignable<Traits>,
 		Traits,
 		decltype(std::reference_wrapper(bounded::declval<Traits const &>()))
 	>;

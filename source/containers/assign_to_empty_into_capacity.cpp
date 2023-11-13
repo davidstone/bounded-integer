@@ -65,7 +65,7 @@ export constexpr auto assign_to_empty_into_capacity(assignable_to_empty auto & t
 	BOUNDED_ASSERT(containers::is_empty(target));
 }
 export template<assignable_to_empty Target, std::size_t init_size>
-	requires std::is_move_constructible_v<range_value_t<Target>>
+	requires bounded::move_constructible<range_value_t<Target>>
 constexpr auto assign_to_empty_into_capacity(Target & target, c_array<range_value_t<Target>, init_size> && source) -> void {
 	::containers::assign_to_empty_into_capacity_impl(target, std::move(source));
 }

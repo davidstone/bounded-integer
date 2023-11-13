@@ -73,7 +73,7 @@ struct [[clang::trivial_abi]] static_vector : private lexicographical_comparison
 	constexpr static_vector(Source) {
 	}
 	
-	~static_vector() requires std::is_trivially_destructible_v<T> = default;
+	~static_vector() requires bounded::trivially_destructible<T> = default;
 	constexpr ~static_vector() {
 		::containers::destroy_range(*this);
 	}

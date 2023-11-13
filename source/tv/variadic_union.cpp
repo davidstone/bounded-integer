@@ -22,7 +22,7 @@ export template<typename... Ts>
 union variadic_union {
 };
 
-template<typename T, typename... Ts> requires(std::is_trivially_destructible_v<T> and ... and std::is_trivially_destructible_v<Ts>)
+template<typename T, typename... Ts> requires(bounded::trivially_destructible<T> and ... and bounded::trivially_destructible<Ts>)
 union variadic_union<T, Ts...> {
 	explicit constexpr variadic_union(bounded::constant_t<0>, auto && construct_):
 		head(OPERATORS_FORWARD(construct_)())

@@ -15,7 +15,7 @@ union [[clang::trivial_abi]] single_element_storage {
 	constexpr ~single_element_storage() {}
 	T value;
 };
-template<typename T> requires std::is_trivially_destructible_v<T>
+template<typename T> requires bounded::trivially_destructible<T>
 union single_element_storage<T> {
 	~single_element_storage() = default;
 	T value;

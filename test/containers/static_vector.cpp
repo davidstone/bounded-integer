@@ -27,17 +27,17 @@ using test_static_vector = containers::static_vector<T, 40_bi>;
 
 static_assert(test_static_vector<int>::capacity() == 40_bi);
 
-static_assert(std::is_trivially_copy_constructible_v<test_static_vector<int>>);
-static_assert(std::is_trivially_move_constructible_v<test_static_vector<int>>);
-static_assert(std::is_trivially_destructible_v<test_static_vector<int>>);
-static_assert(std::is_trivially_copy_assignable_v<test_static_vector<int>>);
-static_assert(std::is_trivially_move_assignable_v<test_static_vector<int>>);
+static_assert(bounded::trivially_copy_constructible<test_static_vector<int>>);
+static_assert(bounded::trivially_move_constructible<test_static_vector<int>>);
+static_assert(bounded::trivially_destructible<test_static_vector<int>>);
+static_assert(bounded::trivially_copy_assignable<test_static_vector<int>>);
+static_assert(bounded::trivially_move_assignable<test_static_vector<int>>);
 
-static_assert(!std::is_trivially_copy_constructible_v<test_static_vector<bounded_test::integer>>);
-static_assert(!std::is_trivially_move_constructible_v<test_static_vector<bounded_test::integer>>);
-static_assert(!std::is_trivially_destructible_v<test_static_vector<bounded_test::integer>>);
-static_assert(!std::is_trivially_copy_assignable_v<test_static_vector<bounded_test::integer>>);
-static_assert(!std::is_trivially_move_assignable_v<test_static_vector<bounded_test::integer>>);
+static_assert(!bounded::trivially_copy_constructible<test_static_vector<bounded_test::integer>>);
+static_assert(!bounded::trivially_move_constructible<test_static_vector<bounded_test::integer>>);
+static_assert(!bounded::trivially_destructible<test_static_vector<bounded_test::integer>>);
+static_assert(!bounded::trivially_copy_assignable<test_static_vector<bounded_test::integer>>);
+static_assert(!bounded::trivially_move_assignable<test_static_vector<bounded_test::integer>>);
 
 static_assert(containers_test::test_sequence_container<test_static_vector<int>>());
 static_assert(containers_test::test_set_size<test_static_vector<int>>());

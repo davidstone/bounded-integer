@@ -121,7 +121,7 @@ private:
 		if constexpr (use_single_indirection) {
 			static_assert(
 				bounded::convertible_to<Function, function_ptr> or
-				std::is_trivially_default_constructible_v<Function>
+				bounded::trivially_default_constructible<Function>
 			);
 			return storage_type();
 		} else {
@@ -257,7 +257,7 @@ static_assert(returns_five() == 5);
 	constexpr auto empty_capture_lambda = [=]{};
 	using empty_capture_lambda_t = decltype(empty_capture_lambda);
 	static_assert(std::is_empty_v<empty_capture_lambda_t>);
-	static_assert(!std::is_trivially_default_constructible_v<empty_capture_lambda_t>);
+	static_assert(!bounded::trivially_default_constructible<empty_capture_lambda_t>);
 	static_assert(!bounded::constructible_from<empty_const_function, empty_capture_lambda_t>);
 
 	constexpr auto non_empty_lambda = [x = 0]{ static_cast<void>(x); };

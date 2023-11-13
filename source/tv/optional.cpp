@@ -367,9 +367,9 @@ static_assert(
 template<typename T>
 constexpr auto test_optional_traits() {
 	static_assert(bounded::convertible_to<T, tv::optional<T>>);
-	static_assert(std::is_trivially_destructible_v<T> == std::is_trivially_destructible_v<tv::optional<T>>);
-	static_assert(std::is_trivially_copy_constructible_v<T> == std::is_trivially_copy_constructible_v<T>);
-	static_assert(std::is_trivially_copy_assignable_v<T> == std::is_trivially_copy_assignable_v<T>);
+	static_assert(bounded::trivially_destructible<T> == bounded::trivially_destructible<tv::optional<T>>);
+	static_assert(bounded::trivially_copy_constructible<T> == bounded::trivially_copy_constructible<T>);
+	static_assert(bounded::trivially_copy_assignable<T> == bounded::trivially_copy_assignable<T>);
 	return true;
 }
 

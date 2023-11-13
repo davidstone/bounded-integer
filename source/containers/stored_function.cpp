@@ -22,11 +22,7 @@ using function_reference = decltype(std::reference_wrapper(bounded::declval<Func
 template<typename Function>
 constexpr auto can_store_copy =
 	std::invocable<Function const &> and
-	std::is_trivially_move_constructible_v<Function> and
-	std::is_trivially_copy_constructible_v<Function> and
-	std::is_trivially_move_assignable_v<Function> and
-	std::is_trivially_copy_assignable_v<Function> and
-	std::is_trivially_destructible_v<Function> and
+	bounded::mostly_trivial<Function> and
 	sizeof(Function) <= sizeof(function_reference<Function>);
 
 export template<typename Function>

@@ -84,7 +84,7 @@ export constexpr auto accumulate(range auto && source, auto && initial, auto fun
 }
 
 
-template<typename T> requires std::is_default_constructible_v<T>
+template<typename T> requires bounded::default_constructible<T>
 constexpr auto initial_sum_value() {
 	if constexpr (bounded::bounded_integer<T>) {
 		return 0_bi;

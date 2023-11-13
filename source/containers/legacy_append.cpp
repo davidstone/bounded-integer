@@ -21,6 +21,7 @@ import containers.reallocation_size;
 import containers.reservable;
 import containers.size_then_use_range;
 
+import bounded;
 import std_module;
 
 namespace containers {
@@ -38,7 +39,7 @@ constexpr auto maybe_reserve(Target & target, Source const & source) {
 
 export template<typename Target, typename Source>
 constexpr auto legacy_append(Target & target, Source && source) -> void {
-	constexpr auto sufficiently_trivial = std::is_trivially_move_assignable_v<range_value_t<Target>>;
+	constexpr auto sufficiently_trivial = bounded::trivially_move_assignable<range_value_t<Target>>;
 	auto transformed = [&]() -> decltype(auto) {
 		if constexpr (is_container<Source>) {
 			return containers::transform(source, [](auto & value) -> auto && { return std::move(value); });

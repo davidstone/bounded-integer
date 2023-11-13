@@ -26,6 +26,11 @@ concept convertible_to =
 	(std::same_as<From, void> and std::same_as<To, void>);
 
 export template<typename T>
+concept default_constructible = std::is_default_constructible_v<T>;
+export template<typename T>
+concept trivially_default_constructible = default_constructible<T> and std::is_trivially_default_constructible_v<T>;
+
+export template<typename T>
 concept move_constructible = std::is_move_constructible_v<T>;
 export template<typename T>
 concept trivially_move_constructible = move_constructible<T> and std::is_trivially_move_constructible_v<T>;
@@ -46,7 +51,19 @@ export template<typename T>
 concept trivially_copy_assignable = copy_assignable<T> and std::is_trivially_copy_assignable_v<T>;
 
 export template<typename T>
-concept trivially_swappable = std::is_trivially_copyable_v<T> and std::is_trivially_copy_assignable_v<T> and std::is_trivially_destructible_v<T>;
+concept trivially_destructible = std::is_trivially_destructible_v<T>;
+
+export template<typename T>
+concept trivially_swappable = trivially_move_constructible<T> and trivially_move_assignable<T> and trivially_destructible<T>;
+
+export template<typename T>
+concept mostly_trivial =
+	trivially_move_constructible<T> and
+	trivially_copy_constructible<T> and
+	trivially_move_assignable<T> and
+	trivially_copy_assignable<T> and
+	trivially_destructible<T>;
+
 
 export template<typename Function, typename Return, typename... Args>
 concept invocable_r = requires(Function function) {

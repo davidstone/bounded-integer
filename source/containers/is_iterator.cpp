@@ -9,6 +9,7 @@ import containers.addable_subtractable;
 import containers.iter_difference_t;
 import containers.offset_type;
 
+import bounded;
 import std_module;
 
 namespace containers {
@@ -27,7 +28,7 @@ concept iterator = requires(Iterator it) {
 export template<typename Iterator>
 concept forward_iterator =
 	iterator<Iterator> and
-	std::is_copy_constructible_v<Iterator> and
+	bounded::copy_constructible<Iterator> and
 	// This test is needed only to support legacy copyable iterators
 	!only_input_or_output_iterator<Iterator>;
 

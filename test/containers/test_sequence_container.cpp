@@ -233,10 +233,10 @@ constexpr auto test_special_members(auto const make) -> bool {
 	using value_type = containers::range_value_t<Container>;
 	test_move_constructor<Container>(make);
 	test_move_assignment<Container>(make);
-	if constexpr (std::is_copy_constructible_v<value_type>) {
+	if constexpr (bounded::copy_constructible<value_type>) {
 		test_copy_constructor<Container>(make);
 		test_copy_constructor_from_mutable<Container>(make);
-		if constexpr (std::is_copy_assignable_v<value_type>) {
+		if constexpr (bounded::copy_assignable<value_type>) {
 			test_copy_assignment<Container>(make);
 		}
 	}

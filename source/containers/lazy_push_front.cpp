@@ -30,7 +30,7 @@ namespace containers {
 export template<typename Container>
 concept lazy_push_frontable =
 	supports_lazy_insert_after<Container> or
-	(std::is_default_constructible_v<Container> and lazy_push_backable<Container> and splicable<Container>);
+	(bounded::default_constructible<Container> and lazy_push_backable<Container> and splicable<Container>);
 
 
 export template<lazy_push_frontable Container>
