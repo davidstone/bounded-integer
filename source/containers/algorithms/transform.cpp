@@ -10,6 +10,7 @@ module;
 export module containers.algorithms.transform;
 
 import containers.algorithms.compare;
+import containers.algorithms.transform_traits;
 import containers.array;
 import containers.algorithms.transform_iterator;
 import containers.adapt;
