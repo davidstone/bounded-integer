@@ -235,6 +235,7 @@ target_sources(containers PUBLIC
 		source/containers/algorithms/filter.cpp
 		source/containers/algorithms/find.cpp
 		source/containers/algorithms/generate.cpp
+		source/containers/algorithms/generate_until.cpp
 		source/containers/algorithms/keyed_binary_search.cpp
 		source/containers/algorithms/keyed_erase.cpp
 		source/containers/algorithms/keyed_insert.cpp
