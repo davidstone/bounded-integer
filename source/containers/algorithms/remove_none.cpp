@@ -92,7 +92,7 @@ struct remove_none {
 	constexpr auto begin() {
 		return remove_none_iterator<Range>(containers::begin(m_data.range), m_data);
 	}
-	constexpr auto end() const {
+	static constexpr auto end() {
 		return remove_none_sentinel();
 	}
 
