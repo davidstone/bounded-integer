@@ -3,6 +3,10 @@
 // (See accompanying file LICENSE_1_0.txt or copy at
 // http://www.boost.org/LICENSE_1_0.txt)
 
+module;
+
+#include <operators/forward.hpp>
+
 export module containers.is_empty;
 
 import containers.begin_end;
@@ -23,7 +27,7 @@ concept never_empty_range = numeric_traits::min_value<range_size_t<Range>> > 0_b
 export constexpr auto is_empty = [](range auto && r) {
 	// The never_empty check is not needed for correctness, but allows this
 	// function to be constexpr in more situations.
-	return never_empty_range<decltype(r)> ? false : containers::begin(r) == containers::end(r);
+	return never_empty_range<decltype(r)> ? false : containers::begin(OPERATORS_FORWARD(r)) == containers::end(OPERATORS_FORWARD(r));
 };
 
 } // namespace containers
