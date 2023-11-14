@@ -48,37 +48,37 @@ public:
 	{
 	}
 	
-	constexpr auto begin() const & -> iterator auto {
+	constexpr auto begin() const & -> iterator auto requires range<Range const &> {
 		return containers::adapt_iterator(
 			::containers::unwrap(m_traits).get_begin(m_range),
 			m_traits
 		);
 	}
-	constexpr auto begin() & -> iterator auto {
+	constexpr auto begin() & -> iterator auto requires range<Range &> {
 		return containers::adapt_iterator(
 			::containers::unwrap(m_traits).get_begin(m_range),
 			m_traits
 		);
 	}
-	constexpr auto begin() && -> iterator auto {
+	constexpr auto begin() && -> iterator auto requires range<Range &&> {
 		return containers::adapt_iterator(
 			::containers::unwrap(m_traits).get_begin(std::move(*this).m_range),
 			m_traits
 		);
 	}
-	constexpr auto end() const & {
+	constexpr auto end() const & requires range<Range const &> {
 		return containers::adapt_iterator(
 			::containers::unwrap(m_traits).get_end(m_range),
 			m_traits
 		);
 	}
-	constexpr auto end() & {
+	constexpr auto end() & requires range<Range &> {
 		return containers::adapt_iterator(
 			::containers::unwrap(m_traits).get_end(m_range),
 			m_traits
 		);
 	}
-	constexpr auto end() && {
+	constexpr auto end() && requires range<Range &&> {
 		return containers::adapt_iterator(
 			::containers::unwrap(m_traits).get_end(std::move(*this).m_range),
 			m_traits
