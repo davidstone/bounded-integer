@@ -65,19 +65,19 @@ public:
 			m_traits
 		);
 	}
-	constexpr auto end() const & -> sentinel_for<decltype(begin())> auto {
+	constexpr auto end() const & {
 		return containers::adapt_iterator(
 			::containers::unwrap(m_traits).get_end(m_range),
 			m_traits
 		);
 	}
-	constexpr auto end() & -> sentinel_for<decltype(begin())> auto {
+	constexpr auto end() & {
 		return containers::adapt_iterator(
 			::containers::unwrap(m_traits).get_end(m_range),
 			m_traits
 		);
 	}
-	constexpr auto end() && -> sentinel_for<decltype(begin())> auto {
+	constexpr auto end() && {
 		return containers::adapt_iterator(
 			::containers::unwrap(m_traits).get_end(std::move(*this).m_range),
 			m_traits
