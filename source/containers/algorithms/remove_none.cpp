@@ -58,7 +58,7 @@ struct remove_none_iterator {
 		return lhs;
 	}
 
-	friend constexpr auto operator==(remove_none_iterator const & lhs, remove_none_iterator const & rhs) -> bool {
+	friend constexpr auto operator==(remove_none_iterator const & lhs, remove_none_iterator const & rhs) -> bool requires bounded::equality_comparable<iterator_t<Range>> {
 		return lhs.m_it == rhs.m_it;
 	}
 	friend constexpr auto operator==(remove_none_iterator const & lhs, remove_none_sentinel) -> bool {
