@@ -400,6 +400,7 @@ target_sources(containers_test PRIVATE
 		test/containers/sort/test_sort.cpp
 		test/containers/algorithms/copy_or_relocate_from.cpp
 		test/containers/algorithms/erase.cpp
+		test/containers/algorithms/zip.cpp
 		test/containers/append.cpp
 		test/containers/array.cpp
 		test/containers/assign.cpp
