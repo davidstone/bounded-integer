@@ -3,6 +3,10 @@
 // (See accompanying file LICENSE_1_0.txt or copy at
 // http://www.boost.org/LICENSE_1_0.txt)
 
+module;
+
+#include <operators/forward.hpp>
+
 export module containers.algorithms.compare;
 
 import containers.c_array;
@@ -33,7 +37,13 @@ constexpr auto lexicographical_compare_3way(InputIterator1 first1, sentinel_for<
 }
 
 export constexpr auto lexicographical_compare_3way(range auto && range1, range auto && range2, auto cmp) {
-	return ::containers::lexicographical_compare_3way(containers::begin(range1), containers::end(range1), containers::begin(range2), containers::end(range2), std::move(cmp));
+	return ::containers::lexicographical_compare_3way(
+		containers::begin(OPERATORS_FORWARD(range1)),
+		containers::end(OPERATORS_FORWARD(range1)),
+		containers::begin(OPERATORS_FORWARD(range2)),
+		containers::end(OPERATORS_FORWARD(range2)),
+		std::move(cmp)
+	);
 }
 
 
@@ -49,7 +59,11 @@ constexpr auto lexicographical_compare_3way(InputIterator1 first1, sentinel_for<
 }
 
 export constexpr auto lexicographical_compare_3way(range auto && range1, range auto && range2) {
-	return ::containers::lexicographical_compare_3way(range1, range2, std::compare_three_way());
+	return ::containers::lexicographical_compare_3way(
+		OPERATORS_FORWARD(range1),
+		OPERATORS_FORWARD(range2),
+		std::compare_three_way()
+	);
 }
 
 
@@ -82,15 +96,19 @@ export constexpr auto shortlex_compare(sized_range auto && range1, sized_range a
 		return result;
 	}
 	return ::containers::lexicographical_compare_3way(
-		::containers::begin(range1),
-		::containers::end(range1),
-		::containers::begin(range2),
+		::containers::begin(OPERATORS_FORWARD(range1)),
+		::containers::end(OPERATORS_FORWARD(range1)),
+		::containers::begin(OPERATORS_FORWARD(range2)),
 		std::move(cmp)
 	);
 }
 
 export constexpr auto shortlex_compare(sized_range auto && range1, sized_range auto && range2) {
-	return ::containers::shortlex_compare(range1, range2, std::compare_three_way());
+	return ::containers::shortlex_compare(
+		OPERATORS_FORWARD(range1),
+		OPERATORS_FORWARD(range2),
+		std::compare_three_way()
+	);
 }
 
 
@@ -148,15 +166,30 @@ constexpr auto equal(Range1 && range1, Range2 && range2, auto cmp) {
 	if constexpr (sized_range<Range1> and sized_range<Range2>) {
 		return
 			::containers::size(range1) == ::containers::size(range2) and
-			::containers::equal(containers::begin(range1), containers::end(range1), containers::begin(range2), std::move(cmp));
+			::containers::equal(
+				containers::begin(OPERATORS_FORWARD(range1)),
+				containers::end(OPERATORS_FORWARD(range1)),
+				containers::begin(OPERATORS_FORWARD(range2)),
+				std::move(cmp)
+			);
 	} else {
-		return ::containers::equal(containers::begin(range1), containers::end(range1), containers::begin(range2), containers::end(range2), std::move(cmp));
+		return ::containers::equal(
+			containers::begin(OPERATORS_FORWARD(range1)),
+			containers::end(OPERATORS_FORWARD(range1)),
+			containers::begin(OPERATORS_FORWARD(range2)),
+			containers::end(OPERATORS_FORWARD(range2)),
+			std::move(cmp)
+		);
 	}
 }
 
 export template<range Range1, range Range2>
 constexpr auto equal(Range1 && range1, Range2 && range2) {
-	return ::containers::equal(range1, range2, bounded::equal_to());
+	return ::containers::equal(
+		OPERATORS_FORWARD(range1),
+		OPERATORS_FORWARD(range2),
+		bounded::equal_to()
+	);
 }
 
 } // namespace containers
