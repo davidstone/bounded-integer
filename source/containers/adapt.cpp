@@ -15,6 +15,7 @@ import containers.is_iterator;
 import containers.is_iterator_sentinel;
 import containers.iter_value_t;
 import containers.iterator_adapter;
+import containers.range;
 import containers.reference_wrapper;
 
 export import containers.common_iterator_functions;
@@ -34,7 +35,7 @@ concept statically_sized_adapted_range = sized_adapted_range<Range, Traits> and 
 	std::remove_reference_t<decltype(::containers::unwrap(traits))>::template get_size<Range>();
 };
 
-export template<typename Range, typename Traits>
+export template<range Range, typename Traits>
 struct adapt {
 private:
 	[[no_unique_address]] Range m_range;
