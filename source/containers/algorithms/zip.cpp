@@ -154,6 +154,22 @@ constexpr auto make_zip_sentinel(auto && ranges, std::index_sequence<indexes...>
 	);
 }
 
+template<typename Range>
+concept supports_begin = requires(Range r) {
+	containers::begin(OPERATORS_FORWARD(r));
+};
+
+template<typename... Ranges>
+concept all_support_begin = (... and supports_begin<Ranges>);
+
+template<typename Range>
+concept supports_end = requires(Range r) {
+	containers::end(OPERATORS_FORWARD(r));
+};
+
+template<typename... Ranges>
+concept all_support_end = (... and supports_end<Ranges>);
+
 export template<range... Ranges>
 struct zip {
 private:
@@ -188,23 +204,23 @@ public:
 	{
 	}
 
-	constexpr auto begin() const & {
+	constexpr auto begin() const & requires all_support_begin<Ranges const &...> {
 		return make_zip_iterator(m_ranges, indexes, use_begin());
 	}
-	constexpr auto begin() & {
+	constexpr auto begin() & requires all_support_begin<Ranges &...> {
 		return make_zip_iterator(m_ranges, indexes, use_begin());
 	}
-	constexpr auto begin() && {
+	constexpr auto begin() && requires all_support_begin<Ranges &&...> {
 		return make_zip_iterator(std::move(m_ranges), indexes, use_begin());
 	}
 
-	constexpr auto end() const & {
+	constexpr auto end() const & requires all_support_end<Ranges const &...> {
 		return end_impl(m_ranges);
 	}
-	constexpr auto end() & {
+	constexpr auto end() & requires all_support_end<Ranges &...> {
 		return end_impl(m_ranges);
 	}
-	constexpr auto end() && {
+	constexpr auto end() && requires all_support_end<Ranges &&...> {
 		return end_impl(std::move(m_ranges));
 	}
 
