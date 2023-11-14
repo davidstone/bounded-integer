@@ -10,17 +10,18 @@ module;
 export module containers.default_begin_end_size;
 
 import containers.begin_end;
+import containers.range;
 import containers.size;
 import containers.sized_range;
 
 namespace containers {
 
 export struct default_begin_end_size {
-	static constexpr auto get_begin(auto && range) {
+	static constexpr auto get_begin(range auto && range) {
 		return containers::begin(OPERATORS_FORWARD(range));
 	}
 
-	static constexpr auto get_end(auto && range) {
+	static constexpr auto get_end(range auto && range) {
 		return containers::end(OPERATORS_FORWARD(range));
 	}
 
