@@ -138,6 +138,17 @@ public:
 	OPERATORS_BRACKET_SEQUENCE_RANGE_DEFINITIONS
 
 	friend auto operator==(range_view, range_view) -> bool = default;
+
+	// TODO: spans of static extent
+	constexpr operator std::span<std::remove_reference_t<iter_reference_t<Iterator>>>() const requires contiguous {
+		return std::span(data(), static_cast<std::size_t>(size()));
+	}
+	constexpr operator std::span<std::remove_reference_t<iter_reference_t<Iterator>>>() requires contiguous {
+		return std::span(data(), static_cast<std::size_t>(size()));
+	}
+	constexpr operator std::basic_string_view<iter_value_t<Iterator>>() const requires(contiguous and std::is_trivial_v<iter_value_t<Iterator>>) {
+		return std::basic_string_view(data(), static_cast<std::size_t>(size()));
+	}
 	
 private:
 	[[no_unique_address]] Iterator m_begin;
@@ -209,3 +220,16 @@ static_assert(std::same_as<
 >);
 
 static_assert(containers::equal(a, containers::range_view(a)));
+
+static_assert(bounded::convertible_to<
+	std::string_view,
+	containers::range_view<int *, int *, std::size_t>
+>);
+static_assert(bounded::convertible_to<
+	std::span<int>,
+	containers::range_view<int *, int *, std::size_t>
+>);
+static_assert(bounded::convertible_to<
+	std::span<int const>,
+	containers::range_view<int *, int *, std::size_t>
+>);
