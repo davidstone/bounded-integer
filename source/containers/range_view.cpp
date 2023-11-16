@@ -18,10 +18,12 @@ import containers.forward_random_access_range;
 import containers.has_member_size;
 import containers.is_iterator_sentinel;
 import containers.iter_difference_t;
+import containers.iter_reference_t;
 import containers.iter_value_t;
 import containers.range;
 import containers.size;
 import containers.sized_range;
+import containers.to_address;
 
 import bounded;
 import std_module;
@@ -58,6 +60,10 @@ concept range_view_size = bounded::integral<T> or std::same_as<T, no_explicit_si
 
 export template<iterator Iterator, range_view_sentinel<Iterator> Sentinel = Iterator, range_view_size Size = no_explicit_size>
 struct range_view {
+private:
+	// TODO: Maybe check if we can do end - begin?
+	static constexpr auto contiguous = to_addressable<Iterator> and explicit_size<Size>;
+public:
 	static_assert(explicit_sentinel<Sentinel> or explicit_size<Size>);
 
 	constexpr range_view(Iterator first, Sentinel last, Size size_) requires explicit_size<Size>:
@@ -92,8 +98,7 @@ struct range_view {
 		)
 	{
 	}
-	
-	// TODO: data?
+
 	constexpr auto begin() const & -> Iterator requires bounded::copy_constructible<Iterator> {
 		return m_begin;
 	}
@@ -105,6 +110,13 @@ struct range_view {
 		return m_size;
 	}
 
+	constexpr auto data() const requires contiguous {
+		return containers::to_address(m_begin);
+	}
+	constexpr auto data() requires contiguous {
+		return containers::to_address(m_begin);
+	}
+	
 	constexpr auto end() const & -> Sentinel requires explicit_sentinel<Sentinel> and bounded::copy_constructible<Sentinel> {
 		return m_end;
 	}
@@ -181,6 +193,7 @@ constexpr auto to_range_view(std::pair<Iterator, Sentinel> pair) {
 } // namespace containers
 
 static_assert(containers::range_view<int *>(nullptr, nullptr).begin() == nullptr);
+static_assert(containers::range_view(static_cast<int *>(nullptr), 0).data() == nullptr);
 static_assert(containers::range_view<int *>(nullptr, nullptr).end() == nullptr);
 static_assert(containers::range<containers::range_view<int *>>);
 
