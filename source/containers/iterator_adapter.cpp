@@ -15,6 +15,7 @@ import containers.default_adapt_traits;
 import containers.is_iterator;
 import containers.iter_difference_t;
 import containers.iterator_category_base;
+import containers.reference_or_value;
 import containers.reference_wrapper;
 
 import bounded;
@@ -68,19 +69,6 @@ template<typename RHSIterator, typename LHSIterator, typename Traits>
 concept adapted_equality_comparable = requires(LHSIterator const & lhs, RHSIterator const & rhs, unwrapped_t<Traits> const traits) {
 	traits.equal(lhs, rhs);
 };
-
-template<typename Traits>
-constexpr auto can_store_copy =
-	bounded::mostly_trivial<Traits> and
-	sizeof(Traits) <= sizeof(std::reference_wrapper<Traits>);
-
-template<typename Traits>
-using stored_traits = std::conditional_t<
-	can_store_copy<Traits>,
-	std::remove_const_t<Traits>,
-	std::reference_wrapper<Traits const>
->;
-
 
 // There are a few functions of interest for an iterator:
 // 1) Dereferencing: *it
@@ -150,7 +138,7 @@ struct adapt_iterator : iterator_category_base<Iterator>, adapted_difference_typ
 
 private:
 	[[no_unique_address]] Iterator m_base;
-	[[no_unique_address]] stored_traits<Traits> m_traits;
+	[[no_unique_address]] reference_or_value<Traits> m_traits;
 };
 
 template<typename Iterator, typename Traits>

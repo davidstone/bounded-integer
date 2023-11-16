@@ -346,6 +346,7 @@ target_sources(containers PUBLIC
 		source/containers/range_value_t.cpp
 		source/containers/range_view.cpp
 		source/containers/reallocation_size.cpp
+		source/containers/reference_or_value.cpp
 		source/containers/reference_wrapper.cpp
 		source/containers/repeat_n.cpp
 		source/containers/reservable.cpp
