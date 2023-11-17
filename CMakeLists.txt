@@ -248,6 +248,7 @@ target_sources(containers PUBLIC
 		source/containers/algorithms/reverse_iterator.cpp
 		source/containers/algorithms/set.cpp
 		source/containers/algorithms/splice.cpp
+		source/containers/algorithms/split.cpp
 		source/containers/algorithms/transform.cpp
 		source/containers/algorithms/transform_traits.cpp
 		source/containers/algorithms/uninitialized.cpp
@@ -401,6 +402,7 @@ target_sources(containers_test PRIVATE
 		test/containers/sort/test_sort.cpp
 		test/containers/algorithms/copy_or_relocate_from.cpp
 		test/containers/algorithms/erase.cpp
+		test/containers/algorithms/split.cpp
 		test/containers/algorithms/zip.cpp
 		test/containers/append.cpp
 		test/containers/array.cpp
