@@ -92,6 +92,7 @@ private:
 
 export template<forward_range Range, typename Delimiter>
 struct split {
+	static_assert(!std::is_array_v<std::remove_cvref_t<Range>>);
 	constexpr split(Range && range, Delimiter && delimiter):
 		m_range(OPERATORS_FORWARD(range)),
 		m_delimiter(OPERATORS_FORWARD(delimiter))
