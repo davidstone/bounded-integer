@@ -39,6 +39,7 @@ export import containers.algorithms.remove_none;
 export import containers.algorithms.reverse;
 export import containers.algorithms.reverse_iterator;
 export import containers.algorithms.set;
+export import containers.algorithms.split;
 export import containers.algorithms.transform;
 export import containers.algorithms.uninitialized;
 export import containers.algorithms.unique;
