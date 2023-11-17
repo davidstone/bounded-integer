@@ -131,6 +131,19 @@ struct tuple : private tuple_impl_t<Types...> {
 	using tuple_impl_t<Types...>::tuple_impl_t;
 	using tuple_impl_t<Types...>::operator[];
 
+	template<std::size_t index>
+	constexpr auto get() const & -> auto && {
+		return (*this)[bounded::constant<index>];
+	}
+	template<std::size_t index>
+	constexpr auto get() & -> auto && {
+		return (*this)[bounded::constant<index>];
+	}
+	template<std::size_t index>
+	constexpr auto get() && -> auto && {
+		return std::move(*this)[bounded::constant<index>];
+	}
+
 	template<bounded::ordered<Types>... RHSTypes>
 	friend constexpr auto operator<=>(tuple const & lhs, tuple<RHSTypes...> const & rhs) {
 		return ::tv::compare_impl(lhs, rhs, bounded::make_index_sequence(bounded::constant<sizeof...(Types)>));
