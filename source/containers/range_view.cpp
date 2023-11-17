@@ -23,6 +23,7 @@ import containers.iter_value_t;
 import containers.range;
 import containers.size;
 import containers.sized_range;
+import containers.subtractable;
 import containers.to_address;
 
 import bounded;
@@ -62,7 +63,9 @@ export template<iterator Iterator, range_view_sentinel<Iterator> Sentinel = Iter
 struct range_view {
 private:
 	// TODO: Maybe check if we can do end - begin?
-	static constexpr auto contiguous = to_addressable<Iterator> and explicit_size<Size>;
+	static constexpr auto contiguous =
+		to_addressable<Iterator> and
+		(explicit_size<Size> or subtractable<Sentinel, Iterator>);
 public:
 	static_assert(explicit_sentinel<Sentinel> or explicit_size<Size>);
 
@@ -141,13 +144,13 @@ public:
 
 	// TODO: spans of static extent
 	constexpr operator std::span<std::remove_reference_t<iter_reference_t<Iterator>>>() const requires contiguous {
-		return std::span(data(), static_cast<std::size_t>(size()));
+		return std::span(data(), static_cast<std::size_t>(::containers::size(*this)));
 	}
 	constexpr operator std::span<std::remove_reference_t<iter_reference_t<Iterator>>>() requires contiguous {
-		return std::span(data(), static_cast<std::size_t>(size()));
+		return std::span(data(), static_cast<std::size_t>(::containers::size(*this)));
 	}
 	constexpr operator std::basic_string_view<iter_value_t<Iterator>>() const requires(contiguous and std::is_trivial_v<iter_value_t<Iterator>>) {
-		return std::basic_string_view(data(), static_cast<std::size_t>(size()));
+		return std::basic_string_view(data(), static_cast<std::size_t>(::containers::size(*this)));
 	}
 	
 private:
@@ -205,6 +208,7 @@ constexpr auto to_range_view(std::pair<Iterator, Sentinel> pair) {
 
 static_assert(containers::range_view<int *>(nullptr, nullptr).begin() == nullptr);
 static_assert(containers::range_view(static_cast<int *>(nullptr), 0).data() == nullptr);
+static_assert(containers::range_view(static_cast<int *>(nullptr), static_cast<int *>(nullptr)).data() == nullptr);
 static_assert(containers::range_view<int *>(nullptr, nullptr).end() == nullptr);
 static_assert(containers::range<containers::range_view<int *>>);
 
