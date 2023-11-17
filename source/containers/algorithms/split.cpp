@@ -61,6 +61,11 @@ struct split_iterator {
 		return lhs;
 	}
 
+	// Can be called on any iterator, even an end iterator
+	constexpr auto remainder() const {
+		return range_view(m_first, m_last);
+	}
+
 	// It is undefined behavior to compare iterators into two different `split`
 	// ranges
 	friend constexpr auto operator<=>(split_iterator const & lhs, split_iterator const & rhs) requires bounded::ordered<Iterator> {

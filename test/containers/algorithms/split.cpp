@@ -12,6 +12,7 @@ module;
 
 export module containers.test.algorithms.split;
 
+import containers.algorithms.advance;
 import containers.algorithms.compare;
 import containers.algorithms.split;
 import containers.algorithms.zip;
@@ -72,3 +73,8 @@ static_assert(compare(
 	"|a||b|"sv,
 	containers::array({""sv, "a"sv, ""sv, "b"sv, ""sv})
 ));
+
+constexpr auto range = containers::split("a"sv, '|');
+static_assert(containers::linear_size(range.begin().remainder()) == 1_bi);
+static_assert(std::string_view(range.begin().remainder()) == "a");
+static_assert(std::string_view(containers::next(range.begin()).remainder()) == "");
