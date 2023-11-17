@@ -7,7 +7,7 @@ export module containers.subtractable;
 
 namespace containers {
 
-export template<typename Iterator>
-concept subtractable = requires(Iterator const it) { it - it; };
+export template<typename LHS, typename RHS = LHS>
+concept subtractable = requires(LHS const lhs, RHS const rhs) { lhs - rhs; };
 
 } // namespace containers
