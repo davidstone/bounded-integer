@@ -7,7 +7,7 @@ module;
 
 export module containers.iter_difference_t;
 
-import containers.addable_subtractable;
+import containers.subtractable;
 
 import bounded;
 import std_module;

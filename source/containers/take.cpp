@@ -18,7 +18,7 @@ export module containers.take;
 
 import containers.algorithms.compare;
 import containers.algorithms.concatenate;
-import containers.addable_subtractable;
+import containers.addable;
 import containers.array;
 import containers.begin_end;
 import containers.is_iterator_sentinel;

@@ -5,9 +5,10 @@
 
 export module containers.is_iterator;
 
-import containers.addable_subtractable;
+import containers.addable;
 import containers.iter_difference_t;
 import containers.offset_type;
+import containers.subtractable;
 
 import bounded;
 import std_module;

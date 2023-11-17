@@ -258,7 +258,7 @@ target_sources(containers PUBLIC
 		source/containers/std/std_allocator.cpp
 		source/containers/std/vector.cpp
 		source/containers/adapt.cpp
-		source/containers/addable_subtractable.cpp
+		source/containers/addable.cpp
 		source/containers/append.cpp
 		source/containers/append_after.cpp
 		source/containers/append_into_capacity.cpp
@@ -365,6 +365,7 @@ target_sources(containers PUBLIC
 		source/containers/static_vector.cpp
 		source/containers/stored_function.cpp
 		source/containers/string.cpp
+		source/containers/subtractable.cpp
 		source/containers/supports_lazy_insert_after.cpp
 		source/containers/take.cpp
 		source/containers/to_address.cpp

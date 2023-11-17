@@ -12,13 +12,14 @@ module;
 
 export module containers.legacy_iterator;
 
-import containers.addable_subtractable;
+import containers.addable;
 import containers.common_iterator_functions;
 import containers.contiguous_iterator;
 import containers.is_iterator;
 import containers.iter_difference_t;
 import containers.iter_reference_t;
 import containers.iter_value_t;
+import containers.subtractable;
 import containers.to_address;
 
 import bounded;
