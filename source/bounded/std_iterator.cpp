@@ -15,13 +15,21 @@ namespace bounded {
 
 template<typename T, typename value_type = std::remove_cvref_t<decltype(*declval<T>())>>
 concept std_random_access_iterator =
+	!std::is_pointer_v<T> and
 	!std::is_void_v<value_type> and !std::is_reference_v<value_type> and !std::is_const_v<value_type> and (
 		std::same_as<T, std::string::iterator> or
 		std::same_as<T, std::string::const_iterator> or
 		std::same_as<T, typename std::deque<value_type>::iterator> or
 		std::same_as<T, typename std::deque<value_type>::const_iterator> or
 		std::same_as<T, typename std::vector<value_type>::iterator> or
-		std::same_as<T, typename std::vector<value_type>::const_iterator>
+		std::same_as<T, typename std::vector<value_type>::const_iterator> or
+		std::same_as<T, typename std::span<value_type>::iterator> or
+		std::same_as<T, typename std::span<value_type const>::iterator> or
+		std::same_as<T, typename std::span<value_type>::const_iterator> or
+		(std::is_trivial_v<value_type> and std::is_standard_layout_v<value_type> and (
+			std::same_as<T, typename std::basic_string_view<value_type>::iterator> or
+			std::same_as<T, typename std::basic_string_view<value_type>::const_iterator>
+		))
 	);
 
 template<
