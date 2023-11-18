@@ -120,6 +120,7 @@ target_sources(bounded PUBLIC
 		source/bounded/relocate.cpp
 		source/bounded/representation_digits.cpp
 		source/bounded/safe_extreme.cpp
+		source/bounded/scope_fail.cpp
 		source/bounded/scope_guard.cpp
 		source/bounded/size_of.cpp
 		source/bounded/std_iterator.cpp

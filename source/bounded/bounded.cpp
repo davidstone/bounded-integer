@@ -39,6 +39,7 @@ export import bounded.number_of;
 export import bounded.pow;
 export import bounded.relocate;
 export import bounded.representation_digits;
+export import bounded.scope_fail;
 export import bounded.scope_guard;
 export import bounded.size_of;
 export import bounded.std_iterator;
