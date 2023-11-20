@@ -189,7 +189,6 @@ constexpr auto take_impl(Range && source, Count const count) {
 	if constexpr (sized_range<Range> and policy == extra_elements_policy::exception) {
 		auto const source_size = containers::size(source);
 		if (source_size > count) {
-			using namespace std::string_view_literals;
 			throw std::runtime_error("Did not take all elements of range");
 		}
 		return containers::range_view(OPERATORS_FORWARD(source));
