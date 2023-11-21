@@ -193,6 +193,23 @@ target_sources(tv PUBLIC
 		source/tv/visit.cpp
 )
 
+add_library(tv_test)
+
+target_link_libraries(tv_test
+	PRIVATE
+		bounded
+		std_module
+		strict_defaults
+		tv
+)
+
+target_sources(tv_test PRIVATE
+	FILE_SET CXX_MODULES
+	BASE_DIRS "${CMAKE_CURRENT_SOURCE_DIR}"
+	FILES
+		test/tv/is_valid_index.cpp
+)
+
 add_library(containers STATIC)
 
 target_sources(containers PUBLIC

@@ -22,6 +22,8 @@ export template<typename Index, std::size_t size>
 concept variant_integer_index = bounded::bounded_integer<Index> and Index::value() < size;
 
 export template<typename Index, typename... Ts>
-concept unique_type_identifier = matches_exactly_one_type_impl<typename Index::type, Ts...> or variant_integer_index<Index, sizeof...(Ts)>;
+concept unique_type_identifier =
+	matches_exactly_one_type_impl<typename Index::type, Ts...> or
+	variant_integer_index<Index, sizeof...(Ts)>;
 
 } // namespace tv

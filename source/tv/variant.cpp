@@ -294,34 +294,6 @@ static_assert(!bounded::trivially_copy_assignable<tv::variant<non_trivial>>);
 static_assert(!bounded::trivially_move_assignable<tv::variant<non_trivial>>);
 static_assert(!bounded::trivially_destructible<tv::variant<non_trivial>>);
 
-template<bool expected, typename Index, typename... Ts>
-constexpr bool assert_type_index_concepts() {
-	static_assert(tv::matches_exactly_one_type<Index, Ts...> == expected);
-	static_assert(!tv::variant_integer_index<bounded::type_t<Index>, sizeof...(Ts)>);
-	static_assert(tv::unique_type_identifier<bounded::type_t<Index>, Ts...> == expected);
-	return true;
-}
-
-template<bool expected, auto index, typename... Ts>
-constexpr bool assert_integer_index_concepts() {
-	static_assert(!tv::matches_exactly_one_type<bounded::constant_t<index>, Ts...>);
-	static_assert(tv::variant_integer_index<bounded::constant_t<index>, sizeof...(Ts)> == expected);
-	static_assert(tv::unique_type_identifier<bounded::constant_t<index>, Ts...> == expected);
-	return true;
-}
-
-static_assert(assert_type_index_concepts<true, int, int>());
-static_assert(assert_type_index_concepts<true, int, int, short>());
-static_assert(assert_type_index_concepts<false, int, int, int>());
-static_assert(assert_type_index_concepts<false, int, short>());
-static_assert(assert_type_index_concepts<false, int>());
-
-static_assert(assert_integer_index_concepts<true, 0, int>());
-static_assert(assert_integer_index_concepts<true, 0, int, short>());
-static_assert(assert_integer_index_concepts<true, 1, int, int>());
-static_assert(assert_integer_index_concepts<false, 1, int>());
-static_assert(assert_integer_index_concepts<false, 0>());
-
 static_assert(!bounded::constructible_from<thing_t, int>);
 static_assert(bounded::constructible_from<thing_t, short>);
 static_assert(bounded::constructible_from<thing_t, long>);
