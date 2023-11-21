@@ -10,7 +10,6 @@ module;
 export module tv.test.variant;
 
 import tv.is_valid_index;
-import tv.overload;
 import tv.variant;
 
 import bounded;

@@ -14,7 +14,6 @@ export module tv.variant;
 import tv.insert;
 import tv.get_index;
 import tv.is_valid_index;
-import tv.overload;
 import tv.single_element_storage;
 import tv.variadic_union;
 import tv.variant_index;
@@ -22,7 +21,6 @@ import tv.visit;
 import tv.indexed_value;
 
 import bounded;
-import bounded.test_int;
 import std_module;
 
 using namespace bounded::literal;
