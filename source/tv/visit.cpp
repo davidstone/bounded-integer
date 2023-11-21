@@ -118,12 +118,13 @@ constexpr decltype(auto) visit_implementation(
 	auto && ... variants
 ) requires(sizeof...(indexes) < sizeof...(variants)) {
 	auto const search_index = variant.index().integer();
+	auto const this_search = search_index - offset;
 
 	// Cannot use a lambda because there is no return type that would be valid
 	// there. A deduced return type would be potentially void.
 	#define VISIT_IMPL(index) \
 		do { \
-			if constexpr (numeric_traits::max_value<decltype(search_index)> < (index)) { \
+			if constexpr (numeric_traits::max_value<decltype(this_search)> < (index)) { \
 				std::unreachable(); \
 			} else { \
 				return ::tv::visit_implementation( \
@@ -136,7 +137,7 @@ constexpr decltype(auto) visit_implementation(
 		} while (false)
 
 	// 16 is arbitrary
-	switch ((search_index - offset).value()) {
+	switch (this_search.value()) {
 		case 0: VISIT_IMPL(0_bi);
 		case 1: VISIT_IMPL(1_bi);
 		case 2: VISIT_IMPL(2_bi);
@@ -155,7 +156,7 @@ constexpr decltype(auto) visit_implementation(
 		case 15: VISIT_IMPL(15_bi);
 		default: {
 			constexpr auto max_index = 16_bi;
-			if constexpr (numeric_traits::max_value<decltype(search_index)> < max_index) {
+			if constexpr (numeric_traits::max_value<decltype(this_search)> < max_index) {
 				std::unreachable();
 			} else {
 				return ::tv::visit_implementation(

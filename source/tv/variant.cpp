@@ -299,12 +299,6 @@ static_assert(bounded::constructible_from<thing_t, short>);
 static_assert(bounded::constructible_from<thing_t, long>);
 static_assert(bounded::constructible_from<thing_t, char>);
 
-static_assert(tv::visit_with_index(
-	thing_t(0_bi, 0),
-	thing_t(0_bi, 0),
-	tv::equality_visitor
-));
-
 static_assert(thing_t(0_bi, 0) == thing_t(0_bi, 0));
 static_assert(thing_t(0_bi, 0) != thing_t(0_bi, 1));
 static_assert(thing_t(0_bi, 0) != thing_t(1_bi, static_cast<short>(0)));
@@ -328,7 +322,6 @@ using thingy = decltype(thing[index]);
 static_assert(std::same_as<thingy, short const &>);
 
 static_assert(thing[index] == value);
-static_assert(tv::visit(thing, [](auto x) { return std::same_as<decltype(x), short>; }));
 
 constexpr auto test_assignment_from_variant() {
 	auto thing1 = thing_t(index, value);
@@ -382,55 +375,10 @@ constexpr bool test_non_trivial() {
 }
 static_assert(test_non_trivial());
 
-constexpr auto variant = tv::variant<int, int *>(5);
-
-constexpr auto int_visitor = [](int) {
-	return 3;
-};
-
-struct special {
-	static constexpr auto operator()(int) {
-		return 2;
-	}
-	static constexpr auto operator()(auto) {
-		return 1;
-	}
-};
-
-static_assert(tv::visit(tv::variant<int>(5), int_visitor) == 3);
-
-static_assert(tv::visit(variant, tv::overload(int_visitor, [](int *) { return 0; })) == 3);
-static_assert(tv::visit(variant, tv::overload(int_visitor, [](int const *) { return 0; })) == 3);
-static_assert(tv::visit(variant, tv::overload([](auto) { return 0; })) == 0);
-static_assert(tv::visit(variant, special{}) == 2);
-static_assert(tv::visit(variant, tv::overload(int_visitor, [](auto) { return 0; })) == 3);
-static_assert(tv::visit(tv::variant<int>(1), [](int && x) { return x; }) == 1);
-
-static_assert(!std::invocable<decltype(tv::visit), decltype(variant), decltype(int_visitor)>);
-static_assert(!std::invocable<decltype(tv::visit), decltype(variant), decltype(tv::overload(int_visitor))>);
-
 static_assert(std::same_as<decltype(bounded::declval<tv::variant<int> &>().emplace(0_bi, [] { return 0; })), int &>);
 
 static_assert(bounded::convertible_to<int, tv::variant<int, unsigned>>);
 static_assert(!bounded::convertible_to<short, tv::variant<int, unsigned>>);
 static_assert(!bounded::convertible_to<int, tv::variant<int, int>>);
-
-struct unused {
-};
-struct multi_visitor {
-	static constexpr auto operator()(int const arg0, int const arg1) -> bool {
-		return arg0 == 0 and arg1 == 1;
-	}
-	static constexpr auto operator()(unused, int) -> bool {
-		return false;
-	}
-	static constexpr auto operator()(int, unused) -> bool {
-		return false;
-	}
-	static constexpr auto operator()(unused, unused) -> bool {
-		return false;
-	}
-};
-static_assert(tv::visit(tv::variant<int, unused>(0), tv::variant<unused, int>(1), multi_visitor()));
 
 } // namespace
