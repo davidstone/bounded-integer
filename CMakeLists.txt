@@ -122,6 +122,7 @@ target_sources(bounded PUBLIC
 		source/bounded/prevent_comma.cpp
 		source/bounded/relocate.cpp
 		source/bounded/representation_digits.cpp
+		source/bounded/safe_compare.cpp
 		source/bounded/safe_extreme.cpp
 		source/bounded/scope_fail.cpp
 		source/bounded/scope_guard.cpp

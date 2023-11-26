@@ -8,6 +8,7 @@ export module bounded.comparison;
 import bounded.bounded_integer;
 import bounded.builtin_integer;
 import bounded.builtin_min_max_value;
+import bounded.safe_compare;
 import bounded.signed_builtin;
 
 import numeric_traits;
@@ -17,19 +18,6 @@ namespace bounded {
 namespace detail {
 
 constexpr auto max_signed = numeric_traits::max_value<numeric_traits::max_signed_t>;
-
-export template<builtin_integer LHS, builtin_integer RHS>
-constexpr auto safe_compare(LHS const lhs, RHS const rhs) -> std::strong_ordering {
-	if constexpr (signed_builtin<LHS> == signed_builtin<RHS>) {
-		return lhs <=> rhs;
-	} else if constexpr (numeric_traits::max_value<LHS> <= max_signed and numeric_traits::max_value<RHS> <= max_signed) {
-		return static_cast<numeric_traits::max_signed_t>(lhs) <=> static_cast<numeric_traits::max_signed_t>(rhs);
-	} else if constexpr (signed_builtin<LHS>) {
-		return lhs < 0 ? std::strong_ordering::less : static_cast<RHS>(lhs) <=> rhs;
-	} else {
-		return rhs < 0 ? std::strong_ordering::greater : lhs <=> static_cast<LHS>(rhs);
-	}
-}
 
 export template<builtin_integer LHS, builtin_integer RHS>
 constexpr auto safe_equal(LHS const lhs, RHS const rhs) -> bool {
@@ -54,12 +42,12 @@ constexpr auto operator<=>(LHS const lhs, RHS const rhs) -> std::strong_ordering
 	constexpr auto lhs_max = builtin_max_value<LHS>;
 	constexpr auto rhs_min = builtin_min_value<RHS>;
 	constexpr auto rhs_max = builtin_max_value<RHS>;
-	if constexpr (detail::safe_compare(lhs_min, rhs_max) > 0) {
+	if constexpr (safe_compare(lhs_min, rhs_max) > 0) {
 		return std::strong_ordering::greater;
-	} else if constexpr (detail::safe_compare(lhs_max, rhs_min) < 0) {
+	} else if constexpr (safe_compare(lhs_max, rhs_min) < 0) {
 		return std::strong_ordering::less;
 	} else {
-		return detail::safe_compare(lhs.value(), rhs.value());
+		return safe_compare(lhs.value(), rhs.value());
 	}
 }
 
@@ -69,7 +57,7 @@ constexpr auto operator==(LHS const lhs, RHS const rhs) -> bool {
 	constexpr auto lhs_max = builtin_max_value<LHS>;
 	constexpr auto rhs_min = builtin_min_value<RHS>;
 	constexpr auto rhs_max = builtin_max_value<RHS>;
-	if constexpr (detail::safe_compare(lhs_min, rhs_max) > 0 or detail::safe_compare(lhs_max, rhs_min) < 0) {
+	if constexpr (safe_compare(lhs_min, rhs_max) > 0 or safe_compare(lhs_max, rhs_min) < 0) {
 		return false;
 	} else {
 		return detail::safe_equal(lhs.value(), rhs.value());

@@ -20,6 +20,7 @@ import bounded.integral;
 import bounded.is_bounded_integer;
 import bounded.isomorphic_to_integral;
 import bounded.normalize;
+import bounded.safe_compare;
 import bounded.safe_extreme;
 import bounded.unchecked;
 import bounded.underlying_type_t;
@@ -76,10 +77,13 @@ namespace bounded {
 template<typename T, auto minimum, auto maximum>
 concept overlapping_integer =
 	isomorphic_to_integral<T> and
-	detail::safe_compare(builtin_min_value<T>, maximum) <= 0 and detail::safe_compare(minimum, builtin_max_value<T>) <= 0;
+	safe_compare(builtin_min_value<T>, maximum) <= 0 and safe_compare(minimum, builtin_max_value<T>) <= 0;
 
 template<typename T, auto minimum, auto maximum>
-concept bounded_by_range = overlapping_integer<T, minimum, maximum> and detail::safe_compare(minimum, builtin_min_value<T>) <= 0 and detail::safe_compare(builtin_max_value<T>, maximum) <= 0;
+concept bounded_by_range =
+	overlapping_integer<T, minimum, maximum> and
+	safe_compare(minimum, builtin_min_value<T>) <= 0 and
+	safe_compare(builtin_max_value<T>, maximum) <= 0;
 
 namespace detail {
 
@@ -169,7 +173,7 @@ template<auto minimum, auto maximum>
 struct integer {
 	static_assert(std::same_as<decltype(minimum), std::remove_const_t<decltype(normalize<minimum>)>>);
 	static_assert(std::same_as<decltype(maximum), std::remove_const_t<decltype(normalize<maximum>)>>);
-	static_assert(detail::safe_compare(minimum, maximum) <= 0, "Maximum cannot be less than minimum");
+	static_assert(safe_compare(minimum, maximum) <= 0, "Maximum cannot be less than minimum");
 
 	using underlying_type = underlying_type_t<minimum, maximum>;
 	
