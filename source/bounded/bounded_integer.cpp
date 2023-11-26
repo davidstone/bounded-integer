@@ -33,9 +33,6 @@ constexpr auto is_integral_constant_of_integral<std::integral_constant<T, value>
 export template<typename T>
 concept integral = builtin_integer<T> or bounded_integer<T> or detail::is_integral_constant_of_integral<T>;
 
-export template<typename T>
-concept isomorphic_to_integral = integral<T> or std::is_enum_v<T> or std::same_as<T, bool>;
-
 } // namespace bounded
 
 namespace {
@@ -52,10 +49,5 @@ static_assert(bounded::integral<int>);
 static_assert(!bounded::integral<bool>);
 static_assert(!bounded::integral<std::byte>);
 static_assert(!bounded::integral<s>);
-
-static_assert(bounded::isomorphic_to_integral<int>);
-static_assert(bounded::isomorphic_to_integral<bool>);
-static_assert(bounded::isomorphic_to_integral<std::byte>);
-static_assert(!bounded::isomorphic_to_integral<s>);
 
 } // namespace

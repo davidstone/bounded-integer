@@ -106,6 +106,7 @@ target_sources(bounded PUBLIC
 		source/bounded/integer.cpp
 		source/bounded/integer_tombstone_traits.cpp
 		source/bounded/is_bounded_integer.cpp
+		source/bounded/isomorphic_to_integral.cpp
 		source/bounded/lazy_init.cpp
 		source/bounded/literal.cpp
 		source/bounded/log.cpp

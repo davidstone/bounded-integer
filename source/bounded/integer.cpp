@@ -16,6 +16,7 @@ import bounded.comparison;
 import bounded.concepts;
 import bounded.homogeneous_equals;
 import bounded.is_bounded_integer;
+import bounded.isomorphic_to_integral;
 import bounded.normalize;
 import bounded.overlapping_range;
 import bounded.safe_extreme;
