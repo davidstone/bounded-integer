@@ -22,11 +22,11 @@ namespace bounded {
 export constexpr auto operator&(bounded_integer auto const lhs_, bounded_integer auto const rhs_) {
 	// Assume always positive integers for now
 	// Not the tightest possible bounds, but probably good enough for now
-	return ::bounded::detail::operator_overload(lhs_, rhs_, std::bit_and(), [](auto const lhs, auto const rhs) {
-		return detail::min_max{
+	return operator_overload(lhs_, rhs_, std::bit_and(), [](auto const lhs, auto const rhs) {
+		return min_max(
 			0,
 			min(lhs.max, rhs.max).value()
-		};
+		);
 	});
 }
 

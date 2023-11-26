@@ -45,12 +45,18 @@ constexpr auto safer_divide() {
 constexpr auto positive_divisor_division(auto const lhs, auto const rhs) {
 	constexpr auto minimum_divisor = conditional_function<lhs.min.value() < 0>(rhs.min, rhs.max).value();
 	constexpr auto maximum_divisor = conditional_function<lhs.max.value() < 0>(rhs.max, rhs.min).value();
-	return detail::min_max{safer_divide<lhs.min.value(), minimum_divisor>(), safer_divide<lhs.max.value(), maximum_divisor>()};
+	return min_max(
+		safer_divide<lhs.min.value(), minimum_divisor>(),
+		safer_divide<lhs.max.value(), maximum_divisor>()
+	);
 }
 constexpr auto negative_divisor_division(auto const lhs, auto const rhs) {
 	constexpr auto minimum_divisor = conditional_function<lhs.max.value() >= 0>(rhs.max, rhs.min).value();
 	constexpr auto maximum_divisor = conditional_function<lhs.min.value() >= 0>(rhs.min, rhs.max).value();
-	return detail::min_max{safer_divide<lhs.max.value(), minimum_divisor>(), safer_divide<lhs.min.value(), maximum_divisor>()};
+	return min_max(
+		safer_divide<lhs.max.value(), minimum_divisor>(),
+		safer_divide<lhs.min.value(), maximum_divisor>()
+	);
 }
 
 // TODO: make this a lambda after resolution of
@@ -64,19 +70,19 @@ struct divides_operator_range_t {
 		} else if constexpr (rhs.max <= constant<-1>) {
 			return negative_divisor_division(lhs, rhs);
 		} else {
-			constexpr auto positive = positive_divisor_division(lhs, detail::min_max{constant<1>, rhs.max});
-			constexpr auto negative = negative_divisor_division(lhs, detail::min_max{rhs.min, constant<-1>});
-			return detail::min_max{
+			constexpr auto positive = positive_divisor_division(lhs, min_max(constant<1>, rhs.max));
+			constexpr auto negative = negative_divisor_division(lhs, min_max(rhs.min, constant<-1>));
+			return min_max(
 				detail::safe_min(positive.min, negative.min),
 				detail::safe_max(positive.max, negative.max)
-			};
+			);
 		}
 	}
 };
 constexpr auto divides_operator_range = divides_operator_range_t();
 
 export constexpr auto operator/(bounded_integer auto const lhs, bounded_integer auto const rhs) {
-	return detail::operator_overload(lhs, rhs, std::divides(), divides_operator_range);
+	return operator_overload(lhs, rhs, std::divides(), divides_operator_range);
 }
 
 }	// namespace bounded

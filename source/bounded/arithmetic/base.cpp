@@ -14,7 +14,6 @@ import numeric_traits;
 import std_module;
 
 namespace bounded {
-namespace detail {
 
 export template<typename Min, typename Max>
 struct min_max {
@@ -60,5 +59,4 @@ constexpr auto modulo_equivalent_operator_overload(LHS const lhs, RHS const rhs,
 	);
 }
 
-} // namespace detail
 } // namespace bounded

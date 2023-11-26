@@ -22,12 +22,12 @@ struct left_shift {
 };
 
 export constexpr auto operator<<(bounded_integer auto const lhs_, bounded_integer auto const rhs_) {
-	return detail::operator_overload(lhs_, rhs_, left_shift(), [](auto const lhs, auto const rhs) {
+	return operator_overload(lhs_, rhs_, left_shift(), [](auto const lhs, auto const rhs) {
 		// TODO: Broaden range
-		return detail::min_max{
+		return min_max(
 			static_cast<numeric_traits::max_signed_t>(lhs.min) << rhs.min.value(),
 			static_cast<numeric_traits::max_signed_t>(lhs.max) << rhs.max.value()
-		};
+		);
 	});
 }
 

@@ -40,11 +40,11 @@ constexpr auto safer_add() {
 }
 
 export constexpr auto operator+(bounded_integer auto const lhs_, bounded_integer auto const rhs_) {
-	return detail::modulo_equivalent_operator_overload(lhs_, rhs_, std::plus(), [](auto const lhs, auto const rhs) {
-		return detail::min_max{
+	return modulo_equivalent_operator_overload(lhs_, rhs_, std::plus(), [](auto const lhs, auto const rhs) {
+		return min_max(
 			::bounded::safer_add<lhs.min.value(), rhs.min.value()>(),
 			::bounded::safer_add<lhs.max.value(), rhs.max.value()>()
-		};
+		);
 	});
 }
 
