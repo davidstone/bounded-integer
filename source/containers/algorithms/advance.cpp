@@ -16,7 +16,7 @@ namespace containers {
 using namespace bounded::literal;
 
 template<typename Iterator, typename Offset>
-concept random_access_advancable_by = requires(Iterator & it, Offset offset) {
+concept random_access_advanceable_by = requires(Iterator & it, Offset offset) {
 	it += offset;
 };
 
@@ -42,7 +42,7 @@ export constexpr auto advance(bidirectional_iterator auto & it, auto const offse
 	}
 }
 export constexpr auto advance(random_access_iterator auto & it, auto const offset) {
-	if constexpr (random_access_advancable_by<decltype(it), decltype(offset)>) {
+	if constexpr (random_access_advanceable_by<decltype(it), decltype(offset)>) {
 		it += offset;
 	} else {
 		it += offset.value();
