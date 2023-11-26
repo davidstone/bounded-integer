@@ -216,9 +216,12 @@ static_assert(homogeneous_equals(
 #if 0	
 // The algorithm to compute the bounds currently runs in O(n) compile time,
 // and thus this test exceed's the constexpr evaluation limits.
-constexpr auto bounded_max_range = bounded::integer(numeric_traits::min_value<bounded::detail::signed_max_t>);
+constexpr auto bounded_max_range = bounded::integer(numeric_traits::min_value<bounded::smax_t>);
 static_assert(homogeneous_equals(
 	bounded_max_range % bounded_max_range,
-	bounded::integer<numeric_traits::min_value<signed_max_t> + 1, -(numeric_traits::min_value<signed_max_t> + 1)>(0)
+	bounded::integer<
+		numeric_traits::min_value<bounded::smax_t> + 1,
+		-(numeric_traits::min_value<bounded::smax_t> + 1)
+	>(0)
 ));
 #endif
