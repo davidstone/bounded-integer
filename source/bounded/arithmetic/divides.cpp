@@ -73,8 +73,8 @@ struct divides_operator_range_t {
 			constexpr auto positive = positive_divisor_division(lhs, min_max(constant<1>, rhs.max));
 			constexpr auto negative = negative_divisor_division(lhs, min_max(rhs.min, constant<-1>));
 			return min_max(
-				detail::safe_min(positive.min, negative.min),
-				detail::safe_max(positive.max, negative.max)
+				safe_min(positive.min, negative.min),
+				safe_max(positive.max, negative.max)
 			);
 		}
 	}

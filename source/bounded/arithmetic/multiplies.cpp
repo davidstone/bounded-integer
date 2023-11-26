@@ -66,8 +66,8 @@ export constexpr auto operator*(bounded_integer auto const lhs_, bounded_integer
 		constexpr auto p2 = safer_multiply(lhs.max, rhs.min);
 		constexpr auto p3 = safer_multiply(lhs.max, rhs.max);
 		return min_max(
-			detail::safe_min(p0, p1, p2, p3),
-			detail::safe_max(p0, p1, p2, p3)
+			safe_min(p0, p1, p2, p3),
+			safe_max(p0, p1, p2, p3)
 		);
 	});
 }

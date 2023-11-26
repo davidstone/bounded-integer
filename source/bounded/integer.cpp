@@ -60,11 +60,11 @@ constexpr auto builtin_min_value<integer<minimum, maximum>> = minimum;
 template<bounded::bounded_integer LHS, bounded::bounded_integer RHS> requires std::same_as<LHS, std::decay_t<LHS>> and std::same_as<RHS, std::decay_t<RHS>>
 struct std::common_type<LHS, RHS> {
 private:
-	static inline constexpr auto minimum = bounded::normalize<bounded::detail::safe_min(
+	static inline constexpr auto minimum = bounded::normalize<bounded::safe_min(
 		bounded::builtin_min_value<LHS>,
 		bounded::builtin_min_value<RHS>
 	)>;
-	static inline constexpr auto maximum = bounded::normalize<bounded::detail::safe_max(
+	static inline constexpr auto maximum = bounded::normalize<bounded::safe_max(
 		bounded::builtin_max_value<LHS>,
 		bounded::builtin_max_value<RHS>
 	)>;
@@ -90,8 +90,8 @@ namespace detail {
 export template<integral T, integral Minimum, integral Maximum>
 constexpr auto assume_in_range_impl(T const value, Minimum, Maximum) {
 	return integer<
-		normalize<detail::safe_max(builtin_min_value<Minimum>, builtin_min_value<T>)>,
-		normalize<detail::safe_min(builtin_max_value<Maximum>, builtin_max_value<T>)>
+		normalize<safe_max(builtin_min_value<Minimum>, builtin_min_value<T>)>,
+		normalize<safe_min(builtin_max_value<Maximum>, builtin_max_value<T>)>
 	>(value, unchecked);
 }
 
