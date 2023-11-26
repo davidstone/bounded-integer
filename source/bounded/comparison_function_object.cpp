@@ -14,7 +14,6 @@ import bounded.comparison;
 import std_module;
 
 namespace bounded {
-namespace detail {
 
 template<typename Bound>
 struct unary_equal_to {
@@ -29,14 +28,12 @@ private:
 	Bound m_bound;
 };
 
-} // namespace detail
-
 export constexpr auto equal_to() {
 	return std::equal_to();
 }
 export template<typename T>
 constexpr auto equal_to(T && t) {
-	return detail::unary_equal_to<T>(OPERATORS_FORWARD(t));
+	return unary_equal_to<T>(OPERATORS_FORWARD(t));
 }
 
 } // namespace bounded
