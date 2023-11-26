@@ -15,6 +15,7 @@ import bounded.builtin_min_max_value;
 import bounded.comparison;
 import bounded.concepts;
 import bounded.homogeneous_equals;
+import bounded.integral;
 import bounded.is_bounded_integer;
 import bounded.isomorphic_to_integral;
 import bounded.normalize;

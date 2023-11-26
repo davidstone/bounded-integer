@@ -105,6 +105,7 @@ target_sources(bounded PUBLIC
 		source/bounded/homogeneous_equals.cpp
 		source/bounded/integer.cpp
 		source/bounded/integer_tombstone_traits.cpp
+		source/bounded/integral.cpp
 		source/bounded/is_bounded_integer.cpp
 		source/bounded/isomorphic_to_integral.cpp
 		source/bounded/lazy_init.cpp

@@ -5,7 +5,7 @@
 
 export module bounded.isomorphic_to_integral;
 
-import bounded.bounded_integer;
+import bounded.integral;
 
 import std_module;
 

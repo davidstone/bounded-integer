@@ -7,6 +7,7 @@ export module bounded.clamp;
 
 import bounded.bounded_integer;
 import bounded.integer;
+import bounded.integral;
 import bounded.minmax;
 
 import numeric_traits;

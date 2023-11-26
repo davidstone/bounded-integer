@@ -13,9 +13,10 @@ module;
 export module bounded.check_in_range;
 
 import bounded.bounded_integer;
-import bounded.integer;
 import bounded.comparison;
 import bounded.comparison_builtin;
+import bounded.integer;
+import bounded.integral;
 
 import numeric_traits;
 import std_module;

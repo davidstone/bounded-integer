@@ -28,6 +28,7 @@ export import bounded.function_ptr;
 export import bounded.hash;
 export import bounded.integer;
 export import bounded.integer_tombstone_traits;
+export import bounded.integral;
 export import bounded.isomorphic_to_integral;
 export import bounded.lazy_init;
 export import bounded.literal;

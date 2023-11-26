@@ -9,7 +9,6 @@ import bounded.is_bounded_integer;
 import bounded.signed_builtin;
 import bounded.unsigned_builtin;
 
-import numeric_traits;
 import std_module;
 
 namespace bounded {
@@ -29,10 +28,6 @@ template<typename T, T value>
 constexpr auto is_integral_constant_of_integral<std::integral_constant<T, value>> = builtin_integer<T>;
 
 } // namespace detail
-
-export template<typename T>
-concept integral = builtin_integer<T> or bounded_integer<T> or detail::is_integral_constant_of_integral<T>;
-
 } // namespace bounded
 
 namespace {
@@ -44,10 +39,5 @@ static_assert(!bounded::bounded_integer<int>);
 static_assert(!bounded::bounded_integer<bool>);
 static_assert(!bounded::bounded_integer<std::byte>);
 static_assert(!bounded::bounded_integer<s>);
-
-static_assert(bounded::integral<int>);
-static_assert(!bounded::integral<bool>);
-static_assert(!bounded::integral<std::byte>);
-static_assert(!bounded::integral<s>);
 
 } // namespace
