@@ -10,8 +10,8 @@ module;
 export module bounded.underlying_type_t;
 
 import bounded.comparison;
-import bounded.overlapping_range;
 import bounded.type;
+import bounded.value_fits_in_type;
 
 import numeric_traits;
 
@@ -20,8 +20,8 @@ namespace bounded {
 template<typename T>
 constexpr auto range_fits_in_type(auto const minimum, auto const maximum) {
 	return
-		detail::value_fits_in_type<T>(minimum) and
-		detail::value_fits_in_type<T>(maximum);
+		value_fits_in_type<T>(minimum) and
+		value_fits_in_type<T>(maximum);
 }
 
 template<auto...>

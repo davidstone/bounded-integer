@@ -119,7 +119,6 @@ target_sources(bounded PUBLIC
 		source/bounded/normalize.cpp
 		source/bounded/number_of.cpp
 		source/bounded/numeric_limits.cpp
-		source/bounded/overlapping_range.cpp
 		source/bounded/pow.cpp
 		source/bounded/prevent_comma.cpp
 		source/bounded/relocate.cpp
@@ -138,6 +137,7 @@ target_sources(bounded PUBLIC
 		source/bounded/unchecked.cpp
 		source/bounded/underlying_type_t.cpp
 		source/bounded/unsigned_builtin.cpp
+		source/bounded/value_fits_in_type.cpp
 		source/bounded/value_to_function.cpp
 )
 

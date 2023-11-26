@@ -18,7 +18,6 @@ import bounded.declval;
 import bounded.homogeneous_equals;
 import bounded.integer;
 import bounded.normalize;
-import bounded.overlapping_range;
 import bounded.test_int;
 import bounded.unchecked;
 

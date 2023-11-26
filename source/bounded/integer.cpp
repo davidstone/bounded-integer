@@ -20,7 +20,6 @@ import bounded.integral;
 import bounded.is_bounded_integer;
 import bounded.isomorphic_to_integral;
 import bounded.normalize;
-import bounded.overlapping_range;
 import bounded.safe_extreme;
 import bounded.unchecked;
 import bounded.underlying_type_t;
