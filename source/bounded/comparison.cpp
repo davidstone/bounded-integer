@@ -42,7 +42,4 @@ constexpr auto operator==(LHS const lhs, RHS const rhs) -> bool {
 	}
 }
 
-export template<typename LHS, typename RHS = LHS>
-concept equality_comparable = requires(LHS const & lhs, RHS const & rhs) { lhs == rhs; };
-
 } // namespace bounded

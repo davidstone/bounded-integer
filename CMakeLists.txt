@@ -100,6 +100,7 @@ target_sources(bounded PUBLIC
 		source/bounded/copy.cpp
 		source/bounded/declval.cpp
 		source/bounded/destroy.cpp
+		source/bounded/equality_comparable.cpp
 		source/bounded/function_ptr.cpp
 		source/bounded/hash.cpp
 		source/bounded/homogeneous_equals.cpp
