@@ -50,16 +50,16 @@ constexpr auto legacy_append(Target & target, Source && source) -> void {
 	constexpr auto has_member_insert = requires(decltype(transformed()) t) {
 		target.insert(
 			containers::end(target),
-			make_legacy_iterator(containers::begin(t)),
-			make_legacy_iterator(containers::end(t))
+			maybe_legacy_iterator(containers::begin(t)),
+			maybe_legacy_iterator(containers::end(t))
 		);
 	};
 	if constexpr (sufficiently_trivial and has_member_insert) {
 		decltype(auto) t = transformed();
 		target.insert(
 			containers::end(target),
-			make_legacy_iterator(containers::begin(t)),
-			make_legacy_iterator(containers::end(t))
+			maybe_legacy_iterator(containers::begin(t)),
+			maybe_legacy_iterator(containers::end(t))
 		);
 	} else {
 		// TODO: How do we handle aliasing issues?

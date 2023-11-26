@@ -35,8 +35,8 @@ namespace containers {
 constexpr auto heap_sort(range auto && r, auto const compare) -> void {
 	auto const first = containers::begin(r);
 	auto const last = containers::end(r);
-	std::make_heap(make_legacy_iterator(first), make_legacy_iterator(last), compare);
-	std::sort_heap(make_legacy_iterator(first), make_legacy_iterator(last), compare);
+	std::make_heap(maybe_legacy_iterator(first), maybe_legacy_iterator(last), compare);
+	std::sort_heap(maybe_legacy_iterator(first), maybe_legacy_iterator(last), compare);
 }
 
 constexpr auto introsort(range auto && r, auto const compare, auto depth) -> void;
@@ -96,8 +96,8 @@ export constexpr auto new_sort = new_sort_t();
 struct sort_t {
 	static constexpr auto operator()(range auto & to_sort, auto cmp) -> void {
 		std::sort(
-			make_legacy_iterator(containers::begin(to_sort)),
-			make_legacy_iterator(containers::end(to_sort)),
+			maybe_legacy_iterator(containers::begin(to_sort)),
+			maybe_legacy_iterator(containers::end(to_sort)),
 			cmp
 		);
 	}

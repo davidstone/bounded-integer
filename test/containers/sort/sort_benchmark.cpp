@@ -80,9 +80,9 @@ constexpr auto insertion_sort = [](containers::range auto && r) -> void {
         auto const insertion = containers::find_last(containers::range_view(first, it), *it);
 		// TODO: Relocate-based algorithm
         std::rotate(
-			containers::make_legacy_iterator(insertion),
-			containers::make_legacy_iterator(it),
-			containers::make_legacy_iterator(containers::next(it))
+			containers::maybe_legacy_iterator(insertion),
+			containers::maybe_legacy_iterator(it),
+			containers::maybe_legacy_iterator(containers::next(it))
 		);
     }
 };

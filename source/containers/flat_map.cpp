@@ -84,9 +84,9 @@ constexpr auto merge_sorted_and_unsorted(Container & container, iterator_t<Conta
 	ska_sort(range_view(midpoint, last), extract_key);
 	if constexpr (allow_duplicates) {
 		std::inplace_merge(
-			make_legacy_iterator(first),
-			make_legacy_iterator(midpoint),
-			make_legacy_iterator(last),
+			maybe_legacy_iterator(first),
+			maybe_legacy_iterator(midpoint),
+			maybe_legacy_iterator(last),
 			compare
 		);
 	} else {

@@ -104,7 +104,7 @@ private:
 	Iterator m_it;
 };
 
-export constexpr auto make_legacy_iterator = []<iterator Iterator>(Iterator it) {
+export constexpr auto maybe_legacy_iterator = []<iterator Iterator>(Iterator it) {
 	if constexpr (bounded::bounded_integer<iter_difference_t<Iterator>>) {
 		return containers::legacy_iterator(std::move(it));
 	} else {
