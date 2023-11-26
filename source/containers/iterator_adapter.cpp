@@ -107,7 +107,7 @@ struct adapt_iterator : iterator_category_base<Iterator>, adapted_difference_typ
 	}
 
 	constexpr auto traits() const -> auto && {
-		return ::containers::unwrap(m_traits);
+		return m_traits.get();
 	}
 
 	OPERATORS_ARROW_DEFINITIONS

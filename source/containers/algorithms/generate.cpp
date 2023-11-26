@@ -35,9 +35,9 @@ struct generate_sentinel {};
 template<typename Offset>
 constexpr auto get_generator(auto && generator) -> auto && {
 	if constexpr (numeric_traits::max_value<Offset> <= 1_bi) {
-		return std::move(containers::unwrap(generator));
+		return std::move(generator);
 	} else {
-		return containers::unwrap(generator);
+		return generator;
 	}
 }
 
@@ -58,7 +58,7 @@ struct generate_n_iterator {
 	auto operator=(generate_n_iterator const &) & -> generate_n_iterator & = delete;
 
 	constexpr auto operator*() const -> decltype(auto) {
-		return std::invoke(::containers::get_generator<Offset>(m_generator));
+		return std::invoke(::containers::get_generator<Offset>(m_generator.get()));
 	}
 	OPERATORS_ARROW_DEFINITIONS
 
@@ -145,7 +145,10 @@ struct indexed_generate_n_iterator {
 	}
 
 	friend constexpr auto operator+(indexed_generate_n_iterator const it, difference_type const difference) -> indexed_generate_n_iterator {
-		return {bounded::assume_in_range<Offset>(it.m_offset + difference), it.m_generator};
+		return indexed_generate_n_iterator(
+			bounded::assume_in_range<Offset>(it.m_offset + difference),
+			it.m_generator.get()
+		);
 	}
 	friend constexpr auto operator+(indexed_generate_n_iterator const it, bounded::constant_t<1>) -> indexed_generate_n_iterator requires(bounded::builtin_integer<Offset> or numeric_traits::max_value<Offset> == 0_bi) {
 		if constexpr (bounded::builtin_integer<Offset>) {

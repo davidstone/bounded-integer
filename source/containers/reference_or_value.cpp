@@ -11,6 +11,19 @@ import std_module;
 namespace containers {
 
 template<typename T>
+struct value_wrapper {
+	constexpr value_wrapper(T value):
+		m_value(value)
+	{
+	}
+	constexpr auto get() const -> T const & {
+		return m_value;
+	}
+private:
+	[[no_unique_address]] T m_value;
+};
+
+template<typename T>
 constexpr auto can_store_copy =
 	bounded::mostly_trivial<T> and
 	sizeof(T) <= sizeof(std::reference_wrapper<T>);
@@ -18,7 +31,7 @@ constexpr auto can_store_copy =
 export template<typename T>
 using reference_or_value = std::conditional_t<
 	can_store_copy<T>,
-	std::remove_const_t<T>,
+	value_wrapper<std::remove_const_t<T>>,
 	std::reference_wrapper<T const>
 >;
 

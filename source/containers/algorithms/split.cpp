@@ -85,7 +85,7 @@ private:
 		return containers::find(
 			m_first,
 			m_last,
-			::containers::unwrap(m_delimiter)
+			m_delimiter.get()
 		);
 	}
 	[[no_unique_address]] Iterator m_first;

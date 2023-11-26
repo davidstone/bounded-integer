@@ -27,7 +27,7 @@ struct generate_until_sentinel {
 	{
 	}
 	constexpr auto is_done() const -> bool {
-		return std::invoke(m_is_done);
+		return std::invoke(m_is_done.get());
 	}
 private:
 	[[no_unique_address]] stored_function<Function> m_is_done;
@@ -49,7 +49,7 @@ struct generate_until_iterator {
 	auto operator=(generate_until_iterator const &) & -> generate_until_iterator & = delete;
 
 	constexpr auto operator*() const -> decltype(auto) {
-		return std::invoke(m_generator);
+		return std::invoke(m_generator.get());
 	}
 	OPERATORS_ARROW_DEFINITIONS
 
