@@ -9,32 +9,13 @@ import bounded.bounded_integer;
 import bounded.builtin_integer;
 import bounded.builtin_min_max_value;
 import bounded.safe_compare;
+import bounded.safe_equal;
 import bounded.signed_builtin;
 
 import numeric_traits;
 import std_module;
 
 namespace bounded {
-namespace detail {
-
-constexpr auto max_signed = numeric_traits::max_value<numeric_traits::max_signed_t>;
-
-export template<builtin_integer LHS, builtin_integer RHS>
-constexpr auto safe_equal(LHS const lhs, RHS const rhs) -> bool {
-	if constexpr (signed_builtin<LHS> == signed_builtin<RHS>) {
-		return lhs == rhs;
-	} else if constexpr (numeric_traits::max_value<LHS> <= max_signed and numeric_traits::max_value<RHS> <= max_signed) {
-		return static_cast<numeric_traits::max_signed_t>(lhs) == static_cast<numeric_traits::max_signed_t>(rhs);
-	} else if constexpr (signed_builtin<LHS>) {
-		static_assert(std::same_as<RHS, numeric_traits::max_unsigned_t>);
-		return lhs >= 0 and static_cast<RHS>(lhs) == rhs;
-	} else {
-		static_assert(std::same_as<LHS, numeric_traits::max_unsigned_t>);
-		return rhs >= 0 and lhs == static_cast<LHS>(rhs);
-	}
-}
-
-} // namespace detail
 
 export template<bounded_integer LHS, bounded_integer RHS>
 constexpr auto operator<=>(LHS const lhs, RHS const rhs) -> std::strong_ordering {
@@ -60,7 +41,7 @@ constexpr auto operator==(LHS const lhs, RHS const rhs) -> bool {
 	if constexpr (safe_compare(lhs_min, rhs_max) > 0 or safe_compare(lhs_max, rhs_min) < 0) {
 		return false;
 	} else {
-		return detail::safe_equal(lhs.value(), rhs.value());
+		return safe_equal(lhs.value(), rhs.value());
 	}
 }
 
