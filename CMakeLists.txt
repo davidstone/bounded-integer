@@ -98,7 +98,6 @@ target_sources(bounded PUBLIC
 		source/bounded/construct.cpp
 		source/bounded/construct_at.cpp
 		source/bounded/copy.cpp
-		source/bounded/copy_cv_ref.cpp
 		source/bounded/declval.cpp
 		source/bounded/destroy.cpp
 		source/bounded/function_ptr.cpp
