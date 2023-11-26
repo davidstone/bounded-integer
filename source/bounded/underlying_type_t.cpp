@@ -7,7 +7,7 @@ module;
 
 #include <numeric_traits/has_int128.hpp>
 
-export module bounded.underlying_type;
+export module bounded.underlying_type_t;
 
 import bounded.comparison;
 import bounded.overlapping_range;
@@ -16,11 +16,12 @@ import bounded.type;
 import numeric_traits;
 
 namespace bounded {
-namespace detail {
 
 template<typename T>
 constexpr auto range_fits_in_type(auto const minimum, auto const maximum) {
-	return value_fits_in_type<T>(minimum) and value_fits_in_type<T>(maximum);
+	return
+		detail::value_fits_in_type<T>(minimum) and
+		detail::value_fits_in_type<T>(maximum);
 }
 
 template<auto...>
@@ -62,5 +63,4 @@ constexpr auto determine_type() {
 export template<auto minimum, auto maximum>
 using underlying_type_t = typename decltype(determine_type<minimum, maximum>())::type;
 
-} // namespace detail
 } // namespace bounded

@@ -136,7 +136,7 @@ target_sources(bounded PUBLIC
 		source/bounded/tombstone_traits.cpp
 		source/bounded/type.cpp
 		source/bounded/unchecked.cpp
-		source/bounded/underlying_type.cpp
+		source/bounded/underlying_type_t.cpp
 		source/bounded/unsigned_builtin.cpp
 		source/bounded/value_to_function.cpp
 )

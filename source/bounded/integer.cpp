@@ -23,7 +23,7 @@ import bounded.normalize;
 import bounded.overlapping_range;
 import bounded.safe_extreme;
 import bounded.unchecked;
-import bounded.underlying_type;
+import bounded.underlying_type_t;
 
 import numeric_traits;
 import std_module;
@@ -128,7 +128,7 @@ template<auto minimum>
 struct integer<minimum, minimum> {
 	static_assert(std::same_as<decltype(minimum), std::remove_const_t<decltype(normalize<minimum>)>>);
 
-	using underlying_type = detail::underlying_type_t<minimum, minimum>;
+	using underlying_type = underlying_type_t<minimum, minimum>;
 	
 	static constexpr auto value() -> underlying_type {
 		return static_cast<underlying_type>(minimum);
@@ -172,7 +172,7 @@ struct integer {
 	static_assert(std::same_as<decltype(maximum), std::remove_const_t<decltype(normalize<maximum>)>>);
 	static_assert(detail::safe_compare(minimum, maximum) <= 0, "Maximum cannot be less than minimum");
 
-	using underlying_type = detail::underlying_type_t<minimum, maximum>;
+	using underlying_type = underlying_type_t<minimum, maximum>;
 	
 	constexpr auto value() const -> underlying_type {
 		BOUNDED_ASSUME(minimum <= m_value and m_value <= maximum);
