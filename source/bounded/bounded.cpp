@@ -41,6 +41,7 @@ export import bounded.relocate;
 export import bounded.representation_digits;
 export import bounded.scope_fail;
 export import bounded.scope_guard;
+export import bounded.signed_builtin;
 export import bounded.size_of;
 export import bounded.std_iterator;
 export import bounded.stream;

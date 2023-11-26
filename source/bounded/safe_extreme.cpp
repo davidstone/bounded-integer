@@ -6,6 +6,7 @@
 export module bounded.safe_extreme;
 
 import bounded.comparison;
+import bounded.signed_builtin;
 
 import numeric_traits;
 import std_module;

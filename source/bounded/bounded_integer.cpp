@@ -6,6 +6,7 @@
 export module bounded.bounded_integer;
 
 import bounded.is_bounded_integer;
+import bounded.signed_builtin;
 
 import numeric_traits;
 import std_module;
@@ -14,9 +15,6 @@ namespace bounded {
 
 export template<typename T>
 concept bounded_integer = is_bounded_integer<T>;
-
-export template<typename T>
-concept signed_builtin = numeric_traits::signed_builtin<T>;
 
 export template<typename T>
 concept unsigned_builtin = numeric_traits::unsigned_builtin<T> and !std::same_as<T, bool>;

@@ -123,6 +123,7 @@ target_sources(bounded PUBLIC
 		source/bounded/safe_extreme.cpp
 		source/bounded/scope_fail.cpp
 		source/bounded/scope_guard.cpp
+		source/bounded/signed_builtin.cpp
 		source/bounded/size_of.cpp
 		source/bounded/std_iterator.cpp
 		source/bounded/stream.cpp
