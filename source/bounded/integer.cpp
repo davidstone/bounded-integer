@@ -11,6 +11,7 @@ module;
 export module bounded.integer;
 
 import bounded.bounded_integer;
+import bounded.builtin_integer;
 import bounded.builtin_min_max_value;
 import bounded.comparison;
 import bounded.concepts;

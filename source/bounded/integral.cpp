@@ -6,6 +6,7 @@
 export module bounded.integral;
 
 import bounded.bounded_integer;
+import bounded.builtin_integer;
 import bounded.integral_constant_of_integral;
 
 namespace bounded {

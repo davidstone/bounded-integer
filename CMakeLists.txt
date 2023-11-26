@@ -84,6 +84,7 @@ target_sources(bounded PUBLIC
 		source/bounded/add_common_cv_reference.cpp
 		source/bounded/bounded.cpp
 		source/bounded/bounded_integer.cpp
+		source/bounded/builtin_integer.cpp
 		source/bounded/builtin_min_max_value.cpp
 		source/bounded/cast.cpp
 		source/bounded/check_in_range.cpp

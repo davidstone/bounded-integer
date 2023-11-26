@@ -10,6 +10,7 @@ export import bounded.arithmetic.operators_builtin;
 export import bounded.arithmetic.round_up_divide;
 export import bounded.abs;
 export import bounded.bounded_integer;
+export import bounded.builtin_integer;
 export import bounded.builtin_min_max_value;
 export import bounded.cast;
 export import bounded.check_in_range;

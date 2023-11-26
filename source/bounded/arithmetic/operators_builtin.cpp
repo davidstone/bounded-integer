@@ -7,6 +7,7 @@ export module bounded.arithmetic.operators_builtin;
 
 import bounded.arithmetic.operators;
 import bounded.bounded_integer;
+import bounded.builtin_integer;
 import bounded.comparison_builtin;
 import bounded.homogeneous_equals;
 import bounded.integer;

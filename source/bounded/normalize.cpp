@@ -6,6 +6,7 @@
 export module bounded.normalize;
 
 import bounded.bounded_integer;
+import bounded.builtin_integer;
 import bounded.homogeneous_equals;
 import bounded.integral_constant_of_integral;
 

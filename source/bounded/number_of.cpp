@@ -5,7 +5,6 @@
 
 export module bounded.number_of;
 
-import bounded.bounded_integer;
 import bounded.integer;
 import bounded.isomorphic_to_integral;
 

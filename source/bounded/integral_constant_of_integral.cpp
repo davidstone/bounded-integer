@@ -5,7 +5,7 @@
 
 export module bounded.integral_constant_of_integral;
 
-import bounded.bounded_integer;
+import bounded.builtin_integer;
 
 import std_module;
 
