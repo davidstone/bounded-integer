@@ -6,13 +6,10 @@
 export module bounded.comparison;
 
 import bounded.bounded_integer;
-import bounded.builtin_integer;
 import bounded.builtin_min_max_value;
 import bounded.safe_compare;
 import bounded.safe_equal;
-import bounded.signed_builtin;
 
-import numeric_traits;
 import std_module;
 
 namespace bounded {
@@ -47,8 +44,5 @@ constexpr auto operator==(LHS const lhs, RHS const rhs) -> bool {
 
 export template<typename LHS, typename RHS = LHS>
 concept equality_comparable = requires(LHS const & lhs, RHS const & rhs) { lhs == rhs; };
-
-export template<typename LHS, typename RHS = LHS>
-concept ordered = requires(LHS const & lhs, RHS const & rhs) { lhs <=> rhs; };
 
 } // namespace bounded

@@ -118,6 +118,7 @@ target_sources(bounded PUBLIC
 		source/bounded/normalize.cpp
 		source/bounded/number_of.cpp
 		source/bounded/numeric_limits.cpp
+		source/bounded/ordered.cpp
 		source/bounded/pow.cpp
 		source/bounded/prevent_comma.cpp
 		source/bounded/relocate.cpp
