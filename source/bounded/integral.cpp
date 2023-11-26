@@ -6,14 +6,15 @@
 export module bounded.integral;
 
 import bounded.bounded_integer;
+import bounded.integral_constant_of_integral;
 
 namespace bounded {
 
 export template<typename T>
 concept integral =
-	builtin_integer<T> or
 	bounded_integer<T> or
-	detail::is_integral_constant_of_integral<T>;
+	builtin_integer<T> or
+	integral_constant_of_integral<T>;
 
 } // namespace bounded
 

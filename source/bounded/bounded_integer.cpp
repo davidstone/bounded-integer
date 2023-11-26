@@ -19,15 +19,6 @@ concept bounded_integer = is_bounded_integer<T>;
 export template<typename T>
 concept builtin_integer = signed_builtin<T> or unsigned_builtin<T>;
 
-namespace detail {
-
-export template<typename T>
-constexpr auto is_integral_constant_of_integral = false;
-
-template<typename T, T value>
-constexpr auto is_integral_constant_of_integral<std::integral_constant<T, value>> = builtin_integer<T>;
-
-} // namespace detail
 } // namespace bounded
 
 namespace {

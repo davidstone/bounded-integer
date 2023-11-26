@@ -7,6 +7,7 @@ export module bounded.normalize;
 
 import bounded.bounded_integer;
 import bounded.homogeneous_equals;
+import bounded.integral_constant_of_integral;
 
 import numeric_traits;
 import std_module;
@@ -17,7 +18,7 @@ template<typename T>
 constexpr auto as_builtin_integer(T const x) {
 	if constexpr (bounded_integer<T>) {
 		return x.value();
-	} else if constexpr (detail::is_integral_constant_of_integral<T>) {
+	} else if constexpr (integral_constant_of_integral<T>) {
 		return x.get();
 	} else if constexpr (std::is_enum_v<T>) {
 		return std::to_underlying(x);
