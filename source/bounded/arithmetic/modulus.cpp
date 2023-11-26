@@ -103,14 +103,14 @@ struct modulus_operator_range_t {
 		constexpr auto divisor = min_max(
 			divisor_min,
 			max(
-				detail::safe_abs(rhs.min.value()),
-				detail::safe_abs(rhs.max.value())
+				safe_abs(rhs.min.value()),
+				safe_abs(rhs.max.value())
 			)
 		);
 
 		constexpr auto negative_dividend = min_max(
-			lhs.max < constant<0> ? detail::safe_abs(lhs.max.value()) : 0,
-			lhs.min < constant<0> ? detail::safe_abs(lhs.min.value()) : 0
+			lhs.max < constant<0> ? safe_abs(lhs.max.value()) : 0,
+			lhs.min < constant<0> ? safe_abs(lhs.min.value()) : 0
 		);
 		constexpr auto positive_dividend = min_max(
 			static_cast<umax_t>(max(lhs.min, constant<0>)),

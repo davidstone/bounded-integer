@@ -53,8 +53,8 @@ constexpr auto to_integer(std::string_view str) {
 	auto impl = [&] {
 		if constexpr(minimum < 0) {
 			constexpr auto combined_max = std::max(
-				bounded::detail::safe_abs(minimum),
-				bounded::detail::safe_abs(maximum)
+				safe_abs(minimum),
+				safe_abs(maximum)
 			);
 			auto negative = false;
 			if (str.front() == '-') {

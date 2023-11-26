@@ -12,7 +12,6 @@ export module bounded.arithmetic.multiplies;
 import bounded.arithmetic.base;
 import bounded.arithmetic.extreme_values;
 import bounded.arithmetic.plus;
-import bounded.arithmetic.safe_abs;
 import bounded.arithmetic.unary_minus;
 import bounded.bounded_integer;
 import bounded.homogeneous_equals;

@@ -34,7 +34,7 @@ constexpr auto conditional_function(auto if_true, auto if_false) {
 template<auto lhs, auto rhs>
 constexpr auto safer_divide() {
 	constexpr auto is_negative = (lhs < 0) xor (rhs < 0);
-	constexpr auto positive_result = detail::safe_abs(lhs) / detail::safe_abs(rhs);
+	constexpr auto positive_result = safe_abs(lhs) / safe_abs(rhs);
 	if constexpr (is_negative) {
 		return static_cast<numeric_traits::max_signed_t>(-positive_result);
 	} else {

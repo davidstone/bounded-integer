@@ -7,10 +7,10 @@ export module bounded.arithmetic.safe_abs;
 
 import numeric_traits;
 
-namespace bounded::detail {
+namespace bounded {
 
 export constexpr auto safe_abs = [](auto const value) {
 	return (value < 0) ? -static_cast<numeric_traits::max_unsigned_t>(value) : static_cast<numeric_traits::max_unsigned_t>(value);
 };
 
-} // namespace bounded::detail
+} // namespace bounded
