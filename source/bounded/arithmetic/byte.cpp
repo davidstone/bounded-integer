@@ -9,10 +9,10 @@ module;
 
 export module bounded.arithmetic.byte;
 
+import bounded.bounded_integer;
 import bounded.comparison;
 import bounded.homogeneous_equals;
 import bounded.integer;
-import bounded.is_bounded_integer;
 
 import numeric_traits;
 import std_module;

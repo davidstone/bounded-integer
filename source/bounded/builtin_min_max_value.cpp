@@ -5,7 +5,6 @@
 
 export module bounded.builtin_min_max_value;
 
-import bounded.is_bounded_integer;
 import bounded.normalize;
 import numeric_traits;
 

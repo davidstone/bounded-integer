@@ -6,9 +6,9 @@
 export module bounded.arithmetic.unary_plus;
 
 import bounded.arithmetic.extreme_values;
+import bounded.bounded_integer;
 import bounded.homogeneous_equals;
 import bounded.integer;
-import bounded.is_bounded_integer;
 
 namespace bounded {
 

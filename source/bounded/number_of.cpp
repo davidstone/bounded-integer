@@ -5,8 +5,8 @@
 
 export module bounded.number_of;
 
+import bounded.bounded_integer;
 import bounded.integer;
-import bounded.is_bounded_integer;
 import numeric_traits;
 
 namespace bounded {

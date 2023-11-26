@@ -6,9 +6,9 @@
 export module bounded.arithmetic.left_shift;
 
 import bounded.arithmetic.base;
+import bounded.bounded_integer;
 import bounded.homogeneous_equals;
 import bounded.integer;
-import bounded.is_bounded_integer;
 import bounded.normalize;
 import numeric_traits;
 

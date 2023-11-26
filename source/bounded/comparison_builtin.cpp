@@ -6,8 +6,8 @@
 export module bounded.comparison_builtin;
 
 export import bounded.comparison;
+import bounded.bounded_integer;
 import bounded.integer;
-import bounded.is_bounded_integer;
 
 import std_module;
 

@@ -10,13 +10,13 @@ module;
 export module bounded.minmax;
 
 import bounded.add_common_cv_reference;
+import bounded.bounded_integer;
 import bounded.comparison;
 import bounded.comparison_function_object;
 import bounded.concepts;
 import bounded.declval;
 import bounded.homogeneous_equals;
 import bounded.integer;
-import bounded.is_bounded_integer;
 import bounded.normalize;
 import bounded.overlapping_range;
 import bounded.test_int;

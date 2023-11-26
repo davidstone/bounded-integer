@@ -9,10 +9,10 @@ import bounded.arithmetic.base;
 import bounded.arithmetic.extreme_values;
 import bounded.arithmetic.safe_abs;
 import bounded.arithmetic.unary_minus;
+import bounded.bounded_integer;
 import bounded.comparison;
 import bounded.homogeneous_equals;
 import bounded.integer;
-import bounded.is_bounded_integer;
 import bounded.minmax;
 import bounded.safe_extreme;
 

@@ -5,9 +5,9 @@
 
 export module bounded.stream;
 
+import bounded.bounded_integer;
 import bounded.check_in_range;
 import bounded.integer;
-import bounded.is_bounded_integer;
 
 import std_module;
 

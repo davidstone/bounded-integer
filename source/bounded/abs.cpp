@@ -6,11 +6,11 @@
 export module bounded.abs;
 
 import bounded.arithmetic.unary_minus;
+import bounded.bounded_integer;
 import bounded.cast;
 import bounded.comparison;
 import bounded.homogeneous_equals;
 import bounded.integer;
-import bounded.is_bounded_integer;
 import bounded.minmax;
 import bounded.unchecked;
 

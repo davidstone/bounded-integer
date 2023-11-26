@@ -6,10 +6,10 @@
 export module bounded.arithmetic.operators_builtin;
 
 import bounded.arithmetic.operators;
+import bounded.bounded_integer;
 import bounded.comparison_builtin;
 import bounded.homogeneous_equals;
 import bounded.integer;
-import bounded.is_bounded_integer;
 
 import std_module;
 

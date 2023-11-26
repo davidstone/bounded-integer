@@ -5,8 +5,8 @@
 
 export module bounded.hash;
 
+import bounded.bounded_integer;
 import bounded.integer;
-import bounded.is_bounded_integer;
 
 import std_module;
 

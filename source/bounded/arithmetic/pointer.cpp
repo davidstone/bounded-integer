@@ -6,9 +6,9 @@
 export module bounded.arithmetic.pointer;
 
 import bounded.arithmetic.plus;
+import bounded.bounded_integer;
 import bounded.comparison;
 import bounded.integer;
-import bounded.is_bounded_integer;
 
 import numeric_traits;
 import std_module;

@@ -10,11 +10,11 @@ module;
 export module bounded.pow;
 
 import bounded.arithmetic.multiplies;
+import bounded.bounded_integer;
 import bounded.builtin_min_max_value;
 import bounded.cast;
 import bounded.comparison;
 import bounded.integer;
-import bounded.is_bounded_integer;
 import bounded.normalize;
 import bounded.unchecked;
 

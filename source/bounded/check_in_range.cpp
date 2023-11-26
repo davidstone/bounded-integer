@@ -12,10 +12,10 @@ module;
 
 export module bounded.check_in_range;
 
+import bounded.bounded_integer;
 import bounded.integer;
 import bounded.comparison;
 import bounded.comparison_builtin;
-import bounded.is_bounded_integer;
 
 import numeric_traits;
 import std_module;

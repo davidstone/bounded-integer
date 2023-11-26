@@ -6,8 +6,8 @@
 export module bounded.arithmetic.round_up_divide;
 
 import bounded.arithmetic.operators;
+import bounded.bounded_integer;
 import bounded.integer;
-import bounded.is_bounded_integer;
 
 namespace bounded {
 

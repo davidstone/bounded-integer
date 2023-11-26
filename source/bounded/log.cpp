@@ -10,11 +10,11 @@ module;
 export module bounded.log;
 
 import bounded.arithmetic.operators;
+import bounded.bounded_integer;
 import bounded.builtin_min_max_value;
 import bounded.comparison;
 import bounded.comparison_builtin;
 import bounded.integer;
-import bounded.is_bounded_integer;
 import bounded.unchecked;
 
 import numeric_traits;

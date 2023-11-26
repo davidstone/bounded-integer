@@ -10,6 +10,7 @@ module;
 
 export module bounded.integer;
 
+import bounded.bounded_integer;
 import bounded.builtin_min_max_value;
 import bounded.comparison;
 import bounded.concepts;
@@ -40,7 +41,7 @@ constexpr auto numeric_traits::min_value<bounded::integer<minimum, maximum>> = b
 namespace bounded {
 
 template<auto minimum, auto maximum>
-constexpr auto detail::is_bounded_integer<integer<minimum, maximum>> = true;
+constexpr auto is_bounded_integer<integer<minimum, maximum>> = true;
 
 template<auto minimum, auto maximum>
 constexpr auto builtin_max_value<integer<minimum, maximum>> = maximum;

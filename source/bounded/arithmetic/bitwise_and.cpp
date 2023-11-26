@@ -10,9 +10,9 @@ export module bounded.arithmetic.bitwise_and;
 // a power of two. For instance, gcc's implementation of std::sort
 
 import bounded.arithmetic.base;
+import bounded.bounded_integer;
 import bounded.comparison;
 import bounded.integer;
-import bounded.is_bounded_integer;
 import bounded.minmax;
 
 import std_module;

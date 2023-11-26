@@ -5,8 +5,8 @@
 
 export module bounded.arithmetic.base;
 
+import bounded.bounded_integer;
 import bounded.integer;
-import bounded.is_bounded_integer;
 import bounded.normalize;
 import bounded.unchecked;
 

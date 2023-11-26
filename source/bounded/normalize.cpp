@@ -5,8 +5,8 @@
 
 export module bounded.normalize;
 
+import bounded.bounded_integer;
 import bounded.homogeneous_equals;
-import bounded.is_bounded_integer;
 
 import numeric_traits;
 import std_module;

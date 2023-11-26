@@ -10,9 +10,9 @@ module;
 export module bounded.integer_tombstone_traits;
 
 import bounded.arithmetic.operators;
+import bounded.bounded_integer;
 import bounded.comparison;
 import bounded.integer;
-import bounded.is_bounded_integer;
 import bounded.literal;
 import bounded.tombstone_traits;
 import bounded.unchecked;
