@@ -78,3 +78,48 @@ constexpr auto range = containers::split("a"sv, '|');
 static_assert(containers::linear_size(range.begin().remainder()) == 1_bi);
 static_assert(std::string_view(range.begin().remainder()) == "a");
 static_assert(std::string_view(containers::next(range.begin()).remainder()) == "");
+
+
+constexpr auto compare_range(std::string_view const input, std::span<std::string_view const> const expected) -> bool {
+	auto const split = containers::split_range(input, ":)");
+	for (auto const [split_inner, expected_inner] : containers::zip(split, expected)) {
+		BOUNDED_ASSERT(std::string_view(split_inner) == expected_inner);
+	}
+	return true;
+}
+
+static_assert(compare_range(
+	"a"sv,
+	containers::array({"a"sv})
+));
+
+static_assert(compare_range(
+	"a:)b"sv,
+	containers::array({"a"sv, "b"sv})
+));
+
+static_assert(compare_range(
+	":)a"sv,
+	containers::array({""sv, "a"sv})
+));
+
+static_assert(compare_range(
+	"a:)"sv,
+	containers::array({"a"sv, ""sv})
+));
+
+static_assert(compare_range(
+	""sv,
+	containers::array({""sv})
+));
+
+static_assert(compare_range(
+	":)"sv,
+	containers::array({""sv, ""sv})
+));
+
+static_assert(compare_range(
+	":)a:):)b:)"sv,
+	containers::array({""sv, "a"sv, ""sv, "b"sv, ""sv})
+));
+
