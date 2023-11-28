@@ -10,10 +10,12 @@ module;
 export module containers.algorithms.transform;
 
 import containers.algorithms.compare;
-import containers.algorithms.transform_traits;
 import containers.array;
 import containers.adapt;
+import containers.default_adapt_traits;
 import containers.default_begin_end_size;
+import containers.is_iterator;
+import containers.iter_reference_t;
 import containers.range;
 
 import std_module;
@@ -21,27 +23,57 @@ import std_module;
 namespace containers {
 
 template<typename UnaryFunction>
-struct range_transform_traits : transform_traits<UnaryFunction>, default_begin_end_size {
-	using transform_traits<UnaryFunction>::transform_traits;
+struct transform_traits :
+	default_add,
+	default_subtract,
+	default_compare,
+	default_begin_end_size
+{
+	constexpr explicit transform_traits(UnaryFunction dereference_):
+		m_dereference(std::move(dereference_))
+	{
+	}
+	
+	template<iterator It> requires std::invocable<UnaryFunction const &, iter_reference_t<It>>
+	constexpr auto dereference(It const & it) const -> decltype(auto) {
+		return std::invoke(m_dereference, *it);
+	}
+private:
+	[[no_unique_address]] UnaryFunction m_dereference;
 };
 
 template<typename UnaryFunction>
-range_transform_traits(UnaryFunction) -> range_transform_traits<UnaryFunction>;
+transform_traits(UnaryFunction) -> transform_traits<UnaryFunction>;
 
 template<typename UnaryFunction>
-struct range_transform_traits_dereference : transform_traits_dereference<UnaryFunction>, default_begin_end_size {
-	using transform_traits_dereference<UnaryFunction>::transform_traits_dereference;
+struct transform_traits_dereference :
+	default_add,
+	default_subtract,
+	default_compare,
+	default_begin_end_size
+{
+	constexpr explicit transform_traits_dereference(UnaryFunction dereference_):
+		m_dereference(std::move(dereference_))
+	{
+	}
+	
+	template<iterator It> requires std::invocable<UnaryFunction const &, It>
+	constexpr auto dereference(It const & it) const -> decltype(auto) {
+		return std::invoke(m_dereference, it);
+	}
+private:
+	[[no_unique_address]] UnaryFunction m_dereference;
 };
 
 template<typename UnaryFunction>
-range_transform_traits_dereference(UnaryFunction) -> range_transform_traits_dereference<UnaryFunction>;
+transform_traits_dereference(UnaryFunction) -> transform_traits_dereference<UnaryFunction>;
 
 export constexpr auto transform(range auto && source, auto dereference) -> range auto {
-	return adapt(OPERATORS_FORWARD(source), range_transform_traits(std::move(dereference)));
+	return adapt(OPERATORS_FORWARD(source), transform_traits(std::move(dereference)));
 }
 
 export constexpr auto transform_dereference(range auto && source, auto dereference) -> range auto {
-	return adapt(OPERATORS_FORWARD(source), range_transform_traits_dereference(std::move(dereference)));
+	return adapt(OPERATORS_FORWARD(source), transform_traits_dereference(std::move(dereference)));
 }
 
 } // namespace containers

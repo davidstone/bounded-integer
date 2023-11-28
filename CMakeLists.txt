@@ -280,7 +280,6 @@ target_sources(containers PUBLIC
 		source/containers/algorithms/splice.cpp
 		source/containers/algorithms/split.cpp
 		source/containers/algorithms/transform.cpp
-		source/containers/algorithms/transform_traits.cpp
 		source/containers/algorithms/uninitialized.cpp
 		source/containers/algorithms/unique.cpp
 		source/containers/algorithms/zip.cpp
