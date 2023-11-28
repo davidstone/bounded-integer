@@ -132,7 +132,11 @@ constexpr auto concatenate(auto && ... ranges) -> Result {
 	}
 
 	auto result = Result();
-	result.reserve(::bounded::assume_in_range<range_size_t<Result>>(total_size));
+	using capacity_t = decltype(result.capacity());
+	constexpr auto always_fits_in_capacity = numeric_traits::min_value<capacity_t> >= numeric_traits::max_value<decltype(total_size)>;
+	if constexpr (!always_fits_in_capacity) {
+		result.reserve(::bounded::assume_in_range<range_size_t<Result>>(total_size));
+	}
 	(..., ::containers::append_into_capacity(result, OPERATORS_FORWARD(ranges)));
 	return result;
 }
