@@ -8,7 +8,7 @@ module;
 #include <operators/arrow.hpp>
 #include <operators/forward.hpp>
 
-export module containers.iterator_adapter;
+export module containers.adapt_iterator;
 
 import containers.contiguous_iterator;
 import containers.default_adapt_traits;

@@ -13,10 +13,10 @@ export module containers.algorithms.reverse_iterator;
 import containers.algorithms.advance;
 import containers.algorithms.compare;
 import containers.adapt;
+import containers.adapt_iterator;
 import containers.array;
 import containers.begin_end;
 import containers.is_iterator;
-import containers.iterator_adapter;
 import containers.range;
 import containers.size;
 
