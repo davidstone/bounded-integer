@@ -27,6 +27,32 @@ using namespace bounded::literal;
 
 namespace containers {
 
+template<typename Sentinel>
+struct adapt_sentinel {
+	adapt_sentinel() = default;
+
+	constexpr adapt_sentinel(Sentinel sentinel):
+		m_base(std::move(sentinel))
+	{
+	}
+
+	template<bounded::convertible_to<Sentinel> It>
+	constexpr adapt_sentinel(adapt_sentinel<It> other):
+		m_base(std::move(other).base())
+	{
+	}
+	
+	constexpr auto base() const & -> Sentinel const & {
+		return m_base;
+	}
+	constexpr auto base() && -> Sentinel && {
+		return std::move(m_base);
+	}
+
+private:
+	[[no_unique_address]] Sentinel m_base;
+};
+
 template<typename T>
 struct adapted_difference_type {
 };
@@ -38,36 +64,33 @@ struct adapted_difference_type<T> {
 	using difference_type = iter_difference_t<T>;
 };
 
-export template<typename Iterator, typename Traits>
-struct adapt_iterator;
-
 template<typename T>
-using unwrapped_t = decltype(::containers::unwrap(bounded::declval<T>()));
-
-template<typename Iterator, typename Traits>
-concept adapted_dereferenceable = requires(Iterator const & it, unwrapped_t<Traits> const traits) {
-	traits.dereference(it);
-};
+using unwrap_t = decltype(::containers::unwrap(bounded::declval<T>()));
 
 template<typename Offset, typename Iterator, typename Traits>
-concept adapted_addable = requires(Offset const offset, Iterator it, unwrapped_t<Traits> const traits) {
-	adapt_iterator<Iterator, Traits>(traits.add(std::move(it), offset), traits);
+concept adapted_addable = requires(Offset const offset, Iterator it, Traits const traits) {
+	{ traits.add(std::move(it), offset) } -> bounded::convertible_to<Iterator>;
+};
+
+template<typename LHSIterator, typename RHSIterator, typename Traits>
+concept adapted_subtractable = requires(LHSIterator const lhs, RHSIterator const rhs, Traits const traits) {
+	traits.subtract(lhs, rhs);
 };
 
 template<typename RHSIterator, typename LHSIterator, typename Traits>
-concept adapted_subtractable = requires(LHSIterator lhs, RHSIterator rhs, unwrapped_t<Traits> const traits) {
-	traits.subtract(std::move(lhs), std::move(rhs));
-};
-
-template<typename RHSIterator, typename LHSIterator, typename Traits>
-concept adapted_ordered = requires(LHSIterator const & lhs, RHSIterator const & rhs, unwrapped_t<Traits> const traits) {
+concept adapted_ordered = requires(LHSIterator const & lhs, RHSIterator const & rhs, Traits const traits) {
 	traits.compare(lhs, rhs);
 };
 
 template<typename RHSIterator, typename LHSIterator, typename Traits>
-concept adapted_equality_comparable = requires(LHSIterator const & lhs, RHSIterator const & rhs, unwrapped_t<Traits> const traits) {
+concept adapted_equality_comparable = requires(LHSIterator const & lhs, RHSIterator const & rhs, Traits const traits) {
 	traits.equal(lhs, rhs);
 };
+
+template<typename Traits, typename Iterator>
+concept iterator_traits =
+	adapted_addable<bounded::constant_t<1>, Iterator, unwrap_t<Traits>> and
+	requires(unwrap_t<Traits> const traits, Iterator it) { traits.dereference(it); };
 
 // There are a few functions of interest for an iterator:
 // 1) Dereferencing: *it
@@ -81,20 +104,26 @@ concept adapted_equality_comparable = requires(LHSIterator const & lhs, RHSItera
 // but unfortunately, there does not appear to be a way to provide a function
 // that unifies these operations.
 
-export template<typename Iterator, typename Traits>
-struct adapt_iterator : iterator_category_base<Iterator>, adapted_difference_type<Iterator> {
+export template<iterator Iterator, iterator_traits<Iterator> TraitsStorage>
+struct adapt_iterator :
+	iterator_category_base<Iterator>,
+	adapted_difference_type<Iterator>
+{
+private:
+	using Traits = unwrap_t<TraitsStorage>;
+public:
 	adapt_iterator() = default;
 
-	constexpr adapt_iterator(Iterator it, auto && traits):
+	constexpr adapt_iterator(Iterator it, TraitsStorage traits):
 		m_base(std::move(it)),
-		m_traits(OPERATORS_FORWARD(traits))
+		m_traits(std::move(traits))
 	{
 	}
 
 	template<bounded::convertible_to<Iterator> It>
-	constexpr adapt_iterator(adapt_iterator<It, Traits> other):
+	constexpr adapt_iterator(adapt_iterator<It, TraitsStorage> other):
 		m_base(std::move(other).base()),
-		m_traits(std::move(other).traits())
+		m_traits(other.traits())
 	{
 	}
 	
@@ -106,12 +135,12 @@ struct adapt_iterator : iterator_category_base<Iterator>, adapted_difference_typ
 	}
 
 	constexpr auto traits() const -> auto && {
-		return m_traits.get();
+		return ::containers::unwrap(m_traits);
 	}
 
 	OPERATORS_ARROW_DEFINITIONS
 
-	friend constexpr auto operator*(adapt_iterator const & it) -> decltype(auto) requires adapted_dereferenceable<Iterator, Traits> {
+	friend constexpr auto operator*(adapt_iterator const & it) -> decltype(auto) {
 		return it.traits().dereference(it.base());
 	}
 
@@ -120,28 +149,55 @@ struct adapt_iterator : iterator_category_base<Iterator>, adapted_difference_typ
 	}
 
 
-	template<adapted_subtractable<Iterator, Traits> RHSIterator>
-	friend constexpr auto operator-(adapt_iterator lhs, adapt_iterator<RHSIterator, Traits> rhs) {
-		return lhs.traits().subtract(std::move(lhs).base(), std::move(rhs).base());
+	template<adapted_subtractable<Iterator, Traits> LHSIterator>
+	friend constexpr auto operator-(
+		adapt_iterator<LHSIterator, TraitsStorage> const & lhs,
+		adapt_iterator const & rhs
+	) {
+		return rhs.traits().subtract(lhs.base(), rhs.base());
+	}
+
+	template<adapted_subtractable<Iterator, Traits> Sentinel>
+	friend constexpr auto operator-(adapt_sentinel<Sentinel> const & lhs, adapt_iterator const & rhs) {
+		return rhs.traits().subtract(lhs.base(), rhs.base());
 	}
 
 	template<adapted_ordered<Iterator, Traits> RHSIterator>
-	friend constexpr auto operator<=>(adapt_iterator const & lhs, adapt_iterator<RHSIterator, Traits> const & rhs) {
+	friend constexpr auto operator<=>(adapt_iterator const & lhs, adapt_iterator<RHSIterator, TraitsStorage> const & rhs) {
+		return lhs.traits().compare(lhs.base(), rhs.base());
+	}
+
+	template<adapted_ordered<Iterator, Traits> Sentinel>
+	friend constexpr auto operator<=>(adapt_iterator const & lhs, adapt_sentinel<Sentinel> const & rhs) {
 		return lhs.traits().compare(lhs.base(), rhs.base());
 	}
 
 	template<adapted_equality_comparable<Iterator, Traits> RHSIterator>
-	friend constexpr auto operator==(adapt_iterator const & lhs, adapt_iterator<RHSIterator, Traits> const & rhs) -> bool {
+	friend constexpr auto operator==(adapt_iterator const & lhs, adapt_iterator<RHSIterator, TraitsStorage> const & rhs) -> bool {
+		return lhs.traits().equal(lhs.base(), rhs.base());
+	}
+
+	template<adapted_equality_comparable<Iterator, Traits> Sentinel>
+	friend constexpr auto operator==(adapt_iterator const & lhs, adapt_sentinel<Sentinel> const & rhs) -> bool {
 		return lhs.traits().equal(lhs.base(), rhs.base());
 	}
 
 private:
 	[[no_unique_address]] Iterator m_base;
-	[[no_unique_address]] reference_or_value<Traits> m_traits;
+	[[no_unique_address]] TraitsStorage m_traits;
 };
 
-template<typename Iterator, typename Traits>
-adapt_iterator(Iterator, Traits &&) -> adapt_iterator<Iterator, std::remove_cvref_t<Traits>>;
+export template<typename Iterator, typename TraitsStorage>
+constexpr auto adapt_iterator_or_sentinel(Iterator it, TraitsStorage traits) {
+	if constexpr (iterator<Iterator>) {
+		return adapt_iterator(
+			std::move(it),
+			std::move(traits)
+		);
+	} else {
+		return adapt_sentinel<Iterator>(std::move(it));
+	}
+}
 
 } // namespace containers
 
