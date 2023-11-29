@@ -22,10 +22,19 @@ struct unary_equal_to {
 	{
 	}
 	constexpr auto operator()(auto const & other) const {
-		return m_bound == other;
+		if constexpr (std::is_reference_v<Bound>) {
+			return m_bound.get() == other;
+		} else {
+			return m_bound == other;
+		}
 	}
 private:
-	Bound m_bound;
+	using storage = std::conditional_t<
+		std::is_reference_v<Bound>,
+		std::reference_wrapper<std::remove_reference_t<Bound>>,
+		Bound
+	>;
+	storage m_bound;
 };
 
 export constexpr auto equal_to() {
