@@ -40,9 +40,6 @@ using namespace bounded::literal;
 
 namespace containers {
 
-export struct concatenate_view_sentinel {
-};
-
 template<typename LHS, typename RHS, std::size_t... indexes>
 constexpr auto have_same_ends(LHS const & lhs, RHS const & rhs, std::index_sequence<indexes...>) {
 	return (... and (containers::end(lhs[bounded::constant<indexes>]) == containers::end(rhs[bounded::constant<indexes>])));
@@ -162,7 +159,7 @@ struct concatenate_view_iterator {
 
 
 	friend constexpr auto operator-(
-		concatenate_view_sentinel,
+		std::default_sentinel_t,
 		concatenate_view_iterator const rhs
 	) {
 		auto transform = [](auto const range) { return containers::size(range); };
@@ -172,7 +169,7 @@ struct concatenate_view_iterator {
 		);
 	}
 
-	friend constexpr auto operator-(concatenate_view_iterator const lhs, concatenate_view_sentinel const rhs) {
+	friend constexpr auto operator-(concatenate_view_iterator const lhs, std::default_sentinel_t const rhs) {
 		return -(rhs - lhs);
 	}
 
@@ -185,7 +182,7 @@ struct concatenate_view_iterator {
 		return lhs.begin_iterators() <=> rhs.begin_iterators();
 	}
 
-	friend constexpr auto operator<=>(concatenate_view_iterator const lhs, concatenate_view_sentinel const rhs) {
+	friend constexpr auto operator<=>(concatenate_view_iterator const lhs, std::default_sentinel_t const rhs) {
 		return lhs == rhs ? std::strong_ordering::equal : std::strong_ordering::less;
 	}
 
@@ -196,7 +193,7 @@ struct concatenate_view_iterator {
 		return lhs.begin_iterators() == rhs.begin_iterators();
 	}
 
-	friend constexpr auto operator==(concatenate_view_iterator const lhs, concatenate_view_sentinel) -> bool {
+	friend constexpr auto operator==(concatenate_view_iterator const lhs, std::default_sentinel_t) -> bool {
 		auto get_end_iterators = [](auto const range) { return containers::end(range); };
 		return lhs.begin_iterators() == tv::transform(get_end_iterators, lhs.m_range_views);
 	}
@@ -239,7 +236,7 @@ struct concatenate_view {
 		return begin_impl(m_ranges);
 	}
 	static constexpr auto end() {
-		return concatenate_view_sentinel();
+		return std::default_sentinel;
 	}
 
 	OPERATORS_BRACKET_SEQUENCE_RANGE_DEFINITIONS

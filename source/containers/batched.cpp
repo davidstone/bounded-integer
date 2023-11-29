@@ -22,12 +22,11 @@ import containers.size;
 import bounded;
 import numeric_traits;
 import operators;
+import std_module;
 
 using namespace bounded::literal;
 
 namespace containers {
-
-struct batch_sentinel {};
 
 template<typename Iterator, typename Sentinel, typename Size, typename Count>
 struct batch_iterator {
@@ -56,7 +55,7 @@ struct batch_iterator {
 	friend constexpr auto operator-(batch_iterator const lhs, batch_iterator const rhs) {
 		return lhs.m_batch - rhs.m_batch;
 	}
-	friend constexpr auto operator-(batch_sentinel, batch_iterator const rhs) {
+	friend constexpr auto operator-(std::default_sentinel_t, batch_iterator const rhs) {
 		return rhs.m_number_of_batches - rhs.m_batch;
 	}
 
@@ -67,10 +66,10 @@ struct batch_iterator {
 		return lhs.m_batch <=> rhs.m_batch;
 	}
 
-	friend auto operator==(batch_iterator const lhs, batch_sentinel) {
+	friend auto operator==(batch_iterator const lhs, std::default_sentinel_t) {
 		return lhs.m_batch == lhs.m_number_of_batches;
 	}
-	friend auto operator<=>(batch_iterator const lhs, batch_sentinel) {
+	friend auto operator<=>(batch_iterator const lhs, std::default_sentinel_t) {
 		return lhs.m_batch <=> lhs.m_number_of_batches;
 	}
 
@@ -92,7 +91,7 @@ export template<bounded::bounded_integer Integer> requires(numeric_traits::min_v
 constexpr auto batched(range auto & r, Integer const number_of_batches) {
 	return containers::range_view(
 		batch_iterator(range_view(r), number_of_batches),
-		batch_sentinel()
+		std::default_sentinel
 	);
 }
 

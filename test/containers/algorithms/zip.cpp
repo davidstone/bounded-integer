@@ -44,8 +44,6 @@ static_assert(containers::equal(containers::zip(a1), a1));
 static_assert(containers::equal(containers::zip(a1, a2), expected));
 
 
-struct input_sentinel {
-};
 struct input_iterator {
 	using difference_type = bounded::integer<-1000, 1000>;
 	constexpr explicit input_iterator(int value):
@@ -64,7 +62,7 @@ struct input_iterator {
 		--lhs.m_value;
 		return lhs;
 	}
-	friend constexpr auto operator==(input_iterator const & lhs, input_sentinel) {
+	friend constexpr auto operator==(input_iterator const & lhs, std::default_sentinel_t) {
 		return lhs.m_value == 0;
 	}
 private:
@@ -72,7 +70,7 @@ private:
 };
 
 constexpr auto make(int value) {
-	return containers::range_view(input_iterator(value), input_sentinel());
+	return containers::range_view(input_iterator(value), std::default_sentinel);
 }
 
 static_assert(containers::is_empty(containers::zip(make(0))));

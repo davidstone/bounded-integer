@@ -30,9 +30,6 @@ import std_module;
 namespace containers {
 using namespace bounded::literal;
 
-struct split_sentinel {
-};
-
 template<typename Integer>
 using one_wider = bounded::integer<
 	bounded::normalize<numeric_traits::min_value<Integer> - 1_bi>,
@@ -128,7 +125,7 @@ struct split_iterator {
 	friend constexpr auto operator==(split_iterator const & lhs, split_iterator const & rhs) -> bool {
 		return lhs.m_first == rhs.m_first and lhs.m_empty_trailing_range == rhs.m_empty_trailing_range;
 	}
-	friend constexpr auto operator==(split_iterator const & lhs, split_sentinel) -> bool {
+	friend constexpr auto operator==(split_iterator const & lhs, std::default_sentinel_t) -> bool {
 		return lhs.m_first == lhs.m_last and !lhs.m_empty_trailing_range;
 	}
 private:
@@ -175,7 +172,7 @@ struct split {
 		);
 	}
 	static constexpr auto end() {
-		return split_sentinel();
+		return std::default_sentinel;
 	}
 private:
 	[[no_unique_address]] Range m_range;
@@ -216,7 +213,7 @@ struct split_range {
 		);
 	}
 	static constexpr auto end() {
-		return split_sentinel();
+		return std::default_sentinel;
 	}
 private:
 	[[no_unique_address]] Range m_range;

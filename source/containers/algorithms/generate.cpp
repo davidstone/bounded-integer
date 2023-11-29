@@ -30,8 +30,6 @@ concept construct_subtractable = requires(LHS const lhs, RHS const rhs) {
 	LHS(lhs - rhs);
 };
 
-struct generate_sentinel {};
-
 template<typename Offset>
 constexpr auto get_generator(auto && generator) -> auto && {
 	if constexpr (numeric_traits::max_value<Offset> <= 1_bi) {
@@ -62,10 +60,10 @@ struct generate_n_iterator {
 	}
 	OPERATORS_ARROW_DEFINITIONS
 
-	friend constexpr auto operator<=>(generate_n_iterator const & lhs, generate_sentinel) {
+	friend constexpr auto operator<=>(generate_n_iterator const & lhs, std::default_sentinel_t) {
 		return lhs.m_remaining <=> 0_bi;
 	}
-	friend constexpr auto operator==(generate_n_iterator const & lhs, generate_sentinel) -> bool {
+	friend constexpr auto operator==(generate_n_iterator const & lhs, std::default_sentinel_t) -> bool {
 		return lhs.m_remaining == 0_bi;
 	}
 
@@ -102,7 +100,7 @@ public:
 		return generate_n_iterator(to_offset_type<Size>(m_size), m_generator);
 	}
 	static constexpr auto end() {
-		return generate_sentinel();
+		return std::default_sentinel;
 	}
 	constexpr auto size() const {
 		return m_size;

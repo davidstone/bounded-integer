@@ -30,9 +30,6 @@ struct remove_none_data {
 	tv::optional<range_reference_t<Range>> cached_value;
 };
 
-struct remove_none_sentinel {
-};
-
 template<typename Range>
 struct remove_none_iterator {
 	using difference_type = iter_difference_t<iterator_t<Range>>;
@@ -61,7 +58,7 @@ struct remove_none_iterator {
 	friend constexpr auto operator==(remove_none_iterator const & lhs, remove_none_iterator const & rhs) -> bool requires bounded::equality_comparable<iterator_t<Range>> {
 		return lhs.m_it == rhs.m_it;
 	}
-	friend constexpr auto operator==(remove_none_iterator const & lhs, remove_none_sentinel) -> bool {
+	friend constexpr auto operator==(remove_none_iterator const & lhs, std::default_sentinel_t) -> bool {
 		return lhs.m_it == containers::end(lhs.m_data.get().range);
 	}
 
@@ -93,7 +90,7 @@ struct remove_none {
 		return remove_none_iterator<Range>(containers::begin(m_data.range), m_data);
 	}
 	static constexpr auto end() {
-		return remove_none_sentinel();
+		return std::default_sentinel;
 	}
 
 private:
