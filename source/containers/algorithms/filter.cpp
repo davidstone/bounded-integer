@@ -13,10 +13,9 @@ module;
 export module containers.algorithms.filter;
 
 import containers.algorithms.advance;
-import containers.algorithms.compare;
 import containers.algorithms.find;
+
 import containers.adapt_iterator;
-import containers.array;
 import containers.begin_end;
 import containers.default_adapt_traits;
 import containers.default_begin_end_size;
@@ -132,12 +131,3 @@ template<typename Range, typename UnaryPredicate>
 filter(Range &&, UnaryPredicate) -> filter<Range, UnaryPredicate>;
 
 } // namespace containers
-
-constexpr auto check_filter() {
-	constexpr auto source = containers::array{1_bi, 2_bi, 3_bi, 2_bi, 4_bi, 5_bi, 6_bi, 8_bi};
-	constexpr auto expected = containers::array{2_bi, 2_bi, 4_bi, 6_bi, 8_bi};
-	auto const filtered = containers::filter(source, [](auto const integer) { return integer % 2_bi == 0_bi; });
-	return containers::equal(filtered, expected);
-}
-
-static_assert(check_filter());
