@@ -5,16 +5,16 @@
 
 export module containers.algorithms.sort.rotate_one;
 
-import containers.reference_wrapper;
-
 import bounded;
+import std_module;
 import tv;
 
 namespace containers {
 
-export constexpr auto rotate_one(auto & arg, auto & ... args) {
+export template<typename T>
+constexpr auto rotate_one(T & arg, auto & ... args) {
 	auto storage = tv::relocate_into_storage(arg);
-	auto ref = ::containers::make_reference_wrapper(arg);
+	auto ref = std::reference_wrapper<T>(arg);
 	(..., (bounded::relocate_at(ref.get(), args), ref = args));
 	bounded::relocate_at(ref.get(), storage.value);
 }

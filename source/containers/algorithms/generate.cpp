@@ -14,7 +14,6 @@ import containers.array;
 import containers.common_iterator_functions;
 import containers.index_type;
 import containers.offset_type;
-import containers.reference_wrapper;
 import containers.stored_function;
 
 import bounded;

@@ -96,7 +96,6 @@ export import containers.range_size_t;
 export import containers.range_value_t;
 export import containers.range_view;
 export import containers.reallocation_size;
-export import containers.reference_wrapper;
 export import containers.repeat_n;
 export import containers.reserve_space_for;
 export import containers.resizable_container;

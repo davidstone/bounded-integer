@@ -20,9 +20,7 @@ import containers.begin_end;
 import containers.default_adapt_traits;
 import containers.default_begin_end_size;
 import containers.is_iterator;
-import containers.is_iterator_sentinel;
 import containers.range_value_t;
-import containers.reference_wrapper;
 import containers.sentinel_t;
 
 import bounded;
