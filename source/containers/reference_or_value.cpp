@@ -12,6 +12,7 @@ namespace containers {
 
 template<typename T>
 struct value_wrapper {
+	using type = T;
 	constexpr value_wrapper(T value):
 		m_value(value)
 	{
