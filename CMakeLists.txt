@@ -165,7 +165,7 @@ target_sources(bounded_test PRIVATE
 		test/bounded/to_integer.cpp
 )
 
-set_source_files_properties(source/bounded/detail/arithmetic/operators.cpp
+set_source_files_properties(source/bounded/arithmetic/operators_builtin.cpp
 	PROPERTIES COMPILE_FLAGS "-Wno-implicit-int-conversion -Wno-shorten-64-to-32"
 )
 
