@@ -120,6 +120,8 @@ static_assert(!bounded::equality_comparable<tv::variant<int, non_comparable>>);
 static_assert(!bounded::equality_comparable<tv::variant<non_comparable, int>>);
 static_assert(!bounded::equality_comparable<tv::variant<int, non_comparable, int>>);
 
+static_assert(tv::variant<non_comparable, int>(5) == 5);
+
 constexpr bool test_non_trivial() {
 	using non_trivial_variant_t = tv::variant<bounded_test::integer>;
 	auto a = non_trivial_variant_t(bounded_test::integer(3));

@@ -51,6 +51,17 @@ constexpr auto equality_visitor = []
 	}
 };
 
+template<typename T>
+constexpr auto single_equality_visitor(T const & single) {
+	return [&]<typename U>(U const & element) -> bool {
+		if constexpr (std::same_as<T, U>) {
+			return element == single;
+		} else {
+			return false;
+		}
+	};
+}
+
 template<typename Function, typename... Ts>
 concept unique_construct_function = matches_exactly_one_type<std::invoke_result_t<Function>, Ts...>;
 
@@ -194,6 +205,12 @@ public:
 		requires(... and bounded::equality_comparable<Ts>)
 	{
 		return visit_with_index(lhs, rhs, equality_visitor);
+	}
+	template<matches_exactly_one_type<Ts...> T>
+	friend constexpr auto operator==(variant const & lhs, T const & rhs) -> bool
+		requires(bounded::equality_comparable<T>)
+	{
+		return visit(lhs, ::tv::single_equality_visitor(rhs));
 	}
 
 private:
