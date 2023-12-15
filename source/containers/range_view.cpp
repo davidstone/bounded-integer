@@ -120,7 +120,7 @@ public:
 		return containers::to_address(m_begin);
 	}
 	
-	constexpr auto end() const & -> Sentinel requires explicit_sentinel<Sentinel> and bounded::copy_constructible<Sentinel> {
+	constexpr auto end() const & -> Sentinel requires explicit_sentinel<Sentinel> {
 		return m_end;
 	}
 	constexpr auto end() && -> Sentinel requires explicit_sentinel<Sentinel> {
@@ -129,7 +129,7 @@ public:
 	// These are required for range-based for loops to work. A constrained `end`
 	// is found by language rules and then causes an error when it cannot be
 	// called.
-	constexpr auto end() const & -> Iterator requires(!explicit_sentinel<Sentinel> and bounded::copy_constructible<Iterator>) {
+	constexpr auto end() const & -> Iterator requires(!explicit_sentinel<Sentinel>) {
 		using offset = std::conditional_t<bounded::builtin_integer<Size>, iter_difference_t<Iterator>, Size>;
 		return begin() + static_cast<offset>(size());
 	}
