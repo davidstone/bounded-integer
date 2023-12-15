@@ -116,9 +116,6 @@ public:
 	constexpr auto data() const requires contiguous {
 		return containers::to_address(m_begin);
 	}
-	constexpr auto data() requires contiguous {
-		return containers::to_address(m_begin);
-	}
 	
 	constexpr auto end() const -> Sentinel requires explicit_sentinel<Sentinel> {
 		return m_end;
