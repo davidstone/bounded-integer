@@ -120,22 +120,15 @@ public:
 		return containers::to_address(m_begin);
 	}
 	
-	constexpr auto end() const & -> Sentinel requires explicit_sentinel<Sentinel> {
+	constexpr auto end() const -> Sentinel requires explicit_sentinel<Sentinel> {
 		return m_end;
 	}
-	constexpr auto end() && -> Sentinel requires explicit_sentinel<Sentinel> {
-		return std::move(m_end);
-	}
-	// These are required for range-based for loops to work. A constrained `end`
+	// This is required for range-based for loops to work. A constrained `end`
 	// is found by language rules and then causes an error when it cannot be
 	// called.
-	constexpr auto end() const & -> Iterator requires(!explicit_sentinel<Sentinel>) {
+	constexpr auto end() const -> Iterator requires(!explicit_sentinel<Sentinel>) {
 		using offset = std::conditional_t<bounded::builtin_integer<Size>, iter_difference_t<Iterator>, Size>;
 		return begin() + static_cast<offset>(size());
-	}
-	constexpr auto end() && -> Iterator {
-		using offset = std::conditional_t<bounded::builtin_integer<Size>, iter_difference_t<Iterator>, Size>;
-		return std::move(*this).begin() + static_cast<offset>(size());
 	}
 
 	OPERATORS_BRACKET_SEQUENCE_RANGE_DEFINITIONS
