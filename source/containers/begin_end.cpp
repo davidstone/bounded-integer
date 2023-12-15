@@ -37,7 +37,7 @@ constexpr auto get_size(c_array<T, size> const &) {
 }
 
 export template<range Range>
-constexpr auto begin(Range && r) {
+constexpr auto begin(Range && r) -> decltype(auto) {
 	if constexpr (has_member_begin<Range>) {
 		return OPERATORS_FORWARD(r).begin();
 	} else if constexpr (has_member_before_begin<Range>) {
