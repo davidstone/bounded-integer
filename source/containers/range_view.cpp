@@ -102,7 +102,7 @@ public:
 	{
 	}
 
-	constexpr auto begin() const & -> Iterator requires bounded::copy_constructible<Iterator> {
+	constexpr auto begin() const & -> Iterator const & {
 		return m_begin;
 	}
 	constexpr auto begin() && -> Iterator {

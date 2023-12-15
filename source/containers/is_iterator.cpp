@@ -21,7 +21,7 @@ concept only_input_or_output_iterator =
 	std::same_as<typename Iterator::iterator_category, std::output_iterator_tag>;
 
 export template<typename Iterator>
-concept iterator = requires(Iterator it) {
+concept iterator = requires(std::remove_cvref_t<Iterator> it) {
 	*it;
 	++it;
 };
@@ -29,12 +29,14 @@ concept iterator = requires(Iterator it) {
 export template<typename Iterator>
 concept forward_iterator =
 	iterator<Iterator> and
-	bounded::copy_constructible<Iterator> and
+	bounded::copy_constructible<std::remove_cvref_t<Iterator>> and
 	// This test is needed only to support legacy copyable iterators
 	!only_input_or_output_iterator<Iterator>;
 
 export template<typename Iterator>
-concept bidirectional_iterator = forward_iterator<Iterator> and requires(Iterator it) { --it; };
+concept bidirectional_iterator =
+	forward_iterator<Iterator> and
+	requires(std::remove_cvref_t<Iterator> it) { --it; };
 
 export template<typename Iterator>
 concept forward_random_access_iterator =
