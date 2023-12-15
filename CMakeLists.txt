@@ -266,6 +266,7 @@ target_sources(containers PUBLIC
 		source/containers/algorithms/find.cpp
 		source/containers/algorithms/generate.cpp
 		source/containers/algorithms/generate_until.cpp
+		source/containers/algorithms/join.cpp
 		source/containers/algorithms/keyed_binary_search.cpp
 		source/containers/algorithms/keyed_erase.cpp
 		source/containers/algorithms/keyed_insert.cpp
@@ -432,6 +433,7 @@ target_sources(containers_test PRIVATE
 		test/containers/algorithms/copy_or_relocate_from.cpp
 		test/containers/algorithms/erase.cpp
 		test/containers/algorithms/filter.cpp
+		test/containers/algorithms/join.cpp
 		test/containers/algorithms/split.cpp
 		test/containers/algorithms/zip.cpp
 		test/containers/append.cpp

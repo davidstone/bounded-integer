@@ -28,6 +28,7 @@ export import containers.algorithms.filter;
 export import containers.algorithms.find;
 export import containers.algorithms.generate;
 export import containers.algorithms.generate_until;
+export import containers.algorithms.join;
 export import containers.algorithms.keyed_binary_search;
 export import containers.algorithms.keyed_erase;
 export import containers.algorithms.keyed_insert;
