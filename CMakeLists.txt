@@ -430,6 +430,7 @@ target_sources(containers_test PRIVATE
 		test/containers/sort/sort.cpp
 		test/containers/sort/sort_exactly_n.cpp
 		test/containers/sort/test_sort.cpp
+		test/containers/algorithms/concatenate_view.cpp
 		test/containers/algorithms/copy_or_relocate_from.cpp
 		test/containers/algorithms/erase.cpp
 		test/containers/algorithms/filter.cpp

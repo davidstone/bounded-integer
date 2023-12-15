@@ -13,26 +13,21 @@ module;
 
 export module containers.algorithms.concatenate_view;
 
-import containers.algorithms.compare;
-import containers.array;
 import containers.begin_end;
 import containers.common_iterator_functions;
 import containers.forward_random_access_range;
+import containers.forward_range;
 import containers.front_back;
 import containers.is_empty;
-import containers.is_iterator;
-import containers.is_iterator_sentinel;
 import containers.iter_difference_t;
 import containers.iterator_t;
-import containers.range;
 import containers.range_reference_t;
-import containers.range_value_t;
 import containers.range_view;
 import containers.size;
+import containers.subtractable;
 
 import bounded;
 import numeric_traits;
-import operators;
 import tv;
 import std_module;
 
@@ -40,9 +35,23 @@ using namespace bounded::literal;
 
 namespace containers {
 
+template<typename LHS, typename RHS>
+constexpr auto compare_sentinels(LHS const & lhs, RHS const & rhs) -> bool {
+	if constexpr (bounded::equality_comparable<LHS, RHS>) {
+		return lhs == rhs;
+	} else {
+		return true;
+	}
+}
+
 template<typename LHS, typename RHS, std::size_t... indexes>
 constexpr auto have_same_ends(LHS const & lhs, RHS const & rhs, std::index_sequence<indexes...>) {
-	return (... and (containers::end(lhs[bounded::constant<indexes>]) == containers::end(rhs[bounded::constant<indexes>])));
+	return (... and (
+		compare_sentinels(
+			containers::end(lhs[bounded::constant<indexes>]),
+			containers::end(rhs[bounded::constant<indexes>])
+		)
+	));
 }
 
 template<typename LHS, typename RHS>
@@ -98,7 +107,7 @@ struct concatenate_view_iterator {
 	>;
 
 	constexpr explicit concatenate_view_iterator(RangeViews... range_views):
-		m_range_views(range_views...)
+		m_range_views(std::move(range_views)...)
 	{
 	}
 
@@ -123,15 +132,29 @@ struct concatenate_view_iterator {
 			(... and forward_random_access_range<RangeViews>)
 		)
 	)
-	friend constexpr auto operator+(concatenate_view_iterator const lhs, Offset const offset) {
-		return [=]<std::size_t... indexes>(std::index_sequence<indexes...>) {
+	friend constexpr auto operator+(concatenate_view_iterator lhs, Offset const offset) -> concatenate_view_iterator {
+		return [&]<std::size_t... indexes>(std::index_sequence<indexes...>) {
 			BOUNDED_ASSERT(offset >= 0_bi);
 			auto remaining_offset = bounded::integer<0, bounded::builtin_max_value<Offset>>(::bounded::assume_in_range(offset, 0_bi, bounded::integer(numeric_traits::max_value<Offset>)));
 			auto specific_range = [&](auto const index) {
-				auto const range = lhs.m_range_views[index];
-				auto const added_size = bounded::min(containers::size(range), remaining_offset);
-				remaining_offset -= added_size;
-				return range_view(containers::begin(range) + added_size, containers::end(range));
+				auto range = std::move(lhs).m_range_views[index];
+				if constexpr (std::same_as<Offset, bounded::constant_t<1>>) {
+					if (remaining_offset == 0_bi or containers::is_empty(range)) {
+						return range;
+					}
+					remaining_offset = 0_bi;
+					return range_view(
+						containers::begin(std::move(range)) + 1_bi,
+						containers::end(std::move(range))
+					);
+				} else {
+					auto const added_size = bounded::min(containers::size(range), remaining_offset);
+					remaining_offset -= added_size;
+					return range_view(
+						containers::begin(std::move(range)) + added_size,
+						containers::end(std::move(range))
+					);
+				}
 			};
 			// Use {} to enforce initialization order
 			return tv::apply(
@@ -141,7 +164,7 @@ struct concatenate_view_iterator {
 		}(std::make_index_sequence<sizeof...(RangeViews)>());
 	}
 
-	template<typename... RHSRanges>
+	template<typename... RHSRanges> requires(... and subtractable<iterator_t<RangeViews>, iterator_t<RHSRanges>>)
 	friend constexpr auto operator-(
 		concatenate_view_iterator const lhs,
 		concatenate_view_iterator<RHSRanges...> const rhs
@@ -188,13 +211,13 @@ struct concatenate_view_iterator {
 
 
 	template<typename... RHSRanges>
-	friend constexpr auto operator==(concatenate_view_iterator const lhs, concatenate_view_iterator<RHSRanges...> const rhs) -> bool {
+	friend constexpr auto operator==(concatenate_view_iterator const & lhs, concatenate_view_iterator<RHSRanges...> const & rhs) -> bool {
 		::containers::assert_same_ends(lhs.m_range_views, rhs.m_range_views);
 		return lhs.begin_iterators() == rhs.begin_iterators();
 	}
 
-	friend constexpr auto operator==(concatenate_view_iterator const lhs, std::default_sentinel_t) -> bool {
-		auto get_end_iterators = [](auto const range) { return containers::end(range); };
+	friend constexpr auto operator==(concatenate_view_iterator const & lhs, std::default_sentinel_t) -> bool {
+		auto get_end_iterators = [](auto const & range) { return containers::end(range); };
 		return lhs.begin_iterators() == tv::transform(get_end_iterators, lhs.m_range_views);
 	}
 
@@ -202,7 +225,7 @@ private:
 	static constexpr auto max_index = bounded::constant<sizeof...(RangeViews)> - 1_bi;
 
 	constexpr auto operator_star(auto const index) const -> reference {
-		auto const range_view = m_range_views[index];
+		auto const & range_view = m_range_views[index];
 		if constexpr (index == max_index) {
 			return containers::front(range_view);
 		} else if (!containers::is_empty(range_view)) {
@@ -213,7 +236,10 @@ private:
 	}
 
 	constexpr auto begin_iterators() const {
-		return tv::transform([](auto const range) { return containers::begin(range); }, m_range_views);
+		return tv::transform(
+			[](auto const & range) -> decltype(auto) { return containers::begin(range); },
+			m_range_views
+		);
 	}
 
 	tv::tuple<RangeViews...> m_range_views;
@@ -229,10 +255,13 @@ struct concatenate_view {
 	{
 	}
 	
-	constexpr auto begin() const {
+	constexpr auto begin() && {
+		return begin_impl(std::move(m_ranges));
+	}
+	constexpr auto begin() const & requires(... and forward_range<Ranges>) {
 		return begin_impl(m_ranges);
 	}
-	constexpr auto begin() {
+	constexpr auto begin() & requires(... and forward_range<Ranges>) {
 		return begin_impl(m_ranges);
 	}
 	static constexpr auto end() {
@@ -243,8 +272,13 @@ struct concatenate_view {
 private:
 	static constexpr auto begin_impl(auto && ranges) {
 		return concatenate_view_iterator(tv::transform(
-			[](auto && range){ return range_view(containers::begin(range), containers::end(range)); },
-			ranges
+			[](auto && range){
+				return range_view(
+					containers::begin(OPERATORS_FORWARD(range)),
+					containers::end(OPERATORS_FORWARD(range))
+				);
+			},
+			OPERATORS_FORWARD(ranges)
 		));
 	}
 	tv::tuple<Ranges...> m_ranges;
@@ -253,48 +287,4 @@ private:
 template<typename... Ranges>
 concatenate_view(Ranges && ...) -> concatenate_view<Ranges...>;
 
-
 }	// namespace containers
-
-template<typename LHS, typename RHS>
-constexpr bool equal_values_and_types(LHS const & lhs, RHS const & rhs) {
-	static_assert(std::same_as<containers::range_value_t<LHS>, containers::range_value_t<RHS>>);
-	return containers::equal(lhs, rhs);
-}
-
-constexpr auto array1 = containers::array{1, 2, 3};
-constexpr auto array2 = containers::array{2, 3, 5, 7};
-constexpr auto array3 = containers::array{1, 1, 2, 3, 5};
-
-constexpr auto two = containers::concatenate_view(array1, array2);
-
-using iterator = decltype(begin(two));
-using sentinel = decltype(end(two));
-
-static_assert(containers::iterator<iterator>);
-static_assert(containers::sentinel_for<sentinel, iterator>);
-static_assert(containers::range<decltype(two)>);
-
-static_assert(containers::size(two) == containers::size(array1) + containers::size(array2));
-static_assert(equal_values_and_types(
-	two,
-	containers::array{1, 2, 3, 2, 3, 5, 7}
-));
-static_assert(begin(two) + containers::size(two) == end(two));
-static_assert(begin(two) + containers::size(two) - begin(two) == containers::size(two));
-
-constexpr auto three = containers::concatenate_view(array3, array1, array2);
-static_assert(containers::size(three) == containers::size(array3) + containers::size(array1) + containers::size(array2));
-static_assert(equal_values_and_types(
-	three,
-	containers::array{1, 1, 2, 3, 5, 1, 2, 3, 2, 3, 5, 7}
-));
-static_assert(begin(three) + containers::size(three) == end(three));
-static_assert(begin(three) + containers::size(three) - begin(three) == containers::size(three));
-
-static_assert(*(begin(three) + 7_bi) == 3);
-
-constexpr auto from_temp = containers::concatenate_view(containers::array{1}, containers::array{2});
-static_assert(equal_values_and_types(from_temp, containers::array{1, 2}));
-
-static_assert(containers::forward_random_access_range<containers::concatenate_view<std::string_view>>);
