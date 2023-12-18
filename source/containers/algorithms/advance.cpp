@@ -7,6 +7,7 @@ export module containers.algorithms.advance;
 
 import containers.is_iterator;
 import containers.iter_difference_t;
+import containers.random_access_iterator;
 
 import bounded;
 import std_module;

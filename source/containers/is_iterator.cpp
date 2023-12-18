@@ -6,7 +6,6 @@
 export module containers.is_iterator;
 
 import containers.addable;
-import containers.iter_difference_t;
 import containers.offset_type;
 import containers.subtractable;
 
@@ -43,11 +42,5 @@ concept forward_random_access_iterator =
 	forward_iterator<Iterator> and
 	subtractable<Iterator> and
 	addable<Iterator, offset_type<Iterator>>;
-
-// TODO: require bounded::ordered<Iterator> when more types support <=>
-export template<typename Iterator>
-concept random_access_iterator = bidirectional_iterator<Iterator> and forward_random_access_iterator<Iterator> and requires(Iterator it, iter_difference_t<Iterator> offset) {
-	it + offset;
-};
 
 } // namespace containers

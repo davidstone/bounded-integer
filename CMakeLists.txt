@@ -369,6 +369,7 @@ target_sources(containers PUBLIC
 		source/containers/push_back.cpp
 		source/containers/push_back_into_capacity.cpp
 		source/containers/push_front.cpp
+		source/containers/random_access_iterator.cpp
 		source/containers/random_access_range.cpp
 		source/containers/random_access_sentinel_for.cpp
 		source/containers/range.cpp

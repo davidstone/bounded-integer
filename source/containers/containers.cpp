@@ -92,6 +92,7 @@ export import containers.pop_front;
 export import containers.push_back;
 export import containers.push_back_into_capacity;
 export import containers.push_front;
+export import containers.random_access_iterator;
 export import containers.random_access_range;
 export import containers.random_access_sentinel_for;
 export import containers.range_reference_t;
