@@ -11,6 +11,7 @@ import containers.is_iterator;
 import containers.is_iterator_sentinel;
 import containers.iterator_t;
 import containers.range;
+import containers.random_access_sentinel_for;
 
 import bounded;
 import std_module;

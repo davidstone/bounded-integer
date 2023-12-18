@@ -14,7 +14,4 @@ namespace containers {
 export template<typename Sentinel, typename Iterator>
 concept sentinel_for = iterator<Iterator> and bounded::equality_comparable<Iterator, Sentinel>;
 
-export template<typename Sentinel, typename Iterator>
-concept random_access_sentinel_for = sentinel_for<Sentinel, Iterator> and requires(Iterator first, Sentinel last) { last - first; };
-
 } // namespace containers

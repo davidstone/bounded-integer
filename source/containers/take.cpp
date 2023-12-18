@@ -18,6 +18,7 @@ import containers.is_iterator_sentinel;
 import containers.iter_difference_t;
 import containers.iterator_category_base;
 import containers.iterator_t;
+import containers.random_access_sentinel_for;
 import containers.range;
 import containers.range_size_t;
 import containers.range_view;
