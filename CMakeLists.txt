@@ -457,6 +457,7 @@ target_sources(containers_test PRIVATE
 		test/containers/push_back_into_capacity.cpp
 		test/containers/shrink_to_fit.cpp
 		test/containers/stable_vector.cpp
+		test/containers/take.cpp
 		test/containers/test_associative_container.cpp
 		test/containers/test_reserve_and_capacity.cpp
 		test/containers/test_sequence_container.cpp
@@ -471,7 +472,6 @@ target_sources(containers_test PRIVATE
 	test/containers/small_buffer_optimized_vector.cpp
 	test/containers/static_vector.cpp
 	test/containers/string.cpp
-	test/containers/take.cpp
 	test/containers/trivial_inplace_function.cpp
 )
 
