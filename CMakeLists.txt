@@ -326,6 +326,7 @@ target_sources(containers PUBLIC
 		source/containers/erase_concepts.cpp
 		source/containers/extract_key_to_less.cpp
 		source/containers/flat_map.cpp
+		source/containers/forward_iterator.cpp
 		source/containers/forward_linked_list.cpp
 		source/containers/forward_random_access_iterator.cpp
 		source/containers/forward_random_access_range.cpp

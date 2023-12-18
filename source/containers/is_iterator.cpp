@@ -10,22 +10,10 @@ import std_module;
 
 namespace containers {
 
-template<typename Iterator>
-concept only_input_or_output_iterator =
-	std::same_as<typename Iterator::iterator_category, std::input_iterator_tag> or
-	std::same_as<typename Iterator::iterator_category, std::output_iterator_tag>;
-
 export template<typename Iterator>
 concept iterator = requires(std::remove_cvref_t<Iterator> it) {
 	*it;
 	++it;
 };
-
-export template<typename Iterator>
-concept forward_iterator =
-	iterator<Iterator> and
-	bounded::copy_constructible<std::remove_cvref_t<Iterator>> and
-	// This test is needed only to support legacy copyable iterators
-	!only_input_or_output_iterator<std::remove_cvref_t<Iterator>>;
 
 } // namespace containers

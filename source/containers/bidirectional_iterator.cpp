@@ -5,7 +5,7 @@
 
 export module containers.bidirectional_iterator;
 
-import containers.is_iterator;
+import containers.forward_iterator;
 
 import std_module;
 

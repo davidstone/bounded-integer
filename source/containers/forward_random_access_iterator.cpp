@@ -5,7 +5,7 @@
 
 export module containers.forward_random_access_iterator;
 
-import containers.is_iterator;
+import containers.forward_iterator;
 import containers.iterator_addable;
 import containers.offset_type;
 import containers.subtractable;

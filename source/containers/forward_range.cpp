@@ -5,13 +5,15 @@
 
 export module containers.forward_range;
 
-import containers.is_iterator;
+import containers.forward_iterator;
 import containers.iterator_t;
 import containers.range;
 
 namespace containers {
 
 export template<typename T>
-concept forward_range = range<T> and forward_iterator<iterator_t<T>>;
+concept forward_range =
+	range<T> and
+	forward_iterator<iterator_t<T>>;
 
 } // namespace containers
