@@ -289,7 +289,6 @@ target_sources(containers PUBLIC
 		source/containers/std/vector.cpp
 		source/containers/adapt.cpp
 		source/containers/adapt_iterator.cpp
-		source/containers/addable.cpp
 		source/containers/append.cpp
 		source/containers/append_after.cpp
 		source/containers/append_into_capacity.cpp
@@ -344,6 +343,7 @@ target_sources(containers PUBLIC
 		source/containers/iter_difference_t.cpp
 		source/containers/iter_reference_t.cpp
 		source/containers/iter_value_t.cpp
+		source/containers/iterator_addable.cpp
 		source/containers/iterator_category_base.cpp
 		source/containers/iterator_t.cpp
 		source/containers/key_comparison_function.cpp

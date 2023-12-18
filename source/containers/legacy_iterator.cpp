@@ -12,13 +12,13 @@ module;
 
 export module containers.legacy_iterator;
 
-import containers.addable;
 import containers.common_iterator_functions;
 import containers.contiguous_iterator;
 import containers.is_iterator;
 import containers.iter_difference_t;
 import containers.iter_reference_t;
 import containers.iter_value_t;
+import containers.iterator_addable;
 import containers.random_access_iterator;
 import containers.subtractable;
 import containers.to_address;
@@ -79,7 +79,7 @@ struct legacy_iterator {
 
 	friend auto operator<=>(legacy_iterator, legacy_iterator) = default;
 
-	friend constexpr auto operator+(legacy_iterator const lhs, bounded::integral auto const rhs) requires addable<Iterator, iter_difference_t<Iterator>> {
+	friend constexpr auto operator+(legacy_iterator const lhs, bounded::integral auto const rhs) requires iterator_addable<Iterator, iter_difference_t<Iterator>> {
 		if constexpr (std::same_as<iter_difference_t<Iterator>, bounded::constant_t<0>>) {
 			std::unreachable();
 			return lhs;

@@ -5,8 +5,8 @@
 
 export module containers.forward_random_access_iterator;
 
-import containers.addable;
 import containers.is_iterator;
+import containers.iterator_addable;
 import containers.offset_type;
 import containers.subtractable;
 
@@ -19,6 +19,6 @@ export template<typename Iterator>
 concept forward_random_access_iterator =
 	forward_iterator<Iterator> and
 	subtractable<Iterator> and
-	addable<Iterator, offset_type<Iterator>>;
+	iterator_addable<Iterator, offset_type<Iterator>>;
 
 } // namespace containers

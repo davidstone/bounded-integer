@@ -12,11 +12,11 @@ module;
 
 export module containers.take;
 
-import containers.addable;
 import containers.begin_end;
 import containers.forward_random_access_iterator;
 import containers.is_iterator;
 import containers.iter_difference_t;
+import containers.iterator_addable;
 import containers.iterator_category_base;
 import containers.iterator_t;
 import containers.random_access_sentinel_for;
@@ -100,7 +100,7 @@ struct counted_iterator : iterator_category_base<Iterator> {
 
 	template<typename Offset> requires(
 		numeric_traits::max_value<decltype(bounded::declval<Count>() - bounded::declval<Offset>())> >= 0_bi and
-		addable<Iterator, Offset>
+		iterator_addable<Iterator, Offset>
 	)
 	friend constexpr auto operator+(counted_iterator it, Offset const offset) {
 		return counted_iterator(

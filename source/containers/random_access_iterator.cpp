@@ -8,6 +8,7 @@ export module containers.random_access_iterator;
 import containers.forward_random_access_iterator;
 import containers.is_iterator;
 import containers.iter_difference_t;
+import containers.iterator_addable;
 
 import bounded;
 import std_module;
@@ -19,8 +20,6 @@ export template<typename Iterator>
 concept random_access_iterator =
 	bidirectional_iterator<Iterator> and
 	forward_random_access_iterator<Iterator> and
-	requires(Iterator it, iter_difference_t<Iterator> offset) {
-		{ it + offset } -> std::same_as<std::remove_cvref_t<Iterator>>;
-	};
+	iterator_addable<Iterator, iter_difference_t<Iterator>>;
 
 } // namespace containers

@@ -5,8 +5,8 @@
 
 export module containers.common_iterator_functions;
 
-import containers.addable;
 import containers.is_iterator;
+import containers.iterator_addable;
 
 import bounded;
 import operators;
@@ -16,8 +16,8 @@ export import containers.common_functions;
 
 namespace containers {
 
-export template<bounded::integral LHS, iterator RHS> requires addable<RHS, LHS>
-constexpr auto operator+(LHS const offset, RHS it) {
+export template<bounded::integral LHS, iterator RHS> requires iterator_addable<RHS, LHS>
+constexpr auto operator+(LHS const offset, RHS it) -> RHS {
 	return std::move(it) + offset;
 }
 
