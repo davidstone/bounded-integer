@@ -57,6 +57,7 @@ export import containers.assign_to_empty;
 export import containers.assign_to_empty_into_capacity;
 export import containers.at;
 export import containers.begin_end;
+export import containers.bidirectional_iterator;
 export import containers.bidirectional_range;
 export import containers.bounded_vector;
 export import containers.c_array;

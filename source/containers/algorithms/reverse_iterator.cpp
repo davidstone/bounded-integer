@@ -16,6 +16,7 @@ import containers.adapt;
 import containers.adapt_iterator;
 import containers.array;
 import containers.begin_end;
+import containers.bidirectional_iterator;
 import containers.is_iterator;
 import containers.random_access_iterator;
 import containers.range;

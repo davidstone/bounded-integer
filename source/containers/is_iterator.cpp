@@ -28,9 +28,4 @@ concept forward_iterator =
 	// This test is needed only to support legacy copyable iterators
 	!only_input_or_output_iterator<std::remove_cvref_t<Iterator>>;
 
-export template<typename Iterator>
-concept bidirectional_iterator =
-	forward_iterator<Iterator> and
-	requires(std::remove_cvref_t<Iterator> it) { --it; };
-
 } // namespace containers

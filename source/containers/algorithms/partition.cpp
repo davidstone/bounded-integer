@@ -13,6 +13,7 @@ import containers.algorithms.advance;
 import containers.algorithms.find;
 import containers.array;
 import containers.begin_end;
+import containers.bidirectional_iterator;
 import containers.is_iterator;
 import containers.range;
 import containers.range_size_t;

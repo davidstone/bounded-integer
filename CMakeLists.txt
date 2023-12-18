@@ -301,6 +301,7 @@ target_sources(containers PUBLIC
 		source/containers/at.cpp
 		source/containers/batched.cpp
 		source/containers/begin_end.cpp
+		source/containers/bidirectional_iterator.cpp
 		source/containers/bidirectional_linked_list.cpp
 		source/containers/bidirectional_range.cpp
 		source/containers/bounded_vector.cpp

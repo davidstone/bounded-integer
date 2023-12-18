@@ -12,6 +12,7 @@ module;
 export module containers.algorithms.find;
 
 import containers.begin_end;
+import containers.bidirectional_iterator;
 import containers.bidirectional_range;
 import containers.c_array;
 import containers.empty_range;
