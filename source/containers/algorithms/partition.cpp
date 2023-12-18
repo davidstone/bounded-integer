@@ -14,9 +14,9 @@ import containers.algorithms.find;
 import containers.array;
 import containers.begin_end;
 import containers.is_iterator;
-import containers.is_iterator_sentinel;
 import containers.range;
 import containers.range_size_t;
+import containers.sentinel_for;
 import containers.size;
 import containers.static_vector;
 

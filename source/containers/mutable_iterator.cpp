@@ -8,7 +8,6 @@ export module containers.mutable_iterator;
 import containers.array;
 import containers.begin_end;
 import containers.is_iterator;
-import containers.is_iterator_sentinel;
 import containers.iterator_t;
 import containers.range;
 import containers.random_access_sentinel_for;

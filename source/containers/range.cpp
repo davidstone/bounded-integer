@@ -9,7 +9,7 @@ import containers.c_array;
 import containers.data;
 import containers.has_member_size;
 import containers.is_iterator;
-import containers.is_iterator_sentinel;
+import containers.sentinel_for;
 
 import bounded;
 

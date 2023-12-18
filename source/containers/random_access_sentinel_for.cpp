@@ -5,7 +5,7 @@
 
 export module containers.random_access_sentinel_for;
 
-import containers.is_iterator_sentinel;
+import containers.sentinel_for;
 import containers.subtractable;
 
 namespace containers {

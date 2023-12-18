@@ -12,8 +12,9 @@ export module containers.algorithms.maybe_find;
 import containers.algorithms.find;
 import containers.array;
 import containers.begin_end;
-import containers.is_iterator_sentinel;
+import containers.is_iterator;
 import containers.range;
+import containers.sentinel_for;
 
 import bounded;
 import tv;

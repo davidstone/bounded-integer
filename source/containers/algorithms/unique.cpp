@@ -21,7 +21,6 @@ import containers.algorithms.move_range;
 import containers.begin_end;
 import containers.dynamic_array;
 import containers.is_iterator;
-import containers.is_iterator_sentinel;
 import containers.iter_difference_t;
 import containers.iter_value_t;
 import containers.iterator_t;
@@ -30,6 +29,7 @@ import containers.range;
 import containers.range_size_t;
 import containers.range_view;
 import containers.repeat_n;
+import containers.sentinel_for;
 import containers.size;
 
 import bounded;

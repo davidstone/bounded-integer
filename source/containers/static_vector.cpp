@@ -28,7 +28,6 @@ import containers.data;
 import containers.index_type;
 import containers.initializer_range;
 import containers.integer_range;
-import containers.is_iterator_sentinel;
 import containers.maximum_array_size;
 import containers.pop_back;
 import containers.range;

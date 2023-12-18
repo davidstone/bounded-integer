@@ -340,7 +340,6 @@ target_sources(containers PUBLIC
 		source/containers/is_container.cpp
 		source/containers/is_empty.cpp
 		source/containers/is_iterator.cpp
-		source/containers/is_iterator_sentinel.cpp
 		source/containers/iter_difference_t.cpp
 		source/containers/iter_reference_t.cpp
 		source/containers/iter_value_t.cpp
@@ -384,6 +383,7 @@ target_sources(containers PUBLIC
 		source/containers/reserve_space_for.cpp
 		source/containers/resizable_container.cpp
 		source/containers/resize.cpp
+		source/containers/sentinel_for.cpp
 		source/containers/sentinel_t.cpp
 		source/containers/shrink_to_fit.cpp
 		source/containers/size.cpp

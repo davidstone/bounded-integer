@@ -13,10 +13,10 @@ import containers.begin_end;
 import containers.common_iterator_functions;
 import containers.forward_random_access_range;
 import containers.is_iterator;
-import containers.is_iterator_sentinel;
 import containers.range;
 import containers.range_value_t;
 import containers.range_view;
+import containers.sentinel_for;
 import containers.size;
 
 import bounded;

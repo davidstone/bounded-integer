@@ -16,8 +16,8 @@ import containers.bidirectional_range;
 import containers.c_array;
 import containers.empty_range;
 import containers.is_iterator;
-import containers.is_iterator_sentinel;
 import containers.range;
+import containers.sentinel_for;
 import containers.size;
 
 import bounded;

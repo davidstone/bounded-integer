@@ -13,7 +13,6 @@ export module containers.adapt;
 import containers.adapt_iterator;
 import containers.begin_end;
 import containers.is_iterator;
-import containers.is_iterator_sentinel;
 import containers.iter_value_t;
 import containers.range;
 import containers.reference_or_value;
