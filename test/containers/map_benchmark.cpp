@@ -62,11 +62,17 @@ using extract_key_t = Extract;
 
 	template<typename Map>
 	auto construct_from_range(auto && range) {
-		return Map(OPERATORS_FORWARD(begin(range)), OPERATORS_FORWARD(end(range)));
+		return Map(
+			containers::begin(OPERATORS_FORWARD(range)),
+			containers::end(OPERATORS_FORWARD(range))
+		);
 	}
 
 	void insert_range(auto & map, auto && range) {
-		map.insert(OPERATORS_FORWARD(begin(range)), OPERATORS_FORWARD(end(range)));
+		map.insert(
+			begin(OPERATORS_FORWARD(range)),
+			end(OPERATORS_FORWARD(range))
+		);
 	}
 
 #elif defined USE_FLAT_MAP
