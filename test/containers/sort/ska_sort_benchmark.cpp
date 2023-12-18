@@ -5,7 +5,6 @@
 
 #include <std_module/prelude.hpp>
 #include <array>
-#include <algorithm>
 
 #include <benchmark/benchmark.h>
 

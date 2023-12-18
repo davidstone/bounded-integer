@@ -3,12 +3,6 @@
 // (See accompanying file LICENSE_1_0.txt or copy at
 // http://www.boost.org/LICENSE_1_0.txt)
 
-module;
-
-#include <std_module/prelude.hpp>
-#include <concepts>
-#include <type_traits>
-
 export module bounded.lazy_init;
 
 import bounded.concepts;
