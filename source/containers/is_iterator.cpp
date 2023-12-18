@@ -5,10 +5,6 @@
 
 export module containers.is_iterator;
 
-import containers.addable;
-import containers.offset_type;
-import containers.subtractable;
-
 import bounded;
 import std_module;
 
@@ -36,11 +32,5 @@ export template<typename Iterator>
 concept bidirectional_iterator =
 	forward_iterator<Iterator> and
 	requires(std::remove_cvref_t<Iterator> it) { --it; };
-
-export template<typename Iterator>
-concept forward_random_access_iterator =
-	forward_iterator<Iterator> and
-	subtractable<Iterator> and
-	addable<Iterator, offset_type<Iterator>>;
 
 } // namespace containers

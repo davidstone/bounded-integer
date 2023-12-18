@@ -5,6 +5,7 @@
 
 export module containers.random_access_iterator;
 
+import containers.forward_random_access_iterator;
 import containers.is_iterator;
 import containers.iter_difference_t;
 

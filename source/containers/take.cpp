@@ -14,6 +14,7 @@ export module containers.take;
 
 import containers.addable;
 import containers.begin_end;
+import containers.forward_random_access_iterator;
 import containers.is_iterator;
 import containers.iter_difference_t;
 import containers.iterator_category_base;

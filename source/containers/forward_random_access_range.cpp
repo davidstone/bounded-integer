@@ -5,6 +5,7 @@
 
 export module containers.forward_random_access_range;
 
+import containers.forward_random_access_iterator;
 import containers.forward_range;
 import containers.is_iterator;
 import containers.iterator_t;
@@ -12,6 +13,8 @@ import containers.iterator_t;
 namespace containers {
 
 export template<typename T>
-concept forward_random_access_range = forward_range<T> and forward_random_access_iterator<iterator_t<T>>;
+concept forward_random_access_range =
+	forward_range<T> and
+	forward_random_access_iterator<iterator_t<T>>;
 
 } // namespace containers
