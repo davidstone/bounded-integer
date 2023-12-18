@@ -91,7 +91,7 @@ public:
 		auto const width = stream.width();
 		auto const max_characters = width <= 0 ? max_width : bounded::clamp(bounded::integer(width), 1_bi, max_width);
 		containers::clear(str);
-		for (auto it = std::istreambuf_iterator<char>(stream); it != std::istreambuf_iterator<char>(); ++it) {
+		for (auto it = std::istreambuf_iterator<char>(stream); it != std::default_sentinel; ++it) {
 			if (containers::size(str) == max_characters) {
 				break;
 			}
