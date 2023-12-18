@@ -14,8 +14,8 @@ import containers.array;
 import containers.adapt;
 import containers.default_adapt_traits;
 import containers.default_begin_end_size;
-import containers.is_iterator;
 import containers.iter_reference_t;
+import containers.iterator;
 import containers.range;
 
 import std_module;

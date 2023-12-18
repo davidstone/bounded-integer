@@ -5,7 +5,7 @@
 
 export module containers.forward_iterator;
 
-import containers.is_iterator;
+import containers.iterator;
 
 import bounded;
 import std_module;

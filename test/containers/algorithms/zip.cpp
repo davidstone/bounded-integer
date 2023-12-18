@@ -18,7 +18,7 @@ import containers.algorithms.zip;
 import containers.array;
 import containers.common_iterator_functions;
 import containers.is_empty;
-import containers.is_iterator;
+import containers.iterator;
 import containers.iterator_t;
 import containers.range_view;
 

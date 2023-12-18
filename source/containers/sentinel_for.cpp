@@ -5,7 +5,7 @@
 
 export module containers.sentinel_for;
 
-import containers.is_iterator;
+import containers.iterator;
 
 import bounded;
 

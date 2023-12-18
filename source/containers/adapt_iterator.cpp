@@ -12,8 +12,8 @@ export module containers.adapt_iterator;
 
 import containers.contiguous_iterator;
 import containers.default_adapt_traits;
-import containers.is_iterator;
 import containers.iter_difference_t;
+import containers.iterator;
 import containers.iterator_category_base;
 import containers.reference_or_value;
 

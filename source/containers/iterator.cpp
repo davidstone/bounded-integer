@@ -3,7 +3,7 @@
 // (See accompanying file LICENSE_1_0.txt or copy at
 // http://www.boost.org/LICENSE_1_0.txt)
 
-export module containers.is_iterator;
+export module containers.iterator;
 
 import bounded;
 import std_module;

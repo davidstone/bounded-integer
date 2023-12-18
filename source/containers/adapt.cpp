@@ -12,8 +12,8 @@ export module containers.adapt;
 
 import containers.adapt_iterator;
 import containers.begin_end;
-import containers.is_iterator;
 import containers.iter_value_t;
+import containers.iterator;
 import containers.range;
 import containers.reference_or_value;
 

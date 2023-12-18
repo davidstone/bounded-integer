@@ -341,10 +341,10 @@ target_sources(containers PUBLIC
 		source/containers/integer_range.cpp
 		source/containers/is_container.cpp
 		source/containers/is_empty.cpp
-		source/containers/is_iterator.cpp
 		source/containers/iter_difference_t.cpp
 		source/containers/iter_reference_t.cpp
 		source/containers/iter_value_t.cpp
+		source/containers/iterator.cpp
 		source/containers/iterator_addable.cpp
 		source/containers/iterator_category_base.cpp
 		source/containers/iterator_t.cpp

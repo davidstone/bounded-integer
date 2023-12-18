@@ -7,7 +7,6 @@ export module containers.forward_random_access_range;
 
 import containers.forward_random_access_iterator;
 import containers.forward_range;
-import containers.is_iterator;
 import containers.iterator_t;
 
 namespace containers {

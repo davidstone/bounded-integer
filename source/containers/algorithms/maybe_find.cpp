@@ -12,7 +12,7 @@ export module containers.algorithms.maybe_find;
 import containers.algorithms.find;
 import containers.array;
 import containers.begin_end;
-import containers.is_iterator;
+import containers.iterator;
 import containers.range;
 import containers.sentinel_for;
 

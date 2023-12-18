@@ -12,7 +12,7 @@ export module containers.algorithms.compare;
 import containers.c_array;
 import containers.begin_end;
 import containers.empty_range;
-import containers.is_iterator;
+import containers.iterator;
 import containers.range;
 import containers.sentinel_for;
 import containers.size;

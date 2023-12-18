@@ -7,8 +7,6 @@ module;
 
 export module containers.iterator_category_base;
 
-import containers.is_iterator;
-
 namespace containers {
 
 template<typename T>

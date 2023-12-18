@@ -10,7 +10,6 @@ module;
 export module containers.contiguous_iterator;
 
 export import containers.common_iterator_functions;
-import containers.is_iterator;
 import containers.maximum_array_size;
 import containers.offset_type;
 import containers.random_access_iterator;

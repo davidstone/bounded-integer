@@ -17,7 +17,7 @@ import containers.algorithms.find;
 import containers.adapt;
 import containers.begin_end;
 import containers.default_adapt_traits;
-import containers.is_iterator;
+import containers.iterator;
 import containers.range;
 import containers.reference_or_value;
 

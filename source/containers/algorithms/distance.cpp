@@ -5,8 +5,8 @@
 
 export module containers.algorithms.distance;
 
-import containers.is_iterator;
 import containers.iter_difference_t;
+import containers.iterator;
 import containers.sentinel_for;
 
 import bounded;

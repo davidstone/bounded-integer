@@ -5,7 +5,7 @@
 
 export module containers.common_iterator_functions;
 
-import containers.is_iterator;
+import containers.iterator;
 import containers.iterator_addable;
 
 import bounded;

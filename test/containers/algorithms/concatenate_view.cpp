@@ -12,7 +12,7 @@ import containers.array;
 import containers.begin_end;
 import containers.common_iterator_functions;
 import containers.forward_random_access_range;
-import containers.is_iterator;
+import containers.iterator;
 import containers.range;
 import containers.range_value_t;
 import containers.range_view;

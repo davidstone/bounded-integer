@@ -10,7 +10,7 @@ module;
 export module containers.default_adapt_traits;
 
 import containers.common_iterator_functions;
-import containers.is_iterator;
+import containers.iterator;
 
 import bounded;
 import std_module;

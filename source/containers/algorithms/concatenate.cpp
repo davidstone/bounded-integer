@@ -16,7 +16,6 @@ import containers.append_into_capacity;
 import containers.begin_end;
 import containers.can_set_size;
 import containers.data;
-import containers.is_iterator;
 import containers.iterator_t;
 import containers.iter_difference_t;
 import containers.range_size_t;

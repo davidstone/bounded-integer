@@ -12,7 +12,7 @@ import containers.test.test_set_size;
 import containers.array;
 import containers.c_array;
 import containers.index_type;
-import containers.is_iterator;
+import containers.iterator;
 import containers.static_vector;
 
 import bounded;
