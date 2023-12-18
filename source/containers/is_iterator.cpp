@@ -31,7 +31,7 @@ concept forward_iterator =
 	iterator<Iterator> and
 	bounded::copy_constructible<std::remove_cvref_t<Iterator>> and
 	// This test is needed only to support legacy copyable iterators
-	!only_input_or_output_iterator<Iterator>;
+	!only_input_or_output_iterator<std::remove_cvref_t<Iterator>>;
 
 export template<typename Iterator>
 concept bidirectional_iterator =
