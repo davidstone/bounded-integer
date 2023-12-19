@@ -167,7 +167,7 @@ struct indexed_generate_n_iterator {
 	}
 private:
 	[[no_unique_address]] Offset m_offset;
-	[[no_unique_address]] stored_function<Function const> m_generator;
+	[[no_unique_address]] stored_function<Function const, generate_index_type<Offset>> m_generator;
 };
 
 export template<typename Size, index_invocable<Size> Function>

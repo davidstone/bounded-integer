@@ -12,9 +12,9 @@ import std_module;
 
 namespace containers {
 
-export template<typename Function>
+export template<typename Function, typename... Args>
 using stored_function = std::conditional_t<
-	std::invocable<Function const &>,
+	std::invocable<Function const &, Args...>,
 	reference_or_value<Function>,
 	std::reference_wrapper<Function>
 >;
