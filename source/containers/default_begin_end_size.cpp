@@ -17,11 +17,11 @@ import containers.sized_range;
 namespace containers {
 
 export struct default_begin_end_size {
-	static constexpr auto get_begin(range auto && range) {
+	static constexpr auto get_begin(range auto && range) -> decltype(auto) {
 		return containers::begin(OPERATORS_FORWARD(range));
 	}
 
-	static constexpr auto get_end(range auto && range) {
+	static constexpr auto get_end(range auto && range) -> decltype(auto) {
 		return containers::end(OPERATORS_FORWARD(range));
 	}
 
