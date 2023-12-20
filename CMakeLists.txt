@@ -250,6 +250,7 @@ target_sources(containers PUBLIC
 		source/containers/algorithms/sort/sort_exactly_6.cpp
 		source/containers/algorithms/sort/to_radix_sort_key.cpp
 		source/containers/algorithms/accumulate.cpp
+		source/containers/algorithms/adjacent.cpp
 		source/containers/algorithms/advance.cpp
 		source/containers/algorithms/all_any_none.cpp
 		source/containers/algorithms/binary_search.cpp
@@ -436,6 +437,7 @@ target_sources(containers_test PRIVATE
 		test/containers/sort/sort.cpp
 		test/containers/sort/sort_exactly_n.cpp
 		test/containers/sort/test_sort.cpp
+		test/containers/algorithms/adjacent.cpp
 		test/containers/algorithms/concatenate_view.cpp
 		test/containers/algorithms/copy_or_relocate_from.cpp
 		test/containers/algorithms/erase.cpp
