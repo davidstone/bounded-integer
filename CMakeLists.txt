@@ -409,6 +409,7 @@ target_sources(containers PUBLIC
 		source/containers/uninitialized_array.cpp
 		source/containers/uninitialized_dynamic_array.cpp
 		source/containers/vector.cpp
+		source/containers/wrap_range.cpp
 )
 
 target_link_libraries(containers
@@ -469,6 +470,7 @@ target_sources(containers_test PRIVATE
 		test/containers/test_set_size.cpp
 		test/containers/uninitialized_dynamic_array.cpp
 		test/containers/vector.cpp
+		test/containers/wrap_range.cpp
 )
 
 target_sources(containers_test PRIVATE

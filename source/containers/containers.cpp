@@ -120,3 +120,4 @@ export import containers.take;
 export import containers.to_string;
 export import containers.trivial_inplace_function;
 export import containers.vector;
+export import containers.wrap_range;
