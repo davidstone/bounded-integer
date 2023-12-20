@@ -48,6 +48,12 @@ constexpr auto get_iterator_traits(Traits const & range_traits, auto & r) -> dec
 	}
 }
 
+template<typename Iterator>
+concept adapt_iterator_constructible = bounded::convertible_to<
+	Iterator,
+	std::remove_reference_t<Iterator>
+>;
+
 export template<range Range, typename Traits>
 struct adapt {
 private:
@@ -67,13 +73,13 @@ public:
 	{
 	}
 	
-	constexpr auto begin() const & -> iterator auto requires range<Range const &> {
+	constexpr auto begin() const & -> iterator auto requires range<Range const &> and adapt_iterator_constructible<decltype(m_traits.get_begin(m_range))> {
 		return containers::adapt_iterator(
 			m_traits.get_begin(m_range),
 			iterator_traits()
 		);
 	}
-	constexpr auto begin() & -> iterator auto requires range<Range &> {
+	constexpr auto begin() & -> iterator auto requires range<Range &> and adapt_iterator_constructible<decltype(m_traits.get_begin(m_range))> {
 		return containers::adapt_iterator(
 			m_traits.get_begin(m_range),
 			iterator_traits()
