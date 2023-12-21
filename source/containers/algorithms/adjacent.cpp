@@ -44,7 +44,10 @@ private:
 
 template<typename Difference, auto amount>
 struct decrease_by_impl {
-	static constexpr auto value = bounded::max(numeric_traits::max_value<Difference> - amount, 0_bi);
+	static constexpr auto value = bounded::max(
+		bounded::constant<numeric_traits::max_value<Difference>> - amount,
+		0_bi
+	);
 	using type = bounded::integer<bounded::normalize<-value>, bounded::normalize<value>>;
 };
 
