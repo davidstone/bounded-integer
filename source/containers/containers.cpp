@@ -12,6 +12,7 @@ export import containers.algorithms.sort.sort;
 export import containers.algorithms.sort.to_radix_sort_key;
 
 export import containers.algorithms.accumulate;
+export import containers.algorithms.adjacent;
 export import containers.algorithms.advance;
 export import containers.algorithms.all_any_none;
 export import containers.algorithms.binary_search;

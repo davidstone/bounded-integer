@@ -123,6 +123,9 @@ struct adjacent_iterator {
 		return containers::back(lhs.m_its) == rhs.base();
 	}
 
+	constexpr auto base() const {
+		return m_its;
+	}
 private:
 	containers::array<Iterator, group_size> m_its;
 };
