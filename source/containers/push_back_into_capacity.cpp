@@ -5,7 +5,7 @@
 
 export module containers.push_back_into_capacity;
 
-import containers.front_back;
+import containers.back;
 import containers.is_container;
 import containers.lazy_push_back_into_capacity;
 import containers.member_push_backable;

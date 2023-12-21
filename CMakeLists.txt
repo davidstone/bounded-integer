@@ -300,6 +300,7 @@ target_sources(containers PUBLIC
 		source/containers/assign_to_empty_into_capacity.cpp
 		source/containers/associative_container.cpp
 		source/containers/at.cpp
+		source/containers/back.cpp
 		source/containers/batched.cpp
 		source/containers/begin_end.cpp
 		source/containers/bidirectional_iterator.cpp
@@ -332,7 +333,7 @@ target_sources(containers PUBLIC
 		source/containers/forward_random_access_iterator.cpp
 		source/containers/forward_random_access_range.cpp
 		source/containers/forward_range.cpp
-		source/containers/front_back.cpp
+		source/containers/front.cpp
 		source/containers/get_source_size.cpp
 		source/containers/has_member_before_begin.cpp
 		source/containers/has_member_size.cpp

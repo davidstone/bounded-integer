@@ -13,10 +13,10 @@ export module containers.algorithms.adjacent;
 
 import containers.algorithms.advance;
 import containers.array;
+import containers.back;
 import containers.begin_end;
 export import containers.common_iterator_functions;
 import containers.forward_range;
-import containers.front_back;
 import containers.iter_difference_t;
 import containers.size;
 import containers.sized_range;

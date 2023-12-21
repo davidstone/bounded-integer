@@ -9,7 +9,7 @@ module;
 
 export module containers.test.lazy_push_back_into_capacity;
 
-import containers.front_back;
+import containers.back;
 import containers.lazy_push_back_into_capacity;
 import containers.vector;
 

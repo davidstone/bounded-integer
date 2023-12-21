@@ -5,7 +5,7 @@
 
 export module containers.push_back;
 
-import containers.front_back;
+import containers.back;
 import containers.lazy_push_back;
 import containers.member_push_backable;
 import containers.range_value_t;

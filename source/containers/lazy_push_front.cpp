@@ -15,7 +15,7 @@ import containers.algorithms.splice;
 import containers.begin_end;
 import containers.bidirectional_linked_list;
 import containers.forward_linked_list;
-import containers.front_back;
+import containers.front;
 import containers.lazy_push_back;
 import containers.range_value_t;
 import containers.splicable;

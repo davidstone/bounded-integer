@@ -5,8 +5,8 @@
 
 export module containers.pop_back;
 
+import containers.back;
 import containers.can_set_size;
-import containers.front_back;
 import containers.range;
 import containers.size;
 

@@ -10,7 +10,7 @@ module;
 
 export module containers.test.push_back_into_capacity;
 
-import containers.front_back;
+import containers.back;
 import containers.push_back_into_capacity;
 import containers.vector;
 

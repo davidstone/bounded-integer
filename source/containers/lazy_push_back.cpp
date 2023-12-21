@@ -10,9 +10,9 @@ module;
 export module containers.lazy_push_back;
 
 import containers.algorithms.uninitialized;
+import containers.back;
 import containers.begin_end;
 import containers.can_set_size;
-import containers.front_back;
 import containers.lazy_push_back_into_capacity;
 import containers.member_lazy_push_backable;
 import containers.range_reference_t;

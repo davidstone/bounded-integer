@@ -15,9 +15,10 @@ import containers.algorithms.compare;
 import containers.test.test_sequence_container;
 
 import containers.array;
+import containers.back;
 import containers.begin_end;
 import containers.bidirectional_linked_list;
-import containers.front_back;
+import containers.front;
 import containers.is_empty;
 
 import bounded;

@@ -20,7 +20,7 @@ import containers.algorithms.reverse_iterator;
 import containers.array;
 import containers.begin_end;
 import containers.c_array;
-import containers.front_back;
+import containers.front;
 import containers.index_type;
 import containers.integer_range;
 import containers.range;

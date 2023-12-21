@@ -18,8 +18,8 @@ import containers.algorithms.sort.is_sorted;
 import containers.algorithms.sort.to_radix_sort_key;
 
 import containers.array;
+import containers.back;
 import containers.c_array;
-import containers.front_back;
 import containers.static_vector;
 import containers.vector;
 
