@@ -16,6 +16,7 @@ export import containers.algorithms.adjacent;
 export import containers.algorithms.advance;
 export import containers.algorithms.all_any_none;
 export import containers.algorithms.binary_search;
+export import containers.algorithms.chunk_by;
 export import containers.algorithms.compare;
 export import containers.algorithms.concatenate;
 export import containers.algorithms.concatenate_view;

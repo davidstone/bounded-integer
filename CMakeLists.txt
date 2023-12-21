@@ -254,6 +254,7 @@ target_sources(containers PUBLIC
 		source/containers/algorithms/advance.cpp
 		source/containers/algorithms/all_any_none.cpp
 		source/containers/algorithms/binary_search.cpp
+		source/containers/algorithms/chunk_by.cpp
 		source/containers/algorithms/compare.cpp
 		source/containers/algorithms/concatenate.cpp
 		source/containers/algorithms/concatenate_view.cpp
@@ -439,6 +440,7 @@ target_sources(containers_test PRIVATE
 		test/containers/sort/sort_exactly_n.cpp
 		test/containers/sort/test_sort.cpp
 		test/containers/algorithms/adjacent.cpp
+		test/containers/algorithms/chunk_by.cpp
 		test/containers/algorithms/concatenate_view.cpp
 		test/containers/algorithms/copy_or_relocate_from.cpp
 		test/containers/algorithms/erase.cpp
