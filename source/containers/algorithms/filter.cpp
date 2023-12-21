@@ -30,6 +30,7 @@ using namespace bounded::literal;
 
 template<typename Sentinel, typename UnaryPredicate>
 struct filter_iterator_traits : default_dereference, default_compare {
+	filter_iterator_traits() = default;
 	constexpr filter_iterator_traits(Sentinel last, UnaryPredicate const & predicate):
 		m_sentinel(std::move(last)),
 		m_predicate(predicate)
@@ -52,6 +53,7 @@ private:
 
 template<typename UnaryPredicate>
 struct filter_traits {
+	filter_traits() = default;
 	constexpr filter_traits(UnaryPredicate condition):
 		m_predicate(std::move(condition))
 	{

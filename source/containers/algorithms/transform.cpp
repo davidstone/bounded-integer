@@ -29,6 +29,7 @@ struct transform_traits :
 	default_compare,
 	default_begin_end_size
 {
+	constexpr transform_traits() = default;
 	constexpr explicit transform_traits(UnaryFunction dereference_):
 		m_dereference(std::move(dereference_))
 	{
@@ -52,6 +53,7 @@ struct transform_traits_dereference :
 	default_compare,
 	default_begin_end_size
 {
+	constexpr transform_traits_dereference() = default;
 	constexpr explicit transform_traits_dereference(UnaryFunction dereference_):
 		m_dereference(std::move(dereference_))
 	{
