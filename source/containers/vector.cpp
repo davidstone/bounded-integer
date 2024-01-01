@@ -56,12 +56,10 @@ struct [[clang::trivial_abi]] vector : private lexicographical_comparison::base 
 	constexpr vector(Source) {
 	}
 
-	// If `other.capacity() > max_size`, the behavior is undefined.
-	// TODO: throw exception instead
 	template<array_size_type<std::byte> other_max_size>
 	constexpr explicit vector(vector<T, other_max_size> && other) noexcept:
 		m_storage(std::move(other.m_storage)),
-		m_size(bounded::assume_in_range<size_type>(std::exchange(other.m_size, 0_bi)))
+		m_size(bounded::check_in_range<size_type>(std::exchange(other.m_size, 0_bi)))
 	{
 	}
 	// TODO: Support trivial relocatability
