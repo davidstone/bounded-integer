@@ -40,7 +40,7 @@ struct [[clang::trivial_abi]] dynamic_array : private lexicographical_comparison
 	constexpr dynamic_array() = default;
 
 	constexpr explicit dynamic_array(constructor_initializer_range<dynamic_array> auto && source):
-		m_data(::bounded::assume_in_range<size_type>(::containers::linear_size(source)))
+		m_data(::bounded::check_in_range<size_type>(::containers::linear_size(source)))
 	{
 		containers::uninitialized_copy_no_overlap(OPERATORS_FORWARD(source), ::containers::begin(*this));
 	}
