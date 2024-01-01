@@ -11,7 +11,7 @@ import containers.algorithms.compare;
 import containers.algorithms.zip;
 
 import containers.array;
-import containers.vector;
+import containers.dynamic_array;
 
 import bounded;
 import std_module;
@@ -45,5 +45,5 @@ static_assert(inner_ranges_equal(
 ));
 static_assert(inner_ranges_equal(
 	containers::chunk_by(containers::array({1, 0, 1}), std::less()),
-	containers::array({containers::vector({1}), containers::vector({0, 1})})
+	containers::array({containers::dynamic_array({1}), containers::dynamic_array({0, 1})})
 ));
