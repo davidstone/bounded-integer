@@ -105,7 +105,7 @@ struct [[clang::trivial_abi]] dynamic_array : private lexicographical_comparison
 			::containers::copy(OPERATORS_FORWARD(range), ::containers::begin(*this));
 		} else {
 			clear();
-			*this = dynamic_array<T>(OPERATORS_FORWARD(range));
+			*this = dynamic_array<T, Size>(OPERATORS_FORWARD(range));
 		}
 	}
 
