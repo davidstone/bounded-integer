@@ -25,6 +25,7 @@ import containers.maximum_array_size;
 import containers.range;
 import containers.range_value_t;
 import containers.range_view;
+import containers.size_then_use_range;
 import containers.uninitialized_dynamic_array;
 
 import bounded;
@@ -39,7 +40,8 @@ struct [[clang::trivial_abi]] dynamic_array : private lexicographical_comparison
 
 	constexpr dynamic_array() = default;
 
-	constexpr explicit dynamic_array(constructor_initializer_range<dynamic_array> auto && source):
+	template<constructor_initializer_range<dynamic_array> Source> requires size_then_use_range<Source>
+	constexpr explicit dynamic_array(Source && source):
 		m_data(::bounded::check_in_range<size_type>(::containers::linear_size(source)))
 	{
 		containers::uninitialized_copy_no_overlap(OPERATORS_FORWARD(source), ::containers::begin(*this));
@@ -98,7 +100,7 @@ struct [[clang::trivial_abi]] dynamic_array : private lexicographical_comparison
 		*this = {};
 	}
 
-	template<range Range> requires(!std::is_array_v<Range> or !std::is_reference_v<Range>)
+	template<size_then_use_range Range> requires(!std::is_array_v<Range> or !std::is_reference_v<Range>)
 	constexpr auto assign(Range && range) & -> void {
 		auto const difference = ::containers::linear_size(range);
 		if (difference == size()) {
