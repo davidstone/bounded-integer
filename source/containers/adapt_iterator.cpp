@@ -134,8 +134,11 @@ public:
 		return std::move(m_base);
 	}
 
-	constexpr auto traits() const -> auto && {
+	constexpr auto traits() const & -> auto && {
 		return ::containers::unwrap(m_traits);
+	}
+	constexpr auto traits() && -> auto && {
+		return ::containers::unwrap(std::move(m_traits));
 	}
 
 	OPERATORS_ARROW_DEFINITIONS
@@ -145,7 +148,8 @@ public:
 	}
 
 	friend constexpr auto operator+(adapt_iterator lhs, adapted_addable<Iterator, Traits> auto const rhs) -> adapt_iterator {
-		return adapt_iterator(lhs.traits().add(std::move(lhs).base(), rhs), lhs.traits());
+		auto base = lhs.traits().add(std::move(lhs).base(), rhs);
+		return adapt_iterator(std::move(base), std::move(lhs).traits());
 	}
 
 
