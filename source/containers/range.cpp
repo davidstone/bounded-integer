@@ -32,7 +32,7 @@ concept forward_linked_range = requires(T range) {
 };
 
 export template<typename T>
-concept range = contiguous_range<T> or size_based_range<T> or basic_range<T> or forward_linked_range<T>;
+concept range = basic_range<T> or size_based_range<T> or contiguous_range<T> or forward_linked_range<T>;
 
 } // namespace containers
 
