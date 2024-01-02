@@ -73,19 +73,19 @@ public:
 	{
 	}
 	
-	constexpr auto begin() const & -> iterator auto requires range<Range const &> and adapt_iterator_constructible<decltype(m_traits.get_begin(m_range))> {
+	constexpr auto begin() const & -> iterator auto requires adapt_iterator_constructible<decltype(m_traits.get_begin(bounded::declval<Range const &>()))> {
 		return containers::adapt_iterator(
 			m_traits.get_begin(m_range),
 			iterator_traits()
 		);
 	}
-	constexpr auto begin() & -> iterator auto requires range<Range &> and adapt_iterator_constructible<decltype(m_traits.get_begin(m_range))> {
+	constexpr auto begin() & -> iterator auto requires adapt_iterator_constructible<decltype(m_traits.get_begin(bounded::declval<Range &>()))> {
 		return containers::adapt_iterator(
 			m_traits.get_begin(m_range),
 			iterator_traits()
 		);
 	}
-	constexpr auto begin() && -> iterator auto requires range<Range &&> {
+	constexpr auto begin() && -> iterator auto requires adapt_iterator_constructible<decltype(m_traits.get_begin(bounded::declval<Range &&>()))> {
 		auto traits = iterator_traits();
 		return containers::adapt_iterator(
 			m_traits.get_begin(std::move(*this).m_range),
