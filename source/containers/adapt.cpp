@@ -34,11 +34,6 @@ concept statically_sized_adapted_range = sized_adapted_range<Range, Traits> and 
 	std::remove_reference_t<decltype(traits)>::template get_size<Range>();
 };
 
-template<typename Traits, typename Range>
-concept has_iterator_traits = requires(Traits const traits) {
-	traits.iterator_traits(bounded::declval<Range>());
-};
-
 template<typename Traits>
 constexpr auto get_iterator_traits(Traits const & range_traits, auto & r) -> decltype(auto) {
 	if constexpr (requires { range_traits.iterator_traits(r); }) {
