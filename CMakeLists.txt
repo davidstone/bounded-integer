@@ -351,6 +351,7 @@ target_sources(containers PUBLIC
 		source/containers/iterator_addable.cpp
 		source/containers/iterator_category_base.cpp
 		source/containers/iterator_t.cpp
+		source/containers/iterator_to_sentinel.cpp
 		source/containers/key_comparison_function.cpp
 		source/containers/lazy_push_back.cpp
 		source/containers/lazy_push_back_into_capacity.cpp

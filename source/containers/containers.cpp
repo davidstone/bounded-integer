@@ -84,6 +84,7 @@ export import containers.is_container;
 export import containers.is_empty;
 export import containers.iter_difference_t;
 export import containers.iterator_t;
+export import containers.iterator_to_sentinel;
 export import containers.lazy_push_back;
 export import containers.lazy_push_back_into_capacity;
 export import containers.legacy_iterator;
