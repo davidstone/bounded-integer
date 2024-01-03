@@ -194,7 +194,7 @@ private:
 export template<typename Iterator, typename TraitsStorage>
 constexpr auto adapt_iterator_or_sentinel(Iterator it, TraitsStorage traits) {
 	if constexpr (iterator<Iterator>) {
-		return adapt_iterator(
+		return adapt_iterator<Iterator, TraitsStorage>(
 			std::move(it),
 			std::move(traits)
 		);
