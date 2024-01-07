@@ -16,8 +16,10 @@ import containers.begin_end;
 import containers.default_adapt_traits;
 import containers.default_begin_end_size;
 import containers.iterator;
+import containers.iterator_t;
 import containers.iterator_to_sentinel;
 import containers.range;
+import containers.range_reference_t;
 import containers.stored_function;
 
 import std_module;
@@ -101,32 +103,38 @@ private:
 	[[no_unique_address]] UnaryFunction m_dereference;
 };
 
-export template<typename UnaryFunction>
-constexpr auto transform(range auto && source, UnaryFunction dereference) -> range auto {
+template<typename Function, typename Range>
+concept element_invocable = std::invocable<Function, range_reference_t<Range>>;
+
+template<typename Function, typename Range>
+concept iterator_invocable = std::invocable<Function, iterator_t<Range>>;
+
+export template<range Range, element_invocable<Range> UnaryFunction>
+constexpr auto transform(Range && source, UnaryFunction dereference) -> range auto {
 	return adapt(
 		OPERATORS_FORWARD(source),
 		transform_traits<UnaryFunction, false>(std::move(dereference))
 	);
 }
 
-export template<typename UnaryFunction>
-constexpr auto transform_dereference(range auto && source, UnaryFunction dereference) -> range auto {
+export template<range Range, iterator_invocable<Range> UnaryFunction>
+constexpr auto transform_dereference(Range && source, UnaryFunction dereference) -> range auto {
 	return adapt(
 		OPERATORS_FORWARD(source),
 		transform_traits<UnaryFunction, true>(std::move(dereference))
 	);
 }
 
-export template<typename UnaryFunction>
-constexpr auto transform_non_idempotent(range auto && source, UnaryFunction dereference) -> range auto {
+export template<range Range, element_invocable<Range> UnaryFunction>
+constexpr auto transform_non_idempotent(Range && source, UnaryFunction dereference) -> range auto {
 	return adapt(
 		OPERATORS_FORWARD(source),
 		transform_traits_non_idempotent<UnaryFunction, false>(std::move(dereference))
 	);
 }
 
-export template<typename UnaryFunction>
-constexpr auto transform_dereference_non_idempotent(range auto && source, UnaryFunction dereference) -> range auto {
+export template<range Range, iterator_invocable<Range> UnaryFunction>
+constexpr auto transform_dereference_non_idempotent(Range && source, UnaryFunction dereference) -> range auto {
 	return adapt(
 		OPERATORS_FORWARD(source),
 		transform_traits_non_idempotent<UnaryFunction, true>(std::move(dereference))
