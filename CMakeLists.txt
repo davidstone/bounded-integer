@@ -218,6 +218,7 @@ target_sources(tv_test PRIVATE
 	BASE_DIRS "${CMAKE_CURRENT_SOURCE_DIR}"
 	FILES
 		test/tv/is_valid_index.cpp
+		test/tv/optional.cpp
 		test/tv/variant.cpp
 		test/tv/visit.cpp
 )
