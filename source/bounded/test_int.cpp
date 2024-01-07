@@ -100,4 +100,4 @@ export constexpr auto copy_value(non_copyable_integer const & x) -> non_copyable
 	return non_copyable_integer(x.value());
 }
 
-} // namespace bounded
+} // namespace bounded_test
