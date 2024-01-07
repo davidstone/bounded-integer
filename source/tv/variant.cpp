@@ -272,6 +272,18 @@ private:
 
 	[[no_unique_address]] variant_index<Ts...> m_index;
 	[[no_unique_address]] variadic_union<Ts...> m_data;
+
+	constexpr explicit variant(bounded::tombstone_tag, auto const make):
+		m_index(make()),
+		m_data(uninitialized_union())
+	{
+	}
+	friend bounded::tombstone_traits<variant>;
+	friend bounded::tombstone_traits_composer<&variant::m_index>;
 };
 
 } // namespace tv
+
+template<typename... Ts>
+struct bounded::tombstone_traits<tv::variant<Ts...>> : bounded::tombstone_traits_composer<&tv::variant<Ts...>::m_index> {
+};

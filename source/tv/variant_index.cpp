@@ -6,6 +6,7 @@
 export module tv.variant_index;
 
 import tv.get_index;
+
 import bounded;
 import std_module;
 
@@ -55,9 +56,20 @@ struct variant_index {
 	}
 private:
 	[[no_unique_address]] integer_index m_index;
+
+	constexpr explicit variant_index(bounded::tombstone_tag, auto const make):
+		m_index(make())
+	{
+	}
+	friend bounded::tombstone_traits<variant_index>;
+	friend bounded::tombstone_traits_composer<&variant_index::m_index>;
 };
 
 } // namespace tv
+
+template<typename... Ts>
+struct bounded::tombstone_traits<tv::variant_index<Ts...>> : bounded::tombstone_traits_composer<&tv::variant_index<Ts...>::m_index> {
+};
 
 using namespace bounded::literal;
 
