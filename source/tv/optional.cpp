@@ -62,8 +62,15 @@ struct optional_storage {
 		return std::move(m_data)[value_index];
 	}
 
-	// TODO: Implement tombstone_traits for variant
-	static constexpr auto spare_representations = 0_bi;
+	using tombstone_t = bounded::tombstone_traits<variant<none_t, T>>;
+	static constexpr auto spare_representations = tombstone_t::spare_representations;
+	constexpr explicit optional_storage(bounded::tombstone_tag, auto const index) noexcept:
+		m_data(tombstone_t::make(index))
+	{
+	}
+	constexpr auto tombstone_index() const noexcept {
+		return tombstone_t::index(m_data);
+	}
 
 private:
 	static constexpr auto none_index = 0_bi;

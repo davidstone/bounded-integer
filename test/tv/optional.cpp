@@ -276,3 +276,5 @@ static_assert(tv::optional<tv::optional<two_spare_representations>>() == tv::non
 static_assert(tv::optional<tv::optional<two_spare_representations>>(tv::optional<two_spare_representations>()) != tv::none);
 static_assert(tv::optional<tv::optional<two_spare_representations>>(tv::optional<two_spare_representations>()) == tv::optional<two_spare_representations>());
 static_assert(*tv::optional<tv::optional<two_spare_representations>>(tv::optional<two_spare_representations>(two_spare_representations(3))) == two_spare_representations(3));
+
+static_assert(sizeof(tv::optional<int>) == sizeof(tv::optional<tv::optional<int>>));
