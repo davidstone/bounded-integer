@@ -219,6 +219,7 @@ target_sources(tv_test PRIVATE
 	FILES
 		test/tv/is_valid_index.cpp
 		test/tv/optional.cpp
+		test/tv/tuple.cpp
 		test/tv/variant.cpp
 		test/tv/visit.cpp
 )
