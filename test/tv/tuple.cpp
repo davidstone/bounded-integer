@@ -216,27 +216,4 @@ constexpr auto d = tv::tuple(0, empty{}, 4);
 static_assert(a != d);
 static_assert(a > d);
 
-struct {
-	static constexpr auto operator()(float const x) {
-		return static_cast<int>(x + 1);
-	}
-	static constexpr auto operator()(float const x, float const y) {
-		return static_cast<int>(x + y);
-	}
-	static constexpr auto operator()(int const x) {
-		return static_cast<float>(x + 1);
-	}
-	static constexpr auto operator()(int const x, int const y) {
-		return static_cast<float>(x + y);
-	}
-} constexpr increment_and_swap_types{};
-
-constexpr auto input_tuple = tv::make_tuple(0, 1.0F, 2, 3.0F, 4);
-constexpr auto type_swapped = tv::transform(increment_and_swap_types, input_tuple);
-static_assert(std::same_as<decltype(type_swapped), tv::tuple<float, int, float, int, float> const>);
-static_assert(type_swapped == tv::make_tuple(1.0F, 2, 3.0F, 4, 5.0F));
-constexpr auto merged = tv::transform(increment_and_swap_types, input_tuple, input_tuple);
-static_assert(std::same_as<decltype(merged), tv::tuple<float, int, float, int, float> const>);
-static_assert(merged == tv::make_tuple(0.0F, 2, 4.0F, 6, 8.0F));
-
 } // namespace

@@ -195,6 +195,7 @@ target_sources(tv PUBLIC
 		source/tv/optional.cpp
 		source/tv/overload.cpp
 		source/tv/single_element_storage.cpp
+		source/tv/transform.cpp
 		source/tv/tuple.cpp
 		source/tv/tv.cpp
 		source/tv/variadic_union.cpp
@@ -219,6 +220,7 @@ target_sources(tv_test PRIVATE
 	FILES
 		test/tv/is_valid_index.cpp
 		test/tv/optional.cpp
+		test/tv/transform.cpp
 		test/tv/tuple.cpp
 		test/tv/variant.cpp
 		test/tv/visit.cpp
