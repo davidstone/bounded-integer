@@ -201,52 +201,6 @@ export template<std::size_t index, typename Tuple>
 using tuple_element = typename tuple_element_c<index, Tuple>::type;
 
 
-template<typename Indexes, typename Tuple>
-struct indexed_tuple;
-
-template<std::size_t... indexes, typename Tuple>
-struct indexed_tuple<std::index_sequence<indexes...>, Tuple> {
-	Tuple && tuple;
-};
-
-template<typename Tuple>
-indexed_tuple(Tuple &&) -> indexed_tuple<std::make_index_sequence<tuple_size<Tuple>.value()>, Tuple>;
-
-struct tuple_cat_t {
-private:
-	template<std::size_t... first_indexes, typename First, std::size_t... second_indexes, typename Second>
-	static constexpr auto cat_impl(
-		indexed_tuple<std::index_sequence<first_indexes...>, First> first,
-		indexed_tuple<std::index_sequence<second_indexes...>, Second> second,
-		auto && ... tail
-	) {
-		return operator()(
-			tuple<
-				tuple_element<first_indexes, First>...,
-				tuple_element<second_indexes, Second>...
-			>(
-				OPERATORS_FORWARD(first).tuple[bounded::constant<first_indexes>]...,
-				OPERATORS_FORWARD(second).tuple[bounded::constant<second_indexes>]...
-			),
-			OPERATORS_FORWARD(tail).tuple...
-		);
-	}
-
-public:
-	template<typename... Tuples> requires(... and bounded::constructible_from<std::decay_t<Tuples>, Tuples &&>)
-	static constexpr auto operator()(Tuples && ... tuples) {
-		if constexpr (sizeof...(tuples) == 0) {
-			return tuple<>{};
-		} else if constexpr (sizeof...(tuples) == 1) {
-			return (..., OPERATORS_FORWARD(tuples));
-		} else {
-			return cat_impl(indexed_tuple{OPERATORS_FORWARD(tuples)}...);
-		}
-	}
-};
-export constexpr auto tuple_cat = tuple_cat_t();
-
-
 export template<std::size_t index>
 constexpr auto && get(tuple_like auto && t) {
 	return OPERATORS_FORWARD(t)[bounded::constant<index>];

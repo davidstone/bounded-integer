@@ -198,6 +198,7 @@ target_sources(tv PUBLIC
 		source/tv/single_element_storage.cpp
 		source/tv/transform.cpp
 		source/tv/tuple.cpp
+		source/tv/tuple_cat.cpp
 		source/tv/tv.cpp
 		source/tv/variadic_union.cpp
 		source/tv/variant.cpp

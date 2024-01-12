@@ -14,5 +14,6 @@ export import tv.overload;
 export import tv.single_element_storage;
 export import tv.transform;
 export import tv.tuple;
+export import tv.tuple_cat;
 export import tv.variant;
 export import tv.visit;
