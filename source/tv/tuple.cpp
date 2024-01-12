@@ -247,24 +247,6 @@ public:
 export constexpr auto tuple_cat = tuple_cat_t();
 
 
-struct apply_t {
-private:
-	template<std::size_t... indexes>
-	static constexpr decltype(auto) implementation(auto && tuple_args, std::index_sequence<indexes...>, auto && function) {
-		return OPERATORS_FORWARD(function)(OPERATORS_FORWARD(tuple_args)[bounded::constant<indexes>]...);
-	}
-public:
-	static constexpr decltype(auto) operator()(auto && tuple_args, auto && function) {
-		return implementation(
-			OPERATORS_FORWARD(tuple_args),
-			bounded::make_index_sequence(tuple_size<decltype(tuple_args)>),
-			OPERATORS_FORWARD(function)
-		);
-	}
-};
-export constexpr auto apply = apply_t();
-
-
 export template<std::size_t index>
 constexpr auto && get(tuple_like auto && t) {
 	return OPERATORS_FORWARD(t)[bounded::constant<index>];
