@@ -8,17 +8,33 @@ export module tv.tuple_size;
 import tv.tuple;
 
 import bounded;
+import numeric_traits;
 import std_module;
 
 namespace tv {
 
-template<typename Tuple>
-struct tuple_size_c;
+export template<typename>
+extern numeric_traits::incomplete tuple_size;
 
-template<typename... Types>
-struct tuple_size_c<tuple<Types...>> : std::integral_constant<std::size_t, sizeof...(Types)> {};
+template<typename T>
+concept has_tuple_size = !std::same_as<decltype(tuple_size<T>), numeric_traits::incomplete>;
 
-export template<typename Tuple>
-constexpr auto tuple_size = bounded::constant<tuple_size_c<std::decay_t<Tuple>>::value>;
+template<has_tuple_size T>
+constexpr auto tuple_size<T const> = tuple_size<T>;
+
+template<has_tuple_size T>
+constexpr auto tuple_size<T volatile> = tuple_size<T>;
+
+template<has_tuple_size T>
+constexpr auto tuple_size<T const volatile> = tuple_size<T>;
+
+template<has_tuple_size T>
+constexpr auto tuple_size<T &> = tuple_size<T>;
+
+template<has_tuple_size T>
+constexpr auto tuple_size<T &&> = tuple_size<T>;
+
+template<typename... Ts>
+constexpr auto tuple_size<tuple<Ts...>> = bounded::constant<sizeof...(Ts)>;
 
 } // namespace tv
