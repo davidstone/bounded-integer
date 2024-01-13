@@ -226,6 +226,7 @@ target_sources(tv_test PRIVATE
 		test/tv/transform.cpp
 		test/tv/tuple.cpp
 		test/tv/tuple_cat.cpp
+		test/tv/tuple_size.cpp
 		test/tv/variant.cpp
 		test/tv/visit.cpp
 )
