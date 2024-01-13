@@ -179,16 +179,6 @@ export constexpr auto tie = [](auto && ... args) {
 	return tuple<decltype(args)...>(OPERATORS_FORWARD(args)...);
 };
 
-template<typename Tuple>
-struct tuple_size_c;
-
-template<typename... Types>
-struct tuple_size_c<tuple<Types...>> : std::integral_constant<std::size_t, sizeof...(Types)> {};
-
-export template<typename Tuple>
-constexpr auto tuple_size = bounded::constant<tuple_size_c<std::decay_t<Tuple>>::value>;
-
-
 template<std::size_t index, typename Tuple>
 struct tuple_element_c;
 

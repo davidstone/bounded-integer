@@ -10,6 +10,7 @@ module;
 export module tv.transform;
 
 import tv.tuple;
+import tv.tuple_size;
 
 import bounded;
 import std_module;
