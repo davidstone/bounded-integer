@@ -37,8 +37,8 @@ private:
 	) {
 		return operator()(
 			tuple<
-				tuple_element<first_indexes, First>...,
-				tuple_element<second_indexes, Second>...
+				tuple_element<first_indexes, std::remove_cvref_t<First>>...,
+				tuple_element<second_indexes, std::remove_cvref_t<Second>>...
 			>(
 				OPERATORS_FORWARD(first).tuple[bounded::constant<first_indexes>]...,
 				OPERATORS_FORWARD(second).tuple[bounded::constant<second_indexes>]...
