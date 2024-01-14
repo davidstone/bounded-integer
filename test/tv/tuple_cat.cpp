@@ -17,9 +17,9 @@ static_assert(tv::tuple_cat(tv::tuple(1, 2)) == tv::tuple(1, 2));
 static_assert(tv::tuple_cat(tv::tuple(), tv::tuple()) == tv::tuple());
 static_assert(tv::tuple_cat(tv::tuple(), tv::tuple(1)) == tv::tuple(1));
 static_assert(tv::tuple_cat(tv::tuple(1), tv::tuple()) == tv::tuple(1));
-static_assert(tv::tuple_cat(tv::tuple(1), tv::tuple()) == tv::tuple(1));
 static_assert(tv::tuple_cat(tv::tuple(1), tv::tuple(2)) == tv::tuple(1, 2));
 static_assert(tv::tuple_cat(tv::tuple(1, 2), tv::tuple(3)) == tv::tuple(1, 2, 3));
+static_assert(tv::tuple_cat(tv::tuple(1, 2), tv::tuple(3, 4)) == tv::tuple(1, 2, 3, 4));
 
 static_assert(tv::tuple_cat(tv::tuple(), tv::tuple(), tv::tuple()) == tv::tuple());
 static_assert(tv::tuple_cat(tv::tuple(1), tv::tuple(), tv::tuple()) == tv::tuple(1));
@@ -27,3 +27,4 @@ static_assert(tv::tuple_cat(tv::tuple(), tv::tuple(1), tv::tuple()) == tv::tuple
 static_assert(tv::tuple_cat(tv::tuple(), tv::tuple(), tv::tuple(1)) == tv::tuple(1));
 static_assert(tv::tuple_cat(tv::tuple(1), tv::tuple(), tv::tuple(2)) == tv::tuple(1, 2));
 static_assert(tv::tuple_cat(tv::tuple(1), tv::tuple(2), tv::tuple(3)) == tv::tuple(1, 2, 3));
+static_assert(tv::tuple_cat(tv::tuple(1, 2), tv::tuple(3), tv::tuple()) == tv::tuple(1, 2, 3));
