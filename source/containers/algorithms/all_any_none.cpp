@@ -13,29 +13,42 @@ import containers.algorithms.find;
 import containers.array;
 import containers.begin_end;
 import containers.range;
+import containers.range_reference_t;
 
 import bounded;
 
 namespace containers {
 
-export constexpr auto all(range auto && range, auto predicate) {
+export constexpr auto all(range auto && range, auto predicate) -> bool {
 	return ::containers::find_if_not(OPERATORS_FORWARD(range), predicate) == containers::end(OPERATORS_FORWARD(range));
 }
-export constexpr auto all_equal(range auto && range, auto && value) {
+export template<range Range>
+constexpr auto all_equal(
+	Range && range,
+	bounded::equality_comparable<range_reference_t<Range>> auto && value
+) -> bool {
 	return ::containers::all(OPERATORS_FORWARD(range), bounded::equal_to(OPERATORS_FORWARD(value)));
 }
 
-export constexpr auto any(range auto && range, auto predicate) {
+export constexpr auto any(range auto && range, auto predicate) -> bool {
 	return ::containers::find_if(OPERATORS_FORWARD(range), predicate) != containers::end(OPERATORS_FORWARD(range));
 }
-export constexpr auto any_equal(range auto && range, auto && value) {
+export template<range Range>
+constexpr auto any_equal(
+	Range && range,
+	bounded::equality_comparable<range_reference_t<Range>> auto && value
+) -> bool {
 	return ::containers::any(OPERATORS_FORWARD(range), bounded::equal_to(OPERATORS_FORWARD(value)));
 }
 
-export constexpr auto none(range auto && range, auto predicate) {
+export constexpr auto none(range auto && range, auto predicate) -> bool {
 	return ::containers::find_if(OPERATORS_FORWARD(range), predicate) == containers::end(OPERATORS_FORWARD(range));
 }
-export constexpr auto none_equal(range auto && range, auto && value) {
+export template<range Range>
+constexpr auto none_equal(
+	Range && range,
+	bounded::equality_comparable<range_reference_t<Range>> auto && value
+) -> bool {
 	return ::containers::none(OPERATORS_FORWARD(range), bounded::equal_to(OPERATORS_FORWARD(value)));
 }
 
