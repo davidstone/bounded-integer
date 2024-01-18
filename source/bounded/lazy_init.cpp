@@ -22,6 +22,9 @@ export constexpr auto lazy_init = lazy_init_t();
 export template<typename T>
 struct no_lazy_construction {
 	T value;
+	constexpr operator T() && {
+		return OPERATORS_FORWARD(value);
+	}
 };
 template<typename T>
 no_lazy_construction(T) -> no_lazy_construction<T>;

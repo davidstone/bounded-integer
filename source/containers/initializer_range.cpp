@@ -26,7 +26,7 @@ export template<typename Source, typename Target>
 concept initializer_range =
 	!std::is_array_v<std::remove_cvref_t<Source>> and
 	range<Source> and
-	bounded::constructible_from<range_value_t<Target>, source_range_reference_t<Source>>;
+	bounded::convertible_to<source_range_reference_t<Source>, range_value_t<Target>>;
 
 // This avoids checking properties of an incomplete type
 export template<typename Source, typename Target>
