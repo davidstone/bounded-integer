@@ -17,4 +17,5 @@ export import tv.tuple;
 export import tv.tuple_cat;
 export import tv.tuple_size;
 export import tv.variant;
+export import tv.variant_index;
 export import tv.visit;
