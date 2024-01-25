@@ -16,7 +16,6 @@ namespace tv {
 
 export template<typename T, std::size_t n>
 struct indexed_value {
-	static_assert(std::is_reference_v<T>);
 	constexpr explicit indexed_value(T value_):
 		m_value(OPERATORS_FORWARD(value_))
 	{
