@@ -65,6 +65,13 @@ struct counted_iterator : iterator_category_base<Iterator> {
 	{
 	}
 
+	constexpr auto base() const & -> Iterator const & {
+		return m_it;
+	}
+	constexpr auto base() && -> Iterator && {
+		return m_it;
+	}
+
 	constexpr decltype(auto) operator*() const {
 		return *m_it;
 	}
@@ -141,6 +148,10 @@ struct random_access_counted_iterator {
 	constexpr explicit random_access_counted_iterator(Iterator it):
 		m_it(std::move(it))
 	{
+	}
+
+	constexpr auto base() const -> Iterator {
+		return m_it;
 	}
 
 	constexpr decltype(auto) operator*() const {
