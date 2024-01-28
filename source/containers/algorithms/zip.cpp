@@ -15,6 +15,7 @@ import containers.range;
 import containers.range_view;
 import containers.size;
 import containers.sized_range;
+import containers.take;
 
 import bounded;
 import numeric_traits;
@@ -62,6 +63,9 @@ struct zip_difference_type_impl<> {
 template<typename... Sentinels>
 struct zip_sentinel;
 
+template<typename... Sentinels>
+struct zip_smallest_sentinel;
+
 template<typename... Iterators>
 struct zip_iterator {
 	using difference_type = typename zip_difference_type_impl<Iterators...>::type;
@@ -90,6 +94,8 @@ struct zip_iterator {
 private:
 	template<typename... Sentinels>
 	friend struct zip_sentinel;
+	template<typename... Sentinels>
+	friend struct zip_smallest_sentinel;
 	static constexpr auto indexes = std::make_index_sequence<sizeof...(Iterators)>();
 	[[no_unique_address]] tv::tuple<Iterators...> m_its;
 };
@@ -97,6 +103,11 @@ private:
 template<std::size_t... indexes>
 constexpr auto all(auto const & lhs, auto const & rhs, std::index_sequence<indexes...>, auto const predicate) {
 	return (... and predicate(lhs[bounded::constant<indexes>], rhs[bounded::constant<indexes>]));
+}
+
+template<std::size_t... indexes>
+constexpr auto any(auto const & lhs, auto const & rhs, std::index_sequence<indexes...>, auto const predicate) {
+	return (... or predicate(lhs[bounded::constant<indexes>], rhs[bounded::constant<indexes>]));
 }
 
 template<typename... Sentinels>
@@ -115,6 +126,21 @@ struct zip_sentinel {
 		} else {
 			throw std::runtime_error("Mismatched sizes for inputs to zip");
 		}
+	}
+private:
+	[[no_unique_address]] tv::tuple<Sentinels...> m_sentinels;
+};
+
+template<typename... Sentinels>
+struct zip_smallest_sentinel {
+	constexpr explicit zip_smallest_sentinel(Sentinels... sentinels):
+		m_sentinels(std::move(sentinels)...)
+	{
+	}
+	template<typename... Iterators> requires(sizeof...(Iterators) == sizeof...(Sentinels))
+	friend constexpr auto operator==(zip_iterator<Iterators...> const & lhs, zip_smallest_sentinel const rhs) -> bool {
+		constexpr auto indexes = std::make_index_sequence<sizeof...(Sentinels)>();
+		return any(lhs.m_its, rhs.m_sentinels, indexes, std::equal_to());
 	}
 private:
 	[[no_unique_address]] tv::tuple<Sentinels...> m_sentinels;
@@ -147,11 +173,17 @@ struct use_end {
 	}
 };
 
-template<std::size_t... indexes>
+template<bool check_equal_sizes, std::size_t... indexes>
 constexpr auto make_zip_sentinel(auto && ranges, std::index_sequence<indexes...>) {
-	return zip_sentinel(
-		containers::end(OPERATORS_FORWARD(ranges)[bounded::constant<indexes>])...
-	);
+	if constexpr (check_equal_sizes) {
+		return zip_sentinel(
+			containers::end(OPERATORS_FORWARD(ranges)[bounded::constant<indexes>])...
+		);
+	} else {
+		return zip_smallest_sentinel(
+			containers::end(OPERATORS_FORWARD(ranges)[bounded::constant<indexes>])...
+		);
+	}
 }
 
 template<typename Range>
@@ -170,28 +202,46 @@ concept supports_end = requires(Range r) {
 template<typename... Ranges>
 concept all_support_end = (... and supports_end<Ranges>);
 
-export template<range... Ranges>
-struct zip {
+struct size_maybe_checked {};
+
+export template<bool check_equal_sizes, range... Ranges>
+struct zip_impl {
 private:
 	static constexpr auto all_are_sized = (... and sized_range<Ranges>);
 	static constexpr auto indexes = std::make_index_sequence<sizeof...(Ranges)>();
-	tv::tuple<Ranges...> m_ranges;
 
-	static constexpr auto end_impl(auto && ranges) {
-		if constexpr (all_are_sized) {
-			return ::containers::make_zip_iterator(OPERATORS_FORWARD(ranges), indexes, use_end());
+	static constexpr auto as_tuple(Ranges && ... ranges) {
+		if constexpr (all_are_sized and !check_equal_sizes and sizeof...(Ranges) != 0) {
+			auto const min = bounded::min(containers::size(ranges)...);
+			return tv::tuple(containers::take(OPERATORS_FORWARD(ranges), min)...);
 		} else {
-			return ::containers::make_zip_sentinel(OPERATORS_FORWARD(ranges), indexes);
+			return tv::tuple<Ranges...>(OPERATORS_FORWARD(ranges)...);
 		}
 	}
 
-	struct size_maybe_checked {};
-	constexpr explicit zip(size_maybe_checked, Ranges && ... ranges):
-		m_ranges(OPERATORS_FORWARD(ranges)...)
+	decltype(as_tuple(bounded::declval<Ranges>()...)) m_ranges;
+
+	static constexpr auto end_impl(auto && ranges) {
+		if constexpr (all_are_sized) {
+			return ::containers::make_zip_iterator(
+				OPERATORS_FORWARD(ranges),
+				indexes,
+				use_end()
+			);
+		} else {
+			return ::containers::make_zip_sentinel<check_equal_sizes>(
+				OPERATORS_FORWARD(ranges),
+				indexes
+			);
+		}
+	}
+
+	constexpr explicit zip_impl(size_maybe_checked, Ranges && ... ranges):
+		m_ranges(as_tuple(OPERATORS_FORWARD(ranges)...))
 	{
 	}
 	static constexpr auto maybe_check_sizes(Ranges const & ... ranges) -> size_maybe_checked {
-		if constexpr (all_are_sized) {
+		if constexpr (all_are_sized and check_equal_sizes) {
 			if (!all_are_equal(containers::size(ranges)...)) {
 				throw std::runtime_error("Mismatched sizes in zip");
 			}
@@ -199,8 +249,8 @@ private:
 		return size_maybe_checked();
 	}
 public:
-	constexpr explicit zip(Ranges && ... ranges):
-		zip(maybe_check_sizes(ranges...), OPERATORS_FORWARD(ranges)...)
+	constexpr explicit zip_impl(Ranges && ... ranges):
+		zip_impl(maybe_check_sizes(ranges...), OPERATORS_FORWARD(ranges)...)
 	{
 	}
 
@@ -233,7 +283,34 @@ public:
 	}
 };
 
+export template<range... Ranges>
+struct zip : private zip_impl<true, Ranges...> {
+	constexpr explicit zip(Ranges && ... ranges):
+		zip_impl<true, Ranges...>(OPERATORS_FORWARD(ranges)...)
+	{
+	}
+
+	using zip_impl<true, Ranges...>::begin;
+	using zip_impl<true, Ranges...>::end;
+	using zip_impl<true, Ranges...>::size;
+};
+
 template<typename... Ranges>
 zip(Ranges && ...) -> zip<Ranges...>;
+
+export template<range... Ranges>
+struct zip_smallest : private zip_impl<false, Ranges...> {
+	constexpr explicit zip_smallest(Ranges && ... ranges):
+		zip_impl<false, Ranges...>(OPERATORS_FORWARD(ranges)...)
+	{
+	}
+
+	using zip_impl<false, Ranges...>::begin;
+	using zip_impl<false, Ranges...>::end;
+	using zip_impl<false, Ranges...>::size;
+};
+
+template<typename... Ranges>
+zip_smallest(Ranges && ...) -> zip_smallest<Ranges...>;
 
 } // namespace containers

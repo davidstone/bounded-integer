@@ -34,14 +34,20 @@ using containers::operator--;
 using namespace bounded::literal;
 
 static_assert(containers::iterator<containers::iterator_t<decltype(containers::zip())>>);
+static_assert(containers::iterator<containers::iterator_t<decltype(containers::zip_smallest())>>);
 
 static_assert(containers::is_empty(containers::zip()));
+static_assert(containers::is_empty(containers::zip_smallest()));
 
 constexpr auto a1 = containers::array({1, 2});
 constexpr auto a2 = containers::array({3, 4});
+constexpr auto a3 = containers::array({3, 4, 5});
 constexpr auto expected = containers::array({tv::tuple(1, 3), tv::tuple(2, 4)});
 static_assert(containers::equal(containers::zip(a1), a1));
+static_assert(containers::equal(containers::zip_smallest(a1), a1));
 static_assert(containers::equal(containers::zip(a1, a2), expected));
+static_assert(containers::equal(containers::zip_smallest(a1, a2), expected));
+static_assert(containers::equal(containers::zip_smallest(a1, a3), expected));
 
 
 struct input_iterator {
@@ -74,8 +80,13 @@ constexpr auto make(int value) {
 }
 
 static_assert(containers::is_empty(containers::zip(make(0))));
+static_assert(containers::is_empty(containers::zip_smallest(make(0))));
 static_assert(containers::equal(
 	containers::zip(make(1)),
+	containers::array({tv::tuple(1)})
+));
+static_assert(containers::equal(
+	containers::zip_smallest(make(1)),
 	containers::array({tv::tuple(1)})
 ));
 static_assert(containers::equal(
@@ -83,8 +94,21 @@ static_assert(containers::equal(
 	containers::array({tv::tuple(1, 1)})
 ));
 static_assert(containers::equal(
+	containers::zip_smallest(make(1), make(1)),
+	containers::array({tv::tuple(1, 1)})
+));
+static_assert(containers::equal(
 	containers::zip(make(2), a2),
 	containers::array({tv::tuple(2, 3), tv::tuple(1, 4)})
+));
+static_assert(containers::equal(
+	containers::zip_smallest(make(2), a2),
+	containers::array({tv::tuple(2, 3), tv::tuple(1, 4)})
+));
+
+static_assert(containers::equal(
+	containers::zip_smallest(make(3), a2),
+	containers::array({tv::tuple(3, 3), tv::tuple(2, 4)})
 ));
 
 TEST_CASE("unequal-sized zips throws with sized inputs", "[zip]") {
