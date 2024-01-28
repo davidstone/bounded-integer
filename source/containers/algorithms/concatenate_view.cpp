@@ -24,6 +24,7 @@ import containers.iterator_t;
 import containers.range_reference_t;
 import containers.range_view;
 import containers.size;
+import containers.sized_range;
 import containers.subtractable;
 
 import bounded;
@@ -184,7 +185,7 @@ struct concatenate_view_iterator {
 	friend constexpr auto operator-(
 		std::default_sentinel_t,
 		concatenate_view_iterator const rhs
-	) {
+	) requires(... and sized_range<RangeViews>) {
 		auto transform = [](auto const range) { return containers::size(range); };
 		return tv::apply(
 			tv::transform(transform, rhs.m_range_views),
