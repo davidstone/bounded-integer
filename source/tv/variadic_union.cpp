@@ -44,18 +44,17 @@ union [[clang::trivial_abi]] variadic_union<T, Ts...> {
 	~variadic_union() requires(bounded::trivially_destructible<T> and ... and bounded::trivially_destructible<Ts>) = default;
 	constexpr ~variadic_union() {}
 
+	template<auto n>
+	constexpr auto operator[](this auto && v, bounded::constant_t<n> const index) -> auto && {
+		if constexpr (index == 0_bi) {
+			return OPERATORS_FORWARD(v).head;
+		} else {
+			return OPERATORS_FORWARD(v).tail[index - 1_bi];
+		}
+	}
+
 	[[no_unique_address]] T head;
 	[[no_unique_address]] variadic_union<Ts...> tail;
 };
-
-
-export template<auto n> requires(n >= 0)
-constexpr auto && get_union_element(auto && v, bounded::constant_t<n> const index) {
-	if constexpr (index == 0_bi) {
-		return OPERATORS_FORWARD(v).head;
-	} else {
-		return get_union_element(OPERATORS_FORWARD(v).tail, index - 1_bi);
-	}
-}
 
 } // namespace tv

@@ -233,7 +233,7 @@ private:
 		constexpr auto index_value = ::tv::get_index(index, bounded::type<Ts>...);
 		m_index = variant_index<Ts...>(index_value);
 		auto & data = bounded::construct_at(m_data, [&] { return variadic_union<Ts...>(index_value, OPERATORS_FORWARD(construct_)); });
-		return ::tv::get_union_element(data, index_value);
+		return data[index_value];
 	}
 
 	constexpr variant(auto && other, copy_move_tag):
@@ -264,10 +264,9 @@ private:
 	}
 
 	static constexpr auto && operator_bracket(auto && data, auto const index_) {
-		return ::tv::get_union_element(
-			OPERATORS_FORWARD(data),
+		return OPERATORS_FORWARD(data)[
 			::tv::get_index(index_, bounded::type<Ts>...)
-		);
+		];
 	}
 
 	[[no_unique_address]] variant_index<Ts...> m_index;
