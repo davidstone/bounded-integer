@@ -99,7 +99,7 @@ constexpr auto empty_generator = containers::generate_until(
 static_assert(empty_generator.begin() == empty_generator.end());
 
 static_assert([] {
-	for ([[maybe_unused]] auto const _ : empty_generator) {
+	for (auto const _ : empty_generator) {
 	}
 	return true;
 }());
@@ -110,7 +110,7 @@ static_assert([] {
 		[&] { return x *= 2; },
 		[&] { return x > 4; }
 	);
-	for ([[maybe_unused]] auto const _ : g) {
+	for (auto const _ : g) {
 	}
 	return x == 8;
 }());

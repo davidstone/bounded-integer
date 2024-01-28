@@ -177,13 +177,13 @@ TEST_CASE("check_size_not_greater_than fails with count of 1 for sized range", "
 
 TEST_CASE("check_size_not_greater_than fails with count of 0 for unsized range", "[check_size_not_greater_than]") {
 	CHECK_THROWS([] {
-		for ([[maybe_unused]] auto const & _ : containers::check_size_not_greater_than(unsized_range, 0_bi)) {
+		for (auto const & _ : containers::check_size_not_greater_than(unsized_range, 0_bi)) {
 		}
 	}());
 }
 TEST_CASE("check_size_not_greater_than fails with count of 1 for unsized range", "[check_size_not_greater_than]") {
 	CHECK_THROWS([] {
-		for ([[maybe_unused]] auto const & _ : containers::check_size_not_greater_than(unsized_range, 1_bi)) {
+		for (auto const & _ : containers::check_size_not_greater_than(unsized_range, 1_bi)) {
 		}
 	}());
 }

@@ -413,7 +413,7 @@ TEST_CASE("sort fuzzer", "[sort]") {
 	constexpr auto max_value = 1000;
 	auto size_distribution = std::uniform_int_distribution(min_size, max_size);
 	auto value_distribution = std::uniform_int_distribution(min_value, max_value);
-	for ([[maybe_unused]] auto const n : containers::integer_range(10000_bi)) {
+	for (auto const _ : containers::integer_range(10000_bi)) {
 		auto container = containers::make_static_vector(containers::generate_n(
 			bounded::assume_in_range(size_distribution(engine), bounded::constant<min_size>, bounded::constant<max_size>),
 			[&] { return value_distribution(engine); }

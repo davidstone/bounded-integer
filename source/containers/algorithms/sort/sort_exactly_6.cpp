@@ -39,7 +39,7 @@ constexpr auto insertion_sort_more_than(auto const first, auto const last, auto 
 	}
 }
 
-export constexpr auto sort_exactly_n(auto it, [[maybe_unused]] bounded::constant_t<6> const size, auto const compare) -> void {
+export constexpr auto sort_exactly_n(auto it, bounded::constant_t<6> const size, auto const compare) -> void {
 	if consteval {
 		::containers::insertion_sort_more_than(it, it + size, 5_bi, compare);
 	} else {

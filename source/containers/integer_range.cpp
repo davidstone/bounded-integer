@@ -203,7 +203,7 @@ static_assert(containers::equal(
 ));
 
 static_assert([]{
-	for (auto const n [[maybe_unused]] : containers::integer_range(1_bi)) {
+	for (auto const _ : containers::integer_range(1_bi)) {
 	}
 	return true;
 }());

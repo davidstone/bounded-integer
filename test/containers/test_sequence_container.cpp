@@ -43,12 +43,12 @@ constexpr auto test_forward_range_concepts() -> bool {
 export template<typename Container>
 constexpr auto test_range_based_for_loop() {
 	auto const ccontainer = Container();
-	for ([[maybe_unused]] auto const & value : ccontainer) {
+	for (auto const & _ : ccontainer) {
 	}
 	auto mcontainer = Container();
-	for ([[maybe_unused]] auto & value : mcontainer) {
+	for (auto & _ : mcontainer) {
 	}
-	for ([[maybe_unused]] auto && value : Container()) {
+	for (auto && _ : Container()) {
 	}
 }
 
