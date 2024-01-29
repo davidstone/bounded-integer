@@ -3,8 +3,7 @@
 # (See accompanying file LICENSE_1_0.txt or copy at
 # http://www.boost.org/LICENSE_1_0.txt)
 
-cmake_minimum_required(VERSION 3.27 FATAL_ERROR)
-cmake_policy(VERSION 3.27...3.28)
+cmake_minimum_required(VERSION 3.28 FATAL_ERROR)
 
 project(bounded_integer LANGUAGES CXX)
 
@@ -19,10 +18,6 @@ if (NOT has_parent)
 	set(CMAKE_CXX_STANDARD 26)
 	set(CMAKE_CXX_STANDARD_REQUIRED On)
 	set(CMAKE_CXX_EXTENSIONS Off)
-
-	if(${CMAKE_VERSION} VERSION_LESS "3.28")
-		set(CMAKE_EXPERIMENTAL_CXX_MODULE_CMAKE_API "aa1f7df0-828a-4fcd-9afc-2dc80491aca7")
-	endif()
 
 	add_subdirectory(dependencies/cmake_strict_defaults)
 	add_subdirectory(dependencies/numeric-traits)
