@@ -184,14 +184,10 @@ public:
 	}
 
 
-	constexpr auto const & operator[](unique_type_identifier<Ts...> auto index_) const & {
-		return operator_bracket(m_data, index_);
-	}
-	constexpr auto & operator[](unique_type_identifier<Ts...> auto index_) & {
-		return operator_bracket(m_data, index_);
-	}
-	constexpr auto && operator[](unique_type_identifier<Ts...> auto index_) && {
-		return operator_bracket(std::move(m_data), index_);
+	constexpr auto operator[](this auto && v, unique_type_identifier<Ts...> auto index_) -> auto && {
+		return OPERATORS_FORWARD(v).m_data[
+			::tv::get_index(index_, bounded::type<Ts>...)
+		];
 	}
 
 	constexpr auto & emplace(auto index, bounded::construct_function_for<type_at<decltype(index)>> auto && construct_) & {
@@ -261,12 +257,6 @@ private:
 				}
 			}
 		);
-	}
-
-	static constexpr auto && operator_bracket(auto && data, auto const index_) {
-		return OPERATORS_FORWARD(data)[
-			::tv::get_index(index_, bounded::type<Ts>...)
-		];
 	}
 
 	[[no_unique_address]] variant_index<Ts...> m_index;
