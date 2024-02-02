@@ -9,4 +9,6 @@ on:
 
 jobs:
   build:
-    uses: davidstone/cmake_strict_defaults/.github/workflows/build-and-test.yml@main
+    runs-on: ubuntu-latest
+    steps:
+    - uses: davidstone/cmake_strict_defaults@main
