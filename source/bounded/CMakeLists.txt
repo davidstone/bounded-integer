@@ -49,6 +49,7 @@ target_sources(bounded PUBLIC
 		builtin_integer.cpp
 		builtin_min_max_value.cpp
 		cast.cpp
+		character.cpp
 		check_in_range.cpp
 		clamp.cpp
 		common_type_and_value_category.cpp

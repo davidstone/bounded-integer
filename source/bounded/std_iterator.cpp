@@ -5,6 +5,7 @@
 
 export module bounded.std_iterator;
 
+import bounded.character;
 import bounded.bounded_integer;
 import bounded.declval;
 import bounded.integer;
@@ -26,7 +27,7 @@ concept std_random_access_iterator =
 		std::same_as<T, typename std::span<value_type>::iterator> or
 		std::same_as<T, typename std::span<value_type const>::iterator> or
 		std::same_as<T, typename std::span<value_type>::const_iterator> or
-		(std::is_trivial_v<value_type> and std::is_standard_layout_v<value_type> and (
+		(character<value_type> and (
 			std::same_as<T, typename std::basic_string_view<value_type>::iterator> or
 			std::same_as<T, typename std::basic_string_view<value_type>::const_iterator>
 		))

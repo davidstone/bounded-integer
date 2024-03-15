@@ -48,14 +48,6 @@ using float_to_unsigned =
 	unknown_floating_point
 >>>;
 
-template<typename T>
-concept character = 
-	std::same_as<T, char> or
-	std::same_as<T, char8_t> or
-	std::same_as<T, char16_t> or
-	std::same_as<T, char32_t> or
-	std::same_as<T, wchar_t>;
-
 namespace to_radix_sort_key_adl {
 
 constexpr auto to_radix_sort_key(bool const value) {
@@ -68,7 +60,7 @@ constexpr auto to_radix_sort_key(std::byte const value) {
 
 template<bounded::builtin_integer T>
 constexpr auto to_radix_sort_key(T const value) {
-	if constexpr (character<T>) {
+	if constexpr (bounded::character<T>) {
 		return static_cast<std::make_unsigned_t<T>>(value);
 	} else if constexpr (bounded::unsigned_builtin<T>) {
 		return value;

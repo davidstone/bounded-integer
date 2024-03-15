@@ -13,6 +13,7 @@ export import bounded.bounded_integer;
 export import bounded.builtin_integer;
 export import bounded.builtin_min_max_value;
 export import bounded.cast;
+export import bounded.character;
 export import bounded.check_in_range;
 export import bounded.clamp;
 export import bounded.common_type_and_value_category;
