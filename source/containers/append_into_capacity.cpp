@@ -40,7 +40,8 @@ constexpr auto append_into_capacity_impl(Target & target, Source && source) -> v
 			target.set_size(original_size + source_size);
 		} else {
 			// TODO: Use an iterator that includes a count if we do not have a
-			// random-access iterator for the target
+			// random-access iterator for the target unless we can always assume
+			// that containers with `set_size` are random-access.
 			auto const new_end = containers::uninitialized_copy_no_overlap(OPERATORS_FORWARD(source), target_position);
 			auto const source_size = ::bounded::assume_in_range<range_size_t<Target>>(new_end - target_position);
 			target.set_size(original_size + source_size);
