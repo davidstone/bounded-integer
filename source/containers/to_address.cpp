@@ -12,22 +12,44 @@ namespace containers {
 template<typename T>
 concept pointer_like = std::is_pointer_v<T> or std::is_null_pointer_v<T>;
 
+template<typename T>
+concept has_member_to_address = requires(T const x) {
+	x.to_address();
+};
+
+template<typename T>
+concept has_pointer_traits = requires(T const x) { std::pointer_traits<T>::to_address(x); };
+
+template<typename T>
+concept has_member_arrow = requires(T const x) { x.operator->(); };
+
 export template<typename T>
-concept to_addressable = pointer_like<T> or requires(T const x) { x.to_address(); };
+concept to_addressable =
+	pointer_like<T> or
+	has_member_to_address<T> or
+	has_pointer_traits<T> or
+	has_member_arrow<T>;
 
 export template<to_addressable Iterator>
 constexpr auto to_address(Iterator const it) {
 	if constexpr (pointer_like<Iterator>) {
 		return it;
-	} else {
+	} else if constexpr (has_member_to_address<Iterator>) {
 		return it.to_address();
+	} else if constexpr (has_pointer_traits<Iterator>) {
+		return std::pointer_traits<Iterator>::to_address(it);
+	} else {
+		return it.operator->();
 	}
 }
 
 } // namespace containers
 
+static_assert(!containers::to_addressable<int>);
+
 static_assert(containers::to_address(nullptr) == nullptr);
 static_assert(containers::to_address(static_cast<void *>(nullptr)) == nullptr);
+static_assert(containers::to_address(std::string_view().begin()) == nullptr);
 
 struct my_iterator {
 	constexpr explicit my_iterator(void * pointer):
