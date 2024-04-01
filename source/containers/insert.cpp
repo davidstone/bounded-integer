@@ -128,7 +128,7 @@ constexpr auto insert(Container & container, iterator_t<Container const &> posit
 				range_size
 			);
 		} else {
-			std::unreachable();
+			throw std::bad_alloc();
 		}
 	}
 }
