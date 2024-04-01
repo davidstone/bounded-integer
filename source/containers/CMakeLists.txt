@@ -105,6 +105,7 @@ target_sources(containers PUBLIC
 		dynamic_array.cpp
 		dynamic_array_data.cpp
 		emplace_back.cpp
+		emplace_back_into_capacity.cpp
 		emplace_front.cpp
 		empty_range.cpp
 		erase_concepts.cpp
