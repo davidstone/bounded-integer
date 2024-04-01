@@ -31,7 +31,7 @@ import containers.is_empty;
 import containers.iter_value_t;
 import containers.iterator;
 import containers.iterator_t;
-import containers.legacy_iterator;
+export import containers.legacy_iterator;
 import containers.maximum_array_size;
 import containers.pop_back;
 import containers.pop_front;
