@@ -26,6 +26,7 @@ import containers.reservable;
 import containers.size;
 import containers.size_then_use_range;
 import containers.sized_range;
+import containers.take;
 
 import bounded;
 import std_module;
@@ -52,9 +53,15 @@ constexpr auto append_impl(Target & target, Source && source) -> void {
 		target.set_size(new_size);
 	} else if constexpr (can_set_size<Target> and !reservable<Target>) {
 		// TODO: Use an iterator that includes a count if we do not have a sized
-		// source range or a random-access iterator for the target
+		// source range or a random-access iterator for the target. Unless we
+		// can always assume that containers with `set_size` are random-access.
+		// TODO: throw `std::bad_alloc` instead of `std::runtime_error`
+		// TODO: Do all containers with `set_size` support `capacity()`?
 		auto const target_position = containers::end(target);
-		auto const new_end = containers::uninitialized_copy_no_overlap(OPERATORS_FORWARD(source), target_position);
+		auto const new_end = containers::uninitialized_copy_no_overlap(
+			::containers::check_size_not_greater_than(OPERATORS_FORWARD(source), target.capacity()),
+			target_position
+		);
 		auto const source_size = [&] {
 			if constexpr (sized_range<Source>) {
 				return containers::size(source);
