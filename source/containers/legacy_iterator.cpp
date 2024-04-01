@@ -13,7 +13,7 @@ module;
 export module containers.legacy_iterator;
 
 import containers.bidirectional_iterator;
-import containers.common_iterator_functions;
+export import containers.common_iterator_functions;
 import containers.contiguous_iterator;
 import containers.forward_iterator;
 import containers.iterator;
