@@ -48,6 +48,7 @@ export import containers.algorithms.uninitialized;
 export import containers.algorithms.unique;
 export import containers.algorithms.zip;
 
+export import containers.std.inplace_vector;
 export import containers.std.vector;
 
 export import containers.adapt;

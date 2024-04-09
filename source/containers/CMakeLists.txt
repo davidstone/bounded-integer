@@ -67,6 +67,7 @@ target_sources(containers PUBLIC
 		algorithms/uninitialized.cpp
 		algorithms/unique.cpp
 		algorithms/zip.cpp
+		std/inplace_vector.cpp
 		std/list.cpp
 		std/std_allocator.cpp
 		std/vector.cpp
