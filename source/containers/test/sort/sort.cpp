@@ -11,6 +11,7 @@ import containers.test.sort.test_sort;
 import containers.algorithms.sort.sort;
 
 import containers.array;
+import containers.legacy_iterator;
 
 import bounded;
 
