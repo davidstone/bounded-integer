@@ -49,14 +49,18 @@ export template<typename T, array_size_type<T> capacity_>
 struct [[clang::trivial_abi]] static_vector : private lexicographical_comparison::base {
 	static_vector() = default;
 
-	static_vector(static_vector &&) requires bounded::trivially_move_constructible<T> = default;
-	constexpr static_vector(static_vector && other) noexcept requires bounded::move_constructible<T> {
+	static_vector(static_vector &&) requires(capacity_ == 0_bi or bounded::trivially_move_constructible<T>) = default;
+	constexpr static_vector(static_vector && other) noexcept
+		requires(capacity_ != 0_bi and !bounded::trivially_move_constructible<T> and bounded::move_constructible<T>)
+	{
 		containers::uninitialized_relocate_no_overlap(other, ::containers::begin(*this));
 		this->m_size = std::exchange(other.m_size, 0_bi);
 	}
 
-	static_vector(static_vector const &) requires bounded::trivially_copy_constructible<T> = default;
-	constexpr static_vector(static_vector const & other) requires bounded::copy_constructible<T> {
+	static_vector(static_vector const &) requires(capacity_ == 0_bi or bounded::trivially_copy_constructible<T>) = default;
+	constexpr static_vector(static_vector const & other)
+		requires(capacity_ != 0_bi and !bounded::trivially_copy_constructible<T> and bounded::copy_constructible<T>)
+	{
 		::containers::assign_to_empty_into_capacity(*this, other);
 	}
 
@@ -72,19 +76,23 @@ struct [[clang::trivial_abi]] static_vector : private lexicographical_comparison
 	constexpr static_vector(Source) {
 	}
 	
-	~static_vector() requires bounded::trivially_destructible<T> = default;
+	~static_vector() requires(capacity_ == 0_bi or bounded::trivially_destructible<T>) = default;
 	constexpr ~static_vector() {
 		::containers::destroy_range(*this);
 	}
 
-	auto operator=(static_vector &&) & -> static_vector & requires bounded::trivially_move_assignable<T> = default;
-	constexpr auto operator=(static_vector && other) & noexcept(std::is_nothrow_move_assignable_v<T> and std::is_nothrow_move_constructible_v<T>)  -> static_vector & requires bounded::move_assignable<T> {
+	auto operator=(static_vector &&) & -> static_vector & requires(capacity_ == 0_bi or bounded::trivially_move_assignable<T>) = default;
+	constexpr auto operator=(static_vector && other) & noexcept(std::is_nothrow_move_assignable_v<T> and std::is_nothrow_move_constructible_v<T>)  -> static_vector &
+		requires(capacity_ != 0_bi and !bounded::trivially_move_assignable<T> and bounded::move_assignable<T>)
+	{
 		containers::assign(*this, std::move(other));
 		return *this;
 	}
 
-	auto operator=(static_vector const &) & -> static_vector & requires bounded::trivially_copy_assignable<T> = default;
-	constexpr auto operator=(static_vector const & other) & -> static_vector & requires bounded::copy_assignable<T> {
+	auto operator=(static_vector const &) & -> static_vector & requires(capacity_ == 0_bi or bounded::trivially_copy_assignable<T>) = default;
+	constexpr auto operator=(static_vector const & other) & -> static_vector &
+		requires(capacity_ != 0_bi and !bounded::trivially_copy_assignable<T> and bounded::copy_assignable<T>)
+	{
 		if (this != std::addressof(other)) {
 			containers::assign(*this, other);
 		}
