@@ -92,11 +92,14 @@ struct inplace_vector {
 	{
 	}
 
+	#if 0
+	// std::from_range_t is not yet generally implemented
 	template<container_compatible_range<T> R>
 	constexpr inplace_vector(std::from_range_t, R && range):
 		m_impl(OPERATORS_FORWARD(range))
 	{
 	}
+	#endif
 
 	inplace_vector(inplace_vector const &) = default;
 	inplace_vector(inplace_vector &&) = default;
