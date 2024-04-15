@@ -5,7 +5,6 @@
 
 export module bounded.arithmetic.modulus;
 
-import bounded.arithmetic.base;
 import bounded.arithmetic.extreme_values;
 import bounded.arithmetic.safe_abs;
 import bounded.bounded_integer;
@@ -13,11 +12,19 @@ import bounded.comparison;
 import bounded.minmax;
 import bounded.homogeneous_equals;
 import bounded.integer;
+import bounded.normalize;
+import bounded.unchecked;
 
 import numeric_traits;
 import std_module;
 
 namespace bounded {
+
+template<typename Min, typename Max>
+struct min_max {
+	Min min;
+	Max max;
+};
 
 using smax_t = numeric_traits::max_signed_t;
 using umax_t = numeric_traits::max_unsigned_t;
@@ -75,72 +82,68 @@ constexpr auto sign_free_value = [](auto const dividend, auto divisor) {
 	return current;
 };
 
-// TODO: make this a lambda after resolution of
-// https://github.com/llvm/llvm-project/issues/59513
-struct modulus_operator_range_t {
-	static constexpr auto operator()(auto const lhs_, auto const rhs_) {
-		constexpr auto lhs = min_max(
-#if 0
-			decltype(lhs_.min)(),
-			decltype(lhs_.max)()
-#endif
-			lhs_.min,
-			lhs_.max
-		);
-		constexpr auto rhs = min_max(
-			decltype(rhs_.min)(),
-			decltype(rhs_.max)()
-		);
-		// The sign of the result is equal to the sign of the lhs. The sign of the
-		// rhs does not matter. Therefore, we use the absolute value of the rhs; we
-		// must be careful when negating due to the possibility of overflow.
-		//
-		// The divisor range cannot terminate on a 0 since that is an invalid value.
-		constexpr auto divisor_min =
-			(rhs.min > constant<0>) ? static_cast<umax_t>(rhs.min) :
-			(rhs.max < constant<0>) ? -static_cast<umax_t>(rhs.max) :
-			1;
-		constexpr auto divisor = min_max(
-			divisor_min,
-			max(
-				safe_abs(rhs.min.value()),
-				safe_abs(rhs.max.value())
-			)
-		);
+constexpr auto modulus_operator_range(auto const lhs, auto const rhs) {
+	// The sign of the result is equal to the sign of the lhs. The sign of the
+	// rhs does not matter. Therefore, we use the absolute value of the rhs; we
+	// must be careful when negating due to the possibility of overflow.
+	//
+	// The divisor range cannot terminate on a 0 since that is an invalid value.
+	constexpr auto divisor_min =
+		(rhs.min > constant<0>) ? static_cast<umax_t>(rhs.min) :
+		(rhs.max < constant<0>) ? -static_cast<umax_t>(rhs.max) :
+		1;
+	constexpr auto divisor = min_max(
+		divisor_min,
+		max(
+			safe_abs(rhs.min.value()),
+			safe_abs(rhs.max.value())
+		)
+	);
 
-		constexpr auto negative_dividend = min_max(
-			lhs.max < constant<0> ? safe_abs(lhs.max.value()) : 0,
-			lhs.min < constant<0> ? safe_abs(lhs.min.value()) : 0
-		);
-		constexpr auto positive_dividend = min_max(
-			static_cast<umax_t>(max(lhs.min, constant<0>)),
-			static_cast<umax_t>(max(lhs.max, constant<0>))
-		);
-		
-		constexpr auto negative = sign_free_value(negative_dividend, divisor);
-		constexpr auto positive = sign_free_value(positive_dividend, divisor);
+	constexpr auto negative_dividend = min_max(
+		lhs.max < constant<0> ? safe_abs(lhs.max.value()) : 0,
+		lhs.min < constant<0> ? safe_abs(lhs.min.value()) : 0
+	);
+	constexpr auto positive_dividend = min_max(
+		static_cast<umax_t>(max(lhs.min, constant<0>)),
+		static_cast<umax_t>(max(lhs.max, constant<0>))
+	);
+	
+	constexpr auto negative = sign_free_value(negative_dividend, divisor);
+	constexpr auto positive = sign_free_value(positive_dividend, divisor);
 
-		constexpr auto has_negative_values = lhs.min < constant<0>;
-		constexpr auto has_positive_values = lhs.max > constant<0>;
-		
-		static_assert(not has_negative_values or negative.max <= -static_cast<umax_t>(numeric_traits::min_value<smax_t>));
+	constexpr auto has_negative_values = lhs.min < constant<0>;
+	constexpr auto has_positive_values = lhs.max > constant<0>;
+	
+	static_assert(not has_negative_values or negative.max <= -static_cast<umax_t>(numeric_traits::min_value<smax_t>));
 
-		using min_type = std::conditional_t<has_negative_values or positive.min <= numeric_traits::max_value<smax_t>, smax_t, umax_t>;
-		using max_type = std::conditional_t<not has_positive_values or positive.max <= numeric_traits::max_value<smax_t>, smax_t, umax_t>;
-		return min_max(
-			has_negative_values ?
-				static_cast<min_type>(-static_cast<smax_t>(negative.max)) :
-				static_cast<min_type>(positive.min),
-			has_positive_values ?
-				static_cast<max_type>(positive.max) :
-				static_cast<max_type>(-static_cast<smax_t>(negative.min))
-		);
-	}
-};
-constexpr auto modulus_operator_range = modulus_operator_range_t();
+	using min_type = std::conditional_t<has_negative_values or positive.min <= numeric_traits::max_value<smax_t>, smax_t, umax_t>;
+	using max_type = std::conditional_t<not has_positive_values or positive.max <= numeric_traits::max_value<smax_t>, smax_t, umax_t>;
+	return min_max(
+		has_negative_values ?
+			static_cast<min_type>(-static_cast<smax_t>(negative.max)) :
+			static_cast<min_type>(positive.min),
+		has_positive_values ?
+			static_cast<max_type>(positive.max) :
+			static_cast<max_type>(-static_cast<smax_t>(negative.min))
+	);
+}
 
-export constexpr auto operator%(bounded_integer auto const lhs, bounded_integer auto const rhs) {
-	return operator_overload(lhs, rhs, std::modulus(), modulus_operator_range);
+template<typename T>
+constexpr auto min_max_range = min_max{numeric_traits::min_value<T>, numeric_traits::max_value<T>};
+
+export template<bounded_integer LHS, bounded_integer RHS>
+constexpr auto operator%(LHS const lhs, RHS const rhs) {
+	constexpr auto range = modulus_operator_range(min_max_range<LHS>, min_max_range<RHS>);
+	using result_t = integer<normalize<range.min>, normalize<range.max>>;
+	using common_t = typename std::common_type_t<result_t, LHS, RHS>::underlying_type;
+	// It is safe to use the unchecked constructor because we already know that
+	// the result will fit in result_t. We have to cast to the intermediate
+	// common_t in case result_t is narrower than one of the arguments.
+	return result_t(
+		static_cast<common_t>(lhs) % static_cast<common_t>(rhs),
+		unchecked
+	);
 }
 
 } // namespace bounded

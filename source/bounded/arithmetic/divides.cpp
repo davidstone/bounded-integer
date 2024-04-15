@@ -5,7 +5,6 @@
 
 export module bounded.arithmetic.divides;
 
-import bounded.arithmetic.base;
 import bounded.arithmetic.extreme_values;
 import bounded.arithmetic.safe_abs;
 import bounded.arithmetic.unary_minus;
@@ -14,12 +13,20 @@ import bounded.comparison;
 import bounded.homogeneous_equals;
 import bounded.integer;
 import bounded.minmax;
+import bounded.normalize;
 import bounded.safe_extreme;
+import bounded.unchecked;
 
 import numeric_traits;
 import std_module;
 
 namespace bounded {
+
+template<typename Min, typename Max>
+struct min_max {
+	Min min;
+	Max max;
+};
 
 template<bool condition>
 constexpr auto conditional_function(auto if_true, auto if_false) {
@@ -59,30 +66,38 @@ constexpr auto negative_divisor_division(auto const lhs, auto const rhs) {
 	);
 }
 
-// TODO: make this a lambda after resolution of
-// https://github.com/llvm/llvm-project/issues/59513
-struct divides_operator_range_t {
-	static constexpr auto operator()(auto const lhs, auto const rhs) {
-		static_assert(rhs.min != constant<0>);
-		static_assert(rhs.max != constant<0>);
-		if constexpr (rhs.min >= constant<1>) {
-			return positive_divisor_division(lhs, rhs);
-		} else if constexpr (rhs.max <= constant<-1>) {
-			return negative_divisor_division(lhs, rhs);
-		} else {
-			constexpr auto positive = positive_divisor_division(lhs, min_max(constant<1>, rhs.max));
-			constexpr auto negative = negative_divisor_division(lhs, min_max(rhs.min, constant<-1>));
-			return min_max(
-				safe_min(positive.min, negative.min),
-				safe_max(positive.max, negative.max)
-			);
-		}
+constexpr auto divides_operator_range(auto const lhs, auto const rhs) {
+	if constexpr (rhs.min >= constant<1>) {
+		return positive_divisor_division(lhs, rhs);
+	} else if constexpr (rhs.max <= constant<-1>) {
+		return negative_divisor_division(lhs, rhs);
+	} else {
+		constexpr auto positive = positive_divisor_division(lhs, min_max(constant<1>, rhs.max));
+		constexpr auto negative = negative_divisor_division(lhs, min_max(rhs.min, constant<-1>));
+		return min_max(
+			safe_min(positive.min, negative.min),
+			safe_max(positive.max, negative.max)
+		);
 	}
-};
-constexpr auto divides_operator_range = divides_operator_range_t();
+}
 
-export constexpr auto operator/(bounded_integer auto const lhs, bounded_integer auto const rhs) {
-	return operator_overload(lhs, rhs, std::divides(), divides_operator_range);
+export template<auto lhs_min, auto lhs_max, auto rhs_min, auto rhs_max>
+constexpr auto operator/(integer<lhs_min, lhs_max> const lhs, integer<rhs_min, rhs_max> const rhs) {
+	static_assert(rhs_min != 0);
+	static_assert(rhs_max != 0);
+	constexpr auto range = divides_operator_range(
+		min_max(constant<lhs_min>, constant<lhs_max>),
+		min_max(constant<rhs_min>, constant<rhs_max>)
+	);
+	using result_t = integer<normalize<range.min>, normalize<range.max>>;
+	using common_t = typename std::common_type_t<result_t, integer<lhs_min, lhs_max>, integer<rhs_min, rhs_max>>::underlying_type;
+	// It is safe to use the unchecked constructor because we already know that
+	// the result will fit in result_t. We have to cast to the intermediate
+	// common_t in case result_t is narrower than one of the arguments.
+	return result_t(
+		static_cast<common_t>(lhs) / static_cast<common_t>(rhs),
+		unchecked
+	);
 }
 
 }	// namespace bounded

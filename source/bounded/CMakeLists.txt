@@ -24,7 +24,6 @@ target_sources(bounded PUBLIC
 	FILE_SET CXX_MODULES
 	BASE_DIRS "${CMAKE_CURRENT_SOURCE_DIR}"
 	FILES
-		arithmetic/base.cpp
 		arithmetic/bitwise_and.cpp
 		arithmetic/byte.cpp
 		arithmetic/divides.cpp

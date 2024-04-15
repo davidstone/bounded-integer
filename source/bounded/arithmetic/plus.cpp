@@ -5,12 +5,13 @@
 
 export module bounded.arithmetic.plus;
 
-import bounded.arithmetic.base;
 import bounded.arithmetic.extreme_values;
 import bounded.bounded_integer;
 import bounded.comparison;
 import bounded.homogeneous_equals;
 import bounded.integer;
+import bounded.normalize;
+import bounded.unchecked;
 
 import numeric_traits;
 import std_module;
@@ -39,13 +40,17 @@ constexpr auto safer_add() {
 	}
 }
 
-export constexpr auto operator+(bounded_integer auto const lhs_, bounded_integer auto const rhs_) {
-	return modulo_equivalent_operator_overload(lhs_, rhs_, std::plus(), [](auto const lhs, auto const rhs) {
-		return min_max(
-			::bounded::safer_add<lhs.min.value(), rhs.min.value()>(),
-			::bounded::safer_add<lhs.max.value(), rhs.max.value()>()
-		);
-	});
+export template<auto lhs_min, auto lhs_max, auto rhs_min, auto rhs_max>
+constexpr auto operator+(integer<lhs_min, lhs_max> const lhs, integer<rhs_min, rhs_max> const rhs) {
+	using result_t = bounded::integer<
+		bounded::normalize<::bounded::safer_add<lhs_min, rhs_min>()>,
+		bounded::normalize<::bounded::safer_add<lhs_max, rhs_max>()>
+	>;
+	auto const intermediate = static_cast<numeric_traits::max_unsigned_t>(lhs) + static_cast<numeric_traits::max_unsigned_t>(rhs);
+	return result_t(
+		static_cast<typename result_t::underlying_type>(intermediate),
+		unchecked
+	);
 }
 
 }	// namespace bounded
@@ -75,6 +80,11 @@ static_assert(homogeneous_equals(
 static_assert(homogeneous_equals(
 	signed_max + signed_max,
 	bounded::constant<static_cast<max_unsigned_t>(signed_max) + static_cast<max_unsigned_t>(signed_max)>
+));
+
+static_assert(homogeneous_equals(
+	bounded::integer<-128, 1>(bounded::constant<0>) + bounded::constant<-1>,
+	bounded::integer<-129, 0>(bounded::constant<-1>)
 ));
 
 // Do not use bounded's operator- for this test

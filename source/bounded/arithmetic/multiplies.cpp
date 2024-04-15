@@ -9,7 +9,6 @@ module;
 
 export module bounded.arithmetic.multiplies;
 
-import bounded.arithmetic.base;
 import bounded.arithmetic.extreme_values;
 import bounded.arithmetic.plus;
 import bounded.arithmetic.unary_minus;
@@ -17,7 +16,9 @@ import bounded.bounded_integer;
 import bounded.homogeneous_equals;
 import bounded.integer;
 import bounded.minmax;
+import bounded.normalize;
 import bounded.safe_extreme;
+import bounded.unchecked;
 
 import numeric_traits;
 import std_module;
@@ -25,7 +26,7 @@ import std_module;
 namespace bounded {
 
 template<auto lhs, auto rhs>
-constexpr auto safer_multiply(constant_t<lhs> const &, constant_t<rhs> const &) {
+constexpr auto safer_multiply() {
 	constexpr auto negative = (lhs < 0) xor (rhs < 0);
 	constexpr auto ulhs = static_cast<numeric_traits::max_unsigned_t>(lhs);
 	constexpr auto urhs = static_cast<numeric_traits::max_unsigned_t>(rhs);
@@ -59,28 +60,21 @@ constexpr auto safer_multiply(constant_t<lhs> const &, constant_t<rhs> const &) 
 	}
 }
 
-export constexpr auto operator*(bounded_integer auto const lhs_, bounded_integer auto const rhs_) {
-	return modulo_equivalent_operator_overload(lhs_, rhs_, std::multiplies(), [](auto const lhs, auto const rhs) {
-		constexpr auto p0 = safer_multiply(lhs.min, rhs.min);
-		constexpr auto p1 = safer_multiply(lhs.min, rhs.max);
-		constexpr auto p2 = safer_multiply(lhs.max, rhs.min);
-		constexpr auto p3 = safer_multiply(lhs.max, rhs.max);
-		return min_max(
-			safe_min(p0, p1, p2, p3),
-			safe_max(p0, p1, p2, p3)
-		);
-	});
-}
-
-// Not technically necessary, but improves compile times in some common cases
-export constexpr auto operator*(bounded_integer auto const lhs, bounded::constant_t<1>) {
-	return lhs;
-}
-export constexpr auto operator*(bounded::constant_t<1>, bounded_integer auto const rhs) {
-	return rhs;
-}
-export constexpr auto operator*(bounded::constant_t<1>, bounded::constant_t<1>) {
-	return bounded::constant<1>;
+export template<auto lhs_min, auto lhs_max, auto rhs_min, auto rhs_max>
+constexpr auto operator*(integer<lhs_min, lhs_max> const lhs, integer<rhs_min, rhs_max> const rhs) {
+	constexpr auto p0 = safer_multiply<lhs_min, rhs_min>();
+	constexpr auto p1 = safer_multiply<lhs_min, rhs_max>();
+	constexpr auto p2 = safer_multiply<lhs_max, rhs_min>();
+	constexpr auto p3 = safer_multiply<lhs_max, rhs_max>();
+	using result_t = bounded::integer<
+		bounded::normalize<safe_min(p0, p1, p2, p3)>,
+		bounded::normalize<safe_max(p0, p1, p2, p3)>
+	>;
+	auto const intermediate = static_cast<numeric_traits::max_unsigned_t>(lhs) * static_cast<numeric_traits::max_unsigned_t>(rhs);
+	return result_t(
+		static_cast<typename result_t::underlying_type>(intermediate),
+		unchecked
+	);
 }
 
 } // namespace bounded
@@ -94,6 +88,19 @@ static_assert(homogeneous_equals(
 static_assert(homogeneous_equals(
 	bounded::constant<0> * bounded::constant<1000>,
 	bounded::constant<0>
+));
+
+static_assert(homogeneous_equals(
+	bounded::constant<1> * bounded::constant<1>,
+	bounded::constant<1>
+));
+static_assert(homogeneous_equals(
+	bounded::constant<1> * bounded::constant<2>,
+	bounded::constant<2>
+));
+static_assert(homogeneous_equals(
+	bounded::constant<2> * bounded::constant<1>,
+	bounded::constant<2>
 ));
 
 static_assert(homogeneous_equals(
