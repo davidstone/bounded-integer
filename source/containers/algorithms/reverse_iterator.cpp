@@ -21,6 +21,7 @@ import containers.iterator;
 import containers.random_access_iterator;
 import containers.range;
 import containers.size;
+import containers.value_wrapper;
 
 import bounded;
 import std_module;
@@ -67,7 +68,7 @@ struct reverse_traits {
 };
 
 export constexpr auto reverse_iterator(bidirectional_iterator auto it) {
-	return adapt_iterator(it, reverse_traits());
+	return adapt_iterator(it, value_wrapper<reverse_traits>());
 }
 
 export constexpr auto reversed(range auto && source) {

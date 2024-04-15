@@ -21,6 +21,7 @@ import containers.iterator_to_sentinel;
 import containers.range;
 import containers.range_reference_t;
 import containers.stored_function;
+import containers.value_wrapper;
 
 import std_module;
 
@@ -96,8 +97,8 @@ struct transform_traits_non_idempotent : default_begin_end_size {
 		return iterator_to_sentinel(containers::end(OPERATORS_FORWARD(range)));
 	}
 
-	constexpr auto iterator_traits(auto const &) const -> transform_iterator_traits_non_idempotent<UnaryFunction, pass_iterator> {
-		return transform_iterator_traits_non_idempotent<UnaryFunction, pass_iterator>(m_dereference);
+	constexpr auto iterator_traits(auto const &) const -> value_wrapper<transform_iterator_traits_non_idempotent<UnaryFunction, pass_iterator>> {
+		return value_wrapper(transform_iterator_traits_non_idempotent<UnaryFunction, pass_iterator>(m_dereference));
 	}
 private:
 	[[no_unique_address]] UnaryFunction m_dereference;

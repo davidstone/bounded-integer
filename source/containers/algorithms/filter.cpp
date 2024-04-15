@@ -20,6 +20,7 @@ import containers.default_adapt_traits;
 import containers.iterator;
 import containers.range;
 import containers.reference_or_value;
+import containers.value_wrapper;
 
 import bounded;
 import std_module;
@@ -72,10 +73,10 @@ struct filter_traits {
 	}
 
 	constexpr auto iterator_traits(range auto & base) const {
-		return filter_iterator_traits(
+		return value_wrapper(filter_iterator_traits(
 			containers::end(base),
 			m_predicate
-		);
+		));
 	}
 
 private:

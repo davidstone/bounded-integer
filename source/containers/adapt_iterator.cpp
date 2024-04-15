@@ -15,7 +15,7 @@ import containers.default_adapt_traits;
 import containers.iter_difference_t;
 import containers.iterator;
 import containers.iterator_category_base;
-import containers.reference_or_value;
+import containers.value_wrapper;
 
 import bounded;
 import operators;
@@ -65,7 +65,7 @@ struct adapted_difference_type<T> {
 };
 
 template<typename T>
-using unwrap_t = decltype(::containers::unwrap(bounded::declval<T>()));
+using unwrap_t = decltype(bounded::declval<T>().get());
 
 template<typename Offset, typename Iterator, typename Traits>
 concept adapted_addable = requires(Offset const offset, Iterator it, Traits const traits) {
@@ -110,6 +110,8 @@ struct adapt_iterator :
 	adapted_difference_type<Iterator>
 {
 private:
+	template<iterator It, iterator_traits<It>>
+	friend struct adapt_iterator;
 	using Traits = unwrap_t<TraitsStorage>;
 public:
 	adapt_iterator() = default;
@@ -122,8 +124,8 @@ public:
 
 	template<bounded::convertible_to<Iterator> It>
 	constexpr adapt_iterator(adapt_iterator<It, TraitsStorage> other):
-		m_base(std::move(other).base()),
-		m_traits(other.traits())
+		m_base(std::move(other).m_base),
+		m_traits(std::move(other).m_traits)
 	{
 	}
 	
@@ -134,22 +136,15 @@ public:
 		return std::move(m_base);
 	}
 
-	constexpr auto traits() const & -> auto && {
-		return ::containers::unwrap(m_traits);
-	}
-	constexpr auto traits() && -> auto && {
-		return ::containers::unwrap(std::move(m_traits));
-	}
-
 	OPERATORS_ARROW_DEFINITIONS
 
 	friend constexpr auto operator*(adapt_iterator const & it) -> decltype(auto) {
-		return it.traits().dereference(it.base());
+		return it.m_traits.get().dereference(it.base());
 	}
 
 	friend constexpr auto operator+(adapt_iterator lhs, adapted_addable<Iterator, Traits> auto const rhs) -> adapt_iterator {
-		auto base = lhs.traits().add(std::move(lhs).base(), rhs);
-		return adapt_iterator(std::move(base), std::move(lhs).traits());
+		auto base = lhs.m_traits.get().add(std::move(lhs).base(), rhs);
+		return adapt_iterator(std::move(base), std::move(lhs).m_traits);
 	}
 
 
@@ -158,32 +153,32 @@ public:
 		adapt_iterator<LHSIterator, TraitsStorage> const & lhs,
 		adapt_iterator const & rhs
 	) {
-		return rhs.traits().subtract(lhs.base(), rhs.base());
+		return rhs.m_traits.get().subtract(lhs.base(), rhs.base());
 	}
 
 	template<adapted_subtractable<Iterator, Traits> Sentinel>
 	friend constexpr auto operator-(adapt_sentinel<Sentinel> const & lhs, adapt_iterator const & rhs) {
-		return rhs.traits().subtract(lhs.base(), rhs.base());
+		return rhs.m_traits.get().subtract(lhs.base(), rhs.base());
 	}
 
 	template<adapted_ordered<Iterator, Traits> RHSIterator>
 	friend constexpr auto operator<=>(adapt_iterator const & lhs, adapt_iterator<RHSIterator, TraitsStorage> const & rhs) {
-		return lhs.traits().compare(lhs.base(), rhs.base());
+		return lhs.m_traits.get().compare(lhs.base(), rhs.base());
 	}
 
 	template<adapted_ordered<Iterator, Traits> Sentinel>
 	friend constexpr auto operator<=>(adapt_iterator const & lhs, adapt_sentinel<Sentinel> const & rhs) {
-		return lhs.traits().compare(lhs.base(), rhs.base());
+		return lhs.m_traits.get().compare(lhs.base(), rhs.base());
 	}
 
 	template<adapted_equality_comparable<Iterator, Traits> RHSIterator>
 	friend constexpr auto operator==(adapt_iterator const & lhs, adapt_iterator<RHSIterator, TraitsStorage> const & rhs) -> bool {
-		return lhs.traits().equal(lhs.base(), rhs.base());
+		return lhs.m_traits.get().equal(lhs.base(), rhs.base());
 	}
 
 	template<adapted_equality_comparable<Iterator, Traits> Sentinel>
 	friend constexpr auto operator==(adapt_iterator const & lhs, adapt_sentinel<Sentinel> const & rhs) -> bool {
-		return lhs.traits().equal(lhs.base(), rhs.base());
+		return lhs.m_traits.get().equal(lhs.base(), rhs.base());
 	}
 
 private:
@@ -214,7 +209,7 @@ struct traits :
 };
 
 template<typename T>
-using iterator = containers::adapt_iterator<containers::contiguous_iterator<T, 2_bi>, traits>;
+using iterator = containers::adapt_iterator<containers::contiguous_iterator<T, 2_bi>, containers::value_wrapper<traits>>;
 
 using const_iterator = iterator<int const>;
 using mutable_iterator = iterator<int>;

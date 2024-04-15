@@ -195,6 +195,7 @@ target_sources(containers PUBLIC
 		trivial_inplace_function.cpp
 		uninitialized_array.cpp
 		uninitialized_dynamic_array.cpp
+		value_wrapper.cpp
 		vector.cpp
 		wrap_range.cpp
 )
