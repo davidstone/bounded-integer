@@ -65,8 +65,8 @@ struct extreme_value<Compare, LHS, RHS> {
 			return rhs;
 		} else {
 			return compare(rhs, lhs) ?
-				::bounded::assume_in_range<result_t>(OPERATORS_FORWARD(rhs)) :
-				::bounded::assume_in_range<result_t>(OPERATORS_FORWARD(lhs));
+				type(OPERATORS_FORWARD(rhs), unchecked) :
+				type(OPERATORS_FORWARD(lhs), unchecked);
 		}
 	}
 };
