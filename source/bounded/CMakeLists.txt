@@ -123,7 +123,6 @@ target_sources(bounded_test PRIVATE
 	FILES
 		test/assert.cpp
 		test/assert-NDEBUG.cpp
-		test/assume.cpp
 		test/check_in_range.cpp
 		test/comparison.cpp
 		test/conditional.cpp

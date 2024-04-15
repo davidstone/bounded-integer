@@ -8,12 +8,12 @@
 
 #include <std_module/prelude.hpp>
 
-#include <bounded/assume.hpp>
-
 #include <cassert>
 
 import bounded.constexpr_only_if;
 import bounded.prevent_comma;
+
+import std_module;
 
 // An expression of type `void`. This is used to allow using variadic
 // function-like macros to support expressions that contain commas, such as
@@ -25,7 +25,7 @@ import bounded.prevent_comma;
 
 #if defined NDEBUG or defined BOUNDED_NDEBUG
 	#define BOUNDED_ASSERT(...) (std::is_constant_evaluated() ? ::bounded::detail::constexpr_only_if(__VA_ARGS__) : void())
-	#define BOUNDED_ASSERT_OR_ASSUME BOUNDED_ASSUME
+	#define BOUNDED_ASSERT_OR_ASSUME(...) [[assume(__VA_ARGS__)]]
 #else
 	#define BOUNDED_ASSERT(...) (BOUNDED_DETAIL_PREVENT_COMMA(__VA_ARGS__), assert((__VA_ARGS__)))
 	#define BOUNDED_ASSERT_OR_ASSUME BOUNDED_ASSERT

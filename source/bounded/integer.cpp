@@ -178,7 +178,7 @@ struct integer {
 	using underlying_type = underlying_type_t<minimum, maximum>;
 	
 	constexpr auto value() const -> underlying_type {
-		BOUNDED_ASSUME(minimum <= m_value and m_value <= maximum);
+		[[assume(minimum <= m_value and m_value <= maximum)]];
 		return m_value;
 	}
 	
