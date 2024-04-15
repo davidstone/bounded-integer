@@ -1,6 +1,8 @@
 name: Build and test
 
 on:
+  schedule:
+    - cron: '27 5 * * *'
   push:
     branches: [ "main" ]
   pull_request:
