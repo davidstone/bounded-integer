@@ -127,32 +127,32 @@ constexpr auto constant = constant_t<normalize<value>>();
 
 
 // TODO: Report clang bug requiring this specialization
-template<auto minimum>
-struct integer<minimum, minimum> {
-	static_assert(std::same_as<decltype(minimum), std::remove_const_t<decltype(normalize<minimum>)>>);
+template<auto value_>
+struct integer<value_, value_> {
+	static_assert(std::same_as<decltype(value_), std::remove_const_t<decltype(normalize<value_>)>>);
 
-	using underlying_type = underlying_type_t<minimum, minimum>;
+	using underlying_type = underlying_type_t<value_, value_>;
 	
 	static constexpr auto value() -> underlying_type {
-		return static_cast<underlying_type>(minimum);
+		return static_cast<underlying_type>(value_);
 	}
 	
 	integer() = default;
 	constexpr integer(integer const &) = default;
 	constexpr integer(integer &&) = default;
 
-	constexpr integer(overlapping_integer<minimum, minimum> auto, unchecked_t) {
+	constexpr integer(overlapping_integer<value_, value_> auto, unchecked_t) {
 	}
 
-	template<bounded_by_range<minimum, minimum> T>
+	template<bounded_by_range<value_, value_> T>
 	constexpr explicit(std::is_enum_v<T>) integer(T) {
 	}
 
 	constexpr auto operator=(integer const & other) & -> integer & = default;
 	constexpr auto operator=(integer && other) & -> integer & = default;
 
-	constexpr auto operator=(overlapping_integer<minimum, minimum> auto const other) & -> integer & {
-		if (other != constant<minimum>) {
+	constexpr auto operator=(overlapping_integer<value_, value_> auto const other) & -> integer & {
+		if (other != constant<value_>) {
 			std::unreachable();
 		}
 		return *this;
@@ -163,7 +163,7 @@ struct integer<minimum, minimum> {
 	// the standard rules of conversion from one integer type to another.
 	template<typename T> requires (builtin_integer<T> or std::is_enum_v<T> or std::floating_point<T>)
 	constexpr explicit operator T() const {
-		return static_cast<T>(value());
+		return static_cast<T>(value_);
 	}
 
 	friend constexpr auto operator<=>(integer, integer) = default;
