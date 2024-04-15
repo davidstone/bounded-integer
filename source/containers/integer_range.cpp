@@ -50,27 +50,26 @@ public:
 		return (lhs.m_value - rhs.m_value) / lhs.m_step;
 	}
 
-	friend constexpr auto operator+(integer_range_iterator const lhs, difference_type const rhs) {
+	friend constexpr auto operator+(integer_range_iterator const lhs, difference_type const rhs) -> integer_range_iterator {
 		if constexpr (has_no_values) {
 			std::unreachable();
-			return lhs;
 		} else {
 			return integer_range_iterator(bounded::assume_in_range<storage_type>(lhs.m_value + rhs * lhs.m_step), lhs.m_step);
 		}
 	}
 	
-	friend constexpr auto operator+(difference_type const lhs, integer_range_iterator const rhs) {
+	friend constexpr auto operator+(difference_type const lhs, integer_range_iterator const rhs) -> integer_range_iterator {
 		return rhs + lhs;
 	}
 
 	// Not technically needed, but helps compile faster
-	friend constexpr auto & operator++(integer_range_iterator & it) {
+	friend constexpr auto operator++(integer_range_iterator & it) -> integer_range_iterator & {
 		if constexpr (has_no_values) {
 			std::unreachable();
 		} else {
 			it.m_value += it.m_step;
+			return it;
 		}
-		return it;
 	}
 
 	friend constexpr auto operator<=>(integer_range_iterator, integer_range_iterator) = default;
@@ -122,10 +121,10 @@ struct integer_range {
 	{
 	}
 
-	constexpr auto begin() const {
+	constexpr auto begin() const -> iterator {
 		return iterator(m_begin, m_step);
 	}
-	constexpr auto end() const {
+	constexpr auto end() const -> iterator {
 		return iterator(m_end, m_step);
 	}
 
