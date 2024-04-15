@@ -170,8 +170,8 @@ struct remove_none {
 			);
 		}
 	}
-	constexpr auto begin() const & -> remove_none_iterator<Range> requires use_inplace<Range> and forward_range<Range> {
-		return remove_none_iterator<Range>(
+	constexpr auto begin() const & -> remove_none_iterator<Range const> requires use_inplace<Range> and forward_range<Range> {
+		return remove_none_iterator<Range const>(
 			containers::begin(m_data),
 			containers::end(m_data)
 		);
@@ -233,3 +233,5 @@ struct by_value_range {
 };
 
 static_assert(containers::equal(containers::remove_none(by_value_range()), by_value_range()));
+constexpr auto r = containers::remove_none(by_value_range());
+static_assert(containers::equal(r, by_value_range()));
