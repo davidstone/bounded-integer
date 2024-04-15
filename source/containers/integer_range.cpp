@@ -113,11 +113,15 @@ struct integer_range {
 	}
 
 	constexpr integer_range(Integer const first, Sentinel const last):
-		integer_range(first, last, Step(1_bi))
+		m_begin(first),
+		m_end(last),
+		m_step(1_bi)
 	{
 	}
 	constexpr integer_range(Sentinel const size):
-		integer_range(Integer(0_bi), size)
+		m_begin(0_bi),
+		m_end(size),
+		m_step(1_bi)
 	{
 	}
 
