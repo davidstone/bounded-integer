@@ -20,4 +20,4 @@ There are some [containers that have backward compatibility as a goal](source/co
 
 * `git submodule update --init` will check out any necessary dependencies
 * Configure with cmake 3.27.6+
-* Build with clang 17+
+* Build with clang 19+
