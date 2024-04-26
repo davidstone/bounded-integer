@@ -27,8 +27,7 @@ export template<typename T>
 concept to_addressable =
 	pointer_like<T> or
 	has_member_to_address<T> or
-	has_pointer_traits<T> or
-	has_member_arrow<T>;
+	has_pointer_traits<T>;
 
 export template<to_addressable Iterator>
 constexpr auto to_address(Iterator const it) {
@@ -36,16 +35,15 @@ constexpr auto to_address(Iterator const it) {
 		return it;
 	} else if constexpr (has_member_to_address<Iterator>) {
 		return it.to_address();
-	} else if constexpr (has_pointer_traits<Iterator>) {
-		return std::pointer_traits<Iterator>::to_address(it);
 	} else {
-		return it.operator->();
+		return std::pointer_traits<Iterator>::to_address(it);
 	}
 }
 
 } // namespace containers
 
 static_assert(!containers::to_addressable<int>);
+static_assert(!containers::to_addressable<std::list<int>::iterator>);
 
 static_assert(containers::to_address(nullptr) == nullptr);
 static_assert(containers::to_address(static_cast<void *>(nullptr)) == nullptr);
