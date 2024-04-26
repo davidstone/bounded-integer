@@ -22,8 +22,16 @@ namespace bounded {
 template<typename T, std::size_t size>
 using c_array = T[size];
 
+// consteval is broken in clang, see
+// https://github.com/llvm/llvm-project/issues/90130
+#ifdef __clang__
+#define CONSTEVAL constexpr
+#else
+#define CONSTEVAL consteval
+#endif
+
 template<std::size_t size>
-consteval auto literal_impl(c_array<char, size> && digits) {
+CONSTEVAL auto literal_impl(c_array<char, size> && digits) {
 	numeric_traits::max_unsigned_t result = 0;
 	for (auto const digit : digits) {
 		if (digit == '\'') {
@@ -41,7 +49,7 @@ consteval auto literal_impl(c_array<char, size> && digits) {
 inline namespace literal {
 
 export template<char... digits>
-consteval auto operator""_bi() {
+CONSTEVAL auto operator""_bi() {
 	return constant<literal_impl({digits...})>;
 }
 
