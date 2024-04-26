@@ -195,7 +195,10 @@ constexpr auto take_impl(Range && source, Count const count) {
 		}
 		return containers::range_view(OPERATORS_FORWARD(source));
 	} else if constexpr (sized_range<Range> and forward_random_access_iterator<iterator>) {
-		auto const true_count = bounded::min(containers::size(source), count);
+		auto const true_count = bounded::min(
+			bounded::integer(containers::size(source)),
+			count
+		);
 		auto first = random_access_counted_iterator<iterator, count_type>(containers::begin(OPERATORS_FORWARD(source)));
 		return containers::range_view(first, true_count);
 	} else {
