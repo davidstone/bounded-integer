@@ -307,7 +307,7 @@ add_executable(ska_sort_benchmark
 )
 target_link_libraries(ska_sort_benchmark PRIVATE
 	bounded
-	benchmark
+	benchmark_main
 	containers
 	strict_defaults
 )

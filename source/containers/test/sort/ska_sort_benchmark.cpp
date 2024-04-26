@@ -401,10 +401,3 @@ void register_all_benchmarks() {
 }
 
 } // namespace
-
-int main(int argc, char * * argv) {
-	// TODO: blocked by https://github.com/llvm/llvm-project/issues/60085
-	// register_all_benchmarks();
-	benchmark::Initialize(&argc, argv);
-	benchmark::RunSpecifiedBenchmarks();
-}
