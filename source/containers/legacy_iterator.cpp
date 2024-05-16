@@ -7,6 +7,7 @@
 
 module;
 
+#include <bounded/assert.hpp>
 #include <operators/arrow.hpp>
 #include <operators/bracket.hpp>
 
@@ -28,6 +29,7 @@ import containers.to_address;
 import bounded;
 import operators;
 import std_module;
+import tv;
 
 using namespace bounded::literal;
 
@@ -47,13 +49,46 @@ struct iterator_category_impl<Iterator> {
 	>>;
 };
 
+template<typename T>
+struct non_optional {
+	non_optional(tv::none_t) {
+		std::unreachable();
+	}
+
+	template<bounded::explicitly_convertible_to<T> Value = T>
+	constexpr explicit(!bounded::convertible_to<Value, T>) non_optional(Value && other):
+		m_value(OPERATORS_FORWARD(other))
+	{
+	}
+	
+	constexpr auto operator*() const & -> T const & {
+		return m_value;
+	}
+	constexpr auto operator*() & -> T & {
+		return m_value;
+	}
+	constexpr auto operator*() && -> T && {
+		return std::move(m_value);
+	}
+	constexpr explicit operator bool() const {
+		return true;
+	}
+
+	friend auto operator<=>(non_optional const &, non_optional const &) = default;
+private:
+	[[no_unique_address]] T m_value;
+};
+
 export template<typename Iterator>
 struct legacy_iterator {
+	using iterator_category = typename iterator_category_impl<Iterator>::type;
+private:
+	static constexpr auto always_exists = bounded::default_constructible<Iterator> or !std::derived_from<iterator_category, std::forward_iterator_tag>;
+public:
 	using value_type = iter_value_t<Iterator>;
 	using difference_type = std::ptrdiff_t;
 	using reference = iter_reference_t<Iterator>;
 	using pointer = std::add_pointer_t<reference>;
-	using iterator_category = typename iterator_category_impl<Iterator>::type;
 
 	legacy_iterator() = default;
 	constexpr legacy_iterator(Iterator it):
@@ -61,50 +96,51 @@ struct legacy_iterator {
 	}
 	template<bounded::convertible_to<Iterator> It>
 	constexpr legacy_iterator(legacy_iterator<It> other):
-		m_it(other.base())
+		m_it(other.m_it ? storage(*std::move(other).m_it) : tv::none)
 	{
 	}
 	
-	constexpr auto base() const {
-		return m_it;
+	constexpr auto base() const requires always_exists {
+		return *m_it;
 	}
 
-	constexpr decltype(auto) operator*() const {
-		return *base();
+	constexpr auto operator*() const -> decltype(auto) {
+		return **m_it;
 	}
 	OPERATORS_ARROW_DEFINITIONS
 	OPERATORS_BRACKET_ITERATOR_DEFINITIONS
 
 	constexpr auto to_address() const requires to_addressable<Iterator> {
-		return containers::to_address(m_it);
+		return m_it ? containers::to_address(*m_it) : nullptr;
 	}
 
 	friend auto operator<=>(legacy_iterator, legacy_iterator) = default;
 
-	friend constexpr auto operator+(legacy_iterator const lhs, bounded::integral auto const rhs) requires iterator_addable<Iterator, iter_difference_t<Iterator>> {
-		if constexpr (std::same_as<iter_difference_t<Iterator>, bounded::constant_t<0>>) {
-			std::unreachable();
-			return lhs;
-		} else {
-			return legacy_iterator<Iterator>(lhs.base() + ::bounded::assume_in_range<iter_difference_t<Iterator>>
-			(rhs));
-		}
+	friend constexpr auto operator+(legacy_iterator const lhs, bounded::integral auto const rhs) -> legacy_iterator requires iterator_addable<Iterator, iter_difference_t<Iterator>> {
+		return rhs == 0_bi ?
+			lhs :
+			legacy_iterator<Iterator>(*lhs.m_it + ::bounded::assume_in_range<iter_difference_t<Iterator>>(rhs));
 	}
 	friend constexpr auto operator++(legacy_iterator & it) -> legacy_iterator & {
-		++it.m_it;
+		++*it.m_it;
 		return it;
 	}
 
 	friend constexpr auto operator-(legacy_iterator const lhs, legacy_iterator const rhs) requires subtractable<Iterator> {
-		return static_cast<typename legacy_iterator<Iterator>::difference_type>(lhs.base() - rhs.base());
+		BOUNDED_ASSERT(static_cast<bool>(lhs.m_it) == static_cast<bool>(rhs.m_it));
+		return lhs.m_it ? static_cast<typename legacy_iterator<Iterator>::difference_type>(*lhs.m_it - *rhs.m_it) : 0;
 	}
 	friend constexpr auto operator--(legacy_iterator & it) -> legacy_iterator & {
-		--it.m_it;
+		--*it.m_it;
 		return it;
 	}
 
 private:
-	Iterator m_it;
+	template<typename I>
+	friend struct legacy_iterator;
+
+	using storage = std::conditional_t<always_exists, non_optional<Iterator>, tv::optional<Iterator>>;
+	storage m_it;
 };
 
 export constexpr auto make_legacy_iterator = []<iterator Iterator>(Iterator it) {
