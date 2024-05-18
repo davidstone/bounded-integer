@@ -114,7 +114,11 @@ public:
 		return m_it ? containers::to_address(*m_it) : nullptr;
 	}
 
-	friend auto operator<=>(legacy_iterator, legacy_iterator) = default;
+	friend constexpr auto operator<=>(legacy_iterator const & lhs, legacy_iterator const & rhs) requires(std::three_way_comparable<Iterator>) {
+		BOUNDED_ASSERT(static_cast<bool>(lhs.m_it) == static_cast<bool>(rhs.m_it));
+		return lhs.m_it ? *lhs.m_it <=> *rhs.m_it : std::strong_ordering::equal;
+	}
+	friend auto operator==(legacy_iterator const &, legacy_iterator const &) -> bool = default;
 
 	friend constexpr auto operator+(legacy_iterator const lhs, bounded::integral auto const rhs) -> legacy_iterator requires iterator_addable<Iterator, iter_difference_t<Iterator>> {
 		return rhs == 0_bi ?
