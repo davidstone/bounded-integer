@@ -6,6 +6,7 @@
 export module bounded.arithmetic.modulus;
 
 import bounded.arithmetic.extreme_values;
+import bounded.arithmetic.min_max;
 import bounded.arithmetic.safe_abs;
 import bounded.bounded_integer;
 import bounded.comparison;
@@ -20,11 +21,6 @@ import std_module;
 
 namespace bounded {
 
-template<typename Min, typename Max>
-struct min_max {
-	Min min;
-	Max max;
-};
 
 using smax_t = numeric_traits::max_signed_t;
 using umax_t = numeric_traits::max_unsigned_t;

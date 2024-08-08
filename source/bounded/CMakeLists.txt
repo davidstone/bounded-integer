@@ -32,6 +32,7 @@ target_sources(bounded PUBLIC
 		arithmetic/increment_decrement.cpp
 		arithmetic/modulus.cpp
 		arithmetic/multiplies.cpp
+		arithmetic/min_max.cpp
 		arithmetic/operators_builtin.cpp
 		arithmetic/operators.cpp
 		arithmetic/plus.cpp

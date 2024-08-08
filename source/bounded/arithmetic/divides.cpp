@@ -6,6 +6,7 @@
 export module bounded.arithmetic.divides;
 
 import bounded.arithmetic.extreme_values;
+import bounded.arithmetic.min_max;
 import bounded.arithmetic.safe_abs;
 import bounded.arithmetic.unary_minus;
 import bounded.bounded_integer;
@@ -21,12 +22,6 @@ import numeric_traits;
 import std_module;
 
 namespace bounded {
-
-template<typename Min, typename Max>
-struct min_max {
-	Min min;
-	Max max;
-};
 
 template<bool condition>
 constexpr auto conditional_function(auto if_true, auto if_false) {
