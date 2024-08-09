@@ -197,7 +197,6 @@ target_sources(containers PUBLIC
 		uninitialized_dynamic_array.cpp
 		value_wrapper.cpp
 		vector.cpp
-		wrap_range.cpp
 )
 
 target_link_libraries(containers
@@ -260,7 +259,6 @@ target_sources(containers_test PRIVATE
 		test/test_set_size.cpp
 		test/uninitialized_dynamic_array.cpp
 		test/vector.cpp
-		test/wrap_range.cpp
 )
 
 target_sources(containers_test PRIVATE
