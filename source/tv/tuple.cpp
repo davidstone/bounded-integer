@@ -93,6 +93,10 @@ struct tuple_value<index, void> {
 	}
 };
 
+struct unusable {
+	unusable() = delete;
+};
+
 template<typename Indexes, typename... Types>
 struct tuple_impl;
 
@@ -116,9 +120,6 @@ struct tuple_impl<std::index_sequence<indexes...>, Types...> : tuple_value<index
 protected:
 	// Add in an overload that is guaranteed to exist so the using operator[]
 	// in tuple is well-formed even for empty tuples
-	struct unusable {
-		unusable() = delete;
-	};
 	void operator[](unusable) = delete;
 };
 
