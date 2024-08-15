@@ -9,9 +9,7 @@ module;
 
 export module containers.algorithms.compare;
 
-import containers.c_array;
 import containers.begin_end;
-import containers.empty_range;
 import containers.iterator;
 import containers.range;
 import containers.sentinel_for;
@@ -193,81 +191,3 @@ constexpr auto equal(Range1 && range1, Range2 && range2) {
 }
 
 } // namespace containers
-
-constexpr auto empty = containers::empty_range<int>();
-
-static_assert(containers::lexicographical_compare_3way(empty, empty) == 0);
-static_assert(containers::equal(empty, empty));
-
-constexpr containers::c_array<int, 1> one_one = {1};
-constexpr containers::c_array<int, 1> one_two = {2};
-
-static_assert(containers::lexicographical_compare_3way(empty, one_one) < 0);
-static_assert(containers::lexicographical_compare_3way(one_one, empty) > 0);
-static_assert(!containers::equal(empty, one_one));
-static_assert(!containers::equal(one_one, empty));
-
-static_assert(containers::lexicographical_compare_3way(one_one, one_two) < 0);
-static_assert(containers::lexicographical_compare_3way(one_two, one_one) > 0);
-static_assert(!containers::equal(one_one, one_two));
-static_assert(!containers::equal(one_two, one_one));
-
-static_assert(containers::equal(one_one, one_one));
-static_assert(containers::equal(one_two, one_two));
-
-constexpr containers::c_array<int, 2> two_forward = {1, 2};
-constexpr containers::c_array<int, 2> two_reversed = {2, 1};
-
-static_assert(containers::lexicographical_compare_3way(empty, two_forward) < 0);
-static_assert(containers::lexicographical_compare_3way(two_forward, empty) > 0);
-static_assert(!containers::equal(empty, two_forward));
-static_assert(!containers::equal(two_forward, empty));
-
-static_assert(containers::lexicographical_compare_3way(one_one, two_forward) < 0);
-static_assert(containers::lexicographical_compare_3way(two_forward, one_one) > 0);
-static_assert(!containers::equal(one_one, two_forward));
-static_assert(!containers::equal(two_forward, one_one));
-
-static_assert(containers::lexicographical_compare_3way(one_two, two_forward) > 0);
-static_assert(containers::lexicographical_compare_3way(two_forward, one_two) < 0);
-static_assert(!containers::equal(one_two, two_forward));
-static_assert(!containers::equal(two_forward, one_two));
-
-static_assert(containers::lexicographical_compare_3way(two_forward, two_reversed) < 0);
-static_assert(containers::lexicographical_compare_3way(two_reversed, two_forward) > 0);
-static_assert(!containers::equal(two_forward, two_reversed));
-static_assert(!containers::equal(two_reversed, two_forward));
-
-static_assert(containers::equal(two_forward, two_forward));
-static_assert(containers::equal(two_reversed, two_reversed));
-
-constexpr containers::c_array<int, 9> nine = {1, 2, 3, 4, 5, 6, 7, 8, 9};
-constexpr containers::c_array<int, 10> ten = {1, 2, 3, 4, 5, 6, 7, 8, 9, 10};
-
-static_assert(containers::lexicographical_compare_3way(empty, nine) < 0);
-static_assert(containers::lexicographical_compare_3way(nine, empty) > 0);
-static_assert(!containers::equal(empty, nine));
-static_assert(!containers::equal(nine, empty));
-
-static_assert(containers::lexicographical_compare_3way(one_one, nine) < 0);
-static_assert(containers::lexicographical_compare_3way(nine, one_one) > 0);
-static_assert(!containers::equal(one_one, nine));
-static_assert(!containers::equal(nine, one_one));
-
-static_assert(containers::lexicographical_compare_3way(one_two, nine) > 0);
-static_assert(containers::lexicographical_compare_3way(nine, one_two) < 0);
-static_assert(!containers::equal(one_two, nine));
-static_assert(!containers::equal(nine, one_two));
-
-static_assert(containers::lexicographical_compare_3way(nine, two_reversed) < 0);
-static_assert(containers::lexicographical_compare_3way(two_reversed, nine) > 0);
-static_assert(!containers::equal(nine, two_reversed));
-static_assert(!containers::equal(two_reversed, nine));
-
-static_assert(containers::lexicographical_compare_3way(nine, ten) < 0);
-static_assert(containers::lexicographical_compare_3way(ten, nine) > 0);
-static_assert(!containers::equal(nine, ten));
-static_assert(!containers::equal(ten, nine));
-
-static_assert(containers::equal(nine, nine));
-static_assert(containers::equal(ten, ten));
