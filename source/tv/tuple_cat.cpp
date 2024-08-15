@@ -63,7 +63,7 @@ constexpr auto impl(
 export template<tuple_like... Tuples>
 	requires(... and bounded::constructible_from<std::decay_t<Tuples>, Tuples &&>)
 constexpr auto tuple_cat(Tuples && ... tuples) {
-	constexpr auto indexes = make_indexes(tuple_size<Tuples>...);
+	constexpr auto indexes = ::tv::make_indexes(tuple_size<Tuples>...);
 	return impl<indexes>(
 		tv::tie(OPERATORS_FORWARD(tuples)...),
 		std::make_index_sequence<indexes.size()>()
