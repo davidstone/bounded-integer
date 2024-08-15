@@ -225,6 +225,7 @@ target_sources(containers_test PRIVATE
 		test/sort/test_sort.cpp
 		test/algorithms/adjacent.cpp
 		test/algorithms/chunk_by.cpp
+		test/algorithms/count.cpp
 		test/algorithms/concatenate_view.cpp
 		test/algorithms/copy_or_relocate_from.cpp
 		test/algorithms/erase.cpp
