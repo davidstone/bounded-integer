@@ -11,7 +11,6 @@ module;
 export module containers.front;
 
 import containers.begin_end;
-import containers.c_array;
 import containers.is_empty;
 import containers.range;
 
@@ -23,9 +22,3 @@ export constexpr auto front(range auto && r) -> decltype(auto) {
 }
 
 } // namespace containers
-
-constexpr containers::c_array<int, 1> one = {5};
-static_assert(containers::front(one) == 5);
-
-constexpr containers::c_array<int, 3> three = {2, 3, 4};
-static_assert(containers::front(three) == 2);

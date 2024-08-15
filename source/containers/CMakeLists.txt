@@ -247,6 +247,7 @@ target_sources(containers_test PRIVATE
 		test/dynamic_array.cpp
 		test/flat_map.cpp
 		test/forward_linked_list.cpp
+		test/front.cpp
 		test/is_container.cpp
 		test/insert.cpp
 		test/lazy_push_back.cpp
