@@ -45,6 +45,8 @@ BOUNDED_INTEGER_MIXED_OPERATOR_OVERLOADS(>>)
 
 } // namespace bounded
 
+namespace {
+
 static_assert(homogeneous_equals(
 	bounded::integer<1, 10>(bounded::constant<9>) + std::integral_constant<int, 5>{},
 	bounded::integer<6, 15>(bounded::constant<14>)
@@ -106,3 +108,5 @@ static_assert(plus_equals(9U, bounded::constant<3>) == 12);
 static_assert(minus_equals(9, bounded::constant<68>) == -59);
 static_assert(divides_equals(-59, bounded::constant<10>) == -5);
 static_assert(modulus_equals(-5, bounded::constant<4>) == -1);
+
+} // namespace

@@ -28,6 +28,8 @@ constexpr auto construct = construct_t<T>();
 
 } // namespace bounded
 
+namespace {
+
 static_assert(bounded::construct<int>() == 0);
 static_assert(bounded::construct<int>(2) == 2);
 static_assert(noexcept(bounded::construct<int>()));
@@ -43,3 +45,5 @@ struct convert_to_int_throws {
 };
 
 static_assert(!noexcept(bounded::construct<int>(convert_to_int_throws())));
+
+} // namespace

@@ -39,6 +39,8 @@ BOUNDED_COMMON_ARITHMETIC(export)
 
 } // namespace bounded
 
+namespace {
+
 static_assert(homogeneous_equals(
 	bounded::constant<0> - bounded::constant<0>,
 	bounded::constant<0>
@@ -89,3 +91,5 @@ static_assert([]{
 	BOUNDED_ASSERT(z == bounded::constant<1>);
 	return true;
 }());
+
+} // namespace

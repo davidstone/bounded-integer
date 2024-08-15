@@ -70,6 +70,8 @@ export constexpr auto construct_at = construct_at_t();
 
 } // namespace bounded
 
+namespace {
+
 struct empty {};
 
 struct accepts_anything {
@@ -115,3 +117,4 @@ static_assert(!noexcept(bounded::construct_at(bounded::declval<int &>(), make_no
 auto make_no_lazy_construction_convert_to_int_throws() noexcept -> bounded::no_lazy_construction<convert_to_int_throws>;
 static_assert(!noexcept(bounded::construct_at(bounded::declval<int &>(), make_no_lazy_construction_convert_to_int_throws)));
 
+} // namespace

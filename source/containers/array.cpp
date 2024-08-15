@@ -170,6 +170,7 @@ struct std::tuple_element<index, ::containers::array<T, size>> {
 	using type = T;
 };
 
+namespace {
 
 constexpr auto size = 5_bi;
 constexpr containers::array<int, size> a = {};
@@ -224,3 +225,5 @@ static_assert(array_non_copyable_empty.size() == 0_bi);
 constexpr auto large_size = 10000_bi;
 constexpr auto large_array_n = containers::make_array_n(large_size, 0);
 static_assert(large_array_n.size() == large_size);
+
+} // namespace

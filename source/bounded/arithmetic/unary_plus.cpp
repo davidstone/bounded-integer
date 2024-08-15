@@ -18,6 +18,8 @@ export constexpr auto operator+(bounded_integer auto const value) {
 
 } // namespace bounded
 
+namespace {
+
 static_assert(homogeneous_equals(
 	+bounded::constant<0>,
 	bounded::constant<0>
@@ -44,3 +46,5 @@ static_assert(homogeneous_equals(
 	+x,
 	x
 ));
+
+} // namespace

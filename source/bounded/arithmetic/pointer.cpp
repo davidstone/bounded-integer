@@ -15,12 +15,16 @@ import std_module;
 
 namespace bounded {
 
+namespace {
+
 // This is faster to compile than `std::is_pointer_v`
 template<typename>
 constexpr auto is_pointer = false;
 
 template<typename T>
 constexpr auto is_pointer<T *> = true;
+
+} // namespace
 
 export template<typename T, bounded_integer Integer> requires(
 	(is_pointer<T> or (std::is_array_v<T> and numeric_traits::max_value<Integer> <= constant<std::extent_v<T>>))
@@ -41,6 +45,8 @@ constexpr auto operator+(Integer const number, T const & array) {
 // https://groups.google.com/a/isocpp.org/forum/#!topic/std-proposals/CmBERU_sr8Y
 
 } // namespace bounded
+
+namespace {
 
 using array_type = int[5];
 constexpr array_type array{ 0, 1, 2, 3, 4 };
@@ -71,3 +77,5 @@ static_assert(
 	"Incorrect array indexing with bounded::integer."
 );
 #endif
+
+} // namespace

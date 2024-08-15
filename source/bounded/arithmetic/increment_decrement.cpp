@@ -23,6 +23,8 @@ namespace bounded {
 OPERATORS_IMPORT_COMPOUND_ASSIGNMENT(export)
 export using operators::binary::operator-; \
 
+namespace {
+
 template<typename T>
 concept incrementable_by_bounded = requires(T value) {
 	value += constant<1>;
@@ -31,6 +33,8 @@ template<typename T>
 concept decrementable_by_bounded = requires(T value) {
 	value -= constant<1>;
 };
+
+} // namespace
 
 inline namespace arithmetic {
 

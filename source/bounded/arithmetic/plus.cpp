@@ -18,7 +18,11 @@ import std_module;
 
 namespace bounded {
 
+namespace {
+
 constexpr auto max_signed = numeric_traits::max_value<numeric_traits::max_signed_t>;
+
+} // namespace
 
 template<auto lhs, auto rhs>
 constexpr auto safer_add() {

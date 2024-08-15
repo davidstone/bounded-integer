@@ -47,6 +47,8 @@ constexpr auto operator-(integer<minimum, maximum> const value) {
 
 } // namespace bounded
 
+namespace {
+
 static_assert(homogeneous_equals(
 	-bounded::constant<0>,
 	bounded::constant<0>
@@ -103,3 +105,5 @@ static_assert(homogeneous_equals(
 	-bounded::integer<-3, 6>(bounded::constant<4>),
 	bounded::integer<-6, 3>(bounded::constant<-4>)
 ));
+
+} // namespace

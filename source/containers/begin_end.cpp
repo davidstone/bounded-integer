@@ -65,6 +65,7 @@ constexpr auto end(Range && r) {
 }
 
 } // namespace containers
+namespace {
 
 using namespace bounded::literal;
 
@@ -112,3 +113,5 @@ struct {
 	}
 } constexpr data_and_size;
 static_assert(containers::begin(data_and_size) == containers::end(data_and_size));
+
+} // namespace

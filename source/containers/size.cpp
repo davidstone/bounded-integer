@@ -37,7 +37,7 @@ constexpr auto size(c_array<T, size_> const &) {
 }
 
 } // namespace containers
-
+namespace {
 using namespace bounded::literal;
 
 constexpr int a[] = {0, 1, 2, 3, 4};
@@ -85,3 +85,5 @@ struct member_begin_end {
 	}
 };
 static_assert(containers::size(member_begin_end()) == 4);
+
+} // namespace
