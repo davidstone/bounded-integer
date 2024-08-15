@@ -230,6 +230,7 @@ target_sources(containers_test PRIVATE
 		test/algorithms/erase.cpp
 		test/algorithms/filter.cpp
 		test/algorithms/join.cpp
+		test/algorithms/set.cpp
 		test/algorithms/split.cpp
 		test/algorithms/zip.cpp
 		test/append.cpp
