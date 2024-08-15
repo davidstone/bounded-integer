@@ -257,6 +257,7 @@ target_sources(containers_test PRIVATE
 		test/pop_back.cpp
 		test/push_back.cpp
 		test/push_back_into_capacity.cpp
+		test/range_view.cpp
 		test/shrink_to_fit.cpp
 		test/stable_vector.cpp
 		test/take.cpp

@@ -10,9 +10,8 @@ module;
 
 export module containers.range_view;
 
-import containers.algorithms.compare;
-import containers.array;
 import containers.begin_end;
+import containers.c_array;
 import containers.common_iterator_functions;
 import containers.forward_random_access_range;
 import containers.has_member_size;
@@ -165,6 +164,13 @@ range_view(Range &&) -> range_view<
 	decltype(bounded::declval<Range &&>().size())
 >;
 
+template<typename T, std::size_t size>
+range_view(c_array<T, size> &) -> range_view<
+	contiguous_iterator<T, bounded::constant<size>>,
+	compute_end_from_size,
+	bounded::constant_t<bounded::normalize<size>>
+>;
+
 template<iterator Iterator, sentinel_for<Iterator> Sentinel>
 range_view(Iterator, Sentinel) -> range_view<
 	Iterator,
@@ -189,37 +195,4 @@ constexpr auto to_range_view(std::pair<Iterator, Sentinel> pair) {
 	return range_view(std::move(pair).first, std::move(pair).second);
 }
 
-
 } // namespace containers
-
-static_assert(containers::range_view<int *>(nullptr, nullptr).begin() == nullptr);
-static_assert(containers::range_view(static_cast<int *>(nullptr), 0).data() == nullptr);
-static_assert(containers::range_view(static_cast<int *>(nullptr), static_cast<int *>(nullptr)).data() == nullptr);
-static_assert(containers::range_view<int *>(nullptr, nullptr).end() == nullptr);
-static_assert(containers::range<containers::range_view<int *>>);
-
-constexpr auto a = containers::array({0, 1, 2, 3, 4});
-
-static_assert(std::same_as<
-	decltype(containers::range_view(a)),
-	containers::range_view<
-		containers::contiguous_iterator<int const, 5_bi>,
-		containers::compute_end_from_size,
-		bounded::constant_t<5>
-	>
->);
-
-static_assert(containers::equal(a, containers::range_view(a)));
-
-static_assert(bounded::convertible_to<
-	std::string_view,
-	containers::range_view<int *, int *, std::size_t>
->);
-static_assert(bounded::convertible_to<
-	std::span<int>,
-	containers::range_view<int *, int *, std::size_t>
->);
-static_assert(bounded::convertible_to<
-	std::span<int const>,
-	containers::range_view<int *, int *, std::size_t>
->);
