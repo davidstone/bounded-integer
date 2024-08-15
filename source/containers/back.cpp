@@ -12,7 +12,6 @@ export module containers.back;
 
 import containers.algorithms.advance;
 import containers.begin_end;
-import containers.c_array;
 import containers.is_empty;
 import containers.range;
 
@@ -24,9 +23,3 @@ export constexpr auto back(range auto && r) -> decltype(auto) {
 }
 
 } // namespace containers
-
-constexpr containers::c_array<int, 1> one = {5};
-static_assert(containers::back(one) == 5);
-
-constexpr containers::c_array<int, 3> three = {2, 3, 4};
-static_assert(containers::back(three) == 4);

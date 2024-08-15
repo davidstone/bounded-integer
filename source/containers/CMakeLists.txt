@@ -241,6 +241,7 @@ target_sources(containers_test PRIVATE
 		test/array.cpp
 		test/assign.cpp
 		test/assign_to_empty.cpp
+		test/back.cpp
 		test/bidirectional_linked_list.cpp
 		test/clear.cpp
 		test/concatenate.cpp
