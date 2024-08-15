@@ -224,6 +224,7 @@ target_sources(containers_test PRIVATE
 		test/sort/sort_exactly_n.cpp
 		test/sort/test_sort.cpp
 		test/algorithms/adjacent.cpp
+		test/algorithms/binary_search.cpp
 		test/algorithms/chunk_by.cpp
 		test/algorithms/compare.cpp
 		test/algorithms/count.cpp
