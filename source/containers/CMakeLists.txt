@@ -108,7 +108,6 @@ target_sources(containers PUBLIC
 		emplace_back.cpp
 		emplace_back_into_capacity.cpp
 		emplace_front.cpp
-		empty_range.cpp
 		erase_concepts.cpp
 		extract_key_to_less.cpp
 		flat_map.cpp
