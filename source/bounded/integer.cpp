@@ -59,17 +59,16 @@ constexpr auto builtin_min_value<integer<minimum, maximum>> = minimum;
 
 template<bounded::bounded_integer LHS, bounded::bounded_integer RHS> requires std::same_as<LHS, std::decay_t<LHS>> and std::same_as<RHS, std::decay_t<RHS>>
 struct std::common_type<LHS, RHS> {
-private:
-	static inline constexpr auto minimum = bounded::normalize<bounded::safe_min(
-		bounded::builtin_min_value<LHS>,
-		bounded::builtin_min_value<RHS>
-	)>;
-	static inline constexpr auto maximum = bounded::normalize<bounded::safe_max(
-		bounded::builtin_max_value<LHS>,
-		bounded::builtin_max_value<RHS>
-	)>;
-public:
-	using type = bounded::integer<minimum, maximum>;
+	using type = bounded::integer<
+		bounded::normalize<bounded::safe_min(
+			bounded::builtin_min_value<LHS>,
+			bounded::builtin_min_value<RHS>
+		)>,
+		bounded::normalize<bounded::safe_max(
+			bounded::builtin_max_value<LHS>,
+			bounded::builtin_max_value<RHS>
+		)>
+	>;
 };
 
 namespace bounded {
