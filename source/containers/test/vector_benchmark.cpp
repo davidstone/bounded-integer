@@ -17,7 +17,7 @@ auto DoNotOptimize(auto && value) -> void {
 }
 
 template<typename T>
-auto default_value() {
+auto default_value() -> T {
 	if constexpr (std::integral<T>) {
 		return 0;
 	} else {

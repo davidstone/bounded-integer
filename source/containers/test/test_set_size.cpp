@@ -12,6 +12,7 @@ export module containers.test.test_set_size;
 
 import containers.begin_end;
 import containers.data;
+import containers.range_value_t;
 
 import bounded;
 
@@ -48,7 +49,7 @@ constexpr auto test_add_one() -> void {
 	auto v = Container({1});
 	bounded::destroy(*containers::begin(v));
 	v.set_size(0_bi);
-	bounded::construct_at(*containers::data(v), [] { return 5; });
+	bounded::construct_at(*containers::data(v), [] { return static_cast<containers::range_value_t<Container>>(5); });
 	v.set_size(1_bi);
 	BOUNDED_ASSERT(v == Container({5}));
 }

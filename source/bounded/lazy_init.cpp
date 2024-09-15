@@ -15,33 +15,9 @@ export struct lazy_init_t {
 };
 export constexpr auto lazy_init = lazy_init_t();
 
-// If your function returns this type, the value will be unwrapped and then
-// copied / moved instead of constructed in place. This is necessary for types
-// like `std::jthread` that have constructors with unconstrained reference
-// parameters where the conversion would not work inside the constructor.
-export template<typename T>
-struct no_lazy_construction {
-	T value;
-	constexpr operator T() && {
-		return OPERATORS_FORWARD(value);
-	}
-};
-template<typename T>
-no_lazy_construction(T) -> no_lazy_construction<T>;
-
-template<typename T>
-struct unwrapped_function_result_type {
-	using type = T;
-};
-
-template<typename T>
-struct unwrapped_function_result_type<no_lazy_construction<T>> {
-	using type = T;
-};
-
 export template<typename Function, typename T>
 concept construct_function_for = convertible_to<
-	typename unwrapped_function_result_type<std::invoke_result_t<Function>>::type,
+	std::invoke_result_t<Function>,
 	T
 >;
 
