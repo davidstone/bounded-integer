@@ -70,54 +70,44 @@ constexpr auto is_cartesian_product_callable<Function, types<Args...>, types<Typ
 	is_cartesian_product_callable<Function, types<Args..., Types>, Rest...>
 );
 
-// The primary template just rotates the parameters
-template<std::size_t index, template<typename> typename GetTypes, typename Arg, typename... Args>
-constexpr auto is_variants_then_visit_function = is_variants_then_visit_function<
-	index - 1U,
-	GetTypes,
-	Args...,
-	Arg
->;
-// The specialization forwards to the implementation that does the real work
-template<template<typename> typename GetTypes, typename Function, typename... Variants>
-constexpr auto is_variants_then_visit_function<
-	0U,
-	GetTypes,
-	Function,
-	Variants...
-> = is_cartesian_product_callable<
-	Function,
-	types<>,
-	GetTypes<Variants>...
->;
+template<template<typename> typename GetTypes, typename Function, typename... Variants, std::size_t... indexes>
+consteval auto is_variants_then_visit_function(std::index_sequence<indexes...>) -> bool {
+	return is_cartesian_product_callable<
+		Function,
+		types<>,
+		GetTypes<Variants...[indexes]>...
+	>;
+}
 
-
-template<std::size_t... indexes>
-constexpr decltype(auto) visit_implementation(
+template<bool use_index, std::size_t, std::size_t... indexes>
+constexpr auto visit_implementation(
 	auto && function,
 	std::index_sequence<indexes...>,
 	bounded::constant_t<0>,
 	auto && ... variants
-) requires(sizeof...(indexes) == sizeof...(variants)) {
-	return OPERATORS_FORWARD(function)(
-		indexed_value<
-			decltype(OPERATORS_FORWARD(variants)[bounded::constant<indexes>]),
-			indexes
-		>(OPERATORS_FORWARD(variants)[bounded::constant<indexes>])...
-	);
+) -> decltype(auto) requires(sizeof...(indexes) == sizeof...(variants)) {
+	if constexpr (use_index) {
+		return OPERATORS_FORWARD(function)(
+			indexed_value<
+				decltype(OPERATORS_FORWARD(variants)[bounded::constant<indexes>]),
+				indexes
+			>(OPERATORS_FORWARD(variants)[bounded::constant<indexes>])...
+		);
+	} else {
+		return OPERATORS_FORWARD(function)(
+			OPERATORS_FORWARD(variants)[bounded::constant<indexes>]...
+		);
+	}
 }
 
-// This function accepts the pack of all variants twice. It passes over them
-// once to get all the indexes, then again to pull out the values.
-template<std::size_t... indexes>
-constexpr decltype(auto) visit_implementation(
+template<bool use_index, std::size_t variant_index, std::size_t... indexes>
+constexpr auto visit_implementation(
 	auto && function,
 	std::index_sequence<indexes...> initial_indexes,
 	auto offset,
-	auto const & variant,
 	auto && ... variants
-) requires(sizeof...(indexes) < sizeof...(variants)) {
-	auto const search_index = variant.index().integer();
+) -> decltype(auto) requires(sizeof...(indexes) < sizeof...(variants)) {
+	auto const search_index = variants...[variant_index].index().integer();
 	auto const this_search = search_index - offset;
 
 	// Cannot use a lambda because there is no return type that would be valid
@@ -127,7 +117,7 @@ constexpr decltype(auto) visit_implementation(
 			if constexpr (numeric_traits::max_value<decltype(this_search)> < (index)) { \
 				std::unreachable(); \
 			} else { \
-				return ::tv::visit_implementation( \
+				return ::tv::visit_implementation<use_index, variant_index + 1>( \
 					OPERATORS_FORWARD(function), \
 					std::index_sequence<indexes..., static_cast<std::size_t>(offset + (index))>{}, \
 					0_bi, \
@@ -159,11 +149,10 @@ constexpr decltype(auto) visit_implementation(
 			if constexpr (numeric_traits::max_value<decltype(this_search)> < max_index) {
 				std::unreachable();
 			} else {
-				return ::tv::visit_implementation(
+				return ::tv::visit_implementation<use_index, variant_index>(
 					OPERATORS_FORWARD(function),
 					initial_indexes,
 					offset + max_index,
-					variant,
 					OPERATORS_FORWARD(variants)...
 				);
 			}
@@ -172,9 +161,6 @@ constexpr decltype(auto) visit_implementation(
 	#undef VISIT_IMPL
 }
 
-template<typename, auto>
-concept any_with_value = true;
-
 // Often, we want to write a function that accepts a variadic number of
 // arguments and a function. We would like to accept the function parameter
 // last, since that gives the best syntax when passing a lambda. However, you
@@ -182,55 +168,37 @@ concept any_with_value = true;
 // the pack. rotate_transform allows us to write an interface that accepts stuff
 // and a function to operate on the stuff, but allows us to decide whether to
 // pass values or indexed values to the user's function.
-template<std::size_t... indexes>
-constexpr auto rotate_transform_impl(std::index_sequence<indexes...>) {
-	return [](
-		auto const transform,
-		any_with_value<indexes> auto && ... variants,
-		auto && function
-	) -> decltype(auto) {
-		return ::tv::visit_implementation(
-			transform(OPERATORS_FORWARD(function)),
-			std::index_sequence<>{},
-			0_bi,
-			variants...,
-			OPERATORS_FORWARD(variants)...
-		);
-	};
+template<bool use_index, std::size_t... indexes>
+constexpr auto rotate_transform(auto && function, std::index_sequence<indexes...>, auto && ... args) -> decltype(auto) {
+	return ::tv::visit_implementation<use_index, 0>(
+		OPERATORS_FORWARD(function),
+		std::index_sequence<>(),
+		0_bi,
+		OPERATORS_FORWARD(args...[indexes])...
+	);
 }
-
-constexpr auto rotate_transform(auto const transform, auto && ... args) -> decltype(auto) {
-	auto impl = ::tv::rotate_transform_impl(std::make_index_sequence<sizeof...(args) - 1>());
-	return impl(transform, OPERATORS_FORWARD(args)...);
-}
-
-struct identity {
-	static constexpr auto operator()(auto && function) -> auto && {
-		return function;
-	}
-};
 
 // Accepts any number of variants (including 0) followed by one function
 export constexpr auto visit_with_index = []<typename... Args>(Args && ... args) static -> decltype(auto)
-	 requires is_variants_then_visit_function<sizeof...(Args) - 1U, indexed_variant_types, Args...>
+	 requires(is_variants_then_visit_function<indexed_variant_types, Args...[sizeof...(args) - 1], Args...>(std::make_index_sequence<sizeof...(Args) - 1>()))
 {
-	return ::tv::rotate_transform(identity(), OPERATORS_FORWARD(args)...);
-};
-
-struct remove_index {
-	static constexpr auto operator()(auto && function) {
-		return [&](auto && ... args) -> decltype(auto) {
-			return OPERATORS_FORWARD(function)(OPERATORS_FORWARD(args).value()...);
-		};
-	}
+	return ::tv::rotate_transform<true>(
+		OPERATORS_FORWARD(args...[sizeof...(args) - 1]),
+		std::make_index_sequence<sizeof...(args) - 1>(),
+		OPERATORS_FORWARD(args)...
+	);
 };
 
 // Accepts any number of variants (including 0) followed by one function with
 // arity equal to the number of variants
 export constexpr auto visit = []<typename... Args>(Args && ... args) static -> decltype(auto)
-	requires is_variants_then_visit_function<sizeof...(Args) - 1U, variant_types, Args...>
+	requires(is_variants_then_visit_function<variant_types, Args...[sizeof...(args) - 1], Args...>(std::make_index_sequence<sizeof...(Args) - 1>()))
 {
-	return ::tv::rotate_transform(remove_index(), OPERATORS_FORWARD(args)...);
+	return ::tv::rotate_transform<false>(
+		OPERATORS_FORWARD(args...[sizeof...(args) - 1]),
+		std::make_index_sequence<sizeof...(args) - 1>(),
+		OPERATORS_FORWARD(args)...
+	);
 };
 
 } // namespace tv
