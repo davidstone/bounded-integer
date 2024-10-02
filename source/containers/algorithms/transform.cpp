@@ -110,6 +110,10 @@ concept element_invocable = std::invocable<Function, range_reference_t<Range>>;
 template<typename Function, typename Range>
 concept iterator_invocable = std::invocable<Function, iterator_t<Range>>;
 
+// Requires that the function has the same effects if called multiple times. A
+// transformed random access range remains random access, but if the function
+// cannot be called multiple times the resulting range must be an input range
+// instead.
 export template<range Range, element_invocable<Range> UnaryFunction>
 constexpr auto transform(Range && source, UnaryFunction dereference) -> range auto {
 	return adapt(
@@ -118,6 +122,10 @@ constexpr auto transform(Range && source, UnaryFunction dereference) -> range au
 	);
 }
 
+// Requires that the function has the same effects if called multiple times. A
+// transformed random access range remains random access, but if the function
+// cannot be called multiple times the resulting range must be an input range
+// instead.
 export template<range Range, iterator_invocable<Range> UnaryFunction>
 constexpr auto transform_dereference(Range && source, UnaryFunction dereference) -> range auto {
 	return adapt(
