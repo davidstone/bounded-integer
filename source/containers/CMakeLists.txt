@@ -50,6 +50,7 @@ target_sources(containers PUBLIC
 		algorithms/generate.cpp
 		algorithms/generate_until.cpp
 		algorithms/join.cpp
+		algorithms/join_with.cpp
 		algorithms/keyed_binary_search.cpp
 		algorithms/keyed_erase.cpp
 		algorithms/keyed_insert.cpp
@@ -233,6 +234,7 @@ target_sources(containers_test PRIVATE
 		test/algorithms/filter.cpp
 		test/algorithms/find.cpp
 		test/algorithms/join.cpp
+		test/algorithms/join_with.cpp
 		test/algorithms/keyed_binary_search.cpp
 		test/algorithms/set.cpp
 		test/algorithms/split.cpp

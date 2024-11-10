@@ -18,7 +18,15 @@ using namespace std::string_view_literals;
 
 template<std::size_t size>
 constexpr auto compare(containers::c_array<std::string_view, size> const & input, std::string_view const expected) -> bool {
-	return containers::equal(containers::join(containers::to_array(input)), expected);
+	auto rjoined = [&] {
+		return containers::join(containers::to_array(input));
+	};
+	auto const cjoined = rjoined();
+	auto mjoined = rjoined();
+	return
+		containers::equal(cjoined, expected) and
+		containers::equal(mjoined, expected) and
+		containers::equal(rjoined(), expected);
 }
 
 static_assert(containers::equal(
