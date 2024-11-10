@@ -51,6 +51,7 @@ target_sources(bounded PUBLIC
 		cast.cpp
 		character.cpp
 		check_in_range.cpp
+		checked_bit_cast.cpp
 		clamp.cpp
 		common_type_and_value_category.cpp
 		comparison.cpp

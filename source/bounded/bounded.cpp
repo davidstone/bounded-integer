@@ -15,6 +15,7 @@ export import bounded.builtin_min_max_value;
 export import bounded.cast;
 export import bounded.character;
 export import bounded.check_in_range;
+export import bounded.checked_bit_cast;
 export import bounded.clamp;
 export import bounded.common_type_and_value_category;
 export import bounded.comparison;
