@@ -1,5 +1,6 @@
 module;
 
+#include <bounded/conditional.hpp>
 #include <operators/forward.hpp>
 
 export module containers.trivial_inplace_function;
@@ -131,10 +132,13 @@ private:
 		}
 	}
 
+	constexpr explicit trivial_inplace_function_impl(bounded::tombstone_tag):
+		m_function_indirection(nullptr)
+	{
+	}
+
+	friend bounded::tombstone_traits<trivial_inplace_function_impl>;
 public:
-	// I would prefer that this not be default constructible. However, that
-	// would mean it could not be stored in a constexpr static_vector
-	trivial_inplace_function_impl() = default;
 
 	constexpr trivial_inplace_function_impl(trivially_storable<capacity, alignment, R, Args...> auto function):
 		m_storage(make_storage(function)),
@@ -158,6 +162,25 @@ public:
 	}
 };
 
+} // namespace containers
+
+template<bool is_const, std::size_t capacity, std::size_t alignment, typename R, typename... Args>
+struct bounded::tombstone_traits<containers::trivial_inplace_function_impl<is_const, capacity, alignment, R, Args...>> {
+private:
+	using T = containers::trivial_inplace_function_impl<is_const, capacity, alignment, R, Args...>;
+public:
+	static constexpr auto spare_representations = 1_bi;
+
+	static constexpr auto make(bounded::constant_t<0>) noexcept {
+		return T(bounded::tombstone_tag());
+	}
+	static constexpr auto index(T const & value) noexcept {
+		return BOUNDED_CONDITIONAL(value.m_function_indirection, -1_bi, 0_bi);
+	}
+};
+
+namespace containers {
+
 // If your function type is convertible to a function pointer, calling through
 // the function must have the same semantics as calling through the function
 // pointer.
@@ -174,8 +197,13 @@ struct trivial_inplace_function<R(Args...), capacity, alignment> :
 {
 private:
 	using base = trivial_inplace_function_impl<false, capacity, alignment, R, Args...>;
+	friend bounded::tombstone_traits<trivial_inplace_function>;
 public:
 	using base::base;
+	constexpr explicit trivial_inplace_function(base && b) noexcept:
+		base(std::move(b))
+	{
+	}
 	using base::operator();
 };
 
@@ -185,83 +213,30 @@ struct trivial_inplace_function<R(Args...) const, capacity, alignment> :
 {
 private:
 	using base = trivial_inplace_function_impl<true, capacity, alignment, R, Args...>;
+	friend bounded::tombstone_traits<trivial_inplace_function>;
 public:
 	using base::base;
+	constexpr explicit trivial_inplace_function(base && b) noexcept:
+		base(std::move(b))
+	{
+	}
 	using base::operator();
 };
 
 } // namespace containers
 
-using empty_const_function = containers::trivial_inplace_function<int() const, 0>;
-using const_function = containers::trivial_inplace_function<int() const, 24>;
-using empty_mutable_function = containers::trivial_inplace_function<int(), 0>;
-using mutable_function = containers::trivial_inplace_function<int(), 24>;
+template<containers::function_signature Signature, std::size_t capacity, std::size_t alignment>
+struct bounded::tombstone_traits<containers::trivial_inplace_function<Signature, capacity, alignment>> {
+private:
+	using T = containers::trivial_inplace_function<Signature, capacity, alignment>;
+	using base = tombstone_traits<typename T::base>;
+public:
+	static constexpr auto spare_representations = base::spare_representations;
 
-static_assert(std::is_trivially_copyable_v<empty_const_function>);
-static_assert(std::is_trivially_copyable_v<const_function>);
-static_assert(std::is_trivially_copyable_v<empty_mutable_function>);
-static_assert(std::is_trivially_copyable_v<mutable_function>);
-
-static_assert(std::invocable<empty_const_function const &>);
-static_assert(std::invocable<const_function const &>);
-static_assert(std::invocable<empty_const_function &>);
-static_assert(std::invocable<const_function &>);
-
-static_assert(!std::invocable<empty_mutable_function const &>);
-static_assert(!std::invocable<mutable_function const &>);
-static_assert(std::invocable<empty_mutable_function &>);
-static_assert(std::invocable<mutable_function &>);
-
-constexpr auto normal_function() -> int {
-	return 2;
-}
-static_assert(empty_const_function(normal_function)() == 2);
-static_assert(bounded::constructible_from<const_function, int(*)()>);
-static_assert(empty_mutable_function(normal_function)() == 2);
-static_assert(bounded::constructible_from<const_function, int(*)()>);
-
-static_assert(!bounded::constructible_from<empty_const_function, void(*)()>);
-static_assert(!bounded::constructible_from<const_function, void(*)()>);
-static_assert(!bounded::constructible_from<empty_const_function, long(*)()>);
-static_assert(!bounded::constructible_from<const_function, long(*)()>);
-
-template<std::size_t size>
-struct sized_function {
-	[[no_unique_address]] containers::array<std::byte, bounded::constant<size>> a;
-	auto operator()() const {
-		return 1;
+	static constexpr auto make(bounded::constant_t<0>) noexcept {
+		return T(base::make(0_bi));
+	}
+	static constexpr auto index(T const & value) noexcept {
+		return base::index(value);
 	}
 };
-
-static_assert(bounded::constructible_from<empty_const_function, sized_function<0>>);
-static_assert(bounded::constructible_from<const_function, sized_function<0>>);
-static_assert(bounded::constructible_from<empty_mutable_function, sized_function<0>>);
-static_assert(bounded::constructible_from<mutable_function, sized_function<0>>);
-
-static_assert(!bounded::constructible_from<empty_const_function, sized_function<24>>);
-static_assert(bounded::constructible_from<const_function, sized_function<24>>);
-static_assert(!bounded::constructible_from<empty_mutable_function, sized_function<24>>);
-static_assert(bounded::constructible_from<mutable_function, sized_function<24>>);
-
-static_assert(!bounded::constructible_from<empty_const_function, sized_function<25>>);
-static_assert(!bounded::constructible_from<const_function, sized_function<25>>);
-static_assert(!bounded::constructible_from<empty_mutable_function, sized_function<25>>);
-static_assert(!bounded::constructible_from<mutable_function, sized_function<25>>);
-
-static_assert(sizeof(containers::trivial_inplace_function<void() const, 0>) == sizeof(void(*)()));
-
-constexpr auto returns_five = empty_const_function([] { return 5; });
-static_assert(returns_five() == 5);
-
-[[maybe_unused]] void test_lambdas() {
-	constexpr auto empty_capture_lambda = [=]{};
-	using empty_capture_lambda_t = decltype(empty_capture_lambda);
-	static_assert(std::is_empty_v<empty_capture_lambda_t>);
-	static_assert(!bounded::trivially_default_constructible<empty_capture_lambda_t>);
-	static_assert(!bounded::constructible_from<empty_const_function, empty_capture_lambda_t>);
-
-	constexpr auto non_empty_lambda = [x = 0]{ static_cast<void>(x); };
-	using non_empty_lambda_t = decltype(non_empty_lambda);
-	static_assert(!std::is_empty_v<non_empty_lambda_t>);
-	static_assert(!bounded::constructible_from<empty_const_function, non_empty_lambda_t>);
-}
