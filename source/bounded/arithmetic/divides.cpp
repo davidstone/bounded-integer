@@ -11,6 +11,7 @@ import bounded.arithmetic.safe_abs;
 import bounded.arithmetic.unary_minus;
 import bounded.bounded_integer;
 import bounded.comparison;
+import bounded.conditional_function;
 import bounded.homogeneous_equals;
 import bounded.integer;
 import bounded.minmax;
@@ -22,15 +23,6 @@ import numeric_traits;
 import std_module;
 
 namespace bounded {
-
-template<bool condition>
-constexpr auto conditional_function(auto if_true, auto if_false) {
-	if constexpr (condition) {
-		return if_true;
-	} else {
-		return if_false;
-	}
-};
 
 // Ignores divide by 0, caught by constexpr
 template<auto lhs, auto rhs>

@@ -58,6 +58,7 @@ target_sources(bounded PUBLIC
 		comparison_builtin.cpp
 		comparison_function_object.cpp
 		concepts.cpp
+		conditional_function.cpp
 		constexpr_only_if.cpp
 		construct.cpp
 		construct_at.cpp
