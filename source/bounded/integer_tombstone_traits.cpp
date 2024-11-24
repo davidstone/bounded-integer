@@ -12,6 +12,7 @@ export module bounded.integer_tombstone_traits;
 import bounded.arithmetic.operators;
 import bounded.bounded_integer;
 import bounded.comparison;
+import bounded.conditional_function;
 import bounded.integer;
 import bounded.literal;
 import bounded.tombstone_traits;
@@ -32,14 +33,14 @@ private:
 	static constexpr auto spare_below = numeric_traits::min_value<T> - underlying_min;
 	static constexpr auto spare_above = underlying_max - numeric_traits::max_value<T>;
 public:
-	static constexpr auto spare_representations = BOUNDED_CONDITIONAL(std::is_empty_v<T>,
+	static constexpr auto spare_representations = conditional_function<std::is_empty_v<T>>(
 		constant<0>,
 		spare_below + spare_above
 	);
 
 	template<bounded_integer Index> requires(Index() < spare_representations)
 	static constexpr auto make(Index const index) noexcept {
-		auto const value = BOUNDED_CONDITIONAL(index < spare_below,
+		auto const value = conditional_function<index < spare_below>(
 			index + underlying_min,
 			index - spare_below + numeric_traits::max_value<T> + constant<1>
 		);
