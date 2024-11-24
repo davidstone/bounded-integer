@@ -130,6 +130,7 @@ target_sources(bounded_test PRIVATE
 		test/conditional.cpp
 		test/stream.cpp
 		test/to_integer.cpp
+		test/tombstone_traits.cpp
 )
 
 target_link_libraries(bounded_test PUBLIC
