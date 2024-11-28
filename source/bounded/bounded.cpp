@@ -22,6 +22,7 @@ export import bounded.comparison;
 export import bounded.comparison_builtin;
 export import bounded.comparison_function_object;
 export import bounded.concepts;
+export import bounded.conditional_function;
 export import bounded.construct;
 export import bounded.construct_at;
 export import bounded.copy;
