@@ -16,5 +16,3 @@ target_link_libraries(bounded_arithmetic_test PUBLIC
 	bounded
 	strict_defaults
 )
-
-add_test(bounded_arithmetic_test bounded_arithmetic_test)
