@@ -117,6 +117,8 @@ set_source_files_properties(arithmetic/operators_builtin.cpp
 	PROPERTIES COMPILE_FLAGS "-Wno-implicit-int-conversion -Wno-shorten-64-to-32"
 )
 
+add_subdirectory(arithmetic/test)
+
 add_executable(bounded_test)
 
 target_sources(bounded_test PRIVATE
