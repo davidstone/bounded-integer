@@ -250,7 +250,7 @@ struct bounded::tombstone_traits<two_spare_representations> {
 	static constexpr auto make(auto const index) noexcept -> two_spare_representations {
 		return two_spare_representations{index == 0_bi ? 12 : 19};
 	}
-	static constexpr auto index(two_spare_representations const & value) noexcept {
+	static constexpr auto index(two_spare_representations const & value) noexcept -> bounded::integer<-1, 1> {
 		return
 			BOUNDED_CONDITIONAL(value.x == 12, 0_bi,
 			BOUNDED_CONDITIONAL(value.x == 19, 1_bi,

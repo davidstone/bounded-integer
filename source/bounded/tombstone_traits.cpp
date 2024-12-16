@@ -5,7 +5,9 @@
 
 export module bounded.tombstone_traits;
 
+import bounded.arithmetic.operators;
 import bounded.integer;
+import bounded.normalize;
 
 namespace bounded {
 
@@ -35,9 +37,15 @@ struct tombstone_traits_composer<pointer> {
 	static constexpr auto spare_representations = tombstone_traits<Inner>::spare_representations;
 
 	static constexpr auto make(auto const index) noexcept -> Outer {
-		return Outer(tombstone_tag(), [=]() noexcept { return tombstone_traits<Inner>::make(index); });
+		return Outer(
+			tombstone_tag(),
+			[=] noexcept { return tombstone_traits<Inner>::make(index); }
+		);
 	}
-	static constexpr auto index(Outer const & value) noexcept {
+	static constexpr auto index(Outer const & value) noexcept -> bounded::integer<
+		-1,
+		bounded::normalize<spare_representations - bounded::constant<1>>
+	> {
 		return tombstone_traits<Inner>::index(value.*pointer);
 	}
 };

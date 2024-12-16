@@ -48,11 +48,12 @@ public:
 	}
 	static constexpr auto index(T const & value) noexcept {
 		auto const bounded_value = integer(value.m_value);
-		return
+		auto const result =
 			BOUNDED_CONDITIONAL(bounded_value < numeric_traits::min_value<T>, bounded_value - underlying_min,
 			BOUNDED_CONDITIONAL(bounded_value > numeric_traits::max_value<T>, bounded_value + spare_below - numeric_traits::max_value<T> - constant<1>,
 			constant<-1>
 		));
+		return bounded::assume_in_range(result, constant<-1>, spare_representations - constant<1>);
 	}
 };
 

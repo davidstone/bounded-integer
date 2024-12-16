@@ -127,8 +127,17 @@ struct optional_storage<T> {
 		m_data(bounded::tombstone_traits<T>::make(index + 1_bi))
 	{
 	}
-	constexpr auto tombstone_index() const noexcept {
-		return bounded::tombstone_traits<T>::index(m_data) - 1_bi;
+	using tombstone_index_t = bounded::integer<
+		-1,
+		bounded::normalize<spare_representations - 1_bi>
+	>;
+	constexpr auto tombstone_index() const noexcept -> tombstone_index_t {
+		auto const underlying_index = bounded::tombstone_traits<T>::index(m_data);
+		return bounded::assume_in_range<tombstone_index_t>(
+			underlying_index == -1_bi ?
+				-1_bi :
+				underlying_index - 1_bi,
+		);
 	}
 
 private:
