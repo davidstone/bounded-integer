@@ -267,12 +267,12 @@ private:
 		m_data(uninitialized_union())
 	{
 	}
-	friend bounded::tombstone_traits<variant>;
-	friend bounded::tombstone_traits_composer<&variant::m_index>;
+	friend bounded::tombstone<variant>;
+	friend bounded::tombstone_member<&variant::m_index>;
 };
 
 } // namespace tv
 
 template<typename... Ts>
-struct bounded::tombstone_traits<tv::variant<Ts...>> : bounded::tombstone_traits_composer<&tv::variant<Ts...>::m_index> {
+struct bounded::tombstone<tv::variant<Ts...>> : bounded::tombstone_member<&tv::variant<Ts...>::m_index> {
 };

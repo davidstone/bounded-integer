@@ -61,14 +61,14 @@ private:
 		m_index(make())
 	{
 	}
-	friend bounded::tombstone_traits<variant_index>;
-	friend bounded::tombstone_traits_composer<&variant_index::m_index>;
+	friend bounded::tombstone<variant_index>;
+	friend bounded::tombstone_member<&variant_index::m_index>;
 };
 
 } // namespace tv
 
 template<typename... Ts>
-struct bounded::tombstone_traits<tv::variant_index<Ts...>> : bounded::tombstone_traits_composer<&tv::variant_index<Ts...>::m_index> {
+struct bounded::tombstone<tv::variant_index<Ts...>> : bounded::tombstone_member<&tv::variant_index<Ts...>::m_index> {
 };
 
 using namespace bounded::literal;

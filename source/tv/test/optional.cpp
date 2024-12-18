@@ -244,9 +244,7 @@ struct two_spare_representations {
 };
 
 template<>
-struct bounded::tombstone_traits<two_spare_representations> {
-	static constexpr auto spare_representations = 2_bi;
-
+struct bounded::tombstone<two_spare_representations> {
 	static constexpr auto make(auto const index) noexcept -> two_spare_representations {
 		return two_spare_representations{index == 0_bi ? 12 : 19};
 	}

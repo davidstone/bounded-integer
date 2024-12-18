@@ -63,7 +63,6 @@ struct optional_storage {
 	}
 
 	using tombstone_t = bounded::tombstone_traits<variant<none_t, T>>;
-	static constexpr auto spare_representations = tombstone_t::spare_representations;
 	constexpr explicit optional_storage(bounded::tombstone_tag, auto const index) noexcept:
 		m_data(tombstone_t::make(index))
 	{
@@ -121,18 +120,18 @@ struct optional_storage<T> {
 	constexpr auto get() && -> T && {
 		return std::move(m_data);
 	}
-
-	static constexpr auto spare_representations = bounded::tombstone_traits<T>::spare_representations - 1_bi;
+	
+	using underlying_tombstone = bounded::tombstone_traits<T>;
 	constexpr explicit optional_storage(bounded::tombstone_tag, auto const index) noexcept:
-		m_data(bounded::tombstone_traits<T>::make(index + 1_bi))
+	m_data(underlying_tombstone::make(index + 1_bi))
 	{
 	}
 	using tombstone_index_t = bounded::integer<
 		-1,
-		bounded::normalize<spare_representations - 1_bi>
+		bounded::normalize<underlying_tombstone::spare_representations - 2_bi>
 	>;
 	constexpr auto tombstone_index() const noexcept -> tombstone_index_t {
-		auto const underlying_index = bounded::tombstone_traits<T>::index(m_data);
+		auto const underlying_index = underlying_tombstone::index(m_data);
 		return bounded::assume_in_range<tombstone_index_t>(
 			underlying_index == -1_bi ?
 				-1_bi :
@@ -183,7 +182,9 @@ struct optional_storage<T &> {
 	}
 
 	// TODO: look into using the unused bits of the pointer
-	static constexpr auto spare_representations = 0_bi;
+	static constexpr auto tombstone_index() noexcept -> bounded::constant_t<-1> {
+		return -1_bi;
+	}
 
 private:
 	T * m_data;
@@ -192,9 +193,7 @@ private:
 } // namespace tv
 
 template<typename T>
-struct bounded::tombstone_traits<tv::optional_storage<T>>  {
-	static constexpr auto spare_representations = tv::optional_storage<T>::spare_representations;
-
+struct bounded::tombstone<tv::optional_storage<T>>  {
 	static constexpr auto make(auto const index) noexcept -> tv::optional_storage<T> {
 		return tv::optional_storage<T>(tombstone_tag(), index);
 	}
@@ -301,8 +300,8 @@ private:
 	}
 	
 	optional_storage<T> m_storage;
-	friend bounded::tombstone_traits<optional<T>>;
-	friend bounded::tombstone_traits_composer<&optional<T>::m_storage>;
+	friend bounded::tombstone<optional<T>>;
+	friend bounded::tombstone_member<&optional<T>::m_storage>;
 };
 
 template<typename T> requires(!std::same_as<T, none_t>)
@@ -319,7 +318,7 @@ export constexpr auto make_optional_lazy(auto && function) -> optional<std::invo
 } // namespace tv
 
 template<typename T>
-struct bounded::tombstone_traits<tv::optional<T>> : bounded::tombstone_traits_composer<&tv::optional<T>::m_storage> {
+struct bounded::tombstone<tv::optional<T>> : bounded::tombstone_member<&tv::optional<T>::m_storage> {
 };
 
 template<typename LHS, typename RHS>

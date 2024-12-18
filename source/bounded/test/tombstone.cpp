@@ -1,63 +1,70 @@
-// Copyright David Stone 2020.
+// Copyright David Stone 2024.
 // Distributed under the Boost Software License, Version 1.0.
 // (See accompanying file LICENSE_1_0.txt or copy at
 // http://www.boost.org/LICENSE_1_0.txt)
 
-module;
+export module bounded.test.tombstone;
 
-#include <bounded/conditional.hpp>
-
-export module bounded.integer_tombstone_traits;
-
-import bounded.arithmetic.operators;
-import bounded.bounded_integer;
+import bounded.arithmetic.unary_minus;
 import bounded.comparison;
-import bounded.conditional_function;
 import bounded.integer;
 import bounded.literal;
-import bounded.tombstone_traits;
-import bounded.unchecked;
+import bounded.tombstone;
 
-import numeric_traits;
+namespace {
+using namespace bounded::literal;
 
-import std_module;
+struct a {
+	int m;
+};
 
-namespace bounded {
-
-template<bounded_integer T>
-struct tombstone_traits<T> {
-private:
-	using underlying = typename T::underlying_type;
-	static constexpr auto underlying_min = constant<numeric_traits::min_value<underlying>>;
-	static constexpr auto underlying_max = constant<numeric_traits::max_value<underlying>>;
-	static constexpr auto spare_below = numeric_traits::min_value<T> - underlying_min;
-	static constexpr auto spare_above = underlying_max - numeric_traits::max_value<T>;
-public:
-	static constexpr auto spare_representations = conditional_function<std::is_empty_v<T>>(
-		constant<0>,
-		spare_below + spare_above
-	);
-
-	template<bounded_integer Index> requires(Index() < spare_representations)
-	static constexpr auto make(Index const index) noexcept {
-		auto const value = conditional_function<index < spare_below>(
-			index + underlying_min,
-			index - spare_below + numeric_traits::max_value<T> + constant<1>
-		);
-		return T(underlying(value), unchecked);
+struct b {
+	constexpr b():
+		m(1)
+	{
 	}
-	static constexpr auto index(T const & value) noexcept {
-		auto const bounded_value = integer(value.m_value);
-		auto const result =
-			BOUNDED_CONDITIONAL(bounded_value < numeric_traits::min_value<T>, bounded_value - underlying_min,
-			BOUNDED_CONDITIONAL(bounded_value > numeric_traits::max_value<T>, bounded_value + spare_below - numeric_traits::max_value<T> - constant<1>,
-			constant<-1>
-		));
-		return bounded::assume_in_range(result, constant<-1>, spare_representations - constant<1>);
+	a m;
+private:
+	constexpr explicit b(bounded::tombstone_tag, auto const make):
+		m(make())
+	{
+	}
+	friend bounded::tombstone_member<&b::m>;
+};
+
+} // namespace
+
+template<>
+struct bounded::tombstone<a> {
+	static constexpr auto make(bounded::constant_t<0>) noexcept -> a {
+		return a(0);
+	}
+	static constexpr auto index(a const & value) noexcept -> bounded::integer<-1, 0> {
+		if (value.m == 0) {
+			return 0_bi;
+		}
+		return -1_bi;
 	}
 };
 
-} // namespace bounded
+template<>
+struct bounded::tombstone<b> : bounded::tombstone_member<&b::m> {
+};
+
+namespace {
+
+using a_traits = bounded::tombstone_traits<a>;
+static_assert(a_traits::spare_representations == 1_bi);
+static_assert(a_traits::make(0_bi).m == 0);
+static_assert(a_traits::index(a(0)) == 0_bi);
+static_assert(a_traits::index(a(1)) == -1_bi);
+
+using b_traits = bounded::tombstone_traits<b>;
+static_assert(b_traits::spare_representations == 1_bi);
+static_assert(b_traits::make(0_bi).m.m == 0);
+static_assert(b_traits::index(b_traits::make(0_bi)) == 0_bi);
+static_assert(b_traits::index(b()) == -1_bi);
+
 
 using namespace bounded::literal;
 
@@ -153,3 +160,5 @@ static_assert(reversible<bounded::integer<-50, 49>>(
 static_assert(bounded::tombstone_traits<bounded::integer<0, 255>>::spare_representations == 0_bi);
 static_assert(bounded::tombstone_traits<bounded::integer<-128, 127>>::spare_representations == 0_bi);
 static_assert(bounded::tombstone_traits<bounded::integer<53, 53>>::spare_representations == 0_bi);
+
+} // namespace

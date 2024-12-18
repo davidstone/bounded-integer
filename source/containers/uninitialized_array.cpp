@@ -90,14 +90,13 @@ struct non_trivial {
 	int m;
 };
 template<>
-struct bounded::tombstone_traits<non_trivial> {
-	static constexpr auto spare_representations = 1_bi;
-
+struct bounded::tombstone<non_trivial> {
+	using index_t = bounded::integer<-1, 0>;
 	static constexpr auto make(bounded::constant_t<0>) noexcept -> non_trivial {
 		return non_trivial(17);
 	}
-	static constexpr auto index(non_trivial const & value) noexcept {
-		return value.m == 17;
+	static constexpr auto index(non_trivial const & value) noexcept -> index_t {
+		return value.m == 17 ? index_t(-1_bi) : index_t(0_bi);
 	}
 };
 

@@ -137,7 +137,7 @@ private:
 	{
 	}
 
-	friend bounded::tombstone_traits<trivial_inplace_function_impl>;
+	friend bounded::tombstone<trivial_inplace_function_impl>;
 public:
 
 	constexpr trivial_inplace_function_impl(trivially_storable<capacity, alignment, R, Args...> auto function):
@@ -165,12 +165,10 @@ public:
 } // namespace containers
 
 template<bool is_const, std::size_t capacity, std::size_t alignment, typename R, typename... Args>
-struct bounded::tombstone_traits<containers::trivial_inplace_function_impl<is_const, capacity, alignment, R, Args...>> {
+struct bounded::tombstone<containers::trivial_inplace_function_impl<is_const, capacity, alignment, R, Args...>> {
 private:
 	using T = containers::trivial_inplace_function_impl<is_const, capacity, alignment, R, Args...>;
 public:
-	static constexpr auto spare_representations = 1_bi;
-
 	static constexpr auto make(bounded::constant_t<0>) noexcept {
 		return T(bounded::tombstone_tag());
 	}
@@ -197,7 +195,7 @@ struct trivial_inplace_function<R(Args...), capacity, alignment> :
 {
 private:
 	using base = trivial_inplace_function_impl<false, capacity, alignment, R, Args...>;
-	friend bounded::tombstone_traits<trivial_inplace_function>;
+	friend bounded::tombstone<trivial_inplace_function>;
 public:
 	using base::base;
 	constexpr explicit trivial_inplace_function(base && b) noexcept:
@@ -213,7 +211,7 @@ struct trivial_inplace_function<R(Args...) const, capacity, alignment> :
 {
 private:
 	using base = trivial_inplace_function_impl<true, capacity, alignment, R, Args...>;
-	friend bounded::tombstone_traits<trivial_inplace_function>;
+	friend bounded::tombstone<trivial_inplace_function>;
 public:
 	using base::base;
 	constexpr explicit trivial_inplace_function(base && b) noexcept:
@@ -226,13 +224,11 @@ public:
 } // namespace containers
 
 template<containers::function_signature Signature, std::size_t capacity, std::size_t alignment>
-struct bounded::tombstone_traits<containers::trivial_inplace_function<Signature, capacity, alignment>> {
+struct bounded::tombstone<containers::trivial_inplace_function<Signature, capacity, alignment>> {
 private:
 	using T = containers::trivial_inplace_function<Signature, capacity, alignment>;
-	using base = tombstone_traits<typename T::base>;
+	using base = tombstone<typename T::base>;
 public:
-	static constexpr auto spare_representations = base::spare_representations;
-
 	static constexpr auto make(bounded::constant_t<0>) noexcept {
 		return T(base::make(0_bi));
 	}

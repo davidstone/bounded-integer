@@ -70,7 +70,6 @@ target_sources(bounded PUBLIC
 		hash.cpp
 		homogeneous_equals.cpp
 		integer.cpp
-		integer_tombstone_traits.cpp
 		integral.cpp
 		integral_constant_of_integral.cpp
 		is_bounded_integer.cpp
@@ -100,7 +99,7 @@ target_sources(bounded PUBLIC
 		stream.cpp
 		test_int.cpp
 		to_integer.cpp
-		tombstone_traits.cpp
+		tombstone.cpp
 		type.cpp
 		unchecked.cpp
 		underlying_type_t.cpp
@@ -132,7 +131,7 @@ target_sources(bounded_test PRIVATE
 		test/conditional.cpp
 		test/stream.cpp
 		test/to_integer.cpp
-		test/tombstone_traits.cpp
+		test/tombstone.cpp
 )
 
 target_link_libraries(bounded_test PUBLIC
