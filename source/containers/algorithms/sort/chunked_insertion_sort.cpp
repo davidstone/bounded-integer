@@ -74,7 +74,7 @@ constexpr auto chunked_insertion_sort(range auto && r, Compare const compare = C
 	);
 	it += initial_sort_size;
 	#endif
-	auto buffer = containers::uninitialized_array<std::remove_reference_t<decltype(*it)>, chunk_size.value()>();
+	auto buffer = containers::uninitialized_array<std::remove_reference_t<decltype(*it)>, chunk_size>();
 	while (it != last) {
 		auto const count = bounded::min(chunk_size, last - it);
 		auto next_it = ::containers::runtime_sort_exactly_n_relocate(it, count, buffer.data(), compare);
