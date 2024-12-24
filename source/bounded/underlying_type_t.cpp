@@ -26,14 +26,14 @@ constexpr auto range_fits_in_type(auto const minimum, auto const maximum) {
 
 template<auto minimum, auto maximum>
 constexpr auto determine_type() {
-	if constexpr (range_fits_in_type<unsigned char>(minimum, maximum)) {
-		return type<unsigned char>;
-	} else if constexpr (range_fits_in_type<signed char>(minimum, maximum)) {
+	if constexpr (range_fits_in_type<signed char>(minimum, maximum)) {
 		return type<signed char>;
-	} else if constexpr (range_fits_in_type<unsigned short>(minimum, maximum)) {
-		return type<unsigned short>;
+	} else if constexpr (range_fits_in_type<unsigned char>(minimum, maximum)) {
+		return type<unsigned char>;
 	} else if constexpr (range_fits_in_type<signed short>(minimum, maximum)) {
 		return type<signed short>;
+	} else if constexpr (range_fits_in_type<unsigned short>(minimum, maximum)) {
+		return type<unsigned short>;
 	} else if constexpr (range_fits_in_type<unsigned int>(minimum, maximum)) {
 		return type<unsigned int>;
 	} else if constexpr (range_fits_in_type<signed int>(minimum, maximum)) {
