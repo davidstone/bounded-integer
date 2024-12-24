@@ -97,25 +97,20 @@ constexpr auto reversible(auto const ... indexes) {
 static_assert(bounded::tombstone_traits<bounded::integer<0, 4>>::spare_representations == 251_bi);
 
 static_assert(reversible<bounded::integer<0, 4>>(
-	pair(0_bi, 5_bi),
-	pair(1_bi, 6_bi),
-	pair(2_bi, 7_bi),
-	pair(3_bi, 8_bi),
-	pair(4_bi, 9_bi),
-	pair(5_bi, 10_bi),
-	pair(250_bi, 255_bi)
+	pair(0_bi, -128_bi),
+	pair(1_bi, -127_bi),
+	pair(128_bi, 5_bi),
+	pair(250_bi, 127_bi)
 ));
 
 static_assert(bounded::tombstone_traits<bounded::integer<2, 5>>::spare_representations == 252_bi);
 
 static_assert(reversible<bounded::integer<2, 5>>(
-	pair(0_bi, 0_bi),
-	pair(1_bi, 1_bi),
-	pair(2_bi, 6_bi),
-	pair(3_bi, 7_bi),
-	pair(4_bi, 8_bi),
-	pair(5_bi, 9_bi),
-	pair(251_bi, 255_bi)
+	pair(0_bi, -128_bi),
+	pair(1_bi, -127_bi),
+	pair(129_bi, 1_bi),
+	pair(130_bi, 6_bi),
+	pair(251_bi, 127_bi)
 ));
 
 static_assert(bounded::tombstone_traits<bounded::integer<254, 255>>::spare_representations == 254_bi);
