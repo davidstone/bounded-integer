@@ -24,9 +24,6 @@ constexpr auto range_fits_in_type(auto const minimum, auto const maximum) {
 		value_fits_in_type<T>(maximum);
 }
 
-template<auto...>
-constexpr auto false_ = false;
-
 template<auto minimum, auto maximum>
 constexpr auto determine_type() {
 	if constexpr (range_fits_in_type<unsigned char>(minimum, maximum)) {
@@ -56,7 +53,7 @@ constexpr auto determine_type() {
 		return type<numeric_traits::int128_t>;
 #endif
 	} else {
-		static_assert(false_<minimum, maximum>, "Bounds cannot fit in any type.");
+		static_assert(false, "Bounds cannot fit in any type.");
 	}
 }
 
