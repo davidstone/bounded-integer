@@ -32,7 +32,7 @@ export constexpr auto fixed_size_merge_sort(auto it, auto const size1, auto cons
 	auto first2 = it + size1;
 	auto const last2 = first2 + size2;
 	::containers::sort_exactly_n(first2, size2, compare);
-	auto buffer = containers::uninitialized_array<std::remove_reference_t<decltype(*it)>, size1.value()>();
+	auto buffer = containers::uninitialized_array<std::remove_reference_t<decltype(*it)>, size1>();
 	auto first1 = buffer.data();
 	auto const last1 = first1 + size1;
 	::containers::sort_exactly_n_relocate(it, size1, first1, compare);
