@@ -10,7 +10,7 @@ module;
 
 export module containers.linked_list_helper;
 
-import containers.common_iterator_functions;
+export import containers.common_iterator_functions;
 import containers.maximum_array_size;
 
 import bounded;
