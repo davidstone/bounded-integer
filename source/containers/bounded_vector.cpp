@@ -124,8 +124,7 @@ struct [[clang::trivial_abi]] bounded_vector : private lexicographical_compariso
 		}
 		if constexpr (min_capacity > 0_bi) {
 			if (!m_storage.data()) {
-				BOUNDED_ASSERT(m_size == 0_bi);
-				m_storage.replace_allocation(reservation_size(other.size()));
+				replace_empty_allocation(other.size());
 				::containers::uninitialized_copy_no_overlap(other, data());
 				m_size = other.m_size;
 				return *this;
