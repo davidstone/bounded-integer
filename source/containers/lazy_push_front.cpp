@@ -5,16 +5,12 @@
 
 module;
 
-#include <bounded/assert.hpp>
-
 #include <operators/forward.hpp>
 
 export module containers.lazy_push_front;
 
 import containers.algorithms.splice;
 import containers.begin_end;
-import containers.bidirectional_linked_list;
-import containers.forward_linked_list;
 import containers.front;
 import containers.lazy_push_back;
 import containers.range_value_t;
@@ -22,8 +18,6 @@ import containers.splicable;
 import containers.supports_lazy_insert_after;
 
 import bounded;
-import bounded.test_int;
-import std_module;
 
 namespace containers {
 
@@ -49,27 +43,3 @@ constexpr auto lazy_push_front(
 }
 
 } // namespace containers
-
-using namespace bounded::literal;
-
-template<typename Container>
-constexpr auto test_lazy_push_front() -> bool {
-	auto c = Container();
-
-	containers::lazy_push_front(c, bounded::value_to_function(3));
-	BOUNDED_ASSERT(c == Container({3}));
-
-	containers::lazy_push_front(c, bounded::value_to_function(4));
-	BOUNDED_ASSERT(c == Container({4, 3}));
-
-	containers::lazy_push_front(c, bounded::value_to_function(5));
-	BOUNDED_ASSERT(c == Container({5, 4, 3}));
-
-	containers::lazy_push_front(c, bounded::value_to_function(12));
-	BOUNDED_ASSERT(c == Container({12, 5, 4, 3}));
-
-	return true;
-}
-
-static_assert(test_lazy_push_front<containers::bidirectional_linked_list<bounded_test::non_copyable_integer>>());
-static_assert(test_lazy_push_front<containers::forward_linked_list<bounded_test::non_copyable_integer>>());

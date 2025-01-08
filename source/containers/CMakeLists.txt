@@ -255,10 +255,12 @@ target_sources(containers_test PRIVATE
 		test/insert.cpp
 		test/lazy_push_back.cpp
 		test/lazy_push_back_into_capacity.cpp
+		test/lazy_push_front.cpp
 		test/linear_map.cpp
 		test/pop_back.cpp
 		test/push_back.cpp
 		test/push_back_into_capacity.cpp
+		test/push_front.cpp
 		test/range_view.cpp
 		test/shrink_to_fit.cpp
 		test/stable_vector.cpp
