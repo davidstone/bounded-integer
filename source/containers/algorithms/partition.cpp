@@ -15,6 +15,7 @@ import containers.array;
 import containers.begin_end;
 import containers.bidirectional_iterator;
 import containers.iterator;
+import containers.iterator_t;
 import containers.range;
 import containers.range_size_t;
 import containers.sentinel_for;
@@ -36,7 +37,7 @@ export constexpr auto is_partitioned = [](range auto && input, auto predicate) -
 	return containers::find_if(it, last, predicate) == last;
 };
 
-export constexpr auto partition_point = []<range Input>(Input && input, auto predicate) {
+export constexpr auto partition_point = []<range Input>(Input && input, auto predicate) -> iterator_t<Input> {
 	auto count = bounded::integer<0, bounded::builtin_max_value<range_size_t<Input>>>(containers::size(input));
 	auto first = containers::begin(input);
 	if constexpr (numeric_traits::max_value<decltype(count)> == 0_bi) {
@@ -62,7 +63,7 @@ concept decrementable = requires(T value) { --value; };
 
 struct partition_t {
 	template<iterator ForwardIterator>
-	static constexpr auto operator()(ForwardIterator first, sentinel_for<ForwardIterator> auto last, auto predicate) {
+	static constexpr auto operator()(ForwardIterator first, sentinel_for<ForwardIterator> auto last, auto predicate) -> ForwardIterator  {
 		auto advance_first = [&]{
 			first = containers::find_if_not(first, last, predicate);
 		};
@@ -100,7 +101,8 @@ struct partition_t {
 		}
 		return first;
 	}
-	static constexpr auto operator()(range auto && input, auto predicate) {
+	template<range Input>
+	static constexpr auto operator()(Input && input, auto predicate) -> iterator_t<Input> {
 		return operator()(containers::begin(input), containers::end(input), predicate);
 	}
 };
@@ -111,7 +113,7 @@ export constexpr auto partition = partition_t();
 // returned.
 struct iterator_partition_t {
 	template<bidirectional_iterator Iterator>
-	constexpr auto operator()(Iterator first, Iterator middle, Iterator last, auto const compare) const {
+	constexpr auto operator()(Iterator first, Iterator middle, Iterator last, auto const compare) const -> Iterator {
 		BOUNDED_ASSERT(first == last or middle != last);
 		auto predicate = [&](auto const & value) { return compare(value, *middle); };
 		while (true) {
