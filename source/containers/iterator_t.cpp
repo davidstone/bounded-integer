@@ -9,10 +9,11 @@ import containers.begin_end;
 import containers.range;
 
 import bounded;
+import std_module;
 
 namespace containers {
 
 export template<range Range>
-using iterator_t = decltype(containers::begin(bounded::declval<Range>()));
+using iterator_t = std::remove_cvref_t<decltype(containers::begin(bounded::declval<Range>()))>;
 
 } // namespace containers
