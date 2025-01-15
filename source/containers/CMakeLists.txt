@@ -236,6 +236,7 @@ target_sources(containers_test PRIVATE
 		test/algorithms/join.cpp
 		test/algorithms/join_with.cpp
 		test/algorithms/keyed_binary_search.cpp
+		test/algorithms/partition.cpp
 		test/algorithms/set.cpp
 		test/algorithms/split.cpp
 		test/algorithms/zip.cpp
@@ -316,7 +317,6 @@ add_executable(ska_sort_benchmark
 	test/sort/ska_sort_benchmark.cpp
 )
 target_link_libraries(ska_sort_benchmark PRIVATE
-	bounded
 	benchmark_main
 	containers
 	strict_defaults
@@ -326,7 +326,6 @@ add_executable(sort_benchmark
 	test/sort/sort_benchmark.cpp
 )
 target_link_libraries(sort_benchmark PRIVATE
-	bounded
 	benchmark_main
 	containers
 	strict_defaults
@@ -336,7 +335,6 @@ add_executable(vector_benchmark
 	test/vector_benchmark.cpp
 )
 target_link_libraries(vector_benchmark PRIVATE
-	bounded
 	benchmark_main
 	containers
 	strict_defaults
