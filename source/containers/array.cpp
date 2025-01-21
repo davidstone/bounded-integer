@@ -35,7 +35,9 @@ struct array_value_type<T> {
 };
 
 struct monostate {
-	friend auto operator<=>(monostate, monostate) = default;
+	// Cannot be a hidden friend to work around
+	// https://github.com/llvm/llvm-project/issues/123815
+	auto operator<=>(monostate const &) const & = default;
 };
 
 template<std::size_t size>
