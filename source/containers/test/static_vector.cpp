@@ -22,50 +22,35 @@ import numeric_traits;
 
 using namespace bounded::literal;
 
-struct non_trivial {
-	constexpr non_trivial(non_trivial &&) noexcept {
-	}
-	constexpr non_trivial(non_trivial const &) {
-	}
-	constexpr ~non_trivial() noexcept {
-	}
-	constexpr auto operator=(non_trivial &&) noexcept -> non_trivial & {
-		return *this;
-	}
-	constexpr auto operator=(non_trivial const &) -> non_trivial & {
-		return *this;
-	}
-};
-
 static_assert(bounded::trivially_move_constructible<containers::static_vector<int, 0_bi>>);
 static_assert(bounded::trivially_move_constructible<containers::static_vector<int, 1_bi>>);
-static_assert(bounded::trivially_move_constructible<containers::static_vector<non_trivial, 0_bi>>);
-static_assert(!bounded::trivially_move_constructible<containers::static_vector<non_trivial, 1_bi>>);
-static_assert(bounded::move_constructible<containers::static_vector<non_trivial, 1_bi>>);
+static_assert(bounded::trivially_move_constructible<containers::static_vector<bounded_test::integer, 0_bi>>);
+static_assert(!bounded::trivially_move_constructible<containers::static_vector<bounded_test::integer, 1_bi>>);
+static_assert(bounded::move_constructible<containers::static_vector<bounded_test::integer, 1_bi>>);
 
 static_assert(bounded::trivially_copy_constructible<containers::static_vector<int, 0_bi>>);
 static_assert(bounded::trivially_copy_constructible<containers::static_vector<int, 1_bi>>);
-static_assert(bounded::trivially_copy_constructible<containers::static_vector<non_trivial, 0_bi>>);
-static_assert(!bounded::trivially_copy_constructible<containers::static_vector<non_trivial, 1_bi>>);
-static_assert(bounded::copy_constructible<containers::static_vector<non_trivial, 1_bi>>);
+static_assert(bounded::trivially_copy_constructible<containers::static_vector<bounded_test::integer, 0_bi>>);
+static_assert(!bounded::trivially_copy_constructible<containers::static_vector<bounded_test::integer, 1_bi>>);
+static_assert(bounded::copy_constructible<containers::static_vector<bounded_test::integer, 1_bi>>);
 
 static_assert(bounded::trivially_destructible<containers::static_vector<int, 0_bi>>);
 static_assert(bounded::trivially_destructible<containers::static_vector<int, 1_bi>>);
-static_assert(bounded::trivially_destructible<containers::static_vector<non_trivial, 0_bi>>);
-static_assert(!bounded::trivially_destructible<containers::static_vector<non_trivial, 1_bi>>);
-static_assert(std::destructible<containers::static_vector<non_trivial, 1_bi>>);
+static_assert(bounded::trivially_destructible<containers::static_vector<bounded_test::integer, 0_bi>>);
+static_assert(!bounded::trivially_destructible<containers::static_vector<bounded_test::integer, 1_bi>>);
+static_assert(std::destructible<containers::static_vector<bounded_test::integer, 1_bi>>);
 
 static_assert(bounded::trivially_copy_assignable<containers::static_vector<int, 0_bi>>);
 static_assert(bounded::trivially_copy_assignable<containers::static_vector<int, 1_bi>>);
-static_assert(bounded::trivially_copy_assignable<containers::static_vector<non_trivial, 0_bi>>);
-static_assert(!bounded::trivially_copy_assignable<containers::static_vector<non_trivial, 1_bi>>);
-static_assert(bounded::copy_assignable<containers::static_vector<non_trivial, 1_bi>>);
+static_assert(bounded::trivially_copy_assignable<containers::static_vector<bounded_test::integer, 0_bi>>);
+static_assert(!bounded::trivially_copy_assignable<containers::static_vector<bounded_test::integer, 1_bi>>);
+static_assert(bounded::copy_assignable<containers::static_vector<bounded_test::integer, 1_bi>>);
 
 static_assert(bounded::trivially_move_assignable<containers::static_vector<int, 0_bi>>);
 static_assert(bounded::trivially_move_assignable<containers::static_vector<int, 1_bi>>);
-static_assert(bounded::trivially_move_assignable<containers::static_vector<non_trivial, 0_bi>>);
-static_assert(!bounded::trivially_move_assignable<containers::static_vector<non_trivial, 1_bi>>);
-static_assert(bounded::move_assignable<containers::static_vector<non_trivial, 1_bi>>);
+static_assert(bounded::trivially_move_assignable<containers::static_vector<bounded_test::integer, 0_bi>>);
+static_assert(!bounded::trivially_move_assignable<containers::static_vector<bounded_test::integer, 1_bi>>);
+static_assert(bounded::move_assignable<containers::static_vector<bounded_test::integer, 1_bi>>);
 
 template<typename T>
 using test_static_vector = containers::static_vector<T, 40_bi>;

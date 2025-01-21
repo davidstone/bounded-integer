@@ -35,21 +35,6 @@ static_assert(bounded::trivially_copy_assignable<thing_t>);
 static_assert(bounded::trivially_move_assignable<thing_t>);
 static_assert(bounded::trivially_destructible<thing_t>);
 
-struct non_trivial {
-	non_trivial();
-	non_trivial(non_trivial &&);
-	non_trivial(non_trivial const &);
-	auto operator=(non_trivial &&) -> non_trivial &;
-	auto operator=(non_trivial const &) -> non_trivial &;
-	~non_trivial();
-};
-
-static_assert(!bounded::trivially_copy_constructible<tv::variant<non_trivial>>);
-static_assert(!bounded::trivially_move_constructible<tv::variant<non_trivial>>);
-static_assert(!bounded::trivially_copy_assignable<tv::variant<non_trivial>>);
-static_assert(!bounded::trivially_move_assignable<tv::variant<non_trivial>>);
-static_assert(!bounded::trivially_destructible<tv::variant<non_trivial>>);
-
 static_assert(!bounded::constructible_from<thing_t, int>);
 static_assert(bounded::constructible_from<thing_t, short>);
 static_assert(bounded::constructible_from<thing_t, long>);
@@ -122,9 +107,21 @@ static_assert(!bounded::equality_comparable<tv::variant<int, non_comparable, int
 
 static_assert(tv::variant<non_comparable, int>(5) == 5);
 
+using non_trivial = tv::variant<bounded_test::integer>;
+
+static_assert(!bounded::trivially_copy_constructible<non_trivial>);
+static_assert(bounded::copy_constructible<non_trivial>);
+static_assert(!bounded::trivially_move_constructible<non_trivial>);
+static_assert(bounded::move_constructible<non_trivial>);
+static_assert(!bounded::trivially_copy_assignable<non_trivial>);
+static_assert(bounded::copy_assignable<non_trivial>);
+static_assert(!bounded::trivially_move_assignable<non_trivial>);
+static_assert(bounded::move_assignable<non_trivial>);
+static_assert(!bounded::trivially_destructible<non_trivial>);
+static_assert(std::destructible<non_trivial>);
+
 constexpr bool test_non_trivial() {
-	using non_trivial_variant_t = tv::variant<bounded_test::integer>;
-	auto a = non_trivial_variant_t(bounded_test::integer(3));
+	auto a = non_trivial(bounded_test::integer(3));
 	BOUNDED_ASSERT(a.index() == 0_bi);
 	auto b = a;
 	BOUNDED_ASSERT(a[0_bi].value() == 3);
