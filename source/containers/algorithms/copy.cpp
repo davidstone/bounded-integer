@@ -16,7 +16,7 @@ import containers.begin_end;
 import containers.dereference;
 import containers.iterator;
 import containers.range;
-import containers.range_view;
+import containers.subrange;
 
 import bounded;
 import std_module;
@@ -113,7 +113,7 @@ using namespace bounded::literal;
 static_assert([] {
 	auto container = containers::array{1, 2, 3, 4};
 	containers::copy(
-		containers::range_view(containers::begin(container), containers::begin(container)),
+		containers::subrange(containers::begin(container), containers::begin(container)),
 		containers::begin(container) + 2_bi
 	);
 	return container == containers::array{1, 2, 3, 4};
@@ -122,7 +122,7 @@ static_assert([] {
 static_assert([] {
 	auto container = containers::array{1, 2, 3, 4};
 	containers::copy(
-		containers::range_view(containers::begin(container), containers::begin(container) + 2_bi),
+		containers::subrange(containers::begin(container), containers::begin(container) + 2_bi),
 		containers::begin(container) + 2_bi
 	);
 	return container == containers::array{1, 2, 1, 2};
@@ -131,7 +131,7 @@ static_assert([] {
 static_assert([] {
 	auto container = containers::array{1, 2, 3, 4};
 	containers::copy_backward(
-		containers::range_view(containers::begin(container), containers::begin(container) + 2_bi),
+		containers::subrange(containers::begin(container), containers::begin(container) + 2_bi),
 		containers::end(container)
 	);
 	return container == containers::array{1, 2, 1, 2};
@@ -140,7 +140,7 @@ static_assert([] {
 static_assert([] {
 	auto container = containers::array{1, 2, 3};
 	containers::copy_backward(
-		containers::range_view(containers::begin(container), containers::begin(container) + 2_bi),
+		containers::subrange(containers::begin(container), containers::begin(container) + 2_bi),
 		containers::end(container)
 	);
 	return container == containers::array{1, 1, 2};

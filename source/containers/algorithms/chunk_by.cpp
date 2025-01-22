@@ -17,8 +17,8 @@ export import containers.common_iterator_functions;
 import containers.forward_range;
 import containers.iter_difference_t;
 import containers.iter_reference_t;
-import containers.range_view;
 import containers.stored_function;
+import containers.subrange;
 
 import bounded;
 import numeric_traits;
@@ -39,7 +39,7 @@ struct chunk_by_iterator {
 	}
 
 	constexpr auto operator*() const {
-		return range_view(m_first, m_middle);
+		return subrange(m_first, m_middle);
 	}
 	friend constexpr auto operator+(chunk_by_iterator lhs, bounded::constant_t<1>) {
 		lhs.m_first = lhs.m_middle;
@@ -70,7 +70,7 @@ private:
 
 	constexpr auto find_from_first() -> Iterator {
 		auto it = containers::find_if(
-			containers::adjacent(containers::range_view(m_first, m_last), 2_bi),
+			containers::adjacent(containers::subrange(m_first, m_last), 2_bi),
 			[&](auto tuple) {
 				return !m_predicate.get()(std::move(tuple)[0_bi], std::move(tuple)[1_bi]);
 			}

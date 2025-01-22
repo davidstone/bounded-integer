@@ -18,14 +18,14 @@ import containers.algorithms.unique;
 
 import containers.begin_end;
 import containers.range;
-import containers.range_view;
+import containers.subrange;
 
 namespace containers {
 
 struct ska_sort_t {
 	static constexpr void operator()(range auto && to_sort, auto const & extract_key) {
 		::containers::inplace_radix_sort<128, 1024>(
-			range_view(
+			subrange(
 				containers::begin(to_sort),
 				containers::end(to_sort)
 			),

@@ -28,7 +28,7 @@ import containers.data;
 import containers.dynamic_array_data;
 import containers.initializer_range;
 import containers.maximum_array_size;
-import containers.range_view;
+import containers.subrange;
 import containers.uninitialized_array;
 
 import bounded;
@@ -315,7 +315,7 @@ private:
 		}
 		auto temp = bounded::relocate(m_state.large);
 		::bounded::construct_at(m_state.small, bounded::construct<small_t>);
-		containers::uninitialized_relocate_no_overlap(range_view(temp.data(), temp.size(m_state.last_byte.size)), m_state.small.data());
+		containers::uninitialized_relocate_no_overlap(subrange(temp.data(), temp.size(m_state.last_byte.size)), m_state.small.data());
 		deallocate_large(temp);
 		set_size_impl(m_state.small, m_state.last_byte, temp.size(m_state.last_byte.size));
 		m_state.last_byte.is_large = false;

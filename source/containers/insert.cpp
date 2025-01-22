@@ -24,12 +24,12 @@ import containers.mutable_iterator;
 import containers.offset_type;
 import containers.range;
 import containers.range_value_t;
-import containers.range_view;
 import containers.reallocation_size;
 import containers.reservable;
 import containers.resizable_container;
 import containers.size;
 import containers.splicable;
+import containers.subrange;
 
 import bounded;
 import std_module;
@@ -44,14 +44,14 @@ constexpr auto insert_without_reallocation(Container & container, iterator_t<Con
 	auto const original_end = containers::end(container);
 	auto const new_end = original_end + number_of_elements;
 	auto const new_position = containers::uninitialized_relocate(
-		containers::reversed(range_view(mutable_position, original_end)),
+		containers::reversed(subrange(mutable_position, original_end)),
 		containers::reverse_iterator(new_end)
 	).base();
 	BOUNDED_ASSERT(new_position == mutable_position + number_of_elements);
 	try {
 		containers::uninitialized_copy_no_overlap(OPERATORS_FORWARD(input_range), mutable_position);
 	} catch (...) {
-		::containers::uninitialized_relocate(range_view(new_position, new_end), mutable_position);
+		::containers::uninitialized_relocate(subrange(new_position, new_end), mutable_position);
 		throw;
 	}
 	container.set_size(containers::size(container) + number_of_elements);
@@ -73,12 +73,12 @@ constexpr auto insert_with_reallocation(Container & container, iterator_t<Contai
 	auto const mutable_position = containers::begin(container) + offset;
 	auto const temp_begin = containers::begin(temp);
 	auto const it = containers::uninitialized_relocate_no_overlap(
-		range_view(containers::begin(container), mutable_position),
+		subrange(containers::begin(container), mutable_position),
 		temp_begin
 	);
 	BOUNDED_ASSERT(temp_begin + offset == it);
 	::containers::uninitialized_relocate_no_overlap(
-		range_view(mutable_position, containers::end(container)),
+		subrange(mutable_position, containers::end(container)),
 		it + ::bounded::assume_in_range<offset_type<iterator_t<Container &>>>(number_of_elements)
 	);
 	container.set_size(0_bi);

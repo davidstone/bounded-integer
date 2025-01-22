@@ -12,7 +12,7 @@ export module containers.algorithms.binary_search;
 import containers.algorithms.partition;
 import containers.begin_end;
 import containers.range;
-import containers.range_view;
+import containers.subrange;
 
 import std_module;
 
@@ -42,9 +42,9 @@ export constexpr auto upper_bound = upper_bound_t();
 struct equal_range_t {
 	static constexpr auto operator()(range auto && sorted, auto const & value, auto cmp) {
 		auto it = lower_bound(OPERATORS_FORWARD(sorted), value, cmp);
-		return range_view(
+		return subrange(
 			it,
-			upper_bound(range_view(it, containers::end(OPERATORS_FORWARD(sorted))), value, cmp)
+			upper_bound(subrange(it, containers::end(OPERATORS_FORWARD(sorted))), value, cmp)
 		);
 	}
 	static constexpr auto operator()(range auto && sorted, auto const & value) {

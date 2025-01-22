@@ -18,7 +18,7 @@ import containers.algorithms.sort.inplace_radix_sort;
 import containers.algorithms.sort.to_radix_sort_key;
 
 import containers.begin_end;
-import containers.range_view;
+import containers.subrange;
 
 import std_module;
 
@@ -26,7 +26,7 @@ using namespace containers_test;
 
 constexpr auto test_sort(auto data, auto function) {
 	containers::inplace_radix_sort<1, 1>(
-		containers::range_view(containers::begin(data.input), containers::end(data.input)),
+		containers::subrange(containers::begin(data.input), containers::end(data.input)),
 		function
 	);
 	return data.input == data.expected;

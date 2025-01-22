@@ -15,7 +15,7 @@ import containers.c_array;
 import containers.front;
 import containers.is_empty;
 import containers.iter_difference_t;
-import containers.range_view;
+import containers.subrange;
 
 import bounded;
 import std_module;
@@ -63,7 +63,7 @@ using namespace bounded::literal;
 template<typename T, std::size_t size>
 constexpr auto test_common_prefix(containers::c_array<T, size> const & source, auto const start_index, std::size_t const expected) {
 	auto const prefix = ::containers::common_prefix(
-		containers::range_view(source),
+		containers::subrange(source),
 		containers::to_radix_sort_key,
 		containers::to_radix_sort_key,
 		start_index

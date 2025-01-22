@@ -16,7 +16,7 @@ import containers.begin_end;
 import containers.is_empty;
 import containers.iterator;
 import containers.range;
-import containers.range_view;
+import containers.subrange;
 
 import bounded;
 
@@ -35,7 +35,7 @@ export constexpr auto merge_relocate_second_range(range auto && r1, range auto &
 	auto const first1 = containers::begin(r1);
 	auto last1 = containers::end(r1);
 	auto relocate_remainder_of_r2 = [&] {
-		::containers::uninitialized_relocate_no_overlap(range_view(first2, last2), first1);
+		::containers::uninitialized_relocate_no_overlap(subrange(first2, last2), first1);
 	};
 	if (first1 == last1) {
 		relocate_remainder_of_r2();
@@ -68,7 +68,7 @@ static_assert([] {
 	auto buffer = containers::array({0, 1});
 	auto other = containers::array({4});
 	::containers::merge_relocate_second_range(
-		containers::range_view(containers::begin(buffer), 1_bi),
+		containers::subrange(containers::begin(buffer), 1_bi),
 		other,
 		containers::end(buffer),
 		std::less()
@@ -80,7 +80,7 @@ static_assert([] {
 	auto buffer = containers::array({0, 1, 2});
 	auto other = containers::array({4});
 	::containers::merge_relocate_second_range(
-		containers::range_view(containers::begin(buffer), 2_bi),
+		containers::subrange(containers::begin(buffer), 2_bi),
 		other,
 		containers::end(buffer),
 		std::less()
@@ -92,7 +92,7 @@ static_assert([] {
 	auto buffer = containers::array({0, 1, 2, 3});
 	auto other = containers::array({4, 5});
 	::containers::merge_relocate_second_range(
-		containers::range_view(containers::begin(buffer), 2_bi),
+		containers::subrange(containers::begin(buffer), 2_bi),
 		other,
 		containers::end(buffer),
 		std::less()
@@ -104,7 +104,7 @@ static_assert([] {
 	auto buffer = containers::array({0, 3, 4});
 	auto other = containers::array({2});
 	::containers::merge_relocate_second_range(
-		containers::range_view(containers::begin(buffer), 2_bi),
+		containers::subrange(containers::begin(buffer), 2_bi),
 		other,
 		containers::end(buffer),
 		std::less()
@@ -116,7 +116,7 @@ static_assert([] {
 	auto buffer = containers::array({0, 1, 2, 3, 5});
 	auto other = containers::array({4});
 	::containers::merge_relocate_second_range(
-		containers::range_view(containers::begin(buffer), 4_bi),
+		containers::subrange(containers::begin(buffer), 4_bi),
 		other,
 		containers::end(buffer),
 		std::less()

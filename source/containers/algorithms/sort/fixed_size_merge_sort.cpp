@@ -16,7 +16,7 @@ import containers.algorithms.uninitialized;
 import containers.array;
 import containers.begin_end;
 import containers.contiguous_iterator;
-import containers.range_view;
+import containers.subrange;
 import containers.uninitialized_array;
 
 import bounded;
@@ -42,7 +42,7 @@ export constexpr auto fixed_size_merge_sort(auto it, auto const size1, auto cons
 			++first2;
 			++it;
 			if (first2 == last2) {
-				::containers::uninitialized_relocate_no_overlap(range_view(first1, last1), it);
+				::containers::uninitialized_relocate_no_overlap(subrange(first1, last1), it);
 				break;
 			}
 		} else {

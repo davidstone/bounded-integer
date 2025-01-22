@@ -20,9 +20,9 @@ import containers.count_type;
 import containers.erase_concepts;
 import containers.iterator_t;
 import containers.mutable_iterator;
-import containers.range_view;
 import containers.size;
 import containers.splicable;
+import containers.subrange;
 
 import bounded;
 import bounded.test_int;
@@ -58,9 +58,9 @@ constexpr auto erase(Container & container, iterator_t<Container const &> const 
 			++source;
 		}
 		if (source != last) {
-			containers::uninitialized_relocate(range_view(source, last), middle);
+			containers::uninitialized_relocate(subrange(source, last), middle);
 		} else {
-			containers::destroy_range(range_view(target, middle));
+			containers::destroy_range(subrange(target, middle));
 		}
 		container.set_size(containers::size(container) - count);
 		return containers::begin(container) + offset;
@@ -79,7 +79,7 @@ constexpr void erase_to_end(Container & container, iterator_t<Container const &>
 	if constexpr (can_set_size<Container>) {
 		auto const count = last - const_position;
 		auto target = ::containers::mutable_iterator(container, const_position);
-		containers::destroy_range(range_view(target, count));
+		containers::destroy_range(subrange(target, count));
 		container.set_size(containers::size(container) - count);
 	} else {
 		::containers::erase(container, const_position, last);

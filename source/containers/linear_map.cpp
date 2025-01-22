@@ -28,9 +28,9 @@ import containers.maximum_array_size;
 import containers.range;
 import containers.range_size_t;
 import containers.range_value_t;
-import containers.range_view;
 import containers.size;
 import containers.static_vector;
+import containers.subrange;
 import containers.vector;
 
 import bounded;
@@ -171,7 +171,7 @@ private:
 		auto const first = begin();
 		auto to_remove = ::containers::end(*this);
 		while (starting_from != to_remove) {
-			auto const unique_range = containers::range_view(first, starting_from);
+			auto const unique_range = containers::subrange(first, starting_from);
 			auto matches_this_value = [&](value_type const & verified) {
 				return equal()(starting_from->key, verified.key);
 			};

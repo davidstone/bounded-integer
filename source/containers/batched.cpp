@@ -16,8 +16,8 @@ import containers.common_iterator_functions;
 import containers.iterator_t;
 import containers.offset_type;
 import containers.range;
-import containers.range_view;
 import containers.size;
+import containers.subrange;
 
 import bounded;
 import numeric_traits;
@@ -30,7 +30,7 @@ namespace containers {
 
 template<typename Iterator, typename Sentinel, typename Size, typename Count>
 struct batch_iterator {
-	constexpr explicit batch_iterator(range_view<Iterator, Sentinel, Size> const all, Count const number_of_batches):
+	constexpr explicit batch_iterator(subrange<Iterator, Sentinel, Size> const all, Count const number_of_batches):
 		m_all(all),
 		m_number_of_batches(number_of_batches),
 		m_batch(0_bi)
@@ -39,7 +39,7 @@ struct batch_iterator {
 
 	constexpr auto operator*() const {
 		auto const first = containers::begin(m_all);
-		return range_view<Iterator>(
+		return subrange<Iterator>(
 			first + elements_prior_to_batch(m_batch),
 			first + elements_prior_to_batch(bounded::assume_in_range<batch_t>(m_batch + 1_bi))
 		);
@@ -79,18 +79,18 @@ private:
 		auto const total_elements = containers::size(m_all);
 		auto const base = total_elements / m_number_of_batches;
 		auto const add_one_if_below = total_elements % m_number_of_batches;
-		using offset_t = offset_type<iterator_t<range_view<Iterator, Sentinel, Size>>>;
+		using offset_t = offset_type<iterator_t<subrange<Iterator, Sentinel, Size>>>;
 		return bounded::assume_in_range<offset_t>(base * batch + bounded::min(add_one_if_below, batch));
 	}
-	[[no_unique_address]] range_view<Iterator, Sentinel, Size> m_all;
+	[[no_unique_address]] subrange<Iterator, Sentinel, Size> m_all;
 	[[no_unique_address]] bounded::integer<1, bounded::builtin_max_value<Count>> m_number_of_batches;
 	[[no_unique_address]] batch_t m_batch;
 };
 
 export template<bounded::bounded_integer Integer> requires(numeric_traits::min_value<Integer> > 0_bi)
 constexpr auto batched(range auto & r, Integer const number_of_batches) {
-	return containers::range_view(
-		batch_iterator(range_view(r), number_of_batches),
+	return containers::subrange(
+		batch_iterator(subrange(r), number_of_batches),
 		std::default_sentinel
 	);
 }

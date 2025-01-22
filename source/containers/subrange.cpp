@@ -8,7 +8,7 @@ module;
 #include <operators/bracket.hpp>
 #include <operators/forward.hpp>
 
-export module containers.range_view;
+export module containers.subrange;
 
 import containers.begin_end;
 import containers.c_array;
@@ -60,7 +60,7 @@ template<typename T>
 concept range_view_size = bounded::integral<T> or std::same_as<T, no_explicit_size>;
 
 export template<iterator Iterator, range_view_sentinel<Iterator> Sentinel = Iterator, range_view_size Size = no_explicit_size>
-struct range_view {
+struct subrange {
 private:
 	// TODO: Maybe check if we can do end - begin?
 	static constexpr auto contiguous =
@@ -69,33 +69,33 @@ private:
 public:
 	static_assert(explicit_sentinel<Sentinel> or explicit_size<Size>);
 
-	constexpr range_view(Iterator first, Sentinel last, Size size_) requires explicit_size<Size>:
+	constexpr subrange(Iterator first, Sentinel last, Size size_) requires explicit_size<Size>:
 		m_begin(std::move(first)),
 		m_end(std::move(last)),
 		m_size(size_)
 	{
 	}
-	constexpr range_view(Iterator first, Sentinel last) requires(!explicit_size<Size>):
+	constexpr subrange(Iterator first, Sentinel last) requires(!explicit_size<Size>):
 		m_begin(std::move(first)),
 		m_end(std::move(last))
 	{
 	}
-	constexpr range_view(Iterator first, Size size_) requires(!explicit_sentinel<Sentinel>):
+	constexpr subrange(Iterator first, Size size_) requires(!explicit_sentinel<Sentinel>):
 		m_begin(std::move(first)),
 		m_size(size_)
 	{
 	}
 
-	constexpr range_view(sized_range auto && r) requires explicit_size<Size>:
-		range_view(
+	constexpr subrange(sized_range auto && r) requires explicit_size<Size>:
+		subrange(
 			containers::begin(OPERATORS_FORWARD(r)),
 			containers::end(OPERATORS_FORWARD(r)),
 			containers::size(r)
 		)
 	{
 	}
-	constexpr range_view(range auto && r) requires(!explicit_size<Size>):
-		range_view(
+	constexpr subrange(range auto && r) requires(!explicit_size<Size>):
+		subrange(
 			containers::begin(OPERATORS_FORWARD(r)),
 			containers::end(OPERATORS_FORWARD(r))
 		)
@@ -128,7 +128,7 @@ public:
 
 	OPERATORS_BRACKET_SEQUENCE_RANGE_DEFINITIONS
 
-	friend auto operator==(range_view, range_view) -> bool = default;
+	friend auto operator==(subrange, subrange) -> bool = default;
 
 	// TODO: spans of static extent
 	constexpr operator std::span<std::remove_reference_t<iter_reference_t<Iterator>>>() const requires contiguous {
@@ -145,40 +145,40 @@ private:
 };
 
 template<range Range>
-range_view(Range &&) -> range_view<
+subrange(Range &&) -> subrange<
 	decltype(containers::begin(bounded::declval<Range &&>())),
 	decltype(containers::end(bounded::declval<Range &&>()))
 >;
 
 template<range Range> requires has_member_size<Range>
-range_view(Range &&) -> range_view<
+subrange(Range &&) -> subrange<
 	decltype(containers::begin(bounded::declval<Range &&>())),
 	decltype(containers::end(bounded::declval<Range &&>())),
 	decltype(bounded::declval<Range &&>().size())
 >;
 
 template<forward_random_access_range Range> requires has_member_size<Range>
-range_view(Range &&) -> range_view<
+subrange(Range &&) -> subrange<
 	decltype(containers::begin(bounded::declval<Range &&>())),
 	compute_end_from_size,
 	decltype(bounded::declval<Range &&>().size())
 >;
 
 template<typename T, std::size_t size>
-range_view(c_array<T, size> &) -> range_view<
+subrange(c_array<T, size> &) -> subrange<
 	contiguous_iterator<T, bounded::constant<size>>,
 	compute_end_from_size,
 	bounded::constant_t<bounded::normalize<size>>
 >;
 
 template<iterator Iterator, sentinel_for<Iterator> Sentinel>
-range_view(Iterator, Sentinel) -> range_view<
+subrange(Iterator, Sentinel) -> subrange<
 	Iterator,
 	Sentinel
 >;
 
 template<iterator Iterator, bounded::integral Size>
-range_view(Iterator, Size) -> range_view<
+subrange(Iterator, Size) -> subrange<
 	Iterator,
 	compute_end_from_size,
 	Size
@@ -188,11 +188,11 @@ export template<typename>
 constexpr auto is_range_view = false;
 
 template<typename Iterator, typename Sentinel, typename Size>
-constexpr auto is_range_view<range_view<Iterator, Sentinel, Size>> = true;
+constexpr auto is_range_view<subrange<Iterator, Sentinel, Size>> = true;
 
 export template<typename Iterator, typename Sentinel>
 constexpr auto to_range_view(std::pair<Iterator, Sentinel> pair) {
-	return range_view(std::move(pair).first, std::move(pair).second);
+	return subrange(std::move(pair).first, std::move(pair).second);
 }
 
 } // namespace containers

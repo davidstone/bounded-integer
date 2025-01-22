@@ -77,7 +77,7 @@ constexpr auto insertion_sort = [](containers::range auto && r) -> void {
 	auto const first = containers::begin(r);
 	auto const last = containers::end(r);
     for (auto it = first; it != last; ++it) {
-        auto const insertion = containers::find_last(containers::range_view(first, it), *it);
+        auto const insertion = containers::find_last(containers::subrange(first, it), *it);
 		// TODO: Relocate-based algorithm
         std::rotate(
 			containers::maybe_legacy_iterator(insertion),

@@ -18,8 +18,8 @@ import containers.iter_value_t;
 import containers.iterator;
 import containers.range;
 import containers.range_value_t;
-import containers.range_view;
 import containers.size;
+import containers.subrange;
 import containers.to_address;
 
 import bounded;
@@ -53,7 +53,7 @@ export constexpr auto uninitialized_copy = [](range auto && input, iterator auto
 	try {
 		copy_or_relocate_from(OPERATORS_FORWARD(input), construct_at_output(output));
 	} catch (...) {
-		containers::destroy_range(range_view(out_first, output));
+		containers::destroy_range(subrange(out_first, output));
 		throw;
 	}
 	return output;

@@ -17,8 +17,8 @@ import containers.algorithms.sort.sort_exactly_6;
 import containers.begin_end;
 import containers.offset_type;
 import containers.range;
-import containers.range_view;
 import containers.size;
+import containers.subrange;
 import containers.uninitialized_array;
 
 import bounded;
@@ -68,7 +68,7 @@ constexpr auto chunked_insertion_sort(range auto && r, Compare const compare = C
 	#if 1
 	auto const initial_sort_size = bounded::min(chunk_size, ::containers::size(r));
 	::containers::small_size_optimized_sort(
-		range_view(it, initial_sort_size),
+		subrange(it, initial_sort_size),
 		compare,
 		[](auto &&, auto) { std::unreachable(); }
 	);
@@ -79,8 +79,8 @@ constexpr auto chunked_insertion_sort(range auto && r, Compare const compare = C
 		auto const count = bounded::min(chunk_size, last - it);
 		auto next_it = ::containers::runtime_sort_exactly_n_relocate(it, count, buffer.data(), compare);
 		merge_relocate_second_range(
-			range_view(containers::begin(r), it),
-			range_view(buffer.data(), count),
+			subrange(containers::begin(r), it),
+			subrange(buffer.data(), count),
 			next_it,
 			compare
 		);

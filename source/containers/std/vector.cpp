@@ -32,10 +32,10 @@ import containers.pop_back;
 import containers.push_back;
 import containers.push_back_into_capacity;
 import containers.range_size_t;
-import containers.range_view;
 import containers.repeat_n;
 import containers.resize;
 import containers.shrink_to_fit;
+import containers.subrange;
 import containers.to_address;
 import containers.vector;
 
@@ -97,7 +97,7 @@ struct vector {
 
 	template<containers::iterator InputIterator>
 	constexpr vector(InputIterator first, InputIterator last):
-		m_impl(containers::range_view(std::move(first), std::move(last)))
+		m_impl(containers::subrange(std::move(first), std::move(last)))
 	{
 	}
 
@@ -130,7 +130,7 @@ struct vector {
 
 	template<containers::iterator InputIterator>
 	constexpr auto assign(InputIterator first, InputIterator last) -> void {
-		containers::assign(m_impl, containers::range_view(std::move(first), std::move(last)));
+		containers::assign(m_impl, containers::subrange(std::move(first), std::move(last)));
 	}
 
 	constexpr auto assign(std::initializer_list<T> init) -> void {
@@ -266,7 +266,7 @@ struct vector {
 	}
 	template<containers::iterator InputIterator>
 	constexpr auto insert(const_iterator const position, InputIterator first, InputIterator last) -> iterator {
-		return containers::to_address(containers::insert(m_impl, impl_iterator(position), containers::range_view(std::move(first), std::move(last))));
+		return containers::to_address(containers::insert(m_impl, impl_iterator(position), containers::subrange(std::move(first), std::move(last))));
 	}
 	constexpr auto insert(const_iterator const position, std::initializer_list<T> init) -> iterator {
 		return containers::to_address(containers::insert(m_impl, impl_iterator(position), init));

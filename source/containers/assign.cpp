@@ -26,8 +26,8 @@ import containers.iterator_t;
 import containers.member_assign;
 import containers.range;
 import containers.range_value_t;
-import containers.range_view;
 import containers.resizable_container;
+import containers.subrange;
 import containers.supports_lazy_insert_after;
 
 import std_module;
@@ -74,7 +74,7 @@ constexpr void assign_impl(Target & target, Source && source) {
 	} else if constexpr (should_use_after_algorithms<Target>) {
 		auto const remainder = ::containers::copy_after(OPERATORS_FORWARD(source), target);
 		::containers::erase_after(target, remainder.output, containers::end(target));
-		::containers::append_after(target, remainder.output, range_view(remainder.input, containers::end(source)));
+		::containers::append_after(target, remainder.output, subrange(remainder.input, containers::end(source)));
 	} else if constexpr (std::is_trivially_copyable_v<range_value_t<Target>> and has_capacity<Target>) {
 		::containers::clear(target);
 		::containers::assign_to_empty(target, OPERATORS_FORWARD(source));
@@ -83,7 +83,7 @@ constexpr void assign_impl(Target & target, Source && source) {
 		::containers::erase_to_end(target, std::move(result.output));
 		::containers::append(
 			target,
-			maybe_transform<Source>(range_view(
+			maybe_transform<Source>(subrange(
 				std::move(result.input),
 				containers::end(OPERATORS_FORWARD(source))
 			))

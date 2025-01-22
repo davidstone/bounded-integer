@@ -15,9 +15,9 @@ import containers.forward_random_access_range;
 import containers.iterator;
 import containers.range;
 import containers.range_value_t;
-import containers.range_view;
 import containers.sentinel_for;
 import containers.size;
+import containers.subrange;
 
 import bounded;
 import std_module;
@@ -99,8 +99,8 @@ private:
 
 static_assert(containers::equal(
 	containers::concatenate_view(
-		containers::range_view<input_iterator, std::default_sentinel_t>(input_iterator(), std::default_sentinel),
-		containers::range_view(input_iterator(), std::default_sentinel)
+		containers::subrange<input_iterator, std::default_sentinel_t>(input_iterator(), std::default_sentinel),
+		containers::subrange(input_iterator(), std::default_sentinel)
 	),
 	containers::array({0, 1, 0, 1})
 ));

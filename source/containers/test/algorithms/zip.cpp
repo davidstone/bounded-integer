@@ -20,7 +20,7 @@ import containers.common_iterator_functions;
 import containers.is_empty;
 import containers.iterator;
 import containers.iterator_t;
-import containers.range_view;
+import containers.subrange;
 
 import bounded;
 import tv;
@@ -76,7 +76,7 @@ private:
 };
 
 constexpr auto make(int value) {
-	return containers::range_view(input_iterator(value), std::default_sentinel);
+	return containers::subrange(input_iterator(value), std::default_sentinel);
 }
 
 static_assert(containers::is_empty(containers::zip(make(0))));

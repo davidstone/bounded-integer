@@ -26,8 +26,8 @@ import containers.integer_range;
 import containers.range;
 import containers.range_size_t;
 import containers.range_value_t;
-import containers.range_view;
 import containers.size;
+import containers.subrange;
 
 import bounded;
 import numeric_traits;
@@ -210,7 +210,7 @@ struct double_buffered_ska_sort_t {
 		if constexpr (numeric_traits::max_value<range_size_t<decltype(source)>> <= 1_bi) {
 			return false;
 		} else {
-			// TODO: Allow buffer to be larger, return range_view instead of bool
+			// TODO: Allow buffer to be larger, return subrange instead of bool
 			// TODO: The actual algorithm doesn't require a sized range
 			BOUNDED_ASSERT(containers::size(source) == containers::size(buffer));
 			// This delegates to an implementation function to collapse lvalue and

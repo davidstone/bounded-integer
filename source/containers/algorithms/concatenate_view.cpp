@@ -22,9 +22,9 @@ import containers.is_empty;
 import containers.iter_difference_t;
 import containers.iterator_t;
 import containers.range_reference_t;
-import containers.range_view;
 import containers.size;
 import containers.sized_range;
+import containers.subrange;
 import containers.subtractable;
 
 import bounded;
@@ -144,14 +144,14 @@ struct concatenate_view_iterator {
 						return range;
 					}
 					remaining_offset = 0_bi;
-					return range_view(
+					return subrange(
 						containers::begin(std::move(range)) + 1_bi,
 						containers::end(std::move(range))
 					);
 				} else {
 					auto const added_size = bounded::min(containers::size(range), remaining_offset);
 					remaining_offset -= added_size;
-					return range_view(
+					return subrange(
 						containers::begin(std::move(range)) + added_size,
 						containers::end(std::move(range))
 					);
@@ -226,11 +226,11 @@ private:
 	static constexpr auto max_index = bounded::constant<sizeof...(RangeViews)> - 1_bi;
 
 	constexpr auto operator_star(auto const index) const -> reference {
-		auto const & range_view = m_range_views[index];
+		auto const & subrange = m_range_views[index];
 		if constexpr (index == max_index) {
-			return containers::front(range_view);
-		} else if (!containers::is_empty(range_view)) {
-			return containers::front(range_view);
+			return containers::front(subrange);
+		} else if (!containers::is_empty(subrange)) {
+			return containers::front(subrange);
 		} else {
 			return operator_star(index + 1_bi);
 		}
@@ -274,7 +274,7 @@ private:
 	static constexpr auto begin_impl(auto && ranges) {
 		return concatenate_view_iterator(tv::transform(
 			[](auto && range){
-				return range_view(
+				return subrange(
 					containers::begin(OPERATORS_FORWARD(range)),
 					containers::end(OPERATORS_FORWARD(range))
 				);

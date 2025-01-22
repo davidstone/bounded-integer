@@ -13,7 +13,7 @@ import containers.algorithms.advance;
 import containers.algorithms.compare;
 import containers.begin_end;
 import containers.pop_back;
-import containers.range_view;
+import containers.subrange;
 import containers.vector;
 
 import bounded;
@@ -24,7 +24,7 @@ constexpr bool test_pop_back(containers::vector<bounded_test::integer> const & o
 	containers::pop_back(copy);
 	BOUNDED_ASSERT(containers::equal(
 		copy,
-		containers::range_view(begin(original), containers::prev(end(original)))
+		containers::subrange(begin(original), containers::prev(end(original)))
 	));
 	return true;
 }

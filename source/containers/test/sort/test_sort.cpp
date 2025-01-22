@@ -12,7 +12,7 @@ import containers.algorithms.compare;
 
 import containers.range;
 import containers.range_value_t;
-import containers.range_view;
+import containers.subrange;
 import containers.uninitialized_array;
 
 import std_module;
@@ -30,7 +30,7 @@ export constexpr auto test_sort_relocate(containers::range auto range, auto func
 	return containers::all(range, [&]<typename Container>(sort_test_data<Container> element) {
 		auto buffer = containers::uninitialized_array<containers::range_value_t<Container>, Container::size()>();
 		function(element.input, buffer);
-		return containers::equal(containers::range_view(buffer.data(), buffer.size()), element.expected);
+		return containers::equal(containers::subrange(buffer.data(), buffer.size()), element.expected);
 	});
 }
 

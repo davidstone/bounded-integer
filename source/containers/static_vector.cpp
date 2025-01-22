@@ -33,8 +33,8 @@ import containers.pop_back;
 import containers.range;
 import containers.range_size_t;
 import containers.range_value_t;
-import containers.range_view;
 import containers.size;
+import containers.subrange;
 import containers.uninitialized_array;
 
 import bounded;
@@ -135,7 +135,7 @@ struct [[clang::trivial_abi]] static_vector : private lexicographical_comparison
 		auto swap_impl = [](static_vector & longer, static_vector & shorter) {
 			auto shorter_last = containers::end(shorter);
 			auto longer_it = std::swap_ranges(containers::begin(shorter), shorter_last, containers::begin(longer));
-			containers::uninitialized_relocate_no_overlap(containers::range_view(longer_it, containers::end(longer)), shorter_last);
+			containers::uninitialized_relocate_no_overlap(containers::subrange(longer_it, containers::end(longer)), shorter_last);
 		};
 		if (containers::size(lhs) >= containers::size(rhs)) {
 			swap_impl(lhs, rhs);

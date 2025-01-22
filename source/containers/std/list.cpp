@@ -37,9 +37,9 @@ import containers.pop_back;
 import containers.pop_front;
 import containers.push_back;
 import containers.push_front;
-import containers.range_view;
 import containers.repeat_n;
 import containers.resize;
+import containers.subrange;
 
 import bounded;
 import bounded.test_int;
@@ -170,7 +170,7 @@ struct list {
 
 	template<containers::iterator InputIterator>
 	constexpr list(InputIterator first, InputIterator last) {
-		containers::assign_to_empty(m_impl, containers::range_view(std::move(first), std::move(last)));
+		containers::assign_to_empty(m_impl, containers::subrange(std::move(first), std::move(last)));
 	}
 
 	constexpr list(std::initializer_list<T> init) {
@@ -201,7 +201,7 @@ struct list {
 
 	template<containers::iterator InputIterator>
 	constexpr auto assign(InputIterator first, InputIterator last) -> void {
-		containers::assign(m_impl, containers::range_view(std::move(first), std::move(last)));
+		containers::assign(m_impl, containers::subrange(std::move(first), std::move(last)));
 	}
 
 	constexpr auto assign(std::initializer_list<T> init) -> void {
@@ -308,7 +308,7 @@ struct list {
 		return containers::legacy_iterator(containers::insert(
 			m_impl,
 			position.base(),
-			containers::range_view(std::move(first), std::move(last))
+			containers::subrange(std::move(first), std::move(last))
 		));
 	}
 	constexpr auto insert(const_iterator const position, std::initializer_list<T> init) -> iterator {

@@ -24,8 +24,8 @@ import containers.linear_size;
 import containers.maximum_array_size;
 import containers.range;
 import containers.range_value_t;
-import containers.range_view;
 import containers.size_then_use_range;
+import containers.subrange;
 import containers.uninitialized_dynamic_array;
 
 import bounded;
@@ -49,7 +49,7 @@ struct [[clang::trivial_abi]] dynamic_array : private lexicographical_comparison
 
 	template<std::size_t source_size>
 	constexpr dynamic_array(c_array<T, source_size> && source):
-		dynamic_array(range_view(std::move(source)))
+		dynamic_array(subrange(std::move(source)))
 	{
 	}
 	template<std::same_as<empty_c_array_parameter> Source = empty_c_array_parameter>
@@ -57,7 +57,7 @@ struct [[clang::trivial_abi]] dynamic_array : private lexicographical_comparison
 	}
 
 	constexpr dynamic_array(dynamic_array const & other):
-		dynamic_array(range_view(other))
+		dynamic_array(subrange(other))
 	{
 	}
 	

@@ -21,10 +21,10 @@ import containers.iterator_t;
 import containers.random_access_sentinel_for;
 import containers.range;
 import containers.range_size_t;
-import containers.range_view;
 import containers.sentinel_t;
 import containers.size;
 import containers.sized_range;
+import containers.subrange;
 
 import bounded;
 import numeric_traits;
@@ -193,17 +193,17 @@ constexpr auto take_impl(Range && source, Count const count) {
 		if (source_size > count) {
 			throw std::runtime_error("Did not take all elements of range");
 		}
-		return containers::range_view(OPERATORS_FORWARD(source));
+		return containers::subrange(OPERATORS_FORWARD(source));
 	} else if constexpr (sized_range<Range> and forward_random_access_iterator<iterator>) {
 		auto const true_count = bounded::min(
 			bounded::integer(containers::size(source)),
 			count
 		);
 		auto first = random_access_counted_iterator<iterator, count_type>(containers::begin(OPERATORS_FORWARD(source)));
-		return containers::range_view(first, true_count);
+		return containers::subrange(first, true_count);
 	} else {
 		auto const used_count = count_type(bounded::min(count, numeric_traits::max_value<count_type>));
-		return containers::range_view(
+		return containers::subrange(
 			counted_iterator(containers::begin(OPERATORS_FORWARD(source)), used_count),
 			counted_sentinel<sentinel_t<Range>, policy>(containers::end(OPERATORS_FORWARD(source)))
 		);

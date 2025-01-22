@@ -21,8 +21,8 @@ import containers.begin_end;
 import containers.legacy_iterator;
 import containers.range;
 import containers.range_size_t;
-import containers.range_view;
 import containers.size;
+import containers.subrange;
 
 import bounded;
 import numeric_traits;
@@ -64,8 +64,8 @@ constexpr auto introsort_impl(Depth const depth) {
 		}
 		median = iterator_partition(first, median, last, compare);
 		auto next_depth = Depth(bounded::assume_in_range<Depth>(depth - 1_bi));
-		::containers::introsort(range_view(first, median), compare, next_depth);
-		::containers::introsort(range_view(median, last), compare, next_depth);
+		::containers::introsort(subrange(first, median), compare, next_depth);
+		::containers::introsort(subrange(median, last), compare, next_depth);
 	};
 }
 

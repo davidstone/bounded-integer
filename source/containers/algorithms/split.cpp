@@ -18,9 +18,9 @@ import containers.legacy_iterator;
 import containers.iter_difference_t;
 import containers.iterator;
 import containers.range_reference_t;
-import containers.range_view;
 import containers.reference_or_value;
 import containers.size;
+import containers.subrange;
 
 import bounded;
 import numeric_traits;
@@ -94,7 +94,7 @@ struct split_iterator {
 	}
 
 	constexpr auto operator*() const {
-		return range_view(m_first, m_middle);
+		return subrange(m_first, m_middle);
 	}
 	friend constexpr auto operator+(split_iterator lhs, bounded::constant_t<1>) {
 		lhs.m_first = lhs.m_middle;
@@ -110,7 +110,7 @@ struct split_iterator {
 
 	// Can be called on any iterator, even an end iterator
 	constexpr auto remainder() const {
-		return range_view(m_first, m_last);
+		return subrange(m_first, m_last);
 	}
 
 	// It is undefined behavior to compare iterators into two different `split`

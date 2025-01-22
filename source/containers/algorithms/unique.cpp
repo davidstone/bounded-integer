@@ -27,10 +27,10 @@ import containers.iterator_t;
 import containers.offset_type;
 import containers.range;
 import containers.range_size_t;
-import containers.range_view;
 import containers.repeat_n;
 import containers.sentinel_for;
 import containers.size;
+import containers.subrange;
 
 import bounded;
 import bounded.test_int;
@@ -58,7 +58,7 @@ constexpr auto unique_copy(Iterator const first, sentinel_for<Iterator> auto con
 	}
 	*output = *first;
 	return ::containers::unique_common(
-		range_view(::containers::next(first), last),
+		subrange(::containers::next(first), last),
 		output,
 		equal
 	);
@@ -94,7 +94,7 @@ constexpr auto unique(Iterator const first, sentinel_for<Iterator> auto const la
 	}
 	*equal_element = std::move(*other);
 	return ::containers::unique_common(
-		::containers::move_range(range_view(containers::next(other), last)),
+		::containers::move_range(subrange(containers::next(other), last)),
 		equal_element,
 		equal
 	);
@@ -137,8 +137,8 @@ constexpr auto unique_merge_copy(range auto && r1, range auto && r2, iterator au
 // Both ranges must be sorted
 export template<iterator Iterator, typename BinaryPredicate = std::less<>>
 constexpr auto unique_inplace_merge(Iterator first, Iterator middle, sentinel_for<Iterator> auto const last, BinaryPredicate less = BinaryPredicate{}) {
-	BOUNDED_ASSERT(containers::is_sorted(range_view(first, middle), less));
-	BOUNDED_ASSERT(containers::is_sorted(range_view(middle, last), less));
+	BOUNDED_ASSERT(containers::is_sorted(subrange(first, middle), less));
+	BOUNDED_ASSERT(containers::is_sorted(subrange(middle, last), less));
 	auto less_to_equal = [&](auto const & lhs, auto const & rhs) {
 		return !less(lhs, rhs) and !less(rhs, lhs);
 	};
@@ -151,10 +151,10 @@ constexpr auto unique_inplace_merge(Iterator first, Iterator middle, sentinel_fo
 	using storage_type = dynamic_array<iter_value_t<Iterator>, offset_type<Iterator>>;
 
 	if (less(*middle, *first)) {
-		auto temp = storage_type(::containers::move_range(range_view(first, middle)));
+		auto temp = storage_type(::containers::move_range(subrange(first, middle)));
 		return ::containers::unique_merge_copy(
 			::containers::move_range(temp),
-			::containers::move_range(range_view(middle, last)),
+			::containers::move_range(subrange(middle, last)),
 			first,
 			less
 		);
@@ -185,7 +185,7 @@ constexpr auto unique_inplace_merge(Iterator first, Iterator middle, sentinel_fo
 	
 	// Move the rest of the elements so we can use their space without
 	// overwriting.
-	auto temp = storage_type(::containers::move_range(range_view(
+	auto temp = storage_type(::containers::move_range(subrange(
 		first_to_move.target,
 		middle
 	)));
@@ -193,7 +193,7 @@ constexpr auto unique_inplace_merge(Iterator first, Iterator middle, sentinel_fo
 
 	return ::containers::unique_merge_copy(
 		::containers::move_range(temp),
-		::containers::move_range(range_view(new_middle, last)),
+		::containers::move_range(subrange(new_middle, last)),
 		first_to_move.target,
 		less
 	);
@@ -206,7 +206,7 @@ using Container = containers::dynamic_array<bounded_test::integer>;
 constexpr void test_unique_copy_less(Container const & source, Container const & expected) {
 	auto destination = Container(containers::repeat_n(containers::size(source), 0));
 	auto const it = containers::unique_copy_less(begin(source), end(source), begin(destination));
-	BOUNDED_ASSERT(containers::equal(containers::range_view(begin(destination), it), expected));
+	BOUNDED_ASSERT(containers::equal(containers::subrange(begin(destination), it), expected));
 }
 
 constexpr void test_unique_less(Container source, Container const & expected) {
@@ -218,7 +218,7 @@ constexpr void test_unique_less(Container source, Container const & expected) {
 constexpr void test_unique_merge_copy(Container const & lhs, Container const & rhs, Container const & expected) {
 	auto result = Container(containers::repeat_n(::bounded::assume_in_range<containers::range_size_t<Container>>(containers::size(lhs) + containers::size(rhs)), 0));
 	auto const it = containers::unique_merge_copy(lhs, rhs, begin(result));
-	BOUNDED_ASSERT(containers::equal(containers::range_view(begin(result), it), expected));
+	BOUNDED_ASSERT(containers::equal(containers::subrange(begin(result), it), expected));
 }
 
 constexpr void test_unique_inplace_merge(Container v, Container const & other, Container const & expected) {
@@ -226,7 +226,7 @@ constexpr void test_unique_inplace_merge(Container v, Container const & other, C
 	auto const midpoint = static_cast<containers::iter_difference_t<iterator>>(containers::size(v));
 	v = Container(containers::concatenate_view(std::move(v), other));
 	auto const it = containers::unique_inplace_merge(begin(v), begin(v) + midpoint, end(v));
-	BOUNDED_ASSERT(containers::equal(containers::range_view(begin(v), it), expected));
+	BOUNDED_ASSERT(containers::equal(containers::subrange(begin(v), it), expected));
 }
 
 constexpr void test_unique_merge(Container v, Container const & other, Container const & expected) {

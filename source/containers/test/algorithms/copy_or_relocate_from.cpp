@@ -12,7 +12,7 @@ export module containers.test.algorithms.copy_or_relocate_from;
 import containers.algorithms.copy_or_relocate_from;
 import containers.lazy_push_back;
 import containers.is_empty;
-import containers.range_view;
+import containers.subrange;
 import containers.vector;
 
 import bounded.test_int;
@@ -52,7 +52,7 @@ static_assert([] {
 	auto container = original;
 	auto result = container_t();
 	containers::copy_or_relocate_from(
-		containers::range_view(container),
+		containers::subrange(container),
 		[&](auto function) { containers::lazy_push_back(result, function); }
 	);
 	BOUNDED_ASSERT(container == original);
@@ -95,7 +95,7 @@ static_assert([] {
 	auto container = original;
 	auto result = container_t();
 	containers::copy_or_relocate_from(
-		containers::range_view(container),
+		containers::subrange(container),
 		[&](auto function) { containers::lazy_push_back(result, function); }
 	);
 	BOUNDED_ASSERT(container == original);

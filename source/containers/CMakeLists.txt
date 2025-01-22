@@ -166,7 +166,6 @@ target_sources(containers PUBLIC
 		range_reference_t.cpp
 		range_size_t.cpp
 		range_value_t.cpp
-		range_view.cpp
 		reallocation_size.cpp
 		reference_or_value.cpp
 		repeat_n.cpp
@@ -186,6 +185,7 @@ target_sources(containers PUBLIC
 		static_vector.cpp
 		stored_function.cpp
 		string.cpp
+		subrange.cpp
 		subtractable.cpp
 		supports_lazy_insert_after.cpp
 		take.cpp
@@ -263,9 +263,9 @@ target_sources(containers_test PRIVATE
 		test/push_back.cpp
 		test/push_back_into_capacity.cpp
 		test/push_front.cpp
-		test/range_view.cpp
 		test/shrink_to_fit.cpp
 		test/stable_vector.cpp
+		test/subrange.cpp
 		test/take.cpp
 		test/test_associative_container.cpp
 		test/test_reserve_and_capacity.cpp

@@ -30,8 +30,8 @@ import containers.front;
 import containers.index_type;
 import containers.iter_difference_t;
 import containers.range;
-import containers.range_view;
 import containers.size;
+import containers.subrange;
 
 import bounded;
 import std_module;
@@ -260,7 +260,7 @@ private:
 			auto const partition_end = first + end_offset;
 			if (partition_end - partition_begin > 1_bi) {
 				sort_selector(
-					range_view(partition_begin, partition_end),
+					subrange(partition_begin, partition_end),
 					extract_key,
 					next_sort,
 					sort_data,
@@ -304,7 +304,7 @@ private:
 			auto partition_end = first + end_offset;
 			if (partition_end - partition_begin > 1_bi) {
 				sort_selector(
-					range_view(partition_begin, partition_end),
+					subrange(partition_begin, partition_end),
 					extract_key,
 					next_sort,
 					sort_data,
@@ -324,12 +324,12 @@ constexpr void inplace_sort(View to_sort, ExtractKey const & extract_key, NextSo
 	if constexpr (std::same_as<SubKeyType, bool>) {
 		auto middle = containers::partition(to_sort, [&](auto && a){ return !CurrentSubKey::sub_key(extract_key(a), sort_data); });
 		next_sort(
-			range_view(containers::begin(to_sort), middle),
+			subrange(containers::begin(to_sort), middle),
 			extract_key,
 			sort_data
 		);
 		next_sort(
-			range_view(middle, containers::end(to_sort)),
+			subrange(middle, containers::end(to_sort)),
 			extract_key,
 			sort_data
 		);
@@ -393,14 +393,14 @@ private:
 		auto const last = containers::end(to_sort);
 		if (end_of_shorter_ones - first > 1) {
 			sort_data.next_sort(
-				range_view(first, end_of_shorter_ones),
+				subrange(first, end_of_shorter_ones),
 				extract_key,
 				sort_data.next_sort_data
 			);
 		}
 		if (last - end_of_shorter_ones > 1_bi) {
 			inplace_sort<std_sort_threshold, american_flag_sort_threshold, ElementSubKey>(
-				range_view(end_of_shorter_ones, last),
+				subrange(end_of_shorter_ones, last),
 				extract_key,
 				static_cast<NextSort<View, ExtractKey>>(sort_from_recursion),
 				std::addressof(sort_data)

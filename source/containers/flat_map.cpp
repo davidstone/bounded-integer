@@ -42,9 +42,9 @@ import containers.push_back;
 import containers.range;
 import containers.range_size_t;
 import containers.range_value_t;
-import containers.range_view;
 import containers.size;
 import containers.static_vector;
+import containers.subrange;
 import containers.vector;
 export import containers.common_iterator_functions;
 
@@ -81,7 +81,7 @@ constexpr auto merge_sorted_and_unsorted(Container & container, iterator_t<Conta
 	auto const first = ::containers::begin(container);
 	auto const last = ::containers::end(container);
 	auto const compare = ::containers::extract_key_to_less(extract_key);
-	ska_sort(range_view(midpoint, last), extract_key);
+	ska_sort(subrange(midpoint, last), extract_key);
 	if constexpr (allow_duplicates) {
 		std::inplace_merge(
 			maybe_legacy_iterator(first),
