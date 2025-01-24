@@ -35,6 +35,11 @@ constexpr auto as_unsigned(auto const value) {
 	return static_cast<numeric_traits::make_unsigned<decltype(value)>>(value);
 };
 
+template<typename T>
+concept supports_bit_width = requires(T integer) {
+	std::bit_width(as_unsigned(integer.value()));
+};
+
 // TODO: It's useful for 0 to return 0, but that's not `log`.
 export template<bounded_integer Value, bounded_integer Base>
 constexpr auto log(Value const value, Base const base) {
@@ -44,7 +49,11 @@ constexpr auto log(Value const value, Base const base) {
 		log_impl(static_cast<numeric_traits::max_unsigned_t>(builtin_min_value<Value>), static_cast<numeric_traits::max_unsigned_t>(numeric_traits::max_value<Base>)),
 		log_impl(static_cast<numeric_traits::max_unsigned_t>(builtin_max_value<Value>), static_cast<numeric_traits::max_unsigned_t>(numeric_traits::min_value<Base>))
 	>;
-	return result_type(log_impl(as_unsigned(value.value()), as_unsigned(base.value())), unchecked);
+	if constexpr (base == constant<2> and supports_bit_width<Value>) {
+		return result_type(value == constant<0> ? 0 : std::bit_width(as_unsigned(value.value())) - 1, unchecked);
+	} else {
+		return result_type(log_impl(as_unsigned(value.value()), as_unsigned(base.value())), unchecked);
+	}
 }
 
 } // namespace bounded
