@@ -60,32 +60,35 @@ constexpr auto runtime_sort_exactly_n_relocate(Iterator it, auto const size, aut
 	}
 }
 
-export template<typename Compare = std::less<>>
-constexpr auto chunked_insertion_sort(range auto && r, Compare const compare = Compare()) -> void {
-	constexpr auto chunk_size = 4_bi;
-	auto it = containers::begin(r);
-	auto const last = containers::end(r);
-	#if 1
-	auto const initial_sort_size = bounded::min(chunk_size, ::containers::size(r));
-	::containers::small_size_optimized_sort(
-		subrange(it, initial_sort_size),
-		compare,
-		[](auto &&, auto) { std::unreachable(); }
-	);
-	it += initial_sort_size;
-	#endif
-	auto buffer = containers::uninitialized_array<std::remove_reference_t<decltype(*it)>, chunk_size>();
-	while (it != last) {
-		auto const count = bounded::min(chunk_size, last - it);
-		auto next_it = ::containers::runtime_sort_exactly_n_relocate(it, count, buffer.data(), compare);
-		merge_relocate_second_range(
-			subrange(containers::begin(r), it),
-			subrange(buffer.data(), count),
-			next_it,
-			compare
+struct chunked_insertion_sort_t {
+	template<typename Compare = std::less<>>
+	static constexpr auto operator()(range auto && r, Compare const compare = Compare()) -> void {
+		constexpr auto chunk_size = 4_bi;
+		auto it = containers::begin(r);
+		auto const last = containers::end(r);
+		#if 1
+		auto const initial_sort_size = bounded::min(chunk_size, ::containers::size(r));
+		::containers::small_size_optimized_sort(
+			subrange(it, initial_sort_size),
+			compare,
+			[](auto &&, auto) { std::unreachable(); }
 		);
-		it = next_it;
+		it += initial_sort_size;
+		#endif
+		auto buffer = containers::uninitialized_array<std::remove_reference_t<decltype(*it)>, chunk_size>();
+		while (it != last) {
+			auto const count = bounded::min(chunk_size, last - it);
+			auto next_it = ::containers::runtime_sort_exactly_n_relocate(it, count, buffer.data(), compare);
+			merge_relocate_second_range(
+				subrange(containers::begin(r), it),
+				subrange(buffer.data(), count),
+				next_it,
+				compare
+			);
+			it = next_it;
+		}
 	}
 };
+export constexpr auto chunked_insertion_sort = chunked_insertion_sort_t();
 
 } // namespace containers
