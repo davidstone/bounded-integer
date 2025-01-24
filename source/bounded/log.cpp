@@ -22,7 +22,7 @@ import std_module;
 
 namespace bounded {
 
-constexpr auto log_impl(auto value, auto const base) {
+constexpr auto log_impl(auto value, auto const base) -> int {
 	auto sum = 0;
 	while (value >= base) {
 		value /= base;
@@ -31,8 +31,8 @@ constexpr auto log_impl(auto value, auto const base) {
 	return sum;
 }
 
-constexpr auto as_unsigned = [](auto const value) {
-	return static_cast<numeric_traits::promoted_unsigned<decltype(value)>>(value);
+constexpr auto as_unsigned(auto const value) {
+	return static_cast<numeric_traits::make_unsigned<decltype(value)>>(value);
 };
 
 // TODO: It's useful for 0 to return 0, but that's not `log`.
