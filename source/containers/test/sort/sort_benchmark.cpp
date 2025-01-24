@@ -16,11 +16,6 @@ namespace {
 
 using namespace bounded::literal;
 
-// https://github.com/google/benchmark/issues/1584
-auto DoNotOptimize(auto && value) -> void {
-	benchmark::DoNotOptimize(value);
-}
-
 template<std::size_t size>
 struct data {
 	constexpr explicit data(unsigned value) {
