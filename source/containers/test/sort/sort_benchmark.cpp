@@ -18,13 +18,15 @@ using namespace bounded::literal;
 
 template<std::size_t size>
 struct data {
+	data() = default;
 	constexpr explicit data(unsigned value) {
 		for (auto const n : containers::integer_range(bounded::constant<size>)) {
 			m[n] = static_cast<std::uint8_t>(value);
 		}
 	}
 	friend constexpr auto operator<=>(data const & lhs, data const & rhs) = default;
-	containers::array<std::uint8_t, bounded::constant<size>> m;
+
+	containers::array<std::uint8_t, bounded::constant<size>> m = {};
 };
 
 template<std::size_t data_size, auto function>
@@ -32,10 +34,9 @@ auto benchmark_sort(benchmark::State & state) -> void {
 	auto engine = std::mt19937(std::random_device()());
 	auto value_distribution = std::uniform_int_distribution<unsigned>();
 	using container_t = containers::vector<data<data_size>>;
-	auto container = container_t();
 	using size_type = containers::range_size_t<container_t>;
 	auto const size = bounded::assume_in_range<size_type>(state.range(0));
-	container.reserve(size);
+	auto container = container_t(containers::repeat_default_n<data<data_size>>(size));
 
 	for (auto _ : state) {
 		containers::copy(
