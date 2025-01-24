@@ -21,26 +21,28 @@ auto DoNotOptimize(auto && value) -> void {
 	benchmark::DoNotOptimize(value);
 }
 
+
+
 template<std::size_t size>
 struct data {
-	constexpr explicit data(unsigned value) {
-		for (auto const n : containers::integer_range(bounded::constant<size>)) {
-			m[n] = static_cast<std::uint8_t>(value);
-		}
+	constexpr explicit data(unsigned value):
+		m(std::bit_cast<array_t>(value))
+	{
 	}
 	friend constexpr auto operator<=>(data const & lhs, data const & rhs) = default;
-	containers::array<std::uint8_t, bounded::constant<size>> m;
+	using array_t = containers::array<std::uint8_t, bounded::constant<size>>;
+	array_t m;
 };
 
-template<std::size_t data_size>
-auto benchmark_impl(benchmark::State & state, auto function) -> void {
+template<std::size_t data_size, auto function>
+auto benchmark_impl(benchmark::State & state) -> void {
 	auto engine = std::mt19937(std::random_device()());
 	auto value_distribution = std::uniform_int_distribution<unsigned>();
 	using container_t = containers::vector<data<data_size>>;
-	auto container = container_t();
 	using size_type = containers::range_size_t<container_t>;
 	auto const size = bounded::assume_in_range<size_type>(state.range(0));
-	container.reserve(size);
+	auto container = container_t();
+	containers::resize(container, size);
 
 	for (auto _ : state) {
 		containers::copy(
@@ -58,9 +60,10 @@ auto benchmark_impl(benchmark::State & state, auto function) -> void {
 	}
 }
 
+#if 0
 template<std::size_t data_size>
 auto benchmark_chunked_insertion_sort(benchmark::State & state) -> void {
-	benchmark_impl<data_size>(state, [](auto & range) { return containers::chunked_insertion_sort(range); });
+	benchmark_impl<data_size>(state, containers::chunked_insertion_sort);
 }
 
 template<std::size_t data_size>
@@ -72,6 +75,8 @@ template<std::size_t data_size>
 auto benchmark_standard(benchmark::State & state) -> void {
 	benchmark_impl<data_size>(state, containers::sort);
 }
+
+#endif
 
 constexpr auto insertion_sort = [](containers::range auto && r) -> void {
 	auto const first = containers::begin(r);
@@ -87,16 +92,23 @@ constexpr auto insertion_sort = [](containers::range auto && r) -> void {
     }
 };
 
+#if 0
+
 template<std::size_t data_size>
 auto benchmark_insertion_sort(benchmark::State & state) -> void {
 	benchmark_impl<data_size>(state, insertion_sort);
 }
 
+#endif
+
+using containers::chunked_insertion_sort;
+using containers::new_sort;
+using containers::sort;
 #define BENCHMARK_ALL(data_size) \
-	BENCHMARK(benchmark_insertion_sort<data_size>)->DenseRange(1, 5, 1)->Arg(16)->Arg(25)->Arg(64)->Arg(128); \
-	BENCHMARK(benchmark_chunked_insertion_sort<data_size>)->DenseRange(1, 5, 1)->Arg(16)->Arg(25)->Arg(64)->Arg(128); \
-	BENCHMARK(benchmark_mine<data_size>)->DenseRange(1, 5, 1)->Arg(16)->Arg(25)->Arg(64)->Arg(128); \
-	BENCHMARK(benchmark_standard<data_size>)->DenseRange(1, 5, 1)->Arg(16)->Arg(25)->Arg(64)->Arg(128)
+	BENCHMARK(benchmark_impl<data_size, insertion_sort>)->DenseRange(1, 5, 1)->Arg(16)->Arg(25)->Arg(64)->Arg(128); \
+	BENCHMARK(benchmark_impl<data_size, chunked_insertion_sort>)->DenseRange(1, 5, 1)->Arg(16)->Arg(25)->Arg(64)->Arg(128); \
+	BENCHMARK(benchmark_impl<data_size, new_sort>)->DenseRange(1, 5, 1)->Arg(16)->Arg(25)->Arg(64)->Arg(128); \
+	BENCHMARK(benchmark_impl<data_size, sort>)->DenseRange(1, 5, 1)->Arg(16)->Arg(25)->Arg(64)->Arg(128)
 
 BENCHMARK_ALL(1);
 BENCHMARK_ALL(4);
