@@ -32,8 +32,8 @@ struct data {
 	containers::array<std::uint8_t, bounded::constant<size>> m;
 };
 
-template<std::size_t data_size>
-auto benchmark_impl(benchmark::State & state, auto function) -> void {
+template<std::size_t data_size, auto function>
+auto benchmark_sort(benchmark::State & state) -> void {
 	auto engine = std::mt19937(std::random_device()());
 	auto value_distribution = std::uniform_int_distribution<unsigned>();
 	using container_t = containers::vector<data<data_size>>;
@@ -58,20 +58,6 @@ auto benchmark_impl(benchmark::State & state, auto function) -> void {
 	}
 }
 
-template<std::size_t data_size>
-auto benchmark_chunked_insertion_sort(benchmark::State & state) -> void {
-	benchmark_impl<data_size>(state, [](auto & range) { return containers::chunked_insertion_sort(range); });
-}
-
-template<std::size_t data_size>
-auto benchmark_mine(benchmark::State & state) -> void {
-	benchmark_impl<data_size>(state, containers::new_sort);
-}
-
-template<std::size_t data_size>
-auto benchmark_standard(benchmark::State & state) -> void {
-	benchmark_impl<data_size>(state, containers::sort);
-}
 
 constexpr auto insertion_sort = [](containers::range auto && r) -> void {
 	auto const first = containers::begin(r);
@@ -87,16 +73,15 @@ constexpr auto insertion_sort = [](containers::range auto && r) -> void {
     }
 };
 
-template<std::size_t data_size>
-auto benchmark_insertion_sort(benchmark::State & state) -> void {
-	benchmark_impl<data_size>(state, insertion_sort);
-}
+using containers::chunked_insertion_sort;
+using containers::new_sort;
+using containers::sort;
 
 #define BENCHMARK_ALL(data_size) \
-	BENCHMARK(benchmark_insertion_sort<data_size>)->DenseRange(1, 5, 1)->Arg(16)->Arg(25)->Arg(64)->Arg(128); \
-	BENCHMARK(benchmark_chunked_insertion_sort<data_size>)->DenseRange(1, 5, 1)->Arg(16)->Arg(25)->Arg(64)->Arg(128); \
-	BENCHMARK(benchmark_mine<data_size>)->DenseRange(1, 5, 1)->Arg(16)->Arg(25)->Arg(64)->Arg(128); \
-	BENCHMARK(benchmark_standard<data_size>)->DenseRange(1, 5, 1)->Arg(16)->Arg(25)->Arg(64)->Arg(128)
+	BENCHMARK(benchmark_sort<data_size, insertion_sort>)->DenseRange(1, 5, 1)->Arg(16)->Arg(25)->Arg(64)->Arg(128); \
+	BENCHMARK(benchmark_sort<data_size, chunked_insertion_sort>)->DenseRange(1, 5, 1)->Arg(16)->Arg(25)->Arg(64)->Arg(128); \
+	BENCHMARK(benchmark_sort<data_size, new_sort>)->DenseRange(1, 5, 1)->Arg(16)->Arg(25)->Arg(64)->Arg(128); \
+	BENCHMARK(benchmark_sort<data_size, sort>)->DenseRange(1, 5, 1)->Arg(16)->Arg(25)->Arg(64)->Arg(128)
 
 BENCHMARK_ALL(1);
 BENCHMARK_ALL(4);
