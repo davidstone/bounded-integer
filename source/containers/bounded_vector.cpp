@@ -122,13 +122,11 @@ struct [[clang::trivial_abi]] bounded_vector : private lexicographical_compariso
 		if (this == std::addressof(other)) {
 			return *this;
 		}
-		if constexpr (min_capacity > 0_bi) {
-			if (!m_storage.data()) {
-				replace_empty_allocation(other.size());
-				::containers::uninitialized_copy_no_overlap(other, data());
-				m_size = other.m_size;
-				return *this;
-			}
+		if (!m_storage.data()) {
+			replace_empty_allocation(other.size());
+			::containers::uninitialized_copy_no_overlap(other, data());
+			m_size = other.m_size;
+			return *this;
 		}
 		containers::assign(*this, other);
 		return *this;

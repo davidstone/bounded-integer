@@ -13,8 +13,14 @@ import bounded;
 import bounded.test_int;
 import std_module;
 
+static_assert(bounded::default_constructible<containers::dynamic_array<int>>);
+static_assert(bounded::default_constructible<containers::dynamic_array<bounded_test::integer>>);
+
 static_assert(containers_test::test_sequence_container<containers::dynamic_array<int>>());
 static_assert(containers_test::test_sequence_container<containers::dynamic_array<bounded_test::integer>>());
+
+static_assert(containers_test::test_sequence_container<containers::dynamic_array<int, bounded::integer<1, 40>>>());
+static_assert(containers_test::test_sequence_container<containers::dynamic_array<bounded_test::integer, bounded::integer<1, 40>>>());
 
 static_assert(bounded::convertible_to<containers::dynamic_array<bounded_test::integer> const &, std::span<bounded_test::integer const>>);
 static_assert(bounded::convertible_to<containers::dynamic_array<bounded_test::integer> &, std::span<bounded_test::integer>>);

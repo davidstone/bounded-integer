@@ -17,6 +17,8 @@ import std_module;
 
 using namespace bounded::literal;
 
+static_assert(bounded::default_constructible<containers::vector<int>>);
+static_assert(bounded::default_constructible<containers::vector<bounded_test::integer>>);
 static_assert(containers_test::test_sequence_container<containers::vector<int>>());
 static_assert(containers_test::test_sequence_container<containers::vector<bounded_test::integer>>());
 

@@ -23,6 +23,7 @@ auto check_equal(std::string_view const input) {
 }
 
 TEST_CASE("string", "[string]") {
+	static_assert(bounded::default_constructible<containers::string>);
 	containers_test::test_sequence_container<containers::string>();
 	containers_test::test_reserve_and_capacity<containers::string>();
 	containers_test::test_set_size<containers::string>();

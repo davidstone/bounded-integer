@@ -22,6 +22,8 @@ using test_stable_vector = containers::stable_vector<T, 1000_bi>;
 
 static_assert(test_stable_vector<int>::capacity() == 1000_bi);
 
+static_assert(bounded::default_constructible<test_stable_vector<int>>);
+static_assert(bounded::default_constructible<test_stable_vector<bounded_test::integer>>);
 static_assert(containers_test::test_sequence_container<test_stable_vector<int>>());
 static_assert(containers_test::test_sequence_container<test_stable_vector<bounded_test::integer>>());
 

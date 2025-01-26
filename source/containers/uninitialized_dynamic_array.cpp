@@ -43,7 +43,6 @@ struct [[clang::trivial_abi]] uninitialized_dynamic_array {
 		m_storage(other.m_storage)
 	{
 		other.m_storage.pointer = nullptr;
-		other.m_storage.size = {};
 	}
 	constexpr auto operator=(uninitialized_dynamic_array && other) & noexcept -> uninitialized_dynamic_array & {
 		auto const original_storage = m_storage;

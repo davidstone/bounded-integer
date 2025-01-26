@@ -29,6 +29,8 @@ using namespace bounded::literal;
 
 static_assert(bounded::convertible_to<containers::forward_linked_list<int>::iterator, containers::forward_linked_list<int>::const_iterator>);
 
+static_assert(bounded::default_constructible<containers::forward_linked_list<int>>);
+static_assert(bounded::default_constructible<containers::forward_linked_list<bounded_test::integer>>);
 static_assert(containers_test::test_sequence_container<containers::forward_linked_list<int>>());
 static_assert(containers_test::test_sequence_container<containers::forward_linked_list<bounded_test::non_copyable_integer>>());
 

@@ -129,9 +129,18 @@ constexpr auto test_default_copy_assignment_from_non_empty(auto const make) -> v
 	BOUNDED_ASSERT(containers::equal(target, Container()));
 }
 template<typename Container>
-constexpr auto test_copy_assignment_from_moved_from(auto const make) -> void {
+constexpr auto test_copy_assignment_from_move_constructed_from(auto const make) -> void {
 	auto target = Container(make());
 	auto const source = std::move(target);
+	target = source;
+	BOUNDED_ASSERT(containers::equal(target, make()));
+	BOUNDED_ASSERT(containers::equal(target, source));
+}
+template<typename Container>
+constexpr auto test_copy_assignment_from_move_assigned_from(auto const make) -> void {
+	auto target = Container(make());
+	auto source = Container(make());
+	source = std::move(target);
 	target = source;
 	BOUNDED_ASSERT(containers::equal(target, make()));
 	BOUNDED_ASSERT(containers::equal(target, source));
@@ -146,11 +155,14 @@ constexpr auto test_self_copy_assignment(auto const make) -> void {
 }
 template<typename Container>
 constexpr auto test_copy_assignment(auto const make) -> void {
-	test_copy_assignment_from_empty<Container>(make);
+	if constexpr (bounded::default_constructible<Container>) {
+		test_copy_assignment_from_empty<Container>(make);
+		test_default_copy_assignment_from_empty<Container>();
+		test_default_copy_assignment_from_non_empty<Container>(make);
+	}
 	test_copy_assignment_from_non_empty<Container>(make);
-	test_default_copy_assignment_from_empty<Container>();
-	test_default_copy_assignment_from_non_empty<Container>(make);
-	test_copy_assignment_from_moved_from<Container>(make);
+	test_copy_assignment_from_move_constructed_from<Container>(make);
+	test_copy_assignment_from_move_assigned_from<Container>(make);
 	test_self_copy_assignment<Container>(make);
 }
 
@@ -169,9 +181,17 @@ constexpr auto test_move_assignment_from_non_empty(auto const make) -> void {
 	BOUNDED_ASSERT(containers::equal(target, make()));
 }
 template<typename Container>
-constexpr auto test_move_assignment_from_moved_from(auto const make) -> void {
+constexpr auto test_move_assignment_from_move_constructed_from(auto const make) -> void {
 	auto target = Container(make());
 	auto temp = std::move(target);
+	target = std::move(temp);
+	BOUNDED_ASSERT(containers::equal(target, make()));
+}
+template<typename Container>
+constexpr auto test_move_assignment_from_move_assigned_from(auto const make) -> void {
+	auto target = Container(make());
+	auto temp = Container(make());
+	temp = std::move(target);
 	target = std::move(temp);
 	BOUNDED_ASSERT(containers::equal(target, make()));
 }
@@ -194,9 +214,12 @@ constexpr auto test_self_move_assignment(auto const make, auto const & validate)
 }
 template<typename Container>
 constexpr auto test_move_assignment(auto const make) -> void {
-	test_move_assignment_from_empty<Container>(make);
+	if constexpr (bounded::default_constructible<Container>) {
+		test_move_assignment_from_empty<Container>(make);
+	}
 	test_move_assignment_from_non_empty<Container>(make);
-	test_move_assignment_from_moved_from<Container>(make);
+	test_move_assignment_from_move_constructed_from<Container>(make);
+	test_move_assignment_from_move_assigned_from<Container>(make);
 	test_self_move_assignment<Container>(make, [&](Container const & container) { return containers::equal(container, make()); });
 }
 
@@ -240,7 +263,9 @@ constexpr auto test_special_members(auto const make) -> bool {
 			test_copy_assignment<Container>(make);
 		}
 	}
-	test_assignment_from_empty_braces<Container>(make);
+	if constexpr (bounded::default_constructible<Container>) {
+		test_assignment_from_empty_braces<Container>(make);
+	}
 	test_swap(make);
 	return true;
 }
@@ -256,14 +281,16 @@ constexpr auto test_sequence_container() -> bool {
 	static_assert(containers::is_container<Container>);
 	test_forward_range_concepts<Container>();
 
-	test_range_based_for_loop<Container>();
+	if constexpr (bounded::default_constructible<Container>) {
+		test_range_based_for_loop<Container>();
 
-	test_sequence_container_default_constructed_empty<Container>();
-	test_sequence_container_implicit_from_two_empty_braces<Container>();
+		test_sequence_container_default_constructed_empty<Container>();
+		test_sequence_container_implicit_from_two_empty_braces<Container>();
 
-	test_sequence_container_from<Container>([] {
-		return containers::to_array<containers::range_value_t<Container>>({});
-	});
+		test_sequence_container_from<Container>([] {
+			return containers::to_array<containers::range_value_t<Container>>({});
+		});
+	}
 	test_sequence_container_from<Container>([] {
 		return containers::to_array<containers::range_value_t<Container>>({5});
 	});

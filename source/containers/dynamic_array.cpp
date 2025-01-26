@@ -33,9 +33,12 @@ import numeric_traits;
 import std_module;
 
 namespace containers {
+	
+using namespace bounded::literal;
 
 export template<typename T, typename Size = array_size_type<T>>
 struct [[clang::trivial_abi]] dynamic_array : private lexicographical_comparison::base {
+	static_assert(numeric_traits::min_value<Size> >= 0_bi);
 	using size_type = Size;
 
 	constexpr dynamic_array() = default;
@@ -62,12 +65,14 @@ struct [[clang::trivial_abi]] dynamic_array : private lexicographical_comparison
 	}
 	
 	constexpr dynamic_array(dynamic_array && other) noexcept:
-		m_data(std::exchange(other.m_data, {}))
+		m_data(std::move(other.m_data))
 	{
 	}
 	
 	constexpr ~dynamic_array() {
-		::containers::destroy_range(*this);
+		if (data()) {
+			::containers::destroy_range(*this);
+		}
 	}
 
 	constexpr auto operator=(dynamic_array const & other) & -> dynamic_array & {
@@ -77,9 +82,10 @@ struct [[clang::trivial_abi]] dynamic_array : private lexicographical_comparison
 		return *this;
 	}
 	constexpr auto operator=(dynamic_array && other) & noexcept -> dynamic_array & {
-		::containers::destroy_range(*this);
+		if (data()) {
+			::containers::destroy_range(*this);
+		}
 		m_data = std::move(other.m_data);
-		other.m_data = {};
 		return *this;
 	}
 	
@@ -100,13 +106,20 @@ struct [[clang::trivial_abi]] dynamic_array : private lexicographical_comparison
 		*this = {};
 	}
 
+	// Requires that `range` does not alias any elements of `*this`
 	template<size_then_use_range Range> requires(!std::is_array_v<Range> or !std::is_reference_v<Range>)
 	constexpr auto assign(Range && range) & -> void {
-		auto const difference = ::containers::linear_size(range);
-		if (difference == size()) {
+		auto const new_size = ::containers::linear_size(range);
+		if (!data()) {
+			*this = dynamic_array<T, Size>(OPERATORS_FORWARD(range));
+			return;
+		}
+		if (new_size == size()) {
 			::containers::copy(OPERATORS_FORWARD(range), ::containers::begin(*this));
 		} else {
-			clear();
+			if constexpr (numeric_traits::min_value<Size> == 0_bi) {
+				clear();
+			}
 			*this = dynamic_array<T, Size>(OPERATORS_FORWARD(range));
 		}
 	}
