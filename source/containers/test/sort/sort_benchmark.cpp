@@ -73,11 +73,13 @@ using containers::chunked_insertion_sort;
 using containers::new_sort;
 using containers::sort;
 
+#define BENCHMARK_SIZES DenseRange(1, 5, 1)->Arg(16)->Arg(25)->Arg(64)->Arg(128)->Arg(1'000'000)
+
 #define BENCHMARK_ALL(data_size) \
-	BENCHMARK(benchmark_sort<data_size, insertion_sort>)->DenseRange(1, 5, 1)->Arg(16)->Arg(25)->Arg(64)->Arg(128); \
-	BENCHMARK(benchmark_sort<data_size, chunked_insertion_sort>)->DenseRange(1, 5, 1)->Arg(16)->Arg(25)->Arg(64)->Arg(128); \
-	BENCHMARK(benchmark_sort<data_size, new_sort>)->DenseRange(1, 5, 1)->Arg(16)->Arg(25)->Arg(64)->Arg(128); \
-	BENCHMARK(benchmark_sort<data_size, sort>)->DenseRange(1, 5, 1)->Arg(16)->Arg(25)->Arg(64)->Arg(128)
+	BENCHMARK(benchmark_sort<data_size, insertion_sort>)->BENCHMARK_SIZES; \
+	BENCHMARK(benchmark_sort<data_size, chunked_insertion_sort>)->BENCHMARK_SIZES; \
+	BENCHMARK(benchmark_sort<data_size, new_sort>)->BENCHMARK_SIZES; \
+	BENCHMARK(benchmark_sort<data_size, sort>)->BENCHMARK_SIZES
 
 BENCHMARK_ALL(1);
 BENCHMARK_ALL(4);
