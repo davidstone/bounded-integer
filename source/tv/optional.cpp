@@ -102,7 +102,9 @@ struct optional_storage<T> {
 	}
 
 	constexpr auto uninitialize() -> void {
-		bounded::destroy(m_data);
+		if (is_initialized()) {
+			bounded::destroy(m_data);
+		}
 		bounded::construct_at(m_data, make_uninitialized);
 	}
 
