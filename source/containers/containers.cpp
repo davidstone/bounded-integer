@@ -8,6 +8,7 @@ export module containers;
 export import containers.algorithms.sort.double_buffered_ska_sort;
 export import containers.algorithms.sort.is_sorted;
 export import containers.algorithms.sort.ska_sort;
+export import containers.algorithms.sort.small_size_optimized_sort;
 export import containers.algorithms.sort.sort;
 export import containers.algorithms.sort.to_radix_sort_key;
 
