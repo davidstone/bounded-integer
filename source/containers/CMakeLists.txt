@@ -218,6 +218,7 @@ target_sources(containers_test PRIVATE
 	FILES
 		test/sort/chunked_insertion_sort.cpp
 		test/sort/double_buffered_ska_sort.cpp
+		test/sort/fixed_size_merge_sort.cpp
 		test/sort/sort_test_data.cpp
 		test/sort/ska_sort.cpp
 		test/sort/sort.cpp

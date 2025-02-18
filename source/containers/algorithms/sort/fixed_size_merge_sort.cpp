@@ -13,9 +13,6 @@ import containers.algorithms.sort.sort_exactly_5;
 
 import containers.algorithms.uninitialized;
 
-import containers.array;
-import containers.begin_end;
-import containers.contiguous_iterator;
 import containers.subrange;
 import containers.uninitialized_array;
 
@@ -57,15 +54,3 @@ export constexpr auto fixed_size_merge_sort(auto it, auto const size1, auto cons
 }
 
 } // namespace containers
-
-static_assert([]{
-	auto container = containers::array{0, 1};
-	containers::fixed_size_merge_sort(containers::begin(container), 1_bi, 1_bi, std::less());
-	return container == containers::array{0, 1};
-}());
-
-static_assert([]{
-	auto container = containers::array{1, 0};
-	containers::fixed_size_merge_sort(containers::begin(container), 1_bi, 1_bi, std::less());
-	return container == containers::array{0, 1};
-}());
