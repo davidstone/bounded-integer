@@ -137,7 +137,7 @@ struct optional_storage<T> {
 		return bounded::assume_in_range<tombstone_index_t>(
 			underlying_index == -1_bi ?
 				-1_bi :
-				underlying_index - 1_bi,
+				underlying_index - 1_bi
 		);
 	}
 
