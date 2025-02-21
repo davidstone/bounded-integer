@@ -3,8 +3,6 @@
 // (See accompanying file LICENSE_1_0.txt or copy at
 // http://www.boost.org/LICENSE_1_0.txt)
 
-#include <array>
-
 #include <benchmark/benchmark.h>
 
 import containers.algorithms.sort.inplace_radix_sort;

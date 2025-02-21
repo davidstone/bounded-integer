@@ -5,8 +5,6 @@
 
 module;
 
-#include <string_view>
-
 #include <bounded/assert.hpp>
 
 #include <operators/forward.hpp>
