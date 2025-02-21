@@ -6,8 +6,6 @@
 #ifndef BOUNDED_ASSERT_HPP
 #define BOUNDED_ASSERT_HPP
 
-#include <std_module/prelude.hpp>
-
 #include <cassert>
 
 import bounded.constexpr_only_if;

@@ -5,7 +5,6 @@
 
 module;
 
-#include <std_module/prelude.hpp>
 #include <climits>
 
 export module bounded.size_of;

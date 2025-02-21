@@ -6,8 +6,6 @@
 #ifndef BOUNDED_TEST_ASSERT_HPP
 #define BOUNDED_TEST_ASSERT_HPP
 
-#include <std_module/prelude.hpp>
-
 #if defined NDEBUG
 	#define BOUNDED_NDEBUG_WAS_DEFINED NDEBUG
 	#undef NDEBUG
