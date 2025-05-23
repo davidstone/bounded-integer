@@ -10,6 +10,7 @@ import containers.algorithms.sort.chunked_insertion_sort;
 import bounded;
 import containers;
 import std_module;
+import tv;
 
 namespace {
 
@@ -58,13 +59,17 @@ constexpr auto insertion_sort = [](containers::range auto && r) -> void {
 	auto const first = containers::begin(r);
 	auto const last = containers::end(r);
     for (auto it = first; it != last; ++it) {
-        auto const insertion = containers::find_last(containers::subrange(first, it), *it);
-		// TODO: Relocate-based algorithm
-        std::rotate(
-			containers::maybe_legacy_iterator(insertion),
-			containers::maybe_legacy_iterator(it),
-			containers::maybe_legacy_iterator(containers::next(it))
+		auto const sorted = containers::subrange(first, it);
+		auto const insertion = ::containers::find_if(
+			sorted,
+			[&](auto const & value) { return *it < value; }
 		);
+		auto temp = tv::relocate_into_storage(*it);
+		containers::uninitialized_relocate_backward(
+			containers::subrange(insertion, it),
+			containers::next(it)
+		);
+		bounded::relocate_at(*insertion, temp.value);
     }
 };
 
