@@ -12,6 +12,8 @@ export module containers.algorithms.uninitialized;
 import containers.algorithms.destroy_range;
 import containers.algorithms.copy_or_relocate_from;
 import containers.begin_end;
+import containers.bidirectional_iterator;
+import containers.bidirectional_range;
 import containers.data;
 import containers.iter_difference_t;
 import containers.iter_value_t;
@@ -91,22 +93,37 @@ export constexpr auto uninitialized_copy_no_overlap = []<range InputRange, itera
 	}
 };
 
+constexpr auto relocate_from(auto & it) {
+	return [&] {
+		if constexpr (std::is_reference_v<decltype(*it)>) {
+			return bounded::relocate(*it);
+		} else {
+			return *it;
+		}
+	};
+}
+
 export constexpr auto uninitialized_relocate = [](range auto && input, iterator auto output) {
 	auto const last = containers::end(OPERATORS_FORWARD(input));
 	for (auto it = containers::begin(OPERATORS_FORWARD(input)); it != last; ++it) {
-		bounded::construct_at(*output, [&] {
-			if constexpr (std::is_reference_v<decltype(*it)>) {
-				return bounded::relocate(*it);
-			} else {
-				return *it;
-			}
-		});
+		bounded::construct_at(*output, ::containers::relocate_from(it));
 		++output;
 	}
 	return output;
 };
 
-export constexpr auto uninitialized_relocate_no_overlap = []<range InputRange, iterator OutputIterator>(InputRange && source, OutputIterator out) {
+export constexpr auto uninitialized_relocate_backward = [](bidirectional_range auto && input, bidirectional_iterator auto output_last) {
+	auto const first = containers::begin(OPERATORS_FORWARD(input));
+	auto last = containers::end(OPERATORS_FORWARD(input));
+	while (last != first) {
+		--last;
+		--output_last;
+		bounded::construct_at(*output_last, ::containers::relocate_from(last));
+	}
+	return output_last;
+};
+
+export constexpr auto uninitialized_relocate_no_overlap = []<range InputRange, iterator OutputIterator>(InputRange && source, OutputIterator out) -> OutputIterator {
 	if constexpr (memcpyable<InputRange, OutputIterator>) {
 		auto result = uninitialized_copy_no_overlap(source, out);
 		::containers::destroy_range(source);
