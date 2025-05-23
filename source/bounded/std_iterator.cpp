@@ -5,8 +5,9 @@
 
 export module bounded.std_iterator;
 
-import bounded.character;
 import bounded.bounded_integer;
+import bounded.character;
+import bounded.concepts;
 import bounded.declval;
 import bounded.integer;
 
@@ -33,9 +34,28 @@ concept std_random_access_iterator =
 		))
 	);
 
+template<typename T>
+concept hashable = default_constructible<std::hash<T>>;
+
+template<typename T, typename Key, typename Mapped>
+concept std_ordered_map_iterator =
+	std::same_as<T, typename std::map<Key, Mapped>::iterator> or
+	std::same_as<T, typename std::map<Key, Mapped>::const_iterator> or
+	std::same_as<T, typename std::multimap<Key, Mapped>::iterator> or
+	std::same_as<T, typename std::multimap<Key, Mapped>::const_iterator>;
+
+template<typename T, typename Key, typename Mapped>
+concept std_unordered_map_iterator =
+	hashable<Key> and (
+		std::same_as<T, typename std::unordered_map<Key, Mapped>::iterator> or
+		std::same_as<T, typename std::unordered_map<Key, Mapped>::const_iterator> or
+		std::same_as<T, typename std::unordered_multimap<Key, Mapped>::iterator> or
+		std::same_as<T, typename std::unordered_multimap<Key, Mapped>::const_iterator>
+	);
+
 template<
 	typename T,
-	typename value_type = std::remove_cvref_t<decltype(*declval<T>())>,
+	typename value_type,
 	typename key_type = typename value_type::first_type,
 	typename mapped_type = typename value_type::second_type
 >
@@ -44,31 +64,31 @@ concept std_map_bidirectional_iterator =
 	!std::is_reference_v<key_type> and !std::is_const_v<key_type> and
 	!std::is_reference_v<mapped_type> and !std::is_const_v<mapped_type> and
 	(
-		std::same_as<T, typename std::map<key_type, mapped_type>::iterator> or
-		std::same_as<T, typename std::map<key_type, mapped_type>::const_iterator> or
-		std::same_as<T, typename std::multimap<key_type, mapped_type>::iterator> or
-		std::same_as<T, typename std::multimap<key_type, mapped_type>::const_iterator> or
-		std::same_as<T, typename std::unordered_map<key_type, mapped_type>::iterator> or
-		std::same_as<T, typename std::unordered_map<key_type, mapped_type>::const_iterator> or
-		std::same_as<T, typename std::unordered_multimap<key_type, mapped_type>::iterator> or
-		std::same_as<T, typename std::unordered_multimap<key_type, mapped_type>::const_iterator>
+		std_ordered_map_iterator<T, key_type, mapped_type> or
+		std_unordered_map_iterator<T, key_type, mapped_type>
+	);
+
+template<typename T, typename value_type>
+concept std_unordered_set_iterator =
+	hashable<value_type> and (
+		std::same_as<T, typename std::unordered_set<value_type>::iterator> or
+		std::same_as<T, typename std::unordered_set<value_type>::const_iterator> or
+		std::same_as<T, typename std::unordered_multiset<value_type>::iterator> or
+		std::same_as<T, typename std::unordered_multiset<value_type>::const_iterator>
 	);
 
 template<typename T, typename value_type = std::remove_cvref_t<decltype(*declval<T>())>>
 concept std_bidirectional_iterator =
 	!std::is_void_v<value_type> and !std::is_reference_v<value_type> and !std::is_const_v<value_type> and (
 		std_random_access_iterator<T> or
-		std_map_bidirectional_iterator<T> or
+		std_map_bidirectional_iterator<T, value_type> or
+		std_unordered_set_iterator<T, value_type> or
 		std::same_as<T, typename std::list<value_type>::iterator> or
 		std::same_as<T, typename std::list<value_type>::const_iterator> or
 		std::same_as<T, typename std::set<value_type>::iterator> or
 		std::same_as<T, typename std::set<value_type>::const_iterator> or
 		std::same_as<T, typename std::multiset<value_type>::iterator> or
-		std::same_as<T, typename std::multiset<value_type>::const_iterator> or
-		std::same_as<T, typename std::unordered_set<value_type>::iterator> or
-		std::same_as<T, typename std::unordered_set<value_type>::const_iterator> or
-		std::same_as<T, typename std::unordered_multiset<value_type>::iterator> or
-		std::same_as<T, typename std::unordered_multiset<value_type>::const_iterator>
+		std::same_as<T, typename std::multiset<value_type>::const_iterator>
 	);
 
 template<typename T, typename value_type = std::remove_cvref_t<decltype(*declval<T>())>>
@@ -116,5 +136,17 @@ static_assert(bounded::std_bidirectional_iterator<std::vector<int>::iterator>);
 static_assert(bounded::std_iterator<std::vector<int>::iterator>);
 
 static_assert(std::same_as<decltype(std::vector<int>::iterator() + bounded::constant<1>), std::vector<int>::iterator>);
+
+struct iterator {
+	struct value_type {
+	};
+	constexpr auto operator*() const -> value_type {
+		return value_type();
+	}
+	constexpr auto operator++() & -> iterator & {
+		return *this;
+	}
+};
+static_assert(!bounded::std_iterator<iterator>);
 
 } // namespace
