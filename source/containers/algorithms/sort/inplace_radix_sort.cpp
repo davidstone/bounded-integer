@@ -219,41 +219,39 @@ private:
 		auto partitions = partition_counts(to_sort, extract_key, sort_data, offset);
 		auto const first = containers::begin(to_sort);
 		using difference_type = iter_difference_t<decltype(first)>;
-		[&]{
-			if (partitions.number > 1) {
-				std::uint8_t * current_block_ptr = partitions.remaining.data();
-				PartitionInfo * current_block = partitions.partitions.data() + *current_block_ptr;
-				std::uint8_t * last_block = partitions.remaining.data() + partitions.number - 1;
-				auto it = first;
-				auto block_end = first + ::bounded::assume_in_range<difference_type>(current_block->next_offset);
-				auto last_element = containers::prev(containers::end(to_sort));
-				for (;;) {
-					PartitionInfo * block = partitions.partitions.data() + current_byte(extract_key(*it), sort_data, offset);
-					if (block == current_block) {
-						++it;
-						if (it == last_element)
-							break;
-						else if (it == block_end) {
-							for (;;) {
-								++current_block_ptr;
-								if (current_block_ptr == last_block)
-									return;
-								current_block = partitions.partitions.data() + *current_block_ptr;
-								if (current_block->offset != current_block->next_offset)
-									break;
-							}
-
-							it = first + ::bounded::assume_in_range<difference_type>(current_block->offset);
-							block_end = first + ::bounded::assume_in_range<difference_type>(current_block->next_offset);
+		if (partitions.number > 1) {
+			std::uint8_t * current_block_ptr = partitions.remaining.data();
+			PartitionInfo * current_block = partitions.partitions.data() + *current_block_ptr;
+			std::uint8_t * last_block = partitions.remaining.data() + partitions.number - 1;
+			auto it = first;
+			auto block_end = first + ::bounded::assume_in_range<difference_type>(current_block->next_offset);
+			auto last_element = containers::prev(containers::end(to_sort));
+			for (;;) {
+				PartitionInfo * block = partitions.partitions.data() + current_byte(extract_key(*it), sort_data, offset);
+				if (block == current_block) {
+					++it;
+					if (it == last_element)
+						break;
+					else if (it == block_end) {
+						for (;;) {
+							++current_block_ptr;
+							if (current_block_ptr == last_block)
+								return;
+							current_block = partitions.partitions.data() + *current_block_ptr;
+							if (current_block->offset != current_block->next_offset)
+								break;
 						}
-					} else {
-						auto const partition_offset = ::bounded::assume_in_range<containers::index_type<View>>(block->offset++);
-						using std::swap;
-						swap(*it, to_sort[partition_offset]);
+
+						it = first + ::bounded::assume_in_range<difference_type>(current_block->offset);
+						block_end = first + ::bounded::assume_in_range<difference_type>(current_block->next_offset);
 					}
+				} else {
+					auto const partition_offset = ::bounded::assume_in_range<containers::index_type<View>>(block->offset++);
+					using std::swap;
+					swap(*it, to_sort[partition_offset]);
 				}
 			}
-		}();
+		}
 		auto partition_begin = first;
 		for (std::uint8_t * it = partitions.remaining.data(), * remaining_end = partitions.remaining.data() + partitions.number; it != remaining_end; ++it) {
 			auto const end_offset = ::bounded::assume_in_range<difference_type>(partitions.partitions[*it].next_offset);
