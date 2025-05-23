@@ -33,18 +33,18 @@ using namespace bounded::literal;
 namespace containers {
 
 export template<erasable Container>
-constexpr auto erase(Container & container, iterator_t<Container const &> const first, iterator_t<Container const &> const middle_) {
+constexpr auto erase(Container & container, iterator_t<Container const &> const first, iterator_t<Container const &> const middle_) -> iterator_t<Container &> {
 	if constexpr (member_erasable<Container>) {
 		return container.erase(first, middle_);
 	} else if constexpr (splicable<Container>) {
 		auto temp = Container();
 		::containers::splice(temp, containers::begin(temp), container, first, middle_);
-		return mutable_iterator(container, middle_);
+		return ::containers::mutable_iterator(container, middle_);
 	} else {
-		auto const middle = ::containers::mutable_iterator(container, middle_);
-		if (first == middle) {
-			return middle;
+		if (first == middle_) {
+			return ::containers::mutable_iterator(container, middle_);
 		}
+		auto const middle = ::containers::mutable_iterator(container, middle_);
 		auto const offset = first - containers::begin(container);
 		auto const count = middle - first;
 		auto const last = containers::end(container);
@@ -68,13 +68,13 @@ constexpr auto erase(Container & container, iterator_t<Container const &> const 
 }
 
 export template<erasable Container>
-constexpr auto erase(Container & container, iterator_t<Container const &> const it) {
+constexpr auto erase(Container & container, iterator_t<Container const &> const it) -> iterator_t<Container &> {
 	BOUNDED_ASSERT(it != containers::end(container));
 	return erase(container, it, ::containers::next(it));
 }
 
 export template<erasable Container>
-constexpr void erase_to_end(Container & container, iterator_t<Container const &> const_position) {
+constexpr auto erase_to_end(Container & container, iterator_t<Container const &> const_position) -> void {
 	auto const last = containers::end(container);
 	if constexpr (can_set_size<Container>) {
 		auto const count = last - const_position;
@@ -87,7 +87,7 @@ constexpr void erase_to_end(Container & container, iterator_t<Container const &>
 }
 
 export template<erasable Container>
-constexpr auto erase_if(Container & container, auto predicate) {
+constexpr auto erase_if(Container & container, auto predicate) -> count_type<Container> {
 	auto result = count_type<Container>(0_bi);
 	if constexpr (constant_time_erasable<Container>) {
 		for (auto it = containers::begin(container); it != containers::end(container); ) {
@@ -119,7 +119,7 @@ constexpr auto erase_if(Container & container, auto predicate) {
 }
 
 export template<has_member_erase_after Container>
-constexpr void erase_after(Container & container, iterator_t<Container const &> const before_first, iterator_t<Container const &> const last) {
+constexpr auto erase_after(Container & container, iterator_t<Container const &> const before_first, iterator_t<Container const &> const last) -> void {
 	auto it = containers::next(before_first);
 	while (it != last) {
 		it = container.erase_after(before_first);

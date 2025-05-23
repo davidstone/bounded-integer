@@ -64,7 +64,7 @@ struct BaseListSortData {
 };
 
 template<view View, typename ExtractKey>
-using NextSort = void (&)(View, ExtractKey const &, BaseListSortData *);
+using NextSort = auto (&)(View, ExtractKey const &, BaseListSortData *) -> void;
 
 template<view View, typename ExtractKey>
 struct ListSortData : BaseListSortData {
@@ -76,7 +76,7 @@ template<typename T>
 struct SubKey {
 	// TODO: Should this use the user-provided `extract_key`?
 	using base = SubKey<decltype(to_radix_sort_key(bounded::declval<T>()))>;
-	static constexpr decltype(auto) sub_key(auto && value, BaseListSortData * data) {
+	static constexpr auto sub_key(auto && value, BaseListSortData * data) -> decltype(auto) {
 		return base::sub_key(to_radix_sort_key(OPERATORS_FORWARD(value)), data);
 	}
 
@@ -95,7 +95,7 @@ struct SubKey<T &&> : SubKey<T> {
 
 template<typename T> requires bounded::unsigned_builtin<T> or std::same_as<T, bool>
 struct SubKey<T> {
-	static constexpr auto sub_key(T const value, BaseListSortData *) {
+	static constexpr auto sub_key(T const value, BaseListSortData *) -> T {
 		return value;
 	}
 
@@ -123,7 +123,7 @@ struct NextTupleSubKey<index, SubKey<void>> {
 
 template<std::size_t index, typename Current, typename... More>
 struct TupleSubKey {
-	static constexpr decltype(auto) sub_key(auto && value, BaseListSortData * sort_data) {
+	static constexpr auto sub_key(auto && value, BaseListSortData * sort_data) -> decltype(auto) {
 		using std::get;
 		return Current::sub_key(get<index>(OPERATORS_FORWARD(value)), sort_data);
 	}
@@ -152,10 +152,10 @@ struct SubKey<Tuple> : TupleSubKeyWrapper<
 
 template<indexable_range T>
 struct SubKey<T> {
-	static constexpr const T & sub_key(T const & value, BaseListSortData *) {
+	static constexpr auto sub_key(T const & value, BaseListSortData *) -> T const & {
 		return value;
 	}
-	static constexpr T sub_key(T && value, BaseListSortData *) {
+	static constexpr auto sub_key(T && value, BaseListSortData *) -> T {
 		return value;
 	}
 
@@ -172,17 +172,17 @@ template<std::ptrdiff_t std_sort_threshold, std::ptrdiff_t american_flag_sort_th
 struct UnsignedInplaceSorter {
 	// Must have this exact signature, no defaulted arguments
 	template<view View, typename ExtractKey>
-	static constexpr void sort(View to_sort, ExtractKey const & extract_key, NextSort<View, ExtractKey> next_sort, BaseListSortData * sort_data) {
+	static constexpr auto sort(View to_sort, ExtractKey const & extract_key, NextSort<View, ExtractKey> next_sort, BaseListSortData * sort_data) -> void {
 		sort_selector(to_sort, extract_key, next_sort, sort_data, 0U);
 	}
 private:
 
-	constexpr static auto current_byte(auto const & elem, BaseListSortData * sort_data, std::size_t const offset) {
+	constexpr static auto current_byte(auto const & elem, BaseListSortData * sort_data, std::size_t const offset) -> std::uint8_t {
 		auto const shift_amount = (number_of_bytes - 1U - offset) * 8U;
 		return static_cast<std::uint8_t>(CurrentSubKey::sub_key(elem, sort_data) >> shift_amount);
 	}
 
-	static constexpr auto partition_counts(view auto to_sort, auto const & extract_key, BaseListSortData * sort_data, std::size_t const offset) {
+	static constexpr auto partition_counts(view auto to_sort, auto const & extract_key, BaseListSortData * sort_data, std::size_t const offset) -> PartitionCounts {
 		auto result = PartitionCounts();
 		for (auto const & value : to_sort) {
 			++result.partitions[current_byte(extract_key(value), sort_data, offset)].count;
@@ -203,7 +203,7 @@ private:
 	}
 
 	template<view View, typename ExtractKey>
-	static constexpr void sort_selector(View to_sort, ExtractKey const & extract_key, NextSort<View, ExtractKey> next_sort, BaseListSortData * sort_data, std::size_t const offset) {
+	static constexpr auto sort_selector(View to_sort, ExtractKey const & extract_key, NextSort<View, ExtractKey> next_sort, BaseListSortData * sort_data, std::size_t const offset) -> void {
 		if (number_of_bytes == offset) {
 			next_sort(to_sort, extract_key, sort_data);
 		} else if (containers::size(to_sort) <= bounded::constant<std_sort_threshold>) {
@@ -215,7 +215,7 @@ private:
 		}
 	}
 	template<view View, typename ExtractKey>
-	static constexpr void american_flag_sort(View to_sort, ExtractKey const & extract_key, NextSort<View, ExtractKey> next_sort, BaseListSortData * sort_data, std::size_t const offset) {
+	static constexpr auto american_flag_sort(View to_sort, ExtractKey const & extract_key, NextSort<View, ExtractKey> next_sort, BaseListSortData * sort_data, std::size_t const offset) -> void {
 		auto partitions = partition_counts(to_sort, extract_key, sort_data, offset);
 		auto const first = containers::begin(to_sort);
 		using difference_type = iter_difference_t<decltype(first)>;
@@ -272,7 +272,7 @@ private:
 	}
 
 	template<view View, typename ExtractKey>
-	static constexpr void ska_byte_sort(View to_sort, ExtractKey const & extract_key, NextSort<View, ExtractKey> next_sort, BaseListSortData * sort_data, std::size_t const offset) {
+	static constexpr auto ska_byte_sort(View to_sort, ExtractKey const & extract_key, NextSort<View, ExtractKey> next_sort, BaseListSortData * sort_data, std::size_t const offset) -> void {
 		auto partitions = partition_counts(to_sort, extract_key, sort_data, offset);
 		auto const first = containers::begin(to_sort);
 		using difference_type = iter_difference_t<decltype(first)>;
@@ -319,7 +319,7 @@ template<std::ptrdiff_t std_sort_threshold, std::ptrdiff_t american_flag_sort_th
 struct ListInplaceSorter;
 
 template<std::ptrdiff_t std_sort_threshold, std::ptrdiff_t american_flag_sort_threshold, typename CurrentSubKey, view View, typename ExtractKey>
-constexpr void inplace_sort(View to_sort, ExtractKey const & extract_key, NextSort<View, ExtractKey> next_sort, BaseListSortData * sort_data) {
+constexpr auto inplace_sort(View to_sort, ExtractKey const & extract_key, NextSort<View, ExtractKey> next_sort, BaseListSortData * sort_data) -> void {
 	using SubKeyType = decltype(CurrentSubKey::sub_key(extract_key(containers::front(to_sort)), sort_data));
 	if constexpr (std::same_as<SubKeyType, bool>) {
 		auto middle = containers::partition(to_sort, [&](auto && a){ return !CurrentSubKey::sub_key(extract_key(a), sort_data); });
@@ -343,7 +343,7 @@ constexpr void inplace_sort(View to_sort, ExtractKey const & extract_key, NextSo
 template<std::ptrdiff_t std_sort_threshold, std::ptrdiff_t american_flag_sort_threshold, typename CurrentSubKey, typename ListType>
 struct ListInplaceSorter {
 	template<view View, typename ExtractKey>
-	static constexpr void sort(View to_sort, ExtractKey const & extract_key, NextSort<View, ExtractKey> next_sort, BaseListSortData * next_sort_data) {
+	static constexpr auto sort(View to_sort, ExtractKey const & extract_key, NextSort<View, ExtractKey> next_sort, BaseListSortData * next_sort_data) -> void {
 		constexpr auto current_index = 0U;
 		constexpr auto recursion_limit = 16U;
 		auto const offset = ListSortData<View, ExtractKey>{
@@ -363,7 +363,7 @@ private:
 
 		using next = ElementSubKey;
 
-		static constexpr decltype(auto) sub_key(auto && value, BaseListSortData * sort_data) {
+		static constexpr auto sub_key(auto && value, BaseListSortData * sort_data) -> decltype(auto) {
 			auto && list = CurrentSubKey::sub_key(OPERATORS_FORWARD(value), sort_data->next_sort_data);
 			return base::sub_key(
 				containers::at(OPERATORS_FORWARD(list), sort_data->current_index),
@@ -373,7 +373,7 @@ private:
 	};
 
 	template<view View, typename ExtractKey>
-	static constexpr void sort(View to_sort, ExtractKey const & extract_key, ListSortData<View, ExtractKey> sort_data) {
+	static constexpr auto sort(View to_sort, ExtractKey const & extract_key, ListSortData<View, ExtractKey> sort_data) -> void {
 		auto current_key = [&](auto const & elem) -> decltype(auto) {
 			return CurrentSubKey::sub_key(extract_key(elem), sort_data.next_sort_data);
 		};
@@ -409,7 +409,7 @@ private:
 	}
 
 	template<view View, typename ExtractKey>
-	static constexpr void sort_from_recursion(View to_sort, ExtractKey const & extract_key, BaseListSortData * next_sort_data) {
+	static constexpr auto sort_from_recursion(View to_sort, ExtractKey const & extract_key, BaseListSortData * next_sort_data) -> void {
 		auto offset = *static_cast<ListSortData<View, ExtractKey> *>(next_sort_data);
 		++offset.current_index;
 		--offset.recursion_limit;
@@ -422,7 +422,7 @@ private:
 };
 
 template<std::ptrdiff_t std_sort_threshold, std::ptrdiff_t american_flag_sort_threshold, typename CurrentSubKey, view View, typename ExtractKey>
-constexpr void sort_starter(View to_sort, ExtractKey const & extract_key, BaseListSortData * next_sort_data) {
+constexpr auto sort_starter(View to_sort, ExtractKey const & extract_key, BaseListSortData * next_sort_data) -> void {
 	if constexpr (!std::same_as<CurrentSubKey, SubKey<void>>) {
 		if (containers::size(to_sort) <= 1_bi) {
 			return;
@@ -438,7 +438,7 @@ constexpr void sort_starter(View to_sort, ExtractKey const & extract_key, BaseLi
 }
 
 export template<std::ptrdiff_t std_sort_threshold, std::ptrdiff_t american_flag_sort_threshold>
-constexpr void inplace_radix_sort(view auto to_sort, auto const & extract_key) {
+constexpr auto inplace_radix_sort(view auto to_sort, auto const & extract_key) -> void {
 	using SubKey = SubKey<decltype(extract_key(containers::front(to_sort)))>;
 	sort_starter<std_sort_threshold, american_flag_sort_threshold, SubKey>(to_sort, extract_key, nullptr);
 }

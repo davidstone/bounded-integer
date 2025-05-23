@@ -20,7 +20,7 @@ using namespace bounded::literal;
 namespace containers {
 
 export template<range Range>
-constexpr auto count_if(Range && r, auto predicate) {
+constexpr auto count_if(Range && r, auto predicate) -> count_type<Range> {
 	auto sum = count_type<Range>(0_bi);
 	for (decltype(auto) value : OPERATORS_FORWARD(r)) {
 		if (predicate(OPERATORS_FORWARD(value))) {

@@ -58,7 +58,7 @@ constexpr auto modulo_round = [](auto const dividend, umax_t const divisor) {
 		);
 };
 
-constexpr auto sign_free_value = [](auto const dividend, auto divisor) {
+constexpr auto sign_free_value = [](auto const dividend, auto divisor) -> min_max<umax_t, umax_t> {
 	if (divisor.min > dividend.max) {
 		return dividend;
 	}

@@ -14,7 +14,7 @@ import std_module;
 namespace bounded_relocate_adl_detail {
 
 template<typename T>
-constexpr auto relocate(T & ref) noexcept {
+constexpr auto relocate(T & ref) noexcept -> T {
 	static_assert(std::is_nothrow_move_constructible_v<T>, "Please provide a noexcept relocate overload for your type or mark its move constructor noexcept.");
 	static_assert(std::is_nothrow_destructible_v<T>, "Do not mark your destructor as noexcept(false)");
 	auto result = std::move(ref);

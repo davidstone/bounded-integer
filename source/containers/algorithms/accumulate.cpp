@@ -61,7 +61,7 @@ using accumulate_t = typename accumulate_c<Range, std::decay_t<Initial>, BinaryF
 
 
 export template<typename Result>
-constexpr auto accumulate(range auto && source, auto && initial, auto function) {
+constexpr auto accumulate(range auto && source, auto && initial, auto function) -> Result {
 	auto result = static_cast<Result>(OPERATORS_FORWARD(initial));
 	for (decltype(auto) value : OPERATORS_FORWARD(source)) {
 		// Not ideal to have this `if` here
@@ -103,7 +103,7 @@ constexpr auto initial_product_value() {
 }
 
 export template<typename Result>
-constexpr auto sum(range auto && source) {
+constexpr auto sum(range auto && source) -> Result {
 	return ::containers::accumulate<Result>(
 		OPERATORS_FORWARD(source),
 		initial_sum_value<range_value_t<decltype(source)>>(),
@@ -120,7 +120,7 @@ export constexpr auto sum(range auto && source) {
 }
 
 export template<typename Result>
-constexpr auto product(range auto && source) {
+constexpr auto product(range auto && source) -> Result {
 	return ::containers::accumulate<Result>(
 		OPERATORS_FORWARD(source),
 		initial_product_value<range_value_t<decltype(source)>>(),

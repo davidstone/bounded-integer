@@ -12,6 +12,7 @@ export module containers.algorithms.minmax_element;
 import containers.algorithms.advance;
 import containers.array;
 import containers.begin_end;
+import containers.iterator_t;
 import containers.range;
 
 import bounded;
@@ -21,7 +22,8 @@ namespace containers {
 
 // TODO: minmax_element
 
-export constexpr auto min_element(range auto && source, auto compare) {
+export template<range Range>
+constexpr auto min_element(Range && source, auto compare) -> iterator_t<Range> {
 	auto smallest = containers::begin(OPERATORS_FORWARD(source));
 	auto const last = containers::end(OPERATORS_FORWARD(source));
 	if (smallest == last) {

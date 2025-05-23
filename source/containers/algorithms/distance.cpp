@@ -17,7 +17,7 @@ namespace containers {
 using namespace bounded::literal;
 
 export template<iterator InputIterator>
-constexpr auto distance(InputIterator first, sentinel_for<InputIterator> auto const last) {
+constexpr auto distance(InputIterator first, sentinel_for<InputIterator> auto const last) -> iter_difference_t<InputIterator> {
 	if constexpr (requires { last - first; }) {
 		return last - first;
 	} else {

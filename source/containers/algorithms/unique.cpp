@@ -66,7 +66,7 @@ constexpr auto unique_copy(Iterator const first, sentinel_for<Iterator> auto con
 
 
 template<iterator Iterator>
-constexpr auto find_first_equal(Iterator first, sentinel_for<Iterator> auto const last, auto equal) {
+constexpr auto find_first_equal(Iterator first, sentinel_for<Iterator> auto const last, auto equal) -> Iterator {
 	if (first == last) {
 		return first;
 	}
@@ -83,7 +83,7 @@ constexpr auto find_first_equal(Iterator first, sentinel_for<Iterator> auto cons
 
 
 export template<iterator Iterator, typename BinaryPredicate = std::equal_to<>>
-constexpr auto unique(Iterator const first, sentinel_for<Iterator> auto const last, BinaryPredicate equal = BinaryPredicate{}) {
+constexpr auto unique(Iterator const first, sentinel_for<Iterator> auto const last, BinaryPredicate equal = BinaryPredicate{}) -> Iterator {
 	auto const equal_element = ::containers::find_first_equal(first, last, equal);
 	if (equal_element == last) {
 		return equal_element;
@@ -105,13 +105,13 @@ constexpr auto unique_copy_less(Iterator const first, sentinel_for<Iterator> aut
 	return ::containers::unique_copy(first, last, output, std::not_fn(less));
 }
 export template<iterator Iterator, typename BinaryPredicate = std::less<>>
-constexpr auto unique_less(Iterator const first, sentinel_for<Iterator> auto const last, BinaryPredicate less = BinaryPredicate{}) {
+constexpr auto unique_less(Iterator const first, sentinel_for<Iterator> auto const last, BinaryPredicate less = BinaryPredicate{}) -> Iterator {
 	return ::containers::unique(first, last, std::not_fn(less));
 }
 
 
 template<iterator Iterator>
-constexpr auto next_greater(Iterator const first, sentinel_for<Iterator> auto const last, auto const & x, auto less) {
+constexpr auto next_greater(Iterator const first, sentinel_for<Iterator> auto const last, auto const & x, auto less) -> Iterator {
 	return ::containers::find_if(first, last, [&](auto const & value) { return less(x, value); });
 }
 
@@ -136,7 +136,7 @@ constexpr auto unique_merge_copy(range auto && r1, range auto && r2, iterator au
 
 // Both ranges must be sorted
 export template<iterator Iterator, typename BinaryPredicate = std::less<>>
-constexpr auto unique_inplace_merge(Iterator first, Iterator middle, sentinel_for<Iterator> auto const last, BinaryPredicate less = BinaryPredicate{}) {
+constexpr auto unique_inplace_merge(Iterator first, Iterator middle, sentinel_for<Iterator> auto const last, BinaryPredicate less = BinaryPredicate{}) -> Iterator {
 	BOUNDED_ASSERT(containers::is_sorted(subrange(first, middle), less));
 	BOUNDED_ASSERT(containers::is_sorted(subrange(middle, last), less));
 	auto less_to_equal = [&](auto const & lhs, auto const & rhs) {

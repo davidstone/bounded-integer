@@ -34,7 +34,7 @@ constexpr auto as_digit(char const c) -> integer<0, 9> {
 }
 
 template<auto maximum>
-constexpr auto to_integer_positive_impl(std::string_view const str) {
+constexpr auto to_integer_positive_impl(std::string_view const str) -> integer<0, normalize<maximum>> {
 	auto positive_result = integer<0, normalize<maximum>>(0_bi);
 	for (auto const c : str) {
 		auto const shifted = positive_result * 10_bi;

@@ -13,6 +13,7 @@ import containers.begin_end;
 import containers.can_set_size;
 import containers.dereference;
 import containers.is_container;
+import containers.iterator_t;
 import containers.range;
 import containers.range_value_t;
 
@@ -23,7 +24,7 @@ using namespace bounded::literal;
 
 namespace containers {
 
-export constexpr auto copy_or_relocate_from = []<range Input>(Input && input, auto function) {
+export constexpr auto copy_or_relocate_from = []<range Input>(Input && input, auto function) -> iterator_t<Input> {
 	// We do not relocate trivially copyable types because that requires setting
 	// the size of the source range to 0. This is extra work that is not
 	// necessary -- we don't want to make operations on rvalues more expensive

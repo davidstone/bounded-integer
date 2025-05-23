@@ -24,7 +24,7 @@ using namespace bounded::literal;
 namespace containers {
 
 export template<iterator Iterator>
-constexpr auto find_if(Iterator first, sentinel_for<Iterator> auto const last, auto predicate) {
+constexpr auto find_if(Iterator first, sentinel_for<Iterator> auto const last, auto predicate) -> Iterator {
 	for (; first != last; ++first) {
 		if (predicate(*first)) {
 			break;
@@ -43,7 +43,7 @@ export constexpr auto find_if(range auto && range, auto predicate) {
 
 
 export template<bidirectional_iterator Iterator>
-constexpr auto find_last_if(Iterator const first, Iterator const last, auto predicate) {
+constexpr auto find_last_if(Iterator const first, Iterator const last, auto predicate) -> Iterator {
 	for (auto it = last; it != first; ) {
 		--it;
 		if (predicate(*it)) {
@@ -63,7 +63,7 @@ export constexpr auto find_last_if(bidirectional_range auto && range, auto predi
 
 
 export template<iterator Iterator>
-constexpr auto find_if_not(Iterator first, sentinel_for<Iterator> auto const last, auto predicate) {
+constexpr auto find_if_not(Iterator first, sentinel_for<Iterator> auto const last, auto predicate) -> Iterator {
 	return ::containers::find_if(std::move(first), last, std::not_fn(std::move(predicate)));
 }
 
@@ -77,7 +77,7 @@ export constexpr auto find_if_not(range auto && range, auto predicate) {
 
 
 export template<bidirectional_iterator Iterator>
-constexpr auto find_last_if_not(Iterator const first, Iterator const last, auto predicate) {
+constexpr auto find_last_if_not(Iterator const first, Iterator const last, auto predicate) -> Iterator {
 	return ::containers::find_last_if(first, last, std::not_fn(std::move(predicate)));
 }
 
@@ -91,7 +91,7 @@ export constexpr auto find_last_if_not(bidirectional_range auto && range, auto p
 
 
 export template<iterator Iterator>
-constexpr auto find(Iterator first, sentinel_for<Iterator> auto const last, auto const & value) {
+constexpr auto find(Iterator first, sentinel_for<Iterator> auto const last, auto const & value) -> Iterator {
 	return ::containers::find_if(std::move(first), last, bounded::equal_to(value));
 }
 
@@ -105,7 +105,7 @@ export constexpr auto find(range auto && range, auto const & value) {
 
 
 export template<bidirectional_iterator Iterator>
-constexpr auto find_last(Iterator const first, Iterator const last, auto const & value) {
+constexpr auto find_last(Iterator const first, Iterator const last, auto const & value) -> Iterator {
 	return ::containers::find_last_if(first, last, bounded::equal_to(value));
 }
 
