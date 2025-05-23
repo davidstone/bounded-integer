@@ -4,6 +4,7 @@
 // http://www.boost.org/LICENSE_1_0.txt)
 
 #include <benchmark/benchmark.h>
+#include <bounded/assert.hpp>
 
 import containers.algorithms.sort.chunked_insertion_sort;
 
@@ -49,6 +50,7 @@ auto benchmark_sort(benchmark::State & state) -> void {
 		benchmark::DoNotOptimize(container);
 		benchmark::ClobberMemory();
 		function(container);
+		BOUNDED_ASSERT(containers::is_sorted(container));
 		benchmark::DoNotOptimize(container);
 		benchmark::ClobberMemory();
 	}
