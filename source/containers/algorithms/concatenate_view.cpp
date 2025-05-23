@@ -134,29 +134,29 @@ struct concatenate_view_iterator {
 		)
 	)
 	friend constexpr auto operator+(concatenate_view_iterator lhs, Offset const offset) -> concatenate_view_iterator {
-		return [&]<std::size_t... indexes>(std::index_sequence<indexes...>) {
-			BOUNDED_ASSERT(offset >= 0_bi);
-			auto remaining_offset = bounded::integer<0, bounded::builtin_max_value<Offset>>(::bounded::assume_in_range(offset, 0_bi, bounded::integer(numeric_traits::max_value<Offset>)));
-			auto specific_range = [&](auto const index) {
-				auto range = std::move(lhs).m_range_views[index];
-				if constexpr (std::same_as<Offset, bounded::constant_t<1>>) {
-					if (remaining_offset == 0_bi or containers::is_empty(range)) {
-						return range;
-					}
-					remaining_offset = 0_bi;
-					return subrange(
-						containers::begin(std::move(range)) + 1_bi,
-						containers::end(std::move(range))
-					);
-				} else {
-					auto const added_size = bounded::min(containers::size(range), remaining_offset);
-					remaining_offset -= added_size;
-					return subrange(
-						containers::begin(std::move(range)) + added_size,
-						containers::end(std::move(range))
-					);
+		BOUNDED_ASSERT(offset >= 0_bi);
+		auto remaining_offset = bounded::integer<0, bounded::builtin_max_value<Offset>>(::bounded::assume_in_range(offset, 0_bi, bounded::integer(numeric_traits::max_value<Offset>)));
+		auto specific_range = [&](auto const index) {
+			auto range = std::move(lhs).m_range_views[index];
+			if constexpr (std::same_as<Offset, bounded::constant_t<1>>) {
+				if (remaining_offset == 0_bi or containers::is_empty(range)) {
+					return range;
 				}
-			};
+				remaining_offset = 0_bi;
+				return subrange(
+					containers::begin(std::move(range)) + 1_bi,
+					containers::end(std::move(range))
+				);
+			} else {
+				auto const added_size = bounded::min(containers::size(range), remaining_offset);
+				remaining_offset -= added_size;
+				return subrange(
+					containers::begin(std::move(range)) + added_size,
+					containers::end(std::move(range))
+				);
+			}
+		};
+		return [&]<std::size_t... indexes>(std::index_sequence<indexes...>) {
 			// Use {} to enforce initialization order
 			return tv::apply(
 				tv::tuple{specific_range(bounded::constant<indexes>)...},
