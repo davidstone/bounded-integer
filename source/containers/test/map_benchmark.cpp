@@ -5,9 +5,9 @@
 
 #include <operators/forward.hpp>
 
+import containers.algorithms.generate;
 import containers.algorithms.keyed_insert;
 import containers.begin_end;
-import containers.emplace_back;
 import containers.extract_key_to_less;
 import containers.flat_map;
 import containers.map_value_type;
@@ -130,16 +130,12 @@ auto ignore(auto &&) -> void {
 
 template<std::size_t key_size, std::size_t value_size>
 void test_performance(std::size_t const loop_count) {
-	auto const generator = [](std::size_t size) {
-		static std::mt19937 engine(0);
-		static std::uniform_int_distribution<std::uint32_t> distribution;
-		using container_type = containers::vector<value_type<Thing<key_size>, Thing<value_size>>>;
-		auto source = container_type();
-		source.reserve(bounded::check_in_range<containers::range_size_t<container_type>>(bounded::integer(size)));
-		for (std::size_t n = 0; n != size; ++n) {
-			::containers::emplace_back(source, distribution(engine), distribution(engine));
-		}
-		return source;
+	auto engine = std::mt19937(0);
+	auto distribution = std::uniform_int_distribution<std::uint32_t>();
+	auto const generator = [&](std::size_t const size) {
+		return containers::vector(containers::generate_n(size, [&] {
+			return value_type<Thing<key_size>, Thing<value_size>>(distribution(engine), distribution(engine));
+		}));
 	};
 
 	auto const source = generator(loop_count);
