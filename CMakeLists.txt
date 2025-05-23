@@ -28,10 +28,11 @@ if (NOT has_parent)
 
 	set(BENCHMARK_ENABLE_TESTING OFF CACHE BOOL "Disable testing benchmark.")
 	add_subdirectory(dependencies/benchmark EXCLUDE_FROM_ALL)
+	get_property(benchmark_include_dirs TARGET benchmark PROPERTY INTERFACE_INCLUDE_DIRECTORIES)
+	set_property(TARGET benchmark PROPERTY INTERFACE_SYSTEM_INCLUDE_DIRECTORIES "${benchmark_include_dirs}")
 	if("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang")
 		target_compile_options(benchmark PUBLIC
 			"-Wno-global-constructors"
-			"-Wno-shift-sign-overflow"
 		)
 	endif()
 endif()
