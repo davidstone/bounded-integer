@@ -58,7 +58,7 @@ constexpr auto link_range(bidirectional_links * const original_first, bidirectio
 }
 
 export template<typename T>
-struct bidirectional_linked_list : private lexicographical_comparison::base {
+struct bidirectional_linked_list replaceable_if_eligible : private lexicographical_comparison::base {
 	using const_iterator = list_iterator<bidirectional_linked_list, bidirectional_links const, T>;
 	using iterator = list_iterator<bidirectional_linked_list, bidirectional_links, T>;
 

@@ -23,7 +23,7 @@ union variadic_union {
 };
 
 template<typename T, typename... Ts>
-union [[clang::trivial_abi]] variadic_union<T, Ts...> {
+union [[clang::trivial_abi]] variadic_union<T, Ts...> trivially_relocatable_if_eligible replaceable_if_eligible {
 	explicit constexpr variadic_union(bounded::constant_t<0>, auto && construct_):
 		head(OPERATORS_FORWARD(construct_)())
 	{

@@ -21,7 +21,7 @@ namespace containers {
 // `max_size` cannot be `array_size_type<T>` because that would not support
 // incomplete types.
 export template<typename T, array_size_type<std::byte> max_size = numeric_traits::max_value<array_size_type<T>>>
-struct [[clang::trivial_abi]] vector : private bounded_vector<T, 0_bi, max_size> {
+struct vector : private bounded_vector<T, 0_bi, max_size> {
 private:
 	using base = bounded_vector<T, 0_bi, max_size>;
 public:

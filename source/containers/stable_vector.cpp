@@ -16,7 +16,7 @@ namespace containers {
 // `capacity_` cannot be `array_size_type<T>` because that would not support
 // incomplete types.
 export template<typename T, array_size_type<std::byte> capacity_>
-struct [[clang::trivial_abi]] stable_vector : private bounded_vector<T, capacity_, capacity_> {
+struct stable_vector : private bounded_vector<T, capacity_, capacity_> {
 private:
 	using base = bounded_vector<T, capacity_, capacity_>;
 public:

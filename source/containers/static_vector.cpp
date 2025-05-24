@@ -46,7 +46,7 @@ using namespace bounded::literal;
 namespace containers {
 
 export template<typename T, array_size_type<T> capacity_>
-struct [[clang::trivial_abi]] static_vector : private lexicographical_comparison::base {
+struct [[clang::trivial_abi]] static_vector trivially_relocatable_if_eligible replaceable_if_eligible : private lexicographical_comparison::base {
 	static_vector() = default;
 
 	static_vector(static_vector &&) requires(capacity_ == 0_bi or bounded::trivially_move_constructible<T>) = default;

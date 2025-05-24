@@ -11,7 +11,7 @@ import std_module;
 namespace tv {
 
 export template<typename T>
-union [[clang::trivial_abi]] single_element_storage {
+union [[clang::trivial_abi]] single_element_storage trivially_relocatable_if_eligible replaceable_if_eligible {
 	~single_element_storage() requires bounded::trivially_destructible<T> = default;
 	constexpr ~single_element_storage() {}
 	T value;

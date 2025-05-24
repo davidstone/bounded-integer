@@ -19,7 +19,7 @@ using namespace bounded::literal;
 namespace containers {
 
 export template<typename T, typename Capacity>
-struct [[clang::trivial_abi]] uninitialized_dynamic_array {
+struct [[clang::trivial_abi]] uninitialized_dynamic_array trivially_relocatable_if_eligible replaceable_if_eligible {
 	template<typename U, typename OtherCapacity>
 	friend struct uninitialized_dynamic_array;
 

@@ -164,7 +164,7 @@ private:
 };
 
 export template<typename T, std::size_t requested_small_capacity, std::size_t max_size = containers::maximum_array_size<T>>
-struct [[clang::trivial_abi]] small_buffer_optimized_vector : private lexicographical_comparison::base {
+struct [[clang::trivial_abi]] small_buffer_optimized_vector trivially_relocatable_if_eligible replaceable_if_eligible : private lexicographical_comparison::base {
 	using size_type = small_buffer_size_type<max_size>;
 
 	static_assert(

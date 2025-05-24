@@ -34,7 +34,7 @@ struct forward_link {
 };
 
 export template<typename T>
-struct [[clang::trivial_abi]] forward_linked_list : private lexicographical_comparison::base {
+struct [[clang::trivial_abi]] forward_linked_list trivially_relocatable_if_eligible replaceable_if_eligible : private lexicographical_comparison::base {
 	using const_iterator = list_iterator<forward_linked_list, forward_link const, T>;
 	using iterator = list_iterator<forward_linked_list, forward_link, T>;
 

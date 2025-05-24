@@ -37,7 +37,7 @@ namespace containers {
 using namespace bounded::literal;
 
 export template<typename T, typename Size = array_size_type<T>>
-struct [[clang::trivial_abi]] dynamic_array : private lexicographical_comparison::base {
+struct [[clang::trivial_abi]] dynamic_array trivially_relocatable_if_eligible replaceable_if_eligible : private lexicographical_comparison::base {
 	static_assert(numeric_traits::min_value<Size> >= 0_bi);
 	using size_type = Size;
 

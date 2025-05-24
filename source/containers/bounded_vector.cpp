@@ -37,7 +37,7 @@ namespace containers {
 // Cannot use `array_size_type<T>` because that would not support incomplete
 // types.
 export template<typename T, array_size_type<std::byte> min_capacity, array_size_type<std::byte> max_capacity>
-struct [[clang::trivial_abi]] bounded_vector : private lexicographical_comparison::base {
+struct [[clang::trivial_abi]] bounded_vector trivially_relocatable_if_eligible replaceable_if_eligible : private lexicographical_comparison::base {
 	template<typename U, array_size_type<std::byte> other_min_capacity, array_size_type<std::byte> other_max_capacity>
 	friend struct bounded_vector;
 
