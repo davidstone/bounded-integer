@@ -3,15 +3,21 @@
 // (See accompanying file LICENSE_1_0.txt or copy at
 // http://www.boost.org/LICENSE_1_0.txt)
 
+module;
+
+#include <operators/returns.hpp>
+
 export module containers.iterator_to_sentinel;
 
-import bounded;
 import std_module;
 
 namespace containers {
 
 export template<typename Iterator>
 struct iterator_to_sentinel {
+private:
+	[[no_unique_address]] Iterator m_base;
+public:
 	iterator_to_sentinel() = default;
 
 	constexpr explicit iterator_to_sentinel(Iterator iterator):
@@ -19,15 +25,13 @@ struct iterator_to_sentinel {
 	{
 	}
 
+	friend constexpr auto operator==(iterator_to_sentinel const &, iterator_to_sentinel const &) -> bool = default;
 	friend constexpr auto operator==(
-		bounded::equality_comparable<Iterator> auto const & lhs,
-		iterator_to_sentinel const & rhs
-	) -> bool {
-		return lhs == rhs.m_base;
-	}
-
-private:
-	[[no_unique_address]] Iterator m_base;
+		iterator_to_sentinel const & lhs,
+		auto const & rhs
+	) OPERATORS_RETURNS(
+		lhs.m_base == rhs
+	)
 };
 
 } // namespace containers

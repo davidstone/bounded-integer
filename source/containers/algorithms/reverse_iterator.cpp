@@ -51,18 +51,22 @@ struct reverse_traits {
 		return *::containers::prev(it);
 	}
 
+	// All of these `OPERATORS_RETURNS` are needed to work around
+	// https://github.com/llvm/llvm-project/issues/154813
+
 	static constexpr auto add(random_access_iterator auto it, auto const offset) OPERATORS_RETURNS(
 		it - offset
 	)
 
-	static constexpr auto subtract(random_access_iterator auto const lhs, random_access_iterator auto const rhs) {
-		return rhs - lhs;
-	}
+	static constexpr auto subtract(random_access_iterator auto const lhs, random_access_iterator auto const rhs) OPERATORS_RETURNS(
+		rhs - lhs
+	)
 
-	static constexpr auto compare(random_access_iterator auto const lhs, random_access_iterator auto const rhs) {
-		return rhs <=> lhs;
-	}
-	static constexpr auto equal(iterator auto const lhs, iterator auto const rhs) {
+	static constexpr auto compare(random_access_iterator auto const lhs, random_access_iterator auto const rhs) OPERATORS_RETURNS(
+		rhs <=> lhs
+	)
+	template<iterator LHS, iterator RHS> requires bounded::equality_comparable<LHS, RHS>
+	static constexpr auto equal(LHS const lhs, RHS const rhs) -> bool {
 		return rhs == lhs;
 	}
 };

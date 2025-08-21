@@ -142,7 +142,8 @@ public:
 		return it.m_traits.get().dereference(it.base());
 	}
 
-	friend constexpr auto operator+(adapt_iterator lhs, adapted_addable<Iterator, Traits> auto const rhs) -> adapt_iterator {
+	// `same_as` works around https://github.com/llvm/llvm-project/issues/143918
+	friend constexpr auto operator+(std::same_as<adapt_iterator> auto lhs, adapted_addable<Iterator, Traits> auto const rhs) -> adapt_iterator {
 		auto base = lhs.m_traits.get().add(std::move(lhs).base(), rhs);
 		return adapt_iterator(std::move(base), std::move(lhs).m_traits);
 	}
