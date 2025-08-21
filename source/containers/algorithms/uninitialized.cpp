@@ -74,8 +74,6 @@ constexpr auto memcpy(void * destination, void const * source, std::size_t const
 }
 
 export constexpr auto uninitialized_copy_no_overlap = []<range InputRange, iterator OutputIterator>(InputRange && source, OutputIterator out) {
-	// TODO: Figure out how to tell the optimizer there is no overlap so I do
-	// not need to explicitly call `memcpy`.
 	if constexpr (memcpyable<InputRange, OutputIterator>) {
 		if consteval {
 			return uninitialized_copy(OPERATORS_FORWARD(source), out);
