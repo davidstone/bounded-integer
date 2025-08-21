@@ -21,8 +21,6 @@ import std_module;
 
 namespace bounded {
 
-namespace {
-
 using smax_t = numeric_traits::max_signed_t;
 using umax_t = numeric_traits::max_unsigned_t;
 
@@ -78,8 +76,6 @@ constexpr auto sign_free_value = [](auto const dividend, auto divisor) -> min_ma
 	}
 	return current;
 };
-
-} // namespace
 
 constexpr auto modulus_operator_range(auto const lhs, auto const rhs) {
 	// The sign of the result is equal to the sign of the lhs. The sign of the

@@ -49,13 +49,9 @@ constexpr auto test_optional_traits() {
 	return true;
 }
 
-namespace {
-
 struct S {
 	int member;
 };
-
-} // namespace
 
 static_assert(test_optional_traits<int>());
 static_assert(test_optional_traits<bounded::integer<0, 10>>());
