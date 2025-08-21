@@ -71,12 +71,34 @@ struct reverse_traits {
 	}
 };
 
-export constexpr auto reverse_iterator(bidirectional_iterator auto it) {
-	return adapt_iterator(it, value_wrapper<reverse_traits>());
+template<typename>
+constexpr auto is_reverse_iterator = false;
+
+template<typename Iterator>
+constexpr auto is_reverse_iterator<adapt_iterator<Iterator, value_wrapper<reverse_traits>>> = true;
+
+export template<bidirectional_iterator Iterator>
+constexpr auto reverse_iterator(Iterator it) {
+	if constexpr (is_reverse_iterator<Iterator>) {
+		return it.base();
+	} else {
+		return adapt_iterator(it, value_wrapper<reverse_traits>());
+	}
 }
 
-export constexpr auto reversed(range auto && source) {
-	return adapt(OPERATORS_FORWARD(source), reverse_traits());
+template<typename>
+constexpr auto is_reversed = false;
+
+template<typename Range>
+constexpr auto is_reversed<adapt<Range, reverse_traits>> = true;
+
+export template<range Range>
+constexpr auto reversed(Range && source) {
+	if constexpr (is_reversed<Range>) {
+		return OPERATORS_FORWARD(source).base();
+	} else {
+		return adapt(OPERATORS_FORWARD(source), reverse_traits());
+	}
 }
 
 } // namespace containers
