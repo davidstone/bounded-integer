@@ -29,21 +29,6 @@ namespace containers {
 template<typename... Iterators>
 struct zip_iterator;
 
-template<typename... Ts>
-constexpr auto ref_or_value_tuple(Ts && ... args) {
-	return tv::tuple<Ts...>(OPERATORS_FORWARD(args)...);
-}
-
-template<std::size_t... indexes>
-constexpr auto dereference(auto const & tuple, std::index_sequence<indexes...>) {
-	return ref_or_value_tuple(*tuple[bounded::constant<indexes>]...);
-}
-
-template<typename... Iterators, std::size_t... indexes>
-constexpr auto add(tv::tuple<Iterators...> tuple, auto const offset, std::index_sequence<indexes...>) -> zip_iterator<Iterators...> {
-	return zip_iterator<Iterators...>((std::move(tuple)[bounded::constant<indexes>] + offset)...);
-}
-
 template<typename... Iterators>
 struct zip_difference_type_impl {
 	static constexpr auto min_max = bounded::min(
@@ -77,17 +62,20 @@ struct zip_iterator {
 	}
 
 	friend constexpr auto operator*(zip_iterator const & it) {
-		return dereference(it.m_its, indexes);
+		auto const & [...its] = it.m_its;
+		return tv::tuple<decltype(*its)...>(*its...);
 	}
-	friend constexpr auto operator+(zip_iterator it, bounded::constant_t<1>) -> zip_iterator {
+	friend constexpr auto operator+(zip_iterator it, bounded::constant_t<1> const offset) -> zip_iterator {
 		if constexpr (sizeof...(Iterators) == 0) {
 			std::unreachable();
 		} else {
-			return add(std::move(it).m_its, 1_bi, indexes);
+			auto && [...its] = std::move(it).m_its;
+			return zip_iterator((std::move(its) + offset)...);
 		}
 	}
 	friend constexpr auto operator+(zip_iterator it, bounded::convertible_to<difference_type> auto const offset) -> zip_iterator {
-		return add(std::move(it).m_its, offset, indexes);
+		auto && [...its] = std::move(it).m_its;
+		return zip_iterator((std::move(its) + offset)...);
 	}
 
 	friend auto operator<=>(zip_iterator const &, zip_iterator const &) = default;
@@ -96,19 +84,8 @@ private:
 	friend struct zip_sentinel;
 	template<typename... Sentinels>
 	friend struct zip_smallest_sentinel;
-	static constexpr auto indexes = std::make_index_sequence<sizeof...(Iterators)>();
 	[[no_unique_address]] tv::tuple<Iterators...> m_its;
 };
-
-template<std::size_t... indexes>
-constexpr auto all(auto const & lhs, auto const & rhs, std::index_sequence<indexes...>, auto const predicate) {
-	return (... and predicate(lhs[bounded::constant<indexes>], rhs[bounded::constant<indexes>]));
-}
-
-template<std::size_t... indexes>
-constexpr auto any(auto const & lhs, auto const & rhs, std::index_sequence<indexes...>, auto const predicate) {
-	return (... or predicate(lhs[bounded::constant<indexes>], rhs[bounded::constant<indexes>]));
-}
 
 template<typename... Sentinels>
 struct zip_sentinel {
@@ -118,10 +95,10 @@ struct zip_sentinel {
 	}
 	template<typename... Iterators> requires(sizeof...(Iterators) == sizeof...(Sentinels))
 	friend constexpr auto operator==(zip_iterator<Iterators...> const & lhs, zip_sentinel const rhs) -> bool {
-		constexpr auto indexes = std::make_index_sequence<sizeof...(Sentinels)>();
-		if (all(lhs.m_its, rhs.m_sentinels, indexes, std::not_equal_to())) {
+		auto const [...indexes] = bounded::index_sequence_struct<sizeof...(Sentinels)>();
+		if ((... and (lhs.m_its[indexes] != rhs.m_sentinels[indexes]))) {
 			return false;
-		} else if (all(lhs.m_its, rhs.m_sentinels, indexes, std::equal_to())) {
+		} else if ((... and (lhs.m_its[indexes] == rhs.m_sentinels[indexes]))) {
 			return true;
 		} else {
 			throw std::runtime_error("Mismatched sizes for inputs to zip");
@@ -139,8 +116,8 @@ struct zip_smallest_sentinel {
 	}
 	template<typename... Iterators> requires(sizeof...(Iterators) == sizeof...(Sentinels))
 	friend constexpr auto operator==(zip_iterator<Iterators...> const & lhs, zip_smallest_sentinel const rhs) -> bool {
-		constexpr auto indexes = std::make_index_sequence<sizeof...(Sentinels)>();
-		return any(lhs.m_its, rhs.m_sentinels, indexes, std::equal_to());
+		auto const [...indexes] = bounded::index_sequence_struct<sizeof...(Sentinels)>();
+		return (... or (lhs.m_its[indexes] == rhs.m_sentinels[indexes]));
 	}
 private:
 	[[no_unique_address]] tv::tuple<Sentinels...> m_sentinels;
@@ -152,38 +129,6 @@ constexpr auto all_are_equal(auto const size, auto const ... sizes) -> bool {
 
 constexpr auto all_are_equal() -> bool {
 	return true;
-}
-
-template<std::size_t... indexes>
-constexpr auto make_zip_iterator(auto && ranges, std::index_sequence<indexes...>, auto get) {
-	return zip_iterator(
-		get(OPERATORS_FORWARD(ranges)[bounded::constant<indexes>])...
-	);
-}
-
-// https://github.com/llvm/llvm-project/issues/59513
-struct use_begin {
-	static constexpr auto operator()(auto && r) {
-		return containers::begin(OPERATORS_FORWARD(r));
-	}
-};
-struct use_end {
-	static constexpr auto operator()(auto && r) {
-		return containers::end(OPERATORS_FORWARD(r));
-	}
-};
-
-template<bool check_equal_sizes, std::size_t... indexes>
-constexpr auto make_zip_sentinel(auto && ranges, std::index_sequence<indexes...>) {
-	if constexpr (check_equal_sizes) {
-		return zip_sentinel(
-			containers::end(OPERATORS_FORWARD(ranges)[bounded::constant<indexes>])...
-		);
-	} else {
-		return zip_smallest_sentinel(
-			containers::end(OPERATORS_FORWARD(ranges)[bounded::constant<indexes>])...
-		);
-	}
 }
 
 template<typename Range>
@@ -208,7 +153,6 @@ export template<bool check_equal_sizes, range... Ranges>
 struct zip_impl {
 private:
 	static constexpr auto all_are_sized = (... and sized_range<Ranges>);
-	static constexpr auto indexes = std::make_index_sequence<sizeof...(Ranges)>();
 
 	static constexpr auto as_tuple(Ranges && ... ranges) {
 		if constexpr (all_are_sized and !check_equal_sizes and sizeof...(Ranges) != 0) {
@@ -221,18 +165,14 @@ private:
 
 	decltype(as_tuple(bounded::declval<Ranges>()...)) m_ranges;
 
-	static constexpr auto end_impl(auto && ranges) {
+	static constexpr auto end_impl(auto && m_ranges) {
+		auto && [...ranges] = OPERATORS_FORWARD(m_ranges);
 		if constexpr (all_are_sized) {
-			return ::containers::make_zip_iterator(
-				OPERATORS_FORWARD(ranges),
-				indexes,
-				use_end()
-			);
+			return zip_iterator(::containers::end(OPERATORS_FORWARD(ranges))...);
+		} else if constexpr (check_equal_sizes) {
+			return zip_sentinel(containers::end(OPERATORS_FORWARD(ranges))...);
 		} else {
-			return ::containers::make_zip_sentinel<check_equal_sizes>(
-				OPERATORS_FORWARD(ranges),
-				indexes
-			);
+			return zip_smallest_sentinel(containers::end(OPERATORS_FORWARD(ranges))...);
 		}
 	}
 
@@ -255,13 +195,16 @@ public:
 	}
 
 	constexpr auto begin() const & requires all_support_begin<Ranges const &...> {
-		return make_zip_iterator(m_ranges, indexes, use_begin());
+		auto && [...ranges] = m_ranges;
+		return zip_iterator(::containers::begin(OPERATORS_FORWARD(ranges))...);
 	}
 	constexpr auto begin() & requires all_support_begin<Ranges &...> {
-		return make_zip_iterator(m_ranges, indexes, use_begin());
+		auto && [...ranges] = m_ranges;
+		return zip_iterator(::containers::begin(OPERATORS_FORWARD(ranges))...);
 	}
 	constexpr auto begin() && requires all_support_begin<Ranges &&...> {
-		return make_zip_iterator(std::move(m_ranges), indexes, use_begin());
+		auto && [...ranges] = std::move(m_ranges);
+		return zip_iterator(::containers::begin(OPERATORS_FORWARD(ranges))...);
 	}
 
 	constexpr auto end() const & requires all_support_end<Ranges const &...> {

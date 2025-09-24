@@ -37,10 +37,8 @@ constexpr auto transform(auto && function, Tuples && ... tuples) requires(all_tu
 	auto single = [&](auto const index) -> decltype(auto) {
 		return function(OPERATORS_FORWARD(tuples)[index]...);
 	};
-	auto all = [&]<std::size_t... indexes>(std::index_sequence<indexes...>) {
-		return tuple<decltype(single(bounded::constant<indexes>))...>(single(bounded::constant<indexes>)...);
-	};
-	return all(std::make_index_sequence<static_cast<std::size_t>(size)>());
+	auto const [...indexes] = bounded::index_sequence_struct(size);
+	return tuple<decltype(single(indexes))...>(single(indexes)...);
 }
 
 }	// namespace tv

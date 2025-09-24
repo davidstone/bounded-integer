@@ -17,21 +17,12 @@ import std_module;
 
 namespace tv {
 
-template<std::size_t... indexes>
-constexpr auto implementation(auto && tuple_args, std::index_sequence<indexes...>, auto && function) -> decltype(auto) {
-	return OPERATORS_FORWARD(function)(
-		OPERATORS_FORWARD(tuple_args)[bounded::constant<indexes>]...
-	);
-}
 struct apply_t {
 	static constexpr auto operator()(tuple_like auto && tuple_args, auto && function) -> decltype(auto) {
-		return implementation(
-			OPERATORS_FORWARD(tuple_args),
-			bounded::make_index_sequence(tuple_size<decltype(tuple_args)>),
-			OPERATORS_FORWARD(function)
-		);
+		auto && [...args] = OPERATORS_FORWARD(tuple_args);
+		return OPERATORS_FORWARD(function)(OPERATORS_FORWARD(args)...);
 	}
 };
 export constexpr auto apply = apply_t();
 
-}	// namespace tv
+} // namespace tv

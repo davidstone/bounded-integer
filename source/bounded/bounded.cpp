@@ -31,6 +31,7 @@ export import bounded.destroy;
 export import bounded.equality_comparable;
 export import bounded.function_ptr;
 export import bounded.hash;
+export import bounded.index_sequence_struct;
 export import bounded.integer;
 export import bounded.integral;
 export import bounded.isomorphic_to_integral;

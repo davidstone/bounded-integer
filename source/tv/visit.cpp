@@ -161,31 +161,16 @@ constexpr auto visit_implementation(
 	#undef VISIT_IMPL
 }
 
-// Often, we want to write a function that accepts a variadic number of
-// arguments and a function. We would like to accept the function parameter
-// last, since that gives the best syntax when passing a lambda. However, you
-// cannot put something after a variadic pack, therefore the function is part of
-// the pack. rotate_transform allows us to write an interface that accepts stuff
-// and a function to operate on the stuff, but allows us to decide whether to
-// pass values or indexed values to the user's function.
-template<bool use_index, std::size_t... indexes>
-constexpr auto rotate_transform(auto && function, std::index_sequence<indexes...>, auto && ... args) -> decltype(auto) {
-	return ::tv::visit_implementation<use_index, 0>(
-		OPERATORS_FORWARD(function),
-		std::index_sequence<>(),
-		0_bi,
-		OPERATORS_FORWARD(args...[indexes])...
-	);
-}
-
 // Accepts any number of variants (including 0) followed by one function
 export constexpr auto visit_with_index = []<typename... Args>(Args && ... args) static -> decltype(auto)
 	 requires(is_variants_then_visit_function<indexed_variant_types, Args...[sizeof...(args) - 1], Args...>(std::make_index_sequence<sizeof...(Args) - 1>()))
 {
-	return ::tv::rotate_transform<true>(
+	auto [...indexes] = bounded::index_sequence_struct<sizeof...(args) - 1>();
+	return ::tv::visit_implementation<true, 0>(
 		OPERATORS_FORWARD(args...[sizeof...(args) - 1]),
-		std::make_index_sequence<sizeof...(args) - 1>(),
-		OPERATORS_FORWARD(args)...
+		std::index_sequence<>(),
+		0_bi,
+		OPERATORS_FORWARD(args...[indexes.value()])...
 	);
 };
 
@@ -194,10 +179,12 @@ export constexpr auto visit_with_index = []<typename... Args>(Args && ... args) 
 export constexpr auto visit = []<typename... Args>(Args && ... args) static -> decltype(auto)
 	requires(is_variants_then_visit_function<variant_types, Args...[sizeof...(args) - 1], Args...>(std::make_index_sequence<sizeof...(Args) - 1>()))
 {
-	return ::tv::rotate_transform<false>(
+	auto [...indexes] = bounded::index_sequence_struct<sizeof...(args) - 1>();
+	return ::tv::visit_implementation<false, 0>(
 		OPERATORS_FORWARD(args...[sizeof...(args) - 1]),
-		std::make_index_sequence<sizeof...(args) - 1>(),
-		OPERATORS_FORWARD(args)...
+		std::index_sequence<>(),
+		0_bi,
+		OPERATORS_FORWARD(args...[indexes.value()])...
 	);
 };
 

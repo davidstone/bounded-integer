@@ -69,6 +69,7 @@ target_sources(bounded PUBLIC
 		function_ptr.cpp
 		hash.cpp
 		homogeneous_equals.cpp
+		index_sequence_struct.cpp
 		integer.cpp
 		integral.cpp
 		integral_constant_of_integral.cpp

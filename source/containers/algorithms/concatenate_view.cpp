@@ -45,20 +45,16 @@ constexpr auto compare_sentinels(LHS const & lhs, RHS const & rhs) -> bool {
 	}
 }
 
-template<typename LHS, typename RHS, std::size_t... indexes>
-constexpr auto have_same_ends(LHS const & lhs, RHS const & rhs, std::index_sequence<indexes...>) {
+template<typename LHS, typename RHS>
+constexpr auto have_same_ends(LHS const & lhs, RHS const & rhs) -> bool {
+	static_assert(tv::tuple_size<LHS> == tv::tuple_size<RHS>);
+	auto [...indexes] = bounded::index_sequence_struct(tv::tuple_size<LHS>);
 	return (... and (
 		compare_sentinels(
-			containers::end(lhs[bounded::constant<indexes>]),
-			containers::end(rhs[bounded::constant<indexes>])
+			containers::end(lhs[indexes]),
+			containers::end(rhs[indexes])
 		)
 	));
-}
-
-template<typename LHS, typename RHS>
-constexpr auto assert_same_ends(LHS const & lhs, RHS const & rhs) {
-	static_assert(tv::tuple_size<LHS> == tv::tuple_size<RHS>);
-	BOUNDED_ASSERT(have_same_ends(lhs, rhs, bounded::make_index_sequence(tv::tuple_size<LHS>)));
 }
 
 template<typename Category, typename RangeView>
@@ -156,13 +152,12 @@ struct concatenate_view_iterator {
 				);
 			}
 		};
-		return [&]<std::size_t... indexes>(std::index_sequence<indexes...>) {
-			// Use {} to enforce initialization order
-			return tv::apply(
-				tv::tuple{specific_range(bounded::constant<indexes>)...},
-				bounded::construct<concatenate_view_iterator>
-			);
-		}(std::make_index_sequence<sizeof...(RangeViews)>());
+		auto [...indexes] = bounded::index_sequence_struct<sizeof...(RangeViews)>();
+		// Use {} to enforce initialization order
+		return tv::apply(
+			tv::tuple{specific_range(indexes)...},
+			bounded::construct<concatenate_view_iterator>
+		);
 	}
 
 	template<typename... RHSRanges> requires(... and subtractable<iterator_t<RangeViews>, iterator_t<RHSRanges>>)
@@ -170,7 +165,7 @@ struct concatenate_view_iterator {
 		concatenate_view_iterator const lhs,
 		concatenate_view_iterator<RHSRanges...> const rhs
 	) {
-		::containers::assert_same_ends(lhs.m_range_views, rhs.m_range_views);
+		BOUNDED_ASSERT(::containers::have_same_ends(lhs.m_range_views, rhs.m_range_views));
 
 		auto transform = [](auto const lhs_range, auto const rhs_range) {
 			return containers::begin(lhs_range) - containers::begin(rhs_range);
@@ -202,7 +197,7 @@ struct concatenate_view_iterator {
 		concatenate_view_iterator const lhs,
 		concatenate_view_iterator<RHSRanges...> const rhs
 	) {
-		::containers::assert_same_ends(lhs.m_range_views, rhs.m_range_views);
+		BOUNDED_ASSERT(::containers::have_same_ends(lhs.m_range_views, rhs.m_range_views));
 		return lhs.begin_iterators() <=> rhs.begin_iterators();
 	}
 
@@ -213,7 +208,7 @@ struct concatenate_view_iterator {
 
 	template<typename... RHSRanges>
 	friend constexpr auto operator==(concatenate_view_iterator const & lhs, concatenate_view_iterator<RHSRanges...> const & rhs) -> bool {
-		::containers::assert_same_ends(lhs.m_range_views, rhs.m_range_views);
+		BOUNDED_ASSERT(::containers::have_same_ends(lhs.m_range_views, rhs.m_range_views));
 		return lhs.begin_iterators() == rhs.begin_iterators();
 	}
 

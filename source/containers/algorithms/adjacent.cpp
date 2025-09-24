@@ -73,13 +73,8 @@ struct adjacent_iterator {
 		}
 	}
 	constexpr auto operator*() const {
-		return [&]<std::size_t... indexes>(std::index_sequence<indexes...>) {
-			return tv::tuple<
-				decltype(*m_its[bounded::constant<indexes>])...
-			>(
-				*m_its[bounded::constant<indexes>]...
-			);
-		}(bounded::make_index_sequence(group_size));
+		auto const & [...its] = m_its;
+		return tv::tuple<decltype(*its)...>(*its...);
 	}
 	friend constexpr auto operator+(adjacent_iterator lhs, bounded::bounded_integer auto const offset) -> adjacent_iterator {
 		for (auto & it : lhs.m_its) {

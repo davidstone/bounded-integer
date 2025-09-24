@@ -45,14 +45,13 @@ struct variant_index {
 	}
 	template<typename T> requires (... or std::same_as<T, Ts>)
 	friend constexpr auto operator==(variant_index const lhs, bounded::type_t<T> const rhs) -> bool {
-		return [=]<std::size_t... indexes>(std::index_sequence<indexes...>) {
-			bool matched = false;
-			(..., (bounded::constant<indexes> == lhs.integer() ?
-				void(matched = (get_type(bounded::constant<indexes>, bounded::type<Ts>...) == rhs)) :
-				void()
-			));
-			return matched;
-		}(std::make_index_sequence<sizeof...(Ts)>());
+		auto const [...indexes] = bounded::index_sequence_struct<sizeof...(Ts)>();
+		bool matched = false;
+		(..., (indexes == lhs.integer() ?
+			void(matched = (get_type(indexes, bounded::type<Ts>...) == rhs)) :
+			void()
+		));
+		return matched;
 	}
 private:
 	[[no_unique_address]] integer_index m_index;

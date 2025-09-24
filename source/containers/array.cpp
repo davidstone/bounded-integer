@@ -108,39 +108,29 @@ array(c_array<T, size> &&) -> array<T, bounded::constant<size>>;
 template<typename T, array_size_type<T>... sizes>
 constexpr auto is_container<array<T, sizes...>> = true;
 
-// Use the comma operator to expand the variadic pack
-// Move the last element in if possible. Order of evaluation is well-defined for
-// aggregate initialization, so there is no risk of copy-after-move
-template<std::size_t... indexes>
-constexpr auto make_array_n_impl(auto const size, auto && value, std::index_sequence<indexes...>) {
-	return array<std::decay_t<decltype(value)>, size>({(void(indexes), value)..., OPERATORS_FORWARD(value)});
-}
-
 export template<auto size_>
 constexpr auto make_array_n(bounded::constant_t<size_> size, auto && value) {
+	using result_t = array<std::decay_t<decltype(value)>, size>;
 	if constexpr (size == 0_bi) {
-		return array<std::decay_t<decltype(value)>, 0_bi>();
+		return result_t();
 	} else {
-		return ::containers::make_array_n_impl(
-			size,
-			OPERATORS_FORWARD(value),
-			bounded::make_index_sequence(size - 1_bi)
-		);
+		auto [...indexes] = bounded::index_sequence_struct<size_ - 1>();
+		// Use the comma operator to expand the variadic pack. Move the last
+		// element if possible. Order of evaluation is well-defined for
+		// aggregate initialization, so there is no risk of copy-after-move
+		return result_t({(void(indexes), value)..., OPERATORS_FORWARD(value)});
 	}
-}
-
-template<std::size_t...indexes>
-constexpr auto to_array_impl(auto && source, std::index_sequence<indexes...>) {
-	return array({OPERATORS_FORWARD(source)[indexes]...});
 }
 
 export template<typename T, std::size_t size>
 constexpr auto to_array(c_array<T, size> const & source) {
-	return ::containers::to_array_impl(source, std::make_index_sequence<size>());
+	auto [...indexes] = bounded::index_sequence_struct<size>();
+	return array({source[std::size_t(indexes)]...});
 }
 export template<typename T, std::size_t size>
 constexpr auto to_array(c_array<T, size> && source) {
-	return ::containers::to_array_impl(std::move(source), std::make_index_sequence<size>());
+	auto [...indexes] = bounded::index_sequence_struct<size>();
+	return array({std::move(source)[std::size_t(indexes)]...});
 }
 export template<typename T>
 constexpr auto to_array(empty_c_array_parameter) {

@@ -171,8 +171,15 @@ constexpr auto double_buffered_range_sort(range auto & source, range auto & buff
 	return which;
 }
 
-template<typename OriginalExtractor, typename CurrentExtractor, std::size_t... indexes>
-constexpr auto double_buffered_tuple_sort(range auto & source, range auto & buffer, OriginalExtractor const & original_extractor, CurrentExtractor const & current_extractor, std::index_sequence<indexes...>) -> bool {
+template<typename OriginalExtractor, typename CurrentExtractor>
+constexpr auto double_buffered_tuple_sort(
+	range auto & source,
+	range auto & buffer,
+	OriginalExtractor const & original_extractor,
+	CurrentExtractor const & current_extractor
+) -> bool {
+	using key_t = std::decay_t<decltype(current_extractor(containers::front(source)))>;
+	auto const [...indexes] = bounded::index_sequence_struct<std::tuple_size_v<key_t>>();
 	auto which = false;
 	auto do_iteration = [&]<auto index>(bounded::constant_t<index>) {
 		using std::get;
@@ -186,7 +193,7 @@ constexpr auto double_buffered_tuple_sort(range auto & source, range auto & buff
 			which = ::containers::double_buffered_sort_impl(source, buffer, original_extractor, extract_index);
 		}
 	};
-	(..., do_iteration(bounded::constant<sizeof...(indexes) - indexes - 1>));
+	(..., do_iteration(bounded::constant<sizeof...(indexes)> - indexes - 1_bi));
 	return which;
 }
 
@@ -201,7 +208,7 @@ constexpr auto double_buffered_sort_impl(range auto & source, range auto & buffe
 		return ::containers::double_buffered_range_sort(source, buffer, original_extractor, current_extractor);
 	} else {
 		static_assert(tuple_like<key_t>);
-		return ::containers::double_buffered_tuple_sort(source, buffer, original_extractor, current_extractor, std::make_index_sequence<std::tuple_size_v<key_t>>());
+		return ::containers::double_buffered_tuple_sort(source, buffer, original_extractor, current_extractor);
 	}
 }
 

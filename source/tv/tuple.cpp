@@ -18,19 +18,6 @@ using namespace bounded::literal;
 
 namespace tv {
 
-template<std::size_t... indexes>
-constexpr auto compare_impl(auto const & lhs, auto const & rhs, std::index_sequence<indexes...>) {
-	auto cmp = std::strong_ordering::equal;
-	void((... or ((cmp = lhs[bounded::constant<indexes>] <=> rhs[bounded::constant<indexes>]), cmp != 0)));
-	return cmp;
-}
-
-template<std::size_t... indexes>
-constexpr auto equal_impl(auto const & lhs, auto const & rhs, std::index_sequence<indexes...>) {
-	return (... and (lhs[bounded::constant<indexes>] == rhs[bounded::constant<indexes>]));
-}
-
-
 // index is the index of this value within the tuple that contains it
 template<std::size_t index, typename T>
 struct tuple_value {
@@ -147,12 +134,16 @@ struct tuple : private tuple_impl_t<Types...> {
 
 	template<bounded::ordered<Types>... RHSTypes>
 	friend constexpr auto operator<=>(tuple const & lhs, tuple<RHSTypes...> const & rhs) {
-		return ::tv::compare_impl(lhs, rhs, bounded::make_index_sequence(bounded::constant<sizeof...(Types)>));
+		auto const [...indexes] = bounded::index_sequence_struct<sizeof...(Types)>();
+		auto cmp = std::strong_ordering::equal;
+		void((... or ((cmp = lhs[indexes] <=> rhs[indexes]), cmp != 0)));
+		return cmp;
 	}
 
 	template<bounded::equality_comparable<Types>... RHSTypes>
 	friend constexpr auto operator==(tuple const & lhs, tuple<RHSTypes...> const & rhs) -> bool {
-		return ::tv::equal_impl(lhs, rhs, bounded::make_index_sequence(bounded::constant<sizeof...(Types)>));
+		auto const [...indexes] = bounded::index_sequence_struct<sizeof...(Types)>();
+		return (... and (lhs[indexes] == rhs[indexes]));
 	}
 };
 
