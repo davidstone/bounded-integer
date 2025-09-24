@@ -79,37 +79,39 @@ consteval auto is_variants_then_visit_function(std::index_sequence<indexes...>) 
 	>;
 }
 
-template<bool use_index, std::size_t, std::size_t... indexes>
+template<bool use_index, std::size_t variant_index>
 constexpr auto visit_implementation(
 	auto && function,
-	std::index_sequence<indexes...>,
 	bounded::constant_t<0>,
-	auto && ... variants
-) -> decltype(auto) requires(sizeof...(indexes) == sizeof...(variants)) {
+	auto && ... elements
+) -> decltype(auto) requires(variant_index == sizeof...(elements)) {
+	return OPERATORS_FORWARD(function)(OPERATORS_FORWARD(elements)...);
+}
+
+template<bool use_index>
+constexpr auto get_element(auto && variant, auto const index) -> decltype(auto) {
 	if constexpr (use_index) {
-		return OPERATORS_FORWARD(function)(
-			indexed_value<
-				decltype(OPERATORS_FORWARD(variants)[bounded::constant<indexes>]),
-				indexes
-			>(OPERATORS_FORWARD(variants)[bounded::constant<indexes>])...
-		);
+		return indexed_value<
+			decltype(OPERATORS_FORWARD(variant)[index]),
+			std::size_t(index)
+		>(OPERATORS_FORWARD(variant)[index]);
 	} else {
-		return OPERATORS_FORWARD(function)(
-			OPERATORS_FORWARD(variants)[bounded::constant<indexes>]...
-		);
+		return OPERATORS_FORWARD(variant)[index];
 	}
 }
 
-template<bool use_index, std::size_t variant_index, std::size_t... indexes>
+template<bool use_index, std::size_t variant_index>
 constexpr auto visit_implementation(
 	auto && function,
-	std::index_sequence<indexes...> initial_indexes,
 	auto offset,
 	auto && ... variants
-) -> decltype(auto) requires(sizeof...(indexes) < sizeof...(variants)) {
+) -> decltype(auto) requires(variant_index < sizeof...(variants)) {
 	auto const search_index = variants...[variant_index].index().integer();
 	auto const this_search = search_index - offset;
 
+	auto const [...element_indexes] = bounded::index_sequence_struct<variant_index>();
+	auto && variant = OPERATORS_FORWARD(variants...[variant_index]); \
+	auto const [...remaining_indexes] = bounded::index_sequence_struct<sizeof...(variants) - variant_index - 1>();
 	// Cannot use a lambda because there is no return type that would be valid
 	// there. A deduced return type would be potentially void.
 	#define VISIT_IMPL(index) \
@@ -119,9 +121,10 @@ constexpr auto visit_implementation(
 			} else { \
 				return ::tv::visit_implementation<use_index, variant_index + 1>( \
 					OPERATORS_FORWARD(function), \
-					std::index_sequence<indexes..., static_cast<std::size_t>(offset + (index))>{}, \
 					0_bi, \
-					OPERATORS_FORWARD(variants)... \
+					OPERATORS_FORWARD(variants...[element_indexes.value()])..., \
+					get_element<use_index>(OPERATORS_FORWARD(variant), offset + (index)), \
+					OPERATORS_FORWARD(variants...[variant_index + 1 + remaining_indexes.value()])... \
 				); \
 			} \
 		} while (false)
@@ -151,7 +154,6 @@ constexpr auto visit_implementation(
 			} else {
 				return ::tv::visit_implementation<use_index, variant_index>(
 					OPERATORS_FORWARD(function),
-					initial_indexes,
 					offset + max_index,
 					OPERATORS_FORWARD(variants)...
 				);
@@ -168,7 +170,6 @@ export constexpr auto visit_with_index = []<typename... Args>(Args && ... args) 
 	auto [...indexes] = bounded::index_sequence_struct<sizeof...(args) - 1>();
 	return ::tv::visit_implementation<true, 0>(
 		OPERATORS_FORWARD(args...[sizeof...(args) - 1]),
-		std::index_sequence<>(),
 		0_bi,
 		OPERATORS_FORWARD(args...[indexes.value()])...
 	);
@@ -182,7 +183,6 @@ export constexpr auto visit = []<typename... Args>(Args && ... args) static -> d
 	auto [...indexes] = bounded::index_sequence_struct<sizeof...(args) - 1>();
 	return ::tv::visit_implementation<false, 0>(
 		OPERATORS_FORWARD(args...[sizeof...(args) - 1]),
-		std::index_sequence<>(),
 		0_bi,
 		OPERATORS_FORWARD(args...[indexes.value()])...
 	);
