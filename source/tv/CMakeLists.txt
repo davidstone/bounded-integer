@@ -18,7 +18,6 @@ target_sources(tv PUBLIC
 	FILE_SET CXX_MODULES
 	BASE_DIRS "${CMAKE_CURRENT_SOURCE_DIR}"
 	FILES
-		apply.cpp
 		get_index.cpp
 		indexed_value.cpp
 		insert.cpp

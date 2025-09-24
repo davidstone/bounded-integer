@@ -5,7 +5,6 @@
 
 export module tv;
 
-export import tv.apply;
 export import tv.indexed_value;
 export import tv.insert;
 export import tv.none;
