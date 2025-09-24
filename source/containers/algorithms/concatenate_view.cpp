@@ -154,10 +154,7 @@ struct concatenate_view_iterator {
 		};
 		auto [...indexes] = bounded::index_sequence_struct<sizeof...(RangeViews)>();
 		// Use {} to enforce initialization order
-		return tv::apply(
-			tv::tuple{specific_range(indexes)...},
-			bounded::construct<concatenate_view_iterator>
-		);
+		return concatenate_view_iterator{specific_range(indexes)...};
 	}
 
 	template<typename... RHSRanges> requires(... and subtractable<iterator_t<RangeViews>, iterator_t<RHSRanges>>)
@@ -170,10 +167,8 @@ struct concatenate_view_iterator {
 		auto transform = [](auto const lhs_range, auto const rhs_range) {
 			return containers::begin(lhs_range) - containers::begin(rhs_range);
 		};
-		return tv::apply(
-			tv::transform(transform, lhs.m_range_views, rhs.m_range_views),
-			[](auto... integers) { return (... + integers); }
-		);
+		auto const [...integers] = tv::transform(transform, lhs.m_range_views, rhs.m_range_views);
+		return (... + integers);
 	}
 
 
@@ -182,10 +177,8 @@ struct concatenate_view_iterator {
 		concatenate_view_iterator const rhs
 	) requires(... and sized_range<RangeViews>) {
 		auto transform = [](auto const range) { return containers::size(range); };
-		return tv::apply(
-			tv::transform(transform, rhs.m_range_views),
-			[](auto... integers) { return (... + integers); }
-		);
+		auto const [...integers] = tv::transform(transform, rhs.m_range_views);
+		return (... + integers);
 	}
 
 	friend constexpr auto operator-(concatenate_view_iterator const lhs, std::default_sentinel_t const rhs) {
