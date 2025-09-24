@@ -158,6 +158,15 @@ static_assert(tv::visit(
 	)
 ));
 
+static_assert(tv::visit(
+	variant<2>(0_bi),
+	variant<2>(1_bi),
+	variant<3>(2_bi),
+	[](bounded::integer<0, 1> const x0, bounded::integer<0, 1> const x1, bounded::integer<0, 2> const x2) {
+		return x0 == 0_bi and x1 == 1_bi and x2 == 2_bi;
+	}
+));
+
 template<int max>
 constexpr auto function = [](bounded::integer<0, max - 1> x) {
 	return x + 1_bi;
