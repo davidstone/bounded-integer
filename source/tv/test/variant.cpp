@@ -40,6 +40,21 @@ static_assert(bounded::constructible_from<thing_t, short>);
 static_assert(bounded::constructible_from<thing_t, long>);
 static_assert(bounded::constructible_from<thing_t, char>);
 
+constexpr auto check_index_and_value(auto const index, auto const value) -> bool {
+	auto const v = thing_t(index, value);
+	BOUNDED_ASSERT(v.index() == index);
+	auto const stored = v[index];
+	static_assert(std::same_as<decltype(stored), decltype(value)>);
+	BOUNDED_ASSERT(stored == value);
+	return true;
+}
+
+static_assert(check_index_and_value(0_bi, 7));
+static_assert(check_index_and_value(1_bi, short(7)));
+static_assert(check_index_and_value(2_bi, 7L));
+static_assert(check_index_and_value(3_bi, 'A'));
+static_assert(check_index_and_value(4_bi, 7));
+
 static_assert(thing_t(0_bi, 0) == thing_t(0_bi, 0));
 static_assert(thing_t(0_bi, 0) != thing_t(0_bi, 1));
 static_assert(thing_t(0_bi, 0) != thing_t(1_bi, static_cast<short>(0)));
@@ -48,21 +63,8 @@ static_assert(thing_t(0_bi, 0) != thing_t(4_bi, 1));
 
 static_assert(thing_t(1_bi, static_cast<short>(5)) == thing_t(static_cast<short>(5)));
 
-static_assert(thing_t(0_bi, 0).index() == 0_bi);
-static_assert(thing_t(1_bi, static_cast<short>(0)).index() == 1_bi);
-static_assert(thing_t(2_bi, 0).index() == 2_bi);
-static_assert(thing_t(3_bi, '\0').index() == 3_bi);
-static_assert(thing_t(4_bi, 0).index() == 4_bi);
-
 constexpr auto index = 1_bi;
 constexpr auto value = static_cast<short>(8);
-
-constexpr auto thing = thing_t(index, value);
-using thingy = decltype(thing[index]);
-
-static_assert(std::same_as<thingy, short const &>);
-
-static_assert(thing[index] == value);
 
 constexpr auto test_assignment_from_variant() {
 	auto thing1 = thing_t(index, value);
