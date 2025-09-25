@@ -5,11 +5,7 @@
 
 export module containers.algorithms.sort.fixed_size_merge_sort;
 
-import containers.algorithms.sort.sort_exactly_1;
-import containers.algorithms.sort.sort_exactly_2;
-import containers.algorithms.sort.sort_exactly_3;
-import containers.algorithms.sort.sort_exactly_4;
-import containers.algorithms.sort.sort_exactly_5;
+import containers.algorithms.sort.sort_exactly_n;
 
 import containers.algorithms.uninitialized;
 
@@ -22,7 +18,7 @@ import std_module;
 using namespace bounded::literal;
 namespace containers {
 
-export constexpr auto fixed_size_merge_sort(auto it, auto const size1, auto const size2, auto const compare) {
+export constexpr auto fixed_size_merge_sort(auto it, auto const size1, auto const size2, auto const compare) -> void {
 	static_assert(size1 <= size2);
 	static_assert(size1 > 0_bi);
 	static_assert(size2 > 0_bi);

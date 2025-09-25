@@ -15,6 +15,7 @@ target_sources(containers PUBLIC
 		algorithms/sort/dereference_all.cpp
 		algorithms/sort/double_buffered_ska_sort.cpp
 		algorithms/sort/fixed_size_merge_sort.cpp
+		algorithms/sort/low_high_ref.cpp
 		algorithms/sort/inplace_radix_sort.cpp
 		algorithms/sort/is_sorted.cpp
 		algorithms/sort/merge_relocate_second_range.cpp
@@ -29,6 +30,7 @@ target_sources(containers PUBLIC
 		algorithms/sort/sort_exactly_4.cpp
 		algorithms/sort/sort_exactly_5.cpp
 		algorithms/sort/sort_exactly_6.cpp
+		algorithms/sort/sort_exactly_n.cpp
 		algorithms/sort/to_radix_sort_key.cpp
 		algorithms/accumulate.cpp
 		algorithms/adjacent.cpp

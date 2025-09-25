@@ -5,10 +5,10 @@
 
 export module containers.algorithms.sort.sort_exactly_6;
 
-import containers.algorithms.sort.fixed_size_merge_sort;
 import containers.algorithms.sort.sort_exactly_5;
-
 import containers.algorithms.advance;
+import containers.array;
+import containers.iterator;
 
 import bounded;
 import std_module;
@@ -17,9 +17,11 @@ import tv;
 namespace containers {
 using namespace bounded::literal;
 
+#if 0
+
 constexpr auto insertion_sort_more_than(auto const first, auto const last, auto const size_greater_than, auto const compare) -> void {
 	static_assert(size_greater_than > 0_bi);
-	::containers::sort_exactly_n(first, size_greater_than, compare);
+	::containers::sort_exactly_n_in_place_impl(first, size_greater_than, compare);
 	auto final_sorted = first + (size_greater_than - 1_bi);
 	for (auto it = containers::next(final_sorted); it != last; ++it) {
 		if (compare(*it, *final_sorted)) {
@@ -39,17 +41,11 @@ constexpr auto insertion_sort_more_than(auto const first, auto const last, auto 
 	}
 }
 
-export constexpr auto sort_exactly_n(auto it, bounded::constant_t<6> const size, auto const compare) -> void {
-	if consteval {
-		::containers::insertion_sort_more_than(it, it + size, 5_bi, compare);
-	} else {
-	#if 0
-		constexpr auto large_size = 3_bi;
-		::containers::fixed_size_merge_sort(it, size - large_size, large_size, compare);
-	#else
-		::containers::insertion_sort_more_than(it, it + size, 5_bi, compare);
-	#endif
-	}
+export template<iterator Iterator, typename Compare>
+constexpr auto sort_exactly_n_in_place(Iterator it, bounded::constant_t<6> const size, Compare const compare) -> void {
+	::containers::insertion_sort_more_than(it, it + size, 5_bi, compare);
 }
+
+#endif
 
 } // namespace containers

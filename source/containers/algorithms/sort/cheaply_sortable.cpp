@@ -14,7 +14,12 @@ namespace containers {
 
 // Size determined experimentally, but also the size of a cache line. Maybe it
 // should be `std::hardware_destructive_interference_size`?
-export template<typename T>
-concept cheaply_sortable = std::is_trivially_copyable_v<T> and sizeof(T) <= 64_bi;
+// This incorrectly considers `std::string_view` cheaply_sortable. This ideally
+// would have something like `has_default_compare`.
+export template<typename T, typename Compare>
+concept cheaply_sortable =
+	std::is_trivially_copyable_v<T> and
+	sizeof(T) <= 64_bi and
+	(std::same_as<Compare, std::less<>> or std::same_as<Compare, std::greater<>>);
 
 } // namespace containers

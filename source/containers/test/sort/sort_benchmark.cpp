@@ -79,7 +79,7 @@ using containers::chunked_insertion_sort;
 using containers::new_sort;
 using containers::sort;
 
-#define BENCHMARK_SIZES DenseRange(1, 5, 1)->Arg(16)->Arg(25)->Arg(64)->Arg(128)->Arg(1'000'000)
+#define BENCHMARK_SIZES DenseRange(1, 40, 1)->Arg(64)->Arg(128)->Arg(1'000)->Arg(1'000'000)
 
 #define BENCHMARK_ALL(data_size) \
 	BENCHMARK(benchmark_sort<data_size, insertion_sort>)->BENCHMARK_SIZES; \

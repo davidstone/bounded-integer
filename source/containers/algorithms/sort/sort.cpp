@@ -18,6 +18,7 @@ import containers.algorithms.advance;
 import containers.algorithms.partition;
 
 import containers.begin_end;
+import containers.iter_value_t;
 import containers.legacy_iterator;
 import containers.range;
 import containers.range_size_t;
@@ -54,12 +55,14 @@ constexpr auto introsort_impl(Depth const depth) {
 		auto median = first + length / 2_bi;
 		auto const before_last = containers::prev(last);
 		auto median_of = [&](auto... its) {
-			::containers::sort_exactly_n_impl(*its..., compare);
+			::containers::sort_exactly_n_in_place_impl(
+				*its...,
+				compare
+			);
 		};
 		if (length >= 1000_bi) {
 			median_of(first, first + length / 4_bi, median, median + length / 4_bi, before_last);
 		} else {
-			static_assert(max_small_sort_size >= 3_bi);
 			median_of(first, median, before_last);
 		}
 		median = iterator_partition(first, median, last, compare);

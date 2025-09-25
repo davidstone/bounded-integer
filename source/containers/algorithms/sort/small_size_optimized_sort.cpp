@@ -10,12 +10,7 @@ module;
 export module containers.algorithms.sort.small_size_optimized_sort;
 
 import containers.algorithms.sort.is_sorted;
-import containers.algorithms.sort.sort_exactly_1;
-import containers.algorithms.sort.sort_exactly_2;
-import containers.algorithms.sort.sort_exactly_3;
-import containers.algorithms.sort.sort_exactly_4;
-import containers.algorithms.sort.sort_exactly_5;
-import containers.algorithms.sort.sort_exactly_6;
+import containers.algorithms.sort.sort_exactly_n;
 
 import containers.begin_end;
 import containers.range;
@@ -30,13 +25,12 @@ namespace containers {
 
 using namespace bounded::literal;
 
-export constexpr auto max_small_sort_size = 6_bi;
-
 export template<range Range>
 inline constexpr auto small_size_optimized_sort(Range && r, auto const compare, auto const sort_large_range) -> void {
+	constexpr auto min_size = numeric_traits::min_value<range_size_t<Range>>;
 	constexpr auto max_size = numeric_traits::max_value<range_size_t<Range>>;
 	auto do_sort = [&](auto const count) {
-		if constexpr (count <= max_size) {
+		if constexpr (min_size <= count and count <= max_size) {
 			::containers::sort_exactly_n(containers::begin(r), count, compare);
 			BOUNDED_ASSERT(::containers::is_sorted(r, compare));
 		} else {
@@ -59,11 +53,8 @@ inline constexpr auto small_size_optimized_sort(Range && r, auto const compare, 
 		case 5:
 			do_sort(5_bi);
 			return;
-		case 6:
-			do_sort(6_bi);
-			return;
 		default:
-			if constexpr (max_size >= max_small_sort_size) {
+			if constexpr (max_size > 5_bi) {
 				sort_large_range(r, compare);
 				return;
 			} else {

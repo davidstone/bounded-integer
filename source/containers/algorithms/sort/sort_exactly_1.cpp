@@ -5,17 +5,31 @@
 
 export module containers.algorithms.sort.sort_exactly_1;
 
+import containers.iterator;
+
 import bounded;
+import std_module;
+
+using namespace bounded::literal;
 
 namespace containers {
 
-export constexpr auto sort_exactly_n([[maybe_unused]] auto const it, bounded::constant_t<1>, [[maybe_unused]] auto const compare) -> void {
+// Stable
+// Average compares: 0 (weight 0)
+// Max compares: 0
+// Sorted compares: 0
+// Reversed compares: 0
+export template<iterator Iterator, typename Compare>
+constexpr auto sort_exactly_n_in_place(Iterator, bounded::constant_t<1>, Compare) -> void {
 }
 
-export constexpr auto sort_exactly_n_relocate(auto it, bounded::constant_t<1>, auto const out, [[maybe_unused]] auto const compare) {
-	bounded::relocate_at(*out, *it);
-	++it;
-	return it;
+export template<typename T, typename Compare>
+constexpr auto sort_exactly_n_relocate_impl(
+	T & x0,
+	auto const out,
+	Compare
+) -> void {
+	bounded::relocate_at(*out, x0);
 }
 
 } // namespace containers
