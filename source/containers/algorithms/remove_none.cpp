@@ -150,8 +150,14 @@ private:
 	[[no_unique_address]] data_t m_data;
 };
 
+template<typename T>
+concept optional_type = requires(T value) {
+	*value;
+	value ? void() : void();
+};
+
 // This goes from range<optional<T>> to range<T>
-export template<range Range>
+export template<range Range> requires optional_type<containers::range_reference_t<Range>>
 struct remove_none {
 	constexpr explicit remove_none(Range && input):
 		m_data(OPERATORS_FORWARD(input))
