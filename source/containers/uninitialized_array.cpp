@@ -15,8 +15,6 @@ using namespace bounded::literal;
 
 namespace containers {
 
-struct empty {};
-
 export template<typename T, array_size_type<T> size_>
 struct uninitialized_array {
 	constexpr uninitialized_array() = default;
