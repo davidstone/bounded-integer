@@ -39,6 +39,17 @@ static_assert(qualifiers_are_contiguous_ranges<containers::array<int, 5_bi>>);
 static_assert(containers::is_container<containers::array<int, 0_bi>>);
 static_assert(containers::is_container<containers::array<int, 1_bi>>);
 
+static_assert(bounded::convertible_to<containers::array<int, 0_bi> const &, std::span<int const>>);
+static_assert(std::span<int const>(containers::array<int, 0_bi>()).size() == 0);
+static_assert(!bounded::convertible_to<containers::array<int, 0_bi> const &, std::span<int>>);
+static_assert(bounded::convertible_to<containers::array<int, 0_bi> &, std::span<int const>>);
+static_assert(bounded::convertible_to<containers::array<int, 0_bi> &, std::span<int>>);
+
+static_assert(bounded::convertible_to<containers::array<int, 0_bi> const &, std::span<int const, 0>>);
+static_assert(!bounded::convertible_to<containers::array<int, 0_bi> const &, std::span<int, 0>>);
+static_assert(bounded::convertible_to<containers::array<int, 0_bi> &, std::span<int const, 0>>);
+static_assert(bounded::convertible_to<containers::array<int, 0_bi> &, std::span<int, 0>>);
+
 static_assert(bounded::convertible_to<containers::array<int, 3_bi> const &, std::span<int const>>);
 static_assert(!bounded::convertible_to<containers::array<int, 3_bi> const &, std::span<int>>);
 static_assert(bounded::convertible_to<containers::array<int, 3_bi> &, std::span<int const>>);

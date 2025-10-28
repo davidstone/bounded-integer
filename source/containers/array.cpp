@@ -34,27 +34,6 @@ struct array_value_type<T> {
 	using type = T;
 };
 
-struct monostate {
-	// Cannot be a hidden friend to work around
-	// https://github.com/llvm/llvm-project/issues/123815
-	auto operator<=>(monostate const &) const & = default;
-};
-
-template<std::size_t size>
-struct array_trait {
-	template<typename T>
-	using type = T[size];
-};
-
-template<>
-struct array_trait<0> {
-	template<typename>
-	using type = monostate;
-};
-
-template<typename T, std::size_t size>
-using array_type = typename array_trait<size>::template type<T>;
-
 export template<typename T, array_size_type<T> size_, array_size_type<T>... sizes>
 struct array {
 	using value_type = typename array_value_type<T, sizes...>::type;
@@ -63,18 +42,10 @@ struct array {
 		return bounded::constant<size_>;
 	}
 	constexpr auto data() const -> value_type const * {
-		if constexpr (size() != 0) {
-			return m_value;
-		} else {
-			return nullptr;
-		}
+		return m_value;
 	}
 	constexpr auto data() -> value_type * {
-		if constexpr (size() != 0) {
-			return m_value;
-		} else {
-			return nullptr;
-		}
+		return m_value;
 	}
 
 	OPERATORS_BRACKET_SEQUENCE_RANGE_DEFINITIONS
@@ -96,7 +67,46 @@ struct array {
 
 	// Consider this private. It must be public for the class to be an
 	// aggregate
-	[[no_unique_address]] array_type<value_type, static_cast<std::size_t>(size_)> m_value;
+	c_array<value_type, static_cast<std::size_t>(size_)> m_value;
+};
+
+template<typename T, array_size_type<T> size_> requires(size_ == 0_bi)
+struct array<T, size_> {
+private:
+	struct monostate {
+		friend auto operator<=>(monostate, monostate) = default;
+	};
+public:
+	using value_type = T;
+
+	static constexpr auto size() -> bounded::constant_t<0> {
+		return 0_bi;
+	}
+	constexpr auto data() const -> value_type const * {
+		return nullptr;
+	}
+	constexpr auto data() -> value_type * {
+		return nullptr;
+	}
+
+	friend auto operator<=>(array, array) = default;
+
+	constexpr operator std::span<T const>() const {
+		return std::span<T const>(data(), 0);
+	}
+	constexpr operator std::span<T>() {
+		return std::span<T const>(data(), 0);
+	}
+	constexpr operator std::span<T const, 0>() const {
+		return std::span<T const, 0>(data(), 0);
+	}
+	constexpr operator std::span<T, 0>() {
+		return std::span<T const, 0>(data(), 0);
+	}
+
+	// Consider this private. It must be public for the class to be an
+	// aggregate
+	[[no_unique_address]] monostate m_value;
 };
 
 template<typename... Args>
