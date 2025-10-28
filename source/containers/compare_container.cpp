@@ -23,12 +23,20 @@ export struct base {
 
 } // namespace range_equality
 
+// I would like to have the comparison bases just publicly derive from
+// `range_equality::base` to reuse the code, but that causes compile times to
+// get much worse.
+
 namespace lexicographical_comparison {
 
-export struct base : range_equality::base {
+export struct base {
 	template<range T> requires bounded::ordered<range_value_t<T>>
 	friend constexpr auto operator<=>(T const & lhs, T const & rhs) {
 		return ::containers::lexicographical_compare_3way(lhs, rhs);
+	}
+	template<range T> requires bounded::equality_comparable<range_value_t<T>>
+	friend constexpr auto operator==(T const & lhs, T const & rhs) -> bool {
+		return ::containers::equal(lhs, rhs);
 	}
 };
 
@@ -36,10 +44,14 @@ export struct base : range_equality::base {
 
 namespace shortlex_comparison {
 
-export struct base : range_equality::base {
+export struct base {
 	template<range T> requires bounded::ordered<range_value_t<T>>
 	friend constexpr auto operator<=>(T const & lhs, T const & rhs) {
 		return ::containers::shortlex_compare(lhs, rhs);
+	}
+	template<range T> requires bounded::equality_comparable<range_value_t<T>>
+	friend constexpr auto operator==(T const & lhs, T const & rhs) -> bool {
+		return ::containers::equal(lhs, rhs);
 	}
 };
 
