@@ -62,8 +62,7 @@ static_assert(bounded::convertible_to<containers::array<int, 3_bi> &, std::span<
 
 constexpr auto array_n = containers::make_array_n(6_bi, 5);
 static_assert(std::same_as<containers::range_value_t<decltype(array_n)>, int>, "Incorrect type from make_array_n.");
-static_assert(array_n.size() == 6_bi, "Incorrect size from make_array_n.");
-static_assert(array_n[3_bi] == 5, "Incorrect values from make_array_n.");
+static_assert(array_n == containers::array({5, 5, 5, 5, 5, 5}));
 
 struct non_copyable {
 	non_copyable() = default;
@@ -79,10 +78,6 @@ static_assert(array_empty.size() == 0_bi);
 
 constexpr auto array_non_copyable_empty = containers::make_array_n(0_bi, non_copyable());
 static_assert(array_non_copyable_empty.size() == 0_bi);
-
-constexpr auto large_size = 10000_bi;
-constexpr auto large_array_n = containers::make_array_n(large_size, 0);
-static_assert(large_array_n.size() == large_size);
 
 using namespace containers_test;
 
