@@ -52,17 +52,17 @@ struct array {
 
 	friend auto operator<=>(array const &, array const &) = default;
 
-	constexpr operator std::span<T const>() const & requires(sizeof...(sizes) == 0) {
-		return std::span<T const>(m_value);
+	constexpr operator std::span<value_type const>() const & {
+		return std::span<value_type const>(m_value);
 	}
-	constexpr operator std::span<T>() & requires(sizeof...(sizes) == 0) {
-		return std::span<T>(m_value);
+	constexpr operator std::span<value_type>() & {
+		return std::span<value_type>(m_value);
 	}
-	constexpr operator std::span<T const, static_cast<std::size_t>(size_)>() const & requires(sizeof...(sizes) == 0) {
-		return std::span<T const, static_cast<std::size_t>(size_)>(m_value);
+	constexpr operator std::span<value_type const, static_cast<std::size_t>(size_)>() const & {
+		return std::span<value_type const, static_cast<std::size_t>(size_)>(m_value);
 	}
-	constexpr operator std::span<T, static_cast<std::size_t>(size_)>() & requires(sizeof...(sizes) == 0) {
-		return std::span<T, static_cast<std::size_t>(size_)>(m_value);
+	constexpr operator std::span<value_type, static_cast<std::size_t>(size_)>() & {
+		return std::span<value_type, static_cast<std::size_t>(size_)>(m_value);
 	}
 
 	// Consider this private. It must be public for the class to be an
