@@ -25,6 +25,11 @@ if (NOT has_parent)
 	add_subdirectory(dependencies/std_module)
 
 	add_subdirectory(dependencies/Catch2 EXCLUDE_FROM_ALL)
+	if("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang")
+		target_compile_options(Catch2 PUBLIC
+			"-Wno-c2y-extensions"
+		)
+	endif()
 
 	set(BENCHMARK_ENABLE_TESTING OFF CACHE BOOL "Disable testing benchmark.")
 	add_subdirectory(dependencies/benchmark EXCLUDE_FROM_ALL)
@@ -33,6 +38,7 @@ if (NOT has_parent)
 	if("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang")
 		target_compile_options(benchmark PUBLIC
 			"-Wno-global-constructors"
+			"-Wno-c2y-extensions"
 		)
 	endif()
 endif()
