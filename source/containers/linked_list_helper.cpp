@@ -88,7 +88,7 @@ struct list_iterator {
 	}
 	OPERATORS_ARROW_DEFINITIONS
 
-	friend auto operator<=>(list_iterator, list_iterator) = default;
+	friend auto operator==(list_iterator, list_iterator) -> bool = default;
 
 	friend constexpr auto operator+(list_iterator const it, bounded::constant_t<1>) {
 		return list_iterator<Container, Links, T>(it.m_links->next);
