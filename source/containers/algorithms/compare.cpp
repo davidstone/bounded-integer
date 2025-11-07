@@ -5,6 +5,7 @@
 
 module;
 
+#include <bounded/assert.hpp>
 #include <operators/forward.hpp>
 
 export module containers.algorithms.compare;
@@ -12,6 +13,7 @@ export module containers.algorithms.compare;
 import containers.begin_end;
 import containers.iterator;
 import containers.range;
+import containers.range_reference_t;
 import containers.sentinel_for;
 import containers.size;
 import containers.sized_range;
@@ -21,8 +23,42 @@ import std_module;
 
 namespace containers {
 
-export template<iterator InputIterator1, iterator InputIterator2>
-constexpr auto lexicographical_compare_3way(InputIterator1 first1, sentinel_for<InputIterator1> auto const last1, InputIterator2 first2, sentinel_for<InputIterator2> auto const last2, auto cmp) -> decltype(cmp(*first1, *first2)) {
+template<typename Range1, typename Range2>
+using comparison_result = std::compare_three_way_result_t<
+	containers::range_reference_t<Range1>,
+	containers::range_reference_t<Range2>
+>;
+
+export template<range Range1, range Range2, typename Compare = std::compare_three_way>
+constexpr auto lexicographical_compare_assume_same_size(
+	Range1 && range1,
+	Range2 && range2,
+	Compare cmp = std::compare_three_way()
+) -> comparison_result<Range1, Range2> {
+	if constexpr (sized_range<Range1> and sized_range<Range2>) {
+		BOUNDED_ASSERT(::containers::size(range1) == ::containers::size(range2));
+	}
+	auto const last1 = containers::end(OPERATORS_FORWARD(range1));
+	auto first1 = containers::begin(OPERATORS_FORWARD(range1));
+	auto first2 = containers::begin(OPERATORS_FORWARD(range2));
+	for (; first1 != last1; ++first1, ++first2) {
+		if (auto const result = cmp(*first1, *first2); result != 0) {
+			return result;
+		}
+	}
+	return std::strong_ordering::equal;
+}
+
+export template<range Range1, range Range2, typename Compare = std::compare_three_way>
+constexpr auto lexicographical_compare(
+	Range1 && range1,
+	Range2 && range2,
+	Compare cmp = std::compare_three_way()
+) -> comparison_result<Range1, Range2> {
+	auto const last1 = containers::end(OPERATORS_FORWARD(range1));
+	auto first1 = containers::begin(OPERATORS_FORWARD(range1));
+	auto const last2 = containers::end(OPERATORS_FORWARD(range2));
+	auto first2 = containers::begin(OPERATORS_FORWARD(range2));
 	for (; first1 != last1 and first2 != last2; ++first1, ++first2) {
 		if (auto const result = cmp(*first1, *first2); result != 0) {
 			return result;
@@ -34,113 +70,37 @@ constexpr auto lexicographical_compare_3way(InputIterator1 first1, sentinel_for<
 		std::strong_ordering::equal;
 }
 
-export constexpr auto lexicographical_compare_3way(range auto && range1, range auto && range2, auto cmp) {
-	return ::containers::lexicographical_compare_3way(
-		containers::begin(OPERATORS_FORWARD(range1)),
-		containers::end(OPERATORS_FORWARD(range1)),
-		containers::begin(OPERATORS_FORWARD(range2)),
-		containers::end(OPERATORS_FORWARD(range2)),
-		std::move(cmp)
-	);
-}
-
-
-export template<iterator InputIterator1, iterator InputIterator2>
-constexpr auto lexicographical_compare_3way(InputIterator1 first1, sentinel_for<InputIterator1> auto last1, InputIterator2 first2, sentinel_for<InputIterator2> auto last2) {
-	return ::containers::lexicographical_compare_3way(
-		std::move(first1),
-		std::move(last1),
-		std::move(first2),
-		std::move(last2),
-		std::compare_three_way()
-	);
-}
-
-export constexpr auto lexicographical_compare_3way(range auto && range1, range auto && range2) {
-	return ::containers::lexicographical_compare_3way(
-		OPERATORS_FORWARD(range1),
-		OPERATORS_FORWARD(range2),
-		std::compare_three_way()
-	);
-}
-
-
-export template<iterator InputIterator1, iterator InputIterator2>
-constexpr auto lexicographical_compare_3way(InputIterator1 first1, sentinel_for<InputIterator1> auto const last1, InputIterator2 first2, auto cmp) requires(!sentinel_for<decltype(cmp), InputIterator2>) {
-	for (; first1 != last1; ++first1, ++first2) {
-		if (auto const result = cmp(*first1, *first2); result != 0) {
-			return result;
-		}
-	}
-	return std::strong_ordering::equal;
-}
-
-export template<iterator InputIterator1>
-constexpr auto lexicographical_compare_3way(InputIterator1 first1, sentinel_for<InputIterator1> auto last1, iterator auto first2) {
-	return ::containers::lexicographical_compare_3way(
-		std::move(first1),
-		std::move(last1),
-		std::move(first2),
-		std::compare_three_way()
-	);
-}
-
-
-
 // Shorter ranges compare less than longer ranges. Ranges of the same length
 // compare lexicographically.
-export constexpr auto shortlex_compare(sized_range auto && range1, sized_range auto && range2, auto cmp) {
+export template<sized_range Range1, sized_range Range2, typename Compare = std::compare_three_way>
+constexpr auto shortlex_compare(
+	Range1 && range1,
+	Range2 && range2,
+	Compare cmp = std::compare_three_way()
+) -> comparison_result<Range1, Range2> {
 	if (auto const result = ::containers::size(range1) <=> ::containers::size(range2); result != 0) {
 		return result;
 	}
-	return ::containers::lexicographical_compare_3way(
-		::containers::begin(OPERATORS_FORWARD(range1)),
-		::containers::end(OPERATORS_FORWARD(range1)),
-		::containers::begin(OPERATORS_FORWARD(range2)),
+	return ::containers::lexicographical_compare_assume_same_size(
+		OPERATORS_FORWARD(range1),
+		OPERATORS_FORWARD(range2),
 		std::move(cmp)
 	);
 }
 
-export constexpr auto shortlex_compare(sized_range auto && range1, sized_range auto && range2) {
-	return ::containers::shortlex_compare(
-		OPERATORS_FORWARD(range1),
-		OPERATORS_FORWARD(range2),
-		std::compare_three_way()
-	);
-}
 
-
-
-
-
-
-
-
-
-export template<iterator InputIterator1, iterator InputIterator2>
-constexpr auto equal(InputIterator1 first1, sentinel_for<InputIterator1> auto const last1, InputIterator2 first2, sentinel_for<InputIterator2> auto const last2, auto cmp) {
-	for (; first1 != last1 and first2 != last2; ++first1, ++first2) {
-		if (!cmp(*first1, *first2)) {
-			return false;
-		}
+export template<range Range1, range Range2, typename Compare = std::equal_to<>>
+constexpr auto equal_assume_same_size(
+	Range1 && range1,
+	Range2 && range2,
+	Compare cmp = std::equal_to()
+) -> bool {
+	if constexpr (sized_range<Range1> and sized_range<Range2>) {
+		BOUNDED_ASSERT(::containers::size(range1) == ::containers::size(range2));
 	}
-	return first1 == last1 and first2 == last2;
-}
-
-
-export template<iterator InputIterator1, iterator InputIterator2>
-constexpr auto equal(InputIterator1 first1, sentinel_for<InputIterator1> auto last1, InputIterator2 first2, sentinel_for<InputIterator2> auto last2) {
-	return ::containers::equal(
-		std::move(first1),
-		std::move(last1),
-		std::move(first2),
-		std::move(last2),
-		bounded::equal_to()
-	);
-}
-
-export template<iterator InputIterator1, iterator InputIterator2>
-constexpr auto equal(InputIterator1 first1, sentinel_for<InputIterator1> auto const last1, InputIterator2 first2, auto cmp) requires(!sentinel_for<decltype(cmp), InputIterator2>) {
+	auto const last1 = containers::end(OPERATORS_FORWARD(range1));
+	auto first1 = containers::begin(OPERATORS_FORWARD(range1));
+	auto first2 = containers::begin(OPERATORS_FORWARD(range2));
 	for (; first1 != last1; ++first1, ++first2) {
 		if (!cmp(*first1, *first2)) {
 			return false;
@@ -149,45 +109,33 @@ constexpr auto equal(InputIterator1 first1, sentinel_for<InputIterator1> auto co
 	return true;
 }
 
-export template<iterator InputIterator1, iterator InputIterator2>
-constexpr auto equal(InputIterator1 first1, sentinel_for<InputIterator1> auto last1, InputIterator2 first2) {
-	return ::containers::equal(
-		std::move(first1),
-		std::move(last1),
-		std::move(first2),
-		bounded::equal_to()
-	);
-}
 
-export template<range Range1, range Range2>
-constexpr auto equal(Range1 && range1, Range2 && range2, auto cmp) {
+export template<range Range1, range Range2, typename Compare = std::equal_to<>>
+constexpr auto equal(
+	Range1 && range1,
+	Range2 && range2,
+	Compare cmp = std::equal_to()
+) -> bool {
 	if constexpr (sized_range<Range1> and sized_range<Range2>) {
 		return
 			::containers::size(range1) == ::containers::size(range2) and
-			::containers::equal(
-				containers::begin(OPERATORS_FORWARD(range1)),
-				containers::end(OPERATORS_FORWARD(range1)),
-				containers::begin(OPERATORS_FORWARD(range2)),
+			::containers::equal_assume_same_size(
+				OPERATORS_FORWARD(range1),
+				OPERATORS_FORWARD(range2),
 				std::move(cmp)
 			);
 	} else {
-		return ::containers::equal(
-			containers::begin(OPERATORS_FORWARD(range1)),
-			containers::end(OPERATORS_FORWARD(range1)),
-			containers::begin(OPERATORS_FORWARD(range2)),
-			containers::end(OPERATORS_FORWARD(range2)),
-			std::move(cmp)
-		);
+		auto const last1 = containers::end(OPERATORS_FORWARD(range1));
+		auto first1 = containers::begin(OPERATORS_FORWARD(range1));
+		auto const last2 = containers::end(OPERATORS_FORWARD(range2));
+		auto first2 = containers::begin(OPERATORS_FORWARD(range2));
+		for (; first1 != last1 and first2 != last2; ++first1, ++first2) {
+			if (!cmp(*first1, *first2)) {
+				return false;
+			}
+		}
+		return first1 == last1 and first2 == last2;
 	}
-}
-
-export template<range Range1, range Range2>
-constexpr auto equal(Range1 && range1, Range2 && range2) {
-	return ::containers::equal(
-		OPERATORS_FORWARD(range1),
-		OPERATORS_FORWARD(range2),
-		bounded::equal_to()
-	);
 }
 
 } // namespace containers

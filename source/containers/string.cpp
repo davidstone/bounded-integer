@@ -68,7 +68,7 @@ public:
 	}
 
 	friend constexpr auto operator<=>(string const & lhs, std::string_view const rhs) {
-		return ::containers::lexicographical_compare_3way(lhs, rhs);
+		return ::containers::lexicographical_compare(lhs, rhs);
 	}
 	friend constexpr auto operator==(string const & lhs, std::string_view const rhs) -> bool {
 		return ::containers::equal(lhs, rhs);

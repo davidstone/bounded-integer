@@ -32,7 +32,7 @@ namespace lexicographical_comparison {
 export struct base {
 	template<range T> requires bounded::ordered<range_value_t<T>>
 	friend constexpr auto operator<=>(T const & lhs, T const & rhs) {
-		return ::containers::lexicographical_compare_3way(lhs, rhs);
+		return ::containers::lexicographical_compare(lhs, rhs);
 	}
 	template<range T> requires bounded::equality_comparable<range_value_t<T>>
 	friend constexpr auto operator==(T const & lhs, T const & rhs) -> bool {
