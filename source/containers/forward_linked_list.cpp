@@ -85,11 +85,8 @@ struct [[clang::trivial_abi]] forward_linked_list trivially_relocatable_if_eligi
 	constexpr auto before_begin() -> iterator {
 		return iterator(std::addressof(m_sentinel));
 	}
-	constexpr auto end() const -> const_iterator {
-		return const_iterator(nullptr);
-	}
-	constexpr auto end() -> iterator {
-		return iterator(nullptr);
+	static constexpr auto end() -> std::default_sentinel_t {
+		return std::default_sentinel;
 	}
 
 	constexpr auto mutable_iterator(const_iterator const it) & -> iterator {
