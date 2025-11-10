@@ -18,6 +18,7 @@ import containers.is_container;
 import containers.iterator;
 import containers.linear_size;
 import containers.range_value_t;
+import containers.sentinel_t;
 
 import bounded;
 import std_module;
@@ -58,7 +59,9 @@ constexpr auto test_sequence_container_default_constructed_empty() -> bool {
 	BOUNDED_ASSERT(containers::begin(default_constructed) == containers::begin(default_constructed));
 	BOUNDED_ASSERT(containers::begin(default_constructed) == containers::end(default_constructed));
 	BOUNDED_ASSERT(containers::end(default_constructed) == containers::begin(default_constructed));
-	BOUNDED_ASSERT(containers::end(default_constructed) == containers::end(default_constructed));
+	if constexpr (bounded::equality_comparable<containers::sentinel_t<Container>>) {
+		BOUNDED_ASSERT(containers::end(default_constructed) == containers::end(default_constructed));
+	}
 	BOUNDED_ASSERT(containers::linear_size(default_constructed) == 0_bi);
 	BOUNDED_ASSERT(default_constructed == default_constructed);
 	BOUNDED_ASSERT(default_constructed == Container());
