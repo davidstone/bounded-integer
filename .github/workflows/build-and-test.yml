@@ -11,6 +11,18 @@ on:
 
 jobs:
   build:
+    if: github.event_name != 'schedule'
+    strategy:
+      matrix:
+        clang_version: [ 'main', '22' ]
     runs-on: ubuntu-latest
     steps:
-    - uses: davidstone/cmake_strict_defaults@main
+      - uses: davidstone/cmake_strict_defaults@main
+        with:
+          clang_version: ${{ matrix.clang_version }}
+
+  nightly:
+    if: github.event_name == 'schedule'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: davidstone/cmake_strict_defaults@main
