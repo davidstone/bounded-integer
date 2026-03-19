@@ -65,7 +65,7 @@ private:
 	[[no_unique_address]] stored_function<Function> m_generator;
 };
 
-export template<std::invocable Function, bounded::invocable_r<bool> UntilFunction>
+export template<std::invocable Function, typename UntilFunction> requires bounded::invocable_r<UntilFunction const &, bool>
 struct generate_until {
 	constexpr generate_until(Function generator, UntilFunction until):
 		m_generator(std::move(generator)),
@@ -79,10 +79,7 @@ struct generate_until {
 	constexpr auto begin() {
 		return generate_until_iterator(m_generator);
 	}
-	constexpr auto end() const requires std::invocable<UntilFunction const &> {
-		return generate_until_sentinel(m_until);
-	}
-	constexpr auto end() {
+	constexpr auto end() const {
 		return generate_until_sentinel(m_until);
 	}
 private:
