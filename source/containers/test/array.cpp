@@ -25,7 +25,10 @@ static_assert(a.size() == size, "Incorrect size.");
 static_assert(a[0_bi] == 0, "Incorrect value.");
 
 static_assert(std::is_standard_layout_v<containers::array<int, 0_bi>>);
-static_assert(std::is_trivial_v<containers::array<int, 0_bi>>);
+static_assert(std::is_trivially_default_constructible_v<containers::array<int, 0_bi>>);
+static_assert(std::is_trivially_copyable_v<containers::array<int, 0_bi>>);
+static_assert(std::is_trivially_copy_assignable_v<containers::array<int, 0_bi>>);
+static_assert(std::is_trivially_destructible_v<containers::array<int, 0_bi>>);
 static_assert(std::is_empty_v<containers::array<int, 0_bi>>);
 
 template<typename T>

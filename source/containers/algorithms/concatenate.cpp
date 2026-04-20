@@ -86,9 +86,15 @@ constexpr auto ugly_size_hack(Size const size) {
 }
 
 template<typename Container>
+concept can_reuse_storage_without_set_size =
+	std::is_trivially_default_constructible_v<range_value_t<Container>> and
+	std::is_trivially_copyable_v<range_value_t<Container>> and
+	resizable_container<Container>;
+
+template<typename Container>
 concept can_reuse_storage =
 	can_set_size<Container> or
-	(std::is_trivial_v<range_value_t<Container>> and resizable_container<Container>);
+	can_reuse_storage_without_set_size<Container>;
 
 template<typename Container>
 constexpr auto move_existing_data_to_final_position(Container & container, auto const before_size) {
@@ -98,7 +104,7 @@ constexpr auto move_existing_data_to_final_position(Container & container, auto 
 		::containers::uninitialized_relocate(containers::reversed(container), containers::reverse_iterator(new_begin + ::containers::size(container)));
 		container.set_size(containers::size(container) + before_size);
 	} else {
-		static_assert(std::is_trivial_v<range_value_t<Container>> and resizable_container<Container>);
+		static_assert(can_reuse_storage_without_set_size<Container>);
 		using difference_type = iter_difference_t<iterator_t<Container &>>;
 		auto const original_size = bounded::integer(::containers::size(container));
 		auto const new_size = original_size + before_size;
