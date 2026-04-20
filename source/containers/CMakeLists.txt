@@ -263,6 +263,7 @@ target_sources(containers_test PRIVATE
 		test/lazy_push_back_into_capacity.cpp
 		test/lazy_push_front.cpp
 		test/linear_map.cpp
+		test/lookup.cpp
 		test/pop_back.cpp
 		test/push_back.cpp
 		test/push_back_into_capacity.cpp
