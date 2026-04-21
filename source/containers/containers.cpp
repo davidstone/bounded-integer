@@ -131,4 +131,5 @@ export import containers.to_address;
 export import containers.to_string;
 export import containers.trivial_inplace_function;
 export import containers.uninitialized_array;
+export import containers.uninitialized_dynamic_array;
 export import containers.vector;
