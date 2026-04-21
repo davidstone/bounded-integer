@@ -44,7 +44,7 @@ struct [[clang::trivial_abi]] bounded_vector : private lexicographical_compariso
 	using size_type = bounded::integer<0, bounded::normalize<max_capacity>>;
 
 	template<typename Capacity>
-	constexpr bounded_vector(reserve_space_for<Capacity> const capacity_):
+	constexpr explicit bounded_vector(reserve_space_for<Capacity> const capacity_):
 		m_storage(capacity_.value),
 		m_size(0_bi)
 	{
