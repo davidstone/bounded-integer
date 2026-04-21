@@ -38,6 +38,11 @@ constexpr auto maybe_reserve(Target & target, Source const & source) {
 	}
 }
 
+template<typename Target, typename Source>
+concept can_append_range = requires(Target & target, Source && source) {
+	target.append_range(OPERATORS_FORWARD(source));
+};
+
 export template<typename Target, typename Source>
 constexpr auto legacy_append(Target & target, Source && source) -> void {
 	constexpr auto sufficiently_trivial = bounded::trivially_move_assignable<range_value_t<Target>>;
@@ -55,7 +60,9 @@ constexpr auto legacy_append(Target & target, Source && source) -> void {
 			maybe_legacy_iterator(containers::end(t))
 		);
 	};
-	if constexpr (sufficiently_trivial and has_member_insert) {
+	if constexpr (can_append_range<Target, Source>) {
+		target.append_range(OPERATORS_FORWARD(source));
+	} else if constexpr (sufficiently_trivial and has_member_insert) {
 		decltype(auto) t = transformed();
 		target.insert(
 			containers::end(target),
