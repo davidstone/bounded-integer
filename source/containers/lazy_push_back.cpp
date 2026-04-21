@@ -49,7 +49,7 @@ constexpr auto lazy_push_back(
 			return ::containers::lazy_push_back_into_capacity(container, OPERATORS_FORWARD(constructor));
 		} else if constexpr (reservable<Container>) {
 			auto temp = Container();
-			temp.reserve(::containers::reallocation_size(container.capacity(), initial_size, 1_bi));
+			temp.reserve(::containers::reallocation_size(container.capacity(), 1_bi));
 
 			bounded::construct_at(*(containers::begin(temp) + initial_size), OPERATORS_FORWARD(constructor));
 

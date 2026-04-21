@@ -44,7 +44,10 @@ constexpr auto append_impl(Target & target, Source && source) -> void {
 			containers::uninitialized_copy_no_overlap(OPERATORS_FORWARD(source), containers::end(target));
 		} else {
 			auto new_target = Target();
-			new_target.reserve(::containers::reallocation_size(target.capacity(), original_size, source_size));
+			new_target.reserve(::containers::reallocation_size(
+				target.capacity(),
+				bounded::integer(new_size)
+			));
 			containers::uninitialized_copy_no_overlap(OPERATORS_FORWARD(source), containers::begin(new_target) + original_size);
 			containers::uninitialized_relocate_no_overlap(target, containers::begin(new_target));
 			target.set_size(0_bi);

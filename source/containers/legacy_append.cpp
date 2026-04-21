@@ -31,8 +31,9 @@ constexpr auto maybe_reserve(Target & target, Source const & source) {
 	if constexpr (size_then_use_range<Source> and reservable<Target>) {
 		auto const source_size = ::containers::get_source_size<Target>(source);
 		auto const current_size = ::containers::linear_size(target);
-		if (current_size + source_size > target.capacity()) {
-			target.reserve(::containers::reallocation_size(target.capacity(), current_size, source_size));
+		auto const combined_size = bounded::integer(current_size) + bounded::integer(source_size);
+		if (combined_size > target.capacity()) {
+			target.reserve(::containers::reallocation_size(target.capacity(), combined_size));
 		}
 	}
 }

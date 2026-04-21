@@ -63,8 +63,12 @@ constexpr auto insert_with_reallocation(Container & container, iterator_t<Contai
 	// There is a reallocation required, so just put everything in the
 	// correct place to begin with
 	auto const original_size = containers::size(container);
+	auto const new_size = original_size + number_of_elements;
 	auto temp = Container();
-	temp.reserve(::containers::reallocation_size(container.capacity(), original_size, number_of_elements));
+	temp.reserve(::containers::reallocation_size(
+		container.capacity(),
+		bounded::integer(new_size)
+	));
 	// First construct the new element because the arguments to
 	// construct it may reference an old element. We cannot move
 	// elements it references before constructing it
@@ -82,7 +86,7 @@ constexpr auto insert_with_reallocation(Container & container, iterator_t<Contai
 		it + ::bounded::assume_in_range<offset_type<iterator_t<Container &>>>(number_of_elements)
 	);
 	container.set_size(0_bi);
-	temp.set_size(original_size + number_of_elements);
+	temp.set_size(new_size);
 	container = std::move(temp);
 	return containers::begin(container) + offset;
 }
