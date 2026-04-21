@@ -89,6 +89,7 @@ export import containers.is_empty;
 export import containers.iter_difference_t;
 export import containers.iter_reference_t;
 export import containers.iter_value_t;
+export import containers.iterator;
 export import containers.iterator_t;
 export import containers.iterator_to_sentinel;
 export import containers.lazy_push_back;
