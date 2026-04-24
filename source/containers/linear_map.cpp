@@ -124,6 +124,9 @@ struct basic_linear_map : private lexicographical_comparison::base {
 	constexpr auto capacity() const {
 		return m_container.capacity();
 	}
+	constexpr auto replace_empty_allocation(range_size_t<Container> const new_capacity) {
+		return m_container.replace_empty_allocation(new_capacity);
+	}
 	constexpr auto reserve(range_size_t<Container> const new_capacity) {
 		return m_container.reserve(new_capacity);
 	}
