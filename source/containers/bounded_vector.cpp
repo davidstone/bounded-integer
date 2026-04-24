@@ -165,7 +165,7 @@ struct [[clang::trivial_abi]] bounded_vector : private lexicographical_compariso
 		BOUNDED_ASSERT(size() == 0_bi);
 		m_storage.replace_allocation(reservation_size(requested_capacity));
 	}
-	constexpr auto reserve(size_type const requested_capacity) -> void {
+	constexpr auto reserve(size_type const requested_capacity) -> void requires(min_capacity != max_capacity) {
 		if (requested_capacity <= capacity()) {
 			return;
 		}
