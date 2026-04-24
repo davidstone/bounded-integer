@@ -15,13 +15,13 @@ import containers.begin_end;
 import containers.c_array;
 import containers.can_set_size;
 import containers.get_source_size;
+import containers.exponential_force_reserve;
 import containers.lazy_push_back;
 import containers.legacy_append;
 import containers.push_back;
 import containers.range;
 import containers.range_size_t;
 import containers.range_value_t;
-import containers.reallocation_size;
 import containers.reservable;
 import containers.size;
 import containers.size_then_use_range;
@@ -44,10 +44,7 @@ constexpr auto append_impl(Target & target, Source && source) -> void {
 			containers::uninitialized_copy_no_overlap(OPERATORS_FORWARD(source), containers::end(target));
 		} else {
 			auto new_target = Target();
-			new_target.reserve(::containers::reallocation_size(
-				target.capacity(),
-				bounded::integer(new_size)
-			));
+			containers::exponential_force_reserve(new_target, target.capacity(), bounded::integer(new_size));
 			containers::uninitialized_copy_no_overlap(OPERATORS_FORWARD(source), containers::begin(new_target) + original_size);
 			containers::uninitialized_relocate_no_overlap(target, containers::begin(new_target));
 			target.set_size(0_bi);

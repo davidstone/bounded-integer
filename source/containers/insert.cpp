@@ -18,13 +18,13 @@ import containers.algorithms.uninitialized;
 import containers.begin_end;
 import containers.count_type;
 import containers.data;
+import containers.exponential_force_reserve;
 import containers.iterator_t;
 import containers.linear_size;
 import containers.mutable_iterator;
 import containers.offset_type;
 import containers.range;
 import containers.range_value_t;
-import containers.reallocation_size;
 import containers.reservable;
 import containers.resizable_container;
 import containers.size;
@@ -65,10 +65,7 @@ constexpr auto insert_with_reallocation(Container & container, iterator_t<Contai
 	auto const original_size = containers::size(container);
 	auto const new_size = original_size + number_of_elements;
 	auto temp = Container();
-	temp.reserve(::containers::reallocation_size(
-		container.capacity(),
-		bounded::integer(new_size)
-	));
+	containers::exponential_force_reserve(temp, container.capacity(), bounded::integer(new_size));
 	// First construct the new element because the arguments to
 	// construct it may reference an old element. We cannot move
 	// elements it references before constructing it

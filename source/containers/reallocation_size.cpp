@@ -16,18 +16,16 @@ namespace containers {
 // container, but can also be a constant when that's known to be safe. If
 // `minimum_acceptable_capacity` is at least `1`, the returned value will be
 // greater than `current_capacity` by some constant factor and by at least `1`.
-export template<typename Capacity>
+export template<typename Capacity, bounded::bounded_integer NewCapacity>
+	requires(numeric_traits::min_value<NewCapacity> >= 1_bi)
 constexpr auto reallocation_size(
 	Capacity const current_capacity,
-	bounded::bounded_integer auto const minimum_acceptable_capacity
+	NewCapacity const minimum_acceptable_capacity
 ) {
-	return ::bounded::assume_in_range<Capacity>(bounded::max(
+	return bounded::max(
 		minimum_acceptable_capacity,
-		bounded::min(
-			bounded::integer(current_capacity) * 2_bi,
-			bounded::constant<numeric_traits::max_value<Capacity>>
-		)
-	));
+		bounded::integer(current_capacity) * 2_bi
+	);
 }
 
 } // namespace containers

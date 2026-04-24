@@ -13,11 +13,11 @@ import containers.algorithms.copy_or_relocate_from;
 import containers.algorithms.transform;
 import containers.begin_end;
 import containers.get_source_size;
+import containers.exponential_force_reserve;
 import containers.is_container;
 import containers.legacy_iterator;
 import containers.linear_size;
 import containers.range_value_t;
-import containers.reallocation_size;
 import containers.reservable;
 import containers.size_then_use_range;
 
@@ -33,7 +33,7 @@ constexpr auto maybe_reserve(Target & target, Source const & source) {
 		auto const current_size = ::containers::linear_size(target);
 		auto const combined_size = bounded::integer(current_size) + bounded::integer(source_size);
 		if (combined_size > target.capacity()) {
-			target.reserve(::containers::reallocation_size(target.capacity(), combined_size));
+			containers::exponential_force_reserve(target, target.capacity(), combined_size);
 		}
 	}
 }

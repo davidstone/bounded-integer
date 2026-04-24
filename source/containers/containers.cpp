@@ -74,6 +74,7 @@ export import containers.data;
 export import containers.dynamic_array;
 export import containers.emplace_back;
 export import containers.emplace_back_into_capacity;
+export import containers.exponential_force_reserve;
 export import containers.flat_map;
 export import containers.forward_iterator;
 export import containers.forward_random_access_iterator;

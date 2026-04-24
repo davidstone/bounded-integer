@@ -112,6 +112,7 @@ target_sources(containers PUBLIC
 		emplace_back_into_capacity.cpp
 		emplace_front.cpp
 		erase_concepts.cpp
+		exponential_force_reserve.cpp
 		extract_key_to_less.cpp
 		flat_map.cpp
 		forward_iterator.cpp
