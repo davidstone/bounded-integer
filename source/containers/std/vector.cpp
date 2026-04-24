@@ -317,6 +317,10 @@ struct vector {
 		m_impl.set_size(new_size);
 	}
 
+	constexpr auto replace_empty_allocation(size_type const requested_capacity) -> void {
+		m_impl.replace_empty_allocation(bounded::check_in_range<containers::range_size_t<impl_t>, std::length_error>(bounded::integer(requested_capacity)));
+	}
+
 	constexpr auto push_back_into_capacity(T const & value) -> void {
 		containers::push_back_into_capacity(m_impl, value);
 	}
