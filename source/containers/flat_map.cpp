@@ -227,6 +227,9 @@ struct flat_map_base : private lexicographical_comparison::base {
 	constexpr auto capacity() const {
 		return m_container.capacity();
 	}
+	constexpr auto replace_empty_allocation(range_size_t<Container> const requested_capacity) {
+		return m_container.replace_empty_allocation(requested_capacity);
+	}
 	constexpr auto reserve(range_size_t<Container> const new_capacity) {
 		return m_container.reserve(new_capacity);
 	}
@@ -304,6 +307,7 @@ public:
 	using base::size;
 
 	using base::capacity;
+	using base::replace_empty_allocation;
 	using base::reserve;
 	
 	using base::lazy_insert;
@@ -375,6 +379,7 @@ public:
 	using base::size;
 
 	using base::capacity;
+	using base::replace_empty_allocation;
 	using base::reserve;
 	
 	using base::lazy_insert;
