@@ -53,6 +53,7 @@ public:
 	using base::operator[];
 	
 	using base::capacity;
+	using base::replace_empty_allocation;
 	using base::reserve;
 	
 	using base::set_size;
