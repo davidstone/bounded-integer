@@ -56,9 +56,16 @@ constexpr auto lazy_push_back(
 			containers::uninitialized_relocate_no_overlap(container, containers::begin(temp));
 			container.set_size(0_bi);
 
-			temp.set_size(initial_size + 1_bi);
-
 			container = std::move(temp);
+			// TODO: We need to document what operations we can perform on a
+			// container that has an incorrect size. Here we assume that move
+			// assignment is valid on a container that has allocated storage.
+			// This works for all of the container types in this library, but is
+			// it true in general? Having `set_size` be the last thing here
+			// allows the optimizer to greatly reduce code size thanks to
+			// sharing some parts between the allocate and non-allocating
+			// sections.
+			container.set_size(initial_size + 1_bi);
 		} else {
 			throw std::bad_alloc();
 		}
