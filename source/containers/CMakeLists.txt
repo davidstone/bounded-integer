@@ -270,6 +270,7 @@ target_sources(containers_test PRIVATE
 		test/push_back.cpp
 		test/push_back_into_capacity.cpp
 		test/push_front.cpp
+		test/resize.cpp
 		test/shrink_to_fit.cpp
 		test/stable_vector.cpp
 		test/subrange.cpp
