@@ -60,8 +60,8 @@ constexpr auto legacy_append(Target & target, Source && source) -> void {
 			maybe_legacy_iterator(containers::end(t))
 		);
 	};
-	if constexpr (can_append_range<Target, Source>) {
-		target.append_range(OPERATORS_FORWARD(source));
+	if constexpr (can_append_range<Target, decltype(transformed())>) {
+		target.append_range(transformed());
 	} else if constexpr (sufficiently_trivial and has_member_insert) {
 		decltype(auto) t = transformed();
 		target.insert(
