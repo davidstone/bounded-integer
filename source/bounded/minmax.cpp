@@ -38,8 +38,22 @@ struct extreme_value {
 	}
 };
 
-// TODO: This should be selected only for less and greater
-template<typename Compare, bounded_integer LHS, bounded_integer RHS>
+template<typename Compare>
+constexpr auto is_less = false;
+
+template<typename T>
+constexpr auto is_less<std::less<T>> = true;
+
+template<typename Compare>
+constexpr auto is_greater = false;
+
+template<typename T>
+constexpr auto is_greater<std::greater<T>> = true;
+
+template<typename Compare>
+concept less_or_greater = is_less<Compare> or is_greater<Compare>;
+
+template<less_or_greater Compare, bounded_integer LHS, bounded_integer RHS>
 struct extreme_value<Compare, LHS, RHS> {
 	static constexpr decltype(auto) operator()(Compare const compare, LHS && lhs, RHS && rhs) {
 		constexpr auto select = [](auto const lhs_, auto const rhs_) {
