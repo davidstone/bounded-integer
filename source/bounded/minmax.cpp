@@ -9,8 +9,8 @@ module;
 
 export module bounded.minmax;
 
-import bounded.add_common_cv_reference;
 import bounded.bounded_integer;
+import bounded.common_type_and_value_category;
 import bounded.comparison;
 import bounded.comparison_function_object;
 import bounded.concepts;
@@ -31,7 +31,7 @@ namespace bounded {
 export template<typename Compare, typename LHS, typename RHS>
 struct extreme_value {
 	static constexpr decltype(auto) operator()(Compare const compare, LHS && lhs, RHS && rhs) {
-		using result_t = add_common_cv_reference<std::common_type_t<LHS, RHS>, LHS, RHS>;
+		using result_t = common_type_and_value_category<LHS, RHS>;
 		return compare(rhs, lhs) ?
 			static_cast<result_t>(OPERATORS_FORWARD(rhs)) :
 			static_cast<result_t>(OPERATORS_FORWARD(lhs));

@@ -5,47 +5,105 @@
 
 export module bounded.common_type_and_value_category;
 
-import bounded.add_common_cv_reference;
-
 import std_module;
 
 namespace bounded {
 
-template<typename... Ts>
-struct common_type_and_value_category_impl;
+template<typename Target, typename... Sources>
+using common_const = std::conditional_t<(... or std::is_const_v<Sources>), Target const, Target>;
+template<typename Target, typename... Sources>
+using common_volatile = std::conditional_t<(... or std::is_volatile_v<Sources>), Target volatile, Target>;
+template<typename Target, typename... Sources>
+using common_cv = common_volatile<common_const<Target, Sources...>, Sources...>;
+
+template<typename Target, typename... Ts>
+struct add_common_cv_reference_impl {
+private:
+	using target_cv = common_cv<Target, std::remove_reference_t<Ts>...>;
+	static constexpr auto same_base_type = (... and std::same_as<Target, std::decay_t<Ts>>);
+	static constexpr auto all_rvalue_references = (... and std::is_rvalue_reference_v<Ts>);
+	static constexpr auto all_lvalue_references = (... and std::is_lvalue_reference_v<Ts>);
+public:
+	// This isn't perfect. A type could have a perfectly safe conversion to a
+	// reference type defined, and this will still select the fallback prvalue
+	// option. However, it should be safe in every case while still being
+	// straightforward.
+	using type =
+		std::conditional_t<same_base_type and all_rvalue_references, std::add_rvalue_reference_t<target_cv>,
+		std::conditional_t<same_base_type and all_lvalue_references, std::add_lvalue_reference_t<target_cv>,
+		Target
+	>>;
+};
+
+export template<typename Target, typename... Ts>
+using add_common_cv_reference = typename add_common_cv_reference_impl<Target, Ts...>::type;
 
 export template<typename... Ts>
-using common_type_and_value_category = typename common_type_and_value_category_impl<Ts...>::type;
-
-template<typename T0>
-struct common_type_and_value_category_impl<T0> {
-	using type = std::decay_t<T0>;
-};
-
-template<typename T0, typename T1>
-struct common_type_and_value_category_impl<T0, T1> {
-	using type = std::remove_cv_t<
-		add_common_cv_reference<
-			std::common_type_t<std::decay_t<T0>, std::decay_t<T1>>,
-			T0,
-			T1
-		>
-	>;
-};
-
-template<>
-struct common_type_and_value_category_impl<void, void> {
-	using type = void;
-};
-
-template<typename T0, typename T1, typename... Ts>
-struct common_type_and_value_category_impl<T0, T1, Ts...> {
-	using type = common_type_and_value_category<common_type_and_value_category<T0, T1>, Ts...>;
-};
+using common_type_and_value_category = add_common_cv_reference<std::common_type_t<Ts...>, Ts...>;
 
 } // namespace bounded
 
-namespace {
+
+static_assert(std::same_as<
+	bounded::common_cv<int>,
+	int
+>);
+
+static_assert(std::same_as<
+	bounded::common_cv<int, int>,
+	int
+>);
+
+static_assert(std::same_as<
+	bounded::common_cv<int, int const>,
+	int const
+>);
+
+static_assert(std::same_as<
+	bounded::common_cv<int, int volatile>,
+	int volatile
+>);
+
+static_assert(std::same_as<
+	bounded::common_cv<int, int const volatile>,
+	int const volatile
+>);
+
+static_assert(std::same_as<
+	bounded::common_cv<int, int, int>,
+	int
+>);
+
+static_assert(std::same_as<
+	bounded::common_cv<int, int const, int>,
+	int const
+>);
+
+static_assert(std::same_as<
+	bounded::common_cv<int, int const, int volatile>,
+	int const volatile
+>);
+
+static_assert(std::same_as<
+	bounded::common_cv<int, int const, int const>,
+	int const
+>);
+
+static_assert(std::same_as<
+	bounded::common_cv<int, int const volatile, int>,
+	int const volatile
+>);
+
+static_assert(std::same_as<
+	bounded::common_cv<int, int, int const volatile>,
+	int const volatile
+>);
+
+static_assert(std::same_as<
+	bounded::common_cv<long, int const, int>,
+	long const
+>);
+
 
 static_assert(std::same_as<
 	bounded::common_type_and_value_category<int>,
@@ -224,5 +282,3 @@ static_assert(std::same_as<
 	bounded::common_type_and_value_category<int, int, int>,
 	int
 >);
-
-}	// namespace

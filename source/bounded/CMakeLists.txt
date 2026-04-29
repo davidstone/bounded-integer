@@ -43,7 +43,6 @@ target_sources(bounded PUBLIC
 		arithmetic/unary_minus.cpp
 		arithmetic/unary_plus.cpp
 		abs.cpp
-		add_common_cv_reference.cpp
 		bounded.cpp
 		bounded_integer.cpp
 		builtin_integer.cpp
