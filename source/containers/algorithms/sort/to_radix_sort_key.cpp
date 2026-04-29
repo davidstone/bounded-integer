@@ -102,13 +102,13 @@ inline auto to_radix_sort_key(std::vector<bool>::reference const value) {
 
 // TODO: This should not be the default behavior.
 constexpr auto && to_radix_sort_key(indexable_range auto && value) {
-	return OPERATORS_FORWARD(value);
+	return value;
 }
 
 // TODO: This should not be the default behavior.
 template<tuple_like T> requires(!indexable_range<T>)
 constexpr auto && to_radix_sort_key(T && value) {
-	return OPERATORS_FORWARD(value);
+	return value;
 }
 
 template<typename T>
