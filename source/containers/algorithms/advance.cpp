@@ -25,7 +25,7 @@ concept random_access_advanceable_by = requires(Iterator & it, Offset offset) {
 template<typename Iterator, typename Offset>
 using advance_counter = std::common_type_t<
 	iter_difference_t<Iterator>,
-	std::decay_t<Offset>
+	Offset
 >;
 
 export constexpr auto advance(iterator auto & it, auto const offset) {
