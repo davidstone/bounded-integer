@@ -18,6 +18,7 @@ import bounded.minmax;
 import bounded.normalize;
 import bounded.safe_extreme;
 import bounded.unchecked;
+import bounded.underlying_type_t;
 
 import numeric_traits;
 import std_module;
@@ -77,7 +78,10 @@ constexpr auto operator/(integer<lhs_min, lhs_max> const lhs, integer<rhs_min, r
 		min_max(constant<rhs_min>, constant<rhs_max>)
 	);
 	using result_t = integer<normalize<range.min>, normalize<range.max>>;
-	using common_t = typename std::common_type_t<result_t, integer<lhs_min, lhs_max>, integer<rhs_min, rhs_max>>::underlying_type;
+	using common_t = underlying_type_t<
+		safe_min(range.min, lhs_min, rhs_min),
+		safe_max(range.max, lhs_max, rhs_max)
+	>;
 	// It is safe to use the unchecked constructor because we already know that
 	// the result will fit in result_t. We have to cast to the intermediate
 	// common_t in case result_t is narrower than one of the arguments.
