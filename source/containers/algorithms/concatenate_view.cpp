@@ -47,14 +47,9 @@ constexpr auto compare_sentinels(LHS const & lhs, RHS const & rhs) -> bool {
 
 template<typename LHS, typename RHS>
 constexpr auto have_same_ends(LHS const & lhs, RHS const & rhs) -> bool {
-	static_assert(tv::tuple_size<LHS> == tv::tuple_size<RHS>);
-	auto [...indexes] = bounded::index_sequence_struct(tv::tuple_size<LHS>);
-	return (... and (
-		compare_sentinels(
-			containers::end(lhs[indexes]),
-			containers::end(rhs[indexes])
-		)
-	));
+	auto const & [...lhs_ranges] = lhs;
+	auto const & [...rhs_ranges] = rhs;
+	return (... and compare_sentinels(containers::end(lhs_ranges), containers::end(rhs_ranges)));
 }
 
 template<typename Category, typename RangeView>
@@ -105,11 +100,6 @@ struct concatenate_view_iterator {
 
 	constexpr explicit concatenate_view_iterator(RangeViews... range_views):
 		m_range_views(std::move(range_views)...)
-	{
-	}
-
-	constexpr explicit concatenate_view_iterator(tv::tuple<RangeViews...> range_views):
-		m_range_views(std::move(range_views))
 	{
 	}
 
@@ -164,11 +154,9 @@ struct concatenate_view_iterator {
 	) {
 		BOUNDED_ASSERT(::containers::have_same_ends(lhs.m_range_views, rhs.m_range_views));
 
-		auto transform = [](auto const lhs_range, auto const rhs_range) {
-			return containers::begin(lhs_range) - containers::begin(rhs_range);
-		};
-		auto const [...integers] = tv::transform(transform, lhs.m_range_views, rhs.m_range_views);
-		return (... + integers);
+		auto const [...lhs_ranges] = lhs.m_range_views;
+		auto const [...rhs_ranges] = rhs.m_range_views;
+		return (... + (containers::begin(lhs_ranges) - containers::begin(rhs_ranges)));
 	}
 
 
@@ -176,9 +164,8 @@ struct concatenate_view_iterator {
 		std::default_sentinel_t,
 		concatenate_view_iterator const rhs
 	) requires(... and sized_range<RangeViews>) {
-		auto transform = [](auto const range) { return containers::size(range); };
-		auto const [...integers] = tv::transform(transform, rhs.m_range_views);
-		return (... + integers);
+		auto const [...ranges] = rhs.m_range_views;
+		return (... + containers::size(ranges));
 	}
 
 	friend constexpr auto operator-(concatenate_view_iterator const lhs, std::default_sentinel_t const rhs) {
@@ -206,8 +193,8 @@ struct concatenate_view_iterator {
 	}
 
 	friend constexpr auto operator==(concatenate_view_iterator const & lhs, std::default_sentinel_t) -> bool {
-		auto get_end_iterators = [](auto const & range) { return containers::end(range); };
-		return lhs.begin_iterators() == tv::transform(get_end_iterators, lhs.m_range_views);
+		auto const & [...ranges] = lhs.m_range_views;
+		return (... and containers::is_empty(ranges));
 	}
 
 private:
@@ -260,15 +247,11 @@ struct concatenate_view {
 	OPERATORS_BRACKET_SEQUENCE_RANGE_DEFINITIONS
 private:
 	static constexpr auto begin_impl(auto && ranges) {
-		return concatenate_view_iterator(tv::transform(
-			[](auto && range){
-				return subrange(
-					containers::begin(OPERATORS_FORWARD(range)),
-					containers::end(OPERATORS_FORWARD(range))
-				);
-			},
-			OPERATORS_FORWARD(ranges)
-		));
+		auto && [...range_pack] = ranges;
+		return concatenate_view_iterator(subrange(
+			containers::begin(OPERATORS_FORWARD(range_pack)),
+			containers::end(OPERATORS_FORWARD(range_pack))
+		)...);
 	}
 	tv::tuple<Ranges...> m_ranges;
 };
