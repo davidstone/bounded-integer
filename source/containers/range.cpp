@@ -8,7 +8,7 @@ export module containers.range;
 import containers.c_array;
 import containers.data;
 import containers.has_member_size;
-import containers.random_access_iterator;
+import containers.forward_random_access_iterator;
 import containers.sentinel_for;
 
 import bounded;
@@ -17,7 +17,7 @@ namespace containers {
 
 template<typename T>
 concept size_based_range = has_member_size<T> and requires {
-	{ bounded::declval<T>().begin() } -> random_access_iterator;
+	{ bounded::declval<T>().begin() } -> forward_random_access_iterator;
 };
 
 template<typename T>
