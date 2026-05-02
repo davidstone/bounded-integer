@@ -83,7 +83,7 @@ inline constexpr bool any_is_output_iterator = any_is_category<std::output_itera
 // dereferencing). This puts us in the strange place where
 // `it + offset - it == offset` holds, but `it + offset - offset == it` cannot
 // be computed.
-export template<typename... RangeViews>
+template<typename... RangeViews>
 struct concatenate_view_iterator {
 	static_assert((... and is_range_view<RangeViews>));
 	static_assert(
