@@ -243,7 +243,7 @@ public:
 	constexpr auto begin() & requires(... and forward_range<Ranges>) {
 		return begin_impl(m_ranges);
 	}
-	static constexpr auto end() {
+	static constexpr auto end() requires(... or !forward_random_access_range<Ranges>) {
 		return std::default_sentinel;
 	}
 	constexpr auto size() const requires all_are_sized {
