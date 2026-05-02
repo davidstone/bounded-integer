@@ -369,7 +369,7 @@ private:
 		};
 		last_byte_t last_byte;
 	};
-	alignas(T *) state m_state;
+	alignas(T *) alignas(small_t) state m_state;
 };
 
 } // namespace containers
