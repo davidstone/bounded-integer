@@ -9,8 +9,6 @@ module;
 
 export module containers.algorithms.generate;
 
-import containers.algorithms.compare;
-import containers.array;
 import containers.common_iterator_functions;
 import containers.index_type;
 import containers.offset_type;
@@ -37,6 +35,13 @@ constexpr auto get_generator(auto && generator) -> auto && {
 		return generator;
 	}
 }
+
+template<typename T>
+using generate_index_type = to_index_type<std::conditional_t<
+	std::same_as<T, bounded::constant_t<0>>,
+	bounded::constant_t<1>,
+	T
+>>;
 
 template<typename Offset, typename Function>
 struct generate_n_iterator {
@@ -79,7 +84,76 @@ private:
 	[[no_unique_address]] stored_function<Function> m_generator;
 };
 
-export template<typename Size, typename Function>
+template<typename Offset, typename Function, bool indexed>
+struct idempotent_generate_n_iterator {
+	using difference_type = decltype(bounded::declval<Offset>() - bounded::declval<Offset>());
+
+	constexpr idempotent_generate_n_iterator(
+		Offset const remaining,
+		Function const & generator
+	):
+		m_offset(remaining),
+		m_generator(generator)
+	{
+	}
+
+	constexpr auto operator*() const -> decltype(auto) {
+		if constexpr (indexed) {
+			return std::invoke(
+				m_generator,
+				bounded::assume_in_range<generate_index_type<Offset>>(m_offset)
+			);
+		} else {
+			return std::invoke(::containers::get_generator<Offset>(m_generator.get()));
+		}
+	}
+	OPERATORS_ARROW_DEFINITIONS
+
+	friend constexpr auto operator<=>(idempotent_generate_n_iterator const lhs, idempotent_generate_n_iterator const rhs) {
+		return lhs.m_offset <=> rhs.m_offset;
+	}
+	friend constexpr auto operator==(idempotent_generate_n_iterator const lhs, idempotent_generate_n_iterator const rhs) -> bool {
+		return lhs.m_offset == rhs.m_offset;
+	}
+
+	friend constexpr auto operator+(idempotent_generate_n_iterator const it, difference_type const difference) -> idempotent_generate_n_iterator {
+		return idempotent_generate_n_iterator(
+			bounded::assume_in_range<Offset>(it.m_offset + difference),
+			it.m_generator.get()
+		);
+	}
+	friend constexpr auto operator+(idempotent_generate_n_iterator const it, bounded::constant_t<1>) -> idempotent_generate_n_iterator requires(bounded::builtin_integer<Offset> or numeric_traits::max_value<Offset> == 0_bi) {
+		if constexpr (bounded::builtin_integer<Offset>) {
+			return it + 1;
+		} else {
+			std::unreachable();
+		}
+	}
+	friend constexpr auto operator+(idempotent_generate_n_iterator const it, bounded::constant_t<-1>) -> idempotent_generate_n_iterator requires(bounded::builtin_integer<Offset> or numeric_traits::max_value<Offset> == 0_bi) {
+		if constexpr (bounded::builtin_integer<Offset>) {
+			return it - 1;
+		} else {
+			std::unreachable();
+		}
+	}
+
+	friend constexpr auto operator-(idempotent_generate_n_iterator const lhs, idempotent_generate_n_iterator const rhs) -> difference_type {
+		return lhs.m_offset - rhs.m_offset;
+	}
+private:
+	using function_t = std::conditional_t<
+		indexed,
+		stored_function<Function const, generate_index_type<Offset>>,
+		stored_function<Function const>
+	>;
+	[[no_unique_address]] Offset m_offset;
+	[[no_unique_address]] function_t m_generator;
+};
+
+template<typename Function>
+concept mutable_invocable = std::invocable<Function &>;
+
+export template<typename Size, mutable_invocable Function>
 struct generate_n {
 private:
 	[[no_unique_address]] Size m_size;
@@ -93,85 +167,56 @@ public:
 	}
 
 	constexpr auto begin() const requires std::invocable<Function const &> {
-		return generate_n_iterator(to_offset_type<Size>(m_size), m_generator);
+		return generate_n_iterator(
+			to_offset_type<Size>(m_size),
+			m_generator
+		);
 	}
 	constexpr auto begin() {
-		return generate_n_iterator(to_offset_type<Size>(m_size), m_generator);
+		return generate_n_iterator(
+			to_offset_type<Size>(m_size),
+			m_generator
+		);
 	}
-	static constexpr auto end() {
+	static constexpr auto end() -> std::default_sentinel_t {
 		return std::default_sentinel;
 	}
-	constexpr auto size() const {
+	constexpr auto size() const -> Size {
 		return m_size;
 	}
 };
 
-template<typename T>
-using generate_index_type = to_index_type<std::conditional_t<
-	std::same_as<T, bounded::constant_t<0>>,
-	bounded::constant_t<1>,
-	T
->>;
+template<typename Function>
+concept idempotent_invocable = std::invocable<Function const &>;
+
+export template<typename Size, idempotent_invocable Function>
+struct generate_n_idempotent {
+	static_assert(!numeric_traits::unsigned_builtin<Size>);
+private:
+	[[no_unique_address]] Size m_size;
+	[[no_unique_address]] Function m_generator;
+
+public:
+	constexpr generate_n_idempotent(Size const size, Function generator):
+		m_size(size),
+		m_generator(std::move(generator))
+	{
+	}
+
+	constexpr auto begin() const -> idempotent_generate_n_iterator<to_offset_type<Size>, Function, false> {
+		return {to_offset_type<Size>(0_bi), m_generator};
+	}
+	constexpr auto size() const -> Size {
+		return m_size;
+	}
+};
 
 template<typename Function, typename Size>
 concept index_invocable = std::invocable<Function const &, generate_index_type<Size>>;
 
-template<typename Offset, typename Function>
-struct indexed_generate_n_iterator {
-	using difference_type = decltype(bounded::declval<Offset>() - bounded::declval<Offset>());
-	
-	constexpr indexed_generate_n_iterator(Offset const remaining, Function const & generator):
-		m_offset(remaining),
-		m_generator(generator)
-	{
-	}
-
-	constexpr auto operator*() const -> decltype(auto) {
-		return std::invoke(
-			m_generator,
-			bounded::assume_in_range<generate_index_type<Offset>>(m_offset)
-		);
-	}
-	OPERATORS_ARROW_DEFINITIONS
-
-	friend constexpr auto operator<=>(indexed_generate_n_iterator const lhs, indexed_generate_n_iterator const rhs) {
-		return lhs.m_offset <=> rhs.m_offset;
-	}
-	friend constexpr auto operator==(indexed_generate_n_iterator const lhs, indexed_generate_n_iterator const rhs) -> bool {
-		return lhs.m_offset == rhs.m_offset;
-	}
-
-	friend constexpr auto operator+(indexed_generate_n_iterator const it, difference_type const difference) -> indexed_generate_n_iterator {
-		return indexed_generate_n_iterator(
-			bounded::assume_in_range<Offset>(it.m_offset + difference),
-			it.m_generator.get()
-		);
-	}
-	friend constexpr auto operator+(indexed_generate_n_iterator const it, bounded::constant_t<1>) -> indexed_generate_n_iterator requires(bounded::builtin_integer<Offset> or numeric_traits::max_value<Offset> == 0_bi) {
-		if constexpr (bounded::builtin_integer<Offset>) {
-			return it + 1;
-		} else {
-			std::unreachable();
-		}
-	}
-	friend constexpr auto operator+(indexed_generate_n_iterator const it, bounded::constant_t<-1>) -> indexed_generate_n_iterator requires(bounded::builtin_integer<Offset> or numeric_traits::max_value<Offset> == 0_bi) {
-		if constexpr (bounded::builtin_integer<Offset>) {
-			return it - 1;
-		} else {
-			std::unreachable();
-		}
-	}
-
-	friend constexpr auto operator-(indexed_generate_n_iterator const lhs, indexed_generate_n_iterator const rhs) -> difference_type {
-		return lhs.m_offset - rhs.m_offset;
-	}
-private:
-	[[no_unique_address]] Offset m_offset;
-	[[no_unique_address]] stored_function<Function const, generate_index_type<Offset>> m_generator;
-};
-
 export template<typename Size, index_invocable<Size> Function>
 struct indexed_generate_n {
+	static_assert(!numeric_traits::unsigned_builtin<Size>);
 private:
 	[[no_unique_address]] Size m_size;
 	[[no_unique_address]] Function m_generator;
@@ -182,24 +227,12 @@ public:
 	{
 	}
 
-	constexpr auto begin() const {
-		return indexed_generate_n_iterator(to_offset_type<Size>(0_bi), m_generator);
+	constexpr auto begin() const -> idempotent_generate_n_iterator<to_offset_type<Size>, Function, true> {
+		return {to_offset_type<Size>(0_bi), m_generator};
 	}
-	constexpr auto size() const {
+	constexpr auto size() const -> Size {
 		return m_size;
 	}
 };
 
 } // namespace containers
-
-static_assert(containers::equal(containers::generate_n(0_bi, bounded::value_to_function(5)), containers::array<int, 0_bi>{}));
-static_assert(containers::equal(containers::generate_n(1_bi, bounded::value_to_function(5)), containers::array{5}));
-static_assert(containers::equal(containers::generate_n(2_bi, bounded::value_to_function(5)), containers::array{5, 5}));
-
-static_assert(containers::equal(containers::indexed_generate_n(0_bi, bounded::copy), containers::array<bounded::constant_t<0>, 0_bi>{}));
-static_assert(containers::equal(containers::indexed_generate_n(1_bi, bounded::copy), containers::array{0_bi}));
-static_assert(containers::equal(containers::indexed_generate_n(2_bi, bounded::copy), containers::array{0_bi, 1_bi}));
-
-static_assert(containers::equal(containers::indexed_generate_n(0, bounded::copy), containers::array<int, 0_bi>{}));
-static_assert(containers::equal(containers::indexed_generate_n(1, bounded::copy), containers::array{0}));
-static_assert(containers::equal(containers::indexed_generate_n(2, bounded::copy), containers::array{0, 1}));

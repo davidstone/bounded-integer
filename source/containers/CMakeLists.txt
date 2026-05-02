@@ -237,6 +237,7 @@ target_sources(containers_test PRIVATE
 		test/algorithms/erase.cpp
 		test/algorithms/filter.cpp
 		test/algorithms/find.cpp
+		test/algorithms/generate.cpp
 		test/algorithms/join.cpp
 		test/algorithms/join_with.cpp
 		test/algorithms/keyed_binary_search.cpp

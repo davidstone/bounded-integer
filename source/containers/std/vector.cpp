@@ -87,11 +87,11 @@ struct vector {
 	constexpr vector() = default;
 
 	constexpr vector(size_type const count, T const & value):
-		m_impl(containers::repeat_n(count, value))
+		m_impl(containers::repeat_n(bounded::integer(count), value))
 	{
 	}
 	constexpr explicit vector(size_type const count):
-		m_impl(containers::repeat_default_n<T>(count))
+		m_impl(containers::repeat_default_n<T>(bounded::integer(count)))
 	{
 	}
 
@@ -125,7 +125,7 @@ struct vector {
 	}
 
 	constexpr auto assign(size_type const count, T const & value) -> void {
-		containers::assign(m_impl, containers::repeat_n(count, value));
+		containers::assign(m_impl, containers::repeat_n(bounded::integer(count), value));
 	}
 
 	template<containers::iterator InputIterator>
@@ -259,9 +259,9 @@ struct vector {
 			return containers::to_address(containers::insert(m_impl, impl_iterator(position), std::move(range)));
 		};
 		if (object_is_in_storage(value)) {
-			return do_insert(containers::repeat_n(count, T(value)));
+			return do_insert(containers::repeat_n(bounded::integer(count), T(value)));
 		} else {
-			return do_insert(containers::repeat_n(count, value));
+			return do_insert(containers::repeat_n(bounded::integer(count), value));
 		}
 	}
 	template<containers::iterator InputIterator>

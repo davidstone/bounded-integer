@@ -162,10 +162,10 @@ struct list {
 	constexpr list() = default;
 
 	constexpr list(size_type const count, T const & value) {
-		containers::assign_to_empty(m_impl, containers::repeat_n(count, value));
+		containers::assign_to_empty(m_impl, containers::repeat_n(bounded::integer(count), value));
 	}
 	constexpr explicit list(size_type const count) {
-		containers::assign_to_empty(m_impl, containers::repeat_default_n<T>(count));
+		containers::assign_to_empty(m_impl, containers::repeat_default_n<T>(bounded::integer(count)));
 	}
 
 	template<containers::iterator InputIterator>
@@ -196,7 +196,7 @@ struct list {
 	}
 
 	constexpr auto assign(size_type const count, T const & value) -> void {
-		containers::assign(m_impl, containers::repeat_n(count, value));
+		containers::assign(m_impl, containers::repeat_n(bounded::integer(count), value));
 	}
 
 	template<containers::iterator InputIterator>
@@ -300,7 +300,7 @@ struct list {
 		return containers::legacy_iterator(containers::insert(
 			m_impl,
 			position.base(),
-			containers::repeat_n(count, value)
+			containers::repeat_n(bounded::integer(count), value)
 		));
 	}
 	template<containers::iterator InputIterator>
