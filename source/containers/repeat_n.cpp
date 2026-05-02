@@ -19,12 +19,12 @@ namespace containers {
 
 export template<typename Size, typename T>
 constexpr auto repeat_n(Size const size, T && value) {
-	return generate_n(size, bounded::value_to_function(OPERATORS_FORWARD(value)));
+	return generate_n_idempotent(size, bounded::value_to_function(OPERATORS_FORWARD(value)));
 }
 
 export template<typename T, typename Size>
 constexpr auto repeat_default_n(Size const size) {
-	return generate_n(size, bounded::construct<T>);
+	return generate_n_idempotent(size, bounded::construct<T>);
 }
 
 } // namespace containers
