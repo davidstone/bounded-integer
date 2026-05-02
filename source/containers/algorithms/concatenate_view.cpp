@@ -226,6 +226,9 @@ private:
 
 export template<typename... Ranges>
 struct concatenate_view {
+private:
+	static constexpr auto all_are_sized = (... and sized_range<Ranges>);
+public:
 	constexpr concatenate_view(Ranges && ... ranges):
 		m_ranges(OPERATORS_FORWARD(ranges)...)
 	{
@@ -242,6 +245,10 @@ struct concatenate_view {
 	}
 	static constexpr auto end() {
 		return std::default_sentinel;
+	}
+	constexpr auto size() const requires all_are_sized {
+		auto const & [...ranges] = m_ranges;
+		return (... + containers::size(ranges));
 	}
 
 	OPERATORS_BRACKET_SEQUENCE_RANGE_DEFINITIONS
