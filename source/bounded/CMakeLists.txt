@@ -44,6 +44,7 @@ target_sources(bounded PUBLIC
 		arithmetic/unary_plus.cpp
 		abs.cpp
 		bounded.cpp
+		bounded_by_range.cpp
 		bounded_integer.cpp
 		builtin_integer.cpp
 		builtin_min_max_value.cpp

@@ -10,6 +10,7 @@ module;
 
 export module bounded.integer;
 
+import bounded.bounded_by_range;
 import bounded.bounded_integer;
 import bounded.builtin_integer;
 import bounded.builtin_min_max_value;
@@ -72,18 +73,6 @@ struct std::common_type<LHS, RHS> {
 };
 
 namespace bounded {
-
-template<typename T, auto minimum, auto maximum>
-concept overlapping_integer =
-	isomorphic_to_integral<T> and
-	safe_compare(builtin_min_value<T>, maximum) <= 0 and safe_compare(minimum, builtin_max_value<T>) <= 0;
-
-template<typename T, auto minimum, auto maximum>
-concept bounded_by_range =
-	overlapping_integer<T, minimum, maximum> and
-	safe_compare(minimum, builtin_min_value<T>) <= 0 and
-	safe_compare(builtin_max_value<T>, maximum) <= 0;
-
 namespace detail {
 
 export template<integral T, integral Minimum, integral Maximum>
@@ -259,12 +248,6 @@ using type3 = bounded::integer<-5, -5>;
 static_assert(std::same_as<std::common_type_t<type1, type2, type3>, bounded::integer<-5, 10>>);
 using type4 = bounded::integer<0, 0>;
 static_assert(std::same_as<std::common_type_t<type1, type2, type3, type4>, bounded::integer<-5, 10>>);
-
-static_assert(bounded::overlapping_integer<bounded::integer<0, 0>, 0, 0>, "Type should overlap its own range.");
-static_assert(!bounded::overlapping_integer<bounded::integer<0, 0>, 1, 1>, "Type should not overlap a disjoint range.");
-
-static_assert(bounded::bounded_by_range<bounded::integer<0, 0>, -1, 1>);
-static_assert(!bounded::bounded_by_range<bounded::integer<0, 1>, 0, 0>);
 
 static_assert(std::is_empty_v<bounded::constant_t<0>>);
 static_assert(std::is_empty_v<bounded::constant_t<1>>);
