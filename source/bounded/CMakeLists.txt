@@ -66,6 +66,7 @@ target_sources(bounded PUBLIC
 		declval.cpp
 		destroy.cpp
 		equality_comparable.cpp
+		format.cpp
 		function_ptr.cpp
 		hash.cpp
 		homogeneous_equals.cpp
@@ -129,6 +130,7 @@ target_sources(bounded_test PRIVATE
 		test/check_in_range.cpp
 		test/comparison.cpp
 		test/conditional.cpp
+		test/format.cpp
 		test/stream.cpp
 		test/to_integer.cpp
 		test/tombstone.cpp

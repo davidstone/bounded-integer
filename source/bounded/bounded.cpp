@@ -30,6 +30,7 @@ export import bounded.copy;
 export import bounded.declval;
 export import bounded.destroy;
 export import bounded.equality_comparable;
+export import bounded.format;
 export import bounded.function_ptr;
 export import bounded.hash;
 export import bounded.index_sequence_struct;
