@@ -38,7 +38,8 @@ struct dynamic_array_data {
 
 template<typename T>
 constexpr auto allocate_at_least(std::size_t const size) {
-	#ifdef __cpp_lib_allocate_at_least
+	// #ifdef __cpp_lib_allocate_at_least
+	#if 0
 		return std::allocator<T>().allocate_at_least(size);
 	#else
 		struct result {
