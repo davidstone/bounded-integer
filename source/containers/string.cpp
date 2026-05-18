@@ -37,7 +37,7 @@ public:
 	constexpr string(Source) {
 	}
 	template<typename Source> requires bounded::convertible_to<Source, std::string_view> or bounded::convertible_to<Source, char const *>
-	constexpr explicit(!std::same_as<Source, std::string_view> and !std::same_as<Source, char const *> and !std::same_as<Source, char *>) string(Source const sv):
+	constexpr explicit(!std::same_as<Source, char const *> and !std::same_as<Source, char *>) string(Source const sv):
 		base(std::string_view(sv))
 	{
 	}
@@ -132,13 +132,14 @@ static_assert(bounded::convertible_to<char const *, containers::string>);
 static_assert(bounded::convertible_to<char *, containers::string>);
 static_assert(bounded::convertible_to<containers::c_array<char, 5> const &, containers::string>);
 static_assert(bounded::convertible_to<containers::c_array<char, 5> &, containers::string>);
-static_assert(bounded::convertible_to<std::string_view, containers::string>);
+static_assert(!bounded::convertible_to<std::string_view, containers::string>);
 static_assert(!bounded::convertible_to<to_sv, containers::string>);
 static_assert(!bounded::convertible_to<to_cstr, containers::string>);
 static_assert(!bounded::convertible_to<to_both, containers::string>);
 static_assert(bounded::constructible_from<containers::string, to_sv>);
 static_assert(bounded::constructible_from<containers::string, to_cstr>);
 static_assert(bounded::constructible_from<containers::string, to_both>);
+static_assert(bounded::constructible_from<containers::string, std::string_view>);
 
 constexpr auto check_equal(std::string_view const input) {
 	auto const output = containers::string(input);
