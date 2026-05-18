@@ -107,6 +107,20 @@ public:
 
 } // namespace containers
 
+template<typename CharT>
+struct std::formatter<containers::string, CharT> : private std::formatter<std::string_view, CharT> {
+private:
+	using base = std::formatter<std::string_view, CharT>;
+public:
+	using base::parse;
+
+	template<typename FormatContext>
+	constexpr auto format(containers::string const & str, FormatContext & context) const {
+		return base::format(std::string_view(str), context);
+	}
+};
+
+
 struct to_sv {
 	constexpr operator std::string_view() const {
 		return "";

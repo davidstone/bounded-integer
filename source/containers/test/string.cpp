@@ -15,6 +15,8 @@ import bounded;
 
 namespace {
 
+using namespace std::string_view_literals;
+
 auto check_equal(std::string_view const input) {
 	auto const output = containers::string(input);
 	CHECK(output == input);
@@ -28,6 +30,14 @@ TEST_CASE("string", "[string]") {
 	containers_test::test_set_size<containers::string>();
 	check_equal("012345678901234567890123");
 	check_equal("0123456789012345678901234");
+}
+
+TEST_CASE("Empty string", "[string format]") {
+	CHECK(std::format("{}", containers::string()) == ""sv);
+}
+
+TEST_CASE("Non-empty string", "[string format]") {
+	CHECK(std::format("{}", containers::string("hi")) == "hi"sv);
 }
 
 } // namespace
