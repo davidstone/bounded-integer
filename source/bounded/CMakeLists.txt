@@ -96,7 +96,6 @@ target_sources(bounded PUBLIC
 		scope_guard.cpp
 		signed_builtin.cpp
 		size_of.cpp
-		std_iterator.cpp
 		stream.cpp
 		test_int.cpp
 		to_integer.cpp

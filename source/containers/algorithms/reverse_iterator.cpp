@@ -54,9 +54,19 @@ struct reverse_traits {
 	// All of these `OPERATORS_RETURNS` are needed to work around
 	// https://github.com/llvm/llvm-project/issues/154813
 
-	static constexpr auto add(random_access_iterator auto it, auto const offset) OPERATORS_RETURNS(
+	static constexpr auto add(bidirectional_iterator auto it, auto const offset) OPERATORS_RETURNS(
 		it - offset
 	)
+	template<bidirectional_iterator It>
+	static constexpr auto add(It it, bounded::constant_t<1>) -> It {
+		--it;
+		return it;
+	}
+	template<bidirectional_iterator It>
+	static constexpr auto add(It it, bounded::constant_t<-1>) -> It {
+		++it;
+		return it;
+	}
 
 	static constexpr auto subtract(random_access_iterator auto const lhs, random_access_iterator auto const rhs) OPERATORS_RETURNS(
 		rhs - lhs

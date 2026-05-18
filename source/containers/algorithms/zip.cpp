@@ -9,6 +9,7 @@ module;
 
 export module containers.algorithms.zip;
 
+import containers.algorithms.advance;
 import containers.begin_end;
 import containers.iter_difference_t;
 import containers.range;
@@ -65,12 +66,12 @@ struct zip_iterator {
 		auto const & [...its] = it.m_its;
 		return tv::tuple<decltype(*its)...>(*its...);
 	}
-	friend constexpr auto operator+(zip_iterator it, bounded::constant_t<1> const offset) -> zip_iterator {
+	friend constexpr auto operator+(zip_iterator it, bounded::constant_t<1>) -> zip_iterator {
 		if constexpr (sizeof...(Iterators) == 0) {
 			std::unreachable();
 		} else {
 			auto && [...its] = std::move(it).m_its;
-			return zip_iterator((std::move(its) + offset)...);
+			return zip_iterator((containers::next(std::move(its)))...);
 		}
 	}
 	friend constexpr auto operator+(zip_iterator it, bounded::convertible_to<difference_type> auto const offset) -> zip_iterator {

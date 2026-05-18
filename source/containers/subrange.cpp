@@ -121,7 +121,8 @@ public:
 		if constexpr (explicit_sentinel<Sentinel>) {
 			return m_end;
 		} else {
-			using offset = std::conditional_t<bounded::builtin_integer<Size>, iter_difference_t<Iterator>, Size>;
+			using iter_diff = iter_difference_t<Iterator>;
+			using offset = std::conditional_t<bounded::builtin_integer<iter_diff>, iter_diff, Size>;
 			return begin() + static_cast<offset>(size());
 		}
 	}
