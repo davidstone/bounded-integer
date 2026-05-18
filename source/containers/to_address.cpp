@@ -21,13 +21,16 @@ template<typename T>
 concept has_pointer_traits = requires(T const x) { std::pointer_traits<T>::to_address(x); };
 
 template<typename T>
-concept has_member_arrow = requires(T const x) { x.operator->(); };
+concept has_contiguous_iterator_tag =
+	std::derived_from<typename T::iterator_concept, std::contiguous_iterator_tag> or
+	std::derived_from<typename std::iterator_traits<T>::iterator_concept, std::contiguous_iterator_tag>;
 
 export template<typename T>
 concept to_addressable =
 	pointer_like<T> or
 	has_member_to_address<T> or
-	has_pointer_traits<T>;
+	has_pointer_traits<T> or
+	has_contiguous_iterator_tag<T>;
 
 export template<to_addressable Iterator>
 constexpr auto to_address(Iterator const it) {
@@ -35,8 +38,10 @@ constexpr auto to_address(Iterator const it) {
 		return it;
 	} else if constexpr (has_member_to_address<Iterator>) {
 		return it.to_address();
-	} else {
+	} else if constexpr (has_pointer_traits<Iterator>) {
 		return std::pointer_traits<Iterator>::to_address(it);
+	} else {
+		return it.operator->();
 	}
 }
 
