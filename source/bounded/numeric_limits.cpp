@@ -57,8 +57,6 @@ public:
 	static constexpr auto has_infinity = false;
 	static constexpr auto has_quiet_NaN = false;
 	static constexpr auto has_signaling_NaN = false;
-	static constexpr auto has_denorm = std::denorm_absent;
-	static constexpr auto has_denorm_loss = false;
 	static constexpr auto round_style = std::round_toward_zero;
 	static constexpr auto is_iec559 = false;
 	static constexpr auto is_bounded = true;
@@ -131,8 +129,6 @@ constexpr auto check_numeric_limits() {
 	BOUNDED_INTEGER_CHECK_CONDITION(has_infinity);
 	BOUNDED_INTEGER_CHECK_CONDITION(has_quiet_NaN);
 	BOUNDED_INTEGER_CHECK_CONDITION(has_signaling_NaN);
-	BOUNDED_INTEGER_CHECK_CONDITION(has_denorm);
-	BOUNDED_INTEGER_CHECK_CONDITION(has_denorm_loss);
 	BOUNDED_INTEGER_CHECK_CONDITION(is_iec559);
 	BOUNDED_INTEGER_CHECK_CONDITION(is_bounded);
 	// is_modulo intentionally left out because it is meaningless
