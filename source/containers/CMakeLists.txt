@@ -144,6 +144,7 @@ target_sources(containers PUBLIC
 		lazy_push_front.cpp
 		legacy_append.cpp
 		legacy_iterator.cpp
+		legacy_range.cpp
 		linear_map.cpp
 		linear_size.cpp
 		linked_list_helper.cpp
@@ -264,6 +265,7 @@ target_sources(containers_test PRIVATE
 		test/lazy_push_back.cpp
 		test/lazy_push_back_into_capacity.cpp
 		test/lazy_push_front.cpp
+		test/legacy_range.cpp
 		test/linear_map.cpp
 		test/lookup.cpp
 		test/ordered_associative_container.cpp

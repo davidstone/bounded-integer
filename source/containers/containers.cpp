@@ -96,6 +96,7 @@ export import containers.iterator_to_sentinel;
 export import containers.lazy_push_back;
 export import containers.lazy_push_back_into_capacity;
 export import containers.legacy_iterator;
+export import containers.legacy_range;
 export import containers.linear_map;
 export import containers.linear_size;
 export import containers.lookup;
