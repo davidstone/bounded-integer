@@ -120,6 +120,13 @@ public:
 	}
 };
 
+template<>
+struct std::hash<containers::string> {
+	static auto operator()(std::string_view const str) noexcept -> std::size_t {
+		return std::hash<std::string_view>()(str);
+	}
+};
+
 
 struct to_sv {
 	constexpr operator std::string_view() const {
