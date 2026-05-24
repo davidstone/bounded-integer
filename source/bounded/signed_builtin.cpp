@@ -9,7 +9,6 @@ import numeric_traits;
 
 namespace bounded {
 
-export template<typename T>
-concept signed_builtin = numeric_traits::signed_builtin<T>;
+export using numeric_traits::signed_builtin;
 
 } // namespace bounded
