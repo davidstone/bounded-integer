@@ -26,6 +26,7 @@ export import containers.algorithms.copy_or_relocate_from;
 export import containers.algorithms.count;
 export import containers.algorithms.destroy_range;
 export import containers.algorithms.distance;
+export import containers.algorithms.drop;
 export import containers.algorithms.erase;
 export import containers.algorithms.filter;
 export import containers.algorithms.find;

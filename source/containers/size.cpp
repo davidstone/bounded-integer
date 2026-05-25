@@ -20,15 +20,16 @@ import std_module;
 
 namespace containers {
 
-export template<sized_range Range>
+export template<has_member_size Range>
 constexpr auto size(Range && range) {
-	if constexpr (has_member_size<Range>) {
-		return range.size();
-	} else {
-		return ::bounded::assume_in_range<range_size_t<Range>>(
-			containers::end(OPERATORS_FORWARD(range)) - containers::begin(OPERATORS_FORWARD(range))
-		);
-	}
+	return range.size();
+}
+
+export template<sized_range Range> requires(!has_member_size<Range>)
+constexpr auto size(Range && range) {
+	return ::bounded::assume_in_range<range_size_t<Range>>(
+		containers::end(OPERATORS_FORWARD(range)) - containers::begin(OPERATORS_FORWARD(range))
+	);
 }
 
 export template<typename T, std::size_t size_>

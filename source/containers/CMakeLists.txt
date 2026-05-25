@@ -46,6 +46,7 @@ target_sources(containers PUBLIC
 		algorithms/count.cpp
 		algorithms/destroy_range.cpp
 		algorithms/distance.cpp
+		algorithms/drop.cpp
 		algorithms/erase.cpp
 		algorithms/filter.cpp
 		algorithms/find.cpp
@@ -235,6 +236,7 @@ target_sources(containers_test PRIVATE
 		test/algorithms/count.cpp
 		test/algorithms/concatenate_view.cpp
 		test/algorithms/copy_or_relocate_from.cpp
+		test/algorithms/drop.cpp
 		test/algorithms/erase.cpp
 		test/algorithms/filter.cpp
 		test/algorithms/find.cpp

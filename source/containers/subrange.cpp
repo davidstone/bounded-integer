@@ -13,6 +13,7 @@ export module containers.subrange;
 import containers.begin_end;
 import containers.c_array;
 import containers.common_iterator_functions;
+import containers.forward_random_access_iterator;
 import containers.forward_random_access_range;
 import containers.has_member_size;
 import containers.iter_difference_t;
@@ -182,6 +183,13 @@ template<iterator Iterator, bounded::integral Size>
 subrange(Iterator, Size) -> subrange<
 	Iterator,
 	compute_end_from_size,
+	Size
+>;
+
+template<iterator Iterator, sentinel_for<Iterator> Sentinel, bounded::integral Size>
+subrange(Iterator, Sentinel, Size) -> subrange<
+	Iterator,
+	std::conditional_t<forward_random_access_iterator<Iterator>, compute_end_from_size, Sentinel>,
 	Size
 >;
 
