@@ -43,23 +43,14 @@ private:
 template<typename T> requires(!std::is_trivially_destructible_v<T>)
 struct wrapper<T> {
 	wrapper() = default;
-	constexpr ~wrapper() {
-		if (m_should_destroy) {
-			bounded::destroy(m_storage.value);
-		}
-	}
 	constexpr auto get(this auto && self) -> auto && {
-		return OPERATORS_FORWARD(self).m_storage.value;
+		return *OPERATORS_FORWARD(self).m_storage;
 	}
 	constexpr auto replace(auto make) {
-		bounded::destroy(m_storage.value);
-		m_should_destroy = false;
-		bounded::construct_at(m_storage.value, make);
-		m_should_destroy = true;
+		m_storage.emplace(make);
 	}
 private:
-	[[no_unique_address]] tv::single_element_storage<T> m_storage{.value = {}};
-	bool m_should_destroy = true;
+	[[no_unique_address]] tv::optional<T> m_storage{bounded::lazy_init, bounded::construct<T>};
 };
 
 template<typename T> requires(std::is_reference_v<T> and !std::is_pointer_v<std::remove_reference_t<T>>)
