@@ -14,6 +14,7 @@ export module tv.optional;
  
 import tv.insert;
 import tv.none;
+import tv.single_element_storage;
 import tv.variant;
 
 import bounded;
@@ -83,49 +84,115 @@ concept nullable = bounded::tombstone_traits<T>::spare_representations != 0_bi;
 template<nullable T>
 struct optional_storage<T> {
 	constexpr optional_storage():
-		m_data(make_uninitialized())
+		m_storage(make_uninitialized)
 	{
 	}
 	
 	constexpr explicit optional_storage(bounded::lazy_init_t, bounded::construct_function_for<T> auto && construct_):
-		m_data(bounded::lazy_init, OPERATORS_FORWARD(construct_)())
+		m_storage(OPERATORS_FORWARD(construct_))
 	{
 	}
 	
 	constexpr explicit optional_storage(bounded::explicitly_convertible_to<T> auto && value):
-		m_data(OPERATORS_FORWARD(value))
+		m_storage(bounded::value_to_function(OPERATORS_FORWARD(value)))
 	{
 	}
 	
+	optional_storage(optional_storage &&) requires bounded::trivially_move_constructible<T> = default;
+	constexpr optional_storage(optional_storage && other)
+		noexcept(std::is_nothrow_move_constructible_v<T>)
+		requires bounded::move_constructible<T>
+	{
+		if (other.is_initialized()) {
+			bounded::construct_at(m_storage.value, [&] -> T && { return std::move(other.m_storage.value); });
+		} else {
+			bounded::construct_at(m_storage.value, make_uninitialized);
+		}
+	}
+	optional_storage(optional_storage const &) requires bounded::trivially_copy_constructible<T> = default;
+	constexpr optional_storage(optional_storage const & other)
+		noexcept(std::is_nothrow_copy_constructible_v<T>)
+		requires bounded::copy_constructible<T>
+	{
+		if (other.is_initialized()) {
+			bounded::construct_at(m_storage.value, [&] -> T const & { return other.m_storage.value; });
+		} else {
+			bounded::construct_at(m_storage.value, make_uninitialized);
+		}
+	}
+
+	auto operator=(optional_storage &&) & -> optional_storage & requires bounded::trivially_move_assignable<T> = default;
+	constexpr auto operator=(optional_storage && other) & noexcept(
+		std::is_nothrow_move_constructible_v<T> and std::is_nothrow_move_assignable_v<T>
+	) -> optional_storage & requires(
+		bounded::move_constructible<T> and
+		bounded::move_assignable<T> and
+		!bounded::trivially_move_assignable<T>
+	 ) {
+		if (!other.is_initialized()) {
+			uninitialize();
+		} else if (!is_initialized()) {
+			bounded::construct_at(m_storage.value, [&] { return std::move(other.m_storage.value); });
+		} else {
+			m_storage.value = std::move(other.m_storage.value);
+		}
+		return *this;
+	}
+
+	auto operator=(optional_storage const &) & -> optional_storage & requires bounded::trivially_copy_assignable<T> = default;
+	constexpr auto operator=(optional_storage const & other) & noexcept(
+		std::is_nothrow_copy_constructible_v<T> and std::is_nothrow_copy_assignable_v<T>
+	) -> optional_storage & requires(
+		bounded::copy_constructible<T> and
+		bounded::copy_assignable<T> and
+		!bounded::trivially_copy_assignable<T>
+	) {
+		if (!other.is_initialized()) {
+			uninitialize();
+		} else if (!is_initialized()) {
+			bounded::construct_at(m_storage.value, [&] { return other.m_storage.value; });
+		} else {
+			m_storage.value = other.m_storage.value;
+		}
+		return *this;
+	}
+
+	~optional_storage() requires bounded::trivially_destructible<T> = default;
+	constexpr ~optional_storage() {
+		if (is_initialized()) {
+			bounded::destroy(m_storage.value);
+		}
+	}
+
 	constexpr auto is_initialized() const -> bool {
-		return bounded::tombstone_traits<T>::index(m_data) != uninitialized_index;
+		return bounded::tombstone_traits<T>::index(m_storage.value) != uninitialized_index;
 	}
 
 	constexpr auto uninitialize() -> void {
 		if (is_initialized()) {
-			bounded::destroy(m_data);
+			bounded::destroy(m_storage.value);
 		}
-		bounded::construct_at(m_data, make_uninitialized);
+		bounded::construct_at(m_storage.value, make_uninitialized);
 	}
 
 	constexpr auto initialize(bounded::construct_function_for<T> auto && construct_) -> T & {
 		uninitialize();
-		return bounded::construct_at(m_data, OPERATORS_FORWARD(construct_));
+		return bounded::construct_at(m_storage.value, OPERATORS_FORWARD(construct_));
 	}
 
 	constexpr auto get() const & -> T const & {
-		return m_data;
+		return m_storage.value;
 	}
 	constexpr auto get() & -> T & {
-		return m_data;
+		return m_storage.value;
 	}
 	constexpr auto get() && -> T && {
-		return std::move(m_data);
+		return std::move(m_storage.value);
 	}
 	
 	using underlying_tombstone = bounded::tombstone_traits<T>;
 	constexpr explicit optional_storage(bounded::tombstone_tag, auto const index) noexcept:
-	m_data(underlying_tombstone::make(index + 1_bi))
+		m_storage([&] { return underlying_tombstone::make(index + 1_bi); })
 	{
 	}
 	using tombstone_index_t = bounded::integer<
@@ -133,7 +200,7 @@ struct optional_storage<T> {
 		bounded::normalize<underlying_tombstone::spare_representations - 2_bi>
 	>;
 	constexpr auto tombstone_index() const noexcept -> tombstone_index_t {
-		auto const underlying_index = underlying_tombstone::index(m_data);
+		auto const underlying_index = underlying_tombstone::index(m_storage.value);
 		return bounded::assume_in_range<tombstone_index_t>(
 			underlying_index == -1_bi ?
 				-1_bi :
@@ -146,7 +213,7 @@ private:
 	static constexpr auto make_uninitialized() noexcept -> T {
 		return bounded::tombstone_traits<T>::make(uninitialized_index);
 	}
-	T m_data;
+	tv::single_element_storage<T> m_storage;
 };
 
 template<typename T>

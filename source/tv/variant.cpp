@@ -218,7 +218,7 @@ private:
 		} else {
 			// TODO: Add fallback before this one that does trivial default
 			// construction on exception
-			auto storage = single_element_storage<value_t>{value_t(OPERATORS_FORWARD(construct_)())};
+			auto storage = single_element_storage<value_t>(OPERATORS_FORWARD(construct_));
 			destroy_active();
 			return replace_active_member(index, [&]{ return bounded::relocate(storage.value); });
 		}

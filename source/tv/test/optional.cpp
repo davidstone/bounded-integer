@@ -272,3 +272,72 @@ static_assert(tv::optional<tv::optional<two_spare_representations>>(tv::optional
 static_assert(*tv::optional<tv::optional<two_spare_representations>>(tv::optional<two_spare_representations>(two_spare_representations(3))) == two_spare_representations(3));
 
 static_assert(sizeof(tv::optional<int>) == sizeof(tv::optional<tv::optional<int>>));
+
+struct non_trivial {
+	constexpr non_trivial() {}
+	constexpr non_trivial(non_trivial &&) {}
+	constexpr non_trivial(non_trivial const &) noexcept {}
+	constexpr auto operator=(non_trivial &&) noexcept -> non_trivial & {
+		return *this;
+	}
+	constexpr auto operator=(non_trivial const &) noexcept -> non_trivial & {
+		return *this;
+	}
+	constexpr ~non_trivial() {
+	}
+};
+
+static_assert(tv::optional<non_trivial>() == tv::none);
+static_assert(tv::optional<tv::optional<non_trivial>>() == tv::none);
+
+using layered_t = tv::optional<tv::optional<tv::optional<non_trivial>>>;
+static_assert(!layered_t());
+constexpr auto layered = layered_t(tv::optional<tv::optional<non_trivial>>());
+static_assert(layered);
+static_assert(!*layered);
+
+constexpr auto layered_copy_constructed = layered;
+static_assert(layered_copy_constructed);
+static_assert(!*layered_copy_constructed);
+
+static_assert([]{
+	auto temp = layered;
+	auto const move_constructed = std::move(temp);
+	BOUNDED_ASSERT(move_constructed);
+	BOUNDED_ASSERT(!*move_constructed);
+	return true;
+}());
+
+static_assert([]{
+	auto copy_assigned = layered;
+	copy_assigned = layered;
+	BOUNDED_ASSERT(copy_assigned);
+	BOUNDED_ASSERT(!*copy_assigned);
+	return true;
+}());
+
+static_assert([]{
+	auto copy_assigned = layered_t();
+	copy_assigned = layered;
+	BOUNDED_ASSERT(copy_assigned);
+	BOUNDED_ASSERT(!*copy_assigned);
+	return true;
+}());
+
+static_assert([]{
+	auto temp = layered;
+	auto move_assigned = layered;
+	move_assigned = std::move(temp);
+	BOUNDED_ASSERT(move_assigned);
+	BOUNDED_ASSERT(!*move_assigned);
+	return true;
+}());
+
+static_assert([]{
+	auto temp = layered;
+	auto move_assigned = layered_t();
+	move_assigned = std::move(temp);
+	BOUNDED_ASSERT(move_assigned);
+	BOUNDED_ASSERT(!*move_assigned);
+	return true;
+}());
