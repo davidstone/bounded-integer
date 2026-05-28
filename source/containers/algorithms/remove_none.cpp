@@ -18,22 +18,87 @@ import containers.iter_difference_t;
 import containers.iterator_t;
 import containers.range;
 import containers.range_reference_t;
+import containers.range_value_t;
 import containers.sentinel_t;
 
 import bounded;
-import tv;
 import std_module;
+import tv;
 
 namespace containers {
 
+template<typename T>
+struct wrapper {
+	wrapper() = default;
+	constexpr auto get(this auto && self) -> auto && {
+		return OPERATORS_FORWARD(self).m_value;
+	}
+	constexpr auto replace(auto make) {
+		bounded::construct_at(m_value, make);
+	}
+private:
+	[[no_unique_address]] T m_value;
+};
+
+template<typename T> requires(!std::is_trivially_destructible_v<T>)
+struct wrapper<T> {
+	wrapper() = default;
+	constexpr ~wrapper() {
+		if (m_should_destroy) {
+			bounded::destroy(m_storage.value);
+		}
+	}
+	constexpr auto get(this auto && self) -> auto && {
+		return OPERATORS_FORWARD(self).m_storage.value;
+	}
+	constexpr auto replace(auto make) {
+		bounded::destroy(m_storage.value);
+		m_should_destroy = false;
+		bounded::construct_at(m_storage.value, make);
+		m_should_destroy = true;
+	}
+private:
+	[[no_unique_address]] tv::single_element_storage<T> m_storage{.value = {}};
+	bool m_should_destroy = true;
+};
+
+template<typename T> requires(std::is_reference_v<T> and !std::is_pointer_v<std::remove_reference_t<T>>)
+struct wrapper<T> {
+	wrapper() = default;
+	constexpr auto get(this wrapper const self) -> T {
+		return static_cast<T>(*self.m_ptr);
+	}
+	constexpr auto replace(auto make) {
+		auto && ref = make();
+		m_ptr = std::addressof(ref);
+	}
+
+private:
+	std::remove_reference_t<T> * m_ptr;
+};
+
+template<typename T> requires(std::is_pointer_v<std::remove_reference_t<T>>)
+struct wrapper<T> {
+	using value_type = std::remove_cvref_t<T>;
+	wrapper() = default;
+	constexpr auto get(this wrapper const self) -> value_type {
+		return self.m_ptr;
+	}
+	constexpr auto replace(auto make) {
+		m_ptr = make();
+	}
+
+private:
+	value_type m_ptr;
+};
+
 template<typename Range>
-concept use_inplace =
-	bounded::mostly_trivial<tv::optional<containers::range_reference_t<Range>>>;
+concept use_inplace = bounded::mostly_trivial<wrapper<containers::range_reference_t<Range>>>;
 
 template<typename Range>
 struct remove_none_data {
 	[[no_unique_address]] Range range;
-	[[no_unique_address]] tv::optional<range_reference_t<Range>> cached_value;
+	[[no_unique_address]] wrapper<range_reference_t<Range>> cached_value;
 };
 
 template<typename Range>
@@ -59,7 +124,7 @@ struct iterator_reference_data {
 		return containers::end(m_data.get().range);
 	}
 
-	constexpr auto cached() const -> tv::optional<range_reference_t<Range>> & {
+	constexpr auto cached() const -> wrapper<range_reference_t<Range>> & {
 		return m_data.get().cached_value;
 	}
 private:
@@ -85,17 +150,17 @@ struct iterator_inplace_data {
 		return m_last;
 	}
 
-	constexpr auto cached() const -> tv::optional<range_reference_t<Range>> const & {
-		return m_cached_value;
-	}
-	constexpr auto cached() -> tv::optional<range_reference_t<Range>> & {
-		return m_cached_value;
+	constexpr auto cached(this auto && self) -> auto & {
+		return self.m_cached_value;
 	}
 private:
 	[[no_unique_address]] iterator_t<Range> m_it;
 	[[no_unique_address]] sentinel_t<Range> m_last;
-	[[no_unique_address]] tv::optional<range_reference_t<Range>> m_cached_value;
+	[[no_unique_address]] wrapper<range_reference_t<Range>> m_cached_value;
 };
+
+template<typename T>
+constexpr auto is_rvalue = std::is_rvalue_reference_v<T> or !std::is_reference_v<T>;
 
 template<typename Range>
 struct remove_none_iterator {
@@ -108,10 +173,10 @@ struct remove_none_iterator {
 	}
 
 	constexpr auto operator*() const -> auto && {
-		if constexpr (use_inplace<Range>) {
-			return **m_data.cached();
+		if constexpr (is_rvalue<range_reference_t<Range>>) {
+			return std::move(*m_data.cached().get());
 		} else {
-			return **std::move(m_data.cached());
+			return *m_data.cached().get();
 		}
 	}
 
@@ -134,8 +199,8 @@ private:
 		auto & it = m_data.iterator();
 		while (it != last) {
 			auto & storage = m_data.cached();
-			storage.emplace([&] -> decltype(auto) { return dereference<Range>(it); });
-			if (*storage) {
+			storage.replace([&] -> decltype(auto) { return dereference<Range>(it); });
+			if (storage.get()) {
 				break;
 			}
 			++it;
@@ -150,14 +215,18 @@ private:
 	[[no_unique_address]] data_t m_data;
 };
 
-template<typename T>
-concept optional_type = requires(T value) {
+template<typename Range>
+concept optional_range = range<Range> and requires(range_reference_t<Range> value) {
 	*value;
 	value ? void() : void();
 };
 
-// This goes from range<optional<T>> to range<T>
-export template<range Range> requires optional_type<containers::range_reference_t<Range>>
+// This goes from range<optional<T>> to range<T>. Requires that the value_type's
+// default constructor puts the optional into the empty state. If an exception
+// is thrown by dereferencing iterators in the underlying range and the
+// underlying range returns a non-pointer optional type by value, then this
+// object can no longer be iterated over.
+export template<optional_range Range>
 struct remove_none {
 	constexpr explicit remove_none(Range && input):
 		m_data(OPERATORS_FORWARD(input))
@@ -209,6 +278,17 @@ remove_none(Range &&) -> remove_none<Range>;
 static_assert([]{
 	constexpr auto source = containers::array{1, 2, tv::none, 3, tv::none};
 	constexpr auto expected = containers::array{1, 2, 3};
+	static_assert(containers::forward_range<decltype(containers::remove_none(source))>);
+	return containers::equal(containers::remove_none(source), expected);
+}());
+
+static_assert([]{
+	static constexpr int a = 0;
+	static constexpr int b = 1;
+	static constexpr int c = 3;
+	constexpr auto source = containers::array{&a, &b, nullptr, nullptr, &c, nullptr};
+	constexpr auto expected = containers::array{0, 1, 3};
+	static_assert(containers::forward_range<decltype(containers::remove_none(source))>);
 	return containers::equal(containers::remove_none(source), expected);
 }());
 
@@ -241,3 +321,4 @@ struct by_value_range {
 static_assert(containers::equal(containers::remove_none(by_value_range()), by_value_range()));
 constexpr auto r = containers::remove_none(by_value_range());
 static_assert(containers::equal(r, by_value_range()));
+static_assert(containers::forward_range<decltype(containers::remove_none(by_value_range()))>);
