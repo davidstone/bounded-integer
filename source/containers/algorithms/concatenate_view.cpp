@@ -13,6 +13,7 @@ module;
 
 export module containers.algorithms.concatenate_view;
 
+import containers.algorithms.advance;
 import containers.begin_end;
 import containers.common_iterator_functions;
 import containers.forward_random_access_range;
@@ -130,7 +131,7 @@ struct concatenate_view_iterator {
 				}
 				remaining_offset = 0_bi;
 				return subrange(
-					containers::begin(std::move(range)) + 1_bi,
+					containers::next(containers::begin(std::move(range))),
 					containers::end(std::move(range))
 				);
 			} else {
