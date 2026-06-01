@@ -19,6 +19,7 @@ import containers.iterator;
 import containers.linear_size;
 import containers.range_value_t;
 import containers.sentinel_t;
+import containers.to_array;
 
 import bounded;
 import std_module;

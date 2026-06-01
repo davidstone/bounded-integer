@@ -196,6 +196,7 @@ target_sources(containers PUBLIC
 		take.cpp
 		to_address.cpp
 		to_any_string.cpp
+		to_array.cpp
 		to_string.cpp
 		trivial_inplace_function.cpp
 		uninitialized_array.cpp
@@ -284,6 +285,7 @@ target_sources(containers_test PRIVATE
 		test/test_reserve_and_capacity.cpp
 		test/test_sequence_container.cpp
 		test/test_set_size.cpp
+		test/to_array.cpp
 		test/uninitialized_dynamic_array.cpp
 		test/vector.cpp
 )

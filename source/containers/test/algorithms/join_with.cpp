@@ -10,6 +10,7 @@ import containers.algorithms.join_with;
 import containers.array;
 import containers.c_array;
 import containers.linear_size;
+import containers.to_array;
 
 import bounded;
 import std_module;

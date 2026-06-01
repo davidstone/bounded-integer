@@ -118,35 +118,6 @@ array(c_array<T, size> &&) -> array<T, bounded::constant<size>>;
 template<typename T, array_size_type<T>... sizes>
 constexpr auto is_container<array<T, sizes...>> = true;
 
-export template<auto size_>
-constexpr auto make_array_n(bounded::constant_t<size_> size, auto && value) {
-	using result_t = array<std::decay_t<decltype(value)>, size>;
-	if constexpr (size == 0_bi) {
-		return result_t();
-	} else {
-		auto [...indexes] = bounded::index_sequence_struct<size_ - 1>();
-		// Use the comma operator to expand the variadic pack. Move the last
-		// element if possible. Order of evaluation is well-defined for
-		// aggregate initialization, so there is no risk of copy-after-move
-		return result_t({(void(indexes), value)..., OPERATORS_FORWARD(value)});
-	}
-}
-
-export template<typename T, std::size_t size>
-constexpr auto to_array(c_array<T, size> const & source) {
-	auto [...indexes] = bounded::index_sequence_struct<size>();
-	return array({source[std::size_t(indexes)]...});
-}
-export template<typename T, std::size_t size>
-constexpr auto to_array(c_array<T, size> && source) {
-	auto [...indexes] = bounded::index_sequence_struct<size>();
-	return array({std::move(source)[std::size_t(indexes)]...});
-}
-export template<typename T>
-constexpr auto to_array(empty_c_array_parameter) {
-	return array<T, 0_bi>();
-}
-
 export template<std::size_t index, typename T, array_size_type<T> size>
 constexpr auto && get(array<T, size> const & a) {
 	return a[bounded::constant<index>];

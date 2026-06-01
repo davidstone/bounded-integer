@@ -132,6 +132,7 @@ export import containers.string;
 export import containers.subrange;
 export import containers.take;
 export import containers.to_address;
+export import containers.to_array;
 export import containers.to_string;
 export import containers.trivial_inplace_function;
 export import containers.uninitialized_array;

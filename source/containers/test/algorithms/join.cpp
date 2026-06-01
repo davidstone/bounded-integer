@@ -9,6 +9,7 @@ import containers.algorithms.compare;
 import containers.algorithms.join;
 import containers.array;
 import containers.c_array;
+import containers.to_array;
 
 import bounded;
 import std_module;
