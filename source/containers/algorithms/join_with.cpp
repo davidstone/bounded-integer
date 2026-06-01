@@ -9,6 +9,8 @@ module;
 
 export module containers.algorithms.join_with;
 
+import containers.algorithms.accumulate;
+import containers.algorithms.transform;
 import containers.begin_end;
 export import containers.common_iterator_functions;
 import containers.forward_range;
@@ -17,10 +19,13 @@ import containers.iter_difference_t;
 import containers.iter_reference_t;
 import containers.iter_value_t;
 import containers.iterator_t;
+import containers.linear_size;
 import containers.range;
 import containers.range_reference_t;
 import containers.range_size_t;
 import containers.sentinel_t;
+import containers.size;
+import containers.sized_range;
 
 import bounded;
 import std_module;
@@ -257,6 +262,40 @@ struct join_with {
 	// TODO: Support bidirectional?
 	static constexpr auto end() {
 		return std::default_sentinel;
+	}
+
+	constexpr auto linear_size() const {
+		using size_type = range_size_t<join_with>;
+		if (containers::is_empty(m_range)) {
+			return size_type(0_bi);
+		}
+		using total_element_size_t = decltype(
+			bounded::declval<range_size_t<Range>>() *
+			bounded::declval<range_size_t<range_reference_t<Range>>>()
+		);
+		struct partial_t {
+			total_element_size_t total_element_size;
+			range_size_t<Range> outer_range_size;
+		};
+		auto const partial = [&] {
+			if constexpr (sized_range<Range>) {
+				return partial_t(
+					containers::sum(containers::transform(m_range, containers::linear_size)),
+					containers::size(m_range)
+				);
+			} else {
+				auto total_element_size = total_element_size_t(0_bi);
+				auto outer_range_size = range_size_t<Range>(0_bi);
+				for (auto const & inner : m_range) {
+					total_element_size += containers::linear_size(inner);
+					++outer_range_size;
+				}
+				return partial_t(total_element_size, outer_range_size);
+			}
+		}();
+		auto const number_of_joiners = bounded::increase_min<0>(partial.outer_range_size - size_type(1_bi));
+		auto const total_joiner_size = number_of_joiners * containers::linear_size(m_joiner);
+		return bounded::assume_in_range<size_type>(partial.total_element_size + total_joiner_size);
 	}
 private:
 	template<typename JW, typename Iterator, typename Sentinel>

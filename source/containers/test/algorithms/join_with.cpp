@@ -9,6 +9,7 @@ import containers.algorithms.compare;
 import containers.algorithms.join_with;
 import containers.array;
 import containers.c_array;
+import containers.linear_size;
 
 import bounded;
 import std_module;
@@ -158,3 +159,5 @@ static_assert(compare(
 	"|"sv,
 	"a||b"sv
 ));
+
+static_assert(containers::linear_size(containers::join_with(containers::to_array({"a"sv, "ab"sv}), "abc"sv)) == 6_bi);
