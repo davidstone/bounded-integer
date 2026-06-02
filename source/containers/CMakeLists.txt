@@ -237,6 +237,7 @@ target_sources(containers_test PRIVATE
 		test/algorithms/compare.cpp
 		test/algorithms/count.cpp
 		test/algorithms/concatenate_view.cpp
+		test/algorithms/copy.cpp
 		test/algorithms/copy_or_relocate_from.cpp
 		test/algorithms/drop.cpp
 		test/algorithms/erase.cpp

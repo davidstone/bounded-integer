@@ -11,12 +11,10 @@ export module containers.algorithms.copy;
 
 import containers.algorithms.copy_or_relocate_from;
 import containers.algorithms.reverse_iterator;
-import containers.array;
 import containers.begin_end;
 import containers.dereference;
 import containers.iterator;
 import containers.range;
-import containers.subrange;
 
 import bounded;
 import std_module;
@@ -107,41 +105,3 @@ export constexpr auto copy_backward(range auto && input, iterator auto out_last)
 }
 
 } // namespace containers
-
-using namespace bounded::literal;
-
-static_assert([] {
-	auto container = containers::array{1, 2, 3, 4};
-	containers::copy(
-		containers::subrange(containers::begin(container), containers::begin(container)),
-		containers::begin(container) + 2_bi
-	);
-	return container == containers::array{1, 2, 3, 4};
-}());
-
-static_assert([] {
-	auto container = containers::array{1, 2, 3, 4};
-	containers::copy(
-		containers::subrange(containers::begin(container), containers::begin(container) + 2_bi),
-		containers::begin(container) + 2_bi
-	);
-	return container == containers::array{1, 2, 1, 2};
-}());
-
-static_assert([] {
-	auto container = containers::array{1, 2, 3, 4};
-	containers::copy_backward(
-		containers::subrange(containers::begin(container), containers::begin(container) + 2_bi),
-		containers::end(container)
-	);
-	return container == containers::array{1, 2, 1, 2};
-}());
-
-static_assert([] {
-	auto container = containers::array{1, 2, 3};
-	containers::copy_backward(
-		containers::subrange(containers::begin(container), containers::begin(container) + 2_bi),
-		containers::end(container)
-	);
-	return container == containers::array{1, 1, 2};
-}());
