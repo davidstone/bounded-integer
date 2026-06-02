@@ -85,7 +85,7 @@ private:
 
 struct bidirectional_container {
 	constexpr explicit bidirectional_container(containers::c_array<int, bidirectional_size> && value) {
-		containers::copy(value, +m_value);
+		containers::copy(value, m_value);
 	}
 	constexpr auto begin() {
 		return bidirectional_iterator(m_value);
