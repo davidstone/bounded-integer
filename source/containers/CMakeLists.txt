@@ -187,6 +187,7 @@ target_sources(containers PUBLIC
 		small_buffer_optimized_vector.cpp
 		splicable.cpp
 		stable_vector.cpp
+		static_string.cpp
 		static_vector.cpp
 		stored_function.cpp
 		string.cpp

@@ -129,6 +129,7 @@ export import containers.small_buffer_optimized_vector;
 export import containers.stable_vector;
 export import containers.static_vector;
 export import containers.string;
+export import containers.static_string;
 export import containers.subrange;
 export import containers.take;
 export import containers.to_address;
