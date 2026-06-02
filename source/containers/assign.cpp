@@ -72,14 +72,14 @@ constexpr void assign_impl(Target & target, Source && source) {
 	if constexpr (member_assignable<Target, Source>) {
 		::containers::member_assign(target, OPERATORS_FORWARD(source));
 	} else if constexpr (should_use_after_algorithms<Target>) {
-		auto const remainder = ::containers::copy_after(OPERATORS_FORWARD(source), target);
+		auto const remainder = ::containers::copy_truncate_after(OPERATORS_FORWARD(source), target);
 		::containers::erase_after(target, remainder.output, containers::end(target));
 		::containers::append_after(target, remainder.output, subrange(remainder.input, containers::end(source)));
 	} else if constexpr (std::is_trivially_copyable_v<range_value_t<Target>> and has_capacity<Target>) {
 		::containers::clear(target);
 		::containers::assign_to_empty(target, OPERATORS_FORWARD(source));
 	} else {
-		auto result = ::containers::copy(OPERATORS_FORWARD(source), target);
+		auto result = ::containers::copy_truncate(OPERATORS_FORWARD(source), target);
 		::containers::erase_to_end(target, std::move(result.output));
 		::containers::append(
 			target,

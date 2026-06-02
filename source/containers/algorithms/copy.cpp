@@ -42,7 +42,7 @@ constexpr auto copy(Input && input, iterator auto output) {
 }
 
 template<range Input>
-constexpr auto range_copy_impl(Input && input, range auto && output, auto out_result) {
+constexpr auto copy_truncate_impl(Input && input, range auto && output, auto out_result) {
 	// TODO: Transform this into a relocate when appropriate
 	auto in_first = containers::begin(OPERATORS_FORWARD(input));
 	auto const in_last = containers::end(OPERATORS_FORWARD(input));
@@ -64,8 +64,8 @@ struct return_position {
 };
 
 export template<range Input>
-constexpr auto copy(Input && input, range auto && output) {
-	return ::containers::range_copy_impl(
+constexpr auto copy_truncate(Input && input, range auto && output) {
+	return ::containers::copy_truncate_impl(
 		OPERATORS_FORWARD(input),
 		OPERATORS_FORWARD(output),
 		return_position()
@@ -89,8 +89,8 @@ private:
 	Iterator m_before_it;
 };
 export template<range Input>
-constexpr auto copy_after(Input && input, range auto && output) {
-	return ::containers::range_copy_impl(
+constexpr auto copy_truncate_after(Input && input, range auto && output) {
+	return ::containers::copy_truncate_impl(
 		OPERATORS_FORWARD(input),
 		OPERATORS_FORWARD(output),
 		return_before_position(output.before_begin())
