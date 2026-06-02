@@ -43,6 +43,13 @@ struct static_string {
 
 	friend auto operator<=>(static_string, static_string) = default;
 
+	friend auto operator<=>(static_string const lhs, std::string const & rhs) {
+		return std::string_view(lhs) <=> std::string_view(rhs);
+	}
+	friend auto operator==(static_string const lhs, std::string const & rhs) -> bool {
+		return std::string_view(lhs) == std::string_view(rhs);
+	}
+
 	constexpr operator std::string_view() const {
 		return std::string_view(data(), static_cast<std::size_t>(size_));
 	}
@@ -51,6 +58,9 @@ struct static_string {
 	}
 	constexpr operator std::span<char const, static_cast<std::size_t>(size_)>() const {
 		return std::span<char const, static_cast<std::size_t>(size_)>(data());
+	}
+	explicit constexpr operator std::string() const {
+		return std::string(data(), static_cast<std::size_t>(size()));
 	}
 
 	friend auto & operator<<(std::ostream & stream, static_string const & str) {
