@@ -29,6 +29,7 @@ import containers.range_size_t;
 import containers.sentinel_t;
 import containers.size;
 import containers.sized_range;
+import containers.static_string;
 import containers.subrange;
 import containers.subtractable;
 
@@ -37,7 +38,7 @@ import numeric_traits;
 import std_module;
 
 using namespace bounded::literal;
-using namespace std::string_view_literals;
+using namespace containers::string_literals;
 
 namespace containers {
 
@@ -60,10 +61,12 @@ private:
 	[[no_unique_address]] Sentinel m_sentinel;
 };
 
-constexpr auto drop_exception_prefix = "Tried to drop more elements than were in the range"sv;
 struct drop_exception : std::runtime_error {
 	explicit drop_exception(std::string_view const str):
-		std::runtime_error(containers::concatenate<std::string>(drop_exception_prefix, ": "sv, str))
+		std::runtime_error(containers::concatenate<std::string>(
+			"Tried to drop more elements than were in the range: "_s,
+			str
+		))
 	{
 	}
 };

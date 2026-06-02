@@ -10,12 +10,13 @@ import containers.test.test_sequence_container;
 import containers.test.test_set_size;
 import containers.size;
 import containers.string;
+import containers.static_string;
 
 import bounded;
 
 namespace {
 
-using namespace std::string_view_literals;
+using namespace containers::string_literals;
 
 auto check_equal(std::string_view const input) {
 	auto const output = containers::string(input);
@@ -33,11 +34,11 @@ TEST_CASE("string", "[string]") {
 }
 
 TEST_CASE("Empty string", "[string format]") {
-	CHECK(std::format("{}", containers::string()) == ""sv);
+	CHECK(std::format("{}", containers::string()) == ""_s);
 }
 
 TEST_CASE("Non-empty string", "[string format]") {
-	CHECK(std::format("{}", containers::string("hi")) == "hi"sv);
+	CHECK(std::format("{}", containers::string("hi"_s)) == "hi"_s);
 }
 
 } // namespace

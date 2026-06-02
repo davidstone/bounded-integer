@@ -18,6 +18,7 @@ import containers.array;
 import containers.back;
 import containers.c_array;
 import containers.static_vector;
+import containers.static_string;
 import containers.to_array;
 import containers.vector;
 
@@ -30,6 +31,7 @@ import std_module;
 namespace containers_test {
 
 using namespace bounded::literal;
+using namespace containers::string_literals;
 
 struct default_copy_t {
 	static constexpr auto operator()(auto && value) {
@@ -629,27 +631,26 @@ export constexpr auto array_uint16_many = sort_test_data(
 	}}
 );
 
-using namespace std::string_view_literals;
 export constexpr auto strings = sort_test_data(
 	containers::array{
-		"Hi"sv,
-		"There"sv,
-		"Hello"sv,
-		"World!"sv,
-		"Foo"sv,
-		"Bar"sv,
-		"Baz"sv,
-		""sv,
+		"Hi"_s,
+		"There"_s,
+		"Hello"_s,
+		"World!"_s,
+		"Foo"_s,
+		"Bar"_s,
+		"Baz"_s,
+		""_s,
 	},
 	containers::array{
-		""sv,
-		"Bar"sv,
-		"Baz"sv,
-		"Foo"sv,
-		"Hello"sv,
-		"Hi"sv,
-		"There"sv,
-		"World!"sv,
+		""_s,
+		"Bar"_s,
+		"Baz"_s,
+		"Foo"_s,
+		"Hello"_s,
+		"Hi"_s,
+		"There"_s,
+		"World!"_s,
 	}
 );
 

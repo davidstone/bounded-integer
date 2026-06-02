@@ -24,9 +24,6 @@ import std_module;
 using namespace bounded::literal;
 using namespace std::string_view_literals;
 
-using namespace bounded::literal;
-using namespace std::string_view_literals;
-
 constexpr auto compare(std::string_view const input, std::span<std::string_view const> const expected) -> bool {
 	auto const split = containers::split(input, '|');
 	for (auto const [split_inner, expected_inner] : containers::zip(split, expected)) {

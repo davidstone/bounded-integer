@@ -9,13 +9,14 @@ import containers.algorithms.compare;
 import containers.algorithms.join;
 import containers.array;
 import containers.c_array;
+import containers.static_string;
 import containers.to_array;
 
 import bounded;
 import std_module;
 
 using namespace bounded::literal;
-using namespace std::string_view_literals;
+using namespace containers::string_literals;
 
 template<std::size_t size>
 constexpr auto compare(containers::c_array<std::string_view, size> const & input, std::string_view const expected) -> bool {
@@ -32,50 +33,50 @@ constexpr auto compare(containers::c_array<std::string_view, size> const & input
 
 static_assert(containers::equal(
 	containers::join(containers::array<std::string_view, 0_bi>()),
-	""sv
+	""_s
 ));
 
 static_assert(compare(
-	{""sv},
-	""sv
+	{""_s},
+	""_s
 ));
 
 static_assert(compare(
-	{""sv, ""sv},
-	""sv
+	{""_s, ""_s},
+	""_s
 ));
 
 static_assert(compare(
-	{"a"sv},
-	"a"sv
+	{"a"_s},
+	"a"_s
 ));
 
 static_assert(compare(
-	{"a"sv, ""sv},
-	"a"sv
+	{"a"_s, ""_s},
+	"a"_s
 ));
 
 static_assert(compare(
-	{""sv, "a"sv},
-	"a"sv
+	{""_s, "a"_s},
+	"a"_s
 ));
 
 static_assert(compare(
-	{"a"sv, "b"sv},
-	"ab"sv
+	{"a"_s, "b"_s},
+	"ab"_s
 ));
 
 static_assert(compare(
-	{"abc"sv, "def"sv},
-	"abcdef"sv
+	{"abc"_s, "def"_s},
+	"abcdef"_s
 ));
 
 static_assert(compare(
-	{""sv, "a"sv, ""sv},
-	"a"sv
+	{""_s, "a"_s, ""_s},
+	"a"_s
 ));
 
 static_assert(compare(
-	{"a"sv, ""sv, "b"sv},
-	"ab"sv
+	{"a"_s, ""_s, "b"_s},
+	"ab"_s
 ));

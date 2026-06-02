@@ -10,14 +10,14 @@ import containers.algorithms.join_with;
 import containers.array;
 import containers.c_array;
 import containers.linear_size;
+import containers.static_string;
 import containers.to_array;
 
 import bounded;
 import std_module;
 
-import containers.vector;
-
 using namespace bounded::literal;
+using namespace containers::string_literals;
 using namespace std::string_view_literals;
 
 template<std::size_t size>
@@ -38,127 +38,127 @@ constexpr auto compare(
 }
 
 static_assert(containers::equal(
-	containers::join_with(containers::array<std::string_view, 0_bi>(), ""sv),
-	""sv
+	containers::join_with(containers::array<std::string_view, 0_bi>(), ""_s),
+	""_s
 ));
 
 static_assert(containers::equal(
-	containers::join_with(containers::array<std::string_view, 0_bi>(), "|"sv),
-	""sv
+	containers::join_with(containers::array<std::string_view, 0_bi>(), "|"_s),
+	""_s
 ));
 
 static_assert(compare(
-	{""sv},
-	""sv,
-	""sv
+	{""_s},
+	""_s,
+	""_s
 ));
 
 static_assert(compare(
-	{""sv},
-	"|"sv,
-	""sv
+	{""_s},
+	"|"_s,
+	""_s
 ));
 
 static_assert(compare(
-	{""sv, ""sv},
-	""sv,
-	""sv
+	{""_s, ""_s},
+	""_s,
+	""_s
 ));
 
 static_assert(compare(
-	{""sv, ""sv},
-	"|"sv,
-	"|"sv
+	{""_s, ""_s},
+	"|"_s,
+	"|"_s
 ));
 
 static_assert(compare(
-	{"a"sv},
-	""sv,
-	"a"sv
+	{"a"_s},
+	""_s,
+	"a"_s
 ));
 
 static_assert(compare(
-	{"a"sv},
-	"|"sv,
-	"a"sv
+	{"a"_s},
+	"|"_s,
+	"a"_s
 ));
 
 static_assert(compare(
-	{"a"sv, ""sv},
-	""sv,
-	"a"sv
+	{"a"_s, ""_s},
+	""_s,
+	"a"_s
 ));
 
 static_assert(compare(
-	{"a"sv, ""sv},
-	"|"sv,
-	"a|"sv
+	{"a"_s, ""_s},
+	"|"_s,
+	"a|"_s
 ));
 
 static_assert(compare(
-	{""sv, "a"sv},
-	""sv,
-	"a"sv
+	{""_s, "a"_s},
+	""_s,
+	"a"_s
 ));
 
 static_assert(compare(
-	{""sv, "a"sv},
-	"|"sv,
-	"|a"sv
+	{""_s, "a"_s},
+	"|"_s,
+	"|a"_s
 ));
 
 static_assert(compare(
-	{"a"sv, "b"sv},
-	""sv,
-	"ab"sv
+	{"a"_s, "b"_s},
+	""_s,
+	"ab"_s
 ));
 
 static_assert(compare(
-	{"a"sv, "b"sv},
-	"|"sv,
-	"a|b"sv
+	{"a"_s, "b"_s},
+	"|"_s,
+	"a|b"_s
 ));
 
 static_assert(compare(
-	{"abc"sv, "def"sv},
-	""sv,
-	"abcdef"sv
+	{"abc"_s, "def"_s},
+	""_s,
+	"abcdef"_s
 ));
 
 static_assert(compare(
-	{"abc"sv, "def"sv},
-	"|"sv,
-	"abc|def"sv
+	{"abc"_s, "def"_s},
+	"|"_s,
+	"abc|def"_s
 ));
 
 static_assert(compare(
-	{"abc"sv, "def"sv},
-	", "sv,
-	"abc, def"sv
+	{"abc"_s, "def"_s},
+	", "_s,
+	"abc, def"_s
 ));
 
 static_assert(compare(
-	{""sv, "a"sv, ""sv},
-	""sv,
-	"a"sv
+	{""_s, "a"_s, ""_s},
+	""_s,
+	"a"_s
 ));
 
 static_assert(compare(
-	{""sv, "a"sv, ""sv},
-	"|"sv,
-	"|a|"sv
+	{""_s, "a"_s, ""_s},
+	"|"_s,
+	"|a|"_s
 ));
 
 static_assert(compare(
-	{"a"sv, ""sv, "b"sv},
-	""sv,
-	"ab"sv
+	{"a"_s, ""_s, "b"_s},
+	""_s,
+	"ab"_s
 ));
 
 static_assert(compare(
-	{"a"sv, ""sv, "b"sv},
-	"|"sv,
-	"a||b"sv
+	{"a"_s, ""_s, "b"_s},
+	"|"_s,
+	"a||b"_s
 ));
 
-static_assert(containers::linear_size(containers::join_with(containers::to_array({"a"sv, "ab"sv}), "abc"sv)) == 6_bi);
+static_assert(containers::linear_size(containers::join_with(containers::array{"a"_s, "ab"_s}, "abc"sv)) == 6_bi);

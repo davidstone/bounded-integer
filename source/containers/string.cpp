@@ -18,12 +18,14 @@ import containers.range_size_t;
 import containers.range_value_t;
 import containers.size;
 import containers.small_buffer_optimized_vector;
+import containers.static_string;
 
 import bounded;
 import numeric_traits;
 import std_module;
 
 using namespace bounded::literal;
+using namespace containers::string_literals;
 
 namespace containers {
 
@@ -36,11 +38,13 @@ public:
 	template<std::same_as<empty_c_array_parameter> Source = empty_c_array_parameter>
 	constexpr string(Source) {
 	}
-	template<typename Source> requires bounded::convertible_to<Source, std::string_view> or bounded::convertible_to<Source, char const *>
-	constexpr explicit(!std::same_as<Source, char const *> and !std::same_as<Source, char *>) string(Source const sv):
-		base(std::string_view(sv))
+	template<auto size_>
+	constexpr string(static_string<size_> const other):
+		base(other)
 	{
 	}
+	explicit string(std::same_as<char const *> auto) = delete("Use `_s` literal instead");
+	explicit string(std::same_as<char *> auto) = delete("Use `_s` literal instead");
 
 	string(string const &) = default;
 	string(string &&) = default;
@@ -128,39 +132,16 @@ struct std::hash<containers::string> {
 };
 
 
-struct to_sv {
-	constexpr operator std::string_view() const {
-		return "";
-	}
-};
-
-struct to_cstr {
-	constexpr operator char const *() const {
-		return "";
-	}
-};
-
-struct to_both {
-	constexpr operator char const *() const {
-		return "";
-	}
-	constexpr operator std::string_view() const {
-		return "";
-	}
-};
-
-static_assert(bounded::convertible_to<char const *, containers::string>);
-static_assert(bounded::convertible_to<char *, containers::string>);
-static_assert(bounded::convertible_to<containers::c_array<char, 5> const &, containers::string>);
-static_assert(bounded::convertible_to<containers::c_array<char, 5> &, containers::string>);
+static_assert(bounded::convertible_to<containers::static_string<5_bi>, containers::string>);
+static_assert(!bounded::convertible_to<char const *, containers::string>);
+static_assert(!bounded::convertible_to<char *, containers::string>);
+static_assert(!bounded::convertible_to<containers::c_array<char, 5> const &, containers::string>);
+static_assert(!bounded::convertible_to<containers::c_array<char, 5> &, containers::string>);
 static_assert(!bounded::convertible_to<std::string_view, containers::string>);
-static_assert(!bounded::convertible_to<to_sv, containers::string>);
-static_assert(!bounded::convertible_to<to_cstr, containers::string>);
-static_assert(!bounded::convertible_to<to_both, containers::string>);
-static_assert(bounded::constructible_from<containers::string, to_sv>);
-static_assert(bounded::constructible_from<containers::string, to_cstr>);
-static_assert(bounded::constructible_from<containers::string, to_both>);
+static_assert(bounded::constructible_from<containers::string, containers::static_string<5_bi>>);
 static_assert(bounded::constructible_from<containers::string, std::string_view>);
+static_assert(!bounded::constructible_from<containers::string, char const *>);
+static_assert(!bounded::constructible_from<containers::string, containers::c_array<char, 5> const &>);
 
 constexpr auto check_equal(std::string_view const input) {
 	auto const output = containers::string(input);
@@ -172,3 +153,4 @@ constexpr auto check_equal(std::string_view const input) {
 static_assert(check_equal(""));
 static_assert(check_equal("a"));
 static_assert(check_equal("01234567890123456789012"));
+static_assert(containers::string({'a', 'b', 'd'}) == containers::string("abd"_s));

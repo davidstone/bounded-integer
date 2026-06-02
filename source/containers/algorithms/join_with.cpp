@@ -114,17 +114,17 @@ private:
 	[[no_unique_address]] sentinel_t<Range> m_last;
 };
 
-template<typename JW, typename Iterator>
+template<typename Joiner, typename Iterator>
 struct join_with_diff_t {
 	using type = std::ptrdiff_t;
 };
 
-template<typename JW, typename Iterator> requires(
+template<typename Joiner, typename Iterator> requires(
 	bounded::bounded_integer<iter_difference_t<Iterator>> and
 	bounded::bounded_integer<range_size_t<iter_value_t<Iterator>>> and
-	bounded::bounded_integer<range_size_t<typename JW::joiner_t>>
+	bounded::bounded_integer<range_size_t<Joiner>>
 )
-struct join_with_diff_t<JW, Iterator> {
+struct join_with_diff_t<Joiner, Iterator> {
 	using type = decltype(
 		(
 			bounded::declval<iter_difference_t<Iterator>>() *
@@ -133,7 +133,7 @@ struct join_with_diff_t<JW, Iterator> {
 		bounded::max(
 			0_bi,
 			(bounded::declval<iter_difference_t<Iterator>>() - 1_bi) *
-			bounded::declval<range_size_t<typename JW::joiner_t>>()
+			bounded::declval<range_size_t<Joiner>>()
 		)
 	);
 };
@@ -145,7 +145,7 @@ private:
 	using inner_it = with_inner_range_iterator<iter_reference_t<Iterator>>;
 	using joiner_it = iterator_t<typename JW::joiner_t const>;
 public:
-	using difference_type = typename join_with_diff_t<JW, Iterator>::type;
+	using difference_type = typename join_with_diff_t<typename JW::joiner_t, Iterator>::type;
 	using reference_type = bounded::common_type_and_value_category<
 		decltype(bounded::declval<inner_it>().dereference(bounded::declval<JW &>().m_inner)),
 		iter_reference_t<joiner_it>

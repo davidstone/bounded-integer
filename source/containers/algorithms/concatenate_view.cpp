@@ -87,7 +87,7 @@ struct concatenate_view_iterator {
 		"Cannot combine input and output ranges in concatenate_view"
 	);
 
-	using difference_type = decltype((0_bi + ... + bounded::declval<iter_difference_t<iterator_t<RangeViews>>>()));
+	using difference_type = decltype((0_bi + ... + bounded::integer(bounded::declval<iter_difference_t<iterator_t<RangeViews>>>())));
 	
 	using iterator_category =
 		std::conditional_t<any_is_output_iterator<RangeViews...>, std::output_iterator_tag,
@@ -157,7 +157,7 @@ struct concatenate_view_iterator {
 
 		auto const [...lhs_ranges] = lhs.m_range_views;
 		auto const [...rhs_ranges] = rhs.m_range_views;
-		return (... + (containers::begin(lhs_ranges) - containers::begin(rhs_ranges)));
+		return (... + bounded::integer(containers::begin(lhs_ranges) - containers::begin(rhs_ranges)));
 	}
 
 
