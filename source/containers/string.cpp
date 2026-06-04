@@ -16,8 +16,8 @@ import containers.is_empty;
 import containers.push_back;
 import containers.range_size_t;
 import containers.range_value_t;
+import containers.sbo_vector;
 import containers.size;
-import containers.small_buffer_optimized_vector;
 import containers.static_string;
 
 import bounded;
@@ -30,8 +30,8 @@ using namespace containers::string_literals;
 namespace containers {
 
 // Unlike std::string, there is no null terminator.
-export struct string : private small_buffer_optimized_vector<char, 0> {
-	using base = small_buffer_optimized_vector<char, 0>;
+export struct string : private sbo_vector<char, 0> {
+	using base = sbo_vector<char, 0>;
 public:
 	using base::base;
 	

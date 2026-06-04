@@ -10,7 +10,7 @@ import containers.test.test_reserve_and_capacity;
 import containers.test.test_sequence_container;
 import containers.test.test_set_size;
 import containers.repeat_n;
-import containers.small_buffer_optimized_vector;
+import containers.sbo_vector;
 
 import bounded;
 import bounded.test_int;
@@ -19,13 +19,13 @@ namespace {
 
 using namespace bounded::literal;
 
-static_assert(bounded::default_constructible<containers::small_buffer_optimized_vector<int, 40>>);
-static_assert(containers_test::test_sequence_container<containers::small_buffer_optimized_vector<int, 40>>());
-static_assert(containers_test::test_set_size<containers::small_buffer_optimized_vector<int, 1>>());
+static_assert(bounded::default_constructible<containers::sbo_vector<int, 40>>);
+static_assert(containers_test::test_sequence_container<containers::sbo_vector<int, 40>>());
+static_assert(containers_test::test_set_size<containers::sbo_vector<int, 1>>());
 
 template<typename T>
 constexpr auto test_sbo_vector_impl(auto const capacity, auto const size) -> void {
-	using container = containers::small_buffer_optimized_vector<T, capacity.value()>;
+	using container = containers::sbo_vector<T, capacity.value()>;
 	static_assert(bounded::default_constructible<container>);
 	static_assert(containers_test::test_sequence_container<container>());
 	static_assert(containers_test::test_reserve_and_capacity<container>());
@@ -40,7 +40,7 @@ constexpr auto test_sbo_vector(auto const capacity) -> void {
 	test_sbo_vector_impl<T>(capacity, capacity + 1_bi);
 }
 
-TEST_CASE("small_buffer_optimized_vector", "[small_buffer_optimized_vector]") {
+TEST_CASE("sbo_vector", "[sbo_vector]") {
 	test_sbo_vector<int>(2_bi);
 	test_sbo_vector<int>(3_bi);
 	test_sbo_vector<int>(4_bi);
@@ -50,10 +50,10 @@ TEST_CASE("small_buffer_optimized_vector", "[small_buffer_optimized_vector]") {
 	test_sbo_vector<char>(254_bi);
 	test_sbo_vector<char>(255_bi);
 	test_sbo_vector<char>(256_bi);
-	static_assert(bounded::default_constructible<containers::small_buffer_optimized_vector<bounded_test::integer, 3>>);
-	containers_test::test_sequence_container<containers::small_buffer_optimized_vector<bounded_test::integer, 3>>();
-	containers_test::test_reserve_and_capacity<containers::small_buffer_optimized_vector<bounded_test::integer, 3>>();
-	containers_test::test_set_size<containers::small_buffer_optimized_vector<bounded_test::integer, 1>>();
+	static_assert(bounded::default_constructible<containers::sbo_vector<bounded_test::integer, 3>>);
+	containers_test::test_sequence_container<containers::sbo_vector<bounded_test::integer, 3>>();
+	containers_test::test_reserve_and_capacity<containers::sbo_vector<bounded_test::integer, 3>>();
+	containers_test::test_set_size<containers::sbo_vector<bounded_test::integer, 1>>();
 }
 
 } // namespace

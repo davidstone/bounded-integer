@@ -11,7 +11,7 @@ module;
 #include <operators/bracket.hpp>
 #include <operators/forward.hpp>
 
-export module containers.small_buffer_optimized_vector;
+export module containers.sbo_vector;
 
 import containers.algorithms.copy;
 import containers.algorithms.destroy_range;
@@ -164,7 +164,7 @@ private:
 };
 
 export template<typename T, std::size_t requested_small_capacity, std::size_t max_size = containers::maximum_array_size<T>>
-struct [[clang::trivial_abi]] small_buffer_optimized_vector : private lexicographical_comparison::base {
+struct [[clang::trivial_abi]] sbo_vector : private lexicographical_comparison::base {
 	using size_type = small_buffer_size_type<max_size>;
 
 	static_assert(
@@ -178,45 +178,45 @@ private:
 	
 public:
 
-	small_buffer_optimized_vector() = default;
+	sbo_vector() = default;
 	
-	constexpr explicit small_buffer_optimized_vector(constructor_initializer_range<small_buffer_optimized_vector> auto && source):
-		small_buffer_optimized_vector()
+	constexpr explicit sbo_vector(constructor_initializer_range<sbo_vector> auto && source):
+		sbo_vector()
 	{
 		::containers::assign_to_empty(*this, OPERATORS_FORWARD(source));
 	}
 	
 	template<std::size_t source_size>
-	constexpr small_buffer_optimized_vector(c_array<T, source_size> && source):
-		small_buffer_optimized_vector()
+	constexpr sbo_vector(c_array<T, source_size> && source):
+		sbo_vector()
 	{
 		::containers::assign_to_empty(*this, std::move(source));
 	}
 	template<std::same_as<empty_c_array_parameter> Source = empty_c_array_parameter>
-	constexpr small_buffer_optimized_vector(Source):
-		small_buffer_optimized_vector()
+	constexpr sbo_vector(Source):
+		sbo_vector()
 	{
 	}
 
-	constexpr small_buffer_optimized_vector(small_buffer_optimized_vector const & other):
-		small_buffer_optimized_vector()
+	constexpr sbo_vector(sbo_vector const & other):
+		sbo_vector()
 	{
 		::containers::assign_to_empty(*this, other);
 	}
 
-	constexpr small_buffer_optimized_vector(small_buffer_optimized_vector && other) noexcept:
-		small_buffer_optimized_vector()
+	constexpr sbo_vector(sbo_vector && other) noexcept:
+		sbo_vector()
 	{
 		move_assign_to_empty(std::move(other));
 	}
 
-	constexpr auto operator=(small_buffer_optimized_vector const & other) & -> small_buffer_optimized_vector & {
+	constexpr auto operator=(sbo_vector const & other) & -> sbo_vector & {
 		if (this != std::addressof(other)) {
 			containers::assign(*this, other);
 		}
 		return *this;
 	}
-	constexpr auto operator=(small_buffer_optimized_vector && other) & noexcept -> small_buffer_optimized_vector & {
+	constexpr auto operator=(sbo_vector && other) & noexcept -> sbo_vector & {
 		// Work around https://github.com/llvm/llvm-project/issues/61562
 		if (std::addressof(other) == this) {
 			return *this;
@@ -226,7 +226,7 @@ public:
 		return *this;
 	}
 
-	constexpr ~small_buffer_optimized_vector() {
+	constexpr ~sbo_vector() {
 		destroy();
 	}
 
@@ -334,7 +334,7 @@ private:
 		}
 	}
 	
-	constexpr auto move_assign_to_empty(small_buffer_optimized_vector && other) & {
+	constexpr auto move_assign_to_empty(sbo_vector && other) & {
 		if (other.is_small()) {
 			::bounded::construct_at(m_state.small, [&] { return bounded::relocate(other.m_state.small); });
 		} else {
@@ -379,16 +379,16 @@ static_assert(small_char_type::capacity() == 23);
 static_assert(std::is_empty_v<small_char_type::first_bytes_of_size_type>);
 static_assert(sizeof(small_char_type) == sizeof(void *) * 3 - 1);
 
-static_assert(sizeof(containers::small_buffer_optimized_vector<char, 0>) == sizeof(void *) * 3);
+static_assert(sizeof(containers::sbo_vector<char, 0>) == sizeof(void *) * 3);
 
 struct check_alignment_first {
-	containers::small_buffer_optimized_vector<char, 0> a;
+	containers::sbo_vector<char, 0> a;
 	char b;
 };
 static_assert(sizeof(check_alignment_first) == sizeof(void *) * 4);
 
 struct check_alignment_last {
 	char a;
-	containers::small_buffer_optimized_vector<char, 0> b;
+	containers::sbo_vector<char, 0> b;
 };
 static_assert(sizeof(check_alignment_last) == sizeof(void *) * 4);

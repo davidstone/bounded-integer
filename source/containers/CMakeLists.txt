@@ -178,13 +178,13 @@ target_sources(containers PUBLIC
 		reserve_space_for.cpp
 		resizable_container.cpp
 		resize.cpp
+		sbo_vector.cpp
 		sentinel_for.cpp
 		sentinel_t.cpp
 		shrink_to_fit.cpp
 		size.cpp
 		size_then_use_range.cpp
 		sized_range.cpp
-		small_buffer_optimized_vector.cpp
 		splicable.cpp
 		stable_vector.cpp
 		static_string.cpp
@@ -295,7 +295,7 @@ target_sources(containers_test PRIVATE
 target_sources(containers_test PRIVATE
 	test/sort/to_radix_sort_key.cpp
 	test/at.cpp
-	test/small_buffer_optimized_vector.cpp
+	test/sbo_vector.cpp
 	test/static_vector.cpp
 	test/string.cpp
 	test/trivial_inplace_function.cpp
