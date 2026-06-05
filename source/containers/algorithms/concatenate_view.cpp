@@ -238,10 +238,10 @@ public:
 	constexpr auto begin() && {
 		return begin_impl(std::move(m_ranges));
 	}
-	constexpr auto begin() const & requires(... and forward_range<Ranges>) {
+	constexpr auto begin() const & requires(... and forward_range<Ranges const &>) {
 		return begin_impl(m_ranges);
 	}
-	constexpr auto begin() & requires(... and forward_range<Ranges>) {
+	constexpr auto begin() & requires(... and forward_range<Ranges &>) {
 		return begin_impl(m_ranges);
 	}
 	static constexpr auto end() requires(... or !forward_random_access_range<Ranges>) {
