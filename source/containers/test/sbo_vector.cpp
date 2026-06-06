@@ -26,15 +26,16 @@ static_assert(containers_test::test_set_size<containers::sbo_vector<int, 1>>());
 template<typename T>
 constexpr auto test_sbo_vector_impl(auto const capacity, auto const size) -> void {
 	using container = containers::sbo_vector<T, capacity.value()>;
-	static_assert(bounded::default_constructible<container>);
-	static_assert(containers_test::test_sequence_container<container>());
-	static_assert(containers_test::test_reserve_and_capacity<container>());
 	constexpr auto generator = containers::repeat_default_n<T>(size);
 	static_assert(containers::equal(container(generator), generator));
 }
 
 template<typename T>
 constexpr auto test_sbo_vector(auto const capacity) -> void {
+	using container = containers::sbo_vector<T, capacity.value()>;
+	static_assert(bounded::default_constructible<container>);
+	static_assert(containers_test::test_sequence_container<container>());
+	static_assert(containers_test::test_reserve_and_capacity<container>());
 	test_sbo_vector_impl<T>(capacity, capacity - 1_bi);
 	test_sbo_vector_impl<T>(capacity, capacity);
 	test_sbo_vector_impl<T>(capacity, capacity + 1_bi);
@@ -57,3 +58,35 @@ TEST_CASE("sbo_vector", "[sbo_vector]") {
 }
 
 } // namespace
+
+TEST_CASE("sbo_vector of sbo_vector of non-trivially relocatable", "[sbo_vector]") {
+	struct non_trivially_relocatable {
+		constexpr non_trivially_relocatable():
+			m_self(this)
+		{
+		}
+	
+		constexpr non_trivially_relocatable(non_trivially_relocatable &&) noexcept:
+			m_self(this)
+		{
+		}
+		constexpr ~non_trivially_relocatable() {
+			CHECK(m_self == this);
+		}
+	
+		non_trivially_relocatable * m_self;
+	};
+	
+	struct wrapper {
+		containers::sbo_vector<non_trivially_relocatable, 1> sources;
+	};
+	
+	auto const _ = 
+	containers::sbo_vector<wrapper, 1>({
+		wrapper{
+			containers::sbo_vector<non_trivially_relocatable, 1>({
+				non_trivially_relocatable(),
+			}),
+		},
+	});
+}

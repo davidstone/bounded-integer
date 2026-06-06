@@ -18,6 +18,10 @@ namespace containers {
 export template<typename T, array_size_type<T> size_>
 struct uninitialized_array {
 	constexpr uninitialized_array() = default;
+	uninitialized_array(uninitialized_array &&) requires bounded::trivially_move_constructible<T> = default;
+	uninitialized_array(uninitialized_array const &) requires bounded::trivially_copy_constructible<T> = default;
+	auto operator=(uninitialized_array &&) & -> uninitialized_array & requires bounded::trivially_move_assignable<T> = default;
+	auto operator=(uninitialized_array const &) & -> uninitialized_array & requires bounded::trivially_copy_assignable<T> = default;
 	constexpr auto data() const noexcept -> T const * {
 		return reinterpret_cast<T const *>(m_storage);
 	}
@@ -43,6 +47,10 @@ struct uninitialized_array<T, size_> {
 		uninitialized_array(bounded::make_index_sequence(size()))
 	{
 	}
+	uninitialized_array(uninitialized_array &&) requires bounded::trivially_move_constructible<T> = default;
+	uninitialized_array(uninitialized_array const &) requires bounded::trivially_copy_constructible<T> = default;
+	auto operator=(uninitialized_array &&) & -> uninitialized_array & requires bounded::trivially_move_assignable<T> = default;
+	auto operator=(uninitialized_array const &) & -> uninitialized_array & requires bounded::trivially_copy_assignable<T> = default;
 	constexpr auto data() const noexcept -> T const * {
 		return m_storage;
 	}

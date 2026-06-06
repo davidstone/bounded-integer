@@ -102,8 +102,8 @@ struct small_type {
 	using size_type = bounded::integer<0, bounded::normalize<capacity()>>;
 	using first_bytes_of_size_type = typename split_size_t<size_type>::first_t;
 
-	constexpr auto size(last_size_byte_t const last) const -> size_type {
-		return recombine_size<size_type>(m_first_bytes_of_size, last);
+	constexpr auto first_bytes_of_size() const -> first_bytes_of_size_type {
+		return m_first_bytes_of_size;
 	}
 	constexpr auto set_size(first_bytes_of_size_type const size) & -> void {
 		m_first_bytes_of_size = size;
@@ -142,8 +142,8 @@ struct [[gnu::packed]] large_type {
 		return bounded::assume_in_range<capacity_type>(m_capacity);
 	}
 
-	constexpr auto size(last_size_byte_t const last_bytes_of_size) const -> size_type {
-		return containers::recombine_size<size_type>(m_first_bytes_of_size, last_bytes_of_size);
+	constexpr auto first_bytes_of_size() const -> first_bytes_of_size_type {
+		return m_first_bytes_of_size;
 	}
 	constexpr auto set_size(first_bytes_of_size_type const size) & -> void {
 		m_first_bytes_of_size = size;
@@ -240,8 +240,8 @@ public:
 	constexpr auto size() const {
 		return BOUNDED_CONDITIONAL(
 			is_small(),
-			m_state.small.size(m_state.last_byte.size),
-			m_state.large.size(m_state.last_byte.size)
+			containers::recombine_size<typename small_t::size_type>(m_state.small.first_bytes_of_size(), m_state.last_byte.size),
+			containers::recombine_size<typename large_t::size_type>(m_state.large.first_bytes_of_size(), m_state.last_byte.size)
 		);
 	}
 
@@ -313,11 +313,12 @@ private:
 		if (is_small()) {
 			return;
 		}
+		auto const size_ = size();
 		auto temp = bounded::relocate(m_state.large);
 		::bounded::construct_at(m_state.small, bounded::construct<small_t>);
-		containers::uninitialized_relocate_no_overlap(subrange(temp.data(), temp.size(m_state.last_byte.size)), m_state.small.data());
+		containers::uninitialized_relocate_no_overlap(subrange(temp.data(), size_), m_state.small.data());
 		deallocate_large(temp);
-		set_size_impl(m_state.small, m_state.last_byte, temp.size(m_state.last_byte.size));
+		set_size_impl(m_state.small, m_state.last_byte, size_);
 		m_state.last_byte.is_large = false;
 	}
 	
@@ -336,7 +337,9 @@ private:
 	
 	constexpr auto move_assign_to_empty(sbo_vector && other) & {
 		if (other.is_small()) {
-			::bounded::construct_at(m_state.small, [&] { return bounded::relocate(other.m_state.small); });
+			bounded::construct_at(m_state.small, bounded::construct<small_t>);
+			containers::uninitialized_relocate_no_overlap(other, m_state.small.data());
+			m_state.small.set_size(other.m_state.small.first_bytes_of_size());
 		} else {
 			::bounded::construct_at(m_state.large, [&] { return bounded::relocate(other.m_state.large); });
 		}
