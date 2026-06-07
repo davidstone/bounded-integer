@@ -18,6 +18,7 @@ import containers.can_set_size;
 import containers.data;
 import containers.iterator_t;
 import containers.iter_difference_t;
+import containers.linear_size;
 import containers.range_size_t;
 import containers.range_value_t;
 import containers.resizable_container;
@@ -67,7 +68,7 @@ constexpr auto reusable_concatenate_container(reusable_concatenate_t<Result, Int
 			return reusable_concatenate_t<Result, Integer>{std::addressof(range), result.before_size};
 		}
 	}
-	result.before_size += ::containers::size(range);
+	result.before_size += ::containers::linear_size(range);
 	return result;
 }
 
@@ -120,7 +121,7 @@ constexpr auto move_existing_data_to_final_position(Container & container, auto 
 // non-reservable output ranges
 export template<typename Result>
 constexpr auto concatenate(auto && ... ranges) -> Result {
-	auto const total_size = (0_bi + ... + ::containers::ugly_size_hack(::containers::size(ranges)));
+	auto const total_size = (0_bi + ... + ::containers::ugly_size_hack(::containers::linear_size(ranges)));
 
 	if constexpr (can_reuse_storage<Result>) {
 		using Integer = bounded::integer<0, bounded::builtin_max_value<decltype(total_size)>>;
