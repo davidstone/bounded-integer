@@ -116,3 +116,90 @@ static_assert(compare_range(
 	containers::array({""sv, "a"sv, ""sv, "b"sv, ""sv})
 ));
 
+constexpr auto compare_keep_delimiters(std::string_view const input, std::span<std::string_view const> const expected) -> bool {
+	auto const split = containers::split_keep_delimiters(input, '|');
+	for (auto const [split_inner, expected_inner] : containers::zip(split, expected)) {
+		BOUNDED_ASSERT(std::string_view(split_inner) == expected_inner);
+	}
+	return true;
+}
+
+static_assert(compare_keep_delimiters(
+	"a"sv,
+	containers::array({"a"sv})
+));
+
+static_assert(compare_keep_delimiters(
+	"a|b"sv,
+	containers::array({"a"sv, "|"sv, "b"sv})
+));
+
+static_assert(compare_keep_delimiters(
+	"|a"sv,
+	containers::array({""sv, "|"sv, "a"sv})
+));
+
+static_assert(compare_keep_delimiters(
+	"a|"sv,
+	containers::array({"a"sv, "|"sv, ""sv})
+));
+
+static_assert(compare_keep_delimiters(
+	""sv,
+	containers::array({""sv})
+));
+
+static_assert(compare_keep_delimiters(
+	"|"sv,
+	containers::array({""sv, "|"sv, ""sv})
+));
+
+static_assert(compare_keep_delimiters(
+	"|a||b|"sv,
+	containers::array({""sv, "|"sv, "a"sv, "|"sv, ""sv, "|"sv, "b"sv, "|"sv, ""sv})
+));
+
+
+constexpr auto compare_range_keep_delimiters(std::string_view const input, std::span<std::string_view const> const expected) -> bool {
+	auto const split = containers::split_range_keep_delimiters(input, ":)");
+	for (auto const [split_inner, expected_inner] : containers::zip(split, expected)) {
+		BOUNDED_ASSERT(std::string_view(split_inner) == expected_inner);
+	}
+	return true;
+}
+
+static_assert(compare_range_keep_delimiters(
+	"a"sv,
+	containers::array({"a"sv})
+));
+
+static_assert(compare_range_keep_delimiters(
+	"a:)b"sv,
+	containers::array({"a"sv, ":)"sv, "b"sv})
+));
+
+static_assert(compare_range_keep_delimiters(
+	":)a"sv,
+	containers::array({""sv, ":)"sv, "a"sv})
+));
+
+static_assert(compare_range_keep_delimiters(
+	"a:)"sv,
+	containers::array({"a"sv, ":)"sv, ""sv})
+));
+
+static_assert(compare_range_keep_delimiters(
+	""sv,
+	containers::array({""sv})
+));
+
+static_assert(compare_range_keep_delimiters(
+	":)"sv,
+	containers::array({""sv, ":)"sv, ""sv})
+));
+
+static_assert(compare_range_keep_delimiters(
+	":)a:):)b:)"sv,
+	containers::array({""sv, ":)"sv, "a"sv, ":)"sv, ""sv, ":)"sv, "b"sv, ":)"sv, ""sv})
+));
+
