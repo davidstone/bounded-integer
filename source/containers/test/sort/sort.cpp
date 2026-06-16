@@ -406,7 +406,7 @@ static_assert(test_sort(
 
 #if 0
 
-TEST_CASE("sort fuzzer", "[sort]") {
+TEST_CASE("sort: sort fuzzer") {
 	auto engine = std::mt19937(std::random_device()());
 	constexpr auto min_size = 1;
 	constexpr auto max_size = 50;

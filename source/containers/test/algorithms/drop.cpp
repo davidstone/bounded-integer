@@ -5,7 +5,7 @@
 
 module;
 
-#include <catch2/catch_test_macros.hpp>
+#include <doctest/doctest.h>
 
 #include <bounded/arithmetic/common_arithmetic.hpp>
 #include <bounded/assert.hpp>
@@ -203,16 +203,16 @@ static_assert(containers::size(containers::drop_exactly(sized_input_range_t(), 2
 static_assert(test_drop_exactly(bounded::construct<input_range_t>));
 
 constexpr auto too_large_count = bounded::integer<0, 4>(4_bi);
-TEST_CASE("drop_exactly fails with too-large count for sized range", "[drop_exactly]") {
+TEST_CASE("drop_exactly: drop_exactly fails with too-large count for sized range") {
 	CHECK_THROWS(containers::drop_exactly(sized_range, too_large_count));
 }
-TEST_CASE("drop_exactly fails with too-large count for unsized range", "[drop_exactly]") {
+TEST_CASE("drop_exactly: drop_exactly fails with too-large count for unsized range") {
 	CHECK_THROWS(containers::drop_exactly(unsized_range, too_large_count));
 }
-TEST_CASE("drop_exactly fails with too-large count for sized input range", "[drop_exactly]") {
+TEST_CASE("drop_exactly: drop_exactly fails with too-large count for sized input range") {
 	CHECK_THROWS(containers::drop_exactly(sized_input_range_t(), too_large_count));
 }
-TEST_CASE("drop_exactly fails with too-large count for unsized input range", "[drop_exactly]") {
+TEST_CASE("drop_exactly: drop_exactly fails with too-large count for unsized input range") {
 	CHECK_THROWS(containers::drop_exactly(input_range_t(), too_large_count));
 }
 

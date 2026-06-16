@@ -5,7 +5,7 @@
 
 module;
 
-#include <catch2/catch_test_macros.hpp>
+#include <doctest/doctest.h>
 
 #include <bounded/assert.hpp>
 
@@ -110,23 +110,23 @@ static_assert(containers::equal(
 	containers::array({tv::tuple(3, 3), tv::tuple(2, 4)})
 ));
 
-TEST_CASE("unequal-sized zips throws with sized inputs", "[zip]") {
+TEST_CASE("zip: unequal-sized zips throws with sized inputs") {
 	CHECK_THROWS(containers::zip(
 		containers::array<int, 0_bi>(),
 		containers::array<int, 1_bi>()
 	));
 }
-TEST_CASE("unequal-sized zips throws with unsized inputs", "[zip]") {
+TEST_CASE("zip: unequal-sized zips throws with unsized inputs") {
 	auto zipped = containers::zip(
 		make(0),
 		make(1)
 	);
-	CHECK_THROWS(std::move(zipped).begin() != std::move(zipped).end());
+	CHECK_THROWS(static_cast<void>(std::move(zipped).begin() != std::move(zipped).end()));
 }
-TEST_CASE("unequal-sized zips throws with some sized some unsized inputs", "[zip]") {
+TEST_CASE("zip: unequal-sized zips throws with some sized some unsized inputs") {
 	auto zipped = containers::zip(
 		containers::array<int, 0_bi>(),
 		make(1)
 	);
-	CHECK_THROWS(std::move(zipped).begin() != std::move(zipped).end());
+	CHECK_THROWS(static_cast<void>(std::move(zipped).begin() != std::move(zipped).end()));
 }

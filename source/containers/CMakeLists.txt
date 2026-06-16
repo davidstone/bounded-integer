@@ -302,16 +302,10 @@ target_sources(containers_test PRIVATE
 )
 
 target_link_libraries(containers_test PRIVATE
-	Catch2::Catch2WithMain
 	containers
+	doctest::doctest_with_main
 	strict_defaults
 )
-# https://github.com/catchorg/Catch2/issues/578
-if("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang")
-	target_compile_options(containers_test PRIVATE
-		"-Wno-reserved-identifier"
-	)
-endif()
 
 add_executable(flat_map
 	test/map_benchmark.cpp

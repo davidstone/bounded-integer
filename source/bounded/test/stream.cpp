@@ -5,7 +5,7 @@
 
 module;
 
-#include <catch2/catch_test_macros.hpp>
+#include <doctest/doctest.h>
 
 export module bounded.stream_test;
 
@@ -29,11 +29,11 @@ auto streaming_test(auto const initial, auto const expected) {
 	CHECK(value == expected);
 }
 
-TEST_CASE("stream small", "[stream]") {
+TEST_CASE("stream: stream small") {
 	streaming_test<bounded::integer<0, 100>>(bounded::constant<7>, bounded::constant<0>);
 }
 
-TEST_CASE("stream large", "[stream]") {
+TEST_CASE("stream: stream large") {
 	constexpr auto large_initial = bounded::constant<numeric_traits::max_value<int> / 3>;
 	constexpr auto large_final = bounded::constant<-49>;
 	streaming_test<decltype(bounded::integer(0))>(large_initial, large_final);

@@ -3,7 +3,7 @@
 // (See accompanying file LICENSE_1_0.txt or copy at
 // http://www.boost.org/LICENSE_1_0.txt)
 
-#include <catch2/catch_test_macros.hpp>
+#include <doctest/doctest.h>
 
 import containers.test.test_reserve_and_capacity;
 import containers.test.test_sequence_container;
@@ -13,6 +13,7 @@ import containers.string;
 import containers.static_string;
 
 import bounded;
+import std_module;
 
 namespace {
 
@@ -24,7 +25,7 @@ auto check_equal(std::string_view const input) {
 	CHECK(containers::size(output) == containers::size(input));
 }
 
-TEST_CASE("string", "[string]") {
+TEST_CASE("string: string") {
 	static_assert(bounded::default_constructible<containers::string>);
 	containers_test::test_sequence_container<containers::string>();
 	containers_test::test_reserve_and_capacity<containers::string>();
@@ -33,11 +34,11 @@ TEST_CASE("string", "[string]") {
 	check_equal("0123456789012345678901234");
 }
 
-TEST_CASE("Empty string", "[string format]") {
+TEST_CASE("string format: Empty string") {
 	CHECK(std::format("{}", containers::string()) == ""_s);
 }
 
-TEST_CASE("Non-empty string", "[string format]") {
+TEST_CASE("string format: Non-empty string") {
 	CHECK(std::format("{}", containers::string("hi"_s)) == "hi"_s);
 }
 

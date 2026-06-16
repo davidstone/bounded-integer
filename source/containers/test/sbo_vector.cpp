@@ -3,7 +3,7 @@
 // (See accompanying file LICENSE_1_0.txt or copy at
 // http://www.boost.org/LICENSE_1_0.txt)
 
-#include <catch2/catch_test_macros.hpp>
+#include <doctest/doctest.h>
 
 import containers.algorithms.compare;
 import containers.test.test_reserve_and_capacity;
@@ -41,7 +41,7 @@ constexpr auto test_sbo_vector(auto const capacity) -> void {
 	test_sbo_vector_impl<T>(capacity, capacity + 1_bi);
 }
 
-TEST_CASE("sbo_vector", "[sbo_vector]") {
+TEST_CASE("sbo_vector: sbo_vector") {
 	test_sbo_vector<int>(2_bi);
 	test_sbo_vector<int>(3_bi);
 	test_sbo_vector<int>(4_bi);
@@ -59,7 +59,7 @@ TEST_CASE("sbo_vector", "[sbo_vector]") {
 
 } // namespace
 
-TEST_CASE("sbo_vector of sbo_vector of non-trivially relocatable", "[sbo_vector]") {
+TEST_CASE("sbo_vector: sbo_vector of sbo_vector of non-trivially relocatable") {
 	struct non_trivially_relocatable {
 		constexpr non_trivially_relocatable():
 			m_self(this)

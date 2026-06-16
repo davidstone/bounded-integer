@@ -20,16 +20,10 @@ if (NOT has_parent)
 	set(CMAKE_CXX_EXTENSIONS Off)
 
 	add_subdirectory(dependencies/cmake_strict_defaults)
+	add_subdirectory(dependencies/doctest)
 	add_subdirectory(dependencies/numeric-traits)
 	add_subdirectory(dependencies/operators)
 	add_subdirectory(dependencies/std_module)
-
-	add_subdirectory(dependencies/Catch2 EXCLUDE_FROM_ALL)
-	if("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang")
-		target_compile_options(Catch2 PUBLIC
-			"-Wno-c2y-extensions"
-		)
-	endif()
 
 	set(BENCHMARK_ENABLE_TESTING OFF CACHE BOOL "Disable testing benchmark.")
 	add_subdirectory(dependencies/benchmark EXCLUDE_FROM_ALL)

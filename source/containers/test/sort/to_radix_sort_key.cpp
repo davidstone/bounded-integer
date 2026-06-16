@@ -3,7 +3,7 @@
 // (See accompanying file LICENSE_1_0.txt or copy at
 // http://www.boost.org/LICENSE_1_0.txt)
 
-#include <catch2/catch_test_macros.hpp>
+#include <doctest/doctest.h>
 
 import containers.algorithms.sort.is_sorted;
 import containers.algorithms.sort.to_radix_sort_key;
@@ -21,7 +21,7 @@ constexpr auto is_sorted_to_radix(auto... values) {
 	return containers::is_sorted(converted);
 }
 
-TEST_CASE("to_radix_sort_key", "[to_radix_sort_key]") {
+TEST_CASE("to_radix_sort_key: to_radix_sort_key") {
 	constexpr int array[] = { 1, 2, 3, 4, 5, 6, 7, 8 };
 	CHECK(is_sorted_to_radix(
 		array + 0,

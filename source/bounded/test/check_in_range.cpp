@@ -5,7 +5,7 @@
 
 module;
 
-#include <catch2/catch_test_macros.hpp>
+#include <doctest/doctest.h>
 
 export module bounded.check_in_range_test;
 
@@ -14,7 +14,7 @@ import bounded.integer;
 
 namespace {
 
-TEST_CASE("check_in_range", "[check_in_range]") {
+TEST_CASE("check_in_range: check_in_range") {
 	constexpr auto minimum = bounded::constant<0>;
 	constexpr auto maximum = bounded::constant<10>;
 	CHECK_THROWS(bounded::check_in_range(

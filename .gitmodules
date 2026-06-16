@@ -1,9 +1,6 @@
 [submodule "benchmark"]
 	path = dependencies/benchmark
 	url = https://github.com/google/benchmark.git
-[submodule "Catch2"]
-	path = dependencies/Catch2
-	url = https://github.com/catchorg/Catch2.git
 [submodule "cmake_strict_defaults"]
 	path = dependencies/cmake_strict_defaults
 	url = https://github.com/davidstone/cmake_strict_defaults
@@ -16,3 +13,6 @@
 [submodule "dependencies/std_module"]
 	path = dependencies/std_module
 	url = https://github.com/davidstone/std_module.git
+[submodule "dependencies/doctest"]
+	path = dependencies/doctest
+	url = https://github.com/doctest/doctest.git

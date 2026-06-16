@@ -137,8 +137,8 @@ target_sources(bounded_test PRIVATE
 )
 
 target_link_libraries(bounded_test PUBLIC
-	Catch2::Catch2WithMain
 	bounded
+	doctest::doctest_with_main
 	strict_defaults
 )
 

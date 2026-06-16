@@ -3,7 +3,7 @@
 // (See accompanying file LICENSE_1_0.txt or copy at
 // http://www.boost.org/LICENSE_1_0.txt)
 
-#include <catch2/catch_test_macros.hpp>
+#include <doctest/doctest.h>
 
 import containers.test.test_sequence_container;
 import containers.test.test_set_size;
@@ -18,6 +18,7 @@ import bounded;
 import bounded.homogeneous_equals;
 import bounded.test_int;
 import numeric_traits;
+import std_module;
 
 using namespace bounded::literal;
 
@@ -72,7 +73,7 @@ static_assert(homogeneous_equals(
 
 static_assert(!bounded::constructible_from<containers::static_vector<int, 1_bi>, containers::c_array<int, 2> &&>);
 
-TEST_CASE("static_vector", "[static_vector]") {
+TEST_CASE("static_vector: static_vector") {
 	static_assert(bounded::default_constructible<test_static_vector<bounded_test::integer>>);
 	containers_test::test_sequence_container<test_static_vector<bounded_test::integer>>();
 	containers_test::test_set_size<test_static_vector<bounded_test::integer>>();

@@ -3,14 +3,14 @@
 // (See accompanying file LICENSE_1_0.txt or copy at
 // http://www.boost.org/LICENSE_1_0.txt)
 
-#include <catch2/catch_test_macros.hpp>
+#include <doctest/doctest.h>
 
 import containers.array;
 import containers.at;
 
 namespace {
 
-TEST_CASE("at throws for out-of-bounds", "[at]") {
+TEST_CASE("at: at throws for out-of-bounds") {
 	CHECK_THROWS(containers::at(containers::array({1}), 1U));
 }
 

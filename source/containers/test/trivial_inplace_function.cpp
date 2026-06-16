@@ -3,7 +3,7 @@
 // (See accompanying file LICENSE_1_0.txt or copy at
 // http://www.boost.org/LICENSE_1_0.txt)
 
-#include <catch2/catch_test_macros.hpp>
+#include <doctest/doctest.h>
 
 import containers.trivial_inplace_function;
 
@@ -98,7 +98,7 @@ static_assert(tombstone_traits::index([]{}) == -1_bi);
 
 constexpr auto big_returns_five = const_function([] { return 5; });
 
-TEST_CASE("trivial_inplace_function lambda", "[trivial_inplace_function]") {
+TEST_CASE("trivial_inplace_function: trivial_inplace_function lambda") {
 	CHECK(big_returns_five() == 5);
 
 	auto increments = mutable_function([x = 0]() mutable { return ++x; });
@@ -107,17 +107,17 @@ TEST_CASE("trivial_inplace_function lambda", "[trivial_inplace_function]") {
 	CHECK(increments() == 2);
 }
 
-TEST_CASE("trivial_inplace_function const const function pointer", "[trivial_inplace_function]") {
+TEST_CASE("trivial_inplace_function: trivial_inplace_function const const function pointer") {
 	auto const f = const_function(normal_function);
 	CHECK(f() == 2);
 }
 
-TEST_CASE("trivial_inplace_function const mutable function pointer", "[trivial_inplace_function]") {
+TEST_CASE("trivial_inplace_function: trivial_inplace_function const mutable function pointer") {
 	auto f = const_function(normal_function);
 	CHECK(f() == 2);
 }
 
-TEST_CASE("trivial_inplace_function mutable function pointer", "[trivial_inplace_function]") {
+TEST_CASE("trivial_inplace_function: trivial_inplace_function mutable function pointer") {
 	auto f = mutable_function(normal_function);
 	CHECK(f() == 2);
 }

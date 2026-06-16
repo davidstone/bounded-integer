@@ -5,7 +5,7 @@
 
 module;
 
-#include <catch2/catch_test_macros.hpp>
+#include <doctest/doctest.h>
 #include <numeric_traits/has_int128.hpp>
 
 export module bounded.test.format;
@@ -18,24 +18,24 @@ import std_module;
 
 namespace {
 
-TEST_CASE("Format 0", "[format]") {
+TEST_CASE("format: Format 0") {
 	CHECK(std::format("{}", bounded::constant<0>) == "0");
 }
 
-TEST_CASE("Format 1", "[format]") {
+TEST_CASE("format: Format 1") {
 	CHECK(std::format("{}", bounded::constant<1>) == "1");
 }
 
-TEST_CASE("Format -1", "[format]") {
+TEST_CASE("format: Format -1") {
 	CHECK(std::format("{}", bounded::constant<-1>) == "-1");
 }
 
-TEST_CASE("Format large integer", "[format]") {
+TEST_CASE("format: Format large integer") {
 	CHECK(std::format("{}", bounded::integer(1LL << 60)) == "1152921504606846976");
 }
 
 #if defined NUMERIC_TRAITS_HAS_INT128
-TEST_CASE("Format very large integer", "[format]") {
+TEST_CASE("format: Format very large integer") {
 	CHECK(std::format("{}", bounded::integer(numeric_traits::max_value<numeric_traits::int128_t>)) == "170141183460469231731687303715884105727");
 }
 #endif

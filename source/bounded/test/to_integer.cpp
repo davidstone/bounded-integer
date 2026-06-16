@@ -5,7 +5,7 @@
 
 module;
 
-#include <catch2/catch_test_macros.hpp>
+#include <doctest/doctest.h>
 
 export module bounded.to_integer_test;
 
@@ -13,7 +13,7 @@ import bounded.to_integer;
 
 import std_module;
 
-TEST_CASE("to_integer", "[to_integer]") {
+TEST_CASE("to_integer: to_integer") {
 	CHECK_THROWS_AS((bounded::to_integer<0, 0>("")), std::invalid_argument);
 	CHECK_THROWS_AS((bounded::to_integer<-1, 1>("-")), std::invalid_argument);
 	CHECK_THROWS_AS((bounded::to_integer<0, 0>("1")), std::invalid_argument);

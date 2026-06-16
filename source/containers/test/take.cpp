@@ -5,7 +5,7 @@
 
 module;
 
-#include <catch2/catch_test_macros.hpp>
+#include <doctest/doctest.h>
 
 #include <bounded/arithmetic/common_arithmetic.hpp>
 #include <bounded/assert.hpp>
@@ -164,29 +164,29 @@ static_assert(!check_sizable<sized_range_t, 1_bi>);
 static_assert(check_sizable<unsized_range_t, 1_bi>);
 static_assert(check_sizable<input_range_t, 1_bi>);
 
-TEST_CASE("check_size_not_greater_than fails with count of 0 for sized range", "[check_size_not_greater_than]") {
+TEST_CASE("check_size_not_greater_than: check_size_not_greater_than fails with count of 0 for sized range") {
 	constexpr auto count = bounded::integer<0, 8>(0_bi);
 	CHECK_THROWS(containers::check_size_not_greater_than(sized_range, count));
 }
-TEST_CASE("check_size_not_greater_than fails with count of 1 for sized range", "[check_size_not_greater_than]") {
+TEST_CASE("check_size_not_greater_than: check_size_not_greater_than fails with count of 1 for sized range") {
 	constexpr auto count = bounded::integer<0, 8>(1_bi);
 	CHECK_THROWS(containers::check_size_not_greater_than(sized_range, count));
 }
 
-TEST_CASE("check_size_not_greater_than fails with count of 0 for unsized range", "[check_size_not_greater_than]") {
+TEST_CASE("check_size_not_greater_than: check_size_not_greater_than fails with count of 0 for unsized range") {
 	CHECK_THROWS([] {
 		for (auto const & _ : containers::check_size_not_greater_than(unsized_range, 0_bi)) {
 		}
 	}());
 }
-TEST_CASE("check_size_not_greater_than fails with count of 1 for unsized range", "[check_size_not_greater_than]") {
+TEST_CASE("check_size_not_greater_than: check_size_not_greater_than fails with count of 1 for unsized range") {
 	CHECK_THROWS([] {
 		for (auto const & _ : containers::check_size_not_greater_than(unsized_range, 1_bi)) {
 		}
 	}());
 }
 
-TEST_CASE("check_size_not_greater_than fails with count of 0 for input range", "[check_size_not_greater_than]") {
+TEST_CASE("check_size_not_greater_than: check_size_not_greater_than fails with count of 0 for input range") {
 	CHECK_THROWS([] {
 		auto range = containers::check_size_not_greater_than(input_range_t(), 0_bi);
 		auto const last = containers::end(range);
@@ -194,7 +194,7 @@ TEST_CASE("check_size_not_greater_than fails with count of 0 for input range", "
 		}
 	}());
 }
-TEST_CASE("check_size_not_greater_than fails with count of 1 for input range", "[check_size_not_greater_than]") {
+TEST_CASE("check_size_not_greater_than: check_size_not_greater_than fails with count of 1 for input range") {
 	CHECK_THROWS([] {
 		auto range = containers::check_size_not_greater_than(input_range_t(), 1_bi);
 		auto const last = containers::end(range);
