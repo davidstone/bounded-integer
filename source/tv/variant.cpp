@@ -77,17 +77,19 @@ private:
 	using type_at = typename decltype(::tv::get_type(Index(), bounded::type<Ts>...))::type;
 
 public:
+	template<typename Index>
 	constexpr variant(
 		bounded::lazy_init_t,
-		auto index_,
-		bounded::construct_function_for<type_at<decltype(index_)>> auto && construct_
+		Index const index_,
+		bounded::construct_function_for<type_at<Index>> auto && construct_
 	):
 		m_index(::tv::get_index(index_, bounded::type<Ts>...)),
 		m_data(::tv::get_index(index_, bounded::type<Ts>...), OPERATORS_FORWARD(construct_))
 	{
 	}
 
-	constexpr variant(auto index_, bounded::convertible_to<type_at<decltype(index_)>> auto && value):
+	template<typename Index>
+	constexpr variant(Index const index_, bounded::convertible_to<type_at<Index>> auto && value):
 		variant(
 			bounded::lazy_init,
 			index_,
@@ -159,7 +161,7 @@ public:
 		bounded::constructible_from<std::decay_t<T>, T &&> and
 		std::is_assignable_v<std::decay_t<T> &, T &&>
 	)
-	constexpr auto & operator=(T && value) & {
+	constexpr auto operator=(T && value) & -> variant & {
 		visit(*this, [&](auto & original) {
 			if constexpr (std::same_as<std::decay_t<decltype(original)>, std::decay_t<T>>) {
 				original = OPERATORS_FORWARD(value);
@@ -190,10 +192,11 @@ public:
 		];
 	}
 
-	constexpr auto & emplace(auto index, bounded::construct_function_for<type_at<decltype(index)>> auto && construct_) & {
+	template<typename Index>
+	constexpr auto emplace(Index const index, bounded::construct_function_for<type_at<Index>> auto && construct_) & -> auto & {
 		return emplace_impl(index, OPERATORS_FORWARD(construct_), [&] { visit(*this, bounded::destroy); });
 	}
-	constexpr auto & emplace(unique_construct_function<Ts...> auto && construct_) & {
+	constexpr auto emplace(unique_construct_function<Ts...> auto && construct_) & -> auto & {
 		return emplace(bounded::type_t<constructed_type<decltype(construct_)>>(), OPERATORS_FORWARD(construct_));
 	}
 	
@@ -210,8 +213,9 @@ public:
 	}
 
 private:
-	constexpr auto & emplace_impl(auto index, bounded::construct_function_for<type_at<decltype(index)>> auto && construct_, auto && destroy_active) & {
-		using value_t = type_at<decltype(index)>;
+	template<typename Index>
+	constexpr auto emplace_impl(Index const index, bounded::construct_function_for<type_at<Index>> auto && construct_, auto && destroy_active) & -> auto &  {
+		using value_t = type_at<Index>;
 		if constexpr (noexcept(value_t(OPERATORS_FORWARD(construct_)()))) {
 			destroy_active();
 			return replace_active_member(index, OPERATORS_FORWARD(construct_));
@@ -225,7 +229,7 @@ private:
 	}
 
 	// Assumes the old object has already been destroyed
-	constexpr auto & replace_active_member(auto const index, auto && construct_) {
+	constexpr auto replace_active_member(auto const index, auto && construct_) -> auto & {
 		constexpr auto index_value = ::tv::get_index(index, bounded::type<Ts>...);
 		m_index = variant_index<Ts...>(index_value);
 		auto & data = bounded::construct_at(m_data, [&] { return variadic_union<Ts...>(index_value, OPERATORS_FORWARD(construct_)); });
@@ -244,7 +248,7 @@ private:
 		);
 	}
 
-	constexpr void assign(auto && other) {
+	constexpr auto assign(auto && other) -> void {
 		visit_with_index(
 			*this,
 			OPERATORS_FORWARD(other),
