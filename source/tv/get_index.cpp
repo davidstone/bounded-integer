@@ -5,7 +5,6 @@
 
 export module tv.get_index;
 
-import tv.nth_type;
 import tv.is_valid_index;
 
 import bounded;
@@ -46,7 +45,7 @@ struct get_type_t {
 
 	template<auto n, typename... Ts> requires variant_integer_index<bounded::constant_t<n>, sizeof...(Ts)>
 	static constexpr auto operator()(bounded::constant_t<n>, Ts...) {
-		return bounded::type_t<nth_type<n, typename Ts::type...>>();
+		return bounded::type_t<typename Ts...[n]::type>();
 	}
 };
 export constexpr auto get_type = get_type_t();
