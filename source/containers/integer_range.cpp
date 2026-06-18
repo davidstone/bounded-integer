@@ -8,6 +8,7 @@ module;
 #include <bounded/assert.hpp>
 
 #include <operators/bracket.hpp>
+#include <operators/forward.hpp>
 
 export module containers.integer_range;
 
@@ -17,6 +18,8 @@ import containers.array;
 import containers.begin_end;
 import containers.common_iterator_functions;
 import containers.iter_value_t;
+import containers.size;
+import containers.sized_range;
 
 import bounded;
 import numeric_traits;
@@ -153,6 +156,10 @@ constexpr auto inclusive_integer_range(auto const first, auto const last, Step c
 
 export constexpr auto inclusive_integer_range(auto const last) {
 	return inclusive_integer_range(0_bi, last);
+}
+
+export constexpr auto index_range(sized_range auto && r) {
+	return containers::integer_range(containers::size(OPERATORS_FORWARD(r)));
 }
 
 // Technically this could construct a more efficient object for compile-time
