@@ -27,7 +27,6 @@ import containers.contiguous_iterator;
 import containers.data;
 import containers.index_type;
 import containers.initializer_range;
-import containers.integer_range;
 import containers.maximum_array_size;
 import containers.pop_back;
 import containers.range;
