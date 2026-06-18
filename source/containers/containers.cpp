@@ -129,6 +129,7 @@ export import containers.sized_range;
 export import containers.stable_vector;
 export import containers.static_vector;
 export import containers.string;
+export import containers.string_view;
 export import containers.static_string;
 export import containers.subrange;
 export import containers.take;

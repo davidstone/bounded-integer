@@ -19,6 +19,7 @@ import containers.flat_map;
 import containers.map_tags;
 import containers.maximum_array_size;
 import containers.range_size_t;
+import containers.string_view;
 
 import bounded;
 import bounded.test_int;
@@ -146,7 +147,7 @@ static_assert(max_map_size<bounded::integer<0, 2>> == 3_bi);
 static_assert(max_map_size<bounded::integer<1, 2>> == 2_bi);
 static_assert(max_map_size<bool> == 2_bi);
 static_assert(max_map_size<std::byte> == 256_bi);
-static_assert(max_map_size<std::string_view> == containers::maximum_array_size<std::string_view>);
+static_assert(max_map_size<containers::string_view> == containers::maximum_array_size<containers::string_view>);
 
 static_assert(containers::associative_range<containers::flat_map<int, int> &>);
 static_assert(containers::associative_range<containers::flat_map<int, int> const &>);

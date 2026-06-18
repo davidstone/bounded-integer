@@ -19,6 +19,7 @@ import containers.range_value_t;
 import containers.sbo_vector;
 import containers.size;
 import containers.static_string;
+import containers.string_view;
 
 import bounded;
 import numeric_traits;
@@ -62,6 +63,9 @@ public:
 	
 	using base::set_size;
 	
+	constexpr operator string_view() const {
+		return string_view(*this);
+	}
 	constexpr operator std::string_view() const {
 		return std::string_view(data(), static_cast<range_size_t<std::string_view>>(size()));
 	}
@@ -72,6 +76,12 @@ public:
 		return std::span<char>(data(), static_cast<std::size_t>(size()));
 	}
 
+	friend constexpr auto operator<=>(string const & lhs, string_view const rhs) {
+		return ::containers::lexicographical_compare(lhs, rhs);
+	}
+	friend constexpr auto operator==(string const & lhs, string_view const rhs) -> bool {
+		return ::containers::equal(lhs, rhs);
+	}
 	friend constexpr auto operator<=>(string const & lhs, std::string_view const rhs) {
 		return ::containers::lexicographical_compare(lhs, rhs);
 	}
@@ -126,8 +136,8 @@ public:
 
 template<>
 struct std::hash<containers::string> {
-	static auto operator()(std::string_view const str) noexcept -> std::size_t {
-		return std::hash<std::string_view>()(str);
+	static auto operator()(containers::string_view const str) noexcept -> std::size_t {
+		return std::hash<containers::string_view>()(str);
 	}
 };
 
@@ -137,20 +147,22 @@ static_assert(!bounded::convertible_to<char const *, containers::string>);
 static_assert(!bounded::convertible_to<char *, containers::string>);
 static_assert(!bounded::convertible_to<containers::c_array<char, 5> const &, containers::string>);
 static_assert(!bounded::convertible_to<containers::c_array<char, 5> &, containers::string>);
+static_assert(!bounded::convertible_to<containers::string_view, containers::string>);
 static_assert(!bounded::convertible_to<std::string_view, containers::string>);
 static_assert(bounded::constructible_from<containers::string, containers::static_string<5_bi>>);
+static_assert(bounded::constructible_from<containers::string, containers::string_view>);
 static_assert(bounded::constructible_from<containers::string, std::string_view>);
 static_assert(!bounded::constructible_from<containers::string, char const *>);
 static_assert(!bounded::constructible_from<containers::string, containers::c_array<char, 5> const &>);
 
-constexpr auto check_equal(std::string_view const input) {
+constexpr auto check_equal(containers::string_view const input) {
 	auto const output = containers::string(input);
 	BOUNDED_ASSERT(output == input);
 	BOUNDED_ASSERT(containers::size(output) == containers::size(input));
 	return true;
 }
 
-static_assert(check_equal(""));
-static_assert(check_equal("a"));
-static_assert(check_equal("01234567890123456789012"));
+static_assert(check_equal(""_sv));
+static_assert(check_equal("a"_sv));
+static_assert(check_equal("01234567890123456789012"_sv));
 static_assert(containers::string({'a', 'b', 'd'}) == containers::string("abd"_s));

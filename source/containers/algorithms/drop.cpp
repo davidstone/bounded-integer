@@ -30,6 +30,7 @@ import containers.sentinel_t;
 import containers.size;
 import containers.sized_range;
 import containers.static_string;
+import containers.string_view;
 import containers.subrange;
 import containers.subtractable;
 
@@ -62,7 +63,7 @@ private:
 };
 
 struct drop_exception : std::runtime_error {
-	explicit drop_exception(std::string_view const str):
+	explicit drop_exception(containers::string_view const str):
 		std::runtime_error(containers::concatenate<std::string>(
 			"Tried to drop more elements than were in the range: "_s,
 			str
@@ -185,7 +186,7 @@ constexpr auto drop_impl(Range && source, Count const count) {
 		for (auto const _ : containers::integer_range(count)) {
 			if (first == last) {
 				if constexpr (policy == extra_elements_policy::exception) {
-					throw drop_exception("unsized range");
+					throw drop_exception("unsized range"_s);
 				} else {
 					break;
 				}

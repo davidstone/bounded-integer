@@ -10,6 +10,7 @@ import containers.algorithms.join;
 import containers.array;
 import containers.c_array;
 import containers.static_string;
+import containers.string_view;
 import containers.to_array;
 
 import bounded;
@@ -19,7 +20,7 @@ using namespace bounded::literal;
 using namespace containers::string_literals;
 
 template<std::size_t size>
-constexpr auto compare(containers::c_array<std::string_view, size> const & input, std::string_view const expected) -> bool {
+constexpr auto compare(containers::c_array<containers::string_view, size> const & input, containers::string_view const expected) -> bool {
 	auto rjoined = [&] {
 		return containers::join(containers::to_array(input));
 	};
@@ -32,7 +33,7 @@ constexpr auto compare(containers::c_array<std::string_view, size> const & input
 }
 
 static_assert(containers::equal(
-	containers::join(containers::array<std::string_view, 0_bi>()),
+	containers::join(containers::array<containers::string_view, 0_bi>()),
 	""_s
 ));
 

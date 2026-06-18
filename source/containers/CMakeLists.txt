@@ -191,6 +191,7 @@ target_sources(containers PUBLIC
 		static_vector.cpp
 		stored_function.cpp
 		string.cpp
+		string_view.cpp
 		subrange.cpp
 		subtractable.cpp
 		supports_lazy_insert_after.cpp

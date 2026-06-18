@@ -241,6 +241,7 @@ split(Range &&, Delimiter &&) -> split<Range, Delimiter>;
 export template<forward_range Range, forward_range Delimiter>
 struct split_range {
 	static_assert(!std::is_array_v<std::remove_cvref_t<Range>>);
+	static_assert(!std::is_array_v<std::remove_cvref_t<Delimiter>>);
 	constexpr split_range(Range && range, Delimiter && delimiter):
 		m_range(OPERATORS_FORWARD(range)),
 		m_delimiter(OPERATORS_FORWARD(delimiter))
@@ -281,10 +282,6 @@ private:
 
 template<typename Range, typename Delimiter>
 split_range(Range &&, Delimiter &&) -> split_range<Range, Delimiter>;
-
-template<typename Range>
-split_range(Range &&, char const *) -> split_range<Range, std::string_view>;
-
 
 // `split_keep_delimiters("a|b"_s, '|') == {"a"_s, "|"_s, "b"_s}`
 export template<forward_range Range, bounded::equality_comparable<range_reference_t<Range>> Delimiter>
@@ -336,6 +333,7 @@ split_keep_delimiters(Range &&, Delimiter &&) -> split_keep_delimiters<Range, De
 export template<forward_range Range, forward_range Delimiter>
 struct split_range_keep_delimiters {
 	static_assert(!std::is_array_v<std::remove_cvref_t<Range>>);
+	static_assert(!std::is_array_v<std::remove_cvref_t<Delimiter>>);
 	constexpr split_range_keep_delimiters(Range && range, Delimiter && delimiter):
 		m_range(OPERATORS_FORWARD(range)),
 		m_delimiter(OPERATORS_FORWARD(delimiter))
@@ -376,8 +374,5 @@ private:
 
 template<typename Range, typename Delimiter>
 split_range_keep_delimiters(Range &&, Delimiter &&) -> split_range_keep_delimiters<Range, Delimiter>;
-
-template<typename Range>
-split_range_keep_delimiters(Range &&, char const *) -> split_range_keep_delimiters<Range, std::string_view>;
 
 } // namespace containers

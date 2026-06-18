@@ -17,6 +17,7 @@ import containers.range;
 import containers.range_value_t;
 import containers.sentinel_for;
 import containers.size;
+import containers.string_view;
 import containers.subrange;
 
 import bounded;
@@ -65,7 +66,7 @@ static_assert(*(begin(three) + 7_bi) == 3);
 constexpr auto from_temp = containers::concatenate_view(containers::array{1}, containers::array{2});
 static_assert(equal_values_and_types(from_temp, containers::array{1, 2}));
 
-static_assert(containers::forward_random_access_range<containers::concatenate_view<std::string_view>>);
+static_assert(containers::forward_random_access_range<containers::concatenate_view<containers::string_view>>);
 
 using containers::operator+;
 using containers::operator-;

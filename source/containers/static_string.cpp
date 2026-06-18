@@ -43,13 +43,17 @@ struct static_string {
 
 	OPERATORS_BRACKET_SEQUENCE_RANGE_DEFINITIONS
 
-	friend auto operator<=>(static_string, static_string) = default;
-
+	friend constexpr auto operator<=>(static_string const lhs, static_string const rhs) {
+		return ::containers::lexicographical_compare(lhs, rhs);
+	}
+	friend constexpr auto operator==(static_string const lhs, static_string const rhs) -> bool {
+		return ::containers::equal(lhs, rhs);
+	}
 	friend auto operator<=>(static_string const lhs, std::string const & rhs) {
-		return std::string_view(lhs) <=> std::string_view(rhs);
+		return ::containers::lexicographical_compare(lhs, rhs);
 	}
 	friend auto operator==(static_string const lhs, std::string const & rhs) -> bool {
-		return std::string_view(lhs) == std::string_view(rhs);
+		return ::containers::equal(lhs, rhs);
 	}
 
 	constexpr operator std::string_view() const {
@@ -107,13 +111,29 @@ public:
 
 	OPERATORS_BRACKET_SEQUENCE_RANGE_DEFINITIONS
 
-	friend auto operator<=>(static_null_terminated_string, static_null_terminated_string) = default;
-
-	friend auto operator<=>(static_null_terminated_string const lhs, std::string const & rhs) {
-		return std::string_view(lhs) <=> std::string_view(rhs);
+	friend constexpr auto operator<=>(
+		static_null_terminated_string const lhs,
+		static_null_terminated_string const rhs)
+	{
+		return ::containers::lexicographical_compare(lhs, rhs);
 	}
-	friend auto operator==(static_null_terminated_string const lhs, std::string const & rhs) -> bool {
-		return std::string_view(lhs) == std::string_view(rhs);
+	friend constexpr auto operator==(
+		static_null_terminated_string const lhs,
+		static_null_terminated_string const rhs
+	) -> bool {
+		return ::containers::equal(lhs, rhs);
+	}
+	friend auto operator<=>(
+		static_null_terminated_string const lhs,
+		std::string const & rhs
+	) {
+		return ::containers::lexicographical_compare(lhs, rhs);
+	}
+	friend auto operator==(
+		static_null_terminated_string const lhs,
+		std::string const & rhs
+	) -> bool {
+		return ::containers::equal(lhs, rhs);
 	}
 
 	constexpr operator std::string_view() const {
@@ -163,11 +183,6 @@ constexpr auto operator""_null_terminated() {
 } // inline namespace string_literals
 
 } // namespace containers
-
-template<auto lhs_size, auto rhs_size> requires(lhs_size != rhs_size)
-struct std::common_type<containers::static_string<lhs_size>, containers::static_string<rhs_size>> {
-	using type = std::string_view;
-};
 
 template<auto size, typename CharT>
 struct std::formatter<containers::static_string<size>, CharT> : private std::formatter<std::string_view, CharT> {
