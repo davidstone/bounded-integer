@@ -178,13 +178,6 @@ struct [[clang::trivial_abi]] bounded_vector : private lexicographical_compariso
 		// m_size remains the same
 	}
 
-	constexpr operator std::span<T const>() const {
-		return std::span<T const>(data(), static_cast<std::size_t>(size()));
-	}
-	constexpr operator std::span<T>() {
-		return std::span<T>(data(), static_cast<std::size_t>(size()));
-	}
-
 private:
 	static constexpr auto reservation_size(auto const source_size) {
 		return bounded::assume_in_range<capacity_type>(bounded::max(source_size, bounded::constant<min_capacity>));

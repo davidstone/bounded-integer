@@ -59,9 +59,6 @@ struct static_string {
 	constexpr operator std::string_view() const {
 		return std::string_view(data(), static_cast<std::size_t>(size_));
 	}
-	constexpr operator std::span<char const>() const {
-		return std::span<char const>(data(), static_cast<std::size_t>(size_));
-	}
 	constexpr operator std::span<char const, static_cast<std::size_t>(size_)>() const {
 		return std::span<char const, static_cast<std::size_t>(size_)>(data());
 	}
@@ -138,9 +135,6 @@ public:
 
 	constexpr operator std::string_view() const {
 		return std::string_view(data(), static_cast<std::size_t>(size_));
-	}
-	constexpr operator std::span<char const>() const {
-		return std::span<char const>(data(), static_cast<std::size_t>(size_));
 	}
 	constexpr operator std::span<char const, static_cast<std::size_t>(size_)>() const {
 		return std::span<char const, static_cast<std::size_t>(size_)>(data());
@@ -228,8 +222,6 @@ using namespace containers::string_literals;
 using namespace std::string_view_literals;
 
 static_assert(bounded::convertible_to<containers::static_string<5_bi>, std::string_view>);
-static_assert(bounded::convertible_to<containers::static_string<5_bi>, std::span<char const>>);
-static_assert(!bounded::convertible_to<containers::static_string<5_bi>, std::span<char>>);
 static_assert(bounded::convertible_to<containers::static_string<5_bi>, std::span<char const, 5>>);
 static_assert(!bounded::convertible_to<containers::static_string<5_bi>, std::span<char, 5>>);
 static_assert(!bounded::convertible_to<containers::static_string<5_bi>, std::span<char const, 4>>);
@@ -240,8 +232,6 @@ static_assert("a"_s == "a"sv);
 static_assert("01234567890123456789012"_s == "01234567890123456789012"sv);
 
 static_assert(bounded::convertible_to<containers::static_null_terminated_string<5_bi>, std::string_view>);
-static_assert(bounded::convertible_to<containers::static_null_terminated_string<5_bi>, std::span<char const>>);
-static_assert(!bounded::convertible_to<containers::static_null_terminated_string<5_bi>, std::span<char>>);
 static_assert(bounded::convertible_to<containers::static_null_terminated_string<5_bi>, std::span<char const, 5>>);
 static_assert(!bounded::convertible_to<containers::static_null_terminated_string<5_bi>, std::span<char, 5>>);
 static_assert(!bounded::convertible_to<containers::static_null_terminated_string<5_bi>, std::span<char const, 4>>);

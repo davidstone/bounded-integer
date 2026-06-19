@@ -292,13 +292,6 @@ public:
 		}
 	}
 
-	constexpr operator std::span<T const>() const {
-		return std::span<T const>(containers::data(*this), static_cast<std::size_t>(size()));
-	}
-	constexpr operator std::span<T>() {
-		return std::span<T>(containers::data(*this), static_cast<std::size_t>(size()));
-	}
-
 private:
 	static constexpr auto deallocate_large(large_t & large) -> void {
 		deallocate_storage(dynamic_array_data<T, size_type>(large.data(), large.capacity()));

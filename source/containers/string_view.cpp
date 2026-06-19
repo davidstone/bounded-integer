@@ -115,9 +115,6 @@ export struct string_view {
 	constexpr operator std::string_view() const {
 		return std::string_view(data(), static_cast<range_size_t<std::string_view>>(size()));
 	}
-	constexpr operator std::span<char const>() const {
-		return std::span<char const>(data(), static_cast<std::size_t>(size()));
-	}
 
 private:
 	char const * m_data = nullptr;

@@ -137,10 +137,6 @@ public:
 
 	friend auto operator==(subrange, subrange) -> bool = default;
 
-	// TODO: spans of static extent
-	constexpr operator std::span<std::remove_reference_t<iter_reference_t<Iterator>>>() const requires contiguous {
-		return std::span(data(), static_cast<std::size_t>(::containers::size(*this)));
-	}
 	constexpr operator std::basic_string_view<iter_value_t<Iterator>>() const requires(contiguous and bounded::character<iter_value_t<Iterator>>) {
 		return std::basic_string_view(data(), static_cast<std::size_t>(::containers::size(*this)));
 	}

@@ -36,8 +36,6 @@ public:
 	using base::set_size;
 	using base::replace_empty_allocation;
 	using base::reserve;
-	using base::operator std::span<T const>;
-	using base::operator std::span<T>;
 };
 
 template<typename Range>

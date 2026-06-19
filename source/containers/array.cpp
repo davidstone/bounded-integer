@@ -52,12 +52,6 @@ struct array {
 
 	friend auto operator<=>(array const &, array const &) = default;
 
-	constexpr operator std::span<value_type const>() const & {
-		return std::span<value_type const>(m_value);
-	}
-	constexpr operator std::span<value_type>() & {
-		return std::span<value_type>(m_value);
-	}
 	constexpr operator std::span<value_type const, static_cast<std::size_t>(size_)>() const & {
 		return std::span<value_type const, static_cast<std::size_t>(size_)>(m_value);
 	}
@@ -91,12 +85,6 @@ public:
 
 	friend auto operator<=>(array, array) = default;
 
-	constexpr operator std::span<T const>() const {
-		return std::span<T const>(data(), 0);
-	}
-	constexpr operator std::span<T>() {
-		return std::span<T const>(data(), 0);
-	}
 	constexpr operator std::span<T const, 0>() const {
 		return std::span<T const, 0>(data(), 0);
 	}

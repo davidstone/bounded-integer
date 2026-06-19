@@ -25,6 +25,7 @@ import containers.iterator_t;
 import containers.range_size_t;
 import containers.size;
 import containers.sized_range;
+import containers.span;
 import containers.static_vector;
 
 import bounded;
@@ -151,8 +152,8 @@ constexpr auto test_drop(auto get_source) {
 }
 static_assert(test_drop([] -> auto const & { return sized_range; }));
 static_assert(containers::drop(sized_range, 1_bi)[0_bi] == 1);
-static_assert(test_drop([] { return std::span<int const>(sized_range); }));
-static_assert(containers::drop(std::span<int const>(sized_range), 1_bi)[0] == 1);
+static_assert(test_drop([] { return containers::span<int const>(sized_range); }));
+static_assert(containers::drop(containers::span<int const>(sized_range), 1_bi)[0] == 1);
 static_assert(test_drop([] { return unsized_range; }));
 static_assert(test_drop(bounded::construct<sized_input_range_t>));
 static_assert(containers::size(containers::drop(sized_input_range_t(), 2_bi)) == 1_bi);
@@ -187,7 +188,7 @@ constexpr auto test_drop_exactly(auto get_source) {
 	static_assert(!requires { containers::drop_exactly(get_source(), -1_bi); });
 	static_assert(requires { containers::drop_exactly(get_source(), 4_bi); });
 	static_assert(
-		!bounded::bounded_integer<containers::range_size_t<decltype(get_source())>> or
+		std::same_as<decltype(get_source()), containers::span<int const>> or
 		!requires { containers::drop_exactly(get_source(), 5_bi); }
 	);
 	return true;
@@ -195,8 +196,8 @@ constexpr auto test_drop_exactly(auto get_source) {
 
 static_assert(test_drop_exactly([] -> auto const & { return sized_range; }));
 static_assert(containers::drop_exactly(sized_range, 1_bi)[0_bi] == 1);
-static_assert(test_drop_exactly([] { return std::span<int const>(sized_range); }));
-static_assert(containers::drop_exactly(std::span<int const>(sized_range), 1_bi)[0] == 1);
+static_assert(test_drop_exactly([] { return containers::span<int const>(sized_range); }));
+static_assert(containers::drop_exactly(containers::span<int const>(sized_range), 1_bi)[0] == 1);
 static_assert(test_drop_exactly([] { return unsized_range; }));
 static_assert(test_drop_exactly(bounded::construct<sized_input_range_t>));
 static_assert(containers::size(containers::drop_exactly(sized_input_range_t(), 2_bi)) == 1_bi);

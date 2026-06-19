@@ -120,13 +120,6 @@ struct [[clang::trivial_abi]] static_vector : private lexicographical_comparison
 
 	OPERATORS_BRACKET_SEQUENCE_RANGE_DEFINITIONS
 
-	constexpr operator std::span<T const>() const {
-		return std::span<T const>(containers::data(*this), static_cast<std::size_t>(size()));
-	}
-	constexpr operator std::span<T>() {
-		return std::span<T>(containers::data(*this), static_cast<std::size_t>(size()));
-	}
-
 	friend constexpr auto swap(static_vector & lhs, static_vector & rhs) noexcept(std::is_nothrow_swappable_v<T>) -> void requires(!bounded::trivially_swappable<T>) {
 		if (std::addressof(lhs) == std::addressof(rhs)) {
 			return;

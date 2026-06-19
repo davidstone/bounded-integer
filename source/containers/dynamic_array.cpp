@@ -124,13 +124,6 @@ struct [[clang::trivial_abi]] dynamic_array : private lexicographical_comparison
 		}
 	}
 
-	constexpr operator std::span<T const>() const {
-		return std::span<T const>(data(), static_cast<std::size_t>(size()));
-	}
-	constexpr operator std::span<T>() {
-		return std::span<T>(data(), static_cast<std::size_t>(size()));
-	}
-
 private:
 	uninitialized_dynamic_array<T, size_type> m_data;
 };

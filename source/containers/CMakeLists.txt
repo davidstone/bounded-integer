@@ -188,6 +188,7 @@ target_sources(containers PUBLIC
 		size.cpp
 		size_then_use_range.cpp
 		sized_range.cpp
+		span.cpp
 		splicable.cpp
 		stable_vector.cpp
 		static_string.cpp
@@ -284,6 +285,7 @@ target_sources(containers_test PRIVATE
 		test/push_front.cpp
 		test/resize.cpp
 		test/shrink_to_fit.cpp
+		test/span.cpp
 		test/stable_vector.cpp
 		test/subrange.cpp
 		test/take.cpp

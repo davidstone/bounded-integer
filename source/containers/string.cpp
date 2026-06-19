@@ -69,12 +69,6 @@ public:
 	constexpr operator std::string_view() const {
 		return std::string_view(data(), static_cast<range_size_t<std::string_view>>(size()));
 	}
-	constexpr operator std::span<char const>() const {
-		return std::span<char const>(data(), static_cast<std::size_t>(size()));
-	}
-	constexpr operator std::span<char>() {
-		return std::span<char>(data(), static_cast<std::size_t>(size()));
-	}
 
 	friend constexpr auto operator<=>(string const & lhs, string_view const rhs) {
 		return ::containers::lexicographical_compare(lhs, rhs);

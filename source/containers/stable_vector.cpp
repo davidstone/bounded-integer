@@ -29,8 +29,6 @@ public:
 	using base::operator[];
 	using base::capacity;
 	using base::set_size;
-	using base::operator std::span<T const>;
-	using base::operator std::span<T>;
 };
 
 } // namespace containers

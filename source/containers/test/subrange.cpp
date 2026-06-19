@@ -9,7 +9,10 @@ import containers.algorithms.compare;
 import containers.array;
 import containers.contiguous_iterator;
 import containers.has_member_size;
+import containers.maximum_array_size;
 import containers.range;
+import containers.span;
+import containers.string_view;
 import containers.subrange;
 
 import bounded;
@@ -43,7 +46,17 @@ static_assert(bounded::convertible_to<
 	std::string_view,
 	containers::subrange<char const *, char const *, std::size_t>
 >);
-static_assert(bounded::convertible_to<
-	std::span<int const>,
-	containers::subrange<int const *, int const *, std::size_t>
->);
+
+template<typename T>
+using sr = containers::subrange<
+	containers::contiguous_iterator<T, bounded::constant<containers::maximum_array_size<T>>>,
+	containers::contiguous_iterator<T, bounded::constant<containers::maximum_array_size<T>>>,
+	containers::array_size_type<T>
+>;
+
+static_assert(bounded::convertible_to<containers::span<int const>, sr<int const>>);
+static_assert(!bounded::convertible_to<containers::span<int const>, sr<int>>);
+static_assert(bounded::convertible_to<containers::span<int>, sr<int const>>);
+static_assert(bounded::convertible_to<containers::span<int>, sr<int>>);
+static_assert(bounded::convertible_to<containers::string_view, sr<char const>>);
+static_assert(!bounded::convertible_to<containers::string_view, sr<char>>);

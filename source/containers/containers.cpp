@@ -127,6 +127,7 @@ export import containers.sentinel_for;
 export import containers.size;
 export import containers.size_then_use_range;
 export import containers.sized_range;
+export import containers.span;
 export import containers.stable_vector;
 export import containers.static_vector;
 export import containers.string;

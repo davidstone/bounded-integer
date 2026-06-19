@@ -16,6 +16,7 @@ import containers.algorithms.zip;
 import containers.array;
 import containers.is_empty;
 import containers.linear_size;
+import containers.span;
 import containers.static_string;
 import containers.string_view;
 import containers.subrange;
@@ -26,7 +27,7 @@ import std_module;
 using namespace bounded::literal;
 using namespace containers::string_literals;
 
-constexpr auto compare(containers::string_view const input, std::span<containers::string_view const> const expected) -> bool {
+constexpr auto compare(containers::string_view const input, containers::span<containers::string_view const> const expected) -> bool {
 	auto const split = containers::split(input, '|');
 	for (auto const [split_inner, expected_inner] : containers::zip(split, expected)) {
 		BOUNDED_ASSERT(containers::string_view(split_inner) == expected_inner);
@@ -75,7 +76,7 @@ static_assert(containers::string_view(range.begin().remainder()) == "a"_sv);
 static_assert(containers::string_view(containers::next(range.begin()).remainder()) == ""_sv);
 
 
-constexpr auto compare_range(containers::string_view const input, std::span<containers::string_view const> const expected) -> bool {
+constexpr auto compare_range(containers::string_view const input, containers::span<containers::string_view const> const expected) -> bool {
 	auto const split = containers::split_range(input, ":)"_s);
 	for (auto const [split_inner, expected_inner] : containers::zip(split, expected)) {
 		BOUNDED_ASSERT(containers::string_view(split_inner) == expected_inner);
@@ -118,7 +119,7 @@ static_assert(compare_range(
 	containers::array({""_sv, "a"_sv, ""_sv, "b"_sv, ""_sv})
 ));
 
-constexpr auto compare_keep_delimiters(containers::string_view const input, std::span<containers::string_view const> const expected) -> bool {
+constexpr auto compare_keep_delimiters(containers::string_view const input, containers::span<containers::string_view const> const expected) -> bool {
 	auto const split = containers::split_keep_delimiters(input, '|');
 	for (auto const [split_inner, expected_inner] : containers::zip(split, expected)) {
 		BOUNDED_ASSERT(containers::string_view(split_inner) == expected_inner);
@@ -162,7 +163,7 @@ static_assert(compare_keep_delimiters(
 ));
 
 
-constexpr auto compare_range_keep_delimiters(containers::string_view const input, std::span<containers::string_view const> const expected) -> bool {
+constexpr auto compare_range_keep_delimiters(containers::string_view const input, containers::span<containers::string_view const> const expected) -> bool {
 	auto const split = containers::split_range_keep_delimiters(input, ":)"_s);
 	for (auto const [split_inner, expected_inner] : containers::zip(split, expected)) {
 		BOUNDED_ASSERT(containers::string_view(split_inner) == expected_inner);

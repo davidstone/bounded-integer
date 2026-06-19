@@ -9,6 +9,7 @@ import containers.test.test_reserve_and_capacity;
 import containers.test.test_sequence_container;
 import containers.test.test_set_size;
 
+import containers.span;
 import containers.vector;
 
 import bounded;
@@ -28,8 +29,8 @@ static_assert(containers_test::test_reserve_and_capacity<containers::vector<boun
 static_assert(containers_test::test_set_size<containers::vector<int>>());
 static_assert(containers_test::test_set_size<containers::vector<bounded_test::integer>>());
 
-static_assert(bounded::convertible_to<containers::vector<bounded_test::integer> const &, std::span<bounded_test::integer const>>);
-static_assert(bounded::convertible_to<containers::vector<bounded_test::integer> &, std::span<bounded_test::integer>>);
+static_assert(bounded::convertible_to<containers::vector<bounded_test::integer> const &, containers::span<bounded_test::integer const>>);
+static_assert(bounded::convertible_to<containers::vector<bounded_test::integer> &, containers::span<bounded_test::integer>>);
 
 struct recursive {
 	containers::vector<recursive, 1_bi> m;
