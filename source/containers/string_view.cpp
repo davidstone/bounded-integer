@@ -19,6 +19,7 @@ import containers.range_size_t;
 import containers.range_value_t;
 import containers.size;
 import containers.static_string;
+import containers.subrange;
 
 import bounded;
 import std_module;
@@ -27,6 +28,18 @@ using namespace bounded::literal;
 using namespace containers::string_literals;
 
 namespace containers {
+
+template<typename T>
+constexpr auto is_subrange = false;
+	
+template<typename Iterator, typename Sentinel, typename Size>
+constexpr auto is_subrange<subrange<Iterator, Sentinel, Size>> = true;
+
+template<typename T>
+concept contiguous_subrange_of_char =
+	is_subrange<T> and
+	std::same_as<char, range_value_t<T>> and
+	contiguous_range<T>;
 
 export struct string_view {
 	string_view() = default;
@@ -53,6 +66,11 @@ export struct string_view {
 		m_size(bounded::assume_in_range<array_size_type<char>>(str.size()))
 	{
 	}
+	constexpr string_view(contiguous_subrange_of_char auto const other):
+		m_data(containers::data(other)),
+		m_size(bounded::assume_in_range<array_size_type<char>>(containers::size(other)))
+	{
+	}
 	constexpr explicit string_view(char const * const ptr):
 		m_data(ptr),
 		m_size(bounded::assume_in_range<array_size_type<char>>(std::char_traits<char>::length(ptr)))
@@ -63,10 +81,10 @@ export struct string_view {
 		m_size(size_)
 	{
 	}
-	template<contiguous_range R> requires std::same_as<range_value_t<R>, char>
+	template<contiguous_range R> requires(std::same_as<range_value_t<R>, char> and !contiguous_subrange_of_char<R>)
 	constexpr explicit string_view(R const & source):
 		m_data(containers::data(source)),
-		m_size(containers::size(source))
+		m_size(bounded::assume_in_range<array_size_type<char>>(containers::size(source)))
 	{
 	}
 
@@ -142,11 +160,14 @@ struct std::hash<containers::string_view> {
 
 
 static_assert(bounded::convertible_to<containers::static_string<5_bi>, containers::string_view>);
+static_assert(bounded::convertible_to<containers::subrange<char const *>, containers::string_view>);
+static_assert(bounded::convertible_to<containers::subrange<char *>, containers::string_view>);
 static_assert(!bounded::convertible_to<char const *, containers::string_view>);
 static_assert(!bounded::convertible_to<char *, containers::string_view>);
 static_assert(!bounded::convertible_to<containers::c_array<char, 5> const &, containers::string_view>);
 static_assert(!bounded::convertible_to<containers::c_array<char, 5> &, containers::string_view>);
 static_assert(bounded::convertible_to<std::string_view, containers::string_view>);
+static_assert(bounded::constructible_from<containers::string_view, containers::subrange<char const *>>);
 static_assert(bounded::constructible_from<containers::string_view, containers::static_string<5_bi>>);
 static_assert(bounded::constructible_from<containers::string_view, std::string_view>);
 static_assert(bounded::constructible_from<containers::string_view, char const *>);
