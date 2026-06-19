@@ -99,6 +99,7 @@ struct concatenate_view_iterator {
 		range_reference_t<RangeViews>...
 	>;
 
+	concatenate_view_iterator() = default;
 	constexpr explicit concatenate_view_iterator(RangeViews... range_views):
 		m_range_views(std::move(range_views)...)
 	{
