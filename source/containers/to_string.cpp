@@ -5,12 +5,14 @@
 
 export module containers.to_string;
 
+import containers.static_string;
 import containers.string;
 import containers.to_any_string;
 
 import bounded;
 
 using namespace bounded::literal;
+using namespace containers::string_literals;
 namespace containers {
 
 export constexpr auto to_string(bounded::bounded_integer auto const x) -> containers::string {
@@ -23,8 +25,8 @@ export constexpr auto to_string(bounded::builtin_integer auto const x) -> contai
 
 } // namespace containers
 
-static_assert(::containers::to_string(0_bi) == "0");
-static_assert(::containers::to_string(1_bi) == "1");
-static_assert(::containers::to_string(15_bi) == "15");
-static_assert(::containers::to_string(-1_bi) == "-1");
-static_assert(::containers::to_string(bounded::integer<-100, 100>(7_bi)) == "7");
+static_assert(::containers::to_string(0_bi) == "0"_s);
+static_assert(::containers::to_string(1_bi) == "1"_s);
+static_assert(::containers::to_string(15_bi) == "15"_s);
+static_assert(::containers::to_string(-1_bi) == "-1"_s);
+static_assert(::containers::to_string(bounded::integer<-100, 100>(7_bi)) == "7"_s);
