@@ -70,6 +70,8 @@ private:
 public:
 	static_assert(explicit_sentinel<Sentinel> or explicit_size<Size>);
 
+	subrange() = default;
+
 	constexpr subrange(Iterator first, Sentinel last, Size size_) requires explicit_size<Size>:
 		m_begin(std::move(first)),
 		m_end(std::move(last)),
@@ -141,9 +143,9 @@ public:
 	}
 	
 private:
-	[[no_unique_address]] Iterator m_begin;
-	[[no_unique_address]] Sentinel m_end;
-	[[no_unique_address]] Size m_size;
+	[[no_unique_address]] Iterator m_begin = {};
+	[[no_unique_address]] Sentinel m_end = {};
+	[[no_unique_address]] Size m_size = {};
 };
 
 template<range Range>
