@@ -20,6 +20,7 @@ import containers.iter_difference_t;
 import containers.iter_reference_t;
 import containers.iter_value_t;
 import containers.iterator;
+import containers.iterator_t;
 import containers.range;
 import containers.sentinel_for;
 import containers.size;
@@ -89,7 +90,8 @@ public:
 	{
 	}
 
-	constexpr subrange(sized_range auto && r) requires explicit_size<Size>:
+	template<sized_range Range> requires(bounded::convertible_to<iterator_t<Range>, Iterator>)
+	constexpr subrange(Range && r) requires explicit_size<Size>:
 		subrange(
 			containers::begin(OPERATORS_FORWARD(r)),
 			containers::end(OPERATORS_FORWARD(r)),
@@ -97,7 +99,8 @@ public:
 		)
 	{
 	}
-	constexpr subrange(range auto && r) requires(!explicit_size<Size>):
+	template<range Range> requires(bounded::convertible_to<iterator_t<Range>, Iterator>)
+	constexpr subrange(Range && r) requires(!explicit_size<Size>):
 		subrange(
 			containers::begin(OPERATORS_FORWARD(r)),
 			containers::end(OPERATORS_FORWARD(r))

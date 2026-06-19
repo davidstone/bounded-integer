@@ -35,15 +35,15 @@ static_assert(sizeof(ctad_b) == sizeof(int const *));
 static_assert(std::same_as<decltype(ctad_b.size()), bounded::constant_t<5>>);
 static_assert(containers::equal(b, ctad_b));
 
-static_assert(bounded::convertible_to<
+static_assert(!bounded::convertible_to<
 	std::string_view,
-	containers::subrange<int *, int *, std::size_t>
+	containers::subrange<char *, char *, std::size_t>
 >);
 static_assert(bounded::convertible_to<
-	std::span<int>,
-	containers::subrange<int *, int *, std::size_t>
+	std::string_view,
+	containers::subrange<char const *, char const *, std::size_t>
 >);
 static_assert(bounded::convertible_to<
 	std::span<int const>,
-	containers::subrange<int *, int *, std::size_t>
+	containers::subrange<int const *, int const *, std::size_t>
 >);
