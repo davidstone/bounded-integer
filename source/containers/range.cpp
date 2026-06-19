@@ -6,18 +6,21 @@
 export module containers.range;
 
 import containers.c_array;
-import containers.data;
+import containers.has_member_data;
 import containers.has_member_size;
-import containers.forward_random_access_iterator;
 import containers.sentinel_for;
 
 import bounded;
+import std_module;
 
 namespace containers {
 
 template<typename T>
-concept size_based_range = has_member_size<T> and requires {
-	{ bounded::declval<T>().begin() } -> forward_random_access_iterator;
+concept pointer_size_range = has_member_data<T> and has_member_size<T>;
+
+template<typename T>
+concept size_based_range = requires {
+	{ bounded::declval<T>().begin() + bounded::declval<T>().size() };
 };
 
 template<typename T>
@@ -27,15 +30,15 @@ concept basic_range = requires {
 
 template<typename T>
 concept forward_linked_range = requires(T range) {
-	range.before_begin();
 	{ range.end() } -> sentinel_for<decltype(range.before_begin())>;
 };
 
 export template<typename T>
 concept range =
-	basic_range<T> or
-	contiguous_range<T> or
+	std::is_array_v<std::remove_reference_t<T>> or
+	pointer_size_range<T> or
 	size_based_range<T> or
+	basic_range<T> or
 	forward_linked_range<T>;
 
 } // namespace containers

@@ -14,6 +14,7 @@ import containers.algorithms.copy_or_relocate_from;
 import containers.begin_end;
 import containers.bidirectional_iterator;
 import containers.bidirectional_range;
+import containers.contiguous_range;
 import containers.data;
 import containers.iter_difference_t;
 import containers.iter_value_t;

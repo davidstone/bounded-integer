@@ -17,6 +17,7 @@ import containers.append;
 import containers.begin_end;
 import containers.c_array;
 import containers.compare_container;
+import containers.contiguous_range;
 import containers.data;
 import containers.flat_map;
 import containers.initializer_range;

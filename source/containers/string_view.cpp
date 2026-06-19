@@ -12,6 +12,7 @@ export module containers.string_view;
 
 import containers.algorithms.compare;
 import containers.c_array;
+import containers.contiguous_range;
 import containers.data;
 import containers.maximum_array_size;
 import containers.range_size_t;

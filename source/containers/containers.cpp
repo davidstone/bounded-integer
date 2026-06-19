@@ -71,6 +71,7 @@ export import containers.c_array;
 export import containers.can_set_size;
 export import containers.clear;
 export import containers.common_iterator_functions;
+export import containers.contiguous_range;
 export import containers.data;
 export import containers.dynamic_array;
 export import containers.emplace_back;

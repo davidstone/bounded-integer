@@ -102,6 +102,7 @@ target_sources(containers PUBLIC
 		compare_container.cpp
 		containers.cpp
 		contiguous_iterator.cpp
+		contiguous_range.cpp
 		count_type.cpp
 		data.cpp
 		dereference.cpp
@@ -124,6 +125,7 @@ target_sources(containers PUBLIC
 		front.cpp
 		get_source_size.cpp
 		has_member_before_begin.cpp
+		has_member_data.cpp
 		has_member_size.cpp
 		index_type.cpp
 		initializer_range.cpp

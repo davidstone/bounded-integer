@@ -8,7 +8,7 @@ export module containers.test.array;
 import containers.test.test_sequence_container;
 
 import containers.array;
-import containers.data;
+import containers.contiguous_range;
 import containers.is_container;
 import containers.range_value_t;
 

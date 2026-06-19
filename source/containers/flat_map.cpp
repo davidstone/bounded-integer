@@ -26,6 +26,7 @@ import containers.begin_end;
 import containers.c_array;
 import containers.common_functions;
 import containers.compare_container;
+import containers.contiguous_range;
 import containers.data;
 import containers.dereference;
 import containers.extract_key_to_less;
