@@ -62,7 +62,7 @@ struct span {
 		return m_size;
 	}
 
-	constexpr auto operator[](index_type<span> const index) const -> T & {
+	constexpr auto operator[](bounded::integer<0, maximum_array_size<T>> const index) const -> T & {
 		return *(data() + index);
 	}
 	
