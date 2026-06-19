@@ -125,6 +125,7 @@ target_sources(containers PUBLIC
 		front.cpp
 		get_source_size.cpp
 		has_member_before_begin.cpp
+		has_member_begin.cpp
 		has_member_data.cpp
 		has_member_size.cpp
 		index_type.cpp

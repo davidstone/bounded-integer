@@ -15,6 +15,7 @@ import containers.c_array;
 export import containers.contiguous_iterator;
 import containers.data;
 import containers.has_member_before_begin;
+import containers.has_member_begin;
 import containers.range;
 
 import bounded;
@@ -22,11 +23,6 @@ import numeric_traits;
 import std_module;
 
 namespace containers {
-
-template<typename Range>
-concept has_member_begin = requires(Range r) {
-	OPERATORS_FORWARD(r).begin();
-};
 
 constexpr auto get_size(auto const & r) {
 	return r.size();
