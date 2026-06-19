@@ -113,7 +113,6 @@ struct concatenate_view_iterator {
 
 	template<typename Offset> requires(
 		std::same_as<Offset, bounded::constant_t<1>> or
-		(!bounded::bounded_integer<difference_type> and numeric_traits::max_value<Offset> >= 0_bi and (... and forward_random_access_range<RangeViews>)) or
 		(
 			bounded::convertible_to<Offset, difference_type> and
 			numeric_traits::min_value<Offset> >= 0_bi and
