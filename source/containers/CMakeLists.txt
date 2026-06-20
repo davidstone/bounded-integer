@@ -67,6 +67,7 @@ target_sources(containers PUBLIC
 		algorithms/set.cpp
 		algorithms/splice.cpp
 		algorithms/split.cpp
+		algorithms/starts_with.cpp
 		algorithms/transform.cpp
 		algorithms/uninitialized.cpp
 		algorithms/unique.cpp
@@ -256,6 +257,7 @@ target_sources(containers_test PRIVATE
 		test/algorithms/partition.cpp
 		test/algorithms/set.cpp
 		test/algorithms/split.cpp
+		test/algorithms/starts_with.cpp
 		test/algorithms/uninitialized.cpp
 		test/algorithms/zip.cpp
 		test/append.cpp
