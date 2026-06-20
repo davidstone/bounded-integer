@@ -20,6 +20,7 @@ import containers.algorithms.drop;
 import containers.array;
 import containers.begin_end;
 import containers.common_iterator_functions;
+import containers.contiguous_range;
 import containers.iter_difference_t;
 import containers.iterator_t;
 import containers.range_size_t;
@@ -37,6 +38,9 @@ using namespace bounded::literal;
 
 using sized_range_t = containers::static_vector<int, 4_bi>;
 constexpr auto sized_range = sized_range_t({0, 1, 2});
+
+static_assert(containers::contiguous_range<decltype(containers::drop(sized_range, 0_bi))>);
+static_assert(containers::contiguous_range<decltype(containers::drop_exactly(sized_range, 0_bi))>);
 
 inline namespace adl {
 

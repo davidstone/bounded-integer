@@ -33,6 +33,7 @@ import containers.static_string;
 import containers.string_view;
 import containers.subrange;
 import containers.subtractable;
+import containers.to_address;
 
 import bounded;
 import numeric_traits;
@@ -92,6 +93,10 @@ struct reduced_range_iterator {
 		return *m_it;
 	}
 	OPERATORS_ARROW_DEFINITIONS
+
+	constexpr auto to_address() const requires to_addressable<Iterator> {
+		return containers::to_address(m_it);
+	}
 
 	friend auto operator<=>(reduced_range_iterator const &, reduced_range_iterator const &) = default;
 	template<std::three_way_comparable<Iterator> Sentinel>
