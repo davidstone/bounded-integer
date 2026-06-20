@@ -115,6 +115,9 @@ export struct string_view {
 	constexpr operator std::string_view() const {
 		return std::string_view(data(), static_cast<range_size_t<std::string_view>>(size()));
 	}
+	explicit operator std::filesystem::path() const {
+		return std::filesystem::path(std::string_view(*this));
+	}
 
 private:
 	char const * m_data = nullptr;
