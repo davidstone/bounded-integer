@@ -50,6 +50,7 @@ enum class extra_elements_policy {
 
 template<typename Sentinel>
 struct reduced_range_sentinel {
+	reduced_range_sentinel() = default;
 	constexpr explicit reduced_range_sentinel(Sentinel sentinel):
 		m_sentinel(std::move(sentinel))
 	{
@@ -77,6 +78,7 @@ template<typename Iterator, auto max_size>
 struct reduced_range_iterator {
 	using difference_type = bounded::integer<bounded::normalize<-max_size>, bounded::normalize<max_size>>;
 
+	reduced_range_iterator() = default;
 	constexpr explicit reduced_range_iterator(Iterator it):
 		m_it(std::move(it))
 	{

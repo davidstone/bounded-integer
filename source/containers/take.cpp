@@ -43,6 +43,7 @@ enum class extra_elements_policy {
 
 template<typename Sentinel, extra_elements_policy>
 struct counted_sentinel {
+	counted_sentinel() = default;
 	constexpr explicit counted_sentinel(Sentinel sentinel):
 		m_sentinel(std::move(sentinel))
 	{
@@ -60,6 +61,7 @@ template<typename Iterator, typename Count>
 struct counted_iterator : iterator_category_base<Iterator> {
 	using difference_type = decltype(bounded::declval<Count>() - bounded::declval<Count>());
 
+	counted_iterator() = default;
 	constexpr explicit counted_iterator(Iterator it, Count count):
 		m_it(std::move(it)),
 		m_count(count)
@@ -139,7 +141,7 @@ struct counted_iterator : iterator_category_base<Iterator> {
 
 private:
 	[[no_unique_address]] Iterator m_it;
-	[[no_unique_address]] Count m_count;
+	[[no_unique_address]] Count m_count = 0_bi;
 };
 
 template<typename Iterator, typename Count>
