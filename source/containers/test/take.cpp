@@ -19,6 +19,7 @@ import containers.algorithms.compare;
 import containers.array;
 import containers.begin_end;
 import containers.common_iterator_functions;
+import containers.contiguous_range;
 import containers.iter_difference_t;
 import containers.iterator_t;
 import containers.take;
@@ -32,6 +33,9 @@ using namespace bounded::literal;
 
 using sized_range_t = containers::array<int, 8_bi>;
 constexpr auto sized_range = sized_range_t{0, 1, 2, 3, 4, 5, 6, 7};
+
+static_assert(containers::contiguous_range<decltype(containers::take(sized_range, 8_bi))>);
+static_assert(containers::contiguous_range<decltype(containers::check_size_not_greater_than(sized_range, 8_bi))>);
 
 inline namespace adl {
 

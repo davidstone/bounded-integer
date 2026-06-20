@@ -25,6 +25,7 @@ import containers.sentinel_t;
 import containers.size;
 import containers.sized_range;
 import containers.subrange;
+import containers.to_address;
 
 import bounded;
 import numeric_traits;
@@ -158,6 +159,10 @@ struct random_access_counted_iterator {
 		return *m_it;
 	}
 	OPERATORS_ARROW_DEFINITIONS
+
+	constexpr auto to_address() const requires to_addressable<Iterator> {
+		return containers::to_address(m_it);
+	}
 
 	friend auto operator<=>(random_access_counted_iterator const &, random_access_counted_iterator const &) = default;
 
