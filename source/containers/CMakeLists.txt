@@ -81,6 +81,7 @@ target_sources(containers PUBLIC
 		append_after.cpp
 		append_into_capacity.cpp
 		array.cpp
+		as_bytes.cpp
 		as_mutable_ptr.cpp
 		assign.cpp
 		assign_to_empty.cpp
@@ -259,6 +260,7 @@ target_sources(containers_test PRIVATE
 		test/algorithms/zip.cpp
 		test/append.cpp
 		test/array.cpp
+		test/as_bytes.cpp
 		test/assign.cpp
 		test/assign_to_empty.cpp
 		test/associative_container.cpp

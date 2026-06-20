@@ -58,6 +58,7 @@ export import containers.adapt;
 export import containers.append;
 export import containers.append_into_capacity;
 export import containers.array;
+export import containers.as_bytes;
 export import containers.assign;
 export import containers.assign_to_empty;
 export import containers.assign_to_empty_into_capacity;
