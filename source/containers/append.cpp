@@ -16,6 +16,7 @@ import containers.c_array;
 import containers.can_set_size;
 import containers.get_source_size;
 import containers.exponential_force_reserve;
+import containers.initializer_range;
 import containers.lazy_push_back;
 import containers.legacy_append;
 import containers.push_back;
@@ -87,7 +88,8 @@ constexpr auto append_impl(Target & target, Source && source) -> void {
 // I would like to return an iterator to the start of the appended range, but
 // that does not seem possible to do efficiently in general due to potential
 // iterator instability.
-export constexpr auto append(push_backable auto & target, range auto && source) -> void {
+export template<push_backable Target>
+constexpr auto append(Target & target, initializer_range<Target> auto && source) -> void {
 	::containers::append_impl(target, OPERATORS_FORWARD(source));
 }
 
