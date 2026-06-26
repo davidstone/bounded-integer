@@ -9,7 +9,7 @@ module;
 
 export module containers.algorithms.generate;
 
-import containers.common_iterator_functions;
+export import containers.common_iterator_functions;
 import containers.index_type;
 import containers.offset_type;
 import containers.stored_function;
@@ -17,10 +17,67 @@ import containers.stored_function;
 import bounded;
 import numeric_traits;
 import std_module;
+import tv;
 
 using namespace bounded::literal;
 
 namespace containers {
+
+template<typename Generator>
+struct generate_iterator {
+	using iterator_category = std::input_iterator_tag;
+	// TODO: ???
+	using difference_type = decltype(bounded::integer(std::int64_t()));
+	
+	explicit constexpr generate_iterator(Generator & generator):
+		m_generator(generator)
+	{
+	}
+	generate_iterator(generate_iterator &&) = default;
+	generate_iterator(generate_iterator const &) = delete;
+	auto operator=(generate_iterator &&) & -> generate_iterator & = default;
+	auto operator=(generate_iterator const &) & -> generate_iterator & = delete;
+
+	constexpr auto operator*() const -> decltype(auto) {
+		return *std::move(m_generator.get().m_cached);
+	}
+	OPERATORS_ARROW_DEFINITIONS
+
+	friend constexpr auto operator==(generate_iterator const & lhs, std::default_sentinel_t) -> bool {
+		return !lhs.m_generator.get().m_cached;
+	}
+
+	friend constexpr auto operator+(generate_iterator it, bounded::constant_t<1>) -> generate_iterator {
+		it.m_generator.get().populate_cache();
+		return it;
+	}
+private:
+	std::reference_wrapper<Generator> m_generator;
+};
+	
+export template<std::invocable Function>
+struct generate {
+	explicit constexpr generate(Function function):
+		m_function(std::move(function))
+	{
+	}
+
+	constexpr auto begin() {
+		populate_cache();
+		return generate_iterator<generate<Function>>(*this);
+	}
+	static constexpr auto end() -> std::default_sentinel_t {
+		return std::default_sentinel;
+	}
+private:
+	friend struct generate_iterator<generate>;
+	constexpr auto populate_cache() {
+		m_cached = std::invoke(m_function);
+	}
+	[[no_unique_address]] Function m_function;
+	std::invoke_result_t<Function &> m_cached;
+};
+
 
 template<typename LHS, typename RHS>
 concept construct_subtractable = requires(LHS const lhs, RHS const rhs) {
@@ -233,6 +290,19 @@ public:
 	constexpr auto size() const -> Size {
 		return m_size;
 	}
+};
+
+template<typename Function>
+struct generate_until_sentinel {
+	explicit constexpr generate_until_sentinel(Function & is_done_):
+		m_is_done(is_done_)
+	{
+	}
+	constexpr auto is_done() const -> bool {
+		return std::invoke(m_is_done.get());
+	}
+private:
+	[[no_unique_address]] stored_function<Function> m_is_done;
 };
 
 } // namespace containers

@@ -8,10 +8,38 @@ export module containers.test.algorithms.generate;
 import containers.algorithms.compare;
 import containers.algorithms.generate;
 import containers.array;
+import containers.is_empty;
 
 import bounded;
+import tv;
 
 using namespace bounded::literal;
+
+constexpr auto make_empty() {
+	return containers::generate([] -> tv::optional<int> { return tv::none; });
+}
+static_assert(containers::is_empty(make_empty()));
+static_assert([] {
+	for (auto const _ : make_empty()) {
+	}
+	return true;
+}());
+
+static_assert([] {
+	int x = 2;
+	auto g = containers::generate(
+		[&] -> tv::optional<int> {
+			if (x > 4) {
+				return tv::none;
+			}
+			x *= 2;
+			return x;
+		}
+	);
+	for (auto const _ : g) {
+	}
+	return x == 8;
+}());
 
 static_assert(containers::equal(containers::generate_n(0_bi, bounded::value_to_function(5)), containers::array<int, 0_bi>{}));
 static_assert(containers::equal(containers::generate_n(1_bi, bounded::value_to_function(5)), containers::array{5}));
