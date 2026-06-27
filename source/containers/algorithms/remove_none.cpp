@@ -25,6 +25,7 @@ import bounded;
 import std_module;
 import tv;
 
+using namespace bounded::literal;
 namespace containers {
 
 template<typename T>
@@ -65,7 +66,7 @@ struct wrapper<T> {
 	}
 
 private:
-	std::remove_reference_t<T> * m_ptr;
+	std::remove_reference_t<T> * m_ptr = nullptr;
 };
 
 template<typename T> requires(std::is_pointer_v<std::remove_reference_t<T>>)
@@ -80,7 +81,7 @@ struct wrapper<T> {
 	}
 
 private:
-	value_type m_ptr;
+	value_type m_ptr = nullptr;
 };
 
 template<typename Range>
@@ -265,6 +266,21 @@ template<typename Range>
 remove_none(Range &&) -> remove_none<Range>;
 
 } // namespace containers
+
+static_assert([]{
+	constexpr auto source = containers::array<tv::optional<int>, 0_bi>{};
+	constexpr auto expected = containers::array<int, 0_bi>{};
+	static_assert(containers::forward_range<decltype(containers::remove_none(source))>);
+	return containers::equal(containers::remove_none(source), expected);
+}());
+
+static_assert([]{
+	constexpr auto source = containers::array<int const *, 0_bi>{};
+	auto removed = containers::remove_none(source);
+	auto it = containers::begin(removed);
+	[[maybe_unused]] auto copy = it;
+	return true;
+}());
 
 static_assert([]{
 	constexpr auto source = containers::array{1, 2, tv::none, 3, tv::none};
