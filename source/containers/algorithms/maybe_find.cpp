@@ -25,8 +25,8 @@ namespace containers {
 // the maybe_find functions return a value contextually convertible to bool. If
 // the range contains the element, it can be dereferenced as an optional
 export template<iterator ForwardIterator>
-constexpr auto maybe_find_if(ForwardIterator const first, sentinel_for<ForwardIterator> auto const last, auto predicate) {
-	auto const it = ::containers::find_if(first, last, std::move(predicate));
+constexpr auto maybe_find_if(ForwardIterator first, sentinel_for<ForwardIterator> auto const last, auto predicate) {
+	auto const it = ::containers::find_if(std::move(first), last, std::move(predicate));
 	if constexpr (std::is_lvalue_reference_v<decltype(*it)>) {
 		return it != last ? std::addressof(*it) : nullptr;
 	} else {
@@ -40,8 +40,8 @@ export constexpr auto maybe_find_if(range auto && range, auto predicate) {
 
 
 export template<iterator ForwardIterator>
-constexpr auto maybe_find(ForwardIterator const first, sentinel_for<ForwardIterator> auto const last, auto const & value) {
-	return ::containers::maybe_find_if(first, last, bounded::equal_to(value));
+constexpr auto maybe_find(ForwardIterator first, sentinel_for<ForwardIterator> auto const last, auto const & value) {
+	return ::containers::maybe_find_if(std::move(first), last, bounded::equal_to(value));
 }
 
 export constexpr auto maybe_find(range auto && range, auto const & value) {
