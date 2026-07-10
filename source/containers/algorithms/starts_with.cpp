@@ -18,7 +18,7 @@ import containers.take;
 namespace containers {
 
 // TODO: Extend to the prefix being an input range
-export constexpr auto starts_with(range auto && full, sized_range auto && prefix) {
+export constexpr auto starts_with(range auto && full, sized_range auto && prefix) -> bool {
 	return containers::equal(
 		containers::take(OPERATORS_FORWARD(full), containers::size(prefix)),
 		OPERATORS_FORWARD(prefix)
