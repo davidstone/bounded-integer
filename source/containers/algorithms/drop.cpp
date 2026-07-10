@@ -207,7 +207,8 @@ constexpr auto drop_impl(Range && source, Count const count) {
 	}
 }
 
-export template<range Range, bounded::bounded_integer Count> requires(numeric_traits::min_value<Count> >= 0_bi)
+export template<range Range, bounded::bounded_integer Count>
+	requires(numeric_traits::min_value<Count> >= 0_bi)
 constexpr auto drop(Range && source, Count const count) {
 	return drop_impl<extra_elements_policy::drop>(OPERATORS_FORWARD(source), count);
 }
