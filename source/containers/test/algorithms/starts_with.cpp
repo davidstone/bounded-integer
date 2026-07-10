@@ -20,3 +20,4 @@ static_assert(containers::starts_with("aa"_s, "aa"_s));
 static_assert(!containers::starts_with(""_s, "a"_s));
 static_assert(!containers::starts_with("a"_s, "b"_s));
 static_assert(!containers::starts_with("a"_s, "aa"_s));
+static_assert(!containers::starts_with("ab"_s, "b"_s));
