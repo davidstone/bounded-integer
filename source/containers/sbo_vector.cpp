@@ -163,7 +163,7 @@ private:
 	[[no_unique_address]] first_bytes_of_size_type m_first_bytes_of_size;
 };
 
-export template<typename T, std::size_t requested_small_capacity, std::size_t max_size = containers::maximum_array_size<T>>
+export template<typename T, std::size_t requested_small_capacity = 1, std::size_t max_size = containers::maximum_array_size<T>>
 struct [[clang::trivial_abi]] sbo_vector : private lexicographical_comparison::base {
 	using size_type = small_buffer_size_type<max_size>;
 

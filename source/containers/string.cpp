@@ -31,8 +31,8 @@ using namespace containers::string_literals;
 namespace containers {
 
 // Unlike std::string, there is no null terminator.
-export struct string : private sbo_vector<char, 0> {
-	using base = sbo_vector<char, 0>;
+export struct string : private sbo_vector<char> {
+	using base = sbo_vector<char>;
 public:
 	using base::base;
 	
