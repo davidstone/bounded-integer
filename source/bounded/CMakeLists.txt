@@ -7,7 +7,6 @@ add_library(bounded STATIC)
 
 target_link_libraries(bounded
 	PUBLIC
-		strict_defaults_interface
 		numeric_traits
 		operators
 		std_module

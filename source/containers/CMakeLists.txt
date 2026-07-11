@@ -217,7 +217,6 @@ target_sources(containers PUBLIC
 target_link_libraries(containers
 	PUBLIC
 		bounded
-		strict_defaults_interface
 		operators
 		std_module
 		tv
