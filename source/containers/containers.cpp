@@ -40,6 +40,7 @@ export import containers.algorithms.keyed_erase;
 export import containers.algorithms.keyed_insert;
 export import containers.algorithms.maybe_find;
 export import containers.algorithms.minmax_element;
+export import containers.algorithms.mismatch;
 export import containers.algorithms.move_range;
 export import containers.algorithms.partition;
 export import containers.algorithms.remove_none;

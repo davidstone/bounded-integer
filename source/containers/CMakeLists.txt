@@ -60,6 +60,7 @@ target_sources(containers PUBLIC
 		algorithms/keyed_insert.cpp
 		algorithms/maybe_find.cpp
 		algorithms/minmax_element.cpp
+		algorithms/mismatch.cpp
 		algorithms/move_range.cpp
 		algorithms/partition.cpp
 		algorithms/remove_none.cpp
@@ -255,6 +256,7 @@ target_sources(containers_test PRIVATE
 		test/algorithms/join.cpp
 		test/algorithms/join_with.cpp
 		test/algorithms/keyed_binary_search.cpp
+		test/algorithms/mismatch.cpp
 		test/algorithms/partition.cpp
 		test/algorithms/set.cpp
 		test/algorithms/split.cpp
