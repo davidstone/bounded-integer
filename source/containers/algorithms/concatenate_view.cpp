@@ -244,9 +244,25 @@ public:
 	constexpr auto begin() & requires(... and forward_range<Ranges &>) {
 		return begin_impl(m_ranges);
 	}
+
+	// `containers::end` would do the right thing without any member `end`
+	// functions defined. However, the range-based for loop just checks if a
+	// member begin and end are declared, so without these overloads a 
+	// concatenate_view` of all `forward_random_access_range`s would not be
+	// compatible.
+	constexpr auto end() && requires(... and forward_random_access_range<Ranges>) {
+		return std::move(*this).begin() + size();
+	}
+	constexpr auto end() const & requires(... and forward_random_access_range<Ranges const &>) {
+		return begin() + size();
+	}
+	constexpr auto end() & requires(... and forward_random_access_range<Ranges &>) {
+		return begin() + size();
+	}
 	static constexpr auto end() requires(... or !forward_random_access_range<Ranges>) {
 		return std::default_sentinel;
 	}
+
 	constexpr auto size() const requires all_are_sized {
 		auto const & [...ranges] = m_ranges;
 		return (... + containers::size(ranges));

@@ -35,6 +35,11 @@ constexpr auto array1 = containers::array{1, 2, 3};
 constexpr auto array2 = containers::array{2, 3, 5, 7};
 constexpr auto array3 = containers::array{1, 1, 2, 3, 5};
 
+auto _() {
+	for (auto _ : containers::concatenate_view(array1)) {
+	}
+}
+
 constexpr auto two = containers::concatenate_view(array1, array2);
 
 using iterator = decltype(begin(two));
