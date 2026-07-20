@@ -49,8 +49,8 @@ static_assert(bounded::convertible_to<
 
 template<typename T>
 using sr = containers::subrange<
-	containers::contiguous_iterator<T, bounded::constant<containers::maximum_array_size<T>>>,
-	containers::contiguous_iterator<T, bounded::constant<containers::maximum_array_size<T>>>,
+	containers::contiguous_iterator<T>,
+	containers::contiguous_iterator<T>,
 	containers::array_size_type<T>
 >;
 

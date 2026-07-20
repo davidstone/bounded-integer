@@ -23,7 +23,6 @@ import containers.begin_end;
 import containers.c_array;
 import containers.common_functions;
 import containers.compare_container;
-import containers.contiguous_iterator;
 import containers.data;
 import containers.dynamic_array_data;
 import containers.initializer_range;

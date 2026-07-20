@@ -25,7 +25,7 @@ namespace containers {
 template<typename T>
 using opposite_const = std::conditional_t<std::is_const_v<T>, std::remove_const_t<T>, T const>;
 
-export template<typename T, array_size_type<T> max_difference>
+export template<typename T, array_size_type<T> max_difference = bounded::constant<maximum_array_size<T>>>
 struct contiguous_iterator {
 	using difference_type = bounded::integer<bounded::normalize<-max_difference>, bounded::normalize<max_difference>>;
 
