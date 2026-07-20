@@ -47,6 +47,7 @@ target_sources(containers PUBLIC
 		algorithms/destroy_range.cpp
 		algorithms/distance.cpp
 		algorithms/drop.cpp
+		algorithms/drop_back.cpp
 		algorithms/ends_with.cpp
 		algorithms/erase.cpp
 		algorithms/filter.cpp
@@ -248,6 +249,7 @@ target_sources(containers_test PRIVATE
 		test/algorithms/copy.cpp
 		test/algorithms/copy_or_relocate_from.cpp
 		test/algorithms/drop.cpp
+		test/algorithms/drop_back.cpp
 		test/algorithms/ends_with.cpp
 		test/algorithms/erase.cpp
 		test/algorithms/filter.cpp

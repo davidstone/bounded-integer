@@ -27,6 +27,7 @@ export import containers.algorithms.count;
 export import containers.algorithms.destroy_range;
 export import containers.algorithms.distance;
 export import containers.algorithms.drop;
+export import containers.algorithms.drop_back;
 export import containers.algorithms.ends_with;
 export import containers.algorithms.erase;
 export import containers.algorithms.filter;
