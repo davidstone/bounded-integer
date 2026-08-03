@@ -2,28 +2,15 @@ name: Build and test
 
 on:
   schedule:
-    - cron: '27 5 * * *'
+    - cron: '27 10 * * *'
   push:
-    branches: [ "main" ]
+    branches: ["main"]
   pull_request:
-    branches: [ "main" ]
+    branches: ["main"]
   workflow_dispatch:
 
 jobs:
-  build:
-    if: github.event_name != 'schedule'
-    strategy:
-      fail-fast: false
-      matrix:
-        clang_version: [ 'main', '22' ]
-    runs-on: ubuntu-latest
-    steps:
-      - uses: davidstone/cmake_strict_defaults@main
-        with:
-          clang_version: ${{ matrix.clang_version }}
-
-  nightly:
-    if: github.event_name == 'schedule'
-    runs-on: ubuntu-latest
-    steps:
-      - uses: davidstone/cmake_strict_defaults@main
+  build-and-test:
+    uses: davidstone/cmake_strict_defaults/.github/workflows/build-and-test.yml@main
+    with:
+      event_name: ${{github.event_name}}
