@@ -14,18 +14,17 @@ namespace tv {
 
 struct get_index_t {
 	template<typename Index, typename... Ts> requires matches_exactly_one_type<Index, typename Ts::type...>
-	static constexpr auto operator()(bounded::type_t<Index> index, Ts... ts) {
+	static constexpr auto operator()(bounded::type_t<Index> index, Ts... types) {
 		constexpr auto result = [=] {
-			bool found = false;
+			// TODO: Use `template for` with `integer_range`
 			std::size_t value = 0;
-			(
-				...,
-				(!found ?
-					void(((found = (index == ts)), ++value)) :
-					void()
-				)
-			);
-			return value - 1;
+			template for (auto const type : {types...}) {
+				if (type == index) {
+					return value;
+				}
+				++value;
+			}
+			std::unreachable();
 		}();
 		return bounded::constant<result>;
 	}
