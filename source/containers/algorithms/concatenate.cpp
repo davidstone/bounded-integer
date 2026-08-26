@@ -58,18 +58,19 @@ struct reusable_concatenate_t {
 	Integer before_size;
 };
 
-template<typename Result, typename Integer, typename Range>
-constexpr auto reusable_concatenate_container(reusable_concatenate_t<Result, Integer> result, auto const total_size, Range && range) {
-	if (result.ptr) {
-		return result;
-	}
-	if constexpr (std::same_as<Result, Range>) {
-		if (range.capacity() >= total_size) {
-			return reusable_concatenate_t<Result, Integer>{std::addressof(range), result.before_size};
+template<typename Result>
+constexpr auto find_reusable_container(auto const total_size, auto && ... ranges) {
+	using Integer = bounded::integer<0, bounded::builtin_max_value<decltype(total_size)>>;
+	auto before_size = Integer(0_bi);
+	template for (auto && range : {OPERATORS_FORWARD(ranges)...}) {
+		if constexpr (std::same_as<decltype(range), Result &&>) {
+			if (range.capacity() >= total_size) {
+				return reusable_concatenate_t<Result, Integer>{std::addressof(range), before_size};
+			}
 		}
+		before_size += ::containers::linear_size(range);
 	}
-	result.before_size += ::containers::linear_size(range);
-	return result;
+	return reusable_concatenate_t<Result, Integer>(nullptr, 0_bi);
 }
 
 // Adding up a bunch of sizes leads to overflow in bounds
@@ -124,9 +125,7 @@ constexpr auto concatenate(auto && ... ranges) -> Result {
 	auto const total_size = (0_bi + ... + ::containers::ugly_size_hack(::containers::linear_size(ranges)));
 
 	if constexpr (can_reuse_storage<Result>) {
-		using Integer = bounded::integer<0, bounded::builtin_max_value<decltype(total_size)>>;
-		auto reusable = reusable_concatenate_t<Result, Integer>{nullptr, 0_bi};
-		(..., (reusable = ::containers::reusable_concatenate_container(reusable, total_size, OPERATORS_FORWARD(ranges))));
+		auto const reusable = find_reusable_container<Result>(total_size, OPERATORS_FORWARD(ranges)...);
 		if (reusable.ptr) {
 			auto & ref = *reusable.ptr;
 			if (reusable.before_size != 0_bi) {
