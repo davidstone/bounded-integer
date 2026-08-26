@@ -82,7 +82,6 @@ consteval auto is_variants_then_visit_function(std::index_sequence<indexes...>) 
 template<bool use_index, std::size_t variant_index>
 constexpr auto visit_implementation(
 	auto && function,
-	bounded::constant_t<0>,
 	auto && ... elements
 ) -> decltype(auto) requires(variant_index == sizeof...(elements)) {
 	return OPERATORS_FORWARD(function)(OPERATORS_FORWARD(elements)...);
@@ -103,64 +102,26 @@ constexpr auto get_element(auto && variant, auto const index) -> decltype(auto) 
 template<bool use_index, std::size_t variant_index>
 constexpr auto visit_implementation(
 	auto && function,
-	auto offset,
 	auto && ... variants
 ) -> decltype(auto) requires(variant_index < sizeof...(variants)) {
-	auto const search_index = variants...[variant_index].index().integer();
-	auto const this_search = search_index - offset;
-
 	auto const [...element_indexes] = bounded::index_sequence_struct<variant_index>();
-	auto && variant = OPERATORS_FORWARD(variants...[variant_index]); \
 	auto const [...remaining_indexes] = bounded::index_sequence_struct<sizeof...(variants) - variant_index - 1>();
-	// Cannot use a lambda because there is no return type that would be valid
-	// there. A deduced return type would be potentially void.
-	#define VISIT_IMPL(index) \
-		do { \
-			if constexpr (numeric_traits::max_value<decltype(this_search)> < (index)) { \
-				std::unreachable(); \
-			} else { \
-				return ::tv::visit_implementation<use_index, variant_index + 1>( \
-					OPERATORS_FORWARD(function), \
-					0_bi, \
-					OPERATORS_FORWARD(variants...[element_indexes.value()])..., \
-					get_element<use_index>(OPERATORS_FORWARD(variant), offset + (index)), \
-					OPERATORS_FORWARD(variants...[variant_index + 1 + remaining_indexes.value()])... \
-				); \
-			} \
-		} while (false)
-
-	// 16 is arbitrary
-	switch (this_search.value()) {
-		case 0: VISIT_IMPL(0_bi);
-		case 1: VISIT_IMPL(1_bi);
-		case 2: VISIT_IMPL(2_bi);
-		case 3: VISIT_IMPL(3_bi);
-		case 4: VISIT_IMPL(4_bi);
-		case 5: VISIT_IMPL(5_bi);
-		case 6: VISIT_IMPL(6_bi);
-		case 7: VISIT_IMPL(7_bi);
-		case 8: VISIT_IMPL(8_bi);
-		case 9: VISIT_IMPL(9_bi);
-		case 10: VISIT_IMPL(10_bi);
-		case 11: VISIT_IMPL(11_bi);
-		case 12: VISIT_IMPL(12_bi);
-		case 13: VISIT_IMPL(13_bi);
-		case 14: VISIT_IMPL(14_bi);
-		case 15: VISIT_IMPL(15_bi);
-		default: {
-			constexpr auto max_index = 16_bi;
-			if constexpr (numeric_traits::max_value<decltype(this_search)> < max_index) {
-				std::unreachable();
-			} else {
-				return ::tv::visit_implementation<use_index, variant_index>(
-					OPERATORS_FORWARD(function),
-					offset + max_index,
-					OPERATORS_FORWARD(variants)...
-				);
-			}
+	
+	auto const search_index = variants...[variant_index].index().integer();
+	using variant_index_t = decltype(search_index);
+	static_assert(numeric_traits::min_value<variant_index_t> == 0_bi);
+	static constexpr auto indexes = bounded::index_sequence_struct<bounded::number_of<variant_index_t>.value()>();
+	template for (constexpr auto index : indexes) {
+		if (index == search_index) {
+			return ::tv::visit_implementation<use_index, variant_index + 1>(
+				OPERATORS_FORWARD(function),
+				OPERATORS_FORWARD(variants...[element_indexes.value()])...,
+				get_element<use_index>(OPERATORS_FORWARD(variants...[variant_index]), index),
+				OPERATORS_FORWARD(variants...[variant_index + 1 + remaining_indexes.value()])...
+			);
 		}
 	}
-	#undef VISIT_IMPL
+	std::unreachable();
 }
 
 // Accepts any number of variants (including 0) followed by one function
@@ -170,7 +131,6 @@ export constexpr auto visit_with_index = []<typename... Args>(Args && ... args) 
 	auto [...indexes] = bounded::index_sequence_struct<sizeof...(args) - 1>();
 	return ::tv::visit_implementation<true, 0>(
 		OPERATORS_FORWARD(args...[sizeof...(args) - 1]),
-		0_bi,
 		OPERATORS_FORWARD(args...[indexes.value()])...
 	);
 };
@@ -183,7 +143,6 @@ export constexpr auto visit = []<typename... Args>(Args && ... args) static -> d
 	auto [...indexes] = bounded::index_sequence_struct<sizeof...(args) - 1>();
 	return ::tv::visit_implementation<false, 0>(
 		OPERATORS_FORWARD(args...[sizeof...(args) - 1]),
-		0_bi,
 		OPERATORS_FORWARD(args...[indexes.value()])...
 	);
 };
