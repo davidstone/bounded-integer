@@ -182,10 +182,11 @@ constexpr auto double_buffered_tuple_sort(
 	auto const [...indexes] = bounded::index_sequence_struct<std::tuple_size_v<key_t>>();
 	auto which = false;
 	auto do_iteration = [&]<auto index>(bounded::constant_t<index>) {
-		using std::get;
 		auto extract_index = [&](auto && value) -> decltype(auto) {
 			using std::get;
-			return static_cast<extract_return_type_tuple<decltype(value), index, OriginalExtractor, CurrentExtractor>>(original_extractor(get<index>(current_extractor(OPERATORS_FORWARD(value)))));
+			return static_cast<extract_return_type_tuple<decltype(value), index, OriginalExtractor, CurrentExtractor>>(
+				original_extractor(get<index>(current_extractor(OPERATORS_FORWARD(value))))
+			);
 		};
 		if (which) {
 			which = !::containers::double_buffered_sort_impl(buffer, source, original_extractor, extract_index);
