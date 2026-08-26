@@ -12,10 +12,13 @@ import tv;
 namespace containers {
 
 export template<typename T>
-constexpr auto rotate_one(T & arg, auto & ... args) {
-	auto storage = tv::relocate_into_storage(arg);
-	auto ref = std::reference_wrapper<T>(arg);
-	(..., (bounded::relocate_at(ref.get(), args), ref = args));
+constexpr auto rotate_one(T & first, auto & ... remainder) {
+	auto storage = tv::relocate_into_storage(first);
+	auto ref = std::reference_wrapper<T>(first);
+	template for (auto & arg : {remainder...}) {
+		bounded::relocate_at(ref.get(), arg);
+		ref = arg;
+	}
 	bounded::relocate_at(ref.get(), storage.value);
 }
 

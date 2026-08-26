@@ -10,7 +10,10 @@ import bounded;
 namespace containers {
 
 export constexpr auto relocate_in_order(auto it, auto & ... xs) {
-	(..., bounded::relocate_at(*it++, xs));
+	template for (auto & x : {xs...}) {
+		bounded::relocate_at(*it, x);
+		++it;
+	}
 }
 
 } // namespace containers
