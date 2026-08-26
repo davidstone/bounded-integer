@@ -25,22 +25,18 @@ struct index_pairs {
 	std::size_t inner;
 };
 
-constexpr auto add_pack(
-	auto it,
-	std::size_t const outer_index,
-	auto const size
-) {
-	auto const [...inner_indexes] = bounded::index_sequence_struct(size);
-	(..., (*it++ = {outer_index, inner_indexes.value()}));
-	return it;
-}
-
 constexpr auto make_indexes(auto const... sizes) {
 	constexpr auto total = (0_bi + ... + sizes);
 	auto result = std::array<index_pairs, total.value()>();
 	auto it = result.begin();
 	auto outer_index = 0UZ;
-	(..., (it = add_pack(it, outer_index++, sizes)));
+	template for (auto const size : {sizes...}) {
+		for (auto inner_index = 0UZ; inner_index != size; ++inner_index) {
+			*it = {outer_index, inner_index};
+			++it;
+		}
+		++outer_index;
+	}
 	BOUNDED_ASSERT(it == result.end());
 	return result;
 }
