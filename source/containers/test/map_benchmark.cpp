@@ -84,7 +84,7 @@ using extract_key_t = Extract;
 	}
 
 	void insert_range(auto & map, auto && range) {
-		map.insert(OPERATORS_FORWARD(range));
+		map.insert_range(OPERATORS_FORWARD(range));
 	}
 
 #else

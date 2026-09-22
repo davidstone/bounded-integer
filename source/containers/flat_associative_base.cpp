@@ -243,7 +243,7 @@ struct flat_associative_base : private lexicographical_comparison::base {
 		}
 	}
 
-	constexpr auto insert(range auto && init) -> void {
+	constexpr auto insert_range(range auto && init) -> void {
 		// Because my underlying container is expected to be contiguous storage,
 		// it's best to do a batch insert and then just sort it all.
 		auto const original_size = containers::size(m_container);

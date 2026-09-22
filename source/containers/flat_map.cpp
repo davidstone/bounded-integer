@@ -64,7 +64,7 @@ public:
 	using base::reserve;
 	
 	using base::lazy_insert;
-	using base::insert;
+	using base::insert_range;
 	
 	using base::erase;
 	using base::erase_if;
@@ -134,7 +134,7 @@ public:
 	using base::reserve;
 	
 	using base::lazy_insert;
-	using base::insert;
+	using base::insert_range;
 	
 	using base::erase;
 	using base::erase_if;
