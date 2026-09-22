@@ -121,6 +121,7 @@ target_sources(containers PUBLIC
 		erase_concepts.cpp
 		exponential_force_reserve.cpp
 		extract_key_to_less.cpp
+		flat_associative_base.cpp
 		flat_map.cpp
 		forward_iterator.cpp
 		forward_linked_list.cpp
