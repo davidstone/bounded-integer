@@ -317,13 +317,11 @@ public:
 	using base::erase;
 	using base::erase_if;
 
-	constexpr auto find(auto const & key) const {
-		auto const it = containers::keyed_lower_bound(*this, key);
-		return (it == ::containers::end(*this) or compare()(key, get_key(*it))) ? ::containers::end(*this) : it;
-	}
-	constexpr auto find(auto const & key) {
-		auto const it = containers::keyed_lower_bound(*this, key);
-		return (it == ::containers::end(*this) or compare()(key, get_key(*it))) ? ::containers::end(*this) : it;
+	constexpr auto find(this auto && self, auto const & key) {
+		auto const it = containers::keyed_lower_bound(self, key);
+		return (it == ::containers::end(self) or self.compare()(key, get_key(*it))) ?
+			::containers::end(self) :
+			it;
 	}
 
 	// `Other` is required to be a unique range of elements
