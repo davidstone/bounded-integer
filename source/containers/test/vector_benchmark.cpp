@@ -24,7 +24,7 @@ auto default_value() -> T {
 	}
 }
 
-template <class Container>
+template<typename Container>
 void benchmark_construct_size(benchmark::State & state) {
 	auto const size = static_cast<containers::range_size_t<Container>>(state.range(0));
 	for (auto _ : state) {
@@ -33,7 +33,7 @@ void benchmark_construct_size(benchmark::State & state) {
 	}
 }
 
-template <class Container, typename Container::value_type value>
+template<typename Container, typename Container::value_type value>
 void benchmark_construct_repeat_value(benchmark::State & state) {
 	auto const size = static_cast<containers::range_size_t<Container>>(state.range(0));
 	for (auto _ : state) {
@@ -42,7 +42,7 @@ void benchmark_construct_repeat_value(benchmark::State & state) {
 	}
 }
 
-template <class Container>
+template<typename Container>
 void benchmark_construct_iterator_pair(benchmark::State & state) {
 	auto const size = static_cast<containers::range_size_t<Container>>(state.range(0));
 	auto in = std::vector(size, default_value<containers::range_value_t<Container>>());

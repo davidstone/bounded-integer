@@ -24,7 +24,7 @@ template<std::size_t capacity>
 union aligned_storage_helper {
 	struct empty {};
 
-	template<class T>
+	template<typename T>
 	using maybe = std::conditional_t<capacity >= sizeof(T), T, empty>;
 	struct double_holder { double a; };
 

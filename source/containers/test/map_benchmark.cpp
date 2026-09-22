@@ -92,8 +92,7 @@ using extract_key_t = Extract;
 #endif
 
 using unit = std::chrono::milliseconds;
-class TimeDestructor {
-public:
+struct TimeDestructor {
 	using TimePoint = decltype(std::chrono::high_resolution_clock::now());
 	void set() {
 		m_time_point = std::chrono::high_resolution_clock::now();
@@ -108,7 +107,6 @@ private:
 
 template<std::size_t size>
 struct Thing {
-public:
 	Thing(std::uint32_t v) {
 		m_value[0] = v;
 	}

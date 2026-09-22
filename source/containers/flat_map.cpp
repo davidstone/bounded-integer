@@ -291,7 +291,7 @@ protected:
 
 
 export template<typename Container, extract_key_function<typename range_value_t<Container>::key_type> ExtractKey = to_radix_sort_key_t>
-class basic_flat_map : private flat_map_base<Container, ExtractKey, false> {
+struct basic_flat_map : private flat_map_base<Container, ExtractKey, false> {
 private:
 	using base = flat_map_base<Container, ExtractKey, false>;
 public:
@@ -363,7 +363,7 @@ basic_flat_map(assume_sorted_unique_t, Range &&, ExtractKey) -> basic_flat_map<s
 
 
 export template<typename Container, extract_key_function<typename range_value_t<Container>::key_type> ExtractKey = to_radix_sort_key_t>
-class basic_flat_multimap : private flat_map_base<Container, ExtractKey, true> {
+struct basic_flat_multimap : private flat_map_base<Container, ExtractKey, true> {
 private:
 	using base = flat_map_base<Container, ExtractKey, true>;
 public:

@@ -191,7 +191,7 @@ constexpr auto && get(tuple_like auto && t) {
 }	// namespace tv
 
 template<typename... Ts>
-class std::tuple_size<tv::tuple<Ts...>> : public std::integral_constant<std::size_t, sizeof...(Ts)> {};
+struct std::tuple_size<tv::tuple<Ts...>> : std::integral_constant<std::size_t, sizeof...(Ts)> {};
 
 template<std::size_t index, typename... Ts>
-class std::tuple_element<index, tv::tuple<Ts...>> : public tv::tuple_element_c<index, tv::tuple<Ts...>> {};
+struct std::tuple_element<index, tv::tuple<Ts...>> : tv::tuple_element_c<index, tv::tuple<Ts...>> {};
