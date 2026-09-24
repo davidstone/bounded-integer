@@ -22,7 +22,6 @@ using namespace bounded::literal;
 
 struct container {
 	using key_type = int;
-	using mapped_type = int;
 
 	constexpr auto begin() const {
 		return containers::begin(m_data);
