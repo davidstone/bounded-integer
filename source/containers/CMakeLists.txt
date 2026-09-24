@@ -123,6 +123,7 @@ target_sources(containers PUBLIC
 		extract_key_to_less.cpp
 		flat_associative_base.cpp
 		flat_map.cpp
+		flat_set.cpp
 		forward_iterator.cpp
 		forward_linked_list.cpp
 		forward_random_access_iterator.cpp
@@ -278,6 +279,7 @@ target_sources(containers_test PRIVATE
 		test/concatenate.cpp
 		test/dynamic_array.cpp
 		test/flat_map.cpp
+		test/flat_set.cpp
 		test/forward_linked_list.cpp
 		test/front.cpp
 		test/is_container.cpp

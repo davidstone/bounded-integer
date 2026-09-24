@@ -45,17 +45,19 @@ import std_module;
 
 namespace containers {
 
-template<typename T, typename ExtractKey>
-struct extract_map_key {
-	constexpr explicit extract_map_key(ExtractKey extract_key):
+template<typename T, typename Key, typename ExtractKey>
+struct extract_key_t {
+	constexpr explicit extract_key_t(ExtractKey extract_key):
 		m_extract(std::move(extract_key))
 	{
 	}
-	constexpr decltype(auto) operator()(T const & value) const {
-		return m_extract(get_key(value));
+	constexpr auto operator()(Key const & value) const -> decltype(auto) {
+		return m_extract(value);
 	}
-	constexpr decltype(auto) operator()(typename T::key_type const & key) const {
-		return m_extract(key);
+	constexpr auto operator()(T const & value) const -> decltype(auto)
+		requires(!std::same_as<Key, T>)
+	{
+		return m_extract(get_key(value));
 	}
 private:
 	[[no_unique_address]] ExtractKey m_extract;
@@ -85,19 +87,15 @@ constexpr auto merge_sorted_and_unsorted(Container & container, iterator_t<Conta
 	}
 }
 
-export template<typename Container, typename ExtractKey, bool allow_duplicates>
+export template<typename Container, typename KeyType, typename ExtractKey, bool allow_duplicates>
 struct flat_associative_base : private lexicographical_comparison::base {
-	// The exact type of value_type should be considered implementation defined.
-	// Unlike with the node-based containers, const-correctness is not possible if
-	// we support inserting into the middle of the container.
 	using value_type = range_value_t<Container>;
-	using key_type = typename value_type::key_type;
-	using mapped_type = typename value_type::mapped_type;
+	using key_type = KeyType;
 
 	using const_iterator = iterator_t<Container const &>;
 	
 	constexpr auto extract_key() const {
-		return extract_map_key<value_type, ExtractKey>(m_extract_key);
+		return extract_key_t<value_type, key_type, ExtractKey>(m_extract_key);
 	}
 	constexpr auto key_comp() const {
 		return ::containers::extract_key_to_less(extract_key());
@@ -234,14 +232,13 @@ struct flat_associative_base : private lexicographical_comparison::base {
 	// Unlike node containers, insert can only provide a time complexity that
 	// matches an insert into the underlying container, which is to say,
 	// linear. An insertion implies shifting all of the elements.
-	template<typename Key = key_type>
-	constexpr auto lazy_insert(Key && key, bounded::construct_function_for<mapped_type> auto && mapped) {
+	constexpr auto insert(auto && key, auto const make_value) {
 		auto const position = containers::keyed_upper_bound(*this, key);
 		auto add_element = [&] {
 			return ::containers::lazy_insert(
 				m_container,
 				position,
-				[&] { return value_type{OPERATORS_FORWARD(key), OPERATORS_FORWARD(mapped)()}; }
+				[&] { return make_value(OPERATORS_FORWARD(key)); }
 			);
 		};
 		if constexpr (allow_duplicates) {

@@ -42,13 +42,22 @@ concept extract_key_function = requires(ExtractKey const & extract_key, T const 
 	extract_key(value);
 };
 
-export template<typename Container, extract_key_function<typename range_value_t<Container>::key_type> ExtractKey = to_radix_sort_key_t>
-struct basic_flat_map : private flat_associative_base<Container, ExtractKey, false> {
+template<typename T>
+using key_t = typename range_value_t<T>::key_type;
+
+export template<
+	typename Container,
+	extract_key_function<key_t<Container>> ExtractKey = to_radix_sort_key_t
+>
+struct basic_flat_map :
+	private flat_associative_base<Container, key_t<Container>, ExtractKey, false>
+{
 private:
-	using base = flat_associative_base<Container, ExtractKey, false>;
+	using base = flat_associative_base<Container, key_t<Container>, ExtractKey, false>;
 public:
+	using typename base::value_type;
 	using typename base::key_type;
-	using typename base::mapped_type;
+	using mapped_type = value_type::mapped_type;
 
 	using base::key_comp;
 	using base::extract_key;
@@ -63,7 +72,21 @@ public:
 	using base::replace_empty_allocation;
 	using base::reserve;
 	
-	using base::lazy_insert;
+	template<typename Key = key_type>
+	constexpr auto lazy_insert(
+		Key && key,
+		bounded::construct_function_for<mapped_type> auto && make_mapped
+	) {
+		return base::insert(
+			OPERATORS_FORWARD(key),
+			[&](auto && key_) {
+				return value_type{
+					OPERATORS_FORWARD(key_),
+					OPERATORS_FORWARD(make_mapped)()
+				};
+			}
+		);
+	}
 	using base::insert_range;
 	
 	using base::erase;
@@ -112,13 +135,16 @@ template<typename Range, typename ExtractKey>
 basic_flat_map(assume_sorted_unique_t, Range &&, ExtractKey) -> basic_flat_map<std::remove_const_t<Range>, ExtractKey>;
 
 
-export template<typename Container, extract_key_function<typename range_value_t<Container>::key_type> ExtractKey = to_radix_sort_key_t>
-struct basic_flat_multimap : private flat_associative_base<Container, ExtractKey, true> {
+export template<typename Container, extract_key_function<key_t<Container>> ExtractKey = to_radix_sort_key_t>
+struct basic_flat_multimap :
+	private flat_associative_base<Container, key_t<Container>, ExtractKey, true>
+{
 private:
-	using base = flat_associative_base<Container, ExtractKey, true>;
+	using base = flat_associative_base<Container, key_t<Container>, ExtractKey, true>;
 public:
+	using typename base::value_type;
 	using typename base::key_type;
-	using typename base::mapped_type;
+	using mapped_type = value_type::mapped_type;
 
 	using base::key_comp;
 	using base::extract_key;
@@ -133,7 +159,21 @@ public:
 	using base::replace_empty_allocation;
 	using base::reserve;
 	
-	using base::lazy_insert;
+	template<typename Key = key_type>
+	constexpr auto lazy_insert(
+		Key && key,
+		bounded::construct_function_for<mapped_type> auto && make_mapped
+	) {
+		return base::insert(
+			OPERATORS_FORWARD(key),
+			[&](auto && key_) {
+				return value_type{
+					OPERATORS_FORWARD(key_),
+					OPERATORS_FORWARD(make_mapped)()
+				};
+			}
+		);
+	}
 	using base::insert_range;
 	
 	using base::erase;
