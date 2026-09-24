@@ -104,7 +104,8 @@ struct flat_associative_base : private lexicographical_comparison::base {
 	}
 	
 	flat_associative_base() = default;
-	constexpr explicit flat_associative_base(ExtractKey extract_key_):
+	template<bounded::convertible_to<ExtractKey> EK>
+	constexpr explicit flat_associative_base(EK extract_key_):
 		m_extract_key(std::move(extract_key_))
 	{
 	}
@@ -162,6 +163,9 @@ struct flat_associative_base : private lexicographical_comparison::base {
 		flat_associative_base(std::move(source), ExtractKey())
 	{
 	}
+	template<std::same_as<empty_c_array_parameter> Source = empty_c_array_parameter>
+	constexpr flat_associative_base(Source) {
+	}
 
 	template<std::size_t init_size>
 	constexpr flat_associative_base(assume_sorted_unique_t, c_array<value_type, init_size> && source, ExtractKey extract_key_):
@@ -175,6 +179,12 @@ struct flat_associative_base : private lexicographical_comparison::base {
 		flat_associative_base(assume_sorted_unique, std::move(source), ExtractKey())
 	{
 	}
+	constexpr flat_associative_base(assume_sorted_unique_t, empty_c_array_parameter, ExtractKey extract_key_):
+		m_extract_key(std::move(extract_key_))
+	{
+	}
+	constexpr flat_associative_base(assume_sorted_unique_t, empty_c_array_parameter) {
+	}
 
 	template<std::size_t init_size>
 	constexpr flat_associative_base(assume_unique_t, c_array<value_type, init_size> && source, ExtractKey extract_key_):
@@ -187,6 +197,12 @@ struct flat_associative_base : private lexicographical_comparison::base {
 	constexpr flat_associative_base(assume_unique_t, c_array<value_type, init_size> && source):
 		flat_associative_base(assume_unique, std::move(source), ExtractKey())
 	{
+	}
+	constexpr flat_associative_base(assume_unique_t, empty_c_array_parameter, ExtractKey extract_key_):
+		m_extract_key(std::move(extract_key_))
+	{
+	}
+	constexpr flat_associative_base(assume_unique_t, empty_c_array_parameter) {
 	}
 
 	constexpr auto data() const requires contiguous_range<Container> {
