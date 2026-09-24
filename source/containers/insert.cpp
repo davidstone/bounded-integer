@@ -24,6 +24,7 @@ import containers.linear_size;
 import containers.mutable_iterator;
 import containers.offset_type;
 import containers.range;
+import containers.range_reference_t;
 import containers.range_value_t;
 import containers.reservable;
 import containers.resizable_container;
@@ -106,7 +107,8 @@ constexpr auto to(Range && range) -> Container {
 }
 
 // TODO: Check if the range lies within the container
-export template<resizable_container Container, range Range> requires bounded::convertible_to<range_value_t<Container>, range_value_t<Range>>
+export template<resizable_container Container, range Range>
+	requires bounded::convertible_to<range_reference_t<Range>, range_value_t<Container>>
 constexpr auto insert(Container & container, iterator_t<Container const &> position, Range && range) -> iterator_t<Container &> {
 	if constexpr (splicable<Container>) {
 		::containers::splice(container, position, ::containers::to<Container>(OPERATORS_FORWARD(range)));
