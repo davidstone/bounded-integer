@@ -15,10 +15,7 @@ namespace containers {
 export template<typename T>
 concept associative_range =
 	forward_range<T> and
-	requires {
-		typename std::remove_reference_t<T>::key_type;
-		typename std::remove_reference_t<T>::mapped_type;
-	};
+	requires { typename std::remove_reference_t<T>::key_type; };
 
 export template<typename T>
 concept associative_container = associative_range<T> and is_container<T>;
