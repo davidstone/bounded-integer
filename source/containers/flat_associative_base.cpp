@@ -58,7 +58,7 @@ struct extract_map_key {
 		return m_extract(key);
 	}
 private:
-	ExtractKey m_extract;
+	[[no_unique_address]] ExtractKey m_extract;
 };
 
 export template<bool allow_duplicates, typename Container>
@@ -279,9 +279,7 @@ struct flat_associative_base : private lexicographical_comparison::base {
 	}
 
 protected:
-	// TODO: Use [[no_unique_address]] after resolution of
-	// https://github.com/llvm/llvm-project/issues/53059
-	Container m_container;
+	[[no_unique_address]] Container m_container;
 	[[no_unique_address]] ExtractKey m_extract_key;
 };
 
