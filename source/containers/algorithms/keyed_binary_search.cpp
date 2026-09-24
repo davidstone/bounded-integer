@@ -18,7 +18,7 @@ export constexpr auto keyed_lower_bound(associative_range auto && map, auto && k
 	return containers::lower_bound(
 		OPERATORS_FORWARD(map),
 		OPERATORS_FORWARD(key),
-		map.compare()
+		map.key_comp()
 	);
 }
 
@@ -26,7 +26,7 @@ export constexpr auto keyed_upper_bound(associative_range auto && map, auto && k
 	return containers::upper_bound(
 		OPERATORS_FORWARD(map),
 		OPERATORS_FORWARD(key),
-		map.compare()
+		map.key_comp()
 	);
 }
 
@@ -34,7 +34,7 @@ export constexpr auto keyed_equal_range(associative_range auto && map, auto && k
 	return containers::equal_range(
 		OPERATORS_FORWARD(map),
 		OPERATORS_FORWARD(key),
-		map.compare()
+		map.key_comp()
 	);
 }
 

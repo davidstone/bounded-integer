@@ -47,7 +47,7 @@ struct map_type {
 	static constexpr auto size() {
 		return size_;
 	}
-	static constexpr auto compare() {
+	static constexpr auto key_comp() {
 		return compare_t();
 	}
 

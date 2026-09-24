@@ -50,7 +50,7 @@ public:
 	using typename base::key_type;
 	using typename base::mapped_type;
 
-	using base::compare;
+	using base::key_comp;
 	using base::extract_key;
 
 	using base::base;
@@ -71,7 +71,7 @@ public:
 
 	constexpr auto find(this auto && self, auto const & key) {
 		auto const it = containers::keyed_lower_bound(self, key);
-		return (it == ::containers::end(self) or self.compare()(key, get_key(*it))) ?
+		return (it == ::containers::end(self) or self.key_comp()(key, *it)) ?
 			::containers::end(self) :
 			it;
 	}
@@ -120,7 +120,7 @@ public:
 	using typename base::key_type;
 	using typename base::mapped_type;
 
-	using base::compare;
+	using base::key_comp;
 	using base::extract_key;
 
 	using base::base;

@@ -99,7 +99,7 @@ struct flat_associative_base : private lexicographical_comparison::base {
 	constexpr auto extract_key() const {
 		return extract_map_key<value_type, ExtractKey>(m_extract_key);
 	}
-	constexpr auto compare() const {
+	constexpr auto key_comp() const {
 		return ::containers::extract_key_to_less(extract_key());
 	}
 	
@@ -128,7 +128,7 @@ struct flat_associative_base : private lexicographical_comparison::base {
 		m_container(OPERATORS_FORWARD(source)),
 		m_extract_key(std::move(extract_key_))
 	{
-		BOUNDED_ASSERT(is_sorted(m_container, compare()));
+		BOUNDED_ASSERT(is_sorted(m_container, key_comp()));
 	}
 	constexpr flat_associative_base(assume_sorted_unique_t, constructor_initializer_range<flat_associative_base> auto && source):
 		flat_associative_base(assume_sorted_unique, OPERATORS_FORWARD(source), ExtractKey())
@@ -168,7 +168,7 @@ struct flat_associative_base : private lexicographical_comparison::base {
 		m_container(std::move(source)),
 		m_extract_key(std::move(extract_key_))
 	{
-		BOUNDED_ASSERT(is_sorted(m_container, compare()));
+		BOUNDED_ASSERT(is_sorted(m_container, key_comp()));
 	}
 	template<std::size_t init_size>
 	constexpr flat_associative_base(assume_sorted_unique_t, c_array<value_type, init_size> && source):
@@ -235,7 +235,7 @@ struct flat_associative_base : private lexicographical_comparison::base {
 			if (!there_is_element_before) {
 				return inserted_t{add_element(), true};
 			}
-			bool const that_element_is_equal = !compare()(get_key(*containers::prev(position)), key);
+			bool const that_element_is_equal = !key_comp()(*containers::prev(position), key);
 			if (!that_element_is_equal) {
 				return inserted_t{add_element(), true};
 			}
