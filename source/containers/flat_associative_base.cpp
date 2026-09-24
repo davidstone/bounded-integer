@@ -231,7 +231,7 @@ struct flat_associative_base : private lexicographical_comparison::base {
 		return m_container.reserve(new_capacity);
 	}
 	
-	// Unlike in std::map, insert can only provide a time complexity that
+	// Unlike node containers, insert can only provide a time complexity that
 	// matches an insert into the underlying container, which is to say,
 	// linear. An insertion implies shifting all of the elements.
 	template<typename Key = key_type>
