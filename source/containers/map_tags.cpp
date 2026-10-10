@@ -19,7 +19,4 @@ struct inserted_t {
 	bool inserted;
 };
 
-template<typename Iterator>
-inserted_t(Iterator, bool) -> inserted_t<Iterator>;
-
 } // namespace containers
