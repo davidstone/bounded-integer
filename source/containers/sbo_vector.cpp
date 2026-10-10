@@ -27,6 +27,7 @@ import containers.data;
 import containers.dynamic_array_data;
 import containers.initializer_range;
 import containers.maximum_array_size;
+import containers.reserve_space_for;
 import containers.subrange;
 import containers.uninitialized_array;
 
@@ -179,6 +180,11 @@ public:
 
 	sbo_vector() = default;
 	
+	template<typename Capacity>
+	constexpr explicit sbo_vector(reserve_space_for<Capacity> const capacity_) {
+		replace_empty_allocation(capacity_.value);
+	}
+
 	constexpr explicit sbo_vector(constructor_initializer_range<sbo_vector> auto && source):
 		sbo_vector()
 	{
