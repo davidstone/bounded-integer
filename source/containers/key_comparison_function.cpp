@@ -27,15 +27,12 @@ private:
 	[[no_unique_address]] ExtractKey m_extract_key;
 };
 
-template<typename>
-constexpr auto always_false = false;
-
 export template<ordered_associative_range Map>
 constexpr auto key_comparison_function(Map const & map) {
 	if constexpr (requires(Map const & c) { c.extract_key(); }) {
 		return extract_key_to_compare(map.extract_key());
 	} else {
-		static_assert(always_false<Map>, "Unimplemented");
+		static_assert(false, "Unimplemented");
 	}
 }
 
