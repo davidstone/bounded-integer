@@ -9,8 +9,6 @@ module;
 
 export module containers.algorithms.transform;
 
-import containers.algorithms.compare;
-import containers.array;
 import containers.adapt;
 import containers.begin_end;
 import containers.default_adapt_traits;
@@ -151,45 +149,3 @@ constexpr auto transform_dereference_non_idempotent(Range && source, UnaryFuncti
 }
 
 } // namespace containers
-
-struct S {
-	constexpr auto f() const { return n; }
-
-	friend auto operator==(S, S) -> bool = default;
-
-	int n;
-};
-
-constexpr auto array = containers::array{S{0}, S{1}, S{2}, S{3}, S{4}};
-
-static_assert(containers::equal(
-	containers::transform(array, [](S const s) { return s; }),
-	array
-));
-
-static_assert(containers::equal(
-	containers::transform_non_idempotent(array, [](S const s) { return s; }),
-	array
-));
-
-constexpr auto integer_array = containers::array{0, 1, 2, 3, 4};
-
-static_assert(containers::equal(
-	containers::transform(array, &S::f),
-	integer_array
-));
-
-static_assert(containers::equal(
-	containers::transform_non_idempotent(array, &S::f),
-	integer_array
-));
-
-static_assert(containers::equal(
-	containers::transform(array, [](S const s) { return s.f(); }),
-	integer_array
-));
-
-static_assert(containers::equal(
-	containers::transform_non_idempotent(array, [](S const s) { return s.f(); }),
-	integer_array
-));

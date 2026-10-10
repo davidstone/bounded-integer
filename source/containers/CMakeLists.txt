@@ -265,6 +265,7 @@ target_sources(containers_test PRIVATE
 		test/algorithms/set.cpp
 		test/algorithms/split.cpp
 		test/algorithms/starts_with.cpp
+		test/algorithms/transform.cpp
 		test/algorithms/uninitialized.cpp
 		test/algorithms/zip.cpp
 		test/append.cpp
