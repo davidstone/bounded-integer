@@ -19,7 +19,6 @@ import containers.assign_to_empty;
 import containers.begin_end;
 import containers.c_array;
 import containers.clear;
-import containers.dereference;
 import containers.erase_concepts;
 import containers.is_container;
 import containers.iterator_t;

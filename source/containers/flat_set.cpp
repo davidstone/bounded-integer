@@ -18,7 +18,6 @@ import containers.append;
 import containers.associative_container;
 import containers.begin_end;
 import containers.common_functions;
-import containers.dereference;
 import containers.flat_associative_base;
 import containers.lookup;
 import containers.map_tags;
