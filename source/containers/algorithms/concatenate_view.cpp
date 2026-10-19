@@ -148,11 +148,10 @@ struct concatenate_view_iterator {
 		return concatenate_view_iterator{specific_range(indexes)...};
 	}
 
-	template<typename... RHSRanges> requires(... and subtractable<iterator_t<RangeViews>, iterator_t<RHSRanges>>)
 	friend constexpr auto operator-(
 		concatenate_view_iterator const lhs,
-		concatenate_view_iterator<RHSRanges...> const rhs
-	) {
+		concatenate_view_iterator const rhs
+	) requires(... and subtractable<iterator_t<RangeViews>>) {
 		BOUNDED_ASSERT(::containers::have_same_ends(lhs.m_range_views, rhs.m_range_views));
 
 		auto const [...lhs_ranges] = lhs.m_range_views;
@@ -173,10 +172,9 @@ struct concatenate_view_iterator {
 		return -(rhs - lhs);
 	}
 
-	template<typename... RHSRanges>
 	friend constexpr auto operator<=>(
-		concatenate_view_iterator const lhs,
-		concatenate_view_iterator<RHSRanges...> const rhs
+		concatenate_view_iterator const & lhs,
+		concatenate_view_iterator const & rhs
 	) {
 		BOUNDED_ASSERT(::containers::have_same_ends(lhs.m_range_views, rhs.m_range_views));
 		return lhs.begin_iterators() <=> rhs.begin_iterators();
@@ -187,8 +185,10 @@ struct concatenate_view_iterator {
 	}
 
 
-	template<typename... RHSRanges>
-	friend constexpr auto operator==(concatenate_view_iterator const & lhs, concatenate_view_iterator<RHSRanges...> const & rhs) -> bool {
+	friend constexpr auto operator==(
+		concatenate_view_iterator const & lhs,
+		concatenate_view_iterator const & rhs
+	) -> bool {
 		BOUNDED_ASSERT(::containers::have_same_ends(lhs.m_range_views, rhs.m_range_views));
 		return lhs.begin_iterators() == rhs.begin_iterators();
 	}
