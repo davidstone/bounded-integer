@@ -117,7 +117,7 @@ concept default_ska_sortable_value = requires(T && value) {
 };
 
 constexpr decltype(auto) to_radix_sort_key_impl(default_ska_sortable_value auto && value) {
-	return to_radix_sort_key(OPERATORS_FORWARD(value));
+	return to_radix_sort_key(to_radix_sort_key(OPERATORS_FORWARD(value)));
 }
 
 } // namespace to_radix_sort_key_adl
