@@ -7,15 +7,17 @@ export module containers.is_container;
 
 import containers.c_array;
 import containers.erase_concepts;
+import containers.iter_reference_t;
+import containers.iterator_t;
 import containers.pop_back;
-import containers.range_reference_t;
 
 import std_module;
 
 namespace containers {
 
 template<typename T>
-concept range_reference_t_is_reference = std::is_reference_v<range_reference_t<T>>;
+concept range_reference_t_is_reference =
+	std::is_reference_v<iter_reference_t<iterator_t<T>>>;
 
 // `is_container` means that if you own a value of type `T`, you can safely move
 // from any subset of the elements in the range.
