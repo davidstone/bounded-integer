@@ -50,10 +50,10 @@ export template<
 	extract_key_function<key_t<Container>> ExtractKey = to_radix_sort_key_t
 >
 struct basic_flat_map :
-	private flat_associative_base<Container, key_t<Container>, ExtractKey, false>
+	private flat_associative_base<Container, ExtractKey, true, false>
 {
 private:
-	using base = flat_associative_base<Container, key_t<Container>, ExtractKey, false>;
+	using base = flat_associative_base<Container, ExtractKey, true, false>;
 public:
 	using typename base::value_type;
 	using typename base::key_type;
@@ -94,7 +94,7 @@ public:
 
 	constexpr auto find(this auto && self, auto const & key) {
 		auto const it = containers::keyed_lower_bound(self, key);
-		return (it == ::containers::end(self) or self.key_comp()(key, *it)) ?
+		return (it == ::containers::end(self) or self.key_comp()(key, get_key(*it))) ?
 			::containers::end(self) :
 			it;
 	}
@@ -115,7 +115,7 @@ public:
 			}
 		}
 		auto const midpoint = begin() + original_size;
-		::containers::merge_sorted_and_unsorted<false>(this->m_container, midpoint, extract_key());
+		::containers::merge_sorted_and_unsorted<false>(this->m_container, midpoint, this->extract_key_from_key());
 	}
 };
 
@@ -137,10 +137,10 @@ basic_flat_map(assume_sorted_unique_t, Range &&, ExtractKey) -> basic_flat_map<s
 
 export template<typename Container, extract_key_function<key_t<Container>> ExtractKey = to_radix_sort_key_t>
 struct basic_flat_multimap :
-	private flat_associative_base<Container, key_t<Container>, ExtractKey, true>
+	private flat_associative_base<Container, ExtractKey, true, true>
 {
 private:
-	using base = flat_associative_base<Container, key_t<Container>, ExtractKey, true>;
+	using base = flat_associative_base<Container, ExtractKey, true, true>;
 public:
 	using typename base::value_type;
 	using typename base::key_type;

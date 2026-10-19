@@ -45,24 +45,6 @@ import std_module;
 
 namespace containers {
 
-template<typename T, typename Key, typename ExtractKey>
-struct extract_key_t {
-	constexpr explicit extract_key_t(ExtractKey extract_key):
-		m_extract(std::move(extract_key))
-	{
-	}
-	constexpr auto operator()(Key const & value) const -> decltype(auto) {
-		return m_extract(value);
-	}
-	constexpr auto operator()(T const & value) const -> decltype(auto)
-		requires(!std::same_as<Key, T>)
-	{
-		return m_extract(get_key(value));
-	}
-private:
-	[[no_unique_address]] ExtractKey m_extract;
-};
-
 export template<bool allow_duplicates, typename Container>
 constexpr auto merge_sorted_and_unsorted(Container & container, iterator_t<Container> midpoint, auto const extract_key) {
 	auto const first = ::containers::begin(container);
@@ -87,18 +69,55 @@ constexpr auto merge_sorted_and_unsorted(Container & container, iterator_t<Conta
 	}
 }
 
-export template<typename Container, typename KeyType, typename ExtractKey, bool allow_duplicates>
-struct flat_associative_base : private lexicographical_comparison::base {
+template<typename Container, bool is_map>
+struct key_and_mapped_typedefs {
+	using key_type = typename range_value_t<Container>::key_type;
+	using mapped_type = typename range_value_t<Container>::mapped_type;
+};
+
+template<typename Container>
+struct key_and_mapped_typedefs<Container, false> {
+	using key_type = range_value_t<Container>;
+};
+
+template<typename ExtractKey, bool is_map>
+struct extract_key_from_key_t {
+	[[no_unique_address]] ExtractKey m_extract;
+	constexpr auto operator()(auto && value) const -> decltype(auto) {
+		if constexpr (is_map) {
+			return m_extract(get_key(OPERATORS_FORWARD(value)));
+		} else {
+			return m_extract(OPERATORS_FORWARD(value));
+		}
+	}
+};
+
+template<bool is_map>
+constexpr auto get_key_impl(auto const & value) -> auto const & {
+	if constexpr (is_map) {
+		return get_key(value);
+	} else {
+		return value;
+	}
+};
+
+export template<typename Container, typename ExtractKey, bool is_map, bool allow_duplicates>
+struct flat_associative_base :
+	key_and_mapped_typedefs<Container, is_map>,
+	private lexicographical_comparison::base
+{
 	using value_type = range_value_t<Container>;
-	using key_type = KeyType;
 
 	using const_iterator = iterator_t<Container const &>;
 	
-	constexpr auto extract_key() const {
-		return extract_key_t<value_type, key_type, ExtractKey>(m_extract_key);
+	constexpr auto extract_key() const -> ExtractKey {
+		return m_extract_key;
 	}
 	constexpr auto key_comp() const {
 		return ::containers::extract_key_to_less(extract_key());
+	}
+	constexpr auto key_comp_key() const {
+		return ::containers::extract_key_to_less(extract_key_from_key());
 	}
 	
 	flat_associative_base() = default;
@@ -113,9 +132,9 @@ struct flat_associative_base : private lexicographical_comparison::base {
 		m_extract_key(std::move(extract_key_))
 	{
 		if constexpr (allow_duplicates) {
-			ska_sort(m_container, extract_key());
+			ska_sort(m_container, extract_key_from_key());
 		} else {
-			unique_ska_sort(m_container, extract_key());
+			unique_ska_sort(m_container, extract_key_from_key());
 		}
 	}
 	constexpr explicit flat_associative_base(constructor_initializer_range<flat_associative_base> auto && source):
@@ -127,7 +146,7 @@ struct flat_associative_base : private lexicographical_comparison::base {
 		m_container(OPERATORS_FORWARD(source)),
 		m_extract_key(std::move(extract_key_))
 	{
-		BOUNDED_ASSERT(is_sorted(m_container, key_comp()));
+		BOUNDED_ASSERT(is_sorted(m_container, key_comp_key()));
 	}
 	constexpr flat_associative_base(assume_sorted_unique_t, constructor_initializer_range<flat_associative_base> auto && source):
 		flat_associative_base(assume_sorted_unique, OPERATORS_FORWARD(source), ExtractKey())
@@ -138,7 +157,7 @@ struct flat_associative_base : private lexicographical_comparison::base {
 		m_container(OPERATORS_FORWARD(source)),
 		m_extract_key(std::move(extract_key_))
 	{
-		ska_sort(m_container, extract_key());
+		ska_sort(m_container, extract_key_from_key());
 	}
 	constexpr flat_associative_base(assume_unique_t, constructor_initializer_range<flat_associative_base> auto && source):
 		flat_associative_base(assume_unique, OPERATORS_FORWARD(source), ExtractKey())
@@ -151,9 +170,9 @@ struct flat_associative_base : private lexicographical_comparison::base {
 		m_extract_key(std::move(extract_key_))
 	{
 		if constexpr (allow_duplicates) {
-			ska_sort(m_container, extract_key());
+			ska_sort(m_container, extract_key_from_key());
 		} else {
-			unique_ska_sort(m_container, extract_key());
+			unique_ska_sort(m_container, extract_key_from_key());
 		}
 	}
 	template<std::size_t init_size>
@@ -170,7 +189,7 @@ struct flat_associative_base : private lexicographical_comparison::base {
 		m_container(std::move(source)),
 		m_extract_key(std::move(extract_key_))
 	{
-		BOUNDED_ASSERT(is_sorted(m_container, key_comp()));
+		BOUNDED_ASSERT(is_sorted(m_container, key_comp_key()));
 	}
 	template<std::size_t init_size>
 	constexpr flat_associative_base(assume_sorted_unique_t, c_array<value_type, init_size> && source):
@@ -189,7 +208,7 @@ struct flat_associative_base : private lexicographical_comparison::base {
 		m_container(std::move(source)),
 		m_extract_key(std::move(extract_key_))
 	{
-		ska_sort(m_container, extract_key());
+		ska_sort(m_container, extract_key_from_key());
 	}
 	template<std::size_t init_size>
 	constexpr flat_associative_base(assume_unique_t, c_array<value_type, init_size> && source):
@@ -248,7 +267,10 @@ struct flat_associative_base : private lexicographical_comparison::base {
 			if (!there_is_element_before) {
 				return inserted_t{add_element(), true};
 			}
-			bool const that_element_is_equal = !key_comp()(*containers::prev(position), key);
+			bool const that_element_is_equal = !key_comp()(
+				containers::get_key_impl<is_map>(*containers::prev(position)),
+				key
+			);
 			if (!that_element_is_equal) {
 				return inserted_t{add_element(), true};
 			}
@@ -262,7 +284,7 @@ struct flat_associative_base : private lexicographical_comparison::base {
 		auto const original_size = containers::size(m_container);
 		::containers::append(m_container, OPERATORS_FORWARD(init));
 		auto const midpoint = begin() + original_size;
-		::containers::merge_sorted_and_unsorted<allow_duplicates>(m_container, midpoint, extract_key());
+		::containers::merge_sorted_and_unsorted<allow_duplicates>(m_container, midpoint, extract_key_from_key());
 	}
 	
 	constexpr auto erase(const_iterator const it) {
@@ -276,6 +298,9 @@ struct flat_associative_base : private lexicographical_comparison::base {
 	}
 
 protected:
+	constexpr auto extract_key_from_key() const -> extract_key_from_key_t<ExtractKey, is_map>{
+		return extract_key_from_key_t<ExtractKey, is_map>(m_extract_key);
+	}
 	[[no_unique_address]] Container m_container;
 	[[no_unique_address]] ExtractKey m_extract_key;
 };

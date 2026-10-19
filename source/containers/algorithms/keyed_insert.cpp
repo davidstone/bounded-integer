@@ -26,7 +26,7 @@ template<typename Map>
 concept legacy_map = requires { typename Map::allocator_type; };
 
 export template<
-	associative_container Map,
+	map_container Map,
 	bounded::convertible_to<typename Map::key_type> Key = typename Map::key_type,
 	bounded::convertible_to<typename Map::mapped_type> Mapped = typename Map::mapped_type
 >
@@ -37,7 +37,7 @@ constexpr auto keyed_insert(Map & map, Key && key, Mapped && mapped) {
 		return map.lazy_insert(OPERATORS_FORWARD(key), bounded::value_to_function(OPERATORS_FORWARD(mapped)));
 	}
 }
-export template<associative_container Map>
+export template<map_container Map>
 constexpr auto keyed_insert(Map & map, range_value_t<Map> const & value) {
 	if constexpr (legacy_map<Map>) {
 		return map.insert(value);
@@ -45,7 +45,7 @@ constexpr auto keyed_insert(Map & map, range_value_t<Map> const & value) {
 		return map.lazy_insert(get_key(value), [&] -> decltype(auto) { return get_mapped(value); });
 	}
 }
-export template<associative_container Map>
+export template<map_container Map>
 constexpr auto keyed_insert(Map & map, range_value_t<Map> && value) {
 	if constexpr (legacy_map<Map>) {
 		return map.insert(std::move(value));

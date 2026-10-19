@@ -32,12 +32,12 @@ namespace containers_test {
 using namespace bounded::literal;
 
 template<typename Container>
-constexpr auto test_associative_container_concepts() -> void {
-	static_assert(containers::associative_range<Container const &>);
-	static_assert(containers::associative_range<Container &>);
-	static_assert(containers::associative_range<Container &&>);
-	static_assert(containers::associative_range<Container>);
-	static_assert(containers::associative_container<Container>);
+constexpr auto test_map_concepts() -> void {
+	static_assert(containers::map_range<Container const &>);
+	static_assert(containers::map_range<Container &>);
+	static_assert(containers::map_range<Container &&>);
+	static_assert(containers::map_range<Container>);
+	static_assert(containers::map_container<Container>);
 }
 
 export template<typename Container>
@@ -290,7 +290,7 @@ constexpr auto test_lazy_insert_existing_key() {
 
 export template<typename Container>
 constexpr auto test_associative_container() -> bool {
-	test_associative_container_concepts<Container>();
+	test_map_concepts<Container>();
 	test_range_based_for_loop<Container>();
 
 	test_sequence_container_from<Container>([] {

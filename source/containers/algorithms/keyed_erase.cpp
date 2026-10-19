@@ -25,19 +25,19 @@ using namespace bounded::literal;
 
 namespace containers {
 
-export constexpr auto keyed_erase(associative_container auto & map, auto && key) {
-	if constexpr (requires { map.find(OPERATORS_FORWARD(key)); }) {
-		auto const it = map.find(OPERATORS_FORWARD(key));
-		if (it == containers::end(map)) {
+export constexpr auto keyed_erase(associative_container auto & ac, auto && key) {
+	if constexpr (requires { ac.find(OPERATORS_FORWARD(key)); }) {
+		auto const it = ac.find(OPERATORS_FORWARD(key));
+		if (it == containers::end(ac)) {
 			return bounded::integer<0, 1>(0_bi);
 		}
-		map.erase(it);
+		ac.erase(it);
 		return bounded::integer<0, 1>(1_bi);
 	} else {
 		// TODO: This can be made more efficient for node-based containers
-		auto const to_erase = keyed_equal_range(map, OPERATORS_FORWARD(key));
+		auto const to_erase = keyed_equal_range(ac, OPERATORS_FORWARD(key));
 		auto const erased = containers::size(to_erase);
-		containers::erase(map, containers::begin(to_erase), containers::end(to_erase));
+		containers::erase(ac, containers::begin(to_erase), containers::end(to_erase));
 		return erased;
 	}
 }

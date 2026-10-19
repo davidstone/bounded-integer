@@ -19,31 +19,61 @@ namespace {
 using namespace bounded::literal;
 
 template<typename... Ts>
-constexpr auto all_qualifications_are_associative_helper = (... and containers::associative_range<Ts>);
+constexpr auto all_qualifications_are_map_helper = (... and containers::map_range<Ts>);
 
 template<typename T>
-constexpr auto all_qualifications_are_associative = all_qualifications_are_associative_helper<T, T const, T &, T const &, T &&>;
+constexpr auto all_qualifications_are_map = all_qualifications_are_map_helper<T, T const, T &, T const &, T &&>;
 
 template<typename... Ts>
-constexpr auto no_qualifications_are_associative_helper = (... and !containers::associative_range<Ts>);
+constexpr auto no_qualifications_are_map_helper = (... and !containers::map_range<Ts>);
 
 template<typename T>
-constexpr auto no_qualifications_are_associative = no_qualifications_are_associative_helper<T, T const, T &, T const &, T &&>;
+constexpr auto no_qualifications_are_map = no_qualifications_are_map_helper<T, T const, T &, T const &, T &&>;
 
-static_assert(no_qualifications_are_associative<int>);
-static_assert(no_qualifications_are_associative<int *>);
+template<typename... Ts>
+constexpr auto all_qualifications_are_set_helper = (... and containers::set_range<Ts>);
 
-static_assert(no_qualifications_are_associative<containers::c_array<int, 5>>);
+template<typename T>
+constexpr auto all_qualifications_are_set = all_qualifications_are_set_helper<T, T const, T &, T const &, T &&>;
 
-static_assert(no_qualifications_are_associative<containers::array<int, 5_bi>>);
-static_assert(no_qualifications_are_associative<containers::array<int, 0_bi>>);
-static_assert(no_qualifications_are_associative<containers::vector<int>>);
-static_assert(no_qualifications_are_associative<containers::string>);
+template<typename... Ts>
+constexpr auto no_qualifications_are_set_helper = (... and !containers::set_range<Ts>);
 
-static_assert(no_qualifications_are_associative<std::array<int, 5>>);
-static_assert(no_qualifications_are_associative<std::array<int, 0>>);
-static_assert(no_qualifications_are_associative<std::vector<int>>);
-static_assert(all_qualifications_are_associative<std::map<int, int>>);
-static_assert(all_qualifications_are_associative<std::unordered_map<int, int>>);
+template<typename T>
+constexpr auto no_qualifications_are_set = no_qualifications_are_set_helper<T, T const, T &, T const &, T &&>;
+
+static_assert(no_qualifications_are_map<int>);
+static_assert(no_qualifications_are_map<int *>);
+static_assert(no_qualifications_are_set<int>);
+static_assert(no_qualifications_are_set<int *>);
+
+static_assert(no_qualifications_are_map<containers::c_array<int, 5>>);
+static_assert(no_qualifications_are_set<containers::c_array<int, 5>>);
+
+static_assert(no_qualifications_are_map<containers::array<int, 5_bi>>);
+static_assert(no_qualifications_are_map<containers::array<int, 0_bi>>);
+static_assert(no_qualifications_are_map<containers::vector<int>>);
+static_assert(no_qualifications_are_map<containers::string>);
+
+static_assert(no_qualifications_are_set<containers::array<int, 5_bi>>);
+static_assert(no_qualifications_are_set<containers::array<int, 0_bi>>);
+static_assert(no_qualifications_are_set<containers::vector<int>>);
+static_assert(no_qualifications_are_set<containers::string>);
+
+static_assert(no_qualifications_are_map<std::array<int, 5>>);
+static_assert(no_qualifications_are_map<std::array<int, 0>>);
+static_assert(no_qualifications_are_map<std::vector<int>>);
+static_assert(all_qualifications_are_map<std::map<int, int>>);
+static_assert(no_qualifications_are_map<std::set<int, int>>);
+static_assert(all_qualifications_are_map<std::unordered_map<int, int>>);
+static_assert(no_qualifications_are_map<std::unordered_set<int, int>>);
+
+static_assert(no_qualifications_are_set<std::array<int, 5>>);
+static_assert(no_qualifications_are_set<std::array<int, 0>>);
+static_assert(no_qualifications_are_set<std::vector<int>>);
+static_assert(no_qualifications_are_set<std::map<int, int>>);
+static_assert(all_qualifications_are_set<std::set<int, int>>);
+static_assert(no_qualifications_are_set<std::unordered_map<int, int>>);
+static_assert(all_qualifications_are_set<std::unordered_set<int, int>>);
 
 }	// namespace

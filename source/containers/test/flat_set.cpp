@@ -42,14 +42,14 @@ static_assert(max_set_size<bool> == 2_bi);
 static_assert(max_set_size<std::byte> == 256_bi);
 static_assert(max_set_size<containers::string_view> == containers::maximum_array_size<containers::string_view>);
 
-static_assert(containers::associative_range<set &>);
-static_assert(containers::associative_range<set const &>);
-static_assert(containers::associative_range<set &&>);
-static_assert(containers::associative_range<set>);
-static_assert(!containers::associative_container<set &>);
-static_assert(!containers::associative_container<set const &>);
-static_assert(containers::associative_container<set &&>);
-static_assert(containers::associative_container<set>);
+static_assert(containers::set_range<set &>);
+static_assert(containers::set_range<set const &>);
+static_assert(containers::set_range<set &&>);
+static_assert(containers::set_range<set>);
+static_assert(!containers::set_container<set &>);
+static_assert(!containers::set_container<set const &>);
+static_assert(containers::set_container<set &&>);
+static_assert(containers::set_container<set>);
 
 constexpr auto array(auto const ... values) {
 	using result = containers::array<bounded_test::non_copyable_integer, bounded::constant<sizeof...(values)>>;

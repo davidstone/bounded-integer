@@ -18,6 +18,22 @@ concept associative_range =
 	requires { typename std::remove_reference_t<T>::key_type; };
 
 export template<typename T>
+concept map_range =
+	associative_range<T> and
+	requires { typename std::remove_reference_t<T>::mapped_type; };
+
+export template<typename T>
+concept set_range =
+	associative_range<T> and
+	!requires { typename std::remove_reference_t<T>::mapped_type; };
+
+export template<typename T>
 concept associative_container = associative_range<T> and is_container<T>;
+
+export template<typename T>
+concept map_container = map_range<T> and associative_container<T>;
+
+export template<typename T>
+concept set_container = set_range<T> and associative_container<T>;
 
 } // namespace containers

@@ -46,10 +46,10 @@ export template<
 	extract_key_function<range_value_t<Container>> ExtractKey = to_radix_sort_key_t
 >
 struct basic_flat_set :
-	private flat_associative_base<Container, range_value_t<Container>, ExtractKey, false>
+	private flat_associative_base<Container, ExtractKey, false, false>
 {
 private:
-	using base = flat_associative_base<Container, range_value_t<Container>, ExtractKey, false>;
+	using base = flat_associative_base<Container, ExtractKey, false, false>;
 public:
 	using typename base::key_type;
 
@@ -80,7 +80,7 @@ public:
 
 	constexpr auto find(this auto && self, auto const & key) {
 		auto const it = containers::keyed_lower_bound(self, key);
-		return (it == ::containers::end(self) or self.key_comp()(key, get_key(*it))) ?
+		return (it == ::containers::end(self) or self.key_comp()(key, *it)) ?
 			::containers::end(self) :
 			it;
 	}
@@ -107,10 +107,10 @@ export template<
 	extract_key_function<range_value_t<Container>> ExtractKey = to_radix_sort_key_t
 >
 struct basic_flat_multiset :
-	private flat_associative_base<Container, range_value_t<Container>, ExtractKey, true>
+	private flat_associative_base<Container, ExtractKey, false, true>
 {
 private:
-	using base = flat_associative_base<Container, range_value_t<Container>, ExtractKey, true>;
+	using base = flat_associative_base<Container, ExtractKey, false, true>;
 public:
 	using typename base::key_type;
 
