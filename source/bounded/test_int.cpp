@@ -9,6 +9,7 @@ module;
 
 export module bounded.test_int;
 
+import numeric_traits;
 import std_module;
 
 namespace bounded_test {
@@ -79,7 +80,7 @@ struct integer_impl {
 		return integer_impl(x, tag());
 	}
 	friend constexpr auto to_radix_sort_key(integer_impl const & x) {
-		return x.value();
+		return unsigned(x.value()) + unsigned(numeric_traits::min_value<int>);
 	}
 private:
 	struct tag{};
