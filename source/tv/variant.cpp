@@ -83,8 +83,8 @@ public:
 		Index const index_,
 		bounded::construct_function_for<type_at<Index>> auto && construct_
 	):
-		m_index(::tv::get_index(index_, bounded::type<Ts>...)),
-		m_data(::tv::get_index(index_, bounded::type<Ts>...), OPERATORS_FORWARD(construct_))
+	m_data(::tv::get_index(index_, bounded::type<Ts>...), OPERATORS_FORWARD(construct_)),
+	m_index(::tv::get_index(index_, bounded::type<Ts>...))
 	{
 	}
 
@@ -237,8 +237,8 @@ private:
 	}
 
 	constexpr variant(auto && other, copy_move_tag):
-		m_index(other.m_index),
-		m_data(uninitialized_union())
+		m_data(uninitialized_union()),
+		m_index(other.m_index)
 	{
 		visit_with_index(
 			OPERATORS_FORWARD(other),
@@ -263,12 +263,12 @@ private:
 		);
 	}
 
-	[[no_unique_address]] variant_index<Ts...> m_index;
 	[[no_unique_address]] variadic_union<Ts...> m_data;
+	[[no_unique_address]] variant_index<Ts...> m_index;
 
 	constexpr explicit variant(bounded::tombstone_tag, auto const make):
-		m_index(make()),
-		m_data(uninitialized_union())
+		m_data(uninitialized_union()),
+		m_index(make())
 	{
 	}
 	friend bounded::tombstone<variant>;
