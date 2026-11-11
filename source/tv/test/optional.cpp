@@ -7,6 +7,7 @@ module;
 
 #include <bounded/assert.hpp>
 #include <bounded/conditional.hpp>
+#include <doctest/doctest.h>
 
 export module tv.test.optional;
 
@@ -341,3 +342,8 @@ static_assert([]{
 	BOUNDED_ASSERT(!*move_assigned);
 	return true;
 }());
+
+TEST_CASE("tv: optional formatting") {
+	CHECK(std::format("{}", tv::optional<int>()) == "[]");
+	CHECK(std::format("{}", tv::optional(5)) == "[5]");
+}

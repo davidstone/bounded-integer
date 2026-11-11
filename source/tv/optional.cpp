@@ -426,3 +426,27 @@ template<typename LHS>
 struct std::common_type<tv::optional<LHS>, tv::none_t> {
 	using type = tv::optional<LHS>;
 };
+
+
+template<std::formattable<char> T>
+struct std::formatter<tv::optional<T>> {
+	constexpr auto parse(std::format_parse_context & context) {
+		return m_underlying.parse(context);
+	}
+
+	constexpr auto format(tv::optional<T> const & value, auto & context) const {
+		auto out = context.out();
+		*out = '[';
+		++out;
+		if (value) {
+			context.advance_to(out);
+			out = m_underlying.format(*value, context);
+		}
+		*out = ']';
+		++out;
+		return out;
+	}
+
+private:
+	std::formatter<T> m_underlying;
+};

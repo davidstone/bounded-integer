@@ -37,15 +37,7 @@ target_sources(tv PUBLIC
 		visit.cpp
 )
 
-add_library(tv_test)
-
-target_link_libraries(tv_test
-	PRIVATE
-		bounded
-		std_module
-		strict_defaults
-		tv
-)
+add_executable(tv_test)
 
 target_sources(tv_test PRIVATE
 	FILE_SET CXX_MODULES
@@ -60,3 +52,13 @@ target_sources(tv_test PRIVATE
 		test/variant.cpp
 		test/visit.cpp
 )
+
+target_link_libraries(tv_test PUBLIC
+	bounded
+	doctest::doctest_with_main
+	std_module
+	strict_defaults
+	tv
+)
+
+add_test(tv_test tv_test)
