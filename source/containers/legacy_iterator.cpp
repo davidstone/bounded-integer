@@ -51,6 +51,8 @@ struct iterator_category_impl<Iterator> {
 
 template<typename T>
 struct non_optional {
+	non_optional() = default;
+
 	non_optional(tv::none_t) {
 		std::unreachable();
 	}
