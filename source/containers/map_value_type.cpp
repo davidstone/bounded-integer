@@ -69,8 +69,27 @@ export constexpr auto get_mapped = get_mapped_t();
 
 } // namespace containers
 
-static_assert(containers::get_key(containers::map_value_type{5, 2}) == 5);
-static_assert(containers::get_mapped(containers::map_value_type{5, 2}) == 2);
+template<typename Key, typename Mapped>
+struct std::formatter<containers::map_value_type<Key, Mapped>> {
+	constexpr formatter() {
+		m_underlying.set_brackets({}, {});
+		m_underlying.set_separator(": ");
+	}
 
-static_assert(containers::get_key(std::pair{5, 2}) == 5);
-static_assert(containers::get_mapped(std::pair{5, 2}) == 2);
+	constexpr auto parse(std::format_parse_context & context) {
+		return m_underlying.parse(context);
+	}
+
+	constexpr auto format(
+		containers::map_value_type<Key, Mapped> const & value,
+		auto & context
+	) const {
+		return m_underlying.format(
+			std::pair<Key const &, Mapped const &>(value.key, value.mapped),
+			context
+		);
+	}
+
+private:
+	std::formatter<std::pair<Key const &, Mapped const &>> m_underlying;
+};

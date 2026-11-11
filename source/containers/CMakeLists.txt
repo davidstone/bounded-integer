@@ -291,6 +291,7 @@ target_sources(containers_test PRIVATE
 		test/legacy_range.cpp
 		test/linear_map.cpp
 		test/lookup.cpp
+		test/map_value_type.cpp
 		test/ordered_associative_container.cpp
 		test/pop_back.cpp
 		test/push_back.cpp
