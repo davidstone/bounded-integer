@@ -124,6 +124,7 @@ target_sources(containers PUBLIC
 		flat_associative_base.cpp
 		flat_map.cpp
 		flat_set.cpp
+		format.cpp
 		forward_iterator.cpp
 		forward_linked_list.cpp
 		forward_random_access_iterator.cpp
