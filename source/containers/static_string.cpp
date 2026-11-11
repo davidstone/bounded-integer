@@ -178,28 +178,26 @@ constexpr auto operator""_null_terminated() {
 
 } // namespace containers
 
-template<auto size, typename CharT>
-struct std::formatter<containers::static_string<size>, CharT> : private std::formatter<std::string_view, CharT> {
+template<auto size>
+struct std::formatter<containers::static_string<size>> : private std::formatter<std::string_view> {
 private:
-	using base = std::formatter<std::string_view, CharT>;
+	using base = std::formatter<std::string_view>;
 public:
 	using base::parse;
 
-	template<typename FormatContext>
-	constexpr auto format(containers::static_string<size> const str, FormatContext & context) const {
+	constexpr auto format(containers::static_string<size> const str, auto & context) const {
 		return base::format(std::string_view(str), context);
 	}
 };
 
-template<auto size, typename CharT>
-struct std::formatter<containers::static_null_terminated_string<size>, CharT> : private std::formatter<std::string_view, CharT> {
+template<auto size>
+struct std::formatter<containers::static_null_terminated_string<size>> : private std::formatter<std::string_view> {
 private:
-	using base = std::formatter<std::string_view, CharT>;
+	using base = std::formatter<std::string_view>;
 public:
 	using base::parse;
 
-	template<typename FormatContext>
-	constexpr auto format(containers::static_null_terminated_string<size> const str, FormatContext & context) const {
+	constexpr auto format(containers::static_null_terminated_string<size> const str, auto & context) const {
 		return base::format(std::string_view(str), context);
 	}
 };

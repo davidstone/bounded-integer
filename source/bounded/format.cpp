@@ -9,15 +9,14 @@ import bounded.bounded_integer;
 
 import std_module;
 
-template<bounded::bounded_integer T, typename CharT>
-struct std::formatter<T, CharT> : private std::formatter<typename T::underlying_type, CharT> {
+template<bounded::bounded_integer T>
+struct std::formatter<T> : private std::formatter<typename T::underlying_type> {
 private:
-	using base = std::formatter<typename T::underlying_type, CharT>;
+	using base = std::formatter<typename T::underlying_type>;
 public:
 	using base::parse;
 
-	template<typename FormatContext>
-	constexpr auto format(bounded::bounded_integer auto const x, FormatContext & context) const {
+	constexpr auto format(bounded::bounded_integer auto const x, auto & context) const {
 		return base::format(x.value(), context);
 	}
 };

@@ -138,15 +138,14 @@ struct std::common_type<containers::static_string<lhs_size>, containers::static_
 	using type = containers::string_view;
 };
 
-template<typename CharT>
-struct std::formatter<containers::string_view, CharT> : private std::formatter<std::string_view, CharT> {
+template<>
+struct std::formatter<containers::string_view> : private std::formatter<std::string_view> {
 private:
-	using base = std::formatter<std::string_view, CharT>;
+	using base = std::formatter<std::string_view>;
 public:
 	using base::parse;
 
-	template<typename FormatContext>
-	constexpr auto format(containers::string_view const str, FormatContext & context) const {
+	constexpr auto format(containers::string_view const str, auto & context) const {
 		return base::format(std::string_view(str), context);
 	}
 };
