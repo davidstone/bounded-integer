@@ -6,6 +6,7 @@
 module;
 
 #include <operators/arrow.hpp>
+#include <operators/bracket.hpp>
 
 export module containers.algorithms.generate;
 
@@ -290,6 +291,8 @@ public:
 	constexpr auto size() const -> Size {
 		return m_size;
 	}
+
+	OPERATORS_BRACKET_SEQUENCE_RANGE_DEFINITIONS
 };
 
 template<typename Function>
