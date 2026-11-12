@@ -37,6 +37,6 @@ constexpr auto array_non_copyable_empty = containers::make_array_n(0_bi, non_cop
 static_assert(array_non_copyable_empty.size() == 0_bi);
 
 static_assert(containers::to_array({1, 2, 3}) == containers::array{1, 2, 3});
-static_assert(containers::to_array(containers::generate_n(3_bi, [] { return 2; })) == containers::array{2, 2, 2});
+static_assert(containers::to_array(containers::indexed_generate_n(3_bi, [](auto) { return 2; })) == containers::array{2, 2, 2});
 
 } // namespace

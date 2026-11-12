@@ -12,6 +12,7 @@ export module containers.to_array;
 import containers.array;
 import containers.begin_end;
 import containers.c_array;
+import containers.index_type;
 import containers.is_container;
 import containers.maximum_array_size;
 import containers.range_value_t;
@@ -25,20 +26,20 @@ using namespace bounded::literal;
 
 namespace containers {
 
+template<typename T>
+constexpr auto make_index(auto const index) {
+	if constexpr (std::is_array_v<std::remove_cvref_t<T>>) {
+		return std::size_t(index);
+	} else {
+		return containers::index_type<T>(index);
+	}
+}
+
 template<typename T, typename Source>
 constexpr auto to_array_impl(Source && source) {
 	constexpr auto size = bounded::constant<containers::size(source)>;
-	if constexpr (size == 0_bi) {
-		return array<T, size>();
-	} else {
-		auto [...indexes] = bounded::index_sequence_struct<static_cast<std::size_t>(size - 1_bi)>();
-		auto it = containers::begin(OPERATORS_FORWARD(source));
-		if constexpr (is_container<Source>) {
-			return array<T, size>({std::move(*it), (static_cast<void>(indexes), std::move(*++it))...});
-		} else {
-			return array<T, size>({*it, (static_cast<void>(indexes), *++it)...});
-		}
-	}
+	static constexpr auto const [...indexes] = bounded::index_sequence_struct(size);
+	return array<T, size>({OPERATORS_FORWARD(source)[containers::make_index<Source>(indexes)]...});
 }
 export template<typename T, statically_sized_range Range>
 constexpr auto to_array(Range && source) {
