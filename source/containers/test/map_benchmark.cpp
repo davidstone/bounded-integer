@@ -189,7 +189,7 @@ void test_performance(std::size_t const loop_count) {
 		auto const volatile & thing = value;
 		ignore(thing);
 	}
-	auto map2 = map;
+	[[maybe_unused]] auto map2 = map;
 	auto const copied = high_resolution_clock::now();
 	
 	for (auto const & value : map) {
