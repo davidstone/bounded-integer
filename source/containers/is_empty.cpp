@@ -22,6 +22,8 @@ using namespace bounded::literal;
 namespace containers {
 
 export constexpr auto is_empty = []<range Range>(Range && r) {
+	// Checking the size is not necessary, but it sometimes leads to slightly
+	// more efficient code and it allows more operations to be `constexpr`.
 	if constexpr (sized_range<Range>) {
 		return containers::size(OPERATORS_FORWARD(r)) == 0_bi;
 	} else {
