@@ -11,23 +11,24 @@ export module containers.is_empty;
 
 import containers.begin_end;
 import containers.range;
-import containers.range_size_t;
+import containers.size;
+import containers.sized_range;
 
 import bounded;
-import numeric_traits;
 import std_module;
 
 using namespace bounded::literal;
 
 namespace containers {
 
-template<typename Range>
-concept never_empty_range = numeric_traits::min_value<range_size_t<Range>> > 0_bi;
-
-export constexpr auto is_empty = [](range auto && r) {
-	// The never_empty check is not needed for correctness, but allows this
-	// function to be constexpr in more situations.
-	return never_empty_range<decltype(r)> ? false : containers::begin(OPERATORS_FORWARD(r)) == containers::end(OPERATORS_FORWARD(r));
+export constexpr auto is_empty = []<range Range>(Range && r) {
+	if constexpr (sized_range<Range>) {
+		return containers::size(OPERATORS_FORWARD(r)) == 0_bi;
+	} else {
+		return
+			containers::begin(OPERATORS_FORWARD(r)) ==
+			containers::end(OPERATORS_FORWARD(r));
+	}
 };
 
 } // namespace containers
