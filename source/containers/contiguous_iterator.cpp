@@ -51,7 +51,7 @@ struct contiguous_iterator {
 	friend auto operator<=>(contiguous_iterator, contiguous_iterator) = default;
 
 	friend constexpr auto operator+(contiguous_iterator const lhs, difference_type const rhs) -> contiguous_iterator {
-		return contiguous_iterator<T, max_difference>(lhs.to_address() + rhs);
+		return contiguous_iterator<T, max_difference>(lhs.m_ptr + rhs);
 	}
 
 	// Iterators over ranges of zero size tend to come up only in generic code, and
@@ -65,10 +65,10 @@ struct contiguous_iterator {
 	}
 
 	friend constexpr auto operator-(contiguous_iterator const lhs, contiguous_iterator const rhs) -> difference_type {
-		return ::bounded::assume_in_range<difference_type>(lhs.to_address() - rhs.to_address());
+		return ::bounded::assume_in_range<difference_type>(lhs.m_ptr - rhs.m_ptr);
 	}
 	friend constexpr auto operator-(contiguous_iterator const lhs, contiguous_iterator<opposite_const<T>, max_difference> const rhs) -> difference_type {
-		return ::bounded::assume_in_range<difference_type>(lhs.to_address() - rhs.to_address());
+		return ::bounded::assume_in_range<difference_type>(lhs.m_ptr - rhs.to_address());
 	}
 
 private:
