@@ -44,7 +44,7 @@ static_assert(!bounded::convertible_to<
 >);
 static_assert(bounded::convertible_to<
 	std::string_view,
-	containers::subrange<char const *, char const *, std::size_t>
+	containers::subrange<std::string_view::const_iterator, std::string_view::const_iterator, std::size_t>
 >);
 
 template<typename T>
