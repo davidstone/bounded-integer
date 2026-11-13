@@ -5,6 +5,8 @@
 
 module;
 
+#include <bounded/no_unique_address.hpp>
+
 #include <operators/bracket.hpp>
 #include <operators/forward.hpp>
 
@@ -142,9 +144,9 @@ public:
 	}
 	
 private:
-	[[no_unique_address]] Iterator m_begin = {};
-	[[no_unique_address]] Sentinel m_end = {};
-	[[no_unique_address]] Size m_size = {};
+	BOUNDED_NO_UNIQUE_ADDRESS Iterator m_begin = {};
+	BOUNDED_NO_UNIQUE_ADDRESS Sentinel m_end = {};
+	BOUNDED_NO_UNIQUE_ADDRESS Size m_size = {};
 };
 
 template<range Range>

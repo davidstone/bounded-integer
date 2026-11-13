@@ -3,6 +3,8 @@
 // (See accompanying file LICENSE_1_0.txt or copy at
 // http://www.boost.org/LICENSE_1_0.txt)
 
+#include <bounded/no_unique_address.hpp>
+
 #include <doctest/doctest.h>
 
 import containers.trivial_inplace_function;
@@ -50,7 +52,7 @@ static_assert(!bounded::constructible_from<const_function, long(*)()>);
 
 template<std::size_t size>
 struct sized_function {
-	[[no_unique_address]] containers::array<std::byte, bounded::constant<size>> a;
+	BOUNDED_NO_UNIQUE_ADDRESS containers::array<std::byte, bounded::constant<size>> a;
 	auto operator()() const {
 		return 1;
 	}

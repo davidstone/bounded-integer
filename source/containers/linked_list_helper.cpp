@@ -5,6 +5,8 @@
 
 module;
 
+#include <bounded/no_unique_address.hpp>
+
 #include <operators/arrow.hpp>
 #include <operators/forward.hpp>
 
@@ -36,7 +38,7 @@ struct linked_list_node : Links {
 		value(OPERATORS_FORWARD(constructor)())
 	{
 	}
-	[[no_unique_address]] T value;
+	BOUNDED_NO_UNIQUE_ADDRESS T value;
 };
 
 export template<typename Node>

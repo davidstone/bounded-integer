@@ -5,6 +5,8 @@
 
 module;
 
+#include <bounded/no_unique_address.hpp>
+
 #include <operators/forward.hpp>
 
 export module tv.tuple;
@@ -62,7 +64,7 @@ private:
 #if defined __GNUC__ and !defined __clang__
 	T m_value;
 #else
-	[[no_unique_address]] T m_value;
+	BOUNDED_NO_UNIQUE_ADDRESS T m_value;
 #endif
 };
 

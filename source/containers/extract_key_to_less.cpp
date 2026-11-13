@@ -3,6 +3,10 @@
 // (See accompanying file LICENSE_1_0.txt or copy at
 // http://www.boost.org/LICENSE_1_0.txt)
 
+module;
+
+#include <bounded/no_unique_address.hpp>
+
 export module containers.extract_key_to_less;
 
 import std_module;
@@ -22,7 +26,7 @@ struct extract_key_to_less {
 	}
 
 private:
-	[[no_unique_address]] ExtractKey m_extract_key;
+	BOUNDED_NO_UNIQUE_ADDRESS ExtractKey m_extract_key;
 };
 
 } // namespace containers

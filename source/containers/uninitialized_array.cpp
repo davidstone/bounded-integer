@@ -3,6 +3,10 @@
 // (See accompanying file LICENSE_1_0.txt or copy at
 // http://www.boost.org/LICENSE_1_0.txt)
 
+module;
+
+#include <bounded/no_unique_address.hpp>
+
 export module containers.uninitialized_array;
 
 import containers.c_array;
@@ -32,7 +36,7 @@ struct uninitialized_array {
 		return bounded::constant<size_>;
 	}
 private:
-	alignas(T) [[no_unique_address]] c_array<std::byte, sizeof(T) * static_cast<std::size_t>(size_)> m_storage;
+	alignas(T) BOUNDED_NO_UNIQUE_ADDRESS c_array<std::byte, sizeof(T) * static_cast<std::size_t>(size_)> m_storage;
 };
 
 // reinterpret_cast is not allowed in a constexpr function, so this avoids
@@ -66,7 +70,7 @@ private:
 		m_storage{(static_cast<void>(indexes), bounded::tombstone_traits<T>::make(0_bi))...}
 	{
 	}
-	[[no_unique_address]] c_array<T, static_cast<std::size_t>(size_)> m_storage;
+	BOUNDED_NO_UNIQUE_ADDRESS c_array<T, static_cast<std::size_t>(size_)> m_storage;
 };
 
 template<typename T, array_size_type<T> size_> requires(size_ == 0_bi)

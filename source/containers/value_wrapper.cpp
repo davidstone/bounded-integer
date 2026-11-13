@@ -3,6 +3,10 @@
 // (See accompanying file LICENSE_1_0.txt or copy at
 // http://www.boost.org/LICENSE_1_0.txt)
 
+module;
+
+#include <bounded/no_unique_address.hpp>
+
 export module containers.value_wrapper;
 
 import std_module;
@@ -24,7 +28,7 @@ struct value_wrapper {
 		return std::move(m_value);
 	}
 private:
-	[[no_unique_address]] T m_value;
+	BOUNDED_NO_UNIQUE_ADDRESS T m_value;
 };
 
 } // namespace containers

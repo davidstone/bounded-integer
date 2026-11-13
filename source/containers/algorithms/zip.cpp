@@ -5,6 +5,8 @@
 
 module;
 
+#include <bounded/no_unique_address.hpp>
+
 #include <operators/forward.hpp>
 
 export module containers.algorithms.zip;
@@ -85,7 +87,7 @@ private:
 	friend struct zip_sentinel;
 	template<typename... Sentinels>
 	friend struct zip_smallest_sentinel;
-	[[no_unique_address]] tv::tuple<Iterators...> m_its;
+	BOUNDED_NO_UNIQUE_ADDRESS tv::tuple<Iterators...> m_its;
 };
 
 template<typename... Sentinels>
@@ -106,7 +108,7 @@ struct zip_sentinel {
 		}
 	}
 private:
-	[[no_unique_address]] tv::tuple<Sentinels...> m_sentinels;
+	BOUNDED_NO_UNIQUE_ADDRESS tv::tuple<Sentinels...> m_sentinels;
 };
 
 template<typename... Sentinels>
@@ -121,7 +123,7 @@ struct zip_smallest_sentinel {
 		return (... or (lhs.m_its[indexes] == rhs.m_sentinels[indexes]));
 	}
 private:
-	[[no_unique_address]] tv::tuple<Sentinels...> m_sentinels;
+	BOUNDED_NO_UNIQUE_ADDRESS tv::tuple<Sentinels...> m_sentinels;
 };
 
 constexpr auto all_are_equal(auto const size, auto const ... sizes) -> bool {

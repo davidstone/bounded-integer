@@ -1,6 +1,8 @@
 module;
 
 #include <bounded/conditional.hpp>
+#include <bounded/no_unique_address.hpp>
+
 #include <operators/forward.hpp>
 
 export module containers.trivial_inplace_function;
@@ -28,16 +30,16 @@ union aligned_storage_helper {
 	using maybe = std::conditional_t<capacity >= sizeof(T), T, empty>;
 	struct double_holder { double a; };
 
-	[[no_unique_address]] containers::array<std::byte, bounded::constant<capacity>> data;
-	[[no_unique_address]] maybe<short> short_;
-	[[no_unique_address]] maybe<int> int_;
-	[[no_unique_address]] maybe<long> long_;
-	[[no_unique_address]] maybe<long long> long_long_;
-	[[no_unique_address]] maybe<void *> void_star_;
-	[[no_unique_address]] maybe<void(*)()> function_ptr_;
-	[[no_unique_address]] maybe<double_holder> double_holder_;
-	[[no_unique_address]] maybe<containers::array<double, 4_bi>> array_double_;
-	[[no_unique_address]] maybe<long double> long_double_;
+	BOUNDED_NO_UNIQUE_ADDRESS containers::array<std::byte, bounded::constant<capacity>> data;
+	BOUNDED_NO_UNIQUE_ADDRESS maybe<short> short_;
+	BOUNDED_NO_UNIQUE_ADDRESS maybe<int> int_;
+	BOUNDED_NO_UNIQUE_ADDRESS maybe<long> long_;
+	BOUNDED_NO_UNIQUE_ADDRESS maybe<long long> long_long_;
+	BOUNDED_NO_UNIQUE_ADDRESS maybe<void *> void_star_;
+	BOUNDED_NO_UNIQUE_ADDRESS maybe<void(*)()> function_ptr_;
+	BOUNDED_NO_UNIQUE_ADDRESS maybe<double_holder> double_holder_;
+	BOUNDED_NO_UNIQUE_ADDRESS maybe<containers::array<double, 4_bi>> array_double_;
+	BOUNDED_NO_UNIQUE_ADDRESS maybe<long double> long_double_;
 };
 
 template<std::size_t capacity>
@@ -69,12 +71,9 @@ struct padded {
 	{
 	}
 
-	// If value is not declared [[no_unique_address]] but it is empty, the bytes
-	// would not be initialized. This would lead to uninitialized bytes being
-	// copied, which would be rejected by the constexpr evaluator.
 	using padding_type = containers::array<std::byte, bounded::constant<size - (std::is_empty_v<T> ? 0 : sizeof(T))>>;
-	[[no_unique_address]] T value;
-	[[no_unique_address]] padding_type padding;
+	BOUNDED_NO_UNIQUE_ADDRESS T value;
+	BOUNDED_NO_UNIQUE_ADDRESS padding_type padding;
 };
 
 template<typename T>
@@ -91,7 +90,7 @@ private:
 		R(*)(std::conditional_t<is_const, storage_type const &, storage_type &>, Args...)
 	>;
 
-	[[no_unique_address]] alignas(alignment) storage_type m_storage;
+	BOUNDED_NO_UNIQUE_ADDRESS alignas(alignment) storage_type m_storage;
 	function_ptr m_function_indirection;
 
 	template<typename Function>

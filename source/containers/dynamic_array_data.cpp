@@ -7,6 +7,8 @@ module;
 
 #include <version>
 
+#include <bounded/no_unique_address.hpp>
+
 export module containers.dynamic_array_data;
 
 import bounded;
@@ -32,8 +34,8 @@ struct dynamic_array_data {
 	{
 	}
 
-	[[no_unique_address]] T * pointer;
-	[[no_unique_address]] Size size;
+	BOUNDED_NO_UNIQUE_ADDRESS T * pointer;
+	BOUNDED_NO_UNIQUE_ADDRESS Size size;
 };
 
 template<typename T>

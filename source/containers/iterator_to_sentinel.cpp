@@ -5,6 +5,8 @@
 
 module;
 
+#include <bounded/no_unique_address.hpp>
+
 #include <operators/returns.hpp>
 
 export module containers.iterator_to_sentinel;
@@ -16,7 +18,7 @@ namespace containers {
 export template<typename Iterator>
 struct iterator_to_sentinel {
 private:
-	[[no_unique_address]] Iterator m_base;
+	BOUNDED_NO_UNIQUE_ADDRESS Iterator m_base;
 public:
 	iterator_to_sentinel() = default;
 

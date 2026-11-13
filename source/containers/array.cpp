@@ -5,6 +5,8 @@
 
 module;
 
+#include <bounded/no_unique_address.hpp>
+
 #include <operators/bracket.hpp>
 #include <operators/forward.hpp>
 
@@ -94,7 +96,7 @@ public:
 
 	// Consider this private. It must be public for the class to be an
 	// aggregate
-	[[no_unique_address]] monostate m_value;
+	BOUNDED_NO_UNIQUE_ADDRESS monostate m_value;
 };
 
 template<typename... Args>

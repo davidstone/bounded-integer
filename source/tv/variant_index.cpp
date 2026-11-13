@@ -3,6 +3,10 @@
 // (See accompanying file LICENSE_1_0.txt or copy at
 // http://www.boost.org/LICENSE_1_0.txt)
 
+module;
+
+#include <bounded/no_unique_address.hpp>
+
 export module tv.variant_index;
 
 import tv.get_index;
@@ -53,7 +57,7 @@ struct variant_index {
 		std::unreachable();
 	}
 private:
-	[[no_unique_address]] integer_index m_index;
+	BOUNDED_NO_UNIQUE_ADDRESS integer_index m_index;
 
 	constexpr explicit variant_index(bounded::tombstone_tag, auto const make):
 		m_index(make())

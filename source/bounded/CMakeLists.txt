@@ -130,6 +130,7 @@ target_sources(bounded_test PRIVATE
 		test/comparison.cpp
 		test/conditional.cpp
 		test/format.cpp
+		test/no_unique_address.cpp
 		test/stream.cpp
 		test/to_integer.cpp
 		test/tombstone.cpp

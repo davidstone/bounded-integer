@@ -5,6 +5,8 @@
 
 module;
 
+#include <bounded/no_unique_address.hpp>
+
 #include <operators/forward.hpp>
 
 export module containers.map_value_type;
@@ -28,8 +30,8 @@ struct map_value_type {
 		};
 	}
 
-	[[no_unique_address]] Key key;
-	[[no_unique_address]] Mapped mapped;
+	BOUNDED_NO_UNIQUE_ADDRESS Key key;
+	BOUNDED_NO_UNIQUE_ADDRESS Mapped mapped;
 };
 
 template<typename Key, typename Mapped>

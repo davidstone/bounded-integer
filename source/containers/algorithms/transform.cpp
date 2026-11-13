@@ -5,6 +5,8 @@
 
 module;
 
+#include <bounded/no_unique_address.hpp>
+
 #include <operators/forward.hpp>
 
 export module containers.algorithms.transform;
@@ -47,7 +49,7 @@ struct transform_traits :
 		}
 	}
 private:
-	[[no_unique_address]] UnaryFunction m_dereference;
+	BOUNDED_NO_UNIQUE_ADDRESS UnaryFunction m_dereference;
 };
 
 template<typename UnaryFunction, bool pass_iterator>
@@ -76,7 +78,7 @@ struct transform_iterator_traits_non_idempotent :
 	}
 
 private:
-	[[no_unique_address]] stored_function<UnaryFunction const> m_dereference;
+	BOUNDED_NO_UNIQUE_ADDRESS stored_function<UnaryFunction const> m_dereference;
 };
 
 template<typename UnaryFunction, bool pass_iterator>
@@ -99,7 +101,7 @@ struct transform_traits_non_idempotent : default_begin_end_size {
 		return value_wrapper(transform_iterator_traits_non_idempotent<UnaryFunction, pass_iterator>(m_dereference));
 	}
 private:
-	[[no_unique_address]] UnaryFunction m_dereference;
+	BOUNDED_NO_UNIQUE_ADDRESS UnaryFunction m_dereference;
 };
 
 template<typename Function, typename Range>

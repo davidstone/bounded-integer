@@ -5,6 +5,8 @@
 
 module;
 
+#include <bounded/no_unique_address.hpp>
+
 #include <operators/forward.hpp>
 
 export module tv.variadic_union;
@@ -53,8 +55,8 @@ union [[clang::trivial_abi]] variadic_union<T, Ts...> {
 		}
 	}
 
-	[[no_unique_address]] T head;
-	[[no_unique_address]] variadic_union<Ts...> tail;
+	BOUNDED_NO_UNIQUE_ADDRESS T head;
+	BOUNDED_NO_UNIQUE_ADDRESS variadic_union<Ts...> tail;
 };
 
 } // namespace tv

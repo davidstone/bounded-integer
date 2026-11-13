@@ -8,6 +8,8 @@
 module;
 
 #include <bounded/assert.hpp>
+#include <bounded/no_unique_address.hpp>
+
 #include <operators/arrow.hpp>
 #include <operators/bracket.hpp>
 
@@ -78,7 +80,7 @@ struct non_optional {
 
 	friend auto operator<=>(non_optional const &, non_optional const &) = default;
 private:
-	[[no_unique_address]] T m_value;
+	BOUNDED_NO_UNIQUE_ADDRESS T m_value;
 };
 
 export template<typename Iterator>

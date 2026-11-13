@@ -6,6 +6,7 @@
 module;
 
 #include <bounded/assert.hpp>
+#include <bounded/no_unique_address.hpp>
 
 #include <operators/bracket.hpp>
 #include <operators/forward.hpp>
@@ -142,8 +143,8 @@ private:
 	{
 	}
 
-	[[no_unique_address]] uninitialized_array<T, capacity_> m_storage = {};
-	[[no_unique_address]] bounded::integer<0, bounded::normalize<capacity_>> m_size = 0_bi;
+	BOUNDED_NO_UNIQUE_ADDRESS uninitialized_array<T, capacity_> m_storage = {};
+	BOUNDED_NO_UNIQUE_ADDRESS bounded::integer<0, bounded::normalize<capacity_>> m_size = 0_bi;
 
 	friend bounded::tombstone<static_vector<T, capacity_>>;
 	friend bounded::tombstone_member<&static_vector<T, capacity_>::m_size>;

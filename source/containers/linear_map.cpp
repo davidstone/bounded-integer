@@ -5,6 +5,8 @@
 
 module;
 
+#include <bounded/no_unique_address.hpp>
+
 #include <operators/forward.hpp>
 
 export module containers.linear_map;
@@ -195,10 +197,8 @@ private:
 		remove_duplicates(begin());
 	}
 
-	// TODO: Use [[no_unique_address]] after resolution of
-	// https://github.com/llvm/llvm-project/issues/53059
-	Container m_container;
-	[[no_unique_address]] Equal m_equal;
+	BOUNDED_NO_UNIQUE_ADDRESS Container m_container;
+	BOUNDED_NO_UNIQUE_ADDRESS Equal m_equal;
 };
 
 template<typename Range>

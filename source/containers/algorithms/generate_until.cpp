@@ -5,6 +5,8 @@
 
 module;
 
+#include <bounded/no_unique_address.hpp>
+
 #include <operators/arrow.hpp>
 
 export module containers.algorithms.generate_until;
@@ -30,7 +32,7 @@ struct generate_until_sentinel {
 		return std::invoke(m_is_done.get());
 	}
 private:
-	[[no_unique_address]] stored_function<Function> m_is_done;
+	BOUNDED_NO_UNIQUE_ADDRESS stored_function<Function> m_is_done;
 };
 
 template<typename Function>
@@ -62,7 +64,7 @@ struct generate_until_iterator {
 		return it;
 	}
 private:
-	[[no_unique_address]] stored_function<Function> m_generator;
+	BOUNDED_NO_UNIQUE_ADDRESS stored_function<Function> m_generator;
 };
 
 export template<std::invocable Function, typename UntilFunction> requires bounded::invocable_r<UntilFunction const &, bool>
@@ -83,8 +85,8 @@ struct generate_until {
 		return generate_until_sentinel(m_until);
 	}
 private:
-	[[no_unique_address]] Function m_generator;
-	[[no_unique_address]] UntilFunction m_until;
+	BOUNDED_NO_UNIQUE_ADDRESS Function m_generator;
+	BOUNDED_NO_UNIQUE_ADDRESS UntilFunction m_until;
 };
 
 } // namespace containers

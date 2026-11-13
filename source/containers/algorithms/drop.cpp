@@ -6,6 +6,7 @@
 module;
 
 #include <bounded/assert.hpp>
+#include <bounded/no_unique_address.hpp>
 
 #include <operators/arrow.hpp>
 #include <operators/forward.hpp>
@@ -61,7 +62,7 @@ struct reduced_range_sentinel {
 	}
 
 private:
-	[[no_unique_address]] Sentinel m_sentinel;
+	BOUNDED_NO_UNIQUE_ADDRESS Sentinel m_sentinel;
 };
 
 struct drop_exception : std::runtime_error {
@@ -145,7 +146,7 @@ struct reduced_range_iterator {
 	}
 
 private:
-	[[no_unique_address]] Iterator m_it;
+	BOUNDED_NO_UNIQUE_ADDRESS Iterator m_it;
 };
 
 template<auto max_size, typename T>

@@ -6,6 +6,7 @@
 module;
 
 #include <bounded/assert.hpp>
+#include <bounded/no_unique_address.hpp>
 
 #include <operators/bracket.hpp>
 #include <operators/forward.hpp>
@@ -90,8 +91,8 @@ public:
 private:
 	static constexpr auto has_no_values = numeric_traits::max_value<difference_type> == 0_bi;
 
-	[[no_unique_address]] storage_type m_value;
-	[[no_unique_address]] Step m_step;
+	BOUNDED_NO_UNIQUE_ADDRESS storage_type m_value;
+	BOUNDED_NO_UNIQUE_ADDRESS Step m_step;
 };
 
 export template<bounded::integral Integer, bounded::integral Sentinel = Integer, bounded::integral Step = bounded::constant_t<1>>
@@ -138,9 +139,9 @@ struct integer_range {
 	OPERATORS_BRACKET_SEQUENCE_RANGE_DEFINITIONS
 
 private:
-	[[no_unique_address]] Integer m_begin;
-	[[no_unique_address]] Sentinel m_end;
-	[[no_unique_address]] Step m_step;
+	BOUNDED_NO_UNIQUE_ADDRESS Integer m_begin;
+	BOUNDED_NO_UNIQUE_ADDRESS Sentinel m_end;
+	BOUNDED_NO_UNIQUE_ADDRESS Step m_step;
 };
 
 template<typename Size>
