@@ -376,6 +376,8 @@ private:
 
 } // namespace containers
 
+static_assert(sizeof(containers::last_byte_t) == 1);
+
 using small_char_type = containers::small_type<char, 0, containers::maximum_array_size<char>>;
 static_assert(small_char_type::capacity() == 23);
 static_assert(std::is_empty_v<small_char_type::first_bytes_of_size_type>);
