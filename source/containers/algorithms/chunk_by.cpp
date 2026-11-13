@@ -80,10 +80,10 @@ private:
 		return containers::back(it.base());
 	}
 
-	BOUNDED_NO_UNIQUE_ADDRESS Iterator m_first;
-	BOUNDED_NO_UNIQUE_ADDRESS Sentinel m_last;
-	BOUNDED_NO_UNIQUE_ADDRESS stored_predicate m_predicate;
-	BOUNDED_NO_UNIQUE_ADDRESS Iterator m_middle;
+	[[BOUNDED_NO_UNIQUE_ADDRESS]] Iterator m_first;
+	[[BOUNDED_NO_UNIQUE_ADDRESS]] Sentinel m_last;
+	[[BOUNDED_NO_UNIQUE_ADDRESS]] stored_predicate m_predicate;
+	[[BOUNDED_NO_UNIQUE_ADDRESS]] Iterator m_middle;
 };
 
 export template<forward_range Range, typename BinaryPredicate>
@@ -119,8 +119,8 @@ struct chunk_by {
 		return std::default_sentinel;
 	}
 private:
-	BOUNDED_NO_UNIQUE_ADDRESS Range m_range;
-	BOUNDED_NO_UNIQUE_ADDRESS BinaryPredicate m_predicate;
+	[[BOUNDED_NO_UNIQUE_ADDRESS]] Range m_range;
+	[[BOUNDED_NO_UNIQUE_ADDRESS]] BinaryPredicate m_predicate;
 };
 
 template<typename Range, typename BinaryPredicate>

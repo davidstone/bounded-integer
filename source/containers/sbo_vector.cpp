@@ -67,8 +67,8 @@ using size_and_bit = decltype((bounded::declval<Size>() << 1_bi) + bounded::decl
 template<typename Size>
 struct split_size_t {
 	using first_t = containers::array<last_size_byte_t, bounded::size_of<size_and_bit<Size>> - 1_bi>;
-	BOUNDED_NO_UNIQUE_ADDRESS first_t first;
-	BOUNDED_NO_UNIQUE_ADDRESS last_size_byte_t last;
+	[[BOUNDED_NO_UNIQUE_ADDRESS]] first_t first;
+	[[BOUNDED_NO_UNIQUE_ADDRESS]] last_size_byte_t last;
 };
 
 template<typename Size>
@@ -118,8 +118,8 @@ struct small_type {
 	}
 
 private:
-	BOUNDED_NO_UNIQUE_ADDRESS uninitialized_array<T, capacity()> m_storage;
-	BOUNDED_NO_UNIQUE_ADDRESS first_bytes_of_size_type m_first_bytes_of_size;
+	[[BOUNDED_NO_UNIQUE_ADDRESS]] uninitialized_array<T, capacity()> m_storage;
+	[[BOUNDED_NO_UNIQUE_ADDRESS]] first_bytes_of_size_type m_first_bytes_of_size;
 };
 
 template<typename T, std::size_t requested_small_capacity, std::size_t max_size>
@@ -159,9 +159,9 @@ struct [[gnu::packed]] large_type {
 
 private:
 	// gnu::packed requires POD types
-	BOUNDED_NO_UNIQUE_ADDRESS T * m_pointer;
-	BOUNDED_NO_UNIQUE_ADDRESS typename capacity_type::underlying_type m_capacity;
-	BOUNDED_NO_UNIQUE_ADDRESS first_bytes_of_size_type m_first_bytes_of_size;
+	[[BOUNDED_NO_UNIQUE_ADDRESS]] T * m_pointer;
+	[[BOUNDED_NO_UNIQUE_ADDRESS]] typename capacity_type::underlying_type m_capacity;
+	[[BOUNDED_NO_UNIQUE_ADDRESS]] first_bytes_of_size_type m_first_bytes_of_size;
 };
 
 export template<typename T, std::size_t requested_small_capacity = 1, std::size_t max_size = containers::maximum_array_size<T>>
@@ -366,8 +366,8 @@ private:
 		{
 		}
 		union {
-			BOUNDED_NO_UNIQUE_ADDRESS small_t small;
-			BOUNDED_NO_UNIQUE_ADDRESS large_t large;
+			[[BOUNDED_NO_UNIQUE_ADDRESS]] small_t small;
+			[[BOUNDED_NO_UNIQUE_ADDRESS]] large_t large;
 		};
 		last_byte_t last_byte;
 	};

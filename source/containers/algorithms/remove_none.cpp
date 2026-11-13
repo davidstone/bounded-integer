@@ -40,7 +40,7 @@ struct wrapper {
 		bounded::construct_at(m_value, make);
 	}
 private:
-	BOUNDED_NO_UNIQUE_ADDRESS T m_value;
+	[[BOUNDED_NO_UNIQUE_ADDRESS]] T m_value;
 };
 
 template<typename T> requires(!std::is_trivially_destructible_v<T>)
@@ -53,7 +53,7 @@ struct wrapper<T> {
 		m_storage.emplace(make);
 	}
 private:
-	BOUNDED_NO_UNIQUE_ADDRESS tv::optional<T> m_storage{bounded::lazy_init, bounded::construct<T>};
+	[[BOUNDED_NO_UNIQUE_ADDRESS]] tv::optional<T> m_storage{bounded::lazy_init, bounded::construct<T>};
 };
 
 template<typename T> requires(std::is_reference_v<T> and !std::is_pointer_v<std::remove_reference_t<T>>)
@@ -91,8 +91,8 @@ concept use_inplace = bounded::mostly_trivial<wrapper<containers::range_referenc
 
 template<typename Range>
 struct remove_none_data {
-	BOUNDED_NO_UNIQUE_ADDRESS Range range;
-	BOUNDED_NO_UNIQUE_ADDRESS wrapper<range_reference_t<Range>> cached_value;
+	[[BOUNDED_NO_UNIQUE_ADDRESS]] Range range;
+	[[BOUNDED_NO_UNIQUE_ADDRESS]] wrapper<range_reference_t<Range>> cached_value;
 };
 
 template<typename Range>
@@ -122,7 +122,7 @@ struct iterator_reference_data {
 		return m_data.get().cached_value;
 	}
 private:
-	BOUNDED_NO_UNIQUE_ADDRESS iterator_t<Range> m_it;
+	[[BOUNDED_NO_UNIQUE_ADDRESS]] iterator_t<Range> m_it;
 	std::reference_wrapper<remove_none_data<Range>> m_data;
 };
 
@@ -148,9 +148,9 @@ struct iterator_inplace_data {
 		return self.m_cached_value;
 	}
 private:
-	BOUNDED_NO_UNIQUE_ADDRESS iterator_t<Range> m_it;
-	BOUNDED_NO_UNIQUE_ADDRESS sentinel_t<Range> m_last;
-	BOUNDED_NO_UNIQUE_ADDRESS wrapper<range_reference_t<Range>> m_cached_value;
+	[[BOUNDED_NO_UNIQUE_ADDRESS]] iterator_t<Range> m_it;
+	[[BOUNDED_NO_UNIQUE_ADDRESS]] sentinel_t<Range> m_last;
+	[[BOUNDED_NO_UNIQUE_ADDRESS]] wrapper<range_reference_t<Range>> m_cached_value;
 };
 
 template<typename T>
@@ -206,7 +206,7 @@ private:
 		iterator_inplace_data<Range>,
 		iterator_reference_data<Range>
 	>;
-	BOUNDED_NO_UNIQUE_ADDRESS data_t m_data;
+	[[BOUNDED_NO_UNIQUE_ADDRESS]] data_t m_data;
 };
 
 template<typename Range>
@@ -261,7 +261,7 @@ private:
 		Range,
 		remove_none_data<Range>
 	>;
-	BOUNDED_NO_UNIQUE_ADDRESS data_t m_data;
+	[[BOUNDED_NO_UNIQUE_ADDRESS]] data_t m_data;
 };
 
 template<typename Range>

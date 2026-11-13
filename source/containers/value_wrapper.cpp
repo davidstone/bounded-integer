@@ -28,7 +28,7 @@ struct value_wrapper {
 		return std::move(m_value);
 	}
 private:
-	BOUNDED_NO_UNIQUE_ADDRESS T m_value;
+	[[BOUNDED_NO_UNIQUE_ADDRESS]] T m_value;
 };
 
 } // namespace containers

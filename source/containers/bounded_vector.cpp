@@ -195,8 +195,8 @@ private:
 		bounded::normalize<max_capacity>
 	>;
 	using storage_type = uninitialized_dynamic_array<T, capacity_type>;
-	BOUNDED_NO_UNIQUE_ADDRESS storage_type m_storage;
-	BOUNDED_NO_UNIQUE_ADDRESS size_type m_size = 0_bi;
+	[[BOUNDED_NO_UNIQUE_ADDRESS]] storage_type m_storage;
+	[[BOUNDED_NO_UNIQUE_ADDRESS]] size_type m_size = 0_bi;
 };
 
 } // namespace containers

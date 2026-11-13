@@ -10,5 +10,5 @@ module;
 export module bounded.no_unique_address;
 
 struct s {
-	BOUNDED_NO_UNIQUE_ADDRESS int m;
+	[[BOUNDED_NO_UNIQUE_ADDRESS]] int m;
 };

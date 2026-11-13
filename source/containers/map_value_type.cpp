@@ -30,8 +30,8 @@ struct map_value_type {
 		};
 	}
 
-	BOUNDED_NO_UNIQUE_ADDRESS Key key;
-	BOUNDED_NO_UNIQUE_ADDRESS Mapped mapped;
+	[[BOUNDED_NO_UNIQUE_ADDRESS]] Key key;
+	[[BOUNDED_NO_UNIQUE_ADDRESS]] Mapped mapped;
 };
 
 template<typename Key, typename Mapped>

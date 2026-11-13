@@ -26,7 +26,7 @@ struct extract_key_to_less {
 	}
 
 private:
-	BOUNDED_NO_UNIQUE_ADDRESS ExtractKey m_extract_key;
+	[[BOUNDED_NO_UNIQUE_ADDRESS]] ExtractKey m_extract_key;
 };
 
 } // namespace containers

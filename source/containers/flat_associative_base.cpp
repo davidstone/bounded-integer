@@ -83,7 +83,7 @@ struct key_and_mapped_typedefs<Container, false> {
 
 template<typename ExtractKey, bool is_map>
 struct extract_key_from_key_t {
-	BOUNDED_NO_UNIQUE_ADDRESS ExtractKey m_extract;
+	[[BOUNDED_NO_UNIQUE_ADDRESS]] ExtractKey m_extract;
 	constexpr auto operator()(auto && value) const -> decltype(auto) {
 		if constexpr (is_map) {
 			return m_extract(get_key(OPERATORS_FORWARD(value)));
@@ -302,8 +302,8 @@ protected:
 	constexpr auto extract_key_from_key() const -> extract_key_from_key_t<ExtractKey, is_map>{
 		return extract_key_from_key_t<ExtractKey, is_map>(m_extract_key);
 	}
-	BOUNDED_NO_UNIQUE_ADDRESS Container m_container;
-	BOUNDED_NO_UNIQUE_ADDRESS ExtractKey m_extract_key;
+	[[BOUNDED_NO_UNIQUE_ADDRESS]] Container m_container;
+	[[BOUNDED_NO_UNIQUE_ADDRESS]] ExtractKey m_extract_key;
 };
 
 } // namespace containers

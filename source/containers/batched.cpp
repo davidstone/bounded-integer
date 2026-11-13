@@ -83,9 +83,9 @@ private:
 		using offset_t = offset_type<iterator_t<subrange<Iterator, Sentinel, Size>>>;
 		return bounded::assume_in_range<offset_t>(base * batch + bounded::min(add_one_if_below, batch));
 	}
-	BOUNDED_NO_UNIQUE_ADDRESS subrange<Iterator, Sentinel, Size> m_all;
-	BOUNDED_NO_UNIQUE_ADDRESS bounded::integer<1, bounded::builtin_max_value<Count>> m_number_of_batches;
-	BOUNDED_NO_UNIQUE_ADDRESS batch_t m_batch;
+	[[BOUNDED_NO_UNIQUE_ADDRESS]] subrange<Iterator, Sentinel, Size> m_all;
+	[[BOUNDED_NO_UNIQUE_ADDRESS]] bounded::integer<1, bounded::builtin_max_value<Count>> m_number_of_batches;
+	[[BOUNDED_NO_UNIQUE_ADDRESS]] batch_t m_batch;
 };
 
 export template<bounded::bounded_integer Integer> requires(numeric_traits::min_value<Integer> > 0_bi)

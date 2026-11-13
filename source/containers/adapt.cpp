@@ -54,8 +54,8 @@ concept adapt_iterator_constructible = bounded::convertible_to<
 export template<range Range, typename Traits>
 struct adapt {
 private:
-	BOUNDED_NO_UNIQUE_ADDRESS Range m_range;
-	BOUNDED_NO_UNIQUE_ADDRESS Traits m_traits;
+	[[BOUNDED_NO_UNIQUE_ADDRESS]] Range m_range;
+	[[BOUNDED_NO_UNIQUE_ADDRESS]] Traits m_traits;
 
 	constexpr auto iterator_traits() const -> decltype(auto) {
 		return get_iterator_traits(m_traits, m_range);

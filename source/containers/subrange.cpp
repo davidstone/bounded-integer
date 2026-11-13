@@ -144,9 +144,9 @@ public:
 	}
 	
 private:
-	BOUNDED_NO_UNIQUE_ADDRESS Iterator m_begin = {};
-	BOUNDED_NO_UNIQUE_ADDRESS Sentinel m_end = {};
-	BOUNDED_NO_UNIQUE_ADDRESS Size m_size = {};
+	[[BOUNDED_NO_UNIQUE_ADDRESS]] Iterator m_begin = {};
+	[[BOUNDED_NO_UNIQUE_ADDRESS]] Sentinel m_end = {};
+	[[BOUNDED_NO_UNIQUE_ADDRESS]] Size m_size = {};
 };
 
 template<range Range>

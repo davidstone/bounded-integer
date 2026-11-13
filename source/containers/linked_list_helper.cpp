@@ -38,7 +38,7 @@ struct linked_list_node : Links {
 		value(OPERATORS_FORWARD(constructor)())
 	{
 	}
-	BOUNDED_NO_UNIQUE_ADDRESS T value;
+	[[BOUNDED_NO_UNIQUE_ADDRESS]] T value;
 };
 
 export template<typename Node>

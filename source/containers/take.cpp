@@ -55,7 +55,7 @@ struct counted_sentinel {
 	}
 
 private:
-	BOUNDED_NO_UNIQUE_ADDRESS Sentinel m_sentinel;
+	[[BOUNDED_NO_UNIQUE_ADDRESS]] Sentinel m_sentinel;
 };
 
 template<typename Iterator, typename Count>
@@ -141,8 +141,8 @@ struct counted_iterator : iterator_category_base<Iterator> {
 	}
 
 private:
-	BOUNDED_NO_UNIQUE_ADDRESS Iterator m_it;
-	BOUNDED_NO_UNIQUE_ADDRESS Count m_count = 0_bi;
+	[[BOUNDED_NO_UNIQUE_ADDRESS]] Iterator m_it;
+	[[BOUNDED_NO_UNIQUE_ADDRESS]] Count m_count = 0_bi;
 };
 
 template<typename Iterator, typename Count>
@@ -182,7 +182,7 @@ struct random_access_counted_iterator {
 	}
 
 private:
-	BOUNDED_NO_UNIQUE_ADDRESS Iterator m_it;
+	[[BOUNDED_NO_UNIQUE_ADDRESS]] Iterator m_it;
 };
 
 template<extra_elements_policy policy, range Range, bounded::bounded_integer Count> requires(numeric_traits::min_value<Count> >= 0_bi)

@@ -30,16 +30,16 @@ union aligned_storage_helper {
 	using maybe = std::conditional_t<capacity >= sizeof(T), T, empty>;
 	struct double_holder { double a; };
 
-	BOUNDED_NO_UNIQUE_ADDRESS containers::array<std::byte, bounded::constant<capacity>> data;
-	BOUNDED_NO_UNIQUE_ADDRESS maybe<short> short_;
-	BOUNDED_NO_UNIQUE_ADDRESS maybe<int> int_;
-	BOUNDED_NO_UNIQUE_ADDRESS maybe<long> long_;
-	BOUNDED_NO_UNIQUE_ADDRESS maybe<long long> long_long_;
-	BOUNDED_NO_UNIQUE_ADDRESS maybe<void *> void_star_;
-	BOUNDED_NO_UNIQUE_ADDRESS maybe<void(*)()> function_ptr_;
-	BOUNDED_NO_UNIQUE_ADDRESS maybe<double_holder> double_holder_;
-	BOUNDED_NO_UNIQUE_ADDRESS maybe<containers::array<double, 4_bi>> array_double_;
-	BOUNDED_NO_UNIQUE_ADDRESS maybe<long double> long_double_;
+	[[BOUNDED_NO_UNIQUE_ADDRESS]] containers::array<std::byte, bounded::constant<capacity>> data;
+	[[BOUNDED_NO_UNIQUE_ADDRESS]] maybe<short> short_;
+	[[BOUNDED_NO_UNIQUE_ADDRESS]] maybe<int> int_;
+	[[BOUNDED_NO_UNIQUE_ADDRESS]] maybe<long> long_;
+	[[BOUNDED_NO_UNIQUE_ADDRESS]] maybe<long long> long_long_;
+	[[BOUNDED_NO_UNIQUE_ADDRESS]] maybe<void *> void_star_;
+	[[BOUNDED_NO_UNIQUE_ADDRESS]] maybe<void(*)()> function_ptr_;
+	[[BOUNDED_NO_UNIQUE_ADDRESS]] maybe<double_holder> double_holder_;
+	[[BOUNDED_NO_UNIQUE_ADDRESS]] maybe<containers::array<double, 4_bi>> array_double_;
+	[[BOUNDED_NO_UNIQUE_ADDRESS]] maybe<long double> long_double_;
 };
 
 template<std::size_t capacity>
@@ -72,8 +72,8 @@ struct padded {
 	}
 
 	using padding_type = containers::array<std::byte, bounded::constant<size - (std::is_empty_v<T> ? 0 : sizeof(T))>>;
-	BOUNDED_NO_UNIQUE_ADDRESS T value;
-	BOUNDED_NO_UNIQUE_ADDRESS padding_type padding;
+	[[BOUNDED_NO_UNIQUE_ADDRESS]] T value;
+	[[BOUNDED_NO_UNIQUE_ADDRESS]] padding_type padding;
 };
 
 template<typename T>
@@ -90,7 +90,7 @@ private:
 		R(*)(std::conditional_t<is_const, storage_type const &, storage_type &>, Args...)
 	>;
 
-	BOUNDED_NO_UNIQUE_ADDRESS alignas(alignment) storage_type m_storage;
+	[[BOUNDED_NO_UNIQUE_ADDRESS]] alignas(alignment) storage_type m_storage;
 	function_ptr m_function_indirection;
 
 	template<typename Function>

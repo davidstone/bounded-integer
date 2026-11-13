@@ -62,7 +62,7 @@ struct reduced_range_sentinel {
 	}
 
 private:
-	BOUNDED_NO_UNIQUE_ADDRESS Sentinel m_sentinel;
+	[[BOUNDED_NO_UNIQUE_ADDRESS]] Sentinel m_sentinel;
 };
 
 struct drop_exception : std::runtime_error {
@@ -146,7 +146,7 @@ struct reduced_range_iterator {
 	}
 
 private:
-	BOUNDED_NO_UNIQUE_ADDRESS Iterator m_it;
+	[[BOUNDED_NO_UNIQUE_ADDRESS]] Iterator m_it;
 };
 
 template<auto max_size, typename T>

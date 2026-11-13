@@ -80,7 +80,7 @@ struct non_optional {
 
 	friend auto operator<=>(non_optional const &, non_optional const &) = default;
 private:
-	BOUNDED_NO_UNIQUE_ADDRESS T m_value;
+	[[BOUNDED_NO_UNIQUE_ADDRESS]] T m_value;
 };
 
 export template<typename Iterator>

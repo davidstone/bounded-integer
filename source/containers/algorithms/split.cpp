@@ -81,7 +81,7 @@ struct single_element_delimiter {
 		return iterator;
 	}
 private:
-	BOUNDED_NO_UNIQUE_ADDRESS reference_or_value<Delimiter> m_delimiter;
+	[[BOUNDED_NO_UNIQUE_ADDRESS]] reference_or_value<Delimiter> m_delimiter;
 };
 
 template<typename Delimiter>
@@ -111,7 +111,7 @@ struct range_delimiter {
 		return containers::next(std::move(it), delimiter_size);
 	}
 private:
-	BOUNDED_NO_UNIQUE_ADDRESS reference_or_value<Delimiter> m_delimiter;
+	[[BOUNDED_NO_UNIQUE_ADDRESS]] reference_or_value<Delimiter> m_delimiter;
 };
 
 template<typename Iterator, typename Sentinel, typename Delimiter, typename OutputDelimiter>
@@ -185,12 +185,12 @@ private:
 	constexpr auto find_from_first() const -> Iterator {
 		return m_delimiter.find(m_first, m_last);
 	}
-	BOUNDED_NO_UNIQUE_ADDRESS Iterator m_first;
-	BOUNDED_NO_UNIQUE_ADDRESS Sentinel m_last;
-	BOUNDED_NO_UNIQUE_ADDRESS Delimiter m_delimiter;
-	BOUNDED_NO_UNIQUE_ADDRESS Iterator m_middle;
-	BOUNDED_NO_UNIQUE_ADDRESS bool m_empty_trailing_range;
-	BOUNDED_NO_UNIQUE_ADDRESS OutputDelimiter m_found_delimiter;
+	[[BOUNDED_NO_UNIQUE_ADDRESS]] Iterator m_first;
+	[[BOUNDED_NO_UNIQUE_ADDRESS]] Sentinel m_last;
+	[[BOUNDED_NO_UNIQUE_ADDRESS]] Delimiter m_delimiter;
+	[[BOUNDED_NO_UNIQUE_ADDRESS]] Iterator m_middle;
+	[[BOUNDED_NO_UNIQUE_ADDRESS]] bool m_empty_trailing_range;
+	[[BOUNDED_NO_UNIQUE_ADDRESS]] OutputDelimiter m_found_delimiter;
 };
 
 // `split("a|b"_s, '|') == {"a"_s, "b"_s}`
@@ -230,8 +230,8 @@ struct split {
 		return std::default_sentinel;
 	}
 private:
-	BOUNDED_NO_UNIQUE_ADDRESS Range m_range;
-	BOUNDED_NO_UNIQUE_ADDRESS Delimiter m_delimiter;
+	[[BOUNDED_NO_UNIQUE_ADDRESS]] Range m_range;
+	[[BOUNDED_NO_UNIQUE_ADDRESS]] Delimiter m_delimiter;
 };
 
 template<typename Range, typename Delimiter>
@@ -278,8 +278,8 @@ struct split_range {
 		return std::default_sentinel;
 	}
 private:
-	BOUNDED_NO_UNIQUE_ADDRESS Range m_range;
-	BOUNDED_NO_UNIQUE_ADDRESS Delimiter m_delimiter;
+	[[BOUNDED_NO_UNIQUE_ADDRESS]] Range m_range;
+	[[BOUNDED_NO_UNIQUE_ADDRESS]] Delimiter m_delimiter;
 };
 
 template<typename Range, typename Delimiter>
@@ -322,8 +322,8 @@ struct split_keep_delimiters {
 		return std::default_sentinel;
 	}
 private:
-	BOUNDED_NO_UNIQUE_ADDRESS Range m_range;
-	BOUNDED_NO_UNIQUE_ADDRESS Delimiter m_delimiter;
+	[[BOUNDED_NO_UNIQUE_ADDRESS]] Range m_range;
+	[[BOUNDED_NO_UNIQUE_ADDRESS]] Delimiter m_delimiter;
 };
 
 template<typename Range, typename Delimiter>
@@ -370,8 +370,8 @@ struct split_range_keep_delimiters {
 		return std::default_sentinel;
 	}
 private:
-	BOUNDED_NO_UNIQUE_ADDRESS Range m_range;
-	BOUNDED_NO_UNIQUE_ADDRESS Delimiter m_delimiter;
+	[[BOUNDED_NO_UNIQUE_ADDRESS]] Range m_range;
+	[[BOUNDED_NO_UNIQUE_ADDRESS]] Delimiter m_delimiter;
 };
 
 template<typename Range, typename Delimiter>

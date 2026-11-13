@@ -96,7 +96,7 @@ public:
 
 	// Consider this private. It must be public for the class to be an
 	// aggregate
-	BOUNDED_NO_UNIQUE_ADDRESS monostate m_value;
+	[[BOUNDED_NO_UNIQUE_ADDRESS]] monostate m_value;
 };
 
 template<typename... Args>

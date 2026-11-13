@@ -62,8 +62,8 @@ struct with_inner_range {
 	}
 
 private:
-	BOUNDED_NO_UNIQUE_ADDRESS tv::optional<Range> m_range{};
-	BOUNDED_NO_UNIQUE_ADDRESS iterator_t<Range> m_it{};
+	[[BOUNDED_NO_UNIQUE_ADDRESS]] tv::optional<Range> m_range{};
+	[[BOUNDED_NO_UNIQUE_ADDRESS]] iterator_t<Range> m_it{};
 };
 
 template<typename Range> requires std::is_reference_v<Range>
@@ -112,8 +112,8 @@ private:
 		m_last(containers::end(OPERATORS_FORWARD(value)))
 	{
 	}
-	BOUNDED_NO_UNIQUE_ADDRESS iterator_t<Range> m_it;
-	BOUNDED_NO_UNIQUE_ADDRESS sentinel_t<Range> m_last;
+	[[BOUNDED_NO_UNIQUE_ADDRESS]] iterator_t<Range> m_it;
+	[[BOUNDED_NO_UNIQUE_ADDRESS]] sentinel_t<Range> m_last;
 };
 
 template<typename Joiner, typename Iterator>
@@ -227,10 +227,10 @@ private:
 		}
 	}
 
-	BOUNDED_NO_UNIQUE_ADDRESS std::reference_wrapper<JW> m_jw;
-	BOUNDED_NO_UNIQUE_ADDRESS Iterator m_outer_it;
-	BOUNDED_NO_UNIQUE_ADDRESS Sentinel m_outer_last;
-	BOUNDED_NO_UNIQUE_ADDRESS inner_t m_inner;
+	[[BOUNDED_NO_UNIQUE_ADDRESS]] std::reference_wrapper<JW> m_jw;
+	[[BOUNDED_NO_UNIQUE_ADDRESS]] Iterator m_outer_it;
+	[[BOUNDED_NO_UNIQUE_ADDRESS]] Sentinel m_outer_last;
+	[[BOUNDED_NO_UNIQUE_ADDRESS]] inner_t m_inner;
 };
 
 export template<range Range, forward_range Joiner>
@@ -304,9 +304,9 @@ private:
 	friend struct join_with_iterator;
 	using joiner_t = Joiner;
 
-	BOUNDED_NO_UNIQUE_ADDRESS Range m_range;
-	BOUNDED_NO_UNIQUE_ADDRESS Joiner m_joiner;
-	BOUNDED_NO_UNIQUE_ADDRESS with_inner_range<range_reference_t<Range>> m_inner;
+	[[BOUNDED_NO_UNIQUE_ADDRESS]] Range m_range;
+	[[BOUNDED_NO_UNIQUE_ADDRESS]] Joiner m_joiner;
+	[[BOUNDED_NO_UNIQUE_ADDRESS]] with_inner_range<range_reference_t<Range>> m_inner;
 };
 
 template<range Range, forward_range Joiner>

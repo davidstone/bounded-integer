@@ -52,7 +52,7 @@ struct adapt_sentinel {
 	}
 
 private:
-	BOUNDED_NO_UNIQUE_ADDRESS Sentinel m_base;
+	[[BOUNDED_NO_UNIQUE_ADDRESS]] Sentinel m_base;
 };
 
 template<typename T>
@@ -185,8 +185,8 @@ public:
 	}
 
 private:
-	BOUNDED_NO_UNIQUE_ADDRESS Iterator m_base;
-	BOUNDED_NO_UNIQUE_ADDRESS TraitsStorage m_traits;
+	[[BOUNDED_NO_UNIQUE_ADDRESS]] Iterator m_base;
+	[[BOUNDED_NO_UNIQUE_ADDRESS]] TraitsStorage m_traits;
 };
 
 export template<typename Iterator, typename TraitsStorage>

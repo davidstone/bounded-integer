@@ -206,7 +206,7 @@ struct integer {
 public:
 	// Do not access this directly. This must be public to be usable as a
 	// non-type template parameter in C++20.
-	BOUNDED_NO_UNIQUE_ADDRESS underlying_type m_value;
+	[[BOUNDED_NO_UNIQUE_ADDRESS]] underlying_type m_value;
 };
 
 template<typename T>

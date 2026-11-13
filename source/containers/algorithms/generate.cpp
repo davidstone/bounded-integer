@@ -77,7 +77,7 @@ private:
 	constexpr auto populate_cache() {
 		m_cached = std::invoke(m_function);
 	}
-	BOUNDED_NO_UNIQUE_ADDRESS Function m_function;
+	[[BOUNDED_NO_UNIQUE_ADDRESS]] Function m_function;
 	std::invoke_result_t<Function &> m_cached;
 };
 
@@ -140,8 +140,8 @@ struct generate_n_iterator {
 		}
 	}
 private:
-	BOUNDED_NO_UNIQUE_ADDRESS Offset m_remaining;
-	BOUNDED_NO_UNIQUE_ADDRESS stored_function<Function> m_generator;
+	[[BOUNDED_NO_UNIQUE_ADDRESS]] Offset m_remaining;
+	[[BOUNDED_NO_UNIQUE_ADDRESS]] stored_function<Function> m_generator;
 };
 
 template<typename Offset, typename Function, bool indexed>
@@ -206,8 +206,8 @@ private:
 		stored_function<Function const, generate_index_type<Offset>>,
 		stored_function<Function const>
 	>;
-	BOUNDED_NO_UNIQUE_ADDRESS Offset m_offset;
-	BOUNDED_NO_UNIQUE_ADDRESS function_t m_generator;
+	[[BOUNDED_NO_UNIQUE_ADDRESS]] Offset m_offset;
+	[[BOUNDED_NO_UNIQUE_ADDRESS]] function_t m_generator;
 };
 
 template<typename Function>
@@ -216,8 +216,8 @@ concept mutable_invocable = std::invocable<Function &>;
 export template<typename Size, mutable_invocable Function>
 struct generate_n {
 private:
-	BOUNDED_NO_UNIQUE_ADDRESS Size m_size;
-	BOUNDED_NO_UNIQUE_ADDRESS Function m_generator;
+	[[BOUNDED_NO_UNIQUE_ADDRESS]] Size m_size;
+	[[BOUNDED_NO_UNIQUE_ADDRESS]] Function m_generator;
 
 public:
 	constexpr generate_n(Size const size, Function generator):
@@ -253,8 +253,8 @@ export template<typename Size, idempotent_invocable Function>
 struct generate_n_idempotent {
 	static_assert(!numeric_traits::unsigned_builtin<Size>);
 private:
-	BOUNDED_NO_UNIQUE_ADDRESS Size m_size;
-	BOUNDED_NO_UNIQUE_ADDRESS Function m_generator;
+	[[BOUNDED_NO_UNIQUE_ADDRESS]] Size m_size;
+	[[BOUNDED_NO_UNIQUE_ADDRESS]] Function m_generator;
 
 public:
 	constexpr generate_n_idempotent(Size const size, Function generator):
@@ -278,8 +278,8 @@ export template<typename Size, index_invocable<Size> Function>
 struct indexed_generate_n {
 	static_assert(!numeric_traits::unsigned_builtin<Size>);
 private:
-	BOUNDED_NO_UNIQUE_ADDRESS Size m_size;
-	BOUNDED_NO_UNIQUE_ADDRESS Function m_generator;
+	[[BOUNDED_NO_UNIQUE_ADDRESS]] Size m_size;
+	[[BOUNDED_NO_UNIQUE_ADDRESS]] Function m_generator;
 public:
 	constexpr indexed_generate_n(Size const size, Function generator):
 		m_size(size),
@@ -307,7 +307,7 @@ struct generate_until_sentinel {
 		return std::invoke(m_is_done.get());
 	}
 private:
-	BOUNDED_NO_UNIQUE_ADDRESS stored_function<Function> m_is_done;
+	[[BOUNDED_NO_UNIQUE_ADDRESS]] stored_function<Function> m_is_done;
 };
 
 } // namespace containers

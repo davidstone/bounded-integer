@@ -57,7 +57,7 @@ struct variant_index {
 		std::unreachable();
 	}
 private:
-	BOUNDED_NO_UNIQUE_ADDRESS integer_index m_index;
+	[[BOUNDED_NO_UNIQUE_ADDRESS]] integer_index m_index;
 
 	constexpr explicit variant_index(bounded::tombstone_tag, auto const make):
 		m_index(make())

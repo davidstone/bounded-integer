@@ -32,7 +32,7 @@ struct generate_until_sentinel {
 		return std::invoke(m_is_done.get());
 	}
 private:
-	BOUNDED_NO_UNIQUE_ADDRESS stored_function<Function> m_is_done;
+	[[BOUNDED_NO_UNIQUE_ADDRESS]] stored_function<Function> m_is_done;
 };
 
 template<typename Function>
@@ -64,7 +64,7 @@ struct generate_until_iterator {
 		return it;
 	}
 private:
-	BOUNDED_NO_UNIQUE_ADDRESS stored_function<Function> m_generator;
+	[[BOUNDED_NO_UNIQUE_ADDRESS]] stored_function<Function> m_generator;
 };
 
 export template<std::invocable Function, typename UntilFunction> requires bounded::invocable_r<UntilFunction const &, bool>
@@ -85,8 +85,8 @@ struct generate_until {
 		return generate_until_sentinel(m_until);
 	}
 private:
-	BOUNDED_NO_UNIQUE_ADDRESS Function m_generator;
-	BOUNDED_NO_UNIQUE_ADDRESS UntilFunction m_until;
+	[[BOUNDED_NO_UNIQUE_ADDRESS]] Function m_generator;
+	[[BOUNDED_NO_UNIQUE_ADDRESS]] UntilFunction m_until;
 };
 
 } // namespace containers

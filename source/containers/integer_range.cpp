@@ -91,8 +91,8 @@ public:
 private:
 	static constexpr auto has_no_values = numeric_traits::max_value<difference_type> == 0_bi;
 
-	BOUNDED_NO_UNIQUE_ADDRESS storage_type m_value;
-	BOUNDED_NO_UNIQUE_ADDRESS Step m_step;
+	[[BOUNDED_NO_UNIQUE_ADDRESS]] storage_type m_value;
+	[[BOUNDED_NO_UNIQUE_ADDRESS]] Step m_step;
 };
 
 export template<bounded::integral Integer, bounded::integral Sentinel = Integer, bounded::integral Step = bounded::constant_t<1>>
@@ -139,9 +139,9 @@ struct integer_range {
 	OPERATORS_BRACKET_SEQUENCE_RANGE_DEFINITIONS
 
 private:
-	BOUNDED_NO_UNIQUE_ADDRESS Integer m_begin;
-	BOUNDED_NO_UNIQUE_ADDRESS Sentinel m_end;
-	BOUNDED_NO_UNIQUE_ADDRESS Step m_step;
+	[[BOUNDED_NO_UNIQUE_ADDRESS]] Integer m_begin;
+	[[BOUNDED_NO_UNIQUE_ADDRESS]] Sentinel m_end;
+	[[BOUNDED_NO_UNIQUE_ADDRESS]] Step m_step;
 };
 
 template<typename Size>

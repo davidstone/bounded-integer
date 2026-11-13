@@ -197,8 +197,8 @@ private:
 		remove_duplicates(begin());
 	}
 
-	BOUNDED_NO_UNIQUE_ADDRESS Container m_container;
-	BOUNDED_NO_UNIQUE_ADDRESS Equal m_equal;
+	[[BOUNDED_NO_UNIQUE_ADDRESS]] Container m_container;
+	[[BOUNDED_NO_UNIQUE_ADDRESS]] Equal m_equal;
 };
 
 template<typename Range>

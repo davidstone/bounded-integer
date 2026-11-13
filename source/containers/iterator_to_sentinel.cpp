@@ -18,7 +18,7 @@ namespace containers {
 export template<typename Iterator>
 struct iterator_to_sentinel {
 private:
-	BOUNDED_NO_UNIQUE_ADDRESS Iterator m_base;
+	[[BOUNDED_NO_UNIQUE_ADDRESS]] Iterator m_base;
 public:
 	iterator_to_sentinel() = default;
 

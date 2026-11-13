@@ -34,8 +34,8 @@ struct dynamic_array_data {
 	{
 	}
 
-	BOUNDED_NO_UNIQUE_ADDRESS T * pointer;
-	BOUNDED_NO_UNIQUE_ADDRESS Size size;
+	[[BOUNDED_NO_UNIQUE_ADDRESS]] T * pointer;
+	[[BOUNDED_NO_UNIQUE_ADDRESS]] Size size;
 };
 
 template<typename T>

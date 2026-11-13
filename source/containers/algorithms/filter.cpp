@@ -49,8 +49,8 @@ struct filter_iterator_traits : default_dereference, default_compare {
 		);
 	}
 private:
-	BOUNDED_NO_UNIQUE_ADDRESS Sentinel m_sentinel;
-	BOUNDED_NO_UNIQUE_ADDRESS reference_or_value<UnaryPredicate> m_predicate;
+	[[BOUNDED_NO_UNIQUE_ADDRESS]] Sentinel m_sentinel;
+	[[BOUNDED_NO_UNIQUE_ADDRESS]] reference_or_value<UnaryPredicate> m_predicate;
 };
 
 template<typename UnaryPredicate>
@@ -81,7 +81,7 @@ struct filter_traits {
 	}
 
 private:
-	BOUNDED_NO_UNIQUE_ADDRESS UnaryPredicate m_predicate;
+	[[BOUNDED_NO_UNIQUE_ADDRESS]] UnaryPredicate m_predicate;
 };
 
 export constexpr auto filter(range auto && source, auto predicate) -> range auto {

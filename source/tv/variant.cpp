@@ -264,8 +264,8 @@ private:
 		);
 	}
 
-	BOUNDED_NO_UNIQUE_ADDRESS variadic_union<Ts...> m_data;
-	BOUNDED_NO_UNIQUE_ADDRESS variant_index<Ts...> m_index;
+	[[BOUNDED_NO_UNIQUE_ADDRESS]] variadic_union<Ts...> m_data;
+	[[BOUNDED_NO_UNIQUE_ADDRESS]] variant_index<Ts...> m_index;
 
 	constexpr explicit variant(bounded::tombstone_tag, auto const make):
 		m_data(uninitialized_union()),

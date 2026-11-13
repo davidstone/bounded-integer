@@ -64,7 +64,7 @@ private:
 #if defined __GNUC__ and !defined __clang__
 	T m_value;
 #else
-	BOUNDED_NO_UNIQUE_ADDRESS T m_value;
+	[[BOUNDED_NO_UNIQUE_ADDRESS]] T m_value;
 #endif
 };
 

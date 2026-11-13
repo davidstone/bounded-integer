@@ -55,8 +55,8 @@ union [[clang::trivial_abi]] variadic_union<T, Ts...> {
 		}
 	}
 
-	BOUNDED_NO_UNIQUE_ADDRESS T head;
-	BOUNDED_NO_UNIQUE_ADDRESS variadic_union<Ts...> tail;
+	[[BOUNDED_NO_UNIQUE_ADDRESS]] T head;
+	[[BOUNDED_NO_UNIQUE_ADDRESS]] variadic_union<Ts...> tail;
 };
 
 } // namespace tv

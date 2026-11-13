@@ -52,7 +52,7 @@ static_assert(!bounded::constructible_from<const_function, long(*)()>);
 
 template<std::size_t size>
 struct sized_function {
-	BOUNDED_NO_UNIQUE_ADDRESS containers::array<std::byte, bounded::constant<size>> a;
+	[[BOUNDED_NO_UNIQUE_ADDRESS]] containers::array<std::byte, bounded::constant<size>> a;
 	auto operator()() const {
 		return 1;
 	}
