@@ -66,14 +66,16 @@ struct array {
 	c_array<value_type, static_cast<std::size_t>(size_)> m_value;
 };
 
+struct empty {};
+
 template<typename T, array_size_type<T> size_> requires(size_ == 0_bi)
 struct array<T, size_> {
-private:
-	struct monostate {
-		friend auto operator<=>(monostate, monostate) = default;
-	};
-public:
 	using value_type = T;
+
+	array() = default;
+	template<typename U = empty>
+	constexpr array(U) noexcept {
+	}
 
 	static constexpr auto size() -> bounded::constant_t<0> {
 		return 0_bi;
@@ -93,10 +95,6 @@ public:
 	constexpr operator std::span<T, 0>() {
 		return std::span<T const, 0>(data(), 0);
 	}
-
-	// Consider this private. It must be public for the class to be an
-	// aggregate
-	[[BOUNDED_NO_UNIQUE_ADDRESS]] monostate m_value;
 };
 
 template<typename... Args>
