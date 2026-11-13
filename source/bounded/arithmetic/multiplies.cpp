@@ -132,7 +132,7 @@ static_assert(homogeneous_equals(
 	signed_min
 ));
 
-#if NUMERIC_TRAITS_HAS_INT128
+#if defined NUMERIC_TRAITS_HAS_INT128
 
 static_assert(homogeneous_equals(
 	bounded::constant<1'000'000'000'000'000'000> * bounded::constant<1'000'000'000'000'000'000>,
