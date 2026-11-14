@@ -35,13 +35,19 @@ TEST_CASE("format: Format large integer") {
 }
 
 #if defined NUMERIC_TRAITS_HAS_INT128
-TEST_CASE("format: Format very large integer") {
-	if constexpr (std::formattable<numeric_traits::int128_t, char>) {
+
+template<typename T>
+constexpr auto check_format_if_formattable() -> void {
+	if constexpr (std::formattable<T, char>) {
 		CHECK(
-			std::format("{}", bounded::integer(numeric_traits::max_value<numeric_traits::int128_t>)) ==
+			std::format("{}", bounded::integer(numeric_traits::max_value<T>)) ==
 			"170141183460469231731687303715884105727"
 		);
 	}
+}
+
+TEST_CASE("format: Format very large integer") {
+	check_format_if_formattable<numeric_traits::int128_t>();
 }
 #endif
 
