@@ -158,7 +158,8 @@ static_assert(sizeof(tv::tuple<int>) == sizeof(int));
 static_assert(sizeof(tv::tuple<int, tv::tuple<int>>) == sizeof(int) * 2);
 
 // Work around https://gcc.gnu.org/bugzilla/show_bug.cgi?id=98995
-#if !defined __GNUC__ or defined __clang__
+// Work around `[[msvc::no_unique_address]]` only sometimes working
+#if defined __clang__ and !defined _WIN32
 static_assert(sizeof(tv::tuple<int, empty>) == sizeof(int));
 #endif
 
