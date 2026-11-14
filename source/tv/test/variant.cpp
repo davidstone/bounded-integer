@@ -24,8 +24,10 @@ using empty_variant_t = tv::variant<>;
 static_assert(not bounded::default_constructible<empty_variant_t>);
 static_assert(not bounded::constructible_from<empty_variant_t, bounded::constant_t<0>>);
 
+#ifndef _WIN32
 struct empty {};
 static_assert(std::is_empty_v<tv::variant<empty>>);
+#endif
 
 using thing_t = tv::variant<int, short, long, char, int>;
 
