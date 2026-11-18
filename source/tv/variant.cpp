@@ -191,9 +191,9 @@ public:
 
 
 	constexpr auto operator[](this auto && v, unique_type_identifier<Ts...> auto index_) -> auto && {
-		return OPERATORS_FORWARD(v).m_data[
-			::tv::get_index(index_, bounded::type<Ts>...)
-		];
+		auto const index = ::tv::get_index(index_, bounded::type<Ts>...);
+		BOUNDED_ASSERT(index == v.m_index);
+		return OPERATORS_FORWARD(v).m_data[index];
 	}
 
 	template<typename Index>
