@@ -84,8 +84,11 @@ public:
 		Index const index_,
 		bounded::construct_function_for<type_at<Index>> auto && construct_
 	):
-	m_data(::tv::get_index(index_, bounded::type<Ts>...), OPERATORS_FORWARD(construct_)),
-	m_index(::tv::get_index(index_, bounded::type<Ts>...))
+		m_data(
+			::tv::get_index(index_, bounded::type<Ts>...),
+			OPERATORS_FORWARD(construct_)
+		),
+		m_index(::tv::get_index(index_, bounded::type<Ts>...))
 	{
 	}
 
