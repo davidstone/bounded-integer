@@ -57,16 +57,11 @@ private:
 };
 
 template<typename T>
-constexpr auto compatible(T const & range) {
-	if constexpr (associative_range<T>) {
-		return fmt_associative(range);
-	} else {
-		return fmt_range(range);
-	}
-}
-
-template<typename T>
-using compatible_t = decltype(::containers::compatible(bounded::declval<T const &>()));
+using compatible = std::conditional_t<
+	associative_range<T const &>,
+	fmt_associative<T>,
+	fmt_range<T>
+>;
 
 template<typename T>
 concept uses_bounded_integers = bounded::bounded_integer<
@@ -92,10 +87,10 @@ struct std::formatter<T> {
 	}
 
 	constexpr auto format(T const & range, auto & context) const {
-		auto const view = ::containers::compatible(range);
+		auto const view = ::containers::compatible<T>(range);
 		return m_underlying.format(view, context);
 	}
 
 private:
-	std::formatter<containers::compatible_t<T>> m_underlying;
+	std::formatter<containers::compatible<T>> m_underlying;
 };
