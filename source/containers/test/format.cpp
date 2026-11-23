@@ -24,9 +24,9 @@ TEST_CASE("containers: format non-empty array") {
 }
 
 TEST_CASE("containers: format empty flat_set") {
-	CHECK(std::format("{}", containers::flat_set<int>()) == "{}"_sv);
+	CHECK(std::format("{}", containers::flat_set<int>()) == "[]"_sv);
 }
 
 TEST_CASE("containers: format non-empty flat_set") {
-	CHECK(std::format("{}", containers::flat_set<int>({2})) == "{2}"_sv);
+	CHECK(std::format("{}", containers::flat_set<int>({2})) == "[2]"_sv);
 }

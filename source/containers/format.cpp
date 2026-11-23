@@ -76,9 +76,12 @@ concept non_std_formattable_range =
 
 } // namespace containers
 
+#if 0
+// Disabled until https://github.com/llvm/llvm-project/issues/244974 is fixed
 // We format `map_value_type`, so we do not need special map vs. set handling.
 template<typename T>
 constexpr auto std::format_kind<containers::fmt_associative<T>> = std::range_format::set;
+#endif
 
 template<containers::non_std_formattable_range T>
 struct std::formatter<T> {
