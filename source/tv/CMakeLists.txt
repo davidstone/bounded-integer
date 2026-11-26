@@ -54,9 +54,7 @@ target_sources(tv_test PRIVATE
 )
 
 target_link_libraries(tv_test PUBLIC
-	bounded
 	doctest::doctest_with_main
-	std_module
 	strict_defaults
 	tv
 )
